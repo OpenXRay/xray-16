@@ -639,10 +639,8 @@ void FrameGraphRenderer::RenderStatsOverlay()
         {
             stats.detailSlots = m_detailManager->slot_count;
             stats.detailInstances = m_detailManager->total_instance_count;
-            // Triangles per blade depends on LOD (LOD0 = 9 segments = 18 tris, etc.)
-            // Use LOD0 as reference
-            if (m_detailManager->bladeIndexCount[0] > 0)
-                stats.detailTrianglesPerBlade = m_detailManager->bladeIndexCount[0] / 3;
+            for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
+                stats.detailTrisPerBlade[lod] = m_detailManager->bladeIndexCount[lod] / 3;
 
             // GPU culling stats (from readback)
             const auto& cullStats = m_detailManager->GetCullingStats();

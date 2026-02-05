@@ -47,27 +47,17 @@ StructuredBuffer<uint> g_instance_to_slot : register(t2);     // Maps instance_i
 Texture2D<float> g_hiz_pyramid : register(t3);
 SamplerState g_point_sampler : register(s0);
 
-// ===========================
 // Output Buffers (Per-LOD)
-// ===========================
-
-// LOD0 (close - highest detail)
 RWStructuredBuffer<InstanceData> g_visible_lod0 : register(u0);
-RWByteAddressBuffer g_visible_count_lod0 : register(u1);
-RWByteAddressBuffer g_indirect_args_lod0 : register(u2);
+RWByteAddressBuffer g_indirect_args_lod0 : register(u1);
 
-// LOD1 (mid - medium detail)
-RWStructuredBuffer<InstanceData> g_visible_lod1 : register(u3);
-RWByteAddressBuffer g_visible_count_lod1 : register(u4);
-RWByteAddressBuffer g_indirect_args_lod1 : register(u5);
+RWStructuredBuffer<InstanceData> g_visible_lod1 : register(u2);
+RWByteAddressBuffer g_indirect_args_lod1 : register(u3);
 
-// LOD2 (far - low detail)
-RWStructuredBuffer<InstanceData> g_visible_lod2 : register(u6);
-RWByteAddressBuffer g_visible_count_lod2 : register(u7);
-RWByteAddressBuffer g_indirect_args_lod2 : register(u8);
+RWStructuredBuffer<InstanceData> g_visible_lod2 : register(u4);
+RWByteAddressBuffer g_indirect_args_lod2 : register(u5);
 
 
-// Append instance to appropriate LOD buffer based on distance
 void AppendInstanceLOD(InstanceData inst)
 {
     float3 to_camera = inst.pos - g_camera_pos;
@@ -76,24 +66,18 @@ void AppendInstanceLOD(InstanceData inst)
     uint idx;
     if (dist_sqr < g_lod_distance_close_sqr)
     {
-        // LOD0 - close range, highest detail
-        g_visible_count_lod0.InterlockedAdd(0, 1, idx);
+        g_indirect_args_lod0.InterlockedAdd(4, 1, idx);
         g_visible_lod0[idx] = inst;
-        g_indirect_args_lod0.InterlockedAdd(4, 1, idx);  // InstanceCount at offset 4
     }
     else if (dist_sqr < g_lod_distance_mid_sqr)
     {
-        // LOD1 - mid range, medium detail
-        g_visible_count_lod1.InterlockedAdd(0, 1, idx);
-        g_visible_lod1[idx] = inst;
         g_indirect_args_lod1.InterlockedAdd(4, 1, idx);
+        g_visible_lod1[idx] = inst;
     }
     else
     {
-        // LOD2 - far range, low detail
-        g_visible_count_lod2.InterlockedAdd(0, 1, idx);
-        g_visible_lod2[idx] = inst;
         g_indirect_args_lod2.InterlockedAdd(4, 1, idx);
+        g_visible_lod2[idx] = inst;
     }
 }
 

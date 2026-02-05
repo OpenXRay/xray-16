@@ -50,7 +50,7 @@ struct RenderStats
     // Detail/grass stats
     u32 detailInstances = 0;     // Total grass instances
     u32 detailSlots = 0;         // Detail slots
-    u32 detailTrianglesPerBlade = 0;  // Triangles per grass blade (LOD dependent)
+    u32 detailTrisPerBlade[3] = {0, 0, 0};  // Triangles per blade per LOD (from bladeIndexCount/3)
 
     // Detail culling stats (from GPU readback)
     u32 detailVisibleSlots = 0;  // Slots that passed frustum culling
@@ -66,7 +66,8 @@ struct RenderStats
         megaBufferVertices = megaBufferIndices = 0;
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
         skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
-        detailInstances = detailSlots = detailTrianglesPerBlade = 0;
+        detailInstances = detailSlots = 0;
+        detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;
         detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;
     }
 };

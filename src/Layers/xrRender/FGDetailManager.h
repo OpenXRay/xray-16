@@ -158,7 +158,6 @@ public:
 
     // GPU culling buffers (per-LOD)
     nvrhi::BufferHandle visibleInstancesBuffer[LOD_COUNT];  // Output: visible instances per LOD
-    nvrhi::BufferHandle visibleCountBuffer[LOD_COUNT];      // Output: atomic counter per LOD
     nvrhi::BufferHandle drawArgsBuffer[LOD_COUNT];          // Output: indirect draw args per LOD
     nvrhi::BufferHandle slotAABBBuffer;                     // Input: slot bounding boxes (shared)
 
@@ -229,6 +228,7 @@ public:
     DetailCullingStats cullingStats;
     nvrhi::BufferHandle statsReadbackBuffer;  // CPU-readable buffer for stats
     bool statsReadbackPending = false;
+    u32 statsFrameCounter = 0;
 
     // ═══════════════════════════════════════════════════════
     //  CACHED PER-FRAME RESOURCES

@@ -533,30 +533,6 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             }
         }
 
-        // Visible count buffer
-        {
-            nvrhi::BufferDesc desc;
-            desc.byteSize = sizeof(u32);
-            desc.structStride = 0;
-            desc.debugName = ("DetailVisibleCountLOD" + std::to_string(lod)).c_str();
-            desc.canHaveUAVs = true;
-            desc.canHaveTypedViews = false;
-            desc.isVertexBuffer = false;
-            desc.isIndexBuffer = false;
-            desc.isConstantBuffer = false;
-            desc.isDrawIndirectArgs = false;
-            desc.canHaveRawViews = true;
-            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-            desc.keepInitialState = false;
-
-            visibleCountBuffer[lod] = device->createBuffer(desc);
-            if (!visibleCountBuffer[lod])
-            {
-                Msg("! [FGDetailManager] Failed to create visible count buffer LOD%u", lod);
-                return false;
-            }
-        }
-
         // Draw args buffer (indirect draw arguments)
         {
             nvrhi::BufferDesc desc;
@@ -698,6 +674,21 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         if (!instanceToSlotBuffer)
         {
             Msg("! [FGDetailManager] Failed to create instance-to-slot buffer");
+            return false;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = sizeof(u32) * 4;
+        desc.debugName = "DetailStatsReadback";
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+        statsReadbackBuffer = device->createBuffer(desc);
+        if (!statsReadbackBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create stats readback buffer");
             return false;
         }
     }
@@ -880,7 +871,6 @@ void FGDetailManager::DestroyGPUBuffers()
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         visibleInstancesBuffer[lod] = nullptr;
-        visibleCountBuffer[lod] = nullptr;
         drawArgsBuffer[lod] = nullptr;
         bladeVertexBuffer[lod] = nullptr;
         bladeIndexBuffer[lod] = nullptr;
@@ -1231,9 +1221,12 @@ void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
     // Upload slot AABBs
     cmdList->writeBuffer(slotAABBBuffer, slot_aabbs.data(), slot_aabbs.size() * sizeof(SlotAABB));
 
-    // Upload instance-to-slot mapping
     if (instanceToSlotBuffer && !instanceToSlotMapping.empty())
+    {
         cmdList->writeBuffer(instanceToSlotBuffer, instanceToSlotMapping.data(), instanceToSlotMapping.size() * sizeof(u32));
+        instanceToSlotMapping.clear();
+        instanceToSlotMapping.shrink_to_fit();
+    }
 }
 
 bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
@@ -1292,19 +1285,12 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),    // t2: instance-to-slot mapping
             nvrhi::BindingLayoutItem::Texture_SRV(3),             // t3: Hi-Z pyramid
             nvrhi::BindingLayoutItem::Sampler(0),                 // s0: point sampler
-            // Per-LOD output buffers
-            // LOD0
             nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),    // u0: visible instances LOD0
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),           // u1: visible count LOD0
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(2),           // u2: indirect args LOD0
-            // LOD1
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(3),    // u3: visible instances LOD1
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(4),           // u4: visible count LOD1
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(5),           // u5: indirect args LOD1
-            // LOD2
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(6),    // u6: visible instances LOD2
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(7),           // u7: visible count LOD2
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(8),           // u8: indirect args LOD2
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),           // u1: indirect args LOD0
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2),    // u2: visible instances LOD1
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(3),           // u3: indirect args LOD1
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(4),    // u4: visible instances LOD2
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(5),           // u5: indirect args LOD2
         };
 
         computeBindingLayout = device->createBindingLayout(layoutDesc);
@@ -1492,7 +1478,6 @@ void FGDetailManager::DispatchCulling(
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         cmdList->beginTrackingBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
-        cmdList->beginTrackingBufferState(visibleCountBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
         cmdList->beginTrackingBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
     }
     cmdList->beginTrackingTextureState(hiZPyramid, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
@@ -1504,7 +1489,6 @@ void FGDetailManager::DispatchCulling(
     struct IndirectDrawArgs { u32 indexCount, instanceCount, startIndex; s32 baseVertex; u32 startInstance; };
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
-        cmdList->clearBufferUInt(visibleCountBuffer[lod], zero);
         IndirectDrawArgs args = { bladeIndexCount[lod], 0, 0, 0, 0 };
         cmdList->writeBuffer(drawArgsBuffer[lod], &args, sizeof(args));
     }
@@ -1551,18 +1535,12 @@ void FGDetailManager::DispatchCulling(
             nvrhi::BindingSetItem::StructuredBuffer_SRV(2, instanceToSlotBuffer),
             nvrhi::BindingSetItem::Texture_SRV(3, hiZPyramid),
             nvrhi::BindingSetItem::Sampler(0, cachedSmp_PointClamp),
-            // LOD0
             nvrhi::BindingSetItem::StructuredBuffer_UAV(0, visibleInstancesBuffer[0]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(1, visibleCountBuffer[0]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(2, drawArgsBuffer[0]),
-            // LOD1
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(3, visibleInstancesBuffer[1]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(4, visibleCountBuffer[1]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(5, drawArgsBuffer[1]),
-            // LOD2
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(6, visibleInstancesBuffer[2]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(7, visibleCountBuffer[2]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(8, drawArgsBuffer[2]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(1, drawArgsBuffer[0]),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(2, visibleInstancesBuffer[1]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(3, drawArgsBuffer[1]),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(4, visibleInstancesBuffer[2]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(5, drawArgsBuffer[2]),
         };
 
         nvrhi::BindingSetHandle instanceCullBindingSet = device->createBindingSet(bindDesc, computeBindingLayout);
@@ -1576,12 +1554,14 @@ void FGDetailManager::DispatchCulling(
         cmdList->dispatch(numGroups, 1, 1);
     }
 
-    // Transition outputs for graphics draws
+    cmdList->setBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         cmdList->setBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::ShaderResource);
         cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::IndirectArgument);
     }
+    cmdList->commitBarriers();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1590,23 +1570,8 @@ void FGDetailManager::DispatchCulling(
 
 void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device)
 {
-    if (!device || !cmdList)
+    if (!device || !cmdList || !statsReadbackBuffer)
         return;
-
-    // Create readback buffer on first use (4 u32s: slots + 3 LODs)
-    if (!statsReadbackBuffer)
-    {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32) * 4;  // visibleSlots, LOD0, LOD1, LOD2
-        desc.debugName = "DetailStatsReadback";
-        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
-        desc.initialState = nvrhi::ResourceStates::CopyDest;
-        desc.keepInitialState = true;
-        statsReadbackBuffer = device->createBuffer(desc);
-
-        if (!statsReadbackBuffer)
-            return;
-    }
 
     // Copy visible slot counter to readback buffer (offset 0)
     if (visibleSlotCounterBuffer)
@@ -1618,18 +1583,24 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
         );
     }
 
-    // Copy LOD visible counts to readback buffer (offsets 4, 8, 12)
+    // Copy instanceCount from drawArgsBuffer (offset 4) for each LOD
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
-        if (visibleCountBuffer[lod])
+        if (drawArgsBuffer[lod])
         {
             cmdList->copyBuffer(
                 statsReadbackBuffer, sizeof(u32) * (1 + lod),
-                visibleCountBuffer[lod], 0,
+                drawArgsBuffer[lod], sizeof(u32),  // instanceCount at offset 4
                 sizeof(u32)
             );
         }
     }
+
+    // Transition source buffers back after copies
+    cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+        cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::IndirectArgument);
+    cmdList->commitBarriers();
 
     statsReadbackPending = true;
 }
@@ -1640,10 +1611,9 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
         return;
 
     // Only read back at the same interval as CPU profiler for consistency
-    static u32 frameCounter = 0;
-    frameCounter++;
+    statsFrameCounter++;
     const u32 throttleInterval = xray::profiler::GetCPUProfiler().GetThrottleInterval();
-    if ((frameCounter % throttleInterval) != 0)
+    if ((statsFrameCounter % throttleInterval) != 0)
         return;
 
     // Map the readback buffer and read the values
