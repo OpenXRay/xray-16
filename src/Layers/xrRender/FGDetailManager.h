@@ -120,11 +120,23 @@ public:
     nvrhi::BufferHandle slotAABBBuffer;                     // Input: slot bounding boxes (shared)
 
     // Phase 6B: Visible slot tracking (for page table system)
-    nvrhi::BufferHandle visibleSlotIDsBuffer;   // u33: visible slot IDs
-    nvrhi::BufferHandle visibleSlotCounterBuffer; // u34: visible slot counter
+    nvrhi::BufferHandle visibleSlotIDsBuffer;   // visible slot IDs
+    nvrhi::BufferHandle visibleSlotCounterBuffer; // visible slot counter
 
-    // Culling compute shader
+    // Two-pass culling buffers
+    nvrhi::BufferHandle slotVisibilityBuffer;    // Per-slot visibility flag (u32 per slot, written by Pass 1)
+    nvrhi::BufferHandle instanceToSlotBuffer;    // Maps instance_idx -> slot_idx (u32 per instance)
+    xr_vector<u32> instanceToSlotMapping;        // CPU-side copy for upload
+
+    // Pass 1: Slot culling compute shader + pipeline
+    nvrhi::ShaderHandle slotCullComputeShader;
+    nvrhi::BindingLayoutHandle slotCullBindingLayout;
+    nvrhi::ComputePipelineHandle slotCullPipeline;
+
+    // Pass 2: Instance culling compute shader + pipeline
     nvrhi::ShaderHandle cullComputeShader;
+    nvrhi::BindingLayoutHandle computeBindingLayout;
+    nvrhi::ComputePipelineHandle computePipeline;
 
     // Graphics shaders
     nvrhi::ShaderHandle vertexShader;
@@ -134,10 +146,6 @@ public:
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::BindingLayoutHandle graphicsBindingLayout;
     nvrhi::GraphicsPipelineHandle graphicsPipeline;
-
-    // Compute pipeline (for GPU culling)
-    nvrhi::BindingLayoutHandle computeBindingLayout;
-    nvrhi::ComputePipelineHandle computePipeline;
 
     // Max capacity for culling buffers
     u32 visibleBufferCapacity = 0;
