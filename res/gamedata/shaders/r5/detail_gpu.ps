@@ -124,6 +124,11 @@ f_forward main(p_flat I)
     float3 worldPos = viewPosToWorld(I.position.xyz);
     float hemi = I.position.w;
 
+    float viewDist = length(I.position.xyz);
+    float distFade = exp(-viewDist * 0.017);
+    float3 midColor = (grass_color_base.rgb + grass_color_tip.rgb) * 0.5;
+    grassAlbedo = lerp(midColor, grassAlbedo, distFade);
+
     float3 sss = ComputeGrassSSS(Nw, -L_sun_dir_w, t);
     float3 finalAlbedo = grassAlbedo + sss * L_sun_color;
 
