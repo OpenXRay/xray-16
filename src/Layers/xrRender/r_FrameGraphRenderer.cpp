@@ -455,8 +455,8 @@ void FrameGraphRenderer::RenderStatsOverlay()
         {
             stats.detailSlots = m_detailManager->slot_count;
             stats.detailInstances = m_detailManager->total_instance_count;
-            if (m_detailManager->bladeIndexCount[0] > 0)
-                stats.detailTrianglesPerBlade = m_detailManager->bladeIndexCount[0] / 3;
+            for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
+                stats.detailTrisPerBlade[lod] = m_detailManager->bladeIndexCount[lod] / 3;
 
             const auto& cullStats = m_detailManager->GetCullingStats();
             stats.detailVisibleSlots = cullStats.visibleSlotsCount;

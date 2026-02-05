@@ -482,29 +482,6 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
 
         {
             nvrhi::BufferDesc desc;
-            desc.byteSize = sizeof(u32);
-            desc.structStride = 0;
-            desc.debugName = ("DetailVisibleCountLOD" + std::to_string(lod)).c_str();
-            desc.canHaveUAVs = true;
-            desc.canHaveTypedViews = false;
-            desc.isVertexBuffer = false;
-            desc.isIndexBuffer = false;
-            desc.isConstantBuffer = false;
-            desc.isDrawIndirectArgs = false;
-            desc.canHaveRawViews = true;
-            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-            desc.keepInitialState = false;
-
-            visibleCountBuffer[lod] = device->createBuffer(desc);
-            if (!visibleCountBuffer[lod])
-            {
-                Msg("! [FGDetailManager] Failed to create visible count buffer LOD%u", lod);
-                return false;
-            }
-        }
-
-        {
-            nvrhi::BufferDesc desc;
             desc.byteSize = 5 * sizeof(u32);
             desc.structStride = 0;
             desc.debugName = ("DetailDrawArgsLOD" + std::to_string(lod)).c_str();
@@ -638,6 +615,21 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         if (!instanceToSlotBuffer)
         {
             Msg("! [FGDetailManager] Failed to create instance-to-slot buffer");
+            return false;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = sizeof(u32) * 4;
+        desc.debugName = "DetailStatsReadback";
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+        statsReadbackBuffer = device->createBuffer(desc);
+        if (!statsReadbackBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create stats readback buffer");
             return false;
         }
     }
@@ -811,7 +803,6 @@ void FGDetailManager::DestroyGPUBuffers()
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         visibleInstancesBuffer[lod] = nullptr;
-        visibleCountBuffer[lod] = nullptr;
         drawArgsBuffer[lod] = nullptr;
         bladeVertexBuffer[lod] = nullptr;
         bladeIndexBuffer[lod] = nullptr;
@@ -1123,7 +1114,11 @@ void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
     cmdList->writeBuffer(slotAABBBuffer, slot_aabbs.data(), slot_aabbs.size() * sizeof(SlotAABB));
 
     if (instanceToSlotBuffer && !instanceToSlotMapping.empty())
+    {
         cmdList->writeBuffer(instanceToSlotBuffer, instanceToSlotMapping.data(), instanceToSlotMapping.size() * sizeof(u32));
+        instanceToSlotMapping.clear();
+        instanceToSlotMapping.shrink_to_fit();
+    }
 }
 
 bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
@@ -1178,13 +1173,10 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
             nvrhi::BindingLayoutItem::Sampler(0),
             nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
             nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(2),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(3),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(4),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(3),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(4),
             nvrhi::BindingLayoutItem::RawBuffer_UAV(5),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(6),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(7),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(8),
         };
 
         computeBindingLayout = device->createBindingLayout(layoutDesc);
@@ -1356,7 +1348,6 @@ void FGDetailManager::DispatchCulling(
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         cmdList->beginTrackingBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
-        cmdList->beginTrackingBufferState(visibleCountBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
         cmdList->beginTrackingBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
     }
     cmdList->beginTrackingTextureState(hiZPyramid, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
@@ -1367,7 +1358,6 @@ void FGDetailManager::DispatchCulling(
     struct IndirectDrawArgs { u32 indexCount, instanceCount, startIndex; s32 baseVertex; u32 startInstance; };
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
-        cmdList->clearBufferUInt(visibleCountBuffer[lod], zero);
         IndirectDrawArgs args = { bladeIndexCount[lod], 0, 0, 0, 0 };
         cmdList->writeBuffer(drawArgsBuffer[lod], &args, sizeof(args));
     }
@@ -1408,14 +1398,11 @@ void FGDetailManager::DispatchCulling(
             nvrhi::BindingSetItem::Texture_SRV(3, hiZPyramid),
             nvrhi::BindingSetItem::Sampler(0, cachedSmp_PointClamp),
             nvrhi::BindingSetItem::StructuredBuffer_UAV(0, visibleInstancesBuffer[0]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(1, visibleCountBuffer[0]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(2, drawArgsBuffer[0]),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(3, visibleInstancesBuffer[1]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(4, visibleCountBuffer[1]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(5, drawArgsBuffer[1]),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(6, visibleInstancesBuffer[2]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(7, visibleCountBuffer[2]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(8, drawArgsBuffer[2]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(1, drawArgsBuffer[0]),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(2, visibleInstancesBuffer[1]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(3, drawArgsBuffer[1]),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(4, visibleInstancesBuffer[2]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(5, drawArgsBuffer[2]),
         };
 
         nvrhi::BindingSetHandle instanceCullBindingSet = device->createBindingSet(bindDesc, computeBindingLayout);
@@ -1429,31 +1416,20 @@ void FGDetailManager::DispatchCulling(
         cmdList->dispatch(numGroups, 1, 1);
     }
 
+    cmdList->setBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         cmdList->setBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::ShaderResource);
         cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::IndirectArgument);
     }
+    cmdList->commitBarriers();
 }
 
 void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device)
 {
-    if (!device || !cmdList)
+    if (!device || !cmdList || !statsReadbackBuffer)
         return;
-
-    if (!statsReadbackBuffer)
-    {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32) * 4;
-        desc.debugName = "DetailStatsReadback";
-        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
-        desc.initialState = nvrhi::ResourceStates::CopyDest;
-        desc.keepInitialState = true;
-        statsReadbackBuffer = device->createBuffer(desc);
-
-        if (!statsReadbackBuffer)
-            return;
-    }
 
     if (visibleSlotCounterBuffer)
     {
@@ -1466,15 +1442,20 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
 
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
-        if (visibleCountBuffer[lod])
+        if (drawArgsBuffer[lod])
         {
             cmdList->copyBuffer(
                 statsReadbackBuffer, sizeof(u32) * (1 + lod),
-                visibleCountBuffer[lod], 0,
+                drawArgsBuffer[lod], sizeof(u32),
                 sizeof(u32)
             );
         }
     }
+
+    cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+        cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::IndirectArgument);
+    cmdList->commitBarriers();
 
     statsReadbackPending = true;
 }
@@ -1484,10 +1465,9 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
     if (!statsReadbackPending || !statsReadbackBuffer || !device)
         return;
 
-    static u32 frameCounter = 0;
-    frameCounter++;
+    statsFrameCounter++;
     const u32 throttleInterval = xray::profiler::GetCPUProfiler().GetThrottleInterval();
-    if ((frameCounter % throttleInterval) != 0)
+    if ((statsFrameCounter % throttleInterval) != 0)
         return;
 
     void* mappedData = device->mapBuffer(statsReadbackBuffer, nvrhi::CpuAccessMode::Read);

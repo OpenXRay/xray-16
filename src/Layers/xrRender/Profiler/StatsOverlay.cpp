@@ -402,7 +402,9 @@ void StatsOverlay::RenderGeometrySection()
                         ImGui::BulletText("LOD2 (2seg): %s", FormatNumber(s.detailVisibleLOD2));
                     ImGui::Unindent();
 
-                    u32 actualTris = s.detailVisibleLOD0 * 17 + s.detailVisibleLOD1 * 7 + s.detailVisibleLOD2 * 3;
+                    u32 actualTris = s.detailVisibleLOD0 * s.detailTrisPerBlade[0]
+                                   + s.detailVisibleLOD1 * s.detailTrisPerBlade[1]
+                                   + s.detailVisibleLOD2 * s.detailTrisPerBlade[2];
                     ImGui::TextDisabled("Actual tris: %s", FormatNumber(actualTris));
                 }
                 else

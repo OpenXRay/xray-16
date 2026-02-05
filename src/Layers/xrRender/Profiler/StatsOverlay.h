@@ -38,7 +38,7 @@ struct RenderStats
 
     u32 detailInstances = 0;
     u32 detailSlots = 0;
-    u32 detailTrianglesPerBlade = 0;
+    u32 detailTrisPerBlade[3] = {0, 0, 0};
 
     u32 detailVisibleSlots = 0;
     u32 detailVisibleLOD0 = 0;
@@ -53,7 +53,8 @@ struct RenderStats
         megaBufferVertices = megaBufferIndices = 0;
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
         skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
-        detailInstances = detailSlots = detailTrianglesPerBlade = 0;
+        detailInstances = detailSlots = 0;
+        detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;
         detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;
     }
 };

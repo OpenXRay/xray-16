@@ -120,7 +120,6 @@ public:
     xr_vector<u16> bladeIndices[LOD_COUNT];
 
     nvrhi::BufferHandle visibleInstancesBuffer[LOD_COUNT];
-    nvrhi::BufferHandle visibleCountBuffer[LOD_COUNT];
     nvrhi::BufferHandle drawArgsBuffer[LOD_COUNT];
     nvrhi::BufferHandle slotAABBBuffer;
 
@@ -172,6 +171,7 @@ public:
     DetailCullingStats cullingStats;
     nvrhi::BufferHandle statsReadbackBuffer;
     bool statsReadbackPending = false;
+    u32 statsFrameCounter = 0;
 
     nvrhi::SamplerHandle cachedSmp_LinearWrap;
     nvrhi::SamplerHandle cachedSmp_PointClamp;
