@@ -10,19 +10,6 @@ struct InstanceData
     uint object_id;
 };
 
-struct SlotAABB
-{
-    float3 aabb_min;
-    float padding0;
-    float3 aabb_max;
-    float padding1;
-    uint instance_base;
-    uint instance_count;
-    int slot_x;
-    int slot_z;
-    float4 padding2;
-};
-
 cbuffer DetailCullParams : register(b5)
 {
     float4x4 g_view_proj;
@@ -40,10 +27,11 @@ cbuffer DetailCullParams : register(b5)
     uint g_pad;
 };
 
-StructuredBuffer<SlotAABB> g_slot_aabbs : register(t0);
-StructuredBuffer<InstanceData> g_all_instances : register(t1);
+StructuredBuffer<InstanceData> g_all_instances : register(t0);
+StructuredBuffer<uint> g_slot_visibility : register(t1);
+StructuredBuffer<uint> g_instance_to_slot : register(t2);
 
-Texture2D<float> g_hiz_pyramid : register(t2);
+Texture2D<float> g_hiz_pyramid : register(t3);
 SamplerState g_point_sampler : register(s0);
 
 RWStructuredBuffer<InstanceData> g_visible_lod0 : register(u0);
@@ -57,9 +45,6 @@ RWByteAddressBuffer g_indirect_args_lod1 : register(u5);
 RWStructuredBuffer<InstanceData> g_visible_lod2 : register(u6);
 RWByteAddressBuffer g_visible_count_lod2 : register(u7);
 RWByteAddressBuffer g_indirect_args_lod2 : register(u8);
-
-RWStructuredBuffer<uint> g_visible_slot_ids : register(u33);
-RWByteAddressBuffer g_visible_slot_counter : register(u34);
 
 
 void AppendInstanceLOD(InstanceData inst)
@@ -91,44 +76,29 @@ void AppendInstanceLOD(InstanceData inst)
 [numthreads(256, 1, 1)]
 void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 {
-    uint slot_idx = dispatch_thread_id.x;
+    uint inst_idx = dispatch_thread_id.x;
 
-    if (slot_idx >= g_total_slot_count)
+    if (inst_idx >= g_total_instance_count)
         return;
 
-    SlotAABB slot = g_slot_aabbs[slot_idx];
+    uint slot_idx = g_instance_to_slot[inst_idx];
 
-    if (slot.instance_count == 0)
+    if (g_slot_visibility[slot_idx] == 0)
         return;
 
-    if (!DistanceTestAABB(slot.aabb_min, slot.aabb_max, g_camera_pos, g_fade_distance_sqr))
+    InstanceData inst = g_all_instances[inst_idx];
+
+    float bounds_radius = inst.scale * 0.5;
+
+    if (!DistanceTestSphere(inst.pos, bounds_radius, g_camera_pos, g_fade_distance_sqr))
         return;
 
-    if (!FrustumTestAABB(slot.aabb_min, slot.aabb_max, g_frustum_planes))
+    if (!FrustumTestSphere(inst.pos, bounds_radius, g_frustum_planes))
         return;
 
-    uint insert_index = 0;
-    g_visible_slot_counter.InterlockedAdd(0, 1, insert_index);
-    if (insert_index < 8192)
-        g_visible_slot_ids[insert_index] = slot_idx;
+    if (!HiZTestSphereTemporal(inst.pos, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
+                        g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
+        return;
 
-    for (uint i = 0; i < slot.instance_count; i++)
-    {
-        uint inst_idx = slot.instance_base + i;
-        InstanceData inst = g_all_instances[inst_idx];
-
-        float bounds_radius = inst.scale * 0.5;
-
-        if (!DistanceTestSphere(inst.pos, bounds_radius, g_camera_pos, g_fade_distance_sqr))
-            continue;
-
-        if (!FrustumTestSphere(inst.pos, bounds_radius, g_frustum_planes))
-            continue;
-
-        if (!HiZTestSphereTemporal(inst.pos, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
-                            g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
-            continue;
-
-        AppendInstanceLOD(inst);
-    }
+    AppendInstanceLOD(inst);
 }

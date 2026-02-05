@@ -87,7 +87,17 @@ public:
     nvrhi::BufferHandle visibleSlotIDsBuffer;
     nvrhi::BufferHandle visibleSlotCounterBuffer;
 
+    nvrhi::BufferHandle slotVisibilityBuffer;
+    nvrhi::BufferHandle instanceToSlotBuffer;
+    xr_vector<u32> instanceToSlotMapping;
+
+    nvrhi::ShaderHandle slotCullComputeShader;
+    nvrhi::BindingLayoutHandle slotCullBindingLayout;
+    nvrhi::ComputePipelineHandle slotCullPipeline;
+
     nvrhi::ShaderHandle cullComputeShader;
+    nvrhi::BindingLayoutHandle computeBindingLayout;
+    nvrhi::ComputePipelineHandle computePipeline;
 
     nvrhi::ShaderHandle vertexShader;
     nvrhi::ShaderHandle pixelShader;
@@ -95,9 +105,6 @@ public:
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::BindingLayoutHandle graphicsBindingLayout;
     nvrhi::GraphicsPipelineHandle graphicsPipeline;
-
-    nvrhi::BindingLayoutHandle computeBindingLayout;
-    nvrhi::ComputePipelineHandle computePipeline;
 
     u32 visibleBufferCapacity = 0;
 

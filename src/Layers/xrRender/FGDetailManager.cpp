@@ -398,7 +398,17 @@ void FGDetailManager::DecompressAllSlots()
 
     total_instance_count = all_instances.size();
 
-    Msg("* [FGDetailManager] Decompressed %u instances in %u slots (%.2f MB)",
+    instanceToSlotMapping.resize(total_instance_count);
+    for (u32 s = 0; s < slot_count; s++)
+    {
+        const SlotAABB& slot = slot_aabbs[s];
+        for (u32 i = 0; i < slot.instance_count; i++)
+        {
+            instanceToSlotMapping[slot.instance_base + i] = s;
+        }
+    }
+
+    Msg("* [FGDetailManager] Decompressed %u instances in %u slots (%.2f MB), built instance-to-slot mapping",
         total_instance_count, slot_count,
         (total_instance_count * sizeof(InstanceData)) / (1024.f * 1024.f));
 }
@@ -585,6 +595,52 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = slot_aabbs.size() * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.debugName = "DetailSlotVisibility";
+        desc.canHaveUAVs = true;
+        desc.canHaveTypedViews = false;
+        desc.isVertexBuffer = false;
+        desc.isIndexBuffer = false;
+        desc.isConstantBuffer = false;
+        desc.isDrawIndirectArgs = false;
+        desc.canHaveRawViews = false;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = false;
+
+        slotVisibilityBuffer = device->createBuffer(desc);
+        if (!slotVisibilityBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create slot visibility buffer");
+            return false;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = total_instance_count * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.debugName = "DetailInstanceToSlot";
+        desc.canHaveUAVs = false;
+        desc.canHaveTypedViews = false;
+        desc.isVertexBuffer = false;
+        desc.isIndexBuffer = false;
+        desc.isConstantBuffer = false;
+        desc.isDrawIndirectArgs = false;
+        desc.canHaveRawViews = false;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+
+        instanceToSlotBuffer = device->createBuffer(desc);
+        if (!instanceToSlotBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create instance-to-slot buffer");
+            return false;
+        }
+    }
+
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         GenerateBladeGeometry(bladeVertices[lod], bladeIndices[lod], LOD_SEGMENTS[lod]);
@@ -662,11 +718,19 @@ void FGDetailManager::DestroyGPUBuffers()
     slotAABBBuffer = nullptr;
     visibleSlotIDsBuffer = nullptr;
     visibleSlotCounterBuffer = nullptr;
+    slotVisibilityBuffer = nullptr;
+    instanceToSlotBuffer = nullptr;
+
+    slotCullComputeShader = nullptr;
+    slotCullBindingLayout = nullptr;
+    slotCullPipeline = nullptr;
+
     computePipeline = nullptr;
-    graphicsPipeline = nullptr;
     computeBindingLayout = nullptr;
-    graphicsBindingLayout = nullptr;
     cullComputeShader = nullptr;
+
+    graphicsPipeline = nullptr;
+    graphicsBindingLayout = nullptr;
 
     windTexture = nullptr;
     windComputeShader = nullptr;
@@ -883,6 +947,13 @@ bool FGDetailManager::LoadCullComputeShader(framegraph::ShaderLoader* shaderLoad
         return false;
     }
 
+    slotCullComputeShader = shaderLoader->LoadComputeShader("detail_cell_cull", "main").handle;
+    if (!slotCullComputeShader)
+    {
+        Msg("! [FGDetailManager] Failed to load detail_cell_cull.cs");
+        return false;
+    }
+
     cullComputeShader = shaderLoader->LoadComputeShader("detail_cull", "main").handle;
     if (!cullComputeShader)
     {
@@ -933,11 +1004,14 @@ void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
     }
 
     cmdList->writeBuffer(slotAABBBuffer, slot_aabbs.data(), slot_aabbs.size() * sizeof(SlotAABB));
+
+    if (instanceToSlotBuffer && !instanceToSlotMapping.empty())
+        cmdList->writeBuffer(instanceToSlotBuffer, instanceToSlotMapping.data(), instanceToSlotMapping.size() * sizeof(u32));
 }
 
 bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
 {
-    if (!renderDevice || !cullComputeShader)
+    if (!renderDevice || !cullComputeShader || !slotCullComputeShader)
     {
         Msg("! [FGDetailManager] CreateComputePipeline: invalid parameters");
         return false;
@@ -945,44 +1019,76 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
 
     nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::Compute;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
-        nvrhi::BindingLayoutItem::Texture_SRV(2),
-        nvrhi::BindingLayoutItem::Sampler(0),
-        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(2),
-        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(3),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(4),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(5),
-        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(6),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(7),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(8),
-        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(33),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(34),
-    };
-
-    computeBindingLayout = device->createBindingLayout(layoutDesc);
-    if (!computeBindingLayout)
     {
-        Msg("! [FGDetailManager] Failed to create compute binding layout");
-        return false;
+        nvrhi::BindingLayoutDesc layoutDesc;
+        layoutDesc.visibility = nvrhi::ShaderType::Compute;
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(1),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(2),
+        };
+
+        slotCullBindingLayout = device->createBindingLayout(layoutDesc);
+        if (!slotCullBindingLayout)
+        {
+            Msg("! [FGDetailManager] Failed to create slot cull binding layout");
+            return false;
+        }
+
+        nvrhi::ComputePipelineDesc pipelineDesc;
+        pipelineDesc.CS = slotCullComputeShader;
+        pipelineDesc.bindingLayouts = { slotCullBindingLayout };
+
+        slotCullPipeline = device->createComputePipeline(pipelineDesc);
+        if (!slotCullPipeline)
+        {
+            Msg("! [FGDetailManager] Failed to create slot cull pipeline");
+            return false;
+        }
     }
 
-    nvrhi::ComputePipelineDesc pipelineDesc;
-    pipelineDesc.CS = cullComputeShader;
-    pipelineDesc.bindingLayouts = { computeBindingLayout };
-
-    computePipeline = device->createComputePipeline(pipelineDesc);
-    if (!computePipeline)
     {
-        Msg("! [FGDetailManager] Failed to create compute pipeline");
-        return false;
+        nvrhi::BindingLayoutDesc layoutDesc;
+        layoutDesc.visibility = nvrhi::ShaderType::Compute;
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
+            nvrhi::BindingLayoutItem::Texture_SRV(3),
+            nvrhi::BindingLayoutItem::Sampler(0),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(2),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(3),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(4),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(6),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(7),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(8),
+        };
+
+        computeBindingLayout = device->createBindingLayout(layoutDesc);
+        if (!computeBindingLayout)
+        {
+            Msg("! [FGDetailManager] Failed to create instance cull binding layout");
+            return false;
+        }
+
+        nvrhi::ComputePipelineDesc pipelineDesc;
+        pipelineDesc.CS = cullComputeShader;
+        pipelineDesc.bindingLayouts = { computeBindingLayout };
+
+        computePipeline = device->createComputePipeline(pipelineDesc);
+        if (!computePipeline)
+        {
+            Msg("! [FGDetailManager] Failed to create instance cull pipeline");
+            return false;
+        }
     }
+
     return true;
 }
 
@@ -1096,7 +1202,10 @@ void FGDetailManager::DispatchCulling(
     u32 hiZHeight,
     u32 hiZMipLevels)
 {
-    if (!cullComputeShader || total_instance_count == 0 || slot_count == 0)
+    if (!cullComputeShader || !slotCullComputeShader || total_instance_count == 0 || slot_count == 0)
+        return;
+
+    if (!computePipeline || !slotCullPipeline)
         return;
 
     struct DetailCullParams
@@ -1149,15 +1258,15 @@ void FGDetailManager::DispatchCulling(
     nvrhi::BufferHandle cullParamsCB = device->createBuffer(cbDesc);
     cmdList->writeBuffer(cullParamsCB, &params, sizeof(params));
 
+    cmdList->beginTrackingBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->beginTrackingBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->beginTrackingBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         cmdList->beginTrackingBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
         cmdList->beginTrackingBufferState(visibleCountBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
         cmdList->beginTrackingBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
     }
-    cmdList->beginTrackingBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->beginTrackingBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
     cmdList->beginTrackingTextureState(hiZPyramid, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
 
     u32 zero = 0;
@@ -1171,48 +1280,71 @@ void FGDetailManager::DispatchCulling(
         cmdList->writeBuffer(drawArgsBuffer[lod], &args, sizeof(args));
     }
 
-    if (!computePipeline)
-        return;
-
-    nvrhi::SamplerDesc samplerDesc;
-    samplerDesc.minFilter = false;
-    samplerDesc.magFilter = false;
-    samplerDesc.mipFilter = false;
-    samplerDesc.addressU = nvrhi::SamplerAddressMode::Clamp;
-    samplerDesc.addressV = nvrhi::SamplerAddressMode::Clamp;
-    samplerDesc.addressW = nvrhi::SamplerAddressMode::Clamp;
-    nvrhi::SamplerHandle pointSampler = device->createSampler(samplerDesc);
-
-    nvrhi::BindingSetDesc bindDesc;
-    bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(5, cullParamsCB),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(0, slotAABBBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(1, instanceBuffer),
-        nvrhi::BindingSetItem::Texture_SRV(2, hiZPyramid),
-        nvrhi::BindingSetItem::Sampler(0, pointSampler),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, visibleInstancesBuffer[0]),
-        nvrhi::BindingSetItem::RawBuffer_UAV(1, visibleCountBuffer[0]),
-        nvrhi::BindingSetItem::RawBuffer_UAV(2, drawArgsBuffer[0]),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(3, visibleInstancesBuffer[1]),
-        nvrhi::BindingSetItem::RawBuffer_UAV(4, visibleCountBuffer[1]),
-        nvrhi::BindingSetItem::RawBuffer_UAV(5, drawArgsBuffer[1]),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(6, visibleInstancesBuffer[2]),
-        nvrhi::BindingSetItem::RawBuffer_UAV(7, visibleCountBuffer[2]),
-        nvrhi::BindingSetItem::RawBuffer_UAV(8, drawArgsBuffer[2]),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(33, visibleSlotIDsBuffer),
-        nvrhi::BindingSetItem::RawBuffer_UAV(34, visibleSlotCounterBuffer),
-    };
-
-    nvrhi::BindingSetHandle cullBindingSet = device->createBindingSet(bindDesc, computeBindingLayout);
-
-    nvrhi::ComputeState state;
-    state.pipeline = computePipeline;
-    state.bindings = { cullBindingSet };
-    cmdList->setComputeState(state);
-
     const u32 threadGroupSize = 256;
-    u32 numGroups = (slot_count + threadGroupSize - 1) / threadGroupSize;
-    cmdList->dispatch(numGroups, 1, 1);
+
+    {
+        nvrhi::BindingSetDesc bindDesc;
+        bindDesc.bindings = {
+            nvrhi::BindingSetItem::ConstantBuffer(5, cullParamsCB),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, slotAABBBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(0, slotVisibilityBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(1, visibleSlotIDsBuffer),
+            nvrhi::BindingSetItem::RawBuffer_UAV(2, visibleSlotCounterBuffer),
+        };
+
+        nvrhi::BindingSetHandle slotCullBindingSet = device->createBindingSet(bindDesc, slotCullBindingLayout);
+
+        nvrhi::ComputeState state;
+        state.pipeline = slotCullPipeline;
+        state.bindings = { slotCullBindingSet };
+        cmdList->setComputeState(state);
+
+        u32 numGroups = (slot_count + threadGroupSize - 1) / threadGroupSize;
+        cmdList->dispatch(numGroups, 1, 1);
+    }
+
+    cmdList->setBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->commitBarriers();
+
+    {
+        nvrhi::SamplerDesc samplerDesc;
+        samplerDesc.minFilter = false;
+        samplerDesc.magFilter = false;
+        samplerDesc.mipFilter = false;
+        samplerDesc.addressU = nvrhi::SamplerAddressMode::Clamp;
+        samplerDesc.addressV = nvrhi::SamplerAddressMode::Clamp;
+        samplerDesc.addressW = nvrhi::SamplerAddressMode::Clamp;
+        nvrhi::SamplerHandle pointSampler = device->createSampler(samplerDesc);
+
+        nvrhi::BindingSetDesc bindDesc;
+        bindDesc.bindings = {
+            nvrhi::BindingSetItem::ConstantBuffer(5, cullParamsCB),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, instanceBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(1, slotVisibilityBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(2, instanceToSlotBuffer),
+            nvrhi::BindingSetItem::Texture_SRV(3, hiZPyramid),
+            nvrhi::BindingSetItem::Sampler(0, pointSampler),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(0, visibleInstancesBuffer[0]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(1, visibleCountBuffer[0]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(2, drawArgsBuffer[0]),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(3, visibleInstancesBuffer[1]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(4, visibleCountBuffer[1]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(5, drawArgsBuffer[1]),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(6, visibleInstancesBuffer[2]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(7, visibleCountBuffer[2]),
+            nvrhi::BindingSetItem::RawBuffer_UAV(8, drawArgsBuffer[2]),
+        };
+
+        nvrhi::BindingSetHandle instanceCullBindingSet = device->createBindingSet(bindDesc, computeBindingLayout);
+
+        nvrhi::ComputeState state;
+        state.pipeline = computePipeline;
+        state.bindings = { instanceCullBindingSet };
+        cmdList->setComputeState(state);
+
+        u32 numGroups = (total_instance_count + threadGroupSize - 1) / threadGroupSize;
+        cmdList->dispatch(numGroups, 1, 1);
+    }
 
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
