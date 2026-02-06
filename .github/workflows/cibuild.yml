@@ -241,3 +241,30 @@ jobs:
         shutdown_vm: false
         sync_files: false
         run: cmake --build build --config ${{ matrix.Configuration }} --parallel 4
+
+  flatpak:
+    name: Flatpak ${{ matrix.platform.arch }}
+    runs-on: ${{ matrix.platform.os }}
+
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      options: --privileged
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - arch: x86_64
+            os: ubuntu-latest
+          - arch: aarch64
+            os: ubuntu-24.04-arm
+
+    steps:
+      - uses: actions/checkout@main
+
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: io.github.OpenXRay.xray-16-${{ matrix.platform.arch }}-${{ github.run_number }}.flatpak
+          manifest-path: misc/flatpak/manifest.yml
+          arch: ${{ matrix.platform.arch }}
+          verbose: true
