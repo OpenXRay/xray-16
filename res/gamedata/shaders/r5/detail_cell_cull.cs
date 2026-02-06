@@ -33,7 +33,7 @@ cbuffer DetailCullParams : register(b5)
     uint g_hiz_mip_levels;
     float g_lod_distance_close_sqr;
     float g_lod_distance_mid_sqr;
-    uint g_pad;
+    float g_detail_density;  // Runtime density (0.04-0.99, lower = more dense)
 };
 
 // Input
@@ -56,7 +56,6 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 
     SlotAABB slot = g_slot_aabbs[slot_idx];
 
-    // Empty slot
     if (slot.instance_count == 0)
     {
         g_slot_visibility[slot_idx] = 0;

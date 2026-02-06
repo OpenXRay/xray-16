@@ -441,6 +441,9 @@ nvrhi::Format DDSLoader::GetFormatFromDXGI(DXGI_FORMAT dxgiFormat) {
         case DXGI_FORMAT_BC7_UNORM_SRGB:
             return nvrhi::Format::BC7_UNORM_SRGB;
 
+        case DXGI_FORMAT_R32_FLOAT:
+            return nvrhi::Format::R32_FLOAT;
+
         default:
             Msg("! [DDSLoader] Unknown DXGI format: %u", (u32)dxgiFormat);
             return nvrhi::Format::UNKNOWN;

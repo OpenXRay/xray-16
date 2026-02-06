@@ -119,8 +119,8 @@ DefaultOutputLayout setupDetailPass(
             if (!psDeviceFlags.is(rsDrawDetails))
                 return;
 
-            // Check if GPU buffers are ready
-            if (!data.detailManager->instanceBuffer || data.detailManager->total_instance_count == 0)
+            bool detailPipelineValid = (data.detailManager->instanceGenPipeline && data.detailManager->slotDataBuffer);
+            if (!detailPipelineValid)
                 return;
 
             // Get physical resources
@@ -135,9 +135,8 @@ DefaultOutputLayout setupDetailPass(
             if (!cmdList)
                 return;
 
-            // === UPLOAD BUFFER DATA (first frame only) ===
             static bool s_detailDataUploaded = false;
-            if (!s_detailDataUploaded && data.detailManager->total_instance_count > 0)
+            if (!s_detailDataUploaded)
             {
                 data.detailManager->UploadBufferData(cmdList);
                 s_detailDataUploaded = true;
@@ -190,9 +189,6 @@ DefaultOutputLayout setupDetailPass(
             // Use previous frame's viewProj for temporal Hi-Z, or current if not available
             Fmatrix effectivePrevViewProj = data.hasPrevViewProj ? data.prevViewProj : Device.mFullTransform;
 
-            if (data.gpuProfiler)
-                data.gpuProfiler->BeginPass(cmdList, "Details.Cull");
-
             data.detailManager->DispatchCulling(
                 cmdList,
                 data.device->GetNVRHIDevice(),
@@ -205,11 +201,9 @@ DefaultOutputLayout setupDetailPass(
                 fadeDistance,
                 data.hiZWidth,
                 data.hiZHeight,
-                data.hiZMipLevels
+                data.hiZMipLevels,
+                data.gpuProfiler
             );
-
-            if (data.gpuProfiler)
-                data.gpuProfiler->EndPass(cmdList, "Details.Cull");
 
             // Schedule stats readback for profiling (visible counts per LOD)
             data.detailManager->ScheduleStatsReadback(cmdList, data.device->GetNVRHIDevice());

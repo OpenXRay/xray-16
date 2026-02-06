@@ -415,7 +415,10 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     // ═══════════════════════════════════════════════════
     //  CHECK IN-MEMORY HANDLE CACHE FIRST (fastest path)
     // ═══════════════════════════════════════════════════
+    // Include entry point in cache key to support multiple entry points per file
     xr_string cacheKey = xr_string(name) + ".cs";
+    if (entryPoint && xr_strcmp(entryPoint, "main") != 0)
+        cacheKey += xr_string(":") + entryPoint;
     auto handleIt = m_handleCache.find(cacheKey);
     if (handleIt != m_handleCache.end()) {
         // Return cached handle + reflection
@@ -438,9 +441,14 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
         fs->length()
     );
 
+    // Build disk cache name (include entry point for non-default)
+    xr_string diskCacheName = name;
+    if (entryPoint && xr_strcmp(entryPoint, "main") != 0)
+        diskCacheName += xr_string("_") + entryPoint;
+
     // Try to load bytecode + reflection from cache
     ExtractedReflection deserializedReflection;
-    bool cacheHit = m_cache.TryLoad(name, ".cs", sourceHash, result.bytecode, &deserializedReflection);
+    bool cacheHit = m_cache.TryLoad(diskCacheName.c_str(), ".cs", sourceHash, result.bytecode, &deserializedReflection);
 
     if (cacheHit)
     {
@@ -533,13 +541,13 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
     // Save bytecode + reflection to disk cache
-    m_cache.Save(name, ".cs", sourceHash, result.bytecode, &extractedReflection);
+    m_cache.Save(diskCacheName.c_str(), ".cs", sourceHash, result.bytecode, &extractedReflection);
 
     // Cache handle and reflection for future calls
     m_handleCache[cacheKey] = result.handle;
     m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
 
-    Msg("* [ShaderLoader] Compiled compute shader: %s.cs", name);
+    Msg("* [ShaderLoader] Compiled compute shader: %s.cs (entry: %s)", name, entryPoint);
 
     return result;
 }

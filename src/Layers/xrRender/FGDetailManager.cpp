@@ -1,4 +1,3 @@
-// FGDetailManager.cpp - Framegraph detail manager implementation
 #include "stdafx.h"
 #include "FGDetailManager.h"
 #include "DetailModel.h"
@@ -10,13 +9,13 @@
 #include "xrCDB/Intersect.hpp"
 #include "xrCDB/xrXRC.h"
 #include "xrMaterialSystem/GameMtlLib.h"
-#include "xrCore/Profiler/Profiler.h"  // For GetCPUProfiler throttle interval
-#include "FrameGraphPasses/ShaderConstants.h"  // For sizeof(DynamicTransforms), sizeof(StaticGlobals)
-#include "ResourceManager/DDSLoader.h"         // For DDS header structs (heightmap save)
+#include "xrCore/Profiler/Profiler.h"
+#include "Profiler/GPUProfiler.h"
+#include "FrameGraphPasses/ShaderConstants.h"
+#include "ResourceManager/DDSLoader.h"
 #include <thread>
 #include <atomic>
 
-// Phase 5: Grass wind tuning parameters (defined in xrEngine)
 extern ENGINE_API float ps_r3_grass_wind_multiplier;
 extern ENGINE_API float ps_r3_grass_wind_min;
 extern ENGINE_API float ps_r3_grass_wind_lerp_rate;
@@ -24,11 +23,9 @@ extern ENGINE_API float ps_r3_grass_wind_displacement;
 extern ENGINE_API float ps_r3_grass_interaction_displacement;
 extern ENGINE_API u32 ps_r3_grass_wind_octaves;
 
-// Grass LOD distance thresholds (defined in xrEngine/Environment_editor.cpp)
 extern ENGINE_API float ps_r3_grass_lod_close;
 extern ENGINE_API float ps_r3_grass_lod_mid;
 
-// Grass blade geometry parameters (defined in xrEngine/Environment_editor.cpp)
 extern ENGINE_API float ps_r3_grass_blade_width;
 extern ENGINE_API float ps_r3_grass_blade_height;
 
@@ -37,24 +34,11 @@ namespace xray::render::RENDER_NAMESPACE
 
 extern float ps_current_detail_height;
 
-// Dither matrix initialization (EXACT copy from DetailManager.cpp)
 static int magic4x4[4][4] = {{0, 14, 3, 13}, {11, 5, 8, 6}, {12, 2, 15, 1}, {7, 9, 4, 10}};
 
 static void bwdithermap(int levels, int magic[16][16])
 {
-    /* Get size of each step */
     float N = 255.0f / (levels - 1);
-
-    /*
-     * Expand 4x4 dither pattern to 16x16.  4x4 leaves obvious patterning,
-     * and doesn't give us full intensity range (only 17 sublevels).
-     *
-     * magicfact is (N - 1)/16 so that we get numbers in the matrix from 0 to
-     * N - 1: mod N gives numbers in 0 to N - 1, don't ever want all
-     * pixels incremented to the next level (this is reserved for the
-     * pixel value with mod N == 0 at the next level).
-     */
-
     float magicfact = (N - 1) / 16;
     for (int i = 0; i < 4; i++)
     {
@@ -72,7 +56,6 @@ static void bwdithermap(int levels, int magic[16][16])
     }
 }
 
-// Bilinear interpolation matching original Interpolate() function exactly
 IC float Interpolate(float* base, u32 x, u32 y, u32 size)
 {
     float f = float(size);
@@ -91,7 +74,6 @@ IC float Interpolate(float* base, u32 x, u32 y, u32 size)
     return (cx + cy) / 2.f;
 }
 
-// Interpolate and dither matching original InterpolateAndDither() exactly
 IC bool InterpolateAndDither(float* alpha255, u32 x, u32 y, u32 sx, u32 sy, u32 size, int dither_matrix[16][16])
 {
     u32 cx = x, cy = y;
@@ -107,7 +89,6 @@ IC bool InterpolateAndDither(float* alpha255, u32 x, u32 y, u32 sx, u32 sy, u32 
 
 FGDetailManager::FGDetailManager()
 {
-    // Dither matrix initialized in Load()
     memset(dither, 0, sizeof(dither));
 }
 
@@ -136,7 +117,6 @@ bool FGDetailManager::Load()
         return false;
     }
 
-    // Read header
     dtFS->r_chunk_safe(0, &dtH, sizeof(dtH));
 
     if (dtH.version() != DETAIL_VERSION)
@@ -151,7 +131,6 @@ bool FGDetailManager::Load()
     Msg("* [FGDetailManager] Loading level.details: %u objects, %dx%d slots",
         object_count, dtH.x_size(), dtH.z_size());
 
-    // Load detail models
     IReader* models_chunk = dtFS->open_chunk(1);
     if (!models_chunk)
     {
@@ -179,8 +158,9 @@ bool FGDetailManager::Load()
 
     models_chunk->close();
 
-    // Make dither matrix (matching original CDetailManager::Load exactly)
     bwdithermap(2, dither);
+
+    PackSlotData();
 
     Msg("* [FGDetailManager] Loaded %u detail models", detail_models.size());
     return true;
@@ -196,8 +176,8 @@ void FGDetailManager::Unload()
         xr_delete(detail);
     detail_models.clear();
 
-    all_instances.clear();
     slot_aabbs.clear();
+    slotDataCPU.clear();
 
     if (dtFS)
     {
@@ -216,7 +196,6 @@ bool FGDetailManager::BakeHeightmap()
         return false;
     }
 
-    // Compute heightmap dimensions
     heightmapWidth = dtH.x_size() * HEIGHTMAP_TEXELS_PER_SLOT;
     heightmapHeight = dtH.z_size() * HEIGHTMAP_TEXELS_PER_SLOT;
     heightmapTexelSize = DETAIL_SLOT_SIZE / float(HEIGHTMAP_TEXELS_PER_SLOT);
@@ -226,7 +205,6 @@ bool FGDetailManager::BakeHeightmap()
     Msg("* [FGDetailManager] Heightmap params: %ux%u pixels, texel=%.2fm, world origin=(%.1f, %.1f)",
         heightmapWidth, heightmapHeight, heightmapTexelSize, heightmapWorldMinX, heightmapWorldMinZ);
 
-    // Check if cached heightmap already exists
     string_path heightmap_path;
     FS.update_path(heightmap_path, "$level$", "level_heightmap.dds");
 
@@ -243,11 +221,9 @@ bool FGDetailManager::BakeHeightmap()
     CTimer bake_timer;
     bake_timer.Start();
 
-    // Allocate pixel buffer
     const u32 pixel_count = heightmapWidth * heightmapHeight;
     xr_vector<float> pixels(pixel_count, HEIGHTMAP_NO_TERRAIN);
 
-    // Open slots chunk to read DetailSlot Y ranges (for ray origin)
     IReader* slots_chunk = dtFS->open_chunk(2);
     if (!slots_chunk)
     {
@@ -256,8 +232,6 @@ bool FGDetailManager::BakeHeightmap()
     }
     DetailSlot* dtSlots = (DetailSlot*)slots_chunk->pointer();
 
-    // Multi-threaded baking: one box_query per SLOT (proven pattern from DecompressAllSlots),
-    // then raycast each texel within that slot against the queried triangles.
     u32 num_threads = std::thread::hardware_concurrency();
     if (num_threads == 0) num_threads = 8;
     if (num_threads > 16) num_threads = 16;
@@ -282,7 +256,6 @@ bool FGDetailManager::BakeHeightmap()
 
             DetailSlot& DS = dtSlots[slot_idx];
 
-            // Set up slot AABB (matching DecompressAllSlots exactly)
             Fbox vis_box;
             vis_box.vMin.set(sx * DETAIL_SLOT_SIZE, DS.r_ybase(), sz * DETAIL_SLOT_SIZE);
             vis_box.vMax.set(vis_box.vMin.x + DETAIL_SLOT_SIZE,
@@ -290,7 +263,6 @@ bool FGDetailManager::BakeHeightmap()
                             vis_box.vMin.z + DETAIL_SLOT_SIZE);
             vis_box.grow(EPS_L);
 
-            // One box query per slot (proven reliable, same as decompression)
             Fvector bC, bD;
             vis_box.get_CD(bC, bD);
             thread_xrc.box_query(CDB::OPT_FULL_TEST,
@@ -303,7 +275,6 @@ bool FGDetailManager::BakeHeightmap()
             Fvector ray_dir;
             ray_dir.set(0.f, -1.f, 0.f);
 
-            // Raycast each texel within this slot
             for (u32 local_z = 0; local_z < HEIGHTMAP_TEXELS_PER_SLOT; local_z++)
             {
                 for (u32 local_x = 0; local_x < HEIGHTMAP_TEXELS_PER_SLOT; local_x++)
@@ -354,7 +325,6 @@ bool FGDetailManager::BakeHeightmap()
         }
     };
 
-    // Launch workers (split by slot index)
     xr_vector<std::thread> workers;
     workers.reserve(num_threads);
     u32 slots_per_thread = total_slots / num_threads;
@@ -377,7 +347,6 @@ bool FGDetailManager::BakeHeightmap()
     float bake_time = bake_timer.GetElapsed_sec();
     Msg("* [FGDetailManager] Heightmap bake complete: %.2f sec (%u threads)", bake_time, num_threads);
 
-    // Count valid vs empty texels and find height range
     u32 valid_count = 0;
     float min_y = FLT_MAX, max_y = -FLT_MAX;
     for (u32 i = 0; i < pixel_count; i++)
@@ -393,7 +362,6 @@ bool FGDetailManager::BakeHeightmap()
         100.f * valid_count / pixel_count);
     Msg("  - Height range: [%.2f, %.2f] meters", min_y, max_y);
 
-    // Write DDS file as R32_FLOAT using DX10 extended header (most correct for float formats)
     VerifyPath(heightmap_path);
     IWriter* writer = FS.w_open(heightmap_path);
     if (!writer)
@@ -402,11 +370,9 @@ bool FGDetailManager::BakeHeightmap()
         return false;
     }
 
-    // DDS magic
-    u32 magic = 0x20534444;  // "DDS "
+    u32 magic = 0x20534444;
     writer->w(&magic, sizeof(magic));
 
-    // DDS_HEADER (124 bytes)
     xray::render::resources::DDS_HEADER header = {};
     header.dwSize = 124;
     header.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | DDSD_PITCH | DDSD_MIPMAPCOUNT;
@@ -420,14 +386,12 @@ bool FGDetailManager::BakeHeightmap()
     header.dwCaps = DDSCAPS_TEXTURE;
     writer->w(&header, sizeof(header));
 
-    // DDS_HEADER_DX10 (20 bytes)
     xray::render::resources::DDS_HEADER_DX10 header10 = {};
     header10.dxgiFormat = xray::render::resources::DXGI_FORMAT_R32_FLOAT;
     header10.resourceDimension = xray::render::resources::D3D10_RESOURCE_DIMENSION_TEXTURE2D;
     header10.arraySize = 1;
     writer->w(&header10, sizeof(header10));
 
-    // Pixel data
     writer->w(pixels.data(), pixel_count * sizeof(float));
 
     FS.w_close(writer);
@@ -436,7 +400,6 @@ bool FGDetailManager::BakeHeightmap()
     Msg("* [FGDetailManager] Heightmap saved: %s (%.1f MB)", heightmap_path,
         float(file_bytes) / (1024.f * 1024.f));
 
-    // Also save a normalized R8 copy for easy visual verification
     {
         string_path preview_path;
         FS.update_path(preview_path, "$level$", "level_heightmap_preview.dds");
@@ -444,7 +407,6 @@ bool FGDetailManager::BakeHeightmap()
         IWriter* pw = FS.w_open(preview_path);
         if (pw)
         {
-            // Normalize heights to 0-255 grayscale
             xr_vector<u8> preview(pixel_count, 0);
             if (valid_count > 0 && max_y > min_y)
             {
@@ -460,7 +422,6 @@ bool FGDetailManager::BakeHeightmap()
                 }
             }
 
-            // Write as 8-bit luminance DDS (universally supported)
             u32 pm = 0x20534444;
             pw->w(&pm, sizeof(pm));
 
@@ -469,7 +430,7 @@ bool FGDetailManager::BakeHeightmap()
             ph.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | DDSD_PITCH;
             ph.dwHeight = heightmapHeight;
             ph.dwWidth = heightmapWidth;
-            ph.dwPitchOrLinearSize = heightmapWidth;  // 1 byte per pixel
+            ph.dwPitchOrLinearSize = heightmapWidth;
             ph.ddspf.dwSize = 32;
             ph.ddspf.dwFlags = DDPF_LUMINANCE;
             ph.ddspf.dwRGBBitCount = 8;
@@ -488,262 +449,159 @@ bool FGDetailManager::BakeHeightmap()
     return true;
 }
 
-void FGDetailManager::DecompressAllSlots()
+bool FGDetailManager::LoadHeightmapTexture(nvrhi::IDevice* device)
+{
+    ZoneScoped;
+
+    if (!device)
+    {
+        Msg("! [FGDetailManager] LoadHeightmapTexture: device is null");
+        return false;
+    }
+
+    string_path heightmap_path;
+    FS.update_path(heightmap_path, "$level$", "level_heightmap.dds");
+
+    if (!FS.exist(heightmap_path))
+    {
+        Msg("! [FGDetailManager] Heightmap file not found: %s", heightmap_path);
+        return false;
+    }
+
+    Msg("* [FGDetailManager] Loading heightmap: %s", heightmap_path);
+
+    resources::DDSData ddsData;
+    if (!resources::DDSLoader::LoadFromFile("level_heightmap", ddsData))
+    {
+        Msg("! [FGDetailManager] Failed to load heightmap DDS (searched in $level$)");
+        return false;
+    }
+
+    if (!ddsData.isValid || ddsData.mipLevels.empty())
+    {
+        Msg("! [FGDetailManager] Invalid heightmap DDS data");
+        return false;
+    }
+
+    if (ddsData.desc.format != nvrhi::Format::R32_FLOAT)
+    {
+        Msg("! [FGDetailManager] Unexpected heightmap format: expected R32_FLOAT, got %d", (int)ddsData.desc.format);
+        return false;
+    }
+
+    if (ddsData.desc.width != heightmapWidth || ddsData.desc.height != heightmapHeight)
+    {
+        Msg("! [FGDetailManager] Heightmap dimension mismatch: expected %ux%u, got %ux%u",
+            heightmapWidth, heightmapHeight, ddsData.desc.width, ddsData.desc.height);
+        return false;
+    }
+
+    nvrhi::TextureDesc texDesc;
+    texDesc.width = ddsData.desc.width;
+    texDesc.height = ddsData.desc.height;
+    texDesc.depth = 1;
+    texDesc.arraySize = 1;
+    texDesc.mipLevels = ddsData.desc.mipLevels;
+    texDesc.format = ddsData.desc.format;
+    texDesc.dimension = nvrhi::TextureDimension::Texture2D;
+    texDesc.isRenderTarget = false;
+    texDesc.isUAV = false;
+    texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    texDesc.keepInitialState = true;
+    texDesc.debugName = "DetailHeightmap";
+
+    heightmapTexture = device->createTexture(texDesc);
+    if (!heightmapTexture)
+    {
+        Msg("! [FGDetailManager] Failed to create heightmap texture");
+        return false;
+    }
+
+    nvrhi::CommandListHandle cmdList = device->createCommandList();
+    cmdList->open();
+
+    for (u32 mip = 0; mip < ddsData.mipLevels.size(); mip++)
+    {
+        const auto& mipLevel = ddsData.mipLevels[mip];
+        cmdList->writeTexture(heightmapTexture, 0, mip, mipLevel.data, mipLevel.rowPitch);
+    }
+
+    cmdList->close();
+    device->executeCommandList(cmdList);
+
+    Msg("  ✓ Heightmap texture loaded: %ux%u R32_FLOAT, %u mips",
+        texDesc.width, texDesc.height, texDesc.mipLevels);
+
+    return true;
+}
+
+void FGDetailManager::PackSlotData()
 {
     ZoneScoped;
 
     if (!dtFS)
     {
-        Msg("! [FGDetailManager] Cannot decompress - level.details not loaded");
+        Msg("! [FGDetailManager] PackSlotData: level.details not loaded");
         return;
     }
 
-    // Open slots chunk
     IReader* slots_chunk = dtFS->open_chunk(2);
     if (!slots_chunk)
     {
-        Msg("! [FGDetailManager] Failed to read slots chunk");
+        Msg("! [FGDetailManager] PackSlotData: failed to read slots chunk");
         return;
     }
 
     DetailSlot* dtSlots = (DetailSlot*)slots_chunk->pointer();
+    u32 total_slots = dtH.x_size() * dtH.z_size();
 
-    Msg("* [FGDetailManager] Decompressing %dx%d detail slots...", dtH.x_size(), dtH.z_size());
+    Msg("* [FGDetailManager] Packing %dx%d detail slots...", dtH.x_size(), dtH.z_size());
 
-    all_instances.clear();
-    all_instances.reserve(1024 * 1024);
+    slotDataCPU.clear();
+    slotDataCPU.resize(total_slots);
 
-    slot_aabbs.clear();
-    slot_count = 0;
-
-    u32 total_slots = 0;
-    u32 empty_slots = 0;
-    u32 no_collision_slots = 0;
-
-    // Iterate through all slots using DATABASE coordinates (0 to size-1)
     for (u32 db_z = 0; db_z < dtH.z_size(); db_z++)
     {
         for (u32 db_x = 0; db_x < dtH.x_size(); db_x++)
         {
-            total_slots++;
-
-            // Convert database coords to world slot coords (matching original cache_Task)
             int sx = int(db_x) - dtH.x_offs();
             int sz = int(db_z) - dtH.z_offs();
-
-            // Get slot data
             u32 slot_idx = db_z * dtH.x_size() + db_x;
-            DetailSlot& DS = dtSlots[slot_idx];
 
-            // Check if slot is empty (matching original cache_Task)
-            bool slot_empty = (DS.id0 == DetailSlot::ID_Empty) &&
-                              (DS.id1 == DetailSlot::ID_Empty) &&
-                              (DS.id2 == DetailSlot::ID_Empty) &&
-                              (DS.id3 == DetailSlot::ID_Empty);
+            DetailSlot& src = dtSlots[slot_idx];
+            GPUSlotData& dst = slotDataCPU[slot_idx];
 
-            if (slot_empty)
-            {
-                empty_slots++;
-                continue;
-            }
+            dst.world_min_x = sx * DETAIL_SLOT_SIZE;
+            dst.world_min_z = sz * DETAIL_SLOT_SIZE;
 
-            // Track instance base for this slot
-            u32 instance_base = all_instances.size();
+            dst.y_base = src.r_ybase();
+            dst.y_height = src.r_yheight();
 
-            // === Set up visibility box (matching original cache_Task) ===
-            Fbox vis_box;
-            vis_box.vMin.set(sx * DETAIL_SLOT_SIZE, DS.r_ybase(), sz * DETAIL_SLOT_SIZE);
-            vis_box.vMax.set(vis_box.vMin.x + DETAIL_SLOT_SIZE,
-                            DS.r_ybase() + DS.r_yheight(),
-                            vis_box.vMin.z + DETAIL_SLOT_SIZE);
-            vis_box.grow(EPS_L);
+            dst.packed_ids = (u32(src.id0) << 0) |
+                             (u32(src.id1) << 8) |
+                             (u32(src.id2) << 16) |
+                             (u32(src.id3) << 24);
 
-            // === Query collision geometry (matching original cache_Decompress) ===
-            Fvector bC, bD;
-            vis_box.get_CD(bC, bD);
+            dst.packed_palette_01 =
+                (u32(src.palette[0].a0) << 0)  | (u32(src.palette[0].a1) << 4)  |
+                (u32(src.palette[0].a2) << 8)  | (u32(src.palette[0].a3) << 12) |
+                (u32(src.palette[1].a0) << 16) | (u32(src.palette[1].a1) << 20) |
+                (u32(src.palette[1].a2) << 24) | (u32(src.palette[1].a3) << 28);
 
-            thread_local xrXRC thread_xrc;
-            thread_xrc.box_query(CDB::OPT_FULL_TEST, g_pGameLevel->ObjectSpace.GetStaticModel(), bC, bD);
-            const auto triCount = thread_xrc.r_count();
+            dst.packed_palette_23 =
+                (u32(src.palette[2].a0) << 0)  | (u32(src.palette[2].a1) << 4)  |
+                (u32(src.palette[2].a2) << 8)  | (u32(src.palette[2].a3) << 12) |
+                (u32(src.palette[3].a0) << 16) | (u32(src.palette[3].a1) << 20) |
+                (u32(src.palette[3].a2) << 24) | (u32(src.palette[3].a3) << 28);
 
-            if (triCount == 0)
-            {
-                no_collision_slots++;
-                continue;
-            }
-
-            CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
-            Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
-
-            // Build alpha255 shading table (matching original)
-            float alpha255[4][4];
-            for (int i = 0; i < 4; i++)
-            {
-                alpha255[i][0] = 255.f * float(DS.palette[i].a0) / 15.f;
-                alpha255[i][1] = 255.f * float(DS.palette[i].a1) / 15.f;
-                alpha255[i][2] = 255.f * float(DS.palette[i].a2) / 15.f;
-                alpha255[i][3] = 255.f * float(DS.palette[i].a3) / 15.f;
-            }
-
-            // Density and jitter settings (matching original cache_Decompress exactly)
-            float density = ps_r__Detail_density;
-            float jitter = density / 1.7f;
-            u32 d_size = iCeil(DETAIL_SLOT_SIZE / density);
-
-            // Seed random generators with world slot coords (matching original)
-            u32 p_rnd = sx * sz;
-            CRandom r_selection(0x12071980 ^ p_rnd);
-            CRandom r_jitter(0x12071980 ^ p_rnd);
-            CRandom r_yaw(0x12071980 ^ p_rnd);
-            CRandom r_scale(0x12071980 ^ p_rnd);
-
-            // === Decompression loop (matching original cache_Decompress exactly) ===
-            for (u32 z = 0; z <= d_size; z++)
-            {
-                for (u32 x = 0; x <= d_size; x++)
-                {
-                    // Dither shift
-                    u32 shift_x = r_jitter.randI(16);
-                    u32 shift_z = r_jitter.randI(16);
-
-                    // Interpolate and dither palette for each object type
-                    svector<int, 4> selected;
-
-                    if ((DS.id0 != DetailSlot::ID_Empty) &&
-                        InterpolateAndDither(alpha255[0], x, z, shift_x, shift_z, d_size, dither))
-                        selected.push_back(0);
-                    if ((DS.id1 != DetailSlot::ID_Empty) &&
-                        InterpolateAndDither(alpha255[1], x, z, shift_x, shift_z, d_size, dither))
-                        selected.push_back(1);
-                    if ((DS.id2 != DetailSlot::ID_Empty) &&
-                        InterpolateAndDither(alpha255[2], x, z, shift_x, shift_z, d_size, dither))
-                        selected.push_back(2);
-                    if ((DS.id3 != DetailSlot::ID_Empty) &&
-                        InterpolateAndDither(alpha255[3], x, z, shift_x, shift_z, d_size, dither))
-                        selected.push_back(3);
-
-                    if (selected.empty())
-                        continue;
-
-                    // Select one object type
-                    u32 index;
-                    if (selected.size() == 1)
-                        index = selected[0];
-                    else
-                        index = selected[r_selection.randI(selected.size())];
-
-                    u32 object_id = DS.r_id(index);
-                    if (object_id >= detail_models.size())
-                        continue;
-
-                    CDetail* Dobj = detail_models[object_id];
-
-                    // Position (XZ) with jitter
-                    float rx = (float(x) / float(d_size)) * DETAIL_SLOT_SIZE + vis_box.vMin.x;
-                    float rz = (float(z) / float(d_size)) * DETAIL_SLOT_SIZE + vis_box.vMin.z;
-                    Fvector Item_P;
-                    Item_P.set(rx + r_jitter.randFs(jitter), vis_box.vMax.y, rz + r_jitter.randFs(jitter));
-
-                    // Position (Y) - raycast down to find terrain
-                    float y = vis_box.vMin.y - 5.f;
-                    Fvector dir;
-                    dir.set(0.f, -1.f, 0.f);
-
-                    float r_u, r_v, r_range;
-                    for (size_t tid = 0; tid < triCount; tid++)
-                    {
-                        CDB::TRI& T = tris[thread_xrc.r_begin()[tid].id];
-                        SGameMtl* mtl = GMLib.GetMaterialByIdx(T.material);
-                        if (mtl->Flags.test(SGameMtl::flPassable))
-                            continue;
-
-                        Fvector Tv[3] = {verts[T.verts[0]], verts[T.verts[1]], verts[T.verts[2]]};
-                        if (CDB::TestRayTri(Item_P, dir, Tv, r_u, r_v, r_range, TRUE))
-                        {
-                            if (r_range >= 0.f)
-                            {
-                                float y_test = Item_P.y - r_range;
-                                if (y_test > y)
-                                    y = y_test;
-                            }
-                        }
-                    }
-
-                    // Skip if no valid terrain hit
-                    if (y < vis_box.vMin.y)
-                        continue;
-
-                    Item_P.y = y;
-
-                    // Scale (matching original exactly)
-                    float scale = r_scale.randF(Dobj->m_fMinScale * 0.5f, Dobj->m_fMaxScale * 0.9f) * ps_current_detail_height;
-
-                    // Rotation (consume random to match original sequence)
-                    float yaw = r_yaw.randF(0.f, PI_MUL_2);
-
-                    // Vis ID (matching original - use global Random, not r_selection)
-                    u32 vis_id;
-                    if (Dobj->m_Flags.is(DO_NO_WAVING))
-                        vis_id = 0;
-                    else
-                    {
-                        if (::Random.randI(0, 3) == 0)
-                            vis_id = 2;
-                        else
-                            vis_id = 1;
-                    }
-
-                    // Create instance
-                    InstanceData instance = {};
-                    instance.pos = Item_P;
-                    instance.scale = scale;
-                    instance.rotation = yaw;
-                    instance.hemi = DS.r_qclr(DS.c_hemi, 15);
-                    instance.vis_id = vis_id;
-                    instance.object_id = object_id;
-
-                    if (instance.object_id <= 6) // ONLY GRASS (id 7-16 used for leaves and ground/water details?)
-                        all_instances.push_back(instance);
-                }
-            }
-
-            // Build AABB for this slot with actual instance count
-            u32 slot_instance_count = all_instances.size() - instance_base;
-            if (slot_instance_count > 0)
-            {
-                SlotAABB aabb = {};
-                aabb.aabb_min.set(vis_box.vMin.x, vis_box.vMin.y, vis_box.vMin.z);
-                aabb.aabb_max.set(vis_box.vMax.x, vis_box.vMax.y + 2.0f, vis_box.vMax.z);
-                aabb.instance_base = instance_base;
-                aabb.instance_count = slot_instance_count;
-                aabb.slot_x = sx;
-                aabb.slot_z = sz;
-
-                slot_aabbs.push_back(aabb);
-                slot_count++;
-            }
+            dst.hemi = src.r_qclr(src.c_hemi, 15);
         }
     }
 
     slots_chunk->close();
 
-    total_instance_count = all_instances.size();
-
-    // Build instance-to-slot mapping (flat lookup: instance_idx -> slot_idx)
-    // Used by two-pass culling: Pass 2 reads this to check slot visibility from Pass 1
-    instanceToSlotMapping.resize(total_instance_count);
-    for (u32 s = 0; s < slot_count; s++)
-    {
-        const SlotAABB& slot = slot_aabbs[s];
-        for (u32 i = 0; i < slot.instance_count; i++)
-        {
-            instanceToSlotMapping[slot.instance_base + i] = s;
-        }
-    }
-
-    Msg("* [FGDetailManager] Decompressed %u instances in %u slots (%.2f MB), built instance-to-slot mapping",
-        total_instance_count, slot_count,
-        (total_instance_count * sizeof(InstanceData)) / (1024.f * 1024.f));
+    float size_mb = float(slotDataCPU.size() * sizeof(GPUSlotData)) / (1024.f * 1024.f);
+    Msg("* [FGDetailManager] Packed %u slots (%.2f MB)", slotDataCPU.size(), size_mb);
 }
 
 bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
@@ -756,23 +614,17 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         return false;
     }
 
-    if (total_instance_count == 0)
-    {
-        Msg("! [FGDetailManager] CreateGPUBuffers: no instances (call DecompressAllSlots first)");
-        return false;
-    }
+    constexpr u32 MAX_GENERATED_INSTANCES = 10000000;
+    visibleBufferCapacity = MAX_GENERATED_INSTANCES;
 
-    // Capacity for visible buffer (same as total - worst case all visible)
-    u32 visibleBufferCapacity = total_instance_count;
-
-    // === Create GPU buffers ===
-
-    // Instance buffer (all decompressed instances)
+    Msg("* [FGDetailManager] Creating GPU buffers (visible capacity: %u, %.1f MB per LOD)",
+        visibleBufferCapacity, (visibleBufferCapacity * sizeof(InstanceData)) / (1024.f * 1024.f));
+    if (!slotDataCPU.empty())
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = total_instance_count * sizeof(InstanceData);
-        desc.structStride = sizeof(InstanceData);
-        desc.debugName = "DetailInstanceBuffer";
+        desc.byteSize = slotDataCPU.size() * sizeof(GPUSlotData);
+        desc.structStride = sizeof(GPUSlotData);
+        desc.debugName = "DetailSlotData";
         desc.canHaveUAVs = false;
         desc.canHaveTypedViews = false;
         desc.isVertexBuffer = false;
@@ -783,18 +635,90 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
 
-        instanceBuffer = device->createBuffer(desc);
-        if (!instanceBuffer)
+        slotDataBuffer = device->createBuffer(desc);
+        if (!slotDataBuffer)
         {
-            Msg("! [FGDetailManager] Failed to create instance buffer");
+            Msg("! [FGDetailManager] Failed to create slot data buffer");
             return false;
         }
+
+        Msg("* [FGDetailManager] Created slot data buffer: %u slots (%.2f MB)",
+            slotDataCPU.size(),
+            float(desc.byteSize) / (1024.f * 1024.f));
     }
 
-    // Per-LOD culling output buffers
+    {
+        constexpr float MIN_DENSITY = 0.04f;
+        constexpr u32 MAX_CAPACITY_BYTES = 512u * 1024u * 1024u;
+        constexpr u32 MAX_CAPACITY = MAX_CAPACITY_BYTES / sizeof(InstanceData);
+        u32 d_size = u32(std::ceil(2.0f / MIN_DENSITY));
+        u32 grid_per_slot = (d_size + 1) * (d_size + 1);
+        generatedInstancesCapacity = std::min(u32(float(slot_count) * float(grid_per_slot) * 0.08f), MAX_CAPACITY);
+        generatedInstancesCapacity = std::max(generatedInstancesCapacity, 1000000u);
+
+        nvrhi::BufferDesc desc;
+        desc.byteSize = generatedInstancesCapacity * sizeof(InstanceData);
+        desc.structStride = sizeof(InstanceData);
+        desc.debugName = "DetailGeneratedInstances";
+        desc.canHaveUAVs = true;
+        desc.canHaveTypedViews = false;
+        desc.isVertexBuffer = false;
+        desc.isIndexBuffer = false;
+        desc.isConstantBuffer = false;
+        desc.isDrawIndirectArgs = false;
+        desc.canHaveRawViews = false;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        generatedInstancesBuffer = device->createBuffer(desc);
+        if (!generatedInstancesBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create generated instances buffer");
+            return false;
+        }
+
+        Msg("* [FGDetailManager] Created generated instances buffer: %.2f MB",
+            float(desc.byteSize) / (1024.f * 1024.f));
+    }
+
+    if (!detail_models.empty())
+    {
+        xr_vector<Fvector4> model_data(detail_models.size());
+        for (u32 i = 0; i < detail_models.size(); i++)
+        {
+            CDetail* model = detail_models[i];
+            model_data[i].x = model->m_fMinScale;
+            model_data[i].y = model->m_fMaxScale;
+            model_data[i].z = *reinterpret_cast<float*>(&model->m_Flags.flags);
+            model_data[i].w = 0.f;
+        }
+
+        nvrhi::BufferDesc desc;
+        desc.byteSize = model_data.size() * sizeof(Fvector4);
+        desc.structStride = sizeof(Fvector4);
+        desc.debugName = "DetailModelsMetadata";
+        desc.canHaveUAVs = false;
+        desc.canHaveTypedViews = false;
+        desc.isVertexBuffer = false;
+        desc.isIndexBuffer = false;
+        desc.isConstantBuffer = false;
+        desc.isDrawIndirectArgs = false;
+        desc.canHaveRawViews = false;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+
+        detailModelsBuffer = device->createBuffer(desc);
+        if (!detailModelsBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create detail models buffer");
+            return false;
+        }
+
+        Msg("* [FGDetailManager] Created detail models buffer: %u models", detail_models.size());
+    }
+
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
-        // Visible instances buffer (full InstanceData per LOD)
         {
             nvrhi::BufferDesc desc;
             desc.byteSize = visibleBufferCapacity * sizeof(InstanceData);
@@ -808,7 +732,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             desc.isDrawIndirectArgs = false;
             desc.canHaveRawViews = false;
             desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-            desc.keepInitialState = false;
+            desc.keepInitialState = true;
 
             visibleInstancesBuffer[lod] = device->createBuffer(desc);
             if (!visibleInstancesBuffer[lod])
@@ -818,10 +742,9 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             }
         }
 
-        // Draw args buffer (indirect draw arguments)
         {
             nvrhi::BufferDesc desc;
-            desc.byteSize = 5 * sizeof(u32);  // DrawIndexedIndirectArgs
+            desc.byteSize = 5 * sizeof(u32);
             desc.structStride = 0;
             desc.debugName = ("DetailDrawArgsLOD" + std::to_string(lod)).c_str();
             desc.canHaveUAVs = true;
@@ -832,7 +755,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             desc.isDrawIndirectArgs = true;
             desc.canHaveRawViews = true;
             desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-            desc.keepInitialState = false;
+            desc.keepInitialState = true;
 
             drawArgsBuffer[lod] = device->createBuffer(desc);
             if (!drawArgsBuffer[lod])
@@ -843,13 +766,12 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    // Slot AABB buffer
     {
         nvrhi::BufferDesc desc;
         desc.byteSize = slot_aabbs.size() * sizeof(SlotAABB);
         desc.structStride = sizeof(SlotAABB);
         desc.debugName = "DetailSlotAABBs";
-        desc.canHaveUAVs = false;
+        desc.canHaveUAVs = true;
         desc.canHaveTypedViews = false;
         desc.isVertexBuffer = false;
         desc.isIndexBuffer = false;
@@ -867,10 +789,9 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    // Visible slot IDs buffer (Pass 1 writes visible slot indices, Pass 2 reads them)
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = slot_aabbs.size() * sizeof(u32);  // Sized to total slot count
+        desc.byteSize = slot_aabbs.size() * sizeof(u32);
         desc.structStride = sizeof(u32);
         desc.debugName = "DetailVisibleSlotIDs";
         desc.canHaveUAVs = true;
@@ -891,11 +812,9 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    // Visible slot counter buffer (also serves as DispatchIndirect args for Pass 2)
-    // Layout: { groupsX (visible slot count), groupsY (1), groupsZ (1) } = 12 bytes
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = 3 * sizeof(u32);  // DispatchIndirectArguments: X, Y, Z
+        desc.byteSize = 3 * sizeof(u32);
         desc.structStride = 0;
         desc.debugName = "DetailCullDispatchArgs";
         desc.canHaveUAVs = true;
@@ -903,10 +822,10 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         desc.isVertexBuffer = false;
         desc.isIndexBuffer = false;
         desc.isConstantBuffer = false;
-        desc.isDrawIndirectArgs = true;   // Used as DispatchIndirect args
+        desc.isDrawIndirectArgs = true;
         desc.canHaveRawViews = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
 
         visibleSlotCounterBuffer = device->createBuffer(desc);
         if (!visibleSlotCounterBuffer)
@@ -916,7 +835,6 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    // Slot visibility buffer (per-slot flag, written by Pass 1, read by Pass 2)
     {
         nvrhi::BufferDesc desc;
         desc.byteSize = slot_aabbs.size() * sizeof(u32);
@@ -940,26 +858,98 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    // Instance-to-slot mapping buffer (maps instance_idx -> slot_idx)
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = total_instance_count * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.debugName = "DetailInstanceToSlot";
-        desc.canHaveUAVs = false;
+        desc.byteSize = sizeof(u32);
+        desc.debugName = "DetailInstanceCounter";
+        desc.canHaveUAVs = true;
         desc.canHaveTypedViews = false;
         desc.isVertexBuffer = false;
         desc.isIndexBuffer = false;
         desc.isConstantBuffer = false;
         desc.isDrawIndirectArgs = false;
-        desc.canHaveRawViews = false;
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.canHaveRawViews = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = true;
 
-        instanceToSlotBuffer = device->createBuffer(desc);
-        if (!instanceToSlotBuffer)
+        instanceCounterBuffer = device->createBuffer(desc);
+        if (!instanceCounterBuffer)
         {
-            Msg("! [FGDetailManager] Failed to create instance-to-slot buffer");
+            Msg("! [FGDetailManager] Failed to create instance counter buffer");
+            return false;
+        }
+    }
+
+    const u32 numBlocks = ((u32)slot_aabbs.size() + PREFIX_SUM_BLOCK_SIZE - 1) / PREFIX_SUM_BLOCK_SIZE;
+    const u32 paddedSlotCount = numBlocks * PREFIX_SUM_BLOCK_SIZE;
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = paddedSlotCount * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.debugName = "DetailPerSlotCounts";
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        perSlotCountsBuffer = device->createBuffer(desc);
+        if (!perSlotCountsBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create per-slot counts buffer");
+            return false;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = paddedSlotCount * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.debugName = "DetailPerSlotPrefix";
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        perSlotPrefixBuffer = device->createBuffer(desc);
+        if (!perSlotPrefixBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create per-slot prefix buffer");
+            return false;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = numBlocks * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.debugName = "DetailBlockTotals";
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        blockTotalsBuffer = device->createBuffer(desc);
+        if (!blockTotalsBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create block totals buffer");
+            return false;
+        }
+    }
+
+    Msg("* [FGDetailManager] Created prefix sum buffers: %u slots, %u blocks of %u (padded to %u)",
+        (u32)slot_aabbs.size(), numBlocks, PREFIX_SUM_BLOCK_SIZE, paddedSlotCount);
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = slot_aabbs.size() * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.debugName = "DetailPerSlotLocalCounters";
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        perSlotLocalCountersBuffer = device->createBuffer(desc);
+        if (!perSlotLocalCountersBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create per-slot local counters buffer");
             return false;
         }
     }
@@ -979,7 +969,6 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    // Generate blade geometry for all LOD levels
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         GenerateBladeGeometry(bladeVertices[lod], bladeIndices[lod], LOD_SEGMENTS[lod]);
@@ -989,7 +978,6 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         Msg("* [FGDetailManager] LOD%u: %u segments, %u vertices, %u indices",
             lod, LOD_SEGMENTS[lod], bladeVertexCount[lod], bladeIndexCount[lod]);
 
-        // Blade vertex buffer
         {
             nvrhi::BufferDesc desc;
             desc.byteSize = bladeVertices[lod].size() * sizeof(BladeVertex);
@@ -1013,7 +1001,6 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             }
         }
 
-        // Blade index buffer
         {
             nvrhi::BufferDesc desc;
             desc.byteSize = bladeIndices[lod].size() * sizeof(u16);
@@ -1038,9 +1025,9 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    Msg("* [FGDetailManager] GPU buffers created: %.2f MB", (total_instance_count * sizeof(InstanceData)) / (1024.f * 1024.f));
+    Msg("* [FGDetailManager] GPU buffers created (instance capacity: %u, %.2f MB)",
+        generatedInstancesCapacity, float(generatedInstancesCapacity * sizeof(InstanceData)) / (1024.f * 1024.f));
 
-    // Create cached per-frame resources (samplers, dummy buffers, volatile CBs)
     if (!CreateCachedResources(device))
     {
         Msg("! [FGDetailManager] Failed to create cached per-frame resources");
@@ -1055,7 +1042,6 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
     if (!device || cachedResourcesInitialized)
         return true;
 
-    // === Samplers (4 unique objects for 7 binding slots) ===
     {
         nvrhi::SamplerDesc desc;
         desc.setAllFilters(true);
@@ -1082,10 +1068,9 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
         cachedSmp_AnisoWrap = device->createSampler(desc);
     }
 
-    // === Dummy buffers (constant placeholders) ===
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = 32;  // sizeof(MaterialData)
+        desc.byteSize = 32;
         desc.structStride = 32;
         desc.debugName = "DummyMaterials_Detail";
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
@@ -1094,7 +1079,7 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
     }
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = 4;  // 1 uint
+        desc.byteSize = 4;
         desc.format = nvrhi::Format::R32_UINT;
         desc.canHaveTypedViews = true;
         desc.debugName = "DummySlotIndirection";
@@ -1103,7 +1088,6 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
         cachedDummySlotIndirection = device->createBuffer(desc);
     }
 
-    // === Volatile constant buffers (created once, writeBuffer'd per frame) ===
     nvrhi::BufferDesc cbDesc;
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
@@ -1113,7 +1097,7 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
     cbDesc.debugName = "DynTransforms_Detail";
     cachedDynTransformsCB = device->createBuffer(cbDesc);
 
-    cbDesc.byteSize = 32;  // ShaderParams dummy
+    cbDesc.byteSize = 32;
     cbDesc.debugName = "ShaderParams_Detail";
     cachedShaderParamsCB = device->createBuffer(cbDesc);
 
@@ -1125,7 +1109,7 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
     cbDesc.debugName = "DetailGlobals";
     cachedDetailGlobalsCB = device->createBuffer(cbDesc);
 
-    cbDesc.byteSize = 48;  // DynamicLight dummy
+    cbDesc.byteSize = 48;
     cbDesc.debugName = "DynLight_Detail";
     cachedDynLightCB = device->createBuffer(cbDesc);
 
@@ -1133,7 +1117,10 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
     cbDesc.debugName = "DetailCullParams";
     cachedCullParamsCB = device->createBuffer(cbDesc);
 
-    // === Grass object tint buffer ===
+    cbDesc.byteSize = sizeof(InstanceGenParams);
+    cbDesc.debugName = "InstanceGenParams";
+    cachedInstanceGenParamsCB = device->createBuffer(cbDesc);
+
     {
         nvrhi::BufferDesc desc;
         desc.byteSize = sizeof(GrassObjectTint) * 64;
@@ -1151,9 +1138,13 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
 
 void FGDetailManager::DestroyGPUBuffers()
 {
-    instanceBuffer = nullptr;
+    slotDataBuffer = nullptr;
+    generatedInstancesBuffer = nullptr;
+    detailModelsBuffer = nullptr;
+    instanceGenComputeShader = nullptr;
+    instanceGenBindingLayout = nullptr;
+    instanceGenPipeline = nullptr;
 
-    // Per-LOD buffers
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         visibleInstancesBuffer[lod] = nullptr;
@@ -1166,33 +1157,37 @@ void FGDetailManager::DestroyGPUBuffers()
     visibleSlotIDsBuffer = nullptr;
     visibleSlotCounterBuffer = nullptr;
     slotVisibilityBuffer = nullptr;
-    instanceToSlotBuffer = nullptr;
 
-    // Pass 1: Slot culling
+    instanceCounterBuffer = nullptr;
+    perSlotCountsBuffer = nullptr;
+    perSlotPrefixBuffer = nullptr;
+    blockTotalsBuffer = nullptr;
+    perSlotLocalCountersBuffer = nullptr;
+    prefixSumScanShader = nullptr;
+    prefixSumTopShader = nullptr;
+    prefixSumBindingLayout = nullptr;
+    prefixSumScanPipeline = nullptr;
+    prefixSumTopPipeline = nullptr;
+
     slotCullComputeShader = nullptr;
     slotCullBindingLayout = nullptr;
     slotCullPipeline = nullptr;
 
-    // Pass 2: Instance culling
     computePipeline = nullptr;
     computeBindingLayout = nullptr;
     cullComputeShader = nullptr;
 
-    // Graphics
     graphicsPipeline = nullptr;
     graphicsBindingLayout = nullptr;
 
-    // Wind system cleanup
     windTexture = nullptr;
     windComputeShader = nullptr;
     windBindingLayout = nullptr;
     windPipeline = nullptr;
 
-    // Stats readback cleanup
     statsReadbackBuffer = nullptr;
     statsReadbackPending = false;
 
-    // Cached per-frame resources
     cachedSmp_LinearWrap = nullptr;
     cachedSmp_PointClamp = nullptr;
     cachedSmp_LinearClamp = nullptr;
@@ -1205,23 +1200,16 @@ void FGDetailManager::DestroyGPUBuffers()
     cachedDetailGlobalsCB = nullptr;
     cachedDynLightCB = nullptr;
     cachedCullParamsCB = nullptr;
+    cachedInstanceGenParamsCB = nullptr;
     cachedGrassTintsBuffer = nullptr;
     cachedResourcesInitialized = false;
 }
-
-// ═══════════════════════════════════════════════════════
-//  WIND SYSTEM
-// ═══════════════════════════════════════════════════════
 
 bool FGDetailManager::CreateWindTexture(nvrhi::IDevice* device)
 {
     if (!device)
         return false;
 
-    // Load static Perlin noise texture from disk (replaces per-frame compute generation)
-    // Path: res/gamedata/textures/shaders/perlin_noise.dds
-
-    // Access resource manager via RImplementation (like dxUIShader.cpp does)
     if (!RImplementation.m_renderDevice)
     {
         Msg("! [FGDetailManager] No render device available for wind texture");
@@ -1242,10 +1230,9 @@ bool FGDetailManager::CreateWindTexture(nvrhi::IDevice* device)
         return false;
     }
 
-    // Load perlin noise texture (X-Ray convention: no extension, backslashes)
     xray::render::resources::TextureHandle texHandle = textureManager->LoadTexture(
         "shaders\\perlin_noise",
-        xray::render::resources::TexturePriority::Critical  // Always keep resident
+        xray::render::resources::TexturePriority::Critical
     );
 
     if (!texHandle.IsValid())
@@ -1254,7 +1241,6 @@ bool FGDetailManager::CreateWindTexture(nvrhi::IDevice* device)
         return false;
     }
 
-    // Get NVRHI texture pointer (TextureManager owns the actual resource)
     nvrhi::ITexture* nvrhiTexture = textureManager->GetNVRHITexture(texHandle);
     if (!nvrhiTexture)
     {
@@ -1262,10 +1248,8 @@ bool FGDetailManager::CreateWindTexture(nvrhi::IDevice* device)
         return false;
     }
 
-    // Store handle for potential future use (reference counted)
     windTexture = nvrhiTexture;
 
-    // Register in bindless descriptor heap for vertex shader access
     if (GEnv.Backend)
     {
         windTextureBindlessIndex = GEnv.Backend->RegisterBindlessTexture(nvrhiTexture);
@@ -1300,12 +1284,11 @@ bool FGDetailManager::CreateWindPipeline(nvrhi::IDevice* device)
     if (!device || !windComputeShader)
         return false;
 
-    // Create binding layout for wind compute shader
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::Compute;
     layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),  // b0: WindParams
-        nvrhi::BindingLayoutItem::Texture_UAV(0),             // u0: g_wind_output
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
+        nvrhi::BindingLayoutItem::Texture_UAV(0),
     };
 
     windBindingLayout = device->createBindingLayout(layoutDesc);
@@ -1331,9 +1314,6 @@ bool FGDetailManager::CreateWindPipeline(nvrhi::IDevice* device)
 
 void FGDetailManager::DispatchWindCompute(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, float time)
 {
-    // DEPRECATED: Wind animation is now computed via multi-scale texture sampling in detail_gpu.vs.
-    // Wind parameters are updated directly in DetailPassSetup.cpp.
-    // This method is kept only for API compatibility.
     (void)cmdList;
     (void)device;
     (void)time;
@@ -1347,14 +1327,11 @@ void FGDetailManager::GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr
     float width_base = ps_r3_grass_blade_width;
     float height = ps_r3_grass_blade_height;
 
-    // Generate vertex pairs for all segments except the tip
     for (int i = 0; i < segments; i++)
     {
         float t = float(i) / float(segments);
         float y = t * height;
 
-        // Use smooth curve for more natural taper (wider at base, sharp at tip)
-        // t^0.7 keeps blade wider longer before tapering sharply at the tip
         float taper = 1.0f - powf(t, 0.7f);
         float width = width_base * taper;
 
@@ -1373,23 +1350,20 @@ void FGDetailManager::GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr
         vertices.push_back(v_right);
     }
 
-    // Single tip vertex (sharp point)
     {
         BladeVertex v_tip;
         v_tip.pos.set(0.0f, height, 0.0f);
-        v_tip.uv.set(0.5f, 0.0f);  // Center UV at tip
+        v_tip.uv.set(0.5f, 0.0f);
         v_tip.t = 1.0f;
         v_tip.width_scale = 0.0f;
         vertices.push_back(v_tip);
     }
 
-    u16 tipIndex = static_cast<u16>(segments * 2);  // Index of the single tip vertex
+    u16 tipIndex = static_cast<u16>(segments * 2);
 
-    // Generate quad indices for all segments except the last
     for (int i = 0; i < segments - 1; i++)
     {
         u16 base = i * 2;
-        // Two triangles forming a quad
         indices.push_back(base);
         indices.push_back(base + 2);
         indices.push_back(base + 1);
@@ -1398,10 +1372,8 @@ void FGDetailManager::GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr
         indices.push_back(base + 3);
     }
 
-    // Final segment connects to the single tip vertex (two triangles)
     {
         u16 base = (segments - 1) * 2;
-        // Left triangle: base_left -> tip -> base_right
         indices.push_back(base);
         indices.push_back(tipIndex);
         indices.push_back(base + 1);
@@ -1416,14 +1388,12 @@ void FGDetailManager::RegenerateBladeGeometry(nvrhi::ICommandList* cmdList)
     Msg("* [FGDetailManager] Regenerating blade geometry (width=%.3f, height=%.2f)",
         ps_r3_grass_blade_width, ps_r3_grass_blade_height);
 
-    // Regenerate geometry for all LOD levels
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         GenerateBladeGeometry(bladeVertices[lod], bladeIndices[lod], LOD_SEGMENTS[lod]);
         bladeVertexCount[lod] = static_cast<u32>(bladeVertices[lod].size());
         bladeIndexCount[lod] = static_cast<u32>(bladeIndices[lod].size());
 
-        // Upload to GPU
         cmdList->writeBuffer(bladeVertexBuffer[lod], bladeVertices[lod].data(), bladeVertices[lod].size() * sizeof(BladeVertex));
         cmdList->writeBuffer(bladeIndexBuffer[lod], bladeIndices[lod].data(), bladeIndices[lod].size() * sizeof(u16));
     }
@@ -1431,7 +1401,59 @@ void FGDetailManager::RegenerateBladeGeometry(nvrhi::ICommandList* cmdList)
 
 void FGDetailManager::ComputeSlotAABBs()
 {
-    // AABBs are built during DecompressAllSlots
+    ZoneScoped;
+
+    if (!dtFS)
+    {
+        Msg("! [FGDetailManager] ComputeSlotAABBs: level.details not loaded");
+        return;
+    }
+
+    IReader* slots_chunk = dtFS->open_chunk(2);
+    if (!slots_chunk)
+    {
+        Msg("! [FGDetailManager] ComputeSlotAABBs: failed to read slots chunk");
+        return;
+    }
+
+    DetailSlot* dtSlots = (DetailSlot*)slots_chunk->pointer();
+    u32 total_slots = dtH.x_size() * dtH.z_size();
+
+    Msg("* [FGDetailManager] Computing slot AABBs for %dx%d grid...", dtH.x_size(), dtH.z_size());
+
+    slot_aabbs.clear();
+    slot_aabbs.resize(total_slots);
+
+    for (u32 db_z = 0; db_z < dtH.z_size(); db_z++)
+    {
+        for (u32 db_x = 0; db_x < dtH.x_size(); db_x++)
+        {
+            int sx = int(db_x) - dtH.x_offs();
+            int sz = int(db_z) - dtH.z_offs();
+            u32 slot_idx = db_z * dtH.x_size() + db_x;
+
+            const DetailSlot& slot = dtSlots[slot_idx];
+
+            float world_x = sx * DETAIL_SLOT_SIZE;
+            float world_z = sz * DETAIL_SLOT_SIZE;
+
+            SlotAABB& aabb = slot_aabbs[slot_idx];
+            aabb.aabb_min = Fvector3(world_x, -50.0f, world_z);
+            aabb.aabb_max = Fvector3(world_x + DETAIL_SLOT_SIZE, 100.0f, world_z + DETAIL_SLOT_SIZE);
+            aabb.instance_base = 0;
+            aabb.instance_count = 0;
+            aabb.slot_x = sx;
+            aabb.slot_z = sz;
+            aabb.padding0 = aabb.padding1 = 0.f;
+            aabb.padding2 = Fvector4(0, 0, 0, 0);
+        }
+    }
+
+    slots_chunk->close();
+
+    slot_count = total_slots;
+
+    Msg("* [FGDetailManager] Computed %u slot AABBs", total_slots);
 }
 
 bool FGDetailManager::LoadCullComputeShader(framegraph::ShaderLoader* shaderLoader)
@@ -1442,7 +1464,6 @@ bool FGDetailManager::LoadCullComputeShader(framegraph::ShaderLoader* shaderLoad
         return false;
     }
 
-    // Pass 1: Slot culling shader
     slotCullComputeShader = shaderLoader->LoadComputeShader("detail_cell_cull", "main").handle;
     if (!slotCullComputeShader)
     {
@@ -1450,7 +1471,6 @@ bool FGDetailManager::LoadCullComputeShader(framegraph::ShaderLoader* shaderLoad
         return false;
     }
 
-    // Pass 2: Instance culling shader
     cullComputeShader = shaderLoader->LoadComputeShader("detail_cull", "main").handle;
     if (!cullComputeShader)
     {
@@ -1460,6 +1480,104 @@ bool FGDetailManager::LoadCullComputeShader(framegraph::ShaderLoader* shaderLoad
     return true;
 }
 
+bool FGDetailManager::LoadInstanceGenShader(framegraph::ShaderLoader* shaderLoader)
+{
+    if (!shaderLoader)
+    {
+        Msg("! [FGDetailManager] LoadInstanceGenShader: shaderLoader is null");
+        return false;
+    }
+
+    instanceGenComputeShader = shaderLoader->LoadComputeShader("detail_instance_gen", "main").handle;
+    if (!instanceGenComputeShader)
+    {
+        Msg("! [FGDetailManager] Failed to load detail_instance_gen.cs");
+        return false;
+    }
+
+    Msg("* [FGDetailManager] Loaded instance generation shader");
+    return true;
+}
+
+bool FGDetailManager::LoadPrefixSumShaders(framegraph::ShaderLoader* shaderLoader)
+{
+    if (!shaderLoader)
+    {
+        Msg("! [FGDetailManager] LoadPrefixSumShaders: shaderLoader is null");
+        return false;
+    }
+
+    prefixSumScanShader = shaderLoader->LoadComputeShader("detail_prefix_sum", "main_scan_blocks").handle;
+    if (!prefixSumScanShader)
+    {
+        Msg("! [FGDetailManager] Failed to load detail_prefix_sum.cs (main_scan_blocks)");
+        return false;
+    }
+
+    prefixSumTopShader = shaderLoader->LoadComputeShader("detail_prefix_sum", "main_scan_top").handle;
+    if (!prefixSumTopShader)
+    {
+        Msg("! [FGDetailManager] Failed to load detail_prefix_sum.cs (main_scan_top)");
+        return false;
+    }
+
+    Msg("* [FGDetailManager] Loaded prefix sum shaders");
+    return true;
+}
+
+bool FGDetailManager::CreatePrefixSumPipeline(ng::RenderDevice* renderDevice)
+{
+    if (!renderDevice || !prefixSumScanShader || !prefixSumTopShader)
+    {
+        Msg("! [FGDetailManager] CreatePrefixSumPipeline: invalid parameters");
+        return false;
+    }
+
+    nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
+
+    nvrhi::BindingLayoutDesc layoutDesc;
+    layoutDesc.visibility = nvrhi::ShaderType::Compute;
+    layoutDesc.bindings = {
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(6),
+        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
+        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(1),
+        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2),
+    };
+
+    prefixSumBindingLayout = device->createBindingLayout(layoutDesc);
+    if (!prefixSumBindingLayout)
+    {
+        Msg("! [FGDetailManager] Failed to create prefix sum binding layout");
+        return false;
+    }
+
+    {
+        nvrhi::ComputePipelineDesc pipeDesc;
+        pipeDesc.CS = prefixSumScanShader;
+        pipeDesc.bindingLayouts = { prefixSumBindingLayout };
+        prefixSumScanPipeline = device->createComputePipeline(pipeDesc);
+        if (!prefixSumScanPipeline)
+        {
+            Msg("! [FGDetailManager] Failed to create prefix sum scan pipeline");
+            return false;
+        }
+    }
+
+    {
+        nvrhi::ComputePipelineDesc pipeDesc;
+        pipeDesc.CS = prefixSumTopShader;
+        pipeDesc.bindingLayouts = { prefixSumBindingLayout };
+        prefixSumTopPipeline = device->createComputePipeline(pipeDesc);
+        if (!prefixSumTopPipeline)
+        {
+            Msg("! [FGDetailManager] Failed to create prefix sum top pipeline");
+            return false;
+        }
+    }
+
+    Msg("* [FGDetailManager] Created prefix sum pipelines");
+    return true;
+}
 
 bool FGDetailManager::LoadGraphicsShaders(framegraph::ShaderLoader* shaderLoader)
 {
@@ -1469,7 +1587,6 @@ bool FGDetailManager::LoadGraphicsShaders(framegraph::ShaderLoader* shaderLoader
         return false;
     }
 
-    // Load vertex shader
     auto vsResult = shaderLoader->LoadVertexShader("detail_gpu", "main");
     if (!vsResult.handle)
     {
@@ -1478,7 +1595,6 @@ bool FGDetailManager::LoadGraphicsShaders(framegraph::ShaderLoader* shaderLoader
     }
     vertexShader = vsResult.handle;
 
-    // Load pixel shader
     auto psResult = shaderLoader->LoadPixelShader("detail_gpu", "main");
     if (!psResult.handle)
     {
@@ -1491,28 +1607,33 @@ bool FGDetailManager::LoadGraphicsShaders(framegraph::ShaderLoader* shaderLoader
 
 void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
 {
-    if (!cmdList || total_instance_count == 0)
+    if (!cmdList)
         return;
 
-    // Upload instance data
-    cmdList->writeBuffer(instanceBuffer, all_instances.data(), all_instances.size() * sizeof(InstanceData));
+    if (slotDataBuffer && !slotDataCPU.empty())
+        cmdList->writeBuffer(slotDataBuffer, slotDataCPU.data(), slotDataCPU.size() * sizeof(GPUSlotData));
 
-    // Upload blade geometry for all LOD levels
+    if (detailModelsBuffer && !detail_models.empty())
+    {
+        xr_vector<Fvector4> model_data(detail_models.size());
+        for (u32 i = 0; i < detail_models.size(); i++)
+        {
+            CDetail* model = detail_models[i];
+            model_data[i].x = model->m_fMinScale;
+            model_data[i].y = model->m_fMaxScale;
+            model_data[i].z = *reinterpret_cast<float*>(&model->m_Flags.flags);
+            model_data[i].w = 0.f;
+        }
+        cmdList->writeBuffer(detailModelsBuffer, model_data.data(), model_data.size() * sizeof(Fvector4));
+    }
+
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         cmdList->writeBuffer(bladeVertexBuffer[lod], bladeVertices[lod].data(), bladeVertices[lod].size() * sizeof(BladeVertex));
         cmdList->writeBuffer(bladeIndexBuffer[lod], bladeIndices[lod].data(), bladeIndices[lod].size() * sizeof(u16));
     }
 
-    // Upload slot AABBs
     cmdList->writeBuffer(slotAABBBuffer, slot_aabbs.data(), slot_aabbs.size() * sizeof(SlotAABB));
-
-    if (instanceToSlotBuffer && !instanceToSlotMapping.empty())
-    {
-        cmdList->writeBuffer(instanceToSlotBuffer, instanceToSlotMapping.data(), instanceToSlotMapping.size() * sizeof(u32));
-        instanceToSlotMapping.clear();
-        instanceToSlotMapping.shrink_to_fit();
-    }
 }
 
 bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
@@ -1525,18 +1646,15 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
 
     nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
 
-    // ═══════════════════════════════════════════════════════
-    //  PASS 1: Slot culling pipeline
-    // ═══════════════════════════════════════════════════════
     {
         nvrhi::BindingLayoutDesc layoutDesc;
         layoutDesc.visibility = nvrhi::ShaderType::Compute;
         layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // b5: DetailCullParams
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),    // t0: slot AABBs
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),    // u0: slot visibility (output)
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(1),    // u1: visible slot IDs
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(2),           // u2: visible slot counter
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(1),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(2),
         };
 
         slotCullBindingLayout = device->createBindingLayout(layoutDesc);
@@ -1558,25 +1676,22 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  PASS 2: Instance culling pipeline (indirect dispatch, 1 group per visible slot)
-    // ═══════════════════════════════════════════════════════
     {
         nvrhi::BindingLayoutDesc layoutDesc;
         layoutDesc.visibility = nvrhi::ShaderType::Compute;
         layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // b5: DetailCullParams
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),    // t0: all instances
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),    // t1: visible slot IDs (from Pass 1)
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),    // t2: slot AABBs (instance_base, count)
-            nvrhi::BindingLayoutItem::Texture_SRV(3),             // t3: Hi-Z pyramid
-            nvrhi::BindingLayoutItem::Sampler(0),                 // s0: point sampler
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),    // u0: visible instances LOD0
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),           // u1: indirect args LOD0
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2),    // u2: visible instances LOD1
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(3),           // u3: indirect args LOD1
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(4),    // u4: visible instances LOD2
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(5),           // u5: indirect args LOD2
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
+            nvrhi::BindingLayoutItem::Texture_SRV(3),
+            nvrhi::BindingLayoutItem::Sampler(0),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(3),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(4),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(5),
         };
 
         computeBindingLayout = device->createBindingLayout(layoutDesc);
@@ -1601,6 +1716,55 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
     return true;
 }
 
+bool FGDetailManager::CreateInstanceGenPipeline(ng::RenderDevice* renderDevice)
+{
+    if (!renderDevice || !instanceGenComputeShader)
+    {
+        Msg("! [FGDetailManager] CreateInstanceGenPipeline: invalid parameters");
+        return false;
+    }
+
+    nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
+
+    nvrhi::BindingLayoutDesc layoutDesc;
+    layoutDesc.visibility = nvrhi::ShaderType::Compute;
+    layoutDesc.bindings = {
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(6),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
+        nvrhi::BindingLayoutItem::Texture_SRV(2),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(4),
+        nvrhi::BindingLayoutItem::Sampler(0),
+        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
+        nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
+        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2),
+        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(3),
+        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(4),
+    };
+
+    instanceGenBindingLayout = device->createBindingLayout(layoutDesc);
+    if (!instanceGenBindingLayout)
+    {
+        Msg("! [FGDetailManager] Failed to create instance gen binding layout");
+        return false;
+    }
+
+    nvrhi::ComputePipelineDesc pipelineDesc;
+    pipelineDesc.CS = instanceGenComputeShader;
+    pipelineDesc.bindingLayouts = { instanceGenBindingLayout };
+
+    instanceGenPipeline = device->createComputePipeline(pipelineDesc);
+    if (!instanceGenPipeline)
+    {
+        Msg("! [FGDetailManager] Failed to create instance gen pipeline");
+        return false;
+    }
+
+    Msg("* [FGDetailManager] Created instance generation pipeline");
+    return true;
+}
+
 bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvrhi::IFramebuffer* framebuffer)
 {
     if (!renderDevice || !framebuffer || !vertexShader || !pixelShader)
@@ -1611,25 +1775,24 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
 
     nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
 
-    // Create binding layout for graphics shaders
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::All;
     layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),  // b0: dynamic_transforms
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(1),  // b1: shader_params
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // b2: static_globals
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(3),  // b3: $Globals (detail params + grass colors)
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // b4: dynamic_light
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // t8: g_Materials
-        nvrhi::BindingLayoutItem::TypedBuffer_SRV(32),        // t32: slot_indirection (dummy)
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(33),   // t33: visible instances
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(34),   // t34: grass_object_tints (per-object colors)
-        nvrhi::BindingLayoutItem::Sampler(0),                 // s0: g_LinearSampler
-        nvrhi::BindingLayoutItem::Sampler(1),                 // s1: smp_nofilter
-        nvrhi::BindingLayoutItem::Sampler(2),                 // s2: smp_rtlinear
-        nvrhi::BindingLayoutItem::Sampler(3),                 // s3: smp_linear
-        nvrhi::BindingLayoutItem::Sampler(4),                 // s4: smp_base
-        nvrhi::BindingLayoutItem::Sampler(5),                 // s5: smp_material
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(1),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(3),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
+        nvrhi::BindingLayoutItem::TypedBuffer_SRV(32),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(33),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(34),
+        nvrhi::BindingLayoutItem::Sampler(0),
+        nvrhi::BindingLayoutItem::Sampler(1),
+        nvrhi::BindingLayoutItem::Sampler(2),
+        nvrhi::BindingLayoutItem::Sampler(3),
+        nvrhi::BindingLayoutItem::Sampler(4),
+        nvrhi::BindingLayoutItem::Sampler(5),
     };
 
     graphicsBindingLayout = device->createBindingLayout(layoutDesc);
@@ -1639,13 +1802,6 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         return false;
     }
 
-    // Create input layout for blade vertex buffer
-    // Must match v_blade_sdf in detail_gpu.vs:
-    //   float3 pos : POSITION;
-    //   float2 tc : TEXCOORD;
-    //   float t : COLOR0;
-    //   float width_scale : COLOR1;
-    // Note: COLOR0/COLOR1 use setArraySize(2) since they have the same format
     nvrhi::VertexAttributeDesc attributes[] = {
         nvrhi::VertexAttributeDesc()
             .setName("POSITION")
@@ -1660,7 +1816,7 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         nvrhi::VertexAttributeDesc()
             .setName("COLOR")
             .setFormat(nvrhi::Format::R32_FLOAT)
-            .setArraySize(2)  // COLOR0 at offset 20, COLOR1 at offset 24
+            .setArraySize(2)
             .setOffset(20)
             .setElementStride(sizeof(BladeVertex)),
     };
@@ -1672,14 +1828,12 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         return false;
     }
 
-    // Create graphics pipeline
     nvrhi::GraphicsPipelineDesc pipelineDesc;
     pipelineDesc.VS = vertexShader;
     pipelineDesc.PS = pixelShader;
     pipelineDesc.inputLayout = inputLayout;
     pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
 
-    // Add binding layouts - regular layout + bindless layout for SM6.6
     pipelineDesc.bindingLayouts.push_back(graphicsBindingLayout);
     auto* backend = renderDevice->GetBackend();
     if (backend) {
@@ -1689,16 +1843,13 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         }
     }
 
-    // Rasterizer state
     pipelineDesc.renderState.rasterState.fillMode = nvrhi::RasterFillMode::Solid;
-    pipelineDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;  // Grass is double-sided
+    pipelineDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
 
-    // Depth state
     pipelineDesc.renderState.depthStencilState.depthTestEnable = true;
     pipelineDesc.renderState.depthStencilState.depthWriteEnable = true;
     pipelineDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
 
-    // Blend state (alpha test handled in shader)
     pipelineDesc.renderState.blendState.targets[0].disableBlend();
 
     graphicsPipeline = device->createGraphicsPipeline(pipelineDesc, framebuffer);
@@ -1722,15 +1873,30 @@ void FGDetailManager::DispatchCulling(
     float fadeDistance,
     u32 hiZWidth,
     u32 hiZHeight,
-    u32 hiZMipLevels)
+    u32 hiZMipLevels,
+    xray::profiler::GPUProfiler* gpuProfiler)
 {
-    if (!cullComputeShader || !slotCullComputeShader || total_instance_count == 0 || slot_count == 0)
+    if (!cullComputeShader || !slotCullComputeShader || slot_count == 0)
+    {
         return;
+    }
 
     if (!computePipeline || !slotCullPipeline)
         return;
 
-    // Fill constant buffer (shared by both passes, must match HLSL DetailCullParams)
+    float current_density = ps_current_detail_density;
+    if (std::abs(current_density - m_lastDensity) > 0.001f)
+    {
+        m_instancesNeedRegeneration = true;
+        m_lastDensity = current_density;
+        Msg("[DetailManager] Density changed to %.3f - regeneration needed", current_density);
+    }
+
+    if (m_instancesNeedRegeneration)
+    {
+        RegenerateAllInstances(cmdList, device, gpuProfiler);
+    }
+
     DetailCullParams params;
     params.viewProj.transpose(viewProj);
     params.prevViewProj.transpose(prevViewProj);
@@ -1745,22 +1911,35 @@ void FGDetailManager::DispatchCulling(
             params.frustumPlanes[i].set(0, 0, 0, 1000000.0f);
     }
 
-    params.totalInstanceCount = total_instance_count;
+    params.totalInstanceCount = 0;
     params.totalSlotCount = slot_count;
     params.hizWidth = hiZWidth;
     params.hizHeight = hiZHeight;
     params.hizMipLevels = hiZMipLevels;
     params.lodDistanceCloseSqr = ps_r3_grass_lod_close * ps_r3_grass_lod_close;
     params.lodDistanceMidSqr = ps_r3_grass_lod_mid * ps_r3_grass_lod_mid;
-    params.pad = 0;
+    params.detailDensity = ps_current_detail_density;
 
-    // Use cached volatile CB (created once in CreateCachedResources)
     cmdList->writeBuffer(cachedCullParamsCB, &params, sizeof(params));
 
-    // Begin tracking all buffer states
     cmdList->beginTrackingBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->beginTrackingBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->beginTrackingBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+    if (generatedInstancesBuffer)
+        cmdList->beginTrackingBufferState(generatedInstancesBuffer, nvrhi::ResourceStates::ShaderResource);
+
+    if (instanceCounterBuffer)
+        cmdList->beginTrackingBufferState(instanceCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    if (perSlotCountsBuffer)
+        cmdList->beginTrackingBufferState(perSlotCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    if (perSlotPrefixBuffer)
+        cmdList->beginTrackingBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    if (blockTotalsBuffer)
+        cmdList->beginTrackingBufferState(blockTotalsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    if (perSlotLocalCountersBuffer)
+        cmdList->beginTrackingBufferState(perSlotLocalCountersBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         cmdList->beginTrackingBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
@@ -1768,8 +1947,6 @@ void FGDetailManager::DispatchCulling(
     }
     cmdList->beginTrackingTextureState(hiZPyramid, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
 
-    // Initialize dispatch args {groupsX=0, groupsY=1, groupsZ=1}
-    // Pass 1 atomically increments groupsX (offset 0) for each visible slot
     u32 dispatchArgs[3] = { 0, 1, 1 };
     cmdList->writeBuffer(visibleSlotCounterBuffer, dispatchArgs, sizeof(dispatchArgs));
 
@@ -1782,9 +1959,7 @@ void FGDetailManager::DispatchCulling(
 
     const u32 threadGroupSize = 256;
 
-    // ═══════════════════════════════════════════════════════
-    //  PASS 1: Slot culling (1 thread per slot)
-    // ═══════════════════════════════════════════════════════
+    if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "Details.SlotCull");
     {
         nvrhi::BindingSetDesc bindDesc;
         bindDesc.bindings = {
@@ -1806,21 +1981,21 @@ void FGDetailManager::DispatchCulling(
         cmdList->dispatch(numGroups, 1, 1);
     }
 
-    // Barriers: Pass 1 outputs → Pass 2 inputs
-    // visibleSlotCounterBuffer: UAV → IndirectArgument (for DispatchIndirect)
-    // visibleSlotIDsBuffer: UAV → SRV (Pass 2 reads visible slot IDs)
+    if (gpuProfiler) gpuProfiler->EndPass(cmdList, "Details.SlotCull");
+
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::IndirectArgument);
     cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->commitBarriers();
 
-    // ═══════════════════════════════════════════════════════
-    //  PASS 2: Instance culling (indirect dispatch, 1 group per visible slot)
-    // ═══════════════════════════════════════════════════════
+    if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "Details.InstanceCull");
     {
+        if (!generatedInstancesBuffer)
+            return;
+
         nvrhi::BindingSetDesc bindDesc;
         bindDesc.bindings = {
             nvrhi::BindingSetItem::ConstantBuffer(5, cachedCullParamsCB),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, instanceBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, generatedInstancesBuffer),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(1, visibleSlotIDsBuffer),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(2, slotAABBBuffer),
             nvrhi::BindingSetItem::Texture_SRV(3, hiZPyramid),
@@ -1844,7 +2019,8 @@ void FGDetailManager::DispatchCulling(
         cmdList->dispatchIndirect(0);
     }
 
-    // Transition all buffers back to expected states for next frame + rendering
+    if (gpuProfiler) gpuProfiler->EndPass(cmdList, "Details.InstanceCull");
+
     cmdList->setBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
@@ -1857,42 +2033,32 @@ void FGDetailManager::DispatchCulling(
     cmdList->commitBarriers();
 }
 
-// ═══════════════════════════════════════════════════════
-//  STATS READBACK (for profiling)
-// ═══════════════════════════════════════════════════════
-
 void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device)
 {
     if (!device || !cmdList || !statsReadbackBuffer)
         return;
 
-    // Copy visible slot counter to readback buffer (offset 0)
-    if (visibleSlotCounterBuffer)
-    {
-        cmdList->copyBuffer(
-            statsReadbackBuffer, 0,
-            visibleSlotCounterBuffer, 0,
-            sizeof(u32)
-        );
-    }
+    cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::CopySource);
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+        cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::CopySource);
+    cmdList->commitBarriers();
 
-    // Copy instanceCount from drawArgsBuffer (offset 4) for each LOD
+    cmdList->copyBuffer(statsReadbackBuffer, 0, visibleSlotCounterBuffer, 0, sizeof(u32));
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         if (drawArgsBuffer[lod])
         {
             cmdList->copyBuffer(
                 statsReadbackBuffer, sizeof(u32) * (1 + lod),
-                drawArgsBuffer[lod], sizeof(u32),  // instanceCount at offset 4
+                drawArgsBuffer[lod], sizeof(u32),
                 sizeof(u32)
             );
         }
     }
 
-    // Transition source buffers back after copies
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
-        cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::IndirectArgument);
+        cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
     cmdList->commitBarriers();
 
     statsReadbackPending = true;
@@ -1903,13 +2069,11 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
     if (!statsReadbackPending || !statsReadbackBuffer || !device)
         return;
 
-    // Only read back at the same interval as CPU profiler for consistency
     statsFrameCounter++;
     const u32 throttleInterval = xray::profiler::GetCPUProfiler().GetThrottleInterval();
     if ((statsFrameCounter % throttleInterval) != 0)
         return;
 
-    // Map the readback buffer and read the values
     void* mappedData = device->mapBuffer(statsReadbackBuffer, nvrhi::CpuAccessMode::Read);
     if (mappedData)
     {
@@ -1921,7 +2085,142 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
         device->unmapBuffer(statsReadbackBuffer);
     }
 
+
+
     statsReadbackPending = false;
+}
+
+nvrhi::BindingSetHandle FGDetailManager::CreateInstanceGenBindingSet(nvrhi::IDevice* device) const
+{
+    nvrhi::BindingSetDesc bindDesc;
+    bindDesc.bindings = {
+        nvrhi::BindingSetItem::ConstantBuffer(5, cachedCullParamsCB),
+        nvrhi::BindingSetItem::ConstantBuffer(6, cachedInstanceGenParamsCB),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(1, slotDataBuffer),
+        nvrhi::BindingSetItem::Texture_SRV(2, heightmapTexture),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(3, detailModelsBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(4, perSlotPrefixBuffer),
+        nvrhi::BindingSetItem::Sampler(0, cachedSmp_PointClamp),
+        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, generatedInstancesBuffer),
+        nvrhi::BindingSetItem::RawBuffer_UAV(1, instanceCounterBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_UAV(2, perSlotCountsBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_UAV(3, perSlotLocalCountersBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_UAV(4, slotAABBBuffer),
+    };
+    return device->createBindingSet(bindDesc, instanceGenBindingLayout);
+}
+
+void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device,
+    xray::profiler::GPUProfiler* gpuProfiler)
+{
+    if (!instanceGenPipeline || !heightmapTexture || !slotDataBuffer ||
+        !prefixSumScanPipeline || !prefixSumTopPipeline)
+    {
+        Msg("! [DetailManager] RegenerateAllInstances: missing resources (genPSO=%p hmap=%p slots=%p scanPSO=%p topPSO=%p)",
+            instanceGenPipeline.Get(), heightmapTexture.Get(), slotDataBuffer.Get(),
+            prefixSumScanPipeline.Get(), prefixSumTopPipeline.Get());
+        m_instancesNeedRegeneration = false;
+        return;
+    }
+
+    constexpr u32 MAX_DISPATCH_1D = 65535;
+    u32 numBlocks = (slot_count + PREFIX_SUM_BLOCK_SIZE - 1) / PREFIX_SUM_BLOCK_SIZE;
+    u32 numGroupsX = std::min(slot_count, MAX_DISPATCH_1D);
+    u32 numGroupsY = (slot_count + MAX_DISPATCH_1D - 1) / MAX_DISPATCH_1D;
+
+    DetailCullParams cullParams = {};
+    cullParams.detailDensity = ps_current_detail_density;
+    cullParams.totalSlotCount = slot_count;
+    for (u32 i = 0; i < 6; i++)
+        cullParams.frustumPlanes[i].set(0, 0, 0, 1000000.0f);
+    cmdList->writeBuffer(cachedCullParamsCB, &cullParams, sizeof(cullParams));
+
+    cmdList->setBufferState(generatedInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(perSlotCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(blockTotalsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(perSlotLocalCountersBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(instanceCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(slotAABBBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->commitBarriers();
+
+    cmdList->clearBufferUInt(perSlotCountsBuffer, 0);
+    cmdList->clearBufferUInt(instanceCounterBuffer, 0);
+    cmdList->clearBufferUInt(perSlotLocalCountersBuffer, 0);
+    cmdList->commitBarriers();
+
+    auto dispatchInstanceGen = [&](u32 mode, const char* passName) {
+        if (gpuProfiler) gpuProfiler->BeginPass(cmdList, passName);
+
+        InstanceGenParams genParams;
+        genParams.heightmapWorldMinX = heightmapWorldMinX;
+        genParams.heightmapWorldMinZ = heightmapWorldMinZ;
+        genParams.heightmapTexelSize = heightmapTexelSize;
+        genParams.detailHeightMultiplier = ps_current_detail_height;
+        genParams.genMode = mode;
+        genParams.prefixSumBlockSize = PREFIX_SUM_BLOCK_SIZE;
+        genParams.prefixSumTotalBlocks = numBlocks;
+        genParams.instanceCapacity = generatedInstancesCapacity;
+        cmdList->writeBuffer(cachedInstanceGenParamsCB, &genParams, sizeof(genParams));
+
+        auto bindingSet = CreateInstanceGenBindingSet(device);
+        nvrhi::ComputeState state;
+        state.pipeline = instanceGenPipeline;
+        state.bindings = { bindingSet };
+        cmdList->setComputeState(state);
+        cmdList->dispatch(numGroupsX, numGroupsY, 1);
+
+        if (gpuProfiler) gpuProfiler->EndPass(cmdList, passName);
+    };
+
+    auto dispatchPrefixSum = [&](nvrhi::ComputePipelineHandle pipeline, u32 groups, const char* passName) {
+        if (gpuProfiler) gpuProfiler->BeginPass(cmdList, passName);
+
+        nvrhi::BindingSetDesc bindDesc;
+        bindDesc.bindings = {
+            nvrhi::BindingSetItem::ConstantBuffer(6, cachedInstanceGenParamsCB),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(0, perSlotCountsBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(1, perSlotPrefixBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(2, blockTotalsBuffer),
+        };
+        auto bindingSet = device->createBindingSet(bindDesc, prefixSumBindingLayout);
+
+        nvrhi::ComputeState state;
+        state.pipeline = pipeline;
+        state.bindings = { bindingSet };
+        cmdList->setComputeState(state);
+        cmdList->dispatch(groups, 1, 1);
+
+        if (gpuProfiler) gpuProfiler->EndPass(cmdList, passName);
+    };
+
+    dispatchInstanceGen(0, "Details.Regen.Count");
+
+    cmdList->setBufferState(perSlotCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->commitBarriers();
+
+    dispatchPrefixSum(prefixSumScanPipeline, numBlocks, "Details.Regen.ScanBlocks");
+
+    cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(blockTotalsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->commitBarriers();
+
+    dispatchPrefixSum(prefixSumTopPipeline, 1, "Details.Regen.ScanTop");
+
+    cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->commitBarriers();
+
+    dispatchInstanceGen(1, "Details.Regen.Scatter");
+
+    cmdList->setBufferState(generatedInstancesBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(slotAABBBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->commitBarriers();
+
+    m_instancesNeedRegeneration = false;
+
+    Msg("[DetailManager] RegenerateAllInstances: 4-pass GPU dispatch complete (%u slots, density=%.3f)",
+        slot_count, ps_current_detail_density);
 }
 
 } // namespace xray::render::RENDER_NAMESPACE

@@ -638,7 +638,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
         if (m_detailManager)
         {
             stats.detailSlots = m_detailManager->slot_count;
-            stats.detailInstances = m_detailManager->total_instance_count;
+            stats.detailInstances = 0;
             for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
                 stats.detailTrisPerBlade[lod] = m_detailManager->bladeIndexCount[lod] / 3;
 
@@ -875,17 +875,24 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         // Lazy initialization - ShaderLoader isn't ready during FrameGraphRenderer::Initialize
         m_gpuCullingManager->Initialize(m_device);
 
-        // Initialize detail manager shaders (lazy - needs ShaderLoader)
-        if (m_detailManager && m_detailManager->total_instance_count > 0) {
+        if (m_detailManager) {
             static bool detailShadersLoaded = false;
             if (!detailShadersLoaded) {
                 auto* shaderLoader = GEnv.Render->GetShaderLoader();
                 m_detailManager->LoadCullComputeShader(shaderLoader);
+                m_detailManager->LoadInstanceGenShader(shaderLoader);
+                m_detailManager->LoadPrefixSumShaders(shaderLoader);
                 m_detailManager->LoadGraphicsShaders(shaderLoader);
 
-                // Create compute pipeline now that shaders are loaded
+                // Create compute pipelines now that shaders are loaded
                 if (!m_detailManager->computePipeline) {
                     m_detailManager->CreateComputePipeline(m_device);
+                }
+                if (!m_detailManager->instanceGenPipeline) {
+                    m_detailManager->CreateInstanceGenPipeline(m_device);
+                }
+                if (!m_detailManager->prefixSumScanPipeline) {
+                    m_detailManager->CreatePrefixSumPipeline(m_device);
                 }
 
                 // Initialize wind system (FBM wind texture + compute shader)

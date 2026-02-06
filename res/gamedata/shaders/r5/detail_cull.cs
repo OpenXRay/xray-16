@@ -49,7 +49,7 @@ cbuffer DetailCullParams : register(b5)
     uint g_hiz_mip_levels;
     float g_lod_distance_close_sqr;  // LOD0 -> LOD1 threshold (squared)
     float g_lod_distance_mid_sqr;    // LOD1 -> LOD2 threshold (squared)
-    uint g_pad;
+    float g_detail_density;          // Runtime density (0.04-0.99, lower = more dense)
 };
 
 // Input buffers

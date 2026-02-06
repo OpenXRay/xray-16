@@ -141,9 +141,12 @@ void CRender::level_Load(IReader* fs)
             auto* detailMgr = m_framegraphRenderer->GetDetailManager();
             if (detailMgr && detailMgr->Load()) {
                 detailMgr->BakeHeightmap();
-                detailMgr->DecompressAllSlots();
+                detailMgr->LoadHeightmapTexture(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
                 detailMgr->ComputeSlotAABBs();
                 detailMgr->CreateGPUBuffers(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
+
+                // NOTE: Initial grass generation happens automatically on first frame
+                // (m_lastDensity starts at -1, triggering regeneration in DispatchCulling)
             }
         }
 
