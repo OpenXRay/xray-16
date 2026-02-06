@@ -192,12 +192,23 @@ public:
 
     bool cachedResourcesInitialized = false;
 
+    static constexpr u32 HEIGHTMAP_TEXELS_PER_SLOT = 4;
+    static constexpr float HEIGHTMAP_NO_TERRAIN = -1e10f;
+
+    u32 heightmapWidth = 0;
+    u32 heightmapHeight = 0;
+    float heightmapWorldMinX = 0.f;
+    float heightmapWorldMinZ = 0.f;
+    float heightmapTexelSize = 0.f;
+
     FGDetailManager();
     ~FGDetailManager();
 
     bool Load();
 
     void Unload();
+
+    bool BakeHeightmap();
 
     void DecompressAllSlots();
 
