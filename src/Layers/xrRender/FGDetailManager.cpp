@@ -12,6 +12,9 @@
 #include "xrMaterialSystem/GameMtlLib.h"
 #include "xrCore/Profiler/Profiler.h"  // For GetCPUProfiler throttle interval
 #include "FrameGraphPasses/ShaderConstants.h"  // For sizeof(DynamicTransforms), sizeof(StaticGlobals)
+#include "ResourceManager/DDSLoader.h"         // For DDS header structs (heightmap save)
+#include <thread>
+#include <atomic>
 
 // Phase 5: Grass wind tuning parameters (defined in xrEngine)
 extern ENGINE_API float ps_r3_grass_wind_multiplier;
@@ -201,6 +204,288 @@ void FGDetailManager::Unload()
         FS.r_close(dtFS);
         dtFS = nullptr;
     }
+}
+
+bool FGDetailManager::BakeHeightmap()
+{
+    ZoneScoped;
+
+    if (!dtFS)
+    {
+        Msg("! [FGDetailManager] BakeHeightmap: level.details not loaded");
+        return false;
+    }
+
+    // Compute heightmap dimensions
+    heightmapWidth = dtH.x_size() * HEIGHTMAP_TEXELS_PER_SLOT;
+    heightmapHeight = dtH.z_size() * HEIGHTMAP_TEXELS_PER_SLOT;
+    heightmapTexelSize = DETAIL_SLOT_SIZE / float(HEIGHTMAP_TEXELS_PER_SLOT);
+    heightmapWorldMinX = -float(dtH.x_offs()) * DETAIL_SLOT_SIZE;
+    heightmapWorldMinZ = -float(dtH.z_offs()) * DETAIL_SLOT_SIZE;
+
+    Msg("* [FGDetailManager] Heightmap params: %ux%u pixels, texel=%.2fm, world origin=(%.1f, %.1f)",
+        heightmapWidth, heightmapHeight, heightmapTexelSize, heightmapWorldMinX, heightmapWorldMinZ);
+
+    // Check if cached heightmap already exists
+    string_path heightmap_path;
+    FS.update_path(heightmap_path, "$level$", "level_heightmap.dds");
+
+    if (FS.exist(heightmap_path))
+    {
+        Msg("* [FGDetailManager] Heightmap already exists: %s — skipping bake", heightmap_path);
+        return true;
+    }
+
+    Msg("* [FGDetailManager] Baking heightmap: %ux%u pixels (%.1f MB)...",
+        heightmapWidth, heightmapHeight,
+        float(heightmapWidth) * heightmapHeight * sizeof(float) / (1024.f * 1024.f));
+
+    CTimer bake_timer;
+    bake_timer.Start();
+
+    // Allocate pixel buffer
+    const u32 pixel_count = heightmapWidth * heightmapHeight;
+    xr_vector<float> pixels(pixel_count, HEIGHTMAP_NO_TERRAIN);
+
+    // Open slots chunk to read DetailSlot Y ranges (for ray origin)
+    IReader* slots_chunk = dtFS->open_chunk(2);
+    if (!slots_chunk)
+    {
+        Msg("! [FGDetailManager] BakeHeightmap: failed to read slots chunk");
+        return false;
+    }
+    DetailSlot* dtSlots = (DetailSlot*)slots_chunk->pointer();
+
+    // Multi-threaded baking: one box_query per SLOT (proven pattern from DecompressAllSlots),
+    // then raycast each texel within that slot against the queried triangles.
+    u32 num_threads = std::thread::hardware_concurrency();
+    if (num_threads == 0) num_threads = 8;
+    if (num_threads > 16) num_threads = 16;
+
+    const u32 total_slots = dtH.x_size() * dtH.z_size();
+    std::atomic<u32> slots_completed{0};
+
+    auto worker = [&](u32 slot_start, u32 slot_end)
+    {
+        thread_local xrXRC thread_xrc;
+
+        CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
+        Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
+
+        for (u32 slot_idx = slot_start; slot_idx < slot_end; slot_idx++)
+        {
+            u32 db_x = slot_idx % dtH.x_size();
+            u32 db_z = slot_idx / dtH.x_size();
+
+            int sx = int(db_x) - dtH.x_offs();
+            int sz = int(db_z) - dtH.z_offs();
+
+            DetailSlot& DS = dtSlots[slot_idx];
+
+            // Set up slot AABB (matching DecompressAllSlots exactly)
+            Fbox vis_box;
+            vis_box.vMin.set(sx * DETAIL_SLOT_SIZE, DS.r_ybase(), sz * DETAIL_SLOT_SIZE);
+            vis_box.vMax.set(vis_box.vMin.x + DETAIL_SLOT_SIZE,
+                            DS.r_ybase() + DS.r_yheight(),
+                            vis_box.vMin.z + DETAIL_SLOT_SIZE);
+            vis_box.grow(EPS_L);
+
+            // One box query per slot (proven reliable, same as decompression)
+            Fvector bC, bD;
+            vis_box.get_CD(bC, bD);
+            thread_xrc.box_query(CDB::OPT_FULL_TEST,
+                g_pGameLevel->ObjectSpace.GetStaticModel(), bC, bD);
+
+            const auto tri_count = thread_xrc.r_count();
+            if (tri_count == 0)
+                continue;
+
+            Fvector ray_dir;
+            ray_dir.set(0.f, -1.f, 0.f);
+
+            // Raycast each texel within this slot
+            for (u32 local_z = 0; local_z < HEIGHTMAP_TEXELS_PER_SLOT; local_z++)
+            {
+                for (u32 local_x = 0; local_x < HEIGHTMAP_TEXELS_PER_SLOT; local_x++)
+                {
+                    u32 tx = db_x * HEIGHTMAP_TEXELS_PER_SLOT + local_x;
+                    u32 tz = db_z * HEIGHTMAP_TEXELS_PER_SLOT + local_z;
+
+                    float world_x = heightmapWorldMinX + (float(tx) + 0.5f) * heightmapTexelSize;
+                    float world_z = heightmapWorldMinZ + (float(tz) + 0.5f) * heightmapTexelSize;
+
+                    Fvector ray_origin;
+                    ray_origin.set(world_x, vis_box.vMax.y, world_z);
+
+                    float best_y = vis_box.vMin.y - 5.f;
+
+                    for (size_t tid = 0; tid < tri_count; tid++)
+                    {
+                        CDB::TRI& T = tris[thread_xrc.r_begin()[tid].id];
+                        SGameMtl* mtl = GMLib.GetMaterialByIdx(T.material);
+                        if (mtl->Flags.test(SGameMtl::flPassable))
+                            continue;
+
+                        Fvector Tv[3] = {verts[T.verts[0]], verts[T.verts[1]], verts[T.verts[2]]};
+
+                        float r_u, r_v, r_range;
+                        if (CDB::TestRayTri(ray_origin, ray_dir, Tv, r_u, r_v, r_range, TRUE))
+                        {
+                            if (r_range >= 0.f)
+                            {
+                                float hit_y = ray_origin.y - r_range;
+                                if (hit_y > best_y)
+                                    best_y = hit_y;
+                            }
+                        }
+                    }
+
+                    if (best_y > vis_box.vMin.y - 5.f)
+                        pixels[tz * heightmapWidth + tx] = best_y;
+                }
+            }
+
+            u32 done = slots_completed.fetch_add(1) + 1;
+            if (done % 5000 == 0)
+            {
+                Msg("  [Heightmap] %u / %u slots (%.0f%%)", done, total_slots,
+                    100.f * done / total_slots);
+            }
+        }
+    };
+
+    // Launch workers (split by slot index)
+    xr_vector<std::thread> workers;
+    workers.reserve(num_threads);
+    u32 slots_per_thread = total_slots / num_threads;
+    u32 remainder = total_slots % num_threads;
+
+    u32 current_slot = 0;
+    for (u32 i = 0; i < num_threads; i++)
+    {
+        u32 slot_end = current_slot + slots_per_thread + (i < remainder ? 1 : 0);
+        if (current_slot < total_slots)
+            workers.emplace_back(worker, current_slot, slot_end);
+        current_slot = slot_end;
+    }
+
+    for (auto& t : workers)
+        t.join();
+
+    slots_chunk->close();
+
+    float bake_time = bake_timer.GetElapsed_sec();
+    Msg("* [FGDetailManager] Heightmap bake complete: %.2f sec (%u threads)", bake_time, num_threads);
+
+    // Count valid vs empty texels and find height range
+    u32 valid_count = 0;
+    float min_y = FLT_MAX, max_y = -FLT_MAX;
+    for (u32 i = 0; i < pixel_count; i++)
+    {
+        if (pixels[i] > HEIGHTMAP_NO_TERRAIN)
+        {
+            valid_count++;
+            if (pixels[i] < min_y) min_y = pixels[i];
+            if (pixels[i] > max_y) max_y = pixels[i];
+        }
+    }
+    Msg("  - Valid texels: %u / %u (%.1f%%)", valid_count, pixel_count,
+        100.f * valid_count / pixel_count);
+    Msg("  - Height range: [%.2f, %.2f] meters", min_y, max_y);
+
+    // Write DDS file as R32_FLOAT using DX10 extended header (most correct for float formats)
+    VerifyPath(heightmap_path);
+    IWriter* writer = FS.w_open(heightmap_path);
+    if (!writer)
+    {
+        Msg("! [FGDetailManager] Failed to open heightmap for writing: %s", heightmap_path);
+        return false;
+    }
+
+    // DDS magic
+    u32 magic = 0x20534444;  // "DDS "
+    writer->w(&magic, sizeof(magic));
+
+    // DDS_HEADER (124 bytes)
+    xray::render::resources::DDS_HEADER header = {};
+    header.dwSize = 124;
+    header.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | DDSD_PITCH | DDSD_MIPMAPCOUNT;
+    header.dwHeight = heightmapHeight;
+    header.dwWidth = heightmapWidth;
+    header.dwPitchOrLinearSize = heightmapWidth * sizeof(float);
+    header.dwMipMapCount = 1;
+    header.ddspf.dwSize = 32;
+    header.ddspf.dwFlags = DDPF_FOURCC;
+    header.ddspf.dwFourCC = FOURCC_DX10;
+    header.dwCaps = DDSCAPS_TEXTURE;
+    writer->w(&header, sizeof(header));
+
+    // DDS_HEADER_DX10 (20 bytes)
+    xray::render::resources::DDS_HEADER_DX10 header10 = {};
+    header10.dxgiFormat = xray::render::resources::DXGI_FORMAT_R32_FLOAT;
+    header10.resourceDimension = xray::render::resources::D3D10_RESOURCE_DIMENSION_TEXTURE2D;
+    header10.arraySize = 1;
+    writer->w(&header10, sizeof(header10));
+
+    // Pixel data
+    writer->w(pixels.data(), pixel_count * sizeof(float));
+
+    FS.w_close(writer);
+
+    u32 file_bytes = 4 + sizeof(header) + sizeof(header10) + pixel_count * sizeof(float);
+    Msg("* [FGDetailManager] Heightmap saved: %s (%.1f MB)", heightmap_path,
+        float(file_bytes) / (1024.f * 1024.f));
+
+    // Also save a normalized R8 copy for easy visual verification
+    {
+        string_path preview_path;
+        FS.update_path(preview_path, "$level$", "level_heightmap_preview.dds");
+
+        IWriter* pw = FS.w_open(preview_path);
+        if (pw)
+        {
+            // Normalize heights to 0-255 grayscale
+            xr_vector<u8> preview(pixel_count, 0);
+            if (valid_count > 0 && max_y > min_y)
+            {
+                float range = max_y - min_y;
+                for (u32 i = 0; i < pixel_count; i++)
+                {
+                    if (pixels[i] > HEIGHTMAP_NO_TERRAIN)
+                    {
+                        float norm = (pixels[i] - min_y) / range;
+                        clamp(norm, 0.f, 1.f);
+                        preview[i] = u8(norm * 255.f);
+                    }
+                }
+            }
+
+            // Write as 8-bit luminance DDS (universally supported)
+            u32 pm = 0x20534444;
+            pw->w(&pm, sizeof(pm));
+
+            xray::render::resources::DDS_HEADER ph = {};
+            ph.dwSize = 124;
+            ph.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | DDSD_PITCH;
+            ph.dwHeight = heightmapHeight;
+            ph.dwWidth = heightmapWidth;
+            ph.dwPitchOrLinearSize = heightmapWidth;  // 1 byte per pixel
+            ph.ddspf.dwSize = 32;
+            ph.ddspf.dwFlags = DDPF_LUMINANCE;
+            ph.ddspf.dwRGBBitCount = 8;
+            ph.ddspf.dwRBitMask = 0xFF;
+            ph.dwCaps = DDSCAPS_TEXTURE;
+            pw->w(&ph, sizeof(ph));
+
+            pw->w(preview.data(), pixel_count);
+            FS.w_close(pw);
+
+            Msg("* [FGDetailManager] Preview saved: %s (%.1f MB)", preview_path,
+                float(4 + sizeof(ph) + pixel_count) / (1024.f * 1024.f));
+        }
+    }
+
+    return true;
 }
 
 void FGDetailManager::DecompressAllSlots()

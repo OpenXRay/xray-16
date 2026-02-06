@@ -98,6 +98,7 @@ struct DDS_HEADER {
 // DX10 extended header (for BC6/BC7 and other modern formats)
 enum DXGI_FORMAT : u32 {
     DXGI_FORMAT_UNKNOWN = 0,
+    DXGI_FORMAT_R32_FLOAT = 41,
     DXGI_FORMAT_BC1_UNORM = 71,
     DXGI_FORMAT_BC1_UNORM_SRGB = 72,
     DXGI_FORMAT_BC2_UNORM = 74,

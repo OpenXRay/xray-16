@@ -140,6 +140,7 @@ void CRender::level_Load(IReader* fs)
         if (m_framegraphRenderer) {
             auto* detailMgr = m_framegraphRenderer->GetDetailManager();
             if (detailMgr && detailMgr->Load()) {
+                detailMgr->BakeHeightmap();
                 detailMgr->DecompressAllSlots();
                 detailMgr->ComputeSlotAABBs();
                 detailMgr->CreateGPUBuffers(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());

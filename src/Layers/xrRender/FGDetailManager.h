@@ -260,6 +260,19 @@ public:
     bool cachedResourcesInitialized = false;
 
     // ═══════════════════════════════════════════════════════
+    //  HEIGHTMAP (baked from collision geometry)
+    // ═══════════════════════════════════════════════════════
+
+    static constexpr u32 HEIGHTMAP_TEXELS_PER_SLOT = 4;   // 4 texels per 2m slot = 2 texels/meter
+    static constexpr float HEIGHTMAP_NO_TERRAIN = -1e10f;  // Sentinel: no solid ground at this texel
+
+    u32 heightmapWidth = 0;          // dtH.x_size() * HEIGHTMAP_TEXELS_PER_SLOT
+    u32 heightmapHeight = 0;         // dtH.z_size() * HEIGHTMAP_TEXELS_PER_SLOT
+    float heightmapWorldMinX = 0.f;  // World X of texel (0,0) left edge
+    float heightmapWorldMinZ = 0.f;  // World Z of texel (0,0) top edge
+    float heightmapTexelSize = 0.f;  // Meters per texel (DETAIL_SLOT_SIZE / HEIGHTMAP_TEXELS_PER_SLOT)
+
+    // ═══════════════════════════════════════════════════════
     //  PUBLIC METHODS
     // ═══════════════════════════════════════════════════════
 
@@ -271,6 +284,9 @@ public:
 
     // Unload all data
     void Unload();
+
+    // Bake terrain heightmap from collision geometry (saves to $level$/level_heightmap.dds)
+    bool BakeHeightmap();
 
     // Decompress entire level into all_instances
     void DecompressAllSlots();
