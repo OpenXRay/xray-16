@@ -37,7 +37,7 @@ cbuffer DetailCullParams : register(b5)
     uint g_hiz_mip_levels;
     float g_lod_distance_close_sqr;
     float g_lod_distance_mid_sqr;
-    uint g_pad;
+    float g_detail_density;
 };
 
 StructuredBuffer<InstanceData> g_all_instances : register(t0);

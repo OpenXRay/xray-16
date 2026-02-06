@@ -111,7 +111,8 @@ DefaultOutputLayout setupDetailPass(
             if (!psDeviceFlags.is(rsDrawDetails))
                 return;
 
-            if (!data.detailManager->instanceBuffer || data.detailManager->total_instance_count == 0)
+            bool detailPipelineValid = (data.detailManager->instanceGenPipeline && data.detailManager->slotDataBuffer);
+            if (!detailPipelineValid)
                 return;
 
             nvrhi::ITexture* colorTexture = fg.GetPhysicalTexture(data.outputColor);
@@ -125,7 +126,7 @@ DefaultOutputLayout setupDetailPass(
                 return;
 
             static bool s_detailDataUploaded = false;
-            if (!s_detailDataUploaded && data.detailManager->total_instance_count > 0)
+            if (!s_detailDataUploaded)
             {
                 data.detailManager->UploadBufferData(cmdList);
                 s_detailDataUploaded = true;
@@ -167,9 +168,6 @@ DefaultOutputLayout setupDetailPass(
 
             Fmatrix effectivePrevViewProj = data.hasPrevViewProj ? data.prevViewProj : Device.mFullTransform;
 
-            if (data.gpuProfiler)
-                data.gpuProfiler->BeginPass(cmdList, "Details.Cull");
-
             data.detailManager->DispatchCulling(
                 cmdList,
                 data.device->GetNVRHIDevice(),
@@ -182,11 +180,9 @@ DefaultOutputLayout setupDetailPass(
                 fadeDistance,
                 data.hiZWidth,
                 data.hiZHeight,
-                data.hiZMipLevels
+                data.hiZMipLevels,
+                data.gpuProfiler
             );
-
-            if (data.gpuProfiler)
-                data.gpuProfiler->EndPass(cmdList, "Details.Cull");
 
             data.detailManager->ScheduleStatsReadback(cmdList, data.device->GetNVRHIDevice());
 

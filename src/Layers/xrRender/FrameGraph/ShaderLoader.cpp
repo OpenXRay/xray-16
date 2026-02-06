@@ -353,6 +353,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     ShaderResult result;
 
     xr_string cacheKey = xr_string(name) + ".cs";
+    if (entryPoint && xr_strcmp(entryPoint, "main") != 0)
+        cacheKey += xr_string(":") + entryPoint;
     auto handleIt = m_handleCache.find(cacheKey);
     if (handleIt != m_handleCache.end()) {
         result.handle = handleIt->second;
@@ -372,8 +374,12 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
         fs->length()
     );
 
+    xr_string diskCacheName = name;
+    if (entryPoint && xr_strcmp(entryPoint, "main") != 0)
+        diskCacheName += xr_string("_") + entryPoint;
+
     ExtractedReflection deserializedReflection;
-    bool cacheHit = m_cache.TryLoad(name, ".cs", sourceHash, result.bytecode, &deserializedReflection);
+    bool cacheHit = m_cache.TryLoad(diskCacheName.c_str(), ".cs", sourceHash, result.bytecode, &deserializedReflection);
 
     if (cacheHit)
     {
@@ -455,12 +461,12 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
 
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
-    m_cache.Save(name, ".cs", sourceHash, result.bytecode, &extractedReflection);
+    m_cache.Save(diskCacheName.c_str(), ".cs", sourceHash, result.bytecode, &extractedReflection);
 
     m_handleCache[cacheKey] = result.handle;
     m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
 
-    Msg("* [ShaderLoader] Compiled compute shader: %s.cs", name);
+    Msg("* [ShaderLoader] Compiled compute shader: %s.cs (entry: %s)", name, entryPoint);
 
     return result;
 }

@@ -5,13 +5,14 @@
 #include "DetailModel.h"
 #include <nvrhi/nvrhi.h>
 
+namespace xray::profiler { class GPUProfiler; }
+
 namespace xray::render::RENDER_NAMESPACE
 {
 
 class FGDetailManager
 {
 public:
-
     struct DetailObject
     {
         ref_shader shader;
@@ -31,6 +32,19 @@ public:
         u32 object_id;
     };
     static_assert(sizeof(InstanceData) == 32, "InstanceData must be 32 bytes");
+
+    struct GPUSlotData
+    {
+        float world_min_x;
+        float world_min_z;
+        float y_base;
+        float y_height;
+        u32 packed_ids;
+        u32 packed_palette_01;
+        u32 packed_palette_23;
+        float hemi;
+    };
+    static_assert(sizeof(GPUSlotData) == 32, "GPUSlotData must be 32 bytes");
 
     struct SlotAABB
     {
@@ -90,27 +104,42 @@ public:
         u32 hizMipLevels;
         float lodDistanceCloseSqr;
         float lodDistanceMidSqr;
-        u32 pad;
+        float detailDensity;
     };
 
     struct GrassObjectTint { float r, g, b, pad; };
 
+    struct InstanceGenParams
+    {
+        float heightmapWorldMinX;
+        float heightmapWorldMinZ;
+        float heightmapTexelSize;
+        float detailHeightMultiplier;
+        u32 genMode;
+        u32 prefixSumBlockSize;
+        u32 prefixSumTotalBlocks;
+        u32 instanceCapacity;
+    };
+
     xr_vector<CDetail*> detail_models;
-
     xr_vector<DetailObject*> objects;
-
-    xr_vector<InstanceData> all_instances;
-    u32 total_instance_count = 0;
-
     xr_vector<SlotAABB> slot_aabbs;
     u32 slot_count = 0;
-
     DetailHeader dtH;
 
     static constexpr u32 LOD_COUNT = 3;
     static constexpr u32 LOD_SEGMENTS[LOD_COUNT] = {9, 4, 2};
 
-    nvrhi::BufferHandle instanceBuffer;
+    nvrhi::BufferHandle slotDataBuffer;
+    xr_vector<GPUSlotData> slotDataCPU;
+
+    nvrhi::BufferHandle generatedInstancesBuffer;
+    nvrhi::BufferHandle detailModelsBuffer;
+    u32 generatedInstancesCapacity = 0;
+
+    nvrhi::ShaderHandle instanceGenComputeShader;
+    nvrhi::BindingLayoutHandle instanceGenBindingLayout;
+    nvrhi::ComputePipelineHandle instanceGenPipeline;
 
     nvrhi::BufferHandle bladeVertexBuffer[LOD_COUNT];
     nvrhi::BufferHandle bladeIndexBuffer[LOD_COUNT];
@@ -125,10 +154,7 @@ public:
 
     nvrhi::BufferHandle visibleSlotIDsBuffer;
     nvrhi::BufferHandle visibleSlotCounterBuffer;
-
     nvrhi::BufferHandle slotVisibilityBuffer;
-    nvrhi::BufferHandle instanceToSlotBuffer;
-    xr_vector<u32> instanceToSlotMapping;
 
     nvrhi::ShaderHandle slotCullComputeShader;
     nvrhi::BindingLayoutHandle slotCullBindingLayout;
@@ -187,6 +213,7 @@ public:
     nvrhi::BufferHandle cachedDetailGlobalsCB;
     nvrhi::BufferHandle cachedDynLightCB;
     nvrhi::BufferHandle cachedCullParamsCB;
+    nvrhi::BufferHandle cachedInstanceGenParamsCB;
 
     nvrhi::BufferHandle cachedGrassTintsBuffer;
 
@@ -201,29 +228,44 @@ public:
     float heightmapWorldMinZ = 0.f;
     float heightmapTexelSize = 0.f;
 
+    nvrhi::TextureHandle heightmapTexture;
+
+    float m_lastDensity = -1.0f;
+    bool m_instancesNeedRegeneration = true;
+
+    nvrhi::BufferHandle instanceCounterBuffer;
+    nvrhi::BufferHandle perSlotCountsBuffer;
+
+    nvrhi::BufferHandle perSlotPrefixBuffer;
+    nvrhi::BufferHandle blockTotalsBuffer;
+    nvrhi::BufferHandle perSlotLocalCountersBuffer;
+
+    static constexpr u32 PREFIX_SUM_BLOCK_SIZE = 256;
+    nvrhi::ShaderHandle prefixSumScanShader;
+    nvrhi::ShaderHandle prefixSumTopShader;
+    nvrhi::BindingLayoutHandle prefixSumBindingLayout;
+    nvrhi::ComputePipelineHandle prefixSumScanPipeline;
+    nvrhi::ComputePipelineHandle prefixSumTopPipeline;
+
     FGDetailManager();
     ~FGDetailManager();
 
     bool Load();
-
     void Unload();
-
     bool BakeHeightmap();
-
-    void DecompressAllSlots();
-
+    bool LoadHeightmapTexture(nvrhi::IDevice* device);
+    void PackSlotData();
     bool CreateGPUBuffers(nvrhi::IDevice* device);
-
     bool CreateCachedResources(nvrhi::IDevice* device);
-
     void UploadBufferData(nvrhi::ICommandList* cmdList);
-
     bool LoadCullComputeShader(class framegraph::ShaderLoader* shaderLoader);
-
+    bool LoadInstanceGenShader(class framegraph::ShaderLoader* shaderLoader);
     bool LoadGraphicsShaders(class framegraph::ShaderLoader* shaderLoader);
     bool CreateGraphicsPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer);
-
     bool CreateComputePipeline(ng::RenderDevice* device);
+    bool CreateInstanceGenPipeline(ng::RenderDevice* device);
+    bool LoadPrefixSumShaders(class framegraph::ShaderLoader* shaderLoader);
+    bool CreatePrefixSumPipeline(ng::RenderDevice* device);
 
     void DispatchCulling(
         nvrhi::ICommandList* cmdList,
@@ -237,7 +279,8 @@ public:
         float fadeDistance,
         u32 hiZWidth,
         u32 hiZHeight,
-        u32 hiZMipLevels);
+        u32 hiZMipLevels,
+        xray::profiler::GPUProfiler* gpuProfiler = nullptr);
 
     void DestroyGPUBuffers();
 
@@ -247,19 +290,21 @@ public:
     void DispatchWindCompute(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, float time);
 
     void GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments = 8);
-
     void RegenerateBladeGeometry(nvrhi::ICommandList* cmdList);
-
     void ComputeSlotAABBs();
 
     void ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device);
     void ProcessStatsReadback(nvrhi::IDevice* device);
     const DetailCullingStats& GetCullingStats() const { return cullingStats; }
 
+    void RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device,
+        xray::profiler::GPUProfiler* gpuProfiler = nullptr);
+
 private:
     IReader* dtFS = nullptr;
-
     int dither[16][16];
+
+    nvrhi::BindingSetHandle CreateInstanceGenBindingSet(nvrhi::IDevice* device) const;
 };
 
 }
