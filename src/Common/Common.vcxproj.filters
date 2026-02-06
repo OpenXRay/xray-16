@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClInclude Include="_d3d_extensions.h" />
     <ClInclude Include="Config.hpp" />
-    <ClInclude Include="face_smoth_flags.h" />
     <ClInclude Include="FSMacros.hpp" />
     <ClInclude Include="GUID.hpp" />
     <ClInclude Include="LevelGameDef.h" />
