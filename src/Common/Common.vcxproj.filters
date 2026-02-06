@@ -18,18 +18,6 @@
     <ClInclude Include="object_saver.h" />
     <ClInclude Include="object_type_traits.h" />
     <ClInclude Include="Util.hpp" />
-    <ClInclude Include="NvMender2003\convert.h">
-      <Filter>NvMender2003</Filter>
-    </ClInclude>
-    <ClInclude Include="NvMender2003\mender_input_output.h">
-      <Filter>NvMender2003</Filter>
-    </ClInclude>
-    <ClInclude Include="NvMender2003\NVMeshMender.h">
-      <Filter>NvMender2003</Filter>
-    </ClInclude>
-    <ClInclude Include="NvMender2003\remove_isolated_verts.h">
-      <Filter>NvMender2003</Filter>
-    </ClInclude>
     <ClInclude Include="Platform.hpp">
       <Filter>Platform</Filter>
     </ClInclude>
@@ -95,9 +83,6 @@
     <ClInclude Include="d3d9compat.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="NvMender2003">
-      <UniqueIdentifier>{4a2b53ad-98a9-4338-99a6-b5ea4123d5bf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Platform">
       <UniqueIdentifier>{05b6dbf9-e387-495f-9d92-e2b8ecc350fa}</UniqueIdentifier>
     </Filter>
@@ -107,11 +92,6 @@
     <Filter Include="Externals">
       <UniqueIdentifier>{d02f2a58-bd08-43dc-86cc-6edd8c1f08a5}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="NvMender2003\NVMeshMender.cpp">
-      <Filter>NvMender2003</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="PlatformBSD.inl">

@@ -61,10 +61,6 @@
     <ClInclude Include="LevelGameDef.h" />
     <ClInclude Include="LevelStructure.hpp" />
     <ClInclude Include="Noncopyable.hpp" />
-    <ClInclude Include="NvMender2003\convert.h" />
-    <ClInclude Include="NvMender2003\mender_input_output.h" />
-    <ClInclude Include="NvMender2003\NVMeshMender.h" />
-    <ClInclude Include="NvMender2003\remove_isolated_verts.h" />
     <ClInclude Include="object_broker.h" />
     <ClInclude Include="object_cloner.h" />
     <ClInclude Include="object_comparer.h" />
@@ -79,9 +75,6 @@
     <ClInclude Include="PlatformWindows.inl" />
     <ClInclude Include="Util.hpp" />
     <ClInclude Include="_d3d_extensions.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="NvMender2003\NVMeshMender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PlatformApple.inl" />

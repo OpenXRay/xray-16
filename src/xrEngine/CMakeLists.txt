@@ -391,14 +391,6 @@ target_sources_grouped(
     EnnumerateVertices.h
 )
 
-# XXX: This is only used in utils, should be moved somewhere to utils
-#target_sources_grouped(
-#    TARGET xrEngine
-#    NAME ""
-#    FILES
-#    xrLoadSurface.cpp
-#)
-
 target_sources(xrEngine
     PRIVATE
     ClientServer.txt
