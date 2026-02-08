@@ -81,6 +81,7 @@ jobs:
     env:
       CFLAGS: "-w"
       CXXFLAGS: "-w"
+      HOMEBREW_NO_AUTO_UPDATE: 1
 
     strategy:
       fail-fast: false
@@ -99,7 +100,9 @@ jobs:
         - { name: Alpine,    os: ubuntu-latest,    arch: x86,     cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
         - { name: Fedora,    os: ubuntu-latest,    arch: x86_64,  cc: gcc,   container: 'fedora:latest', }
         #- { name: Haiku,     os: ubuntu-latest,    arch: x86_64,  cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, container: 'haiku/cross-compiler:x86_64-r1beta4', }
-        - { name: macOS,     os: macos-latest,     arch: arm64,   cc: clang, threads: 3 }
+        # macOS images have tighter concurrency limits; keep the matrix minimal.
+        - { name: macOS,          os: macos-latest,    arch: arm64,  cc: clang, threads: 3, flags: "-DCPACK_GENERATOR=ZIP" }
+        - { name: macOS Intel,    os: macos-15-intel,  arch: x86_64, cc: clang, flags: "-DCMAKE_OSX_ARCHITECTURES=x86_64 -DCPACK_GENERATOR=ZIP" }
 
         configuration: [Debug, Mixed, Release, ReleaseMasterGold]
 
@@ -133,8 +136,7 @@ jobs:
     - name: Install macOS packages
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: |
-          brew update
-          brew install sdl2 lzo libogg libvorbis theora
+          brew install ccache cmake sdl2 lzo libogg libvorbis theora openal-soft jpeg-turbo
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
@@ -150,12 +152,26 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Restore ccache
+      if: ${{ startsWith(matrix.platform.name, 'macOS') }}
+      uses: actions/cache@main
+      with:
+        path: ~/.ccache
+        key: ccache-${{ runner.os }}-${{ matrix.platform.arch }}-${{ matrix.configuration }}-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'src/**/CMakeLists.txt', 'Externals/**/CMakeLists.txt') }}
+        restore-keys: |
+          ccache-${{ runner.os }}-${{ matrix.platform.arch }}-${{ matrix.configuration }}-
+          ccache-${{ runner.os }}-${{ matrix.platform.arch }}-
+
     - name: Run CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_UNITY_BUILD=ON ${{ matrix.platform.flags }} --log-level VERBOSE
 
     - name: Run CMake Build
       id: cmake-build
       run: cmake --build build --config ${{ matrix.configuration }} --parallel ${{ matrix.platform.threads || 4 }}
+
+    - name: Show ccache stats
+      if: ${{ startsWith(matrix.platform.name, 'macOS') }}
+      run: ccache -s || true
 
     - name: Make package
       if: ${{ steps.cmake-build.outcome == 'success' }}
