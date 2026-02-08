@@ -142,6 +142,7 @@ void CRender::level_Load(IReader* fs)
             if (detailMgr && detailMgr->Load()) {
                 detailMgr->BakeHeightmap();
                 detailMgr->LoadHeightmapTexture(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
+                detailMgr->LoadBuildDetailsTexture(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
                 detailMgr->ComputeSlotAABBs();
                 detailMgr->CreateGPUBuffers(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
 

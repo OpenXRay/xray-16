@@ -87,7 +87,8 @@ public:
         Fvector4 grass_sss_color;
         float grass_color_variation;
         float grass_blade_height;
-        float pad0, pad1;
+        float pad0;
+        u32 buildDetailsIndex;
     };
 
     struct DetailCullParams
@@ -109,6 +110,30 @@ public:
 
     struct GrassObjectTint { float r, g, b, pad; };
 
+    struct DecalPulledVertex
+    {
+        float px, py, pz;
+        float u, v;
+    };
+    static_assert(sizeof(DecalPulledVertex) == 20, "DecalPulledVertex must be 20 bytes");
+
+    struct DetailModelGPU
+    {
+        float minScale;
+        float maxScale;
+        float flags;
+        float geomExtentX;
+        float geomExtentZ;
+        float uv_min_x;
+        float uv_min_y;
+        float uv_max_x;
+        float uv_max_y;
+        u32 decalVertexBase;
+        u32 decalIndexCount;
+        u32 pad;
+    };
+    static_assert(sizeof(DetailModelGPU) == 48, "DetailModelGPU must be 48 bytes");
+
     struct InstanceGenParams
     {
         float heightmapWorldMinX;
@@ -119,6 +144,8 @@ public:
         u32 prefixSumBlockSize;
         u32 prefixSumTotalBlocks;
         u32 instanceCapacity;
+        u32 detailModelCount;
+        u32 pad0, pad1, pad2;
     };
 
     xr_vector<CDetail*> detail_models;
@@ -148,9 +175,19 @@ public:
     xr_vector<BladeVertex> bladeVertices[LOD_COUNT];
     xr_vector<u16> bladeIndices[LOD_COUNT];
 
+    nvrhi::BufferHandle decalPulledVertexBuffer;
+    nvrhi::BufferHandle decalIndexBuffer;
+    u32 maxDecalIndexCount = 0;
+    xr_vector<DetailModelGPU> cachedModelGPUData;
+
     nvrhi::BufferHandle visibleInstancesBuffer[LOD_COUNT];
     nvrhi::BufferHandle drawArgsBuffer[LOD_COUNT];
+    nvrhi::BufferHandle visibleDecalInstancesBuffer;
+    nvrhi::BufferHandle decalDrawArgsBuffer;
     nvrhi::BufferHandle slotAABBBuffer;
+
+    nvrhi::TextureHandle buildDetailsTexture;
+    u32 buildDetailsBindlessIndex = 0;
 
     nvrhi::BufferHandle visibleSlotIDsBuffer;
     nvrhi::BufferHandle visibleSlotCounterBuffer;
@@ -166,10 +203,13 @@ public:
 
     nvrhi::ShaderHandle vertexShader;
     nvrhi::ShaderHandle pixelShader;
+    nvrhi::ShaderHandle decalVertexShader;
+    nvrhi::ShaderHandle decalPixelShader;
 
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::BindingLayoutHandle graphicsBindingLayout;
     nvrhi::GraphicsPipelineHandle graphicsPipeline;
+    nvrhi::GraphicsPipelineHandle decalGraphicsPipeline;
 
     u32 visibleBufferCapacity = 0;
 
@@ -254,6 +294,7 @@ public:
     void Unload();
     bool BakeHeightmap();
     bool LoadHeightmapTexture(nvrhi::IDevice* device);
+    bool LoadBuildDetailsTexture(nvrhi::IDevice* device);
     void PackSlotData();
     bool CreateGPUBuffers(nvrhi::IDevice* device);
     bool CreateCachedResources(nvrhi::IDevice* device);
@@ -304,7 +345,13 @@ private:
     IReader* dtFS = nullptr;
     int dither[16][16];
 
+    xr_vector<DecalPulledVertex> decalPulledVertexData;
+
+    struct PendingMipUpload { xr_vector<u8> data; u32 rowPitch; };
+    xr_vector<PendingMipUpload> pendingBuildDetailsUploads;
+
     nvrhi::BindingSetHandle CreateInstanceGenBindingSet(nvrhi::IDevice* device) const;
+    void BuildDetailModelGPUData();
 };
 
 } // namespace xray::render::RENDER_NAMESPACE
