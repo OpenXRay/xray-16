@@ -1,0 +1,40 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+cbuffer DetailGlobals : register(b3)
+{
+	float4 consts;
+	float4 wave;
+	float4 dir2D;
+	float4 dir2D_2;
+	float4x4 m_VP;
+	float4 detail_params;
+	float4 g_wind_direction;
+	float grass_wind_displacement;
+	float grass_interaction_displacement;
+	uint interaction_atlas_index;
+	uint wind_texture_index;
+	float4 grass_color_tip;
+	float4 grass_color_base;
+	float4 grass_sss_color;
+	float grass_color_variation;
+	float grass_blade_height;
+	float _pad0;
+	uint build_details_index;
+};
+
+f_forward main(p_flat I)
+{
+	Texture2D atlas_tex = GetBindlessTexture(build_details_index);
+	float4 texel = atlas_tex.Sample(g_LinearSampler, I.tcdh.xy);
+
+	clip(texel.a - 0.5);
+
+	float3 N = normalize(I.N);
+	float3 Nw = viewDirToWorld(N);
+	float3 worldPos = viewPosToWorld(I.position.xyz);
+	float hemi = I.position.w;
+
+	return output_forward_pbr(texel.rgb, Nw, worldPos, 0.0, 0.85, 1.0, hemi);
+}

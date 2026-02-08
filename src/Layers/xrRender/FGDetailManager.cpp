@@ -288,7 +288,7 @@ bool FGDetailManager::BakeHeightmap()
                     Fvector ray_origin;
                     ray_origin.set(world_x, vis_box.vMax.y, world_z);
 
-                    float best_y = vis_box.vMin.y - 5.f;
+                    float best_y = FLT_MAX;
 
                     for (size_t tid = 0; tid < tri_count; tid++)
                     {
@@ -299,19 +299,24 @@ bool FGDetailManager::BakeHeightmap()
 
                         Fvector Tv[3] = {verts[T.verts[0]], verts[T.verts[1]], verts[T.verts[2]]};
 
+                        Fvector tri_normal;
+                        tri_normal.mknormal(Tv[0], Tv[1], Tv[2]);
+                        if (tri_normal.y < 0.7f)
+                            continue;
+
                         float r_u, r_v, r_range;
                         if (CDB::TestRayTri(ray_origin, ray_dir, Tv, r_u, r_v, r_range, TRUE))
                         {
                             if (r_range >= 0.f)
                             {
                                 float hit_y = ray_origin.y - r_range;
-                                if (hit_y > best_y)
+                                if (hit_y >= vis_box.vMin.y && hit_y < best_y)
                                     best_y = hit_y;
                             }
                         }
                     }
 
-                    if (best_y > vis_box.vMin.y - 5.f)
+                    if (best_y < FLT_MAX)
                         pixels[tz * heightmapWidth + tx] = best_y;
                 }
             }
@@ -535,6 +540,66 @@ bool FGDetailManager::LoadHeightmapTexture(nvrhi::IDevice* device)
     return true;
 }
 
+bool FGDetailManager::LoadBuildDetailsTexture(nvrhi::IDevice* device)
+{
+    ZoneScoped;
+
+    if (!device)
+        return false;
+
+    string_path path;
+    FS.update_path(path, "$level$", "build_details.dds");
+
+    if (!FS.exist(path))
+    {
+        Msg("! [FGDetailManager] build_details.dds not found: %s", path);
+        return false;
+    }
+
+    resources::DDSData ddsData;
+    if (!resources::DDSLoader::LoadFromFile("build_details", ddsData) || !ddsData.isValid || ddsData.mipLevels.empty())
+    {
+        Msg("! [FGDetailManager] Failed to load build_details.dds");
+        return false;
+    }
+
+    nvrhi::TextureDesc texDesc;
+    texDesc.width = ddsData.desc.width;
+    texDesc.height = ddsData.desc.height;
+    texDesc.depth = 1;
+    texDesc.arraySize = 1;
+    texDesc.mipLevels = ddsData.desc.mipLevels;
+    texDesc.format = ddsData.desc.format;
+    texDesc.dimension = nvrhi::TextureDimension::Texture2D;
+    texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    texDesc.keepInitialState = true;
+    texDesc.debugName = "BuildDetails";
+
+    buildDetailsTexture = device->createTexture(texDesc);
+    if (!buildDetailsTexture)
+    {
+        Msg("! [FGDetailManager] Failed to create build_details texture");
+        return false;
+    }
+
+    pendingBuildDetailsUploads.resize(ddsData.mipLevels.size());
+    for (u32 mip = 0; mip < ddsData.mipLevels.size(); mip++)
+    {
+        const auto& ml = ddsData.mipLevels[mip];
+        pendingBuildDetailsUploads[mip].data.assign(ml.data, ml.data + ml.size);
+        pendingBuildDetailsUploads[mip].rowPitch = ml.rowPitch;
+    }
+
+    if (GEnv.Backend)
+    {
+        buildDetailsBindlessIndex = GEnv.Backend->RegisterBindlessTexture(buildDetailsTexture);
+        Msg("* [FGDetailManager] build_details.dds loaded: %ux%u, %u mips, format=%d, bindless=%u",
+            texDesc.width, texDesc.height, texDesc.mipLevels, (int)texDesc.format, buildDetailsBindlessIndex);
+    }
+
+    return true;
+}
+
 void FGDetailManager::PackSlotData()
 {
     ZoneScoped;
@@ -683,19 +748,11 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
 
     if (!detail_models.empty())
     {
-        xr_vector<Fvector4> model_data(detail_models.size());
-        for (u32 i = 0; i < detail_models.size(); i++)
-        {
-            CDetail* model = detail_models[i];
-            model_data[i].x = model->m_fMinScale;
-            model_data[i].y = model->m_fMaxScale;
-            model_data[i].z = *reinterpret_cast<float*>(&model->m_Flags.flags);
-            model_data[i].w = 0.f;
-        }
+        BuildDetailModelGPUData();
 
         nvrhi::BufferDesc desc;
-        desc.byteSize = model_data.size() * sizeof(Fvector4);
-        desc.structStride = sizeof(Fvector4);
+        desc.byteSize = cachedModelGPUData.size() * sizeof(DetailModelGPU);
+        desc.structStride = sizeof(DetailModelGPU);
         desc.debugName = "DetailModelsMetadata";
         desc.canHaveUAVs = false;
         desc.canHaveTypedViews = false;
@@ -715,6 +772,29 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
 
         Msg("* [FGDetailManager] Created detail models buffer: %u models", detail_models.size());
+
+        nvrhi::BufferDesc pvDesc;
+        pvDesc.byteSize = decalPulledVertexData.size() * sizeof(DecalPulledVertex);
+        pvDesc.structStride = sizeof(DecalPulledVertex);
+        pvDesc.debugName = "DetailDecalPulledVerts";
+        pvDesc.canHaveUAVs = false;
+        pvDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        pvDesc.keepInitialState = true;
+        decalPulledVertexBuffer = device->createBuffer(pvDesc);
+
+        if (maxDecalIndexCount > 0)
+        {
+            Msg("* [FGDetailManager] Decal pulled vertices: %u entries (%u decal models, max %u indices/model)",
+                (u32)decalPulledVertexData.size(), (u32)(decalPulledVertexData.size() / maxDecalIndexCount), maxDecalIndexCount);
+
+            nvrhi::BufferDesc ibDesc;
+            ibDesc.byteSize = maxDecalIndexCount * sizeof(u16);
+            ibDesc.isIndexBuffer = true;
+            ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+            ibDesc.keepInitialState = true;
+            ibDesc.debugName = "DetailDecalIB";
+            decalIndexBuffer = device->createBuffer(ibDesc);
+        }
     }
 
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
@@ -763,6 +843,42 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
                 Msg("! [FGDetailManager] Failed to create draw args buffer LOD%u", lod);
                 return false;
             }
+        }
+    }
+
+    {
+        u32 decalCapacity = visibleBufferCapacity / 10;
+        nvrhi::BufferDesc desc;
+        desc.byteSize = decalCapacity * sizeof(InstanceData);
+        desc.structStride = sizeof(InstanceData);
+        desc.debugName = "DetailVisibleDecals";
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        visibleDecalInstancesBuffer = device->createBuffer(desc);
+        if (!visibleDecalInstancesBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create visible decal instances buffer");
+            return false;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = 5 * sizeof(u32);
+        desc.debugName = "DetailDrawArgsDecal";
+        desc.canHaveUAVs = true;
+        desc.isDrawIndirectArgs = true;
+        desc.canHaveRawViews = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        decalDrawArgsBuffer = device->createBuffer(desc);
+        if (!decalDrawArgsBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create decal draw args buffer");
+            return false;
         }
     }
 
@@ -1025,6 +1141,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
+
     Msg("* [FGDetailManager] GPU buffers created (instance capacity: %u, %.2f MB)",
         generatedInstancesCapacity, float(generatedInstancesCapacity * sizeof(InstanceData)) / (1024.f * 1024.f));
 
@@ -1154,6 +1271,8 @@ void FGDetailManager::DestroyGPUBuffers()
     }
 
     slotAABBBuffer = nullptr;
+    visibleDecalInstancesBuffer = nullptr;
+    decalDrawArgsBuffer = nullptr;
     visibleSlotIDsBuffer = nullptr;
     visibleSlotCounterBuffer = nullptr;
     slotVisibilityBuffer = nullptr;
@@ -1178,7 +1297,12 @@ void FGDetailManager::DestroyGPUBuffers()
     cullComputeShader = nullptr;
 
     graphicsPipeline = nullptr;
+    decalGraphicsPipeline = nullptr;
     graphicsBindingLayout = nullptr;
+
+    decalPulledVertexBuffer = nullptr;
+    decalIndexBuffer = nullptr;
+    buildDetailsTexture = nullptr;
 
     windTexture = nullptr;
     windComputeShader = nullptr;
@@ -1602,6 +1726,23 @@ bool FGDetailManager::LoadGraphicsShaders(framegraph::ShaderLoader* shaderLoader
         return false;
     }
     pixelShader = psResult.handle;
+
+    auto decalVsResult = shaderLoader->LoadVertexShader("detail_decal", "main");
+    if (!decalVsResult.handle)
+    {
+        Msg("! [FGDetailManager] Failed to load detail_decal.vs");
+        return false;
+    }
+    decalVertexShader = decalVsResult.handle;
+
+    auto decalPsResult = shaderLoader->LoadPixelShader("detail_decal", "main");
+    if (!decalPsResult.handle)
+    {
+        Msg("! [FGDetailManager] Failed to load detail_decal.ps");
+        return false;
+    }
+    decalPixelShader = decalPsResult.handle;
+
     return true;
 }
 
@@ -1613,24 +1754,38 @@ void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
     if (slotDataBuffer && !slotDataCPU.empty())
         cmdList->writeBuffer(slotDataBuffer, slotDataCPU.data(), slotDataCPU.size() * sizeof(GPUSlotData));
 
-    if (detailModelsBuffer && !detail_models.empty())
-    {
-        xr_vector<Fvector4> model_data(detail_models.size());
-        for (u32 i = 0; i < detail_models.size(); i++)
-        {
-            CDetail* model = detail_models[i];
-            model_data[i].x = model->m_fMinScale;
-            model_data[i].y = model->m_fMaxScale;
-            model_data[i].z = *reinterpret_cast<float*>(&model->m_Flags.flags);
-            model_data[i].w = 0.f;
-        }
-        cmdList->writeBuffer(detailModelsBuffer, model_data.data(), model_data.size() * sizeof(Fvector4));
-    }
+    if (detailModelsBuffer && !cachedModelGPUData.empty())
+        cmdList->writeBuffer(detailModelsBuffer, cachedModelGPUData.data(), cachedModelGPUData.size() * sizeof(DetailModelGPU));
 
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         cmdList->writeBuffer(bladeVertexBuffer[lod], bladeVertices[lod].data(), bladeVertices[lod].size() * sizeof(BladeVertex));
         cmdList->writeBuffer(bladeIndexBuffer[lod], bladeIndices[lod].data(), bladeIndices[lod].size() * sizeof(u16));
+    }
+
+    if (decalPulledVertexBuffer && !decalPulledVertexData.empty())
+        cmdList->writeBuffer(decalPulledVertexBuffer, decalPulledVertexData.data(), decalPulledVertexData.size() * sizeof(DecalPulledVertex));
+
+    if (decalIndexBuffer && maxDecalIndexCount > 0)
+    {
+        xr_vector<u16> seqIndices(maxDecalIndexCount);
+        for (u32 j = 0; j < maxDecalIndexCount; j++)
+            seqIndices[j] = (u16)j;
+        cmdList->writeBuffer(decalIndexBuffer, seqIndices.data(), seqIndices.size() * sizeof(u16));
+    }
+
+    decalPulledVertexData.clear();
+    decalPulledVertexData.shrink_to_fit();
+
+    if (buildDetailsTexture && !pendingBuildDetailsUploads.empty())
+    {
+        for (u32 mip = 0; mip < pendingBuildDetailsUploads.size(); mip++)
+        {
+            auto& ml = pendingBuildDetailsUploads[mip];
+            cmdList->writeTexture(buildDetailsTexture, 0, mip, ml.data.data(), ml.rowPitch);
+        }
+        pendingBuildDetailsUploads.clear();
+        pendingBuildDetailsUploads.shrink_to_fit();
     }
 
     cmdList->writeBuffer(slotAABBBuffer, slot_aabbs.data(), slot_aabbs.size() * sizeof(SlotAABB));
@@ -1685,6 +1840,7 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
             nvrhi::BindingLayoutItem::Texture_SRV(3),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(4),
             nvrhi::BindingLayoutItem::Sampler(0),
             nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
             nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
@@ -1692,6 +1848,8 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
             nvrhi::BindingLayoutItem::RawBuffer_UAV(3),
             nvrhi::BindingLayoutItem::StructuredBuffer_UAV(4),
             nvrhi::BindingLayoutItem::RawBuffer_UAV(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(6),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(7),
         };
 
         computeBindingLayout = device->createBindingLayout(layoutDesc);
@@ -1787,6 +1945,8 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         nvrhi::BindingLayoutItem::TypedBuffer_SRV(32),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(33),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(34),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(35),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(36),
         nvrhi::BindingLayoutItem::Sampler(0),
         nvrhi::BindingLayoutItem::Sampler(1),
         nvrhi::BindingLayoutItem::Sampler(2),
@@ -1858,6 +2018,22 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         Msg("! [FGDetailManager] Failed to create graphics pipeline");
         return false;
     }
+
+    if (decalVertexShader && decalPixelShader)
+    {
+        nvrhi::GraphicsPipelineDesc decalPipeDesc = pipelineDesc;
+        decalPipeDesc.VS = decalVertexShader;
+        decalPipeDesc.PS = decalPixelShader;
+        decalPipeDesc.inputLayout = nullptr;
+
+        decalGraphicsPipeline = device->createGraphicsPipeline(decalPipeDesc, framebuffer);
+        if (!decalGraphicsPipeline)
+        {
+            Msg("! [FGDetailManager] Failed to create decal graphics pipeline");
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -1945,6 +2121,8 @@ void FGDetailManager::DispatchCulling(
         cmdList->beginTrackingBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
         cmdList->beginTrackingBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
     }
+    cmdList->beginTrackingBufferState(visibleDecalInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->beginTrackingBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->beginTrackingTextureState(hiZPyramid, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
 
     u32 dispatchArgs[3] = { 0, 1, 1 };
@@ -1955,6 +2133,10 @@ void FGDetailManager::DispatchCulling(
     {
         IndirectDrawArgs args = { bladeIndexCount[lod], 0, 0, 0, 0 };
         cmdList->writeBuffer(drawArgsBuffer[lod], &args, sizeof(args));
+    }
+    {
+        IndirectDrawArgs decalArgs = { maxDecalIndexCount, 0, 0, 0, 0 };
+        cmdList->writeBuffer(decalDrawArgsBuffer, &decalArgs, sizeof(decalArgs));
     }
 
     const u32 threadGroupSize = 256;
@@ -1999,6 +2181,7 @@ void FGDetailManager::DispatchCulling(
             nvrhi::BindingSetItem::StructuredBuffer_SRV(1, visibleSlotIDsBuffer),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(2, slotAABBBuffer),
             nvrhi::BindingSetItem::Texture_SRV(3, hiZPyramid),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(4, detailModelsBuffer),
             nvrhi::BindingSetItem::Sampler(0, cachedSmp_PointClamp),
             nvrhi::BindingSetItem::StructuredBuffer_UAV(0, visibleInstancesBuffer[0]),
             nvrhi::BindingSetItem::RawBuffer_UAV(1, drawArgsBuffer[0]),
@@ -2006,6 +2189,8 @@ void FGDetailManager::DispatchCulling(
             nvrhi::BindingSetItem::RawBuffer_UAV(3, drawArgsBuffer[1]),
             nvrhi::BindingSetItem::StructuredBuffer_UAV(4, visibleInstancesBuffer[2]),
             nvrhi::BindingSetItem::RawBuffer_UAV(5, drawArgsBuffer[2]),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(6, visibleDecalInstancesBuffer),
+            nvrhi::BindingSetItem::RawBuffer_UAV(7, decalDrawArgsBuffer),
         };
 
         nvrhi::BindingSetHandle instanceCullBindingSet = device->createBindingSet(bindDesc, computeBindingLayout);
@@ -2030,6 +2215,8 @@ void FGDetailManager::DispatchCulling(
         cmdList->setBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::ShaderResource);
         cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::IndirectArgument);
     }
+    cmdList->setBufferState(visibleDecalInstancesBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
     cmdList->commitBarriers();
 }
 
@@ -2059,6 +2246,8 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
         cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(visibleDecalInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->commitBarriers();
 
     statsReadbackPending = true;
@@ -2088,6 +2277,89 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
 
 
     statsReadbackPending = false;
+}
+
+void FGDetailManager::BuildDetailModelGPUData()
+{
+    maxDecalIndexCount = 0;
+    for (auto* m : detail_models)
+    {
+        if (m->m_Flags.flags & 0x0001)
+            maxDecalIndexCount = std::max(maxDecalIndexCount, m->number_indices);
+    }
+
+    cachedModelGPUData.resize(detail_models.size());
+    xr_vector<DecalPulledVertex> pulledVerts;
+    u32 runningDecalOffset = 0;
+
+    for (u32 i = 0; i < detail_models.size(); i++)
+    {
+        CDetail* m = detail_models[i];
+        auto& d = cachedModelGPUData[i];
+        d.minScale = m->m_fMinScale;
+        d.maxScale = m->m_fMaxScale;
+        d.flags = *reinterpret_cast<const float*>(&m->m_Flags.flags);
+
+        if (m->number_vertices > 0)
+        {
+            float pxmin = FLT_MAX, pzmin = FLT_MAX, pxmax = -FLT_MAX, pzmax = -FLT_MAX;
+            float umin = FLT_MAX, vmin = FLT_MAX, umax = -FLT_MAX, vmax = -FLT_MAX;
+            for (u32 v = 0; v < m->number_vertices; v++)
+            {
+                pxmin = std::min(pxmin, m->vertices[v].P.x);
+                pzmin = std::min(pzmin, m->vertices[v].P.z);
+                pxmax = std::max(pxmax, m->vertices[v].P.x);
+                pzmax = std::max(pzmax, m->vertices[v].P.z);
+                umin = std::min(umin, m->vertices[v].u);
+                vmin = std::min(vmin, m->vertices[v].v);
+                umax = std::max(umax, m->vertices[v].u);
+                vmax = std::max(vmax, m->vertices[v].v);
+            }
+            d.geomExtentX = pxmax - pxmin;
+            d.geomExtentZ = pzmax - pzmin;
+            d.uv_min_x = umin;
+            d.uv_min_y = vmin;
+            d.uv_max_x = umax;
+            d.uv_max_y = vmax;
+        }
+        else
+        {
+            d.geomExtentX = d.geomExtentZ = 0.f;
+            d.uv_min_x = d.uv_min_y = d.uv_max_x = d.uv_max_y = 0.f;
+        }
+
+        bool isDecal = (m->m_Flags.flags & 0x0001) != 0;
+        if (isDecal && maxDecalIndexCount > 0)
+        {
+            d.decalVertexBase = runningDecalOffset;
+            d.decalIndexCount = m->number_indices;
+            for (u32 j = 0; j < m->number_indices; j++)
+            {
+                u16 idx = m->indices[j];
+                DecalPulledVertex dv;
+                dv.px = m->vertices[idx].P.x;
+                dv.py = m->vertices[idx].P.y;
+                dv.pz = m->vertices[idx].P.z;
+                dv.u = m->vertices[idx].u;
+                dv.v = m->vertices[idx].v;
+                pulledVerts.push_back(dv);
+            }
+            for (u32 j = m->number_indices; j < maxDecalIndexCount; j++)
+                pulledVerts.push_back(DecalPulledVertex{});
+            runningDecalOffset += maxDecalIndexCount;
+        }
+        else
+        {
+            d.decalVertexBase = 0;
+            d.decalIndexCount = 0;
+        }
+        d.pad = 0;
+    }
+
+    if (pulledVerts.empty())
+        pulledVerts.push_back(DecalPulledVertex{});
+
+    decalPulledVertexData = std::move(pulledVerts);
 }
 
 nvrhi::BindingSetHandle FGDetailManager::CreateInstanceGenBindingSet(nvrhi::IDevice* device) const
@@ -2161,6 +2433,8 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
         genParams.prefixSumBlockSize = PREFIX_SUM_BLOCK_SIZE;
         genParams.prefixSumTotalBlocks = numBlocks;
         genParams.instanceCapacity = generatedInstancesCapacity;
+        genParams.detailModelCount = u32(detail_models.size());
+        genParams.pad0 = genParams.pad1 = genParams.pad2 = 0;
         cmdList->writeBuffer(cachedInstanceGenParamsCB, &genParams, sizeof(genParams));
 
         auto bindingSet = CreateInstanceGenBindingSet(device);

@@ -23,6 +23,22 @@ struct SlotAABB
     float4 padding2;
 };
 
+struct DetailModelGPU
+{
+    float minScale;
+    float maxScale;
+    float flags;
+    float geomExtentX;
+    float geomExtentZ;
+    float uv_min_x;
+    float uv_min_y;
+    float uv_max_x;
+    float uv_max_y;
+    uint decalVertexBase;
+    uint decalIndexCount;
+    uint pad;
+};
+
 cbuffer DetailCullParams : register(b5)
 {
     float4x4 g_view_proj;
@@ -43,21 +59,22 @@ cbuffer DetailCullParams : register(b5)
 StructuredBuffer<InstanceData> g_all_instances : register(t0);
 StructuredBuffer<uint> g_visible_slot_ids : register(t1);
 StructuredBuffer<SlotAABB> g_slot_aabbs : register(t2);
-
 Texture2D<float> g_hiz_pyramid : register(t3);
+StructuredBuffer<DetailModelGPU> g_detail_models : register(t4);
 SamplerState g_point_sampler : register(s0);
 
 RWStructuredBuffer<InstanceData> g_visible_lod0 : register(u0);
 RWByteAddressBuffer g_indirect_args_lod0 : register(u1);
-
 RWStructuredBuffer<InstanceData> g_visible_lod1 : register(u2);
 RWByteAddressBuffer g_indirect_args_lod1 : register(u3);
-
 RWStructuredBuffer<InstanceData> g_visible_lod2 : register(u4);
 RWByteAddressBuffer g_indirect_args_lod2 : register(u5);
+RWStructuredBuffer<InstanceData> g_visible_decals : register(u6);
+RWByteAddressBuffer g_indirect_args_decal : register(u7);
 
+static const uint DO_NO_WAVING = 0x0001;
 
-void AppendInstanceLOD(InstanceData inst)
+void AppendBladeLOD(InstanceData inst)
 {
     float3 to_camera = inst.pos - g_camera_pos;
     float dist_sqr = dot(to_camera, to_camera);
@@ -78,6 +95,13 @@ void AppendInstanceLOD(InstanceData inst)
         g_indirect_args_lod2.InterlockedAdd(4, 1, idx);
         g_visible_lod2[idx] = inst;
     }
+}
+
+void AppendDecal(InstanceData inst)
+{
+    uint idx;
+    g_indirect_args_decal.InterlockedAdd(4, 1, idx);
+    g_visible_decals[idx] = inst;
 }
 
 [numthreads(64, 1, 1)]
@@ -103,6 +127,10 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
                             g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
             continue;
 
-        AppendInstanceLOD(inst);
+        uint flags = asuint(g_detail_models[inst.object_id].flags);
+        if ((flags & DO_NO_WAVING) != 0)
+            AppendDecal(inst);
+        else
+            AppendBladeLOD(inst);
     }
 }

@@ -52,6 +52,22 @@ cbuffer DetailCullParams : register(b5)
     float g_detail_density;
 };
 
+struct DetailModelGPU
+{
+    float minScale;
+    float maxScale;
+    float flags;
+    float geomExtentX;
+    float geomExtentZ;
+    float uv_min_x;
+    float uv_min_y;
+    float uv_max_x;
+    float uv_max_y;
+    uint decalVertexBase;
+    uint decalIndexCount;
+    uint pad;
+};
+
 cbuffer InstanceGenParams : register(b6)
 {
     float g_heightmap_world_min_x;
@@ -62,11 +78,13 @@ cbuffer InstanceGenParams : register(b6)
     uint g_prefix_sum_block_size;
     uint g_prefix_sum_total_blocks;
     uint g_instance_capacity;
+    uint g_detail_model_count;
+    uint g_pad0, g_pad1, g_pad2;
 };
 
 StructuredBuffer<GPUSlotData> g_slot_data : register(t1);
 Texture2D<float> g_heightmap : register(t2);
-StructuredBuffer<float4> g_detail_models : register(t3);
+StructuredBuffer<DetailModelGPU> g_detail_models : register(t3);
 StructuredBuffer<uint> g_prefix_offsets : register(t4);
 
 RWStructuredBuffer<InstanceData> g_instances : register(u0);
@@ -245,7 +263,7 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         else if (index == 2) object_id = id2;
         else object_id = id3;
 
-        if (object_id > 6)
+        if (object_id >= g_detail_model_count)
             continue;
 
         float jitter = g_detail_density / 1.7;
@@ -274,14 +292,11 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         }
         else
         {
-            float4 model_data = g_detail_models[object_id];
-            float min_scale = model_data.x * 0.5;
-            float max_scale = model_data.y * 0.9;
-            float scale = pcg_randF(r_scale, min_scale, max_scale) * g_detail_height_multiplier;
-
+            DetailModelGPU mdl = g_detail_models[object_id];
+            float scale = pcg_randF(r_scale, mdl.minScale * 0.5, mdl.maxScale * 0.9) * g_detail_height_multiplier;
             float rotation = pcg_randF(r_yaw, 0.0, 6.28318530718);
 
-            uint flags = asuint(model_data.z);
+            uint flags = asuint(mdl.flags);
             const uint DO_NO_WAVING = 0x0001;
             uint vis_id;
             if ((flags & DO_NO_WAVING) != 0)

@@ -247,7 +247,8 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.grass_sss_color.set(ps_r3_grass_sss_color.x, ps_r3_grass_sss_color.y, ps_r3_grass_sss_color.z, ps_r3_grass_sss_intensity);
             frameConstants.grass_color_variation = ps_r3_grass_color_variation;
             frameConstants.grass_blade_height = ps_r3_grass_blade_height;
-            frameConstants.pad0 = frameConstants.pad1 = 0.0f;
+            frameConstants.pad0 = 0.0f;
+            frameConstants.buildDetailsIndex = dm->buildDetailsBindlessIndex;
             cmdList->writeBuffer(dm->cachedDetailGlobalsCB, &frameConstants, sizeof(frameConstants));
 
             u8 dummyLight[48] = {};
@@ -272,8 +273,7 @@ DefaultOutputLayout setupDetailPass(
             if (data.gpuProfiler)
                 data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
 
-            for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
-            {
+            auto makeBindingSet = [&](nvrhi::BufferHandle instanceBuffer) {
                 nvrhi::BindingSetDesc bindDesc;
                 bindDesc.bindings = {
                     nvrhi::BindingSetItem::ConstantBuffer(0, dm->cachedDynTransformsCB),
@@ -283,8 +283,10 @@ DefaultOutputLayout setupDetailPass(
                     nvrhi::BindingSetItem::ConstantBuffer(4, dm->cachedDynLightCB),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(8, dm->cachedDummyMaterials),
                     nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(33, dm->visibleInstancesBuffer[lod]),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(33, instanceBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(34, dm->cachedGrassTintsBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(35, dm->detailModelsBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(36, dm->decalPulledVertexBuffer),
                     nvrhi::BindingSetItem::Sampler(0, dm->cachedSmp_LinearWrap),
                     nvrhi::BindingSetItem::Sampler(1, dm->cachedSmp_PointClamp),
                     nvrhi::BindingSetItem::Sampler(2, dm->cachedSmp_LinearClamp),
@@ -292,23 +294,41 @@ DefaultOutputLayout setupDetailPass(
                     nvrhi::BindingSetItem::Sampler(4, dm->cachedSmp_AnisoWrap),
                     nvrhi::BindingSetItem::Sampler(5, dm->cachedSmp_LinearWrap),
                 };
+                return data.device->GetNVRHIDevice()->createBindingSet(bindDesc, dm->graphicsBindingLayout);
+            };
 
-                nvrhi::BindingSetHandle bindingSet = data.device->GetNVRHIDevice()->createBindingSet(bindDesc, dm->graphicsBindingLayout);
+            for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
+            {
+                nvrhi::BindingSetHandle bindingSet = makeBindingSet(dm->visibleInstancesBuffer[lod]);
 
                 nvrhi::GraphicsState state;
                 state.framebuffer = framebuffer;
                 state.viewport.addViewportAndScissorRect(nvrhi::Viewport((float)data.width, (float)data.height));
                 state.pipeline = dm->graphicsPipeline;
                 state.bindings = { bindingSet };
-
-                if (bindlessTable) {
+                if (bindlessTable)
                     state.addBindingSet(bindlessTable);
-                }
-
                 state.indexBuffer = { dm->bladeIndexBuffer[lod], nvrhi::Format::R16_UINT, 0 };
                 state.vertexBuffers = {{ dm->bladeVertexBuffer[lod], 0, 0 }};
-
                 state.indirectParams = dm->drawArgsBuffer[lod];
+
+                cmdList->setGraphicsState(state);
+                cmdList->drawIndexedIndirect(0);
+            }
+
+            if (dm->decalGraphicsPipeline && dm->visibleDecalInstancesBuffer && dm->decalDrawArgsBuffer && dm->decalIndexBuffer && dm->maxDecalIndexCount > 0)
+            {
+                nvrhi::BindingSetHandle decalBindingSet = makeBindingSet(dm->visibleDecalInstancesBuffer);
+
+                nvrhi::GraphicsState state;
+                state.framebuffer = framebuffer;
+                state.viewport.addViewportAndScissorRect(nvrhi::Viewport((float)data.width, (float)data.height));
+                state.pipeline = dm->decalGraphicsPipeline;
+                state.bindings = { decalBindingSet };
+                if (bindlessTable)
+                    state.addBindingSet(bindlessTable);
+                state.indexBuffer = { dm->decalIndexBuffer, nvrhi::Format::R16_UINT, 0 };
+                state.indirectParams = dm->decalDrawArgsBuffer;
 
                 cmdList->setGraphicsState(state);
                 cmdList->drawIndexedIndirect(0);
