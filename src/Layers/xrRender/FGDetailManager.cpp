@@ -597,6 +597,41 @@ bool FGDetailManager::LoadBuildDetailsTexture(nvrhi::IDevice* device)
             texDesc.width, texDesc.height, texDesc.mipLevels, (int)texDesc.format, buildDetailsBindlessIndex);
     }
 
+    resources::DDSData pbrData;
+    if (resources::DDSLoader::LoadFromFile("build_details_pbr", pbrData) && pbrData.isValid && !pbrData.mipLevels.empty())
+    {
+        nvrhi::TextureDesc pbrDesc;
+        pbrDesc.width = pbrData.desc.width;
+        pbrDesc.height = pbrData.desc.height;
+        pbrDesc.depth = 1;
+        pbrDesc.arraySize = 1;
+        pbrDesc.mipLevels = pbrData.desc.mipLevels;
+        pbrDesc.format = pbrData.desc.format;
+        pbrDesc.dimension = nvrhi::TextureDimension::Texture2D;
+        pbrDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        pbrDesc.keepInitialState = true;
+        pbrDesc.debugName = "BuildDetailsPBR";
+
+        buildDetailsPbrTexture = device->createTexture(pbrDesc);
+        if (buildDetailsPbrTexture)
+        {
+            pendingBuildDetailsPbrUploads.resize(pbrData.mipLevels.size());
+            for (u32 mip = 0; mip < pbrData.mipLevels.size(); mip++)
+            {
+                const auto& ml = pbrData.mipLevels[mip];
+                pendingBuildDetailsPbrUploads[mip].data.assign(ml.data, ml.data + ml.size);
+                pendingBuildDetailsPbrUploads[mip].rowPitch = ml.rowPitch;
+            }
+
+            if (GEnv.Backend)
+            {
+                buildDetailsPbrBindlessIndex = GEnv.Backend->RegisterBindlessTexture(buildDetailsPbrTexture);
+                Msg("* [FGDetailManager] build_details_pbr.dds loaded: %ux%u, %u mips, format=%d, bindless=%u",
+                    pbrDesc.width, pbrDesc.height, pbrDesc.mipLevels, (int)pbrDesc.format, buildDetailsPbrBindlessIndex);
+            }
+        }
+    }
+
     return true;
 }
 
@@ -1799,6 +1834,17 @@ void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
         }
         pendingBuildDetailsUploads.clear();
         pendingBuildDetailsUploads.shrink_to_fit();
+    }
+
+    if (buildDetailsPbrTexture && !pendingBuildDetailsPbrUploads.empty())
+    {
+        for (u32 mip = 0; mip < pendingBuildDetailsPbrUploads.size(); mip++)
+        {
+            auto& ml = pendingBuildDetailsPbrUploads[mip];
+            cmdList->writeTexture(buildDetailsPbrTexture, 0, mip, ml.data.data(), ml.rowPitch);
+        }
+        pendingBuildDetailsPbrUploads.clear();
+        pendingBuildDetailsPbrUploads.shrink_to_fit();
     }
 
     cmdList->writeBuffer(slotAABBBuffer, slot_aabbs.data(), slot_aabbs.size() * sizeof(SlotAABB));

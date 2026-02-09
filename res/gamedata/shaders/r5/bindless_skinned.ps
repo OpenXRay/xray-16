@@ -33,37 +33,6 @@ cbuffer SkinnedMaterialCB : register(b4)
     uint g_SkinnedPad2;
 };
 
-// Simple PBR-ish lighting (same as bindless_forward.ps)
-float3 CalculateLighting(float3 albedo, float3 N, float3 V, float metallic, float roughness, float ao)
-{
-    float3 L = -L_sun_dir_w;
-    float3 H = normalize(V + L);
-
-    float NdotL = saturate(dot(N, L));
-    float NdotH = saturate(dot(N, H));
-    float NdotV = saturate(dot(N, V));
-
-    // Diffuse
-    float3 diffuse = albedo * (1.0 - metallic);
-
-    // Specular (simplified GGX)
-    float alpha = roughness * roughness;
-    float alpha2 = alpha * alpha;
-    float denom = NdotH * NdotH * (alpha2 - 1.0) + 1.0;
-    float D = alpha2 / (3.14159 * denom * denom);
-
-    float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedo, metallic);
-    float3 F = F0 + (1.0 - F0) * pow(1.0 - saturate(dot(H, V)), 5.0);
-
-    float3 specular = D * F * 0.25;
-
-    // Combine
-    float3 directLight = (diffuse + specular) * L_sun_color * NdotL;
-    float3 ambient = albedo * L_ambient.rgb * ao;
-
-    return directLight + ambient;
-}
-
 PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
@@ -118,12 +87,7 @@ PS_OUTPUT main(PS_INPUT input)
         ao = pbrSample.b;
     }
 
-    // View direction
-    float3 V = normalize(eye_position - input.worldPos);
-
-    // Calculate lighting
-    float3 finalColor = CalculateLighting(albedo, N, V, metallic, roughness, ao);
-
-    output.color = float4(finalColor, diffuseSample.a);
+    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao);
+    output.color = float4(fwd.color.rgb, diffuseSample.a);
     return output;
 }

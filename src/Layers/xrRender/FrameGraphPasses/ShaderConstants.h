@@ -6,6 +6,7 @@
 #include "xrCore/_matrix.h"
 
 // Forward declarations of X-Ray engine globals
+extern ECORE_API float ps_r2_sun_lumscale_hemi;
 namespace xray::render {
     namespace RENDER_NAMESPACE {
         extern float r__dtex_range;  // Detail texture range (defined in TextureDescrManager.cpp)
@@ -200,7 +201,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.L_ambient.set(0.2f, 0.2f, 0.2f, 1.0f);  // Ambient (placeholder)
     cb.L_sun_color.set(1.0f, 0.95f, 0.9f);     // Warm sunlight (placeholder)
     cb.L_sun_dir_w.set(0.577f, -0.577f, 0.577f);  // Diagonal down (placeholder)
-    cb.L_hemi_color.set(0.3f, 0.4f, 0.5f, 1.0f);  // Sky color (placeholder)
+    cb.L_hemi_color.set(0.3f, 0.4f, 0.5f, ps_r2_sun_lumscale_hemi);
 
     // Camera position
     cb.eye_position = Device.vCameraPosition;

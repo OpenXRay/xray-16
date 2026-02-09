@@ -173,8 +173,6 @@ f_forward main(p_flat I)
     // ===== WORLD SPACE TRANSFORMS =====
     float3 Nw = viewDirToWorld(N);
     float3 worldPos = viewPosToWorld(I.position.xyz);
-    float hemi = I.position.w;
-
     // ===== DISTANCE-BASED COLOR FADE =====
     // Blend toward uniform mid-color at distance to reduce shading noise on far grass
     // (inspired by Ghost of Tsushima grass_example_repo fog integration)
@@ -189,5 +187,5 @@ f_forward main(p_flat I)
     float3 finalAlbedo = grassAlbedo + sss * L_sun_color;
 
     // PBR Forward+ lighting with computed grass material properties
-    return output_forward_pbr(finalAlbedo, Nw, worldPos, metallic, roughness, ao, hemi);
+    return output_forward_pbr(finalAlbedo, Nw, worldPos, metallic, roughness, ao);
 }

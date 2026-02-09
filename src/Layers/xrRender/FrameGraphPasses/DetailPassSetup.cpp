@@ -280,8 +280,8 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.grass_sss_color.set(ps_r3_grass_sss_color.x, ps_r3_grass_sss_color.y, ps_r3_grass_sss_color.z, ps_r3_grass_sss_intensity);
             frameConstants.grass_color_variation = ps_r3_grass_color_variation;
             frameConstants.grass_blade_height = ps_r3_grass_blade_height;
-            frameConstants.pad0 = 0.0f;
             frameConstants.buildDetailsIndex = dm->buildDetailsBindlessIndex;
+            frameConstants.buildDetailsPbrIndex = dm->buildDetailsPbrBindlessIndex;
             cmdList->writeBuffer(dm->cachedDetailGlobalsCB, &frameConstants, sizeof(frameConstants));
 
             // b4: dynamic_light (dummy)
