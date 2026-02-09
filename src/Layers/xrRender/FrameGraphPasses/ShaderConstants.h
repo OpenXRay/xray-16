@@ -7,6 +7,7 @@
 
 // Forward declarations of X-Ray engine globals
 extern ECORE_API float ps_r2_sun_lumscale_hemi;
+extern ENGINE_API int ps_fg_pbr_diffuse_mode;
 namespace xray::render {
     namespace RENDER_NAMESPACE {
         extern float r__dtex_range;  // Detail texture range (defined in TextureDescrManager.cpp)
@@ -111,7 +112,7 @@ struct alignas(16) StaticGlobals {
     // Lighting
     Fvector4 L_ambient;        // 240-256: Ambient light color
     Fvector3 L_sun_color;      // 256-268: Sun light color
-    float padding1;            // 268-272: Padding
+    float pbr_diffuse_mode;    // 268-272: 0=Disney/Burley, 1=Lambertian
     Fvector3 L_sun_dir_w;      // 272-284: Sun direction (world space)
     float padding2;            // 284-288: Padding
     Fvector4 L_hemi_color;     // 288-304: Hemisphere light color
@@ -200,6 +201,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     // Lighting - defaults, will be overridden by FillSunConstants if sun is available
     cb.L_ambient.set(0.2f, 0.2f, 0.2f, 1.0f);  // Ambient (placeholder)
     cb.L_sun_color.set(1.0f, 0.95f, 0.9f);     // Warm sunlight (placeholder)
+    cb.pbr_diffuse_mode = (float)ps_fg_pbr_diffuse_mode;
     cb.L_sun_dir_w.set(0.577f, -0.577f, 0.577f);  // Diagonal down (placeholder)
     cb.L_hemi_color.set(0.3f, 0.4f, 0.5f, ps_r2_sun_lumscale_hemi);
 
@@ -261,7 +263,6 @@ static class cl_pos_decompress_params2 : public R_constant_setup
     );
 
     // Clear padding to avoid uninitialized memory warnings
-    cb.padding1 = 0.0f;
     cb.padding2 = 0.0f;
     cb.padding3 = 0.0f;
 

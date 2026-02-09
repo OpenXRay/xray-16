@@ -76,52 +76,79 @@ float3 CalculateF0(float3 albedo, float metallic)
     return lerp(DIELECTRIC_F0, albedo, metallic);
 }
 
+// Lambertian diffuse (simplest, uniform)
+float LambertianDiffuse()
+{
+    return 1.0f / PI;
+}
+
+// Disney/Burley diffuse BRDF
+// Roughness-dependent with retroreflection at grazing angles
+float DisneyDiffuse(float NdotV, float NdotL, float LdotH, float roughness)
+{
+    float fd90 = 0.5f + 2.0f * LdotH * LdotH * roughness;
+    float lightScatter = 1.0f + (fd90 - 1.0f) * pow(saturate(1.0f - NdotL), 5.0f);
+    float viewScatter = 1.0f + (fd90 - 1.0f) * pow(saturate(1.0f - NdotV), 5.0f);
+    return lightScatter * viewScatter / PI;
+}
+
+// Directional albedo approximation for multiscattering (Lazarov 2013 / Kulla-Conty)
+// Returns approximate integral of single-scatter BRDF over hemisphere
+float DirectionalAlbedo(float NdotV, float roughness)
+{
+    float a = roughness;
+    float r = 1.0f - a;
+    return 1.0f - (1.0f - NdotV) * pow(1.0f - r, 5.0f)
+         - a * (0.1f + 0.9f * pow(1.0f - NdotV, 2.0f));
+}
+
+// Multiscatter energy compensation (Fdez-Aguera / Kulla-Conty approximation)
+// Adds energy lost to inter-microfacet bounces at high roughness
+float3 MultiscatterCompensation(float3 F0, float NdotV, float NdotL, float roughness)
+{
+    float Eo = DirectionalAlbedo(NdotV, roughness);
+    float Ei = DirectionalAlbedo(NdotL, roughness);
+    float Eavg = F0.r * 0.2126f + F0.g * 0.7152f + F0.b * 0.0722f;
+    float denom = 1.0f - Eavg * (1.0f - Eo);
+    return (1.0f - Eo) * (1.0f - Ei) / max(denom, 0.001f) * F0;
+}
+
 // Full PBR direct lighting calculation
+// diffuseMode: 0=Disney/Burley, 1=Lambertian, 2=Oren-Nayar
 float3 PBRDirectLighting(
     float3 albedo,
-    float3 N,           // World-space normal
-    float3 V,           // View direction (eye to surface, normalized)
-    float3 L,           // Light direction (surface to light, normalized)
+    float3 N,
+    float3 V,
+    float3 L,
     float3 lightColor,
     float metallic,
     float roughness,
-    float ao)
+    uint diffuseMode)
 {
-    // Clamp roughness to avoid division issues
     roughness = max(roughness, MIN_ROUGHNESS);
 
-    // Calculate halfway vector
     float3 H = normalize(V + L);
 
-    // Dot products
     float NdotL = max(dot(N, L), 0.0f);
     float NdotV = max(dot(N, V), 0.0f);
     float NdotH = max(dot(N, H), 0.0f);
     float HdotV = max(dot(H, V), 0.0f);
+    float LdotH = max(dot(L, H), 0.0f);
 
-    // Early out if light is behind surface
-    if (NdotL <= 0.0f)
-        return float3(0.0f, 0.0f, 0.0f);
-
-    // Calculate F0 based on metallic
     float3 F0 = CalculateF0(albedo, metallic);
-
-    // Calculate Fresnel
     float3 F = F_Schlick(HdotV, F0);
 
-    // Calculate specular BRDF (Cook-Torrance)
     float3 specular = CookTorranceSpecular(NdotH, NdotV, NdotL, HdotV, roughness, F0);
+    specular += MultiscatterCompensation(F0, NdotV, NdotL, roughness);
 
-    // Calculate diffuse (Lambertian)
-    // Metals have no diffuse, energy conservation: kD = 1 - kS
-    float3 kS = F;
-    float3 kD = (1.0f - kS) * (1.0f - metallic);
-    float3 diffuse = kD * albedo / PI;
+    float fd = (diffuseMode == 1)
+        ? LambertianDiffuse()
+        : DisneyDiffuse(NdotV, NdotL, LdotH, roughness);
 
-    // Final lighting
-    float3 Lo = (diffuse + specular) * lightColor * NdotL;
+    float3 kD = (1.0f - F) * (1.0f - metallic);
+    float3 diffuse = kD * albedo * fd;
 
-    return Lo * ao;
+    return (diffuse + specular) * lightColor * NdotL;
 }
 
 // Simplified ambient term (placeholder for future IBL)

@@ -38,6 +38,7 @@ cbuffer	static_globals : register(b2)
 
 	float4		L_ambient;		// L_ambient.w = skynbox-lerp-factor
 	float3		L_sun_color;
+	float		pbr_diffuse_mode;
 	float3		L_sun_dir_w;
 	float4		L_hemi_color;
 

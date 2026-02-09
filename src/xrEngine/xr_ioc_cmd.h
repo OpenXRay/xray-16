@@ -30,6 +30,7 @@
 
 extern ENGINE_API bool renderer_allow_override; // allows to change renderer setting
 extern ENGINE_API int ps_r4_use_pbr;  // Phase 2.5: Enable PBR texture conversion and rendering
+extern ENGINE_API int ps_fg_pbr_diffuse_mode;  // 0=Disney/Burley, 1=Lambertian
 
 class ENGINE_API IConsole_Command
 {
