@@ -187,36 +187,24 @@ f_forward output_forward_pbr(
 	float3 worldPos,
 	float metallic,
 	float roughness,
-	float ao,
-	float hemi)
+	float ao)
 {
 	f_forward res;
 
 	float3 N = normalize(worldNormal);
-
 	float3 V = normalize(eye_position - worldPos);
-
 	float3 L = normalize(-L_sun_dir_w);
 
 	float3 sunLight = PBRDirectLighting(
-		albedo,
-		N,
-		V,
-		L,
+		albedo, N, V, L,
 		L_sun_color,
-		metallic,
-		roughness,
-		ao
+		metallic, roughness, ao
 	);
 
-	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * hemi;
+	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
 	float3 ambient = PBRAmbient(
-		albedo,
-		N,
-		V,
-		metallic,
-		roughness,
-		ao,
+		albedo, N, V,
+		metallic, roughness, ao,
 		ambientColor
 	);
 

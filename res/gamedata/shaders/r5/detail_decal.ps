@@ -20,8 +20,8 @@ cbuffer DetailGlobals : register(b3)
 	float4 grass_sss_color;
 	float grass_color_variation;
 	float grass_blade_height;
-	float _pad0;
 	uint build_details_index;
+	uint build_details_pbr_index;
 };
 
 f_forward main(p_flat I)
@@ -34,7 +34,18 @@ f_forward main(p_flat I)
 	float3 N = normalize(I.N);
 	float3 Nw = viewDirToWorld(N);
 	float3 worldPos = viewPosToWorld(I.position.xyz);
-	float hemi = I.position.w;
+	float metallic = 0.0;
+	float roughness = 0.85;
+	float ao = 1.0;
 
-	return output_forward_pbr(texel.rgb, Nw, worldPos, 0.0, 0.85, 1.0, hemi);
+	if (build_details_pbr_index != 0)
+	{
+		Texture2D pbr_tex = GetBindlessTexture(build_details_pbr_index);
+		float4 pbr = pbr_tex.Sample(g_LinearSampler, I.tcdh.xy);
+		metallic = pbr.r;
+		roughness = pbr.g;
+		ao = pbr.b;
+	}
+
+	return output_forward_pbr(texel.rgb, Nw, worldPos, metallic, roughness, ao);
 }

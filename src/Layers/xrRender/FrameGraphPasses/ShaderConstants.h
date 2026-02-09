@@ -4,6 +4,7 @@
 #include "xrCore/_vector3d.h"
 #include "xrCore/_matrix.h"
 
+extern ECORE_API float ps_r2_sun_lumscale_hemi;
 namespace xray::render {
     namespace RENDER_NAMESPACE {
         extern float r__dtex_range;
@@ -135,7 +136,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.L_ambient.set(0.2f, 0.2f, 0.2f, 1.0f);
     cb.L_sun_color.set(1.0f, 0.95f, 0.9f);
     cb.L_sun_dir_w.set(0.577f, -0.577f, 0.577f);
-    cb.L_hemi_color.set(0.3f, 0.4f, 0.5f, 1.0f);
+    cb.L_hemi_color.set(0.3f, 0.4f, 0.5f, ps_r2_sun_lumscale_hemi);
 
     cb.eye_position = Device.vCameraPosition;
 

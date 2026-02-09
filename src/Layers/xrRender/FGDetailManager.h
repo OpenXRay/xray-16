@@ -83,8 +83,8 @@ public:
         Fvector4 grass_sss_color;
         float grass_color_variation;
         float grass_blade_height;
-        float pad0;
         u32 buildDetailsIndex;
+        u32 buildDetailsPbrIndex;
     };
 
     struct DetailCullParams
@@ -186,6 +186,8 @@ public:
 
     nvrhi::TextureHandle buildDetailsTexture;
     u32 buildDetailsBindlessIndex = 0;
+    nvrhi::TextureHandle buildDetailsPbrTexture;
+    u32 buildDetailsPbrBindlessIndex = 0;
 
     nvrhi::BufferHandle visibleSlotIDsBuffer;
     nvrhi::BufferHandle visibleSlotCounterBuffer;
@@ -352,6 +354,7 @@ private:
 
     struct PendingMipUpload { xr_vector<u8> data; u32 rowPitch; };
     xr_vector<PendingMipUpload> pendingBuildDetailsUploads;
+    xr_vector<PendingMipUpload> pendingBuildDetailsPbrUploads;
 
     nvrhi::BindingSetHandle CreateInstanceGenBindingSet(nvrhi::IDevice* device) const;
     void BuildDetailModelGPUData();

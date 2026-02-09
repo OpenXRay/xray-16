@@ -63,8 +63,8 @@ cbuffer DetailGlobals : register(b3)
 	float4 grass_sss_color;
 	float grass_color_variation;
 	float grass_blade_height;
-	float _pad0;
 	uint build_details_index;
+	uint build_details_pbr_index;
 };
 
 StructuredBuffer<uint> visible_indices : register(t33);
