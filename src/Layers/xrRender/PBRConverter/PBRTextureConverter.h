@@ -185,6 +185,15 @@ struct ConsolidationStats {
     u32 files_deleted = 0;
 };
 
+// Convert a single texture to PBR at the given VFS location
+// Produces <base_name>_pbr.dds (packed R=M, G=R, B=AO, A=Parallax) alongside the original
+// Returns true if conversion succeeded or output already exists
+bool ConvertSingleTextureToPBR(
+    const char* root_alias,
+    const char* relative_path,
+    const PBRConversionParams& params
+);
+
 // Consolidate existing separate PBR textures into packed _pbr.dds
 // Also updates .thm files and deletes old separate files
 bool ConsolidatePBRTextures(

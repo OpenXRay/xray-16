@@ -1904,4 +1904,52 @@ bool ConsolidatePBRTextures(
     return out_stats.textures_failed == 0;
 }
 
+bool ConvertSingleTextureToPBR(
+    const char* root_alias,
+    const char* relative_path,
+    const PBRConversionParams& params)
+{
+    if (!FileExists(root_alias, relative_path))
+    {
+        Msg("! [PBRTextureConverter] Texture not found: %s/%s", root_alias, relative_path);
+        return false;
+    }
+
+    xr_string rel(relative_path);
+    xr_string base_name = rel;
+    if (const auto dot = base_name.find_last_of('.'); dot != xr_string::npos)
+        base_name = base_name.substr(0, dot);
+
+    xr_string pbr_path = base_name + "_pbr.dds";
+    if (FileExists(root_alias, pbr_path.c_str()))
+    {
+        Msg("~ [PBRTextureConverter] %s already exists, skipping", pbr_path.c_str());
+        return true;
+    }
+
+    LegacyTextureAsset asset;
+    asset.base_name = base_name;
+    asset.diffuse.root_alias = root_alias;
+    asset.diffuse.relative_path = relative_path;
+
+    TextureInventory inventory;
+    inventory.assets.push_back(std::move(asset));
+    inventory.total_textures = 1;
+
+    PBRConversionParams localParams = params;
+    localParams.output_root = root_alias;
+
+    PBRConversionStats stats;
+    if (!ConvertTexturesToPBR(inventory, localParams, stats, nullptr))
+    {
+        Msg("! [PBRTextureConverter] Conversion failed: %s", relative_path);
+        return false;
+    }
+
+    ConsolidationStats consolidationStats;
+    ConsolidatePBRTextures(root_alias, consolidationStats, nullptr);
+
+    return stats.textures_failed == 0;
+}
+
 } // namespace xray::render::pbr

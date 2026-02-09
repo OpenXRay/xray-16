@@ -20,6 +20,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "Layers/xrRender/FGDetailManager.h"
+#include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -142,6 +143,9 @@ void CRender::level_Load(IReader* fs)
             if (detailMgr && detailMgr->Load()) {
                 detailMgr->BakeHeightmap();
                 detailMgr->LoadHeightmapTexture(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
+                pbr::PBRConversionParams pbrParams;
+                pbrParams.generate_mipmaps = true;
+                pbr::ConvertSingleTextureToPBR("$level$", "build_details.dds", pbrParams);
                 detailMgr->LoadBuildDetailsTexture(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
                 detailMgr->ComputeSlotAABBs();
                 detailMgr->CreateGPUBuffers(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
