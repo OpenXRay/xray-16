@@ -49,13 +49,15 @@ struct InstanceData
 	uint object_id;
 };
 
-StructuredBuffer<InstanceData> detail_buffer : register(t33);
+StructuredBuffer<uint> visible_indices : register(t33);
+StructuredBuffer<InstanceData> all_instances : register(t37);
 
 v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 {
 	v2p_flat O;
 
-	InstanceData det = detail_buffer[instance_id];
+	uint src_idx = visible_indices[instance_id];
+	InstanceData det = all_instances[src_idx];
 
 	float2 height_uv = det.pos.xz * HEIGHT_NOISE_SCALE + float2(0.37, 0.73);
 	Texture2D height_noise_tex = GetBindlessTexture(wind_texture_index);

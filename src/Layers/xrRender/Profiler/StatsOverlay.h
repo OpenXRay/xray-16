@@ -44,6 +44,11 @@ struct RenderStats
     u32 detailVisibleLOD0 = 0;
     u32 detailVisibleLOD1 = 0;
     u32 detailVisibleLOD2 = 0;
+    u32 detailVisibleDecals = 0;
+
+    u32 detailGeneratedInstances = 0;
+    u32 detailVisibleCapacity = 0;
+    u32 detailDecalCapacity = 0;
 
     void Reset()
     {
@@ -56,6 +61,8 @@ struct RenderStats
         detailInstances = detailSlots = 0;
         detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;
         detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;
+        detailVisibleDecals = 0;
+        detailGeneratedInstances = detailVisibleCapacity = detailDecalCapacity = 0;
     }
 };
 

@@ -46,7 +46,7 @@ cbuffer DetailCullParams : register(b5)
     float3 g_camera_pos;
     float g_fade_distance_sqr;
     float4 g_frustum_planes[6];
-    uint g_total_instance_count;
+    uint g_visible_blade_capacity;
     uint g_total_slot_count;
     uint g_hiz_width;
     uint g_hiz_height;
@@ -54,6 +54,8 @@ cbuffer DetailCullParams : register(b5)
     float g_lod_distance_close_sqr;
     float g_lod_distance_mid_sqr;
     float g_detail_density;
+    uint g_visible_decal_capacity;
+    uint g_cull_pad0, g_cull_pad1, g_cull_pad2;
 };
 
 StructuredBuffer<InstanceData> g_all_instances : register(t0);
@@ -63,18 +65,18 @@ Texture2D<float> g_hiz_pyramid : register(t3);
 StructuredBuffer<DetailModelGPU> g_detail_models : register(t4);
 SamplerState g_point_sampler : register(s0);
 
-RWStructuredBuffer<InstanceData> g_visible_lod0 : register(u0);
+RWStructuredBuffer<uint> g_visible_lod0 : register(u0);
 RWByteAddressBuffer g_indirect_args_lod0 : register(u1);
-RWStructuredBuffer<InstanceData> g_visible_lod1 : register(u2);
+RWStructuredBuffer<uint> g_visible_lod1 : register(u2);
 RWByteAddressBuffer g_indirect_args_lod1 : register(u3);
-RWStructuredBuffer<InstanceData> g_visible_lod2 : register(u4);
+RWStructuredBuffer<uint> g_visible_lod2 : register(u4);
 RWByteAddressBuffer g_indirect_args_lod2 : register(u5);
-RWStructuredBuffer<InstanceData> g_visible_decals : register(u6);
+RWStructuredBuffer<uint> g_visible_decals : register(u6);
 RWByteAddressBuffer g_indirect_args_decal : register(u7);
 
 static const uint DO_NO_WAVING = 0x0001;
 
-void AppendBladeLOD(InstanceData inst)
+void AppendBladeLOD(InstanceData inst, uint inst_idx)
 {
     float3 to_camera = inst.pos - g_camera_pos;
     float dist_sqr = dot(to_camera, to_camera);
@@ -83,25 +85,29 @@ void AppendBladeLOD(InstanceData inst)
     if (dist_sqr < g_lod_distance_close_sqr)
     {
         g_indirect_args_lod0.InterlockedAdd(4, 1, idx);
-        g_visible_lod0[idx] = inst;
+        if (idx < g_visible_blade_capacity)
+            g_visible_lod0[idx] = inst_idx;
     }
     else if (dist_sqr < g_lod_distance_mid_sqr)
     {
         g_indirect_args_lod1.InterlockedAdd(4, 1, idx);
-        g_visible_lod1[idx] = inst;
+        if (idx < g_visible_blade_capacity)
+            g_visible_lod1[idx] = inst_idx;
     }
     else
     {
         g_indirect_args_lod2.InterlockedAdd(4, 1, idx);
-        g_visible_lod2[idx] = inst;
+        if (idx < g_visible_blade_capacity)
+            g_visible_lod2[idx] = inst_idx;
     }
 }
 
-void AppendDecal(InstanceData inst)
+void AppendDecal(uint inst_idx)
 {
     uint idx;
     g_indirect_args_decal.InterlockedAdd(4, 1, idx);
-    g_visible_decals[idx] = inst;
+    if (idx < g_visible_decal_capacity)
+        g_visible_decals[idx] = inst_idx;
 }
 
 [numthreads(64, 1, 1)]
@@ -129,8 +135,8 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
 
         uint flags = asuint(g_detail_models[inst.object_id].flags);
         if ((flags & DO_NO_WAVING) != 0)
-            AppendDecal(inst);
+            AppendDecal(inst_idx);
         else
-            AppendBladeLOD(inst);
+            AppendBladeLOD(inst, inst_idx);
     }
 }

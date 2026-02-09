@@ -42,7 +42,7 @@ cbuffer DetailCullParams : register(b5)
     float3 g_camera_pos;
     float g_fade_distance_sqr;
     float4 g_frustum_planes[6];
-    uint g_total_instance_count;
+    uint g_visible_blade_capacity;
     uint g_total_slot_count;
     uint g_hiz_width;
     uint g_hiz_height;
@@ -50,6 +50,8 @@ cbuffer DetailCullParams : register(b5)
     float g_lod_distance_close_sqr;
     float g_lod_distance_mid_sqr;
     float g_detail_density;
+    uint g_visible_decal_capacity;
+    uint g_cull_pad0, g_cull_pad1, g_cull_pad2;
 };
 
 struct DetailModelGPU
