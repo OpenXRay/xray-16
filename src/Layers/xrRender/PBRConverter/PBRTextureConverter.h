@@ -107,6 +107,12 @@ struct ConsolidationStats {
     u32 files_deleted = 0;
 };
 
+bool ConvertSingleTextureToPBR(
+    const char* root_alias,
+    const char* relative_path,
+    const PBRConversionParams& params
+);
+
 bool ConsolidatePBRTextures(
     const xr_string& root_alias,
     ConsolidationStats& out_stats,
