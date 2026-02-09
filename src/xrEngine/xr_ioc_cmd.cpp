@@ -25,6 +25,7 @@ ENGINE_API int dm_debug_trails = 0;
 ENGINE_API int g_debug_utils = 0;
 ENGINE_API bool renderer_allow_override = false;
 ENGINE_API int ps_r4_use_pbr = 0;
+ENGINE_API int ps_fg_pbr_diffuse_mode = 0;
 extern int ps_disable_lens_flare;
 
 void IConsole_Command::InvalidSyntax()

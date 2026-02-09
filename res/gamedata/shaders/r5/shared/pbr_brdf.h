@@ -66,6 +66,36 @@ float3 CalculateF0(float3 albedo, float metallic)
     return lerp(DIELECTRIC_F0, albedo, metallic);
 }
 
+float LambertianDiffuse()
+{
+    return 1.0f / PI;
+}
+
+float DisneyDiffuse(float NdotV, float NdotL, float LdotH, float roughness)
+{
+    float fd90 = 0.5f + 2.0f * LdotH * LdotH * roughness;
+    float lightScatter = 1.0f + (fd90 - 1.0f) * pow(saturate(1.0f - NdotL), 5.0f);
+    float viewScatter = 1.0f + (fd90 - 1.0f) * pow(saturate(1.0f - NdotV), 5.0f);
+    return lightScatter * viewScatter / PI;
+}
+
+float DirectionalAlbedo(float NdotV, float roughness)
+{
+    float a = roughness;
+    float r = 1.0f - a;
+    return 1.0f - (1.0f - NdotV) * pow(1.0f - r, 5.0f)
+         - a * (0.1f + 0.9f * pow(1.0f - NdotV, 2.0f));
+}
+
+float3 MultiscatterCompensation(float3 F0, float NdotV, float NdotL, float roughness)
+{
+    float Eo = DirectionalAlbedo(NdotV, roughness);
+    float Ei = DirectionalAlbedo(NdotL, roughness);
+    float Eavg = F0.r * 0.2126f + F0.g * 0.7152f + F0.b * 0.0722f;
+    float denom = 1.0f - Eavg * (1.0f - Eo);
+    return (1.0f - Eo) * (1.0f - Ei) / max(denom, 0.001f) * F0;
+}
+
 float3 PBRDirectLighting(
     float3 albedo,
     float3 N,
@@ -74,7 +104,7 @@ float3 PBRDirectLighting(
     float3 lightColor,
     float metallic,
     float roughness,
-    float ao)
+    uint diffuseMode)
 {
     roughness = max(roughness, MIN_ROUGHNESS);
 
@@ -84,23 +114,22 @@ float3 PBRDirectLighting(
     float NdotV = max(dot(N, V), 0.0f);
     float NdotH = max(dot(N, H), 0.0f);
     float HdotV = max(dot(H, V), 0.0f);
-
-    if (NdotL <= 0.0f)
-        return float3(0.0f, 0.0f, 0.0f);
+    float LdotH = max(dot(L, H), 0.0f);
 
     float3 F0 = CalculateF0(albedo, metallic);
-
     float3 F = F_Schlick(HdotV, F0);
 
     float3 specular = CookTorranceSpecular(NdotH, NdotV, NdotL, HdotV, roughness, F0);
+    specular += MultiscatterCompensation(F0, NdotV, NdotL, roughness);
 
-    float3 kS = F;
-    float3 kD = (1.0f - kS) * (1.0f - metallic);
-    float3 diffuse = kD * albedo / PI;
+    float fd = (diffuseMode == 1)
+        ? LambertianDiffuse()
+        : DisneyDiffuse(NdotV, NdotL, LdotH, roughness);
 
-    float3 Lo = (diffuse + specular) * lightColor * NdotL;
+    float3 kD = (1.0f - F) * (1.0f - metallic);
+    float3 diffuse = kD * albedo * fd;
 
-    return Lo * ao;
+    return (diffuse + specular) * lightColor * NdotL;
 }
 
 float3 PBRAmbient(

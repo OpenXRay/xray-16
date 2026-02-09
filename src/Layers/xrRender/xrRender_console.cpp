@@ -1183,6 +1183,7 @@ void xrRender_initconsole()
     CMD1(CCC_NVRHITest, "r4_nvrhi_test");
     CMD1(CCC_RenderContextTest, "r4_rendercontext_test");
     CMD4(CCC_Integer, "r4_use_pbr", &ps_r4_use_pbr, 0, 1);
+    CMD4(CCC_Integer, "fg_pbr_diffuse_mode", &ps_fg_pbr_diffuse_mode, 0, 1);
     CMD4(CCC_Integer, "r4_debug_gpu_culling", &ps_r4_debug_gpu_culling, 0, 1);
 
 #ifdef DEBUG

@@ -5,6 +5,7 @@
 #include "xrCore/_matrix.h"
 
 extern ECORE_API float ps_r2_sun_lumscale_hemi;
+extern ENGINE_API int ps_fg_pbr_diffuse_mode;
 namespace xray::render {
     namespace RENDER_NAMESPACE {
         extern float r__dtex_range;
@@ -70,7 +71,7 @@ struct alignas(16) StaticGlobals {
 
     Fvector4 L_ambient;
     Fvector3 L_sun_color;
-    float padding1;
+    float pbr_diffuse_mode;
     Fvector3 L_sun_dir_w;
     float padding2;
     Fvector4 L_hemi_color;
@@ -135,6 +136,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
 
     cb.L_ambient.set(0.2f, 0.2f, 0.2f, 1.0f);
     cb.L_sun_color.set(1.0f, 0.95f, 0.9f);
+    cb.pbr_diffuse_mode = (float)ps_fg_pbr_diffuse_mode;
     cb.L_sun_dir_w.set(0.577f, -0.577f, 0.577f);
     cb.L_hemi_color.set(0.3f, 0.4f, 0.5f, ps_r2_sun_lumscale_hemi);
 
@@ -162,7 +164,6 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
         1.0f / (float)Device.dwHeight
     );
 
-    cb.padding1 = 0.0f;
     cb.padding2 = 0.0f;
     cb.padding3 = 0.0f;
 
