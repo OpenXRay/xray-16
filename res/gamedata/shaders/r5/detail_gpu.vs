@@ -67,27 +67,45 @@ struct v_blade_sdf
 	float width_scale : COLOR1;      // Width at this vertex
 };
 
-// Instance data structure (must match C++ FGDetailManager::InstanceData exactly!)
 struct InstanceData
 {
-	float3 pos;      // World position (12 bytes)
-	float scale;     // Scale factor (4 bytes)
-	float rotation;  // Y-axis rotation in radians (4 bytes)
-	float hemi;      // Hemisphere lighting (4 bytes)
-	uint vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2) (4 bytes)
-	uint object_id;  // Which grass object type (0-63) (4 bytes)
-};  // Total: 32 bytes
+	float3 pos;
+	uint packed;
+};
+
+struct GPUSlotData
+{
+	float world_min_x;
+	float world_min_z;
+	float y_base;
+	float y_height;
+	uint packed_ids;
+	uint packed_palette_01;
+	uint packed_palette_23;
+	float hemi;
+};
+
+static const float PACK_MAX_SCALE = 4.0;
+static const float TWO_PI = 6.28318530718;
 
 // NOTE: common_samplers.h uses t0-t31, so we use t32+ to avoid conflicts
 StructuredBuffer<uint> visible_indices : register(t33);
 StructuredBuffer<InstanceData> all_instances : register(t37);
+StructuredBuffer<GPUSlotData> slot_data : register(t38);
 
 v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 {
 	v2p_flat O;
 
 	uint src_idx = visible_indices[instance_id];
-	InstanceData det = all_instances[src_idx];
+	InstanceData raw = all_instances[src_idx];
+
+	struct { float3 pos; float scale; float rotation; uint vis_id; uint object_id; } det;
+	det.pos = raw.pos;
+	det.object_id = raw.packed & 0x3F;
+	det.vis_id = (raw.packed >> 6) & 0x3;
+	det.rotation = float((raw.packed >> 8) & 0x3FF) / 1023.0 * TWO_PI;
+	det.scale = float((raw.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
 
 	// ===== HEIGHT VARIATION USING PERLIN NOISE =====
 	// Sample static Perlin noise at different scale/offset for height variation
@@ -404,8 +422,9 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	float4 pos = float4(bezier_pos + width_offset, 1.0);
 
 	// ===== Calculate blade normal =====
-	float hemi = abs(det.hemi);
-	float sun = sign(det.hemi) * 0.25f + 0.25f;
+	float slot_hemi = slot_data[slot_idx].hemi;
+	float hemi = abs(slot_hemi);
+	float sun = sign(slot_hemi) * 0.25f + 0.25f;
 
 	// NORMAL = perpendicular to blade surface = cross(tangent, right)
 	// Since right is derived from rotation matrix, this is stable

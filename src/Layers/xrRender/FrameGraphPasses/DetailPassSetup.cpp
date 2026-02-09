@@ -267,7 +267,9 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.dir2D.set(dm->windDirection.x, dm->windDirection.y, 0.0f, 0.0f);
             frameConstants.dir2D_2.set(-dm->windDirection.y, dm->windDirection.x, 0.0f, 0.0f);
             frameConstants.viewProj = Device.mFullTransform;
-            frameConstants.detail_params.set(64.0f, 64.0f, 0.0f, 0.0f);
+            frameConstants.detail_params.set(
+                float(dm->dtH.x_size()), float(dm->dtH.z_size()),
+                float(dm->dtH.x_offs()), float(dm->dtH.z_offs()));
             frameConstants.g_wind_direction.set(windAngleDeg, windSpeed, 0.0f, 0.0f);
             frameConstants.grass_wind_displacement = ps_r3_grass_wind_displacement;
             frameConstants.grass_interaction_displacement = ps_r3_grass_interaction_displacement;
@@ -322,6 +324,7 @@ DefaultOutputLayout setupDetailPass(
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(35, dm->detailModelsBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(36, dm->decalPulledVertexBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(37, dm->generatedInstancesBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(38, dm->slotDataBuffer),
                     nvrhi::BindingSetItem::Sampler(0, dm->cachedSmp_LinearWrap),
                     nvrhi::BindingSetItem::Sampler(1, dm->cachedSmp_PointClamp),
                     nvrhi::BindingSetItem::Sampler(2, dm->cachedSmp_LinearClamp),

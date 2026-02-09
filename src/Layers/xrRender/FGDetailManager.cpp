@@ -1961,6 +1961,7 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(35),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(36),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(37),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(38),
         nvrhi::BindingLayoutItem::Sampler(0),
         nvrhi::BindingLayoutItem::Sampler(1),
         nvrhi::BindingLayoutItem::Sampler(2),

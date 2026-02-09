@@ -25,13 +25,9 @@ public:
     struct InstanceData
     {
         Fvector pos;
-        float scale;
-        float rotation;
-        float hemi;
-        u32 vis_id;
-        u32 object_id;
+        u32 packed;
     };
-    static_assert(sizeof(InstanceData) == 32, "InstanceData must be 32 bytes");
+    static_assert(sizeof(InstanceData) == 16, "InstanceData must be 16 bytes");
 
     struct GPUSlotData
     {

@@ -3,12 +3,10 @@
 struct InstanceData
 {
     float3 pos;
-    float scale;
-    float rotation;
-    float hemi;
-    uint vis_id;
-    uint object_id;
+    uint packed;
 };
+
+static const float PACK_MAX_SCALE = 4.0;
 
 struct SlotAABB
 {
@@ -76,9 +74,9 @@ RWByteAddressBuffer g_indirect_args_decal : register(u7);
 
 static const uint DO_NO_WAVING = 0x0001;
 
-void AppendBladeLOD(InstanceData inst, uint inst_idx)
+void AppendBladeLOD(float3 pos, uint inst_idx)
 {
-    float3 to_camera = inst.pos - g_camera_pos;
+    float3 to_camera = pos - g_camera_pos;
     float dist_sqr = dot(to_camera, to_camera);
 
     uint idx;
@@ -121,7 +119,10 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         uint inst_idx = slot.instance_base + i;
         InstanceData inst = g_all_instances[inst_idx];
 
-        float bounds_radius = inst.scale * 0.5;
+        float scale = float((inst.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
+        uint object_id = inst.packed & 0x3F;
+
+        float bounds_radius = scale * 0.5;
 
         if (!DistanceTestSphere(inst.pos, bounds_radius, g_camera_pos, g_fade_distance_sqr))
             continue;
@@ -133,10 +134,10 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
                             g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
             continue;
 
-        uint flags = asuint(g_detail_models[inst.object_id].flags);
+        uint flags = asuint(g_detail_models[object_id].flags);
         if ((flags & DO_NO_WAVING) != 0)
             AppendDecal(inst_idx);
         else
-            AppendBladeLOD(inst, inst_idx);
+            AppendBladeLOD(inst.pos, inst_idx);
     }
 }
