@@ -15,12 +15,11 @@ struct GPUSlotData
 struct InstanceData
 {
     float3 pos;
-    float scale;
-    float rotation;
-    float hemi;
-    uint vis_id;
-    uint object_id;
+    uint packed;
 };
+
+static const float PACK_MAX_SCALE = 4.0;
+static const float TWO_PI = 6.28318530718;
 
 struct SlotAABB
 {
@@ -311,13 +310,15 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
                     vis_id = 1;
             }
 
+            uint pack_scale = uint(clamp(scale / PACK_MAX_SCALE, 0.0, 1.0) * 1023.0);
+            uint pack_rotation = uint(clamp(rotation / TWO_PI, 0.0, 0.999) * 1023.0);
+
             InstanceData inst;
             inst.pos = world_pos;
-            inst.scale = scale;
-            inst.rotation = rotation;
-            inst.hemi = slot.hemi;
-            inst.vis_id = vis_id;
-            inst.object_id = object_id;
+            inst.packed = (object_id & 0x3F)
+                        | ((vis_id & 0x3) << 6)
+                        | ((pack_rotation & 0x3FF) << 8)
+                        | ((pack_scale & 0x3FF) << 18);
 
             uint base_offset = g_prefix_offsets[slot_idx];
             if (base_offset >= g_instance_capacity)

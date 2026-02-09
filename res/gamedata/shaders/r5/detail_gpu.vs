@@ -42,22 +42,41 @@ struct v_blade_sdf
 struct InstanceData
 {
 	float3 pos;
-	float scale;
-	float rotation;
-	float hemi;
-	uint vis_id;
-	uint object_id;
+	uint packed;
 };
+
+struct GPUSlotData
+{
+	float world_min_x;
+	float world_min_z;
+	float y_base;
+	float y_height;
+	uint packed_ids;
+	uint packed_palette_01;
+	uint packed_palette_23;
+	float hemi;
+};
+
+static const float PACK_MAX_SCALE = 4.0;
+static const float TWO_PI = 6.28318530718;
 
 StructuredBuffer<uint> visible_indices : register(t33);
 StructuredBuffer<InstanceData> all_instances : register(t37);
+StructuredBuffer<GPUSlotData> slot_data : register(t38);
 
 v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 {
 	v2p_flat O;
 
 	uint src_idx = visible_indices[instance_id];
-	InstanceData det = all_instances[src_idx];
+	InstanceData raw = all_instances[src_idx];
+
+	struct { float3 pos; float scale; float rotation; uint vis_id; uint object_id; } det;
+	det.pos = raw.pos;
+	det.object_id = raw.packed & 0x3F;
+	det.vis_id = (raw.packed >> 6) & 0x3;
+	det.rotation = float((raw.packed >> 8) & 0x3FF) / 1023.0 * TWO_PI;
+	det.scale = float((raw.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
 
 	float2 height_uv = det.pos.xz * HEIGHT_NOISE_SCALE + float2(0.37, 0.73);
 	Texture2D height_noise_tex = GetBindlessTexture(wind_texture_index);
@@ -265,8 +284,9 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
 	float4 pos = float4(bezier_pos + width_offset, 1.0);
 
-	float hemi = abs(det.hemi);
-	float sun = sign(det.hemi) * 0.25f + 0.25f;
+	float slot_hemi = slot_data[slot_idx].hemi;
+	float hemi = abs(slot_hemi);
+	float sun = sign(slot_hemi) * 0.25f + 0.25f;
 
 	float3 normal_raw = cross(tangent, right);
 	float normal_len = length(normal_raw);

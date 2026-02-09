@@ -5,12 +5,23 @@
 struct InstanceData
 {
 	float3 pos;
-	float scale;
-	float rotation;
-	float hemi;
-	uint vis_id;
-	uint object_id;
+	uint packed;
 };
+
+struct GPUSlotData
+{
+	float world_min_x;
+	float world_min_z;
+	float y_base;
+	float y_height;
+	uint packed_ids;
+	uint packed_palette_01;
+	uint packed_palette_23;
+	float hemi;
+};
+
+static const float PACK_MAX_SCALE = 4.0;
+static const float TWO_PI = 6.28318530718;
 
 struct DetailModelGPU
 {
@@ -60,14 +71,21 @@ StructuredBuffer<uint> visible_indices : register(t33);
 StructuredBuffer<DetailModelGPU> detail_models : register(t35);
 StructuredBuffer<DecalPulledVertex> decal_vertices : register(t36);
 StructuredBuffer<InstanceData> all_instances : register(t37);
+StructuredBuffer<GPUSlotData> slot_data : register(t38);
 
 v2p_flat main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 {
 	v2p_flat O;
 
 	uint src_idx = visible_indices[instance_id];
-	InstanceData det = all_instances[src_idx];
-	DetailModelGPU mdl = detail_models[det.object_id];
+	InstanceData raw = all_instances[src_idx];
+
+	uint object_id = raw.packed & 0x3F;
+	uint vis_id = (raw.packed >> 6) & 0x3;
+	float rotation = float((raw.packed >> 8) & 0x3FF) / 1023.0 * TWO_PI;
+	float scale = float((raw.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
+
+	DetailModelGPU mdl = detail_models[object_id];
 
 	if (vertex_id >= mdl.decalIndexCount)
 	{
@@ -78,16 +96,16 @@ v2p_flat main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 
 	DecalPulledVertex v = decal_vertices[mdl.decalVertexBase + vertex_id];
 
-	float3 local_pos = float3(v.px, v.py, v.pz) * det.scale;
+	float3 local_pos = float3(v.px, v.py, v.pz) * scale;
 
-	float c = cos(det.rotation);
-	float s = sin(det.rotation);
+	float c = cos(rotation);
+	float s = sin(rotation);
 	float3 rotated;
 	rotated.x = local_pos.x * c - local_pos.z * s;
 	rotated.y = local_pos.y;
 	rotated.z = local_pos.x * s + local_pos.z * c;
 
-	float4 world_pos = float4(rotated + det.pos, 1.0);
+	float4 world_pos = float4(rotated + raw.pos, 1.0);
 
 	float3 Pe = mul(m_WV, world_pos);
 
@@ -95,12 +113,23 @@ v2p_flat main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 	float3 view_N = mul((float3x3)m_WV, N_up);
 
 	float2 uv = float2(v.u, v.v);
-	uint flip = asuint(det.rotation) ^ det.vis_id;
+	uint flip = raw.packed;
 	if (flip & 1u) uv.x = mdl.uv_min_x + mdl.uv_max_x - uv.x;
 	if (flip & 2u) uv.y = mdl.uv_min_y + mdl.uv_max_y - uv.y;
 
-	float hemi = abs(det.hemi);
-	float sun = sign(det.hemi) * 0.25 + 0.25;
+	const float slot_size = 2.0;
+	int slot_x = int(floor(raw.pos.x / slot_size));
+	int slot_z = int(floor(raw.pos.z / slot_size));
+	uint x_size = uint(detail_params.x);
+	int x_offs = int(detail_params.z);
+	int z_offs = int(detail_params.w);
+	int sx_local = clamp(slot_x + x_offs, 0, int(x_size) - 1);
+	int sz_local = clamp(slot_z + z_offs, 0, int(detail_params.y) - 1);
+	uint slot_idx = uint(sz_local) * x_size + uint(sx_local);
+
+	float slot_hemi = slot_data[slot_idx].hemi;
+	float hemi = abs(slot_hemi);
+	float sun = sign(slot_hemi) * 0.25 + 0.25;
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh = float4(uv, hemi, sun);
@@ -114,7 +143,7 @@ v2p_flat main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 	O.rotatedNormal1 = view_N;
 	O.rotatedNormal2 = view_N;
 	O.interaction_uv = float2(0, 0);
-	O.objectId = det.object_id;
+	O.objectId = object_id;
 	O.hpos = mul(m_P, float4(Pe, 1.0));
 
 	return O;
