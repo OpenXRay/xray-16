@@ -78,16 +78,16 @@ struct InstanceData
 	uint object_id;  // Which grass object type (0-63) (4 bytes)
 };  // Total: 32 bytes
 
-// Instance buffer
 // NOTE: common_samplers.h uses t0-t31, so we use t32+ to avoid conflicts
-StructuredBuffer<InstanceData> detail_buffer : register(t33);
+StructuredBuffer<uint> visible_indices : register(t33);
+StructuredBuffer<InstanceData> all_instances : register(t37);
 
 v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 {
 	v2p_flat O;
 
-	// Read instance data from structured buffer
-	InstanceData det = detail_buffer[instance_id];
+	uint src_idx = visible_indices[instance_id];
+	InstanceData det = all_instances[src_idx];
 
 	// ===== HEIGHT VARIATION USING PERLIN NOISE =====
 	// Sample static Perlin noise at different scale/offset for height variation

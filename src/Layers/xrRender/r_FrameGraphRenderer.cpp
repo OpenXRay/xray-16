@@ -638,16 +638,18 @@ void FrameGraphRenderer::RenderStatsOverlay()
         if (m_detailManager)
         {
             stats.detailSlots = m_detailManager->slot_count;
-            stats.detailInstances = 0;
             for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
                 stats.detailTrisPerBlade[lod] = m_detailManager->bladeIndexCount[lod] / 3;
 
-            // GPU culling stats (from readback)
             const auto& cullStats = m_detailManager->GetCullingStats();
             stats.detailVisibleSlots = cullStats.visibleSlotsCount;
             stats.detailVisibleLOD0 = cullStats.visibleLOD0Count;
             stats.detailVisibleLOD1 = cullStats.visibleLOD1Count;
             stats.detailVisibleLOD2 = cullStats.visibleLOD2Count;
+            stats.detailVisibleDecals = cullStats.visibleDecalCount;
+            stats.detailGeneratedInstances = m_detailManager->totalGeneratedInstances;
+            stats.detailVisibleCapacity = m_detailManager->visibleBufferCapacity;
+            stats.detailDecalCapacity = std::max(m_detailManager->visibleBufferCapacity / 4, 10000u);
         }
 
         m_statsOverlay->SetRenderStats(stats);

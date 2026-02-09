@@ -98,7 +98,7 @@ public:
         Fvector3 cameraPos;
         float fadeDistanceSqr;
         Fvector4 frustumPlanes[6];
-        u32 totalInstanceCount;
+        u32 visibleBladeCapacity;
         u32 totalSlotCount;
         u32 hizWidth;
         u32 hizHeight;
@@ -106,6 +106,8 @@ public:
         float lodDistanceCloseSqr;
         float lodDistanceMidSqr;
         float detailDensity;
+        u32 visibleDecalCapacity;
+        u32 cullPad0, cullPad1, cullPad2;
     };
 
     struct GrassObjectTint { float r, g, b, pad; };
@@ -230,6 +232,7 @@ public:
         u32 visibleLOD0Count = 0;
         u32 visibleLOD1Count = 0;
         u32 visibleLOD2Count = 0;
+        u32 visibleDecalCount = 0;
 
         u32 totalVisible() const { return visibleLOD0Count + visibleLOD1Count + visibleLOD2Count; }
     };
@@ -274,6 +277,9 @@ public:
     bool m_instancesNeedRegeneration = true;
 
     nvrhi::BufferHandle instanceCounterBuffer;
+    nvrhi::BufferHandle instanceCountReadbackBuffer;
+    u32 totalGeneratedInstances = 0;
+    bool instanceCountReadbackPending = false;
     nvrhi::BufferHandle perSlotCountsBuffer;
 
     nvrhi::BufferHandle perSlotPrefixBuffer;
@@ -340,6 +346,7 @@ public:
 
     void RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device,
         xray::profiler::GPUProfiler* gpuProfiler = nullptr);
+    void ResizeVisibleBuffersIfNeeded(nvrhi::IDevice* device);
 
 private:
     IReader* dtFS = nullptr;

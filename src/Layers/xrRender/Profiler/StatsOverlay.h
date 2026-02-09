@@ -57,6 +57,12 @@ struct RenderStats
     u32 detailVisibleLOD0 = 0;   // Instances in LOD0 (close, 9 segments)
     u32 detailVisibleLOD1 = 0;   // Instances in LOD1 (mid, 4 segments)
     u32 detailVisibleLOD2 = 0;   // Instances in LOD2 (far, 2 segments)
+    u32 detailVisibleDecals = 0; // Visible decal instances
+
+    // Detail buffer sizing
+    u32 detailGeneratedInstances = 0;  // Total generated instances (from readback)
+    u32 detailVisibleCapacity = 0;     // Current visible buffer capacity per LOD
+    u32 detailDecalCapacity = 0;       // Current decal buffer capacity
 
     void Reset()
     {
@@ -69,6 +75,8 @@ struct RenderStats
         detailInstances = detailSlots = 0;
         detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;
         detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;
+        detailVisibleDecals = 0;
+        detailGeneratedInstances = detailVisibleCapacity = detailDecalCapacity = 0;
     }
 };
 

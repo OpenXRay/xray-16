@@ -679,11 +679,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         return false;
     }
 
-    constexpr u32 MAX_GENERATED_INSTANCES = 10000000;
-    visibleBufferCapacity = MAX_GENERATED_INSTANCES;
-
-    Msg("* [FGDetailManager] Creating GPU buffers (visible capacity: %u, %.1f MB per LOD)",
-        visibleBufferCapacity, (visibleBufferCapacity * sizeof(InstanceData)) / (1024.f * 1024.f));
+    Msg("* [FGDetailManager] Creating GPU buffers");
     if (!slotDataCPU.empty())
     {
         nvrhi::BufferDesc desc;
@@ -746,6 +742,10 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             float(desc.byteSize) / (1024.f * 1024.f));
     }
 
+    visibleBufferCapacity = std::max(generatedInstancesCapacity / 4, 100000u);
+    Msg("* [FGDetailManager] Initial visible buffer capacity: %u (%.1f MB per LOD)",
+        visibleBufferCapacity, (visibleBufferCapacity * sizeof(u32)) / (1024.f * 1024.f));
+
     if (!detail_models.empty())
     {
         BuildDetailModelGPUData();
@@ -801,8 +801,8 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
     {
         {
             nvrhi::BufferDesc desc;
-            desc.byteSize = visibleBufferCapacity * sizeof(InstanceData);
-            desc.structStride = sizeof(InstanceData);
+            desc.byteSize = visibleBufferCapacity * sizeof(u32);
+            desc.structStride = sizeof(u32);
             desc.debugName = ("DetailVisibleLOD" + std::to_string(lod)).c_str();
             desc.canHaveUAVs = true;
             desc.canHaveTypedViews = false;
@@ -847,10 +847,10 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
     }
 
     {
-        u32 decalCapacity = visibleBufferCapacity / 10;
+        u32 decalCapacity = std::max(visibleBufferCapacity / 4, 10000u);
         nvrhi::BufferDesc desc;
-        desc.byteSize = decalCapacity * sizeof(InstanceData);
-        desc.structStride = sizeof(InstanceData);
+        desc.byteSize = decalCapacity * sizeof(u32);
+        desc.structStride = sizeof(u32);
         desc.debugName = "DetailVisibleDecals";
         desc.canHaveUAVs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
@@ -996,6 +996,16 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = sizeof(u32);
+        desc.debugName = "DetailInstanceCountReadback";
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+        instanceCountReadbackBuffer = device->createBuffer(desc);
+    }
+
     const u32 numBlocks = ((u32)slot_aabbs.size() + PREFIX_SUM_BLOCK_SIZE - 1) / PREFIX_SUM_BLOCK_SIZE;
     const u32 paddedSlotCount = numBlocks * PREFIX_SUM_BLOCK_SIZE;
 
@@ -1072,7 +1082,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
 
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32) * 4;
+        desc.byteSize = sizeof(u32) * 5;
         desc.debugName = "DetailStatsReadback";
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
@@ -1278,6 +1288,9 @@ void FGDetailManager::DestroyGPUBuffers()
     slotVisibilityBuffer = nullptr;
 
     instanceCounterBuffer = nullptr;
+    instanceCountReadbackBuffer = nullptr;
+    instanceCountReadbackPending = false;
+    totalGeneratedInstances = 0;
     perSlotCountsBuffer = nullptr;
     perSlotPrefixBuffer = nullptr;
     blockTotalsBuffer = nullptr;
@@ -1947,6 +1960,7 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(34),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(35),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(36),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(37),
         nvrhi::BindingLayoutItem::Sampler(0),
         nvrhi::BindingLayoutItem::Sampler(1),
         nvrhi::BindingLayoutItem::Sampler(2),
@@ -2068,10 +2082,61 @@ void FGDetailManager::DispatchCulling(
         Msg("[DetailManager] Density changed to %.3f - regeneration needed", current_density);
     }
 
+    ResizeVisibleBuffersIfNeeded(device);
+
     if (m_instancesNeedRegeneration)
     {
+        constexpr u32 MAX_INSTANCES = 128u * 1024u * 1024u;
+        u32 d_size = u32(std::ceil(2.0f / ps_current_detail_density));
+        u32 grid_per_slot = (d_size + 1) * (d_size + 1);
+        u32 neededGenCapacity = std::min(u32(float(slot_count) * float(grid_per_slot) * 0.08f), MAX_INSTANCES);
+        neededGenCapacity = std::max(neededGenCapacity, 1000000u);
+
+        if (neededGenCapacity > generatedInstancesCapacity)
+        {
+            Msg("[DetailManager] Growing generated buffer: %u -> %u (density=%.3f, %.1f MB)",
+                generatedInstancesCapacity, neededGenCapacity, ps_current_detail_density,
+                (neededGenCapacity * sizeof(InstanceData)) / (1024.f * 1024.f));
+            generatedInstancesCapacity = neededGenCapacity;
+            nvrhi::BufferDesc desc;
+            desc.byteSize = generatedInstancesCapacity * sizeof(InstanceData);
+            desc.structStride = sizeof(InstanceData);
+            desc.debugName = "DetailGeneratedInstances";
+            desc.canHaveUAVs = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = true;
+            generatedInstancesBuffer = device->createBuffer(desc);
+        }
+
+        if (visibleBufferCapacity < generatedInstancesCapacity)
+        {
+            Msg("[DetailManager] Pre-grow visible buffers: %u -> %u", visibleBufferCapacity, generatedInstancesCapacity);
+            visibleBufferCapacity = generatedInstancesCapacity;
+            for (u32 lod = 0; lod < LOD_COUNT; lod++)
+            {
+                nvrhi::BufferDesc desc;
+                desc.byteSize = visibleBufferCapacity * sizeof(u32);
+                desc.structStride = sizeof(u32);
+                desc.debugName = ("DetailVisibleLOD" + std::to_string(lod)).c_str();
+                desc.canHaveUAVs = true;
+                desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+                desc.keepInitialState = true;
+                visibleInstancesBuffer[lod] = device->createBuffer(desc);
+            }
+            u32 dc = std::max(visibleBufferCapacity / 4, 10000u);
+            nvrhi::BufferDesc desc;
+            desc.byteSize = dc * sizeof(u32);
+            desc.structStride = sizeof(u32);
+            desc.debugName = "DetailVisibleDecals";
+            desc.canHaveUAVs = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = true;
+            visibleDecalInstancesBuffer = device->createBuffer(desc);
+        }
         RegenerateAllInstances(cmdList, device, gpuProfiler);
     }
+
+    u32 decalCapacity = std::max(visibleBufferCapacity / 4, 10000u);
 
     DetailCullParams params;
     params.viewProj.transpose(viewProj);
@@ -2087,7 +2152,7 @@ void FGDetailManager::DispatchCulling(
             params.frustumPlanes[i].set(0, 0, 0, 1000000.0f);
     }
 
-    params.totalInstanceCount = 0;
+    params.visibleBladeCapacity = visibleBufferCapacity;
     params.totalSlotCount = slot_count;
     params.hizWidth = hiZWidth;
     params.hizHeight = hiZHeight;
@@ -2095,6 +2160,8 @@ void FGDetailManager::DispatchCulling(
     params.lodDistanceCloseSqr = ps_r3_grass_lod_close * ps_r3_grass_lod_close;
     params.lodDistanceMidSqr = ps_r3_grass_lod_mid * ps_r3_grass_lod_mid;
     params.detailDensity = ps_current_detail_density;
+    params.visibleDecalCapacity = decalCapacity;
+    params.cullPad0 = params.cullPad1 = params.cullPad2 = 0;
 
     cmdList->writeBuffer(cachedCullParamsCB, &params, sizeof(params));
 
@@ -2228,6 +2295,8 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::CopySource);
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
         cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::CopySource);
+    if (decalDrawArgsBuffer)
+        cmdList->setBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::CopySource);
     cmdList->commitBarriers();
 
     cmdList->copyBuffer(statsReadbackBuffer, 0, visibleSlotCounterBuffer, 0, sizeof(u32));
@@ -2241,6 +2310,14 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
                 sizeof(u32)
             );
         }
+    }
+    if (decalDrawArgsBuffer)
+    {
+        cmdList->copyBuffer(
+            statsReadbackBuffer, sizeof(u32) * 4,
+            decalDrawArgsBuffer, sizeof(u32),
+            sizeof(u32)
+        );
     }
 
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
@@ -2271,10 +2348,9 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
         cullingStats.visibleLOD0Count = counts[1];
         cullingStats.visibleLOD1Count = counts[2];
         cullingStats.visibleLOD2Count = counts[3];
+        cullingStats.visibleDecalCount = counts[4];
         device->unmapBuffer(statsReadbackBuffer);
     }
-
-
 
     statsReadbackPending = false;
 }
@@ -2489,12 +2565,74 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
     cmdList->setBufferState(generatedInstancesBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(slotAABBBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+    if (instanceCountReadbackBuffer)
+    {
+        cmdList->setBufferState(instanceCounterBuffer, nvrhi::ResourceStates::CopySource);
+        cmdList->commitBarriers();
+        cmdList->copyBuffer(instanceCountReadbackBuffer, 0, instanceCounterBuffer, 0, sizeof(u32));
+        cmdList->setBufferState(instanceCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
+        instanceCountReadbackPending = true;
+    }
+
     cmdList->commitBarriers();
 
     m_instancesNeedRegeneration = false;
 
-    Msg("[DetailManager] RegenerateAllInstances: 4-pass GPU dispatch complete (%u slots, density=%.3f)",
-        slot_count, ps_current_detail_density);
+    Msg("[DetailManager] RegenerateAllInstances: 4-pass GPU dispatch complete (%u slots, density=%.3f, capacity=%u)",
+        slot_count, ps_current_detail_density, generatedInstancesCapacity);
+}
+
+void FGDetailManager::ResizeVisibleBuffersIfNeeded(nvrhi::IDevice* device)
+{
+    if (!instanceCountReadbackPending || !instanceCountReadbackBuffer || !device)
+        return;
+
+    void* mapped = device->mapBuffer(instanceCountReadbackBuffer, nvrhi::CpuAccessMode::Read);
+    if (!mapped)
+        return;
+
+    totalGeneratedInstances = *static_cast<const u32*>(mapped);
+    device->unmapBuffer(instanceCountReadbackBuffer);
+    instanceCountReadbackPending = false;
+
+    if (totalGeneratedInstances >= generatedInstancesCapacity * 95 / 100)
+        Msg("! [DetailManager] Generated instances at capacity: %u/%u (%.0f%%) - some grass may be missing",
+            totalGeneratedInstances, generatedInstancesCapacity,
+            100.f * float(totalGeneratedInstances) / float(generatedInstancesCapacity));
+
+    u32 newCapacity = std::max(totalGeneratedInstances, 100000u);
+    bool needsGrow = newCapacity > visibleBufferCapacity;
+    bool needsShrink = newCapacity < visibleBufferCapacity / 2;
+    if (!needsGrow && !needsShrink)
+        return;
+
+    Msg("[DetailManager] Resizing visible buffers: %u -> %u (generated=%u)",
+        visibleBufferCapacity, newCapacity, totalGeneratedInstances);
+
+    visibleBufferCapacity = newCapacity;
+
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = visibleBufferCapacity * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.debugName = ("DetailVisibleLOD" + std::to_string(lod)).c_str();
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        visibleInstancesBuffer[lod] = device->createBuffer(desc);
+    }
+
+    u32 decalCapacity = std::max(visibleBufferCapacity / 4, 10000u);
+    nvrhi::BufferDesc desc;
+    desc.byteSize = decalCapacity * sizeof(u32);
+    desc.structStride = sizeof(u32);
+    desc.debugName = "DetailVisibleDecals";
+    desc.canHaveUAVs = true;
+    desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+    desc.keepInitialState = true;
+    visibleDecalInstancesBuffer = device->createBuffer(desc);
 }
 
 } // namespace xray::render::RENDER_NAMESPACE

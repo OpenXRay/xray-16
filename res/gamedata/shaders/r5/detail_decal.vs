@@ -56,28 +56,23 @@ cbuffer DetailGlobals : register(b3)
 	uint build_details_index;
 };
 
-StructuredBuffer<InstanceData> detail_buffer : register(t33);
+StructuredBuffer<uint> visible_indices : register(t33);
 StructuredBuffer<DetailModelGPU> detail_models : register(t35);
 StructuredBuffer<DecalPulledVertex> decal_vertices : register(t36);
+StructuredBuffer<InstanceData> all_instances : register(t37);
 
 v2p_flat main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 {
 	v2p_flat O;
 
-	InstanceData det = detail_buffer[instance_id];
+	uint src_idx = visible_indices[instance_id];
+	InstanceData det = all_instances[src_idx];
 	DetailModelGPU mdl = detail_models[det.object_id];
 
 	if (vertex_id >= mdl.decalIndexCount)
 	{
-		O.hpos = float4(0, 0, 0, 0);
-		O.position = 0;
-		O.tcdh = 0;
-		O.N = 0;
-		O.heightParam = 0;
-		O.rotatedNormal1 = 0;
-		O.rotatedNormal2 = 0;
-		O.interaction_uv = 0;
-		O.objectId = 0;
+		O = (v2p_flat)0;
+		O.hpos = asfloat(0x7FC00000);
 		return O;
 	}
 

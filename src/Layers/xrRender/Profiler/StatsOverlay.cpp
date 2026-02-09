@@ -437,55 +437,63 @@ void StatsOverlay::RenderGeometrySection()
         // ═══════════════════════════════════════════════════
         //  DETAIL/GRASS STATS
         // ═══════════════════════════════════════════════════
-        if (s.detailInstances > 0 || s.detailSlots > 0)
+        if (s.detailSlots > 0)
         {
             ImGui::Text("Grass/Detail:");
             ImGui::Indent();
 
-            // Slot stats with culling info
-            if (s.detailSlots > 0)
+            if (s.detailVisibleSlots > 0)
             {
-                if (s.detailVisibleSlots > 0)
-                {
-                    float slotCullRate = 100.0f * (1.0f - float(s.detailVisibleSlots) / float(s.detailSlots));
-                    ImGui::Text("Slots: %u/%u visible (%.0f%% culled)",
-                        s.detailVisibleSlots, s.detailSlots, slotCullRate);
-                }
-                else
-                {
-                    ImGui::Text("Slots: %u", s.detailSlots);
-                }
+                float slotCullRate = 100.0f * (1.0f - float(s.detailVisibleSlots) / float(s.detailSlots));
+                ImGui::Text("Slots: %u/%u visible (%.0f%% culled)",
+                    s.detailVisibleSlots, s.detailSlots, slotCullRate);
+            }
+            else
+            {
+                ImGui::Text("Slots: %u", s.detailSlots);
             }
 
-            // Instance stats with per-LOD breakdown
-            if (s.detailInstances > 0)
+            u32 totalVisible = s.detailVisibleLOD0 + s.detailVisibleLOD1 + s.detailVisibleLOD2;
+            if (totalVisible > 0)
             {
-                u32 totalVisible = s.detailVisibleLOD0 + s.detailVisibleLOD1 + s.detailVisibleLOD2;
-                if (totalVisible > 0)
+                if (s.detailGeneratedInstances > 0)
                 {
-                    float cullRate = 100.0f * (1.0f - float(totalVisible) / float(s.detailInstances));
-                    ImGui::Text("Instances: %s/%s visible (%.0f%% culled)",
-                        FormatNumber(totalVisible), FormatNumber(s.detailInstances), cullRate);
-
-                    // Per-LOD breakdown (show as tree)
-                    ImGui::Indent();
-                    if (s.detailVisibleLOD0 > 0)
-                        ImGui::BulletText("LOD0 (9seg): %s", FormatNumber(s.detailVisibleLOD0));
-                    if (s.detailVisibleLOD1 > 0)
-                        ImGui::BulletText("LOD1 (4seg): %s", FormatNumber(s.detailVisibleLOD1));
-                    if (s.detailVisibleLOD2 > 0)
-                        ImGui::BulletText("LOD2 (2seg): %s", FormatNumber(s.detailVisibleLOD2));
-                    ImGui::Unindent();
-
-                    u32 actualTris = s.detailVisibleLOD0 * s.detailTrisPerBlade[0]
-                                   + s.detailVisibleLOD1 * s.detailTrisPerBlade[1]
-                                   + s.detailVisibleLOD2 * s.detailTrisPerBlade[2];
-                    ImGui::TextDisabled("Actual tris: %s", FormatNumber(actualTris));
+                    float cullRate = 100.0f * (1.0f - float(totalVisible) / float(s.detailGeneratedInstances));
+                    char visStr[32];
+                    xr_strcpy(visStr, FormatNumber(totalVisible));
+                    ImGui::Text("Blades: %s/%s visible (%.0f%% culled)",
+                        visStr, FormatNumber(s.detailGeneratedInstances), cullRate);
                 }
                 else
                 {
-                    ImGui::Text("Instances: %s (no GPU stats)", FormatNumber(s.detailInstances));
+                    ImGui::Text("Blades: %s visible", FormatNumber(totalVisible));
                 }
+
+                ImGui::Indent();
+                if (s.detailVisibleLOD0 > 0)
+                    ImGui::BulletText("LOD0 (9seg): %s", FormatNumber(s.detailVisibleLOD0));
+                if (s.detailVisibleLOD1 > 0)
+                    ImGui::BulletText("LOD1 (4seg): %s", FormatNumber(s.detailVisibleLOD1));
+                if (s.detailVisibleLOD2 > 0)
+                    ImGui::BulletText("LOD2 (2seg): %s", FormatNumber(s.detailVisibleLOD2));
+                ImGui::Unindent();
+
+                u32 actualTris = s.detailVisibleLOD0 * s.detailTrisPerBlade[0]
+                               + s.detailVisibleLOD1 * s.detailTrisPerBlade[1]
+                               + s.detailVisibleLOD2 * s.detailTrisPerBlade[2];
+                ImGui::TextDisabled("Blade tris: %s", FormatNumber(actualTris));
+            }
+
+            if (s.detailVisibleDecals > 0)
+                ImGui::Text("Decals: %s visible", FormatNumber(s.detailVisibleDecals));
+
+            if (s.detailVisibleCapacity > 0)
+            {
+                float totalMB = (s.detailVisibleCapacity * 4.0f * 3 + s.detailDecalCapacity * 4.0f) / (1024.0f * 1024.0f);
+                char capStr[32];
+                xr_strcpy(capStr, FormatNumber(s.detailVisibleCapacity));
+                ImGui::TextDisabled("Buffers: %s/LOD + %s decal (%.1f MB)",
+                    capStr, FormatNumber(s.detailDecalCapacity), totalMB);
             }
 
             ImGui::Unindent();

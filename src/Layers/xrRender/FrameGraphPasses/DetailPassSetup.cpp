@@ -307,7 +307,7 @@ DefaultOutputLayout setupDetailPass(
             if (data.gpuProfiler)
                 data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
 
-            auto makeBindingSet = [&](nvrhi::BufferHandle instanceBuffer) {
+            auto makeBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer) {
                 nvrhi::BindingSetDesc bindDesc;
                 bindDesc.bindings = {
                     nvrhi::BindingSetItem::ConstantBuffer(0, dm->cachedDynTransformsCB),
@@ -317,10 +317,11 @@ DefaultOutputLayout setupDetailPass(
                     nvrhi::BindingSetItem::ConstantBuffer(4, dm->cachedDynLightCB),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(8, dm->cachedDummyMaterials),
                     nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(33, instanceBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(33, visibleIndicesBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(34, dm->cachedGrassTintsBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(35, dm->detailModelsBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(36, dm->decalPulledVertexBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(37, dm->generatedInstancesBuffer),
                     nvrhi::BindingSetItem::Sampler(0, dm->cachedSmp_LinearWrap),
                     nvrhi::BindingSetItem::Sampler(1, dm->cachedSmp_PointClamp),
                     nvrhi::BindingSetItem::Sampler(2, dm->cachedSmp_LinearClamp),
