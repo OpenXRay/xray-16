@@ -419,6 +419,43 @@ static const char* const FOLDER_BLACKLIST[] = {
     "wm",
 };
 
+static const char* const METALLIC_WHITELIST[] = {
+    "metall", "metal", "iron", "steel", "chrome", "alumin",
+    "copper", "brass", "bronze", "gold", "silver", "tin", "zinc",
+    "pipe", "rebar", "wire", "chain", "bolt", "nut", "screw",
+    "rail", "grate", "mesh",
+};
+
+static const char* const NON_METALLIC_KEYWORDS[] = {
+    "wood", "bark", "bork",
+    "dirt", "ground", "grnd", "soil", "mud", "sand",
+    "grass", "leaf", "leaves", "vine", "moss", "bush", "tree",
+    "brick", "briks", "concrete", "crete", "stone", "rock", "gravel",
+    "plaster", "stucco", "cement", "asphalt", "road",
+    "cloth", "fabric", "carpet", "curtain", "leather",
+    "paper", "cardboard",
+    "skin", "flesh", "body",
+    "food",
+    "oblaka", "sky", "cloud",
+    "water",
+    "detail", "build_details",
+    "floor", "roof", "tile", "wall",
+};
+
+static bool IsNonMetallic(const xr_string& name) {
+    xr_string lower = name;
+    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+    for (const char* keyword : METALLIC_WHITELIST) {
+        if (lower.find(keyword) != xr_string::npos)
+            return false;
+    }
+    for (const char* keyword : NON_METALLIC_KEYWORDS) {
+        if (lower.find(keyword) != xr_string::npos)
+            return true;
+    }
+    return false;
+}
+
 static bool IsInBlacklistedFolder(const xr_string& path) {
     for (const char* folder : FOLDER_BLACKLIST) {
         // Check if path starts with "folder\" or "folder/"
@@ -689,6 +726,15 @@ struct ConvertedPBRTextures {
     u32 height = 0;
     bool success = false;
 };
+
+static void ZeroMetallicIfBlacklisted(ConvertedPBRTextures& converted, const xr_string& name) {
+    if (!converted.success || converted.metallicData.empty())
+        return;
+    if (IsNonMetallic(name)) {
+        std::memset(converted.metallicData.data(), 0, converted.metallicData.size());
+        Msg("~ [PBRTextureConverter] Forced metallic=0 for non-metallic material: %s", name.c_str());
+    }
+}
 
 static ConvertedPBRTextures ConvertSpecularGlossToPBR(
     const resources::DDSData* diffuseData,
@@ -1570,6 +1616,8 @@ bool ConvertTexturesToPBR(
                 failed_count++;
                 continue;
             }
+
+            ZeroMetallicIfBlacklisted(converted, asset.base_name);
 
             // ═══════════════════════════════════════════════════════
             //  WRITE OUTPUT TEXTURES
