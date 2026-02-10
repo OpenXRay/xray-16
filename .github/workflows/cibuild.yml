@@ -100,6 +100,8 @@ jobs:
         - { name: Alpine,    os: ubuntu-latest,    arch: x86,     cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
         - { name: Fedora,    os: ubuntu-latest,    arch: x86_64,  cc: gcc,   container: 'fedora:latest', }
         #- { name: Haiku,     os: ubuntu-latest,    arch: x86_64,  cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, container: 'haiku/cross-compiler:x86_64-r1beta4', }
+        - { name: AppImage,  os: ubuntu-latest,    arch: amd64,   cc: gcc,   flags: "-DBUILD_SHARED_LIBS=OFF", linuxdeploy: linuxdeploy-x86_64.AppImage }
+        - { name: AppImage,  os: ubuntu-24.04-arm, arch: arm64,   cc: gcc,   flags: "-DBUILD_SHARED_LIBS=OFF", linuxdeploy: linuxdeploy-aarch64.AppImage }
         # macOS images have tighter concurrency limits; keep the matrix minimal.
         - { name: macOS,          os: macos-latest,    arch: arm64,  cc: clang, threads: 3, flags: "-DCPACK_GENERATOR=ZIP" }
         - { name: macOS Intel,    os: macos-15-intel,  arch: x86_64, cc: clang, flags: "-DCMAKE_OSX_ARCHITECTURES=x86_64 -DCPACK_GENERATOR=ZIP" }
@@ -116,7 +118,7 @@ jobs:
         packages: build-base cmake git mold sdl2-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
 
     - name: Install Ubuntu packages
-      if: ${{ matrix.platform.name == 'Ubuntu' }}
+      if: ${{ matrix.platform.name == 'Ubuntu' || matrix.platform.name == 'AppImage' }}
       run: |
           sudo dpkg --add-architecture ${{ matrix.platform.arch }}
           sudo apt-get update -qq
@@ -141,6 +143,12 @@ jobs:
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
       run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel lzo-devel libjpeg-turbo-devel openal-soft-devel libogg-devel libtheora-devel libvorbis-devel
+
+    - name: Install AppImage linuxdeploy
+      if: ${{ matrix.platform.name == 'AppImage' }}
+      uses: pcolby/install-linuxdeploy@v1
+      with:
+        plugins: appimage
 
     - name: Set environment variables
       if: ${{ matrix.platform.cc != '' && matrix.platform.cxx != '' }}
@@ -173,8 +181,10 @@ jobs:
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: ccache -s || true
 
+    # TODO: Merge this step with 'Make AppImage' once we switch to CMake 4.2 which directly supports AppImage generation with CPack
+    # https://cmake.org/cmake/help/latest/cpack_gen/appimage.html
     - name: Make package
-      if: ${{ steps.cmake-build.outcome == 'success' }}
+      if: ${{ steps.cmake-build.outcome == 'success' && matrix.platform.name != 'AppImage' }}
       id: make-package
       #continue-on-error: true
       working-directory: build
@@ -182,8 +192,18 @@ jobs:
           cpack -B artifacts -C ${{ matrix.configuration }} -DCPACK_THREADS=${{ matrix.platform.threads || 4 }}
           file artifacts/openxray*.*
 
+    - name: Make AppImage
+      if: ${{ steps.cmake-build.outcome == 'success' && matrix.platform.name == 'AppImage' }}
+      id: make-appimage
+      run: |
+          DESTDIR=AppDir cmake --install build --prefix /usr
+          ${{ matrix.platform.linuxdeploy }} --appdir AppDir --output appimage --executable AppDir/usr/bin/xr_3da --desktop-file AppDir/usr/share/applications/openxray_cop.desktop --desktop-file AppDir/usr/share/applications/openxray_cs.desktop --desktop-file AppDir/usr/share/applications/openxray_soc.desktop --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_cop.png --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_cs.png --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_soc.png
+          mkdir -p build/artifacts
+          mv *.AppImage build/artifacts/openxray-${{ matrix.configuration }}-${{ matrix.platform.arch }}.AppImage
+          file build/artifacts/openxray*.*
+
     - name: Upload OpenXRay artifact
-      if: ${{ steps.make-package.outcome == 'success' }}
+      if: ${{ steps.make-package.outcome == 'success' || steps.make-appimage.outcome == 'success' }}
       uses: actions/upload-artifact@main
       with:
         name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc }} github-${{ github.run_number }})
