@@ -12,6 +12,7 @@ CUICheckButton::CUICheckButton()
     TextItemControl()->SetTextAlignment(CGameFont::alLeft);
     SetButtonAsSwitch(true);
     m_pDependControl = NULL;
+    m_opt_backup_value = false;
 }
 
 void CUICheckButton::SetDependControl(CUIWindow* pWnd) { m_pDependControl = pWnd; }
