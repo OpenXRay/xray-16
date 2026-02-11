@@ -247,7 +247,7 @@ f_forward output_forward_pbr(
 	float3 sunLight = PBRDirectLighting(
 		albedo, N, V, L,
 		L_sun_color,
-		metallic, roughness, ao
+		metallic, roughness, (uint)pbr_diffuse_mode
 	);
 
 	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
