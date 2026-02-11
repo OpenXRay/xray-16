@@ -117,7 +117,6 @@ float3 PBRDirectLighting(
     float LdotH = max(dot(L, H), 0.0f);
 
     float3 F0 = CalculateF0(albedo, metallic);
-    float3 F = F_Schlick(HdotV, F0);
 
     float3 specular = CookTorranceSpecular(NdotH, NdotV, NdotL, HdotV, roughness, F0);
     specular += MultiscatterCompensation(F0, NdotV, NdotL, roughness);
@@ -126,7 +125,9 @@ float3 PBRDirectLighting(
         ? LambertianDiffuse()
         : DisneyDiffuse(NdotV, NdotL, LdotH, roughness);
 
-    float3 kD = (1.0f - F) * (1.0f - metallic);
+    float3 F_in = F_Schlick(NdotL, F0);
+    float3 F_out = F_Schlick(NdotV, F0);
+    float3 kD = (1.0f - F_in) * (1.0f - F_out) * (1.0f - metallic);
     float3 diffuse = kD * albedo * fd;
 
     return (diffuse + specular) * lightColor * NdotL;
@@ -145,9 +146,7 @@ float3 PBRAmbient(
     float NdotV = max(dot(N, V), 0.0f);
     float3 F = F_SchlickRoughness(NdotV, F0, roughness);
 
-    float3 kS = F;
-    float3 kD = (1.0f - kS) * (1.0f - metallic);
-
+    float3 kD = (1.0f - F) * (1.0f - metallic);
     float3 diffuseAmbient = kD * albedo * ambientColor;
 
     float3 specularAmbient = F * ambientColor * 0.3f;
