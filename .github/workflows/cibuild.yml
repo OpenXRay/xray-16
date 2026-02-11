@@ -138,7 +138,7 @@ jobs:
     - name: Install macOS packages
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: |
-          brew install ccache cmake sdl2 lzo libogg libvorbis theora openal-soft jpeg-turbo
+          brew install ccache cmake dylibbundler sdl2 lzo libogg libvorbis theora openal-soft jpeg-turbo
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
@@ -181,6 +181,13 @@ jobs:
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: ccache -s || true
 
+    - name: Make macOS app bundle
+      if: ${{ startsWith(matrix.platform.name, 'macOS') && matrix.configuration == 'Release' && steps.cmake-build.outcome == 'success' }}
+      id: make-macos-app-bundle
+      run: |
+          bash misc/macos/make_app_bundle.sh "${{ matrix.platform.arch }}" "${{ matrix.configuration }}"
+          file build/artifacts/openxray*.*
+
     # TODO: Merge this step with 'Make AppImage' once we switch to CMake 4.2 which directly supports AppImage generation with CPack
     # https://cmake.org/cmake/help/latest/cpack_gen/appimage.html
     - name: Make package
@@ -203,7 +210,7 @@ jobs:
           file build/artifacts/openxray*.*
 
     - name: Upload OpenXRay artifact
-      if: ${{ steps.make-package.outcome == 'success' || steps.make-appimage.outcome == 'success' }}
+      if: ${{ steps.make-package.outcome == 'success' || steps.make-appimage.outcome == 'success' || steps.make-macos-app-bundle.outcome == 'success' }}
       uses: actions/upload-artifact@main
       with:
         name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc }} github-${{ github.run_number }})

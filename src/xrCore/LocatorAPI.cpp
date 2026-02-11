@@ -799,6 +799,182 @@ bool CLocatorAPI::Recurse(pcstr path)
 bool file_handle_internal(pcstr file_name, size_t& size, int& file_handle);
 void* FileDownload(pcstr file_name, const int& file_handle, size_t& file_size);
 
+#if defined(XR_PLATFORM_APPLE)
+static bool IsDirectory(pcstr path)
+{
+    struct stat st;
+    return stat(path, &st) == 0 && S_ISDIR(st.st_mode);
+}
+
+static bool IsFile(pcstr path)
+{
+    struct stat st;
+    return stat(path, &st) == 0 && S_ISREG(st.st_mode);
+}
+
+static bool HasRequiredGameData(pcstr rootPath)
+{
+    if (!rootPath || !rootPath[0])
+        return false;
+
+    string_path path;
+    xr_sprintf(path, "%s/levels", rootPath);
+    if (!IsDirectory(path))
+        return false;
+
+    xr_sprintf(path, "%s/resources", rootPath);
+    if (!IsDirectory(path))
+        return false;
+
+    xr_sprintf(path, "%s/localization", rootPath);
+    return IsDirectory(path);
+}
+
+static bool PromptForGameRoot(string_path& outPath)
+{
+    static constexpr pcstr command =
+        "osascript "
+        "-e 'try' "
+        "-e 'POSIX path of (choose folder with prompt \"Select S.T.A.L.K.E.R. game data directory (levels/resources/localization)\")' "
+        "-e 'on error number -128' "
+        "-e 'return \"\"' "
+        "-e 'end try'";
+
+    FILE* pipe = popen(command, "r");
+    if (!pipe)
+        return false;
+
+    string_path buffer;
+    buffer[0] = 0;
+    const bool hasValue = fgets(buffer, sizeof(buffer), pipe) != nullptr;
+    pclose(pipe);
+    if (!hasValue)
+        return false;
+
+    size_t len = SDL_strlen(buffer);
+    while (len > 0 && (buffer[len - 1] == '\n' || buffer[len - 1] == '\r'))
+        buffer[--len] = 0;
+
+    if (len == 0)
+        return false;
+
+    SDL_strlcpy(outPath, buffer, sizeof(outPath));
+    return true;
+}
+
+static void LinkIfMissing(pcstr prefPath, pcstr gameRoot, pcstr dirName)
+{
+    string_path targetPath;
+    xr_sprintf(targetPath, "%s/%s", gameRoot, dirName);
+    if (!IsDirectory(targetPath))
+        return;
+
+    string_path linkPath;
+    xr_sprintf(linkPath, "%s%s", prefPath, dirName);
+
+    struct stat st;
+    if (lstat(linkPath, &st) == 0)
+        return;
+
+    symlink(targetPath, linkPath);
+}
+
+static void LinkGameDataIntoPrefPath(pcstr prefPath, pcstr gameRoot)
+{
+    static constexpr pcstr dirs[] = {"levels", "resources", "localization", "mp", "patches"};
+    for (const auto dir : dirs)
+        LinkIfMissing(prefPath, gameRoot, dir);
+}
+
+static bool TryUseGameRoot(pcstr prefPath, pcstr gameRoot)
+{
+    if (!HasRequiredGameData(gameRoot))
+        return false;
+
+    LinkGameDataIntoPrefPath(prefPath, gameRoot);
+    return HasRequiredGameData(prefPath);
+}
+
+static bool ResolveFromPopularGameLocations(pcstr prefPath)
+{
+    const char* home = SDL_getenv("HOME");
+    if (home && home[0])
+    {
+        string_path steamPath;
+        xr_sprintf(steamPath, "%s/Library/Application Support/Steam/steamapps/common/STALKER Call of Pripyat", home);
+        if (TryUseGameRoot(prefPath, steamPath))
+            return true;
+
+        string_path gogPath;
+        xr_sprintf(gogPath, "%s/GOG Games/S.T.A.L.K.E.R. - Call of Pripyat", home);
+        if (TryUseGameRoot(prefPath, gogPath))
+            return true;
+
+        string_path applicationsPath;
+        xr_sprintf(applicationsPath, "%s/Applications/S.T.A.L.K.E.R. - Call of Pripyat", home);
+        if (TryUseGameRoot(prefPath, applicationsPath))
+            return true;
+    }
+
+    return TryUseGameRoot(prefPath, "/Applications/S.T.A.L.K.E.R. - Call of Pripyat");
+}
+
+static void ResolveGameDataForMac(pcstr prefPath)
+{
+    if (HasRequiredGameData(prefPath))
+        return;
+
+    const bool runningFromBundle = strstr(Core.ApplicationPath, ".app/Contents/MacOS/") != nullptr;
+    if (!runningFromBundle)
+        return;
+
+    string_path bundleNeighborRoot;
+    xr_sprintf(bundleNeighborRoot, "%s../../..", Core.ApplicationPath);
+    if (TryUseGameRoot(prefPath, bundleNeighborRoot))
+        return;
+
+    if (ResolveFromPopularGameLocations(prefPath))
+        return;
+
+    string_path selectedRoot;
+    selectedRoot[0] = 0;
+    if (PromptForGameRoot(selectedRoot) && TryUseGameRoot(prefPath, selectedRoot))
+        return;
+
+    SDL_ShowSimpleMessageBox(
+        SDL_MESSAGEBOX_WARNING,
+        "OpenXRay: game files are required",
+        "OpenXRay could not find required game files (levels/resources/localization).\n"
+        "Please select the game directory when prompted or copy the game files into\n"
+        "~/Library/Application Support/GSC Game World/S.T.A.L.K.E.R. - Call of Pripyat/",
+        nullptr);
+}
+
+static bool ResolveOpenXRayResourcesPath(string_path& outPath)
+{
+    string_path bundleResourcesPath;
+    xr_sprintf(bundleResourcesPath, "%s../Resources/openxray", Core.ApplicationPath);
+
+    string_path bundleFsgamePath;
+    xr_sprintf(bundleFsgamePath, "%s/fsgame.ltx", bundleResourcesPath);
+    if (IsFile(bundleFsgamePath))
+    {
+        SDL_strlcpy(outPath, bundleResourcesPath, sizeof(outPath));
+        return true;
+    }
+
+    string_path installedFsgamePath;
+    xr_sprintf(installedFsgamePath, "%s/openxray/fsgame.ltx", CMAKE_INSTALL_FULL_DATAROOTDIR);
+    if (IsFile(installedFsgamePath))
+    {
+        xr_sprintf(outPath, "%s/openxray", CMAKE_INSTALL_FULL_DATAROOTDIR);
+        return true;
+    }
+
+    return false;
+}
+#endif
+
 void CLocatorAPI::setup_fs_path(pcstr fs_name, string_path& fs_path)
 {
     xr_strcpy(fs_path, fs_name ? fs_name : "");
@@ -851,8 +1027,10 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
              * I propose adding shaders from <CMAKE_INSTALL_FULL_DATAROOTDIR>/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
              * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
             chdir(pref_path);
-            static constexpr pcstr install_dir = CMAKE_INSTALL_FULL_DATAROOTDIR;
             string_path tmp, tmp_link;
+#if defined(XR_PLATFORM_APPLE)
+            ResolveGameDataForMac(pref_path);
+#endif
             xr_sprintf(tmp, "%sfsgame.ltx", pref_path);
             struct stat statbuf;
             ZeroMemory(&statbuf, sizeof(statbuf));
@@ -868,7 +1046,13 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
                 res = lstat(tmp, &statbuf);
                 if (res == 0)
                     xr_unlink(tmp);
-                xr_sprintf(tmp_link, "%s/openxray/fsgame.ltx", install_dir);
+#if defined(XR_PLATFORM_APPLE)
+                string_path resourcesRoot;
+                if (ResolveOpenXRayResourcesPath(resourcesRoot))
+                    xr_sprintf(tmp_link, "%s/fsgame.ltx", resourcesRoot);
+                else
+#endif
+                    xr_sprintf(tmp_link, "%s/openxray/fsgame.ltx", CMAKE_INSTALL_FULL_DATAROOTDIR);
                 symlink(tmp_link, tmp);
             }
             xr_sprintf(tmp, "%sgamedata/shaders/gl", pref_path);
@@ -885,7 +1069,13 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
                     mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
                     mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
                 }
-                xr_sprintf(tmp_link, "%s/openxray/gamedata/shaders/gl", install_dir);
+#if defined(XR_PLATFORM_APPLE)
+                string_path resourcesRoot;
+                if (ResolveOpenXRayResourcesPath(resourcesRoot))
+                    xr_sprintf(tmp_link, "%s/gamedata/shaders/gl", resourcesRoot);
+                else
+#endif
+                    xr_sprintf(tmp_link, "%s/openxray/gamedata/shaders/gl", CMAKE_INSTALL_FULL_DATAROOTDIR);
                 symlink(tmp_link, tmp);
             }
 
