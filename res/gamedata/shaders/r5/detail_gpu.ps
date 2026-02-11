@@ -8,7 +8,7 @@ cbuffer DetailGlobals : register(b3)
     float4 wave;
     float4 dir2D;
     float4 dir2D_2;
-    float4x4 m_VP;
+    float4x4 g_detail_VP;
     float4 detail_params;
     float4 g_wind_direction;
     float grass_wind_displacement;
@@ -100,9 +100,8 @@ f_forward main(p_flat I)
     float color_blend = smoothstep(0.2, 0.8, t);
     float3 grassAlbedo = lerp(baseColor, tipColor, color_blend);
 
-    float hash = frac(sin(dot(I.position.xz, float2(12.9898, 78.233))) * 43758.5453);
     float variationAmount = grass_color_variation;
-    grassAlbedo *= lerp(1.0 - variationAmount, 1.0 + variationAmount, hash);
+    grassAlbedo *= lerp(1.0 - variationAmount, 1.0 + variationAmount, I.bladeHash);
 
     GrassObjectTint objectTint = grass_object_tints[I.objectId];
     float3 tintColor = float3(objectTint.r, objectTint.g, objectTint.b);
@@ -120,15 +119,13 @@ f_forward main(p_flat I)
         grassAlbedo = lerp(grassAlbedo, float3(1.0, 0.0, 0.0), interaction_strength * 0.7);
     }
 
-    float3 Nw = viewDirToWorld(N);
-    float3 worldPos = viewPosToWorld(I.position.xyz);
-    float viewDist = length(I.position.xyz);
+    float viewDist = length(I.position.xyz - eye_position);
     float distFade = exp(-viewDist * 0.017);
     float3 midColor = (grass_color_base.rgb + grass_color_tip.rgb) * 0.5;
     grassAlbedo = lerp(midColor, grassAlbedo, distFade);
 
-    float3 sss = ComputeGrassSSS(Nw, -L_sun_dir_w, t);
+    float3 sss = ComputeGrassSSS(N, -L_sun_dir_w, t);
     float3 finalAlbedo = grassAlbedo + sss * L_sun_color;
 
-    return output_forward_pbr(finalAlbedo, Nw, worldPos, metallic, roughness, ao);
+    return output_forward_pbr(finalAlbedo, N, I.position.xyz, metallic, roughness, ao);
 }

@@ -8,7 +8,7 @@ cbuffer DetailGlobals : register(b3)
     float4 wave;
     float4 dir2D;
     float4 dir2D_2;
-    float4x4 m_VP;
+    float4x4 g_detail_VP;
     float4 detail_params;
     float4 g_wind_direction;
     float grass_wind_displacement;
@@ -277,10 +277,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
 	float3 right = float3(cos_rot, 0.0, -sin_rot);
 
-	float camera_dist = length(det.pos - eye_position);
-	float dist_width_scale = 1.0 + min(pow(0.025 * camera_dist, 4.0), 2.0);
-
-	float3 width_offset = right * (I.pos.x * det.scale * dist_width_scale);
+	float3 width_offset = right * (I.pos.x * det.scale);
 
 	float4 pos = float4(bezier_pos + width_offset, 1.0);
 
@@ -303,37 +300,23 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	                      + cross(axis, blade_normal) * (-sinTheta)
 	                      + axis * dot(axis, blade_normal) * (1.0 - cosTheta);
 
-	float3 Pe = mul(m_WV, pos);
-
-	{
-		float3 cam_dir = normalize(pos.xyz - eye_position);
-		float dot_nv = abs(dot(blade_normal, cam_dir));
-		float edge_on = 1.0 - dot_nv;
-		float thicken = edge_on * edge_on * edge_on * edge_on;
-		Pe.x += thicken * I.pos.x * det.scale;
-	}
-
-	float3 view_normal = mul((float3x3)m_WV, blade_normal);
-	float3 view_rotatedNormal1 = mul((float3x3)m_WV, rotatedNormal1);
-	float3 view_rotatedNormal2 = mul((float3x3)m_WV, rotatedNormal2);
-
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh = float4(I.tc.xy, hemi, sun);
 #else
 	O.tcdh = I.tc.xy;
 #endif
 
-	O.position = float4(Pe, hemi);
-	O.N = view_normal;
+	O.position = float4(pos.xyz, hemi);
+	O.N = blade_normal;
 	O.heightParam = I.t;
-
-	O.rotatedNormal1 = view_rotatedNormal1;
-	O.rotatedNormal2 = view_rotatedNormal2;
-
+	O.rotatedNormal1 = rotatedNormal1;
+	O.rotatedNormal2 = rotatedNormal2;
 	O.interaction_uv = atlas_uv;
-
 	O.objectId = det.object_id;
-
-	O.hpos = mul(m_P, float4(Pe, 1.0));
+	int2 bc = int2(floor(det.pos.xz));
+	uint bh = asuint(bc.x * 73856093 + bc.y * 19349663);
+	bh ^= bh >> 16;
+	O.bladeHash = float(bh & 0xFFFFu) / 65535.0;
+	O.hpos = mul(g_detail_VP, pos);
 	return O;
 }

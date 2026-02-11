@@ -335,6 +335,7 @@ struct	v2p_flat
     float3	rotatedNormal1 : TEXCOORD7;
     float3	rotatedNormal2 : TEXCOORD8;
     nointerpolation uint objectId : TEXCOORD9;
+    float	bladeHash : TEXCOORD10;
     float4	hpos : SV_Position;
 };
 
@@ -358,6 +359,30 @@ struct	p_flat
     float3	rotatedNormal1 : TEXCOORD7;
     float3	rotatedNormal2 : TEXCOORD8;
     nointerpolation uint objectId : TEXCOORD9;
+    float	bladeHash : TEXCOORD10;
+};
+
+struct	v2p_decal
+{
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
+    float4	tcdh : TEXCOORD0;
+#else
+    float2	tcdh : TEXCOORD0;
+#endif
+    float4	position : TEXCOORD1;
+    float3	N : TEXCOORD2;
+    float4	hpos : SV_Position;
+};
+
+struct	p_decal
+{
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
+    float4	tcdh : TEXCOORD0;
+#else
+    float2	tcdh : TEXCOORD0;
+#endif
+    float4	position : TEXCOORD1;
+    float3	N : TEXCOORD2;
 };
 
 struct	v_shadow_direct_aref

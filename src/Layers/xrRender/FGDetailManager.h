@@ -208,6 +208,7 @@ public:
 
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::BindingLayoutHandle graphicsBindingLayout;
+    nvrhi::BindingLayoutHandle decalBindingLayout;
     nvrhi::GraphicsPipelineHandle graphicsPipeline;
     nvrhi::GraphicsPipelineHandle decalGraphicsPipeline;
 
@@ -245,7 +246,6 @@ public:
     nvrhi::SamplerHandle cachedSmp_LinearClamp;
     nvrhi::SamplerHandle cachedSmp_AnisoWrap;
 
-    nvrhi::BufferHandle cachedDummyMaterials;
     nvrhi::BufferHandle cachedDummySlotIndirection;
 
     nvrhi::BufferHandle cachedDynTransformsCB;

@@ -51,7 +51,7 @@ cbuffer DetailGlobals : register(b3)
 	float4 wave;
 	float4 dir2D;
 	float4 dir2D_2;
-	float4x4 m_VP;
+	float4x4 g_detail_VP;
 	float4 detail_params;
 	float4 g_wind_direction;
 	float grass_wind_displacement;
@@ -73,15 +73,14 @@ StructuredBuffer<DecalPulledVertex> decal_vertices : register(t36);
 StructuredBuffer<InstanceData> all_instances : register(t37);
 StructuredBuffer<GPUSlotData> slot_data : register(t38);
 
-v2p_flat main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
+v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 {
-	v2p_flat O;
+	v2p_decal O;
 
 	uint src_idx = visible_indices[instance_id];
 	InstanceData raw = all_instances[src_idx];
 
 	uint object_id = raw.packed & 0x3F;
-	uint vis_id = (raw.packed >> 6) & 0x3;
 	float rotation = float((raw.packed >> 8) & 0x3FF) / 1023.0 * TWO_PI;
 	float scale = float((raw.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
 
@@ -89,7 +88,7 @@ v2p_flat main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 
 	if (vertex_id >= mdl.decalIndexCount)
 	{
-		O = (v2p_flat)0;
+		O = (v2p_decal)0;
 		O.hpos = asfloat(0x7FC00000);
 		return O;
 	}
@@ -106,11 +105,6 @@ v2p_flat main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 	rotated.z = local_pos.x * s + local_pos.z * c;
 
 	float4 world_pos = float4(rotated + raw.pos, 1.0);
-
-	float3 Pe = mul(m_WV, world_pos);
-
-	float3 N_up = float3(0, 1, 0);
-	float3 view_N = mul((float3x3)m_WV, N_up);
 
 	float2 uv = float2(v.u, v.v);
 	uint flip = raw.packed;
@@ -137,14 +131,9 @@ v2p_flat main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 	O.tcdh = uv;
 #endif
 
-	O.position = float4(Pe, hemi);
-	O.N = view_N;
-	O.heightParam = 0;
-	O.rotatedNormal1 = view_N;
-	O.rotatedNormal2 = view_N;
-	O.interaction_uv = float2(0, 0);
-	O.objectId = object_id;
-	O.hpos = mul(m_P, float4(Pe, 1.0));
+	O.position = float4(world_pos.xyz, hemi);
+	O.N = float3(0, 1, 0);
+	O.hpos = mul(g_detail_VP, world_pos);
 
 	return O;
 }
