@@ -83,7 +83,12 @@ for lib in "${LIBS_DIR}"/*.dylib; do
 done
 
 # Bundle non-system dynamic libraries (Homebrew deps etc.).
-dylibbundler -of -cd -b -x "${MACOS_DIR}/xr_3da" -d "${LIBS_DIR}"
+dylibbundler \
+    -of -cd -b \
+    -x "${MACOS_DIR}/xr_3da" \
+    -d "${LIBS_DIR}" \
+    -s "${BIN_DIR}" \
+    -s "${LIBS_DIR}"
 
 APP_ZIP="${ARTIFACTS_DIR}/openxray-${CONFIGURATION}-${ARCH}.app.zip"
 DMG_PATH="${ARTIFACTS_DIR}/openxray-${CONFIGURATION}-${ARCH}.dmg"
