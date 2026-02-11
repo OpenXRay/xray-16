@@ -16,7 +16,7 @@ cbuffer DetailGlobals : register(b3)
     float4 wave;                    // cx,cy,cz,tm - for wave animation
     float4 dir2D;                   // Wind direction 1 (XY = direction, normalized)
     float4 dir2D_2;                 // Wind direction 2 (perpendicular)
-    float4x4 m_VP;                  // View-projection matrix
+    float4x4 g_detail_VP;
     float4 detail_params;           // x=slot_x_size, y=slot_z_size, z=slot_x_offs, w=slot_z_offs
     float4 g_wind_direction;        // x=wind angle degrees, y=wind speed, z/w=unused
     float grass_wind_displacement;  // Wind displacement strength
@@ -145,10 +145,8 @@ f_forward main(p_flat I)
     float color_blend = smoothstep(0.2, 0.8, t);
     float3 grassAlbedo = lerp(baseColor, tipColor, color_blend);
 
-    // Per-blade variation using world position hash
-    float hash = frac(sin(dot(I.position.xz, float2(12.9898, 78.233))) * 43758.5453);
-    float variationAmount = grass_color_variation;  // From constant buffer (e.g., 0.15 = ±15%)
-    grassAlbedo *= lerp(1.0 - variationAmount, 1.0 + variationAmount, hash);
+    float variationAmount = grass_color_variation;
+    grassAlbedo *= lerp(1.0 - variationAmount, 1.0 + variationAmount, I.bladeHash);
 
     // Apply per-object tint (from structured buffer)
     GrassObjectTint objectTint = grass_object_tints[I.objectId];
@@ -170,22 +168,13 @@ f_forward main(p_flat I)
         grassAlbedo = lerp(grassAlbedo, float3(1.0, 0.0, 0.0), interaction_strength * 0.7);
     }
 
-    // ===== WORLD SPACE TRANSFORMS =====
-    float3 Nw = viewDirToWorld(N);
-    float3 worldPos = viewPosToWorld(I.position.xyz);
-    // ===== DISTANCE-BASED COLOR FADE =====
-    // Blend toward uniform mid-color at distance to reduce shading noise on far grass
-    // (inspired by Ghost of Tsushima grass_example_repo fog integration)
-    float viewDist = length(I.position.xyz);
-    float distFade = exp(-viewDist * 0.017);  // Exponential decay, ~50% at 40m, ~20% at 95m
+    float viewDist = length(I.position.xyz - eye_position);
+    float distFade = exp(-viewDist * 0.017);
     float3 midColor = (grass_color_base.rgb + grass_color_tip.rgb) * 0.5;
     grassAlbedo = lerp(midColor, grassAlbedo, distFade);
 
-    // ===== SUBSURFACE SCATTERING APPROXIMATION =====
-    // Add SSS contribution to albedo (approximate translucency)
-    float3 sss = ComputeGrassSSS(Nw, -L_sun_dir_w, t);
+    float3 sss = ComputeGrassSSS(N, -L_sun_dir_w, t);
     float3 finalAlbedo = grassAlbedo + sss * L_sun_color;
 
-    // PBR Forward+ lighting with computed grass material properties
-    return output_forward_pbr(finalAlbedo, Nw, worldPos, metallic, roughness, ao);
+    return output_forward_pbr(finalAlbedo, N, I.position.xyz, metallic, roughness, ao);
 }

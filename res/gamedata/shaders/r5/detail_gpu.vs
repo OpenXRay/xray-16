@@ -29,7 +29,7 @@ cbuffer DetailGlobals : register(b3)
     float4 wave;                    // cx,cy,cz,tm - for wave animation
     float4 dir2D;                   // Wind direction 1 (XY = direction, normalized)
     float4 dir2D_2;                 // Wind direction 2 (perpendicular)
-    float4x4 m_VP;                  // View-projection matrix
+    float4x4 g_detail_VP;
     float4 detail_params;           // x=slot_x_size, y=slot_z_size, z=slot_x_offs, w=slot_z_offs
     float4 g_wind_direction;        // x=wind angle degrees, y=wind speed, z/w=unused
     float grass_wind_displacement;  // Wind displacement strength
@@ -409,14 +409,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// For Y-axis rotation: right = (cos, 0, -sin)
 	float3 right = float3(cos_rot, 0.0, -sin_rot);
 
-	// Distance-based blade width scaling: widen far-away blades for better screen coverage
-	// Quartic curve stays near 1.0 at close range, ramps up at distance (inspired by GoT grass)
-	float camera_dist = length(det.pos - eye_position);
-	float dist_width_scale = 1.0 + min(pow(0.025 * camera_dist, 4.0), 2.0);
-
-	// Apply width offset using rotation-based right vector
-	// Note: Use original det.scale for width (not blade_height) so taller blades appear thinner/wispier
-	float3 width_offset = right * (I.pos.x * det.scale * dist_width_scale);
+	float3 width_offset = right * (I.pos.x * det.scale);
 
 	// Final position
 	float4 pos = float4(bezier_pos + width_offset, 1.0);
@@ -445,53 +438,23 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	                      + cross(axis, blade_normal) * (-sinTheta)
 	                      + axis * dot(axis, blade_normal) * (1.0 - cosTheta);
 
-	// Transform to view space
-	float3 Pe = mul(m_WV, pos);
-
-	// View-space blade thickening: prevent blades from disappearing when edge-on to camera
-	// When blade normal is perpendicular to view direction, expand in view-space X
-	// (Ghost of Tsushima technique adapted from grass_example_repo)
-	{
-		float3 cam_dir = normalize(pos.xyz - eye_position);
-		float dot_nv = abs(dot(blade_normal, cam_dir));
-		// Quartic falloff: only thickens when nearly edge-on (dot_nv near 0)
-		float edge_on = 1.0 - dot_nv;
-		float thicken = edge_on * edge_on * edge_on * edge_on;  // x^4
-		// Scale by blade local width — center vertices (I.pos.x=0) stay put
-		Pe.x += thicken * I.pos.x * det.scale;
-	}
-
-	float3 view_normal = mul((float3x3)m_WV, blade_normal);
-	float3 view_rotatedNormal1 = mul((float3x3)m_WV, rotatedNormal1);
-	float3 view_rotatedNormal2 = mul((float3x3)m_WV, rotatedNormal2);
-
-	// Pack output
-	// Standard X-Ray approach for v2p_flat:
-	// - tcdh.xy = texture coordinates
-	// - tcdh.zw = hemi, sun (only if USE_R2_STATIC_SUN && !USE_LM_HEMI)
-	// - position.xyz = view-space position
-	// - position.w = hemi
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh = float4(I.tc.xy, hemi, sun);
 #else
 	O.tcdh = I.tc.xy;
 #endif
 
-	O.position = float4(Pe, hemi);  // Pack hemi in position.w
-	O.N = view_normal;
-	O.heightParam = I.t;  // Phase 6: Pass height parameter for AO calculation
-
-	// Phase 6: Pass rotated normals for rounded blade effect
-	O.rotatedNormal1 = view_rotatedNormal1;
-	O.rotatedNormal2 = view_rotatedNormal2;
-
-	// Phase 5: Pass atlas UV for grass interaction debug visualization
-	O.interaction_uv = atlas_uv;  // Pass the correct atlas UV computed with indirection table
-
-	// Pass object ID for per-type coloring (nointerpolation - flat shading)
+	O.position = float4(pos.xyz, hemi);
+	O.N = blade_normal;
+	O.heightParam = I.t;
+	O.rotatedNormal1 = rotatedNormal1;
+	O.rotatedNormal2 = rotatedNormal2;
+	O.interaction_uv = atlas_uv;
 	O.objectId = det.object_id;
-
-	// Derive clip-space position from modified view-space Pe (accounts for view-space thickening)
-	O.hpos = mul(m_P, float4(Pe, 1.0));
+	int2 bc = int2(floor(det.pos.xz));
+	uint bh = asuint(bc.x * 73856093 + bc.y * 19349663);
+	bh ^= bh >> 16;
+	O.bladeHash = float(bh & 0xFFFFu) / 65535.0;
+	O.hpos = mul(g_detail_VP, pos);
 	return O;
 }

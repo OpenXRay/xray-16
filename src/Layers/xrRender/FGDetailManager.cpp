@@ -1232,15 +1232,6 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
 
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = 32;
-        desc.structStride = 32;
-        desc.debugName = "DummyMaterials_Detail";
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
-        desc.keepInitialState = true;
-        cachedDummyMaterials = device->createBuffer(desc);
-    }
-    {
-        nvrhi::BufferDesc desc;
         desc.byteSize = 4;
         desc.format = nvrhi::Format::R32_UINT;
         desc.canHaveTypedViews = true;
@@ -1347,6 +1338,7 @@ void FGDetailManager::DestroyGPUBuffers()
     graphicsPipeline = nullptr;
     decalGraphicsPipeline = nullptr;
     graphicsBindingLayout = nullptr;
+    decalBindingLayout = nullptr;
 
     decalPulledVertexBuffer = nullptr;
     decalIndexBuffer = nullptr;
@@ -1364,7 +1356,6 @@ void FGDetailManager::DestroyGPUBuffers()
     cachedSmp_PointClamp = nullptr;
     cachedSmp_LinearClamp = nullptr;
     cachedSmp_AnisoWrap = nullptr;
-    cachedDummyMaterials = nullptr;
     cachedDummySlotIndirection = nullptr;
     cachedDynTransformsCB = nullptr;
     cachedShaderParamsCB = nullptr;
@@ -2000,12 +1991,10 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(3),
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
         nvrhi::BindingLayoutItem::TypedBuffer_SRV(32),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(33),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(34),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(35),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(36),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(37),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(38),
         nvrhi::BindingLayoutItem::Sampler(0),
@@ -2020,6 +2009,34 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
     if (!graphicsBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create graphics binding layout");
+        return false;
+    }
+
+    nvrhi::BindingLayoutDesc decalLayoutDesc;
+    decalLayoutDesc.visibility = nvrhi::ShaderType::All;
+    decalLayoutDesc.bindings = {
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(1),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(3),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(33),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(35),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(36),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(37),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(38),
+        nvrhi::BindingLayoutItem::Sampler(0),
+        nvrhi::BindingLayoutItem::Sampler(1),
+        nvrhi::BindingLayoutItem::Sampler(2),
+        nvrhi::BindingLayoutItem::Sampler(3),
+        nvrhi::BindingLayoutItem::Sampler(4),
+        nvrhi::BindingLayoutItem::Sampler(5),
+    };
+
+    decalBindingLayout = device->createBindingLayout(decalLayoutDesc);
+    if (!decalBindingLayout)
+    {
+        Msg("! [FGDetailManager] Failed to create decal binding layout");
         return false;
     }
 
@@ -2086,6 +2103,12 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         decalPipeDesc.VS = decalVertexShader;
         decalPipeDesc.PS = decalPixelShader;
         decalPipeDesc.inputLayout = nullptr;
+        decalPipeDesc.bindingLayouts = { decalBindingLayout };
+        if (backend) {
+            auto* bindlessLayout = backend->GetBindlessLayout();
+            if (bindlessLayout)
+                decalPipeDesc.bindingLayouts.push_back(bindlessLayout);
+        }
 
         decalGraphicsPipeline = device->createGraphicsPipeline(decalPipeDesc, framebuffer);
         if (!decalGraphicsPipeline)

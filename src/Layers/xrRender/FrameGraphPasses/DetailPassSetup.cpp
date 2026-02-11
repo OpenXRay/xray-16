@@ -266,7 +266,7 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.wave.set(1.0f / 5.0f, 1.0f / 7.0f, 1.0f / 3.0f, Device.fTimeGlobal);
             frameConstants.dir2D.set(dm->windDirection.x, dm->windDirection.y, 0.0f, 0.0f);
             frameConstants.dir2D_2.set(-dm->windDirection.y, dm->windDirection.x, 0.0f, 0.0f);
-            frameConstants.viewProj = Device.mFullTransform;
+            frameConstants.viewProj.transpose(Device.mFullTransform);
             frameConstants.detail_params.set(
                 float(dm->dtH.x_size()), float(dm->dtH.z_size()),
                 float(dm->dtH.x_offs()), float(dm->dtH.z_offs()));
@@ -309,7 +309,7 @@ DefaultOutputLayout setupDetailPass(
             if (data.gpuProfiler)
                 data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
 
-            auto makeBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer) {
+            auto makeGrassBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer) {
                 nvrhi::BindingSetDesc bindDesc;
                 bindDesc.bindings = {
                     nvrhi::BindingSetItem::ConstantBuffer(0, dm->cachedDynTransformsCB),
@@ -317,12 +317,10 @@ DefaultOutputLayout setupDetailPass(
                     nvrhi::BindingSetItem::ConstantBuffer(2, dm->cachedStaticGlobalsCB),
                     nvrhi::BindingSetItem::ConstantBuffer(3, dm->cachedDetailGlobalsCB),
                     nvrhi::BindingSetItem::ConstantBuffer(4, dm->cachedDynLightCB),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(8, dm->cachedDummyMaterials),
                     nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(33, visibleIndicesBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(34, dm->cachedGrassTintsBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(35, dm->detailModelsBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(36, dm->decalPulledVertexBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(37, dm->generatedInstancesBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(38, dm->slotDataBuffer),
                     nvrhi::BindingSetItem::Sampler(0, dm->cachedSmp_LinearWrap),
@@ -335,9 +333,32 @@ DefaultOutputLayout setupDetailPass(
                 return data.device->GetNVRHIDevice()->createBindingSet(bindDesc, dm->graphicsBindingLayout);
             };
 
+            auto makeDecalBindingSet = [&]() {
+                nvrhi::BindingSetDesc bindDesc;
+                bindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(0, dm->cachedDynTransformsCB),
+                    nvrhi::BindingSetItem::ConstantBuffer(1, dm->cachedShaderParamsCB),
+                    nvrhi::BindingSetItem::ConstantBuffer(2, dm->cachedStaticGlobalsCB),
+                    nvrhi::BindingSetItem::ConstantBuffer(3, dm->cachedDetailGlobalsCB),
+                    nvrhi::BindingSetItem::ConstantBuffer(4, dm->cachedDynLightCB),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(33, dm->visibleDecalInstancesBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(35, dm->detailModelsBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(36, dm->decalPulledVertexBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(37, dm->generatedInstancesBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(38, dm->slotDataBuffer),
+                    nvrhi::BindingSetItem::Sampler(0, dm->cachedSmp_LinearWrap),
+                    nvrhi::BindingSetItem::Sampler(1, dm->cachedSmp_PointClamp),
+                    nvrhi::BindingSetItem::Sampler(2, dm->cachedSmp_LinearClamp),
+                    nvrhi::BindingSetItem::Sampler(3, dm->cachedSmp_LinearWrap),
+                    nvrhi::BindingSetItem::Sampler(4, dm->cachedSmp_AnisoWrap),
+                    nvrhi::BindingSetItem::Sampler(5, dm->cachedSmp_LinearWrap),
+                };
+                return data.device->GetNVRHIDevice()->createBindingSet(bindDesc, dm->decalBindingLayout);
+            };
+
             for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
             {
-                nvrhi::BindingSetHandle bindingSet = makeBindingSet(dm->visibleInstancesBuffer[lod]);
+                nvrhi::BindingSetHandle bindingSet = makeGrassBindingSet(dm->visibleInstancesBuffer[lod]);
 
                 nvrhi::GraphicsState state;
                 state.framebuffer = framebuffer;
@@ -356,7 +377,7 @@ DefaultOutputLayout setupDetailPass(
 
             if (dm->decalGraphicsPipeline && dm->visibleDecalInstancesBuffer && dm->decalDrawArgsBuffer && dm->decalIndexBuffer && dm->maxDecalIndexCount > 0)
             {
-                nvrhi::BindingSetHandle decalBindingSet = makeBindingSet(dm->visibleDecalInstancesBuffer);
+                nvrhi::BindingSetHandle decalBindingSet = makeDecalBindingSet();
 
                 nvrhi::GraphicsState state;
                 state.framebuffer = framebuffer;

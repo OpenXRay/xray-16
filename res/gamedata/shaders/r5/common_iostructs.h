@@ -374,33 +374,60 @@ struct	v2p_flat
     float2	lmh : TEXCOORD4;	// lm-hemi
 #endif
     float	heightParam : TEXCOORD5;	// Phase 6: Height for AO (0=base, 1=tip)
-    float2	interaction_uv : TEXCOORD6;	// Phase 5: Atlas UV for interaction sampling (pre-computed with indirection table)
-    float3	rotatedNormal1 : TEXCOORD7;	// Phase 6: Rotated normal for rounded blade effect
-    float3	rotatedNormal2 : TEXCOORD8;	// Phase 6: Rotated normal for rounded blade effect
-    nointerpolation uint objectId : TEXCOORD9;	// Grass object type ID (0-63) for per-type coloring
+    float2	interaction_uv : TEXCOORD6;
+    float3	rotatedNormal1 : TEXCOORD7;
+    float3	rotatedNormal2 : TEXCOORD8;
+    nointerpolation uint objectId : TEXCOORD9;
+    float	bladeHash : TEXCOORD10;
     float4	hpos : SV_Position;
 };
 
 struct	p_flat
 {
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
-    float4	tcdh : TEXCOORD0;	// Texture coordinates,         w=sun_occlusion
+    float4	tcdh : TEXCOORD0;
 #else
-    float2	tcdh : TEXCOORD0;	// Texture coordinates
+    float2	tcdh : TEXCOORD0;
 #endif
-    float4	position : TEXCOORD1;	// position + hemi
-    float3	N : TEXCOORD2;	// Eye-space normal        (for lighting)
+    float4	position : TEXCOORD1;
+    float3	N : TEXCOORD2;
 #ifdef USE_TDETAIL
-    float2	tcdbump : TEXCOORD3;	// d-bump
+    float2	tcdbump : TEXCOORD3;
 #endif
 #ifdef USE_LM_HEMI
-    float2	lmh : TEXCOORD4;	// lm-hemi
+    float2	lmh : TEXCOORD4;
 #endif
-    float	heightParam : TEXCOORD5;	// Phase 6: Height for AO (0=base, 1=tip)
-    float2	interaction_uv : TEXCOORD6;	// Phase 5: Atlas UV for interaction sampling (pre-computed with indirection table)
-    float3	rotatedNormal1 : TEXCOORD7;	// Phase 6: Rotated normal for rounded blade effect
-    float3	rotatedNormal2 : TEXCOORD8;	// Phase 6: Rotated normal for rounded blade effect
-    nointerpolation uint objectId : TEXCOORD9;	// Grass object type ID (0-63) for per-type coloring
+    float	heightParam : TEXCOORD5;
+    float2	interaction_uv : TEXCOORD6;
+    float3	rotatedNormal1 : TEXCOORD7;
+    float3	rotatedNormal2 : TEXCOORD8;
+    nointerpolation uint objectId : TEXCOORD9;
+    float	bladeHash : TEXCOORD10;
+};
+
+////////////////////////////////////////////////////////////////
+//	Detail decal (minimal interpolators)
+struct	v2p_decal
+{
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
+    float4	tcdh : TEXCOORD0;
+#else
+    float2	tcdh : TEXCOORD0;
+#endif
+    float4	position : TEXCOORD1;
+    float3	N : TEXCOORD2;
+    float4	hpos : SV_Position;
+};
+
+struct	p_decal
+{
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
+    float4	tcdh : TEXCOORD0;
+#else
+    float2	tcdh : TEXCOORD0;
+#endif
+    float4	position : TEXCOORD1;
+    float3	N : TEXCOORD2;
 };
 
 ////////////////////////////////////////////////////////////////
