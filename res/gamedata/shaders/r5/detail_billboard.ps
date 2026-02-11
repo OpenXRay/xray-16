@@ -1,0 +1,64 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+cbuffer DetailGlobals : register(b3)
+{
+	float4 consts;
+	float4 wave;
+	float4 dir2D;
+	float4 dir2D_2;
+	float4x4 g_detail_VP;
+	float4 detail_params;
+	float4 g_wind_direction;
+	float grass_wind_displacement;
+	float grass_interaction_displacement;
+	uint interaction_atlas_index;
+	uint wind_texture_index;
+	float4 grass_color_tip;
+	float4 grass_color_base;
+	float4 grass_sss_color;
+	float grass_color_variation;
+	float grass_blade_height;
+	uint build_details_index;
+	uint build_details_pbr_index;
+};
+
+float3 ComputeBillboardSSS(float3 worldNormal, float3 lightDir, float heightParam)
+{
+	float backlit = saturate(dot(worldNormal, lightDir) * 0.5 + 0.5);
+	float thinness = heightParam;
+	float sssAmount = backlit * thinness * grass_sss_color.w;
+	return grass_sss_color.rgb * sssAmount;
+}
+
+f_forward main(p_billboard I)
+{
+	Texture2D atlas_tex = GetBindlessTexture(build_details_index);
+	float4 texel = atlas_tex.Sample(g_LinearSampler, I.tcdh.xy);
+
+	float mipLevel = atlas_tex.CalculateLevelOfDetail(g_LinearSampler, I.tcdh.xy);
+	float alphaRef = lerp(0.5, 0.25, saturate(mipLevel / 4.0));
+	clip(texel.a - alphaRef);
+
+	float3 albedo = texel.rgb;
+	float3 N = normalize(I.N);
+	float t = I.heightParam;
+	float metallic = 0.0;
+	float roughness = 0.85;
+	float ao = lerp(0.5, 1.0, saturate(t));
+
+	if (build_details_pbr_index != 0)
+	{
+		Texture2D pbr_tex = GetBindlessTexture(build_details_pbr_index);
+		float4 pbr = pbr_tex.Sample(g_LinearSampler, I.tcdh.xy);
+		metallic = pbr.r;
+		roughness = pbr.g;
+		ao = pbr.b;
+	}
+
+	float3 sss = ComputeBillboardSSS(N, -L_sun_dir_w, t);
+	albedo += sss * L_sun_color;
+
+	return output_forward_pbr(albedo, N, I.position.xyz, metallic, roughness, ao);
+}

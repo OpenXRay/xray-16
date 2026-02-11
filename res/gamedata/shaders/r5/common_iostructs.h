@@ -431,6 +431,35 @@ struct	p_decal
 };
 
 ////////////////////////////////////////////////////////////////
+//	Detail billboard (vanilla grass with wind + lighting)
+struct	v2p_billboard
+{
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
+    float4	tcdh : TEXCOORD0;
+#else
+    float2	tcdh : TEXCOORD0;
+#endif
+    float4	position : TEXCOORD1;
+    float3	N : TEXCOORD2;
+    float	heightParam : TEXCOORD3;
+    float	bladeHash : TEXCOORD4;
+    float4	hpos : SV_Position;
+};
+
+struct	p_billboard
+{
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
+    float4	tcdh : TEXCOORD0;
+#else
+    float2	tcdh : TEXCOORD0;
+#endif
+    float4	position : TEXCOORD1;
+    float3	N : TEXCOORD2;
+    float	heightParam : TEXCOORD3;
+    float	bladeHash : TEXCOORD4;
+};
+
+////////////////////////////////////////////////////////////////
 //	Shadow
 struct	v_shadow_direct_aref
 {

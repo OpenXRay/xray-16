@@ -31,7 +31,7 @@ extern ENGINE_API float ps_r3_grass_blade_height;
 
 namespace xray::render::RENDER_NAMESPACE
 {
-
+extern int ps_r__detail_gpu;
 extern float ps_current_detail_height;
 
 static int magic4x4[4][4] = {{0, 14, 3, 13}, {11, 5, 8, 6}, {12, 2, 15, 1}, {7, 9, 4, 10}};
@@ -809,26 +809,26 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         Msg("* [FGDetailManager] Created detail models buffer: %u models", detail_models.size());
 
         nvrhi::BufferDesc pvDesc;
-        pvDesc.byteSize = decalPulledVertexData.size() * sizeof(DecalPulledVertex);
+        pvDesc.byteSize = pulledVertexData.size() * sizeof(DecalPulledVertex);
         pvDesc.structStride = sizeof(DecalPulledVertex);
-        pvDesc.debugName = "DetailDecalPulledVerts";
+        pvDesc.debugName = "DetailPulledVerts";
         pvDesc.canHaveUAVs = false;
         pvDesc.initialState = nvrhi::ResourceStates::ShaderResource;
         pvDesc.keepInitialState = true;
-        decalPulledVertexBuffer = device->createBuffer(pvDesc);
+        pulledVertexBuffer = device->createBuffer(pvDesc);
 
-        if (maxDecalIndexCount > 0)
+        if (maxPulledIndexCount > 0)
         {
-            Msg("* [FGDetailManager] Decal pulled vertices: %u entries (%u decal models, max %u indices/model)",
-                (u32)decalPulledVertexData.size(), (u32)(decalPulledVertexData.size() / maxDecalIndexCount), maxDecalIndexCount);
+            Msg("* [FGDetailManager] Pulled vertices: %u entries (%u models, max %u indices/model)",
+                (u32)pulledVertexData.size(), (u32)(pulledVertexData.size() / maxPulledIndexCount), maxPulledIndexCount);
 
             nvrhi::BufferDesc ibDesc;
-            ibDesc.byteSize = maxDecalIndexCount * sizeof(u16);
+            ibDesc.byteSize = maxPulledIndexCount * sizeof(u16);
             ibDesc.isIndexBuffer = true;
             ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
             ibDesc.keepInitialState = true;
-            ibDesc.debugName = "DetailDecalIB";
-            decalIndexBuffer = device->createBuffer(ibDesc);
+            ibDesc.debugName = "DetailPulledIB";
+            pulledIndexBuffer = device->createBuffer(ibDesc);
         }
     }
 
@@ -913,6 +913,41 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         if (!decalDrawArgsBuffer)
         {
             Msg("! [FGDetailManager] Failed to create decal draw args buffer");
+            return false;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = visibleBufferCapacity * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.debugName = "DetailVisibleBillboard";
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        visibleBillboardInstancesBuffer = device->createBuffer(desc);
+        if (!visibleBillboardInstancesBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create visible billboard instances buffer");
+            return false;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = 5 * sizeof(u32);
+        desc.debugName = "DetailDrawArgsBillboard";
+        desc.canHaveUAVs = true;
+        desc.isDrawIndirectArgs = true;
+        desc.canHaveRawViews = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        billboardDrawArgsBuffer = device->createBuffer(desc);
+        if (!billboardDrawArgsBuffer)
+        {
+            Msg("! [FGDetailManager] Failed to create billboard draw args buffer");
             return false;
         }
     }
@@ -1117,7 +1152,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
 
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32) * 5;
+        desc.byteSize = sizeof(u32) * 6;
         desc.debugName = "DetailStatsReadback";
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
@@ -1309,6 +1344,8 @@ void FGDetailManager::DestroyGPUBuffers()
     slotAABBBuffer = nullptr;
     visibleDecalInstancesBuffer = nullptr;
     decalDrawArgsBuffer = nullptr;
+    visibleBillboardInstancesBuffer = nullptr;
+    billboardDrawArgsBuffer = nullptr;
     visibleSlotIDsBuffer = nullptr;
     visibleSlotCounterBuffer = nullptr;
     slotVisibilityBuffer = nullptr;
@@ -1337,11 +1374,15 @@ void FGDetailManager::DestroyGPUBuffers()
 
     graphicsPipeline = nullptr;
     decalGraphicsPipeline = nullptr;
+    billboardGraphicsPipeline = nullptr;
     graphicsBindingLayout = nullptr;
     decalBindingLayout = nullptr;
+    billboardBindingLayout = nullptr;
+    billboardVertexShader = nullptr;
+    billboardPixelShader = nullptr;
 
-    decalPulledVertexBuffer = nullptr;
-    decalIndexBuffer = nullptr;
+    pulledVertexBuffer = nullptr;
+    pulledIndexBuffer = nullptr;
     buildDetailsTexture = nullptr;
 
     windTexture = nullptr;
@@ -1782,6 +1823,18 @@ bool FGDetailManager::LoadGraphicsShaders(framegraph::ShaderLoader* shaderLoader
     }
     decalPixelShader = decalPsResult.handle;
 
+    auto bbVsResult = shaderLoader->LoadVertexShader("detail_billboard", "main");
+    if (!bbVsResult.handle)
+        Msg("! [FGDetailManager] Failed to load detail_billboard.vs (billboard grass unavailable)");
+    else
+        billboardVertexShader = bbVsResult.handle;
+
+    auto bbPsResult = shaderLoader->LoadPixelShader("detail_billboard", "main");
+    if (!bbPsResult.handle)
+        Msg("! [FGDetailManager] Failed to load detail_billboard.ps (billboard grass unavailable)");
+    else
+        billboardPixelShader = bbPsResult.handle;
+
     return true;
 }
 
@@ -1802,19 +1855,19 @@ void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
         cmdList->writeBuffer(bladeIndexBuffer[lod], bladeIndices[lod].data(), bladeIndices[lod].size() * sizeof(u16));
     }
 
-    if (decalPulledVertexBuffer && !decalPulledVertexData.empty())
-        cmdList->writeBuffer(decalPulledVertexBuffer, decalPulledVertexData.data(), decalPulledVertexData.size() * sizeof(DecalPulledVertex));
+    if (pulledVertexBuffer && !pulledVertexData.empty())
+        cmdList->writeBuffer(pulledVertexBuffer, pulledVertexData.data(), pulledVertexData.size() * sizeof(DecalPulledVertex));
 
-    if (decalIndexBuffer && maxDecalIndexCount > 0)
+    if (pulledIndexBuffer && maxPulledIndexCount > 0)
     {
-        xr_vector<u16> seqIndices(maxDecalIndexCount);
-        for (u32 j = 0; j < maxDecalIndexCount; j++)
+        xr_vector<u16> seqIndices(maxPulledIndexCount);
+        for (u32 j = 0; j < maxPulledIndexCount; j++)
             seqIndices[j] = (u16)j;
-        cmdList->writeBuffer(decalIndexBuffer, seqIndices.data(), seqIndices.size() * sizeof(u16));
+        cmdList->writeBuffer(pulledIndexBuffer, seqIndices.data(), seqIndices.size() * sizeof(u16));
     }
 
-    decalPulledVertexData.clear();
-    decalPulledVertexData.shrink_to_fit();
+    pulledVertexData.clear();
+    pulledVertexData.shrink_to_fit();
 
     if (buildDetailsTexture && !pendingBuildDetailsUploads.empty())
     {
@@ -1900,6 +1953,8 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
             nvrhi::BindingLayoutItem::RawBuffer_UAV(5),
             nvrhi::BindingLayoutItem::StructuredBuffer_UAV(6),
             nvrhi::BindingLayoutItem::RawBuffer_UAV(7),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(8),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(9),
         };
 
         computeBindingLayout = device->createBindingLayout(layoutDesc);
@@ -2118,6 +2173,26 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         }
     }
 
+    if (billboardVertexShader && billboardPixelShader)
+    {
+        billboardBindingLayout = device->createBindingLayout(decalLayoutDesc);
+
+        nvrhi::GraphicsPipelineDesc bbPipeDesc = pipelineDesc;
+        bbPipeDesc.VS = billboardVertexShader;
+        bbPipeDesc.PS = billboardPixelShader;
+        bbPipeDesc.inputLayout = nullptr;
+        bbPipeDesc.bindingLayouts = { billboardBindingLayout };
+        if (backend) {
+            auto* bindlessLayout = backend->GetBindlessLayout();
+            if (bindlessLayout)
+                bbPipeDesc.bindingLayouts.push_back(bindlessLayout);
+        }
+
+        billboardGraphicsPipeline = device->createGraphicsPipeline(bbPipeDesc, framebuffer);
+        if (!billboardGraphicsPipeline)
+            Msg("! [FGDetailManager] Failed to create billboard graphics pipeline");
+    }
+
     return true;
 }
 
@@ -2202,6 +2277,15 @@ void FGDetailManager::DispatchCulling(
             desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
             desc.keepInitialState = true;
             visibleDecalInstancesBuffer = device->createBuffer(desc);
+
+            nvrhi::BufferDesc bbDesc;
+            bbDesc.byteSize = visibleBufferCapacity * sizeof(u32);
+            bbDesc.structStride = sizeof(u32);
+            bbDesc.debugName = "DetailVisibleBillboard";
+            bbDesc.canHaveUAVs = true;
+            bbDesc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            bbDesc.keepInitialState = true;
+            visibleBillboardInstancesBuffer = device->createBuffer(bbDesc);
         }
         RegenerateAllInstances(cmdList, device, gpuProfiler);
     }
@@ -2231,7 +2315,9 @@ void FGDetailManager::DispatchCulling(
     params.lodDistanceMidSqr = ps_r3_grass_lod_mid * ps_r3_grass_lod_mid;
     params.detailDensity = ps_current_detail_density;
     params.visibleDecalCapacity = decalCapacity;
-    params.cullPad0 = params.cullPad1 = params.cullPad2 = 0;
+    params.grassMode = ps_r__detail_gpu ? 1u : 0u;
+    params.visibleBillboardCapacity = visibleBufferCapacity;
+    params.cullPad2 = 0;
 
     cmdList->writeBuffer(cachedCullParamsCB, &params, sizeof(params));
 
@@ -2260,6 +2346,8 @@ void FGDetailManager::DispatchCulling(
     }
     cmdList->beginTrackingBufferState(visibleDecalInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->beginTrackingBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->beginTrackingBufferState(visibleBillboardInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->beginTrackingBufferState(billboardDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->beginTrackingTextureState(hiZPyramid, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
 
     u32 dispatchArgs[3] = { 0, 1, 1 };
@@ -2272,8 +2360,12 @@ void FGDetailManager::DispatchCulling(
         cmdList->writeBuffer(drawArgsBuffer[lod], &args, sizeof(args));
     }
     {
-        IndirectDrawArgs decalArgs = { maxDecalIndexCount, 0, 0, 0, 0 };
+        IndirectDrawArgs decalArgs = { maxPulledIndexCount, 0, 0, 0, 0 };
         cmdList->writeBuffer(decalDrawArgsBuffer, &decalArgs, sizeof(decalArgs));
+    }
+    {
+        IndirectDrawArgs bbArgs = { maxPulledIndexCount, 0, 0, 0, 0 };
+        cmdList->writeBuffer(billboardDrawArgsBuffer, &bbArgs, sizeof(bbArgs));
     }
 
     const u32 threadGroupSize = 256;
@@ -2328,6 +2420,8 @@ void FGDetailManager::DispatchCulling(
             nvrhi::BindingSetItem::RawBuffer_UAV(5, drawArgsBuffer[2]),
             nvrhi::BindingSetItem::StructuredBuffer_UAV(6, visibleDecalInstancesBuffer),
             nvrhi::BindingSetItem::RawBuffer_UAV(7, decalDrawArgsBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(8, visibleBillboardInstancesBuffer),
+            nvrhi::BindingSetItem::RawBuffer_UAV(9, billboardDrawArgsBuffer),
         };
 
         nvrhi::BindingSetHandle instanceCullBindingSet = device->createBindingSet(bindDesc, computeBindingLayout);
@@ -2354,6 +2448,8 @@ void FGDetailManager::DispatchCulling(
     }
     cmdList->setBufferState(visibleDecalInstancesBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(visibleBillboardInstancesBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(billboardDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
     cmdList->commitBarriers();
 }
 
@@ -2367,6 +2463,8 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
         cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::CopySource);
     if (decalDrawArgsBuffer)
         cmdList->setBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::CopySource);
+    if (billboardDrawArgsBuffer)
+        cmdList->setBufferState(billboardDrawArgsBuffer, nvrhi::ResourceStates::CopySource);
     cmdList->commitBarriers();
 
     cmdList->copyBuffer(statsReadbackBuffer, 0, visibleSlotCounterBuffer, 0, sizeof(u32));
@@ -2389,12 +2487,22 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
             sizeof(u32)
         );
     }
+    if (billboardDrawArgsBuffer)
+    {
+        cmdList->copyBuffer(
+            statsReadbackBuffer, sizeof(u32) * 5,
+            billboardDrawArgsBuffer, sizeof(u32),
+            sizeof(u32)
+        );
+    }
 
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
         cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(visibleDecalInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(visibleBillboardInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(billboardDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->commitBarriers();
 
     statsReadbackPending = true;
@@ -2419,6 +2527,7 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
         cullingStats.visibleLOD1Count = counts[2];
         cullingStats.visibleLOD2Count = counts[3];
         cullingStats.visibleDecalCount = counts[4];
+        cullingStats.visibleBillboardCount = counts[5];
         device->unmapBuffer(statsReadbackBuffer);
     }
 
@@ -2427,16 +2536,13 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
 
 void FGDetailManager::BuildDetailModelGPUData()
 {
-    maxDecalIndexCount = 0;
+    maxPulledIndexCount = 0;
     for (auto* m : detail_models)
-    {
-        if (m->m_Flags.flags & 0x0001)
-            maxDecalIndexCount = std::max(maxDecalIndexCount, m->number_indices);
-    }
+        maxPulledIndexCount = std::max(maxPulledIndexCount, m->number_indices);
 
     cachedModelGPUData.resize(detail_models.size());
     xr_vector<DecalPulledVertex> pulledVerts;
-    u32 runningDecalOffset = 0;
+    u32 runningOffset = 0;
 
     for (u32 i = 0; i < detail_models.size(); i++)
     {
@@ -2449,6 +2555,7 @@ void FGDetailManager::BuildDetailModelGPUData()
         if (m->number_vertices > 0)
         {
             float pxmin = FLT_MAX, pzmin = FLT_MAX, pxmax = -FLT_MAX, pzmax = -FLT_MAX;
+            float pymin = FLT_MAX, pymax = -FLT_MAX;
             float umin = FLT_MAX, vmin = FLT_MAX, umax = -FLT_MAX, vmax = -FLT_MAX;
             for (u32 v = 0; v < m->number_vertices; v++)
             {
@@ -2456,6 +2563,8 @@ void FGDetailManager::BuildDetailModelGPUData()
                 pzmin = std::min(pzmin, m->vertices[v].P.z);
                 pxmax = std::max(pxmax, m->vertices[v].P.x);
                 pzmax = std::max(pzmax, m->vertices[v].P.z);
+                pymin = std::min(pymin, m->vertices[v].P.y);
+                pymax = std::max(pymax, m->vertices[v].P.y);
                 umin = std::min(umin, m->vertices[v].u);
                 vmin = std::min(vmin, m->vertices[v].v);
                 umax = std::max(umax, m->vertices[v].u);
@@ -2463,6 +2572,7 @@ void FGDetailManager::BuildDetailModelGPUData()
             }
             d.geomExtentX = pxmax - pxmin;
             d.geomExtentZ = pzmax - pzmin;
+            d.geomExtentY = pymax - pymin;
             d.uv_min_x = umin;
             d.uv_min_y = vmin;
             d.uv_max_x = umax;
@@ -2470,15 +2580,14 @@ void FGDetailManager::BuildDetailModelGPUData()
         }
         else
         {
-            d.geomExtentX = d.geomExtentZ = 0.f;
+            d.geomExtentX = d.geomExtentZ = d.geomExtentY = 0.f;
             d.uv_min_x = d.uv_min_y = d.uv_max_x = d.uv_max_y = 0.f;
         }
 
-        bool isDecal = (m->m_Flags.flags & 0x0001) != 0;
-        if (isDecal && maxDecalIndexCount > 0)
+        if (m->number_indices > 0 && maxPulledIndexCount > 0)
         {
-            d.decalVertexBase = runningDecalOffset;
-            d.decalIndexCount = m->number_indices;
+            d.pulledVertexBase = runningOffset;
+            d.pulledIndexCount = m->number_indices;
             for (u32 j = 0; j < m->number_indices; j++)
             {
                 u16 idx = m->indices[j];
@@ -2490,22 +2599,21 @@ void FGDetailManager::BuildDetailModelGPUData()
                 dv.v = m->vertices[idx].v;
                 pulledVerts.push_back(dv);
             }
-            for (u32 j = m->number_indices; j < maxDecalIndexCount; j++)
+            for (u32 j = m->number_indices; j < maxPulledIndexCount; j++)
                 pulledVerts.push_back(DecalPulledVertex{});
-            runningDecalOffset += maxDecalIndexCount;
+            runningOffset += maxPulledIndexCount;
         }
         else
         {
-            d.decalVertexBase = 0;
-            d.decalIndexCount = 0;
+            d.pulledVertexBase = 0;
+            d.pulledIndexCount = 0;
         }
-        d.pad = 0;
     }
 
     if (pulledVerts.empty())
         pulledVerts.push_back(DecalPulledVertex{});
 
-    decalPulledVertexData = std::move(pulledVerts);
+    pulledVertexData = std::move(pulledVerts);
 }
 
 nvrhi::BindingSetHandle FGDetailManager::CreateInstanceGenBindingSet(nvrhi::IDevice* device) const
@@ -2703,6 +2811,15 @@ void FGDetailManager::ResizeVisibleBuffersIfNeeded(nvrhi::IDevice* device)
     desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
     desc.keepInitialState = true;
     visibleDecalInstancesBuffer = device->createBuffer(desc);
+
+    nvrhi::BufferDesc bbDesc;
+    bbDesc.byteSize = visibleBufferCapacity * sizeof(u32);
+    bbDesc.structStride = sizeof(u32);
+    bbDesc.debugName = "DetailVisibleBillboard";
+    bbDesc.canHaveUAVs = true;
+    bbDesc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+    bbDesc.keepInitialState = true;
+    visibleBillboardInstancesBuffer = device->createBuffer(bbDesc);
 }
 
 } // namespace xray::render::RENDER_NAMESPACE

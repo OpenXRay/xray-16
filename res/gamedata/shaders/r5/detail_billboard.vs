@@ -22,6 +22,7 @@ struct GPUSlotData
 
 static const float PACK_MAX_SCALE = 4.0;
 static const float TWO_PI = 6.28318530718;
+static const float M_PI = 3.1415926;
 
 struct DetailModelGPU
 {
@@ -39,7 +40,7 @@ struct DetailModelGPU
 	float geomExtentY;
 };
 
-struct DecalPulledVertex
+struct PulledVertex
 {
 	float px, py, pz;
 	float u, v;
@@ -69,13 +70,13 @@ cbuffer DetailGlobals : register(b3)
 
 StructuredBuffer<uint> visible_indices : register(t33);
 StructuredBuffer<DetailModelGPU> detail_models : register(t35);
-StructuredBuffer<DecalPulledVertex> decal_vertices : register(t36);
+StructuredBuffer<PulledVertex> pulled_vertices : register(t36);
 StructuredBuffer<InstanceData> all_instances : register(t37);
 StructuredBuffer<GPUSlotData> slot_data : register(t38);
 
-v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
+v2p_billboard main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 {
-	v2p_decal O;
+	v2p_billboard O;
 
 	uint src_idx = visible_indices[instance_id];
 	InstanceData raw = all_instances[src_idx];
@@ -88,14 +89,15 @@ v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 
 	if (vertex_id >= mdl.pulledIndexCount)
 	{
-		O = (v2p_decal)0;
+		O = (v2p_billboard)0;
 		O.hpos = asfloat(0x7FC00000);
 		return O;
 	}
 
-	DecalPulledVertex v = decal_vertices[mdl.pulledVertexBase + vertex_id];
+	PulledVertex v = pulled_vertices[mdl.pulledVertexBase + vertex_id];
 
 	float3 local_pos = float3(v.px, v.py, v.pz) * scale;
+	float height_factor = saturate(v.py / max(mdl.geomExtentY, 0.01));
 
 	float c = cos(rotation);
 	float s = sin(rotation);
@@ -105,6 +107,31 @@ v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 	rotated.z = local_pos.x * s + local_pos.z * c;
 
 	float4 world_pos = float4(rotated + raw.pos, 1.0);
+
+	Texture2D wind_tex = GetBindlessTexture(wind_texture_index);
+	float wind_speed = max(g_wind_direction.y, 0.1);
+	float time = wave.w;
+
+	float wind_angle_rad = g_wind_direction.x * (M_PI / 180.0);
+	float2 global_wind_dir = float2(sin(wind_angle_rad), cos(wind_angle_rad));
+
+	float2 dir_uv = world_pos.zx * (0.005 / wind_speed) + time * (0.005 * wind_speed);
+	float wind_dir_noise = wind_tex.SampleLevel(g_LinearSampler, dir_uv, 0).r;
+
+	float2 str_uv = world_pos.xz * (0.025 / wind_speed) + time * 0.05;
+	float wind_str_noise = wind_tex.SampleLevel(g_LinearSampler, str_uv, 0).r;
+
+	float fbm_wind_strength = lerp(0.25, 1.0, wind_str_noise);
+	fbm_wind_strength *= fbm_wind_strength;
+	fbm_wind_strength *= wind_speed;
+
+	float fbm_turbulence = (wind_dir_noise * 2.0 - 1.0) * 0.3;
+	float2 perpendicular_dir = float2(-global_wind_dir.y, global_wind_dir.x);
+	float2 wind_dir = normalize(global_wind_dir + perpendicular_dir * fbm_turbulence);
+
+	float displacement = fbm_wind_strength * grass_wind_displacement * height_factor;
+	world_pos.x += displacement * wind_dir.x;
+	world_pos.z += displacement * wind_dir.y;
 
 	float2 uv = float2(v.u, v.v);
 
@@ -122,6 +149,11 @@ v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 	float hemi = abs(slot_hemi);
 	float sun = sign(slot_hemi) * 0.25 + 0.25;
 
+	float3 blade_facing = float3(sin(rotation), 0, cos(rotation));
+	float3 N = normalize(cross(float3(0, 1, 0), blade_facing));
+	if (N.y < 0) N = -N;
+	N = normalize(lerp(float3(0, 1, 0), N, 0.5));
+
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh = float4(uv, hemi, sun);
 #else
@@ -129,8 +161,12 @@ v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 #endif
 
 	O.position = float4(world_pos.xyz, hemi);
-	O.N = float3(0, 1, 0);
+	O.N = N;
+	O.heightParam = height_factor;
+	int2 bc = int2(floor(raw.pos.xz));
+	uint bh = asuint(bc.x * 73856093 + bc.y * 19349663);
+	bh ^= bh >> 16;
+	O.bladeHash = float(bh & 0xFFFFu) / 65535.0;
 	O.hpos = mul(g_detail_VP, world_pos);
-
 	return O;
 }
