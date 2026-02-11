@@ -34,9 +34,9 @@ struct DetailModelGPU
 	float uv_min_y;
 	float uv_max_x;
 	float uv_max_y;
-	uint decalVertexBase;
-	uint decalIndexCount;
-	uint pad;
+	uint pulledVertexBase;
+	uint pulledIndexCount;
+	float geomExtentY;
 };
 
 struct DecalPulledVertex
@@ -86,14 +86,14 @@ v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 
 	DetailModelGPU mdl = detail_models[object_id];
 
-	if (vertex_id >= mdl.decalIndexCount)
+	if (vertex_id >= mdl.pulledIndexCount)
 	{
 		O = (v2p_decal)0;
 		O.hpos = asfloat(0x7FC00000);
 		return O;
 	}
 
-	DecalPulledVertex v = decal_vertices[mdl.decalVertexBase + vertex_id];
+	DecalPulledVertex v = decal_vertices[mdl.pulledVertexBase + vertex_id];
 
 	float3 local_pos = float3(v.px, v.py, v.pz) * scale;
 
@@ -107,9 +107,6 @@ v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 	float4 world_pos = float4(rotated + raw.pos, 1.0);
 
 	float2 uv = float2(v.u, v.v);
-	uint flip = raw.packed;
-	if (flip & 1u) uv.x = mdl.uv_min_x + mdl.uv_max_x - uv.x;
-	if (flip & 2u) uv.y = mdl.uv_min_y + mdl.uv_max_y - uv.y;
 
 	const float slot_size = 2.0;
 	int slot_x = int(floor(raw.pos.x / slot_size));

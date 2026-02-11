@@ -50,7 +50,9 @@ cbuffer DetailCullParams : register(b5)
     float g_lod_distance_mid_sqr;
     float g_detail_density;
     uint g_visible_decal_capacity;
-    uint g_cull_pad0, g_cull_pad1, g_cull_pad2;
+    uint g_grass_mode;
+    uint g_visible_billboard_capacity;
+    uint g_cull_pad2;
 };
 
 struct DetailModelGPU
@@ -64,9 +66,9 @@ struct DetailModelGPU
     float uv_min_y;
     float uv_max_x;
     float uv_max_y;
-    uint decalVertexBase;
-    uint decalIndexCount;
-    uint pad;
+    uint pulledVertexBase;
+    uint pulledIndexCount;
+    float geomExtentY;
 };
 
 cbuffer InstanceGenParams : register(b6)

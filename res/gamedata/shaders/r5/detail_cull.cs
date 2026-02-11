@@ -32,9 +32,9 @@ struct DetailModelGPU
     float uv_min_y;
     float uv_max_x;
     float uv_max_y;
-    uint decalVertexBase;
-    uint decalIndexCount;
-    uint pad;
+    uint pulledVertexBase;
+    uint pulledIndexCount;
+    float geomExtentY;
 };
 
 cbuffer DetailCullParams : register(b5)
@@ -53,7 +53,9 @@ cbuffer DetailCullParams : register(b5)
     float g_lod_distance_mid_sqr;
     float g_detail_density;
     uint g_visible_decal_capacity;
-    uint g_cull_pad0, g_cull_pad1, g_cull_pad2;
+    uint g_grass_mode;
+    uint g_visible_billboard_capacity;
+    uint g_cull_pad2;
 };
 
 StructuredBuffer<InstanceData> g_all_instances : register(t0);
@@ -71,6 +73,8 @@ RWStructuredBuffer<uint> g_visible_lod2 : register(u4);
 RWByteAddressBuffer g_indirect_args_lod2 : register(u5);
 RWStructuredBuffer<uint> g_visible_decals : register(u6);
 RWByteAddressBuffer g_indirect_args_decal : register(u7);
+RWStructuredBuffer<uint> g_visible_billboard : register(u8);
+RWByteAddressBuffer g_indirect_args_billboard : register(u9);
 
 static const uint DO_NO_WAVING = 0x0001;
 
@@ -100,6 +104,14 @@ void AppendBladeLOD(float3 pos, uint inst_idx)
     }
 }
 
+void AppendBillboard(uint inst_idx)
+{
+    uint idx;
+    g_indirect_args_billboard.InterlockedAdd(4, 1, idx);
+    if (idx < g_visible_billboard_capacity)
+        g_visible_billboard[idx] = inst_idx;
+}
+
 void AppendDecal(uint inst_idx)
 {
     uint idx;
@@ -122,21 +134,28 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         float scale = float((inst.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
         uint object_id = inst.packed & 0x3F;
 
-        float bounds_radius = scale * 0.5;
+        DetailModelGPU mdl = g_detail_models[object_id];
+        float geom_half_height = mdl.geomExtentY * 0.5;
+        float bounds_radius = scale * max(geom_half_height, max(mdl.geomExtentX, mdl.geomExtentZ) * 0.5);
+        bounds_radius = max(bounds_radius, scale * 0.25);
+        float3 bounds_center = inst.pos + float3(0, scale * geom_half_height, 0);
 
-        if (!DistanceTestSphere(inst.pos, bounds_radius, g_camera_pos, g_fade_distance_sqr))
+        if (!DistanceTestSphere(bounds_center, bounds_radius, g_camera_pos, g_fade_distance_sqr))
             continue;
 
-        if (!FrustumTestSphere(inst.pos, bounds_radius, g_frustum_planes))
+        if (!FrustumTestSphere(bounds_center, bounds_radius, g_frustum_planes))
             continue;
 
-        if (!HiZTestSphereTemporal(inst.pos, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
+        if (!HiZTestSphereTemporal(bounds_center, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
                             g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
             continue;
 
-        uint flags = asuint(g_detail_models[object_id].flags);
-        if ((flags & DO_NO_WAVING) != 0)
+        uint flags = asuint(mdl.flags);
+        bool is_static = (flags & DO_NO_WAVING) != 0;
+        if (is_static)
             AppendDecal(inst_idx);
+        else if (g_grass_mode == 0)
+            AppendBillboard(inst_idx);
         else
             AppendBladeLOD(inst.pos, inst_idx);
     }

@@ -103,7 +103,9 @@ public:
         float lodDistanceMidSqr;
         float detailDensity;
         u32 visibleDecalCapacity;
-        u32 cullPad0, cullPad1, cullPad2;
+        u32 grassMode;
+        u32 visibleBillboardCapacity;
+        u32 cullPad2;
     };
 
     struct GrassObjectTint { float r, g, b, pad; };
@@ -126,9 +128,9 @@ public:
         float uv_min_y;
         float uv_max_x;
         float uv_max_y;
-        u32 decalVertexBase;
-        u32 decalIndexCount;
-        u32 pad;
+        u32 pulledVertexBase;
+        u32 pulledIndexCount;
+        float geomExtentY;
     };
     static_assert(sizeof(DetailModelGPU) == 48, "DetailModelGPU must be 48 bytes");
 
@@ -173,15 +175,17 @@ public:
     xr_vector<BladeVertex> bladeVertices[LOD_COUNT];
     xr_vector<u16> bladeIndices[LOD_COUNT];
 
-    nvrhi::BufferHandle decalPulledVertexBuffer;
-    nvrhi::BufferHandle decalIndexBuffer;
-    u32 maxDecalIndexCount = 0;
+    nvrhi::BufferHandle pulledVertexBuffer;
+    nvrhi::BufferHandle pulledIndexBuffer;
+    u32 maxPulledIndexCount = 0;
     xr_vector<DetailModelGPU> cachedModelGPUData;
 
     nvrhi::BufferHandle visibleInstancesBuffer[LOD_COUNT];
     nvrhi::BufferHandle drawArgsBuffer[LOD_COUNT];
     nvrhi::BufferHandle visibleDecalInstancesBuffer;
     nvrhi::BufferHandle decalDrawArgsBuffer;
+    nvrhi::BufferHandle visibleBillboardInstancesBuffer;
+    nvrhi::BufferHandle billboardDrawArgsBuffer;
     nvrhi::BufferHandle slotAABBBuffer;
 
     nvrhi::TextureHandle buildDetailsTexture;
@@ -205,12 +209,16 @@ public:
     nvrhi::ShaderHandle pixelShader;
     nvrhi::ShaderHandle decalVertexShader;
     nvrhi::ShaderHandle decalPixelShader;
+    nvrhi::ShaderHandle billboardVertexShader;
+    nvrhi::ShaderHandle billboardPixelShader;
 
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::BindingLayoutHandle graphicsBindingLayout;
     nvrhi::BindingLayoutHandle decalBindingLayout;
+    nvrhi::BindingLayoutHandle billboardBindingLayout;
     nvrhi::GraphicsPipelineHandle graphicsPipeline;
     nvrhi::GraphicsPipelineHandle decalGraphicsPipeline;
+    nvrhi::GraphicsPipelineHandle billboardGraphicsPipeline;
 
     u32 visibleBufferCapacity = 0;
 
@@ -232,8 +240,9 @@ public:
         u32 visibleLOD1Count = 0;
         u32 visibleLOD2Count = 0;
         u32 visibleDecalCount = 0;
+        u32 visibleBillboardCount = 0;
 
-        u32 totalVisible() const { return visibleLOD0Count + visibleLOD1Count + visibleLOD2Count; }
+        u32 totalVisible() const { return visibleLOD0Count + visibleLOD1Count + visibleLOD2Count + visibleBillboardCount; }
     };
 
     DetailCullingStats cullingStats;
@@ -350,7 +359,7 @@ private:
     IReader* dtFS = nullptr;
     int dither[16][16];
 
-    xr_vector<DecalPulledVertex> decalPulledVertexData;
+    xr_vector<DecalPulledVertex> pulledVertexData;
 
     struct PendingMipUpload { xr_vector<u8> data; u32 rowPitch; };
     xr_vector<PendingMipUpload> pendingBuildDetailsUploads;
