@@ -41,6 +41,7 @@ static nvrhi::BindingLayoutHandle s_terrainLayout;
 static nvrhi::ShaderHandle s_terrainPS;
 static bool s_terrainInitialized = false;
 
+
 static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer);
 
 void InitializeForwardPipelines(ng::RenderDevice* device)

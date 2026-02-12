@@ -29,6 +29,7 @@ struct MaterialData
 #define MAT_FLAG_HAS_PBR       (1 << 5)
 #define MAT_FLAG_TERRAIN       (1 << 6)
 #define MAT_FLAG_HAS_PBR_LAYER (1 << 7)
+#define MAT_FLAG_ALPHA_BLEND   (1 << 8)
 
 struct TerrainMaterialData
 {

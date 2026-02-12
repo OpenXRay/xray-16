@@ -943,6 +943,9 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\DetailPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1725,6 +1728,9 @@
       <Filter>Framegraph</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\DetailPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Externals\meshoptimizer\src\allocator.cpp">

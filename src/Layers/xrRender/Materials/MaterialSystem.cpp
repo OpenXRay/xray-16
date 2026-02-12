@@ -90,11 +90,13 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* 
         case BlendMode::Additive:
         case BlendMode::Multiply:
         case BlendMode::Multiply2X:
-            info.alphaTest = true;
-            info.alphaRef = blenderProps.alphaRef > 0 ? blenderProps.alphaRef : 1;
+            info.alphaTest = false;
+            info.alphaRef = 0;
             info.transparent = true;
             break;
         }
+        if (blenderProps.strictB2F)
+            info.transparent = true;
         m_stats.materialsFromBlender++;
 
         m_materialCache[key] = info;

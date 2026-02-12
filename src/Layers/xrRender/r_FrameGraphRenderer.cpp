@@ -29,6 +29,7 @@
 #include "GPUCullingManager.h"
 #include "FGDetailManager.h"
 #include "FrameGraphPasses/DetailPassSetup.h"
+#include "FrameGraphPasses/TransparentPassSetup.h"
 #include "Bindless/MaterialBuffer.h"
 #include "Bindless/TerrainMaterialBuffer.h"
 #include "FrameGraphPasses/SkyPassSetup.h"
@@ -752,6 +753,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.terrainCompactCountBuffer = m_gpuCullingManager->GetTerrainCompactCountBuffer();
             bindlessConfig.terrainObjectCount = m_gpuCullingManager->GetTerrainObjectCount();
         }
+
     }
 
     auto forwardOutputs = passes::setupForwardColorPass(
@@ -839,11 +841,31 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_gpuProfiler.get()
     );
 
+    passes::TransparentPassConfig transparentConfig;
+    if (m_gpuCullingManager && m_gpuCullingManager->GetTransparentObjectCount() > 0) {
+        transparentConfig.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
+        transparentConfig.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
+        transparentConfig.instanceBuffer = m_gpuCullingManager->GetTransparentInstanceBuffer();
+        transparentConfig.compactDrawArgsBuffer = m_gpuCullingManager->GetTransparentCompactDrawArgsBuffer();
+        transparentConfig.compactBatchIndicesBuffer = m_gpuCullingManager->GetTransparentCompactBatchIndicesBuffer();
+        transparentConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetTransparentCompactMaterialIDBuffer();
+        transparentConfig.compactCountBuffer = m_gpuCullingManager->GetTransparentCompactCountBuffer();
+        transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
+    }
+
+    auto transparentOutputs = passes::setupTransparentPass(
+        *m_framegraph,
+        m_device,
+        detailOutputs,
+        transparentConfig,
+        width, height
+    );
+
     passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();
     auto exposureOutput = passes::setupExposurePass(
         *m_framegraph,
         m_device,
-        detailOutputs.albedo,
+        transparentOutputs.albedo,
         exposureConfig,
         Device.fTimeDelta,
         width,
@@ -854,7 +876,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
-        detailOutputs.albedo,
+        transparentOutputs.albedo,
         width,
         height
     );

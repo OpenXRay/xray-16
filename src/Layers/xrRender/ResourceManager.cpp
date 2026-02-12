@@ -94,6 +94,7 @@ bool CResourceManager::GetBlenderProperties(LPCSTR shaderName, BlenderProperties
 
     const CLASS_ID cls = B->getDescription().CLS;
     outProps = {};
+    outProps.strictB2F = B->IsStrictSorting();
 
     if (cls == B_DEFAULT_AREF || cls == B_VERT_AREF)
     {

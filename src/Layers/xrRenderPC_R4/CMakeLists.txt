@@ -84,6 +84,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/SunPassSetup.cpp
     ../xrRender/FrameGraphPasses/DetailPassSetup.h
     ../xrRender/FrameGraphPasses/DetailPassSetup.cpp
+    ../xrRender/FrameGraphPasses/TransparentPassSetup.h
+    ../xrRender/FrameGraphPasses/TransparentPassSetup.cpp
 
     # Detail System (Framegraph) - Renderer agnostic
     ../xrRender/FGDetailManager.h

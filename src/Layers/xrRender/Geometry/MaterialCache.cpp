@@ -2596,6 +2596,9 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
             matData.flags |= MAT_FLAG_ALPHA_TEST;
             matData.alphaRef = matInfo.alphaRef / 255.0f;
         }
+        if (matInfo.transparent) {
+            matData.flags |= MAT_FLAG_ALPHA_BLEND;
+        }
         matData.flags |= MAT_FLAG_HAS_NORMAL;
     }
 

@@ -133,6 +133,12 @@ struct GPUCullOutput {
     framegraph::VirtualResourceHandle terrainCompactMaterialIDs;
     framegraph::VirtualResourceHandle terrainCompactCount;
     u32 terrainObjectCount;
+
+    framegraph::VirtualResourceHandle transparentCompactDrawArgs;
+    framegraph::VirtualResourceHandle transparentCompactBatchIndices;
+    framegraph::VirtualResourceHandle transparentCompactMaterialIDs;
+    framegraph::VirtualResourceHandle transparentCompactCount;
+    u32 transparentObjectCount;
 };
 
 struct GPUParticleCullOutput {
@@ -240,11 +246,19 @@ public:
     nvrhi::IBuffer* GetTerrainDrawArgsBuffer() const { return m_terrainDrawArgsBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainMaterialIDBuffer() const { return m_terrainMaterialIDBuffer.Get(); }
 
+    u32 GetTransparentObjectCount() const { return m_transparentSet.objectCount; }
+    nvrhi::IBuffer* GetTransparentInstanceBuffer() const { return m_transparentSet.instanceBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentCompactDrawArgsBuffer() const { return m_transparentSet.compactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentCompactBatchIndicesBuffer() const { return m_transparentSet.compactBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentCompactMaterialIDBuffer() const { return m_transparentSet.compactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentCompactCountBuffer() const { return m_transparentSet.compactCountBuffer.Get(); }
+
     struct CullingStats {
         u32 staticVisible = 0;
         u32 dynamicVisible = 0;
         u32 terrainVisible = 0;
-        u32 totalVisible() const { return staticVisible + dynamicVisible + terrainVisible; }
+        u32 transparentVisible = 0;
+        u32 totalVisible() const { return staticVisible + dynamicVisible + terrainVisible + transparentVisible; }
     };
     const CullingStats& GetCullingStats() const { return m_cullingStats; }
 
@@ -373,6 +387,8 @@ private:
     nvrhi::ComputePipelineHandle m_terrainApplyVisibilityPipeline;
     nvrhi::BindingLayoutHandle m_terrainApplyVisibilityLayout;
 
+    CullSetBuffers m_transparentSet;
+
     nvrhi::BufferHandle m_debugBuffer;
     nvrhi::BufferHandle m_debugComputeParamsCB;
     nvrhi::BufferHandle m_debugGraphicsParamsCB;
@@ -419,6 +435,11 @@ private:
     xr_vector<IndirectDrawArgs> m_terrainDrawArgsData;
     xr_vector<u32> m_terrainMaterialIDData;
     xr_vector<GPUInstanceData> m_terrainInstanceData;
+
+    xr_vector<GPUObjectData> m_transparentObjectData;
+    xr_vector<IndirectDrawArgs> m_transparentDrawArgsData;
+    xr_vector<u32> m_transparentMaterialIDData;
+    xr_vector<GPUInstanceData> m_transparentInstanceData;
 
     nvrhi::BufferHandle m_skinnedObjectBuffer;
     nvrhi::BufferHandle m_skinnedVisibilityBuffer;

@@ -163,6 +163,7 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\SkyPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\SunPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\DetailPassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.h" />
     <ClInclude Include="..\xrRender\FGDetailManager.h" />
     <ClInclude Include="..\..\..\Externals\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\xrRender\ImGuiRendererNVRHI.h" />
@@ -404,6 +405,7 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\SkyPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\SunPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\DetailPassSetup.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FGDetailManager.cpp" />
     <ClCompile Include="..\xrRender\ImGuiRendererNVRHI.cpp" />
     <ClCompile Include="..\xrRender\ImGuiRendererNVRHI_Shaders.cpp" />
