@@ -122,6 +122,7 @@ public:
         BlendMode blendMode = BlendMode::Opaque;
         u32 alphaRef = 0;           // 0-255 alpha threshold (for AlphaTest)
         bool writesDepth = true;    // Whether this shader writes to depth buffer
+        bool strictB2F = false;     // Requires back-to-front sorting (from oStrictSorting)
     };
     bool GetBlenderProperties(LPCSTR blenderName, BlenderProperties& outProps);
     //.	BOOL							_GetDetailTexture	(LPCSTR Name, LPCSTR& T, R_constant_setup* &M);

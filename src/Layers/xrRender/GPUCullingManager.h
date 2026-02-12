@@ -155,6 +155,13 @@ struct GPUCullOutput {
     framegraph::VirtualResourceHandle terrainCompactMaterialIDs;
     framegraph::VirtualResourceHandle terrainCompactCount;
     u32 terrainObjectCount;
+
+    // Transparent-specific outputs (alpha-blended geometry)
+    framegraph::VirtualResourceHandle transparentCompactDrawArgs;
+    framegraph::VirtualResourceHandle transparentCompactBatchIndices;
+    framegraph::VirtualResourceHandle transparentCompactMaterialIDs;
+    framegraph::VirtualResourceHandle transparentCompactCount;
+    u32 transparentObjectCount;
 };
 
 struct GPUParticleCullOutput {
@@ -317,6 +324,16 @@ public:
     nvrhi::IBuffer* GetTerrainMaterialIDBuffer() const { return m_terrainMaterialIDBuffer.Get(); }
 
     // ───────────────────────────────────────────────────────
+    //  TRANSPARENT-SPECIFIC BUFFERS
+    // ───────────────────────────────────────────────────────
+    u32 GetTransparentObjectCount() const { return m_transparentSet.objectCount; }
+    nvrhi::IBuffer* GetTransparentInstanceBuffer() const { return m_transparentSet.instanceBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentCompactDrawArgsBuffer() const { return m_transparentSet.compactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentCompactBatchIndicesBuffer() const { return m_transparentSet.compactBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentCompactMaterialIDBuffer() const { return m_transparentSet.compactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentCompactCountBuffer() const { return m_transparentSet.compactCountBuffer.Get(); }
+
+    // ───────────────────────────────────────────────────────
     //  CULLING STATS READBACK (for profiling overlay)
     // ───────────────────────────────────────────────────────
     // Returns previous frame's visible counts (1-frame latency to avoid GPU stall)
@@ -324,7 +341,8 @@ public:
         u32 staticVisible = 0;
         u32 dynamicVisible = 0;
         u32 terrainVisible = 0;
-        u32 totalVisible() const { return staticVisible + dynamicVisible + terrainVisible; }
+        u32 transparentVisible = 0;
+        u32 totalVisible() const { return staticVisible + dynamicVisible + terrainVisible + transparentVisible; }
     };
     const CullingStats& GetCullingStats() const { return m_cullingStats; }
 
@@ -492,6 +510,11 @@ private:
     nvrhi::BindingLayoutHandle m_terrainApplyVisibilityLayout;
 
     // ───────────────────────────────────────────────────────
+    //  TRANSPARENT CULLING SET (alpha-blended geometry)
+    // ───────────────────────────────────────────────────────
+    CullSetBuffers m_transparentSet;
+
+    // ───────────────────────────────────────────────────────
     //  DEBUG VISUALIZATION RESOURCES
     // ───────────────────────────────────────────────────────
     nvrhi::BufferHandle m_debugBuffer;                // CullDebugData for all objects
@@ -541,8 +564,14 @@ private:
     u32 m_maxTerrainObjects = 0;
     xr_vector<GPUObjectData> m_terrainObjectData;
     xr_vector<IndirectDrawArgs> m_terrainDrawArgsData;
-    xr_vector<u32> m_terrainMaterialIDData;      // Terrain material IDs (index into TerrainMaterialBuffer)
-    xr_vector<GPUInstanceData> m_terrainInstanceData;  // Terrain world transforms
+    xr_vector<u32> m_terrainMaterialIDData;
+    xr_vector<GPUInstanceData> m_terrainInstanceData;
+
+    // Transparent-specific CPU data
+    xr_vector<GPUObjectData> m_transparentObjectData;
+    xr_vector<IndirectDrawArgs> m_transparentDrawArgsData;
+    xr_vector<u32> m_transparentMaterialIDData;
+    xr_vector<GPUInstanceData> m_transparentInstanceData;
 
     // ───────────────────────────────────────────────────────
     //  SKINNED MESH CULLING (GPU-Driven)

@@ -31,6 +31,7 @@
 #include "GPUCullingManager.h"                       // Phase 3.5: GPU frustum/occlusion culling
 #include "FGDetailManager.h"                         // Detail system (grass/vegetation)
 #include "FrameGraphPasses/DetailPassSetup.h"        // Detail rendering pass
+#include "FrameGraphPasses/TransparentPassSetup.h"   // Transparent alpha-blended geometry (after detail)
 // SM6 bindless: Textures registered directly with D3D12Backend via RegisterBindlessTexture()
 #include "Bindless/MaterialBuffer.h"                 // Bindless material buffer
 #include "Bindless/TerrainMaterialBuffer.h"          // Terrain material buffer
@@ -1053,6 +1054,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.terrainCompactCountBuffer = m_gpuCullingManager->GetTerrainCompactCountBuffer();
             bindlessConfig.terrainObjectCount = m_gpuCullingManager->GetTerrainObjectCount();
         }
+
     }
 
     auto forwardOutputs = passes::setupForwardColorPass(
@@ -1165,6 +1167,31 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
 
     // ═══════════════════════════════════════════════════════
+    //  TRANSPARENT PASS (alpha-blended geometry)
+    // ═══════════════════════════════════════════════════════
+    // Renders AFTER detail so grass depth is already written.
+    // Depth test on, depth write off, SrcAlpha/InvSrcAlpha blend.
+    passes::TransparentPassConfig transparentConfig;
+    if (m_gpuCullingManager && m_gpuCullingManager->GetTransparentObjectCount() > 0) {
+        transparentConfig.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
+        transparentConfig.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
+        transparentConfig.instanceBuffer = m_gpuCullingManager->GetTransparentInstanceBuffer();
+        transparentConfig.compactDrawArgsBuffer = m_gpuCullingManager->GetTransparentCompactDrawArgsBuffer();
+        transparentConfig.compactBatchIndicesBuffer = m_gpuCullingManager->GetTransparentCompactBatchIndicesBuffer();
+        transparentConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetTransparentCompactMaterialIDBuffer();
+        transparentConfig.compactCountBuffer = m_gpuCullingManager->GetTransparentCompactCountBuffer();
+        transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
+    }
+
+    auto transparentOutputs = passes::setupTransparentPass(
+        *m_framegraph,
+        m_device,
+        detailOutputs,
+        transparentConfig,
+        width, height
+    );
+
+    // ═══════════════════════════════════════════════════════
     //  EXPOSURE PASS (Auto-Exposure / Eye Adaptation)
     // ═══════════════════════════════════════════════════════
     // Computes scene exposure using histogram-based analysis.
@@ -1175,7 +1202,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     auto exposureOutput = passes::setupExposurePass(
         *m_framegraph,
         m_device,
-        detailOutputs.albedo,     // HDR scene color for histogram (after detail pass)
+        transparentOutputs.albedo,  // HDR scene color (after transparent pass)
         exposureConfig,
         Device.fTimeDelta,       // Frame delta for temporal adaptation
         width,
@@ -1189,7 +1216,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // 4. UI Pass - Renders 2D UI directly to scene HDR target with alpha blending
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
-        detailOutputs.albedo,  // Scene + HUD + Particles + Details (HDR)
+        transparentOutputs.albedo,  // Scene + HUD + Particles + Details + Transparent (HDR)
         width,
         height
     );

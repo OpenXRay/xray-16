@@ -390,6 +390,77 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
     Msg("* [GPUCulling] Terrain buffers created (max: %u objects)", m_maxTerrainObjects);
 
     // ───────────────────────────────────────────────────────
+    //  TRANSPARENT CULLING SET (reuses CullSetBuffers pattern)
+    // ───────────────────────────────────────────────────────
+    {
+        const u32 maxTransparent = 4096;
+        m_transparentSet.maxObjects = maxTransparent;
+
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_Transparent_Objects";
+        desc.byteSize = maxTransparent * sizeof(GPUObjectData);
+        desc.structStride = sizeof(GPUObjectData);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        m_transparentSet.objectBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Transparent_VisibleIndices";
+        desc.byteSize = maxTransparent * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.visibleIndexBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Transparent_VisibleCount";
+        desc.byteSize = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.visibleCountBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Transparent_DrawArgs";
+        desc.byteSize = maxTransparent * sizeof(IndirectDrawArgs);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.drawArgsBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Transparent_Visibility";
+        desc.byteSize = maxTransparent * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.visibilityBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Transparent_MaterialIDs";
+        desc.byteSize = maxTransparent * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        m_transparentSet.materialIDBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Transparent_InstanceData";
+        desc.byteSize = maxTransparent * sizeof(GPUInstanceData);
+        desc.structStride = sizeof(GPUInstanceData);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        m_transparentSet.instanceBuffer = nvDevice->createBuffer(desc);
+
+        Msg("* [GPUCulling] Transparent buffers created (max: %u objects)", maxTransparent);
+    }
+
+    // ───────────────────────────────────────────────────────
     //  SKINNED MESH CULLING BUFFERS
     // ───────────────────────────────────────────────────────
     CreateSkinnedCullingBuffers(device);
@@ -830,6 +901,78 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
         }
     }
 
+    // Transparent compaction buffers (same pattern as static/dynamic)
+    {
+        const u32 maxTrans = m_transparentSet.maxObjects;
+        u32 maxTransGroups = (maxTrans + COMPACT_THREAD_GROUP_SIZE - 1) / COMPACT_THREAD_GROUP_SIZE;
+        R_ASSERT2(maxTransGroups > 0, "Transparent compaction group count must be non-zero");
+        R_ASSERT2(maxTransGroups <= COMPACT_THREAD_GROUP_SIZE, "Transparent compaction group count exceeds scan group size");
+
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_Trans_CompactDrawArgs";
+        desc.byteSize = maxTrans * sizeof(IndirectDrawArgs);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.compactDrawArgsBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Trans_CompactBatchIndices";
+        desc.byteSize = maxTrans * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.compactBatchIndicesBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Trans_CompactMaterialIDs";
+        desc.byteSize = maxTrans * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.compactMaterialIDBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Trans_CompactCount";
+        desc.byteSize = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.compactCountBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Trans_CompactLocalPrefix";
+        desc.byteSize = maxTrans * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.compactLocalPrefixBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Trans_CompactGroupCounts";
+        desc.byteSize = maxTransGroups * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.compactGroupCountsBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
+        desc.debugName = "GPUCull_Trans_CompactGroupOffsets";
+        desc.byteSize = maxTransGroups * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.compactGroupOffsetsBuffer = nvDevice->createBuffer(desc);
+    }
+
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_CompactParams";
@@ -1010,6 +1153,8 @@ void GPUCullingManager::Shutdown()
     m_dynamicSet.maxObjects = 0;
     m_dynamicSet.drawArgsUploaded = false;
     m_dynamicSet.objectsUploaded = false;
+
+    m_transparentSet = {};
 
     m_cullParamsCB = nullptr;
     m_cullPipeline = nullptr;
@@ -1245,13 +1390,19 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
 
     // Terrain-specific arrays
     m_terrainObjectData.clear();
-    m_terrainObjectData.reserve(totalBatches / 4);  // Terrain is typically ~25% of batches
+    m_terrainObjectData.reserve(totalBatches / 4);
     m_terrainDrawArgsData.clear();
     m_terrainDrawArgsData.reserve(totalBatches / 4);
     m_terrainMaterialIDData.clear();
     m_terrainMaterialIDData.reserve(totalBatches / 4);
     m_terrainInstanceData.clear();
     m_terrainInstanceData.reserve(totalBatches / 4);
+
+    // Transparent-specific arrays
+    m_transparentObjectData.clear();
+    m_transparentDrawArgsData.clear();
+    m_transparentMaterialIDData.clear();
+    m_transparentInstanceData.clear();
 
     auto appendBatch = [&](const GeometryBatch& batch,
                            xr_vector<GPUObjectData>& objectData,
@@ -1361,6 +1512,11 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
             inst.pad0 = 0.0f;
             inst.pad1 = 0.0f;
             m_terrainInstanceData.push_back(inst);
+            continue;
+        }
+
+        if (batch.IsStrictB2F()) {
+            appendBatch(batch, m_transparentObjectData, m_transparentDrawArgsData, m_transparentMaterialIDData, m_transparentInstanceData);
             continue;
         }
 
@@ -1565,7 +1721,41 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         }
     }
 
-    // Upload instance data (world matrices) handled above for static/dynamic sets
+    // ─────────────────────────────────────────────────────
+    //  TRANSPARENT BUFFER UPLOADS (every frame)
+    // ─────────────────────────────────────────────────────
+    //  TRANSPARENT GPU UPLOAD (per-frame, like dynamic)
+    // ─────────────────────────────────────────────────────
+    m_transparentSet.objectCount = std::min(static_cast<u32>(m_transparentObjectData.size()), m_transparentSet.maxObjects);
+
+    if (m_transparentSet.objectCount > 0 && m_transparentSet.objectBuffer && m_transparentSet.drawArgsBuffer) {
+        for (auto& args : m_transparentDrawArgsData)
+            args.instanceCount = 1;
+
+        cmdList->beginTrackingBufferState(m_transparentSet.objectBuffer, nvrhi::ResourceStates::CopyDest);
+        cmdList->writeBuffer(m_transparentSet.objectBuffer,
+            m_transparentObjectData.data(),
+            m_transparentSet.objectCount * sizeof(GPUObjectData));
+        cmdList->setBufferState(m_transparentSet.objectBuffer, nvrhi::ResourceStates::ShaderResource);
+
+        cmdList->beginTrackingBufferState(m_transparentSet.drawArgsBuffer, nvrhi::ResourceStates::CopyDest);
+        cmdList->writeBuffer(m_transparentSet.drawArgsBuffer,
+            m_transparentDrawArgsData.data(),
+            m_transparentSet.objectCount * sizeof(IndirectDrawArgs));
+        cmdList->setBufferState(m_transparentSet.drawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
+
+        cmdList->beginTrackingBufferState(m_transparentSet.materialIDBuffer, nvrhi::ResourceStates::CopyDest);
+        cmdList->writeBuffer(m_transparentSet.materialIDBuffer,
+            m_transparentMaterialIDData.data(),
+            m_transparentSet.objectCount * sizeof(u32));
+        cmdList->setBufferState(m_transparentSet.materialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+
+        cmdList->beginTrackingBufferState(m_transparentSet.instanceBuffer, nvrhi::ResourceStates::CopyDest);
+        cmdList->writeBuffer(m_transparentSet.instanceBuffer,
+            m_transparentInstanceData.data(),
+            m_transparentSet.objectCount * sizeof(GPUInstanceData));
+        cmdList->setBufferState(m_transparentSet.instanceBuffer, nvrhi::ResourceStates::ShaderResource);
+    }
 }
 
 void GPUCullingManager::InvalidateStaticCullingData()
@@ -1878,6 +2068,11 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     output.terrainCompactMaterialIDs = VirtualResourceHandle();
     output.terrainCompactCount = VirtualResourceHandle();
     output.terrainObjectCount = 0;
+    output.transparentCompactDrawArgs = VirtualResourceHandle();
+    output.transparentCompactBatchIndices = VirtualResourceHandle();
+    output.transparentCompactMaterialIDs = VirtualResourceHandle();
+    output.transparentCompactCount = VirtualResourceHandle();
+    output.transparentObjectCount = 0;
 
     // Early out if not enabled
     if (!m_computeEnabled) {
@@ -2306,6 +2501,11 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 cmdList->setBufferState(mgr->m_terrainCompactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
                 cmdList->setBufferState(mgr->m_terrainCompactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
             }
+
+            // ─────────────────────────────────────────────────────
+            //  TRANSPARENT CULLING (uses CullSetBuffers + dispatchCullSet)
+            // ─────────────────────────────────────────────────────
+            dispatchCullSet(mgr->m_transparentSet);
         }
     );
 
@@ -2410,6 +2610,53 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
         output.terrainCompactBatchIndices = VirtualResourceHandle();
         output.terrainCompactMaterialIDs = VirtualResourceHandle();
         output.terrainCompactCount = VirtualResourceHandle();
+    }
+
+    // ───────────────────────────────────────────────────────
+    //  TRANSPARENT OUTPUT HANDLES
+    // ───────────────────────────────────────────────────────
+    output.transparentObjectCount = m_transparentSet.objectCount;
+
+    if (m_transparentSet.objectCount > 0 && m_compactEnabled) {
+        ResourceDesc transCompactArgsDesc;
+        transCompactArgsDesc.type = ResourceDesc::Type::Buffer;
+        transCompactArgsDesc.debugName = "GPUCull_TransCompactDrawArgs";
+        transCompactArgsDesc.bufferSize = m_transparentSet.maxObjects * sizeof(IndirectDrawArgs);
+        transCompactArgsDesc.isUAV = true;
+        transCompactArgsDesc.isTransient = false;
+
+        ResourceDesc transCompactIndicesDesc;
+        transCompactIndicesDesc.type = ResourceDesc::Type::Buffer;
+        transCompactIndicesDesc.debugName = "GPUCull_TransCompactBatchIndices";
+        transCompactIndicesDesc.bufferSize = m_transparentSet.maxObjects * sizeof(u32);
+        transCompactIndicesDesc.structStride = sizeof(u32);
+        transCompactIndicesDesc.isUAV = true;
+        transCompactIndicesDesc.isTransient = false;
+
+        ResourceDesc transCompactMaterialDesc;
+        transCompactMaterialDesc.type = ResourceDesc::Type::Buffer;
+        transCompactMaterialDesc.debugName = "GPUCull_TransCompactMaterialIDs";
+        transCompactMaterialDesc.bufferSize = m_transparentSet.maxObjects * sizeof(u32);
+        transCompactMaterialDesc.structStride = sizeof(u32);
+        transCompactMaterialDesc.isUAV = true;
+        transCompactMaterialDesc.isTransient = false;
+
+        ResourceDesc transCompactCountDesc;
+        transCompactCountDesc.type = ResourceDesc::Type::Buffer;
+        transCompactCountDesc.debugName = "GPUCull_TransCompactCount";
+        transCompactCountDesc.bufferSize = sizeof(u32);
+        transCompactCountDesc.isUAV = true;
+        transCompactCountDesc.isTransient = false;
+
+        output.transparentCompactDrawArgs = fg.ImportBuffer("gpu_cull_trans_compact_drawargs", m_transparentSet.compactDrawArgsBuffer, transCompactArgsDesc);
+        output.transparentCompactBatchIndices = fg.ImportBuffer("gpu_cull_trans_compact_batchindices", m_transparentSet.compactBatchIndicesBuffer, transCompactIndicesDesc);
+        output.transparentCompactMaterialIDs = fg.ImportBuffer("gpu_cull_trans_compact_materialids", m_transparentSet.compactMaterialIDBuffer, transCompactMaterialDesc);
+        output.transparentCompactCount = fg.ImportBuffer("gpu_cull_trans_compact_count", m_transparentSet.compactCountBuffer, transCompactCountDesc);
+    } else {
+        output.transparentCompactDrawArgs = VirtualResourceHandle();
+        output.transparentCompactBatchIndices = VirtualResourceHandle();
+        output.transparentCompactMaterialIDs = VirtualResourceHandle();
+        output.transparentCompactCount = VirtualResourceHandle();
     }
 
     return output;

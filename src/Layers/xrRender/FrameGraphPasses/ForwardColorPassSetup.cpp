@@ -52,6 +52,7 @@ static nvrhi::BindingLayoutHandle s_terrainLayout;
 static nvrhi::ShaderHandle s_terrainPS;
 static bool s_terrainInitialized = false;
 
+
 // ═══════════════════════════════════════════════════════════════════════════
 //  FORWARD DECLARATIONS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -834,6 +835,7 @@ void renderBindlessForward(
         }
     }
 
+    // Transparent geometry is rendered in a separate TransparentPass (after Detail pass)
     // Skinned meshes are rendered in the SkinningPass (see SkinningPassSetup.cpp)
 }
 

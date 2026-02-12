@@ -3316,11 +3316,11 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
         const auto& matInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName.c_str(), visual->textureName.c_str());
         if (matInfo.alphaTest) {
             matData.flags |= MAT_FLAG_ALPHA_TEST;
-            // Use actual alphaRef from blender, normalized to 0.0-1.0
             matData.alphaRef = matInfo.alphaRef / 255.0f;
         }
-        // Note: Normal map detection would need texture probing or metadata
-        // For now, assume materials have normals (common case)
+        if (matInfo.transparent) {
+            matData.flags |= MAT_FLAG_ALPHA_BLEND;
+        }
         matData.flags |= MAT_FLAG_HAS_NORMAL;
     }
 

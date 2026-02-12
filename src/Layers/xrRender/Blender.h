@@ -61,6 +61,7 @@ public:
     // Alpha properties for bindless material system
     virtual int getAREF() { return 0; }
     virtual bool getBlend() { return false; }
+    bool IsStrictSorting() const { return oStrictSorting.value; }
 
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);

@@ -90,7 +90,6 @@ struct BindlessForwardConfig {
     nvrhi::IBuffer* terrainCompactCountBuffer = nullptr;        // Terrain compact visible count
     u32 terrainObjectCount = 0;                          // Number of terrain objects
 
-    // Check if GPU-driven culled rendering is available
     bool UseGPUCulling() const {
         return enabled && (staticSet.IsValid() || dynamicSet.IsValid());
     }
@@ -104,7 +103,6 @@ struct BindlessForwardConfig {
             terrainCompactMaterialIDBuffer && terrainCompactCountBuffer;
     }
 
-    // Check if terrain rendering is available
     bool HasTerrain() const {
         return terrainObjectCount > 0 && (terrainDrawArgsBuffer || terrainCompactDrawArgsBuffer);
     }

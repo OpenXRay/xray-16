@@ -96,6 +96,7 @@ bool CResourceManager::GetBlenderProperties(LPCSTR shaderName, BlenderProperties
 
     const CLASS_ID cls = B->getDescription().CLS;
     outProps = {};  // Reset to defaults
+    outProps.strictB2F = B->IsStrictSorting();
 
     // B_DEFAULT_AREF / B_VERT_AREF - alpha ref blenders (oAREF, oBlend)
     if (cls == B_DEFAULT_AREF || cls == B_VERT_AREF)
