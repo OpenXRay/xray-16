@@ -3,6 +3,8 @@
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
+#include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 
 using namespace xray::render::resources;
 using namespace xray::render::framegraph;
@@ -40,6 +42,8 @@ void MaterialSystem::Initialize(resources::FGResourceManager* fgResourceManager,
     m_defaultMaterialInfo = MaterialInfo{};
     m_emptyTextureSet = TextureSet{};
 
+    ShaderVariantRegistry::Instance().Initialize();
+
     m_initialized = true;
     Msg("* [MaterialSystem] Initialized");
 }
@@ -49,6 +53,8 @@ void MaterialSystem::Shutdown()
     if (!m_initialized)
         return;
 
+    VariantPSOCache::Instance().Shutdown();
+    ShaderVariantRegistry::Instance().Shutdown();
     ClearCaches();
 
     m_fgResourceManager = nullptr;
@@ -98,9 +104,21 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* 
         if (blenderProps.strictB2F)
             info.transparent = true;
         m_stats.materialsFromBlender++;
+    }
 
-        m_materialCache[key] = info;
-        return m_materialCache[key];
+    auto& registry = ShaderVariantRegistry::Instance();
+    u32 variantIdx = registry.GetVariantIndex(shaderName);
+    if (variantIdx > 0)
+    {
+        const auto* variant = registry.GetVariantByIndex(variantIdx);
+        info.shaderVariant = variantIdx;
+        if (variant->transparent)
+            info.transparent = true;
+        if (!variant->passes.empty() && variant->passes[0].hasAlphaTestOverride)
+        {
+            info.alphaTest = true;
+            info.alphaRef = variant->passes[0].alphaTestRef;
+        }
     }
 
     m_materialCache[key] = info;
@@ -109,17 +127,11 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* 
 
 MaterialSystem::MaterialInfo MaterialSystem::GetDefaultMaterialInfo() const
 {
-    return MaterialInfo{
-        false,
-        0,
-        false,
-        1,
-        0.0f,
-        0.5f,
-        1.0f,
-        false,
-        false
-    };
+    MaterialInfo info{};
+    info.priority = 1;
+    info.roughness = 0.5f;
+    info.aoScale = 1.0f;
+    return info;
 }
 
 void MaterialSystem::PreloadMaterialTextures(const char* textureName)

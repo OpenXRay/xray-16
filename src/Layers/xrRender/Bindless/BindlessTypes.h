@@ -32,7 +32,7 @@ struct alignas(16) MaterialData {
     float detailScale;
     float alphaRef;
     u32 flags;
-    float padding;
+    u32 shaderVariant;
 };
 static_assert(sizeof(MaterialData) == 32, "MaterialData must be 32 bytes for GPU alignment");
 

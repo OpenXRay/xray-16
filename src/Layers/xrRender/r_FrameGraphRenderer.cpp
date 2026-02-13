@@ -32,6 +32,7 @@
 #include "FrameGraphPasses/TransparentPassSetup.h"
 #include "Bindless/MaterialBuffer.h"
 #include "Bindless/TerrainMaterialBuffer.h"
+#include "Bindless/VariantTextureBuffer.h"
 #include "FrameGraphPasses/SkyPassSetup.h"
 #include "FrameGraphPasses/SunPassSetup.h"
 #include "FrameGraphPasses/SkinningPassSetup.h"
@@ -108,6 +109,7 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     bindless::MaterialBuffer::Instance().Initialize(m_device);
     bindless::TerrainMaterialBuffer::Instance().Initialize(m_device);
+    bindless::VariantTextureBuffer::Instance().Initialize(m_device);
     bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);
     Msg("* [FrameGraphRenderer] Bindless material buffers initialized (early)");
 
@@ -182,6 +184,10 @@ void FrameGraphRenderer::Shutdown() {
     passes::ShutdownSkyGeometry();
     passes::ShutdownSunPass();
     passes::ShutdownTonemapPass();
+
+    bindless::VariantTextureBuffer::Instance().Shutdown();
+    bindless::MaterialBuffer::Instance().Shutdown();
+    bindless::TerrainMaterialBuffer::Instance().Shutdown();
 
     m_device = nullptr;
 }
@@ -754,6 +760,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.terrainObjectCount = m_gpuCullingManager->GetTerrainObjectCount();
         }
 
+        if (m_gpuCullingManager->IsVariantPartitionEnabled())
+            bindlessConfig.variantPartition = m_gpuCullingManager->GetStaticPartition().ToConfig();
     }
 
     auto forwardOutputs = passes::setupForwardColorPass(
@@ -851,6 +859,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         transparentConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetTransparentCompactMaterialIDBuffer();
         transparentConfig.compactCountBuffer = m_gpuCullingManager->GetTransparentCompactCountBuffer();
         transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
+
+        if (m_gpuCullingManager->IsVariantPartitionEnabled())
+            transparentConfig.variantPartition = m_gpuCullingManager->GetTransparentPartition().ToConfig();
     }
 
     auto transparentOutputs = passes::setupTransparentPass(

@@ -1,18 +1,11 @@
 #pragma once
 
+#include "GPUStructuredBuffer.h"
 #include "BindlessTypes.h"
-#include <nvrhi/nvrhi.h>
-
-namespace xray::render {
-    namespace ng {
-        class RenderDevice;
-        class RenderContext;
-    }
-}
 
 namespace xray::render::RENDER_NAMESPACE::bindless {
 
-class MaterialBuffer {
+class MaterialBuffer : public GPUStructuredBuffer<MaterialData> {
 public:
     static MaterialBuffer& Instance();
 
@@ -20,33 +13,20 @@ public:
     void Shutdown();
 
     u32 RegisterMaterial(const MaterialData& material);
-
     void UpdateMaterial(u32 materialID, const MaterialData& material);
-
-    const MaterialData* GetMaterial(u32 materialID) const;
-
-    void Upload(ng::RenderContext* ctx);
-
-    nvrhi::IBuffer* GetBuffer() const { return m_buffer.Get(); }
+    const MaterialData* GetMaterial(u32 materialID) const { return Get(materialID); }
 
     u32 GetMaterialCount() const { return m_materialCount; }
 
-    bool IsInitialized() const { return m_initialized; }
+    u32 GetShaderVariant(u32 materialID) const {
+        const auto* mat = GetMaterial(materialID);
+        return mat ? mat->shaderVariant : 0;
+    }
 
 private:
-    MaterialBuffer();
-    ~MaterialBuffer();
+    MaterialBuffer() = default;
 
-    ng::RenderDevice* m_device = nullptr;
-    nvrhi::BufferHandle m_buffer;
-    bool m_initialized = false;
-
-    xr_vector<MaterialData> m_materials;
     u32 m_materialCount = 0;
-
-    bool m_fullUploadNeeded = true;
-    u32 m_dirtyRangeStart = 0;
-    u32 m_dirtyRangeEnd = 0;
 };
 
 class DrawMaterialIDBuffer {
@@ -57,15 +37,13 @@ public:
     void Shutdown();
 
     void SetMaterialID(u32 drawIndex, u32 materialID);
-
     void Upload(ng::RenderContext* ctx, u32 drawCount);
 
     nvrhi::IBuffer* GetBuffer() const { return m_buffer.Get(); }
-
     bool IsInitialized() const { return m_initialized; }
 
 private:
-    DrawMaterialIDBuffer();
+    DrawMaterialIDBuffer() = default;
     ~DrawMaterialIDBuffer();
 
     ng::RenderDevice* m_device = nullptr;

@@ -15,7 +15,10 @@
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
+#include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
+#include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "xrCore/FMesh.hpp"
 
 extern ENGINE_API float psHUD_FOV;
@@ -128,6 +131,7 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),
         nvrhi::BindingLayoutItem::Sampler(0),
     };
     s_skinnedLayout = nvDevice->createBindingLayout(skinnedLayoutDesc);
@@ -441,6 +445,30 @@ static nvrhi::IGraphicsPipeline* SelectSkinnedPipeline(u32 vertexStride, u16 ren
     return s_skinnedPipeline.Get();
 }
 
+static u32 GetSkinnedVertexFormatID(u16 renderMode, u32 vertexStride)
+{
+    if (renderMode == RM_SKINNING_3B || renderMode == RM_SKINNING_3B_HQ) return VF_SKINNED_HQ3W;
+    if (renderMode == RM_SKINNING_2B || renderMode == RM_SKINNING_2B_HQ) return VF_SKINNED_HQ2W;
+    if (renderMode == RM_SKINNING_4B || renderMode == RM_SKINNING_4B_HQ) return VF_SKINNED_HQ4W;
+    if (renderMode == RM_SKINNING_1B_HQ || renderMode == RM_SINGLE_HQ) return VF_SKINNED_HQ1W;
+    if (renderMode == RM_SKINNING_1B || renderMode == RM_SINGLE) return VF_SKINNED_NONHQ;
+    if (vertexStride == 36) return VF_SKINNED_HQ1W;
+    if (vertexStride == 40) return VF_SKINNED_HQ4W;
+    if (vertexStride == 44) return VF_SKINNED_HQ2W;
+    return VF_SKINNED_NONHQ;
+}
+
+static nvrhi::IInputLayout* GetSkinnedInputLayout(u32 fmt)
+{
+    switch (fmt) {
+    case VF_SKINNED_HQ1W: return s_skinnedHQ1WInputLayout.Get();
+    case VF_SKINNED_HQ4W: return s_skinnedHQ4WInputLayout.Get();
+    case VF_SKINNED_HQ2W: return s_skinnedHQ2WInputLayout.Get();
+    case VF_SKINNED_HQ3W: return s_skinnedHQ3WInputLayout.Get();
+    default: return s_skinnedInputLayout.Get();
+    }
+}
+
 static u32 GetSkeletonBoneOffset(
     nvrhi::ICommandList* cmdList,
     GPUCullingManager& gpuCullMgr,
@@ -473,6 +501,7 @@ static void RenderSkinnedBatch(
     nvrhi::IBuffer* globalBoneBuffer,
     nvrhi::IBuffer* terrainMaterialsSB,
     nvrhi::IDescriptorTable* bindlessTable,
+    nvrhi::IBindingLayout* bindlessLayout,
     const nvrhi::Viewport& viewport,
     const nvrhi::Rect& scissor,
     const GeometryBatch& batch,
@@ -482,14 +511,8 @@ static void RenderSkinnedBatch(
     using namespace RENDER_NAMESPACE;
     using namespace RENDER_NAMESPACE::bindless;
 
-    if (!batch.vertexBuffer || !batch.indexBuffer) {
+    if (!batch.vertexBuffer || !batch.indexBuffer)
         return;
-    }
-
-    nvrhi::IGraphicsPipeline* pipeline = SelectSkinnedPipeline(batch.vertexStride, batch.skinningRenderMode);
-    if (!pipeline) {
-        return;
-    }
 
     DynamicTransforms dynTransData = {};
     FillDynamicTransforms(dynTransData, worldMatrix);
@@ -507,9 +530,8 @@ static void RenderSkinnedBatch(
     matIdData.materialID = batch.bindlessMaterialID;
     cmdList->writeBuffer(materialIdCB, &matIdData, sizeof(matIdData));
 
-    if (!globalBoneBuffer) {
+    if (!globalBoneBuffer)
         return;
-    }
 
     auto& matBuffer = MaterialBuffer::Instance();
     nvrhi::BindingSetDesc bindDesc;
@@ -522,33 +544,53 @@ static void RenderSkinnedBatch(
         nvrhi::BindingSetItem::ConstantBuffer(4, materialIdCB),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMaterialsSB),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(10, bindless::VariantTextureBuffer::Instance().GetBuffer()),
         nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
     };
     auto bindingSet = nvDevice->createBindingSet(bindDesc, s_skinnedLayout);
-    if (!bindingSet) {
+    if (!bindingSet)
         return;
+
+    u32 variantIdx = MaterialBuffer::Instance().GetShaderVariant(batch.bindlessMaterialID);
+    const ShaderVariantDesc* variant = nullptr;
+    u32 passCount = 1;
+    if (variantIdx > 0) {
+        variant = ShaderVariantRegistry::Instance().GetVariantByIndex(variantIdx);
+        if (variant)
+            passCount = variant->GetPassCount();
     }
 
-    nvrhi::GraphicsState state;
-    state.pipeline = pipeline;
-    state.framebuffer = framebuffer;
-    state.bindings = { bindingSet };
-    if (bindlessTable) {
-        state.addBindingSet(bindlessTable);
+    for (u32 p = 0; p < passCount; p++) {
+        nvrhi::IGraphicsPipeline* pipeline;
+        if (variant) {
+            u32 fmt = GetSkinnedVertexFormatID(batch.skinningRenderMode, batch.vertexStride);
+            pipeline = VariantPSOCache::Instance().GetOrCreatePSO(
+                nvDevice, framebuffer, variantIdx, *variant, p, fmt,
+                GetSkinnedInputLayout(fmt), s_skinnedLayout, bindlessLayout);
+        } else {
+            pipeline = SelectSkinnedPipeline(batch.vertexStride, batch.skinningRenderMode);
+        }
+        if (!pipeline)
+            continue;
+
+        nvrhi::GraphicsState state;
+        state.pipeline = pipeline;
+        state.framebuffer = framebuffer;
+        state.bindings = { bindingSet };
+        if (bindlessTable)
+            state.addBindingSet(bindlessTable);
+        state.vertexBuffers = { {batch.vertexBuffer, 0, 0} };
+        state.indexBuffer = { batch.indexBuffer, nvrhi::Format::R16_UINT, 0 };
+        state.viewport.addViewport(viewport);
+        state.viewport.addScissorRect(scissor);
+
+        cmdList->setGraphicsState(state);
+        cmdList->drawIndexed(
+            nvrhi::DrawArguments()
+                .setVertexCount(batch.indexCount)
+                .setStartIndexLocation(batch.startIndex)
+                .setStartVertexLocation(batch.baseVertex));
     }
-    state.vertexBuffers = { {batch.vertexBuffer, 0, 0} };
-    state.indexBuffer = { batch.indexBuffer, nvrhi::Format::R16_UINT, 0 };
-    state.viewport.addViewport(viewport);
-    state.viewport.addScissorRect(scissor);
-
-    cmdList->setGraphicsState(state);
-
-    cmdList->drawIndexed(
-        nvrhi::DrawArguments()
-            .setVertexCount(batch.indexCount)
-            .setStartIndexLocation(batch.startIndex)
-            .setStartVertexLocation(batch.baseVertex)
-    );
 }
 
 framegraph::DefaultOutputLayout setupSkinningPass(
@@ -714,6 +756,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
             auto* backend = data.device->GetBackend();
             nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
+            nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
 
             nvrhi::Rect scissor(rtDesc.width, rtDesc.height);
 
@@ -752,7 +795,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                             cmdList, nvDevice, framebuffer,
                             dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
                             globalBoneBuffer, terrainMatBuffer.GetBuffer(),
-                            bindlessTable, worldViewport, scissor,
+                            bindlessTable, bindlessLayout, worldViewport, scissor,
                             batch, batch.worldMatrix, boneOffset
                         );
                         renderedCount++;
@@ -774,7 +817,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                             cmdList, nvDevice, framebuffer,
                             dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
                             globalBoneBuffer, terrainMatBuffer.GetBuffer(),
-                            bindlessTable, worldViewport, scissor,
+                            bindlessTable, bindlessLayout, worldViewport, scissor,
                             batch, batch.worldMatrix, boneOffset
                         );
                         drawCount++;
@@ -797,7 +840,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         cmdList, nvDevice, framebuffer,
                         dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
                         globalBoneBuffer, terrainMatBuffer.GetBuffer(),
-                        bindlessTable, hudViewport, scissor,
+                        bindlessTable, bindlessLayout, hudViewport, scissor,
                         batch, adjustedWorldMatrix, boneOffset
                     );
                 }

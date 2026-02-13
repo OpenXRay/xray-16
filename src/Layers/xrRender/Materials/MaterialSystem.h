@@ -31,6 +31,8 @@ public:
 
         bool useParallax = false;
         bool useDetail = false;
+
+        u32 shaderVariant = 0;
     };
 
     struct TextureSet

@@ -2,6 +2,7 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -70,6 +71,8 @@ struct BindlessForwardConfig {
     bool HasTerrain() const {
         return terrainObjectCount > 0 && (terrainDrawArgsBuffer || terrainCompactDrawArgsBuffer);
     }
+
+    VariantPartitionConfig variantPartition;
 };
 
 void InitializeForwardPipelines(ng::RenderDevice* device);

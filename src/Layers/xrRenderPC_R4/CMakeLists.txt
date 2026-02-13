@@ -48,6 +48,23 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraph/VolatileConstantBufferPool.h
     ../xrRender/FrameGraph/VolatileConstantBufferPool.cpp
 
+    # Shader Variant System - Data-driven shader descriptors
+    ../xrRender/ShaderVariant/ShaderVariantRegistry.h
+    ../xrRender/ShaderVariant/ShaderVariantRegistry.cpp
+    ../xrRender/ShaderVariant/JsonParser.h
+    ../xrRender/ShaderVariant/JsonParser.cpp
+    ../xrRender/ShaderVariant/VariantPartitionConfig.h
+    ../xrRender/ShaderVariant/VariantPSOCache.h
+    ../xrRender/ShaderVariant/VariantPSOCache.cpp
+
+    # Bindless Rendering - GPU Structured Buffer Base
+    ../xrRender/Bindless/GPUStructuredBuffer.h
+    ../xrRender/Bindless/GPUStructuredBuffer.cpp
+
+    # Bindless Rendering - Variant Texture Buffer
+    ../xrRender/Bindless/VariantTextureBuffer.h
+    ../xrRender/Bindless/VariantTextureBuffer.cpp
+
     # Shader System (Phase 2) - Slang integration
     ../xrRender/Shaders/SlangCompiler.h
     ../xrRender/Shaders/SlangCompiler.cpp

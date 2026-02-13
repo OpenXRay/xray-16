@@ -219,6 +219,12 @@ framegraph::VirtualResourceHandle setupTextPass(
             static nvrhi::BufferHandle s_vertexBuffer;
             static nvrhi::BufferHandle s_indexBuffer;
             static nvrhi::BufferHandle s_constantBuffer;
+            struct TextVertex {
+                float x, y, z, w;
+                u32 color;
+                float u, v;
+            };
+
             static bool s_initialized = false;
 
             if (!s_initialized) {
@@ -228,7 +234,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                 nvrhi::IDevice* nvrhiDevice = device->GetNVRHIDevice();
 
                 nvrhi::BufferDesc vbDesc;
-                vbDesc.byteSize = MAX_TEXT_VERTICES * 24;
+                vbDesc.byteSize = MAX_TEXT_VERTICES * sizeof(TextVertex);
                 vbDesc.debugName = "TextPass Vertex Buffer";
                 vbDesc.isVertexBuffer = true;
                 vbDesc.isVolatile = false;
@@ -276,12 +282,6 @@ framegraph::VirtualResourceHandle setupTextPass(
 
             cmdList->beginTrackingBufferState(s_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
             cmdList->beginTrackingBufferState(s_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
-
-            struct TextVertex {
-                float x, y, z, w;
-                u32 color;
-                float u, v;
-            };
 
             struct FontBatch {
                 CGameFont* font;
