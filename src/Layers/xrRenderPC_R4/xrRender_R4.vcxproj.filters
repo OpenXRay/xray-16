@@ -205,6 +205,9 @@
     <Filter Include="PBRConverter">
       <UniqueIdentifier>{878d07e8-9481-4b4f-9c22-84db67a73811}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ShaderVariant">
+      <UniqueIdentifier>{b4c8e2f1-7a3d-4e9b-8f5c-1d2e3f4a5b6c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -928,8 +931,22 @@
     <ClInclude Include="..\xrRender\Bindless\BindlessTypes.h" />
     <ClInclude Include="..\xrRender\Bindless\MaterialBuffer.h" />
     <ClInclude Include="..\xrRender\Bindless\TerrainMaterialBuffer.h" />
+    <ClInclude Include="..\xrRender\Bindless\GPUStructuredBuffer.h" />
+    <ClInclude Include="..\xrRender\Bindless\VariantTextureBuffer.h" />
     <ClInclude Include="..\xrRender\Bindless\VertexConverter.h" />
     <ClInclude Include="..\xrRender\Bindless\UnifiedVertex.h" />
+    <ClInclude Include="..\xrRender\ShaderVariant\ShaderVariantRegistry.h">
+      <Filter>ShaderVariant</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ShaderVariant\JsonParser.h">
+      <Filter>ShaderVariant</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ShaderVariant\VariantPartitionConfig.h">
+      <Filter>ShaderVariant</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ShaderVariant\VariantPSOCache.h">
+      <Filter>ShaderVariant</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\Backend\D3D12Backend.h" />
     <ClInclude Include="..\utils\xrLC_Light\R_light.h" />
     <ClInclude Include="..\xrRender\Backend\D3D11BackendWrapper.h" />
@@ -1720,7 +1737,18 @@
     <ClCompile Include="..\xrRender\PBRConverter\ONNXModelRunner.cpp" />
     <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
     <ClCompile Include="..\xrRender\Bindless\TerrainMaterialBuffer.cpp" />
+    <ClCompile Include="..\xrRender\Bindless\GPUStructuredBuffer.cpp" />
+    <ClCompile Include="..\xrRender\Bindless\VariantTextureBuffer.cpp" />
     <ClCompile Include="..\xrRender\Bindless\VertexConverter.cpp" />
+    <ClCompile Include="..\xrRender\ShaderVariant\ShaderVariantRegistry.cpp">
+      <Filter>ShaderVariant</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ShaderVariant\JsonParser.cpp">
+      <Filter>ShaderVariant</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ShaderVariant\VariantPSOCache.cpp">
+      <Filter>ShaderVariant</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRender\Backend\D3D12Backend.cpp" />
     <ClCompile Include="..\xrRender\Backend\D3D11BackendWrapper.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\PassResourceCache.cpp" />

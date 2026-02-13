@@ -33,6 +33,8 @@
 #include "Layers/xrRender/blenders/Blender_BmmD.h"            // For CBlender_BmmD detail texture accessors
 #include "Layers/xrRender/r_constants.h"                      // For R_constant_setup
 #include "Layers/xrRender/Materials/MaterialSystem.h"         // For MaterialSystem (D3D12)
+#include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
+#include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "xrEngine/xr_object.h"                               // For GEnv
 
 #if defined(USE_DX11)
@@ -2902,7 +2904,7 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
     matData.detailScale = matPSO->detail_scale;
     matData.alphaRef = 0.5f;  // Default alpha ref
     matData.flags = 0;
-    matData.padding = 0.0f;
+    matData.shaderVariant = 0;
 
     // Extract material properties from shader/pass
     if (matPSO->pass) {
@@ -3304,7 +3306,7 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     matData.detailScale = 1.0f;
     matData.alphaRef = 0.5f;  // Default, will be overwritten if blender data available
     matData.flags = 0;
-    matData.padding = 0.0f;
+    matData.shaderVariant = 0;
 
     // Get material info from MaterialSystem using shader/texture names
     if (visual->textureName.size() > 0) {
@@ -3321,6 +3323,7 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
         if (matInfo.transparent) {
             matData.flags |= MAT_FLAG_ALPHA_BLEND;
         }
+        matData.shaderVariant = matInfo.shaderVariant;
         matData.flags |= MAT_FLAG_HAS_NORMAL;
     }
 
@@ -3376,7 +3379,7 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
     matData.detailScale = 1.0f;
     matData.alphaRef = 0.01f / 255.0f;  // Minimal alpha test for particles
     matData.flags = 0;  // No alpha test, no normal map for particles
-    matData.padding = 0.0f;
+    matData.shaderVariant = 0;
 
     // Register with material buffer
     u32 materialID = materialBuffer.RegisterMaterial(matData);
@@ -3536,6 +3539,35 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
             materialBuffer.UpdateMaterial(materialID, matData);
             processedCount++;
         }
+
+        if (matData.shaderVariant > 0) {
+            auto& registry = ShaderVariantRegistry::Instance();
+            const auto* variant = registry.GetVariantByIndex(matData.shaderVariant);
+            if (variant && !variant->textures.empty()) {
+                auto& vtb = bindless::VariantTextureBuffer::Instance();
+                bindless::VariantTextureData vtData;
+                for (u32 i = 0; i < bindless::MAX_VARIANT_TEXTURE_SLOTS; i++)
+                    vtData.tex[i] = INVALID_TEXTURE_INDEX;
+
+                u32 slotIdx = 0;
+                for (const auto& [slotName, texPath] : variant->textures) {
+                    if (slotIdx >= bindless::MAX_VARIANT_TEXTURE_SLOTS) break;
+                    if (texPath.c_str()[0] == '$') { slotIdx++; continue; }
+
+                    resources::TextureHandle handle = texManager->LoadTexture(texPath.c_str());
+                    if (handle.IsValid()) {
+                        nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+                        if (nvrhiTex) {
+                            u32 idx = backend->RegisterBindlessTexture(nvrhiTex);
+                            if (idx != INVALID_TEXTURE_INDEX)
+                                vtData.tex[slotIdx] = idx;
+                        }
+                    }
+                    slotIdx++;
+                }
+                vtb.SetVariantTextures(materialID, vtData);
+            }
+        }
     }
 
     // Clear pending list
@@ -3545,6 +3577,10 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
     if (processedCount > 0) {
         materialBuffer.Upload(ctx);
     }
+
+    auto& vtb = bindless::VariantTextureBuffer::Instance();
+    if (vtb.IsInitialized())
+        vtb.Upload(ctx);
 }
 
 } // namespace xray::render

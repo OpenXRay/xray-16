@@ -12,6 +12,8 @@
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/Bindless/VertexConverter.h"
 #include "Layers/xrRender/SkeletonCustom.h"  // For CKinematics bone access
+#include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
+#include "Layers/xrRender/Bindless/MaterialBuffer.h"
 
 namespace RENDER_NAMESPACE
 {
@@ -86,6 +88,7 @@ static ref_cs s_batch_compact_count_cs;
 static ref_cs s_batch_compact_scan_cs;
 static ref_cs s_batch_compact_scatter_cs;
 static ref_cs s_terrain_apply_visibility_cs;
+static ref_cs s_variant_partition_cs;
 
 // ═══════════════════════════════════════════════════════
 //  CONSTRUCTOR / DESTRUCTOR
@@ -151,6 +154,7 @@ void GPUCullingManager::Initialize(ng::RenderDevice* device)
     CreateBuffers(device);
     CreateComputePipeline(device);
     CreateCompactionResources(device);
+    CreateVariantPartitionResources(device);
     CreateDebugResources(device);
     CreateParticleResources(device);
 
@@ -759,6 +763,20 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
 
             {
                 nvrhi::BufferDesc desc;
+                desc.debugName = pickName("GPUCull_Static_CompactDispatchArgs", "GPUCull_Dynamic_CompactDispatchArgs");
+                desc.byteSize = 3 * sizeof(u32);
+                desc.canHaveUAVs = true;
+                desc.canHaveRawViews = true;
+                desc.isDrawIndirectArgs = true;
+                desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+                desc.keepInitialState = true;
+
+                set.compactDispatchArgsBuffer = nvDevice->createBuffer(desc);
+                R_ASSERT2(set.compactDispatchArgsBuffer, "Failed to create compact dispatch args buffer");
+            }
+
+            {
+                nvrhi::BufferDesc desc;
                 desc.debugName = pickName("GPUCull_Static_CompactLocalPrefix", "GPUCull_Dynamic_CompactLocalPrefix");
                 desc.byteSize = m_maxObjects * sizeof(u32);
                 desc.structStride = sizeof(u32);
@@ -856,6 +874,20 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
     }
 
     {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainCompactDispatchArgs";
+        desc.byteSize = 3 * sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_terrainCompactDispatchArgsBuffer = nvDevice->createBuffer(desc);
+        R_ASSERT2(m_terrainCompactDispatchArgsBuffer, "Failed to create terrain compact dispatch args buffer");
+    }
+
+    {
         u32 maxTerrainGroups = (m_maxTerrainObjects + COMPACT_THREAD_GROUP_SIZE - 1) / COMPACT_THREAD_GROUP_SIZE;
         R_ASSERT2(maxTerrainGroups > 0, "Terrain compaction group count must be non-zero");
         R_ASSERT2(maxTerrainGroups <= COMPACT_THREAD_GROUP_SIZE,
@@ -946,6 +978,16 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
         m_transparentSet.compactCountBuffer = nvDevice->createBuffer(desc);
 
         desc = {};
+        desc.debugName = "GPUCull_Trans_CompactDispatchArgs";
+        desc.byteSize = 3 * sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_transparentSet.compactDispatchArgsBuffer = nvDevice->createBuffer(desc);
+
+        desc = {};
         desc.debugName = "GPUCull_Trans_CompactLocalPrefix";
         desc.byteSize = maxTrans * sizeof(u32);
         desc.structStride = sizeof(u32);
@@ -1007,16 +1049,14 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
     {
         // Binding layout for batch_compact_scan.cs:
         // b5: CompactParams (constant buffer)
-        // t0: g_GroupCounts (StructuredBuffer<uint> - SRV)
-        // u0: g_GroupOffsets (RWStructuredBuffer<uint>)
-        // u1: g_VisibleCount (RWByteAddressBuffer)
         nvrhi::BindingLayoutDesc layoutDesc;
         layoutDesc.visibility = nvrhi::ShaderType::Compute;
         layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),   // Group counts
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),   // Group offsets
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1)           // Visible count
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),   // g_GroupCounts
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),   // g_GroupOffsets
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),          // g_VisibleCount
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(2)           // g_DispatchArgs
         };
 
         m_compactScanLayout = nvDevice->createBindingLayout(layoutDesc);
@@ -1114,6 +1154,217 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
     }
 }
 
+void GPUCullingManager::CreateVariantPartitionResources(ng::RenderDevice* device)
+{
+    if (!m_compactEnabled)
+        return;
+
+    auto& registry = ShaderVariantRegistry::Instance();
+    u32 variantCount = registry.GetVariantCount();
+    if (variantCount <= 1) {
+        Msg("* [GPUCulling] No shader variants loaded, partition disabled");
+        return;
+    }
+
+    if (variantCount > MAX_SHADER_VARIANTS) {
+        Msg("! [GPUCulling] Variant count %d exceeds MAX_SHADER_VARIANTS (%d), clamping", variantCount, MAX_SHADER_VARIANTS);
+        variantCount = MAX_SHADER_VARIANTS;
+    }
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+
+    s_variant_partition_cs.create("variant_partition");
+    if (!s_variant_partition_cs || !s_variant_partition_cs->nvrhiShader) {
+        Msg("! [GPUCulling] variant_partition.cs not found - variant partition disabled");
+        return;
+    }
+
+    {
+        nvrhi::BindingLayoutDesc layoutDesc;
+        layoutDesc.visibility = nvrhi::ShaderType::Compute;
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+            nvrhi::BindingLayoutItem::RawBuffer_SRV(0),
+            nvrhi::BindingLayoutItem::RawBuffer_SRV(1),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(3)
+        };
+        m_variantPartitionLayout = nvDevice->createBindingLayout(layoutDesc);
+        R_ASSERT2(m_variantPartitionLayout, "Failed to create variant partition layout");
+    }
+
+    {
+        nvrhi::ComputePipelineDesc pipeDesc;
+        pipeDesc.CS = s_variant_partition_cs->nvrhiShader;
+        pipeDesc.bindingLayouts = { m_variantPartitionLayout };
+        m_variantPartitionPipeline = nvDevice->createComputePipeline(pipeDesc);
+        R_ASSERT2(m_variantPartitionPipeline, "Failed to create variant partition pipeline");
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "VariantPartition_Params";
+        desc.byteSize = 16;
+        desc.isConstantBuffer = true;
+        desc.isVolatile = true;
+        desc.maxVersions = 16;
+        m_variantPartitionParamsCB = nvDevice->createBuffer(desc);
+        R_ASSERT2(m_variantPartitionParamsCB, "Failed to create variant partition params CB");
+    }
+
+    InitPartitionBuffers(nvDevice, m_staticPartition, "Static", variantCount, m_maxObjects);
+    InitPartitionBuffers(nvDevice, m_transparentPartition, "Transparent", variantCount, m_maxObjects);
+
+    m_variantPartitionEnabled = true;
+    Msg("* [GPUCulling] Variant partition enabled (%d variants)", variantCount);
+}
+
+void GPUCullingManager::InitPartitionBuffers(
+    nvrhi::IDevice* nvDevice, VariantPartitionBuffers& part,
+    const char* prefix, u32 variantCount, u32 maxObjects)
+{
+    part.variantCount = variantCount;
+    part.binCapacity = maxObjects;
+    u32 totalSlots = variantCount * maxObjects;
+
+    auto makeBuffer = [&](const char* suffix, nvrhi::BufferDesc desc) -> nvrhi::BufferHandle {
+        desc.debugName = xr_string(prefix) + suffix;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        auto buf = nvDevice->createBuffer(desc);
+        R_ASSERT2(buf, desc.debugName);
+        return buf;
+    };
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = variantCount * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        part.variantCountBuffer = makeBuffer("_VariantCounts", desc);
+    }
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = totalSlots * sizeof(IndirectDrawArgs);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        part.reorderedDrawArgsBuffer = makeBuffer("_ReorderedDrawArgs", desc);
+    }
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = totalSlots * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        part.reorderedBatchIndicesBuffer = makeBuffer("_ReorderedBatchIndices", desc);
+    }
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = totalSlots * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        part.reorderedMaterialIDsBuffer = makeBuffer("_ReorderedMaterialIDs", desc);
+    }
+    {
+        xr_vector<u32> drawIndices(totalSlots);
+        for (u32 i = 0; i < totalSlots; i++)
+            drawIndices[i] = i;
+
+        nvrhi::BufferDesc desc;
+        desc.byteSize = totalSlots * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.isVertexBuffer = true;
+        desc.initialState = nvrhi::ResourceStates::VertexBuffer;
+        desc.keepInitialState = true;
+        desc.debugName = xr_string(prefix) + "_PartitionDrawIndex";
+        part.drawIndexBuffer = nvDevice->createBuffer(desc);
+        R_ASSERT2(part.drawIndexBuffer, desc.debugName);
+
+        if (GEnv.Backend)
+            GEnv.Backend->UploadBufferData(part.drawIndexBuffer, drawIndices.data(), totalSlots * sizeof(u32));
+    }
+
+    Msg("* [GPUCulling] Variant partition buffers: %s (%d variants x %d cap = %d slots, %.1f MB)",
+        prefix, variantCount, maxObjects, totalSlots,
+        static_cast<float>(totalSlots * (sizeof(IndirectDrawArgs) + sizeof(u32) * 3)) / (1024.f * 1024.f));
+}
+
+void GPUCullingManager::DispatchVariantPartition(
+    nvrhi::ICommandList* cmdList,
+    nvrhi::IDevice* nvDevice,
+    const CullSetBuffers& set,
+    VariantPartitionBuffers& partition)
+{
+    auto& matBuffer = bindless::MaterialBuffer::Instance();
+    nvrhi::IBuffer* materialBuffer = matBuffer.GetBuffer();
+    if (!materialBuffer)
+        return;
+
+    u32 zeroData[MAX_SHADER_VARIANTS] = {};
+    cmdList->writeBuffer(partition.variantCountBuffer, zeroData, partition.variantCount * sizeof(u32));
+
+    cmdList->setBufferState(set.compactDrawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(set.compactBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(set.compactMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(set.compactDrawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(set.compactBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(set.compactMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(set.compactDispatchArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(materialBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(partition.variantCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(partition.reorderedDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(partition.reorderedBatchIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(partition.reorderedMaterialIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->commitBarriers();
+
+    struct PartitionParamsCB {
+        u32 binCapacity;
+        u32 variantCount;
+        u32 padding0;
+        u32 padding1;
+    };
+    PartitionParamsCB params;
+    params.binCapacity = partition.binCapacity;
+    params.variantCount = partition.variantCount;
+    params.padding0 = 0;
+    params.padding1 = 0;
+    cmdList->writeBuffer(m_variantPartitionParamsCB, &params, sizeof(params));
+
+    nvrhi::BindingSetDesc bindDesc;
+    bindDesc.bindings = {
+        nvrhi::BindingSetItem::ConstantBuffer(5, m_variantPartitionParamsCB),
+        nvrhi::BindingSetItem::RawBuffer_SRV(0, set.compactCountBuffer),
+        nvrhi::BindingSetItem::RawBuffer_SRV(1, set.compactDrawArgsBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(2, set.compactBatchIndicesBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(3, set.compactMaterialIDBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(8, materialBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, partition.variantCountBuffer),
+        nvrhi::BindingSetItem::RawBuffer_UAV(1, partition.reorderedDrawArgsBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_UAV(2, partition.reorderedBatchIndicesBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_UAV(3, partition.reorderedMaterialIDsBuffer)
+    };
+    nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, m_variantPartitionLayout);
+    R_ASSERT2(bindingSet, "Failed to create variant partition binding set");
+
+    nvrhi::ComputeState state;
+    state.pipeline = m_variantPartitionPipeline;
+    state.bindings = { bindingSet };
+    state.indirectParams = set.compactDispatchArgsBuffer;
+    cmdList->setComputeState(state);
+    cmdList->dispatchIndirect(0);
+
+    cmdList->setBufferState(partition.variantCountBuffer, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(partition.reorderedDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(partition.reorderedBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(partition.reorderedMaterialIDsBuffer, nvrhi::ResourceStates::ShaderResource);
+}
+
 void GPUCullingManager::Shutdown()
 {
     m_staticSet.objectBuffer = nullptr;
@@ -1126,6 +1377,7 @@ void GPUCullingManager::Shutdown()
     m_staticSet.compactBatchIndicesBuffer = nullptr;
     m_staticSet.compactMaterialIDBuffer = nullptr;
     m_staticSet.compactCountBuffer = nullptr;
+    m_staticSet.compactDispatchArgsBuffer = nullptr;
     m_staticSet.compactLocalPrefixBuffer = nullptr;
     m_staticSet.compactGroupCountsBuffer = nullptr;
     m_staticSet.compactGroupOffsetsBuffer = nullptr;
@@ -1145,6 +1397,7 @@ void GPUCullingManager::Shutdown()
     m_dynamicSet.compactBatchIndicesBuffer = nullptr;
     m_dynamicSet.compactMaterialIDBuffer = nullptr;
     m_dynamicSet.compactCountBuffer = nullptr;
+    m_dynamicSet.compactDispatchArgsBuffer = nullptr;
     m_dynamicSet.compactLocalPrefixBuffer = nullptr;
     m_dynamicSet.compactGroupCountsBuffer = nullptr;
     m_dynamicSet.compactGroupOffsetsBuffer = nullptr;
@@ -1168,6 +1421,13 @@ void GPUCullingManager::Shutdown()
     m_compactCountLayout = nullptr;
     m_compactScanLayout = nullptr;
     m_compactScatterLayout = nullptr;
+
+    m_variantPartitionPipeline = nullptr;
+    m_variantPartitionLayout = nullptr;
+    m_variantPartitionParamsCB = nullptr;
+    m_staticPartition = {};
+    m_transparentPartition = {};
+    m_variantPartitionEnabled = false;
 
     m_debugBuffer = nullptr;
     m_debugComputeParamsCB = nullptr;
@@ -1218,6 +1478,7 @@ void GPUCullingManager::Shutdown()
     m_terrainCompactDrawArgsBuffer = nullptr;
     m_terrainCompactBatchIndicesBuffer = nullptr;
     m_terrainCompactCountBuffer = nullptr;
+    m_terrainCompactDispatchArgsBuffer = nullptr;
     m_terrainCompactMaterialIDBuffer = nullptr;
     m_terrainCompactLocalPrefixBuffer = nullptr;
     m_terrainCompactGroupCountsBuffer = nullptr;
@@ -2154,6 +2415,8 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             // This ensures we use the correct command list
             mgr->UploadSceneObjects(ctx, data.geometry);
 
+            bindless::MaterialBuffer::Instance().Upload(ctx);
+
             // Get Hi-Z texture
             nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
             if (!hizTexture) {
@@ -2161,7 +2424,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 return;
             }
 
-            auto dispatchCullSet = [&](CullSetBuffers& set) {
+            auto dispatchCullSet = [&](CullSetBuffers& set, VariantPartitionBuffers* partition = nullptr) {
                 if (set.objectCount == 0)
                     return;
 
@@ -2247,6 +2510,8 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     if (compactGroupCount == 0) {
                         u32 zeroCount = 0;
                         cmdList->writeBuffer(set.compactCountBuffer, &zeroCount, sizeof(u32));
+                        u32 zeroDispatch[3] = { 0, 1, 1 };
+                        cmdList->writeBuffer(set.compactDispatchArgsBuffer, zeroDispatch, sizeof(zeroDispatch));
                     } else {
                         cmdList->setBufferState(set.visibilityBuffer, nvrhi::ResourceStates::ShaderResource);
                         cmdList->setBufferState(set.compactLocalPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
@@ -2272,13 +2537,15 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                         cmdList->setBufferState(set.compactGroupCountsBuffer, nvrhi::ResourceStates::ShaderResource);
                         cmdList->setBufferState(set.compactGroupOffsetsBuffer, nvrhi::ResourceStates::UnorderedAccess);
                         cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
+                        cmdList->setBufferState(set.compactDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
                         nvrhi::BindingSetDesc scanBindDesc;
                         scanBindDesc.bindings = {
                             nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
                             nvrhi::BindingSetItem::StructuredBuffer_SRV(0, set.compactGroupCountsBuffer),
                             nvrhi::BindingSetItem::StructuredBuffer_UAV(0, set.compactGroupOffsetsBuffer),
-                            nvrhi::BindingSetItem::RawBuffer_UAV(1, set.compactCountBuffer)
+                            nvrhi::BindingSetItem::RawBuffer_UAV(1, set.compactCountBuffer),
+                            nvrhi::BindingSetItem::RawBuffer_UAV(2, set.compactDispatchArgsBuffer)
                         };
 
                         nvrhi::BindingSetHandle scanBindingSet = nvDevice->createBindingSet(scanBindDesc, mgr->m_compactScanLayout);
@@ -2321,12 +2588,17 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                         cmdList->dispatch(compactGroupCount, 1, 1);
                     }
 
+                    if (partition && mgr->m_variantPartitionEnabled) {
+                        mgr->DispatchVariantPartition(cmdList, nvDevice, set, *partition);
+                    }
+
                     cmdList->setBufferState(set.compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
                     cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
                 }
             };
 
-            dispatchCullSet(mgr->m_staticSet);
+            dispatchCullSet(mgr->m_staticSet,
+                mgr->m_variantPartitionEnabled ? &mgr->m_staticPartition : nullptr);
             dispatchCullSet(mgr->m_dynamicSet);
 
             // ─────────────────────────────────────────────────────
@@ -2446,13 +2718,15 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     cmdList->setBufferState(mgr->m_terrainCompactGroupCountsBuffer, nvrhi::ResourceStates::ShaderResource);
                     cmdList->setBufferState(mgr->m_terrainCompactGroupOffsetsBuffer, nvrhi::ResourceStates::UnorderedAccess);
                     cmdList->setBufferState(mgr->m_terrainCompactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
+                    cmdList->setBufferState(mgr->m_terrainCompactDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
                     nvrhi::BindingSetDesc terrainScanBindDesc;
                     terrainScanBindDesc.bindings = {
                         nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
                         nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_terrainCompactGroupCountsBuffer),
                         nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_terrainCompactGroupOffsetsBuffer),
-                        nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_terrainCompactCountBuffer)
+                        nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_terrainCompactCountBuffer),
+                        nvrhi::BindingSetItem::RawBuffer_UAV(2, mgr->m_terrainCompactDispatchArgsBuffer)
                     };
 
                     nvrhi::BindingSetHandle terrainScanBindingSet =
@@ -2505,7 +2779,11 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             // ─────────────────────────────────────────────────────
             //  TRANSPARENT CULLING (uses CullSetBuffers + dispatchCullSet)
             // ─────────────────────────────────────────────────────
-            dispatchCullSet(mgr->m_transparentSet);
+            dispatchCullSet(mgr->m_transparentSet,
+                mgr->m_variantPartitionEnabled ? &mgr->m_transparentPartition : nullptr);
+
+            // Note: partition buffers are left in IndirectArgument/ShaderResource state
+            // for the render passes to consume. keepInitialState handles reset for next frame.
         }
     );
 

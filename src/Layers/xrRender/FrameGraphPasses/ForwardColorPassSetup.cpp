@@ -17,6 +17,8 @@
 #include "Layers/xrRender/Backend/D3D12Backend.h"  // For SM6 bindless descriptor heap
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"  // For terrain rendering
+#include "Layers/xrRender/Bindless/VariantTextureBuffer.h"  // For variant textures
+#include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "xrCore/FMesh.hpp"  // For MT_NORMAL, MT_TREE, etc.
 
 namespace xray::render::RENDER_NAMESPACE
@@ -170,6 +172,7 @@ static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebu
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // static_globals (b2)
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // LightingConstants (b4)
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),   // g_VariantTextures
         nvrhi::BindingLayoutItem::Sampler(0),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),   // g_InstanceData
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),   // g_CompactBatchIndices
@@ -357,9 +360,8 @@ void renderBindlessForward(
             nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // LightingConstants (b4) - volatile
             // b5 removed - shader uses SV_DrawID for multi-draw instead of per-draw CB
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials (contains descriptor indices)
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),   // g_VariantTextures
             nvrhi::BindingLayoutItem::Sampler(0),
-            // SM6 bindless: No texture arrays - textures accessed via ResourceDescriptorHeap[NonUniformResourceIndex(index)]
-            // GPU-driven rendering buffers (for culled rendering)
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),   // g_InstanceData (world matrices)
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),   // g_CompactBatchIndices
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),   // g_CompactMaterialIDs
@@ -588,16 +590,19 @@ void renderBindlessForward(
 
     cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
+    auto& variantTexBuffer = bindless::VariantTextureBuffer::Instance();
+
     auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
         nvrhi::BindingSetDesc bindDesc;
         bindDesc.bindings = {
-            nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),  // b2 - engine matrices (m_VP, etc.)
-            nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),       // b4 - our lighting constants
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),  // g_Materials
+            nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
+            nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(10, variantTexBuffer.GetBuffer()),
             nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(14, set.instanceBuffer),           // g_InstanceData
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(15, set.compactBatchIndicesBuffer), // g_CompactBatchIndices
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(16, set.compactMaterialIDBuffer),  // g_CompactMaterialIDs
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(14, set.instanceBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(15, set.compactBatchIndicesBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(16, set.compactMaterialIDBuffer),
         };
 
         return nvDevice->createBindingSet(bindDesc, s_bindlessLayout);
@@ -675,7 +680,34 @@ void renderBindlessForward(
         s_gpuDrivenDraws += set.totalObjectCount;
     };
 
-    drawSet(config.staticSet);
+    if (config.variantPartition.Enabled()) {
+        auto* backendDev = device->GetBackend();
+        VariantPartitionDrawConfig vpCfg;
+        vpCfg.defaultPipeline = s_bindlessPipeline.Get();
+        vpCfg.inputLayout = s_bindlessInputLayout;
+        vpCfg.passLayout = s_bindlessLayout;
+        vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
+        vpCfg.bindlessTable = bindlessTable;
+        vpCfg.sampler = s_linearSampler;
+        vpCfg.staticGlobalsCB = staticGlobalsCB;
+        vpCfg.lightingCB = lightingCB;
+        vpCfg.materialBuffer = matBuffer.GetBuffer();
+        vpCfg.variantTexBuffer = variantTexBuffer.GetBuffer();
+        vpCfg.instanceBuffer = config.staticSet.instanceBuffer;
+        vpCfg.megaVertexBuffer = config.megaVertexBuffer;
+        vpCfg.partition = config.variantPartition;
+        vpCfg.selectTransparent = false;
+
+        DrawVariantPartition(cmdList, nvDevice, framebuffer, state, vpCfg);
+
+        state.pipeline = s_bindlessPipeline;
+        state.vertexBuffers = {
+            {config.megaVertexBuffer, 0, 0},
+            {s_drawIndexBuffer, 1, 0}
+        };
+    } else {
+        drawSet(config.staticSet);
+    }
     drawSet(config.dynamicSet);
 
     // ═══════════════════════════════════════════════════════
@@ -701,6 +733,7 @@ void renderBindlessForward(
                         nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // LightingConstants (b4)
                         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials (unused but keep for layout compat)
                         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),    // g_TerrainMaterials
+                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),   // g_VariantTextures
                         nvrhi::BindingLayoutItem::Sampler(0),
                         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),   // g_InstanceData
                         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),   // g_CompactBatchIndices
@@ -770,6 +803,7 @@ void renderBindlessForward(
                 nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),        // b4 - lighting
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),  // t8 - regular materials (unused)
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMatBuffer.GetBuffer()),  // t9 - terrain materials
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(10, variantTexBuffer.GetBuffer()), // t10 - variant textures
                 nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.terrainInstanceBuffer),       // Terrain world transforms
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.terrainCompactBatchIndicesBuffer),   // Compact batch indices

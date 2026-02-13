@@ -9,6 +9,8 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
+#include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -54,6 +56,7 @@ static void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFra
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // static_globals (b2)
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // LightingConstants (b4)
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),   // g_VariantTextures
         nvrhi::BindingLayoutItem::Sampler(0),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),   // g_InstanceData
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),   // g_CompactBatchIndices
@@ -272,11 +275,14 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             cmdList->beginTrackingBufferState(cfg.compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
             cmdList->beginTrackingBufferState(cfg.compactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
 
+            auto& variantTexBuffer = bindless::VariantTextureBuffer::Instance();
+
             nvrhi::BindingSetDesc bindDesc;
             bindDesc.bindings = {
                 nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
                 nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(10, variantTexBuffer.GetBuffer()),
                 nvrhi::BindingSetItem::Sampler(0, s_transparentSampler),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(14, cfg.instanceBuffer),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(15, cfg.compactBatchIndicesBuffer),
@@ -311,8 +317,30 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             state.viewport.addViewport(viewport);
             state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
-            cmdList->setGraphicsState(state);
-            cmdList->drawIndexedIndirectCount(0, 0, cfg.objectCount);
+            if (cfg.variantPartition.Enabled()) {
+                auto* backendDev = data.device->GetBackend();
+
+                VariantPartitionDrawConfig vpCfg;
+                vpCfg.defaultPipeline = s_transparentPipeline.Get();
+                vpCfg.inputLayout = s_transparentInputLayout;
+                vpCfg.passLayout = s_transparentLayout;
+                vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
+                vpCfg.bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
+                vpCfg.sampler = s_transparentSampler;
+                vpCfg.staticGlobalsCB = staticGlobalsCB;
+                vpCfg.lightingCB = lightingCB;
+                vpCfg.materialBuffer = matBuffer.GetBuffer();
+                vpCfg.variantTexBuffer = variantTexBuffer.GetBuffer();
+                vpCfg.instanceBuffer = cfg.instanceBuffer;
+                vpCfg.megaVertexBuffer = cfg.megaVertexBuffer;
+                vpCfg.partition = cfg.variantPartition;
+                vpCfg.selectTransparent = true;
+
+                DrawVariantPartition(cmdList, nvDevice, framebuffer, state, vpCfg);
+            } else {
+                cmdList->setGraphicsState(state);
+                cmdList->drawIndexedIndirectCount(0, 0, cfg.objectCount);
+            }
         }
     );
 

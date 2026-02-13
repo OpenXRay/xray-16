@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/Bindless/UnifiedVertex.h"
+#include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
     struct ParticleBatch;
@@ -162,6 +163,7 @@ struct GPUCullOutput {
     framegraph::VirtualResourceHandle transparentCompactMaterialIDs;
     framegraph::VirtualResourceHandle transparentCompactCount;
     u32 transparentObjectCount;
+
 };
 
 struct GPUParticleCullOutput {
@@ -334,6 +336,33 @@ public:
     nvrhi::IBuffer* GetTransparentCompactCountBuffer() const { return m_transparentSet.compactCountBuffer.Get(); }
 
     // ───────────────────────────────────────────────────────
+    //  VARIANT PARTITIONING (multi-PSO rendering)
+    // ───────────────────────────────────────────────────────
+    static constexpr u32 MAX_SHADER_VARIANTS = 32;
+
+    struct VariantPartitionBuffers {
+        nvrhi::BufferHandle variantCountBuffer;
+        nvrhi::BufferHandle reorderedDrawArgsBuffer;
+        nvrhi::BufferHandle reorderedBatchIndicesBuffer;
+        nvrhi::BufferHandle reorderedMaterialIDsBuffer;
+        nvrhi::BufferHandle drawIndexBuffer;
+        u32 binCapacity = 0;
+        u32 variantCount = 0;
+
+        VariantPartitionConfig ToConfig() const {
+            return {
+                variantCountBuffer.Get(), reorderedDrawArgsBuffer.Get(),
+                reorderedBatchIndicesBuffer.Get(), reorderedMaterialIDsBuffer.Get(),
+                drawIndexBuffer.Get(), binCapacity, variantCount
+            };
+        }
+    };
+
+    bool IsVariantPartitionEnabled() const { return m_variantPartitionEnabled; }
+    const VariantPartitionBuffers& GetStaticPartition() const { return m_staticPartition; }
+    const VariantPartitionBuffers& GetTransparentPartition() const { return m_transparentPartition; }
+
+    // ───────────────────────────────────────────────────────
     //  CULLING STATS READBACK (for profiling overlay)
     // ───────────────────────────────────────────────────────
     // Returns previous frame's visible counts (1-frame latency to avoid GPU stall)
@@ -446,6 +475,7 @@ private:
         nvrhi::BufferHandle compactBatchIndicesBuffer;  // Compacted batch indices (output)
         nvrhi::BufferHandle compactMaterialIDBuffer;    // Compacted material IDs (output)
         nvrhi::BufferHandle compactCountBuffer;         // Compacted visible count (output)
+        nvrhi::BufferHandle compactDispatchArgsBuffer;  // DispatchIndirect args derived from compact count
         nvrhi::BufferHandle compactLocalPrefixBuffer;   // Local prefix per batch (scratch)
         nvrhi::BufferHandle compactGroupCountsBuffer;   // Visible count per group (scratch)
         nvrhi::BufferHandle compactGroupOffsetsBuffer;  // Prefix offsets per group (scratch)
@@ -478,6 +508,23 @@ private:
 
     nvrhi::BufferHandle m_compactParamsCB;
 
+    // Variant partition pipeline
+    nvrhi::ComputePipelineHandle m_variantPartitionPipeline;
+    nvrhi::BindingLayoutHandle m_variantPartitionLayout;
+    nvrhi::BufferHandle m_variantPartitionParamsCB;
+    VariantPartitionBuffers m_staticPartition;
+    VariantPartitionBuffers m_transparentPartition;
+    bool m_variantPartitionEnabled = false;
+
+    void CreateVariantPartitionResources(ng::RenderDevice* device);
+    void InitPartitionBuffers(nvrhi::IDevice* nvDevice, VariantPartitionBuffers& part,
+        const char* prefix, u32 variantCount, u32 maxObjects);
+    void DispatchVariantPartition(
+        nvrhi::ICommandList* cmdList,
+        nvrhi::IDevice* nvDevice,
+        const CullSetBuffers& set,
+        VariantPartitionBuffers& partition);
+
     bool m_staticTerrainDrawArgsUploaded = false;  // True after first upload (terrain)
 
     bool m_compactEnabled = false;
@@ -499,6 +546,7 @@ private:
     nvrhi::BufferHandle m_terrainCompactDrawArgsBuffer;  // Terrain compacted draw args
     nvrhi::BufferHandle m_terrainCompactBatchIndicesBuffer;
     nvrhi::BufferHandle m_terrainCompactCountBuffer;
+    nvrhi::BufferHandle m_terrainCompactDispatchArgsBuffer;
     nvrhi::BufferHandle m_terrainCompactMaterialIDBuffer;
     nvrhi::BufferHandle m_terrainCompactLocalPrefixBuffer;
     nvrhi::BufferHandle m_terrainCompactGroupCountsBuffer;

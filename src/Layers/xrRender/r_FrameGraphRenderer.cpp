@@ -35,6 +35,7 @@
 // SM6 bindless: Textures registered directly with D3D12Backend via RegisterBindlessTexture()
 #include "Bindless/MaterialBuffer.h"                 // Bindless material buffer
 #include "Bindless/TerrainMaterialBuffer.h"          // Terrain material buffer
+#include "Bindless/VariantTextureBuffer.h"           // Variant texture buffer
 #include "FrameGraphPasses/SkyPassSetup.h"           // Sky dome rendering
 #include "FrameGraphPasses/SunPassSetup.h"           // Sun disc rendering
 #include "FrameGraphPasses/SkinningPassSetup.h"
@@ -127,6 +128,7 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     // terrain batches get UINT32_MAX material IDs and render black.
     bindless::MaterialBuffer::Instance().Initialize(m_device);
     bindless::TerrainMaterialBuffer::Instance().Initialize(m_device);
+    bindless::VariantTextureBuffer::Instance().Initialize(m_device);
     bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);  // Max 64K draws
     Msg("* [FrameGraphRenderer] Bindless material buffers initialized (early)");
 
@@ -233,6 +235,10 @@ void FrameGraphRenderer::Shutdown() {
     passes::ShutdownSkyGeometry();
     passes::ShutdownSunPass();
     passes::ShutdownTonemapPass();
+
+    bindless::VariantTextureBuffer::Instance().Shutdown();
+    bindless::MaterialBuffer::Instance().Shutdown();
+    bindless::TerrainMaterialBuffer::Instance().Shutdown();
 
     m_device = nullptr;
 }
@@ -1055,6 +1061,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.terrainObjectCount = m_gpuCullingManager->GetTerrainObjectCount();
         }
 
+        if (m_gpuCullingManager->IsVariantPartitionEnabled())
+            bindlessConfig.variantPartition = m_gpuCullingManager->GetStaticPartition().ToConfig();
     }
 
     auto forwardOutputs = passes::setupForwardColorPass(
@@ -1181,6 +1189,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         transparentConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetTransparentCompactMaterialIDBuffer();
         transparentConfig.compactCountBuffer = m_gpuCullingManager->GetTransparentCompactCountBuffer();
         transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
+
+        if (m_gpuCullingManager->IsVariantPartitionEnabled())
+            transparentConfig.variantPartition = m_gpuCullingManager->GetTransparentPartition().ToConfig();
     }
 
     auto transparentOutputs = passes::setupTransparentPass(

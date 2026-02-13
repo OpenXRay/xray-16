@@ -16,6 +16,7 @@ StructuredBuffer<uint> g_GroupCounts : register(t0);
 
 RWStructuredBuffer<uint> g_GroupOffsets : register(u0);
 RWByteAddressBuffer g_VisibleCount : register(u1);
+RWByteAddressBuffer g_DispatchArgs : register(u2);
 
 groupshared uint s_Scan[COMPACT_GROUP_SIZE];
 
@@ -48,6 +49,10 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     if (idx + 1 == groupCount)
     {
-        g_VisibleCount.Store(0, s_Scan[idx]);
+        uint total = s_Scan[idx];
+        g_VisibleCount.Store(0, total);
+        g_DispatchArgs.Store(0, (total + 255) / 256);
+        g_DispatchArgs.Store(4, 1);
+        g_DispatchArgs.Store(8, 1);
     }
 }

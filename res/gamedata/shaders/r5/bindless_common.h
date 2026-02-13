@@ -42,7 +42,7 @@ struct MaterialData
     float detailScale;
     float alphaRef;
     uint flags;
-    float padding;
+    uint shaderVariant;
 };
 
 // Material flags
@@ -91,17 +91,42 @@ struct TerrainMaterialData
 };
 
 // ═══════════════════════════════════════════════════════
+//  VARIANT TEXTURE DATA (matches C++ VariantTextureData)
+// ═══════════════════════════════════════════════════════
+// Additional textures for shader variants (up to 8 per material)
+// Indexed by materialID, only valid when mat.shaderVariant > 0
+
+struct VariantTextureData
+{
+    uint tex[8];
+};
+
+// ═══════════════════════════════════════════════════════
 //  BINDLESS BUFFERS
 // ═══════════════════════════════════════════════════════
 
 StructuredBuffer<MaterialData> g_Materials : register(t8);
 StructuredBuffer<TerrainMaterialData> g_TerrainMaterials : register(t9);
+StructuredBuffer<VariantTextureData> g_VariantTextures : register(t10);
 
 // ═══════════════════════════════════════════════════════
 //  SAMPLER STATE
 // ═══════════════════════════════════════════════════════
 
 SamplerState g_LinearSampler : register(s0);
+
+// ═══════════════════════════════════════════════════════
+//  VARIANT TEXTURE SAMPLING
+// ═══════════════════════════════════════════════════════
+
+float4 SampleVariantTexture(uint materialID, uint slot, float2 uv)
+{
+    uint texIdx = g_VariantTextures[materialID].tex[slot];
+    if (texIdx == INVALID_TEXTURE_INDEX)
+        return float4(0, 0, 0, 0);
+    Texture2D tex = GetBindlessTexture(texIdx);
+    return tex.Sample(g_LinearSampler, uv);
+}
 
 // ═══════════════════════════════════════════════════════
 //  TEXTURE SAMPLING

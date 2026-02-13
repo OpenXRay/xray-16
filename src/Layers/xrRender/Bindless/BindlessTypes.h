@@ -57,7 +57,7 @@ struct alignas(16) MaterialData {
     float detailScale;   // Detail texture tiling multiplier
     float alphaRef;      // Alpha test threshold (0.5 typical)
     u32 flags;           // Material flags (see MaterialFlags)
-    float padding;       // Pad to 32 bytes (16-byte aligned)
+    u32 shaderVariant;   // Index into ShaderVariantRegistry (0=default)
 };
 static_assert(sizeof(MaterialData) == 32, "MaterialData must be 32 bytes for GPU alignment");
 
