@@ -139,6 +139,8 @@ private:
     u32 m_prevFrameHeight = 0;
     nvrhi::CommandListHandle m_depthCopyCommandList;
 
+    nvrhi::TextureHandle m_inspectorPreview;
+
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
 
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_geometryVCBPool;

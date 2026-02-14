@@ -2,6 +2,7 @@
 
 #include "xrCore/Profiler/ProfilerTypes.h"
 #include "GPUProfiler.h"
+#include <nvrhi/nvrhi.h>
 
 namespace xray::profiler
 {
@@ -83,10 +84,16 @@ public:
     void SetVisible(bool visible) { m_visible = visible; }
     void ToggleVisible() { m_visible = !m_visible; }
 
+    void SetInspectorRTList(const xr_vector<shared_str>& names) { m_rtNames = names; }
+    void SetInspectorPreview(nvrhi::ITexture* tex) { m_inspectorPreview = tex; }
+    shared_str GetSelectedRTName() const { return m_selectedRTName; }
+    int GetChannelMode() const { return m_channelMode; }
+
 private:
     void RenderCPUSection();
     void RenderGPUSection();
     void RenderGeometrySection();
+    void RenderInspectorSection();
     void RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, float parentTime);
 
     static const char* FormatTime(float ms, int slot = -1);
@@ -101,6 +108,12 @@ private:
     bool m_cpuExpanded = true;
     bool m_gpuExpanded = true;
     bool m_geometryExpanded = true;
+
+    xr_vector<shared_str> m_rtNames;
+    int m_inspectorSelectedRT = -1;
+    nvrhi::ITexture* m_inspectorPreview = nullptr;
+    int m_channelMode = 0;
+    shared_str m_selectedRTName;
 };
 
 }
