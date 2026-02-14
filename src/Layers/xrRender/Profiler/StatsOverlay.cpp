@@ -536,6 +536,7 @@ void StatsOverlay::RenderInspectorSection()
             {
                 m_inspectorSelectedRT = i;
                 m_selectedRTName = m_rtNames[i];
+                m_selectedMipLevel = 0;
             }
             if (selected)
                 ImGui::SetItemDefaultFocus();
@@ -551,6 +552,12 @@ void StatsOverlay::RenderInspectorSection()
         ImGui::RadioButton("B", &m_channelMode, 3); ImGui::SameLine();
         ImGui::RadioButton("A", &m_channelMode, 4);
 
+        if (m_selectedRTMipCount > 1)
+        {
+            int maxMip = (int)m_selectedRTMipCount - 1;
+            ImGui::SliderInt("Mip Level", &m_selectedMipLevel, 0, maxMip);
+        }
+
         float availWidth = ImGui::GetContentRegionAvail().x;
         float aspect = 1.0f;
         auto desc = m_inspectorPreview->getDesc();
@@ -565,7 +572,19 @@ void StatsOverlay::RenderInspectorSection()
             ImVec2(displayW, displayH)
         );
 
-        ImGui::TextDisabled("Preview: %ux%u", desc.width, desc.height);
+        if (m_selectedRTMipCount > 1)
+        {
+            u32 srcW = m_sourceWidth;
+            u32 srcH = m_sourceHeight;
+            u32 mipW = std::max(1u, srcW >> m_selectedMipLevel);
+            u32 mipH = std::max(1u, srcH >> m_selectedMipLevel);
+            ImGui::TextDisabled("%ux%u (mip %d: %ux%u, %u mips)",
+                srcW, srcH, m_selectedMipLevel, mipW, mipH, m_selectedRTMipCount);
+        }
+        else
+        {
+            ImGui::TextDisabled("%ux%u", m_sourceWidth, m_sourceHeight);
+        }
     }
 }
 

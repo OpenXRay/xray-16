@@ -107,6 +107,9 @@ public:
     void SetInspectorPreview(nvrhi::ITexture* tex) { m_inspectorPreview = tex; }
     shared_str GetSelectedRTName() const { return m_selectedRTName; }
     int GetChannelMode() const { return m_channelMode; }
+    void SetSelectedRTMipCount(u32 mips) { m_selectedRTMipCount = mips; }
+    void SetSelectedRTSize(u32 w, u32 h) { m_sourceWidth = w; m_sourceHeight = h; }
+    int GetSelectedMipLevel() const { return m_selectedMipLevel; }
 
 private:
     void RenderCPUSection();
@@ -134,6 +137,10 @@ private:
     int m_inspectorSelectedRT = -1;
     nvrhi::ITexture* m_inspectorPreview = nullptr;
     int m_channelMode = 0;
+    int m_selectedMipLevel = 0;
+    u32 m_selectedRTMipCount = 1;
+    u32 m_sourceWidth = 0;
+    u32 m_sourceHeight = 0;
     shared_str m_selectedRTName;
 };
 

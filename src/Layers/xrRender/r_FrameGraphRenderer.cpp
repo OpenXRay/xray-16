@@ -1324,6 +1324,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                     ng::RenderDevice* device;
                     u32 sourceW, sourceH;
                     int channelMode;
+                    int mipLevel;
                 };
 
                 auto& previewData = m_framegraph->addCallbackPass<DebugPreviewData>(
@@ -1331,11 +1332,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                     [&, selectedHandle, previewHandle](framegraph::FrameGraph& builder, framegraph::PassHandle pass, DebugPreviewData& data) {
                         data.device = m_device;
                         data.channelMode = m_statsOverlay ? m_statsOverlay->GetChannelMode() : 0;
+                        data.mipLevel = m_statsOverlay ? m_statsOverlay->GetSelectedMipLevel() : 0;
                         data.source = selectedHandle;
                         data.dest = previewHandle;
                         auto& srcDesc = builder.GetResourceDesc(selectedHandle);
                         data.sourceW = srcDesc.width;
                         data.sourceH = srcDesc.height;
+                        if (m_statsOverlay) {
+                            m_statsOverlay->SetSelectedRTMipCount(srcDesc.mipLevels);
+                            m_statsOverlay->SetSelectedRTSize(srcDesc.width, srcDesc.height);
+                        }
                         builder.PassRead(pass, selectedHandle, framegraph::ResourceState::ShaderResource);
                         builder.PassWrite(pass, previewHandle, framegraph::ResourceState::UnorderedAccess);
                     },
@@ -1389,12 +1395,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                             u32 outputW, outputH;
                             u32 sourceW, sourceH;
                             u32 mode;
-                            u32 pad[3];
+                            u32 mipLevel;
+                            u32 pad[2];
                         } cb;
                         cb.outputW = 512; cb.outputH = 512;
                         cb.sourceW = data.sourceW; cb.sourceH = data.sourceH;
                         cb.mode = (u32)data.channelMode;
-                        cb.pad[0] = cb.pad[1] = cb.pad[2] = 0;
+                        cb.mipLevel = (u32)data.mipLevel;
+                        cb.pad[0] = cb.pad[1] = 0;
 
                         nvrhi::ICommandList* cmdList = ctx->GetCommandList();
                         cmdList->writeBuffer(s_cb, &cb, sizeof(cb));

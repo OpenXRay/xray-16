@@ -5,8 +5,9 @@ cbuffer DebugPreviewParams : register(b5)
 {
     uint2 g_outputSize;
     uint2 g_sourceSize;
-    uint g_mode; // 0=RGB, 1=R, 2=G, 3=B, 4=A, 5=depth
-    uint3 g_pad;
+    uint g_mode;
+    uint g_mipLevel;
+    uint2 g_pad;
 };
 
 [numthreads(8, 8, 1)]
@@ -19,7 +20,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     uint2 srcCoord = uint2(uv * float2(g_sourceSize));
     srcCoord = min(srcCoord, g_sourceSize - 1);
 
-    float4 color = t_source[srcCoord];
+    float4 color = t_source.Load(int3(srcCoord, g_mipLevel));
 
     if (g_mode == 5)
     {
