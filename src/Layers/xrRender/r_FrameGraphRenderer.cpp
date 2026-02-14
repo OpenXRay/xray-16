@@ -600,6 +600,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     m_currentDepthHandle = depthBuffer;
 
+    framegraph::ResourceDesc normalDesc;
+    normalDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    normalDesc.debugName = "rt_Normal";
+    normalDesc.width = width;
+    normalDesc.height = height;
+    normalDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    normalDesc.isRenderTarget = true;
+    normalDesc.isTransient = true;
+    framegraph::VirtualResourceHandle normalBuffer = m_framegraph->CreateTexture("rt_Normal", normalDesc);
+
     passes::HiZPyramidOutput hizOutput;
     hizOutput.pyramid = framegraph::VirtualResourceHandle();
     hizOutput.mipLevels = 0;
@@ -786,6 +796,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_device,
         depthBuffer,
         sunOutput,
+        normalBuffer,
         m_geometryCollector.get(),
         m_materialCache.get(),
         width,
@@ -934,8 +945,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     m_framegraph->GetRTRegistry().RegisterRT("rt_SceneColor", skyColorHandle);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
-    if (ps_r4_ssr_enable && sceneColorForDownstream.is_valid())
-        m_framegraph->GetRTRegistry().RegisterRT("rt_SceneWithSSR", sceneColorForDownstream);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_Normal", transparentOutputs.normal);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Exposure", exposureOutput.exposureTexture);
 
     if (m_statsOverlay && psDeviceFlags.test(rsStatistic) && m_inspectorPreview)

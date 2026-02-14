@@ -67,6 +67,10 @@ void InitializeForwardPipelines(ng::RenderDevice* device)
     colorDesc.debugName = "ForwardInit_DummyColor";
     auto dummyColorRT = nvDevice->createTexture(colorDesc);
 
+    nvrhi::TextureDesc normalDesc = colorDesc;
+    normalDesc.debugName = "ForwardInit_DummyNormal";
+    auto dummyNormalRT = nvDevice->createTexture(normalDesc);
+
     nvrhi::TextureDesc depthDesc;
     depthDesc.width = 64;
     depthDesc.height = 64;
@@ -79,6 +83,7 @@ void InitializeForwardPipelines(ng::RenderDevice* device)
 
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.addColorAttachment(dummyColorRT);
+    fbDesc.addColorAttachment(dummyNormalRT);
     fbDesc.setDepthAttachment(dummyDepthRT);
     auto dummyFramebuffer = nvDevice->createFramebuffer(fbDesc);
 
@@ -266,6 +271,7 @@ void renderBindlessForward(
     ng::RenderDevice* device,
     const GeometryCollector* geometry,
     nvrhi::ITexture* colorRT,
+    nvrhi::ITexture* normalRT,
     nvrhi::ITexture* depthRT,
     const BindlessForwardConfig& config,
     MaterialCache* materialCache)
@@ -423,6 +429,8 @@ void renderBindlessForward(
 
         nvrhi::FramebufferDesc fbDesc;
         fbDesc.addColorAttachment(colorRT);
+        if (normalRT)
+            fbDesc.addColorAttachment(normalRT);
         fbDesc.setDepthAttachment(depthRT);
         auto framebuffer = nvDevice->createFramebuffer(fbDesc);
 
@@ -451,6 +459,8 @@ void renderBindlessForward(
 
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.addColorAttachment(colorRT);
+    if (normalRT)
+        fbDesc.addColorAttachment(normalRT);
     fbDesc.setDepthAttachment(depthRT);
     auto framebuffer = nvDevice->createFramebuffer(fbDesc);
 
@@ -752,6 +762,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     ng::RenderDevice* device,
     framegraph::VirtualResourceHandle depthInput,
     framegraph::VirtualResourceHandle colorInput,
+    framegraph::VirtualResourceHandle normalInput,
     const GeometryCollector* geometry,
     MaterialCache* materialCache,
     u32 width,
@@ -764,6 +775,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     struct ForwardColorPassData {
         VirtualResourceHandle depth;
         VirtualResourceHandle color;
+        VirtualResourceHandle normal;
         VirtualResourceHandle drawArgsBuffer;
         ng::RenderDevice* device;
         const GeometryCollector* geometry;
@@ -777,7 +789,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     auto& passData = fg.addCallbackPass<ForwardColorPassData>(
         "Forward+ Color Pass",
 
-        [&, width, height, colorInput, drawArgsInput, bindlessConfig](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
+        [&, width, height, colorInput, normalInput, drawArgsInput, bindlessConfig](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -788,14 +800,15 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
-
             data.color = passBuilder.readWrite(colorInput, ResourceState::RenderTarget);
+            data.normal = passBuilder.write(normalInput, ResourceState::RenderTarget);
 
             if (drawArgsInput.is_valid()) {
                 data.drawArgsBuffer = passBuilder.read(drawArgsInput, ResourceState::IndirectArgument);
             }
 
             data.outputs.albedo = data.color;
+            data.outputs.normal = data.normal;
             data.outputs.depth = data.depth;
         },
 
@@ -805,6 +818,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
 
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             auto* colorRT = fg.GetPhysicalTexture(data.color);
+            auto* normalRT = fg.GetPhysicalTexture(data.normal);
 
             if (!depthRT || !colorRT)
                 return;
@@ -812,6 +826,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             if (cmdList) {
                 cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 1.0f, false, 0);
+                if (normalRT)
+                    cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
             }
 
             if (!data.geometry)
@@ -827,6 +843,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 data.device,
                 data.geometry,
                 colorRT,
+                normalRT,
                 depthRT,
                 data.bindlessConfig,
                 data.materialCache
@@ -836,8 +853,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
 
     DefaultOutputLayout outputs;
     outputs.albedo = passData.color;
-    outputs.normal = passData.color;
-    outputs.material = passData.color;
+    outputs.normal = passData.normal;
     outputs.depth = passData.depth;
     return outputs;
 }

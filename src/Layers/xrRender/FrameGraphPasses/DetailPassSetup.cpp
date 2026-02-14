@@ -56,6 +56,7 @@ DefaultOutputLayout setupDetailPass(
         VirtualResourceHandle inputColor;
         VirtualResourceHandle depth;
         VirtualResourceHandle outputColor;
+        VirtualResourceHandle outputNormal;
         VirtualResourceHandle hiZPyramid;
         ng::RenderDevice* device;
         RENDER_NAMESPACE::FGDetailManager* detailManager;
@@ -100,8 +101,10 @@ DefaultOutputLayout setupDetailPass(
             data.inputColor = passBuilder.read(forwardInputs.albedo);
             data.depth = passBuilder.read(forwardInputs.depth);
             data.outputColor = passBuilder.write(forwardInputs.albedo);
+            data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
 
             data.outputs.albedo = data.outputColor;
+            data.outputs.normal = data.outputNormal;
             data.outputs.depth = data.depth;
         },
         [](const DetailPassData& data, const FrameGraph& fg, ng::RenderContext* ctx)
@@ -193,8 +196,12 @@ DefaultOutputLayout setupDetailPass(
             const nvrhi::TextureDesc& colorDesc = colorTexture->getDesc();
             const nvrhi::TextureDesc& depthDesc = depthTexture->getDesc();
 
+            nvrhi::ITexture* normalTexture = fg.GetPhysicalTexture(data.outputNormal);
+
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorTexture);
+            if (normalTexture)
+                fbDesc.addColorAttachment(normalTexture);
             fbDesc.setDepthAttachment(depthTexture);
 
             nvrhi::FramebufferHandle framebuffer = data.device->GetNVRHIDevice()->createFramebuffer(fbDesc);
@@ -391,7 +398,11 @@ DefaultOutputLayout setupDetailPass(
         }
     );
 
-    return passData.outputs;
+    DefaultOutputLayout outputs;
+    outputs.albedo = passData.outputColor;
+    outputs.normal = passData.outputNormal;
+    outputs.depth = passData.depth;
+    return outputs;
 }
 
 }
