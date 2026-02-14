@@ -21,6 +21,7 @@ struct PS_INPUT
 struct PS_OUTPUT
 {
     float4 color : SV_Target0;
+    float4 normal : SV_Target1;
 };
 
 // Per-draw material ID (set via constant buffer for skinned meshes)
@@ -54,17 +55,18 @@ PS_OUTPUT main(PS_INPUT input)
 
     float3 albedo = diffuseSample.rgb;
 
-    // Normal mapping
     float3 N = normalize(input.normal);
+    float gloss = 0.0;
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
-        float3 normalSample = SampleNormal(mat, input.texcoord);
+        BumpSample bump = SampleNormal(mat, input.texcoord);
         float3x3 TBN = float3x3(
             normalize(input.tangent),
             normalize(input.bitangent),
             N
         );
-        N = normalize(mul(normalSample, TBN));
+        N = normalize(mul(bump.normal, TBN));
+        gloss = bump.gloss;
     }
 
     // Detail texture
@@ -74,9 +76,8 @@ PS_OUTPUT main(PS_INPUT input)
         albedo = albedo * (detailSample.rgb * 2.0);
     }
 
-    // PBR properties
     float metallic = 0.0;
-    float roughness = 0.5;
+    float roughness = 1.0 - gloss;
     float ao = 1.0;
 
     if (mat.flags & MAT_FLAG_HAS_PBR)
@@ -89,5 +90,6 @@ PS_OUTPUT main(PS_INPUT input)
 
     f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao);
     output.color = float4(fwd.color.rgb, diffuseSample.a);
+    output.normal = fwd.normal;
     return output;
 }

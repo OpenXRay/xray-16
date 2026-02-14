@@ -126,15 +126,16 @@ void ShutdownForwardPipelines();
 // NOTE: Does NOT clear color buffer - sky pass renders background first
 framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,                      // Render device for buffer access
-    framegraph::VirtualResourceHandle depthInput,  // Existing depth buffer from prepass
-    framegraph::VirtualResourceHandle colorInput,  // Color buffer from sky pass
-    const GeometryCollector* geometry,             // Geometry batches to render
-    MaterialCache* materialCache,                  // Material cache for shaders
-    u32 width,                                     // Render target width
-    u32 height,                                    // Render target height
-    framegraph::VirtualResourceHandle drawArgsBuffer = framegraph::VirtualResourceHandle(),  // GPU culling draw args (optional)
-    const BindlessForwardConfig& bindlessConfig = BindlessForwardConfig()  // Bindless rendering config
+    ng::RenderDevice* device,
+    framegraph::VirtualResourceHandle depthInput,
+    framegraph::VirtualResourceHandle colorInput,
+    framegraph::VirtualResourceHandle normalInput,
+    const GeometryCollector* geometry,
+    MaterialCache* materialCache,
+    u32 width,
+    u32 height,
+    framegraph::VirtualResourceHandle drawArgsBuffer = framegraph::VirtualResourceHandle(),
+    const BindlessForwardConfig& bindlessConfig = BindlessForwardConfig()
 );
 
 } // namespace xray::render::passes

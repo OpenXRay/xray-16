@@ -114,6 +114,10 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
     colorDesc.debugName = "SkinningInit_DummyColor";
     auto dummyColorRT = nvDevice->createTexture(colorDesc);
 
+    nvrhi::TextureDesc normalDesc = colorDesc;
+    normalDesc.debugName = "SkinningInit_DummyNormal";
+    auto dummyNormalRT = nvDevice->createTexture(normalDesc);
+
     nvrhi::TextureDesc depthDesc;
     depthDesc.width = 64;
     depthDesc.height = 64;
@@ -126,6 +130,7 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
 
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.addColorAttachment(dummyColorRT);
+    fbDesc.addColorAttachment(dummyNormalRT);
     fbDesc.setDepthAttachment(dummyDepthRT);
     auto framebuffer = nvDevice->createFramebuffer(fbDesc);
 
@@ -687,6 +692,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
     struct SkinningPassData {
         VirtualResourceHandle color;
+        VirtualResourceHandle normal;
         VirtualResourceHandle depth;
         ng::RenderDevice* device;
         const GeometryCollector* geometry;
@@ -694,7 +700,6 @@ framegraph::DefaultOutputLayout setupSkinningPass(
         MaterialCache* materialCache;
         u32 width, height;
         DefaultOutputLayout outputs;
-        // GPU culling visibility data
         SkinnedVisibilityData visibilityData;
     };
 
@@ -715,11 +720,12 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             data.materialCache = materialCache;
             data.visibilityData = visibilityData;
 
-            // Read-write color and depth (renders on top of forward pass)
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
+            data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
             data.depth = passBuilder.readWrite(inputs.depth, ResourceState::DepthStencilWrite);
 
             data.outputs.albedo = data.color;
+            data.outputs.normal = data.normal;
             data.outputs.depth = data.depth;
         },
 
@@ -752,8 +758,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 return;
             }
 
-            // Get physical resources
             auto* colorRT = fg.GetPhysicalTexture(data.color);
+            auto* normalRT = fg.GetPhysicalTexture(data.normal);
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             if (!colorRT || !depthRT)
                 return;
@@ -763,9 +769,10 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             if (!nvDevice || !cmdList)
                 return;
 
-            // Create framebuffer
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
+            if (normalRT)
+                fbDesc.addColorAttachment(normalRT);
             fbDesc.setDepthAttachment(depthRT);
             auto framebuffer = nvDevice->createFramebuffer(fbDesc);
             if (!framebuffer)
@@ -975,6 +982,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     // Return outputs
     DefaultOutputLayout outputs;
     outputs.albedo = passData.color;
+    outputs.normal = passData.normal;
     outputs.depth = passData.depth;
     return outputs;
 }

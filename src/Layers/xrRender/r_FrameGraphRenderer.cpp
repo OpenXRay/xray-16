@@ -833,6 +833,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // Store for later copy to persistent storage
     m_currentDepthHandle = depthBuffer;
 
+    framegraph::ResourceDesc normalDesc;
+    normalDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    normalDesc.debugName = "rt_Normal";
+    normalDesc.width = width;
+    normalDesc.height = height;
+    normalDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    normalDesc.isRenderTarget = true;
+    normalDesc.isTransient = true;
+    framegraph::VirtualResourceHandle normalBuffer = m_framegraph->CreateTexture("rt_Normal", normalDesc);
+
     // ═══════════════════════════════════════════════════════
     //  TEMPORAL HI-Z PYRAMID BUILD (From Previous Frame)
     // ═══════════════════════════════════════════════════════
@@ -1085,14 +1095,15 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     auto forwardOutputs = passes::setupForwardColorPass(
         *m_framegraph,
         m_device,
-        depthBuffer,  // Reuse depth from prepass for early-Z
-        sunOutput,    // Color buffer from sun pass (has sky + sun)
+        depthBuffer,
+        sunOutput,
+        normalBuffer,
         m_geometryCollector.get(),
         m_materialCache.get(),
         width,
         height,
-        drawArgsBuffer,  // Draw args from GPU culling (enables indirect draw if valid)
-        bindlessConfig   // Bindless rendering configuration
+        drawArgsBuffer,
+        bindlessConfig
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1282,8 +1293,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     m_framegraph->GetRTRegistry().RegisterRT("rt_SceneColor", skyColorHandle);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
-    if (ps_r4_ssr_enable && sceneColorForDownstream.is_valid())
-        m_framegraph->GetRTRegistry().RegisterRT("rt_SceneWithSSR", sceneColorForDownstream);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_Normal", transparentOutputs.normal);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Exposure", exposureOutput.exposureTexture);
 
     if (m_statsOverlay && psDeviceFlags.test(rsStatistic) && m_inspectorPreview)

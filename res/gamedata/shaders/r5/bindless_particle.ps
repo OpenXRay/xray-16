@@ -19,6 +19,7 @@ struct PS_INPUT
 struct PS_OUTPUT
 {
     float4 color : SV_Target0;
+    float4 normal : SV_Target1;
 };
 
 PS_OUTPUT main(PS_INPUT input)
@@ -38,5 +39,6 @@ PS_OUTPUT main(PS_INPUT input)
     clip(result.a - (0.01 / 255.0));
 
     output.color = result;
+    output.normal = float4(0, 0, 0, 0);
     return output;
 }

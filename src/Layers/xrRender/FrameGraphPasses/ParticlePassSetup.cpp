@@ -302,10 +302,14 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
     colorDesc.debugName = "ParticleInit_DummyColor";
     auto dummyColorRT = nvDevice->createTexture(colorDesc);
 
+    nvrhi::TextureDesc normalDesc = colorDesc;
+    normalDesc.debugName = "ParticleInit_DummyNormal";
+    auto dummyNormalRT = nvDevice->createTexture(normalDesc);
+
     nvrhi::TextureDesc depthDesc;
     depthDesc.width = 64;
     depthDesc.height = 64;
-    depthDesc.format = nvrhi::Format::D32;  // Changed from D24S8 to match framegraph
+    depthDesc.format = nvrhi::Format::D32;
     depthDesc.isRenderTarget = true;
     depthDesc.initialState = nvrhi::ResourceStates::DepthWrite;
     depthDesc.keepInitialState = true;
@@ -314,6 +318,7 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
 
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.addColorAttachment(dummyColorRT);
+    fbDesc.addColorAttachment(dummyNormalRT);
     fbDesc.setDepthAttachment(dummyDepthRT);
     auto framebuffer = nvDevice->createFramebuffer(fbDesc);
     if (!framebuffer)
@@ -499,6 +504,7 @@ DefaultOutputLayout setupParticlePass(
         VirtualResourceHandle inputColor;
         VirtualResourceHandle depth;
         VirtualResourceHandle outputColor;
+        VirtualResourceHandle outputNormal;
         VirtualResourceHandle hiZPyramid;
         ng::RenderDevice* device;
         const xr_vector<ParticleBatch>* worldParticleBatches;
@@ -534,9 +540,11 @@ DefaultOutputLayout setupParticlePass(
 
             data.inputColor = passBuilder.read(forwardInputs.albedo);
             data.outputColor = passBuilder.write(forwardInputs.albedo, ResourceState::RenderTarget);
+            data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
 
             data.outputs.albedo = data.outputColor;
+            data.outputs.normal = data.outputNormal;
             data.outputs.depth = data.depth;
         },
         [](const ParticlePassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
@@ -547,6 +555,7 @@ DefaultOutputLayout setupParticlePass(
                 return;
 
             auto* colorRT = fg.GetPhysicalTexture(data.outputColor);
+            auto* normalRT = fg.GetPhysicalTexture(data.outputNormal);
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             if (!colorRT || !depthRT)
                 return;
@@ -556,15 +565,15 @@ DefaultOutputLayout setupParticlePass(
             if (!nvDevice || !cmdList)
                 return;
 
-            // Finalize materials
             if (data.materialCache)
                 data.materialCache->FinalizePendingMaterials(ctx);
             auto& matBuffer = MaterialBuffer::Instance();
             matBuffer.Upload(ctx);
 
-            // Create framebuffer
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
+            if (normalRT)
+                fbDesc.addColorAttachment(normalRT);
             fbDesc.setDepthAttachment(depthRT);
             auto framebuffer = nvDevice->createFramebuffer(fbDesc);
             if (!framebuffer)
@@ -769,6 +778,7 @@ DefaultOutputLayout setupParticlePass(
 
     DefaultOutputLayout outputs;
     outputs.albedo = passData.outputColor;
+    outputs.normal = passData.outputNormal;
     outputs.depth = passData.depth;
     return outputs;
 }

@@ -303,7 +303,8 @@ struct	v_static_color
 //	Forward+ output (single RT)
 struct f_forward
 {
-    float4	color : SV_Target0;        // Final HDR color output (RGBA16_FLOAT)
+    float4	color : SV_Target0;
+    float4	normal : SV_Target1;       // view normal.xyz, roughness.w
 };
 
 struct					gbuffer_data

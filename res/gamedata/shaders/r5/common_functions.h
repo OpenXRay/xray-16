@@ -222,11 +222,16 @@ float gbuf_unpack_mtl( float mtl_hemi )
 // ══════════════════════════════════════════════════════════
 #include "shared/pbr_brdf.h"
 
+float3 worldNormalToView(float3 N)
+{
+	return normalize(mul(float3x3(m_V[0].xyz, m_V[1].xyz, m_V[2].xyz), N));
+}
+
 f_forward output_forward_color(float3 albedo, float3 normal, float metallic, float roughness)
 {
-	// Legacy overload - assumes world position unavailable, no lighting
 	f_forward res;
 	res.color = float4(albedo, 1.0);
+	res.normal = float4(worldNormalToView(normalize(normal)), roughness);
 	return res;
 }
 
@@ -260,6 +265,7 @@ f_forward output_forward_pbr(
 	float3 finalColor = sunLight + ambient;
 
 	res.color = float4(finalColor, 1.0);
+	res.normal = float4(worldNormalToView(N), roughness);
 	return res;
 }
 

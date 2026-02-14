@@ -179,6 +179,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     struct TransparentPassData {
         VirtualResourceHandle depth;
         VirtualResourceHandle color;
+        VirtualResourceHandle normal;
         ng::RenderDevice* device;
         TransparentPassConfig config;
         u32 width, height;
@@ -195,6 +196,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
 
             RenderPassBuilder passBuilder(builder, passHandle);
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
+            data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
         },
 
@@ -203,6 +205,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             ng::RenderContext* ctx) {
 
             auto* colorRT = fg.GetPhysicalTexture(data.color);
+            auto* normalRT = fg.GetPhysicalTexture(data.normal);
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             if (!colorRT || !depthRT)
                 return;
@@ -214,6 +217,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
+            if (normalRT)
+                fbDesc.addColorAttachment(normalRT);
             fbDesc.setDepthAttachment(depthRT);
             auto framebuffer = nvDevice->createFramebuffer(fbDesc);
             if (!framebuffer)
@@ -346,6 +351,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
 
     DefaultOutputLayout outputs;
     outputs.albedo = passData.color;
+    outputs.normal = passData.normal;
     outputs.depth = passData.depth;
     return outputs;
 }

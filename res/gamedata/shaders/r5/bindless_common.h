@@ -149,20 +149,30 @@ float4 SampleDiffuse(MaterialData mat, float2 uv)
 //  NORMAL SAMPLING
 // ─────────────────────────────────────────────────────
 
-float3 SampleNormal(MaterialData mat, float2 uv)
+struct BumpSample
 {
+    float3 normal;
+    float gloss;
+};
+
+BumpSample SampleNormal(MaterialData mat, float2 uv)
+{
+    BumpSample result;
+    result.normal = float3(0, 0, 1);
+    result.gloss = 0.0;
+
     if (mat.normalIndex == INVALID_TEXTURE_INDEX)
-        return float3(0.5, 0.5, 1.0);  // Flat normal
+        return result;
 
     Texture2D tex = GetBindlessTexture(mat.normalIndex);
-    float4 sample = tex.Sample(g_LinearSampler, uv);
+    float4 Nu = tex.Sample(g_LinearSampler, uv);
 
-    // X-Ray normal map format: R=gloss, G=Z, B=Y, A=X
-    float3 normal;
-    normal.x = sample.a * 2.0 - 1.0;
-    normal.y = sample.b * 2.0 - 1.0;
-    normal.z = sample.g * 2.0 - 1.0;
-    return normal;
+    // X-Ray bump format: R=glossiness, G=normalZ(unused), B=normalY(DX), A=normalX
+    result.normal.x = Nu.a * 2.0 - 1.0;
+    result.normal.y = Nu.b * 2.0 - 1.0;
+    result.normal.z = sqrt(saturate(1.0 - result.normal.x * result.normal.x - result.normal.y * result.normal.y));
+    result.gloss = Nu.r * Nu.r;
+    return result;
 }
 
 // ─────────────────────────────────────────────────────
