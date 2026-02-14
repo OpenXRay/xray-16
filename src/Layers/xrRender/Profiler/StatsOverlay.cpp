@@ -124,6 +124,11 @@ void StatsOverlay::Render()
     // GPU Section
     RenderGPUSection();
 
+    ImGui::Separator();
+
+    // Render Inspector Section
+    RenderInspectorSection();
+
     ImGui::End();
 }
 
@@ -502,6 +507,65 @@ void StatsOverlay::RenderGeometrySection()
     else
     {
         m_geometryExpanded = false;
+    }
+}
+
+void StatsOverlay::RenderInspectorSection()
+{
+    if (!ImGui::CollapsingHeader("Render Inspector"))
+        return;
+
+    if (m_rtNames.empty())
+    {
+        ImGui::TextDisabled("No render targets registered");
+        return;
+    }
+
+    ImGui::Indent();
+
+    const char* previewLabel = m_inspectorSelectedRT >= 0 && m_inspectorSelectedRT < (int)m_rtNames.size()
+        ? m_rtNames[m_inspectorSelectedRT].c_str()
+        : "Select RT...";
+
+    if (ImGui::BeginCombo("RT", previewLabel))
+    {
+        for (int i = 0; i < (int)m_rtNames.size(); i++)
+        {
+            bool selected = (m_inspectorSelectedRT == i);
+            if (ImGui::Selectable(m_rtNames[i].c_str(), selected))
+            {
+                m_inspectorSelectedRT = i;
+                m_selectedRTName = m_rtNames[i];
+            }
+            if (selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    if (m_inspectorPreview && m_inspectorSelectedRT >= 0)
+    {
+        ImGui::RadioButton("RGB", &m_channelMode, 0); ImGui::SameLine();
+        ImGui::RadioButton("R", &m_channelMode, 1); ImGui::SameLine();
+        ImGui::RadioButton("G", &m_channelMode, 2); ImGui::SameLine();
+        ImGui::RadioButton("B", &m_channelMode, 3); ImGui::SameLine();
+        ImGui::RadioButton("A", &m_channelMode, 4);
+
+        float availWidth = ImGui::GetContentRegionAvail().x;
+        float aspect = 1.0f;
+        auto desc = m_inspectorPreview->getDesc();
+        if (desc.height > 0)
+            aspect = (float)desc.width / (float)desc.height;
+
+        float displayW = std::min(availWidth, 400.0f);
+        float displayH = displayW / aspect;
+
+        ImGui::Image(
+            reinterpret_cast<ImTextureID>(m_inspectorPreview),
+            ImVec2(displayW, displayH)
+        );
+
+        ImGui::TextDisabled("Preview: %ux%u", desc.width, desc.height);
     }
 }
 

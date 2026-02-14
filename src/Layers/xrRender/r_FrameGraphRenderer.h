@@ -175,6 +175,9 @@ private:
     u32 m_prevFrameHeight = 0;
     nvrhi::CommandListHandle m_depthCopyCommandList; // Reusable command list for depth copy (avoids per-frame allocation)
 
+    // Debug preview texture for Render Inspector (persistent, not part of framegraph)
+    nvrhi::TextureHandle m_inspectorPreview;
+
     // Passes
     //xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
     //xr_unique_ptr<passes::HUDPass> m_hudPass;

@@ -187,6 +187,19 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_statsOverlay->SetGPUProfiler(m_gpuProfiler.get());
     Msg("* [FrameGraphRenderer] Profiler initialized");
 
+    {
+        nvrhi::TextureDesc previewDesc;
+        previewDesc.debugName = "InspectorPreview";
+        previewDesc.width = 512;
+        previewDesc.height = 512;
+        previewDesc.format = nvrhi::Format::RGBA16_FLOAT;
+        previewDesc.isUAV = true;
+        previewDesc.isRenderTarget = false;
+        previewDesc.keepInitialState = true;
+        previewDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        m_inspectorPreview = device->GetNVRHIDevice()->createTexture(previewDesc);
+    }
+
     Msg("* [FrameGraphRenderer] initialized");
 
     return true;
@@ -207,6 +220,7 @@ void FrameGraphRenderer::Shutdown() {
         m_gpuProfiler = nullptr;
     }
 
+    m_inspectorPreview = nullptr;
     m_renderContext = nullptr;
     m_geometryCollector = nullptr;
     m_materialCache = nullptr;
@@ -660,6 +674,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
         }
 
         m_statsOverlay->SetRenderStats(stats);
+        m_statsOverlay->SetInspectorPreview(m_inspectorPreview ? m_inspectorPreview.Get() : nullptr);
         m_statsOverlay->SetVisible(true);
         m_statsOverlay->Render();
     }
@@ -862,6 +877,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     // Store Hi-Z pyramid handle for future GPU culling pass
     m_hizPyramid = hizOutput.pyramid;
+    if (m_hizPyramid.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_HiZ", m_hizPyramid);
 
     // ═══════════════════════════════════════════════════════
     //  PHASE 3.5: GPU CULLING PASS (Frustum + Occlusion)
@@ -1259,6 +1276,136 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width,
         height
     );
+
+    // ═══════════════════════════════════════════════════════
+    //  DEBUG PREVIEW PASS (Render Inspector RT visualization)
+    // ═══════════════════════════════════════════════════════
+    m_framegraph->GetRTRegistry().RegisterRT("rt_SceneColor", skyColorHandle);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
+    if (ps_r4_ssr_enable && sceneColorForDownstream.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_SceneWithSSR", sceneColorForDownstream);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_Exposure", exposureOutput.exposureTexture);
+
+    if (m_statsOverlay && psDeviceFlags.test(rsStatistic) && m_inspectorPreview)
+    {
+        auto rtNames = m_framegraph->GetRTRegistry().GetAllNames();
+        m_statsOverlay->SetInspectorRTList(rtNames);
+
+        auto selectedName = m_statsOverlay->GetSelectedRTName();
+        if (selectedName.size() > 0)
+        {
+            auto selectedHandle = m_framegraph->GetRTRegistry().TryGetRT(selectedName.c_str());
+            if (selectedHandle.is_valid())
+            {
+                framegraph::ResourceDesc previewDesc;
+                previewDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+                previewDesc.width = 512;
+                previewDesc.height = 512;
+                previewDesc.format = nvrhi::Format::RGBA16_FLOAT;
+                previewDesc.isUAV = true;
+                previewDesc.isImported = true;
+                previewDesc.debugName = "debug_preview";
+                auto previewHandle = m_framegraph->ImportTexture(
+                    "debug_preview", m_inspectorPreview.Get(), previewDesc);
+
+                struct DebugPreviewData {
+                    framegraph::VirtualResourceHandle source;
+                    framegraph::VirtualResourceHandle dest;
+                    ng::RenderDevice* device;
+                    u32 sourceW, sourceH;
+                    int channelMode;
+                };
+
+                auto& previewData = m_framegraph->addCallbackPass<DebugPreviewData>(
+                    "Debug Preview",
+                    [&, selectedHandle, previewHandle](framegraph::FrameGraph& builder, framegraph::PassHandle pass, DebugPreviewData& data) {
+                        data.device = m_device;
+                        data.channelMode = m_statsOverlay ? m_statsOverlay->GetChannelMode() : 0;
+                        data.source = selectedHandle;
+                        data.dest = previewHandle;
+                        auto& srcDesc = builder.GetResourceDesc(selectedHandle);
+                        data.sourceW = srcDesc.width;
+                        data.sourceH = srcDesc.height;
+                        builder.PassRead(pass, selectedHandle, framegraph::ResourceState::ShaderResource);
+                        builder.PassWrite(pass, previewHandle, framegraph::ResourceState::UnorderedAccess);
+                    },
+                    [](const DebugPreviewData& data, const framegraph::FrameGraph& fg, ng::RenderContext* ctx) {
+                        static ref_cs s_debugPreviewCS;
+                        static nvrhi::ComputePipelineHandle s_pipeline;
+                        static nvrhi::BindingLayoutHandle s_layout;
+                        static nvrhi::BufferHandle s_cb;
+                        static bool s_init = false;
+
+                        nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+
+                        if (!s_init) {
+                            s_debugPreviewCS.create("debug_preview");
+                            if (!s_debugPreviewCS || !s_debugPreviewCS->nvrhiShader) return;
+
+                            nvrhi::BindingLayoutDesc layoutDesc;
+                            layoutDesc.visibility = nvrhi::ShaderType::Compute;
+                            layoutDesc.bindings = {
+                                nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+                                nvrhi::BindingLayoutItem::Texture_SRV(0),
+                                nvrhi::BindingLayoutItem::Texture_UAV(0),
+                            };
+                            s_layout = nvDevice->createBindingLayout(layoutDesc);
+
+                            nvrhi::ComputePipelineDesc pipeDesc;
+                            pipeDesc.CS = s_debugPreviewCS->nvrhiShader;
+                            pipeDesc.bindingLayouts = { s_layout };
+                            s_pipeline = nvDevice->createComputePipeline(pipeDesc);
+
+                            nvrhi::BufferDesc cbDesc;
+                            cbDesc.debugName = "DebugPreviewCB";
+                            cbDesc.byteSize = 32;
+                            cbDesc.isConstantBuffer = true;
+                            cbDesc.isVolatile = true;
+                            cbDesc.maxVersions = 16;
+                            cbDesc.keepInitialState = true;
+                            cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+                            s_cb = nvDevice->createBuffer(cbDesc);
+
+                            s_init = true;
+                        }
+
+                        if (!s_pipeline) return;
+
+                        nvrhi::ITexture* srcTex = fg.GetPhysicalTexture(data.source);
+                        nvrhi::ITexture* dstTex = fg.GetPhysicalTexture(data.dest);
+                        if (!srcTex || !dstTex) return;
+
+                        struct {
+                            u32 outputW, outputH;
+                            u32 sourceW, sourceH;
+                            u32 mode;
+                            u32 pad[3];
+                        } cb;
+                        cb.outputW = 512; cb.outputH = 512;
+                        cb.sourceW = data.sourceW; cb.sourceH = data.sourceH;
+                        cb.mode = (u32)data.channelMode;
+                        cb.pad[0] = cb.pad[1] = cb.pad[2] = 0;
+
+                        nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+                        cmdList->writeBuffer(s_cb, &cb, sizeof(cb));
+
+                        nvrhi::BindingSetDesc bindDesc;
+                        bindDesc.bindings = {
+                            nvrhi::BindingSetItem::ConstantBuffer(5, s_cb),
+                            nvrhi::BindingSetItem::Texture_SRV(0, srcTex),
+                            nvrhi::BindingSetItem::Texture_UAV(0, dstTex),
+                        };
+                        auto bindings = nvDevice->createBindingSet(bindDesc, s_layout);
+                        if (!bindings) return;
+
+                        ctx->SetComputePipeline(s_pipeline.Get());
+                        ctx->SetComputeBindingSet(0, bindings.Get());
+                        ctx->Dispatch((512 + 7) / 8, (512 + 7) / 8, 1);
+                    }
+                );
+            }
+        }
+    }
 
     // 7. ImGui Pass - Renders debug UI on top of LDR output (backbuffer)
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
