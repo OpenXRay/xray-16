@@ -2,6 +2,24 @@
 
 namespace xray::imgui
 {
+struct ScopeID final : Noncopyable
+{
+    template <typename... Args>
+    explicit ScopeID(Args... args)
+    {
+        ImGui::PushID(std::forward<Args>(args)...);
+    }
+
+    ~ScopeID()
+    {
+        ImGui::PopID();
+    }
+};
+
+// Uses previous ItemID in the ID stack for the storage ID to allow
+// same ID for multiple items without causing ID conflicts
+bool CascadingCollapsingHeader(cpcstr label, ImGuiTreeNodeFlags flags = 0);
+
 inline void ItemHelp(const char* desc, bool use_separate_marker = true, bool on_same_line = true)
 {
     if (use_separate_marker)
