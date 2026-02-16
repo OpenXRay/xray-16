@@ -240,17 +240,12 @@ void CObjectFactory::on_tool_frame()
             constexpr pcstr styles[] =
             {
                 "Game",
-                "LTX"
+                "LTX",
             };
 
             ImGui::SetNextItemWidth(ImGui::CalcTextSize(" Game ").x); // shrink to minimal
-            ImGui::SliderInt("", &display_mode, 0, std::size(styles) - 1, styles[display_mode], ImGuiSliderFlags_NoInput);
-            if (ImGui::IsItemDeactivated() && !ImGui::IsItemDeactivatedAfterEdit())
-            {
-                display_mode = !display_mode;
-            }
-
-            imgui::ItemHelp("Left-click on the item in this list to spawn it.\n"
+            imgui::Selector("", display_mode, styles, std::size(styles),
+                            "Left-click on the item in this list to spawn it.\n"
                             "You can also select between displaying game names or ltx sections by using a switch.");
             ImGui::EndMenuBar();
         }
