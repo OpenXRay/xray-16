@@ -17,19 +17,11 @@ bool window_ambients = false;
 bool window_thunderbolts = false;
 bool window_level_weathers = false;
 
-struct combo_raii
-{
-    ~combo_raii()
-    {
-        ImGui::EndCombo();
-    }
-};
-
 bool TimeFrameCombo(pcstr label, CEnvDescriptor*& descriptor, const CEnvironment::EnvVec* currentWeather)
 {
     if (ImGui::BeginCombo(label, descriptor ? descriptor->m_identifier.c_str() : "##"))
     {
-        combo_raii raii;
+        xray::imgui::combo_raii raii;
 
         if (ImGui::Selectable("##", !descriptor))
         {
@@ -53,35 +45,16 @@ bool TimeFrameCombo(pcstr label, CEnvDescriptor*& descriptor, const CEnvironment
 
 bool ConfigStyleSelector(pcstr label, bool& soc_style)
 {
-    using namespace xray::imgui;
-
-    bool result = false;
-    enum ConfigStyle
+    constexpr pcstr styles[] =
     {
-        ConfigStyle_SOC,
-        ConfigStyle_CSCOP,
-        ConfigStyle_COUNT
-    };
-    constexpr pcstr styles[ConfigStyle_COUNT] =
-    {
+        "CS/COP",
         "SOC",
-        "CS/COP"
     };
-    int selected = soc_style ? ConfigStyle_SOC : ConfigStyle_CSCOP;
-    if (ImGui::SliderInt(label, &selected, 0, ConfigStyle_COUNT - 1, styles[selected]))
-    {
-        switch (static_cast<ConfigStyle>(selected))
-        {
-        case ConfigStyle_SOC:   soc_style = true; break;
-        case ConfigStyle_CSCOP: soc_style = false; break;
-        }
-        result = true;
-    }
-    ItemHelp("This affects how environment color will be calculated in the mixer. "
+    return xray::imgui::Selector(label, soc_style, styles, std::size(styles),
+        "This affects how environment color will be calculated in the mixer. "
         "(look at the environment color in the mixer category)");
-    return result;
 }
-}
+} // namespace
 #endif
 
 void CEnvDescriptor::ed_show_params(const CEnvironment& env)

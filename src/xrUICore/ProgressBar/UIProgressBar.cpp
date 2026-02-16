@@ -1,6 +1,8 @@
 #include "pch.hpp"
 #include "UIProgressBar.h"
 
+#include "xrEngine/editor_helper.h"
+
 CUIProgressBar::CUIProgressBar()
     : CUIWindow("CUIProgressBar"), m_UIProgressItem("Progress"), m_UIBackgroundItem("Background")
 {
@@ -165,12 +167,7 @@ void CUIProgressBar::FillDebugInfo()
         "Horizontal (from center to sides)",
         "Vertical (from center to sides)",
     };
-    int mode = m_orient_mode;
-    if (ImGui::SliderInt("Mode", &mode, 0, om_count - 1, styles[m_orient_mode]))
-    {
-        m_orient_mode = (EOrientMode)mode;
-        update |= true;
-    }
+    update |= xray::imgui::Selector("Mode", m_orient_mode, styles, om_count);
 
     update |= ImGui::Button("Update");
 
