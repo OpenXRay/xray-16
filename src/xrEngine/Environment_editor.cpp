@@ -89,8 +89,9 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
 #ifndef MASTER_GOLD
     using namespace xray::imgui;
 
-    ImGui::PushID(m_identifier.c_str());
-    if (ImGui::CollapsingHeader("sun##category", ImGuiTreeNodeFlags_DefaultOpen))
+    ScopeID scope(this);
+
+    if (CascadingCollapsingHeader("sun##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (ImGui::BeginCombo("sun##lensflareid", lens_flare ? lens_flare->section.c_str() : ""))
         {
@@ -151,7 +152,7 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
 
         ImGui::DragFloat("shafts intensity", &m_fSunShaftsIntensity, 0.001f, 0.0f, 1.0f);
     }
-    if (ImGui::CollapsingHeader("hemisphere##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("hemisphere##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (InputText("sky texture", sky_texture_name))
         {
@@ -171,7 +172,7 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
         if (ImGui::DragFloat("sky rotation", &rotation, 0.5f, -360.0f, 360.f))
             sky_rotation = deg2rad(rotation);
     }
-    if (ImGui::CollapsingHeader("clouds##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("clouds##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (InputText("clouds texture", clouds_texture_name))
             on_device_create();
@@ -182,7 +183,7 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
         if (ImGui::DragFloat("clouds rotation", &rotation, 0.5f, -360.0f, 360.f))
             clouds_rotation = deg2rad(rotation);
     }
-    if (ImGui::CollapsingHeader("ambient##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("ambient##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (ImGui::BeginCombo("ambient##env_ambient", env_ambient ? env_ambient->name().c_str() : ""))
         {
@@ -209,7 +210,7 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
                  "CS/COP: ambient_color\n"
                  "   SOC: ambient");
     }
-    if (ImGui::CollapsingHeader("fog##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("fog##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::DragFloat("far plane", &far_plane);
         ImGui::ColorEdit3("fog color", reinterpret_cast<float*>(&fog_color));
@@ -218,12 +219,12 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
         ImGui::DragFloat("fog density", &fog_density, 0.001f, 0.0f, 1.0f);
         ImGui::DragFloat("water intensity", &m_fWaterIntensity, 0.001f, 0.0f, 1.0f);
     }
-    if (ImGui::CollapsingHeader("rain##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("rain##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::ColorEdit3("rain color", reinterpret_cast<float*>(&rain_color));
         ImGui::DragFloat("rain density", &rain_density, 0.001f, 0.0f, 1.0f);
     }
-    if (ImGui::CollapsingHeader("thunderbolts##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("thunderbolts##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (ImGui::BeginCombo("thunderbolts", thunderbolt ? thunderbolt->section.c_str() : ""))
         {
@@ -247,7 +248,7 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
         ImGui::DragFloat("duration", &bolt_duration);
         ImGui::DragFloat("period", &bolt_period);
     }
-    if (ImGui::CollapsingHeader("wind##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("wind##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         float direction = rad2deg(wind_direction);
         if (ImGui::DragFloat("wind direction", &direction, 0.5f, -360.0f, 360.f))
@@ -255,7 +256,6 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
 
         ImGui::DragFloat("wind velocity", &wind_velocity, 1.0f, 0.0f, 1000.0f);
     }
-    ImGui::PopID();
 #endif
 }
 
@@ -266,8 +266,8 @@ void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
 
     CEnvDescriptor::ed_show_params(env);
 
-    ImGui::PushID(m_identifier.c_str());
-    if (ImGui::CollapsingHeader("mixer##category", ImGuiTreeNodeFlags_DefaultOpen))
+    ScopeID scope(this);
+    if (CascadingCollapsingHeader("mixer##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::ColorEdit4("environment color", reinterpret_cast<float*>(&env_color));
         ItemHelp("CS/COP: takes hemisphere color as the base value.\n"
@@ -278,7 +278,6 @@ void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
         ImGui::DragFloat("fog near", &fog_near);
         ImGui::DragFloat("fog far", &fog_far);
     }
-    ImGui::PopID();
 #endif
 }
 
