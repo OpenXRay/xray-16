@@ -39,8 +39,7 @@ struct SkinningPassState {
     bool initialized = false;
 };
 
-void InitializeSkinningPipelines(ng::RenderDevice* device, SkinningPassState& state);
-void ShutdownSkinningPipelines(SkinningPassState& state);
+void InitializeSkinningResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, SkinningPassState& state);
 
 using SkinnedStatsCallback = void(*)(u32 rendered, u32 culled, void* userData);
 

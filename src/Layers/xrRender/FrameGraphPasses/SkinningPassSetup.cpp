@@ -49,7 +49,7 @@ static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
     return result;
 }
 
-void InitializeSkinningPipelines(ng::RenderDevice* device, SkinningPassState& state)
+void InitializeSkinningResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, SkinningPassState& state)
 {
     if (state.initialized)
         return;
@@ -58,20 +58,14 @@ void InitializeSkinningPipelines(ng::RenderDevice* device, SkinningPassState& st
     if (!nvDevice)
         return;
 
-    Msg("* [SkinningPass] Initializing skinned pipelines...");
-
-    auto framebuffer = CreateDummyPipelineFramebuffer(nvDevice);
-    if (!framebuffer) {
-        Msg("! [SkinningPass] Failed to create dummy framebuffer");
-        return;
-    }
-
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     if (!shaderLoader)
         return;
 
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+    auto& cache = framegraph::GetPassResourceCache();
+    auto fbInfo = framebuffer->getFramebufferInfo();
 
     nvrhi::BindingLayoutDesc skinnedLayoutDesc;
     skinnedLayoutDesc.visibility = nvrhi::ShaderType::All;
@@ -101,219 +95,100 @@ void InitializeSkinningPipelines(ng::RenderDevice* device, SkinningPassState& st
     samplerDesc.setMaxAnisotropy(16.0f);
     state.linearSampler = nvDevice->createSampler(samplerDesc);
 
+    auto buildPipelineDesc = [&](nvrhi::IShader* vs, nvrhi::IInputLayout* il) {
+        nvrhi::GraphicsPipelineDesc pipeDesc;
+        pipeDesc.VS = vs;
+        pipeDesc.PS = state.ps;
+        pipeDesc.inputLayout = il;
+        if (bindlessLayout)
+            pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
+        else
+            pipeDesc.bindingLayouts = { state.layout };
+        pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
+        pipeDesc.renderState.depthStencilState.depthTestEnable = true;
+        pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
+        pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+        pipeDesc.renderState.rasterState.frontCounterClockwise = false;
+        pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+        return pipeDesc;
+    };
+
+    auto initVariant = [&](SkinningPipelineVariant& variant, const char* shaderName, const char* cacheName,
+                           const nvrhi::VertexAttributeDesc* attribs, u32 attrCount) {
+        auto vsResult = shaderLoader->LoadVertexShader(shaderName, "main");
+        if (!vsResult.handle)
+            return;
+        variant.vs = vsResult.handle;
+        variant.inputLayout = nvDevice->createInputLayout(attribs, attrCount, variant.vs);
+        auto pipeDesc = buildPipelineDesc(variant.vs, variant.inputLayout);
+        variant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
+        if (variant.pipeline)
+            QueryBindingLayoutFromPipeline(variant.pipeline, state.layout);
+    };
+
     {
-        auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned", "main");
-        if (vsResult.handle) {
-            state.nonHQ.vs = vsResult.handle;
-
-            constexpr u32 stride = 24;
-            nvrhi::VertexAttributeDesc attribs[] = {
-                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA16_SNORM).setOffset(0).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(8).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(12).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG16_SNORM).setOffset(20).setElementStride(stride),
-            };
-            state.nonHQ.inputLayout = nvDevice->createInputLayout(attribs, 5, state.nonHQ.vs);
-
-            nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = state.nonHQ.vs;
-            pipeDesc.PS = state.ps;
-            pipeDesc.inputLayout = state.nonHQ.inputLayout;
-            if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
-            } else {
-                pipeDesc.bindingLayouts = { state.layout };
-            }
-            pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-            pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-            pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-            pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-            pipeDesc.renderState.rasterState.frontCounterClockwise = false;
-            pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-            state.nonHQ.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinningPass] Non-HQ pipeline (24-byte): %s", state.nonHQ.pipeline ? "OK" : "FAILED");
-
-            if (state.nonHQ.pipeline)
-                QueryBindingLayoutFromPipeline(state.nonHQ.pipeline, state.layout);
-        }
+        constexpr u32 stride = 24;
+        nvrhi::VertexAttributeDesc attribs[] = {
+            nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA16_SNORM).setOffset(0).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(8).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(12).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG16_SNORM).setOffset(20).setElementStride(stride),
+        };
+        initVariant(state.nonHQ, "bindless_skinned", "SkinningPass_nonHQ", attribs, 5);
     }
 
     {
-        auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_hq", "main");
-        if (vsResult.handle) {
-            state.hq1w.vs = vsResult.handle;
-
-            constexpr u32 stride = 36;
-            nvrhi::VertexAttributeDesc attribs[] = {
-                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
-            };
-            state.hq1w.inputLayout = nvDevice->createInputLayout(attribs, 5, state.hq1w.vs);
-
-            nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = state.hq1w.vs;
-            pipeDesc.PS = state.ps;
-            pipeDesc.inputLayout = state.hq1w.inputLayout;
-            if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
-            } else {
-                pipeDesc.bindingLayouts = { state.layout };
-            }
-            pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-            pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-            pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-            pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-            pipeDesc.renderState.rasterState.frontCounterClockwise = false;
-            pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-            state.hq1w.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinningPass] HQ 1W pipeline (36-byte): %s", state.hq1w.pipeline ? "OK" : "FAILED");
-
-            if (state.hq1w.pipeline)
-                QueryBindingLayoutFromPipeline(state.hq1w.pipeline, state.layout);
-        }
+        constexpr u32 stride = 36;
+        nvrhi::VertexAttributeDesc attribs[] = {
+            nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
+        };
+        initVariant(state.hq1w, "bindless_skinned_hq", "SkinningPass_hq1w", attribs, 5);
     }
 
     {
-        auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_4w", "main");
-        if (vsResult.handle) {
-            state.hq4w.vs = vsResult.handle;
-
-            constexpr u32 stride = 40;
-            nvrhi::VertexAttributeDesc attribs[] = {
-                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("BLENDINDICES").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(36).setElementStride(stride),
-            };
-            state.hq4w.inputLayout = nvDevice->createInputLayout(attribs, 6, state.hq4w.vs);
-
-            nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = state.hq4w.vs;
-            pipeDesc.PS = state.ps;
-            pipeDesc.inputLayout = state.hq4w.inputLayout;
-            if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
-            } else {
-                pipeDesc.bindingLayouts = { state.layout };
-            }
-            pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-            pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-            pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-            pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-            pipeDesc.renderState.rasterState.frontCounterClockwise = false;
-            pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-            state.hq4w.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinningPass] HQ 4W pipeline (40-byte): %s", state.hq4w.pipeline ? "OK" : "FAILED");
-
-            if (state.hq4w.pipeline)
-                QueryBindingLayoutFromPipeline(state.hq4w.pipeline, state.layout);
-        }
+        constexpr u32 stride = 40;
+        nvrhi::VertexAttributeDesc attribs[] = {
+            nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("BLENDINDICES").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(36).setElementStride(stride),
+        };
+        initVariant(state.hq4w, "bindless_skinned_4w", "SkinningPass_hq4w", attribs, 6);
     }
 
     {
-        auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_2w", "main");
-        if (vsResult.handle) {
-            state.hq2w.vs = vsResult.handle;
-
-            constexpr u32 stride = 44;
-            nvrhi::VertexAttributeDesc attribs[] = {
-                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
-            };
-            state.hq2w.inputLayout = nvDevice->createInputLayout(attribs, 5, state.hq2w.vs);
-
-            nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = state.hq2w.vs;
-            pipeDesc.PS = state.ps;
-            pipeDesc.inputLayout = state.hq2w.inputLayout;
-            if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
-            } else {
-                pipeDesc.bindingLayouts = { state.layout };
-            }
-            pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-            pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-            pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-            pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-            pipeDesc.renderState.rasterState.frontCounterClockwise = false;
-            pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-            state.hq2w.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinningPass] HQ 2W pipeline (44-byte): %s", state.hq2w.pipeline ? "OK" : "FAILED");
-
-            if (state.hq2w.pipeline)
-                QueryBindingLayoutFromPipeline(state.hq2w.pipeline, state.layout);
-        }
+        constexpr u32 stride = 44;
+        nvrhi::VertexAttributeDesc attribs[] = {
+            nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
+        };
+        initVariant(state.hq2w, "bindless_skinned_2w", "SkinningPass_hq2w", attribs, 5);
     }
 
     {
-        auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_3w", "main");
-        if (vsResult.handle) {
-            state.hq3w.vs = vsResult.handle;
-
-            constexpr u32 stride = 44;
-            nvrhi::VertexAttributeDesc attribs[] = {
-                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
-            };
-            state.hq3w.inputLayout = nvDevice->createInputLayout(attribs, 5, state.hq3w.vs);
-
-            nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = state.hq3w.vs;
-            pipeDesc.PS = state.ps;
-            pipeDesc.inputLayout = state.hq3w.inputLayout;
-            if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
-            } else {
-                pipeDesc.bindingLayouts = { state.layout };
-            }
-            pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-            pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-            pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-            pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-            pipeDesc.renderState.rasterState.frontCounterClockwise = false;
-            pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-            state.hq3w.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinningPass] HQ 3W pipeline (44-byte): %s", state.hq3w.pipeline ? "OK" : "FAILED");
-
-            if (state.hq3w.pipeline)
-                QueryBindingLayoutFromPipeline(state.hq3w.pipeline, state.layout);
-        }
+        constexpr u32 stride = 44;
+        nvrhi::VertexAttributeDesc attribs[] = {
+            nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
+            nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
+        };
+        initVariant(state.hq3w, "bindless_skinned_3w", "SkinningPass_hq3w", attribs, 5);
     }
 
     state.initialized = true;
     Msg("* [SkinningPass] Pipeline initialization complete");
-}
-
-void ShutdownSkinningPipelines(SkinningPassState& state)
-{
-    state.nonHQ = {};
-    state.hq1w = {};
-    state.hq2w = {};
-    state.hq3w = {};
-    state.hq4w = {};
-    state.layout = nullptr;
-    state.ps = nullptr;
-    state.linearSampler = nullptr;
-    state.initialized = false;
-
-    Msg("* [SkinningPass] Pipeline resources released");
 }
 
 enum {
@@ -552,10 +427,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 return;
             }
 
-            if (!data.passState || !data.passState->initialized) {
-                Msg("! [SkinningPass] Pipelines not initialized!");
+            if (!data.passState)
                 return;
-            }
 
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
@@ -575,6 +448,10 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             fbDesc.setDepthAttachment(depthRT);
             auto framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer("SkinningPass", fbDesc, nvDevice);
             if (!framebuffer)
+                return;
+
+            InitializeSkinningResources(data.device, framebuffer, *data.passState);
+            if (!data.passState->initialized)
                 return;
 
             const auto& rtDesc = colorRT->getDesc();

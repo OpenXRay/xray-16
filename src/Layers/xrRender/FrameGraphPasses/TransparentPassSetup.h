@@ -55,7 +55,7 @@ struct TransparentPassData {
     u32 width, height;
 };
 
-void ShutdownTransparentPipelines(TransparentPassState& state);
+void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, TransparentPassState& state);
 
 framegraph::DefaultOutputLayout setupTransparentPass(
     framegraph::FrameGraph& fg,

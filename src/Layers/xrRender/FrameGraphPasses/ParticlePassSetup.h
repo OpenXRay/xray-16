@@ -74,8 +74,7 @@ struct ParticlePassData {
     ParticlePassState* passState;
 };
 
-void InitializeParticlePipelines(ng::RenderDevice* device, ParticlePassState& state);
-void ShutdownParticlePipelines(ParticlePassState& state);
+void InitializeParticleResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ParticlePassState& state);
 
 framegraph::DefaultOutputLayout setupParticlePass(
     framegraph::FrameGraph& fg,

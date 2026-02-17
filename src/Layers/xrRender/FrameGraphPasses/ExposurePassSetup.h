@@ -62,6 +62,8 @@ struct ExposureOutput {
     framegraph::VirtualResourceHandle histogramBuffer;
 };
 
+void InitializeExposureResources(ng::RenderDevice* device, ExposurePassState& state);
+
 ExposureOutput setupExposurePass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,

@@ -40,39 +40,6 @@ nvrhi::BufferHandle GetOrCreateDrawIndexBuffer(const char* passName, nvrhi::IDev
     return buffer;
 }
 
-nvrhi::FramebufferHandle CreateDummyPipelineFramebuffer(nvrhi::IDevice* device)
-{
-    nvrhi::TextureDesc colorDesc;
-    colorDesc.width = 64;
-    colorDesc.height = 64;
-    colorDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    colorDesc.isRenderTarget = true;
-    colorDesc.initialState = nvrhi::ResourceStates::RenderTarget;
-    colorDesc.keepInitialState = true;
-    colorDesc.debugName = "DummyPipelineColor";
-    auto dummyColorRT = device->createTexture(colorDesc);
-
-    nvrhi::TextureDesc normalDesc = colorDesc;
-    normalDesc.debugName = "DummyPipelineNormal";
-    auto dummyNormalRT = device->createTexture(normalDesc);
-
-    nvrhi::TextureDesc depthDesc;
-    depthDesc.width = 64;
-    depthDesc.height = 64;
-    depthDesc.format = nvrhi::Format::D32;
-    depthDesc.isRenderTarget = true;
-    depthDesc.initialState = nvrhi::ResourceStates::DepthWrite;
-    depthDesc.keepInitialState = true;
-    depthDesc.debugName = "DummyPipelineDepth";
-    auto dummyDepthRT = device->createTexture(depthDesc);
-
-    nvrhi::FramebufferDesc fbDesc;
-    fbDesc.addColorAttachment(dummyColorRT);
-    fbDesc.addColorAttachment(dummyNormalRT);
-    fbDesc.setDepthAttachment(dummyDepthRT);
-    return device->createFramebuffer(fbDesc);
-}
-
 LightingConstants FillLightingConstants()
 {
     LightingConstants lc;

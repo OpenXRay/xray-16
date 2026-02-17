@@ -42,7 +42,7 @@ nvrhi::ITexture* GetExposureTexture(const ExposurePassState& state)
     return state.exposureTexture.Get();
 }
 
-static void InitializeExposureResources(ng::RenderDevice* device, ExposurePassState& state)
+void InitializeExposureResources(ng::RenderDevice* device, ExposurePassState& state)
 {
     if (state.initialized)
         return;

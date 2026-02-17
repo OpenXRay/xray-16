@@ -44,6 +44,8 @@ struct HiZPyramidOutput {
     u32 height;
 };
 
+void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 height, HiZBuildPassState& state);
+
 HiZPyramidOutput setupHiZBuildPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,

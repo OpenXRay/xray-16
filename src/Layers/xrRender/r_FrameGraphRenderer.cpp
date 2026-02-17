@@ -193,10 +193,6 @@ void FrameGraphRenderer::Shutdown() {
         passes::ShutdownSkyGeometry(m_passStates->sky);
         passes::ShutdownSunPass(m_passStates->sun);
         passes::ShutdownTonemapPass(m_passStates->tonemap);
-        passes::ShutdownTransparentPipelines(m_passStates->transparent);
-        passes::ShutdownForwardPipelines(m_passStates->forwardColor);
-        passes::ShutdownSkinningPipelines(m_passStates->skinning);
-        passes::ShutdownParticlePipelines(m_passStates->particle);
         m_passStates.reset();
     }
 
@@ -218,13 +214,6 @@ void FrameGraphRenderer::Render() {
     {
         m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
         m_gpuProfiler->FrameStart();
-    }
-
-    if (!m_pipelinesInitialized && m_device && m_passStates) {
-        passes::InitializeForwardPipelines(m_device, m_passStates->forwardColor);
-        passes::InitializeSkinningPipelines(m_device, m_passStates->skinning);
-        passes::InitializeParticlePipelines(m_device, m_passStates->particle);
-        m_pipelinesInitialized = true;
     }
 
     auto frameStart = std::chrono::high_resolution_clock::now();
