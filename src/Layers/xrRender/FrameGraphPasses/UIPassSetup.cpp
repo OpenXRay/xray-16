@@ -239,6 +239,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                 vbDesc.isVertexBuffer = true;
                 vbDesc.isVolatile = false;
                 vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+                vbDesc.keepInitialState = true;
                 s_vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
 
                 xr_vector<u16> quadIndices;
@@ -259,10 +260,8 @@ framegraph::VirtualResourceHandle setupTextPass(
                 ibDesc.isIndexBuffer = true;
                 ibDesc.isVolatile = false;
                 ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+                ibDesc.keepInitialState = true;
                 s_indexBuffer = nvrhiDevice->createBuffer(ibDesc);
-
-                cmdList->beginTrackingBufferState(s_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
-                cmdList->beginTrackingBufferState(s_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
 
                 cmdList->writeBuffer(s_indexBuffer, quadIndices.data(), quadIndices.size() * sizeof(u16));
 
@@ -279,9 +278,6 @@ framegraph::VirtualResourceHandle setupTextPass(
                 s_initialized = true;
                 Msg("* [TextPass] Initialized buffers");
             }
-
-            cmdList->beginTrackingBufferState(s_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
-            cmdList->beginTrackingBufferState(s_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
 
             struct FontBatch {
                 CGameFont* font;

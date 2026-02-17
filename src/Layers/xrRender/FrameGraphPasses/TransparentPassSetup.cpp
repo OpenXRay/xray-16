@@ -274,12 +274,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
 
             const auto& cfg = data.config;
 
-            cmdList->beginTrackingBufferState(cfg.instanceBuffer, nvrhi::ResourceStates::ShaderResource);
-            cmdList->beginTrackingBufferState(cfg.compactBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
-            cmdList->beginTrackingBufferState(cfg.compactMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
-            cmdList->beginTrackingBufferState(cfg.compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-            cmdList->beginTrackingBufferState(cfg.compactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
-
             auto& variantTexBuffer = bindless::VariantTextureBuffer::Instance();
 
             nvrhi::BindingSetDesc bindDesc;

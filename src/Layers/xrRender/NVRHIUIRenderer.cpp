@@ -130,9 +130,6 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
         return;
     }
 
-    commandList->beginTrackingBufferState(m_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
-    commandList->beginTrackingBufferState(m_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
-
     u32 vertexOffset = 0;
     u32 indexOffset = 0;
 
@@ -217,6 +214,7 @@ bool NVRHIUIRenderer::CreateBuffers()
     vbDesc.isVertexBuffer = true;
     vbDesc.debugName = "UI_VertexBuffer";
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+    vbDesc.keepInitialState = true;
 
     m_vertexBuffer = m_device->GetNVRHIDevice()->createBuffer(vbDesc);
     if (!m_vertexBuffer)
@@ -231,6 +229,7 @@ bool NVRHIUIRenderer::CreateBuffers()
     ibDesc.isIndexBuffer = true;
     ibDesc.debugName = "UI_IndexBuffer";
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+    ibDesc.keepInitialState = true;
 
     m_indexBuffer = m_device->GetNVRHIDevice()->createBuffer(ibDesc);
     if (!m_indexBuffer)
@@ -254,6 +253,7 @@ void NVRHIUIRenderer::EnsureBufferCapacity(size_t vertexCount, size_t indexCount
         vbDesc.isVertexBuffer = true;
         vbDesc.debugName = "UI_VertexBuffer";
         vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+        vbDesc.keepInitialState = true;
 
         m_vertexBuffer = m_device->GetNVRHIDevice()->createBuffer(vbDesc);
         m_vertexBufferSize = newSize;
@@ -270,6 +270,7 @@ void NVRHIUIRenderer::EnsureBufferCapacity(size_t vertexCount, size_t indexCount
         ibDesc.isIndexBuffer = true;
         ibDesc.debugName = "UI_IndexBuffer";
         ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+        ibDesc.keepInitialState = true;
 
         m_indexBuffer = m_device->GetNVRHIDevice()->createBuffer(ibDesc);
         m_indexBufferSize = newSize;

@@ -128,13 +128,6 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     passes::InitializeSunPass(device);
     passes::InitializeTonemapPass(device->GetNVRHIDevice());
 
-    {
-        nvrhi::CommandListParameters cmdParams;
-        cmdParams.enableImmediateExecution = false;
-        m_depthCopyCommandList = device->GetNVRHIDevice()->createCommandList(cmdParams);
-        Msg("* [FrameGraphRenderer] Depth copy command list created (reusable)");
-    }
-
     m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
     m_gpuProfiler->Initialize(device->GetNVRHIDevice());
 
@@ -266,10 +259,9 @@ void FrameGraphRenderer::Render() {
         m_gpuCullingManager->ScheduleStatsReadback(m_renderContext->GetCommandList());
     }
 
-    {
-        ZoneScopedN("FG::Present");
-        PresentToBackbuffer();
-    }
+    m_hasPrevFrameData = true;
+    m_prevViewProj = Device.mFullTransform;
+    m_prevCameraPos = Device.vCameraPosition;
 
     if (m_gpuProfiler)
     {
@@ -380,8 +372,6 @@ void FrameGraphRenderer::RenderMenu() {
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
     m_framegraph->Compile();
     m_framegraph->Execute();
-
-    PresentToBackbuffer();
 
     if (m_gpuProfiler)
         m_gpuProfiler->FrameEnd();
@@ -597,8 +587,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     depthDesc.isTransient = true;
 
     framegraph::VirtualResourceHandle depthBuffer = m_framegraph->CreateTexture("rt_Depth", depthDesc);
-
-    m_currentDepthHandle = depthBuffer;
 
     framegraph::ResourceDesc normalDesc;
     normalDesc.type = framegraph::ResourceDesc::Type::Texture2D;
@@ -988,8 +976,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                         data.source = selectedHandle;
                         data.dest = previewHandle;
                         auto& srcDesc = builder.GetResourceDesc(selectedHandle);
-                        data.sourceW = srcDesc.width;
-                        data.sourceH = srcDesc.height;
+                        data.sourceW = std::max(1u, srcDesc.width >> data.mipLevel);
+                        data.sourceH = std::max(1u, srcDesc.height >> data.mipLevel);
                         if (m_statsOverlay) {
                             m_statsOverlay->SetSelectedRTMipCount(srcDesc.mipLevels);
                             m_statsOverlay->SetSelectedRTSize(srcDesc.width, srcDesc.height);
@@ -1088,6 +1076,53 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     m_finalOutput = finalOutput;
 
+    {
+        nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+
+        if (!m_prevFrameDepth || m_prevFrameWidth != width || m_prevFrameHeight != height) {
+            nvrhi::TextureDesc prevDepthDesc;
+            prevDepthDesc.width = width;
+            prevDepthDesc.height = height;
+            prevDepthDesc.format = nvrhi::Format::D32;
+            prevDepthDesc.isShaderResource = true;
+            prevDepthDesc.debugName = "PrevFrameDepth";
+            prevDepthDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+            prevDepthDesc.keepInitialState = true;
+
+            m_prevFrameDepth = nvDevice->createTexture(prevDepthDesc);
+            m_prevFrameWidth = width;
+            m_prevFrameHeight = height;
+            if (m_prevFrameDepth)
+                Msg("* [TemporalHiZ] Created persistent depth buffer: %dx%d", width, height);
+        }
+
+        if (m_prevFrameDepth) {
+            framegraph::ResourceDesc prevDepthImportDesc;
+            prevDepthImportDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+            prevDepthImportDesc.debugName = "rt_PrevDepthCopyDest";
+            prevDepthImportDesc.width = width;
+            prevDepthImportDesc.height = height;
+            prevDepthImportDesc.format = nvrhi::Format::D32;
+            prevDepthImportDesc.isDepthStencil = true;
+            prevDepthImportDesc.isImported = true;
+            prevDepthImportDesc.isTransient = false;
+
+            auto prevDepthCopyDest = m_framegraph->ImportTexture("rt_PrevDepthCopyDest", m_prevFrameDepth, prevDepthImportDesc);
+
+            auto finalDepth = transparentOutputs.depth;
+            framegraph::PassHandle depthCopyPass = m_framegraph->AddPass("DepthCopy");
+            m_framegraph->PassRead(depthCopyPass, finalDepth, framegraph::ResourceState::CopySource);
+            m_framegraph->PassWrite(depthCopyPass, prevDepthCopyDest, framegraph::ResourceState::CopyDest);
+            m_framegraph->SetPassCallback(depthCopyPass,
+                [finalDepth, prevDepthCopyDest](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
+                    nvrhi::ITexture* src = fg.GetPhysicalTexture(finalDepth);
+                    nvrhi::ITexture* dst = fg.GetPhysicalTexture(prevDepthCopyDest);
+                    if (src && dst)
+                        ctx.GetCommandList()->copyTexture(dst, nvrhi::TextureSlice(), src, nvrhi::TextureSlice());
+                }
+            );
+        }
+    }
 }
 
 void FrameGraphRenderer::PrintStats() const {
@@ -1103,80 +1138,6 @@ void FrameGraphRenderer::PrintStats() const {
     Msg("  Draw calls: %u", m_stats.numDrawCalls);
     Msg("  Triangles: %u", m_stats.numTriangles);
     Msg("═══════════════════════════════════════");
-}
-
-void FrameGraphRenderer::PresentToBackbuffer() {
-    ZoneScopedN("PresentToBackbuffer");
-
-    if (!m_device || !m_currentDepthHandle.is_valid())
-        return;
-
-    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
-    if (!nvDevice)
-        return;
-
-    nvrhi::ITexture* currentDepth = m_framegraph->GetPhysicalTexture(m_currentDepthHandle);
-    if (!currentDepth)
-        return;
-
-    const nvrhi::TextureDesc& depthDesc = currentDepth->getDesc();
-    u32 width = depthDesc.width;
-    u32 height = depthDesc.height;
-
-    if (!m_prevFrameDepth || m_prevFrameWidth != width || m_prevFrameHeight != height) {
-        nvrhi::TextureDesc prevDepthDesc;
-        prevDepthDesc.width = width;
-        prevDepthDesc.height = height;
-        prevDepthDesc.format = nvrhi::Format::D32;
-        prevDepthDesc.isRenderTarget = false;
-        prevDepthDesc.isShaderResource = true;
-        prevDepthDesc.debugName = "PrevFrameDepth";
-        prevDepthDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-        prevDepthDesc.keepInitialState = true;
-
-        m_prevFrameDepth = nvDevice->createTexture(prevDepthDesc);
-        m_prevFrameWidth = width;
-        m_prevFrameHeight = height;
-
-        if (m_prevFrameDepth) {
-            Msg("* [TemporalHiZ] Created persistent depth buffer: %dx%d", width, height);
-        }
-    }
-
-    if (!m_prevFrameDepth)
-        return;
-
-    if (!m_depthCopyCommandList) {
-        nvrhi::CommandListParameters cmdParams;
-        cmdParams.enableImmediateExecution = false;
-        m_depthCopyCommandList = nvDevice->createCommandList(cmdParams);
-    }
-    m_depthCopyCommandList->open();
-
-    m_depthCopyCommandList->beginTrackingTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::DepthWrite);
-
-    m_depthCopyCommandList->setTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
-    m_depthCopyCommandList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
-    m_depthCopyCommandList->commitBarriers();
-
-    {
-        ZoneScopedN("PresentToBackbuffer::DepthCopy");
-        m_depthCopyCommandList->copyTexture(m_prevFrameDepth, nvrhi::TextureSlice(), currentDepth, nvrhi::TextureSlice());
-    }
-
-    m_depthCopyCommandList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
-    m_depthCopyCommandList->commitBarriers();
-
-    m_depthCopyCommandList->close();
-
-    {
-        ZoneScopedN("PresentToBackbuffer::Execute");
-        nvDevice->executeCommandList(m_depthCopyCommandList);
-    }
-
-    m_hasPrevFrameData = true;
-    m_prevViewProj = Device.mFullTransform;
-    m_prevCameraPos = Device.vCameraPosition;
 }
 
 void FrameGraphRenderer::RenderHUD() {

@@ -131,13 +131,11 @@ private:
     framegraph::VirtualResourceHandle m_hizPyramid;
 
     nvrhi::TextureHandle m_prevFrameDepth;
-    framegraph::VirtualResourceHandle m_currentDepthHandle;
     Fmatrix m_prevViewProj;
     Fvector m_prevCameraPos;
     bool m_hasPrevFrameData = false;
     u32 m_prevFrameWidth = 0;
     u32 m_prevFrameHeight = 0;
-    nvrhi::CommandListHandle m_depthCopyCommandList;
 
     nvrhi::TextureHandle m_inspectorPreview;
 
@@ -180,8 +178,6 @@ private:
     void SetupFrame();
 
     void SetupFrameGraphPasses();
-
-    void PresentToBackbuffer();
 
     void CollectVisibleGeometry();
 

@@ -129,7 +129,7 @@ bool ParticleGPUCullingManager::CreateBuffers()
         desc.structStride = sizeof(u32);
         desc.debugName = "ParticleVisibleIndices";
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
         desc.canHaveUAVs = true;
         m_visibleIndicesBuffer = nvDevice->createBuffer(desc);
         if (!m_visibleIndicesBuffer)
@@ -155,7 +155,7 @@ bool ParticleGPUCullingManager::CreateBuffers()
         desc.structStride = sizeof(ParticleVertex);
         desc.debugName = "ParticleVertexBuffer";
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
         desc.canHaveUAVs = true;
         desc.isVertexBuffer = true;
         m_vertexBuffer = nvDevice->createBuffer(desc);
@@ -168,7 +168,7 @@ bool ParticleGPUCullingManager::CreateBuffers()
         desc.byteSize = 5 * sizeof(u32);
         desc.debugName = "ParticleDrawArgs";
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
         desc.isDrawIndirectArgs = true;
@@ -340,8 +340,6 @@ void ParticleGPUCullingManager::DispatchCulling(
 
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
 
-    cmdList->beginTrackingBufferState(m_visibleIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
     ParticleCullParams params;
     params.viewProj.transpose(viewProj);
     for (int i = 0; i < 6; i++)
@@ -387,9 +385,6 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
 
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
 
-    cmdList->beginTrackingBufferState(m_vertexBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->beginTrackingBufferState(m_drawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
     ParticleBillboardParams params;
     params.cameraTop.set(cameraTop.x, cameraTop.y, cameraTop.z, 0.0f);
     params.cameraRight.set(cameraRight.x, cameraRight.y, cameraRight.z, 0.0f);
@@ -417,7 +412,6 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
     u32 numGroups = (params.visibleCount + BILLBOARD_THREAD_GROUP_SIZE - 1) / BILLBOARD_THREAD_GROUP_SIZE;
     cmdList->dispatch(numGroups, 1, 1);
 
-    cmdList->setBufferState(m_visibleIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
 }
 
 }

@@ -988,7 +988,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         desc.isDrawIndirectArgs = false;
         desc.canHaveRawViews = false;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
 
         visibleSlotIDsBuffer = device->createBuffer(desc);
         if (!visibleSlotIDsBuffer)
@@ -1034,7 +1034,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         desc.isDrawIndirectArgs = false;
         desc.canHaveRawViews = false;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
 
         slotVisibilityBuffer = device->createBuffer(desc);
         if (!slotVisibilityBuffer)
@@ -2321,35 +2321,6 @@ void FGDetailManager::DispatchCulling(
 
     cmdList->writeBuffer(cachedCullParamsCB, &params, sizeof(params));
 
-    cmdList->beginTrackingBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->beginTrackingBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->beginTrackingBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-    if (generatedInstancesBuffer)
-        cmdList->beginTrackingBufferState(generatedInstancesBuffer, nvrhi::ResourceStates::ShaderResource);
-
-    if (instanceCounterBuffer)
-        cmdList->beginTrackingBufferState(instanceCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    if (perSlotCountsBuffer)
-        cmdList->beginTrackingBufferState(perSlotCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    if (perSlotPrefixBuffer)
-        cmdList->beginTrackingBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    if (blockTotalsBuffer)
-        cmdList->beginTrackingBufferState(blockTotalsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    if (perSlotLocalCountersBuffer)
-        cmdList->beginTrackingBufferState(perSlotLocalCountersBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-    for (u32 lod = 0; lod < LOD_COUNT; lod++)
-    {
-        cmdList->beginTrackingBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
-        cmdList->beginTrackingBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
-    }
-    cmdList->beginTrackingBufferState(visibleDecalInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->beginTrackingBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->beginTrackingBufferState(visibleBillboardInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->beginTrackingBufferState(billboardDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->beginTrackingTextureState(hiZPyramid, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
-
     u32 dispatchArgs[3] = { 0, 1, 1 };
     cmdList->writeBuffer(visibleSlotCounterBuffer, dispatchArgs, sizeof(dispatchArgs));
 
@@ -2396,7 +2367,6 @@ void FGDetailManager::DispatchCulling(
 
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::IndirectArgument);
     cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->commitBarriers();
 
     if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "Details.InstanceCull");
     {
@@ -2436,21 +2406,6 @@ void FGDetailManager::DispatchCulling(
     }
 
     if (gpuProfiler) gpuProfiler->EndPass(cmdList, "Details.InstanceCull");
-
-    cmdList->setBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-    for (u32 lod = 0; lod < LOD_COUNT; lod++)
-    {
-        cmdList->setBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::IndirectArgument);
-    }
-    cmdList->setBufferState(visibleDecalInstancesBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(visibleBillboardInstancesBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(billboardDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->commitBarriers();
 }
 
 void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device)
@@ -2465,7 +2420,6 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
         cmdList->setBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::CopySource);
     if (billboardDrawArgsBuffer)
         cmdList->setBufferState(billboardDrawArgsBuffer, nvrhi::ResourceStates::CopySource);
-    cmdList->commitBarriers();
 
     cmdList->copyBuffer(statsReadbackBuffer, 0, visibleSlotCounterBuffer, 0, sizeof(u32));
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
@@ -2495,15 +2449,6 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
             sizeof(u32)
         );
     }
-
-    cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    for (u32 lod = 0; lod < LOD_COUNT; lod++)
-        cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(visibleDecalInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(decalDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(visibleBillboardInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(billboardDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->commitBarriers();
 
     statsReadbackPending = true;
 }
@@ -2668,12 +2613,10 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
     cmdList->setBufferState(perSlotLocalCountersBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(instanceCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(slotAABBBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->commitBarriers();
 
     cmdList->clearBufferUInt(perSlotCountsBuffer, 0);
     cmdList->clearBufferUInt(instanceCounterBuffer, 0);
     cmdList->clearBufferUInt(perSlotLocalCountersBuffer, 0);
-    cmdList->commitBarriers();
 
     auto dispatchInstanceGen = [&](u32 mode, const char* passName) {
         if (gpuProfiler) gpuProfiler->BeginPass(cmdList, passName);
@@ -2725,18 +2668,15 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
     dispatchInstanceGen(0, "Details.Regen.Count");
 
     cmdList->setBufferState(perSlotCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->commitBarriers();
 
     dispatchPrefixSum(prefixSumScanPipeline, numBlocks, "Details.Regen.ScanBlocks");
 
     cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(blockTotalsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->commitBarriers();
 
     dispatchPrefixSum(prefixSumTopPipeline, 1, "Details.Regen.ScanTop");
 
     cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->commitBarriers();
 
     dispatchInstanceGen(1, "Details.Regen.Scatter");
 
@@ -2747,13 +2687,10 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
     if (instanceCountReadbackBuffer)
     {
         cmdList->setBufferState(instanceCounterBuffer, nvrhi::ResourceStates::CopySource);
-        cmdList->commitBarriers();
         cmdList->copyBuffer(instanceCountReadbackBuffer, 0, instanceCounterBuffer, 0, sizeof(u32));
         cmdList->setBufferState(instanceCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
         instanceCountReadbackPending = true;
     }
-
-    cmdList->commitBarriers();
 
     m_instancesNeedRegeneration = false;
 
