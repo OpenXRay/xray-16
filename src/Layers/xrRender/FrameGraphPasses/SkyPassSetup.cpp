@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "SkyPassSetup.h"
+#include "PassVertexFormats.h"
 #include "ShaderConstants.h"
 #include "ExposurePassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
@@ -19,7 +20,7 @@ namespace RENDER_NAMESPACE {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-static Fvector3 hbox_verts[24] = {
+static const Fvector3 hbox_verts[24] = {
     {-1.f, -1.f,   -1.f}, {-1.f, -1.01f, -1.f},
     { 1.f, -1.f,   -1.f}, { 1.f, -1.01f, -1.f},
     {-1.f, -1.f,    1.f}, {-1.f, -1.01f,  1.f},
@@ -34,7 +35,7 @@ static Fvector3 hbox_verts[24] = {
     {-1.f, -0.01f,  1.f}, {-1.f, -1.f,    1.f}
 };
 
-static u16 hbox_faces[20 * 3] = {
+static const u16 hbox_faces[20 * 3] = {
     0,   2,  3,
     3,   1,  0,
     4,   5,  7,
@@ -272,11 +273,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
             auto dynamicCBBuffer = cache.GetOrCreateVolatileCB("SkyPass", "DynamicCB", sizeof(DynamicTransforms), 16, device);
             cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
-            StaticGlobals staticCB = {};
-            FillGlobalConstants(staticCB);
-            SunLightData sunData;
-            GetSunLightData(sunData, 2.0f);
-            FillSunConstants(staticCB, sunData);
+            auto staticCB = BuildStaticGlobals();
 
             auto staticCBBuffer = cache.GetOrCreateVolatileCB("SkyPass", "StaticCB", sizeof(StaticGlobals), 16, device);
             cmdList->writeBuffer(staticCBBuffer, &staticCB, sizeof(staticCB));
@@ -343,12 +340,6 @@ framegraph::VirtualResourceHandle setupSkyPass(
             state.indexBuffer = {data.passState->indexBuffer, nvrhi::Format::R16_UINT, 0};
 
             cmdList->setGraphicsState(state);
-
-            nvrhi::DrawArguments drawArgs;
-            drawArgs.vertexCount = 12;
-            drawArgs.instanceCount = 1;
-            drawArgs.startIndexLocation = 0;
-            drawArgs.startVertexLocation = 0;
 
             cmdList->drawIndexed(nvrhi::DrawArguments{60, 1, 0, 0, 0});
         }

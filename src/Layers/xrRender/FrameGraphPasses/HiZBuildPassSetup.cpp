@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "HiZBuildPassSetup.h"
+#include "PassVertexFormats.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"

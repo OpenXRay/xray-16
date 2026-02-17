@@ -54,11 +54,6 @@ public:
     void DispatchCulling(
         nvrhi::ICommandList* cmdList,
         nvrhi::ITexture* hiZPyramid,
-        const Fmatrix& viewProj,
-        const Fvector4* frustumPlanes,
-        const Fvector& cameraPos,
-        const Fvector& cameraTop,
-        const Fvector& cameraRight,
         u32 particleCount,
         u32 hiZWidth,
         u32 hiZHeight,
@@ -66,8 +61,6 @@ public:
 
     void DispatchBillboardGeneration(
         nvrhi::ICommandList* cmdList,
-        const Fvector& cameraTop,
-        const Fvector& cameraRight,
         u32 maxVisibleCount);
 
     void ClearVisibleCount(nvrhi::ICommandList* cmdList);

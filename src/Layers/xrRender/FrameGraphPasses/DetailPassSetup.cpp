@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "PassCommon.h"
 #include "DetailPassSetup.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FGDetailManager.h"
@@ -9,7 +10,6 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
-#include "xrCDB/Frustum.h"
 
 extern ENGINE_API float ps_r__Detail_l_aniso;
 extern ENGINE_API float ps_r__Detail_l_ambient;
@@ -138,35 +138,15 @@ DefaultOutputLayout setupDetailPass(
                 data.detailManager->windDirection.set(_cos(wind_rad), _sin(wind_rad));
             }
 
-            CFrustum frustum;
-            frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
-
-            Fvector4 extractedPlanes[6];
-            for (u32 i = 0; i < frustum.p_count && i < 6; i++)
-            {
-                extractedPlanes[i].set(
-                    frustum.planes[i].n.x,
-                    frustum.planes[i].n.y,
-                    frustum.planes[i].n.z,
-                    frustum.planes[i].d
-                );
-            }
-
             nvrhi::ITexture* hiZTexture = fg.GetPhysicalTexture(data.hiZPyramid);
-
             const float fadeDistance = g_pGamePersistent->Environment().CurrentEnv.far_plane;
-
             Fmatrix effectivePrevViewProj = data.hasPrevViewProj ? data.prevViewProj : Device.mFullTransform;
 
             data.detailManager->DispatchCulling(
                 cmdList,
                 data.device->GetNVRHIDevice(),
                 hiZTexture,
-                Device.mFullTransform,
                 effectivePrevViewProj,
-                extractedPlanes,
-                frustum.p_count,
-                Device.vCameraPosition,
                 fadeDistance,
                 data.hiZWidth,
                 data.hiZHeight,
@@ -175,9 +155,6 @@ DefaultOutputLayout setupDetailPass(
             );
 
             data.detailManager->ScheduleStatsReadback(cmdList, data.device->GetNVRHIDevice());
-
-            const nvrhi::TextureDesc& colorDesc = colorTexture->getDesc();
-            const nvrhi::TextureDesc& depthDesc = depthTexture->getDesc();
 
             nvrhi::ITexture* normalTexture = fg.GetPhysicalTexture(data.outputNormal);
 
@@ -211,11 +188,7 @@ DefaultOutputLayout setupDetailPass(
             u8 dummyParams[32] = {};
             cmdList->writeBuffer(dm->cachedShaderParamsCB, dummyParams, 32);
 
-            StaticGlobals staticGlobals = {};
-            FillGlobalConstants(staticGlobals);
-            SunLightData sunData;
-            GetSunLightData(sunData, 2.0f);
-            FillSunConstants(staticGlobals, sunData);
+            auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(dm->cachedStaticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
             float windAngleDeg = 0.0f;

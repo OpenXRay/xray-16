@@ -4,7 +4,6 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FBasicVisual.h"
-#include "xrCore/xrCore.h"
 #include "PassVertexFormats.h"
 #include "ParticleGPUCullingManager.h"
 
@@ -21,7 +20,6 @@ namespace xray::render {
     class MaterialCache;
     namespace ng {
         class RenderDevice;
-        class PipelineState;
     }
 }
 
