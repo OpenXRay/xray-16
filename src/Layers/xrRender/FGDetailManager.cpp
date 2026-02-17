@@ -12,6 +12,7 @@
 #include "xrCore/Profiler/Profiler.h"
 #include "Profiler/GPUProfiler.h"
 #include "FrameGraphPasses/ShaderConstants.h"
+#include "FrameGraph/PassResourceCache.h"
 #include "ResourceManager/DDSLoader.h"
 #include <thread>
 #include <atomic>
@@ -2352,7 +2353,7 @@ void FGDetailManager::DispatchCulling(
             nvrhi::BindingSetItem::RawBuffer_UAV(2, visibleSlotCounterBuffer),
         };
 
-        nvrhi::BindingSetHandle slotCullBindingSet = device->createBindingSet(bindDesc, slotCullBindingLayout);
+        nvrhi::BindingSetHandle slotCullBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, slotCullBindingLayout, device);
 
         nvrhi::ComputeState state;
         state.pipeline = slotCullPipeline;
@@ -2394,7 +2395,7 @@ void FGDetailManager::DispatchCulling(
             nvrhi::BindingSetItem::RawBuffer_UAV(9, billboardDrawArgsBuffer),
         };
 
-        nvrhi::BindingSetHandle instanceCullBindingSet = device->createBindingSet(bindDesc, computeBindingLayout);
+        nvrhi::BindingSetHandle instanceCullBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, computeBindingLayout, device);
 
         nvrhi::ComputeState state;
         state.pipeline = computePipeline;
@@ -2578,7 +2579,7 @@ nvrhi::BindingSetHandle FGDetailManager::CreateInstanceGenBindingSet(nvrhi::IDev
         nvrhi::BindingSetItem::StructuredBuffer_UAV(3, perSlotLocalCountersBuffer),
         nvrhi::BindingSetItem::StructuredBuffer_UAV(4, slotAABBBuffer),
     };
-    return device->createBindingSet(bindDesc, instanceGenBindingLayout);
+    return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, instanceGenBindingLayout, device);
 }
 
 void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device,
@@ -2654,7 +2655,7 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
             nvrhi::BindingSetItem::StructuredBuffer_UAV(1, perSlotPrefixBuffer),
             nvrhi::BindingSetItem::StructuredBuffer_UAV(2, blockTotalsBuffer),
         };
-        auto bindingSet = device->createBindingSet(bindDesc, prefixSumBindingLayout);
+        auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, prefixSumBindingLayout, device);
 
         nvrhi::ComputeState state;
         state.pipeline = pipeline;

@@ -8,6 +8,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "xrCDB/Frustum.h"
 
 extern ENGINE_API float ps_r__Detail_l_aniso;
@@ -307,7 +308,7 @@ DefaultOutputLayout setupDetailPass(
                     nvrhi::BindingSetItem::Sampler(4, dm->cachedSmp_AnisoWrap),
                     nvrhi::BindingSetItem::Sampler(5, dm->cachedSmp_LinearWrap),
                 };
-                return data.device->GetNVRHIDevice()->createBindingSet(bindDesc, dm->graphicsBindingLayout);
+                return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, dm->graphicsBindingLayout, data.device->GetNVRHIDevice());
             };
 
             auto makePulledBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer, nvrhi::BindingLayoutHandle layout) {
@@ -330,7 +331,7 @@ DefaultOutputLayout setupDetailPass(
                     nvrhi::BindingSetItem::Sampler(4, dm->cachedSmp_AnisoWrap),
                     nvrhi::BindingSetItem::Sampler(5, dm->cachedSmp_LinearWrap),
                 };
-                return data.device->GetNVRHIDevice()->createBindingSet(bindDesc, layout);
+                return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, layout, data.device->GetNVRHIDevice());
             };
 
             bool billboardMode = !ps_r__detail_gpu;

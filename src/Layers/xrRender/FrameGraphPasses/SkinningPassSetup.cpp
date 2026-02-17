@@ -19,6 +19,7 @@
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "xrCore/FMesh.hpp"
 
 extern ENGINE_API float psHUD_FOV;
@@ -49,6 +50,11 @@ static nvrhi::ShaderHandle s_skinnedHQ3WVS;
 static nvrhi::BindingLayoutHandle s_skinnedLayout;
 static nvrhi::ShaderHandle s_skinnedPS;
 static nvrhi::SamplerHandle s_linearSampler;
+static nvrhi::BufferHandle s_dynTransformsCB;
+static nvrhi::BufferHandle s_staticGlobalsCB;
+static nvrhi::BufferHandle s_shaderParamsCB;
+static nvrhi::BufferHandle s_materialIdCB;
+static nvrhi::BufferHandle s_instanceSB;
 static bool s_skinnedInitialized = false;
 
 static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
@@ -370,6 +376,33 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
         }
     }
 
+    nvrhi::BufferDesc vcbDesc;
+    vcbDesc.isConstantBuffer = true;
+    vcbDesc.isVolatile = true;
+
+    vcbDesc.byteSize = sizeof(DynamicTransforms);
+    vcbDesc.maxVersions = 1024;
+    s_dynTransformsCB = nvDevice->createBuffer(vcbDesc);
+
+    vcbDesc.byteSize = sizeof(StaticGlobals);
+    vcbDesc.maxVersions = 16;
+    s_staticGlobalsCB = nvDevice->createBuffer(vcbDesc);
+
+    vcbDesc.byteSize = sizeof(ShaderParams);
+    vcbDesc.maxVersions = 512;
+    s_shaderParamsCB = nvDevice->createBuffer(vcbDesc);
+
+    vcbDesc.byteSize = sizeof(SkinnedMaterialCB);
+    vcbDesc.maxVersions = 1024;
+    s_materialIdCB = nvDevice->createBuffer(vcbDesc);
+
+    nvrhi::BufferDesc instDesc;
+    instDesc.byteSize = sizeof(GPUSkinnedInstanceData);
+    instDesc.structStride = sizeof(GPUSkinnedInstanceData);
+    instDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    instDesc.keepInitialState = true;
+    s_instanceSB = nvDevice->createBuffer(instDesc);
+
     s_skinnedInitialized = true;
     Msg("* [SkinningPass] Pipeline initialization complete");
 }
@@ -552,7 +585,7 @@ static void RenderSkinnedBatch(
         nvrhi::BindingSetItem::StructuredBuffer_SRV(10, bindless::VariantTextureBuffer::Instance().GetBuffer()),
         nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
     };
-    auto bindingSet = nvDevice->createBindingSet(bindDesc, s_skinnedLayout);
+    auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, s_skinnedLayout, nvDevice);
     if (!bindingSet)
         return;
 
@@ -704,20 +737,11 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
             nvrhi::IBuffer* globalBoneBuffer = gpuCullMgr->GetGlobalBoneBuffer();
 
-            nvrhi::BufferDesc dynTransCbDesc;
-            dynTransCbDesc.byteSize = sizeof(DynamicTransforms);
-            dynTransCbDesc.isConstantBuffer = true;
-            dynTransCbDesc.isVolatile = true;
-            dynTransCbDesc.maxVersions = 512;
-            dynTransCbDesc.debugName = "SkinningPass_DynTransforms";
-            auto dynTransformsCB = nvDevice->createBuffer(dynTransCbDesc);
-
-            nvrhi::BufferDesc staticGlobalsCbDesc;
-            staticGlobalsCbDesc.byteSize = sizeof(StaticGlobals);
-            staticGlobalsCbDesc.isConstantBuffer = true;
-            staticGlobalsCbDesc.isVolatile = true;
-            staticGlobalsCbDesc.maxVersions = 16;
-            auto staticGlobalsCB = nvDevice->createBuffer(staticGlobalsCbDesc);
+            auto dynTransformsCB = s_dynTransformsCB.Get();
+            auto staticGlobalsCB = s_staticGlobalsCB.Get();
+            auto shaderParamsCB = s_shaderParamsCB.Get();
+            auto materialIdCB = s_materialIdCB.Get();
+            auto instanceSB = s_instanceSB.Get();
 
             StaticGlobals staticGlobals;
             FillGlobalConstants(staticGlobals);
@@ -726,33 +750,10 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             FillSunConstants(staticGlobals, sunData);
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-            nvrhi::BufferDesc instanceSbDesc;
-            instanceSbDesc.byteSize = sizeof(GPUSkinnedInstanceData);
-            instanceSbDesc.structStride = sizeof(GPUSkinnedInstanceData);
-            instanceSbDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-            instanceSbDesc.keepInitialState = true;
-            instanceSbDesc.debugName = "SkinningPass_Instance_SB";
-            auto instanceSB = nvDevice->createBuffer(instanceSbDesc);
-
-            nvrhi::BufferDesc shaderParamsCbDesc;
-            shaderParamsCbDesc.byteSize = sizeof(ShaderParams);
-            shaderParamsCbDesc.isConstantBuffer = true;
-            shaderParamsCbDesc.isVolatile = true;
-            shaderParamsCbDesc.maxVersions = 128;
-            shaderParamsCbDesc.debugName = "SkinningPass_ShaderParams";
-            auto shaderParamsCB = nvDevice->createBuffer(shaderParamsCbDesc);
-
             ShaderParams shaderParams = {};
             shaderParams.m_AlphaRef = 0.5f;
             shaderParams.dt_params.set(1.0f, 0.0f, 1.0f, 50.0f);
             cmdList->writeBuffer(shaderParamsCB, &shaderParams, sizeof(shaderParams));
-
-            nvrhi::BufferDesc materialIdCbDesc;
-            materialIdCbDesc.byteSize = sizeof(SkinnedMaterialCB);
-            materialIdCbDesc.isConstantBuffer = true;
-            materialIdCbDesc.isVolatile = true;
-            materialIdCbDesc.maxVersions = 256;
-            auto materialIdCB = nvDevice->createBuffer(materialIdCbDesc);
 
             auto& terrainMatBuffer = TerrainMaterialBuffer::Instance();
             if (!terrainMatBuffer.GetBuffer()) {

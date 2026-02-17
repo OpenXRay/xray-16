@@ -194,6 +194,39 @@ bool PassResourceCache::HasStaticBuffer(const char* passName, const char* buffer
     return m_staticBuffers.find(key) != m_staticBuffers.end();
 }
 
+static u64 HashBindingSetDesc(const nvrhi::BindingSetDesc& desc, nvrhi::IBindingLayout* layout) {
+    u64 hash = PassResourceCache::HashPointer(layout);
+    for (const auto& item : desc.bindings) {
+        hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(item.resourceHandle));
+        hash = PassResourceCache::HashCombine(hash, u64(item.slot));
+        hash = PassResourceCache::HashCombine(hash, u64(item.type));
+        hash = PassResourceCache::HashCombine(hash, u64(item.format));
+        hash = PassResourceCache::HashCombine(hash, u64(item.dimension));
+        hash = PassResourceCache::HashCombine(hash, item.rawData[0]);
+        hash = PassResourceCache::HashCombine(hash, item.rawData[1]);
+    }
+    return hash;
+}
+
+nvrhi::BindingSetHandle PassResourceCache::GetOrCreateBindingSet(
+    const nvrhi::BindingSetDesc& desc,
+    nvrhi::IBindingLayout* layout,
+    nvrhi::IDevice* device)
+{
+    u64 key = HashBindingSetDesc(desc, layout);
+    auto it = m_bindingSets.find(key);
+    if (it != m_bindingSets.end()) {
+        m_stats.bindingSetHits++;
+        return it->second;
+    }
+
+    m_stats.bindingSetMisses++;
+    nvrhi::BindingSetHandle bindingSet = device->createBindingSet(desc, layout);
+    if (bindingSet)
+        m_bindingSets[key] = bindingSet;
+    return bindingSet;
+}
+
 void PassResourceCache::Clear() {
     m_samplers.clear();
     m_bindingLayouts.clear();
@@ -202,6 +235,7 @@ void PassResourceCache::Clear() {
     m_framebuffers.clear();
     m_inputLayouts.clear();
     m_staticBuffers.clear();
+    m_bindingSets.clear();
 
     Msg("* [PassResourceCache] Cleared all caches");
 }

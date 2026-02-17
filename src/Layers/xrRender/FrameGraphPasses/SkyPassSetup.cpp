@@ -69,6 +69,8 @@ struct SkyVertex {
 static nvrhi::BufferHandle s_skyVertexBuffer;
 static nvrhi::BufferHandle s_skyIndexBuffer;
 static nvrhi::TextureHandle s_placeholderCubemap;
+static nvrhi::BufferHandle s_dynamicCBBuffer;
+static nvrhi::BufferHandle s_staticCBBuffer;
 static bool s_skyGeometryInitialized = false;
 
 void InitializeSkyGeometry(ng::RenderDevice* device) {
@@ -117,6 +119,17 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
 
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
+
+    nvrhi::BufferDesc vcbDesc;
+    vcbDesc.isConstantBuffer = true;
+    vcbDesc.isVolatile = true;
+    vcbDesc.maxVersions = 16;
+    vcbDesc.byteSize = sizeof(DynamicTransforms);
+    vcbDesc.debugName = "SkyDynamicTransforms";
+    s_dynamicCBBuffer = nvrhiDevice->createBuffer(vcbDesc);
+    vcbDesc.byteSize = sizeof(StaticGlobals);
+    vcbDesc.debugName = "SkyStaticGlobals";
+    s_staticCBBuffer = nvrhiDevice->createBuffer(vcbDesc);
 
     s_skyGeometryInitialized = true;
     Msg("* [SkyPass] Sky geometry initialized");
@@ -290,25 +303,16 @@ framegraph::VirtualResourceHandle setupSkyPass(
             DynamicTransforms dynamicCB = {};
             FillDynamicTransforms(dynamicCB, mSky);
 
-            nvrhi::BufferDesc cbDesc;
-            cbDesc.byteSize = sizeof(DynamicTransforms);
-            cbDesc.isConstantBuffer = true;
-            cbDesc.debugName = "SkyDynamicTransforms";
-            cbDesc.isVolatile = true;
-            cbDesc.maxVersions = 16;
-            auto dynamicCBBuffer = cmdList->getDevice()->createBuffer(cbDesc);
+            auto dynamicCBBuffer = s_dynamicCBBuffer.Get();
             cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
             StaticGlobals staticCB = {};
             FillGlobalConstants(staticCB);
-
             SunLightData sunData;
             GetSunLightData(sunData, 2.0f);
             FillSunConstants(staticCB, sunData);
 
-            cbDesc.byteSize = sizeof(StaticGlobals);
-            cbDesc.debugName = "SkyStaticGlobals";
-            auto staticCBBuffer = cmdList->getDevice()->createBuffer(cbDesc);
+            auto staticCBBuffer = s_staticCBBuffer.Get();
             cmdList->writeBuffer(staticCBBuffer, &staticCB, sizeof(staticCB));
 
             nvrhi::ITexture* sky0Tex = nullptr;
@@ -348,7 +352,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
                 nvrhi::BindingSetItem::Sampler(0, sampler)
             };
 
-            auto bindingSet = cmdList->getDevice()->createBindingSet(bindingSetDesc, bindingLayout);
+            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindingSetDesc, bindingLayout, cmdList->getDevice());
 
             cmdList->clearTextureFloat(colorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f));
 

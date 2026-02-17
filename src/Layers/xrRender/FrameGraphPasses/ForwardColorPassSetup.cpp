@@ -18,6 +18,7 @@
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "xrCore/FMesh.hpp"
 
 namespace xray::render::RENDER_NAMESPACE
@@ -36,6 +37,8 @@ static nvrhi::SamplerHandle s_linearSampler;
 static nvrhi::ShaderHandle s_bindlessVS;
 static nvrhi::ShaderHandle s_bindlessPS;
 static nvrhi::BufferHandle s_drawIndexBuffer;
+static nvrhi::BufferHandle s_lightingCB;
+static nvrhi::BufferHandle s_staticGlobalsCB;
 static bool s_bindlessInitialized = false;
 
 static nvrhi::GraphicsPipelineHandle s_terrainPipeline;
@@ -262,6 +265,15 @@ static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebu
         s_bindlessLayout = actualDesc.bindingLayouts[0];
     }
 
+    nvrhi::BufferDesc vcbDesc;
+    vcbDesc.isConstantBuffer = true;
+    vcbDesc.isVolatile = true;
+    vcbDesc.maxVersions = 16;
+    vcbDesc.byteSize = 96;
+    s_lightingCB = nvDevice->createBuffer(vcbDesc);
+    vcbDesc.byteSize = 768;
+    s_staticGlobalsCB = nvDevice->createBuffer(vcbDesc);
+
     s_bindlessInitialized = true;
     Msg("* [BindlessForward] Pipeline initialized");
 }
@@ -474,12 +486,7 @@ void renderBindlessForward(
     } lightingData;
     static_assert(sizeof(LightingConstants) == 96, "LightingConstants must be 96 bytes");
 
-    nvrhi::BufferDesc cbDesc;
-    cbDesc.byteSize = sizeof(LightingConstants);
-    cbDesc.isConstantBuffer = true;
-    cbDesc.isVolatile = true;
-    cbDesc.maxVersions = 16;
-    auto lightingCB = nvDevice->createBuffer(cbDesc);
+    auto lightingCB = s_lightingCB;
 
     if (g_pGamePersistent) {
         auto& env = g_pGamePersistent->Environment().CurrentEnv;
@@ -498,8 +505,7 @@ void renderBindlessForward(
 
     cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
 
-    cbDesc.byteSize = sizeof(StaticGlobals);
-    auto staticGlobalsCB = nvDevice->createBuffer(cbDesc);
+    auto staticGlobalsCB = s_staticGlobalsCB;
 
     StaticGlobals staticGlobals;
     FillGlobalConstants(staticGlobals);
@@ -525,7 +531,7 @@ void renderBindlessForward(
             nvrhi::BindingSetItem::StructuredBuffer_SRV(16, set.compactMaterialIDBuffer),
         };
 
-        return nvDevice->createBindingSet(bindDesc, s_bindlessLayout);
+        return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, s_bindlessLayout, nvDevice);
     };
 
     const auto& rtDesc = colorRT->getDesc();
@@ -694,7 +700,7 @@ void renderBindlessForward(
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(16, config.terrainCompactMaterialIDBuffer),
             };
 
-            auto terrainBindingSet = nvDevice->createBindingSet(terrainBindDesc, s_terrainLayout);
+            auto terrainBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainBindDesc, s_terrainLayout, nvDevice);
             R_ASSERT2(terrainBindingSet, "Terrain binding set creation failed");
 
             nvrhi::GraphicsState terrainState;
