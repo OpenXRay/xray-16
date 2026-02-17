@@ -80,8 +80,9 @@ struct alignas(16) ShaderParams {
 // Skinned Material CB (per-draw constant, register b4)
 // Used by pixel shader to index into bindless material buffer.
 struct alignas(16) SkinnedMaterialCB {
-    u32 materialID;            // 0-4:    Bindless material index
-    u32 pad0, pad1, pad2;      // 4-16:   Padding to 16-byte boundary
+    u32 materialID;
+    u32 skeletonBoneOffset;
+    u32 pad0, pad1;
 };
 
 // Slot 2: Static Globals (EXTENDED for Forward+)

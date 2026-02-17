@@ -24,14 +24,12 @@ struct PS_OUTPUT
     float4 normal : SV_Target1;
 };
 
-// Per-draw material ID (set via constant buffer for skinned meshes)
-// This is uploaded by FGConstantSystem for each skeleton draw
 cbuffer SkinnedMaterialCB : register(b4)
 {
     uint g_SkinnedMaterialID;
+    uint g_SkeletonBoneOffset;
     uint g_SkinnedPad0;
     uint g_SkinnedPad1;
-    uint g_SkinnedPad2;
 };
 
 PS_OUTPUT main(PS_INPUT input)

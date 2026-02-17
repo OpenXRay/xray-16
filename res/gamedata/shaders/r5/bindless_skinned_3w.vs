@@ -27,7 +27,7 @@ struct VS_OUTPUT
     nointerpolation uint materialID : TEXCOORD5;
 };
 
-VS_OUTPUT main(VS_INPUT_3W v, uint instanceID : SV_InstanceID)
+VS_OUTPUT main(VS_INPUT_3W v)
 {
     VS_OUTPUT o;
 
@@ -35,14 +35,13 @@ VS_OUTPUT main(VS_INPUT_3W v, uint instanceID : SV_InstanceID)
     float3 T = unpack_d3dcolor_normal(v.T.xyz);
     float3 B = unpack_d3dcolor_normal(v.B.xyz);
 
-    // Bone indices: tc.zw for indices 0,1; B.w for index 2
     int id_0 = int(v.tc.z);
     int id_1 = int(v.tc.w);
-    int id_2 = int(v.B.w * 255.0 + 0.3);  // D3DCOLOR format
+    int id_2 = int(v.B.w * 255.0 + 0.3);
 
-    float3x4 bone_0 = get_bone(id_0, instanceID);
-    float3x4 bone_1 = get_bone(id_1, instanceID);
-    float3x4 bone_2 = get_bone(id_2, instanceID);
+    float3x4 bone_0 = get_bone(id_0);
+    float3x4 bone_1 = get_bone(id_1);
+    float3x4 bone_2 = get_bone(id_2);
 
     // 3W weights: w0 = N.w, w1 = T.w, w2 = 1 - w0 - w1
     float w0 = v.N.w;
@@ -57,17 +56,16 @@ VS_OUTPUT main(VS_INPUT_3W v, uint instanceID : SV_InstanceID)
     float3 skinnedT = skinning_dir(T, bone);
     float3 skinnedB = skinning_dir(B, bone);
 
-    float4x4 worldMatrix = g_SkinnedInstances[instanceID].world;
-    float3 worldPos3 = mul(worldMatrix, skinnedPos).xyz;
+    float3 worldPos3 = mul(m_W, skinnedPos);
     o.worldPos = worldPos3;
     o.position = mul(m_VP, float4(worldPos3, 1.0));
 
-    float3x3 worldMatrix3x3 = (float3x3)worldMatrix;
-    o.normal = normalize(mul(worldMatrix3x3, skinnedN));
-    o.tangent = normalize(mul(worldMatrix3x3, skinnedT));
-    o.bitangent = normalize(mul(worldMatrix3x3, skinnedB));
+    float3x3 worldRot = (float3x3)m_W;
+    o.normal = normalize(mul(worldRot, skinnedN));
+    o.tangent = normalize(mul(worldRot, skinnedT));
+    o.bitangent = normalize(mul(worldRot, skinnedB));
 
-    o.materialID = g_SkinnedInstances[instanceID].materialID;
+    o.materialID = g_SkinnedMaterialID;
     o.texcoord = v.tc.xy;
 
     return o;

@@ -125,16 +125,6 @@ struct GPUInstanceData {
 };
 static_assert(sizeof(GPUInstanceData) == 80, "GPUInstanceData must be 80 bytes for GPU alignment");
 
-// Extended instance data with skeleton bone buffer offset for GPU-driven skinned rendering
-struct GPUSkinnedInstanceData {
-    Fmatrix world;              // World transform (64 bytes)
-    u32 materialID;             // Bindless material ID (4 bytes)
-    u32 skeletonBoneOffset;     // Offset into global bone buffer (4 bytes)
-    u32 batchIndex;             // Original batch index (4 bytes)
-    u32 flags;                  // Instance flags (4 bytes)
-};
-static_assert(sizeof(GPUSkinnedInstanceData) == 80, "GPUSkinnedInstanceData must be 80 bytes for GPU alignment");
-
 struct GPUCullOutput {
     framegraph::VirtualResourceHandle visibleIndices;
     framegraph::VirtualResourceHandle visibleCount;
