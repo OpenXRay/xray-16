@@ -150,11 +150,26 @@ SThunderboltCollection* CEffect_Thunderbolt::AppendDef(shared_str sect)
         if (item->section == sect)
             return item;
 
-    auto* result = xr_new<SThunderboltCollection>(sect,
-        m_thunderbolt_collections_config ? m_thunderbolt_collections_config : pSettings,
-        m_thunderbolts_config ? m_thunderbolts_config : pSettings
-    );
+    const CInifile* collections_config;
+    const CInifile* thunderbolts_config;
 
+    if (m_thunderbolt_collections_config && m_thunderbolt_collections_config->section_exist(sect))
+    {
+        collections_config = m_thunderbolt_collections_config;
+        thunderbolts_config = m_thunderbolts_config;
+    }
+    else if (pSettings->section_exist(sect))
+    {
+        collections_config = pSettings;
+        thunderbolts_config = pSettings;
+    }
+    else
+    {
+        collections_config = m_thunderbolt_collections_config ? m_thunderbolt_collections_config : pSettings;
+        thunderbolts_config = m_thunderbolts_config ? m_thunderbolts_config : pSettings;
+    }
+
+    auto* result = xr_new<SThunderboltCollection>(sect, collections_config, thunderbolts_config);
     return collections.emplace_back(result);
 }
 
