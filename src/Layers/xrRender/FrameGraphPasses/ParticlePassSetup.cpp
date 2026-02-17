@@ -264,7 +264,7 @@ static u32 CollectGPUParticleData(
     return totalParticles;
 }
 
-void InitializeParticlePipelines(ng::RenderDevice* device, ParticlePassState& state)
+void InitializeParticleResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ParticlePassState& state)
 {
     if (state.initialized)
         return;
@@ -273,27 +273,22 @@ void InitializeParticlePipelines(ng::RenderDevice* device, ParticlePassState& st
     if (!nvDevice)
         return;
 
-    Msg("* [ParticlePass] Initializing particle pipelines...");
-
-    auto framebuffer = CreateDummyPipelineFramebuffer(nvDevice);
-    if (!framebuffer)
-        return;
-
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     if (!shaderLoader)
         return;
 
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+    auto& cache = framegraph::GetPassResourceCache();
+    auto fbInfo = framebuffer->getFramebufferInfo();
 
-    // Binding layout - no per-material CB needed anymore
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::All;
     layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),  // dynamic_transforms (b0)
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // static_globals (b2)
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials (t8)
-        nvrhi::BindingLayoutItem::Sampler(0),                 // g_LinearSampler (s0)
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
+        nvrhi::BindingLayoutItem::Sampler(0),
     };
     state.layout = nvDevice->createBindingLayout(layoutDesc);
 
@@ -313,33 +308,12 @@ void InitializeParticlePipelines(ng::RenderDevice* device, ParticlePassState& st
     samplerDesc.setMaxAnisotropy(8.0f);
     state.sampler = nvDevice->createSampler(samplerDesc);
 
-    // Input layout (32 bytes per vertex — padded for Vulkan std430 stride)
     constexpr u32 stride = sizeof(ParticleVertex);
     nvrhi::VertexAttributeDesc attribs[] = {
-        nvrhi::VertexAttributeDesc()
-            .setName("POSITION")
-            .setFormat(nvrhi::Format::RGB32_FLOAT)
-            .setBufferIndex(0)
-            .setOffset(0)
-            .setElementStride(stride),
-        nvrhi::VertexAttributeDesc()
-            .setName("COLOR")
-            .setFormat(nvrhi::Format::BGRA8_UNORM)
-            .setBufferIndex(0)
-            .setOffset(12)
-            .setElementStride(stride),
-        nvrhi::VertexAttributeDesc()
-            .setName("TEXCOORD")
-            .setFormat(nvrhi::Format::RG32_FLOAT)
-            .setBufferIndex(0)
-            .setOffset(16)
-            .setElementStride(stride),
-        nvrhi::VertexAttributeDesc()
-            .setName("MATERIALID")
-            .setFormat(nvrhi::Format::R32_UINT)
-            .setBufferIndex(0)
-            .setOffset(24)
-            .setElementStride(stride),
+        nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGB32_FLOAT).setBufferIndex(0).setOffset(0).setElementStride(stride),
+        nvrhi::VertexAttributeDesc().setName("COLOR").setFormat(nvrhi::Format::BGRA8_UNORM).setBufferIndex(0).setOffset(12).setElementStride(stride),
+        nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setBufferIndex(0).setOffset(16).setElementStride(stride),
+        nvrhi::VertexAttributeDesc().setName("MATERIALID").setFormat(nvrhi::Format::R32_UINT).setBufferIndex(0).setOffset(24).setElementStride(stride),
     };
     state.inputLayout = nvDevice->createInputLayout(attribs, 4, state.vs);
 
@@ -362,14 +336,12 @@ void InitializeParticlePipelines(ng::RenderDevice* device, ParticlePassState& st
         pipeDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
         pipeDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
 
-        state.pipelineBlend = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-        Msg("* [ParticlePass] Alpha blend pipeline: %s", state.pipelineBlend ? "OK" : "FAILED");
+        state.pipelineBlend = cache.GetOrCreatePipeline("ParticlePass_alphaBlend", pipeDesc, fbInfo, nvDevice);
 
         if (state.pipelineBlend) {
             const nvrhi::GraphicsPipelineDesc& actualDesc = state.pipelineBlend->getDesc();
-            if (!actualDesc.bindingLayouts.empty()) {
+            if (!actualDesc.bindingLayouts.empty())
                 state.layout = actualDesc.bindingLayouts[0];
-            }
         }
     }
 
@@ -392,45 +364,25 @@ void InitializeParticlePipelines(ng::RenderDevice* device, ParticlePassState& st
         pipeDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
         pipeDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::One;
 
-        state.pipelineAdd = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-        Msg("* [ParticlePass] Additive blend pipeline: %s", state.pipelineAdd ? "OK" : "FAILED");
+        state.pipelineAdd = cache.GetOrCreatePipeline("ParticlePass_additive", pipeDesc, fbInfo, nvDevice);
 
         if (state.pipelineAdd) {
             const nvrhi::GraphicsPipelineDesc& actualDesc = state.pipelineAdd->getDesc();
-            if (!actualDesc.bindingLayouts.empty()) {
+            if (!actualDesc.bindingLayouts.empty())
                 state.layout = actualDesc.bindingLayouts[0];
-            }
         }
     }
 
     state.initialized = true;
     Msg("* [ParticlePass] Pipeline initialization complete");
 
-    state.gpuCullingManager = xr_make_unique<ParticleGPUCullingManager>();
-    if (!state.gpuCullingManager->Initialize(device, MAX_GPU_PARTICLES)) {
-        Msg("! [ParticlePass] GPU culling initialization failed, using CPU fallback");
-        state.gpuCullingManager.reset();
+    if (!state.gpuCullingManager) {
+        state.gpuCullingManager = xr_make_unique<ParticleGPUCullingManager>();
+        if (!state.gpuCullingManager->Initialize(device, MAX_GPU_PARTICLES)) {
+            Msg("! [ParticlePass] GPU culling initialization failed, using CPU fallback");
+            state.gpuCullingManager.reset();
+        }
     }
-}
-
-void ShutdownParticlePipelines(ParticlePassState& state)
-{
-    if (state.gpuCullingManager) {
-        state.gpuCullingManager->Shutdown();
-        state.gpuCullingManager.reset();
-    }
-    state.pipelineBlend = nullptr;
-    state.pipelineAdd = nullptr;
-    state.layout = nullptr;
-    state.inputLayout = nullptr;
-    state.vs = nullptr;
-    state.ps = nullptr;
-    state.sampler = nullptr;
-    state.particleVB = nullptr;
-    state.quadIB = nullptr;
-    state.particleVBSize = 0;
-    state.maxQuads = 0;
-    state.initialized = false;
 }
 
 DefaultOutputLayout setupParticlePass(
@@ -482,7 +434,7 @@ DefaultOutputLayout setupParticlePass(
             u32 totalWorld = data.worldParticleBatches ? (u32)data.worldParticleBatches->size() : 0;
             u32 totalHUD = data.hudParticleBatches ? (u32)data.hudParticleBatches->size() : 0;
 
-            if ((totalWorld == 0 && totalHUD == 0) || !data.passState || !data.passState->initialized)
+            if ((totalWorld == 0 && totalHUD == 0) || !data.passState)
                 return;
 
             auto* colorRT = fg.GetPhysicalTexture(data.outputColor);
@@ -506,13 +458,17 @@ DefaultOutputLayout setupParticlePass(
             if (normalRT)
                 fbDesc.addColorAttachment(normalRT);
             fbDesc.setDepthAttachment(depthRT);
-            auto framebuffer = nvDevice->createFramebuffer(fbDesc);
+            auto& cache = framegraph::GetPassResourceCache();
+            auto framebuffer = cache.GetOrCreateFramebuffer("ParticlePass", fbDesc, nvDevice);
             if (!framebuffer)
+                return;
+
+            InitializeParticleResources(data.device, framebuffer, *data.passState);
+            if (!data.passState->initialized)
                 return;
 
             const auto& rtDesc = colorRT->getDesc();
 
-            auto& cache = framegraph::GetPassResourceCache();
             auto dynTransformsCB = cache.GetOrCreateVolatileCB("ParticlePass", "DynTransforms", sizeof(DynamicTransforms), 16, nvDevice).Get();
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ParticlePass", "StaticGlobals", sizeof(StaticGlobals), 16, nvDevice).Get();
 

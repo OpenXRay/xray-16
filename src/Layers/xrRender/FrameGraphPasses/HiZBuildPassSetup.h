@@ -77,6 +77,8 @@ struct HiZPyramidOutput {
     u32 height;                                 // Base height
 };
 
+void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 height, HiZBuildPassState& state);
+
 // Setup Hi-Z pyramid generation pass
 // Input: Full-resolution depth buffer from depth prepass
 // Output: Depth pyramid with conservative (max) depths

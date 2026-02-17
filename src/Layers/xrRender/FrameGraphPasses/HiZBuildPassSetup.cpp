@@ -23,7 +23,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 
 using namespace framegraph;
 
-static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 height, HiZBuildPassState& state)
+void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 height, HiZBuildPassState& state)
 {
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice) {

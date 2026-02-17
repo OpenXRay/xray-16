@@ -30,54 +30,7 @@ namespace xray::render::RENDER_NAMESPACE
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ForwardColorPassState& state);
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  EAGER PIPELINE INITIALIZATION
-// ═══════════════════════════════════════════════════════════════════════════
-// Called once at device creation to avoid frame hitches on first render
-
-void InitializeForwardPipelines(ng::RenderDevice* device, ForwardColorPassState& state)
-{
-    if (!device)
-        return;
-
-    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
-    if (!nvDevice)
-        return;
-
-    Msg("* [ForwardPass] Initializing forward pipelines...");
-
-    auto dummyFramebuffer = CreateDummyPipelineFramebuffer(nvDevice);
-    if (!dummyFramebuffer)
-        return;
-
-    InitializeBindlessPipeline(device, dummyFramebuffer, state);
-
-    Msg("* [ForwardPass] Pipeline initialization complete");
-}
-
-void ShutdownForwardPipelines(ForwardColorPassState& state)
-{
-    state.bindlessPipeline = nullptr;
-    state.bindlessLayout = nullptr;
-    state.bindlessInputLayout = nullptr;
-    state.linearSampler = nullptr;
-    state.bindlessVS = nullptr;
-    state.bindlessPS = nullptr;
-    state.bindlessInitialized = false;
-    state.terrainPipeline = nullptr;
-    state.terrainLayout = nullptr;
-    state.terrainPS = nullptr;
-    state.terrainInitialized = false;
-
-    Msg("* [ForwardPass] Pipeline resources released");
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  BINDLESS PIPELINE INITIALIZATION
-// ═══════════════════════════════════════════════════════════════════════════
-static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ForwardColorPassState& state)
+void InitializeForwardResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ForwardColorPassState& state)
 {
     if (state.bindlessInitialized)
         return;
@@ -100,6 +53,8 @@ static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebu
 
     state.bindlessVS = vsResult.handle;
     state.bindlessPS = psResult.handle;
+
+    auto& cache = framegraph::GetPassResourceCache();
 
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
@@ -152,7 +107,7 @@ static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebu
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-    state.bindlessPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+    state.bindlessPipeline = cache.GetOrCreatePipeline("ForwardColor", pipeDesc, framebuffer->getFramebufferInfo(), nvDevice);
     if (!state.bindlessPipeline) {
         Msg("! [BindlessForward] Failed to create pipeline");
         return;
@@ -205,6 +160,8 @@ static void renderBindlessForward(
     fbDesc.setDepthAttachment(depthRT);
     auto& cache = framegraph::GetPassResourceCache();
     auto framebuffer = cache.GetOrCreateFramebuffer("ForwardColor", fbDesc, nvDevice);
+
+    InitializeForwardResources(device, framebuffer, ps);
 
     auto lightingCB = cache.GetOrCreateVolatileCB("ForwardColor", "LightingCB", sizeof(LightingConstants), 16, nvDevice);
     auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ForwardColor", "StaticGlobalsCB", sizeof(StaticGlobals), 16, nvDevice);
@@ -385,7 +342,7 @@ static void renderBindlessForward(
                         terrainPipeDesc.renderState.rasterState.frontCounterClockwise = false;
                         terrainPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-                        ps.terrainPipeline = nvDevice->createGraphicsPipeline(terrainPipeDesc, framebuffer);
+                        ps.terrainPipeline = cache.GetOrCreatePipeline("ForwardColor_Terrain", terrainPipeDesc, framebuffer->getFramebufferInfo(), nvDevice);
                         if (ps.terrainPipeline) {
                             ps.terrainInitialized = true;
                             Msg("* [BindlessForward] Terrain pipeline initialized");

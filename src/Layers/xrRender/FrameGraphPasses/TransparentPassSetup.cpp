@@ -16,7 +16,7 @@
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-static void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, TransparentPassState& state)
+void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, TransparentPassState& state)
 {
     if (state.initialized)
         return;
@@ -95,7 +95,8 @@ static void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFra
     rt0.destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
     rt0.blendOpAlpha = nvrhi::BlendOp::Add;
 
-    state.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+    auto& cache = framegraph::GetPassResourceCache();
+    state.pipeline = cache.GetOrCreatePipeline("TransparentPass", pipeDesc, framebuffer->getFramebufferInfo(), nvDevice);
     if (!state.pipeline)
         return;
 
@@ -103,17 +104,6 @@ static void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFra
 
     state.initialized = true;
     Msg("* [TransparentPass] Pipeline initialized");
-}
-
-void ShutdownTransparentPipelines(TransparentPassState& state)
-{
-    state.pipeline = nullptr;
-    state.layout = nullptr;
-    state.inputLayout = nullptr;
-    state.sampler = nullptr;
-    state.vs = nullptr;
-    state.ps = nullptr;
-    state.initialized = false;
 }
 
 framegraph::DefaultOutputLayout setupTransparentPass(

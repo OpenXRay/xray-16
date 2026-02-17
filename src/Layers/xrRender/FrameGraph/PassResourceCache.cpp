@@ -97,14 +97,45 @@ nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayout(
 //  GRAPHICS PIPELINE CACHE
 // ═══════════════════════════════════════════════════════════════════════════════
 
+static u64 HashGraphicsPipelineKey(const char* passName,
+    const nvrhi::GraphicsPipelineDesc& desc,
+    const nvrhi::FramebufferInfo& fbInfo)
+{
+    u64 hash = PassResourceCache::HashString(passName);
+    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.VS.Get()));
+    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.PS.Get()));
+    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.GS.Get()));
+    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.HS.Get()));
+    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.DS.Get()));
+    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.inputLayout.Get()));
+    hash = PassResourceCache::HashCombine(hash, u64(desc.primType));
+    for (const auto& layout : desc.bindingLayouts)
+        hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(layout.Get()));
+    for (const auto& fmt : fbInfo.colorFormats)
+        hash = PassResourceCache::HashCombine(hash, u64(fmt));
+    hash = PassResourceCache::HashCombine(hash, u64(fbInfo.depthFormat));
+    hash = PassResourceCache::HashCombine(hash, u64(fbInfo.sampleCount));
+    const auto& rs = desc.renderState;
+    hash = PassResourceCache::HashCombine(hash, u64(rs.depthStencilState.depthTestEnable));
+    hash = PassResourceCache::HashCombine(hash, u64(rs.depthStencilState.depthWriteEnable));
+    hash = PassResourceCache::HashCombine(hash, u64(rs.depthStencilState.depthFunc));
+    hash = PassResourceCache::HashCombine(hash, u64(rs.rasterState.cullMode));
+    hash = PassResourceCache::HashCombine(hash, u64(rs.rasterState.frontCounterClockwise));
+    const auto& bt = rs.blendState.targets[0];
+    hash = PassResourceCache::HashCombine(hash, u64(bt.blendEnable));
+    hash = PassResourceCache::HashCombine(hash, u64(bt.srcBlend));
+    hash = PassResourceCache::HashCombine(hash, u64(bt.destBlend));
+    hash = PassResourceCache::HashCombine(hash, u64(bt.blendOp));
+    return hash;
+}
+
 nvrhi::GraphicsPipelineHandle PassResourceCache::GetOrCreatePipeline(
     const char* passName,
     const nvrhi::GraphicsPipelineDesc& desc,
     const nvrhi::FramebufferInfo& fbInfo,
     nvrhi::IDevice* device)
 {
-    // Key is just pass name - each pass has one pipeline configuration
-    u64 key = HashString(passName);
+    u64 key = HashGraphicsPipelineKey(passName, desc, fbInfo);
 
     auto it = m_graphicsPipelines.find(key);
     if (it != m_graphicsPipelines.end()) {
@@ -112,7 +143,6 @@ nvrhi::GraphicsPipelineHandle PassResourceCache::GetOrCreatePipeline(
         return it->second;
     }
 
-    // Create new pipeline using FramebufferInfo (preferred API)
     m_stats.pipelineMisses++;
     nvrhi::GraphicsPipelineHandle pipeline = device->createGraphicsPipeline(desc, fbInfo);
     if (pipeline) {

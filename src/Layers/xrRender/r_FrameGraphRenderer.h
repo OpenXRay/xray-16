@@ -108,7 +108,6 @@ public:
 
 private:
     bool m_enabled = false;
-    bool m_pipelinesInitialized = false;
     ng::RenderDevice* m_device = nullptr;
 
     xr_unique_ptr<RENDER_NAMESPACE::passes::PassStates> m_passStates;

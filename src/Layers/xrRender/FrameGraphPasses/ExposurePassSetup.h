@@ -94,6 +94,8 @@ struct ExposureOutput {
     framegraph::VirtualResourceHandle histogramBuffer;  // 64 u32 bins (for debug)
 };
 
+void InitializeExposureResources(ng::RenderDevice* device, ExposurePassState& state);
+
 // Setup the exposure pass
 // Returns handle to 1x1 exposure texture
 ExposureOutput setupExposurePass(

@@ -55,8 +55,6 @@ inline void QueryBindingLayoutFromPipeline(
 
 nvrhi::BufferHandle GetOrCreateDrawIndexBuffer(const char* passName, nvrhi::IDevice* device);
 
-nvrhi::FramebufferHandle CreateDummyPipelineFramebuffer(nvrhi::IDevice* device);
-
 LightingConstants FillLightingConstants();
 
 u32 ExtractFrustumPlanes(Fvector4 outPlanes[6]);
