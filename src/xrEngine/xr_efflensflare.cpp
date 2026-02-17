@@ -561,9 +561,15 @@ CLensFlareDescriptor* CLensFlare::AppendDef(shared_str sect)
         if (flare->section == sect)
             return flare;
 
-    const auto descriptor = xr_new<CLensFlareDescriptor>(sect,
-        m_suns_config ? m_suns_config : pSettings
-    );
+    const CInifile* suns_config;
+    if (m_suns_config && m_suns_config->section_exist(sect))
+        suns_config = m_suns_config;
+    else if (pSettings->section_exist(sect))
+        suns_config = pSettings;
+    else
+        suns_config = m_suns_config ? m_suns_config : pSettings;
+
+    const auto descriptor = xr_new<CLensFlareDescriptor>(sect, suns_config);
     return m_Palette.emplace_back(descriptor);
 }
 
