@@ -12,9 +12,7 @@
 namespace
 {
 bool window_weather_cycle = false;
-bool window_suns = false;
 bool window_ambients = false;
-bool window_thunderbolts = false;
 bool window_level_weathers = false;
 
 bool TimeFrameCombo(pcstr label, CEnvDescriptor*& descriptor, const CEnvironment::EnvVec* currentWeather)
@@ -68,10 +66,6 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
     {
         if (ImGui::BeginCombo("sun##lensflareid", lens_flare ? lens_flare->section.c_str() : ""))
         {
-            if (ImGui::Selectable("<edit>", false))
-            {
-                window_suns = true;
-            }
             if (ImGui::Selectable("##", !lens_flare))
                 lens_flare = nullptr;
             for (CLensFlareDescriptor* desc : env.eff_LensFlare->GetDescriptors())
@@ -84,6 +78,15 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
         ItemHelp("Name in configs: \n"
                  "CS/COP: sun\n"
                  "   SOC: flares");
+
+        ImGui::SameLine();
+        ImGui::Button("Edit##flares");
+        if (ImGui::BeginPopupContextItem(nullptr, ImGuiPopupFlags_MouseButtonLeft))
+        {
+            if (lens_flare)
+                lens_flare->ed_show_params();
+            ImGui::EndPopup();
+        }
 
         ImGui::ColorEdit3("sun color", reinterpret_cast<float*>(&sun_color));
 
@@ -199,12 +202,8 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
     }
     if (CascadingCollapsingHeader("thunderbolts##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (ImGui::BeginCombo("thunderbolts", thunderbolt ? thunderbolt->section.c_str() : ""))
+        if (ImGui::BeginCombo("bolts", thunderbolt ? thunderbolt->section.c_str() : ""))
         {
-            if (ImGui::Selectable("<edit>", false))
-            {
-                window_thunderbolts = true;
-            }
             if (ImGui::Selectable("##", !thunderbolt))
                 thunderbolt = nullptr;
             for (const auto& bolts : env.eff_Thunderbolt->GetCollections())
@@ -217,6 +216,16 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
         ItemHelp("Name in configs: \n"
                  "CS/COP: thunderbolts_collection\n"
                  "   SOC: thunderbolt");
+
+        ImGui::SameLine();
+        ImGui::Button("Edit##thunderbolts");
+        if (ImGui::BeginPopupContextItem(nullptr, ImGuiPopupFlags_MouseButtonLeft))
+        {
+            env.eff_Thunderbolt->ED_ShowParams();
+            if (thunderbolt)
+                thunderbolt->ed_show_params();
+            ImGui::EndPopup();
+        }
 
         ImGui::DragFloat("duration", &bolt_duration);
         ImGui::DragFloat("period", &bolt_period);
@@ -254,33 +263,6 @@ void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
 #endif
 }
 
-void CEffect_Thunderbolt::ED_ShowParams()
-{
-#ifndef MASTER_GOLD
-    using namespace xray::imgui;
-
-    float altitude[2] = { rad2deg(p_var_alt.x) , rad2deg(p_var_alt.y) };
-    if (ImGui::DragFloat2("altitude", altitude, 0.5f, -360.0f, 360.f))
-        p_var_alt = { rad2deg(altitude[0]) , rad2deg(altitude[1]) };
-
-    float deltalongitude = rad2deg(p_var_long);
-    if (ImGui::DragFloat("wind direction", &deltalongitude, 0.5f, -360.0f, 360.f))
-        p_var_long = deg2rad(deltalongitude);
-
-    ImGui::DragFloat("minimum distance factor", &p_min_dist, 0.001f, 0.0f, MAX_DIST_FACTOR);
-    ItemHelp("Distance from far plane");
-
-    float tilt = rad2deg(p_tilt);
-    if (ImGui::DragFloat("tilt", &tilt, 0.01f, 15.0f, 30.f))
-        p_tilt = deg2rad(tilt);
-
-    ImGui::DragFloat("second probability", &p_second_prop, 0.001f, 0.0f, 1.0f);
-    ImGui::DragFloat("sky color", &p_sky_color, 0.001f, 0.0f, 1.0f);
-    ImGui::DragFloat("sun color", &p_sun_color, 0.001f, 0.0f, 1.0f);
-    ImGui::DragFloat("fog color", &p_fog_color, 0.001f, 0.0f, 1.0f);
-#endif
-}
-
 void CEnvironment::on_tool_frame()
 {
 #ifndef MASTER_GOLD
@@ -310,9 +292,7 @@ void CEnvironment::on_tool_frame()
             if (ImGui::BeginMenu("Windows"))
             {
                 if (ImGui::MenuItem("Weather cycles", nullptr, &window_weather_cycle)) {}
-                if (ImGui::MenuItem("Suns", nullptr, &window_suns)) {}
                 if (ImGui::MenuItem("Ambients", nullptr, &window_ambients)) {}
-                if (ImGui::MenuItem("Thunderbolts", nullptr, &window_thunderbolts)) {}
                 if (ImGui::MenuItem("Level weathers", nullptr, &window_level_weathers)) {}
 
                 ImGui::EndMenu();

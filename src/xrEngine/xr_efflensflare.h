@@ -32,11 +32,14 @@ public:
         shared_str texture;
         shared_str shader;
         FactoryPtr<IFlareRender> m_pRender;
+
+        bool ed_show_params(); // ImGui editor
     };
 
     struct SSource : public SFlare
     {
         bool ignore_color;
+        bool ed_show_params(); // ImGui editor
     };
     using FlareVec = xr_vector<SFlare>;
 
@@ -70,6 +73,9 @@ public:
     CLensFlareDescriptor(const shared_str& section, CInifile const* pIni);
     void OnDeviceCreate();
     void OnDeviceDestroy();
+
+    void ed_show_params(); // ImGui editor
+    void save(CInifile* config) const;
 };
 
 class ENGINE_API CLensFlare
@@ -136,4 +142,6 @@ public:
 
     [[nodiscard]]
     auto& GetDescriptors() { return m_Palette; }
+
+    void save(bool soc_style) const;
 };

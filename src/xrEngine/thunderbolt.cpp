@@ -4,6 +4,7 @@
 #include "Render.h"
 #endif
 #include "thunderbolt.h"
+
 #include "IGame_Persistent.h"
 #include "LightAnimLibrary.h"
 
@@ -14,6 +15,8 @@
 #include "xrCDB/xr_area.h"
 #include "xr_object.h"
 #endif
+
+#include "editor_helper.h"
 
 SThunderboltDesc::SThunderboltDesc(const CInifile& pIni, shared_str const& sect)
 {
@@ -99,6 +102,18 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
 
     m_thunderbolt_collections_config = load_config("environment\\thunderbolt_collections.ltx");
     m_thunderbolts_config = load_config("environment\\thunderbolts.ltx");
+
+#ifndef MASTER_GOLD
+    // Load all sections so weather editor can see all of them
+    if (m_thunderbolt_collections_config && m_thunderbolts_config)
+    {
+        for (const auto& section : m_thunderbolt_collections_config->sections())
+        {
+            auto* result = xr_new<SThunderboltCollection>(section->Name, m_thunderbolt_collections_config, m_thunderbolts_config);
+            collections.emplace_back(result);
+        }
+    }
+#endif
 
     pcstr section = "environment";
     CInifile const* config = load_config("environment\\environment.ltx");
@@ -314,4 +329,101 @@ void CEffect_Thunderbolt::Render()
 {
     if (state == stWorking)
         m_pRender->Render(*this);
+}
+
+void CEffect_Thunderbolt::ED_ShowParams()
+{
+#ifndef MASTER_GOLD
+    using namespace xray::imgui;
+
+    ImGui::SeparatorText("Common");
+    float altitude[2] = { rad2deg(p_var_alt.x) , rad2deg(p_var_alt.y) };
+    if (ImGui::DragFloat2("altitude", altitude, 0.5f, -360.0f, 360.f))
+        p_var_alt = { rad2deg(altitude[0]) , rad2deg(altitude[1]) };
+
+    float deltalongitude = rad2deg(p_var_long);
+    if (ImGui::DragFloat("wind direction", &deltalongitude, 0.5f, -360.0f, 360.f))
+        p_var_long = deg2rad(deltalongitude);
+
+    ImGui::DragFloat("minimum distance factor", &p_min_dist, 0.001f, 0.0f, MAX_DIST_FACTOR);
+    ItemHelp("Distance from far plane");
+
+    float tilt = rad2deg(p_tilt);
+    if (ImGui::DragFloat("tilt", &tilt, 0.01f, 15.0f, 30.f))
+        p_tilt = deg2rad(tilt);
+
+    ImGui::DragFloat("second probability", &p_second_prop, 0.001f, 0.0f, 1.0f);
+    ImGui::DragFloat("sky color", &p_sky_color, 0.001f, 0.0f, 1.0f);
+    ImGui::DragFloat("sun color", &p_sun_color, 0.001f, 0.0f, 1.0f);
+    ImGui::DragFloat("fog color", &p_fog_color, 0.001f, 0.0f, 1.0f);
+#endif
+}
+
+void SThunderboltDesc::SFlare::ed_show_params()
+{
+#ifndef MASTER_GOLD
+    using namespace xray::imgui;
+    ScopeID scope{ this };
+    ImGui::DragFloat("Opacity", &fOpacity);
+    ImGui::DragFloat2("Radius", reinterpret_cast<float*>(&fRadius));
+    if (InputText("Shader", shader))
+    {
+        m_pFlare->DestroyShader();
+        m_pFlare->CreateShader(shader.c_str(), texture.c_str());
+    }
+    if (InputText("Texture", texture))
+    {
+        m_pFlare->DestroyShader();
+        m_pFlare->CreateShader(shader.c_str(), texture.c_str());
+    }
+#endif
+}
+
+void SThunderboltDesc::ed_show_params()
+{
+#ifndef MASTER_GOLD
+    // XXX: color anim, model, sound
+    ImGui::SeparatorText("Top gradient");
+    m_GradientTop->ed_show_params();
+    ImGui::SeparatorText("Center gradient");
+    m_GradientCenter->ed_show_params();
+#endif
+}
+
+void SThunderboltCollection::ed_show_params()
+{
+#ifndef MASTER_GOLD
+    if (ImGui::BeginTabBar("Thunderbolts"))
+    {
+        for (auto& bolt : palette)
+        {
+            if (ImGui::BeginTabItem(bolt->name.c_str()))
+            {
+                bolt->ed_show_params();
+                ImGui::EndTabItem();
+            }
+        }
+        // XXX: add new thunderbolt
+        //if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
+        //    ;
+        ImGui::EndTabBar();
+    }
+#endif
+}
+
+void SThunderboltDesc::SFlare::save(CInifile* config) const
+{
+}
+
+void SThunderboltDesc::save(CInifile* config) const
+{
+}
+
+void SThunderboltCollection::save(CInifile* config) const
+{
+}
+
+void CEffect_Thunderbolt::save()
+{
+    // XXX: save
 }
