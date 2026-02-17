@@ -5,6 +5,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -422,7 +423,7 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
         nvrhi::BindingSetItem::StructuredBuffer_UAV(0, m_vertexBuffer),
         nvrhi::BindingSetItem::RawBuffer_UAV(1, m_drawArgsBuffer),
     };
-    m_billboardBindingSet = nvDevice->createBindingSet(bindDesc, m_billboardLayout);
+    m_billboardBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, m_billboardLayout, nvDevice);
 
     nvrhi::ComputeState state;
     state.pipeline = m_billboardPipeline;

@@ -31,6 +31,7 @@ struct SunVertex {
 static nvrhi::TextureHandle s_sunPlaceholderTexture;
 static nvrhi::BufferHandle s_sunVertexBuffer;
 static nvrhi::BufferHandle s_sunIndexBuffer;
+static nvrhi::BufferHandle s_dynamicCBBuffer;
 static bool s_sunPassInitialized = false;
 
 void InitializeSunPass(ng::RenderDevice* device) {
@@ -73,6 +74,14 @@ void InitializeSunPass(ng::RenderDevice* device) {
     cmdList->writeBuffer(s_sunIndexBuffer, indices, sizeof(indices));
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
+
+    nvrhi::BufferDesc vcbDesc;
+    vcbDesc.isConstantBuffer = true;
+    vcbDesc.isVolatile = true;
+    vcbDesc.maxVersions = 16;
+    vcbDesc.byteSize = sizeof(DynamicTransforms);
+    vcbDesc.debugName = "SunDynamicTransforms";
+    s_dynamicCBBuffer = nvrhiDevice->createBuffer(vcbDesc);
 
     s_sunPassInitialized = true;
 }
@@ -366,13 +375,7 @@ framegraph::VirtualResourceHandle setupSunPass(
             DynamicTransforms dynamicCB = {};
             FillDynamicTransforms(dynamicCB, Fidentity);
 
-            nvrhi::BufferDesc cbDesc;
-            cbDesc.byteSize = sizeof(DynamicTransforms);
-            cbDesc.isConstantBuffer = true;
-            cbDesc.debugName = "SunDynamicTransforms";
-            cbDesc.isVolatile = true;  // Per-frame data, no state tracking needed
-            cbDesc.maxVersions = 16;
-            auto dynamicCBBuffer = cmdList->getDevice()->createBuffer(cbDesc);
+            auto dynamicCBBuffer = s_dynamicCBBuffer.Get();
             cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
             // ═══════════════════════════════════════════════════════
@@ -412,7 +415,7 @@ framegraph::VirtualResourceHandle setupSunPass(
                 nvrhi::BindingSetItem::Texture_SRV(0, sunTex),
                 nvrhi::BindingSetItem::Sampler(0, sampler)
             };
-            auto bindingSet = cmdList->getDevice()->createBindingSet(bindingSetDesc, bindingLayout);
+            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindingSetDesc, bindingLayout, cmdList->getDevice());
 
             // ═══════════════════════════════════════════════════════
             //  RENDER SUN

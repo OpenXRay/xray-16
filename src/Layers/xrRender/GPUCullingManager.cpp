@@ -14,6 +14,7 @@
 #include "Layers/xrRender/SkeletonCustom.h"  // For CKinematics bone access
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 
 namespace RENDER_NAMESPACE
 {
@@ -1345,7 +1346,7 @@ void GPUCullingManager::DispatchVariantPartition(
         nvrhi::BindingSetItem::StructuredBuffer_UAV(2, partition.reorderedBatchIndicesBuffer),
         nvrhi::BindingSetItem::StructuredBuffer_UAV(3, partition.reorderedMaterialIDsBuffer)
     };
-    nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, m_variantPartitionLayout);
+    nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, m_variantPartitionLayout, nvDevice);
     R_ASSERT2(bindingSet, "Failed to create variant partition binding set");
 
     nvrhi::ComputeState state;
@@ -2510,7 +2511,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                             nvrhi::BindingSetItem::StructuredBuffer_UAV(1, set.compactGroupCountsBuffer)
                         };
 
-                        nvrhi::BindingSetHandle countBindingSet = nvDevice->createBindingSet(countBindDesc, mgr->m_compactCountLayout);
+                        nvrhi::BindingSetHandle countBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(countBindDesc, mgr->m_compactCountLayout, nvDevice);
                         R_ASSERT2(countBindingSet, "Failed to create compaction count binding set");
 
                         nvrhi::ComputeState countState;
@@ -2533,7 +2534,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                             nvrhi::BindingSetItem::RawBuffer_UAV(2, set.compactDispatchArgsBuffer)
                         };
 
-                        nvrhi::BindingSetHandle scanBindingSet = nvDevice->createBindingSet(scanBindDesc, mgr->m_compactScanLayout);
+                        nvrhi::BindingSetHandle scanBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(scanBindDesc, mgr->m_compactScanLayout, nvDevice);
                         R_ASSERT2(scanBindingSet, "Failed to create compaction scan binding set");
 
                         nvrhi::ComputeState scanState;
@@ -2563,7 +2564,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                             nvrhi::BindingSetItem::StructuredBuffer_UAV(2, set.compactMaterialIDBuffer)
                         };
 
-                        nvrhi::BindingSetHandle scatterBindingSet = nvDevice->createBindingSet(scatterBindDesc, mgr->m_compactScatterLayout);
+                        nvrhi::BindingSetHandle scatterBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(scatterBindDesc, mgr->m_compactScatterLayout, nvDevice);
                         R_ASSERT2(scatterBindingSet, "Failed to create compaction scatter binding set");
 
                         nvrhi::ComputeState scatterState;
@@ -2686,7 +2687,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     };
 
                     nvrhi::BindingSetHandle terrainCountBindingSet =
-                        nvDevice->createBindingSet(terrainCountBindDesc, mgr->m_compactCountLayout);
+                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainCountBindDesc, mgr->m_compactCountLayout, nvDevice);
                     R_ASSERT2(terrainCountBindingSet, "Terrain compaction count binding set creation failed");
 
                     nvrhi::ComputeState terrainCountState;
@@ -2710,7 +2711,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     };
 
                     nvrhi::BindingSetHandle terrainScanBindingSet =
-                        nvDevice->createBindingSet(terrainScanBindDesc, mgr->m_compactScanLayout);
+                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainScanBindDesc, mgr->m_compactScanLayout, nvDevice);
                     R_ASSERT2(terrainScanBindingSet, "Terrain compaction scan binding set creation failed");
 
                     nvrhi::ComputeState terrainScanState;
@@ -2741,7 +2742,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     };
 
                     nvrhi::BindingSetHandle terrainScatterBindingSet =
-                        nvDevice->createBindingSet(terrainScatterBindDesc, mgr->m_compactScatterLayout);
+                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainScatterBindDesc, mgr->m_compactScatterLayout, nvDevice);
                     R_ASSERT2(terrainScatterBindingSet, "Terrain compaction scatter binding set creation failed");
 
                     nvrhi::ComputeState terrainScatterState;

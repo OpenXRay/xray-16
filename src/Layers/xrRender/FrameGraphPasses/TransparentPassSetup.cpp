@@ -11,6 +11,7 @@
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -21,6 +22,8 @@ static nvrhi::SamplerHandle s_transparentSampler;
 static nvrhi::ShaderHandle s_transparentVS;
 static nvrhi::ShaderHandle s_transparentPS;
 static nvrhi::BufferHandle s_transparentDrawIndexBuffer;
+static nvrhi::BufferHandle s_lightingCB;
+static nvrhi::BufferHandle s_staticGlobalsCB;
 static bool s_transparentInitialized = false;
 
 static void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer)
@@ -147,6 +150,15 @@ static void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFra
     if (!actualDesc.bindingLayouts.empty())
         s_transparentLayout = actualDesc.bindingLayouts[0];
 
+    nvrhi::BufferDesc vcbDesc;
+    vcbDesc.isConstantBuffer = true;
+    vcbDesc.isVolatile = true;
+    vcbDesc.maxVersions = 16;
+    vcbDesc.byteSize = 96;  // sizeof(LightingConstants)
+    s_lightingCB = nvDevice->createBuffer(vcbDesc);
+    vcbDesc.byteSize = 768;  // sizeof(StaticGlobals)
+    s_staticGlobalsCB = nvDevice->createBuffer(vcbDesc);
+
     s_transparentInitialized = true;
     Msg("* [TransparentPass] Pipeline initialized");
 }
@@ -240,12 +252,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 Fvector4 fogColor;
             } lightingData;
 
-            nvrhi::BufferDesc cbDesc;
-            cbDesc.byteSize = sizeof(LightingConstants);
-            cbDesc.isConstantBuffer = true;
-            cbDesc.isVolatile = true;
-            cbDesc.maxVersions = 16;
-            auto lightingCB = nvDevice->createBuffer(cbDesc);
+            auto lightingCB = s_lightingCB.Get();
 
             if (g_pGamePersistent) {
                 auto& env = g_pGamePersistent->Environment().CurrentEnv;
@@ -263,8 +270,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             lightingData.cameraPosition.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 1.0f);
             cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
 
-            cbDesc.byteSize = sizeof(StaticGlobals);
-            auto staticGlobalsCB = nvDevice->createBuffer(cbDesc);
+            auto staticGlobalsCB = s_staticGlobalsCB.Get();
             StaticGlobals staticGlobals;
             FillGlobalConstants(staticGlobals);
             SunLightData sunData;
@@ -288,7 +294,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(16, cfg.compactMaterialIDBuffer),
             };
 
-            auto bindingSet = nvDevice->createBindingSet(bindDesc, s_transparentLayout);
+            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, s_transparentLayout, nvDevice);
             R_ASSERT2(bindingSet, "Transparent binding set creation failed");
 
             nvrhi::GraphicsState state;

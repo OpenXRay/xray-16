@@ -434,7 +434,7 @@ ExposureOutput setupExposurePass(
                             nvrhi::BindingSetItem::StructuredBuffer_SRV(0, s_histogram_buffer),
                             nvrhi::BindingSetItem::Texture_UAV(0, s_exposure_texture)
                         };
-                        nvrhi::BindingSetHandle adaptBindings = nvDevice->createBindingSet(bindDesc, s_adapt_layout);
+                        nvrhi::BindingSetHandle adaptBindings = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, s_adapt_layout, nvDevice);
 
                         if (adaptBindings) {
                             ctx->SetComputePipeline(s_adapt_pipeline.Get());

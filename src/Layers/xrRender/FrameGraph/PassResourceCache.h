@@ -100,6 +100,17 @@ public:
     bool HasStaticBuffer(const char* passName, const char* bufferName) const;
 
     // ═══════════════════════════════════════════════════════
+    //  BINDING SET CACHE
+    // ═══════════════════════════════════════════════════════
+    // Binding sets are immutable in NVRHI - cache by hashing resource pointers + layout.
+    // VCB handles are stable (NVRHI resolves versions at bind-time), so binding sets
+    // referencing VCBs are cacheable. Only transient FG textures invalidate per-frame.
+    nvrhi::BindingSetHandle GetOrCreateBindingSet(
+        const nvrhi::BindingSetDesc& desc,
+        nvrhi::IBindingLayout* layout,
+        nvrhi::IDevice* device);
+
+    // ═══════════════════════════════════════════════════════
     //  LIFECYCLE
     // ═══════════════════════════════════════════════════════
     void Clear();  // Clear all caches (on shutdown or device reset)
@@ -120,6 +131,8 @@ public:
         u32 inputLayoutMisses = 0;
         u32 bufferHits = 0;
         u32 bufferMisses = 0;
+        u32 bindingSetHits = 0;
+        u32 bindingSetMisses = 0;
     };
     const Stats& GetStats() const { return m_stats; }
     void ResetStats();
@@ -140,10 +153,11 @@ private:
     xr_map<u64, nvrhi::FramebufferHandle> m_framebuffers;
     xr_map<u64, nvrhi::InputLayoutHandle> m_inputLayouts;
     xr_map<u64, nvrhi::BufferHandle> m_staticBuffers;
+    xr_map<u64, nvrhi::BindingSetHandle> m_bindingSets;
 
     Stats m_stats;
 
-    // Hash helpers
+public:
     static u64 HashString(const char* str);
     static u64 HashCombine(u64 a, u64 b);
     static u64 HashPointer(const void* ptr);

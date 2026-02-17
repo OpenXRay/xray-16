@@ -17,6 +17,7 @@
 #include "Layers/xrRender/PSLibrary.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "xrParticles/psystem.h"
 #include "xrCDB/Frustum.h"  // For CFrustum (frustum plane extraction)
 
@@ -39,6 +40,8 @@ static nvrhi::ShaderHandle s_particleVS;
 static nvrhi::ShaderHandle s_particlePS;
 static nvrhi::SamplerHandle s_particleSampler;
 static nvrhi::BindingSetHandle s_particleBindingSet;
+static nvrhi::BufferHandle s_dynTransformsCB;
+static nvrhi::BufferHandle s_staticGlobalsCB;
 static bool s_particleInitialized = false;
 
 // Dynamic buffers (CPU fallback path)
@@ -455,6 +458,15 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
         }
     }
 
+    nvrhi::BufferDesc vcbDesc;
+    vcbDesc.isConstantBuffer = true;
+    vcbDesc.isVolatile = true;
+    vcbDesc.maxVersions = 16;
+    vcbDesc.byteSize = sizeof(DynamicTransforms);
+    s_dynTransformsCB = nvDevice->createBuffer(vcbDesc);
+    vcbDesc.byteSize = sizeof(StaticGlobals);
+    s_staticGlobalsCB = nvDevice->createBuffer(vcbDesc);
+
     s_particleInitialized = true;
     Msg("* [ParticlePass] Pipeline initialization complete");
 
@@ -582,16 +594,8 @@ DefaultOutputLayout setupParticlePass(
 
             const auto& rtDesc = colorRT->getDesc();
 
-            // Create constant buffers
-            nvrhi::BufferDesc cbDesc;
-            cbDesc.byteSize = sizeof(DynamicTransforms);
-            cbDesc.isConstantBuffer = true;
-            cbDesc.isVolatile = true;
-            cbDesc.maxVersions = 16;
-            auto dynTransformsCB = nvDevice->createBuffer(cbDesc);
-
-            cbDesc.byteSize = sizeof(StaticGlobals);
-            auto staticGlobalsCB = nvDevice->createBuffer(cbDesc);
+            auto dynTransformsCB = s_dynTransformsCB.Get();
+            auto staticGlobalsCB = s_staticGlobalsCB.Get();
 
             // Fill constants
             DynamicTransforms dynTrans = {};
@@ -613,7 +617,7 @@ DefaultOutputLayout setupParticlePass(
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
                 nvrhi::BindingSetItem::Sampler(0, s_particleSampler),
             };
-            auto bindingSet = nvDevice->createBindingSet(bindDesc, s_particleLayout);
+            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, s_particleLayout, nvDevice);
 
             auto* backend = data.device->GetBackend();
             nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
