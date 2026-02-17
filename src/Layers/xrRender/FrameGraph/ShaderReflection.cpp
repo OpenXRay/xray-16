@@ -251,12 +251,37 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
         elem.semanticName = semanticName;
         elem.semanticIndex = semanticIndex;
         elem.format = format;
-        elem.inputSlot = 0;  // Default to slot 0 (will be overridden from vertex decl)
+        elem.inputSlot = 0;
 
         signature.elements.push_back(elem);
     }
 
-    // NOTE: Don't release reflection - it's owned by the shader struct (SVS/SPS)
+    Msg("  [ShaderReflector] VS input before sort (%u elements):", signature.elements.size());
+    for (u32 i = 0; i < signature.elements.size(); i++) {
+        const auto& e = signature.elements[i];
+        Msg("    [%u] semantic='%s' index=%u format=%d", i, e.semanticName.c_str(), e.semanticIndex, (int)e.format);
+    }
+
+    auto semanticPriority = [](const char* name, u32 idx) -> int {
+        if (xr_strcmp(name, "POSITION") == 0 || xr_strcmp(name, "POSITIONT") == 0) return 0;
+        if (xr_strcmp(name, "NORMAL") == 0) return 100;
+        if (xr_strcmp(name, "TANGENT") == 0) return 200;
+        if (xr_strcmp(name, "BINORMAL") == 0) return 300;
+        if (xr_strcmp(name, "TEXCOORD") == 0) return 400 + idx;
+        if (xr_strcmp(name, "COLOR") == 0) return 500 + idx;
+        return 1000;
+    };
+    std::sort(signature.elements.begin(), signature.elements.end(),
+        [&](const auto& a, const auto& b) {
+            return semanticPriority(a.semanticName.c_str(), a.semanticIndex) <
+                   semanticPriority(b.semanticName.c_str(), b.semanticIndex);
+        });
+
+    Msg("  [ShaderReflector] VS input after sort:");
+    for (u32 i = 0; i < signature.elements.size(); i++) {
+        const auto& e = signature.elements[i];
+        Msg("    [%u] semantic='%s' index=%u format=%d", i, e.semanticName.c_str(), e.semanticIndex, (int)e.format);
+    }
 
     return signature;
 }

@@ -505,7 +505,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                 // Create or get binding sets (this binds textures + constant buffers)
                 textMatCache->GetOrCreateBindingSet(pso);
 
-                if (!pso->vsBindingSet || !pso->psBindingSet) {
+                if (!pso->vsBindingSet) {
                     Msg("! [TextPass] Binding sets not created");
                     continue;
                 }
@@ -529,7 +529,8 @@ framegraph::VirtualResourceHandle setupTextPass(
                 ctx->SetVertexBuffer(0, s_vertexBuffer.Get(), 0);
                 ctx->SetIndexBuffer(s_indexBuffer.Get(), nvrhi::Format::R16_UINT, 0);
                 ctx->SetBindingSet(0, pso->vsBindingSet.Get());
-                ctx->SetBindingSet(1, pso->psBindingSet.Get());
+                if (pso->psBindingSet)
+                    ctx->SetBindingSet(1, pso->psBindingSet.Get());
 
                 const u32 numQuads = vertexCount / 4;
                 const u32 numIndices = numQuads * 6;

@@ -468,6 +468,8 @@ public:
         MaterialPSO::ShaderStage stage,
         nvrhi::ShaderType nvrhiStage);
 
+    nvrhi::BindingLayoutHandle CreateCombinedBindingLayout(const MaterialPSO* matPSO);
+
     // Get or create cached binding set for material
     // Cached per MaterialPSO for reuse across draws - only creates once!
     // VCBs are queried directly from the pool

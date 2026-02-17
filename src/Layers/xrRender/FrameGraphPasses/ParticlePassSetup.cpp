@@ -360,7 +360,7 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
     samplerDesc.setMaxAnisotropy(8.0f);
     s_particleSampler = nvDevice->createSampler(samplerDesc);
 
-    // Input layout (28 bytes per vertex now)
+    // Input layout (32 bytes per vertex — padded for Vulkan std430 stride)
     constexpr u32 stride = sizeof(ParticleVertex);
     nvrhi::VertexAttributeDesc attribs[] = {
         nvrhi::VertexAttributeDesc()
@@ -711,8 +711,11 @@ DefaultOutputLayout setupParticlePass(
 
                 cmdList->setGraphicsState(state);
 
-                // Indirect draw
                 cmdList->drawIndexedIndirect(0, 1);
+
+                // Restore to UAV for next frame's beginTrackingBufferState
+                cmdList->setBufferState(s_gpuCullingManager->GetVertexBuffer(), nvrhi::ResourceStates::UnorderedAccess);
+                cmdList->setBufferState(s_gpuCullingManager->GetDrawArgsBuffer(), nvrhi::ResourceStates::UnorderedAccess);
             };
 
             // CPU fallback path

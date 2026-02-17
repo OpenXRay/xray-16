@@ -150,8 +150,7 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
     // GetOrCreateBindingSet queries VCB pool directly (no parameters needed)
     m_matCache->GetOrCreateBindingSet(pso);
 
-    // Verify binding sets were created
-    if (!pso->vsBindingSet || !pso->psBindingSet) {
+    if (!pso->vsBindingSet) {
         Msg("! [NVRHIUIRenderer] Failed to create binding sets for shader");
         return;
     }
@@ -191,11 +190,9 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
         state.pipeline = nativePipeline;
         state.framebuffer = framebuffer;
 
-        // Bind both per-stage binding sets:
-        // Slot 0: VS binding set (VS constant buffers)
-        // Slot 1: PS binding set (PS constant buffers + textures + samplers)
         state.addBindingSet(pso->vsBindingSet);
-        state.addBindingSet(pso->psBindingSet);
+        if (pso->psBindingSet)
+            state.addBindingSet(pso->psBindingSet);
 
         nvrhi::VertexBufferBinding vbBinding;
         vbBinding.buffer = m_vertexBuffer;

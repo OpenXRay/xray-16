@@ -801,7 +801,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             dynTransCbDesc.byteSize = sizeof(DynamicTransforms);
             dynTransCbDesc.isConstantBuffer = true;
             dynTransCbDesc.isVolatile = true;
-            dynTransCbDesc.maxVersions = 128;
+            dynTransCbDesc.maxVersions = 512;
             dynTransCbDesc.debugName = "SkinningPass_DynTransforms";
             auto dynTransformsCB = nvDevice->createBuffer(dynTransCbDesc);
 

@@ -15,12 +15,14 @@ struct ParticleData {
     float2 uvMax;       //  8 bytes
 };
 
-// Must match ParticleVertex in ParticlePassSetup.h (28 bytes)
+// Must match ParticleVertex in ParticlePassSetup.h (32 bytes)
+// Padded to 32 bytes: std430 vec3 alignment=16 → struct alignment=16 → stride=ceil(28/16)*16=32
 struct ParticleVertex {
     float3 position;    // 12 bytes
     uint color;         //  4 bytes
     float2 texcoord;    //  8 bytes
     uint materialID;    //  4 bytes
+    uint _pad;          //  4 bytes
 };
 
 cbuffer BillboardParams : register(b0) {
@@ -32,6 +34,7 @@ cbuffer BillboardParams : register(b0) {
 
 StructuredBuffer<ParticleData> g_ParticleData : register(t0);
 StructuredBuffer<uint> g_VisibleIndices : register(t1);
+ByteAddressBuffer g_VisibleCountBuf : register(t2);
 
 RWStructuredBuffer<ParticleVertex> g_Vertices : register(u0);
 RWByteAddressBuffer g_DrawArgs : register(u1);
@@ -41,7 +44,8 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
 {
     uint visibleIdx = dispatchThreadID.x;
 
-    if (visibleIdx >= g_VisibleCount)
+    uint actualVisibleCount = g_VisibleCountBuf.Load(0);
+    if (visibleIdx >= actualVisibleCount)
         return;
 
     // Get original particle index
@@ -95,15 +99,9 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
     g_Vertices[baseVertex + 3].texcoord = float2(p.uvMax.x, p.uvMin.y);
     g_Vertices[baseVertex + 3].materialID = p.materialID;
 
-    // First thread updates draw args
+    // First thread updates draw args with actual GPU-computed visible count
     if (visibleIdx == 0) {
-        // DrawIndexedIndirectArgs layout:
-        // [0] IndexCountPerInstance = visibleCount * 6
-        // [4] InstanceCount = 1
-        // [8] StartIndexLocation = 0
-        // [12] BaseVertexLocation = 0
-        // [16] StartInstanceLocation = 0
-        g_DrawArgs.Store(0, g_VisibleCount * 6);
+        g_DrawArgs.Store(0, actualVisibleCount * 6);
         g_DrawArgs.Store(4, 1);
         g_DrawArgs.Store(8, 0);
         g_DrawArgs.Store(12, 0);

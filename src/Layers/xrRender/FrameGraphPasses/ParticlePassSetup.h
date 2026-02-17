@@ -54,8 +54,10 @@ struct ParticleVertex {
     u32 color;       // RGBA color (4 bytes)
     Fvector2 t;      // Texcoord (8 bytes)
     u32 materialID;  // Bindless material ID (4 bytes)
-    // Total: 28 bytes per vertex
+    u32 _pad;        // Padding to match Vulkan std430 stride (4 bytes)
+    // Total: 32 bytes per vertex (std430: vec3 alignment=16 → struct alignment=16 → stride=32)
 };
+static_assert(sizeof(ParticleVertex) == 32, "ParticleVertex must be 32 bytes to match Vulkan std430 stride");
 
 // ═══════════════════════════════════════════════════════
 //  GPU PARTICLE DATA (for GPU culling)

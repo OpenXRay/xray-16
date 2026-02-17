@@ -34,10 +34,10 @@ enum class RenderPhase {
 //
 struct VertexInputSignature {
     struct InputElement {
-        shared_str semanticName;   // "POSITION", "TEXCOORD", etc.
-        u32 semanticIndex;          // 0, 1, 2, etc.
-        nvrhi::Format format;         // R32G32B32_FLOAT, R8G8B8A8_UNORM, etc.
-        u32 inputSlot;              // Buffer slot (usually 0)
+        shared_str semanticName;
+        u32 semanticIndex;
+        nvrhi::Format format;
+        u32 inputSlot;
 
         InputElement() : semanticIndex(0), format(nvrhi::Format::UNKNOWN), inputSlot(0) {}
     };

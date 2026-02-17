@@ -257,6 +257,7 @@ bool ParticleGPUCullingManager::CreateBindingLayouts()
             nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),       // BillboardParams (b0)
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),         // g_ParticleData (t0)
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),         // g_VisibleIndices (t1)
+            nvrhi::BindingLayoutItem::RawBuffer_SRV(2),                // g_VisibleCountBuf (t2)
             nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),         // g_Vertices (u0)
             nvrhi::BindingLayoutItem::RawBuffer_UAV(1),                // g_DrawArgs (u1)
         };
@@ -408,12 +409,10 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
 
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
 
-    // Begin tracking buffer states (required for NVRHI state management)
-    // These buffers transition: UAV (compute) -> VertexBuffer/IndirectArgument (draw)
+    // Begin tracking buffer states — NVRHI auto-transitions via binding sets
     cmdList->beginTrackingBufferState(m_vertexBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->beginTrackingBufferState(m_drawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-    // Fill billboard params
     ParticleBillboardParams params;
     params.cameraTop.set(cameraTop.x, cameraTop.y, cameraTop.z, 0.0f);
     params.cameraRight.set(cameraRight.x, cameraRight.y, cameraRight.z, 0.0f);
@@ -422,18 +421,17 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
 
     cmdList->writeBuffer(m_billboardParamsCB, &params, sizeof(params));
 
-    // Create binding set
     nvrhi::BindingSetDesc bindDesc;
     bindDesc.bindings = {
         nvrhi::BindingSetItem::ConstantBuffer(0, m_billboardParamsCB),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(0, m_particleDataBuffer),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(1, m_visibleIndicesBuffer),
+        nvrhi::BindingSetItem::RawBuffer_SRV(2, m_visibleCountBuffer),
         nvrhi::BindingSetItem::StructuredBuffer_UAV(0, m_vertexBuffer),
         nvrhi::BindingSetItem::RawBuffer_UAV(1, m_drawArgsBuffer),
     };
     m_billboardBindingSet = nvDevice->createBindingSet(bindDesc, m_billboardLayout);
 
-    // Dispatch billboard generation
     nvrhi::ComputeState state;
     state.pipeline = m_billboardPipeline;
     state.bindings = { m_billboardBindingSet };
@@ -441,6 +439,10 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
 
     u32 numGroups = (params.visibleCount + BILLBOARD_THREAD_GROUP_SIZE - 1) / BILLBOARD_THREAD_GROUP_SIZE;
     cmdList->dispatch(numGroups, 1, 1);
+
+    // visibleCountBuffer: keepInitialState=true → auto-restored by NVRHI at cmdList close
+    // visibleIndicesBuffer: keepInitialState=false → needs explicit restore for next frame
+    cmdList->setBufferState(m_visibleIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
 }
 
 } // namespace xray::render::RENDER_NAMESPACE::passes
