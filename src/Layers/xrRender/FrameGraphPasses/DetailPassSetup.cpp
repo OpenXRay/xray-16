@@ -1,5 +1,6 @@
 // DetailPassSetup.cpp - Framegraph pass for detail objects (grass, etc.)
 #include "stdafx.h"
+#include "PassCommon.h"
 #include "DetailPassSetup.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FGDetailManager.h"
@@ -10,7 +11,6 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
-#include "xrCDB/Frustum.h"
 
 // Detail rendering console variables
 extern ENGINE_API float ps_r__Detail_l_aniso;
@@ -152,42 +152,15 @@ DefaultOutputLayout setupDetailPass(
                 data.detailManager->windDirection.set(_cos(wind_rad), _sin(wind_rad));
             }
 
-            // === GPU CULLING COMPUTE PASS ===
-            // Extract frustum planes from view-projection matrix
-            CFrustum frustum;
-            frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
-
-            // IMPORTANT: CFrustum::fplane is 32 bytes (alignas(16) + aabb_overlap_id)
-            // but Fplane is 16 bytes. We must manually extract to avoid stride mismatch!
-            Fvector4 extractedPlanes[6];
-            for (u32 i = 0; i < frustum.p_count && i < 6; i++)
-            {
-                extractedPlanes[i].set(
-                    frustum.planes[i].n.x,
-                    frustum.planes[i].n.y,
-                    frustum.planes[i].n.z,
-                    frustum.planes[i].d
-                );
-            }
-
-            // Get Hi-Z pyramid texture
             nvrhi::ITexture* hiZTexture = fg.GetPhysicalTexture(data.hiZPyramid);
-
-            // Dispatch GPU culling
             const float fadeDistance = g_pGamePersistent->Environment().CurrentEnv.far_plane;
-
-            // Use previous frame's viewProj for temporal Hi-Z, or current if not available
             Fmatrix effectivePrevViewProj = data.hasPrevViewProj ? data.prevViewProj : Device.mFullTransform;
 
             data.detailManager->DispatchCulling(
                 cmdList,
                 data.device->GetNVRHIDevice(),
                 hiZTexture,
-                Device.mFullTransform,
-                effectivePrevViewProj,  // Previous frame's viewProj for temporal Hi-Z
-                extractedPlanes,
-                frustum.p_count,
-                Device.vCameraPosition,
+                effectivePrevViewProj,
                 fadeDistance,
                 data.hiZWidth,
                 data.hiZHeight,
@@ -197,11 +170,6 @@ DefaultOutputLayout setupDetailPass(
 
             // Schedule stats readback for profiling (visible counts per LOD)
             data.detailManager->ScheduleStatsReadback(cmdList, data.device->GetNVRHIDevice());
-
-            // === GRAPHICS PASS ===
-            // Log texture formats for debugging
-            const nvrhi::TextureDesc& colorDesc = colorTexture->getDesc();
-            const nvrhi::TextureDesc& depthDesc = depthTexture->getDesc();
 
             nvrhi::ITexture* normalTexture = fg.GetPhysicalTexture(data.outputNormal);
 
@@ -240,11 +208,7 @@ DefaultOutputLayout setupDetailPass(
             cmdList->writeBuffer(dm->cachedShaderParamsCB, dummyParams, 32);
 
             // b2: static_globals
-            StaticGlobals staticGlobals = {};
-            FillGlobalConstants(staticGlobals);
-            SunLightData sunData;
-            GetSunLightData(sunData, 2.0f);
-            FillSunConstants(staticGlobals, sunData);
+            auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(dm->cachedStaticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
             // b3: DetailGlobals

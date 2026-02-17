@@ -30,8 +30,6 @@ namespace xray::render::RENDER_NAMESPACE
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-enum class RenderPhase { None, Opaque, AlphaTested, Transparent };
-
 static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ForwardColorPassState& state);
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -50,40 +48,9 @@ void InitializeForwardPipelines(ng::RenderDevice* device, ForwardColorPassState&
 
     Msg("* [ForwardPass] Initializing forward pipelines...");
 
-    nvrhi::TextureDesc colorDesc;
-    colorDesc.width = 64;
-    colorDesc.height = 64;
-    colorDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    colorDesc.isRenderTarget = true;
-    colorDesc.initialState = nvrhi::ResourceStates::RenderTarget;
-    colorDesc.keepInitialState = true;
-    colorDesc.debugName = "ForwardInit_DummyColor";
-    auto dummyColorRT = nvDevice->createTexture(colorDesc);
-
-    nvrhi::TextureDesc normalDesc = colorDesc;
-    normalDesc.debugName = "ForwardInit_DummyNormal";
-    auto dummyNormalRT = nvDevice->createTexture(normalDesc);
-
-    nvrhi::TextureDesc depthDesc;
-    depthDesc.width = 64;
-    depthDesc.height = 64;
-    depthDesc.format = nvrhi::Format::D32;
-    depthDesc.isRenderTarget = true;
-    depthDesc.initialState = nvrhi::ResourceStates::DepthWrite;
-    depthDesc.keepInitialState = true;
-    depthDesc.debugName = "ForwardInit_DummyDepth";
-    auto dummyDepthRT = nvDevice->createTexture(depthDesc);
-
-    nvrhi::FramebufferDesc fbDesc;
-    fbDesc.addColorAttachment(dummyColorRT);
-    fbDesc.addColorAttachment(dummyNormalRT);
-    fbDesc.setDepthAttachment(dummyDepthRT);
-    auto dummyFramebuffer = nvDevice->createFramebuffer(fbDesc);
-
-    if (!dummyFramebuffer) {
-        Msg("! [ForwardPass] Failed to create dummy framebuffer for pipeline init");
+    auto dummyFramebuffer = CreateDummyPipelineFramebuffer(nvDevice);
+    if (!dummyFramebuffer)
         return;
-    }
 
     InitializeBindlessPipeline(device, dummyFramebuffer, state);
 
@@ -243,33 +210,10 @@ static void renderBindlessForward(
     auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ForwardColor", "StaticGlobalsCB", sizeof(StaticGlobals), 16, nvDevice);
     auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("ForwardColor", nvDevice);
 
-    LightingConstants lightingData;
-
-    if (g_pGamePersistent) {
-        auto& env = g_pGamePersistent->Environment().CurrentEnv;
-        lightingData.sunDirection.set(env.sun_dir.x, env.sun_dir.y, env.sun_dir.z, 0.0f);
-        lightingData.sunColor.set(env.sun_color.x, env.sun_color.y, env.sun_color.z, 1.0f);
-        lightingData.fogParams.set(env.fog_near, env.fog_far, env.fog_density, 0.0f);
-        lightingData.fogColor.set(env.fog_color.x, env.fog_color.y, env.fog_color.z, 1.0f);
-    } else {
-        lightingData.sunDirection.set(0.5f, -0.7f, 0.5f, 0.0f);
-        lightingData.sunColor.set(1.0f, 1.0f, 1.0f, 1.0f);
-        lightingData.fogParams.set(50.0f, 300.0f, 0.001f, 0.0f);
-        lightingData.fogColor.set(0.5f, 0.5f, 0.6f, 1.0f);
-    }
-    lightingData.ambientColor.set(0.1f, 0.1f, 0.15f, 1.0f);
-    lightingData.cameraPosition.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 1.0f);
-
+    auto lightingData = FillLightingConstants();
     cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
 
-    // Fill static globals with view/projection matrices
-    StaticGlobals staticGlobals;
-    FillGlobalConstants(staticGlobals);
-
-    // CRITICAL: Fill sun lighting data! Shader reads L_sun_color/L_sun_dir_w from static_globals
-    SunLightData sunData;
-    GetSunLightData(sunData, 2.0f);  // HDR multiplier
-    FillSunConstants(staticGlobals, sunData);
+    auto staticGlobals = BuildStaticGlobals();
 
     cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 

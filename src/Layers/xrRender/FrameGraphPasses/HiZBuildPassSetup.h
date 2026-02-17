@@ -3,7 +3,6 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
-#include "PassVertexFormats.h"
 #include <nvrhi/nvrhi.h>
 
 // Forward declarations

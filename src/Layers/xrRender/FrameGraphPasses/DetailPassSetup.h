@@ -25,7 +25,6 @@ namespace xray::profiler {
 
 namespace xray::render::framegraph {
     class FrameGraph;
-    class ShaderLoader;
 }
 
 namespace xray::render::RENDER_NAMESPACE::passes {

@@ -182,29 +182,10 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("TransparentPass", "StaticGlobalsCB", sizeof(StaticGlobals), 16, nvDevice);
             auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("TransparentPass", nvDevice);
 
-            LightingConstants lightingData;
-
-            if (g_pGamePersistent) {
-                auto& env = g_pGamePersistent->Environment().CurrentEnv;
-                lightingData.sunDirection.set(env.sun_dir.x, env.sun_dir.y, env.sun_dir.z, 0.0f);
-                lightingData.sunColor.set(env.sun_color.x, env.sun_color.y, env.sun_color.z, 1.0f);
-                lightingData.fogParams.set(env.fog_near, env.fog_far, env.fog_density, 0.0f);
-                lightingData.fogColor.set(env.fog_color.x, env.fog_color.y, env.fog_color.z, 1.0f);
-            } else {
-                lightingData.sunDirection.set(0.5f, -0.7f, 0.5f, 0.0f);
-                lightingData.sunColor.set(1.0f, 1.0f, 1.0f, 1.0f);
-                lightingData.fogParams.set(50.0f, 300.0f, 0.001f, 0.0f);
-                lightingData.fogColor.set(0.5f, 0.5f, 0.6f, 1.0f);
-            }
-            lightingData.ambientColor.set(0.1f, 0.1f, 0.15f, 1.0f);
-            lightingData.cameraPosition.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 1.0f);
+            auto lightingData = FillLightingConstants();
             cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
 
-            StaticGlobals staticGlobals;
-            FillGlobalConstants(staticGlobals);
-            SunLightData sunData;
-            GetSunLightData(sunData, 2.0f);
-            FillSunConstants(staticGlobals, sunData);
+            auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
             const auto& cfg = data.config;

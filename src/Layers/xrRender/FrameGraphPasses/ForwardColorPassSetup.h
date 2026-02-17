@@ -161,4 +161,4 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     ForwardColorPassState* state = nullptr
 );
 
-} // namespace xray::render::passes
+} // namespace xray::render::RENDER_NAMESPACE::passes

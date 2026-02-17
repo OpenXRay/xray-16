@@ -667,11 +667,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             instDesc.keepInitialState = true;
             auto instanceSB = cache.GetOrCreateStaticBuffer("SkinningPass", "InstanceSB", instDesc, nvDevice).Get();
 
-            StaticGlobals staticGlobals;
-            FillGlobalConstants(staticGlobals);
-            SunLightData sunData;
-            GetSunLightData(sunData, 2.0f);
-            FillSunConstants(staticGlobals, sunData);
+            auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
             ShaderParams shaderParams = {};

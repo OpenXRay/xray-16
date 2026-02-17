@@ -32,4 +32,4 @@ framegraph::VirtualResourceHandle setupImGuiPass(
     u32 height
 );
 
-} // namespace xray::render::passes
+} // namespace xray::render::RENDER_NAMESPACE::passes

@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #include "ParticleGPUCullingManager.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "xrEngine/device.h"
+#include "xrCDB/Frustum.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
@@ -342,11 +344,6 @@ void ParticleGPUCullingManager::ClearVisibleCount(nvrhi::ICommandList* cmdList)
 void ParticleGPUCullingManager::DispatchCulling(
     nvrhi::ICommandList* cmdList,
     nvrhi::ITexture* hiZPyramid,
-    const Fmatrix& viewProj,
-    const Fvector4* frustumPlanes,
-    const Fvector& cameraPos,
-    const Fvector& cameraTop,
-    const Fvector& cameraRight,
     u32 particleCount,
     u32 hiZWidth,
     u32 hiZHeight,
@@ -357,15 +354,22 @@ void ParticleGPUCullingManager::DispatchCulling(
 
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
 
-    // Fill cull params
+    CFrustum frustum;
+    frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+    u32 planeCount = std::min<u32>((u32)frustum.p_count, 6);
+
     ParticleCullParams params;
-    // Must transpose matrix - Fmatrix storage is transposed relative to HLSL row-major
-    params.viewProj.transpose(viewProj);
-    for (int i = 0; i < 6; i++)
-        params.frustumPlanes[i] = frustumPlanes[i];
-    params.cameraPos.set(cameraPos.x, cameraPos.y, cameraPos.z, 0.0f);
-    params.cameraTop.set(cameraTop.x, cameraTop.y, cameraTop.z, 0.0f);
-    params.cameraRight.set(cameraRight.x, cameraRight.y, cameraRight.z, 0.0f);
+    params.viewProj.transpose(Device.mFullTransform);
+    for (u32 i = 0; i < 6; i++)
+    {
+        if (i < planeCount)
+            params.frustumPlanes[i].set(frustum.planes[i].n.x, frustum.planes[i].n.y, frustum.planes[i].n.z, frustum.planes[i].d);
+        else
+            params.frustumPlanes[i].set(0, 0, 0, 1000000.0f);
+    }
+    params.cameraPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 0.0f);
+    params.cameraTop.set(Device.vCameraTop.x, Device.vCameraTop.y, Device.vCameraTop.z, 0.0f);
+    params.cameraRight.set(Device.vCameraRight.x, Device.vCameraRight.y, Device.vCameraRight.z, 0.0f);
     params.particleCount = std::min(particleCount, m_maxParticles);
     params.hiZWidth = hiZWidth;
     params.hiZHeight = hiZHeight;
@@ -397,8 +401,6 @@ void ParticleGPUCullingManager::DispatchCulling(
 
 void ParticleGPUCullingManager::DispatchBillboardGeneration(
     nvrhi::ICommandList* cmdList,
-    const Fvector& cameraTop,
-    const Fvector& cameraRight,
     u32 maxVisibleCount)
 {
     if (!m_initialized || maxVisibleCount == 0)
@@ -407,8 +409,8 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
 
     ParticleBillboardParams params;
-    params.cameraTop.set(cameraTop.x, cameraTop.y, cameraTop.z, 0.0f);
-    params.cameraRight.set(cameraRight.x, cameraRight.y, cameraRight.z, 0.0f);
+    params.cameraTop.set(Device.vCameraTop.x, Device.vCameraTop.y, Device.vCameraTop.z, 0.0f);
+    params.cameraRight.set(Device.vCameraRight.x, Device.vCameraRight.y, Device.vCameraRight.z, 0.0f);
     params.visibleCount = std::min(maxVisibleCount, m_maxParticles);
     params.padding[0] = params.padding[1] = params.padding[2] = 0;
 

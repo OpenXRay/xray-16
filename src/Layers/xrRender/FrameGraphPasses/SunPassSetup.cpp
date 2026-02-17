@@ -1,6 +1,7 @@
 // xrRender/FrameGraphPasses/SunPassSetup.cpp
 #include "stdafx.h"
 #include "SunPassSetup.h"
+#include "PassVertexFormats.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"

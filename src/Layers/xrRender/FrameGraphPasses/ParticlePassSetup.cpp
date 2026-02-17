@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "ParticlePassSetup.h"
 #include "ParticleGPUCullingManager.h"
+#include "PassCommon.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
@@ -274,36 +275,7 @@ void InitializeParticlePipelines(ng::RenderDevice* device, ParticlePassState& st
 
     Msg("* [ParticlePass] Initializing particle pipelines...");
 
-    // Dummy framebuffer for pipeline creation
-    nvrhi::TextureDesc colorDesc;
-    colorDesc.width = 64;
-    colorDesc.height = 64;
-    colorDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    colorDesc.isRenderTarget = true;
-    colorDesc.initialState = nvrhi::ResourceStates::RenderTarget;
-    colorDesc.keepInitialState = true;
-    colorDesc.debugName = "ParticleInit_DummyColor";
-    auto dummyColorRT = nvDevice->createTexture(colorDesc);
-
-    nvrhi::TextureDesc normalDesc = colorDesc;
-    normalDesc.debugName = "ParticleInit_DummyNormal";
-    auto dummyNormalRT = nvDevice->createTexture(normalDesc);
-
-    nvrhi::TextureDesc depthDesc;
-    depthDesc.width = 64;
-    depthDesc.height = 64;
-    depthDesc.format = nvrhi::Format::D32;
-    depthDesc.isRenderTarget = true;
-    depthDesc.initialState = nvrhi::ResourceStates::DepthWrite;
-    depthDesc.keepInitialState = true;
-    depthDesc.debugName = "ParticleInit_DummyDepth";
-    auto dummyDepthRT = nvDevice->createTexture(depthDesc);
-
-    nvrhi::FramebufferDesc fbDesc;
-    fbDesc.addColorAttachment(dummyColorRT);
-    fbDesc.addColorAttachment(dummyNormalRT);
-    fbDesc.setDepthAttachment(dummyDepthRT);
-    auto framebuffer = nvDevice->createFramebuffer(fbDesc);
+    auto framebuffer = CreateDummyPipelineFramebuffer(nvDevice);
     if (!framebuffer)
         return;
 
@@ -549,11 +521,7 @@ DefaultOutputLayout setupParticlePass(
             FillDynamicTransforms(dynTrans);
             cmdList->writeBuffer(dynTransformsCB, &dynTrans, sizeof(dynTrans));
 
-            StaticGlobals staticGlobals;
-            FillGlobalConstants(staticGlobals);
-            SunLightData sunData;
-            GetSunLightData(sunData, 2.0f);
-            FillSunConstants(staticGlobals, sunData);
+            auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
             // Create binding set (shared for all particles)
@@ -578,21 +546,6 @@ DefaultOutputLayout setupParticlePass(
             // TODO: Re-enable once GPU particle culling is debugged
             bool useGPUCulling = data.passState->gpuCullingManager && data.passState->gpuCullingManager->IsReady() && hiZTexture;
 
-            // Extract frustum planes at execute time (from current view matrix)
-            Fvector4 frustumPlanes[6] = {};
-            if (useGPUCulling) {
-                CFrustum frustum;
-                frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
-                for (u32 i = 0; i < frustum.p_count && i < 6; i++) {
-                    frustumPlanes[i].set(
-                        frustum.planes[i].n.x,
-                        frustum.planes[i].n.y,
-                        frustum.planes[i].n.z,
-                        frustum.planes[i].d
-                    );
-                }
-            }
-
             // GPU culling path
             auto renderParticlesGPU = [&](const xr_vector<ParticleBatch>& batches, float depthMin, float depthMax) {
                 xr_vector<GPUParticleData> gpuParticles;
@@ -612,23 +565,11 @@ DefaultOutputLayout setupParticlePass(
                 gpuCull.ClearVisibleCount(cmdList);
 
                 gpuCull.DispatchCulling(
-                    cmdList,
-                    hiZTexture,
-                    Device.mFullTransform,
-                    frustumPlanes,
-                    Device.vCameraPosition,
-                    Device.vCameraTop,
-                    Device.vCameraRight,
-                    totalParticles,
+                    cmdList, hiZTexture, totalParticles,
                     data.hiZWidth, data.hiZHeight, data.hiZMipLevels
                 );
 
-                gpuCull.DispatchBillboardGeneration(
-                    cmdList,
-                    Device.vCameraTop,
-                    Device.vCameraRight,
-                    totalParticles
-                );
+                gpuCull.DispatchBillboardGeneration(cmdList, totalParticles);
 
                 EnsureQuadIndexBuffer(nvDevice, totalParticles, *data.passState);
                 if (!data.passState->quadIB)

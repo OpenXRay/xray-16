@@ -1,6 +1,7 @@
 // xrRender/FrameGraphPasses/ExposurePassSetup.cpp
 #include "stdafx.h"
 #include "ExposurePassSetup.h"
+#include "PassVertexFormats.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"

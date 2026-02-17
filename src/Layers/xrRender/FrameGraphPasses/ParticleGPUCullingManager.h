@@ -62,25 +62,16 @@ public:
         nvrhi::ICommandList* cmdList,
         const xr_vector<GPUParticleData>& particles);
 
-    // Run culling compute pass
     void DispatchCulling(
         nvrhi::ICommandList* cmdList,
         nvrhi::ITexture* hiZPyramid,
-        const Fmatrix& viewProj,
-        const Fvector4* frustumPlanes,
-        const Fvector& cameraPos,
-        const Fvector& cameraTop,
-        const Fvector& cameraRight,
         u32 particleCount,
         u32 hiZWidth,
         u32 hiZHeight,
         u32 hiZMipLevels);
 
-    // Run billboard generation compute pass
     void DispatchBillboardGeneration(
         nvrhi::ICommandList* cmdList,
-        const Fvector& cameraTop,
-        const Fvector& cameraRight,
         u32 maxVisibleCount);
 
     // Clear visible count buffer (call before culling)

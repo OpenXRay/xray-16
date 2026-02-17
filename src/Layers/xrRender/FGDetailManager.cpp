@@ -6,6 +6,8 @@
 #include "ResourceManager/FGResourceManager.h"
 #include "ResourceManager/TextureManager.h"
 #include "xrRender_console.h"
+#include "xrEngine/device.h"
+#include "xrCDB/Frustum.h"
 #include "xrCDB/Intersect.hpp"
 #include "xrCDB/xrXRC.h"
 #include "xrMaterialSystem/GameMtlLib.h"
@@ -2201,11 +2203,7 @@ void FGDetailManager::DispatchCulling(
     nvrhi::ICommandList* cmdList,
     nvrhi::IDevice* device,
     nvrhi::ITexture* hiZPyramid,
-    const Fmatrix& viewProj,
     const Fmatrix& prevViewProj,
-    const Fvector4* frustumPlanes,
-    u32 frustumPlaneCount,
-    const Fvector& cameraPos,
     float fadeDistance,
     u32 hiZWidth,
     u32 hiZHeight,
@@ -2294,15 +2292,18 @@ void FGDetailManager::DispatchCulling(
     u32 decalCapacity = std::max(visibleBufferCapacity / 4, 10000u);
 
     DetailCullParams params;
-    params.viewProj.transpose(viewProj);
+    params.viewProj.transpose(Device.mFullTransform);
     params.prevViewProj.transpose(prevViewProj);
-    params.cameraPos = cameraPos;
+    params.cameraPos = Device.vCameraPosition;
     params.fadeDistanceSqr = fadeDistance * fadeDistance;
 
+    CFrustum frustum;
+    frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+    u32 frustumPlaneCount = std::min<u32>((u32)frustum.p_count, 6);
     for (u32 i = 0; i < 6; i++)
     {
         if (i < frustumPlaneCount)
-            params.frustumPlanes[i] = frustumPlanes[i];
+            params.frustumPlanes[i].set(frustum.planes[i].n.x, frustum.planes[i].n.y, frustum.planes[i].n.z, frustum.planes[i].d);
         else
             params.frustumPlanes[i].set(0, 0, 0, 1000000.0f);
     }

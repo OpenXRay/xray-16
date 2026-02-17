@@ -3,7 +3,6 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
-#include "PassVertexFormats.h"
 
 // Forward declarations
 namespace xray::render {
