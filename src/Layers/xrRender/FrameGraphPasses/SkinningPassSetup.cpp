@@ -80,7 +80,6 @@ void InitializeSkinningPipelines(ng::RenderDevice* device, SkinningPassState& st
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(1),
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(4),
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
@@ -411,7 +410,6 @@ static void RenderSkinnedBatch(
     nvrhi::IBuffer* shaderParamsCB,
     nvrhi::IBuffer* staticGlobalsCB,
     nvrhi::IBuffer* materialIdCB,
-    nvrhi::IBuffer* instanceSB,
     nvrhi::IBuffer* globalBoneBuffer,
     nvrhi::IBuffer* terrainMaterialsSB,
     nvrhi::IDescriptorTable* bindlessTable,
@@ -432,16 +430,9 @@ static void RenderSkinnedBatch(
     FillDynamicTransforms(dynTransData, worldMatrix);
     cmdList->writeBuffer(dynTransformsCB, &dynTransData, sizeof(dynTransData));
 
-    GPUSkinnedInstanceData instData;
-    instData.world.transpose(worldMatrix);
-    instData.materialID = batch.bindlessMaterialID;
-    instData.skeletonBoneOffset = skeletonBoneOffset;
-    instData.batchIndex = 0;
-    instData.flags = 0;
-    cmdList->writeBuffer(instanceSB, &instData, sizeof(instData));
-
     SkinnedMaterialCB matIdData = {};
     matIdData.materialID = batch.bindlessMaterialID;
+    matIdData.skeletonBoneOffset = skeletonBoneOffset;
     cmdList->writeBuffer(materialIdCB, &matIdData, sizeof(matIdData));
 
     if (!globalBoneBuffer)
@@ -454,7 +445,6 @@ static void RenderSkinnedBatch(
         nvrhi::BindingSetItem::ConstantBuffer(1, shaderParamsCB),
         nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(3, globalBoneBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(4, instanceSB),
         nvrhi::BindingSetItem::ConstantBuffer(4, materialIdCB),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMaterialsSB),
@@ -608,13 +598,6 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             auto shaderParamsCB = cache.GetOrCreateVolatileCB("SkinningPass", "ShaderParams", sizeof(ShaderParams), 512, nvDevice).Get();
             auto materialIdCB = cache.GetOrCreateVolatileCB("SkinningPass", "MaterialId", sizeof(SkinnedMaterialCB), 1024, nvDevice).Get();
 
-            nvrhi::BufferDesc instDesc;
-            instDesc.byteSize = sizeof(GPUSkinnedInstanceData);
-            instDesc.structStride = sizeof(GPUSkinnedInstanceData);
-            instDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-            instDesc.keepInitialState = true;
-            auto instanceSB = cache.GetOrCreateStaticBuffer("SkinningPass", "InstanceSB", instDesc, nvDevice).Get();
-
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
@@ -676,7 +659,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         RenderSkinnedBatch(
                             *data.passState,
                             cmdList, nvDevice, framebuffer,
-                            dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
+                            dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
                             globalBoneBuffer, terrainMatBuffer.GetBuffer(),
                             bindlessTable, bindlessLayout, worldViewport, scissor,
                             batch, batch.worldMatrix, boneOffset
@@ -699,7 +682,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         RenderSkinnedBatch(
                             *data.passState,
                             cmdList, nvDevice, framebuffer,
-                            dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
+                            dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
                             globalBoneBuffer, terrainMatBuffer.GetBuffer(),
                             bindlessTable, bindlessLayout, worldViewport, scissor,
                             batch, batch.worldMatrix, boneOffset
@@ -723,7 +706,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                     RenderSkinnedBatch(
                         *data.passState,
                         cmdList, nvDevice, framebuffer,
-                        dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
+                        dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
                         globalBoneBuffer, terrainMatBuffer.GetBuffer(),
                         bindlessTable, bindlessLayout, hudViewport, scissor,
                         batch, adjustedWorldMatrix, boneOffset

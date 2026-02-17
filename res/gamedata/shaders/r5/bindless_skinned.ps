@@ -22,9 +22,9 @@ struct PS_OUTPUT
 cbuffer SkinnedMaterialCB : register(b4)
 {
     uint g_SkinnedMaterialID;
+    uint g_SkeletonBoneOffset;
     uint g_SkinnedPad0;
     uint g_SkinnedPad1;
-    uint g_SkinnedPad2;
 };
 
 PS_OUTPUT main(PS_INPUT input)

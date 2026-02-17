@@ -105,15 +105,6 @@ struct GPUInstanceData {
 };
 static_assert(sizeof(GPUInstanceData) == 80, "GPUInstanceData must be 80 bytes for GPU alignment");
 
-struct GPUSkinnedInstanceData {
-    Fmatrix world;
-    u32 materialID;
-    u32 skeletonBoneOffset;
-    u32 batchIndex;
-    u32 flags;
-};
-static_assert(sizeof(GPUSkinnedInstanceData) == 80, "GPUSkinnedInstanceData must be 80 bytes for GPU alignment");
-
 struct GPUCullOutput {
     framegraph::VirtualResourceHandle visibleIndices;
     framegraph::VirtualResourceHandle visibleCount;
