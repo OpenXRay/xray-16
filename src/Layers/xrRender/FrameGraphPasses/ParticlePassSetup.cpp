@@ -678,6 +678,9 @@ DefaultOutputLayout setupParticlePass(
                 cmdList->setGraphicsState(state);
 
                 cmdList->drawIndexedIndirect(0, 1);
+
+                cmdList->setBufferState(s_gpuCullingManager->GetVertexBuffer(), nvrhi::ResourceStates::UnorderedAccess);
+                cmdList->setBufferState(s_gpuCullingManager->GetDrawArgsBuffer(), nvrhi::ResourceStates::UnorderedAccess);
             };
 
             auto renderParticlesCPU = [&](const xr_vector<ParticleBatch>& batches, float depthMin, float depthMax) {

@@ -224,7 +224,8 @@ void renderDepthOnlyGeometry(
             materialCache->GetOrCreateBindingSet(matPSO);
 
             ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
-            ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
+            if (matPSO->psBindingSet)
+                ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
         }
 
         nvrhi::IBuffer* vb = batch.vertexBuffer.Get();

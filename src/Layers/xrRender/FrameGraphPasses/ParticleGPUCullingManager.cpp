@@ -245,6 +245,7 @@ bool ParticleGPUCullingManager::CreateBindingLayouts()
             nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
+            nvrhi::BindingLayoutItem::RawBuffer_SRV(2),
             nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
             nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
         };
@@ -402,6 +403,7 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
         nvrhi::BindingSetItem::ConstantBuffer(0, m_billboardParamsCB),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(0, m_particleDataBuffer),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(1, m_visibleIndicesBuffer),
+        nvrhi::BindingSetItem::RawBuffer_SRV(2, m_visibleCountBuffer),
         nvrhi::BindingSetItem::StructuredBuffer_UAV(0, m_vertexBuffer),
         nvrhi::BindingSetItem::RawBuffer_UAV(1, m_drawArgsBuffer),
     };
@@ -414,6 +416,8 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
 
     u32 numGroups = (params.visibleCount + BILLBOARD_THREAD_GROUP_SIZE - 1) / BILLBOARD_THREAD_GROUP_SIZE;
     cmdList->dispatch(numGroups, 1, 1);
+
+    cmdList->setBufferState(m_visibleIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
 }
 
 }

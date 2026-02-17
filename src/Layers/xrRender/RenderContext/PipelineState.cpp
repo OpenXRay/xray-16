@@ -258,25 +258,27 @@ PipelineState* PipelineStateCache::CreatePipelineState(
     if (!desc.vertexAttributes.empty()) {
         xr_vector<nvrhi::VertexAttributeDesc> nvrhiAttrs;
 
-        xr_map<xr_string, xr_vector<const VertexAttribute*>> semanticGroups;
-        for (const auto& attr : desc.vertexAttributes) {
-            if (attr.semanticName) {
-                semanticGroups[attr.semanticName].push_back(&attr);
-            }
-        }
+        for (size_t i = 0; i < desc.vertexAttributes.size(); ) {
+            const auto& first = desc.vertexAttributes[i];
+            if (!first.semanticName) { ++i; continue; }
 
-        for (const auto& [semName, attrs] : semanticGroups) {
-            const VertexAttribute* firstAttr = attrs[0];
+            u32 count = 1;
+            while (i + count < desc.vertexAttributes.size() &&
+                   desc.vertexAttributes[i + count].semanticName &&
+                   xr_strcmp(desc.vertexAttributes[i + count].semanticName, first.semanticName) == 0) {
+                ++count;
+            }
 
             nvrhi::VertexAttributeDesc nvrhiAttr;
-            nvrhiAttr.name = firstAttr->semanticName;
-            nvrhiAttr.format = firstAttr->format;
-            nvrhiAttr.offset = firstAttr->offset;
-            nvrhiAttr.bufferIndex = firstAttr->bufferIndex;
-            nvrhiAttr.isInstanced = firstAttr->isInstanced;
-            nvrhiAttr.elementStride = firstAttr->elementStride;
-            nvrhiAttr.arraySize = (uint32_t)attrs.size();
+            nvrhiAttr.name = first.semanticName;
+            nvrhiAttr.format = first.format;
+            nvrhiAttr.offset = first.offset;
+            nvrhiAttr.bufferIndex = first.bufferIndex;
+            nvrhiAttr.isInstanced = first.isInstanced;
+            nvrhiAttr.elementStride = first.elementStride;
+            nvrhiAttr.arraySize = count;
             nvrhiAttrs.push_back(nvrhiAttr);
+            i += count;
         }
 
         nvrhiDesc.inputLayout = m_device->GetNativeDevice()->createInputLayout(

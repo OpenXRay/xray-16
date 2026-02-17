@@ -434,7 +434,7 @@ MaterialPSO* MaterialCache::CreatePSO(
     ExtractSamplers(pass, pso.get());
 
     CreateBindingLayouts(pso.get());
-    if (!pso->vsBindingLayout || !pso->psBindingLayout) {
+    if (!pso->vsBindingLayout) {
         return nullptr;
     }
 
@@ -857,13 +857,17 @@ void MaterialCache::CreateBindingLayouts(MaterialPSO* matPSO)
 {
     VERIFY(matPSO);
 
-    matPSO->vsBindingLayout = CreateStageBindingLayout(
-        matPSO, MaterialPSO::ShaderStage::Vertex, nvrhi::ShaderType::Vertex);
-
-    matPSO->psBindingLayout = CreateStageBindingLayout(
-        matPSO, MaterialPSO::ShaderStage::Pixel, nvrhi::ShaderType::Pixel);
-
-    if (matPSO->vsBindingLayout && matPSO->psBindingLayout) {
+    if (GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
+    {
+        matPSO->vsBindingLayout = CreateCombinedBindingLayout(matPSO);
+        matPSO->psBindingLayout = nullptr;
+    }
+    else
+    {
+        matPSO->vsBindingLayout = CreateStageBindingLayout(
+            matPSO, MaterialPSO::ShaderStage::Vertex, nvrhi::ShaderType::Vertex);
+        matPSO->psBindingLayout = CreateStageBindingLayout(
+            matPSO, MaterialPSO::ShaderStage::Pixel, nvrhi::ShaderType::Pixel);
     }
 }
 
@@ -949,6 +953,8 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
         }
     }
 
+    if (GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
+        layoutDesc.bindingOffsets = { 0, 0, 0, 0 };
 
     nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(layoutDesc);
     if (!layout) {
@@ -958,15 +964,88 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
     return layout;
 }
 
+nvrhi::BindingLayoutHandle MaterialCache::CreateCombinedBindingLayout(const MaterialPSO* matPSO)
+{
+    VERIFY(matPSO);
+
+    nvrhi::BindingLayoutDesc layoutDesc;
+    layoutDesc.visibility = nvrhi::ShaderType::All;
+
+    struct CBBinding {
+        u32 slot;
+        bool isVCB;
+    };
+    xr_vector<CBBinding> allCBs;
+
+    for (const auto& vcbReq : matPSO->vcbRequirements) {
+        allCBs.push_back({vcbReq.slot, true});
+    }
+
+    for (const auto& cbInfo : matPSO->constantBuffers) {
+        bool duplicate = false;
+        for (const auto& existing : allCBs) {
+            if (existing.slot == cbInfo.slot) { duplicate = true; break; }
+        }
+        if (!duplicate)
+            allCBs.push_back({cbInfo.slot, false});
+    }
+
+    std::sort(allCBs.begin(), allCBs.end(), [](const CBBinding& a, const CBBinding& b) {
+        return a.slot < b.slot;
+    });
+
+    for (const auto& cb : allCBs) {
+        if (cb.isVCB)
+            layoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::VolatileConstantBuffer(cb.slot));
+        else
+            layoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::ConstantBuffer(cb.slot));
+    }
+
+    xr_vector<MaterialPSO::TextureSlot> sortedTextures(matPSO->textures);
+    std::sort(sortedTextures.begin(), sortedTextures.end(),
+        [](const MaterialPSO::TextureSlot& a, const MaterialPSO::TextureSlot& b) {
+            return a.slot < b.slot;
+        });
+    for (const auto& texSlot : sortedTextures) {
+        layoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::Texture_SRV(texSlot.slot));
+    }
+
+    xr_vector<MaterialPSO::SamplerInfo> allSamplers;
+    xr_set<u32> addedSamplerSlots;
+    for (const auto& samplerInfo : matPSO->samplers) {
+        if (addedSamplerSlots.count(samplerInfo.slot))
+            continue;
+        allSamplers.push_back(samplerInfo);
+        addedSamplerSlots.insert(samplerInfo.slot);
+    }
+    std::sort(allSamplers.begin(), allSamplers.end(),
+        [](const MaterialPSO::SamplerInfo& a, const MaterialPSO::SamplerInfo& b) {
+            return a.slot < b.slot;
+        });
+    for (const auto& samplerInfo : allSamplers) {
+        layoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::Sampler(samplerInfo.slot));
+    }
+
+    layoutDesc.bindingOffsets = { 0, 0, 0, 0 };
+
+    return m_device->CreateBindingLayout(layoutDesc);
+}
+
 nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO)
 {
     VERIFY(matPSO);
     VERIFY(matPSO->vsBindingLayout);
-    VERIFY(matPSO->psBindingLayout);
 
-    if (matPSO->vsBindingSet && matPSO->psBindingSet && !matPSO->needsBindingSetRebuild) {
+    bool combinedMode = (matPSO->psBindingLayout == nullptr);
+
+    if (!combinedMode)
+        VERIFY(matPSO->psBindingLayout);
+
+    bool cacheValid = combinedMode
+        ? (matPSO->vsBindingSet && !matPSO->needsBindingSetRebuild)
+        : (matPSO->vsBindingSet && matPSO->psBindingSet && !matPSO->needsBindingSetRebuild);
+    if (cacheValid)
         return matPSO->vsBindingSet;
-    }
 
     matPSO->needsBindingSetRebuild = false;
 
@@ -1074,26 +1153,55 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         psBindingDesc.bindings.push_back(binding.item);
     }
 
-    nvrhi::BindingSetHandle vsBindingSet = m_device->CreateBindingSet(
-        vsBindingDesc,
-        matPSO->vsBindingLayout);
+    if (combinedMode)
+    {
+        nvrhi::BindingSetDesc combinedDesc;
 
-    if (!vsBindingSet) {
-        Msg("! [MaterialCache::GetOrCreateBindingSet] Failed to create VS binding set");
-        return nullptr;
+        xr_set<u32> addedCBSlots;
+        for (const auto& binding : vsBindings) {
+            combinedDesc.bindings.push_back(
+                nvrhi::BindingSetItem::ConstantBuffer(binding.slot, binding.buffer));
+            addedCBSlots.insert(binding.slot);
+        }
+
+        for (const auto& binding : psBindings) {
+            if (binding.type == PSBinding::CB && addedCBSlots.count(binding.slot))
+                continue;
+            combinedDesc.bindings.push_back(binding.item);
+        }
+
+        nvrhi::BindingSetHandle combinedSet = m_device->CreateBindingSet(
+            combinedDesc, matPSO->vsBindingLayout);
+
+        if (!combinedSet) {
+            Msg("! [MaterialCache::GetOrCreateBindingSet] Failed to create combined binding set");
+            return nullptr;
+        }
+
+        matPSO->vsBindingSet = combinedSet;
+        matPSO->psBindingSet = nullptr;
     }
+    else
+    {
+        nvrhi::BindingSetHandle vsBindingSet = m_device->CreateBindingSet(
+            vsBindingDesc, matPSO->vsBindingLayout);
 
-    nvrhi::BindingSetHandle psBindingSet = m_device->CreateBindingSet(
-        psBindingDesc,
-        matPSO->psBindingLayout);
+        if (!vsBindingSet) {
+            Msg("! [MaterialCache::GetOrCreateBindingSet] Failed to create VS binding set");
+            return nullptr;
+        }
 
-    if (!psBindingSet) {
-        Msg("! [MaterialCache::GetOrCreateBindingSet] Failed to create PS binding set");
-        return nullptr;
+        nvrhi::BindingSetHandle psBindingSet = m_device->CreateBindingSet(
+            psBindingDesc, matPSO->psBindingLayout);
+
+        if (!psBindingSet) {
+            Msg("! [MaterialCache::GetOrCreateBindingSet] Failed to create PS binding set");
+            return nullptr;
+        }
+
+        matPSO->vsBindingSet = vsBindingSet;
+        matPSO->psBindingSet = psBindingSet;
     }
-
-    matPSO->vsBindingSet = vsBindingSet;
-    matPSO->psBindingSet = psBindingSet;
 
     if (!allTexturesValid) {
         matPSO->needsBindingSetRebuild = true;
@@ -1806,6 +1914,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     uiVertexLayout["COLOR"]     = {nvrhi::Format::RGBA8_UNORM, 16};
     uiVertexLayout["TEXCOORD"]  = {nvrhi::Format::RG32_FLOAT, 20};
 
+    Msg("  [CreateUIPSO] Building vertex attributes from %u signature elements:", pso->vsInputSignature.elements.size());
     for (const auto& shaderElem : pso->vsInputSignature.elements) {
         std::string semantic = shaderElem.semanticName.c_str();
 
@@ -1823,6 +1932,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         attr.bufferIndex = 0;
         attr.elementStride = 0;
 
+        Msg("    attr[%u]: semantic='%s' format=%d offset=%u", (u32)psoDesc.vertexAttributes.size(), semantic.c_str(), (int)attr.format, attr.offset);
         psoDesc.vertexAttributes.push_back(attr);
     }
 
@@ -1906,9 +2016,10 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
     if (nativePipeline) {
         const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
-        if (actualDesc.bindingLayouts.size() >= 2) {
+        if (actualDesc.bindingLayouts.size() >= 1) {
             pso->vsBindingLayout = actualDesc.bindingLayouts[0];
-            pso->psBindingLayout = actualDesc.bindingLayouts[1];
+            if (actualDesc.bindingLayouts.size() >= 2)
+                pso->psBindingLayout = actualDesc.bindingLayouts[1];
         }
     }
 
@@ -2128,9 +2239,10 @@ MaterialPSO* MaterialCache::CreateFontPSO(
     nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
     if (nativePipeline) {
         const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
-        if (actualDesc.bindingLayouts.size() >= 2) {
+        if (actualDesc.bindingLayouts.size() >= 1) {
             pso->vsBindingLayout = actualDesc.bindingLayouts[0];
-            pso->psBindingLayout = actualDesc.bindingLayouts[1];
+            if (actualDesc.bindingLayouts.size() >= 2)
+                pso->psBindingLayout = actualDesc.bindingLayouts[1];
         }
     }
 

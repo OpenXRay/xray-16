@@ -125,7 +125,7 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
 
     m_matCache->GetOrCreateBindingSet(pso);
 
-    if (!pso->vsBindingSet || !pso->psBindingSet) {
+    if (!pso->vsBindingSet) {
         Msg("! [NVRHIUIRenderer] Failed to create binding sets for shader");
         return;
     }
@@ -153,7 +153,8 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
         state.framebuffer = framebuffer;
 
         state.addBindingSet(pso->vsBindingSet);
-        state.addBindingSet(pso->psBindingSet);
+        if (pso->psBindingSet)
+            state.addBindingSet(pso->psBindingSet);
 
         nvrhi::VertexBufferBinding vbBinding;
         vbBinding.buffer = m_vertexBuffer;

@@ -354,6 +354,8 @@ public:
         MaterialPSO::ShaderStage stage,
         nvrhi::ShaderType nvrhiStage);
 
+    nvrhi::BindingLayoutHandle CreateCombinedBindingLayout(const MaterialPSO* matPSO);
+
     nvrhi::BindingSetHandle GetOrCreateBindingSet(MaterialPSO* matPSO);
 
     u32 RegisterBindlessMaterial(MaterialPSO* matPSO);
