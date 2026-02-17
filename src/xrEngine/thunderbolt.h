@@ -53,6 +53,9 @@ struct ENGINE_API SThunderboltDesc
         {
             m_pFlare->DestroyShader();
         }
+
+        void ed_show_params(); // ImGui editor
+        void save(CInifile* config) const;
     };
     SFlare* m_GradientTop;
     SFlare* m_GradientCenter;
@@ -63,6 +66,8 @@ public:
     SThunderboltDesc(const CInifile& pIni, shared_str const& sect);
     ~SThunderboltDesc();
     static SFlare* create_gradient(pcstr gradient_name, const CInifile& config, shared_str const& sect);
+    void ed_show_params(); // ImGui editor
+    void save(CInifile* config) const;
 };
 
 struct ENGINE_API SThunderboltCollection
@@ -78,6 +83,9 @@ struct ENGINE_API SThunderboltCollection
         VERIFY(palette.size() > 0);
         return palette[Random.randI(palette.size())];
     }
+
+    void ed_show_params(); // ImGui editor
+    void save(CInifile* config) const;
 };
 
 #define THUNDERBOLT_CACHE_SIZE 8
@@ -147,4 +155,5 @@ public:
     auto& GetCollections() { return collections; }
 
     void ED_ShowParams(); // ImGui editor
+    void save();
 };
