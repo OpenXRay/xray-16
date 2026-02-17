@@ -167,13 +167,11 @@ private:
     // Instead of depth prepass, reuse previous frame's depth for Hi-Z
     // Eliminates double vertex processing cost (~1.5-2ms savings)
     nvrhi::TextureHandle m_prevFrameDepth;        // Previous frame's depth (persistent)
-    framegraph::VirtualResourceHandle m_currentDepthHandle;  // Current frame's depth (for copy)
     Fmatrix m_prevViewProj;                       // Previous frame's view-projection
     Fvector m_prevCameraPos;                      // Previous frame's camera position
     bool m_hasPrevFrameData = false;              // Valid previous frame exists
     u32 m_prevFrameWidth = 0;                     // Previous frame resolution
     u32 m_prevFrameHeight = 0;
-    nvrhi::CommandListHandle m_depthCopyCommandList; // Reusable command list for depth copy (avoids per-frame allocation)
 
     // Debug preview texture for Render Inspector (persistent, not part of framegraph)
     nvrhi::TextureHandle m_inspectorPreview;
@@ -254,9 +252,6 @@ private:
 
     // FrameGraph passes (called per-frame in Render)
     void SetupFrameGraphPasses();
-
-    // Copy final output to game backbuffer
-    void PresentToBackbuffer();
 
     // Visibility & culling (CPU-based for now, will move to GPU later)
     void CollectVisibleGeometry();

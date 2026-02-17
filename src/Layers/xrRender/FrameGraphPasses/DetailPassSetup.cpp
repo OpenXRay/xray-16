@@ -106,7 +106,7 @@ DefaultOutputLayout setupDetailPass(
             data.hiZPyramid = passBuilder.read(hiZPyramid, ResourceState::ShaderResource);
 
             data.inputColor = passBuilder.read(forwardInputs.albedo);
-            data.depth = passBuilder.read(forwardInputs.depth);
+            data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
             data.outputColor = passBuilder.write(forwardInputs.albedo);
             data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
 

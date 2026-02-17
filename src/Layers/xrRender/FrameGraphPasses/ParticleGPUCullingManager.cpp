@@ -133,7 +133,7 @@ bool ParticleGPUCullingManager::CreateBuffers()
         desc.structStride = sizeof(u32);
         desc.debugName = "ParticleVisibleIndices";
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;  // Transitions: UAV (cull) -> SRV (billboard)
+        desc.keepInitialState = true;
         desc.canHaveUAVs = true;
         m_visibleIndicesBuffer = nvDevice->createBuffer(desc);
         if (!m_visibleIndicesBuffer)
@@ -161,7 +161,7 @@ bool ParticleGPUCullingManager::CreateBuffers()
         desc.structStride = sizeof(ParticleVertex);
         desc.debugName = "ParticleVertexBuffer";
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;  // Transitions to VertexBuffer for rendering
+        desc.keepInitialState = true;
         desc.canHaveUAVs = true;
         desc.isVertexBuffer = true;
         m_vertexBuffer = nvDevice->createBuffer(desc);
@@ -175,7 +175,7 @@ bool ParticleGPUCullingManager::CreateBuffers()
         desc.byteSize = 5 * sizeof(u32);  // DrawIndexedIndirectArgs
         desc.debugName = "ParticleDrawArgs";
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;  // Transitions to IndirectArgument
+        desc.keepInitialState = true;
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
         desc.isDrawIndirectArgs = true;
@@ -356,10 +356,6 @@ void ParticleGPUCullingManager::DispatchCulling(
 
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
 
-    // Begin tracking buffer state (required for NVRHI state management)
-    // This buffer transitions: UAV (cull) -> SRV (billboard)
-    cmdList->beginTrackingBufferState(m_visibleIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
     // Fill cull params
     ParticleCullParams params;
     // Must transpose matrix - Fmatrix storage is transposed relative to HLSL row-major
@@ -409,10 +405,6 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
 
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
 
-    // Begin tracking buffer states — NVRHI auto-transitions via binding sets
-    cmdList->beginTrackingBufferState(m_vertexBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->beginTrackingBufferState(m_drawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
     ParticleBillboardParams params;
     params.cameraTop.set(cameraTop.x, cameraTop.y, cameraTop.z, 0.0f);
     params.cameraRight.set(cameraRight.x, cameraRight.y, cameraRight.z, 0.0f);
@@ -440,9 +432,6 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
     u32 numGroups = (params.visibleCount + BILLBOARD_THREAD_GROUP_SIZE - 1) / BILLBOARD_THREAD_GROUP_SIZE;
     cmdList->dispatch(numGroups, 1, 1);
 
-    // visibleCountBuffer: keepInitialState=true → auto-restored by NVRHI at cmdList close
-    // visibleIndicesBuffer: keepInitialState=false → needs explicit restore for next frame
-    cmdList->setBufferState(m_visibleIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
 }
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

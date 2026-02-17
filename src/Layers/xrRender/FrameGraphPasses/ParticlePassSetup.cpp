@@ -75,6 +75,7 @@ static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads)
     ibDesc.isIndexBuffer = true;
     ibDesc.debugName = "ParticleQuadIB";
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+    ibDesc.keepInitialState = true;
 
     s_quadIB = nvDevice->createBuffer(ibDesc);
     if (!s_quadIB)
@@ -82,7 +83,6 @@ static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads)
 
     nvrhi::CommandListHandle cmdList = nvDevice->createCommandList();
     cmdList->open();
-    cmdList->beginTrackingBufferState(s_quadIB, nvrhi::ResourceStates::IndexBuffer);
     cmdList->writeBuffer(s_quadIB, indices.data(), indices.size() * sizeof(u16));
     cmdList->close();
     nvDevice->executeCommandList(cmdList);
@@ -102,6 +102,7 @@ static void EnsureParticleVertexBuffer(nvrhi::IDevice* nvDevice, u32 sizeBytes)
     vbDesc.isVertexBuffer = true;
     vbDesc.debugName = "ParticleDynamicVB";
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+    vbDesc.keepInitialState = true;
 
     s_particleVB = nvDevice->createBuffer(vbDesc);
     s_particleVBSize = s_particleVB ? allocSize : 0;
@@ -687,9 +688,6 @@ DefaultOutputLayout setupParticlePass(
                 if (!s_quadIB)
                     return;
 
-                // Initialize buffer state tracking for this command list
-                cmdList->beginTrackingBufferState(s_quadIB, nvrhi::ResourceStates::IndexBuffer);
-
                 // Setup graphics state
                 nvrhi::Viewport viewport(
                     0.0f, static_cast<float>(rtDesc.width),
@@ -712,10 +710,6 @@ DefaultOutputLayout setupParticlePass(
                 cmdList->setGraphicsState(state);
 
                 cmdList->drawIndexedIndirect(0, 1);
-
-                // Restore to UAV for next frame's beginTrackingBufferState
-                cmdList->setBufferState(s_gpuCullingManager->GetVertexBuffer(), nvrhi::ResourceStates::UnorderedAccess);
-                cmdList->setBufferState(s_gpuCullingManager->GetDrawArgsBuffer(), nvrhi::ResourceStates::UnorderedAccess);
             };
 
             // CPU fallback path
@@ -731,10 +725,6 @@ DefaultOutputLayout setupParticlePass(
 
                 if (!s_particleVB || !s_quadIB)
                     return;
-
-                // Initialize buffer state tracking for this command list
-                cmdList->beginTrackingBufferState(s_particleVB, nvrhi::ResourceStates::VertexBuffer);
-                cmdList->beginTrackingBufferState(s_quadIB, nvrhi::ResourceStates::IndexBuffer);
 
                 cmdList->writeBuffer(s_particleVB, vertices.data(), vertices.size() * sizeof(ParticleVertex));
 

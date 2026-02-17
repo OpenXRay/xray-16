@@ -287,14 +287,13 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
     // Terrain uses same culling but separate draw call with terrain shader
     m_maxTerrainObjects = 4096;  // Typical level has ~1000-2000 terrain batches
 
-    // Terrain object buffer
-    // NOTE: Do NOT use keepInitialState - buffer needs state transitions for writeBuffer!
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_TerrainObjects";
         desc.byteSize = m_maxTerrainObjects * sizeof(GPUObjectData);
         desc.structStride = sizeof(GPUObjectData);
-        desc.initialState = nvrhi::ResourceStates::Common;  // Will be transitioned as needed
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
 
         m_terrainObjectBuffer = nvDevice->createBuffer(desc);
         if (!m_terrainObjectBuffer) {
@@ -341,8 +340,6 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
         m_terrainVisibilityBuffer = nvDevice->createBuffer(desc);
     }
 
-    // Terrain draw arguments buffer
-    // NOTE: Do NOT use keepInitialState - needs state transitions for writeBuffer AND culling shader!
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_TerrainDrawArgs";
@@ -350,43 +347,41 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
         desc.isDrawIndirectArgs = true;
-        desc.initialState = nvrhi::ResourceStates::Common;  // Will be transitioned as needed
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
 
         m_terrainDrawArgsBuffer = nvDevice->createBuffer(desc);
     }
 
-    // Terrain material ID buffer
-    // NOTE: Do NOT use keepInitialState - buffer needs state transitions for writeBuffer!
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_TerrainMaterialIDs";
         desc.byteSize = m_maxTerrainObjects * sizeof(u32);
         desc.structStride = sizeof(u32);
-        desc.initialState = nvrhi::ResourceStates::Common;  // Will be transitioned as needed
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
 
         m_terrainMaterialIDBuffer = nvDevice->createBuffer(desc);
     }
 
-    // Terrain instance buffer (world transforms - matches GPUInstanceData)
-    // NOTE: Do NOT use keepInitialState - buffer needs state transitions for writeBuffer!
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_TerrainInstanceData";
         desc.byteSize = m_maxTerrainObjects * sizeof(GPUInstanceData);
         desc.structStride = sizeof(GPUInstanceData);
-        desc.initialState = nvrhi::ResourceStates::Common;  // Will be transitioned as needed
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
 
         m_terrainInstanceBuffer = nvDevice->createBuffer(desc);
     }
 
-    // Terrain batch indices buffer (identity mapping: 0,1,2,3... for direct indexing)
-    // NOTE: Do NOT use keepInitialState - buffer needs state transitions for writeBuffer!
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_TerrainBatchIndices";
         desc.byteSize = m_maxTerrainObjects * sizeof(u32);
         desc.structStride = sizeof(u32);
-        desc.initialState = nvrhi::ResourceStates::Common;  // Will be transitioned as needed
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
 
         m_terrainBatchIndicesBuffer = nvDevice->createBuffer(desc);
     }
@@ -482,7 +477,8 @@ void GPUCullingManager::CreateSkinnedCullingBuffers(ng::RenderDevice* device)
         desc.debugName = "GPUCull_SkinnedObjects";
         desc.byteSize = m_maxSkinnedObjects * sizeof(GPUObjectData);
         desc.structStride = sizeof(GPUObjectData);
-        desc.initialState = nvrhi::ResourceStates::Common;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
 
         m_skinnedObjectBuffer = nvDevice->createBuffer(desc);
         if (!m_skinnedObjectBuffer) {
@@ -573,7 +569,8 @@ void GPUCullingManager::EnsureSkinnedBufferCapacity(u32 count)
         desc.debugName = "GPUCull_SkinnedObjects";
         desc.byteSize = newCapacity * sizeof(GPUObjectData);
         desc.structStride = sizeof(GPUObjectData);
-        desc.initialState = nvrhi::ResourceStates::Common;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
 
         m_skinnedObjectBuffer = nvDevice->createBuffer(desc);
     }
@@ -1321,7 +1318,6 @@ void GPUCullingManager::DispatchVariantPartition(
     cmdList->setBufferState(partition.reorderedDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(partition.reorderedBatchIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(partition.reorderedMaterialIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->commitBarriers();
 
     struct PartitionParamsCB {
         u32 binCapacity;
@@ -1915,7 +1911,6 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
 
         // Terrain object data (bounding spheres) - still uploaded every frame
         // TODO: Terrain is static, could cache this too with dirty flag
-        cmdList->beginTrackingBufferState(m_terrainObjectBuffer, nvrhi::ResourceStates::CopyDest);
         cmdList->writeBuffer(m_terrainObjectBuffer,
             m_terrainObjectData.data(),
             m_terrainObjectCount * sizeof(GPUObjectData));
@@ -1929,7 +1924,6 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
             }
 
             // Upload terrain draw args
-            cmdList->beginTrackingBufferState(m_terrainDrawArgsBuffer, nvrhi::ResourceStates::CopyDest);
             cmdList->writeBuffer(m_terrainDrawArgsBuffer,
                 m_terrainDrawArgsData.data(),
                 m_terrainObjectCount * sizeof(IndirectDrawArgs));
@@ -1937,7 +1931,6 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
 
             // Upload terrain material IDs
             if (m_terrainMaterialIDBuffer) {
-                cmdList->beginTrackingBufferState(m_terrainMaterialIDBuffer, nvrhi::ResourceStates::CopyDest);
                 cmdList->writeBuffer(m_terrainMaterialIDBuffer,
                     m_terrainMaterialIDData.data(),
                     m_terrainObjectCount * sizeof(u32));
@@ -1958,7 +1951,6 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
 
             // Upload terrain instance data (world transforms)
             if (m_terrainInstanceBuffer && !m_terrainInstanceData.empty()) {
-                cmdList->beginTrackingBufferState(m_terrainInstanceBuffer, nvrhi::ResourceStates::CopyDest);
                 cmdList->writeBuffer(m_terrainInstanceBuffer,
                     m_terrainInstanceData.data(),
                     m_terrainObjectCount * sizeof(GPUInstanceData));
@@ -1970,7 +1962,6 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
                 xr_vector<u32> identityIndices(m_terrainObjectCount);
                 for (u32 i = 0; i < m_terrainObjectCount; i++)
                     identityIndices[i] = i;
-                cmdList->beginTrackingBufferState(m_terrainBatchIndicesBuffer, nvrhi::ResourceStates::CopyDest);
                 cmdList->writeBuffer(m_terrainBatchIndicesBuffer,
                     identityIndices.data(),
                     m_terrainObjectCount * sizeof(u32));
@@ -1993,25 +1984,21 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         for (auto& args : m_transparentDrawArgsData)
             args.instanceCount = 1;
 
-        cmdList->beginTrackingBufferState(m_transparentSet.objectBuffer, nvrhi::ResourceStates::CopyDest);
         cmdList->writeBuffer(m_transparentSet.objectBuffer,
             m_transparentObjectData.data(),
             m_transparentSet.objectCount * sizeof(GPUObjectData));
         cmdList->setBufferState(m_transparentSet.objectBuffer, nvrhi::ResourceStates::ShaderResource);
 
-        cmdList->beginTrackingBufferState(m_transparentSet.drawArgsBuffer, nvrhi::ResourceStates::CopyDest);
         cmdList->writeBuffer(m_transparentSet.drawArgsBuffer,
             m_transparentDrawArgsData.data(),
             m_transparentSet.objectCount * sizeof(IndirectDrawArgs));
         cmdList->setBufferState(m_transparentSet.drawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
 
-        cmdList->beginTrackingBufferState(m_transparentSet.materialIDBuffer, nvrhi::ResourceStates::CopyDest);
         cmdList->writeBuffer(m_transparentSet.materialIDBuffer,
             m_transparentMaterialIDData.data(),
             m_transparentSet.objectCount * sizeof(u32));
         cmdList->setBufferState(m_transparentSet.materialIDBuffer, nvrhi::ResourceStates::ShaderResource);
 
-        cmdList->beginTrackingBufferState(m_transparentSet.instanceBuffer, nvrhi::ResourceStates::CopyDest);
         cmdList->writeBuffer(m_transparentSet.instanceBuffer,
             m_transparentInstanceData.data(),
             m_transparentSet.objectCount * sizeof(GPUInstanceData));
@@ -2083,8 +2070,6 @@ void GPUCullingManager::UploadSkinnedObjects(ng::RenderContext* ctx, const Geome
     // Upload to GPU
     auto cmdList = ctx->GetCommandList();
 
-    // Object data (bounding spheres for culling)
-    cmdList->beginTrackingBufferState(m_skinnedObjectBuffer, nvrhi::ResourceStates::CopyDest);
     cmdList->writeBuffer(m_skinnedObjectBuffer,
         m_skinnedObjectData.data(),
         m_skinnedObjectCount * sizeof(GPUObjectData));
@@ -2664,11 +2649,6 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                               mgr->m_terrainCompactGroupOffsetsBuffer,
                     "Terrain compaction buffers not initialized");
                 R_ASSERT2(mgr->m_terrainMaterialIDBuffer, "Terrain material ID buffer missing");
-
-                // Transition terrain draw args to SRV for compaction input
-                cmdList->beginTrackingBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-                cmdList->setBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
-                cmdList->beginTrackingBufferState(mgr->m_terrainMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
 
                 // Update compact params (reuse same CB)
                 struct CompactParamsCB {

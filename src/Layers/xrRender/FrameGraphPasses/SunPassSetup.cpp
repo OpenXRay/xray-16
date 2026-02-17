@@ -28,8 +28,9 @@ struct SunVertex {
 };
 #pragma pack(pop)
 
-// Static placeholder texture (1x1 white)
 static nvrhi::TextureHandle s_sunPlaceholderTexture;
+static nvrhi::BufferHandle s_sunVertexBuffer;
+static nvrhi::BufferHandle s_sunIndexBuffer;
 static bool s_sunPassInitialized = false;
 
 void InitializeSunPass(ng::RenderDevice* device) {
@@ -48,11 +49,28 @@ void InitializeSunPass(ng::RenderDevice* device) {
     texDesc.keepInitialState = true;  // OK - static texture persists
     s_sunPlaceholderTexture = nvrhiDevice->createTexture(texDesc);
 
-    // Initialize with white
+    nvrhi::BufferDesc vbDesc;
+    vbDesc.byteSize = 4 * sizeof(SunVertex);
+    vbDesc.debugName = "SunVertexBuffer";
+    vbDesc.isVertexBuffer = true;
+    vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+    vbDesc.keepInitialState = true;
+    s_sunVertexBuffer = nvrhiDevice->createBuffer(vbDesc);
+
+    nvrhi::BufferDesc ibDesc;
+    ibDesc.byteSize = 6 * sizeof(u16);
+    ibDesc.debugName = "SunIndexBuffer";
+    ibDesc.isIndexBuffer = true;
+    ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+    ibDesc.keepInitialState = true;
+    s_sunIndexBuffer = nvrhiDevice->createBuffer(ibDesc);
+
     nvrhi::CommandListHandle cmdList = nvrhiDevice->createCommandList();
     cmdList->open();
     u32 white = 0xFFFFFFFF;
     cmdList->writeTexture(s_sunPlaceholderTexture, 0, 0, &white, sizeof(white));
+    u16 indices[] = { 0, 1, 2, 2, 1, 3 };
+    cmdList->writeBuffer(s_sunIndexBuffer, indices, sizeof(indices));
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
 
@@ -61,6 +79,8 @@ void InitializeSunPass(ng::RenderDevice* device) {
 
 void ShutdownSunPass() {
     s_sunPlaceholderTexture = nullptr;
+    s_sunVertexBuffer = nullptr;
+    s_sunIndexBuffer = nullptr;
     s_sunPassInitialized = false;
 }
 
@@ -243,28 +263,7 @@ framegraph::VirtualResourceHandle setupSunPass(
             vertices[3].u = 1.0f;
             vertices[3].v = 1.0f;
 
-            // Create vertex buffer (dynamic - updated each frame)
-            nvrhi::BufferDesc vbDesc;
-            vbDesc.byteSize = sizeof(vertices);
-            vbDesc.debugName = "SunVertexBuffer";
-            vbDesc.isVertexBuffer = true;
-            vbDesc.initialState = nvrhi::ResourceStates::CopyDest;
-            auto vb = cmdList->getDevice()->createBuffer(vbDesc);
-            cmdList->beginTrackingBufferState(vb, nvrhi::ResourceStates::CopyDest);
-            cmdList->writeBuffer(vb, vertices, sizeof(vertices));
-            cmdList->setBufferState(vb, nvrhi::ResourceStates::VertexBuffer);
-
-            // Index buffer for two triangles (static - same indices every frame)
-            u16 indices[] = { 0, 1, 2, 2, 1, 3 };
-            nvrhi::BufferDesc ibDesc;
-            ibDesc.byteSize = sizeof(indices);
-            ibDesc.debugName = "SunIndexBuffer";
-            ibDesc.isIndexBuffer = true;
-            ibDesc.initialState = nvrhi::ResourceStates::CopyDest;
-            auto ib = cmdList->getDevice()->createBuffer(ibDesc);
-            cmdList->beginTrackingBufferState(ib, nvrhi::ResourceStates::CopyDest);
-            cmdList->writeBuffer(ib, indices, sizeof(indices));
-            cmdList->setBufferState(ib, nvrhi::ResourceStates::IndexBuffer);
+            cmdList->writeBuffer(s_sunVertexBuffer, vertices, sizeof(vertices));
 
             // ═══════════════════════════════════════════════════════
             //  LOAD SUN SHADER
@@ -423,8 +422,8 @@ framegraph::VirtualResourceHandle setupSunPass(
             state.pipeline = pipeline;
             state.framebuffer = framebuffer;
             state.bindings = { bindingSet };
-            state.vertexBuffers = { { vb, 0, 0 } };
-            state.indexBuffer = { ib, nvrhi::Format::R16_UINT, 0 };
+            state.vertexBuffers = { { s_sunVertexBuffer, 0, 0 } };
+            state.indexBuffer = { s_sunIndexBuffer, nvrhi::Format::R16_UINT, 0 };
             state.viewport = nvrhi::ViewportState().addViewportAndScissorRect(
                 nvrhi::Viewport((float)data.width, (float)data.height));
 

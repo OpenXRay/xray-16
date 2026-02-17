@@ -798,13 +798,6 @@ void renderBindlessForward(
                           config.terrainCompactDrawArgsBuffer && config.terrainCompactCountBuffer,
                 "Terrain buffers not ready for compaction rendering");
 
-            // Begin tracking terrain buffer states for this command list
-            cmdList->beginTrackingBufferState(config.terrainInstanceBuffer, nvrhi::ResourceStates::ShaderResource);
-            cmdList->beginTrackingBufferState(config.terrainCompactBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
-            cmdList->beginTrackingBufferState(config.terrainCompactMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
-            cmdList->beginTrackingBufferState(config.terrainCompactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-            cmdList->beginTrackingBufferState(config.terrainCompactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
-
             // Create terrain binding set (includes TerrainMaterialBuffer at t9)
             // NOTE: Terrain uses its own instance/batch buffers, not the regular ones
             nvrhi::BindingSetDesc terrainBindDesc;
