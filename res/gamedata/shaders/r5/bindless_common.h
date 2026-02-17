@@ -1,32 +1,25 @@
 // bindless_common.h
-// SM6.6 Bindless Rendering using Slang DescriptorHandle
-// Uses descriptor indices for true bindless texture access
+// Bindless Rendering via unbounded descriptor arrays (space1)
+// Works on both D3D12 (descriptor table root param) and Vulkan (descriptor set 1)
 // Must match C++ BindlessTypes.h exactly!
 
 #ifndef BINDLESS_COMMON_H
 #define BINDLESS_COMMON_H
 
-// ═══════════════════════════════════════════════════════
-//  SM6 BINDLESS CONFIGURATION
-// ═══════════════════════════════════════════════════════
-
-// Invalid texture index marker
 #define INVALID_TEXTURE_INDEX 0xFFFFFFFF
 
 // ═══════════════════════════════════════════════════════
-//  SLANG BINDLESS TEXTURE ACCESS
+//  BINDLESS TEXTURE ARRAY
 // ═══════════════════════════════════════════════════════
-// Uses Slang's DescriptorHandle<T> which translates to
-// ResourceDescriptorHeap[index] when compiled to HLSL/DXIL
-// For SPIRV/Vulkan: translates to unbounded descriptor arrays
+// Unbounded SRV array in space1 — maps to:
+//   D3D12: Root descriptor table with RegisterSpace=1
+//   Vulkan: Descriptor set 1, binding 0
 
-// Fetch texture from descriptor heap using index
-// nonuniform() handles divergent access (like NonUniformResourceIndex in HLSL)
+Texture2D g_BindlessTextures[] : register(t0, space1);
+
 Texture2D GetBindlessTexture(uint index)
 {
-    // Construct handle from uint2 (x = texture index, y = unused for Texture2D)
-    DescriptorHandle<Texture2D> handle = DescriptorHandle<Texture2D>(uint2(index, 0));
-    return *nonuniform(handle);
+    return g_BindlessTextures[NonUniformResourceIndex(index)];
 }
 
 // ═══════════════════════════════════════════════════════

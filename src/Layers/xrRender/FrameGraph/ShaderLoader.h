@@ -177,8 +177,16 @@ private:
     /// </summary>
     IReader* OpenShaderFile(const char* name, const char* extension);
 
+public:
+    void SetTarget(xray::render::SlangCompiler::Target target) {
+        m_target = target;
+        m_cache.SetBackendSubdir(target == xray::render::SlangCompiler::Target::SPIRV ? "vk" : "dx12");
+    }
+    xray::render::SlangCompiler::Target GetTarget() const { return m_target; }
+
 private:
     xray::render::SlangCompiler* m_slangCompiler;
+    xray::render::SlangCompiler::Target m_target = xray::render::SlangCompiler::Target::DXIL;
     ShaderCache m_cache;
 
     // Cache for extracted reflection data (keyed by shader name + extension)

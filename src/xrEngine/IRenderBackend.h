@@ -47,6 +47,7 @@ public:
 
     virtual API GetAPI() const = 0;
     virtual pcstr GetAPIName() const = 0;
+    bool IsFrameGraph() const { return GetAPI() == API::D3D12 || GetAPI() == API::Vulkan; }
 
     // ═══════ Lifecycle ═══════
     virtual bool IsInitialized() const = 0;

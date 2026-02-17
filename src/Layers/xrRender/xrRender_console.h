@@ -164,6 +164,10 @@ extern ECORE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 // R4 Debug
 extern ECORE_API int ps_r4_debug_gpu_culling; // 0=off, 1=show bounding spheres with cull state colors
 
+// FrameGraph render backend selection (requires restart)
+enum { FG_RENDER_DX12 = 0, FG_RENDER_VULKAN = 1 };
+extern ECORE_API u32 ps_fg_render_mode;
+
 enum
 {
     R2FLAG_SUN = (1 << 0),

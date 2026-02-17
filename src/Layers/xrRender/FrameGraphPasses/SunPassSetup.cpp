@@ -248,9 +248,7 @@ framegraph::VirtualResourceHandle setupSunPass(
             vbDesc.byteSize = sizeof(vertices);
             vbDesc.debugName = "SunVertexBuffer";
             vbDesc.isVertexBuffer = true;
-            vbDesc.isVolatile = false;
-            vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
-            vbDesc.initialState = nvrhi::ResourceStates::CopyDest;  // Start in CopyDest for writeBuffer
+            vbDesc.initialState = nvrhi::ResourceStates::CopyDest;
             auto vb = cmdList->getDevice()->createBuffer(vbDesc);
             cmdList->beginTrackingBufferState(vb, nvrhi::ResourceStates::CopyDest);
             cmdList->writeBuffer(vb, vertices, sizeof(vertices));
@@ -262,9 +260,7 @@ framegraph::VirtualResourceHandle setupSunPass(
             ibDesc.byteSize = sizeof(indices);
             ibDesc.debugName = "SunIndexBuffer";
             ibDesc.isIndexBuffer = true;
-            ibDesc.isVolatile = false;
-            ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
-            ibDesc.initialState = nvrhi::ResourceStates::CopyDest;  // Start in CopyDest for writeBuffer
+            ibDesc.initialState = nvrhi::ResourceStates::CopyDest;
             auto ib = cmdList->getDevice()->createBuffer(ibDesc);
             cmdList->beginTrackingBufferState(ib, nvrhi::ResourceStates::CopyDest);
             cmdList->writeBuffer(ib, indices, sizeof(indices));

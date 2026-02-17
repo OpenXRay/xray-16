@@ -370,17 +370,11 @@ void D3D12Backend::CreateBackBufferTextures() {
 void D3D12Backend::CreateBindlessResources() {
     Msg("* [D3D12Backend] Creating bindless resources...");
 
-    // Create bindless layout for SM6.6 ResourceDescriptorHeap access
-    // MutableSrvUavCbv enables D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED
     nvrhi::BindlessLayoutDesc bindlessDesc;
     bindlessDesc.visibility = nvrhi::ShaderType::All;
     bindlessDesc.firstSlot = 0;
     bindlessDesc.maxCapacity = MAX_BINDLESS_TEXTURES;
-    // Use MutableSrvUavCbv to enable ResourceDescriptorHeap direct indexing (SM6.6)
-    bindlessDesc.layoutType = nvrhi::BindlessLayoutDesc::LayoutType::MutableSrvUavCbv;
-
-    Msg("* [D3D12Backend] Bindless layout desc: visibility=0x%x, maxCapacity=%u, layoutType=MutableSrvUavCbv",
-        static_cast<u32>(bindlessDesc.visibility), bindlessDesc.maxCapacity);
+    bindlessDesc.registerSpaces = { nvrhi::BindingLayoutItem::Texture_SRV(1) };
 
     m_bindlessLayout = m_nvrhiDevice->createBindlessLayout(bindlessDesc);
     if (!m_bindlessLayout) {
@@ -483,23 +477,12 @@ u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
         return UINT32_MAX;
     }
 
-    // Return the ABSOLUTE heap index for use with ResourceDescriptorHeap[index]
-    // The descriptor table starts at firstDescriptor in the global heap
-    u32 heapOffset = m_bindlessDescriptorTable->getFirstDescriptorIndexInHeap();
-    return heapOffset + slot;
+    return slot;
 }
 
-void D3D12Backend::UnregisterBindlessTexture(u32 absoluteIndex) {
-    // Convert absolute heap index back to slot
-    u32 heapOffset = m_bindlessDescriptorTable ?
-        m_bindlessDescriptorTable->getFirstDescriptorIndexInHeap() : 0;
-
-    if (absoluteIndex >= heapOffset) {
-        u32 slot = absoluteIndex - heapOffset;
-        if (slot < MAX_BINDLESS_TEXTURES) {
-            m_freeBindlessIndices.push_back(slot);
-        }
-    }
+void D3D12Backend::UnregisterBindlessTexture(u32 index) {
+    if (index < MAX_BINDLESS_TEXTURES)
+        m_freeBindlessIndices.push_back(index);
 }
 
 nvrhi::ITexture* D3D12Backend::GetBackBuffer() {

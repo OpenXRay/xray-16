@@ -267,6 +267,13 @@ int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 // R4 Debug
 int ps_r4_debug_gpu_culling = 0; // 0=off, 1=show bounding spheres with cull state colors
 
+u32 ps_fg_render_mode = FG_RENDER_DX12;
+const xr_token fg_render_mode_token[] = {
+    {"dx12", FG_RENDER_DX12},
+    {"vulkan", FG_RENDER_VULKAN},
+    {nullptr, 0}
+};
+
 u32 ps_steep_parallax = 0;
 int ps_r__detail_radius = 49;
 int ps_r__detail_gpu = 1; // 0=Vanilla CPU path, 1=GPU compute path (default GPU)
@@ -1210,6 +1217,9 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "fg_pbr_diffuse_mode", &ps_fg_pbr_diffuse_mode, 0, 1);
     // GPU Culling debug visualization
     CMD4(CCC_Integer, "r4_debug_gpu_culling", &ps_r4_debug_gpu_culling, 0, 1);
+
+    // FrameGraph render backend (requires restart)
+    CMD3(CCC_Token, "fg_render_mode", &ps_fg_render_mode, fg_render_mode_token);
 
 #ifdef DEBUG
     // TextureManager unit tests (Week 1 Day 2)

@@ -102,6 +102,8 @@ public:
     const Stats& GetStats() const { return m_stats; }
     void ResetStats() { m_stats = {}; }
 
+    void SetBackendSubdir(const char* subdir) { m_backendSubdir = subdir; }
+
 private:
     /// <summary>
     /// Get cache file path for a shader
@@ -129,9 +131,10 @@ private:
         ExtractedReflection& outReflection
     );
 
-    static constexpr u32 CACHE_VERSION = 4;  // Removed redundant constantBuffers field - unified into constantLayout
+    static constexpr u32 CACHE_VERSION = 4;
     Stats m_stats;
-    bool m_cacheEnabled;  // If false, TryLoad always returns false (dev mode)
+    bool m_cacheEnabled;
+    xr_string m_backendSubdir;
 };
 
 } // namespace xray::render::framegraph

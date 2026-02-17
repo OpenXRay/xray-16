@@ -6,7 +6,10 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
+#include <SDL.h>
 #include "Layers/xrRender/Backend/D3D12Backend.h"
+// Factory function - avoids pulling vulkan/vulkan.h into this TU
+IRenderBackend* CreateVulkanBackend(SDL_Window* window, u32 width, u32 height, bool enableValidation);
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"  // Phase 2.5.3
 #include "xrEngine/IFrameGraphRender.h"
 
@@ -125,8 +128,6 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
 
 void D3DXRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 {
-    // D3D12 doesn't require special window flags beyond what SDL provides
-    // Just ensure we have a proper window for HWND extraction
     windowFlags |= SDL_WINDOW_SHOWN;
 }
 
@@ -171,7 +172,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
     if (!GEnv.isDedicatedServer)
     {
         // For D3D12/FrameGraph: Skip legacy shader creation - FrameGraph has its own rendering
-        const bool useFrameGraph = GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12;
+        const bool useFrameGraph = GEnv.Backend && GEnv.Backend->IsFrameGraph();
         if (!useFrameGraph)
         {
             m_WireShader.create("editor" DELIMITER "wire");
@@ -233,26 +234,44 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
     dwWidth = static_cast<u32>(w);
     dwHeight = static_cast<u32>(h);
 
-    // Initialize D3D12 backend
     auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
-
     const bool enableValidation = !!strstr(Core.Params, "-d3ddebug");
-    auto* dx12Backend = xr_new<D3D12Backend>();
 
-    if (dx12Backend->Initialize(hWnd, dwWidth, dwHeight, enableValidation))
+    if (ps_fg_render_mode == FG_RENDER_VULKAN)
     {
-        render.m_backend = dx12Backend;
-        GEnv.Backend = dx12Backend;
-        Msg("* [CRender] D3D12 backend initialized successfully");
-        Msg("*   Bindless textures: %s (max %u)",
-            dx12Backend->GetCapabilities().bindlessTextures ? "Yes" : "No",
-            dx12Backend->GetCapabilities().maxBindlessResources);
+        auto* vkBackend = CreateVulkanBackend(hWnd, dwWidth, dwHeight, enableValidation);
+        if (vkBackend)
+        {
+            render.m_backend = vkBackend;
+            GEnv.Backend = vkBackend;
+            Msg("* [CRender] Vulkan backend initialized successfully");
+            Msg("*   Bindless textures: %s (max %u)",
+                vkBackend->GetCapabilities().bindlessTextures ? "Yes" : "No",
+                vkBackend->GetCapabilities().maxBindlessResources);
+        }
+        else
+        {
+            FATAL("Vulkan initialization failed");
+        }
     }
     else
     {
-        Msg("! [CRender] D3D12 backend initialization failed");
-        xr_delete(dx12Backend);
-        FATAL("D3D12 initialization failed - no fallback available");
+        auto* dx12Backend = xr_new<D3D12Backend>();
+        if (dx12Backend->Initialize(hWnd, dwWidth, dwHeight, enableValidation))
+        {
+            render.m_backend = dx12Backend;
+            GEnv.Backend = dx12Backend;
+            Msg("* [CRender] D3D12 backend initialized successfully");
+            Msg("*   Bindless textures: %s (max %u)",
+                dx12Backend->GetCapabilities().bindlessTextures ? "Yes" : "No",
+                dx12Backend->GetCapabilities().maxBindlessResources);
+        }
+        else
+        {
+            Msg("! [CRender] D3D12 backend initialization failed");
+            xr_delete(dx12Backend);
+            FATAL("D3D12 initialization failed - no fallback available");
+        }
     }
 
     std::tie(dwWidth, dwHeight) = GEnv.Backend->GetBackBufferSize();
@@ -405,7 +424,7 @@ bool D3DXRenderBase::HWSupportsShaderYUV2RGB()
 {
     // DX12/FrameGraph: GPU-side YUV→RGB conversion not yet implemented
     // Force CPU-side conversion until we implement YUV shader support
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
         return false;
 
     // D3D11: Use hardware capabilities check

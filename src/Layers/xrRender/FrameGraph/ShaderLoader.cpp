@@ -105,7 +105,7 @@ bool ShaderLoader::CompileShader(
         sourceCode.c_str(),
         entryPoint,
         stage,
-        xray::render::SlangCompiler::Target::DXIL,  // DX12 target (SM6 bindless)
+        m_target,  // DX12 target (SM6 bindless)
         shaderName
     );
 
@@ -211,7 +211,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Vertex,
-        xray::render::SlangCompiler::Target::DXIL,  // DX12 SM6
+        m_target,  // DX12 SM6
         fullPath  // Full path allows VFS to resolve relative includes
     );
 
@@ -347,7 +347,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Pixel,
-        xray::render::SlangCompiler::Target::DXIL,  // DX12 SM6
+        m_target,  // DX12 SM6
         fullPath  // Full path allows VFS to resolve relative includes
     );
 
@@ -495,7 +495,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Compute,
-        xray::render::SlangCompiler::Target::DXIL,  // DX12 SM6
+        m_target,  // DX12 SM6
         fullPath  // Full path allows VFS to resolve relative includes
     );
 
@@ -618,7 +618,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Amplification,
-        xray::render::SlangCompiler::Target::DXIL,
+        m_target,
         fullPath
     );
 
@@ -726,7 +726,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Mesh,
-        xray::render::SlangCompiler::Target::DXIL,
+        m_target,
         fullPath
     );
 
@@ -856,7 +856,7 @@ bool ShaderLoader::CompileShaderWithDefines(
         sourceCode.c_str(),
         entryPoint,
         stage,
-        xray::render::SlangCompiler::Target::DXIL,  // DX12 SM6
+        m_target,  // DX12 SM6
         fullPath,
         defines.data(),
         defines.size()

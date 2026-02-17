@@ -345,7 +345,7 @@ void dxEnvironmentRender::OnDeviceCreate()
         return;
 
     // DX12: Compile shaders using NVRHI
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         auto* shaderLoader = RImplementation.GetShaderLoader();
         if (shaderLoader)
@@ -393,7 +393,7 @@ void dxEnvironmentRender::OnDeviceCreate()
     clouds_geom.create(v_clouds_fvf, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 
     // DX12: Skip legacy constant setup (not used in framegraph)
-    if (GEnv.Backend && GEnv.Backend->GetAPI() != IRenderBackend::API::D3D12)
+    if (GEnv.Backend && !GEnv.Backend->IsFrameGraph())
     {
         const auto& sky2_constants = sh_2sky->E[0]->passes[0]->constants;
         const auto& clouds_constants = clouds_sh->E[0]->passes[0]->constants;

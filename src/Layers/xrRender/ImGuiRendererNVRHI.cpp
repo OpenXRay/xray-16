@@ -220,9 +220,8 @@ bool ImGuiRendererNVRHI::CreateBuffers(size_t vtxSize, size_t idxSize)
     nvrhi::BufferDesc vbDesc;
     vbDesc.byteSize = vtxSize * sizeof(ImDrawVert);
     vbDesc.isVertexBuffer = true;
-    vbDesc.isVolatile = false;
-    vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
     vbDesc.debugName = "ImGui Vertex Buffer";
+    vbDesc.keepInitialState = true;
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
 
     m_vertexBuffer = m_device->createBuffer(vbDesc);
@@ -235,9 +234,8 @@ bool ImGuiRendererNVRHI::CreateBuffers(size_t vtxSize, size_t idxSize)
     nvrhi::BufferDesc ibDesc;
     ibDesc.byteSize = idxSize * sizeof(ImDrawIdx);
     ibDesc.isIndexBuffer = true;
-    ibDesc.isVolatile = false;
-    ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
     ibDesc.debugName = "ImGui Index Buffer";
+    ibDesc.keepInitialState = true;
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
 
     m_indexBuffer = m_device->createBuffer(ibDesc);

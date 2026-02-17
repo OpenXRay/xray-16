@@ -23,7 +23,7 @@ void dxUIRender::SetShader(IUIShader& shader)
 {
     // DX12: UI rendering uses UIRenderCollector + NVRHIUIRenderer instead
     // This legacy path is only for D3D11
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
         return;
 
     dxUIShader* pShader = (dxUIShader*)&shader;

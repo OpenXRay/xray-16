@@ -96,7 +96,7 @@ static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 heig
         cbDesc.byteSize = sizeof(HiZCB);
         cbDesc.isConstantBuffer = true;
         cbDesc.isVolatile = true;
-        cbDesc.maxVersions = 16;
+        cbDesc.maxVersions = 64;
         cbDesc.keepInitialState = true;
         cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
         s_hiz_cb = nvDevice->createBuffer(cbDesc);

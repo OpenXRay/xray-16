@@ -51,7 +51,7 @@ void R_sync_point::Create()
 {
     // For D3D12/FrameGraph: NVRHI handles GPU/CPU synchronization via fences internally
     // Skip legacy D3D11 event query creation
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         Msg("* [R_sync_point] Disabled - NVRHI handles synchronization");
         return;
@@ -67,7 +67,7 @@ void R_sync_point::Create()
 void R_sync_point::Destroy()
 {
     // For D3D12/FrameGraph: Nothing to destroy
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
         return;
 
     const u32 gpuNum = GEnv.Backend->GetCapabilities().iGPUNum;
@@ -80,7 +80,7 @@ bool R_sync_point::Wait(u32 wait_sleep, u64 timeout)
     ZoneScoped;
 
     // For D3D12/FrameGraph: NVRHI handles synchronization, always return success
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
         return true;
 
     CTimer T;
@@ -103,7 +103,7 @@ bool R_sync_point::Wait(u32 wait_sleep, u64 timeout)
 void R_sync_point::End()
 {
     // For D3D12/FrameGraph: No-op
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
         return;
 
     q_sync_count = (q_sync_count + 1) % GEnv.Backend->GetCapabilities().iGPUNum;

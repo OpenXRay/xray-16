@@ -16,7 +16,7 @@ void dxUIShader::Copy(IUIShader& _in) { *this = *((dxUIShader*)&_in); }
 void dxUIShader::create(LPCSTR sh, LPCSTR tex)
 {
     // DX12/FrameGraph: Compile shaders using NVRHI ShaderLoader
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         auto* shaderLoader = RImplementation.GetShaderLoader();
         if (!shaderLoader)
@@ -92,7 +92,7 @@ void dxUIShader::create(LPCSTR sh, LPCSTR tex)
 
 void dxUIShader::destroy()
 {
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         m_vsHandle = nullptr;
         m_psHandle = nullptr;
@@ -116,7 +116,7 @@ void dxUIShader::destroy()
 CTexture* dxUIShader::GetBaseTexture() const
 {
     // DX12: Return cached texture pointer
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         return m_baseTexture;
     }

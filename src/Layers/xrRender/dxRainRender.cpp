@@ -33,7 +33,7 @@ dxRainRender::dxRainRender()
     DM_Drop = RImplementation.model_CreateDM(F);
 
     // DX12: Compile rain shaders using NVRHI
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         auto* shaderLoader = RImplementation.GetShaderLoader();
         if (shaderLoader)

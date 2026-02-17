@@ -320,7 +320,7 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     // ═══════════════════════════════════════════════════
     //  D3D12: FAST PATH - Precompiled PSO Lookup
     // ═══════════════════════════════════════════════════
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12) {
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph()) {
         // Check if this is level geometry with precompiled PSOs
         u32 shaderID = visual->shader_id;
         if (shaderID != UINT32_MAX) {
@@ -461,7 +461,7 @@ MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
     }
 
     // D3D12/FrameGraph mode: Return null - uses bindless depth prepass instead
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12) {
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph()) {
         return nullptr;
     }
 

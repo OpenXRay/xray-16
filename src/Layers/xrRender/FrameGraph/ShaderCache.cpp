@@ -23,11 +23,13 @@ void ShaderCache::GetCachePath(
     u32 sourceHash,
     string_path& outPath)
 {
-    // Format: shaders_cache_fg/<shader_name>.<ext>/<source_hash>
-    // Example: shaders_cache_fg/gbuffer.vs/A3F2B1C0
     string_path shaderDir;
-    xr_sprintf(shaderDir, "shaders_cache_fg%s%s%s",
-        DELIMITER, shaderName, extension);
+    if (m_backendSubdir.empty())
+        xr_sprintf(shaderDir, "shaders_cache_fg%s%s%s",
+            DELIMITER, shaderName, extension);
+    else
+        xr_sprintf(shaderDir, "shaders_cache_fg%s%s%s%s%s",
+            DELIMITER, m_backendSubdir.c_str(), DELIMITER, shaderName, extension);
 
     xr_sprintf(outPath, "%s%s%08X",
         shaderDir, DELIMITER, sourceHash);
