@@ -58,7 +58,7 @@ SThunderboltDesc::~SThunderboltDesc()
 //----------------------------------------------------------------------------------------------
 // collection
 //----------------------------------------------------------------------------------------------
-SThunderboltCollection::SThunderboltCollection(shared_str sect, CInifile const* pIni, CInifile const* thunderbolts)
+SThunderboltCollection::SThunderboltCollection(const shared_str& sect, CInifile const* pIni, CInifile const* thunderbolts)
 {
     section = sect;
     const int tb_count = pIni->line_count(sect);
@@ -141,7 +141,7 @@ CEffect_Thunderbolt::~CEffect_Thunderbolt()
     m_thunderbolts_config = nullptr;
 }
 
-SThunderboltCollection* CEffect_Thunderbolt::AppendDef(shared_str sect)
+SThunderboltCollection* CEffect_Thunderbolt::AppendDef(const shared_str& sect)
 {
     if (!sect || (0 == sect[0]))
         return nullptr;

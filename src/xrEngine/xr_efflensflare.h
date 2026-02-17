@@ -26,13 +26,12 @@ class ENGINE_API CLensFlareDescriptor
 public:
     struct SFlare
     {
-        float fOpacity;
-        float fRadius;
-        float fPosition;
+        float fOpacity{};
+        float fRadius{};
+        float fPosition{};
         shared_str texture;
         shared_str shader;
         FactoryPtr<IFlareRender> m_pRender;
-        SFlare() { fOpacity = fRadius = fPosition = 0; }
     };
 
     struct SSource : public SFlare
@@ -68,7 +67,7 @@ public:
     shared_str section;
 
 public:
-    CLensFlareDescriptor(shared_str section, CInifile const* pIni);
+    CLensFlareDescriptor(const shared_str& section, CInifile const* pIni);
     void OnDeviceCreate();
     void OnDeviceDestroy();
 };

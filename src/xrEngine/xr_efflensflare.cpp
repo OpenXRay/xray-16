@@ -51,13 +51,14 @@ void CLensFlareDescriptor::SetGradient(float fMaxRadius, float fOpacity, pcstr t
 
 void CLensFlareDescriptor::AddFlare(float fRadius, float fOpacity, float fPosition, pcstr tex_name, pcstr sh_name)
 {
-    SFlare F;
-    F.fRadius = fRadius;
-    F.fOpacity = fOpacity;
-    F.fPosition = fPosition;
-    F.shader = sh_name;
-    F.texture = tex_name;
-    m_Flares.push_back(F);
+    m_Flares.emplace_back(SFlare
+    {
+        .fOpacity = fOpacity,
+        .fRadius = fRadius,
+        .fPosition = fPosition,
+        .texture = tex_name,
+        .shader = sh_name,
+    });
 }
 
 struct FlareDescriptorFields
@@ -79,7 +80,7 @@ FlareDescriptorFields SunFields =
     "sun", "sun_shader", "sun_texture", "sun_radius", "sun_ignore_color"
 };
 
-CLensFlareDescriptor::CLensFlareDescriptor(shared_str sect, CInifile const* pIni)
+CLensFlareDescriptor::CLensFlareDescriptor(const shared_str& sect, CInifile const* pIni)
 {
     section = sect;
 

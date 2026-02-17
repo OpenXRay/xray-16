@@ -67,11 +67,10 @@ public:
 
 struct ENGINE_API SThunderboltCollection
 {
-    using DescVec = xr_vector<SThunderboltDesc*>;
-    DescVec palette;
+    xr_vector<SThunderboltDesc*> palette;
     shared_str section;
 
-    SThunderboltCollection(shared_str sect, CInifile const* pIni, CInifile const* thunderbolts);
+    SThunderboltCollection(const shared_str& sect, CInifile const* pIni, CInifile const* thunderbolts);
     ~SThunderboltCollection();
 
     SThunderboltDesc* GetRandomDesc()
@@ -120,7 +119,6 @@ private:
     CInifile* m_thunderbolt_collections_config{};
     CInifile* m_thunderbolts_config{};
 
-
     // params
     static constexpr float MAX_DIST_FACTOR = 0.95f;
     Fvector2 p_var_alt;
@@ -143,7 +141,7 @@ public:
     void OnFrame(CEnvDescriptorMixer& currentEnv);
     void Render();
 
-    SThunderboltCollection* AppendDef(shared_str sect);
+    SThunderboltCollection* AppendDef(const shared_str& sect);
 
     [[nodiscard]]
     auto& GetCollections() { return collections; }
