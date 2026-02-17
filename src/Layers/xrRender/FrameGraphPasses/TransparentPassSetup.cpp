@@ -12,23 +12,13 @@
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "PassCommon.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-static nvrhi::GraphicsPipelineHandle s_transparentPipeline;
-static nvrhi::BindingLayoutHandle s_transparentLayout;
-static nvrhi::InputLayoutHandle s_transparentInputLayout;
-static nvrhi::SamplerHandle s_transparentSampler;
-static nvrhi::ShaderHandle s_transparentVS;
-static nvrhi::ShaderHandle s_transparentPS;
-static nvrhi::BufferHandle s_transparentDrawIndexBuffer;
-static nvrhi::BufferHandle s_lightingCB;
-static nvrhi::BufferHandle s_staticGlobalsCB;
-static bool s_transparentInitialized = false;
-
-static void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer)
+static void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, TransparentPassState& state)
 {
-    if (s_transparentInitialized)
+    if (state.initialized)
         return;
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -44,14 +34,14 @@ static void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFra
     if (!vsResult.handle || !psResult.handle)
         return;
 
-    s_transparentVS = vsResult.handle;
-    s_transparentPS = psResult.handle;
+    state.vs = vsResult.handle;
+    state.ps = psResult.handle;
 
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
     samplerDesc.setAllFilters(true);
     samplerDesc.setMaxAnisotropy(16.0f);
-    s_transparentSampler = nvDevice->createSampler(samplerDesc);
+    state.sampler = nvDevice->createSampler(samplerDesc);
 
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::All;
@@ -65,66 +55,29 @@ static void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFra
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),   // g_CompactBatchIndices
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),   // g_CompactMaterialIDs
     };
-    s_transparentLayout = nvDevice->createBindingLayout(layoutDesc);
-    if (!s_transparentLayout)
+    state.layout = nvDevice->createBindingLayout(layoutDesc);
+    if (!state.layout)
         return;
 
-    constexpr u32 vertexStride = 48;
-    nvrhi::VertexAttributeDesc vertexAttribs[] = {
-        nvrhi::VertexAttributeDesc()
-            .setName("POSITION").setFormat(nvrhi::Format::RGB32_FLOAT)
-            .setBufferIndex(0).setOffset(0).setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM)
-            .setBufferIndex(0).setOffset(12).setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM)
-            .setBufferIndex(0).setOffset(16).setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM)
-            .setBufferIndex(0).setOffset(20).setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT)
-            .setArraySize(2).setBufferIndex(0).setOffset(24).setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("COLOR").setFormat(nvrhi::Format::BGRA8_UNORM)
-            .setBufferIndex(0).setOffset(40).setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("DRAWINDEX").setFormat(nvrhi::Format::R32_UINT)
-            .setBufferIndex(1).setOffset(0).setElementStride(4).setIsInstanced(true),
-    };
-    s_transparentInputLayout = nvDevice->createInputLayout(vertexAttribs, 7, s_transparentVS);
+    u32 attrCount = 0;
+    auto* attrs = GetUnifiedVertexAttributes(attrCount);
+    state.inputLayout = nvDevice->createInputLayout(attrs, attrCount, state.vs);
 
-    constexpr u32 MAX_DRAWS = 65536;
-    xr_vector<u32> drawIndices(MAX_DRAWS);
-    for (u32 i = 0; i < MAX_DRAWS; i++)
-        drawIndices[i] = i;
-
-    nvrhi::BufferDesc drawIndexDesc;
-    drawIndexDesc.byteSize = MAX_DRAWS * sizeof(u32);
-    drawIndexDesc.structStride = sizeof(u32);
-    drawIndexDesc.isVertexBuffer = true;
-    drawIndexDesc.debugName = "TransparentDrawIndexBuffer";
-    drawIndexDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-    drawIndexDesc.keepInitialState = true;
-    s_transparentDrawIndexBuffer = nvDevice->createBuffer(drawIndexDesc);
-    if (!s_transparentDrawIndexBuffer)
+    auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("TransparentPass", nvDevice);
+    if (!drawIndexBuffer)
         return;
-
-    if (GEnv.Backend)
-        GEnv.Backend->UploadBufferData(s_transparentDrawIndexBuffer, drawIndices.data(), MAX_DRAWS * sizeof(u32));
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
-    pipeDesc.VS = s_transparentVS;
-    pipeDesc.PS = s_transparentPS;
-    pipeDesc.inputLayout = s_transparentInputLayout;
+    pipeDesc.VS = state.vs;
+    pipeDesc.PS = state.ps;
+    pipeDesc.inputLayout = state.inputLayout;
 
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
     if (bindlessLayout)
-        pipeDesc.bindingLayouts = { s_transparentLayout, bindlessLayout };
+        pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
     else
-        pipeDesc.bindingLayouts = { s_transparentLayout };
+        pipeDesc.bindingLayouts = { state.layout };
 
     pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
     pipeDesc.renderState.depthStencilState.depthTestEnable = true;
@@ -142,37 +95,25 @@ static void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFra
     rt0.destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
     rt0.blendOpAlpha = nvrhi::BlendOp::Add;
 
-    s_transparentPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-    if (!s_transparentPipeline)
+    state.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+    if (!state.pipeline)
         return;
 
-    const nvrhi::GraphicsPipelineDesc& actualDesc = s_transparentPipeline->getDesc();
-    if (!actualDesc.bindingLayouts.empty())
-        s_transparentLayout = actualDesc.bindingLayouts[0];
+    QueryBindingLayoutFromPipeline(state.pipeline, state.layout);
 
-    nvrhi::BufferDesc vcbDesc;
-    vcbDesc.isConstantBuffer = true;
-    vcbDesc.isVolatile = true;
-    vcbDesc.maxVersions = 16;
-    vcbDesc.byteSize = 96;  // sizeof(LightingConstants)
-    s_lightingCB = nvDevice->createBuffer(vcbDesc);
-    vcbDesc.byteSize = 768;  // sizeof(StaticGlobals)
-    s_staticGlobalsCB = nvDevice->createBuffer(vcbDesc);
-
-    s_transparentInitialized = true;
+    state.initialized = true;
     Msg("* [TransparentPass] Pipeline initialized");
 }
 
-void ShutdownTransparentPipelines()
+void ShutdownTransparentPipelines(TransparentPassState& state)
 {
-    s_transparentPipeline = nullptr;
-    s_transparentLayout = nullptr;
-    s_transparentInputLayout = nullptr;
-    s_transparentSampler = nullptr;
-    s_transparentVS = nullptr;
-    s_transparentPS = nullptr;
-    s_transparentDrawIndexBuffer = nullptr;
-    s_transparentInitialized = false;
+    state.pipeline = nullptr;
+    state.layout = nullptr;
+    state.inputLayout = nullptr;
+    state.sampler = nullptr;
+    state.vs = nullptr;
+    state.ps = nullptr;
+    state.initialized = false;
 }
 
 framegraph::DefaultOutputLayout setupTransparentPass(
@@ -180,22 +121,14 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     ng::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     const TransparentPassConfig& config,
-    u32 width, u32 height)
+    u32 width, u32 height,
+    TransparentPassState& state)
 {
     using namespace framegraph;
 
     if (!config.IsValid()) {
         return inputs;
     }
-
-    struct TransparentPassData {
-        VirtualResourceHandle depth;
-        VirtualResourceHandle color;
-        VirtualResourceHandle normal;
-        ng::RenderDevice* device;
-        TransparentPassConfig config;
-        u32 width, height;
-    };
 
     auto& passData = fg.addCallbackPass<TransparentPassData>(
         "Transparent Pass",
@@ -205,6 +138,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             data.height = height;
             data.device = device;
             data.config = config;
+            data.passState = &state;
 
             RenderPassBuilder passBuilder(builder, passHandle);
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
@@ -232,27 +166,23 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             if (normalRT)
                 fbDesc.addColorAttachment(normalRT);
             fbDesc.setDepthAttachment(depthRT);
-            auto framebuffer = nvDevice->createFramebuffer(fbDesc);
+            auto& cache = framegraph::GetPassResourceCache();
+            auto framebuffer = cache.GetOrCreateFramebuffer("TransparentPass", fbDesc, nvDevice);
             if (!framebuffer)
                 return;
 
-            InitializeTransparentResources(data.device, framebuffer);
-            if (!s_transparentInitialized || !s_transparentPipeline)
+            InitializeTransparentResources(data.device, framebuffer, *data.passState);
+            if (!data.passState->initialized || !data.passState->pipeline)
                 return;
 
             using namespace RENDER_NAMESPACE::bindless;
             auto& matBuffer = MaterialBuffer::Instance();
 
-            struct LightingConstants {
-                Fvector4 sunDirection;
-                Fvector4 sunColor;
-                Fvector4 ambientColor;
-                Fvector4 cameraPosition;
-                Fvector4 fogParams;
-                Fvector4 fogColor;
-            } lightingData;
+            auto lightingCB = cache.GetOrCreateVolatileCB("TransparentPass", "LightingCB", sizeof(LightingConstants), 16, nvDevice);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("TransparentPass", "StaticGlobalsCB", sizeof(StaticGlobals), 16, nvDevice);
+            auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("TransparentPass", nvDevice);
 
-            auto lightingCB = s_lightingCB.Get();
+            LightingConstants lightingData;
 
             if (g_pGamePersistent) {
                 auto& env = g_pGamePersistent->Environment().CurrentEnv;
@@ -270,7 +200,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             lightingData.cameraPosition.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 1.0f);
             cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
 
-            auto staticGlobalsCB = s_staticGlobalsCB.Get();
             StaticGlobals staticGlobals;
             FillGlobalConstants(staticGlobals);
             SunLightData sunData;
@@ -288,17 +217,17 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(10, variantTexBuffer.GetBuffer()),
-                nvrhi::BindingSetItem::Sampler(0, s_transparentSampler),
+                nvrhi::BindingSetItem::Sampler(0, data.passState->sampler),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(14, cfg.instanceBuffer),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(15, cfg.compactBatchIndicesBuffer),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(16, cfg.compactMaterialIDBuffer),
             };
 
-            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, s_transparentLayout, nvDevice);
+            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, data.passState->layout, nvDevice);
             R_ASSERT2(bindingSet, "Transparent binding set creation failed");
 
             nvrhi::GraphicsState state;
-            state.pipeline = s_transparentPipeline;
+            state.pipeline = data.passState->pipeline;
             state.framebuffer = framebuffer;
             state.bindings = { bindingSet };
 
@@ -311,7 +240,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
 
             state.vertexBuffers = {
                 {cfg.megaVertexBuffer, 0, 0},
-                {s_transparentDrawIndexBuffer, 1, 0}
+                {drawIndexBuffer, 1, 0}
             };
             state.indexBuffer = { cfg.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
             state.indirectParams = cfg.compactDrawArgsBuffer;
@@ -326,12 +255,12 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 auto* backendDev = data.device->GetBackend();
 
                 VariantPartitionDrawConfig vpCfg;
-                vpCfg.defaultPipeline = s_transparentPipeline.Get();
-                vpCfg.inputLayout = s_transparentInputLayout;
-                vpCfg.passLayout = s_transparentLayout;
+                vpCfg.defaultPipeline = data.passState->pipeline.Get();
+                vpCfg.inputLayout = data.passState->inputLayout;
+                vpCfg.passLayout = data.passState->layout;
                 vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
                 vpCfg.bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
-                vpCfg.sampler = s_transparentSampler;
+                vpCfg.sampler = data.passState->sampler;
                 vpCfg.staticGlobalsCB = staticGlobalsCB;
                 vpCfg.lightingCB = lightingCB;
                 vpCfg.materialBuffer = matBuffer.GetBuffer();

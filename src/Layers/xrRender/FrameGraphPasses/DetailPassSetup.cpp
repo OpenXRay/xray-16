@@ -55,27 +55,10 @@ DefaultOutputLayout setupDetailPass(
     u32 hiZHeight,
     u32 hiZMipLevels,
     const Fmatrix* prevViewProj,
-    xray::profiler::GPUProfiler* gpuProfiler
+    xray::profiler::GPUProfiler* gpuProfiler,
+    DetailPassState* detailState
 )
 {
-    struct DetailPassData {
-        VirtualResourceHandle inputColor;
-        VirtualResourceHandle depth;
-        VirtualResourceHandle outputColor;
-        VirtualResourceHandle outputNormal;
-        VirtualResourceHandle hiZPyramid;
-        ng::RenderDevice* device;
-        RENDER_NAMESPACE::FGDetailManager* detailManager;
-        DefaultOutputLayout outputs;
-        u32 width;
-        u32 height;
-        u32 hiZWidth;
-        u32 hiZHeight;
-        u32 hiZMipLevels;
-        Fmatrix prevViewProj;    // Previous frame's viewProj for temporal Hi-Z
-        bool hasPrevViewProj;    // True if prevViewProj is valid
-        xray::profiler::GPUProfiler* gpuProfiler;
-    };
 
     // Capture prevViewProj by value (it's a pointer, we need to copy the data)
     Fmatrix capturedPrevViewProj;
@@ -88,7 +71,7 @@ DefaultOutputLayout setupDetailPass(
 
     auto& passData = fg.addCallbackPass<DetailPassData>(
         "Details",
-        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, capturedPrevViewProj, hasPrevViewProj, gpuProfiler](
+        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, capturedPrevViewProj, hasPrevViewProj, gpuProfiler, detailState](
             FrameGraph& builder, PassHandle passHandle, DetailPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
@@ -102,6 +85,7 @@ DefaultOutputLayout setupDetailPass(
             data.prevViewProj = capturedPrevViewProj;
             data.hasPrevViewProj = hasPrevViewProj;
             data.gpuProfiler = gpuProfiler;
+            data.detailState = detailState;
 
             // Add Hi-Z as read dependency
             data.hiZPyramid = passBuilder.read(hiZPyramid, ResourceState::ShaderResource);
@@ -143,19 +127,17 @@ DefaultOutputLayout setupDetailPass(
             if (!cmdList)
                 return;
 
-            static bool s_detailDataUploaded = false;
-            if (!s_detailDataUploaded)
+            if (data.detailState && !data.detailState->detailDataUploaded)
             {
                 data.detailManager->UploadBufferData(cmdList);
-                s_detailDataUploaded = true;
+                data.detailState->detailDataUploaded = true;
             }
 
             // === AUTO-REGENERATE GEOMETRY WHEN WIDTH CHANGES ===
-            static float s_lastBladeWidth = ps_r3_grass_blade_width;
-            if (s_lastBladeWidth != ps_r3_grass_blade_width)
+            if (data.detailState && data.detailState->lastBladeWidth != ps_r3_grass_blade_width)
             {
                 data.detailManager->RegenerateBladeGeometry(cmdList);
-                s_lastBladeWidth = ps_r3_grass_blade_width;
+                data.detailState->lastBladeWidth = ps_r3_grass_blade_width;
             }
 
             // === WIND PARAMETERS UPDATE ===

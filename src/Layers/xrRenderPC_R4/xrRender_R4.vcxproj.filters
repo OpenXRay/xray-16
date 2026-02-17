@@ -196,9 +196,6 @@
     <Filter Include="Slang">
       <UniqueIdentifier>{971dc00e-f646-4c8c-bf38-96d32432d02e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Externals\meshoptimizer">
-      <UniqueIdentifier>{f2c1d5e5-4a59-4f69-a66a-3d44d5b9b1b7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Framegraph\ConstantSystem">
       <UniqueIdentifier>{7e4fa8a3-2a14-47bb-8d56-b7230ea2ba89}</UniqueIdentifier>
     </Filter>
@@ -816,6 +813,9 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\PassVertexFormats.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticleGPUCullingManager.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
@@ -915,9 +915,6 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.h">
-      <Filter>Framegraph\Passes</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
@@ -927,7 +924,6 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\ShaderConstants.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\SkyPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\SunPassSetup.h" />
-    <ClInclude Include="..\xrRender\PBRConverter\ONNXModelRunner.h" />
     <ClInclude Include="..\xrRender\Bindless\BindlessTypes.h" />
     <ClInclude Include="..\xrRender\Bindless\MaterialBuffer.h" />
     <ClInclude Include="..\xrRender\Bindless\TerrainMaterialBuffer.h" />
@@ -954,15 +950,22 @@
     <ClInclude Include="..\xrRender\FGDetailManager.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Externals\meshoptimizer\src\meshoptimizer.h">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\DetailPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\PassCommon.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\PassStates.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Backend\VulkanBackend.h" />
+    <ClInclude Include="..\..\..\Externals\meshoptimizer\src\meshoptimizer.h" />
+    <ClInclude Include="..\xrRender\Profiler\GPUProfiler.h" />
+    <ClInclude Include="..\xrRender\Profiler\StatsOverlay.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1632,6 +1635,9 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\PassCommon.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticleGPUCullingManager.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
@@ -1722,9 +1728,6 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.cpp">
-      <Filter>Framegraph\Passes</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
@@ -1734,7 +1737,6 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\ShaderConstants.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\SkyPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\SunPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\PBRConverter\ONNXModelRunner.cpp" />
     <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
     <ClCompile Include="..\xrRender\Bindless\TerrainMaterialBuffer.cpp" />
     <ClCompile Include="..\xrRender\Bindless\GPUStructuredBuffer.cpp" />
@@ -1761,54 +1763,25 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\allocator.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\clusterizer.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexanalyzer.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexcodec.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexgenerator.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\overdrawoptimizer.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\partition.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\quantization.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\rasterizer.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\simplifier.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\spatialorder.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\stripifier.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vcacheoptimizer.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexcodec.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexfilter.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vfetchoptimizer.cpp">
-      <Filter>Externals\meshoptimizer</Filter>
-    </ClCompile>
+    <ClCompile Include="..\xrRender\Backend\VulkanBackend.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\allocator.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\clusterizer.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexanalyzer.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexcodec.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexgenerator.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\overdrawoptimizer.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\partition.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\quantization.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\rasterizer.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\simplifier.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\spatialorder.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\stripifier.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vcacheoptimizer.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexcodec.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexfilter.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vfetchoptimizer.cpp" />
+    <ClCompile Include="..\xrRender\Profiler\GPUProfiler.cpp" />
+    <ClCompile Include="..\xrRender\Profiler\StatsOverlay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

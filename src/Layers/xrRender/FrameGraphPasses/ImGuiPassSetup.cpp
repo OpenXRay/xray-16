@@ -18,14 +18,6 @@ framegraph::VirtualResourceHandle setupImGuiPass(
 {
     using namespace framegraph;
 
-    struct ImGuiPassData {
-        VirtualResourceHandle input;
-        VirtualResourceHandle output;
-        ng::ImGuiRendererNVRHI* renderer;
-        u32 width;
-        u32 height;
-    };
-
     auto& passData = fg.addCallbackPass<ImGuiPassData>(
         "ImGui",
 

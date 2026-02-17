@@ -3,6 +3,7 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 #include <nvrhi/nvrhi.h>
 
@@ -17,7 +18,6 @@ namespace xray::render {
 
 namespace xray::render::framegraph {
     class FrameGraph;
-    struct DefaultOutputLayout;
 }
 
 namespace xray::render::RENDER_NAMESPACE::passes {
@@ -111,15 +111,37 @@ struct BindlessForwardConfig {
     VariantPartitionConfig variantPartition;
 };
 
-// ═══════════════════════════════════════════════════════
-//  PIPELINE INITIALIZATION (Called once at device creation)
-// ═══════════════════════════════════════════════════════
-// Eagerly initializes all forward pass pipelines to avoid frame hitches
-// on first render. Call from D3D12Backend::OnDeviceCreate() or equivalent.
-void InitializeForwardPipelines(ng::RenderDevice* device);
+struct ForwardColorPassState {
+    nvrhi::GraphicsPipelineHandle bindlessPipeline;
+    nvrhi::BindingLayoutHandle bindlessLayout;
+    nvrhi::InputLayoutHandle bindlessInputLayout;
+    nvrhi::SamplerHandle linearSampler;
+    nvrhi::ShaderHandle bindlessVS;
+    nvrhi::ShaderHandle bindlessPS;
+    bool bindlessInitialized = false;
+    nvrhi::GraphicsPipelineHandle terrainPipeline;
+    nvrhi::BindingLayoutHandle terrainLayout;
+    nvrhi::ShaderHandle terrainPS;
+    bool terrainInitialized = false;
+};
 
-// Clean up forward pass resources (call on device destroy)
-void ShutdownForwardPipelines();
+struct ForwardColorPassData {
+    framegraph::VirtualResourceHandle depth;
+    framegraph::VirtualResourceHandle color;
+    framegraph::VirtualResourceHandle normal;
+    framegraph::VirtualResourceHandle drawArgsBuffer;
+    ng::RenderDevice* device;
+    const GeometryCollector* geometry;
+    MaterialCache* materialCache;
+    ForwardColorPassState* passState;
+    framegraph::DefaultOutputLayout outputs;
+    u32 width;
+    u32 height;
+    BindlessForwardConfig bindlessConfig;
+};
+
+void InitializeForwardPipelines(ng::RenderDevice* device, ForwardColorPassState& state);
+void ShutdownForwardPipelines(ForwardColorPassState& state);
 
 // Lambda-based ForwardColorPass setup function (Frostbite pattern)
 // Replaces the wasteful 3-RT G-buffer with single color output
@@ -135,7 +157,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     u32 width,
     u32 height,
     framegraph::VirtualResourceHandle drawArgsBuffer = framegraph::VirtualResourceHandle(),
-    const BindlessForwardConfig& bindlessConfig = BindlessForwardConfig()
+    const BindlessForwardConfig& bindlessConfig = BindlessForwardConfig(),
+    ForwardColorPassState* state = nullptr
 );
 
 } // namespace xray::render::passes

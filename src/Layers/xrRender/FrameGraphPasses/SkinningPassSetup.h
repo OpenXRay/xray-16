@@ -4,6 +4,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
+#include <nvrhi/nvrhi.h>
 
 namespace xray::render {
     struct GeometryBatch;
@@ -31,12 +32,26 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 // This pass consolidates all skinned mesh rendering that was previously split
 // between ForwardColorPass (world skinned) and HUDPass (HUD skinned).
 
-// Initialize skinned pipelines eagerly at device creation
-// Must be called before any skinning pass execution
-void InitializeSkinningPipelines(ng::RenderDevice* device);
+struct SkinningPipelineVariant {
+    nvrhi::GraphicsPipelineHandle pipeline;
+    nvrhi::InputLayoutHandle inputLayout;
+    nvrhi::ShaderHandle vs;
+};
 
-// Release all skinned pipeline resources
-void ShutdownSkinningPipelines();
+struct SkinningPassState {
+    SkinningPipelineVariant nonHQ;
+    SkinningPipelineVariant hq1w;
+    SkinningPipelineVariant hq2w;
+    SkinningPipelineVariant hq3w;
+    SkinningPipelineVariant hq4w;
+    nvrhi::BindingLayoutHandle layout;
+    nvrhi::ShaderHandle ps;
+    nvrhi::SamplerHandle linearSampler;
+    bool initialized = false;
+};
+
+void InitializeSkinningPipelines(ng::RenderDevice* device, SkinningPassState& state);
+void ShutdownSkinningPipelines(SkinningPassState& state);
 
 // Callback to update skinned culling stats
 using SkinnedStatsCallback = void(*)(u32 rendered, u32 culled, void* userData);
@@ -57,6 +72,20 @@ struct SkinnedVisibilityData {
     void* statsUserData = nullptr;
 };
 
+struct SkinningPassData {
+    framegraph::VirtualResourceHandle color;
+    framegraph::VirtualResourceHandle normal;
+    framegraph::VirtualResourceHandle depth;
+    ng::RenderDevice* device;
+    const GeometryCollector* geometry;
+    const xr_vector<GeometryBatch>* hudBatches;
+    MaterialCache* materialCache;
+    u32 width, height;
+    framegraph::DefaultOutputLayout outputs;
+    SkinnedVisibilityData visibilityData;
+    SkinningPassState* passState;
+};
+
 // Main skinning pass setup function
 // Renders world skinned meshes followed by HUD skinned meshes
 framegraph::DefaultOutputLayout setupSkinningPass(
@@ -68,7 +97,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     MaterialCache* materialCache,
     u32 width,
     u32 height,
-    const SkinnedVisibilityData& visibilityData = {}  // Optional: GPU culling visibility
+    const SkinnedVisibilityData& visibilityData = {},
+    SkinningPassState* state = nullptr
 );
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

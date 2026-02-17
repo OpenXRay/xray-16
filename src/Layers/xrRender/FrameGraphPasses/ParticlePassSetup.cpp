@@ -31,32 +31,11 @@ using RENDER_NAMESPACE::PS::CParticleEffect;
 using RENDER_NAMESPACE::PS::CParticleGroup;
 using RENDER_NAMESPACE::PS::CPEDef;
 
-// Static pipeline state
-static nvrhi::GraphicsPipelineHandle s_particlePipelineBlend;
-static nvrhi::GraphicsPipelineHandle s_particlePipelineAdd;
-static nvrhi::BindingLayoutHandle s_particleLayout;
-static nvrhi::InputLayoutHandle s_particleInputLayout;
-static nvrhi::ShaderHandle s_particleVS;
-static nvrhi::ShaderHandle s_particlePS;
-static nvrhi::SamplerHandle s_particleSampler;
-static nvrhi::BindingSetHandle s_particleBindingSet;
-static nvrhi::BufferHandle s_dynTransformsCB;
-static nvrhi::BufferHandle s_staticGlobalsCB;
-static bool s_particleInitialized = false;
-
-// Dynamic buffers (CPU fallback path)
-static nvrhi::BufferHandle s_particleVB;
-static u32 s_particleVBSize = 0;
-static nvrhi::BufferHandle s_quadIB;
-static u32 s_maxQuads = 0;
-
-// GPU culling manager
-static std::unique_ptr<ParticleGPUCullingManager> s_gpuCullingManager;
 static constexpr u32 MAX_GPU_PARTICLES = 65536;
 
-static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads)
+static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads, ParticlePassState& state)
 {
-    if (s_quadIB && s_maxQuads >= maxQuads)
+    if (state.quadIB && state.maxQuads >= maxQuads)
         return;
 
     u32 numIndices = maxQuads * 6;
@@ -80,22 +59,22 @@ static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads)
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
     ibDesc.keepInitialState = true;
 
-    s_quadIB = nvDevice->createBuffer(ibDesc);
-    if (!s_quadIB)
+    state.quadIB = nvDevice->createBuffer(ibDesc);
+    if (!state.quadIB)
         return;
 
     nvrhi::CommandListHandle cmdList = nvDevice->createCommandList();
     cmdList->open();
-    cmdList->writeBuffer(s_quadIB, indices.data(), indices.size() * sizeof(u16));
+    cmdList->writeBuffer(state.quadIB, indices.data(), indices.size() * sizeof(u16));
     cmdList->close();
     nvDevice->executeCommandList(cmdList);
 
-    s_maxQuads = maxQuads;
+    state.maxQuads = maxQuads;
 }
 
-static void EnsureParticleVertexBuffer(nvrhi::IDevice* nvDevice, u32 sizeBytes)
+static void EnsureParticleVertexBuffer(nvrhi::IDevice* nvDevice, u32 sizeBytes, ParticlePassState& state)
 {
-    if (s_particleVB && s_particleVBSize >= sizeBytes)
+    if (state.particleVB && state.particleVBSize >= sizeBytes)
         return;
 
     u32 allocSize = ((sizeBytes + 65535) / 65536) * 65536;
@@ -107,8 +86,8 @@ static void EnsureParticleVertexBuffer(nvrhi::IDevice* nvDevice, u32 sizeBytes)
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
     vbDesc.keepInitialState = true;
 
-    s_particleVB = nvDevice->createBuffer(vbDesc);
-    s_particleVBSize = s_particleVB ? allocSize : 0;
+    state.particleVB = nvDevice->createBuffer(vbDesc);
+    state.particleVBSize = state.particleVB ? allocSize : 0;
 }
 
 static void FillSprite(
@@ -284,9 +263,9 @@ static u32 CollectGPUParticleData(
     return totalParticles;
 }
 
-void InitializeParticlePipelines(ng::RenderDevice* device)
+void InitializeParticlePipelines(ng::RenderDevice* device, ParticlePassState& state)
 {
-    if (s_particleInitialized)
+    if (state.initialized)
         return;
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -344,25 +323,23 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials (t8)
         nvrhi::BindingLayoutItem::Sampler(0),                 // g_LinearSampler (s0)
     };
-    s_particleLayout = nvDevice->createBindingLayout(layoutDesc);
+    state.layout = nvDevice->createBindingLayout(layoutDesc);
 
-    // Load shaders
     auto vsResult = shaderLoader->LoadVertexShader("bindless_particle", "main");
     if (!vsResult.handle)
         return;
-    s_particleVS = vsResult.handle;
+    state.vs = vsResult.handle;
 
     auto psResult = shaderLoader->LoadPixelShader("bindless_particle", "main");
     if (!psResult.handle)
         return;
-    s_particlePS = psResult.handle;
+    state.ps = psResult.handle;
 
-    // Sampler
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
     samplerDesc.setAllFilters(true);
     samplerDesc.setMaxAnisotropy(8.0f);
-    s_particleSampler = nvDevice->createSampler(samplerDesc);
+    state.sampler = nvDevice->createSampler(samplerDesc);
 
     // Input layout (32 bytes per vertex — padded for Vulkan std430 stride)
     constexpr u32 stride = sizeof(ParticleVertex);
@@ -392,15 +369,14 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
             .setOffset(24)
             .setElementStride(stride),
     };
-    s_particleInputLayout = nvDevice->createInputLayout(attribs, 4, s_particleVS);
+    state.inputLayout = nvDevice->createInputLayout(attribs, 4, state.vs);
 
-    // Alpha blend pipeline
     {
         nvrhi::GraphicsPipelineDesc pipeDesc;
-        pipeDesc.VS = s_particleVS;
-        pipeDesc.PS = s_particlePS;
-        pipeDesc.inputLayout = s_particleInputLayout;
-        pipeDesc.bindingLayouts.push_back(s_particleLayout);
+        pipeDesc.VS = state.vs;
+        pipeDesc.PS = state.ps;
+        pipeDesc.inputLayout = state.inputLayout;
+        pipeDesc.bindingLayouts.push_back(state.layout);
         if (bindlessLayout)
             pipeDesc.bindingLayouts.push_back(bindlessLayout);
         pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
@@ -414,25 +390,23 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
         pipeDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
         pipeDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
 
-        s_particlePipelineBlend = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-        Msg("* [ParticlePass] Alpha blend pipeline: %s", s_particlePipelineBlend ? "OK" : "FAILED");
+        state.pipelineBlend = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+        Msg("* [ParticlePass] Alpha blend pipeline: %s", state.pipelineBlend ? "OK" : "FAILED");
 
-        // CRITICAL FIX: Query binding layout from pipeline
-        if (s_particlePipelineBlend) {
-            const nvrhi::GraphicsPipelineDesc& actualDesc = s_particlePipelineBlend->getDesc();
+        if (state.pipelineBlend) {
+            const nvrhi::GraphicsPipelineDesc& actualDesc = state.pipelineBlend->getDesc();
             if (!actualDesc.bindingLayouts.empty()) {
-                s_particleLayout = actualDesc.bindingLayouts[0];
+                state.layout = actualDesc.bindingLayouts[0];
             }
         }
     }
 
-    // Additive blend pipeline
     {
         nvrhi::GraphicsPipelineDesc pipeDesc;
-        pipeDesc.VS = s_particleVS;
-        pipeDesc.PS = s_particlePS;
-        pipeDesc.inputLayout = s_particleInputLayout;
-        pipeDesc.bindingLayouts.push_back(s_particleLayout);
+        pipeDesc.VS = state.vs;
+        pipeDesc.PS = state.ps;
+        pipeDesc.inputLayout = state.inputLayout;
+        pipeDesc.bindingLayouts.push_back(state.layout);
         if (bindlessLayout)
             pipeDesc.bindingLayouts.push_back(bindlessLayout);
         pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
@@ -446,57 +420,45 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
         pipeDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
         pipeDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::One;
 
-        s_particlePipelineAdd = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-        Msg("* [ParticlePass] Additive blend pipeline: %s", s_particlePipelineAdd ? "OK" : "FAILED");
+        state.pipelineAdd = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+        Msg("* [ParticlePass] Additive blend pipeline: %s", state.pipelineAdd ? "OK" : "FAILED");
 
-        // CRITICAL FIX: Query binding layout from pipeline
-        if (s_particlePipelineAdd) {
-            const nvrhi::GraphicsPipelineDesc& actualDesc = s_particlePipelineAdd->getDesc();
+        if (state.pipelineAdd) {
+            const nvrhi::GraphicsPipelineDesc& actualDesc = state.pipelineAdd->getDesc();
             if (!actualDesc.bindingLayouts.empty()) {
-                s_particleLayout = actualDesc.bindingLayouts[0];
+                state.layout = actualDesc.bindingLayouts[0];
             }
         }
     }
 
-    nvrhi::BufferDesc vcbDesc;
-    vcbDesc.isConstantBuffer = true;
-    vcbDesc.isVolatile = true;
-    vcbDesc.maxVersions = 16;
-    vcbDesc.byteSize = sizeof(DynamicTransforms);
-    s_dynTransformsCB = nvDevice->createBuffer(vcbDesc);
-    vcbDesc.byteSize = sizeof(StaticGlobals);
-    s_staticGlobalsCB = nvDevice->createBuffer(vcbDesc);
-
-    s_particleInitialized = true;
+    state.initialized = true;
     Msg("* [ParticlePass] Pipeline initialization complete");
 
-    // Initialize GPU culling manager
-    s_gpuCullingManager = std::make_unique<ParticleGPUCullingManager>();
-    if (!s_gpuCullingManager->Initialize(device, MAX_GPU_PARTICLES)) {
+    state.gpuCullingManager = xr_make_unique<ParticleGPUCullingManager>();
+    if (!state.gpuCullingManager->Initialize(device, MAX_GPU_PARTICLES)) {
         Msg("! [ParticlePass] GPU culling initialization failed, using CPU fallback");
-        s_gpuCullingManager.reset();
+        state.gpuCullingManager.reset();
     }
 }
 
-void ShutdownParticlePipelines()
+void ShutdownParticlePipelines(ParticlePassState& state)
 {
-    if (s_gpuCullingManager) {
-        s_gpuCullingManager->Shutdown();
-        s_gpuCullingManager.reset();
+    if (state.gpuCullingManager) {
+        state.gpuCullingManager->Shutdown();
+        state.gpuCullingManager.reset();
     }
-    s_particlePipelineBlend = nullptr;
-    s_particlePipelineAdd = nullptr;
-    s_particleLayout = nullptr;
-    s_particleInputLayout = nullptr;
-    s_particleVS = nullptr;
-    s_particlePS = nullptr;
-    s_particleSampler = nullptr;
-    s_particleBindingSet = nullptr;
-    s_particleVB = nullptr;
-    s_quadIB = nullptr;
-    s_particleVBSize = 0;
-    s_maxQuads = 0;
-    s_particleInitialized = false;
+    state.pipelineBlend = nullptr;
+    state.pipelineAdd = nullptr;
+    state.layout = nullptr;
+    state.inputLayout = nullptr;
+    state.vs = nullptr;
+    state.ps = nullptr;
+    state.sampler = nullptr;
+    state.particleVB = nullptr;
+    state.quadIB = nullptr;
+    state.particleVBSize = 0;
+    state.maxQuads = 0;
+    state.initialized = false;
 }
 
 DefaultOutputLayout setupParticlePass(
@@ -511,29 +473,12 @@ DefaultOutputLayout setupParticlePass(
     VirtualResourceHandle hiZPyramid,
     u32 hiZWidth,
     u32 hiZHeight,
-    u32 hiZMipLevels)
+    u32 hiZMipLevels,
+    ParticlePassState* state)
 {
-    struct ParticlePassData {
-        VirtualResourceHandle inputColor;
-        VirtualResourceHandle depth;
-        VirtualResourceHandle outputColor;
-        VirtualResourceHandle outputNormal;
-        VirtualResourceHandle hiZPyramid;
-        ng::RenderDevice* device;
-        const xr_vector<ParticleBatch>* worldParticleBatches;
-        const xr_vector<ParticleBatch>* hudParticleBatches;
-        MaterialCache* materialCache;
-        DefaultOutputLayout outputs;
-        u32 width;
-        u32 height;
-        u32 hiZWidth;
-        u32 hiZHeight;
-        u32 hiZMipLevels;
-    };
-
     auto& passData = fg.addCallbackPass<ParticlePassData>(
         "Particles",
-        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels](FrameGraph& builder, PassHandle passHandle, ParticlePassData& data) {
+        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, state](FrameGraph& builder, PassHandle passHandle, ParticlePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -546,6 +491,7 @@ DefaultOutputLayout setupParticlePass(
             data.hiZWidth = hiZWidth;
             data.hiZHeight = hiZHeight;
             data.hiZMipLevels = hiZMipLevels;
+            data.passState = state;
 
             // Add Hi-Z as read dependency if valid
             if (hiZPyramid.is_valid())
@@ -564,7 +510,7 @@ DefaultOutputLayout setupParticlePass(
             u32 totalWorld = data.worldParticleBatches ? (u32)data.worldParticleBatches->size() : 0;
             u32 totalHUD = data.hudParticleBatches ? (u32)data.hudParticleBatches->size() : 0;
 
-            if ((totalWorld == 0 && totalHUD == 0) || !s_particleInitialized)
+            if ((totalWorld == 0 && totalHUD == 0) || !data.passState || !data.passState->initialized)
                 return;
 
             auto* colorRT = fg.GetPhysicalTexture(data.outputColor);
@@ -594,8 +540,9 @@ DefaultOutputLayout setupParticlePass(
 
             const auto& rtDesc = colorRT->getDesc();
 
-            auto dynTransformsCB = s_dynTransformsCB.Get();
-            auto staticGlobalsCB = s_staticGlobalsCB.Get();
+            auto& cache = framegraph::GetPassResourceCache();
+            auto dynTransformsCB = cache.GetOrCreateVolatileCB("ParticlePass", "DynTransforms", sizeof(DynamicTransforms), 16, nvDevice).Get();
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ParticlePass", "StaticGlobals", sizeof(StaticGlobals), 16, nvDevice).Get();
 
             // Fill constants
             DynamicTransforms dynTrans = {};
@@ -615,9 +562,9 @@ DefaultOutputLayout setupParticlePass(
                 nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
                 nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-                nvrhi::BindingSetItem::Sampler(0, s_particleSampler),
+                nvrhi::BindingSetItem::Sampler(0, data.passState->sampler),
             };
-            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, s_particleLayout, nvDevice);
+            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, data.passState->layout, nvDevice);
 
             auto* backend = data.device->GetBackend();
             nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
@@ -629,7 +576,7 @@ DefaultOutputLayout setupParticlePass(
 
             // Check if GPU culling is available
             // TODO: Re-enable once GPU particle culling is debugged
-            bool useGPUCulling = s_gpuCullingManager && s_gpuCullingManager->IsReady() && hiZTexture;
+            bool useGPUCulling = data.passState->gpuCullingManager && data.passState->gpuCullingManager->IsReady() && hiZTexture;
 
             // Extract frustum planes at execute time (from current view matrix)
             Fvector4 frustumPlanes[6] = {};
@@ -655,19 +602,16 @@ DefaultOutputLayout setupParticlePass(
                     return;
 
                 // Clamp to max particles
-                if (totalParticles > s_gpuCullingManager->GetMaxParticles()) {
-                    gpuParticles.resize(s_gpuCullingManager->GetMaxParticles());
-                    totalParticles = s_gpuCullingManager->GetMaxParticles();
+                auto& gpuCull = *data.passState->gpuCullingManager;
+                if (totalParticles > gpuCull.GetMaxParticles()) {
+                    gpuParticles.resize(gpuCull.GetMaxParticles());
+                    totalParticles = gpuCull.GetMaxParticles();
                 }
 
-                // Upload particle data
-                s_gpuCullingManager->UploadParticleData(cmdList, gpuParticles);
+                gpuCull.UploadParticleData(cmdList, gpuParticles);
+                gpuCull.ClearVisibleCount(cmdList);
 
-                // Clear visible count
-                s_gpuCullingManager->ClearVisibleCount(cmdList);
-
-                // Dispatch culling
-                s_gpuCullingManager->DispatchCulling(
+                gpuCull.DispatchCulling(
                     cmdList,
                     hiZTexture,
                     Device.mFullTransform,
@@ -679,39 +623,36 @@ DefaultOutputLayout setupParticlePass(
                     data.hiZWidth, data.hiZHeight, data.hiZMipLevels
                 );
 
-                // Dispatch billboard generation
-                s_gpuCullingManager->DispatchBillboardGeneration(
+                gpuCull.DispatchBillboardGeneration(
                     cmdList,
                     Device.vCameraTop,
                     Device.vCameraRight,
                     totalParticles
                 );
 
-                // Ensure index buffer
-                EnsureQuadIndexBuffer(nvDevice, totalParticles);
-                if (!s_quadIB)
+                EnsureQuadIndexBuffer(nvDevice, totalParticles, *data.passState);
+                if (!data.passState->quadIB)
                     return;
 
-                // Setup graphics state
                 nvrhi::Viewport viewport(
                     0.0f, static_cast<float>(rtDesc.width),
                     0.0f, static_cast<float>(rtDesc.height),
                     depthMin, depthMax
                 );
 
-                nvrhi::GraphicsState state;
-                state.pipeline = s_particlePipelineBlend;
-                state.framebuffer = framebuffer;
-                state.bindings = { bindingSet };
+                nvrhi::GraphicsState gfxState;
+                gfxState.pipeline = data.passState->pipelineBlend;
+                gfxState.framebuffer = framebuffer;
+                gfxState.bindings = { bindingSet };
                 if (bindlessTable)
-                    state.addBindingSet(bindlessTable);
-                state.vertexBuffers = { {s_gpuCullingManager->GetVertexBuffer(), 0, 0} };
-                state.indexBuffer = { s_quadIB, nvrhi::Format::R16_UINT, 0 };
-                state.indirectParams = s_gpuCullingManager->GetDrawArgsBuffer();
-                state.viewport.addViewport(viewport);
-                state.viewport.addScissorRect(scissor);
+                    gfxState.addBindingSet(bindlessTable);
+                gfxState.vertexBuffers = { {gpuCull.GetVertexBuffer(), 0, 0} };
+                gfxState.indexBuffer = { data.passState->quadIB, nvrhi::Format::R16_UINT, 0 };
+                gfxState.indirectParams = gpuCull.GetDrawArgsBuffer();
+                gfxState.viewport.addViewport(viewport);
+                gfxState.viewport.addScissorRect(scissor);
 
-                cmdList->setGraphicsState(state);
+                cmdList->setGraphicsState(gfxState);
 
                 cmdList->drawIndexedIndirect(0, 1);
             };
@@ -724,13 +665,13 @@ DefaultOutputLayout setupParticlePass(
                 if (totalParticles == 0)
                     return;
 
-                EnsureParticleVertexBuffer(nvDevice, (u32)(vertices.size() * sizeof(ParticleVertex)));
-                EnsureQuadIndexBuffer(nvDevice, totalParticles);
+                EnsureParticleVertexBuffer(nvDevice, (u32)(vertices.size() * sizeof(ParticleVertex)), *data.passState);
+                EnsureQuadIndexBuffer(nvDevice, totalParticles, *data.passState);
 
-                if (!s_particleVB || !s_quadIB)
+                if (!data.passState->particleVB || !data.passState->quadIB)
                     return;
 
-                cmdList->writeBuffer(s_particleVB, vertices.data(), vertices.size() * sizeof(ParticleVertex));
+                cmdList->writeBuffer(data.passState->particleVB, vertices.data(), vertices.size() * sizeof(ParticleVertex));
 
                 nvrhi::Viewport viewport(
                     0.0f, static_cast<float>(rtDesc.width),
@@ -738,18 +679,18 @@ DefaultOutputLayout setupParticlePass(
                     depthMin, depthMax
                 );
 
-                nvrhi::GraphicsState state;
-                state.pipeline = s_particlePipelineBlend;
-                state.framebuffer = framebuffer;
-                state.bindings = { bindingSet };
+                nvrhi::GraphicsState gfxState;
+                gfxState.pipeline = data.passState->pipelineBlend;
+                gfxState.framebuffer = framebuffer;
+                gfxState.bindings = { bindingSet };
                 if (bindlessTable)
-                    state.addBindingSet(bindlessTable);
-                state.vertexBuffers = { {s_particleVB, 0, 0} };
-                state.indexBuffer = { s_quadIB, nvrhi::Format::R16_UINT, 0 };
-                state.viewport.addViewport(viewport);
-                state.viewport.addScissorRect(scissor);
+                    gfxState.addBindingSet(bindlessTable);
+                gfxState.vertexBuffers = { {data.passState->particleVB, 0, 0} };
+                gfxState.indexBuffer = { data.passState->quadIB, nvrhi::Format::R16_UINT, 0 };
+                gfxState.viewport.addViewport(viewport);
+                gfxState.viewport.addScissorRect(scissor);
 
-                cmdList->setGraphicsState(state);
+                cmdList->setGraphicsState(gfxState);
 
                 cmdList->drawIndexed(
                     nvrhi::DrawArguments()

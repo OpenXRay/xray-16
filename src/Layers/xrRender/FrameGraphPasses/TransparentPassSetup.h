@@ -35,14 +35,35 @@ struct TransparentPassConfig {
     }
 };
 
-void ShutdownTransparentPipelines();
+struct TransparentPassState {
+    nvrhi::GraphicsPipelineHandle pipeline;
+    nvrhi::BindingLayoutHandle layout;
+    nvrhi::InputLayoutHandle inputLayout;
+    nvrhi::SamplerHandle sampler;
+    nvrhi::ShaderHandle vs;
+    nvrhi::ShaderHandle ps;
+    bool initialized = false;
+};
+
+struct TransparentPassData {
+    framegraph::VirtualResourceHandle depth;
+    framegraph::VirtualResourceHandle color;
+    framegraph::VirtualResourceHandle normal;
+    ng::RenderDevice* device;
+    TransparentPassConfig config;
+    TransparentPassState* passState;
+    u32 width, height;
+};
+
+void ShutdownTransparentPipelines(TransparentPassState& state);
 
 framegraph::DefaultOutputLayout setupTransparentPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     const TransparentPassConfig& config,
-    u32 width, u32 height
+    u32 width, u32 height,
+    TransparentPassState& state
 );
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

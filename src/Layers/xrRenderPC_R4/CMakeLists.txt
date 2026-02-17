@@ -75,8 +75,6 @@ target_sources(xrRenderPC_R4 PRIVATE
     # FrameGraph Passes (Phase 3) - Renderer agnostic
     ../xrRender/FrameGraphPasses/ShaderConstants.h
     ../xrRender/FrameGraphPasses/ShaderConstants.cpp
-    ../xrRender/FrameGraphPasses/DepthPrepassSetup.h
-    ../xrRender/FrameGraphPasses/DepthPrepassSetup.cpp
     ../xrRender/FrameGraphPasses/ForwardColorPassSetup.h
     ../xrRender/FrameGraphPasses/ForwardColorPassSetup.cpp
     ../xrRender/FrameGraphPasses/HiZBuildPassSetup.h
@@ -103,6 +101,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/DetailPassSetup.cpp
     ../xrRender/FrameGraphPasses/TransparentPassSetup.h
     ../xrRender/FrameGraphPasses/TransparentPassSetup.cpp
+    ../xrRender/FrameGraphPasses/PassCommon.h
+    ../xrRender/FrameGraphPasses/PassCommon.cpp
 
     # Detail System (Framegraph) - Renderer agnostic
     ../xrRender/FGDetailManager.h

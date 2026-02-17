@@ -3,6 +3,8 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "PassVertexFormats.h"
+#include <nvrhi/nvrhi.h>
 
 // Forward declarations
 namespace xray::render {
@@ -41,7 +43,18 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 // - Epic Games: "Auto Exposure in UE 4.25" (2020)
 // - Hillaire: "A Scalable and Production Ready Sky and Atmosphere" (2020)
 
-// Exposure configuration
+struct ExposurePassState {
+    nvrhi::BufferHandle histogramBuffer;
+    nvrhi::TextureHandle exposureTexture;
+    nvrhi::ComputePipelineHandle histogramPipeline;
+    nvrhi::ComputePipelineHandle adaptPipeline;
+    nvrhi::BindingLayoutHandle histogramLayout;
+    nvrhi::BindingLayoutHandle adaptLayout;
+    bool initialized = false;
+    bool computeEnabled = false;
+    float currentExposure = 1.0f;
+};
+
 struct ExposureConfig {
     // Histogram parameters
     float minLogLuminance = -10.0f;  // Minimum log2 luminance (EV)
@@ -64,6 +77,18 @@ struct ExposureConfig {
     float calibrationConstant = 12.5f;  // Reflected-light meter constant K
 };
 
+struct ExposurePassData {
+    framegraph::VirtualResourceHandle sceneColor;
+    framegraph::VirtualResourceHandle exposureTexture;
+    framegraph::VirtualResourceHandle histogramBuffer;
+    ng::RenderDevice* device;
+    ExposureConfig config;
+    float deltaTime;
+    u32 width;
+    u32 height;
+    ExposurePassState* passState;
+};
+
 // Output handles from exposure pass
 struct ExposureOutput {
     framegraph::VirtualResourceHandle exposureTexture;  // 1x1 R32_FLOAT
@@ -75,18 +100,16 @@ struct ExposureOutput {
 ExposureOutput setupExposurePass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
-    framegraph::VirtualResourceHandle hdrSceneColor,  // HDR scene to analyze
+    framegraph::VirtualResourceHandle hdrSceneColor,
     const ExposureConfig& config,
-    float deltaTime,  // Frame delta for temporal adaptation
+    float deltaTime,
     u32 width,
-    u32 height
+    u32 height,
+    ExposurePassState& state
 );
 
-// Get default exposure config (Earth-like, game-friendly)
 ExposureConfig GetDefaultExposureConfig();
 
-// Get the physical NVRHI exposure texture directly (for tonemap pass)
-// This bypasses the framegraph virtual resource system to avoid state transition issues
-nvrhi::ITexture* GetExposureTexture();
+nvrhi::ITexture* GetExposureTexture(const ExposurePassState& state);
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

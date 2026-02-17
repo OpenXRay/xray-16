@@ -25,7 +25,6 @@
 #include <imgui.h>
 
 // Lambda-based pass setup functions
-#include "FrameGraphPasses/DepthPrepassSetup.h"      // Phase 2: Depth prepass for early-Z
 #include "FrameGraphPasses/HiZBuildPassSetup.h"      // Phase 3.5: Hi-Z pyramid for GPU culling
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering + pipeline init
 #include "GPUCullingManager.h"                       // Phase 3.5: GPU frustum/occlusion culling
@@ -43,6 +42,7 @@
 #include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
+#include "FrameGraphPasses/PassStates.h"             // Aggregate pass state (owns all per-pass state)
 #include "FrameGraphPasses/ImGuiPassSetup.h"
 
 #include "xrEngine/Environment.h"
@@ -161,9 +161,10 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     // ═══════════════════════════════════════════════════════
     //  INITIALIZE PASS RESOURCES
     // ═══════════════════════════════════════════════════════
-    passes::InitializeSkyGeometry(device);
-    passes::InitializeSunPass(device);
-    passes::InitializeTonemapPass(device->GetNVRHIDevice());
+    m_passStates = xr_make_unique<passes::PassStates>();
+    passes::InitializeSkyGeometry(device, m_passStates->sky);
+    passes::InitializeSunPass(device, m_passStates->sun);
+    passes::InitializeTonemapPass(device->GetNVRHIDevice(), m_passStates->tonemap);
 
     // ═══════════════════════════════════════════════════════
     //  PROFILER (GPU timing + ImGui overlay)
@@ -233,10 +234,16 @@ void FrameGraphRenderer::Shutdown() {
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
 
-    // Cleanup pass resources
-    passes::ShutdownSkyGeometry();
-    passes::ShutdownSunPass();
-    passes::ShutdownTonemapPass();
+    if (m_passStates) {
+        passes::ShutdownSkyGeometry(m_passStates->sky);
+        passes::ShutdownSunPass(m_passStates->sun);
+        passes::ShutdownTonemapPass(m_passStates->tonemap);
+        passes::ShutdownTransparentPipelines(m_passStates->transparent);
+        passes::ShutdownForwardPipelines(m_passStates->forwardColor);
+        passes::ShutdownSkinningPipelines(m_passStates->skinning);
+        passes::ShutdownParticlePipelines(m_passStates->particle);
+        m_passStates.reset();
+    }
 
     bindless::VariantTextureBuffer::Instance().Shutdown();
     bindless::MaterialBuffer::Instance().Shutdown();
@@ -267,13 +274,11 @@ void FrameGraphRenderer::Render() {
     //  EAGER PIPELINE INITIALIZATION (First frame only)
     // ═══════════════════════════════════════════════════════
     // Initialize forward pass pipelines on first render when ShaderLoader is ready
-    static bool s_pipelinesInitialized = false;
-    if (!s_pipelinesInitialized && m_device) {
-        passes::InitializeForwardPipelines(m_device);
-        passes::InitializeSkinningPipelines(m_device);
-        passes::InitializeParticlePipelines(m_device);
-        // Note: Detail pipelines initialized later (after shader loading, see line ~622)
-        s_pipelinesInitialized = true;
+    if (!m_pipelinesInitialized && m_device && m_passStates) {
+        passes::InitializeForwardPipelines(m_device, m_passStates->forwardColor);
+        passes::InitializeSkinningPipelines(m_device, m_passStates->skinning);
+        passes::InitializeParticlePipelines(m_device, m_passStates->particle);
+        m_pipelinesInitialized = true;
     }
 
     auto frameStart = std::chrono::high_resolution_clock::now();
@@ -474,7 +479,7 @@ void FrameGraphRenderer::RenderMenu() {
     auto sceneWithUI = passes::setupUIPass(*m_framegraph, backgroundTarget, width, height);
 
     // 3. Text Pass - Renders menu text
-    sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height);
+    sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height, m_passStates->uiText);
 
     // 4. Cursor Pass - Renders cursor
     sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
@@ -488,7 +493,8 @@ void FrameGraphRenderer::RenderMenu() {
         framegraph::VirtualResourceHandle(),  // No exposure for menu
         backbufferHandle,  // Output directly to imported backbuffer
         width,
-        height
+        height,
+        m_passStates->tonemap
     );
 
     // 6. ImGui Pass - Debug overlay on LDR output
@@ -843,7 +849,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_device,
             prevDepthHandle,
             width,
-            height
+            height,
+            m_passStates->hiZBuild
         );
     }
 
@@ -979,7 +986,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         depthBuffer,
         g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
         width,
-        height
+        height,
+        m_passStates->sky
     );
 
     // ═══════════════════════════════════════════════════════
@@ -991,10 +999,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     auto sunOutput = passes::setupSunPass(
         *m_framegraph,
         m_device,
-        skyOutput,  // Color buffer from sky pass
+        skyOutput,
         g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
         width,
-        height
+        height,
+        m_passStates->sun
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1065,7 +1074,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width,
         height,
         drawArgsBuffer,
-        bindlessConfig
+        bindlessConfig,
+        &m_passStates->forwardColor
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1118,12 +1128,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         *m_framegraph,
         m_device,
         forwardOutputs,
-        m_geometryCollector.get(),  // World skinned batches from GeometryCollector
-        &m_hudBatches,              // HUD skinned batches
+        m_geometryCollector.get(),
+        &m_hudBatches,
         m_materialCache.get(),
         width,
         height,
-        skinnedVisibility           // GPU culling visibility data
+        skinnedVisibility,
+        &m_passStates->skinning
     );
 
     auto particleOutputs = passes::setupParticlePass(
@@ -1135,10 +1146,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_materialCache.get(),
         width,
         height,
-        hizOutput.pyramid,       // Hi-Z pyramid for GPU particle culling
+        hizOutput.pyramid,
         hizOutput.width,
         hizOutput.height,
-        hizOutput.mipLevels
+        hizOutput.mipLevels,
+        &m_passStates->particle
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1153,15 +1165,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         *m_framegraph,
         m_device,
         m_detailManager.get(),
-        particleOutputs,          // Render on top of particles
+        particleOutputs,
         width,
         height,
-        hizOutput.pyramid,        // Hi-Z pyramid for GPU culling
+        hizOutput.pyramid,
         hizOutput.width,
         hizOutput.height,
         hizOutput.mipLevels,
-        m_hasPrevFrameData ? &m_prevViewProj : nullptr,  // Previous frame's viewProj for temporal Hi-Z
-        m_gpuProfiler.get()       // Sub-pass timing (cull vs draw)
+        m_hasPrevFrameData ? &m_prevViewProj : nullptr,
+        m_gpuProfiler.get(),
+        &m_passStates->detail
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1189,7 +1202,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_device,
         detailOutputs,
         transparentConfig,
-        width, height
+        width, height,
+        m_passStates->transparent
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1203,11 +1217,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     auto exposureOutput = passes::setupExposurePass(
         *m_framegraph,
         m_device,
-        transparentOutputs.albedo,  // HDR scene color (after transparent pass)
+        transparentOutputs.albedo,
         exposureConfig,
-        Device.fTimeDelta,       // Frame delta for temporal adaptation
+        Device.fTimeDelta,
         width,
-        height
+        height,
+        m_passStates->exposure
     );
 
     // Store exposure texture for future sky pass integration
@@ -1222,12 +1237,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
-    // 4. Text Pass - Renders text on top of UI
     sceneWithUI = passes::setupTextPass(
         *m_framegraph,
         sceneWithUI,
         width,
-        height
+        height,
+        m_passStates->uiText
     );
 
     // 5. Cursor Pass - Renders cursor on top of UI+Text
@@ -1243,11 +1258,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // Renders directly to backbuffer if available (Frostbite pattern)
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
-        sceneWithUI,  // HDR input (RGBA16_FLOAT)
-        exposureOutput.exposureTexture,  // Auto-exposure from histogram
-        backbufferHandle,  // Output directly to imported backbuffer
+        sceneWithUI,
+        exposureOutput.exposureTexture,
+        backbufferHandle,
         width,
-        height
+        height,
+        m_passStates->tonemap,
+        &m_passStates->exposure
     );
 
     // ═══════════════════════════════════════════════════════

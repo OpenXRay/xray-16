@@ -3,6 +3,8 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "PassVertexFormats.h"
+#include <nvrhi/nvrhi.h>
 
 // Forward declarations
 namespace xray::render {
@@ -48,7 +50,27 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 // - Wihlidal: "Optimizing the Graphics Pipeline with Compute" (GDC 2016)
 // - Ubisoft: "GPU-Driven Rendering Pipelines" (SIGGRAPH 2015)
 
-// Output structure for Hi-Z build pass
+struct HiZBuildPassState {
+    nvrhi::SamplerHandle pointSampler;
+    nvrhi::ComputePipelineHandle pipeline;
+    nvrhi::BindingLayoutHandle layout;
+    bool initialized = false;
+    bool computeEnabled = false;
+    u32 currentWidth = 0;
+    u32 currentHeight = 0;
+    u32 mipLevels = 0;
+};
+
+struct HiZBuildData {
+    framegraph::VirtualResourceHandle depthInput;
+    framegraph::VirtualResourceHandle hizPyramid;
+    ng::RenderDevice* device;
+    u32 width;
+    u32 height;
+    u32 mipLevels;
+    HiZBuildPassState* passState;
+};
+
 struct HiZPyramidOutput {
     framegraph::VirtualResourceHandle pyramid;  // R32_FLOAT with full mip chain
     u32 mipLevels;                              // Number of mip levels generated
@@ -67,7 +89,8 @@ HiZPyramidOutput setupHiZBuildPass(
     ng::RenderDevice* device,
     framegraph::VirtualResourceHandle depthInput,
     u32 width,
-    u32 height
+    u32 height,
+    HiZBuildPassState& state
 );
 
 // Get number of mip levels for given dimensions

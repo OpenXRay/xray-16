@@ -3,16 +3,31 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
-
-namespace nvrhi {
-    class IDevice;
-}
+#include <nvrhi/nvrhi.h>
 
 namespace xray::render::framegraph {
     class FrameGraph;
 }
 
 namespace xray::render::RENDER_NAMESPACE::passes {
+
+struct ExposurePassState;
+
+struct TonemapPassState {
+    nvrhi::TextureHandle fallbackExposureTexture;
+    bool initialized = false;
+};
+
+struct TonemapPassData {
+    framegraph::VirtualResourceHandle hdrInput;
+    framegraph::VirtualResourceHandle exposureInput;
+    framegraph::VirtualResourceHandle ldrOutput;
+    bool hasExposure;
+    u32 width;
+    u32 height;
+    TonemapPassState* passState;
+    const ExposurePassState* exposurePassState;
+};
 
 // Lambda-based tonemap pass setup
 // Converts HDR scene color (RGBA16_FLOAT) to LDR output (RGBA8_UNORM) using ACES filmic tonemap
@@ -22,16 +37,15 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 framegraph::VirtualResourceHandle setupTonemapPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle hdrInput,
-    framegraph::VirtualResourceHandle exposureTexture,  // 1x1 R32_FLOAT from ExposurePass (can be invalid for fixed exposure)
-    framegraph::VirtualResourceHandle outputTarget,     // Optional: imported backbuffer (invalid = create rt_Final)
+    framegraph::VirtualResourceHandle exposureTexture,
+    framegraph::VirtualResourceHandle outputTarget,
     u32 width,
-    u32 height
+    u32 height,
+    TonemapPassState& state,
+    const ExposurePassState* exposureState = nullptr
 );
 
-// Initialize tonemap pass resources (call once at startup)
-void InitializeTonemapPass(nvrhi::IDevice* device);
-
-// Shutdown tonemap pass resources
-void ShutdownTonemapPass();
+void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state);
+void ShutdownTonemapPass(TonemapPassState& state);
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

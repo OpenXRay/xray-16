@@ -23,52 +23,13 @@
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "PassCommon.h"
 #include "xrCore/FMesh.hpp"
 
 extern ENGINE_API float psHUD_FOV;
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 using namespace bindless;
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  SKINNED PIPELINE INFRASTRUCTURE (shared by World and HUD phases)
-// ═══════════════════════════════════════════════════════════════════════════
-
-// Non-HQ: 24 bytes (SHORT4 position, SHORT2 UV)
-static nvrhi::GraphicsPipelineHandle s_skinnedPipeline;
-static nvrhi::InputLayoutHandle s_skinnedInputLayout;
-static nvrhi::ShaderHandle s_skinnedVS;
-
-// HQ 1W: 36 bytes (FLOAT4 position, bone index in normal.w)
-static nvrhi::GraphicsPipelineHandle s_skinnedHQ1WPipeline;
-static nvrhi::InputLayoutHandle s_skinnedHQ1WInputLayout;
-static nvrhi::ShaderHandle s_skinnedHQ1WVS;
-
-// HQ 4W: 40 bytes (FLOAT4 position, BLENDINDICES)
-static nvrhi::GraphicsPipelineHandle s_skinnedHQ4WPipeline;
-static nvrhi::InputLayoutHandle s_skinnedHQ4WInputLayout;
-static nvrhi::ShaderHandle s_skinnedHQ4WVS;
-
-// HQ 2W: 44 bytes (FLOAT4 position, FLOAT4 UV+indices) - lerp blend
-static nvrhi::GraphicsPipelineHandle s_skinnedHQ2WPipeline;
-static nvrhi::InputLayoutHandle s_skinnedHQ2WInputLayout;
-static nvrhi::ShaderHandle s_skinnedHQ2WVS;
-
-// HQ 3W: 44 bytes (same layout as 2W, different weight formula)
-static nvrhi::GraphicsPipelineHandle s_skinnedHQ3WPipeline;
-static nvrhi::InputLayoutHandle s_skinnedHQ3WInputLayout;
-static nvrhi::ShaderHandle s_skinnedHQ3WVS;
-
-// Shared resources
-static nvrhi::BindingLayoutHandle s_skinnedLayout;
-static nvrhi::ShaderHandle s_skinnedPS;
-static nvrhi::SamplerHandle s_linearSampler;
-static nvrhi::BufferHandle s_dynTransformsCB;
-static nvrhi::BufferHandle s_staticGlobalsCB;
-static nvrhi::BufferHandle s_shaderParamsCB;
-static nvrhi::BufferHandle s_materialIdCB;
-static nvrhi::BufferHandle s_instanceSB;
-static bool s_skinnedInitialized = false;
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  HUD FOV ADJUSTMENT
@@ -98,9 +59,9 @@ static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
 //  PIPELINE INITIALIZATION
 // ═══════════════════════════════════════════════════════════════════════════
 
-void InitializeSkinningPipelines(ng::RenderDevice* device)
+void InitializeSkinningPipelines(ng::RenderDevice* device, SkinningPassState& state)
 {
-    if (s_skinnedInitialized)
+    if (state.initialized)
         return;
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -109,37 +70,7 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
 
     Msg("* [SkinningPass] Initializing skinned pipelines...");
 
-    // Create dummy framebuffer for pipeline creation
-    nvrhi::TextureDesc colorDesc;
-    colorDesc.width = 64;
-    colorDesc.height = 64;
-    colorDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    colorDesc.isRenderTarget = true;
-    colorDesc.initialState = nvrhi::ResourceStates::RenderTarget;
-    colorDesc.keepInitialState = true;
-    colorDesc.debugName = "SkinningInit_DummyColor";
-    auto dummyColorRT = nvDevice->createTexture(colorDesc);
-
-    nvrhi::TextureDesc normalDesc = colorDesc;
-    normalDesc.debugName = "SkinningInit_DummyNormal";
-    auto dummyNormalRT = nvDevice->createTexture(normalDesc);
-
-    nvrhi::TextureDesc depthDesc;
-    depthDesc.width = 64;
-    depthDesc.height = 64;
-    depthDesc.format = nvrhi::Format::D32;  // Changed from D24S8 to match framegraph
-    depthDesc.isRenderTarget = true;
-    depthDesc.initialState = nvrhi::ResourceStates::DepthWrite;
-    depthDesc.keepInitialState = true;
-    depthDesc.debugName = "SkinningInit_DummyDepth";
-    auto dummyDepthRT = nvDevice->createTexture(depthDesc);
-
-    nvrhi::FramebufferDesc fbDesc;
-    fbDesc.addColorAttachment(dummyColorRT);
-    fbDesc.addColorAttachment(dummyNormalRT);
-    fbDesc.setDepthAttachment(dummyDepthRT);
-    auto framebuffer = nvDevice->createFramebuffer(fbDesc);
-
+    auto framebuffer = CreateDummyPipelineFramebuffer(nvDevice);
     if (!framebuffer) {
         Msg("! [SkinningPass] Failed to create dummy framebuffer");
         return;
@@ -177,30 +108,25 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),   // g_VariantTextures (t10)
         nvrhi::BindingLayoutItem::Sampler(0),
     };
-    s_skinnedLayout = nvDevice->createBindingLayout(skinnedLayoutDesc);
+    state.layout = nvDevice->createBindingLayout(skinnedLayoutDesc);
 
-    // Load shared pixel shader
     auto skinnedPsResult = shaderLoader->LoadPixelShader("bindless_skinned", "main");
     if (!skinnedPsResult.handle) {
         Msg("! [SkinningPass] Failed to load pixel shader");
         return;
     }
-    s_skinnedPS = skinnedPsResult.handle;
+    state.ps = skinnedPsResult.handle;
 
-    // Create sampler
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
     samplerDesc.setAllFilters(true);
     samplerDesc.setMaxAnisotropy(16.0f);
-    s_linearSampler = nvDevice->createSampler(samplerDesc);
+    state.linearSampler = nvDevice->createSampler(samplerDesc);
 
-    // ═══════════════════════════════════════════════════════
-    //  NON-HQ PIPELINE (24-byte format)
-    // ═══════════════════════════════════════════════════════
     {
         auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned", "main");
         if (vsResult.handle) {
-            s_skinnedVS = vsResult.handle;
+            state.nonHQ.vs = vsResult.handle;
 
             constexpr u32 stride = 24;
             nvrhi::VertexAttributeDesc attribs[] = {
@@ -210,16 +136,16 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
                 nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
                 nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG16_SNORM).setOffset(20).setElementStride(stride),
             };
-            s_skinnedInputLayout = nvDevice->createInputLayout(attribs, 5, s_skinnedVS);
+            state.nonHQ.inputLayout = nvDevice->createInputLayout(attribs, 5, state.nonHQ.vs);
 
             nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = s_skinnedVS;
-            pipeDesc.PS = s_skinnedPS;
-            pipeDesc.inputLayout = s_skinnedInputLayout;
+            pipeDesc.VS = state.nonHQ.vs;
+            pipeDesc.PS = state.ps;
+            pipeDesc.inputLayout = state.nonHQ.inputLayout;
             if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { s_skinnedLayout, bindlessLayout };
+                pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
             } else {
-                pipeDesc.bindingLayouts = { s_skinnedLayout };
+                pipeDesc.bindingLayouts = { state.layout };
             }
             pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
             pipeDesc.renderState.depthStencilState.depthTestEnable = true;
@@ -228,26 +154,18 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
             pipeDesc.renderState.rasterState.frontCounterClockwise = false;
             pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-            s_skinnedPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinningPass] Non-HQ pipeline (24-byte): %s", s_skinnedPipeline ? "OK" : "FAILED");
+            state.nonHQ.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+            Msg("* [SkinningPass] Non-HQ pipeline (24-byte): %s", state.nonHQ.pipeline ? "OK" : "FAILED");
 
-            // CRITICAL FIX: Query binding layout from pipeline
-            if (s_skinnedPipeline) {
-                const nvrhi::GraphicsPipelineDesc& actualDesc = s_skinnedPipeline->getDesc();
-                if (!actualDesc.bindingLayouts.empty()) {
-                    s_skinnedLayout = actualDesc.bindingLayouts[0];
-                }
-            }
+            if (state.nonHQ.pipeline)
+                QueryBindingLayoutFromPipeline(state.nonHQ.pipeline, state.layout);
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  HQ 1W PIPELINE (36-byte format)
-    // ═══════════════════════════════════════════════════════
     {
         auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_hq", "main");
         if (vsResult.handle) {
-            s_skinnedHQ1WVS = vsResult.handle;
+            state.hq1w.vs = vsResult.handle;
 
             constexpr u32 stride = 36;
             nvrhi::VertexAttributeDesc attribs[] = {
@@ -257,16 +175,16 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
                 nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
                 nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
             };
-            s_skinnedHQ1WInputLayout = nvDevice->createInputLayout(attribs, 5, s_skinnedHQ1WVS);
+            state.hq1w.inputLayout = nvDevice->createInputLayout(attribs, 5, state.hq1w.vs);
 
             nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = s_skinnedHQ1WVS;
-            pipeDesc.PS = s_skinnedPS;
-            pipeDesc.inputLayout = s_skinnedHQ1WInputLayout;
+            pipeDesc.VS = state.hq1w.vs;
+            pipeDesc.PS = state.ps;
+            pipeDesc.inputLayout = state.hq1w.inputLayout;
             if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { s_skinnedLayout, bindlessLayout };
+                pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
             } else {
-                pipeDesc.bindingLayouts = { s_skinnedLayout };
+                pipeDesc.bindingLayouts = { state.layout };
             }
             pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
             pipeDesc.renderState.depthStencilState.depthTestEnable = true;
@@ -275,26 +193,18 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
             pipeDesc.renderState.rasterState.frontCounterClockwise = false;
             pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-            s_skinnedHQ1WPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinningPass] HQ 1W pipeline (36-byte): %s", s_skinnedHQ1WPipeline ? "OK" : "FAILED");
+            state.hq1w.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+            Msg("* [SkinningPass] HQ 1W pipeline (36-byte): %s", state.hq1w.pipeline ? "OK" : "FAILED");
 
-            // CRITICAL FIX: Query binding layout from pipeline
-            if (s_skinnedHQ1WPipeline) {
-                const nvrhi::GraphicsPipelineDesc& actualDesc = s_skinnedHQ1WPipeline->getDesc();
-                if (!actualDesc.bindingLayouts.empty()) {
-                    s_skinnedLayout = actualDesc.bindingLayouts[0];
-                }
-            }
+            if (state.hq1w.pipeline)
+                QueryBindingLayoutFromPipeline(state.hq1w.pipeline, state.layout);
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  HQ 4W PIPELINE (40-byte format)
-    // ═══════════════════════════════════════════════════════
     {
         auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_4w", "main");
         if (vsResult.handle) {
-            s_skinnedHQ4WVS = vsResult.handle;
+            state.hq4w.vs = vsResult.handle;
 
             constexpr u32 stride = 40;
             nvrhi::VertexAttributeDesc attribs[] = {
@@ -305,16 +215,16 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
                 nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
                 nvrhi::VertexAttributeDesc().setName("BLENDINDICES").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(36).setElementStride(stride),
             };
-            s_skinnedHQ4WInputLayout = nvDevice->createInputLayout(attribs, 6, s_skinnedHQ4WVS);
+            state.hq4w.inputLayout = nvDevice->createInputLayout(attribs, 6, state.hq4w.vs);
 
             nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = s_skinnedHQ4WVS;
-            pipeDesc.PS = s_skinnedPS;
-            pipeDesc.inputLayout = s_skinnedHQ4WInputLayout;
+            pipeDesc.VS = state.hq4w.vs;
+            pipeDesc.PS = state.ps;
+            pipeDesc.inputLayout = state.hq4w.inputLayout;
             if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { s_skinnedLayout, bindlessLayout };
+                pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
             } else {
-                pipeDesc.bindingLayouts = { s_skinnedLayout };
+                pipeDesc.bindingLayouts = { state.layout };
             }
             pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
             pipeDesc.renderState.depthStencilState.depthTestEnable = true;
@@ -323,26 +233,18 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
             pipeDesc.renderState.rasterState.frontCounterClockwise = false;
             pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-            s_skinnedHQ4WPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinningPass] HQ 4W pipeline (40-byte): %s", s_skinnedHQ4WPipeline ? "OK" : "FAILED");
+            state.hq4w.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+            Msg("* [SkinningPass] HQ 4W pipeline (40-byte): %s", state.hq4w.pipeline ? "OK" : "FAILED");
 
-            // CRITICAL FIX: Query binding layout from pipeline
-            if (s_skinnedHQ4WPipeline) {
-                const nvrhi::GraphicsPipelineDesc& actualDesc = s_skinnedHQ4WPipeline->getDesc();
-                if (!actualDesc.bindingLayouts.empty()) {
-                    s_skinnedLayout = actualDesc.bindingLayouts[0];
-                }
-            }
+            if (state.hq4w.pipeline)
+                QueryBindingLayoutFromPipeline(state.hq4w.pipeline, state.layout);
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  HQ 2W/3W PIPELINE (44-byte format)
-    // ═══════════════════════════════════════════════════════
     {
         auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_2w", "main");
         if (vsResult.handle) {
-            s_skinnedHQ2WVS = vsResult.handle;
+            state.hq2w.vs = vsResult.handle;
 
             constexpr u32 stride = 44;
             nvrhi::VertexAttributeDesc attribs[] = {
@@ -352,16 +254,16 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
                 nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
                 nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
             };
-            s_skinnedHQ2WInputLayout = nvDevice->createInputLayout(attribs, 5, s_skinnedHQ2WVS);
+            state.hq2w.inputLayout = nvDevice->createInputLayout(attribs, 5, state.hq2w.vs);
 
             nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = s_skinnedHQ2WVS;
-            pipeDesc.PS = s_skinnedPS;
-            pipeDesc.inputLayout = s_skinnedHQ2WInputLayout;
+            pipeDesc.VS = state.hq2w.vs;
+            pipeDesc.PS = state.ps;
+            pipeDesc.inputLayout = state.hq2w.inputLayout;
             if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { s_skinnedLayout, bindlessLayout };
+                pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
             } else {
-                pipeDesc.bindingLayouts = { s_skinnedLayout };
+                pipeDesc.bindingLayouts = { state.layout };
             }
             pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
             pipeDesc.renderState.depthStencilState.depthTestEnable = true;
@@ -370,26 +272,18 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
             pipeDesc.renderState.rasterState.frontCounterClockwise = false;
             pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-            s_skinnedHQ2WPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinningPass] HQ 2W pipeline (44-byte): %s", s_skinnedHQ2WPipeline ? "OK" : "FAILED");
+            state.hq2w.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+            Msg("* [SkinningPass] HQ 2W pipeline (44-byte): %s", state.hq2w.pipeline ? "OK" : "FAILED");
 
-            // CRITICAL FIX: Query binding layout from pipeline
-            if (s_skinnedHQ2WPipeline) {
-                const nvrhi::GraphicsPipelineDesc& actualDesc = s_skinnedHQ2WPipeline->getDesc();
-                if (!actualDesc.bindingLayouts.empty()) {
-                    s_skinnedLayout = actualDesc.bindingLayouts[0];
-                }
-            }
+            if (state.hq2w.pipeline)
+                QueryBindingLayoutFromPipeline(state.hq2w.pipeline, state.layout);
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  HQ 3W PIPELINE (44-byte format, different weight formula)
-    // ═══════════════════════════════════════════════════════
     {
         auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_3w", "main");
         if (vsResult.handle) {
-            s_skinnedHQ3WVS = vsResult.handle;
+            state.hq3w.vs = vsResult.handle;
 
             constexpr u32 stride = 44;
             nvrhi::VertexAttributeDesc attribs[] = {
@@ -399,16 +293,16 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
                 nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
                 nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
             };
-            s_skinnedHQ3WInputLayout = nvDevice->createInputLayout(attribs, 5, s_skinnedHQ3WVS);
+            state.hq3w.inputLayout = nvDevice->createInputLayout(attribs, 5, state.hq3w.vs);
 
             nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = s_skinnedHQ3WVS;
-            pipeDesc.PS = s_skinnedPS;
-            pipeDesc.inputLayout = s_skinnedHQ3WInputLayout;
+            pipeDesc.VS = state.hq3w.vs;
+            pipeDesc.PS = state.ps;
+            pipeDesc.inputLayout = state.hq3w.inputLayout;
             if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { s_skinnedLayout, bindlessLayout };
+                pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
             } else {
-                pipeDesc.bindingLayouts = { s_skinnedLayout };
+                pipeDesc.bindingLayouts = { state.layout };
             }
             pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
             pipeDesc.renderState.depthStencilState.depthTestEnable = true;
@@ -417,79 +311,29 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
             pipeDesc.renderState.rasterState.frontCounterClockwise = false;
             pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-            s_skinnedHQ3WPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinningPass] HQ 3W pipeline (44-byte): %s", s_skinnedHQ3WPipeline ? "OK" : "FAILED");
+            state.hq3w.pipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+            Msg("* [SkinningPass] HQ 3W pipeline (44-byte): %s", state.hq3w.pipeline ? "OK" : "FAILED");
 
-            // CRITICAL FIX: Query binding layout from pipeline
-            if (s_skinnedHQ3WPipeline) {
-                const nvrhi::GraphicsPipelineDesc& actualDesc = s_skinnedHQ3WPipeline->getDesc();
-                if (!actualDesc.bindingLayouts.empty()) {
-                    s_skinnedLayout = actualDesc.bindingLayouts[0];
-                }
-            }
+            if (state.hq3w.pipeline)
+                QueryBindingLayoutFromPipeline(state.hq3w.pipeline, state.layout);
         }
     }
 
-    // Note: Global bone buffer is now managed by GPUCullingManager
-    // and initialized via CreateSkinnedCullingBuffers()
-
-    nvrhi::BufferDesc vcbDesc;
-    vcbDesc.isConstantBuffer = true;
-    vcbDesc.isVolatile = true;
-
-    vcbDesc.byteSize = sizeof(DynamicTransforms);
-    vcbDesc.maxVersions = 1024;
-    s_dynTransformsCB = nvDevice->createBuffer(vcbDesc);
-
-    vcbDesc.byteSize = sizeof(StaticGlobals);
-    vcbDesc.maxVersions = 16;
-    s_staticGlobalsCB = nvDevice->createBuffer(vcbDesc);
-
-    vcbDesc.byteSize = sizeof(ShaderParams);
-    vcbDesc.maxVersions = 512;
-    s_shaderParamsCB = nvDevice->createBuffer(vcbDesc);
-
-    vcbDesc.byteSize = sizeof(SkinnedMaterialCB);
-    vcbDesc.maxVersions = 1024;
-    s_materialIdCB = nvDevice->createBuffer(vcbDesc);
-
-    nvrhi::BufferDesc instDesc;
-    instDesc.byteSize = sizeof(GPUSkinnedInstanceData);
-    instDesc.structStride = sizeof(GPUSkinnedInstanceData);
-    instDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-    instDesc.keepInitialState = true;
-    s_instanceSB = nvDevice->createBuffer(instDesc);
-
-    s_skinnedInitialized = true;
+    state.initialized = true;
     Msg("* [SkinningPass] Pipeline initialization complete");
 }
 
-void ShutdownSkinningPipelines()
+void ShutdownSkinningPipelines(SkinningPassState& state)
 {
-    s_skinnedPipeline = nullptr;
-    s_skinnedInputLayout = nullptr;
-    s_skinnedVS = nullptr;
-
-    s_skinnedHQ1WPipeline = nullptr;
-    s_skinnedHQ1WInputLayout = nullptr;
-    s_skinnedHQ1WVS = nullptr;
-
-    s_skinnedHQ4WPipeline = nullptr;
-    s_skinnedHQ4WInputLayout = nullptr;
-    s_skinnedHQ4WVS = nullptr;
-
-    s_skinnedHQ2WPipeline = nullptr;
-    s_skinnedHQ2WInputLayout = nullptr;
-    s_skinnedHQ2WVS = nullptr;
-
-    s_skinnedHQ3WPipeline = nullptr;
-    s_skinnedHQ3WInputLayout = nullptr;
-    s_skinnedHQ3WVS = nullptr;
-
-    s_skinnedLayout = nullptr;
-    s_skinnedPS = nullptr;
-    s_linearSampler = nullptr;
-    s_skinnedInitialized = false;
+    state.nonHQ = {};
+    state.hq1w = {};
+    state.hq2w = {};
+    state.hq3w = {};
+    state.hq4w = {};
+    state.layout = nullptr;
+    state.ps = nullptr;
+    state.linearSampler = nullptr;
+    state.initialized = false;
 
     Msg("* [SkinningPass] Pipeline resources released");
 }
@@ -512,39 +356,31 @@ enum {
     RM_SKINNING_4B_HQ = 10
 };
 
-static nvrhi::IGraphicsPipeline* SelectSkinnedPipeline(u32 vertexStride, u16 renderMode)
+static nvrhi::IGraphicsPipeline* SelectSkinnedPipeline(const SkinningPassState& state, u32 vertexStride, u16 renderMode)
 {
-    // Use renderMode to distinguish 2W vs 3W (both are 44 bytes)
-    if (renderMode == RM_SKINNING_3B || renderMode == RM_SKINNING_3B_HQ) {
-        return s_skinnedHQ3WPipeline.Get();
-    }
-    if (renderMode == RM_SKINNING_2B || renderMode == RM_SKINNING_2B_HQ) {
-        return s_skinnedHQ2WPipeline.Get();
-    }
-    if (renderMode == RM_SKINNING_4B || renderMode == RM_SKINNING_4B_HQ) {
-        return s_skinnedHQ4WPipeline.Get();
-    }
-    if (renderMode == RM_SKINNING_1B_HQ || renderMode == RM_SINGLE_HQ) {
-        return s_skinnedHQ1WPipeline.Get();
-    }
-    if (renderMode == RM_SKINNING_1B || renderMode == RM_SINGLE) {
-        return s_skinnedPipeline.Get();
-    }
+    if (renderMode == RM_SKINNING_3B || renderMode == RM_SKINNING_3B_HQ)
+        return state.hq3w.pipeline.Get();
+    if (renderMode == RM_SKINNING_2B || renderMode == RM_SKINNING_2B_HQ)
+        return state.hq2w.pipeline.Get();
+    if (renderMode == RM_SKINNING_4B || renderMode == RM_SKINNING_4B_HQ)
+        return state.hq4w.pipeline.Get();
+    if (renderMode == RM_SKINNING_1B_HQ || renderMode == RM_SINGLE_HQ)
+        return state.hq1w.pipeline.Get();
+    if (renderMode == RM_SKINNING_1B || renderMode == RM_SINGLE)
+        return state.nonHQ.pipeline.Get();
 
-    // Fallback: use vertex stride
     if (vertexStride == 36)
-        return s_skinnedHQ1WPipeline.Get();
+        return state.hq1w.pipeline.Get();
     if (vertexStride == 40)
-        return s_skinnedHQ4WPipeline.Get();
+        return state.hq4w.pipeline.Get();
     if (vertexStride == 44)
-        return s_skinnedHQ2WPipeline.Get();  // Default to 2W for 44-byte
+        return state.hq2w.pipeline.Get();
     if (vertexStride == 24)
-        return s_skinnedPipeline.Get();
+        return state.nonHQ.pipeline.Get();
 
-    // Last resort fallback
     if (vertexStride >= 36)
-        return s_skinnedHQ1WPipeline.Get();
-    return s_skinnedPipeline.Get();
+        return state.hq1w.pipeline.Get();
+    return state.nonHQ.pipeline.Get();
 }
 
 static u32 GetSkinnedVertexFormatID(u16 renderMode, u32 vertexStride)
@@ -560,14 +396,14 @@ static u32 GetSkinnedVertexFormatID(u16 renderMode, u32 vertexStride)
     return VF_SKINNED_NONHQ;
 }
 
-static nvrhi::IInputLayout* GetSkinnedInputLayout(u32 fmt)
+static nvrhi::IInputLayout* GetSkinnedInputLayout(const SkinningPassState& state, u32 fmt)
 {
     switch (fmt) {
-    case VF_SKINNED_HQ1W: return s_skinnedHQ1WInputLayout.Get();
-    case VF_SKINNED_HQ4W: return s_skinnedHQ4WInputLayout.Get();
-    case VF_SKINNED_HQ2W: return s_skinnedHQ2WInputLayout.Get();
-    case VF_SKINNED_HQ3W: return s_skinnedHQ3WInputLayout.Get();
-    default: return s_skinnedInputLayout.Get();
+    case VF_SKINNED_HQ1W: return state.hq1w.inputLayout.Get();
+    case VF_SKINNED_HQ4W: return state.hq4w.inputLayout.Get();
+    case VF_SKINNED_HQ2W: return state.hq2w.inputLayout.Get();
+    case VF_SKINNED_HQ3W: return state.hq3w.inputLayout.Get();
+    default: return state.nonHQ.inputLayout.Get();
     }
 }
 
@@ -603,6 +439,7 @@ static u32 GetSkeletonBoneOffset(
 // Each draw uploads a single GPUSkinnedInstanceData to instance buffer (t4).
 // This eliminates expensive per-draw bone matrix uploads (~3.7KB per draw).
 static void RenderSkinnedBatch(
+    const SkinningPassState& state,
     nvrhi::ICommandList* cmdList,
     nvrhi::IDevice* nvDevice,
     nvrhi::IFramebuffer* framebuffer,
@@ -658,9 +495,9 @@ static void RenderSkinnedBatch(
         nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMaterialsSB),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(10, bindless::VariantTextureBuffer::Instance().GetBuffer()),
-        nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
+        nvrhi::BindingSetItem::Sampler(0, state.linearSampler),
     };
-    auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, s_skinnedLayout, nvDevice);
+    auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, state.layout, nvDevice);
     if (!bindingSet)
         return;
 
@@ -679,25 +516,25 @@ static void RenderSkinnedBatch(
             u32 fmt = GetSkinnedVertexFormatID(batch.skinningRenderMode, batch.vertexStride);
             pipeline = VariantPSOCache::Instance().GetOrCreatePSO(
                 nvDevice, framebuffer, variantIdx, *variant, p, fmt,
-                GetSkinnedInputLayout(fmt), s_skinnedLayout, bindlessLayout);
+                GetSkinnedInputLayout(state, fmt), state.layout, bindlessLayout);
         } else {
-            pipeline = SelectSkinnedPipeline(batch.vertexStride, batch.skinningRenderMode);
+            pipeline = SelectSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode);
         }
         if (!pipeline)
             continue;
 
-        nvrhi::GraphicsState state;
-        state.pipeline = pipeline;
-        state.framebuffer = framebuffer;
-        state.bindings = { bindingSet };
+        nvrhi::GraphicsState gfxState;
+        gfxState.pipeline = pipeline;
+        gfxState.framebuffer = framebuffer;
+        gfxState.bindings = { bindingSet };
         if (bindlessTable)
-            state.addBindingSet(bindlessTable);
-        state.vertexBuffers = { {batch.vertexBuffer, 0, 0} };
-        state.indexBuffer = { batch.indexBuffer, nvrhi::Format::R16_UINT, 0 };
-        state.viewport.addViewport(viewport);
-        state.viewport.addScissorRect(scissor);
+            gfxState.addBindingSet(bindlessTable);
+        gfxState.vertexBuffers = { {batch.vertexBuffer, 0, 0} };
+        gfxState.indexBuffer = { batch.indexBuffer, nvrhi::Format::R16_UINT, 0 };
+        gfxState.viewport.addViewport(viewport);
+        gfxState.viewport.addScissorRect(scissor);
 
-        cmdList->setGraphicsState(state);
+        cmdList->setGraphicsState(gfxState);
         cmdList->drawIndexed(
             nvrhi::DrawArguments()
                 .setVertexCount(batch.indexCount)
@@ -719,22 +556,10 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     MaterialCache* materialCache,
     u32 width,
     u32 height,
-    const SkinnedVisibilityData& visibilityData)
+    const SkinnedVisibilityData& visibilityData,
+    SkinningPassState* state)
 {
     using namespace framegraph;
-
-    struct SkinningPassData {
-        VirtualResourceHandle color;
-        VirtualResourceHandle normal;
-        VirtualResourceHandle depth;
-        ng::RenderDevice* device;
-        const GeometryCollector* geometry;
-        const xr_vector<GeometryBatch>* hudBatches;
-        MaterialCache* materialCache;
-        u32 width, height;
-        DefaultOutputLayout outputs;
-        SkinnedVisibilityData visibilityData;
-    };
 
     auto& passData = fg.addCallbackPass<SkinningPassData>(
         "Skinning Pass",
@@ -742,7 +567,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA
         // ═══════════════════════════════════════════════════════
-        [&, width, height, visibilityData](FrameGraph& builder, PassHandle passHandle, SkinningPassData& data) {
+        [&, width, height, visibilityData, state](FrameGraph& builder, PassHandle passHandle, SkinningPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -752,6 +577,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             data.hudBatches = hudBatches;
             data.materialCache = materialCache;
             data.visibilityData = visibilityData;
+            data.passState = state;
 
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
@@ -785,8 +611,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 return;
             }
 
-            // Ensure pipelines are initialized
-            if (!s_skinnedInitialized) {
+            if (!data.passState || !data.passState->initialized) {
                 Msg("! [SkinningPass] Pipelines not initialized!");
                 return;
             }
@@ -807,7 +632,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             if (normalRT)
                 fbDesc.addColorAttachment(normalRT);
             fbDesc.setDepthAttachment(depthRT);
-            auto framebuffer = nvDevice->createFramebuffer(fbDesc);
+            auto framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer("SkinningPass", fbDesc, nvDevice);
             if (!framebuffer)
                 return;
 
@@ -829,11 +654,18 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             // Get global bone buffer for shader binding
             nvrhi::IBuffer* globalBoneBuffer = gpuCullMgr->GetGlobalBoneBuffer();
 
-            auto dynTransformsCB = s_dynTransformsCB.Get();
-            auto staticGlobalsCB = s_staticGlobalsCB.Get();
-            auto shaderParamsCB = s_shaderParamsCB.Get();
-            auto materialIdCB = s_materialIdCB.Get();
-            auto instanceSB = s_instanceSB.Get();
+            auto& cache = framegraph::GetPassResourceCache();
+            auto dynTransformsCB = cache.GetOrCreateVolatileCB("SkinningPass", "DynTransforms", sizeof(DynamicTransforms), 1024, nvDevice).Get();
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("SkinningPass", "StaticGlobals", sizeof(StaticGlobals), 16, nvDevice).Get();
+            auto shaderParamsCB = cache.GetOrCreateVolatileCB("SkinningPass", "ShaderParams", sizeof(ShaderParams), 512, nvDevice).Get();
+            auto materialIdCB = cache.GetOrCreateVolatileCB("SkinningPass", "MaterialId", sizeof(SkinnedMaterialCB), 1024, nvDevice).Get();
+
+            nvrhi::BufferDesc instDesc;
+            instDesc.byteSize = sizeof(GPUSkinnedInstanceData);
+            instDesc.structStride = sizeof(GPUSkinnedInstanceData);
+            instDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+            instDesc.keepInitialState = true;
+            auto instanceSB = cache.GetOrCreateStaticBuffer("SkinningPass", "InstanceSB", instDesc, nvDevice).Get();
 
             StaticGlobals staticGlobals;
             FillGlobalConstants(staticGlobals);
@@ -912,6 +744,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
 
                         RenderSkinnedBatch(
+                            *data.passState,
                             cmdList, nvDevice, framebuffer,
                             dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
                             globalBoneBuffer, terrainMatBuffer.GetBuffer(),
@@ -937,6 +770,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
 
                         RenderSkinnedBatch(
+                            *data.passState,
                             cmdList, nvDevice, framebuffer,
                             dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
                             globalBoneBuffer, terrainMatBuffer.GetBuffer(),
@@ -963,6 +797,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                     u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
 
                     RenderSkinnedBatch(
+                        *data.passState,
                         cmdList, nvDevice, framebuffer,
                         dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
                         globalBoneBuffer, terrainMatBuffer.GetBuffer(),

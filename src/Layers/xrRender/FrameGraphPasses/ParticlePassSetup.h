@@ -6,6 +6,8 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCore/xrCore.h"
+#include "PassVertexFormats.h"
+#include "ParticleGPUCullingManager.h"
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
@@ -45,44 +47,43 @@ struct ParticleBatch {
     u32 bindlessMaterialID = 0;  // Bindless material ID for texture lookup
 };
 
-// ═══════════════════════════════════════════════════════
-//  PARTICLE VERTEX FORMAT
-// ═══════════════════════════════════════════════════════
-// Extended format with material ID for batched rendering
-struct ParticleVertex {
-    Fvector p;       // Position (12 bytes)
-    u32 color;       // RGBA color (4 bytes)
-    Fvector2 t;      // Texcoord (8 bytes)
-    u32 materialID;  // Bindless material ID (4 bytes)
-    u32 _pad;        // Padding to match Vulkan std430 stride (4 bytes)
-    // Total: 32 bytes per vertex (std430: vec3 alignment=16 → struct alignment=16 → stride=32)
+struct ParticlePassState {
+    nvrhi::GraphicsPipelineHandle pipelineBlend;
+    nvrhi::GraphicsPipelineHandle pipelineAdd;
+    nvrhi::BindingLayoutHandle layout;
+    nvrhi::InputLayoutHandle inputLayout;
+    nvrhi::ShaderHandle vs;
+    nvrhi::ShaderHandle ps;
+    nvrhi::SamplerHandle sampler;
+    bool initialized = false;
+    nvrhi::BufferHandle particleVB;
+    u32 particleVBSize = 0;
+    nvrhi::BufferHandle quadIB;
+    u32 maxQuads = 0;
+    xr_unique_ptr<ParticleGPUCullingManager> gpuCullingManager;
 };
-static_assert(sizeof(ParticleVertex) == 32, "ParticleVertex must be 32 bytes to match Vulkan std430 stride");
 
-// ═══════════════════════════════════════════════════════
-//  GPU PARTICLE DATA (for GPU culling)
-// ═══════════════════════════════════════════════════════
-// Compact particle data uploaded to GPU for culling + billboard generation
-struct GPUParticleData {
-    Fvector position;   // 12 bytes - World position (billboard center)
-    float rotation;     //  4 bytes - Rotation angle (radians)
-    Fvector2 size;      //  8 bytes - Billboard half-extents
-    u32 color;          //  4 bytes - BGRA8 packed color
-    u32 materialID;     //  4 bytes - Bindless material index
-    Fvector2 uvMin;     //  8 bytes - UV top-left
-    Fvector2 uvMax;     //  8 bytes - UV bottom-right
-    // Total: 48 bytes per particle
+struct ParticlePassData {
+    framegraph::VirtualResourceHandle inputColor;
+    framegraph::VirtualResourceHandle depth;
+    framegraph::VirtualResourceHandle outputColor;
+    framegraph::VirtualResourceHandle outputNormal;
+    framegraph::VirtualResourceHandle hiZPyramid;
+    ng::RenderDevice* device;
+    const xr_vector<ParticleBatch>* worldParticleBatches;
+    const xr_vector<ParticleBatch>* hudParticleBatches;
+    MaterialCache* materialCache;
+    framegraph::DefaultOutputLayout outputs;
+    u32 width;
+    u32 height;
+    u32 hiZWidth;
+    u32 hiZHeight;
+    u32 hiZMipLevels;
+    ParticlePassState* passState;
 };
-static_assert(sizeof(GPUParticleData) == 48, "GPUParticleData must be 48 bytes");
 
-// ═══════════════════════════════════════════════════════
-//  PARTICLE PIPELINE MANAGEMENT
-// ═══════════════════════════════════════════════════════
-// Initialize particle pipelines (call once at startup)
-void InitializeParticlePipelines(ng::RenderDevice* device);
-
-// Shutdown particle pipelines (call at cleanup)
-void ShutdownParticlePipelines();
+void InitializeParticlePipelines(ng::RenderDevice* device, ParticlePassState& state);
+void ShutdownParticlePipelines(ParticlePassState& state);
 
 // ═══════════════════════════════════════════════════════
 //  PARTICLE PASS SETUP
@@ -104,7 +105,8 @@ framegraph::DefaultOutputLayout setupParticlePass(
     framegraph::VirtualResourceHandle hiZPyramid = {},  // Hi-Z pyramid for GPU culling
     u32 hiZWidth = 0,
     u32 hiZHeight = 0,
-    u32 hiZMipLevels = 0
+    u32 hiZMipLevels = 0,
+    ParticlePassState* state = nullptr
 );
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

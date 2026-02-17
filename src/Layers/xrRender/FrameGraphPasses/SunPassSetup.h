@@ -3,6 +3,7 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "PassVertexFormats.h"
 
 // Forward declarations
 class CEnvironment;
@@ -32,19 +33,33 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 // - Gradient (glow around sun)
 // - Lens flares (optional, along sun-screen axis)
 
+struct SunPassState {
+    nvrhi::TextureHandle placeholderTexture;
+    nvrhi::BufferHandle vertexBuffer;
+    nvrhi::BufferHandle indexBuffer;
+    bool initialized = false;
+};
+
+struct SunPassData {
+    framegraph::VirtualResourceHandle colorOutput;
+    ng::RenderDevice* device;
+    CEnvironment* environment;
+    u32 width;
+    u32 height;
+    SunPassState* passState;
+};
+
 framegraph::VirtualResourceHandle setupSunPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
-    framegraph::VirtualResourceHandle colorInput,  // Color buffer from sky pass
+    framegraph::VirtualResourceHandle colorInput,
     CEnvironment* environment,
     u32 width,
-    u32 height
+    u32 height,
+    SunPassState& state
 );
 
-// Initialize sun pass resources (call once at startup)
-void InitializeSunPass(ng::RenderDevice* device);
-
-// Shutdown sun pass resources
-void ShutdownSunPass();
+void InitializeSunPass(ng::RenderDevice* device, SunPassState& state);
+void ShutdownSunPass(SunPassState& state);
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

@@ -2,7 +2,7 @@
 // GPU-driven particle culling and billboard generation
 #pragma once
 
-#include "ParticlePassSetup.h"
+#include "PassVertexFormats.h"
 #include "xrCore/xrCore.h"
 #include <nvrhi/nvrhi.h>
 

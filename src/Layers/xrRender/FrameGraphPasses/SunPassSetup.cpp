@@ -19,23 +19,8 @@ namespace RENDER_NAMESPACE {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-// Sun vertex: position + color + UV
-#pragma pack(push, 1)
-struct SunVertex {
-    Fvector3 position;
-    u32 color;
-    float u, v;
-};
-#pragma pack(pop)
-
-static nvrhi::TextureHandle s_sunPlaceholderTexture;
-static nvrhi::BufferHandle s_sunVertexBuffer;
-static nvrhi::BufferHandle s_sunIndexBuffer;
-static nvrhi::BufferHandle s_dynamicCBBuffer;
-static bool s_sunPassInitialized = false;
-
-void InitializeSunPass(ng::RenderDevice* device) {
-    if (s_sunPassInitialized || !device) return;
+void InitializeSunPass(ng::RenderDevice* device, SunPassState& state) {
+    if (state.initialized || !device) return;
 
     auto* nvrhiDevice = device->GetNVRHIDevice();
     if (!nvrhiDevice) return;
@@ -48,7 +33,7 @@ void InitializeSunPass(ng::RenderDevice* device) {
     texDesc.debugName = "SunTexturePlaceholder";
     texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
     texDesc.keepInitialState = true;  // OK - static texture persists
-    s_sunPlaceholderTexture = nvrhiDevice->createTexture(texDesc);
+    state.placeholderTexture = nvrhiDevice->createTexture(texDesc);
 
     nvrhi::BufferDesc vbDesc;
     vbDesc.byteSize = 4 * sizeof(SunVertex);
@@ -56,7 +41,7 @@ void InitializeSunPass(ng::RenderDevice* device) {
     vbDesc.isVertexBuffer = true;
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
     vbDesc.keepInitialState = true;
-    s_sunVertexBuffer = nvrhiDevice->createBuffer(vbDesc);
+    state.vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
 
     nvrhi::BufferDesc ibDesc;
     ibDesc.byteSize = 6 * sizeof(u16);
@@ -64,33 +49,25 @@ void InitializeSunPass(ng::RenderDevice* device) {
     ibDesc.isIndexBuffer = true;
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
     ibDesc.keepInitialState = true;
-    s_sunIndexBuffer = nvrhiDevice->createBuffer(ibDesc);
+    state.indexBuffer = nvrhiDevice->createBuffer(ibDesc);
 
     nvrhi::CommandListHandle cmdList = nvrhiDevice->createCommandList();
     cmdList->open();
     u32 white = 0xFFFFFFFF;
-    cmdList->writeTexture(s_sunPlaceholderTexture, 0, 0, &white, sizeof(white));
+    cmdList->writeTexture(state.placeholderTexture, 0, 0, &white, sizeof(white));
     u16 indices[] = { 0, 1, 2, 2, 1, 3 };
-    cmdList->writeBuffer(s_sunIndexBuffer, indices, sizeof(indices));
+    cmdList->writeBuffer(state.indexBuffer, indices, sizeof(indices));
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
 
-    nvrhi::BufferDesc vcbDesc;
-    vcbDesc.isConstantBuffer = true;
-    vcbDesc.isVolatile = true;
-    vcbDesc.maxVersions = 16;
-    vcbDesc.byteSize = sizeof(DynamicTransforms);
-    vcbDesc.debugName = "SunDynamicTransforms";
-    s_dynamicCBBuffer = nvrhiDevice->createBuffer(vcbDesc);
-
-    s_sunPassInitialized = true;
+    state.initialized = true;
 }
 
-void ShutdownSunPass() {
-    s_sunPlaceholderTexture = nullptr;
-    s_sunVertexBuffer = nullptr;
-    s_sunIndexBuffer = nullptr;
-    s_sunPassInitialized = false;
+void ShutdownSunPass(SunPassState& state) {
+    state.placeholderTexture = nullptr;
+    state.vertexBuffer = nullptr;
+    state.indexBuffer = nullptr;
+    state.initialized = false;
 }
 
 framegraph::VirtualResourceHandle setupSunPass(
@@ -99,23 +76,16 @@ framegraph::VirtualResourceHandle setupSunPass(
     framegraph::VirtualResourceHandle colorInput,
     CEnvironment* environment,
     u32 width,
-    u32 height)
+    u32 height,
+    SunPassState& sunState)
 {
     using namespace framegraph;
-
-    struct SunPassData {
-        VirtualResourceHandle colorOutput;
-        ng::RenderDevice* device;
-        CEnvironment* environment;
-        u32 width;
-        u32 height;
-    };
 
     auto& passData = fg.addCallbackPass<SunPassData>(
         "Sun",
 
         // Setup lambda
-        [colorInput, device, environment, width, height](
+        [colorInput, device, environment, width, height, &sunState](
             FrameGraph& builder, PassHandle passHandle, SunPassData& data) {
 
             RenderPassBuilder passBuilder(builder, passHandle);
@@ -124,6 +94,7 @@ framegraph::VirtualResourceHandle setupSunPass(
             data.environment = environment;
             data.width = width;
             data.height = height;
+            data.passState = &sunState;
 
             // Read-Write color (sun adds to existing sky)
             data.colorOutput = passBuilder.readWrite(colorInput, ResourceState::RenderTarget);
@@ -136,44 +107,16 @@ framegraph::VirtualResourceHandle setupSunPass(
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
-            // Debug: Log that we're entering sun pass execute
-            static bool s_logOnce = true;
-            if (s_logOnce) {
-                Msg("* [SunPass] Execute lambda called");
-                s_logOnce = false;
-            }
-
-            // Get lens flare system
             CLensFlare* lensFlare = data.environment ? data.environment->eff_LensFlare : nullptr;
-            if (!lensFlare) {
-                static bool s_noLensFlare = true;
-                if (s_noLensFlare) {
-                    Msg("! [SunPass] No lens flare system (environment=%p)", data.environment);
-                    s_noLensFlare = false;
-                }
+            if (!lensFlare)
                 return;
-            }
 
-            // Get current lens flare descriptor (updated by OnFrame)
             CLensFlareDescriptor* flareDesc = lensFlare->GetCurrent();
-            if (!flareDesc) {
-                static bool s_noFlareDesc = true;
-                if (s_noFlareDesc) {
-                    Msg("! [SunPass] No flare descriptor");
-                    s_noFlareDesc = false;
-                }
+            if (!flareDesc)
                 return;
-            }
 
-            // Check if sun source should be rendered
-            if (!flareDesc->m_Flags.is(CLensFlareDescriptor::flSource)) {
-                static bool s_noSource = true;
-                if (s_noSource) {
-                    Msg("! [SunPass] flSource flag not set");
-                    s_noSource = false;
-                }
+            if (!flareDesc->m_Flags.is(CLensFlareDescriptor::flSource))
                 return;
-            }
 
             // Get sun direction from environment
             const CEnvDescriptorMixer& env = data.environment->CurrentEnv;
@@ -189,12 +132,6 @@ framegraph::VirtualResourceHandle setupSunPass(
             if (fDot <= 0.01f) {
                 // Don't log this - it's normal when looking away from sun
                 return;
-            }
-
-            static bool s_sunRendering = true;
-            if (s_sunRendering) {
-                Msg("* [SunPass] Rendering sun (fDot=%.3f)", fDot);
-                s_sunRendering = false;
             }
 
             // Calculate sun position on far plane
@@ -272,7 +209,7 @@ framegraph::VirtualResourceHandle setupSunPass(
             vertices[3].u = 1.0f;
             vertices[3].v = 1.0f;
 
-            cmdList->writeBuffer(s_sunVertexBuffer, vertices, sizeof(vertices));
+            cmdList->writeBuffer(data.passState->vertexBuffer, vertices, sizeof(vertices));
 
             // ═══════════════════════════════════════════════════════
             //  LOAD SUN SHADER
@@ -375,7 +312,8 @@ framegraph::VirtualResourceHandle setupSunPass(
             DynamicTransforms dynamicCB = {};
             FillDynamicTransforms(dynamicCB, Fidentity);
 
-            auto dynamicCBBuffer = s_dynamicCBBuffer.Get();
+            auto dynamicCBBuffer = framegraph::GetPassResourceCache().GetOrCreateVolatileCB(
+                "SunPass", "DynamicCB", sizeof(DynamicTransforms), 16, device);
             cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
             // ═══════════════════════════════════════════════════════
@@ -399,7 +337,7 @@ framegraph::VirtualResourceHandle setupSunPass(
 
             // Fallback to static placeholder if texture not available
             if (!sunTex) {
-                sunTex = s_sunPlaceholderTexture.Get();
+                sunTex = data.passState->placeholderTexture.Get();
             }
 
             // Create sampler (cached)
@@ -425,8 +363,8 @@ framegraph::VirtualResourceHandle setupSunPass(
             state.pipeline = pipeline;
             state.framebuffer = framebuffer;
             state.bindings = { bindingSet };
-            state.vertexBuffers = { { s_sunVertexBuffer, 0, 0 } };
-            state.indexBuffer = { s_sunIndexBuffer, nvrhi::Format::R16_UINT, 0 };
+            state.vertexBuffers = { { data.passState->vertexBuffer, 0, 0 } };
+            state.indexBuffer = { data.passState->indexBuffer, nvrhi::Format::R16_UINT, 0 };
             state.viewport = nvrhi::ViewportState().addViewportAndScissorRect(
                 nvrhi::Viewport((float)data.width, (float)data.height));
 

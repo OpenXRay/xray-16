@@ -3,6 +3,7 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "PassVertexFormats.h"
 
 // Forward declarations
 namespace xray::render {
@@ -36,22 +37,35 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 // - Renders directly to scene color buffer (behind geometry)
 // - Uses reverse-Z (z = w) for infinite far plane
 
-// Setup the sky pass
-// Returns handle to the color output (same as input, sky rendered behind)
+struct SkyPassState {
+    nvrhi::BufferHandle vertexBuffer;
+    nvrhi::BufferHandle indexBuffer;
+    nvrhi::TextureHandle placeholderCubemap;
+    bool initialized = false;
+};
+
+struct SkyPassData {
+    framegraph::VirtualResourceHandle colorOutput;
+    framegraph::VirtualResourceHandle depthOutput;
+    ng::RenderDevice* device;
+    CEnvironment* environment;
+    SkyPassState* passState;
+    u32 width;
+    u32 height;
+};
+
 framegraph::VirtualResourceHandle setupSkyPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
-    framegraph::VirtualResourceHandle colorInput,   // Scene color to render sky into
-    framegraph::VirtualResourceHandle depthInput,   // Depth buffer (for z-test)
-    CEnvironment* environment,                       // Environment system (sky textures, colors)
+    framegraph::VirtualResourceHandle colorInput,
+    framegraph::VirtualResourceHandle depthInput,
+    CEnvironment* environment,
     u32 width,
-    u32 height
+    u32 height,
+    SkyPassState& state
 );
 
-// Initialize sky geometry buffers (call once at startup)
-void InitializeSkyGeometry(ng::RenderDevice* device);
-
-// Shutdown sky geometry buffers
-void ShutdownSkyGeometry();
+void InitializeSkyGeometry(ng::RenderDevice* device, SkyPassState& state);
+void ShutdownSkyGeometry(SkyPassState& state);
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

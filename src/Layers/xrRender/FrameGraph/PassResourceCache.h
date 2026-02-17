@@ -86,9 +86,9 @@ public:
         nvrhi::IDevice* device);
 
     // ═══════════════════════════════════════════════════════
-    //  STATIC BUFFER CACHE
+    //  BUFFER CACHE
     // ═══════════════════════════════════════════════════════
-    // For index buffers, vertex buffers with static geometry
+    // For index buffers, vertex buffers, structured buffers
     // bufferName distinguishes multiple buffers within same pass
     nvrhi::BufferHandle GetOrCreateStaticBuffer(
         const char* passName,
@@ -96,7 +96,14 @@ public:
         const nvrhi::BufferDesc& desc,
         nvrhi::IDevice* device);
 
-    // Check if a buffer exists (for conditional initialization)
+    // Convenience: create a volatile constant buffer (builds BufferDesc internally)
+    nvrhi::BufferHandle GetOrCreateVolatileCB(
+        const char* passName,
+        const char* bufferName,
+        u32 byteSize,
+        u32 maxVersions,
+        nvrhi::IDevice* device);
+
     bool HasStaticBuffer(const char* passName, const char* bufferName) const;
 
     // ═══════════════════════════════════════════════════════

@@ -14,6 +14,14 @@ namespace xray::render::framegraph {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
+struct ImGuiPassData {
+    framegraph::VirtualResourceHandle input;
+    framegraph::VirtualResourceHandle output;
+    ng::ImGuiRendererNVRHI* renderer;
+    u32 width;
+    u32 height;
+};
+
 // Lambda-based ImGui pass setup
 // Renders ImGui interface on top of final output
 framegraph::VirtualResourceHandle setupImGuiPass(
