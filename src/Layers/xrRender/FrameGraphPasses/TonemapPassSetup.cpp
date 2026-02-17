@@ -14,11 +14,8 @@ namespace xray::render::RENDER_NAMESPACE {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-static nvrhi::TextureHandle s_fallbackExposureTexture;
-static bool s_tonemapPassInitialized = false;
-
-void InitializeTonemapPass(nvrhi::IDevice* device) {
-    if (s_tonemapPassInitialized || !device) return;
+void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state) {
+    if (state.initialized || !device) return;
 
     nvrhi::TextureDesc texDesc;
     texDesc.debugName = "FallbackExposure";
@@ -28,21 +25,21 @@ void InitializeTonemapPass(nvrhi::IDevice* device) {
     texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
     texDesc.keepInitialState = true;
 
-    s_fallbackExposureTexture = device->createTexture(texDesc);
+    state.fallbackExposureTexture = device->createTexture(texDesc);
 
     nvrhi::CommandListHandle cmdList = device->createCommandList();
     cmdList->open();
     float defaultExposure = 1.0f;
-    cmdList->writeTexture(s_fallbackExposureTexture, 0, 0, &defaultExposure, sizeof(float));
+    cmdList->writeTexture(state.fallbackExposureTexture, 0, 0, &defaultExposure, sizeof(float));
     cmdList->close();
     device->executeCommandList(cmdList);
 
-    s_tonemapPassInitialized = true;
+    state.initialized = true;
 }
 
-void ShutdownTonemapPass() {
-    s_fallbackExposureTexture = nullptr;
-    s_tonemapPassInitialized = false;
+void ShutdownTonemapPass(TonemapPassState& state) {
+    state.fallbackExposureTexture = nullptr;
+    state.initialized = false;
 }
 
 framegraph::VirtualResourceHandle setupTonemapPass(
@@ -51,18 +48,11 @@ framegraph::VirtualResourceHandle setupTonemapPass(
     framegraph::VirtualResourceHandle exposureTexture,
     framegraph::VirtualResourceHandle outputTarget,
     u32 width,
-    u32 height)
+    u32 height,
+    TonemapPassState& tonemapState,
+    const ExposurePassState* exposureState)
 {
     using namespace framegraph;
-
-    struct TonemapPassData {
-        VirtualResourceHandle hdrInput;
-        VirtualResourceHandle exposureInput;
-        VirtualResourceHandle ldrOutput;
-        bool hasExposure;
-        u32 width;
-        u32 height;
-    };
 
     bool hasExposure = exposureTexture.is_valid();
     bool hasOutputTarget = outputTarget.is_valid();
@@ -70,12 +60,14 @@ framegraph::VirtualResourceHandle setupTonemapPass(
     auto& passData = fg.addCallbackPass<TonemapPassData>(
         "Tonemap",
 
-        [hdrInput, exposureTexture, outputTarget, hasExposure, hasOutputTarget, width, height](FrameGraph& builder, PassHandle passHandle, TonemapPassData& data) {
+        [hdrInput, exposureTexture, outputTarget, hasExposure, hasOutputTarget, width, height, &tonemapState, exposureState](FrameGraph& builder, PassHandle passHandle, TonemapPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
             data.height = height;
             data.hasExposure = hasExposure;
+            data.passState = &tonemapState;
+            data.exposurePassState = exposureState;
 
             data.hdrInput = passBuilder.read(hdrInput, ResourceState::ShaderResource);
 
@@ -108,7 +100,8 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             auto* hdrTexture = fg.GetPhysicalTexture(data.hdrInput);
             auto* ldrTexture = fg.GetPhysicalTexture(data.ldrOutput);
 
-            auto* exposureTexture = data.hasExposure ? passes::GetExposureTexture() : nullptr;
+            auto* exposureTexture = (data.hasExposure && data.exposurePassState)
+                ? passes::GetExposureTexture(*data.exposurePassState) : nullptr;
 
             if (!hdrTexture || !ldrTexture) {
                 Msg("! [TonemapPass] Failed to get textures");
@@ -181,7 +174,7 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             nvrhi::ITexture* exposureToUse = exposureTexture;
             if (!exposureToUse) {
-                exposureToUse = s_fallbackExposureTexture.Get();
+                exposureToUse = data.passState->fallbackExposureTexture.Get();
             }
 
             if (!exposureToUse) {

@@ -2,6 +2,7 @@
 #include "UIPassSetup.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
@@ -80,13 +81,6 @@ framegraph::VirtualResourceHandle setupUIPass(
     u32 height)
 {
     using namespace framegraph;
-
-    struct UIPassData {
-        VirtualResourceHandle sceneInput;
-        VirtualResourceHandle sceneOutput;
-        u32 width;
-        u32 height;
-    };
 
     auto& passData = fg.addCallbackPass<UIPassData>(
         "UI",
@@ -171,24 +165,20 @@ framegraph::VirtualResourceHandle setupTextPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle uiTarget,
     u32 width,
-    u32 height)
+    u32 height,
+    UITextPassState& state)
 {
     using namespace framegraph;
-
-    struct TextPassData {
-        VirtualResourceHandle uiTarget;
-        u32 width;
-        u32 height;
-    };
 
     auto& passData = fg.addCallbackPass<TextPassData>(
         "Text",
 
-        [uiTarget, width, height](FrameGraph& builder, PassHandle passHandle, TextPassData& data) {
+        [uiTarget, width, height, &state](FrameGraph& builder, PassHandle passHandle, TextPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
             data.height = height;
+            data.passState = &state;
 
             data.uiTarget = passBuilder.readWrite(uiTarget, ResourceState::RenderTarget);
         },
@@ -216,18 +206,7 @@ framegraph::VirtualResourceHandle setupTextPass(
             }
             extern ENGINE_API Fvector2 g_current_font_scale;
 
-            static nvrhi::BufferHandle s_vertexBuffer;
-            static nvrhi::BufferHandle s_indexBuffer;
-            static nvrhi::BufferHandle s_constantBuffer;
-            struct TextVertex {
-                float x, y, z, w;
-                u32 color;
-                float u, v;
-            };
-
-            static bool s_initialized = false;
-
-            if (!s_initialized) {
+            if (!data.passState->initialized) {
                 constexpr u32 MAX_TEXT_VERTICES = 16384;
                 constexpr u32 MAX_TEXT_INDICES = MAX_TEXT_VERTICES / 4 * 6;
 
@@ -240,7 +219,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                 vbDesc.isVolatile = false;
                 vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
                 vbDesc.keepInitialState = true;
-                s_vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
+                data.passState->vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
 
                 xr_vector<u16> quadIndices;
                 quadIndices.reserve(MAX_TEXT_INDICES);
@@ -261,29 +240,13 @@ framegraph::VirtualResourceHandle setupTextPass(
                 ibDesc.isVolatile = false;
                 ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
                 ibDesc.keepInitialState = true;
-                s_indexBuffer = nvrhiDevice->createBuffer(ibDesc);
+                data.passState->indexBuffer = nvrhiDevice->createBuffer(ibDesc);
 
-                cmdList->writeBuffer(s_indexBuffer, quadIndices.data(), quadIndices.size() * sizeof(u16));
+                cmdList->writeBuffer(data.passState->indexBuffer, quadIndices.data(), quadIndices.size() * sizeof(u16));
 
-                nvrhi::BufferDesc cbDesc;
-                cbDesc.byteSize = 16;
-                cbDesc.isConstantBuffer = true;
-                cbDesc.debugName = "TextPass screen_res CB";
-                cbDesc.isVolatile = true;
-                cbDesc.maxVersions = 16;
-                cbDesc.keepInitialState = true;
-                cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-                s_constantBuffer = nvrhiDevice->createBuffer(cbDesc);
-
-                s_initialized = true;
+                data.passState->initialized = true;
                 Msg("* [TextPass] Initialized buffers");
             }
-
-            struct FontBatch {
-                CGameFont* font;
-                xr_vector<TextVertex> vertices;
-                u32 numStrings;
-            };
 
             xr_vector<FontBatch> fontBatches;
 
@@ -410,15 +373,13 @@ framegraph::VirtualResourceHandle setupTextPass(
             passDesc.clearColor = false;
             ctx->BeginRenderPass(passDesc);
 
-            struct ScreenResCB {
-                float width, height, invWidth, invHeight;
-            };
             ScreenResCB cbData;
             cbData.width = (float)data.width;
             cbData.height = (float)data.height;
             cbData.invWidth = 1.0f / cbData.width;
             cbData.invHeight = 1.0f / cbData.height;
-            ctx->WriteBuffer(s_constantBuffer.Get(), &cbData, sizeof(ScreenResCB));
+            auto screenResCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("TextPass", "ScreenResCB", sizeof(ScreenResCB), 16, device->GetNVRHIDevice());
+            ctx->WriteBuffer(screenResCB.Get(), &cbData, sizeof(ScreenResCB));
 
             ctx->SetViewport(0, 0, (float)data.width, (float)data.height);
 
@@ -461,19 +422,15 @@ framegraph::VirtualResourceHandle setupTextPass(
                 constexpr u32 MAX_TEXT_VERTICES = 16384;
                 const u32 vertexCount = std::min(static_cast<u32>(batch.vertices.size()), MAX_TEXT_VERTICES);
                 if (vertexCount < batch.vertices.size()) {
-                    static bool s_warnOnce = false;
-                    if (!s_warnOnce) {
-                        Msg("! [TextPass] Vertex count %zu exceeds buffer capacity %u, truncating", batch.vertices.size(), MAX_TEXT_VERTICES);
-                        s_warnOnce = true;
-                    }
+                    Msg("! [TextPass] Vertex count %zu exceeds buffer capacity %u, truncating", batch.vertices.size(), MAX_TEXT_VERTICES);
                 }
-                cmdList->writeBuffer(s_vertexBuffer, batch.vertices.data(), vertexCount * sizeof(TextVertex));
+                cmdList->writeBuffer(data.passState->vertexBuffer, batch.vertices.data(), vertexCount * sizeof(TextVertex));
 
-                cmdList->setBufferState(s_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
+                cmdList->setBufferState(data.passState->vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
 
                 ctx->SetPipeline(pso->pso->GetNativePipeline());
-                ctx->SetVertexBuffer(0, s_vertexBuffer.Get(), 0);
-                ctx->SetIndexBuffer(s_indexBuffer.Get(), nvrhi::Format::R16_UINT, 0);
+                ctx->SetVertexBuffer(0, data.passState->vertexBuffer.Get(), 0);
+                ctx->SetIndexBuffer(data.passState->indexBuffer.Get(), nvrhi::Format::R16_UINT, 0);
                 ctx->SetBindingSet(0, pso->vsBindingSet.Get());
                 if (pso->psBindingSet)
                     ctx->SetBindingSet(1, pso->psBindingSet.Get());
@@ -509,12 +466,6 @@ framegraph::VirtualResourceHandle setupCursorPass(
     u32 height)
 {
     using namespace framegraph;
-
-    struct CursorPassData {
-        VirtualResourceHandle uiTarget;
-        u32 width;
-        u32 height;
-    };
 
     auto& passData = fg.addCallbackPass<CursorPassData>(
         "Cursor",

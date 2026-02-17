@@ -48,6 +48,13 @@ public:
         const nvrhi::BufferDesc& desc,
         nvrhi::IDevice* device);
 
+    nvrhi::BufferHandle GetOrCreateVolatileCB(
+        const char* passName,
+        const char* bufferName,
+        u32 byteSize,
+        u32 maxVersions,
+        nvrhi::IDevice* device);
+
     bool HasStaticBuffer(const char* passName, const char* bufferName) const;
 
     nvrhi::BindingSetHandle GetOrCreateBindingSet(

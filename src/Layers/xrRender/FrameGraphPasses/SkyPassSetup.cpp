@@ -57,24 +57,8 @@ static u16 hbox_faces[20 * 3] = {
     4,   6, 11
 };
 
-#pragma pack(push, 1)
-struct SkyVertex {
-    Fvector3 position;
-    u32 color;
-    Fvector3 texcoord0;
-    Fvector3 texcoord1;
-};
-#pragma pack(pop)
-
-static nvrhi::BufferHandle s_skyVertexBuffer;
-static nvrhi::BufferHandle s_skyIndexBuffer;
-static nvrhi::TextureHandle s_placeholderCubemap;
-static nvrhi::BufferHandle s_dynamicCBBuffer;
-static nvrhi::BufferHandle s_staticCBBuffer;
-static bool s_skyGeometryInitialized = false;
-
-void InitializeSkyGeometry(ng::RenderDevice* device) {
-    if (s_skyGeometryInitialized || !device) return;
+void InitializeSkyGeometry(ng::RenderDevice* device, SkyPassState& state) {
+    if (state.initialized || !device) return;
 
     auto* nvrhiDevice = device->GetNVRHIDevice();
     if (!nvrhiDevice) return;
@@ -85,7 +69,7 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
     vbDesc.isVertexBuffer = true;
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
     vbDesc.keepInitialState = true;
-    s_skyVertexBuffer = nvrhiDevice->createBuffer(vbDesc);
+    state.vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
 
     nvrhi::BufferDesc ibDesc;
     ibDesc.byteSize = 20 * 3 * sizeof(u16);
@@ -93,7 +77,7 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
     ibDesc.isIndexBuffer = true;
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
     ibDesc.keepInitialState = true;
-    s_skyIndexBuffer = nvrhiDevice->createBuffer(ibDesc);
+    state.indexBuffer = nvrhiDevice->createBuffer(ibDesc);
     
     nvrhi::TextureDesc placeholderDesc;
     placeholderDesc.width = 1;
@@ -104,42 +88,31 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
     placeholderDesc.debugName = "PlaceholderSkyCubemap";
     placeholderDesc.initialState = nvrhi::ResourceStates::ShaderResource;
     placeholderDesc.keepInitialState = true;
-    s_placeholderCubemap = nvrhiDevice->createTexture(placeholderDesc);
+    state.placeholderCubemap = nvrhiDevice->createTexture(placeholderDesc);
 
     if (GEnv.Backend) {
-        GEnv.Backend->UploadBufferData(s_skyIndexBuffer, hbox_faces, sizeof(hbox_faces));
+        GEnv.Backend->UploadBufferData(state.indexBuffer, hbox_faces, sizeof(hbox_faces));
     }
 
     nvrhi::CommandListHandle cmdList = nvrhiDevice->createCommandList();
     cmdList->open();
     u32 skyBlue = 0xFF8080FF;
     for (u32 face = 0; face < 6; face++) {
-        cmdList->writeTexture(s_placeholderCubemap, face, 0, &skyBlue, sizeof(skyBlue));
+        cmdList->writeTexture(state.placeholderCubemap, face, 0, &skyBlue, sizeof(skyBlue));
     }
 
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
 
-    nvrhi::BufferDesc vcbDesc;
-    vcbDesc.isConstantBuffer = true;
-    vcbDesc.isVolatile = true;
-    vcbDesc.maxVersions = 16;
-    vcbDesc.byteSize = sizeof(DynamicTransforms);
-    vcbDesc.debugName = "SkyDynamicTransforms";
-    s_dynamicCBBuffer = nvrhiDevice->createBuffer(vcbDesc);
-    vcbDesc.byteSize = sizeof(StaticGlobals);
-    vcbDesc.debugName = "SkyStaticGlobals";
-    s_staticCBBuffer = nvrhiDevice->createBuffer(vcbDesc);
-
-    s_skyGeometryInitialized = true;
+    state.initialized = true;
     Msg("* [SkyPass] Sky geometry initialized");
 }
 
-void ShutdownSkyGeometry() {
-    s_skyVertexBuffer = nullptr;
-    s_skyIndexBuffer = nullptr;
-    s_placeholderCubemap = nullptr;
-    s_skyGeometryInitialized = false;
+void ShutdownSkyGeometry(SkyPassState& state) {
+    state.vertexBuffer = nullptr;
+    state.indexBuffer = nullptr;
+    state.placeholderCubemap = nullptr;
+    state.initialized = false;
 }
 
 framegraph::VirtualResourceHandle setupSkyPass(
@@ -149,29 +122,22 @@ framegraph::VirtualResourceHandle setupSkyPass(
     framegraph::VirtualResourceHandle depthInput,
     CEnvironment* environment,
     u32 width,
-    u32 height)
+    u32 height,
+    SkyPassState& skyState)
 {
     using namespace framegraph;
-
-    struct SkyPassData {
-        VirtualResourceHandle colorOutput;
-        VirtualResourceHandle depthOutput;
-        ng::RenderDevice* device;
-        CEnvironment* environment;
-        u32 width;
-        u32 height;
-    };
 
     auto& passData = fg.addCallbackPass<SkyPassData>(
         "Sky",
 
-        [colorInput, depthInput, device, environment, width, height](
+        [colorInput, depthInput, device, environment, width, height, &skyState](
             FrameGraph& builder, PassHandle passHandle, SkyPassData& data) {
 
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.device = device;
             data.environment = environment;
+            data.passState = &skyState;
             data.width = width;
             data.height = height;
 
@@ -184,7 +150,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
            const FrameGraph& fg,
            ng::RenderContext* ctx) {
 
-            if (!data.environment || !s_skyGeometryInitialized) {
+            if (!data.environment || !data.passState->initialized) {
                 return;
             }
 
@@ -219,7 +185,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
                 vertices[v].texcoord1 = hbox_verts[v * 2 + 1];
             }
 
-            cmdList->writeBuffer(s_skyVertexBuffer, vertices, sizeof(vertices));
+            cmdList->writeBuffer(data.passState->vertexBuffer, vertices, sizeof(vertices));
 
             if (!RImplementation.m_shaderLoader) {
                 Msg("! [SkyPass] ShaderLoader not initialized");
@@ -303,7 +269,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
             DynamicTransforms dynamicCB = {};
             FillDynamicTransforms(dynamicCB, mSky);
 
-            auto dynamicCBBuffer = s_dynamicCBBuffer.Get();
+            auto dynamicCBBuffer = cache.GetOrCreateVolatileCB("SkyPass", "DynamicCB", sizeof(DynamicTransforms), 16, device);
             cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
             StaticGlobals staticCB = {};
@@ -312,7 +278,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
             GetSunLightData(sunData, 2.0f);
             FillSunConstants(staticCB, sunData);
 
-            auto staticCBBuffer = s_staticCBBuffer.Get();
+            auto staticCBBuffer = cache.GetOrCreateVolatileCB("SkyPass", "StaticCB", sizeof(StaticGlobals), 16, device);
             cmdList->writeBuffer(staticCBBuffer, &staticCB, sizeof(staticCB));
 
             nvrhi::ITexture* sky0Tex = nullptr;
@@ -335,8 +301,8 @@ framegraph::VirtualResourceHandle setupSkyPass(
                 }
             }
 
-            if (!sky0Tex) sky0Tex = s_placeholderCubemap.Get();
-            if (!sky1Tex) sky1Tex = s_placeholderCubemap.Get();
+            if (!sky0Tex) sky0Tex = data.passState->placeholderCubemap.Get();
+            if (!sky1Tex) sky1Tex = data.passState->placeholderCubemap.Get();
 
             nvrhi::SamplerDesc samplerDesc;
             samplerDesc.setAllFilters(true);
@@ -352,7 +318,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
                 nvrhi::BindingSetItem::Sampler(0, sampler)
             };
 
-            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindingSetDesc, bindingLayout, cmdList->getDevice());
+            auto bindingSet = cache.GetOrCreateBindingSet(bindingSetDesc, bindingLayout, device);
 
             cmdList->clearTextureFloat(colorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f));
 
@@ -373,8 +339,8 @@ framegraph::VirtualResourceHandle setupSkyPass(
             state.framebuffer = framebuffer;
             state.viewport.addViewportAndScissorRect(viewport);
             state.addBindingSet(bindingSet);
-            state.vertexBuffers = {{s_skyVertexBuffer, 0, 0}};
-            state.indexBuffer = {s_skyIndexBuffer, nvrhi::Format::R16_UINT, 0};
+            state.vertexBuffers = {{data.passState->vertexBuffer, 0, 0}};
+            state.indexBuffer = {data.passState->indexBuffer, nvrhi::Format::R16_UINT, 0};
 
             cmdList->setGraphicsState(state);
 

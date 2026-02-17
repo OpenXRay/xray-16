@@ -13,6 +13,14 @@ namespace xray::render::framegraph {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
+struct ImGuiPassData {
+    framegraph::VirtualResourceHandle input;
+    framegraph::VirtualResourceHandle output;
+    ng::ImGuiRendererNVRHI* renderer;
+    u32 width;
+    u32 height;
+};
+
 framegraph::VirtualResourceHandle setupImGuiPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle inputTarget,

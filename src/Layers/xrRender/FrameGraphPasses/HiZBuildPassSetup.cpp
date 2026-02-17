@@ -21,28 +21,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 
 using namespace framegraph;
 
-static ref_cs s_hiz_build_cs;
-
-static nvrhi::BufferHandle s_hiz_cb;
-static nvrhi::SamplerHandle s_point_sampler;
-
-static nvrhi::ComputePipelineHandle s_hiz_pipeline;
-static nvrhi::BindingLayoutHandle s_hiz_layout;
-
-static bool s_initialized = false;
-static bool s_compute_enabled = false;
-static u32 s_current_width = 0;
-static u32 s_current_height = 0;
-static u32 s_mip_levels = 0;
-
-struct HiZCB {
-    u32 outputWidth;
-    u32 outputHeight;
-    u32 inputMipLevel;
-    u32 isFirstMip;
-};
-
-static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 height)
+static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 height, HiZBuildPassState& state)
 {
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice) {
@@ -50,39 +29,24 @@ static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 heig
         return;
     }
 
-    bool needsReinit = !s_initialized ||
-                       s_current_width != width ||
-                       s_current_height != height;
+    bool needsReinit = !state.initialized ||
+                       state.currentWidth != width ||
+                       state.currentHeight != height;
 
     if (!needsReinit) {
         return;
     }
 
-    if (!s_initialized) {
-        s_hiz_build_cs.create("hiz_build");
+    if (!state.initialized) {
+        ref_cs hiz_build_cs;
+        hiz_build_cs.create("hiz_build");
 
-        if (s_hiz_build_cs && s_hiz_build_cs->nvrhiShader) {
+        if (hiz_build_cs && hiz_build_cs->nvrhiShader) {
             Msg("* [HiZBuild] Loaded hiz_build compute shader: OK");
-            s_compute_enabled = true;
+            state.computeEnabled = true;
         } else {
             Msg("! [HiZBuild] hiz_build.cs not found - Hi-Z culling disabled");
-            s_compute_enabled = false;
-        }
-
-        nvrhi::BufferDesc cbDesc;
-        cbDesc.debugName = "HiZCB";
-        cbDesc.byteSize = sizeof(HiZCB);
-        cbDesc.isConstantBuffer = true;
-        cbDesc.isVolatile = true;
-        cbDesc.maxVersions = 64;
-        cbDesc.keepInitialState = true;
-        cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-        s_hiz_cb = nvDevice->createBuffer(cbDesc);
-
-        if (s_hiz_cb) {
-            Msg("* [HiZBuild] Constant buffer created: %p, size=%d", s_hiz_cb.Get(), sizeof(HiZCB));
-        } else {
-            Msg("! [HiZBuild] Failed to create constant buffer!");
+            state.computeEnabled = false;
         }
 
         auto& cache = framegraph::GetPassResourceCache();
@@ -94,9 +58,9 @@ static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 heig
         samplerDesc.addressU = nvrhi::SamplerAddressMode::Clamp;
         samplerDesc.addressV = nvrhi::SamplerAddressMode::Clamp;
         samplerDesc.addressW = nvrhi::SamplerAddressMode::Clamp;
-        s_point_sampler = cache.GetOrCreateSampler("HiZBuildPass", samplerDesc, nvDevice);
+        state.pointSampler = cache.GetOrCreateSampler("HiZBuildPass", samplerDesc, nvDevice);
 
-        if (s_compute_enabled) {
+        if (state.computeEnabled) {
             nvrhi::BindingLayoutDesc layoutDesc;
             layoutDesc.visibility = nvrhi::ShaderType::Compute;
             layoutDesc.bindings = {
@@ -105,34 +69,34 @@ static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 heig
                 nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
                 nvrhi::BindingLayoutItem::Sampler(0)
             };
-            s_hiz_layout = cache.GetOrCreateBindingLayout("HiZBuildPass", layoutDesc, nvDevice);
+            state.layout = cache.GetOrCreateBindingLayout("HiZBuildPass", layoutDesc, nvDevice);
 
-            if (s_hiz_layout) {
+            if (state.layout) {
                 nvrhi::ComputePipelineDesc pipeDesc;
-                pipeDesc.CS = s_hiz_build_cs->nvrhiShader;
-                pipeDesc.bindingLayouts = { s_hiz_layout };
-                s_hiz_pipeline = cache.GetOrCreateComputePipeline("HiZBuildPass", pipeDesc, nvDevice);
+                pipeDesc.CS = hiz_build_cs->nvrhiShader;
+                pipeDesc.bindingLayouts = { state.layout };
+                state.pipeline = cache.GetOrCreateComputePipeline("HiZBuildPass", pipeDesc, nvDevice);
 
-                if (s_hiz_pipeline) {
+                if (state.pipeline) {
                     Msg("* [HiZBuild] Compute pipeline created successfully");
                 } else {
                     Msg("! [HiZBuild] Failed to create compute pipeline");
-                    s_compute_enabled = false;
+                    state.computeEnabled = false;
                 }
             } else {
                 Msg("! [HiZBuild] Failed to create binding layout");
-                s_compute_enabled = false;
+                state.computeEnabled = false;
             }
         }
     }
 
-    s_current_width = width;
-    s_current_height = height;
-    s_mip_levels = CalculateHiZMipLevels(width, height);
+    state.currentWidth = width;
+    state.currentHeight = height;
+    state.mipLevels = CalculateHiZMipLevels(width, height);
 
-    Msg("* [HiZBuild] Initialized: %dx%d, %d mips (texture managed by FrameGraph)", width, height, s_mip_levels);
+    Msg("* [HiZBuild] Initialized: %dx%d, %d mips (texture managed by FrameGraph)", width, height, state.mipLevels);
 
-    s_initialized = true;
+    state.initialized = true;
 }
 
 HiZPyramidOutput setupHiZBuildPass(
@@ -140,11 +104,12 @@ HiZPyramidOutput setupHiZBuildPass(
     ng::RenderDevice* device,
     VirtualResourceHandle depthInput,
     u32 width,
-    u32 height)
+    u32 height,
+    HiZBuildPassState& hizState)
 {
-    InitializeHiZResources(device, width, height);
+    InitializeHiZResources(device, width, height, hizState);
 
-    if (!s_compute_enabled) {
+    if (!hizState.computeEnabled) {
         Msg("! [HiZBuild] Compute disabled, returning invalid output");
         HiZPyramidOutput output;
         output.pyramid = VirtualResourceHandle();
@@ -153,16 +118,6 @@ HiZPyramidOutput setupHiZBuildPass(
         output.height = height;
         return output;
     }
-
-    struct HiZBuildData {
-        VirtualResourceHandle depthInput;
-        VirtualResourceHandle hizPyramid;
-
-        ng::RenderDevice* device;
-        u32 width;
-        u32 height;
-        u32 mipLevels;
-    };
 
     u32 hizWidth = std::max(1u, width / 2);
     u32 hizHeight = std::max(1u, height / 2);
@@ -190,9 +145,9 @@ HiZPyramidOutput setupHiZBuildPass(
             data.width = hizWidth;
             data.height = hizHeight;
             data.mipLevels = hizMipLevels;
+            data.passState = &hizState;
 
             data.depthInput = passBuilder.read(depthInput, ResourceState::ShaderResource);
-
             data.hizPyramid = passBuilder.write(hizHandle, ResourceState::UnorderedAccess);
         },
 
@@ -200,7 +155,7 @@ HiZPyramidOutput setupHiZBuildPass(
            const FrameGraph& fg,
            ng::RenderContext* ctx) {
 
-            if (!s_compute_enabled || !s_hiz_pipeline) {
+            if (!data.passState->computeEnabled || !data.passState->pipeline) {
                 return;
             }
 
@@ -221,7 +176,8 @@ HiZPyramidOutput setupHiZBuildPass(
                 return;
             }
 
-            if (!s_hiz_cb) {
+            auto hizCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("HiZBuild", "HiZCB", sizeof(HiZCB), 64, nvDevice);
+            if (!hizCB) {
                 Msg("! [HiZBuild] Constant buffer is NULL at execute time!");
                 return;
             }
@@ -238,7 +194,7 @@ HiZPyramidOutput setupHiZBuildPass(
                 cb.inputMipLevel = 0;
                 cb.isFirstMip = (mip == 0) ? 1 : 0;
 
-                cmdList->writeBuffer(s_hiz_cb, &cb, sizeof(cb));
+                cmdList->writeBuffer(hizCB, &cb, sizeof(cb));
 
                 nvrhi::BindingSetDesc bindDesc;
 
@@ -266,11 +222,11 @@ HiZPyramidOutput setupHiZBuildPass(
                     nvrhi::BindingSetItem::Texture_UAV(0, hizTexture, nvrhi::Format::R32_FLOAT, outputSubres));
 
                 bindDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::ConstantBuffer(5, s_hiz_cb));
+                    nvrhi::BindingSetItem::ConstantBuffer(5, hizCB));
                 bindDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::Sampler(0, s_point_sampler));
+                    nvrhi::BindingSetItem::Sampler(0, data.passState->pointSampler));
 
-                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, s_hiz_layout);
+                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, data.passState->layout);
 
                 if (!bindingSet) {
                     Msg("! [HiZBuild] Failed to create binding set for mip %d", mip);
@@ -278,7 +234,7 @@ HiZPyramidOutput setupHiZBuildPass(
                 }
 
                 nvrhi::ComputeState state;
-                state.pipeline = s_hiz_pipeline;
+                state.pipeline = data.passState->pipeline;
                 state.bindings = { bindingSet };
                 cmdList->setComputeState(state);
 

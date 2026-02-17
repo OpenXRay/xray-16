@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ParticlePassSetup.h"
+#include "PassVertexFormats.h"
 #include "xrCore/xrCore.h"
 #include <nvrhi/nvrhi.h>
 

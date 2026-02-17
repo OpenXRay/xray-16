@@ -17,6 +17,7 @@ namespace xray::render::RENDER_NAMESPACE {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
     struct ParticleBatch;
+    struct PassStates;
 }
 
 namespace xray::render::ng {
@@ -91,7 +92,10 @@ public:
 
 private:
     bool m_enabled = false;
+    bool m_pipelinesInitialized = false;
     ng::RenderDevice* m_device = nullptr;
+
+    xr_unique_ptr<RENDER_NAMESPACE::passes::PassStates> m_passStates;
 
     xr_unique_ptr<framegraph::FrameGraph> m_framegraph;
 

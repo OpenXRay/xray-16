@@ -2,6 +2,8 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "PassVertexFormats.h"
+#include <nvrhi/nvrhi.h>
 
 namespace xray::render {
     namespace ng {
@@ -14,6 +16,18 @@ namespace xray::render::framegraph {
 }
 
 namespace xray::render::RENDER_NAMESPACE::passes {
+
+struct ExposurePassState {
+    nvrhi::BufferHandle histogramBuffer;
+    nvrhi::TextureHandle exposureTexture;
+    nvrhi::ComputePipelineHandle histogramPipeline;
+    nvrhi::ComputePipelineHandle adaptPipeline;
+    nvrhi::BindingLayoutHandle histogramLayout;
+    nvrhi::BindingLayoutHandle adaptLayout;
+    bool initialized = false;
+    bool computeEnabled = false;
+    float currentExposure = 1.0f;
+};
 
 struct ExposureConfig {
     float minLogLuminance = -10.0f;
@@ -32,6 +46,18 @@ struct ExposureConfig {
     float calibrationConstant = 12.5f;
 };
 
+struct ExposurePassData {
+    framegraph::VirtualResourceHandle sceneColor;
+    framegraph::VirtualResourceHandle exposureTexture;
+    framegraph::VirtualResourceHandle histogramBuffer;
+    ng::RenderDevice* device;
+    ExposureConfig config;
+    float deltaTime;
+    u32 width;
+    u32 height;
+    ExposurePassState* passState;
+};
+
 struct ExposureOutput {
     framegraph::VirtualResourceHandle exposureTexture;
     framegraph::VirtualResourceHandle histogramBuffer;
@@ -44,11 +70,12 @@ ExposureOutput setupExposurePass(
     const ExposureConfig& config,
     float deltaTime,
     u32 width,
-    u32 height
+    u32 height,
+    ExposurePassState& state
 );
 
 ExposureConfig GetDefaultExposureConfig();
 
-nvrhi::ITexture* GetExposureTexture();
+nvrhi::ITexture* GetExposureTexture(const ExposurePassState& state);
 
 }

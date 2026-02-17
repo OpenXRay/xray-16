@@ -156,12 +156,12 @@
     <ClInclude Include="..\xrRender\dxEnvironmentRender.h" />
     <ClInclude Include="..\xrRender\dxFontRender.h" />
     <ClInclude Include="..\xrRender\dxImGuiRender.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\SkinningPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\PassVertexFormats.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticleGPUCullingManager.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.h" />
@@ -171,6 +171,8 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\SunPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\DetailPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\PassCommon.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\PassStates.h" />
     <ClInclude Include="..\xrRender\FGDetailManager.h" />
     <ClInclude Include="..\..\..\Externals\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\xrRender\ImGuiRendererNVRHI.h" />
@@ -404,7 +406,6 @@
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp" />
     <ClCompile Include="..\xrRender\dxFontRender.cpp" />
     <ClCompile Include="..\xrRender\dxImGuiRender.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\SkinningPassSetup.cpp" />
@@ -419,6 +420,7 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\SunPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\DetailPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\PassCommon.cpp" />
     <ClCompile Include="..\xrRender\FGDetailManager.cpp" />
     <ClCompile Include="..\xrRender\ImGuiRendererNVRHI.cpp" />
     <ClCompile Include="..\xrRender\ImGuiRendererNVRHI_Shaders.cpp" />

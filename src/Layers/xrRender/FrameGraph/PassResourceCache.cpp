@@ -194,6 +194,27 @@ bool PassResourceCache::HasStaticBuffer(const char* passName, const char* buffer
     return m_staticBuffers.find(key) != m_staticBuffers.end();
 }
 
+nvrhi::BufferHandle PassResourceCache::GetOrCreateVolatileCB(
+    const char* passName, const char* bufferName,
+    u32 byteSize, u32 maxVersions, nvrhi::IDevice* device)
+{
+    u64 key = HashCombine(HashString(passName), HashString(bufferName));
+    auto it = m_staticBuffers.find(key);
+    if (it != m_staticBuffers.end()) {
+        m_stats.bufferHits++;
+        return it->second;
+    }
+    m_stats.bufferMisses++;
+    nvrhi::BufferDesc desc;
+    desc.byteSize = byteSize;
+    desc.isConstantBuffer = true;
+    desc.isVolatile = true;
+    desc.maxVersions = maxVersions;
+    auto buffer = device->createBuffer(desc);
+    if (buffer) m_staticBuffers[key] = buffer;
+    return buffer;
+}
+
 static u64 HashBindingSetDesc(const nvrhi::BindingSetDesc& desc, nvrhi::IBindingLayout* layout) {
     u64 hash = PassResourceCache::HashPointer(layout);
     for (const auto& item : desc.bindings) {

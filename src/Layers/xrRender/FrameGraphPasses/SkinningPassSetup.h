@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
+#include <nvrhi/nvrhi.h>
 
 namespace xray::render {
     struct GeometryBatch;
@@ -20,9 +21,26 @@ namespace xray::render::framegraph {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-void InitializeSkinningPipelines(ng::RenderDevice* device);
+struct SkinningPipelineVariant {
+    nvrhi::GraphicsPipelineHandle pipeline;
+    nvrhi::InputLayoutHandle inputLayout;
+    nvrhi::ShaderHandle vs;
+};
 
-void ShutdownSkinningPipelines();
+struct SkinningPassState {
+    SkinningPipelineVariant nonHQ;
+    SkinningPipelineVariant hq1w;
+    SkinningPipelineVariant hq2w;
+    SkinningPipelineVariant hq3w;
+    SkinningPipelineVariant hq4w;
+    nvrhi::BindingLayoutHandle layout;
+    nvrhi::ShaderHandle ps;
+    nvrhi::SamplerHandle linearSampler;
+    bool initialized = false;
+};
+
+void InitializeSkinningPipelines(ng::RenderDevice* device, SkinningPassState& state);
+void ShutdownSkinningPipelines(SkinningPassState& state);
 
 using SkinnedStatsCallback = void(*)(u32 rendered, u32 culled, void* userData);
 
@@ -38,6 +56,20 @@ struct SkinnedVisibilityData {
     void* statsUserData = nullptr;
 };
 
+struct SkinningPassData {
+    framegraph::VirtualResourceHandle color;
+    framegraph::VirtualResourceHandle normal;
+    framegraph::VirtualResourceHandle depth;
+    ng::RenderDevice* device;
+    const GeometryCollector* geometry;
+    const xr_vector<GeometryBatch>* hudBatches;
+    MaterialCache* materialCache;
+    u32 width, height;
+    framegraph::DefaultOutputLayout outputs;
+    SkinnedVisibilityData visibilityData;
+    SkinningPassState* passState;
+};
+
 framegraph::DefaultOutputLayout setupSkinningPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
@@ -47,7 +79,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     MaterialCache* materialCache,
     u32 width,
     u32 height,
-    const SkinnedVisibilityData& visibilityData = {}
+    const SkinnedVisibilityData& visibilityData = {},
+    SkinningPassState* state = nullptr
 );
 
 }

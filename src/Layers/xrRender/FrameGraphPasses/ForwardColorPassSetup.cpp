@@ -19,6 +19,7 @@
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "PassCommon.h"
 #include "xrCore/FMesh.hpp"
 
 namespace xray::render::RENDER_NAMESPACE
@@ -30,26 +31,9 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 
 enum class RenderPhase { None, Opaque, AlphaTested, Transparent };
 
-static nvrhi::GraphicsPipelineHandle s_bindlessPipeline;
-static nvrhi::BindingLayoutHandle s_bindlessLayout;
-static nvrhi::InputLayoutHandle s_bindlessInputLayout;
-static nvrhi::SamplerHandle s_linearSampler;
-static nvrhi::ShaderHandle s_bindlessVS;
-static nvrhi::ShaderHandle s_bindlessPS;
-static nvrhi::BufferHandle s_drawIndexBuffer;
-static nvrhi::BufferHandle s_lightingCB;
-static nvrhi::BufferHandle s_staticGlobalsCB;
-static bool s_bindlessInitialized = false;
+static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ForwardColorPassState& state);
 
-static nvrhi::GraphicsPipelineHandle s_terrainPipeline;
-static nvrhi::BindingLayoutHandle s_terrainLayout;
-static nvrhi::ShaderHandle s_terrainPS;
-static bool s_terrainInitialized = false;
-
-
-static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer);
-
-void InitializeForwardPipelines(ng::RenderDevice* device)
+void InitializeForwardPipelines(ng::RenderDevice* device, ForwardColorPassState& state)
 {
     if (!device)
         return;
@@ -95,28 +79,31 @@ void InitializeForwardPipelines(ng::RenderDevice* device)
         return;
     }
 
-    InitializeBindlessPipeline(device, dummyFramebuffer);
+    InitializeBindlessPipeline(device, dummyFramebuffer, state);
 
     Msg("* [ForwardPass] Pipeline initialization complete");
 }
 
-void ShutdownForwardPipelines()
+void ShutdownForwardPipelines(ForwardColorPassState& state)
 {
-    s_bindlessPipeline = nullptr;
-    s_bindlessLayout = nullptr;
-    s_bindlessInputLayout = nullptr;
-    s_linearSampler = nullptr;
-    s_bindlessVS = nullptr;
-    s_bindlessPS = nullptr;
-    s_drawIndexBuffer = nullptr;
-    s_bindlessInitialized = false;
+    state.bindlessPipeline = nullptr;
+    state.bindlessLayout = nullptr;
+    state.bindlessInputLayout = nullptr;
+    state.linearSampler = nullptr;
+    state.bindlessVS = nullptr;
+    state.bindlessPS = nullptr;
+    state.bindlessInitialized = false;
+    state.terrainPipeline = nullptr;
+    state.terrainLayout = nullptr;
+    state.terrainPS = nullptr;
+    state.terrainInitialized = false;
 
     Msg("* [ForwardPass] Pipeline resources released");
 }
 
-static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer)
+static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ForwardColorPassState& state)
 {
-    if (s_bindlessInitialized)
+    if (state.bindlessInitialized)
         return;
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -135,14 +122,14 @@ static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebu
         return;
     }
 
-    s_bindlessVS = vsResult.handle;
-    s_bindlessPS = psResult.handle;
+    state.bindlessVS = vsResult.handle;
+    state.bindlessPS = psResult.handle;
 
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
     samplerDesc.setAllFilters(true);
     samplerDesc.setMaxAnisotropy(16.0f);
-    s_linearSampler = nvDevice->createSampler(samplerDesc);
+    state.linearSampler = nvDevice->createSampler(samplerDesc);
 
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::All;
@@ -156,95 +143,30 @@ static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebu
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),
     };
-    s_bindlessLayout = nvDevice->createBindingLayout(layoutDesc);
+    state.bindlessLayout = nvDevice->createBindingLayout(layoutDesc);
 
-    constexpr u32 vertexStride = 48;
-    nvrhi::VertexAttributeDesc vertexAttribs[] = {
-        nvrhi::VertexAttributeDesc()
-            .setName("POSITION")
-            .setFormat(nvrhi::Format::RGB32_FLOAT)
-            .setBufferIndex(0)
-            .setOffset(0)
-            .setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("NORMAL")
-            .setFormat(nvrhi::Format::BGRA8_UNORM)
-            .setBufferIndex(0)
-            .setOffset(12)
-            .setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("TANGENT")
-            .setFormat(nvrhi::Format::BGRA8_UNORM)
-            .setBufferIndex(0)
-            .setOffset(16)
-            .setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("BINORMAL")
-            .setFormat(nvrhi::Format::BGRA8_UNORM)
-            .setBufferIndex(0)
-            .setOffset(20)
-            .setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("TEXCOORD")
-            .setFormat(nvrhi::Format::RG32_FLOAT)
-            .setArraySize(2)
-            .setBufferIndex(0)
-            .setOffset(24)
-            .setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("COLOR")
-            .setFormat(nvrhi::Format::BGRA8_UNORM)
-            .setBufferIndex(0)
-            .setOffset(40)
-            .setElementStride(vertexStride),
-        nvrhi::VertexAttributeDesc()
-            .setName("DRAWINDEX")
-            .setFormat(nvrhi::Format::R32_UINT)
-            .setBufferIndex(1)
-            .setOffset(0)
-            .setElementStride(4)
-            .setIsInstanced(true),
-    };
-    s_bindlessInputLayout = nvDevice->createInputLayout(vertexAttribs, 7, s_bindlessVS);
+    u32 attrCount = 0;
+    auto* attrs = GetUnifiedVertexAttributes(attrCount);
+    state.bindlessInputLayout = nvDevice->createInputLayout(attrs, attrCount, state.bindlessVS);
 
-    constexpr u32 MAX_DRAWS = 65536;
-    xr_vector<u32> drawIndices(MAX_DRAWS);
-    for (u32 i = 0; i < MAX_DRAWS; i++) {
-        drawIndices[i] = i;
-    }
-
-    nvrhi::BufferDesc drawIndexDesc;
-    drawIndexDesc.byteSize = MAX_DRAWS * sizeof(u32);
-    drawIndexDesc.structStride = sizeof(u32);
-    drawIndexDesc.isVertexBuffer = true;
-    drawIndexDesc.debugName = "DrawIndexBuffer";
-    drawIndexDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-    drawIndexDesc.keepInitialState = true;
-    s_drawIndexBuffer = nvDevice->createBuffer(drawIndexDesc);
-
-    if (!s_drawIndexBuffer) {
+    auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("ForwardColor", nvDevice);
+    if (!drawIndexBuffer) {
         Msg("! [BindlessForward] Failed to create draw index buffer");
         return;
     }
 
-    if (GEnv.Backend) {
-        GEnv.Backend->UploadBufferData(s_drawIndexBuffer, drawIndices.data(), MAX_DRAWS * sizeof(u32));
-    }
-
-    Msg("* [BindlessForward] Created draw index buffer (65536 entries)");
-
     nvrhi::GraphicsPipelineDesc pipeDesc;
-    pipeDesc.VS = s_bindlessVS;
-    pipeDesc.PS = s_bindlessPS;
-    pipeDesc.inputLayout = s_bindlessInputLayout;
+    pipeDesc.VS = state.bindlessVS;
+    pipeDesc.PS = state.bindlessPS;
+    pipeDesc.inputLayout = state.bindlessInputLayout;
 
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
 
     if (bindlessLayout) {
-        pipeDesc.bindingLayouts = { s_bindlessLayout, bindlessLayout };
+        pipeDesc.bindingLayouts = { state.bindlessLayout, bindlessLayout };
     } else {
-        pipeDesc.bindingLayouts = { s_bindlessLayout };
+        pipeDesc.bindingLayouts = { state.bindlessLayout };
     }
 
     pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
@@ -254,31 +176,19 @@ static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebu
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-    s_bindlessPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-    if (!s_bindlessPipeline) {
+    state.bindlessPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+    if (!state.bindlessPipeline) {
         Msg("! [BindlessForward] Failed to create pipeline");
         return;
     }
 
-    const nvrhi::GraphicsPipelineDesc& actualDesc = s_bindlessPipeline->getDesc();
-    if (!actualDesc.bindingLayouts.empty()) {
-        s_bindlessLayout = actualDesc.bindingLayouts[0];
-    }
+    QueryBindingLayoutFromPipeline(state.bindlessPipeline, state.bindlessLayout);
 
-    nvrhi::BufferDesc vcbDesc;
-    vcbDesc.isConstantBuffer = true;
-    vcbDesc.isVolatile = true;
-    vcbDesc.maxVersions = 16;
-    vcbDesc.byteSize = 96;
-    s_lightingCB = nvDevice->createBuffer(vcbDesc);
-    vcbDesc.byteSize = 768;
-    s_staticGlobalsCB = nvDevice->createBuffer(vcbDesc);
-
-    s_bindlessInitialized = true;
+    state.bindlessInitialized = true;
     Msg("* [BindlessForward] Pipeline initialized");
 }
 
-void renderBindlessForward(
+static void renderBindlessForward(
     ng::RenderContext* ctx,
     ng::RenderDevice* device,
     const GeometryCollector* geometry,
@@ -286,7 +196,8 @@ void renderBindlessForward(
     nvrhi::ITexture* normalRT,
     nvrhi::ITexture* depthRT,
     const BindlessForwardConfig& config,
-    MaterialCache* materialCache)
+    MaterialCache* materialCache,
+    ForwardColorPassState& ps)
 {
     using namespace RENDER_NAMESPACE::bindless;
 
@@ -306,187 +217,19 @@ void renderBindlessForward(
     if (!cmdList)
         return;
 
-    if (!s_bindlessInitialized) {
-        auto* shaderLoader = GEnv.Render->GetShaderLoader();
-        if (!shaderLoader)
-            return;
-
-        auto vsResult = shaderLoader->LoadVertexShader("bindless_forward", "main");
-        auto psResult = shaderLoader->LoadPixelShader("bindless_forward", "main");
-
-        if (!vsResult.handle || !psResult.handle)
-            return;
-
-        s_bindlessVS = vsResult.handle;
-        s_bindlessPS = psResult.handle;
-
-        nvrhi::SamplerDesc samplerDesc;
-        samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
-        samplerDesc.setAllFilters(true);
-        samplerDesc.setMaxAnisotropy(16.0f);
-        s_linearSampler = nvDevice->createSampler(samplerDesc);
-
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::All;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),
-            nvrhi::BindingLayoutItem::Sampler(0),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),
-        };
-        s_bindlessLayout = nvDevice->createBindingLayout(layoutDesc);
-
-        if (!s_bindlessLayout)
-            return;
-
-        constexpr u32 vertexStride = 48;
-        nvrhi::VertexAttributeDesc vertexAttribs[] = {
-            nvrhi::VertexAttributeDesc()
-                .setName("POSITION")
-                .setFormat(nvrhi::Format::RGB32_FLOAT)
-                .setBufferIndex(0)
-                .setOffset(0)
-                .setElementStride(vertexStride),
-            nvrhi::VertexAttributeDesc()
-                .setName("NORMAL")
-                .setFormat(nvrhi::Format::BGRA8_UNORM)
-                .setBufferIndex(0)
-                .setOffset(12)
-                .setElementStride(vertexStride),
-            nvrhi::VertexAttributeDesc()
-                .setName("TANGENT")
-                .setFormat(nvrhi::Format::BGRA8_UNORM)
-                .setBufferIndex(0)
-                .setOffset(16)
-                .setElementStride(vertexStride),
-            nvrhi::VertexAttributeDesc()
-                .setName("BINORMAL")
-                .setFormat(nvrhi::Format::BGRA8_UNORM)
-                .setBufferIndex(0)
-                .setOffset(20)
-                .setElementStride(vertexStride),
-            nvrhi::VertexAttributeDesc()
-                .setName("TEXCOORD")
-                .setFormat(nvrhi::Format::RG32_FLOAT)
-                .setArraySize(2)
-                .setBufferIndex(0)
-                .setOffset(24)
-                .setElementStride(vertexStride),
-            nvrhi::VertexAttributeDesc()
-                .setName("COLOR")
-                .setFormat(nvrhi::Format::BGRA8_UNORM)
-                .setBufferIndex(0)
-                .setOffset(40)
-                .setElementStride(vertexStride),
-            nvrhi::VertexAttributeDesc()
-                .setName("DRAWINDEX")
-                .setFormat(nvrhi::Format::R32_UINT)
-                .setBufferIndex(1)
-                .setOffset(0)
-                .setElementStride(4)
-                .setIsInstanced(true),
-        };
-        s_bindlessInputLayout = nvDevice->createInputLayout(vertexAttribs, 7, s_bindlessVS);
-
-        constexpr u32 MAX_DRAWS = 65536;
-        xr_vector<u32> drawIndices(MAX_DRAWS);
-        for (u32 i = 0; i < MAX_DRAWS; i++) {
-            drawIndices[i] = i;
-        }
-
-        nvrhi::BufferDesc drawIndexDesc;
-        drawIndexDesc.byteSize = MAX_DRAWS * sizeof(u32);
-        drawIndexDesc.structStride = sizeof(u32);
-        drawIndexDesc.isVertexBuffer = true;
-        drawIndexDesc.debugName = "DrawIndexBuffer";
-        drawIndexDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-        drawIndexDesc.keepInitialState = true;
-        s_drawIndexBuffer = nvDevice->createBuffer(drawIndexDesc);
-
-        if (!s_drawIndexBuffer) {
-            Msg("! [BindlessForward] Failed to create draw index buffer");
-            return;
-        }
-
-        if (GEnv.Backend) {
-            GEnv.Backend->UploadBufferData(s_drawIndexBuffer, drawIndices.data(), MAX_DRAWS * sizeof(u32));
-        }
-
-        Msg("* [BindlessForward] Created draw index buffer (65536 entries)");
-
-        nvrhi::GraphicsPipelineDesc pipeDesc;
-        pipeDesc.VS = s_bindlessVS;
-        pipeDesc.PS = s_bindlessPS;
-        pipeDesc.inputLayout = s_bindlessInputLayout;
-
-        auto* backend = device->GetBackend();
-        nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
-
-        if (bindlessLayout) {
-            pipeDesc.bindingLayouts = { s_bindlessLayout, bindlessLayout };
-        } else {
-            pipeDesc.bindingLayouts = { s_bindlessLayout };
-        }
-
-        pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-        pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-        pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-        pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-        pipeDesc.renderState.rasterState.frontCounterClockwise = false;
-        pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-        nvrhi::FramebufferDesc fbDesc;
-        fbDesc.addColorAttachment(colorRT);
-        if (normalRT)
-            fbDesc.addColorAttachment(normalRT);
-        fbDesc.setDepthAttachment(depthRT);
-        auto framebuffer = nvDevice->createFramebuffer(fbDesc);
-
-        Msg("* [FGDetailManager] Creating bindless forward graphics pipeline...");
-        Msg("  - VS handle: %p", s_bindlessVS.Get());
-        Msg("  - PS handle: %p", s_bindlessPS.Get());
-        Msg("  - Binding layout: %p", s_bindlessLayout.Get());
-        Msg("* [FGDetailManager] Calling device->createGraphicsPipeline...");
-
-        s_bindlessPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-        if (!s_bindlessPipeline) {
-            Msg("! [FGDetailManager] Failed to create bindless forward graphics pipeline");
-            return;
-        }
-
-        Msg("* [FGDetailManager] Bindless forward graphics pipeline created successfully");
-
-        const nvrhi::GraphicsPipelineDesc& actualDesc = s_bindlessPipeline->getDesc();
-        if (!actualDesc.bindingLayouts.empty()) {
-            s_bindlessLayout = actualDesc.bindingLayouts[0];
-            Msg("* [FGDetailManager] Updated bindless forward bindingLayout from pipeline (pointer: %p)", s_bindlessLayout.Get());
-        }
-
-        s_bindlessInitialized = true;
-    }
-
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.addColorAttachment(colorRT);
     if (normalRT)
         fbDesc.addColorAttachment(normalRT);
     fbDesc.setDepthAttachment(depthRT);
-    auto framebuffer = nvDevice->createFramebuffer(fbDesc);
+    auto& cache = framegraph::GetPassResourceCache();
+    auto framebuffer = cache.GetOrCreateFramebuffer("ForwardColor", fbDesc, nvDevice);
 
-    struct LightingConstants {
-        Fvector4 sunDirection;
-        Fvector4 sunColor;
-        Fvector4 ambientColor;
-        Fvector4 cameraPosition;
-        Fvector4 fogParams;
-        Fvector4 fogColor;
-    } lightingData;
-    static_assert(sizeof(LightingConstants) == 96, "LightingConstants must be 96 bytes");
+    auto lightingCB = cache.GetOrCreateVolatileCB("ForwardColor", "LightingCB", sizeof(LightingConstants), 16, nvDevice);
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ForwardColor", "StaticGlobalsCB", sizeof(StaticGlobals), 16, nvDevice);
+    auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("ForwardColor", nvDevice);
 
-    auto lightingCB = s_lightingCB;
+    LightingConstants lightingData;
 
     if (g_pGamePersistent) {
         auto& env = g_pGamePersistent->Environment().CurrentEnv;
@@ -504,8 +247,6 @@ void renderBindlessForward(
     lightingData.cameraPosition.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 1.0f);
 
     cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
-
-    auto staticGlobalsCB = s_staticGlobalsCB;
 
     StaticGlobals staticGlobals;
     FillGlobalConstants(staticGlobals);
@@ -525,30 +266,28 @@ void renderBindlessForward(
             nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(10, variantTexBuffer.GetBuffer()),
-            nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
+            nvrhi::BindingSetItem::Sampler(0, ps.linearSampler),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(14, set.instanceBuffer),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(15, set.compactBatchIndicesBuffer),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(16, set.compactMaterialIDBuffer),
         };
 
-        return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, s_bindlessLayout, nvDevice);
+        return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, ps.bindlessLayout, nvDevice);
     };
 
     const auto& rtDesc = colorRT->getDesc();
     nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
 
-    static u32 s_gpuDrivenDraws = 0;
-
     if (!config.UseGPUCulling() || !config.UseMegaBuffers()) {
         return;
     }
 
-    if (!s_bindlessPipeline || !framebuffer) {
+    if (!ps.bindlessPipeline || !framebuffer) {
         return;
     }
 
     nvrhi::GraphicsState state;
-    state.pipeline = s_bindlessPipeline;
+    state.pipeline = ps.bindlessPipeline;
     state.framebuffer = framebuffer;
 
     auto* backend = device->GetBackend();
@@ -557,14 +296,14 @@ void renderBindlessForward(
         bindlessTable = backend->GetBindlessDescriptorTable();
     }
 
-    if (!s_drawIndexBuffer) {
+    if (!drawIndexBuffer) {
         Msg("! [BindlessForward] Draw index buffer not initialized!");
         return;
     }
 
     state.vertexBuffers = {
         {config.megaVertexBuffer, 0, 0},
-        {s_drawIndexBuffer, 1, 0}
+        {drawIndexBuffer, 1, 0}
     };
     state.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
     state.viewport.addViewport(viewport);
@@ -586,18 +325,17 @@ void renderBindlessForward(
 
         cmdList->setGraphicsState(state);
         cmdList->drawIndexedIndirectCount(0, 0, set.totalObjectCount);
-        s_gpuDrivenDraws += set.totalObjectCount;
     };
 
     if (config.variantPartition.Enabled()) {
         auto* backendDev = device->GetBackend();
         VariantPartitionDrawConfig vpCfg;
-        vpCfg.defaultPipeline = s_bindlessPipeline.Get();
-        vpCfg.inputLayout = s_bindlessInputLayout;
-        vpCfg.passLayout = s_bindlessLayout;
+        vpCfg.defaultPipeline = ps.bindlessPipeline.Get();
+        vpCfg.inputLayout = ps.bindlessInputLayout;
+        vpCfg.passLayout = ps.bindlessLayout;
         vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
         vpCfg.bindlessTable = bindlessTable;
-        vpCfg.sampler = s_linearSampler;
+        vpCfg.sampler = ps.linearSampler;
         vpCfg.staticGlobalsCB = staticGlobalsCB;
         vpCfg.lightingCB = lightingCB;
         vpCfg.materialBuffer = matBuffer.GetBuffer();
@@ -609,10 +347,10 @@ void renderBindlessForward(
 
         DrawVariantPartition(cmdList, nvDevice, framebuffer, state, vpCfg);
 
-        state.pipeline = s_bindlessPipeline;
+        state.pipeline = ps.bindlessPipeline;
         state.vertexBuffers = {
             {config.megaVertexBuffer, 0, 0},
-            {s_drawIndexBuffer, 1, 0}
+            {drawIndexBuffer, 1, 0}
         };
     } else {
         drawSet(config.staticSet);
@@ -622,12 +360,12 @@ void renderBindlessForward(
     if (config.HasTerrain() && config.UseMegaBuffers()) {
         R_ASSERT2(config.UseTerrainCompaction(), "Terrain compaction buffers missing");
 
-        if (!s_terrainInitialized) {
+        if (!ps.terrainInitialized) {
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             if (shaderLoader) {
                 auto terrainPsResult = shaderLoader->LoadPixelShader("bindless_terrain", "main");
                 if (terrainPsResult.handle) {
-                    s_terrainPS = terrainPsResult.handle;
+                    ps.terrainPS = terrainPsResult.handle;
 
                     nvrhi::BindingLayoutDesc terrainLayoutDesc;
                     terrainLayoutDesc.visibility = nvrhi::ShaderType::All;
@@ -642,21 +380,21 @@ void renderBindlessForward(
                         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),
                         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),
                     };
-                    s_terrainLayout = nvDevice->createBindingLayout(terrainLayoutDesc);
+                    ps.terrainLayout = nvDevice->createBindingLayout(terrainLayoutDesc);
 
-                    if (s_terrainLayout && s_bindlessVS) {
+                    if (ps.terrainLayout && ps.bindlessVS) {
                         nvrhi::GraphicsPipelineDesc terrainPipeDesc;
-                        terrainPipeDesc.VS = s_bindlessVS;
-                        terrainPipeDesc.PS = s_terrainPS;
-                        terrainPipeDesc.inputLayout = s_bindlessInputLayout;
+                        terrainPipeDesc.VS = ps.bindlessVS;
+                        terrainPipeDesc.PS = ps.terrainPS;
+                        terrainPipeDesc.inputLayout = ps.bindlessInputLayout;
 
                         auto* backendDevice = device->GetBackend();
                         nvrhi::IBindingLayout* bindlessLayout = backendDevice ? backendDevice->GetBindlessLayout() : nullptr;
                         if (bindlessLayout) {
-                            terrainPipeDesc.bindingLayouts = { s_terrainLayout, bindlessLayout };
+                            terrainPipeDesc.bindingLayouts = { ps.terrainLayout, bindlessLayout };
                             Msg("* [TerrainForward] Pipeline created WITH bindless layout");
                         } else {
-                            terrainPipeDesc.bindingLayouts = { s_terrainLayout };
+                            terrainPipeDesc.bindingLayouts = { ps.terrainLayout };
                             Msg("! [TerrainForward] Pipeline created WITHOUT bindless layout - textures will be black!");
                         }
 
@@ -667,9 +405,9 @@ void renderBindlessForward(
                         terrainPipeDesc.renderState.rasterState.frontCounterClockwise = false;
                         terrainPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-                        s_terrainPipeline = nvDevice->createGraphicsPipeline(terrainPipeDesc, framebuffer);
-                        if (s_terrainPipeline) {
-                            s_terrainInitialized = true;
+                        ps.terrainPipeline = nvDevice->createGraphicsPipeline(terrainPipeDesc, framebuffer);
+                        if (ps.terrainPipeline) {
+                            ps.terrainInitialized = true;
                             Msg("* [BindlessForward] Terrain pipeline initialized");
                         }
                     }
@@ -677,8 +415,8 @@ void renderBindlessForward(
             }
         }
 
-        R_ASSERT2(s_terrainInitialized && s_terrainPipeline, "Terrain pipeline not initialized");
-        if (s_terrainInitialized && s_terrainPipeline) {
+        R_ASSERT2(ps.terrainInitialized && ps.terrainPipeline, "Terrain pipeline not initialized");
+        if (ps.terrainInitialized && ps.terrainPipeline) {
             auto& terrainMatBuffer = bindless::TerrainMaterialBuffer::Instance();
             terrainMatBuffer.Upload(ctx);
 
@@ -694,42 +432,29 @@ void renderBindlessForward(
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMatBuffer.GetBuffer()),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(10, variantTexBuffer.GetBuffer()),
-                nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
+                nvrhi::BindingSetItem::Sampler(0, ps.linearSampler),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.terrainInstanceBuffer),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.terrainCompactBatchIndicesBuffer),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(16, config.terrainCompactMaterialIDBuffer),
             };
 
-            auto terrainBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainBindDesc, s_terrainLayout, nvDevice);
+            auto terrainBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainBindDesc, ps.terrainLayout, nvDevice);
             R_ASSERT2(terrainBindingSet, "Terrain binding set creation failed");
 
             nvrhi::GraphicsState terrainState;
-            terrainState.pipeline = s_terrainPipeline;
+            terrainState.pipeline = ps.terrainPipeline;
             terrainState.framebuffer = framebuffer;
             terrainState.bindings = { terrainBindingSet };
 
             if (backend) {
                 auto* bindlessTable = backend->GetBindlessDescriptorTable();
-                if (bindlessTable) {
+                if (bindlessTable)
                     terrainState.addBindingSet(bindlessTable);
-                } else {
-                    static bool s_warnOnce = false;
-                    if (!s_warnOnce) {
-                        Msg("! [TerrainForward] GetBindlessDescriptorTable() returned null!");
-                        s_warnOnce = true;
-                    }
-                }
-            } else {
-                static bool s_warnOnce = false;
-                if (!s_warnOnce) {
-                    Msg("! [TerrainForward] backend is null - bindless textures won't work!");
-                    s_warnOnce = true;
-                }
             }
 
             terrainState.vertexBuffers = {
                 {config.megaVertexBuffer, 0, 0},
-                {s_drawIndexBuffer, 1, 0}
+                {drawIndexBuffer, 1, 0}
             };
             terrainState.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
             terrainState.indirectParams = config.terrainCompactDrawArgsBuffer;
@@ -738,20 +463,8 @@ void renderBindlessForward(
             terrainState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
             cmdList->setGraphicsState(terrainState);
-
-            static bool s_terrainDrawLogged = false;
-            if (!s_terrainDrawLogged) {
-                Msg("* [TerrainDraw] Drawing %u terrain batches (compacted), megaVB=%p, megaIB=%p, drawArgs=%p, count=%p, matIDs=%p, inst=%p, batchIdx=%p",
-                    config.terrainObjectCount, config.megaVertexBuffer, config.megaIndexBuffer,
-                    config.terrainCompactDrawArgsBuffer, config.terrainCompactCountBuffer,
-                    config.terrainCompactMaterialIDBuffer, config.terrainInstanceBuffer,
-                    config.terrainCompactBatchIndicesBuffer);
-                s_terrainDrawLogged = true;
-            }
-
             cmdList->drawIndexedIndirectCount(0, 0, config.terrainObjectCount);
 
-            s_gpuDrivenDraws += config.terrainObjectCount;
         }
     }
 
@@ -768,34 +481,22 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     u32 width,
     u32 height,
     framegraph::VirtualResourceHandle drawArgsInput,
-    const BindlessForwardConfig& bindlessConfig)
+    const BindlessForwardConfig& bindlessConfig,
+    ForwardColorPassState* state)
 {
     using namespace framegraph;
-
-    struct ForwardColorPassData {
-        VirtualResourceHandle depth;
-        VirtualResourceHandle color;
-        VirtualResourceHandle normal;
-        VirtualResourceHandle drawArgsBuffer;
-        ng::RenderDevice* device;
-        const GeometryCollector* geometry;
-        MaterialCache* materialCache;
-        DefaultOutputLayout outputs;
-        u32 width;
-        u32 height;
-        BindlessForwardConfig bindlessConfig;
-    };
 
     auto& passData = fg.addCallbackPass<ForwardColorPassData>(
         "Forward+ Color Pass",
 
-        [&, width, height, colorInput, normalInput, drawArgsInput, bindlessConfig](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
+        [&, width, height, colorInput, normalInput, drawArgsInput, bindlessConfig, state](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
             data.geometry = geometry;
             data.materialCache = materialCache;
             data.bindlessConfig = bindlessConfig;
+            data.passState = state;
 
             RenderPassBuilder passBuilder(builder, passHandle);
 
@@ -846,7 +547,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 normalRT,
                 depthRT,
                 data.bindlessConfig,
-                data.materialCache
+                data.materialCache,
+                *data.passState
             );
         }
     );

@@ -5,6 +5,8 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCore/xrCore.h"
+#include "PassVertexFormats.h"
+#include "ParticleGPUCullingManager.h"
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
@@ -39,29 +41,43 @@ struct ParticleBatch {
     u32 bindlessMaterialID = 0;
 };
 
-struct ParticleVertex {
-    Fvector p;
-    u32 color;
-    Fvector2 t;
-    u32 materialID;
-    u32 _pad;
+struct ParticlePassState {
+    nvrhi::GraphicsPipelineHandle pipelineBlend;
+    nvrhi::GraphicsPipelineHandle pipelineAdd;
+    nvrhi::BindingLayoutHandle layout;
+    nvrhi::InputLayoutHandle inputLayout;
+    nvrhi::ShaderHandle vs;
+    nvrhi::ShaderHandle ps;
+    nvrhi::SamplerHandle sampler;
+    bool initialized = false;
+    nvrhi::BufferHandle particleVB;
+    u32 particleVBSize = 0;
+    nvrhi::BufferHandle quadIB;
+    u32 maxQuads = 0;
+    xr_unique_ptr<ParticleGPUCullingManager> gpuCullingManager;
 };
-static_assert(sizeof(ParticleVertex) == 32, "ParticleVertex must be 32 bytes to match Vulkan std430 stride");
 
-struct GPUParticleData {
-    Fvector position;
-    float rotation;
-    Fvector2 size;
-    u32 color;
-    u32 materialID;
-    Fvector2 uvMin;
-    Fvector2 uvMax;
+struct ParticlePassData {
+    framegraph::VirtualResourceHandle inputColor;
+    framegraph::VirtualResourceHandle depth;
+    framegraph::VirtualResourceHandle outputColor;
+    framegraph::VirtualResourceHandle outputNormal;
+    framegraph::VirtualResourceHandle hiZPyramid;
+    ng::RenderDevice* device;
+    const xr_vector<ParticleBatch>* worldParticleBatches;
+    const xr_vector<ParticleBatch>* hudParticleBatches;
+    MaterialCache* materialCache;
+    framegraph::DefaultOutputLayout outputs;
+    u32 width;
+    u32 height;
+    u32 hiZWidth;
+    u32 hiZHeight;
+    u32 hiZMipLevels;
+    ParticlePassState* passState;
 };
-static_assert(sizeof(GPUParticleData) == 48, "GPUParticleData must be 48 bytes");
 
-void InitializeParticlePipelines(ng::RenderDevice* device);
-
-void ShutdownParticlePipelines();
+void InitializeParticlePipelines(ng::RenderDevice* device, ParticlePassState& state);
+void ShutdownParticlePipelines(ParticlePassState& state);
 
 framegraph::DefaultOutputLayout setupParticlePass(
     framegraph::FrameGraph& fg,
@@ -75,7 +91,8 @@ framegraph::DefaultOutputLayout setupParticlePass(
     framegraph::VirtualResourceHandle hiZPyramid = {},
     u32 hiZWidth = 0,
     u32 hiZHeight = 0,
-    u32 hiZMipLevels = 0
+    u32 hiZMipLevels = 0,
+    ParticlePassState* state = nullptr
 );
 
 }

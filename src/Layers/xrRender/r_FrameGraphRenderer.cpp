@@ -23,7 +23,6 @@
 #include "xrEngine/device.h"
 #include <imgui.h>
 
-#include "FrameGraphPasses/DepthPrepassSetup.h"
 #include "FrameGraphPasses/HiZBuildPassSetup.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "GPUCullingManager.h"
@@ -40,6 +39,7 @@
 #include "FrameGraphPasses/ExposurePassSetup.h"
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"
+#include "FrameGraphPasses/PassStates.h"
 #include "FrameGraphPasses/ImGuiPassSetup.h"
 
 #include "xrEngine/Environment.h"
@@ -124,9 +124,10 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
         return false;
     }
 
-    passes::InitializeSkyGeometry(device);
-    passes::InitializeSunPass(device);
-    passes::InitializeTonemapPass(device->GetNVRHIDevice());
+    m_passStates = xr_make_unique<passes::PassStates>();
+    passes::InitializeSkyGeometry(device, m_passStates->sky);
+    passes::InitializeSunPass(device, m_passStates->sun);
+    passes::InitializeTonemapPass(device->GetNVRHIDevice(), m_passStates->tonemap);
 
     m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
     m_gpuProfiler->Initialize(device->GetNVRHIDevice());
@@ -188,9 +189,16 @@ void FrameGraphRenderer::Shutdown() {
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
 
-    passes::ShutdownSkyGeometry();
-    passes::ShutdownSunPass();
-    passes::ShutdownTonemapPass();
+    if (m_passStates) {
+        passes::ShutdownSkyGeometry(m_passStates->sky);
+        passes::ShutdownSunPass(m_passStates->sun);
+        passes::ShutdownTonemapPass(m_passStates->tonemap);
+        passes::ShutdownTransparentPipelines(m_passStates->transparent);
+        passes::ShutdownForwardPipelines(m_passStates->forwardColor);
+        passes::ShutdownSkinningPipelines(m_passStates->skinning);
+        passes::ShutdownParticlePipelines(m_passStates->particle);
+        m_passStates.reset();
+    }
 
     bindless::VariantTextureBuffer::Instance().Shutdown();
     bindless::MaterialBuffer::Instance().Shutdown();
@@ -212,12 +220,11 @@ void FrameGraphRenderer::Render() {
         m_gpuProfiler->FrameStart();
     }
 
-    static bool s_pipelinesInitialized = false;
-    if (!s_pipelinesInitialized && m_device) {
-        passes::InitializeForwardPipelines(m_device);
-        passes::InitializeSkinningPipelines(m_device);
-        passes::InitializeParticlePipelines(m_device);
-        s_pipelinesInitialized = true;
+    if (!m_pipelinesInitialized && m_device && m_passStates) {
+        passes::InitializeForwardPipelines(m_device, m_passStates->forwardColor);
+        passes::InitializeSkinningPipelines(m_device, m_passStates->skinning);
+        passes::InitializeParticlePipelines(m_device, m_passStates->particle);
+        m_pipelinesInitialized = true;
     }
 
     auto frameStart = std::chrono::high_resolution_clock::now();
@@ -344,7 +351,7 @@ void FrameGraphRenderer::RenderMenu() {
 
     auto sceneWithUI = passes::setupUIPass(*m_framegraph, backgroundTarget, width, height);
 
-    sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height);
+    sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height, m_passStates->uiText);
 
     sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
 
@@ -354,7 +361,8 @@ void FrameGraphRenderer::RenderMenu() {
         framegraph::VirtualResourceHandle(),
         backbufferHandle,
         width,
-        height
+        height,
+        m_passStates->tonemap
     );
 
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
@@ -625,7 +633,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_device,
             prevDepthHandle,
             width,
-            height
+            height,
+            m_passStates->hiZBuild
         );
     }
 
@@ -727,7 +736,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         depthBuffer,
         g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
         width,
-        height
+        height,
+        m_passStates->sky
     );
 
     auto sunOutput = passes::setupSunPass(
@@ -736,7 +746,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         skyOutput,
         g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
         width,
-        height
+        height,
+        m_passStates->sun
     );
 
     passes::BindlessForwardConfig bindlessConfig;
@@ -790,7 +801,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width,
         height,
         drawArgsBuffer,
-        bindlessConfig
+        bindlessConfig,
+        &m_passStates->forwardColor
     );
 
     if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid()) {
@@ -832,7 +844,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_materialCache.get(),
         width,
         height,
-        skinnedVisibility
+        skinnedVisibility,
+        &m_passStates->skinning
     );
 
     auto particleOutputs = passes::setupParticlePass(
@@ -847,7 +860,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.pyramid,
         hizOutput.width,
         hizOutput.height,
-        hizOutput.mipLevels
+        hizOutput.mipLevels,
+        &m_passStates->particle
     );
 
     auto detailOutputs = passes::setupDetailPass(
@@ -862,7 +876,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.height,
         hizOutput.mipLevels,
         m_hasPrevFrameData ? &m_prevViewProj : nullptr,
-        m_gpuProfiler.get()
+        m_gpuProfiler.get(),
+        &m_passStates->detail
     );
 
     passes::TransparentPassConfig transparentConfig;
@@ -885,7 +900,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_device,
         detailOutputs,
         transparentConfig,
-        width, height
+        width, height,
+        m_passStates->transparent
     );
 
     passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();
@@ -896,7 +912,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         exposureConfig,
         Device.fTimeDelta,
         width,
-        height
+        height,
+        m_passStates->exposure
     );
 
     m_exposureTexture = exposureOutput.exposureTexture;
@@ -912,7 +929,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         *m_framegraph,
         sceneWithUI,
         width,
-        height
+        height,
+        m_passStates->uiText
     );
 
     sceneWithUI = passes::setupCursorPass(
@@ -928,7 +946,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         exposureOutput.exposureTexture,
         backbufferHandle,
         width,
-        height
+        height,
+        m_passStates->tonemap,
+        &m_passStates->exposure
     );
 
     m_framegraph->GetRTRegistry().RegisterRT("rt_SceneColor", skyColorHandle);
