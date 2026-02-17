@@ -709,6 +709,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             dynTransCbDesc.isConstantBuffer = true;
             dynTransCbDesc.isVolatile = true;
             dynTransCbDesc.maxVersions = 128;
+            dynTransCbDesc.debugName = "SkinningPass_DynTransforms";
             auto dynTransformsCB = nvDevice->createBuffer(dynTransCbDesc);
 
             nvrhi::BufferDesc staticGlobalsCbDesc;
@@ -738,6 +739,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             shaderParamsCbDesc.isConstantBuffer = true;
             shaderParamsCbDesc.isVolatile = true;
             shaderParamsCbDesc.maxVersions = 128;
+            shaderParamsCbDesc.debugName = "SkinningPass_ShaderParams";
             auto shaderParamsCB = nvDevice->createBuffer(shaderParamsCbDesc);
 
             ShaderParams shaderParams = {};

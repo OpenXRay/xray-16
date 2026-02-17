@@ -15,7 +15,7 @@ void dxUIShader::Copy(IUIShader& _in) { *this = *((dxUIShader*)&_in); }
 
 void dxUIShader::create(LPCSTR sh, LPCSTR tex)
 {
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         auto* shaderLoader = RImplementation.GetShaderLoader();
         if (!shaderLoader)
@@ -81,7 +81,7 @@ void dxUIShader::create(LPCSTR sh, LPCSTR tex)
 
 void dxUIShader::destroy()
 {
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         m_vsHandle = nullptr;
         m_psHandle = nullptr;
@@ -108,7 +108,7 @@ bool dxUIShader::operator==(const IUIShader& other) const
 
 CTexture* dxUIShader::GetBaseTexture() const
 {
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         return m_baseTexture;
     }

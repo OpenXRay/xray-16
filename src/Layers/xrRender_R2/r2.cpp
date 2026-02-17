@@ -531,7 +531,12 @@ void CRender::create()
 
                 m_shaderLoader = xr_new<framegraph::ShaderLoader>(
                     m_renderDevice->GetSlangCompiler());
-                Msg("* ShaderLoader initialized (Slang compiler active)");
+                if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
+                    m_shaderLoader->SetTarget(xray::render::SlangCompiler::Target::SPIRV);
+                else
+                    m_shaderLoader->SetTarget(xray::render::SlangCompiler::Target::DXIL);
+                Msg("* ShaderLoader initialized (target: %s)",
+                    m_shaderLoader->GetTarget() == xray::render::SlangCompiler::Target::SPIRV ? "SPIRV" : "DXIL");
 
                 xray::render::MaterialSystem::Instance().Initialize(
                     m_renderDevice->GetFGResourceManager(),
@@ -563,7 +568,7 @@ void CRender::create()
 
     //	TODO: OGL: Implement FluidManager.
 #if defined(USE_DX11)
-    if (!GEnv.Backend || GEnv.Backend->GetAPI() != IRenderBackend::API::D3D12)
+    if (!GEnv.Backend || !GEnv.Backend->IsFrameGraph())
     {
         FluidManager.Initialize(70, 70, 70);
         //	FluidManager.Initialize( 100, 100, 100 );
@@ -581,7 +586,7 @@ void CRender::create()
 void CRender::destroy()
 {
 #if defined(USE_DX11)
-    if (!GEnv.Backend || GEnv.Backend->GetAPI() != IRenderBackend::API::D3D12)
+    if (!GEnv.Backend || !GEnv.Backend->IsFrameGraph())
     {
         FluidManager.Destroy();
     }

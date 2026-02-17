@@ -1,0 +1,791 @@
+#include "stdafx.h"
+#include "VulkanBackend.h"
+
+#include "xrCore/Threading/TaskManager.hpp"
+
+#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
+#include <vulkan/vulkan.hpp>
+#include <nvrhi/vulkan.h>
+#include <nvrhi/validation.h>
+#include <SDL.h>
+#include <SDL_syswm.h>
+#ifdef XR_PLATFORM_WINDOWS
+#include <vulkan/vulkan_win32.h>
+#endif
+
+VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
+
+class NVRHIVulkanMessageCallback : public nvrhi::IMessageCallback {
+public:
+    void message(nvrhi::MessageSeverity severity, const char* messageText) override {
+        switch (severity) {
+        case nvrhi::MessageSeverity::Info:
+            Msg("* [NVRHI-VK] %s", messageText);
+            break;
+        case nvrhi::MessageSeverity::Warning:
+            Msg("! [NVRHI-VK] WARNING: %s", messageText);
+            break;
+        case nvrhi::MessageSeverity::Error:
+            Msg("! [NVRHI-VK] ERROR: %s", messageText);
+            break;
+        case nvrhi::MessageSeverity::Fatal:
+            Msg("! [NVRHI-VK] FATAL: %s", messageText);
+            R_ASSERT2(false, messageText);
+            break;
+        }
+    }
+};
+
+static NVRHIVulkanMessageCallback s_nvrhiVkMessageCallback;
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+    VkDebugUtilsMessageTypeFlagsEXT type,
+    const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
+    void* userData)
+{
+    if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+        Msg("! [Vulkan] ERROR: %s", callbackData->pMessage);
+    else if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+        Msg("! [Vulkan] WARNING: %s", callbackData->pMessage);
+    return VK_FALSE;
+}
+
+VulkanBackend::VulkanBackend() = default;
+
+VulkanBackend::~VulkanBackend() {
+    Shutdown();
+}
+
+bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool enableValidation) {
+    if (m_initialized) {
+        Msg("! [VulkanBackend] Already initialized");
+        return false;
+    }
+    if (!window) {
+        Msg("! [VulkanBackend] No window provided");
+        return false;
+    }
+
+    Msg("* [VulkanBackend] Initializing...");
+    m_validationEnabled = enableValidation;
+
+    if (!CreateInstance(enableValidation)) { Shutdown(); return false; }
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(m_instance, vkGetInstanceProcAddr);
+    if (!CreateSurface(window)) { Shutdown(); return false; }
+    if (!SelectPhysicalDevice()) { Shutdown(); return false; }
+    if (!CreateLogicalDevice()) { Shutdown(); return false; }
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(m_instance, vkGetInstanceProcAddr, m_device, vkGetDeviceProcAddr);
+    if (!CreateSwapChain(width, height)) { Shutdown(); return false; }
+
+    nvrhi::vulkan::DeviceDesc deviceDesc;
+    deviceDesc.errorCB = &s_nvrhiVkMessageCallback;
+    deviceDesc.instance = m_instance;
+    deviceDesc.physicalDevice = m_physicalDevice;
+    deviceDesc.device = m_device;
+    deviceDesc.graphicsQueue = m_graphicsQueue;
+    deviceDesc.graphicsQueueIndex = static_cast<int>(m_graphicsQueueFamily);
+
+    const char* instanceExts[] = {
+        VK_KHR_SURFACE_EXTENSION_NAME,
+#ifdef XR_PLATFORM_WINDOWS
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+#endif
+        VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+    };
+    deviceDesc.instanceExtensions = instanceExts;
+    deviceDesc.numInstanceExtensions = std::size(instanceExts);
+
+    const char* deviceExts[] = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
+        VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
+        VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+    };
+    deviceDesc.deviceExtensions = deviceExts;
+    deviceDesc.numDeviceExtensions = std::size(deviceExts);
+
+    m_nvrhiVulkanDevice = nvrhi::vulkan::createDevice(deviceDesc);
+    if (!m_nvrhiVulkanDevice) {
+        Msg("! [VulkanBackend] Failed to create NVRHI Vulkan device");
+        Shutdown();
+        return false;
+    }
+
+    m_nvrhiDevice = nvrhi::validation::createValidationLayer(m_nvrhiVulkanDevice);
+    if (!m_nvrhiDevice) {
+        Msg("! [VulkanBackend] Failed to create NVRHI validation layer");
+        Shutdown();
+        return false;
+    }
+    Msg("* [VulkanBackend] NVRHI validation layer enabled");
+
+    nvrhi::CommandListParameters cmdParams;
+    cmdParams.enableImmediateExecution = false;
+    m_commandList = m_nvrhiDevice->createCommandList(cmdParams);
+    if (!m_commandList) {
+        Msg("! [VulkanBackend] Failed to create command list");
+        Shutdown();
+        return false;
+    }
+
+    m_uploadCommandList = m_nvrhiDevice->createCommandList(cmdParams);
+    if (!m_uploadCommandList) {
+        Msg("! [VulkanBackend] Failed to create upload command list");
+        Shutdown();
+        return false;
+    }
+
+    QueryCapabilities();
+    CreateBackBufferTextures();
+    CreateSyncObjects();
+    CreateBindlessResources();
+
+    m_initialized = true;
+    Msg("* [VulkanBackend] Initialized successfully");
+    Msg("*   Bindless textures: Yes (max %u)", m_capabilities.maxBindlessResources);
+    return true;
+}
+
+void VulkanBackend::Shutdown() {
+    if (!m_initialized && !m_nvrhiDevice)
+        return;
+
+    Msg("* [VulkanBackend] Shutting down...");
+    WaitForIdle();
+
+    m_bindlessDescriptorTable = nullptr;
+    m_bindlessLayout = nullptr;
+    for (auto& bb : m_backBuffers)
+        bb = nullptr;
+    m_commandList = nullptr;
+    m_uploadCommandList = nullptr;
+    m_nvrhiDevice = nullptr;
+    m_nvrhiVulkanDevice = nullptr;
+
+    DestroySyncObjects();
+    DestroySwapChain();
+
+    if (m_device) {
+        vkDestroyDevice(m_device, nullptr);
+        m_device = VK_NULL_HANDLE;
+    }
+    if (m_surface) {
+        vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+        m_surface = VK_NULL_HANDLE;
+    }
+    if (m_debugMessenger) {
+        auto destroyFunc = (PFN_vkDestroyDebugUtilsMessengerEXT)
+            vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
+        if (destroyFunc)
+            destroyFunc(m_instance, m_debugMessenger, nullptr);
+        m_debugMessenger = VK_NULL_HANDLE;
+    }
+    if (m_instance) {
+        vkDestroyInstance(m_instance, nullptr);
+        m_instance = VK_NULL_HANDLE;
+    }
+
+    m_initialized = false;
+    Msg("* [VulkanBackend] Shutdown complete");
+}
+
+bool VulkanBackend::CreateInstance(bool enableValidation) {
+    VkApplicationInfo appInfo = {};
+    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pApplicationName = "OpenXRay";
+    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.pEngineName = "X-Ray Engine";
+    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.apiVersion = VK_API_VERSION_1_2;
+
+    xr_vector<const char*> extensions;
+    extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+#ifdef XR_PLATFORM_WINDOWS
+    extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+#endif
+    extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+    xr_vector<const char*> layers;
+    if (enableValidation) {
+        layers.push_back("VK_LAYER_KHRONOS_validation");
+    }
+
+    VkInstanceCreateInfo createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    createInfo.pApplicationInfo = &appInfo;
+    createInfo.enabledExtensionCount = static_cast<u32>(extensions.size());
+    createInfo.ppEnabledExtensionNames = extensions.data();
+    createInfo.enabledLayerCount = static_cast<u32>(layers.size());
+    createInfo.ppEnabledLayerNames = layers.data();
+
+    VkResult result = vkCreateInstance(&createInfo, nullptr, &m_instance);
+    if (result != VK_SUCCESS) {
+        Msg("! [VulkanBackend] vkCreateInstance failed: %d", result);
+        return false;
+    }
+
+    if (enableValidation) {
+        auto createFunc = (PFN_vkCreateDebugUtilsMessengerEXT)
+            vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT");
+        if (createFunc) {
+            VkDebugUtilsMessengerCreateInfoEXT debugInfo = {};
+            debugInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+            debugInfo.messageSeverity =
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+            debugInfo.messageType =
+                VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+            debugInfo.pfnUserCallback = VulkanDebugCallback;
+            createFunc(m_instance, &debugInfo, nullptr, &m_debugMessenger);
+            Msg("* [VulkanBackend] Validation layer enabled");
+        }
+    }
+
+    Msg("* [VulkanBackend] Vulkan instance created (API 1.2)");
+    return true;
+}
+
+bool VulkanBackend::SelectPhysicalDevice() {
+    u32 deviceCount = 0;
+    vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
+    if (deviceCount == 0) {
+        Msg("! [VulkanBackend] No Vulkan-capable GPUs found");
+        return false;
+    }
+
+    xr_vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
+
+    for (auto& dev : devices) {
+        VkPhysicalDeviceProperties props;
+        vkGetPhysicalDeviceProperties(dev, &props);
+
+        if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+            m_physicalDevice = dev;
+            m_capabilities.id_vendor = props.vendorID;
+            m_capabilities.id_device = props.deviceID;
+            Msg("* [VulkanBackend] Using GPU: %s", props.deviceName);
+            return true;
+        }
+    }
+
+    m_physicalDevice = devices[0];
+    VkPhysicalDeviceProperties props;
+    vkGetPhysicalDeviceProperties(m_physicalDevice, &props);
+    m_capabilities.id_vendor = props.vendorID;
+    m_capabilities.id_device = props.deviceID;
+    Msg("* [VulkanBackend] Using GPU (fallback): %s", props.deviceName);
+    return true;
+}
+
+bool VulkanBackend::CreateSurface(SDL_Window* window) {
+#ifdef XR_PLATFORM_WINDOWS
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
+    if (!SDL_GetWindowWMInfo(window, &wmInfo)) {
+        Msg("! [VulkanBackend] SDL_GetWindowWMInfo failed: %s", SDL_GetError());
+        return false;
+    }
+
+    VkWin32SurfaceCreateInfoKHR surfaceInfo = {};
+    surfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    surfaceInfo.hinstance = GetModuleHandle(nullptr);
+    surfaceInfo.hwnd = wmInfo.info.win.window;
+
+    VkResult result = vkCreateWin32SurfaceKHR(m_instance, &surfaceInfo, nullptr, &m_surface);
+    if (result != VK_SUCCESS) {
+        Msg("! [VulkanBackend] vkCreateWin32SurfaceKHR failed: %d", result);
+        return false;
+    }
+    return true;
+#else
+    Msg("! [VulkanBackend] Vulkan surface creation not implemented for this platform");
+    return false;
+#endif
+}
+
+bool VulkanBackend::CreateLogicalDevice() {
+    u32 queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyCount, nullptr);
+    xr_vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyCount, queueFamilies.data());
+
+    m_graphicsQueueFamily = UINT32_MAX;
+    for (u32 i = 0; i < queueFamilyCount; i++) {
+        VkBool32 presentSupport = VK_FALSE;
+        vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, i, m_surface, &presentSupport);
+
+        if ((queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && presentSupport) {
+            m_graphicsQueueFamily = i;
+            break;
+        }
+    }
+
+    if (m_graphicsQueueFamily == UINT32_MAX) {
+        Msg("! [VulkanBackend] No graphics+present queue family found");
+        return false;
+    }
+
+    float queuePriority = 1.0f;
+    VkDeviceQueueCreateInfo queueCreateInfo = {};
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = m_graphicsQueueFamily;
+    queueCreateInfo.queueCount = 1;
+    queueCreateInfo.pQueuePriorities = &queuePriority;
+
+    const char* deviceExtensions[] = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
+        VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
+        VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+    };
+
+    VkPhysicalDeviceDescriptorIndexingFeatures indexingFeatures = {};
+    indexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+    indexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+    indexingFeatures.runtimeDescriptorArray = VK_TRUE;
+    indexingFeatures.descriptorBindingPartiallyBound = VK_TRUE;
+    indexingFeatures.descriptorBindingVariableDescriptorCount = VK_TRUE;
+    indexingFeatures.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+
+    VkPhysicalDeviceTimelineSemaphoreFeatures timelineFeatures = {};
+    timelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES;
+    timelineFeatures.timelineSemaphore = VK_TRUE;
+    indexingFeatures.pNext = &timelineFeatures;
+
+    VkPhysicalDeviceSynchronization2Features sync2Features = {};
+    sync2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
+    sync2Features.synchronization2 = VK_TRUE;
+    timelineFeatures.pNext = &sync2Features;
+
+    VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamicRenderingFeatures = {};
+    dynamicRenderingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR;
+    dynamicRenderingFeatures.dynamicRendering = VK_TRUE;
+    sync2Features.pNext = &dynamicRenderingFeatures;
+
+    VkPhysicalDeviceVulkan11Features vulkan11Features = {};
+    vulkan11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+    vulkan11Features.shaderDrawParameters = VK_TRUE;
+    dynamicRenderingFeatures.pNext = &vulkan11Features;
+
+    VkPhysicalDeviceFeatures2 features2 = {};
+    features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    features2.pNext = &indexingFeatures;
+    features2.features.samplerAnisotropy = VK_TRUE;
+    features2.features.fillModeNonSolid = VK_TRUE;
+    features2.features.multiDrawIndirect = VK_TRUE;
+    features2.features.independentBlend = VK_TRUE;
+
+    VkDeviceCreateInfo deviceCreateInfo = {};
+    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.pNext = &features2;
+    deviceCreateInfo.queueCreateInfoCount = 1;
+    deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+    deviceCreateInfo.enabledExtensionCount = static_cast<u32>(std::size(deviceExtensions));
+    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions;
+
+    VkResult result = vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);
+    if (result != VK_SUCCESS) {
+        Msg("! [VulkanBackend] vkCreateDevice failed: %d", result);
+        return false;
+    }
+
+    vkGetDeviceQueue(m_device, m_graphicsQueueFamily, 0, &m_graphicsQueue);
+    Msg("* [VulkanBackend] Logical device created (queue family %u)", m_graphicsQueueFamily);
+    return true;
+}
+
+bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
+    VkSurfaceCapabilitiesKHR surfaceCaps;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &surfaceCaps);
+
+    u32 formatCount = 0;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, nullptr);
+    xr_vector<VkSurfaceFormatKHR> formats(formatCount);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, formats.data());
+
+    m_swapchainFormat = VK_FORMAT_R8G8B8A8_UNORM;
+    VkColorSpaceKHR colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+    bool foundFormat = false;
+    for (const auto& fmt : formats) {
+        if (fmt.format == VK_FORMAT_R8G8B8A8_UNORM) {
+            m_swapchainFormat = fmt.format;
+            colorSpace = fmt.colorSpace;
+            foundFormat = true;
+            break;
+        }
+    }
+    if (!foundFormat) {
+        for (const auto& fmt : formats) {
+            if (fmt.format == VK_FORMAT_B8G8R8A8_UNORM) {
+                m_swapchainFormat = fmt.format;
+                colorSpace = fmt.colorSpace;
+                break;
+            }
+        }
+    }
+
+    u32 presentModeCount = 0;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, nullptr);
+    xr_vector<VkPresentModeKHR> presentModes(presentModeCount);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, presentModes.data());
+
+    VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    for (auto mode : presentModes) {
+        if (mode == VK_PRESENT_MODE_MAILBOX_KHR) {
+            presentMode = mode;
+            break;
+        }
+    }
+
+    VkExtent2D extent = { width, height };
+    if (surfaceCaps.currentExtent.width != UINT32_MAX)
+        extent = surfaceCaps.currentExtent;
+
+    u32 imageCount = BACK_BUFFER_COUNT;
+    if (imageCount < surfaceCaps.minImageCount)
+        imageCount = surfaceCaps.minImageCount;
+    if (surfaceCaps.maxImageCount > 0 && imageCount > surfaceCaps.maxImageCount)
+        imageCount = surfaceCaps.maxImageCount;
+
+    VkSwapchainCreateInfoKHR swapchainInfo = {};
+    swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapchainInfo.surface = m_surface;
+    swapchainInfo.minImageCount = imageCount;
+    swapchainInfo.imageFormat = m_swapchainFormat;
+    swapchainInfo.imageColorSpace = colorSpace;
+    swapchainInfo.imageExtent = extent;
+    swapchainInfo.imageArrayLayers = 1;
+    swapchainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    swapchainInfo.preTransform = surfaceCaps.currentTransform;
+    swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    swapchainInfo.presentMode = presentMode;
+    swapchainInfo.clipped = VK_TRUE;
+    swapchainInfo.oldSwapchain = VK_NULL_HANDLE;
+
+    VkResult result = vkCreateSwapchainKHR(m_device, &swapchainInfo, nullptr, &m_swapchain);
+    if (result != VK_SUCCESS) {
+        Msg("! [VulkanBackend] vkCreateSwapchainKHR failed: %d", result);
+        return false;
+    }
+
+    vkGetSwapchainImagesKHR(m_device, m_swapchain, &imageCount, nullptr);
+    m_swapchainImages.resize(imageCount);
+    vkGetSwapchainImagesKHR(m_device, m_swapchain, &imageCount, m_swapchainImages.data());
+
+    m_backBufferWidth = extent.width;
+    m_backBufferHeight = extent.height;
+    m_currentImageIndex = 0;
+
+    Msg("* [VulkanBackend] Swapchain created: %ux%u, %u images, format %d",
+        extent.width, extent.height, imageCount, m_swapchainFormat);
+    return true;
+}
+
+void VulkanBackend::DestroySwapChain() {
+    for (auto& bb : m_backBuffers)
+        bb = nullptr;
+    m_swapchainImages.clear();
+
+    if (m_swapchain) {
+        vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+        m_swapchain = VK_NULL_HANDLE;
+    }
+}
+
+void VulkanBackend::CreateBackBufferTextures() {
+    nvrhi::Format nvFormat = (m_swapchainFormat == VK_FORMAT_R8G8B8A8_UNORM)
+        ? nvrhi::Format::RGBA8_UNORM
+        : nvrhi::Format::BGRA8_UNORM;
+
+    for (u32 i = 0; i < m_swapchainImages.size() && i < BACK_BUFFER_COUNT; i++) {
+        nvrhi::TextureDesc desc;
+        desc.width = m_backBufferWidth;
+        desc.height = m_backBufferHeight;
+        desc.format = nvFormat;
+        desc.isRenderTarget = true;
+        desc.debugName = "BackBuffer";
+        desc.keepInitialState = true;
+        desc.initialState = nvrhi::ResourceStates::Present;
+
+        m_backBuffers[i] = m_nvrhiDevice->createHandleForNativeTexture(
+            nvrhi::ObjectTypes::VK_Image,
+            nvrhi::Object(m_swapchainImages[i]),
+            desc
+        );
+    }
+}
+
+void VulkanBackend::CreateSyncObjects() {
+    VkSemaphoreCreateInfo semInfo = {};
+    semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    for (u32 i = 0; i < BACK_BUFFER_COUNT; i++) {
+        vkCreateSemaphore(m_device, &semInfo, nullptr, &m_imageAvailable[i]);
+        vkCreateSemaphore(m_device, &semInfo, nullptr, &m_renderFinished[i]);
+    }
+}
+
+void VulkanBackend::DestroySyncObjects() {
+    if (!m_device)
+        return;
+    for (u32 i = 0; i < BACK_BUFFER_COUNT; i++) {
+        if (m_imageAvailable[i]) {
+            vkDestroySemaphore(m_device, m_imageAvailable[i], nullptr);
+            m_imageAvailable[i] = VK_NULL_HANDLE;
+        }
+        if (m_renderFinished[i]) {
+            vkDestroySemaphore(m_device, m_renderFinished[i], nullptr);
+            m_renderFinished[i] = VK_NULL_HANDLE;
+        }
+    }
+}
+
+void VulkanBackend::CreateBindlessResources() {
+    Msg("* [VulkanBackend] Creating bindless resources...");
+
+    nvrhi::BindlessLayoutDesc bindlessDesc;
+    bindlessDesc.visibility = nvrhi::ShaderType::All;
+    bindlessDesc.firstSlot = 0;
+    bindlessDesc.maxCapacity = MAX_BINDLESS_TEXTURES;
+    bindlessDesc.registerSpaces = { nvrhi::BindingLayoutItem::Texture_SRV(1) };
+
+    m_bindlessLayout = m_nvrhiDevice->createBindlessLayout(bindlessDesc);
+    if (!m_bindlessLayout) {
+        Msg("! [VulkanBackend] Failed to create bindless layout");
+        return;
+    }
+
+    m_bindlessDescriptorTable = m_nvrhiDevice->createDescriptorTable(m_bindlessLayout);
+    if (!m_bindlessDescriptorTable) {
+        Msg("! [VulkanBackend] Failed to create bindless descriptor table");
+        return;
+    }
+
+    m_nvrhiDevice->resizeDescriptorTable(m_bindlessDescriptorTable, MAX_BINDLESS_TEXTURES, false);
+    Msg("* [VulkanBackend] Bindless resources created (max %u textures)", MAX_BINDLESS_TEXTURES);
+}
+
+void VulkanBackend::QueryCapabilities() {
+    m_capabilities.bindlessTextures = true;
+    m_capabilities.maxBindlessResources = MAX_BINDLESS_TEXTURES;
+    m_capabilities.shaderModel = 60;
+
+    VkPhysicalDeviceProperties props;
+    vkGetPhysicalDeviceProperties(m_physicalDevice, &props);
+
+    VkPhysicalDeviceFeatures features;
+    vkGetPhysicalDeviceFeatures(m_physicalDevice, &features);
+
+    m_capabilities.geometry.dwRegisters = 256;
+    m_capabilities.geometry.dwInstructions = 65535;
+    m_capabilities.geometry.dwClipPlanes = 6;
+    m_capabilities.geometry.dwVertexCache = 24;
+    m_capabilities.geometry.bVTF = true;
+
+    m_capabilities.raster.dwRegisters = 256;
+    m_capabilities.raster.dwInstructions = 65535;
+    m_capabilities.raster.dwStages = 16;
+    m_capabilities.raster.dwMRT_count = 8;
+    m_capabilities.raster.b_MRT_mixdepth = true;
+
+    m_capabilities.raster_major = 6;
+    m_capabilities.raster_minor = 0;
+    m_capabilities.raster_profile = "ps_6_0";
+    m_capabilities.geometry_major = 6;
+    m_capabilities.geometry_minor = 0;
+    m_capabilities.geometry_profile = "vs_6_0";
+    m_capabilities.iGPUNum = 1;
+
+    m_capabilities.hasStencil = true;
+    m_capabilities.hasScissor = true;
+    m_capabilities.hasFixedPipeline = false;
+    m_capabilities.useCombinedSamplers = false;
+}
+
+u32 VulkanBackend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
+    if (!m_bindlessDescriptorTable || !texture)
+        return UINT32_MAX;
+
+    u32 slot;
+    if (!m_freeBindlessIndices.empty()) {
+        slot = m_freeBindlessIndices.back();
+        m_freeBindlessIndices.pop_back();
+    } else {
+        if (m_nextBindlessIndex >= MAX_BINDLESS_TEXTURES) {
+            Msg("! [VulkanBackend] Bindless texture limit reached");
+            return UINT32_MAX;
+        }
+        slot = m_nextBindlessIndex++;
+    }
+
+    nvrhi::BindingSetItem item = nvrhi::BindingSetItem::Texture_SRV(0, texture);
+    item.slot = slot;
+
+    if (!m_nvrhiDevice->writeDescriptorTable(m_bindlessDescriptorTable, item)) {
+        m_freeBindlessIndices.push_back(slot);
+        return UINT32_MAX;
+    }
+
+    return slot;
+}
+
+void VulkanBackend::UnregisterBindlessTexture(u32 index) {
+    if (index < MAX_BINDLESS_TEXTURES)
+        m_freeBindlessIndices.push_back(index);
+}
+
+nvrhi::ITexture* VulkanBackend::GetBackBuffer() {
+    return m_backBuffers[m_currentImageIndex].Get();
+}
+
+void VulkanBackend::Present(bool vsync) {
+    ZoneScopedN("VulkanBackend::Present");
+
+    VkPresentInfoKHR presentInfo = {};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores = &m_renderFinished[m_currentFrameIndex];
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = &m_swapchain;
+    presentInfo.pImageIndices = &m_currentImageIndex;
+
+    VkResult result = vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+        Msg("* [VulkanBackend] Swapchain out of date, resize needed");
+    }
+}
+
+void VulkanBackend::ResizeSwapChain(u32 width, u32 height) {
+    WaitForIdle();
+
+    for (auto& bb : m_backBuffers)
+        bb = nullptr;
+
+    DestroySwapChain();
+    CreateSwapChain(width, height);
+    CreateBackBufferTextures();
+}
+
+void VulkanBackend::BeginFrame() {
+    ZoneScopedN("VK::BeginFrame");
+
+    if (m_gcTask) {
+        ZoneScopedN("VK::WaitForGC");
+        TaskScheduler->Wait(*m_gcTask);
+        m_gcTask = nullptr;
+    }
+
+    VkResult result = vkAcquireNextImageKHR(
+        m_device, m_swapchain, UINT64_MAX,
+        m_imageAvailable[m_currentFrameIndex], VK_NULL_HANDLE,
+        &m_currentImageIndex);
+
+    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        Msg("* [VulkanBackend] Swapchain out of date during acquire");
+        return;
+    }
+
+    auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+    vkDevice->queueWaitForSemaphore(
+        nvrhi::CommandQueue::Graphics,
+        m_imageAvailable[m_currentFrameIndex], 0);
+
+    {
+        ZoneScopedN("VK::CommandListOpen");
+        m_commandList->open();
+    }
+    m_inFrame = true;
+}
+
+void VulkanBackend::EndFrame() {
+    ZoneScopedN("VK::EndFrame");
+
+    m_inFrame = false;
+
+    auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+    vkDevice->queueSignalSemaphore(
+        nvrhi::CommandQueue::Graphics,
+        m_renderFinished[m_currentFrameIndex], 0);
+
+    {
+        ZoneScopedN("VK::CommandListClose");
+        m_commandList->close();
+    }
+
+    {
+        ZoneScopedN("VK::ExecuteCommandList");
+        m_nvrhiDevice->executeCommandList(m_commandList);
+    }
+
+    m_currentFrameIndex = (m_currentFrameIndex + 1) % BACK_BUFFER_COUNT;
+
+    nvrhi::IDevice* device = m_nvrhiDevice;
+    m_gcTask = &TaskScheduler->AddTask([device] {
+        device->runGarbageCollection();
+    });
+}
+
+void VulkanBackend::WaitForIdle() {
+    if (m_gcTask) {
+        TaskScheduler->Wait(*m_gcTask);
+        m_gcTask = nullptr;
+    }
+    if (m_nvrhiDevice)
+        m_nvrhiDevice->waitForIdle();
+    if (m_device)
+        vkDeviceWaitIdle(m_device);
+}
+
+void VulkanBackend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
+    if (m_nvrhiDevice && commandList)
+        m_nvrhiDevice->executeCommandList(commandList);
+}
+
+void VulkanBackend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {
+    if (!m_nvrhiDevice) return;
+    for (u32 i = 0; i < count; i++) {
+        if (commandLists[i])
+            m_nvrhiDevice->executeCommandList(commandLists[i]);
+    }
+}
+
+void VulkanBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) {
+    if (!buffer || !data || size == 0) return;
+
+    if (m_inFrame) {
+        m_commandList->writeBuffer(buffer, data, size);
+    } else {
+        m_uploadCommandList->open();
+        m_uploadCommandList->writeBuffer(buffer, data, size);
+        m_uploadCommandList->close();
+        m_nvrhiDevice->executeCommandList(m_uploadCommandList);
+    }
+}
+
+nvrhi::ICommandList* VulkanBackend::CreateCommandList() {
+    return nullptr;
+}
+
+DeviceState VulkanBackend::GetDeviceState() const {
+    if (!m_initialized || !m_device)
+        return DeviceState::Lost;
+    return DeviceState::Normal;
+}
+
+void VulkanBackend::BeginDebugEvent(pcstr name) {}
+void VulkanBackend::EndDebugEvent() {}
+void VulkanBackend::SetMarker(pcstr name) {}
+
+IRenderBackend* CreateVulkanBackend(SDL_Window* window, u32 width, u32 height, bool enableValidation) {
+    auto* backend = xr_new<VulkanBackend>();
+    if (backend->Initialize(window, width, height, enableValidation))
+        return backend;
+    Msg("! [VulkanBackend] Initialization failed");
+    xr_delete(backend);
+    return nullptr;
+}

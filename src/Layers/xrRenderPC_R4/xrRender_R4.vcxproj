@@ -25,18 +25,18 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;$(VULKAN_SDK)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)'!='Release Master Gold'">$(xrExternals)onnxruntime\include\onnxruntime\core\session;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;RENDER_NAMESPACE=render_r4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'!='Release Master Gold'">%(PreprocessorDefinitions);USE_AI_PBR</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;nvrhi_vk.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;$(VULKAN_SDK)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -45,11 +45,11 @@
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;nvrhi_vk.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;$(VULKAN_SDK)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -95,6 +95,7 @@
     <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_SIMD.h" />
     <ClInclude Include="..\xrRender\Backend\D3D11BackendWrapper.h" />
     <ClInclude Include="..\xrRender\Backend\D3D12Backend.h" />
+    <ClInclude Include="..\xrRender\Backend\VulkanBackend.h" />
     <ClInclude Include="..\xrRender\Bindless\BindlessTypes.h" />
     <ClInclude Include="..\xrRender\Bindless\GPUStructuredBuffer.h" />
     <ClInclude Include="..\xrRender\Bindless\MaterialBuffer.h" />
@@ -339,6 +340,7 @@
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
     <ClCompile Include="..\xrRender\Backend\D3D11BackendWrapper.cpp" />
     <ClCompile Include="..\xrRender\Backend\D3D12Backend.cpp" />
+    <ClCompile Include="..\xrRender\Backend\VulkanBackend.cpp" />
     <ClCompile Include="..\xrRender\Bindless\GPUStructuredBuffer.cpp" />
     <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
     <ClCompile Include="..\xrRender\Bindless\TerrainMaterialBuffer.cpp" />
@@ -710,6 +712,9 @@
     <ProjectReference Include="..\..\..\Externals\nvrhi\vs_build\nvrhi-d3d12.vcxproj" Condition="Exists('..\..\..\Externals\nvrhi\vs_build\nvrhi-d3d12.vcxproj')">
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\nvrhi\vs_build\nvrhi-vk.vcxproj" Condition="Exists('..\..\..\Externals\nvrhi\vs_build\nvrhi-vk.vcxproj')">
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Externals\slang\vs_build\slang.vcxproj" Condition="Exists('..\..\..\Externals\slang\vs_build\slang.vcxproj')">
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
@@ -802,7 +807,7 @@
   <Target Name="ConfigureAndBuildNVRHI" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <NVRHIBuildDir>$(xrExternals)nvrhi\vs_build</NVRHIBuildDir>
-      <NVRHICMakeOptions>-DNVRHI_BUILD_SHARED=OFF -DNVRHI_WITH_DX11=ON -DNVRHI_WITH_DX12=ON -DNVRHI_WITH_VULKAN=OFF -DNVRHI_WITH_VALIDATION=ON -DNVRHI_INSTALL=OFF</NVRHICMakeOptions>
+      <NVRHICMakeOptions>-DNVRHI_BUILD_SHARED=OFF -DNVRHI_WITH_DX11=ON -DNVRHI_WITH_DX12=ON -DNVRHI_WITH_VULKAN=ON -DNVRHI_WITH_VALIDATION=ON -DNVRHI_INSTALL=OFF</NVRHICMakeOptions>
       <!-- Map OpenXRay configurations to CMake standard configurations -->
       <NVRHIConfig Condition="'$(Configuration)'=='Debug'">RelWithDebInfo</NVRHIConfig>
       <NVRHIConfig Condition="'$(Configuration)'=='Mixed'">RelWithDebInfo</NVRHIConfig>
@@ -814,8 +819,8 @@
     <Exec Command="cmake -A x64 $(NVRHICMakeOptions) -S $(xrExternals)nvrhi -B $(NVRHIBuildDir)" Condition="!Exists('$(NVRHIBuildDir)\nvrhi.sln')" />
     <!-- Build NVRHI for current configuration with parallel jobs -->
     <Message Text="[NVRHI Build] Processor Count: $(NVRHIParallelCount)" Importance="high" />
-    <Message Text="[NVRHI Build] Build Command: cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --target nvrhi nvrhi_d3d11 nvrhi_d3d12 --parallel $(NVRHIParallelCount)" Importance="high" />
-    <Exec Command="cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --target nvrhi nvrhi_d3d11 nvrhi_d3d12 --parallel $(NVRHIParallelCount)" Condition="Exists('$(NVRHIBuildDir)\nvrhi.sln')" />
+    <Message Text="[NVRHI Build] Build Command: cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --target nvrhi nvrhi_d3d11 nvrhi_d3d12 nvrhi_vk --parallel $(NVRHIParallelCount)" Importance="high" />
+    <Exec Command="cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --target nvrhi nvrhi_d3d11 nvrhi_d3d12 nvrhi_vk --parallel $(NVRHIParallelCount)" Condition="Exists('$(NVRHIBuildDir)\nvrhi.sln')" />
   </Target>
   <Target Name="ConfigureAndBuildSlang" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -83,7 +83,7 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         profile = "sm_6_6";
         break;
     case Target::SPIRV:
-        profile = "sm_5_0";
+        profile = "sm_6_6";
         break;
     default:
         profile = "sm_5_0";
@@ -91,6 +91,26 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     }
 
     targetDesc.profile = m_globalSession->findProfile(profile);
+
+    slang::CompilerOptionEntry targetOptions[5];
+    u32 targetOptionCount = 0;
+
+    if (target == Target::SPIRV)
+    {
+        targetOptions[targetOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
+            {slang::CompilerOptionValueKind::Int, 0, 384}};
+        targetOptions[targetOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
+            {slang::CompilerOptionValueKind::Int, 1, 128}};
+        targetOptions[targetOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
+            {slang::CompilerOptionValueKind::Int, 2, 0}};
+        targetOptions[targetOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
+            {slang::CompilerOptionValueKind::Int, 3, 256}};
+        targetOptions[targetOptionCount++] = {slang::CompilerOptionName::EmitSpirvMethod,
+            {slang::CompilerOptionValueKind::Int, SLANG_EMIT_SPIRV_VIA_GLSL, 0}};
+    }
+
+    targetDesc.compilerOptionEntries = targetOptions;
+    targetDesc.compilerOptionEntryCount = targetOptionCount;
 
     sessionDesc.targets = &targetDesc;
     sessionDesc.targetCount = 1;
@@ -101,25 +121,22 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         sessionDesc.preprocessorMacroCount = slangDefines.size();
     }
 
-    slang::CompilerOptionEntry compilerOptions[3];
+    slang::CompilerOptionEntry sessionOptions[3];
 
-    compilerOptions[0].name = slang::CompilerOptionName::NoMangle;
-    compilerOptions[0].value.kind = slang::CompilerOptionValueKind::Int;
-    compilerOptions[0].value.intValue0 = 1;
+    sessionOptions[0].name = slang::CompilerOptionName::NoMangle;
+    sessionOptions[0].value = {slang::CompilerOptionValueKind::Int, 1, 0};
 
-    compilerOptions[1].name = slang::CompilerOptionName::PreserveParameters;
-    compilerOptions[1].value.kind = slang::CompilerOptionValueKind::Int;
-    compilerOptions[1].value.intValue0 = 1;
+    sessionOptions[1].name = slang::CompilerOptionName::PreserveParameters;
+    sessionOptions[1].value = {slang::CompilerOptionValueKind::Int, 1, 0};
 
-    compilerOptions[2].name = slang::CompilerOptionName::DebugInformation;
-    compilerOptions[2].value.kind = slang::CompilerOptionValueKind::Int;
+    sessionOptions[2].name = slang::CompilerOptionName::DebugInformation;
 #ifdef DEBUG
-    compilerOptions[2].value.intValue0 = SLANG_DEBUG_INFO_LEVEL_MAXIMAL;
+    sessionOptions[2].value = {slang::CompilerOptionValueKind::Int, SLANG_DEBUG_INFO_LEVEL_MAXIMAL, 0};
 #else
-    compilerOptions[2].value.intValue0 = SLANG_DEBUG_INFO_LEVEL_NONE;
+    sessionOptions[2].value = {slang::CompilerOptionValueKind::Int, SLANG_DEBUG_INFO_LEVEL_NONE, 0};
 #endif
 
-    sessionDesc.compilerOptionEntries = compilerOptions;
+    sessionDesc.compilerOptionEntries = sessionOptions;
     sessionDesc.compilerOptionEntryCount = 3;
 
     sessionDesc.fileSystem = m_vfsAdapter.get();

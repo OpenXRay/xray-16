@@ -347,10 +347,7 @@ void D3D12Backend::CreateBindlessResources() {
     bindlessDesc.visibility = nvrhi::ShaderType::All;
     bindlessDesc.firstSlot = 0;
     bindlessDesc.maxCapacity = MAX_BINDLESS_TEXTURES;
-    bindlessDesc.layoutType = nvrhi::BindlessLayoutDesc::LayoutType::MutableSrvUavCbv;
-
-    Msg("* [D3D12Backend] Bindless layout desc: visibility=0x%x, maxCapacity=%u, layoutType=MutableSrvUavCbv",
-        static_cast<u32>(bindlessDesc.visibility), bindlessDesc.maxCapacity);
+    bindlessDesc.registerSpaces = { nvrhi::BindingLayoutItem::Texture_SRV(1) };
 
     m_bindlessLayout = m_nvrhiDevice->createBindlessLayout(bindlessDesc);
     if (!m_bindlessLayout) {
@@ -443,20 +440,12 @@ u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
         return UINT32_MAX;
     }
 
-    u32 heapOffset = m_bindlessDescriptorTable->getFirstDescriptorIndexInHeap();
-    return heapOffset + slot;
+    return slot;
 }
 
-void D3D12Backend::UnregisterBindlessTexture(u32 absoluteIndex) {
-    u32 heapOffset = m_bindlessDescriptorTable ?
-        m_bindlessDescriptorTable->getFirstDescriptorIndexInHeap() : 0;
-
-    if (absoluteIndex >= heapOffset) {
-        u32 slot = absoluteIndex - heapOffset;
-        if (slot < MAX_BINDLESS_TEXTURES) {
-            m_freeBindlessIndices.push_back(slot);
-        }
-    }
+void D3D12Backend::UnregisterBindlessTexture(u32 index) {
+    if (index < MAX_BINDLESS_TEXTURES)
+        m_freeBindlessIndices.push_back(index);
 }
 
 nvrhi::ITexture* D3D12Backend::GetBackBuffer() {

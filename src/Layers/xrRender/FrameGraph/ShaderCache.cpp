@@ -23,8 +23,12 @@ void ShaderCache::GetCachePath(
     string_path& outPath)
 {
     string_path shaderDir;
-    xr_sprintf(shaderDir, "shaders_cache_fg%s%s%s",
-        DELIMITER, shaderName, extension);
+    if (m_backendSubdir.empty())
+        xr_sprintf(shaderDir, "shaders_cache_fg%s%s%s",
+            DELIMITER, shaderName, extension);
+    else
+        xr_sprintf(shaderDir, "shaders_cache_fg%s%s%s%s%s",
+            DELIMITER, m_backendSubdir.c_str(), DELIMITER, shaderName, extension);
 
     xr_sprintf(outPath, "%s%s%08X",
         shaderDir, DELIMITER, sourceHash);

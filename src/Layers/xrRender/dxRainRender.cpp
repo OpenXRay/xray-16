@@ -32,7 +32,7 @@ dxRainRender::dxRainRender()
 
     DM_Drop = RImplementation.model_CreateDM(F);
 
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         auto* shaderLoader = RImplementation.GetShaderLoader();
         if (shaderLoader)

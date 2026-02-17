@@ -3,10 +3,11 @@
 
 #define INVALID_TEXTURE_INDEX 0xFFFFFFFF
 
+Texture2D g_BindlessTextures[] : register(t0, space1);
+
 Texture2D GetBindlessTexture(uint index)
 {
-    DescriptorHandle<Texture2D> handle = DescriptorHandle<Texture2D>(uint2(index, 0));
-    return *nonuniform(handle);
+    return g_BindlessTextures[NonUniformResourceIndex(index)];
 }
 
 struct MaterialData

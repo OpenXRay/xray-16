@@ -15,7 +15,7 @@ namespace xray::render::RENDER_NAMESPACE
 {
 dxFontRender::~dxFontRender()
 {
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         m_vsHandle = nullptr;
         m_psHandle = nullptr;
@@ -37,7 +37,7 @@ dxFontRender::~dxFontRender()
 
 void dxFontRender::Initialize(cpcstr cShader, cpcstr cTexture)
 {
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         auto* shaderLoader = RImplementation.GetShaderLoader();
         if (!shaderLoader)

@@ -92,7 +92,7 @@ bool ShaderLoader::CompileShader(
         sourceCode.c_str(),
         entryPoint,
         stage,
-        xray::render::SlangCompiler::Target::DXIL,
+        m_target,
         shaderName
     );
 
@@ -182,7 +182,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Vertex,
-        xray::render::SlangCompiler::Target::DXIL,
+        m_target,
         fullPath
     );
 
@@ -299,7 +299,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Pixel,
-        xray::render::SlangCompiler::Target::DXIL,
+        m_target,
         fullPath
     );
 
@@ -422,7 +422,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Compute,
-        xray::render::SlangCompiler::Target::DXIL,
+        m_target,
         fullPath
     );
 
@@ -528,7 +528,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Amplification,
-        xray::render::SlangCompiler::Target::DXIL,
+        m_target,
         fullPath
     );
 
@@ -627,7 +627,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Mesh,
-        xray::render::SlangCompiler::Target::DXIL,
+        m_target,
         fullPath
     );
 
@@ -745,7 +745,7 @@ bool ShaderLoader::CompileShaderWithDefines(
         sourceCode.c_str(),
         entryPoint,
         stage,
-        xray::render::SlangCompiler::Target::DXIL,
+        m_target,
         fullPath,
         defines.data(),
         defines.size()

@@ -12,7 +12,7 @@ namespace xray::render::RENDER_NAMESPACE
 void dxFlareRender::Copy(IFlareRender& _in) { *this = *(dxFlareRender*)&_in; }
 void dxFlareRender::CreateShader(LPCSTR sh_name, LPCSTR tex_name)
 {
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         if (tex_name && tex_name[0])
         {
@@ -46,7 +46,7 @@ void dxFlareRender::CreateShader(LPCSTR sh_name, LPCSTR tex_name)
 
 void dxFlareRender::DestroyShader()
 {
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         m_vsHandle = nullptr;
         m_psHandle = nullptr;

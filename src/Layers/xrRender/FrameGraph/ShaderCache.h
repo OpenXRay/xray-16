@@ -59,6 +59,8 @@ public:
     const Stats& GetStats() const { return m_stats; }
     void ResetStats() { m_stats = {}; }
 
+    void SetBackendSubdir(const char* subdir) { m_backendSubdir = subdir; }
+
 private:
     void GetCachePath(
         const char* shaderName,
@@ -80,6 +82,7 @@ private:
     static constexpr u32 CACHE_VERSION = 4;
     Stats m_stats;
     bool m_cacheEnabled;
+    xr_string m_backendSubdir;
 };
 
 }

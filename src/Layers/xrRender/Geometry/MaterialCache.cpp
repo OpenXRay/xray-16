@@ -252,7 +252,7 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
         return nullptr;
     }
 
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12) {
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph()) {
         u32 shaderID = visual->shader_id;
         if (shaderID != UINT32_MAX) {
             auto* compiled = RImplementation.getCompiledShader(shaderID);
@@ -350,7 +350,7 @@ MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
         return nullptr;
     }
 
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12) {
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph()) {
         return nullptr;
     }
 

@@ -137,6 +137,10 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/ImGuiRendererIntegration.cpp
     ../xrRender/dxRenderFactory_ImGui.cpp
     ../xrRender/GlobalRenderDevice.cpp
+
+    # Vulkan Backend
+    ../xrRender/Backend/VulkanBackend.h
+    ../xrRender/Backend/VulkanBackend.cpp
 )
 
 target_include_directories(xrRenderPC_R4
@@ -146,6 +150,8 @@ target_include_directories(xrRenderPC_R4
     "${CMAKE_SOURCE_DIR}/Externals/nvrhi/include"
     "${CMAKE_SOURCE_DIR}/Externals/slang/include"
 )
+
+find_package(Vulkan REQUIRED)
 
 target_link_libraries(xrRenderPC_R4
     PRIVATE
@@ -158,6 +164,8 @@ target_link_libraries(xrRenderPC_R4
     xrMiscMath
     nvrhi
     nvrhi-d3d11
+    nvrhi_vk
+    Vulkan::Vulkan
     slang
 )
 

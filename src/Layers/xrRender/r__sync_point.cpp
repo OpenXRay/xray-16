@@ -53,7 +53,7 @@ void R_sync_point::End()
 #elif defined(USE_DX11)
 void R_sync_point::Create()
 {
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
     {
         Msg("* [R_sync_point] Disabled - NVRHI handles synchronization");
         return;
@@ -68,7 +68,7 @@ void R_sync_point::Create()
 
 void R_sync_point::Destroy()
 {
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
         return;
 
     const u32 gpuNum = GEnv.Backend->GetCapabilities().iGPUNum;
@@ -80,7 +80,7 @@ bool R_sync_point::Wait(u32 wait_sleep, u64 timeout)
 {
     ZoneScoped;
 
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
         return true;
 
     CTimer T;
@@ -102,7 +102,7 @@ bool R_sync_point::Wait(u32 wait_sleep, u64 timeout)
 
 void R_sync_point::End()
 {
-    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
         return;
 
     q_sync_count = (q_sync_count + 1) % GEnv.Backend->GetCapabilities().iGPUNum;

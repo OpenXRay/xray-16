@@ -25,7 +25,7 @@ public:
     virtual void create(LPCSTR sh, LPCSTR tex = nullptr);
     virtual bool inited()
     {
-        if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+        if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
             return m_vsHandle && m_psHandle;
         return hShader;
     }
