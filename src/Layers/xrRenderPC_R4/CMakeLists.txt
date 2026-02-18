@@ -97,6 +97,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/SkyPassSetup.cpp
     ../xrRender/FrameGraphPasses/SunPassSetup.h
     ../xrRender/FrameGraphPasses/SunPassSetup.cpp
+    ../xrRender/FrameGraphPasses/DetailCullPassSetup.h
+    ../xrRender/FrameGraphPasses/DetailCullPassSetup.cpp
     ../xrRender/FrameGraphPasses/DetailPassSetup.h
     ../xrRender/FrameGraphPasses/DetailPassSetup.cpp
     ../xrRender/FrameGraphPasses/TransparentPassSetup.h

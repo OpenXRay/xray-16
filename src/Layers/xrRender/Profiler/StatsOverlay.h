@@ -114,6 +114,7 @@ public:
 private:
     void RenderCPUSection();
     void RenderGPUSection();
+    void RenderGPUPassList(const xr_vector<GPUPassTiming>& passTimings, float totalGPU, bool asyncOnly);
     void RenderGeometrySection();
     void RenderInspectorSection();
     void RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, float parentTime);

@@ -64,6 +64,13 @@ public:
     // Note: Returns raw pointer, caller must manage lifetime via RefCountPtr
     virtual nvrhi::ICommandList* CreateCommandList() { return nullptr; }
 
+    // ═══════ Async Compute ═══════
+    virtual bool HasAsyncCompute() const { return false; }
+    virtual nvrhi::ICommandList* GetComputeCommandList() const { return nullptr; }
+    virtual u64 ExecuteComputeCommandList(nvrhi::ICommandList* commandList) { return 0; }
+    virtual void QueueWaitForCompute(u64 instanceID) {}
+    virtual void ComputeWaitForPreviousGraphics() {}
+
     // ═══════ Command Execution ═══════
     virtual void ExecuteCommandList(nvrhi::ICommandList* commandList) {}
     virtual void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {}

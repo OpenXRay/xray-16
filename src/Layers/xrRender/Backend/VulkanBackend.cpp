@@ -85,6 +85,10 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
     deviceDesc.device = m_device;
     deviceDesc.graphicsQueue = m_graphicsQueue;
     deviceDesc.graphicsQueueIndex = static_cast<int>(m_graphicsQueueFamily);
+    if (m_computeQueue) {
+        deviceDesc.computeQueue = m_computeQueue;
+        deviceDesc.computeQueueIndex = static_cast<int>(m_computeQueueFamily);
+    }
 
     const char* instanceExts[] = {
         VK_KHR_SURFACE_EXTENSION_NAME,
@@ -136,6 +140,18 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
         return false;
     }
 
+    if (m_computeQueue) {
+        nvrhi::CommandListParameters computeParams;
+        computeParams.enableImmediateExecution = false;
+        computeParams.setQueueType(nvrhi::CommandQueue::Compute);
+        m_computeCommandList = m_nvrhiDevice->createCommandList(computeParams);
+        if (m_computeCommandList) {
+            Msg("* [VulkanBackend] Async compute enabled");
+        } else {
+            Msg("! [VulkanBackend] Failed to create compute command list (async compute disabled)");
+        }
+    }
+
     QueryCapabilities();
     CreateBackBufferTextures();
     CreateSyncObjects();
@@ -159,6 +175,7 @@ void VulkanBackend::Shutdown() {
     for (auto& bb : m_backBuffers)
         bb = nullptr;
     m_commandList = nullptr;
+    m_computeCommandList = nullptr;
     m_uploadCommandList = nullptr;
     m_nvrhiDevice = nullptr;
     m_nvrhiVulkanDevice = nullptr;
@@ -314,13 +331,18 @@ bool VulkanBackend::CreateLogicalDevice() {
     vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyCount, queueFamilies.data());
 
     m_graphicsQueueFamily = UINT32_MAX;
+    m_computeQueueFamily = UINT32_MAX;
     for (u32 i = 0; i < queueFamilyCount; i++) {
         VkBool32 presentSupport = VK_FALSE;
         vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, i, m_surface, &presentSupport);
 
         if ((queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && presentSupport) {
             m_graphicsQueueFamily = i;
-            break;
+        }
+
+        if ((queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT) &&
+            !(queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)) {
+            m_computeQueueFamily = i;
         }
     }
 
@@ -329,12 +351,33 @@ bool VulkanBackend::CreateLogicalDevice() {
         return false;
     }
 
-    float queuePriority = 1.0f;
-    VkDeviceQueueCreateInfo queueCreateInfo = {};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = m_graphicsQueueFamily;
-    queueCreateInfo.queueCount = 1;
-    queueCreateInfo.pQueuePriorities = &queuePriority;
+    // If no dedicated compute family, try using a second queue from graphics family
+    bool useGraphicsFamilyForCompute = false;
+    if (m_computeQueueFamily == UINT32_MAX) {
+        if (queueFamilies[m_graphicsQueueFamily].queueCount >= 2) {
+            m_computeQueueFamily = m_graphicsQueueFamily;
+            useGraphicsFamilyForCompute = true;
+        }
+    }
+
+    float queuePriorities[2] = { 1.0f, 1.0f };
+
+    xr_vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    VkDeviceQueueCreateInfo graphicsQueueInfo = {};
+    graphicsQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    graphicsQueueInfo.queueFamilyIndex = m_graphicsQueueFamily;
+    graphicsQueueInfo.queueCount = useGraphicsFamilyForCompute ? 2 : 1;
+    graphicsQueueInfo.pQueuePriorities = queuePriorities;
+    queueCreateInfos.push_back(graphicsQueueInfo);
+
+    if (m_computeQueueFamily != UINT32_MAX && !useGraphicsFamilyForCompute) {
+        VkDeviceQueueCreateInfo computeQueueInfo = {};
+        computeQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        computeQueueInfo.queueFamilyIndex = m_computeQueueFamily;
+        computeQueueInfo.queueCount = 1;
+        computeQueueInfo.pQueuePriorities = queuePriorities;
+        queueCreateInfos.push_back(computeQueueInfo);
+    }
 
     const char* deviceExtensions[] = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
@@ -382,8 +425,8 @@ bool VulkanBackend::CreateLogicalDevice() {
     VkDeviceCreateInfo deviceCreateInfo = {};
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     deviceCreateInfo.pNext = &features2;
-    deviceCreateInfo.queueCreateInfoCount = 1;
-    deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+    deviceCreateInfo.queueCreateInfoCount = static_cast<u32>(queueCreateInfos.size());
+    deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
     deviceCreateInfo.enabledExtensionCount = static_cast<u32>(std::size(deviceExtensions));
     deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions;
 
@@ -394,7 +437,18 @@ bool VulkanBackend::CreateLogicalDevice() {
     }
 
     vkGetDeviceQueue(m_device, m_graphicsQueueFamily, 0, &m_graphicsQueue);
-    Msg("* [VulkanBackend] Logical device created (queue family %u)", m_graphicsQueueFamily);
+
+    if (m_computeQueueFamily != UINT32_MAX) {
+        u32 computeQueueIndex = useGraphicsFamilyForCompute ? 1 : 0;
+        vkGetDeviceQueue(m_device, m_computeQueueFamily, computeQueueIndex, &m_computeQueue);
+        Msg("* [VulkanBackend] Compute queue: family %u, index %u%s",
+            m_computeQueueFamily, computeQueueIndex,
+            useGraphicsFamilyForCompute ? " (shared family)" : " (dedicated)");
+    } else {
+        Msg("* [VulkanBackend] No compute queue available (async compute disabled)");
+    }
+
+    Msg("* [VulkanBackend] Logical device created (graphics family %u)", m_graphicsQueueFamily);
     return true;
 }
 
@@ -719,7 +773,7 @@ void VulkanBackend::EndFrame() {
 
     {
         ZoneScopedN("VK::ExecuteCommandList");
-        m_nvrhiDevice->executeCommandList(m_commandList);
+        m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(m_commandList);
     }
 
     m_currentFrameIndex = (m_currentFrameIndex + 1) % BACK_BUFFER_COUNT;
@@ -744,6 +798,24 @@ void VulkanBackend::WaitForIdle() {
 void VulkanBackend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
     if (m_nvrhiDevice && commandList)
         m_nvrhiDevice->executeCommandList(commandList);
+}
+
+u64 VulkanBackend::ExecuteComputeCommandList(nvrhi::ICommandList* commandList) {
+    if (!m_nvrhiDevice || !commandList || !m_computeQueue)
+        return 0;
+    return m_nvrhiDevice->executeCommandList(commandList, nvrhi::CommandQueue::Compute);
+}
+
+void VulkanBackend::QueueWaitForCompute(u64 instanceID) {
+    if (!m_nvrhiDevice || !m_computeQueue || instanceID == 0)
+        return;
+    m_nvrhiDevice->queueWaitForCommandList(nvrhi::CommandQueue::Graphics, nvrhi::CommandQueue::Compute, instanceID);
+}
+
+void VulkanBackend::ComputeWaitForPreviousGraphics() {
+    if (!m_nvrhiDevice || !m_computeQueue || m_lastGraphicsInstanceID == 0)
+        return;
+    m_nvrhiDevice->queueWaitForCommandList(nvrhi::CommandQueue::Compute, nvrhi::CommandQueue::Graphics, m_lastGraphicsInstanceID);
 }
 
 void VulkanBackend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {

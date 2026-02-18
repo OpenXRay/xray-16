@@ -109,6 +109,7 @@ struct PassNode {
     bool isGraphics = true;              // Uses graphics pipeline
     bool isCompute = false;              // Uses compute pipeline
     bool isCopy = false;                 // Copy/blit operation
+    bool hasSideEffects = false;         // Writes to external resources (prevents culling)
 
     PassNode() = default;
 

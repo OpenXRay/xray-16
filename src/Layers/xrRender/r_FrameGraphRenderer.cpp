@@ -29,6 +29,7 @@
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering + pipeline init
 #include "GPUCullingManager.h"                       // Phase 3.5: GPU frustum/occlusion culling
 #include "FGDetailManager.h"                         // Detail system (grass/vegetation)
+#include "FrameGraphPasses/DetailCullPassSetup.h"    // Detail culling (async compute)
 #include "FrameGraphPasses/DetailPassSetup.h"        // Detail rendering pass
 #include "FrameGraphPasses/TransparentPassSetup.h"   // Transparent alpha-blended geometry (after detail)
 // SM6 bindless: Textures registered directly with D3D12Backend via RegisterBindlessTexture()
@@ -321,6 +322,12 @@ void FrameGraphRenderer::Render() {
     // Set GPUProfiler for per-pass timing
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
 
+    // Wire async compute (Vulkan only for now — D3D12 triggers device removed)
+    if (ps_fg_render_mode == FG_RENDER_VULKAN && GEnv.Backend->HasAsyncCompute())
+        m_framegraph->SetAsyncCompute(GEnv.Backend->GetComputeCommandList(), GEnv.Backend);
+    else
+        m_framegraph->SetAsyncCompute(nullptr, nullptr);
+
     // Compile the graph (optimizes passes, calculates lifetimes, etc.)
     {
         ZoneScopedN("FG::Compile");
@@ -502,6 +509,7 @@ void FrameGraphRenderer::RenderMenu() {
 
     m_framegraph->SetRenderContext(m_renderContext.get());
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
+    m_framegraph->SetAsyncCompute(nullptr, nullptr);
     m_framegraph->Compile();
     m_framegraph->Execute();
 
@@ -1139,20 +1147,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
 
     // ═══════════════════════════════════════════════════════
-    //  DETAIL PASS (Grass/Vegetation)
+    //  DETAIL CULL PASS (Async Compute)
     // ═══════════════════════════════════════════════════════
-    // Renders detail objects (grass, small vegetation) using:
-    // - GPU compute culling (frustum + Hi-Z occlusion)
-    // - Single unified draw call via DrawIndexedIndirect
-    // Renders after particles but before post-processing.
-
-    auto detailOutputs = passes::setupDetailPass(
+    passes::setupDetailCullPass(
         *m_framegraph,
         m_device,
         m_detailManager.get(),
-        particleOutputs,
-        width,
-        height,
         hizOutput.pyramid,
         hizOutput.width,
         hizOutput.height,
@@ -1160,6 +1160,19 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_hasPrevFrameData ? &m_prevViewProj : nullptr,
         m_gpuProfiler.get(),
         &m_passStates->detail
+    );
+
+    // ═══════════════════════════════════════════════════════
+    //  DETAIL DRAW PASS (Graphics)
+    // ═══════════════════════════════════════════════════════
+    auto detailOutputs = passes::setupDetailPass(
+        *m_framegraph,
+        m_device,
+        m_detailManager.get(),
+        particleOutputs,
+        width,
+        height,
+        m_gpuProfiler.get()
     );
 
     // ═══════════════════════════════════════════════════════

@@ -322,12 +322,17 @@ public:
     //  INTERNAL
     // ═══════════════════════════════════════════════════════
 
-    nvrhi::ICommandList* GetCommandList() const { return m_commandList.Get(); }
+    nvrhi::ICommandList* GetCommandList() const {
+        return m_overrideCommandList ? m_overrideCommandList : m_commandList.Get();
+    }
     RenderDevice* GetDevice() const { return m_device; }
+
+    void SetOverrideCommandList(nvrhi::ICommandList* cmdList) { m_overrideCommandList = cmdList; }
 
 private:
     RenderDevice* m_device;  // Our abstraction layer device
     nvrhi::CommandListHandle m_commandList;  // Smart pointer - MUST keep alive!
+    nvrhi::ICommandList* m_overrideCommandList = nullptr;
     ResourceManager* m_resourceManager = nullptr;  // Set later
 
     // State tracking

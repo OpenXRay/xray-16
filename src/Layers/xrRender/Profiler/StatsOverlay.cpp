@@ -228,6 +228,53 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
     ImGui::PopID();
 }
 
+void StatsOverlay::RenderGPUPassList(const xr_vector<GPUPassTiming>& passTimings, float totalGPU, bool asyncOnly)
+{
+    for (const auto& pass : passTimings)
+    {
+        if (pass.isAsync != asyncOnly)
+            continue;
+        if (strchr(pass.name.c_str(), '.') != nullptr)
+            continue;
+
+        u32 color = GetTimeColor(pass.timeMs, totalGPU);
+        ImGui::PushStyleColor(ImGuiCol_Text, color);
+
+        float percent = totalGPU > 0.0f ? (pass.timeMs / totalGPU) * 100.0f : 0.0f;
+
+        ImGui::BulletText("%s", pass.name.c_str());
+        ImGui::SameLine();
+        ImGui::TextDisabled("%s (%.1f%%)", FormatTime(pass.timeMs), percent);
+
+        ImGui::PopStyleColor();
+
+        xr_string parentPrefix(pass.name.c_str());
+        parentPrefix += '.';
+
+        for (const auto& sub : passTimings)
+        {
+            if (sub.isAsync != asyncOnly)
+                continue;
+            if (strncmp(sub.name.c_str(), parentPrefix.c_str(), parentPrefix.size()) != 0)
+                continue;
+
+            const char* subName = sub.name.c_str() + parentPrefix.size();
+            u32 subColor = GetTimeColor(sub.timeMs, totalGPU);
+            ImGui::PushStyleColor(ImGuiCol_Text, subColor);
+
+            float subPercent = totalGPU > 0.0f ? (sub.timeMs / totalGPU) * 100.0f : 0.0f;
+
+            ImGui::Indent();
+            ImGui::BulletText("%s", subName);
+            ImGui::SameLine();
+            ImGui::TextDisabled("%s (%.1f%%)", FormatTime(sub.timeMs), subPercent);
+            ImGui::Unindent();
+
+            ImGui::PopStyleColor();
+        }
+    }
+}
+
 void StatsOverlay::RenderGPUSection()
 {
     ImGui::SetNextItemOpen(m_gpuExpanded, ImGuiCond_Once);
@@ -251,54 +298,44 @@ void StatsOverlay::RenderGPUSection()
         }
 
         ImGui::Text("Total: %s", FormatTime(totalGPU));
-        ImGui::Indent();
 
-        // Render parent passes first, then their sub-passes immediately after.
-        // Sub-passes are nested timer queries that resolve before the parent,
-        // so we can't rely on list order. Instead: iterate parents, then find children.
+        float asyncTotal = 0.0f;
+        float graphicsTotal = 0.0f;
+        bool hasAsync = false;
         for (const auto& pass : passTimings)
         {
-            // Skip sub-passes (handled below their parent)
-            if (strchr(pass.name.c_str(), '.') != nullptr)
-                continue;
-
-            u32 color = GetTimeColor(pass.timeMs, totalGPU);
-            ImGui::PushStyleColor(ImGuiCol_Text, color);
-
-            float percent = totalGPU > 0.0f ? (pass.timeMs / totalGPU) * 100.0f : 0.0f;
-
-            ImGui::BulletText("%s", pass.name.c_str());
-            ImGui::SameLine();
-            ImGui::TextDisabled("%s (%.1f%%)", FormatTime(pass.timeMs), percent);
-
-            ImGui::PopStyleColor();
-
-            // Find and render sub-passes matching "ParentName.*"
-            xr_string parentPrefix(pass.name.c_str());
-            parentPrefix += '.';
-
-            for (const auto& sub : passTimings)
-            {
-                if (strncmp(sub.name.c_str(), parentPrefix.c_str(), parentPrefix.size()) != 0)
-                    continue;
-
-                const char* subName = sub.name.c_str() + parentPrefix.size();
-                u32 subColor = GetTimeColor(sub.timeMs, totalGPU);
-                ImGui::PushStyleColor(ImGuiCol_Text, subColor);
-
-                float subPercent = totalGPU > 0.0f ? (sub.timeMs / totalGPU) * 100.0f : 0.0f;
-
-                ImGui::Indent();
-                ImGui::BulletText("%s", subName);
-                ImGui::SameLine();
-                ImGui::TextDisabled("%s (%.1f%%)", FormatTime(sub.timeMs), subPercent);
-                ImGui::Unindent();
-
-                ImGui::PopStyleColor();
+            bool isSubPass = (strchr(pass.name.c_str(), '.') != nullptr);
+            if (isSubPass) continue;
+            if (pass.isAsync) {
+                asyncTotal += pass.timeMs;
+                hasAsync = true;
+            } else {
+                graphicsTotal += pass.timeMs;
             }
         }
 
-        ImGui::Unindent();
+        if (hasAsync)
+        {
+            ImGui::Indent();
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(140, 180, 255, 255));
+            ImGui::Text("Async Compute: %s", FormatTime(asyncTotal));
+            ImGui::PopStyleColor();
+            ImGui::Indent();
+            RenderGPUPassList(passTimings, totalGPU, true);
+            ImGui::Unindent();
+
+            ImGui::Text("Graphics: %s", FormatTime(graphicsTotal));
+            ImGui::Indent();
+            RenderGPUPassList(passTimings, totalGPU, false);
+            ImGui::Unindent();
+            ImGui::Unindent();
+        }
+        else
+        {
+            ImGui::Indent();
+            RenderGPUPassList(passTimings, totalGPU, false);
+            ImGui::Unindent();
+        }
     }
     else
     {

@@ -37,6 +37,12 @@ public:
 
     nvrhi::ICommandList* CreateCommandList() override;
 
+    bool HasAsyncCompute() const override { return m_computeCommandList != nullptr; }
+    nvrhi::ICommandList* GetComputeCommandList() const override { return m_computeCommandList.Get(); }
+    u64 ExecuteComputeCommandList(nvrhi::ICommandList* commandList) override;
+    void QueueWaitForCompute(u64 instanceID) override;
+    void ComputeWaitForPreviousGraphics() override;
+
     void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
 
@@ -95,10 +101,12 @@ private:
     // D3D12 objects
     ID3D12Device* m_d3d12Device = nullptr;
     ID3D12CommandQueue* m_commandQueue = nullptr;
+    ID3D12CommandQueue* m_computeQueue = nullptr;
 
     // NVRHI wrapper
     nvrhi::DeviceHandle m_nvrhiDevice;
     nvrhi::CommandListHandle m_commandList;  // Per-frame command list for rendering
+    nvrhi::CommandListHandle m_computeCommandList;  // Async compute command list
     nvrhi::CommandListHandle m_uploadCommandList;  // Persistent upload command list (out-of-frame)
     nvrhi::TextureHandle m_backBuffers[BACK_BUFFER_COUNT];
 
@@ -120,4 +128,5 @@ private:
     // Async GC - runs garbage collection on background thread between frames
     // GC is launched at EndFrame and waited on at BeginFrame
     Task* m_gcTask = nullptr;
+    u64 m_lastGraphicsInstanceID = 0;
 };

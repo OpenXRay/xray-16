@@ -950,6 +950,9 @@
     <ClInclude Include="..\xrRender\FGDetailManager.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\DetailCullPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\DetailPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
@@ -1756,6 +1759,9 @@
     <ClCompile Include="..\xrRender\FrameGraph\PassResourceCache.cpp" />
     <ClCompile Include="..\xrRender\FGDetailManager.cpp">
       <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\DetailCullPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\DetailPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>

@@ -3,6 +3,7 @@
 #include "FrameGraph.h"
 #include "../RenderContext/RenderDevice.h"
 #include "../Profiler/GPUProfiler.h"
+#include "xrEngine/IRenderBackend.h"
 
 namespace xray::render::framegraph {
 
@@ -161,6 +162,22 @@ void FrameGraph::SetPassCallback(PassHandle pass, PassExecuteCallback callback) 
     passNode->executeCallback = callback;
 }
 
+void FrameGraph::SetPassAsyncCompute(PassHandle pass) {
+    PassNode* passNode = GetPassNode(pass);
+    VERIFY(passNode != nullptr);
+
+    passNode->isAsync = true;
+    passNode->isCompute = true;
+    passNode->isGraphics = false;
+}
+
+void FrameGraph::SetPassHasSideEffects(PassHandle pass) {
+    PassNode* passNode = GetPassNode(pass);
+    VERIFY(passNode != nullptr);
+
+    passNode->hasSideEffects = true;
+}
+
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  COMPILE PHASE (STUB FOR NOW)
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -200,6 +217,20 @@ void FrameGraph::Compile() {
 //  EXECUTE PHASE (STUB FOR NOW)
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
+void FrameGraph::ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList) {
+    cmdList->beginMarker(pass->name.c_str());
+
+    if (m_gpuProfiler)
+        m_gpuProfiler->BeginPass(cmdList, pass->name.c_str(), pass->isAsync);
+
+    pass->executeCallback(*m_context, *this);
+
+    if (m_gpuProfiler)
+        m_gpuProfiler->EndPass(cmdList, pass->name.c_str());
+
+    cmdList->endMarker();
+}
+
 void FrameGraph::Execute() {
     ZoneScoped;
 
@@ -207,78 +238,71 @@ void FrameGraph::Execute() {
     VERIFY(m_context != nullptr && "RenderContext required for execution");
     VERIFY(m_renderDevice != nullptr && "RenderDevice required for execution");
 
-    // Get command list from context (which now uses the backend's command list)
-    // The backend opens the command list in BeginFrame() and closes/executes it in EndFrame()
-    // We just record commands to it here.
-    nvrhi::ICommandList* cmdList = m_context->GetCommandList();
-    VERIFY(cmdList != nullptr);
+    nvrhi::ICommandList* graphicsCmdList = m_context->GetCommandList();
+    VERIFY(graphicsCmdList != nullptr);
 
-    u32 passesExecuted = 0;
-    u32 passesCulled = 0;
-    u32 passesNoCallback = 0;
+    bool hasAsyncCompute = m_computeCommandList != nullptr && m_asyncComputeBackend != nullptr;
 
-    // Execute passes in sorted order
+    // Count async passes to check if we have any work for the compute queue
+    u32 asyncPassCount = 0;
+    if (hasAsyncCompute) {
+        for (PassNode* pass : m_sortedPasses) {
+            if (!pass->culled && pass->executeCallback && pass->isAsync)
+                asyncPassCount++;
+        }
+        if (asyncPassCount == 0)
+            hasAsyncCompute = false;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  PHASE A: Record async compute passes
+    // ═══════════════════════════════════════════════════════
+    u64 computeInstanceID = 0;
+    if (hasAsyncCompute) {
+        m_asyncComputeBackend->ComputeWaitForPreviousGraphics();
+        m_computeCommandList->open();
+        m_context->SetOverrideCommandList(m_computeCommandList);
+
+        for (PassNode* pass : m_sortedPasses) {
+            if (pass->culled || !pass->executeCallback || !pass->isAsync)
+                continue;
+            ExecutePass(pass, m_computeCommandList);
+        }
+
+        m_context->SetOverrideCommandList(nullptr);
+        m_computeCommandList->close();
+        computeInstanceID = m_asyncComputeBackend->ExecuteComputeCommandList(m_computeCommandList);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  PHASE B: Record graphics passes (with sync point)
+    // ═══════════════════════════════════════════════════════
+    bool syncInserted = false;
+
     for (PassNode* pass : m_sortedPasses) {
-        // Skip culled passes
-        if (pass->culled) {
-            passesCulled++;
+        if (pass->culled || !pass->executeCallback)
             continue;
-        }
 
-        // Skip passes without callbacks
-        if (!pass->executeCallback) {
-            Msg("! [FrameGraph::Execute] Pass '%s' has no callback!", pass->name.c_str());
-            passesNoCallback++;
+        // Skip async passes (already executed on compute queue)
+        if (hasAsyncCompute && pass->isAsync)
             continue;
+
+        // Insert sync point before first graphics pass that depends on async output
+        if (!syncInserted && computeInstanceID != 0) {
+            m_asyncComputeBackend->QueueWaitForCompute(computeInstanceID);
+            syncInserted = true;
         }
 
-        // Apply resource barriers before this pass
-        if (!pass->barriersBeforePass.empty()) {
-            for (const auto& barrier : pass->barriersBeforePass) {
-                ResourceNode* resource = GetResourceNode(barrier.resource);
-                if (!resource || !resource->nvrhiTexture) {
-                    continue;
-                }
-
-                // Convert FrameGraph states to NVRHI states
-                nvrhi::ResourceStates nvrhiBefore = ConvertToNVRHIState(barrier.stateBefore);
-                nvrhi::ResourceStates nvrhiAfter = ConvertToNVRHIState(barrier.stateAfter);
-
-                // Note: Actual barrier insertion would require command list access
-                // For now, we just log the barrier
-                // TODO: Insert actual NVRHI barriers when RenderContext supports it
-            }
-        }
-
-        // Execute the pass callback with automatic GPU markers and timing
-        // Note: CPU profiling per-pass not supported (ZoneScopedN uses static storage)
-        cmdList->beginMarker(pass->name.c_str());
-
-        // Begin GPU timing for this pass
-        if (m_gpuProfiler)
-            m_gpuProfiler->BeginPass(cmdList, pass->name.c_str());
-
-        pass->executeCallback(*m_context, *this);
-
-        // End GPU timing for this pass
-        if (m_gpuProfiler)
-            m_gpuProfiler->EndPass(cmdList, pass->name.c_str());
-
-        cmdList->endMarker();
-
-        passesExecuted++;
+        ExecutePass(pass, graphicsCmdList);
     }
 
     // ═══════════════════════════════════════════════════════
     //  TRANSITION IMPORTED BACKBUFFER TO PRESENT STATE
     // ═══════════════════════════════════════════════════════
-    // D3D12 requires backbuffer to be in Present state before Present() is called.
-    // Find imported resources and transition them to Present state.
     for (auto& resource : m_resources) {
         if (resource.desc.isImported && resource.nvrhiTexture) {
-            // Imported render target (backbuffer) - transition to Present
             if (resource.desc.isRenderTarget) {
-                cmdList->setTextureState(
+                graphicsCmdList->setTextureState(
                     resource.nvrhiTexture.Get(),
                     nvrhi::AllSubresources,
                     nvrhi::ResourceStates::Present
@@ -286,11 +310,7 @@ void FrameGraph::Execute() {
             }
         }
     }
-    // Commit all pending barriers
-    cmdList->commitBarriers();
-
-    // NOTE: We do NOT close or execute the command list here.
-    // The backend handles that in EndFrame() after all rendering is complete.
+    graphicsCmdList->commitBarriers();
 }
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -772,7 +792,10 @@ void FrameGraph::CullUnusedPasses() {
     xr_vector<PassNode*> terminalPasses;
 
     for (auto& pass : m_passes) {
-        // Check if this pass writes to any imported/persistent resources
+        if (pass.hasSideEffects) {
+            terminalPasses.push_back(&pass);
+            continue;
+        }
         for (const auto& access : pass.resourceAccesses) {
             if (access.IsWrite()) {
                 const ResourceNode* resource = GetResourceNode(access.resource);

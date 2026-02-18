@@ -125,6 +125,15 @@ public:
     //  UTILITY
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
+    // Mark this pass as async compute (runs on compute queue)
+    void asyncCompute() {
+        m_frameGraph.SetPassAsyncCompute(m_passHandle);
+    }
+
+    void sideEffects() {
+        m_frameGraph.SetPassHasSideEffects(m_passHandle);
+    }
+
     // Get the underlying FrameGraph
     FrameGraph& getFrameGraph() { return m_frameGraph; }
     const FrameGraph& getFrameGraph() const { return m_frameGraph; }

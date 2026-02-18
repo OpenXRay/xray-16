@@ -9,6 +9,8 @@
 #include "../RenderContext/RenderContext.h"
 #include "../ResourceManager/FGResourceManager.h"
 
+class IRenderBackend;
+
 namespace xray::profiler {
     class GPUProfiler;
 }
@@ -64,6 +66,12 @@ public:
     // Set pass execution callback
     void SetPassCallback(PassHandle pass, PassExecuteCallback callback);
 
+    // Mark pass as async compute (runs on compute queue)
+    void SetPassAsyncCompute(PassHandle pass);
+
+    // Mark pass as having side effects (writes to external resources, prevents culling)
+    void SetPassHasSideEffects(PassHandle pass);
+
     // Template method for lambda-based passes (Frostbite pattern)
     template<typename PassData>
     PassData& addCallbackPass(
@@ -101,6 +109,11 @@ public:
 
     // Set GPUProfiler for per-pass timing (optional, can be nullptr)
     void SetGPUProfiler(xray::profiler::GPUProfiler* profiler) { m_gpuProfiler = profiler; }
+
+    void SetAsyncCompute(nvrhi::ICommandList* computeCmdList, IRenderBackend* backend) {
+        m_computeCommandList = computeCmdList;
+        m_asyncComputeBackend = backend;
+    }
 
     void Compile();
 
@@ -192,6 +205,8 @@ private:
     nvrhi::IDevice* m_device;
     ng::RenderContext* m_context = nullptr;
     xray::profiler::GPUProfiler* m_gpuProfiler = nullptr;
+    nvrhi::ICommandList* m_computeCommandList = nullptr;
+    IRenderBackend* m_asyncComputeBackend = nullptr;
     resources::FGResourceManager* m_resourceManager;
     xr_unique_ptr<FGResourcePool> m_resourcePool;
 
@@ -224,6 +239,8 @@ private:
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     //  HELPER METHODS
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+
+    void ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList);
 
     ResourceNode* GetResourceNode(VirtualResourceHandle handle);
     const ResourceNode* GetResourceNode(VirtualResourceHandle handle) const;

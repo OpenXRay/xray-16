@@ -39,19 +39,12 @@ struct DetailPassData {
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle outputNormal;
-    framegraph::VirtualResourceHandle hiZPyramid;
     ng::RenderDevice* device;
     RENDER_NAMESPACE::FGDetailManager* detailManager;
     framegraph::DefaultOutputLayout outputs;
     u32 width;
     u32 height;
-    u32 hiZWidth;
-    u32 hiZHeight;
-    u32 hiZMipLevels;
-    Fmatrix prevViewProj;
-    bool hasPrevViewProj;
     xray::profiler::GPUProfiler* gpuProfiler;
-    DetailPassState* detailState;
 };
 // Lambda-based detail pass setup with GPU culling support
 // Renders detail objects (grass, vegetation) using:
@@ -67,13 +60,7 @@ framegraph::DefaultOutputLayout setupDetailPass(
     const framegraph::DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
-    framegraph::VirtualResourceHandle hiZPyramid = {},
-    u32 hiZWidth = 0,
-    u32 hiZHeight = 0,
-    u32 hiZMipLevels = 0,
-    const Fmatrix* prevViewProj = nullptr,  // Previous frame's viewProj for temporal Hi-Z
-    xray::profiler::GPUProfiler* gpuProfiler = nullptr,
-    DetailPassState* detailState = nullptr
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr
 );
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

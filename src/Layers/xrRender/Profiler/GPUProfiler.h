@@ -13,6 +13,7 @@ struct PendingQuery
     nvrhi::TimerQueryHandle query;
     u32 frameSubmitted = 0;
     bool resolved = false;
+    bool isAsync = false;
 };
 
 // GPU Profiler - manages NVRHI timer queries for FrameGraph passes
@@ -31,7 +32,7 @@ public:
     bool IsProfilingEnabled() const { return m_enabled; }
 
     // Begin/End timing for a named pass
-    void BeginPass(nvrhi::ICommandList* cmdList, const char* name);
+    void BeginPass(nvrhi::ICommandList* cmdList, const char* name, bool isAsync = false);
     void EndPass(nvrhi::ICommandList* cmdList, const char* name);
 
     // Frame lifecycle
@@ -65,6 +66,7 @@ private:
     {
         shared_str name;
         nvrhi::TimerQueryHandle query;
+        bool isAsync = false;
     };
     xr_vector<ActivePass> m_activePasses;
 

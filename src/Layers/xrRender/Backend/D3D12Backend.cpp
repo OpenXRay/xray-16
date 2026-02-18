@@ -104,6 +104,7 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
     nvrhi::d3d12::DeviceDesc deviceDesc;
     deviceDesc.pDevice = m_d3d12Device;
     deviceDesc.pGraphicsCommandQueue = m_commandQueue;
+    deviceDesc.pComputeCommandQueue = m_computeQueue;
     deviceDesc.errorCB = &s_nvrhiMessageCallback;  // Error/warning logging
     deviceDesc.enableHeapDirectlyIndexed = true;   // Enable bindless
 
@@ -144,6 +145,18 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
         return false;
     }
 
+    if (m_computeQueue) {
+        nvrhi::CommandListParameters computeParams;
+        computeParams.enableImmediateExecution = false;
+        computeParams.setQueueType(nvrhi::CommandQueue::Compute);
+        m_computeCommandList = m_nvrhiDevice->createCommandList(computeParams);
+        if (m_computeCommandList) {
+            Msg("* [D3D12Backend] Async compute enabled (dedicated compute queue)");
+        } else {
+            Msg("! [D3D12Backend] Failed to create compute command list (async compute disabled)");
+        }
+    }
+
     // Query capabilities
     QueryCapabilities();
 
@@ -174,6 +187,7 @@ void D3D12Backend::Shutdown() {
     for (auto& bb : m_backBuffers)
         bb = nullptr;
     m_commandList = nullptr;
+    m_computeCommandList = nullptr;
     m_uploadCommandList = nullptr;
     m_nvrhiDevice = nullptr;
 
@@ -181,6 +195,10 @@ void D3D12Backend::Shutdown() {
     if (m_swapChain) {
         m_swapChain->Release();
         m_swapChain = nullptr;
+    }
+    if (m_computeQueue) {
+        m_computeQueue->Release();
+        m_computeQueue = nullptr;
     }
     if (m_commandQueue) {
         m_commandQueue->Release();
@@ -292,8 +310,19 @@ bool D3D12Backend::CreateCommandQueue() {
 
     HRESULT hr = m_d3d12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue));
     if (FAILED(hr)) {
-        Msg("! [D3D12Backend] Failed to create command queue");
+        Msg("! [D3D12Backend] Failed to create graphics command queue");
         return false;
+    }
+
+    D3D12_COMMAND_QUEUE_DESC computeQueueDesc = {};
+    computeQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+    computeQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+    computeQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+
+    hr = m_d3d12Device->CreateCommandQueue(&computeQueueDesc, IID_PPV_ARGS(&m_computeQueue));
+    if (FAILED(hr)) {
+        Msg("! [D3D12Backend] Failed to create compute command queue (async compute disabled)");
+        m_computeQueue = nullptr;
     }
 
     return true;
@@ -570,7 +599,7 @@ void D3D12Backend::EndFrame() {
     // NVRHI handles fence signaling internally
     {
         ZoneScopedN("D3D12::ExecuteCommandList");
-        m_nvrhiDevice->executeCommandList(m_commandList);
+        m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(m_commandList);
     }
 
     // ═══════════════════════════════════════════════════════
@@ -606,6 +635,24 @@ void D3D12Backend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
     if (m_nvrhiDevice && commandList) {
         m_nvrhiDevice->executeCommandList(commandList);
     }
+}
+
+u64 D3D12Backend::ExecuteComputeCommandList(nvrhi::ICommandList* commandList) {
+    if (!m_nvrhiDevice || !commandList || !m_computeQueue)
+        return 0;
+    return m_nvrhiDevice->executeCommandList(commandList, nvrhi::CommandQueue::Compute);
+}
+
+void D3D12Backend::QueueWaitForCompute(u64 instanceID) {
+    if (!m_nvrhiDevice || !m_computeQueue || instanceID == 0)
+        return;
+    m_nvrhiDevice->queueWaitForCommandList(nvrhi::CommandQueue::Graphics, nvrhi::CommandQueue::Compute, instanceID);
+}
+
+void D3D12Backend::ComputeWaitForPreviousGraphics() {
+    if (!m_nvrhiDevice || !m_computeQueue || m_lastGraphicsInstanceID == 0)
+        return;
+    m_nvrhiDevice->queueWaitForCommandList(nvrhi::CommandQueue::Compute, nvrhi::CommandQueue::Graphics, m_lastGraphicsInstanceID);
 }
 
 void D3D12Backend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {

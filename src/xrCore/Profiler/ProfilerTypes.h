@@ -54,6 +54,7 @@ struct GPUPassTiming
     shared_str name;
     float timeMs = 0.0f;
     bool pending = false;  // Waiting for GPU results
+    bool isAsync = false;  // Ran on async compute queue
 };
 
 // Frame statistics summary

@@ -77,7 +77,7 @@ void GPUProfiler::ReleaseTimerQuery(nvrhi::TimerQueryHandle query)
     }
 }
 
-void GPUProfiler::BeginPass(nvrhi::ICommandList* cmdList, const char* name)
+void GPUProfiler::BeginPass(nvrhi::ICommandList* cmdList, const char* name, bool isAsync)
 {
     if (!m_enabled || !m_device || !cmdList || !name)
         return;
@@ -91,6 +91,7 @@ void GPUProfiler::BeginPass(nvrhi::ICommandList* cmdList, const char* name)
     ActivePass pass;
     pass.name = name;
     pass.query = query;
+    pass.isAsync = isAsync;
     m_activePasses.push_back(pass);
 }
 
@@ -106,12 +107,12 @@ void GPUProfiler::EndPass(nvrhi::ICommandList* cmdList, const char* name)
         {
             cmdList->endTimerQuery(it->query);
 
-            // Move to pending
             PendingQuery pending;
             pending.name = it->name;
             pending.query = it->query;
             pending.frameSubmitted = m_currentFrame;
             pending.resolved = false;
+            pending.isAsync = it->isAsync;
             m_pendingQueries.push_back(pending);
 
             // Remove from active (convert reverse iterator)
@@ -168,6 +169,7 @@ void GPUProfiler::ResolvePendingQueries()
             timing.name = it->name;
             timing.timeMs = timeMs;
             timing.pending = false;
+            timing.isAsync = it->isAsync;
             m_passTimings.push_back(timing);
 
             // Sub-passes (names containing '.') are children of a parent pass
