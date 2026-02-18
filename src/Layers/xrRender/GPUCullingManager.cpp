@@ -2136,6 +2136,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
         [&, hizWidth, hizHeight, hizMipLevels, staticDrawArgsHandle, dynamicDrawArgsHandle, geometry, prevViewProj](FrameGraph& builder, PassHandle passHandle, GPUCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
 
             data.manager = this;
             data.geometry = geometry;
@@ -2695,6 +2696,7 @@ void GPUCullingManager::SetupSkinnedCullingPass(
 
         [&, hizWidth, hizHeight, hizMipLevels, geometry, prevViewProj, visBufferHandle](FrameGraph& builder, PassHandle passHandle, SkinnedCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
 
             data.manager = this;
             data.geometry = geometry;
@@ -3386,6 +3388,7 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
 
         [&, hizWidth, hizHeight, hizMipLevels, drawArgsHandle, batches](FrameGraph& builder, PassHandle passHandle, ParticleCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
 
             data.manager = this;
             data.batches = batches;

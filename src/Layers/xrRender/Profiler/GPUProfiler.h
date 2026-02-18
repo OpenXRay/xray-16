@@ -12,6 +12,7 @@ struct PendingQuery
     nvrhi::TimerQueryHandle query;
     u32 frameSubmitted = 0;
     bool resolved = false;
+    bool isAsync = false;
 };
 
 class GPUProfiler
@@ -26,7 +27,7 @@ public:
     void SetEnabled(bool enabled) { m_enabled = enabled; }
     bool IsProfilingEnabled() const { return m_enabled; }
 
-    void BeginPass(nvrhi::ICommandList* cmdList, const char* name);
+    void BeginPass(nvrhi::ICommandList* cmdList, const char* name, bool isAsync = false);
     void EndPass(nvrhi::ICommandList* cmdList, const char* name);
 
     void FrameStart();
@@ -54,6 +55,7 @@ private:
     {
         shared_str name;
         nvrhi::TimerQueryHandle query;
+        bool isAsync = false;
     };
     xr_vector<ActivePass> m_activePasses;
 

@@ -2,6 +2,7 @@
 #include "FrameGraph.h"
 #include "../RenderContext/RenderDevice.h"
 #include "../Profiler/GPUProfiler.h"
+#include "xrEngine/IRenderBackend.h"
 
 namespace xray::render::framegraph {
 
@@ -133,6 +134,22 @@ void FrameGraph::SetPassCallback(PassHandle pass, PassExecuteCallback callback) 
     passNode->executeCallback = callback;
 }
 
+void FrameGraph::SetPassAsyncCompute(PassHandle pass) {
+    PassNode* passNode = GetPassNode(pass);
+    VERIFY(passNode != nullptr);
+
+    passNode->isAsync = true;
+    passNode->isCompute = true;
+    passNode->isGraphics = false;
+}
+
+void FrameGraph::SetPassHasSideEffects(PassHandle pass) {
+    PassNode* passNode = GetPassNode(pass);
+    VERIFY(passNode != nullptr);
+
+    passNode->hasSideEffects = true;
+}
+
 void FrameGraph::Compile() {
     ZoneScoped;
 
@@ -157,6 +174,20 @@ void FrameGraph::Compile() {
     m_stats.numResources = static_cast<u32>(m_resources.size());
 }
 
+void FrameGraph::ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList) {
+    cmdList->beginMarker(pass->name.c_str());
+
+    if (m_gpuProfiler)
+        m_gpuProfiler->BeginPass(cmdList, pass->name.c_str(), pass->isAsync);
+
+    pass->executeCallback(*m_context, *this);
+
+    if (m_gpuProfiler)
+        m_gpuProfiler->EndPass(cmdList, pass->name.c_str());
+
+    cmdList->endMarker();
+}
+
 void FrameGraph::Execute() {
     ZoneScoped;
 
@@ -164,57 +195,59 @@ void FrameGraph::Execute() {
     VERIFY(m_context != nullptr && "RenderContext required for execution");
     VERIFY(m_renderDevice != nullptr && "RenderDevice required for execution");
 
-    nvrhi::ICommandList* cmdList = m_context->GetCommandList();
-    VERIFY(cmdList != nullptr);
+    nvrhi::ICommandList* graphicsCmdList = m_context->GetCommandList();
+    VERIFY(graphicsCmdList != nullptr);
 
-    u32 passesExecuted = 0;
-    u32 passesCulled = 0;
-    u32 passesNoCallback = 0;
+    bool hasAsyncCompute = m_computeCommandList != nullptr && m_asyncComputeBackend != nullptr;
+
+    u32 asyncPassCount = 0;
+    if (hasAsyncCompute) {
+        for (PassNode* pass : m_sortedPasses) {
+            if (!pass->culled && pass->executeCallback && pass->isAsync)
+                asyncPassCount++;
+        }
+        if (asyncPassCount == 0)
+            hasAsyncCompute = false;
+    }
+
+    u64 computeInstanceID = 0;
+    if (hasAsyncCompute) {
+        m_asyncComputeBackend->ComputeWaitForPreviousGraphics();
+        m_computeCommandList->open();
+        m_context->SetOverrideCommandList(m_computeCommandList);
+
+        for (PassNode* pass : m_sortedPasses) {
+            if (pass->culled || !pass->executeCallback || !pass->isAsync)
+                continue;
+            ExecutePass(pass, m_computeCommandList);
+        }
+
+        m_context->SetOverrideCommandList(nullptr);
+        m_computeCommandList->close();
+        computeInstanceID = m_asyncComputeBackend->ExecuteComputeCommandList(m_computeCommandList);
+    }
+
+    bool syncInserted = false;
 
     for (PassNode* pass : m_sortedPasses) {
-        if (pass->culled) {
-            passesCulled++;
+        if (pass->culled || !pass->executeCallback)
             continue;
-        }
 
-        if (!pass->executeCallback) {
-            Msg("! [FrameGraph::Execute] Pass '%s' has no callback!", pass->name.c_str());
-            passesNoCallback++;
+        if (hasAsyncCompute && pass->isAsync)
             continue;
+
+        if (!syncInserted && computeInstanceID != 0) {
+            m_asyncComputeBackend->QueueWaitForCompute(computeInstanceID);
+            syncInserted = true;
         }
 
-        if (!pass->barriersBeforePass.empty()) {
-            for (const auto& barrier : pass->barriersBeforePass) {
-                ResourceNode* resource = GetResourceNode(barrier.resource);
-                if (!resource || !resource->nvrhiTexture) {
-                    continue;
-                }
-
-                nvrhi::ResourceStates nvrhiBefore = ConvertToNVRHIState(barrier.stateBefore);
-                nvrhi::ResourceStates nvrhiAfter = ConvertToNVRHIState(barrier.stateAfter);
-
-            }
-        }
-
-        cmdList->beginMarker(pass->name.c_str());
-
-        if (m_gpuProfiler)
-            m_gpuProfiler->BeginPass(cmdList, pass->name.c_str());
-
-        pass->executeCallback(*m_context, *this);
-
-        if (m_gpuProfiler)
-            m_gpuProfiler->EndPass(cmdList, pass->name.c_str());
-
-        cmdList->endMarker();
-
-        passesExecuted++;
+        ExecutePass(pass, graphicsCmdList);
     }
 
     for (auto& resource : m_resources) {
         if (resource.desc.isImported && resource.nvrhiTexture) {
             if (resource.desc.isRenderTarget) {
-                cmdList->setTextureState(
+                graphicsCmdList->setTextureState(
                     resource.nvrhiTexture.Get(),
                     nvrhi::AllSubresources,
                     nvrhi::ResourceStates::Present
@@ -222,8 +255,7 @@ void FrameGraph::Execute() {
             }
         }
     }
-    cmdList->commitBarriers();
-
+    graphicsCmdList->commitBarriers();
 }
 
 nvrhi::ITexture* FrameGraph::GetPhysicalTexture(VirtualResourceHandle handle) const {
@@ -617,6 +649,10 @@ void FrameGraph::CullUnusedPasses() {
     xr_vector<PassNode*> terminalPasses;
 
     for (auto& pass : m_passes) {
+        if (pass.hasSideEffects) {
+            terminalPasses.push_back(&pass);
+            continue;
+        }
         for (const auto& access : pass.resourceAccesses) {
             if (access.IsWrite()) {
                 const ResourceNode* resource = GetResourceNode(access.resource);

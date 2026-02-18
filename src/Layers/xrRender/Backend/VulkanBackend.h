@@ -25,6 +25,12 @@ public:
     nvrhi::ICommandList* GetCommandList() const override { return m_commandList.Get(); }
     nvrhi::ICommandList* CreateCommandList() override;
 
+    bool HasAsyncCompute() const override { return m_computeCommandList != nullptr; }
+    nvrhi::ICommandList* GetComputeCommandList() const override { return m_computeCommandList.Get(); }
+    u64 ExecuteComputeCommandList(nvrhi::ICommandList* commandList) override;
+    void QueueWaitForCompute(u64 instanceID) override;
+    void ComputeWaitForPreviousGraphics() override;
+
     void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
 
@@ -76,6 +82,8 @@ private:
     VkSwapchainKHR m_swapchain = VK_NULL_HANDLE;
     VkQueue m_graphicsQueue = VK_NULL_HANDLE;
     u32 m_graphicsQueueFamily = UINT32_MAX;
+    VkQueue m_computeQueue = VK_NULL_HANDLE;
+    u32 m_computeQueueFamily = UINT32_MAX;
     VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
 
     VkSemaphore m_imageAvailable[BACK_BUFFER_COUNT] = {};
@@ -84,6 +92,7 @@ private:
     nvrhi::DeviceHandle m_nvrhiDevice;
     nvrhi::DeviceHandle m_nvrhiVulkanDevice;
     nvrhi::CommandListHandle m_commandList;
+    nvrhi::CommandListHandle m_computeCommandList;
     nvrhi::CommandListHandle m_uploadCommandList;
     xr_vector<VkImage> m_swapchainImages;
     nvrhi::TextureHandle m_backBuffers[BACK_BUFFER_COUNT];
@@ -104,4 +113,5 @@ private:
     VkFormat m_swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
 
     Task* m_gcTask = nullptr;
+    u64 m_lastGraphicsInstanceID = 0;
 };

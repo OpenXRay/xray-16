@@ -81,6 +81,7 @@ struct PassNode {
     bool isGraphics = true;
     bool isCompute = false;
     bool isCopy = false;
+    bool hasSideEffects = false;
 
     PassNode() = default;
 

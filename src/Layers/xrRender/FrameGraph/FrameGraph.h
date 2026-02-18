@@ -8,6 +8,8 @@
 #include "../RenderContext/RenderContext.h"
 #include "../ResourceManager/FGResourceManager.h"
 
+class IRenderBackend;
+
 namespace xray::profiler {
     class GPUProfiler;
 }
@@ -49,6 +51,10 @@ public:
 
     void SetPassCallback(PassHandle pass, PassExecuteCallback callback);
 
+    void SetPassAsyncCompute(PassHandle pass);
+
+    void SetPassHasSideEffects(PassHandle pass);
+
     template<typename PassData>
     PassData& addCallbackPass(
         const char* name,
@@ -74,6 +80,11 @@ public:
     void SetRenderContext(ng::RenderContext* context) { m_context = context; }
 
     void SetGPUProfiler(xray::profiler::GPUProfiler* profiler) { m_gpuProfiler = profiler; }
+
+    void SetAsyncCompute(nvrhi::ICommandList* computeCmdList, IRenderBackend* backend) {
+        m_computeCommandList = computeCmdList;
+        m_asyncComputeBackend = backend;
+    }
 
     void Compile();
 
@@ -127,6 +138,8 @@ private:
     nvrhi::IDevice* m_device;
     ng::RenderContext* m_context = nullptr;
     xray::profiler::GPUProfiler* m_gpuProfiler = nullptr;
+    nvrhi::ICommandList* m_computeCommandList = nullptr;
+    IRenderBackend* m_asyncComputeBackend = nullptr;
     resources::FGResourceManager* m_resourceManager;
     xr_unique_ptr<FGResourcePool> m_resourcePool;
 
@@ -147,6 +160,8 @@ private:
     void AllocateResources();
     void InsertResourceBarriers();
     void OptimizeMemoryAliasing();
+
+    void ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList);
 
     ResourceNode* GetResourceNode(VirtualResourceHandle handle);
     const ResourceNode* GetResourceNode(VirtualResourceHandle handle) const;

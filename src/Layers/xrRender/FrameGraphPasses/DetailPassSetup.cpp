@@ -45,27 +45,13 @@ DefaultOutputLayout setupDetailPass(
     const DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
-    VirtualResourceHandle hiZPyramid,
-    u32 hiZWidth,
-    u32 hiZHeight,
-    u32 hiZMipLevels,
-    const Fmatrix* prevViewProj,
-    xray::profiler::GPUProfiler* gpuProfiler,
-    DetailPassState* detailState
+    xray::profiler::GPUProfiler* gpuProfiler
 )
 {
 
-    Fmatrix capturedPrevViewProj;
-    bool hasPrevViewProj = (prevViewProj != nullptr);
-    if (hasPrevViewProj) {
-        capturedPrevViewProj = *prevViewProj;
-    } else {
-        capturedPrevViewProj.identity();
-    }
-
     auto& passData = fg.addCallbackPass<DetailPassData>(
-        "Details",
-        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, capturedPrevViewProj, hasPrevViewProj, gpuProfiler, detailState](
+        "DetailDraw",
+        [&, width, height, gpuProfiler](
             FrameGraph& builder, PassHandle passHandle, DetailPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
@@ -73,15 +59,7 @@ DefaultOutputLayout setupDetailPass(
             data.height = height;
             data.device = device;
             data.detailManager = detailManager;
-            data.hiZWidth = hiZWidth;
-            data.hiZHeight = hiZHeight;
-            data.hiZMipLevels = hiZMipLevels;
-            data.prevViewProj = capturedPrevViewProj;
-            data.hasPrevViewProj = hasPrevViewProj;
             data.gpuProfiler = gpuProfiler;
-            data.detailState = detailState;
-
-            data.hiZPyramid = passBuilder.read(hiZPyramid, ResourceState::ShaderResource);
 
             data.inputColor = passBuilder.read(forwardInputs.albedo);
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
@@ -117,18 +95,6 @@ DefaultOutputLayout setupDetailPass(
             if (!cmdList)
                 return;
 
-            if (data.detailState && !data.detailState->detailDataUploaded)
-            {
-                data.detailManager->UploadBufferData(cmdList);
-                data.detailState->detailDataUploaded = true;
-            }
-
-            if (data.detailState && data.detailState->lastBladeWidth != ps_r3_grass_blade_width)
-            {
-                data.detailManager->RegenerateBladeGeometry(cmdList);
-                data.detailState->lastBladeWidth = ps_r3_grass_blade_width;
-            }
-
             if (g_pGamePersistent)
             {
                 data.detailManager->windSpeed = _max(
@@ -137,24 +103,6 @@ DefaultOutputLayout setupDetailPass(
                 float wind_rad = deg2rad(g_pGamePersistent->Environment().CurrentEnv.wind_direction);
                 data.detailManager->windDirection.set(_cos(wind_rad), _sin(wind_rad));
             }
-
-            nvrhi::ITexture* hiZTexture = fg.GetPhysicalTexture(data.hiZPyramid);
-            const float fadeDistance = g_pGamePersistent->Environment().CurrentEnv.far_plane;
-            Fmatrix effectivePrevViewProj = data.hasPrevViewProj ? data.prevViewProj : Device.mFullTransform;
-
-            data.detailManager->DispatchCulling(
-                cmdList,
-                data.device->GetNVRHIDevice(),
-                hiZTexture,
-                effectivePrevViewProj,
-                fadeDistance,
-                data.hiZWidth,
-                data.hiZHeight,
-                data.hiZMipLevels,
-                data.gpuProfiler
-            );
-
-            data.detailManager->ScheduleStatsReadback(cmdList, data.device->GetNVRHIDevice());
 
             nvrhi::ITexture* normalTexture = fg.GetPhysicalTexture(data.outputNormal);
 

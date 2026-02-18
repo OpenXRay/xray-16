@@ -27,6 +27,7 @@
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "GPUCullingManager.h"
 #include "FGDetailManager.h"
+#include "FrameGraphPasses/DetailCullPassSetup.h"
 #include "FrameGraphPasses/DetailPassSetup.h"
 #include "FrameGraphPasses/TransparentPassSetup.h"
 #include "Bindless/MaterialBuffer.h"
@@ -240,6 +241,11 @@ void FrameGraphRenderer::Render() {
 
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
 
+    if (ps_fg_render_mode == FG_RENDER_VULKAN && GEnv.Backend->HasAsyncCompute())
+        m_framegraph->SetAsyncCompute(GEnv.Backend->GetComputeCommandList(), GEnv.Backend);
+    else
+        m_framegraph->SetAsyncCompute(nullptr, nullptr);
+
     {
         ZoneScopedN("FG::Compile");
         m_framegraph->Compile();
@@ -367,6 +373,7 @@ void FrameGraphRenderer::RenderMenu() {
 
     m_framegraph->SetRenderContext(m_renderContext.get());
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
+    m_framegraph->SetAsyncCompute(nullptr, nullptr);
     m_framegraph->Compile();
     m_framegraph->Execute();
 
@@ -853,13 +860,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_passStates->particle
     );
 
-    auto detailOutputs = passes::setupDetailPass(
+    passes::setupDetailCullPass(
         *m_framegraph,
         m_device,
         m_detailManager.get(),
-        particleOutputs,
-        width,
-        height,
         hizOutput.pyramid,
         hizOutput.width,
         hizOutput.height,
@@ -867,6 +871,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_hasPrevFrameData ? &m_prevViewProj : nullptr,
         m_gpuProfiler.get(),
         &m_passStates->detail
+    );
+
+    auto detailOutputs = passes::setupDetailPass(
+        *m_framegraph,
+        m_device,
+        m_detailManager.get(),
+        particleOutputs,
+        width,
+        height,
+        m_gpuProfiler.get()
     );
 
     passes::TransparentPassConfig transparentConfig;

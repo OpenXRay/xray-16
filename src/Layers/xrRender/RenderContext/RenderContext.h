@@ -234,12 +234,17 @@ public:
 
     bool IsInRenderPass() const { return m_inRenderPass; }
 
-    nvrhi::ICommandList* GetCommandList() const { return m_commandList.Get(); }
+    nvrhi::ICommandList* GetCommandList() const {
+        return m_overrideCommandList ? m_overrideCommandList : m_commandList.Get();
+    }
     RenderDevice* GetDevice() const { return m_device; }
+
+    void SetOverrideCommandList(nvrhi::ICommandList* cmdList) { m_overrideCommandList = cmdList; }
 
 private:
     RenderDevice* m_device;
     nvrhi::CommandListHandle m_commandList;
+    nvrhi::ICommandList* m_overrideCommandList = nullptr;
     ResourceManager* m_resourceManager = nullptr;
 
     bool m_inRenderPass = false;

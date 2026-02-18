@@ -169,6 +169,7 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\ShaderConstants.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\SkyPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\SunPassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\DetailCullPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\DetailPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\PassCommon.h" />
@@ -418,6 +419,7 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\ShaderConstants.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\SkyPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\SunPassSetup.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\DetailCullPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\DetailPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\PassCommon.cpp" />

@@ -96,6 +96,14 @@ public:
         return handle;
     }
 
+    void asyncCompute() {
+        m_frameGraph.SetPassAsyncCompute(m_passHandle);
+    }
+
+    void sideEffects() {
+        m_frameGraph.SetPassHasSideEffects(m_passHandle);
+    }
+
     FrameGraph& getFrameGraph() { return m_frameGraph; }
     const FrameGraph& getFrameGraph() const { return m_frameGraph; }
 

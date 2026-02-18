@@ -48,6 +48,12 @@ public:
 
     virtual nvrhi::ICommandList* CreateCommandList() { return nullptr; }
 
+    virtual bool HasAsyncCompute() const { return false; }
+    virtual nvrhi::ICommandList* GetComputeCommandList() const { return nullptr; }
+    virtual u64 ExecuteComputeCommandList(nvrhi::ICommandList* commandList) { return 0; }
+    virtual void QueueWaitForCompute(u64 instanceID) {}
+    virtual void ComputeWaitForPreviousGraphics() {}
+
     virtual void ExecuteCommandList(nvrhi::ICommandList* commandList) {}
     virtual void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {}
 

@@ -31,6 +31,12 @@ public:
 
     nvrhi::ICommandList* CreateCommandList() override;
 
+    bool HasAsyncCompute() const override { return m_computeCommandList != nullptr; }
+    nvrhi::ICommandList* GetComputeCommandList() const override { return m_computeCommandList.Get(); }
+    u64 ExecuteComputeCommandList(nvrhi::ICommandList* commandList) override;
+    void QueueWaitForCompute(u64 instanceID) override;
+    void ComputeWaitForPreviousGraphics() override;
+
     void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
 
@@ -83,9 +89,11 @@ private:
 
     ID3D12Device* m_d3d12Device = nullptr;
     ID3D12CommandQueue* m_commandQueue = nullptr;
+    ID3D12CommandQueue* m_computeQueue = nullptr;
 
     nvrhi::DeviceHandle m_nvrhiDevice;
     nvrhi::CommandListHandle m_commandList;
+    nvrhi::CommandListHandle m_computeCommandList;
     nvrhi::CommandListHandle m_uploadCommandList;
     nvrhi::TextureHandle m_backBuffers[BACK_BUFFER_COUNT];
 
@@ -103,4 +111,5 @@ private:
     u32 m_currentBackBufferIndex = 0;
 
     Task* m_gcTask = nullptr;
+    u64 m_lastGraphicsInstanceID = 0;
 };

@@ -48,6 +48,7 @@ struct GPUPassTiming
     shared_str name;
     float timeMs = 0.0f;
     bool pending = false;
+    bool isAsync = false;
 };
 
 struct FrameStats
