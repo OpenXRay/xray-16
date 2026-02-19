@@ -45,7 +45,7 @@ VS_OUTPUT main(VS_INPUT_4W v)
     int id2 = int(v.ind.z * 255.0 + 0.3);
     int id3 = int(v.ind.w * 255.0 + 0.3);
 
-    float3x4 bone = get_bone(id0) * w0
+    float4x4 bone = get_bone(id0) * w0
                   + get_bone(id1) * w1
                   + get_bone(id2) * w2
                   + get_bone(id3) * w3;
@@ -55,7 +55,7 @@ VS_OUTPUT main(VS_INPUT_4W v)
     float3 skinnedT = skinning_dir(T, bone);
     float3 skinnedB = skinning_dir(B, bone);
 
-    float3 worldPos3 = mul(m_W, skinnedPos);
+    float3 worldPos3 = mul(m_W, skinnedPos).xyz;
     o.worldPos = worldPos3;
     o.position = mul(m_VP, float4(worldPos3, 1.0));
 

@@ -359,7 +359,7 @@ void ParticleGPUCullingManager::DispatchCulling(
     u32 planeCount = std::min<u32>((u32)frustum.p_count, 6);
 
     ParticleCullParams params;
-    params.viewProj.transpose(Device.mFullTransform);
+    params.viewProj = Device.mFullTransform;
     for (u32 i = 0; i < 6; i++)
     {
         if (i < planeCount)

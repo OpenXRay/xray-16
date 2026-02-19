@@ -28,65 +28,22 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 using RENDER_NAMESPACE::dxFontRender;
 using namespace xray::render::fgconstants;
 
-// Helper function to upload StaticGlobals using FGConstantSystem (STATIC API)
-// UI shaders use static constant buffers (persistent), not volatile VCBs
 static void UploadStaticGlobals(FGConstantSystem& constants, const StaticGlobals& cb) {
-    // Reconstruct matrices from transposed float arrays
-    // Note: StaticGlobals stores transposed matrices (for HLSL row-major)
-    // but FGConstantSystem expects Fmatrix (column-major), so we transpose back
-
-    // m_V: float3x4 matrix (12 floats) - View matrix
-    Fmatrix m_V;
-    m_V._11 = cb.m_V[0];  m_V._12 = cb.m_V[4];  m_V._13 = cb.m_V[8];   m_V._14 = 0.0f;
-    m_V._21 = cb.m_V[1];  m_V._22 = cb.m_V[5];  m_V._23 = cb.m_V[9];   m_V._24 = 0.0f;
-    m_V._31 = cb.m_V[2];  m_V._32 = cb.m_V[6];  m_V._33 = cb.m_V[10];  m_V._34 = 0.0f;
-    m_V._41 = cb.m_V[3];  m_V._42 = cb.m_V[7];  m_V._43 = cb.m_V[11];  m_V._44 = 1.0f;
-    constants.SetStatic("m_V", m_V);
-
-    // m_P: float4x4 matrix (16 floats) - Projection matrix
-    Fmatrix m_P;
-    m_P._11 = cb.m_P[0];  m_P._12 = cb.m_P[4];  m_P._13 = cb.m_P[8];   m_P._14 = cb.m_P[12];
-    m_P._21 = cb.m_P[1];  m_P._22 = cb.m_P[5];  m_P._23 = cb.m_P[9];   m_P._24 = cb.m_P[13];
-    m_P._31 = cb.m_P[2];  m_P._32 = cb.m_P[6];  m_P._33 = cb.m_P[10];  m_P._34 = cb.m_P[14];
-    m_P._41 = cb.m_P[3];  m_P._42 = cb.m_P[7];  m_P._43 = cb.m_P[11];  m_P._44 = cb.m_P[15];
-    constants.SetStatic("m_P", m_P);
-
-    // m_VP: float4x4 matrix (16 floats) - View-Projection matrix
-    Fmatrix m_VP;
-    m_VP._11 = cb.m_VP[0];  m_VP._12 = cb.m_VP[4];  m_VP._13 = cb.m_VP[8];   m_VP._14 = cb.m_VP[12];
-    m_VP._21 = cb.m_VP[1];  m_VP._22 = cb.m_VP[5];  m_VP._23 = cb.m_VP[9];   m_VP._24 = cb.m_VP[13];
-    m_VP._31 = cb.m_VP[2];  m_VP._32 = cb.m_VP[6];  m_VP._33 = cb.m_VP[10];  m_VP._34 = cb.m_VP[14];
-    m_VP._41 = cb.m_VP[3];  m_VP._42 = cb.m_VP[7];  m_VP._43 = cb.m_VP[11];  m_VP._44 = cb.m_VP[15];
-    constants.SetStatic("m_VP", m_VP);
-
-    // Set timing
+    constants.SetStatic("m_V", cb.m_V);
+    constants.SetStatic("m_P", cb.m_P);
+    constants.SetStatic("m_VP", cb.m_VP);
     constants.SetStatic("timers", cb.timers);
-
-    // Set fog parameters
     constants.SetStatic("fog_plane", cb.fog_plane);
     constants.SetStatic("fog_params", cb.fog_params);
     constants.SetStatic("fog_color", cb.fog_color);
-
-    // Set lighting - L_sun_color and L_sun_dir_w are Fvector3 but need padding for float4
     constants.SetStatic("L_ambient", cb.L_ambient);
-    Fvector4 L_sun_color(cb.L_sun_color.x, cb.L_sun_color.y, cb.L_sun_color.z, 0.0f);
-    constants.SetStatic("L_sun_color", L_sun_color);
-    Fvector4 L_sun_dir_w(cb.L_sun_dir_w.x, cb.L_sun_dir_w.y, cb.L_sun_dir_w.z, 0.0f);
-    constants.SetStatic("L_sun_dir_w", L_sun_dir_w);
+    constants.SetStatic("L_sun_color", Fvector4(cb.L_sun_color.x, cb.L_sun_color.y, cb.L_sun_color.z, 0.0f));
+    constants.SetStatic("L_sun_dir_w", Fvector4(cb.L_sun_dir_w.x, cb.L_sun_dir_w.y, cb.L_sun_dir_w.z, 0.0f));
     constants.SetStatic("L_hemi_color", cb.L_hemi_color);
-
-    // Set camera position
-    Fvector4 eye_pos(cb.eye_position.x, cb.eye_position.y, cb.eye_position.z, 0.0f);
-    constants.SetStatic("eye_position", eye_pos);
-
-    // Set decompression params
+    constants.SetStatic("eye_position", Fvector4(cb.eye_position.x, cb.eye_position.y, cb.eye_position.z, 0.0f));
     constants.SetStatic("pos_decompression_params", cb.pos_decompression_params);
     constants.SetStatic("pos_decompression_params2", cb.pos_decompression_params2);
-
-    // Set parallax
     constants.SetStatic("parallax", cb.parallax);
-
-    // Set screen resolution
     constants.SetStatic("screen_res", cb.screen_res);
 }
 

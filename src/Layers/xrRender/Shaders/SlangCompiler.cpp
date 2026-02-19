@@ -74,7 +74,10 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     }
 
     // Create session for this compilation
+    // column_major: HLSL interprets row-major C++ bytes (Fmatrix) as columns,
+    // naturally transposing so mul(M, v) gives the correct row-vector result (v * M).
     slang::SessionDesc sessionDesc = {};
+    sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
     slang::TargetDesc targetDesc = {};
     targetDesc.format = GetSlangTarget(target);
 

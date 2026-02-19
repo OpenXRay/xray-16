@@ -51,23 +51,23 @@ struct v_model_skinned_4        // 28 bytes
 float4 u_position(float4 v) { return float4(v.xyz, 1.f); } // -12..+12
 
 //////////////////////////////////////////////////////////////////////////////////////////
-uniform float3x4 sbones_array[78];
+uniform float4x4 sbones_array[78];
 
-float3x4 get_bone(int legacy_index)
+float4x4 get_bone(int legacy_index)
 {
     return sbones_array[legacy_index / 3];
 }
 
-float3 skinning_dir(float3 dir, float3x4 bone_matrix)
+float3 skinning_dir(float3 dir, float4x4 bone_matrix)
 {
     float3 U = unpack_normal(dir);
     return mul((float3x3)bone_matrix, U);
 }
 
-float4 skinning_pos(float4 pos, float3x4 bone_matrix)
+float4 skinning_pos(float4 pos, float4x4 bone_matrix)
 {
     float4 P = u_position(pos);
-    return float4(mul(bone_matrix, P), 1.0);
+    return mul(bone_matrix, P);
 }
 
 v_model skinning_0(v_model_skinned_0 v)
@@ -98,7 +98,7 @@ v_model skinning_1(v_model_skinned_1 v)
     int mid = int(v.N.w * 255.0 + 0.3);
     
     // Get bone (automatically handles /3 division)
-    float3x4 bone = get_bone(mid);
+    float4x4 bone = get_bone(mid);
 
     // skinning
     v_model o;
@@ -121,12 +121,12 @@ v_model skinning_2(v_model_skinned_2 v)
     int id_0 = int(v.tc.z);
     int id_1 = int(v.tc.w);
     
-    float3x4 bone_0 = get_bone(id_0);
-    float3x4 bone_1 = get_bone(id_1);
+    float4x4 bone_0 = get_bone(id_0);
+    float4x4 bone_1 = get_bone(id_1);
 
     // Blend bones
     float w = v.N.w;
-    float3x4 bone = lerp(bone_0, bone_1, w);
+    float4x4 bone = lerp(bone_0, bone_1, w);
 
     // skinning
     v_model o;
@@ -150,16 +150,16 @@ v_model skinning_3(v_model_skinned_3 v)
     int id_1 = int(v.tc.w);                   // Short, direct
     int id_2 = int(v.B.w * 255.0 + 0.3);      // D3DCOLOR, scaled
 
-    float3x4 bone_0 = get_bone(id_0);
-    float3x4 bone_1 = get_bone(id_1);
-    float3x4 bone_2 = get_bone(id_2);
+    float4x4 bone_0 = get_bone(id_0);
+    float4x4 bone_1 = get_bone(id_1);
+    float4x4 bone_2 = get_bone(id_2);
 
     // Blend 3 bones
     float w0 = v.N.w;
     float w1 = v.T.w;
     float w2 = 1 - w0 - w1;
     
-    float3x4 bone = bone_0 * w0 + bone_1 * w1 + bone_2 * w2;
+    float4x4 bone = bone_0 * w0 + bone_1 * w1 + bone_2 * w2;
 
     // skinning
     v_model o;
@@ -193,7 +193,7 @@ v_model skinning_4(v_model_skinned_4 v)
     // Accumulate Matrix
     // Indices come from BLENDINDICES (usually D3DCOLOR), so scale by 255
     int id0 = int(v.ind.x * 255.0 + 0.3);
-    float3x4 bone = get_bone(id0) * w[0];
+    float4x4 bone = get_bone(id0) * w[0];
 
     [unroll]
     for (int i = 1; i < 4; ++i)

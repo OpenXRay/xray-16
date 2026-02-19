@@ -38,19 +38,19 @@ VS_OUTPUT main(VS_INPUT_2W v)
     int id_0 = int(v.tc.z);
     int id_1 = int(v.tc.w);
 
-    float3x4 bone_0 = get_bone(id_0);
-    float3x4 bone_1 = get_bone(id_1);
+    float4x4 bone_0 = get_bone(id_0);
+    float4x4 bone_1 = get_bone(id_1);
 
     // 2W uses lerp: result = bone_0 * (1-w) + bone_1 * w
     float w = v.N.w;
-    float3x4 bone = lerp(bone_0, bone_1, w);
+    float4x4 bone = lerp(bone_0, bone_1, w);
 
     float4 skinnedPos = skinning_pos(v.P, bone);
     float3 skinnedN = skinning_dir(N, bone);
     float3 skinnedT = skinning_dir(T, bone);
     float3 skinnedB = skinning_dir(B, bone);
 
-    float3 worldPos3 = mul(m_W, skinnedPos);
+    float3 worldPos3 = mul(m_W, skinnedPos).xyz;
     o.worldPos = worldPos3;
     o.position = mul(m_VP, float4(worldPos3, 1.0));
 

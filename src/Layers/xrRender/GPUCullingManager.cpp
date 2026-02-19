@@ -532,7 +532,7 @@ void GPUCullingManager::CreateSkinnedCullingBuffers(ng::RenderDevice* device)
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "GlobalBoneBuffer";
-        desc.byteSize = MAX_TOTAL_BONES * BONE_STRIDE;  // 8192 * 48 = 384KB
+        desc.byteSize = MAX_TOTAL_BONES * BONE_STRIDE;  // 8192 * 64 = 512KB
         desc.structStride = BONE_STRIDE;
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
@@ -1713,7 +1713,7 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         //  INSTANCE DATA (world transforms + material ID)
         // ─────────────────────────────────────────────────────
         GPUInstanceData inst;
-        inst.world.transpose(batch.worldMatrix);
+        inst.world = batch.worldMatrix;
         inst.materialID = batch.bindlessMaterialID;
         inst.flags = obj.flags;
         inst.pad0 = 0.0f;
@@ -1764,7 +1764,7 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
 
             // Terrain instance data (world transform)
             GPUInstanceData inst;
-            inst.world.transpose(batch.worldMatrix);
+            inst.world = batch.worldMatrix;
             inst.materialID = batch.terrainMaterialID;  // Terrain material ID
             inst.flags = GPU_OBJECT_OPAQUE;  // Terrain is always opaque
             inst.pad0 = 0.0f;
@@ -2227,29 +2227,10 @@ void GPUCullingManager::UploadSkeletonBones(nvrhi::ICommandList* cmdList, CKinem
         m_boneStagingBuffer.resize(boneCount);
     }
 
-    // Convert bone matrices to Float3x4 format
-    // X-Ray's Fmatrix is column-major, Float3x4 is row-major for HLSL
+    // Slang uses column_major — raw row-major Fmatrix bytes are naturally transposed.
+    // No explicit transpose needed.
     for (u32 i = 0; i < boneCount; i++) {
-        const Fmatrix& bone = skeleton->LL_GetTransform_R(u16(i));
-
-        // Convert Fmatrix (4x4 column-major) to float3x4 (row-major for HLSL)
-        // Row 0: bone._11, bone._21, bone._31, bone._41
-        // Row 1: bone._12, bone._22, bone._32, bone._42
-        // Row 2: bone._13, bone._23, bone._33, bone._43
-        m_boneStagingBuffer[i].m[0][0] = bone._11;
-        m_boneStagingBuffer[i].m[0][1] = bone._21;
-        m_boneStagingBuffer[i].m[0][2] = bone._31;
-        m_boneStagingBuffer[i].m[0][3] = bone._41;
-
-        m_boneStagingBuffer[i].m[1][0] = bone._12;
-        m_boneStagingBuffer[i].m[1][1] = bone._22;
-        m_boneStagingBuffer[i].m[1][2] = bone._32;
-        m_boneStagingBuffer[i].m[1][3] = bone._42;
-
-        m_boneStagingBuffer[i].m[2][0] = bone._13;
-        m_boneStagingBuffer[i].m[2][1] = bone._23;
-        m_boneStagingBuffer[i].m[2][2] = bone._33;
-        m_boneStagingBuffer[i].m[2][3] = bone._43;
+        m_boneStagingBuffer[i] = skeleton->LL_GetTransform_R(u16(i));
     }
 
     // Upload to GPU at the correct offset
@@ -2424,8 +2405,8 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                 // Fill constant buffer
                 CullParamsCB cb;
-                cb.viewProj.transpose(Device.mFullTransform);
-                cb.prevViewProj.transpose(data.prevViewProj);  // Previous frame's viewProj for temporal Hi-Z
+                cb.viewProj = Device.mFullTransform;
+                cb.prevViewProj = data.prevViewProj;  // Previous frame's viewProj for temporal Hi-Z
                 cb.cameraPos = Device.vCameraPosition;
                 float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
                 cb.maxDistanceSq = farPlane * farPlane;
@@ -2602,8 +2583,8 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 cmdList->writeBuffer(mgr->m_terrainVisibleCountBuffer, &zeroTerrain, sizeof(u32));
                 // Update constant buffer for terrain (reuse same CB, different object count)
                 CullParamsCB terrainCB;
-                terrainCB.viewProj.transpose(Device.mFullTransform);
-                terrainCB.prevViewProj.transpose(data.prevViewProj);  // Previous frame for temporal Hi-Z
+                terrainCB.viewProj = Device.mFullTransform;
+                terrainCB.prevViewProj = data.prevViewProj;  // Previous frame for temporal Hi-Z
                 terrainCB.cameraPos = Device.vCameraPosition;
                 float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
                 terrainCB.maxDistanceSq = farPlane * farPlane;
@@ -3024,8 +3005,8 @@ void GPUCullingManager::SetupSkinnedCullingPass(
 
             // Fill constant buffer (reuse m_cullParamsCB)
             CullParamsCB cb;
-            cb.viewProj.transpose(Device.mFullTransform);
-            cb.prevViewProj.transpose(data.prevViewProj);
+            cb.viewProj = Device.mFullTransform;
+            cb.prevViewProj = data.prevViewProj;
             cb.cameraPos = Device.vCameraPosition;
             float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
             cb.maxDistanceSq = farPlane * farPlane;
@@ -3340,7 +3321,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                     return;
 
                 CullDebugParamsCB cb;
-                cb.viewProj.transpose(Device.mFullTransform);
+                cb.viewProj = Device.mFullTransform;
                 cb.cameraPos = Device.vCameraPosition;
                 cb.maxDistanceSq = farPlane * farPlane;
                 cb.objectCount = objectCount;
@@ -3400,7 +3381,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                                          mgr->m_particleData.size() * sizeof(GPUParticleData));
 
                     CullDebugParamsCB cb;
-                    cb.viewProj.transpose(Device.mFullTransform);
+                    cb.viewProj = Device.mFullTransform;
                     cb.cameraPos = Device.vCameraPosition;
                     cb.maxDistanceSq = farPlane * farPlane;
                     cb.objectCount = static_cast<u32>(mgr->m_particleData.size());
@@ -3439,8 +3420,8 @@ void GPUCullingManager::SetupDebugVisualizationPass(
             u32 totalDebugCount = data.objectCount + data.particleCount;
             if (totalDebugCount > 0) {
                 CullDebugVSParamsCB vsCB;
-                vsCB.view.transpose(Device.mView);
-                vsCB.viewProj.transpose(Device.mFullTransform);
+                vsCB.view = Device.mView;
+                vsCB.viewProj = Device.mFullTransform;
                 vsCB.objectCount = totalDebugCount;
                 vsCB.wireframeAlpha = 0.7f;
 
@@ -3745,7 +3726,7 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
                 frameId = 1;
 
             CullParamsCB cb;
-            cb.viewProj.transpose(Device.mFullTransform);
+            cb.viewProj = Device.mFullTransform;
             cb.cameraPos = Device.vCameraPosition;
             float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
             cb.maxDistanceSq = farPlane * farPlane;

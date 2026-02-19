@@ -537,68 +537,16 @@ void FGConstantSystem::WriteStaticConstant(const ShaderConstant* constant, const
 // ═══════════════════════════════════════════════════
 
 void FGConstantSystem::WriteMatrix3x4(u8* dest, const Fmatrix& src) {
-    // ═══════════════════════════════════════════════════
-    // Fmatrix → float3x4 Conversion
-    // ═══════════════════════════════════════════════════
-    //
-    // Fmatrix layout (column-major in memory):
-    //   [_11 _21 _31 _41]  ← Column 0
-    //   [_12 _22 _32 _42]  ← Column 1
-    //   [_13 _23 _33 _43]  ← Column 2
-    //   [_14 _24 _34 _44]  ← Column 3
-    //
-    // HLSL float3x4 (row_major) expected layout:
-    //   Row 0: [_11 _12 _13 _14]  (16 bytes, padded to stride 16)
-    //   Row 1: [_21 _22 _23 _24]  (16 bytes)
-    //   Row 2: [_31 _32 _33 _34]  (16 bytes)
-    //   Total: 48 bytes (no row 3)
-    //
-    // Since Slang shader uses row_major qualifier, we write in row-major order
-    //
-
-    Fmatrix transposed;
-    transposed.transpose(src);
-
-    float* out = (float*)dest;
-
-    // Row 0: [_11, _12, _13, _14]
-    out[0]  = transposed._11;  out[1]  = transposed._12;  out[2]  = transposed._13;  out[3]  = transposed._14;
-
-    // Row 1: [_21, _22, _23, _24]
-    out[4]  = transposed._21;  out[5]  = transposed._22;  out[6]  = transposed._23;  out[7]  = transposed._24;
-
-    // Row 2: [_31, _32, _33, _34]
-    out[8]  = transposed._31;  out[9]  = transposed._32;  out[10] = transposed._33;  out[11] = transposed._34;
-
-    // Note: Row 3 (_41, _42, _43, _44) is discarded (float3x4 has no 4th row)
+    // Fmatrix is row-major, Slang uses column_major interpretation.
+    // column_major naturally transposes row-major bytes — no explicit transpose needed.
+    // Write first 3 rows (48 bytes) of raw Fmatrix data.
+    memcpy(dest, &src, 48);
 }
 
 void FGConstantSystem::WriteMatrix4x4(u8* dest, const Fmatrix& src) {
-    // ═══════════════════════════════════════════════════
-    // Fmatrix → float4x4 Conversion
-    // ═══════════════════════════════════════════════════
-    //
-    // HLSL float4x4 (row_major) expected layout:
-    //   Row 0: [_11 _12 _13 _14]  (16 bytes)
-    //   Row 1: [_21 _22 _23 _24]  (16 bytes)
-    //   Row 2: [_31 _32 _33 _34]  (16 bytes)
-    //   Row 3: [_41 _42 _43 _44]  (16 bytes)
-    //   Total: 64 bytes
-    //
-
-    float* out = (float*)dest;
-
-    // Row 0
-    out[0]  = src._11;  out[1]  = src._12;  out[2]  = src._13;  out[3]  = src._14;
-
-    // Row 1
-    out[4]  = src._21;  out[5]  = src._22;  out[6]  = src._23;  out[7]  = src._24;
-
-    // Row 2
-    out[8]  = src._31;  out[9]  = src._32;  out[10] = src._33;  out[11] = src._34;
-
-    // Row 3
-    out[12] = src._41;  out[13] = src._42;  out[14] = src._43;  out[15] = src._44;
+    // Fmatrix is row-major, Slang uses column_major interpretation.
+    // column_major naturally transposes row-major bytes — no explicit transpose needed.
+    memcpy(dest, &src, sizeof(Fmatrix));
 }
 
 bool FGConstantSystem::ValidateBindings() const {

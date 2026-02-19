@@ -51,22 +51,15 @@ struct alignas(16) PerObjectConstants {
 };
 static_assert(sizeof(PerObjectConstants) == 256, "PerObjectConstants must be 256 bytes");
 
-// Slot 1: Dynamic Transforms (224 bytes minimum)
+// Slot 1: Dynamic Transforms
 // UPDATED PER-DRAW! Contains world/view/projection for current object.
-// For static geometry: m_W = identity, for dynamic: m_W = object's world matrix
-// CRITICAL: HLSL float3x4 = 48 bytes (3 rows), float4x4 = 64 bytes (4 rows)
 struct alignas(16) DynamicTransforms {
-    // Combined matrices (computed per-draw)
-    float m_WVP[16];           // 0-64:   World-View-Projection (float4x4)
-    float m_WV[12];            // 64-112: World-View (float3x4)
-    float m_W[12];             // 112-160: World matrix (float3x4)
-                               //         IDENTITY for static geometry!
-
-    // Material/lighting per-draw params
-    Fvector4 L_material;       // 160-176: Material params (0,0,0,mid)
-    Fvector4 hemi_cube_pos_faces;  // 176-192: Hemisphere cube pos faces
-    Fvector4 hemi_cube_neg_faces;  // 192-208: Hemisphere cube neg faces
-    // dt_params MOVED to ShaderParams (b1) - it's material-frequency, not instance-frequency
+    Fmatrix m_WVP;
+    Fmatrix m_WV;
+    Fmatrix m_W;
+    Fvector4 L_material;
+    Fvector4 hemi_cube_pos_faces;
+    Fvector4 hemi_cube_neg_faces;
 };
 
 // Shader Params (Material-frequency constants, register b1)
@@ -87,103 +80,51 @@ struct alignas(16) SkinnedMaterialCB {
 
 // Slot 2: Static Globals (EXTENDED for Forward+)
 // UPDATED ONCE PER FRAME! Contains view/projection matrices, lighting, fog, etc.
-// CRITICAL: HLSL float3x4 = 48 bytes (3 rows), float4x4 = 64 bytes (4 rows)
-// We CANNOT use Fmatrix (64 bytes) for float3x4 - it would shift all offsets!
-//
-// PHASE 1.3: Extended with Forward+ data (inverse VP, shadow cascades, cluster grid)
 struct alignas(16) StaticGlobals {
-    // View and projection matrices
-    // m_V is float3x4 in HLSL = 48 bytes (3 rows of float4)
-    float m_V[12];             // 0-48:   View matrix (3x4 row-major)
+    Fmatrix m_V;
+    Fmatrix m_P;
+    Fmatrix m_VP;
 
-    // m_P is float4x4 in HLSL = 64 bytes (4 rows of float4)
-    float m_P[16];             // 48-112: Projection matrix (4x4 row-major)
+    Fvector4 timers;
+    Fvector4 fog_plane;
+    Fvector4 fog_params;
+    Fvector4 fog_color;
 
-    // m_VP is float4x4 in HLSL = 64 bytes (4 rows of float4)
-    float m_VP[16];            // 112-176: View-Projection matrix (4x4 row-major)
+    Fvector4 L_ambient;
+    Fvector3 L_sun_color;
+    float pbr_diffuse_mode;
+    Fvector3 L_sun_dir_w;
+    float padding2;
+    Fvector4 L_hemi_color;
 
-    // Timing
-    Fvector4 timers;           // 176-192: x=game time, y=frame time, z=sin(time), w=cos(time)
+    Fvector3 eye_position;
+    float padding3;
 
-    // Fog
-    Fvector4 fog_plane;        // 192-208: Fog plane equation (ax + by + cz + d)
-    Fvector4 fog_params;       // 208-224: x=fog near, y=fog far, z=density, w=?
-    Fvector4 fog_color;        // 224-240: RGB fog color + alpha
+    Fvector4 pos_decompression_params;
+    Fvector4 pos_decompression_params2;
 
-    // Lighting
-    Fvector4 L_ambient;        // 240-256: Ambient light color
-    Fvector3 L_sun_color;      // 256-268: Sun light color
-    float pbr_diffuse_mode;    // 268-272: 0=Disney/Burley, 1=Lambertian
-    Fvector3 L_sun_dir_w;      // 272-284: Sun direction (world space)
-    float padding2;            // 284-288: Padding
-    Fvector4 L_hemi_color;     // 288-304: Hemisphere light color
+    Fvector4 parallax;
+    Fvector4 screen_res;
 
-    // Camera
-    Fvector3 eye_position;     // 304-316: Camera position (world space)
-    float padding3;            // 316-320: Padding
+    Fmatrix m_InvVP;
 
-    // Vertex decompression (for compressed position attributes)
-    Fvector4 pos_decompression_params;  // 320-336
-    Fvector4 pos_decompression_params2; // 336-352
+    Fmatrix shadow_matrices[4];
+    Fvector4 cascade_splits;
 
-    // Misc
-    Fvector4 parallax;         // 352-368: Parallax mapping parameters
-    Fvector4 screen_res;       // 368-384: Screen resolution (x=width, y=height, z=1/width, w=1/height)
+    Fvector4 cluster_params;
+    Fvector4 cluster_scales;
 
-    // ═══════════════════════════════════════════════════════
-    //  FORWARD+ EXTENSIONS (Phase 1.3+)
-    // ═══════════════════════════════════════════════════════
-
-    // Inverse View-Projection for position reconstruction from depth
-    float m_InvVP[16];         // 384-448: Inverse View-Projection matrix (float4x4)
-
-    // Shadow cascade matrices (Phase 4: CSM shadows)
-    float shadow_matrices[4][16]; // 448-704: Shadow view-projection matrices (4×float4x4)
-    Fvector4 cascade_splits;   // 704-720: Cascade split distances (x, y, z, w)
-
-    // Cluster grid parameters (Phase 5: Clustered light culling)
-    Fvector4 cluster_params;   // 720-736: (grid_dim_x, grid_dim_y, grid_dim_z, num_lights)
-    Fvector4 cluster_scales;   // 736-752: (z_near, z_far, scale_x, scale_y)
-
-    // Camera direction vector (for lighting calculations)
-    Fvector4 camera_direction; // 752-768: Camera forward vector (xyz) + padding (w)
+    Fvector4 camera_direction;
 };
-static_assert(sizeof(StaticGlobals) == 768, "StaticGlobals must be 768 bytes");
+static_assert(sizeof(StaticGlobals) == 784, "StaticGlobals must be 784 bytes");
 
 // Legacy alias for compatibility
 using GlobalConstants = StaticGlobals;
 
-// Helper function to fill GlobalConstants from Device state
 inline void FillGlobalConstants(GlobalConstants& cb) {
-    // View/Projection matrices
-    // CRITICAL: HLSL expects row-major float3x4/float4x4, but X-Ray stores column-major
-    // We must TRANSPOSE the matrices when copying to CB!
-
-    // m_V is float3x4 (12 floats: 3 rows of 4 floats)
-    // X-Ray's mView is column-major, HLSL expects row-major, so transpose
-    Fmatrix viewT;
-    viewT.transpose(Device.mView);
-    cb.m_V[0]  = viewT._11; cb.m_V[1]  = viewT._12; cb.m_V[2]  = viewT._13; cb.m_V[3]  = viewT._14;
-    cb.m_V[4]  = viewT._21; cb.m_V[5]  = viewT._22; cb.m_V[6]  = viewT._23; cb.m_V[7]  = viewT._24;
-    cb.m_V[8]  = viewT._31; cb.m_V[9]  = viewT._32; cb.m_V[10] = viewT._33; cb.m_V[11] = viewT._34;
-
-    // m_P is float4x4 (16 floats: 4 rows of 4 floats)
-    Fmatrix projT;
-    projT.transpose(Device.mProject);
-    cb.m_P[0]  = projT._11; cb.m_P[1]  = projT._12; cb.m_P[2]  = projT._13; cb.m_P[3]  = projT._14;
-    cb.m_P[4]  = projT._21; cb.m_P[5]  = projT._22; cb.m_P[6]  = projT._23; cb.m_P[7]  = projT._24;
-    cb.m_P[8]  = projT._31; cb.m_P[9]  = projT._32; cb.m_P[10] = projT._33; cb.m_P[11] = projT._34;
-    cb.m_P[12] = projT._41; cb.m_P[13] = projT._42; cb.m_P[14] = projT._43; cb.m_P[15] = projT._44;
-
-    // m_VP is float4x4 (16 floats: 4 rows of 4 floats)
-    Fmatrix tempVP;
-    tempVP.mul(Device.mProject, Device.mView);
-    Fmatrix vpT;
-    vpT.transpose(tempVP);
-    cb.m_VP[0]  = vpT._11; cb.m_VP[1]  = vpT._12; cb.m_VP[2]  = vpT._13; cb.m_VP[3]  = vpT._14;
-    cb.m_VP[4]  = vpT._21; cb.m_VP[5]  = vpT._22; cb.m_VP[6]  = vpT._23; cb.m_VP[7]  = vpT._24;
-    cb.m_VP[8]  = vpT._31; cb.m_VP[9]  = vpT._32; cb.m_VP[10] = vpT._33; cb.m_VP[11] = vpT._34;
-    cb.m_VP[12] = vpT._41; cb.m_VP[13] = vpT._42; cb.m_VP[14] = vpT._43; cb.m_VP[15] = vpT._44;
+    cb.m_V = Device.mView;
+    cb.m_P = Device.mProject;
+    cb.m_VP.mul(Device.mProject, Device.mView);
 
     // Timers
     cb.timers.set(
@@ -242,32 +183,10 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     //  FORWARD+ EXTENSIONS (Phase 1.3)
     // ═══════════════════════════════════════════════════════
 
-    // Inverse View-Projection matrix (for position reconstruction from depth)
-    Fmatrix invVP;
-    invVP.invert(tempVP);
-    Fmatrix invVPT;
-    invVPT.transpose(invVP);
-    cb.m_InvVP[0]  = invVPT._11; cb.m_InvVP[1]  = invVPT._12; cb.m_InvVP[2]  = invVPT._13; cb.m_InvVP[3]  = invVPT._14;
-    cb.m_InvVP[4]  = invVPT._21; cb.m_InvVP[5]  = invVPT._22; cb.m_InvVP[6]  = invVPT._23; cb.m_InvVP[7]  = invVPT._24;
-    cb.m_InvVP[8]  = invVPT._31; cb.m_InvVP[9]  = invVPT._32; cb.m_InvVP[10] = invVPT._33; cb.m_InvVP[11] = invVPT._34;
-    cb.m_InvVP[12] = invVPT._41; cb.m_InvVP[13] = invVPT._42; cb.m_InvVP[14] = invVPT._43; cb.m_InvVP[15] = invVPT._44;
+    cb.m_InvVP.invert(cb.m_VP);
 
-    // Shadow cascade matrices (PLACEHOLDER - Phase 4: will be populated from shadow pass)
-    for (int i = 0; i < 4; i++) {
-        Fmatrix identity;
-        identity.identity();
-        Fmatrix identityT;
-        identityT.transpose(identity);
-
-        cb.shadow_matrices[i][0]  = identityT._11; cb.shadow_matrices[i][1]  = identityT._12;
-        cb.shadow_matrices[i][2]  = identityT._13; cb.shadow_matrices[i][3]  = identityT._14;
-        cb.shadow_matrices[i][4]  = identityT._21; cb.shadow_matrices[i][5]  = identityT._22;
-        cb.shadow_matrices[i][6]  = identityT._23; cb.shadow_matrices[i][7]  = identityT._24;
-        cb.shadow_matrices[i][8]  = identityT._31; cb.shadow_matrices[i][9]  = identityT._32;
-        cb.shadow_matrices[i][10] = identityT._33; cb.shadow_matrices[i][11] = identityT._34;
-        cb.shadow_matrices[i][12] = identityT._41; cb.shadow_matrices[i][13] = identityT._42;
-        cb.shadow_matrices[i][14] = identityT._43; cb.shadow_matrices[i][15] = identityT._44;
-    }
+    for (int i = 0; i < 4; i++)
+        cb.shadow_matrices[i].identity();
     cb.cascade_splits.set(10.0f, 50.0f, 150.0f, 500.0f);
 
     // Cluster grid parameters (PLACEHOLDER - Phase 5: will be populated from light culling pass)
@@ -280,40 +199,13 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
 }
 
 inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity) {
-    Fmatrix wv, wvp;
-    wv.mul_43(Device.mView, m_W);           // WV = View * World
-    wvp.mul(Device.mProject, wv);        // WVP = Projection *
+    cb.m_W = m_W;
+    cb.m_WV.mul_43(Device.mView, m_W);
+    cb.m_WVP.mul(Device.mProject, cb.m_WV);
 
-    // Transpose for HLSL (column-major -> row-major)
-    Fmatrix wvpT, wvT, wT;
-    wvpT.transpose(wvp);
-    wvT.transpose(wv);
-
-    wT.identity();
-    wT.transpose(m_W);  // World = identity for static geometry
-
-    // m_WVP (float4x4, 64 bytes)
-    cb.m_WVP[0]  = wvpT._11; cb.m_WVP[1]  = wvpT._12; cb.m_WVP[2]  = wvpT._13; cb.m_WVP[3]  = wvpT._14;
-    cb.m_WVP[4]  = wvpT._21; cb.m_WVP[5]  = wvpT._22; cb.m_WVP[6]  = wvpT._23; cb.m_WVP[7]  = wvpT._24;
-    cb.m_WVP[8]  = wvpT._31; cb.m_WVP[9]  = wvpT._32; cb.m_WVP[10] = wvpT._33; cb.m_WVP[11] = wvpT._34;
-    cb.m_WVP[12] = wvpT._41; cb.m_WVP[13] = wvpT._42; cb.m_WVP[14] = wvpT._43; cb.m_WVP[15] = wvpT._44;
-
-    // m_WV (float3x4, 48 bytes)
-    cb.m_WV[0]  = wvT._11; cb.m_WV[1]  = wvT._12; cb.m_WV[2]  = wvT._13; cb.m_WV[3]  = wvT._14;
-    cb.m_WV[4]  = wvT._21; cb.m_WV[5]  = wvT._22; cb.m_WV[6]  = wvT._23; cb.m_WV[7]  = wvT._24;
-    cb.m_WV[8]  = wvT._31; cb.m_WV[9]  = wvT._32; cb.m_WV[10] = wvT._33; cb.m_WV[11] = wvT._34;
-
-    // m_W (float3x4, 48 bytes)
-    cb.m_W[0]  = wT._11; cb.m_W[1]  = wT._12; cb.m_W[2]  = wT._13; cb.m_W[3]  = wT._14;
-    cb.m_W[4]  = wT._21; cb.m_W[5]  = wT._22; cb.m_W[6]  = wT._23; cb.m_W[7]  = wT._24;
-    cb.m_W[8]  = wT._31; cb.m_W[9]  = wT._32; cb.m_W[10] = wT._33; cb.m_W[11] = wT._34;
-
-    // Material/lighting params (TODO: Get from X-Ray's material/environment system)
-    cb.L_material.set(0.01903f, 0.74998f, 0.0f, 0.25f);  // Vanilla values from RenderDoc
+    cb.L_material.set(0.01903f, 0.74998f, 0.0f, 0.25f);
     cb.hemi_cube_pos_faces.set(0.08034f, 0.42066f, 0.13277f, 0.0f);
     cb.hemi_cube_neg_faces.set(0.19919f, 0.00392f, 0.09922f, 0.0f);
-
-    // dt_params moved to ShaderParams (b1) - material-frequency, not instance-frequency
 }
 
 // ══════════════════════════════════════════════════════════

@@ -9,9 +9,9 @@
 //	Used by VS
 cbuffer	dynamic_transforms : register(b0)
 {
-	float4x4		m_WVP;		//	World View Projection composition
-	float3x4		m_WV;
-	float3x4	    m_W;
+	float4x4		m_WVP;
+	float4x4		m_WV;
+	float4x4	    m_W;
 	//	Used by VS only
 	float4		L_material;	// 0,0,0,mid
 	float4          hemi_cube_pos_faces;
@@ -26,7 +26,7 @@ cbuffer	shader_params : register(b1)
 
 cbuffer	static_globals : register(b2)
 {
-	float3x4		m_V;
+	float4x4		m_V;
 	float4x4 	m_P;
 	float4x4 	m_VP;
 

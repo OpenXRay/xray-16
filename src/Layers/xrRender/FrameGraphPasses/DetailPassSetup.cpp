@@ -164,7 +164,7 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.wave.set(1.0f / 5.0f, 1.0f / 7.0f, 1.0f / 3.0f, Device.fTimeGlobal);
             frameConstants.dir2D.set(dm->windDirection.x, dm->windDirection.y, 0.0f, 0.0f);
             frameConstants.dir2D_2.set(-dm->windDirection.y, dm->windDirection.x, 0.0f, 0.0f);
-            frameConstants.viewProj.transpose(Device.mFullTransform);
+            frameConstants.viewProj = Device.mFullTransform;
             frameConstants.detail_params.set(
                 float(dm->dtH.x_size()), float(dm->dtH.z_size()),
                 float(dm->dtH.x_offs()), float(dm->dtH.z_offs()));

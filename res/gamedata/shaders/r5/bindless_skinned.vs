@@ -41,14 +41,14 @@ VS_OUTPUT main(VS_INPUT input)
     float3 B = unpack_d3dcolor_normal(input.B.xyz);
 
     int boneIdx = int(input.N.w * 255.0 + 0.3);
-    float3x4 bone = get_bone(boneIdx);
+    float4x4 bone = get_bone(boneIdx);
 
     float4 skinnedPos = skinning_pos(localPos, bone);
     float3 skinnedN = skinning_dir(N, bone);
     float3 skinnedT = skinning_dir(T, bone);
     float3 skinnedB = skinning_dir(B, bone);
 
-    float3 worldPos3 = mul(m_W, skinnedPos);
+    float3 worldPos3 = mul(m_W, skinnedPos).xyz;
     output.worldPos = worldPos3;
     output.position = mul(m_VP, float4(worldPos3, 1.0));
 
