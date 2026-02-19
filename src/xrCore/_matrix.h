@@ -5,6 +5,16 @@
 #include "_vector3d.h"
 #include "_vector4.h"
 #include "_std_extensions.h" // _valid<float>
+
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
+#include <immintrin.h>
+#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+#include "sse2neon/sse2neon.h"
+#elif defined(XR_ARCHITECTURE_RISCV)
+#include "sse2rvv/sse2rvv.h"
+#elif defined(XR_ARCHITECTURE_PPC64)
+#include <xmmintrin.h>
+#endif
 /*
 * DirectX-compliant, ie row-column order, ie m[Row][Col].
 * Same as:
@@ -416,66 +426,90 @@ struct Fmatrix
 
     IC SelfRef inertion(const Self& mat, float v)
     {
-        float iv = 1.f - v;
+        __m128 sv = _mm_set1_ps(v);
+        __m128 siv = _mm_set1_ps(1.f - v);
         for (int i = 0; i < 4; i++)
         {
-            m[i][0] = m[i][0] * v + mat.m[i][0] * iv;
-            m[i][1] = m[i][1] * v + mat.m[i][1] * iv;
-            m[i][2] = m[i][2] * v + mat.m[i][2] * iv;
-            m[i][3] = m[i][3] * v + mat.m[i][3] * iv;
+            __m128 a = _mm_loadu_ps(&m[i][0]);
+            __m128 b = _mm_loadu_ps(&mat.m[i][0]);
+            _mm_storeu_ps(&m[i][0], _mm_add_ps(_mm_mul_ps(a, sv), _mm_mul_ps(b, siv)));
         }
         return *this;
     }
 
-    ICF void transform_tiny(Fvector& dest, const Fvector& v) const // preferred to use
+    ICF void transform_tiny(Fvector& dest, const Fvector& v) const
     {
-        dest.x = v.x * _11 + v.y * _21 + v.z * _31 + _41;
-        dest.y = v.x * _12 + v.y * _22 + v.z * _32 + _42;
-        dest.z = v.x * _13 + v.y * _23 + v.z * _33 + _43;
+        __m128 r = _mm_mul_ps(_mm_loadu_ps(&m[0][0]), _mm_set1_ps(v.x));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[1][0]), _mm_set1_ps(v.y)));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[2][0]), _mm_set1_ps(v.z)));
+        r = _mm_add_ps(r, _mm_loadu_ps(&m[3][0]));
+        dest.x = _mm_cvtss_f32(r);
+        dest.y = _mm_cvtss_f32(_mm_shuffle_ps(r, r, 1));
+        dest.z = _mm_cvtss_f32(_mm_shuffle_ps(r, r, 2));
     }
 
-    ICF void transform_tiny32(Fvector2& dest, const Fvector& v) const // preferred to use
+    ICF void transform_tiny32(Fvector2& dest, const Fvector& v) const
     {
-        dest.x = v.x * _11 + v.y * _21 + v.z * _31 + _41;
-        dest.y = v.x * _12 + v.y * _22 + v.z * _32 + _42;
+        __m128 r = _mm_mul_ps(_mm_loadu_ps(&m[0][0]), _mm_set1_ps(v.x));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[1][0]), _mm_set1_ps(v.y)));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[2][0]), _mm_set1_ps(v.z)));
+        r = _mm_add_ps(r, _mm_loadu_ps(&m[3][0]));
+        dest.x = _mm_cvtss_f32(r);
+        dest.y = _mm_cvtss_f32(_mm_shuffle_ps(r, r, 1));
     }
 
-    ICF void transform_tiny23(Fvector& dest, const Fvector2& v) const // preferred to use
+    ICF void transform_tiny23(Fvector& dest, const Fvector2& v) const
     {
-        dest.x = v.x * _11 + v.y * _21 + _41;
-        dest.y = v.x * _12 + v.y * _22 + _42;
-        dest.z = v.x * _13 + v.y * _23 + _43;
+        __m128 r = _mm_mul_ps(_mm_loadu_ps(&m[0][0]), _mm_set1_ps(v.x));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[1][0]), _mm_set1_ps(v.y)));
+        r = _mm_add_ps(r, _mm_loadu_ps(&m[3][0]));
+        dest.x = _mm_cvtss_f32(r);
+        dest.y = _mm_cvtss_f32(_mm_shuffle_ps(r, r, 1));
+        dest.z = _mm_cvtss_f32(_mm_shuffle_ps(r, r, 2));
     }
 
-    ICF void transform_dir(Fvector& dest, const Fvector& v) const // preferred to use
+    ICF void transform_dir(Fvector& dest, const Fvector& v) const
     {
-        dest.x = v.x * _11 + v.y * _21 + v.z * _31;
-        dest.y = v.x * _12 + v.y * _22 + v.z * _32;
-        dest.z = v.x * _13 + v.y * _23 + v.z * _33;
+        __m128 r = _mm_mul_ps(_mm_loadu_ps(&m[0][0]), _mm_set1_ps(v.x));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[1][0]), _mm_set1_ps(v.y)));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[2][0]), _mm_set1_ps(v.z)));
+        dest.x = _mm_cvtss_f32(r);
+        dest.y = _mm_cvtss_f32(_mm_shuffle_ps(r, r, 1));
+        dest.z = _mm_cvtss_f32(_mm_shuffle_ps(r, r, 2));
     }
 
-    IC void transform(Fvector4& dest, const Fvector& v) const // preferred to use
+    IC void transform(Fvector4& dest, const Fvector& v) const
     {
-        dest.w = v.x * _14 + v.y * _24 + v.z * _34 + _44;
-        dest.x = (v.x * _11 + v.y * _21 + v.z * _31 + _41) / dest.w;
-        dest.y = (v.x * _12 + v.y * _22 + v.z * _32 + _42) / dest.w;
-        dest.z = (v.x * _13 + v.y * _23 + v.z * _33 + _43) / dest.w;
+        __m128 r = _mm_mul_ps(_mm_loadu_ps(&m[0][0]), _mm_set1_ps(v.x));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[1][0]), _mm_set1_ps(v.y)));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[2][0]), _mm_set1_ps(v.z)));
+        r = _mm_add_ps(r, _mm_loadu_ps(&m[3][0]));
+        __m128 w = _mm_shuffle_ps(r, r, _MM_SHUFFLE(3, 3, 3, 3));
+        r = _mm_div_ps(r, w);
+        _mm_storeu_ps(&dest.x, r);
+        dest.w = _mm_cvtss_f32(w);
     }
 
-    IC void transform(Fvector& dest, const Fvector& v) const // preferred to use
+    IC void transform(Fvector& dest, const Fvector& v) const
     {
-        float iw = 1.f / (v.x * _14 + v.y * _24 + v.z * _34 + _44);
-        dest.x = (v.x * _11 + v.y * _21 + v.z * _31 + _41) * iw;
-        dest.y = (v.x * _12 + v.y * _22 + v.z * _32 + _42) * iw;
-        dest.z = (v.x * _13 + v.y * _23 + v.z * _33 + _43) * iw;
+        __m128 r = _mm_mul_ps(_mm_loadu_ps(&m[0][0]), _mm_set1_ps(v.x));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[1][0]), _mm_set1_ps(v.y)));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[2][0]), _mm_set1_ps(v.z)));
+        r = _mm_add_ps(r, _mm_loadu_ps(&m[3][0]));
+        __m128 iw = _mm_div_ps(_mm_set1_ps(1.f), _mm_shuffle_ps(r, r, _MM_SHUFFLE(3, 3, 3, 3)));
+        r = _mm_mul_ps(r, iw);
+        dest.x = _mm_cvtss_f32(r);
+        dest.y = _mm_cvtss_f32(_mm_shuffle_ps(r, r, 1));
+        dest.z = _mm_cvtss_f32(_mm_shuffle_ps(r, r, 2));
     }
 
-    IC void transform(Fvector4& dest, const Fvector4& v) const // preferred to use
+    IC void transform(Fvector4& dest, const Fvector4& v) const
     {
-        dest.w = v.x * _14 + v.y * _24 + v.z * _34 + v.w * _44;
-        dest.x = v.x * _11 + v.y * _21 + v.z * _31 + v.w * _41;
-        dest.y = v.x * _12 + v.y * _22 + v.z * _32 + v.w * _42;
-        dest.z = v.x * _13 + v.y * _23 + v.z * _33 + v.w * _43;
+        __m128 r = _mm_mul_ps(_mm_loadu_ps(&m[0][0]), _mm_set1_ps(v.x));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[1][0]), _mm_set1_ps(v.y)));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[2][0]), _mm_set1_ps(v.z)));
+        r = _mm_add_ps(r, _mm_mul_ps(_mm_loadu_ps(&m[3][0]), _mm_set1_ps(v.w)));
+        _mm_storeu_ps(&dest.x, r);
     }
 
     ICF void transform_tiny(Fvector& v) const
