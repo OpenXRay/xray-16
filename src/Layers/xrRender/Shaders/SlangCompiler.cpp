@@ -70,6 +70,7 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     }
 
     slang::SessionDesc sessionDesc = {};
+    sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
     slang::TargetDesc targetDesc = {};
     targetDesc.format = GetSlangTarget(target);
 

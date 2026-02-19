@@ -5,8 +5,8 @@
 cbuffer	dynamic_transforms : register(b0)
 {
 	float4x4		m_WVP;
-	float3x4		m_WV;
-	float3x4	    m_W;
+	float4x4		m_WV;
+	float4x4	    m_W;
 	float4		L_material;
 	float4          hemi_cube_pos_faces;
 	float4          hemi_cube_neg_faces;
@@ -20,7 +20,7 @@ cbuffer	shader_params : register(b1)
 
 cbuffer	static_globals : register(b2)
 {
-	float3x4		m_V;
+	float4x4		m_V;
 	float4x4 	m_P;
 	float4x4 	m_VP;
 

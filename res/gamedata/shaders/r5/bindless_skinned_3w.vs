@@ -35,22 +35,22 @@ VS_OUTPUT main(VS_INPUT_3W v)
     int id_1 = int(v.tc.w);
     int id_2 = int(v.B.w * 255.0 + 0.3);
 
-    float3x4 bone_0 = get_bone(id_0);
-    float3x4 bone_1 = get_bone(id_1);
-    float3x4 bone_2 = get_bone(id_2);
+    float4x4 bone_0 = get_bone(id_0);
+    float4x4 bone_1 = get_bone(id_1);
+    float4x4 bone_2 = get_bone(id_2);
 
     float w0 = v.N.w;
     float w1 = v.T.w;
     float w2 = 1.0 - w0 - w1;
 
-    float3x4 bone = bone_0 * w0 + bone_1 * w1 + bone_2 * w2;
+    float4x4 bone = bone_0 * w0 + bone_1 * w1 + bone_2 * w2;
 
     float4 skinnedPos = skinning_pos(v.P, bone);
     float3 skinnedN = skinning_dir(N, bone);
     float3 skinnedT = skinning_dir(T, bone);
     float3 skinnedB = skinning_dir(B, bone);
 
-    float3 worldPos3 = mul(m_W, skinnedPos);
+    float3 worldPos3 = mul(m_W, skinnedPos).xyz;
     o.worldPos = worldPos3;
     o.position = mul(m_VP, float4(worldPos3, 1.0));
 

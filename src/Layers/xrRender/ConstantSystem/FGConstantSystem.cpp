@@ -449,31 +449,11 @@ void FGConstantSystem::WriteStaticConstant(const ShaderConstant* constant, const
 }
 
 void FGConstantSystem::WriteMatrix3x4(u8* dest, const Fmatrix& src) {
-
-    Fmatrix transposed;
-    transposed.transpose(src);
-
-    float* out = (float*)dest;
-
-    out[0]  = transposed._11;  out[1]  = transposed._12;  out[2]  = transposed._13;  out[3]  = transposed._14;
-
-    out[4]  = transposed._21;  out[5]  = transposed._22;  out[6]  = transposed._23;  out[7]  = transposed._24;
-
-    out[8]  = transposed._31;  out[9]  = transposed._32;  out[10] = transposed._33;  out[11] = transposed._34;
-
+    memcpy(dest, &src, 48);
 }
 
 void FGConstantSystem::WriteMatrix4x4(u8* dest, const Fmatrix& src) {
-
-    float* out = (float*)dest;
-
-    out[0]  = src._11;  out[1]  = src._12;  out[2]  = src._13;  out[3]  = src._14;
-
-    out[4]  = src._21;  out[5]  = src._22;  out[6]  = src._23;  out[7]  = src._24;
-
-    out[8]  = src._31;  out[9]  = src._32;  out[10] = src._33;  out[11] = src._34;
-
-    out[12] = src._41;  out[13] = src._42;  out[14] = src._43;  out[15] = src._44;
+    memcpy(dest, &src, sizeof(Fmatrix));
 }
 
 bool FGConstantSystem::ValidateBindings() const {

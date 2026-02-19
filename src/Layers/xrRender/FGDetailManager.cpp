@@ -2292,8 +2292,8 @@ void FGDetailManager::DispatchCulling(
     u32 decalCapacity = std::max(visibleBufferCapacity / 4, 10000u);
 
     DetailCullParams params;
-    params.viewProj.transpose(Device.mFullTransform);
-    params.prevViewProj.transpose(prevViewProj);
+    params.viewProj = Device.mFullTransform;
+    params.prevViewProj = prevViewProj;
     params.cameraPos = Device.vCameraPosition;
     params.fadeDistanceSqr = fadeDistance * fadeDistance;
 

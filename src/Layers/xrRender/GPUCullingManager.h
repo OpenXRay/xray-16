@@ -47,10 +47,6 @@ struct GPUParticleData {
 };
 static_assert(sizeof(GPUParticleData) == 32, "GPUParticleData must be 32 bytes for GPU alignment");
 
-struct Float3x4 {
-    float m[3][4];
-};
-static_assert(sizeof(Float3x4) == 48, "Float3x4 must be 48 bytes");
 
 enum GPUObjectFlags : u32 {
     GPU_OBJECT_OPAQUE      = 0x1,
@@ -497,10 +493,10 @@ private:
     SkinnedCullingStats m_skinnedCullingStats;
 
     static constexpr u32 MAX_TOTAL_BONES = 8192;
-    static constexpr u32 BONE_STRIDE = sizeof(Float3x4);
+    static constexpr u32 BONE_STRIDE = sizeof(Fmatrix);
     nvrhi::BufferHandle m_globalBoneBuffer;
     xr_map<CKinematics*, u32> m_skeletonOffsets;
-    xr_vector<Float3x4> m_boneStagingBuffer;
+    xr_vector<Fmatrix> m_boneStagingBuffer;
     u32 m_currentBoneOffset = 0;
     bool m_boneBufferInitialized = false;
 
