@@ -1,6 +1,6 @@
 cbuffer vertexBuffer : register(b0)
 {
-    column_major float4x4 ProjectionMatrix;
+    float4x4 ProjectionMatrix;
 };
 
 struct VS_INPUT
