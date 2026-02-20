@@ -33,6 +33,14 @@ float2 GetHitUV(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
     return uv0 * w0 + uv1 * barycentrics.x + uv2 * barycentrics.y;
 }
 
+float3 DecodePackedNormal(uint packed)
+{
+    return float3(
+        ((packed >> 16) & 0xFF) / 127.5 - 1.0,
+        ((packed >>  8) & 0xFF) / 127.5 - 1.0,
+        ((packed >>  0) & 0xFF) / 127.5 - 1.0);
+}
+
 float3 GetHitNormal(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
                     RTBatchInfo info, uint primitiveIndex, float2 barycentrics)
 {
@@ -41,25 +49,18 @@ float3 GetHitNormal(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
     uint i1 = megaIB.Load(triBase * 4 + 4) + info.baseVertex;
     uint i2 = megaIB.Load(triBase * 4 + 8) + info.baseVertex;
 
-    uint packed0 = megaVB.Load(i0 * 48 + 12);
-    uint packed1 = megaVB.Load(i1 * 48 + 12);
-    uint packed2 = megaVB.Load(i2 * 48 + 12);
-
-    float3 n0 = float3(
-        ((packed0 >> 16) & 0xFF) / 127.5 - 1.0,
-        ((packed0 >>  8) & 0xFF) / 127.5 - 1.0,
-        ((packed0 >>  0) & 0xFF) / 127.5 - 1.0);
-    float3 n1 = float3(
-        ((packed1 >> 16) & 0xFF) / 127.5 - 1.0,
-        ((packed1 >>  8) & 0xFF) / 127.5 - 1.0,
-        ((packed1 >>  0) & 0xFF) / 127.5 - 1.0);
-    float3 n2 = float3(
-        ((packed2 >> 16) & 0xFF) / 127.5 - 1.0,
-        ((packed2 >>  8) & 0xFF) / 127.5 - 1.0,
-        ((packed2 >>  0) & 0xFF) / 127.5 - 1.0);
+    float3 n0 = DecodePackedNormal(megaVB.Load(i0 * 48 + 12));
+    float3 n1 = DecodePackedNormal(megaVB.Load(i1 * 48 + 12));
+    float3 n2 = DecodePackedNormal(megaVB.Load(i2 * 48 + 12));
 
     float w0 = 1.0 - barycentrics.x - barycentrics.y;
     return normalize(n0 * w0 + n1 * barycentrics.x + n2 * barycentrics.y);
+}
+
+float3 TransformNormalToWorld(float3 localNormal, float3x4 objectToWorld)
+{
+    float3x3 rot = float3x3(objectToWorld[0].xyz, objectToWorld[1].xyz, objectToWorld[2].xyz);
+    return normalize(mul(rot, localNormal));
 }
 
 uint pcg_hash(uint input)

@@ -7,6 +7,13 @@
 
 namespace xray::render::RENDER_NAMESPACE {
 
+static void FmatrixToRTTransform(const Fmatrix& m, nvrhi::rt::AffineTransform& out)
+{
+    out[0]  = m._11; out[1]  = m._21; out[2]  = m._31; out[3]  = m._41;
+    out[4]  = m._12; out[5]  = m._22; out[6]  = m._32; out[7]  = m._42;
+    out[8]  = m._13; out[9]  = m._23; out[10] = m._33; out[11] = m._43;
+}
+
 void RTAccelStructManager::Initialize(ng::RenderDevice* device)
 {
     m_device = device;
@@ -23,11 +30,13 @@ void RTAccelStructManager::Initialize(ng::RenderDevice* device)
 
 void RTAccelStructManager::Shutdown()
 {
-    m_blas = nullptr;
+    m_staticBlas = nullptr;
+    m_uniqueGeometries.clear();
     m_tlas = nullptr;
     m_batchInfoBuffer = nullptr;
     m_isReady = false;
     m_batchCount = 0;
+    m_batchCounts = {};
 }
 
 void RTAccelStructManager::BuildIfNeeded(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling)
@@ -42,22 +51,26 @@ void RTAccelStructManager::BuildIfNeeded(nvrhi::ICommandList* cmdList, GPUCullin
     if (drawArgs.empty())
         return;
 
-    Msg("* [RT] Building acceleration structures (%u static batches)...", (u32)drawArgs.size());
-
     m_megaVB = gpuCulling->GetMegaVertexBuffer();
     m_megaIB = gpuCulling->GetMegaIndexBuffer();
 
-    BuildBLAS(cmdList, gpuCulling);
-    if (!m_blas) return;
-
+    BuildStaticBLAS(cmdList, gpuCulling);
+    BuildInstancedBLAS(cmdList, gpuCulling);
     BuildTLAS(cmdList);
     if (!m_tlas) return;
 
     CreateBatchInfoBuffer(cmdList, gpuCulling);
 
     m_isReady = true;
-    Msg("* [RT] Acceleration structures ready (%u geometries: %u static, %u terrain, %u transparent)",
-        m_batchCount, m_staticBatchCount, m_terrainBatchCount, m_transparentBatchCount);
+
+    u32 totalInstances = 0;
+    for (const auto& ug : m_uniqueGeometries)
+        totalInstances += (u32)ug.instances.size();
+
+    Msg("* [RT] Acceleration structures ready (identity: %u static + %u terrain + %u transparent, instanced: %u unique BLAS x %u instances, TLAS: %u instances)",
+        m_batchCounts.identityStatic, m_batchCounts.terrain, m_batchCounts.transparent,
+        (u32)m_uniqueGeometries.size(), totalInstances,
+        (m_staticBlas ? 1u : 0u) + totalInstances);
 }
 
 static u32 AddBatchesToBLAS(
@@ -65,10 +78,14 @@ static u32 AddBatchesToBLAS(
     const xr_vector<IndirectDrawArgs>& drawArgs,
     nvrhi::IBuffer* megaVB, nvrhi::IBuffer* megaIB,
     u32 totalVertexCount, u32 vertexStride,
-    const xr_vector<u32>* vertexCounts = nullptr)
+    const xr_vector<u32>* vertexCounts = nullptr,
+    const xr_vector<bool>* skipMask = nullptr)
 {
     u32 count = 0;
     for (u32 i = 0; i < (u32)drawArgs.size(); i++) {
+        if (skipMask && i < skipMask->size() && (*skipMask)[i])
+            continue;
+
         const auto& args = drawArgs[i];
         if (args.indexCountPerInstance == 0)
             continue;
@@ -97,50 +114,140 @@ static u32 AddBatchesToBLAS(
     return count;
 }
 
-void RTAccelStructManager::BuildBLAS(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling)
+void RTAccelStructManager::BuildStaticBLAS(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling)
 {
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
     constexpr u32 vertexStride = sizeof(bindless::UnifiedVertex);
     const u32 totalVerts = gpuCulling->GetTotalVertexCount();
     const auto& staticVertCounts = gpuCulling->GetStaticBatchVertexCounts();
+    const auto& staticDrawArgs = gpuCulling->GetStaticDrawArgsData();
+    const auto& staticInstances = gpuCulling->GetStaticInstanceData();
+
+    xr_vector<bool> isTransformed(staticDrawArgs.size(), false);
+    for (u32 i = 0; i < (u32)staticDrawArgs.size(); i++) {
+        if (i < staticInstances.size() && memcmp(&staticInstances[i].world, &Fidentity, sizeof(Fmatrix)) != 0)
+            isTransformed[i] = true;
+    }
 
     nvrhi::rt::AccelStructDesc blasDesc;
-    blasDesc.debugName = "SceneBLAS";
+    blasDesc.debugName = "StaticSceneBLAS";
     blasDesc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace |
                           nvrhi::rt::AccelStructBuildFlags::AllowCompaction;
 
-    m_staticBatchCount = AddBatchesToBLAS(blasDesc, gpuCulling->GetStaticDrawArgsData(),
-        m_megaVB, m_megaIB, totalVerts, vertexStride, &staticVertCounts);
-    m_terrainBatchCount = AddBatchesToBLAS(blasDesc, gpuCulling->GetTerrainDrawArgsData(),
+    m_batchCounts.identityStatic = AddBatchesToBLAS(blasDesc, staticDrawArgs,
+        m_megaVB, m_megaIB, totalVerts, vertexStride, &staticVertCounts, &isTransformed);
+    m_batchCounts.terrain = AddBatchesToBLAS(blasDesc, gpuCulling->GetTerrainDrawArgsData(),
         m_megaVB, m_megaIB, totalVerts, vertexStride);
-    m_transparentBatchCount = AddBatchesToBLAS(blasDesc, gpuCulling->GetTransparentDrawArgsData(),
+    m_batchCounts.transparent = AddBatchesToBLAS(blasDesc, gpuCulling->GetTransparentDrawArgsData(),
         m_megaVB, m_megaIB, totalVerts, vertexStride);
 
-    m_batchCount = m_staticBatchCount + m_terrainBatchCount + m_transparentBatchCount;
+    u32 staticTotal = m_batchCounts.identityStatic + m_batchCounts.terrain + m_batchCounts.transparent;
+    if (staticTotal == 0) return;
 
-    if (m_batchCount == 0) {
-        Msg("! [RT] No valid geometries for BLAS");
-        return;
-    }
+    m_staticBlas = nvDevice->createAccelStruct(blasDesc);
+    if (!m_staticBlas) return;
 
-    m_blas = nvDevice->createAccelStruct(blasDesc);
-    if (!m_blas) {
-        Msg("! [RT] Failed to create BLAS");
-        return;
-    }
-
-    nvrhi::utils::BuildBottomLevelAccelStruct(cmdList, m_blas, blasDesc);
+    nvrhi::utils::BuildBottomLevelAccelStruct(cmdList, m_staticBlas, blasDesc);
     cmdList->compactBottomLevelAccelStructs();
+}
+
+void RTAccelStructManager::BuildInstancedBLAS(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling)
+{
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    constexpr u32 vertexStride = sizeof(bindless::UnifiedVertex);
+    const u32 totalVerts = gpuCulling->GetTotalVertexCount();
+    const auto& staticDrawArgs = gpuCulling->GetStaticDrawArgsData();
+    const auto& staticInstances = gpuCulling->GetStaticInstanceData();
+    const auto& staticMaterialIDs = gpuCulling->GetStaticMaterialIDData();
+    const auto& staticVertCounts = gpuCulling->GetStaticBatchVertexCounts();
+
+    m_uniqueGeometries.clear();
+    xr_map<GeometryKey, u32> keyToIndex;
+
+    for (u32 i = 0; i < (u32)staticDrawArgs.size(); i++) {
+        if (i >= staticInstances.size()) continue;
+        if (memcmp(&staticInstances[i].world, &Fidentity, sizeof(Fmatrix)) == 0) continue;
+
+        const auto& args = staticDrawArgs[i];
+        if (args.indexCountPerInstance == 0) continue;
+
+        GeometryKey key = { args.startIndexLocation, args.baseVertexLocation, args.indexCountPerInstance };
+        InstanceInfo inst;
+        inst.world = staticInstances[i].world;
+        inst.materialID = (i < staticMaterialIDs.size()) ? staticMaterialIDs[i] : 0;
+
+        auto it = keyToIndex.find(key);
+        if (it != keyToIndex.end()) {
+            m_uniqueGeometries[it->second].instances.push_back(inst);
+        } else {
+            u32 baseVert = static_cast<u32>(args.baseVertexLocation);
+            u32 batchVertexCount = (i < staticVertCounts.size()) ? staticVertCounts[i] : (totalVerts - baseVert);
+
+            UniqueGeometry ug;
+            ug.key = key;
+            ug.vertexCount = batchVertexCount;
+            ug.instances.push_back(inst);
+            keyToIndex[key] = (u32)m_uniqueGeometries.size();
+            m_uniqueGeometries.push_back(std::move(ug));
+        }
+    }
+
+    for (auto& ug : m_uniqueGeometries) {
+        nvrhi::rt::AccelStructDesc blasDesc;
+        blasDesc.debugName = "InstancedBLAS";
+        blasDesc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace |
+                              nvrhi::rt::AccelStructBuildFlags::AllowCompaction;
+
+        nvrhi::rt::GeometryTriangles tri;
+        tri.setIndexBuffer(m_megaIB)
+           .setIndexFormat(nvrhi::Format::R32_UINT)
+           .setIndexOffset(static_cast<uint64_t>(ug.key.startIndex) * sizeof(u32))
+           .setIndexCount(ug.key.indexCount)
+           .setVertexBuffer(m_megaVB)
+           .setVertexFormat(nvrhi::Format::RGB32_FLOAT)
+           .setVertexStride(vertexStride)
+           .setVertexOffset(static_cast<uint64_t>(static_cast<u32>(ug.key.baseVertex)) * vertexStride)
+           .setVertexCount(ug.vertexCount);
+
+        nvrhi::rt::GeometryDesc geom;
+        geom.setTriangles(tri).setFlags(nvrhi::rt::GeometryFlags::Opaque);
+        blasDesc.addBottomLevelGeometry(geom);
+
+        ug.blas = nvDevice->createAccelStruct(blasDesc);
+        if (!ug.blas) continue;
+
+        nvrhi::utils::BuildBottomLevelAccelStruct(cmdList, ug.blas, blasDesc);
+    }
+
+    cmdList->compactBottomLevelAccelStructs();
+
+    u32 totalInstances = 0;
+    for (const auto& ug : m_uniqueGeometries)
+        totalInstances += (u32)ug.instances.size();
+    m_batchCounts.instancedTotal = totalInstances;
+
+    if (!m_uniqueGeometries.empty())
+        Msg("* [RT] Built %u unique instanced BLAS (%u total instances)", (u32)m_uniqueGeometries.size(), totalInstances);
 }
 
 void RTAccelStructManager::BuildTLAS(nvrhi::ICommandList* cmdList)
 {
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
 
+    u32 totalInstances = 0;
+    for (const auto& ug : m_uniqueGeometries)
+        totalInstances += (u32)ug.instances.size();
+
+    u32 instanceCount = (m_staticBlas ? 1 : 0) + totalInstances;
+    if (instanceCount == 0) {
+        Msg("! [RT] No BLAS to build TLAS from");
+        return;
+    }
+
     nvrhi::rt::AccelStructDesc tlasDesc;
     tlasDesc.debugName = "SceneTLAS";
     tlasDesc.isTopLevel = true;
-    tlasDesc.topLevelMaxInstances = 1;
+    tlasDesc.topLevelMaxInstances = instanceCount;
     tlasDesc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
 
     m_tlas = nvDevice->createAccelStruct(tlasDesc);
@@ -149,22 +256,54 @@ void RTAccelStructManager::BuildTLAS(nvrhi::ICommandList* cmdList)
         return;
     }
 
-    nvrhi::rt::InstanceDesc instance;
-    instance.setTransform(nvrhi::rt::c_IdentityTransform)
-            .setInstanceID(0)
-            .setInstanceMask(0xFF)
-            .setFlags(nvrhi::rt::InstanceFlags::ForceOpaque)
-            .setBLAS(m_blas);
+    xr_vector<nvrhi::rt::InstanceDesc> instances;
+    instances.reserve(instanceCount);
 
-    cmdList->buildTopLevelAccelStruct(m_tlas, &instance, 1);
+    u32 staticGeomCount = m_batchCounts.identityStatic + m_batchCounts.terrain + m_batchCounts.transparent;
+
+    if (m_staticBlas) {
+        nvrhi::rt::InstanceDesc inst;
+        inst.setTransform(nvrhi::rt::c_IdentityTransform)
+            .setInstanceID(0)
+            .setInstanceMask(0x01)
+            .setFlags(nvrhi::rt::InstanceFlags::ForceOpaque)
+            .setBLAS(m_staticBlas);
+        instances.push_back(inst);
+    }
+
+    u32 instancedBatchOffset = staticGeomCount;
+    for (const auto& ug : m_uniqueGeometries) {
+        if (!ug.blas) {
+            instancedBatchOffset += (u32)ug.instances.size();
+            continue;
+        }
+        for (const auto& instInfo : ug.instances) {
+            nvrhi::rt::InstanceDesc inst;
+            nvrhi::rt::AffineTransform xform;
+            FmatrixToRTTransform(instInfo.world, xform);
+            inst.setTransform(xform)
+                .setInstanceID(instancedBatchOffset)
+                .setInstanceMask(0x01)
+                .setFlags(nvrhi::rt::InstanceFlags::ForceOpaque)
+                .setBLAS(ug.blas);
+            instances.push_back(inst);
+            instancedBatchOffset++;
+        }
+    }
+
+    m_batchCount = instancedBatchOffset;
+    cmdList->buildTopLevelAccelStruct(m_tlas, instances.data(), (u32)instances.size());
 }
 
 static void AppendBatchInfos(
     xr_vector<RTBatchInfo>& out,
     const xr_vector<IndirectDrawArgs>& drawArgs,
-    const xr_vector<u32>& materialIDs)
+    const xr_vector<u32>& materialIDs,
+    const xr_vector<bool>* skipMask = nullptr)
 {
     for (u32 i = 0; i < (u32)drawArgs.size(); i++) {
+        if (skipMask && i < skipMask->size() && (*skipMask)[i])
+            continue;
         if (drawArgs[i].indexCountPerInstance == 0)
             continue;
         RTBatchInfo info;
@@ -180,12 +319,34 @@ void RTAccelStructManager::CreateBatchInfoBuffer(nvrhi::ICommandList* cmdList, G
 {
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
 
+    const auto& staticDrawArgs = gpuCulling->GetStaticDrawArgsData();
+    const auto& staticInstances = gpuCulling->GetStaticInstanceData();
+
+    xr_vector<bool> isTransformed(staticDrawArgs.size(), false);
+    for (u32 i = 0; i < (u32)staticDrawArgs.size(); i++) {
+        if (i < staticInstances.size() && memcmp(&staticInstances[i].world, &Fidentity, sizeof(Fmatrix)) != 0)
+            isTransformed[i] = true;
+    }
+
     xr_vector<RTBatchInfo> batchInfos;
     batchInfos.reserve(m_batchCount);
 
-    AppendBatchInfos(batchInfos, gpuCulling->GetStaticDrawArgsData(), gpuCulling->GetStaticMaterialIDData());
+    AppendBatchInfos(batchInfos, staticDrawArgs, gpuCulling->GetStaticMaterialIDData(), &isTransformed);
     AppendBatchInfos(batchInfos, gpuCulling->GetTerrainDrawArgsData(), gpuCulling->GetTerrainMaterialIDData());
     AppendBatchInfos(batchInfos, gpuCulling->GetTransparentDrawArgsData(), gpuCulling->GetTransparentMaterialIDData());
+
+    for (const auto& ug : m_uniqueGeometries) {
+        for (const auto& instInfo : ug.instances) {
+            RTBatchInfo info;
+            info.materialID = instInfo.materialID;
+            info.startIndex = ug.key.startIndex;
+            info.baseVertex = ug.key.baseVertex;
+            info.indexCount = ug.key.indexCount;
+            batchInfos.push_back(info);
+        }
+    }
+
+    if (batchInfos.empty()) return;
 
     nvrhi::BufferDesc desc;
     desc.debugName = "RTBatchInfoBuffer";
