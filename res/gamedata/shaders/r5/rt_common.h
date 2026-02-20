@@ -57,6 +57,21 @@ float3 GetHitNormal(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
     return normalize(n0 * w0 + n1 * barycentrics.x + n2 * barycentrics.y);
 }
 
+float3 GetHitGeometricNormal(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
+                             RTBatchInfo info, uint primitiveIndex)
+{
+    uint triBase = (info.startIndex + primitiveIndex * 3);
+    uint i0 = megaIB.Load(triBase * 4 + 0) + info.baseVertex;
+    uint i1 = megaIB.Load(triBase * 4 + 4) + info.baseVertex;
+    uint i2 = megaIB.Load(triBase * 4 + 8) + info.baseVertex;
+
+    float3 p0 = asfloat(megaVB.Load3(i0 * 48));
+    float3 p1 = asfloat(megaVB.Load3(i1 * 48));
+    float3 p2 = asfloat(megaVB.Load3(i2 * 48));
+
+    return normalize(cross(p1 - p0, p2 - p0));
+}
+
 float3 TransformNormalToWorld(float3 localNormal, float3x4 objectToWorld)
 {
     float3x3 rot = float3x3(objectToWorld[0].xyz, objectToWorld[1].xyz, objectToWorld[2].xyz);

@@ -145,15 +145,21 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         float3 localN = GetHitNormal(g_MegaVB, g_MegaIB, info, primIdx, bary);
         float3 hitN = TransformNormalToWorld(localN, objectToWorld);
 
-        if (dot(hitN, direction) > 0)
+        float3 localGeoN = GetHitGeometricNormal(g_MegaVB, g_MegaIB, info, primIdx);
+        float3 geoN = TransformNormalToWorld(localGeoN, objectToWorld);
+
+        if (dot(geoN, direction) > 0)
+            geoN = -geoN;
+        if (dot(hitN, geoN) < 0)
             hitN = -hitN;
 
         float3 albedo = GetHitAlbedo(info, hitUV, batchIdx);
         float3 hitPos = origin + direction * hitT;
+        float3 biasedPos = hitPos + geoN * 0.005;
 
         {
             RayDesc shadowRay;
-            shadowRay.Origin = hitPos + hitN * 0.002;
+            shadowRay.Origin = biasedPos;
             shadowRay.Direction = sunDir;
             shadowRay.TMin = 0.001;
             shadowRay.TMax = 10000.0;
@@ -179,7 +185,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
             throughput /= p;
         }
 
-        origin = hitPos + hitN * 0.002;
+        origin = biasedPos;
         direction = bounceDir;
     }
 
