@@ -26,6 +26,8 @@ TextureCube<float4> g_Sky1 : register(t6);
 RWTexture2D<float4> g_Accumulation : register(u0);
 RWTexture2D<float4> g_Output : register(u1);
 
+static const uint MAX_ALPHA_SKIPS = 8;
+
 float4 SampleTerrainTexture(uint index, float2 uv)
 {
     if (index == INVALID_TEXTURE_INDEX)
@@ -62,15 +64,34 @@ bool IsTerrainBatch(uint batchIdx)
            batchIdx < g_IdentityStaticCount + g_TerrainBatchCount;
 }
 
-float3 GetHitAlbedo(RTBatchInfo info, float2 hitUV, uint batchIdx)
+struct HitMaterial {
+    float3 albedo;
+    float alpha;
+    float alphaRef;
+    uint flags;
+};
+
+HitMaterial GetHitMaterial(RTBatchInfo info, float2 hitUV, uint batchIdx)
 {
+    HitMaterial result;
+    result.alpha = 1.0;
+    result.alphaRef = 0.0;
+    result.flags = 0;
+
     if (IsTerrainBatch(batchIdx)) {
         TerrainMaterialData tmat = g_TerrainMaterials[info.materialID];
-        return SampleTerrainAlbedo(tmat, hitUV);
+        result.albedo = SampleTerrainAlbedo(tmat, hitUV);
+        result.flags = tmat.flags;
+        return result;
     }
 
     MaterialData mat = g_Materials[info.materialID];
-    return SampleDiffuse(mat, hitUV).rgb;
+    float4 diffuse = SampleDiffuseLevel(mat, hitUV);
+    result.albedo = diffuse.rgb;
+    result.alpha = diffuse.a;
+    result.alphaRef = mat.alphaRef;
+    result.flags = mat.flags;
+    return result;
 }
 
 float3 SampleSky(float3 dir)
@@ -153,30 +174,77 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         if (dot(hitN, geoN) < 0)
             hitN = -hitN;
 
-        float3 albedo = GetHitAlbedo(info, hitUV, batchIdx);
+        HitMaterial hitMat = GetHitMaterial(info, hitUV, batchIdx);
+
+        if ((hitMat.flags & MAT_FLAG_ALPHA_TEST) && hitMat.alpha < hitMat.alphaRef) {
+            origin = origin + direction * hitT + direction * 0.002;
+            bounce--;
+            continue;
+        }
+
+        if ((hitMat.flags & MAT_FLAG_ALPHA_BLEND) && hitMat.alpha < 0.5) {
+            throughput *= (1.0 - hitMat.alpha);
+            origin = origin + direction * hitT + direction * 0.002;
+            bounce--;
+            continue;
+        }
+
         float3 hitPos = origin + direction * hitT;
         float3 biasedPos = hitPos + geoN * 0.005;
 
         {
-            RayDesc shadowRay;
-            shadowRay.Origin = biasedPos;
-            shadowRay.Direction = sunDir;
-            shadowRay.TMin = 0.001;
-            shadowRay.TMax = 10000.0;
+            float shadowAtten = 1.0;
+            float3 shadowOrigin = biasedPos;
+            for (uint si = 0; si < MAX_ALPHA_SKIPS; si++) {
+                RayDesc shadowRay;
+                shadowRay.Origin = shadowOrigin;
+                shadowRay.Direction = sunDir;
+                shadowRay.TMin = 0.001;
+                shadowRay.TMax = 10000.0;
 
-            RayQuery<RAY_FLAG_FORCE_OPAQUE | RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES | RAY_FLAG_ACCEPT_FIRST_HIT_AND_END_SEARCH> shadowQ;
-            shadowQ.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, 0xFF, shadowRay);
-            shadowQ.Proceed();
+                RayQuery<RAY_FLAG_FORCE_OPAQUE | RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES> shadowQ;
+                shadowQ.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, 0xFF, shadowRay);
+                shadowQ.Proceed();
 
-            if (shadowQ.CommittedStatus() != COMMITTED_TRIANGLE_HIT) {
+                if (shadowQ.CommittedStatus() != COMMITTED_TRIANGLE_HIT)
+                    break;
+
+                uint sBatchIdx = shadowQ.CommittedInstanceID() + shadowQ.CommittedGeometryIndex();
+                RTBatchInfo sInfo = g_BatchInfo[sBatchIdx];
+                float2 sUV = GetHitUV(g_MegaVB, g_MegaIB, sInfo, shadowQ.CommittedPrimitiveIndex(), shadowQ.CommittedTriangleBarycentrics());
+
+                if (IsTerrainBatch(sBatchIdx)) {
+                    shadowAtten = 0.0;
+                    break;
+                }
+
+                MaterialData sMat = g_Materials[sInfo.materialID];
+                float4 sDiffuse = SampleDiffuseLevel(sMat, sUV);
+
+                if ((sMat.flags & MAT_FLAG_ALPHA_TEST) && sDiffuse.a < sMat.alphaRef) {
+                    shadowOrigin = shadowOrigin + sunDir * (shadowQ.CommittedRayT() + 0.002);
+                    continue;
+                }
+
+                if ((sMat.flags & MAT_FLAG_ALPHA_BLEND) && sDiffuse.a < 0.5) {
+                    shadowAtten *= (1.0 - sDiffuse.a);
+                    shadowOrigin = shadowOrigin + sunDir * (shadowQ.CommittedRayT() + 0.002);
+                    continue;
+                }
+
+                shadowAtten = 0.0;
+                break;
+            }
+
+            if (shadowAtten > 0.001) {
                 float NdotL = max(0.0, dot(hitN, sunDir));
-                radiance += throughput * albedo * NdotL * sunColor;
+                radiance += throughput * hitMat.albedo * NdotL * sunColor * shadowAtten;
             }
         }
 
         float2 u = float2(rand_float(rng), rand_float(rng));
         float3 bounceDir = cosine_weighted_hemisphere(u, hitN);
-        throughput *= albedo;
+        throughput *= hitMat.albedo;
 
         if (bounce >= 3) {
             float p = max(throughput.r, max(throughput.g, throughput.b));

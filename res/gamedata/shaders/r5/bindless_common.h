@@ -138,6 +138,13 @@ float4 SampleDiffuse(MaterialData mat, float2 uv)
     return tex.Sample(g_LinearSampler, uv);
 }
 
+float4 SampleDiffuseLevel(MaterialData mat, float2 uv)
+{
+    if (mat.diffuseIndex == INVALID_TEXTURE_INDEX)
+        return float4(1, 0, 1, 1);
+    return GetBindlessTexture(mat.diffuseIndex).SampleLevel(g_LinearSampler, uv, 0);
+}
+
 // ─────────────────────────────────────────────────────
 //  NORMAL SAMPLING
 // ─────────────────────────────────────────────────────
