@@ -210,7 +210,8 @@ private:
     // Ray Tracing acceleration structures (for path tracer)
     xr_unique_ptr<RENDER_NAMESPACE::RTAccelStructManager> m_rtAccelMgr;
     u32 m_ptSampleIndex = 0;
-    Fmatrix m_ptPrevViewProj;
+    Fvector m_ptPrevCameraPos = {0, 0, 0};
+    Fvector m_ptPrevCameraDir = {0, 0, 0};
     int m_ptPrevBounces = 0;
     bool m_ptWasEnabled = false;
 

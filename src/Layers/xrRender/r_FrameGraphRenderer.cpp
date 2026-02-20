@@ -1226,13 +1226,15 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         bool justEnabled = !m_ptWasEnabled;
         m_ptWasEnabled = true;
 
-        bool viewChanged = (memcmp(&m_ptPrevViewProj, &Device.mFullTransform, sizeof(Fmatrix)) != 0);
+        bool posChanged = !Device.vCameraPosition.similar(m_ptPrevCameraPos, 0.01f);
+        bool dirChanged = !Device.vCameraDirection.similar(m_ptPrevCameraDir, 0.001f);
         bool bouncesChanged = m_ptPrevBounces != ps_r_path_tracer_bounces;
 
-        if (justEnabled || viewChanged || bouncesChanged)
+        if (justEnabled || posChanged || dirChanged || bouncesChanged)
             m_ptSampleIndex = 0;
 
-        m_ptPrevViewProj = Device.mFullTransform;
+        m_ptPrevCameraPos = Device.vCameraPosition;
+        m_ptPrevCameraDir = Device.vCameraDirection;
         m_ptPrevBounces = ps_r_path_tracer_bounces;
 
         passes::PathTracerConfig ptConfig;
