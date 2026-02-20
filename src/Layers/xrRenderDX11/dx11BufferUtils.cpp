@@ -38,6 +38,12 @@ static nvrhi::BufferHandle CreateNvrhiBuffer(nvrhi::IDevice* device, const void*
     if (isConstantBuffer)
         desc.isConstantBuffer = true;
 
+    if (isVertexBuffer || isIndexBuffer)
+    {
+        desc.canHaveRawViews = true;
+        desc.isAccelStructBuildInput = true;
+    }
+
     if (bDynamic)
     {
         desc.cpuAccess = nvrhi::CpuAccessMode::Write;

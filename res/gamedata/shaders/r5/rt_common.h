@@ -72,6 +72,53 @@ float3 GetHitGeometricNormal(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
     return normalize(cross(p1 - p0, p2 - p0));
 }
 
+float2 GetSkinnedHitUV(ByteAddressBuffer skinnedVB, ByteAddressBuffer skinnedIB,
+                       RTBatchInfo info, uint primitiveIndex, float2 barycentrics)
+{
+    uint triBase = (info.startIndex + primitiveIndex * 3);
+    uint i0 = skinnedIB.Load(triBase * 4 + 0) + info.baseVertex;
+    uint i1 = skinnedIB.Load(triBase * 4 + 4) + info.baseVertex;
+    uint i2 = skinnedIB.Load(triBase * 4 + 8) + info.baseVertex;
+
+    float2 uv0 = asfloat(skinnedVB.Load2(i0 * 24 + 16));
+    float2 uv1 = asfloat(skinnedVB.Load2(i1 * 24 + 16));
+    float2 uv2 = asfloat(skinnedVB.Load2(i2 * 24 + 16));
+
+    float w0 = 1.0 - barycentrics.x - barycentrics.y;
+    return uv0 * w0 + uv1 * barycentrics.x + uv2 * barycentrics.y;
+}
+
+float3 GetSkinnedHitNormal(ByteAddressBuffer skinnedVB, ByteAddressBuffer skinnedIB,
+                           RTBatchInfo info, uint primitiveIndex, float2 barycentrics)
+{
+    uint triBase = (info.startIndex + primitiveIndex * 3);
+    uint i0 = skinnedIB.Load(triBase * 4 + 0) + info.baseVertex;
+    uint i1 = skinnedIB.Load(triBase * 4 + 4) + info.baseVertex;
+    uint i2 = skinnedIB.Load(triBase * 4 + 8) + info.baseVertex;
+
+    float3 n0 = DecodePackedNormal(skinnedVB.Load(i0 * 24 + 12));
+    float3 n1 = DecodePackedNormal(skinnedVB.Load(i1 * 24 + 12));
+    float3 n2 = DecodePackedNormal(skinnedVB.Load(i2 * 24 + 12));
+
+    float w0 = 1.0 - barycentrics.x - barycentrics.y;
+    return normalize(n0 * w0 + n1 * barycentrics.x + n2 * barycentrics.y);
+}
+
+float3 GetSkinnedHitGeoNormal(ByteAddressBuffer skinnedVB, ByteAddressBuffer skinnedIB,
+                              RTBatchInfo info, uint primitiveIndex)
+{
+    uint triBase = (info.startIndex + primitiveIndex * 3);
+    uint i0 = skinnedIB.Load(triBase * 4 + 0) + info.baseVertex;
+    uint i1 = skinnedIB.Load(triBase * 4 + 4) + info.baseVertex;
+    uint i2 = skinnedIB.Load(triBase * 4 + 8) + info.baseVertex;
+
+    float3 p0 = asfloat(skinnedVB.Load3(i0 * 24));
+    float3 p1 = asfloat(skinnedVB.Load3(i1 * 24));
+    float3 p2 = asfloat(skinnedVB.Load3(i2 * 24));
+
+    return normalize(cross(p1 - p0, p2 - p0));
+}
+
 float3 TransformNormalToWorld(float3 localNormal, float3x4 objectToWorld)
 {
     float3x3 rot = float3x3(objectToWorld[0].xyz, objectToWorld[1].xyz, objectToWorld[2].xyz);

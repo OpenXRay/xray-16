@@ -47,6 +47,7 @@
 #include "FrameGraphPasses/ImGuiPassSetup.h"
 #include "FrameGraphPasses/PathTracerPassSetup.h"
 #include "RayTracing/RTAccelStructManager.h"
+#include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -1237,6 +1238,61 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_ptPrevCameraDir = Device.vCameraDirection;
         m_ptPrevBounces = ps_r_path_tracer_bounces;
 
+        if (m_ptSampleIndex == 0 && m_rtAccelMgr->IsReady()) {
+            struct SkinnedBLASData {
+                RTAccelStructManager* accelMgr;
+                GPUCullingManager* gpuCulling;
+                const GeometryCollector* geometry;
+                const xr_vector<GeometryBatch>* hudBatches;
+            };
+
+            m_framegraph->addCallbackPass<SkinnedBLASData>(
+                "Skinned BLAS Build",
+                [&](framegraph::FrameGraph& builder, framegraph::PassHandle passHandle, SkinnedBLASData& data) {
+                    framegraph::RenderPassBuilder pb(builder, passHandle);
+                    pb.sideEffects();
+                    data.accelMgr = m_rtAccelMgr.get();
+                    data.gpuCulling = m_gpuCullingManager.get();
+                    data.geometry = m_geometryCollector.get();
+                    data.hudBatches = &m_hudBatches;
+                },
+                [](const SkinnedBLASData& data, const framegraph::FrameGraph&, ng::RenderContext* ctx) {
+                    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+
+                    xr_vector<GeometryBatch> worldSkinned;
+                    for (const auto& b : data.geometry->GetBatches()) {
+                        if (b.isSkinned && b.visual && b.indexCount > 0)
+                            worldSkinned.push_back(b);
+                    }
+
+                    extern ENGINE_API float psHUD_FOV;
+                    float fovScale = 1.0f / psHUD_FOV;
+                    Fmatrix viewMatrix = Device.mView;
+                    Fmatrix invView;
+                    invView.invert(viewMatrix);
+                    Fmatrix fovScaleMat;
+                    fovScaleMat.identity();
+                    fovScaleMat._11 = fovScale;
+                    fovScaleMat._22 = fovScale;
+
+                    xr_vector<GeometryBatch> hudSkinned;
+                    for (const auto& b : *data.hudBatches) {
+                        if (b.isSkinned && b.visual && b.indexCount > 0) {
+                            auto adjusted = b;
+                            Fmatrix t1, t2;
+                            t1.mul(viewMatrix, b.worldMatrix);
+                            t2.mul(fovScaleMat, t1);
+                            adjusted.worldMatrix.mul(invView, t2);
+                            hudSkinned.push_back(adjusted);
+                        }
+                    }
+
+                    data.gpuCulling->BeginSkinnedFrame();
+                    data.accelMgr->BuildSkinnedBLAS(cmdList, data.gpuCulling, worldSkinned, hudSkinned);
+                }
+            );
+        }
+
         passes::PathTracerConfig ptConfig;
         ptConfig.maxBounces = static_cast<u32>(ps_r_path_tracer_bounces);
         ptConfig.sampleIndex = m_ptSampleIndex;
@@ -1257,6 +1313,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         if (m_ptWasEnabled) {
             m_ptSampleIndex = 0;
             m_ptWasEnabled = false;
+            if (m_rtAccelMgr)
+                m_rtAccelMgr->InvalidateSkinned();
         }
     }
 

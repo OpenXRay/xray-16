@@ -13,7 +13,7 @@ cbuffer PathTracerParams : register(b5) {
     uint g_IdentityStaticCount;
     uint g_TerrainBatchCount;
     uint g_TransparentBatchCount;
-    uint g_Pad2;
+    uint g_SkinnedBatchStart;
 };
 
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
@@ -22,11 +22,18 @@ ByteAddressBuffer g_MegaVB : register(t3);
 ByteAddressBuffer g_MegaIB : register(t4);
 TextureCube<float4> g_Sky0 : register(t5);
 TextureCube<float4> g_Sky1 : register(t6);
+ByteAddressBuffer g_SkinnedVB : register(t7);
+ByteAddressBuffer g_SkinnedIB : register(t11);
 
 RWTexture2D<float4> g_Accumulation : register(u0);
 RWTexture2D<float4> g_Output : register(u1);
 
 static const uint MAX_ALPHA_SKIPS = 8;
+
+bool IsSkinnedBatch(uint batchIdx)
+{
+    return g_SkinnedBatchStart > 0 && batchIdx >= g_SkinnedBatchStart;
+}
 
 float4 SampleTerrainTexture(uint index, float2 uv)
 {
@@ -120,6 +127,29 @@ float3 GenerateCameraRay(uint2 pixel, inout uint rng, out float3 origin)
     return normalize(farWorld.xyz - nearWorld.xyz);
 }
 
+struct HitResult {
+    float2 uv;
+    float3 normal;
+    float3 geoNormal;
+};
+
+HitResult GetHitAttributes(uint batchIdx, RTBatchInfo info, uint primIdx, float2 bary, float3x4 objectToWorld)
+{
+    HitResult h;
+    if (IsSkinnedBatch(batchIdx)) {
+        h.uv = GetSkinnedHitUV(g_SkinnedVB, g_SkinnedIB, info, primIdx, bary);
+        h.normal = GetSkinnedHitNormal(g_SkinnedVB, g_SkinnedIB, info, primIdx, bary);
+        h.geoNormal = GetSkinnedHitGeoNormal(g_SkinnedVB, g_SkinnedIB, info, primIdx);
+    } else {
+        h.uv = GetHitUV(g_MegaVB, g_MegaIB, info, primIdx, bary);
+        float3 localN = GetHitNormal(g_MegaVB, g_MegaIB, info, primIdx, bary);
+        h.normal = TransformNormalToWorld(localN, objectToWorld);
+        float3 localGeoN = GetHitGeometricNormal(g_MegaVB, g_MegaIB, info, primIdx);
+        h.geoNormal = TransformNormalToWorld(localGeoN, objectToWorld);
+    }
+    return h;
+}
+
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchID : SV_DispatchThreadID)
 {
@@ -162,19 +192,16 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         float3x4 objectToWorld = q.CommittedObjectToWorld3x4();
 
         RTBatchInfo info = g_BatchInfo[batchIdx];
-        float2 hitUV = GetHitUV(g_MegaVB, g_MegaIB, info, primIdx, bary);
-        float3 localN = GetHitNormal(g_MegaVB, g_MegaIB, info, primIdx, bary);
-        float3 hitN = TransformNormalToWorld(localN, objectToWorld);
-
-        float3 localGeoN = GetHitGeometricNormal(g_MegaVB, g_MegaIB, info, primIdx);
-        float3 geoN = TransformNormalToWorld(localGeoN, objectToWorld);
+        HitResult hit = GetHitAttributes(batchIdx, info, primIdx, bary, objectToWorld);
+        float3 hitN = hit.normal;
+        float3 geoN = hit.geoNormal;
 
         if (dot(geoN, direction) > 0)
             geoN = -geoN;
         if (dot(hitN, geoN) < 0)
             hitN = -hitN;
 
-        HitMaterial hitMat = GetHitMaterial(info, hitUV, batchIdx);
+        HitMaterial hitMat = GetHitMaterial(info, hit.uv, batchIdx);
 
         if ((hitMat.flags & MAT_FLAG_ALPHA_TEST) && hitMat.alpha < hitMat.alphaRef) {
             origin = origin + direction * hitT + direction * 0.002;
@@ -211,9 +238,19 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
                 uint sBatchIdx = shadowQ.CommittedInstanceID() + shadowQ.CommittedGeometryIndex();
                 RTBatchInfo sInfo = g_BatchInfo[sBatchIdx];
-                float2 sUV = GetHitUV(g_MegaVB, g_MegaIB, sInfo, shadowQ.CommittedPrimitiveIndex(), shadowQ.CommittedTriangleBarycentrics());
+
+                float2 sUV;
+                if (IsSkinnedBatch(sBatchIdx))
+                    sUV = GetSkinnedHitUV(g_SkinnedVB, g_SkinnedIB, sInfo, shadowQ.CommittedPrimitiveIndex(), shadowQ.CommittedTriangleBarycentrics());
+                else
+                    sUV = GetHitUV(g_MegaVB, g_MegaIB, sInfo, shadowQ.CommittedPrimitiveIndex(), shadowQ.CommittedTriangleBarycentrics());
 
                 if (IsTerrainBatch(sBatchIdx)) {
+                    shadowAtten = 0.0;
+                    break;
+                }
+
+                if (IsSkinnedBatch(sBatchIdx)) {
                     shadowAtten = 0.0;
                     break;
                 }
