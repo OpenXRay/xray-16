@@ -83,14 +83,16 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
             break;
         }
 
-        uint geomIdx = q.CommittedGeometryIndex();
+        uint batchIdx = q.CommittedInstanceID() + q.CommittedGeometryIndex();
         uint primIdx = q.CommittedPrimitiveIndex();
         float2 bary = q.CommittedTriangleBarycentrics();
         float hitT = q.CommittedRayT();
+        float3x4 objectToWorld = q.CommittedObjectToWorld3x4();
 
-        RTBatchInfo info = g_BatchInfo[geomIdx];
+        RTBatchInfo info = g_BatchInfo[batchIdx];
         float2 hitUV = GetHitUV(g_MegaVB, g_MegaIB, info, primIdx, bary);
-        float3 hitN = GetHitNormal(g_MegaVB, g_MegaIB, info, primIdx, bary);
+        float3 localN = GetHitNormal(g_MegaVB, g_MegaIB, info, primIdx, bary);
+        float3 hitN = TransformNormalToWorld(localN, objectToWorld);
 
         if (dot(hitN, direction) > 0)
             hitN = -hitN;
