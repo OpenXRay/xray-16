@@ -13,6 +13,7 @@
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 
@@ -2162,8 +2163,12 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
             if (mgr->m_rtAccelMgr) {
                 mgr->m_rtAccelMgr->BuildIfNeeded(cmdList, mgr);
-                if (mgr->m_rtAccelMgr->IsReady() && !mgr->m_rtAccelMgr->GetMaterialBuffer())
-                    mgr->m_rtAccelMgr->SetMaterialBuffer(bindless::MaterialBuffer::Instance().GetBuffer());
+                if (mgr->m_rtAccelMgr->IsReady()) {
+                    if (!mgr->m_rtAccelMgr->GetMaterialBuffer())
+                        mgr->m_rtAccelMgr->SetMaterialBuffer(bindless::MaterialBuffer::Instance().GetBuffer());
+                    if (!mgr->m_rtAccelMgr->GetTerrainMaterialBuffer())
+                        mgr->m_rtAccelMgr->SetTerrainMaterialBuffer(bindless::TerrainMaterialBuffer::Instance().GetBuffer());
+                }
             }
 
             nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);

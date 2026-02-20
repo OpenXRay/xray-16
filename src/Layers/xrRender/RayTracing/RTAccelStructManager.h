@@ -41,10 +41,12 @@ public:
     nvrhi::IBuffer* GetMegaVB() const { return m_megaVB; }
     nvrhi::IBuffer* GetMegaIB() const { return m_megaIB; }
     nvrhi::IBuffer* GetMaterialBuffer() const { return m_materialBuffer; }
+    nvrhi::IBuffer* GetTerrainMaterialBuffer() const { return m_terrainMaterialBuffer; }
     u32 GetBatchCount() const { return m_batchCount; }
     const RTBatchCounts& GetBatchCounts() const { return m_batchCounts; }
 
     void SetMaterialBuffer(nvrhi::IBuffer* buf) { m_materialBuffer = buf; }
+    void SetTerrainMaterialBuffer(nvrhi::IBuffer* buf) { m_terrainMaterialBuffer = buf; }
 
 private:
     struct GeometryKey {
@@ -89,6 +91,7 @@ private:
     nvrhi::IBuffer* m_megaVB = nullptr;
     nvrhi::IBuffer* m_megaIB = nullptr;
     nvrhi::IBuffer* m_materialBuffer = nullptr;
+    nvrhi::IBuffer* m_terrainMaterialBuffer = nullptr;
 };
 
 }

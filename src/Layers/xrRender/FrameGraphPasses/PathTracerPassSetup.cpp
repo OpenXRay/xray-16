@@ -40,8 +40,12 @@ struct PathTracerCB {
     float screenHeight;
     u32 sampleIndex;
     u32 maxBounces;
+    u32 identityStaticCount;
+    u32 terrainBatchCount;
+    u32 transparentBatchCount;
+    u32 pad2;
 };
-static_assert(sizeof(PathTracerCB) == 128, "PathTracerCB must be 128 bytes");
+static_assert(sizeof(PathTracerCB) == 144, "PathTracerCB must be 144 bytes");
 
 static void CreatePlaceholderCubemap(nvrhi::IDevice* nvDevice)
 {
@@ -102,6 +106,7 @@ static void InitializeResources(ng::RenderDevice* device)
         nvrhi::BindingLayoutItem::Texture_SRV(5),
         nvrhi::BindingLayoutItem::Texture_SRV(6),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
         nvrhi::BindingLayoutItem::Texture_UAV(0),
         nvrhi::BindingLayoutItem::Texture_UAV(1),
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
@@ -243,6 +248,12 @@ PathTracerOutput setupPathTracerPass(
     cbData.sampleIndex = config.sampleIndex;
     cbData.maxBounces = config.maxBounces;
 
+    const auto& batchCounts = accelMgr->GetBatchCounts();
+    cbData.identityStaticCount = batchCounts.identityStatic;
+    cbData.terrainBatchCount = batchCounts.terrain;
+    cbData.transparentBatchCount = batchCounts.transparent;
+    cbData.pad2 = 0;
+
     auto& passData = fg.addCallbackPass<PathTracerData>(
         "Path Tracer",
 
@@ -280,6 +291,7 @@ PathTracerOutput setupPathTracerPass(
                 nvrhi::BindingSetItem::Texture_SRV(5, data.sky0),
                 nvrhi::BindingSetItem::Texture_SRV(6, data.sky1),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, data.accelMgr->GetMaterialBuffer()),
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(9, data.accelMgr->GetTerrainMaterialBuffer()),
                 nvrhi::BindingSetItem::Texture_UAV(0, s_accumBuffer),
                 nvrhi::BindingSetItem::Texture_UAV(1, outTex),
                 nvrhi::BindingSetItem::ConstantBuffer(5, s_cb),
