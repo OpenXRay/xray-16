@@ -3,6 +3,10 @@
 #include "xrCore/xrCore.h"
 #include <nvrhi/nvrhi.h>
 
+namespace xray::render {
+    struct GeometryBatch;
+}
+
 namespace xray::render::ng {
 class RenderDevice;
 class RenderContext;
@@ -24,6 +28,7 @@ struct RTBatchCounts {
     u32 terrain = 0;
     u32 transparent = 0;
     u32 instancedTotal = 0;
+    u32 skinned = 0;
 };
 
 class RTAccelStructManager {
@@ -32,6 +37,11 @@ public:
     void Shutdown();
 
     void BuildIfNeeded(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
+
+    void BuildSkinnedBLAS(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling,
+                          const xr_vector<GeometryBatch>& worldBatches,
+                          const xr_vector<GeometryBatch>& hudBatches);
+    void InvalidateSkinned();
 
     bool IsReady() const { return m_isReady; }
     bool IsSupported() const { return m_rtSupported; }
@@ -42,6 +52,8 @@ public:
     nvrhi::IBuffer* GetMegaIB() const { return m_megaIB; }
     nvrhi::IBuffer* GetMaterialBuffer() const { return m_materialBuffer; }
     nvrhi::IBuffer* GetTerrainMaterialBuffer() const { return m_terrainMaterialBuffer; }
+    nvrhi::IBuffer* GetSkinnedOutputVB() const { return m_skinnedOutputVB.Get(); }
+    nvrhi::IBuffer* GetSkinnedIB() const { return m_skinnedIB.Get(); }
     u32 GetBatchCount() const { return m_batchCount; }
     const RTBatchCounts& GetBatchCounts() const { return m_batchCounts; }
 
@@ -72,10 +84,28 @@ private:
         xr_vector<InstanceInfo> instances;
     };
 
+    struct SkinnedBatchRT {
+        u32 vertexOffset;
+        u32 vertexCount;
+        u32 indexOffset;
+        u32 indexCount;
+        u32 materialID;
+        nvrhi::IBuffer* srcVB;
+        u32 srcStride;
+        u32 srcBaseVertex;
+        u32 formatID;
+        u32 boneOffset;
+        Fmatrix worldMatrix;
+        nvrhi::IBuffer* srcIB;
+        u32 srcStartIndex;
+    };
+
     void BuildStaticBLAS(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
     void BuildInstancedBLAS(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
     void BuildTLAS(nvrhi::ICommandList* cmdList);
     void CreateBatchInfoBuffer(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
+    void InitSkinningPipeline();
+    u32 GetSkinningFormatID(u16 renderMode, u32 stride);
 
     ng::RenderDevice* m_device = nullptr;
     bool m_rtSupported = false;
@@ -92,6 +122,17 @@ private:
     nvrhi::IBuffer* m_megaIB = nullptr;
     nvrhi::IBuffer* m_materialBuffer = nullptr;
     nvrhi::IBuffer* m_terrainMaterialBuffer = nullptr;
+
+    nvrhi::BufferHandle m_skinnedOutputVB;
+    nvrhi::BufferHandle m_skinnedIB;
+    nvrhi::rt::AccelStructHandle m_skinnedBlas;
+    xr_vector<SkinnedBatchRT> m_skinnedBatchData;
+    bool m_skinnedReady = false;
+
+    static nvrhi::ComputePipelineHandle s_skinPipeline;
+    static nvrhi::BindingLayoutHandle s_skinLayout;
+    static nvrhi::BufferHandle s_skinCB;
+    static bool s_skinInitialized;
 };
 
 }

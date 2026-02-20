@@ -26,6 +26,7 @@ static nvrhi::BindingLayoutHandle s_layout;
 static nvrhi::SamplerHandle s_sampler;
 static nvrhi::TextureHandle s_accumBuffer;
 static nvrhi::TextureHandle s_placeholderCube;
+static nvrhi::BufferHandle s_placeholderBuffer;
 static u32 s_accumWidth = 0;
 static u32 s_accumHeight = 0;
 static bool s_initialized = false;
@@ -43,7 +44,7 @@ struct PathTracerCB {
     u32 identityStaticCount;
     u32 terrainBatchCount;
     u32 transparentBatchCount;
-    u32 pad2;
+    u32 skinnedBatchStart;
 };
 static_assert(sizeof(PathTracerCB) == 144, "PathTracerCB must be 144 bytes");
 
@@ -63,6 +64,20 @@ static void CreatePlaceholderCubemap(nvrhi::IDevice* nvDevice)
     desc.keepInitialState = true;
 
     s_placeholderCube = nvDevice->createTexture(desc);
+}
+
+static void CreatePlaceholderBuffer(nvrhi::IDevice* nvDevice)
+{
+    if (s_placeholderBuffer) return;
+
+    nvrhi::BufferDesc desc;
+    desc.debugName = "PT_PlaceholderBuffer";
+    desc.byteSize = 4;
+    desc.canHaveRawViews = true;
+    desc.initialState = nvrhi::ResourceStates::ShaderResource;
+    desc.keepInitialState = true;
+
+    s_placeholderBuffer = nvDevice->createBuffer(desc);
 }
 
 static void InitializeResources(ng::RenderDevice* device)
@@ -95,6 +110,7 @@ static void InitializeResources(ng::RenderDevice* device)
     s_sampler = cache.GetOrCreateSampler("PathTracer", samplerDesc, nvDevice);
 
     CreatePlaceholderCubemap(nvDevice);
+    CreatePlaceholderBuffer(nvDevice);
 
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::Compute;
@@ -105,8 +121,10 @@ static void InitializeResources(ng::RenderDevice* device)
         nvrhi::BindingLayoutItem::RawBuffer_SRV(4),
         nvrhi::BindingLayoutItem::Texture_SRV(5),
         nvrhi::BindingLayoutItem::Texture_SRV(6),
+        nvrhi::BindingLayoutItem::RawBuffer_SRV(7),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
+        nvrhi::BindingLayoutItem::RawBuffer_SRV(11),
         nvrhi::BindingLayoutItem::Texture_UAV(0),
         nvrhi::BindingLayoutItem::Texture_UAV(1),
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
@@ -252,7 +270,12 @@ PathTracerOutput setupPathTracerPass(
     cbData.identityStaticCount = batchCounts.identityStatic;
     cbData.terrainBatchCount = batchCounts.terrain;
     cbData.transparentBatchCount = batchCounts.transparent;
-    cbData.pad2 = 0;
+
+    if (batchCounts.skinned > 0)
+        cbData.skinnedBatchStart = batchCounts.identityStatic + batchCounts.terrain +
+                                   batchCounts.transparent + batchCounts.instancedTotal;
+    else
+        cbData.skinnedBatchStart = 0;
 
     auto& passData = fg.addCallbackPass<PathTracerData>(
         "Path Tracer",
@@ -282,6 +305,11 @@ PathTracerOutput setupPathTracerPass(
 
             cmdList->writeBuffer(s_cb, &data.cbData, sizeof(PathTracerCB));
 
+            nvrhi::IBuffer* skinnedVB = data.accelMgr->GetSkinnedOutputVB();
+            nvrhi::IBuffer* skinnedIB = data.accelMgr->GetSkinnedIB();
+            if (!skinnedVB) skinnedVB = s_placeholderBuffer.Get();
+            if (!skinnedIB) skinnedIB = s_placeholderBuffer.Get();
+
             nvrhi::BindingSetDesc bindDesc;
             bindDesc.bindings = {
                 nvrhi::BindingSetItem::RayTracingAccelStruct(1, data.accelMgr->GetTLAS()),
@@ -290,8 +318,10 @@ PathTracerOutput setupPathTracerPass(
                 nvrhi::BindingSetItem::RawBuffer_SRV(4, data.accelMgr->GetMegaIB()),
                 nvrhi::BindingSetItem::Texture_SRV(5, data.sky0),
                 nvrhi::BindingSetItem::Texture_SRV(6, data.sky1),
+                nvrhi::BindingSetItem::RawBuffer_SRV(7, skinnedVB),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, data.accelMgr->GetMaterialBuffer()),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(9, data.accelMgr->GetTerrainMaterialBuffer()),
+                nvrhi::BindingSetItem::RawBuffer_SRV(11, skinnedIB),
                 nvrhi::BindingSetItem::Texture_UAV(0, s_accumBuffer),
                 nvrhi::BindingSetItem::Texture_UAV(1, outTex),
                 nvrhi::BindingSetItem::ConstantBuffer(5, s_cb),
@@ -331,6 +361,7 @@ void ShutdownPathTracer()
     s_sampler = nullptr;
     s_accumBuffer = nullptr;
     s_placeholderCube = nullptr;
+    s_placeholderBuffer = nullptr;
     s_accumWidth = 0;
     s_accumHeight = 0;
     s_initialized = false;
