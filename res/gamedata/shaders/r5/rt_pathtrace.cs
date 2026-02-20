@@ -10,6 +10,10 @@ cbuffer PathTracerParams : register(b5) {
     float g_ScreenHeight;
     uint g_SampleIndex;
     uint g_MaxBounces;
+    uint g_IdentityStaticCount;
+    uint g_TerrainBatchCount;
+    uint g_TransparentBatchCount;
+    uint g_Pad2;
 };
 
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
@@ -21,6 +25,53 @@ TextureCube<float4> g_Sky1 : register(t6);
 
 RWTexture2D<float4> g_Accumulation : register(u0);
 RWTexture2D<float4> g_Output : register(u1);
+
+float4 SampleTerrainTexture(uint index, float2 uv)
+{
+    if (index == INVALID_TEXTURE_INDEX)
+        return float4(0.5, 0.5, 0.5, 1.0);
+    return GetBindlessTexture(index).SampleLevel(g_LinearSampler, uv, 0);
+}
+
+float3 SampleTerrainAlbedo(TerrainMaterialData mat, float2 uv)
+{
+    float2 baseUV = uv;
+    float2 detailUV = uv * mat.detailScale;
+
+    float4 baseSample = SampleTerrainTexture(mat.baseAlbedoIndex, baseUV);
+
+    float4 mask = SampleTerrainTexture(mat.blendMaskIndex, baseUV);
+    float maskSum = dot(mask, float4(1, 1, 1, 1));
+    if (maskSum > 0.001)
+        mask /= maskSum;
+    else
+        mask = float4(0.25, 0.25, 0.25, 0.25);
+
+    float3 detailR = SampleTerrainTexture(mat.detailR_Index, detailUV).rgb;
+    float3 detailG = SampleTerrainTexture(mat.detailG_Index, detailUV).rgb;
+    float3 detailB = SampleTerrainTexture(mat.detailB_Index, detailUV).rgb;
+    float3 detailA = SampleTerrainTexture(mat.detailA_Index, detailUV).rgb;
+
+    float3 blendedDetail = detailR * mask.r + detailG * mask.g + detailB * mask.b + detailA * mask.a;
+    return baseSample.rgb * blendedDetail * 2.0;
+}
+
+bool IsTerrainBatch(uint batchIdx)
+{
+    return batchIdx >= g_IdentityStaticCount &&
+           batchIdx < g_IdentityStaticCount + g_TerrainBatchCount;
+}
+
+float3 GetHitAlbedo(RTBatchInfo info, float2 hitUV, uint batchIdx)
+{
+    if (IsTerrainBatch(batchIdx)) {
+        TerrainMaterialData tmat = g_TerrainMaterials[info.materialID];
+        return SampleTerrainAlbedo(tmat, hitUV);
+    }
+
+    MaterialData mat = g_Materials[info.materialID];
+    return SampleDiffuse(mat, hitUV).rgb;
+}
 
 float3 SampleSky(float3 dir)
 {
@@ -97,10 +148,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         if (dot(hitN, direction) > 0)
             hitN = -hitN;
 
-        MaterialData mat = g_Materials[info.materialID];
-        float4 diffuse = SampleDiffuse(mat, hitUV);
-        float3 albedo = diffuse.rgb;
-
+        float3 albedo = GetHitAlbedo(info, hitUV, batchIdx);
         float3 hitPos = origin + direction * hitT;
 
         {
