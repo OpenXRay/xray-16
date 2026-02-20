@@ -13,6 +13,7 @@ struct ImDrawData;
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
+    class RTAccelStructManager;
 }
 
 namespace xray::render::RENDER_NAMESPACE::passes {
@@ -150,6 +151,12 @@ private:
     xr_unique_ptr<RENDER_NAMESPACE::GPUCullingManager> m_gpuCullingManager;
 
     xr_unique_ptr<RENDER_NAMESPACE::FGDetailManager> m_detailManager;
+
+    xr_unique_ptr<RENDER_NAMESPACE::RTAccelStructManager> m_rtAccelMgr;
+    u32 m_ptSampleIndex = 0;
+    Fmatrix m_ptPrevViewProj;
+    int m_ptPrevBounces = 0;
+    bool m_ptWasEnabled = false;
 
     xr_unique_ptr<ui::UIRenderCollector> m_uiCollector;
     xr_unique_ptr<ui::NVRHIUIRenderer> m_uiRenderer;

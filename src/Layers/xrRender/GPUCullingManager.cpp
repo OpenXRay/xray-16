@@ -14,6 +14,7 @@
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 
 namespace RENDER_NAMESPACE
 {
@@ -1353,6 +1354,7 @@ void GPUCullingManager::Shutdown()
     m_staticObjectData.clear();
     m_staticDrawArgsData.clear();
     m_staticMaterialIDData.clear();
+    m_staticBatchVertexCounts.clear();
     m_dynamicObjectData.clear();
     m_dynamicDrawArgsData.clear();
     m_dynamicMaterialIDData.clear();
@@ -1514,6 +1516,8 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         m_staticMaterialIDData.reserve(totalBatches);
         m_staticInstanceData.clear();
         m_staticInstanceData.reserve(totalBatches);
+        m_staticBatchVertexCounts.clear();
+        m_staticBatchVertexCounts.reserve(totalBatches);
     }
 
     m_dynamicObjectData.clear();
@@ -1635,6 +1639,7 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         if (batch.isStatic) {
             if (!m_staticDataCached) {
                 appendBatch(batch, m_staticObjectData, m_staticDrawArgsData, m_staticMaterialIDData, m_staticInstanceData);
+                m_staticBatchVertexCounts.push_back(batch.megaBufferAlloc.valid ? batch.megaBufferAlloc.vertexCount : 0);
             }
         } else {
             appendBatch(batch, m_dynamicObjectData, m_dynamicDrawArgsData, m_dynamicMaterialIDData, m_dynamicInstanceData);
@@ -1664,8 +1669,7 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
 
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
-    static bool s_megaDataUploaded = false;
-    if (!s_megaDataUploaded && m_megaBuffersReady &&
+    if (!m_megaDataUploaded && m_megaBuffersReady &&
         !m_megaVertices.empty() && !m_megaIndices.empty() &&
         m_megaVertexBuffer && m_megaIndexBuffer) {
 
@@ -1677,7 +1681,7 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
             m_megaIndices.data(),
             m_megaIndices.size() * sizeof(u32));
 
-        s_megaDataUploaded = true;
+        m_megaDataUploaded = true;
 
         Msg("* [GPUCulling] Mega-buffer data uploaded: %zu vertices, %zu indices",
             m_megaVertices.size(), m_megaIndices.size());
@@ -1848,6 +1852,7 @@ void GPUCullingManager::InvalidateStaticCullingData()
     m_staticDrawArgsData.clear();
     m_staticMaterialIDData.clear();
     m_staticInstanceData.clear();
+    m_staticBatchVertexCounts.clear();
 
     Msg("* [GPUCulling] Static culling data invalidated");
 }
@@ -2154,6 +2159,12 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             mgr->UploadSceneObjects(ctx, data.geometry);
 
             bindless::MaterialBuffer::Instance().Upload(ctx);
+
+            if (mgr->m_rtAccelMgr) {
+                mgr->m_rtAccelMgr->BuildIfNeeded(cmdList, mgr);
+                if (mgr->m_rtAccelMgr->IsReady() && !mgr->m_rtAccelMgr->GetMaterialBuffer())
+                    mgr->m_rtAccelMgr->SetMaterialBuffer(bindless::MaterialBuffer::Instance().GetBuffer());
+            }
 
             nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
             if (!hizTexture) {
@@ -3467,6 +3478,7 @@ void GPUCullingManager::BeginLevelLoad(u32 estimatedVertices, u32 estimatedIndic
 
     m_levelLoadInProgress = true;
     m_megaBuffersReady = false;
+    m_megaDataUploaded = false;
 
     InvalidateStaticCullingData();
 
@@ -3559,6 +3571,8 @@ void GPUCullingManager::CreateMegaBuffers()
         desc.isVertexBuffer = true;
         desc.initialState = nvrhi::ResourceStates::VertexBuffer;
         desc.keepInitialState = true;
+        desc.canHaveRawViews = true;
+        desc.isAccelStructBuildInput = true;
 
         m_megaVertexBuffer = nvDevice->createBuffer(desc);
         if (!m_megaVertexBuffer) {
@@ -3577,6 +3591,8 @@ void GPUCullingManager::CreateMegaBuffers()
         desc.initialState = nvrhi::ResourceStates::IndexBuffer;
         desc.keepInitialState = true;
         desc.isIndexBuffer = true;
+        desc.canHaveRawViews = true;
+        desc.isAccelStructBuildInput = true;
 
         m_megaIndexBuffer = nvDevice->createBuffer(desc);
         if (!m_megaIndexBuffer) {

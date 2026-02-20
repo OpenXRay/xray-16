@@ -25,6 +25,7 @@ namespace xray::render {
 
 namespace xray::render::RENDER_NAMESPACE {
     class CKinematics;
+    class RTAccelStructManager;
 }
 
 namespace xray::render::RENDER_NAMESPACE {
@@ -178,6 +179,7 @@ public:
     void EndLevelLoad();
 
     bool AreMegaBuffersReady() const { return m_megaBuffersReady; }
+    bool IsMegaDataUploaded() const { return m_megaDataUploaded; }
 
     nvrhi::IBuffer* GetMegaVertexBuffer() const { return m_megaVertexBuffer.Get(); }
     nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
@@ -187,6 +189,17 @@ public:
 
     u32 GetTotalVertexCount() const { return m_totalVertexCount; }
     u32 GetTotalIndexCount() const { return m_totalIndexCount; }
+
+    const xr_vector<IndirectDrawArgs>& GetStaticDrawArgsData() const { return m_staticDrawArgsData; }
+    const xr_vector<u32>& GetStaticMaterialIDData() const { return m_staticMaterialIDData; }
+    const xr_vector<u32>& GetStaticBatchVertexCounts() const { return m_staticBatchVertexCounts; }
+    const xr_vector<IndirectDrawArgs>& GetTerrainDrawArgsData() const { return m_terrainDrawArgsData; }
+    const xr_vector<u32>& GetTerrainMaterialIDData() const { return m_terrainMaterialIDData; }
+    const xr_vector<IndirectDrawArgs>& GetTransparentDrawArgsData() const { return m_transparentDrawArgsData; }
+    const xr_vector<u32>& GetTransparentMaterialIDData() const { return m_transparentMaterialIDData; }
+
+    void SetRTAccelStructManager(RTAccelStructManager* mgr) { m_rtAccelMgr = mgr; }
+    RTAccelStructManager* GetRTAccelStructManager() const { return m_rtAccelMgr; }
 
     void SetupDebugVisualizationPass(
         framegraph::FrameGraph& fg,
@@ -445,6 +458,7 @@ private:
     xr_vector<GPUParticleData> m_particleData;
     xr_vector<IndirectDrawArgs> m_particleDrawArgsData;
     ng::RenderDevice* m_device = nullptr;
+    RTAccelStructManager* m_rtAccelMgr = nullptr;
     u32 m_objectCount = 0;
     u32 m_maxObjects = 0;
     bool m_initialized = false;
@@ -454,6 +468,7 @@ private:
     xr_vector<IndirectDrawArgs> m_staticDrawArgsData;
     xr_vector<u32> m_staticMaterialIDData;
     xr_vector<GPUInstanceData> m_staticInstanceData;
+    xr_vector<u32> m_staticBatchVertexCounts;
 
     xr_vector<GPUObjectData> m_dynamicObjectData;
     xr_vector<IndirectDrawArgs> m_dynamicDrawArgsData;
@@ -515,6 +530,7 @@ private:
     u32 m_maxMegaVertices = 0;
     u32 m_maxMegaIndices = 0;
     bool m_megaBuffersReady = false;
+    bool m_megaDataUploaded = false;
     bool m_levelLoadInProgress = false;
 
     struct VBPoolInfo {

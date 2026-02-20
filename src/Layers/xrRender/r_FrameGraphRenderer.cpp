@@ -42,6 +42,8 @@
 #include "FrameGraphPasses/TonemapPassSetup.h"
 #include "FrameGraphPasses/PassStates.h"
 #include "FrameGraphPasses/ImGuiPassSetup.h"
+#include "FrameGraphPasses/PathTracerPassSetup.h"
+#include "RayTracing/RTAccelStructManager.h"
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -118,6 +120,9 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     m_detailManager = xr_make_unique<RENDER_NAMESPACE::FGDetailManager>();
 
+    m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
+    m_rtAccelMgr->Initialize(device);
+
     m_renderContext.reset(device->CreateContext());
     if (!m_renderContext)
     {
@@ -186,6 +191,12 @@ void FrameGraphRenderer::Shutdown() {
     if (m_gpuCullingManager) {
         m_gpuCullingManager->InvalidateStaticCullingData();
     }
+
+    if (m_rtAccelMgr) {
+        m_rtAccelMgr->Shutdown();
+        m_rtAccelMgr = nullptr;
+    }
+    passes::ShutdownPathTracer();
 
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
@@ -676,8 +687,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             }
         }
 
-        if (m_gpuCullingManager->IsEnabled()) {
+        if (m_rtAccelMgr && m_rtAccelMgr->IsSupported())
+            m_gpuCullingManager->SetRTAccelStructManager(m_rtAccelMgr.get());
 
+        if (m_gpuCullingManager->IsEnabled()) {
             auto cullOutput = m_gpuCullingManager->SetupCullingPass(
                 *m_framegraph,
                 m_hizPyramid,
@@ -907,11 +920,52 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_passStates->transparent
     );
 
+    auto sceneColor = transparentOutputs.albedo;
+
+    extern ENGINE_API int ps_r_path_tracer;
+    extern ENGINE_API int ps_r_path_tracer_bounces;
+
+    if (ps_r_path_tracer && m_rtAccelMgr && m_rtAccelMgr->IsSupported()) {
+        bool justEnabled = !m_ptWasEnabled;
+        m_ptWasEnabled = true;
+
+        bool viewChanged = (memcmp(&m_ptPrevViewProj, &Device.mFullTransform, sizeof(Fmatrix)) != 0);
+        bool bouncesChanged = m_ptPrevBounces != ps_r_path_tracer_bounces;
+
+        if (justEnabled || viewChanged || bouncesChanged)
+            m_ptSampleIndex = 0;
+
+        m_ptPrevViewProj = Device.mFullTransform;
+        m_ptPrevBounces = ps_r_path_tracer_bounces;
+
+        passes::PathTracerConfig ptConfig;
+        ptConfig.maxBounces = static_cast<u32>(ps_r_path_tracer_bounces);
+        ptConfig.sampleIndex = m_ptSampleIndex;
+
+        auto ptOutput = passes::setupPathTracerPass(
+            *m_framegraph,
+            m_device,
+            m_rtAccelMgr.get(),
+            ptConfig,
+            Device.mInvFullTransform,
+            Device.vCameraPosition,
+            width, height
+        );
+
+        sceneColor = ptOutput.composited;
+        m_ptSampleIndex++;
+    } else {
+        if (m_ptWasEnabled) {
+            m_ptSampleIndex = 0;
+            m_ptWasEnabled = false;
+        }
+    }
+
     passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();
     auto exposureOutput = passes::setupExposurePass(
         *m_framegraph,
         m_device,
-        transparentOutputs.albedo,
+        sceneColor,
         exposureConfig,
         Device.fTimeDelta,
         width,
@@ -923,7 +977,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
-        transparentOutputs.albedo,
+        sceneColor,
         width,
         height
     );

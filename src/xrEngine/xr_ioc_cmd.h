@@ -31,6 +31,8 @@
 extern ENGINE_API bool renderer_allow_override; // allows to change renderer setting
 extern ENGINE_API int ps_r4_use_pbr;
 extern ENGINE_API int ps_fg_pbr_diffuse_mode;
+extern ENGINE_API int ps_r_path_tracer;
+extern ENGINE_API int ps_r_path_tracer_bounces;
 
 class ENGINE_API IConsole_Command
 {
