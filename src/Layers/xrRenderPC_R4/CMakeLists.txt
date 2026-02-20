@@ -105,6 +105,12 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/TransparentPassSetup.cpp
     ../xrRender/FrameGraphPasses/PassCommon.h
     ../xrRender/FrameGraphPasses/PassCommon.cpp
+    ../xrRender/FrameGraphPasses/PathTracerPassSetup.h
+    ../xrRender/FrameGraphPasses/PathTracerPassSetup.cpp
+
+    # Ray Tracing
+    ../xrRender/RayTracing/RTAccelStructManager.h
+    ../xrRender/RayTracing/RTAccelStructManager.cpp
 
     # Detail System (Framegraph) - Renderer agnostic
     ../xrRender/FGDetailManager.h

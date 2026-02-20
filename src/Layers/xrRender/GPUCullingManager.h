@@ -25,7 +25,8 @@ namespace xray::render {
 }
 
 namespace xray::render::RENDER_NAMESPACE {
-    class CKinematics;  // Forward declaration for skeleton bone buffer
+    class CKinematics;
+    class RTAccelStructManager;
 }
 
 namespace xray::render::RENDER_NAMESPACE {
@@ -237,8 +238,8 @@ public:
     // End level load - upload all data to GPU
     void EndLevelLoad();
 
-    // Check if mega-buffers are ready for rendering
     bool AreMegaBuffersReady() const { return m_megaBuffersReady; }
+    bool IsMegaDataUploaded() const { return m_megaDataUploaded; }
 
     // Get mega-buffers for rendering
     nvrhi::IBuffer* GetMegaVertexBuffer() const { return m_megaVertexBuffer.Get(); }
@@ -249,9 +250,19 @@ public:
     // Upload instance data (transforms) for current frame
     void UploadInstanceData(ng::RenderContext* ctx, const GeometryCollector* geometry);
 
-    // Get mega-buffer stats
     u32 GetTotalVertexCount() const { return m_totalVertexCount; }
     u32 GetTotalIndexCount() const { return m_totalIndexCount; }
+
+    const xr_vector<IndirectDrawArgs>& GetStaticDrawArgsData() const { return m_staticDrawArgsData; }
+    const xr_vector<u32>& GetStaticMaterialIDData() const { return m_staticMaterialIDData; }
+    const xr_vector<u32>& GetStaticBatchVertexCounts() const { return m_staticBatchVertexCounts; }
+    const xr_vector<IndirectDrawArgs>& GetTerrainDrawArgsData() const { return m_terrainDrawArgsData; }
+    const xr_vector<u32>& GetTerrainMaterialIDData() const { return m_terrainMaterialIDData; }
+    const xr_vector<IndirectDrawArgs>& GetTransparentDrawArgsData() const { return m_transparentDrawArgsData; }
+    const xr_vector<u32>& GetTransparentMaterialIDData() const { return m_transparentMaterialIDData; }
+
+    void SetRTAccelStructManager(RTAccelStructManager* mgr) { m_rtAccelMgr = mgr; }
+    RTAccelStructManager* GetRTAccelStructManager() const { return m_rtAccelMgr; }
 
     // ───────────────────────────────────────────────────────
     //  DEBUG VISUALIZATION
@@ -576,16 +587,17 @@ private:
     xr_vector<GPUParticleData> m_particleData;
     xr_vector<IndirectDrawArgs> m_particleDrawArgsData;
     ng::RenderDevice* m_device = nullptr;
+    RTAccelStructManager* m_rtAccelMgr = nullptr;
     u32 m_objectCount = 0;
     u32 m_maxObjects = 0;
     bool m_initialized = false;
     bool m_computeEnabled = false;
 
-    // CPU-side object data (for upload)
     xr_vector<GPUObjectData> m_staticObjectData;
-    xr_vector<IndirectDrawArgs> m_staticDrawArgsData;  // Draw arguments (geometry info)
-    xr_vector<u32> m_staticMaterialIDData;             // Material IDs per batch (for bindless)
+    xr_vector<IndirectDrawArgs> m_staticDrawArgsData;
+    xr_vector<u32> m_staticMaterialIDData;
     xr_vector<GPUInstanceData> m_staticInstanceData;
+    xr_vector<u32> m_staticBatchVertexCounts;
 
     xr_vector<GPUObjectData> m_dynamicObjectData;
     xr_vector<IndirectDrawArgs> m_dynamicDrawArgsData;  // Draw arguments (geometry info)
@@ -668,6 +680,7 @@ private:
     u32 m_maxMegaVertices = 0;
     u32 m_maxMegaIndices = 0;
     bool m_megaBuffersReady = false;
+    bool m_megaDataUploaded = false;
     bool m_levelLoadInProgress = false;
 
     // ───────────────────────────────────────────────────────

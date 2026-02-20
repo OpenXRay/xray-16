@@ -15,6 +15,7 @@ struct ImDrawData;
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
+    class RTAccelStructManager;
 }
 
 namespace xray::render::RENDER_NAMESPACE::passes {
@@ -205,6 +206,13 @@ private:
 
     // Detail Manager (Framegraph: grass/vegetation rendering)
     xr_unique_ptr<RENDER_NAMESPACE::FGDetailManager> m_detailManager;
+
+    // Ray Tracing acceleration structures (for path tracer)
+    xr_unique_ptr<RENDER_NAMESPACE::RTAccelStructManager> m_rtAccelMgr;
+    u32 m_ptSampleIndex = 0;
+    Fmatrix m_ptPrevViewProj;
+    int m_ptPrevBounces = 0;
+    bool m_ptWasEnabled = false;
 
     // UI rendering infrastructure (shared by UI/Text/Cursor passes)
     xr_unique_ptr<ui::UIRenderCollector> m_uiCollector;

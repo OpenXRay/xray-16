@@ -45,6 +45,8 @@
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
 #include "FrameGraphPasses/PassStates.h"             // Aggregate pass state (owns all per-pass state)
 #include "FrameGraphPasses/ImGuiPassSetup.h"
+#include "FrameGraphPasses/PathTracerPassSetup.h"
+#include "RayTracing/RTAccelStructManager.h"
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -142,6 +144,9 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     // Note: Will be loaded during level loading (see r2_loader.cpp), not here
     m_detailManager = xr_make_unique<RENDER_NAMESPACE::FGDetailManager>();
 
+    m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
+    m_rtAccelMgr->Initialize(device);
+
     // Create RenderContext for execution
     m_renderContext.reset(device->CreateContext());
     if (!m_renderContext)
@@ -231,6 +236,12 @@ void FrameGraphRenderer::Shutdown() {
     if (m_gpuCullingManager) {
         m_gpuCullingManager->InvalidateStaticCullingData();
     }
+
+    if (m_rtAccelMgr) {
+        m_rtAccelMgr->Shutdown();
+        m_rtAccelMgr = nullptr;
+    }
+    passes::ShutdownPathTracer();
 
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
@@ -911,11 +922,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         // NOTE: Bindless buffers initialized earlier in RenderFrame() before SetupFrame()
         // This ensures materials are ready when CollectVisibleGeometry() calls PreRegisterBindlessMaterial
 
-        if (m_gpuCullingManager->IsEnabled()) {
-            // NOTE: UploadSceneObjects is now called inside the culling pass execute lambda
-            // This ensures it uses the correct command list during framegraph execution
+        if (m_rtAccelMgr && m_rtAccelMgr->IsSupported())
+            m_gpuCullingManager->SetRTAccelStructManager(m_rtAccelMgr.get());
 
-            // Setup GPU culling pass (upload happens inside execute lambda)
+        if (m_gpuCullingManager->IsEnabled()) {
             auto cullOutput = m_gpuCullingManager->SetupCullingPass(
                 *m_framegraph,
                 m_hizPyramid,
@@ -1205,17 +1215,57 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
 
     // ═══════════════════════════════════════════════════════
+    //  PATH TRACER (Reference / Ground-Truth Mode)
+    // ═══════════════════════════════════════════════════════
+    auto sceneColor = transparentOutputs.albedo;
+
+    extern ENGINE_API int ps_r_path_tracer;
+    extern ENGINE_API int ps_r_path_tracer_bounces;
+
+    if (ps_r_path_tracer && m_rtAccelMgr && m_rtAccelMgr->IsSupported()) {
+        bool justEnabled = !m_ptWasEnabled;
+        m_ptWasEnabled = true;
+
+        bool viewChanged = (memcmp(&m_ptPrevViewProj, &Device.mFullTransform, sizeof(Fmatrix)) != 0);
+        bool bouncesChanged = m_ptPrevBounces != ps_r_path_tracer_bounces;
+
+        if (justEnabled || viewChanged || bouncesChanged)
+            m_ptSampleIndex = 0;
+
+        m_ptPrevViewProj = Device.mFullTransform;
+        m_ptPrevBounces = ps_r_path_tracer_bounces;
+
+        passes::PathTracerConfig ptConfig;
+        ptConfig.maxBounces = static_cast<u32>(ps_r_path_tracer_bounces);
+        ptConfig.sampleIndex = m_ptSampleIndex;
+
+        auto ptOutput = passes::setupPathTracerPass(
+            *m_framegraph,
+            m_device,
+            m_rtAccelMgr.get(),
+            ptConfig,
+            Device.mInvFullTransform,
+            Device.vCameraPosition,
+            width, height
+        );
+
+        sceneColor = ptOutput.composited;
+        m_ptSampleIndex++;
+    } else {
+        if (m_ptWasEnabled) {
+            m_ptSampleIndex = 0;
+            m_ptWasEnabled = false;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
     //  EXPOSURE PASS (Auto-Exposure / Eye Adaptation)
     // ═══════════════════════════════════════════════════════
-    // Computes scene exposure using histogram-based analysis.
-    // Outputs 1×1 R32_FLOAT texture for sky and tonemap passes.
-    // Uses temporal adaptation for smooth transitions.
-
     passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();
     auto exposureOutput = passes::setupExposurePass(
         *m_framegraph,
         m_device,
-        transparentOutputs.albedo,
+        sceneColor,
         exposureConfig,
         Device.fTimeDelta,
         width,
@@ -1230,7 +1280,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // 4. UI Pass - Renders 2D UI directly to scene HDR target with alpha blending
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
-        transparentOutputs.albedo,  // Scene + HUD + Particles + Details + Transparent (HDR)
+        sceneColor,
         width,
         height
     );

@@ -1217,6 +1217,8 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "fg_pbr_diffuse_mode", &ps_fg_pbr_diffuse_mode, 0, 1);
     // GPU Culling debug visualization
     CMD4(CCC_Integer, "r4_debug_gpu_culling", &ps_r4_debug_gpu_culling, 0, 1);
+    CMD4(CCC_Integer, "r_path_tracer", &ps_r_path_tracer, 0, 1);
+    CMD4(CCC_Integer, "r_path_tracer_bounces", &ps_r_path_tracer_bounces, 1, 16);
 
     // FrameGraph render backend (requires restart)
     CMD3(CCC_Token, "fg_render_mode", &ps_fg_render_mode, fg_render_mode_token);

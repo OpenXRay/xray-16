@@ -190,6 +190,9 @@
     <Filter Include="Framegraph\Passes">
       <UniqueIdentifier>{6aa36c2e-cba5-46c5-a125-6eabb9a0bf2c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Framegraph\RayTracing">
+      <UniqueIdentifier>{b3a7e5d1-4f2c-4a8d-9e1b-5c3d7f9a2b4e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="NVRHI">
       <UniqueIdentifier>{866d137d-6227-4c9c-aae3-99172ef2ca6c}</UniqueIdentifier>
     </Filter>
@@ -821,6 +824,12 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.h">
       <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\PathTracerPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\RayTracing\RTAccelStructManager.h">
+      <Filter>Framegraph\RayTracing</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
@@ -1646,6 +1655,12 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\PathTracerPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\RayTracing\RTAccelStructManager.cpp">
+      <Filter>Framegraph\RayTracing</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
