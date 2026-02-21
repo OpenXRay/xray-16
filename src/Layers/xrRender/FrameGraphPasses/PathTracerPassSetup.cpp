@@ -45,8 +45,10 @@ struct PathTracerCB {
     u32 terrainBatchCount;
     u32 transparentBatchCount;
     u32 skinnedBatchStart;
+    u32 grassBatchStart;
+    u32 pad[3];
 };
-static_assert(sizeof(PathTracerCB) == 144, "PathTracerCB must be 144 bytes");
+static_assert(sizeof(PathTracerCB) == 160, "PathTracerCB must be 160 bytes");
 
 static void CreatePlaceholderCubemap(nvrhi::IDevice* nvDevice)
 {
@@ -125,6 +127,8 @@ static void InitializeResources(ng::RenderDevice* device)
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
         nvrhi::BindingLayoutItem::RawBuffer_SRV(11),
+        nvrhi::BindingLayoutItem::RawBuffer_SRV(12),
+        nvrhi::BindingLayoutItem::RawBuffer_SRV(13),
         nvrhi::BindingLayoutItem::Texture_UAV(0),
         nvrhi::BindingLayoutItem::Texture_UAV(1),
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
@@ -277,6 +281,17 @@ PathTracerOutput setupPathTracerPass(
     else
         cbData.skinnedBatchStart = 0;
 
+    if (batchCounts.grass > 0)
+        cbData.grassBatchStart = batchCounts.identityStatic + batchCounts.terrain +
+                                 batchCounts.transparent + batchCounts.instancedTotal +
+                                 batchCounts.skinned;
+    else
+        cbData.grassBatchStart = 0;
+
+    cbData.pad[0] = 0;
+    cbData.pad[1] = 0;
+    cbData.pad[2] = 0;
+
     auto& passData = fg.addCallbackPass<PathTracerData>(
         "Path Tracer",
 
@@ -307,8 +322,12 @@ PathTracerOutput setupPathTracerPass(
 
             nvrhi::IBuffer* skinnedVB = data.accelMgr->GetSkinnedOutputVB();
             nvrhi::IBuffer* skinnedIB = data.accelMgr->GetSkinnedIB();
+            nvrhi::IBuffer* grassVB = data.accelMgr->GetGrassOutputVB();
+            nvrhi::IBuffer* grassIB = data.accelMgr->GetGrassIB();
             if (!skinnedVB) skinnedVB = s_placeholderBuffer.Get();
             if (!skinnedIB) skinnedIB = s_placeholderBuffer.Get();
+            if (!grassVB) grassVB = s_placeholderBuffer.Get();
+            if (!grassIB) grassIB = s_placeholderBuffer.Get();
 
             nvrhi::BindingSetDesc bindDesc;
             bindDesc.bindings = {
@@ -322,6 +341,8 @@ PathTracerOutput setupPathTracerPass(
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, data.accelMgr->GetMaterialBuffer()),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(9, data.accelMgr->GetTerrainMaterialBuffer()),
                 nvrhi::BindingSetItem::RawBuffer_SRV(11, skinnedIB),
+                nvrhi::BindingSetItem::RawBuffer_SRV(12, grassVB),
+                nvrhi::BindingSetItem::RawBuffer_SRV(13, grassIB),
                 nvrhi::BindingSetItem::Texture_UAV(0, s_accumBuffer),
                 nvrhi::BindingSetItem::Texture_UAV(1, outTex),
                 nvrhi::BindingSetItem::ConstantBuffer(5, s_cb),

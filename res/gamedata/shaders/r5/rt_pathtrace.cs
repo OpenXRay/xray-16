@@ -14,6 +14,8 @@ cbuffer PathTracerParams : register(b5) {
     uint g_TerrainBatchCount;
     uint g_TransparentBatchCount;
     uint g_SkinnedBatchStart;
+    uint g_GrassBatchStart;
+    uint3 g_Pad;
 };
 
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
@@ -24,6 +26,8 @@ TextureCube<float4> g_Sky0 : register(t5);
 TextureCube<float4> g_Sky1 : register(t6);
 ByteAddressBuffer g_SkinnedVB : register(t7);
 ByteAddressBuffer g_SkinnedIB : register(t11);
+ByteAddressBuffer g_GrassVB : register(t12);
+ByteAddressBuffer g_GrassIB : register(t13);
 
 RWTexture2D<float4> g_Accumulation : register(u0);
 RWTexture2D<float4> g_Output : register(u1);
@@ -32,7 +36,13 @@ static const uint MAX_ALPHA_SKIPS = 8;
 
 bool IsSkinnedBatch(uint batchIdx)
 {
-    return g_SkinnedBatchStart > 0 && batchIdx >= g_SkinnedBatchStart;
+    return g_SkinnedBatchStart > 0 && batchIdx >= g_SkinnedBatchStart &&
+           !(g_GrassBatchStart > 0 && batchIdx >= g_GrassBatchStart);
+}
+
+bool IsGrassBatch(uint batchIdx)
+{
+    return g_GrassBatchStart > 0 && batchIdx >= g_GrassBatchStart;
 }
 
 float4 SampleTerrainTexture(uint index, float2 uv)
@@ -75,6 +85,8 @@ struct HitMaterial {
     float3 albedo;
     float alpha;
     float alphaRef;
+    float metallic;
+    float roughness;
     uint flags;
 };
 
@@ -83,7 +95,16 @@ HitMaterial GetHitMaterial(RTBatchInfo info, float2 hitUV, uint batchIdx)
     HitMaterial result;
     result.alpha = 1.0;
     result.alphaRef = 0.0;
+    result.metallic = 0.0;
+    result.roughness = 1.0;
     result.flags = 0;
+
+    if (IsGrassBatch(batchIdx)) {
+        float height_t = 1.0 - hitUV.y;
+        result.albedo = lerp(float3(0.08, 0.18, 0.03), float3(0.15, 0.35, 0.06), height_t);
+        result.flags = 0;
+        return result;
+    }
 
     if (IsTerrainBatch(batchIdx)) {
         TerrainMaterialData tmat = g_TerrainMaterials[info.materialID];
@@ -98,6 +119,13 @@ HitMaterial GetHitMaterial(RTBatchInfo info, float2 hitUV, uint batchIdx)
     result.alpha = diffuse.a;
     result.alphaRef = mat.alphaRef;
     result.flags = mat.flags;
+
+    if (mat.flags & MAT_FLAG_HAS_PBR) {
+        float3 pbr = SamplePBR(mat, hitUV);
+        result.metallic = pbr.r;
+        result.roughness = pbr.g;
+    }
+
     return result;
 }
 
@@ -136,6 +164,12 @@ struct HitResult {
 HitResult GetHitAttributes(uint batchIdx, RTBatchInfo info, uint primIdx, float2 bary, float3x4 objectToWorld)
 {
     HitResult h;
+    if (IsGrassBatch(batchIdx)) {
+        h.uv = GetSkinnedHitUV(g_GrassVB, g_GrassIB, info, primIdx, bary);
+        h.normal = GetSkinnedHitNormal(g_GrassVB, g_GrassIB, info, primIdx, bary);
+        h.geoNormal = GetSkinnedHitGeoNormal(g_GrassVB, g_GrassIB, info, primIdx);
+        return h;
+    }
     if (IsSkinnedBatch(batchIdx)) {
         h.uv = GetSkinnedHitUV(g_SkinnedVB, g_SkinnedIB, info, primIdx, bary);
         h.normal = GetSkinnedHitNormal(g_SkinnedVB, g_SkinnedIB, info, primIdx, bary);
@@ -238,6 +272,12 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
                 uint sBatchIdx = shadowQ.CommittedInstanceID() + shadowQ.CommittedGeometryIndex();
                 RTBatchInfo sInfo = g_BatchInfo[sBatchIdx];
+
+                if (IsGrassBatch(sBatchIdx)) {
+                    shadowAtten *= 0.5;
+                    shadowOrigin = shadowOrigin + sunDir * (shadowQ.CommittedRayT() + 0.002);
+                    continue;
+                }
 
                 float2 sUV;
                 if (IsSkinnedBatch(sBatchIdx))

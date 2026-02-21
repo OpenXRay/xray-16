@@ -151,4 +151,22 @@ float3 cosine_weighted_hemisphere(float2 u, float3 N)
     return normalize(T * dir.x + B * dir.y + N * dir.z);
 }
 
+float3 sample_ggx(float2 u, float3 N, float roughness)
+{
+    float a = roughness * roughness;
+    float a2 = a * a;
+
+    float phi = 6.28318530718 * u.x;
+    float cosTheta = sqrt((1.0 - u.y) / (1.0 + (a2 - 1.0) * u.y));
+    float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+
+    float3 H = float3(sinTheta * cos(phi), sinTheta * sin(phi), cosTheta);
+
+    float3 up = abs(N.y) < 0.999 ? float3(0, 1, 0) : float3(1, 0, 0);
+    float3 T = normalize(cross(up, N));
+    float3 B = cross(N, T);
+
+    return normalize(T * H.x + B * H.y + N * H.z);
+}
+
 #endif
