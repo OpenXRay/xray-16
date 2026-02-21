@@ -20,6 +20,8 @@ extern ENGINE_API float ps_r3_grass_wind_displacement;
 
 namespace xray::render::RENDER_NAMESPACE {
 
+extern int ps_r__detail_gpu;
+
 nvrhi::ComputePipelineHandle RTAccelStructManager::s_skinPipeline;
 nvrhi::BindingLayoutHandle RTAccelStructManager::s_skinLayout;
 nvrhi::BufferHandle RTAccelStructManager::s_skinCB;
@@ -30,6 +32,11 @@ nvrhi::BindingLayoutHandle RTAccelStructManager::s_grassLayout;
 nvrhi::BufferHandle RTAccelStructManager::s_grassCB;
 nvrhi::SamplerHandle RTAccelStructManager::s_grassSampler;
 bool RTAccelStructManager::s_grassInitialized = false;
+
+nvrhi::ComputePipelineHandle RTAccelStructManager::s_billboardPipeline;
+nvrhi::BindingLayoutHandle RTAccelStructManager::s_billboardLayout;
+nvrhi::BufferHandle RTAccelStructManager::s_billboardCB;
+bool RTAccelStructManager::s_billboardInitialized = false;
 
 struct RTSkinningCB {
     Fmatrix worldMatrix;
@@ -54,9 +61,17 @@ struct GrassRTCB {
     u32 vertsPerBlade;
     u32 bladeCount;
     u32 outputVertexOffset;
-    u32 pad;
+    u32 indicesPerBlade;
+    u32 outputIndexOffset;
+    u32 pad[3];
 };
-static_assert(sizeof(GrassRTCB) == 80, "GrassRTCB must be 80 bytes");
+static_assert(sizeof(GrassRTCB) == 96, "GrassRTCB must be 96 bytes");
+
+struct BillboardRTCB {
+    u32 maxVertsPerBillboard;
+    u32 pad[3];
+};
+static_assert(sizeof(BillboardRTCB) == 16, "BillboardRTCB must be 16 bytes");
 
 static void FmatrixToRTTransform(const Fmatrix& m, nvrhi::rt::AffineTransform& out)
 {
@@ -110,6 +125,11 @@ void RTAccelStructManager::Shutdown()
     s_grassCB = nullptr;
     s_grassSampler = nullptr;
     s_grassInitialized = false;
+
+    s_billboardPipeline = nullptr;
+    s_billboardLayout = nullptr;
+    s_billboardCB = nullptr;
+    s_billboardInitialized = false;
 }
 
 void RTAccelStructManager::BuildIfNeeded(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling)
@@ -765,6 +785,7 @@ void RTAccelStructManager::InitGrassPipeline()
         nvrhi::BindingLayoutItem::Texture_SRV(3),
         nvrhi::BindingLayoutItem::Sampler(0),
         nvrhi::BindingLayoutItem::RawBuffer_UAV(0),
+        nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
     };
     s_grassLayout = cache.GetOrCreateBindingLayout("RTGrass", layoutDesc, nvDevice);
@@ -780,144 +801,235 @@ void RTAccelStructManager::InitGrassPipeline()
         Msg("* [RT] Grass compute pipeline created");
 }
 
+void RTAccelStructManager::InitBillboardPipeline()
+{
+    if (s_billboardInitialized) return;
+
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    auto& cache = framegraph::GetPassResourceCache();
+
+    static ref_cs s_rt_billboard_cs;
+    s_rt_billboard_cs.create("rt_grass_billboard");
+    if (!s_rt_billboard_cs || !s_rt_billboard_cs->nvrhiShader) {
+        Msg("! [RT] Failed to load rt_grass_billboard shader");
+        return;
+    }
+
+    nvrhi::BufferDesc cbDesc;
+    cbDesc.debugName = "BillboardRTCB";
+    cbDesc.byteSize = sizeof(BillboardRTCB);
+    cbDesc.isConstantBuffer = true;
+    cbDesc.isVolatile = true;
+    cbDesc.maxVersions = 4;
+    cbDesc.keepInitialState = true;
+    cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+    s_billboardCB = nvDevice->createBuffer(cbDesc);
+
+    nvrhi::BindingLayoutDesc layoutDesc;
+    layoutDesc.visibility = nvrhi::ShaderType::Compute;
+    layoutDesc.bindings = {
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),
+        nvrhi::BindingLayoutItem::RawBuffer_SRV(4),
+        nvrhi::BindingLayoutItem::RawBuffer_UAV(0),
+        nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+    };
+    s_billboardLayout = cache.GetOrCreateBindingLayout("RTBillboard", layoutDesc, nvDevice);
+
+    nvrhi::ComputePipelineDesc pipeDesc;
+    pipeDesc.CS = s_rt_billboard_cs->nvrhiShader;
+    pipeDesc.bindingLayouts = { s_billboardLayout };
+    s_billboardPipeline = nvDevice->createComputePipeline(pipeDesc);
+
+    s_billboardInitialized = s_billboardPipeline != nullptr;
+
+    if (s_billboardInitialized)
+        Msg("* [RT] Billboard grass compute pipeline created");
+}
+
 void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetailManager* detailMgr)
 {
     if (!m_rtSupported || !m_isReady || !detailMgr)
         return;
 
-    InitGrassPipeline();
-    if (!s_grassInitialized) return;
-
+    const bool billboardMode = !ps_r__detail_gpu;
     const auto& stats = detailMgr->GetCullingStats();
-    u32 lodCounts[FGDetailManager::LOD_COUNT] = {
-        stats.visibleLOD0Count, stats.visibleLOD1Count, stats.visibleLOD2Count
-    };
-    u32 totalBlades = lodCounts[0] + lodCounts[1] + lodCounts[2];
-    if (totalBlades == 0) {
-        InvalidateGrass();
-        return;
-    }
-
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
     constexpr u32 GRASS_VERTEX_STRIDE = 24;
-
-    u32 lodVertsPerBlade[FGDetailManager::LOD_COUNT];
-    u32 lodIndicesPerBlade[FGDetailManager::LOD_COUNT];
     u32 totalVerts = 0;
     u32 totalIndices = 0;
 
-    for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++) {
-        u32 seg = FGDetailManager::LOD_SEGMENTS[lod];
-        lodVertsPerBlade[lod] = seg * 2 + 1;
-        lodIndicesPerBlade[lod] = (seg - 1) * 6 + 3;
-        totalVerts += lodCounts[lod] * lodVertsPerBlade[lod];
-        totalIndices += lodCounts[lod] * lodIndicesPerBlade[lod];
-    }
+    if (billboardMode) {
+        InitBillboardPipeline();
+        if (!s_billboardInitialized) return;
 
-    u64 vbSize = static_cast<u64>(totalVerts) * GRASS_VERTEX_STRIDE;
-    u64 ibSize = static_cast<u64>(totalIndices) * sizeof(u32);
+        u32 maxVPB = detailMgr->maxPulledIndexCount;
+        maxVPB = (maxVPB / 3) * 3;
+        if (maxVPB == 0 || !detailMgr->billboardDrawArgsBuffer) { InvalidateGrass(); return; }
 
-    if (!m_grassOutputVB || m_grassOutputVB->getDesc().byteSize < vbSize) {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GrassOutputVB";
-        desc.byteSize = vbSize;
-        desc.canHaveRawViews = true;
-        desc.isAccelStructBuildInput = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
-        desc.canHaveUAVs = true;
-        m_grassOutputVB = nvDevice->createBuffer(desc);
-    }
+        u32 capacity = detailMgr->visibleBufferCapacity;
+        totalVerts = capacity * maxVPB;
+        totalIndices = totalVerts;
+        u64 vbSize = static_cast<u64>(totalVerts) * GRASS_VERTEX_STRIDE;
+        u64 ibSize = static_cast<u64>(totalIndices) * sizeof(u32);
 
-    xr_vector<u32> consolidatedIndices;
-    consolidatedIndices.reserve(totalIndices);
-    u32 vertBase = 0;
-    for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++) {
-        u32 seg = FGDetailManager::LOD_SEGMENTS[lod];
-        u32 vpb = lodVertsPerBlade[lod];
-        for (u32 blade = 0; blade < lodCounts[lod]; blade++) {
-            u32 b = vertBase + blade * vpb;
-            for (u32 i = 0; i < seg - 1; i++) {
-                u32 base = b + i * 2;
-                consolidatedIndices.push_back(base);
-                consolidatedIndices.push_back(base + 2);
-                consolidatedIndices.push_back(base + 1);
-                consolidatedIndices.push_back(base + 1);
-                consolidatedIndices.push_back(base + 2);
-                consolidatedIndices.push_back(base + 3);
-            }
-            u32 tipBase = b + (seg - 1) * 2;
-            u32 tipIdx = b + seg * 2;
-            consolidatedIndices.push_back(tipBase);
-            consolidatedIndices.push_back(tipIdx);
-            consolidatedIndices.push_back(tipBase + 1);
+        if (!m_grassOutputVB || m_grassOutputVB->getDesc().byteSize < vbSize) {
+            nvrhi::BufferDesc desc;
+            desc.debugName = "GrassOutputVB";
+            desc.byteSize = vbSize;
+            desc.canHaveRawViews = true;
+            desc.isAccelStructBuildInput = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = true;
+            desc.canHaveUAVs = true;
+            m_grassOutputVB = nvDevice->createBuffer(desc);
         }
-        vertBase += lodCounts[lod] * vpb;
-    }
 
-    if (!m_grassIB || m_grassIB->getDesc().byteSize < ibSize) {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GrassConsolidatedIB";
-        desc.byteSize = ibSize;
-        desc.canHaveRawViews = true;
-        desc.isAccelStructBuildInput = true;
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
-        desc.keepInitialState = true;
-        m_grassIB = nvDevice->createBuffer(desc);
-    }
+        if (!m_grassIB || m_grassIB->getDesc().byteSize < ibSize) {
+            nvrhi::BufferDesc desc;
+            desc.debugName = "GrassConsolidatedIB";
+            desc.byteSize = ibSize;
+            desc.canHaveRawViews = true;
+            desc.isAccelStructBuildInput = true;
+            desc.canHaveUAVs = true;
+            desc.initialState = nvrhi::ResourceStates::ShaderResource;
+            desc.keepInitialState = true;
+            m_grassIB = nvDevice->createBuffer(desc);
+        }
 
-    cmdList->writeBuffer(m_grassIB, consolidatedIndices.data(), consolidatedIndices.size() * sizeof(u32));
-
-    float windAngleDeg = 0.0f;
-    float windSpeed = detailMgr->windSpeed;
-    if (g_pGamePersistent)
-        windAngleDeg = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
-
-    GrassRTCB cbTemplate;
-    cbTemplate.detail_params.set(
-        float(detailMgr->dtH.x_size()), float(detailMgr->dtH.z_size()),
-        float(detailMgr->dtH.x_offs()), float(detailMgr->dtH.z_offs()));
-    cbTemplate.wind_direction.set(windAngleDeg, windSpeed, 0.0f, 0.0f);
-    cbTemplate.wave.set(1.0f / 5.0f, 1.0f / 7.0f, 1.0f / 3.0f, Device.fTimeGlobal);
-    cbTemplate.grass_wind_displacement = ps_r3_grass_wind_displacement;
-    cbTemplate.grass_blade_height = ps_r3_grass_blade_height;
-    cbTemplate.grass_blade_width = ps_r3_grass_blade_width;
-    cbTemplate.pad = 0;
-
-    nvrhi::ComputeState state;
-    state.pipeline = s_grassPipeline;
-
-    u32 vertexOffset = 0;
-    for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++) {
-        if (lodCounts[lod] == 0) continue;
+        BillboardRTCB cb;
+        cb.maxVertsPerBillboard = maxVPB;
+        cb.pad[0] = cb.pad[1] = cb.pad[2] = 0;
 
         nvrhi::BindingSetDesc bindDesc;
         bindDesc.bindings = {
             nvrhi::BindingSetItem::StructuredBuffer_SRV(0, detailMgr->generatedInstancesBuffer,
                 nvrhi::Format::UNKNOWN, nvrhi::BufferRange(0, detailMgr->generatedInstancesBuffer->getDesc().byteSize)),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(1, detailMgr->slotDataBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(2, detailMgr->visibleInstancesBuffer[lod]),
-            nvrhi::BindingSetItem::Texture_SRV(3, detailMgr->windTexture),
-            nvrhi::BindingSetItem::Sampler(0, s_grassSampler),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(1, detailMgr->visibleBillboardInstancesBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(2, detailMgr->detailModelsBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(3, detailMgr->pulledVertexBuffer),
+            nvrhi::BindingSetItem::RawBuffer_SRV(4, detailMgr->billboardDrawArgsBuffer),
             nvrhi::BindingSetItem::RawBuffer_UAV(0, m_grassOutputVB),
-            nvrhi::BindingSetItem::ConstantBuffer(5, s_grassCB),
+            nvrhi::BindingSetItem::RawBuffer_UAV(1, m_grassIB),
+            nvrhi::BindingSetItem::ConstantBuffer(5, s_billboardCB),
         };
-        auto bindingSet = nvDevice->createBindingSet(bindDesc, s_grassLayout);
+        auto bindingSet = nvDevice->createBindingSet(bindDesc, s_billboardLayout);
 
-        GrassRTCB cb = cbTemplate;
-        cb.segments = FGDetailManager::LOD_SEGMENTS[lod];
-        cb.vertsPerBlade = lodVertsPerBlade[lod];
-        cb.bladeCount = lodCounts[lod];
-        cb.outputVertexOffset = vertexOffset;
-
-        cmdList->writeBuffer(s_grassCB, &cb, sizeof(GrassRTCB));
+        cmdList->writeBuffer(s_billboardCB, &cb, sizeof(BillboardRTCB));
+        nvrhi::ComputeState state;
+        state.pipeline = s_billboardPipeline;
         state.bindings = { bindingSet };
         cmdList->setComputeState(state);
+        cmdList->dispatch((capacity + 255) / 256, 1, 1);
+    } else {
+        InitGrassPipeline();
+        if (!s_grassInitialized) return;
 
-        u32 totalVertsThisLod = lodCounts[lod] * lodVertsPerBlade[lod];
-        cmdList->dispatch((totalVertsThisLod + 255) / 256, 1, 1);
+        u32 lodCounts[FGDetailManager::LOD_COUNT] = {
+            stats.visibleLOD0Count, stats.visibleLOD1Count, stats.visibleLOD2Count
+        };
+        u32 totalBlades = lodCounts[0] + lodCounts[1] + lodCounts[2];
+        if (totalBlades == 0) { InvalidateGrass(); return; }
 
-        vertexOffset += totalVertsThisLod;
+        u32 lodVertsPerBlade[FGDetailManager::LOD_COUNT];
+        u32 lodIndicesPerBlade[FGDetailManager::LOD_COUNT];
+        for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++) {
+            u32 seg = FGDetailManager::LOD_SEGMENTS[lod];
+            lodVertsPerBlade[lod] = seg * 2 + 1;
+            lodIndicesPerBlade[lod] = (seg - 1) * 6 + 3;
+            totalVerts += lodCounts[lod] * lodVertsPerBlade[lod];
+            totalIndices += lodCounts[lod] * lodIndicesPerBlade[lod];
+        }
+
+        u64 vbSize = static_cast<u64>(totalVerts) * GRASS_VERTEX_STRIDE;
+        u64 ibSize = static_cast<u64>(totalIndices) * sizeof(u32);
+
+        if (!m_grassOutputVB || m_grassOutputVB->getDesc().byteSize < vbSize) {
+            nvrhi::BufferDesc desc;
+            desc.debugName = "GrassOutputVB";
+            desc.byteSize = vbSize;
+            desc.canHaveRawViews = true;
+            desc.isAccelStructBuildInput = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = true;
+            desc.canHaveUAVs = true;
+            m_grassOutputVB = nvDevice->createBuffer(desc);
+        }
+
+        if (!m_grassIB || m_grassIB->getDesc().byteSize < ibSize) {
+            nvrhi::BufferDesc desc;
+            desc.debugName = "GrassConsolidatedIB";
+            desc.byteSize = ibSize;
+            desc.canHaveRawViews = true;
+            desc.isAccelStructBuildInput = true;
+            desc.canHaveUAVs = true;
+            desc.initialState = nvrhi::ResourceStates::ShaderResource;
+            desc.keepInitialState = true;
+            m_grassIB = nvDevice->createBuffer(desc);
+        }
+
+        float windAngleDeg = 0.0f;
+        float windSpeed = detailMgr->windSpeed;
+        if (g_pGamePersistent)
+            windAngleDeg = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
+
+        GrassRTCB cbTemplate;
+        cbTemplate.detail_params.set(
+            float(detailMgr->dtH.x_size()), float(detailMgr->dtH.z_size()),
+            float(detailMgr->dtH.x_offs()), float(detailMgr->dtH.z_offs()));
+        cbTemplate.wind_direction.set(windAngleDeg, windSpeed, 0.0f, 0.0f);
+        cbTemplate.wave.set(1.0f / 5.0f, 1.0f / 7.0f, 1.0f / 3.0f, Device.fTimeGlobal);
+        cbTemplate.grass_wind_displacement = ps_r3_grass_wind_displacement;
+        cbTemplate.grass_blade_height = ps_r3_grass_blade_height;
+        cbTemplate.grass_blade_width = ps_r3_grass_blade_width;
+        cbTemplate.pad[0] = cbTemplate.pad[1] = cbTemplate.pad[2] = 0;
+
+        nvrhi::ComputeState state;
+        state.pipeline = s_grassPipeline;
+
+        u32 vertexOffset = 0;
+        u32 indexOffset = 0;
+        for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++) {
+            if (lodCounts[lod] == 0) continue;
+
+            nvrhi::BindingSetDesc bindDesc;
+            bindDesc.bindings = {
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(0, detailMgr->generatedInstancesBuffer,
+                    nvrhi::Format::UNKNOWN, nvrhi::BufferRange(0, detailMgr->generatedInstancesBuffer->getDesc().byteSize)),
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(1, detailMgr->slotDataBuffer),
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(2, detailMgr->visibleInstancesBuffer[lod]),
+                nvrhi::BindingSetItem::Texture_SRV(3, detailMgr->windTexture),
+                nvrhi::BindingSetItem::Sampler(0, s_grassSampler),
+                nvrhi::BindingSetItem::RawBuffer_UAV(0, m_grassOutputVB),
+                nvrhi::BindingSetItem::RawBuffer_UAV(1, m_grassIB),
+                nvrhi::BindingSetItem::ConstantBuffer(5, s_grassCB),
+            };
+            auto bindingSet = nvDevice->createBindingSet(bindDesc, s_grassLayout);
+
+            GrassRTCB cb = cbTemplate;
+            cb.segments = FGDetailManager::LOD_SEGMENTS[lod];
+            cb.vertsPerBlade = lodVertsPerBlade[lod];
+            cb.indicesPerBlade = lodIndicesPerBlade[lod];
+            cb.bladeCount = lodCounts[lod];
+            cb.outputVertexOffset = vertexOffset;
+            cb.outputIndexOffset = indexOffset;
+
+            cmdList->writeBuffer(s_grassCB, &cb, sizeof(GrassRTCB));
+            state.bindings = { bindingSet };
+            cmdList->setComputeState(state);
+
+            u32 totalVertsThisLod = lodCounts[lod] * lodVertsPerBlade[lod];
+            cmdList->dispatch((totalVertsThisLod + 255) / 256, 1, 1);
+
+            vertexOffset += totalVertsThisLod;
+            indexOffset += lodCounts[lod] * lodIndicesPerBlade[lod];
+        }
+
+        Msg("* [RT] Built blade grass BLAS (%u blades, %u verts, %u indices, LODs: %u/%u/%u)",
+            totalBlades, totalVerts, totalIndices, lodCounts[0], lodCounts[1], lodCounts[2]);
     }
 
     nvrhi::rt::AccelStructDesc blasDesc;
@@ -939,7 +1051,9 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
     geom.setTriangles(tri).setFlags(nvrhi::rt::GeometryFlags::Opaque);
     blasDesc.addBottomLevelGeometry(geom);
 
-    m_grassBlas = nvDevice->createAccelStruct(blasDesc);
+    if (!m_grassBlas || m_grassTotalVerts != totalVerts || m_grassTotalIndices != totalIndices)
+        m_grassBlas = nvDevice->createAccelStruct(blasDesc);
+
     if (m_grassBlas)
         nvrhi::utils::BuildBottomLevelAccelStruct(cmdList, m_grassBlas, blasDesc);
 
@@ -947,9 +1061,6 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
     m_grassTotalIndices = totalIndices;
     m_batchCounts.grass = 1;
     m_grassReady = true;
-
-    Msg("* [RT] Built grass BLAS (%u blades, %u verts, %u indices, LODs: %u/%u/%u)",
-        totalBlades, totalVerts, totalIndices, lodCounts[0], lodCounts[1], lodCounts[2]);
 }
 
 }

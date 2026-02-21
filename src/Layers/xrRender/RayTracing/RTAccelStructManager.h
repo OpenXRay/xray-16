@@ -116,6 +116,7 @@ private:
     void CreateBatchInfoBuffer(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
     void InitSkinningPipeline();
     void InitGrassPipeline();
+    void InitBillboardPipeline();
     u32 GetSkinningFormatID(u16 renderMode, u32 stride);
 
     ng::RenderDevice* m_device = nullptr;
@@ -157,6 +158,11 @@ private:
     static nvrhi::BufferHandle s_grassCB;
     static nvrhi::SamplerHandle s_grassSampler;
     static bool s_grassInitialized;
+
+    static nvrhi::ComputePipelineHandle s_billboardPipeline;
+    static nvrhi::BindingLayoutHandle s_billboardLayout;
+    static nvrhi::BufferHandle s_billboardCB;
+    static bool s_billboardInitialized;
 };
 
 }
