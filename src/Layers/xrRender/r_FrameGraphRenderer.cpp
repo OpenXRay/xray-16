@@ -1239,24 +1239,26 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_ptPrevBounces = ps_r_path_tracer_bounces;
 
         if (m_ptSampleIndex == 0 && m_rtAccelMgr->IsReady()) {
-            struct SkinnedBLASData {
+            struct DynamicBLASData {
                 RTAccelStructManager* accelMgr;
                 GPUCullingManager* gpuCulling;
+                FGDetailManager* detailMgr;
                 const GeometryCollector* geometry;
                 const xr_vector<GeometryBatch>* hudBatches;
             };
 
-            m_framegraph->addCallbackPass<SkinnedBLASData>(
-                "Skinned BLAS Build",
-                [&](framegraph::FrameGraph& builder, framegraph::PassHandle passHandle, SkinnedBLASData& data) {
+            m_framegraph->addCallbackPass<DynamicBLASData>(
+                "Dynamic BLAS Build",
+                [&](framegraph::FrameGraph& builder, framegraph::PassHandle passHandle, DynamicBLASData& data) {
                     framegraph::RenderPassBuilder pb(builder, passHandle);
                     pb.sideEffects();
                     data.accelMgr = m_rtAccelMgr.get();
                     data.gpuCulling = m_gpuCullingManager.get();
+                    data.detailMgr = m_detailManager.get();
                     data.geometry = m_geometryCollector.get();
                     data.hudBatches = &m_hudBatches;
                 },
-                [](const SkinnedBLASData& data, const framegraph::FrameGraph&, ng::RenderContext* ctx) {
+                [](const DynamicBLASData& data, const framegraph::FrameGraph&, ng::RenderContext* ctx) {
                     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
                     xr_vector<GeometryBatch> worldSkinned;
@@ -1289,6 +1291,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
                     data.gpuCulling->BeginSkinnedFrame();
                     data.accelMgr->BuildSkinnedBLAS(cmdList, data.gpuCulling, worldSkinned, hudSkinned);
+                    data.accelMgr->BuildGrassBLAS(cmdList, data.detailMgr);
+                    data.accelMgr->RebuildDynamic(cmdList, data.gpuCulling);
                 }
             );
         }
@@ -1313,8 +1317,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         if (m_ptWasEnabled) {
             m_ptSampleIndex = 0;
             m_ptWasEnabled = false;
-            if (m_rtAccelMgr)
+            if (m_rtAccelMgr) {
                 m_rtAccelMgr->InvalidateSkinned();
+                m_rtAccelMgr->InvalidateGrass();
+            }
         }
     }
 

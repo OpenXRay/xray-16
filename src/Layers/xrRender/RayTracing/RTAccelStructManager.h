@@ -7,6 +7,10 @@ namespace xray::render {
     struct GeometryBatch;
 }
 
+namespace xray::render::RENDER_NAMESPACE {
+    class FGDetailManager;
+}
+
 namespace xray::render::ng {
 class RenderDevice;
 class RenderContext;
@@ -29,6 +33,7 @@ struct RTBatchCounts {
     u32 transparent = 0;
     u32 instancedTotal = 0;
     u32 skinned = 0;
+    u32 grass = 0;
 };
 
 class RTAccelStructManager {
@@ -41,7 +46,10 @@ public:
     void BuildSkinnedBLAS(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling,
                           const xr_vector<GeometryBatch>& worldBatches,
                           const xr_vector<GeometryBatch>& hudBatches);
+    void BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetailManager* detailMgr);
+    void RebuildDynamic(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
     void InvalidateSkinned();
+    void InvalidateGrass();
 
     bool IsReady() const { return m_isReady; }
     bool IsSupported() const { return m_rtSupported; }
@@ -54,6 +62,8 @@ public:
     nvrhi::IBuffer* GetTerrainMaterialBuffer() const { return m_terrainMaterialBuffer; }
     nvrhi::IBuffer* GetSkinnedOutputVB() const { return m_skinnedOutputVB.Get(); }
     nvrhi::IBuffer* GetSkinnedIB() const { return m_skinnedIB.Get(); }
+    nvrhi::IBuffer* GetGrassOutputVB() const { return m_grassOutputVB.Get(); }
+    nvrhi::IBuffer* GetGrassIB() const { return m_grassIB.Get(); }
     u32 GetBatchCount() const { return m_batchCount; }
     const RTBatchCounts& GetBatchCounts() const { return m_batchCounts; }
 
@@ -105,6 +115,7 @@ private:
     void BuildTLAS(nvrhi::ICommandList* cmdList);
     void CreateBatchInfoBuffer(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
     void InitSkinningPipeline();
+    void InitGrassPipeline();
     u32 GetSkinningFormatID(u16 renderMode, u32 stride);
 
     ng::RenderDevice* m_device = nullptr;
@@ -129,10 +140,23 @@ private:
     xr_vector<SkinnedBatchRT> m_skinnedBatchData;
     bool m_skinnedReady = false;
 
+    nvrhi::BufferHandle m_grassOutputVB;
+    nvrhi::BufferHandle m_grassIB;
+    nvrhi::rt::AccelStructHandle m_grassBlas;
+    u32 m_grassTotalVerts = 0;
+    u32 m_grassTotalIndices = 0;
+    bool m_grassReady = false;
+
     static nvrhi::ComputePipelineHandle s_skinPipeline;
     static nvrhi::BindingLayoutHandle s_skinLayout;
     static nvrhi::BufferHandle s_skinCB;
     static bool s_skinInitialized;
+
+    static nvrhi::ComputePipelineHandle s_grassPipeline;
+    static nvrhi::BindingLayoutHandle s_grassLayout;
+    static nvrhi::BufferHandle s_grassCB;
+    static nvrhi::SamplerHandle s_grassSampler;
+    static bool s_grassInitialized;
 };
 
 }
