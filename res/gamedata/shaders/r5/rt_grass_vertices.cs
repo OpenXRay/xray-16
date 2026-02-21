@@ -20,6 +20,7 @@ StructuredBuffer<uint> g_VisibleIndices : register(t2);
 Texture2D g_WindTexture : register(t3);
 SamplerState g_LinearSampler : register(s0);
 RWByteAddressBuffer g_Output : register(u0);
+RWByteAddressBuffer g_OutputIB : register(u1);
 
 cbuffer GrassRTCB : register(b5) {
     float4 detail_params;
@@ -32,7 +33,9 @@ cbuffer GrassRTCB : register(b5) {
     uint vertsPerBlade;
     uint bladeCount;
     uint outputVertexOffset;
-    uint pad;
+    uint indicesPerBlade;
+    uint outputIndexOffset;
+    uint3 pad;
 };
 
 static const float PACK_MAX_SCALE = 4.0;
@@ -179,4 +182,21 @@ void main(uint3 dtid : SV_DispatchThreadID)
     g_Output.Store3(outAddr, asuint(world_pos));
     g_Output.Store(outAddr + 12, pack_normal(normal));
     g_Output.Store2(outAddr + 16, asuint(uv));
+
+    if (local_vert % 2 == 0 && local_vert < segments * 2) {
+        uint seg = local_vert / 2;
+        uint vBase = outputVertexOffset + blade_idx * vertsPerBlade;
+        uint bladeIBByte = (outputIndexOffset + blade_idx * indicesPerBlade) * 4;
+        if (seg < segments - 1) {
+            uint byteOff = bladeIBByte + seg * 24;
+            uint v = vBase + seg * 2;
+            g_OutputIB.Store4(byteOff, uint4(v, v + 2, v + 1, v + 1));
+            g_OutputIB.Store2(byteOff + 16, uint2(v + 2, v + 3));
+        } else {
+            uint byteOff = bladeIBByte + (segments - 1) * 24;
+            uint tipV = vBase + (segments - 1) * 2;
+            uint tipTop = vBase + segments * 2;
+            g_OutputIB.Store3(byteOff, uint3(tipV, tipTop, tipV + 1));
+        }
+    }
 }
