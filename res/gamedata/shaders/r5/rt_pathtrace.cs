@@ -15,7 +15,8 @@ cbuffer PathTracerParams : register(b5) {
     uint g_TransparentBatchCount;
     uint g_SkinnedBatchStart;
     uint g_GrassBatchStart;
-    uint3 g_Pad;
+    uint g_DetailAtlasIndex;
+    uint2 g_Pad;
 };
 
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
@@ -100,9 +101,14 @@ HitMaterial GetHitMaterial(RTBatchInfo info, float2 hitUV, uint batchIdx)
     result.flags = 0;
 
     if (IsGrassBatch(batchIdx)) {
-        float height_t = 1.0 - hitUV.y;
-        result.albedo = lerp(float3(0.08, 0.18, 0.03), float3(0.15, 0.35, 0.06), height_t);
-        result.flags = 0;
+        if (g_DetailAtlasIndex > 0) {
+            float4 texel = GetBindlessTexture(g_DetailAtlasIndex).SampleLevel(g_LinearSampler, hitUV, 0);
+            result.albedo = texel.rgb;
+            result.alpha = texel.a;
+        } else {
+            float height_t = 1.0 - hitUV.y;
+            result.albedo = lerp(float3(0.08, 0.18, 0.03), float3(0.15, 0.35, 0.06), height_t);
+        }
         return result;
     }
 
@@ -210,9 +216,21 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         ray.TMin = 0.001;
         ray.TMax = 10000.0;
 
-        RayQuery<RAY_FLAG_FORCE_OPAQUE | RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES> q;
+        RayQuery<RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES> q;
         q.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, 0xFF, ray);
-        q.Proceed();
+        while (q.Proceed()) {
+            if (q.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE) {
+                uint candBatch = q.CandidateInstanceID() + q.CandidateGeometryIndex();
+                if (IsGrassBatch(candBatch) && g_DetailAtlasIndex > 0) {
+                    RTBatchInfo candInfo = g_BatchInfo[candBatch];
+                    float2 candUV = GetSkinnedHitUV(g_GrassVB, g_GrassIB, candInfo,
+                        q.CandidatePrimitiveIndex(), q.CandidateTriangleBarycentrics());
+                    float4 texel = GetBindlessTexture(g_DetailAtlasIndex).SampleLevel(g_LinearSampler, candUV, 0);
+                    if (texel.a >= 0.3)
+                        q.CommitNonOpaqueTriangleHit();
+                }
+            }
+        }
 
         if (q.CommittedStatus() != COMMITTED_TRIANGLE_HIT) {
             radiance += throughput * SampleSky(direction);
@@ -263,9 +281,21 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
                 shadowRay.TMin = 0.001;
                 shadowRay.TMax = 10000.0;
 
-                RayQuery<RAY_FLAG_FORCE_OPAQUE | RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES> shadowQ;
+                RayQuery<RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES> shadowQ;
                 shadowQ.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, 0xFF, shadowRay);
-                shadowQ.Proceed();
+                while (shadowQ.Proceed()) {
+                    if (shadowQ.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE) {
+                        uint candBatch = shadowQ.CandidateInstanceID() + shadowQ.CandidateGeometryIndex();
+                        if (IsGrassBatch(candBatch) && g_DetailAtlasIndex > 0) {
+                            RTBatchInfo candInfo = g_BatchInfo[candBatch];
+                            float2 candUV = GetSkinnedHitUV(g_GrassVB, g_GrassIB, candInfo,
+                                shadowQ.CandidatePrimitiveIndex(), shadowQ.CandidateTriangleBarycentrics());
+                            float4 texel = GetBindlessTexture(g_DetailAtlasIndex).SampleLevel(g_LinearSampler, candUV, 0);
+                            if (texel.a >= 0.3)
+                                shadowQ.CommitNonOpaqueTriangleHit();
+                        }
+                    }
+                }
 
                 if (shadowQ.CommittedStatus() != COMMITTED_TRIANGLE_HIT)
                     break;
@@ -274,6 +304,10 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
                 RTBatchInfo sInfo = g_BatchInfo[sBatchIdx];
 
                 if (IsGrassBatch(sBatchIdx)) {
+                    if (g_DetailAtlasIndex > 0) {
+                        shadowAtten = 0.0;
+                        break;
+                    }
                     shadowAtten *= 0.5;
                     shadowOrigin = shadowOrigin + sunDir * (shadowQ.CommittedRayT() + 0.002);
                     continue;

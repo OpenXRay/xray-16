@@ -66,6 +66,7 @@ public:
     nvrhi::IBuffer* GetGrassIB() const { return m_grassIB.Get(); }
     u32 GetBatchCount() const { return m_batchCount; }
     const RTBatchCounts& GetBatchCounts() const { return m_batchCounts; }
+    u32 GetDetailAtlasIndex() const { return m_detailAtlasIndex; }
 
     void SetMaterialBuffer(nvrhi::IBuffer* buf) { m_materialBuffer = buf; }
     void SetTerrainMaterialBuffer(nvrhi::IBuffer* buf) { m_terrainMaterialBuffer = buf; }
@@ -147,6 +148,8 @@ private:
     u32 m_grassTotalVerts = 0;
     u32 m_grassTotalIndices = 0;
     bool m_grassReady = false;
+    bool m_grassBillboardMode = false;
+    u32 m_detailAtlasIndex = 0;
 
     static nvrhi::ComputePipelineHandle s_skinPipeline;
     static nvrhi::BindingLayoutHandle s_skinLayout;
