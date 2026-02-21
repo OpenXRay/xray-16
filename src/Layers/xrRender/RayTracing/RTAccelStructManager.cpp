@@ -399,11 +399,14 @@ void RTAccelStructManager::BuildTLAS(nvrhi::ICommandList* cmdList)
 
     u32 grassBatchOffset = skinnedBatchOffset + skinnedCount;
     if (m_grassBlas && grassCount > 0) {
+        auto grassInstFlags = m_grassBillboardMode
+            ? nvrhi::rt::InstanceFlags::TriangleCullDisable
+            : nvrhi::rt::InstanceFlags::ForceOpaque;
         nvrhi::rt::InstanceDesc inst;
         inst.setTransform(nvrhi::rt::c_IdentityTransform)
             .setInstanceID(grassBatchOffset)
             .setInstanceMask(0x01)
-            .setFlags(nvrhi::rt::InstanceFlags::ForceOpaque)
+            .setFlags(grassInstFlags)
             .setBLAS(m_grassBlas);
         instances.push_back(inst);
     }
@@ -739,6 +742,8 @@ void RTAccelStructManager::InvalidateGrass()
     m_grassTotalIndices = 0;
     m_batchCounts.grass = 0;
     m_grassReady = false;
+    m_grassBillboardMode = false;
+    m_detailAtlasIndex = 0;
 }
 
 void RTAccelStructManager::RebuildDynamic(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling)
@@ -1047,8 +1052,9 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
        .setVertexOffset(0)
        .setVertexCount(totalVerts);
 
+    auto geomFlags = billboardMode ? nvrhi::rt::GeometryFlags::None : nvrhi::rt::GeometryFlags::Opaque;
     nvrhi::rt::GeometryDesc geom;
-    geom.setTriangles(tri).setFlags(nvrhi::rt::GeometryFlags::Opaque);
+    geom.setTriangles(tri).setFlags(geomFlags);
     blasDesc.addBottomLevelGeometry(geom);
 
     if (!m_grassBlas || m_grassTotalVerts != totalVerts || m_grassTotalIndices != totalIndices)
@@ -1061,6 +1067,8 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
     m_grassTotalIndices = totalIndices;
     m_batchCounts.grass = 1;
     m_grassReady = true;
+    m_grassBillboardMode = billboardMode;
+    m_detailAtlasIndex = billboardMode ? detailMgr->buildDetailsBindlessIndex : 0;
 }
 
 }

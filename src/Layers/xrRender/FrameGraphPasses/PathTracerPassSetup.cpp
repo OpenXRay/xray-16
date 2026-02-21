@@ -46,7 +46,8 @@ struct PathTracerCB {
     u32 transparentBatchCount;
     u32 skinnedBatchStart;
     u32 grassBatchStart;
-    u32 pad[3];
+    u32 detailAtlasIndex;
+    u32 pad[2];
 };
 static_assert(sizeof(PathTracerCB) == 160, "PathTracerCB must be 160 bytes");
 
@@ -288,9 +289,9 @@ PathTracerOutput setupPathTracerPass(
     else
         cbData.grassBatchStart = 0;
 
+    cbData.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
     cbData.pad[0] = 0;
     cbData.pad[1] = 0;
-    cbData.pad[2] = 0;
 
     auto& passData = fg.addCallbackPass<PathTracerData>(
         "Path Tracer",
