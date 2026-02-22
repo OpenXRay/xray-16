@@ -184,6 +184,7 @@ f_forward output_forward_color(float3 albedo, float3 normal, float metallic, flo
 	f_forward res;
 	res.color = float4(albedo, 1.0);
 	res.normal = float4(worldNormalToView(normalize(normal)), roughness);
+	res.baseColor = float4(albedo, metallic);
 	return res;
 }
 
@@ -218,6 +219,7 @@ f_forward output_forward_pbr(
 
 	res.color = float4(finalColor, 1.0);
 	res.normal = float4(worldNormalToView(N), roughness);
+	res.baseColor = float4(albedo, metallic);
 	return res;
 }
 

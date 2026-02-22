@@ -16,7 +16,7 @@ namespace xray::render::framegraph {
 struct DefaultOutputLayout {
     VirtualResourceHandle albedo;
     VirtualResourceHandle normal;
-    VirtualResourceHandle material;
+    VirtualResourceHandle baseColor;
     VirtualResourceHandle depth;
     VirtualResourceHandle distortion;
 };

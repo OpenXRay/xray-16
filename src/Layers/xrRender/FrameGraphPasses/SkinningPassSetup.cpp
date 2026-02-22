@@ -403,10 +403,13 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
+            if (inputs.baseColor.is_valid())
+                data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
             data.depth = passBuilder.readWrite(inputs.depth, ResourceState::DepthStencilWrite);
 
             data.outputs.albedo = data.color;
             data.outputs.normal = data.normal;
+            data.outputs.baseColor = data.baseColor;
             data.outputs.depth = data.depth;
         },
 
@@ -432,6 +435,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
+            auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             if (!colorRT || !depthRT)
                 return;
@@ -445,6 +449,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             fbDesc.addColorAttachment(colorRT);
             if (normalRT)
                 fbDesc.addColorAttachment(normalRT);
+            if (baseColorRT)
+                fbDesc.addColorAttachment(baseColorRT);
             fbDesc.setDepthAttachment(depthRT);
             auto framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer("SkinningPass", fbDesc, nvDevice);
             if (!framebuffer)

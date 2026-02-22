@@ -49,6 +49,7 @@ struct TransparentPassData {
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
+    framegraph::VirtualResourceHandle baseColor;
     ng::RenderDevice* device;
     TransparentPassConfig config;
     TransparentPassState* passState;
