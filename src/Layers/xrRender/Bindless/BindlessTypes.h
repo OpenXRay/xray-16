@@ -46,6 +46,7 @@ enum MaterialFlags : u32 {
     MAT_FLAG_TERRAIN       = (1 << 6),
     MAT_FLAG_HAS_PBR_LAYER = (1 << 7),
     MAT_FLAG_ALPHA_BLEND   = (1 << 8),
+    MAT_FLAG_WATER         = (1 << 9),
 };
 
 constexpr u32 MAX_TERRAIN_MATERIALS = 512 * 4;

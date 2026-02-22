@@ -31,6 +31,7 @@ struct MaterialData
 #define MAT_FLAG_TERRAIN       (1 << 6)
 #define MAT_FLAG_HAS_PBR_LAYER (1 << 7)
 #define MAT_FLAG_ALPHA_BLEND   (1 << 8)
+#define MAT_FLAG_WATER         (1 << 9)
 
 struct TerrainMaterialData
 {

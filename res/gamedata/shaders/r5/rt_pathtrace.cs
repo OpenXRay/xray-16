@@ -255,6 +255,25 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
         HitMaterial hitMat = GetHitMaterial(info, hit.uv, batchIdx);
 
+        if (hitMat.flags & MAT_FLAG_WATER) {
+            float3 hitPos = origin + direction * hitT;
+            float3 faceN = dot(direction, geoN) < 0 ? hitN : -hitN;
+
+            float cosI = saturate(dot(-direction, faceN));
+            float fresnel = 0.02 + 0.98 * pow(1.0 - cosI, 5.0);
+
+            if (rand_float(rng) < fresnel) {
+                origin = hitPos + faceN * 0.005;
+                direction = reflect(direction, faceN);
+            } else {
+                static const float3 WATER_TINT = float3(0.7, 0.85, 0.8);
+                throughput *= WATER_TINT;
+                origin = hitPos - faceN * 0.005;
+            }
+            bounce--;
+            continue;
+        }
+
         if ((hitMat.flags & MAT_FLAG_ALPHA_TEST) && hitMat.alpha < hitMat.alphaRef) {
             origin = origin + direction * hitT + direction * 0.002;
             bounce--;
@@ -313,6 +332,14 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
                     continue;
                 }
 
+                MaterialData sMat = g_Materials[sInfo.materialID];
+
+                if (sMat.flags & MAT_FLAG_WATER) {
+                    shadowAtten *= 0.85;
+                    shadowOrigin = shadowOrigin + sunDir * (shadowQ.CommittedRayT() + 0.002);
+                    continue;
+                }
+
                 float2 sUV;
                 if (IsSkinnedBatch(sBatchIdx))
                     sUV = GetSkinnedHitUV(g_SkinnedVB, g_SkinnedIB, sInfo, shadowQ.CommittedPrimitiveIndex(), shadowQ.CommittedTriangleBarycentrics());
@@ -329,7 +356,6 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
                     break;
                 }
 
-                MaterialData sMat = g_Materials[sInfo.materialID];
                 float4 sDiffuse = SampleDiffuseLevel(sMat, sUV);
 
                 if ((sMat.flags & MAT_FLAG_ALPHA_TEST) && sDiffuse.a < sMat.alphaRef) {
