@@ -39,6 +39,7 @@ struct DetailPassData {
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle outputNormal;
+    framegraph::VirtualResourceHandle baseColor;
     ng::RenderDevice* device;
     RENDER_NAMESPACE::FGDetailManager* detailManager;
     framegraph::DefaultOutputLayout outputs;

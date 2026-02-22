@@ -134,6 +134,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
+            data.baseColor = inputs.baseColor;
         },
 
         [](const TransparentPassData& data,
@@ -252,6 +253,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     DefaultOutputLayout outputs;
     outputs.albedo = passData.color;
     outputs.normal = passData.normal;
+    outputs.baseColor = passData.baseColor;
     outputs.depth = passData.depth;
     return outputs;
 }

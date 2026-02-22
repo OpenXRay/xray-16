@@ -125,6 +125,7 @@ static void renderBindlessForward(
     const GeometryCollector* geometry,
     nvrhi::ITexture* colorRT,
     nvrhi::ITexture* normalRT,
+    nvrhi::ITexture* baseColorRT,
     nvrhi::ITexture* depthRT,
     const BindlessForwardConfig& config,
     MaterialCache* materialCache,
@@ -157,6 +158,8 @@ static void renderBindlessForward(
     fbDesc.addColorAttachment(colorRT);
     if (normalRT)
         fbDesc.addColorAttachment(normalRT);
+    if (baseColorRT)
+        fbDesc.addColorAttachment(baseColorRT);
     fbDesc.setDepthAttachment(depthRT);
     auto& cache = framegraph::GetPassResourceCache();
     auto framebuffer = cache.GetOrCreateFramebuffer("ForwardColor", fbDesc, nvDevice);
@@ -422,6 +425,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::VirtualResourceHandle depthInput,
     framegraph::VirtualResourceHandle colorInput,
     framegraph::VirtualResourceHandle normalInput,
+    framegraph::VirtualResourceHandle baseColorInput,
     const GeometryCollector* geometry,
     MaterialCache* materialCache,
     u32 width,
@@ -438,7 +442,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA (Declares resource usage)
         // ═══════════════════════════════════════════════════════
-        [&, width, height, colorInput, normalInput, drawArgsInput, bindlessConfig, state](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
+        [&, width, height, colorInput, normalInput, baseColorInput, drawArgsInput, bindlessConfig, state](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -452,6 +456,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
             data.color = passBuilder.readWrite(colorInput, ResourceState::RenderTarget);
             data.normal = passBuilder.write(normalInput, ResourceState::RenderTarget);
+            if (baseColorInput.is_valid())
+                data.baseColor = passBuilder.write(baseColorInput, ResourceState::RenderTarget);
 
             if (drawArgsInput.is_valid()) {
                 data.drawArgsBuffer = passBuilder.read(drawArgsInput, ResourceState::IndirectArgument);
@@ -459,6 +465,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
 
             data.outputs.albedo = data.color;
             data.outputs.normal = data.normal;
+            data.outputs.baseColor = data.baseColor;
             data.outputs.depth = data.depth;
         },
 
@@ -472,6 +479,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
+            auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
 
             if (!depthRT || !colorRT)
                 return;
@@ -481,6 +489,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 1.0f, false, 0);
                 if (normalRT)
                     cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
+                if (baseColorRT)
+                    cmdList->clearTextureFloat(baseColorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
             }
 
             // Check if we have geometry to render
@@ -505,6 +515,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 data.geometry,
                 colorRT,
                 normalRT,
+                baseColorRT,
                 depthRT,
                 data.bindlessConfig,
                 data.materialCache,
@@ -516,6 +527,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     DefaultOutputLayout outputs;
     outputs.albedo = passData.color;
     outputs.normal = passData.normal;
+    outputs.baseColor = passData.baseColor;
     outputs.depth = passData.depth;
     return outputs;
 }

@@ -11,6 +11,7 @@
 #include "ParticlePassSetup.h"
 #include "ForwardColorPassSetup.h"
 #include "SkinningPassSetup.h"
+#include "MotionVectorPassSetup.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -26,6 +27,7 @@ struct PassStates {
     ParticlePassState particle;
     ForwardColorPassState forwardColor;
     SkinningPassState skinning;
+    MotionVectorPassState motionVector;
 };
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

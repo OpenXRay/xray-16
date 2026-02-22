@@ -70,9 +70,12 @@ DefaultOutputLayout setupDetailPass(
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
             data.outputColor = passBuilder.write(forwardInputs.albedo);
             data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
+            if (forwardInputs.baseColor.is_valid())
+                data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = data.outputNormal;
+            data.outputs.baseColor = data.baseColor;
             data.outputs.depth = data.depth;
         },
         [](const DetailPassData& data, const FrameGraph& fg, ng::RenderContext* ctx)
@@ -113,11 +116,14 @@ DefaultOutputLayout setupDetailPass(
             }
 
             nvrhi::ITexture* normalTexture = fg.GetPhysicalTexture(data.outputNormal);
+            auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorTexture);
             if (normalTexture)
                 fbDesc.addColorAttachment(normalTexture);
+            if (baseColorRT)
+                fbDesc.addColorAttachment(baseColorRT);
             fbDesc.setDepthAttachment(depthTexture);
 
             nvrhi::FramebufferHandle framebuffer = data.device->GetNVRHIDevice()->createFramebuffer(fbDesc);
@@ -322,6 +328,7 @@ DefaultOutputLayout setupDetailPass(
     DefaultOutputLayout outputs;
     outputs.albedo = passData.outputColor;
     outputs.normal = passData.outputNormal;
+    outputs.baseColor = passData.baseColor;
     outputs.depth = passData.depth;
     return outputs;
 }

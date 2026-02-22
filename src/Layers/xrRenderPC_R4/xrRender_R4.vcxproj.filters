@@ -828,6 +828,9 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\PathTracerPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\MotionVectorPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\RayTracing\RTAccelStructManager.h">
       <Filter>Framegraph\RayTracing</Filter>
     </ClInclude>
@@ -1657,6 +1660,9 @@
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\PathTracerPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\MotionVectorPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\RayTracing\RTAccelStructManager.cpp">

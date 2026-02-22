@@ -129,6 +129,7 @@ struct ForwardColorPassData {
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
+    framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle drawArgsBuffer;
     ng::RenderDevice* device;
     const GeometryCollector* geometry;
@@ -151,6 +152,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::VirtualResourceHandle depthInput,
     framegraph::VirtualResourceHandle colorInput,
     framegraph::VirtualResourceHandle normalInput,
+    framegraph::VirtualResourceHandle baseColorInput,
     const GeometryCollector* geometry,
     MaterialCache* materialCache,
     u32 width,

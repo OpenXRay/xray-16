@@ -21,10 +21,10 @@ namespace xray::render::framegraph {
 // Future: Add LightingOutputLayout, PostProcessOutputLayout, etc.
 
 struct DefaultOutputLayout {
-    VirtualResourceHandle albedo;      // RT0: Albedo.rgb + Metallic.a
-    VirtualResourceHandle normal;      // RT1: Normal.xyz + Roughness.a
-    VirtualResourceHandle material;    // RT2: Material ID
-    VirtualResourceHandle depth;       // Depth/Stencil
+    VirtualResourceHandle albedo;      // RT0: Lit HDR color (RGBA16_FLOAT)
+    VirtualResourceHandle normal;      // RT1: World normal.xyz + Roughness.a (RGBA16_FLOAT)
+    VirtualResourceHandle baseColor;   // RT2: Unlit diffuse albedo.rgb + Metallic.a (RGBA8_UNORM)
+    VirtualResourceHandle depth;       // Depth/Stencil (D32)
     VirtualResourceHandle distortion;  // Distortion buffer (RG = UV offset, A = intensity)
 };
 

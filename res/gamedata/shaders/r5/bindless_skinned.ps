@@ -22,6 +22,7 @@ struct PS_OUTPUT
 {
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
+    float4 baseColor : SV_Target2;
 };
 
 cbuffer SkinnedMaterialCB : register(b4)
@@ -89,5 +90,6 @@ PS_OUTPUT main(PS_INPUT input)
     f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao);
     output.color = float4(fwd.color.rgb, diffuseSample.a);
     output.normal = fwd.normal;
+    output.baseColor = fwd.baseColor;
     return output;
 }

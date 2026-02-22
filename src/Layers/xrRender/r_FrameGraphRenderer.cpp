@@ -816,6 +816,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     normalDesc.isTransient = true;
     framegraph::VirtualResourceHandle normalBuffer = m_framegraph->CreateTexture("rt_Normal", normalDesc);
 
+    framegraph::ResourceDesc baseColorDesc;
+    baseColorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    baseColorDesc.debugName = "rt_BaseColor";
+    baseColorDesc.width = width;
+    baseColorDesc.height = height;
+    baseColorDesc.format = nvrhi::Format::RGBA8_UNORM;
+    baseColorDesc.isRenderTarget = true;
+    baseColorDesc.isTransient = true;
+    framegraph::VirtualResourceHandle baseColorBuffer = m_framegraph->CreateTexture("rt_BaseColor", baseColorDesc);
+
     // ═══════════════════════════════════════════════════════
     //  TEMPORAL HI-Z PYRAMID BUILD (From Previous Frame)
     // ═══════════════════════════════════════════════════════
@@ -863,6 +873,22 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     m_hizPyramid = hizOutput.pyramid;
     if (m_hizPyramid.is_valid())
         m_framegraph->GetRTRegistry().RegisterRT("rt_HiZ", m_hizPyramid);
+
+    // Import previous frame normals for ReSTIR temporal validation
+    framegraph::VirtualResourceHandle prevNormalsHandle;
+    if (m_hasPrevFrameData && m_prevFrameNormals) {
+        framegraph::ResourceDesc prevNormalsDesc;
+        prevNormalsDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+        prevNormalsDesc.debugName = "rt_PrevNormals";
+        prevNormalsDesc.width = width;
+        prevNormalsDesc.height = height;
+        prevNormalsDesc.format = nvrhi::Format::RGBA16_FLOAT;
+        prevNormalsDesc.isRenderTarget = true;
+        prevNormalsDesc.isImported = true;
+        prevNormalsDesc.isTransient = false;
+        prevNormalsHandle = m_framegraph->ImportTexture("rt_PrevNormals", m_prevFrameNormals, prevNormalsDesc);
+        m_framegraph->GetRTRegistry().RegisterRT("rt_PrevNormals", prevNormalsHandle);
+    }
 
     // ═══════════════════════════════════════════════════════
     //  PHASE 3.5: GPU CULLING PASS (Frustum + Occlusion)
@@ -1073,6 +1099,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         depthBuffer,
         sunOutput,
         normalBuffer,
+        baseColorBuffer,
         m_geometryCollector.get(),
         m_materialCache.get(),
         width,
@@ -1214,6 +1241,20 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width, height,
         m_passStates->transparent
     );
+
+    // ═══════════════════════════════════════════════════════
+    //  MOTION VECTOR PASS (Depth-based reprojection)
+    // ═══════════════════════════════════════════════════════
+    passes::MotionVectorOutput motionOutput;
+    if (m_hasPrevFrameData) {
+        motionOutput = passes::setupMotionVectorPass(
+            *m_framegraph, m_device,
+            transparentOutputs.depth,
+            Device.mInvFullTransform, m_prevViewProj,
+            width, height,
+            m_passStates->motionVector
+        );
+    }
 
     // ═══════════════════════════════════════════════════════
     //  PATH TRACER (Reference / Ground-Truth Mode)
@@ -1387,7 +1428,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     m_framegraph->GetRTRegistry().RegisterRT("rt_SceneColor", skyColorHandle);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Normal", transparentOutputs.normal);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_BaseColor", baseColorBuffer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Exposure", exposureOutput.exposureTexture);
+    if (motionOutput.motionVectors.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_MotionVectors", motionOutput.motionVectors);
 
     if (m_statsOverlay && psDeviceFlags.test(rsStatistic) && m_inspectorPreview)
     {
@@ -1577,6 +1621,52 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 [finalDepth, prevDepthCopyDest](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
                     nvrhi::ITexture* src = fg.GetPhysicalTexture(finalDepth);
                     nvrhi::ITexture* dst = fg.GetPhysicalTexture(prevDepthCopyDest);
+                    if (src && dst)
+                        ctx.GetCommandList()->copyTexture(dst, nvrhi::TextureSlice(), src, nvrhi::TextureSlice());
+                }
+            );
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  NORMAL COPY PASS (Save normals for next frame's ReSTIR temporal resampling)
+    // ═══════════════════════════════════════════════════════
+    {
+        nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+
+        if (!m_prevFrameNormals || m_prevFrameWidth != width || m_prevFrameHeight != height) {
+            nvrhi::TextureDesc desc;
+            desc.width = width;
+            desc.height = height;
+            desc.format = nvrhi::Format::RGBA16_FLOAT;
+            desc.isShaderResource = true;
+            desc.debugName = "PrevFrameNormals";
+            desc.initialState = nvrhi::ResourceStates::ShaderResource;
+            desc.keepInitialState = true;
+            m_prevFrameNormals = nvDevice->createTexture(desc);
+        }
+
+        if (m_prevFrameNormals) {
+            framegraph::ResourceDesc importDesc;
+            importDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+            importDesc.debugName = "rt_PrevNormalsCopyDest";
+            importDesc.width = width;
+            importDesc.height = height;
+            importDesc.format = nvrhi::Format::RGBA16_FLOAT;
+            importDesc.isRenderTarget = true;
+            importDesc.isImported = true;
+            importDesc.isTransient = false;
+
+            auto prevNormalsCopyDest = m_framegraph->ImportTexture("rt_PrevNormalsCopyDest", m_prevFrameNormals, importDesc);
+
+            auto finalNormals = transparentOutputs.normal;
+            framegraph::PassHandle normalsCopyPass = m_framegraph->AddPass("NormalsCopy");
+            m_framegraph->PassRead(normalsCopyPass, finalNormals, framegraph::ResourceState::CopySource);
+            m_framegraph->PassWrite(normalsCopyPass, prevNormalsCopyDest, framegraph::ResourceState::CopyDest);
+            m_framegraph->SetPassCallback(normalsCopyPass,
+                [finalNormals, prevNormalsCopyDest](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
+                    nvrhi::ITexture* src = fg.GetPhysicalTexture(finalNormals);
+                    nvrhi::ITexture* dst = fg.GetPhysicalTexture(prevNormalsCopyDest);
                     if (src && dst)
                         ctx.GetCommandList()->copyTexture(dst, nvrhi::TextureSlice(), src, nvrhi::TextureSlice());
                 }
