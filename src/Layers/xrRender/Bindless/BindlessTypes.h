@@ -72,6 +72,7 @@ enum MaterialFlags : u32 {
     MAT_FLAG_TERRAIN       = (1 << 6),  // Terrain 4-layer blending material
     MAT_FLAG_HAS_PBR_LAYER = (1 << 7),  // Terrain has PBR detail textures
     MAT_FLAG_ALPHA_BLEND   = (1 << 8),  // Transparent alpha blending
+    MAT_FLAG_WATER         = (1 << 9),  // Water surface (Fresnel reflect/refract)
 };
 
 // ═══════════════════════════════════════════════════════
