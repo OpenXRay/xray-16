@@ -160,21 +160,20 @@ static void InitializeResources(ng::RenderDevice* device, ReSTIRGIPassState& sta
         nvrhi::BindingLayoutDesc desc;
         desc.visibility = nvrhi::ShaderType::Compute;
         desc.bindings = {
-            nvrhi::BindingLayoutItem::Texture_SRV(0),
-            nvrhi::BindingLayoutItem::Texture_SRV(1),
-            nvrhi::BindingLayoutItem::Texture_SRV(2),
-            nvrhi::BindingLayoutItem::Texture_SRV(3),
-            nvrhi::BindingLayoutItem::Texture_SRV(4),
-            nvrhi::BindingLayoutItem::Texture_SRV(5),
-            nvrhi::BindingLayoutItem::Texture_SRV(6),
-            nvrhi::BindingLayoutItem::Texture_SRV(7),
-            nvrhi::BindingLayoutItem::Texture_SRV(8),
-            nvrhi::BindingLayoutItem::Texture_SRV(9),
-            nvrhi::BindingLayoutItem::Texture_UAV(0),
-            nvrhi::BindingLayoutItem::Texture_UAV(1),
+            nvrhi::BindingLayoutItem::Texture_SRV(0),  // PrevReservoirA
+            nvrhi::BindingLayoutItem::Texture_SRV(1),  // PrevReservoirB
+            nvrhi::BindingLayoutItem::Texture_SRV(2),  // MotionVectors
+            nvrhi::BindingLayoutItem::Texture_SRV(3),  // Depth (current)
+            nvrhi::BindingLayoutItem::Texture_SRV(4),  // Normal (current)
+            nvrhi::BindingLayoutItem::Texture_SRV(5),  // PrevNormal (previous frame)
+            nvrhi::BindingLayoutItem::Texture_SRV(6),  // BaseColor (current)
+            nvrhi::BindingLayoutItem::Texture_SRV(7),  // WorldPos (current)
+            nvrhi::BindingLayoutItem::Texture_SRV(8),  // PrevWorldPos (previous frame)
+            nvrhi::BindingLayoutItem::Texture_UAV(0),   // ReservoirA out
+            nvrhi::BindingLayoutItem::Texture_UAV(1),   // ReservoirB out
             nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
         };
-        state.temporalLayout = cache.GetOrCreateBindingLayout("RTGI_Temporal_v3", desc, nvDevice);
+        state.temporalLayout = cache.GetOrCreateBindingLayout("RTGI_Temporal_v4", desc, nvDevice);
 
         ref_cs shader;
         shader.create("restir_gi_temporal");
@@ -292,6 +291,7 @@ struct TemporalPassData {
     ReSTIRGIPassState* state;
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
+    VirtualResourceHandle prevNormals;
     VirtualResourceHandle baseColor;
     VirtualResourceHandle worldPos;
     VirtualResourceHandle prevWorldPos;
@@ -324,6 +324,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
     VirtualResourceHandle normal,
     VirtualResourceHandle baseColor,
     VirtualResourceHandle worldPos,
+    VirtualResourceHandle prevNormals,
     VirtualResourceHandle prevWorldPos,
     VirtualResourceHandle motionVectors,
     VirtualResourceHandle sceneColorIn,
@@ -582,6 +583,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 RenderPassBuilder pb(builder, passHandle);
                 data.depth = pb.read(depth, ResourceState::ShaderResource);
                 data.normal = pb.read(normal, ResourceState::ShaderResource);
+                if (prevNormals.is_valid())
+                    data.prevNormals = pb.read(prevNormals, ResourceState::ShaderResource);
                 data.baseColor = pb.read(baseColor, ResourceState::ShaderResource);
                 data.worldPos = pb.read(worldPos, ResourceState::ShaderResource);
                 if (prevWorldPos.is_valid())
@@ -601,6 +604,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
             [](const TemporalPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
                 auto* depthTex = fg.GetPhysicalTexture(data.depth);
                 auto* normalTex = fg.GetPhysicalTexture(data.normal);
+                auto* prevNormalsTex = data.prevNormals.is_valid() ? fg.GetPhysicalTexture(data.prevNormals) : normalTex;
                 auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
                 auto* worldPosTex = fg.GetPhysicalTexture(data.worldPos);
                 auto* prevWorldPosTex = data.prevWorldPos.is_valid() ? fg.GetPhysicalTexture(data.prevWorldPos) : worldPosTex;
@@ -619,11 +623,10 @@ ReSTIRGIOutput setupReSTIRGIPass(
                     nvrhi::BindingSetItem::Texture_SRV(2, mvTex),
                     nvrhi::BindingSetItem::Texture_SRV(3, depthTex),
                     nvrhi::BindingSetItem::Texture_SRV(4, normalTex),
-                    nvrhi::BindingSetItem::Texture_SRV(5, depthTex),
-                    nvrhi::BindingSetItem::Texture_SRV(6, normalTex),
-                    nvrhi::BindingSetItem::Texture_SRV(7, baseColorTex),
-                    nvrhi::BindingSetItem::Texture_SRV(8, worldPosTex),
-                    nvrhi::BindingSetItem::Texture_SRV(9, prevWorldPosTex),
+                    nvrhi::BindingSetItem::Texture_SRV(5, prevNormalsTex),
+                    nvrhi::BindingSetItem::Texture_SRV(6, baseColorTex),
+                    nvrhi::BindingSetItem::Texture_SRV(7, worldPosTex),
+                    nvrhi::BindingSetItem::Texture_SRV(8, prevWorldPosTex),
                     nvrhi::BindingSetItem::Texture_UAV(0, data.state->reservoirA[data.writeIdx]),
                     nvrhi::BindingSetItem::Texture_UAV(1, data.state->reservoirB[data.writeIdx]),
                     nvrhi::BindingSetItem::ConstantBuffer(5, data.state->cb),

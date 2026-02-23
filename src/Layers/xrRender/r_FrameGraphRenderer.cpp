@@ -1295,7 +1295,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             *m_framegraph, m_device, m_rtAccelMgr.get(),
             transparentOutputs.depth, transparentOutputs.normal,
             transparentOutputs.baseColor, transparentOutputs.worldPos,
-            prevWorldPosHandle,
+            prevNormalsHandle, prevWorldPosHandle,
             motionOutput.motionVectors,
             sceneColor,
             Device.mInvFullTransform, m_prevViewProj,

@@ -17,11 +17,10 @@ Texture2D<float4> t_PrevReservoirB : register(t1);
 Texture2D<float2> t_MotionVectors : register(t2);
 Texture2D<float> t_Depth : register(t3);
 Texture2D<float4> t_Normal : register(t4);
-Texture2D<float> t_PrevDepth : register(t5);
-Texture2D<float4> t_PrevNormal : register(t6);
-Texture2D<float4> t_BaseColor : register(t7);
-Texture2D<float4> t_WorldPos : register(t8);
-Texture2D<float4> t_PrevWorldPos : register(t9);
+Texture2D<float4> t_PrevNormal : register(t5);
+Texture2D<float4> t_BaseColor : register(t6);
+Texture2D<float4> t_WorldPos : register(t7);
+Texture2D<float4> t_PrevWorldPos : register(t8);
 
 RWTexture2D<float4> u_ReservoirA : register(u0);
 RWTexture2D<float4> u_ReservoirB : register(u1);
@@ -48,7 +47,6 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float3 worldPos = t_WorldPos.Load(int3(pixel, 0)).xyz;
     float4 normalData = t_Normal.Load(int3(pixel, 0));
     float3 N = normalize(normalData.xyz);
-    float roughness = normalData.w;
     float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
     float3 albedo = baseColorData.rgb;
     float metallic = baseColorData.a;
@@ -80,15 +78,14 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     if (all(prevUV >= 0) && all(prevUV < 1.0)) {
         int2 prevPixel = int2(prevUV * g_ScreenSize);
-
-        float4 prevNormalData = t_PrevNormal.Load(int3(prevPixel, 0));
-        float3 prevN = normalize(prevNormalData.xyz);
         float3 prevWorldPos = t_PrevWorldPos.Load(int3(prevPixel, 0)).xyz;
+        float3 prevN = normalize(t_PrevNormal.Load(int3(prevPixel, 0)).xyz);
 
-        float currLinearDepth = length(worldPos - g_CameraPos.xyz);
-        float prevLinearDepth = length(prevWorldPos - g_CameraPos.xyz);
+        float viewDist = length(worldPos - g_CameraPos.xyz);
+        float posDist = length(worldPos - prevWorldPos);
+        bool valid = posDist < 0.1 * viewDist && dot(N, prevN) > 0.906;
 
-        if (ValidateTemporalNeighbor(currLinearDepth, N, prevLinearDepth, prevN)) {
+        if (valid) {
             GIReservoir prevRes = UnpackReservoir(
                 t_PrevReservoirA.Load(int3(prevPixel, 0)),
                 t_PrevReservoirB.Load(int3(prevPixel, 0))
@@ -106,15 +103,14 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
                     uint clampedM = min(prevRes.M, RESTIR_M_MAX);
                     float w_prev = targetLum_prev * prevRes.W * clampedM;
 
-                    if (ReservoirUpdate(output, w_prev, prevRes.samplePos, prevRes.sampleNormal, prevRes.Lo, rng)) {
-                    }
+                    ReservoirUpdate(output, w_prev, prevRes.samplePos, prevRes.sampleNormal, prevRes.Lo, rng);
                     output.M += clampedM - 1;
                 }
             }
         }
     }
 
-    float outTargetLum = Luminance(target_curr);
+    float outTargetLum = targetLum_curr;
     if (output.samplePos.x != currRes.samplePos.x || output.samplePos.y != currRes.samplePos.y) {
         float3 wi_out = normalize(output.samplePos - worldPos);
         float cosTheta_out = max(dot(N, wi_out), 0);
