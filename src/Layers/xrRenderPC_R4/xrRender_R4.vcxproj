@@ -176,6 +176,7 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\PassStates.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\PathTracerPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\MotionVectorPassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\ReSTIRGIPassSetup.h" />
     <ClInclude Include="..\xrRender\RayTracing\RTAccelStructManager.h" />
     <ClInclude Include="..\xrRender\FGDetailManager.h" />
     <ClInclude Include="..\..\..\Externals\meshoptimizer\src\meshoptimizer.h" />
@@ -431,6 +432,7 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\PassCommon.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\PathTracerPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\MotionVectorPassSetup.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\ReSTIRGIPassSetup.cpp" />
     <ClCompile Include="..\xrRender\RayTracing\RTAccelStructManager.cpp" />
     <ClCompile Include="..\xrRender\FGDetailManager.cpp" />
     <ClCompile Include="..\xrRender\ImGuiRendererNVRHI.cpp" />
