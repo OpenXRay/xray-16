@@ -24,6 +24,7 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
     float4 baseColor : SV_Target2;
+    float4 worldPos : SV_Target3;
 };
 
 // Lighting uses static_globals from common.h (b2):
@@ -108,5 +109,6 @@ PS_OUTPUT main(PS_INPUT input)
     output.color = float4(fwd.color.rgb, diffuseSample.a);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
+    output.worldPos = fwd.worldPos;
     return output;
 }

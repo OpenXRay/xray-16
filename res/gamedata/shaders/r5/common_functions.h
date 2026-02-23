@@ -227,12 +227,13 @@ float3 worldNormalToView(float3 N)
 	return normalize(mul(float3x3(m_V[0].xyz, m_V[1].xyz, m_V[2].xyz), N));
 }
 
-f_forward output_forward_color(float3 albedo, float3 normal, float metallic, float roughness)
+f_forward output_forward_color(float3 albedo, float3 normal, float3 worldPos, float metallic, float roughness)
 {
 	f_forward res;
 	res.color = float4(albedo, 1.0);
-	res.normal = float4(worldNormalToView(normalize(normal)), roughness);
+	res.normal = float4(normalize(normal), roughness);
 	res.baseColor = float4(albedo, metallic);
+	res.worldPos = float4(worldPos, 1.0);
 	return res;
 }
 
@@ -266,8 +267,9 @@ f_forward output_forward_pbr(
 	float3 finalColor = sunLight + ambient;
 
 	res.color = float4(finalColor, 1.0);
-	res.normal = float4(worldNormalToView(N), roughness);
+	res.normal = float4(N, roughness);
 	res.baseColor = float4(albedo, metallic);
+	res.worldPos = float4(worldPos, 1.0);
 	return res;
 }
 

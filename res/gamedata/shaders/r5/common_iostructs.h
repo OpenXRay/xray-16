@@ -306,6 +306,7 @@ struct f_forward
     float4	color : SV_Target0;
     float4	normal : SV_Target1;
     float4	baseColor : SV_Target2;
+    float4	worldPos : SV_Target3;
 };
 
 struct					gbuffer_data

@@ -67,6 +67,7 @@ struct ParticlePassData {
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle outputNormal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle hiZPyramid;
     ng::RenderDevice* device;
     const xr_vector<ParticleBatch>* worldParticleBatches;

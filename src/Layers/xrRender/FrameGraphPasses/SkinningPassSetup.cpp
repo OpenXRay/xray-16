@@ -432,11 +432,14 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
             if (inputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
+            if (inputs.worldPos.is_valid())
+                data.worldPos = passBuilder.readWrite(inputs.worldPos, ResourceState::RenderTarget);
             data.depth = passBuilder.readWrite(inputs.depth, ResourceState::DepthStencilWrite);
 
             data.outputs.albedo = data.color;
             data.outputs.normal = data.normal;
             data.outputs.baseColor = data.baseColor;
+            data.outputs.worldPos = data.worldPos;
             data.outputs.depth = data.depth;
         },
 
@@ -469,6 +472,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
+            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             if (!colorRT || !depthRT)
                 return;
@@ -484,6 +488,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 fbDesc.addColorAttachment(normalRT);
             if (baseColorRT)
                 fbDesc.addColorAttachment(baseColorRT);
+            if (worldPosRT)
+                fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthRT);
             auto framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer("SkinningPass", fbDesc, nvDevice);
             if (!framebuffer)
@@ -659,6 +665,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     DefaultOutputLayout outputs;
     outputs.albedo = passData.color;
     outputs.normal = passData.normal;
+    outputs.worldPos = passData.worldPos;
     outputs.depth = passData.depth;
     return outputs;
 }

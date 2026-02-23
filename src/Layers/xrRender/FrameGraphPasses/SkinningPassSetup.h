@@ -75,6 +75,7 @@ struct SkinningPassData {
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle depth;
     ng::RenderDevice* device;
     const GeometryCollector* geometry;

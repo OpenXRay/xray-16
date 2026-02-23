@@ -826,6 +826,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     baseColorDesc.isTransient = true;
     framegraph::VirtualResourceHandle baseColorBuffer = m_framegraph->CreateTexture("rt_BaseColor", baseColorDesc);
 
+    framegraph::ResourceDesc worldPosDesc;
+    worldPosDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    worldPosDesc.debugName = "rt_WorldPos";
+    worldPosDesc.width = width;
+    worldPosDesc.height = height;
+    worldPosDesc.format = nvrhi::Format::RGBA32_FLOAT;
+    worldPosDesc.isRenderTarget = true;
+    worldPosDesc.isTransient = true;
+    framegraph::VirtualResourceHandle worldPosBuffer = m_framegraph->CreateTexture("rt_WorldPos", worldPosDesc);
+
     // ═══════════════════════════════════════════════════════
     //  TEMPORAL HI-Z PYRAMID BUILD (From Previous Frame)
     // ═══════════════════════════════════════════════════════
@@ -1100,6 +1110,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         sunOutput,
         normalBuffer,
         baseColorBuffer,
+        worldPosBuffer,
         m_geometryCollector.get(),
         m_materialCache.get(),
         width,
@@ -1257,29 +1268,41 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
     // ═══════════════════════════════════════════════════════
-    //  PATH TRACER (Reference / Ground-Truth Mode)
+    //  ReSTIR GI (RT Shadows + Indirect Lighting)
     // ═══════════════════════════════════════════════════════
     auto sceneColor = transparentOutputs.albedo;
 
+    extern ENGINE_API int ps_r_rt_gi;
+    extern ENGINE_API float ps_r_rt_gi_intensity;
+
+    if (ps_r_rt_gi && m_rtAccelMgr && m_rtAccelMgr->IsSupported() && m_rtAccelMgr->IsReady()) {
+        auto rtgiOutput = passes::setupReSTIRGIPass(
+            *m_framegraph, m_device, m_rtAccelMgr.get(),
+            transparentOutputs.depth, transparentOutputs.normal,
+            baseColorBuffer, transparentOutputs.worldPos,
+            motionOutput.motionVectors,
+            sceneColor,
+            Device.mInvFullTransform, m_prevViewProj,
+            Device.vCameraPosition, ps_r_rt_gi_intensity,
+            width, height,
+            m_passStates->restirGI, m_hasPrevFrameData
+        );
+        sceneColor = rtgiOutput.sceneColor;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  DYNAMIC BLAS BUILD (shared by Path Tracer + ReSTIR GI)
+    // ═══════════════════════════════════════════════════════
     extern ENGINE_API int ps_r_path_tracer;
     extern ENGINE_API int ps_r_path_tracer_bounces;
 
-    if (ps_r_path_tracer && m_rtAccelMgr && m_rtAccelMgr->IsSupported()) {
-        bool justEnabled = !m_ptWasEnabled;
-        m_ptWasEnabled = true;
+    bool needsRT = (ps_r_path_tracer || ps_r_rt_gi) && m_rtAccelMgr && m_rtAccelMgr->IsSupported();
 
-        bool posChanged = !Device.vCameraPosition.similar(m_ptPrevCameraPos, 0.01f);
-        bool dirChanged = !Device.vCameraDirection.similar(m_ptPrevCameraDir, 0.001f);
-        bool bouncesChanged = m_ptPrevBounces != ps_r_path_tracer_bounces;
+    if (needsRT && m_rtAccelMgr->IsReady()) {
+        bool ptNeedsBLAS = ps_r_path_tracer && m_ptSampleIndex == 0;
+        bool giNeedsBLAS = ps_r_rt_gi && !ps_r_path_tracer;
 
-        if (justEnabled || posChanged || dirChanged || bouncesChanged)
-            m_ptSampleIndex = 0;
-
-        m_ptPrevCameraPos = Device.vCameraPosition;
-        m_ptPrevCameraDir = Device.vCameraDirection;
-        m_ptPrevBounces = ps_r_path_tracer_bounces;
-
-        if (m_ptSampleIndex == 0 && m_rtAccelMgr->IsReady()) {
+        if (ptNeedsBLAS || giNeedsBLAS) {
             struct DynamicBLASData {
                 RTAccelStructManager* accelMgr;
                 GPUCullingManager* gpuCulling;
@@ -1337,6 +1360,25 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 }
             );
         }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  PATH TRACER (Reference / Ground-Truth Mode)
+    // ═══════════════════════════════════════════════════════
+    if (ps_r_path_tracer && m_rtAccelMgr && m_rtAccelMgr->IsSupported()) {
+        bool justEnabled = !m_ptWasEnabled;
+        m_ptWasEnabled = true;
+
+        bool posChanged = !Device.vCameraPosition.similar(m_ptPrevCameraPos, 0.01f);
+        bool dirChanged = !Device.vCameraDirection.similar(m_ptPrevCameraDir, 0.001f);
+        bool bouncesChanged = m_ptPrevBounces != ps_r_path_tracer_bounces;
+
+        if (justEnabled || posChanged || dirChanged || bouncesChanged)
+            m_ptSampleIndex = 0;
+
+        m_ptPrevCameraPos = Device.vCameraPosition;
+        m_ptPrevCameraDir = Device.vCameraDirection;
+        m_ptPrevBounces = ps_r_path_tracer_bounces;
 
         passes::PathTracerConfig ptConfig;
         ptConfig.maxBounces = static_cast<u32>(ps_r_path_tracer_bounces);
@@ -1429,9 +1471,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Normal", transparentOutputs.normal);
     m_framegraph->GetRTRegistry().RegisterRT("rt_BaseColor", baseColorBuffer);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_WorldPos", worldPosBuffer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Exposure", exposureOutput.exposureTexture);
     if (motionOutput.motionVectors.is_valid())
         m_framegraph->GetRTRegistry().RegisterRT("rt_MotionVectors", motionOutput.motionVectors);
+    if (ps_r_rt_gi)
+        m_framegraph->GetRTRegistry().RegisterRT("rt_RTGI_SceneColor", sceneColor);
 
     if (m_statsOverlay && psDeviceFlags.test(rsStatistic) && m_inspectorPreview)
     {

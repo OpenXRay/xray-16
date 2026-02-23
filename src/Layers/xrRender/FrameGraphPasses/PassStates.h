@@ -12,6 +12,7 @@
 #include "ForwardColorPassSetup.h"
 #include "SkinningPassSetup.h"
 #include "MotionVectorPassSetup.h"
+#include "ReSTIRGIPassSetup.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -28,6 +29,7 @@ struct PassStates {
     ForwardColorPassState forwardColor;
     SkinningPassState skinning;
     MotionVectorPassState motionVector;
+    ReSTIRGIPassState restirGI;
 };
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

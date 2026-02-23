@@ -33,6 +33,8 @@ extern ENGINE_API int ps_r4_use_pbr;
 extern ENGINE_API int ps_fg_pbr_diffuse_mode;
 extern ENGINE_API int ps_r_path_tracer;
 extern ENGINE_API int ps_r_path_tracer_bounces;
+extern ENGINE_API int ps_r_rt_gi;
+extern ENGINE_API float ps_r_rt_gi_intensity;
 
 class ENGINE_API IConsole_Command
 {

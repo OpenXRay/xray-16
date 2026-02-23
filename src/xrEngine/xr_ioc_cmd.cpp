@@ -26,6 +26,8 @@ ENGINE_API int ps_r4_use_pbr = 0;
 ENGINE_API int ps_fg_pbr_diffuse_mode = 0;
 ENGINE_API int ps_r_path_tracer = 0;
 ENGINE_API int ps_r_path_tracer_bounces = 8;
+ENGINE_API int ps_r_rt_gi = 0;
+ENGINE_API float ps_r_rt_gi_intensity = 1.0f;
 extern int ps_disable_lens_flare;
 
 void IConsole_Command::InvalidSyntax()

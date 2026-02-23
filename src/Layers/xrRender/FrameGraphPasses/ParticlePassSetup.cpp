@@ -426,10 +426,12 @@ DefaultOutputLayout setupParticlePass(
             data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
             data.baseColor = forwardInputs.baseColor;
+            data.worldPos = forwardInputs.worldPos;
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = data.outputNormal;
             data.outputs.baseColor = data.baseColor;
+            data.outputs.worldPos = data.worldPos;
             data.outputs.depth = data.depth;
         },
         [](const ParticlePassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
@@ -617,6 +619,7 @@ DefaultOutputLayout setupParticlePass(
     outputs.albedo = passData.outputColor;
     outputs.normal = passData.outputNormal;
     outputs.baseColor = passData.baseColor;
+    outputs.worldPos = passData.worldPos;
     outputs.depth = passData.depth;
     return outputs;
 }

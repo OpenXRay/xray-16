@@ -109,6 +109,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/PathTracerPassSetup.cpp
     ../xrRender/FrameGraphPasses/MotionVectorPassSetup.h
     ../xrRender/FrameGraphPasses/MotionVectorPassSetup.cpp
+    ../xrRender/FrameGraphPasses/ReSTIRGIPassSetup.h
+    ../xrRender/FrameGraphPasses/ReSTIRGIPassSetup.cpp
 
     # Ray Tracing
     ../xrRender/RayTracing/RTAccelStructManager.h
