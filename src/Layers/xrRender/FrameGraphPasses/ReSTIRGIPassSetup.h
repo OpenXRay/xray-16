@@ -44,6 +44,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
     framegraph::VirtualResourceHandle normal,
     framegraph::VirtualResourceHandle baseColor,
     framegraph::VirtualResourceHandle worldPos,
+    framegraph::VirtualResourceHandle prevWorldPos,
     framegraph::VirtualResourceHandle motionVectors,
     framegraph::VirtualResourceHandle sceneColorIn,
     const Fmatrix& invViewProj,

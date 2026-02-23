@@ -5,6 +5,7 @@
 
 cbuffer ReSTIRTemporalParams : register(b5) {
     float4x4 g_InvViewProj;
+    float4 g_CameraPos;
     float2 g_ScreenSize;
     float2 g_InvScreenSize;
     uint g_FrameIndex;
@@ -20,6 +21,7 @@ Texture2D<float> t_PrevDepth : register(t5);
 Texture2D<float4> t_PrevNormal : register(t6);
 Texture2D<float4> t_BaseColor : register(t7);
 Texture2D<float4> t_WorldPos : register(t8);
+Texture2D<float4> t_PrevWorldPos : register(t9);
 
 RWTexture2D<float4> u_ReservoirA : register(u0);
 RWTexture2D<float4> u_ReservoirB : register(u1);
@@ -79,12 +81,12 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     if (all(prevUV >= 0) && all(prevUV < 1.0)) {
         int2 prevPixel = int2(prevUV * g_ScreenSize);
 
-        float prevDepth = t_PrevDepth.Load(int3(prevPixel, 0));
         float4 prevNormalData = t_PrevNormal.Load(int3(prevPixel, 0));
         float3 prevN = normalize(prevNormalData.xyz);
+        float3 prevWorldPos = t_PrevWorldPos.Load(int3(prevPixel, 0)).xyz;
 
-        float prevLinearDepth = prevDepth;
-        float currLinearDepth = depth;
+        float currLinearDepth = length(worldPos - g_CameraPos.xyz);
+        float prevLinearDepth = length(prevWorldPos - g_CameraPos.xyz);
 
         if (ValidateTemporalNeighbor(currLinearDepth, N, prevLinearDepth, prevN)) {
             GIReservoir prevRes = UnpackReservoir(

@@ -136,6 +136,7 @@ private:
 
     nvrhi::TextureHandle m_prevFrameDepth;
     nvrhi::TextureHandle m_prevFrameNormals;
+    nvrhi::TextureHandle m_prevFrameWorldPos;
     Fmatrix m_prevViewProj;
     Fvector m_prevCameraPos;
     bool m_hasPrevFrameData = false;
