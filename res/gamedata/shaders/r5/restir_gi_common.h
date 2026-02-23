@@ -142,9 +142,9 @@ float JacobianReconnectionShift(float3 x2_normal, float3 x1_new, float3 x1_old, 
     return (cos_new * t_old2) / max(cos_old * t_new2, 1e-6);
 }
 
-bool ValidateTemporalNeighbor(float currDepth, float3 currNormal, float prevDepth, float3 prevNormal)
+bool ValidateTemporalNeighbor(float currLinearDepth, float3 currNormal, float prevLinearDepth, float3 prevNormal)
 {
-    float depthDiff = abs(currDepth - prevDepth) / max(currDepth, 1e-4);
+    float depthDiff = abs(currLinearDepth - prevLinearDepth) / max(currLinearDepth, 1e-4);
     if (depthDiff > 0.1)
         return false;
     if (dot(currNormal, prevNormal) < 0.906)

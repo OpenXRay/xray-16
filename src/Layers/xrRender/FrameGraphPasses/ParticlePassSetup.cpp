@@ -425,8 +425,10 @@ DefaultOutputLayout setupParticlePass(
             data.outputColor = passBuilder.write(forwardInputs.albedo, ResourceState::RenderTarget);
             data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
-            data.baseColor = forwardInputs.baseColor;
-            data.worldPos = forwardInputs.worldPos;
+            if (forwardInputs.baseColor.is_valid())
+                data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
+            if (forwardInputs.worldPos.is_valid())
+                data.worldPos = passBuilder.readWrite(forwardInputs.worldPos, ResourceState::RenderTarget);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = data.outputNormal;
@@ -457,10 +459,17 @@ DefaultOutputLayout setupParticlePass(
             auto& matBuffer = MaterialBuffer::Instance();
             matBuffer.Upload(ctx);
 
+            auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
+            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
+
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
             if (normalRT)
                 fbDesc.addColorAttachment(normalRT);
+            if (baseColorRT)
+                fbDesc.addColorAttachment(baseColorRT);
+            if (worldPosRT)
+                fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = framegraph::GetPassResourceCache();
             auto framebuffer = cache.GetOrCreateFramebuffer("ParticlePass", fbDesc, nvDevice);

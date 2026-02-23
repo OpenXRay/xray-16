@@ -665,6 +665,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     DefaultOutputLayout outputs;
     outputs.albedo = passData.color;
     outputs.normal = passData.normal;
+    outputs.baseColor = passData.baseColor;
     outputs.worldPos = passData.worldPos;
     outputs.depth = passData.depth;
     return outputs;

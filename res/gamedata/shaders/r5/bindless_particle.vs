@@ -25,7 +25,8 @@ struct VS_OUTPUT
     float2 texcoord : TEXCOORD0;
     float4 color    : TEXCOORD1;
     float3 worldPos : TEXCOORD2;
-    nointerpolation uint materialID : TEXCOORD3;
+    float3 normal   : TEXCOORD3;
+    nointerpolation uint materialID : TEXCOORD4;
 };
 
 VS_OUTPUT main(VS_INPUT input)
@@ -35,6 +36,7 @@ VS_OUTPUT main(VS_INPUT input)
     float4 worldPos = float4(input.position.xyz, 1.0);
     output.hpos = mul(m_VP, worldPos);
     output.worldPos = worldPos.xyz;
+    output.normal = normalize(eye_position - worldPos.xyz);
     output.texcoord = input.texcoord;
     output.color = input.color;
     output.materialID = input.materialID;

@@ -172,6 +172,7 @@ private:
     // Eliminates double vertex processing cost (~1.5-2ms savings)
     nvrhi::TextureHandle m_prevFrameDepth;        // Previous frame's depth (persistent)
     nvrhi::TextureHandle m_prevFrameNormals;      // Previous frame's normals (persistent)
+    nvrhi::TextureHandle m_prevFrameWorldPos;     // Previous frame's world positions (persistent)
     Fmatrix m_prevViewProj;                       // Previous frame's view-projection
     Fvector m_prevCameraPos;                      // Previous frame's camera position
     bool m_hasPrevFrameData = false;              // Valid previous frame exists

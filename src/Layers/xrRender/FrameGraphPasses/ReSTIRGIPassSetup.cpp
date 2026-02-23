@@ -42,6 +42,7 @@ static_assert(sizeof(ReSTIRGICB) == 224, "ReSTIRGICB must be 224 bytes");
 
 struct TemporalCB {
     Fmatrix invViewProj;
+    Fvector4 cameraPos;
     float screenWidth;
     float screenHeight;
     float invScreenWidth;
@@ -49,7 +50,7 @@ struct TemporalCB {
     u32 frameIndex;
     u32 pad[3];
 };
-static_assert(sizeof(TemporalCB) == 96, "TemporalCB must be 96 bytes");
+static_assert(sizeof(TemporalCB) == 112, "TemporalCB must be 112 bytes");
 
 struct CompositeCB {
     Fmatrix invViewProj;
@@ -168,11 +169,12 @@ static void InitializeResources(ng::RenderDevice* device, ReSTIRGIPassState& sta
             nvrhi::BindingLayoutItem::Texture_SRV(6),
             nvrhi::BindingLayoutItem::Texture_SRV(7),
             nvrhi::BindingLayoutItem::Texture_SRV(8),
+            nvrhi::BindingLayoutItem::Texture_SRV(9),
             nvrhi::BindingLayoutItem::Texture_UAV(0),
             nvrhi::BindingLayoutItem::Texture_UAV(1),
             nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
         };
-        state.temporalLayout = cache.GetOrCreateBindingLayout("RTGI_Temporal_v2", desc, nvDevice);
+        state.temporalLayout = cache.GetOrCreateBindingLayout("RTGI_Temporal_v3", desc, nvDevice);
 
         ref_cs shader;
         shader.create("restir_gi_temporal");
@@ -292,6 +294,7 @@ struct TemporalPassData {
     VirtualResourceHandle normal;
     VirtualResourceHandle baseColor;
     VirtualResourceHandle worldPos;
+    VirtualResourceHandle prevWorldPos;
     VirtualResourceHandle motionVectors;
     TemporalCB cbData;
     u32 width, height;
@@ -321,6 +324,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
     VirtualResourceHandle normal,
     VirtualResourceHandle baseColor,
     VirtualResourceHandle worldPos,
+    VirtualResourceHandle prevWorldPos,
     VirtualResourceHandle motionVectors,
     VirtualResourceHandle sceneColorIn,
     const Fmatrix& invViewProj,
@@ -493,7 +497,18 @@ ReSTIRGIOutput setupReSTIRGIPass(
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
-            cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(ReSTIRGICB));
+            ReSTIRGICB cb = data.cbData;
+            const auto& bc = data.accelMgr->GetBatchCounts();
+            cb.identityStaticCount = bc.identityStatic;
+            cb.terrainBatchCount = bc.terrain;
+            cb.skinnedBatchStart = bc.skinned > 0
+                ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal
+                : 0;
+            cb.grassBatchStart = bc.grass > 0
+                ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal + bc.skinned
+                : 0;
+            cb.detailAtlasIndex = data.accelMgr->GetDetailAtlasIndex();
+            cmdList->writeBuffer(data.state->cb, &cb, sizeof(ReSTIRGICB));
 
             nvrhi::IBuffer* skinnedVB = data.accelMgr->GetSkinnedOutputVB();
             nvrhi::IBuffer* skinnedIB = data.accelMgr->GetSkinnedIB();
@@ -553,6 +568,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
     if (hasPrevFrameData && motionVectors.is_valid()) {
         TemporalCB temporalCB;
         temporalCB.invViewProj = invViewProj;
+        temporalCB.cameraPos = { cameraPos.x, cameraPos.y, cameraPos.z, 0 };
         temporalCB.screenWidth = (float)width;
         temporalCB.screenHeight = (float)height;
         temporalCB.invScreenWidth = 1.0f / width;
@@ -568,6 +584,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 data.normal = pb.read(normal, ResourceState::ShaderResource);
                 data.baseColor = pb.read(baseColor, ResourceState::ShaderResource);
                 data.worldPos = pb.read(worldPos, ResourceState::ShaderResource);
+                if (prevWorldPos.is_valid())
+                    data.prevWorldPos = pb.read(prevWorldPos, ResourceState::ShaderResource);
                 data.motionVectors = pb.read(motionVectors, ResourceState::ShaderResource);
                 pb.readWrite(fgResA, ResourceState::UnorderedAccess);
                 pb.readWrite(fgResB, ResourceState::UnorderedAccess);
@@ -585,6 +603,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 auto* normalTex = fg.GetPhysicalTexture(data.normal);
                 auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
                 auto* worldPosTex = fg.GetPhysicalTexture(data.worldPos);
+                auto* prevWorldPosTex = data.prevWorldPos.is_valid() ? fg.GetPhysicalTexture(data.prevWorldPos) : worldPosTex;
                 auto* mvTex = fg.GetPhysicalTexture(data.motionVectors);
                 if (!depthTex || !normalTex || !baseColorTex || !worldPosTex || !mvTex) return;
 
@@ -604,6 +623,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
                     nvrhi::BindingSetItem::Texture_SRV(6, normalTex),
                     nvrhi::BindingSetItem::Texture_SRV(7, baseColorTex),
                     nvrhi::BindingSetItem::Texture_SRV(8, worldPosTex),
+                    nvrhi::BindingSetItem::Texture_SRV(9, prevWorldPosTex),
                     nvrhi::BindingSetItem::Texture_UAV(0, data.state->reservoirA[data.writeIdx]),
                     nvrhi::BindingSetItem::Texture_UAV(1, data.state->reservoirB[data.writeIdx]),
                     nvrhi::BindingSetItem::ConstantBuffer(5, data.state->cb),

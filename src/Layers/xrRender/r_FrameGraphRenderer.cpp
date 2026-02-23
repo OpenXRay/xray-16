@@ -900,6 +900,21 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_framegraph->GetRTRegistry().RegisterRT("rt_PrevNormals", prevNormalsHandle);
     }
 
+    framegraph::VirtualResourceHandle prevWorldPosHandle;
+    if (m_hasPrevFrameData && m_prevFrameWorldPos) {
+        framegraph::ResourceDesc prevWorldPosDesc;
+        prevWorldPosDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+        prevWorldPosDesc.debugName = "rt_PrevWorldPos";
+        prevWorldPosDesc.width = width;
+        prevWorldPosDesc.height = height;
+        prevWorldPosDesc.format = nvrhi::Format::RGBA32_FLOAT;
+        prevWorldPosDesc.isRenderTarget = true;
+        prevWorldPosDesc.isImported = true;
+        prevWorldPosDesc.isTransient = false;
+        prevWorldPosHandle = m_framegraph->ImportTexture("rt_PrevWorldPos", m_prevFrameWorldPos, prevWorldPosDesc);
+        m_framegraph->GetRTRegistry().RegisterRT("rt_PrevWorldPos", prevWorldPosHandle);
+    }
+
     // ═══════════════════════════════════════════════════════
     //  PHASE 3.5: GPU CULLING PASS (Frustum + Occlusion)
     // ═══════════════════════════════════════════════════════
@@ -1279,7 +1294,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         auto rtgiOutput = passes::setupReSTIRGIPass(
             *m_framegraph, m_device, m_rtAccelMgr.get(),
             transparentOutputs.depth, transparentOutputs.normal,
-            baseColorBuffer, transparentOutputs.worldPos,
+            transparentOutputs.baseColor, transparentOutputs.worldPos,
+            prevWorldPosHandle,
             motionOutput.motionVectors,
             sceneColor,
             Device.mInvFullTransform, m_prevViewProj,
@@ -1712,6 +1728,52 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 [finalNormals, prevNormalsCopyDest](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
                     nvrhi::ITexture* src = fg.GetPhysicalTexture(finalNormals);
                     nvrhi::ITexture* dst = fg.GetPhysicalTexture(prevNormalsCopyDest);
+                    if (src && dst)
+                        ctx.GetCommandList()->copyTexture(dst, nvrhi::TextureSlice(), src, nvrhi::TextureSlice());
+                }
+            );
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  WORLD POS COPY PASS (Save world positions for next frame's ReSTIR temporal resampling)
+    // ═══════════════════════════════════════════════════════
+    {
+        nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+
+        if (!m_prevFrameWorldPos || m_prevFrameWidth != width || m_prevFrameHeight != height) {
+            nvrhi::TextureDesc desc;
+            desc.width = width;
+            desc.height = height;
+            desc.format = nvrhi::Format::RGBA32_FLOAT;
+            desc.isShaderResource = true;
+            desc.debugName = "PrevFrameWorldPos";
+            desc.initialState = nvrhi::ResourceStates::ShaderResource;
+            desc.keepInitialState = true;
+            m_prevFrameWorldPos = nvDevice->createTexture(desc);
+        }
+
+        if (m_prevFrameWorldPos) {
+            framegraph::ResourceDesc importDesc;
+            importDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+            importDesc.debugName = "rt_PrevWorldPosCopyDest";
+            importDesc.width = width;
+            importDesc.height = height;
+            importDesc.format = nvrhi::Format::RGBA32_FLOAT;
+            importDesc.isRenderTarget = true;
+            importDesc.isImported = true;
+            importDesc.isTransient = false;
+
+            auto prevWorldPosCopyDest = m_framegraph->ImportTexture("rt_PrevWorldPosCopyDest", m_prevFrameWorldPos, importDesc);
+
+            auto finalWorldPos = transparentOutputs.worldPos;
+            framegraph::PassHandle worldPosCopyPass = m_framegraph->AddPass("WorldPosCopy");
+            m_framegraph->PassRead(worldPosCopyPass, finalWorldPos, framegraph::ResourceState::CopySource);
+            m_framegraph->PassWrite(worldPosCopyPass, prevWorldPosCopyDest, framegraph::ResourceState::CopyDest);
+            m_framegraph->SetPassCallback(worldPosCopyPass,
+                [finalWorldPos, prevWorldPosCopyDest](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
+                    nvrhi::ITexture* src = fg.GetPhysicalTexture(finalWorldPos);
+                    nvrhi::ITexture* dst = fg.GetPhysicalTexture(prevWorldPosCopyDest);
                     if (src && dst)
                         ctx.GetCommandList()->copyTexture(dst, nvrhi::TextureSlice(), src, nvrhi::TextureSlice());
                 }
