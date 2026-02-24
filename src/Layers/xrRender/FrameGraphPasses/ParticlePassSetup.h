@@ -29,6 +29,23 @@ namespace xray::render::framegraph {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
+enum class ParticleShaderVariant : u8 {
+    Standard,
+    Emissive,
+    Distort,
+    Count
+};
+
+enum ParticleBlendMode : u8 {
+    PARTICLE_BLEND_SET       = 0,
+    PARTICLE_BLEND_BLEND     = 1,
+    PARTICLE_BLEND_ADD       = 2,
+    PARTICLE_BLEND_MUL       = 3,
+    PARTICLE_BLEND_MUL_2X    = 4,
+    PARTICLE_BLEND_ALPHA_ADD = 5,
+    PARTICLE_BLEND_COUNT     = 6,
+};
+
 struct ParticleBatch {
     RENDER_NAMESPACE::dxRender_Visual* visual = nullptr;
     Fmatrix worldMatrix;
@@ -37,11 +54,12 @@ struct ParticleBatch {
     u32 particleCount = 0;
     u32 vertexOffset = 0;
     u32 bindlessMaterialID = 0;
+    u8 blendMode = PARTICLE_BLEND_BLEND;
+    ParticleShaderVariant shaderVariant = ParticleShaderVariant::Standard;
 };
 
 struct ParticlePassState {
-    nvrhi::GraphicsPipelineHandle pipelineBlend;
-    nvrhi::GraphicsPipelineHandle pipelineAdd;
+    nvrhi::GraphicsPipelineHandle pipelines[PARTICLE_BLEND_COUNT];
     nvrhi::BindingLayoutHandle layout;
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::ShaderHandle vs;
