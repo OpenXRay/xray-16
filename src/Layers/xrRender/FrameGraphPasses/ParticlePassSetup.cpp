@@ -139,7 +139,22 @@ static void FillSprite(
     pv++;
 }
 
-// Returns total particle count generated, fills vertices
+static Fmatrix BuildHUDFOVMatrix()
+{
+    float fovScale = 1.0f / psHUD_FOV;
+    Fmatrix viewMatrix = Device.mView;
+    Fmatrix invView;
+    invView.invert(viewMatrix);
+    Fmatrix fovScaleMat;
+    fovScaleMat.identity();
+    fovScaleMat._11 = fovScale;
+    fovScaleMat._22 = fovScale;
+    Fmatrix t1, result;
+    t1.mul(fovScaleMat, viewMatrix);
+    result.mul(invView, t1);
+    return result;
+}
+
 static u32 GenerateParticleVertices(
     const xr_vector<ParticleBatch>& batches,
     xr_vector<ParticleVertex>& vertices)
@@ -165,6 +180,11 @@ static u32 GenerateParticleVertices(
         u32 baseVertex = (u32)vertices.size();
         vertices.resize(baseVertex + particleCount * 4);
         ParticleVertex* pv = &vertices[baseVertex];
+
+        Fmatrix hudMat;
+        bool isHUD = batch.isHUDMode;
+        if (isHUD)
+            hudMat = BuildHUDFOVMatrix();
 
         float sina = 0.0f, cosa = 0.0f;
         float angle = float(0xFFFFFFFF);
@@ -194,8 +214,17 @@ static u32 GenerateParticleVertices(
                 r_y += speed * pDef->m_VelocityScale.y;
             }
 
+            ParticleVertex* pvStart = pv;
             FillSprite(pv, Device.vCameraTop, Device.vCameraRight, m.pos, lt, rb,
                        r_x, r_y, m.color, batch.bindlessMaterialID, sina, cosa);
+
+            if (isHUD) {
+                for (ParticleVertex* v = pvStart; v < pv; v++) {
+                    Fvector tmp;
+                    hudMat.transform_tiny(tmp, v->p);
+                    v->p = tmp;
+                }
+            }
         }
 
         totalParticles += particleCount;
