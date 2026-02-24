@@ -307,6 +307,7 @@ void InitializeParticleResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
+        nvrhi::BindingLayoutItem::Texture_SRV(1),
         nvrhi::BindingLayoutItem::Sampler(0),
     };
     state.layout = nvDevice->createBindingLayout(layoutDesc);
@@ -424,12 +425,12 @@ DefaultOutputLayout setupParticlePass(
             if (forwardInputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
             if (forwardInputs.worldPos.is_valid())
-                data.worldPos = passBuilder.readWrite(forwardInputs.worldPos, ResourceState::RenderTarget);
+                data.worldPos = passBuilder.read(forwardInputs.worldPos, ResourceState::ShaderResource);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = data.outputNormal;
             data.outputs.baseColor = data.baseColor;
-            data.outputs.worldPos = data.worldPos;
+            data.outputs.worldPos = forwardInputs.worldPos;
             data.outputs.depth = data.depth;
         },
         [](const ParticlePassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
@@ -464,8 +465,6 @@ DefaultOutputLayout setupParticlePass(
                 fbDesc.addColorAttachment(normalRT);
             if (baseColorRT)
                 fbDesc.addColorAttachment(baseColorRT);
-            if (worldPosRT)
-                fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = framegraph::GetPassResourceCache();
             auto framebuffer = cache.GetOrCreateFramebuffer("ParticlePass", fbDesc, nvDevice);
@@ -493,6 +492,7 @@ DefaultOutputLayout setupParticlePass(
                 nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
                 nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
+                nvrhi::BindingSetItem::Texture_SRV(1, worldPosRT),
                 nvrhi::BindingSetItem::Sampler(0, data.passState->sampler),
             };
             auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, data.passState->layout, nvDevice);
