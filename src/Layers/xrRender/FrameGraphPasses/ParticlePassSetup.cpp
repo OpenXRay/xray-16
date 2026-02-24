@@ -139,6 +139,25 @@ static void FillSprite(
     pv++;
 }
 
+static void FillSpriteAligned(
+    ParticleVertex*& pv,
+    const Fvector& pos, const Fvector& dir,
+    const Fvector2& lt, const Fvector2& rb,
+    float r1, float r2,
+    u32 clr, u32 matID,
+    float sina, float cosa)
+{
+    Fvector R;
+    R.crossproduct(dir, Device.vCameraDirection);
+    float mag = R.magnitude();
+    if (mag > EPS_S)
+        R.div(mag);
+    else
+        R.set(Device.vCameraRight);
+
+    FillSprite(pv, dir, R, pos, lt, rb, r1, r2, clr, matID, sina, cosa);
+}
+
 static Fmatrix BuildHUDFOVMatrix()
 {
     float fovScale = 1.0f / psHUD_FOV;
@@ -181,6 +200,12 @@ static u32 GenerateParticleVertices(
         vertices.resize(baseVertex + particleCount * 4);
         ParticleVertex* pv = &vertices[baseVertex];
 
+        bool alignToPath = pDef->m_Flags.is(CPEDef::dfAlignToPath);
+        bool worldAlign = pDef->m_Flags.is(CPEDef::dfWorldAlign);
+        bool faceAlign = pDef->m_Flags.is(CPEDef::dfFaceAlign);
+        bool hasXForm = pEffect->m_RT_Flags.is(CParticleEffect::flRT_XFORM);
+        const Fmatrix& xform = pEffect->m_XFORM;
+
         Fmatrix hudMat;
         bool isHUD = batch.isHUDMode;
         if (isHUD)
@@ -208,15 +233,76 @@ static u32 GenerateParticleVertices(
             float r_x = m.size.x * 0.5f;
             float r_y = m.size.y * 0.5f;
 
+            float speed = 0.f;
+            bool speedCalc = false;
+
             if (pDef->m_Flags.is(CPEDef::dfVelocityScale)) {
-                float speed = m.vel.magnitude();
+                speed = m.vel.magnitude();
+                speedCalc = true;
                 r_x += speed * pDef->m_VelocityScale.x;
                 r_y += speed * pDef->m_VelocityScale.y;
             }
 
             ParticleVertex* pvStart = pv;
-            FillSprite(pv, Device.vCameraTop, Device.vCameraRight, m.pos, lt, rb,
-                       r_x, r_y, m.color, batch.bindlessMaterialID, sina, cosa);
+
+            if (alignToPath) {
+                if (!speedCalc)
+                    speed = m.vel.magnitude();
+
+                if ((speed < EPS_S) && worldAlign) {
+                    Fmatrix M;
+                    M.setXYZ(pDef->m_APDefaultRotation);
+                    if (hasXForm) {
+                        Fvector p;
+                        xform.transform_tiny(p, m.pos);
+                        M.mulA_43(xform);
+                        FillSprite(pv, M.k, M.i, p, lt, rb, r_x, r_y, m.color, batch.bindlessMaterialID, sina, cosa);
+                    } else {
+                        FillSprite(pv, M.k, M.i, m.pos, lt, rb, r_x, r_y, m.color, batch.bindlessMaterialID, sina, cosa);
+                    }
+                } else if ((speed >= EPS_S) && faceAlign) {
+                    Fmatrix M;
+                    M.identity();
+                    M.k.div(m.vel, speed);
+                    M.j.set(0, 1, 0);
+                    if (_abs(M.j.dotproduct(M.k)) > .99f)
+                        M.j.set(0, 0, 1);
+                    M.i.crossproduct(M.j, M.k);
+                    M.i.normalize();
+                    M.j.crossproduct(M.k, M.i);
+                    M.j.normalize();
+                    if (hasXForm) {
+                        Fvector p;
+                        xform.transform_tiny(p, m.pos);
+                        M.mulA_43(xform);
+                        FillSprite(pv, M.j, M.i, p, lt, rb, r_x, r_y, m.color, batch.bindlessMaterialID, sina, cosa);
+                    } else {
+                        FillSprite(pv, M.j, M.i, m.pos, lt, rb, r_x, r_y, m.color, batch.bindlessMaterialID, sina, cosa);
+                    }
+                } else {
+                    Fvector dir;
+                    if (speed >= EPS_S)
+                        dir.div(m.vel, speed);
+                    else
+                        dir.setHP(-pDef->m_APDefaultRotation.y, -pDef->m_APDefaultRotation.x);
+                    if (hasXForm) {
+                        Fvector p, d;
+                        xform.transform_tiny(p, m.pos);
+                        xform.transform_dir(d, dir);
+                        FillSpriteAligned(pv, p, d, lt, rb, r_x, r_y, m.color, batch.bindlessMaterialID, sina, cosa);
+                    } else {
+                        FillSpriteAligned(pv, m.pos, dir, lt, rb, r_x, r_y, m.color, batch.bindlessMaterialID, sina, cosa);
+                    }
+                }
+            } else {
+                if (hasXForm) {
+                    Fvector p;
+                    xform.transform_tiny(p, m.pos);
+                    FillSprite(pv, Device.vCameraTop, Device.vCameraRight, p, lt, rb, r_x, r_y, m.color, batch.bindlessMaterialID, sina, cosa);
+                } else {
+                    FillSprite(pv, Device.vCameraTop, Device.vCameraRight, m.pos, lt, rb, r_x, r_y, m.color, batch.bindlessMaterialID, sina, cosa);
+                }
+            }
 
             if (isHUD) {
                 for (ParticleVertex* v = pvStart; v < pv; v++) {
