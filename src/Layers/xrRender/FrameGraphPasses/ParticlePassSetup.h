@@ -62,12 +62,16 @@ struct ParticleBatch {
 
 struct ParticlePassState {
     nvrhi::GraphicsPipelineHandle pipelines[PARTICLE_BLEND_COUNT];
+    nvrhi::GraphicsPipelineHandle distortPipeline;
     nvrhi::BindingLayoutHandle layout;
+    nvrhi::BindingLayoutHandle distortLayout;
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
+    nvrhi::ShaderHandle distortPS;
     nvrhi::SamplerHandle sampler;
     bool initialized = false;
+    bool distortInitialized = false;
     nvrhi::BufferHandle particleVB;
     u32 particleVBSize = 0;
     nvrhi::BufferHandle quadIB;
@@ -83,6 +87,8 @@ struct ParticlePassData {
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle hiZPyramid;
+    framegraph::VirtualResourceHandle distortionRT;
+    framegraph::VirtualResourceHandle worldPosCopy;
     ng::RenderDevice* device;
     const xr_vector<ParticleBatch>* worldParticleBatches;
     const xr_vector<ParticleBatch>* hudParticleBatches;
@@ -94,6 +100,12 @@ struct ParticlePassData {
     u32 hiZHeight;
     u32 hiZMipLevels;
     ParticlePassState* passState;
+    bool hasDistortion;
+};
+
+struct ParticlePassOutput {
+    framegraph::DefaultOutputLayout layout;
+    framegraph::VirtualResourceHandle distortionRT;
 };
 
 void InitializeParticleResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ParticlePassState& state);
@@ -106,7 +118,7 @@ void InitializeParticleResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
 // Renders AFTER forward color and skinning passes (particles on top of world+HUD)
 // Supports both world and HUD particles with proper FOV handling
 // When hiZPyramid is valid, uses GPU frustum + occlusion culling
-framegraph::DefaultOutputLayout setupParticlePass(
+ParticlePassOutput setupParticlePass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
     const framegraph::DefaultOutputLayout& forwardInputs,

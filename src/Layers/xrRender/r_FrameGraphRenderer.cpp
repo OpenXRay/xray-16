@@ -40,6 +40,7 @@
 #include "FrameGraphPasses/SunPassSetup.h"           // Sun disc rendering
 #include "FrameGraphPasses/SkinningPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"      // Particle rendering (billboards/sprites)
+#include "FrameGraphPasses/DistortionApplyPassSetup.h" // Distortion post-process
 #include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
@@ -1286,10 +1287,38 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_passStates->particle
     );
 
+    auto sceneColor = particleOutputs.layout.albedo;
+
+    if (particleOutputs.distortionRT.is_valid()) {
+        framegraph::ResourceDesc snapDesc;
+        snapDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+        snapDesc.width = width;
+        snapDesc.height = height;
+        snapDesc.format = nvrhi::Format::RGBA16_FLOAT;
+        snapDesc.isRenderTarget = true;
+        snapDesc.isTransient = true;
+        snapDesc.debugName = "rt_SceneSnapshot";
+        auto snapshotHandle = m_framegraph->CreateTexture("rt_SceneSnapshot", snapDesc);
+
+        framegraph::PassHandle copyPass = m_framegraph->AddPass("SceneSnapshotCopy");
+        m_framegraph->PassRead(copyPass, sceneColor, framegraph::ResourceState::CopySource);
+        m_framegraph->PassWrite(copyPass, snapshotHandle, framegraph::ResourceState::CopyDest);
+        m_framegraph->SetPassCallback(copyPass,
+            [sceneColor, snapshotHandle](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
+                auto* src = fg.GetPhysicalTexture(sceneColor);
+                auto* dst = fg.GetPhysicalTexture(snapshotHandle);
+                if (src && dst)
+                    ctx.GetCommandList()->copyTexture(dst, nvrhi::TextureSlice(), src, nvrhi::TextureSlice());
+            });
+
+        sceneColor = passes::setupDistortionApplyPass(
+            *m_framegraph, snapshotHandle, particleOutputs.distortionRT,
+            particleOutputs.layout.worldPos, width, height);
+    }
+
     // ═══════════════════════════════════════════════════════
     //  ReSTIR GI (RT Shadows + Indirect Lighting)
     // ═══════════════════════════════════════════════════════
-    auto sceneColor = particleOutputs.albedo;
 
     extern ENGINE_API int ps_r_rt_gi;
     extern ENGINE_API float ps_r_rt_gi_intensity;
@@ -2249,6 +2278,9 @@ void FrameGraphRenderer::ProcessSingleParticleEffect(
     batch.isHUDMode = isHUDParticle;
     batch.particleCount = particleCount;
     batch.blendMode = QueryParticleBlendMode(pDef->m_ShaderName.c_str());
+
+    if (strstr(pDef->m_ShaderName.c_str(), "distort"))
+        batch.shaderVariant = passes::ParticleShaderVariant::Distort;
 
     if (m_materialCache && pDef->m_TextureName.size())
         batch.bindlessMaterialID = m_materialCache->PreRegisterParticleMaterial(pDef->m_TextureName);

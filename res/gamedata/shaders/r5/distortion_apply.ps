@@ -1,0 +1,53 @@
+#define SM_6_0
+#include "common.h"
+
+Texture2D g_Snapshot : register(t0);
+Texture2D g_Distortion : register(t1);
+Texture2D<float4> g_WorldPos : register(t2);
+SamplerState g_LinearSampler : register(s0);
+
+struct PS_INPUT
+{
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    float4 distortSample = g_Distortion.Sample(g_LinearSampler, input.texcoord);
+    float2 offset = distortSample.xy;
+    float totalWeight = distortSample.w;
+
+    if (totalWeight < 0.0001)
+        return g_Snapshot.Sample(g_LinearSampler, input.texcoord);
+
+    float sourceViewZ = distortSample.z / totalWeight;
+
+    int2 pixelCoord = (int2)input.position.xy;
+    float4 currentWP = g_WorldPos.Load(int3(pixelCoord, 0));
+    if (currentWP.w > 0.5) {
+        float3 viewDir = camera_direction.xyz;
+        float currentViewZ = dot(currentWP.xyz - eye_position, viewDir);
+
+        if (currentViewZ < sourceViewZ * 0.9)
+            return g_Snapshot.Sample(g_LinearSampler, input.texcoord);
+    }
+
+    float2 displaced = saturate(input.texcoord + offset);
+
+    if (currentWP.w > 0.5) {
+        float3 viewDir = camera_direction.xyz;
+        float currentViewZ = dot(currentWP.xyz - eye_position, viewDir);
+
+        uint2 dims;
+        g_WorldPos.GetDimensions(dims.x, dims.y);
+        float4 displacedWP = g_WorldPos.Load(int3((int2)(displaced * dims), 0));
+        if (displacedWP.w > 0.5) {
+            float displacedViewZ = dot(displacedWP.xyz - eye_position, viewDir);
+            if (displacedViewZ < currentViewZ * 0.85)
+                displaced = input.texcoord;
+        }
+    }
+
+    return g_Snapshot.Sample(g_LinearSampler, displaced);
+}

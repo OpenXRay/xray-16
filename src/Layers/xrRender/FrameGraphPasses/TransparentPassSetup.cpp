@@ -135,9 +135,9 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
             if (inputs.baseColor.is_valid())
-                data.baseColor = passBuilder.read(inputs.baseColor);
+                data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
             if (inputs.worldPos.is_valid())
-                data.worldPos = passBuilder.read(inputs.worldPos);
+                data.worldPos = passBuilder.readWrite(inputs.worldPos, ResourceState::RenderTarget);
         },
 
         [](const TransparentPassData& data,
@@ -155,10 +155,17 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             if (!nvDevice || !cmdList)
                 return;
 
+            auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
+            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
+
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
             if (normalRT)
                 fbDesc.addColorAttachment(normalRT);
+            if (baseColorRT)
+                fbDesc.addColorAttachment(baseColorRT);
+            if (worldPosRT)
+                fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = framegraph::GetPassResourceCache();
             auto framebuffer = cache.GetOrCreateFramebuffer("TransparentPass", fbDesc, nvDevice);
