@@ -16,6 +16,9 @@ struct ImDrawData;
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
     class RTAccelStructManager;
+    namespace PS {
+        class CParticleEffect;
+    }
 }
 
 namespace xray::render::RENDER_NAMESPACE::passes {
@@ -286,6 +289,7 @@ private:
     bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr, bool isStatic = false);
     bool ProcessHudGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr);
     bool ProcessParticleGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr, bool isHUD = false);
+    void ProcessSingleParticleEffect(RENDER_NAMESPACE::PS::CParticleEffect* pEffect, const Fmatrix& worldTransform, IRenderable* renderable, bool isHUD);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
 
     // ═══════════════════════════════════════════════════

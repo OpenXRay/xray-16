@@ -52,6 +52,7 @@
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrParticles/psystem.h"
+#include "blenders/Blender_Particle.h"
 
 namespace xray::render {
 
@@ -2199,6 +2200,62 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
 // World particles: Normal rendering, depth test against world geometry
 // HUD particles: Apply hud_transform_helper FOV adjustment
 //
+static u8 QueryParticleBlendMode(LPCSTR shaderName)
+{
+    if (!shaderName || !shaderName[0])
+        return passes::PARTICLE_BLEND_BLEND;
+
+    IBlender* B = RENDER_NAMESPACE::RImplementation.Resources->_FindBlender(shaderName);
+    if (!B)
+        return passes::PARTICLE_BLEND_BLEND;
+
+    if (B->getDescription().CLS == B_PARTICLE) {
+        auto* bp = static_cast<RENDER_NAMESPACE::CBlender_Particle*>(B);
+        u32 id = bp->oBlend.IDselected;
+        return (id < passes::PARTICLE_BLEND_COUNT) ? (u8)id : passes::PARTICLE_BLEND_BLEND;
+    }
+
+    return passes::PARTICLE_BLEND_BLEND;
+}
+
+void FrameGraphRenderer::ProcessSingleParticleEffect(
+    RENDER_NAMESPACE::PS::CParticleEffect* pEffect,
+    const Fmatrix& worldTransform,
+    IRenderable* renderable,
+    bool isHUD)
+{
+    if (!pEffect)
+        return;
+
+    bool isHUDParticle = isHUD || pEffect->GetHudMode();
+
+    PAPI::Particle* particles = nullptr;
+    u32 particleCount = 0;
+    PAPI::ParticleManager()->GetParticles(pEffect->GetHandleEffect(), particles, particleCount);
+    if (particleCount == 0)
+        return;
+
+    auto* pDef = pEffect->GetDefinition();
+    if (!pDef)
+        return;
+
+    passes::ParticleBatch batch;
+    batch.visual = pEffect;
+    batch.worldMatrix = worldTransform;
+    batch.renderable = renderable;
+    batch.isHUDMode = isHUDParticle;
+    batch.particleCount = particleCount;
+    batch.blendMode = QueryParticleBlendMode(pDef->m_ShaderName.c_str());
+
+    if (m_materialCache && pDef->m_TextureName.size())
+        batch.bindlessMaterialID = m_materialCache->PreRegisterParticleMaterial(pDef->m_TextureName);
+
+    if (isHUDParticle)
+        m_hudParticleBatches.push_back(batch);
+    else
+        m_worldParticleBatches.push_back(batch);
+}
+
 bool FrameGraphRenderer::ProcessParticleGeometry(
     dxRender_Visual* visual,
     const Fmatrix& worldTransform,
@@ -2208,52 +2265,38 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
     if (!visual)
         return false;
 
-    // Verify this is actually a particle system
     u32 vType = visual->getType();
-    if (vType != MT_PARTICLE_EFFECT && vType != MT_PARTICLE_GROUP)
-        return false;
-
-    bool isHUDParticle = isHUD;
-    u32 particleCount = 0;
-    shared_str textureName;
 
     if (vType == MT_PARTICLE_EFFECT) {
-        RENDER_NAMESPACE::PS::CParticleEffect* pEffect =
-            static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(visual);
-        isHUDParticle = pEffect->GetHudMode();
+        auto* pEffect = static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(visual);
+        ProcessSingleParticleEffect(pEffect, worldTransform, renderable, isHUD);
+        return true;
+    }
 
-        PAPI::Particle* particles = nullptr;
-        PAPI::ParticleManager()->GetParticles(pEffect->GetHandleEffect(), particles, particleCount);
-
-        // Get texture name from particle definition for bindless material
-        auto* pDef = pEffect->GetDefinition();
-        if (pDef) {
-            textureName = pDef->m_TextureName;
+    if (vType == MT_PARTICLE_GROUP) {
+        auto* pGroup = static_cast<RENDER_NAMESPACE::PS::CParticleGroup*>(visual);
+        for (auto& item : pGroup->items) {
+            if (item._effect) {
+                auto* childEffect = static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(item._effect);
+                ProcessSingleParticleEffect(childEffect, worldTransform, renderable, isHUD);
+            }
+            for (auto* child : item._children_related) {
+                if (child && child->getType() == MT_PARTICLE_EFFECT)
+                    ProcessSingleParticleEffect(
+                        static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(child),
+                        worldTransform, renderable, isHUD);
+            }
+            for (auto* child : item._children_free) {
+                if (child && child->getType() == MT_PARTICLE_EFFECT)
+                    ProcessSingleParticleEffect(
+                        static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(child),
+                        worldTransform, renderable, isHUD);
+            }
         }
+        return true;
     }
 
-    if (particleCount == 0)
-        return false;
-
-    passes::ParticleBatch batch;
-    batch.visual = visual;
-    batch.worldMatrix = worldTransform;
-    batch.renderable = renderable;
-    batch.isHUDMode = isHUDParticle;
-    batch.particleCount = particleCount;
-
-    // Register bindless material for particle texture
-    if (m_materialCache && textureName.size()) {
-        batch.bindlessMaterialID = m_materialCache->PreRegisterParticleMaterial(textureName);
-    }
-
-    if (isHUDParticle) {
-        m_hudParticleBatches.push_back(batch);
-    } else {
-        m_worldParticleBatches.push_back(batch);
-    }
-
-    return true;
+    return false;
 }
 
 // Helper to recursively extract leaf visuals from static hierarchy
