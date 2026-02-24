@@ -37,12 +37,23 @@ cbuffer	static_globals : register(b2)
 	float4		L_hemi_color;
 
 	float3 		eye_position;
+	float		_pad_eye;
 
 	float4 		pos_decompression_params;
 	float4 		pos_decompression_params2;
 
 	float4		parallax;
 	float4		screen_res;
+
+	float4x4	m_InvVP;
+
+	float4x4	shadow_matrices[4];
+	float4		cascade_splits;
+
+	float4		cluster_params;
+	float4		cluster_scales;
+
+	float4		camera_direction;
 };
 
 float 	calc_cyclic 	(float x)				

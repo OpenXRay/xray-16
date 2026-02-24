@@ -2,6 +2,10 @@
 #include "common.h"
 #include "bindless_common.h"
 
+Texture2D<float4> g_SceneWorldPos : register(t1);
+
+#define DEPTH_EPSILON 0.1
+
 struct PS_INPUT
 {
     float4 hpos     : SV_Position;
@@ -17,7 +21,6 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
     float4 baseColor : SV_Target2;
-    float4 worldPos : SV_Target3;
 };
 
 PS_OUTPUT main(PS_INPUT input)
@@ -25,16 +28,26 @@ PS_OUTPUT main(PS_INPUT input)
     PS_OUTPUT output;
 
     MaterialData mat = g_Materials[input.materialID];
-
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
-
     float4 result = diffuseSample * input.color;
 
     clip(result.a - (0.01 / 255.0));
 
+    float4 sceneWP = g_SceneWorldPos.Load(int3((int2)input.hpos.xy, 0));
+    if (sceneWP.w > 0.5) {
+        float3 viewDir = camera_direction.xyz;
+        float sceneViewZ = dot(sceneWP.xyz - eye_position, viewDir);
+        float particleViewZ = dot(input.worldPos - eye_position, viewDir);
+        float spaceDepth = sceneViewZ - particleViewZ - DEPTH_EPSILON;
+        if (spaceDepth < -2 * DEPTH_EPSILON)
+            spaceDepth = 100000.0;
+        float soft = Contrast(saturate(spaceDepth * 1.3), 2);
+        result.a *= soft;
+        result.rgb *= soft;
+    }
+
     output.color = result;
     output.normal = float4(normalize(input.normal), 1);
     output.baseColor = float4(diffuseSample.rgb, 0);
-    output.worldPos = float4(input.worldPos, 1.0);
     return output;
 }
