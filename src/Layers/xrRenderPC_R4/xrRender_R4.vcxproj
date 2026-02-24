@@ -161,6 +161,7 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\SkinningPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\PassVertexFormats.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticleGPUCullingManager.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.h" />
@@ -419,6 +420,7 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\SkinningPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticleGPUCullingManager.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.cpp" />

@@ -21,6 +21,7 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
     float4 baseColor : SV_Target2;
+    float4 worldPos : SV_Target3;
 };
 
 PS_OUTPUT main(PS_INPUT input)
@@ -49,5 +50,6 @@ PS_OUTPUT main(PS_INPUT input)
     output.color = result;
     output.normal = float4(normalize(input.normal), 1);
     output.baseColor = float4(diffuseSample.rgb, 0);
+    output.worldPos = float4(input.worldPos, 1.0);
     return output;
 }
