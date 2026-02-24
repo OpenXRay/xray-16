@@ -911,22 +911,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_passStates->skinning
     );
 
-    auto particleOutputs = passes::setupParticlePass(
-        *m_framegraph,
-        m_device,
-        hudOutputs,
-        &m_worldParticleBatches,
-        &m_hudParticleBatches,
-        m_materialCache.get(),
-        width,
-        height,
-        hizOutput.pyramid,
-        hizOutput.width,
-        hizOutput.height,
-        hizOutput.mipLevels,
-        &m_passStates->particle
-    );
-
     passes::setupDetailCullPass(
         *m_framegraph,
         m_device,
@@ -944,7 +928,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         *m_framegraph,
         m_device,
         m_detailManager.get(),
-        particleOutputs,
+        hudOutputs,
         width,
         height,
         m_gpuProfiler.get()
@@ -985,7 +969,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    auto sceneColor = transparentOutputs.albedo;
+    auto particleOutputs = passes::setupParticlePass(
+        *m_framegraph,
+        m_device,
+        transparentOutputs,
+        &m_worldParticleBatches,
+        &m_hudParticleBatches,
+        m_materialCache.get(),
+        width,
+        height,
+        hizOutput.pyramid,
+        hizOutput.width,
+        hizOutput.height,
+        hizOutput.mipLevels,
+        &m_passStates->particle
+    );
+
+    auto sceneColor = particleOutputs.albedo;
 
     extern ENGINE_API int ps_r_rt_gi;
     extern ENGINE_API float ps_r_rt_gi_intensity;
