@@ -40,6 +40,7 @@
 #include "FrameGraphPasses/DistortionApplyPassSetup.h"
 #include "FrameGraphPasses/DecalPassSetup.h"
 #include "Decals/DecalManager.h"
+#include "Decals/OverlayManager.h"
 #include "FrameGraphPasses/ExposurePassSetup.h"
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"
@@ -128,6 +129,9 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_decalManager = xr_make_unique<RENDER_NAMESPACE::decals::DecalManager>();
     m_decalManager->Initialize(device);
 
+    m_overlayManager = xr_make_unique<RENDER_NAMESPACE::decals::OverlayManager>();
+    m_overlayManager->Initialize(device);
+
     m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
     m_rtAccelMgr->Initialize(device);
 
@@ -203,6 +207,11 @@ void FrameGraphRenderer::Shutdown() {
     if (m_decalManager) {
         m_decalManager->Shutdown();
         m_decalManager = nullptr;
+    }
+
+    if (m_overlayManager) {
+        m_overlayManager->Shutdown();
+        m_overlayManager = nullptr;
     }
 
     if (m_rtAccelMgr) {

@@ -831,6 +831,9 @@
     <ClInclude Include="..\xrRender\Decals\MeshPicker.h">
       <Filter>Framegraph\Decals</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\Decals\OverlayManager.h">
+      <Filter>Framegraph\Decals</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
@@ -1681,6 +1684,9 @@
       <Filter>Framegraph\Decals</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\Decals\MeshPicker.cpp">
+      <Filter>Framegraph\Decals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\Decals\OverlayManager.cpp">
       <Filter>Framegraph\Decals</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.cpp">
