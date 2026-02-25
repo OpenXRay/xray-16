@@ -10,10 +10,14 @@ namespace xray::render {
     struct GeometryBatch;
     class MaterialCache;
     class GeometryCollector;
-    class dxRender_Visual;  // Forward declaration for visibility lookup
+    class dxRender_Visual;
     namespace ng {
         class RenderDevice;
     }
+}
+
+namespace xray::render::RENDER_NAMESPACE::decals {
+    class OverlayManager;
 }
 
 namespace xray::render::framegraph {
@@ -85,6 +89,7 @@ struct SkinningPassData {
     framegraph::DefaultOutputLayout outputs;
     SkinnedVisibilityData visibilityData;
     SkinningPassState* passState;
+    decals::OverlayManager* overlayMgr;
 };
 
 // Main skinning pass setup function
@@ -99,7 +104,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     u32 width,
     u32 height,
     const SkinnedVisibilityData& visibilityData = {},
-    SkinningPassState* state = nullptr
+    SkinningPassState* state = nullptr,
+    decals::OverlayManager* overlayMgr = nullptr
 );
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

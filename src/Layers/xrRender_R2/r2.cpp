@@ -1254,12 +1254,6 @@ void CRender::add_SkeletonWallmark(
             Msg("[OverlayPaint] queued uv=(%.4f,%.4f) r=%.4f obj=%p",
                 pickResult.uv.x, pickResult.uv.y, uvRadius, obj);
         }
-        m_framegraphRenderer->GetDecalManager()->AddSkeletonDecalFromRay(
-            xf, (CKinematics*)obj, start, dir, decalSize, matID);
-        Msg("[Decal] SKELETON result: static=%u skel=%u total=%u",
-            m_framegraphRenderer->GetDecalManager()->GetStaticCount(),
-            m_framegraphRenderer->GetDecalManager()->GetSkeletonCount(),
-            m_framegraphRenderer->GetDecalManager()->GetActiveCount());
         return;
     }
 #endif

@@ -1218,7 +1218,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width,
         height,
         skinnedVisibility,
-        &m_passStates->skinning
+        &m_passStates->skinning,
+        m_overlayManager.get()
     );
 
     // ═══════════════════════════════════════════════════════

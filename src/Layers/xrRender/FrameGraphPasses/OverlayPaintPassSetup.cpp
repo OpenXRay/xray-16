@@ -101,6 +101,7 @@ void setupOverlayPaintPass(
             data.overlayMgr = overlayMgr;
             data.commands = paints;
             data.passState = &state;
+            overlayMgr->ClearPendingPaints();
         },
 
         [](const OverlayPaintPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
@@ -148,7 +149,6 @@ void setupOverlayPaintPass(
                 );
             }
 
-            data.overlayMgr->ClearPendingPaints();
         }
     );
 }

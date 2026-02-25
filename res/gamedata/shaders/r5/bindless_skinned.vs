@@ -48,6 +48,8 @@ VS_OUTPUT main(VS_INPUT input)
     float3 skinnedT = skinning_dir(T, bone);
     float3 skinnedB = skinning_dir(B, bone);
 
+    skinnedPos.xyz = apply_overlay_deform(skinnedPos.xyz, skinnedN, input.tc);
+
     float3 worldPos3 = mul(m_W, skinnedPos).xyz;
     output.worldPos = worldPos3;
     output.position = mul(m_VP, float4(worldPos3, 1.0));

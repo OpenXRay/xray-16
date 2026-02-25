@@ -23,6 +23,7 @@
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/Decals/OverlayManager.h"
 #include "PassCommon.h"
 #include "xrCore/FMesh.hpp"
 
@@ -295,6 +296,25 @@ static u32 GetSkeletonBoneOffset(
     return gpuCullMgr.GetOrUploadSkeleton(cmdList, parent);
 }
 
+static u32 GetOverlayIndex(const GeometryBatch& batch, decals::OverlayManager* overlayMgr)
+{
+    if (!overlayMgr)
+        return UINT32_MAX;
+
+    CKinematics* parent = nullptr;
+    u32 visualType = batch.visual ? batch.visual->getType() : 0;
+
+    if (visualType == MT_SKELETON_GEOMDEF_ST)
+        parent = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
+    else if (visualType == MT_SKELETON_GEOMDEF_PM)
+        parent = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+
+    if (!parent)
+        return UINT32_MAX;
+
+    return overlayMgr->GetBindlessIndex(parent);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 static void RenderSkinnedBatch(
     const SkinningPassState& state,
@@ -313,7 +333,8 @@ static void RenderSkinnedBatch(
     const nvrhi::Rect& scissor,
     const GeometryBatch& batch,
     const Fmatrix& worldMatrix,
-    u32 skeletonBoneOffset)
+    u32 skeletonBoneOffset,
+    u32 overlayTextureIndex = UINT32_MAX)
 {
     using namespace RENDER_NAMESPACE;
     using namespace RENDER_NAMESPACE::bindless;
@@ -328,6 +349,7 @@ static void RenderSkinnedBatch(
     SkinnedMaterialCB matIdData = {};
     matIdData.materialID = batch.bindlessMaterialID;
     matIdData.skeletonBoneOffset = skeletonBoneOffset;
+    matIdData.overlayTextureIndex = overlayTextureIndex;
     cmdList->writeBuffer(materialIdCB, &matIdData, sizeof(matIdData));
 
     if (!globalBoneBuffer)
@@ -406,7 +428,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     u32 width,
     u32 height,
     const SkinnedVisibilityData& visibilityData,
-    SkinningPassState* state)
+    SkinningPassState* state,
+    decals::OverlayManager* overlayMgr)
 {
     using namespace framegraph;
 
@@ -416,7 +439,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA
         // ═══════════════════════════════════════════════════════
-        [&, width, height, visibilityData, state](FrameGraph& builder, PassHandle passHandle, SkinningPassData& data) {
+        [&, width, height, visibilityData, state, overlayMgr](FrameGraph& builder, PassHandle passHandle, SkinningPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -427,6 +450,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             data.materialCache = materialCache;
             data.visibilityData = visibilityData;
             data.passState = state;
+            data.overlayMgr = overlayMgr;
 
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
@@ -592,8 +616,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                             continue;
                         }
 
-                        // Get bone offset from global buffer
                         u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
+                        u32 overlayIdx = GetOverlayIndex(batch, data.overlayMgr);
 
                         RenderSkinnedBatch(
                             *data.passState,
@@ -601,7 +625,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                             dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
                             globalBoneBuffer, terrainMatBuffer.GetBuffer(),
                             bindlessTable, bindlessLayout, worldViewport, scissor,
-                            batch, batch.worldMatrix, boneOffset
+                            batch, batch.worldMatrix, boneOffset, overlayIdx
                         );
                         renderedCount++;
                     }
@@ -618,8 +642,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         if (!batch.isSkinned)
                             continue;
 
-                        // Get bone offset from global buffer
                         u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
+                        u32 overlayIdx = GetOverlayIndex(batch, data.overlayMgr);
 
                         RenderSkinnedBatch(
                             *data.passState,
@@ -627,7 +651,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                             dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
                             globalBoneBuffer, terrainMatBuffer.GetBuffer(),
                             bindlessTable, bindlessLayout, worldViewport, scissor,
-                            batch, batch.worldMatrix, boneOffset
+                            batch, batch.worldMatrix, boneOffset, overlayIdx
                         );
                         drawCount++;
                     }
@@ -657,6 +681,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         batch, adjustedWorldMatrix, boneOffset
                     );
                 }
+
             }
         }
     );

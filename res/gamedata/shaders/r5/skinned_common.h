@@ -7,7 +7,7 @@ cbuffer SkinnedMaterialCB : register(b4)
 {
     uint g_SkinnedMaterialID;
     uint g_SkeletonBoneOffset;
-    uint g_SkinnedPad0;
+    uint g_OverlayTextureIndex;
     uint g_SkinnedPad1;
 };
 
@@ -29,6 +29,18 @@ float3 skinning_dir(float3 dir, float4x4 bone)
 float3 unpack_d3dcolor_normal(float3 packed)
 {
     return packed * 2.0 - 1.0;
+}
+
+static const float OVERLAY_DEFORM_SCALE = -0.005;
+
+float3 apply_overlay_deform(float3 pos, float3 normal, float2 uv)
+{
+    if (g_OverlayTextureIndex == 0xFFFFFFFF)
+        return pos;
+
+    Texture2D overlayTex = GetBindlessTexture(g_OverlayTextureIndex);
+    float deform = saturate(overlayTex.SampleLevel(g_LinearSampler, uv, 0).a);
+    return pos + normalize(normal) * (deform * OVERLAY_DEFORM_SCALE);
 }
 
 #endif // SKINNED_COMMON_H

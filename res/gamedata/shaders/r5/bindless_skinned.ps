@@ -6,6 +6,7 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
+#include "skinned_common.h"
 
 struct PS_INPUT
 {
@@ -24,14 +25,6 @@ struct PS_OUTPUT
     float4 normal : SV_Target1;
     float4 baseColor : SV_Target2;
     float4 worldPos : SV_Target3;
-};
-
-cbuffer SkinnedMaterialCB : register(b4)
-{
-    uint g_SkinnedMaterialID;
-    uint g_SkeletonBoneOffset;
-    uint g_SkinnedPad0;
-    uint g_SkinnedPad1;
 };
 
 PS_OUTPUT main(PS_INPUT input)
@@ -86,6 +79,13 @@ PS_OUTPUT main(PS_INPUT input)
         metallic = pbrSample.r;
         roughness = pbrSample.g;
         ao = pbrSample.b;
+    }
+
+    if (g_OverlayTextureIndex != 0xFFFFFFFF)
+    {
+        Texture2D overlayTex = GetBindlessTexture(g_OverlayTextureIndex);
+        float4 overlay = overlayTex.Sample(g_LinearSampler, input.texcoord);
+        albedo = lerp(albedo, overlay.rgb, overlay.a);
     }
 
     f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao);
