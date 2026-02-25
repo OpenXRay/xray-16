@@ -10,8 +10,6 @@
 #include "Common/object_broker.h"
 #include "Common/LevelGameDef.h"
 
-ENGINE_API float SunshaftsIntensity = 0.f;
-
 void CEnvModifier::load(IReader* fs, u32 version)
 {
     use_flags.one();
@@ -557,19 +555,12 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     rain_color.lerp(A.rain_color, B.rain_color, f);
     bolt_period = fi * A.bolt_period + f * B.bolt_period;
     bolt_duration = fi * A.bolt_duration + f * B.bolt_duration;
+
     // wind
     wind_velocity = fi * A.wind_velocity + f * B.wind_velocity;
     wind_direction = fi * A.wind_direction + f * B.wind_direction;
 
-#ifdef DEBUG
-    if (SunshaftsIntensity > 0.f)
-        m_fSunShaftsIntensity = SunshaftsIntensity;
-    else
-#endif
-    {
-        m_fSunShaftsIntensity = fi * A.m_fSunShaftsIntensity + f * B.m_fSunShaftsIntensity;
-    }
-
+    m_fSunShaftsIntensity = fi * A.m_fSunShaftsIntensity + f * B.m_fSunShaftsIntensity;
     m_fWaterIntensity = fi * A.m_fWaterIntensity + f * B.m_fWaterIntensity;
 
     // trees
