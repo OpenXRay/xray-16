@@ -221,12 +221,7 @@ public:
     }
     CBoneData* LL_GetBoneData(u16 bone_id)
     {
-        VERIFY(bone_id < LL_BoneCount());
-        VERIFY(bones);
-        u32 sz = sizeof(vecBones);
-        u32 sz1 = sizeof(((*bones)[bone_id])->children);
-        Msg("sz: %d", sz);
-        Msg("sz1: %d", sz1);
+        R_ASSERT1_CURE(bones && bone_id < LL_BoneCount(), { return nullptr; });
         CBoneData* bd = ((*bones)[bone_id]);
         return bd;
     }
@@ -254,13 +249,13 @@ public:
     u16 LL_GetBoneRoot() override { return iRoot; }
     void LL_SetBoneRoot(u16 bone_id) override
     {
-        VERIFY(bone_id < LL_BoneCount());
+        R_ASSERT1_CURE(bone_id < LL_BoneCount(), { return; });
         iRoot = bone_id;
     }
 
     BOOL LL_GetBoneVisible(u16 bone_id) override
     {
-        VERIFY(bone_id < LL_BoneCount());
+        R_ASSERT1_CURE(bone_id < LL_BoneCount(), { return false; });
         return visimask.is(u64(1) << bone_id);
     }
     void LL_SetBoneVisible(u16 bone_id, BOOL val, BOOL bRecursive) override;
