@@ -22,11 +22,7 @@ class CSkeletonX
 public:
     CKinematics* GetParent() { return Parent; }
     u16 RenderMode;
-protected:
-    enum
-    {
-        vertRenderFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1
-    };
+
     enum
     {
         RM_SKINNING_SOFT,
@@ -40,6 +36,12 @@ protected:
         RM_SKINNING_3B_HQ,
         RM_SKINNING_4B,
         RM_SKINNING_4B_HQ
+    };
+
+protected:
+    enum
+    {
+        vertRenderFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1
     };
 
     CKinematics* Parent; // setted up by parent
@@ -114,7 +116,17 @@ public:
         IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir, u16 bone_id) = 0;
     virtual void FillVertices(
         const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size, u16 bone_id) = 0;
+
+    const ref_smem<vertBoned1W>& GetVertices1W() const { return Vertices1W; }
+    const ref_smem<vertBoned2W>& GetVertices2W() const { return Vertices2W; }
+    const ref_smem<vertBoned3W>& GetVertices3W() const { return Vertices3W; }
+    const ref_smem<vertBoned4W>& GetVertices4W() const { return Vertices4W; }
 };
+
+void get_pos_bones(const vertBoned1W& v, Fvector& p, CKinematics* Parent);
+void get_pos_bones(const vertBoned2W& vert, Fvector& p, CKinematics* Parent);
+void get_pos_bones(const vertBoned3W& vert, Fvector& p, CKinematics* Parent);
+void get_pos_bones(const vertBoned4W& vert, Fvector& p, CKinematics* Parent);
 
 template <typename T_vertex, typename T_buffer>
 BOOL pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S,

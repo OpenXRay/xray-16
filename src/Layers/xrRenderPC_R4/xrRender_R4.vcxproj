@@ -165,6 +165,7 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.h" />
     <ClInclude Include="..\xrRender\Decals\DecalManager.h" />
     <ClInclude Include="..\xrRender\Decals\fgWallMarkArray.h" />
+    <ClInclude Include="..\xrRender\Decals\MeshPicker.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\PassVertexFormats.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticleGPUCullingManager.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.h" />
@@ -427,6 +428,7 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.cpp" />
     <ClCompile Include="..\xrRender\Decals\DecalManager.cpp" />
     <ClCompile Include="..\xrRender\Decals\fgWallMarkArray.cpp" />
+    <ClCompile Include="..\xrRender\Decals\MeshPicker.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticleGPUCullingManager.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.cpp" />

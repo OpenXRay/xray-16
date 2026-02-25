@@ -93,6 +93,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/Decals/DecalManager.cpp
     ../xrRender/Decals/fgWallMarkArray.h
     ../xrRender/Decals/fgWallMarkArray.cpp
+    ../xrRender/Decals/MeshPicker.h
+    ../xrRender/Decals/MeshPicker.cpp
     ../xrRender/FrameGraphPasses/ParticleGPUCullingManager.h
     ../xrRender/FrameGraphPasses/ParticleGPUCullingManager.cpp
     ../xrRender/FrameGraphPasses/ExposurePassSetup.h

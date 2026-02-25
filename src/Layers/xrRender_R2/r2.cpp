@@ -12,6 +12,7 @@
 #include "Layers/xrRender/dxUIShader.h"
 #include "Layers/xrRender/Decals/fgWallMarkArray.h"
 #include "Layers/xrRender/Decals/DecalManager.h"
+#include "Layers/xrRender/Decals/MeshPicker.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
@@ -1231,8 +1232,14 @@ void CRender::add_SkeletonWallmark(
         if (matID == UINT32_MAX)
             return;
         float decalSize = size * 2.0f;
-        Msg("[Decal] SKELETON ray start=(%.1f,%.1f,%.1f) dir=(%.2f,%.2f,%.2f) size=%.3f matID=%u",
-            start.x, start.y, start.z, dir.x, dir.y, dir.z, decalSize, matID);
+        decals::MeshPickResult pickResult;
+        if (decals::PickMeshDirect((CKinematics*)obj, *xf, start, dir, 100.f, pickResult)) {
+            Msg("[MeshPicker] HIT uv=(%.4f,%.4f) bone=%u dist=%.2f worldPos=(%.1f,%.1f,%.1f)",
+                pickResult.uv.x, pickResult.uv.y, pickResult.boneID, pickResult.dist,
+                pickResult.worldPos.x, pickResult.worldPos.y, pickResult.worldPos.z);
+        } else {
+            Msg("[MeshPicker] MISS");
+        }
         m_framegraphRenderer->GetDecalManager()->AddSkeletonDecalFromRay(
             xf, (CKinematics*)obj, start, dir, decalSize, matID);
         Msg("[Decal] SKELETON result: static=%u skel=%u total=%u",
