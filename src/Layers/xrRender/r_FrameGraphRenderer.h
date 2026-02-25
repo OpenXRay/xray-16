@@ -19,6 +19,9 @@ namespace xray::render::RENDER_NAMESPACE {
     namespace PS {
         class CParticleEffect;
     }
+    namespace decals {
+        class DecalManager;
+    }
 }
 
 namespace xray::render::RENDER_NAMESPACE::passes {
@@ -109,6 +112,9 @@ public:
 
     // Detail Manager accessor (for level loading integration)
     RENDER_NAMESPACE::FGDetailManager* GetDetailManager() const { return m_detailManager.get(); }
+
+    // Decal Manager accessor (for wallmark routing)
+    RENDER_NAMESPACE::decals::DecalManager* GetDecalManager() const { return m_decalManager.get(); }
 
 private:
     bool m_enabled = false;
@@ -211,6 +217,9 @@ private:
 
     // Detail Manager (Framegraph: grass/vegetation rendering)
     xr_unique_ptr<RENDER_NAMESPACE::FGDetailManager> m_detailManager;
+
+    // Decal Manager (screen-space box decals replacing legacy wallmarks)
+    xr_unique_ptr<RENDER_NAMESPACE::decals::DecalManager> m_decalManager;
 
     // Ray Tracing acceleration structures (for path tracer)
     xr_unique_ptr<RENDER_NAMESPACE::RTAccelStructManager> m_rtAccelMgr;

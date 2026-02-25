@@ -1,0 +1,62 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct GPUDecalData
+{
+    float4x4 worldToDecal;
+    float4x4 decalToWorld;
+    uint materialID;
+    float opacity;
+    float normalThreshold;
+    uint flags;
+};
+
+Texture2D<float> g_Depth : register(t4);
+Texture2D<float4> g_Normal : register(t5);
+Texture2D<float4> g_WorldPos : register(t6);
+StructuredBuffer<GPUDecalData> g_Decals : register(t3);
+
+struct VS_OUTPUT
+{
+    float4 position : SV_Position;
+    float4 screenPos : TEXCOORD0;
+    nointerpolation uint instanceID : TEXCOORD1;
+};
+
+float4 main(VS_OUTPUT input) : SV_Target0
+{
+    GPUDecalData decal = g_Decals[input.instanceID];
+    int2 pixelCoord = int2(input.position.xy);
+
+    float depth = g_Depth.Load(int3(pixelCoord, 0));
+    if (depth >= 1.0)
+        discard;
+
+    float4 worldPosData = g_WorldPos.Load(int3(pixelCoord, 0));
+    float geoType = worldPosData.w;
+    bool isStatic = geoType < 1.5;
+    if (decal.flags == 0 && !isStatic)
+        discard;
+    if (decal.flags == 1 && isStatic)
+        discard;
+    if (decal.flags == 1 && depth < 0.1)
+        discard;
+    float3 worldPos = worldPosData.xyz;
+    float4 decalLocal = mul(decal.worldToDecal, float4(worldPos, 1.0));
+
+    float3 absLocal = abs(decalLocal.xyz);
+    if (absLocal.x > 0.5 || absLocal.y > 0.5 || absLocal.z > 0.5)
+        discard;
+
+    float2 uv = decalLocal.xz + 0.5;
+
+    MaterialData mat = g_Materials[decal.materialID];
+    float4 decalColor = SampleDiffuse(mat, uv);
+
+    float3 edgeDist = 0.5 - absLocal;
+    float minEdge = min(edgeDist.x, min(edgeDist.y, edgeDist.z));
+    float edgeFade = saturate(minEdge * 4.0);
+
+    return float4(decalColor.rgb, decalColor.a * decal.opacity * edgeFade);
+}

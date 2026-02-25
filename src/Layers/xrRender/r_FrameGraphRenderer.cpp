@@ -41,6 +41,8 @@
 #include "FrameGraphPasses/SkinningPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"      // Particle rendering (billboards/sprites)
 #include "FrameGraphPasses/DistortionApplyPassSetup.h" // Distortion post-process
+#include "FrameGraphPasses/DecalPassSetup.h"          // Screen-space box decals
+#include "Decals/DecalManager.h"                      // Decal manager
 #include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
@@ -147,6 +149,9 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     // Note: Will be loaded during level loading (see r2_loader.cpp), not here
     m_detailManager = xr_make_unique<RENDER_NAMESPACE::FGDetailManager>();
 
+    m_decalManager = xr_make_unique<RENDER_NAMESPACE::decals::DecalManager>();
+    m_decalManager->Initialize(device);
+
     m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
     m_rtAccelMgr->Initialize(device);
 
@@ -238,6 +243,11 @@ void FrameGraphRenderer::Shutdown() {
     m_staticBatchesCached = false;
     if (m_gpuCullingManager) {
         m_gpuCullingManager->InvalidateStaticCullingData();
+    }
+
+    if (m_decalManager) {
+        m_decalManager->Shutdown();
+        m_decalManager = nullptr;
     }
 
     if (m_rtAccelMgr) {
@@ -1253,6 +1263,21 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width, height,
         m_passStates->transparent
     );
+
+    // ═══════════════════════════════════════════════════════
+    //  DECAL PASS (screen-space box decals on surfaces)
+    // ═══════════════════════════════════════════════════════
+    if (m_decalManager) {
+        m_decalManager->Update(Device.fTimeDelta, Device.fTimeGlobal);
+        if (m_decalManager->GetActiveCount() > 0) {
+            transparentOutputs = passes::setupDecalPass(
+                *m_framegraph, m_device,
+                transparentOutputs, m_decalManager.get(),
+                width, height,
+                m_passStates->decal
+            );
+        }
+    }
 
     // ═══════════════════════════════════════════════════════
     //  MOTION VECTOR PASS (Depth-based reprojection)

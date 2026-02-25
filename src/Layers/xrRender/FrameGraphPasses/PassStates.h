@@ -13,6 +13,7 @@
 #include "SkinningPassSetup.h"
 #include "MotionVectorPassSetup.h"
 #include "ReSTIRGIPassSetup.h"
+#include "DecalPassSetup.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -30,6 +31,7 @@ struct PassStates {
     SkinningPassState skinning;
     MotionVectorPassState motionVector;
     ReSTIRGIPassState restirGI;
+    DecalPassState decal;
 };
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

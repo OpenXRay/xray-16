@@ -93,5 +93,6 @@ PS_OUTPUT main(PS_INPUT input)
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
     output.worldPos = fwd.worldPos;
+    output.worldPos.w = 2.0;
     return output;
 }

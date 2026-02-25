@@ -10,6 +10,8 @@
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/Decals/fgWallMarkArray.h"
+#include "Layers/xrRender/Decals/DecalManager.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
@@ -1166,6 +1168,10 @@ void CRender::add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fm
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
+#if RENDER == R_R4
+    if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled())
+        return;
+#endif
     VERIFY2(T, "Invalid static wallmark triangle");
     if (T->suppress_wm)
         return;
@@ -1175,6 +1181,23 @@ void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::
 
 void CRender::add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
 {
+#if RENDER == R_R4
+    if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled()) {
+        if (!T || T->suppress_wm || !V || s <= EPS_L)
+            return;
+        auto* fgArray = static_cast<decals::fgWallMarkArray*>(pArray);
+        u32 matID = fgArray->GenerateBindlessMaterialID();
+        if (matID == UINT32_MAX)
+            return;
+        Fvector N;
+        N.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
+        float decalSize = s * 2.0f;
+        m_framegraphRenderer->GetDecalManager()->AddStaticDecal(P, N, decalSize, matID);
+        Msg("[Decal] STATIC pos=(%.1f,%.1f,%.1f) size=%.3f matID=%u count=%u",
+            P.x, P.y, P.z, decalSize, matID, m_framegraphRenderer->GetDecalManager()->GetActiveCount());
+        return;
+    }
+#endif
     dxWallMarkArray* pWMA = (dxWallMarkArray*)pArray;
     ref_shader* pShader = pWMA->dxGenerateWallmark();
     if (pShader)
@@ -1197,6 +1220,28 @@ void CRender::add_SkeletonWallmark(
 void CRender::add_SkeletonWallmark(
     const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start, const Fvector& dir, float size)
 {
+#if RENDER == R_R4
+    if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled()) {
+        if (!xf || !obj || size <= EPS_L)
+            return;
+        if (xf->c.distance_to_sqr(Device.vCameraPosition) > _sqr(50.f))
+            return;
+        auto* fgArray = static_cast<decals::fgWallMarkArray*>(pArray);
+        u32 matID = fgArray->GenerateBindlessMaterialID();
+        if (matID == UINT32_MAX)
+            return;
+        float decalSize = size * 2.0f;
+        Msg("[Decal] SKELETON ray start=(%.1f,%.1f,%.1f) dir=(%.2f,%.2f,%.2f) size=%.3f matID=%u",
+            start.x, start.y, start.z, dir.x, dir.y, dir.z, decalSize, matID);
+        m_framegraphRenderer->GetDecalManager()->AddSkeletonDecalFromRay(
+            xf, (CKinematics*)obj, start, dir, decalSize, matID);
+        Msg("[Decal] SKELETON result: static=%u skel=%u total=%u",
+            m_framegraphRenderer->GetDecalManager()->GetStaticCount(),
+            m_framegraphRenderer->GetDecalManager()->GetSkeletonCount(),
+            m_framegraphRenderer->GetDecalManager()->GetActiveCount());
+        return;
+    }
+#endif
     dxWallMarkArray* pWMA = (dxWallMarkArray*)pArray;
     ref_shader* pShader = pWMA->dxGenerateWallmark();
     if (pShader)
