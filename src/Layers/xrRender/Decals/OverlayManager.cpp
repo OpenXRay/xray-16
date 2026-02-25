@@ -46,7 +46,7 @@ ObjectOverlay& OverlayManager::GetOrCreateOverlay(CKinematics* obj, float distSq
     desc.format = nvrhi::Format::RGBA16_FLOAT;
     desc.isRenderTarget = true;
     desc.isUAV = true;
-    desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+    desc.initialState = nvrhi::ResourceStates::ShaderResource;
     desc.keepInitialState = true;
     desc.debugName = "NPC_Overlay";
 

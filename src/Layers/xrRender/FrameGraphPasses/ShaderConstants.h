@@ -53,7 +53,8 @@ struct alignas(16) ShaderParams {
 struct alignas(16) SkinnedMaterialCB {
     u32 materialID;
     u32 skeletonBoneOffset;
-    u32 pad0, pad1;
+    u32 overlayTextureIndex;
+    u32 pad1;
 };
 
 struct alignas(16) StaticGlobals {
