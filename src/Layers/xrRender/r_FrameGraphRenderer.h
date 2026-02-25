@@ -21,6 +21,7 @@ namespace xray::render::RENDER_NAMESPACE {
     }
     namespace decals {
         class DecalManager;
+        class OverlayManager;
     }
 }
 
@@ -115,6 +116,7 @@ public:
 
     // Decal Manager accessor (for wallmark routing)
     RENDER_NAMESPACE::decals::DecalManager* GetDecalManager() const { return m_decalManager.get(); }
+    RENDER_NAMESPACE::decals::OverlayManager* GetOverlayManager() const { return m_overlayManager.get(); }
 
 private:
     bool m_enabled = false;
@@ -220,6 +222,9 @@ private:
 
     // Decal Manager (screen-space box decals replacing legacy wallmarks)
     xr_unique_ptr<RENDER_NAMESPACE::decals::DecalManager> m_decalManager;
+
+    // Overlay Manager (per-NPC UV-space overlay textures for baked decals)
+    xr_unique_ptr<RENDER_NAMESPACE::decals::OverlayManager> m_overlayManager;
 
     // Ray Tracing acceleration structures (for path tracer)
     xr_unique_ptr<RENDER_NAMESPACE::RTAccelStructManager> m_rtAccelMgr;

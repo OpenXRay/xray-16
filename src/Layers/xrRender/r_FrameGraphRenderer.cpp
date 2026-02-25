@@ -43,6 +43,7 @@
 #include "FrameGraphPasses/DistortionApplyPassSetup.h" // Distortion post-process
 #include "FrameGraphPasses/DecalPassSetup.h"          // Screen-space box decals
 #include "Decals/DecalManager.h"                      // Decal manager
+#include "Decals/OverlayManager.h"                    // Per-NPC overlay textures
 #include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
@@ -152,6 +153,9 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_decalManager = xr_make_unique<RENDER_NAMESPACE::decals::DecalManager>();
     m_decalManager->Initialize(device);
 
+    m_overlayManager = xr_make_unique<RENDER_NAMESPACE::decals::OverlayManager>();
+    m_overlayManager->Initialize(device);
+
     m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
     m_rtAccelMgr->Initialize(device);
 
@@ -248,6 +252,11 @@ void FrameGraphRenderer::Shutdown() {
     if (m_decalManager) {
         m_decalManager->Shutdown();
         m_decalManager = nullptr;
+    }
+
+    if (m_overlayManager) {
+        m_overlayManager->Shutdown();
+        m_overlayManager = nullptr;
     }
 
     if (m_rtAccelMgr) {

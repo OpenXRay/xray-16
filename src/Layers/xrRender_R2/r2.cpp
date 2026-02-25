@@ -13,6 +13,7 @@
 #include "Layers/xrRender/Decals/fgWallMarkArray.h"
 #include "Layers/xrRender/Decals/DecalManager.h"
 #include "Layers/xrRender/Decals/MeshPicker.h"
+#include "Layers/xrRender/Decals/OverlayManager.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
@@ -1237,6 +1238,11 @@ void CRender::add_SkeletonWallmark(
             Msg("[MeshPicker] HIT uv=(%.4f,%.4f) bone=%u dist=%.2f worldPos=(%.1f,%.1f,%.1f)",
                 pickResult.uv.x, pickResult.uv.y, pickResult.boneID, pickResult.dist,
                 pickResult.worldPos.x, pickResult.worldPos.y, pickResult.worldPos.z);
+            auto* overlayMgr = m_framegraphRenderer->GetOverlayManager();
+            float distSq = xf->c.distance_to_sqr(Device.vCameraPosition);
+            auto& overlay = overlayMgr->GetOrCreateOverlay((CKinematics*)obj, distSq);
+            Msg("[Overlay] obj=%p res=%u bindless=%u dirty=%d count=%u",
+                obj, overlay.resolution, overlay.bindlessIndex, overlay.dirty, overlayMgr->GetOverlayCount());
         } else {
             Msg("[MeshPicker] MISS");
         }
