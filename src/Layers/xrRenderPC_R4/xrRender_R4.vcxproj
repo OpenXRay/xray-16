@@ -162,6 +162,7 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\DecalPassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\OverlayPaintPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.h" />
     <ClInclude Include="..\xrRender\Decals\DecalManager.h" />
     <ClInclude Include="..\xrRender\Decals\fgWallMarkArray.h" />
@@ -426,6 +427,7 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\DecalPassSetup.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\OverlayPaintPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.cpp" />
     <ClCompile Include="..\xrRender\Decals\DecalManager.cpp" />
     <ClCompile Include="..\xrRender\Decals\fgWallMarkArray.cpp" />

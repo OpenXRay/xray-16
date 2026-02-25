@@ -1235,16 +1235,24 @@ void CRender::add_SkeletonWallmark(
         float decalSize = size * 2.0f;
         decals::MeshPickResult pickResult;
         if (decals::PickMeshDirect((CKinematics*)obj, *xf, start, dir, 100.f, pickResult)) {
-            Msg("[MeshPicker] HIT uv=(%.4f,%.4f) bone=%u dist=%.2f worldPos=(%.1f,%.1f,%.1f)",
-                pickResult.uv.x, pickResult.uv.y, pickResult.boneID, pickResult.dist,
-                pickResult.worldPos.x, pickResult.worldPos.y, pickResult.worldPos.z);
             auto* overlayMgr = m_framegraphRenderer->GetOverlayManager();
             float distSq = xf->c.distance_to_sqr(Device.vCameraPosition);
-            auto& overlay = overlayMgr->GetOrCreateOverlay((CKinematics*)obj, distSq);
-            Msg("[Overlay] obj=%p res=%u bindless=%u dirty=%d count=%u",
-                obj, overlay.resolution, overlay.bindlessIndex, overlay.dirty, overlayMgr->GetOverlayCount());
-        } else {
-            Msg("[MeshPicker] MISS");
+            overlayMgr->GetOrCreateOverlay((CKinematics*)obj, distSq);
+
+            Fvector cross;
+            cross.crossproduct(pickResult.triWorldEdge1, pickResult.triWorldEdge2);
+            float worldArea = cross.magnitude() * 0.5f;
+            Fvector2 uvE1, uvE2;
+            uvE1.sub(pickResult.triUV[1], pickResult.triUV[0]);
+            uvE2.sub(pickResult.triUV[2], pickResult.triUV[0]);
+            float uvArea = _abs(uvE1.x * uvE2.y - uvE2.x * uvE1.y) * 0.5f;
+            float uvToWorld = _sqrt(uvArea / _max(worldArea, 0.0001f));
+            float uvRadius = _max(decalSize * 0.5f * uvToWorld, 0.01f);
+
+            Fvector4 bloodTint = { 0.4f, 0.02f, 0.02f, 0.8f };
+            overlayMgr->QueuePaint((CKinematics*)obj, pickResult.uv, uvRadius, 0, bloodTint, 1);
+            Msg("[OverlayPaint] queued uv=(%.4f,%.4f) r=%.4f obj=%p",
+                pickResult.uv.x, pickResult.uv.y, uvRadius, obj);
         }
         m_framegraphRenderer->GetDecalManager()->AddSkeletonDecalFromRay(
             xf, (CKinematics*)obj, start, dir, decalSize, matID);

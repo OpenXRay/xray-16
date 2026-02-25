@@ -604,6 +604,7 @@ ParticlePassOutput setupParticlePass(
                 distDesc.format = nvrhi::Format::RGBA16_FLOAT;
                 distDesc.isRenderTarget = true;
                 distDesc.isTransient = true;
+                distDesc.isUAV = true;
                 distDesc.debugName = "rt_Distortion";
                 data.distortionRT = passBuilder.createTexture("rt_Distortion", distDesc);
             }

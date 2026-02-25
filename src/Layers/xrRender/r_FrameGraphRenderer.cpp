@@ -1202,6 +1202,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         skinnedVisibility.statsUserData = m_gpuCullingManager.get();
     }
 
+    passes::setupOverlayPaintPass(
+        *m_framegraph, m_device,
+        m_overlayManager.get(),
+        m_passStates->overlayPaint
+    );
+
     auto hudOutputs = passes::setupSkinningPass(
         *m_framegraph,
         m_device,
@@ -1331,6 +1337,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         snapDesc.format = nvrhi::Format::RGBA16_FLOAT;
         snapDesc.isRenderTarget = true;
         snapDesc.isTransient = true;
+        snapDesc.isUAV = true;
         snapDesc.debugName = "rt_SceneSnapshot";
         auto snapshotHandle = m_framegraph->CreateTexture("rt_SceneSnapshot", snapDesc);
 

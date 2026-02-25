@@ -14,6 +14,7 @@
 #include "MotionVectorPassSetup.h"
 #include "ReSTIRGIPassSetup.h"
 #include "DecalPassSetup.h"
+#include "OverlayPaintPassSetup.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -32,6 +33,7 @@ struct PassStates {
     MotionVectorPassState motionVector;
     ReSTIRGIPassState restirGI;
     DecalPassState decal;
+    OverlayPaintPassState overlayPaint;
 };
 
 } // namespace xray::render::RENDER_NAMESPACE::passes
