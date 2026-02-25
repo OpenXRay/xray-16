@@ -190,6 +190,9 @@
     <Filter Include="Framegraph\Passes">
       <UniqueIdentifier>{6aa36c2e-cba5-46c5-a125-6eabb9a0bf2c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Framegraph\Decals">
+      <UniqueIdentifier>{d4e5f6a7-b8c9-4d0e-a1b2-c3d4e5f6a7b8}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Framegraph\RayTracing">
       <UniqueIdentifier>{b3a7e5d1-4f2c-4a8d-9e1b-5c3d7f9a2b4e}</UniqueIdentifier>
     </Filter>
@@ -815,6 +818,15 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.h">
       <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\DecalPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Decals\DecalManager.h">
+      <Filter>Framegraph\Decals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Decals\fgWallMarkArray.h">
+      <Filter>Framegraph\Decals</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
@@ -1655,6 +1667,15 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\DecalPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\Decals\DecalManager.cpp">
+      <Filter>Framegraph\Decals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\Decals\fgWallMarkArray.cpp">
+      <Filter>Framegraph\Decals</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>

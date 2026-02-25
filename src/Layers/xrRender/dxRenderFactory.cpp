@@ -17,6 +17,8 @@
 
 #include "dxFontRender.h"
 #include "dxWallMarkArray.h"
+#include "Decals/fgWallMarkArray.h"
+#include "xrEngine/IFrameGraphRender.h"
 #include "dxUISequenceVideoItem.h"
 #include "dxUIShader.h"
 
@@ -37,7 +39,23 @@ RENDER_FACTORY_IMPLEMENT(StatGraphRender)
 #ifdef DEBUG
 RENDER_FACTORY_IMPLEMENT(ObjectSpaceRender)
 #endif // DEBUG
-RENDER_FACTORY_IMPLEMENT(WallMarkArray)
+IWallMarkArray* dxRenderFactory::CreateWallMarkArray()
+{
+#if RENDER == R_R4
+    return xr_new<decals::fgWallMarkArray>();
+#else
+    return xr_new<dxWallMarkArray>();
+#endif
+}
+void dxRenderFactory::DestroyWallMarkArray(IWallMarkArray* pObject)
+{
+#if RENDER == R_R4
+    auto* p = static_cast<decals::fgWallMarkArray*>(pObject);
+    xr_delete(p);
+#else
+    xr_delete((dxWallMarkArray*&)pObject);
+#endif
+}
 #endif // _EDITOR
 
 #ifndef _EDITOR

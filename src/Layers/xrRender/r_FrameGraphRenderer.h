@@ -17,6 +17,9 @@ namespace xray::render::RENDER_NAMESPACE {
     namespace PS {
         class CParticleEffect;
     }
+    namespace decals {
+        class DecalManager;
+    }
 }
 
 namespace xray::render::RENDER_NAMESPACE::passes {
@@ -94,6 +97,8 @@ public:
 
     RENDER_NAMESPACE::FGDetailManager* GetDetailManager() const { return m_detailManager.get(); }
 
+    RENDER_NAMESPACE::decals::DecalManager* GetDecalManager() const { return m_decalManager.get(); }
+
 private:
     bool m_enabled = false;
     ng::RenderDevice* m_device = nullptr;
@@ -156,6 +161,8 @@ private:
     xr_unique_ptr<RENDER_NAMESPACE::GPUCullingManager> m_gpuCullingManager;
 
     xr_unique_ptr<RENDER_NAMESPACE::FGDetailManager> m_detailManager;
+
+    xr_unique_ptr<RENDER_NAMESPACE::decals::DecalManager> m_decalManager;
 
     xr_unique_ptr<RENDER_NAMESPACE::RTAccelStructManager> m_rtAccelMgr;
     u32 m_ptSampleIndex = 0;

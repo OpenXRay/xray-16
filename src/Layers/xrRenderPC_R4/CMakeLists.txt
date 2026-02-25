@@ -85,6 +85,14 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/ImGuiPassSetup.cpp
     ../xrRender/FrameGraphPasses/ParticlePassSetup.h
     ../xrRender/FrameGraphPasses/ParticlePassSetup.cpp
+    ../xrRender/FrameGraphPasses/DecalPassSetup.h
+    ../xrRender/FrameGraphPasses/DecalPassSetup.cpp
+    ../xrRender/FrameGraphPasses/DistortionApplyPassSetup.h
+    ../xrRender/FrameGraphPasses/DistortionApplyPassSetup.cpp
+    ../xrRender/Decals/DecalManager.h
+    ../xrRender/Decals/DecalManager.cpp
+    ../xrRender/Decals/fgWallMarkArray.h
+    ../xrRender/Decals/fgWallMarkArray.cpp
     ../xrRender/FrameGraphPasses/ParticleGPUCullingManager.h
     ../xrRender/FrameGraphPasses/ParticleGPUCullingManager.cpp
     ../xrRender/FrameGraphPasses/ExposurePassSetup.h

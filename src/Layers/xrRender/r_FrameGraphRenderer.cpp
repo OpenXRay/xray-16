@@ -38,6 +38,8 @@
 #include "FrameGraphPasses/SkinningPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"
 #include "FrameGraphPasses/DistortionApplyPassSetup.h"
+#include "FrameGraphPasses/DecalPassSetup.h"
+#include "Decals/DecalManager.h"
 #include "FrameGraphPasses/ExposurePassSetup.h"
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"
@@ -123,6 +125,9 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     m_detailManager = xr_make_unique<RENDER_NAMESPACE::FGDetailManager>();
 
+    m_decalManager = xr_make_unique<RENDER_NAMESPACE::decals::DecalManager>();
+    m_decalManager->Initialize(device);
+
     m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
     m_rtAccelMgr->Initialize(device);
 
@@ -193,6 +198,11 @@ void FrameGraphRenderer::Shutdown() {
     m_staticBatchesCached = false;
     if (m_gpuCullingManager) {
         m_gpuCullingManager->InvalidateStaticCullingData();
+    }
+
+    if (m_decalManager) {
+        m_decalManager->Shutdown();
+        m_decalManager = nullptr;
     }
 
     if (m_rtAccelMgr) {
@@ -958,6 +968,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width, height,
         m_passStates->transparent
     );
+
+    if (m_decalManager) {
+        m_decalManager->Update(Device.fTimeDelta, Device.fTimeGlobal);
+        if (m_decalManager->GetActiveCount() > 0) {
+            transparentOutputs = passes::setupDecalPass(
+                *m_framegraph, m_device,
+                transparentOutputs, m_decalManager.get(),
+                width, height,
+                m_passStates->decal
+            );
+        }
+    }
 
     passes::MotionVectorOutput motionOutput;
     if (m_hasPrevFrameData) {
