@@ -8,6 +8,10 @@
 // Forward declarations of X-Ray engine globals
 extern ECORE_API float ps_r2_sun_lumscale_hemi;
 extern ENGINE_API int ps_fg_pbr_diffuse_mode;
+extern ENGINE_API Fvector4 ps_dev_param_1;
+extern ENGINE_API Fvector4 ps_dev_param_2;
+extern ENGINE_API Fvector4 ps_dev_param_3;
+extern ENGINE_API Fvector4 ps_dev_param_4;
 namespace xray::render {
     namespace RENDER_NAMESPACE {
         extern float r__dtex_range;  // Detail texture range (defined in TextureDescrManager.cpp)
@@ -116,8 +120,13 @@ struct alignas(16) StaticGlobals {
     Fvector4 cluster_scales;
 
     Fvector4 camera_direction;
+
+    Fvector4 dev_param_1;
+    Fvector4 dev_param_2;
+    Fvector4 dev_param_3;
+    Fvector4 dev_param_4;
 };
-static_assert(sizeof(StaticGlobals) == 784, "StaticGlobals must be 784 bytes");
+static_assert(sizeof(StaticGlobals) == 848, "StaticGlobals must be 848 bytes");
 
 // Legacy alias for compatibility
 using GlobalConstants = StaticGlobals;
@@ -197,6 +206,11 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     // Camera direction vector (for lighting calculations)
     cb.camera_direction.set(Device.vCameraDirection.x, Device.vCameraDirection.y,
                             Device.vCameraDirection.z, 0.0f);
+
+    cb.dev_param_1 = ps_dev_param_1;
+    cb.dev_param_2 = ps_dev_param_2;
+    cb.dev_param_3 = ps_dev_param_3;
+    cb.dev_param_4 = ps_dev_param_4;
 }
 
 inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity) {

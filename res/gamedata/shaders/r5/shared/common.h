@@ -60,6 +60,11 @@ cbuffer	static_globals : register(b2)
 	float4		cluster_scales;
 
 	float4		camera_direction;
+
+	float4		dev_param_1;
+	float4		dev_param_2;
+	float4		dev_param_3;
+	float4		dev_param_4;
 };
 
 /*

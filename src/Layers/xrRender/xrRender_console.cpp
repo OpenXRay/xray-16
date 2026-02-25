@@ -1222,6 +1222,11 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
 
+    CMD4(CCC_Vector4, "dev_param_1", &ps_dev_param_1, Fvector4().set(-1000, -1000, -1000, -1000), Fvector4().set(1000, 1000, 1000, 1000));
+    CMD4(CCC_Vector4, "dev_param_2", &ps_dev_param_2, Fvector4().set(-1000, -1000, -1000, -1000), Fvector4().set(1000, 1000, 1000, 1000));
+    CMD4(CCC_Vector4, "dev_param_3", &ps_dev_param_3, Fvector4().set(-1000, -1000, -1000, -1000), Fvector4().set(1000, 1000, 1000, 1000));
+    CMD4(CCC_Vector4, "dev_param_4", &ps_dev_param_4, Fvector4().set(-1000, -1000, -1000, -1000), Fvector4().set(1000, 1000, 1000, 1000));
+
     // FrameGraph render backend (requires restart)
     CMD3(CCC_Token, "fg_render_mode", &ps_fg_render_mode, fg_render_mode_token);
 

@@ -28,6 +28,10 @@ ENGINE_API int ps_r_path_tracer = 0;
 ENGINE_API int ps_r_path_tracer_bounces = 8;
 ENGINE_API int ps_r_rt_gi = 0;
 ENGINE_API float ps_r_rt_gi_intensity = 1.0f;
+ENGINE_API Fvector4 ps_dev_param_1 = {0, 0, 0, 0};
+ENGINE_API Fvector4 ps_dev_param_2 = {0, 0, 0, 0};
+ENGINE_API Fvector4 ps_dev_param_3 = {0, 0, 0, 0};
+ENGINE_API Fvector4 ps_dev_param_4 = {0, 0, 0, 0};
 extern int ps_disable_lens_flare;
 
 void IConsole_Command::InvalidSyntax()
