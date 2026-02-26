@@ -18,6 +18,11 @@ namespace xray::render::RENDER_NAMESPACE::decals {
 
 static constexpr u32 MAX_SPLATS_PER_OBJECT = 32;
 
+enum SplatMode : u32 {
+    SPLAT_MODE_DECAL = 0,
+    SPLAT_MODE_PROCEDURAL_BLOOD = 1
+};
+
 struct alignas(16) GPUPaintSplat {
     Fvector4 posRadius;
     Fvector4 color;
@@ -26,8 +31,9 @@ struct alignas(16) GPUPaintSplat {
     Fvector2 hitUV;
     float uvRadius;
     u32 wallmarkMaterialID;
+    Fvector4 evolution;
 };
-static_assert(sizeof(GPUPaintSplat) == 80);
+static_assert(sizeof(GPUPaintSplat) == 96);
 
 struct SplatDebugInfo {
     Fvector2 uv;
@@ -51,6 +57,8 @@ public:
                   const Fvector& color, float alpha,
                   Fvector2 uv = {0.f, 0.f}, float uvRadius = 0.f,
                   u32 wallmarkMaterialID = UINT32_MAX,
+                  u32 mode = SPLAT_MODE_DECAL,
+                  float lifetime = 12.f,
                   const char* targetTextureName = nullptr,
                   const char* wallmarkTextureName = nullptr);
 

@@ -162,6 +162,7 @@ extern ECORE_API float ps_r3_dyn_wet_surf_far; // 30.0f
 extern ECORE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 
 extern ECORE_API int ps_r4_debug_gpu_culling;
+extern ECORE_API int ps_r4_skeleton_wallmark_mode;
 
 enum { FG_RENDER_DX12 = 0, FG_RENDER_VULKAN = 1 };
 extern ECORE_API u32 ps_fg_render_mode;
