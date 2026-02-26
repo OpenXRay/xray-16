@@ -664,8 +664,10 @@ ParticlePassOutput setupParticlePass(
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
             auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
             auto* worldPosCopyRT = data.worldPosCopy.is_valid() ? fg.GetPhysicalTexture(data.worldPosCopy) : nullptr;
+            if (!worldPosCopyRT)
+                worldPosCopyRT = worldPosRT;
 
-            if (worldPosRT && worldPosCopyRT)
+            if (worldPosRT && worldPosCopyRT && worldPosCopyRT != worldPosRT)
                 cmdList->copyTexture(worldPosCopyRT, nvrhi::TextureSlice(), worldPosRT, nvrhi::TextureSlice());
 
             nvrhi::FramebufferDesc fbDesc;

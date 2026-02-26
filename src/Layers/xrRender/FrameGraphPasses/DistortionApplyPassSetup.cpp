@@ -76,16 +76,10 @@ VirtualResourceHandle setupDistortionApplyPass(
             auto& cache = GetPassResourceCache();
             nvrhi::IDevice* device = cmdList->getDevice();
 
-            nvrhi::BindingLayoutDesc globalsLayoutDesc;
-            globalsLayoutDesc.visibility = nvrhi::ShaderType::Pixel;
-            globalsLayoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-            };
-            auto globalsLayout = cache.GetOrCreateBindingLayout("DistortionApply_globals", globalsLayoutDesc, device);
-
             nvrhi::BindingLayoutDesc layoutDesc;
             layoutDesc.visibility = nvrhi::ShaderType::Pixel;
             layoutDesc.bindings = {
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
                 nvrhi::BindingLayoutItem::Texture_SRV(0),
                 nvrhi::BindingLayoutItem::Texture_SRV(1),
                 nvrhi::BindingLayoutItem::Texture_SRV(2),
@@ -96,7 +90,6 @@ VirtualResourceHandle setupDistortionApplyPass(
             nvrhi::GraphicsPipelineDesc pipeDesc;
             pipeDesc.setVertexShader(vsResult.handle);
             pipeDesc.setPixelShader(psResult.handle);
-            pipeDesc.addBindingLayout(globalsLayout);
             pipeDesc.addBindingLayout(layout);
             pipeDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
             pipeDesc.renderState.blendState.targets[0].setBlendEnable(false);
@@ -122,14 +115,9 @@ VirtualResourceHandle setupDistortionApplyPass(
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-            nvrhi::BindingSetDesc globalsBindDesc;
-            globalsBindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-            };
-            auto globalsBindingSet = cache.GetOrCreateBindingSet(globalsBindDesc, globalsLayout, device);
-
             nvrhi::BindingSetDesc bindDesc;
             bindDesc.bindings = {
+                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
                 nvrhi::BindingSetItem::Texture_SRV(0, snapshotTex),
                 nvrhi::BindingSetItem::Texture_SRV(1, distortTex),
                 nvrhi::BindingSetItem::Texture_SRV(2, worldPosTex),
@@ -149,7 +137,6 @@ VirtualResourceHandle setupDistortionApplyPass(
             state.pipeline = pipeline;
             state.framebuffer = framebuffer;
             state.viewport.addViewportAndScissorRect(viewport);
-            state.addBindingSet(globalsBindingSet);
             state.addBindingSet(bindingSet);
 
             cmdList->setGraphicsState(state);
