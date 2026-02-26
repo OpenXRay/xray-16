@@ -151,12 +151,6 @@ public:
 
     [[nodiscard]]
     virtual float GetEnvironmentGameDayTimeSec() const = 0;
-
-    // Lua garbage collection step (called from Device when mt_script_gc is enabled)
-    virtual void script_gc() {}
-
-    // Returns true if script_gc should run as a parallel task (mt_script_gc enabled)
-    virtual bool IsScriptGcParallel() const { return false; }
 };
 
 //-----------------------------------------------------------------------------------------------------------

@@ -558,11 +558,8 @@ void IGame_Persistent::OnFrame()
 {
     ZoneScoped;
 
-    {
-        ZoneScopedN("SpatialSpace.Update");
-        SpatialSpace.update();
-        SpatialSpacePhysic.update();
-    }
+    SpatialSpace.update();
+    SpatialSpacePhysic.update();
 
 #ifndef _EDITOR
     if (!Device.Paused() || Device.dwPrecacheFrame)
@@ -571,17 +568,24 @@ void IGame_Persistent::OnFrame()
     stats.Starting = ps_needtoplay.size();
     stats.Active = ps_active.size();
     stats.Destroying = ps_destroy.size();
-
-    while (ps_needtoplay.size()) {
+    // Play req particle systems
+    while (ps_needtoplay.size())
+    {
         CPS_Instance* psi = ps_needtoplay.back();
         ps_needtoplay.pop_back();
         psi->Play(false);
     }
-
-    while (ps_destroy.size()) {
+    // Destroy inactive particle systems
+    while (ps_destroy.size())
+    {
+        // u32 cnt = ps_destroy.size();
         CPS_Instance* psi = ps_destroy.back();
+        VERIFY(psi);
         if (psi->Locked())
+        {
+            Log("--locked");
             break;
+        }
         ps_destroy.pop_back();
         psi->PSI_internal_delete();
     }
