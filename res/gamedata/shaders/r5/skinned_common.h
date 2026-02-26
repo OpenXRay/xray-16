@@ -17,6 +17,9 @@ struct PaintSplat
     float4 color;           // rgb + alpha
     uint4  boneIdx;         // up to 4 bone indices (local to skeleton)
     float4 boneWeights;     // corresponding weights (sum = 1)
+    float2 hitUV;           // hit UV in target diffuse UV space
+    float uvRadius;         // radius in UV space for stamp sampling
+    uint wallmarkMaterialID; // bindless material ID for wallmark texture
 };
 
 StructuredBuffer<PaintSplat> g_PaintSplats : register(t11);
@@ -70,7 +73,22 @@ float3 apply_splat_deform(float3 worldPos, float3 worldNormal)
     return offset;
 }
 
-float3 apply_splat_color(float3 albedo, float3 worldPos)
+float4 sample_splat_stamp(PaintSplat splat, float2 meshUV)
+{
+    if (splat.wallmarkMaterialID == INVALID_TEXTURE_INDEX || splat.uvRadius <= 1e-5)
+        return float4(1, 1, 1, 1);
+
+    float2 uvMin = splat.hitUV - splat.uvRadius;
+    float2 uvMax = splat.hitUV + splat.uvRadius;
+    if (any(meshUV < uvMin) || any(meshUV > uvMax))
+        return float4(0, 0, 0, 0);
+
+    float2 stampUV = (meshUV - uvMin) / max(2.0 * splat.uvRadius, 1e-5);
+    MaterialData wallmarkMat = g_Materials[splat.wallmarkMaterialID];
+    return SampleDiffuse(wallmarkMat, stampUV);
+}
+
+float3 apply_splat_color(float3 albedo, float3 worldPos, float2 meshUV)
 {
     for (uint i = 0; i < g_SplatCount; i++)
     {
@@ -81,7 +99,16 @@ float3 apply_splat_color(float3 albedo, float3 worldPos)
         if (dist < r)
         {
             float fade = 1.0 - smoothstep(r * 0.5, r, dist);
-            albedo = lerp(albedo, splat.color.rgb, splat.color.a * fade);
+            float3 splatColor = splat.color.rgb;
+            float splatAlpha = splat.color.a * fade;
+
+            float4 stamp = sample_splat_stamp(splat, meshUV);
+            if (stamp.a <= 1e-5)
+                continue;
+
+            splatColor *= stamp.rgb;
+            splatAlpha *= stamp.a;
+            albedo = lerp(albedo, splatColor, saturate(splatAlpha));
         }
     }
     return albedo;

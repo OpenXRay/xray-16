@@ -1214,6 +1214,46 @@ void CRender::add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, 
 
 void CRender::clear_static_wallmarks() { Wallmarks->clear(); }
 void CRender::add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm) { Wallmarks->AddSkeletonWallmark(wm); }
+
+static float EstimateSplatUVRadius(const decals::MeshPickResult& pickResult, float worldRadius)
+{
+    const float du1 = pickResult.triUV[1].x - pickResult.triUV[0].x;
+    const float dv1 = pickResult.triUV[1].y - pickResult.triUV[0].y;
+    const float du2 = pickResult.triUV[2].x - pickResult.triUV[0].x;
+    const float dv2 = pickResult.triUV[2].y - pickResult.triUV[0].y;
+
+    const float det = du1 * dv2 - dv1 * du2;
+    if (_abs(det) > EPS_S)
+    {
+        const float invDet = 1.f / det;
+
+        Fvector dpdu;
+        dpdu.set(
+            (pickResult.triWorldEdge1.x * dv2 - pickResult.triWorldEdge2.x * dv1) * invDet,
+            (pickResult.triWorldEdge1.y * dv2 - pickResult.triWorldEdge2.y * dv1) * invDet,
+            (pickResult.triWorldEdge1.z * dv2 - pickResult.triWorldEdge2.z * dv1) * invDet);
+
+        Fvector dpdv;
+        dpdv.set(
+            (pickResult.triWorldEdge2.x * du1 - pickResult.triWorldEdge1.x * du2) * invDet,
+            (pickResult.triWorldEdge2.y * du1 - pickResult.triWorldEdge1.y * du2) * invDet,
+            (pickResult.triWorldEdge2.z * du1 - pickResult.triWorldEdge1.z * du2) * invDet);
+
+        const float worldPerUV = 0.5f * (dpdu.magnitude() + dpdv.magnitude());
+        if (worldPerUV > EPS_S)
+            return _max(worldRadius / worldPerUV, 1e-4f);
+    }
+
+    const float worldEdge = _max(pickResult.triWorldEdge1.magnitude(), pickResult.triWorldEdge2.magnitude());
+    const float uvEdge1 = _sqrt(_sqr(du1) + _sqr(dv1));
+    const float uvEdge2 = _sqrt(_sqr(du2) + _sqr(dv2));
+    const float uvEdge = _max(uvEdge1, uvEdge2);
+    if (worldEdge > EPS_S && uvEdge > EPS_S)
+        return _max(worldRadius * (uvEdge / worldEdge), 1e-4f);
+
+    return 0.02f;
+}
+
 void CRender::add_SkeletonWallmark(
     const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size)
 {
@@ -1234,7 +1274,8 @@ void CRender::add_SkeletonWallmark(
             return;
         }
         auto* fgArray = static_cast<decals::fgWallMarkArray*>(pArray);
-        u32 matID = fgArray->GenerateBindlessMaterialID();
+        shared_str wallmarkTexture;
+        u32 matID = fgArray->GenerateBindlessMaterialID(&wallmarkTexture);
         if (matID == UINT32_MAX) {
             Msg("[Splat] SKIP: matID invalid");
             return;
@@ -1245,14 +1286,18 @@ void CRender::add_SkeletonWallmark(
         if (decals::PickMeshDirect((CKinematics*)obj, *xf, start, dir, 100.f, pickResult)) {
             auto* overlayMgr = m_framegraphRenderer->GetOverlayManager();
             float worldRadius = decalSize * 0.5f;
+            const float uvRadius = EstimateSplatUVRadius(pickResult, worldRadius);
             Fvector bloodColor = { 0.4f, 0.02f, 0.02f };
             overlayMgr->AddSplat((CKinematics*)obj, pickResult.triVerts,
                                   pickResult.baryU, pickResult.baryV,
                                   worldRadius, bloodColor, 0.8f,
-                                  pickResult.uv, pickResult.hitTextureName.c_str());
-            Msg("[Splat] HIT: r=%.3f uv=(%.3f,%.3f) bary=(%.3f,%.3f) obj=%p",
+                                  pickResult.uv, uvRadius, matID,
+                                  pickResult.hitTextureName.c_str(),
+                                  wallmarkTexture.c_str());
+            Msg("[Splat] HIT: r=%.3f uv=(%.3f,%.3f) uvR=%.4f bary=(%.3f,%.3f) obj=%p wm=%s",
                 worldRadius, pickResult.uv.x, pickResult.uv.y,
-                pickResult.baryU, pickResult.baryV, obj);
+                uvRadius, pickResult.baryU, pickResult.baryV, obj,
+                wallmarkTexture.size() ? wallmarkTexture.c_str() : "<none>");
         } else {
             Msg("[Splat] MISS: no triangle hit for obj=%p", obj);
         }

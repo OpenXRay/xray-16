@@ -23,12 +23,16 @@ struct alignas(16) GPUPaintSplat {
     Fvector4 color;         // rgb + alpha
     u32 boneIdx[4];         // up to 4 bone indices (local to skeleton)
     float boneWeight[4];    // corresponding weights (sum = 1)
+    Fvector2 hitUV;         // Hit UV in the target diffuse UV space
+    float uvRadius;         // Radius in UV space for wallmark texture sampling
+    u32 wallmarkMaterialID; // Bindless material ID of the wallmark texture
 };
-static_assert(sizeof(GPUPaintSplat) == 64);
+static_assert(sizeof(GPUPaintSplat) == 80);
 
 struct SplatDebugInfo {
     Fvector2 uv;
-    xr_string textureName;
+    xr_string targetTextureName;
+    xr_string wallmarkTextureName;
 };
 
 struct ObjectSplats {
@@ -45,7 +49,10 @@ public:
     void AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
                   float baryU, float baryV, float radius,
                   const Fvector& color, float alpha,
-                  Fvector2 uv = {0.f, 0.f}, const char* textureName = nullptr);
+                  Fvector2 uv = {0.f, 0.f}, float uvRadius = 0.f,
+                  u32 wallmarkMaterialID = UINT32_MAX,
+                  const char* targetTextureName = nullptr,
+                  const char* wallmarkTextureName = nullptr);
 
     struct SplatRange { u32 offset; u32 count; };
     SplatRange GetSplatRange(CKinematics* obj) const;

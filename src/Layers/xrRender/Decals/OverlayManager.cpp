@@ -30,7 +30,11 @@ void OverlayManager::Shutdown()
 
 void OverlayManager::AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
                                float baryU, float baryV, float radius,
-                               const Fvector& color, float alpha, Fvector2 uv, const char* textureName)
+                               const Fvector& color, float alpha,
+                               Fvector2 uv, float uvRadius,
+                               u32 wallmarkMaterialID,
+                               const char* targetTextureName,
+                               const char* wallmarkTextureName)
 {
     // Merge up to 12 bone contributions (3 verts × 4) into top-4 for the hit point
     struct BoneContrib { u16 idx; float weight; };
@@ -71,6 +75,8 @@ void OverlayManager::AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
     float totalW = 0.f;
     for (u32 i = 0; i < useCount; i++)
         totalW += contribs[i].weight;
+    if (totalW <= EPS_S)
+        return;
 
     GPUPaintSplat gpu = {};
     gpu.posRadius = { restPos.x, restPos.y, restPos.z, radius };
@@ -79,6 +85,9 @@ void OverlayManager::AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
         gpu.boneIdx[i] = contribs[i].idx;
         gpu.boneWeight[i] = contribs[i].weight / totalW;
     }
+    gpu.hitUV = uv;
+    gpu.uvRadius = _max(uvRadius, 0.f);
+    gpu.wallmarkMaterialID = wallmarkMaterialID;
 
     auto& data = m_objects[obj];
     data.lastPaintTime = Device.fTimeGlobal;
@@ -87,7 +96,11 @@ void OverlayManager::AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
         data.splatDebug.erase(data.splatDebug.begin());
     }
     data.splats.push_back(gpu);
-    data.splatDebug.push_back({ uv, textureName ? xr_string(textureName) : xr_string() });
+    data.splatDebug.push_back({
+        uv,
+        targetTextureName ? xr_string(targetTextureName) : xr_string(),
+        wallmarkTextureName ? xr_string(wallmarkTextureName) : xr_string()
+    });
     m_dirty = true;
 }
 
@@ -110,9 +123,23 @@ void OverlayManager::UploadSplats(nvrhi::ICommandList* cmdList)
     for (auto& [obj, data] : m_objects) {
         SplatRange range;
         range.offset = (u32)m_gpuSplats.size();
-        range.count = (u32)data.splats.size();
-        for (const auto& s : data.splats)
+        range.count = 0;
+
+        const u32 total = (u32)data.splats.size();
+        const u32 remaining = (u32)(MAX_GPU_SPLATS - m_gpuSplats.size());
+        if (remaining == 0) {
+            m_rangeCache[obj] = range;
+            continue;
+        }
+
+        const u32 keepCount = std::min(total, remaining);
+        const u32 start = total - keepCount;
+        for (u32 i = start; i < total; i++)
+        {
+            const auto& s = data.splats[i];
             m_gpuSplats.push_back(s);
+        }
+        range.count = keepCount;
         m_rangeCache[obj] = range;
     }
 

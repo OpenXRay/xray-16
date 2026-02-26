@@ -737,14 +737,26 @@ void StatsOverlay::RenderWallmarksSection()
                     ImVec2(canvasPos.x + canvasW, canvasPos.y + t * canvasW), gridCol);
     }
 
-    float dotR = std::max(4.0f, canvasW * 0.018f);
+    const float minStampRadiusPx = std::max(3.0f, canvasW * 0.01f);
     for (const auto& s : group.splats)
     {
         float px = canvasPos.x + s.u * canvasW;
         float py = canvasPos.y + s.v * canvasW;
-        ImU32 col = IM_COL32((int)(s.r * 255), (int)(s.g * 255), (int)(s.b * 255), 220);
-        dl->AddCircleFilled(ImVec2(px, py), dotR, col);
-        dl->AddCircle(ImVec2(px, py), dotR, IM_COL32(255, 255, 255, 80));
+        float radiusPx = std::max(minStampRadiusPx, s.uvRadius * canvasW);
+        ImU32 tint = IM_COL32((int)(s.r * 255), (int)(s.g * 255), (int)(s.b * 255), (int)(s.a * 255));
+
+        if (s.stampTex)
+        {
+            ImVec2 p0(px - radiusPx, py - radiusPx);
+            ImVec2 p1(px + radiusPx, py + radiusPx);
+            dl->AddImage(reinterpret_cast<ImTextureID>(s.stampTex), p0, p1, ImVec2(0, 0), ImVec2(1, 1), tint);
+            dl->AddCircle(ImVec2(px, py), radiusPx, IM_COL32(255, 255, 255, 60));
+        }
+        else
+        {
+            dl->AddCircleFilled(ImVec2(px, py), radiusPx, tint);
+            dl->AddCircle(ImVec2(px, py), radiusPx, IM_COL32(255, 255, 255, 80));
+        }
     }
 
     ImGui::Dummy(ImVec2(canvasW, canvasW));

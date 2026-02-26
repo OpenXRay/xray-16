@@ -111,7 +111,12 @@ public:
     void SetSelectedRTSize(u32 w, u32 h) { m_sourceWidth = w; m_sourceHeight = h; }
     int GetSelectedMipLevel() const { return m_selectedMipLevel; }
 
-    struct WallmarkSplat { float u, v, r, g, b, a; };
+    struct WallmarkSplat {
+        float u, v;
+        float uvRadius;
+        float r, g, b, a;
+        nvrhi::ITexture* stampTex = nullptr;
+    };
     struct WallmarkTexGroup { nvrhi::ITexture* diffuseTex = nullptr; xr_string texName; xr_vector<WallmarkSplat> splats; };
     struct WallmarkObjectData { void* objKey = nullptr; xr_vector<WallmarkTexGroup> groups; };
     void SetWallmarkData(xr_vector<WallmarkObjectData> data) { m_wallmarkData = std::move(data); }

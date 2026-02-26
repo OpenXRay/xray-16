@@ -682,28 +682,43 @@ void FrameGraphRenderer::RenderStatsOverlay()
                 od.objKey = obj;
 
                 xr_map<xr_string, int> groupIndex;
+                xr_map<xr_string, nvrhi::ITexture*> texCache;
+                auto resolveTexture = [&](const xr_string& texName) -> nvrhi::ITexture*
+                {
+                    if (!m_materialCache || texName.empty())
+                        return nullptr;
+
+                    auto it = texCache.find(texName);
+                    if (it != texCache.end())
+                        return it->second;
+
+                    nvrhi::ITexture* tex = m_materialCache->GetNVRHITextureByName(texName.c_str());
+                    texCache[texName] = tex;
+                    return tex;
+                };
+
                 for (u32 i = 0; i < (u32)data.splats.size(); i++)
                 {
                     const auto& gpu   = data.splats[i];
                     const auto& dbg   = data.splatDebug[i];
-                    const xr_string& texName = dbg.textureName;
+                    const xr_string& targetTexName = dbg.targetTextureName;
 
-                    auto git = groupIndex.find(texName);
+                    auto git = groupIndex.find(targetTexName);
                     if (git == groupIndex.end())
                     {
                         xray::profiler::StatsOverlay::WallmarkTexGroup g;
-                        g.texName   = texName;
-                        g.diffuseTex = m_materialCache
-                            ? m_materialCache->GetNVRHITextureByName(texName.c_str())
-                            : nullptr;
-                        groupIndex[texName] = (int)od.groups.size();
+                        g.texName = targetTexName;
+                        g.diffuseTex = resolveTexture(targetTexName);
+                        groupIndex[targetTexName] = (int)od.groups.size();
                         od.groups.push_back(std::move(g));
-                        git = groupIndex.find(texName);
+                        git = groupIndex.find(targetTexName);
                     }
 
+                    nvrhi::ITexture* stampTex = resolveTexture(dbg.wallmarkTextureName);
                     od.groups[git->second].splats.push_back(
-                        { dbg.uv.x, dbg.uv.y,
-                          gpu.color.x, gpu.color.y, gpu.color.z, gpu.color.w });
+                        { dbg.uv.x, dbg.uv.y, gpu.uvRadius,
+                          gpu.color.x, gpu.color.y, gpu.color.z, gpu.color.w,
+                          stampTex });
                 }
 
                 wmData.push_back(std::move(od));
