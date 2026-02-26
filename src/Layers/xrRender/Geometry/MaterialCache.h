@@ -360,6 +360,8 @@ public:
 
     u32 RegisterBindlessMaterial(MaterialPSO* matPSO);
 
+    nvrhi::ITexture* GetNVRHITextureByName(const char* textureName);
+
     u32 PreRegisterBindlessMaterial(dxRender_Visual* visual);
 
     u32 PreRegisterParticleMaterial(const shared_str& textureName);
