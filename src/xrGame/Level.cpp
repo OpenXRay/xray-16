@@ -566,7 +566,11 @@ void CLevel::OnFrame()
             m_level_sound_manager->Update();
 
         // defer LUA-GC-STEP
-        if (!g_mt_config.test(mtLUA_GC))
+        if (g_mt_config.test(mtLUA_GC))
+        {
+            Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CLevel::script_gc));
+        }
+        else
             script_gc();
     }
     if (pStatGraphR)
@@ -608,11 +612,6 @@ void CLevel::script_gc()
     }
 
     AIStats.LuaGC.End();
-}
-
-bool CLevel::IsScriptGcParallel() const
-{
-    return g_mt_config.test(mtLUA_GC);
 }
 
 #ifdef DEBUG_PRECISE_PATH

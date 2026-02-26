@@ -304,21 +304,9 @@ void CRenderDevice::ProcessFrame()
             seqFrameMT.Process();
         });
 
-        Task* scriptGcTask = nullptr;
-        if (g_pGameLevel && g_pGameLevel->IsScriptGcParallel())
-        {
-            scriptGcTask = &TaskScheduler->AddTask([]
-            {
-                ZoneScopedN("ScriptGC");
-                g_pGameLevel->script_gc();
-            });
-        }
-
         DoRender();
 
         TaskScheduler->Wait(processSeqParallel);
-        if (scriptGcTask)
-            TaskScheduler->Wait(*scriptGcTask);
 
         const u64 frameEndTime = TimerGlobal.GetElapsed_ms();
         const u64 frameTime = frameEndTime - frameStartTime;
