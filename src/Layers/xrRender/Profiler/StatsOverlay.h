@@ -115,6 +115,8 @@ public:
         float u, v;
         float uvRadius;
         float r, g, b, a;
+        u32 mode = 0;
+        float seed = 0.f;
         nvrhi::ITexture* stampTex = nullptr;
     };
     struct WallmarkTexGroup { nvrhi::ITexture* diffuseTex = nullptr; xr_string texName; xr_vector<WallmarkSplat> splats; };

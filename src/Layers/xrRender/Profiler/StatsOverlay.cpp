@@ -737,6 +737,7 @@ void StatsOverlay::RenderWallmarksSection()
                     ImVec2(canvasPos.x + canvasW, canvasPos.y + t * canvasW), gridCol);
     }
 
+    constexpr u32 WM_MODE_PROCEDURAL = 1u;
     const float minStampRadiusPx = std::max(3.0f, canvasW * 0.01f);
     for (const auto& s : group.splats)
     {
@@ -745,7 +746,27 @@ void StatsOverlay::RenderWallmarksSection()
         float radiusPx = std::max(minStampRadiusPx, s.uvRadius * canvasW);
         ImU32 tint = IM_COL32((int)(s.r * 255), (int)(s.g * 255), (int)(s.b * 255), (int)(s.a * 255));
 
-        if (s.stampTex)
+        if (s.mode == WM_MODE_PROCEDURAL)
+        {
+            constexpr int kSegments = 24;
+            ImVec2 pts[kSegments];
+            for (int i = 0; i < kSegments; i++)
+            {
+                float t = (float)i / (float)kSegments;
+                float a = t * PI_MUL_2;
+                float n0 = 0.5f + 0.5f * _sin(a * (5.0f + _abs(s.seed) * 0.013f) + s.seed * 0.071f);
+                float n1 = 0.5f + 0.5f * _sin(a * (9.0f + _abs(s.seed) * 0.007f) - s.seed * 0.113f);
+                float r = radiusPx * (0.72f + 0.20f * n0 + 0.18f * n1);
+                pts[i] = ImVec2(px + _cos(a) * r, py + _sin(a) * r);
+            }
+
+            dl->AddConvexPolyFilled(pts, kSegments, tint);
+            dl->AddPolyline(pts, kSegments, IM_COL32(255, 255, 255, 70), true, 1.0f);
+
+            ImU32 core = IM_COL32((int)(s.r * 180), (int)(s.g * 140), (int)(s.b * 140), (int)(s.a * 210));
+            dl->AddCircleFilled(ImVec2(px, py), radiusPx * 0.35f, core);
+        }
+        else if (s.stampTex)
         {
             ImVec2 p0(px - radiusPx, py - radiusPx);
             ImVec2 p1(px + radiusPx, py + radiusPx);

@@ -163,6 +163,7 @@ extern ECORE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 
 // R4 Debug
 extern ECORE_API int ps_r4_debug_gpu_culling; // 0=off, 1=show bounding spheres with cull state colors
+extern ECORE_API int ps_r4_skeleton_wallmark_mode; // 0=decal stamps, 1=procedural blood
 
 // FrameGraph render backend selection (requires restart)
 enum { FG_RENDER_DX12 = 0, FG_RENDER_VULKAN = 1 };

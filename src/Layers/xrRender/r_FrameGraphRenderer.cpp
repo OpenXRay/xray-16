@@ -715,9 +715,11 @@ void FrameGraphRenderer::RenderStatsOverlay()
                     }
 
                     nvrhi::ITexture* stampTex = resolveTexture(dbg.wallmarkTextureName);
+                    u32 mode = (u32)(gpu.evolution.w + 0.5f);
                     od.groups[git->second].splats.push_back(
                         { dbg.uv.x, dbg.uv.y, gpu.uvRadius,
                           gpu.color.x, gpu.color.y, gpu.color.z, gpu.color.w,
+                          mode, gpu.evolution.z,
                           stampTex });
                 }
 

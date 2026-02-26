@@ -1273,31 +1273,72 @@ void CRender::add_SkeletonWallmark(
             Msg("[Splat] SKIP: too far dist=%.1f", _sqrt(distSq));
             return;
         }
-        auto* fgArray = static_cast<decals::fgWallMarkArray*>(pArray);
+        const u32 splatMode = ps_r4_skeleton_wallmark_mode > 0
+            ? decals::SPLAT_MODE_PROCEDURAL_BLOOD
+            : decals::SPLAT_MODE_DECAL;
+
         shared_str wallmarkTexture;
-        u32 matID = fgArray->GenerateBindlessMaterialID(&wallmarkTexture);
-        if (matID == UINT32_MAX) {
-            Msg("[Splat] SKIP: matID invalid");
-            return;
+        u32 matID = UINT32_MAX;
+        if (splatMode == decals::SPLAT_MODE_DECAL)
+        {
+            if (!pArray) {
+                Msg("[Splat] SKIP: missing wallmark array for decal mode");
+                return;
+            }
+
+            auto* fgArray = static_cast<decals::fgWallMarkArray*>(pArray);
+            matID = fgArray->GenerateBindlessMaterialID(&wallmarkTexture);
+            if (matID == UINT32_MAX) {
+                Msg("[Splat] SKIP: matID invalid");
+                return;
+            }
         }
         float decalSize = size * 2.0f;
-        decals::MeshPickResult pickResult;
+        decals::MeshPickResult entryPick;
         Msg("[Splat] Picking obj=%p dir=(%.2f,%.2f,%.2f)", obj, dir.x, dir.y, dir.z);
-        if (decals::PickMeshDirect((CKinematics*)obj, *xf, start, dir, 100.f, pickResult)) {
+        if (decals::PickMeshDirect((CKinematics*)obj, *xf, start, dir, 100.f, entryPick)) {
             auto* overlayMgr = m_framegraphRenderer->GetOverlayManager();
             float worldRadius = decalSize * 0.5f;
-            const float uvRadius = EstimateSplatUVRadius(pickResult, worldRadius);
             Fvector bloodColor = { 0.4f, 0.02f, 0.02f };
-            overlayMgr->AddSplat((CKinematics*)obj, pickResult.triVerts,
-                                  pickResult.baryU, pickResult.baryV,
-                                  worldRadius, bloodColor, 0.8f,
-                                  pickResult.uv, uvRadius, matID,
-                                  pickResult.hitTextureName.c_str(),
-                                  wallmarkTexture.c_str());
-            Msg("[Splat] HIT: r=%.3f uv=(%.3f,%.3f) uvR=%.4f bary=(%.3f,%.3f) obj=%p wm=%s",
-                worldRadius, pickResult.uv.x, pickResult.uv.y,
-                uvRadius, pickResult.baryU, pickResult.baryV, obj,
-                wallmarkTexture.size() ? wallmarkTexture.c_str() : "<none>");
+            const float lifetime = splatMode == decals::SPLAT_MODE_PROCEDURAL_BLOOD ? 18.f : 12.f;
+
+            auto queueSplat = [&](const decals::MeshPickResult& pick, const char* hitKind)
+            {
+                const float uvRadius = EstimateSplatUVRadius(pick, worldRadius);
+                overlayMgr->AddSplat((CKinematics*)obj, pick.triVerts,
+                                      pick.baryU, pick.baryV,
+                                      worldRadius, bloodColor, 0.8f,
+                                      pick.uv, uvRadius, matID,
+                                      splatMode, lifetime,
+                                      pick.hitTextureName.c_str(),
+                                      wallmarkTexture.c_str());
+                Msg("[Splat] %s: mode=%s r=%.3f uv=(%.3f,%.3f) uvR=%.4f bary=(%.3f,%.3f) obj=%p wm=%s",
+                    hitKind,
+                    splatMode == decals::SPLAT_MODE_PROCEDURAL_BLOOD ? "proc" : "decal",
+                    worldRadius, pick.uv.x, pick.uv.y,
+                    uvRadius, pick.baryU, pick.baryV, obj,
+                    wallmarkTexture.size() ? wallmarkTexture.c_str() : "<none>");
+            };
+
+            queueSplat(entryPick, "ENTRY");
+
+            Fvector shotDir = dir;
+            shotDir.normalize_safe();
+            const float entryAdvance = entryPick.dist + 0.01f;
+            const float remaining = 100.f - entryAdvance;
+            if (remaining > 0.01f)
+            {
+                Fvector exitStart;
+                exitStart.mad(start, shotDir, entryAdvance);
+
+                decals::MeshPickResult exitPick;
+                if (decals::PickMeshDirect((CKinematics*)obj, *xf, exitStart, shotDir, remaining, exitPick))
+                {
+                    const float minSeparation = _max(0.02f, worldRadius * 0.25f);
+                    if (entryPick.worldPos.distance_to(exitPick.worldPos) > minSeparation)
+                        queueSplat(exitPick, "EXIT");
+                }
+            }
         } else {
             Msg("[Splat] MISS: no triangle hit for obj=%p", obj);
         }

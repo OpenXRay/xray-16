@@ -33,6 +33,8 @@ void OverlayManager::AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
                                const Fvector& color, float alpha,
                                Fvector2 uv, float uvRadius,
                                u32 wallmarkMaterialID,
+                               u32 mode,
+                               float lifetime,
                                const char* targetTextureName,
                                const char* wallmarkTextureName)
 {
@@ -88,6 +90,12 @@ void OverlayManager::AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
     gpu.hitUV = uv;
     gpu.uvRadius = _max(uvRadius, 0.f);
     gpu.wallmarkMaterialID = wallmarkMaterialID;
+    gpu.evolution.set(
+        Device.fTimeGlobal,
+        lifetime > EPS_S ? (1.f / lifetime) : 0.f,
+        ::Random.randF(0.f, 10000.f),
+        (float)mode
+    );
 
     auto& data = m_objects[obj];
     data.lastPaintTime = Device.fTimeGlobal;
