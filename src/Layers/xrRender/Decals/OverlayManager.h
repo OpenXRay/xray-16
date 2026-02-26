@@ -23,12 +23,16 @@ struct alignas(16) GPUPaintSplat {
     Fvector4 color;
     u32 boneIdx[4];
     float boneWeight[4];
+    Fvector2 hitUV;
+    float uvRadius;
+    u32 wallmarkMaterialID;
 };
-static_assert(sizeof(GPUPaintSplat) == 64);
+static_assert(sizeof(GPUPaintSplat) == 80);
 
 struct SplatDebugInfo {
     Fvector2 uv;
-    xr_string textureName;
+    xr_string targetTextureName;
+    xr_string wallmarkTextureName;
 };
 
 struct ObjectSplats {
@@ -45,7 +49,10 @@ public:
     void AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
                   float baryU, float baryV, float radius,
                   const Fvector& color, float alpha,
-                  Fvector2 uv = {0.f, 0.f}, const char* textureName = nullptr);
+                  Fvector2 uv = {0.f, 0.f}, float uvRadius = 0.f,
+                  u32 wallmarkMaterialID = UINT32_MAX,
+                  const char* targetTextureName = nullptr,
+                  const char* wallmarkTextureName = nullptr);
 
     struct SplatRange { u32 offset; u32 count; };
     SplatRange GetSplatRange(CKinematics* obj) const;

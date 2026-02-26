@@ -92,27 +92,75 @@ template <typename T_vertex>
 static bool PickAllTrisHW(T_vertex* vertices, CKinematics* parent, const Fvector& S, const Fvector& D,
     u16* indices, u32 numIndices, float& bestDist, TriPickResult& bestHit)
 {
-    bool found = false;
+    constexpr float kRayDistEps = 0.001f;
+    constexpr float kTriAreaEps = 1e-8f;
+
+    bool foundFront = false;
+    bool foundAny = false;
+    float bestFrontDist = bestDist;
+    float bestAnyDist = bestDist;
+    TriPickResult bestFrontHit = {};
+    TriPickResult bestAnyHit = {};
+
     for (u32 tri = 0; tri < numIndices / 3; tri++) {
         u32 idx = tri * 3;
         Fvector skinned[3];
         for (u32 k = 0; k < 3; k++)
             vertices[indices[idx + k]].get_pos_bones(skinned[k], parent);
 
+        Fvector edge1, edge2, triNormal;
+        edge1.sub(skinned[1], skinned[0]);
+        edge2.sub(skinned[2], skinned[0]);
+        triNormal.crossproduct(edge1, edge2);
+        if (triNormal.square_magnitude() <= kTriAreaEps)
+            continue;
+
         float u, v, dist = flt_max;
-        if (CDB::TestRayTri(S, D, skinned, u, v, dist, false) && dist > 0.f && dist < bestDist) {
-            bestDist = dist;
-            bestHit.dist = dist;
-            bestHit.baryU = u;
-            bestHit.baryV = v;
-            for (u32 k = 0; k < 3; k++) {
-                bestHit.skinnedPos[k] = skinned[k];
-                bestHit.vertIdx[k] = indices[idx + k];
+        if (CDB::TestRayTri(S, D, skinned, u, v, dist, false)) {
+            if (dist <= kRayDistEps)
+                continue;
+
+            const bool frontFacing = triNormal.dotproduct(D) < 0.f;
+
+            if (frontFacing && dist < bestFrontDist) {
+                bestFrontDist = dist;
+                bestFrontHit.dist = dist;
+                bestFrontHit.baryU = u;
+                bestFrontHit.baryV = v;
+                for (u32 k = 0; k < 3; k++) {
+                    bestFrontHit.skinnedPos[k] = skinned[k];
+                    bestFrontHit.vertIdx[k] = indices[idx + k];
+                }
+                foundFront = true;
             }
-            found = true;
+
+            if (dist < bestAnyDist) {
+                bestAnyDist = dist;
+                bestAnyHit.dist = dist;
+                bestAnyHit.baryU = u;
+                bestAnyHit.baryV = v;
+                for (u32 k = 0; k < 3; k++) {
+                    bestAnyHit.skinnedPos[k] = skinned[k];
+                    bestAnyHit.vertIdx[k] = indices[idx + k];
+                }
+                foundAny = true;
+            }
         }
     }
-    return found;
+
+    if (foundFront) {
+        bestDist = bestFrontDist;
+        bestHit = bestFrontHit;
+        return true;
+    }
+
+    if (foundAny) {
+        bestDist = bestAnyDist;
+        bestHit = bestAnyHit;
+        return true;
+    }
+
+    return false;
 }
 
 template <typename T_vertex>
@@ -145,6 +193,15 @@ static bool TryPickChild(void* vbData, CKinematics* parent, const Fvector& S, co
         return true;
     }
     return false;
+}
+
+template <typename T_vertex>
+static bool TryPickChildIfStride(void* vbData, u32 stride, CKinematics* parent, const Fvector& S, const Fvector& D,
+    u16* indices, u32 indexCount, float& bestDist, TriPickResult& bestHit, UVBoneResult& uvOut, bool& uvValid)
+{
+    if (stride != sizeof(T_vertex))
+        return false;
+    return TryPickChild<T_vertex>(vbData, parent, S, D, indices, indexCount, bestDist, bestHit, uvOut, uvValid);
 }
 
 bool PickMeshDirect(
@@ -193,6 +250,9 @@ bool PickMeshDirect(
         if (indexCount == 0)
             continue;
 
+        if (indexBase + indexCount > V->dwPrimitives * 3)
+            continue;
+
         u16* allIndices = static_cast<u16*>(V->p_rm_Indices->Map(0, V->dwPrimitives * 3, true));
         void* vbData = V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true);
         if (!allIndices || !vbData) {
@@ -208,29 +268,52 @@ bool PickMeshDirect(
         switch (skelChild->RenderMode) {
         case CSkeletonX::RM_SINGLE:
         case CSkeletonX::RM_SKINNING_1B:
-            TryPickChild<vertHW_1W<s16>>(vbData, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            TryPickChildIfStride<vertHW_1W<s16>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            if (!childUVValid)
+                TryPickChildIfStride<vertHW_1W<float>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
             break;
         case CSkeletonX::RM_SKINNING_2B:
-            TryPickChild<vertHW_2W<s16>>(vbData, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            TryPickChildIfStride<vertHW_2W<s16>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            if (!childUVValid)
+                TryPickChildIfStride<vertHW_2W<float>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
             break;
         case CSkeletonX::RM_SKINNING_3B:
-            TryPickChild<vertHW_3W<s16>>(vbData, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            TryPickChildIfStride<vertHW_3W<s16>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            if (!childUVValid)
+                TryPickChildIfStride<vertHW_3W<float>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
             break;
         case CSkeletonX::RM_SKINNING_4B:
-            TryPickChild<vertHW_4W<s16>>(vbData, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            TryPickChildIfStride<vertHW_4W<s16>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            if (!childUVValid)
+                TryPickChildIfStride<vertHW_4W<float>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
             break;
         case CSkeletonX::RM_SINGLE_HQ:
         case CSkeletonX::RM_SKINNING_1B_HQ:
-            TryPickChild<vertHW_1W<float>>(vbData, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            TryPickChildIfStride<vertHW_1W<float>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            if (!childUVValid)
+                TryPickChildIfStride<vertHW_1W<s16>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
             break;
         case CSkeletonX::RM_SKINNING_2B_HQ:
-            TryPickChild<vertHW_2W<float>>(vbData, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            TryPickChildIfStride<vertHW_2W<float>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            if (!childUVValid)
+                TryPickChildIfStride<vertHW_2W<s16>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
             break;
         case CSkeletonX::RM_SKINNING_3B_HQ:
-            TryPickChild<vertHW_3W<float>>(vbData, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            TryPickChildIfStride<vertHW_3W<float>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            if (!childUVValid)
+                TryPickChildIfStride<vertHW_3W<s16>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
             break;
         case CSkeletonX::RM_SKINNING_4B_HQ:
-            TryPickChild<vertHW_4W<float>>(vbData, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            TryPickChildIfStride<vertHW_4W<float>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            if (!childUVValid)
+                TryPickChildIfStride<vertHW_4W<s16>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            break;
+        default:
+            TryPickChildIfStride<vertHW_1W<s16>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            if (!childUVValid)
+                TryPickChildIfStride<vertHW_1W<float>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
+            if (!childUVValid)
+                TryPickChildIfStride<vertHW_4W<float>>(vbData, V->vStride, obj, S, D, indices, indexCount, bestDist, bestHit, childUV, childUVValid);
             break;
         }
 

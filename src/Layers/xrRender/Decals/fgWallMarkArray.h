@@ -14,7 +14,7 @@ public:
     bool empty() override;
     wm_shader GenerateWallmark() override;
 
-    u32 GenerateBindlessMaterialID();
+    u32 GenerateBindlessMaterialID(shared_str* outTextureName = nullptr);
 
 private:
     u32 TryRegisterMaterial(u32 index);

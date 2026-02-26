@@ -80,11 +80,13 @@ wm_shader fgWallMarkArray::GenerateWallmark()
     return {};
 }
 
-u32 fgWallMarkArray::GenerateBindlessMaterialID()
+u32 fgWallMarkArray::GenerateBindlessMaterialID(shared_str* outTextureName)
 {
     if (m_materialIDs.empty())
         return UINT32_MAX;
     u32 idx = ::Random.randI(0, m_materialIDs.size());
+    if (outTextureName)
+        *outTextureName = m_textureNames[idx];
     if (m_materialIDs[idx] == UINT32_MAX)
         TryRegisterMaterial(idx);
     return m_materialIDs[idx];
