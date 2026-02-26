@@ -1224,35 +1224,37 @@ void CRender::add_SkeletonWallmark(
 {
 #if RENDER == R_R4
     if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled()) {
-        if (!xf || !obj || size <= EPS_L)
+        if (!xf || !obj || size <= EPS_L) {
+            Msg("[Splat] SKIP: bad params xf=%p obj=%p size=%.3f", xf, obj, size);
             return;
-        if (xf->c.distance_to_sqr(Device.vCameraPosition) > _sqr(50.f))
+        }
+        float distSq = xf->c.distance_to_sqr(Device.vCameraPosition);
+        if (distSq > _sqr(50.f)) {
+            Msg("[Splat] SKIP: too far dist=%.1f", _sqrt(distSq));
             return;
+        }
         auto* fgArray = static_cast<decals::fgWallMarkArray*>(pArray);
         u32 matID = fgArray->GenerateBindlessMaterialID();
-        if (matID == UINT32_MAX)
+        if (matID == UINT32_MAX) {
+            Msg("[Splat] SKIP: matID invalid");
             return;
+        }
         float decalSize = size * 2.0f;
         decals::MeshPickResult pickResult;
+        Msg("[Splat] Picking obj=%p dir=(%.2f,%.2f,%.2f)", obj, dir.x, dir.y, dir.z);
         if (decals::PickMeshDirect((CKinematics*)obj, *xf, start, dir, 100.f, pickResult)) {
             auto* overlayMgr = m_framegraphRenderer->GetOverlayManager();
-            float distSq = xf->c.distance_to_sqr(Device.vCameraPosition);
-            overlayMgr->GetOrCreateOverlay((CKinematics*)obj, distSq);
-
-            Fvector cross;
-            cross.crossproduct(pickResult.triWorldEdge1, pickResult.triWorldEdge2);
-            float worldArea = cross.magnitude() * 0.5f;
-            Fvector2 uvE1, uvE2;
-            uvE1.sub(pickResult.triUV[1], pickResult.triUV[0]);
-            uvE2.sub(pickResult.triUV[2], pickResult.triUV[0]);
-            float uvArea = _abs(uvE1.x * uvE2.y - uvE2.x * uvE1.y) * 0.5f;
-            float uvToWorld = _sqrt(uvArea / _max(worldArea, 0.0001f));
-            float uvRadius = _max(decalSize * 0.5f * uvToWorld, 0.01f);
-
-            Fvector4 bloodTint = { 0.4f, 0.02f, 0.02f, 0.8f };
-            overlayMgr->QueuePaint((CKinematics*)obj, pickResult.uv, uvRadius, 0, bloodTint, 1);
-            Msg("[OverlayPaint] queued uv=(%.4f,%.4f) r=%.4f obj=%p",
-                pickResult.uv.x, pickResult.uv.y, uvRadius, obj);
+            float worldRadius = decalSize * 0.5f;
+            Fvector bloodColor = { 0.4f, 0.02f, 0.02f };
+            overlayMgr->AddSplat((CKinematics*)obj, pickResult.triVerts,
+                                  pickResult.baryU, pickResult.baryV,
+                                  worldRadius, bloodColor, 0.8f,
+                                  pickResult.uv, pickResult.hitTextureName.c_str());
+            Msg("[Splat] HIT: r=%.3f uv=(%.3f,%.3f) bary=(%.3f,%.3f) obj=%p",
+                worldRadius, pickResult.uv.x, pickResult.uv.y,
+                pickResult.baryU, pickResult.baryV, obj);
+        } else {
+            Msg("[Splat] MISS: no triangle hit for obj=%p", obj);
         }
         return;
     }

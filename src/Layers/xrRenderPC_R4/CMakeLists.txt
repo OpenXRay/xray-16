@@ -87,8 +87,7 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/ParticlePassSetup.cpp
     ../xrRender/FrameGraphPasses/DecalPassSetup.h
     ../xrRender/FrameGraphPasses/DecalPassSetup.cpp
-    ../xrRender/FrameGraphPasses/OverlayPaintPassSetup.h
-    ../xrRender/FrameGraphPasses/OverlayPaintPassSetup.cpp
+
     ../xrRender/FrameGraphPasses/DistortionApplyPassSetup.h
     ../xrRender/FrameGraphPasses/DistortionApplyPassSetup.cpp
     ../xrRender/Decals/DecalManager.h

@@ -3679,4 +3679,23 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
         vtb.Upload(ctx);
 }
 
+nvrhi::ITexture* MaterialCache::GetNVRHITextureByName(const char* textureName)
+{
+    if (!textureName || !textureName[0])
+        return nullptr;
+
+    auto cacheIt = m_textureHandleCache.find(textureName);
+    if (cacheIt != m_textureHandleCache.end())
+    {
+        auto* texManager = m_resourceManager ? m_resourceManager->GetTextureManager() : nullptr;
+        return texManager ? texManager->GetNVRHITexture(cacheIt->second) : nullptr;
+    }
+
+    auto* texManager = m_resourceManager ? m_resourceManager->GetTextureManager() : nullptr;
+    if (!texManager) return nullptr;
+
+    auto handle = texManager->LoadTexture(textureName);
+    return handle.IsValid() ? texManager->GetNVRHITexture(handle) : nullptr;
+}
+
 } // namespace xray::render

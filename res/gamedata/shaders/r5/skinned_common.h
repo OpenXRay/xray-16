@@ -7,9 +7,19 @@ cbuffer SkinnedMaterialCB : register(b4)
 {
     uint g_SkinnedMaterialID;
     uint g_SkeletonBoneOffset;
-    uint g_OverlayTextureIndex;
-    uint g_SkinnedPad1;
+    uint g_SplatOffset;
+    uint g_SplatCount;
 };
+
+struct PaintSplat
+{
+    float4 posRadius;       // xyz = rest-pose position, w = world-space radius
+    float4 color;           // rgb + alpha
+    uint4  boneIdx;         // up to 4 bone indices (local to skeleton)
+    float4 boneWeights;     // corresponding weights (sum = 1)
+};
+
+StructuredBuffer<PaintSplat> g_PaintSplats : register(t11);
 
 float4x4 get_bone(int legacy_index)
 {
@@ -31,16 +41,50 @@ float3 unpack_d3dcolor_normal(float3 packed)
     return packed * 2.0 - 1.0;
 }
 
-static const float OVERLAY_DEFORM_SCALE = -0.005;
-
-float3 apply_overlay_deform(float3 pos, float3 normal, float2 uv)
+float3 skin_splat_pos(PaintSplat splat)
 {
-    if (g_OverlayTextureIndex == 0xFFFFFFFF)
-        return pos;
+    float3 result = 0;
+    for (uint i = 0; i < 4; i++)
+    {
+        float4x4 bone = g_BoneMatrices[g_SkeletonBoneOffset + splat.boneIdx[i]];
+        result += mul(bone, float4(splat.posRadius.xyz, 1)).xyz * splat.boneWeights[i];
+    }
+    return result;
+}
 
-    Texture2D overlayTex = GetBindlessTexture(g_OverlayTextureIndex);
-    float deform = saturate(overlayTex.SampleLevel(g_LinearSampler, uv, 0).a);
-    return pos + normalize(normal) * (deform * OVERLAY_DEFORM_SCALE);
+float3 apply_splat_deform(float3 worldPos, float3 worldNormal)
+{
+    float3 offset = 0;
+    for (uint i = 0; i < g_SplatCount; i++)
+    {
+        PaintSplat splat = g_PaintSplats[g_SplatOffset + i];
+        float3 splatWorldPos = mul(m_W, float4(skin_splat_pos(splat), 1)).xyz;
+        float dist = distance(worldPos, splatWorldPos);
+        float r = splat.posRadius.w;
+        if (dist < r)
+        {
+            float fade = 1.0 - smoothstep(r * 0.5, r, dist);
+            offset -= worldNormal * (splat.color.a * fade * dev_param_1.x);
+        }
+    }
+    return offset;
+}
+
+float3 apply_splat_color(float3 albedo, float3 worldPos)
+{
+    for (uint i = 0; i < g_SplatCount; i++)
+    {
+        PaintSplat splat = g_PaintSplats[g_SplatOffset + i];
+        float3 splatWorldPos = mul(m_W, float4(skin_splat_pos(splat), 1)).xyz;
+        float dist = distance(worldPos, splatWorldPos);
+        float r = splat.posRadius.w;
+        if (dist < r)
+        {
+            float fade = 1.0 - smoothstep(r * 0.5, r, dist);
+            albedo = lerp(albedo, splat.color.rgb, splat.color.a * fade);
+        }
+    }
+    return albedo;
 }
 
 #endif // SKINNED_COMMON_H

@@ -79,8 +79,8 @@ struct alignas(16) ShaderParams {
 struct alignas(16) SkinnedMaterialCB {
     u32 materialID;
     u32 skeletonBoneOffset;
-    u32 overlayTextureIndex;
-    u32 pad1;
+    u32 splatOffset;
+    u32 splatCount;
 };
 
 // Slot 2: Static Globals (EXTENDED for Forward+)

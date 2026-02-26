@@ -111,12 +111,18 @@ public:
     void SetSelectedRTSize(u32 w, u32 h) { m_sourceWidth = w; m_sourceHeight = h; }
     int GetSelectedMipLevel() const { return m_selectedMipLevel; }
 
+    struct WallmarkSplat { float u, v, r, g, b, a; };
+    struct WallmarkTexGroup { nvrhi::ITexture* diffuseTex = nullptr; xr_string texName; xr_vector<WallmarkSplat> splats; };
+    struct WallmarkObjectData { void* objKey = nullptr; xr_vector<WallmarkTexGroup> groups; };
+    void SetWallmarkData(xr_vector<WallmarkObjectData> data) { m_wallmarkData = std::move(data); }
+
 private:
     void RenderCPUSection();
     void RenderGPUSection();
     void RenderGPUPassList(const xr_vector<GPUPassTiming>& passTimings, float totalGPU, bool asyncOnly);
     void RenderGeometrySection();
     void RenderInspectorSection();
+    void RenderWallmarksSection();
     void RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, float parentTime);
 
     static const char* FormatTime(float ms, int slot = -1);
@@ -143,6 +149,10 @@ private:
     u32 m_sourceWidth = 0;
     u32 m_sourceHeight = 0;
     shared_str m_selectedRTName;
+
+    xr_vector<WallmarkObjectData> m_wallmarkData;
+    void* m_wallmarkSelectedKey = nullptr;
+    int m_wallmarkSelectedGroup = 0;
 };
 
 } // namespace xray::profiler

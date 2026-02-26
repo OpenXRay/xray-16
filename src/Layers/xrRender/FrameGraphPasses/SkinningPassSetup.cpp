@@ -89,6 +89,7 @@ void InitializeSkinningResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(11),
         nvrhi::BindingLayoutItem::Sampler(0),
     };
     state.layout = nvDevice->createBindingLayout(skinnedLayoutDesc);
@@ -296,10 +297,10 @@ static u32 GetSkeletonBoneOffset(
     return gpuCullMgr.GetOrUploadSkeleton(cmdList, parent);
 }
 
-static u32 GetOverlayIndex(const GeometryBatch& batch, decals::OverlayManager* overlayMgr)
+static decals::OverlayManager::SplatRange GetSplatRange(const GeometryBatch& batch, decals::OverlayManager* overlayMgr)
 {
     if (!overlayMgr)
-        return UINT32_MAX;
+        return { 0, 0 };
 
     CKinematics* parent = nullptr;
     u32 visualType = batch.visual ? batch.visual->getType() : 0;
@@ -310,9 +311,9 @@ static u32 GetOverlayIndex(const GeometryBatch& batch, decals::OverlayManager* o
         parent = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
 
     if (!parent)
-        return UINT32_MAX;
+        return { 0, 0 };
 
-    return overlayMgr->GetBindlessIndex(parent);
+    return overlayMgr->GetSplatRange(parent);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -334,7 +335,8 @@ static void RenderSkinnedBatch(
     const GeometryBatch& batch,
     const Fmatrix& worldMatrix,
     u32 skeletonBoneOffset,
-    u32 overlayTextureIndex = UINT32_MAX)
+    nvrhi::IBuffer* splatBuffer,
+    decals::OverlayManager::SplatRange splatRange = {0, 0})
 {
     using namespace RENDER_NAMESPACE;
     using namespace RENDER_NAMESPACE::bindless;
@@ -349,7 +351,8 @@ static void RenderSkinnedBatch(
     SkinnedMaterialCB matIdData = {};
     matIdData.materialID = batch.bindlessMaterialID;
     matIdData.skeletonBoneOffset = skeletonBoneOffset;
-    matIdData.overlayTextureIndex = overlayTextureIndex;
+    matIdData.splatOffset = splatRange.offset;
+    matIdData.splatCount = splatRange.count;
     cmdList->writeBuffer(materialIdCB, &matIdData, sizeof(matIdData));
 
     if (!globalBoneBuffer)
@@ -366,6 +369,7 @@ static void RenderSkinnedBatch(
         nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMaterialsSB),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(10, bindless::VariantTextureBuffer::Instance().GetBuffer()),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(11, splatBuffer),
         nvrhi::BindingSetItem::Sampler(0, state.linearSampler),
     };
     auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, state.layout, nvDevice);
@@ -571,6 +575,10 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             auto& matBuffer = MaterialBuffer::Instance();
             matBuffer.Upload(ctx);
 
+            if (data.overlayMgr)
+                data.overlayMgr->UploadSplats(cmdList);
+            nvrhi::IBuffer* splatBuffer = data.overlayMgr ? data.overlayMgr->GetSplatBuffer() : nullptr;
+
             auto* backend = data.device->GetBackend();
             nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
             nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
@@ -617,7 +625,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         }
 
                         u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
-                        u32 overlayIdx = GetOverlayIndex(batch, data.overlayMgr);
+                        auto sr = GetSplatRange(batch, data.overlayMgr);
 
                         RenderSkinnedBatch(
                             *data.passState,
@@ -625,7 +633,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                             dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
                             globalBoneBuffer, terrainMatBuffer.GetBuffer(),
                             bindlessTable, bindlessLayout, worldViewport, scissor,
-                            batch, batch.worldMatrix, boneOffset, overlayIdx
+                            batch, batch.worldMatrix, boneOffset, splatBuffer, sr
                         );
                         renderedCount++;
                     }
@@ -643,7 +651,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                             continue;
 
                         u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
-                        u32 overlayIdx = GetOverlayIndex(batch, data.overlayMgr);
+                        auto sr = GetSplatRange(batch, data.overlayMgr);
 
                         RenderSkinnedBatch(
                             *data.passState,
@@ -651,7 +659,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                             dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
                             globalBoneBuffer, terrainMatBuffer.GetBuffer(),
                             bindlessTable, bindlessLayout, worldViewport, scissor,
-                            batch, batch.worldMatrix, boneOffset, overlayIdx
+                            batch, batch.worldMatrix, boneOffset, splatBuffer, sr
                         );
                         drawCount++;
                     }
@@ -678,7 +686,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
                         globalBoneBuffer, terrainMatBuffer.GetBuffer(),
                         bindlessTable, bindlessLayout, hudViewport, scissor,
-                        batch, adjustedWorldMatrix, boneOffset
+                        batch, adjustedWorldMatrix, boneOffset, splatBuffer
                     );
                 }
 

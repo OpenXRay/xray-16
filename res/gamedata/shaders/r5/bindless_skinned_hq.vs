@@ -42,14 +42,13 @@ VS_OUTPUT main(VS_INPUT_1W v)
     float3 skinnedT = skinning_dir(T, bone);
     float3 skinnedB = skinning_dir(B, bone);
 
-    skinnedPos.xyz = apply_overlay_deform(skinnedPos.xyz, skinnedN, v.tc);
-
+    float3x3 worldRot = (float3x3)m_W;
     float3 worldPos3 = mul(m_W, skinnedPos).xyz;
+    o.normal = normalize(mul(worldRot, skinnedN));
+
+    worldPos3 += apply_splat_deform(worldPos3, o.normal);
     o.worldPos = worldPos3;
     o.position = mul(m_VP, float4(worldPos3, 1.0));
-
-    float3x3 worldRot = (float3x3)m_W;
-    o.normal = normalize(mul(worldRot, skinnedN));
     o.tangent = normalize(mul(worldRot, skinnedT));
     o.bitangent = normalize(mul(worldRot, skinnedB));
 

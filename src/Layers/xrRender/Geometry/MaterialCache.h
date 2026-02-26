@@ -480,6 +480,9 @@ public:
     // Returns material ID (stored in matPSO->bindlessMaterialID)
     u32 RegisterBindlessMaterial(MaterialPSO* matPSO);
 
+    // Get NVRHI texture by name (for debug visualization)
+    nvrhi::ITexture* GetNVRHITextureByName(const char* textureName);
+
     // Pre-register bindless material by visual (for geometry collection)
     // Creates material entry before PSO exists, returns material ID
     // Used to populate batch.bindlessMaterialID before GPU culling upload

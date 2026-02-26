@@ -28,10 +28,64 @@ template <typename T> static u16 GetHWBone(const vertHW_2W<T>& v) { return v.get
 template <typename T> static u16 GetHWBone(const vertHW_3W<T>& v) { return v.get_bone(0); }
 template <typename T> static u16 GetHWBone(const vertHW_4W<T>& v) { return v.get_bone(0); }
 
+template <typename T>
+static TriVertexSkin ExtractSkin(const vertHW_1W<T>& v) {
+    TriVertexSkin s;
+    v.get_pos(s.restPos);
+    s.boneIdx[0] = v.get_bone();
+    s.boneIdx[1] = s.boneIdx[2] = s.boneIdx[3] = 0;
+    s.weight[0] = 1.f;
+    s.weight[1] = s.weight[2] = s.weight[3] = 0.f;
+    return s;
+}
+
+template <typename T>
+static TriVertexSkin ExtractSkin(const vertHW_2W<T>& v) {
+    TriVertexSkin s;
+    v.get_pos(s.restPos);
+    s.boneIdx[0] = v.get_bone(0);
+    s.boneIdx[1] = v.get_bone(1);
+    s.boneIdx[2] = s.boneIdx[3] = 0;
+    float w = v.get_weight();
+    s.weight[0] = 1.f - w;
+    s.weight[1] = w;
+    s.weight[2] = s.weight[3] = 0.f;
+    return s;
+}
+
+template <typename T>
+static TriVertexSkin ExtractSkin(const vertHW_3W<T>& v) {
+    TriVertexSkin s;
+    v.get_pos(s.restPos);
+    s.boneIdx[0] = v.get_bone(0);
+    s.boneIdx[1] = v.get_bone(1);
+    s.boneIdx[2] = v.get_bone(2);
+    s.boneIdx[3] = 0;
+    s.weight[0] = v.get_weight0();
+    s.weight[1] = v.get_weight1();
+    s.weight[2] = 1.f - s.weight[0] - s.weight[1];
+    s.weight[3] = 0.f;
+    return s;
+}
+
+template <typename T>
+static TriVertexSkin ExtractSkin(const vertHW_4W<T>& v) {
+    TriVertexSkin s;
+    v.get_pos(s.restPos);
+    for (u16 i = 0; i < 4; i++)
+        s.boneIdx[i] = v.get_bone(i);
+    s.weight[0] = v.get_weight0();
+    s.weight[1] = v.get_weight1();
+    s.weight[2] = v.get_weight2();
+    s.weight[3] = 1.f - s.weight[0] - s.weight[1] - s.weight[2];
+    return s;
+}
+
 struct UVBoneResult {
     Fvector2 uv;
     u16 boneID;
     Fvector2 triUV[3];
+    TriVertexSkin triVerts[3];
 };
 
 template <typename T_vertex>
@@ -39,9 +93,7 @@ static bool PickAllTrisHW(T_vertex* vertices, CKinematics* parent, const Fvector
     u16* indices, u32 numIndices, float& bestDist, TriPickResult& bestHit)
 {
     bool found = false;
-    u32 numTris = numIndices / 3;
-
-    for (u32 tri = 0; tri < numTris; tri++) {
+    for (u32 tri = 0; tri < numIndices / 3; tri++) {
         u32 idx = tri * 3;
         Fvector skinned[3];
         for (u32 k = 0; k < 3; k++)
@@ -67,8 +119,10 @@ template <typename T_vertex>
 static UVBoneResult ExtractHW(T_vertex* vertices, const TriPickResult& hit)
 {
     UVBoneResult r;
-    for (u32 k = 0; k < 3; k++)
+    for (u32 k = 0; k < 3; k++) {
         r.triUV[k] = GetHWUV(vertices[hit.vertIdx[k]]);
+        r.triVerts[k] = ExtractSkin(vertices[hit.vertIdx[k]]);
+    }
     float w0 = 1.f - hit.baryU - hit.baryV;
     r.uv = { r.triUV[0].x * w0 + r.triUV[1].x * hit.baryU + r.triUV[2].x * hit.baryV,
               r.triUV[0].y * w0 + r.triUV[1].y * hit.baryU + r.triUV[2].y * hit.baryV };
@@ -76,7 +130,6 @@ static UVBoneResult ExtractHW(T_vertex* vertices, const TriPickResult& hit)
     return r;
 }
 
-// Dispatch pick + extract by RenderMode, all while VB is mapped
 template <typename T_vertex>
 static bool TryPickChild(void* vbData, CKinematics* parent, const Fvector& S, const Fvector& D,
     u16* indices, u32 indexCount, float& bestDist, TriPickResult& bestHit, UVBoneResult& uvOut, bool& uvValid)
@@ -114,6 +167,7 @@ bool PickMeshDirect(
     bestHit.dist = flt_max;
     UVBoneResult bestUV;
     bool hasHit = false;
+    xr_string bestTextureName;
 
     for (u32 i = 0; i < obj->children.size(); i++) {
         auto* skelChild = dynamic_cast<CSkeletonX*>(obj->children[i]);
@@ -186,6 +240,7 @@ bool PickMeshDirect(
         if (childUVValid) {
             bestUV = childUV;
             hasHit = true;
+            bestTextureName = V->textureName.c_str();
         }
     }
 
@@ -202,19 +257,24 @@ bool PickMeshDirect(
     parentXForm.transform_dir(result.worldNormal, localNormal);
     result.worldNormal.normalize();
 
+    result.hitTextureName = bestTextureName;
     result.dist = bestDist;
     result.uv = bestUV.uv;
     result.boneID = bestUV.boneID;
     result.parent = obj;
+    result.baryU = bestHit.baryU;
+    result.baryV = bestHit.baryV;
+
+    for (u32 k = 0; k < 3; k++) {
+        result.triVerts[k] = bestUV.triVerts[k];
+        result.triUV[k] = bestUV.triUV[k];
+    }
 
     Fvector edge1, edge2;
     edge1.sub(bestHit.skinnedPos[1], bestHit.skinnedPos[0]);
     edge2.sub(bestHit.skinnedPos[2], bestHit.skinnedPos[0]);
     parentXForm.transform_dir(result.triWorldEdge1, edge1);
     parentXForm.transform_dir(result.triWorldEdge2, edge2);
-
-    for (u32 k = 0; k < 3; k++)
-        result.triUV[k] = bestUV.triUV[k];
 
     return true;
 }

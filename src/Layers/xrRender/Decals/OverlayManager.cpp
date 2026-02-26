@@ -1,105 +1,135 @@
 #include "stdafx.h"
 #include "OverlayManager.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
-#include "Layers/xrRender/RenderContext/RenderContext.h"
-#include "xrEngine/xr_object.h"
 
 namespace xray::render::RENDER_NAMESPACE::decals {
+
+static constexpr u32 MAX_GPU_SPLATS = 1024;
 
 void OverlayManager::Initialize(ng::RenderDevice* device)
 {
     m_device = device;
-    m_pendingPaints.reserve(32);
+    m_gpuSplats.reserve(MAX_GPU_SPLATS);
+
+    nvrhi::BufferDesc desc;
+    desc.byteSize = MAX_GPU_SPLATS * sizeof(GPUPaintSplat);
+    desc.structStride = sizeof(GPUPaintSplat);
+    desc.initialState = nvrhi::ResourceStates::ShaderResource;
+    desc.keepInitialState = true;
+    desc.debugName = "PaintSplatBuffer";
+    m_splatBuffer = device->GetNVRHIDevice()->createBuffer(desc);
 }
 
 void OverlayManager::Shutdown()
 {
-    for (auto& [obj, overlay] : m_overlays) {
-        if (overlay.bindlessIndex != UINT32_MAX)
-            GEnv.Backend->UnregisterBindlessTexture(overlay.bindlessIndex);
+    m_objects.clear();
+    m_rangeCache.clear();
+    m_gpuSplats.clear();
+    m_splatBuffer = nullptr;
+}
+
+void OverlayManager::AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
+                               float baryU, float baryV, float radius,
+                               const Fvector& color, float alpha, Fvector2 uv, const char* textureName)
+{
+    // Merge up to 12 bone contributions (3 verts × 4) into top-4 for the hit point
+    struct BoneContrib { u16 idx; float weight; };
+    BoneContrib contribs[12];
+    u32 numContribs = 0;
+
+    float bary[3] = { 1.f - baryU - baryV, baryU, baryV };
+
+    Fvector restPos = { 0, 0, 0 };
+    for (u32 i = 0; i < 3; i++)
+        restPos.mad(triVerts[i].restPos, bary[i]);
+
+    for (u32 i = 0; i < 3; i++) {
+        for (u32 j = 0; j < 4; j++) {
+            float w = bary[i] * triVerts[i].weight[j];
+            if (w <= 0.f)
+                continue;
+            bool merged = false;
+            for (u32 k = 0; k < numContribs; k++) {
+                if (contribs[k].idx == triVerts[i].boneIdx[j]) {
+                    contribs[k].weight += w;
+                    merged = true;
+                    break;
+                }
+            }
+            if (!merged)
+                contribs[numContribs++] = { triVerts[i].boneIdx[j], w };
+        }
     }
-    m_overlays.clear();
-    m_pendingPaints.clear();
+
+    // Sort descending by weight, take top 4
+    for (u32 i = 0; i < numContribs - 1; i++)
+        for (u32 j = i + 1; j < numContribs; j++)
+            if (contribs[j].weight > contribs[i].weight)
+                std::swap(contribs[i], contribs[j]);
+
+    u32 useCount = std::min(numContribs, 4u);
+    float totalW = 0.f;
+    for (u32 i = 0; i < useCount; i++)
+        totalW += contribs[i].weight;
+
+    GPUPaintSplat gpu = {};
+    gpu.posRadius = { restPos.x, restPos.y, restPos.z, radius };
+    gpu.color = { color.x, color.y, color.z, alpha };
+    for (u32 i = 0; i < useCount; i++) {
+        gpu.boneIdx[i] = contribs[i].idx;
+        gpu.boneWeight[i] = contribs[i].weight / totalW;
+    }
+
+    auto& data = m_objects[obj];
+    data.lastPaintTime = Device.fTimeGlobal;
+    if (data.splats.size() >= MAX_SPLATS_PER_OBJECT) {
+        data.splats.erase(data.splats.begin());
+        data.splatDebug.erase(data.splatDebug.begin());
+    }
+    data.splats.push_back(gpu);
+    data.splatDebug.push_back({ uv, textureName ? xr_string(textureName) : xr_string() });
+    m_dirty = true;
 }
 
-u32 OverlayManager::ResolutionForDistance(float distSq)
+OverlayManager::SplatRange OverlayManager::GetSplatRange(CKinematics* obj) const
 {
-    if (distSq < 15.f * 15.f)
-        return 512;
-    if (distSq < 40.f * 40.f)
-        return 256;
-    return 128;
-}
-
-ObjectOverlay& OverlayManager::GetOrCreateOverlay(CKinematics* obj, float distSq)
-{
-    auto it = m_overlays.find(obj);
-    if (it != m_overlays.end())
+    auto it = m_rangeCache.find(obj);
+    if (it != m_rangeCache.end())
         return it->second;
-
-    u32 res = ResolutionForDistance(distSq);
-    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
-
-    nvrhi::TextureDesc desc;
-    desc.width = res;
-    desc.height = res;
-    desc.format = nvrhi::Format::RGBA16_FLOAT;
-    desc.isRenderTarget = true;
-    desc.isUAV = true;
-    desc.initialState = nvrhi::ResourceStates::ShaderResource;
-    desc.keepInitialState = true;
-    desc.debugName = "NPC_Overlay";
-
-    ObjectOverlay overlay;
-    overlay.colorOverlay = nvDevice->createTexture(desc);
-    overlay.bindlessIndex = GEnv.Backend->RegisterBindlessTexture(overlay.colorOverlay.Get());
-    overlay.resolution = res;
-    overlay.dirty = true;
-    overlay.lastPaintTime = Device.fTimeGlobal;
-
-    return m_overlays.emplace(obj, std::move(overlay)).first->second;
+    return { 0, 0 };
 }
 
-void OverlayManager::ReleaseOverlay(CKinematics* obj)
+void OverlayManager::UploadSplats(nvrhi::ICommandList* cmdList)
 {
-    auto it = m_overlays.find(obj);
-    if (it == m_overlays.end())
+    if (!m_dirty || !m_splatBuffer || !cmdList)
         return;
 
-    if (it->second.bindlessIndex != UINT32_MAX)
-        GEnv.Backend->UnregisterBindlessTexture(it->second.bindlessIndex);
-    m_overlays.erase(it);
-}
+    m_gpuSplats.clear();
+    m_rangeCache.clear();
 
-u32 OverlayManager::GetBindlessIndex(CKinematics* obj) const
-{
-    auto it = m_overlays.find(obj);
-    if (it == m_overlays.end())
-        return UINT32_MAX;
-    return it->second.bindlessIndex;
-}
+    for (auto& [obj, data] : m_objects) {
+        SplatRange range;
+        range.offset = (u32)m_gpuSplats.size();
+        range.count = (u32)data.splats.size();
+        for (const auto& s : data.splats)
+            m_gpuSplats.push_back(s);
+        m_rangeCache[obj] = range;
+    }
 
-void OverlayManager::QueuePaint(CKinematics* target, const Fvector2& hitUV,
-                                 float uvRadius, u32 decalTextureIndex,
-                                 const Fvector4& tintColor, u32 flags)
-{
-    PaintCommand cmd;
-    cmd.target = target;
-    cmd.hitUV = hitUV;
-    cmd.uvRadius = uvRadius;
-    cmd.decalTextureIndex = decalTextureIndex;
-    cmd.tintColor = tintColor;
-    cmd.flags = flags;
-    m_pendingPaints.push_back(cmd);
+    if (!m_gpuSplats.empty())
+        cmdList->writeBuffer(m_splatBuffer, m_gpuSplats.data(),
+                             (u32)(m_gpuSplats.size() * sizeof(GPUPaintSplat)));
+
+    m_dirty = false;
 }
 
 void OverlayManager::CleanupExpired(float currentTime, float maxAge)
 {
-    for (auto it = m_overlays.begin(); it != m_overlays.end(); ) {
+    for (auto it = m_objects.begin(); it != m_objects.end(); ) {
         if (currentTime - it->second.lastPaintTime > maxAge) {
-            if (it->second.bindlessIndex != UINT32_MAX)
-                GEnv.Backend->UnregisterBindlessTexture(it->second.bindlessIndex);
-            it = m_overlays.erase(it);
+            m_rangeCache.erase(it->first);
+            it = m_objects.erase(it);
+            m_dirty = true;
         } else {
             ++it;
         }

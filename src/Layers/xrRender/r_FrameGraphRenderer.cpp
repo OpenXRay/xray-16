@@ -672,6 +672,45 @@ void FrameGraphRenderer::RenderStatsOverlay()
 
         m_statsOverlay->SetRenderStats(stats);
         m_statsOverlay->SetInspectorPreview(m_inspectorPreview ? m_inspectorPreview.Get() : nullptr);
+
+        if (m_overlayManager)
+        {
+            xr_vector<xray::profiler::StatsOverlay::WallmarkObjectData> wmData;
+            for (const auto& [obj, data] : m_overlayManager->GetDebugObjects())
+            {
+                xray::profiler::StatsOverlay::WallmarkObjectData od;
+                od.objKey = obj;
+
+                xr_map<xr_string, int> groupIndex;
+                for (u32 i = 0; i < (u32)data.splats.size(); i++)
+                {
+                    const auto& gpu   = data.splats[i];
+                    const auto& dbg   = data.splatDebug[i];
+                    const xr_string& texName = dbg.textureName;
+
+                    auto git = groupIndex.find(texName);
+                    if (git == groupIndex.end())
+                    {
+                        xray::profiler::StatsOverlay::WallmarkTexGroup g;
+                        g.texName   = texName;
+                        g.diffuseTex = m_materialCache
+                            ? m_materialCache->GetNVRHITextureByName(texName.c_str())
+                            : nullptr;
+                        groupIndex[texName] = (int)od.groups.size();
+                        od.groups.push_back(std::move(g));
+                        git = groupIndex.find(texName);
+                    }
+
+                    od.groups[git->second].splats.push_back(
+                        { dbg.uv.x, dbg.uv.y,
+                          gpu.color.x, gpu.color.y, gpu.color.z, gpu.color.w });
+                }
+
+                wmData.push_back(std::move(od));
+            }
+            m_statsOverlay->SetWallmarkData(std::move(wmData));
+        }
+
         m_statsOverlay->SetVisible(true);
         m_statsOverlay->Render();
     }
@@ -1201,12 +1240,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         skinnedVisibility.statsCallback = skinnedStatsCallback;
         skinnedVisibility.statsUserData = m_gpuCullingManager.get();
     }
-
-    passes::setupOverlayPaintPass(
-        *m_framegraph, m_device,
-        m_overlayManager.get(),
-        m_passStates->overlayPaint
-    );
 
     auto hudOutputs = passes::setupSkinningPass(
         *m_framegraph,

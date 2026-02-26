@@ -129,6 +129,11 @@ void StatsOverlay::Render()
     // Render Inspector Section
     RenderInspectorSection();
 
+    ImGui::Separator();
+
+    // Wallmarks Section
+    RenderWallmarksSection();
+
     ImGui::End();
 }
 
@@ -623,6 +628,127 @@ void StatsOverlay::RenderInspectorSection()
             ImGui::TextDisabled("%ux%u", m_sourceWidth, m_sourceHeight);
         }
     }
+}
+
+void StatsOverlay::RenderWallmarksSection()
+{
+    if (!ImGui::CollapsingHeader("Wallmarks"))
+        return;
+
+    if (m_wallmarkData.empty())
+    {
+        ImGui::TextDisabled("No active wallmarks");
+        return;
+    }
+
+    ImGui::Text("Objects: %d", (int)m_wallmarkData.size());
+
+    // Object selector (stable by pointer key)
+    const WallmarkObjectData* selectedObj = nullptr;
+    int selectedObjIdx = 0;
+    for (int i = 0; i < (int)m_wallmarkData.size(); i++)
+    {
+        if (m_wallmarkData[i].objKey == m_wallmarkSelectedKey)
+        {
+            selectedObj = &m_wallmarkData[i];
+            selectedObjIdx = i;
+            break;
+        }
+    }
+    if (!selectedObj)
+    {
+        selectedObj = &m_wallmarkData[0];
+        m_wallmarkSelectedKey = m_wallmarkData[0].objKey;
+    }
+
+    int totalSplats = 0;
+    for (const auto& g : selectedObj->groups) totalSplats += (int)g.splats.size();
+
+    char objLabel[64];
+    xr_sprintf(objLabel, sizeof(objLabel), "Object %d  (%d splats, %d meshes)",
+        selectedObjIdx, totalSplats, (int)selectedObj->groups.size());
+
+    if (ImGui::BeginCombo("##wm_obj", objLabel))
+    {
+        for (int i = 0; i < (int)m_wallmarkData.size(); i++)
+        {
+            int n = 0;
+            for (const auto& g : m_wallmarkData[i].groups) n += (int)g.splats.size();
+            char label[64];
+            xr_sprintf(label, sizeof(label), "Object %d  (%d splats)", i, n);
+            bool sel = (m_wallmarkData[i].objKey == m_wallmarkSelectedKey);
+            if (ImGui::Selectable(label, sel))
+            {
+                m_wallmarkSelectedKey = m_wallmarkData[i].objKey;
+                m_wallmarkSelectedGroup = 0;
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    if (selectedObj->groups.empty())
+    {
+        ImGui::TextDisabled("No painted meshes");
+        return;
+    }
+
+    // Group (submesh/texture) selector
+    m_wallmarkSelectedGroup = std::min(m_wallmarkSelectedGroup, (int)selectedObj->groups.size() - 1);
+    const WallmarkTexGroup& group = selectedObj->groups[m_wallmarkSelectedGroup];
+
+    if (selectedObj->groups.size() > 1)
+    {
+        char grpLabel[128];
+        const char* baseName = group.texName.empty() ? "unknown" : group.texName.c_str();
+        xr_sprintf(grpLabel, sizeof(grpLabel), "%s  (%d)", baseName, (int)group.splats.size());
+        if (ImGui::BeginCombo("##wm_grp", grpLabel))
+        {
+            for (int i = 0; i < (int)selectedObj->groups.size(); i++)
+            {
+                const char* n = selectedObj->groups[i].texName.empty() ? "unknown" : selectedObj->groups[i].texName.c_str();
+                char label[128];
+                xr_sprintf(label, sizeof(label), "%s  (%d)", n, (int)selectedObj->groups[i].splats.size());
+                if (ImGui::Selectable(label, m_wallmarkSelectedGroup == i))
+                    m_wallmarkSelectedGroup = i;
+            }
+            ImGui::EndCombo();
+        }
+    }
+
+    float canvasW = ImGui::GetContentRegionAvail().x;
+    ImVec2 canvasPos = ImGui::GetCursorScreenPos();
+    ImVec2 canvasBR(canvasPos.x + canvasW, canvasPos.y + canvasW);
+
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    dl->AddRectFilled(canvasPos, canvasBR, IM_COL32(20, 20, 20, 255));
+
+    if (group.diffuseTex)
+        dl->AddImage(reinterpret_cast<ImTextureID>(group.diffuseTex), canvasPos, canvasBR);
+
+    dl->AddRect(canvasPos, canvasBR, IM_COL32(80, 80, 80, 255));
+
+    ImU32 gridCol = group.diffuseTex ? IM_COL32(255, 255, 255, 30) : IM_COL32(40, 40, 40, 255);
+    for (int i = 1; i < 4; i++)
+    {
+        float t = i * 0.25f;
+        dl->AddLine(ImVec2(canvasPos.x + t * canvasW, canvasPos.y),
+                    ImVec2(canvasPos.x + t * canvasW, canvasPos.y + canvasW), gridCol);
+        dl->AddLine(ImVec2(canvasPos.x, canvasPos.y + t * canvasW),
+                    ImVec2(canvasPos.x + canvasW, canvasPos.y + t * canvasW), gridCol);
+    }
+
+    float dotR = std::max(4.0f, canvasW * 0.018f);
+    for (const auto& s : group.splats)
+    {
+        float px = canvasPos.x + s.u * canvasW;
+        float py = canvasPos.y + s.v * canvasW;
+        ImU32 col = IM_COL32((int)(s.r * 255), (int)(s.g * 255), (int)(s.b * 255), 220);
+        dl->AddCircleFilled(ImVec2(px, py), dotR, col);
+        dl->AddCircle(ImVec2(px, py), dotR, IM_COL32(255, 255, 255, 80));
+    }
+
+    ImGui::Dummy(ImVec2(canvasW, canvasW));
+    ImGui::TextDisabled("%d splat(s)  --  UV space [0,1]x[0,1]", (int)group.splats.size());
 }
 
 } // namespace xray::profiler

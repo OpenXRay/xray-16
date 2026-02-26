@@ -81,12 +81,7 @@ PS_OUTPUT main(PS_INPUT input)
         ao = pbrSample.b;
     }
 
-    if (g_OverlayTextureIndex != 0xFFFFFFFF)
-    {
-        Texture2D overlayTex = GetBindlessTexture(g_OverlayTextureIndex);
-        float4 overlay = overlayTex.Sample(g_LinearSampler, input.texcoord);
-        albedo = lerp(albedo, overlay.rgb, overlay.a);
-    }
+    albedo = apply_splat_color(albedo, input.worldPos);
 
     f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao);
     output.color = float4(fwd.color.rgb, diffuseSample.a);
