@@ -160,6 +160,12 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Configure ccache
+      if: ${{ startsWith(matrix.platform.name, 'macOS') }}
+      run: |
+        echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
+        mkdir -p "$HOME/.ccache"
+
     - name: Restore ccache
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       uses: actions/cache@main
