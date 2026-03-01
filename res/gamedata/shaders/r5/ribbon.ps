@@ -1,0 +1,26 @@
+// ribbon.ps
+// Minimal ribbon pixel shader — no soft particles, single RT output
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct PS_INPUT
+{
+    float4 hpos     : SV_Position;
+    float2 texcoord : TEXCOORD0;
+    float4 color    : TEXCOORD1;
+    float3 worldPos : TEXCOORD2;
+    float3 normal   : TEXCOORD3;
+    nointerpolation uint materialID : TEXCOORD4;
+};
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    MaterialData mat = g_Materials[input.materialID];
+    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+    float4 result = diffuseSample * input.color;
+
+    clip(result.a - (0.01 / 255.0));
+
+    return result;
+}
