@@ -1083,7 +1083,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_passStates->ribbon
     );
 
-    auto sceneColor = ribbonOutputs.layout.albedo;
+    auto trailOutputs = passes::setupTrailPass(
+        *m_framegraph,
+        m_device,
+        ribbonOutputs.layout,
+        width,
+        height,
+        &m_passStates->trail
+    );
+
+    auto sceneColor = trailOutputs.layout.albedo;
 
     if (particleOutputs.distortionRT.is_valid()) {
         framegraph::ResourceDesc snapDesc;

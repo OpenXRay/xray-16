@@ -822,6 +822,9 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\RibbonPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\TrailPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\DecalPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
@@ -1679,6 +1682,9 @@
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\RibbonPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\TrailPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\DecalPassSetup.cpp">

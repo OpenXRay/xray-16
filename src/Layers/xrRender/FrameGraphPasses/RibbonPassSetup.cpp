@@ -196,12 +196,6 @@ RibbonPassOutput setupRibbonPass(
     u32 height,
     RibbonPassState* state)
 {
-    if (state) {
-        Fvector emitterPos;
-        emitterPos.mad(Device.vCameraPosition, Device.vCameraDirection, 5.f);
-        UpdateTrailPoints(*state, emitterPos, Device.fTimeDelta, state->defaultHalfWidth);
-    }
-
     auto& passData = fg.addCallbackPass<RibbonPassData>(
         "Ribbon",
         [&, width, height, state](FrameGraph& builder, PassHandle passHandle, RibbonPassData& data) {

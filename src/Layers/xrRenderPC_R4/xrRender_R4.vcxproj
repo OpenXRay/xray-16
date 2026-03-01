@@ -162,6 +162,7 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\RibbonPassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\TrailPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\DecalPassSetup.h" />
 
     <ClInclude Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.h" />
@@ -428,6 +429,7 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\RibbonPassSetup.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\TrailPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\DecalPassSetup.cpp" />
 
     <ClCompile Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.cpp" />
