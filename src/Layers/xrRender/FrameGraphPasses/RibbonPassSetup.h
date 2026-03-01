@@ -4,7 +4,6 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
-#include "PassVertexFormats.h"
 
 namespace xray::render {
     namespace ng {
@@ -54,18 +53,52 @@ struct RibbonPoint {
     u32 order;       // Upper 16 = group ID, lower 16 = spawn order
 };
 
+// GPU control point — uploaded to StructuredBuffer (24 bytes, no float3, Vulkan std430 safe)
+struct GPURibbonControlPoint {
+    float posX, posY, posZ;
+    float halfWidth;
+    float ageNorm;   // age / maxAge (0=head, 1=tail)
+    float cumDist;   // cumulative distance from head
+};
+static_assert(sizeof(GPURibbonControlPoint) == 24, "GPURibbonControlPoint must be 24 bytes");
+
+// Constant buffer matching ribbon.vs cbuffer RibbonParams at b5
+struct RibbonParamsCB {
+    // Row 0
+    u32   controlPointCount;
+    u32   subdivisions;
+    float texCoordsFactor;
+    u32   uvPolicy;
+
+    // Row 1
+    float totalDist;
+    u32   enableTailFade;
+    u32   smoothingMode;
+    u32   useScreenSpaceWidth;
+
+    // Row 2
+    u32   flipX;
+    u32   flipY;
+    u32   rotate90;
+    u32   materialID;
+
+    // Row 3: InvView X (camera right), w unused
+    Fvector4 invViewX;
+
+    // Row 4: InvView Y (camera up), w unused
+    Fvector4 invViewY;
+};
+static_assert(sizeof(RibbonParamsCB) == 80, "RibbonParamsCB must be 80 bytes (5 rows x 16)");
+
 struct RibbonPassState {
     // GPU resources
     nvrhi::GraphicsPipelineHandle pipeline;
     nvrhi::BindingLayoutHandle layout;
-    nvrhi::InputLayoutHandle inputLayout;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
     nvrhi::SamplerHandle sampler;
-    nvrhi::BufferHandle ribbonVB;
-    u32 ribbonVBCapacity = 0;
-    nvrhi::BufferHandle ribbonIB;
-    u32 ribbonIBCapacity = 0;
+    nvrhi::BufferHandle controlPointBuffer;
+    u32 controlPointCapacity = 0;
     bool initialized = false;
 
     // CPU-side trail state (persists across frames)
@@ -107,8 +140,8 @@ void InitializeRibbonResources(ng::RenderDevice* device, nvrhi::IFramebuffer* fr
 // ═══════════════════════════════════════════════════════
 //  RIBBON PASS SETUP
 // ═══════════════════════════════════════════════════════
-// Renders a ribbon trail: camera-facing quad strip connecting
-// control points emitted over time. Points age out after maxAge seconds.
+// Renders a ribbon trail: GPU-generated quad strip from control points.
+// VS reads StructuredBuffer, does Catmull-Rom subdivision + camera-facing width.
 // Supports Stride-compatible smoothing, UV policies, and group splitting.
 RibbonPassOutput setupRibbonPass(
     framegraph::FrameGraph& fg,
