@@ -87,6 +87,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/ParticlePassSetup.cpp
     ../xrRender/FrameGraphPasses/RibbonPassSetup.h
     ../xrRender/FrameGraphPasses/RibbonPassSetup.cpp
+    ../xrRender/FrameGraphPasses/TrailPassSetup.h
+    ../xrRender/FrameGraphPasses/TrailPassSetup.cpp
     ../xrRender/FrameGraphPasses/DecalPassSetup.h
     ../xrRender/FrameGraphPasses/DecalPassSetup.cpp
 

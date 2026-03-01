@@ -15,6 +15,7 @@
 #include "ReSTIRGIPassSetup.h"
 #include "DecalPassSetup.h"
 #include "RibbonPassSetup.h"
+#include "TrailPassSetup.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -34,6 +35,7 @@ struct PassStates {
     ReSTIRGIPassState restirGI;
     DecalPassState decal;
     RibbonPassState ribbon;
+    TrailPassState trail;
 };
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

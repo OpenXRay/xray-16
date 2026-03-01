@@ -1390,7 +1390,19 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_passStates->ribbon
     );
 
-    auto sceneColor = ribbonOutputs.layout.albedo;
+    // ═══════════════════════════════════════════════════════
+    //  TRAIL PASS (after ribbon, stored-direction width)
+    // ═══════════════════════════════════════════════════════
+    auto trailOutputs = passes::setupTrailPass(
+        *m_framegraph,
+        m_device,
+        ribbonOutputs.layout,
+        width,
+        height,
+        &m_passStates->trail
+    );
+
+    auto sceneColor = trailOutputs.layout.albedo;
 
     if (particleOutputs.distortionRT.is_valid()) {
         framegraph::ResourceDesc snapDesc;

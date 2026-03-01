@@ -1,8 +1,10 @@
-// xrRender/FrameGraphPasses/RibbonPassSetup.cpp
-// GPU ribbon trail rendering — VS reads StructuredBuffer of control points,
-// generates Catmull-Rom subdivided quad strip with camera-facing width.
+// xrRender/FrameGraphPasses/TrailPassSetup.cpp
+// GPU trail rendering — Stride ShapeBuilderTrail parity.
+// VS reads StructuredBuffer of control points with stored direction,
+// generates Catmull-Rom subdivided quad strip. No camera dependency.
+// Parallel to RibbonPassSetup.cpp (which implements ShapeBuilderRibbon).
 #include "stdafx.h"
-#include "RibbonPassSetup.h"
+#include "TrailPassSetup.h"
 #include "PassCommon.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
@@ -20,10 +22,10 @@ using namespace framegraph;
 using namespace bindless;
 
 // ═══════════════════════════════════════════════════════
-//  Trail point management (unchanged from CPU version)
+//  Trail point management
 // ═══════════════════════════════════════════════════════
 
-static void UpdateTrailPoints(RibbonPassState& state, const Fvector& emitterPos, float dt, float pointSize)
+static void UpdateTrailPoints(TrailPassState& state, const Fvector& emitterPos, float dt, float pointHalfWidth)
 {
     // Age existing points & remove expired ones
     u32 writeIdx = 0;
@@ -42,36 +44,63 @@ static void UpdateTrailPoints(RibbonPassState& state, const Fvector& emitterPos,
     if (state.pointCount > 0) {
         Fvector diff;
         diff.sub(emitterPos, state.points[0].position);
-        if (diff.magnitude() < RIBBON_MIN_SEGMENT_DIST)
+        if (diff.magnitude() < TRAIL_MIN_SEGMENT_DIST)
             shouldInsert = false;
     }
 
     if (shouldInsert) {
-        u32 count = std::min(state.pointCount, RIBBON_MAX_POINTS - 1);
+        u32 count = std::min(state.pointCount, TRAIL_MAX_POINTS - 1);
         for (u32 i = count; i > 0; i--)
             state.points[i] = state.points[i - 1];
 
         state.points[0].position = emitterPos;
         state.points[0].age = 0.f;
-        state.points[0].size = pointSize;
         state.points[0].order = (u32(state.currentGroupID) << 16) | u32(state.nextSpawnOrder);
         state.nextSpawnOrder++;
+
+        // Compute direction: cross(tangent, up) scaled to half-width
+        // Stride UpdaterSpeedToDirection: direction from velocity (pos - oldPos)
+        Fvector dir = {0, 0, 0};
+        if (count > 0) {
+            Fvector tangent;
+            tangent.sub(emitterPos, state.points[1].position);
+            float tangentLen = tangent.magnitude();
+            if (tangentLen > 0.0001f) {
+                tangent.div(tangentLen);
+                Fvector up = {0, 1, 0};
+                dir.crossproduct(tangent, up);
+                float dirLen = dir.magnitude();
+                if (dirLen > 0.0001f) {
+                    dir.div(dirLen);
+                    dir.mul(pointHalfWidth);
+                } else {
+                    // Tangent is parallel to up — use camera right as fallback
+                    dir.set(pointHalfWidth, 0, 0);
+                }
+            } else {
+                dir.set(pointHalfWidth, 0, 0);
+            }
+        } else {
+            dir.set(pointHalfWidth, 0, 0);
+        }
+        state.points[0].direction = dir;
+
         state.pointCount = count + 1;
     }
 }
 
 // ═══════════════════════════════════════════════════════
-//  Order field group splitting (unchanged from CPU version)
+//  Order field group splitting (same as ribbon)
 // ═══════════════════════════════════════════════════════
 
-struct RibbonGroup {
+struct TrailGroup {
     u32 startIdx;
     u32 count;
 };
 
-static xr_vector<RibbonGroup> SplitRibbonGroups(const RibbonPoint* points, u32 pointCount)
+static xr_vector<TrailGroup> SplitTrailGroups(const TrailPoint* points, u32 pointCount)
 {
-    xr_vector<RibbonGroup> groups;
+    xr_vector<TrailGroup> groups;
     if (pointCount == 0)
         return groups;
 
@@ -94,10 +123,10 @@ static xr_vector<RibbonGroup> SplitRibbonGroups(const RibbonPoint* points, u32 p
 //  Pack control points for GPU upload
 // ═══════════════════════════════════════════════════════
 
-static xr_vector<GPURibbonControlPoint> PackControlPoints(
-    const RibbonPoint* points, u32 count, float maxAge)
+static xr_vector<GPUTrailControlPoint> PackControlPoints(
+    const TrailPoint* points, u32 count, float maxAge)
 {
-    xr_vector<GPURibbonControlPoint> packed(count);
+    xr_vector<GPUTrailControlPoint> packed(count);
 
     float cumDist = 0.0f;
     for (u32 i = 0; i < count; i++) {
@@ -107,7 +136,9 @@ static xr_vector<GPURibbonControlPoint> PackControlPoints(
         packed[i].posX = points[i].position.x;
         packed[i].posY = points[i].position.y;
         packed[i].posZ = points[i].position.z;
-        packed[i].halfWidth = points[i].size;
+        packed[i].dirX = points[i].direction.x;
+        packed[i].dirY = points[i].direction.y;
+        packed[i].dirZ = points[i].direction.z;
         packed[i].ageNorm = (maxAge > 0.f) ? (points[i].age / maxAge) : 0.f;
         packed[i].cumDist = cumDist;
     }
@@ -118,27 +149,41 @@ static xr_vector<GPURibbonControlPoint> PackControlPoints(
 //  Buffer management
 // ═══════════════════════════════════════════════════════
 
-static void EnsureControlPointBuffer(nvrhi::IDevice* nvDevice, u32 pointCount, RibbonPassState& state)
+static void EnsureControlPointBuffer(nvrhi::IDevice* nvDevice, u32 pointCount, TrailPassState& state)
 {
     if (state.controlPointBuffer && state.controlPointCapacity >= pointCount)
         return;
 
     u32 capacity = std::max(pointCount, 64u);
     nvrhi::BufferDesc desc;
-    desc.byteSize = capacity * sizeof(GPURibbonControlPoint);
-    desc.structStride = sizeof(GPURibbonControlPoint);
-    desc.debugName = "RibbonControlPoints";
+    desc.byteSize = capacity * sizeof(GPUTrailControlPoint);
+    desc.structStride = sizeof(GPUTrailControlPoint);
+    desc.debugName = "TrailControlPoints";
     desc.initialState = nvrhi::ResourceStates::ShaderResource;
     desc.keepInitialState = true;
     state.controlPointBuffer = nvDevice->createBuffer(desc);
     state.controlPointCapacity = state.controlPointBuffer ? capacity : 0;
 }
 
+static void EnsureDummyStateBuffer(nvrhi::IDevice* nvDevice, TrailPassState& state)
+{
+    if (state.dummyStateBuffer)
+        return;
+
+    nvrhi::BufferDesc desc;
+    desc.byteSize = 16;
+    desc.initialState = nvrhi::ResourceStates::ShaderResource;
+    desc.keepInitialState = true;
+    desc.canHaveRawViews = true;
+    desc.debugName = "TrailDummyState";
+    state.dummyStateBuffer = nvDevice->createBuffer(desc);
+}
+
 // ═══════════════════════════════════════════════════════
 //  Pipeline initialization
 // ═══════════════════════════════════════════════════════
 
-void InitializeRibbonResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, RibbonPassState& state)
+void InitializeTrailResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, TrailPassState& state)
 {
     if (state.initialized)
         return;
@@ -156,13 +201,13 @@ void InitializeRibbonResources(ng::RenderDevice* device, nvrhi::IFramebuffer* fr
     auto& cache = GetPassResourceCache();
     auto fbInfo = framebuffer->getFramebufferInfo();
 
-    // Load GPU ribbon VS (SV_VertexID driven, no input layout)
-    auto vsResult = shaderLoader->LoadVertexShader("ribbon", "main");
+    // Load trail VS (SV_VertexID driven, no input layout)
+    auto vsResult = shaderLoader->LoadVertexShader("trail", "main");
     if (!vsResult.handle)
         return;
     state.vs = vsResult.handle;
 
-    auto psResult = shaderLoader->LoadPixelShader("ribbon", "main");
+    auto psResult = shaderLoader->LoadPixelShader("trail", "main");
     if (!psResult.handle)
         return;
     state.ps = psResult.handle;
@@ -173,14 +218,16 @@ void InitializeRibbonResources(ng::RenderDevice* device, nvrhi::IFramebuffer* fr
     samplerDesc.setMaxAnisotropy(8.0f);
     state.sampler = nvDevice->createSampler(samplerDesc);
 
-    // Binding layout: StaticGlobals (b2) + RibbonParams (b5) + MaterialBuffer (t8) + ControlPoints (t10) + Sampler
+    // Binding layout: StaticGlobals (b2) + TrailParams (b5) + MaterialBuffer (t8) +
+    //                 ControlPoints (t10) + TrailState (t11) + Sampler (s0)
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::All;
     layoutDesc.bindings = {
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),   // StaticGlobals
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),   // RibbonParams
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),   // TrailParams
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),     // MaterialBuffer
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),    // ControlPoints
+        nvrhi::BindingLayoutItem::RawBuffer_SRV(11),           // TrailState (GPU-driven mode)
         nvrhi::BindingLayoutItem::Sampler(0),
     };
     state.layout = nvDevice->createBindingLayout(layoutDesc);
@@ -204,7 +251,7 @@ void InitializeRibbonResources(ng::RenderDevice* device, nvrhi::IFramebuffer* fr
     pipeDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
     pipeDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
 
-    state.pipeline = cache.GetOrCreatePipeline("RibbonPass_blend", pipeDesc, fbInfo, nvDevice);
+    state.pipeline = cache.GetOrCreatePipeline("TrailPass_blend", pipeDesc, fbInfo, nvDevice);
 
     if (state.pipeline) {
         const auto& actualDesc = state.pipeline->getDesc();
@@ -212,25 +259,28 @@ void InitializeRibbonResources(ng::RenderDevice* device, nvrhi::IFramebuffer* fr
             state.layout = actualDesc.bindingLayouts[0];
     }
 
+    // Create dummy state buffer for CPU-driven mode (t11 must always be bound)
+    EnsureDummyStateBuffer(nvDevice, state);
+
     state.initialized = true;
-    Msg("* [RibbonPass] GPU pipeline initialization complete (vertex-ID driven)");
+    Msg("* [TrailPass] GPU pipeline initialization complete (vertex-ID driven, stored direction)");
 }
 
 // ═══════════════════════════════════════════════════════
 //  Pass setup
 // ═══════════════════════════════════════════════════════
 
-RibbonPassOutput setupRibbonPass(
+TrailPassOutput setupTrailPass(
     FrameGraph& fg,
     ng::RenderDevice* device,
     const DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
-    RibbonPassState* state)
+    TrailPassState* state)
 {
-    auto& passData = fg.addCallbackPass<RibbonPassData>(
-        "Ribbon",
-        [&, width, height, state](FrameGraph& builder, PassHandle passHandle, RibbonPassData& data) {
+    auto& passData = fg.addCallbackPass<TrailPassData>(
+        "Trail",
+        [&, width, height, state](FrameGraph& builder, PassHandle passHandle, TrailPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -248,7 +298,7 @@ RibbonPassOutput setupRibbonPass(
             data.outputs.worldPos = forwardInputs.worldPos;
             data.outputs.depth = data.depth;
         },
-        [](const RibbonPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const TrailPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
             if (!data.passState || data.passState->pointCount < 2)
                 return;
 
@@ -269,26 +319,22 @@ RibbonPassOutput setupRibbonPass(
             fbDesc.addColorAttachment(colorRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = GetPassResourceCache();
-            auto framebuffer = cache.GetOrCreateFramebuffer("RibbonPass", fbDesc, nvDevice);
+            auto framebuffer = cache.GetOrCreateFramebuffer("TrailPass", fbDesc, nvDevice);
             if (!framebuffer)
                 return;
 
-            InitializeRibbonResources(data.device, framebuffer, *data.passState);
+            InitializeTrailResources(data.device, framebuffer, *data.passState);
             if (!data.passState->initialized)
                 return;
 
             auto& st = *data.passState;
 
-            // Extract camera basis from inverse view matrix (for screen-space width mode)
-            Fmatrix invView;
-            invView.invert(Device.mView);
-
             // Split points by group ID
-            auto groups = SplitRibbonGroups(st.points, st.pointCount);
+            auto groups = SplitTrailGroups(st.points, st.pointCount);
 
             // Constant buffers
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("RibbonPass", "StaticGlobals", sizeof(StaticGlobals), 16, nvDevice).Get();
-            auto ribbonParamsCB = cache.GetOrCreateVolatileCB("RibbonPass", "RibbonParams", sizeof(RibbonParamsCB), 16, nvDevice).Get();
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("TrailPass", "StaticGlobals", sizeof(StaticGlobals), 16, nvDevice).Get();
+            auto trailParamsCB = cache.GetOrCreateVolatileCB("TrailPass", "TrailParams", sizeof(TrailParamsCB), 16, nvDevice).Get();
 
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
@@ -309,7 +355,7 @@ RibbonPassOutput setupRibbonPass(
                 if (group.count < 2)
                     continue;
 
-                // Pack control points with cumDist
+                // Pack control points with direction + cumDist
                 auto packed = PackControlPoints(&st.points[group.startIdx], group.count, st.maxAge);
                 if (packed.empty())
                     continue;
@@ -320,33 +366,33 @@ RibbonPassOutput setupRibbonPass(
                     continue;
 
                 // Upload control points
-                cmdList->writeBuffer(st.controlPointBuffer, packed.data(), packed.size() * sizeof(GPURibbonControlPoint));
+                cmdList->writeBuffer(st.controlPointBuffer, packed.data(), packed.size() * sizeof(GPUTrailControlPoint));
 
-                // Fill RibbonParams CB
-                RibbonParamsCB params = {};
+                // Fill TrailParams CB — no camera dependency, no invViewX/Y
+                TrailParamsCB params = {};
                 params.controlPointCount = group.count;
-                params.subdivisions = RIBBON_SUBDIVISIONS;
+                params.subdivisions = TRAIL_SUBDIVISIONS;
                 params.texCoordsFactor = st.texCoordsFactor;
                 params.uvPolicy = (u32)st.uvPolicy;
                 params.totalDist = packed.back().cumDist;
                 params.enableTailFade = st.enableTailFade ? 1u : 0u;
                 params.smoothingMode = (u32)st.smoothing;
-                params.useScreenSpaceWidth = st.useScreenSpaceWidth ? 1u : 0u;
+                params.edgePolicy = (u32)st.edgePolicy;
                 params.flipX = st.uvTransform.flipX ? 1u : 0u;
                 params.flipY = st.uvTransform.flipY ? 1u : 0u;
                 params.rotate90 = st.uvTransform.rotate90 ? 1u : 0u;
                 params.materialID = 0;
-                params.invViewX.set(invView.i.x, invView.i.y, invView.i.z, 0.f);
-                params.invViewY.set(invView.j.x, invView.j.y, invView.j.z, 0.f);
-                cmdList->writeBuffer(ribbonParamsCB, &params, sizeof(params));
+                params.useGPUState = 0;  // CPU-driven mode
+                cmdList->writeBuffer(trailParamsCB, &params, sizeof(params));
 
                 // Create binding set for this group
                 nvrhi::BindingSetDesc bindDesc;
                 bindDesc.bindings = {
                     nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-                    nvrhi::BindingSetItem::ConstantBuffer(5, ribbonParamsCB),
+                    nvrhi::BindingSetItem::ConstantBuffer(5, trailParamsCB),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(10, st.controlPointBuffer),
+                    nvrhi::BindingSetItem::RawBuffer_SRV(11, st.dummyStateBuffer),
                     nvrhi::BindingSetItem::Sampler(0, st.sampler),
                 };
                 auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st.layout, nvDevice);
@@ -358,15 +404,14 @@ RibbonPassOutput setupRibbonPass(
                 gfxState.bindings = { bindingSet };
                 if (bindlessTable)
                     gfxState.addBindingSet(bindlessTable);
-                // No vertex buffers, no index buffer (vertex-ID driven)
                 gfxState.viewport.addViewport(viewport);
                 gfxState.viewport.addScissorRect(scissor);
 
                 cmdList->setGraphicsState(gfxState);
 
                 // Compute vertex count: (smoothCount - 1) * 6
-                u32 segments = group.count - 1;
-                u32 smoothCount = segments * RIBBON_SUBDIVISIONS + 1;
+                u32 segs = group.count - 1;
+                u32 smoothCount = segs * TRAIL_SUBDIVISIONS + 1;
                 u32 vertexCount = (smoothCount - 1) * 6;
 
                 cmdList->draw(nvrhi::DrawArguments().setVertexCount(vertexCount));
@@ -374,7 +419,7 @@ RibbonPassOutput setupRibbonPass(
         }
     );
 
-    RibbonPassOutput output;
+    TrailPassOutput output;
     output.layout.albedo = passData.outputColor;
     output.layout.normal = passData.outputs.normal;
     output.layout.baseColor = passData.outputs.baseColor;
