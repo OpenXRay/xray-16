@@ -3,7 +3,6 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
-#include "PassVertexFormats.h"
 
 namespace xray::render {
     namespace ng {
@@ -45,17 +44,44 @@ struct RibbonPoint {
     u32 order;
 };
 
+struct GPURibbonControlPoint {
+    float posX, posY, posZ;
+    float halfWidth;
+    float ageNorm;
+    float cumDist;
+};
+static_assert(sizeof(GPURibbonControlPoint) == 24, "GPURibbonControlPoint must be 24 bytes");
+
+struct RibbonParamsCB {
+    u32   controlPointCount;
+    u32   subdivisions;
+    float texCoordsFactor;
+    u32   uvPolicy;
+
+    float totalDist;
+    u32   enableTailFade;
+    u32   smoothingMode;
+    u32   useScreenSpaceWidth;
+
+    u32   flipX;
+    u32   flipY;
+    u32   rotate90;
+    u32   materialID;
+
+    Fvector4 invViewX;
+
+    Fvector4 invViewY;
+};
+static_assert(sizeof(RibbonParamsCB) == 80, "RibbonParamsCB must be 80 bytes (5 rows x 16)");
+
 struct RibbonPassState {
     nvrhi::GraphicsPipelineHandle pipeline;
     nvrhi::BindingLayoutHandle layout;
-    nvrhi::InputLayoutHandle inputLayout;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
     nvrhi::SamplerHandle sampler;
-    nvrhi::BufferHandle ribbonVB;
-    u32 ribbonVBCapacity = 0;
-    nvrhi::BufferHandle ribbonIB;
-    u32 ribbonIBCapacity = 0;
+    nvrhi::BufferHandle controlPointBuffer;
+    u32 controlPointCapacity = 0;
     bool initialized = false;
 
     RibbonPoint points[RIBBON_MAX_POINTS] = {};
