@@ -269,6 +269,7 @@ int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 int ps_r4_debug_gpu_culling = 0; // 0=off, 1=show bounding spheres with cull state colors
 
 u32 ps_fg_render_mode = FG_RENDER_DX12;
+int ps_fg_hot_reload_shaders = 0;
 const xr_token fg_render_mode_token[] = {
     {"dx12", FG_RENDER_DX12},
     {"vulkan", FG_RENDER_VULKAN},
@@ -1249,6 +1250,7 @@ void xrRender_initconsole()
 
     // FrameGraph render backend (requires restart)
     CMD3(CCC_Token, "fg_render_mode", &ps_fg_render_mode, fg_render_mode_token);
+    CMD4(CCC_Integer, "fg_hot_reload_shaders", &ps_fg_hot_reload_shaders, 0, 1);
 
 #ifdef DEBUG
     // TextureManager unit tests (Week 1 Day 2)

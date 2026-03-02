@@ -38,6 +38,24 @@ struct PassStates {
     RibbonPassState ribbon;
     TrailPassState trail;
     SmokeTrailPassState smokeTrail;
+
+    void ResetAll()
+    {
+        detail = {};
+        transparent = {};
+        hiZBuild = {};
+        exposure = {};
+        uiText = {};
+        particle = {};
+        forwardColor = {};
+        skinning = {};
+        motionVector = {};
+        restirGI = {};
+        decal = {};
+        ribbon = {};
+        trail.ResetGPUState();
+        smokeTrail = {};
+    }
 };
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

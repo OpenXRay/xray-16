@@ -95,6 +95,19 @@ struct TrailPassState {
     u32 controlPointCapacity = 0;
     bool initialized = false;
 
+    void ResetGPUState()
+    {
+        pipeline = nullptr;
+        layout = nullptr;
+        vs = nullptr;
+        ps = nullptr;
+        sampler = nullptr;
+        controlPointBuffer = nullptr;
+        dummyStateBuffer = nullptr;
+        controlPointCapacity = 0;
+        initialized = false;
+    }
+
     // CPU-side trail state (persists across frames)
     TrailPoint points[TRAIL_MAX_POINTS] = {};
     u32 pointCount = 0;

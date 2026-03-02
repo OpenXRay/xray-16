@@ -3,8 +3,82 @@
 #include "ShaderLoader.h"
 #include "xrCore/FileCRC32.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/xrRender_console.h"
 
 namespace xray::render::framegraph {
+using namespace RENDER_NAMESPACE;
+
+namespace {
+
+bool TryGetNvrhiShaderType(xray::render::SlangCompiler::Stage stage, nvrhi::ShaderType& outType)
+{
+    switch (stage)
+    {
+    case xray::render::SlangCompiler::Stage::Vertex:
+        outType = nvrhi::ShaderType::Vertex;
+        return true;
+    case xray::render::SlangCompiler::Stage::Pixel:
+        outType = nvrhi::ShaderType::Pixel;
+        return true;
+    case xray::render::SlangCompiler::Stage::Compute:
+        outType = nvrhi::ShaderType::Compute;
+        return true;
+    case xray::render::SlangCompiler::Stage::Amplification:
+        outType = nvrhi::ShaderType::Amplification;
+        return true;
+    case xray::render::SlangCompiler::Stage::Mesh:
+        outType = nvrhi::ShaderType::Mesh;
+        return true;
+    default:
+        return false;
+    }
+}
+
+void ResolveShaderSourceRelativePath(
+    const char* name,
+    const char* extension,
+    char* outRelativePath,
+    size_t outRelativePathSize)
+{
+    // Remove ( and everything after it (shader variant params)
+    // e.g., "deffer_model_bump(TESS_PN,)" -> "deffer_model_bump"
+    string_path shName;
+    {
+        pcstr pchr = strchr(name, '(');
+        ptrdiff_t size = pchr ? pchr - name : xr_strlen(name);
+        strncpy(shName, name, size);
+        shName[size] = 0;
+    }
+
+    // Only remove skinning suffix (_0, _1, _2, _3, _4) for vertex shaders
+    // Skinning only affects vertex processing, not pixel shaders
+    // This avoids incorrectly stripping suffixes from shaders like "bloom_luminance_1"
+    bool isVertexShader = (xr_strcmp(extension, ".vs") == 0);
+    if (isVertexShader)
+    {
+        size_t len = xr_strlen(shName);
+        if (len > 2 && shName[len - 2] == '_' && shName[len - 1] >= '0' && shName[len - 1] <= '4')
+        {
+            // Check if this looks like a skinning suffix by checking if the base name exists
+            string_path testName;
+            xr_strcpy(testName, shName);
+            testName[len - 2] = 0; // Remove the "_X" suffix
+
+            string_path testFilename;
+            strconcat(sizeof(testFilename), testFilename, "r5" DELIMITER, testName, extension);
+
+            // Only strip if the base file exists
+            if (FS.exist("$game_shaders$", testFilename))
+            {
+                xr_strcpy(shName, testName); // Use the base name
+            }
+        }
+    }
+
+    strconcat(outRelativePathSize, outRelativePath, "r5" DELIMITER, shName, extension);
+}
+
+} // namespace
 
 ShaderLoader::ShaderLoader(xray::render::SlangCompiler* slangCompiler)
     : m_slangCompiler(slangCompiler)
@@ -30,46 +104,43 @@ ShaderLoader::~ShaderLoader()
 
 IReader* ShaderLoader::OpenShaderFile(const char* name, const char* extension)
 {
-    // Remove ( and everything after it (shader variant params)
-    // e.g., "deffer_model_bump(TESS_PN,)" -> "deffer_model_bump"
-    string_path shName;
-    {
-        pcstr pchr = strchr(name, '(');
-        ptrdiff_t size = pchr ? pchr - name : xr_strlen(name);
-        strncpy(shName, name, size);
-        shName[size] = 0;
-    }
-
-    // Only remove skinning suffix (_0, _1, _2, _3, _4) for vertex shaders
-    // Skinning only affects vertex processing, not pixel shaders
-    // This avoids incorrectly stripping suffixes from shaders like "bloom_luminance_1"
-    bool isVertexShader = (xr_strcmp(extension, ".vs") == 0);
-    if (isVertexShader)
-    {
-        size_t len = xr_strlen(shName);
-        if (len > 2 && shName[len-2] == '_' && shName[len-1] >= '0' && shName[len-1] <= '4')
-        {
-            // Check if this looks like a skinning suffix by checking if the base name exists
-            string_path testName;
-            xr_strcpy(testName, shName);
-            testName[len-2] = 0;  // Remove the "_X" suffix
-
-            string_path testFilename;
-            strconcat(sizeof(testFilename), testFilename, "r5" DELIMITER, testName, extension);
-
-            // Only strip if the base file exists
-            if (FS.exist("$game_shaders$", testFilename))
-            {
-                xr_strcpy(shName, testName);  // Use the base name
-            }
-        }
-    }
-
     string_path filename;
-    strconcat(sizeof(filename), filename, "r5" DELIMITER, shName, extension);
+    ResolveShaderSourceRelativePath(name, extension, filename, sizeof(filename));
 
     IReader* R = FS.r_open("$game_shaders$", filename);
     return R;
+}
+
+void ShaderLoader::WatchShaderFile(
+    const xr_string& cacheKey,
+    const char* name,
+    const char* extension,
+    const char* entryPoint,
+    xray::render::SlangCompiler::Stage stage)
+{
+    if (!ps_fg_hot_reload_shaders)
+        return;
+
+    string_path filename;
+    ResolveShaderSourceRelativePath(name, extension, filename, sizeof(filename));
+
+    string_path fullPath;
+    FS.update_path(fullPath, "$game_shaders$", filename);
+
+    std::error_code ec;
+    const auto writeTime = std::filesystem::last_write_time(fullPath, ec);
+    if (ec)
+        return;
+
+    WatchedFile watchedFile;
+    watchedFile.absolutePath = fullPath;
+    watchedFile.shaderName = name;
+    watchedFile.extension = extension;
+    watchedFile.entryPoint = entryPoint ? entryPoint : "main";
+    watchedFile.stage = stage;
+    watchedFile.lastWriteTime = writeTime;
+
+    m_watchedFiles[cacheKey] = std::move(watchedFile);
 }
 
 bool ShaderLoader::CompileShader(
@@ -155,6 +226,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     IReader* fs = OpenShaderFile(name, ".vs");
     if (!fs)
         return result;  // Empty result
+    WatchShaderFile(cacheKey, name, ".vs", entryPoint, xray::render::SlangCompiler::Stage::Vertex);
 
     // Compute hash of shader source
     u32 sourceHash = ShaderCache::ComputeHash(
@@ -291,6 +363,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     IReader* fs = OpenShaderFile(name, ".ps");
     if (!fs)
         return result;  // Empty result
+    WatchShaderFile(cacheKey, name, ".ps", entryPoint, xray::render::SlangCompiler::Stage::Pixel);
 
     // Compute hash of shader source
     u32 sourceHash = ShaderCache::ComputeHash(
@@ -434,6 +507,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     IReader* fs = OpenShaderFile(name, ".cs");
     if (!fs)
         return result;  // Empty result
+    WatchShaderFile(cacheKey, name, ".cs", entryPoint, xray::render::SlangCompiler::Stage::Compute);
 
     // Compute hash of shader source
     u32 sourceHash = ShaderCache::ComputeHash(
@@ -578,6 +652,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
     IReader* fs = OpenShaderFile(name, ".as");
     if (!fs)
         return result;
+    WatchShaderFile(cacheKey, name, ".as", entryPoint, xray::render::SlangCompiler::Stage::Amplification);
 
     // Compute hash of shader source
     u32 sourceHash = ShaderCache::ComputeHash(
@@ -686,6 +761,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
     IReader* fs = OpenShaderFile(name, ".ms");
     if (!fs)
         return result;
+    WatchShaderFile(cacheKey, name, ".ms", entryPoint, xray::render::SlangCompiler::Stage::Mesh);
 
     // Compute hash of shader source
     u32 sourceHash = ShaderCache::ComputeHash(
@@ -895,6 +971,144 @@ bool ShaderLoader::CompileShaderWithDefines(
         shaderName, extension, outBytecode.size());
 
     return true;
+}
+
+bool ShaderLoader::CheckForChangedFiles()
+{
+    if (!ps_fg_hot_reload_shaders)
+        return false;
+
+    // Hot-reload can be enabled at runtime after shaders were already cached.
+    // Prime watcher entries by forcing one cache rebuild pass.
+    if (m_watchedFiles.empty() && !m_handleCache.empty())
+    {
+        Msg("* [ShaderLoader] Priming hot-reload file watch list");
+        ClearAllCaches();
+        return false;
+    }
+
+    for (const auto& watchedEntry : m_watchedFiles)
+    {
+        const auto& info = watchedEntry.second;
+        std::error_code ec;
+        const auto currentTime = std::filesystem::last_write_time(info.absolutePath, ec);
+        if (ec)
+            continue;
+
+        if (currentTime != info.lastWriteTime)
+        {
+            Msg("* Shader hot-reload: %s changed", info.absolutePath.c_str());
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool ShaderLoader::ValidateChangedFiles()
+{
+    if (!GEnv.FrameGraphRenderer || !GEnv.FrameGraphRenderer->GetRenderDevice())
+    {
+        Msg("! [ShaderLoader] Hot-reload validation failed: render device is unavailable");
+        return false;
+    }
+
+    bool hasChangedFiles = false;
+    for (const auto& watchedEntry : m_watchedFiles)
+    {
+        const auto& info = watchedEntry.second;
+
+        std::error_code ec;
+        const auto currentTime = std::filesystem::last_write_time(info.absolutePath, ec);
+        if (ec || currentTime == info.lastWriteTime)
+            continue;
+
+        hasChangedFiles = true;
+
+        IReader* shaderFile = OpenShaderFile(info.shaderName.c_str(), info.extension.c_str());
+        if (!shaderFile)
+        {
+            Msg("! [ShaderLoader] Hot-reload validation failed: cannot open %s%s",
+                info.shaderName.c_str(), info.extension.c_str());
+            return false;
+        }
+
+        xr_string sourceCode;
+        sourceCode.assign((const char*)shaderFile->pointer(), shaderFile->length());
+        shaderFile->close();
+
+        string_path fullPath;
+        strconcat(sizeof(fullPath), fullPath,
+            GEnv.Render->getShaderPath(),
+            info.shaderName.c_str(),
+            info.extension.c_str());
+
+        auto compileResult = m_slangCompiler->CompileFromSource(
+            sourceCode.c_str(),
+            info.entryPoint.c_str(),
+            info.stage,
+            m_target,
+            fullPath);
+
+        if (!compileResult.IsValid())
+        {
+            Msg("! [ShaderLoader] Hot-reload validation compile failed: %s%s (entry: %s)",
+                info.shaderName.c_str(), info.extension.c_str(), info.entryPoint.c_str());
+            if (!compileResult.errorMessage.empty())
+                Msg("! Error: %s", compileResult.errorMessage.c_str());
+            return false;
+        }
+
+        nvrhi::ShaderType shaderType;
+        if (!TryGetNvrhiShaderType(info.stage, shaderType))
+        {
+            Msg("! [ShaderLoader] Hot-reload validation failed: unsupported stage for %s%s",
+                info.shaderName.c_str(), info.extension.c_str());
+            return false;
+        }
+
+        nvrhi::ShaderDesc desc;
+        desc.shaderType = shaderType;
+        desc.debugName = info.shaderName.c_str();
+
+        nvrhi::ShaderHandle testHandle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+            desc,
+            compileResult.bytecode.data(),
+            compileResult.bytecode.size());
+
+        if (!testHandle)
+        {
+            Msg("! [ShaderLoader] Hot-reload validation failed: shader creation failed for %s%s (entry: %s)",
+                info.shaderName.c_str(), info.extension.c_str(), info.entryPoint.c_str());
+            return false;
+        }
+    }
+
+    if (hasChangedFiles)
+        Msg("* [ShaderLoader] Hot-reload validation succeeded");
+
+    return true;
+}
+
+void ShaderLoader::ClearAllCaches()
+{
+    m_handleCache.clear();
+
+    for (auto& [key, reflection] : m_reflectionCache)
+    {
+        if (reflection)
+            xr_delete(reflection);
+    }
+    m_reflectionCache.clear();
+
+    for (auto& watchedEntry : m_watchedFiles)
+    {
+        auto& info = watchedEntry.second;
+        std::error_code ec;
+        const auto currentTime = std::filesystem::last_write_time(info.absolutePath, ec);
+        if (!ec)
+            info.lastWriteTime = currentTime;
+    }
 }
 
 // ══════════════════════════════════════════════════════════

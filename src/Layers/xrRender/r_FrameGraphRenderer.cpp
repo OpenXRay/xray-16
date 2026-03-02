@@ -53,6 +53,8 @@
 #include "FrameGraphPasses/PathTracerPassSetup.h"
 #include "RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -363,6 +365,46 @@ void FrameGraphRenderer::Render() {
     // With lambda-based passes, we rebuild the graph every frame
     // (Frostbite-style: graph rebuilt, GPU resources reused from pool)
     m_framegraph->ResetForNextFrame();
+
+    // Shader hot-reload check (throttled to avoid per-frame filesystem polling)
+    if (ps_fg_hot_reload_shaders)
+    {
+        static u32 frameCounter = 0;
+        if (++frameCounter >= 60)
+        {
+            frameCounter = 0;
+            if (RImplementation.m_shaderLoader && RImplementation.m_shaderLoader->CheckForChangedFiles())
+            {
+                Msg("* Shader hot-reload detected, validating changed shaders...");
+                if (!RImplementation.m_shaderLoader->ValidateChangedFiles())
+                {
+                    Msg("! Shader hot-reload skipped: validation failed, keeping current shaders");
+                }
+                else
+                {
+                    Msg("* Hot-reloading shaders...");
+
+                    // Ensure no in-flight work references old pipelines/shaders.
+                    m_device->GetNVRHIDevice()->waitForIdle();
+
+                    RImplementation.m_shaderLoader->ClearAllCaches();
+                    framegraph::GetPassResourceCache().Clear();
+                    if (m_passStates)
+                    {
+                        m_passStates->ResetAll();
+
+                        // These passes have persistent resources initialized outside setup,
+                        // so ensure they're available immediately after hot-reload.
+                        passes::InitializeSkyGeometry(m_device, m_passStates->sky);
+                        passes::InitializeSunPass(m_device, m_passStates->sun);
+                        passes::InitializeTonemapPass(m_device->GetNVRHIDevice(), m_passStates->tonemap);
+                    }
+
+                    Msg("* Shader hot-reload complete");
+                }
+            }
+        }
+    }
 
     // ═══════════════════════════════════════════════════════
     //  SETUP PASSES (PER-FRAME: Route geometry to passes)
