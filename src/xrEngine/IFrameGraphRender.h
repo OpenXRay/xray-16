@@ -33,4 +33,8 @@ public:
     virtual xray::render::ui::UIRenderCollector* GetUICollector() const = 0;
     virtual xray::render::ui::NVRHIUIRenderer* GetUIRenderer() const = 0;
     virtual xray::render::MaterialCache* GetTextMaterialCache() const = 0;
+
+    virtual void UpdateSmokeTrail(const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode) = 0;
+
+    virtual void NotifySmokeShot() = 0;
 };

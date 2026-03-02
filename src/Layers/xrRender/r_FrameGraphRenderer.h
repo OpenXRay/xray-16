@@ -26,6 +26,7 @@ namespace xray::render::RENDER_NAMESPACE {
 namespace xray::render::RENDER_NAMESPACE::passes {
     struct ParticleBatch;
     struct PassStates;
+    class SmokeTrailManager;
 }
 
 namespace xray::render::ng {
@@ -93,6 +94,10 @@ public:
     ui::NVRHIUIRenderer* GetUIRenderer() const override { return m_uiRenderer.get(); }
     MaterialCache* GetTextMaterialCache() const override { return m_textMaterialCache.get(); }
     framegraph::VolatileConstantBufferPool* GetTextVCBPool() const { return m_textVCBPool.get(); }
+
+    void UpdateSmokeTrail(const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode) override;
+    void NotifySmokeShot() override;
+    RENDER_NAMESPACE::passes::SmokeTrailManager* GetSmokeTrailManager() const { return m_smokeTrailManager.get(); }
 
     RENDER_NAMESPACE::GPUCullingManager* GetGPUCullingManager() const { return m_gpuCullingManager.get(); }
 
@@ -167,6 +172,8 @@ private:
     xr_unique_ptr<RENDER_NAMESPACE::decals::DecalManager> m_decalManager;
 
     xr_unique_ptr<RENDER_NAMESPACE::decals::OverlayManager> m_overlayManager;
+
+    xr_unique_ptr<RENDER_NAMESPACE::passes::SmokeTrailManager> m_smokeTrailManager;
 
     xr_unique_ptr<RENDER_NAMESPACE::RTAccelStructManager> m_rtAccelMgr;
     u32 m_ptSampleIndex = 0;

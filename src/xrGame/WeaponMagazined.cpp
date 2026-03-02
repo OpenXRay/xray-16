@@ -21,6 +21,7 @@
 #include "xrScriptEngine/script_callback_ex.h"
 #include "script_game_object.h"
 #include "HudSound.h"
+#include "xrEngine/IFrameGraphRender.h"
 
 CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon(), m_bStopedAfterQueueFired(false)
 {
@@ -620,6 +621,13 @@ void CWeaponMagazined::state_MagEmpty(float dt) {}
 void CWeaponMagazined::SetDefaults() { CWeapon::SetDefaults(); }
 void CWeaponMagazined::OnShot()
 {
+    if (GEnv.FrameGraphRenderer && GEnv.FrameGraphRenderer->IsEnabled() && IsGameTypeSingle())
+    {
+        auto* actor = smart_cast<CActor*>(H_Parent());
+        if (actor && actor->inventory().ActiveItem() == this)
+            GEnv.FrameGraphRenderer->NotifySmokeShot();
+    }
+
     // Sound
     //Alundaio: LAYERED_SND_SHOOT
     m_layered_sounds.PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);

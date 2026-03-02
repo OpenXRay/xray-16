@@ -44,6 +44,7 @@
 #include "FrameGraphPasses/ExposurePassSetup.h"
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"
+#include "FrameGraphPasses/SmokeTrailPassSetup.h"
 #include "FrameGraphPasses/PassStates.h"
 #include "FrameGraphPasses/ImGuiPassSetup.h"
 #include "FrameGraphPasses/PathTracerPassSetup.h"
@@ -55,6 +56,8 @@
 #include "xrParticles/psystem.h"
 #include "blenders/Blender_Particle.h"
 
+extern ENGINE_API float psHUD_FOV;
+
 namespace xray::render {
 
 using namespace RENDER_NAMESPACE;
@@ -64,6 +67,22 @@ namespace RENDER_NAMESPACE {
     extern CRender RImplementation;
 }
 
+static Fmatrix BuildHUDFOVMatrix()
+{
+    const float fovScale = 1.0f / psHUD_FOV;
+    Fmatrix invView;
+    invView.invert(Device.mView);
+
+    Fmatrix fovScaleMat;
+    fovScaleMat.identity();
+    fovScaleMat._11 = fovScale;
+    fovScaleMat._22 = fovScale;
+
+    Fmatrix t1, result;
+    t1.mul(fovScaleMat, Device.mView);
+    result.mul(invView, t1);
+    return result;
+}
 
 FrameGraphRenderer::FrameGraphRenderer() {
     Msg("* [FrameGraphRenderer] Created");
@@ -134,6 +153,9 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
     m_rtAccelMgr->Initialize(device);
+
+    m_smokeTrailManager = xr_make_unique<RENDER_NAMESPACE::passes::SmokeTrailManager>();
+    m_smokeTrailManager->Initialize(device);
 
     m_renderContext.reset(device->CreateContext());
     if (!m_renderContext)
@@ -218,6 +240,12 @@ void FrameGraphRenderer::Shutdown() {
         m_rtAccelMgr->Shutdown();
         m_rtAccelMgr = nullptr;
     }
+
+    if (m_smokeTrailManager) {
+        m_smokeTrailManager->Shutdown();
+        m_smokeTrailManager = nullptr;
+    }
+
     passes::ShutdownPathTracer();
 
     m_shaderPhaseCache = nullptr;
@@ -1092,7 +1120,22 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_passStates->trail
     );
 
-    auto sceneColor = trailOutputs.layout.albedo;
+    auto smokeOutputs = trailOutputs.layout;
+    if (m_smokeTrailManager && m_smokeTrailManager->IsReady())
+    {
+        smokeOutputs = passes::setupSmokeTrailPass(
+            *m_framegraph,
+            m_device,
+            trailOutputs.layout,
+            m_smokeTrailManager.get(),
+            &m_passStates->trail,
+            width,
+            height,
+            m_passStates->smokeTrail
+        );
+    }
+
+    auto sceneColor = smokeOutputs.albedo;
 
     if (particleOutputs.distortionRT.is_valid()) {
         framegraph::ResourceDesc snapDesc;
@@ -2273,6 +2316,30 @@ void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRH
     }
 
     imguiRenderer->Render(drawData, framebuffer.Get(), cmdList);
+}
+
+void FrameGraphRenderer::UpdateSmokeTrail(
+    const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode)
+{
+    if (!m_smokeTrailManager || !m_smokeTrailManager->IsReady())
+        return;
+
+    Fvector correctedPos = muzzlePos;
+    Fvector correctedDir = muzzleDir;
+
+    if (isHUDMode)
+    {
+        const Fmatrix hudMat = BuildHUDFOVMatrix();
+        hudMat.transform_tiny(correctedPos);
+        hudMat.transform_dir(correctedDir);
+        correctedDir.normalize_safe();
+    }
+
+    m_smokeTrailManager->Update(dt, correctedPos, correctedDir);
+}
+
+void FrameGraphRenderer::NotifySmokeShot()
+{
 }
 
 }
