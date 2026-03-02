@@ -3,6 +3,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include "ShaderCache.h"
+#include <filesystem>
 
 #include "Layers/xrRender/Shaders/SlangCompiler.h"
 
@@ -97,6 +98,10 @@ public:
         const char* extension
     );
 
+    bool CheckForChangedFiles();
+    bool ValidateChangedFiles();
+    void ClearAllCaches();
+
 private:
     bool CompileShader(
         const char* shaderName,
@@ -116,6 +121,14 @@ public:
     xray::render::SlangCompiler::Target GetTarget() const { return m_target; }
 
 private:
+    void WatchShaderFile(
+        const xr_string& cacheKey,
+        const char* name,
+        const char* extension,
+        const char* entryPoint,
+        xray::render::SlangCompiler::Stage stage
+    );
+
     xray::render::SlangCompiler* m_slangCompiler;
     xray::render::SlangCompiler::Target m_target = xray::render::SlangCompiler::Target::DXIL;
     ShaderCache m_cache;
@@ -123,6 +136,16 @@ private:
     xr_map<xr_string, ExtractedReflection*> m_reflectionCache;
 
     xr_map<xr_string, nvrhi::ShaderHandle> m_handleCache;
+
+    struct WatchedFile {
+        xr_string absolutePath;
+        xr_string shaderName;
+        xr_string extension;
+        xr_string entryPoint;
+        xray::render::SlangCompiler::Stage stage = xray::render::SlangCompiler::Stage::Vertex;
+        std::filesystem::file_time_type lastWriteTime;
+    };
+    xr_map<xr_string, WatchedFile> m_watchedFiles;
 };
 
 }
