@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "Weapon.h"
+#include "xrEngine/IFrameGraphRender.h"
 #include "ParticlesObject.h"
 #include "entity_alive.h"
 #include "inventory_item_impl.h"
@@ -910,6 +911,17 @@ void CWeapon::UpdateCL()
 
     if (m_zoom_params.m_pVision)
         m_zoom_params.m_pVision->Update();
+
+    // Feed muzzle position to GPU smoke trail system
+    if (GEnv.FrameGraphRenderer && GEnv.FrameGraphRenderer->IsEnabled() && IsGameTypeSingle())
+    {
+        CActor* pActor = smart_cast<CActor*>(H_Parent());
+        if (pActor && pActor->inventory().ActiveItem() == this)
+        {
+            GEnv.FrameGraphRenderer->UpdateSmokeTrail(
+                get_LastFP(), get_LastFD(), Device.fTimeDelta, !!GetHUDmode());
+        }
+    }
 }
 void CWeapon::EnableActorNVisnAfterZoom()
 {

@@ -45,4 +45,10 @@ public:
     virtual xray::render::ui::UIRenderCollector* GetUICollector() const = 0;
     virtual xray::render::ui::NVRHIUIRenderer* GetUIRenderer() const = 0;
     virtual xray::render::MaterialCache* GetTextMaterialCache() const = 0;
+
+    // Weapon smoke trail: feed muzzle transform each frame
+    virtual void UpdateSmokeTrail(const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode) = 0;
+
+    // Notify renderer that weapon fired (for smoke heat accumulation)
+    virtual void NotifySmokeShot() = 0;
 };

@@ -16,6 +16,7 @@
 #include "DecalPassSetup.h"
 #include "RibbonPassSetup.h"
 #include "TrailPassSetup.h"
+#include "SmokeTrailPassSetup.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -36,6 +37,7 @@ struct PassStates {
     DecalPassState decal;
     RibbonPassState ribbon;
     TrailPassState trail;
+    SmokeTrailPassState smokeTrail;
 };
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

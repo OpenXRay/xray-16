@@ -17,11 +17,6 @@ struct PS_INPUT
 
 float4 main(PS_INPUT input) : SV_Target0
 {
-    MaterialData mat = g_Materials[input.materialID];
-    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
-    float4 result = diffuseSample * input.color;
-
-    clip(result.a - (0.01 / 255.0));
-
-    return result;
+    // Debug: visualize UV coordinates
+    return float4(input.texcoord.x, input.texcoord.y, 0.0, input.color.a);
 }

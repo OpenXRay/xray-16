@@ -89,6 +89,10 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/RibbonPassSetup.cpp
     ../xrRender/FrameGraphPasses/TrailPassSetup.h
     ../xrRender/FrameGraphPasses/TrailPassSetup.cpp
+    ../xrRender/FrameGraphPasses/SmokeTrailManager.h
+    ../xrRender/FrameGraphPasses/SmokeTrailManager.cpp
+    ../xrRender/FrameGraphPasses/SmokeTrailPassSetup.h
+    ../xrRender/FrameGraphPasses/SmokeTrailPassSetup.cpp
     ../xrRender/FrameGraphPasses/DecalPassSetup.h
     ../xrRender/FrameGraphPasses/DecalPassSetup.cpp
 

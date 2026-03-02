@@ -299,7 +299,7 @@ TrailPassOutput setupTrailPass(
             data.outputs.depth = data.depth;
         },
         [](const TrailPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
-            if (!data.passState || data.passState->pointCount < 2)
+            if (!data.passState)
                 return;
 
             auto* colorRT = fg.GetPhysicalTexture(data.outputColor);
@@ -312,9 +312,6 @@ TrailPassOutput setupTrailPass(
             if (!nvDevice || !cmdList)
                 return;
 
-            auto& matBuffer = MaterialBuffer::Instance();
-            matBuffer.Upload(ctx);
-
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
             fbDesc.setDepthAttachment(depthRT);
@@ -323,9 +320,17 @@ TrailPassOutput setupTrailPass(
             if (!framebuffer)
                 return;
 
+            // Always initialize pipeline/layout (smoke draw pass depends on this)
             InitializeTrailResources(data.device, framebuffer, *data.passState);
             if (!data.passState->initialized)
                 return;
+
+            // Nothing to draw if no CPU trail points
+            if (data.passState->pointCount < 2)
+                return;
+
+            auto& matBuffer = MaterialBuffer::Instance();
+            matBuffer.Upload(ctx);
 
             auto& st = *data.passState;
 

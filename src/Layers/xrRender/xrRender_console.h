@@ -232,6 +232,15 @@ enum
     R3FLAGEXT_SSR_JITTER = (1 << 11),
 };
 
+// Smoke Trail (weapon muzzle smoke)
+extern ECORE_API int   ps_r_smoke_trail_enabled;
+extern ECORE_API float ps_r_smoke_max_emit_rate;
+extern ECORE_API float ps_r_smoke_point_lifetime;
+extern ECORE_API float ps_r_smoke_max_width;
+extern ECORE_API float ps_r_smoke_gravity;
+extern ECORE_API float ps_r_smoke_buoyancy;
+extern ECORE_API float ps_r_smoke_turbulence;
+
 extern void xrRender_initconsole();
 extern BOOL xrRender_test_hw();
 } // namespace xray::render::RENDER_NAMESPACE

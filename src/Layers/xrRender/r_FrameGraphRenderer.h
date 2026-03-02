@@ -28,6 +28,7 @@ namespace xray::render::RENDER_NAMESPACE {
 namespace xray::render::RENDER_NAMESPACE::passes {
     struct ParticleBatch;
     struct PassStates;
+    class SmokeTrailManager;
 }
 
 namespace xray::render::ng {
@@ -107,6 +108,11 @@ public:
     ui::NVRHIUIRenderer* GetUIRenderer() const override { return m_uiRenderer.get(); }
     MaterialCache* GetTextMaterialCache() const override { return m_textMaterialCache.get(); }
     framegraph::VolatileConstantBufferPool* GetTextVCBPool() const { return m_textVCBPool.get(); }
+
+    // Smoke trail interface
+    void UpdateSmokeTrail(const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode) override;
+    void NotifySmokeShot() override;
+    RENDER_NAMESPACE::passes::SmokeTrailManager* GetSmokeTrailManager() const { return m_smokeTrailManager.get(); }
 
     // GPU Culling Manager accessor (for level loading integration)
     RENDER_NAMESPACE::GPUCullingManager* GetGPUCullingManager() const { return m_gpuCullingManager.get(); }
@@ -225,6 +231,9 @@ private:
 
     // Overlay Manager (per-NPC UV-space overlay textures for baked decals)
     xr_unique_ptr<RENDER_NAMESPACE::decals::OverlayManager> m_overlayManager;
+
+    // Smoke Trail Manager (GPU weapon muzzle smoke)
+    xr_unique_ptr<RENDER_NAMESPACE::passes::SmokeTrailManager> m_smokeTrailManager;
 
     // Ray Tracing acceleration structures (for path tracer)
     xr_unique_ptr<RENDER_NAMESPACE::RTAccelStructManager> m_rtAccelMgr;

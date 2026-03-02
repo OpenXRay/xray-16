@@ -275,6 +275,15 @@ const xr_token fg_render_mode_token[] = {
     {nullptr, 0}
 };
 
+// Smoke Trail (weapon muzzle smoke)
+int   ps_r_smoke_trail_enabled  = 1;
+float ps_r_smoke_max_emit_rate  = 45.f;
+float ps_r_smoke_point_lifetime = 2.5f;
+float ps_r_smoke_max_width      = 0.04f;
+float ps_r_smoke_gravity        = 0.15f;
+float ps_r_smoke_buoyancy       = 1.0f;
+float ps_r_smoke_turbulence     = 0.8f;
+
 u32 ps_steep_parallax = 0;
 int ps_r__detail_radius = 49;
 int ps_r__detail_gpu = 1; // 0=Vanilla CPU path, 1=GPU compute path (default GPU)
@@ -1223,6 +1232,15 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_path_tracer_bounces", &ps_r_path_tracer_bounces, 1, 16);
     CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
+
+    // Smoke Trail (weapon muzzle smoke)
+    CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);
+    CMD4(CCC_Float,   "r_smoke_emit_rate", &ps_r_smoke_max_emit_rate,  1.0f, 120.0f);
+    CMD4(CCC_Float,   "r_smoke_lifetime",  &ps_r_smoke_point_lifetime, 0.5f, 10.0f);
+    CMD4(CCC_Float,   "r_smoke_width",     &ps_r_smoke_max_width,      0.005f, 0.2f);
+    CMD4(CCC_Float,   "r_smoke_gravity",   &ps_r_smoke_gravity,        0.0f, 2.0f);
+    CMD4(CCC_Float,   "r_smoke_buoyancy",  &ps_r_smoke_buoyancy,       0.0f, 3.0f);
+    CMD4(CCC_Float,   "r_smoke_turbulence",&ps_r_smoke_turbulence,     0.0f, 3.0f);
 
     CMD4(CCC_Vector4, "dev_param_1", &ps_dev_param_1, Fvector4().set(-1000, -1000, -1000, -1000), Fvector4().set(1000, 1000, 1000, 1000));
     CMD4(CCC_Vector4, "dev_param_2", &ps_dev_param_2, Fvector4().set(-1000, -1000, -1000, -1000), Fvector4().set(1000, 1000, 1000, 1000));

@@ -47,6 +47,7 @@
 #include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
+#include "FrameGraphPasses/SmokeTrailPassSetup.h"    // GPU smoke trail (emit/sim/compact/draw)
 #include "FrameGraphPasses/PassStates.h"             // Aggregate pass state (owns all per-pass state)
 #include "FrameGraphPasses/ImGuiPassSetup.h"
 #include "FrameGraphPasses/PathTracerPassSetup.h"
@@ -58,6 +59,8 @@
 #include "xrParticles/psystem.h"
 #include "blenders/Blender_Particle.h"
 
+extern ENGINE_API float psHUD_FOV;
+
 namespace xray::render {
 
 using namespace RENDER_NAMESPACE;
@@ -68,6 +71,22 @@ namespace RENDER_NAMESPACE {
     extern CRender RImplementation;
 }
 
+static Fmatrix BuildHUDFOVMatrix()
+{
+    const float fovScale = 1.0f / psHUD_FOV;
+    Fmatrix invView;
+    invView.invert(Device.mView);
+
+    Fmatrix fovScaleMat;
+    fovScaleMat.identity();
+    fovScaleMat._11 = fovScale;
+    fovScaleMat._22 = fovScale;
+
+    Fmatrix t1, result;
+    t1.mul(fovScaleMat, Device.mView);
+    result.mul(invView, t1);
+    return result;
+}
 
 FrameGraphRenderer::FrameGraphRenderer() {
     Msg("* [FrameGraphRenderer] Created");
@@ -158,6 +177,9 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
     m_rtAccelMgr->Initialize(device);
+
+    m_smokeTrailManager = xr_make_unique<RENDER_NAMESPACE::passes::SmokeTrailManager>();
+    m_smokeTrailManager->Initialize(device);
 
     // Create RenderContext for execution
     m_renderContext.reset(device->CreateContext());
@@ -263,6 +285,12 @@ void FrameGraphRenderer::Shutdown() {
         m_rtAccelMgr->Shutdown();
         m_rtAccelMgr = nullptr;
     }
+
+    if (m_smokeTrailManager) {
+        m_smokeTrailManager->Shutdown();
+        m_smokeTrailManager = nullptr;
+    }
+
     passes::ShutdownPathTracer();
 
     m_shaderPhaseCache = nullptr;
@@ -1402,7 +1430,25 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_passStates->trail
     );
 
-    auto sceneColor = trailOutputs.layout.albedo;
+    // ═══════════════════════════════════════════════════════
+    //  SMOKE TRAIL PASS (GPU-simulated weapon muzzle smoke)
+    // ═══════════════════════════════════════════════════════
+    auto smokeOutputs = trailOutputs.layout;
+    if (m_smokeTrailManager && m_smokeTrailManager->IsReady())
+    {
+        smokeOutputs = passes::setupSmokeTrailPass(
+            *m_framegraph,
+            m_device,
+            trailOutputs.layout,
+            m_smokeTrailManager.get(),
+            &m_passStates->trail,  // reuse trail pipeline for draw
+            width,
+            height,
+            m_passStates->smokeTrail
+        );
+    }
+
+    auto sceneColor = smokeOutputs.albedo;
 
     if (particleOutputs.distortionRT.is_valid()) {
         framegraph::ResourceDesc snapDesc;
@@ -2899,6 +2945,36 @@ void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRH
     // Render ImGui onto final output
     // Commands are batched into main cmdlist, executed at EndFrame
     imguiRenderer->Render(drawData, framebuffer.Get(), cmdList);
+}
+
+// ═══════════════════════════════════════════════════════
+//  SMOKE TRAIL (weapon muzzle smoke)
+// ═══════════════════════════════════════════════════════
+
+void FrameGraphRenderer::UpdateSmokeTrail(
+    const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode)
+{
+    if (!m_smokeTrailManager || !m_smokeTrailManager->IsReady())
+        return;
+
+    Fvector correctedPos = muzzlePos;
+    Fvector correctedDir = muzzleDir;
+
+    if (isHUDMode)
+    {
+        const Fmatrix hudMat = BuildHUDFOVMatrix();
+        hudMat.transform_tiny(correctedPos);
+        hudMat.transform_dir(correctedDir);
+        correctedDir.normalize_safe();
+    }
+
+    m_smokeTrailManager->Update(dt, correctedPos, correctedDir);
+}
+
+void FrameGraphRenderer::NotifySmokeShot()
+{
+    // No-op for first pass (constant emission, no heat system)
+    // Will forward to m_smokeTrailManager->OnShot() when heat system is added
 }
 
 } // namespace xray::render

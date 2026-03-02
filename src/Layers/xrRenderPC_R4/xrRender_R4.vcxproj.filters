@@ -825,6 +825,12 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\TrailPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\SmokeTrailManager.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\SmokeTrailPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\DecalPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
@@ -1685,6 +1691,12 @@
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\TrailPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\SmokeTrailManager.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\SmokeTrailPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\DecalPassSetup.cpp">
