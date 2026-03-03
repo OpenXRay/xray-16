@@ -17,7 +17,7 @@ struct GPUSlotData {
 StructuredBuffer<InstanceData> g_AllInstances : register(t0);
 StructuredBuffer<GPUSlotData> g_SlotData : register(t1);
 StructuredBuffer<uint> g_VisibleIndices : register(t2);
-Texture2D g_WindTexture : register(t3);
+Texture3D g_WindTexture : register(t3);  // 3D Perlin4D volume (grass samples at z=0)
 SamplerState g_LinearSampler : register(s0);
 RWByteAddressBuffer g_Output : register(u0);
 RWByteAddressBuffer g_OutputIB : register(u1);
@@ -70,7 +70,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float scale = float((raw.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
 
     float2 height_uv = base_pos.xz * HEIGHT_NOISE_SCALE + float2(0.37, 0.73);
-    float height_noise = g_WindTexture.SampleLevel(g_LinearSampler, height_uv, 0).r;
+    float height_noise = g_WindTexture.SampleLevel(g_LinearSampler, float3(height_uv, 0), 0).r;
     float height_multiplier = lerp(HEIGHT_VARIATION_MIN, HEIGHT_VARIATION_MAX, height_noise);
     float blade_height_val = scale * height_multiplier * grass_blade_height;
 
@@ -105,14 +105,14 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float time = wave.w;
 
     float2 dir_uv = P0.zx * (0.005 / wind_speed) + time * (0.005 * wind_speed);
-    float wind_dir_noise = g_WindTexture.SampleLevel(g_LinearSampler, dir_uv, 0).r;
+    float wind_dir_noise = g_WindTexture.SampleLevel(g_LinearSampler, float3(dir_uv, 0), 0).r;
 
     float2 str_uv = P0.xz * (0.025 / wind_speed) + time * 0.05;
-    float wind_str_noise = g_WindTexture.SampleLevel(g_LinearSampler, str_uv, 0).r;
+    float wind_str_noise = g_WindTexture.SampleLevel(g_LinearSampler, float3(str_uv, 0), 0).r;
 
     float height_factor = t;
     float2 turb_uv = P0.xz * (0.025 / wind_speed) + (time + height_factor * height_factor * 0.25) * 0.05;
-    float wind_turb_noise = g_WindTexture.SampleLevel(g_LinearSampler, turb_uv, 0).r;
+    float wind_turb_noise = g_WindTexture.SampleLevel(g_LinearSampler, float3(turb_uv, 0), 0).r;
 
     float fbm_wind_strength = lerp(0.25, 1.0, wind_str_noise);
     fbm_wind_strength *= fbm_wind_strength;

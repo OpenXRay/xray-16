@@ -1388,10 +1388,11 @@ void FGDetailManager::DestroyGPUBuffers()
     pulledIndexBuffer = nullptr;
     buildDetailsTexture = nullptr;
 
-    windTexture = nullptr;
-    windComputeShader = nullptr;
-    windBindingLayout = nullptr;
-    windPipeline = nullptr;
+    perlin4dTexture = nullptr;
+    perlin4dComputeShader = nullptr;
+    perlin4dBindingLayout = nullptr;
+    perlin4dPipeline = nullptr;
+    perlin4dCB = nullptr;
 
     statsReadbackBuffer = nullptr;
     statsReadbackPending = false;
@@ -1412,83 +1413,53 @@ void FGDetailManager::DestroyGPUBuffers()
     cachedResourcesInitialized = false;
 }
 
-bool FGDetailManager::CreateWindTexture(nvrhi::IDevice* device)
+bool FGDetailManager::CreatePerlin4DTexture(nvrhi::IDevice* device)
 {
     if (!device)
         return false;
 
-    if (!RImplementation.m_renderDevice)
+    nvrhi::TextureDesc desc;
+    desc.width            = PERLIN4D_TEXTURE_SIZE;
+    desc.height           = PERLIN4D_TEXTURE_SIZE;
+    desc.depth            = PERLIN4D_TEXTURE_SIZE;
+    desc.dimension        = nvrhi::TextureDimension::Texture3D;
+    desc.format           = nvrhi::Format::RGBA16_FLOAT;
+    desc.isUAV            = true;
+    desc.initialState     = nvrhi::ResourceStates::ShaderResource;
+    desc.keepInitialState = true;
+    desc.debugName        = "Perlin4DVolume";
+
+    perlin4dTexture = device->createTexture(desc);
+    if (!perlin4dTexture)
     {
-        Msg("! [FGDetailManager] No render device available for wind texture");
+        Msg("! [FGDetailManager] Failed to create Perlin4D volume texture");
         return false;
     }
 
-    auto* resourceManager = RImplementation.m_renderDevice->GetFGResourceManager();
-    if (!resourceManager)
-    {
-        Msg("! [FGDetailManager] No resource manager available for wind texture");
-        return false;
-    }
-
-    auto* textureManager = resourceManager->GetTextureManager();
-    if (!textureManager)
-    {
-        Msg("! [FGDetailManager] No texture manager available for wind texture");
-        return false;
-    }
-
-    xray::render::resources::TextureHandle texHandle = textureManager->LoadTexture(
-        "shaders\\perlin_noise",
-        xray::render::resources::TexturePriority::Critical
-    );
-
-    if (!texHandle.IsValid())
-    {
-        Msg("! [FGDetailManager] Failed to load shaders/perlin_noise.dds");
-        return false;
-    }
-
-    nvrhi::ITexture* nvrhiTexture = textureManager->GetNVRHITexture(texHandle);
-    if (!nvrhiTexture)
-    {
-        Msg("! [FGDetailManager] Failed to get NVRHI handle for perlin_noise");
-        return false;
-    }
-
-    windTexture = nvrhiTexture;
-
-    if (GEnv.Backend)
-    {
-        windTextureBindlessIndex = GEnv.Backend->RegisterBindlessTexture(nvrhiTexture);
-        if (windTextureBindlessIndex == 0)
-        {
-            Msg("! [FGDetailManager] Failed to register perlin_noise in bindless heap");
-            return false;
-        }
-        Msg("* [FGDetailManager] Wind texture (perlin_noise) loaded, bindless index: %u", windTextureBindlessIndex);
-    }
+    Msg("* [FGDetailManager] Perlin4D volume texture created (%u^3 RGBA16F, %u KB)",
+        PERLIN4D_TEXTURE_SIZE, PERLIN4D_TEXTURE_SIZE * PERLIN4D_TEXTURE_SIZE * PERLIN4D_TEXTURE_SIZE * 8 / 1024);
 
     return true;
 }
 
-bool FGDetailManager::LoadWindComputeShader(framegraph::ShaderLoader* shaderLoader)
+bool FGDetailManager::LoadPerlin4DComputeShader(framegraph::ShaderLoader* shaderLoader)
 {
     if (!shaderLoader)
         return false;
 
-    windComputeShader = shaderLoader->LoadComputeShader("detail_wind_fbm", "main").handle;
-    if (!windComputeShader)
+    perlin4dComputeShader = shaderLoader->LoadComputeShader("perlin4d_gen", "main").handle;
+    if (!perlin4dComputeShader)
     {
-        Msg("! [FGDetailManager] Failed to load detail_wind_fbm compute shader");
+        Msg("! [FGDetailManager] Failed to load perlin4d_gen compute shader");
         return false;
     }
 
     return true;
 }
 
-bool FGDetailManager::CreateWindPipeline(nvrhi::IDevice* device)
+bool FGDetailManager::CreatePerlin4DPipeline(nvrhi::IDevice* device)
 {
-    if (!device || !windComputeShader)
+    if (!device || !perlin4dComputeShader)
         return false;
 
     nvrhi::BindingLayoutDesc layoutDesc;
@@ -1498,32 +1469,74 @@ bool FGDetailManager::CreateWindPipeline(nvrhi::IDevice* device)
         nvrhi::BindingLayoutItem::Texture_UAV(0),
     };
 
-    windBindingLayout = device->createBindingLayout(layoutDesc);
-    if (!windBindingLayout)
+    perlin4dBindingLayout = device->createBindingLayout(layoutDesc);
+    if (!perlin4dBindingLayout)
     {
-        Msg("! [FGDetailManager] Failed to create wind binding layout");
+        Msg("! [FGDetailManager] Failed to create Perlin4D binding layout");
         return false;
     }
 
     nvrhi::ComputePipelineDesc pipelineDesc;
-    pipelineDesc.CS = windComputeShader;
-    pipelineDesc.bindingLayouts = { windBindingLayout };
+    pipelineDesc.CS = perlin4dComputeShader;
+    pipelineDesc.bindingLayouts = { perlin4dBindingLayout };
 
-    windPipeline = device->createComputePipeline(pipelineDesc);
-    if (!windPipeline)
+    perlin4dPipeline = device->createComputePipeline(pipelineDesc);
+    if (!perlin4dPipeline)
     {
-        Msg("! [FGDetailManager] Failed to create wind compute pipeline");
+        Msg("! [FGDetailManager] Failed to create Perlin4D compute pipeline");
         return false;
     }
+
+    // Volatile constant buffer for per-frame dispatch params
+    nvrhi::BufferDesc cbDesc;
+    cbDesc.byteSize         = 16;  // Perlin4DGenParams: time, tileScale, textureSize, pad
+    cbDesc.isVolatile       = true;
+    cbDesc.maxVersions      = 16;
+    cbDesc.isConstantBuffer = true;
+    cbDesc.keepInitialState = true;
+    cbDesc.debugName        = "Perlin4DGenCB";
+    perlin4dCB = device->createBuffer(cbDesc);
 
     return true;
 }
 
-void FGDetailManager::DispatchWindCompute(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, float time)
+void FGDetailManager::DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, float time)
 {
-    (void)cmdList;
-    (void)device;
-    (void)time;
+    if (!perlin4dPipeline || !perlin4dTexture || !perlin4dCB)
+        return;
+
+    // CB data: must match perlin4d_gen.cs Perlin4DGenParams
+    struct Perlin4DGenParams
+    {
+        float time;
+        float tileScale;
+        u32   textureSize;
+        float pad0;
+    };
+
+    Perlin4DGenParams params;
+    params.time        = time * 0.5f;  // Match g_TurbEvolution = fTimeGlobal * 0.5
+    params.tileScale   = 4.0f;         // 4 noise periods across volume
+    params.textureSize = PERLIN4D_TEXTURE_SIZE;
+    params.pad0        = 0.f;
+
+    // writeBuffer BEFORE setComputeState (NVRHI volatile CB ordering)
+    cmdList->writeBuffer(perlin4dCB, &params, sizeof(params));
+
+    nvrhi::BindingSetDesc bindDesc;
+    bindDesc.bindings = {
+        nvrhi::BindingSetItem::ConstantBuffer(0, perlin4dCB),
+        nvrhi::BindingSetItem::Texture_UAV(0, perlin4dTexture),
+    };
+    auto bindSet = device->createBindingSet(bindDesc, perlin4dBindingLayout);
+
+    nvrhi::ComputeState cs;
+    cs.pipeline = perlin4dPipeline;
+    cs.bindings = { bindSet };
+    cmdList->setComputeState(cs);
+
+    // 3D dispatch: 64/4 = 16 groups per dimension
+    cmdList->dispatch(PERLIN4D_TEXTURE_SIZE / 8, PERLIN4D_TEXTURE_SIZE / 8, PERLIN4D_TEXTURE_SIZE / 8);
 }
 
 void FGDetailManager::GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments)
@@ -2055,6 +2068,7 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(35),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(37),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(38),
+        nvrhi::BindingLayoutItem::Texture_SRV(12),             // Perlin4D 3D volume
         nvrhi::BindingLayoutItem::Sampler(0),
         nvrhi::BindingLayoutItem::Sampler(1),
         nvrhi::BindingLayoutItem::Sampler(2),
@@ -2083,6 +2097,7 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(36),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(37),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(38),
+        nvrhi::BindingLayoutItem::Texture_SRV(12),             // Perlin4D 3D volume
         nvrhi::BindingLayoutItem::Sampler(0),
         nvrhi::BindingLayoutItem::Sampler(1),
         nvrhi::BindingLayoutItem::Sampler(2),

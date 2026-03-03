@@ -57,7 +57,7 @@ cbuffer DetailGlobals : register(b3)
 	float grass_wind_displacement;
 	float grass_interaction_displacement;
 	uint interaction_atlas_index;
-	uint wind_texture_index;
+	uint perlin4d_texture_index;
 	float4 grass_color_tip;
 	float4 grass_color_base;
 	float4 grass_sss_color;

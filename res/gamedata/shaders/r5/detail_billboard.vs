@@ -58,7 +58,7 @@ cbuffer DetailGlobals : register(b3)
 	float grass_wind_displacement;
 	float grass_interaction_displacement;
 	uint interaction_atlas_index;
-	uint wind_texture_index;
+	uint perlin4d_texture_index;
 	float4 grass_color_tip;
 	float4 grass_color_base;
 	float4 grass_sss_color;
@@ -67,6 +67,9 @@ cbuffer DetailGlobals : register(b3)
 	uint build_details_index;
 	uint build_details_pbr_index;
 };
+
+// Perlin4D 3D volume — bound directly at t12 (not bindless, since bindless is Texture2D only)
+Texture3D g_Perlin4D : register(t12);
 
 StructuredBuffer<uint> visible_indices : register(t33);
 StructuredBuffer<DetailModelGPU> detail_models : register(t35);
@@ -108,7 +111,6 @@ v2p_billboard main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceI
 
 	float4 world_pos = float4(rotated + raw.pos, 1.0);
 
-	Texture2D wind_tex = GetBindlessTexture(wind_texture_index);
 	float wind_speed = max(g_wind_direction.y, 0.1);
 	float time = wave.w;
 
@@ -116,10 +118,10 @@ v2p_billboard main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceI
 	float2 global_wind_dir = float2(sin(wind_angle_rad), cos(wind_angle_rad));
 
 	float2 dir_uv = world_pos.zx * (0.005 / wind_speed) + time * (0.005 * wind_speed);
-	float wind_dir_noise = wind_tex.SampleLevel(g_LinearSampler, dir_uv, 0).r;
+	float wind_dir_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(dir_uv, 0), 0).r;
 
 	float2 str_uv = world_pos.xz * (0.025 / wind_speed) + time * 0.05;
-	float wind_str_noise = wind_tex.SampleLevel(g_LinearSampler, str_uv, 0).r;
+	float wind_str_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(str_uv, 0), 0).r;
 
 	float fbm_wind_strength = lerp(0.25, 1.0, wind_str_noise);
 	fbm_wind_strength *= fbm_wind_strength;

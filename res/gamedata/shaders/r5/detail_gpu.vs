@@ -35,7 +35,7 @@ cbuffer DetailGlobals : register(b3)
     float grass_wind_displacement;  // Wind displacement strength
     float grass_interaction_displacement;  // Interaction displacement strength
     uint interaction_atlas_index;   // Bindless index for interaction atlas
-    uint wind_texture_index;        // Bindless index for wind texture
+    uint perlin4d_texture_index;        // Bindless index for wind texture
     // Grass color parameters (must match pixel shader)
     float4 grass_color_tip;         // RGB + padding (blade tip color)
     float4 grass_color_base;        // RGB + padding (blade base color)
@@ -89,6 +89,9 @@ static const float PACK_MAX_SCALE = 4.0;
 static const float TWO_PI = 6.28318530718;
 
 // NOTE: common_samplers.h uses t0-t31, so we use t32+ to avoid conflicts
+// Perlin4D 3D volume — bound directly at t12 (not bindless, since bindless is Texture2D only)
+Texture3D g_Perlin4D : register(t12);
+
 StructuredBuffer<uint> visible_indices : register(t33);
 StructuredBuffer<InstanceData> all_instances : register(t37);
 StructuredBuffer<GPUSlotData> slot_data : register(t38);
@@ -111,8 +114,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// Sample static Perlin noise at different scale/offset for height variation
 	// This gives natural-looking height randomization that tiles seamlessly
 	float2 height_uv = det.pos.xz * HEIGHT_NOISE_SCALE + float2(0.37, 0.73);  // Offset to decorrelate from wind
-	Texture2D height_noise_tex = GetBindlessTexture(wind_texture_index);
-	float height_noise = height_noise_tex.SampleLevel(g_LinearSampler, height_uv, 0).r;  // Use R channel (turbulence)
+	float height_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(height_uv, 0), 0).r;  // Use R channel (turbulence)
 
 	// Map noise to height multiplier range
 	float height_multiplier = lerp(HEIGHT_VARIATION_MIN, HEIGHT_VARIATION_MAX, height_noise);
@@ -210,26 +212,25 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// ===== WIND ANIMATION (Based on grass_example_repo reference) =====
 	// Sample Perlin noise for direction, strength, and turbulence separately
 	// Key: Scale inversely with wind_speed, time scroll proportionally
-	Texture2D wind_tex = GetBindlessTexture(wind_texture_index);
 	float wind_speed = max(g_wind_direction.y, 0.1);  // Avoid division by zero
 	float time = wave.w;  // Global time
 
 	// Wind DIRECTION sample - larger scale, slower movement
 	// Reference: pos.zx * 0.005/wind_speed + TIME * 0.005 * wind_speed
 	float2 dir_uv = P0.zx * (0.005 / wind_speed) + time * (0.005 * wind_speed);
-	float wind_dir_noise = wind_tex.SampleLevel(g_LinearSampler, dir_uv, 0).r;
+	float wind_dir_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(dir_uv, 0), 0).r;
 
 	// Wind STRENGTH sample - smaller scale, faster movement
 	// Reference: pos.xz * 0.025/wind_speed + TIME * 0.05
 	float2 str_uv = P0.xz * (0.025 / wind_speed) + time * 0.05;
-	float wind_str_noise = wind_tex.SampleLevel(g_LinearSampler, str_uv, 0).r;
+	float wind_str_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(str_uv, 0), 0).r;
 
 	// Wind TURBULENCE sample - same as strength but with HEIGHT-based time offset
 	// This makes blade tips flutter at different phase than base
 	// Reference: pos.xz * 0.025/wind_speed + (TIME + height_factor² * 0.25) * 0.05
 	float height_factor = vertex_height_factor;  // 0 at base, 1 at tip
 	float2 turb_uv = P0.xz * (0.025 / wind_speed) + (time + height_factor * height_factor * 0.25) * 0.05;
-	float wind_turb_noise = wind_tex.SampleLevel(g_LinearSampler, turb_uv, 0).r;
+	float wind_turb_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(turb_uv, 0), 0).r;
 
 	// Process strength: remap to [0.25, 1.0], square for contrast, scale by wind_speed
 	float fbm_wind_strength = lerp(0.25, 1.0, wind_str_noise);

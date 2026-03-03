@@ -77,7 +77,7 @@ public:
         float grass_wind_displacement;
         float grass_interaction_displacement;
         u32 interaction_atlas_index;
-        u32 wind_texture_index;
+        u32 perlin4d_texture_index;
         Fvector4 grass_color_tip;
         Fvector4 grass_color_base;
         Fvector4 grass_sss_color;
@@ -222,14 +222,16 @@ public:
 
     u32 visibleBufferCapacity = 0;
 
-    nvrhi::TextureHandle windTexture;
-    u32 windTextureBindlessIndex = 0;
-    static constexpr u32 WIND_TEXTURE_SIZE = 512;
+    nvrhi::TextureHandle perlin4dTexture;  // 3D volume (RGBA16F, 32³)
+    u32 perlin4dBindlessIndex = 0;         // not used for 3D — bound directly at t12
+    static constexpr u32 PERLIN4D_TEXTURE_SIZE = 32;
 
-    nvrhi::ShaderHandle windComputeShader;
-    nvrhi::BindingLayoutHandle windBindingLayout;
-    nvrhi::ComputePipelineHandle windPipeline;
+    nvrhi::ShaderHandle perlin4dComputeShader;
+    nvrhi::BindingLayoutHandle perlin4dBindingLayout;
+    nvrhi::ComputePipelineHandle perlin4dPipeline;
+    nvrhi::BufferHandle perlin4dCB;
 
+    // Wind parameters (set from environment, consumed by detail/grass passes)
     Fvector2 windDirection = {1.0f, 0.0f};
     float windSpeed = 0.5f;
 
@@ -334,10 +336,10 @@ public:
 
     void DestroyGPUBuffers();
 
-    bool CreateWindTexture(nvrhi::IDevice* device);
-    bool LoadWindComputeShader(class framegraph::ShaderLoader* shaderLoader);
-    bool CreateWindPipeline(nvrhi::IDevice* device);
-    void DispatchWindCompute(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, float time);
+    bool CreatePerlin4DTexture(nvrhi::IDevice* device);
+    bool LoadPerlin4DComputeShader(class framegraph::ShaderLoader* shaderLoader);
+    bool CreatePerlin4DPipeline(nvrhi::IDevice* device);
+    void DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, float time);
 
     void GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments = 8);
     void RegenerateBladeGeometry(nvrhi::ICommandList* cmdList);

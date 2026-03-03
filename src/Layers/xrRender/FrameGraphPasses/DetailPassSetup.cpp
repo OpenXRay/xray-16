@@ -184,7 +184,7 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.grass_wind_displacement = ps_r3_grass_wind_displacement;
             frameConstants.grass_interaction_displacement = ps_r3_grass_interaction_displacement;
             frameConstants.interaction_atlas_index = 0;
-            frameConstants.wind_texture_index = dm->windTextureBindlessIndex;
+            frameConstants.perlin4d_texture_index = dm->perlin4dBindlessIndex;
             frameConstants.grass_color_tip.set(ps_r3_grass_color_tip.x, ps_r3_grass_color_tip.y, ps_r3_grass_color_tip.z, 0.0f);
             frameConstants.grass_color_base.set(ps_r3_grass_color_base.x, ps_r3_grass_color_base.y, ps_r3_grass_color_base.z, 0.0f);
             frameConstants.grass_sss_color.set(ps_r3_grass_sss_color.x, ps_r3_grass_sss_color.y, ps_r3_grass_sss_color.z, ps_r3_grass_sss_intensity);
@@ -233,6 +233,7 @@ DefaultOutputLayout setupDetailPass(
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(35, dm->detailModelsBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(37, dm->generatedInstancesBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(38, dm->slotDataBuffer),
+                    nvrhi::BindingSetItem::Texture_SRV(12, dm->perlin4dTexture),
                     nvrhi::BindingSetItem::Sampler(0, dm->cachedSmp_LinearWrap),
                     nvrhi::BindingSetItem::Sampler(1, dm->cachedSmp_PointClamp),
                     nvrhi::BindingSetItem::Sampler(2, dm->cachedSmp_LinearClamp),
@@ -256,6 +257,7 @@ DefaultOutputLayout setupDetailPass(
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(36, dm->pulledVertexBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(37, dm->generatedInstancesBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(38, dm->slotDataBuffer),
+                    nvrhi::BindingSetItem::Texture_SRV(12, dm->perlin4dTexture),
                     nvrhi::BindingSetItem::Sampler(0, dm->cachedSmp_LinearWrap),
                     nvrhi::BindingSetItem::Sampler(1, dm->cachedSmp_PointClamp),
                     nvrhi::BindingSetItem::Sampler(2, dm->cachedSmp_LinearClamp),
