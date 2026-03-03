@@ -1006,7 +1006,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
                     nvrhi::Format::UNKNOWN, nvrhi::BufferRange(0, detailMgr->generatedInstancesBuffer->getDesc().byteSize)),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(1, detailMgr->slotDataBuffer),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(2, detailMgr->visibleInstancesBuffer[lod]),
-                nvrhi::BindingSetItem::Texture_SRV(3, detailMgr->windTexture),
+                nvrhi::BindingSetItem::Texture_SRV(3, detailMgr->perlin4dTexture),
                 nvrhi::BindingSetItem::Sampler(0, s_grassSampler),
                 nvrhi::BindingSetItem::RawBuffer_UAV(0, m_grassOutputVB),
                 nvrhi::BindingSetItem::RawBuffer_UAV(1, m_grassIB),

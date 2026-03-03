@@ -867,14 +867,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                     m_detailManager->CreatePrefixSumPipeline(m_device);
                 }
 
-                if (!m_detailManager->windTexture) {
-                    m_detailManager->CreateWindTexture(m_device->GetNVRHIDevice());
+                if (!m_detailManager->perlin4dTexture) {
+                    m_detailManager->CreatePerlin4DTexture(m_device->GetNVRHIDevice());
                 }
-                if (!m_detailManager->windComputeShader) {
-                    m_detailManager->LoadWindComputeShader(shaderLoader);
+                if (!m_detailManager->perlin4dComputeShader) {
+                    m_detailManager->LoadPerlin4DComputeShader(shaderLoader);
                 }
-                if (!m_detailManager->windPipeline && m_detailManager->windComputeShader) {
-                    m_detailManager->CreateWindPipeline(m_device->GetNVRHIDevice());
+                if (!m_detailManager->perlin4dPipeline && m_detailManager->perlin4dComputeShader) {
+                    m_detailManager->CreatePerlin4DPipeline(m_device->GetNVRHIDevice());
                 }
 
                 detailShadersLoaded = true;
@@ -1067,6 +1067,26 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_passStates->detail
     );
 
+    if (m_detailManager && m_detailManager->perlin4dPipeline)
+    {
+        struct Perlin4DGenData { FGDetailManager* dm = nullptr; };
+        m_framegraph->addCallbackPass<Perlin4DGenData>(
+            "Perlin4DGen",
+            [&](framegraph::FrameGraph& builder, framegraph::PassHandle passHandle, Perlin4DGenData& data)
+            {
+                framegraph::RenderPassBuilder passBuilder(builder, passHandle);
+                passBuilder.sideEffects();
+                data.dm = m_detailManager.get();
+            },
+            [](const Perlin4DGenData& data, const framegraph::FrameGraph&, ng::RenderContext* ctx)
+            {
+                auto* cmdList = ctx->GetCommandList();
+                auto* device  = cmdList->getDevice();
+                data.dm->DispatchPerlin4DCompute(cmdList, device, Device.fTimeGlobal);
+            }
+        );
+    }
+
     auto detailOutputs = passes::setupDetailPass(
         *m_framegraph,
         m_device,
@@ -1169,7 +1189,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             &m_passStates->trail,
             width,
             height,
-            m_passStates->smokeTrail
+            m_passStates->smokeTrail,
+            m_detailManager ? m_detailManager->perlin4dTexture.Get() : nullptr
         );
     }
 

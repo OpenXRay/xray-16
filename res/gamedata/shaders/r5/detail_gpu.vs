@@ -14,7 +14,7 @@ cbuffer DetailGlobals : register(b3)
     float grass_wind_displacement;
     float grass_interaction_displacement;
     uint interaction_atlas_index;
-    uint wind_texture_index;
+    uint perlin4d_texture_index;
     float4 grass_color_tip;
     float4 grass_color_base;
     float4 grass_sss_color;
@@ -60,6 +60,8 @@ struct GPUSlotData
 static const float PACK_MAX_SCALE = 4.0;
 static const float TWO_PI = 6.28318530718;
 
+Texture3D g_Perlin4D : register(t12);
+
 StructuredBuffer<uint> visible_indices : register(t33);
 StructuredBuffer<InstanceData> all_instances : register(t37);
 StructuredBuffer<GPUSlotData> slot_data : register(t38);
@@ -79,8 +81,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	det.scale = float((raw.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
 
 	float2 height_uv = det.pos.xz * HEIGHT_NOISE_SCALE + float2(0.37, 0.73);
-	Texture2D height_noise_tex = GetBindlessTexture(wind_texture_index);
-	float height_noise = height_noise_tex.SampleLevel(g_LinearSampler, height_uv, 0).r;
+	float height_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(height_uv, 0), 0).r;
 
 	float height_multiplier = lerp(HEIGHT_VARIATION_MIN, HEIGHT_VARIATION_MAX, height_noise);
 	float blade_height = det.scale * height_multiplier * grass_blade_height;
@@ -141,19 +142,18 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 		interaction = interaction_tex.SampleLevel(g_LinearSampler, atlas_uv, 0);
 	}
 
-	Texture2D wind_tex = GetBindlessTexture(wind_texture_index);
 	float wind_speed = max(g_wind_direction.y, 0.1);
 	float time = wave.w;
 
 	float2 dir_uv = P0.zx * (0.005 / wind_speed) + time * (0.005 * wind_speed);
-	float wind_dir_noise = wind_tex.SampleLevel(g_LinearSampler, dir_uv, 0).r;
+	float wind_dir_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(dir_uv, 0), 0).r;
 
 	float2 str_uv = P0.xz * (0.025 / wind_speed) + time * 0.05;
-	float wind_str_noise = wind_tex.SampleLevel(g_LinearSampler, str_uv, 0).r;
+	float wind_str_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(str_uv, 0), 0).r;
 
 	float height_factor = vertex_height_factor;
 	float2 turb_uv = P0.xz * (0.025 / wind_speed) + (time + height_factor * height_factor * 0.25) * 0.05;
-	float wind_turb_noise = wind_tex.SampleLevel(g_LinearSampler, turb_uv, 0).r;
+	float wind_turb_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(turb_uv, 0), 0).r;
 
 	float fbm_wind_strength = lerp(0.25, 1.0, wind_str_noise);
 	fbm_wind_strength *= fbm_wind_strength;
