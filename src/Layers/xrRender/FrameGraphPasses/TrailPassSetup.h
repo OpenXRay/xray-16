@@ -79,9 +79,17 @@ struct TrailParamsCB {
 
     // Row 3
     u32   useGPUState;           // 1 = read liveCount/totalDist from t11 state buffer
-    u32   pad0, pad1, pad2;
+    float turbAmount;            // per-instance turbulence displacement amount
+    float turbFrequency;         // spatial frequency (1/size)
+    float turbEvolution;         // time parameter (4th noise dimension)
+
+    // Row 4
+    float sphereCenterX;
+    float sphereCenterY;
+    float sphereCenterZ;
+    float sphereRadius;
 };
-static_assert(sizeof(TrailParamsCB) == 64, "TrailParamsCB must be 64 bytes (4 rows x 16)");
+static_assert(sizeof(TrailParamsCB) == 80, "TrailParamsCB must be 80 bytes (5 rows x 16)");
 
 struct TrailPassState {
     // GPU resources

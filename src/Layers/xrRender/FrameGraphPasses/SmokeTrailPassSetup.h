@@ -21,9 +21,10 @@ namespace xray::render::framegraph {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-// Persistent pass state — compute pipelines only (draw reuses TrailPassState)
+// Persistent pass state — compute pipelines + dedicated draw pipeline
 struct SmokeTrailPassState
 {
+    // Compute
     nvrhi::ComputePipelineHandle  emitPipeline;
     nvrhi::ComputePipelineHandle  simPipeline;
     nvrhi::ComputePipelineHandle  compactPipeline;
@@ -33,6 +34,13 @@ struct SmokeTrailPassState
     nvrhi::ShaderHandle           emitCS;
     nvrhi::ShaderHandle           simCS;
     nvrhi::ShaderHandle           compactCS;
+
+    // Draw (own pipeline with smoke_trail.ps, reuses trail.vs)
+    nvrhi::GraphicsPipelineHandle drawPipeline;
+    nvrhi::BindingLayoutHandle    drawLayout;
+    nvrhi::ShaderHandle           drawPS;
+    nvrhi::SamplerHandle          sampler;
+
     bool initialized = false;
 };
 

@@ -1,18 +1,29 @@
 // smoke_trail_compact.cs
-// Compact compute: linearizes live ring points oldest→newest
-// into TrailControlPoint format for trail.vs consumption.
-// Parallel read from global sim buffer → groupshared,
-// then thread 0 compacts sequentially from shared memory (fast).
-// Writes DrawIndirectArguments (non-indexed) and state buffer.
+// Compact: collect live sim points into TrailControlPoint array for trail.vs.
+// Applies turbulence displacement (4D Perlin fBm) in parallel phase.
+// Thread 0 compacts + computes directions + writes draw args.
 
 #include "smoke_common.h"
 
 cbuffer SmokeCompactCB : register(b5)
 {
+    // Row 0
     uint  g_MaxPoints;
     uint  g_Subdivisions;
     float g_MaxWidth;
-    float g_Pad0;
+    float g_TurbAmount;
+
+    // Row 1
+    float g_TurbFrequency;
+    float g_TurbEvolution;
+    float g_SphereRadius;
+    float _pad0;
+
+    // Row 2
+    float g_SphereCenterX;
+    float g_SphereCenterY;
+    float g_SphereCenterZ;
+    float _pad1;
 };
 
 RWStructuredBuffer<TrailControlPoint>   g_CompactBuffer : register(u0);
@@ -22,26 +33,16 @@ RWStructuredBuffer<SmokeSimPoint>       g_SimBuffer     : register(u3);
 
 #define MAX_PTS 256
 
-// Per-point data read in parallel, consumed sequentially
-struct SharedPoint
-{
-    float3 pos;
-    float3 vel;
-    float  ageNorm;
-    float  halfWidth;
-    bool   alive;
-};
-
-groupshared SharedPoint s_points[MAX_PTS];
-groupshared uint        s_ringCount;
-
-// Raw pre-scaled directions before smoothing
-groupshared float3      s_rawDir[MAX_PTS];
+groupshared float3 s_pos[MAX_PTS];
+groupshared float  s_ageNorm[MAX_PTS];
+groupshared float  s_width[MAX_PTS];
+groupshared bool   s_alive[MAX_PTS];
+groupshared uint   s_ringCount;
+groupshared float  s_compactWidth[MAX_PTS];
 
 [numthreads(MAX_PTS, 1, 1)]
 void main(uint gtid : SV_GroupIndex)
 {
-    // Thread 0 loads ring metadata
     if (gtid == 0)
     {
         uint totalSpawned = g_StateBuffer.Load(4);
@@ -51,109 +52,107 @@ void main(uint gtid : SV_GroupIndex)
 
     uint ringCount = s_ringCount;
 
-    // ── Parallel phase: each thread reads one sim point ──
-    SharedPoint sp;
-    sp.alive = false;
-    sp.pos = float3(0, 0, 0);
-    sp.vel = float3(0, 0, 0);
-    sp.ageNorm = 0;
-    sp.halfWidth = 0;
+    // Parallel phase: each thread reads one sim point + applies displacement
+    s_alive[gtid] = false;
 
     if (gtid < ringCount)
     {
         uint totalSpawned = g_StateBuffer.Load(4);
         uint oldestSpawn = (totalSpawned > ringCount) ? (totalSpawned - ringCount) : 0;
-        uint spawnId = oldestSpawn + gtid;
-        uint slot = spawnId % g_MaxPoints;
+        uint slot = (oldestSpawn + gtid) % g_MaxPoints;
 
         SmokeSimPoint p = g_SimBuffer[slot];
         if (p.lifetime > 0.0f && p.age < p.lifetime)
         {
-            float ageNorm = saturate(p.age / p.lifetime);
-            // Width profile: widen, hold, then widen more (smoke dissipates outward)
-            float initial  = smoothstep(0.0f, 0.15f, ageNorm);        // 0→1 quick open
-            float spread   = 1.0f + smoothstep(0.5f, 1.0f, ageNorm);  // 1→2 late spread
+            float3 basePos = float3(p.px, p.py, p.pz);
 
-            sp.alive = true;
-            sp.pos = float3(p.px, p.py, p.pz);
-            sp.vel = float3(p.vx, p.vy, p.vz);
-            sp.ageNorm = ageNorm;
-            sp.halfWidth = max(0.0008f, g_MaxWidth * initial * spread * 0.70f);
+            // Turbulence displacement (4D Perlin fBm with spherical falloff)
+            float3 sphereCenter = float3(g_SphereCenterX, g_SphereCenterY + 0.75f, g_SphereCenterZ);
+            float3 disp = turbulenceDisplace(basePos, g_TurbEvolution,
+                                             g_TurbAmount, g_TurbFrequency,
+                                             sphereCenter, g_SphereRadius * 0.25f);
+
+            s_alive[gtid]   = true;
+            s_pos[gtid]     = basePos + disp;
+            s_ageNorm[gtid] = saturate(p.age / p.lifetime);
+            s_width[gtid]   = p.width;
         }
     }
-    s_points[gtid] = sp;
     GroupMemoryBarrierWithGroupSync();
 
-    // ── Sequential phase: thread 0 compacts from shared memory ──
     if (gtid != 0)
         return;
 
+    // Thread 0: compact live points
     uint liveCount = 0;
     float totalDist = 0.0f;
     float3 prevPos = float3(0, 0, 0);
 
     for (uint i = 0; i < ringCount; i++)
     {
-        SharedPoint pt = s_points[i];
-        if (!pt.alive)
+        if (!s_alive[i])
             continue;
 
-        // Width direction from velocity
-        float vLen = length(pt.vel);
-        float3 tangent = (vLen > 0.0001f) ? pt.vel / vLen : float3(0, 0, 1);
-        float3 up = (abs(tangent.y) < 0.9f) ? float3(0, 1, 0) : float3(1, 0, 0);
-        float3 dir = normalize(cross(tangent, up));
+        float3 pos = s_pos[i];
 
         if (liveCount > 0)
-            totalDist += length(pt.pos - prevPos);
-
-        // Store raw pre-scaled direction for smoothing pass
-        s_rawDir[liveCount] = dir * pt.halfWidth;
+            totalDist += length(pos - prevPos);
 
         TrailControlPoint cp;
-        cp.posX = pt.pos.x;
-        cp.posY = pt.pos.y;
-        cp.posZ = pt.pos.z;
-        cp.dirX = 0; // written by smoothing pass
+        cp.posX = pos.x;
+        cp.posY = pos.y;
+        cp.posZ = pos.z;
+        cp.dirX = 0;
         cp.dirY = 0;
         cp.dirZ = 0;
-        cp.ageNorm = pt.ageNorm;
+        cp.ageNorm = s_ageNorm[i];
         cp.cumDist = totalDist;
 
         g_CompactBuffer[liveCount] = cp;
-        prevPos = pt.pos;
+        s_compactWidth[liveCount] = s_width[i];
+        prevPos = pos;
         liveCount++;
     }
 
-    // Smoothing pass: average direction over ±R neighbors
-    // At flip points, opposing dirs cancel through zero → smooth pinch
-    static const int R = 4;
+    // Direction pass: tangent from neighbors → cross with up → scale to halfWidth
     for (uint k = 0; k < liveCount; k++)
     {
-        float3 sum = float3(0, 0, 0);
-        int lo = max(0, (int)k - R);
-        int hi = min((int)liveCount - 1, (int)k + R);
-        for (int n = lo; n <= hi; n++)
-            sum += s_rawDir[n];
-        sum /= (float)(hi - lo + 1);
+        float3 curr = float3(g_CompactBuffer[k].posX, g_CompactBuffer[k].posY, g_CompactBuffer[k].posZ);
+        float3 tangent;
 
-        g_CompactBuffer[k].dirX = sum.x;
-        g_CompactBuffer[k].dirY = sum.y;
-        g_CompactBuffer[k].dirZ = sum.z;
+        if (liveCount < 2)
+            tangent = float3(0, 1, 0);
+        else if (k == 0)
+            tangent = float3(g_CompactBuffer[1].posX, g_CompactBuffer[1].posY, g_CompactBuffer[1].posZ) - curr;
+        else if (k == liveCount - 1)
+            tangent = curr - float3(g_CompactBuffer[k-1].posX, g_CompactBuffer[k-1].posY, g_CompactBuffer[k-1].posZ);
+        else
+            tangent = float3(g_CompactBuffer[k+1].posX, g_CompactBuffer[k+1].posY, g_CompactBuffer[k+1].posZ)
+                    - float3(g_CompactBuffer[k-1].posX, g_CompactBuffer[k-1].posY, g_CompactBuffer[k-1].posZ);
+
+        float tLen = length(tangent);
+        tangent = (tLen > 0.0001f) ? tangent / tLen : float3(0, 1, 0);
+
+        float3 up = (abs(tangent.y) < 0.9f) ? float3(0, 1, 0) : float3(1, 0, 0);
+        float3 dir = normalize(cross(tangent, up));
+
+        float hw = s_compactWidth[k];
+
+        g_CompactBuffer[k].dirX = dir.x * hw;
+        g_CompactBuffer[k].dirY = dir.y * hw;
+        g_CompactBuffer[k].dirZ = dir.z * hw;
     }
 
-    // State: liveCount + totalDist
+    // State buffer
     g_StateBuffer.Store(8, liveCount);
     g_StateBuffer.Store(12, asuint(totalDist));
 
-    // DrawIndirectArguments (non-indexed)
-    uint smoothCount = (liveCount >= 2)
-        ? ((liveCount - 1) * g_Subdivisions + 1)
-        : 0;
+    // Draw args (non-indexed)
+    uint smoothCount = (liveCount >= 2) ? ((liveCount - 1) * g_Subdivisions + 1) : 0;
     uint vertexCount = (smoothCount >= 2) ? ((smoothCount - 1) * 6) : 0;
 
     g_DrawArgs.Store(0,  vertexCount);
-    g_DrawArgs.Store(4,  1);
+    g_DrawArgs.Store(4,  64);   // 8 instances, offset in VS via SV_InstanceID
     g_DrawArgs.Store(8,  0);
     g_DrawArgs.Store(12, 0);
 }

@@ -1,0 +1,19 @@
+// smoke_trail.ps
+// Pixel shader for GPU smoke trail rendering.
+#define SM_6_0
+#include "common.h"
+
+struct PS_INPUT
+{
+    float4 hpos     : SV_Position;
+    float2 texcoord : TEXCOORD0;
+    float4 color    : TEXCOORD1;
+    float3 worldPos : TEXCOORD2;
+    float3 normal   : TEXCOORD3;
+    nointerpolation uint materialID : TEXCOORD4;
+};
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    return float4(1.0, 1.0, 1.0, 0.04);
+}

@@ -158,10 +158,18 @@ void SmokeTrailManager::Update(float dt, const Fvector& muzzlePos, const Fvector
     m_simParams.heat01     = 1.f;  // always full heat for constant emission
 
     // Compact CB
-    m_compactParams.maxPoints    = MAX_POINTS;
-    m_compactParams.subdivisions = TRAIL_SUBDIVISIONS;
-    m_compactParams.maxWidth     = ps_r_smoke_max_width;
-    m_compactParams.pad0         = 0.f;
+    m_compactParams.maxPoints      = MAX_POINTS;
+    m_compactParams.subdivisions   = TRAIL_SUBDIVISIONS;
+    m_compactParams.maxWidth       = ps_r_smoke_max_width;
+    m_compactParams.turbAmount     = ps_r_smoke_turbulence;
+    m_compactParams.turbFrequency  = 2.0f;
+    m_compactParams.turbEvolution  = Device.fTimeGlobal * 0.5f;
+    m_compactParams.sphereRadius   = 3.0f;
+    m_compactParams.pad0           = 0.f;
+    m_compactParams.sphereCenterX  = muzzlePos.x;
+    m_compactParams.sphereCenterY  = muzzlePos.y;
+    m_compactParams.sphereCenterZ  = muzzlePos.z;
+    m_compactParams.pad1           = 0.f;
 }
 
 } // namespace xray::render::RENDER_NAMESPACE::passes
