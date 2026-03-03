@@ -516,7 +516,7 @@ void CRenderDevice::FrameMove()
     stats.EngineTotal.End();
     stats.EngineTotal.FrameEnd();
 
-    if (GEnv.FrameGraphRenderer)
+    if (GEnv.FrameGraphRenderer && g_pGameLevel)
         GEnv.FrameGraphRenderer->RenderStatsOverlay();
 
     ImGui::EndFrame();

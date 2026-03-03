@@ -53,9 +53,19 @@ struct SmokeCompactParams
     u32   maxPoints;
     u32   subdivisions;
     float maxWidth;
+    float turbAmount;
+
+    float turbFrequency;
+    float turbEvolution;
+    float sphereRadius;
     float pad0;
+
+    float sphereCenterX;
+    float sphereCenterY;
+    float sphereCenterZ;
+    float pad1;
 };
-static_assert(sizeof(SmokeCompactParams) == 16);
+static_assert(sizeof(SmokeCompactParams) == 48);
 
 class SmokeTrailManager
 {

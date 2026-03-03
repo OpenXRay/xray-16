@@ -94,6 +94,88 @@ static void InitSmokeComputePipelines(ng::RenderDevice* device, SmokeTrailPassSt
     state.initialized = true;
 }
 
+static void InitSmokeDrawPipeline(
+    ng::RenderDevice* device,
+    nvrhi::IFramebuffer* framebuffer,
+    TrailPassState& trailState,
+    SmokeTrailPassState& state)
+{
+    if (state.drawPipeline)
+        return;
+
+    if (!trailState.initialized)
+        return;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    if (!nvDevice)
+        return;
+
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    if (!shaderLoader)
+        return;
+
+    auto psResult = shaderLoader->LoadPixelShader("smoke_trail", "main");
+    if (!psResult.handle)
+    {
+        Msg("! SmokeTrail: failed to load smoke_trail.ps");
+        return;
+    }
+    state.drawPS = psResult.handle;
+
+    nvrhi::SamplerDesc samplerDesc;
+    samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
+    samplerDesc.setAllFilters(true);
+    samplerDesc.setMaxAnisotropy(8.0f);
+    state.sampler = nvDevice->createSampler(samplerDesc);
+
+    auto* backend = device->GetBackend();
+    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+
+    nvrhi::BindingLayoutDesc layoutDesc;
+    layoutDesc.visibility = nvrhi::ShaderType::All;
+    layoutDesc.bindings = {
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),
+        nvrhi::BindingLayoutItem::RawBuffer_SRV(11),
+        nvrhi::BindingLayoutItem::Sampler(0),
+    };
+    state.drawLayout = nvDevice->createBindingLayout(layoutDesc);
+
+    auto& cache = GetPassResourceCache();
+    auto fbInfo = framebuffer->getFramebufferInfo();
+
+    nvrhi::GraphicsPipelineDesc pipeDesc;
+    pipeDesc.VS = trailState.vs;
+    pipeDesc.PS = state.drawPS;
+    pipeDesc.inputLayout = nullptr;
+    pipeDesc.bindingLayouts.push_back(state.drawLayout);
+    if (bindlessLayout)
+        pipeDesc.bindingLayouts.push_back(bindlessLayout);
+    pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
+    pipeDesc.renderState.depthStencilState.depthTestEnable = true;
+    pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
+    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+    pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+    pipeDesc.renderState.blendState.targets[0].enableBlend();
+    pipeDesc.renderState.blendState.targets[0].srcBlend = nvrhi::BlendFactor::SrcAlpha;
+    pipeDesc.renderState.blendState.targets[0].destBlend = nvrhi::BlendFactor::InvSrcAlpha;
+    pipeDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
+    pipeDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
+
+    state.drawPipeline = cache.GetOrCreatePipeline("SmokeTrailDraw_blend", pipeDesc, fbInfo, nvDevice);
+
+    if (state.drawPipeline)
+    {
+        const auto& actualDesc = state.drawPipeline->getDesc();
+        if (!actualDesc.bindingLayouts.empty())
+            state.drawLayout = actualDesc.bindingLayouts[0];
+
+        Msg("* [SmokeTrail] Draw pipeline initialized (smoke_trail.ps)");
+    }
+}
+
 struct SmokeEmitPassData
 {
     ng::RenderDevice*    device  = nullptr;
@@ -336,8 +418,8 @@ DefaultOutputLayout setupSmokeTrailPass(
             if (!framebuffer)
                 return;
 
-            InitializeTrailResources(data.device, framebuffer, *trail);
-            if (!trail->initialized)
+            InitSmokeDrawPipeline(data.device, framebuffer, *trail, *st);
+            if (!st->drawPipeline)
                 return;
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB(
@@ -362,6 +444,16 @@ DefaultOutputLayout setupSmokeTrailPass(
             params.rotate90          = 0;
             params.materialID        = 0;
             params.useGPUState       = 1;
+
+            const auto& compactParams = mgr->GetCompactParams();
+            params.turbAmount     = compactParams.turbAmount;
+            params.turbFrequency  = compactParams.turbFrequency;
+            params.turbEvolution  = compactParams.turbEvolution;
+            params.sphereCenterX  = compactParams.sphereCenterX;
+            params.sphereCenterY  = compactParams.sphereCenterY;
+            params.sphereCenterZ  = compactParams.sphereCenterZ;
+            params.sphereRadius   = compactParams.sphereRadius;
+
             cmdList->writeBuffer(trailParamsCB, &params, sizeof(params));
 
             const auto& rtDesc = colorRT->getDesc();
@@ -382,12 +474,12 @@ DefaultOutputLayout setupSmokeTrailPass(
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(10, mgr->GetCompactBuffer()),
                 nvrhi::BindingSetItem::RawBuffer_SRV(11, mgr->GetStateBuffer()),
-                nvrhi::BindingSetItem::Sampler(0, trail->sampler),
+                nvrhi::BindingSetItem::Sampler(0, st->sampler),
             };
-            auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, trail->layout, nvDevice);
+            auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st->drawLayout, nvDevice);
 
             nvrhi::GraphicsState gfxState;
-            gfxState.pipeline     = trail->pipeline;
+            gfxState.pipeline     = st->drawPipeline;
             gfxState.framebuffer  = framebuffer;
             gfxState.bindings     = { bindingSet };
             if (bindlessTable)

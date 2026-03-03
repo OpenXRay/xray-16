@@ -29,6 +29,12 @@ struct SmokeTrailPassState
     nvrhi::ShaderHandle           emitCS;
     nvrhi::ShaderHandle           simCS;
     nvrhi::ShaderHandle           compactCS;
+
+    nvrhi::GraphicsPipelineHandle drawPipeline;
+    nvrhi::BindingLayoutHandle    drawLayout;
+    nvrhi::ShaderHandle           drawPS;
+    nvrhi::SamplerHandle          sampler;
+
     bool initialized = false;
 };
 

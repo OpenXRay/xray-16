@@ -1,6 +1,7 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
+#include "noise4d.h"
 
 struct TrailControlPoint
 {
@@ -31,9 +32,14 @@ cbuffer TrailParams : register(b5)
     uint  g_MaterialID;
 
     uint  g_UseGPUState;
-    uint  _pad0;
-    uint  _pad1;
-    uint  _pad2;
+    float g_TurbAmount;
+    float g_TurbFrequency;
+    float g_TurbEvolution;
+
+    float g_SphereCenterX;
+    float g_SphereCenterY;
+    float g_SphereCenterZ;
+    float g_SphereRadius;
 };
 
 struct VS_OUTPUT
@@ -149,7 +155,7 @@ float3 EvalSmoothPos(uint smoothIdx, uint segments, uint cpCount)
         return CatmullRom(p0, p1, p2, p3, localT);
 }
 
-VS_OUTPUT main(uint vertexID : SV_VertexID)
+VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
 {
     VS_OUTPUT output = (VS_OUTPUT)0;
 
@@ -214,8 +220,6 @@ VS_OUTPUT main(uint vertexID : SV_VertexID)
         tailFade = 1.0 - globalT * globalT;
     }
 
-    widthDir *= tailFade;
-
     float3 finalPos;
     if (g_EdgePolicy == 1)
     {
@@ -248,11 +252,20 @@ VS_OUTPUT main(uint vertexID : SV_VertexID)
 
     float2 uv = ApplyUVTransform(u, v);
 
-    float4 color = float4(1.0, 1.0, 1.0, tailFade);
+    finalPos.y += float(instanceID) * 0.001;
+
+    float3 sphereCenter = float3(g_SphereCenterX, g_SphereCenterY + 0.75f, g_SphereCenterZ);
+    float ageStrength = smoothstep(0.0, 0.7, smoothAge);
+    float instanceStrength = smoothstep(0, 1.0, float(instanceID) * 0.00025);
+    float instEvolution = g_TurbEvolution * instanceStrength;
+    float3 instDisp = turbulenceDisplace(finalPos, instEvolution,
+                                         g_TurbAmount * 1.5 * ageStrength, g_TurbFrequency * 0.6,
+                                         sphereCenter, g_SphereRadius * 0.25f);
+    finalPos += instDisp;
 
     output.hpos = mul(m_VP, float4(finalPos, 1.0));
     output.texcoord = uv;
-    output.color = color;
+    output.color = float4(1.0, 1.0, 1.0, smoothAge);
     output.worldPos = finalPos;
     output.normal = normalize(eye_position - finalPos);
     output.materialID = g_MaterialID;

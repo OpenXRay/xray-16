@@ -58,9 +58,16 @@ struct TrailParamsCB {
     u32   materialID;
 
     u32   useGPUState;
-    u32   pad0, pad1, pad2;
+    float turbAmount;
+    float turbFrequency;
+    float turbEvolution;
+
+    float sphereCenterX;
+    float sphereCenterY;
+    float sphereCenterZ;
+    float sphereRadius;
 };
-static_assert(sizeof(TrailParamsCB) == 64, "TrailParamsCB must be 64 bytes (4 rows x 16)");
+static_assert(sizeof(TrailParamsCB) == 80, "TrailParamsCB must be 80 bytes (5 rows x 16)");
 
 struct TrailPassState {
     nvrhi::GraphicsPipelineHandle pipeline;
