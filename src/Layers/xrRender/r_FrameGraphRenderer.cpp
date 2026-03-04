@@ -1506,7 +1506,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_device,
             trailOutputs.layout,
             m_smokeTrailManager.get(),
-            &m_passStates->trail,  // reuse trail pipeline for draw
             width,
             height,
             m_passStates->smokeTrail,

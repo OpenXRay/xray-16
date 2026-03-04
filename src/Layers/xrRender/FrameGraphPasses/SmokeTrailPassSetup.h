@@ -1,12 +1,12 @@
 // SmokeTrailPassSetup.h
 // FrameGraph pass setup for GPU smoke trail:
-// emit CS → simulate CS → compact CS → draw (reuses trail.vs pipeline)
+// emit CS → simulate CS → compact CS → draw (smoke_trail.vs)
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "SmokeTrailManager.h"
-#include "TrailPassSetup.h"  // TrailPassState (reused for draw)
+#include "TrailPassSetup.h"  // TrailParamsCB, shared structs
 
 namespace xray::render {
 namespace ng {
@@ -35,9 +35,10 @@ struct SmokeTrailPassState
     nvrhi::ShaderHandle           simCS;
     nvrhi::ShaderHandle           compactCS;
 
-    // Draw (own pipeline with smoke_trail.ps, reuses trail.vs)
+    // Draw (own VS + PS pipeline — smoke_trail.vs, smoke_trail.ps)
     nvrhi::GraphicsPipelineHandle drawPipeline;
     nvrhi::BindingLayoutHandle    drawLayout;
+    nvrhi::ShaderHandle           drawVS;
     nvrhi::ShaderHandle           drawPS;
     nvrhi::SamplerHandle          sampler;
 
@@ -45,13 +46,11 @@ struct SmokeTrailPassState
 };
 
 // Setup: inserts 4 passes (3 compute + 1 draw) into the framegraph.
-// Draw pass reuses TrailPassState's pipeline/layout for stored-direction rendering.
 framegraph::DefaultOutputLayout setupSmokeTrailPass(
     framegraph::FrameGraph&              fg,
     ng::RenderDevice*                    device,
     const framegraph::DefaultOutputLayout& inputs,
     SmokeTrailManager*                   manager,
-    TrailPassState*                      trailState,  // reused for draw
     u32                                  width,
     u32                                  height,
     SmokeTrailPassState&                 state,

@@ -300,38 +300,6 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
 
     float2 uv = ApplyUVTransform(u, v);
 
-    // --- Instance offset (Y) ---
-    finalPos.y += float(instanceID) * 0.0001;
-
-    // --- Per-instance turbulence displacement (3D volume texture) ---
-    // Parity with: turbulenceDisplace(finalPos, instEvolution,
-    //              g_TurbAmount * 1.5, g_TurbFrequency * 0.6,
-    //              sphereCenter, g_SphereRadius * 0.7)
-    {
-        float ageStrength = smoothstep(0.0, 0.5, smoothAge);
-        float3 sphereCenter = float3(g_SphereCenterX, g_SphereCenterY + 1.75f, g_SphereCenterZ);
-        float instanceStrength = float(instanceID) * 0.00005;
-        float instEvolution = g_TurbEvolution * instanceStrength * ageStrength;
-
-        // Map worldPos to 3D UVW — same as procedural: worldPos * frequency / tileScale
-        // tileScale=4.0 in compute shader, frequency=g_TurbFrequency*0.6 from original
-        float3 noiseUVW = finalPos * g_TurbFrequency * 0.6 / 4.0;
-
-        // Per-instance evolution offset — approximates 4th-dim shift as 3D UVW offset
-        // Original shifts 4th Perlin dimension by instEvolution; we offset UVW in a
-        // decorrelated direction to sample different noise values per instance
-        noiseUVW += float3(0.7071, 0.0, 0.7071) * instEvolution;
-
-        // Sample 3D volume (stored as [0,1], decode to [-1,1])
-        float3 disp = g_Perlin4D.SampleLevel(g_LinearSampler, noiseUVW, 0).xyz * 2.0 - 1.0;
-
-        // Spherical falloff
-        float dist = length(finalPos - sphereCenter);
-        float falloff = 1.0 - smoothstep(0.0, g_SphereRadius * 0.7, dist);
-
-        finalPos += disp * g_TurbAmount * 1.5 * falloff;
-    }
-
     // --- Output ---
     output.hpos = mul(m_VP, float4(finalPos, 1.0));
     output.texcoord = uv;

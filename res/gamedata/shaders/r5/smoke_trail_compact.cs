@@ -140,12 +140,12 @@ void main(uint gtid : SV_GroupIndex)
     g_StateBuffer.Store(8, liveCount);
     g_StateBuffer.Store(12, asuint(totalDist));
 
-    // Draw args (non-indexed)
-    uint smoothCount = (liveCount >= 2) ? ((liveCount - 1) * g_Subdivisions + 1) : 0;
-    uint vertexCount = (smoothCount >= 2) ? ((smoothCount - 1) * 6) : 0;
+    // Draw args (non-indexed) — no subdivision, 1 quad per segment
+    uint segments = (liveCount >= 2) ? (liveCount - 1) : 0;
+    uint vertexCount = segments * 6;
 
     g_DrawArgs.Store(0,  vertexCount);
-    g_DrawArgs.Store(4,  128);   // 8 instances, offset in VS via SV_InstanceID
+    g_DrawArgs.Store(4,  128);   // instances, offset in VS via SV_InstanceID
     g_DrawArgs.Store(8,  0);
     g_DrawArgs.Store(12, 0);
 }
