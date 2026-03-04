@@ -56,14 +56,8 @@ void main(uint gtid : SV_GroupIndex)
         if (p.lifetime > 0.0f && p.age < p.lifetime)
         {
             float3 basePos = float3(p.px, p.py, p.pz);
-
-            float3 sphereCenter = float3(g_SphereCenterX, g_SphereCenterY + 0.75f, g_SphereCenterZ);
-            float3 disp = turbulenceDisplace(basePos, g_TurbEvolution,
-                                             g_TurbAmount, g_TurbFrequency,
-                                             sphereCenter, g_SphereRadius * 0.25f);
-
             s_alive[gtid]   = true;
-            s_pos[gtid]     = basePos + disp;
+            s_pos[gtid]     = basePos;
             s_ageNorm[gtid] = saturate(p.age / p.lifetime);
             s_width[gtid]   = p.width;
         }
@@ -138,7 +132,7 @@ void main(uint gtid : SV_GroupIndex)
     uint vertexCount = (smoothCount >= 2) ? ((smoothCount - 1) * 6) : 0;
 
     g_DrawArgs.Store(0,  vertexCount);
-    g_DrawArgs.Store(4,  64);
+    g_DrawArgs.Store(4,  128);
     g_DrawArgs.Store(8,  0);
     g_DrawArgs.Store(12, 0);
 }

@@ -46,6 +46,7 @@ framegraph::DefaultOutputLayout setupSmokeTrailPass(
     TrailPassState*                      trailState,
     u32                                  width,
     u32                                  height,
-    SmokeTrailPassState&                 state);
+    SmokeTrailPassState&                 state,
+    nvrhi::ITexture*                     perlin4dVolume = nullptr);
 
 }
