@@ -1,7 +1,7 @@
 // smoke_trail_compact.cs
 // Compact: collect live sim points into TrailControlPoint array for trail.vs.
-// Applies turbulence displacement (4D Perlin fBm) in parallel phase.
-// Thread 0 compacts + computes directions + writes draw args.
+// Parallel read to groupshared, thread 0 compacts + computes directions + writes draw args.
+// Turbulence params passed through CB for trail.vs (not used here).
 
 #include "smoke_common.h"
 
@@ -52,7 +52,7 @@ void main(uint gtid : SV_GroupIndex)
 
     uint ringCount = s_ringCount;
 
-    // Parallel phase: each thread reads one sim point + applies displacement
+    // Parallel phase: each thread reads one sim point
     s_alive[gtid] = false;
 
     if (gtid < ringCount)
@@ -65,15 +65,8 @@ void main(uint gtid : SV_GroupIndex)
         if (p.lifetime > 0.0f && p.age < p.lifetime)
         {
             float3 basePos = float3(p.px, p.py, p.pz);
-
-            // Turbulence displacement (4D Perlin fBm with spherical falloff)
-            float3 sphereCenter = float3(g_SphereCenterX, g_SphereCenterY + 0.75f, g_SphereCenterZ);
-            float3 disp = turbulenceDisplace(basePos, g_TurbEvolution,
-                                             g_TurbAmount, g_TurbFrequency,
-                                             sphereCenter, g_SphereRadius * 0.25f);
-
             s_alive[gtid]   = true;
-            s_pos[gtid]     = basePos + disp;
+            s_pos[gtid]     = basePos;
             s_ageNorm[gtid] = saturate(p.age / p.lifetime);
             s_width[gtid]   = p.width;
         }
@@ -152,7 +145,7 @@ void main(uint gtid : SV_GroupIndex)
     uint vertexCount = (smoothCount >= 2) ? ((smoothCount - 1) * 6) : 0;
 
     g_DrawArgs.Store(0,  vertexCount);
-    g_DrawArgs.Store(4,  64);   // 8 instances, offset in VS via SV_InstanceID
+    g_DrawArgs.Store(4,  128);   // 8 instances, offset in VS via SV_InstanceID
     g_DrawArgs.Store(8,  0);
     g_DrawArgs.Store(12, 0);
 }

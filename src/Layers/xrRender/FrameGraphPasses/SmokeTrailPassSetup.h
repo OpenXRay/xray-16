@@ -54,6 +54,7 @@ framegraph::DefaultOutputLayout setupSmokeTrailPass(
     TrailPassState*                      trailState,  // reused for draw
     u32                                  width,
     u32                                  height,
-    SmokeTrailPassState&                 state);
+    SmokeTrailPassState&                 state,
+    nvrhi::ITexture*                     perlin4dVolume = nullptr);
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

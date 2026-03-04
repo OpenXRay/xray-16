@@ -15,5 +15,10 @@ struct PS_INPUT
 
 float4 main(PS_INPUT input) : SV_Target0
 {
-    return float4(1.0, 1.0, 1.0, 0.04);
+    float age = input.color.a;
+    float fadeIn  = smoothstep(0.0, 0.2, age);
+    float fadeOut = 1.0 - smoothstep(0.0, 1.0, age);
+    float alpha   = fadeIn * fadeOut;
+
+    return float4(1.0, 1.0, 1.0, 0.06 * fadeOut * fadeIn);
 }

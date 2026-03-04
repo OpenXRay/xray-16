@@ -155,6 +155,7 @@ static void InitSmokeDrawPipeline(
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),     // MaterialBuffer
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),    // CompactBuffer
         nvrhi::BindingLayoutItem::RawBuffer_SRV(11),           // StateBuffer
+        nvrhi::BindingLayoutItem::Texture_SRV(12),             // Perlin4D 3D volume
         nvrhi::BindingLayoutItem::Sampler(0),
     };
     state.drawLayout = nvDevice->createBindingLayout(layoutDesc);
@@ -230,6 +231,8 @@ struct SmokeDrawPassData
     DefaultOutputLayout  outputs;
     u32 width  = 0;
     u32 height = 0;
+    u32 noiseTextureIndex = 0;
+    nvrhi::ITexture* perlin4dVolume = nullptr;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -244,7 +247,8 @@ DefaultOutputLayout setupSmokeTrailPass(
     TrailPassState*                  trailState,
     u32                              width,
     u32                              height,
-    SmokeTrailPassState&             state)
+    SmokeTrailPassState&             state,
+    nvrhi::ITexture*                 perlin4dVolume)
 {
     // ── Pass 1: Emit ──
     fg.addCallbackPass<SmokeEmitPassData>(
@@ -404,13 +408,14 @@ DefaultOutputLayout setupSmokeTrailPass(
         {
             RenderPassBuilder passBuilder(builder, passHandle);
 
-            data.device     = device;
-            data.manager    = manager;
-            data.smokeState = &state;
-            data.trailState = trailState;
-            data.width      = width;
-            data.height     = height;
-            data.outputs    = inputs;
+            data.device            = device;
+            data.manager           = manager;
+            data.smokeState        = &state;
+            data.trailState        = trailState;
+            data.width             = width;
+            data.height            = height;
+            data.outputs           = inputs;
+            data.perlin4dVolume    = perlin4dVolume;
 
             data.inputColor  = passBuilder.read(inputs.albedo);
             data.outputColor = passBuilder.write(inputs.albedo, ResourceState::RenderTarget);
@@ -486,7 +491,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             params.sphereCenterX  = compactParams.sphereCenterX;
             params.sphereCenterY  = compactParams.sphereCenterY;
             params.sphereCenterZ  = compactParams.sphereCenterZ;
-            params.sphereRadius   = compactParams.sphereRadius;
+            params.sphereRadius      = compactParams.sphereRadius;
 
             cmdList->writeBuffer(trailParamsCB, &params, sizeof(params));
 
@@ -501,7 +506,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             auto* backend = data.device->GetBackend();
             nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
 
-            // Binding set: smoke's own layout with smoke buffers
+            // Binding set: smoke's own layout with smoke buffers + perlin4d volume
             nvrhi::BindingSetDesc bindDesc;
             bindDesc.bindings = {
                 nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
@@ -509,6 +514,7 @@ DefaultOutputLayout setupSmokeTrailPass(
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(10, mgr->GetCompactBuffer()),
                 nvrhi::BindingSetItem::RawBuffer_SRV(11, mgr->GetStateBuffer()),
+                nvrhi::BindingSetItem::Texture_SRV(12, data.perlin4dVolume),
                 nvrhi::BindingSetItem::Sampler(0, st->sampler),
             };
             auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st->drawLayout, nvDevice);
