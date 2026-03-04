@@ -255,26 +255,6 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
 
     float2 uv = ApplyUVTransform(u, v);
 
-    finalPos.y += float(instanceID) * 0.0001;
-
-    {
-        float ageStrength = smoothstep(0.0, 0.5, smoothAge);
-        float3 sphereCenter = float3(g_SphereCenterX, g_SphereCenterY + 1.75f, g_SphereCenterZ);
-        float instanceStrength = float(instanceID) * 0.00005;
-        float instEvolution = g_TurbEvolution * instanceStrength * ageStrength;
-
-        float3 noiseUVW = finalPos * g_TurbFrequency * 0.6 / 4.0;
-
-        noiseUVW += float3(0.7071, 0.0, 0.7071) * instEvolution;
-
-        float3 disp = g_Perlin4D.SampleLevel(g_LinearSampler, noiseUVW, 0).xyz * 2.0 - 1.0;
-
-        float dist = length(finalPos - sphereCenter);
-        float falloff = 1.0 - smoothstep(0.0, g_SphereRadius * 0.7, dist);
-
-        finalPos += disp * g_TurbAmount * 1.5 * falloff;
-    }
-
     output.hpos = mul(m_VP, float4(finalPos, 1.0));
     output.texcoord = uv;
     output.color = float4(1.0, 1.0, 1.0, smoothAge);

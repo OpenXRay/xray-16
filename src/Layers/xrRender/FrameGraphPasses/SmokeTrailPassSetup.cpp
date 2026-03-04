@@ -97,13 +97,9 @@ static void InitSmokeComputePipelines(ng::RenderDevice* device, SmokeTrailPassSt
 static void InitSmokeDrawPipeline(
     ng::RenderDevice* device,
     nvrhi::IFramebuffer* framebuffer,
-    TrailPassState& trailState,
     SmokeTrailPassState& state)
 {
     if (state.drawPipeline)
-        return;
-
-    if (!trailState.initialized)
         return;
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -113,6 +109,14 @@ static void InitSmokeDrawPipeline(
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     if (!shaderLoader)
         return;
+
+    auto vsResult = shaderLoader->LoadVertexShader("smoke_trail", "main");
+    if (!vsResult.handle)
+    {
+        Msg("! SmokeTrail: failed to load smoke_trail.vs");
+        return;
+    }
+    state.drawVS = vsResult.handle;
 
     auto psResult = shaderLoader->LoadPixelShader("smoke_trail", "main");
     if (!psResult.handle)
@@ -148,7 +152,7 @@ static void InitSmokeDrawPipeline(
     auto fbInfo = framebuffer->getFramebufferInfo();
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
-    pipeDesc.VS = trailState.vs;
+    pipeDesc.VS = state.drawVS;
     pipeDesc.PS = state.drawPS;
     pipeDesc.inputLayout = nullptr;
     pipeDesc.bindingLayouts.push_back(state.drawLayout);
@@ -173,7 +177,7 @@ static void InitSmokeDrawPipeline(
         if (!actualDesc.bindingLayouts.empty())
             state.drawLayout = actualDesc.bindingLayouts[0];
 
-        Msg("* [SmokeTrail] Draw pipeline initialized (smoke_trail.ps)");
+        Msg("* [SmokeTrail] Draw pipeline initialized (smoke_trail.vs + smoke_trail.ps)");
     }
 }
 
@@ -206,7 +210,6 @@ struct SmokeDrawPassData
     ng::RenderDevice*    device     = nullptr;
     SmokeTrailManager*   manager    = nullptr;
     SmokeTrailPassState* smokeState = nullptr;
-    TrailPassState*      trailState = nullptr;
     DefaultOutputLayout  outputs;
     u32 width  = 0;
     u32 height = 0;
@@ -219,7 +222,6 @@ DefaultOutputLayout setupSmokeTrailPass(
     ng::RenderDevice*                device,
     const DefaultOutputLayout&       inputs,
     SmokeTrailManager*               manager,
-    TrailPassState*                  trailState,
     u32                              width,
     u32                              height,
     SmokeTrailPassState&             state,
@@ -382,7 +384,6 @@ DefaultOutputLayout setupSmokeTrailPass(
             data.device            = device;
             data.manager           = manager;
             data.smokeState        = &state;
-            data.trailState        = trailState;
             data.width             = width;
             data.height            = height;
             data.outputs           = inputs;
@@ -396,10 +397,7 @@ DefaultOutputLayout setupSmokeTrailPass(
         {
             auto* mgr   = data.manager;
             auto* st    = data.smokeState;
-            auto* trail = data.trailState;
             if (!mgr || !mgr->IsReady() || !st || !st->initialized)
-                return;
-            if (!trail || !trail->initialized)
                 return;
 
             auto* colorRT = fg.GetPhysicalTexture(data.outputColor);
@@ -423,7 +421,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             if (!framebuffer)
                 return;
 
-            InitSmokeDrawPipeline(data.device, framebuffer, *trail, *st);
+            InitSmokeDrawPipeline(data.device, framebuffer, *st);
             if (!st->drawPipeline)
                 return;
 

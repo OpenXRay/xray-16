@@ -128,8 +128,8 @@ void main(uint gtid : SV_GroupIndex)
     g_StateBuffer.Store(8, liveCount);
     g_StateBuffer.Store(12, asuint(totalDist));
 
-    uint smoothCount = (liveCount >= 2) ? ((liveCount - 1) * g_Subdivisions + 1) : 0;
-    uint vertexCount = (smoothCount >= 2) ? ((smoothCount - 1) * 6) : 0;
+    uint segments = (liveCount >= 2) ? (liveCount - 1) : 0;
+    uint vertexCount = segments * 6;
 
     g_DrawArgs.Store(0,  vertexCount);
     g_DrawArgs.Store(4,  128);

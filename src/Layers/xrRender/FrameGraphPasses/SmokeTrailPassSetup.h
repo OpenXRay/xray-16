@@ -32,6 +32,7 @@ struct SmokeTrailPassState
 
     nvrhi::GraphicsPipelineHandle drawPipeline;
     nvrhi::BindingLayoutHandle    drawLayout;
+    nvrhi::ShaderHandle           drawVS;
     nvrhi::ShaderHandle           drawPS;
     nvrhi::SamplerHandle          sampler;
 
@@ -43,7 +44,6 @@ framegraph::DefaultOutputLayout setupSmokeTrailPass(
     ng::RenderDevice*                    device,
     const framegraph::DefaultOutputLayout& inputs,
     SmokeTrailManager*                   manager,
-    TrailPassState*                      trailState,
     u32                                  width,
     u32                                  height,
     SmokeTrailPassState&                 state,
