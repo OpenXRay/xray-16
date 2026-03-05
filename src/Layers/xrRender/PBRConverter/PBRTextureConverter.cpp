@@ -7,6 +7,10 @@
 #include "Layers/xrRender/ETextureParams.h"
 #include <atomic>
 #include <algorithm>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <queue>
 #include <DirectXTex.h>
 
 using namespace xray::render::RENDER_NAMESPACE;
@@ -394,6 +398,35 @@ static bool IsInBlacklistedFolder(const xr_string& path) {
     return false;
 }
 
+static bool ReadDDSDimensions(const char* root_alias, const char* relative_path, u32& outWidth, u32& outHeight) {
+    string_path full_path;
+    FS.update_path(full_path, root_alias, relative_path);
+    if (!FS.exist(full_path))
+        return false;
+
+    IReader* reader = FS.r_open(root_alias, relative_path);
+    if (!reader) return false;
+
+    if (reader->length() < 20) {
+        FS.r_close(reader);
+        return false;
+    }
+
+    u32 magic = reader->r_u32();
+    if (magic != 0x20534444) {
+        FS.r_close(reader);
+        return false;
+    }
+
+    reader->r_u32();
+    reader->r_u32();
+    outHeight = reader->r_u32();
+    outWidth  = reader->r_u32();
+
+    FS.r_close(reader);
+    return (outWidth > 0 && outHeight > 0);
+}
+
 TextureInventory BuildTextureInventory(const TextureScanConfig& config) {
     TextureInventory inventory;
 
@@ -439,6 +472,8 @@ TextureInventory BuildTextureInventory(const TextureScanConfig& config) {
             asset.diffuse = MakeFileLocation(root, file);
             asset.total_size_bytes = asset.diffuse.file_size;
             asset.latest_modified_time = asset.diffuse.modified_time_seconds;
+
+            ReadDDSDimensions(root.c_str(), file_name.c_str(), asset.diffuse_width, asset.diffuse_height);
 
             xr_string spec_path = base_name + "_s.dds";
             if (FileExists(root.c_str(), spec_path.c_str())) {
@@ -596,56 +631,6 @@ static void ZeroMetallicIfBlacklisted(ConvertedPBRTextures& converted, const xr_
     }
 }
 
-static ConvertedPBRTextures ConvertSpecularGlossToPBR(
-    const resources::DDSData* diffuseData,
-    const resources::DDSData* specularData,
-    const resources::DDSData* glossData,
-    const PBRConversionParams& params)
-{
-    ConvertedPBRTextures result;
-
-    if (!diffuseData || !diffuseData->isValid || diffuseData->mipLevels.empty()) {
-        return result;
-    }
-
-    const auto& baseMip = diffuseData->mipLevels[0];
-    result.width = baseMip.width;
-    result.height = baseMip.height;
-
-    const u32 pixelCount = result.width * result.height;
-    result.metallicData.resize(pixelCount, static_cast<u8>(params.default_metallic * 255.0f));
-    result.roughnessData.resize(pixelCount, static_cast<u8>(params.default_roughness * 255.0f));
-
-    if (specularData && specularData->isValid && !specularData->mipLevels.empty()) {
-        const auto& specMip = specularData->mipLevels[0];
-
-        if (specMip.width == result.width && specMip.height == result.height) {
-            const u8* specPixels = specMip.data;
-
-            for (u32 i = 0; i < pixelCount; ++i) {
-                const u8 specR = specPixels[i * 4 + 0];
-                result.metallicData[i] = specR;
-            }
-        }
-    }
-
-    if (glossData && glossData->isValid && !glossData->mipLevels.empty()) {
-        const auto& glossMip = glossData->mipLevels[0];
-
-        if (glossMip.width == result.width && glossMip.height == result.height) {
-            const u8* glossPixels = glossMip.data;
-
-            for (u32 i = 0; i < pixelCount; ++i) {
-                const u8 glossValue = glossPixels[i * 4 + 0];
-                result.roughnessData[i] = 255 - glossValue;
-            }
-        }
-    }
-
-    result.success = true;
-    return result;
-}
-
 #ifdef USE_AI_PBR
 
 static bool InitializeAIPipeline() {
@@ -800,6 +785,118 @@ static ConvertedPBRTextures ConvertWithAI(
     result.success = true;
     return result;
 }
+
+static xr_vector<u8> NearestNeighborUpscaleRGBA(
+    const xr_vector<u8>& src, u32 srcW, u32 srcH, u32 dstW, u32 dstH)
+{
+    xr_vector<u8> dst(dstW * dstH * 4);
+    for (u32 y = 0; y < dstH; ++y) {
+        for (u32 x = 0; x < dstW; ++x) {
+            u32 srcIdx = (y * srcH / dstH * srcW + x * srcW / dstW) * 4;
+            u32 dstIdx = (y * dstW + x) * 4;
+            dst[dstIdx + 0] = src[srcIdx + 0];
+            dst[dstIdx + 1] = src[srcIdx + 1];
+            dst[dstIdx + 2] = src[srcIdx + 2];
+            dst[dstIdx + 3] = src[srcIdx + 3];
+        }
+    }
+    return dst;
+}
+
+struct DecompressedPair {
+    xr_vector<u8> diffuseRGBA;
+    xr_vector<u8> normalRGBA;
+    u32 width = 0;
+    u32 height = 0;
+    bool success = false;
+};
+
+static DecompressedPair DecompressAndPrepare(
+    const resources::DDSData* diffuseData,
+    const resources::DDSData* normalData)
+{
+    DecompressedPair result;
+
+    if (!diffuseData || !diffuseData->isValid || diffuseData->mipLevels.empty())
+        return result;
+    if (!normalData || !normalData->isValid || normalData->mipLevels.empty())
+        return result;
+
+    u32 diffuseWidth, diffuseHeight, normalWidth, normalHeight;
+    result.diffuseRGBA = DecompressDDS(*diffuseData, diffuseWidth, diffuseHeight);
+    result.normalRGBA = DecompressDDS(*normalData, normalWidth, normalHeight);
+
+    if (result.diffuseRGBA.empty() || result.normalRGBA.empty()) {
+        Msg("! [PBRTextureConverter] Failed to decompress textures");
+        return result;
+    }
+
+    Msg("~ [PBRTextureConverter] Decompressed dimensions: diffuse %ux%u, normal %ux%u",
+        diffuseWidth, diffuseHeight, normalWidth, normalHeight);
+
+    constexpr u32 MIN_AI_TEXTURE_SIZE = 32;
+    if (diffuseWidth < MIN_AI_TEXTURE_SIZE || diffuseHeight < MIN_AI_TEXTURE_SIZE) {
+        u32 newWidth = std::max(diffuseWidth, MIN_AI_TEXTURE_SIZE);
+        u32 newHeight = std::max(diffuseHeight, MIN_AI_TEXTURE_SIZE);
+        Msg("~ [PBRTextureConverter] Upscaling small texture %ux%u → %ux%u for AI processing",
+            diffuseWidth, diffuseHeight, newWidth, newHeight);
+
+        result.diffuseRGBA = NearestNeighborUpscaleRGBA(result.diffuseRGBA, diffuseWidth, diffuseHeight, newWidth, newHeight);
+        result.normalRGBA = NearestNeighborUpscaleRGBA(result.normalRGBA, normalWidth, normalHeight, newWidth, newHeight);
+
+        diffuseWidth = newWidth;
+        diffuseHeight = newHeight;
+        normalWidth = newWidth;
+        normalHeight = newHeight;
+    }
+
+    if (normalWidth != diffuseWidth || normalHeight != diffuseHeight) {
+        Msg("~ [PBRTextureConverter] Upscaling normal map: %ux%u → %ux%u",
+            normalWidth, normalHeight, diffuseWidth, diffuseHeight);
+        result.normalRGBA = NearestNeighborUpscaleRGBA(result.normalRGBA, normalWidth, normalHeight, diffuseWidth, diffuseHeight);
+    }
+
+    result.width = diffuseWidth;
+    result.height = diffuseHeight;
+    result.success = true;
+    return result;
+}
+
+static ConvertedPBRTextures PackOutputs(PBRPipelineOutputs& outputs, const xr_vector<u8>& originalDiffuseRGBA, u32 width, u32 height) {
+    ConvertedPBRTextures result;
+    result.width = width;
+    result.height = height;
+
+    xr_vector<u8> aiAlbedoRGB = outputs.albedo.ToImageData(false);
+    result.metallicData = outputs.metallic.ToImageData(true);
+    result.roughnessData = outputs.roughness.ToImageData(true);
+    result.aoData = outputs.ao.ToImageData(true);
+    result.parallaxData = outputs.parallax.ToImageData(true);
+
+    const u32 pixelCount = width * height;
+    result.albedoData.resize(pixelCount * 4);
+
+    for (u32 i = 0; i < pixelCount; ++i) {
+        result.albedoData[i * 4 + 0] = aiAlbedoRGB[i * 3 + 0];
+        result.albedoData[i * 4 + 1] = aiAlbedoRGB[i * 3 + 1];
+        result.albedoData[i * 4 + 2] = aiAlbedoRGB[i * 3 + 2];
+        result.albedoData[i * 4 + 3] = originalDiffuseRGBA[i * 4 + 3];
+    }
+
+    result.success = true;
+    return result;
+}
+
+struct Stage1Intermediate {
+    PBRPipeline::Stage1Result stage1;
+    xr_vector<u8> originalDiffuseRGBA;
+    u32 width = 0;
+    u32 height = 0;
+    xr_string base_name;
+    xr_string pbr_path;
+    xr_string pbr_name;
+    xr_string albedo_path;
+};
 
 #endif
 
@@ -1155,6 +1252,64 @@ static bool WriteTHMFile(
     return true;
 }
 
+template<typename T>
+class BoundedQueue {
+public:
+    explicit BoundedQueue(size_t max_size) : max_size_(max_size) {}
+
+    void push(T item) {
+        std::unique_lock<std::mutex> lock(mutex_);
+        not_full_.wait(lock, [this] { return queue_.size() < max_size_ || done_; });
+        if (done_) return;
+        queue_.push(std::move(item));
+        not_empty_.notify_one();
+    }
+
+    bool pop(T& item) {
+        std::unique_lock<std::mutex> lock(mutex_);
+        not_empty_.wait(lock, [this] { return !queue_.empty() || done_; });
+        if (queue_.empty()) return false;
+        item = std::move(queue_.front());
+        queue_.pop();
+        not_full_.notify_one();
+        return true;
+    }
+
+    void signal_done() {
+        std::unique_lock<std::mutex> lock(mutex_);
+        done_ = true;
+        not_empty_.notify_all();
+        not_full_.notify_all();
+    }
+
+private:
+    std::queue<T> queue_;
+    std::mutex mutex_;
+    std::condition_variable not_empty_;
+    std::condition_variable not_full_;
+    size_t max_size_;
+    bool done_ = false;
+};
+
+struct PreparedTexture {
+    xr_string base_name;
+    xr_string pbr_path;
+    xr_string pbr_name;
+    xr_string albedo_path;
+    resources::DDSData diffuseData;
+    resources::DDSData normalData;
+};
+
+struct ConvertedOutput {
+    xr_string base_name;
+    xr_string pbr_path;
+    xr_string pbr_name;
+    xr_string albedo_path;
+    ConvertedPBRTextures converted;
+    bool generate_mipmaps;
+    xr_string output_root;
+};
+
 bool ConvertTexturesToPBR(
     const TextureInventory& inventory,
     const PBRConversionParams& params,
@@ -1176,26 +1331,68 @@ bool ConvertTexturesToPBR(
     std::atomic<u32> failed_count{0};
 #ifdef USE_AI_PBR
     std::atomic<u32> ai_conversions{0};
-    std::atomic<u32> heuristic_conversions{0};
 #endif
 
     const auto start_time = std::chrono::high_resolution_clock::now();
 
-#ifdef USE_AI_PBR
-    Msg("[PBRTextureConverter] Converting %u textures (AI: %s)...",
-        total_textures, g_ai_available ? "enabled" : "disabled");
-#else
-    Msg("[PBRTextureConverter] Converting %u textures (heuristic mode)...", total_textures);
-#endif
+    xr_vector<LegacyTextureAsset> sorted_assets(inventory.assets.begin(), inventory.assets.end());
+    std::sort(sorted_assets.begin(), sorted_assets.end(),
+        [](const LegacyTextureAsset& a, const LegacyTextureAsset& b) {
+            if (a.diffuse_width != b.diffuse_width)
+                return a.diffuse_width < b.diffuse_width;
+            if (a.diffuse_height != b.diffuse_height)
+                return a.diffuse_height < b.diffuse_height;
+            return a.diffuse.file_size < b.diffuse.file_size;
+        });
 
-    for (size_t idx = 0; idx < inventory.assets.size(); ++idx) {
-            LegacyTextureAsset asset = inventory.assets[idx];
+    Msg("[PBRTextureConverter] Converting %u textures (pipelined, sorted by dimensions)...", total_textures);
+
+#ifndef USE_AI_PBR
+    Msg("! [PBRTextureConverter] USE_AI_PBR not defined, cannot convert any textures");
+    out_stats.textures_scanned = total_textures;
+    out_stats.textures_skipped = total_textures;
+    return true;
+#else
+    if (!g_ai_available) {
+        Msg("! [PBRTextureConverter] AI pipeline not available, cannot convert any textures");
+        out_stats.textures_scanned = total_textures;
+        out_stats.textures_skipped = total_textures;
+        return true;
+    }
+
+    {
+        xr_vector<std::pair<u32, u32>> unique_dims;
+        for (const auto& asset : sorted_assets) {
+            if (asset.diffuse_width == 0 || asset.diffuse_height == 0)
+                continue;
+            std::pair<u32, u32> dim = { asset.diffuse_width, asset.diffuse_height };
+            if (unique_dims.empty() || unique_dims.back() != dim)
+                unique_dims.push_back(dim);
+        }
+
+        if (!unique_dims.empty()) {
+            ScopeLock lock{ &g_ai_pipeline_mutex };
+            g_ai_pipeline->WarmupTRTEngines(unique_dims);
+        }
+    }
+
+    BoundedQueue<PreparedTexture> prepared_queue(2);
+    BoundedQueue<ConvertedOutput> write_queue(2);
+
+    auto StripDDSExtension = [](const xr_string& path) -> xr_string {
+        if (path.size() >= 4 && path.substr(path.size() - 4) == ".dds") {
+            return path.substr(0, path.size() - 4);
+        }
+        return path;
+    };
+
+    std::thread producer([&]() {
+        for (size_t idx = 0; idx < sorted_assets.size(); ++idx) {
+            LegacyTextureAsset asset = sorted_assets[idx];
 
             if (idx % 10 == 0 || idx == 0) {
-                Msg("~ [PBRTextureConverter] Processing texture %u/%u: %s",
-                    static_cast<u32>(idx + 1),
-                    total_textures,
-                    asset.base_name.c_str());
+                Msg("~ [PBRTextureConverter] Preparing texture %u/%u: %s",
+                    static_cast<u32>(idx + 1), total_textures, asset.base_name.c_str());
             }
 
             xr_string pbr_path = asset.base_name + "_pbr.dds";
@@ -1215,47 +1412,21 @@ bool ConvertTexturesToPBR(
                 continue;
             }
 
-            xr_string albedo_path = asset.base_name + ".dds";
-            xr_string metallic_path = asset.base_name + "_metallic.dds";
-            xr_string roughness_path = asset.base_name + "_roughness.dds";
-            xr_string ao_path = asset.base_name + "_ao.dds";
-            xr_string parallax_path = asset.base_name + "_parallax.dds";
-
-            xr_string metallic_name = asset.base_name + "_metallic";
-            xr_string roughness_name = asset.base_name + "_roughness";
-            xr_string ao_name = asset.base_name + "_ao";
-            xr_string parallax_name = asset.base_name + "_parallax";
-
-            Msg("* [PBRTextureConverter] PBR textures missing, running conversion: %s", asset.base_name.c_str());
-
             resources::DDSData diffuseData;
-            resources::DDSData specularData;
-            resources::DDSData glossData;
-
-            auto StripDDSExtension = [](const xr_string& path) -> xr_string {
-                if (path.size() >= 4 && path.substr(path.size() - 4) == ".dds") {
-                    return path.substr(0, path.size() - 4);
-                }
-                return path;
-            };
-
             xr_string diffuse_vfs_path = StripDDSExtension(asset.diffuse.relative_path);
             if (!resources::DDSLoader::LoadFromFile(diffuse_vfs_path.c_str(), diffuseData)) {
-                Msg("! [PBRTextureConverter] Failed to load diffuse: %s (VFS path: %s)",
-                    asset.diffuse.relative_path.c_str(), diffuse_vfs_path.c_str());
+                Msg("! [PBRTextureConverter] Failed to load diffuse: %s", asset.diffuse.relative_path.c_str());
                 failed_count++;
                 continue;
             }
 
-            xr_vector<u8> generatedNormalRGBA;
-
             if (!asset.has_normal) {
                 Msg("~ [PBRTextureConverter] No normal map for %s, generating from diffuse...", asset.base_name.c_str());
-
                 u32 diffuseWidth, diffuseHeight;
                 xr_vector<u8> diffuseRGBA = DecompressDDS(diffuseData, diffuseWidth, diffuseHeight);
 
                 if (!diffuseRGBA.empty()) {
+                    xr_vector<u8> generatedNormalRGBA;
                     if (GenerateNormalMapFromDiffuse(diffuseRGBA, diffuseWidth, diffuseHeight, generatedNormalRGBA, 4.0f)) {
                         xr_string bump_path = asset.base_name + "_bump.dds";
                         if (WriteNormalMapDDS(params.output_root.c_str(), bump_path, generatedNormalRGBA, diffuseWidth, diffuseHeight)) {
@@ -1264,122 +1435,70 @@ bool ConvertTexturesToPBR(
                             asset.normal.relative_path = bump_path;
                             Msg("* [PBRTextureConverter] Generated normal map saved: %s", bump_path.c_str());
                         }
-                    } else {
-                        Msg("! [PBRTextureConverter] Failed to generate normal map for %s", asset.base_name.c_str());
                     }
                 }
             }
 
-#ifdef USE_AI_PBR
             if (!asset.has_normal) {
                 Msg("~ [PBRTextureConverter] Skipping %s (no normal map available)", asset.base_name.c_str());
                 skipped_count++;
                 continue;
             }
-#endif
 
-            const resources::DDSData* specularPtr = nullptr;
-            if (asset.has_specular) {
-                xr_string spec_vfs_path = StripDDSExtension(asset.specular.relative_path);
-                if (resources::DDSLoader::LoadFromFile(spec_vfs_path.c_str(), specularData)) {
-                    specularPtr = &specularData;
-                }
-            }
-
-            const resources::DDSData* glossPtr = nullptr;
-            if (asset.has_gloss) {
-                xr_string gloss_vfs_path = StripDDSExtension(asset.gloss.relative_path);
-                if (resources::DDSLoader::LoadFromFile(gloss_vfs_path.c_str(), glossData)) {
-                    glossPtr = &glossData;
-                }
-            }
-
-            ConvertedPBRTextures converted;
-
-#ifdef USE_AI_PBR
-            if (g_ai_available && asset.has_normal) {
-                resources::DDSData normalData;
-                xr_string normal_vfs_path = StripDDSExtension(asset.normal.relative_path);
-
-                if (resources::DDSLoader::LoadFromFile(normal_vfs_path.c_str(), normalData)) {
-                    converted = ConvertWithAI(&diffuseData, &normalData, params);
-                    if (converted.success) {
-                        ai_conversions++;
-                    }
-                }
-            }
-
-            if (!converted.success) {
-                converted = ConvertSpecularGlossToPBR(&diffuseData, specularPtr, glossPtr, params);
-                if (converted.success) {
-                    heuristic_conversions++;
-                }
-            }
-#else
-            converted = ConvertSpecularGlossToPBR(&diffuseData, specularPtr, glossPtr, params);
-#endif
-
-            if (!converted.success) {
-                Msg("! [PBRTextureConverter] Conversion failed: %s", asset.base_name.c_str());
+            resources::DDSData normalData;
+            xr_string normal_vfs_path = StripDDSExtension(asset.normal.relative_path);
+            if (!resources::DDSLoader::LoadFromFile(normal_vfs_path.c_str(), normalData)) {
+                Msg("! [PBRTextureConverter] Failed to load normal: %s", asset.normal.relative_path.c_str());
                 failed_count++;
                 continue;
             }
 
-            ZeroMetallicIfBlacklisted(converted, asset.base_name);
+            Msg("* [PBRTextureConverter] PBR textures missing, running conversion: %s", asset.base_name.c_str());
 
-            if (!converted.albedoData.empty()) {
-                if (!WriteRGBADDS(params.output_root.c_str(), albedo_path,
-                                  converted.albedoData.data(),
-                                  converted.width, converted.height, params.generate_mipmaps)) {
-                    Msg("! [PBRTextureConverter] Failed to write albedo: %s/%s",
-                        params.output_root.c_str(), albedo_path.c_str());
+            PreparedTexture prepared;
+            prepared.base_name = asset.base_name;
+            prepared.pbr_path = std::move(pbr_path);
+            prepared.pbr_name = std::move(pbr_name);
+            prepared.albedo_path = asset.base_name + ".dds";
+            prepared.diffuseData = std::move(diffuseData);
+            prepared.normalData = std::move(normalData);
+            prepared_queue.push(std::move(prepared));
+        }
+        prepared_queue.signal_done();
+    });
+
+    std::thread writer([&]() {
+        ConvertedOutput output;
+        while (write_queue.pop(output)) {
+            auto t_write_start = std::chrono::high_resolution_clock::now();
+
+            if (!output.converted.albedoData.empty()) {
+                if (!WriteRGBADDS(output.output_root.c_str(), output.albedo_path,
+                                  output.converted.albedoData.data(),
+                                  output.converted.width, output.converted.height, output.generate_mipmaps)) {
+                    Msg("! [PBRTextureConverter] Failed to write albedo: %s", output.albedo_path.c_str());
                     failed_count++;
                     continue;
                 }
             }
 
-            if (!WriteSingleChannelDDS(params.output_root.c_str(), metallic_path,
-                                       converted.metallicData.data(),
-                                       converted.width, converted.height, params.generate_mipmaps)) {
-                Msg("! [PBRTextureConverter] Failed to write metallic: %s/%s",
-                    params.output_root.c_str(), metallic_path.c_str());
+            if (!WritePackedPBRDDS(output.output_root.c_str(), output.pbr_path,
+                                   output.converted.metallicData.data(),
+                                   output.converted.roughnessData.data(),
+                                   output.converted.aoData.empty() ? nullptr : output.converted.aoData.data(),
+                                   output.converted.parallaxData.empty() ? nullptr : output.converted.parallaxData.data(),
+                                   output.converted.width, output.converted.height, output.generate_mipmaps)) {
+                Msg("! [PBRTextureConverter] Failed to write packed PBR: %s", output.pbr_path.c_str());
                 failed_count++;
                 continue;
             }
 
-            if (!WriteSingleChannelDDS(params.output_root.c_str(), roughness_path,
-                                       converted.roughnessData.data(),
-                                       converted.width, converted.height, params.generate_mipmaps)) {
-                Msg("! [PBRTextureConverter] Failed to write roughness: %s/%s",
-                    params.output_root.c_str(), roughness_path.c_str());
-                failed_count++;
-                continue;
-            }
+            WriteTHMFileConsolidated(output.output_root.c_str(), output.base_name, output.pbr_name);
 
-            if (!converted.aoData.empty()) {
-                if (!WriteSingleChannelDDS(params.output_root.c_str(), ao_path,
-                                           converted.aoData.data(),
-                                           converted.width, converted.height, params.generate_mipmaps)) {
-                    Msg("! [PBRTextureConverter] Failed to write AO: %s/%s",
-                        params.output_root.c_str(), ao_path.c_str());
-                    failed_count++;
-                    continue;
-                }
-            }
-
-            if (!converted.parallaxData.empty()) {
-                if (!WriteSingleChannelDDS(params.output_root.c_str(), parallax_path,
-                                           converted.parallaxData.data(),
-                                           converted.width, converted.height, params.generate_mipmaps)) {
-                    Msg("! [PBRTextureConverter] Failed to write parallax: %s/%s",
-                        params.output_root.c_str(), parallax_path.c_str());
-                    failed_count++;
-                    continue;
-                }
-            }
-
-            WriteTHMFile(params.output_root.c_str(), asset.base_name,
-                        metallic_name, roughness_name, ao_name, parallax_name);
+            auto t_write_end = std::chrono::high_resolution_clock::now();
+            auto write_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t_write_end - t_write_start).count();
+            Msg("* [PBRTextureConverter] Consolidated PBR: %s (%ux%u) [write %lldms]",
+                output.pbr_path.c_str(), output.converted.width, output.converted.height, write_ms);
 
             converted_count++;
 
@@ -1387,11 +1506,140 @@ bool ConvertTexturesToPBR(
                 const float progress = static_cast<float>(converted_count + skipped_count + failed_count)
                                      / static_cast<float>(total_textures);
                 xr_string status = "Converting ";
-                status.append(asset.base_name);
+                status.append(output.base_name);
                 status.append("...");
                 progress_callback(progress, status.c_str());
             }
+        }
+    });
+
+    {
+        auto EmitResult = [&](Stage1Intermediate& inter, ConvertedPBRTextures&& converted, long long infer_ms) {
+            if (!converted.success) {
+                Msg("! [PBRTextureConverter] Conversion failed: %s [%lldms]", inter.base_name.c_str(), infer_ms);
+                failed_count++;
+                return;
+            }
+
+            Msg("~ [PBRTextureConverter] AI inference done: %s (%ux%u) [%lldms]",
+                inter.base_name.c_str(), converted.width, converted.height, infer_ms);
+
+            ZeroMetallicIfBlacklisted(converted, inter.base_name);
+            ai_conversions++;
+
+            ConvertedOutput output;
+            output.base_name = std::move(inter.base_name);
+            output.pbr_path = std::move(inter.pbr_path);
+            output.pbr_name = std::move(inter.pbr_name);
+            output.albedo_path = std::move(inter.albedo_path);
+            output.converted = std::move(converted);
+            output.generate_mipmaps = params.generate_mipmaps;
+            output.output_root = params.output_root;
+            write_queue.push(std::move(output));
+        };
+
+        auto FlushLargeBatch = [&](xr_vector<Stage1Intermediate>& batch) {
+            if (batch.empty()) return;
+
+            Msg("[PBRTextureConverter] Stage2 pass for %zu large textures (%ux%u)",
+                batch.size(), batch[0].width, batch[0].height);
+
+            for (auto& inter : batch) {
+                auto t_start = std::chrono::high_resolution_clock::now();
+                PBRPipelineOutputs outputs = g_ai_pipeline->ProcessStage2(inter.stage1);
+                auto t_end = std::chrono::high_resolution_clock::now();
+                auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count();
+
+                ConvertedPBRTextures converted;
+                if (outputs.success)
+                    converted = PackOutputs(outputs, inter.originalDiffuseRGBA, inter.width, inter.height);
+
+                EmitResult(inter, std::move(converted), ms);
+            }
+            batch.clear();
+        };
+
+        xr_vector<Stage1Intermediate> large_batch;
+        PreparedTexture prepared;
+
+        while (prepared_queue.pop(prepared)) {
+            auto t_infer_start = std::chrono::high_resolution_clock::now();
+
+            DecompressedPair decompressed = DecompressAndPrepare(&prepared.diffuseData, &prepared.normalData);
+            if (!decompressed.success) {
+                Msg("! [PBRTextureConverter] Decompress failed: %s", prepared.base_name.c_str());
+                failed_count++;
+                continue;
+            }
+
+            Msg("~ [PBRTextureConverter] Calling Process with dimensions: width=%u, height=%u",
+                decompressed.width, decompressed.height);
+
+            const bool large = g_ai_pipeline->NeedsSplitProcessing(decompressed.width, decompressed.height);
+
+            if (!large_batch.empty() &&
+                (large_batch[0].width != decompressed.width || large_batch[0].height != decompressed.height)) {
+                FlushLargeBatch(large_batch);
+            }
+
+            if (!large) {
+                PBRPipelineOutputs outputs = g_ai_pipeline->Process(
+                    decompressed.diffuseRGBA.data(),
+                    decompressed.normalRGBA.data(),
+                    decompressed.width,
+                    decompressed.height
+                );
+
+                auto t_infer_end = std::chrono::high_resolution_clock::now();
+                auto infer_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t_infer_end - t_infer_start).count();
+
+                ConvertedPBRTextures converted;
+                if (outputs.success)
+                    converted = PackOutputs(outputs, decompressed.diffuseRGBA, decompressed.width, decompressed.height);
+
+                Stage1Intermediate dummy;
+                dummy.base_name = std::move(prepared.base_name);
+                dummy.pbr_path = std::move(prepared.pbr_path);
+                dummy.pbr_name = std::move(prepared.pbr_name);
+                dummy.albedo_path = std::move(prepared.albedo_path);
+                EmitResult(dummy, std::move(converted), infer_ms);
+            } else {
+                PBRPipeline::Stage1Result stage1 = g_ai_pipeline->ProcessStage1(
+                    decompressed.diffuseRGBA.data(),
+                    decompressed.normalRGBA.data(),
+                    decompressed.width,
+                    decompressed.height
+                );
+
+                if (!stage1.success) {
+                    auto t_infer_end = std::chrono::high_resolution_clock::now();
+                    auto infer_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t_infer_end - t_infer_start).count();
+                    Msg("! [PBRTextureConverter] Stage1 failed: %s [%lldms]", prepared.base_name.c_str(), infer_ms);
+                    failed_count++;
+                    continue;
+                }
+
+                Stage1Intermediate inter;
+                inter.stage1 = std::move(stage1);
+                inter.originalDiffuseRGBA = std::move(decompressed.diffuseRGBA);
+                inter.width = decompressed.width;
+                inter.height = decompressed.height;
+                inter.base_name = std::move(prepared.base_name);
+                inter.pbr_path = std::move(prepared.pbr_path);
+                inter.pbr_name = std::move(prepared.pbr_name);
+                inter.albedo_path = std::move(prepared.albedo_path);
+                large_batch.push_back(std::move(inter));
+            }
+        }
+
+        FlushLargeBatch(large_batch);
+
+        write_queue.signal_done();
     }
+
+    producer.join();
+    writer.join();
+#endif
 
     const auto end_time = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
@@ -1402,21 +1650,11 @@ bool ConvertTexturesToPBR(
     out_stats.textures_failed = failed_count.load();
     out_stats.conversion_time_seconds = duration.count() / 1000.0f;
 
-#ifdef USE_AI_PBR
-    Msg("[PBRTextureConverter] Conversion complete: %u converted (%u AI, %u heuristic), %u skipped, %u failed (%.2fs)",
-        out_stats.textures_converted,
-        ai_conversions.load(),
-        heuristic_conversions.load(),
-        out_stats.textures_skipped,
-        out_stats.textures_failed,
-        out_stats.conversion_time_seconds);
-#else
     Msg("[PBRTextureConverter] Conversion complete: %u converted, %u skipped, %u failed (%.2fs)",
         out_stats.textures_converted,
         out_stats.textures_skipped,
         out_stats.textures_failed,
         out_stats.conversion_time_seconds);
-#endif
 
     return out_stats.textures_failed == 0;
 }

@@ -48,7 +48,8 @@ public:
     static bool InitializeEnvironment();
     static void ShutdownEnvironment();
 
-    bool LoadModel(const char* model_path, bool use_gpu = true, const char* trt_cache_path = "");
+    bool LoadModel(const char* model_path, bool use_gpu = true, const char* trt_cache_path = "",
+                   const char* trt_profile_min = nullptr, const char* trt_profile_max = nullptr, const char* trt_profile_opt = nullptr);
 
     bool IsLoaded() const;
 
@@ -127,6 +128,20 @@ public:
 
     PBRPipelineOutputs Process(const u8* diffuse, const u8* normal, u32 width, u32 height);
 
+    struct Stage1Result {
+        Tensor albedo;
+        Tensor normal;
+        Tensor material_logits;
+        Tensor seg_features;
+        Tensor diffuse_rgba_original;
+        bool success = false;
+    };
+
+    Stage1Result ProcessStage1(const u8* diffuse, const u8* normal, u32 width, u32 height);
+    PBRPipelineOutputs ProcessStage2(Stage1Result& stage1);
+    bool NeedsSplitProcessing(u32 width, u32 height) const;
+    void WarmupTRTEngines(const xr_vector<std::pair<u32, u32>>& dimensions);
+
     xr_string GetModelDir() const { return config_.model_dir; }
 
 private:
@@ -140,8 +155,24 @@ private:
     xr_string unet_ao_path_;
     xr_string unet_metallic_path_;
     xr_string unet_roughness_path_;
-
     xr_string trt_cache_path_;
+
+    ONNXModelRunner cached_unet_albedo_uncond_;
+    ONNXModelRunner cached_segformer_;
+    ONNXModelRunner cached_unet_albedo_;
+    ONNXModelRunner cached_unet_parallax_;
+    ONNXModelRunner cached_unet_ao_;
+    ONNXModelRunner cached_unet_metallic_;
+    ONNXModelRunner cached_unet_roughness_;
+    u32 cached_H_ = 0;
+    u32 cached_W_ = 0;
+
+    enum class LoadedStage { None, Stage1, Stage2, All };
+    LoadedStage loaded_stage_ = LoadedStage::None;
+
+    static constexpr u32 MIN_AI_RESOLUTION = 16;
+    static constexpr u32 VRAM_SPLIT_THRESHOLD = 512 * 1024;
+    static constexpr u32 VRAM_SINGLE_MODEL_THRESHOLD = 2048 * 1024;
 
     struct Stage1Outputs {
         Tensor albedo;
@@ -149,7 +180,6 @@ private:
         Tensor seg_features;
         bool success = false;
     };
-    Stage1Outputs RunStage1(const Tensor& diffuse, const Tensor& normal);
 
     struct Stage2Outputs {
         Tensor metallic;
@@ -158,12 +188,26 @@ private:
         Tensor parallax;
         bool success = false;
     };
+
+    void ResetAllCachedModels();
+    bool EnsureStage1ModelsLoaded(u32 H, u32 W);
+    bool EnsureStage2ModelsLoaded(u32 H, u32 W);
+    bool EnsureAllModelsLoaded(u32 H, u32 W);
+
+    Stage1Outputs RunStage1(const Tensor& diffuse, const Tensor& normal);
     Stage2Outputs RunStage2(
         const Tensor& albedo,
         const Tensor& normal,
         const Tensor& material_logits,
         const Tensor& seg_features
     );
+    Stage2Outputs RunStage2SingleModel(
+        const Tensor& albedo,
+        const Tensor& normal,
+        const Tensor& material_logits,
+        const Tensor& seg_features
+    );
+    bool NeedsSingleModelProcessing(u32 width, u32 height) const;
 };
 
 bool AreAIModelsAvailable(const char* model_dir = "ai_models");
