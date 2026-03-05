@@ -8,11 +8,13 @@
 #include <algorithm>
 #include <cmath>
 #include <numeric>
+#include <thread>
 #include <unordered_map>
 
 #ifdef USE_AI_PBR
 // ONNX Runtime C++ API
 #include <onnxruntime_cxx_api.h>
+#include <filesystem>
 
 namespace xray::render::pbr {
 
@@ -197,7 +199,8 @@ ONNXModelRunner& ONNXModelRunner::operator=(ONNXModelRunner&& other) noexcept {
     return *this;
 }
 
-bool ONNXModelRunner::LoadModel(const char* model_path, bool use_gpu, const char* trt_cache_path) {
+bool ONNXModelRunner::LoadModel(const char* model_path, bool use_gpu, const char* trt_cache_path,
+                                const char* trt_profile_min, const char* trt_profile_max, const char* trt_profile_opt) {
     if (!env_initialized_) {
         Msg("! [ONNXModelRunner] Environment not initialized. Call InitializeEnvironment() first.");
         return false;
@@ -230,30 +233,31 @@ bool ONNXModelRunner::LoadModel(const char* model_path, bool use_gpu, const char
         trt_opts["trt_max_workspace_size"] = "2147483648"; // 2GB
         trt_opts["trt_fp16_enable"] = "1"; // Enable FP16 tensor cores
 
+        if (trt_profile_min && trt_profile_min[0]) trt_opts["trt_profile_min_shapes"] = trt_profile_min;
+        if (trt_profile_max && trt_profile_max[0]) trt_opts["trt_profile_max_shapes"] = trt_profile_max;
+        if (trt_profile_opt && trt_profile_opt[0]) trt_opts["trt_profile_opt_shapes"] = trt_profile_opt;
+
         // Engine caching
         trt_opts["trt_engine_cache_enable"] = "1";
         if (trt_cache_path && trt_cache_path[0] != '\0') {
             trt_opts["trt_engine_cache_path"] = trt_cache_path;
         }
 
-        // Speed up compilation with reduced optimization (level 2 instead of 3)
-        trt_opts["trt_builder_optimization_level"] = "2"; // 0-5, default 3 (slower build, best perf)
+        trt_opts["trt_builder_optimization_level"] = "0";
 
-        // Enable detailed build logging to see progress
-        trt_opts["trt_detailed_build_log"] = "1";
-
-        // Use heuristics for faster builds
         trt_opts["trt_build_heuristics_enable"] = "1";
 
-        // Enable timing cache to speed up future builds
         trt_opts["trt_timing_cache_enable"] = "1";
         if (trt_cache_path && trt_cache_path[0] != '\0') {
-            trt_opts["trt_timing_cache_path"] = trt_cache_path;
+            std::string cache_str(trt_cache_path);
+            auto last_sep = cache_str.find_last_of("\\/");
+            std::string timing_path = (last_sep != std::string::npos) ? cache_str.substr(0, last_sep) : cache_str;
+            trt_opts["trt_timing_cache_path"] = timing_path;
         }
 
         trt_options.Update(trt_opts);
         session_options.AppendExecutionProvider_TensorRT_V2(*trt_options);
-        Msg("[ONNXModelRunner] TensorRT V2 GPU acceleration enabled (FP16, optimization level 2, detailed logging)");
+        Msg("[ONNXModelRunner] TensorRT V2 GPU acceleration enabled (FP16, profile shapes constrained)");
         use_gpu_ = true;
     }
 
@@ -762,7 +766,6 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
         return false;
     }
 
-    // Build model paths using VFS and validate they exist
     string_path seg_path, albedo_path, albedo_uncond_path, parallax_path, ao_path, metallic_path, roughness_path;
     FS.update_path(seg_path, "$game_data$", (config.model_dir + "\\segformer.onnx").c_str());
     FS.update_path(albedo_path, "$game_data$", (config.model_dir + "\\unet_albedo.onnx").c_str());
@@ -772,7 +775,6 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
     FS.update_path(metallic_path, "$game_data$", (config.model_dir + "\\unet_metallic.onnx").c_str());
     FS.update_path(roughness_path, "$game_data$", (config.model_dir + "\\unet_roughness.onnx").c_str());
 
-    // Validate all model files exist
     bool all_exist = true;
     all_exist &= FS.exist(seg_path, FSType::External);
     all_exist &= FS.exist(albedo_path, FSType::External);
@@ -787,7 +789,6 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
         return false;
     }
 
-    // Store paths for on-demand loading (saves VRAM - only load when needed)
     segformer_path_ = seg_path;
     unet_albedo_path_ = albedo_path;
     unet_albedo_uncond_path_ = albedo_uncond_path;
@@ -796,7 +797,6 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
     unet_metallic_path_ = metallic_path;
     unet_roughness_path_ = roughness_path;
 
-    // Resolve TensorRT engine cache path using VFS
     string_path cache_path;
     FS.update_path(cache_path, "$game_data$", (config.model_dir + "\\trt_cache").c_str());
     trt_cache_path_ = cache_path;
@@ -807,6 +807,165 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
     return true;
 }
 
+static std::string TRT_ProfileSingle(const char* input_name, u32 channels, u32 H, u32 W) {
+    char buf[128];
+    xr_sprintf(buf, sizeof(buf), "%s:1x%ux%ux%u", input_name, channels, H, W);
+    return buf;
+}
+
+static std::string TRT_ProfileWithFeatures(const char* input_name, u32 channels, u32 H, u32 W) {
+    u32 fH = std::max(H / 32, 1u);
+    u32 fW = std::max(W / 32, 1u);
+    char buf[256];
+    xr_sprintf(buf, sizeof(buf), "%s:1x%ux%ux%u,seg_features:1x512x%ux%u",
+        input_name, channels, H, W, fH, fW);
+    return buf;
+}
+
+static void FormatResCachePath(char* buf, size_t bufSize, const char* trt_cache_path, u32 W, u32 H) {
+    xr_sprintf(buf, bufSize, "%s\\%ux%u", trt_cache_path, W, H);
+    std::filesystem::create_directories(buf);
+}
+
+void PBRPipeline::ResetAllCachedModels() {
+    cached_unet_albedo_uncond_ = ONNXModelRunner();
+    cached_segformer_ = ONNXModelRunner();
+    cached_unet_albedo_ = ONNXModelRunner();
+    cached_unet_parallax_ = ONNXModelRunner();
+    cached_unet_ao_ = ONNXModelRunner();
+    cached_unet_metallic_ = ONNXModelRunner();
+    cached_unet_roughness_ = ONNXModelRunner();
+    loaded_stage_ = LoadedStage::None;
+    cached_H_ = 0;
+    cached_W_ = 0;
+}
+
+bool PBRPipeline::EnsureStage1ModelsLoaded(u32 H, u32 W) {
+    if (cached_H_ == H && cached_W_ == W &&
+        (loaded_stage_ == LoadedStage::Stage1 || loaded_stage_ == LoadedStage::All) &&
+        cached_unet_albedo_uncond_.IsLoaded() && cached_segformer_.IsLoaded() &&
+        cached_unet_albedo_.IsLoaded()) {
+        return true;
+    }
+
+    Msg("[PBRPipeline] Loading Stage1 models for %ux%u", W, H);
+
+    auto prof_uncond = TRT_ProfileSingle("image", 6, H, W);
+    auto prof_seg = TRT_ProfileSingle("input", 6, H, W);
+    auto prof_albedo = TRT_ProfileWithFeatures("image", 6, H, W);
+
+    char res_cache[512];
+    FormatResCachePath(res_cache, sizeof(res_cache), trt_cache_path_.c_str(), W, H);
+    ResetAllCachedModels();
+
+    bool ok = true;
+    ok = ok && cached_unet_albedo_uncond_.LoadModel(unet_albedo_uncond_path_.c_str(), config_.use_gpu, res_cache,
+            prof_uncond.c_str(), prof_uncond.c_str(), prof_uncond.c_str());
+    ok = ok && cached_segformer_.LoadModel(segformer_path_.c_str(), config_.use_gpu, res_cache,
+            prof_seg.c_str(), prof_seg.c_str(), prof_seg.c_str());
+    ok = ok && cached_unet_albedo_.LoadModel(unet_albedo_path_.c_str(), config_.use_gpu, res_cache,
+            prof_albedo.c_str(), prof_albedo.c_str(), prof_albedo.c_str());
+
+    if (ok) {
+        cached_H_ = H;
+        cached_W_ = W;
+        loaded_stage_ = LoadedStage::Stage1;
+    } else {
+        Msg("! [PBRPipeline] Failed to load Stage1 models for %ux%u", W, H);
+        ResetAllCachedModels();
+    }
+
+    return ok;
+}
+
+bool PBRPipeline::EnsureStage2ModelsLoaded(u32 H, u32 W) {
+    if (cached_H_ == H && cached_W_ == W &&
+        (loaded_stage_ == LoadedStage::Stage2 || loaded_stage_ == LoadedStage::All) &&
+        cached_unet_parallax_.IsLoaded() && cached_unet_ao_.IsLoaded() &&
+        cached_unet_metallic_.IsLoaded() && cached_unet_roughness_.IsLoaded()) {
+        return true;
+    }
+
+    Msg("[PBRPipeline] Loading Stage2 models for %ux%u", W, H);
+
+    auto prof_5ch = TRT_ProfileWithFeatures("image", 5, H, W);
+    auto prof_12ch = TRT_ProfileWithFeatures("image", 12, H, W);
+
+    char res_cache[512];
+    FormatResCachePath(res_cache, sizeof(res_cache), trt_cache_path_.c_str(), W, H);
+    ResetAllCachedModels();
+
+    bool ok = true;
+    ok = ok && cached_unet_parallax_.LoadModel(unet_parallax_path_.c_str(), config_.use_gpu, res_cache,
+            prof_5ch.c_str(), prof_5ch.c_str(), prof_5ch.c_str());
+    ok = ok && cached_unet_ao_.LoadModel(unet_ao_path_.c_str(), config_.use_gpu, res_cache,
+            prof_5ch.c_str(), prof_5ch.c_str(), prof_5ch.c_str());
+    ok = ok && cached_unet_metallic_.LoadModel(unet_metallic_path_.c_str(), config_.use_gpu, res_cache,
+            prof_12ch.c_str(), prof_12ch.c_str(), prof_12ch.c_str());
+    ok = ok && cached_unet_roughness_.LoadModel(unet_roughness_path_.c_str(), config_.use_gpu, res_cache,
+            prof_12ch.c_str(), prof_12ch.c_str(), prof_12ch.c_str());
+
+    if (ok) {
+        cached_H_ = H;
+        cached_W_ = W;
+        loaded_stage_ = LoadedStage::Stage2;
+    } else {
+        Msg("! [PBRPipeline] Failed to load Stage2 models for %ux%u", W, H);
+        ResetAllCachedModels();
+    }
+
+    return ok;
+}
+
+bool PBRPipeline::EnsureAllModelsLoaded(u32 H, u32 W) {
+    if (cached_H_ == H && cached_W_ == W && loaded_stage_ == LoadedStage::All &&
+        cached_unet_albedo_uncond_.IsLoaded() && cached_segformer_.IsLoaded() &&
+        cached_unet_albedo_.IsLoaded() && cached_unet_parallax_.IsLoaded() &&
+        cached_unet_ao_.IsLoaded() && cached_unet_metallic_.IsLoaded() &&
+        cached_unet_roughness_.IsLoaded()) {
+        return true;
+    }
+
+    Msg("[PBRPipeline] Loading all models for %ux%u", W, H);
+
+    auto prof_uncond = TRT_ProfileSingle("image", 6, H, W);
+    auto prof_seg = TRT_ProfileSingle("input", 6, H, W);
+    auto prof_albedo = TRT_ProfileWithFeatures("image", 6, H, W);
+    auto prof_5ch = TRT_ProfileWithFeatures("image", 5, H, W);
+    auto prof_12ch = TRT_ProfileWithFeatures("image", 12, H, W);
+
+    char res_cache[512];
+    FormatResCachePath(res_cache, sizeof(res_cache), trt_cache_path_.c_str(), W, H);
+    ResetAllCachedModels();
+
+    bool ok = true;
+    ok = ok && cached_unet_albedo_uncond_.LoadModel(unet_albedo_uncond_path_.c_str(), config_.use_gpu, res_cache,
+            prof_uncond.c_str(), prof_uncond.c_str(), prof_uncond.c_str());
+    ok = ok && cached_segformer_.LoadModel(segformer_path_.c_str(), config_.use_gpu, res_cache,
+            prof_seg.c_str(), prof_seg.c_str(), prof_seg.c_str());
+    ok = ok && cached_unet_albedo_.LoadModel(unet_albedo_path_.c_str(), config_.use_gpu, res_cache,
+            prof_albedo.c_str(), prof_albedo.c_str(), prof_albedo.c_str());
+    ok = ok && cached_unet_parallax_.LoadModel(unet_parallax_path_.c_str(), config_.use_gpu, res_cache,
+            prof_5ch.c_str(), prof_5ch.c_str(), prof_5ch.c_str());
+    ok = ok && cached_unet_ao_.LoadModel(unet_ao_path_.c_str(), config_.use_gpu, res_cache,
+            prof_5ch.c_str(), prof_5ch.c_str(), prof_5ch.c_str());
+    ok = ok && cached_unet_metallic_.LoadModel(unet_metallic_path_.c_str(), config_.use_gpu, res_cache,
+            prof_12ch.c_str(), prof_12ch.c_str(), prof_12ch.c_str());
+    ok = ok && cached_unet_roughness_.LoadModel(unet_roughness_path_.c_str(), config_.use_gpu, res_cache,
+            prof_12ch.c_str(), prof_12ch.c_str(), prof_12ch.c_str());
+
+    if (ok) {
+        cached_H_ = H;
+        cached_W_ = W;
+        loaded_stage_ = LoadedStage::All;
+    } else {
+        Msg("! [PBRPipeline] Failed to load models for %ux%u", W, H);
+        ResetAllCachedModels();
+    }
+
+    return ok;
+}
+
 PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const Tensor& normal) {
     Stage1Outputs result;
 
@@ -815,6 +974,11 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
 
     if (config_.verbose) {
         Msg("[PBRPipeline] Stage1: Processing %ux%u texture (Two-Pass Albedo)", W, H);
+    }
+
+    if (!cached_unet_albedo_uncond_.IsLoaded() || !cached_segformer_.IsLoaded() || !cached_unet_albedo_.IsLoaded()) {
+        Msg("! [PBRPipeline] Stage1: Models not loaded for %ux%u", W, H);
+        return result;
     }
 
     // ═══════════════════════════════════════════════════════
@@ -859,27 +1023,18 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
     // ═══════════════════════════════════════════════════════
     //  STEP 3: FIRST PASS - Run UNet Albedo UNCOND (no features) → "dirty" albedo
     // ═══════════════════════════════════════════════════════
-    Tensor dirty_albedo;
-    {
-        ONNXModelRunner unet_albedo_uncond;
-        if (!unet_albedo_uncond.LoadModel(unet_albedo_uncond_path_.c_str(), config_.use_gpu, trt_cache_path_.c_str())) {
-            Msg("! [PBRPipeline] Stage1: Failed to load UNet Albedo Uncond");
-            return result;
-        }
+    xr_vector<Tensor> uncond_inputs = { input_6ch_std };
+    xr_vector<const char*> uncond_input_names = { "image" };
+    xr_vector<const char*> uncond_output_names = { "albedo" };
 
-        xr_vector<Tensor> uncond_inputs = { input_6ch_std };
-        xr_vector<const char*> uncond_input_names = { "image" };
-        xr_vector<const char*> uncond_output_names = { "albedo" };
+    xr_vector<Tensor> uncond_outputs = cached_unet_albedo_uncond_.Run(uncond_inputs, uncond_input_names, uncond_output_names);
 
-        xr_vector<Tensor> uncond_outputs = unet_albedo_uncond.Run(uncond_inputs, uncond_input_names, uncond_output_names);
+    if (uncond_outputs.empty()) {
+        Msg("! [PBRPipeline] Stage1: UNet Albedo Uncond failed");
+        return result;
+    }
 
-        if (uncond_outputs.empty()) {
-            Msg("! [PBRPipeline] Stage1: UNet Albedo Uncond failed");
-            return result;
-        }
-
-        dirty_albedo = std::move(uncond_outputs[0]);
-    } // UNet Albedo Uncond unloaded here
+    Tensor dirty_albedo = std::move(uncond_outputs[0]);
 
     if (config_.verbose) {
         Msg("[PBRPipeline] First pass (uncond): Dirty albedo [%u,%u,%u,%u]",
@@ -916,20 +1071,11 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
     // ═══════════════════════════════════════════════════════
     //  STEP 6: Run SegFormer → logits + features (load on-demand)
     // ═══════════════════════════════════════════════════════
-    xr_vector<Tensor> seg_outputs;
-    {
-        ONNXModelRunner segformer;
-        if (!segformer.LoadModel(segformer_path_.c_str(), config_.use_gpu, trt_cache_path_.c_str())) {
-            Msg("! [PBRPipeline] Stage1: Failed to load SegFormer");
-            return result;
-        }
+    xr_vector<Tensor> seg_inputs = { segformer_input_6ch };
+    xr_vector<const char*> seg_input_names = { "input" };
+    xr_vector<const char*> seg_output_names = { "logits", "features" };
 
-        xr_vector<Tensor> seg_inputs = { segformer_input_6ch };
-        xr_vector<const char*> seg_input_names = { "input" };
-        xr_vector<const char*> seg_output_names = { "logits", "features" };
-
-        seg_outputs = segformer.Run(seg_inputs, seg_input_names, seg_output_names);
-    } // SegFormer unloaded here
+    xr_vector<Tensor> seg_outputs = cached_segformer_.Run(seg_inputs, seg_input_names, seg_output_names);
 
     if (seg_outputs.size() != 2) {
         Msg("! [PBRPipeline] Stage1: SegFormer returned %zu outputs, expected 2", seg_outputs.size());
@@ -950,21 +1096,11 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
     // ═══════════════════════════════════════════════════════
     //  STEP 7: SECOND PASS - Run UNet Albedo with features → final albedo (load on-demand)
     // ═══════════════════════════════════════════════════════
-    xr_vector<Tensor> albedo_outputs;
-    {
-        ONNXModelRunner unet_albedo;
-        if (!unet_albedo.LoadModel(unet_albedo_path_.c_str(), config_.use_gpu, trt_cache_path_.c_str())) {
-            Msg("! [PBRPipeline] Stage1: Failed to load UNet Albedo");
-            return result;
-        }
+    xr_vector<Tensor> albedo_inputs = { input_6ch_std, result.seg_features };
+    xr_vector<const char*> albedo_input_names = { "image", "seg_features" };
+    xr_vector<const char*> albedo_output_names = { "albedo" };
 
-        // Use original STANDARD-normalized 6ch input + seg_features
-        xr_vector<Tensor> albedo_inputs = { input_6ch_std, result.seg_features };
-        xr_vector<const char*> albedo_input_names = { "image", "seg_features" };
-        xr_vector<const char*> albedo_output_names = { "albedo" };
-
-        albedo_outputs = unet_albedo.Run(albedo_inputs, albedo_input_names, albedo_output_names);
-    } // UNet Albedo unloaded here
+    xr_vector<Tensor> albedo_outputs = cached_unet_albedo_.Run(albedo_inputs, albedo_input_names, albedo_output_names);
 
     if (albedo_outputs.empty()) {
         Msg("! [PBRPipeline] Stage1: UNet Albedo failed");
@@ -983,6 +1119,78 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
     return result;
 }
 
+struct Stage2Inputs {
+    Tensor input_5ch;
+    Tensor input_12ch;
+};
+
+static Stage2Inputs PrepareStage2Inputs(
+    const Tensor& albedo, const Tensor& normal,
+    const Tensor& material_logits, u32 H, u32 W, bool verbose)
+{
+    Stage2Inputs result;
+
+    Tensor albedo_std = Tensor::Create(1, 3, H, W);
+    Tensor albedo_default = Tensor::Create(1, 3, H, W);
+    Tensor normal_std = Tensor::Create(1, 3, H, W);
+
+    for (u32 c = 0; c < 3; ++c) {
+        for (u32 i = 0; i < H * W; ++i) {
+            albedo_std.data[c * H * W + i] = albedo.data[c * H * W + i];
+            albedo_default.data[c * H * W + i] = albedo.data[c * H * W + i];
+            normal_std.data[c * H * W + i] = normal.data[c * H * W + i];
+        }
+    }
+
+    PreprocessingUtils::NormalizeImageNetStandard(albedo_std);
+    PreprocessingUtils::NormalizeImageNetDefault(albedo_default);
+    PreprocessingUtils::NormalizeImageNetStandard(normal_std);
+
+    Tensor curvature = PreprocessingUtils::ComputeMeanCurvature(normal_std);
+    Tensor poisson = PreprocessingUtils::ComputePoissonCoarse(normal_std);
+
+    constexpr u32 NUM_CLASSES = 6;
+    Tensor material_mask = PreprocessingUtils::LogitsToMask(material_logits, NUM_CLASSES);
+    material_mask = PreprocessingUtils::Upsample(material_mask, H, W);
+
+    if (verbose) {
+        Msg("[PBRPipeline] Preprocessing: curvature [%u,%u,%u,%u], poisson [%u,%u,%u,%u], mask [%u,%u,%u,%u]",
+            curvature.batch(), curvature.channels(), curvature.height(), curvature.width(),
+            poisson.batch(), poisson.channels(), poisson.height(), poisson.width(),
+            material_mask.batch(), material_mask.channels(), material_mask.height(), material_mask.width());
+    }
+
+    result.input_5ch = Tensor::Create(1, 5, H, W);
+    for (u32 c = 0; c < 3; ++c) {
+        for (u32 i = 0; i < H * W; ++i) {
+            result.input_5ch.data[c * H * W + i] = normal_std.data[c * H * W + i];
+        }
+    }
+    for (u32 i = 0; i < H * W; ++i) {
+        result.input_5ch.data[3 * H * W + i] = curvature.data[i];
+        result.input_5ch.data[4 * H * W + i] = poisson.data[i];
+    }
+
+    result.input_12ch = Tensor::Create(1, 12, H, W);
+    for (u32 c = 0; c < 3; ++c) {
+        for (u32 i = 0; i < H * W; ++i) {
+            result.input_12ch.data[c * H * W + i] = albedo_default.data[c * H * W + i];
+        }
+    }
+    for (u32 c = 0; c < 3; ++c) {
+        for (u32 i = 0; i < H * W; ++i) {
+            result.input_12ch.data[(c + 3) * H * W + i] = normal_std.data[c * H * W + i];
+        }
+    }
+    for (u32 c = 0; c < NUM_CLASSES; ++c) {
+        for (u32 i = 0; i < H * W; ++i) {
+            result.input_12ch.data[(c + 6) * H * W + i] = material_mask.data[c * H * W + i];
+        }
+    }
+
+    return result;
+}
+
 PBRPipeline::Stage2Outputs PBRPipeline::RunStage2(
     const Tensor& albedo,
     const Tensor& normal,
@@ -994,235 +1202,96 @@ PBRPipeline::Stage2Outputs PBRPipeline::RunStage2(
     const u32 H = normal.height();
     const u32 W = normal.width();
 
-    if (config_.verbose) {
-        Msg("[PBRPipeline] Stage2: Processing %ux%u texture", W, H);
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  STEP 1: Dual normalization (STANDARD + DEFAULT)
-    // ═══════════════════════════════════════════════════════
-    // CRITICAL: Python creates TWO albedo copies with different normalizations!
-    // - albedo_std (STANDARD 0.5): for UNets (not used in 5ch, but kept for consistency)
-    // - albedo_default (DEFAULT 0.485): for 12ch input (metallic/roughness)
-    // - normal_std (STANDARD 0.5): for all inputs
-
-    Tensor albedo_std = Tensor::Create(1, 3, H, W);
-    Tensor albedo_default = Tensor::Create(1, 3, H, W);
-    Tensor normal_std = Tensor::Create(1, 3, H, W);
-
-    // Copy albedo (twice) and normal
-    for (u32 c = 0; c < 3; ++c) {
-        for (u32 i = 0; i < H * W; ++i) {
-            albedo_std.data[c * H * W + i] = albedo.data[c * H * W + i];
-            albedo_default.data[c * H * W + i] = albedo.data[c * H * W + i];
-            normal_std.data[c * H * W + i] = normal.data[c * H * W + i];
-        }
-    }
-
-    // Normalize albedo with BOTH stats
-    PreprocessingUtils::NormalizeImageNetStandard(albedo_std);
-    PreprocessingUtils::NormalizeImageNetDefault(albedo_default);
-
-    // Normalize normal with STANDARD stats
-    PreprocessingUtils::NormalizeImageNetStandard(normal_std);
-
-    // ═══════════════════════════════════════════════════════
-    //  STEP 2: Compute preprocessing from NORMALIZED normal
-    // ═══════════════════════════════════════════════════════
-
-    // Compute mean curvature from STANDARD-normalized normal map
-    Tensor curvature = PreprocessingUtils::ComputeMeanCurvature(normal_std);
-
-    // Compute Poisson coarse height from STANDARD-normalized normal map
-    Tensor poisson = PreprocessingUtils::ComputePoissonCoarse(normal_std);
-
-    // Convert material logits to one-hot mask (6 classes)
-    constexpr u32 NUM_CLASSES = 6;  // fabric, ground, leather, metal, stone, wood
-    Tensor material_mask = PreprocessingUtils::LogitsToMask(material_logits, NUM_CLASSES);
-
-    // DEBUG: Check material mask values
-    float mask_min = FLT_MAX, mask_max = -FLT_MAX;
-    for (const float& val : material_mask.data) {
-        mask_min = std::min(mask_min, val);
-        mask_max = std::max(mask_max, val);
-    }
-    Msg("~ [PBRPipeline] Material mask before upsample: Range [%.4f, %.4f], Shape [%u,%u,%u,%u]",
-        mask_min, mask_max,
-        material_mask.batch(), material_mask.channels(), material_mask.height(), material_mask.width());
-
-    // Upsample material mask to match texture resolution (from H/4 to H)
-    material_mask = PreprocessingUtils::Upsample(material_mask, H, W);
-
-    // DEBUG: Check material mask after upsample
-    mask_min = FLT_MAX; mask_max = -FLT_MAX;
-    for (const float& val : material_mask.data) {
-        mask_min = std::min(mask_min, val);
-        mask_max = std::max(mask_max, val);
-    }
-    Msg("~ [PBRPipeline] Material mask after upsample: Range [%.4f, %.4f]", mask_min, mask_max);
-
-    if (config_.verbose) {
-        Msg("[PBRPipeline] Preprocessing: curvature [%u,%u,%u,%u], poisson [%u,%u,%u,%u], mask [%u,%u,%u,%u]",
-            curvature.batch(), curvature.channels(), curvature.height(), curvature.width(),
-            poisson.batch(), poisson.channels(), poisson.height(), poisson.width(),
-            material_mask.batch(), material_mask.channels(), material_mask.height(), material_mask.width());
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  STEP 3: Prepare inputs for 4 UNets
-    // ═══════════════════════════════════════════════════════
-
-    // Input for Parallax/AO: 5 channels (RGB STANDARD-normalized normal + curvature + poisson)
-    Tensor input_5ch = Tensor::Create(1, 5, H, W);
-    for (u32 c = 0; c < 3; ++c) {
-        for (u32 i = 0; i < H * W; ++i) {
-            input_5ch.data[c * H * W + i] = normal_std.data[c * H * W + i];
-        }
-    }
-    for (u32 i = 0; i < H * W; ++i) {
-        input_5ch.data[3 * H * W + i] = curvature.data[i];
-        input_5ch.data[4 * H * W + i] = poisson.data[i];
-    }
-
-    // DEBUG: Check albedo and normal ranges
-    float albedo_min = FLT_MAX, albedo_max = -FLT_MAX;
-    for (const float& val : albedo.data) {
-        albedo_min = std::min(albedo_min, val);
-        albedo_max = std::max(albedo_max, val);
-    }
-    float normal_min = FLT_MAX, normal_max = -FLT_MAX;
-    for (const float& val : normal.data) {
-        normal_min = std::min(normal_min, val);
-        normal_max = std::max(normal_max, val);
-    }
-    Msg("~ [PBRPipeline] Input ranges: albedo [%.4f, %.4f], normal [%.4f, %.4f]",
-        albedo_min, albedo_max, normal_min, normal_max);
-
-    // Input for Metallic/Roughness: 12 channels (DEFAULT albedo + STANDARD normal + 6-class mask)
-    // CRITICAL: Python uses DEFAULT-normalized albedo here, not STANDARD!
-    Msg("~ [PBRPipeline] Creating 12ch input from: albedo_default [%u,%u,%u,%u], normal_std [%u,%u,%u,%u], mask [%u,%u,%u,%u]",
-        albedo_default.batch(), albedo_default.channels(), albedo_default.height(), albedo_default.width(),
-        normal_std.batch(), normal_std.channels(), normal_std.height(), normal_std.width(),
-        material_mask.batch(), material_mask.channels(), material_mask.height(), material_mask.width());
-
-    Tensor input_12ch = Tensor::Create(1, 12, H, W);
-    // Copy DEFAULT-normalized albedo (3ch) - matches Python's albedo_segformer
-    for (u32 c = 0; c < 3; ++c) {
-        for (u32 i = 0; i < H * W; ++i) {
-            input_12ch.data[c * H * W + i] = albedo_default.data[c * H * W + i];
-        }
-    }
-    // Copy STANDARD-normalized normal (3ch)
-    for (u32 c = 0; c < 3; ++c) {
-        for (u32 i = 0; i < H * W; ++i) {
-            input_12ch.data[(c + 3) * H * W + i] = normal_std.data[c * H * W + i];
-        }
-    }
-    // Copy material mask (6ch)
-    for (u32 c = 0; c < NUM_CLASSES; ++c) {
-        for (u32 i = 0; i < H * W; ++i) {
-            input_12ch.data[(c + 6) * H * W + i] = material_mask.data[c * H * W + i];
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  STEP 3: Run UNet Parallax (5ch input) - load on-demand
-    // ═══════════════════════════════════════════════════════
-    xr_vector<Tensor> parallax_outputs;
-    {
-        ONNXModelRunner unet_parallax;
-        if (!unet_parallax.LoadModel(unet_parallax_path_.c_str(), config_.use_gpu, trt_cache_path_.c_str())) {
-            Msg("! [PBRPipeline] Stage2: Failed to load UNet Parallax");
-            return result;
-        }
-
-        xr_vector<Tensor> parallax_inputs = { input_5ch, seg_features };
-        xr_vector<const char*> parallax_input_names = { "image", "seg_features" };
-        xr_vector<const char*> parallax_output_names = { "output" };
-
-        parallax_outputs = unet_parallax.Run(parallax_inputs, parallax_input_names, parallax_output_names);
-    } // UNet Parallax unloaded here
-
-    if (parallax_outputs.empty()) {
-        Msg("! [PBRPipeline] Stage2: UNet Parallax failed");
+    if (!cached_unet_parallax_.IsLoaded() || !cached_unet_ao_.IsLoaded() ||
+        !cached_unet_metallic_.IsLoaded() || !cached_unet_roughness_.IsLoaded()) {
+        Msg("! [PBRPipeline] Stage2: Models not loaded for %ux%u", W, H);
         return result;
     }
+
+    const bool sequential = (loaded_stage_ == LoadedStage::Stage2);
+
+    auto prepared = PrepareStage2Inputs(albedo, normal, material_logits, H, W, config_.verbose);
+
+    xr_vector<Tensor> parallax_outputs, ao_outputs, metallic_outputs, roughness_outputs;
+    bool parallax_ok = false, ao_ok = false, metallic_ok = false, roughness_ok = false;
+
+    if (sequential) {
+        {
+            xr_vector<Tensor> inputs = { prepared.input_5ch, seg_features };
+            xr_vector<const char*> in_names = { "image", "seg_features" };
+            xr_vector<const char*> out_names = { "output" };
+            parallax_outputs = cached_unet_parallax_.Run(inputs, in_names, out_names);
+            parallax_ok = !parallax_outputs.empty();
+        }
+
+        {
+            xr_vector<Tensor> inputs = { prepared.input_5ch, seg_features };
+            xr_vector<const char*> in_names = { "image", "seg_features" };
+            xr_vector<const char*> out_names = { "output" };
+            ao_outputs = cached_unet_ao_.Run(inputs, in_names, out_names);
+            ao_ok = !ao_outputs.empty();
+        }
+
+        {
+            xr_vector<Tensor> inputs = { prepared.input_12ch, seg_features };
+            xr_vector<const char*> in_names = { "image", "seg_features" };
+            xr_vector<const char*> out_names = { "output" };
+            metallic_outputs = cached_unet_metallic_.Run(inputs, in_names, out_names);
+            metallic_ok = !metallic_outputs.empty();
+        }
+
+        {
+            xr_vector<Tensor> inputs = { prepared.input_12ch, seg_features };
+            xr_vector<const char*> in_names = { "image", "seg_features" };
+            xr_vector<const char*> out_names = { "output" };
+            roughness_outputs = cached_unet_roughness_.Run(inputs, in_names, out_names);
+            roughness_ok = !roughness_outputs.empty();
+        }
+    } else {
+        std::thread ao_thread([&]() {
+            xr_vector<Tensor> inputs = { prepared.input_5ch, seg_features };
+            xr_vector<const char*> in_names = { "image", "seg_features" };
+            xr_vector<const char*> out_names = { "output" };
+            ao_outputs = cached_unet_ao_.Run(inputs, in_names, out_names);
+            ao_ok = !ao_outputs.empty();
+        });
+
+        std::thread metallic_thread([&]() {
+            xr_vector<Tensor> inputs = { prepared.input_12ch, seg_features };
+            xr_vector<const char*> in_names = { "image", "seg_features" };
+            xr_vector<const char*> out_names = { "output" };
+            metallic_outputs = cached_unet_metallic_.Run(inputs, in_names, out_names);
+            metallic_ok = !metallic_outputs.empty();
+        });
+
+        std::thread roughness_thread([&]() {
+            xr_vector<Tensor> inputs = { prepared.input_12ch, seg_features };
+            xr_vector<const char*> in_names = { "image", "seg_features" };
+            xr_vector<const char*> out_names = { "output" };
+            roughness_outputs = cached_unet_roughness_.Run(inputs, in_names, out_names);
+            roughness_ok = !roughness_outputs.empty();
+        });
+
+        {
+            xr_vector<Tensor> inputs = { prepared.input_5ch, seg_features };
+            xr_vector<const char*> in_names = { "image", "seg_features" };
+            xr_vector<const char*> out_names = { "output" };
+            parallax_outputs = cached_unet_parallax_.Run(inputs, in_names, out_names);
+            parallax_ok = !parallax_outputs.empty();
+        }
+
+        ao_thread.join();
+        metallic_thread.join();
+        roughness_thread.join();
+    }
+
+    if (!parallax_ok) { Msg("! [PBRPipeline] Stage2: UNet Parallax failed"); return result; }
     result.parallax = std::move(parallax_outputs[0]);
-
-    // ═══════════════════════════════════════════════════════
-    //  STEP 4: Run UNet AO (5ch input) - load on-demand
-    // ═══════════════════════════════════════════════════════
-    xr_vector<Tensor> ao_outputs;
-    {
-        ONNXModelRunner unet_ao;
-        if (!unet_ao.LoadModel(unet_ao_path_.c_str(), config_.use_gpu, trt_cache_path_.c_str())) {
-            Msg("! [PBRPipeline] Stage2: Failed to load UNet AO");
-            return result;
-        }
-
-        xr_vector<Tensor> ao_inputs = { input_5ch, seg_features };
-        xr_vector<const char*> ao_input_names = { "image", "seg_features" };
-        xr_vector<const char*> ao_output_names = { "output" };
-
-        ao_outputs = unet_ao.Run(ao_inputs, ao_input_names, ao_output_names);
-    } // UNet AO unloaded here
-
-    if (ao_outputs.empty()) {
-        Msg("! [PBRPipeline] Stage2: UNet AO failed");
-        return result;
-    }
+    if (!ao_ok) { Msg("! [PBRPipeline] Stage2: UNet AO failed"); return result; }
     result.ao = std::move(ao_outputs[0]);
-
-    // ═══════════════════════════════════════════════════════
-    //  STEP 5: Run UNet Metallic (12ch input) - load on-demand
-    // ═══════════════════════════════════════════════════════
-    Msg("~ [PBRPipeline] Metallic inputs: image [%u,%u,%u,%u], seg_features [%u,%u,%u,%u]",
-        input_12ch.batch(), input_12ch.channels(), input_12ch.height(), input_12ch.width(),
-        seg_features.batch(), seg_features.channels(), seg_features.height(), seg_features.width());
-
-    xr_vector<Tensor> metallic_outputs;
-    {
-        ONNXModelRunner unet_metallic;
-        if (!unet_metallic.LoadModel(unet_metallic_path_.c_str(), config_.use_gpu, trt_cache_path_.c_str())) {
-            Msg("! [PBRPipeline] Stage2: Failed to load UNet Metallic");
-            return result;
-        }
-
-        xr_vector<Tensor> metallic_inputs = { input_12ch, seg_features };
-        xr_vector<const char*> metallic_input_names = { "image", "seg_features" };
-        xr_vector<const char*> metallic_output_names = { "output" };
-
-        metallic_outputs = unet_metallic.Run(metallic_inputs, metallic_input_names, metallic_output_names);
-    } // UNet Metallic unloaded here
-
-    if (metallic_outputs.empty()) {
-        Msg("! [PBRPipeline] Stage2: UNet Metallic failed");
-        return result;
-    }
+    if (!metallic_ok) { Msg("! [PBRPipeline] Stage2: UNet Metallic failed"); return result; }
     result.metallic = std::move(metallic_outputs[0]);
-
-    // ═══════════════════════════════════════════════════════
-    //  STEP 6: Run UNet Roughness (12ch input) - load on-demand
-    // ═══════════════════════════════════════════════════════
-    xr_vector<Tensor> roughness_outputs;
-    {
-        ONNXModelRunner unet_roughness;
-        if (!unet_roughness.LoadModel(unet_roughness_path_.c_str(), config_.use_gpu, trt_cache_path_.c_str())) {
-            Msg("! [PBRPipeline] Stage2: Failed to load UNet Roughness");
-            return result;
-        }
-
-        xr_vector<Tensor> roughness_inputs = { input_12ch, seg_features };
-        xr_vector<const char*> roughness_input_names = { "image", "seg_features" };
-        xr_vector<const char*> roughness_output_names = { "output" };
-
-        roughness_outputs = unet_roughness.Run(roughness_inputs, roughness_input_names, roughness_output_names);
-    } // UNet Roughness unloaded here
-
-    if (roughness_outputs.empty()) {
-        Msg("! [PBRPipeline] Stage2: UNet Roughness failed");
-        return result;
-    }
+    if (!roughness_ok) { Msg("! [PBRPipeline] Stage2: UNet Roughness failed"); return result; }
     result.roughness = std::move(roughness_outputs[0]);
 
     if (config_.verbose) {
@@ -1237,6 +1306,116 @@ PBRPipeline::Stage2Outputs PBRPipeline::RunStage2(
     return result;
 }
 
+bool PBRPipeline::NeedsSingleModelProcessing(u32 width, u32 height) const {
+    return (static_cast<u64>(width) * height) > VRAM_SINGLE_MODEL_THRESHOLD;
+}
+
+PBRPipeline::Stage2Outputs PBRPipeline::RunStage2SingleModel(
+    const Tensor& albedo,
+    const Tensor& normal,
+    const Tensor& material_logits,
+    const Tensor& seg_features)
+{
+    Stage2Outputs result;
+
+    const u32 H = normal.height();
+    const u32 W = normal.width();
+
+    Msg("[PBRPipeline] Stage2 single-model mode for %ux%u", W, H);
+
+    auto prepared = PrepareStage2Inputs(albedo, normal, material_logits, H, W, config_.verbose);
+
+    char res_cache[512];
+    FormatResCachePath(res_cache, sizeof(res_cache), trt_cache_path_.c_str(), W, H);
+
+    auto prof_5ch = TRT_ProfileWithFeatures("image", 5, H, W);
+    auto prof_12ch = TRT_ProfileWithFeatures("image", 12, H, W);
+
+    ResetAllCachedModels();
+
+    auto run_single_model = [&](const char* name, const xr_string& model_path,
+                                const std::string& profile, const Tensor& input,
+                                const Tensor& features) -> Tensor
+    {
+        Msg("[PBRPipeline] Stage2 single-model: loading %s @ %ux%u", name, W, H);
+
+        ONNXModelRunner runner;
+        if (!runner.LoadModel(model_path.c_str(), config_.use_gpu, res_cache,
+                profile.c_str(), profile.c_str(), profile.c_str())) {
+            Msg("! [PBRPipeline] Stage2 single-model: failed to load %s", name);
+            return {};
+        }
+
+        xr_vector<Tensor> inputs = { input, features };
+        xr_vector<const char*> in_names = { "image", "seg_features" };
+        xr_vector<const char*> out_names = { "output" };
+        auto outputs = runner.Run(inputs, in_names, out_names);
+
+        if (outputs.empty()) {
+            Msg("! [PBRPipeline] Stage2 single-model: inference failed for %s", name);
+            return {};
+        }
+
+        Msg("[PBRPipeline] Stage2 single-model: %s complete", name);
+        return std::move(outputs[0]);
+    };
+
+    result.parallax = run_single_model("unet_parallax", unet_parallax_path_, prof_5ch, prepared.input_5ch, seg_features);
+    if (result.parallax.data.empty()) { Msg("! [PBRPipeline] Stage2: UNet Parallax failed (single-model)"); return result; }
+
+    result.ao = run_single_model("unet_ao", unet_ao_path_, prof_5ch, prepared.input_5ch, seg_features);
+    if (result.ao.data.empty()) { Msg("! [PBRPipeline] Stage2: UNet AO failed (single-model)"); return result; }
+
+    result.metallic = run_single_model("unet_metallic", unet_metallic_path_, prof_12ch, prepared.input_12ch, seg_features);
+    if (result.metallic.data.empty()) { Msg("! [PBRPipeline] Stage2: UNet Metallic failed (single-model)"); return result; }
+
+    result.roughness = run_single_model("unet_roughness", unet_roughness_path_, prof_12ch, prepared.input_12ch, seg_features);
+    if (result.roughness.data.empty()) { Msg("! [PBRPipeline] Stage2: UNet Roughness failed (single-model)"); return result; }
+
+    if (config_.verbose) {
+        Msg("[PBRPipeline] Stage2 single-model complete: parallax [%u,%u,%u,%u], AO [%u,%u,%u,%u], metallic [%u,%u,%u,%u], roughness [%u,%u,%u,%u]",
+            result.parallax.batch(), result.parallax.channels(), result.parallax.height(), result.parallax.width(),
+            result.ao.batch(), result.ao.channels(), result.ao.height(), result.ao.width(),
+            result.metallic.batch(), result.metallic.channels(), result.metallic.height(), result.metallic.width(),
+            result.roughness.batch(), result.roughness.channels(), result.roughness.height(), result.roughness.width());
+    }
+
+    result.success = true;
+    return result;
+}
+
+struct PreparedInputTensors {
+    Tensor diffuse;
+    Tensor normal;
+    Tensor diffuse_rgba;
+};
+
+static PreparedInputTensors PrepareInputTensors(const u8* diffuse_data, const u8* normal_data, u32 width, u32 height) {
+    PreparedInputTensors result;
+    result.diffuse_rgba = Tensor::FromImageData(diffuse_data, width, height, 4);
+    Tensor normal_rgba = Tensor::FromImageData(normal_data, width, height, 4);
+
+    const u32 H = result.diffuse_rgba.height();
+    const u32 W = result.diffuse_rgba.width();
+
+    result.diffuse = Tensor::Create(1, 3, H, W);
+    result.normal = Tensor::Create(1, 3, H, W);
+
+    for (u32 c = 0; c < 3; ++c) {
+        for (u32 i = 0; i < H * W; ++i) {
+            result.diffuse.data[c * H * W + i] = result.diffuse_rgba.data[c * H * W + i];
+        }
+    }
+
+    for (u32 i = 0; i < H * W; ++i) {
+        result.normal.data[0 * H * W + i] = normal_rgba.data[3 * H * W + i];
+        result.normal.data[1 * H * W + i] = normal_rgba.data[2 * H * W + i];
+        result.normal.data[2 * H * W + i] = normal_rgba.data[1 * H * W + i];
+    }
+
+    return result;
+}
+
 PBRPipelineOutputs PBRPipeline::Process(const u8* diffuse, const u8* normal, u32 width, u32 height) {
     PBRPipelineOutputs outputs;
 
@@ -1245,55 +1424,204 @@ PBRPipelineOutputs PBRPipeline::Process(const u8* diffuse, const u8* normal, u32
         return outputs;
     }
 
-    // Convert input images to tensors
-    // Note: DecompressDDS outputs RGBA8 (4 channels), so we read 4 then extract RGB
-    Tensor diffuse_rgba = Tensor::FromImageData(diffuse, width, height, 4);
-    Tensor normal_rgba = Tensor::FromImageData(normal, width, height, 4);
-
-    // Extract RGB channels
-    Tensor diffuse_tensor = Tensor::Create(1, 3, diffuse_rgba.height(), diffuse_rgba.width());
-    Tensor normal_tensor = Tensor::Create(1, 3, normal_rgba.height(), normal_rgba.width());
-
-    const u32 H = diffuse_rgba.height();
-    const u32 W = diffuse_rgba.width();
-
-    // Extract diffuse RGB (discard alpha - gloss channel)
-    for (u32 c = 0; c < 3; ++c) {
-        for (u32 i = 0; i < H * W; ++i) {
-            diffuse_tensor.data[c * H * W + i] = diffuse_rgba.data[c * H * W + i];
-        }
+    if (width < MIN_AI_RESOLUTION || height < MIN_AI_RESOLUTION) {
+        Msg("[PBRPipeline] %ux%u below minimum %u, skipping AI conversion", width, height, MIN_AI_RESOLUTION);
+        return outputs;
     }
 
-    // Swizzle X-Ray normal format to AI model format
-    // X-Ray format (RGBA): R=gloss, G=normalZ, B=normalY, A=normalX
-    // AI expects (RGB):    R=normalX, G=normalY, B=normalZ
-    for (u32 i = 0; i < H * W; ++i) {
-        normal_tensor.data[0 * H * W + i] = normal_rgba.data[3 * H * W + i];  // R ← A (normal X)
-        normal_tensor.data[1 * H * W + i] = normal_rgba.data[2 * H * W + i];  // G ← B (normal Y)
-        normal_tensor.data[2 * H * W + i] = normal_rgba.data[1 * H * W + i];  // B ← G (normal Z)
+    auto tensors = PrepareInputTensors(diffuse, normal, width, height);
+
+    const u32 H = tensors.diffuse.height();
+    const u32 W = tensors.diffuse.width();
+
+    if (!EnsureAllModelsLoaded(H, W)) {
+        Msg("! [PBRPipeline] Process: Failed to load models for %ux%u", W, H);
+        return outputs;
     }
 
-    // Stage 1: Albedo + Material Classification
-    auto stage1 = RunStage1(diffuse_tensor, normal_tensor);
+    auto t_stage1_start = std::chrono::high_resolution_clock::now();
+    auto stage1 = RunStage1(tensors.diffuse, tensors.normal);
+    auto t_stage1_end = std::chrono::high_resolution_clock::now();
     if (!stage1.success) {
         return outputs;
     }
 
-    // Stage 2: PBR Maps
-    auto stage2 = RunStage2(stage1.albedo, normal_tensor, stage1.material_logits, stage1.seg_features);
+    auto t_stage2_start = std::chrono::high_resolution_clock::now();
+    auto stage2 = RunStage2(stage1.albedo, tensors.normal, stage1.material_logits, stage1.seg_features);
+    auto t_stage2_end = std::chrono::high_resolution_clock::now();
     if (!stage2.success) {
         return outputs;
     }
 
-    // Pack results
+    auto stage1_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t_stage1_end - t_stage1_start).count();
+    auto stage2_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t_stage2_end - t_stage2_start).count();
+    Msg("[PBRPipeline] %ux%u inference: Stage1 %lldms, Stage2 %lldms, total %lldms",
+        W, H, stage1_ms, stage2_ms, stage1_ms + stage2_ms);
+
     outputs.albedo = std::move(stage1.albedo);
     outputs.metallic = std::move(stage2.metallic);
     outputs.roughness = std::move(stage2.roughness);
     outputs.ao = std::move(stage2.ao);
     outputs.parallax = std::move(stage2.parallax);
-    outputs.normal = normal_tensor;  // Passthrough
+    outputs.normal = std::move(tensors.normal);
     outputs.success = true;
 
+    return outputs;
+}
+
+void PBRPipeline::WarmupTRTEngines(const xr_vector<std::pair<u32, u32>>& dimensions) {
+    if (!initialized_) return;
+    if (dimensions.empty()) return;
+
+    struct ModelInfo {
+        const char* name;
+        const xr_string* path;
+        int profile_type;
+    };
+
+    const ModelInfo models[] = {
+        { "unet_albedo_uncond", &unet_albedo_uncond_path_, 0 },
+        { "segformer",          &segformer_path_,          1 },
+        { "unet_albedo",        &unet_albedo_path_,        2 },
+        { "unet_parallax",      &unet_parallax_path_,      3 },
+        { "unet_ao",            &unet_ao_path_,            3 },
+        { "unet_metallic",      &unet_metallic_path_,      4 },
+        { "unet_roughness",     &unet_roughness_path_,     4 },
+    };
+
+    Msg("[PBRPipeline] Warming up TRT engines for %zu resolutions, 7 models each...", dimensions.size());
+
+    for (const auto& [W, H] : dimensions) {
+        if (W < MIN_AI_RESOLUTION || H < MIN_AI_RESOLUTION) {
+            Msg("[PBRPipeline] Warmup: %ux%u below minimum %u, skipping", W, H, MIN_AI_RESOLUTION);
+            continue;
+        }
+
+        char res_cache[512];
+        FormatResCachePath(res_cache, sizeof(res_cache), trt_cache_path_.c_str(), W, H);
+
+        auto prof_uncond  = TRT_ProfileSingle("image", 6, H, W);
+        auto prof_seg     = TRT_ProfileSingle("input", 6, H, W);
+        auto prof_albedo  = TRT_ProfileWithFeatures("image", 6, H, W);
+        auto prof_5ch     = TRT_ProfileWithFeatures("image", 5, H, W);
+        auto prof_12ch    = TRT_ProfileWithFeatures("image", 12, H, W);
+
+        u32 cached_engine_count = 0;
+        try {
+            for (const auto& entry : std::filesystem::directory_iterator(res_cache)) {
+                if (entry.path().extension() == ".engine")
+                    ++cached_engine_count;
+            }
+        } catch (const std::filesystem::filesystem_error&) {
+        }
+
+        if (cached_engine_count >= 7) {
+            Msg("[PBRPipeline] Warmup: %ux%u already cached (%u .engine files), skipping", W, H, cached_engine_count);
+            continue;
+        }
+
+        Msg("[PBRPipeline] Warmup: %ux%u has %u/7 cached engines, building missing...", W, H, cached_engine_count);
+
+        for (const auto& model : models) {
+            const char* prof = nullptr;
+            switch (model.profile_type) {
+                case 0: prof = prof_uncond.c_str(); break;
+                case 1: prof = prof_seg.c_str();    break;
+                case 2: prof = prof_albedo.c_str(); break;
+                case 3: prof = prof_5ch.c_str();    break;
+                case 4: prof = prof_12ch.c_str();   break;
+            }
+
+            Msg("[PBRPipeline] Warmup: %s @ %ux%u", model.name, W, H);
+
+            ONNXModelRunner runner;
+            if (!runner.LoadModel(model.path->c_str(), config_.use_gpu, res_cache,
+                    prof, prof, prof)) {
+                Msg("! [PBRPipeline] Warmup failed: %s @ %ux%u", model.name, W, H);
+            }
+        }
+
+        Msg("[PBRPipeline] Warmup complete for %ux%u", W, H);
+    }
+
+    ResetAllCachedModels();
+
+    Msg("[PBRPipeline] TRT engine warmup complete for all resolutions");
+}
+
+bool PBRPipeline::NeedsSplitProcessing(u32 width, u32 height) const {
+    return (static_cast<u64>(width) * height) > VRAM_SPLIT_THRESHOLD;
+}
+
+PBRPipeline::Stage1Result PBRPipeline::ProcessStage1(const u8* diffuse, const u8* normal, u32 width, u32 height) {
+    Stage1Result result;
+
+    if (!initialized_) {
+        Msg("! [PBRPipeline] Pipeline not initialized");
+        return result;
+    }
+
+    if (width < MIN_AI_RESOLUTION || height < MIN_AI_RESOLUTION) {
+        Msg("[PBRPipeline] %ux%u below minimum %u, skipping AI conversion", width, height, MIN_AI_RESOLUTION);
+        return result;
+    }
+
+    auto tensors = PrepareInputTensors(diffuse, normal, width, height);
+
+    const u32 H = tensors.diffuse.height();
+    const u32 W = tensors.diffuse.width();
+
+    if (!EnsureStage1ModelsLoaded(H, W)) {
+        Msg("! [PBRPipeline] ProcessStage1: Failed to load Stage1 models for %ux%u", W, H);
+        return result;
+    }
+
+    auto stage1 = RunStage1(tensors.diffuse, tensors.normal);
+    if (!stage1.success)
+        return result;
+
+    result.albedo = std::move(stage1.albedo);
+    result.normal = std::move(tensors.normal);
+    result.material_logits = std::move(stage1.material_logits);
+    result.seg_features = std::move(stage1.seg_features);
+    result.diffuse_rgba_original = std::move(tensors.diffuse_rgba);
+    result.success = true;
+    return result;
+}
+
+PBRPipelineOutputs PBRPipeline::ProcessStage2(Stage1Result& stage1) {
+    PBRPipelineOutputs outputs;
+
+    if (!stage1.success) {
+        Msg("! [PBRPipeline] ProcessStage2: Stage1 result is invalid");
+        return outputs;
+    }
+
+    const u32 H = stage1.normal.height();
+    const u32 W = stage1.normal.width();
+
+    Stage2Outputs stage2;
+
+    if (NeedsSingleModelProcessing(W, H)) {
+        stage2 = RunStage2SingleModel(stage1.albedo, stage1.normal, stage1.material_logits, stage1.seg_features);
+    } else {
+        if (!EnsureStage2ModelsLoaded(H, W)) {
+            Msg("! [PBRPipeline] ProcessStage2: Failed to load Stage2 models for %ux%u", W, H);
+            return outputs;
+        }
+        stage2 = RunStage2(stage1.albedo, stage1.normal, stage1.material_logits, stage1.seg_features);
+    }
+
+    if (!stage2.success)
+        return outputs;
+
+    outputs.albedo = std::move(stage1.albedo);
+    outputs.metallic = std::move(stage2.metallic);
+    outputs.roughness = std::move(stage2.roughness);
+    outputs.ao = std::move(stage2.ao);
+    outputs.parallax = std::move(stage2.parallax);
+    outputs.normal = std::move(stage1.normal);
+    outputs.success = true;
     return outputs;
 }
 

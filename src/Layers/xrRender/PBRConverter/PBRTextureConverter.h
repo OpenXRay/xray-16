@@ -60,6 +60,9 @@ struct LegacyTextureAsset {
     bool has_gloss = false;
     bool has_normal = false;
 
+    u32 diffuse_width = 0;
+    u32 diffuse_height = 0;
+
     // For digest calculation (detect changes)
     std::int64_t total_size_bytes = 0;
     std::int64_t latest_modified_time = 0;

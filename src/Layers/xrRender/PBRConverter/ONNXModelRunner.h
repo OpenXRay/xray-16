@@ -88,7 +88,8 @@ public:
     // model_path: Absolute path to .onnx file (e.g., "$game_data$/ai_models/segformer.onnx")
     // use_gpu: Try to use DirectML (Windows) or CUDA (Linux) if available
     // trt_cache_path: Path to TensorRT engine cache directory (optional, uses current dir if empty)
-    bool LoadModel(const char* model_path, bool use_gpu = true, const char* trt_cache_path = "");
+    bool LoadModel(const char* model_path, bool use_gpu = true, const char* trt_cache_path = "",
+                   const char* trt_profile_min = nullptr, const char* trt_profile_max = nullptr, const char* trt_profile_opt = nullptr);
 
     // Check if model is loaded and ready
     bool IsLoaded() const;
@@ -210,40 +211,61 @@ public:
     //  INFERENCE
     // ═══════════════════════════════════════════════════════
 
-    // Process legacy textures → PBR outputs
-    // diffuse: RGB image [H, W, 3]
-    // normal: RGB normal map [H, W, 3] (XYZ format)
     PBRPipelineOutputs Process(const u8* diffuse, const u8* normal, u32 width, u32 height);
 
-    // Get model directory
+    struct Stage1Result {
+        Tensor albedo;
+        Tensor normal;
+        Tensor material_logits;
+        Tensor seg_features;
+        Tensor diffuse_rgba_original;
+        bool success = false;
+    };
+
+    Stage1Result ProcessStage1(const u8* diffuse, const u8* normal, u32 width, u32 height);
+    PBRPipelineOutputs ProcessStage2(Stage1Result& stage1);
+    bool NeedsSplitProcessing(u32 width, u32 height) const;
+    void WarmupTRTEngines(const xr_vector<std::pair<u32, u32>>& dimensions);
+
     xr_string GetModelDir() const { return config_.model_dir; }
 
 private:
     PBRPipelineConfig config_;
     bool initialized_ = false;
 
-    // Model paths (models loaded on-demand to save VRAM)
     xr_string segformer_path_;
     xr_string unet_albedo_path_;
-    xr_string unet_albedo_uncond_path_;  // Unconditional albedo model (first pass)
+    xr_string unet_albedo_uncond_path_;
     xr_string unet_parallax_path_;
     xr_string unet_ao_path_;
     xr_string unet_metallic_path_;
     xr_string unet_roughness_path_;
-
-    // TensorRT engine cache path
     xr_string trt_cache_path_;
 
-    // Helper: Stage 1 - Generate albedo + material features
+    ONNXModelRunner cached_unet_albedo_uncond_;
+    ONNXModelRunner cached_segformer_;
+    ONNXModelRunner cached_unet_albedo_;
+    ONNXModelRunner cached_unet_parallax_;
+    ONNXModelRunner cached_unet_ao_;
+    ONNXModelRunner cached_unet_metallic_;
+    ONNXModelRunner cached_unet_roughness_;
+    u32 cached_H_ = 0;
+    u32 cached_W_ = 0;
+
+    enum class LoadedStage { None, Stage1, Stage2, All };
+    LoadedStage loaded_stage_ = LoadedStage::None;
+
+    static constexpr u32 MIN_AI_RESOLUTION = 16;
+    static constexpr u32 VRAM_SPLIT_THRESHOLD = 512 * 1024;
+    static constexpr u32 VRAM_SINGLE_MODEL_THRESHOLD = 2048 * 1024;
+
     struct Stage1Outputs {
-        Tensor albedo;          // [1, 3, H, W]
-        Tensor material_logits; // [1, 6, H/4, W/4]
-        Tensor seg_features;    // [1, 512, H/16, W/16]
+        Tensor albedo;
+        Tensor material_logits;
+        Tensor seg_features;
         bool success = false;
     };
-    Stage1Outputs RunStage1(const Tensor& diffuse, const Tensor& normal);
 
-    // Helper: Stage 2 - Generate PBR maps
     struct Stage2Outputs {
         Tensor metallic;
         Tensor roughness;
@@ -251,12 +273,26 @@ private:
         Tensor parallax;
         bool success = false;
     };
+
+    void ResetAllCachedModels();
+    bool EnsureStage1ModelsLoaded(u32 H, u32 W);
+    bool EnsureStage2ModelsLoaded(u32 H, u32 W);
+    bool EnsureAllModelsLoaded(u32 H, u32 W);
+
+    Stage1Outputs RunStage1(const Tensor& diffuse, const Tensor& normal);
     Stage2Outputs RunStage2(
         const Tensor& albedo,
         const Tensor& normal,
         const Tensor& material_logits,
         const Tensor& seg_features
     );
+    Stage2Outputs RunStage2SingleModel(
+        const Tensor& albedo,
+        const Tensor& normal,
+        const Tensor& material_logits,
+        const Tensor& seg_features
+    );
+    bool NeedsSingleModelProcessing(u32 width, u32 height) const;
 };
 
 // ══════════════════════════════════════════════════════════
