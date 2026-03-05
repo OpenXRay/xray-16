@@ -27,12 +27,12 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;$(VULKAN_SDK)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)'!='Release Master Gold'">$(xrExternals)onnxruntime\include\onnxruntime\core\session;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;RENDER_NAMESPACE=render_r4;NVRHI_SHARED_LIBRARY_INCLUDE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;RENDER_NAMESPACE=render_r4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'!='Release Master Gold'">%(PreprocessorDefinitions);USE_AI_PBR</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;vulkan-1.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;nvrhi_vk.lib;vulkan-1.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -45,7 +45,7 @@
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;vulkan-1.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;nvrhi_vk.lib;vulkan-1.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
