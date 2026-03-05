@@ -334,6 +334,7 @@ public:
         xray::profiler::GPUProfiler* gpuProfiler = nullptr);
 
     void DestroyGPUBuffers();
+    void InvalidateShadersAndPipelines();
 
     bool CreatePerlin4DTexture(nvrhi::IDevice* device);
     bool LoadPerlin4DComputeShader(class framegraph::ShaderLoader* shaderLoader);

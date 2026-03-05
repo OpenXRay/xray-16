@@ -1413,6 +1413,47 @@ void FGDetailManager::DestroyGPUBuffers()
     cachedResourcesInitialized = false;
 }
 
+void FGDetailManager::InvalidateShadersAndPipelines()
+{
+    instanceGenComputeShader = nullptr;
+    instanceGenBindingLayout = nullptr;
+    instanceGenPipeline = nullptr;
+
+    slotCullComputeShader = nullptr;
+    slotCullBindingLayout = nullptr;
+    slotCullPipeline = nullptr;
+
+    cullComputeShader = nullptr;
+    computeBindingLayout = nullptr;
+    computePipeline = nullptr;
+
+    vertexShader = nullptr;
+    pixelShader = nullptr;
+    decalVertexShader = nullptr;
+    decalPixelShader = nullptr;
+    billboardVertexShader = nullptr;
+    billboardPixelShader = nullptr;
+
+    graphicsBindingLayout = nullptr;
+    decalBindingLayout = nullptr;
+    billboardBindingLayout = nullptr;
+    graphicsPipeline = nullptr;
+    decalGraphicsPipeline = nullptr;
+    billboardGraphicsPipeline = nullptr;
+
+    perlin4dComputeShader = nullptr;
+    perlin4dBindingLayout = nullptr;
+    perlin4dPipeline = nullptr;
+
+    prefixSumScanShader = nullptr;
+    prefixSumTopShader = nullptr;
+    prefixSumBindingLayout = nullptr;
+    prefixSumScanPipeline = nullptr;
+    prefixSumTopPipeline = nullptr;
+
+    m_instancesNeedRegeneration = true;
+}
+
 bool FGDetailManager::CreatePerlin4DTexture(nvrhi::IDevice* device)
 {
     if (!device)
