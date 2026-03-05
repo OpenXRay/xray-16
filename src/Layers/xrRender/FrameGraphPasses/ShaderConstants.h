@@ -190,6 +190,8 @@ struct SunLightData {
 };
 
 inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
+    const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
+
     cb.L_sun_color.set(
         sun.color.x * sun.intensity,
         sun.color.y * sun.intensity,
@@ -200,6 +202,18 @@ inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
         sun.direction.x,
         sun.direction.y,
         sun.direction.z
+    );
+
+    cb.L_ambient.set(
+        desc.ambient.x,
+        desc.ambient.y,
+        desc.ambient.z
+    );
+
+    cb.L_hemi_color.set(
+        desc.hemi_color.x,
+        desc.hemi_color.y,
+        desc.hemi_color.z
     );
 }
 
