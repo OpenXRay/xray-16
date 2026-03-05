@@ -223,43 +223,40 @@ inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity
     cb.hemi_cube_neg_faces.set(0.19919f, 0.00392f, 0.09922f, 0.0f);
 }
 
-// ══════════════════════════════════════════════════════════
-//  SUN CONSTANTS (HDR Lighting)
-// ══════════════════════════════════════════════════════════
-// Separate struct for sun data to be filled from RImplementation.Lights.sun
-
 struct SunLightData {
     Fvector color;      // Sun color (RGB)
     Fvector direction;  // Sun direction (world space, pointing toward light)
     float intensity;    // HDR intensity multiplier (1.0 = SDR, 2.0+ = HDR)
 };
 
-// Fill sun constants in StaticGlobals from sun light data
-// Call this AFTER FillGlobalConstants to override placeholder values
 inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
-    // Apply HDR intensity multiplier to sun color
-    // For true HDR, sun should be MUCH brighter than 1.0
-    // Real sun illuminance: ~100,000 lux
-    // Typical indoor: ~300-500 lux
-    // For now, use a moderate multiplier to get values > 1.0
+    const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
+
     cb.L_sun_color.set(
         sun.color.x * sun.intensity,
         sun.color.y * sun.intensity,
         sun.color.z * sun.intensity
     );
 
-    // Sun direction (world space)
-    // Vanilla passes sun_dir directly - it's the direction light travels (from sun toward scene)
-    // Shaders handle the negation internally for N.L calculations
     cb.L_sun_dir_w.set(
         sun.direction.x,
         sun.direction.y,
         sun.direction.z
     );
+
+    cb.L_ambient.set(
+        desc.ambient.x,
+        desc.ambient.y,
+        desc.ambient.z
+    );
+
+    cb.L_hemi_color.set(
+        desc.hemi_color.x,
+        desc.hemi_color.y,
+        desc.hemi_color.z
+    );
 }
 
-// Helper to extract sun data from an IRender_Light (call from pass setup)
-// Declaration only - implementation in ShaderConstants.cpp
 void GetSunLightData(SunLightData& outSun, float hdrIntensity = 2.0f);
 
 inline StaticGlobals BuildStaticGlobals(float hdrIntensity = 2.0f) {
