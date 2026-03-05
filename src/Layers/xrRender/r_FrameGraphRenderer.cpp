@@ -400,6 +400,9 @@ void FrameGraphRenderer::Render() {
                         passes::InitializeTonemapPass(m_device->GetNVRHIDevice(), m_passStates->tonemap);
                     }
 
+                    if (m_detailManager)
+                        m_detailManager->InvalidateShadersAndPipelines();
+
                     Msg("* Shader hot-reload complete");
                 }
             }
@@ -1083,38 +1086,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         // Lazy initialization - ShaderLoader isn't ready during FrameGraphRenderer::Initialize
         m_gpuCullingManager->Initialize(m_device);
 
-        if (m_detailManager) {
-            static bool detailShadersLoaded = false;
-            if (!detailShadersLoaded) {
-                auto* shaderLoader = GEnv.Render->GetShaderLoader();
-                m_detailManager->LoadCullComputeShader(shaderLoader);
-                m_detailManager->LoadInstanceGenShader(shaderLoader);
-                m_detailManager->LoadPrefixSumShaders(shaderLoader);
-                m_detailManager->LoadGraphicsShaders(shaderLoader);
+        if (m_detailManager && !m_detailManager->computePipeline) {
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            m_detailManager->LoadCullComputeShader(shaderLoader);
+            m_detailManager->LoadInstanceGenShader(shaderLoader);
+            m_detailManager->LoadPrefixSumShaders(shaderLoader);
+            m_detailManager->LoadGraphicsShaders(shaderLoader);
 
-                // Create compute pipelines now that shaders are loaded
-                if (!m_detailManager->computePipeline) {
-                    m_detailManager->CreateComputePipeline(m_device);
-                }
-                if (!m_detailManager->instanceGenPipeline) {
-                    m_detailManager->CreateInstanceGenPipeline(m_device);
-                }
-                if (!m_detailManager->prefixSumScanPipeline) {
-                    m_detailManager->CreatePrefixSumPipeline(m_device);
-                }
+            m_detailManager->CreateComputePipeline(m_device);
+            m_detailManager->CreateInstanceGenPipeline(m_device);
+            m_detailManager->CreatePrefixSumPipeline(m_device);
 
-                // Initialize Perlin4D noise texture + compute shader
-                if (!m_detailManager->perlin4dTexture) {
-                    m_detailManager->CreatePerlin4DTexture(m_device->GetNVRHIDevice());
-                }
-                if (!m_detailManager->perlin4dComputeShader) {
-                    m_detailManager->LoadPerlin4DComputeShader(shaderLoader);
-                }
-                if (!m_detailManager->perlin4dPipeline && m_detailManager->perlin4dComputeShader) {
-                    m_detailManager->CreatePerlin4DPipeline(m_device->GetNVRHIDevice());
-                }
-
-                detailShadersLoaded = true;
+            if (!m_detailManager->perlin4dTexture) {
+                m_detailManager->CreatePerlin4DTexture(m_device->GetNVRHIDevice());
+            }
+            m_detailManager->LoadPerlin4DComputeShader(shaderLoader);
+            if (m_detailManager->perlin4dComputeShader) {
+                m_detailManager->CreatePerlin4DPipeline(m_device->GetNVRHIDevice());
             }
         }
 
