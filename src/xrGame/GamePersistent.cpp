@@ -126,9 +126,10 @@ void CGamePersistent::OnAppStart()
 
     inherited::OnAppStart();
 
-    // Phase 2.5.3: PBR texture conversion (call via render interface)
+#ifndef MASTER_GOLD
     if (GEnv.Render)
         GEnv.Render->ConvertLegacyAssetsToPBR();
+#endif
 
 #ifdef XR_PLATFORM_WINDOWS
     ansel = xr_new<AnselManager>();
