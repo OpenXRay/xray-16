@@ -150,10 +150,19 @@ v2p_billboard main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceI
 	float hemi = abs(slot_hemi);
 	float sun = sign(slot_hemi) * 0.25 + 0.25;
 
-	float3 blade_facing = float3(sin(rotation), 0, cos(rotation));
-	float3 N = normalize(cross(float3(0, 1, 0), blade_facing));
-	if (N.y < 0) N = -N;
-	N = normalize(lerp(float3(0, 1, 0), N, 0.5));
+	uint triBase = (vertex_id / 3) * 3;
+	PulledVertex v0 = pulled_vertices[mdl.pulledVertexBase + triBase];
+	PulledVertex v1 = pulled_vertices[mdl.pulledVertexBase + triBase + 1];
+	PulledVertex v2 = pulled_vertices[mdl.pulledVertexBase + triBase + 2];
+	float3 e1 = float3(v1.px - v0.px, v1.py - v0.py, v1.pz - v0.pz);
+	float3 e2 = float3(v2.px - v0.px, v2.py - v0.py, v2.pz - v0.pz);
+	float3 faceN = cross(e1, e2);
+	float len = length(faceN);
+	faceN = (len > 0.001) ? (faceN / len) : float3(0, 1, 0);
+	float3 N;
+	N.x = faceN.x * c - faceN.z * s;
+	N.y = faceN.y;
+	N.z = faceN.x * s + faceN.z * c;
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh = float4(uv, hemi, sun);
