@@ -61,7 +61,7 @@ void CObjectFactory::init_spawn_data()
             cpcstr npc_random = pSettings->read_if_exists<pcstr>(name, "npc_random", "");
             _GetItem(npc ? npc : npc_random, 0, temp);
 
-            if (!temp.empty())
+            if (!temp.empty() && pSettings->line_exist(temp.c_str(), "class"))
             {
                 const auto npc_clsid    = pSettings->r_clsid(temp.c_str(), "class");
                 const auto npc_kind     = pSettings->read_if_exists<pcstr>(temp.c_str(), "kind", nullptr);
