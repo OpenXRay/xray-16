@@ -4,7 +4,6 @@
 // subdivided ribbon with camera-facing width. No input layout needed.
 #define SM_6_0
 #include "common.h"
-#include "bindless_common.h"
 
 // ═══════════════════════════════════════════════════════
 //  Control point data (uploaded from CPU per group)

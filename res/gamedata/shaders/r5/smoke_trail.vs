@@ -5,7 +5,6 @@
 // Turbulence displacement via Perlin4D 3D volume texture.
 #define SM_6_0
 #include "common.h"
-#include "bindless_common.h"
 
 // ═══════════════════════════════════════════════════════
 //  Control point data (from smoke_trail_compact.cs)

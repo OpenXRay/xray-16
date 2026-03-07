@@ -1,6 +1,5 @@
 #define SM_6_0
 #include "common.h"
-#include "bindless_common.h"
 
 struct InstanceData
 {

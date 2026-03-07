@@ -5,7 +5,6 @@
 // Parallel to ribbon.vs (which implements ShapeBuilderRibbon).
 #define SM_6_0
 #include "common.h"
-#include "bindless_common.h"
 // noise4d.h no longer needed — turbulence sampled from perlin4d 3D volume texture
 
 // ═══════════════════════════════════════════════════════
