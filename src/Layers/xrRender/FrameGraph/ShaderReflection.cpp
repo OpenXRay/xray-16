@@ -1,7 +1,6 @@
-// xrRender/FrameGraph/ShaderReflection.cpp
 #include "stdafx.h"
 #include "ShaderReflection.h"
-#include "ShaderCache.h"  // For ExtractedReflection definition
+#include "ShaderCache.h"
 #include "Layers/xrRender/Shaders/SlangReflectionWrapper.h"
 #include <slang.h>
 
@@ -1060,10 +1059,6 @@ xr_vector<const char*> ShaderReflector::GetPhaseRTNames(RenderPhase phase) {
     }
 }
 
-// ═══════════════════════════════════════════════════
-//  EXTRACT REFLECTION (NEW UNIFIED API)
-// ═══════════════════════════════════════════════════
-
 ExtractedReflection ShaderReflector::ExtractReflection(
     slang::ShaderReflection* slangReflection,
     bool isVertexShader)
@@ -1075,7 +1070,6 @@ ExtractedReflection ShaderReflector::ExtractReflection(
         return result;
     }
 
-    // Extract all reflection data using existing Analyze methods
     if (isVertexShader)
     {
         result.vertexInputSignature = AnalyzeVertexShader(slangReflection);
@@ -1085,8 +1079,6 @@ ExtractedReflection ShaderReflector::ExtractReflection(
         result.rtBindings = AnalyzePixelShader(slangReflection);
     }
 
-    // Extract full constant layout (CB + per-constant metadata)
-    // This includes implicit $Globals CB for loose uniforms
     result.constantLayout = AnalyzeConstantLayout(slangReflection);
 
     return result;

@@ -997,6 +997,7 @@
     <ClInclude Include="..\xrRender\Backend\D3D11BackendWrapper.h" />
     <ClInclude Include="..\xrRender\FrameGraph\PassResourceCache.h" />
     <ClInclude Include="..\xrRender\FrameGraph\BindingLayoutBuilder.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\BindingSetBuilder.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ResourceShape.h" />
     <ClInclude Include="..\xrRender\FGDetailManager.h">
       <Filter>Framegraph</Filter>
@@ -1852,6 +1853,7 @@
     <ClCompile Include="..\xrRender\Backend\D3D11BackendWrapper.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\PassResourceCache.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\BindingLayoutBuilder.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\BindingSetBuilder.cpp" />
     <ClCompile Include="..\xrRender\FGDetailManager.cpp">
       <Filter>Framegraph</Filter>
     </ClCompile>

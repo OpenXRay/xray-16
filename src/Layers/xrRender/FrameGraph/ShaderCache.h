@@ -14,11 +14,10 @@ struct ExtractedReflection
 {
     VertexInputSignature vertexInputSignature;
     ShaderRTBindings rtBindings;
-    ShaderConstantLayout constantLayout;  // Full layout: CB metadata + per-constant data
+    ShaderConstantLayout constantLayout;
 
     ExtractedReflection() = default;
 
-    /// Check if this reflection has any data
     bool IsEmpty() const {
         return vertexInputSignature.elements.empty() &&
                constantLayout.constantBuffers.buffers.empty() &&
@@ -132,7 +131,7 @@ private:
         ExtractedReflection& outReflection
     );
 
-    static constexpr u32 CACHE_VERSION = 5;
+    static constexpr u32 CACHE_VERSION = 6;
     Stats m_stats;
     bool m_cacheEnabled;
     xr_string m_backendSubdir;

@@ -293,11 +293,11 @@ void ShaderCache::SerializeReflection(IWriter* writer, const ExtractedReflection
     // Depth output
     writer->w_u8(reflection.rtBindings.hasDepthOutput ? 1 : 0);
 
-    // Shader name
     u32 shaderNameLen = reflection.rtBindings.shaderName.size();
     writer->w_u32(shaderNameLen);
     if (shaderNameLen > 0)
         writer->w(reflection.rtBindings.shaderName.c_str(), shaderNameLen);
+
 }
 
 bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& outReflection)
@@ -468,7 +468,6 @@ bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& ou
         // Depth output
         outReflection.rtBindings.hasDepthOutput = reader->r_u8() != 0;
 
-        // Shader name
         u32 shaderNameLen = reader->r_u32();
         if (shaderNameLen > 0)
         {

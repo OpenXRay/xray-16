@@ -319,16 +319,13 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     // ═══════════════════════════════════════════════════
     result.bytecode = std::move(compileResult.bytecode);
 
-    // Extract reflection from Slang for storage and caching
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,
-        true  // isVertexShader
+        true
     );
 
-    // Store extracted reflection in result
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
-    // Save bytecode + reflection to disk cache
     m_cache.Save(name, ".vs", sourceHash, result.bytecode, &extractedReflection);
 
     // Cache handle and reflection for future calls
@@ -456,16 +453,13 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     // ═══════════════════════════════════════════════════
     result.bytecode = std::move(compileResult.bytecode);
 
-    // Extract reflection from Slang for storage and caching
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,
-        false  // isVertexShader (this is pixel shader)
+        false
     );
 
-    // Store extracted reflection in result
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
-    // Save bytecode + reflection to disk cache
     m_cache.Save(name, ".ps", sourceHash, result.bytecode, &extractedReflection);
 
     // Cache handle and reflection for future calls
@@ -605,16 +599,13 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     // ═══════════════════════════════════════════════════
     result.bytecode = std::move(compileResult.bytecode);
 
-    // Extract reflection from Slang for storage and caching
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,
-        false  // isVertexShader (this is compute shader)
+        false
     );
 
-    // Store extracted reflection in result
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
-    // Save bytecode + reflection to disk cache
     m_cache.Save(diskCacheName.c_str(), ".cs", sourceHash, result.bytecode, &extractedReflection);
 
     // Cache handle and reflection for future calls
@@ -723,7 +714,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
 
     result.bytecode = std::move(compileResult.bytecode);
 
-    auto extractedReflection = ShaderReflector::ExtractReflection(compileResult.reflection, false);
+    auto extractedReflection = ShaderReflector::ExtractReflection(
+        compileResult.reflection, false);
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
     m_cache.Save(name, ".as", sourceHash, result.bytecode, &extractedReflection);
@@ -832,7 +824,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
 
     result.bytecode = std::move(compileResult.bytecode);
 
-    auto extractedReflection = ShaderReflector::ExtractReflection(compileResult.reflection, false);
+    auto extractedReflection = ShaderReflector::ExtractReflection(
+        compileResult.reflection, false);
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
     m_cache.Save(name, ".ms", sourceHash, result.bytecode, &extractedReflection);
@@ -948,7 +941,6 @@ bool ShaderLoader::CompileShaderWithDefines(
         return false;
     }
 
-    // Extract reflection
     bool isVertexShader = (strcmp(extension, ".vs") == 0);
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,

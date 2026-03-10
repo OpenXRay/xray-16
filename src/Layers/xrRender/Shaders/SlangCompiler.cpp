@@ -136,7 +136,7 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     sessionOptions[0].value = {slang::CompilerOptionValueKind::Int, 1, 0};
 
     sessionOptions[1].name = slang::CompilerOptionName::PreserveParameters;
-    sessionOptions[1].value = {slang::CompilerOptionValueKind::Int, 1, 0};
+    sessionOptions[1].value = {slang::CompilerOptionValueKind::Int, 0, 0};
 
     sessionOptions[2].name = slang::CompilerOptionName::DebugInformation;
 #ifdef DEBUG

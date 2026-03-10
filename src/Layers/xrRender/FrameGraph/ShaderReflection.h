@@ -388,7 +388,6 @@ public:
     //  REFLECTION EXTRACTION (from live Slang compilation)
     // ═══════════════════════════════════════════════════
 
-    // Extract full reflection data from Slang (call once after compilation)
     static ExtractedReflection ExtractReflection(
         slang::ShaderReflection* slangReflection,
         bool isVertexShader);
@@ -434,7 +433,6 @@ private:
     // Helper: Infer constant persistence (static vs volatile) from CB name and frequency
     static ConstantPersistence InferConstantPersistence(const char* cbName, UpdateFrequency frequency);
 
-    // Helper: check if texture name matches pattern
     static bool MatchesPattern(const char* name, const char* pattern);
 };
 
