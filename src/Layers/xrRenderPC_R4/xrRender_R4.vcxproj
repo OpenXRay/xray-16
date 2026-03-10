@@ -330,6 +330,7 @@
     <ClInclude Include="..\xrRender\FrameGraph\FrameGraph.h" />
     <ClInclude Include="..\xrRender\FrameGraph\PassResourceCache.h" />
     <ClInclude Include="..\xrRender\FrameGraph\BindingLayoutBuilder.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\BindingSetBuilder.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ResourceShape.h" />
     <ClInclude Include="..\xrRender\FrameGraph\FGTest.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ShaderLoader.h" />
@@ -692,6 +693,7 @@
     <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\PassResourceCache.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\BindingLayoutBuilder.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\BindingSetBuilder.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\ShaderReflection.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\ShaderLoader.cpp" />

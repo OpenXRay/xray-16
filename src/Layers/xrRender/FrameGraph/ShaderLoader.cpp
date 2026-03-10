@@ -633,7 +633,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
 
     result.bytecode = std::move(compileResult.bytecode);
 
-    auto extractedReflection = ShaderReflector::ExtractReflection(compileResult.reflection, false);
+    auto extractedReflection = ShaderReflector::ExtractReflection(
+        compileResult.reflection, false);
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
     m_cache.Save(name, ".as", sourceHash, result.bytecode, &extractedReflection);
@@ -733,7 +734,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
 
     result.bytecode = std::move(compileResult.bytecode);
 
-    auto extractedReflection = ShaderReflector::ExtractReflection(compileResult.reflection, false);
+    auto extractedReflection = ShaderReflector::ExtractReflection(
+        compileResult.reflection, false);
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
     m_cache.Save(name, ".ms", sourceHash, result.bytecode, &extractedReflection);

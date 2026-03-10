@@ -260,6 +260,7 @@ void ShaderCache::SerializeReflection(IWriter* writer, const ExtractedReflection
     writer->w_u32(shaderNameLen);
     if (shaderNameLen > 0)
         writer->w(reflection.rtBindings.shaderName.c_str(), shaderNameLen);
+
 }
 
 bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& outReflection)
