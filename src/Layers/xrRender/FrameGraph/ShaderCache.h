@@ -24,6 +24,7 @@ struct ExtractedReflection
                constantLayout.constantBuffers.buffers.empty() &&
                rtBindings.inputTextures.empty() &&
                rtBindings.samplers.empty() &&
+               rtBindings.uavBindings.empty() &&
                rtBindings.outputRTs.empty();
     }
 };
@@ -131,7 +132,7 @@ private:
         ExtractedReflection& outReflection
     );
 
-    static constexpr u32 CACHE_VERSION = 4;
+    static constexpr u32 CACHE_VERSION = 5;
     Stats m_stats;
     bool m_cacheEnabled;
     xr_string m_backendSubdir;

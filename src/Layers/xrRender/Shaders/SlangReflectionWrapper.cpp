@@ -98,6 +98,27 @@ ShaderConstant::Type DetectConstantType(
     }
 }
 
+ResourceShape ClassifyResourceShape(slang::VariableLayoutReflection* param)
+{
+    auto* typeLayout = param->getTypeLayout();
+    if (!typeLayout) return ResourceShape::Unknown;
+    auto* type = typeLayout->getType();
+    if (!type) return ResourceShape::Unknown;
+
+    auto baseShape = type->getResourceShape() & SLANG_RESOURCE_BASE_SHAPE_MASK;
+    switch (baseShape) {
+    case SLANG_STRUCTURED_BUFFER:       return ResourceShape::StructuredBuffer;
+    case SLANG_BYTE_ADDRESS_BUFFER:     return ResourceShape::RawBuffer;
+    case SLANG_ACCELERATION_STRUCTURE:  return ResourceShape::AccelStruct;
+    case SLANG_TEXTURE_1D:
+    case SLANG_TEXTURE_2D:
+    case SLANG_TEXTURE_3D:
+    case SLANG_TEXTURE_CUBE:
+    case SLANG_TEXTURE_BUFFER:          return ResourceShape::Texture;
+    default:                            return ResourceShape::Unknown;
+    }
+}
+
 } // anonymous namespace
 
 namespace xray::render
@@ -154,6 +175,7 @@ xr_vector<SlangReflectionWrapper::TextureInfo> SlangReflectionWrapper::GetTextur
         info.name = param->getName();
         info.slot = static_cast<u32>(param->getOffset(slang::ParameterCategory::ShaderResource));
         info.space = static_cast<u32>(param->getBindingSpace(slang::ParameterCategory::ShaderResource));
+        info.shape = ClassifyResourceShape(param);
 
         result.push_back(info);
     });
@@ -188,6 +210,7 @@ xr_vector<SlangReflectionWrapper::UAVInfo> SlangReflectionWrapper::GetUAVs() con
         info.name = param->getName();
         info.slot = static_cast<u32>(param->getOffset(slang::ParameterCategory::UnorderedAccess));
         info.space = static_cast<u32>(param->getBindingSpace(slang::ParameterCategory::UnorderedAccess));
+        info.shape = ClassifyResourceShape(param);
 
         result.push_back(info);
     });

@@ -8,6 +8,8 @@
 
 namespace xray::render::framegraph {
 
+struct ExtractedReflection;
+
 // ═══════════════════════════════════════════════════════════════════════════════
 //  PASS RESOURCE CACHE
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -39,12 +41,36 @@ public:
         nvrhi::IDevice* device);
 
     // ═══════════════════════════════════════════════════════
+    //  COMMON SAMPLERS (shared across all passes)
+    // ═══════════════════════════════════════════════════════
+    nvrhi::ISampler* GetAnisoWrapSampler(nvrhi::IDevice* device);
+    nvrhi::ISampler* GetLinearWrapSampler(nvrhi::IDevice* device);
+    nvrhi::ISampler* GetLinearClampSampler(nvrhi::IDevice* device);
+    nvrhi::ISampler* GetPointClampSampler(nvrhi::IDevice* device);
+    nvrhi::ISampler* GetShadowCmpSampler(nvrhi::IDevice* device);
+    nvrhi::ITexture* GetDummyShadowMap(nvrhi::IDevice* device);
+    nvrhi::ITexture* GetDummyShadowMap2D(nvrhi::IDevice* device);
+
+    nvrhi::ISampler* GetSamplerByName(const char* smpName, nvrhi::IDevice* device);
+
+    // ═══════════════════════════════════════════════════════
     //  BINDING LAYOUT CACHE
     // ═══════════════════════════════════════════════════════
     // Layouts are immutable - cache by pass name
     nvrhi::BindingLayoutHandle GetOrCreateBindingLayout(
         const char* passName,
         const nvrhi::BindingLayoutDesc& desc,
+        nvrhi::IDevice* device);
+
+    nvrhi::BindingLayoutHandle GetOrCreateBindingLayoutFromReflection(
+        const char* passName,
+        const ExtractedReflection& csReflection,
+        nvrhi::IDevice* device);
+
+    nvrhi::BindingLayoutHandle GetOrCreateBindingLayoutFromReflection(
+        const char* passName,
+        const ExtractedReflection& vsReflection,
+        const ExtractedReflection& psReflection,
         nvrhi::IDevice* device);
 
     // ═══════════════════════════════════════════════════════

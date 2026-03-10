@@ -2,6 +2,8 @@
 // Implementation of centralized pass resource caching
 #include "stdafx.h"
 #include "PassResourceCache.h"
+#include "BindingLayoutBuilder.h"
+#include "ShaderCache.h"
 
 namespace xray::render::framegraph {
 
@@ -67,6 +69,107 @@ nvrhi::SamplerHandle PassResourceCache::GetOrCreateSampler(
     return sampler;
 }
 
+nvrhi::ISampler* PassResourceCache::GetAnisoWrapSampler(nvrhi::IDevice* device) {
+    if (!m_commonAnisoWrap) {
+        nvrhi::SamplerDesc desc;
+        desc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
+        desc.setAllFilters(true);
+        desc.setMaxAnisotropy(16.0f);
+        m_commonAnisoWrap = device->createSampler(desc);
+    }
+    return m_commonAnisoWrap;
+}
+
+nvrhi::ISampler* PassResourceCache::GetLinearWrapSampler(nvrhi::IDevice* device) {
+    if (!m_commonLinearWrap) {
+        nvrhi::SamplerDesc desc;
+        desc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
+        desc.setAllFilters(true);
+        m_commonLinearWrap = device->createSampler(desc);
+    }
+    return m_commonLinearWrap;
+}
+
+nvrhi::ISampler* PassResourceCache::GetLinearClampSampler(nvrhi::IDevice* device) {
+    if (!m_commonLinearClamp) {
+        nvrhi::SamplerDesc desc;
+        desc.setAllAddressModes(nvrhi::SamplerAddressMode::ClampToEdge);
+        desc.setAllFilters(true);
+        m_commonLinearClamp = device->createSampler(desc);
+    }
+    return m_commonLinearClamp;
+}
+
+nvrhi::ISampler* PassResourceCache::GetPointClampSampler(nvrhi::IDevice* device) {
+    if (!m_commonPointClamp) {
+        nvrhi::SamplerDesc desc;
+        desc.setAllAddressModes(nvrhi::SamplerAddressMode::ClampToEdge);
+        desc.setAllFilters(false);
+        m_commonPointClamp = device->createSampler(desc);
+    }
+    return m_commonPointClamp;
+}
+
+nvrhi::ISampler* PassResourceCache::GetShadowCmpSampler(nvrhi::IDevice* device) {
+    if (!m_commonShadowCmp) {
+        nvrhi::SamplerDesc desc;
+        desc.reductionType = nvrhi::SamplerReductionType::Comparison;
+        desc.minFilter = true;
+        desc.magFilter = true;
+        desc.mipFilter = false;
+        desc.addressU = nvrhi::SamplerAddressMode::Border;
+        desc.addressV = nvrhi::SamplerAddressMode::Border;
+        desc.addressW = nvrhi::SamplerAddressMode::Border;
+        desc.borderColor = nvrhi::Color(1.0f);
+        m_commonShadowCmp = device->createSampler(desc);
+    }
+    return m_commonShadowCmp;
+}
+
+nvrhi::ITexture* PassResourceCache::GetDummyShadowMap(nvrhi::IDevice* device) {
+    if (!m_dummyShadowMap) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.arraySize = 3;
+        desc.format = nvrhi::Format::D32;
+        desc.debugName = "DummyShadowMap";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.dimension = nvrhi::TextureDimension::Texture2DArray;
+        m_dummyShadowMap = device->createTexture(desc);
+    }
+    return m_dummyShadowMap;
+}
+
+nvrhi::ITexture* PassResourceCache::GetDummyShadowMap2D(nvrhi::IDevice* device) {
+    if (!m_dummyShadowMap2D) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.format = nvrhi::Format::D32;
+        desc.debugName = "DummyShadowMap2D";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.dimension = nvrhi::TextureDimension::Texture2D;
+        m_dummyShadowMap2D = device->createTexture(desc);
+    }
+    return m_dummyShadowMap2D;
+}
+
+nvrhi::ISampler* PassResourceCache::GetSamplerByName(const char* smpName, nvrhi::IDevice* device)
+{
+    if (strstr(smpName, "smp_nofilter") || strstr(smpName, "smp_smap") || strstr(smpName, "smp_jitter"))
+        return GetPointClampSampler(device);
+    if (strstr(smpName, "smp_rtlinear"))
+        return GetLinearClampSampler(device);
+    if (strstr(smpName, "smp_base") || strstr(smpName, "smp_material") || strstr(smpName, "smp_bump"))
+        return GetAnisoWrapSampler(device);
+    if (strstr(smpName, "smp_shadowcmp"))
+        return GetShadowCmpSampler(device);
+    return GetLinearWrapSampler(device);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 //  BINDING LAYOUT CACHE
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -91,6 +194,25 @@ nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayout(
         m_bindingLayouts[key] = layout;
     }
     return layout;
+}
+
+nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayoutFromReflection(
+    const char* passName,
+    const ExtractedReflection& csReflection,
+    nvrhi::IDevice* device)
+{
+    auto desc = BindingLayoutBuilder::Build(csReflection, nvrhi::ShaderType::Compute);
+    return GetOrCreateBindingLayout(passName, desc, device);
+}
+
+nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayoutFromReflection(
+    const char* passName,
+    const ExtractedReflection& vsReflection,
+    const ExtractedReflection& psReflection,
+    nvrhi::IDevice* device)
+{
+    auto desc = BindingLayoutBuilder::Build(vsReflection, psReflection);
+    return GetOrCreateBindingLayout(passName, desc, device);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

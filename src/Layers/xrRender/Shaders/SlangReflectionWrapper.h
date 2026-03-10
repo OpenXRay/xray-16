@@ -3,55 +3,45 @@
 #include <slang.h>
 #include "xrCore/xrstring.h"
 
+#include "Layers/xrRender/FrameGraph/ResourceShape.h"
+
 namespace xray::render
 {
 
-/// <summary>
-/// Wrapper around Slang reflection API to extract shader resource information
-/// Provides a clean interface to query constant buffers, textures, and samplers
-/// </summary>
+using framegraph::ResourceShape;
+
 class SlangReflectionWrapper
 {
 public:
-    /// <summary>
-    /// Constant buffer information
-    /// </summary>
     struct CBInfo
     {
         const char* name;
-        u32 slot;        // Register number (b0, b1, b2, etc.)
-        u32 space;       // Register space (for DX12/Vulkan descriptor sets)
-        u32 size;        // Size in bytes
+        u32 slot;
+        u32 space;
+        u32 size;
     };
 
-    /// <summary>
-    /// Texture/Structured Buffer information (SRV)
-    /// </summary>
     struct TextureInfo
     {
         const char* name;
-        u32 slot;        // Register number (t0, t1, t2, etc.)
-        u32 space;       // Register space
+        u32 slot;
+        u32 space;
+        ResourceShape shape = ResourceShape::Texture;
     };
 
-    /// <summary>
-    /// Sampler information
-    /// </summary>
     struct SamplerInfo
     {
         const char* name;
-        u32 slot;        // Register number (s0, s1, s2, etc.)
-        u32 space;       // Register space
+        u32 slot;
+        u32 space;
     };
 
-    /// <summary>
-    /// UAV (Unordered Access View) information
-    /// </summary>
     struct UAVInfo
     {
         const char* name;
-        u32 slot;        // Register number (u0, u1, u2, etc.)
-        u32 space;       // Register space
+        u32 slot;
+        u32 space;
+        ResourceShape shape = ResourceShape::Unknown;
     };
 
 public:

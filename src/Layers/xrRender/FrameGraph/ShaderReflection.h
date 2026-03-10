@@ -1,8 +1,8 @@
 #pragma once
 
 #include "xrCore/xrstring.h"
+#include "ResourceShape.h"
 
-// Forward declarations for Slang reflection
 namespace slang {
     struct ShaderReflection;
 }
@@ -54,15 +54,26 @@ struct VertexInputSignature {
 struct ShaderRTBindings {
     RenderPhase phase = RenderPhase::Custom;
 
-    // ─── Input Textures (SRVs) ───
     struct InputTexture {
-        shared_str name;       // "s_position", "s_normal", etc.
-        u32 slot;              // Texture slot (t0, t1, ...)
+        shared_str name;
+        u32 slot;
+        ResourceShape shape = ResourceShape::Texture;
 
         InputTexture() : slot(0) {}
         InputTexture(const char* n, u32 s) : name(n), slot(s) {}
+        InputTexture(const char* n, u32 s, ResourceShape sh) : name(n), slot(s), shape(sh) {}
     };
     xr_vector<InputTexture> inputTextures;
+
+    struct UAVBinding {
+        shared_str name;
+        u32 slot;
+        ResourceShape shape = ResourceShape::Unknown;
+
+        UAVBinding() : slot(0) {}
+        UAVBinding(const char* n, u32 s, ResourceShape sh) : name(n), slot(s), shape(sh) {}
+    };
+    xr_vector<UAVBinding> uavBindings;
 
     // ─── Samplers ───
     struct Sampler {

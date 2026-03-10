@@ -1,0 +1,13 @@
+#pragma once
+
+namespace xray::render::framegraph {
+
+enum class ResourceShape : u8 {
+    Texture,
+    StructuredBuffer,
+    RawBuffer,
+    AccelStruct,
+    Unknown
+};
+
+}

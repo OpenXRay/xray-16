@@ -252,6 +252,18 @@ void ShaderCache::SerializeReflection(IWriter* writer, const ExtractedReflection
         if (nameLen > 0)
             writer->w(tex.name.c_str(), nameLen);
         writer->w_u32(tex.slot);
+        writer->w_u8(static_cast<u8>(tex.shape));
+    }
+
+    writer->w_u32(static_cast<u32>(reflection.rtBindings.uavBindings.size()));
+    for (const auto& uav : reflection.rtBindings.uavBindings)
+    {
+        u32 nameLen = uav.name.size();
+        writer->w_u32(nameLen);
+        if (nameLen > 0)
+            writer->w(uav.name.c_str(), nameLen);
+        writer->w_u32(uav.slot);
+        writer->w_u8(static_cast<u8>(uav.shape));
     }
 
     // Samplers
@@ -394,6 +406,25 @@ bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& ou
                 tex.name = name.c_str();
             }
             tex.slot = reader->r_u32();
+            tex.shape = static_cast<ResourceShape>(reader->r_u8());
+        }
+
+        u32 uavCount = reader->r_u32();
+        outReflection.rtBindings.uavBindings.resize(uavCount);
+        for (u32 i = 0; i < uavCount; ++i)
+        {
+            auto& uav = outReflection.rtBindings.uavBindings[i];
+
+            u32 nameLen = reader->r_u32();
+            if (nameLen > 0)
+            {
+                xr_string name;
+                name.resize(nameLen);
+                reader->r(&name[0], nameLen);
+                uav.name = name.c_str();
+            }
+            uav.slot = reader->r_u32();
+            uav.shape = static_cast<ResourceShape>(reader->r_u8());
         }
 
         // Samplers
