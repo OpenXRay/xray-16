@@ -662,6 +662,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
                 desc.byteSize = sizeof(u32);
                 desc.canHaveUAVs = true;
                 desc.canHaveRawViews = true;
+                desc.isDrawIndirectArgs = true;
                 desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
                 desc.keepInitialState = true;
 
@@ -773,6 +774,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
         desc.byteSize = sizeof(u32);
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = true;
 
@@ -879,6 +881,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
         desc.byteSize = sizeof(u32);
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = true;
         m_transparentSet.compactCountBuffer = nvDevice->createBuffer(desc);

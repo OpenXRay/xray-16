@@ -10,6 +10,15 @@ namespace slang {
 
 namespace xray::render::framegraph {
 
+struct VulkanBindShifts {
+    u32 shaderResource = 0;
+    u32 sampler = 0;
+    u32 constantBuffer = 0;
+    u32 unorderedAccess = 0;
+
+    bool HasShifts() const { return shaderResource || sampler || constantBuffer || unorderedAccess; }
+};
+
 enum class RenderPhase {
     Geometry,
     Lighting,
@@ -290,7 +299,8 @@ public:
     static ExtractedReflection ExtractReflection(
         slang::ShaderReflection* slangReflection,
         slang::IComponentType* linkedProgram,
-        bool isVertexShader);
+        bool isVertexShader,
+        VulkanBindShifts vkShifts = {});
 
     static const VertexInputSignature& GetVertexInputSignature(
         const ExtractedReflection* reflection);

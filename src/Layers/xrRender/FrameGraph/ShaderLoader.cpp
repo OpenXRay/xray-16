@@ -289,7 +289,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,
         compileResult.linkedProgram,
-        true
+        true,
+        compileResult.vkShifts
     );
 
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
@@ -408,7 +409,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,
         compileResult.linkedProgram,
-        false
+        false,
+        compileResult.vkShifts
     );
 
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
@@ -533,7 +535,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,
         compileResult.linkedProgram,
-        false
+        false,
+        compileResult.vkShifts
     );
 
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
@@ -637,7 +640,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
     result.bytecode = std::move(compileResult.bytecode);
 
     auto extractedReflection = ShaderReflector::ExtractReflection(
-        compileResult.reflection, compileResult.linkedProgram, false);
+        compileResult.reflection, compileResult.linkedProgram, false, compileResult.vkShifts);
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
     m_cache.Save(name, ".as", sourceHash, result.bytecode, &extractedReflection);
@@ -738,7 +741,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
     result.bytecode = std::move(compileResult.bytecode);
 
     auto extractedReflection = ShaderReflector::ExtractReflection(
-        compileResult.reflection, compileResult.linkedProgram, false);
+        compileResult.reflection, compileResult.linkedProgram, false, compileResult.vkShifts);
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
     m_cache.Save(name, ".ms", sourceHash, result.bytecode, &extractedReflection);
@@ -846,7 +849,8 @@ bool ShaderLoader::CompileShaderWithDefines(
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,
         compileResult.linkedProgram,
-        isVertexShader
+        isVertexShader,
+        compileResult.vkShifts
     );
 
     xr_string cacheKeyStr = xr_string(shaderName) + extension;
