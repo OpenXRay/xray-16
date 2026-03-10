@@ -3,6 +3,7 @@
 #include "ShaderCache.h"
 #include "Layers/xrRender/Shaders/SlangReflectionWrapper.h"
 #include <slang.h>
+#include <slang-com-ptr.h>
 
 namespace xray::render::framegraph {
 
@@ -1059,8 +1060,79 @@ xr_vector<const char*> ShaderReflector::GetPhaseRTNames(RenderPhase phase) {
     }
 }
 
+static void FilterReflectionByUsage(ExtractedReflection& result, slang::IComponentType* program)
+{
+    Slang::ComPtr<slang::IMetadata> metadata;
+    SlangResult hr = program->getEntryPointMetadata(0, 0, metadata.writeRef(), nullptr);
+    if (SLANG_FAILED(hr) || !metadata)
+    {
+        Msg("! [FilterReflection] getEntryPointMetadata failed: hr=0x%08X metadata=%p", hr, metadata.get());
+        return;
+    }
+
+    auto isUsed = [&](SlangParameterCategory category, u32 slot) -> bool {
+        bool used = false;
+        SlangResult hr = metadata->isParameterLocationUsed(category, 0, slot, used);
+        if (SLANG_FAILED(hr))
+            return true;
+        return used;
+    };
+
+    Msg("  [FilterReflection] Before: %u SRVs, %u UAVs, %u samplers, %u CBs",
+        result.rtBindings.inputTextures.size(), result.rtBindings.uavBindings.size(),
+        result.rtBindings.samplers.size(), result.constantLayout.constantBuffers.buffers.size());
+
+    for (const auto& t : result.rtBindings.inputTextures) {
+        bool usedSR = false, usedDTS = false;
+        SlangResult hrSR = metadata->isParameterLocationUsed(SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE, 0, t.slot, usedSR);
+        SlangResult hrDTS = metadata->isParameterLocationUsed(SLANG_PARAMETER_CATEGORY_DESCRIPTOR_TABLE_SLOT, 0, t.slot, usedDTS);
+        Msg("    SRV t%u '%s' -> SR:hr=0x%08X,%s  DTS:hr=0x%08X,%s",
+            t.slot, t.name.c_str(),
+            hrSR, usedSR ? "used" : "unused",
+            hrDTS, usedDTS ? "used" : "unused");
+    }
+
+    auto& textures = result.rtBindings.inputTextures;
+    textures.erase(std::remove_if(textures.begin(), textures.end(),
+        [&](const auto& t) { return !isUsed(SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE, t.slot); }),
+        textures.end());
+
+    auto& uavs = result.rtBindings.uavBindings;
+    uavs.erase(std::remove_if(uavs.begin(), uavs.end(),
+        [&](const auto& u) { return !isUsed(SLANG_PARAMETER_CATEGORY_UNORDERED_ACCESS, u.slot); }),
+        uavs.end());
+
+    auto& samplers = result.rtBindings.samplers;
+    samplers.erase(std::remove_if(samplers.begin(), samplers.end(),
+        [&](const auto& s) { return !isUsed(SLANG_PARAMETER_CATEGORY_SAMPLER_STATE, s.slot); }),
+        samplers.end());
+
+    auto& cbs = result.constantLayout.constantBuffers.buffers;
+    xr_map<u16, u16> cbIndexRemap;
+    u16 newIndex = 0;
+    for (u16 i = 0; i < static_cast<u16>(cbs.size()); ++i) {
+        bool cbUsed = isUsed(SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER, cbs[i].slot);
+        Msg("    CB b%u '%s' -> %s", cbs[i].slot, cbs[i].name.c_str(), cbUsed ? "USED" : "UNUSED");
+        if (cbUsed)
+            cbIndexRemap[i] = newIndex++;
+    }
+
+    auto& constants = result.constantLayout.constants;
+    constants.erase(std::remove_if(constants.begin(), constants.end(),
+        [&](const auto& c) { return cbIndexRemap.find(c.cbIndex) == cbIndexRemap.end(); }),
+        constants.end());
+
+    for (auto& c : constants)
+        c.cbIndex = cbIndexRemap[c.cbIndex];
+
+    cbs.erase(std::remove_if(cbs.begin(), cbs.end(),
+        [&](const auto& cb) { return !isUsed(SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER, cb.slot); }),
+        cbs.end());
+}
+
 ExtractedReflection ShaderReflector::ExtractReflection(
     slang::ShaderReflection* slangReflection,
+    slang::IComponentType* linkedProgram,
     bool isVertexShader)
 {
     ExtractedReflection result;
@@ -1074,12 +1146,12 @@ ExtractedReflection ShaderReflector::ExtractReflection(
     {
         result.vertexInputSignature = AnalyzeVertexShader(slangReflection);
     }
-    else
-    {
-        result.rtBindings = AnalyzePixelShader(slangReflection);
-    }
 
+    result.rtBindings = AnalyzePixelShader(slangReflection);
     result.constantLayout = AnalyzeConstantLayout(slangReflection);
+
+    if (linkedProgram)
+        FilterReflectionByUsage(result, linkedProgram);
 
     return result;
 }

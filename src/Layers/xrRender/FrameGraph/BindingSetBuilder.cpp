@@ -54,7 +54,8 @@ static void DeduplicateBySlotAndClass(xr_vector<BindingSetBuilder::ReflectedReso
     }
 }
 
-BindingSetBuilder::BindingSetBuilder(const ExtractedReflection& reflection, nvrhi::IDevice* device)
+BindingSetBuilder::BindingSetBuilder(const ExtractedReflection& reflection, nvrhi::IDevice* device,
+    const char*)
     : m_device(device)
 {
     CollectReflection(reflection);
@@ -63,7 +64,8 @@ BindingSetBuilder::BindingSetBuilder(const ExtractedReflection& reflection, nvrh
 BindingSetBuilder::BindingSetBuilder(
     const ExtractedReflection& vsReflection,
     const ExtractedReflection& psReflection,
-    nvrhi::IDevice* device)
+    nvrhi::IDevice* device,
+    const char*)
     : m_device(device)
 {
     CollectReflection(vsReflection);

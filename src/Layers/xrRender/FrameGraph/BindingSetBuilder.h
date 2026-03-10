@@ -8,11 +8,13 @@ struct ExtractedReflection;
 
 class BindingSetBuilder {
 public:
-    BindingSetBuilder(const ExtractedReflection& reflection, nvrhi::IDevice* device);
+    BindingSetBuilder(const ExtractedReflection& reflection, nvrhi::IDevice* device,
+                      const char* debugLabel = nullptr);
 
     BindingSetBuilder(const ExtractedReflection& vsReflection,
                       const ExtractedReflection& psReflection,
-                      nvrhi::IDevice* device);
+                      nvrhi::IDevice* device,
+                      const char* debugLabel = nullptr);
 
     BindingSetBuilder& Texture(const char* name, nvrhi::ITexture* texture,
                                nvrhi::Format format = nvrhi::Format::UNKNOWN,
