@@ -235,7 +235,7 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
     dwHeight = static_cast<u32>(h);
 
     auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
-    const bool enableValidation = true;
+    const bool enableValidation = !!strstr(Core.Params, "-d3ddebug");
 
     if (ps_fg_render_mode == FG_RENDER_VULKAN)
     {

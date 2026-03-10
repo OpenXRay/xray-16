@@ -23,8 +23,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 
 struct DecalPassState {
     nvrhi::GraphicsPipelineHandle pipeline;
-    nvrhi::BindingLayoutHandle globalsLayout;
-    nvrhi::BindingLayoutHandle decalLayout;
+    nvrhi::BindingLayoutHandle bindingLayout;
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;

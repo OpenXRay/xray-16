@@ -12,10 +12,9 @@ struct GPUDecalData
     uint flags;
 };
 
-Texture2D<float> g_Depth : register(t4);
-Texture2D<float4> g_Normal : register(t5);
-Texture2D<float4> g_WorldPos : register(t6);
 StructuredBuffer<GPUDecalData> g_Decals : register(t3);
+Texture2D<float> g_Depth : register(t24);
+Texture2D<float4> g_WorldPos : register(t25);
 
 struct VS_OUTPUT
 {

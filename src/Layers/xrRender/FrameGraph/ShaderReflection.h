@@ -2,6 +2,7 @@
 
 #include "xrCore/xrstring.h"
 #include "ResourceShape.h"
+#include <slang.h>
 
 namespace slang {
     struct ShaderReflection;
@@ -401,7 +402,6 @@ public:
     static ExtractedReflection ExtractReflection(
         slang::ShaderReflection* slangReflection,
         slang::IComponentType* linkedProgram,
-        bool isVertexShader,
         VulkanBindShifts vkShifts = {});
 
     // ═══════════════════════════════════════════════════
@@ -435,7 +435,7 @@ public:
 private:
     // Internal helpers (extract data from live Slang reflection)
     static VertexInputSignature AnalyzeVertexShader(slang::ShaderReflection* reflection);
-    static ShaderRTBindings AnalyzePixelShader(slang::ShaderReflection* reflection);
+    static ShaderRTBindings AnalyzeResourceBindings(slang::ShaderReflection* reflection, SlangStage stage);
     static ShaderConstantBuffers AnalyzeConstantBuffers(slang::ShaderReflection* reflection);
     static ShaderConstantLayout AnalyzeConstantLayout(slang::ShaderReflection* reflection);
 

@@ -57,24 +57,8 @@ static void InitializeDecalResources(ng::RenderDevice* device, nvrhi::IFramebuff
     posAttr.elementStride = sizeof(Fvector);
     state.inputLayout = nvDevice->createInputLayout(&posAttr, 1, state.vs);
 
-    nvrhi::BindingLayoutDesc globalsLayoutDesc;
-    globalsLayoutDesc.visibility = nvrhi::ShaderType::All;
-    globalsLayoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-    };
-    state.globalsLayout = cache.GetOrCreateBindingLayout("Decal_globals", globalsLayoutDesc, nvDevice);
-
-    nvrhi::BindingLayoutDesc decalLayoutDesc;
-    decalLayoutDesc.visibility = nvrhi::ShaderType::All;
-    decalLayoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),
-        nvrhi::BindingLayoutItem::Texture_SRV(4),
-        nvrhi::BindingLayoutItem::Texture_SRV(5),
-        nvrhi::BindingLayoutItem::Texture_SRV(6),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
-        nvrhi::BindingLayoutItem::Sampler(0),
-    };
-    state.decalLayout = cache.GetOrCreateBindingLayout("Decal_textures", decalLayoutDesc, nvDevice);
+    state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "Decal", *vsResult.reflection, *psResult.reflection, nvDevice);
 
     auto fbInfo = framebuffer->getFramebufferInfo();
 
@@ -82,8 +66,7 @@ static void InitializeDecalResources(ng::RenderDevice* device, nvrhi::IFramebuff
     pipeDesc.setVertexShader(state.vs);
     pipeDesc.setPixelShader(state.ps);
     pipeDesc.setInputLayout(state.inputLayout);
-    pipeDesc.addBindingLayout(state.globalsLayout);
-    pipeDesc.addBindingLayout(state.decalLayout);
+    pipeDesc.addBindingLayout(state.bindingLayout);
 
     if (GEnv.Backend && GEnv.Backend->GetBindlessLayout())
         pipeDesc.addBindingLayout(GEnv.Backend->GetBindlessLayout());
@@ -160,25 +143,20 @@ DefaultOutputLayout setupDecalPass(
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-            nvrhi::BindingSetDesc globalsBindDesc;
-            globalsBindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-            };
-            auto globalsBindingSet = cache.GetOrCreateBindingSet(globalsBindDesc, data.passState->globalsLayout, nvDevice);
-
             auto* vsReflection = RImplementation.m_shaderLoader->GetCachedReflection("decal_box", ".vs");
             auto* psReflection = RImplementation.m_shaderLoader->GetCachedReflection("decal_box", ".ps");
 
             auto* materialBuffer = MaterialBuffer::Instance().GetBuffer();
 
-            framegraph::BindingSetBuilder decalBsb(*vsReflection, *psReflection, nvDevice, "Decal");
-            decalBsb.BufferSRV("g_Decals", data.decalMgr->GetDecalBuffer());
-            decalBsb.Texture("g_Depth", depthTex);
-            decalBsb.Texture("g_Normal", normalTex);
-            decalBsb.Texture("g_WorldPos", worldPosTex);
-            decalBsb.BufferSRV("g_Materials", materialBuffer);
+            framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Decal");
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+            bsb.BufferSRV("g_Decals", data.decalMgr->GetDecalBuffer());
+            bsb.Texture("g_Depth", depthTex);
+            bsb.Texture("g_WorldPos", worldPosTex);
+            bsb.BufferSRV("g_Materials", materialBuffer);
 
-            auto decalBindingSet = nvDevice->createBindingSet(decalBsb.Build(), data.passState->decalLayout);
+            auto bindingSet = cache.GetOrCreateBindingSet(
+                bsb.Build(), data.passState->bindingLayout, nvDevice);
 
             nvrhi::Viewport viewport;
             viewport.minX = 0;
@@ -192,8 +170,7 @@ DefaultOutputLayout setupDecalPass(
             gfxState.pipeline = data.passState->pipeline;
             gfxState.framebuffer = framebuffer;
             gfxState.viewport.addViewportAndScissorRect(viewport);
-            gfxState.addBindingSet(globalsBindingSet);
-            gfxState.addBindingSet(decalBindingSet);
+            gfxState.addBindingSet(bindingSet);
 
             auto* backend = data.device->GetBackend();
             nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
