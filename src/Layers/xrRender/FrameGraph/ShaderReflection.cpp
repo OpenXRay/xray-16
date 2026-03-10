@@ -183,7 +183,7 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
     }
 
     if (!inputParam) {
-        Msg("! [ShaderReflector] No VaryingInput parameter found in entry point");
+        Msg("  [ShaderReflector] No VaryingInput parameter found in entry point");
         return signature;
     }
 
@@ -521,7 +521,7 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
                         }
                     }
 
-                    Msg("! [AnalyzeConstantLayout] WARNING: $Globals size=0 from Slang, calculated %u bytes from %u constants",
+                    Msg("  [AnalyzeConstantLayout] $Globals size=0 from Slang, calculated %u bytes from %u constants",
                         calculatedSize, extractedConstantCount);
                     implicitCB.size = calculatedSize;
                 }
@@ -592,7 +592,7 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
                         }
                     }
 
-                    Msg("! [AnalyzeConstantLayout] WARNING: $Globals size=0 from Slang (unwrapped), calculated %u bytes from %u constants",
+                    Msg("  [AnalyzeConstantLayout] $Globals size=0 from Slang (unwrapped), calculated %u bytes from %u constants",
                         calculatedSize, looseConstantCount);
                     implicitCB.size = calculatedSize;
                 }
@@ -609,13 +609,13 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
     return layout;
 }
 
-ShaderRTBindings ShaderReflector::AnalyzePixelShader(
-    slang::ShaderReflection* reflection) {
+ShaderRTBindings ShaderReflector::AnalyzeResourceBindings(
+    slang::ShaderReflection* reflection, SlangStage stage) {
 
     ShaderRTBindings bindings;
 
     if (!reflection) {
-        Msg("! [ShaderReflector] Null Slang reflection for pixel shader");
+        Msg("! [ShaderReflector] Null Slang reflection");
         return bindings;
     }
 
@@ -641,75 +641,71 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
         bindings.uavBindings.emplace_back(uav.name, uav.slot, uav.shape);
     }
 
-    if (reflection->getEntryPointCount() == 0) {
-        Msg("! [ShaderReflector] No entry points found in pixel shader");
-        return bindings;
-    }
+    slang::EntryPointReflection* entryPoint = nullptr;
+    if (reflection->getEntryPointCount() > 0)
+        entryPoint = reflection->getEntryPointByIndex(0);
 
-    auto* entryPoint = reflection->getEntryPointByIndex(0);
-    if (!entryPoint) {
-        Msg("! [ShaderReflector] Failed to get pixel shader entry point");
-        return bindings;
-    }
+    slang::VariableLayoutReflection* resultVarLayout = nullptr;
 
-    auto* resultVarLayout = entryPoint->getResultVarLayout();
-    if (resultVarLayout)
+    if (stage == SLANG_STAGE_FRAGMENT && entryPoint)
     {
-        auto* typeLayout = resultVarLayout->getTypeLayout();
-        if (typeLayout)
+        resultVarLayout = entryPoint->getResultVarLayout();
+        if (resultVarLayout)
         {
-            auto* type = typeLayout->getType();
-            if (type && type->getKind() == slang::TypeReflection::Kind::Struct)
+            auto* typeLayout = resultVarLayout->getTypeLayout();
+            if (typeLayout)
             {
-                u32 fieldCount = type->getFieldCount();
-
-                for (u32 i = 0; i < fieldCount; i++)
+                auto* type = typeLayout->getType();
+                if (type && type->getKind() == slang::TypeReflection::Kind::Struct)
                 {
-                    auto* field = type->getFieldByIndex(i);
-                    if (!field)
-                        continue;
+                    u32 fieldCount = type->getFieldCount();
 
-                    const char* fieldName = field->getName();
-
-                    auto* fieldLayout = typeLayout->getFieldByIndex(i);
-                    if (!fieldLayout)
-                        continue;
-
-                    const char* semantic = fieldLayout->getSemanticName();
-                    u32 semanticIndex = fieldLayout->getSemanticIndex();
-
-                    if (semantic)
+                    for (u32 i = 0; i < fieldCount; i++)
                     {
-                        if (xr_strcmp(semantic, "SV_Target") == 0)
+                        auto* field = type->getFieldByIndex(i);
+                        if (!field)
+                            continue;
+
+                        auto* fieldLayout = typeLayout->getFieldByIndex(i);
+                        if (!fieldLayout)
+                            continue;
+
+                        const char* semantic = fieldLayout->getSemanticName();
+                        u32 semanticIndex = fieldLayout->getSemanticIndex();
+
+                        if (semantic)
                         {
-                            ShaderRTBindings::OutputRT output;
-                            output.slot = semanticIndex;
-                            bindings.outputRTs.push_back(output);
-                        }
-                        else if (xr_strcmp(semantic, "SV_Depth") == 0)
-                        {
-                            bindings.hasDepthOutput = true;
+                            if (xr_strcmp(semantic, "SV_Target") == 0)
+                            {
+                                ShaderRTBindings::OutputRT output;
+                                output.slot = semanticIndex;
+                                bindings.outputRTs.push_back(output);
+                            }
+                            else if (xr_strcmp(semantic, "SV_Depth") == 0)
+                            {
+                                bindings.hasDepthOutput = true;
+                            }
                         }
                     }
                 }
-            }
-            else if (type)
-            {
-                const char* semantic = resultVarLayout->getSemanticName();
-                u32 semanticIndex = resultVarLayout->getSemanticIndex();
-
-                if (semantic && xr_strcmp(semantic, "SV_Target") == 0)
+                else if (type)
                 {
-                    ShaderRTBindings::OutputRT output;
-                    output.slot = semanticIndex;
-                    bindings.outputRTs.push_back(output);
+                    const char* semantic = resultVarLayout->getSemanticName();
+                    u32 semanticIndex = resultVarLayout->getSemanticIndex();
+
+                    if (semantic && xr_strcmp(semantic, "SV_Target") == 0)
+                    {
+                        ShaderRTBindings::OutputRT output;
+                        output.slot = semanticIndex;
+                        bindings.outputRTs.push_back(output);
+                    }
                 }
             }
         }
-    }
-    else
-    {
-        Msg("! [AnalyzePixelShader] No result var layout found");
+        else
+        {
+            Msg("! [AnalyzeResourceBindings] No result var layout found for pixel shader");
+        }
     }
 
     bindings.phase = InferPhase(bindings);
@@ -980,7 +976,6 @@ static void UnshiftVulkanBindings(ExtractedReflection& result, const VulkanBindS
 ExtractedReflection ShaderReflector::ExtractReflection(
     slang::ShaderReflection* slangReflection,
     slang::IComponentType* linkedProgram,
-    bool isVertexShader,
     VulkanBindShifts vkShifts)
 {
     ExtractedReflection result;
@@ -990,12 +985,17 @@ ExtractedReflection ShaderReflector::ExtractReflection(
         return result;
     }
 
-    if (isVertexShader)
-    {
-        result.vertexInputSignature = AnalyzeVertexShader(slangReflection);
+    SlangStage stage = SLANG_STAGE_NONE;
+    if (slangReflection->getEntryPointCount() > 0) {
+        auto* entryPoint = slangReflection->getEntryPointByIndex(0);
+        if (entryPoint)
+            stage = entryPoint->getStage();
     }
 
-    result.rtBindings = AnalyzePixelShader(slangReflection);
+    if (stage == SLANG_STAGE_VERTEX)
+        result.vertexInputSignature = AnalyzeVertexShader(slangReflection);
+
+    result.rtBindings = AnalyzeResourceBindings(slangReflection, stage);
     result.constantLayout = AnalyzeConstantLayout(slangReflection);
 
     if (vkShifts.HasShifts())

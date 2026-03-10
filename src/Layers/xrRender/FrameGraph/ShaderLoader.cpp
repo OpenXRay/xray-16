@@ -289,7 +289,6 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,
         compileResult.linkedProgram,
-        true,
         compileResult.vkShifts
     );
 
@@ -409,7 +408,6 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,
         compileResult.linkedProgram,
-        false,
         compileResult.vkShifts
     );
 
@@ -535,7 +533,6 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,
         compileResult.linkedProgram,
-        false,
         compileResult.vkShifts
     );
 
@@ -640,7 +637,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
     result.bytecode = std::move(compileResult.bytecode);
 
     auto extractedReflection = ShaderReflector::ExtractReflection(
-        compileResult.reflection, compileResult.linkedProgram, false, compileResult.vkShifts);
+        compileResult.reflection, compileResult.linkedProgram, compileResult.vkShifts);
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
     m_cache.Save(name, ".as", sourceHash, result.bytecode, &extractedReflection);
@@ -741,7 +738,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
     result.bytecode = std::move(compileResult.bytecode);
 
     auto extractedReflection = ShaderReflector::ExtractReflection(
-        compileResult.reflection, compileResult.linkedProgram, false, compileResult.vkShifts);
+        compileResult.reflection, compileResult.linkedProgram, compileResult.vkShifts);
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
     m_cache.Save(name, ".ms", sourceHash, result.bytecode, &extractedReflection);
@@ -845,11 +842,9 @@ bool ShaderLoader::CompileShaderWithDefines(
         return false;
     }
 
-    bool isVertexShader = (strcmp(extension, ".vs") == 0);
     auto extractedReflection = ShaderReflector::ExtractReflection(
         compileResult.reflection,
         compileResult.linkedProgram,
-        isVertexShader,
         compileResult.vkShifts
     );
 
