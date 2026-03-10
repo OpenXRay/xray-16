@@ -5,6 +5,7 @@
 
 namespace slang {
     struct ShaderReflection;
+    struct IComponentType;
 }
 
 namespace xray::render::framegraph {
@@ -288,6 +289,7 @@ public:
 
     static ExtractedReflection ExtractReflection(
         slang::ShaderReflection* slangReflection,
+        slang::IComponentType* linkedProgram,
         bool isVertexShader);
 
     static const VertexInputSignature& GetVertexInputSignature(

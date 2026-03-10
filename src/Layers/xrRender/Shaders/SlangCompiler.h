@@ -39,13 +39,20 @@ public:
         xr_string errorMessage;
         xr_string warningMessage;
 
+        Slang::ComPtr<slang::ISession> session;
         slang::IComponentType* slangProgram = nullptr;
+        slang::IComponentType* linkedProgram = nullptr;
         slang::ShaderReflection* reflection = nullptr;
 
         bool IsValid() const { return success && !bytecode.empty(); }
 
         ~CompileResult()
         {
+            if (linkedProgram)
+            {
+                linkedProgram->release();
+                linkedProgram = nullptr;
+            }
             if (slangProgram)
             {
                 slangProgram->release();

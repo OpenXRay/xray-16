@@ -142,79 +142,116 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
 
     sessionDesc.fileSystem = m_vfsAdapter.get();
 
-    Slang::ComPtr<slang::ISession> session;
-    SlangResult slangResult = m_globalSession->createSession(sessionDesc, session.writeRef());
-    if (SLANG_FAILED(slangResult) || !session)
+    SlangResult slangResult = m_globalSession->createSession(sessionDesc, result.session.writeRef());
+    if (SLANG_FAILED(slangResult) || !result.session)
     {
         result.errorMessage = "Failed to create Slang session";
         Msg("! [SlangCompiler] %s", result.errorMessage.c_str());
         return result;
     }
+    auto& session = result.session;
 
-    Slang::ComPtr<slang::ICompileRequest> request;
-    slangResult = session->createCompileRequest(request.writeRef());
-    if (SLANG_FAILED(slangResult) || !request)
+    Slang::ComPtr<slang::IBlob> diagnosticBlob;
+
+    Slang::ComPtr<slang::IModule> module;
     {
-        result.errorMessage = "Failed to create compile request";
-        Msg("! [SlangCompiler] %s", result.errorMessage.c_str());
-        return result;
+        module = session->loadModuleFromSourceString(
+            sourcePath, sourcePath, source, diagnosticBlob.writeRef());
+        if (diagnosticBlob)
+        {
+            auto* msg = static_cast<const char*>(diagnosticBlob->getBufferPointer());
+            if (msg && msg[0])
+                result.warningMessage = msg;
+            diagnosticBlob = nullptr;
+        }
+        if (!module)
+        {
+            result.errorMessage = result.warningMessage.empty()
+                ? "Failed to load module" : result.warningMessage;
+            Msg("! [SlangCompiler] %s: %s", sourcePath, result.errorMessage.c_str());
+            return result;
+        }
     }
 
-    int translationUnitIndex = request->addTranslationUnit(SLANG_SOURCE_LANGUAGE_SLANG, sourcePath);
-    request->addTranslationUnitSourceString(translationUnitIndex, sourcePath, source);
-
-    SlangStage slangStage = GetSlangStage(stage);
-    request->addEntryPoint(translationUnitIndex, entryPoint, slangStage);
-
-    slangResult = request->compile();
-
-    const char* diagnostics = request->getDiagnosticOutput();
-    if (diagnostics && diagnostics[0])
+    Slang::ComPtr<slang::IEntryPoint> entryPointComp;
     {
-        result.errorMessage = diagnostics;
+        SlangStage slangStage = GetSlangStage(stage);
+        slangResult = module->findAndCheckEntryPoint(
+            entryPoint, slangStage, entryPointComp.writeRef(), diagnosticBlob.writeRef());
+        if (diagnosticBlob)
+        {
+            auto* msg = static_cast<const char*>(diagnosticBlob->getBufferPointer());
+            if (msg && msg[0] && result.warningMessage.empty())
+                result.warningMessage = msg;
+            diagnosticBlob = nullptr;
+        }
+        if (SLANG_FAILED(slangResult) || !entryPointComp)
+        {
+            result.errorMessage = "Failed to find entry point: " + xr_string(entryPoint);
+            Msg("! [SlangCompiler] %s", result.errorMessage.c_str());
+            return result;
+        }
     }
 
-    if (SLANG_FAILED(slangResult))
+    Slang::ComPtr<slang::IComponentType> compositeProgram;
     {
-        result.success = false;
-        if (result.errorMessage.empty())
-            result.errorMessage = "Compilation failed";
+        slang::IComponentType* components[] = { module, entryPointComp.get() };
+        slangResult = session->createCompositeComponentType(
+            components, 2, compositeProgram.writeRef(), diagnosticBlob.writeRef());
+        if (SLANG_FAILED(slangResult) || !compositeProgram)
+        {
+            result.errorMessage = "Failed to create composite program";
+            Msg("! [SlangCompiler] %s", result.errorMessage.c_str());
+            return result;
+        }
+    }
 
-        Msg("! [SlangCompiler] Compilation failed for %s (entry: %s, stage: %s, target: %s)",
-            sourcePath, entryPoint, GetStageName(stage), GetTargetName(target));
-        if (!result.errorMessage.empty())
-            Msg("! [SlangCompiler] Error: %s", result.errorMessage.c_str());
-
-        return result;
+    Slang::ComPtr<slang::IComponentType> linkedProgram;
+    {
+        slangResult = compositeProgram->link(linkedProgram.writeRef(), diagnosticBlob.writeRef());
+        if (diagnosticBlob)
+        {
+            auto* msg = static_cast<const char*>(diagnosticBlob->getBufferPointer());
+            if (msg && msg[0])
+            {
+                result.errorMessage = msg;
+                Msg("! [SlangCompiler] Link errors for %s: %s", sourcePath, msg);
+            }
+            diagnosticBlob = nullptr;
+        }
+        if (SLANG_FAILED(slangResult) || !linkedProgram)
+        {
+            if (result.errorMessage.empty())
+                result.errorMessage = "Failed to link program";
+            Msg("! [SlangCompiler] Compilation failed for %s (entry: %s, stage: %s, target: %s)",
+                sourcePath, entryPoint, GetStageName(stage), GetTargetName(target));
+            return result;
+        }
     }
 
     Slang::ComPtr<slang::IBlob> codeBlob;
-    slangResult = request->getEntryPointCodeBlob(0, 0, (ISlangBlob**)codeBlob.writeRef());
+    slangResult = linkedProgram->getEntryPointCode(0, 0, codeBlob.writeRef(), diagnosticBlob.writeRef());
     if (SLANG_FAILED(slangResult) || !codeBlob)
     {
         result.errorMessage = "Failed to retrieve compiled bytecode";
-        result.success = false;
         Msg("! [SlangCompiler] %s", result.errorMessage.c_str());
         return result;
     }
 
     const u8* bytecodeData = static_cast<const u8*>(codeBlob->getBufferPointer());
     size_t bytecodeSize = codeBlob->getBufferSize();
-
     result.bytecode.resize(bytecodeSize);
     std::memcpy(result.bytecode.data(), bytecodeData, bytecodeSize);
     result.success = true;
 
-    slang::IComponentType* program = nullptr;
-    SlangResult getProgramResult = request->getProgramWithEntryPoints(&program);
-    if (SLANG_SUCCEEDED(getProgramResult) && program)
-    {
-        program->addRef();
-        result.slangProgram = program;
+    auto* compositeLayout = compositeProgram->getLayout();
+    result.reflection = compositeLayout;
 
-        auto* programLayout = program->getLayout();
-        result.reflection = programLayout;
-    }
+    compositeProgram->addRef();
+    result.slangProgram = compositeProgram.get();
+
+    linkedProgram->addRef();
+    result.linkedProgram = linkedProgram.get();
 
     if (!result.warningMessage.empty())
     {
