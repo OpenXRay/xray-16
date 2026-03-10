@@ -216,9 +216,42 @@ void BindingSetBuilder::AddSamplers()
     }
 }
 
+static int GetBindingSetRegisterClass(nvrhi::ResourceType type)
+{
+    switch (type) {
+    case nvrhi::ResourceType::Texture_SRV:
+    case nvrhi::ResourceType::TypedBuffer_SRV:
+    case nvrhi::ResourceType::StructuredBuffer_SRV:
+    case nvrhi::ResourceType::RawBuffer_SRV:
+    case nvrhi::ResourceType::RayTracingAccelStruct:
+        return 0;
+    case nvrhi::ResourceType::Texture_UAV:
+    case nvrhi::ResourceType::TypedBuffer_UAV:
+    case nvrhi::ResourceType::StructuredBuffer_UAV:
+    case nvrhi::ResourceType::RawBuffer_UAV:
+        return 1;
+    case nvrhi::ResourceType::ConstantBuffer:
+    case nvrhi::ResourceType::VolatileConstantBuffer:
+        return 2;
+    case nvrhi::ResourceType::Sampler:
+        return 3;
+    default:
+        return -1;
+    }
+}
+
 nvrhi::BindingSetDesc BindingSetBuilder::Build()
 {
     AddSamplers();
+
+    std::sort(m_desc.bindings.begin(), m_desc.bindings.end(),
+        [](const nvrhi::BindingSetItem& a, const nvrhi::BindingSetItem& b) {
+            int classA = GetBindingSetRegisterClass(a.type);
+            int classB = GetBindingSetRegisterClass(b.type);
+            if (classA != classB) return classA < classB;
+            return a.slot < b.slot;
+        });
+
     return m_desc;
 }
 

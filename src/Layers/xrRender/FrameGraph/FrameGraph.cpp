@@ -862,7 +862,6 @@ void FrameGraph::AllocateResources() {
                 nvrhiDesc.sampleCount = resource.desc.sampleCount;
                 nvrhiDesc.format = resource.desc.format;
                 nvrhiDesc.debugName = resource.desc.debugName.c_str();
-                nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
                 nvrhiDesc.keepInitialState = true;
 
                 switch (resource.desc.type) {
@@ -888,15 +887,17 @@ void FrameGraph::AllocateResources() {
                 nvrhiDesc.isShaderResource = true;
 
                 if (resource.desc.isRenderTarget && !resource.desc.isDepthStencil) {
+                    nvrhiDesc.initialState = nvrhi::ResourceStates::RenderTarget;
                     nvrhiDesc.useClearValue = true;
-                    nvrhiDesc.clearValue = nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f);
-                }
-
-                if (resource.desc.isDepthStencil) {
+                    nvrhiDesc.clearValue = nvrhi::Color(0.0f);
+                } else if (resource.desc.isDepthStencil) {
+                    nvrhiDesc.initialState = nvrhi::ResourceStates::DepthWrite;
                     nvrhiDesc.isRenderTarget = true;
                     nvrhiDesc.isTypeless = true;
                     nvrhiDesc.useClearValue = true;
                     nvrhiDesc.clearValue = nvrhi::Color(1.0f);
+                } else {
+                    nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
                 }
 
             resource.nvrhiTexture = m_device->createTexture(nvrhiDesc);

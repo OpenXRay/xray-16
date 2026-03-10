@@ -294,7 +294,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
 
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), bindingLayout, device);
 
-            cmdList->clearTextureFloat(colorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f));
+            cmdList->clearTextureFloat(colorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);

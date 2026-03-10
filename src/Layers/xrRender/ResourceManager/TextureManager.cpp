@@ -270,7 +270,7 @@ TextureHandle TextureManager::CreateTexture(
 
     if (desc.isRenderTarget && !desc.isDepthStencil) {
         nvrhiDesc.useClearValue = true;
-        nvrhiDesc.clearValue = nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f);
+        nvrhiDesc.clearValue = nvrhi::Color(0.0f);
     }
 
     if (desc.isDepthStencil) {

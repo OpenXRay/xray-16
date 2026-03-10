@@ -19,7 +19,6 @@ struct VS_OUTPUT
     float3 color    : COLOR0;
     float2 uv       : TEXCOORD0;
     float  alpha    : TEXCOORD1;
-    uint   cullState: TEXCOORD2;
 };
 
 VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
@@ -32,7 +31,6 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
         output.color = float3(0, 0, 0);
         output.uv = float2(0, 0);
         output.alpha = 0;
-        output.cullState = 0;
         return output;
     }
 
@@ -58,7 +56,6 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
     output.position = mul(g_ViewProj, float4(worldPos, 1.0));
 
     output.color = GetCullDebugColor(debugData.cullState);
-    output.cullState = debugData.cullState;
 
     output.uv = cornerOffset;
 
