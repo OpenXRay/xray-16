@@ -10,7 +10,7 @@ Texture2D t_normal : register(t1);     // RGB: normal, A: roughness
 Texture2D t_material : register(t2);   // Material ID
 Texture2D t_depth : register(t3);      // Depth
 
-SamplerState s_point : register(s0);
+#include "common_samplers.h"
 
 // ══════════════════════════════════════════════════════════
 //  CONSTANTS
@@ -169,9 +169,9 @@ float3 CalculatePBRLighting(
 
 float4 main(PS_INPUT input) : SV_TARGET {
     // Sample G-Buffer
-    float4 albedoSample = t_albedo.Sample(s_point, input.texcoord);
-    float4 normalSample = t_normal.Sample(s_point, input.texcoord);
-    float depth = t_depth.Sample(s_point, input.texcoord).r;
+    float4 albedoSample = t_albedo.Sample(smp_nofilter, input.texcoord);
+    float4 normalSample = t_normal.Sample(smp_nofilter, input.texcoord);
+    float depth = t_depth.Sample(smp_nofilter, input.texcoord).r;
 
     // Early out if no geometry (sky)
     if (depth >= 1.0) {

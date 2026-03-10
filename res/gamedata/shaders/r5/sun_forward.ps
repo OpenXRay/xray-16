@@ -5,10 +5,11 @@
 // Sun texture typically has falloff baked in.
 
 #include "shared/common.h"
+#include "common_samplers.h"
 
 // Sun texture (gradient or sun image with baked falloff)
 Texture2D s_sun : register(t0);
-SamplerState smp_linear : register(s0);
+
 
 struct PS_INPUT {
     float4 hpos     : SV_POSITION;

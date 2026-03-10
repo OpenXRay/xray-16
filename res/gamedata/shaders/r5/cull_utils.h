@@ -91,7 +91,7 @@ bool DistanceTestAABB(float3 aabb_min, float3 aabb_max, float3 camera_pos, float
 // ═══════════════════════════════════════════════════════
 // Requires caller to define:
 //   Texture2D<float> g_HiZPyramid : register(t1);
-//   SamplerState g_PointSampler : register(s0);  (or g_PointClampSampler)
+
 
 // Hi-Z occlusion test for sphere (4-tap conservative)
 // Returns: true = visible, false = occluded (cull)

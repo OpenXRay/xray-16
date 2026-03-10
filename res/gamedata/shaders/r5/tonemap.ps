@@ -13,7 +13,8 @@
 
 Texture2D t_hdr : register(t0);
 Texture2D<float> t_exposure : register(t1);  // Reserved for future HDR
-SamplerState s_linear : register(s0);
+
+#include "common_samplers.h"
 
 struct PS_INPUT {
     float4 position : SV_POSITION;
@@ -31,7 +32,7 @@ struct PS_INPUT {
 // }
 
 float4 main(PS_INPUT input) : SV_TARGET {
-    float4 color = t_hdr.Sample(s_linear, input.texcoord);
+    float4 color = t_hdr.Sample(smp_linear, input.texcoord);
 
     // Apply exposure uniformly to entire scene
     // float exposure = t_exposure.Load(int3(0, 0, 0));

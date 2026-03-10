@@ -4,6 +4,7 @@
 
 #define THREAD_GROUP_SIZE 64
 
+#include "common_samplers.h"
 #include "cull_utils.h"
 
 // Must match GPUParticleData in ParticlePassSetup.h (48 bytes)
@@ -32,7 +33,7 @@ cbuffer ParticleCullParams : register(b5) {
 
 StructuredBuffer<ParticleData> g_ParticleData : register(t0);
 Texture2D<float> g_HiZPyramid : register(t1);
-SamplerState g_PointClampSampler : register(s0);
+
 
 RWStructuredBuffer<uint> g_VisibleIndices : register(u0);
 RWByteAddressBuffer g_VisibleCount : register(u1);
@@ -62,7 +63,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
                 g_CameraPos.xyz,
                 g_ViewProj,
                 g_HiZPyramid,
-                g_PointClampSampler,
+                smp_nofilter,
                 g_HiZWidth,
                 g_HiZHeight,
                 g_HiZMipLevels))

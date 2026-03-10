@@ -63,7 +63,7 @@ uniform int dm_debug_trails;
 float SampleGrassInteraction(float2 atlas_uv)
 {
     Texture2D interaction_tex = GetBindlessTexture(interaction_atlas_index);
-    float4 interaction = interaction_tex.Sample(g_LinearSampler, atlas_uv);
+    float4 interaction = interaction_tex.Sample(smp_linear, atlas_uv);
     return interaction.r;
 }
 
@@ -133,7 +133,7 @@ f_forward main(p_flat I)
 
     // ===== VEIN DETAIL TEXTURE (BINDLESS) =====
     Texture2D vein_tex = GetBindlessTexture(grass_vein_index);
-    float4 vein_detail = vein_tex.Sample(g_LinearSampler, I.tcdh.xy);
+    float4 vein_detail = vein_tex.Sample(smp_linear, I.tcdh.xy);
     float veinValue = vein_detail.a;  // Use alpha for detail intensity
 
     // ===== PROCEDURAL GRASS ALBEDO =====

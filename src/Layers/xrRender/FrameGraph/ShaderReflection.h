@@ -134,26 +134,17 @@ struct ShaderRTBindings {
             else if (strstr(name.c_str(), "smp_nofilter") != nullptr ||
                      strstr(name.c_str(), "smp_smap") != nullptr ||
                      strstr(name.c_str(), "smp_jitter") != nullptr) {
-                // D3DTADDRESS_CLAMP, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT
                 state.addressMode = AddressMode::Clamp;
                 state.minFilter = FilterMode::Point;
                 state.magFilter = FilterMode::Point;
                 state.mipFilter = FilterMode::Point;
                 state.maxAnisotropy = 1;
             }
-            else if (strstr(name.c_str(), "PointClamp") != nullptr) {
-                // Fluid sim samplers
-                state.addressMode = AddressMode::Clamp;
-                state.minFilter = FilterMode::Point;
-                state.magFilter = FilterMode::Point;
-                state.mipFilter = FilterMode::Point;
-                state.maxAnisotropy = 1;
-            }
-            else if (strstr(name.c_str(), "LinearClamp") != nullptr) {
+            else if (strstr(name.c_str(), "smp_shadowcmp") != nullptr) {
                 state.addressMode = AddressMode::Clamp;
                 state.minFilter = FilterMode::Linear;
                 state.magFilter = FilterMode::Linear;
-                state.mipFilter = FilterMode::Linear;
+                state.mipFilter = FilterMode::Point;
                 state.maxAnisotropy = 1;
             }
             else {

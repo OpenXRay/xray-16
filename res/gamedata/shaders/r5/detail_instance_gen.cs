@@ -96,7 +96,7 @@ RWStructuredBuffer<uint> g_per_slot_counts : register(u2);
 RWStructuredBuffer<uint> g_local_counters : register(u3);
 RWStructuredBuffer<SlotAABB> g_slot_aabbs : register(u4);
 
-SamplerState g_point_sampler : register(s0);
+#include "common_samplers.h"
 
 uint pcg_hash(uint input)
 {
@@ -272,7 +272,7 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         uint hm_width, hm_height;
         g_heightmap.GetDimensions(hm_width, hm_height);
         float2 hm_uv = hm_pixel / float2(hm_width, hm_height);
-        float terrain_y = g_heightmap.SampleLevel(g_point_sampler, hm_uv, 0).r;
+        float terrain_y = g_heightmap.SampleLevel(smp_nofilter, hm_uv, 0).r;
 
         const float HEIGHTMAP_NO_TERRAIN = -1e10;
         if (terrain_y < slot.y_base || terrain_y < HEIGHTMAP_NO_TERRAIN * 0.5)

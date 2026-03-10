@@ -5,6 +5,7 @@
 // Outputs HDR color to single render target
 
 #include "shared/common.h"
+#include "common_samplers.h"
 
 struct PS_INPUT {
     float4 hpos     : SV_POSITION;
@@ -17,8 +18,6 @@ struct PS_INPUT {
 TextureCube s_sky0 : register(t0);
 TextureCube s_sky1 : register(t1);
 
-// Sampler
-SamplerState smp_rtlinear : register(s0);
 
 float4 main(PS_INPUT I) : SV_TARGET {
     // Sample both sky cubemaps

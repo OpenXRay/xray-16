@@ -202,7 +202,7 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
         float3 noiseUVW = finalPos * g_TurbFrequency * 0.6 / 4.0;
         noiseUVW += float3(0.7071, 0.0, 0.7071) * instEvolution;
 
-        float3 disp = g_Perlin4D.SampleLevel(g_LinearSampler, noiseUVW, 0).xyz * 2.0 - 1.0;
+        float3 disp = g_Perlin4D.SampleLevel(smp_linear, noiseUVW, 0).xyz * 2.0 - 1.0;
 
         float dist = length(finalPos - sphereCenter);
         float falloff = 1.0 - smoothstep(0.0, g_SphereRadius * 0.7, dist);

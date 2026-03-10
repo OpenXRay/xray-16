@@ -37,7 +37,7 @@ float4 SampleTerrainTexture(uint index, float2 uv)
         return float4(0.5, 0.5, 0.5, 1.0);  // Neutral gray fallback
 
     Texture2D tex = GetBindlessTexture(index);
-    return tex.Sample(g_LinearSampler, uv);
+    return tex.Sample(smp_linear, uv);
 }
 
 // Sample terrain normal map with X-Ray format conversion
@@ -47,7 +47,7 @@ float3 SampleTerrainNormal(uint index, float2 uv)
         return float3(0.0, 0.0, 1.0);
 
     Texture2D tex = GetBindlessTexture(index);
-    float4 Nu = tex.Sample(g_LinearSampler, uv);
+    float4 Nu = tex.Sample(smp_linear, uv);
 
     float3 normal;
     normal.x = Nu.a * 2.0 - 1.0;

@@ -18,7 +18,8 @@ struct PS_INPUT {
 // ══════════════════════════════════════════════════════════
 
 Texture2D t_albedo : register(t0);
-SamplerState s_linear : register(s0);
+
+#include "common_samplers.h"
 
 // ══════════════════════════════════════════════════════════
 //  PIXEL SHADER (Alpha test only, no color output)
@@ -26,7 +27,7 @@ SamplerState s_linear : register(s0);
 
 void main(PS_INPUT input) {
     // Sample alpha channel
-    float alpha = t_albedo.Sample(s_linear, input.texcoord).a;
+    float alpha = t_albedo.Sample(smp_linear, input.texcoord).a;
 
     // Discard if alpha fails threshold (alpha testing)
     if (alpha < 0.5) {

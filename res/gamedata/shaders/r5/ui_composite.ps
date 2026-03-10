@@ -4,7 +4,7 @@
 Texture2D sceneTexture : register(t0);  // Base 3D scene
 Texture2D uiTexture    : register(t1);  // UI layer with alpha
 
-SamplerState linearSampler : register(s0);
+#include "common_samplers.h"
 
 struct PS_INPUT
 {
@@ -15,8 +15,8 @@ struct PS_INPUT
 float4 main(PS_INPUT input) : SV_TARGET
 {
     // Sample both layers
-    float4 sceneColor = sceneTexture.Sample(linearSampler, input.texcoord);
-    float4 uiColor = uiTexture.Sample(linearSampler, input.texcoord);
+    float4 sceneColor = sceneTexture.Sample(smp_linear, input.texcoord);
+    float4 uiColor = uiTexture.Sample(smp_linear, input.texcoord);
 
     // Alpha-over blend: finalColor = uiColor * uiAlpha + sceneColor * (1 - uiAlpha)
     // This is the standard Porter-Duff "source over destination" blend

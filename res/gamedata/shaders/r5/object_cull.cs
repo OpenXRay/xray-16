@@ -66,8 +66,6 @@ StructuredBuffer<GPUObjectData> g_Objects : register(t0);
 // Input: Hi-Z pyramid from depth prepass
 Texture2D<float> g_HiZPyramid : register(t1);
 
-// Sampler for Hi-Z pyramid
-SamplerState g_PointSampler : register(s0);
 
 // Output: Indices of visible objects (for debug/readback)
 RWStructuredBuffer<uint> g_VisibleIndices : register(u0);
@@ -116,7 +114,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     // but will never mark visible objects as occluded
     // TEMPORAL HI-Z: Use prevViewProj for Hi-Z lookup since pyramid was built from previous frame's depth
     if (!HiZTestSphereTemporal(obj.position, obj.radius, g_CameraPos, g_ViewProj, g_PrevViewProj,
-                       g_HiZPyramid, g_PointSampler, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
+                       g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
         return;
 
     // ─────────────────────────────────────────────────────

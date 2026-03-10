@@ -1,5 +1,6 @@
 // xrRender/Shaders/gbuffer.ps.hlsl
 #include "shared/common.h"
+#include "common_samplers.h"
 
 // ══════════════════════════════════════════════════════════
 //  INPUT
@@ -32,7 +33,6 @@ Texture2D t_albedo : register(t0);
 Texture2D t_normal : register(t1);
 Texture2D t_material : register(t2);  // R: metallic, G: roughness
 
-SamplerState s_linear : register(s0);
 
 // ══════════════════════════════════════════════════════════
 //  CONSTANTS
@@ -57,9 +57,9 @@ PS_OUTPUT main(PS_INPUT input) {
     //  SAMPLE TEXTURES
     // ═══════════════════════════════════════════════════════
 
-    float4 albedoSample = t_albedo.Sample(s_linear, input.texcoord);
-    float3 normalSample = t_normal.Sample(s_linear, input.texcoord).xyz;
-    float2 materialSample = t_material.Sample(s_linear, input.texcoord).rg;
+    float4 albedoSample = t_albedo.Sample(smp_linear, input.texcoord);
+    float3 normalSample = t_normal.Sample(smp_linear, input.texcoord).xyz;
+    float2 materialSample = t_material.Sample(smp_linear, input.texcoord).rg;
 
     // ═══════════════════════════════════════════════════════
     //  ALBEDO + METALLIC

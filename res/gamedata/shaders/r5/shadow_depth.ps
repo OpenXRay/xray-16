@@ -1,0 +1,51 @@
+#ifndef BINDLESS_COMMON_H
+#define BINDLESS_COMMON_H
+
+#define INVALID_TEXTURE_INDEX 0xFFFFFFFF
+
+Texture2D g_BindlessTextures[] : register(t0, space1);
+
+Texture2D GetBindlessTexture(uint index)
+{
+    return g_BindlessTextures[NonUniformResourceIndex(index)];
+}
+
+#endif
+
+struct MaterialData
+{
+    uint diffuseIndex;
+    uint normalIndex;
+    uint detailIndex;
+    uint pbrIndex;
+    float detailScale;
+    float alphaRef;
+    uint flags;
+    uint shaderVariant;
+};
+
+#define MAT_FLAG_ALPHA_TEST (1 << 0)
+
+#include "common_samplers.h"
+
+StructuredBuffer<MaterialData> g_Materials : register(t8);
+
+struct PS_INPUT
+{
+    float4 position   : SV_Position;
+    float2 texcoord   : TEXCOORD0;
+    nointerpolation uint materialID : TEXCOORD1;
+};
+
+void main(PS_INPUT input)
+{
+    MaterialData mat = g_Materials[input.materialID];
+
+    if (mat.flags & MAT_FLAG_ALPHA_TEST)
+    {
+        if (mat.diffuseIndex == INVALID_TEXTURE_INDEX)
+            return;
+        float alpha = GetBindlessTexture(mat.diffuseIndex).Sample(smp_linear, input.texcoord).a;
+        clip(alpha - mat.alphaRef);
+    }
+}

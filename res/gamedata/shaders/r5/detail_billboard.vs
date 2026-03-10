@@ -118,10 +118,10 @@ v2p_billboard main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceI
 	float2 global_wind_dir = float2(sin(wind_angle_rad), cos(wind_angle_rad));
 
 	float2 dir_uv = world_pos.zx * (0.005 / wind_speed) + time * (0.005 * wind_speed);
-	float wind_dir_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(dir_uv, 0), 0).r;
+	float wind_dir_noise = g_Perlin4D.SampleLevel(smp_linear, float3(dir_uv, 0), 0).r;
 
 	float2 str_uv = world_pos.xz * (0.025 / wind_speed) + time * 0.05;
-	float wind_str_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(str_uv, 0), 0).r;
+	float wind_str_noise = g_Perlin4D.SampleLevel(smp_linear, float3(str_uv, 0), 0).r;
 
 	float fbm_wind_strength = lerp(0.25, 1.0, wind_str_noise);
 	fbm_wind_strength *= fbm_wind_strength;

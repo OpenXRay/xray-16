@@ -1,3 +1,4 @@
+#include "common_samplers.h"
 #include "cull_utils.h"
 
 struct InstanceData
@@ -63,7 +64,7 @@ StructuredBuffer<uint> g_visible_slot_ids : register(t1);
 StructuredBuffer<SlotAABB> g_slot_aabbs : register(t2);
 Texture2D<float> g_hiz_pyramid : register(t3);
 StructuredBuffer<DetailModelGPU> g_detail_models : register(t4);
-SamplerState g_point_sampler : register(s0);
+
 
 RWStructuredBuffer<uint> g_visible_lod0 : register(u0);
 RWByteAddressBuffer g_indirect_args_lod0 : register(u1);
@@ -147,7 +148,7 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
             continue;
 
         if (!HiZTestSphereTemporal(bounds_center, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
-                            g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
+                            g_hiz_pyramid, smp_nofilter, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
             continue;
 
         uint flags = asuint(mdl.flags);

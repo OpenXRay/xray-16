@@ -30,8 +30,6 @@ Texture2D<float> g_input_depth : register(t0);
 // Output: Current Hi-Z mip level (R32_FLOAT UAV)
 RWTexture2D<float> g_output_hiz : register(u0);
 
-// Point sampler for exact texel fetches
-SamplerState g_point_sampler : register(s0);
 
 // ═══════════════════════════════════════════════════════
 //  MAIN COMPUTE SHADER
