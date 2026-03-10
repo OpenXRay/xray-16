@@ -12,6 +12,7 @@
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
@@ -37,25 +38,8 @@ void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFramebuffe
     state.vs = vsResult.handle;
     state.ps = psResult.handle;
 
-    nvrhi::SamplerDesc samplerDesc;
-    samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
-    samplerDesc.setAllFilters(true);
-    samplerDesc.setMaxAnisotropy(16.0f);
-    state.sampler = nvDevice->createSampler(samplerDesc);
-
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::All;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // static_globals (b2)
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // LightingConstants (b4)
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),   // g_VariantTextures
-        nvrhi::BindingLayoutItem::Sampler(0),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),   // g_InstanceData
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),   // g_CompactBatchIndices
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),   // g_CompactMaterialIDs
-    };
-    state.layout = nvDevice->createBindingLayout(layoutDesc);
+    auto& cache = framegraph::GetPassResourceCache();
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection("TransparentPass", *vsResult.reflection, *psResult.reflection, nvDevice);
     if (!state.layout)
         return;
 
@@ -95,7 +79,6 @@ void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFramebuffe
     rt0.destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
     rt0.blendOpAlpha = nvrhi::BlendOp::Add;
 
-    auto& cache = framegraph::GetPassResourceCache();
     state.pipeline = cache.GetOrCreatePipeline("TransparentPass", pipeDesc, framebuffer->getFramebufferInfo(), nvDevice);
     if (!state.pipeline)
         return;
@@ -193,19 +176,20 @@ framegraph::DefaultOutputLayout setupTransparentPass(
 
             auto& variantTexBuffer = bindless::VariantTextureBuffer::Instance();
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-                nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(10, variantTexBuffer.GetBuffer()),
-                nvrhi::BindingSetItem::Sampler(0, data.passState->sampler),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(14, cfg.instanceBuffer),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(15, cfg.compactBatchIndicesBuffer),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(16, cfg.compactMaterialIDBuffer),
-            };
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* vsReflection = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
+            auto* psReflection = shaderLoader->GetCachedReflection("bindless_forward", ".ps");
 
-            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, data.passState->layout, nvDevice);
+            framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+            bsb.ConstantBufferSlot(4, lightingCB);
+            bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+            bsb.BufferSRV("g_VariantTextures", variantTexBuffer.GetBuffer());
+            bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
+            bsb.BufferSRV("g_CompactBatchIndices", cfg.compactBatchIndicesBuffer);
+            bsb.BufferSRV("g_CompactMaterialIDs", cfg.compactMaterialIDBuffer);
+
+            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
             R_ASSERT2(bindingSet, "Transparent binding set creation failed");
 
             nvrhi::GraphicsState state;

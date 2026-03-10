@@ -5,7 +5,6 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include <nvrhi/nvrhi.h>
 
-// Forward declarations
 namespace xray::render {
     namespace ng {
         class RenderDevice;
@@ -50,7 +49,6 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 // - Ubisoft: "GPU-Driven Rendering Pipelines" (SIGGRAPH 2015)
 
 struct HiZBuildPassState {
-    nvrhi::SamplerHandle pointSampler;
     nvrhi::ComputePipelineHandle pipeline;
     nvrhi::BindingLayoutHandle layout;
     bool initialized = false;

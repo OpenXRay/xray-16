@@ -11,6 +11,7 @@
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
@@ -218,19 +219,7 @@ void InitializeTrailResources(ng::RenderDevice* device, nvrhi::IFramebuffer* fra
     samplerDesc.setMaxAnisotropy(8.0f);
     state.sampler = nvDevice->createSampler(samplerDesc);
 
-    // Binding layout: StaticGlobals (b2) + TrailParams (b5) + MaterialBuffer (t8) +
-    //                 ControlPoints (t10) + TrailState (t11) + Sampler (s0)
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::All;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),   // StaticGlobals
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),   // TrailParams
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),     // MaterialBuffer
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),    // ControlPoints
-        nvrhi::BindingLayoutItem::RawBuffer_SRV(11),           // TrailState (GPU-driven mode)
-        nvrhi::BindingLayoutItem::Sampler(0),
-    };
-    state.layout = nvDevice->createBindingLayout(layoutDesc);
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection("TrailPass", *vsResult.reflection, *psResult.reflection, nvDevice);
 
     // Pipeline: no input layout (vertex-ID driven)
     nvrhi::GraphicsPipelineDesc pipeDesc;
@@ -391,15 +380,16 @@ TrailPassOutput setupTrailPass(
                 cmdList->writeBuffer(trailParamsCB, &params, sizeof(params));
 
                 // Create binding set for this group
-                nvrhi::BindingSetDesc bindDesc;
-                bindDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-                    nvrhi::BindingSetItem::ConstantBuffer(5, trailParamsCB),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(10, st.controlPointBuffer),
-                    nvrhi::BindingSetItem::RawBuffer_SRV(11, st.dummyStateBuffer),
-                    nvrhi::BindingSetItem::Sampler(0, st.sampler),
-                };
+                auto* shaderLoader = GEnv.Render->GetShaderLoader();
+                auto* vsReflection = shaderLoader->GetCachedReflection("trail", ".vs");
+                auto* psReflection = shaderLoader->GetCachedReflection("trail", ".ps");
+                BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB)
+                   .ConstantBuffer("TrailParams", trailParamsCB)
+                   .BufferSRV("g_Materials", matBuffer.GetBuffer())
+                   .BufferSRV("g_ControlPoints", st.controlPointBuffer)
+                   .BufferSRV("g_TrailState", st.dummyStateBuffer);
+                auto bindDesc = bsb.Build();
                 auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st.layout, nvDevice);
 
                 // Set graphics state

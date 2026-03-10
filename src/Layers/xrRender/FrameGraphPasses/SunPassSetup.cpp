@@ -3,6 +3,7 @@
 #include "SunPassSetup.h"
 #include "PassVertexFormats.h"
 #include "ShaderConstants.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
@@ -258,15 +259,7 @@ framegraph::VirtualResourceHandle setupSunPass(
             auto inputLayout = cache.GetOrCreateInputLayout(
                 "SunPass", vertexAttribs, std::size(vertexAttribs), vsResult.handle, device);
 
-            // Binding layout
-            nvrhi::BindingLayoutDesc bindingLayoutDesc;
-            bindingLayoutDesc.visibility = nvrhi::ShaderType::All;
-            bindingLayoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),  // dynamic_transforms - volatile
-                nvrhi::BindingLayoutItem::Texture_SRV(0),             // sun texture
-                nvrhi::BindingLayoutItem::Sampler(0)                  // sampler
-            };
-            auto bindingLayout = cache.GetOrCreateBindingLayout("SunPass", bindingLayoutDesc, device);
+            auto bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("SunPass", *vsResult.reflection, *psResult.reflection, device);
 
             // Render state: additive blending, no depth write
             nvrhi::RenderState renderState;
@@ -341,19 +334,11 @@ framegraph::VirtualResourceHandle setupSunPass(
                 sunTex = data.passState->placeholderTexture.Get();
             }
 
-            // Create sampler (cached)
-            nvrhi::SamplerDesc samplerDesc;
-            samplerDesc.setAllFilters(true);
-            samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
-            auto sampler = cache.GetOrCreateSampler("SunPass", samplerDesc, device);
-
             // Create binding set
-            nvrhi::BindingSetDesc bindingSetDesc;
-            bindingSetDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(0, dynamicCBBuffer),
-                nvrhi::BindingSetItem::Texture_SRV(0, sunTex),
-                nvrhi::BindingSetItem::Sampler(0, sampler)
-            };
+            BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device);
+            bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer)
+               .Texture("s_sun", sunTex);
+            auto bindingSetDesc = bsb.Build();
             auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindingSetDesc, bindingLayout, cmdList->getDevice());
 
             // ═══════════════════════════════════════════════════════

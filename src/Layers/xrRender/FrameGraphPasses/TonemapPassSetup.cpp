@@ -4,7 +4,9 @@
 #include "ExposurePassSetup.h"  // For GetExposureTexture()
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
+#include "Layers/xrRender/FrameGraph/ShaderCache.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
@@ -142,17 +144,7 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             auto& cache = framegraph::GetPassResourceCache();
             nvrhi::IDevice* device = cmdList->getDevice();
 
-            // Create binding layout
-            // t0: HDR texture, t1: Exposure texture (1x1), s0: Linear sampler
-            nvrhi::BindingLayoutDesc bindingLayoutDesc;
-            bindingLayoutDesc.visibility = nvrhi::ShaderType::Pixel;
-            bindingLayoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::Texture_SRV(0),  // t0: HDR texture
-                nvrhi::BindingLayoutItem::Texture_SRV(1),  // t1: Exposure texture (1x1 R32_FLOAT)
-                nvrhi::BindingLayoutItem::Sampler(0)       // s0: Linear sampler
-            };
-
-            auto bindingLayout = cache.GetOrCreateBindingLayout("TonemapPass", bindingLayoutDesc, device);
+            auto bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("TonemapPass", *vsResult.reflection, *psResult.reflection, device);
 
             if (!bindingLayout) {
                 Msg("! [TonemapPass] Failed to create binding layout");
@@ -185,43 +177,19 @@ framegraph::VirtualResourceHandle setupTonemapPass(
                 return;
             }
 
-            // ═══════════════════════════════════════════════════
-            //  CREATE SAMPLER (cached)
-            // ═══════════════════════════════════════════════════
-            nvrhi::SamplerDesc samplerDesc;
-            samplerDesc.setAllFilters(true);  // Linear filtering
-            samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
-            auto sampler = cache.GetOrCreateSampler("TonemapPass", samplerDesc, device);
-
-            if (!sampler) {
-                Msg("! [TonemapPass] Failed to create sampler");
-                return;
-            }
-
-            // ═══════════════════════════════════════════════════
-            //  GET EXPOSURE TEXTURE (use static fallback if not provided)
-            // ═══════════════════════════════════════════════════
             nvrhi::ITexture* exposureToUse = exposureTexture;
-            if (!exposureToUse) {
+            if (!exposureToUse)
                 exposureToUse = data.passState->fallbackExposureTexture.Get();
-            }
 
             if (!exposureToUse) {
-                Msg("! [TonemapPass] No exposure texture available (static fallback not initialized)");
+                Msg("! [TonemapPass] No exposure texture available");
                 return;
             }
 
-            // ═══════════════════════════════════════════════════
-            //  CREATE BINDING SET
-            // ═══════════════════════════════════════════════════
-            nvrhi::BindingSetDesc bindingSetDesc;
-            bindingSetDesc.bindings = {
-                nvrhi::BindingSetItem::Texture_SRV(0, hdrTexture),
-                nvrhi::BindingSetItem::Texture_SRV(1, exposureToUse),
-                nvrhi::BindingSetItem::Sampler(0, sampler)
-            };
+            framegraph::BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device);
+            bsb.Texture("t_hdr", hdrTexture);
 
-            auto bindingSet = cmdList->getDevice()->createBindingSet(bindingSetDesc, bindingLayout);
+            auto bindingSet = device->createBindingSet(bsb.Build(), bindingLayout);
 
             if (!bindingSet) {
                 Msg("! [TonemapPass] Failed to create binding set");

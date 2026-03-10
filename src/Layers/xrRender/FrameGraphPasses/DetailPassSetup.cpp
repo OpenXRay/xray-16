@@ -11,6 +11,8 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 // Detail rendering console variables
 extern ENGINE_API float ps_r__Detail_l_aniso;
@@ -219,53 +221,48 @@ DefaultOutputLayout setupDetailPass(
             if (data.gpuProfiler)
                 data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
 
+            auto& smpCache = framegraph::GetPassResourceCache();
+            auto* nvDev = data.device->GetNVRHIDevice();
+
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* grassVsRefl = shaderLoader->GetCachedReflection("detail_gpu", ".vs");
+            auto* grassPsRefl = shaderLoader->GetCachedReflection("detail_gpu", ".ps");
+
             auto makeGrassBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer) {
-                nvrhi::BindingSetDesc bindDesc;
-                bindDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(0, dm->cachedDynTransformsCB),
-                    nvrhi::BindingSetItem::ConstantBuffer(1, dm->cachedShaderParamsCB),
-                    nvrhi::BindingSetItem::ConstantBuffer(2, dm->cachedStaticGlobalsCB),
-                    nvrhi::BindingSetItem::ConstantBuffer(3, dm->cachedDetailGlobalsCB),
-                    nvrhi::BindingSetItem::ConstantBuffer(4, dm->cachedDynLightCB),
-                    nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(33, visibleIndicesBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(34, dm->cachedGrassTintsBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(35, dm->detailModelsBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(37, dm->generatedInstancesBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(38, dm->slotDataBuffer),
-                    nvrhi::BindingSetItem::Texture_SRV(12, dm->perlin4dTexture),
-                    nvrhi::BindingSetItem::Sampler(0, dm->cachedSmp_LinearWrap),
-                    nvrhi::BindingSetItem::Sampler(1, dm->cachedSmp_PointClamp),
-                    nvrhi::BindingSetItem::Sampler(2, dm->cachedSmp_LinearClamp),
-                    nvrhi::BindingSetItem::Sampler(3, dm->cachedSmp_LinearWrap),
-                    nvrhi::BindingSetItem::Sampler(4, dm->cachedSmp_AnisoWrap),
-                    nvrhi::BindingSetItem::Sampler(5, dm->cachedSmp_LinearWrap),
-                };
-                return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, dm->graphicsBindingLayout, data.device->GetNVRHIDevice());
+                framegraph::BindingSetBuilder bsb(*grassVsRefl, *grassPsRefl, nvDev);
+                bsb.ConstantBuffer("dynamic_transforms", dm->cachedDynTransformsCB);
+                bsb.ConstantBuffer("shader_params", dm->cachedShaderParamsCB);
+                bsb.ConstantBuffer("static_globals", dm->cachedStaticGlobalsCB);
+                bsb.ConstantBuffer("DetailGlobals", dm->cachedDetailGlobalsCB);
+                bsb.ConstantBufferSlot(4, dm->cachedDynLightCB);
+                bsb.BufferSRV("visible_indices", visibleIndicesBuffer);
+                bsb.BufferSRV("grass_object_tints", dm->cachedGrassTintsBuffer);
+                bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
+                bsb.BufferSRV("slot_data", dm->slotDataBuffer);
+                bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
+                auto bindDesc = bsb.Build();
+                bindDesc.bindings.push_back(nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection));
+                bindDesc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_SRV(35, dm->detailModelsBuffer));
+                return smpCache.GetOrCreateBindingSet(bindDesc, dm->graphicsBindingLayout, nvDev);
             };
 
+            auto* bbVsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".vs");
+            auto* bbPsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".ps");
+
             auto makePulledBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer, nvrhi::BindingLayoutHandle layout) {
-                nvrhi::BindingSetDesc bindDesc;
-                bindDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(0, dm->cachedDynTransformsCB),
-                    nvrhi::BindingSetItem::ConstantBuffer(1, dm->cachedShaderParamsCB),
-                    nvrhi::BindingSetItem::ConstantBuffer(2, dm->cachedStaticGlobalsCB),
-                    nvrhi::BindingSetItem::ConstantBuffer(3, dm->cachedDetailGlobalsCB),
-                    nvrhi::BindingSetItem::ConstantBuffer(4, dm->cachedDynLightCB),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(33, visibleIndicesBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(35, dm->detailModelsBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(36, dm->pulledVertexBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(37, dm->generatedInstancesBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(38, dm->slotDataBuffer),
-                    nvrhi::BindingSetItem::Texture_SRV(12, dm->perlin4dTexture),
-                    nvrhi::BindingSetItem::Sampler(0, dm->cachedSmp_LinearWrap),
-                    nvrhi::BindingSetItem::Sampler(1, dm->cachedSmp_PointClamp),
-                    nvrhi::BindingSetItem::Sampler(2, dm->cachedSmp_LinearClamp),
-                    nvrhi::BindingSetItem::Sampler(3, dm->cachedSmp_LinearWrap),
-                    nvrhi::BindingSetItem::Sampler(4, dm->cachedSmp_AnisoWrap),
-                    nvrhi::BindingSetItem::Sampler(5, dm->cachedSmp_LinearWrap),
-                };
-                return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, layout, data.device->GetNVRHIDevice());
+                framegraph::BindingSetBuilder bsb(*bbVsRefl, *bbPsRefl, nvDev);
+                bsb.ConstantBuffer("dynamic_transforms", dm->cachedDynTransformsCB);
+                bsb.ConstantBuffer("shader_params", dm->cachedShaderParamsCB);
+                bsb.ConstantBuffer("static_globals", dm->cachedStaticGlobalsCB);
+                bsb.ConstantBuffer("DetailGlobals", dm->cachedDetailGlobalsCB);
+                bsb.ConstantBufferSlot(4, dm->cachedDynLightCB);
+                bsb.BufferSRV("visible_indices", visibleIndicesBuffer);
+                bsb.BufferSRV("detail_models", dm->detailModelsBuffer);
+                bsb.BufferSRVSlot(36, dm->pulledVertexBuffer);
+                bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
+                bsb.BufferSRV("slot_data", dm->slotDataBuffer);
+                bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
+                return smpCache.GetOrCreateBindingSet(bsb.Build(), layout, nvDev);
             };
 
             bool billboardMode = !ps_r__detail_gpu;

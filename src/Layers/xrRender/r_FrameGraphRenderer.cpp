@@ -55,6 +55,7 @@
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -1792,7 +1793,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                         builder.PassWrite(pass, previewHandle, framegraph::ResourceState::UnorderedAccess);
                     },
                     [](const DebugPreviewData& data, const framegraph::FrameGraph& fg, ng::RenderContext* ctx) {
-                        static ref_cs s_debugPreviewCS;
                         static nvrhi::ComputePipelineHandle s_pipeline;
                         static nvrhi::BindingLayoutHandle s_layout;
                         static nvrhi::BufferHandle s_cb;
@@ -1801,20 +1801,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                         nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
 
                         if (!s_init) {
-                            s_debugPreviewCS.create("debug_preview");
-                            if (!s_debugPreviewCS || !s_debugPreviewCS->nvrhiShader) return;
+                            auto csResult = RImplementation.m_shaderLoader->LoadComputeShader("debug_preview");
+                            if (!csResult.handle) return;
 
-                            nvrhi::BindingLayoutDesc layoutDesc;
-                            layoutDesc.visibility = nvrhi::ShaderType::Compute;
-                            layoutDesc.bindings = {
-                                nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-                                nvrhi::BindingLayoutItem::Texture_SRV(0),
-                                nvrhi::BindingLayoutItem::Texture_UAV(0),
-                            };
-                            s_layout = nvDevice->createBindingLayout(layoutDesc);
+                            s_layout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DebugPreview", *csResult.reflection, nvDevice);
 
                             nvrhi::ComputePipelineDesc pipeDesc;
-                            pipeDesc.CS = s_debugPreviewCS->nvrhiShader;
+                            pipeDesc.CS = csResult.handle;
                             pipeDesc.bindingLayouts = { s_layout };
                             s_pipeline = nvDevice->createComputePipeline(pipeDesc);
 
@@ -1853,13 +1846,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                         nvrhi::ICommandList* cmdList = ctx->GetCommandList();
                         cmdList->writeBuffer(s_cb, &cb, sizeof(cb));
 
-                        nvrhi::BindingSetDesc bindDesc;
-                        bindDesc.bindings = {
-                            nvrhi::BindingSetItem::ConstantBuffer(5, s_cb),
-                            nvrhi::BindingSetItem::Texture_SRV(0, srcTex),
-                            nvrhi::BindingSetItem::Texture_UAV(0, dstTex),
-                        };
-                        auto bindings = nvDevice->createBindingSet(bindDesc, s_layout);
+                        auto* debugRefl = RImplementation.m_shaderLoader->GetCachedReflection("debug_preview", ".cs");
+                        framegraph::BindingSetBuilder bsb(*debugRefl, nvDevice);
+                        bsb.ConstantBuffer("DebugPreviewParams", s_cb)
+                           .Texture("t_source", srcTex)
+                           .TextureUAV("u_output", dstTex);
+                        auto bindings = nvDevice->createBindingSet(bsb.Build(), s_layout);
                         if (!bindings) return;
 
                         ctx->SetComputePipeline(s_pipeline.Get());

@@ -15,6 +15,7 @@
 #include "Profiler/GPUProfiler.h"
 #include "FrameGraphPasses/ShaderConstants.h"
 #include "FrameGraph/PassResourceCache.h"
+#include "FrameGraph/BindingSetBuilder.h"
 #include "ResourceManager/DDSLoader.h"
 #include <thread>
 #include <atomic>
@@ -1503,14 +1504,15 @@ bool FGDetailManager::CreatePerlin4DPipeline(nvrhi::IDevice* device)
     if (!device || !perlin4dComputeShader)
         return false;
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::Compute;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
-        nvrhi::BindingLayoutItem::Texture_UAV(0),
-    };
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* refl = shaderLoader->GetCachedReflection("perlin4d_gen", ".cs");
+    if (!refl)
+    {
+        Msg("! [FGDetailManager] Failed to get Perlin4D reflection");
+        return false;
+    }
 
-    perlin4dBindingLayout = device->createBindingLayout(layoutDesc);
+    perlin4dBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailPerlin4D", *refl, device);
     if (!perlin4dBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create Perlin4D binding layout");
@@ -1564,12 +1566,11 @@ void FGDetailManager::DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrh
     // writeBuffer BEFORE setComputeState (NVRHI volatile CB ordering)
     cmdList->writeBuffer(perlin4dCB, &params, sizeof(params));
 
-    nvrhi::BindingSetDesc bindDesc;
-    bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(0, perlin4dCB),
-        nvrhi::BindingSetItem::Texture_UAV(0, perlin4dTexture),
-    };
-    auto bindSet = device->createBindingSet(bindDesc, perlin4dBindingLayout);
+    auto* perlin4dRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("perlin4d_gen", ".cs");
+    framegraph::BindingSetBuilder bsb(*perlin4dRefl, device);
+    bsb.ConstantBuffer("Perlin4DGenParams", perlin4dCB)
+       .TextureUAV("g_output", perlin4dTexture);
+    auto bindSet = device->createBindingSet(bsb.Build(), perlin4dBindingLayout);
 
     nvrhi::ComputeState cs;
     cs.pipeline = perlin4dPipeline;
@@ -1796,16 +1797,15 @@ bool FGDetailManager::CreatePrefixSumPipeline(ng::RenderDevice* renderDevice)
 
     nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::Compute;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(6),
-        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(1),
-        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2),
-    };
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* refl = shaderLoader->GetCachedReflection("detail_prefix_sum", ".cs");
+    if (!refl)
+    {
+        Msg("! [FGDetailManager] Failed to get prefix sum reflection");
+        return false;
+    }
 
-    prefixSumBindingLayout = device->createBindingLayout(layoutDesc);
+    prefixSumBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailPrefixSum", *refl, device);
     if (!prefixSumBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create prefix sum binding layout");
@@ -1960,19 +1960,17 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
     }
 
     nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
 
     {
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::Compute;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(1),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(2),
-        };
+        auto* slotCullRefl = shaderLoader->GetCachedReflection("detail_cell_cull", ".cs");
+        if (!slotCullRefl)
+        {
+            Msg("! [FGDetailManager] Failed to get slot cull reflection");
+            return false;
+        }
 
-        slotCullBindingLayout = device->createBindingLayout(layoutDesc);
+        slotCullBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailSlotCull", *slotCullRefl, device);
         if (!slotCullBindingLayout)
         {
             Msg("! [FGDetailManager] Failed to create slot cull binding layout");
@@ -1992,29 +1990,14 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
     }
 
     {
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::Compute;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
-            nvrhi::BindingLayoutItem::Texture_SRV(3),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(4),
-            nvrhi::BindingLayoutItem::Sampler(0),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(3),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(4),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(5),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(6),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(7),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(8),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(9),
-        };
+        auto* cullRefl = shaderLoader->GetCachedReflection("detail_cull", ".cs");
+        if (!cullRefl)
+        {
+            Msg("! [FGDetailManager] Failed to get detail cull reflection");
+            return false;
+        }
 
-        computeBindingLayout = device->createBindingLayout(layoutDesc);
+        computeBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailCull", *cullRefl, device);
         if (!computeBindingLayout)
         {
             Msg("! [FGDetailManager] Failed to create instance cull binding layout");
@@ -2046,24 +2029,15 @@ bool FGDetailManager::CreateInstanceGenPipeline(ng::RenderDevice* renderDevice)
 
     nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::Compute;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(6),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
-        nvrhi::BindingLayoutItem::Texture_SRV(2),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(4),
-        nvrhi::BindingLayoutItem::Sampler(0),
-        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2),
-        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(3),
-        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(4),
-    };
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* refl = shaderLoader->GetCachedReflection("detail_instance_gen", ".cs");
+    if (!refl)
+    {
+        Msg("! [FGDetailManager] Failed to get instance gen reflection");
+        return false;
+    }
 
-    instanceGenBindingLayout = device->createBindingLayout(layoutDesc);
+    instanceGenBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailInstanceGen", *refl, device);
     if (!instanceGenBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create instance gen binding layout");
@@ -2095,59 +2069,31 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
 
     nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::All;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(1),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(3),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
-        nvrhi::BindingLayoutItem::TypedBuffer_SRV(32),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(33),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(34),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(35),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(37),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(38),
-        nvrhi::BindingLayoutItem::Texture_SRV(12),             // Perlin4D 3D volume
-        nvrhi::BindingLayoutItem::Sampler(0),
-        nvrhi::BindingLayoutItem::Sampler(1),
-        nvrhi::BindingLayoutItem::Sampler(2),
-        nvrhi::BindingLayoutItem::Sampler(3),
-        nvrhi::BindingLayoutItem::Sampler(4),
-        nvrhi::BindingLayoutItem::Sampler(5),
-    };
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* vsRefl = shaderLoader->GetCachedReflection("detail_gpu", ".vs");
+    auto* psRefl = shaderLoader->GetCachedReflection("detail_gpu", ".ps");
+    if (!vsRefl || !psRefl)
+    {
+        Msg("! [FGDetailManager] Failed to get detail_gpu reflection");
+        return false;
+    }
 
-    graphicsBindingLayout = device->createBindingLayout(layoutDesc);
+    graphicsBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailGPU", *vsRefl, *psRefl, device);
     if (!graphicsBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create graphics binding layout");
         return false;
     }
 
-    nvrhi::BindingLayoutDesc decalLayoutDesc;
-    decalLayoutDesc.visibility = nvrhi::ShaderType::All;
-    decalLayoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(1),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(3),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(33),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(35),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(36),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(37),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(38),
-        nvrhi::BindingLayoutItem::Texture_SRV(12),             // Perlin4D 3D volume
-        nvrhi::BindingLayoutItem::Sampler(0),
-        nvrhi::BindingLayoutItem::Sampler(1),
-        nvrhi::BindingLayoutItem::Sampler(2),
-        nvrhi::BindingLayoutItem::Sampler(3),
-        nvrhi::BindingLayoutItem::Sampler(4),
-        nvrhi::BindingLayoutItem::Sampler(5),
-    };
+    auto* decalVsRefl = shaderLoader->GetCachedReflection("detail_decal", ".vs");
+    auto* decalPsRefl = shaderLoader->GetCachedReflection("detail_decal", ".ps");
+    if (!decalVsRefl || !decalPsRefl)
+    {
+        Msg("! [FGDetailManager] Failed to get detail_decal reflection");
+        return false;
+    }
 
-    decalBindingLayout = device->createBindingLayout(decalLayoutDesc);
+    decalBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailDecal", *decalVsRefl, *decalPsRefl, device);
     if (!decalBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create decal binding layout");
@@ -2234,13 +2180,13 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
 
     if (billboardVertexShader && billboardPixelShader)
     {
-        billboardBindingLayout = device->createBindingLayout(decalLayoutDesc);
+        billboardBindingLayout = decalBindingLayout;
 
         nvrhi::GraphicsPipelineDesc bbPipeDesc = pipelineDesc;
         bbPipeDesc.VS = billboardVertexShader;
         bbPipeDesc.PS = billboardPixelShader;
         bbPipeDesc.inputLayout = nullptr;
-        bbPipeDesc.bindingLayouts = { billboardBindingLayout };
+        bbPipeDesc.bindingLayouts = { decalBindingLayout };
         if (backend) {
             auto* bindlessLayout = backend->GetBindlessLayout();
             if (bindlessLayout)
@@ -2401,16 +2347,15 @@ void FGDetailManager::DispatchCulling(
 
     if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "Details.SlotCull");
     {
-        nvrhi::BindingSetDesc bindDesc;
-        bindDesc.bindings = {
-            nvrhi::BindingSetItem::ConstantBuffer(5, cachedCullParamsCB),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, slotAABBBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(0, slotVisibilityBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(1, visibleSlotIDsBuffer),
-            nvrhi::BindingSetItem::RawBuffer_UAV(2, visibleSlotCounterBuffer),
-        };
+        auto* slotCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_cell_cull", ".cs");
+        framegraph::BindingSetBuilder bsb(*slotCullRefl, device);
+        bsb.ConstantBuffer("DetailCullParams", cachedCullParamsCB)
+           .BufferSRV("g_slot_aabbs", slotAABBBuffer)
+           .BufferUAV("g_slot_visibility", slotVisibilityBuffer)
+           .BufferUAV("g_visible_slot_ids", visibleSlotIDsBuffer)
+           .BufferUAV("g_visible_slot_counter", visibleSlotCounterBuffer);
 
-        nvrhi::BindingSetHandle slotCullBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, slotCullBindingLayout, device);
+        nvrhi::BindingSetHandle slotCullBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), slotCullBindingLayout, device);
 
         nvrhi::ComputeState state;
         state.pipeline = slotCullPipeline;
@@ -2431,28 +2376,26 @@ void FGDetailManager::DispatchCulling(
         if (!generatedInstancesBuffer)
             return;
 
-        nvrhi::BindingSetDesc bindDesc;
-        bindDesc.bindings = {
-            nvrhi::BindingSetItem::ConstantBuffer(5, cachedCullParamsCB),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, generatedInstancesBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(1, visibleSlotIDsBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(2, slotAABBBuffer),
-            nvrhi::BindingSetItem::Texture_SRV(3, hiZPyramid),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(4, detailModelsBuffer),
-            nvrhi::BindingSetItem::Sampler(0, cachedSmp_PointClamp),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(0, visibleInstancesBuffer[0]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(1, drawArgsBuffer[0]),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(2, visibleInstancesBuffer[1]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(3, drawArgsBuffer[1]),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(4, visibleInstancesBuffer[2]),
-            nvrhi::BindingSetItem::RawBuffer_UAV(5, drawArgsBuffer[2]),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(6, visibleDecalInstancesBuffer),
-            nvrhi::BindingSetItem::RawBuffer_UAV(7, decalDrawArgsBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(8, visibleBillboardInstancesBuffer),
-            nvrhi::BindingSetItem::RawBuffer_UAV(9, billboardDrawArgsBuffer),
-        };
+        auto* cullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_cull", ".cs");
+        framegraph::BindingSetBuilder bsb(*cullRefl, device);
+        bsb.ConstantBuffer("DetailCullParams", cachedCullParamsCB)
+           .BufferSRV("g_all_instances", generatedInstancesBuffer)
+           .BufferSRV("g_visible_slot_ids", visibleSlotIDsBuffer)
+           .BufferSRV("g_slot_aabbs", slotAABBBuffer)
+           .Texture("g_hiz_pyramid", hiZPyramid)
+           .BufferSRV("g_detail_models", detailModelsBuffer)
+           .BufferUAV("g_visible_lod0", visibleInstancesBuffer[0])
+           .BufferUAV("g_indirect_args_lod0", drawArgsBuffer[0])
+           .BufferUAV("g_visible_lod1", visibleInstancesBuffer[1])
+           .BufferUAV("g_indirect_args_lod1", drawArgsBuffer[1])
+           .BufferUAV("g_visible_lod2", visibleInstancesBuffer[2])
+           .BufferUAV("g_indirect_args_lod2", drawArgsBuffer[2])
+           .BufferUAV("g_visible_decals", visibleDecalInstancesBuffer)
+           .BufferUAV("g_indirect_args_decal", decalDrawArgsBuffer)
+           .BufferUAV("g_visible_billboard", visibleBillboardInstancesBuffer)
+           .BufferUAV("g_indirect_args_billboard", billboardDrawArgsBuffer);
 
-        nvrhi::BindingSetHandle instanceCullBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, computeBindingLayout, device);
+        nvrhi::BindingSetHandle instanceCullBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), computeBindingLayout, device);
 
         nvrhi::ComputeState state;
         state.pipeline = computePipeline;
@@ -2621,22 +2564,20 @@ void FGDetailManager::BuildDetailModelGPUData()
 
 nvrhi::BindingSetHandle FGDetailManager::CreateInstanceGenBindingSet(nvrhi::IDevice* device) const
 {
-    nvrhi::BindingSetDesc bindDesc;
-    bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(5, cachedCullParamsCB),
-        nvrhi::BindingSetItem::ConstantBuffer(6, cachedInstanceGenParamsCB),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(1, slotDataBuffer),
-        nvrhi::BindingSetItem::Texture_SRV(2, heightmapTexture),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(3, detailModelsBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(4, perSlotPrefixBuffer),
-        nvrhi::BindingSetItem::Sampler(0, cachedSmp_PointClamp),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, generatedInstancesBuffer),
-        nvrhi::BindingSetItem::RawBuffer_UAV(1, instanceCounterBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(2, perSlotCountsBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(3, perSlotLocalCountersBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(4, slotAABBBuffer),
-    };
-    return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, instanceGenBindingLayout, device);
+    auto* instGenRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_instance_gen", ".cs");
+    framegraph::BindingSetBuilder bsb(*instGenRefl, device);
+    bsb.ConstantBuffer("DetailCullParams", cachedCullParamsCB)
+       .ConstantBuffer("InstanceGenParams", cachedInstanceGenParamsCB)
+       .BufferSRV("g_slot_data", slotDataBuffer)
+       .Texture("g_heightmap", heightmapTexture)
+       .BufferSRV("g_detail_models", detailModelsBuffer)
+       .BufferSRV("g_prefix_offsets", perSlotPrefixBuffer)
+       .BufferUAV("g_instances", generatedInstancesBuffer)
+       .BufferUAV("g_instance_counter", instanceCounterBuffer)
+       .BufferUAV("g_per_slot_counts", perSlotCountsBuffer)
+       .BufferUAV("g_local_counters", perSlotLocalCountersBuffer)
+       .BufferUAV("g_slot_aabbs", slotAABBBuffer);
+    return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), instanceGenBindingLayout, device);
 }
 
 void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device,
@@ -2705,14 +2646,13 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
     auto dispatchPrefixSum = [&](nvrhi::ComputePipelineHandle pipeline, u32 groups, const char* passName) {
         if (gpuProfiler) gpuProfiler->BeginPass(cmdList, passName);
 
-        nvrhi::BindingSetDesc bindDesc;
-        bindDesc.bindings = {
-            nvrhi::BindingSetItem::ConstantBuffer(6, cachedInstanceGenParamsCB),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(0, perSlotCountsBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(1, perSlotPrefixBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_UAV(2, blockTotalsBuffer),
-        };
-        auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, prefixSumBindingLayout, device);
+        auto* prefixRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_prefix_sum", ".cs");
+        framegraph::BindingSetBuilder bsb(*prefixRefl, device);
+        bsb.ConstantBuffer("InstanceGenParams", cachedInstanceGenParamsCB)
+           .BufferUAV("g_per_slot_counts", perSlotCountsBuffer)
+           .BufferUAV("g_prefix_output", perSlotPrefixBuffer)
+           .BufferUAV("g_block_totals", blockTotalsBuffer);
+        auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), prefixSumBindingLayout, device);
 
         nvrhi::ComputeState state;
         state.pipeline = pipeline;

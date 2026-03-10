@@ -19,6 +19,7 @@
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "xrParticles/psystem.h"
 #include "xrCDB/Frustum.h"  // For CFrustum (frustum plane extraction)
 
@@ -416,17 +417,6 @@ void InitializeParticleResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
     auto& cache = framegraph::GetPassResourceCache();
     auto fbInfo = framebuffer->getFramebufferInfo();
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::All;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
-        nvrhi::BindingLayoutItem::Texture_SRV(1),
-        nvrhi::BindingLayoutItem::Sampler(0),
-    };
-    state.layout = nvDevice->createBindingLayout(layoutDesc);
-
     auto vsResult = shaderLoader->LoadVertexShader("bindless_particle", "main");
     if (!vsResult.handle)
         return;
@@ -436,6 +426,8 @@ void InitializeParticleResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
     if (!psResult.handle)
         return;
     state.ps = psResult.handle;
+
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection("ParticlePass", *vsResult.reflection, *psResult.reflection, nvDevice);
 
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
@@ -512,20 +504,13 @@ static void InitializeDistortionPipeline(ng::RenderDevice* device, nvrhi::IFrame
     auto& cache = framegraph::GetPassResourceCache();
     auto fbInfo = distortFB->getFramebufferInfo();
 
-    auto psResult = shaderLoader->LoadPixelShader("bindless_particle_distort", "main");
-    if (!psResult.handle)
+    auto distortPsResult = shaderLoader->LoadPixelShader("bindless_particle_distort", "main");
+    if (!distortPsResult.handle)
         return;
-    state.distortPS = psResult.handle;
+    state.distortPS = distortPsResult.handle;
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::All;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
-        nvrhi::BindingLayoutItem::Sampler(0),
-    };
-    state.distortLayout = nvDevice->createBindingLayout(layoutDesc);
+    auto distortVsResult = shaderLoader->LoadVertexShader("bindless_particle", "main");
+    state.distortLayout = cache.GetOrCreateBindingLayoutFromReflection("ParticlePass_Distort", *distortVsResult.reflection, *distortPsResult.reflection, nvDevice);
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
     pipeDesc.VS = state.vs;
@@ -700,14 +685,15 @@ ParticlePassOutput setupParticlePass(
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-                nvrhi::BindingSetItem::Texture_SRV(1, worldPosCopyRT),
-                nvrhi::BindingSetItem::Sampler(0, data.passState->sampler),
-            };
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* vsReflection = shaderLoader->GetCachedReflection("bindless_particle", ".vs");
+            auto* psReflection = shaderLoader->GetCachedReflection("bindless_particle", ".ps");
+            BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+            bsb.ConstantBuffer("dynamic_transforms", dynTransformsCB)
+               .ConstantBuffer("static_globals", staticGlobalsCB)
+               .BufferSRV("g_Materials", matBuffer.GetBuffer())
+               .Texture("g_SceneWorldPos", worldPosCopyRT);
+            auto bindDesc = bsb.Build();
             auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, data.passState->layout, nvDevice);
 
             auto* backend = data.device->GetBackend();
@@ -810,13 +796,13 @@ ParticlePassOutput setupParticlePass(
 
             cmdList->clearTextureFloat(distortRT, nvrhi::AllSubresources, nvrhi::Color(0.f, 0.f, 0.f, 0.f));
 
-            nvrhi::BindingSetDesc distortBindDesc;
-            distortBindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-                nvrhi::BindingSetItem::Sampler(0, data.passState->sampler),
-            };
+            auto* distortVsReflection = shaderLoader->GetCachedReflection("bindless_particle", ".vs");
+            auto* distortPsReflection = shaderLoader->GetCachedReflection("bindless_particle_distort", ".ps");
+            BindingSetBuilder distortBsb(*distortVsReflection, *distortPsReflection, nvDevice);
+            distortBsb.ConstantBuffer("dynamic_transforms", dynTransformsCB)
+                      .ConstantBuffer("static_globals", staticGlobalsCB)
+                      .BufferSRV("g_Materials", matBuffer.GetBuffer());
+            auto distortBindDesc = distortBsb.Build();
             auto distortBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(
                 distortBindDesc, data.passState->distortLayout, nvDevice);
 

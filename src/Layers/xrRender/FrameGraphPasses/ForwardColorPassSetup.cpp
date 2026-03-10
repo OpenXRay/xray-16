@@ -20,6 +20,7 @@
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"  // For variant textures
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
 #include "xrCore/FMesh.hpp"  // For MT_NORMAL, MT_TREE, etc.
 
@@ -56,25 +57,7 @@ void InitializeForwardResources(ng::RenderDevice* device, nvrhi::IFramebuffer* f
 
     auto& cache = framegraph::GetPassResourceCache();
 
-    nvrhi::SamplerDesc samplerDesc;
-    samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
-    samplerDesc.setAllFilters(true);
-    samplerDesc.setMaxAnisotropy(16.0f);
-    state.linearSampler = nvDevice->createSampler(samplerDesc);
-
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::All;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),
-        nvrhi::BindingLayoutItem::Sampler(0),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),
-    };
-    state.bindlessLayout = nvDevice->createBindingLayout(layoutDesc);
+    state.bindlessLayout = cache.GetOrCreateBindingLayoutFromReflection("ForwardColor", *vsResult.reflection, *psResult.reflection, nvDevice);
 
     u32 attrCount = 0;
     auto* attrs = GetUnifiedVertexAttributes(attrCount);
@@ -182,20 +165,21 @@ static void renderBindlessForward(
 
     auto& variantTexBuffer = bindless::VariantTextureBuffer::Instance();
 
-    auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
-        nvrhi::BindingSetDesc bindDesc;
-        bindDesc.bindings = {
-            nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-            nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(10, variantTexBuffer.GetBuffer()),
-            nvrhi::BindingSetItem::Sampler(0, ps.linearSampler),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(14, set.instanceBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(15, set.compactBatchIndicesBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(16, set.compactMaterialIDBuffer),
-        };
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* vsReflection = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
+    auto* psReflection = shaderLoader->GetCachedReflection("bindless_forward", ".ps");
 
-        return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, ps.bindlessLayout, nvDevice);
+    auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
+        framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+        bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+        bsb.ConstantBufferSlot(4, lightingCB);
+        bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+        bsb.BufferSRV("g_VariantTextures", variantTexBuffer.GetBuffer());
+        bsb.BufferSRV("g_InstanceData", set.instanceBuffer);
+        bsb.BufferSRV("g_CompactBatchIndices", set.compactBatchIndicesBuffer);
+        bsb.BufferSRV("g_CompactMaterialIDs", set.compactMaterialIDBuffer);
+
+        return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), ps.bindlessLayout, nvDevice);
     };
 
     // ═══════════════════════════════════════════════════════
@@ -310,20 +294,8 @@ static void renderBindlessForward(
                 if (terrainPsResult.handle) {
                     ps.terrainPS = terrainPsResult.handle;
 
-                    nvrhi::BindingLayoutDesc terrainLayoutDesc;
-                    terrainLayoutDesc.visibility = nvrhi::ShaderType::All;
-                    terrainLayoutDesc.bindings = {
-                        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-                        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
-                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
-                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
-                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),
-                        nvrhi::BindingLayoutItem::Sampler(0),
-                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),
-                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),
-                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),
-                    };
-                    ps.terrainLayout = nvDevice->createBindingLayout(terrainLayoutDesc);
+                    auto* vsRefl = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
+                    ps.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection("ForwardColor_Terrain", *vsRefl, *terrainPsResult.reflection, nvDevice);
 
                     if (ps.terrainLayout && ps.bindlessVS) {
                         nvrhi::GraphicsPipelineDesc terrainPipeDesc;
@@ -373,20 +345,19 @@ static void renderBindlessForward(
 
             // Create terrain binding set (includes TerrainMaterialBuffer at t9)
             // NOTE: Terrain uses its own instance/batch buffers, not the regular ones
-            nvrhi::BindingSetDesc terrainBindDesc;
-            terrainBindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),   // b2 - static_globals
-                nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),        // b4 - lighting
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),  // t8 - regular materials (unused)
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMatBuffer.GetBuffer()),  // t9 - terrain materials
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(10, variantTexBuffer.GetBuffer()), // t10 - variant textures
-                nvrhi::BindingSetItem::Sampler(0, ps.linearSampler),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.terrainInstanceBuffer),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.terrainCompactBatchIndicesBuffer),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(16, config.terrainCompactMaterialIDBuffer),
-            };
+            auto* terrainVsRefl = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
+            auto* terrainPsRefl = shaderLoader->GetCachedReflection("bindless_terrain", ".ps");
+            framegraph::BindingSetBuilder terrainBsb(*terrainVsRefl, *terrainPsRefl, nvDevice);
+            terrainBsb.ConstantBuffer("static_globals", staticGlobalsCB);
+            terrainBsb.ConstantBufferSlot(4, lightingCB);
+            terrainBsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+            terrainBsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
+            terrainBsb.BufferSRV("g_VariantTextures", variantTexBuffer.GetBuffer());
+            terrainBsb.BufferSRV("g_InstanceData", config.terrainInstanceBuffer);
+            terrainBsb.BufferSRV("g_CompactBatchIndices", config.terrainCompactBatchIndicesBuffer);
+            terrainBsb.BufferSRV("g_CompactMaterialIDs", config.terrainCompactMaterialIDBuffer);
 
-            auto terrainBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainBindDesc, ps.terrainLayout, nvDevice);
+            auto terrainBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainBsb.Build(), ps.terrainLayout, nvDevice);
             R_ASSERT2(terrainBindingSet, "Terrain binding set creation failed");
 
             // Set up terrain graphics state

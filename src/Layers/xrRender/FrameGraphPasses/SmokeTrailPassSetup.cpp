@@ -8,6 +8,7 @@
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
@@ -33,69 +34,45 @@ static void InitSmokeComputePipelines(ng::RenderDevice* device, SmokeTrailPassSt
         return;
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    auto& cache = GetPassResourceCache();
 
-    auto emitCS = RImplementation.m_shaderLoader->LoadComputeShader("smoke_trail_emit", "main").handle;
-    auto simCS = RImplementation.m_shaderLoader->LoadComputeShader("smoke_trail_simulate", "main").handle;
-    auto compactCS = RImplementation.m_shaderLoader->LoadComputeShader("smoke_trail_compact", "main").handle;
+    auto emitResult = RImplementation.m_shaderLoader->LoadComputeShader("smoke_trail_emit", "main");
+    auto simResult = RImplementation.m_shaderLoader->LoadComputeShader("smoke_trail_simulate", "main");
+    auto compactResult = RImplementation.m_shaderLoader->LoadComputeShader("smoke_trail_compact", "main");
 
-    if (!emitCS || !simCS || !compactCS)
+    if (!emitResult.handle || !simResult.handle || !compactResult.handle)
     {
         Msg("! SmokeTrail: failed to load compute shaders");
         return;
     }
 
-    state.emitCS = emitCS;
-    state.simCS = simCS;
-    state.compactCS = compactCS;
+    state.emitCS = emitResult.handle;
+    state.simCS = simResult.handle;
+    state.compactCS = compactResult.handle;
 
-    // Emit layout: b5 + u0(sim) + u1(state)
     {
-        nvrhi::BindingLayoutDesc d;
-        d.visibility = nvrhi::ShaderType::Compute;
-        d.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-        };
-        state.emitLayout = nvDevice->createBindingLayout(d);
+        state.emitLayout = cache.GetOrCreateBindingLayoutFromReflection("SmokeTrail_Emit", *emitResult.reflection, nvDevice);
 
         nvrhi::ComputePipelineDesc p;
-        p.CS = emitCS;
+        p.CS = emitResult.handle;
         p.bindingLayouts = { state.emitLayout };
         state.emitPipeline = nvDevice->createComputePipeline(p);
     }
 
-    // Sim layout: b5 + u0(sim)
     {
-        nvrhi::BindingLayoutDesc d;
-        d.visibility = nvrhi::ShaderType::Compute;
-        d.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-        };
-        state.simLayout = nvDevice->createBindingLayout(d);
+        state.simLayout = cache.GetOrCreateBindingLayoutFromReflection("SmokeTrail_Simulate", *simResult.reflection, nvDevice);
 
         nvrhi::ComputePipelineDesc p;
-        p.CS = simCS;
+        p.CS = simResult.handle;
         p.bindingLayouts = { state.simLayout };
         state.simPipeline = nvDevice->createComputePipeline(p);
     }
 
-    // Compact layout: b5 + u0(compact output) + u1(state) + u2(drawArgs) + u3(sim input)
     {
-        nvrhi::BindingLayoutDesc d;
-        d.visibility = nvrhi::ShaderType::Compute;
-        d.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(2),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(3),
-        };
-        state.compactLayout = nvDevice->createBindingLayout(d);
+        state.compactLayout = cache.GetOrCreateBindingLayoutFromReflection("SmokeTrail_Compact", *compactResult.reflection, nvDevice);
 
         nvrhi::ComputePipelineDesc p;
-        p.CS = compactCS;
+        p.CS = compactResult.handle;
         p.bindingLayouts = { state.compactLayout };
         state.compactPipeline = nvDevice->createComputePipeline(p);
     }
@@ -147,25 +124,12 @@ static void InitSmokeDrawPipeline(
     samplerDesc.setMaxAnisotropy(8.0f);
     state.sampler = nvDevice->createSampler(samplerDesc);
 
-    // Binding layout: b2 + b5 + t8 + t10 + t11 + t12 + s0
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
-
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::All;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),   // StaticGlobals
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),   // TrailParams
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),     // MaterialBuffer
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),    // CompactBuffer
-        nvrhi::BindingLayoutItem::RawBuffer_SRV(11),           // StateBuffer
-        nvrhi::BindingLayoutItem::Texture_SRV(12),             // Perlin4D 3D volume
-        nvrhi::BindingLayoutItem::Sampler(0),
-    };
-    state.drawLayout = nvDevice->createBindingLayout(layoutDesc);
-
-    // Pipeline: own VS + PS, alpha blend, depth test, no depth write
     auto& cache = GetPassResourceCache();
+
+    state.drawLayout = cache.GetOrCreateBindingLayoutFromReflection("SmokeTrail_Draw", *vsResult.reflection, *psResult.reflection, nvDevice);
+
     auto fbInfo = framebuffer->getFramebufferInfo();
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
@@ -286,12 +250,12 @@ DefaultOutputLayout setupSmokeTrailPass(
                 "SmokeTrail", "emit", sizeof(SmokeEmitParams), 16, nvDevice);
             cmdList->writeBuffer(emitCB, &emitParams, sizeof(emitParams));
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(5, emitCB),
-                nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->GetSimBuffer()),
-                nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->GetStateBuffer()),
-            };
+            auto* emitReflection = RImplementation.m_shaderLoader->GetCachedReflection("smoke_trail_emit", ".cs");
+            BindingSetBuilder bsb(*emitReflection, nvDevice);
+            bsb.ConstantBuffer("SmokeEmitCB", emitCB)
+               .BufferUAV("g_SimBuffer", mgr->GetSimBuffer())
+               .BufferUAV("g_StateBuffer", mgr->GetStateBuffer());
+            auto bindDesc = bsb.Build();
             auto bindSet = nvDevice->createBindingSet(bindDesc, st->emitLayout);
 
             nvrhi::ComputeState cs;
@@ -336,11 +300,11 @@ DefaultOutputLayout setupSmokeTrailPass(
                 "SmokeTrail", "sim", sizeof(SmokeSimParams), 16, nvDevice);
             cmdList->writeBuffer(simCB, &simParams, sizeof(simParams));
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(5, simCB),
-                nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->GetSimBuffer()),
-            };
+            auto* simReflection = RImplementation.m_shaderLoader->GetCachedReflection("smoke_trail_simulate", ".cs");
+            BindingSetBuilder bsb(*simReflection, nvDevice);
+            bsb.ConstantBuffer("SmokeSimCB", simCB)
+               .BufferUAV("g_SimBuffer", mgr->GetSimBuffer());
+            auto bindDesc = bsb.Build();
             auto bindSet = nvDevice->createBindingSet(bindDesc, st->simLayout);
 
             nvrhi::ComputeState cs;
@@ -385,14 +349,14 @@ DefaultOutputLayout setupSmokeTrailPass(
                 "SmokeTrail", "compact", sizeof(SmokeCompactParams), 16, nvDevice);
             cmdList->writeBuffer(compactCB, &compactParams, sizeof(compactParams));
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(5, compactCB),
-                nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->GetCompactBuffer()),
-                nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->GetStateBuffer()),
-                nvrhi::BindingSetItem::RawBuffer_UAV(2, mgr->GetDrawArgsBuffer()),
-                nvrhi::BindingSetItem::StructuredBuffer_UAV(3, mgr->GetSimBuffer()),
-            };
+            auto* compactReflection = RImplementation.m_shaderLoader->GetCachedReflection("smoke_trail_compact", ".cs");
+            BindingSetBuilder bsb(*compactReflection, nvDevice);
+            bsb.ConstantBuffer("SmokeCompactCB", compactCB)
+               .BufferUAV("g_CompactBuffer", mgr->GetCompactBuffer())
+               .BufferUAV("g_StateBuffer", mgr->GetStateBuffer())
+               .BufferUAV("g_DrawArgs", mgr->GetDrawArgsBuffer())
+               .BufferUAV("g_SimBuffer", mgr->GetSimBuffer());
+            auto bindDesc = bsb.Build();
             auto bindSet = nvDevice->createBindingSet(bindDesc, st->compactLayout);
 
             nvrhi::ComputeState cs;
@@ -505,16 +469,17 @@ DefaultOutputLayout setupSmokeTrailPass(
             nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
 
             // Binding set: smoke's own layout with smoke buffers + perlin4d volume
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-                nvrhi::BindingSetItem::ConstantBuffer(5, trailParamsCB),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(10, mgr->GetCompactBuffer()),
-                nvrhi::BindingSetItem::RawBuffer_SRV(11, mgr->GetStateBuffer()),
-                nvrhi::BindingSetItem::Texture_SRV(12, data.perlin4dVolume),
-                nvrhi::BindingSetItem::Sampler(0, st->sampler),
-            };
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* vsReflection = shaderLoader->GetCachedReflection("smoke_trail", ".vs");
+            auto* psReflection = shaderLoader->GetCachedReflection("smoke_trail", ".ps");
+            BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB)
+               .ConstantBuffer("TrailParams", trailParamsCB)
+               .BufferSRV("g_Materials", matBuffer.GetBuffer())
+               .BufferSRV("g_ControlPoints", mgr->GetCompactBuffer())
+               .BufferSRV("g_TrailState", mgr->GetStateBuffer())
+               .Texture("g_Perlin4D", data.perlin4dVolume);
+            auto bindDesc = bsb.Build();
             auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st->drawLayout, nvDevice);
 
             // Graphics state with indirect params

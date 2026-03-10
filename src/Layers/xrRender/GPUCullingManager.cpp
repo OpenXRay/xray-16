@@ -13,10 +13,12 @@
 #include "Layers/xrRender/Bindless/VertexConverter.h"
 #include "Layers/xrRender/SkeletonCustom.h"  // For CKinematics bone access
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace RENDER_NAMESPACE
 {
@@ -81,17 +83,6 @@ struct CullDebugVSParamsCB {
 //  STATIC STATE
 // ═══════════════════════════════════════════════════════
 
-static ref_cs s_object_cull_cs;
-static ref_cs s_object_cull_debug_cs;
-static ref_vs s_cull_debug_vs;
-static ref_ps s_cull_debug_ps;
-static ref_cs s_particle_cull_cs;
-static ref_cs s_particle_cull_debug_cs;
-static ref_cs s_batch_compact_count_cs;
-static ref_cs s_batch_compact_scan_cs;
-static ref_cs s_batch_compact_scatter_cs;
-static ref_cs s_terrain_apply_visibility_cs;
-static ref_cs s_variant_partition_cs;
 
 // ═══════════════════════════════════════════════════════
 //  CONSTRUCTOR / DESTRUCTOR
@@ -143,8 +134,8 @@ void GPUCullingManager::Initialize(ng::RenderDevice* device)
     }
 
     // Load compute shader
-    s_object_cull_cs.create("object_cull");
-    if (s_object_cull_cs && s_object_cull_cs->nvrhiShader) {
+    auto cullResult = RImplementation.m_shaderLoader->LoadComputeShader("object_cull");
+    if (cullResult.handle) {
         Msg("* [GPUCulling] Loaded object_cull compute shader: OK");
         m_computeEnabled = true;
     } else {
@@ -631,19 +622,9 @@ void GPUCullingManager::CreateComputePipeline(ng::RenderDevice* device)
     // u1: g_VisibleCount (raw buffer UAV)
     // u2: g_Visibility (structured buffer UAV - 1 uint per object: 0=culled, 1=visible)
     {
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::Compute;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
-            nvrhi::BindingLayoutItem::Texture_SRV(1),
-            nvrhi::BindingLayoutItem::Sampler(0),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2)  // Visibility buffer (replaces draw args write)
-        };
-
-        m_cullLayout = nvDevice->createBindingLayout(layoutDesc);
+        auto& cache = framegraph::GetPassResourceCache();
+        auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
+        m_cullLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ObjectCull", *objectCullRefl, nvDevice);
         if (!m_cullLayout) {
             Msg("! [GPUCulling] Failed to create binding layout");
             m_computeEnabled = false;
@@ -654,7 +635,8 @@ void GPUCullingManager::CreateComputePipeline(ng::RenderDevice* device)
     // Create compute pipeline for main culling
     {
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = s_object_cull_cs->nvrhiShader;
+        auto cullShader = RImplementation.m_shaderLoader->LoadComputeShader("object_cull");
+        pipeDesc.CS = cullShader.handle;
         pipeDesc.bindingLayouts = { m_cullLayout };
 
         m_cullPipeline = nvDevice->createComputePipeline(pipeDesc);
@@ -675,14 +657,14 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    s_batch_compact_count_cs.create("batch_compact_count");
-    R_ASSERT2(s_batch_compact_count_cs && s_batch_compact_count_cs->nvrhiShader,
+    auto compactCountResult = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact_count");
+    R_ASSERT2(compactCountResult.handle,
         "batch_compact_count.cs not found - compaction requires this shader");
-    s_batch_compact_scan_cs.create("batch_compact_scan");
-    R_ASSERT2(s_batch_compact_scan_cs && s_batch_compact_scan_cs->nvrhiShader,
+    auto compactScanResult = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact_scan");
+    R_ASSERT2(compactScanResult.handle,
         "batch_compact_scan.cs not found - compaction requires this shader");
-    s_batch_compact_scatter_cs.create("batch_compact");
-    R_ASSERT2(s_batch_compact_scatter_cs && s_batch_compact_scatter_cs->nvrhiShader,
+    auto compactScatterResult = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact");
+    R_ASSERT2(compactScatterResult.handle,
         "batch_compact.cs not found - compaction requires this shader");
 
     {
@@ -1028,73 +1010,29 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
     }
 
     {
-        // Binding layout for batch_compact_count.cs:
-        // b5: CompactParams (constant buffer)
-        // t0: g_Visibility (StructuredBuffer<uint> - SRV)
-        // u0: g_LocalPrefix (RWStructuredBuffer<uint>)
-        // u1: g_GroupCounts (RWStructuredBuffer<uint>)
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::Compute;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),   // Visibility buffer
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),   // Local prefix
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(1)    // Group counts
-        };
-
-        m_compactCountLayout = nvDevice->createBindingLayout(layoutDesc);
+        auto& cache = framegraph::GetPassResourceCache();
+        auto* compactCountRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_count", ".cs");
+        m_compactCountLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_CompactCount", *compactCountRefl, nvDevice);
         R_ASSERT2(m_compactCountLayout, "Failed to create compact count binding layout");
     }
 
     {
-        // Binding layout for batch_compact_scan.cs:
-        // b5: CompactParams (constant buffer)
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::Compute;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),   // g_GroupCounts
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),   // g_GroupOffsets
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),          // g_VisibleCount
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(2)           // g_DispatchArgs
-        };
-
-        m_compactScanLayout = nvDevice->createBindingLayout(layoutDesc);
+        auto& cache = framegraph::GetPassResourceCache();
+        auto* compactScanRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_scan", ".cs");
+        m_compactScanLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_CompactScan", *compactScanRefl, nvDevice);
         R_ASSERT2(m_compactScanLayout, "Failed to create compact scan binding layout");
     }
 
     {
-        // Binding layout for batch_compact.cs (scatter):
-        // b5: CompactParams (constant buffer)
-        // t0: g_InputDrawArgs (ByteAddressBuffer - raw buffer SRV)
-        // t1: g_InputMaterialIDs (StructuredBuffer<uint> - SRV)
-        // t2: g_Visibility (StructuredBuffer<uint> - SRV)
-        // t3: g_LocalPrefix (StructuredBuffer<uint> - SRV)
-        // t4: g_GroupOffsets (StructuredBuffer<uint> - SRV)
-        // u0: g_OutputDrawArgs (RWByteAddressBuffer - raw buffer UAV)
-        // u1: g_VisibleBatchIndices (RWStructuredBuffer<uint>)
-        // u2: g_OutputMaterialIDs (RWStructuredBuffer<uint>)
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::Compute;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
-            nvrhi::BindingLayoutItem::RawBuffer_SRV(0),          // Input draw args
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),   // Input material IDs
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),   // Visibility buffer
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),   // Local prefix
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(4),   // Group offsets
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(0),          // Output draw args
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(1),   // Batch indices
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2)    // Output material IDs
-        };
-
-        m_compactScatterLayout = nvDevice->createBindingLayout(layoutDesc);
+        auto& cache = framegraph::GetPassResourceCache();
+        auto* compactScatterRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact", ".cs");
+        m_compactScatterLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_CompactScatter", *compactScatterRefl, nvDevice);
         R_ASSERT2(m_compactScatterLayout, "Failed to create compact scatter binding layout");
     }
 
     {
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = s_batch_compact_count_cs->nvrhiShader;
+        pipeDesc.CS = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact_count").handle;
         pipeDesc.bindingLayouts = { m_compactCountLayout };
 
         m_compactCountPipeline = nvDevice->createComputePipeline(pipeDesc);
@@ -1103,7 +1041,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
 
     {
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = s_batch_compact_scan_cs->nvrhiShader;
+        pipeDesc.CS = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact_scan").handle;
         pipeDesc.bindingLayouts = { m_compactScanLayout };
 
         m_compactScanPipeline = nvDevice->createComputePipeline(pipeDesc);
@@ -1112,7 +1050,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
 
     {
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = s_batch_compact_scatter_cs->nvrhiShader;
+        pipeDesc.CS = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact").handle;
         pipeDesc.bindingLayouts = { m_compactScatterLayout };
 
         m_compactScatterPipeline = nvDevice->createComputePipeline(pipeDesc);
@@ -1127,21 +1065,13 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
     // ───────────────────────────────────────────────────────
     // Copies terrain visibility buffer → instanceCount in draw args
     // Simpler than full compaction since terrain doesn't need sorting
-    s_terrain_apply_visibility_cs.create("terrain_apply_visibility");
-    if (s_terrain_apply_visibility_cs && s_terrain_apply_visibility_cs->nvrhiShader) {
-        // Layout: b5 = params, t0 = visibility, u0 = draw args
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::Compute;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // ApplyVisibilityParams
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),    // Visibility buffer
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(0)            // Draw args (write instanceCount)
-        };
-
-        m_terrainApplyVisibilityLayout = nvDevice->createBindingLayout(layoutDesc);
+    auto terrainVisResult = RImplementation.m_shaderLoader->LoadComputeShader("terrain_apply_visibility");
+    if (terrainVisResult.handle) {
+        auto& cache = framegraph::GetPassResourceCache();
+        m_terrainApplyVisibilityLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_TerrainVisibility", *terrainVisResult.reflection, nvDevice);
         if (m_terrainApplyVisibilityLayout) {
             nvrhi::ComputePipelineDesc pipeDesc;
-            pipeDesc.CS = s_terrain_apply_visibility_cs->nvrhiShader;
+            pipeDesc.CS = terrainVisResult.handle;
             pipeDesc.bindingLayouts = { m_terrainApplyVisibilityLayout };
 
             m_terrainApplyVisibilityPipeline = nvDevice->createComputePipeline(pipeDesc);
@@ -1173,34 +1103,21 @@ void GPUCullingManager::CreateVariantPartitionResources(ng::RenderDevice* device
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    s_variant_partition_cs.create("variant_partition");
-    if (!s_variant_partition_cs || !s_variant_partition_cs->nvrhiShader) {
+    auto variantPartResult = RImplementation.m_shaderLoader->LoadComputeShader("variant_partition");
+    if (!variantPartResult.handle) {
         Msg("! [GPUCulling] variant_partition.cs not found - variant partition disabled");
         return;
     }
 
     {
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::Compute;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-            nvrhi::BindingLayoutItem::RawBuffer_SRV(0),
-            nvrhi::BindingLayoutItem::RawBuffer_SRV(1),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(3)
-        };
-        m_variantPartitionLayout = nvDevice->createBindingLayout(layoutDesc);
+        auto& cache = framegraph::GetPassResourceCache();
+        m_variantPartitionLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_VariantPartition", *variantPartResult.reflection, nvDevice);
         R_ASSERT2(m_variantPartitionLayout, "Failed to create variant partition layout");
     }
 
     {
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = s_variant_partition_cs->nvrhiShader;
+        pipeDesc.CS = variantPartResult.handle;
         pipeDesc.bindingLayouts = { m_variantPartitionLayout };
         m_variantPartitionPipeline = nvDevice->createComputePipeline(pipeDesc);
         R_ASSERT2(m_variantPartitionPipeline, "Failed to create variant partition pipeline");
@@ -1335,20 +1252,19 @@ void GPUCullingManager::DispatchVariantPartition(
     params.padding1 = 0;
     cmdList->writeBuffer(m_variantPartitionParamsCB, &params, sizeof(params));
 
-    nvrhi::BindingSetDesc bindDesc;
-    bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(5, m_variantPartitionParamsCB),
-        nvrhi::BindingSetItem::RawBuffer_SRV(0, set.compactCountBuffer),
-        nvrhi::BindingSetItem::RawBuffer_SRV(1, set.compactDrawArgsBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(2, set.compactBatchIndicesBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(3, set.compactMaterialIDBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(8, materialBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, partition.variantCountBuffer),
-        nvrhi::BindingSetItem::RawBuffer_UAV(1, partition.reorderedDrawArgsBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(2, partition.reorderedBatchIndicesBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(3, partition.reorderedMaterialIDsBuffer)
-    };
-    nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, m_variantPartitionLayout, nvDevice);
+    auto* variantPartRefl = RImplementation.m_shaderLoader->GetCachedReflection("variant_partition", ".cs");
+    framegraph::BindingSetBuilder bsb(*variantPartRefl, nvDevice);
+    bsb.ConstantBuffer("PartitionParams", m_variantPartitionParamsCB)
+       .BufferSRV("g_CompactCount", set.compactCountBuffer)
+       .BufferSRV("g_CompactDrawArgs", set.compactDrawArgsBuffer)
+       .BufferSRV("g_CompactBatchIndices", set.compactBatchIndicesBuffer)
+       .BufferSRV("g_CompactMaterialIDs", set.compactMaterialIDBuffer)
+       .BufferSRV("g_Materials", materialBuffer)
+       .BufferUAV("g_VariantCounts", partition.variantCountBuffer)
+       .BufferUAV("g_ReorderedDrawArgs", partition.reorderedDrawArgsBuffer)
+       .BufferUAV("g_ReorderedBatchIndices", partition.reorderedBatchIndicesBuffer)
+       .BufferUAV("g_ReorderedMaterialIDs", partition.reorderedMaterialIDsBuffer);
+    nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), m_variantPartitionLayout, nvDevice);
     R_ASSERT2(bindingSet, "Failed to create variant partition binding set");
 
     nvrhi::ComputeState state;
@@ -2437,19 +2353,16 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                 cmdList->writeBuffer(mgr->m_cullParamsCB, &cb, sizeof(cb));
 
-                // Create binding set (u2 = visibility buffer instead of draw args)
-                nvrhi::BindingSetDesc bindDesc;
-                bindDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_cullParamsCB),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, set.objectBuffer),
-                    nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
-                    nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
-                    nvrhi::BindingSetItem::StructuredBuffer_UAV(0, set.visibleIndexBuffer),
-                    nvrhi::BindingSetItem::RawBuffer_UAV(1, set.visibleCountBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_UAV(2, set.visibilityBuffer)
-                };
+                auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
+                framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice);
+                bsb.ConstantBuffer("CullParams", mgr->m_cullParamsCB)
+                   .BufferSRV("g_Objects", set.objectBuffer)
+                   .Texture("g_HiZPyramid", hizTexture)
+                   .BufferUAV("g_VisibleIndices", set.visibleIndexBuffer)
+                   .BufferUAV("g_VisibleCount", set.visibleCountBuffer)
+                   .BufferUAV("g_Visibility", set.visibilityBuffer);
 
-                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_cullLayout);
+                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_cullLayout);
                 R_ASSERT2(bindingSet, "Failed to create culling binding set");
 
                 // Set compute state and dispatch culling
@@ -2501,15 +2414,14 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                         cmdList->setBufferState(set.compactLocalPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
                         cmdList->setBufferState(set.compactGroupCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                        nvrhi::BindingSetDesc countBindDesc;
-                        countBindDesc.bindings = {
-                            nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
-                            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, set.visibilityBuffer),
-                            nvrhi::BindingSetItem::StructuredBuffer_UAV(0, set.compactLocalPrefixBuffer),
-                            nvrhi::BindingSetItem::StructuredBuffer_UAV(1, set.compactGroupCountsBuffer)
-                        };
+                        auto* compactCountRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_count", ".cs");
+                        framegraph::BindingSetBuilder countBsb(*compactCountRefl, nvDevice);
+                        countBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                               .BufferSRV("g_Visibility", set.visibilityBuffer)
+                               .BufferUAV("g_LocalPrefix", set.compactLocalPrefixBuffer)
+                               .BufferUAV("g_GroupCounts", set.compactGroupCountsBuffer);
 
-                        nvrhi::BindingSetHandle countBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(countBindDesc, mgr->m_compactCountLayout, nvDevice);
+                        nvrhi::BindingSetHandle countBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(countBsb.Build(), mgr->m_compactCountLayout, nvDevice);
                         R_ASSERT2(countBindingSet, "Failed to create compaction count binding set");
 
                         nvrhi::ComputeState countState;
@@ -2523,16 +2435,15 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                         cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
                         cmdList->setBufferState(set.compactDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                        nvrhi::BindingSetDesc scanBindDesc;
-                        scanBindDesc.bindings = {
-                            nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
-                            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, set.compactGroupCountsBuffer),
-                            nvrhi::BindingSetItem::StructuredBuffer_UAV(0, set.compactGroupOffsetsBuffer),
-                            nvrhi::BindingSetItem::RawBuffer_UAV(1, set.compactCountBuffer),
-                            nvrhi::BindingSetItem::RawBuffer_UAV(2, set.compactDispatchArgsBuffer)
-                        };
+                        auto* compactScanRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_scan", ".cs");
+                        framegraph::BindingSetBuilder scanBsb(*compactScanRefl, nvDevice);
+                        scanBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                               .BufferSRV("g_GroupCounts", set.compactGroupCountsBuffer)
+                               .BufferUAV("g_GroupOffsets", set.compactGroupOffsetsBuffer)
+                               .BufferUAV("g_VisibleCount", set.compactCountBuffer)
+                               .BufferUAV("g_DispatchArgs", set.compactDispatchArgsBuffer);
 
-                        nvrhi::BindingSetHandle scanBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(scanBindDesc, mgr->m_compactScanLayout, nvDevice);
+                        nvrhi::BindingSetHandle scanBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(scanBsb.Build(), mgr->m_compactScanLayout, nvDevice);
                         R_ASSERT2(scanBindingSet, "Failed to create compaction scan binding set");
 
                         nvrhi::ComputeState scanState;
@@ -2549,20 +2460,19 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                         cmdList->setBufferState(set.compactBatchIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
                         cmdList->setBufferState(set.compactMaterialIDBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                        nvrhi::BindingSetDesc scatterBindDesc;
-                        scatterBindDesc.bindings = {
-                            nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
-                            nvrhi::BindingSetItem::RawBuffer_SRV(0, set.drawArgsBuffer),
-                            nvrhi::BindingSetItem::StructuredBuffer_SRV(1, set.materialIDBuffer),
-                            nvrhi::BindingSetItem::StructuredBuffer_SRV(2, set.visibilityBuffer),
-                            nvrhi::BindingSetItem::StructuredBuffer_SRV(3, set.compactLocalPrefixBuffer),
-                            nvrhi::BindingSetItem::StructuredBuffer_SRV(4, set.compactGroupOffsetsBuffer),
-                            nvrhi::BindingSetItem::RawBuffer_UAV(0, set.compactDrawArgsBuffer),
-                            nvrhi::BindingSetItem::StructuredBuffer_UAV(1, set.compactBatchIndicesBuffer),
-                            nvrhi::BindingSetItem::StructuredBuffer_UAV(2, set.compactMaterialIDBuffer)
-                        };
+                        auto* compactScatterRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact", ".cs");
+                        framegraph::BindingSetBuilder scatterBsb(*compactScatterRefl, nvDevice);
+                        scatterBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                                  .BufferSRV("g_InputDrawArgs", set.drawArgsBuffer)
+                                  .BufferSRV("g_InputMaterialIDs", set.materialIDBuffer)
+                                  .BufferSRV("g_Visibility", set.visibilityBuffer)
+                                  .BufferSRV("g_LocalPrefix", set.compactLocalPrefixBuffer)
+                                  .BufferSRV("g_GroupOffsets", set.compactGroupOffsetsBuffer)
+                                  .BufferUAV("g_OutputDrawArgs", set.compactDrawArgsBuffer)
+                                  .BufferUAV("g_VisibleBatchIndices", set.compactBatchIndicesBuffer)
+                                  .BufferUAV("g_OutputMaterialIDs", set.compactMaterialIDBuffer);
 
-                        nvrhi::BindingSetHandle scatterBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(scatterBindDesc, mgr->m_compactScatterLayout, nvDevice);
+                        nvrhi::BindingSetHandle scatterBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(scatterBsb.Build(), mgr->m_compactScatterLayout, nvDevice);
                         R_ASSERT2(scatterBindingSet, "Failed to create compaction scatter binding set");
 
                         nvrhi::ComputeState scatterState;
@@ -2613,19 +2523,16 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 mgr->ExtractFrustumPlanes(Device.mFullTransform, terrainCB.frustumPlanes);
                 cmdList->writeBuffer(mgr->m_cullParamsCB, &terrainCB, sizeof(terrainCB));
 
-                // Create terrain binding set (same layout as regular geometry, uses visibility buffer)
-                nvrhi::BindingSetDesc terrainBindDesc;
-                terrainBindDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_cullParamsCB),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_terrainObjectBuffer),
-                    nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
-                    nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
-                    nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_terrainVisibleIndexBuffer),
-                    nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_terrainVisibleCountBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_UAV(2, mgr->m_terrainVisibilityBuffer)  // Visibility buffer (like regular geometry)
-                };
+                auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
+                framegraph::BindingSetBuilder terrainBsb(*objectCullRefl, nvDevice);
+                terrainBsb.ConstantBuffer("CullParams", mgr->m_cullParamsCB)
+                          .BufferSRV("g_Objects", mgr->m_terrainObjectBuffer)
+                          .Texture("g_HiZPyramid", hizTexture)
+                          .BufferUAV("g_VisibleIndices", mgr->m_terrainVisibleIndexBuffer)
+                          .BufferUAV("g_VisibleCount", mgr->m_terrainVisibleCountBuffer)
+                          .BufferUAV("g_Visibility", mgr->m_terrainVisibilityBuffer);
 
-                nvrhi::BindingSetHandle terrainBindingSet = nvDevice->createBindingSet(terrainBindDesc, mgr->m_cullLayout);
+                nvrhi::BindingSetHandle terrainBindingSet = nvDevice->createBindingSet(terrainBsb.Build(), mgr->m_cullLayout);
                 R_ASSERT2(terrainBindingSet, "Terrain culling binding set creation failed");
 
                 nvrhi::ComputeState terrainState;
@@ -2676,16 +2583,15 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     cmdList->setBufferState(mgr->m_terrainCompactLocalPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
                     cmdList->setBufferState(mgr->m_terrainCompactGroupCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                    nvrhi::BindingSetDesc terrainCountBindDesc;
-                    terrainCountBindDesc.bindings = {
-                        nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
-                        nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_terrainVisibilityBuffer),
-                        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_terrainCompactLocalPrefixBuffer),
-                        nvrhi::BindingSetItem::StructuredBuffer_UAV(1, mgr->m_terrainCompactGroupCountsBuffer)
-                    };
+                    auto* compactCountRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_count", ".cs");
+                    framegraph::BindingSetBuilder terrainCountBsb(*compactCountRefl, nvDevice);
+                    terrainCountBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                                   .BufferSRV("g_Visibility", mgr->m_terrainVisibilityBuffer)
+                                   .BufferUAV("g_LocalPrefix", mgr->m_terrainCompactLocalPrefixBuffer)
+                                   .BufferUAV("g_GroupCounts", mgr->m_terrainCompactGroupCountsBuffer);
 
                     nvrhi::BindingSetHandle terrainCountBindingSet =
-                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainCountBindDesc, mgr->m_compactCountLayout, nvDevice);
+                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainCountBsb.Build(), mgr->m_compactCountLayout, nvDevice);
                     R_ASSERT2(terrainCountBindingSet, "Terrain compaction count binding set creation failed");
 
                     nvrhi::ComputeState terrainCountState;
@@ -2699,17 +2605,16 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     cmdList->setBufferState(mgr->m_terrainCompactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
                     cmdList->setBufferState(mgr->m_terrainCompactDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                    nvrhi::BindingSetDesc terrainScanBindDesc;
-                    terrainScanBindDesc.bindings = {
-                        nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
-                        nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_terrainCompactGroupCountsBuffer),
-                        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_terrainCompactGroupOffsetsBuffer),
-                        nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_terrainCompactCountBuffer),
-                        nvrhi::BindingSetItem::RawBuffer_UAV(2, mgr->m_terrainCompactDispatchArgsBuffer)
-                    };
+                    auto* compactScanRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_scan", ".cs");
+                    framegraph::BindingSetBuilder terrainScanBsb(*compactScanRefl, nvDevice);
+                    terrainScanBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                                  .BufferSRV("g_GroupCounts", mgr->m_terrainCompactGroupCountsBuffer)
+                                  .BufferUAV("g_GroupOffsets", mgr->m_terrainCompactGroupOffsetsBuffer)
+                                  .BufferUAV("g_VisibleCount", mgr->m_terrainCompactCountBuffer)
+                                  .BufferUAV("g_DispatchArgs", mgr->m_terrainCompactDispatchArgsBuffer);
 
                     nvrhi::BindingSetHandle terrainScanBindingSet =
-                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainScanBindDesc, mgr->m_compactScanLayout, nvDevice);
+                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainScanBsb.Build(), mgr->m_compactScanLayout, nvDevice);
                     R_ASSERT2(terrainScanBindingSet, "Terrain compaction scan binding set creation failed");
 
                     nvrhi::ComputeState terrainScanState;
@@ -2726,21 +2631,20 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     cmdList->setBufferState(mgr->m_terrainCompactBatchIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
                     cmdList->setBufferState(mgr->m_terrainCompactMaterialIDBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                    nvrhi::BindingSetDesc terrainScatterBindDesc;
-                    terrainScatterBindDesc.bindings = {
-                        nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
-                        nvrhi::BindingSetItem::RawBuffer_SRV(0, mgr->m_terrainDrawArgsBuffer),
-                        nvrhi::BindingSetItem::StructuredBuffer_SRV(1, mgr->m_terrainMaterialIDBuffer),
-                        nvrhi::BindingSetItem::StructuredBuffer_SRV(2, mgr->m_terrainVisibilityBuffer),
-                        nvrhi::BindingSetItem::StructuredBuffer_SRV(3, mgr->m_terrainCompactLocalPrefixBuffer),
-                        nvrhi::BindingSetItem::StructuredBuffer_SRV(4, mgr->m_terrainCompactGroupOffsetsBuffer),
-                        nvrhi::BindingSetItem::RawBuffer_UAV(0, mgr->m_terrainCompactDrawArgsBuffer),
-                        nvrhi::BindingSetItem::StructuredBuffer_UAV(1, mgr->m_terrainCompactBatchIndicesBuffer),
-                        nvrhi::BindingSetItem::StructuredBuffer_UAV(2, mgr->m_terrainCompactMaterialIDBuffer)
-                    };
+                    auto* compactScatterRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact", ".cs");
+                    framegraph::BindingSetBuilder terrainScatterBsb(*compactScatterRefl, nvDevice);
+                    terrainScatterBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                                     .BufferSRV("g_InputDrawArgs", mgr->m_terrainDrawArgsBuffer)
+                                     .BufferSRV("g_InputMaterialIDs", mgr->m_terrainMaterialIDBuffer)
+                                     .BufferSRV("g_Visibility", mgr->m_terrainVisibilityBuffer)
+                                     .BufferSRV("g_LocalPrefix", mgr->m_terrainCompactLocalPrefixBuffer)
+                                     .BufferSRV("g_GroupOffsets", mgr->m_terrainCompactGroupOffsetsBuffer)
+                                     .BufferUAV("g_OutputDrawArgs", mgr->m_terrainCompactDrawArgsBuffer)
+                                     .BufferUAV("g_VisibleBatchIndices", mgr->m_terrainCompactBatchIndicesBuffer)
+                                     .BufferUAV("g_OutputMaterialIDs", mgr->m_terrainCompactMaterialIDBuffer);
 
                     nvrhi::BindingSetHandle terrainScatterBindingSet =
-                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainScatterBindDesc, mgr->m_compactScatterLayout, nvDevice);
+                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainScatterBsb.Build(), mgr->m_compactScatterLayout, nvDevice);
                     R_ASSERT2(terrainScatterBindingSet, "Terrain compaction scatter binding set creation failed");
 
                     nvrhi::ComputeState terrainScatterState;
@@ -3037,20 +2941,16 @@ void GPUCullingManager::SetupSkinnedCullingPass(
 
             cmdList->writeBuffer(mgr->m_cullParamsCB, &cb, sizeof(cb));
 
-            // Create binding set for skinned culling
-            // Note: We use a dummy visible count buffer since we only need visibility buffer output
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_cullParamsCB),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_skinnedObjectBuffer),
-                nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
-                nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
-                nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_staticSet.visibleIndexBuffer),  // Dummy - not used
-                nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_staticSet.visibleCountBuffer),         // Dummy - not used
-                nvrhi::BindingSetItem::StructuredBuffer_UAV(2, mgr->m_skinnedVisibilityBuffer)
-            };
+            auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
+                framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice);
+            bsb.ConstantBuffer("CullParams", mgr->m_cullParamsCB)
+               .BufferSRV("g_Objects", mgr->m_skinnedObjectBuffer)
+               .Texture("g_HiZPyramid", hizTexture)
+               .BufferUAV("g_VisibleIndices", mgr->m_staticSet.visibleIndexBuffer)  // Dummy - not used
+               .BufferUAV("g_VisibleCount", mgr->m_staticSet.visibleCountBuffer)    // Dummy - not used
+               .BufferUAV("g_Visibility", mgr->m_skinnedVisibilityBuffer);
 
-            nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_cullLayout);
+            nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_cullLayout);
             R_ASSERT2(bindingSet, "Failed to create skinned culling binding set");
 
             // Set compute state and dispatch culling
@@ -3084,24 +2984,24 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    s_object_cull_debug_cs.create("object_cull_debug");
-    s_particle_cull_debug_cs.create("particle_cull_debug");
-    s_cull_debug_vs = RImplementation.Resources->_CreateVS("cull_debug");
-    s_cull_debug_ps = RImplementation.Resources->_CreatePS("cull_debug");
+    auto debugCsResult = RImplementation.m_shaderLoader->LoadComputeShader("object_cull_debug");
+    auto particleDebugCsResult = RImplementation.m_shaderLoader->LoadComputeShader("particle_cull_debug");
+    auto debugVsResult = RImplementation.m_shaderLoader->LoadVertexShader("cull_debug");
+    auto debugPsResult = RImplementation.m_shaderLoader->LoadPixelShader("cull_debug");
 
-    if (!s_object_cull_debug_cs || !s_object_cull_debug_cs->nvrhiShader) {
+    if (!debugCsResult.handle) {
         Msg("! [GPUCulling] object_cull_debug.cs not found - debug visualization disabled");
         return;
     }
-    if (!s_cull_debug_vs || !s_cull_debug_vs->nvrhiShader) {
+    if (!debugVsResult.handle) {
         Msg("! [GPUCulling] cull_debug.vs not found - debug visualization disabled");
         return;
     }
-    if (!s_cull_debug_ps || !s_cull_debug_ps->nvrhiShader) {
+    if (!debugPsResult.handle) {
         Msg("! [GPUCulling] cull_debug.ps not found - debug visualization disabled");
         return;
     }
-    if (!s_particle_cull_debug_cs || !s_particle_cull_debug_cs->nvrhiShader) {
+    if (!particleDebugCsResult.handle) {
         Msg("* [GPUCulling] particle_cull_debug.cs not found - particle debug disabled");
     }
 
@@ -3159,30 +3059,16 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
     //  DEBUG COMPUTE PIPELINE (object_cull_debug.cs)
     // ─────────────────────────────────────────────────────
     {
-        // Binding layout for debug compute
-        // b5: CullDebugParams
-        // t0: g_Objects (structured buffer SRV)
-        // t1: g_HiZPyramid (texture SRV)
-        // s0: g_PointSampler
-        // u0: g_DebugOutput (structured buffer UAV)
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::Compute;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
-            nvrhi::BindingLayoutItem::Texture_SRV(1),
-            nvrhi::BindingLayoutItem::Sampler(0),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0)
-        };
-
-        m_debugComputeLayout = nvDevice->createBindingLayout(layoutDesc);
+        auto& cache = framegraph::GetPassResourceCache();
+        auto* debugCsRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull_debug", ".cs");
+        m_debugComputeLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_DebugCompute", *debugCsRefl, nvDevice);
         if (!m_debugComputeLayout) {
             Msg("! [GPUCulling] Failed to create debug compute binding layout");
             return;
         }
 
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = s_object_cull_debug_cs->nvrhiShader;
+        pipeDesc.CS = RImplementation.m_shaderLoader->LoadComputeShader("object_cull_debug").handle;
         pipeDesc.bindingLayouts = { m_debugComputeLayout };
 
         m_debugComputePipeline = nvDevice->createComputePipeline(pipeDesc);
@@ -3191,9 +3077,10 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
             return;
         }
 
-        if (s_particle_cull_debug_cs && s_particle_cull_debug_cs->nvrhiShader) {
+        auto particleDebugHandle = RImplementation.m_shaderLoader->LoadComputeShader("particle_cull_debug");
+        if (particleDebugHandle.handle) {
             nvrhi::ComputePipelineDesc particlePipeDesc;
-            particlePipeDesc.CS = s_particle_cull_debug_cs->nvrhiShader;
+            particlePipeDesc.CS = particleDebugHandle.handle;
             particlePipeDesc.bindingLayouts = { m_debugComputeLayout };
             m_particleDebugComputePipeline = nvDevice->createComputePipeline(particlePipeDesc);
         }
@@ -3203,17 +3090,10 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
     //  DEBUG GRAPHICS PIPELINE (cull_debug.vs + cull_debug.ps)
     // ─────────────────────────────────────────────────────
     {
-        // Binding layout for debug graphics
-        // b5: CullDebugVSParams (constant buffer)
-        // t0: g_DebugData (structured buffer SRV)
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::Vertex | nvrhi::ShaderType::Pixel;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0)
-        };
-
-        m_debugGraphicsLayout = nvDevice->createBindingLayout(layoutDesc);
+        auto& cache = framegraph::GetPassResourceCache();
+        auto* debugVsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".vs");
+        auto* debugPsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".ps");
+        m_debugGraphicsLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_DebugGraphics", *debugVsRefl, *debugPsRefl, nvDevice);
         if (!m_debugGraphicsLayout) {
             Msg("! [GPUCulling] Failed to create debug graphics binding layout");
             return;
@@ -3221,8 +3101,8 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
 
         // No input layout needed - VS generates vertices from SV_VertexID/SV_InstanceID
         nvrhi::GraphicsPipelineDesc pipeDesc;
-        pipeDesc.VS = s_cull_debug_vs->nvrhiShader;
-        pipeDesc.PS = s_cull_debug_ps->nvrhiShader;
+        pipeDesc.VS = RImplementation.m_shaderLoader->LoadVertexShader("cull_debug").handle;
+        pipeDesc.PS = RImplementation.m_shaderLoader->LoadPixelShader("cull_debug").handle;
         pipeDesc.bindingLayouts = { m_debugGraphicsLayout };
         pipeDesc.primType = nvrhi::PrimitiveType::TriangleStrip;
         pipeDesc.inputLayout = nullptr;  // No vertex input - generated in shader
@@ -3350,16 +3230,14 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
                 cmdList->writeBuffer(mgr->m_debugComputeParamsCB, &cb, sizeof(cb));
 
-                nvrhi::BindingSetDesc bindDesc;
-                bindDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_debugComputeParamsCB),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, objectBuffer),
-                    nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
-                    nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
-                    nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_debugBuffer)
-                };
+                auto* debugCsRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull_debug", ".cs");
+                framegraph::BindingSetBuilder bsb(*debugCsRefl, nvDevice);
+                bsb.ConstantBuffer("CullDebugParams", mgr->m_debugComputeParamsCB)
+                   .BufferSRV("g_Objects", objectBuffer)
+                   .Texture("g_HiZPyramid", hizTexture)
+                   .BufferUAV("g_DebugOutput", mgr->m_debugBuffer);
 
-                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_debugComputeLayout);
+                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_debugComputeLayout);
                 R_ASSERT2(bindingSet, "Debug binding set creation failed");
 
                 nvrhi::ComputeState state;
@@ -3410,16 +3288,14 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                     mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
                     cmdList->writeBuffer(mgr->m_debugComputeParamsCB, &cb, sizeof(cb));
 
-                    nvrhi::BindingSetDesc bindDesc;
-                    bindDesc.bindings = {
-                        nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_debugComputeParamsCB),
-                        nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_particleBuffer),
-                        nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
-                        nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
-                        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_debugBuffer)
-                    };
+                    auto* particleDebugRefl = RImplementation.m_shaderLoader->GetCachedReflection("particle_cull_debug", ".cs");
+                    framegraph::BindingSetBuilder bsb(*particleDebugRefl, nvDevice);
+                    bsb.ConstantBuffer("CullDebugParams", mgr->m_debugComputeParamsCB)
+                       .BufferSRV("g_Particles", mgr->m_particleBuffer)
+                       .Texture("g_HiZPyramid", hizTexture)
+                       .BufferUAV("g_DebugOutput", mgr->m_debugBuffer);
 
-                    nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_debugComputeLayout);
+                    nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_debugComputeLayout);
 
                     nvrhi::ComputeState state;
                     state.pipeline = mgr->m_particleDebugComputePipeline;
@@ -3443,13 +3319,13 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
                 cmdList->writeBuffer(mgr->m_debugGraphicsParamsCB, &vsCB, sizeof(vsCB));
 
-                nvrhi::BindingSetDesc bindDesc;
-                bindDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_debugGraphicsParamsCB),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_debugBuffer)
-                };
+                auto* debugVsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".vs");
+                auto* debugPsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".ps");
+                framegraph::BindingSetBuilder bsb(*debugVsRefl, *debugPsRefl, nvDevice);
+                bsb.ConstantBuffer("CullDebugVSParams", mgr->m_debugGraphicsParamsCB)
+                   .BufferSRV("g_DebugData", mgr->m_debugBuffer);
 
-                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_debugGraphicsLayout);
+                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_debugGraphicsLayout);
 
                 nvrhi::FramebufferDesc fbDesc;
                 fbDesc.addColorAttachment(colorTexture);
@@ -3492,8 +3368,8 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    s_particle_cull_cs.create("particle_cull");
-    if (!s_particle_cull_cs || !s_particle_cull_cs->nvrhiShader) {
+    auto particleCullResult = RImplementation.m_shaderLoader->LoadComputeShader("particle_cull");
+    if (!particleCullResult.handle) {
         Msg("! [GPUCulling] particle_cull.cs not found - particle culling disabled");
         return;
     }
@@ -3562,18 +3438,9 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
     }
 
     {
-        nvrhi::BindingLayoutDesc layoutDesc;
-        layoutDesc.visibility = nvrhi::ShaderType::Compute;
-        layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
-            nvrhi::BindingLayoutItem::Texture_SRV(1),
-            nvrhi::BindingLayoutItem::Sampler(0),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(0),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1)
-        };
-
-        m_particleCullLayout = nvDevice->createBindingLayout(layoutDesc);
+        auto& cache = framegraph::GetPassResourceCache();
+        auto* particleCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("particle_cull", ".cs");
+        m_particleCullLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ParticleCull", *particleCullRefl, nvDevice);
         if (!m_particleCullLayout) {
             Msg("! [GPUCulling] Failed to create particle binding layout");
             return;
@@ -3582,7 +3449,7 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
 
     {
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = s_particle_cull_cs->nvrhiShader;
+        pipeDesc.CS = RImplementation.m_shaderLoader->LoadComputeShader("particle_cull").handle;
         pipeDesc.bindingLayouts = { m_particleCullLayout };
 
         Msg("* [GPUCulling] Creating particle compute pipeline:");
@@ -3757,17 +3624,15 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
 
             cmdList->writeBuffer(mgr->m_particleCullParamsCB, &cb, sizeof(cb));
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_particleCullParamsCB),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_particleBuffer),
-                nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
-                nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
-                nvrhi::BindingSetItem::RawBuffer_UAV(0, mgr->m_particleVisibleCountBuffer),
-                nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_particleDrawArgsBuffer)
-            };
+            auto* particleCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("particle_cull", ".cs");
+            framegraph::BindingSetBuilder bsb(*particleCullRefl, nvDevice);
+            bsb.ConstantBuffer("ParticleCullParams", mgr->m_particleCullParamsCB)
+               .BufferSRV("g_ParticleData", mgr->m_particleBuffer)
+               .Texture("g_HiZPyramid", hizTexture)
+               .BufferUAV("g_VisibleIndices", mgr->m_particleVisibleCountBuffer)
+               .BufferUAV("g_VisibleCount", mgr->m_particleDrawArgsBuffer);
 
-            nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_particleCullLayout);
+            nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_particleCullLayout);
             if (!bindingSet) {
                 Msg("! [GPUCulling] Failed to create particle binding set");
                 return;

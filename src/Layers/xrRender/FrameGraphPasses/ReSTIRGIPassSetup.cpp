@@ -4,6 +4,8 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
@@ -13,6 +15,11 @@
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
 #include <nvrhi/utils.h>
+
+namespace RENDER_NAMESPACE
+{
+    extern CRender RImplementation;
+}
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -112,41 +119,14 @@ static void InitializeResources(ng::RenderDevice* device, ReSTIRGIPassState& sta
 
     // --- Initial pass layout (RT + bindless) ---
     {
-        nvrhi::BindingLayoutDesc desc;
-        desc.visibility = nvrhi::ShaderType::Compute;
-        desc.bindings = {
-            nvrhi::BindingLayoutItem::RayTracingAccelStruct(1),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
-            nvrhi::BindingLayoutItem::RawBuffer_SRV(3),
-            nvrhi::BindingLayoutItem::RawBuffer_SRV(4),
-            nvrhi::BindingLayoutItem::Texture_SRV(5),
-            nvrhi::BindingLayoutItem::Texture_SRV(6),
-            nvrhi::BindingLayoutItem::RawBuffer_SRV(7),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
-            nvrhi::BindingLayoutItem::RawBuffer_SRV(11),
-            nvrhi::BindingLayoutItem::RawBuffer_SRV(12),
-            nvrhi::BindingLayoutItem::RawBuffer_SRV(13),
-            nvrhi::BindingLayoutItem::Texture_SRV(14),
-            nvrhi::BindingLayoutItem::Texture_SRV(15),
-            nvrhi::BindingLayoutItem::Texture_SRV(16),
-            nvrhi::BindingLayoutItem::Texture_SRV(17),
-            nvrhi::BindingLayoutItem::Texture_UAV(0),
-            nvrhi::BindingLayoutItem::Texture_UAV(1),
-            nvrhi::BindingLayoutItem::Texture_UAV(2),
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-            nvrhi::BindingLayoutItem::Sampler(0),
-        };
-        state.initialLayout = cache.GetOrCreateBindingLayout("RTGI_Initial", desc, nvDevice);
-
-        ref_cs shader;
-        shader.create("restir_gi_initial");
-        if (shader && shader->nvrhiShader) {
+        auto csResult = RImplementation.m_shaderLoader->LoadComputeShader("restir_gi_initial");
+        if (csResult.handle) {
+            state.initialLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Initial", *csResult.reflection, nvDevice);
             auto* backend = dynamic_cast<D3D12Backend*>(GEnv.Backend);
             nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
 
             nvrhi::ComputePipelineDesc pipeDesc;
-            pipeDesc.CS = shader->nvrhiShader;
+            pipeDesc.CS = csResult.handle;
             if (bindlessLayout)
                 pipeDesc.bindingLayouts = { state.initialLayout, bindlessLayout };
             else
@@ -157,29 +137,11 @@ static void InitializeResources(ng::RenderDevice* device, ReSTIRGIPassState& sta
 
     // --- Temporal pass layout ---
     {
-        nvrhi::BindingLayoutDesc desc;
-        desc.visibility = nvrhi::ShaderType::Compute;
-        desc.bindings = {
-            nvrhi::BindingLayoutItem::Texture_SRV(0),  // PrevReservoirA
-            nvrhi::BindingLayoutItem::Texture_SRV(1),  // PrevReservoirB
-            nvrhi::BindingLayoutItem::Texture_SRV(2),  // MotionVectors
-            nvrhi::BindingLayoutItem::Texture_SRV(3),  // Depth (current)
-            nvrhi::BindingLayoutItem::Texture_SRV(4),  // Normal (current)
-            nvrhi::BindingLayoutItem::Texture_SRV(5),  // PrevNormal (previous frame)
-            nvrhi::BindingLayoutItem::Texture_SRV(6),  // BaseColor (current)
-            nvrhi::BindingLayoutItem::Texture_SRV(7),  // WorldPos (current)
-            nvrhi::BindingLayoutItem::Texture_SRV(8),  // PrevWorldPos (previous frame)
-            nvrhi::BindingLayoutItem::Texture_UAV(0),   // ReservoirA out
-            nvrhi::BindingLayoutItem::Texture_UAV(1),   // ReservoirB out
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-        };
-        state.temporalLayout = cache.GetOrCreateBindingLayout("RTGI_Temporal_v4", desc, nvDevice);
-
-        ref_cs shader;
-        shader.create("restir_gi_temporal");
-        if (shader && shader->nvrhiShader) {
+        auto csResult = RImplementation.m_shaderLoader->LoadComputeShader("restir_gi_temporal");
+        if (csResult.handle) {
+            state.temporalLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Temporal", *csResult.reflection, nvDevice);
             nvrhi::ComputePipelineDesc pipeDesc;
-            pipeDesc.CS = shader->nvrhiShader;
+            pipeDesc.CS = csResult.handle;
             pipeDesc.bindingLayouts = { state.temporalLayout };
             state.temporalPipeline = nvDevice->createComputePipeline(pipeDesc);
         }
@@ -187,27 +149,11 @@ static void InitializeResources(ng::RenderDevice* device, ReSTIRGIPassState& sta
 
     // --- Composite pass layout ---
     {
-        nvrhi::BindingLayoutDesc desc;
-        desc.visibility = nvrhi::ShaderType::Compute;
-        desc.bindings = {
-            nvrhi::BindingLayoutItem::Texture_SRV(0),
-            nvrhi::BindingLayoutItem::Texture_SRV(1),
-            nvrhi::BindingLayoutItem::Texture_SRV(2),
-            nvrhi::BindingLayoutItem::Texture_SRV(3),
-            nvrhi::BindingLayoutItem::Texture_SRV(4),
-            nvrhi::BindingLayoutItem::Texture_SRV(5),
-            nvrhi::BindingLayoutItem::Texture_SRV(6),
-            nvrhi::BindingLayoutItem::Texture_SRV(7),
-            nvrhi::BindingLayoutItem::Texture_UAV(0),
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-        };
-        state.compositeLayout = cache.GetOrCreateBindingLayout("RTGI_Composite_v3", desc, nvDevice);
-
-        ref_cs shader;
-        shader.create("restir_gi_composite");
-        if (shader && shader->nvrhiShader) {
+        auto csResult = RImplementation.m_shaderLoader->LoadComputeShader("restir_gi_composite");
+        if (csResult.handle) {
+            state.compositeLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Composite", *csResult.reflection, nvDevice);
             nvrhi::ComputePipelineDesc pipeDesc;
-            pipeDesc.CS = shader->nvrhiShader;
+            pipeDesc.CS = csResult.handle;
             pipeDesc.bindingLayouts = { state.compositeLayout };
             state.compositePipeline = nvDevice->createComputePipeline(pipeDesc);
         }
@@ -520,31 +466,32 @@ ReSTIRGIOutput setupReSTIRGIPass(
             if (!grassVB) grassVB = s_placeholderBuffer.Get();
             if (!grassIB) grassIB = s_placeholderBuffer.Get();
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::RayTracingAccelStruct(1, tlas),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(2, batchInfo),
-                nvrhi::BindingSetItem::RawBuffer_SRV(3, megaVB),
-                nvrhi::BindingSetItem::RawBuffer_SRV(4, megaIB),
-                nvrhi::BindingSetItem::Texture_SRV(5, sky0),
-                nvrhi::BindingSetItem::Texture_SRV(6, sky1),
-                nvrhi::BindingSetItem::RawBuffer_SRV(7, skinnedVB),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuf),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainBuf),
-                nvrhi::BindingSetItem::RawBuffer_SRV(11, skinnedIB),
-                nvrhi::BindingSetItem::RawBuffer_SRV(12, grassVB),
-                nvrhi::BindingSetItem::RawBuffer_SRV(13, grassIB),
-                nvrhi::BindingSetItem::Texture_SRV(14, depthTex),
-                nvrhi::BindingSetItem::Texture_SRV(15, normalTex),
-                nvrhi::BindingSetItem::Texture_SRV(16, baseColorTex),
-                nvrhi::BindingSetItem::Texture_SRV(17, worldPosTex),
-                nvrhi::BindingSetItem::Texture_UAV(0, directLit),
-                nvrhi::BindingSetItem::Texture_UAV(1, resA),
-                nvrhi::BindingSetItem::Texture_UAV(2, resB),
-                nvrhi::BindingSetItem::ConstantBuffer(5, data.state->cb),
-                nvrhi::BindingSetItem::Sampler(0, data.state->sampler),
-            };
-            auto bindingSet = nvDevice->createBindingSet(bindDesc, data.state->initialLayout);
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_initial", ".cs");
+            if (!csReflection) return;
+
+            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice);
+            bsb.ConstantBuffer("ReSTIRGIParams", data.state->cb);
+            bsb.AccelStruct("g_SceneTLAS", tlas);
+            bsb.BufferSRV("g_BatchInfo", batchInfo);
+            bsb.BufferSRV("g_MegaVB", megaVB);
+            bsb.BufferSRV("g_MegaIB", megaIB);
+            bsb.Texture("g_Sky0", sky0);
+            bsb.Texture("g_Sky1", sky1);
+            bsb.BufferSRV("g_SkinnedVB", skinnedVB);
+            bsb.BufferSRV("g_Materials", matBuf);
+            bsb.BufferSRV("g_TerrainMaterials", terrainBuf);
+            bsb.BufferSRV("g_SkinnedIB", skinnedIB);
+            bsb.BufferSRV("g_GrassVB", grassVB);
+            bsb.BufferSRV("g_GrassIB", grassIB);
+            bsb.Texture("t_Depth", depthTex);
+            bsb.Texture("t_Normal", normalTex);
+            bsb.Texture("t_BaseColor", baseColorTex);
+            bsb.Texture("t_WorldPos", worldPosTex);
+            bsb.TextureUAV("u_DirectLighting", directLit);
+            bsb.TextureUAV("u_ReservoirA", resA);
+            bsb.TextureUAV("u_ReservoirB", resB);
+            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->initialLayout);
             if (!bindingSet) return;
 
             nvrhi::ComputeState cs;
@@ -616,22 +563,24 @@ ReSTIRGIOutput setupReSTIRGIPass(
 
                 cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(TemporalCB));
 
-                nvrhi::BindingSetDesc bindDesc;
-                bindDesc.bindings = {
-                    nvrhi::BindingSetItem::Texture_SRV(0, data.state->reservoirA[data.readIdx]),
-                    nvrhi::BindingSetItem::Texture_SRV(1, data.state->reservoirB[data.readIdx]),
-                    nvrhi::BindingSetItem::Texture_SRV(2, mvTex),
-                    nvrhi::BindingSetItem::Texture_SRV(3, depthTex),
-                    nvrhi::BindingSetItem::Texture_SRV(4, normalTex),
-                    nvrhi::BindingSetItem::Texture_SRV(5, prevNormalsTex),
-                    nvrhi::BindingSetItem::Texture_SRV(6, baseColorTex),
-                    nvrhi::BindingSetItem::Texture_SRV(7, worldPosTex),
-                    nvrhi::BindingSetItem::Texture_SRV(8, prevWorldPosTex),
-                    nvrhi::BindingSetItem::Texture_UAV(0, data.state->reservoirA[data.writeIdx]),
-                    nvrhi::BindingSetItem::Texture_UAV(1, data.state->reservoirB[data.writeIdx]),
-                    nvrhi::BindingSetItem::ConstantBuffer(5, data.state->cb),
-                };
-                auto bindingSet = nvDevice->createBindingSet(bindDesc, data.state->temporalLayout);
+                auto* shaderLoader = GEnv.Render->GetShaderLoader();
+                auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_temporal", ".cs");
+                if (!csReflection) return;
+
+                framegraph::BindingSetBuilder bsb(*csReflection, nvDevice);
+                bsb.ConstantBuffer("ReSTIRTemporalParams", data.state->cb);
+                bsb.Texture("t_PrevReservoirA", data.state->reservoirA[data.readIdx]);
+                bsb.Texture("t_PrevReservoirB", data.state->reservoirB[data.readIdx]);
+                bsb.Texture("t_MotionVectors", mvTex);
+                bsb.Texture("t_Depth", depthTex);
+                bsb.Texture("t_Normal", normalTex);
+                bsb.Texture("t_PrevNormal", prevNormalsTex);
+                bsb.Texture("t_BaseColor", baseColorTex);
+                bsb.Texture("t_WorldPos", worldPosTex);
+                bsb.Texture("t_PrevWorldPos", prevWorldPosTex);
+                bsb.TextureUAV("u_ReservoirA", data.state->reservoirA[data.writeIdx]);
+                bsb.TextureUAV("u_ReservoirB", data.state->reservoirB[data.writeIdx]);
+                auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->temporalLayout);
                 if (!bindingSet) return;
 
                 nvrhi::ComputeState cs;
@@ -698,20 +647,22 @@ ReSTIRGIOutput setupReSTIRGIPass(
 
             cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(CompositeCB));
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::Texture_SRV(0, directLit),
-                nvrhi::BindingSetItem::Texture_SRV(1, resA),
-                nvrhi::BindingSetItem::Texture_SRV(2, resB),
-                nvrhi::BindingSetItem::Texture_SRV(3, depthTex),
-                nvrhi::BindingSetItem::Texture_SRV(4, normalTex),
-                nvrhi::BindingSetItem::Texture_SRV(5, baseColorTex),
-                nvrhi::BindingSetItem::Texture_SRV(6, sceneColorInTex),
-                nvrhi::BindingSetItem::Texture_SRV(7, worldPosTex),
-                nvrhi::BindingSetItem::Texture_UAV(0, outTex),
-                nvrhi::BindingSetItem::ConstantBuffer(5, data.state->cb),
-            };
-            auto bindingSet = nvDevice->createBindingSet(bindDesc, data.state->compositeLayout);
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_composite", ".cs");
+            if (!csReflection) return;
+
+            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice);
+            bsb.ConstantBuffer("CompositeParams", data.state->cb);
+            bsb.Texture("t_DirectLighting", directLit);
+            bsb.Texture("t_ReservoirA", resA);
+            bsb.Texture("t_ReservoirB", resB);
+            bsb.Texture("t_Depth", depthTex);
+            bsb.Texture("t_Normal", normalTex);
+            bsb.Texture("t_BaseColor", baseColorTex);
+            bsb.Texture("t_SceneColorIn", sceneColorInTex);
+            bsb.Texture("t_WorldPos", worldPosTex);
+            bsb.TextureUAV("u_SceneColor", outTex);
+            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->compositeLayout);
             if (!bindingSet) return;
 
             nvrhi::ComputeState cs;

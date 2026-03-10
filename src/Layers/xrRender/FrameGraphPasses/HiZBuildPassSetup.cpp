@@ -5,6 +5,8 @@
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
@@ -40,10 +42,9 @@ void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 height, HiZ
     }
 
     if (!state.initialized) {
-        ref_cs hiz_build_cs;
-        hiz_build_cs.create("hiz_build");
+        auto csResult = RImplementation.m_shaderLoader->LoadComputeShader("hiz_build");
 
-        if (hiz_build_cs && hiz_build_cs->nvrhiShader) {
+        if (csResult.handle) {
             Msg("* [HiZBuild] Loaded hiz_build compute shader: OK");
             state.computeEnabled = true;
         } else {
@@ -53,29 +54,12 @@ void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 height, HiZ
 
         auto& cache = framegraph::GetPassResourceCache();
 
-        nvrhi::SamplerDesc samplerDesc;
-        samplerDesc.minFilter = false;
-        samplerDesc.magFilter = false;
-        samplerDesc.mipFilter = false;
-        samplerDesc.addressU = nvrhi::SamplerAddressMode::Clamp;
-        samplerDesc.addressV = nvrhi::SamplerAddressMode::Clamp;
-        samplerDesc.addressW = nvrhi::SamplerAddressMode::Clamp;
-        state.pointSampler = cache.GetOrCreateSampler("HiZBuildPass", samplerDesc, nvDevice);
-
         if (state.computeEnabled) {
-            nvrhi::BindingLayoutDesc layoutDesc;
-            layoutDesc.visibility = nvrhi::ShaderType::Compute;
-            layoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::Texture_SRV(0),
-                nvrhi::BindingLayoutItem::Texture_UAV(0),
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-                nvrhi::BindingLayoutItem::Sampler(0)
-            };
-            state.layout = cache.GetOrCreateBindingLayout("HiZBuildPass", layoutDesc, nvDevice);
+            state.layout = cache.GetOrCreateBindingLayoutFromReflection("HiZBuildPass", *csResult.reflection, nvDevice);
 
             if (state.layout) {
                 nvrhi::ComputePipelineDesc pipeDesc;
-                pipeDesc.CS = hiz_build_cs->nvrhiShader;
+                pipeDesc.CS = csResult.handle;
                 pipeDesc.bindingLayouts = { state.layout };
                 state.pipeline = cache.GetOrCreateComputePipeline("HiZBuildPass", pipeDesc, nvDevice);
 
@@ -226,44 +210,28 @@ HiZPyramidOutput setupHiZBuildPass(
 
                 cmdList->writeBuffer(hizCB, &cb, sizeof(cb));
 
-                // Create binding set for this mip level
-                nvrhi::BindingSetDesc bindDesc;
+                nvrhi::TextureSubresourceSet inputSubres;
+                inputSubres.baseMipLevel = (mip > 0) ? mip - 1 : 0;
+                inputSubres.numMipLevels = 1;
+                inputSubres.baseArraySlice = 0;
+                inputSubres.numArraySlices = 1;
 
-                // Input texture
-                if (mip == 0) {
-                    // First mip reads from full-res depth buffer
-                    // NOTE: D32 depth textures must be read as R32_FLOAT when used as SRV
-                    bindDesc.bindings.push_back(
-                        nvrhi::BindingSetItem::Texture_SRV(0, depthTexture, nvrhi::Format::R32_FLOAT));
-                } else {
-                    // Subsequent mips read from previous Hi-Z mip
-                    nvrhi::TextureSubresourceSet inputSubres;
-                    inputSubres.baseMipLevel = mip - 1;
-                    inputSubres.numMipLevels = 1;
-                    inputSubres.baseArraySlice = 0;
-                    inputSubres.numArraySlices = 1;
-
-                    bindDesc.bindings.push_back(
-                        nvrhi::BindingSetItem::Texture_SRV(0, hizTexture, nvrhi::Format::R32_FLOAT, inputSubres));
-                }
-
-                // Output mip level as UAV
                 nvrhi::TextureSubresourceSet outputSubres;
                 outputSubres.baseMipLevel = mip;
                 outputSubres.numMipLevels = 1;
                 outputSubres.baseArraySlice = 0;
                 outputSubres.numArraySlices = 1;
 
-                bindDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::Texture_UAV(0, hizTexture, nvrhi::Format::R32_FLOAT, outputSubres));
+                auto* hizRefl = RImplementation.m_shaderLoader->GetCachedReflection("hiz_build", ".cs");
+                framegraph::BindingSetBuilder bsb(*hizRefl, nvDevice);
+                if (mip == 0)
+                    bsb.Texture("g_input_depth", depthTexture, nvrhi::Format::R32_FLOAT);
+                else
+                    bsb.Texture("g_input_depth", hizTexture, nvrhi::Format::R32_FLOAT, inputSubres);
+                bsb.TextureUAV("g_output_hiz", hizTexture, nvrhi::Format::R32_FLOAT, outputSubres);
+                bsb.ConstantBuffer("HiZParams", hizCB);
 
-                // Constant buffer and sampler
-                bindDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::ConstantBuffer(5, hizCB));
-                bindDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::Sampler(0, data.passState->pointSampler));
-
-                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, data.passState->layout);
+                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), data.passState->layout);
 
                 if (!bindingSet) {
                     Msg("! [HiZBuild] Failed to create binding set for mip %d", mip);

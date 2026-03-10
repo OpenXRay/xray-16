@@ -4,10 +4,12 @@
 #include "PassVertexFormats.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/dx11HW.h"
@@ -63,13 +65,11 @@ void InitializeExposureResources(ng::RenderDevice* device, ExposurePassState& st
         return;
     }
 
-    ref_cs histogram_cs;
-    ref_cs adapt_cs;
-    histogram_cs.create("luminance_histogram");
-    adapt_cs.create("exposure_adapt");
+    auto histogramResult = RImplementation.m_shaderLoader->LoadComputeShader("luminance_histogram");
+    auto adaptResult = RImplementation.m_shaderLoader->LoadComputeShader("exposure_adapt");
 
-    bool histogramOK = histogram_cs && histogram_cs->nvrhiShader;
-    bool adaptOK = adapt_cs && adapt_cs->nvrhiShader;
+    bool histogramOK = histogramResult.handle != nullptr;
+    bool adaptOK = adaptResult.handle != nullptr;
 
     if (histogramOK)
         Msg("* [ExposurePass] Loaded luminance_histogram compute shader: OK");
@@ -116,36 +116,22 @@ void InitializeExposureResources(ng::RenderDevice* device, ExposurePassState& st
         auto& cache = framegraph::GetPassResourceCache();
 
         {
-            nvrhi::BindingLayoutDesc layoutDesc;
-            layoutDesc.visibility = nvrhi::ShaderType::Compute;
-            layoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-                nvrhi::BindingLayoutItem::Texture_SRV(0),
-                nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0)
-            };
-            state.histogramLayout = cache.GetOrCreateBindingLayout("ExposurePass_Histogram", layoutDesc, nvDevice);
+            state.histogramLayout = cache.GetOrCreateBindingLayoutFromReflection("ExposurePass_Histogram", *histogramResult.reflection, nvDevice);
 
             if (state.histogramLayout) {
                 nvrhi::ComputePipelineDesc pipeDesc;
-                pipeDesc.CS = histogram_cs->nvrhiShader;
+                pipeDesc.CS = histogramResult.handle;
                 pipeDesc.bindingLayouts = { state.histogramLayout };
                 state.histogramPipeline = cache.GetOrCreateComputePipeline("ExposurePass_Histogram", pipeDesc, nvDevice);
             }
         }
 
         {
-            nvrhi::BindingLayoutDesc layoutDesc;
-            layoutDesc.visibility = nvrhi::ShaderType::Compute;
-            layoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-                nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
-                nvrhi::BindingLayoutItem::Texture_UAV(0)
-            };
-            state.adaptLayout = cache.GetOrCreateBindingLayout("ExposurePass_Adapt", layoutDesc, nvDevice);
+            state.adaptLayout = cache.GetOrCreateBindingLayoutFromReflection("ExposurePass_Adapt", *adaptResult.reflection, nvDevice);
 
             if (state.adaptLayout) {
                 nvrhi::ComputePipelineDesc pipeDesc;
-                pipeDesc.CS = adapt_cs->nvrhiShader;
+                pipeDesc.CS = adaptResult.handle;
                 pipeDesc.bindingLayouts = { state.adaptLayout };
                 state.adaptPipeline = cache.GetOrCreateComputePipeline("ExposurePass_Adapt", pipeDesc, nvDevice);
             }
@@ -274,12 +260,12 @@ ExposureOutput setupExposurePass(
 
                         cmdList->writeBuffer(histogramCB, &histCB, sizeof(histCB));
 
-                        nvrhi::BindingSetDesc bindDesc;
-                        bindDesc.bindings = {
-                            nvrhi::BindingSetItem::ConstantBuffer(5, histogramCB),
-                            nvrhi::BindingSetItem::Texture_SRV(0, sceneTexture),
-                            nvrhi::BindingSetItem::StructuredBuffer_UAV(0, ps->histogramBuffer)
-                        };
+                        auto* histRefl = RImplementation.m_shaderLoader->GetCachedReflection("luminance_histogram", ".cs");
+                        BindingSetBuilder bsb(*histRefl, nvDevice);
+                        bsb.ConstantBuffer("ExposureParams", histogramCB)
+                           .Texture("g_scene_color", sceneTexture)
+                           .BufferUAV("g_histogram", ps->histogramBuffer);
+                        auto bindDesc = bsb.Build();
                         nvrhi::BindingSetHandle histBindings = nvDevice->createBindingSet(bindDesc, ps->histogramLayout);
 
                         if (histBindings) {
@@ -309,12 +295,12 @@ ExposureOutput setupExposurePass(
 
                         cmdList->writeBuffer(adaptCBHandle, &adaptCB, sizeof(adaptCB));
 
-                        nvrhi::BindingSetDesc bindDesc;
-                        bindDesc.bindings = {
-                            nvrhi::BindingSetItem::ConstantBuffer(5, adaptCBHandle),
-                            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, ps->histogramBuffer),
-                            nvrhi::BindingSetItem::Texture_UAV(0, ps->exposureTexture)
-                        };
+                        auto* adaptRefl = RImplementation.m_shaderLoader->GetCachedReflection("exposure_adapt", ".cs");
+                        BindingSetBuilder bsb(*adaptRefl, nvDevice);
+                        bsb.ConstantBuffer("ExposureAdaptParams", adaptCBHandle)
+                           .BufferSRV("g_histogram", ps->histogramBuffer)
+                           .TextureUAV("g_exposure", ps->exposureTexture);
+                        auto bindDesc = bsb.Build();
                         nvrhi::BindingSetHandle adaptBindings = cache.GetOrCreateBindingSet(bindDesc, ps->adaptLayout, nvDevice);
 
                         if (adaptBindings) {

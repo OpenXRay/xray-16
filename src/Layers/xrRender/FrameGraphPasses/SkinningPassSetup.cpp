@@ -23,6 +23,7 @@
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/Decals/OverlayManager.h"
 #include "PassCommon.h"
 #include "xrCore/FMesh.hpp"
@@ -78,22 +79,6 @@ void InitializeSkinningResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
     auto& cache = framegraph::GetPassResourceCache();
     auto fbInfo = framebuffer->getFramebufferInfo();
 
-    nvrhi::BindingLayoutDesc skinnedLayoutDesc;
-    skinnedLayoutDesc.visibility = nvrhi::ShaderType::All;
-    skinnedLayoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(1),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(11),
-        nvrhi::BindingLayoutItem::Sampler(0),
-    };
-    state.layout = nvDevice->createBindingLayout(skinnedLayoutDesc);
-
     auto skinnedPsResult = shaderLoader->LoadPixelShader("bindless_skinned", "main");
     if (!skinnedPsResult.handle) {
         Msg("! [SkinningPass] Failed to load pixel shader");
@@ -101,11 +86,12 @@ void InitializeSkinningResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
     }
     state.ps = skinnedPsResult.handle;
 
-    nvrhi::SamplerDesc samplerDesc;
-    samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
-    samplerDesc.setAllFilters(true);
-    samplerDesc.setMaxAnisotropy(16.0f);
-    state.linearSampler = nvDevice->createSampler(samplerDesc);
+    auto skinnedVsForReflection = shaderLoader->LoadVertexShader("bindless_skinned", "main");
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass", *skinnedVsForReflection.reflection, *skinnedPsResult.reflection, nvDevice);
+
+    auto hudPsResult = shaderLoader->LoadPixelShader("bindless_skinned_hud", "main");
+    if (hudPsResult.handle)
+        state.hudPS = hudPsResult.handle;
 
     auto buildPipelineDesc = [&](nvrhi::IShader* vs, nvrhi::IInputLayout* il) {
         nvrhi::GraphicsPipelineDesc pipeDesc;
@@ -359,20 +345,24 @@ static void RenderSkinnedBatch(
         return;
 
     auto& matBuffer = MaterialBuffer::Instance();
-    nvrhi::BindingSetDesc bindDesc;
-    bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
-        nvrhi::BindingSetItem::ConstantBuffer(1, shaderParamsCB),
-        nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(3, globalBoneBuffer),
-        nvrhi::BindingSetItem::ConstantBuffer(4, materialIdCB),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMaterialsSB),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(10, bindless::VariantTextureBuffer::Instance().GetBuffer()),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(11, splatBuffer),
-        nvrhi::BindingSetItem::Sampler(0, state.linearSampler),
-    };
-    auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, state.layout, nvDevice);
+    auto& cache = framegraph::GetPassResourceCache();
+
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* vsReflection = shaderLoader->GetCachedReflection("bindless_skinned", ".vs");
+    auto* psReflection = shaderLoader->GetCachedReflection("bindless_skinned", ".ps");
+
+    framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+    bsb.ConstantBuffer("dynamic_transforms", dynTransformsCB);
+    bsb.ConstantBuffer("shader_params", shaderParamsCB);
+    bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+    bsb.BufferSRV("g_BoneMatrices", globalBoneBuffer);
+    bsb.ConstantBuffer("SkinnedMaterialCB", materialIdCB);
+    bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+    bsb.BufferSRV("g_TerrainMaterials", terrainMaterialsSB);
+    bsb.BufferSRV("g_VariantTextures", bindless::VariantTextureBuffer::Instance().GetBuffer());
+    bsb.BufferSRV("g_PaintSplats", splatBuffer);
+
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.layout, nvDevice);
     if (!bindingSet)
         return;
 

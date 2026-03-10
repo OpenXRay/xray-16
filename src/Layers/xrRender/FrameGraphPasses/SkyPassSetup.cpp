@@ -6,6 +6,7 @@
 #include "ExposurePassSetup.h"  // For GetExposureTexture()
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
@@ -245,18 +246,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
             auto& cache = framegraph::GetPassResourceCache();
             nvrhi::IDevice* device = cmdList->getDevice();
 
-            // Binding layout: sky textures + sampler + constants
-            nvrhi::BindingLayoutDesc bindingLayoutDesc;
-            bindingLayoutDesc.visibility = nvrhi::ShaderType::All;
-            bindingLayoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),  // dynamic_transforms (m_WVP) - volatile
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // static_globals - volatile
-                nvrhi::BindingLayoutItem::Texture_SRV(0),             // s_sky0 (cubemap)
-                nvrhi::BindingLayoutItem::Texture_SRV(1),             // s_sky1 (cubemap)
-                nvrhi::BindingLayoutItem::Sampler(0)                  // smp_rtlinear
-            };
-
-            auto bindingLayout = cache.GetOrCreateBindingLayout("SkyPass", bindingLayoutDesc, device);
+            auto bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("SkyPass", *vsResult.reflection, *psResult.reflection, device);
 
             // Render state: no depth write, depth test at far plane
             nvrhi::RenderState renderState;
@@ -317,11 +307,6 @@ framegraph::VirtualResourceHandle setupSkyPass(
             auto dynamicCBBuffer = cache.GetOrCreateVolatileCB("SkyPass", "DynamicCB", sizeof(DynamicTransforms), 16, device);
             cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
-            auto staticCB = BuildStaticGlobals();
-
-            auto staticCBBuffer = cache.GetOrCreateVolatileCB("SkyPass", "StaticCB", sizeof(StaticGlobals), 16, device);
-            cmdList->writeBuffer(staticCBBuffer, &staticCB, sizeof(staticCB));
-
             // ═══════════════════════════════════════════════════════
             //  GET SKY TEXTURES FROM ENVIRONMENT
             // ═══════════════════════════════════════════════════════
@@ -358,26 +343,12 @@ framegraph::VirtualResourceHandle setupSkyPass(
             if (!sky0Tex) sky0Tex = data.passState->placeholderCubemap.Get();
             if (!sky1Tex) sky1Tex = data.passState->placeholderCubemap.Get();
 
-            // Create sampler (cached)
-            nvrhi::SamplerDesc samplerDesc;
-            samplerDesc.setAllFilters(true);
-            samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
-            auto sampler = cache.GetOrCreateSampler("SkyPass", samplerDesc, device);
+            framegraph::BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device);
+            bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer);
+            bsb.Texture("s_sky0", sky0Tex);
+            bsb.Texture("s_sky1", sky1Tex);
 
-            // ═══════════════════════════════════════════════════════
-            //  CREATE BINDING SET
-            // ═══════════════════════════════════════════════════════
-
-            nvrhi::BindingSetDesc bindingSetDesc;
-            bindingSetDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(0, dynamicCBBuffer),
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticCBBuffer),
-                nvrhi::BindingSetItem::Texture_SRV(0, sky0Tex),    // Current weather sky
-                nvrhi::BindingSetItem::Texture_SRV(1, sky1Tex),    // Target weather sky
-                nvrhi::BindingSetItem::Sampler(0, sampler)
-            };
-
-            auto bindingSet = cache.GetOrCreateBindingSet(bindingSetDesc, bindingLayout, device);
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), bindingLayout, device);
 
             // ═══════════════════════════════════════════════════════
             //  RENDER SKY

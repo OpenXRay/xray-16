@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "ImGuiRendererNVRHI.h"
 #include "FrameGraph/ShaderLoader.h"
+#include "FrameGraph/PassResourceCache.h"
+#include "FrameGraph/BindingSetBuilder.h"
 #include <d3dcompiler.h>
 
 namespace xray::render::ng {
@@ -93,19 +95,17 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
     m_renderState.depthStencilState.setDepthWriteEnable(false);
     m_renderState.depthStencilState.setStencilEnable(false);
 
-    // Create binding layout for resources
-    nvrhi::BindingLayoutDesc bindingLayoutDesc;
-    bindingLayoutDesc.visibility = nvrhi::ShaderType::All;
-    bindingLayoutDesc.bindings = {
-        // Constant buffer for projection matrix (volatile - updated every frame)
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
-        // Texture
-        nvrhi::BindingLayoutItem::Texture_SRV(0),
-        // Sampler
-        nvrhi::BindingLayoutItem::Sampler(0)
-    };
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* vsRefl = shaderLoader->GetCachedReflection("imgui", ".vs");
+    auto* psRefl = shaderLoader->GetCachedReflection("imgui", ".ps");
+    auto& cache = framegraph::GetPassResourceCache();
 
-    m_bindingLayout = m_device->createBindingLayout(bindingLayoutDesc);
+    if (vsRefl && psRefl)
+        m_bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("ImGui", *vsRefl, *psRefl, m_device);
+    else if (psRefl)
+        m_bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("ImGui", *psRefl, m_device);
+    else
+        Msg("! ImGui shader reflection not available");
 
     if (!m_bindingLayout)
     {
@@ -159,15 +159,21 @@ bool ImGuiRendererNVRHI::CreateResourceBindings()
         return false;
     }
 
-    // Create resource bindings with the actual font texture
-    nvrhi::BindingSetDesc bindingSetDesc;
-    bindingSetDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
-        nvrhi::BindingSetItem::Texture_SRV(0, m_fontTexture),
-        nvrhi::BindingSetItem::Sampler(0, m_fontSampler)
-    };
+    auto* imgShaderLoader = GEnv.Render->GetShaderLoader();
+    auto* imgVsRefl = imgShaderLoader->GetCachedReflection("imgui", ".vs");
+    auto* imgPsRefl = imgShaderLoader->GetCachedReflection("imgui", ".ps");
 
-    m_resourceBindings = m_device->createBindingSet(bindingSetDesc, m_bindingLayout);
+    if (imgVsRefl && imgPsRefl) {
+        framegraph::BindingSetBuilder bsb(*imgVsRefl, *imgPsRefl, m_device);
+        bsb.ConstantBuffer("vertexBuffer", m_constantBuffer)
+           .Texture("texture0", m_fontTexture);
+        m_resourceBindings = m_device->createBindingSet(bsb.Build(), m_bindingLayout);
+    } else if (imgPsRefl) {
+        framegraph::BindingSetBuilder bsb(*imgPsRefl, m_device);
+        bsb.ConstantBuffer("vertexBuffer", m_constantBuffer)
+           .Texture("texture0", m_fontTexture);
+        m_resourceBindings = m_device->createBindingSet(bsb.Build(), m_bindingLayout);
+    }
 
     if (!m_resourceBindings)
     {
