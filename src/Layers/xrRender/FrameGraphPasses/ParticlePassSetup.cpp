@@ -688,9 +688,8 @@ ParticlePassOutput setupParticlePass(
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* vsReflection = shaderLoader->GetCachedReflection("bindless_particle", ".vs");
             auto* psReflection = shaderLoader->GetCachedReflection("bindless_particle", ".ps");
-            BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
-            bsb.ConstantBuffer("dynamic_transforms", dynTransformsCB)
-               .ConstantBuffer("static_globals", staticGlobalsCB)
+            BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Particle");
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                .BufferSRV("g_Materials", matBuffer.GetBuffer())
                .Texture("g_SceneWorldPos", worldPosCopyRT);
             auto bindDesc = bsb.Build();
@@ -798,9 +797,8 @@ ParticlePassOutput setupParticlePass(
 
             auto* distortVsReflection = shaderLoader->GetCachedReflection("bindless_particle", ".vs");
             auto* distortPsReflection = shaderLoader->GetCachedReflection("bindless_particle_distort", ".ps");
-            BindingSetBuilder distortBsb(*distortVsReflection, *distortPsReflection, nvDevice);
-            distortBsb.ConstantBuffer("dynamic_transforms", dynTransformsCB)
-                      .ConstantBuffer("static_globals", staticGlobalsCB)
+            BindingSetBuilder distortBsb(*distortVsReflection, *distortPsReflection, nvDevice, "Particle.Distort");
+            distortBsb.ConstantBuffer("static_globals", staticGlobalsCB)
                       .BufferSRV("g_Materials", matBuffer.GetBuffer());
             auto distortBindDesc = distortBsb.Build();
             auto distortBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(

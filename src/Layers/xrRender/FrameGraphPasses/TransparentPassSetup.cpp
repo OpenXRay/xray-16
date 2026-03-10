@@ -180,11 +180,9 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             auto* vsReflection = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
             auto* psReflection = shaderLoader->GetCachedReflection("bindless_forward", ".ps");
 
-            framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+            framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Transparent");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-            bsb.ConstantBufferSlot(4, lightingCB);
             bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-            bsb.BufferSRV("g_VariantTextures", variantTexBuffer.GetBuffer());
             bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
             bsb.BufferSRV("g_CompactBatchIndices", cfg.compactBatchIndicesBuffer);
             bsb.BufferSRV("g_CompactMaterialIDs", cfg.compactMaterialIDBuffer);

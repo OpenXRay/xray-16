@@ -186,7 +186,7 @@ framegraph::VirtualResourceHandle setupTonemapPass(
                 return;
             }
 
-            framegraph::BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device);
+            framegraph::BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device, "Tonemap");
             bsb.Texture("t_hdr", hdrTexture);
 
             auto bindingSet = device->createBindingSet(bsb.Build(), bindingLayout);

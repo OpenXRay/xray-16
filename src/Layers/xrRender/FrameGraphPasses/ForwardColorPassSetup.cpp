@@ -170,11 +170,9 @@ static void renderBindlessForward(
     auto* psReflection = shaderLoader->GetCachedReflection("bindless_forward", ".ps");
 
     auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
-        framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+        framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "ForwardColor");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-        bsb.ConstantBufferSlot(4, lightingCB);
         bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-        bsb.BufferSRV("g_VariantTextures", variantTexBuffer.GetBuffer());
         bsb.BufferSRV("g_InstanceData", set.instanceBuffer);
         bsb.BufferSRV("g_CompactBatchIndices", set.compactBatchIndicesBuffer);
         bsb.BufferSRV("g_CompactMaterialIDs", set.compactMaterialIDBuffer);
@@ -347,12 +345,9 @@ static void renderBindlessForward(
             // NOTE: Terrain uses its own instance/batch buffers, not the regular ones
             auto* terrainVsRefl = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
             auto* terrainPsRefl = shaderLoader->GetCachedReflection("bindless_terrain", ".ps");
-            framegraph::BindingSetBuilder terrainBsb(*terrainVsRefl, *terrainPsRefl, nvDevice);
+            framegraph::BindingSetBuilder terrainBsb(*terrainVsRefl, *terrainPsRefl, nvDevice, "ForwardColor.Terrain");
             terrainBsb.ConstantBuffer("static_globals", staticGlobalsCB);
-            terrainBsb.ConstantBufferSlot(4, lightingCB);
-            terrainBsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
             terrainBsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
-            terrainBsb.BufferSRV("g_VariantTextures", variantTexBuffer.GetBuffer());
             terrainBsb.BufferSRV("g_InstanceData", config.terrainInstanceBuffer);
             terrainBsb.BufferSRV("g_CompactBatchIndices", config.terrainCompactBatchIndicesBuffer);
             terrainBsb.BufferSRV("g_CompactMaterialIDs", config.terrainCompactMaterialIDBuffer);

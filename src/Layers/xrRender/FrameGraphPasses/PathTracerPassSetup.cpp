@@ -322,7 +322,7 @@ PathTracerOutput setupPathTracerPass(
             auto* csReflection = shaderLoader->GetCachedReflection("rt_pathtrace", ".cs");
             if (!csReflection) return;
 
-            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice);
+            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "PathTracer");
             bsb.ConstantBuffer("PathTracerParams", s_cb);
             bsb.AccelStruct("g_SceneTLAS", data.accelMgr->GetTLAS());
             bsb.BufferSRV("g_BatchInfo", data.accelMgr->GetBatchInfoBuffer());

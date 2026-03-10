@@ -335,7 +335,7 @@ framegraph::VirtualResourceHandle setupSunPass(
             }
 
             // Create binding set
-            BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device);
+            BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device, "Sun");
             bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer)
                .Texture("s_sun", sunTex);
             auto bindingSetDesc = bsb.Build();

@@ -343,7 +343,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
             if (!sky0Tex) sky0Tex = data.passState->placeholderCubemap.Get();
             if (!sky1Tex) sky1Tex = data.passState->placeholderCubemap.Get();
 
-            framegraph::BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device);
+            framegraph::BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device, "Sky");
             bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer);
             bsb.Texture("s_sky0", sky0Tex);
             bsb.Texture("s_sky1", sky1Tex);

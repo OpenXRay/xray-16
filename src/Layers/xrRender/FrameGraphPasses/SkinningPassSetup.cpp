@@ -90,8 +90,12 @@ void InitializeSkinningResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
     state.layout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass", *skinnedVsForReflection.reflection, *skinnedPsResult.reflection, nvDevice);
 
     auto hudPsResult = shaderLoader->LoadPixelShader("bindless_skinned_hud", "main");
-    if (hudPsResult.handle)
+    if (hudPsResult.handle) {
         state.hudPS = hudPsResult.handle;
+        state.hudLayout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass_HUD", *skinnedVsForReflection.reflection, *hudPsResult.reflection, nvDevice);
+    }
+    if (!state.hudLayout)
+        state.hudLayout = state.layout;
 
     auto buildPipelineDesc = [&](nvrhi::IShader* vs, nvrhi::IInputLayout* il) {
         nvrhi::GraphicsPipelineDesc pipeDesc;
@@ -122,6 +126,16 @@ void InitializeSkinningResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
         variant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
         if (variant.pipeline)
             QueryBindingLayoutFromPipeline(variant.pipeline, state.layout);
+    };
+
+    auto initHudVariant = [&](SkinningPipelineVariant& hudVariant, const SkinningPipelineVariant& worldVariant, const char* cacheName) {
+        if (!worldVariant.pipeline || !state.hudPS)
+            return;
+        hudVariant.vs = worldVariant.vs;
+        hudVariant.inputLayout = worldVariant.inputLayout;
+        auto pipeDesc = buildPipelineDesc(worldVariant.vs, worldVariant.inputLayout, state.hudPS);
+        pipeDesc.bindingLayouts[0] = state.hudLayout;
+        hudVariant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
     };
 
     {
@@ -349,20 +363,19 @@ static void RenderSkinnedBatch(
 
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     auto* vsReflection = shaderLoader->GetCachedReflection("bindless_skinned", ".vs");
-    auto* psReflection = shaderLoader->GetCachedReflection("bindless_skinned", ".ps");
+    const char* psShaderName = isHUD ? "bindless_skinned_hud" : "bindless_skinned";
+    auto* psReflection = shaderLoader->GetCachedReflection(psShaderName, ".ps");
+    auto activeLayout = isHUD ? state.hudLayout : state.layout;
 
-    framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+    framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, isHUD ? "Skinning.HUD" : "Skinning");
     bsb.ConstantBuffer("dynamic_transforms", dynTransformsCB);
-    bsb.ConstantBuffer("shader_params", shaderParamsCB);
     bsb.ConstantBuffer("static_globals", staticGlobalsCB);
     bsb.BufferSRV("g_BoneMatrices", globalBoneBuffer);
     bsb.ConstantBuffer("SkinnedMaterialCB", materialIdCB);
     bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-    bsb.BufferSRV("g_TerrainMaterials", terrainMaterialsSB);
-    bsb.BufferSRV("g_VariantTextures", bindless::VariantTextureBuffer::Instance().GetBuffer());
     bsb.BufferSRV("g_PaintSplats", splatBuffer);
 
-    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.layout, nvDevice);
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), activeLayout, nvDevice);
     if (!bindingSet)
         return;
 

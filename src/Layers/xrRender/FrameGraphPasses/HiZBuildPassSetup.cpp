@@ -223,7 +223,7 @@ HiZPyramidOutput setupHiZBuildPass(
                 outputSubres.numArraySlices = 1;
 
                 auto* hizRefl = RImplementation.m_shaderLoader->GetCachedReflection("hiz_build", ".cs");
-                framegraph::BindingSetBuilder bsb(*hizRefl, nvDevice);
+                framegraph::BindingSetBuilder bsb(*hizRefl, nvDevice, "HiZBuild");
                 if (mip == 0)
                     bsb.Texture("g_input_depth", depthTexture, nvrhi::Format::R32_FLOAT);
                 else

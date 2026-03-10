@@ -1847,7 +1847,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                         cmdList->writeBuffer(s_cb, &cb, sizeof(cb));
 
                         auto* debugRefl = RImplementation.m_shaderLoader->GetCachedReflection("debug_preview", ".cs");
-                        framegraph::BindingSetBuilder bsb(*debugRefl, nvDevice);
+                        framegraph::BindingSetBuilder bsb(*debugRefl, nvDevice, "FGRenderer.Debug");
                         bsb.ConstantBuffer("DebugPreviewParams", s_cb)
                            .Texture("t_source", srcTex)
                            .TextureUAV("u_output", dstTex);

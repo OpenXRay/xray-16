@@ -229,12 +229,10 @@ DefaultOutputLayout setupDetailPass(
             auto* grassPsRefl = shaderLoader->GetCachedReflection("detail_gpu", ".ps");
 
             auto makeGrassBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer) {
-                framegraph::BindingSetBuilder bsb(*grassVsRefl, *grassPsRefl, nvDev);
-                bsb.ConstantBuffer("dynamic_transforms", dm->cachedDynTransformsCB);
-                bsb.ConstantBuffer("shader_params", dm->cachedShaderParamsCB);
+                framegraph::BindingSetBuilder bsb(*grassVsRefl, *grassPsRefl, nvDev, "Detail.Grass");
                 bsb.ConstantBuffer("static_globals", dm->cachedStaticGlobalsCB);
                 bsb.ConstantBuffer("DetailGlobals", dm->cachedDetailGlobalsCB);
-                bsb.ConstantBufferSlot(4, dm->cachedDynLightCB);
+                bsb.ConstantBuffer("$Globals", dm->cachedDynLightCB);
                 bsb.BufferSRV("visible_indices", visibleIndicesBuffer);
                 bsb.BufferSRV("grass_object_tints", dm->cachedGrassTintsBuffer);
                 bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
@@ -242,7 +240,6 @@ DefaultOutputLayout setupDetailPass(
                 bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
                 auto bindDesc = bsb.Build();
                 bindDesc.bindings.push_back(nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection));
-                bindDesc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_SRV(35, dm->detailModelsBuffer));
                 return smpCache.GetOrCreateBindingSet(bindDesc, dm->graphicsBindingLayout, nvDev);
             };
 
@@ -250,15 +247,12 @@ DefaultOutputLayout setupDetailPass(
             auto* bbPsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".ps");
 
             auto makePulledBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer, nvrhi::BindingLayoutHandle layout) {
-                framegraph::BindingSetBuilder bsb(*bbVsRefl, *bbPsRefl, nvDev);
-                bsb.ConstantBuffer("dynamic_transforms", dm->cachedDynTransformsCB);
-                bsb.ConstantBuffer("shader_params", dm->cachedShaderParamsCB);
+                framegraph::BindingSetBuilder bsb(*bbVsRefl, *bbPsRefl, nvDev, "Detail.Billboard");
                 bsb.ConstantBuffer("static_globals", dm->cachedStaticGlobalsCB);
                 bsb.ConstantBuffer("DetailGlobals", dm->cachedDetailGlobalsCB);
-                bsb.ConstantBufferSlot(4, dm->cachedDynLightCB);
                 bsb.BufferSRV("visible_indices", visibleIndicesBuffer);
                 bsb.BufferSRV("detail_models", dm->detailModelsBuffer);
-                bsb.BufferSRVSlot(36, dm->pulledVertexBuffer);
+                bsb.BufferSRV("pulled_vertices", dm->pulledVertexBuffer);
                 bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
                 bsb.BufferSRV("slot_data", dm->slotDataBuffer);
                 bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
@@ -309,7 +303,17 @@ DefaultOutputLayout setupDetailPass(
 
             if (dm->decalGraphicsPipeline && dm->visibleDecalInstancesBuffer && dm->decalDrawArgsBuffer && dm->pulledIndexBuffer && dm->maxPulledIndexCount > 0)
             {
-                nvrhi::BindingSetHandle decalBindingSet = makePulledBindingSet(dm->visibleDecalInstancesBuffer, dm->decalBindingLayout);
+                auto* decalVsRefl = shaderLoader->GetCachedReflection("detail_decal", ".vs");
+                auto* decalPsRefl = shaderLoader->GetCachedReflection("detail_decal", ".ps");
+                framegraph::BindingSetBuilder decalBsb(*decalVsRefl, *decalPsRefl, nvDev, "Detail.Decal");
+                decalBsb.ConstantBuffer("static_globals", dm->cachedStaticGlobalsCB);
+                decalBsb.ConstantBuffer("DetailGlobals", dm->cachedDetailGlobalsCB);
+                decalBsb.BufferSRV("visible_indices", dm->visibleDecalInstancesBuffer);
+                decalBsb.BufferSRV("detail_models", dm->detailModelsBuffer);
+                decalBsb.BufferSRV("decal_vertices", dm->pulledVertexBuffer);
+                decalBsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
+                decalBsb.BufferSRV("slot_data", dm->slotDataBuffer);
+                nvrhi::BindingSetHandle decalBindingSet = smpCache.GetOrCreateBindingSet(decalBsb.Build(), dm->decalBindingLayout, nvDev);
 
                 nvrhi::GraphicsState state;
                 state.framebuffer = framebuffer;

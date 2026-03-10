@@ -1567,7 +1567,7 @@ void FGDetailManager::DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrh
     cmdList->writeBuffer(perlin4dCB, &params, sizeof(params));
 
     auto* perlin4dRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("perlin4d_gen", ".cs");
-    framegraph::BindingSetBuilder bsb(*perlin4dRefl, device);
+    framegraph::BindingSetBuilder bsb(*perlin4dRefl, device, "Detail.Perlin4D");
     bsb.ConstantBuffer("Perlin4DGenParams", perlin4dCB)
        .TextureUAV("g_output", perlin4dTexture);
     auto bindSet = device->createBindingSet(bsb.Build(), perlin4dBindingLayout);
@@ -1798,7 +1798,7 @@ bool FGDetailManager::CreatePrefixSumPipeline(ng::RenderDevice* renderDevice)
     nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
 
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
-    auto* refl = shaderLoader->GetCachedReflection("detail_prefix_sum", ".cs");
+    auto* refl = shaderLoader->GetCachedReflection("detail_prefix_sum", ".cs:main_scan_blocks");
     if (!refl)
     {
         Msg("! [FGDetailManager] Failed to get prefix sum reflection");
@@ -2180,13 +2180,18 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
 
     if (billboardVertexShader && billboardPixelShader)
     {
-        billboardBindingLayout = decalBindingLayout;
+        auto* bbVsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".vs");
+        auto* bbPsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".ps");
+        if (bbVsRefl && bbPsRefl)
+            billboardBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailBillboard", *bbVsRefl, *bbPsRefl, device);
+        if (!billboardBindingLayout)
+            billboardBindingLayout = decalBindingLayout;
 
         nvrhi::GraphicsPipelineDesc bbPipeDesc = pipelineDesc;
         bbPipeDesc.VS = billboardVertexShader;
         bbPipeDesc.PS = billboardPixelShader;
         bbPipeDesc.inputLayout = nullptr;
-        bbPipeDesc.bindingLayouts = { decalBindingLayout };
+        bbPipeDesc.bindingLayouts = { billboardBindingLayout };
         if (backend) {
             auto* bindlessLayout = backend->GetBindlessLayout();
             if (bindlessLayout)
@@ -2348,7 +2353,7 @@ void FGDetailManager::DispatchCulling(
     if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "Details.SlotCull");
     {
         auto* slotCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_cell_cull", ".cs");
-        framegraph::BindingSetBuilder bsb(*slotCullRefl, device);
+        framegraph::BindingSetBuilder bsb(*slotCullRefl, device, "Detail.SlotCull");
         bsb.ConstantBuffer("DetailCullParams", cachedCullParamsCB)
            .BufferSRV("g_slot_aabbs", slotAABBBuffer)
            .BufferUAV("g_slot_visibility", slotVisibilityBuffer)
@@ -2377,7 +2382,7 @@ void FGDetailManager::DispatchCulling(
             return;
 
         auto* cullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_cull", ".cs");
-        framegraph::BindingSetBuilder bsb(*cullRefl, device);
+        framegraph::BindingSetBuilder bsb(*cullRefl, device, "Detail.Cull");
         bsb.ConstantBuffer("DetailCullParams", cachedCullParamsCB)
            .BufferSRV("g_all_instances", generatedInstancesBuffer)
            .BufferSRV("g_visible_slot_ids", visibleSlotIDsBuffer)
@@ -2565,7 +2570,7 @@ void FGDetailManager::BuildDetailModelGPUData()
 nvrhi::BindingSetHandle FGDetailManager::CreateInstanceGenBindingSet(nvrhi::IDevice* device) const
 {
     auto* instGenRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_instance_gen", ".cs");
-    framegraph::BindingSetBuilder bsb(*instGenRefl, device);
+    framegraph::BindingSetBuilder bsb(*instGenRefl, device, "Detail.InstanceGen");
     bsb.ConstantBuffer("DetailCullParams", cachedCullParamsCB)
        .ConstantBuffer("InstanceGenParams", cachedInstanceGenParamsCB)
        .BufferSRV("g_slot_data", slotDataBuffer)
@@ -2646,8 +2651,8 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
     auto dispatchPrefixSum = [&](nvrhi::ComputePipelineHandle pipeline, u32 groups, const char* passName) {
         if (gpuProfiler) gpuProfiler->BeginPass(cmdList, passName);
 
-        auto* prefixRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_prefix_sum", ".cs");
-        framegraph::BindingSetBuilder bsb(*prefixRefl, device);
+        auto* prefixRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_prefix_sum", ".cs:main_scan_blocks");
+        framegraph::BindingSetBuilder bsb(*prefixRefl, device, "Detail.PrefixSum");
         bsb.ConstantBuffer("InstanceGenParams", cachedInstanceGenParamsCB)
            .BufferUAV("g_per_slot_counts", perSlotCountsBuffer)
            .BufferUAV("g_prefix_output", perSlotPrefixBuffer)

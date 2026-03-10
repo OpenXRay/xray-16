@@ -164,12 +164,12 @@ bool ImGuiRendererNVRHI::CreateResourceBindings()
     auto* imgPsRefl = imgShaderLoader->GetCachedReflection("imgui", ".ps");
 
     if (imgVsRefl && imgPsRefl) {
-        framegraph::BindingSetBuilder bsb(*imgVsRefl, *imgPsRefl, m_device);
+        framegraph::BindingSetBuilder bsb(*imgVsRefl, *imgPsRefl, m_device, "ImGui.Init");
         bsb.ConstantBuffer("vertexBuffer", m_constantBuffer)
            .Texture("texture0", m_fontTexture);
         m_resourceBindings = m_device->createBindingSet(bsb.Build(), m_bindingLayout);
     } else if (imgPsRefl) {
-        framegraph::BindingSetBuilder bsb(*imgPsRefl, m_device);
+        framegraph::BindingSetBuilder bsb(*imgPsRefl, m_device, "ImGui.PerDraw");
         bsb.ConstantBuffer("vertexBuffer", m_constantBuffer)
            .Texture("texture0", m_fontTexture);
         m_resourceBindings = m_device->createBindingSet(bsb.Build(), m_bindingLayout);

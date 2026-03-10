@@ -367,7 +367,7 @@ void ParticleGPUCullingManager::DispatchCulling(
     auto* cullReflection = shaderLoader->GetCachedReflection("particle_cull", ".cs");
     if (!cullReflection) return;
 
-    framegraph::BindingSetBuilder bsb(*cullReflection, nvDevice);
+    framegraph::BindingSetBuilder bsb(*cullReflection, nvDevice, "ParticleGPUCull");
     bsb.ConstantBuffer("ParticleCullParams", m_cullParamsCB);
     bsb.BufferSRV("g_ParticleData", m_particleDataBuffer);
     bsb.Texture("g_HiZPyramid", hiZPyramid);
@@ -406,7 +406,7 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
     auto* billboardReflection = shaderLoader->GetCachedReflection("particle_billboard", ".cs");
     if (!billboardReflection) return;
 
-    framegraph::BindingSetBuilder bsb(*billboardReflection, nvDevice);
+    framegraph::BindingSetBuilder bsb(*billboardReflection, nvDevice, "ParticleBillboard");
     bsb.ConstantBuffer("BillboardParams", m_billboardParamsCB);
     bsb.BufferSRV("g_ParticleData", m_particleDataBuffer);
     bsb.BufferSRV("g_VisibleIndices", m_visibleIndicesBuffer);

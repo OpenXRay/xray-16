@@ -383,7 +383,7 @@ TrailPassOutput setupTrailPass(
                 auto* shaderLoader = GEnv.Render->GetShaderLoader();
                 auto* vsReflection = shaderLoader->GetCachedReflection("trail", ".vs");
                 auto* psReflection = shaderLoader->GetCachedReflection("trail", ".ps");
-                BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+                BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Trail");
                 bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                    .ConstantBuffer("TrailParams", trailParamsCB)
                    .BufferSRV("g_Materials", matBuffer.GetBuffer())

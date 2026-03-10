@@ -133,7 +133,7 @@ void setupOverlayPaintPass(
                 cmdList->writeBuffer(cbHandle, &cb, sizeof(cb));
 
                 auto* paintRefl = RImplementation.m_shaderLoader->GetCachedReflection("overlay_paint", ".cs");
-                BindingSetBuilder bsb(*paintRefl, nvDevice);
+                BindingSetBuilder bsb(*paintRefl, nvDevice, "OverlayPaint");
                 bsb.ConstantBuffer("PaintParams", cbHandle)
                    .TextureUAV("g_Overlay", overlay.colorOverlay);
                 auto bindDesc = bsb.Build();

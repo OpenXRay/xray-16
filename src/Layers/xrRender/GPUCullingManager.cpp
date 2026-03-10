@@ -1253,7 +1253,7 @@ void GPUCullingManager::DispatchVariantPartition(
     cmdList->writeBuffer(m_variantPartitionParamsCB, &params, sizeof(params));
 
     auto* variantPartRefl = RImplementation.m_shaderLoader->GetCachedReflection("variant_partition", ".cs");
-    framegraph::BindingSetBuilder bsb(*variantPartRefl, nvDevice);
+    framegraph::BindingSetBuilder bsb(*variantPartRefl, nvDevice, "GPUCull.VariantPart");
     bsb.ConstantBuffer("PartitionParams", m_variantPartitionParamsCB)
        .BufferSRV("g_CompactCount", set.compactCountBuffer)
        .BufferSRV("g_CompactDrawArgs", set.compactDrawArgsBuffer)
@@ -2354,7 +2354,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 cmdList->writeBuffer(mgr->m_cullParamsCB, &cb, sizeof(cb));
 
                 auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
-                framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice);
+                framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice, "GPUCull.ObjectCull");
                 bsb.ConstantBuffer("CullParams", mgr->m_cullParamsCB)
                    .BufferSRV("g_Objects", set.objectBuffer)
                    .Texture("g_HiZPyramid", hizTexture)
@@ -2524,7 +2524,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 cmdList->writeBuffer(mgr->m_cullParamsCB, &terrainCB, sizeof(terrainCB));
 
                 auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
-                framegraph::BindingSetBuilder terrainBsb(*objectCullRefl, nvDevice);
+                framegraph::BindingSetBuilder terrainBsb(*objectCullRefl, nvDevice, "GPUCull.TerrainCull");
                 terrainBsb.ConstantBuffer("CullParams", mgr->m_cullParamsCB)
                           .BufferSRV("g_Objects", mgr->m_terrainObjectBuffer)
                           .Texture("g_HiZPyramid", hizTexture)
@@ -2942,7 +2942,7 @@ void GPUCullingManager::SetupSkinnedCullingPass(
             cmdList->writeBuffer(mgr->m_cullParamsCB, &cb, sizeof(cb));
 
             auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
-                framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice);
+                framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice, "GPUCull.DynamicCull");
             bsb.ConstantBuffer("CullParams", mgr->m_cullParamsCB)
                .BufferSRV("g_Objects", mgr->m_skinnedObjectBuffer)
                .Texture("g_HiZPyramid", hizTexture)
@@ -3231,7 +3231,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 cmdList->writeBuffer(mgr->m_debugComputeParamsCB, &cb, sizeof(cb));
 
                 auto* debugCsRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull_debug", ".cs");
-                framegraph::BindingSetBuilder bsb(*debugCsRefl, nvDevice);
+                framegraph::BindingSetBuilder bsb(*debugCsRefl, nvDevice, "GPUCull.Debug");
                 bsb.ConstantBuffer("CullDebugParams", mgr->m_debugComputeParamsCB)
                    .BufferSRV("g_Objects", objectBuffer)
                    .Texture("g_HiZPyramid", hizTexture)
@@ -3289,7 +3289,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                     cmdList->writeBuffer(mgr->m_debugComputeParamsCB, &cb, sizeof(cb));
 
                     auto* particleDebugRefl = RImplementation.m_shaderLoader->GetCachedReflection("particle_cull_debug", ".cs");
-                    framegraph::BindingSetBuilder bsb(*particleDebugRefl, nvDevice);
+                    framegraph::BindingSetBuilder bsb(*particleDebugRefl, nvDevice, "GPUCull.ParticleDebug");
                     bsb.ConstantBuffer("CullDebugParams", mgr->m_debugComputeParamsCB)
                        .BufferSRV("g_Particles", mgr->m_particleBuffer)
                        .Texture("g_HiZPyramid", hizTexture)
@@ -3321,7 +3321,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
                 auto* debugVsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".vs");
                 auto* debugPsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".ps");
-                framegraph::BindingSetBuilder bsb(*debugVsRefl, *debugPsRefl, nvDevice);
+                framegraph::BindingSetBuilder bsb(*debugVsRefl, *debugPsRefl, nvDevice, "GPUCull.DebugDraw");
                 bsb.ConstantBuffer("CullDebugVSParams", mgr->m_debugGraphicsParamsCB)
                    .BufferSRV("g_DebugData", mgr->m_debugBuffer);
 
@@ -3410,6 +3410,7 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
         nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_ParticleVisibleCount";
         desc.byteSize = sizeof(u32);
+        desc.structStride = sizeof(u32);
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
@@ -3625,7 +3626,7 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
             cmdList->writeBuffer(mgr->m_particleCullParamsCB, &cb, sizeof(cb));
 
             auto* particleCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("particle_cull", ".cs");
-            framegraph::BindingSetBuilder bsb(*particleCullRefl, nvDevice);
+            framegraph::BindingSetBuilder bsb(*particleCullRefl, nvDevice, "GPUCull.ParticleCull");
             bsb.ConstantBuffer("ParticleCullParams", mgr->m_particleCullParamsCB)
                .BufferSRV("g_ParticleData", mgr->m_particleBuffer)
                .Texture("g_HiZPyramid", hizTexture)
