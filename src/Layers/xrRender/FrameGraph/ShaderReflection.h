@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xrCore/xrstring.h"
+#include "ResourceShape.h"
 
 namespace slang {
     struct ShaderReflection;
@@ -35,11 +36,23 @@ struct ShaderRTBindings {
     struct InputTexture {
         shared_str name;
         u32 slot;
+        ResourceShape shape = ResourceShape::Texture;
 
         InputTexture() : slot(0) {}
         InputTexture(const char* n, u32 s) : name(n), slot(s) {}
+        InputTexture(const char* n, u32 s, ResourceShape sh) : name(n), slot(s), shape(sh) {}
     };
     xr_vector<InputTexture> inputTextures;
+
+    struct UAVBinding {
+        shared_str name;
+        u32 slot;
+        ResourceShape shape = ResourceShape::Unknown;
+
+        UAVBinding() : slot(0) {}
+        UAVBinding(const char* n, u32 s, ResourceShape sh) : name(n), slot(s), shape(sh) {}
+    };
+    xr_vector<UAVBinding> uavBindings;
 
     struct Sampler {
         shared_str name;

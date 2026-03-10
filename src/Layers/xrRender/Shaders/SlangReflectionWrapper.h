@@ -3,8 +3,12 @@
 #include <slang.h>
 #include "xrCore/xrstring.h"
 
+#include "Layers/xrRender/FrameGraph/ResourceShape.h"
+
 namespace xray::render
 {
+
+using framegraph::ResourceShape;
 
 class SlangReflectionWrapper
 {
@@ -22,6 +26,7 @@ public:
         const char* name;
         u32 slot;
         u32 space;
+        ResourceShape shape = ResourceShape::Texture;
     };
 
     struct SamplerInfo
@@ -36,6 +41,7 @@ public:
         const char* name;
         u32 slot;
         u32 space;
+        ResourceShape shape = ResourceShape::Unknown;
     };
 
 public:

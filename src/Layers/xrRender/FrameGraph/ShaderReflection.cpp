@@ -622,10 +622,8 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
 
     auto textures = wrapper.GetTextures();
     for (const auto& tex : textures) {
-        ShaderRTBindings::InputTexture input;
-        input.name = tex.name;
-        input.slot = tex.slot;
-        bindings.inputTextures.push_back(input);
+        if (tex.space != 0) continue;
+        bindings.inputTextures.emplace_back(tex.name, tex.slot, tex.shape);
     }
 
     auto samplers = wrapper.GetSamplers();
@@ -634,6 +632,12 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
         sampler.name = samp.name;
         sampler.slot = samp.slot;
         bindings.samplers.push_back(sampler);
+    }
+
+    auto uavs = wrapper.GetUAVs();
+    for (const auto& uav : uavs) {
+        if (uav.space != 0) continue;
+        bindings.uavBindings.emplace_back(uav.name, uav.slot, uav.shape);
     }
 
     if (reflection->getEntryPointCount() == 0) {
