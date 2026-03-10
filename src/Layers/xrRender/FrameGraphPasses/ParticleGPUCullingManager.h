@@ -4,6 +4,7 @@
 
 #include "PassVertexFormats.h"
 #include "xrCore/xrCore.h"
+#include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -112,9 +113,8 @@ private:
     nvrhi::BufferHandle m_vertexBuffer;          // Output: billboard vertices
     nvrhi::BufferHandle m_drawArgsBuffer;        // Output: indirect draw args
 
-    // Constant buffers
-    nvrhi::BufferHandle m_cullParamsCB;
-    nvrhi::BufferHandle m_billboardParamsCB;
+    ng::BufferHandle m_cullParamsCB;
+    ng::BufferHandle m_billboardParamsCB;
 
     // Samplers
     nvrhi::SamplerHandle m_pointClampSampler;

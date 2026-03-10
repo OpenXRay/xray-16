@@ -169,7 +169,7 @@ public:
         bool isVolatile = false;
         u32 maxVersions = 0;
 
-        static constexpr u32 VOLATILE_CB_MAX_VERSIONS = 512;
+        static constexpr u32 VOLATILE_CB_MAX_VERSIONS = 4096;
 
         shared_str debugName;
     };

@@ -184,8 +184,9 @@ BufferHandle BufferManager::CreateBuffer(
 
     if (desc.usage == BufferUsage::Dynamic) {
         nvrhiDesc.isVolatile = true;
-        nvrhiDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
         nvrhiDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
+        if (desc.type == BufferType::Constant)
+            nvrhiDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     }
 
     if (desc.gpuWrite) {

@@ -7,6 +7,7 @@
 #include "ResourceManager/TextureManager.h"
 #include "xrRender_console.h"
 #include "xrEngine/device.h"
+#include "xrEngine/IFrameGraphRender.h"
 #include "xrCDB/Frustum.h"
 #include "xrCDB/Intersect.hpp"
 #include "xrCDB/xrXRC.h"
@@ -829,7 +830,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             nvrhi::BufferDesc ibDesc;
             ibDesc.byteSize = maxPulledIndexCount * sizeof(u16);
             ibDesc.isIndexBuffer = true;
-            ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+            ibDesc.initialState = nvrhi::ResourceStates::ShaderResource;
             ibDesc.keepInitialState = true;
             ibDesc.debugName = "DetailPulledIB";
             pulledIndexBuffer = device->createBuffer(ibDesc);
@@ -1190,7 +1191,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             desc.isConstantBuffer = false;
             desc.isDrawIndirectArgs = false;
             desc.canHaveRawViews = false;
-            desc.initialState = nvrhi::ResourceStates::VertexBuffer;
+            desc.initialState = nvrhi::ResourceStates::ShaderResource;
             desc.keepInitialState = true;
 
             bladeVertexBuffer[lod] = device->createBuffer(desc);
@@ -1213,7 +1214,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             desc.isConstantBuffer = false;
             desc.isDrawIndirectArgs = false;
             desc.canHaveRawViews = false;
-            desc.initialState = nvrhi::ResourceStates::IndexBuffer;
+            desc.initialState = nvrhi::ResourceStates::ShaderResource;
             desc.keepInitialState = true;
 
             bladeIndexBuffer[lod] = device->createBuffer(desc);
@@ -1280,38 +1281,40 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
         cachedDummySlotIndirection = device->createBuffer(desc);
     }
 
-    nvrhi::BufferDesc cbDesc;
+    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
+
+    ng::RenderDevice::BufferDesc cbDesc;
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
     cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
     cbDesc.byteSize = sizeof(passes::DynamicTransforms);
     cbDesc.debugName = "DynTransforms_Detail";
-    cachedDynTransformsCB = device->createBuffer(cbDesc);
+    cachedDynTransformsCB = renderDevice->CreateBuffer(cbDesc);
 
     cbDesc.byteSize = 32;
     cbDesc.debugName = "ShaderParams_Detail";
-    cachedShaderParamsCB = device->createBuffer(cbDesc);
+    cachedShaderParamsCB = renderDevice->CreateBuffer(cbDesc);
 
     cbDesc.byteSize = sizeof(passes::StaticGlobals);
     cbDesc.debugName = "StaticGlobals_Detail";
-    cachedStaticGlobalsCB = device->createBuffer(cbDesc);
+    cachedStaticGlobalsCB = renderDevice->CreateBuffer(cbDesc);
 
     cbDesc.byteSize = sizeof(DetailFrameConstants);
     cbDesc.debugName = "DetailGlobals";
-    cachedDetailGlobalsCB = device->createBuffer(cbDesc);
+    cachedDetailGlobalsCB = renderDevice->CreateBuffer(cbDesc);
 
     cbDesc.byteSize = 48;
     cbDesc.debugName = "DynLight_Detail";
-    cachedDynLightCB = device->createBuffer(cbDesc);
+    cachedDynLightCB = renderDevice->CreateBuffer(cbDesc);
 
     cbDesc.byteSize = sizeof(DetailCullParams);
     cbDesc.debugName = "DetailCullParams";
-    cachedCullParamsCB = device->createBuffer(cbDesc);
+    cachedCullParamsCB = renderDevice->CreateBuffer(cbDesc);
 
     cbDesc.byteSize = sizeof(InstanceGenParams);
     cbDesc.debugName = "InstanceGenParams";
-    cachedInstanceGenParamsCB = device->createBuffer(cbDesc);
+    cachedInstanceGenParamsCB = renderDevice->CreateBuffer(cbDesc);
 
     {
         nvrhi::BufferDesc desc;
@@ -1393,7 +1396,7 @@ void FGDetailManager::DestroyGPUBuffers()
     perlin4dComputeShader = nullptr;
     perlin4dBindingLayout = nullptr;
     perlin4dPipeline = nullptr;
-    perlin4dCB = nullptr;
+    perlin4dCB = ng::BufferHandle();
 
     statsReadbackBuffer = nullptr;
     statsReadbackPending = false;
@@ -1403,13 +1406,13 @@ void FGDetailManager::DestroyGPUBuffers()
     cachedSmp_LinearClamp = nullptr;
     cachedSmp_AnisoWrap = nullptr;
     cachedDummySlotIndirection = nullptr;
-    cachedDynTransformsCB = nullptr;
-    cachedShaderParamsCB = nullptr;
-    cachedStaticGlobalsCB = nullptr;
-    cachedDetailGlobalsCB = nullptr;
-    cachedDynLightCB = nullptr;
-    cachedCullParamsCB = nullptr;
-    cachedInstanceGenParamsCB = nullptr;
+    cachedDynTransformsCB = ng::BufferHandle();
+    cachedShaderParamsCB = ng::BufferHandle();
+    cachedStaticGlobalsCB = ng::BufferHandle();
+    cachedDetailGlobalsCB = ng::BufferHandle();
+    cachedDynLightCB = ng::BufferHandle();
+    cachedCullParamsCB = ng::BufferHandle();
+    cachedInstanceGenParamsCB = ng::BufferHandle();
     cachedGrassTintsBuffer = nullptr;
     cachedResourcesInitialized = false;
 }
@@ -1531,21 +1534,20 @@ bool FGDetailManager::CreatePerlin4DPipeline(nvrhi::IDevice* device)
     }
 
     // Volatile constant buffer for per-frame dispatch params
-    nvrhi::BufferDesc cbDesc;
-    cbDesc.byteSize         = 16;  // Perlin4DGenParams: time, tileScale, textureSize, pad
-    cbDesc.isVolatile       = true;
-    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
-    cbDesc.isConstantBuffer = true;
-    cbDesc.keepInitialState = true;
-    cbDesc.debugName        = "Perlin4DGenCB";
-    perlin4dCB = device->createBuffer(cbDesc);
+    ng::RenderDevice::BufferDesc perlinCBDesc;
+    perlinCBDesc.byteSize         = 16;
+    perlinCBDesc.isVolatile       = true;
+    perlinCBDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    perlinCBDesc.isConstantBuffer = true;
+    perlinCBDesc.debugName        = "Perlin4DGenCB";
+    perlin4dCB = GEnv.FrameGraphRenderer->GetRenderDevice()->CreateBuffer(perlinCBDesc);
 
     return true;
 }
 
 void FGDetailManager::DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, float time)
 {
-    if (!perlin4dPipeline || !perlin4dTexture || !perlin4dCB)
+    if (!perlin4dPipeline || !perlin4dTexture || !perlin4dCB.IsValid())
         return;
 
     // CB data: must match perlin4d_gen.cs Perlin4DGenParams
@@ -1564,11 +1566,12 @@ void FGDetailManager::DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrh
     params.pad0        = 0.f;
 
     // writeBuffer BEFORE setComputeState (NVRHI volatile CB ordering)
-    cmdList->writeBuffer(perlin4dCB, &params, sizeof(params));
+    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
+    cmdList->writeBuffer(renderDevice->GetNativeBuffer(perlin4dCB), &params, sizeof(params));
 
     auto* perlin4dRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("perlin4d_gen", ".cs");
     framegraph::BindingSetBuilder bsb(*perlin4dRefl, device, "Detail.Perlin4D");
-    bsb.ConstantBuffer("Perlin4DGenParams", perlin4dCB)
+    bsb.ConstantBuffer("Perlin4DGenParams", renderDevice->GetNativeBuffer(perlin4dCB))
        .TextureUAV("g_output", perlin4dTexture);
     auto bindSet = device->createBindingSet(bsb.Build(), perlin4dBindingLayout);
 
@@ -2225,6 +2228,8 @@ void FGDetailManager::DispatchCulling(
     if (!computePipeline || !slotCullPipeline)
         return;
 
+    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
+
     float current_density = ps_current_detail_density;
     if (std::abs(current_density - m_lastDensity) > 0.001f)
     {
@@ -2328,7 +2333,7 @@ void FGDetailManager::DispatchCulling(
     params.visibleBillboardCapacity = visibleBufferCapacity;
     params.cullPad2 = 0;
 
-    cmdList->writeBuffer(cachedCullParamsCB, &params, sizeof(params));
+    cmdList->writeBuffer(renderDevice->GetNativeBuffer(cachedCullParamsCB), &params, sizeof(params));
 
     u32 dispatchArgs[3] = { 0, 1, 1 };
     cmdList->writeBuffer(visibleSlotCounterBuffer, dispatchArgs, sizeof(dispatchArgs));
@@ -2354,7 +2359,7 @@ void FGDetailManager::DispatchCulling(
     {
         auto* slotCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_cell_cull", ".cs");
         framegraph::BindingSetBuilder bsb(*slotCullRefl, device, "Detail.SlotCull");
-        bsb.ConstantBuffer("DetailCullParams", cachedCullParamsCB)
+        bsb.ConstantBuffer("DetailCullParams", renderDevice->GetNativeBuffer(cachedCullParamsCB))
            .BufferSRV("g_slot_aabbs", slotAABBBuffer)
            .BufferUAV("g_slot_visibility", slotVisibilityBuffer)
            .BufferUAV("g_visible_slot_ids", visibleSlotIDsBuffer)
@@ -2383,7 +2388,7 @@ void FGDetailManager::DispatchCulling(
 
         auto* cullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_cull", ".cs");
         framegraph::BindingSetBuilder bsb(*cullRefl, device, "Detail.Cull");
-        bsb.ConstantBuffer("DetailCullParams", cachedCullParamsCB)
+        bsb.ConstantBuffer("DetailCullParams", renderDevice->GetNativeBuffer(cachedCullParamsCB))
            .BufferSRV("g_all_instances", generatedInstancesBuffer)
            .BufferSRV("g_visible_slot_ids", visibleSlotIDsBuffer)
            .BufferSRV("g_slot_aabbs", slotAABBBuffer)
@@ -2569,10 +2574,11 @@ void FGDetailManager::BuildDetailModelGPUData()
 
 nvrhi::BindingSetHandle FGDetailManager::CreateInstanceGenBindingSet(nvrhi::IDevice* device) const
 {
+    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
     auto* instGenRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_instance_gen", ".cs");
     framegraph::BindingSetBuilder bsb(*instGenRefl, device, "Detail.InstanceGen");
-    bsb.ConstantBuffer("DetailCullParams", cachedCullParamsCB)
-       .ConstantBuffer("InstanceGenParams", cachedInstanceGenParamsCB)
+    bsb.ConstantBuffer("DetailCullParams", renderDevice->GetNativeBuffer(cachedCullParamsCB))
+       .ConstantBuffer("InstanceGenParams", renderDevice->GetNativeBuffer(cachedInstanceGenParamsCB))
        .BufferSRV("g_slot_data", slotDataBuffer)
        .Texture("g_heightmap", heightmapTexture)
        .BufferSRV("g_detail_models", detailModelsBuffer)
@@ -2598,6 +2604,8 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
         return;
     }
 
+    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
+
     constexpr u32 MAX_DISPATCH_1D = 65535;
     u32 numBlocks = (slot_count + PREFIX_SUM_BLOCK_SIZE - 1) / PREFIX_SUM_BLOCK_SIZE;
     u32 numGroupsX = std::min(slot_count, MAX_DISPATCH_1D);
@@ -2608,7 +2616,7 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
     cullParams.totalSlotCount = slot_count;
     for (u32 i = 0; i < 6; i++)
         cullParams.frustumPlanes[i].set(0, 0, 0, 1000000.0f);
-    cmdList->writeBuffer(cachedCullParamsCB, &cullParams, sizeof(cullParams));
+    cmdList->writeBuffer(renderDevice->GetNativeBuffer(cachedCullParamsCB), &cullParams, sizeof(cullParams));
 
     cmdList->setBufferState(generatedInstancesBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(perSlotCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
@@ -2636,7 +2644,7 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
         genParams.instanceCapacity = generatedInstancesCapacity;
         genParams.detailModelCount = u32(detail_models.size());
         genParams.pad0 = genParams.pad1 = genParams.pad2 = 0;
-        cmdList->writeBuffer(cachedInstanceGenParamsCB, &genParams, sizeof(genParams));
+        cmdList->writeBuffer(renderDevice->GetNativeBuffer(cachedInstanceGenParamsCB), &genParams, sizeof(genParams));
 
         auto bindingSet = CreateInstanceGenBindingSet(device);
         nvrhi::ComputeState state;
@@ -2653,7 +2661,7 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
 
         auto* prefixRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_prefix_sum", ".cs:main_scan_blocks");
         framegraph::BindingSetBuilder bsb(*prefixRefl, device, "Detail.PrefixSum");
-        bsb.ConstantBuffer("InstanceGenParams", cachedInstanceGenParamsCB)
+        bsb.ConstantBuffer("InstanceGenParams", renderDevice->GetNativeBuffer(cachedInstanceGenParamsCB))
            .BufferUAV("g_per_slot_counts", perSlotCountsBuffer)
            .BufferUAV("g_prefix_output", perSlotPrefixBuffer)
            .BufferUAV("g_block_totals", blockTotalsBuffer);

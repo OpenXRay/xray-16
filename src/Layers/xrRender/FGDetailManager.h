@@ -4,6 +4,7 @@
 #include "DetailFormat.h"
 #include "DetailModel.h"
 #include <nvrhi/nvrhi.h>
+#include "RenderContext/ResourceHandle.h"
 
 namespace xray::profiler { class GPUProfiler; }
 
@@ -229,7 +230,7 @@ public:
     nvrhi::ShaderHandle perlin4dComputeShader;
     nvrhi::BindingLayoutHandle perlin4dBindingLayout;
     nvrhi::ComputePipelineHandle perlin4dPipeline;
-    nvrhi::BufferHandle perlin4dCB;
+    ng::BufferHandle perlin4dCB;
 
     // Wind parameters (set from environment, consumed by detail/grass passes)
     Fvector2 windDirection = {1.0f, 0.0f};
@@ -259,13 +260,13 @@ public:
 
     nvrhi::BufferHandle cachedDummySlotIndirection;
 
-    nvrhi::BufferHandle cachedDynTransformsCB;
-    nvrhi::BufferHandle cachedShaderParamsCB;
-    nvrhi::BufferHandle cachedStaticGlobalsCB;
-    nvrhi::BufferHandle cachedDetailGlobalsCB;
-    nvrhi::BufferHandle cachedDynLightCB;
-    nvrhi::BufferHandle cachedCullParamsCB;
-    nvrhi::BufferHandle cachedInstanceGenParamsCB;
+    ng::BufferHandle cachedDynTransformsCB;
+    ng::BufferHandle cachedShaderParamsCB;
+    ng::BufferHandle cachedStaticGlobalsCB;
+    ng::BufferHandle cachedDetailGlobalsCB;
+    ng::BufferHandle cachedDynLightCB;
+    ng::BufferHandle cachedCullParamsCB;
+    ng::BufferHandle cachedInstanceGenParamsCB;
 
     nvrhi::BufferHandle cachedGrassTintsBuffer;
 

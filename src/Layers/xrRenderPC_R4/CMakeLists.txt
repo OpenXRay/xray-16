@@ -182,6 +182,7 @@ target_include_directories(xrRenderPC_R4
     "${CMAKE_SOURCE_DIR}/sdk/include"
     "${CMAKE_SOURCE_DIR}/Externals/nvrhi/include"
     "${CMAKE_SOURCE_DIR}/Externals/slang/include"
+    "${CMAKE_SOURCE_DIR}/Externals/nvrhi/thirdparty/Vulkan-Headers/include"
 )
 
 find_package(Vulkan REQUIRED)
@@ -198,7 +199,7 @@ target_link_libraries(xrRenderPC_R4
     nvrhi
     nvrhi-d3d11
     nvrhi_vk
-    Vulkan::Vulkan
+    ${Vulkan_LIBRARIES}
     slang
 )
 

@@ -4,6 +4,7 @@
 #include "xrCore/xrCore.h"
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include "Layers/xrRender/Bindless/UnifiedVertex.h"
 #include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 
@@ -488,7 +489,7 @@ private:
     CullSetBuffers m_dynamicSet;
 
     // Shared constant buffer
-    nvrhi::BufferHandle m_cullParamsCB;         // Constant buffer
+    ng::BufferHandle m_cullParamsCB;         // Constant buffer
 
     // Compute pipelines
     nvrhi::ComputePipelineHandle m_cullPipeline;
@@ -503,12 +504,12 @@ private:
     nvrhi::BindingLayoutHandle m_compactScatterLayout;
     nvrhi::SamplerHandle m_pointSampler;
 
-    nvrhi::BufferHandle m_compactParamsCB;
+    ng::BufferHandle m_compactParamsCB;
 
     // Variant partition pipeline
     nvrhi::ComputePipelineHandle m_variantPartitionPipeline;
     nvrhi::BindingLayoutHandle m_variantPartitionLayout;
-    nvrhi::BufferHandle m_variantPartitionParamsCB;
+    ng::BufferHandle m_variantPartitionParamsCB;
     VariantPartitionBuffers m_staticPartition;
     VariantPartitionBuffers m_transparentPartition;
     bool m_variantPartitionEnabled = false;
@@ -563,8 +564,8 @@ private:
     //  DEBUG VISUALIZATION RESOURCES
     // ───────────────────────────────────────────────────────
     nvrhi::BufferHandle m_debugBuffer;                // CullDebugData for all objects
-    nvrhi::BufferHandle m_debugComputeParamsCB;       // Constant buffer for compute shader
-    nvrhi::BufferHandle m_debugGraphicsParamsCB;      // Constant buffer for graphics shaders
+    ng::BufferHandle m_debugComputeParamsCB;       // Constant buffer for compute shader
+    ng::BufferHandle m_debugGraphicsParamsCB;      // Constant buffer for graphics shaders
 
     // Debug compute pipeline (object_cull_debug.cs)
     nvrhi::ComputePipelineHandle m_debugComputePipeline;
@@ -578,7 +579,7 @@ private:
     nvrhi::BufferHandle m_particleBuffer;
     nvrhi::BufferHandle m_particleDrawArgsBuffer;
     nvrhi::BufferHandle m_particleVisibleCountBuffer;
-    nvrhi::BufferHandle m_particleCullParamsCB;
+    ng::BufferHandle m_particleCullParamsCB;
     nvrhi::ComputePipelineHandle m_particleCullPipeline;
     nvrhi::BindingLayoutHandle m_particleCullLayout;
 

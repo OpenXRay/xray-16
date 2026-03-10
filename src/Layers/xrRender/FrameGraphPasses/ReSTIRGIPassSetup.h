@@ -18,7 +18,7 @@ struct ReSTIRGIPassState {
     nvrhi::ComputePipelineHandle compositePipeline;
     nvrhi::BindingLayoutHandle compositeLayout;
 
-    nvrhi::BufferHandle cb;
+    nvrhi::IBuffer* cb = nullptr;
     nvrhi::SamplerHandle sampler;
 
     nvrhi::TextureHandle reservoirA[2];

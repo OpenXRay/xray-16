@@ -58,7 +58,7 @@ static nvrhi::BufferHandle CreateNvrhiBuffer(nvrhi::IDevice* device, const void*
     else if (isConstantBuffer)
         desc.initialState = nvrhi::ResourceStates::ConstantBuffer;
     else
-        desc.initialState = nvrhi::ResourceStates::Common;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
 
     nvrhi::BufferHandle buffer = device->createBuffer(desc);
     if (!buffer)

@@ -248,15 +248,15 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
 
     // Constant buffer
     {
-        nvrhi::BufferDesc desc;
+        ng::RenderDevice::BufferDesc desc;
         desc.debugName = "GPUCull_Params";
         desc.byteSize = sizeof(CullParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
         desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
-        m_cullParamsCB = nvDevice->createBuffer(desc);
-        if (!m_cullParamsCB) {
+        m_cullParamsCB = m_device->CreateBuffer(desc);
+        if (!m_cullParamsCB.IsValid()) {
             Msg("! [GPUCulling] Failed to create constant buffer");
             m_computeEnabled = false;
         }
@@ -1001,15 +1001,15 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
     }
 
     {
-        nvrhi::BufferDesc desc;
+        ng::RenderDevice::BufferDesc desc;
         desc.debugName = "GPUCull_CompactParams";
         desc.byteSize = 16;
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
         desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
-        m_compactParamsCB = nvDevice->createBuffer(desc);
-        R_ASSERT2(m_compactParamsCB, "Failed to create compact params CB");
+        m_compactParamsCB = m_device->CreateBuffer(desc);
+        R_ASSERT2(m_compactParamsCB.IsValid(), "Failed to create compact params CB");
     }
 
     {
@@ -1127,14 +1127,14 @@ void GPUCullingManager::CreateVariantPartitionResources(ng::RenderDevice* device
     }
 
     {
-        nvrhi::BufferDesc desc;
+        ng::RenderDevice::BufferDesc desc;
         desc.debugName = "VariantPartition_Params";
         desc.byteSize = 16;
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
         desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
-        m_variantPartitionParamsCB = nvDevice->createBuffer(desc);
-        R_ASSERT2(m_variantPartitionParamsCB, "Failed to create variant partition params CB");
+        m_variantPartitionParamsCB = m_device->CreateBuffer(desc);
+        R_ASSERT2(m_variantPartitionParamsCB.IsValid(), "Failed to create variant partition params CB");
     }
 
     InitPartitionBuffers(nvDevice, m_staticPartition, "Static", variantCount, m_maxObjects);
@@ -1253,11 +1253,11 @@ void GPUCullingManager::DispatchVariantPartition(
     params.variantCount = partition.variantCount;
     params.padding0 = 0;
     params.padding1 = 0;
-    cmdList->writeBuffer(m_variantPartitionParamsCB, &params, sizeof(params));
+    cmdList->writeBuffer(m_device->GetNativeBuffer(m_variantPartitionParamsCB), &params, sizeof(params));
 
     auto* variantPartRefl = RImplementation.m_shaderLoader->GetCachedReflection("variant_partition", ".cs");
     framegraph::BindingSetBuilder bsb(*variantPartRefl, nvDevice, "GPUCull.VariantPart");
-    bsb.ConstantBuffer("PartitionParams", m_variantPartitionParamsCB)
+    bsb.ConstantBuffer("PartitionParams", m_device->GetNativeBuffer(m_variantPartitionParamsCB))
        .BufferSRV("g_CompactCount", set.compactCountBuffer)
        .BufferSRV("g_CompactDrawArgs", set.compactDrawArgsBuffer)
        .BufferSRV("g_CompactBatchIndices", set.compactBatchIndicesBuffer)
@@ -1327,12 +1327,12 @@ void GPUCullingManager::Shutdown()
 
     m_transparentSet = {};
 
-    m_cullParamsCB = nullptr;
+    m_cullParamsCB = ng::BufferHandle();
     m_cullPipeline = nullptr;
     m_cullLayout = nullptr;
     m_pointSampler = nullptr;
 
-    m_compactParamsCB = nullptr;
+    m_compactParamsCB = ng::BufferHandle();
     m_compactCountPipeline = nullptr;
     m_compactScanPipeline = nullptr;
     m_compactScatterPipeline = nullptr;
@@ -1342,14 +1342,14 @@ void GPUCullingManager::Shutdown()
 
     m_variantPartitionPipeline = nullptr;
     m_variantPartitionLayout = nullptr;
-    m_variantPartitionParamsCB = nullptr;
+    m_variantPartitionParamsCB = ng::BufferHandle();
     m_staticPartition = {};
     m_transparentPartition = {};
     m_variantPartitionEnabled = false;
 
     m_debugBuffer = nullptr;
-    m_debugComputeParamsCB = nullptr;
-    m_debugGraphicsParamsCB = nullptr;
+    m_debugComputeParamsCB = ng::BufferHandle();
+    m_debugGraphicsParamsCB = ng::BufferHandle();
     m_debugComputePipeline = nullptr;
     m_particleDebugComputePipeline = nullptr;
     m_debugComputeLayout = nullptr;
@@ -1360,7 +1360,7 @@ void GPUCullingManager::Shutdown()
     m_particleBuffer = nullptr;
     m_particleDrawArgsBuffer = nullptr;
     m_particleVisibleCountBuffer = nullptr;
-    m_particleCullParamsCB = nullptr;
+    m_particleCullParamsCB = ng::BufferHandle();
     m_particleCullPipeline = nullptr;
     m_particleCullLayout = nullptr;
 
@@ -2354,11 +2354,11 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                 mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
 
-                cmdList->writeBuffer(mgr->m_cullParamsCB, &cb, sizeof(cb));
+                cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB), &cb, sizeof(cb));
 
                 auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
                 framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice, "GPUCull.ObjectCull");
-                bsb.ConstantBuffer("CullParams", mgr->m_cullParamsCB)
+                bsb.ConstantBuffer("CullParams", mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB))
                    .BufferSRV("g_Objects", set.objectBuffer)
                    .Texture("g_HiZPyramid", hizTexture)
                    .BufferUAV("g_VisibleIndices", set.visibleIndexBuffer)
@@ -2405,7 +2405,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     compactCB.batchCount = set.objectCount;
                     compactCB.frameId = frameId;
                     compactCB.padding[0] = compactCB.padding[1] = 0;
-                    cmdList->writeBuffer(mgr->m_compactParamsCB, &compactCB, sizeof(compactCB));
+                    cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB), &compactCB, sizeof(compactCB));
 
                     if (compactGroupCount == 0) {
                         u32 zeroCount = 0;
@@ -2419,7 +2419,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                         auto* compactCountRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_count", ".cs");
                         framegraph::BindingSetBuilder countBsb(*compactCountRefl, nvDevice);
-                        countBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                        countBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                .BufferSRV("g_Visibility", set.visibilityBuffer)
                                .BufferUAV("g_LocalPrefix", set.compactLocalPrefixBuffer)
                                .BufferUAV("g_GroupCounts", set.compactGroupCountsBuffer);
@@ -2440,7 +2440,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                         auto* compactScanRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_scan", ".cs");
                         framegraph::BindingSetBuilder scanBsb(*compactScanRefl, nvDevice);
-                        scanBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                        scanBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                .BufferSRV("g_GroupCounts", set.compactGroupCountsBuffer)
                                .BufferUAV("g_GroupOffsets", set.compactGroupOffsetsBuffer)
                                .BufferUAV("g_VisibleCount", set.compactCountBuffer)
@@ -2465,7 +2465,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                         auto* compactScatterRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact", ".cs");
                         framegraph::BindingSetBuilder scatterBsb(*compactScatterRefl, nvDevice);
-                        scatterBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                        scatterBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                   .BufferSRV("g_InputDrawArgs", set.drawArgsBuffer)
                                   .BufferSRV("g_InputMaterialIDs", set.materialIDBuffer)
                                   .BufferSRV("g_Visibility", set.visibilityBuffer)
@@ -2524,11 +2524,11 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 terrainCB.frameId = frameId;
                 terrainCB.padding[0] = terrainCB.padding[1] = terrainCB.padding[2] = 0;
                 mgr->ExtractFrustumPlanes(Device.mFullTransform, terrainCB.frustumPlanes);
-                cmdList->writeBuffer(mgr->m_cullParamsCB, &terrainCB, sizeof(terrainCB));
+                cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB), &terrainCB, sizeof(terrainCB));
 
                 auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
                 framegraph::BindingSetBuilder terrainBsb(*objectCullRefl, nvDevice, "GPUCull.TerrainCull");
-                terrainBsb.ConstantBuffer("CullParams", mgr->m_cullParamsCB)
+                terrainBsb.ConstantBuffer("CullParams", mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB))
                           .BufferSRV("g_Objects", mgr->m_terrainObjectBuffer)
                           .Texture("g_HiZPyramid", hizTexture)
                           .BufferUAV("g_VisibleIndices", mgr->m_terrainVisibleIndexBuffer)
@@ -2569,7 +2569,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 terrainCompactCB.batchCount = mgr->m_terrainObjectCount;
                 terrainCompactCB.frameId = frameId;
                 terrainCompactCB.padding[0] = terrainCompactCB.padding[1] = 0;
-                cmdList->writeBuffer(mgr->m_compactParamsCB, &terrainCompactCB, sizeof(terrainCompactCB));
+                cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB), &terrainCompactCB, sizeof(terrainCompactCB));
 
                 u32 terrainCompactGroupCount =
                     (mgr->m_terrainObjectCount + COMPACT_THREAD_GROUP_SIZE - 1) / COMPACT_THREAD_GROUP_SIZE;
@@ -2588,7 +2588,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                     auto* compactCountRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_count", ".cs");
                     framegraph::BindingSetBuilder terrainCountBsb(*compactCountRefl, nvDevice);
-                    terrainCountBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                    terrainCountBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                    .BufferSRV("g_Visibility", mgr->m_terrainVisibilityBuffer)
                                    .BufferUAV("g_LocalPrefix", mgr->m_terrainCompactLocalPrefixBuffer)
                                    .BufferUAV("g_GroupCounts", mgr->m_terrainCompactGroupCountsBuffer);
@@ -2610,7 +2610,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                     auto* compactScanRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_scan", ".cs");
                     framegraph::BindingSetBuilder terrainScanBsb(*compactScanRefl, nvDevice);
-                    terrainScanBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                    terrainScanBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                   .BufferSRV("g_GroupCounts", mgr->m_terrainCompactGroupCountsBuffer)
                                   .BufferUAV("g_GroupOffsets", mgr->m_terrainCompactGroupOffsetsBuffer)
                                   .BufferUAV("g_VisibleCount", mgr->m_terrainCompactCountBuffer)
@@ -2636,7 +2636,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                     auto* compactScatterRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact", ".cs");
                     framegraph::BindingSetBuilder terrainScatterBsb(*compactScatterRefl, nvDevice);
-                    terrainScatterBsb.ConstantBuffer("CompactParams", mgr->m_compactParamsCB)
+                    terrainScatterBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                      .BufferSRV("g_InputDrawArgs", mgr->m_terrainDrawArgsBuffer)
                                      .BufferSRV("g_InputMaterialIDs", mgr->m_terrainMaterialIDBuffer)
                                      .BufferSRV("g_Visibility", mgr->m_terrainVisibilityBuffer)
@@ -2942,11 +2942,11 @@ void GPUCullingManager::SetupSkinnedCullingPass(
 
             mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
 
-            cmdList->writeBuffer(mgr->m_cullParamsCB, &cb, sizeof(cb));
+            cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB), &cb, sizeof(cb));
 
             auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
                 framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice, "GPUCull.DynamicCull");
-            bsb.ConstantBuffer("CullParams", mgr->m_cullParamsCB)
+            bsb.ConstantBuffer("CullParams", mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB))
                .BufferSRV("g_Objects", mgr->m_skinnedObjectBuffer)
                .Texture("g_HiZPyramid", hizTexture)
                .BufferUAV("g_VisibleIndices", mgr->m_staticSet.visibleIndexBuffer)  // Dummy - not used
@@ -3029,30 +3029,30 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
     // ─────────────────────────────────────────────────────
     {
         // Compute shader constant buffer
-        nvrhi::BufferDesc desc;
+        ng::RenderDevice::BufferDesc desc;
         desc.debugName = "GPUCull_DebugComputeParams";
         desc.byteSize = sizeof(CullDebugParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
         desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
-        m_debugComputeParamsCB = nvDevice->createBuffer(desc);
-        if (!m_debugComputeParamsCB) {
+        m_debugComputeParamsCB = m_device->CreateBuffer(desc);
+        if (!m_debugComputeParamsCB.IsValid()) {
             Msg("! [GPUCulling] Failed to create debug compute constant buffer");
             return;
         }
     }
     {
         // Graphics shader constant buffer
-        nvrhi::BufferDesc desc;
+        ng::RenderDevice::BufferDesc desc;
         desc.debugName = "GPUCull_DebugGraphicsParams";
         desc.byteSize = sizeof(CullDebugVSParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
         desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
-        m_debugGraphicsParamsCB = nvDevice->createBuffer(desc);
-        if (!m_debugGraphicsParamsCB) {
+        m_debugGraphicsParamsCB = m_device->CreateBuffer(desc);
+        if (!m_debugGraphicsParamsCB.IsValid()) {
             Msg("! [GPUCulling] Failed to create debug graphics constant buffer");
             return;
         }
@@ -3231,11 +3231,11 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 cb.debugOffset = debugOffset;
 
                 mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
-                cmdList->writeBuffer(mgr->m_debugComputeParamsCB, &cb, sizeof(cb));
+                cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_debugComputeParamsCB), &cb, sizeof(cb));
 
                 auto* debugCsRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull_debug", ".cs");
                 framegraph::BindingSetBuilder bsb(*debugCsRefl, nvDevice, "GPUCull.Debug");
-                bsb.ConstantBuffer("CullDebugParams", mgr->m_debugComputeParamsCB)
+                bsb.ConstantBuffer("CullDebugParams", mgr->m_device->GetNativeBuffer(mgr->m_debugComputeParamsCB))
                    .BufferSRV("g_Objects", objectBuffer)
                    .Texture("g_HiZPyramid", hizTexture)
                    .BufferUAV("g_DebugOutput", mgr->m_debugBuffer);
@@ -3289,11 +3289,11 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                     cb.debugOffset = data.objectCount;
 
                     mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
-                    cmdList->writeBuffer(mgr->m_debugComputeParamsCB, &cb, sizeof(cb));
+                    cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_debugComputeParamsCB), &cb, sizeof(cb));
 
                     auto* particleDebugRefl = RImplementation.m_shaderLoader->GetCachedReflection("particle_cull_debug", ".cs");
                     framegraph::BindingSetBuilder bsb(*particleDebugRefl, nvDevice, "GPUCull.ParticleDebug");
-                    bsb.ConstantBuffer("CullDebugParams", mgr->m_debugComputeParamsCB)
+                    bsb.ConstantBuffer("CullDebugParams", mgr->m_device->GetNativeBuffer(mgr->m_debugComputeParamsCB))
                        .BufferSRV("g_Particles", mgr->m_particleBuffer)
                        .Texture("g_HiZPyramid", hizTexture)
                        .BufferUAV("g_DebugOutput", mgr->m_debugBuffer);
@@ -3320,12 +3320,12 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 vsCB.objectCount = totalDebugCount;
                 vsCB.wireframeAlpha = 0.7f;
 
-                cmdList->writeBuffer(mgr->m_debugGraphicsParamsCB, &vsCB, sizeof(vsCB));
+                cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_debugGraphicsParamsCB), &vsCB, sizeof(vsCB));
 
                 auto* debugVsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".vs");
                 auto* debugPsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".ps");
                 framegraph::BindingSetBuilder bsb(*debugVsRefl, *debugPsRefl, nvDevice, "GPUCull.DebugDraw");
-                bsb.ConstantBuffer("CullDebugVSParams", mgr->m_debugGraphicsParamsCB)
+                bsb.ConstantBuffer("CullDebugVSParams", mgr->m_device->GetNativeBuffer(mgr->m_debugGraphicsParamsCB))
                    .BufferSRV("g_DebugData", mgr->m_debugBuffer);
 
                 nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_debugGraphicsLayout);
@@ -3427,15 +3427,15 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
     }
 
     {
-        nvrhi::BufferDesc desc;
+        ng::RenderDevice::BufferDesc desc;
         desc.debugName = "GPUCull_ParticleParams";
         desc.byteSize = sizeof(CullParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
         desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
-        m_particleCullParamsCB = nvDevice->createBuffer(desc);
-        if (!m_particleCullParamsCB) {
+        m_particleCullParamsCB = m_device->CreateBuffer(desc);
+        if (!m_particleCullParamsCB.IsValid()) {
             Msg("! [GPUCulling] Failed to create particle constant buffer");
             return;
         }
@@ -3626,11 +3626,11 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
 
             mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
 
-            cmdList->writeBuffer(mgr->m_particleCullParamsCB, &cb, sizeof(cb));
+            cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_particleCullParamsCB), &cb, sizeof(cb));
 
             auto* particleCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("particle_cull", ".cs");
             framegraph::BindingSetBuilder bsb(*particleCullRefl, nvDevice, "GPUCull.ParticleCull");
-            bsb.ConstantBuffer("ParticleCullParams", mgr->m_particleCullParamsCB)
+            bsb.ConstantBuffer("ParticleCullParams", mgr->m_device->GetNativeBuffer(mgr->m_particleCullParamsCB))
                .BufferSRV("g_ParticleData", mgr->m_particleBuffer)
                .Texture("g_HiZPyramid", hizTexture)
                .BufferUAV("g_VisibleIndices", mgr->m_particleVisibleCountBuffer)

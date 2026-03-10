@@ -11,7 +11,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 struct MotionVectorPassState {
     nvrhi::ComputePipelineHandle pipeline;
     nvrhi::BindingLayoutHandle layout;
-    nvrhi::BufferHandle cb;
+    nvrhi::IBuffer* cb = nullptr;
     bool initialized = false;
 };
 
