@@ -240,7 +240,7 @@ TextureHandle TextureManager::CreateTexture(
     nvrhiDesc.mipLevels = desc.mipLevels;
     nvrhiDesc.format = desc.format;
     nvrhiDesc.debugName = desc.debugName.c_str();
-    nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
+    nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
     nvrhiDesc.keepInitialState = true;
 
     switch (desc.type) {

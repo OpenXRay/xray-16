@@ -536,7 +536,7 @@ void RTAccelStructManager::InitSkinningPipeline()
     cbDesc.byteSize = sizeof(RTSkinningCB);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = 256;
+    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     cbDesc.keepInitialState = true;
     cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
     s_skinCB = nvDevice->createBuffer(cbDesc);
@@ -767,7 +767,7 @@ void RTAccelStructManager::InitGrassPipeline()
     cbDesc.byteSize = sizeof(GrassRTCB);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = 16;
+    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     cbDesc.keepInitialState = true;
     cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
     s_grassCB = nvDevice->createBuffer(cbDesc);
@@ -808,7 +808,7 @@ void RTAccelStructManager::InitBillboardPipeline()
     cbDesc.byteSize = sizeof(BillboardRTCB);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = 4;
+    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     cbDesc.keepInitialState = true;
     cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
     s_billboardCB = nvDevice->createBuffer(cbDesc);

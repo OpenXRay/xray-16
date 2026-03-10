@@ -78,7 +78,7 @@ public:
         bool isUAV = false;
         bool generateMips = false;
 
-        nvrhi::ResourceStates initialState = nvrhi::ResourceStates::Common;
+        nvrhi::ResourceStates initialState = nvrhi::ResourceStates::ShaderResource;
 
         shared_str debugName;
     };
@@ -135,6 +135,8 @@ public:
 
         bool isVolatile = false;
         u32 maxVersions = 0;
+
+        static constexpr u32 VOLATILE_CB_MAX_VERSIONS = 2 * 128;
 
         shared_str debugName;
     };

@@ -187,7 +187,7 @@ bool ParticleGPUCullingManager::CreateBuffers()
         desc.debugName = "ParticleCullParamsCB";
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = 16;
+        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
         m_cullParamsCB = nvDevice->createBuffer(desc);
         if (!m_cullParamsCB)
             return false;
@@ -199,7 +199,7 @@ bool ParticleGPUCullingManager::CreateBuffers()
         desc.debugName = "ParticleBillboardParamsCB";
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = 16;
+        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
         m_billboardParamsCB = nvDevice->createBuffer(desc);
         if (!m_billboardParamsCB)
             return false;

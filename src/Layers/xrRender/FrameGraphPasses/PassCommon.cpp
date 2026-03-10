@@ -17,7 +17,7 @@ nvrhi::BufferHandle GetOrCreateDrawIndexBuffer(const char* passName, nvrhi::IDev
         desc.structStride = sizeof(u32);
         desc.isVertexBuffer = true;
         desc.debugName = "DrawIndexBuffer";
-        desc.initialState = nvrhi::ResourceStates::VertexBuffer;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
         return cache.GetOrCreateStaticBuffer(passName, "DrawIndexBuffer", desc, device);
     }
@@ -27,7 +27,7 @@ nvrhi::BufferHandle GetOrCreateDrawIndexBuffer(const char* passName, nvrhi::IDev
     desc.structStride = sizeof(u32);
     desc.isVertexBuffer = true;
     desc.debugName = "DrawIndexBuffer";
-    desc.initialState = nvrhi::ResourceStates::VertexBuffer;
+    desc.initialState = nvrhi::ResourceStates::ShaderResource;
     desc.keepInitialState = true;
     auto buffer = cache.GetOrCreateStaticBuffer(passName, "DrawIndexBuffer", desc, device);
 

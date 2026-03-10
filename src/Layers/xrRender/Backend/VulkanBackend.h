@@ -88,6 +88,7 @@ private:
 
     VkSemaphore m_imageAvailable[BACK_BUFFER_COUNT] = {};
     VkSemaphore m_renderFinished[BACK_BUFFER_COUNT] = {};
+    VkFence m_inFlightFence[BACK_BUFFER_COUNT] = {};
 
     nvrhi::DeviceHandle m_nvrhiDevice;
     nvrhi::DeviceHandle m_nvrhiVulkanDevice;

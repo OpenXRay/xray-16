@@ -1475,7 +1475,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                             cbDesc.byteSize = 32;
                             cbDesc.isConstantBuffer = true;
                             cbDesc.isVolatile = true;
-                            cbDesc.maxVersions = 16;
+                            cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
                             cbDesc.keepInitialState = true;
                             cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
                             s_cb = nvDevice->createBuffer(cbDesc);
