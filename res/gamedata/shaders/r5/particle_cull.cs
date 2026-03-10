@@ -7,15 +7,14 @@
 #include "common_samplers.h"
 #include "cull_utils.h"
 
-// Must match GPUParticleData in ParticlePassSetup.h (48 bytes)
+// Must match GPUParticleData in GPUCullingManager.h (32 bytes)
 struct ParticleData {
     float3 position;    // 12 bytes
-    float rotation;     //  4 bytes
-    float2 size;        //  8 bytes
-    uint color;         //  4 bytes
-    uint materialID;    //  4 bytes
-    float2 uvMin;       //  8 bytes
-    float2 uvMax;       //  8 bytes
+    float radius;       //  4 bytes
+    uint batchIndex;    //  4 bytes
+    uint flags;         //  4 bytes
+    float pad0;         //  4 bytes
+    float pad1;         //  4 bytes
 };
 
 // Use b5 to avoid collision with common.h buffers (b0, b1, b2, b3, b4)
@@ -48,10 +47,8 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
 
     ParticleData p = g_ParticleData[particleIdx];
 
-    // Bounding sphere radius (diagonal of billboard)
-    float radius = length(p.size);
+    float radius = p.radius;
 
-    // Frustum culling (returns true = visible)
     if (!FrustumTestSphere(p.position, radius, g_FrustumPlanes))
         return;
 

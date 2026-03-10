@@ -423,6 +423,8 @@ nvrhi::IBuffer* PassResourceCache::GetOrCreateVolatileCB(
     ng::BufferHandle handle = device->CreateBuffer(desc);
     if (handle.IsValid()) {
         m_volatileCBs[key] = handle;
+        Msg("* [VCB] Created '%s' (%u bytes, %u versions, total %u bytes)",
+            debugStr, byteSize, maxVersions, byteSize * maxVersions);
         return device->GetNativeBuffer(handle);
     }
     return nullptr;

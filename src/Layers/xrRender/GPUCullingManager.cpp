@@ -253,7 +253,7 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
         desc.byteSize = sizeof(CullParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+        desc.maxVersions = 512;
 
         m_cullParamsCB = m_device->CreateBuffer(desc);
         if (!m_cullParamsCB.IsValid()) {
@@ -1006,7 +1006,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
         desc.byteSize = 16;
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+        desc.maxVersions = 512;
 
         m_compactParamsCB = m_device->CreateBuffer(desc);
         R_ASSERT2(m_compactParamsCB.IsValid(), "Failed to create compact params CB");

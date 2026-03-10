@@ -153,7 +153,7 @@ static void renderBindlessForward(
     InitializeForwardResources(device, framebuffer, ps);
 
     auto lightingCB = cache.GetOrCreateVolatileCB("ForwardColor", "LightingCB", sizeof(LightingConstants), device);
-    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ForwardColor", "StaticGlobalsCB", sizeof(StaticGlobals), device);
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ForwardColor", "StaticGlobalsCB", sizeof(StaticGlobals), device, 1024);
     auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("ForwardColor", nvDevice);
 
     auto lightingData = FillLightingConstants();

@@ -139,11 +139,11 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     sessionOptionCount++;
 
     sessionOptions[sessionOptionCount].name = slang::CompilerOptionName::DebugInformation;
-#ifdef DEBUG
-    sessionOptions[sessionOptionCount].value = {slang::CompilerOptionValueKind::Int, SLANG_DEBUG_INFO_LEVEL_MAXIMAL, 0};
-#else
+//#ifdef DEBUG
+    //sessionOptions[sessionOptionCount].value = {slang::CompilerOptionValueKind::Int, SLANG_DEBUG_INFO_LEVEL_MAXIMAL, 0};
+//#else
     sessionOptions[sessionOptionCount].value = {slang::CompilerOptionValueKind::Int, SLANG_DEBUG_INFO_LEVEL_NONE, 0};
-#endif
+//#endif
     sessionOptionCount++;
 
     if (target == Target::SPIRV)

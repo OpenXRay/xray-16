@@ -569,7 +569,7 @@ void FrameGraphRenderer::RenderMenu() {
             auto* bgRT = fg.GetPhysicalTexture(backgroundTarget);
             if (bgRT) {
                 nvrhi::ICommandList* cmdList = ctx.GetCommandList();
-                cmdList->clearTextureFloat(bgRT, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f));
+                cmdList->clearTextureFloat(bgRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
             }
         }
     );

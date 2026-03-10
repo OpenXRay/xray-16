@@ -587,12 +587,11 @@ bool FGDetailManager::LoadBuildDetailsTexture(nvrhi::IDevice* device)
         return false;
     }
 
-    pendingBuildDetailsUploads.resize(ddsData.mipLevels.size());
+    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
     for (u32 mip = 0; mip < ddsData.mipLevels.size(); mip++)
     {
         const auto& ml = ddsData.mipLevels[mip];
-        pendingBuildDetailsUploads[mip].data.assign(ml.data, ml.data + ml.size);
-        pendingBuildDetailsUploads[mip].rowPitch = ml.rowPitch;
+        renderDevice->UploadTextureDataToNVRHI(buildDetailsTexture, 0, mip, ml.data, ml.size, ml.rowPitch, 0);
     }
 
     if (GEnv.Backend)
@@ -620,12 +619,10 @@ bool FGDetailManager::LoadBuildDetailsTexture(nvrhi::IDevice* device)
         buildDetailsPbrTexture = device->createTexture(pbrDesc);
         if (buildDetailsPbrTexture)
         {
-            pendingBuildDetailsPbrUploads.resize(pbrData.mipLevels.size());
             for (u32 mip = 0; mip < pbrData.mipLevels.size(); mip++)
             {
                 const auto& ml = pbrData.mipLevels[mip];
-                pendingBuildDetailsPbrUploads[mip].data.assign(ml.data, ml.data + ml.size);
-                pendingBuildDetailsPbrUploads[mip].rowPitch = ml.rowPitch;
+                renderDevice->UploadTextureDataToNVRHI(buildDetailsPbrTexture, 0, mip, ml.data, ml.size, ml.rowPitch, 0);
             }
 
             if (GEnv.Backend)
@@ -1286,8 +1283,8 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
     ng::RenderDevice::BufferDesc cbDesc;
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
+    cbDesc.maxVersions = 512;
     cbDesc.byteSize = sizeof(passes::DynamicTransforms);
     cbDesc.debugName = "DynTransforms_Detail";
     cachedDynTransformsCB = renderDevice->CreateBuffer(cbDesc);
@@ -1312,6 +1309,7 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
     cbDesc.debugName = "DetailCullParams";
     cachedCullParamsCB = renderDevice->CreateBuffer(cbDesc);
 
+    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     cbDesc.byteSize = sizeof(InstanceGenParams);
     cbDesc.debugName = "InstanceGenParams";
     cachedInstanceGenParamsCB = renderDevice->CreateBuffer(cbDesc);
@@ -1928,28 +1926,6 @@ void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
 
     pulledVertexData.clear();
     pulledVertexData.shrink_to_fit();
-
-    if (buildDetailsTexture && !pendingBuildDetailsUploads.empty())
-    {
-        for (u32 mip = 0; mip < pendingBuildDetailsUploads.size(); mip++)
-        {
-            auto& ml = pendingBuildDetailsUploads[mip];
-            cmdList->writeTexture(buildDetailsTexture, 0, mip, ml.data.data(), ml.rowPitch);
-        }
-        pendingBuildDetailsUploads.clear();
-        pendingBuildDetailsUploads.shrink_to_fit();
-    }
-
-    if (buildDetailsPbrTexture && !pendingBuildDetailsPbrUploads.empty())
-    {
-        for (u32 mip = 0; mip < pendingBuildDetailsPbrUploads.size(); mip++)
-        {
-            auto& ml = pendingBuildDetailsPbrUploads[mip];
-            cmdList->writeTexture(buildDetailsPbrTexture, 0, mip, ml.data.data(), ml.rowPitch);
-        }
-        pendingBuildDetailsPbrUploads.clear();
-        pendingBuildDetailsPbrUploads.shrink_to_fit();
-    }
 
     cmdList->writeBuffer(slotAABBBuffer, slot_aabbs.data(), slot_aabbs.size() * sizeof(SlotAABB));
 }

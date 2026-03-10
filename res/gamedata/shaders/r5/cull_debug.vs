@@ -32,9 +32,8 @@ struct VS_OUTPUT
 {
     float4 position : SV_Position;
     float3 color    : COLOR0;
-    float2 uv       : TEXCOORD0;     // For circle rendering in PS
+    float2 uv       : TEXCOORD0;
     float  alpha    : TEXCOORD1;
-    uint   cullState: TEXCOORD2;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -52,7 +51,6 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
         output.color = float3(0, 0, 0);
         output.uv = float2(0, 0);
         output.alpha = 0;
-        output.cullState = 0;
         return output;
     }
 
@@ -87,7 +85,6 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
 
     // Get debug color based on cull state
     output.color = GetCullDebugColor(debugData.cullState);
-    output.cullState = debugData.cullState;
 
     // UV for circle rendering ([-1, 1] range)
     output.uv = cornerOffset;

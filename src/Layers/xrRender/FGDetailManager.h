@@ -361,10 +361,6 @@ private:
 
     xr_vector<DecalPulledVertex> pulledVertexData;
 
-    struct PendingMipUpload { xr_vector<u8> data; u32 rowPitch; };
-    xr_vector<PendingMipUpload> pendingBuildDetailsUploads;
-    xr_vector<PendingMipUpload> pendingBuildDetailsPbrUploads;
-
     nvrhi::BindingSetHandle CreateInstanceGenBindingSet(nvrhi::IDevice* device) const;
     void BuildDetailModelGPUData();
 };

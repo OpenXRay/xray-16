@@ -13,9 +13,8 @@ struct PS_INPUT
 {
     float4 position : SV_Position;
     float3 color    : COLOR0;
-    float2 uv       : TEXCOORD0;     // [-1, 1] range from billboard quad
+    float2 uv       : TEXCOORD0;
     float  alpha    : TEXCOORD1;
-    uint   cullState: TEXCOORD2;
 };
 
 // ═══════════════════════════════════════════════════════

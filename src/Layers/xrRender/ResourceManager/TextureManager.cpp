@@ -319,7 +319,7 @@ TextureHandle TextureManager::CreateTexture(
     // Set optimized clear value for render targets (D3D12 performance optimization)
     if (desc.isRenderTarget && !desc.isDepthStencil) {
         nvrhiDesc.useClearValue = true;
-        nvrhiDesc.clearValue = nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f);
+        nvrhiDesc.clearValue = nvrhi::Color(0.0f);
     }
 
     // Depth/stencil handling

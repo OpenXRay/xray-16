@@ -356,7 +356,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
 
             // Clear color buffer first - sky half-box doesn't cover entire screen
             // Areas above horizon need to be cleared to prevent smearing
-            cmdList->clearTextureFloat(colorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f));
+            cmdList->clearTextureFloat(colorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
 
             // Create framebuffer (cached)
             nvrhi::FramebufferDesc fbDesc;

@@ -56,9 +56,7 @@ struct VS_OUTPUT
     float4 hpos     : SV_Position;
     float2 texcoord : TEXCOORD0;
     float4 color    : TEXCOORD1;
-    float3 worldPos : TEXCOORD2;
-    float3 normal   : TEXCOORD3;
-    nointerpolation uint materialID : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD2;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -374,8 +372,6 @@ VS_OUTPUT main(uint vertexID : SV_VertexID)
     output.hpos = mul(m_VP, float4(finalPos, 1.0));
     output.texcoord = uv;
     output.color = color;
-    output.worldPos = finalPos;
-    output.normal = normalize(eye_position - finalPos);
     output.materialID = g_MaterialID;
 
     return output;

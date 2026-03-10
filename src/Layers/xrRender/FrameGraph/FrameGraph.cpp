@@ -1041,8 +1041,7 @@ void FrameGraph::AllocateResources() {
                 nvrhiDesc.sampleCount = resource.desc.sampleCount;
                 nvrhiDesc.format = resource.desc.format;
                 nvrhiDesc.debugName = resource.desc.debugName.c_str();
-                nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-                nvrhiDesc.keepInitialState = true;  // D3D12 requires state tracking
+                nvrhiDesc.keepInitialState = true;
 
                 // Set texture dimension
                 switch (resource.desc.type) {
@@ -1066,20 +1065,20 @@ void FrameGraph::AllocateResources() {
                 // Set usage flags
                 nvrhiDesc.isRenderTarget = resource.desc.isRenderTarget;
                 nvrhiDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
-                nvrhiDesc.isShaderResource = true;  // Always allow SRV
+                nvrhiDesc.isShaderResource = true;
 
-                // Set optimized clear value for render targets (D3D12 performance optimization)
                 if (resource.desc.isRenderTarget && !resource.desc.isDepthStencil) {
+                    nvrhiDesc.initialState = nvrhi::ResourceStates::RenderTarget;
                     nvrhiDesc.useClearValue = true;
-                    nvrhiDesc.clearValue = nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f);  // Default RT clear: black
-                }
-
-                // Depth/stencil handling
-                if (resource.desc.isDepthStencil) {
-                    nvrhiDesc.isRenderTarget = true;  // NVRHI uses this flag + format to set BIND_DEPTH_STENCIL
-                    nvrhiDesc.isTypeless = true;  // CRITICAL: Use typeless format for depth+SRV
+                    nvrhiDesc.clearValue = nvrhi::Color(0.0f);
+                } else if (resource.desc.isDepthStencil) {
+                    nvrhiDesc.initialState = nvrhi::ResourceStates::DepthWrite;
+                    nvrhiDesc.isRenderTarget = true;
+                    nvrhiDesc.isTypeless = true;
                     nvrhiDesc.useClearValue = true;
-                    nvrhiDesc.clearValue = nvrhi::Color(1.0f);  // Default depth clear
+                    nvrhiDesc.clearValue = nvrhi::Color(1.0f);
+                } else {
+                    nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
                 }
 
             resource.nvrhiTexture = m_device->createTexture(nvrhiDesc);

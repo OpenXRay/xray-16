@@ -550,7 +550,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
             auto& cache = framegraph::GetPassResourceCache();
             auto dynTransformsCB = cache.GetOrCreateVolatileCB("SkinningPass", "DynTransforms", sizeof(DynamicTransforms), data.device, 1024 * 8);
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("SkinningPass", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("SkinningPass", "StaticGlobals", sizeof(StaticGlobals), data.device, 1024);
             auto shaderParamsCB = cache.GetOrCreateVolatileCB("SkinningPass", "ShaderParams", sizeof(ShaderParams), data.device, 512);
             auto materialIdCB = cache.GetOrCreateVolatileCB("SkinningPass", "MaterialId", sizeof(SkinnedMaterialCB), data.device, 1024);
 

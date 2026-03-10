@@ -8,9 +8,6 @@ struct PS_INPUT
     float4 hpos     : SV_Position;
     float2 texcoord : TEXCOORD0;
     float4 color    : TEXCOORD1;
-    float3 worldPos : TEXCOORD2;
-    float3 normal   : TEXCOORD3;
-    nointerpolation uint materialID : TEXCOORD4;
 };
 
 float4 main(PS_INPUT input) : SV_Target0

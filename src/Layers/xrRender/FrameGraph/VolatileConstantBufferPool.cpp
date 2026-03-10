@@ -38,7 +38,7 @@ ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layo
     cbDesc.byteSize = layout.size;
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    cbDesc.maxVersions = 1024;
 
     // Build debug name
     string256 debugName;

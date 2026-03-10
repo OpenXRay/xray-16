@@ -114,6 +114,13 @@ static void DeduplicateBindings(nvrhi::BindingLayoutDesc& desc)
                 ++j;
         }
     }
+
+    std::sort(b.begin(), b.end(), [](const nvrhi::BindingLayoutItem& a, const nvrhi::BindingLayoutItem& b) {
+        int classA = GetRegisterClass(a.type);
+        int classB = GetRegisterClass(b.type);
+        if (classA != classB) return classA < classB;
+        return a.slot < b.slot;
+    });
 }
 
 nvrhi::BindingLayoutDesc BindingLayoutBuilder::Build(
