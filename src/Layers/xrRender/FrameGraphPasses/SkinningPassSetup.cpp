@@ -97,10 +97,10 @@ void InitializeSkinningResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
     if (!state.hudLayout)
         state.hudLayout = state.layout;
 
-    auto buildPipelineDesc = [&](nvrhi::IShader* vs, nvrhi::IInputLayout* il) {
+    auto buildPipelineDesc = [&](nvrhi::IShader* vs, nvrhi::IInputLayout* il, nvrhi::IShader* psOverride = nullptr) {
         nvrhi::GraphicsPipelineDesc pipeDesc;
         pipeDesc.VS = vs;
-        pipeDesc.PS = state.ps;
+        pipeDesc.PS = psOverride ? nvrhi::ShaderHandle(psOverride) : state.ps;
         pipeDesc.inputLayout = il;
         if (bindlessLayout)
             pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
@@ -336,7 +336,8 @@ static void RenderSkinnedBatch(
     const Fmatrix& worldMatrix,
     u32 skeletonBoneOffset,
     nvrhi::IBuffer* splatBuffer,
-    decals::OverlayManager::SplatRange splatRange = {0, 0})
+    decals::OverlayManager::SplatRange splatRange = {0, 0},
+    bool isHUD = false)
 {
     using namespace RENDER_NAMESPACE;
     using namespace RENDER_NAMESPACE::bindless;
@@ -363,7 +364,7 @@ static void RenderSkinnedBatch(
 
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     auto* vsReflection = shaderLoader->GetCachedReflection("bindless_skinned", ".vs");
-    const char* psShaderName = isHUD ? "bindless_skinned_hud" : "bindless_skinned";
+    const char* psShaderName = isHUD ? "bindless_skinned" : "bindless_skinned";
     auto* psReflection = shaderLoader->GetCachedReflection(psShaderName, ".ps");
     auto activeLayout = isHUD ? state.hudLayout : state.layout;
 
@@ -689,7 +690,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
                         globalBoneBuffer, terrainMatBuffer.GetBuffer(),
                         bindlessTable, bindlessLayout, hudViewport, scissor,
-                        batch, adjustedWorldMatrix, boneOffset, splatBuffer
+                        batch, adjustedWorldMatrix, boneOffset, splatBuffer, {0, 0}, true
                     );
                 }
 

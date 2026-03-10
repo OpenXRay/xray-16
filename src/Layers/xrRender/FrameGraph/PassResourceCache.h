@@ -189,6 +189,14 @@ private:
     xr_map<u64, ng::BufferHandle> m_volatileCBs;
     xr_map<u64, nvrhi::BindingSetHandle> m_bindingSets;
 
+    nvrhi::SamplerHandle m_commonAnisoWrap;
+    nvrhi::SamplerHandle m_commonLinearWrap;
+    nvrhi::SamplerHandle m_commonLinearClamp;
+    nvrhi::SamplerHandle m_commonPointClamp;
+    nvrhi::SamplerHandle m_commonShadowCmp;
+    nvrhi::TextureHandle m_dummyShadowMap;
+    nvrhi::TextureHandle m_dummyShadowMap2D;
+
     Stats m_stats;
 
 public:

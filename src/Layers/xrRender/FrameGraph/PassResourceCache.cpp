@@ -481,6 +481,13 @@ void PassResourceCache::Clear() {
     m_staticBuffers.clear();
     m_volatileCBs.clear();
     m_bindingSets.clear();
+    m_commonAnisoWrap = nullptr;
+    m_commonLinearWrap = nullptr;
+    m_commonLinearClamp = nullptr;
+    m_commonPointClamp = nullptr;
+    m_commonShadowCmp = nullptr;
+    m_dummyShadowMap = nullptr;
+    m_dummyShadowMap2D = nullptr;
 
     Msg("* [PassResourceCache] Cleared all caches");
 }
