@@ -81,7 +81,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	det.scale = float((raw.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
 
 	float2 height_uv = det.pos.xz * HEIGHT_NOISE_SCALE + float2(0.37, 0.73);
-	float height_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(height_uv, 0), 0).r;
+	float height_noise = g_Perlin4D.SampleLevel(smp_linear, float3(height_uv, 0), 0).r;
 
 	float height_multiplier = lerp(HEIGHT_VARIATION_MIN, HEIGHT_VARIATION_MAX, height_noise);
 	float blade_height = det.scale * height_multiplier * grass_blade_height;
@@ -139,21 +139,21 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 		atlas_uv = page_base_uv + slot_local * page_size_uv;
 
 		Texture2D interaction_tex = GetBindlessTexture(interaction_atlas_index);
-		interaction = interaction_tex.SampleLevel(g_LinearSampler, atlas_uv, 0);
+		interaction = interaction_tex.SampleLevel(smp_linear, atlas_uv, 0);
 	}
 
 	float wind_speed = max(g_wind_direction.y, 0.1);
 	float time = wave.w;
 
 	float2 dir_uv = P0.zx * (0.005 / wind_speed) + time * (0.005 * wind_speed);
-	float wind_dir_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(dir_uv, 0), 0).r;
+	float wind_dir_noise = g_Perlin4D.SampleLevel(smp_linear, float3(dir_uv, 0), 0).r;
 
 	float2 str_uv = P0.xz * (0.025 / wind_speed) + time * 0.05;
-	float wind_str_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(str_uv, 0), 0).r;
+	float wind_str_noise = g_Perlin4D.SampleLevel(smp_linear, float3(str_uv, 0), 0).r;
 
 	float height_factor = vertex_height_factor;
 	float2 turb_uv = P0.xz * (0.025 / wind_speed) + (time + height_factor * height_factor * 0.25) * 0.05;
-	float wind_turb_noise = g_Perlin4D.SampleLevel(g_LinearSampler, float3(turb_uv, 0), 0).r;
+	float wind_turb_noise = g_Perlin4D.SampleLevel(smp_linear, float3(turb_uv, 0), 0).r;
 
 	float fbm_wind_strength = lerp(0.25, 1.0, wind_str_noise);
 	fbm_wind_strength *= fbm_wind_strength;

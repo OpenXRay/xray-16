@@ -12,7 +12,6 @@ Texture2D<float> g_input_depth : register(t0);
 
 RWTexture2D<float> g_output_hiz : register(u0);
 
-SamplerState g_point_sampler : register(s0);
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatch_id : SV_DispatchThreadID)

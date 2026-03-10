@@ -4,7 +4,6 @@
 Texture2D g_Snapshot : register(t0);
 Texture2D g_Distortion : register(t1);
 Texture2D<float4> g_WorldPos : register(t2);
-SamplerState g_LinearSampler : register(s0);
 
 struct PS_INPUT
 {
@@ -14,12 +13,12 @@ struct PS_INPUT
 
 float4 main(PS_INPUT input) : SV_Target0
 {
-    float4 distortSample = g_Distortion.Sample(g_LinearSampler, input.texcoord);
+    float4 distortSample = g_Distortion.Sample(smp_linear, input.texcoord);
     float2 offset = distortSample.xy;
     float totalWeight = distortSample.w;
 
     if (totalWeight < 0.0001)
-        return g_Snapshot.Sample(g_LinearSampler, input.texcoord);
+        return g_Snapshot.Sample(smp_linear, input.texcoord);
 
     float sourceViewZ = distortSample.z / totalWeight;
 
@@ -30,7 +29,7 @@ float4 main(PS_INPUT input) : SV_Target0
         float currentViewZ = dot(currentWP.xyz - eye_position, viewDir);
 
         if (currentViewZ < sourceViewZ * 0.9)
-            return g_Snapshot.Sample(g_LinearSampler, input.texcoord);
+            return g_Snapshot.Sample(smp_linear, input.texcoord);
     }
 
     float2 displaced = saturate(input.texcoord + offset);
@@ -49,5 +48,5 @@ float4 main(PS_INPUT input) : SV_Target0
         }
     }
 
-    return g_Snapshot.Sample(g_LinearSampler, displaced);
+    return g_Snapshot.Sample(smp_linear, displaced);
 }

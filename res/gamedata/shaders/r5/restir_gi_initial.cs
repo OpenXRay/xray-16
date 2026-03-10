@@ -61,8 +61,8 @@ bool IsTerrainBatch(uint batchIdx)
 float3 SampleSky(float3 dir)
 {
     float w = g_SunColor_SkyWeight.w;
-    float3 s0 = g_Sky0.SampleLevel(g_LinearSampler, dir, 0).rgb;
-    float3 s1 = g_Sky1.SampleLevel(g_LinearSampler, dir, 0).rgb;
+    float3 s0 = g_Sky0.SampleLevel(smp_linear, dir, 0).rgb;
+    float3 s1 = g_Sky1.SampleLevel(smp_linear, dir, 0).rgb;
     return lerp(s0, s1, w);
 }
 
@@ -87,7 +87,7 @@ float TraceShadow(float3 origin, float3 sunDir)
                     RTBatchInfo candInfo = g_BatchInfo[candBatch];
                     float2 candUV = GetSkinnedHitUV(g_GrassVB, g_GrassIB, candInfo,
                         q.CandidatePrimitiveIndex(), q.CandidateTriangleBarycentrics());
-                    float4 texel = GetBindlessTexture(g_DetailAtlasIndex).SampleLevel(g_LinearSampler, candUV, 0);
+                    float4 texel = GetBindlessTexture(g_DetailAtlasIndex).SampleLevel(smp_linear, candUV, 0);
                     if (texel.a >= 0.3)
                         q.CommitNonOpaqueTriangleHit();
                 }
@@ -174,7 +174,7 @@ BounceHit TraceBounce(float3 origin, float3 direction, inout uint rng)
                     RTBatchInfo candInfo = g_BatchInfo[candBatch];
                     float2 candUV = GetSkinnedHitUV(g_GrassVB, g_GrassIB, candInfo,
                         q.CandidatePrimitiveIndex(), q.CandidateTriangleBarycentrics());
-                    float4 texel = GetBindlessTexture(g_DetailAtlasIndex).SampleLevel(g_LinearSampler, candUV, 0);
+                    float4 texel = GetBindlessTexture(g_DetailAtlasIndex).SampleLevel(smp_linear, candUV, 0);
                     if (texel.a >= 0.3)
                         q.CommitNonOpaqueTriangleHit();
                 }
@@ -215,7 +215,7 @@ BounceHit TraceBounce(float3 origin, float3 direction, inout uint rng)
 
         if (IsGrassBatch(batchIdx)) {
             if (g_DetailAtlasIndex > 0) {
-                float4 texel = GetBindlessTexture(g_DetailAtlasIndex).SampleLevel(g_LinearSampler, hitUV, 0);
+                float4 texel = GetBindlessTexture(g_DetailAtlasIndex).SampleLevel(smp_linear, hitUV, 0);
                 albedo = texel.rgb;
                 if (texel.a < 0.3) {
                     rayOrigin = rayOrigin + direction * (q.CommittedRayT() + 0.002);
@@ -261,7 +261,7 @@ float4 SampleTerrainTexture(uint index, float2 uv)
 {
     if (index == INVALID_TEXTURE_INDEX)
         return float4(0.5, 0.5, 0.5, 1.0);
-    return GetBindlessTexture(index).SampleLevel(g_LinearSampler, uv, 0);
+    return GetBindlessTexture(index).SampleLevel(smp_linear, uv, 0);
 }
 
 float3 SampleTerrainAlbedo(TerrainMaterialData mat, float2 uv)

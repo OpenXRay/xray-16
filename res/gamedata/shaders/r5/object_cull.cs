@@ -39,7 +39,6 @@ StructuredBuffer<GPUObjectData> g_Objects : register(t0);
 
 Texture2D<float> g_HiZPyramid : register(t1);
 
-SamplerState g_PointSampler : register(s0);
 
 RWStructuredBuffer<uint> g_VisibleIndices : register(u0);
 
@@ -64,7 +63,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
         return;
 
     if (!HiZTestSphereTemporal(obj.position, obj.radius, g_CameraPos, g_ViewProj, g_PrevViewProj,
-                       g_HiZPyramid, g_PointSampler, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
+                       g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
         return;
 
     uint visibleIdx;

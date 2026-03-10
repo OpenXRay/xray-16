@@ -1,7 +1,8 @@
 #include "shared/common.h"
+#include "common_samplers.h"
 
 Texture2D s_sun : register(t0);
-SamplerState smp_linear : register(s0);
+
 
 struct PS_INPUT {
     float4 hpos     : SV_POSITION;

@@ -29,7 +29,7 @@ cbuffer CullDebugParams : register(b5)
 
 StructuredBuffer<GPUParticleData> g_Particles : register(t0);
 Texture2D<float> g_HiZPyramid : register(t1);
-SamplerState g_PointSampler : register(s0);
+
 
 RWStructuredBuffer<CullDebugData> g_DebugOutput : register(u0);
 
@@ -63,10 +63,10 @@ float3 OcclusionTestSphereDebug(float3 center, float radius)
     float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5)));
     mipLevel = clamp(mipLevel, 0.0, float(g_HiZMipLevels - 1));
 
-    float d1 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.x, boxUV.y), mipLevel);
-    float d2 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.z, boxUV.y), mipLevel);
-    float d3 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.x, boxUV.w), mipLevel);
-    float d4 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.z, boxUV.w), mipLevel);
+    float d1 = g_HiZPyramid.SampleLevel(smp_nofilter, float2(boxUV.x, boxUV.y), mipLevel);
+    float d2 = g_HiZPyramid.SampleLevel(smp_nofilter, float2(boxUV.z, boxUV.y), mipLevel);
+    float d3 = g_HiZPyramid.SampleLevel(smp_nofilter, float2(boxUV.x, boxUV.w), mipLevel);
+    float d4 = g_HiZPyramid.SampleLevel(smp_nofilter, float2(boxUV.z, boxUV.w), mipLevel);
     float hiZDepth = max(max(d1, d2), max(d3, d4));
 
     float3 viewDir = normalize(center - g_CameraPos);

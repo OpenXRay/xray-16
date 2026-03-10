@@ -66,7 +66,9 @@ StructuredBuffer<MaterialData> g_Materials : register(t8);
 StructuredBuffer<TerrainMaterialData> g_TerrainMaterials : register(t9);
 StructuredBuffer<VariantTextureData> g_VariantTextures : register(t10);
 
-SamplerState g_LinearSampler : register(s0);
+#ifndef common_samplers_h_included
+#include "common_samplers.h"
+#endif
 
 float4 SampleVariantTexture(uint materialID, uint slot, float2 uv)
 {
@@ -74,7 +76,7 @@ float4 SampleVariantTexture(uint materialID, uint slot, float2 uv)
     if (texIdx == INVALID_TEXTURE_INDEX)
         return float4(0, 0, 0, 0);
     Texture2D tex = GetBindlessTexture(texIdx);
-    return tex.Sample(g_LinearSampler, uv);
+    return tex.Sample(smp_linear, uv);
 }
 
 float4 SampleDiffuse(MaterialData mat, float2 uv)
@@ -83,14 +85,14 @@ float4 SampleDiffuse(MaterialData mat, float2 uv)
         return float4(1, 0, 1, 1);
 
     Texture2D tex = GetBindlessTexture(mat.diffuseIndex);
-    return tex.Sample(g_LinearSampler, uv);
+    return tex.Sample(smp_linear, uv);
 }
 
 float4 SampleDiffuseLevel(MaterialData mat, float2 uv)
 {
     if (mat.diffuseIndex == INVALID_TEXTURE_INDEX)
         return float4(1, 0, 1, 1);
-    return GetBindlessTexture(mat.diffuseIndex).SampleLevel(g_LinearSampler, uv, 0);
+    return GetBindlessTexture(mat.diffuseIndex).SampleLevel(smp_linear, uv, 0);
 }
 
 struct BumpSample
@@ -109,7 +111,7 @@ BumpSample SampleNormal(MaterialData mat, float2 uv)
         return result;
 
     Texture2D tex = GetBindlessTexture(mat.normalIndex);
-    float4 Nu = tex.Sample(g_LinearSampler, uv);
+    float4 Nu = tex.Sample(smp_linear, uv);
 
     result.normal.x = Nu.a * 2.0 - 1.0;
     result.normal.y = Nu.b * 2.0 - 1.0;
@@ -124,7 +126,7 @@ float4 SampleDetail(MaterialData mat, float2 uv)
         return float4(0.5, 0.5, 0.5, 0.5);
 
     Texture2D tex = GetBindlessTexture(mat.detailIndex);
-    return tex.Sample(g_LinearSampler, uv * mat.detailScale);
+    return tex.Sample(smp_linear, uv * mat.detailScale);
 }
 
 float3 SamplePBR(MaterialData mat, float2 uv)
@@ -133,7 +135,7 @@ float3 SamplePBR(MaterialData mat, float2 uv)
         return float3(0.0, 0.5, 1.0);
 
     Texture2D tex = GetBindlessTexture(mat.pbrIndex);
-    return tex.Sample(g_LinearSampler, uv).rgb;
+    return tex.Sample(smp_linear, uv).rgb;
 }
 
 #endif

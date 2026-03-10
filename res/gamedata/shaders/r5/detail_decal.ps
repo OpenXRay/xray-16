@@ -27,7 +27,7 @@ cbuffer DetailGlobals : register(b3)
 f_forward main(p_decal I)
 {
 	Texture2D atlas_tex = GetBindlessTexture(build_details_index);
-	float4 texel = atlas_tex.Sample(g_LinearSampler, I.tcdh.xy);
+	float4 texel = atlas_tex.Sample(smp_linear, I.tcdh.xy);
 
 	clip(texel.a - 0.5);
 
@@ -39,7 +39,7 @@ f_forward main(p_decal I)
 	if (build_details_pbr_index != 0)
 	{
 		Texture2D pbr_tex = GetBindlessTexture(build_details_pbr_index);
-		float4 pbr = pbr_tex.Sample(g_LinearSampler, I.tcdh.xy);
+		float4 pbr = pbr_tex.Sample(smp_linear, I.tcdh.xy);
 		metallic = pbr.r;
 		roughness = pbr.g;
 		ao = pbr.b;

@@ -52,6 +52,7 @@ bool DistanceTestAABB(float3 aabb_min, float3 aabb_max, float3 camera_pos, float
     return dist_sq < max_dist_sq;
 }
 
+
 bool HiZTestSphereTemporal(
     float3 center,
     float radius,
