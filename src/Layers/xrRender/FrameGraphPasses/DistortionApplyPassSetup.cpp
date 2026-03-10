@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DistortionApplyPassSetup.h"
 #include "ShaderConstants.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
@@ -76,16 +77,7 @@ VirtualResourceHandle setupDistortionApplyPass(
             auto& cache = GetPassResourceCache();
             nvrhi::IDevice* device = cmdList->getDevice();
 
-            nvrhi::BindingLayoutDesc layoutDesc;
-            layoutDesc.visibility = nvrhi::ShaderType::Pixel;
-            layoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-                nvrhi::BindingLayoutItem::Texture_SRV(0),
-                nvrhi::BindingLayoutItem::Texture_SRV(1),
-                nvrhi::BindingLayoutItem::Texture_SRV(2),
-                nvrhi::BindingLayoutItem::Sampler(0),
-            };
-            auto layout = cache.GetOrCreateBindingLayout("DistortionApply", layoutDesc, device);
+            auto layout = cache.GetOrCreateBindingLayoutFromReflection("DistortionApply", *vsResult.reflection, *psResult.reflection, device);
 
             nvrhi::GraphicsPipelineDesc pipeDesc;
             pipeDesc.setVertexShader(vsResult.handle);
@@ -106,23 +98,16 @@ VirtualResourceHandle setupDistortionApplyPass(
             if (!pipeline)
                 return;
 
-            nvrhi::SamplerDesc samplerDesc;
-            samplerDesc.setAllFilters(true);
-            samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
-            auto sampler = cache.GetOrCreateSampler("DistortionApply", samplerDesc, device);
-
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("DistortionApply", "globals", sizeof(StaticGlobals), 16, device);
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-                nvrhi::BindingSetItem::Texture_SRV(0, snapshotTex),
-                nvrhi::BindingSetItem::Texture_SRV(1, distortTex),
-                nvrhi::BindingSetItem::Texture_SRV(2, worldPosTex),
-                nvrhi::BindingSetItem::Sampler(0, sampler),
-            };
+            BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device);
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB)
+               .Texture("g_Snapshot", snapshotTex)
+               .Texture("g_Distortion", distortTex)
+               .Texture("g_WorldPos", worldPosTex);
+            auto bindDesc = bsb.Build();
             auto bindingSet = device->createBindingSet(bindDesc, layout);
 
             nvrhi::Viewport viewport;

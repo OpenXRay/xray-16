@@ -1,10 +1,17 @@
 #include "stdafx.h"
 #include "MotionVectorPassSetup.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+
+namespace RENDER_NAMESPACE
+{
+    extern CRender RImplementation;
+}
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 using namespace framegraph;
@@ -16,21 +23,13 @@ static void InitializeResources(ng::RenderDevice* device, MotionVectorPassState&
     auto& cache = GetPassResourceCache();
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::Compute;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-        nvrhi::BindingLayoutItem::Texture_SRV(0),
-        nvrhi::BindingLayoutItem::Texture_UAV(0),
-    };
-    state.layout = cache.GetOrCreateBindingLayout("MotionVector", layoutDesc, nvDevice);
+    auto csResult = RImplementation.m_shaderLoader->LoadComputeShader("restir_motion_vectors");
+    if (!csResult.handle) return;
 
-    ref_cs shader;
-    shader.create("restir_motion_vectors");
-    if (!shader || !shader->nvrhiShader) return;
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection("MotionVector", *csResult.reflection, nvDevice);
 
     nvrhi::ComputePipelineDesc pipeDesc;
-    pipeDesc.CS = shader->nvrhiShader;
+    pipeDesc.CS = csResult.handle;
     pipeDesc.bindingLayouts = { state.layout };
     state.pipeline = cache.GetOrCreateComputePipeline("MotionVector", pipeDesc, nvDevice);
 
@@ -117,12 +116,12 @@ MotionVectorOutput setupMotionVectorPass(
 
             cmdList->writeBuffer(data.state->cb, &cb, sizeof(cb));
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(5, data.state->cb),
-                nvrhi::BindingSetItem::Texture_SRV(0, depthTex),
-                nvrhi::BindingSetItem::Texture_UAV(0, mvTex),
-            };
+            auto* mvRefl = RImplementation.m_shaderLoader->GetCachedReflection("restir_motion_vectors", ".cs");
+            BindingSetBuilder bsb(*mvRefl, nvDevice);
+            bsb.ConstantBuffer("MotionVectorParams", data.state->cb)
+               .Texture("t_Depth", depthTex)
+               .TextureUAV("u_MotionVectors", mvTex);
+            auto bindDesc = bsb.Build();
             auto bindingSet = nvDevice->createBindingSet(bindDesc, data.state->layout);
 
             ctx->SetComputePipeline(data.state->pipeline.Get());

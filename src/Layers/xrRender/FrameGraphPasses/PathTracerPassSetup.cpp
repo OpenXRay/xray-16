@@ -4,6 +4,8 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
@@ -15,11 +17,16 @@
 #include "xrEngine/IGame_Persistent.h"
 #include <nvrhi/utils.h>
 
+namespace RENDER_NAMESPACE
+{
+    extern CRender RImplementation;
+}
+
 namespace xray::render::RENDER_NAMESPACE::passes {
 
 using namespace framegraph;
 
-static ref_cs s_pathtrace_cs;
+static nvrhi::ShaderHandle s_pathtrace_shader;
 static nvrhi::BufferHandle s_cb;
 static nvrhi::ComputePipelineHandle s_pipeline;
 static nvrhi::BindingLayoutHandle s_layout;
@@ -90,12 +97,13 @@ static void InitializeResources(ng::RenderDevice* device)
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     auto& cache = GetPassResourceCache();
 
-    s_pathtrace_cs.create("rt_pathtrace");
-    if (!s_pathtrace_cs || !s_pathtrace_cs->nvrhiShader) {
+    auto csResult = RImplementation.m_shaderLoader->LoadComputeShader("rt_pathtrace");
+    if (!csResult.handle) {
         Msg("! [PathTracer] Failed to load rt_pathtrace shader");
         s_initialized = true;
         return;
     }
+    s_pathtrace_shader = csResult.handle;
 
     nvrhi::BufferDesc cbDesc;
     cbDesc.debugName = "PathTracerCB";
@@ -115,33 +123,13 @@ static void InitializeResources(ng::RenderDevice* device)
     CreatePlaceholderCubemap(nvDevice);
     CreatePlaceholderBuffer(nvDevice);
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::Compute;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::RayTracingAccelStruct(1),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
-        nvrhi::BindingLayoutItem::RawBuffer_SRV(3),
-        nvrhi::BindingLayoutItem::RawBuffer_SRV(4),
-        nvrhi::BindingLayoutItem::Texture_SRV(5),
-        nvrhi::BindingLayoutItem::Texture_SRV(6),
-        nvrhi::BindingLayoutItem::RawBuffer_SRV(7),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
-        nvrhi::BindingLayoutItem::RawBuffer_SRV(11),
-        nvrhi::BindingLayoutItem::RawBuffer_SRV(12),
-        nvrhi::BindingLayoutItem::RawBuffer_SRV(13),
-        nvrhi::BindingLayoutItem::Texture_UAV(0),
-        nvrhi::BindingLayoutItem::Texture_UAV(1),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-        nvrhi::BindingLayoutItem::Sampler(0),
-    };
-    s_layout = cache.GetOrCreateBindingLayout("PathTracer", layoutDesc, nvDevice);
+    s_layout = cache.GetOrCreateBindingLayoutFromReflection("PathTracer", *csResult.reflection, nvDevice);
 
     auto* backend = dynamic_cast<D3D12Backend*>(GEnv.Backend);
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
 
     nvrhi::ComputePipelineDesc pipeDesc;
-    pipeDesc.CS = s_pathtrace_cs->nvrhiShader;
+    pipeDesc.CS = s_pathtrace_shader;
     if (bindlessLayout)
         pipeDesc.bindingLayouts = { s_layout, bindlessLayout };
     else
@@ -330,26 +318,27 @@ PathTracerOutput setupPathTracerPass(
             if (!grassVB) grassVB = s_placeholderBuffer.Get();
             if (!grassIB) grassIB = s_placeholderBuffer.Get();
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::RayTracingAccelStruct(1, data.accelMgr->GetTLAS()),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(2, data.accelMgr->GetBatchInfoBuffer()),
-                nvrhi::BindingSetItem::RawBuffer_SRV(3, data.accelMgr->GetMegaVB()),
-                nvrhi::BindingSetItem::RawBuffer_SRV(4, data.accelMgr->GetMegaIB()),
-                nvrhi::BindingSetItem::Texture_SRV(5, data.sky0),
-                nvrhi::BindingSetItem::Texture_SRV(6, data.sky1),
-                nvrhi::BindingSetItem::RawBuffer_SRV(7, skinnedVB),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, data.accelMgr->GetMaterialBuffer()),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(9, data.accelMgr->GetTerrainMaterialBuffer()),
-                nvrhi::BindingSetItem::RawBuffer_SRV(11, skinnedIB),
-                nvrhi::BindingSetItem::RawBuffer_SRV(12, grassVB),
-                nvrhi::BindingSetItem::RawBuffer_SRV(13, grassIB),
-                nvrhi::BindingSetItem::Texture_UAV(0, s_accumBuffer),
-                nvrhi::BindingSetItem::Texture_UAV(1, outTex),
-                nvrhi::BindingSetItem::ConstantBuffer(5, s_cb),
-                nvrhi::BindingSetItem::Sampler(0, s_sampler),
-            };
-            auto bindingSet = nvDevice->createBindingSet(bindDesc, s_layout);
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* csReflection = shaderLoader->GetCachedReflection("rt_pathtrace", ".cs");
+            if (!csReflection) return;
+
+            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice);
+            bsb.ConstantBuffer("PathTracerParams", s_cb);
+            bsb.AccelStruct("g_SceneTLAS", data.accelMgr->GetTLAS());
+            bsb.BufferSRV("g_BatchInfo", data.accelMgr->GetBatchInfoBuffer());
+            bsb.BufferSRV("g_MegaVB", data.accelMgr->GetMegaVB());
+            bsb.BufferSRV("g_MegaIB", data.accelMgr->GetMegaIB());
+            bsb.Texture("g_Sky0", data.sky0);
+            bsb.Texture("g_Sky1", data.sky1);
+            bsb.BufferSRV("g_SkinnedVB", skinnedVB);
+            bsb.BufferSRV("g_Materials", data.accelMgr->GetMaterialBuffer());
+            bsb.BufferSRV("g_TerrainMaterials", data.accelMgr->GetTerrainMaterialBuffer());
+            bsb.BufferSRV("g_SkinnedIB", skinnedIB);
+            bsb.BufferSRV("g_GrassVB", grassVB);
+            bsb.BufferSRV("g_GrassIB", grassIB);
+            bsb.TextureUAV("g_Accumulation", s_accumBuffer);
+            bsb.TextureUAV("g_Output", outTex);
+            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_layout);
 
             nvrhi::ComputeState state;
             state.pipeline = s_pipeline;
@@ -376,7 +365,7 @@ PathTracerOutput setupPathTracerPass(
 
 void ShutdownPathTracer()
 {
-    s_pathtrace_cs.destroy();
+    s_pathtrace_shader = nullptr;
     s_cb = nullptr;
     s_pipeline = nullptr;
     s_layout = nullptr;

@@ -6,6 +6,7 @@
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
@@ -147,16 +148,7 @@ void InitializeRibbonResources(ng::RenderDevice* device, nvrhi::IFramebuffer* fr
     samplerDesc.setMaxAnisotropy(8.0f);
     state.sampler = nvDevice->createSampler(samplerDesc);
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::All;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(10),
-        nvrhi::BindingLayoutItem::Sampler(0),
-    };
-    state.layout = nvDevice->createBindingLayout(layoutDesc);
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection("RibbonPass", *vsResult.reflection, *psResult.reflection, nvDevice);
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
     pipeDesc.VS = state.vs;
@@ -300,14 +292,15 @@ RibbonPassOutput setupRibbonPass(
                 params.invViewY.set(invView.j.x, invView.j.y, invView.j.z, 0.f);
                 cmdList->writeBuffer(ribbonParamsCB, &params, sizeof(params));
 
-                nvrhi::BindingSetDesc bindDesc;
-                bindDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-                    nvrhi::BindingSetItem::ConstantBuffer(5, ribbonParamsCB),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(10, st.controlPointBuffer),
-                    nvrhi::BindingSetItem::Sampler(0, st.sampler),
-                };
+                auto* shaderLoader = GEnv.Render->GetShaderLoader();
+                auto* vsReflection = shaderLoader->GetCachedReflection("ribbon", ".vs");
+                auto* psReflection = shaderLoader->GetCachedReflection("ribbon", ".ps");
+                BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB)
+                   .ConstantBuffer("RibbonParams", ribbonParamsCB)
+                   .BufferSRV("g_Materials", matBuffer.GetBuffer())
+                   .BufferSRV("g_ControlPoints", st.controlPointBuffer);
+                auto bindDesc = bsb.Build();
                 auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st.layout, nvDevice);
 
                 nvrhi::GraphicsState gfxState;

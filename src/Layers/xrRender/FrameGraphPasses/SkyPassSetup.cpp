@@ -5,6 +5,7 @@
 #include "ExposurePassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
@@ -210,17 +211,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
             auto& cache = framegraph::GetPassResourceCache();
             nvrhi::IDevice* device = cmdList->getDevice();
 
-            nvrhi::BindingLayoutDesc bindingLayoutDesc;
-            bindingLayoutDesc.visibility = nvrhi::ShaderType::All;
-            bindingLayoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
-                nvrhi::BindingLayoutItem::Texture_SRV(0),
-                nvrhi::BindingLayoutItem::Texture_SRV(1),
-                nvrhi::BindingLayoutItem::Sampler(0)
-            };
-
-            auto bindingLayout = cache.GetOrCreateBindingLayout("SkyPass", bindingLayoutDesc, device);
+            auto bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("SkyPass", *vsResult.reflection, *psResult.reflection, device);
 
             nvrhi::RenderState renderState;
             renderState.blendState.targets[0].setBlendEnable(false);
@@ -273,11 +264,6 @@ framegraph::VirtualResourceHandle setupSkyPass(
             auto dynamicCBBuffer = cache.GetOrCreateVolatileCB("SkyPass", "DynamicCB", sizeof(DynamicTransforms), 16, device);
             cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
-            auto staticCB = BuildStaticGlobals();
-
-            auto staticCBBuffer = cache.GetOrCreateVolatileCB("SkyPass", "StaticCB", sizeof(StaticGlobals), 16, device);
-            cmdList->writeBuffer(staticCBBuffer, &staticCB, sizeof(staticCB));
-
             nvrhi::ITexture* sky0Tex = nullptr;
             nvrhi::ITexture* sky1Tex = nullptr;
 
@@ -301,21 +287,12 @@ framegraph::VirtualResourceHandle setupSkyPass(
             if (!sky0Tex) sky0Tex = data.passState->placeholderCubemap.Get();
             if (!sky1Tex) sky1Tex = data.passState->placeholderCubemap.Get();
 
-            nvrhi::SamplerDesc samplerDesc;
-            samplerDesc.setAllFilters(true);
-            samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
-            auto sampler = cache.GetOrCreateSampler("SkyPass", samplerDesc, device);
+            framegraph::BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device);
+            bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer);
+            bsb.Texture("s_sky0", sky0Tex);
+            bsb.Texture("s_sky1", sky1Tex);
 
-            nvrhi::BindingSetDesc bindingSetDesc;
-            bindingSetDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(0, dynamicCBBuffer),
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticCBBuffer),
-                nvrhi::BindingSetItem::Texture_SRV(0, sky0Tex),
-                nvrhi::BindingSetItem::Texture_SRV(1, sky1Tex),
-                nvrhi::BindingSetItem::Sampler(0, sampler)
-            };
-
-            auto bindingSet = cache.GetOrCreateBindingSet(bindingSetDesc, bindingLayout, device);
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), bindingLayout, device);
 
             cmdList->clearTextureFloat(colorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f));
 

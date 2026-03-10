@@ -6,6 +6,7 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -225,34 +226,20 @@ bool ParticleGPUCullingManager::CreateBindingLayouts()
     if (!nvDevice)
         return false;
 
-    {
-        nvrhi::BindingLayoutDesc desc;
-        desc.visibility = nvrhi::ShaderType::Compute;
-        desc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
-            nvrhi::BindingLayoutItem::Texture_SRV(1),
-            nvrhi::BindingLayoutItem::Sampler(0),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-        };
-        m_cullLayout = nvDevice->createBindingLayout(desc);
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    if (!shaderLoader)
+        return false;
+
+    auto* cullRefl = shaderLoader->GetCachedReflection("particle_cull", ".cs");
+    if (cullRefl) {
+        m_cullLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("ParticleGPUCull", *cullRefl, nvDevice);
         if (!m_cullLayout)
             return false;
     }
 
-    {
-        nvrhi::BindingLayoutDesc desc;
-        desc.visibility = nvrhi::ShaderType::Compute;
-        desc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
-            nvrhi::BindingLayoutItem::RawBuffer_SRV(2),
-            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-        };
-        m_billboardLayout = nvDevice->createBindingLayout(desc);
+    auto* billboardRefl = shaderLoader->GetCachedReflection("particle_billboard", ".cs");
+    if (billboardRefl) {
+        m_billboardLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("ParticleBillboard", *billboardRefl, nvDevice);
         if (!m_billboardLayout)
             return false;
     }
@@ -361,16 +348,17 @@ void ParticleGPUCullingManager::DispatchCulling(
 
     cmdList->writeBuffer(m_cullParamsCB, &params, sizeof(params));
 
-    nvrhi::BindingSetDesc bindDesc;
-    bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(5, m_cullParamsCB),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(0, m_particleDataBuffer),
-        nvrhi::BindingSetItem::Texture_SRV(1, hiZPyramid),
-        nvrhi::BindingSetItem::Sampler(0, m_pointClampSampler),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, m_visibleIndicesBuffer),
-        nvrhi::BindingSetItem::RawBuffer_UAV(1, m_visibleCountBuffer),
-    };
-    m_cullBindingSet = nvDevice->createBindingSet(bindDesc, m_cullLayout);
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* cullReflection = shaderLoader->GetCachedReflection("particle_cull", ".cs");
+    if (!cullReflection) return;
+
+    framegraph::BindingSetBuilder bsb(*cullReflection, nvDevice);
+    bsb.ConstantBuffer("ParticleCullParams", m_cullParamsCB);
+    bsb.BufferSRV("g_ParticleData", m_particleDataBuffer);
+    bsb.Texture("g_HiZPyramid", hiZPyramid);
+    bsb.BufferUAV("g_VisibleIndices", m_visibleIndicesBuffer);
+    bsb.BufferUAV("g_VisibleCount", m_visibleCountBuffer);
+    m_cullBindingSet = nvDevice->createBindingSet(bsb.Build(), m_cullLayout);
 
     nvrhi::ComputeState state;
     state.pipeline = m_cullPipeline;
@@ -398,16 +386,18 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
 
     cmdList->writeBuffer(m_billboardParamsCB, &params, sizeof(params));
 
-    nvrhi::BindingSetDesc bindDesc;
-    bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(0, m_billboardParamsCB),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(0, m_particleDataBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(1, m_visibleIndicesBuffer),
-        nvrhi::BindingSetItem::RawBuffer_SRV(2, m_visibleCountBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, m_vertexBuffer),
-        nvrhi::BindingSetItem::RawBuffer_UAV(1, m_drawArgsBuffer),
-    };
-    m_billboardBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, m_billboardLayout, nvDevice);
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* billboardReflection = shaderLoader->GetCachedReflection("particle_billboard", ".cs");
+    if (!billboardReflection) return;
+
+    framegraph::BindingSetBuilder bsb(*billboardReflection, nvDevice);
+    bsb.ConstantBuffer("BillboardParams", m_billboardParamsCB);
+    bsb.BufferSRV("g_ParticleData", m_particleDataBuffer);
+    bsb.BufferSRV("g_VisibleIndices", m_visibleIndicesBuffer);
+    bsb.BufferSRV("g_VisibleCountBuf", m_visibleCountBuffer);
+    bsb.BufferUAV("g_Vertices", m_vertexBuffer);
+    bsb.BufferUAV("g_DrawArgs", m_drawArgsBuffer);
+    m_billboardBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), m_billboardLayout, nvDevice);
 
     nvrhi::ComputeState state;
     state.pipeline = m_billboardPipeline;

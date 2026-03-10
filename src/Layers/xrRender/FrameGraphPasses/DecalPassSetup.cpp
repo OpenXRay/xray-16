@@ -6,6 +6,7 @@
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
@@ -165,24 +166,19 @@ DefaultOutputLayout setupDecalPass(
             };
             auto globalsBindingSet = cache.GetOrCreateBindingSet(globalsBindDesc, data.passState->globalsLayout, nvDevice);
 
-            auto sampler = cache.GetOrCreateSampler("Decal",
-                nvrhi::SamplerDesc()
-                    .setAllFilters(true)
-                    .setAllAddressModes(nvrhi::SamplerAddressMode::Clamp),
-                nvDevice);
+            auto* vsReflection = RImplementation.m_shaderLoader->GetCachedReflection("decal_box", ".vs");
+            auto* psReflection = RImplementation.m_shaderLoader->GetCachedReflection("decal_box", ".ps");
 
             auto* materialBuffer = MaterialBuffer::Instance().GetBuffer();
 
-            nvrhi::BindingSetDesc decalBindDesc;
-            decalBindDesc.bindings = {
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(3, data.decalMgr->GetDecalBuffer()),
-                nvrhi::BindingSetItem::Texture_SRV(4, depthTex),
-                nvrhi::BindingSetItem::Texture_SRV(5, normalTex),
-                nvrhi::BindingSetItem::Texture_SRV(6, worldPosTex),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, materialBuffer),
-                nvrhi::BindingSetItem::Sampler(0, sampler),
-            };
-            auto decalBindingSet = nvDevice->createBindingSet(decalBindDesc, data.passState->decalLayout);
+            framegraph::BindingSetBuilder decalBsb(*vsReflection, *psReflection, nvDevice);
+            decalBsb.BufferSRV("g_Decals", data.decalMgr->GetDecalBuffer());
+            decalBsb.Texture("g_Depth", depthTex);
+            decalBsb.Texture("g_Normal", normalTex);
+            decalBsb.Texture("g_WorldPos", worldPosTex);
+            decalBsb.BufferSRV("g_Materials", materialBuffer);
+
+            auto decalBindingSet = nvDevice->createBindingSet(decalBsb.Build(), data.passState->decalLayout);
 
             nvrhi::Viewport viewport;
             viewport.minX = 0;

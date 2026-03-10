@@ -5,11 +5,13 @@
 #include "Layers/xrRender/Bindless/UnifiedVertex.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FGDetailManager.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #include <nvrhi/utils.h>
@@ -17,6 +19,11 @@
 extern ENGINE_API float ps_r3_grass_blade_width;
 extern ENGINE_API float ps_r3_grass_blade_height;
 extern ENGINE_API float ps_r3_grass_wind_displacement;
+
+namespace xray::render::RENDER_NAMESPACE {
+    class CRender;
+    extern CRender RImplementation;
+}
 
 namespace xray::render::RENDER_NAMESPACE {
 
@@ -518,9 +525,8 @@ void RTAccelStructManager::InitSkinningPipeline()
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
     auto& cache = framegraph::GetPassResourceCache();
 
-    static ref_cs s_rt_skin_cs;
-    s_rt_skin_cs.create("rt_skin_vertices");
-    if (!s_rt_skin_cs || !s_rt_skin_cs->nvrhiShader) {
+    auto skinResult = RImplementation.m_shaderLoader->LoadComputeShader("rt_skin_vertices");
+    if (!skinResult.handle) {
         Msg("! [RT] Failed to load rt_skin_vertices shader");
         return;
     }
@@ -535,18 +541,10 @@ void RTAccelStructManager::InitSkinningPipeline()
     cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
     s_skinCB = nvDevice->createBuffer(cbDesc);
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::Compute;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::RawBuffer_SRV(0),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(0),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-    };
-    s_skinLayout = cache.GetOrCreateBindingLayout("RTSkinning", layoutDesc, nvDevice);
+    s_skinLayout = cache.GetOrCreateBindingLayoutFromReflection("RTSkinning", *skinResult.reflection, nvDevice);
 
     nvrhi::ComputePipelineDesc pipeDesc;
-    pipeDesc.CS = s_rt_skin_cs->nvrhiShader;
+    pipeDesc.CS = skinResult.handle;
     pipeDesc.bindingLayouts = { s_skinLayout };
     s_skinPipeline = nvDevice->createComputePipeline(pipeDesc);
 
@@ -668,14 +666,13 @@ void RTAccelStructManager::BuildSkinnedBLAS(
     for (const auto& sb : m_skinnedBatchData) {
         auto it = bindingSetCache.find(sb.srcVB);
         if (it == bindingSetCache.end()) {
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::RawBuffer_SRV(0, sb.srcVB),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(1, boneBuffer),
-                nvrhi::BindingSetItem::RawBuffer_UAV(0, m_skinnedOutputVB),
-                nvrhi::BindingSetItem::ConstantBuffer(5, s_skinCB),
-            };
-            it = bindingSetCache.emplace(sb.srcVB, nvDevice->createBindingSet(bindDesc, s_skinLayout)).first;
+            auto* skinRefl = RImplementation.m_shaderLoader->GetCachedReflection("rt_skin_vertices", ".cs");
+            framegraph::BindingSetBuilder bsb(*skinRefl, nvDevice);
+            bsb.BufferSRV("g_SrcVB", sb.srcVB)
+               .BufferSRV("g_BoneMatrices", boneBuffer)
+               .BufferUAV("g_Output", m_skinnedOutputVB)
+               .ConstantBuffer("RTSkinningCB", s_skinCB);
+            it = bindingSetCache.emplace(sb.srcVB, nvDevice->createBindingSet(bsb.Build(), s_skinLayout)).first;
         }
 
         RTSkinningCB cb;
@@ -759,9 +756,8 @@ void RTAccelStructManager::InitGrassPipeline()
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
     auto& cache = framegraph::GetPassResourceCache();
 
-    static ref_cs s_rt_grass_cs;
-    s_rt_grass_cs.create("rt_grass_vertices");
-    if (!s_rt_grass_cs || !s_rt_grass_cs->nvrhiShader) {
+    auto grassResult = RImplementation.m_shaderLoader->LoadComputeShader("rt_grass_vertices");
+    if (!grassResult.handle) {
         Msg("! [RT] Failed to load rt_grass_vertices shader");
         return;
     }
@@ -781,22 +777,10 @@ void RTAccelStructManager::InitGrassPipeline()
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
     s_grassSampler = cache.GetOrCreateSampler("RTGrass", samplerDesc, nvDevice);
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::Compute;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
-        nvrhi::BindingLayoutItem::Texture_SRV(3),
-        nvrhi::BindingLayoutItem::Sampler(0),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(0),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-    };
-    s_grassLayout = cache.GetOrCreateBindingLayout("RTGrass", layoutDesc, nvDevice);
+    s_grassLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGrass", *grassResult.reflection, nvDevice);
 
     nvrhi::ComputePipelineDesc pipeDesc;
-    pipeDesc.CS = s_rt_grass_cs->nvrhiShader;
+    pipeDesc.CS = grassResult.handle;
     pipeDesc.bindingLayouts = { s_grassLayout };
     s_grassPipeline = nvDevice->createComputePipeline(pipeDesc);
 
@@ -813,9 +797,8 @@ void RTAccelStructManager::InitBillboardPipeline()
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
     auto& cache = framegraph::GetPassResourceCache();
 
-    static ref_cs s_rt_billboard_cs;
-    s_rt_billboard_cs.create("rt_grass_billboard");
-    if (!s_rt_billboard_cs || !s_rt_billboard_cs->nvrhiShader) {
+    auto billboardResult = RImplementation.m_shaderLoader->LoadComputeShader("rt_grass_billboard");
+    if (!billboardResult.handle) {
         Msg("! [RT] Failed to load rt_grass_billboard shader");
         return;
     }
@@ -830,22 +813,10 @@ void RTAccelStructManager::InitBillboardPipeline()
     cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
     s_billboardCB = nvDevice->createBuffer(cbDesc);
 
-    nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::Compute;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),
-        nvrhi::BindingLayoutItem::RawBuffer_SRV(4),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(0),
-        nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
-    };
-    s_billboardLayout = cache.GetOrCreateBindingLayout("RTBillboard", layoutDesc, nvDevice);
+    s_billboardLayout = cache.GetOrCreateBindingLayoutFromReflection("RTBillboard", *billboardResult.reflection, nvDevice);
 
     nvrhi::ComputePipelineDesc pipeDesc;
-    pipeDesc.CS = s_rt_billboard_cs->nvrhiShader;
+    pipeDesc.CS = billboardResult.handle;
     pipeDesc.bindingLayouts = { s_billboardLayout };
     s_billboardPipeline = nvDevice->createComputePipeline(pipeDesc);
 
@@ -909,19 +880,17 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
         cb.maxVertsPerBillboard = maxVPB;
         cb.pad[0] = cb.pad[1] = cb.pad[2] = 0;
 
-        nvrhi::BindingSetDesc bindDesc;
-        bindDesc.bindings = {
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, detailMgr->generatedInstancesBuffer,
-                nvrhi::Format::UNKNOWN, nvrhi::BufferRange(0, detailMgr->generatedInstancesBuffer->getDesc().byteSize)),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(1, detailMgr->visibleBillboardInstancesBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(2, detailMgr->detailModelsBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(3, detailMgr->pulledVertexBuffer),
-            nvrhi::BindingSetItem::RawBuffer_SRV(4, detailMgr->billboardDrawArgsBuffer),
-            nvrhi::BindingSetItem::RawBuffer_UAV(0, m_grassOutputVB),
-            nvrhi::BindingSetItem::RawBuffer_UAV(1, m_grassIB),
-            nvrhi::BindingSetItem::ConstantBuffer(5, s_billboardCB),
-        };
-        auto bindingSet = nvDevice->createBindingSet(bindDesc, s_billboardLayout);
+        auto* billboardRefl = RImplementation.m_shaderLoader->GetCachedReflection("rt_grass_billboard", ".cs");
+        framegraph::BindingSetBuilder bsb(*billboardRefl, nvDevice);
+        bsb.BufferSRV("g_AllInstances", detailMgr->generatedInstancesBuffer)
+           .BufferSRV("g_VisibleIndices", detailMgr->visibleBillboardInstancesBuffer)
+           .BufferSRV("g_DetailModels", detailMgr->detailModelsBuffer)
+           .BufferSRV("g_PulledVerts", detailMgr->pulledVertexBuffer)
+           .BufferSRV("g_DrawArgs", detailMgr->billboardDrawArgsBuffer)
+           .BufferUAV("g_Output", m_grassOutputVB)
+           .BufferUAV("g_OutputIB", m_grassIB)
+           .ConstantBuffer("BillboardRTCB", s_billboardCB);
+        auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_billboardLayout);
 
         cmdList->writeBuffer(s_billboardCB, &cb, sizeof(BillboardRTCB));
         nvrhi::ComputeState state;
@@ -1000,19 +969,16 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
         for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++) {
             if (lodCounts[lod] == 0) continue;
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(0, detailMgr->generatedInstancesBuffer,
-                    nvrhi::Format::UNKNOWN, nvrhi::BufferRange(0, detailMgr->generatedInstancesBuffer->getDesc().byteSize)),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(1, detailMgr->slotDataBuffer),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(2, detailMgr->visibleInstancesBuffer[lod]),
-                nvrhi::BindingSetItem::Texture_SRV(3, detailMgr->perlin4dTexture),
-                nvrhi::BindingSetItem::Sampler(0, s_grassSampler),
-                nvrhi::BindingSetItem::RawBuffer_UAV(0, m_grassOutputVB),
-                nvrhi::BindingSetItem::RawBuffer_UAV(1, m_grassIB),
-                nvrhi::BindingSetItem::ConstantBuffer(5, s_grassCB),
-            };
-            auto bindingSet = nvDevice->createBindingSet(bindDesc, s_grassLayout);
+            auto* grassRefl = RImplementation.m_shaderLoader->GetCachedReflection("rt_grass_vertices", ".cs");
+            framegraph::BindingSetBuilder bsb(*grassRefl, nvDevice);
+            bsb.BufferSRV("g_AllInstances", detailMgr->generatedInstancesBuffer)
+               .BufferSRV("g_SlotData", detailMgr->slotDataBuffer)
+               .BufferSRV("g_VisibleIndices", detailMgr->visibleInstancesBuffer[lod])
+               .Texture("g_WindTexture", detailMgr->perlin4dTexture)
+               .BufferUAV("g_Output", m_grassOutputVB)
+               .BufferUAV("g_OutputIB", m_grassIB)
+               .ConstantBuffer("GrassRTCB", s_grassCB);
+            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_grassLayout);
 
             GrassRTCB cb = cbTemplate;
             cb.segments = FGDetailManager::LOD_SEGMENTS[lod];

@@ -17,7 +17,6 @@ namespace xray::render::framegraph {
 namespace xray::render::RENDER_NAMESPACE::passes {
 
 struct HiZBuildPassState {
-    nvrhi::SamplerHandle pointSampler;
     nvrhi::ComputePipelineHandle pipeline;
     nvrhi::BindingLayoutHandle layout;
     bool initialized = false;
