@@ -99,7 +99,8 @@ void MakeFilter(string1024& dest, pcstr info, pcstr ext)
     }
     xr_strcpy(dest, res.c_str());
 
-    for (size_t i = 0; i < res.size(); ++i)
+    const auto bound = res.size() > sizeof(dest) ? sizeof(dest) : res.size();
+    for (size_t i = 0; i < bound; ++i)
     {
         if (res[i] == '|')
             dest[i] = '\0';
