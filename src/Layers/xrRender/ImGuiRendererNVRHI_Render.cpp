@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "ImGuiRendererNVRHI.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
+#include "FrameGraph/BindingSetBuilder.h"
+#include "FrameGraph/ShaderCache.h"
+#include "FrameGraph/ShaderLoader.h"
 
 namespace xray::render::ng {
 
@@ -54,14 +57,16 @@ void ImGuiRendererNVRHI::UpdateTextureBinding(ImTextureID textureId)
         texture = m_fontTexture.Get();
     }
 
-    nvrhi::BindingSetDesc bindingSetDesc;
-    bindingSetDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
-        nvrhi::BindingSetItem::Texture_SRV(0, nvrhi::TextureHandle(texture)),
-        nvrhi::BindingSetItem::Sampler(0, m_fontSampler)
-    };
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* vsRefl = shaderLoader->GetCachedReflection("imgui", ".vs");
+    auto* psRefl = shaderLoader->GetCachedReflection("imgui", ".ps");
 
-    m_resourceBindings = m_device->createBindingSet(bindingSetDesc, m_bindingLayout);
+    if (vsRefl && psRefl) {
+        framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, m_device, "ImGui.PerDraw");
+        bsb.ConstantBuffer("vertexBuffer", m_constantBuffer)
+           .Texture("texture0", nvrhi::TextureHandle(texture));
+        m_resourceBindings = m_device->createBindingSet(bsb.Build(), m_bindingLayout);
+    }
 }
 
 void ImGuiRendererNVRHI::SetupRenderState(ImDrawData* drawData, nvrhi::ICommandList* cmdList)

@@ -239,7 +239,7 @@ ExposureOutput setupExposurePass(
                         cmdList->writeBuffer(histogramCB, &histCB, sizeof(histCB));
 
                         auto* histRefl = RImplementation.m_shaderLoader->GetCachedReflection("luminance_histogram", ".cs");
-                        BindingSetBuilder bsb(*histRefl, nvDevice);
+                        BindingSetBuilder bsb(*histRefl, nvDevice, "Exposure.Histogram");
                         bsb.ConstantBuffer("ExposureParams", histogramCB)
                            .Texture("g_scene_color", sceneTexture)
                            .BufferUAV("g_histogram", ps->histogramBuffer);
@@ -274,7 +274,7 @@ ExposureOutput setupExposurePass(
                         cmdList->writeBuffer(adaptCBHandle, &adaptCB, sizeof(adaptCB));
 
                         auto* adaptRefl = RImplementation.m_shaderLoader->GetCachedReflection("exposure_adapt", ".cs");
-                        BindingSetBuilder bsb(*adaptRefl, nvDevice);
+                        BindingSetBuilder bsb(*adaptRefl, nvDevice, "Exposure.Adapt");
                         bsb.ConstantBuffer("ExposureAdaptParams", adaptCBHandle)
                            .BufferSRV("g_histogram", ps->histogramBuffer)
                            .TextureUAV("g_exposure", ps->exposureTexture);

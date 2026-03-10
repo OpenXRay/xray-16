@@ -293,7 +293,7 @@ framegraph::VirtualResourceHandle setupSunPass(
                 sunTex = data.passState->placeholderTexture.Get();
             }
 
-            BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device);
+            BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device, "Sun");
             bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer)
                .Texture("s_sun", sunTex);
             auto bindingSetDesc = bsb.Build();

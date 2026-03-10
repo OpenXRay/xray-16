@@ -117,7 +117,7 @@ MotionVectorOutput setupMotionVectorPass(
             cmdList->writeBuffer(data.state->cb, &cb, sizeof(cb));
 
             auto* mvRefl = RImplementation.m_shaderLoader->GetCachedReflection("restir_motion_vectors", ".cs");
-            BindingSetBuilder bsb(*mvRefl, nvDevice);
+            BindingSetBuilder bsb(*mvRefl, nvDevice, "MotionVector");
             bsb.ConstantBuffer("MotionVectorParams", data.state->cb)
                .Texture("t_Depth", depthTex)
                .TextureUAV("u_MotionVectors", mvTex);

@@ -171,7 +171,7 @@ DefaultOutputLayout setupDecalPass(
 
             auto* materialBuffer = MaterialBuffer::Instance().GetBuffer();
 
-            framegraph::BindingSetBuilder decalBsb(*vsReflection, *psReflection, nvDevice);
+            framegraph::BindingSetBuilder decalBsb(*vsReflection, *psReflection, nvDevice, "Decal");
             decalBsb.BufferSRV("g_Decals", data.decalMgr->GetDecalBuffer());
             decalBsb.Texture("g_Depth", depthTex);
             decalBsb.Texture("g_Normal", normalTex);

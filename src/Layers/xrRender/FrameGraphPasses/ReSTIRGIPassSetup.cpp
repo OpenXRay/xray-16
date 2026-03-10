@@ -464,7 +464,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
             auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_initial", ".cs");
             if (!csReflection) return;
 
-            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice);
+            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "ReSTIRGI.Initial");
             bsb.ConstantBuffer("ReSTIRGIParams", data.state->cb);
             bsb.AccelStruct("g_SceneTLAS", tlas);
             bsb.BufferSRV("g_BatchInfo", batchInfo);
@@ -558,7 +558,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_temporal", ".cs");
                 if (!csReflection) return;
 
-                framegraph::BindingSetBuilder bsb(*csReflection, nvDevice);
+                framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "ReSTIRGI.Temporal");
                 bsb.ConstantBuffer("ReSTIRTemporalParams", data.state->cb);
                 bsb.Texture("t_PrevReservoirA", data.state->reservoirA[data.readIdx]);
                 bsb.Texture("t_PrevReservoirB", data.state->reservoirB[data.readIdx]);
@@ -639,7 +639,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
             auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_composite", ".cs");
             if (!csReflection) return;
 
-            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice);
+            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "ReSTIRGI.Spatial");
             bsb.ConstantBuffer("CompositeParams", data.state->cb);
             bsb.Texture("t_DirectLighting", directLit);
             bsb.Texture("t_ReservoirA", resA);

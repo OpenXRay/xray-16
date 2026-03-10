@@ -102,7 +102,7 @@ VirtualResourceHandle setupDistortionApplyPass(
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-            BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device);
+            BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device, "DistortionApply");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                .Texture("g_Snapshot", snapshotTex)
                .Texture("g_Distortion", distortTex)

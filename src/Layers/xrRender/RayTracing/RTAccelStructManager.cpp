@@ -667,7 +667,7 @@ void RTAccelStructManager::BuildSkinnedBLAS(
         auto it = bindingSetCache.find(sb.srcVB);
         if (it == bindingSetCache.end()) {
             auto* skinRefl = RImplementation.m_shaderLoader->GetCachedReflection("rt_skin_vertices", ".cs");
-            framegraph::BindingSetBuilder bsb(*skinRefl, nvDevice);
+            framegraph::BindingSetBuilder bsb(*skinRefl, nvDevice, "RT.SkinVertices");
             bsb.BufferSRV("g_SrcVB", sb.srcVB)
                .BufferSRV("g_BoneMatrices", boneBuffer)
                .BufferUAV("g_Output", m_skinnedOutputVB)
@@ -881,7 +881,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
         cb.pad[0] = cb.pad[1] = cb.pad[2] = 0;
 
         auto* billboardRefl = RImplementation.m_shaderLoader->GetCachedReflection("rt_grass_billboard", ".cs");
-        framegraph::BindingSetBuilder bsb(*billboardRefl, nvDevice);
+        framegraph::BindingSetBuilder bsb(*billboardRefl, nvDevice, "RT.Billboard");
         bsb.BufferSRV("g_AllInstances", detailMgr->generatedInstancesBuffer)
            .BufferSRV("g_VisibleIndices", detailMgr->visibleBillboardInstancesBuffer)
            .BufferSRV("g_DetailModels", detailMgr->detailModelsBuffer)
@@ -970,7 +970,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
             if (lodCounts[lod] == 0) continue;
 
             auto* grassRefl = RImplementation.m_shaderLoader->GetCachedReflection("rt_grass_vertices", ".cs");
-            framegraph::BindingSetBuilder bsb(*grassRefl, nvDevice);
+            framegraph::BindingSetBuilder bsb(*grassRefl, nvDevice, "RT.Grass");
             bsb.BufferSRV("g_AllInstances", detailMgr->generatedInstancesBuffer)
                .BufferSRV("g_SlotData", detailMgr->slotDataBuffer)
                .BufferSRV("g_VisibleIndices", detailMgr->visibleInstancesBuffer[lod])

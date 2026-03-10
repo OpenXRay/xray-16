@@ -230,7 +230,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             cmdList->writeBuffer(emitCB, &emitParams, sizeof(emitParams));
 
             auto* emitReflection = RImplementation.m_shaderLoader->GetCachedReflection("smoke_trail_emit", ".cs");
-            BindingSetBuilder bsb(*emitReflection, nvDevice);
+            BindingSetBuilder bsb(*emitReflection, nvDevice, "SmokeTrail.Emit");
             bsb.ConstantBuffer("SmokeEmitCB", emitCB)
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer())
                .BufferUAV("g_StateBuffer", mgr->GetStateBuffer());
@@ -279,7 +279,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             cmdList->writeBuffer(simCB, &simParams, sizeof(simParams));
 
             auto* simReflection = RImplementation.m_shaderLoader->GetCachedReflection("smoke_trail_simulate", ".cs");
-            BindingSetBuilder bsb(*simReflection, nvDevice);
+            BindingSetBuilder bsb(*simReflection, nvDevice, "SmokeTrail.Sim");
             bsb.ConstantBuffer("SmokeSimCB", simCB)
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer());
             auto bindDesc = bsb.Build();
@@ -327,7 +327,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             cmdList->writeBuffer(compactCB, &compactParams, sizeof(compactParams));
 
             auto* compactReflection = RImplementation.m_shaderLoader->GetCachedReflection("smoke_trail_compact", ".cs");
-            BindingSetBuilder bsb(*compactReflection, nvDevice);
+            BindingSetBuilder bsb(*compactReflection, nvDevice, "SmokeTrail.Compact");
             bsb.ConstantBuffer("SmokeCompactCB", compactCB)
                .BufferUAV("g_CompactBuffer", mgr->GetCompactBuffer())
                .BufferUAV("g_StateBuffer", mgr->GetStateBuffer())
@@ -439,13 +439,15 @@ DefaultOutputLayout setupSmokeTrailPass(
             auto* backend = data.device->GetBackend();
             nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
 
+            if (!data.perlin4dVolume)
+                return;
+
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* vsReflection = shaderLoader->GetCachedReflection("smoke_trail", ".vs");
             auto* psReflection = shaderLoader->GetCachedReflection("smoke_trail", ".ps");
-            BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice);
+            BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "SmokeTrail.Draw");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                .ConstantBuffer("TrailParams", trailParamsCB)
-               .BufferSRV("g_Materials", matBuffer.GetBuffer())
                .BufferSRV("g_ControlPoints", mgr->GetCompactBuffer())
                .BufferSRV("g_TrailState", mgr->GetStateBuffer())
                .Texture("g_Perlin4D", data.perlin4dVolume);
