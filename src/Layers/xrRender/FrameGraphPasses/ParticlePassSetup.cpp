@@ -675,8 +675,8 @@ ParticlePassOutput setupParticlePass(
 
             const auto& rtDesc = colorRT->getDesc();
 
-            auto dynTransformsCB = cache.GetOrCreateVolatileCB("ParticlePass", "DynTransforms", sizeof(DynamicTransforms), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice).Get();
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ParticlePass", "StaticGlobals", sizeof(StaticGlobals), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice).Get();
+            auto dynTransformsCB = cache.GetOrCreateVolatileCB("ParticlePass", "DynTransforms", sizeof(DynamicTransforms), data.device);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ParticlePass", "StaticGlobals", sizeof(StaticGlobals), data.device);
 
             DynamicTransforms dynTrans = {};
             FillDynamicTransforms(dynTrans);

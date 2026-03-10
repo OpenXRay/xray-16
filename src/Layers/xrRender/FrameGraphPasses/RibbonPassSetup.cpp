@@ -278,8 +278,8 @@ RibbonPassOutput setupRibbonPass(
             auto groups = SplitRibbonGroups(st.points, st.pointCount);
 
             // Constant buffers
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("RibbonPass", "StaticGlobals", sizeof(StaticGlobals), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice).Get();
-            auto ribbonParamsCB = cache.GetOrCreateVolatileCB("RibbonPass", "RibbonParams", sizeof(RibbonParamsCB), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice).Get();
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("RibbonPass", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            auto ribbonParamsCB = cache.GetOrCreateVolatileCB("RibbonPass", "RibbonParams", sizeof(RibbonParamsCB), data.device);
 
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));

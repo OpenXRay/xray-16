@@ -185,7 +185,7 @@ HiZPyramidOutput setupHiZBuildPass(
             // For mip 0, we read from full-res depth and downsample 2x2 → 1
             // For mip N (N>0), we read from Hi-Z mip N-1 and downsample 2x2 → 1
 
-            auto hizCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("HiZBuild", "HiZCB", sizeof(HiZCB), 64, nvDevice);
+            auto hizCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("HiZBuild", "HiZCB", sizeof(HiZCB), data.device, 64);
             if (!hizCB) {
                 Msg("! [HiZBuild] Constant buffer is NULL at execute time!");
                 return;

@@ -304,7 +304,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
             DynamicTransforms dynamicCB = {};
             FillDynamicTransforms(dynamicCB, mSky);
 
-            auto dynamicCBBuffer = cache.GetOrCreateVolatileCB("SkyPass", "DynamicCB", sizeof(DynamicTransforms), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, device);
+            auto dynamicCBBuffer = cache.GetOrCreateVolatileCB("SkyPass", "DynamicCB", sizeof(DynamicTransforms), data.device);
             cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
             // ═══════════════════════════════════════════════════════

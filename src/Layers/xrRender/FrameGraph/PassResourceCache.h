@@ -5,6 +5,7 @@
 
 #include <nvrhi/nvrhi.h>
 #include "Common/Common.hpp"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render::framegraph {
 
@@ -122,13 +123,12 @@ public:
         const nvrhi::BufferDesc& desc,
         nvrhi::IDevice* device);
 
-    // Convenience: create a volatile constant buffer (builds BufferDesc internally)
-    nvrhi::BufferHandle GetOrCreateVolatileCB(
+    nvrhi::IBuffer* GetOrCreateVolatileCB(
         const char* passName,
         const char* bufferName,
         u32 byteSize,
-        u32 maxVersions,
-        nvrhi::IDevice* device);
+        ng::RenderDevice* device,
+        u32 maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS);
 
     bool HasStaticBuffer(const char* passName, const char* bufferName) const;
 
@@ -186,6 +186,7 @@ private:
     xr_map<u64, nvrhi::FramebufferHandle> m_framebuffers;
     xr_map<u64, nvrhi::InputLayoutHandle> m_inputLayouts;
     xr_map<u64, nvrhi::BufferHandle> m_staticBuffers;
+    xr_map<u64, ng::BufferHandle> m_volatileCBs;
     xr_map<u64, nvrhi::BindingSetHandle> m_bindingSets;
 
     Stats m_stats;

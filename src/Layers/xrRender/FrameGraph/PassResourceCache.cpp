@@ -398,25 +398,34 @@ bool PassResourceCache::HasStaticBuffer(const char* passName, const char* buffer
     return m_staticBuffers.find(key) != m_staticBuffers.end();
 }
 
-nvrhi::BufferHandle PassResourceCache::GetOrCreateVolatileCB(
+nvrhi::IBuffer* PassResourceCache::GetOrCreateVolatileCB(
     const char* passName, const char* bufferName,
-    u32 byteSize, u32 maxVersions, nvrhi::IDevice* device)
+    u32 byteSize, ng::RenderDevice* device, u32 maxVersions)
 {
     u64 key = HashCombine(HashString(passName), HashString(bufferName));
-    auto it = m_staticBuffers.find(key);
-    if (it != m_staticBuffers.end()) {
+    auto it = m_volatileCBs.find(key);
+    if (it != m_volatileCBs.end()) {
         m_stats.bufferHits++;
-        return it->second;
+        return device->GetNativeBuffer(it->second);
     }
     m_stats.bufferMisses++;
-    nvrhi::BufferDesc desc;
+
+    ng::RenderDevice::BufferDesc desc;
     desc.byteSize = byteSize;
     desc.isConstantBuffer = true;
     desc.isVolatile = true;
     desc.maxVersions = maxVersions;
-    auto buffer = device->createBuffer(desc);
-    if (buffer) m_staticBuffers[key] = buffer;
-    return buffer;
+
+    string256 debugStr;
+    xr_sprintf(debugStr, "VCB_%s_%s", passName, bufferName);
+    desc.debugName = debugStr;
+
+    ng::BufferHandle handle = device->CreateBuffer(desc);
+    if (handle.IsValid()) {
+        m_volatileCBs[key] = handle;
+        return device->GetNativeBuffer(handle);
+    }
+    return nullptr;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -468,6 +477,7 @@ void PassResourceCache::Clear() {
     m_framebuffers.clear();
     m_inputLayouts.clear();
     m_staticBuffers.clear();
+    m_volatileCBs.clear();
     m_bindingSets.clear();
 
     Msg("* [PassResourceCache] Cleared all caches");

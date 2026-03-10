@@ -152,8 +152,8 @@ static void renderBindlessForward(
 
     InitializeForwardResources(device, framebuffer, ps);
 
-    auto lightingCB = cache.GetOrCreateVolatileCB("ForwardColor", "LightingCB", sizeof(LightingConstants), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice);
-    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ForwardColor", "StaticGlobalsCB", sizeof(StaticGlobals), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice);
+    auto lightingCB = cache.GetOrCreateVolatileCB("ForwardColor", "LightingCB", sizeof(LightingConstants), device);
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ForwardColor", "StaticGlobalsCB", sizeof(StaticGlobals), device);
     auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("ForwardColor", nvDevice);
 
     auto lightingData = FillLightingConstants();

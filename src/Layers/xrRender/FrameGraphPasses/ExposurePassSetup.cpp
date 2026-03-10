@@ -246,8 +246,8 @@ ExposureOutput setupExposurePass(
 
                 if (sceneTexture) {
                     auto& cache = framegraph::GetPassResourceCache();
-                    auto histogramCB = cache.GetOrCreateVolatileCB("ExposurePass", "HistogramCB", sizeof(HistogramCB), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice);
-                    auto adaptCBHandle = cache.GetOrCreateVolatileCB("ExposurePass", "AdaptCB", sizeof(AdaptCB), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice);
+                    auto histogramCB = cache.GetOrCreateVolatileCB("ExposurePass", "HistogramCB", sizeof(HistogramCB), data.device);
+                    auto adaptCBHandle = cache.GetOrCreateVolatileCB("ExposurePass", "AdaptCB", sizeof(AdaptCB), data.device);
 
                     ctx->ClearBufferUint(ps->histogramBuffer.Get(), 0);
 

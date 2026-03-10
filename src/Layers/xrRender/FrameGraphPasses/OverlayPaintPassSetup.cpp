@@ -110,7 +110,7 @@ void setupOverlayPaintPass(
             auto* ps = data.passState;
 
             auto cbHandle = cache.GetOrCreateVolatileCB(
-                "OverlayPaint", "PaintCB", sizeof(OverlayPaintCB), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice);
+                "OverlayPaint", "PaintCB", sizeof(OverlayPaintCB), data.device);
 
             for (const auto& cmd : data.commands) {
                 auto& overlay = data.overlayMgr->GetOrCreateOverlay(cmd.target);

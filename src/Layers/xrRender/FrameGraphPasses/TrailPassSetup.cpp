@@ -327,8 +327,8 @@ TrailPassOutput setupTrailPass(
             auto groups = SplitTrailGroups(st.points, st.pointCount);
 
             // Constant buffers
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("TrailPass", "StaticGlobals", sizeof(StaticGlobals), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice).Get();
-            auto trailParamsCB = cache.GetOrCreateVolatileCB("TrailPass", "TrailParams", sizeof(TrailParamsCB), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice).Get();
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("TrailPass", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            auto trailParamsCB = cache.GetOrCreateVolatileCB("TrailPass", "TrailParams", sizeof(TrailParamsCB), data.device);
 
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
