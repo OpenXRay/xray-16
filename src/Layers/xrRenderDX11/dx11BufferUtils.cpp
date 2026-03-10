@@ -41,7 +41,7 @@ static nvrhi::BufferHandle CreateNvrhiBuffer(nvrhi::IDevice* device, const void*
     if (isVertexBuffer || isIndexBuffer)
     {
         desc.canHaveRawViews = true;
-        desc.isAccelStructBuildInput = true;
+        desc.isAccelStructBuildInput = device->queryFeatureSupport(nvrhi::Feature::RayTracingAccelStruct);
     }
 
     if (bDynamic)

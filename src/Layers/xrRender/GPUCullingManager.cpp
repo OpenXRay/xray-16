@@ -253,7 +253,7 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
         desc.byteSize = sizeof(CullParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = 16;
+        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
         m_cullParamsCB = nvDevice->createBuffer(desc);
         if (!m_cullParamsCB) {
@@ -1006,7 +1006,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
         desc.byteSize = 16;
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = 16;
+        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
         m_compactParamsCB = nvDevice->createBuffer(desc);
         R_ASSERT2(m_compactParamsCB, "Failed to create compact params CB");
@@ -1132,7 +1132,7 @@ void GPUCullingManager::CreateVariantPartitionResources(ng::RenderDevice* device
         desc.byteSize = 16;
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = 16;
+        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
         m_variantPartitionParamsCB = nvDevice->createBuffer(desc);
         R_ASSERT2(m_variantPartitionParamsCB, "Failed to create variant partition params CB");
     }
@@ -1199,7 +1199,7 @@ void GPUCullingManager::InitPartitionBuffers(
         desc.byteSize = totalSlots * sizeof(u32);
         desc.structStride = sizeof(u32);
         desc.isVertexBuffer = true;
-        desc.initialState = nvrhi::ResourceStates::VertexBuffer;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
         desc.debugName = xr_string(prefix) + "_PartitionDrawIndex";
         part.drawIndexBuffer = nvDevice->createBuffer(desc);
@@ -3034,7 +3034,7 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
         desc.byteSize = sizeof(CullDebugParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = 16;
+        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
         m_debugComputeParamsCB = nvDevice->createBuffer(desc);
         if (!m_debugComputeParamsCB) {
@@ -3049,7 +3049,7 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
         desc.byteSize = sizeof(CullDebugVSParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = 16;
+        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
         m_debugGraphicsParamsCB = nvDevice->createBuffer(desc);
         if (!m_debugGraphicsParamsCB) {
@@ -3432,7 +3432,7 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
         desc.byteSize = sizeof(CullParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = 16;
+        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
         m_particleCullParamsCB = nvDevice->createBuffer(desc);
         if (!m_particleCullParamsCB) {
@@ -3769,10 +3769,10 @@ void GPUCullingManager::CreateMegaBuffers()
         desc.debugName = "MegaVertexBuffer";
         desc.byteSize = m_totalVertexCount * sizeof(bindless::UnifiedVertex);
         desc.isVertexBuffer = true;  // Required for D3D11 vertex buffer binding
-        desc.initialState = nvrhi::ResourceStates::VertexBuffer;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
         desc.canHaveRawViews = true;
-        desc.isAccelStructBuildInput = true;
+        desc.isAccelStructBuildInput = nvDevice->queryFeatureSupport(nvrhi::Feature::RayTracingAccelStruct);
 
         m_megaVertexBuffer = nvDevice->createBuffer(desc);
         if (!m_megaVertexBuffer) {
@@ -3789,11 +3789,11 @@ void GPUCullingManager::CreateMegaBuffers()
         nvrhi::BufferDesc desc;
         desc.debugName = "MegaIndexBuffer";
         desc.byteSize = m_totalIndexCount * sizeof(u32);
-        desc.initialState = nvrhi::ResourceStates::IndexBuffer;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
         desc.isIndexBuffer = true;
         desc.canHaveRawViews = true;
-        desc.isAccelStructBuildInput = true;
+        desc.isAccelStructBuildInput = nvDevice->queryFeatureSupport(nvrhi::Feature::RayTracingAccelStruct);
 
         m_megaIndexBuffer = nvDevice->createBuffer(desc);
         if (!m_megaIndexBuffer) {

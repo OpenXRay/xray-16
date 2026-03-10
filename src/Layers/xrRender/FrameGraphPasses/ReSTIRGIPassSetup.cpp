@@ -112,7 +112,7 @@ static void InitializeResources(ng::RenderDevice* device, ReSTIRGIPassState& sta
     cbDesc.byteSize = std::max({ sizeof(ReSTIRGICB), sizeof(TemporalCB), sizeof(CompositeCB) });
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = 16;
+    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     cbDesc.keepInitialState = true;
     cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
     state.cb = nvDevice->createBuffer(cbDesc);

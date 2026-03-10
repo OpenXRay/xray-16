@@ -100,7 +100,7 @@ public:
         bool generateMips = false;
 
         // Initial state
-        nvrhi::ResourceStates initialState = nvrhi::ResourceStates::Common;
+        nvrhi::ResourceStates initialState = nvrhi::ResourceStates::ShaderResource;
 
         shared_str debugName;
     };
@@ -166,9 +166,10 @@ public:
         bool cpuRead = false;
         bool cpuWrite = false;
 
-        // Update frequency hint
-        bool isVolatile = false;  // Updated every frame
-        u32 maxVersions = 0;      // For volatile buffers: NVRHI version count
+        bool isVolatile = false;
+        u32 maxVersions = 0;
+
+        static constexpr u32 VOLATILE_CB_MAX_VERSIONS = 2 * 128;
 
         shared_str debugName;
     };

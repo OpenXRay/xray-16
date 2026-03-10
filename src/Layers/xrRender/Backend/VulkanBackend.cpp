@@ -580,9 +580,14 @@ void VulkanBackend::CreateSyncObjects() {
     VkSemaphoreCreateInfo semInfo = {};
     semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
+    VkFenceCreateInfo fenceInfo = {};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
     for (u32 i = 0; i < BACK_BUFFER_COUNT; i++) {
         vkCreateSemaphore(m_device, &semInfo, nullptr, &m_imageAvailable[i]);
         vkCreateSemaphore(m_device, &semInfo, nullptr, &m_renderFinished[i]);
+        vkCreateFence(m_device, &fenceInfo, nullptr, &m_inFlightFence[i]);
     }
 }
 
@@ -597,6 +602,10 @@ void VulkanBackend::DestroySyncObjects() {
         if (m_renderFinished[i]) {
             vkDestroySemaphore(m_device, m_renderFinished[i], nullptr);
             m_renderFinished[i] = VK_NULL_HANDLE;
+        }
+        if (m_inFlightFence[i]) {
+            vkDestroyFence(m_device, m_inFlightFence[i], nullptr);
+            m_inFlightFence[i] = VK_NULL_HANDLE;
         }
     }
 }
@@ -714,6 +723,12 @@ void VulkanBackend::Present(bool vsync) {
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
         Msg("* [VulkanBackend] Swapchain out of date, resize needed");
     }
+
+    VkSubmitInfo fenceSubmit = {};
+    fenceSubmit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    vkQueueSubmit(m_graphicsQueue, 1, &fenceSubmit, m_inFlightFence[m_currentFrameIndex]);
+
+    m_currentFrameIndex = (m_currentFrameIndex + 1) % BACK_BUFFER_COUNT;
 }
 
 void VulkanBackend::ResizeSwapChain(u32 width, u32 height) {
@@ -735,6 +750,9 @@ void VulkanBackend::BeginFrame() {
         TaskScheduler->Wait(*m_gcTask);
         m_gcTask = nullptr;
     }
+
+    vkWaitForFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex], VK_TRUE, UINT64_MAX);
+    vkResetFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex]);
 
     VkResult result = vkAcquireNextImageKHR(
         m_device, m_swapchain, UINT64_MAX,
@@ -777,8 +795,6 @@ void VulkanBackend::EndFrame() {
         ZoneScopedN("VK::ExecuteCommandList");
         m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(m_commandList);
     }
-
-    m_currentFrameIndex = (m_currentFrameIndex + 1) % BACK_BUFFER_COUNT;
 
     nvrhi::IDevice* device = m_nvrhiDevice;
     m_gcTask = &TaskScheduler->AddTask([device] {

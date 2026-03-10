@@ -162,8 +162,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             using namespace RENDER_NAMESPACE::bindless;
             auto& matBuffer = MaterialBuffer::Instance();
 
-            auto lightingCB = cache.GetOrCreateVolatileCB("TransparentPass", "LightingCB", sizeof(LightingConstants), 16, nvDevice);
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("TransparentPass", "StaticGlobalsCB", sizeof(StaticGlobals), 16, nvDevice);
+            auto lightingCB = cache.GetOrCreateVolatileCB("TransparentPass", "LightingCB", sizeof(LightingConstants), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("TransparentPass", "StaticGlobalsCB", sizeof(StaticGlobals), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice);
             auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("TransparentPass", nvDevice);
 
             auto lightingData = FillLightingConstants();

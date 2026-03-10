@@ -247,7 +247,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             auto& cache = GetPassResourceCache();
 
             auto emitCB = cache.GetOrCreateVolatileCB(
-                "SmokeTrail", "emit", sizeof(SmokeEmitParams), 16, nvDevice);
+                "SmokeTrail", "emit", sizeof(SmokeEmitParams), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice);
             cmdList->writeBuffer(emitCB, &emitParams, sizeof(emitParams));
 
             auto* emitReflection = RImplementation.m_shaderLoader->GetCachedReflection("smoke_trail_emit", ".cs");
@@ -297,7 +297,7 @@ DefaultOutputLayout setupSmokeTrailPass(
 
             const auto& simParams = mgr->GetSimParams();
             auto simCB = cache.GetOrCreateVolatileCB(
-                "SmokeTrail", "sim", sizeof(SmokeSimParams), 16, nvDevice);
+                "SmokeTrail", "sim", sizeof(SmokeSimParams), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice);
             cmdList->writeBuffer(simCB, &simParams, sizeof(simParams));
 
             auto* simReflection = RImplementation.m_shaderLoader->GetCachedReflection("smoke_trail_simulate", ".cs");
@@ -346,7 +346,7 @@ DefaultOutputLayout setupSmokeTrailPass(
 
             const auto& compactParams = mgr->GetCompactParams();
             auto compactCB = cache.GetOrCreateVolatileCB(
-                "SmokeTrail", "compact", sizeof(SmokeCompactParams), 16, nvDevice);
+                "SmokeTrail", "compact", sizeof(SmokeCompactParams), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice);
             cmdList->writeBuffer(compactCB, &compactParams, sizeof(compactParams));
 
             auto* compactReflection = RImplementation.m_shaderLoader->GetCachedReflection("smoke_trail_compact", ".cs");
@@ -422,9 +422,9 @@ DefaultOutputLayout setupSmokeTrailPass(
 
             // Constant buffers (writeBuffer BEFORE setGraphicsState)
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB(
-                "SmokeDraw", "StaticGlobals", sizeof(StaticGlobals), 16, nvDevice).Get();
+                "SmokeDraw", "StaticGlobals", sizeof(StaticGlobals), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice).Get();
             auto trailParamsCB = cache.GetOrCreateVolatileCB(
-                "SmokeDraw", "TrailParams", sizeof(TrailParamsCB), 16, nvDevice).Get();
+                "SmokeDraw", "TrailParams", sizeof(TrailParamsCB), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice).Get();
 
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));

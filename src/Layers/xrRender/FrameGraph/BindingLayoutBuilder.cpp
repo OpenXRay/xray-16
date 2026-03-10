@@ -11,6 +11,8 @@ static nvrhi::BindingLayoutItem MakeSRVItem(u32 slot, ResourceShape shape)
         return nvrhi::BindingLayoutItem::StructuredBuffer_SRV(slot);
     case ResourceShape::RawBuffer:
         return nvrhi::BindingLayoutItem::RawBuffer_SRV(slot);
+    case ResourceShape::TypedBuffer:
+        return nvrhi::BindingLayoutItem::TypedBuffer_SRV(slot);
     case ResourceShape::AccelStruct:
         return nvrhi::BindingLayoutItem::RayTracingAccelStruct(slot);
     default:
@@ -25,6 +27,8 @@ static nvrhi::BindingLayoutItem MakeUAVItem(u32 slot, ResourceShape shape)
         return nvrhi::BindingLayoutItem::StructuredBuffer_UAV(slot);
     case ResourceShape::RawBuffer:
         return nvrhi::BindingLayoutItem::RawBuffer_UAV(slot);
+    case ResourceShape::TypedBuffer:
+        return nvrhi::BindingLayoutItem::TypedBuffer_UAV(slot);
     default:
         return nvrhi::BindingLayoutItem::Texture_UAV(slot);
     }
@@ -76,8 +80,10 @@ static bool IsBufferType(nvrhi::ResourceType type)
     switch (type) {
     case nvrhi::ResourceType::StructuredBuffer_SRV:
     case nvrhi::ResourceType::RawBuffer_SRV:
+    case nvrhi::ResourceType::TypedBuffer_SRV:
     case nvrhi::ResourceType::StructuredBuffer_UAV:
     case nvrhi::ResourceType::RawBuffer_UAV:
+    case nvrhi::ResourceType::TypedBuffer_UAV:
         return true;
     default:
         return false;

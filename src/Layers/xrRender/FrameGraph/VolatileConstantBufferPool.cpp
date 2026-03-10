@@ -34,14 +34,11 @@ ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layo
     Msg("* [VCBPool] Creating new VCB for '%s' (slot b%u, %u bytes)",
         layout.name.c_str(), layout.slot, layout.size);
 
-    static constexpr u32 FRAMES_IN_FLIGHT = 2;
-    static constexpr u32 WRITES_PER_FRAME = 8;
-
     ng::RenderDevice::BufferDesc cbDesc;
     cbDesc.byteSize = layout.size;
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = FRAMES_IN_FLIGHT * WRITES_PER_FRAME;
+    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
     // Build debug name
     string256 debugName;

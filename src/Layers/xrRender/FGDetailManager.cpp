@@ -1283,7 +1283,7 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
     nvrhi::BufferDesc cbDesc;
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = 16;
+    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
     cbDesc.byteSize = sizeof(passes::DynamicTransforms);
     cbDesc.debugName = "DynTransforms_Detail";
@@ -1534,7 +1534,7 @@ bool FGDetailManager::CreatePerlin4DPipeline(nvrhi::IDevice* device)
     nvrhi::BufferDesc cbDesc;
     cbDesc.byteSize         = 16;  // Perlin4DGenParams: time, tileScale, textureSize, pad
     cbDesc.isVolatile       = true;
-    cbDesc.maxVersions      = 16;
+    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     cbDesc.isConstantBuffer = true;
     cbDesc.keepInitialState = true;
     cbDesc.debugName        = "Perlin4DGenCB";

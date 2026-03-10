@@ -6,6 +6,7 @@
 
 // Include CRender for accessing backbuffer
 #include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 
 namespace xray::render::ng {
 
@@ -163,7 +164,7 @@ bool ImGuiRendererNVRHI::CreateDeviceObjects()
     cbDesc.byteSize = sizeof(ImGuiConstants);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true; // We update it every frame
-    cbDesc.maxVersions = 16;  // Support multiple frames in flight
+    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     cbDesc.debugName = "ImGui Constants";
     m_constantBuffer = m_device->createBuffer(cbDesc);
 

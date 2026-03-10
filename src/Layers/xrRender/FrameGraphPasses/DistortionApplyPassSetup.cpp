@@ -7,6 +7,7 @@
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render::RENDER_NAMESPACE {
     class CRender;
@@ -98,7 +99,7 @@ VirtualResourceHandle setupDistortionApplyPass(
             if (!pipeline)
                 return;
 
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("DistortionApply", "globals", sizeof(StaticGlobals), 16, device);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("DistortionApply", "globals", sizeof(StaticGlobals), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, device);
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 

@@ -156,7 +156,7 @@ DefaultOutputLayout setupDecalPass(
             if (!data.passState->initialized)
                 return;
 
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Decal", "globals", sizeof(StaticGlobals), 16, nvDevice);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Decal", "globals", sizeof(StaticGlobals), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, nvDevice);
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 

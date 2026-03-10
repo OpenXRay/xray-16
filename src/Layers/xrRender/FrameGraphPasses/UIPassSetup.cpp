@@ -365,7 +365,7 @@ framegraph::VirtualResourceHandle setupTextPass(
             cbData.height = (float)data.height;
             cbData.invWidth = 1.0f / cbData.width;
             cbData.invHeight = 1.0f / cbData.height;
-            auto screenResCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("TextPass", "ScreenResCB", sizeof(ScreenResCB), 16, device->GetNVRHIDevice());
+            auto screenResCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("TextPass", "ScreenResCB", sizeof(ScreenResCB), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, device->GetNVRHIDevice());
             ctx->WriteBuffer(screenResCB.Get(), &cbData, sizeof(ScreenResCB));
 
             ctx->SetViewport(0, 0, (float)data.width, (float)data.height);

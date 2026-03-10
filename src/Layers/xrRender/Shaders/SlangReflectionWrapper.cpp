@@ -110,11 +110,12 @@ ResourceShape ClassifyResourceShape(slang::VariableLayoutReflection* param)
     case SLANG_STRUCTURED_BUFFER:       return ResourceShape::StructuredBuffer;
     case SLANG_BYTE_ADDRESS_BUFFER:     return ResourceShape::RawBuffer;
     case SLANG_ACCELERATION_STRUCTURE:  return ResourceShape::AccelStruct;
+    case SLANG_TEXTURE_BUFFER:          return ResourceShape::TypedBuffer;
     case SLANG_TEXTURE_1D:
     case SLANG_TEXTURE_2D:
     case SLANG_TEXTURE_3D:
     case SLANG_TEXTURE_CUBE:
-    case SLANG_TEXTURE_BUFFER:          return ResourceShape::Texture;
+                                        return ResourceShape::Texture;
     default: {
         auto* elementTypeLayout = typeLayout->getElementTypeLayout();
         if (elementTypeLayout) {
@@ -125,11 +126,12 @@ ResourceShape ClassifyResourceShape(slang::VariableLayoutReflection* param)
                 case SLANG_STRUCTURED_BUFFER:       return ResourceShape::StructuredBuffer;
                 case SLANG_BYTE_ADDRESS_BUFFER:     return ResourceShape::RawBuffer;
                 case SLANG_ACCELERATION_STRUCTURE:  return ResourceShape::AccelStruct;
+                case SLANG_TEXTURE_BUFFER:          return ResourceShape::TypedBuffer;
                 case SLANG_TEXTURE_1D:
                 case SLANG_TEXTURE_2D:
                 case SLANG_TEXTURE_3D:
                 case SLANG_TEXTURE_CUBE:
-                case SLANG_TEXTURE_BUFFER:          return ResourceShape::Texture;
+                                                    return ResourceShape::Texture;
                 default: break;
                 }
             }
