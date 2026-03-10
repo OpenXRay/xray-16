@@ -142,16 +142,17 @@ DefaultOutputLayout setupDetailPass(
             }
 
             auto* dm = data.detailManager;
+            auto* renderDevice = data.device;
 
             DynamicTransforms dynTrans = {};
             FillDynamicTransforms(dynTrans);
-            cmdList->writeBuffer(dm->cachedDynTransformsCB, &dynTrans, sizeof(dynTrans));
+            cmdList->writeBuffer(renderDevice->GetNativeBuffer(dm->cachedDynTransformsCB), &dynTrans, sizeof(dynTrans));
 
             u8 dummyParams[32] = {};
-            cmdList->writeBuffer(dm->cachedShaderParamsCB, dummyParams, 32);
+            cmdList->writeBuffer(renderDevice->GetNativeBuffer(dm->cachedShaderParamsCB), dummyParams, 32);
 
             auto staticGlobals = BuildStaticGlobals();
-            cmdList->writeBuffer(dm->cachedStaticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
+            cmdList->writeBuffer(renderDevice->GetNativeBuffer(dm->cachedStaticGlobalsCB), &staticGlobals, sizeof(staticGlobals));
 
             float windAngleDeg = 0.0f;
             float windSpeed = dm->windSpeed;
@@ -180,10 +181,10 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.grass_blade_height = ps_r3_grass_blade_height;
             frameConstants.buildDetailsIndex = dm->buildDetailsBindlessIndex;
             frameConstants.buildDetailsPbrIndex = dm->buildDetailsPbrBindlessIndex;
-            cmdList->writeBuffer(dm->cachedDetailGlobalsCB, &frameConstants, sizeof(frameConstants));
+            cmdList->writeBuffer(renderDevice->GetNativeBuffer(dm->cachedDetailGlobalsCB), &frameConstants, sizeof(frameConstants));
 
             u8 dummyLight[48] = {};
-            cmdList->writeBuffer(dm->cachedDynLightCB, dummyLight, 48);
+            cmdList->writeBuffer(renderDevice->GetNativeBuffer(dm->cachedDynLightCB), dummyLight, 48);
 
             FGDetailManager::GrassObjectTint tintData[64];
             for (int i = 0; i < 64; i++)
@@ -213,9 +214,9 @@ DefaultOutputLayout setupDetailPass(
 
             auto makeGrassBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer) {
                 framegraph::BindingSetBuilder bsb(*grassVsRefl, *grassPsRefl, nvDev, "Detail.Grass");
-                bsb.ConstantBuffer("static_globals", dm->cachedStaticGlobalsCB);
-                bsb.ConstantBuffer("DetailGlobals", dm->cachedDetailGlobalsCB);
-                bsb.ConstantBuffer("$Globals", dm->cachedDynLightCB);
+                bsb.ConstantBuffer("static_globals", renderDevice->GetNativeBuffer(dm->cachedStaticGlobalsCB));
+                bsb.ConstantBuffer("DetailGlobals", renderDevice->GetNativeBuffer(dm->cachedDetailGlobalsCB));
+                bsb.ConstantBuffer("$Globals", renderDevice->GetNativeBuffer(dm->cachedDynLightCB));
                 bsb.BufferSRV("visible_indices", visibleIndicesBuffer);
                 bsb.BufferSRV("grass_object_tints", dm->cachedGrassTintsBuffer);
                 bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
@@ -231,8 +232,8 @@ DefaultOutputLayout setupDetailPass(
 
             auto makePulledBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer, nvrhi::BindingLayoutHandle layout) {
                 framegraph::BindingSetBuilder bsb(*bbVsRefl, *bbPsRefl, nvDev, "Detail.Billboard");
-                bsb.ConstantBuffer("static_globals", dm->cachedStaticGlobalsCB);
-                bsb.ConstantBuffer("DetailGlobals", dm->cachedDetailGlobalsCB);
+                bsb.ConstantBuffer("static_globals", renderDevice->GetNativeBuffer(dm->cachedStaticGlobalsCB));
+                bsb.ConstantBuffer("DetailGlobals", renderDevice->GetNativeBuffer(dm->cachedDetailGlobalsCB));
                 bsb.BufferSRV("visible_indices", visibleIndicesBuffer);
                 bsb.BufferSRV("detail_models", dm->detailModelsBuffer);
                 bsb.BufferSRV("pulled_vertices", dm->pulledVertexBuffer);
@@ -289,8 +290,8 @@ DefaultOutputLayout setupDetailPass(
                 auto* decalVsRefl = shaderLoader->GetCachedReflection("detail_decal", ".vs");
                 auto* decalPsRefl = shaderLoader->GetCachedReflection("detail_decal", ".ps");
                 framegraph::BindingSetBuilder decalBsb(*decalVsRefl, *decalPsRefl, nvDev, "Detail.Decal");
-                decalBsb.ConstantBuffer("static_globals", dm->cachedStaticGlobalsCB);
-                decalBsb.ConstantBuffer("DetailGlobals", dm->cachedDetailGlobalsCB);
+                decalBsb.ConstantBuffer("static_globals", renderDevice->GetNativeBuffer(dm->cachedStaticGlobalsCB));
+                decalBsb.ConstantBuffer("DetailGlobals", renderDevice->GetNativeBuffer(dm->cachedDetailGlobalsCB));
                 decalBsb.BufferSRV("visible_indices", dm->visibleDecalInstancesBuffer);
                 decalBsb.BufferSRV("detail_models", dm->detailModelsBuffer);
                 decalBsb.BufferSRV("decal_vertices", dm->pulledVertexBuffer);

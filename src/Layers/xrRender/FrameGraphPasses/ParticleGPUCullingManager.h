@@ -2,6 +2,7 @@
 
 #include "PassVertexFormats.h"
 #include "xrCore/xrCore.h"
+#include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -95,8 +96,8 @@ private:
     nvrhi::BufferHandle m_vertexBuffer;
     nvrhi::BufferHandle m_drawArgsBuffer;
 
-    nvrhi::BufferHandle m_cullParamsCB;
-    nvrhi::BufferHandle m_billboardParamsCB;
+    ng::BufferHandle m_cullParamsCB;
+    ng::BufferHandle m_billboardParamsCB;
 
     nvrhi::SamplerHandle m_pointClampSampler;
 

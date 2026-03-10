@@ -71,12 +71,28 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
     m_validationEnabled = enableValidation;
 
     if (!CreateInstance(enableValidation)) { Shutdown(); return false; }
+    Msg("* [VulkanBackend] Instance created, m_instance=%p", m_instance);
+
     VULKAN_HPP_DEFAULT_DISPATCHER.init(m_instance, vkGetInstanceProcAddr);
+    Msg("* [VulkanBackend] Dispatcher instance-init done, vkCreateDevice=%p vkCreateSemaphore=%p",
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateDevice, VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSemaphore);
+
     if (!CreateSurface(window)) { Shutdown(); return false; }
     if (!SelectPhysicalDevice()) { Shutdown(); return false; }
     if (!CreateLogicalDevice()) { Shutdown(); return false; }
+    Msg("* [VulkanBackend] Device created, m_device=%p", m_device);
+
     VULKAN_HPP_DEFAULT_DISPATCHER.init(m_instance, vkGetInstanceProcAddr, m_device, vkGetDeviceProcAddr);
+    Msg("* [VulkanBackend] Dispatcher device-init done, vkCreateSemaphore=%p vkDestroySemaphore=%p vkCreateCommandPool=%p",
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSemaphore,
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySemaphore,
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateCommandPool);
+
     if (!CreateSwapChain(width, height)) { Shutdown(); return false; }
+
+    Msg("* [VulkanBackend] About to create NVRHI device...");
+    Msg("* [VulkanBackend]   graphicsQueue=%p family=%u", m_graphicsQueue, m_graphicsQueueFamily);
+    Msg("* [VulkanBackend]   computeQueue=%p family=%u", m_computeQueue, m_computeQueueFamily);
 
     nvrhi::vulkan::DeviceDesc deviceDesc;
     deviceDesc.errorCB = &s_nvrhiVkMessageCallback;

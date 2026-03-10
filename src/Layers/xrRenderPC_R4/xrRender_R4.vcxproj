@@ -25,35 +25,35 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;$(VULKAN_SDK)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;$(xrExternals)nvrhi\thirdparty\Vulkan-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)'!='Release Master Gold'">$(xrExternals)onnxruntime\include\onnxruntime\core\session;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;RENDER_NAMESPACE=render_r4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'!='Release Master Gold'">%(PreprocessorDefinitions);USE_AI_PBR</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;nvrhi_vk.lib;vulkan-1.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Release Master Gold'">dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;nvrhi_vk.lib;vulkan-1.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;vulkan-1.lib;slang.lib;onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;$(VULKAN_SDK)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build_static\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;nvrhi_vk.lib;vulkan-1.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Release Master Gold'">dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;nvrhi_vk.lib;vulkan-1.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;vulkan-1.lib;slang.lib;onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;$(VULKAN_SDK)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build_static\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
@@ -839,8 +839,10 @@
   </Target>
   <Target Name="ConfigureAndBuildNVRHI" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <NVRHIBuildDir>$(xrExternals)nvrhi\vs_build</NVRHIBuildDir>
-      <NVRHICMakeOptions>-DNVRHI_BUILD_SHARED=ON -DNVRHI_WITH_DX11=ON -DNVRHI_WITH_DX12=ON -DNVRHI_WITH_VULKAN=ON -DNVRHI_WITH_VALIDATION=ON -DNVRHI_INSTALL=OFF</NVRHICMakeOptions>
+      <NVRHIBuildDir Condition="'$(Configuration)'!='Release Master Gold'">$(xrExternals)nvrhi\vs_build</NVRHIBuildDir>
+      <NVRHIBuildDir Condition="'$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build_static</NVRHIBuildDir>
+      <NVRHICMakeOptions Condition="'$(Configuration)'!='Release Master Gold'">-DNVRHI_BUILD_SHARED=ON -DNVRHI_WITH_DX11=ON -DNVRHI_WITH_DX12=ON -DNVRHI_WITH_VULKAN=ON -DNVRHI_WITH_VALIDATION=ON -DNVRHI_INSTALL=OFF</NVRHICMakeOptions>
+      <NVRHICMakeOptions Condition="'$(Configuration)'=='Release Master Gold'">-DNVRHI_BUILD_SHARED=OFF -DNVRHI_WITH_DX11=ON -DNVRHI_WITH_DX12=ON -DNVRHI_WITH_VULKAN=ON -DNVRHI_WITH_VALIDATION=ON -DNVRHI_INSTALL=OFF</NVRHICMakeOptions>
       <!-- Map OpenXRay configurations to CMake standard configurations -->
       <NVRHIConfig Condition="'$(Configuration)'=='Debug'">RelWithDebInfo</NVRHIConfig>
       <NVRHIConfig Condition="'$(Configuration)'=='Mixed'">RelWithDebInfo</NVRHIConfig>
@@ -848,13 +850,14 @@
       <NVRHIConfig Condition="'$(Configuration)'=='Release Master Gold'">Release</NVRHIConfig>
       <NVRHIParallelCount>$([System.Environment]::ProcessorCount)</NVRHIParallelCount>
     </PropertyGroup>
-    <!-- Configure NVRHI with CMake if vs_build doesn't exist -->
+    <!-- Configure NVRHI with CMake if build dir doesn't exist -->
     <Exec Command="cmake -A x64 $(NVRHICMakeOptions) -S $(xrExternals)nvrhi -B $(NVRHIBuildDir)" Condition="!Exists('$(NVRHIBuildDir)\nvrhi.sln')" />
     <!-- Build NVRHI for current configuration with parallel jobs -->
     <Message Text="[NVRHI Build] Processor Count: $(NVRHIParallelCount)" Importance="high" />
-    <Message Text="[NVRHI Build] Build Command: cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --target nvrhi --parallel $(NVRHIParallelCount)" Importance="high" />
-    <Exec Command="cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --target nvrhi --parallel $(NVRHIParallelCount)" Condition="Exists('$(NVRHIBuildDir)\nvrhi.sln')" />
-    <Copy SourceFiles="$(NVRHIBuildDir)\$(NVRHIConfig)\nvrhi.dll" DestinationFolder="$(xrBinDir)" SkipUnchangedFiles="true" Condition="Exists('$(NVRHIBuildDir)\$(NVRHIConfig)\nvrhi.dll')" />
+    <Message Text="[NVRHI Build] Build Command: cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --parallel $(NVRHIParallelCount)" Importance="high" />
+    <Exec Command="cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --parallel $(NVRHIParallelCount)" Condition="Exists('$(NVRHIBuildDir)\nvrhi.sln')" />
+    <!-- Copy shared DLL for non-Release Master Gold configs -->
+    <Copy SourceFiles="$(NVRHIBuildDir)\$(NVRHIConfig)\nvrhi.dll" DestinationFolder="$(xrBinDir)" SkipUnchangedFiles="true" Condition="'$(Configuration)'!='Release Master Gold' AND Exists('$(NVRHIBuildDir)\$(NVRHIConfig)\nvrhi.dll')" />
   </Target>
   <Target Name="ConfigureAndBuildSlang" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

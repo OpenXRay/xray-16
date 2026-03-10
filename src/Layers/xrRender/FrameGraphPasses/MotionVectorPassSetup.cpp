@@ -33,15 +33,7 @@ static void InitializeResources(ng::RenderDevice* device, MotionVectorPassState&
     pipeDesc.bindingLayouts = { state.layout };
     state.pipeline = cache.GetOrCreateComputePipeline("MotionVector", pipeDesc, nvDevice);
 
-    nvrhi::BufferDesc cbDesc;
-    cbDesc.debugName = "MotionVectorCB";
-    cbDesc.byteSize = 160;
-    cbDesc.isConstantBuffer = true;
-    cbDesc.isVolatile = true;
-    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
-    cbDesc.keepInitialState = true;
-    cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-    state.cb = nvDevice->createBuffer(cbDesc);
+    state.cb = cache.GetOrCreateVolatileCB("MotionVector", "MotionVectorCB", 160, device);
 
     state.initialized = true;
 }

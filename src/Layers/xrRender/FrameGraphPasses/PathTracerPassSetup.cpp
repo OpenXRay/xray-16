@@ -27,7 +27,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 using namespace framegraph;
 
 static nvrhi::ShaderHandle s_pathtrace_shader;
-static nvrhi::BufferHandle s_cb;
+static nvrhi::IBuffer* s_cb = nullptr;
 static nvrhi::ComputePipelineHandle s_pipeline;
 static nvrhi::BindingLayoutHandle s_layout;
 static nvrhi::SamplerHandle s_sampler;
@@ -105,15 +105,7 @@ static void InitializeResources(ng::RenderDevice* device)
     }
     s_pathtrace_shader = csResult.handle;
 
-    nvrhi::BufferDesc cbDesc;
-    cbDesc.debugName = "PathTracerCB";
-    cbDesc.byteSize = sizeof(PathTracerCB);
-    cbDesc.isConstantBuffer = true;
-    cbDesc.isVolatile = true;
-    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
-    cbDesc.keepInitialState = true;
-    cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-    s_cb = nvDevice->createBuffer(cbDesc);
+    s_cb = cache.GetOrCreateVolatileCB("PathTracer", "PathTracerCB", sizeof(PathTracerCB), device);
 
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllFilters(true);

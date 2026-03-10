@@ -3,6 +3,7 @@
 #include "xrCore/xrCore.h"
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include "Layers/xrRender/Bindless/UnifiedVertex.h"
 #include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 
@@ -374,7 +375,7 @@ private:
     CullSetBuffers m_staticSet;
     CullSetBuffers m_dynamicSet;
 
-    nvrhi::BufferHandle m_cullParamsCB;
+    ng::BufferHandle m_cullParamsCB;
 
     nvrhi::ComputePipelineHandle m_cullPipeline;
     nvrhi::ComputePipelineHandle m_clearArgsPipeline;
@@ -388,11 +389,11 @@ private:
     nvrhi::BindingLayoutHandle m_compactScatterLayout;
     nvrhi::SamplerHandle m_pointSampler;
 
-    nvrhi::BufferHandle m_compactParamsCB;
+    ng::BufferHandle m_compactParamsCB;
 
     nvrhi::ComputePipelineHandle m_variantPartitionPipeline;
     nvrhi::BindingLayoutHandle m_variantPartitionLayout;
-    nvrhi::BufferHandle m_variantPartitionParamsCB;
+    ng::BufferHandle m_variantPartitionParamsCB;
     VariantPartitionBuffers m_staticPartition;
     VariantPartitionBuffers m_transparentPartition;
     bool m_variantPartitionEnabled = false;
@@ -435,8 +436,8 @@ private:
     CullSetBuffers m_transparentSet;
 
     nvrhi::BufferHandle m_debugBuffer;
-    nvrhi::BufferHandle m_debugComputeParamsCB;
-    nvrhi::BufferHandle m_debugGraphicsParamsCB;
+    ng::BufferHandle m_debugComputeParamsCB;
+    ng::BufferHandle m_debugGraphicsParamsCB;
 
     nvrhi::ComputePipelineHandle m_debugComputePipeline;
     nvrhi::ComputePipelineHandle m_particleDebugComputePipeline;
@@ -449,7 +450,7 @@ private:
     nvrhi::BufferHandle m_particleBuffer;
     nvrhi::BufferHandle m_particleDrawArgsBuffer;
     nvrhi::BufferHandle m_particleVisibleCountBuffer;
-    nvrhi::BufferHandle m_particleCullParamsCB;
+    ng::BufferHandle m_particleCullParamsCB;
     nvrhi::ComputePipelineHandle m_particleCullPipeline;
     nvrhi::BindingLayoutHandle m_particleCullLayout;
 
