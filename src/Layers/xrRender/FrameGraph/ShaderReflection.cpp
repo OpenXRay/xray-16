@@ -1060,7 +1060,8 @@ xr_vector<const char*> ShaderReflector::GetPhaseRTNames(RenderPhase phase) {
     }
 }
 
-static void FilterReflectionByUsage(ExtractedReflection& result, slang::IComponentType* program)
+static void FilterReflectionByUsage(ExtractedReflection& result, slang::IComponentType* program,
+    const VulkanBindShifts& vkShifts)
 {
     Slang::ComPtr<slang::IMetadata> metadata;
     SlangResult hr = program->getEntryPointMetadata(0, 0, metadata.writeRef(), nullptr);
@@ -1071,8 +1072,18 @@ static void FilterReflectionByUsage(ExtractedReflection& result, slang::ICompone
     }
 
     auto isUsed = [&](SlangParameterCategory category, u32 slot) -> bool {
+        u32 querySlot = slot;
+        if (vkShifts.HasShifts()) {
+            switch (category) {
+            case SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE: querySlot += vkShifts.shaderResource; break;
+            case SLANG_PARAMETER_CATEGORY_UNORDERED_ACCESS: querySlot += vkShifts.unorderedAccess; break;
+            case SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER: querySlot += vkShifts.constantBuffer; break;
+            case SLANG_PARAMETER_CATEGORY_SAMPLER_STATE: querySlot += vkShifts.sampler; break;
+            default: break;
+            }
+        }
         bool used = false;
-        SlangResult hr = metadata->isParameterLocationUsed(category, 0, slot, used);
+        SlangResult hr = metadata->isParameterLocationUsed(category, 0, querySlot, used);
         if (SLANG_FAILED(hr))
             return true;
         return used;
@@ -1082,14 +1093,17 @@ static void FilterReflectionByUsage(ExtractedReflection& result, slang::ICompone
         result.rtBindings.inputTextures.size(), result.rtBindings.uavBindings.size(),
         result.rtBindings.samplers.size(), result.constantLayout.constantBuffers.buffers.size());
 
-    for (const auto& t : result.rtBindings.inputTextures) {
-        bool usedSR = false, usedDTS = false;
-        SlangResult hrSR = metadata->isParameterLocationUsed(SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE, 0, t.slot, usedSR);
-        SlangResult hrDTS = metadata->isParameterLocationUsed(SLANG_PARAMETER_CATEGORY_DESCRIPTOR_TABLE_SLOT, 0, t.slot, usedDTS);
-        Msg("    SRV t%u '%s' -> SR:hr=0x%08X,%s  DTS:hr=0x%08X,%s",
-            t.slot, t.name.c_str(),
-            hrSR, usedSR ? "used" : "unused",
-            hrDTS, usedDTS ? "used" : "unused");
+    {
+        u32 srUsed = 0, srUnused = 0, dtsUsed = 0, dtsUnused = 0;
+        for (const auto& t : result.rtBindings.inputTextures) {
+            bool uSR = false, uDTS = false;
+            metadata->isParameterLocationUsed(SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE, 0, t.slot, uSR);
+            metadata->isParameterLocationUsed(SLANG_PARAMETER_CATEGORY_DESCRIPTOR_TABLE_SLOT, 0, t.slot, uDTS);
+            if (uSR) ++srUsed; else ++srUnused;
+            if (uDTS) ++dtsUsed; else ++dtsUnused;
+        }
+        Msg("  [FilterReflection] Category test: SHADER_RESOURCE %u used/%u unused, DESCRIPTOR_TABLE_SLOT %u used/%u unused",
+            srUsed, srUnused, dtsUsed, dtsUnused);
     }
 
     auto& textures = result.rtBindings.inputTextures;
@@ -1128,12 +1142,50 @@ static void FilterReflectionByUsage(ExtractedReflection& result, slang::ICompone
     cbs.erase(std::remove_if(cbs.begin(), cbs.end(),
         [&](const auto& cb) { return !isUsed(SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER, cb.slot); }),
         cbs.end());
+
+    for (size_t i = 0; i < textures.size(); ++i)
+    {
+        for (size_t j = i + 1; j < textures.size(); )
+        {
+            if (textures[i].slot == textures[j].slot)
+            {
+                if (textures[j].shape != ResourceShape::Texture && textures[i].shape == ResourceShape::Texture)
+                {
+                    textures.erase(textures.begin() + i);
+                    --i;
+                    break;
+                }
+                else
+                {
+                    textures.erase(textures.begin() + j);
+                }
+            }
+            else
+                ++j;
+        }
+    }
+
+    Msg("  [FilterReflection] After: %u SRVs, %u UAVs, %u samplers, %u CBs",
+        textures.size(), uavs.size(), samplers.size(), cbs.size());
+}
+
+static void UnshiftVulkanBindings(ExtractedReflection& result, const VulkanBindShifts& shifts)
+{
+    for (auto& t : result.rtBindings.inputTextures)
+        t.slot -= shifts.shaderResource;
+    for (auto& u : result.rtBindings.uavBindings)
+        u.slot -= shifts.unorderedAccess;
+    for (auto& s : result.rtBindings.samplers)
+        s.slot -= shifts.sampler;
+    for (auto& cb : result.constantLayout.constantBuffers.buffers)
+        cb.slot -= shifts.constantBuffer;
 }
 
 ExtractedReflection ShaderReflector::ExtractReflection(
     slang::ShaderReflection* slangReflection,
     slang::IComponentType* linkedProgram,
-    bool isVertexShader)
+    bool isVertexShader,
+    VulkanBindShifts vkShifts)
 {
     ExtractedReflection result;
 
@@ -1150,8 +1202,29 @@ ExtractedReflection ShaderReflector::ExtractReflection(
     result.rtBindings = AnalyzePixelShader(slangReflection);
     result.constantLayout = AnalyzeConstantLayout(slangReflection);
 
+    if (vkShifts.HasShifts())
+    {
+        Msg("  [Reflection] Before unshift: %u SRVs, %u UAVs, %u samplers, %u CBs",
+            result.rtBindings.inputTextures.size(), result.rtBindings.uavBindings.size(),
+            result.rtBindings.samplers.size(), result.constantLayout.constantBuffers.buffers.size());
+        for (const auto& t : result.rtBindings.inputTextures)
+            Msg("    SRV '%s' slot=%u shape=%d", t.name.c_str(), t.slot, (int)t.shape);
+        for (const auto& u : result.rtBindings.uavBindings)
+            Msg("    UAV '%s' slot=%u shape=%d", u.name.c_str(), u.slot, (int)u.shape);
+        for (const auto& cb : result.constantLayout.constantBuffers.buffers)
+            Msg("    CB '%s' slot=%u", cb.name.c_str(), cb.slot);
+        UnshiftVulkanBindings(result, vkShifts);
+        Msg("  [Reflection] After unshift:");
+        for (const auto& t : result.rtBindings.inputTextures)
+            Msg("    SRV '%s' slot=%u", t.name.c_str(), t.slot);
+        for (const auto& u : result.rtBindings.uavBindings)
+            Msg("    UAV '%s' slot=%u", u.name.c_str(), u.slot);
+        for (const auto& cb : result.constantLayout.constantBuffers.buffers)
+            Msg("    CB '%s' slot=%u", cb.name.c_str(), cb.slot);
+    }
+
     if (linkedProgram)
-        FilterReflectionByUsage(result, linkedProgram);
+        FilterReflectionByUsage(result, linkedProgram, vkShifts);
 
     return result;
 }

@@ -386,23 +386,22 @@ bool VulkanBackend::CreateLogicalDevice() {
         VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
     };
 
-    VkPhysicalDeviceDescriptorIndexingFeatures indexingFeatures = {};
-    indexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
-    indexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
-    indexingFeatures.runtimeDescriptorArray = VK_TRUE;
-    indexingFeatures.descriptorBindingPartiallyBound = VK_TRUE;
-    indexingFeatures.descriptorBindingVariableDescriptorCount = VK_TRUE;
-    indexingFeatures.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
-
-    VkPhysicalDeviceTimelineSemaphoreFeatures timelineFeatures = {};
-    timelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES;
-    timelineFeatures.timelineSemaphore = VK_TRUE;
-    indexingFeatures.pNext = &timelineFeatures;
+    VkPhysicalDeviceVulkan12Features vulkan12Features = {};
+    vulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+    vulkan12Features.drawIndirectCount = VK_TRUE;
+    vulkan12Features.descriptorIndexing = VK_TRUE;
+    vulkan12Features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+    vulkan12Features.runtimeDescriptorArray = VK_TRUE;
+    vulkan12Features.descriptorBindingPartiallyBound = VK_TRUE;
+    vulkan12Features.descriptorBindingVariableDescriptorCount = VK_TRUE;
+    vulkan12Features.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+    vulkan12Features.descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
+    vulkan12Features.timelineSemaphore = VK_TRUE;
 
     VkPhysicalDeviceSynchronization2Features sync2Features = {};
     sync2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
     sync2Features.synchronization2 = VK_TRUE;
-    timelineFeatures.pNext = &sync2Features;
+    vulkan12Features.pNext = &sync2Features;
 
     VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamicRenderingFeatures = {};
     dynamicRenderingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR;
@@ -416,11 +415,14 @@ bool VulkanBackend::CreateLogicalDevice() {
 
     VkPhysicalDeviceFeatures2 features2 = {};
     features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    features2.pNext = &indexingFeatures;
+    features2.pNext = &vulkan12Features;
     features2.features.samplerAnisotropy = VK_TRUE;
     features2.features.fillModeNonSolid = VK_TRUE;
     features2.features.multiDrawIndirect = VK_TRUE;
     features2.features.independentBlend = VK_TRUE;
+    features2.features.shaderStorageImageReadWithoutFormat = VK_TRUE;
+    features2.features.shaderStorageImageWriteWithoutFormat = VK_TRUE;
+    features2.features.multiViewport = VK_TRUE;
 
     VkDeviceCreateInfo deviceCreateInfo = {};
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

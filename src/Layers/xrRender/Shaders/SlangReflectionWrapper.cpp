@@ -115,7 +115,32 @@ ResourceShape ClassifyResourceShape(slang::VariableLayoutReflection* param)
     case SLANG_TEXTURE_3D:
     case SLANG_TEXTURE_CUBE:
     case SLANG_TEXTURE_BUFFER:          return ResourceShape::Texture;
-    default:                            return ResourceShape::Unknown;
+    default: {
+        auto* elementTypeLayout = typeLayout->getElementTypeLayout();
+        if (elementTypeLayout) {
+            auto* elementType = elementTypeLayout->getType();
+            if (elementType) {
+                auto innerShape = elementType->getResourceShape() & SLANG_RESOURCE_BASE_SHAPE_MASK;
+                switch (innerShape) {
+                case SLANG_STRUCTURED_BUFFER:       return ResourceShape::StructuredBuffer;
+                case SLANG_BYTE_ADDRESS_BUFFER:     return ResourceShape::RawBuffer;
+                case SLANG_ACCELERATION_STRUCTURE:  return ResourceShape::AccelStruct;
+                case SLANG_TEXTURE_1D:
+                case SLANG_TEXTURE_2D:
+                case SLANG_TEXTURE_3D:
+                case SLANG_TEXTURE_CUBE:
+                case SLANG_TEXTURE_BUFFER:          return ResourceShape::Texture;
+                default: break;
+                }
+            }
+        }
+        auto kind = type->getKind();
+        if (kind == slang::TypeReflection::Kind::Resource) {
+            Msg("! [ClassifyResourceShape] Unknown resource shape 0x%x for '%s' (kind=Resource)",
+                type->getResourceShape(), param->getName() ? param->getName() : "?");
+        }
+        return ResourceShape::Unknown;
+    }
     }
 }
 

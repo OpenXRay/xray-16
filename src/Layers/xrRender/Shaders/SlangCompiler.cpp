@@ -101,21 +101,18 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
 
     targetDesc.profile = m_globalSession->findProfile(profile);
 
-    slang::CompilerOptionEntry targetOptions[5];
+    slang::CompilerOptionEntry targetOptions[1];
     u32 targetOptionCount = 0;
 
     if (target == Target::SPIRV)
     {
-        targetOptions[targetOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
-            {slang::CompilerOptionValueKind::Int, 0, 384}};
-        targetOptions[targetOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
-            {slang::CompilerOptionValueKind::Int, 1, 128}};
-        targetOptions[targetOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
-            {slang::CompilerOptionValueKind::Int, 2, 0}};
-        targetOptions[targetOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
-            {slang::CompilerOptionValueKind::Int, 3, 256}};
         targetOptions[targetOptionCount++] = {slang::CompilerOptionName::EmitSpirvMethod,
-            {slang::CompilerOptionValueKind::Int, SLANG_EMIT_SPIRV_VIA_GLSL, 0}};
+            {slang::CompilerOptionValueKind::Int, SLANG_EMIT_SPIRV_DIRECTLY, 0}};
+
+        result.vkShifts.unorderedAccess = 384;
+        result.vkShifts.sampler = 128;
+        result.vkShifts.shaderResource = 0;
+        result.vkShifts.constantBuffer = 256;
     }
 
     targetDesc.compilerOptionEntries = targetOptions;
@@ -130,23 +127,39 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         sessionDesc.preprocessorMacroCount = slangDefines.size();
     }
 
-    slang::CompilerOptionEntry sessionOptions[3];
+    slang::CompilerOptionEntry sessionOptions[8];
+    u32 sessionOptionCount = 0;
 
-    sessionOptions[0].name = slang::CompilerOptionName::NoMangle;
-    sessionOptions[0].value = {slang::CompilerOptionValueKind::Int, 1, 0};
+    sessionOptions[sessionOptionCount].name = slang::CompilerOptionName::NoMangle;
+    sessionOptions[sessionOptionCount].value = {slang::CompilerOptionValueKind::Int, 1, 0};
+    sessionOptionCount++;
 
-    sessionOptions[1].name = slang::CompilerOptionName::PreserveParameters;
-    sessionOptions[1].value = {slang::CompilerOptionValueKind::Int, 0, 0};
+    sessionOptions[sessionOptionCount].name = slang::CompilerOptionName::PreserveParameters;
+    sessionOptions[sessionOptionCount].value = {slang::CompilerOptionValueKind::Int, 0, 0};
+    sessionOptionCount++;
 
-    sessionOptions[2].name = slang::CompilerOptionName::DebugInformation;
+    sessionOptions[sessionOptionCount].name = slang::CompilerOptionName::DebugInformation;
 #ifdef DEBUG
-    sessionOptions[2].value = {slang::CompilerOptionValueKind::Int, SLANG_DEBUG_INFO_LEVEL_MAXIMAL, 0};
+    sessionOptions[sessionOptionCount].value = {slang::CompilerOptionValueKind::Int, SLANG_DEBUG_INFO_LEVEL_MAXIMAL, 0};
 #else
-    sessionOptions[2].value = {slang::CompilerOptionValueKind::Int, SLANG_DEBUG_INFO_LEVEL_NONE, 0};
+    sessionOptions[sessionOptionCount].value = {slang::CompilerOptionValueKind::Int, SLANG_DEBUG_INFO_LEVEL_NONE, 0};
 #endif
+    sessionOptionCount++;
+
+    if (target == Target::SPIRV)
+    {
+        sessionOptions[sessionOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
+            {slang::CompilerOptionValueKind::Int, 0, 384}};
+        sessionOptions[sessionOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
+            {slang::CompilerOptionValueKind::Int, 1, 128}};
+        sessionOptions[sessionOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
+            {slang::CompilerOptionValueKind::Int, 2, 0}};
+        sessionOptions[sessionOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
+            {slang::CompilerOptionValueKind::Int, 3, 256}};
+    }
 
     sessionDesc.compilerOptionEntries = sessionOptions;
-    sessionDesc.compilerOptionEntryCount = 3;
+    sessionDesc.compilerOptionEntryCount = sessionOptionCount;
 
     // Use VFS adapter for file system operations (includes from VFS)
     sessionDesc.fileSystem = m_vfsAdapter.get();

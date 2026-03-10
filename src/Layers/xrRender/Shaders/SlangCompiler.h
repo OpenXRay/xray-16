@@ -3,6 +3,7 @@
 #include <slang.h>
 #include <slang-com-ptr.h>
 #include "xrCore/xrstring.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 
 namespace xray::render
 {
@@ -57,6 +58,7 @@ public:
         slang::IComponentType* slangProgram = nullptr;
         slang::IComponentType* linkedProgram = nullptr;
         slang::ShaderReflection* reflection = nullptr;
+        xray::render::framegraph::VulkanBindShifts vkShifts;
 
         bool IsValid() const { return success && !bytecode.empty(); }
 

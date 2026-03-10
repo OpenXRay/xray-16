@@ -71,6 +71,19 @@ static int GetRegisterClass(nvrhi::ResourceType type)
     }
 }
 
+static bool IsBufferType(nvrhi::ResourceType type)
+{
+    switch (type) {
+    case nvrhi::ResourceType::StructuredBuffer_SRV:
+    case nvrhi::ResourceType::RawBuffer_SRV:
+    case nvrhi::ResourceType::StructuredBuffer_UAV:
+    case nvrhi::ResourceType::RawBuffer_UAV:
+        return true;
+    default:
+        return false;
+    }
+}
+
 static void DeduplicateBindings(nvrhi::BindingLayoutDesc& desc)
 {
     auto& b = desc.bindings;
@@ -79,7 +92,18 @@ static void DeduplicateBindings(nvrhi::BindingLayoutDesc& desc)
         for (size_t j = i + 1; j < b.size(); )
         {
             if (GetRegisterClass(b[i].type) == GetRegisterClass(b[j].type) && b[i].slot == b[j].slot)
-                b.erase(b.begin() + j);
+            {
+                if (!IsBufferType(b[i].type) && IsBufferType(b[j].type))
+                {
+                    b.erase(b.begin() + i);
+                    --i;
+                    break;
+                }
+                else
+                {
+                    b.erase(b.begin() + j);
+                }
+            }
             else
                 ++j;
         }

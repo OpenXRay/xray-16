@@ -1269,6 +1269,9 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
         }
     }
 
+    //if (GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
+    //    layoutDesc.bindingOffsets = { 0, 0, 0, 0 };
+
     nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(layoutDesc);
     if (!layout) {
         return nullptr;
@@ -1338,6 +1341,9 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateCombinedBindingLayout(const Mate
     for (const auto& samplerInfo : allSamplers) {
         layoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::Sampler(samplerInfo.slot));
     }
+
+    //if (GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
+    //    layoutDesc.bindingOffsets = { 0, 0, 0, 0 };
 
     return m_device->CreateBindingLayout(layoutDesc);
 }
