@@ -854,50 +854,50 @@ void FrameGraph::AllocateResources() {
             }
 
             nvrhi::TextureDesc nvrhiDesc;
-            nvrhiDesc.width = resource.desc.width;
-            nvrhiDesc.height = resource.desc.height;
-            nvrhiDesc.depth = resource.desc.depth;
-            nvrhiDesc.arraySize = resource.desc.arraySize;
-            nvrhiDesc.mipLevels = resource.desc.mipLevels;
-            nvrhiDesc.sampleCount = resource.desc.sampleCount;
-            nvrhiDesc.format = resource.desc.format;
-            nvrhiDesc.debugName = resource.desc.debugName.c_str();
-            nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-            nvrhiDesc.keepInitialState = true;
+                nvrhiDesc.width = resource.desc.width;
+                nvrhiDesc.height = resource.desc.height;
+                nvrhiDesc.depth = resource.desc.depth;
+                nvrhiDesc.arraySize = resource.desc.arraySize;
+                nvrhiDesc.mipLevels = resource.desc.mipLevels;
+                nvrhiDesc.sampleCount = resource.desc.sampleCount;
+                nvrhiDesc.format = resource.desc.format;
+                nvrhiDesc.debugName = resource.desc.debugName.c_str();
+                nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+                nvrhiDesc.keepInitialState = true;
 
-            switch (resource.desc.type) {
-                case ResourceDesc::Type::Texture2D:
-                    nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
-                    break;
-                case ResourceDesc::Type::Texture3D:
-                    nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
-                    break;
-                case ResourceDesc::Type::TextureCube:
-                    nvrhiDesc.dimension = nvrhi::TextureDimension::TextureCube;
-                    break;
-                case ResourceDesc::Type::Texture2DArray:
-                    nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
-                    break;
-                default:
-                    nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
-                    break;
-            }
+                switch (resource.desc.type) {
+                    case ResourceDesc::Type::Texture2D:
+                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
+                        break;
+                    case ResourceDesc::Type::Texture3D:
+                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
+                        break;
+                    case ResourceDesc::Type::TextureCube:
+                        nvrhiDesc.dimension = nvrhi::TextureDimension::TextureCube;
+                        break;
+                    case ResourceDesc::Type::Texture2DArray:
+                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
+                        break;
+                    default:
+                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
+                        break;
+                }
 
-            nvrhiDesc.isRenderTarget = resource.desc.isRenderTarget;
-            nvrhiDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
-            nvrhiDesc.isShaderResource = true;
+                nvrhiDesc.isRenderTarget = resource.desc.isRenderTarget;
+                nvrhiDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
+                nvrhiDesc.isShaderResource = true;
 
-            if (resource.desc.isRenderTarget && !resource.desc.isDepthStencil) {
-                nvrhiDesc.useClearValue = true;
-                nvrhiDesc.clearValue = nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f);
-            }
+                if (resource.desc.isRenderTarget && !resource.desc.isDepthStencil) {
+                    nvrhiDesc.useClearValue = true;
+                    nvrhiDesc.clearValue = nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f);
+                }
 
-            if (resource.desc.isDepthStencil) {
-                nvrhiDesc.isRenderTarget = true;
-                nvrhiDesc.isTypeless = true;
-                nvrhiDesc.useClearValue = true;
-                nvrhiDesc.clearValue = nvrhi::Color(1.0f);
-            }
+                if (resource.desc.isDepthStencil) {
+                    nvrhiDesc.isRenderTarget = true;
+                    nvrhiDesc.isTypeless = true;
+                    nvrhiDesc.useClearValue = true;
+                    nvrhiDesc.clearValue = nvrhi::Color(1.0f);
+                }
 
             resource.nvrhiTexture = m_device->createTexture(nvrhiDesc);
 

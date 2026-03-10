@@ -162,7 +162,7 @@ HiZPyramidOutput setupHiZBuildPass(
                 return;
             }
 
-            auto hizCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("HiZBuild", "HiZCB", sizeof(HiZCB), 64, nvDevice);
+            auto hizCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("HiZBuild", "HiZCB", sizeof(HiZCB), data.device, 64);
             if (!hizCB) {
                 Msg("! [HiZBuild] Constant buffer is NULL at execute time!");
                 return;

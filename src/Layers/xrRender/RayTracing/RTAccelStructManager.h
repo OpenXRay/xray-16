@@ -153,18 +153,18 @@ private:
 
     static nvrhi::ComputePipelineHandle s_skinPipeline;
     static nvrhi::BindingLayoutHandle s_skinLayout;
-    static nvrhi::BufferHandle s_skinCB;
+    static ng::BufferHandle s_skinCB;
     static bool s_skinInitialized;
 
     static nvrhi::ComputePipelineHandle s_grassPipeline;
     static nvrhi::BindingLayoutHandle s_grassLayout;
-    static nvrhi::BufferHandle s_grassCB;
+    static ng::BufferHandle s_grassCB;
     static nvrhi::SamplerHandle s_grassSampler;
     static bool s_grassInitialized;
 
     static nvrhi::ComputePipelineHandle s_billboardPipeline;
     static nvrhi::BindingLayoutHandle s_billboardLayout;
-    static nvrhi::BufferHandle s_billboardCB;
+    static ng::BufferHandle s_billboardCB;
     static bool s_billboardInitialized;
 };
 

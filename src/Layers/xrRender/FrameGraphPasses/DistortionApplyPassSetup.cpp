@@ -99,7 +99,7 @@ VirtualResourceHandle setupDistortionApplyPass(
             if (!pipeline)
                 return;
 
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("DistortionApply", "globals", sizeof(StaticGlobals), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, device);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("DistortionApply", "globals", sizeof(StaticGlobals), ctx->GetDevice());
             auto staticGlobals = BuildStaticGlobals();
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 

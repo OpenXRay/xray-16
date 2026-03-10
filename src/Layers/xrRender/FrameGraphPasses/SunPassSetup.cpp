@@ -272,7 +272,7 @@ framegraph::VirtualResourceHandle setupSunPass(
             FillDynamicTransforms(dynamicCB, Fidentity);
 
             auto dynamicCBBuffer = framegraph::GetPassResourceCache().GetOrCreateVolatileCB(
-                "SunPass", "DynamicCB", sizeof(DynamicTransforms), ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS, device);
+                "SunPass", "DynamicCB", sizeof(DynamicTransforms), data.device);
             cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
             nvrhi::ITexture* sunTex = nullptr;

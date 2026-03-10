@@ -31,18 +31,18 @@ extern int ps_r__detail_gpu;
 
 nvrhi::ComputePipelineHandle RTAccelStructManager::s_skinPipeline;
 nvrhi::BindingLayoutHandle RTAccelStructManager::s_skinLayout;
-nvrhi::BufferHandle RTAccelStructManager::s_skinCB;
+ng::BufferHandle RTAccelStructManager::s_skinCB;
 bool RTAccelStructManager::s_skinInitialized = false;
 
 nvrhi::ComputePipelineHandle RTAccelStructManager::s_grassPipeline;
 nvrhi::BindingLayoutHandle RTAccelStructManager::s_grassLayout;
-nvrhi::BufferHandle RTAccelStructManager::s_grassCB;
+ng::BufferHandle RTAccelStructManager::s_grassCB;
 nvrhi::SamplerHandle RTAccelStructManager::s_grassSampler;
 bool RTAccelStructManager::s_grassInitialized = false;
 
 nvrhi::ComputePipelineHandle RTAccelStructManager::s_billboardPipeline;
 nvrhi::BindingLayoutHandle RTAccelStructManager::s_billboardLayout;
-nvrhi::BufferHandle RTAccelStructManager::s_billboardCB;
+ng::BufferHandle RTAccelStructManager::s_billboardCB;
 bool RTAccelStructManager::s_billboardInitialized = false;
 
 struct RTSkinningCB {
@@ -124,18 +124,18 @@ void RTAccelStructManager::Shutdown()
 
     s_skinPipeline = nullptr;
     s_skinLayout = nullptr;
-    s_skinCB = nullptr;
+    s_skinCB = ng::BufferHandle();
     s_skinInitialized = false;
 
     s_grassPipeline = nullptr;
     s_grassLayout = nullptr;
-    s_grassCB = nullptr;
+    s_grassCB = ng::BufferHandle();
     s_grassSampler = nullptr;
     s_grassInitialized = false;
 
     s_billboardPipeline = nullptr;
     s_billboardLayout = nullptr;
-    s_billboardCB = nullptr;
+    s_billboardCB = ng::BufferHandle();
     s_billboardInitialized = false;
 }
 
@@ -531,15 +531,13 @@ void RTAccelStructManager::InitSkinningPipeline()
         return;
     }
 
-    nvrhi::BufferDesc cbDesc;
+    ng::RenderDevice::BufferDesc cbDesc;
     cbDesc.debugName = "RTSkinningCB";
     cbDesc.byteSize = sizeof(RTSkinningCB);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
     cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
-    cbDesc.keepInitialState = true;
-    cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-    s_skinCB = nvDevice->createBuffer(cbDesc);
+    s_skinCB = m_device->CreateBuffer(cbDesc);
 
     s_skinLayout = cache.GetOrCreateBindingLayoutFromReflection("RTSkinning", *skinResult.reflection, nvDevice);
 
@@ -671,7 +669,7 @@ void RTAccelStructManager::BuildSkinnedBLAS(
             bsb.BufferSRV("g_SrcVB", sb.srcVB)
                .BufferSRV("g_BoneMatrices", boneBuffer)
                .BufferUAV("g_Output", m_skinnedOutputVB)
-               .ConstantBuffer("RTSkinningCB", s_skinCB);
+               .ConstantBuffer("RTSkinningCB", m_device->GetNativeBuffer(s_skinCB));
             it = bindingSetCache.emplace(sb.srcVB, nvDevice->createBindingSet(bsb.Build(), s_skinLayout)).first;
         }
 
@@ -685,7 +683,7 @@ void RTAccelStructManager::BuildSkinnedBLAS(
         cb.inputBaseVertex = sb.srcBaseVertex;
         cb.pad[0] = 0;
         cb.pad[1] = 0;
-        cmdList->writeBuffer(s_skinCB, &cb, sizeof(RTSkinningCB));
+        cmdList->writeBuffer(m_device->GetNativeBuffer(s_skinCB), &cb, sizeof(RTSkinningCB));
 
         state.bindings = { it->second };
         cmdList->setComputeState(state);
@@ -762,15 +760,13 @@ void RTAccelStructManager::InitGrassPipeline()
         return;
     }
 
-    nvrhi::BufferDesc cbDesc;
-    cbDesc.debugName = "GrassRTCB";
-    cbDesc.byteSize = sizeof(GrassRTCB);
-    cbDesc.isConstantBuffer = true;
-    cbDesc.isVolatile = true;
-    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
-    cbDesc.keepInitialState = true;
-    cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-    s_grassCB = nvDevice->createBuffer(cbDesc);
+    ng::RenderDevice::BufferDesc grassCBDesc;
+    grassCBDesc.debugName = "GrassRTCB";
+    grassCBDesc.byteSize = sizeof(GrassRTCB);
+    grassCBDesc.isConstantBuffer = true;
+    grassCBDesc.isVolatile = true;
+    grassCBDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    s_grassCB = m_device->CreateBuffer(grassCBDesc);
 
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllFilters(true);
@@ -803,15 +799,13 @@ void RTAccelStructManager::InitBillboardPipeline()
         return;
     }
 
-    nvrhi::BufferDesc cbDesc;
-    cbDesc.debugName = "BillboardRTCB";
-    cbDesc.byteSize = sizeof(BillboardRTCB);
-    cbDesc.isConstantBuffer = true;
-    cbDesc.isVolatile = true;
-    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
-    cbDesc.keepInitialState = true;
-    cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-    s_billboardCB = nvDevice->createBuffer(cbDesc);
+    ng::RenderDevice::BufferDesc bbCBDesc;
+    bbCBDesc.debugName = "BillboardRTCB";
+    bbCBDesc.byteSize = sizeof(BillboardRTCB);
+    bbCBDesc.isConstantBuffer = true;
+    bbCBDesc.isVolatile = true;
+    bbCBDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    s_billboardCB = m_device->CreateBuffer(bbCBDesc);
 
     s_billboardLayout = cache.GetOrCreateBindingLayoutFromReflection("RTBillboard", *billboardResult.reflection, nvDevice);
 
@@ -889,10 +883,10 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
            .BufferSRV("g_DrawArgs", detailMgr->billboardDrawArgsBuffer)
            .BufferUAV("g_Output", m_grassOutputVB)
            .BufferUAV("g_OutputIB", m_grassIB)
-           .ConstantBuffer("BillboardRTCB", s_billboardCB);
+           .ConstantBuffer("BillboardRTCB", m_device->GetNativeBuffer(s_billboardCB));
         auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_billboardLayout);
 
-        cmdList->writeBuffer(s_billboardCB, &cb, sizeof(BillboardRTCB));
+        cmdList->writeBuffer(m_device->GetNativeBuffer(s_billboardCB), &cb, sizeof(BillboardRTCB));
         nvrhi::ComputeState state;
         state.pipeline = s_billboardPipeline;
         state.bindings = { bindingSet };
@@ -977,7 +971,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
                .Texture("g_WindTexture", detailMgr->perlin4dTexture)
                .BufferUAV("g_Output", m_grassOutputVB)
                .BufferUAV("g_OutputIB", m_grassIB)
-               .ConstantBuffer("GrassRTCB", s_grassCB);
+               .ConstantBuffer("GrassRTCB", m_device->GetNativeBuffer(s_grassCB));
             auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_grassLayout);
 
             GrassRTCB cb = cbTemplate;
@@ -988,7 +982,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
             cb.outputVertexOffset = vertexOffset;
             cb.outputIndexOffset = indexOffset;
 
-            cmdList->writeBuffer(s_grassCB, &cb, sizeof(GrassRTCB));
+            cmdList->writeBuffer(m_device->GetNativeBuffer(s_grassCB), &cb, sizeof(GrassRTCB));
             state.bindings = { bindingSet };
             cmdList->setComputeState(state);
 
