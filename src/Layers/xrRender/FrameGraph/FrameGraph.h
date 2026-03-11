@@ -63,13 +63,12 @@ public:
     {
         PassHandle passHandle = AddPass(name);
 
-        PassData* passData = new PassData();
+        auto passData = std::make_shared<PassData>();
 
         setupFunc(*this, passHandle, *passData);
 
         PassExecuteCallback callback = [passData, executeFunc](ng::RenderContext& ctx, const FrameGraph& fg) {
             executeFunc(*passData, fg, &ctx);
-            delete passData;
         };
 
         SetPassCallback(passHandle, callback);

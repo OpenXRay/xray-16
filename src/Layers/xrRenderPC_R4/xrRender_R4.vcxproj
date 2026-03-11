@@ -184,7 +184,7 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\DetailPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\PassCommon.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\PassStates.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\Blackboard.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\PathTracerPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\MotionVectorPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ReSTIRGIPassSetup.h" />

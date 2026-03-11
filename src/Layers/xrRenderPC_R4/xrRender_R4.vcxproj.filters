@@ -1014,8 +1014,8 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\PassCommon.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\FrameGraphPasses\PassStates.h">
-      <Filter>Framegraph\Passes</Filter>
+    <ClInclude Include="..\xrRender\FrameGraph\Blackboard.h">
+      <Filter>Framegraph</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\Backend\VulkanBackend.h" />
     <ClInclude Include="..\..\..\Externals\meshoptimizer\src\meshoptimizer.h" />
