@@ -159,7 +159,7 @@ bool EFS_Utils::GetOpenNameInternal(
     string512 path;
     xr_strcpy(path, (offset && offset[0]) ? offset : P.m_Path);
     ofn.lpstrInitialDir = path;
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR |
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR |
         (bMulti ? OFN_ALLOWMULTISELECT | OFN_EXPLORER : 0);
 
     ofn.FlagsEx = OFN_EX_NOPLACESBAR;
