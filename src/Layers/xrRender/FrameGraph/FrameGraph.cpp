@@ -196,17 +196,11 @@ void FrameGraph::Compile() {
     // Phase 3: Remove unused passes
     CullUnusedPasses();
 
-    // Phase 4: Compute resource lifetimes for aliasing
     ComputeResourceLifetimes();
 
-    // Phase 5: Allocate physical GPU resources
-    AllocateResources();
-
-    // Phase 6: Insert resource barriers for state transitions
-    InsertResourceBarriers();
-
-    // Phase 7: Optimize memory usage through aliasing
     OptimizeMemoryAliasing();
+
+    AllocateResources();
 
     m_compiled = true;
     m_stats.numPasses = static_cast<u32>(m_passes.size());
@@ -274,23 +268,27 @@ void FrameGraph::Execute() {
         computeInstanceID = m_asyncComputeBackend->ExecuteComputeCommandList(m_computeCommandList);
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  PHASE B: Record graphics passes (with sync point)
-    // ═══════════════════════════════════════════════════════
     bool syncInserted = false;
 
     for (PassNode* pass : m_sortedPasses) {
         if (pass->culled || !pass->executeCallback)
             continue;
 
-        // Skip async passes (already executed on compute queue)
         if (hasAsyncCompute && pass->isAsync)
             continue;
 
-        // Insert sync point before first graphics pass that depends on async output
         if (!syncInserted && computeInstanceID != 0) {
-            m_asyncComputeBackend->QueueWaitForCompute(computeInstanceID);
-            syncInserted = true;
+            bool dependsOnAsync = false;
+            for (const PassNode* dep : pass->dependsOn) {
+                if (dep->isAsync) {
+                    dependsOnAsync = true;
+                    break;
+                }
+            }
+            if (dependsOnAsync) {
+                m_asyncComputeBackend->QueueWaitForCompute(computeInstanceID);
+                syncInserted = true;
+            }
         }
 
         ExecutePass(pass, graphicsCmdList);
@@ -363,20 +361,14 @@ void FrameGraph::ResetForNextFrame() {
     // This returns them to the pool for reuse next frame
     if (m_resourcePool) {
         for (auto& resource : m_resources) {
-            // Skip imported resources (we don't own them)
-            if (resource.desc.isImported) {
+            if (resource.desc.isImported || resource.aliasedWith != INVALID_INDEX)
                 continue;
-            }
 
-            // Free transient textures back to pool for aliasing
-            if (resource.resourceTexture.IsValid()) {
+            if (resource.resourceTexture.IsValid())
                 m_resourcePool->FreeTexture(resource.resourceTexture);
-            }
 
-            // Free buffers
-            if (resource.resourceBuffer.IsValid()) {
+            if (resource.resourceBuffer.IsValid())
                 m_resourcePool->FreeBuffer(resource.resourceBuffer);
-            }
         }
     }
 
@@ -404,18 +396,14 @@ void FrameGraph::Reset() {
         resources::BufferManager* bufManager = m_resourceManager->GetBufferManager();
 
         for (auto& resource : m_resources) {
-            // Skip imported resources (we don't own them)
-            if (resource.desc.isImported) {
+            if (resource.desc.isImported || resource.aliasedWith != INVALID_INDEX)
                 continue;
-            }
 
-            // Release ResourceManager textures
             if (resource.resourceTexture.IsValid()) {
                 texManager->Release(resource.resourceTexture);
                 resource.resourceTexture = resources::TextureHandle();
             }
 
-            // Release ResourceManager buffers
             if (resource.resourceBuffer.IsValid()) {
                 bufManager->Release(resource.resourceBuffer);
                 resource.resourceBuffer = resources::BufferHandle();
@@ -428,21 +416,12 @@ void FrameGraph::Reset() {
         m_resourcePool->Reset();
     }
 
-    // Clear direct NVRHI handles (already released via ResourceManager)
     for (auto& resource : m_resources) {
-        // Skip imported resources (we don't own them)
-        if (resource.desc.isImported) {
+        if (resource.desc.isImported || resource.aliasedWith != INVALID_INDEX)
             continue;
-        }
 
-        // Clear NVRHI handles (RefPtr will release if not managed by ResourceManager)
-        if (resource.nvrhiTexture) {
-            resource.nvrhiTexture = nullptr;
-        }
-
-        if (resource.nvrhiBuffer) {
-            resource.nvrhiBuffer = nullptr;
-        }
+        resource.nvrhiTexture = nullptr;
+        resource.nvrhiBuffer = nullptr;
     }
 
     // Clear state
@@ -680,28 +659,20 @@ bool FrameGraph::HasCyclicDependency() const {
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
 void FrameGraph::BuildDependencyGraph() {
-    // Clear existing dependencies
     for (auto& pass : m_passes) {
         pass.dependsOn.clear();
         pass.dependents.clear();
     }
 
-    // Track the last pass that wrote to each resource
-    xr_map<u32, PassNode*> lastWriter;  // resource index -> pass that wrote it
+    xr_map<u32, PassNode*> lastWriter;
 
-    // For each pass in order
     for (auto& pass : m_passes) {
-        // Check all resources this pass reads
-        xr_vector<VirtualResourceHandle> readResources;
-        pass.GetReadResources(readResources);
+        for (const auto& access : pass.resourceAccesses) {
+            if (!access.IsRead()) continue;
 
-        for (const auto& resource : readResources) {
-            // Find the producer (last pass that wrote this resource)
-            auto it = lastWriter.find(resource.index);
+            auto it = lastWriter.find(access.resource.index);
             if (it != lastWriter.end()) {
                 PassNode* producer = it->second;
-
-                // Add dependency: this pass depends on the producer
                 if (!pass.DependsOn(producer)) {
                     pass.dependsOn.push_back(producer);
                     producer->dependents.push_back(&pass);
@@ -709,74 +680,56 @@ void FrameGraph::BuildDependencyGraph() {
             }
         }
 
-        // Track resources this pass writes (for future consumers)
-        xr_vector<VirtualResourceHandle> writeResources;
-        pass.GetWriteResources(writeResources);
-
-        for (const auto& resource : writeResources) {
-            lastWriter[resource.index] = &pass;
+        for (const auto& access : pass.resourceAccesses) {
+            if (access.IsWrite()) {
+                lastWriter[access.resource.index] = &pass;
+            }
         }
     }
-
 }
 
 void FrameGraph::TopologicalSort() {
+    const u32 numPasses = static_cast<u32>(m_passes.size());
     m_sortedPasses.clear();
-    m_sortedPasses.reserve(m_passes.size());
+    m_sortedPasses.reserve(numPasses);
 
-    // Kahn's algorithm for topological sorting
-    // Calculate in-degree (number of dependencies) for each pass
-    xr_map<PassNode*, u32> inDegree;
-    for (auto& pass : m_passes) {
-        inDegree[&pass] = static_cast<u32>(pass.dependsOn.size());
-    }
+    xr_vector<u32> inDegree(numPasses);
+    for (u32 i = 0; i < numPasses; ++i)
+        inDegree[i] = static_cast<u32>(m_passes[i].dependsOn.size());
 
-    // Queue of passes with no dependencies (in-degree = 0)
     xr_vector<PassNode*> queue;
-    for (auto& pass : m_passes) {
-        if (inDegree[&pass] == 0) {
-            queue.push_back(&pass);
-        }
+    for (u32 i = 0; i < numPasses; ++i) {
+        if (inDegree[i] == 0)
+            queue.push_back(&m_passes[i]);
     }
 
-    // Process passes in dependency order
     u32 executionOrder = 0;
     while (!queue.empty()) {
-        // Pop pass from queue
         PassNode* current = queue.back();
         queue.pop_back();
 
-        // Add to sorted list
         current->executionOrder = executionOrder++;
         m_sortedPasses.push_back(current);
 
-        // Decrease in-degree for all dependents
         for (PassNode* dependent : current->dependents) {
-            inDegree[dependent]--;
-
-            // If dependent now has no dependencies, add to queue
-            if (inDegree[dependent] == 0) {
+            u32 idx = dependent->handle.index;
+            if (--inDegree[idx] == 0)
                 queue.push_back(dependent);
-            }
         }
     }
 
-    // Check for cycles (if we didn't process all passes)
     if (m_sortedPasses.size() != m_passes.size()) {
         Msg("! [FrameGraph] Cycle detected in dependency graph!");
-        Msg("! [FrameGraph] Processed %u/%u passes",
+        Msg("! [FrameGraph] Processed %zu/%zu passes",
             m_sortedPasses.size(), m_passes.size());
 
-        // Find passes that weren't processed (part of cycle)
         for (auto& pass : m_passes) {
-            if (pass.executionOrder == INVALID_INDEX) {
+            if (pass.executionOrder == INVALID_INDEX)
                 Msg("! [FrameGraph]   Pass in cycle: %s", pass.name.c_str());
-            }
         }
 
         VERIFY2(false, "FrameGraph has cyclic dependencies");
     }
-
 }
 
 void FrameGraph::CullUnusedPasses() {
@@ -904,23 +857,16 @@ void FrameGraph::AllocateResources() {
     u64 totalMemoryAllocated = 0;
 
     for (auto& resource : m_resources) {
-        // Skip unused resources
-        if (resource.firstUsedPass == INVALID_INDEX) {
+        if (resource.firstUsedPass == INVALID_INDEX)
             continue;
-        }
 
-        // Skip imported resources (already have physical resources)
         if (resource.desc.isImported) {
             resource.isAllocated = true;
             continue;
         }
 
-        // Determine if resource should use aliasing
-        // ONLY imported resources (owned externally) should skip aliasing
-        // All transient resources (created each frame) use the aliasing pool
-        bool skipAliasing = resource.desc.isImported;  // Only imported resources skip the pool
-
-        // Create physical resource based on type
+        if (resource.aliasedWith != INVALID_INDEX)
+            continue;
         if (resource.desc.type == ResourceDesc::Type::Buffer) {
             // Allocate buffer via ResourceManager if available
             if (m_resourcePool) {
@@ -1010,13 +956,7 @@ void FrameGraph::AllocateResources() {
                 rmTexDesc.isDepthStencil = resource.desc.isDepthStencil;
                 rmTexDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
 
-                // Allocate via FGResourcePool (with or without aliasing)
-                resources::TextureHandle rmHandle;
-                if (skipAliasing) {
-                    rmHandle = m_resourcePool->AllocatePersistentTexture(rmTexDesc);
-                } else {
-                    rmHandle = m_resourcePool->AllocateTexture(rmTexDesc);
-                }
+                resources::TextureHandle rmHandle = m_resourcePool->AllocateTexture(rmTexDesc);
 
                 if (rmHandle.IsValid()) {
                     // Store ResourceManager handle for lifecycle management
@@ -1088,6 +1028,18 @@ void FrameGraph::AllocateResources() {
                 totalMemoryAllocated += resource.memorySize;
             }
         }
+    }
+
+    for (auto& resource : m_resources) {
+        if (resource.aliasedWith == INVALID_INDEX)
+            continue;
+
+        ResourceNode& target = m_resources[resource.aliasedWith];
+        resource.nvrhiTexture = target.nvrhiTexture;
+        resource.nvrhiBuffer = target.nvrhiBuffer;
+        resource.resourceTexture = target.resourceTexture;
+        resource.resourceBuffer = target.resourceBuffer;
+        resource.isAllocated = target.isAllocated;
     }
 
     m_stats.totalMemoryAllocated = totalMemoryAllocated;
