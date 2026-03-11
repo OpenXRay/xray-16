@@ -47,8 +47,12 @@
 #include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
-#include "FrameGraphPasses/SmokeTrailPassSetup.h"    // GPU smoke trail (emit/sim/compact/draw)
-#include "FrameGraphPasses/PassStates.h"             // Aggregate pass state (owns all per-pass state)
+#include "FrameGraphPasses/SmokeTrailPassSetup.h"
+#include "FrameGraphPasses/MotionVectorPassSetup.h"
+#include "FrameGraphPasses/ReSTIRGIPassSetup.h"
+#include "FrameGraphPasses/RibbonPassSetup.h"
+#include "FrameGraphPasses/TrailPassSetup.h"
+#include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "FrameGraphPasses/ImGuiPassSetup.h"
 #include "FrameGraphPasses/PathTracerPassSetup.h"
 #include "RayTracing/RTAccelStructManager.h"
@@ -160,7 +164,7 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
         return false;
     }
 
-    m_passStates = xr_make_unique<passes::PassStates>();
+    m_blackboard = xr_make_unique<framegraph::Blackboard>();
     m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
     m_statsOverlay = xr_make_unique<xray::profiler::StatsOverlay>();
     
@@ -240,11 +244,14 @@ void FrameGraphRenderer::Shutdown() {
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
 
-    if (m_passStates) {
-        passes::ShutdownSkyGeometry(m_passStates->sky);
-        passes::ShutdownSunPass(m_passStates->sun);
-        passes::ShutdownTonemapPass(m_passStates->tonemap);
-        m_passStates.reset();
+    if (m_blackboard) {
+        if (auto* sky = m_blackboard->try_get<passes::SkyPassState>())
+            passes::ShutdownSkyGeometry(*sky);
+        if (auto* sun = m_blackboard->try_get<passes::SunPassState>())
+            passes::ShutdownSunPass(*sun);
+        if (auto* tonemap = m_blackboard->try_get<passes::TonemapPassState>())
+            passes::ShutdownTonemapPass(*tonemap);
+        m_blackboard.reset();
     }
 
     bindless::VariantTextureBuffer::Instance().Shutdown();
@@ -312,9 +319,9 @@ void FrameGraphRenderer::Render() {
 
                     RImplementation.m_shaderLoader->ClearAllCaches();
                     framegraph::GetPassResourceCache().Clear();
-                    if (m_passStates)
+                    if (m_blackboard)
                     {
-                        m_passStates->ResetAll();
+                        m_blackboard->clear();
                     }
 
                     if (m_detailManager)
@@ -464,7 +471,7 @@ void FrameGraphRenderer::RenderMenu() {
     );
 
     auto sceneWithUI = passes::setupUIPass(*m_framegraph, backgroundTarget, width, height);
-    sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height, m_passStates->uiText);
+    sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height, m_blackboard->get_or_add<passes::UITextPassState>());
     sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
     
     auto ldrOutput = passes::setupTonemapPass(
@@ -475,7 +482,7 @@ void FrameGraphRenderer::RenderMenu() {
         backbufferHandle,  // Output directly to imported backbuffer
         width,
         height,
-        m_passStates->tonemap
+        m_blackboard->get_or_add<passes::TonemapPassState>()
     );
 
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
@@ -870,7 +877,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             prevDepthHandle,
             width,
             height,
-            m_passStates->hiZBuild
+            m_blackboard->get_or_add<passes::HiZBuildPassState>()
         );
     }
 
@@ -999,7 +1006,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
         width,
         height,
-        m_passStates->sky
+        m_blackboard->get_or_add<passes::SkyPassState>()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1013,7 +1020,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
         width,
         height,
-        m_passStates->sun
+        m_blackboard->get_or_add<passes::SunPassState>()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1079,7 +1086,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height,
         drawArgsBuffer,
         bindlessConfig,
-        &m_passStates->forwardColor
+        &m_blackboard->get_or_add<passes::ForwardColorPassState>()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1128,7 +1135,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width,
         height,
         skinnedVisibility,
-        &m_passStates->skinning,
+        &m_blackboard->get_or_add<passes::SkinningPassState>(),
         m_overlayManager.get()
     );
 
@@ -1145,7 +1152,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.mipLevels,
         m_hasPrevFrameData ? &m_prevViewProj : nullptr,
         m_gpuProfiler.get(),
-        &m_passStates->detail
+        &m_blackboard->get_or_add<passes::DetailPassState>()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1208,7 +1215,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         detailOutputs,
         transparentConfig,
         width, height,
-        m_passStates->transparent
+        m_blackboard->get_or_add<passes::TransparentPassState>()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1221,7 +1228,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 *m_framegraph, m_device,
                 transparentOutputs, m_decalManager.get(),
                 width, height,
-                m_passStates->decal
+                m_blackboard->get_or_add<passes::DecalPassState>()
             );
         }
     }
@@ -1236,7 +1243,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             transparentOutputs.depth,
             Device.mInvFullTransform, m_prevViewProj,
             width, height,
-            m_passStates->motionVector
+            m_blackboard->get_or_add<passes::MotionVectorPassState>()
         );
     }
 
@@ -1256,7 +1263,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.width,
         hizOutput.height,
         hizOutput.mipLevels,
-        &m_passStates->particle
+        &m_blackboard->get_or_add<passes::ParticlePassState>()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1268,7 +1275,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         particleOutputs.layout,
         width,
         height,
-        &m_passStates->ribbon
+        &m_blackboard->get_or_add<passes::RibbonPassState>()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1280,7 +1287,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         ribbonOutputs.layout,
         width,
         height,
-        &m_passStates->trail
+        &m_blackboard->get_or_add<passes::TrailPassState>()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1296,7 +1303,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_smokeTrailManager.get(),
             width,
             height,
-            m_passStates->smokeTrail,
+            m_blackboard->get_or_add<passes::SmokeTrailPassState>(),
             m_detailManager ? m_detailManager->perlin4dTexture.Get() : nullptr
         );
     }
@@ -1307,7 +1314,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         sceneColor = passes::setupDistortionApplyPass(
             *m_framegraph, m_device, sceneColor, particleOutputs.distortionRT,
             particleOutputs.layout.worldPos, width, height,
-            m_passStates->distortionApply);
+            m_blackboard->get_or_add<passes::DistortionApplyPassState>());
     }
 
     // ═══════════════════════════════════════════════════════
@@ -1328,7 +1335,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             Device.mInvFullTransform, m_prevViewProj,
             Device.vCameraPosition, ps_r_rt_gi_intensity,
             width, height,
-            m_passStates->restirGI, m_hasPrevFrameData
+            m_blackboard->get_or_add<passes::ReSTIRGIPassState>(), m_hasPrevFrameData
         );
         sceneColor = rtgiOutput.sceneColor;
     }
@@ -1462,7 +1469,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         Device.fTimeDelta,
         width,
         height,
-        m_passStates->exposure
+        m_blackboard->get_or_add<passes::ExposurePassState>()
     );
 
     m_exposureTexture = exposureOutput.exposureTexture;
@@ -1479,7 +1486,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         sceneWithUI,
         width,
         height,
-        m_passStates->uiText
+        m_blackboard->get_or_add<passes::UITextPassState>()
     );
 
     // 5. Cursor Pass - Renders cursor on top of UI+Text
@@ -1499,8 +1506,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         backbufferHandle,
         width,
         height,
-        m_passStates->tonemap,
-        &m_passStates->exposure
+        m_blackboard->get_or_add<passes::TonemapPassState>(),
+        &m_blackboard->get_or_add<passes::ExposurePassState>()
     );
 
     // ═══════════════════════════════════════════════════════
