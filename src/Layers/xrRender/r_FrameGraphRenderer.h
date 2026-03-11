@@ -298,9 +298,6 @@ private:
     // Visibility & culling (CPU-based for now, will move to GPU later)
     void CollectVisibleGeometry();
 
-    // HUD rendering (after world geometry, with special projection)
-    void RenderHUD();
-
     // Helper: Create render target (DRY helper for BuildFrameGraph)
     framegraph::VirtualResourceHandle CreateRT(
         const char* name,

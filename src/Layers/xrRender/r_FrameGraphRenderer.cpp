@@ -106,23 +106,14 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     Msg("* [FrameGraphRenderer] Initializing...");
 
-    // Create FrameGraph
     m_framegraph = xr_make_unique<framegraph::FrameGraph>(device);
-
-    // Create shader phase cache (Week 16 - for precompilation phase detection)
     m_shaderPhaseCache = xr_make_unique<framegraph::ShaderPhaseCache>();
-
-    // Create VCB pool for geometry rendering
     m_geometryVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
-
-    // Create material cache for geometry rendering
     m_materialCache = xr_make_unique<MaterialCache>(
         device,
         device->GetFGResourceManager(),
         m_geometryVCBPool.get()
     );
-
-    // Create UI rendering infrastructure
     m_uiVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
     m_uiMaterialCache = xr_make_unique<MaterialCache>(
         device,
@@ -131,58 +122,34 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     );
     m_uiCollector = xr_make_unique<ui::UIRenderCollector>();
     m_uiRenderer = xr_make_unique<ui::NVRHIUIRenderer>();
-    m_uiRenderer->Initialize(device, m_uiMaterialCache.get());
-
-    Msg("* [FrameGraphRenderer] UI infrastructure initialized");
-
-    // Create Text rendering infrastructure
     m_textVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
     m_textMaterialCache = xr_make_unique<MaterialCache>(
         device,
         device->GetFGResourceManager(),
         m_textVCBPool.get()
     );
-
-    Msg("* [FrameGraphRenderer] Text infrastructure initialized");
-
-    // Create geometry collector
     m_geometryCollector = xr_make_unique<GeometryCollector>();
-
-    // Set global geometry collector pointer
     g_geometryCollector = m_geometryCollector.get();
 
-    // ═══════════════════════════════════════════════════════
-    //  INITIALIZE BINDLESS BUFFERS (EARLY - before level load!)
-    // ═══════════════════════════════════════════════════════
-    // CRITICAL: Must initialize BEFORE level geometry is loaded!
-    // Level load calls ProcessVisualGeometry -> PreRegisterTerrainMaterial
-    // which needs TerrainMaterialBuffer to be initialized, otherwise
-    // terrain batches get UINT32_MAX material IDs and render black.
+
+    m_gpuCullingManager = xr_make_unique<RENDER_NAMESPACE::GPUCullingManager>();
+    m_detailManager = xr_make_unique<RENDER_NAMESPACE::FGDetailManager>();
+    m_decalManager = xr_make_unique<RENDER_NAMESPACE::decals::DecalManager>();
+    m_overlayManager = xr_make_unique<RENDER_NAMESPACE::decals::OverlayManager>();
+    m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
+    m_smokeTrailManager = xr_make_unique<RENDER_NAMESPACE::passes::SmokeTrailManager>();
+
+
     bindless::MaterialBuffer::Instance().Initialize(m_device);
     bindless::TerrainMaterialBuffer::Instance().Initialize(m_device);
     bindless::VariantTextureBuffer::Instance().Initialize(m_device);
     bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);  // Max 64K draws
     Msg("* [FrameGraphRenderer] Bindless material buffers initialized (early)");
 
-    // Create GPU culling manager (Phase 3.5)
-    // NOTE: Initialization is deferred to first frame (SetupFrameGraphPasses)
-    // because ShaderLoader isn't ready during FrameGraphRenderer::Initialize
-    m_gpuCullingManager = xr_make_unique<RENDER_NAMESPACE::GPUCullingManager>();
-
-    // Create detail manager (Framegraph)
-    // Note: Will be loaded during level loading (see r2_loader.cpp), not here
-    m_detailManager = xr_make_unique<RENDER_NAMESPACE::FGDetailManager>();
-
-    m_decalManager = xr_make_unique<RENDER_NAMESPACE::decals::DecalManager>();
+    m_uiRenderer->Initialize(device, m_uiMaterialCache.get());
     m_decalManager->Initialize(device);
-
-    m_overlayManager = xr_make_unique<RENDER_NAMESPACE::decals::OverlayManager>();
     m_overlayManager->Initialize(device);
-
-    m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
     m_rtAccelMgr->Initialize(device);
-
-    m_smokeTrailManager = xr_make_unique<RENDER_NAMESPACE::passes::SmokeTrailManager>();
     m_smokeTrailManager->Initialize(device);
 
     // Create RenderContext for execution
@@ -193,28 +160,13 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
         return false;
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  TRANSIENT RESOURCES (NEW ARCHITECTURE)
-    // ═══════════════════════════════════════════════════════
-    // Resources now created per-frame in SetupFrameGraphPasses()
-    // No need for BuildFrameGraphStructure() anymore
-
-    // BuildFrameGraphStructure();  // REMOVED - Using transient resources
-    // m_framegraph->Compile();     // REMOVED - Compile per-frame now
-
-    // ═══════════════════════════════════════════════════════
-    //  INITIALIZE PASS RESOURCES
-    // ═══════════════════════════════════════════════════════
     m_passStates = xr_make_unique<passes::PassStates>();
-
-    // ═══════════════════════════════════════════════════════
-    //  PROFILER (GPU timing + ImGui overlay)
-    // ═══════════════════════════════════════════════════════
     m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
-    m_gpuProfiler->Initialize(device->GetNVRHIDevice());
-
     m_statsOverlay = xr_make_unique<xray::profiler::StatsOverlay>();
+    
+    m_gpuProfiler->Initialize(device->GetNVRHIDevice());
     m_statsOverlay->SetGPUProfiler(m_gpuProfiler.get());
+    
     Msg("* [FrameGraphRenderer] Profiler initialized");
 
     {
@@ -240,10 +192,7 @@ void FrameGraphRenderer::Shutdown() {
 
     Msg("* [FrameGraphRenderer] Shutting down");
 
-    // Clear global geometry collector pointer
     g_geometryCollector = nullptr;
-
-    // Cleanup profiler
     m_statsOverlay = nullptr;
     if (m_gpuProfiler) {
         m_gpuProfiler->Shutdown();
@@ -254,18 +203,12 @@ void FrameGraphRenderer::Shutdown() {
     m_renderContext = nullptr;
     m_geometryCollector = nullptr;
     m_materialCache = nullptr;
-
-    // Cleanup UI infrastructure
     m_uiRenderer = nullptr;
     m_uiCollector = nullptr;
     m_uiMaterialCache = nullptr;
     m_uiVCBPool = nullptr;
-
-    // Cleanup Text infrastructure
     m_textMaterialCache = nullptr;
     m_textVCBPool = nullptr;
-
-    // Clear static geometry cache
     m_cachedStaticBatches.clear();
     m_staticBatchesCached = false;
     if (m_gpuCullingManager) {
@@ -318,36 +261,19 @@ void FrameGraphRenderer::Render() {
 
     VERIFY(m_framegraph != nullptr);
 
-    // ═══════════════════════════════════════════════════════
-    //  GPU PROFILER FRAME START
-    // ═══════════════════════════════════════════════════════
     if (m_gpuProfiler)
     {
-        // Sync GPU profiler with CPU profiler's throttled state
-        // (CPU profiler only runs every N frames, GPU should match)
         m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
         m_gpuProfiler->FrameStart();
     }
 
     auto frameStart = std::chrono::high_resolution_clock::now();
-
-    // ═══════════════════════════════════════════════════════
-    //  UPDATE LIGHTS (Sun direction, color from environment)
-    // ═══════════════════════════════════════════════════════
-    // Must be called before rendering to update sun from environment system
+    
     RImplementation.Lights.Update();
-
-    // ═══════════════════════════════════════════════════════
-    //  UPDATE RESOURCE MANAGER (Video textures, streaming)
-    // ═══════════════════════════════════════════════════════
 
     if (m_device && m_device->GetFGResourceManager()) {
         m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
     }
-
-    // NOTE: Bindless buffers are initialized in FrameGraphRenderer::Initialize()
-    // (before level load) so terrain materials get valid IDs during geometry processing.
-    // The Initialize() calls are idempotent so this is just a safety fallback.
 
     // ═══════════════════════════════════════════════════════
     //  SETUP FRAME (PER-FRAME: Collect geometry)
@@ -361,8 +287,6 @@ void FrameGraphRenderer::Render() {
     // ═══════════════════════════════════════════════════════
     //  RESET FRAMEGRAPH FOR NEW FRAME
     // ═══════════════════════════════════════════════════════
-    // With lambda-based passes, we rebuild the graph every frame
-    // (Frostbite-style: graph rebuilt, GPU resources reused from pool)
     m_framegraph->ResetForNextFrame();
 
     // Shader hot-reload check (throttled to avoid per-frame filesystem polling)
@@ -405,7 +329,6 @@ void FrameGraphRenderer::Render() {
     // ═══════════════════════════════════════════════════════
     //  SETUP PASSES (PER-FRAME: Route geometry to passes)
     // ═══════════════════════════════════════════════════════
-
     {
         ZoneScopedN("FG::SetupPasses");
         SetupFrameGraphPasses();
@@ -414,13 +337,9 @@ void FrameGraphRenderer::Render() {
     // ═══════════════════════════════════════════════════════
     //  COMPILE & EXECUTE
     // ═══════════════════════════════════════════════════════
-
-    // Set RenderContext for execution
     m_framegraph->SetRenderContext(m_renderContext.get());
-
-    // Set GPUProfiler for per-pass timing
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
-
+    
     // Wire async compute (Vulkan only for now — D3D12 triggers device removed)
     if (ps_fg_render_mode == FG_RENDER_VULKAN && GEnv.Backend->HasAsyncCompute())
         m_framegraph->SetAsyncCompute(GEnv.Backend->GetComputeCommandList(), GEnv.Backend);
@@ -433,29 +352,23 @@ void FrameGraphRenderer::Render() {
         m_framegraph->Compile();
     }
 
-    {
-        auto& cache = framegraph::GetPassResourceCache();
-        auto* cmdList = m_renderContext->GetCommandList();
+    auto& cache = framegraph::GetPassResourceCache();
+    auto* cmdList = m_renderContext->GetCommandList();
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device);
+    auto staticGlobalsData = passes::BuildStaticGlobals();
+    cmdList->writeBuffer(staticGlobalsCB, &staticGlobalsData, sizeof(staticGlobalsData));
 
-        auto sgCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals",
-            sizeof(passes::StaticGlobals), m_device);
-        auto sg = passes::BuildStaticGlobals();
-        cmdList->writeBuffer(sgCB, &sg, sizeof(sg));
+    auto dynamicTransformsCB = cache.GetOrCreateVolatileCB("Frame", "DynamicTransforms",
+        sizeof(passes::DynamicTransforms), m_device);
+    passes::DynamicTransforms dynamicTransformsData = {};
+    passes::FillDynamicTransforms(dynamicTransformsData);
+    cmdList->writeBuffer(dynamicTransformsCB, &dynamicTransformsData, sizeof(dynamicTransformsData));
 
-        auto dtCB = cache.GetOrCreateVolatileCB("Frame", "DynamicTransforms",
-            sizeof(passes::DynamicTransforms), m_device);
-        passes::DynamicTransforms dt = {};
-        passes::FillDynamicTransforms(dt);
-        cmdList->writeBuffer(dtCB, &dt, sizeof(dt));
-    }
-
-    // Execute the compiled graph (FrameGraph orchestrates all passes)
     {
         ZoneScopedN("FG::Execute");
         m_framegraph->Execute();
     }
 
-    // Schedule GPU culling stats readback (for profiling overlay)
     if (m_gpuCullingManager && psDeviceFlags.test(rsStatistic))
     {
         m_gpuCullingManager->ScheduleStatsReadback(m_renderContext->GetCommandList());
@@ -466,9 +379,6 @@ void FrameGraphRenderer::Render() {
     m_prevCameraPos = Device.vCameraPosition;
     m_pingPongIndex = 1 - m_pingPongIndex;
 
-    // ═══════════════════════════════════════════════════════
-    //  GPU PROFILER FRAME END
-    // ═══════════════════════════════════════════════════════
     if (m_gpuProfiler)
     {
         m_gpuProfiler->FrameEnd();
@@ -490,16 +400,7 @@ void FrameGraphRenderer::Render() {
     m_stats.tonemapMs = 0.0f;
     m_stats.numDrawCalls = 0;
     m_stats.numTriangles = 0;
-
-    // NOTE: We call Reset() at the start of each frame (line 199)
-    // No need to reset here at the end
 }
-
-// ═══════════════════════════════════════════════════════
-//  RENDER MENU (Simplified for Main Menu)
-// ═══════════════════════════════════════════════════════
-// Main menu rendering: No 3D geometry, lighting, or post-process
-// Just clear background + ImGui UI overlay
 
 void FrameGraphRenderer::RenderMenu() {
     ZoneScopedN("FrameGraphRenderer::RenderMenu");
@@ -508,39 +409,21 @@ void FrameGraphRenderer::RenderMenu() {
 
     VERIFY(m_framegraph != nullptr);
 
-    // GPU profiler frame start - sync with CPU profiler's throttled state
     if (m_gpuProfiler)
     {
         m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
         m_gpuProfiler->FrameStart();
     }
-
-    // Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
-
-    // ═══════════════════════════════════════════════════════
-    //  UPDATE RESOURCE MANAGER (Video textures, streaming)
-    // ═══════════════════════════════════════════════════════
-
+    
     if (m_device && m_device->GetFGResourceManager()) {
         m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
     }
-
-    // ═══════════════════════════════════════════════════════
-    //  RESET FRAMEGRAPH FOR NEW FRAME
-    // ═══════════════════════════════════════════════════════
+    
     m_framegraph->ResetForNextFrame();
-
-    // ═══════════════════════════════════════════════════════
-    //  MENU PASS SETUP (LAMBDA-BASED)
-    // ═══════════════════════════════════════════════════════
-    // For menu, we skip GBuffer/HUD and just render UI
 
     const u32 width = Device.dwWidth;
     const u32 height = Device.dwHeight;
 
-    // ═══════════════════════════════════════════════════════
-    //  IMPORT BACKBUFFER (Frostbite Pattern)
-    // ═══════════════════════════════════════════════════════
     nvrhi::ITexture* backbufferTexture = GEnv.Backend->GetBackBuffer();
     framegraph::VirtualResourceHandle backbufferHandle;
 
@@ -558,7 +441,6 @@ void FrameGraphRenderer::RenderMenu() {
         backbufferHandle = m_framegraph->ImportTexture("Backbuffer", backbufferTexture, backbufferDesc);
     }
 
-    // 1. Create black background target
     framegraph::ResourceDesc bgDesc;
     bgDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     bgDesc.width = width;
@@ -568,8 +450,7 @@ void FrameGraphRenderer::RenderMenu() {
     bgDesc.debugName = "rt_MenuBackground";
 
     auto backgroundTarget = m_framegraph->CreateTexture("rt_MenuBackground", bgDesc);
-
-    // Clear background in a simple pass (using manual PassWrite since we need the PassHandle)
+    
     framegraph::PassHandle clearPass = m_framegraph->AddPass("ClearBackground");
     m_framegraph->PassWrite(clearPass, backgroundTarget, framegraph::ResourceState::RenderTarget);
     m_framegraph->SetPassCallback(clearPass,
@@ -582,18 +463,10 @@ void FrameGraphRenderer::RenderMenu() {
         }
     );
 
-    // 2. UI Pass - Renders menu UI directly to background with alpha blending
     auto sceneWithUI = passes::setupUIPass(*m_framegraph, backgroundTarget, width, height);
-
-    // 3. Text Pass - Renders menu text
     sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height, m_passStates->uiText);
-
-    // 4. Cursor Pass - Renders cursor
     sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
-
-    // 5. Tonemap Pass - Convert HDR to LDR using ACES filmic tonemap
-    // Note: No exposure pass for menu rendering, pass invalid handle for fixed exposure
-    // Renders directly to backbuffer (Frostbite pattern)
+    
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
         m_device,
@@ -605,8 +478,6 @@ void FrameGraphRenderer::RenderMenu() {
         m_passStates->tonemap
     );
 
-    // 6. ImGui Pass - Debug overlay on LDR output
-    // Note: Stats overlay is rendered from device.cpp between ImGui::NewFrame/EndFrame
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
@@ -616,12 +487,7 @@ void FrameGraphRenderer::RenderMenu() {
         height
     );
 
-    // Store final output for presentation
     m_finalOutput = finalOutput;
-
-    // ═══════════════════════════════════════════════════════
-    //  COMPILE & EXECUTE
-    // ═══════════════════════════════════════════════════════
 
     m_framegraph->SetRenderContext(m_renderContext.get());
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
@@ -629,33 +495,22 @@ void FrameGraphRenderer::RenderMenu() {
     m_framegraph->Compile();
     m_framegraph->Execute();
 
-    // GPU profiler frame end
     if (m_gpuProfiler)
         m_gpuProfiler->FrameEnd();
-
-    // NOTE: We call Reset() at the start of each frame (line 285)
-    // No need to reset here at the end
-
-    // Msg("* [FrameGraphRenderer::RenderMenu] Menu frame complete");
 }
 
 void FrameGraphRenderer::RenderStatsOverlay()
 {
-    // Called from device.cpp between ImGui::NewFrame and EndFrame
-    // This ensures proper ImGui input processing
     if (m_statsOverlay && psDeviceFlags.test(rsStatistic))
     {
-        // Collect render stats before displaying
         xray::profiler::RenderStats stats;
         stats.Reset();
 
-        // Collect geometry stats from collector
         if (m_geometryCollector)
         {
             const auto& batches = m_geometryCollector->GetBatches();
             stats.totalBatches = static_cast<u32>(batches.size());
 
-            // Track unique skeletons for bone counting
             xr_set<IRenderVisual*> uniqueSkeletons;
 
             for (const auto& batch : batches)
@@ -668,7 +523,6 @@ void FrameGraphRenderer::RenderStatsOverlay()
                     stats.skinnedBatches++;
                     stats.skinnedTriangles += triangles;
 
-                    // Count unique skeletons and their bones
                     if (batch.renderable)
                     {
                         IRenderVisual* rootVisual = batch.renderable->GetRenderData().visual;
@@ -819,37 +673,26 @@ void FrameGraphRenderer::RenderStatsOverlay()
 void FrameGraphRenderer::SetupFrame() {
     const bool levelLoaded = g_pGamePersistent && g_pGameLevel;
 
-    // Process GPU culling stats readback from previous frame
     if (m_gpuCullingManager) {
         m_gpuCullingManager->ProcessStatsReadback();
         m_gpuCullingManager->ProcessSkinnedVisibilityReadback();
     }
 
-    // Process detail culling stats readback from previous frame
     if (m_detailManager && m_device) {
         m_detailManager->ProcessStatsReadback(m_device->GetNVRHIDevice());
     }
 
-    // Clear buffer handle cache (X-Ray may recreate buffers each frame)
     m_bufferHandleCache.clear();
-
-    // Clear cached spatial queries from previous frame
     m_lstRenderables.clear();
 
-    // Query spatial database ONCE per frame (mimicking render_main::calculate())
-    // This populates m_lstRenderables which we reuse throughout the frame
     if (levelLoaded)
     {
-        // Setup frustum (same as render_main)
-        // Safety check: Ensure spatial database is initialized
-        // SpatialSpace isn't ready during early level loading
         if (levelLoaded && !g_pGamePersistent->IsLoadingScreenShown())
         {
             CFrustum view_frustum;
             view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-            // Query spatial DB with EXACT same parameters as render_main::calculate()
-            // See: src/Layers/xrRender_R2/r2_R_calculate.cpp lines 54-58
+            // ref: src/Layers/xrRender_R2/r2_R_calculate.cpp lines 54-58
             u32 spatial_traverse_flags = ISpatial_DB::O_ORDERED;  // Front-to-back ordering
             u32 spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;  // Both renderables AND lights
 
@@ -862,28 +705,17 @@ void FrameGraphRenderer::SetupFrame() {
         }
     }
 
-    // Begin geometry collection
     m_geometryCollector->BeginFrame();
-
-    // Clear HUD batches from previous frame
     m_hudBatches.clear();
-
-    // Clear particle batches from previous frame
     m_worldParticleBatches.clear();
     m_hudParticleBatches.clear();
 
-    // Collect visible geometry (CPU culling for now, GPU later)
     if (levelLoaded)
         CollectVisibleGeometry();
 
-    // End geometry collection (sorts batches)
     m_geometryCollector->EndFrame();
 
 }
-
-// ═══════════════════════════════════════════════════════
-//  HELPER: CREATE RENDER TARGET (DRY)
-// ═══════════════════════════════════════════════════════
 
 framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
     const char* name,
@@ -905,25 +737,9 @@ framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
     return m_framegraph->CreateTexture(name, desc);
 }
 
-// ═══════════════════════════════════════════════════════
-//  SETUP FRAMEGRAPH PASSES (CALLED PER-FRAME)
-// ═══════════════════════════════════════════════════════
-
 void FrameGraphRenderer::SetupFrameGraphPasses() {
-    // ═══════════════════════════════════════════════════════
-    //  LAMBDA-BASED PASS SETUP (NEW ARCHITECTURE)
-    // ═══════════════════════════════════════════════════════
-    // ALL passes now use lambda pattern - executed by FrameGraph
-
     const u32 width = Device.dwWidth;
     const u32 height = Device.dwHeight;
-
-    // ═══════════════════════════════════════════════════════
-    //  IMPORT BACKBUFFER (Frostbite Pattern)
-    // ═══════════════════════════════════════════════════════
-    // Import swapchain backbuffer as external resource.
-    // Final pass (TonemapPass/ImGuiPass) renders directly to it.
-    // This eliminates the need for a separate copy-to-backbuffer pass.
 
     nvrhi::ITexture* backbufferTexture = GEnv.Backend->GetBackBuffer();
     framegraph::VirtualResourceHandle backbufferHandle;
@@ -945,15 +761,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  TEMPORAL HI-Z (No Depth Prepass)
     // ═══════════════════════════════════════════════════════
-    // Instead of rendering geometry twice (depth prepass + forward), we:
-    // 1. Build Hi-Z from PREVIOUS frame's depth (1 frame latency, usually fine)
-    // 2. Render forward pass with fresh depth buffer
-    // 3. Copy depth at end of frame for next frame's Hi-Z
-    //
-    // PERFORMANCE: Saves ~1.5-2.0ms by eliminating depth prepass
-    // TRADEOFF: 1 frame latency for occlusion culling (conservative errors OK)
-
-    // Create fresh depth buffer for this frame (forward pass will write to it)
     framegraph::ResourceDesc depthDesc;
     depthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     depthDesc.debugName = "rt_Depth";
@@ -962,7 +769,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     depthDesc.format = nvrhi::Format::D32;
     depthDesc.isDepthStencil = true;
     depthDesc.isTransient = true;
-    // Note: Depth clear happens in ForwardColorPass execute lambda
 
     framegraph::VirtualResourceHandle depthBuffer = m_framegraph->CreateTexture("rt_Depth", depthDesc);
 
@@ -1036,23 +842,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  TEMPORAL HI-Z PYRAMID BUILD (From Previous Frame)
     // ═══════════════════════════════════════════════════════
-    // Build Hi-Z pyramid from previous frame's depth buffer.
-    // First frame: Hi-Z culling disabled (frustum-only culling)
-    //
-    // PERFORMANCE: ~0.2-0.3ms (async compute capable)
-
     passes::HiZPyramidOutput hizOutput;
     hizOutput.pyramid = framegraph::VirtualResourceHandle();  // Invalid by default
     hizOutput.mipLevels = 0;
     hizOutput.width = width / 2;
     hizOutput.height = height / 2;
 
-    // Check if we have valid previous frame depth
     bool hasPrevDepth = m_hasPrevFrameData && m_prevFrameDepth &&
                         m_prevFrameWidth == width && m_prevFrameHeight == height;
 
     if (hasPrevDepth) {
-        // Import previous frame's depth into framegraph
         framegraph::ResourceDesc prevDepthDesc;
         prevDepthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
         prevDepthDesc.debugName = "rt_PrevDepth";
@@ -1065,7 +864,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
         auto prevDepthHandle = m_framegraph->ImportTexture("rt_PrevDepth", m_prevFrameDepth, prevDepthDesc);
 
-        // Build Hi-Z from previous frame's depth
         hizOutput = passes::setupHiZBuildPass(
             *m_framegraph,
             m_device,
@@ -1076,7 +874,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    // Store Hi-Z pyramid handle for future GPU culling pass
     m_hizPyramid = hizOutput.pyramid;
     if (m_hizPyramid.is_valid())
         m_framegraph->GetRTRegistry().RegisterRT("rt_HiZ", m_hizPyramid);
@@ -1114,22 +911,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  PHASE 3.5: GPU CULLING PASS (Frustum + Occlusion)
     // ═══════════════════════════════════════════════════════
-    // Uses Hi-Z pyramid to perform GPU-side occlusion culling.
-    // Outputs draw args buffer for indirect draw in forward pass.
-    //
-    // PERFORMANCE:
-    // - ~0.3-0.5ms for 100K objects (async compute capable)
-    // - 10-100x faster than CPU culling for large scenes
-    //
-    // ARCHITECTURE:
-    // - GPU culling pass writes to draw args buffer (UAV)
-    // - Forward pass reads draw args buffer (IndirectArgument)
-    // - FrameGraph ensures proper state transitions and execution order
 
     framegraph::VirtualResourceHandle drawArgsBuffer;  // Will be passed to forward pass
 
     if (m_gpuCullingManager && hizOutput.pyramid.is_valid()) {
-        // Lazy initialization - ShaderLoader isn't ready during FrameGraphRenderer::Initialize
         m_gpuCullingManager->Initialize(m_device);
 
         if (m_detailManager && !m_detailManager->computePipeline) {
@@ -1151,9 +936,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 m_detailManager->CreatePerlin4DPipeline(m_device->GetNVRHIDevice());
             }
         }
-
-        // NOTE: Bindless buffers initialized earlier in RenderFrame() before SetupFrame()
-        // This ensures materials are ready when CollectVisibleGeometry() calls PreRegisterBindlessMaterial
 
         if (m_rtAccelMgr && m_rtAccelMgr->IsSupported())
             m_gpuCullingManager->SetRTAccelStructManager(m_rtAccelMgr.get());
@@ -1183,7 +965,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             );
         }
 
-        // Setup skinned mesh culling (uses same Hi-Z pyramid)
         if (m_gpuCullingManager->IsSkinnedCullingEnabled()) {
             m_gpuCullingManager->SetupSkinnedCullingPass(
                 *m_framegraph,
@@ -1200,11 +981,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  SKY PASS (Renders sky dome behind everything)
     // ═══════════════════════════════════════════════════════
-    // Renders sky dome geometry with cubemap textures
-    // Creates the HDR color RT and fills it with sky
-    // Must render BEFORE forward geometry (sky = background)
-
-    // Create HDR color buffer for sky (will be reused by forward pass)
     framegraph::ResourceDesc colorDesc;
     colorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     colorDesc.width = width;
@@ -1229,8 +1005,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  SUN PASS (Sun disc with additive blending)
     // ═══════════════════════════════════════════════════════
-    // Renders sun disc as camera-facing billboard
-    // Uses additive blending on top of sky
 
     auto sunOutput = passes::setupSunPass(
         *m_framegraph,
@@ -1243,14 +1017,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
 
     // ═══════════════════════════════════════════════════════
-    //  PHASE 1: FORWARD COLOR PASS (Single-RT, Reuses Depth)
+    //  FORWARD COLOR PASS (Single-RT, Reuses Depth)
     // ═══════════════════════════════════════════════════════
-    // Simplified from wasteful 3-RT G-buffer to single HDR color output
-    // BANDWIDTH SAVINGS: 60% reduction (3 RTs → 1 RT)
-    // EARLY-Z OPTIMIZATION: Reuses depth from prepass (20-30% faster)
-    // Reuses sky color RT (no clear - sky is background)
-
-    // Configure bindless rendering if GPU culling manager has compaction data
     passes::BindlessForwardConfig bindlessConfig;
     if (m_gpuCullingManager && m_gpuCullingManager->IsCompactionEnabled()) {
         bindlessConfig.enabled = true;  // TODO: Add console var to toggle bindless mode
@@ -1272,7 +1040,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         // ═══════════════════════════════════════════════════════
         //  MEGA-BUFFER CONFIGURATION (GPU-Driven Rendering)
         // ═══════════════════════════════════════════════════════
-        // If mega-buffers are ready, provide them for unified VB/IB rendering
         if (m_gpuCullingManager->AreMegaBuffersReady()) {
             bindlessConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
             bindlessConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
@@ -1282,7 +1049,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         // ═══════════════════════════════════════════════════════
         //  TERRAIN CONFIGURATION (4-layer detail blending)
         // ═══════════════════════════════════════════════════════
-        // Terrain uses separate TerrainMaterialBuffer and terrain shader
         if (m_gpuCullingManager->GetTerrainObjectCount() > 0) {
             bindlessConfig.terrainDrawArgsBuffer = m_gpuCullingManager->GetTerrainDrawArgsBuffer();
             bindlessConfig.terrainMaterialIDBuffer = m_gpuCullingManager->GetTerrainMaterialIDBuffer();
@@ -1319,13 +1085,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  GPU CULLING DEBUG VISUALIZATION (Optional overlay)
     // ═══════════════════════════════════════════════════════
-    // Renders colored bounding spheres showing culling state:
-    // - Green: Visible (passed all tests)
-    // - Blue: Occluder (close to camera)
-    // - Red: Culled (distance/frustum)
-    // - Yellow: Culled by Hi-Z occlusion
-    // Enable with: r4_debug_gpu_culling 1
-
     if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid()) {
         m_gpuCullingManager->SetupDebugVisualizationPass(
             *m_framegraph,
@@ -1342,13 +1101,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // 2. Skinning Pass - Renders all skinned meshes (world + HUD)
     // World skinned: NPCs, monsters with normal depth [0.0, 1.0]
     // HUD skinned: First-person weapons/hands with depth [0.0, 0.1]
-
-    // Static callback for skinned culling stats (can't use lambda with captures)
     static auto skinnedStatsCallback = +[](u32 rendered, u32 culled, void* userData) {
         static_cast<GPUCullingManager*>(userData)->UpdateSkinnedCullingStats(rendered, culled);
     };
 
-    // Static callback for visual-based visibility lookup (handles batch reordering)
     static auto visibilityByVisualCallback = +[](const dxRender_Visual* visual, void* userData) -> u32 {
         return static_cast<GPUCullingManager*>(userData)->GetSkinnedVisibilityByVisual(visual);
     };
@@ -1431,8 +1187,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  TRANSPARENT PASS (alpha-blended geometry)
     // ═══════════════════════════════════════════════════════
-    // Renders AFTER detail so grass depth is already written.
-    // Depth test on, depth write off, SrcAlpha/InvSrcAlpha blend.
     passes::TransparentPassConfig transparentConfig;
     if (m_gpuCullingManager && m_gpuCullingManager->GetTransparentObjectCount() > 0) {
         transparentConfig.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
@@ -1711,11 +1465,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_passStates->exposure
     );
 
-    // Store exposure texture for future sky pass integration
-    // (Sky pass will read exposure via s_tonemap.Load(int3(0,0,0)).x)
     m_exposureTexture = exposureOutput.exposureTexture;
 
-    // 4. UI Pass - Renders 2D UI directly to scene HDR target with alpha blending
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
         sceneColor,
@@ -1740,8 +1491,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
 
     // 6. Tonemap Pass - Convert HDR to LDR using ACES filmic tonemap
-    // Now uses exposure from ExposurePass for auto-exposure
-    // Renders directly to backbuffer if available (Frostbite pattern)
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
         m_device,
@@ -1888,11 +1637,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
-    // 7. ImGui Pass - Renders debug UI on top of LDR output (backbuffer)
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
-        ldrOutput,  // LDR input (backbuffer if available, else rt_Final)
+        ldrOutput,
         imguiRenderer,
         width,
         height
@@ -1904,8 +1652,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  DEPTH COPY PASS (Temporal Hi-Z: save depth for next frame)
     // ═══════════════════════════════════════════════════════
-    // Copy this frame's depth to persistent storage for next frame's Hi-Z build.
-    // The framegraph handles all barriers and lifetime tracking automatically.
     {
         nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
 
@@ -1973,36 +1719,11 @@ void FrameGraphRenderer::PrintStats() const {
     Msg("═══════════════════════════════════════");
 }
 
-// ═══════════════════════════════════════════════════════
-//  HUD RENDERING
-// ═══════════════════════════════════════════════════════
-//
-// HUD items use special rendering state:
-// - psHUD_FOV projection matrix (wider FOV)
-// - HUD_VIEWPORT_NEAR near plane (closer to camera)
-// - Optional custom culling for left-handed mode
-//
-// Original engine: hud_transform_helper + mapHUD/mapHUDSorted/mapHUDEmissive
-
-void FrameGraphRenderer::RenderHUD() {
-    // HUD rendering is now handled by SkinningPass in the FrameGraph pipeline
-    // This function is kept as a stub for future HUD-specific post-processing
-    // (e.g., HUD-only effects, UI overlays, etc.)
-}
-
-// ═══════════════════════════════════════════════════════
-//  VISIBILITY & CULLING
-// ═══════════════════════════════════════════════════════
-
-// Helper to process a visual and submit geometry batch (returns true if submitted)
 bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable, bool isStatic) {
     if (!visual)
         return false;
-
-    // Get mesh interface based on visual type
-    // IRender_Mesh is not polymorphic, so we must cast to concrete types
+    
     IRender_Mesh* meshVisual = nullptr;
-
     switch (visual->getType()) {
         case MT_NORMAL:           // Static mesh
             meshVisual = static_cast<Fvisual*>(visual);
@@ -2020,19 +1741,9 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         case MT_SKELETON_GEOMDEF_PM:  // Skinned mesh (progressive)
             meshVisual = static_cast<CSkeletonX_PM*>(visual);
             break;
-
-        // ═══════════════════════════════════════════════════════
-        //  PARTICLES - Collected separately for ParticlePass
-        // ═══════════════════════════════════════════════════════
-        case MT_PARTICLE_EFFECT:
+        case MT_PARTICLE_EFFECT: // particles & particle groups
         case MT_PARTICLE_GROUP:
-            // Particles use a different rendering path (billboards/sprites)
-            // They don't have traditional mesh geometry (vb/ib)
-            // Collect them in separate particle batches for ParticlePass
             return ProcessParticleGeometry(visual, worldTransform, renderable, false);
-
-        // MT_HIERRARHY, MT_SKELETON_ANIM, MT_SKELETON_RIGID, MT_LOD are containers, not leaf meshes
-        // They should have been unpacked by ExtractStaticLeafVisuals
         default:
             return false;
     }
@@ -2048,36 +1759,13 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     if (!geom->vb || !geom->ib)
         return false;
 
-    // ═══════════════════════════════════════════════════════
-    //  GET NVRHI BUFFER HANDLES
-    // ═══════════════════════════════════════════════════════
-
-    // geom->vb and geom->ib are already nvrhi::BufferHandle (created via NVRHI)
     nvrhi::BufferHandle nvrhiVB = geom->vb;
     nvrhi::BufferHandle nvrhiIB = geom->ib;
 
     if (!nvrhiVB || !nvrhiIB)
         return false;
 
-    // Diagnostic logging for skeleton meshes - investigating "wrong mesh" issue
-    u32 visualType = visual->getType();
-    if (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM) {
-        // Get RenderMode from skeleton
-        u16 renderMode = 0;
-        if (visualType == MT_SKELETON_GEOMDEF_ST) {
-            renderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
-        } else {
-            renderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  CREATE GEOMETRY BATCH
-    // ═══════════════════════════════════════════════════════
-
     GeometryBatch batch;
-
-    // Store NVRHI buffer handles directly
     batch.vertexBuffer = nvrhiVB;
     batch.indexBuffer = nvrhiIB;
 
@@ -2097,12 +1785,12 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     //   - For now, always use iBase/iCount (max detail, no LOD)
     //   - TODO: Implement proper LOD selection for progressive meshes
     //
+
+    u32 visualType = visual->getType();
     bool isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
 
     if (isSkinned) {
-        // Skinned meshes: indices are mesh-relative, ignore iBase
         if (visualType == MT_SKELETON_GEOMDEF_PM) {
-            // Progressive skinned: use SWI for proper index range
             const FSlideWindowItem& swi = static_cast<CSkeletonX_PM*>(visual)->GetSWI();
             if (swi.sw && swi.count > 0) {
                 const FSlideWindow& sw = swi.sw[0];  // LOD 0 = max detail
@@ -2113,28 +1801,22 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
                 batch.startIndex = 0;
             }
         } else {
-            // Static skinned: startIndex = 0
             batch.indexCount = meshVisual->iCount;
             batch.startIndex = 0;
         }
         batch.baseVertex = 0;  // Skinned meshes always have vBase = 0
     } else if (visualType == MT_PROGRESSIVE) {
-        // Progressive meshes (terrain, water, etc.): use SWI for LOD 0 (max detail)
-        // Vanilla: Render(vBase, 0, SW.num_verts, iBase + SW.offset, SW.num_tris)
         const FSlideWindowItem& swi = static_cast<FProgressive*>(visual)->GetSWI();
         if (swi.sw && swi.count > 0) {
             const FSlideWindow& sw = swi.sw[0];  // LOD 0 = max detail
             batch.indexCount = sw.num_tris * 3;
             batch.startIndex = meshVisual->iBase + sw.offset;  // iBase + SW.offset
         } else {
-            // Fallback if SWI not available
             batch.indexCount = meshVisual->iCount;
             batch.startIndex = meshVisual->iBase;
         }
         batch.baseVertex = meshVisual->vBase;
     } else if (visualType == MT_TREE_PM) {
-        // Progressive tree mesh: SWI is a pointer (loaded from global SWIs)
-        // Vanilla: Render(vBase, 0, SW.num_verts, iBase + SW.offset, SW.num_tris)
         const FSlideWindowItem* pSWI = static_cast<FTreeVisual_PM*>(visual)->GetSWI();
         if (pSWI && pSWI->sw && pSWI->count > 0) {
             const FSlideWindow& sw = pSWI->sw[0];  // LOD 0 = max detail
@@ -2146,28 +1828,16 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         }
         batch.baseVertex = meshVisual->vBase;
     } else {
-        // Non-progressive meshes (MT_NORMAL, MT_TREE_ST): use iBase/iCount directly
         batch.indexCount = meshVisual->iCount;
         batch.startIndex = meshVisual->iBase;
         batch.baseVertex = meshVisual->vBase;
     }
     batch.vertexStride = meshVisual->vStride;
-
-    // Set world matrix (used for shader constants)
     batch.worldMatrix = worldTransform;
-
-    // Store visual for material system
     batch.visual = visual;
-
-    // Store renderable (for skeletons - provides bone data)
     batch.renderable = renderable;
-
-    // Mark skinned meshes for separate rendering pipeline
-    // Skinned meshes use bindless_skinned.vs/ps with per-draw bone matrices
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
     batch.isStatic = isStatic;
-
-    // Store skinning render mode for correct shader selection (1B, 2B, 3B, 4B)
     if (batch.isSkinned) {
         if (visualType == MT_SKELETON_GEOMDEF_ST) {
             batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
@@ -2175,37 +1845,22 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
             batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
         }
     }
-
-    // Compute world-space bounding sphere for GPU culling
-    // Different visual types have different sphere conventions:
-    // - Static geometry: sphere already in world space, worldTransform = identity
-    // - Trees: sphere already in world space (level compiler pre-transforms), but worldTransform != identity
-    // - Dynamic objects: sphere in local space, needs worldTransform applied
-    // Note: visualType already computed above for skeleton logging
     if (visualType == MT_TREE_ST || visualType == MT_TREE_PM) {
-        // Trees: sphere is ALREADY in world space (pre-transformed by level compiler)
-        // Do NOT apply worldTransform to sphere (it's only for shader constants)
         batch.worldBoundsCenter = visual->vis.sphere.P;
         batch.worldBoundsRadius = visual->vis.sphere.R;
     } else {
-        // Static/dynamic geometry: transform sphere by worldMatrix
         worldTransform.transform_tiny(batch.worldBoundsCenter, visual->vis.sphere.P);
         batch.worldBoundsRadius = visual->vis.sphere.R;
     }
 
-    // Calculate SSA (Screen Space Area) for sorting - matches vanilla CalcSSA()
-    // SSA = R / distSQ - larger SSA = closer/bigger = render first (front-to-back)
     float distSQ = Device.vCameraPosition.distance_to_sqr(batch.worldBoundsCenter) + EPS;
     batch.ssa = batch.worldBoundsRadius / distSQ;
 
-    // PSO and binding set will be created by MaterialCache in GBufferPass
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 
-    // Extract shader key for debug name (production-safe)
     RENDER_NAMESPACE::ShaderKey shaderKey;
     if (RENDER_NAMESPACE::ExtractShaderKey(visual, shaderKey)) {
-        // Store as static string to avoid dangling pointer
         static thread_local std::string s_debugNameBuffer;
         s_debugNameBuffer = shaderKey.ToString();
         batch.debugName = s_debugNameBuffer.c_str();
@@ -2213,15 +1868,12 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         batch.debugName = "<unknown_shader>";
     }
 
-    // DEBUG: Verify buffers are valid before submit
     if (!nvrhiVB || !nvrhiIB) {
         Msg("! [ProcessVisualGeometry] ERROR: Created batch with null buffers! VB=%p, IB=%p",
             nvrhiVB.Get(), nvrhiIB.Get());
         return false;
     }
 
-    // Pre-register bindless material for GPU-driven rendering
-    // This assigns material ID before GPU culling uploads the batch
     if (m_materialCache) {
         // Check if this is terrain (uses B_BmmD blender with 4-layer detail blending)
         if (m_materialCache->IsTerrainMaterial(visual)) {
@@ -2232,12 +1884,6 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  GPU-DRIVEN: Compute mega-buffer allocation
-    // ═══════════════════════════════════════════════════════
-    // Use mesh's pool IDs to get offsets into unified mega-buffers
-    // CRITICAL: Use batch.startIndex/indexCount (adjusted for SWI) not meshVisual->iBase/iCount
-    // For progressive meshes, batch.startIndex = iBase + sw.offset, batch.indexCount = sw.num_tris * 3
     if (m_gpuCullingManager && m_gpuCullingManager->AreMegaBuffersReady()) {
         batch.megaBufferAlloc = m_gpuCullingManager->GetMeshAllocation(
             meshVisual->vbPoolID, batch.baseVertex, meshVisual->vCount,
@@ -2261,22 +1907,10 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     return true;
 }
 
-// ═══════════════════════════════════════════════════════
-//  PROCESS HUD GEOMETRY (separate from world geometry)
-// ═══════════════════════════════════════════════════════
-// HUD geometry is rendered with:
-// - Different projection matrix (psHUD_FOV instead of regular FOV)
-// - Different near plane (HUD_VIEWPORT_NEAR instead of VIEWPORT_NEAR)
-// - Separate depth buffer or depth range
-// - Custom culling for left-handed mode
-//
-// Original engine uses: mapHUD, mapHUDSorted, mapHUDEmissive
-
 bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable) {
     if (!visual)
         return false;
 
-    // Get mesh interface based on visual type (same logic as world geometry)
     IRender_Mesh* meshVisual = nullptr;
 
     switch (visual->getType()) {
@@ -2294,7 +1928,6 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
             break;
         case MT_PARTICLE_EFFECT:
         case MT_PARTICLE_GROUP:
-            // HUD particles need special FOV handling - collect them separately
             return ProcessParticleGeometry(visual, worldTransform, renderable, true);
         default:
             return false;
@@ -2303,7 +1936,6 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     if (!meshVisual)
         return false;
 
-    // Check if geometry is valid
     if (!meshVisual->rm_geom || !meshVisual->rm_geom._get())
         return false;
 
@@ -2311,14 +1943,12 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     if (!geom->vb || !geom->ib)
         return false;
 
-    // geom->vb and geom->ib are already nvrhi::BufferHandle (created via NVRHI)
     nvrhi::BufferHandle nvrhiVB = geom->vb;
     nvrhi::BufferHandle nvrhiIB = geom->ib;
 
     if (!nvrhiVB || !nvrhiIB)
         return false;
 
-    // Create HUD batch
     GeometryBatch batch;
     batch.vertexBuffer = nvrhiVB;
     batch.indexBuffer = nvrhiIB;
@@ -2332,11 +1962,9 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 
-    // Mark skinned meshes (HUD weapons/hands are typically skinned)
     u32 visualType = visual->getType();
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
 
-    // Store skinning render mode for correct shader selection (1B, 2B, 3B, 4B)
     if (batch.isSkinned) {
         if (visualType == MT_SKELETON_GEOMDEF_ST) {
             batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
@@ -2345,12 +1973,10 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
         }
     }
 
-    // Pre-register bindless material for HUD rendering
     if (m_materialCache) {
         batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
     }
 
-    // Extract shader key for debug name
     RENDER_NAMESPACE::ShaderKey shaderKey;
     if (RENDER_NAMESPACE::ExtractShaderKey(visual, shaderKey)) {
         static thread_local std::string s_hudDebugNameBuffer;
@@ -2360,21 +1986,10 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
         batch.debugName = "<hud_unknown_shader>";
     }
 
-    // Add to HUD batch list (NOT to world geometry collector)
     m_hudBatches.push_back(batch);
     return true;
 }
 
-// ═══════════════════════════════════════════════════════
-//  PROCESS PARTICLE GEOMETRY (billboards/sprites)
-// ═══════════════════════════════════════════════════════
-// Particles use dynamic vertex buffers and billboard rendering.
-// They don't have traditional static mesh geometry (vb/ib).
-// Collected separately for ParticlePass to render.
-//
-// World particles: Normal rendering, depth test against world geometry
-// HUD particles: Apply hud_transform_helper FOV adjustment
-//
 static u8 QueryParticleBlendMode(LPCSTR shaderName)
 {
     if (!shaderName || !shaderName[0])
@@ -2477,14 +2092,12 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
     return false;
 }
 
-// Helper to recursively extract leaf visuals from static hierarchy
 void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs) {
     if (!pVisual)
         return;
 
     switch (pVisual->Type) {
         case MT_HIERRARHY: {
-            // Recursively process children
             FHierrarhyVisual* pV = static_cast<FHierrarhyVisual*>(pVisual);
             for (auto& child : pV->children) {
                 ExtractStaticLeafVisuals(child, outLeafs);
@@ -2492,7 +2105,6 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
             break;
         }
         case MT_LOD: {
-            // For now, just take all children (TODO: proper LOD selection)
             FLOD* pV = static_cast<FLOD*>(pVisual);
             for (auto& child : pV->children) {
                 ExtractStaticLeafVisuals(child, outLeafs);
@@ -2501,19 +2113,15 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
         }
         case MT_SKELETON_ANIM:
         case MT_SKELETON_RIGID: {
-            // Skeletons have children meshes (FHierrarhyVisual base)
-            // CRITICAL: Must calculate bones BEFORE extracting children!
-            // Bone matrices are needed by skinned mesh children for rendering
             CKinematics* pV = static_cast<CKinematics*>(pVisual);
-            pV->CalculateBones_InvalidateFG();  // Compute bone transformation matrices
-            pV->CalculateBonesFG(TRUE);  // Compute bone transformation matrices
-
-            // Extract children - these are the actual renderable skinned meshes
+            pV->CalculateBones_InvalidateFG();
+            pV->CalculateBonesFG(TRUE);
+            
             for (auto& child : pV->children) {
                 ExtractStaticLeafVisuals(child, outLeafs);
             }
 
-            // Also check for LOD model
+            // TODO: Also check for LOD model / progressive skinning
             //if (pV->m_lod) {
                 //outLeafs.push_back(pV->m_lod);
             //}
@@ -2521,18 +2129,14 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
         }
         case MT_SKELETON_GEOMDEF_PM:
         case MT_SKELETON_GEOMDEF_ST: {
-            // These are skinned meshes - they ARE leaf visuals themselves
-            // (CSkeletonX_PM/ST inherit from FProgressive/Fvisual + have mesh data)
             outLeafs.push_back(pVisual);
             break;
         }
         case MT_PROGRESSIVE: {
-            // Progressive meshes are leaf visuals (e.g., water surfaces with LOD)
             outLeafs.push_back(pVisual);
             break;
         }
         case MT_PARTICLE_GROUP: {
-            // Particle groups contain effects - recursively extract visuals
             PS::CParticleGroup* pG = static_cast<PS::CParticleGroup*>(pVisual);
             for (auto& item : pG->items) {
                 xr_vector<dxRender_Visual*> visuals;
@@ -2544,14 +2148,12 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
             break;
         }
         case MT_PARTICLE_EFFECT:
-            // Particle effects are leaf visuals
             outLeafs.push_back(pVisual);
             break;
         case MT_TREE_ST:
         case MT_TREE_PM:
         case MT_NORMAL:
         default: {
-            // Leaf visual - add to list
             outLeafs.push_back(pVisual);
             break;
         }
@@ -2559,42 +2161,28 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
 }
 
 void FrameGraphRenderer::CollectVisibleGeometry() {
-    // ═══════════════════════════════════════════════════════
-    //  STATIC GEOMETRY CACHING
-    // ═══════════════════════════════════════════════════════
-    // Static geometry never changes - collect once at first frame, cache forever
-    // GPU culling handles visibility (frustum + Hi-Z), so we submit ALL static
-    // This saves ~5-10ms CPU time per frame by avoiding per-frame collection
-
     if (!g_pGamePersistent)
         return;
 
     auto& dsgraph = RImplementation.get_imm_context();
     u32 submittedStatic = 0;
 
-    // ═══════════════════════════════════════════════════════
-    //  FIRST FRAME: Collect ALL static geometry from ALL sectors
-    // ═══════════════════════════════════════════════════════
     if (!m_staticBatchesCached && !dsgraph.Sectors.empty()) {
         Msg("* [GeomCache] Building static geometry cache from %zu sectors...", dsgraph.Sectors.size());
 
         xr_vector<dxRender_Visual*> staticVisuals;
         xr_set<dxRender_Visual*> uniqueVisuals;
 
-        // Collect from ALL sectors (not just portal-visible)
-        // GPU culling will filter visibility - we just need all geometry uploaded
         for (CSector* sector : dsgraph.Sectors) {
             if (sector && sector->root()) {
                 ExtractStaticLeafVisuals(sector->root(), staticVisuals);
             }
         }
 
-        // Remove duplicates
         for (dxRender_Visual* v : staticVisuals) {
             uniqueVisuals.insert(v);
         }
 
-        // Process each unique visual and cache the batches
         u32 batchCountBefore = static_cast<u32>(m_geometryCollector->GetBatches().size());
 
         for (dxRender_Visual* visual : uniqueVisuals) {
@@ -2617,7 +2205,6 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             }
         }
 
-        // Cache the static batches
         const auto& allBatches = m_geometryCollector->GetBatches();
         m_cachedStaticBatches.assign(allBatches.begin() + batchCountBefore, allBatches.end());
         m_staticBatchesCached = true;
@@ -2625,22 +2212,16 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         Msg("* [GeomCache] Cached %zu static batches from %zu unique visuals (total sectors: %zu)",
             m_cachedStaticBatches.size(), uniqueVisuals.size(), dsgraph.Sectors.size());
     }
-    // ═══════════════════════════════════════════════════════
-    //  SUBSEQUENT FRAMES: Just submit cached batches
-    // ═══════════════════════════════════════════════════════
     else if (m_staticBatchesCached) {
-        // Fast path: just submit cached static batches
         for (const auto& batch : m_cachedStaticBatches) {
             m_geometryCollector->Submit(batch);
             submittedStatic++;
         }
     }
 
-
     // ═══════════════════════════════════════════════════════
     //  PROCESS DYNAMIC GEOMETRY
     // ═══════════════════════════════════════════════════════
-
     u32 submittedDynamic = 0;
     u32 notRenderable = 0;
 
@@ -2677,22 +2258,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     }
 }
 
-// ═══════════════════════════════════════════════════════
-//  GAME OBJECT RENDERING CALLBACK INTEGRATION
-// ═══════════════════════════════════════════════════════
-
 void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& xform) {
-    // This method is called by game objects during their renderable_Render() callbacks
-    // via CRender::add_Visual() -> FrameGraphRenderer::add_Visual()
-    //
-    // This allows game objects to add:
-    // - Their main visual
-    // - Attachments (weapons, items, equipment)
-    // - HUD items (if renderable_HUD() is true)
-    // - Any custom sub-objects
-    //
-    // This is CRITICAL for rendering NPCs, weapons, attachments, HUD items, etc.
-
     if (!V) {
         return;  // No visual to add
     }
@@ -2701,28 +2267,12 @@ void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix
     if (!visual) {
         return;  // Not a valid visual type
     }
-
-    // ═══════════════════════════════════════════════════════
-    //  HUD FILTERING (original engine: r__dsgraph_build.cpp:83-96)
-    // ═══════════════════════════════════════════════════════
-    // HUD items are rendered in a separate pass with:
-    // - Special projection matrix (psHUD_FOV)
-    // - Different near plane (HUD_VIEWPORT_NEAR)
-    // - Custom culling mode (for left-handed mode)
-    //
-    // Original code: if (root && root->renderable_HUD()) { add to mapHUD; return; }
+    
     bool isHUD = (root && root->renderable_HUD());
-
-    // Extract leaf visuals from the visual hierarchy
-    // This handles:
-    // - Hierarchical visuals (FHierrarhyVisual)
-    // - Skinned meshes (CKinematics)
-    // - LOD meshes (FLOD)
-    // - Progressive meshes (FProgressive)
+    
     xr_vector<dxRender_Visual*> leafVisuals;
     ExtractStaticLeafVisuals(visual, leafVisuals);
 
-    // Route to appropriate processor based on HUD flag
     u32 processed = 0;
     for (dxRender_Visual* leafVisual : leafVisuals) {
         bool success = false;
@@ -2740,46 +2290,19 @@ void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix
     }
 }
 
-// ═══════════════════════════════════════════════════════
-//  DYNAMIC PASS ROUTING (Week 16)
-// ═══════════════════════════════════════════════════════
-
 xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
     xr_set<framegraph::RenderPhase> phases;
 
-    // Get batches and populate phase info
     auto& batches = const_cast<GeometryCollector*>(m_geometryCollector.get())->GetBatchesMutable();
-    // Msg("! [FrameGraphRenderer] Scanning %u batches for required phases...", batches.size());
-
-    // ═══════════════════════════════════════════════════════
-    //  TRUE PHASE DETECTION (Week 16 - with ShaderPhaseCache)
-    // ═══════════════════════════════════════════════════════
-    //
-    // Use ShaderPhaseCache to extract phase info from shader reflection
-    // WITHOUT creating full PSOs. This works because:
-    //
-    // 1. ShaderPhaseCache only runs shader reflection (no RT dependencies)
-    // 2. Phase is determined purely from shader outputs
-    // 3. No physical textures needed - just bytecode analysis
-    // 4. MaterialPSOs still created lazily during Execute() (after Compile)
-    // ═══════════════════════════════════════════════════════
-
-    // Track phase distribution
     xr_map<framegraph::RenderPhase, u32> phaseCount;
 
     for (auto& batch : batches) {
-        // Skip batches without visual
         if (!batch.visual) {
             continue;
         }
 
-        // Query shader phase cache (runs reflection if not cached)
         framegraph::RenderPhase phase = m_shaderPhaseCache->GetPhase(batch.visual);
-
-        // Store phase in batch for routing
         batch.renderPhase = phase;
-
-        // Track for statistics
         phases.insert(phase);
         phaseCount[phase]++;
     }
@@ -2793,9 +2316,6 @@ void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
 
     switch (phase) {
         case framegraph::RenderPhase::Geometry: {
-            // For Geometry phase, we already have m_gbufferPass created in Initialize()
-            // Just store a reference to it (not owned by m_activePasses)
-            // We'll handle this specially in BuildFrameGraph() since we can't move m_gbufferPass
             return;
         }
 
@@ -2807,68 +2327,28 @@ void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
         default:
             return;
     }
-
-    // This code is unreachable for now, but will be used when we add more pass types
-    // m_activePasses.push_back(std::move(entry));
 }
 
 void FrameGraphRenderer::CreateAllRequiredPasses() {
-    // Scan materials to determine which phases are needed
     xr_set<framegraph::RenderPhase> requiredPhases = ScanRequiredPhases();
-
-    // Create passes for each required phase
     for (framegraph::RenderPhase phase : requiredPhases) {
         CreatePhasePass(phase);
     }
-
-    // Msg("! [FrameGraphRenderer] Created %u passes", m_activePasses.size());
 }
 
 void FrameGraphRenderer::RouteBatchesToPasses() {
-    // Get all batches
     auto& batches = m_geometryCollector->GetBatchesMutable();
-
-    // DEBUG: Check if batches have valid buffers before routing
-    // u32 nullVBCount = 0, nullIBCount = 0;
-    // for (const auto& batch : batches) {
-    //     if (!batch.vertexBuffer) nullVBCount++;
-    //     if (!batch.indexBuffer) nullIBCount++;
-    // }
-    // if (nullVBCount > 0 || nullIBCount > 0) {
-    //     Msg("! [RouteBatches] BEFORE ROUTING: %u batches with null VB, %u with null IB (total %u)",
-    //         nullVBCount, nullIBCount, batches.size());
-    // } else {
-    //     Msg("  [RouteBatches] All %u batches have valid buffers before routing", batches.size());
-    // }
-
-    // ═══════════════════════════════════════════════════════
-    //  TRUE PHASE-BASED ROUTING (Week 16)
-    // ═══════════════════════════════════════════════════════
-    //
-    // Use cached phase info from ScanRequiredPhases().
-    // Each batch has a renderPhase field populated from ShaderPhaseCache.
-    //
-    // MaterialPSOs are still created lazily during Execute()
-    // (after FrameGraph compilation).
-    // ═══════════════════════════════════════════════════════
-
-    // Group batches by phase
     xr_map<framegraph::RenderPhase, xr_vector<GeometryBatch*>> batchesByPhase;
 
     for (auto& batch : batches) {
-        // Use cached phase from batch (populated in ScanRequiredPhases)
         batchesByPhase[batch.renderPhase].push_back(&batch);
     }
 
-    // Assign batches to pass instances
     for (const auto& [phase, phaseBatches] : batchesByPhase) {
         const char* phaseName = framegraph::IPass::GetPhaseName(phase);
 
         switch (phase) {
             case framegraph::RenderPhase::Geometry:
-                // DEPRECATED: Old class-based GBufferPass removed (using lambda-based pass now)
-                // Batches are passed directly to setupGBufferPass() via GeometryCollector
-                //m_gbufferPass->SetBatches(phaseBatches);
                 break;
 
             case framegraph::RenderPhase::Lighting:
@@ -2881,10 +2361,6 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
         }
     }
 }
-
-// ═══════════════════════════════════════════════════════
-//  IMGUI RENDERING (inline, on final output)
-// ═══════════════════════════════════════════════════════
 
 void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer) {
     if (!drawData || drawData->TotalVtxCount == 0)
@@ -2899,14 +2375,12 @@ void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRH
         return;
     }
 
-    // Get the physical texture for m_finalOutput
     nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
     if (!finalTexture) {
         Msg("! [FrameGraphRenderer] Failed to get final output texture for ImGui");
         return;
     }
-
-    // Create framebuffer from final output
+    
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.addColorAttachment(nvrhi::TextureHandle(finalTexture));
 
@@ -2916,21 +2390,14 @@ void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRH
         return;
     }
 
-    // Get main command list (already open from BeginFrame, will execute at EndFrame)
     nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
     if (!cmdList) {
         Msg("! [FrameGraphRenderer] No command list available for ImGui");
         return;
     }
 
-    // Render ImGui onto final output
-    // Commands are batched into main cmdlist, executed at EndFrame
     imguiRenderer->Render(drawData, framebuffer.Get(), cmdList);
 }
-
-// ═══════════════════════════════════════════════════════
-//  SMOKE TRAIL (weapon muzzle smoke)
-// ═══════════════════════════════════════════════════════
 
 void FrameGraphRenderer::UpdateSmokeTrail(
     const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode)
@@ -2954,8 +2421,7 @@ void FrameGraphRenderer::UpdateSmokeTrail(
 
 void FrameGraphRenderer::NotifySmokeShot()
 {
-    // No-op for first pass (constant emission, no heat system)
-    // Will forward to m_smokeTrailManager->OnShot() when heat system is added
+    // TODO: forward to m_smokeTrailManager->OnShot() when heat system is added
 }
 
 } // namespace xray::render
