@@ -153,7 +153,7 @@ struct TrailPassOutput {
     framegraph::DefaultOutputLayout layout;
 };
 
-void InitializeTrailResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, TrailPassState& state);
+void InitializeTrailResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, TrailPassState& state);
 
 // ═══════════════════════════════════════════════════════
 //  TRAIL PASS SETUP

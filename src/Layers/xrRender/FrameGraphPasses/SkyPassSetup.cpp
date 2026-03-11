@@ -121,7 +121,62 @@ void InitializeSkyGeometry(ng::RenderDevice* device, SkyPassState& state) {
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
 
-    // Note: Input layout is created during pass execution when shader is available
+    if (!RImplementation.m_shaderLoader)
+        return;
+
+    auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("sky_forward");
+    auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("sky_forward");
+
+    if (!vsResult.handle || !psResult.handle) {
+        vsResult = RImplementation.m_shaderLoader->LoadVertexShader("sky2");
+        psResult = RImplementation.m_shaderLoader->LoadPixelShader("sky2");
+        if (!vsResult.handle || !psResult.handle)
+            return;
+    }
+
+    auto& cache = framegraph::GetPassResourceCache();
+
+    state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("SkyPass", *vsResult.reflection, *psResult.reflection, nvrhiDevice);
+
+    nvrhi::RenderState renderState;
+    renderState.blendState.targets[0].setBlendEnable(false);
+    renderState.depthStencilState.setDepthTestEnable(false);
+    renderState.depthStencilState.setDepthWriteEnable(false);
+    renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
+
+    nvrhi::VertexAttributeDesc vertexAttribs[] = {
+        nvrhi::VertexAttributeDesc()
+            .setName("POSITION")
+            .setFormat(nvrhi::Format::RGB32_FLOAT)
+            .setOffset(offsetof(SkyVertex, position))
+            .setElementStride(sizeof(SkyVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("COLOR")
+            .setFormat(nvrhi::Format::RGBA8_UNORM)
+            .setOffset(offsetof(SkyVertex, color))
+            .setElementStride(sizeof(SkyVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("TEXCOORD")
+            .setFormat(nvrhi::Format::RGB32_FLOAT)
+            .setArraySize(2)
+            .setOffset(offsetof(SkyVertex, texcoord0))
+            .setElementStride(sizeof(SkyVertex)),
+    };
+
+    state.inputLayout = cache.GetOrCreateInputLayout("SkyPass", vertexAttribs, 3, vsResult.handle, nvrhiDevice);
+
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+    pipelineDesc.setVertexShader(vsResult.handle);
+    pipelineDesc.setPixelShader(psResult.handle);
+    pipelineDesc.addBindingLayout(state.bindingLayout);
+    pipelineDesc.setInputLayout(state.inputLayout);
+    pipelineDesc.setRenderState(renderState);
+    pipelineDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+
+    state.pipeline = cache.GetOrCreatePipeline("SkyPass", pipelineDesc, fbInfo, nvrhiDevice);
 
     state.initialized = true;
     Msg("* [SkyPass] Sky geometry initialized");
@@ -131,6 +186,9 @@ void ShutdownSkyGeometry(SkyPassState& state) {
     state.vertexBuffer = nullptr;
     state.indexBuffer = nullptr;
     state.placeholderCubemap = nullptr;
+    state.pipeline = nullptr;
+    state.bindingLayout = nullptr;
+    state.inputLayout = nullptr;
     state.initialized = false;
 }
 
@@ -145,6 +203,8 @@ framegraph::VirtualResourceHandle setupSkyPass(
     SkyPassState& skyState)
 {
     using namespace framegraph;
+
+    InitializeSkyGeometry(device, skyState);
 
     auto& passData = fg.addCallbackPass<SkyPassData>(
         "Sky",
@@ -214,87 +274,11 @@ framegraph::VirtualResourceHandle setupSkyPass(
             // Upload vertex data
             cmdList->writeBuffer(data.passState->vertexBuffer, vertices, sizeof(vertices));
 
-            // ═══════════════════════════════════════════════════════
-            //  LOAD SKY SHADER
-            // ═══════════════════════════════════════════════════════
-
-            if (!RImplementation.m_shaderLoader) {
-                Msg("! [SkyPass] ShaderLoader not initialized");
+            if (!data.passState->pipeline)
                 return;
-            }
-
-            // Load sky shaders from r5/ directory
-            auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("sky_forward");
-            auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("sky_forward");
-
-            if (!vsResult.handle || !psResult.handle) {
-                Msg("! [SkyPass] Failed to load sky_forward shaders, falling back to sky2");
-                // Fallback: try vanilla sky2 shader (needs s_tonemap bound!)
-                vsResult = RImplementation.m_shaderLoader->LoadVertexShader("sky2");
-                psResult = RImplementation.m_shaderLoader->LoadPixelShader("sky2");
-
-                if (!vsResult.handle || !psResult.handle) {
-                    Msg("! [SkyPass] Failed to load sky shaders");
-                    return;
-                }
-            }
-
-            // ═══════════════════════════════════════════════════════
-            //  CREATE PIPELINE (cached)
-            // ═══════════════════════════════════════════════════════
 
             auto& cache = framegraph::GetPassResourceCache();
             nvrhi::IDevice* device = cmdList->getDevice();
-
-            auto bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("SkyPass", *vsResult.reflection, *psResult.reflection, device);
-
-            // Render state: no depth write, depth test at far plane
-            nvrhi::RenderState renderState;
-            renderState.blendState.targets[0].setBlendEnable(false);
-            renderState.depthStencilState.setDepthTestEnable(false);  // Sky always at infinity
-            renderState.depthStencilState.setDepthWriteEnable(false);
-            renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
-
-            // Input layout for sky vertices
-            // NVRHI uses arraySize to handle multiple semantic indices (TEXCOORD0, TEXCOORD1)
-            nvrhi::VertexAttributeDesc vertexAttribs[] = {
-                nvrhi::VertexAttributeDesc()
-                    .setName("POSITION")
-                    .setFormat(nvrhi::Format::RGB32_FLOAT)
-                    .setOffset(offsetof(SkyVertex, position))
-                    .setElementStride(sizeof(SkyVertex)),
-                nvrhi::VertexAttributeDesc()
-                    .setName("COLOR")
-                    .setFormat(nvrhi::Format::RGBA8_UNORM)
-                    .setOffset(offsetof(SkyVertex, color))
-                    .setElementStride(sizeof(SkyVertex)),
-                nvrhi::VertexAttributeDesc()
-                    .setName("TEXCOORD")
-                    .setFormat(nvrhi::Format::RGB32_FLOAT)
-                    .setArraySize(2)  // TEXCOORD0 and TEXCOORD1
-                    .setOffset(offsetof(SkyVertex, texcoord0))
-                    .setElementStride(sizeof(SkyVertex)),
-            };
-
-            auto inputLayout = cache.GetOrCreateInputLayout("SkyPass", vertexAttribs, 3, vsResult.handle, device);
-
-            nvrhi::GraphicsPipelineDesc pipelineDesc;
-            pipelineDesc.setVertexShader(vsResult.handle);
-            pipelineDesc.setPixelShader(psResult.handle);
-            pipelineDesc.addBindingLayout(bindingLayout);
-            pipelineDesc.setInputLayout(inputLayout);
-            pipelineDesc.setRenderState(renderState);
-            pipelineDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
-
-            nvrhi::FramebufferInfoEx fbInfo;
-            fbInfo.addColorFormat(colorRT->getDesc().format);
-
-            auto pipeline = cache.GetOrCreatePipeline("SkyPass", pipelineDesc, fbInfo, device);
-
-            if (!pipeline) {
-                Msg("! [SkyPass] Failed to create pipeline");
-                return;
-            }
 
             // ═══════════════════════════════════════════════════════
             //  CREATE CONSTANT BUFFERS
@@ -343,12 +327,15 @@ framegraph::VirtualResourceHandle setupSkyPass(
             if (!sky0Tex) sky0Tex = data.passState->placeholderCubemap.Get();
             if (!sky1Tex) sky1Tex = data.passState->placeholderCubemap.Get();
 
-            framegraph::BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device, "Sky");
+            auto* vsRefl = RImplementation.m_shaderLoader->GetCachedReflection("sky_forward", ".vs");
+            auto* psRefl = RImplementation.m_shaderLoader->GetCachedReflection("sky_forward", ".ps");
+            if (!vsRefl || !psRefl) return;
+            framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, device, "Sky");
             bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer);
             bsb.Texture("s_sky0", sky0Tex);
             bsb.Texture("s_sky1", sky1Tex);
 
-            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), bindingLayout, device);
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->bindingLayout, device);
 
             // ═══════════════════════════════════════════════════════
             //  RENDER SKY
@@ -372,7 +359,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
             viewport.maxZ = 1.0f;
 
             nvrhi::GraphicsState state;
-            state.pipeline = pipeline;
+            state.pipeline = data.passState->pipeline;
             state.framebuffer = framebuffer;
             state.viewport.addViewportAndScissorRect(viewport);
             state.addBindingSet(bindingSet);

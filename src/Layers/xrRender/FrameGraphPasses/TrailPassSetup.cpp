@@ -184,7 +184,7 @@ static void EnsureDummyStateBuffer(nvrhi::IDevice* nvDevice, TrailPassState& sta
 //  Pipeline initialization
 // ═══════════════════════════════════════════════════════
 
-void InitializeTrailResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, TrailPassState& state)
+void InitializeTrailResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, TrailPassState& state)
 {
     if (state.initialized)
         return;
@@ -200,7 +200,6 @@ void InitializeTrailResources(ng::RenderDevice* device, nvrhi::IFramebuffer* fra
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
     auto& cache = GetPassResourceCache();
-    auto fbInfo = framebuffer->getFramebufferInfo();
 
     // Load trail VS (SV_VertexID driven, no input layout)
     auto vsResult = shaderLoader->LoadVertexShader("trail", "main");
@@ -267,6 +266,13 @@ TrailPassOutput setupTrailPass(
     u32 height,
     TrailPassState* state)
 {
+    if (state) {
+        nvrhi::FramebufferInfoEx fbInfo;
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+        fbInfo.depthFormat = nvrhi::Format::D32;
+        InitializeTrailResources(device, fbInfo, *state);
+    }
+
     auto& passData = fg.addCallbackPass<TrailPassData>(
         "Trail",
         [&, width, height, state](FrameGraph& builder, PassHandle passHandle, TrailPassData& data) {
@@ -309,8 +315,6 @@ TrailPassOutput setupTrailPass(
             if (!framebuffer)
                 return;
 
-            // Always initialize pipeline/layout (smoke draw pass depends on this)
-            InitializeTrailResources(data.device, framebuffer, *data.passState);
             if (!data.passState->initialized)
                 return;
 
@@ -327,11 +331,8 @@ TrailPassOutput setupTrailPass(
             auto groups = SplitTrailGroups(st.points, st.pointCount);
 
             // Constant buffers
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("TrailPass", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             auto trailParamsCB = cache.GetOrCreateVolatileCB("TrailPass", "TrailParams", sizeof(TrailParamsCB), data.device);
-
-            auto staticGlobals = BuildStaticGlobals();
-            cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
             const auto& rtDesc = colorRT->getDesc();
             nvrhi::Viewport viewport(

@@ -86,7 +86,6 @@ static void InitSmokeComputePipelines(ng::RenderDevice* device, SmokeTrailPassSt
 
 static void InitSmokeDrawPipeline(
     ng::RenderDevice* device,
-    nvrhi::IFramebuffer* framebuffer,
     SmokeTrailPassState& state)
 {
     if (state.drawPipeline)
@@ -130,7 +129,9 @@ static void InitSmokeDrawPipeline(
 
     state.drawLayout = cache.GetOrCreateBindingLayoutFromReflection("SmokeTrail_Draw", *vsResult.reflection, *psResult.reflection, nvDevice);
 
-    auto fbInfo = framebuffer->getFramebufferInfo();
+    nvrhi::FramebufferInfo fbInfo;
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    fbInfo.depthFormat = nvrhi::Format::D32;
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
     pipeDesc.VS = state.drawVS;  // Dedicated smoke trail VS (no subdivision)
@@ -216,6 +217,8 @@ DefaultOutputLayout setupSmokeTrailPass(
     SmokeTrailPassState&             state,
     nvrhi::ITexture*                 perlin4dVolume)
 {
+    InitSmokeComputePipelines(device, state);
+
     // ── Pass 1: Emit ──
     fg.addCallbackPass<SmokeEmitPassData>(
         "SmokeEmit",
@@ -234,7 +237,6 @@ DefaultOutputLayout setupSmokeTrailPass(
             if (!mgr || !mgr->IsReady())
                 return;
 
-            InitSmokeComputePipelines(data.device, *st);
             if (!st->emitPipeline)
                 return;
 
@@ -256,7 +258,7 @@ DefaultOutputLayout setupSmokeTrailPass(
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer())
                .BufferUAV("g_StateBuffer", mgr->GetStateBuffer());
             auto bindDesc = bsb.Build();
-            auto bindSet = nvDevice->createBindingSet(bindDesc, st->emitLayout);
+            auto bindSet = cache.GetOrCreateBindingSet(bindDesc, st->emitLayout, nvDevice);
 
             nvrhi::ComputeState cs;
             cs.pipeline = st->emitPipeline;
@@ -287,7 +289,6 @@ DefaultOutputLayout setupSmokeTrailPass(
             if (!mgr || !mgr->IsReady())
                 return;
 
-            InitSmokeComputePipelines(data.device, *st);
             if (!st->simPipeline)
                 return;
 
@@ -305,7 +306,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             bsb.ConstantBuffer("SmokeSimCB", simCB)
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer());
             auto bindDesc = bsb.Build();
-            auto bindSet = nvDevice->createBindingSet(bindDesc, st->simLayout);
+            auto bindSet = cache.GetOrCreateBindingSet(bindDesc, st->simLayout, nvDevice);
 
             nvrhi::ComputeState cs;
             cs.pipeline = st->simPipeline;
@@ -336,7 +337,6 @@ DefaultOutputLayout setupSmokeTrailPass(
             if (!mgr || !mgr->IsReady())
                 return;
 
-            InitSmokeComputePipelines(data.device, *st);
             if (!st->compactPipeline)
                 return;
 
@@ -357,7 +357,7 @@ DefaultOutputLayout setupSmokeTrailPass(
                .BufferUAV("g_DrawArgs", mgr->GetDrawArgsBuffer())
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer());
             auto bindDesc = bsb.Build();
-            auto bindSet = nvDevice->createBindingSet(bindDesc, st->compactLayout);
+            auto bindSet = cache.GetOrCreateBindingSet(bindDesc, st->compactLayout, nvDevice);
 
             nvrhi::ComputeState cs;
             cs.pipeline = st->compactPipeline;
@@ -368,6 +368,8 @@ DefaultOutputLayout setupSmokeTrailPass(
     );
 
     // ── Pass 4: Draw (smoke_trail.vs pipeline with drawIndirect) ──
+    InitSmokeDrawPipeline(device, state);
+
     auto& passData = fg.addCallbackPass<SmokeDrawPassData>(
         "SmokeDraw",
         [&](FrameGraph& builder, PassHandle passHandle, SmokeDrawPassData& data)
@@ -415,19 +417,14 @@ DefaultOutputLayout setupSmokeTrailPass(
             if (!framebuffer)
                 return;
 
-            // Initialize smoke draw pipeline (own VS, needs framebuffer)
-            InitSmokeDrawPipeline(data.device, framebuffer, *st);
             if (!st->drawPipeline)
                 return;
 
             // Constant buffers (writeBuffer BEFORE setGraphicsState)
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB(
-                "SmokeDraw", "StaticGlobals", sizeof(StaticGlobals), data.device);
+                "Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             auto trailParamsCB = cache.GetOrCreateVolatileCB(
                 "SmokeDraw", "TrailParams", sizeof(TrailParamsCB), data.device);
-
-            auto staticGlobals = BuildStaticGlobals();
-            cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
             // Trail params — no camera dependency, stored direction
             TrailParamsCB params = {};

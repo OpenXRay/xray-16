@@ -17,7 +17,7 @@
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, TransparentPassState& state)
+void InitializeTransparentResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, TransparentPassState& state)
 {
     if (state.initialized)
         return;
@@ -79,7 +79,7 @@ void InitializeTransparentResources(ng::RenderDevice* device, nvrhi::IFramebuffe
     rt0.destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
     rt0.blendOpAlpha = nvrhi::BlendOp::Add;
 
-    state.pipeline = cache.GetOrCreatePipeline("TransparentPass", pipeDesc, framebuffer->getFramebufferInfo(), nvDevice);
+    state.pipeline = cache.GetOrCreatePipeline("TransparentPass", pipeDesc, fbInfo, nvDevice);
     if (!state.pipeline)
         return;
 
@@ -102,6 +102,14 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     if (!config.IsValid()) {
         return inputs;
     }
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
+    fbInfo.depthFormat = nvrhi::Format::D32;
+    InitializeTransparentResources(device, fbInfo, state);
 
     auto& passData = fg.addCallbackPass<TransparentPassData>(
         "Transparent Pass",
@@ -155,7 +163,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             if (!framebuffer)
                 return;
 
-            InitializeTransparentResources(data.device, framebuffer, *data.passState);
             if (!data.passState->initialized || !data.passState->pipeline)
                 return;
 
@@ -163,14 +170,11 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             auto& matBuffer = MaterialBuffer::Instance();
 
             auto lightingCB = cache.GetOrCreateVolatileCB("TransparentPass", "LightingCB", sizeof(LightingConstants), data.device);
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("TransparentPass", "StaticGlobalsCB", sizeof(StaticGlobals), data.device);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("TransparentPass", nvDevice);
 
             auto lightingData = FillLightingConstants();
             cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
-
-            auto staticGlobals = BuildStaticGlobals();
-            cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
             const auto& cfg = data.config;
 

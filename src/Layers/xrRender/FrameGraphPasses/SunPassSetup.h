@@ -36,6 +36,9 @@ struct SunPassState {
     nvrhi::TextureHandle placeholderTexture;
     nvrhi::BufferHandle vertexBuffer;
     nvrhi::BufferHandle indexBuffer;
+    nvrhi::GraphicsPipelineHandle pipeline;
+    nvrhi::BindingLayoutHandle bindingLayout;
+    nvrhi::InputLayoutHandle inputLayout;
     bool initialized = false;
 };
 

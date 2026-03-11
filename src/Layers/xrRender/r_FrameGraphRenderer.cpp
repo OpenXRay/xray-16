@@ -56,6 +56,7 @@
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "FrameGraphPasses/ShaderConstants.h"
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -205,9 +206,6 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     //  INITIALIZE PASS RESOURCES
     // ═══════════════════════════════════════════════════════
     m_passStates = xr_make_unique<passes::PassStates>();
-    passes::InitializeSkyGeometry(device, m_passStates->sky);
-    passes::InitializeSunPass(device, m_passStates->sun);
-    passes::InitializeTonemapPass(device->GetNVRHIDevice(), m_passStates->tonemap);
 
     // ═══════════════════════════════════════════════════════
     //  PROFILER (GPU timing + ImGui overlay)
@@ -393,12 +391,6 @@ void FrameGraphRenderer::Render() {
                     if (m_passStates)
                     {
                         m_passStates->ResetAll();
-
-                        // These passes have persistent resources initialized outside setup,
-                        // so ensure they're available immediately after hot-reload.
-                        passes::InitializeSkyGeometry(m_device, m_passStates->sky);
-                        passes::InitializeSunPass(m_device, m_passStates->sun);
-                        passes::InitializeTonemapPass(m_device->GetNVRHIDevice(), m_passStates->tonemap);
                     }
 
                     if (m_detailManager)
@@ -439,6 +431,22 @@ void FrameGraphRenderer::Render() {
     {
         ZoneScopedN("FG::Compile");
         m_framegraph->Compile();
+    }
+
+    {
+        auto& cache = framegraph::GetPassResourceCache();
+        auto* cmdList = m_renderContext->GetCommandList();
+
+        auto sgCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals",
+            sizeof(passes::StaticGlobals), m_device);
+        auto sg = passes::BuildStaticGlobals();
+        cmdList->writeBuffer(sgCB, &sg, sizeof(sg));
+
+        auto dtCB = cache.GetOrCreateVolatileCB("Frame", "DynamicTransforms",
+            sizeof(passes::DynamicTransforms), m_device);
+        passes::DynamicTransforms dt = {};
+        passes::FillDynamicTransforms(dt);
+        cmdList->writeBuffer(dtCB, &dt, sizeof(dt));
     }
 
     // Execute the compiled graph (FrameGraph orchestrates all passes)
@@ -588,6 +596,7 @@ void FrameGraphRenderer::RenderMenu() {
     // Renders directly to backbuffer (Frostbite pattern)
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
+        m_device,
         sceneWithUI,  // HDR input (RGBA16_FLOAT)
         framegraph::VirtualResourceHandle(),  // No exposure for menu
         backbufferHandle,  // Output directly to imported backbuffer
@@ -1542,7 +1551,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     if (particleOutputs.distortionRT.is_valid()) {
         sceneColor = passes::setupDistortionApplyPass(
-            *m_framegraph, sceneColor, particleOutputs.distortionRT,
+            *m_framegraph, m_device, sceneColor, particleOutputs.distortionRT,
             particleOutputs.layout.worldPos, width, height,
             m_passStates->distortionApply);
     }
@@ -1735,6 +1744,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // Renders directly to backbuffer if available (Frostbite pattern)
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
+        m_device,
         sceneWithUI,
         exposureOutput.exposureTexture,
         backbufferHandle,

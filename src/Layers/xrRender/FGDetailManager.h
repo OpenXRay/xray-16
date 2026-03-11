@@ -260,11 +260,6 @@ public:
 
     nvrhi::BufferHandle cachedDummySlotIndirection;
 
-    ng::BufferHandle cachedDynTransformsCB;
-    ng::BufferHandle cachedShaderParamsCB;
-    ng::BufferHandle cachedStaticGlobalsCB;
-    ng::BufferHandle cachedDetailGlobalsCB;
-    ng::BufferHandle cachedDynLightCB;
     ng::BufferHandle cachedCullParamsCB;
     ng::BufferHandle cachedInstanceGenParamsCB;
 
@@ -318,7 +313,7 @@ public:
     bool LoadCullComputeShader(class framegraph::ShaderLoader* shaderLoader);
     bool LoadInstanceGenShader(class framegraph::ShaderLoader* shaderLoader);
     bool LoadGraphicsShaders(class framegraph::ShaderLoader* shaderLoader);
-    bool CreateGraphicsPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer);
+    bool CreateGraphicsPipeline(ng::RenderDevice* device, const nvrhi::FramebufferInfo& fbInfo);
     bool CreateComputePipeline(ng::RenderDevice* device);
     bool CreateInstanceGenPipeline(ng::RenderDevice* device);
     bool LoadPrefixSumShaders(class framegraph::ShaderLoader* shaderLoader);

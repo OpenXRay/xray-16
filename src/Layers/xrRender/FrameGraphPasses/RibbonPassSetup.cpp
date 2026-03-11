@@ -139,7 +139,7 @@ static void EnsureControlPointBuffer(nvrhi::IDevice* nvDevice, u32 pointCount, R
 //  Pipeline initialization
 // ═══════════════════════════════════════════════════════
 
-void InitializeRibbonResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, RibbonPassState& state)
+void InitializeRibbonResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, RibbonPassState& state)
 {
     if (state.initialized)
         return;
@@ -155,7 +155,6 @@ void InitializeRibbonResources(ng::RenderDevice* device, nvrhi::IFramebuffer* fr
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
     auto& cache = GetPassResourceCache();
-    auto fbInfo = framebuffer->getFramebufferInfo();
 
     // Load GPU ribbon VS (SV_VertexID driven, no input layout)
     auto vsResult = shaderLoader->LoadVertexShader("ribbon", "main");
@@ -219,6 +218,13 @@ RibbonPassOutput setupRibbonPass(
     u32 height,
     RibbonPassState* state)
 {
+    if (state) {
+        nvrhi::FramebufferInfoEx fbInfo;
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+        fbInfo.depthFormat = nvrhi::Format::D32;
+        InitializeRibbonResources(device, fbInfo, *state);
+    }
+
     auto& passData = fg.addCallbackPass<RibbonPassData>(
         "Ribbon",
         [&, width, height, state](FrameGraph& builder, PassHandle passHandle, RibbonPassData& data) {
@@ -264,7 +270,6 @@ RibbonPassOutput setupRibbonPass(
             if (!framebuffer)
                 return;
 
-            InitializeRibbonResources(data.device, framebuffer, *data.passState);
             if (!data.passState->initialized)
                 return;
 
@@ -278,11 +283,8 @@ RibbonPassOutput setupRibbonPass(
             auto groups = SplitRibbonGroups(st.points, st.pointCount);
 
             // Constant buffers
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("RibbonPass", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             auto ribbonParamsCB = cache.GetOrCreateVolatileCB("RibbonPass", "RibbonParams", sizeof(RibbonParamsCB), data.device);
-
-            auto staticGlobals = BuildStaticGlobals();
-            cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
             const auto& rtDesc = colorRT->getDesc();
             nvrhi::Viewport viewport(

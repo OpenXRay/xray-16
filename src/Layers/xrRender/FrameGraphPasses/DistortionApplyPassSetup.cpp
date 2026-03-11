@@ -28,8 +28,46 @@ struct DistortionApplyData {
     DistortionApplyPassState* passState;
 };
 
+void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassState& state) {
+    if (state.initialized || !device) return;
+
+    if (!RImplementation.m_shaderLoader)
+        return;
+
+    auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("fullscreen");
+    auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("distortion_apply");
+    if (!vsResult.handle || !psResult.handle) {
+        state.initialized = true;
+        return;
+    }
+
+    auto& cache = GetPassResourceCache();
+
+    state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "DistortionApply", *vsResult.reflection, *psResult.reflection, device);
+
+    if (state.bindingLayout) {
+        nvrhi::GraphicsPipelineDesc pipeDesc;
+        pipeDesc.setVertexShader(vsResult.handle);
+        pipeDesc.setPixelShader(psResult.handle);
+        pipeDesc.addBindingLayout(state.bindingLayout);
+        pipeDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
+        pipeDesc.renderState.blendState.targets[0].setBlendEnable(false);
+        pipeDesc.renderState.depthStencilState.setDepthTestEnable(false);
+        pipeDesc.renderState.depthStencilState.setDepthWriteEnable(false);
+        pipeDesc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
+
+        nvrhi::FramebufferInfoEx fbInfo;
+        fbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
+
+        state.pipeline = cache.GetOrCreatePipeline("DistortionApply", pipeDesc, fbInfo, device);
+    }
+    state.initialized = true;
+}
+
 VirtualResourceHandle setupDistortionApplyPass(
     FrameGraph& fg,
+    ng::RenderDevice* device,
     VirtualResourceHandle sceneColor,
     VirtualResourceHandle distortionRT,
     VirtualResourceHandle worldPos,
@@ -37,6 +75,9 @@ VirtualResourceHandle setupDistortionApplyPass(
     u32 height,
     DistortionApplyPassState& passState)
 {
+    if (device && device->GetNVRHIDevice())
+        InitializeDistortionApplyPass(device->GetNVRHIDevice(), passState);
+
     ResourceDesc outputDesc;
     outputDesc.type = ResourceDesc::Type::Texture2D;
     outputDesc.width = width;
@@ -75,43 +116,10 @@ VirtualResourceHandle setupDistortionApplyPass(
             nvrhi::IDevice* device = cmdList->getDevice();
             auto& cache = GetPassResourceCache();
 
-            if (!ps->initialized) {
-                if (!RImplementation.m_shaderLoader)
-                    return;
-
-                auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("fullscreen");
-                auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("distortion_apply");
-                if (!vsResult.handle || !psResult.handle)
-                    return;
-
-                ps->bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-                    "DistortionApply", *vsResult.reflection, *psResult.reflection, device);
-
-                if (ps->bindingLayout) {
-                    nvrhi::GraphicsPipelineDesc pipeDesc;
-                    pipeDesc.setVertexShader(vsResult.handle);
-                    pipeDesc.setPixelShader(psResult.handle);
-                    pipeDesc.addBindingLayout(ps->bindingLayout);
-                    pipeDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
-                    pipeDesc.renderState.blendState.targets[0].setBlendEnable(false);
-                    pipeDesc.renderState.depthStencilState.setDepthTestEnable(false);
-                    pipeDesc.renderState.depthStencilState.setDepthWriteEnable(false);
-                    pipeDesc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
-
-                    nvrhi::FramebufferInfoEx fbInfo;
-                    fbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
-
-                    ps->pipeline = cache.GetOrCreatePipeline("DistortionApply", pipeDesc, fbInfo, device);
-                }
-                ps->initialized = true;
-            }
-
             if (!ps->pipeline || !ps->bindingLayout)
                 return;
 
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("DistortionApply", "globals", sizeof(StaticGlobals), ctx->GetDevice());
-            auto staticGlobals = BuildStaticGlobals();
-            cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), ctx->GetDevice());
 
             auto* vsRefl = RImplementation.m_shaderLoader->GetCachedReflection("fullscreen", ".vs");
             auto* psRefl = RImplementation.m_shaderLoader->GetCachedReflection("distortion_apply", ".ps");

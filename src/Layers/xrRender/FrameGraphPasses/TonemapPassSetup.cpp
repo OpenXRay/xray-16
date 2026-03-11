@@ -9,6 +9,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderCache.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render::RENDER_NAMESPACE {
     class CRender;
@@ -37,43 +38,35 @@ void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state) {
     cmdList->close();
     device->executeCommandList(cmdList);
 
+    if (RImplementation.m_shaderLoader) {
+        auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("tonemap");
+        auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("tonemap");
+        if (vsResult.handle && psResult.handle) {
+            auto& cache = framegraph::GetPassResourceCache();
+
+            state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
+                "TonemapPass", *vsResult.reflection, *psResult.reflection, device);
+
+            if (state.bindingLayout) {
+                nvrhi::GraphicsPipelineDesc pipeDesc;
+                pipeDesc.setVertexShader(vsResult.handle);
+                pipeDesc.setPixelShader(psResult.handle);
+                pipeDesc.addBindingLayout(state.bindingLayout);
+                pipeDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
+                pipeDesc.renderState.blendState.targets[0].setBlendEnable(false);
+                pipeDesc.renderState.depthStencilState.setDepthTestEnable(false);
+                pipeDesc.renderState.depthStencilState.setDepthWriteEnable(false);
+                pipeDesc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
+
+                nvrhi::FramebufferInfoEx fbInfo;
+                fbInfo.addColorFormat(nvrhi::Format::RGBA8_UNORM);
+
+                state.pipeline = cache.GetOrCreatePipeline("TonemapPass", pipeDesc, fbInfo, device);
+            }
+        }
+    }
+
     state.initialized = true;
-}
-
-static void EnsureTonemapPipeline(TonemapPassState& state, nvrhi::IDevice* device) {
-    if (state.pipeline)
-        return;
-
-    if (!RImplementation.m_shaderLoader)
-        return;
-
-    auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("tonemap");
-    auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("tonemap");
-    if (!vsResult.handle || !psResult.handle)
-        return;
-
-    auto& cache = framegraph::GetPassResourceCache();
-
-    state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "TonemapPass", *vsResult.reflection, *psResult.reflection, device);
-
-    if (!state.bindingLayout)
-        return;
-
-    nvrhi::GraphicsPipelineDesc pipeDesc;
-    pipeDesc.setVertexShader(vsResult.handle);
-    pipeDesc.setPixelShader(psResult.handle);
-    pipeDesc.addBindingLayout(state.bindingLayout);
-    pipeDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
-    pipeDesc.renderState.blendState.targets[0].setBlendEnable(false);
-    pipeDesc.renderState.depthStencilState.setDepthTestEnable(false);
-    pipeDesc.renderState.depthStencilState.setDepthWriteEnable(false);
-    pipeDesc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
-
-    nvrhi::FramebufferInfoEx fbInfo;
-    fbInfo.addColorFormat(nvrhi::Format::RGBA8_UNORM);
-
-    state.pipeline = cache.GetOrCreatePipeline("TonemapPass", pipeDesc, fbInfo, device);
 }
 
 void ShutdownTonemapPass(TonemapPassState& state) {
@@ -85,6 +78,7 @@ void ShutdownTonemapPass(TonemapPassState& state) {
 
 framegraph::VirtualResourceHandle setupTonemapPass(
     framegraph::FrameGraph& fg,
+    ng::RenderDevice* device,
     framegraph::VirtualResourceHandle hdrInput,
     framegraph::VirtualResourceHandle exposureTexture,
     framegraph::VirtualResourceHandle outputTarget,
@@ -94,6 +88,9 @@ framegraph::VirtualResourceHandle setupTonemapPass(
     const ExposurePassState* exposureState)
 {
     using namespace framegraph;
+
+    if (device && device->GetNVRHIDevice())
+        InitializeTonemapPass(device->GetNVRHIDevice(), tonemapState);
 
     bool hasExposure = exposureTexture.is_valid();
     bool hasOutputTarget = outputTarget.is_valid();
@@ -140,7 +137,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             nvrhi::IDevice* device = cmdList->getDevice();
 
-            EnsureTonemapPipeline(*ps, device);
             if (!ps->pipeline || !ps->bindingLayout)
                 return;
 

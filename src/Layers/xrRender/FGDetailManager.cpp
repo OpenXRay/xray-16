@@ -1283,27 +1283,7 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
     ng::RenderDevice::BufferDesc cbDesc;
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-
     cbDesc.maxVersions = 512;
-    cbDesc.byteSize = sizeof(passes::DynamicTransforms);
-    cbDesc.debugName = "DynTransforms_Detail";
-    cachedDynTransformsCB = renderDevice->CreateBuffer(cbDesc);
-
-    cbDesc.byteSize = 32;
-    cbDesc.debugName = "ShaderParams_Detail";
-    cachedShaderParamsCB = renderDevice->CreateBuffer(cbDesc);
-
-    cbDesc.byteSize = sizeof(passes::StaticGlobals);
-    cbDesc.debugName = "StaticGlobals_Detail";
-    cachedStaticGlobalsCB = renderDevice->CreateBuffer(cbDesc);
-
-    cbDesc.byteSize = sizeof(DetailFrameConstants);
-    cbDesc.debugName = "DetailGlobals";
-    cachedDetailGlobalsCB = renderDevice->CreateBuffer(cbDesc);
-
-    cbDesc.byteSize = 48;
-    cbDesc.debugName = "DynLight_Detail";
-    cachedDynLightCB = renderDevice->CreateBuffer(cbDesc);
 
     cbDesc.byteSize = sizeof(DetailCullParams);
     cbDesc.debugName = "DetailCullParams";
@@ -1404,11 +1384,6 @@ void FGDetailManager::DestroyGPUBuffers()
     cachedSmp_LinearClamp = nullptr;
     cachedSmp_AnisoWrap = nullptr;
     cachedDummySlotIndirection = nullptr;
-    cachedDynTransformsCB = ng::BufferHandle();
-    cachedShaderParamsCB = ng::BufferHandle();
-    cachedStaticGlobalsCB = ng::BufferHandle();
-    cachedDetailGlobalsCB = ng::BufferHandle();
-    cachedDynLightCB = ng::BufferHandle();
     cachedCullParamsCB = ng::BufferHandle();
     cachedInstanceGenParamsCB = ng::BufferHandle();
     cachedGrassTintsBuffer = nullptr;
@@ -2038,9 +2013,9 @@ bool FGDetailManager::CreateInstanceGenPipeline(ng::RenderDevice* renderDevice)
     return true;
 }
 
-bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvrhi::IFramebuffer* framebuffer)
+bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, const nvrhi::FramebufferInfo& fbInfo)
 {
-    if (!renderDevice || !framebuffer || !vertexShader || !pixelShader)
+    if (!renderDevice || !vertexShader || !pixelShader)
     {
         Msg("! [FGDetailManager] CreateGraphicsPipeline: invalid parameters");
         return false;
@@ -2129,7 +2104,7 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
 
     pipelineDesc.renderState.blendState.targets[0].disableBlend();
 
-    graphicsPipeline = device->createGraphicsPipeline(pipelineDesc, framebuffer);
+    graphicsPipeline = device->createGraphicsPipeline(pipelineDesc, fbInfo);
     if (!graphicsPipeline)
     {
         Msg("! [FGDetailManager] Failed to create graphics pipeline");
@@ -2149,7 +2124,7 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
                 decalPipeDesc.bindingLayouts.push_back(bindlessLayout);
         }
 
-        decalGraphicsPipeline = device->createGraphicsPipeline(decalPipeDesc, framebuffer);
+        decalGraphicsPipeline = device->createGraphicsPipeline(decalPipeDesc, fbInfo);
         if (!decalGraphicsPipeline)
         {
             Msg("! [FGDetailManager] Failed to create decal graphics pipeline");
@@ -2177,7 +2152,7 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
                 bbPipeDesc.bindingLayouts.push_back(bindlessLayout);
         }
 
-        billboardGraphicsPipeline = device->createGraphicsPipeline(bbPipeDesc, framebuffer);
+        billboardGraphicsPipeline = device->createGraphicsPipeline(bbPipeDesc, fbInfo);
         if (!billboardGraphicsPipeline)
             Msg("! [FGDetailManager] Failed to create billboard graphics pipeline");
     }

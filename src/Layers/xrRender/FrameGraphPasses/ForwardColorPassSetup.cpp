@@ -31,7 +31,7 @@ namespace xray::render::RENDER_NAMESPACE
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-void InitializeForwardResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ForwardColorPassState& state)
+void InitializeForwardResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ForwardColorPassState& state)
 {
     if (state.bindlessInitialized)
         return;
@@ -90,13 +90,40 @@ void InitializeForwardResources(ng::RenderDevice* device, nvrhi::IFramebuffer* f
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-    state.bindlessPipeline = cache.GetOrCreatePipeline("ForwardColor", pipeDesc, framebuffer->getFramebufferInfo(), nvDevice);
+    state.bindlessPipeline = cache.GetOrCreatePipeline("ForwardColor", pipeDesc, fbInfo, nvDevice);
     if (!state.bindlessPipeline) {
         Msg("! [BindlessForward] Failed to create pipeline");
         return;
     }
 
     QueryBindingLayoutFromPipeline(state.bindlessPipeline, state.bindlessLayout);
+
+    auto terrainPsResult = shaderLoader->LoadPixelShader("bindless_terrain", "main");
+    if (terrainPsResult.handle) {
+        state.terrainPS = terrainPsResult.handle;
+        state.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection(
+            "ForwardColor_Terrain", *vsResult.reflection, *terrainPsResult.reflection, nvDevice);
+
+        if (state.terrainLayout) {
+            nvrhi::GraphicsPipelineDesc terrainPipeDesc;
+            terrainPipeDesc.VS = state.bindlessVS;
+            terrainPipeDesc.PS = state.terrainPS;
+            terrainPipeDesc.inputLayout = state.bindlessInputLayout;
+            if (bindlessLayout)
+                terrainPipeDesc.bindingLayouts = { state.terrainLayout, bindlessLayout };
+            else
+                terrainPipeDesc.bindingLayouts = { state.terrainLayout };
+            terrainPipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
+            terrainPipeDesc.renderState.depthStencilState.depthTestEnable = true;
+            terrainPipeDesc.renderState.depthStencilState.depthWriteEnable = true;
+            terrainPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+            terrainPipeDesc.renderState.rasterState.frontCounterClockwise = false;
+            terrainPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+            state.terrainPipeline = cache.GetOrCreatePipeline("ForwardColor_Terrain", terrainPipeDesc, fbInfo, nvDevice);
+            if (state.terrainPipeline)
+                state.terrainInitialized = true;
+        }
+    }
 
     state.bindlessInitialized = true;
     Msg("* [BindlessForward] Pipeline initialized");
@@ -150,18 +177,12 @@ static void renderBindlessForward(
     auto& cache = framegraph::GetPassResourceCache();
     auto framebuffer = cache.GetOrCreateFramebuffer("ForwardColor", fbDesc, nvDevice);
 
-    InitializeForwardResources(device, framebuffer, ps);
-
     auto lightingCB = cache.GetOrCreateVolatileCB("ForwardColor", "LightingCB", sizeof(LightingConstants), device);
-    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ForwardColor", "StaticGlobalsCB", sizeof(StaticGlobals), device, 1024);
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), device);
     auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("ForwardColor", nvDevice);
 
     auto lightingData = FillLightingConstants();
     cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
-
-    auto staticGlobals = BuildStaticGlobals();
-
-    cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
     auto& variantTexBuffer = bindless::VariantTextureBuffer::Instance();
 
@@ -284,52 +305,6 @@ static void renderBindlessForward(
     if (config.HasTerrain() && config.UseMegaBuffers()) {
         R_ASSERT2(config.UseTerrainCompaction(), "Terrain compaction buffers missing");
 
-        // Lazy init terrain pipeline
-        if (!ps.terrainInitialized) {
-            auto* shaderLoader = GEnv.Render->GetShaderLoader();
-            if (shaderLoader) {
-                auto terrainPsResult = shaderLoader->LoadPixelShader("bindless_terrain", "main");
-                if (terrainPsResult.handle) {
-                    ps.terrainPS = terrainPsResult.handle;
-
-                    auto* vsRefl = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
-                    ps.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection("ForwardColor_Terrain", *vsRefl, *terrainPsResult.reflection, nvDevice);
-
-                    if (ps.terrainLayout && ps.bindlessVS) {
-                        nvrhi::GraphicsPipelineDesc terrainPipeDesc;
-                        terrainPipeDesc.VS = ps.bindlessVS;
-                        terrainPipeDesc.PS = ps.terrainPS;
-                        terrainPipeDesc.inputLayout = ps.bindlessInputLayout;
-
-                        auto* backendDevice = device->GetBackend();
-                        nvrhi::IBindingLayout* bindlessLayout = backendDevice ? backendDevice->GetBindlessLayout() : nullptr;
-                        if (bindlessLayout) {
-                            terrainPipeDesc.bindingLayouts = { ps.terrainLayout, bindlessLayout };
-                            Msg("* [TerrainForward] Pipeline created WITH bindless layout");
-                        } else {
-                            terrainPipeDesc.bindingLayouts = { ps.terrainLayout };
-                            Msg("! [TerrainForward] Pipeline created WITHOUT bindless layout - textures will be black!");
-                        }
-
-                        terrainPipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-                        terrainPipeDesc.renderState.depthStencilState.depthTestEnable = true;
-                        terrainPipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-                        terrainPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-                        terrainPipeDesc.renderState.rasterState.frontCounterClockwise = false;
-                        terrainPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-                        ps.terrainPipeline = cache.GetOrCreatePipeline("ForwardColor_Terrain", terrainPipeDesc, framebuffer->getFramebufferInfo(), nvDevice);
-                        if (ps.terrainPipeline) {
-                            ps.terrainInitialized = true;
-                            Msg("* [BindlessForward] Terrain pipeline initialized");
-                        }
-                    }
-                }
-            }
-        }
-
-        // Render terrain if pipeline is ready
-        R_ASSERT2(ps.terrainInitialized && ps.terrainPipeline, "Terrain pipeline not initialized");
         if (ps.terrainInitialized && ps.terrainPipeline) {
             // Upload terrain materials
             auto& terrainMatBuffer = bindless::TerrainMaterialBuffer::Instance();
@@ -405,6 +380,16 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     ForwardColorPassState* state)
 {
     using namespace framegraph;
+
+    if (state) {
+        nvrhi::FramebufferInfoEx fbInfo;
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
+        fbInfo.depthFormat = nvrhi::Format::D32;
+        InitializeForwardResources(device, fbInfo, *state);
+    }
 
     auto& passData = fg.addCallbackPass<ForwardColorPassData>(
         "Forward+ Color Pass",

@@ -114,7 +114,8 @@ MotionVectorOutput setupMotionVectorPass(
                .Texture("t_Depth", depthTex)
                .TextureUAV("u_MotionVectors", mvTex);
             auto bindDesc = bsb.Build();
-            auto bindingSet = nvDevice->createBindingSet(bindDesc, data.state->layout);
+            auto& cache = GetPassResourceCache();
+            auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, data.state->layout, nvDevice);
 
             ctx->SetComputePipeline(data.state->pipeline.Get());
             ctx->SetComputeBindingSet(0, bindingSet.Get());

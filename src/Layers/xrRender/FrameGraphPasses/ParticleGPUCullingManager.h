@@ -4,7 +4,6 @@
 
 #include "PassVertexFormats.h"
 #include "xrCore/xrCore.h"
-#include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -112,9 +111,6 @@ private:
     nvrhi::BufferHandle m_visibleCountBuffer;    // Output: visible count (single u32)
     nvrhi::BufferHandle m_vertexBuffer;          // Output: billboard vertices
     nvrhi::BufferHandle m_drawArgsBuffer;        // Output: indirect draw args
-
-    ng::BufferHandle m_cullParamsCB;
-    ng::BufferHandle m_billboardParamsCB;
 
     // Samplers
     nvrhi::SamplerHandle m_pointClampSampler;

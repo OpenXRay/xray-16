@@ -231,7 +231,7 @@ HiZPyramidOutput setupHiZBuildPass(
                 bsb.TextureUAV("g_output_hiz", hizTexture, nvrhi::Format::R32_FLOAT, outputSubres);
                 bsb.ConstantBuffer("HiZParams", hizCB);
 
-                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), data.passState->layout);
+                nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
 
                 if (!bindingSet) {
                     Msg("! [HiZBuild] Failed to create binding set for mip %d", mip);

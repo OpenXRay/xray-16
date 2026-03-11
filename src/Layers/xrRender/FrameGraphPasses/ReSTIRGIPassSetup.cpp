@@ -484,7 +484,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
             bsb.TextureUAV("u_DirectLighting", directLit);
             bsb.TextureUAV("u_ReservoirA", resA);
             bsb.TextureUAV("u_ReservoirB", resB);
-            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->initialLayout);
+            auto& cache = GetPassResourceCache();
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->initialLayout, nvDevice);
             if (!bindingSet) return;
 
             nvrhi::ComputeState cs;
@@ -573,7 +574,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 bsb.Texture("t_PrevWorldPos", prevWorldPosTex);
                 bsb.TextureUAV("u_ReservoirA", data.state->reservoirA[data.writeIdx]);
                 bsb.TextureUAV("u_ReservoirB", data.state->reservoirB[data.writeIdx]);
-                auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->temporalLayout);
+                auto& cache = GetPassResourceCache();
+                auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->temporalLayout, nvDevice);
                 if (!bindingSet) return;
 
                 nvrhi::ComputeState cs;
@@ -655,7 +657,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
             bsb.Texture("t_SceneColorIn", sceneColorInTex);
             bsb.Texture("t_WorldPos", worldPosTex);
             bsb.TextureUAV("u_SceneColor", outTex);
-            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->compositeLayout);
+            auto& cache = GetPassResourceCache();
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->compositeLayout, nvDevice);
             if (!bindingSet) return;
 
             nvrhi::ComputeState cs;

@@ -33,7 +33,7 @@ struct DecalPassData {
     u32 width, height;
 };
 
-static void InitializeDecalResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, DecalPassState& state)
+static void InitializeDecalResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, DecalPassState& state)
 {
     if (state.initialized)
         return;
@@ -59,8 +59,6 @@ static void InitializeDecalResources(ng::RenderDevice* device, nvrhi::IFramebuff
 
     state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
         "Decal", *vsResult.reflection, *psResult.reflection, nvDevice);
-
-    auto fbInfo = framebuffer->getFramebufferInfo();
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
     pipeDesc.setVertexShader(state.vs);
@@ -97,6 +95,10 @@ DefaultOutputLayout setupDecalPass(
     u32 width, u32 height,
     DecalPassState& state)
 {
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    InitializeDecalResources(device, fbInfo, state);
+
     auto& passData = fg.addCallbackPass<DecalPassData>(
         "Decals",
 
@@ -135,13 +137,10 @@ DefaultOutputLayout setupDecalPass(
             fbDesc.addColorAttachment(colorTex);
             auto framebuffer = cache.GetOrCreateFramebuffer("Decal", fbDesc, nvDevice);
 
-            InitializeDecalResources(data.device, framebuffer, *data.passState);
             if (!data.passState->initialized)
                 return;
 
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Decal", "globals", sizeof(StaticGlobals), data.device);
-            auto staticGlobals = BuildStaticGlobals();
-            cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
 
             auto* vsReflection = RImplementation.m_shaderLoader->GetCachedReflection("decal_box", ".vs");
             auto* psReflection = RImplementation.m_shaderLoader->GetCachedReflection("decal_box", ".ps");

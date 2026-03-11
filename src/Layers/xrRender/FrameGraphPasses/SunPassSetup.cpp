@@ -62,6 +62,62 @@ void InitializeSunPass(ng::RenderDevice* device, SunPassState& state) {
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
 
+    if (!RImplementation.m_shaderLoader)
+        return;
+
+    auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("sun_forward");
+    auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("sun_forward");
+
+    if (!vsResult.handle || !psResult.handle)
+        return;
+
+    auto& cache = framegraph::GetPassResourceCache();
+
+    state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("SunPass", *vsResult.reflection, *psResult.reflection, nvrhiDevice);
+
+    nvrhi::VertexAttributeDesc vertexAttribs[] = {
+        nvrhi::VertexAttributeDesc()
+            .setName("POSITION")
+            .setFormat(nvrhi::Format::RGB32_FLOAT)
+            .setOffset(offsetof(SunVertex, position))
+            .setElementStride(sizeof(SunVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("COLOR")
+            .setFormat(nvrhi::Format::RGBA8_UNORM)
+            .setOffset(offsetof(SunVertex, color))
+            .setElementStride(sizeof(SunVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("TEXCOORD")
+            .setFormat(nvrhi::Format::RG32_FLOAT)
+            .setOffset(offsetof(SunVertex, u))
+            .setElementStride(sizeof(SunVertex)),
+    };
+
+    state.inputLayout = cache.GetOrCreateInputLayout(
+        "SunPass", vertexAttribs, std::size(vertexAttribs), vsResult.handle, nvrhiDevice);
+
+    nvrhi::RenderState renderState;
+    renderState.blendState.targets[0].setBlendEnable(true);
+    renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::One);
+    renderState.blendState.targets[0].setDestBlend(nvrhi::BlendFactor::One);
+    renderState.blendState.targets[0].setBlendOp(nvrhi::BlendOp::Add);
+    renderState.depthStencilState.setDepthTestEnable(false);
+    renderState.depthStencilState.setDepthWriteEnable(false);
+    renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
+
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+    pipelineDesc.inputLayout = state.inputLayout;
+    pipelineDesc.VS = vsResult.handle;
+    pipelineDesc.PS = psResult.handle;
+    pipelineDesc.bindingLayouts = { state.bindingLayout };
+    pipelineDesc.renderState = renderState;
+    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+
+    state.pipeline = cache.GetOrCreatePipeline("SunPass", pipelineDesc, fbInfo, nvrhiDevice);
+
     state.initialized = true;
 }
 
@@ -69,6 +125,9 @@ void ShutdownSunPass(SunPassState& state) {
     state.placeholderTexture = nullptr;
     state.vertexBuffer = nullptr;
     state.indexBuffer = nullptr;
+    state.pipeline = nullptr;
+    state.bindingLayout = nullptr;
+    state.inputLayout = nullptr;
     state.initialized = false;
 }
 
@@ -82,6 +141,8 @@ framegraph::VirtualResourceHandle setupSunPass(
     SunPassState& sunState)
 {
     using namespace framegraph;
+
+    InitializeSunPass(device, sunState);
 
     auto& passData = fg.addCallbackPass<SunPassData>(
         "Sun",
@@ -213,102 +274,26 @@ framegraph::VirtualResourceHandle setupSunPass(
 
             cmdList->writeBuffer(data.passState->vertexBuffer, vertices, sizeof(vertices));
 
-            // ═══════════════════════════════════════════════════════
-            //  LOAD SUN SHADER
-            // ═══════════════════════════════════════════════════════
-
-            if (!RImplementation.m_shaderLoader) {
-                Msg("! [SunPass] ShaderLoader not initialized");
+            if (!data.passState->pipeline)
                 return;
-            }
-
-            auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("sun_forward");
-            auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("sun_forward");
-
-            if (!vsResult.handle || !psResult.handle) {
-                Msg("! [SunPass] Failed to load sun shaders");
-                return;
-            }
-
-            // ═══════════════════════════════════════════════════════
-            //  CREATE PIPELINE (cached)
-            // ═══════════════════════════════════════════════════════
 
             auto& cache = framegraph::GetPassResourceCache();
             nvrhi::IDevice* device = cmdList->getDevice();
 
-            // Input layout
-            nvrhi::VertexAttributeDesc vertexAttribs[] = {
-                nvrhi::VertexAttributeDesc()
-                    .setName("POSITION")
-                    .setFormat(nvrhi::Format::RGB32_FLOAT)
-                    .setOffset(offsetof(SunVertex, position))
-                    .setElementStride(sizeof(SunVertex)),
-                nvrhi::VertexAttributeDesc()
-                    .setName("COLOR")
-                    .setFormat(nvrhi::Format::RGBA8_UNORM)
-                    .setOffset(offsetof(SunVertex, color))
-                    .setElementStride(sizeof(SunVertex)),
-                nvrhi::VertexAttributeDesc()
-                    .setName("TEXCOORD")
-                    .setFormat(nvrhi::Format::RG32_FLOAT)
-                    .setOffset(offsetof(SunVertex, u))
-                    .setElementStride(sizeof(SunVertex)),
-            };
-
-            auto inputLayout = cache.GetOrCreateInputLayout(
-                "SunPass", vertexAttribs, std::size(vertexAttribs), vsResult.handle, device);
-
-            auto bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("SunPass", *vsResult.reflection, *psResult.reflection, device);
-
-            // Render state: additive blending, no depth write
-            nvrhi::RenderState renderState;
-            renderState.blendState.targets[0].setBlendEnable(true);
-            renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::One);
-            renderState.blendState.targets[0].setDestBlend(nvrhi::BlendFactor::One);
-            renderState.blendState.targets[0].setBlendOp(nvrhi::BlendOp::Add);
-            renderState.depthStencilState.setDepthTestEnable(false);
-            renderState.depthStencilState.setDepthWriteEnable(false);
-            renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
-
-            // Get color RT
             nvrhi::ITexture* colorRT = fg.GetPhysicalTexture(data.colorOutput);
-            if (!colorRT) {
+            if (!colorRT)
                 return;
-            }
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
             auto framebuffer = cache.GetOrCreateFramebuffer("SunPass", fbDesc, device);
 
-            nvrhi::FramebufferInfoEx fbInfo = framebuffer->getFramebufferInfo();
-
-            nvrhi::GraphicsPipelineDesc pipelineDesc;
-            pipelineDesc.inputLayout = inputLayout;
-            pipelineDesc.VS = vsResult.handle;
-            pipelineDesc.PS = psResult.handle;
-            pipelineDesc.bindingLayouts = { bindingLayout };
-            pipelineDesc.renderState = renderState;
-            pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
-
-            auto pipeline = cache.GetOrCreatePipeline("SunPass", pipelineDesc, fbInfo, device);
-
-            if (!pipeline) {
-                Msg("! [SunPass] Failed to create pipeline");
-                return;
-            }
-
             // ═══════════════════════════════════════════════════════
             //  CREATE CONSTANT BUFFER
             // ═══════════════════════════════════════════════════════
 
-            // Use identity world matrix (vertices already in world space)
-            DynamicTransforms dynamicCB = {};
-            FillDynamicTransforms(dynamicCB, Fidentity);
-
             auto dynamicCBBuffer = framegraph::GetPassResourceCache().GetOrCreateVolatileCB(
-                "SunPass", "DynamicCB", sizeof(DynamicTransforms), data.device);
-            cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
+                "Frame", "DynamicTransforms", sizeof(DynamicTransforms), data.device);
 
             // ═══════════════════════════════════════════════════════
             //  GET SUN TEXTURE
@@ -334,19 +319,21 @@ framegraph::VirtualResourceHandle setupSunPass(
                 sunTex = data.passState->placeholderTexture.Get();
             }
 
-            // Create binding set
-            BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device, "Sun");
+            auto* vsRefl = RImplementation.m_shaderLoader->GetCachedReflection("sun_forward", ".vs");
+            auto* psRefl = RImplementation.m_shaderLoader->GetCachedReflection("sun_forward", ".ps");
+            if (!vsRefl || !psRefl) return;
+            framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, device, "Sun");
             bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer)
                .Texture("s_sun", sunTex);
             auto bindingSetDesc = bsb.Build();
-            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindingSetDesc, bindingLayout, cmdList->getDevice());
+            auto bindingSet = cache.GetOrCreateBindingSet(bindingSetDesc, data.passState->bindingLayout, device);
 
             // ═══════════════════════════════════════════════════════
             //  RENDER SUN
             // ═══════════════════════════════════════════════════════
 
             nvrhi::GraphicsState state;
-            state.pipeline = pipeline;
+            state.pipeline = data.passState->pipeline;
             state.framebuffer = framebuffer;
             state.bindings = { bindingSet };
             state.vertexBuffers = { { data.passState->vertexBuffer, 0, 0 } };

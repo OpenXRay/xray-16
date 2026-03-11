@@ -399,7 +399,7 @@ static const ParticleBlendDesc s_blendDescs[PARTICLE_BLEND_COUNT] = {
     { nvrhi::BlendFactor::SrcAlpha,  nvrhi::BlendFactor::One,         nvrhi::BlendFactor::One, nvrhi::BlendFactor::One,         true,  false, "ParticlePass_alphaAdd" },
 };
 
-void InitializeParticleResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ParticlePassState& state)
+void InitializeParticleResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state)
 {
     if (state.initialized)
         return;
@@ -415,7 +415,6 @@ void InitializeParticleResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
     auto& cache = framegraph::GetPassResourceCache();
-    auto fbInfo = framebuffer->getFramebufferInfo();
 
     auto vsResult = shaderLoader->LoadVertexShader("bindless_particle", "main");
     if (!vsResult.handle)
@@ -489,7 +488,7 @@ void InitializeParticleResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
     }
 }
 
-static void InitializeDistortionPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* distortFB, ParticlePassState& state)
+static void InitializeDistortionPipeline(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state)
 {
     if (state.distortInitialized)
         return;
@@ -502,7 +501,6 @@ static void InitializeDistortionPipeline(ng::RenderDevice* device, nvrhi::IFrame
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
     auto& cache = framegraph::GetPassResourceCache();
-    auto fbInfo = distortFB->getFramebufferInfo();
 
     auto distortPsResult = shaderLoader->LoadPixelShader("bindless_particle_distort", "main");
     if (!distortPsResult.handle)
@@ -556,6 +554,21 @@ ParticlePassOutput setupParticlePass(
     u32 hiZMipLevels,
     ParticlePassState* state)
 {
+    if (state) {
+        nvrhi::FramebufferInfoEx fbInfo;
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
+        fbInfo.depthFormat = nvrhi::Format::D32;
+        InitializeParticleResources(device, fbInfo, *state);
+
+        nvrhi::FramebufferInfoEx distortFbInfo;
+        distortFbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+        distortFbInfo.depthFormat = nvrhi::Format::D32;
+        InitializeDistortionPipeline(device, distortFbInfo, *state);
+    }
+
     auto& passData = fg.addCallbackPass<ParticlePassData>(
         "Particles",
         [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, state](FrameGraph& builder, PassHandle passHandle, ParticlePassData& data) {
@@ -669,21 +682,12 @@ ParticlePassOutput setupParticlePass(
             if (!framebuffer)
                 return;
 
-            InitializeParticleResources(data.device, framebuffer, *data.passState);
             if (!data.passState->initialized)
                 return;
 
             const auto& rtDesc = colorRT->getDesc();
 
-            auto dynTransformsCB = cache.GetOrCreateVolatileCB("ParticlePass", "DynTransforms", sizeof(DynamicTransforms), data.device);
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("ParticlePass", "StaticGlobals", sizeof(StaticGlobals), data.device);
-
-            DynamicTransforms dynTrans = {};
-            FillDynamicTransforms(dynTrans);
-            cmdList->writeBuffer(dynTransformsCB, &dynTrans, sizeof(dynTrans));
-
-            auto staticGlobals = BuildStaticGlobals();
-            cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* vsReflection = shaderLoader->GetCachedReflection("bindless_particle", ".vs");
@@ -789,7 +793,6 @@ ParticlePassOutput setupParticlePass(
             if (!distortFB)
                 return;
 
-            InitializeDistortionPipeline(data.device, distortFB, *data.passState);
             if (!data.passState->distortPipeline)
                 return;
 

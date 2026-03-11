@@ -137,7 +137,7 @@ void setupOverlayPaintPass(
                 bsb.ConstantBuffer("PaintParams", cbHandle)
                    .TextureUAV("g_Overlay", overlay.colorOverlay);
                 auto bindDesc = bsb.Build();
-                auto bindSet = nvDevice->createBindingSet(bindDesc, ps->layout);
+                auto bindSet = cache.GetOrCreateBindingSet(bindDesc, ps->layout, nvDevice);
 
                 ctx->SetComputePipeline(ps->pipeline.Get());
                 ctx->SetComputeBindingSet(0, bindSet.Get());

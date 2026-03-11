@@ -75,12 +75,6 @@ void ParticleGPUCullingManager::Shutdown()
     m_visibleCountBuffer = nullptr;
     m_vertexBuffer = nullptr;
     m_drawArgsBuffer = nullptr;
-    if (m_device && m_cullParamsCB.IsValid())
-        m_device->DestroyBuffer(m_cullParamsCB);
-    if (m_device && m_billboardParamsCB.IsValid())
-        m_device->DestroyBuffer(m_billboardParamsCB);
-    m_cullParamsCB = {};
-    m_billboardParamsCB = {};
     m_pointClampSampler = nullptr;
     m_cullBindingSet = nullptr;
     m_billboardBindingSet = nullptr;
@@ -189,30 +183,6 @@ bool ParticleGPUCullingManager::CreateBuffers()
         desc.isDrawIndirectArgs = true;
         m_drawArgsBuffer = nvDevice->createBuffer(desc);
         if (!m_drawArgsBuffer)
-            return false;
-    }
-
-    {
-        ng::RenderDevice::BufferDesc desc;
-        desc.byteSize = sizeof(ParticleCullParams);
-        desc.debugName = "ParticleCullParamsCB";
-        desc.isConstantBuffer = true;
-        desc.isVolatile = true;
-        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
-        m_cullParamsCB = m_device->CreateBuffer(desc);
-        if (!m_cullParamsCB.IsValid())
-            return false;
-    }
-
-    {
-        ng::RenderDevice::BufferDesc desc;
-        desc.byteSize = sizeof(ParticleBillboardParams);
-        desc.debugName = "ParticleBillboardParamsCB";
-        desc.isConstantBuffer = true;
-        desc.isVolatile = true;
-        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
-        m_billboardParamsCB = m_device->CreateBuffer(desc);
-        if (!m_billboardParamsCB.IsValid())
             return false;
     }
 
@@ -362,20 +332,21 @@ void ParticleGPUCullingManager::DispatchCulling(
     params.hiZHeight = hiZHeight;
     params.hiZMipLevels = hiZMipLevels;
 
-    nvrhi::IBuffer* cullParamsCBNative = m_device->GetNativeBuffer(m_cullParamsCB);
-    cmdList->writeBuffer(cullParamsCBNative, &params, sizeof(params));
+    auto& cache = framegraph::GetPassResourceCache();
+    auto cullParamsCB = cache.GetOrCreateVolatileCB("ParticleGPUCull", "CullParams", sizeof(ParticleCullParams), m_device);
+    cmdList->writeBuffer(cullParamsCB, &params, sizeof(params));
 
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     auto* cullReflection = shaderLoader->GetCachedReflection("particle_cull", ".cs");
     if (!cullReflection) return;
 
     framegraph::BindingSetBuilder bsb(*cullReflection, nvDevice, "ParticleGPUCull");
-    bsb.ConstantBuffer("ParticleCullParams", cullParamsCBNative);
+    bsb.ConstantBuffer("ParticleCullParams", cullParamsCB);
     bsb.BufferSRV("g_ParticleData", m_particleDataBuffer);
     bsb.Texture("g_HiZPyramid", hiZPyramid);
     bsb.BufferUAV("g_VisibleIndices", m_visibleIndicesBuffer);
     bsb.BufferUAV("g_VisibleCount", m_visibleCountBuffer);
-    m_cullBindingSet = nvDevice->createBindingSet(bsb.Build(), m_cullLayout);
+    m_cullBindingSet = cache.GetOrCreateBindingSet(bsb.Build(), m_cullLayout, nvDevice);
 
     // Dispatch
     nvrhi::ComputeState state;
@@ -402,21 +373,22 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
     params.visibleCount = std::min(maxVisibleCount, m_maxParticles);
     params.padding[0] = params.padding[1] = params.padding[2] = 0;
 
-    nvrhi::IBuffer* billboardParamsCBNative = m_device->GetNativeBuffer(m_billboardParamsCB);
-    cmdList->writeBuffer(billboardParamsCBNative, &params, sizeof(params));
+    auto& cache = framegraph::GetPassResourceCache();
+    auto billboardParamsCB = cache.GetOrCreateVolatileCB("ParticleBillboard", "BillboardParams", sizeof(ParticleBillboardParams), m_device);
+    cmdList->writeBuffer(billboardParamsCB, &params, sizeof(params));
 
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     auto* billboardReflection = shaderLoader->GetCachedReflection("particle_billboard", ".cs");
     if (!billboardReflection) return;
 
     framegraph::BindingSetBuilder bsb(*billboardReflection, nvDevice, "ParticleBillboard");
-    bsb.ConstantBuffer("BillboardParams", billboardParamsCBNative);
+    bsb.ConstantBuffer("BillboardParams", billboardParamsCB);
     bsb.BufferSRV("g_ParticleData", m_particleDataBuffer);
     bsb.BufferSRV("g_VisibleIndices", m_visibleIndicesBuffer);
     bsb.BufferSRV("g_VisibleCountBuf", m_visibleCountBuffer);
     bsb.BufferUAV("g_Vertices", m_vertexBuffer);
     bsb.BufferUAV("g_DrawArgs", m_drawArgsBuffer);
-    m_billboardBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), m_billboardLayout, nvDevice);
+    m_billboardBindingSet = cache.GetOrCreateBindingSet(bsb.Build(), m_billboardLayout, nvDevice);
 
     nvrhi::ComputeState state;
     state.pipeline = m_billboardPipeline;

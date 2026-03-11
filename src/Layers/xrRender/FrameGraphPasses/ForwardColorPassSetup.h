@@ -142,7 +142,7 @@ struct ForwardColorPassData {
     BindlessForwardConfig bindlessConfig;
 };
 
-void InitializeForwardResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ForwardColorPassState& state);
+void InitializeForwardResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ForwardColorPassState& state);
 
 // Lambda-based ForwardColorPass setup function (Frostbite pattern)
 // Replaces the wasteful 3-RT G-buffer with single color output

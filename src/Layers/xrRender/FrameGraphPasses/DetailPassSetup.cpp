@@ -55,6 +55,16 @@ DefaultOutputLayout setupDetailPass(
     xray::profiler::GPUProfiler* gpuProfiler
 )
 {
+    if (detailManager && !detailManager->graphicsPipeline)
+    {
+        nvrhi::FramebufferInfo fbInfo;
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
+        fbInfo.depthFormat = nvrhi::Format::D32;
+        detailManager->CreateGraphicsPipeline(device, fbInfo);
+    }
 
     auto& passData = fg.addCallbackPass<DetailPassData>(
         "DetailDraw",
@@ -138,34 +148,16 @@ DefaultOutputLayout setupDetailPass(
             if (!framebuffer)
                 return;
 
-            // Create graphics pipeline (lazy - needs framebuffer)
             if (!data.detailManager->graphicsPipeline)
-            {
-                data.detailManager->CreateGraphicsPipeline(data.device, framebuffer);
-            }
-
-            if (!data.detailManager->graphicsPipeline)
-            {
-                Msg("! [DetailPass] Graphics pipeline not available");
                 return;
-            }
 
-            // Use cached per-frame resources (created once in CreateCachedResources)
             auto* dm = data.detailManager;
             auto* renderDevice = data.device;
+            auto& cache = framegraph::GetPassResourceCache();
 
-            // b0: dynamic_transforms
-            DynamicTransforms dynTrans = {};
-            FillDynamicTransforms(dynTrans);
-            cmdList->writeBuffer(renderDevice->GetNativeBuffer(dm->cachedDynTransformsCB), &dynTrans, sizeof(dynTrans));
-
-            // b1: shader_params (dummy)
-            u8 dummyParams[32] = {};
-            cmdList->writeBuffer(renderDevice->GetNativeBuffer(dm->cachedShaderParamsCB), dummyParams, 32);
-
-            // b2: static_globals
-            auto staticGlobals = BuildStaticGlobals();
-            cmdList->writeBuffer(renderDevice->GetNativeBuffer(dm->cachedStaticGlobalsCB), &staticGlobals, sizeof(staticGlobals));
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), renderDevice);
+            auto detailGlobalsCB = cache.GetOrCreateVolatileCB("Detail", "DetailGlobals", sizeof(FGDetailManager::DetailFrameConstants), renderDevice);
+            auto dynLightCB = cache.GetOrCreateVolatileCB("Detail", "DynLight", 48, renderDevice);
 
             // b3: DetailGlobals
             float windAngleDeg = 0.0f;
@@ -195,11 +187,10 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.grass_blade_height = ps_r3_grass_blade_height;
             frameConstants.buildDetailsIndex = dm->buildDetailsBindlessIndex;
             frameConstants.buildDetailsPbrIndex = dm->buildDetailsPbrBindlessIndex;
-            cmdList->writeBuffer(renderDevice->GetNativeBuffer(dm->cachedDetailGlobalsCB), &frameConstants, sizeof(frameConstants));
+            cmdList->writeBuffer(detailGlobalsCB, &frameConstants, sizeof(frameConstants));
 
-            // b4: dynamic_light (dummy)
             u8 dummyLight[48] = {};
-            cmdList->writeBuffer(renderDevice->GetNativeBuffer(dm->cachedDynLightCB), dummyLight, 48);
+            cmdList->writeBuffer(dynLightCB, dummyLight, 48);
 
             // Update grass tints
             FGDetailManager::GrassObjectTint tintData[64];
@@ -222,7 +213,6 @@ DefaultOutputLayout setupDetailPass(
             if (data.gpuProfiler)
                 data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
 
-            auto& smpCache = framegraph::GetPassResourceCache();
             auto* nvDev = data.device->GetNVRHIDevice();
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -231,9 +221,9 @@ DefaultOutputLayout setupDetailPass(
 
             auto makeGrassBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer) {
                 framegraph::BindingSetBuilder bsb(*grassVsRefl, *grassPsRefl, nvDev, "Detail.Grass");
-                bsb.ConstantBuffer("static_globals", renderDevice->GetNativeBuffer(dm->cachedStaticGlobalsCB));
-                bsb.ConstantBuffer("DetailGlobals", renderDevice->GetNativeBuffer(dm->cachedDetailGlobalsCB));
-                bsb.ConstantBuffer("$Globals", renderDevice->GetNativeBuffer(dm->cachedDynLightCB));
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                bsb.ConstantBuffer("DetailGlobals", detailGlobalsCB);
+                bsb.ConstantBuffer("$Globals", dynLightCB);
                 bsb.BufferSRV("visible_indices", visibleIndicesBuffer);
                 bsb.BufferSRV("grass_object_tints", dm->cachedGrassTintsBuffer);
                 bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
@@ -241,7 +231,7 @@ DefaultOutputLayout setupDetailPass(
                 bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
                 auto bindDesc = bsb.Build();
                 bindDesc.bindings.push_back(nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection));
-                return smpCache.GetOrCreateBindingSet(bindDesc, dm->graphicsBindingLayout, nvDev);
+                return cache.GetOrCreateBindingSet(bindDesc, dm->graphicsBindingLayout, nvDev);
             };
 
             auto* bbVsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".vs");
@@ -249,15 +239,15 @@ DefaultOutputLayout setupDetailPass(
 
             auto makePulledBindingSet = [&](nvrhi::BufferHandle visibleIndicesBuffer, nvrhi::BindingLayoutHandle layout) {
                 framegraph::BindingSetBuilder bsb(*bbVsRefl, *bbPsRefl, nvDev, "Detail.Billboard");
-                bsb.ConstantBuffer("static_globals", renderDevice->GetNativeBuffer(dm->cachedStaticGlobalsCB));
-                bsb.ConstantBuffer("DetailGlobals", renderDevice->GetNativeBuffer(dm->cachedDetailGlobalsCB));
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                bsb.ConstantBuffer("DetailGlobals", detailGlobalsCB);
                 bsb.BufferSRV("visible_indices", visibleIndicesBuffer);
                 bsb.BufferSRV("detail_models", dm->detailModelsBuffer);
                 bsb.BufferSRV("pulled_vertices", dm->pulledVertexBuffer);
                 bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
                 bsb.BufferSRV("slot_data", dm->slotDataBuffer);
                 bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
-                return smpCache.GetOrCreateBindingSet(bsb.Build(), layout, nvDev);
+                return cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDev);
             };
 
             bool billboardMode = !ps_r__detail_gpu;
@@ -307,14 +297,14 @@ DefaultOutputLayout setupDetailPass(
                 auto* decalVsRefl = shaderLoader->GetCachedReflection("detail_decal", ".vs");
                 auto* decalPsRefl = shaderLoader->GetCachedReflection("detail_decal", ".ps");
                 framegraph::BindingSetBuilder decalBsb(*decalVsRefl, *decalPsRefl, nvDev, "Detail.Decal");
-                decalBsb.ConstantBuffer("static_globals", renderDevice->GetNativeBuffer(dm->cachedStaticGlobalsCB));
-                decalBsb.ConstantBuffer("DetailGlobals", renderDevice->GetNativeBuffer(dm->cachedDetailGlobalsCB));
+                decalBsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                decalBsb.ConstantBuffer("DetailGlobals", detailGlobalsCB);
                 decalBsb.BufferSRV("visible_indices", dm->visibleDecalInstancesBuffer);
                 decalBsb.BufferSRV("detail_models", dm->detailModelsBuffer);
                 decalBsb.BufferSRV("decal_vertices", dm->pulledVertexBuffer);
                 decalBsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
                 decalBsb.BufferSRV("slot_data", dm->slotDataBuffer);
-                nvrhi::BindingSetHandle decalBindingSet = smpCache.GetOrCreateBindingSet(decalBsb.Build(), dm->decalBindingLayout, nvDev);
+                nvrhi::BindingSetHandle decalBindingSet = cache.GetOrCreateBindingSet(decalBsb.Build(), dm->decalBindingLayout, nvDev);
 
                 nvrhi::GraphicsState state;
                 state.framebuffer = framebuffer;

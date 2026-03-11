@@ -61,7 +61,7 @@ static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
 //  PIPELINE INITIALIZATION
 // ═══════════════════════════════════════════════════════════════════════════
 
-void InitializeSkinningResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, SkinningPassState& state)
+void InitializeSkinningResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state)
 {
     if (state.initialized)
         return;
@@ -77,7 +77,6 @@ void InitializeSkinningResources(ng::RenderDevice* device, nvrhi::IFramebuffer* 
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
     auto& cache = framegraph::GetPassResourceCache();
-    auto fbInfo = framebuffer->getFramebufferInfo();
 
     auto skinnedPsResult = shaderLoader->LoadPixelShader("bindless_skinned", "main");
     if (!skinnedPsResult.handle) {
@@ -441,6 +440,16 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 {
     using namespace framegraph;
 
+    if (state) {
+        nvrhi::FramebufferInfoEx fbInfo;
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
+        fbInfo.depthFormat = nvrhi::Format::D32;
+        InitializeSkinningResources(device, fbInfo, *state);
+    }
+
     auto& passData = fg.addCallbackPass<SkinningPassData>(
         "Skinning Pass",
 
@@ -527,7 +536,6 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             if (!framebuffer)
                 return;
 
-            InitializeSkinningResources(data.device, framebuffer, *data.passState);
             if (!data.passState->initialized)
                 return;
 
@@ -551,12 +559,9 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
             auto& cache = framegraph::GetPassResourceCache();
             auto dynTransformsCB = cache.GetOrCreateVolatileCB("SkinningPass", "DynTransforms", sizeof(DynamicTransforms), data.device, 1024 * 8);
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("SkinningPass", "StaticGlobals", sizeof(StaticGlobals), data.device, 1024);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             auto shaderParamsCB = cache.GetOrCreateVolatileCB("SkinningPass", "ShaderParams", sizeof(ShaderParams), data.device, 512);
             auto materialIdCB = cache.GetOrCreateVolatileCB("SkinningPass", "MaterialId", sizeof(SkinnedMaterialCB), data.device, 1024);
-
-            auto staticGlobals = BuildStaticGlobals();
-            cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
             ShaderParams shaderParams = {};
             shaderParams.m_AlphaRef = 0.5f;
