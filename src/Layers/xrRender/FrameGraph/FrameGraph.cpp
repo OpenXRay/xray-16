@@ -163,11 +163,9 @@ void FrameGraph::Compile() {
 
     ComputeResourceLifetimes();
 
-    AllocateResources();
-
-    InsertResourceBarriers();
-
     OptimizeMemoryAliasing();
+
+    AllocateResources();
 
     m_compiled = true;
     m_stats.numPasses = static_cast<u32>(m_passes.size());
@@ -237,8 +235,17 @@ void FrameGraph::Execute() {
             continue;
 
         if (!syncInserted && computeInstanceID != 0) {
-            m_asyncComputeBackend->QueueWaitForCompute(computeInstanceID);
-            syncInserted = true;
+            bool dependsOnAsync = false;
+            for (const PassNode* dep : pass->dependsOn) {
+                if (dep->isAsync) {
+                    dependsOnAsync = true;
+                    break;
+                }
+            }
+            if (dependsOnAsync) {
+                m_asyncComputeBackend->QueueWaitForCompute(computeInstanceID);
+                syncInserted = true;
+            }
         }
 
         ExecutePass(pass, graphicsCmdList);
@@ -290,17 +297,14 @@ void FrameGraph::ResetForNextFrame() {
 
     if (m_resourcePool) {
         for (auto& resource : m_resources) {
-            if (resource.desc.isImported) {
+            if (resource.desc.isImported || resource.aliasedWith != INVALID_INDEX)
                 continue;
-            }
 
-            if (resource.resourceTexture.IsValid()) {
+            if (resource.resourceTexture.IsValid())
                 m_resourcePool->FreeTexture(resource.resourceTexture);
-            }
 
-            if (resource.resourceBuffer.IsValid()) {
+            if (resource.resourceBuffer.IsValid())
                 m_resourcePool->FreeBuffer(resource.resourceBuffer);
-            }
         }
     }
 
@@ -320,9 +324,8 @@ void FrameGraph::Reset() {
         resources::BufferManager* bufManager = m_resourceManager->GetBufferManager();
 
         for (auto& resource : m_resources) {
-            if (resource.desc.isImported) {
+            if (resource.desc.isImported || resource.aliasedWith != INVALID_INDEX)
                 continue;
-            }
 
             if (resource.resourceTexture.IsValid()) {
                 texManager->Release(resource.resourceTexture);
@@ -341,17 +344,11 @@ void FrameGraph::Reset() {
     }
 
     for (auto& resource : m_resources) {
-        if (resource.desc.isImported) {
+        if (resource.desc.isImported || resource.aliasedWith != INVALID_INDEX)
             continue;
-        }
 
-        if (resource.nvrhiTexture) {
-            resource.nvrhiTexture = nullptr;
-        }
-
-        if (resource.nvrhiBuffer) {
-            resource.nvrhiBuffer = nullptr;
-        }
+        resource.nvrhiTexture = nullptr;
+        resource.nvrhiBuffer = nullptr;
     }
 
     m_resources.clear();
@@ -567,14 +564,12 @@ void FrameGraph::BuildDependencyGraph() {
     xr_map<u32, PassNode*> lastWriter;
 
     for (auto& pass : m_passes) {
-        xr_vector<VirtualResourceHandle> readResources;
-        pass.GetReadResources(readResources);
+        for (const auto& access : pass.resourceAccesses) {
+            if (!access.IsRead()) continue;
 
-        for (const auto& resource : readResources) {
-            auto it = lastWriter.find(resource.index);
+            auto it = lastWriter.find(access.resource.index);
             if (it != lastWriter.end()) {
                 PassNode* producer = it->second;
-
                 if (!pass.DependsOn(producer)) {
                     pass.dependsOn.push_back(producer);
                     producer->dependents.push_back(&pass);
@@ -582,30 +577,27 @@ void FrameGraph::BuildDependencyGraph() {
             }
         }
 
-        xr_vector<VirtualResourceHandle> writeResources;
-        pass.GetWriteResources(writeResources);
-
-        for (const auto& resource : writeResources) {
-            lastWriter[resource.index] = &pass;
+        for (const auto& access : pass.resourceAccesses) {
+            if (access.IsWrite()) {
+                lastWriter[access.resource.index] = &pass;
+            }
         }
     }
-
 }
 
 void FrameGraph::TopologicalSort() {
+    const u32 numPasses = static_cast<u32>(m_passes.size());
     m_sortedPasses.clear();
-    m_sortedPasses.reserve(m_passes.size());
+    m_sortedPasses.reserve(numPasses);
 
-    xr_map<PassNode*, u32> inDegree;
-    for (auto& pass : m_passes) {
-        inDegree[&pass] = static_cast<u32>(pass.dependsOn.size());
-    }
+    xr_vector<u32> inDegree(numPasses);
+    for (u32 i = 0; i < numPasses; ++i)
+        inDegree[i] = static_cast<u32>(m_passes[i].dependsOn.size());
 
     xr_vector<PassNode*> queue;
-    for (auto& pass : m_passes) {
-        if (inDegree[&pass] == 0) {
-            queue.push_back(&pass);
-        }
+    for (u32 i = 0; i < numPasses; ++i) {
+        if (inDegree[i] == 0)
+            queue.push_back(&m_passes[i]);
     }
 
     u32 executionOrder = 0;
@@ -617,28 +609,24 @@ void FrameGraph::TopologicalSort() {
         m_sortedPasses.push_back(current);
 
         for (PassNode* dependent : current->dependents) {
-            inDegree[dependent]--;
-
-            if (inDegree[dependent] == 0) {
+            u32 idx = dependent->handle.index;
+            if (--inDegree[idx] == 0)
                 queue.push_back(dependent);
-            }
         }
     }
 
     if (m_sortedPasses.size() != m_passes.size()) {
         Msg("! [FrameGraph] Cycle detected in dependency graph!");
-        Msg("! [FrameGraph] Processed %u/%u passes",
+        Msg("! [FrameGraph] Processed %zu/%zu passes",
             m_sortedPasses.size(), m_passes.size());
 
         for (auto& pass : m_passes) {
-            if (pass.executionOrder == INVALID_INDEX) {
+            if (pass.executionOrder == INVALID_INDEX)
                 Msg("! [FrameGraph]   Pass in cycle: %s", pass.name.c_str());
-            }
         }
 
         VERIFY2(false, "FrameGraph has cyclic dependencies");
     }
-
 }
 
 void FrameGraph::CullUnusedPasses() {
@@ -746,17 +734,16 @@ void FrameGraph::AllocateResources() {
     u64 totalMemoryAllocated = 0;
 
     for (auto& resource : m_resources) {
-        if (resource.firstUsedPass == INVALID_INDEX) {
+        if (resource.firstUsedPass == INVALID_INDEX)
             continue;
-        }
 
         if (resource.desc.isImported) {
             resource.isAllocated = true;
             continue;
         }
 
-        bool skipAliasing = resource.desc.isImported;
-
+        if (resource.aliasedWith != INVALID_INDEX)
+            continue;
         if (resource.desc.type == ResourceDesc::Type::Buffer) {
             if (m_resourcePool) {
                 resources::BufferDesc rmBufferDesc;
@@ -835,12 +822,7 @@ void FrameGraph::AllocateResources() {
                 rmTexDesc.isDepthStencil = resource.desc.isDepthStencil;
                 rmTexDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
 
-                resources::TextureHandle rmHandle;
-                if (skipAliasing) {
-                    rmHandle = m_resourcePool->AllocatePersistentTexture(rmTexDesc);
-                } else {
-                    rmHandle = m_resourcePool->AllocateTexture(rmTexDesc);
-                }
+                resources::TextureHandle rmHandle = m_resourcePool->AllocateTexture(rmTexDesc);
 
                 if (rmHandle.IsValid()) {
                     resource.resourceTexture = rmHandle;
@@ -907,6 +889,18 @@ void FrameGraph::AllocateResources() {
                 totalMemoryAllocated += resource.memorySize;
             }
         }
+    }
+
+    for (auto& resource : m_resources) {
+        if (resource.aliasedWith == INVALID_INDEX)
+            continue;
+
+        ResourceNode& target = m_resources[resource.aliasedWith];
+        resource.nvrhiTexture = target.nvrhiTexture;
+        resource.nvrhiBuffer = target.nvrhiBuffer;
+        resource.resourceTexture = target.resourceTexture;
+        resource.resourceBuffer = target.resourceBuffer;
+        resource.isAllocated = target.isAllocated;
     }
 
     m_stats.totalMemoryAllocated = totalMemoryAllocated;
