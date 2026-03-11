@@ -217,8 +217,6 @@ private:
 
     void CollectVisibleGeometry();
 
-    void RenderHUD();
-
     framegraph::VirtualResourceHandle CreateRT(
         const char* name,
         u32 width,

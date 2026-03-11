@@ -103,17 +103,13 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     Msg("* [FrameGraphRenderer] Initializing...");
 
     m_framegraph = xr_make_unique<framegraph::FrameGraph>(device);
-
     m_shaderPhaseCache = xr_make_unique<framegraph::ShaderPhaseCache>();
-
     m_geometryVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
-
     m_materialCache = xr_make_unique<MaterialCache>(
         device,
         device->GetFGResourceManager(),
         m_geometryVCBPool.get()
     );
-
     m_uiVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
     m_uiMaterialCache = xr_make_unique<MaterialCache>(
         device,
@@ -122,22 +118,23 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     );
     m_uiCollector = xr_make_unique<ui::UIRenderCollector>();
     m_uiRenderer = xr_make_unique<ui::NVRHIUIRenderer>();
-    m_uiRenderer->Initialize(device, m_uiMaterialCache.get());
-
-    Msg("* [FrameGraphRenderer] UI infrastructure initialized");
-
     m_textVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
     m_textMaterialCache = xr_make_unique<MaterialCache>(
         device,
         device->GetFGResourceManager(),
         m_textVCBPool.get()
     );
-
-    Msg("* [FrameGraphRenderer] Text infrastructure initialized");
-
     m_geometryCollector = xr_make_unique<GeometryCollector>();
-
     g_geometryCollector = m_geometryCollector.get();
+
+
+    m_gpuCullingManager = xr_make_unique<RENDER_NAMESPACE::GPUCullingManager>();
+    m_detailManager = xr_make_unique<RENDER_NAMESPACE::FGDetailManager>();
+    m_decalManager = xr_make_unique<RENDER_NAMESPACE::decals::DecalManager>();
+    m_overlayManager = xr_make_unique<RENDER_NAMESPACE::decals::OverlayManager>();
+    m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
+    m_smokeTrailManager = xr_make_unique<RENDER_NAMESPACE::passes::SmokeTrailManager>();
+
 
     bindless::MaterialBuffer::Instance().Initialize(m_device);
     bindless::TerrainMaterialBuffer::Instance().Initialize(m_device);
@@ -145,20 +142,10 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);
     Msg("* [FrameGraphRenderer] Bindless material buffers initialized (early)");
 
-    m_gpuCullingManager = xr_make_unique<RENDER_NAMESPACE::GPUCullingManager>();
-
-    m_detailManager = xr_make_unique<RENDER_NAMESPACE::FGDetailManager>();
-
-    m_decalManager = xr_make_unique<RENDER_NAMESPACE::decals::DecalManager>();
+    m_uiRenderer->Initialize(device, m_uiMaterialCache.get());
     m_decalManager->Initialize(device);
-
-    m_overlayManager = xr_make_unique<RENDER_NAMESPACE::decals::OverlayManager>();
     m_overlayManager->Initialize(device);
-
-    m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
     m_rtAccelMgr->Initialize(device);
-
-    m_smokeTrailManager = xr_make_unique<RENDER_NAMESPACE::passes::SmokeTrailManager>();
     m_smokeTrailManager->Initialize(device);
 
     m_renderContext.reset(device->CreateContext());
@@ -169,12 +156,12 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     }
 
     m_passStates = xr_make_unique<passes::PassStates>();
-
     m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
-    m_gpuProfiler->Initialize(device->GetNVRHIDevice());
-
     m_statsOverlay = xr_make_unique<xray::profiler::StatsOverlay>();
+    
+    m_gpuProfiler->Initialize(device->GetNVRHIDevice());
     m_statsOverlay->SetGPUProfiler(m_gpuProfiler.get());
+    
     Msg("* [FrameGraphRenderer] Profiler initialized");
 
     {
@@ -201,7 +188,6 @@ void FrameGraphRenderer::Shutdown() {
     Msg("* [FrameGraphRenderer] Shutting down");
 
     g_geometryCollector = nullptr;
-
     m_statsOverlay = nullptr;
     if (m_gpuProfiler) {
         m_gpuProfiler->Shutdown();
@@ -212,15 +198,12 @@ void FrameGraphRenderer::Shutdown() {
     m_renderContext = nullptr;
     m_geometryCollector = nullptr;
     m_materialCache = nullptr;
-
     m_uiRenderer = nullptr;
     m_uiCollector = nullptr;
     m_uiMaterialCache = nullptr;
     m_uiVCBPool = nullptr;
-
     m_textMaterialCache = nullptr;
     m_textVCBPool = nullptr;
-
     m_cachedStaticBatches.clear();
     m_staticBatchesCached = false;
     if (m_gpuCullingManager) {
@@ -280,7 +263,7 @@ void FrameGraphRenderer::Render() {
     }
 
     auto frameStart = std::chrono::high_resolution_clock::now();
-
+    
     RImplementation.Lights.Update();
 
     if (m_device && m_device->GetFGResourceManager()) {
@@ -335,9 +318,8 @@ void FrameGraphRenderer::Render() {
     }
 
     m_framegraph->SetRenderContext(m_renderContext.get());
-
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
-
+    
     if (ps_fg_render_mode == FG_RENDER_VULKAN && GEnv.Backend->HasAsyncCompute())
         m_framegraph->SetAsyncCompute(GEnv.Backend->GetComputeCommandList(), GEnv.Backend);
     else
@@ -348,21 +330,17 @@ void FrameGraphRenderer::Render() {
         m_framegraph->Compile();
     }
 
-    {
-        auto& cache = framegraph::GetPassResourceCache();
-        auto* cmdList = m_renderContext->GetCommandList();
+    auto& cache = framegraph::GetPassResourceCache();
+    auto* cmdList = m_renderContext->GetCommandList();
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device);
+    auto staticGlobalsData = passes::BuildStaticGlobals();
+    cmdList->writeBuffer(staticGlobalsCB, &staticGlobalsData, sizeof(staticGlobalsData));
 
-        auto sgCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals",
-            sizeof(passes::StaticGlobals), m_device);
-        auto sg = passes::BuildStaticGlobals();
-        cmdList->writeBuffer(sgCB, &sg, sizeof(sg));
-
-        auto dtCB = cache.GetOrCreateVolatileCB("Frame", "DynamicTransforms",
-            sizeof(passes::DynamicTransforms), m_device);
-        passes::DynamicTransforms dt = {};
-        passes::FillDynamicTransforms(dt);
-        cmdList->writeBuffer(dtCB, &dt, sizeof(dt));
-    }
+    auto dynamicTransformsCB = cache.GetOrCreateVolatileCB("Frame", "DynamicTransforms",
+        sizeof(passes::DynamicTransforms), m_device);
+    passes::DynamicTransforms dynamicTransformsData = {};
+    passes::FillDynamicTransforms(dynamicTransformsData);
+    cmdList->writeBuffer(dynamicTransformsCB, &dynamicTransformsData, sizeof(dynamicTransformsData));
 
     {
         ZoneScopedN("FG::Execute");
@@ -394,7 +372,6 @@ void FrameGraphRenderer::Render() {
     m_stats.tonemapMs = 0.0f;
     m_stats.numDrawCalls = 0;
     m_stats.numTriangles = 0;
-
 }
 
 void FrameGraphRenderer::RenderMenu() {
@@ -409,11 +386,11 @@ void FrameGraphRenderer::RenderMenu() {
         m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
         m_gpuProfiler->FrameStart();
     }
-
+    
     if (m_device && m_device->GetFGResourceManager()) {
         m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
     }
-
+    
     m_framegraph->ResetForNextFrame();
 
     const u32 width = Device.dwWidth;
@@ -445,7 +422,7 @@ void FrameGraphRenderer::RenderMenu() {
     bgDesc.debugName = "rt_MenuBackground";
 
     auto backgroundTarget = m_framegraph->CreateTexture("rt_MenuBackground", bgDesc);
-
+    
     framegraph::PassHandle clearPass = m_framegraph->AddPass("ClearBackground");
     m_framegraph->PassWrite(clearPass, backgroundTarget, framegraph::ResourceState::RenderTarget);
     m_framegraph->SetPassCallback(clearPass,
@@ -459,11 +436,9 @@ void FrameGraphRenderer::RenderMenu() {
     );
 
     auto sceneWithUI = passes::setupUIPass(*m_framegraph, backgroundTarget, width, height);
-
     sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height, m_passStates->uiText);
-
     sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
-
+    
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
         m_device,
@@ -494,7 +469,6 @@ void FrameGraphRenderer::RenderMenu() {
 
     if (m_gpuProfiler)
         m_gpuProfiler->FrameEnd();
-
 }
 
 void FrameGraphRenderer::RenderStatsOverlay()
@@ -674,7 +648,6 @@ void FrameGraphRenderer::SetupFrame() {
     }
 
     m_bufferHandleCache.clear();
-
     m_lstRenderables.clear();
 
     if (levelLoaded)
@@ -697,9 +670,7 @@ void FrameGraphRenderer::SetupFrame() {
     }
 
     m_geometryCollector->BeginFrame();
-
     m_hudBatches.clear();
-
     m_worldParticleBatches.clear();
     m_hudParticleBatches.clear();
 
@@ -731,7 +702,6 @@ framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
 }
 
 void FrameGraphRenderer::SetupFrameGraphPasses() {
-
     const u32 width = Device.dwWidth;
     const u32 height = Device.dwHeight;
 
@@ -1629,15 +1599,11 @@ void FrameGraphRenderer::PrintStats() const {
     Msg("═══════════════════════════════════════");
 }
 
-void FrameGraphRenderer::RenderHUD() {
-}
-
 bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable, bool isStatic) {
     if (!visual)
         return false;
-
+    
     IRender_Mesh* meshVisual = nullptr;
-
     switch (visual->getType()) {
         case MT_NORMAL:
             meshVisual = static_cast<Fvisual*>(visual);
@@ -1655,11 +1621,9 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         case MT_SKELETON_GEOMDEF_PM:
             meshVisual = static_cast<CSkeletonX_PM*>(visual);
             break;
-
         case MT_PARTICLE_EFFECT:
         case MT_PARTICLE_GROUP:
             return ProcessParticleGeometry(visual, worldTransform, renderable, false);
-
         default:
             return false;
     }
@@ -1680,21 +1644,11 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     if (!nvrhiVB || !nvrhiIB)
         return false;
 
-    u32 visualType = visual->getType();
-    if (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM) {
-        u16 renderMode = 0;
-        if (visualType == MT_SKELETON_GEOMDEF_ST) {
-            renderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
-        } else {
-            renderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
-        }
-    }
-
     GeometryBatch batch;
-
     batch.vertexBuffer = nvrhiVB;
     batch.indexBuffer = nvrhiIB;
 
+    u32 visualType = visual->getType();
     bool isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
 
     if (isSkinned) {
@@ -1741,16 +1695,11 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         batch.baseVertex = meshVisual->vBase;
     }
     batch.vertexStride = meshVisual->vStride;
-
     batch.worldMatrix = worldTransform;
-
     batch.visual = visual;
-
     batch.renderable = renderable;
-
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
     batch.isStatic = isStatic;
-
     if (batch.isSkinned) {
         if (visualType == MT_SKELETON_GEOMDEF_ST) {
             batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
@@ -1758,7 +1707,6 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
             batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
         }
     }
-
     if (visualType == MT_TREE_ST || visualType == MT_TREE_PM) {
         batch.worldBoundsCenter = visual->vis.sphere.P;
         batch.worldBoundsRadius = visual->vis.sphere.R;
@@ -2027,7 +1975,7 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
             CKinematics* pV = static_cast<CKinematics*>(pVisual);
             pV->CalculateBones_InvalidateFG();
             pV->CalculateBonesFG(TRUE);
-
+            
             for (auto& child : pV->children) {
                 ExtractStaticLeafVisuals(child, outLeafs);
             }
@@ -2068,7 +2016,6 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
 }
 
 void FrameGraphRenderer::CollectVisibleGeometry() {
-
     if (!g_pGamePersistent)
         return;
 
@@ -2127,7 +2074,6 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         }
     }
 
-
     u32 submittedDynamic = 0;
     u32 notRenderable = 0;
 
@@ -2158,7 +2104,6 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 }
 
 void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& xform) {
-
     if (!V) {
         return;
     }
@@ -2167,9 +2112,9 @@ void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix
     if (!visual) {
         return;
     }
-
+    
     bool isHUD = (root && root->renderable_HUD());
-
+    
     xr_vector<dxRender_Visual*> leafVisuals;
     ExtractStaticLeafVisuals(visual, leafVisuals);
 
@@ -2192,7 +2137,6 @@ xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
     xr_set<framegraph::RenderPhase> phases;
 
     auto& batches = const_cast<GeometryCollector*>(m_geometryCollector.get())->GetBatchesMutable();
-
     xr_map<framegraph::RenderPhase, u32> phaseCount;
 
     for (auto& batch : batches) {
@@ -2201,9 +2145,7 @@ xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
         }
 
         framegraph::RenderPhase phase = m_shaderPhaseCache->GetPhase(batch.visual);
-
         batch.renderPhase = phase;
-
         phases.insert(phase);
         phaseCount[phase]++;
     }
@@ -2228,21 +2170,17 @@ void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
         default:
             return;
     }
-
 }
 
 void FrameGraphRenderer::CreateAllRequiredPasses() {
     xr_set<framegraph::RenderPhase> requiredPhases = ScanRequiredPhases();
-
     for (framegraph::RenderPhase phase : requiredPhases) {
         CreatePhasePass(phase);
     }
-
 }
 
 void FrameGraphRenderer::RouteBatchesToPasses() {
     auto& batches = m_geometryCollector->GetBatchesMutable();
-
     xr_map<framegraph::RenderPhase, xr_vector<GeometryBatch*>> batchesByPhase;
 
     for (auto& batch : batches) {
@@ -2285,7 +2223,7 @@ void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRH
         Msg("! [FrameGraphRenderer] Failed to get final output texture for ImGui");
         return;
     }
-
+    
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.addColorAttachment(nvrhi::TextureHandle(finalTexture));
 
