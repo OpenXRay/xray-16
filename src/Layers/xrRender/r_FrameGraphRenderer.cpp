@@ -53,6 +53,7 @@
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "FrameGraphPasses/ShaderConstants.h"
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -168,9 +169,6 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     }
 
     m_passStates = xr_make_unique<passes::PassStates>();
-    passes::InitializeSkyGeometry(device, m_passStates->sky);
-    passes::InitializeSunPass(device, m_passStates->sun);
-    passes::InitializeTonemapPass(device->GetNVRHIDevice(), m_passStates->tonemap);
 
     m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
     m_gpuProfiler->Initialize(device->GetNVRHIDevice());
@@ -320,10 +318,6 @@ void FrameGraphRenderer::Render() {
                     if (m_passStates)
                     {
                         m_passStates->ResetAll();
-
-                        passes::InitializeSkyGeometry(m_device, m_passStates->sky);
-                        passes::InitializeSunPass(m_device, m_passStates->sun);
-                        passes::InitializeTonemapPass(m_device->GetNVRHIDevice(), m_passStates->tonemap);
                     }
 
                     if (m_detailManager)
@@ -352,6 +346,22 @@ void FrameGraphRenderer::Render() {
     {
         ZoneScopedN("FG::Compile");
         m_framegraph->Compile();
+    }
+
+    {
+        auto& cache = framegraph::GetPassResourceCache();
+        auto* cmdList = m_renderContext->GetCommandList();
+
+        auto sgCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals",
+            sizeof(passes::StaticGlobals), m_device);
+        auto sg = passes::BuildStaticGlobals();
+        cmdList->writeBuffer(sgCB, &sg, sizeof(sg));
+
+        auto dtCB = cache.GetOrCreateVolatileCB("Frame", "DynamicTransforms",
+            sizeof(passes::DynamicTransforms), m_device);
+        passes::DynamicTransforms dt = {};
+        passes::FillDynamicTransforms(dt);
+        cmdList->writeBuffer(dtCB, &dt, sizeof(dt));
     }
 
     {
@@ -456,6 +466,7 @@ void FrameGraphRenderer::RenderMenu() {
 
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
+        m_device,
         sceneWithUI,
         framegraph::VirtualResourceHandle(),
         backbufferHandle,
@@ -1226,7 +1237,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     if (particleOutputs.distortionRT.is_valid()) {
         sceneColor = passes::setupDistortionApplyPass(
-            *m_framegraph, sceneColor, particleOutputs.distortionRT,
+            *m_framegraph, m_device, sceneColor, particleOutputs.distortionRT,
             particleOutputs.layout.worldPos, width, height,
             m_passStates->distortionApply);
     }
@@ -1399,6 +1410,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
+        m_device,
         sceneWithUI,
         exposureOutput.exposureTexture,
         backbufferHandle,

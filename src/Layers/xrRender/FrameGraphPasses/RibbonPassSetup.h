@@ -115,7 +115,7 @@ struct RibbonPassOutput {
     framegraph::DefaultOutputLayout layout;
 };
 
-void InitializeRibbonResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, RibbonPassState& state);
+void InitializeRibbonResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, RibbonPassState& state);
 
 RibbonPassOutput setupRibbonPass(
     framegraph::FrameGraph& fg,

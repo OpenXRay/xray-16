@@ -106,7 +106,7 @@ struct ForwardColorPassData {
     BindlessForwardConfig bindlessConfig;
 };
 
-void InitializeForwardResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ForwardColorPassState& state);
+void InitializeForwardResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ForwardColorPassState& state);
 
 framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::FrameGraph& fg,

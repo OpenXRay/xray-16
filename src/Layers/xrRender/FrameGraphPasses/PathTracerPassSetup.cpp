@@ -330,7 +330,8 @@ PathTracerOutput setupPathTracerPass(
             bsb.BufferSRV("g_GrassIB", grassIB);
             bsb.TextureUAV("g_Accumulation", s_accumBuffer);
             bsb.TextureUAV("g_Output", outTex);
-            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_layout);
+            auto& cache = GetPassResourceCache();
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), s_layout, nvDevice);
 
             nvrhi::ComputeState state;
             state.pipeline = s_pipeline;

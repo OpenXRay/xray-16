@@ -106,7 +106,7 @@ struct ParticlePassOutput {
     framegraph::VirtualResourceHandle distortionRT;
 };
 
-void InitializeParticleResources(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer, ParticlePassState& state);
+void InitializeParticleResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state);
 
 ParticlePassOutput setupParticlePass(
     framegraph::FrameGraph& fg,
