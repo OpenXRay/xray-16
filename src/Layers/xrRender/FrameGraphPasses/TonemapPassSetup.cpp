@@ -39,8 +39,46 @@ void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state) {
     state.initialized = true;
 }
 
+static void EnsureTonemapPipeline(TonemapPassState& state, nvrhi::IDevice* device) {
+    if (state.pipeline)
+        return;
+
+    if (!RImplementation.m_shaderLoader)
+        return;
+
+    auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("tonemap");
+    auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("tonemap");
+    if (!vsResult.handle || !psResult.handle)
+        return;
+
+    auto& cache = framegraph::GetPassResourceCache();
+
+    state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "TonemapPass", *vsResult.reflection, *psResult.reflection, device);
+
+    if (!state.bindingLayout)
+        return;
+
+    nvrhi::GraphicsPipelineDesc pipeDesc;
+    pipeDesc.setVertexShader(vsResult.handle);
+    pipeDesc.setPixelShader(psResult.handle);
+    pipeDesc.addBindingLayout(state.bindingLayout);
+    pipeDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
+    pipeDesc.renderState.blendState.targets[0].setBlendEnable(false);
+    pipeDesc.renderState.depthStencilState.setDepthTestEnable(false);
+    pipeDesc.renderState.depthStencilState.setDepthWriteEnable(false);
+    pipeDesc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.addColorFormat(nvrhi::Format::RGBA8_UNORM);
+
+    state.pipeline = cache.GetOrCreatePipeline("TonemapPass", pipeDesc, fbInfo, device);
+}
+
 void ShutdownTonemapPass(TonemapPassState& state) {
     state.fallbackExposureTexture = nullptr;
+    state.pipeline = nullptr;
+    state.bindingLayout = nullptr;
     state.initialized = false;
 }
 
@@ -97,83 +135,31 @@ framegraph::VirtualResourceHandle setupTonemapPass(
            const FrameGraph& fg,
            ng::RenderContext* ctx) {
 
+            auto* ps = data.passState;
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            nvrhi::IDevice* device = cmdList->getDevice();
+
+            EnsureTonemapPipeline(*ps, device);
+            if (!ps->pipeline || !ps->bindingLayout)
+                return;
 
             auto* hdrTexture = fg.GetPhysicalTexture(data.hdrInput);
             auto* ldrTexture = fg.GetPhysicalTexture(data.ldrOutput);
-
-            auto* exposureTexture = (data.hasExposure && data.exposurePassState)
-                ? passes::GetExposureTexture(*data.exposurePassState) : nullptr;
-
-            if (!hdrTexture || !ldrTexture) {
-                Msg("! [TonemapPass] Failed to get textures");
+            if (!hdrTexture || !ldrTexture)
                 return;
-            }
-
-            if (!RImplementation.m_shaderLoader) {
-                Msg("! [TonemapPass] ShaderLoader not initialized");
-                return;
-            }
-
-            auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("tonemap");
-            auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("tonemap");
-
-            if (!vsResult.handle || !psResult.handle) {
-                Msg("! [TonemapPass] Failed to load shaders");
-                return;
-            }
 
             auto& cache = framegraph::GetPassResourceCache();
-            nvrhi::IDevice* device = cmdList->getDevice();
 
-            auto bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("TonemapPass", *vsResult.reflection, *psResult.reflection, device);
-
-            if (!bindingLayout) {
-                Msg("! [TonemapPass] Failed to create binding layout");
+            auto* vsRefl = RImplementation.m_shaderLoader->GetCachedReflection("tonemap", ".vs");
+            auto* psRefl = RImplementation.m_shaderLoader->GetCachedReflection("tonemap", ".ps");
+            if (!vsRefl || !psRefl)
                 return;
-            }
 
-            nvrhi::RenderState renderState;
-            renderState.blendState.targets[0].setBlendEnable(false);
-            renderState.depthStencilState.setDepthTestEnable(false);
-            renderState.depthStencilState.setDepthWriteEnable(false);
-            renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
-
-            nvrhi::GraphicsPipelineDesc pipelineDesc;
-            pipelineDesc.setVertexShader(vsResult.handle);
-            pipelineDesc.setPixelShader(psResult.handle);
-            pipelineDesc.addBindingLayout(bindingLayout);
-            pipelineDesc.setRenderState(renderState);
-            pipelineDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
-
-            nvrhi::FramebufferInfoEx framebufferInfo;
-            framebufferInfo.addColorFormat(nvrhi::Format::RGBA8_UNORM);
-
-            auto pipeline = cache.GetOrCreatePipeline("TonemapPass", pipelineDesc, framebufferInfo, device);
-
-            if (!pipeline) {
-                Msg("! [TonemapPass] Failed to create pipeline");
-                return;
-            }
-
-            nvrhi::ITexture* exposureToUse = exposureTexture;
-            if (!exposureToUse)
-                exposureToUse = data.passState->fallbackExposureTexture.Get();
-
-            if (!exposureToUse) {
-                Msg("! [TonemapPass] No exposure texture available");
-                return;
-            }
-
-            framegraph::BindingSetBuilder bsb(*vsResult.reflection, *psResult.reflection, device, "Tonemap");
+            framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, device, "Tonemap");
             bsb.Texture("t_hdr", hdrTexture);
-
-            auto bindingSet = device->createBindingSet(bsb.Build(), bindingLayout);
-
-            if (!bindingSet) {
-                Msg("! [TonemapPass] Failed to create binding set");
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->bindingLayout, device);
+            if (!bindingSet)
                 return;
-            }
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(ldrTexture);
@@ -188,16 +174,13 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             viewport.maxZ = 1.0f;
 
             nvrhi::GraphicsState state;
-            state.pipeline = pipeline;
+            state.pipeline = ps->pipeline;
             state.framebuffer = framebuffer;
             state.viewport.addViewportAndScissorRect(viewport);
             state.addBindingSet(bindingSet);
 
             cmdList->setGraphicsState(state);
-
-            nvrhi::DrawArguments drawArgs;
-            drawArgs.vertexCount = 3;
-            cmdList->draw(drawArgs);
+            cmdList->draw(nvrhi::DrawArguments().setVertexCount(3));
         }
     );
 

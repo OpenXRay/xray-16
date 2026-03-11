@@ -14,6 +14,8 @@ struct ExposurePassState;
 
 struct TonemapPassState {
     nvrhi::TextureHandle fallbackExposureTexture;
+    nvrhi::GraphicsPipelineHandle pipeline;
+    nvrhi::BindingLayoutHandle bindingLayout;
     bool initialized = false;
 };
 

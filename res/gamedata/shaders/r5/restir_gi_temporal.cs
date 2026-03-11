@@ -16,11 +16,11 @@ Texture2D<float4> t_PrevReservoirA : register(t0);
 Texture2D<float4> t_PrevReservoirB : register(t1);
 Texture2D<float2> t_MotionVectors : register(t2);
 Texture2D<float> t_Depth : register(t3);
-Texture2D<float4> t_Normal : register(t4);
 Texture2D<float4> t_PrevNormal : register(t5);
 Texture2D<float4> t_BaseColor : register(t6);
 Texture2D<float4> t_WorldPos : register(t7);
 Texture2D<float4> t_PrevWorldPos : register(t8);
+Texture2D<float4> t_Normal : register(t9);
 
 RWTexture2D<float4> u_ReservoirA : register(u0);
 RWTexture2D<float4> u_ReservoirB : register(u1);

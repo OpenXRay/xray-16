@@ -150,8 +150,10 @@ private:
     framegraph::VirtualResourceHandle m_hizPyramid;
 
     nvrhi::TextureHandle m_prevFrameDepth;
-    nvrhi::TextureHandle m_prevFrameNormals;
-    nvrhi::TextureHandle m_prevFrameWorldPos;
+    nvrhi::TextureHandle m_normals[2];
+    nvrhi::TextureHandle m_worldPos[2];
+    u32 m_pingPongIndex = 0;
+
     Fmatrix m_prevViewProj;
     Fvector m_prevCameraPos;
     bool m_hasPrevFrameData = false;
