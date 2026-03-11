@@ -265,8 +265,7 @@ ExposureOutput setupExposurePass(
                         bsb.ConstantBuffer("ExposureParams", histogramCB)
                            .Texture("g_scene_color", sceneTexture)
                            .BufferUAV("g_histogram", ps->histogramBuffer);
-                        auto bindDesc = bsb.Build();
-                        nvrhi::BindingSetHandle histBindings = nvDevice->createBindingSet(bindDesc, ps->histogramLayout);
+                        nvrhi::BindingSetHandle histBindings = cache.GetOrCreateBindingSet(bsb.Build(), ps->histogramLayout, nvDevice);
 
                         if (histBindings) {
                             ctx->SetComputePipeline(ps->histogramPipeline.Get());

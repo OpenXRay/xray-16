@@ -453,10 +453,10 @@ void FrameGraphRenderer::Render() {
         m_gpuCullingManager->ScheduleStatsReadback(m_renderContext->GetCommandList());
     }
 
-    // Mark that we have valid previous frame data for next frame's Hi-Z
     m_hasPrevFrameData = true;
     m_prevViewProj = Device.mFullTransform;
     m_prevCameraPos = Device.vCameraPosition;
+    m_pingPongIndex = 1 - m_pingPongIndex;
 
     // ═══════════════════════════════════════════════════════
     //  GPU PROFILER FRAME END
@@ -957,15 +957,51 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     framegraph::VirtualResourceHandle depthBuffer = m_framegraph->CreateTexture("rt_Depth", depthDesc);
 
-    framegraph::ResourceDesc normalDesc;
-    normalDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    normalDesc.debugName = "rt_Normal";
-    normalDesc.width = width;
-    normalDesc.height = height;
-    normalDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    normalDesc.isRenderTarget = true;
-    normalDesc.isTransient = true;
-    framegraph::VirtualResourceHandle normalBuffer = m_framegraph->CreateTexture("rt_Normal", normalDesc);
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+
+    u32 writeIdx = m_pingPongIndex;
+    u32 readIdx = 1 - m_pingPongIndex;
+
+    if (!m_normals[0] || m_prevFrameWidth != width || m_prevFrameHeight != height) {
+        nvrhi::TextureDesc desc;
+        desc.width = width;
+        desc.height = height;
+        desc.format = nvrhi::Format::RGBA16_FLOAT;
+        desc.isShaderResource = true;
+        desc.isRenderTarget = true;
+        desc.initialState = nvrhi::ResourceStates::RenderTarget;
+        desc.keepInitialState = true;
+        for (int i = 0; i < 2; i++) {
+            desc.debugName = (i == 0) ? "Normals_A" : "Normals_B";
+            m_normals[i] = nvDevice->createTexture(desc);
+        }
+    }
+
+    if (!m_worldPos[0] || m_prevFrameWidth != width || m_prevFrameHeight != height) {
+        nvrhi::TextureDesc desc;
+        desc.width = width;
+        desc.height = height;
+        desc.format = nvrhi::Format::RGBA32_FLOAT;
+        desc.isShaderResource = true;
+        desc.isRenderTarget = true;
+        desc.initialState = nvrhi::ResourceStates::RenderTarget;
+        desc.keepInitialState = true;
+        for (int i = 0; i < 2; i++) {
+            desc.debugName = (i == 0) ? "WorldPos_A" : "WorldPos_B";
+            m_worldPos[i] = nvDevice->createTexture(desc);
+        }
+    }
+
+    framegraph::ResourceDesc normalImportDesc;
+    normalImportDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    normalImportDesc.width = width;
+    normalImportDesc.height = height;
+    normalImportDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    normalImportDesc.isRenderTarget = true;
+    normalImportDesc.isImported = true;
+    normalImportDesc.isTransient = false;
+    normalImportDesc.debugName = "rt_Normal";
+    framegraph::VirtualResourceHandle normalBuffer = m_framegraph->ImportTexture("rt_Normal", m_normals[writeIdx], normalImportDesc);
 
     framegraph::ResourceDesc baseColorDesc;
     baseColorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
@@ -977,15 +1013,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     baseColorDesc.isTransient = true;
     framegraph::VirtualResourceHandle baseColorBuffer = m_framegraph->CreateTexture("rt_BaseColor", baseColorDesc);
 
-    framegraph::ResourceDesc worldPosDesc;
-    worldPosDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    worldPosDesc.debugName = "rt_WorldPos";
-    worldPosDesc.width = width;
-    worldPosDesc.height = height;
-    worldPosDesc.format = nvrhi::Format::RGBA32_FLOAT;
-    worldPosDesc.isRenderTarget = true;
-    worldPosDesc.isTransient = true;
-    framegraph::VirtualResourceHandle worldPosBuffer = m_framegraph->CreateTexture("rt_WorldPos", worldPosDesc);
+    framegraph::ResourceDesc worldPosImportDesc;
+    worldPosImportDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    worldPosImportDesc.width = width;
+    worldPosImportDesc.height = height;
+    worldPosImportDesc.format = nvrhi::Format::RGBA32_FLOAT;
+    worldPosImportDesc.isRenderTarget = true;
+    worldPosImportDesc.isImported = true;
+    worldPosImportDesc.isTransient = false;
+    worldPosImportDesc.debugName = "rt_WorldPos";
+    framegraph::VirtualResourceHandle worldPosBuffer = m_framegraph->ImportTexture("rt_WorldPos", m_worldPos[writeIdx], worldPosImportDesc);
 
     // ═══════════════════════════════════════════════════════
     //  TEMPORAL HI-Z PYRAMID BUILD (From Previous Frame)
@@ -1035,9 +1072,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_hizPyramid.is_valid())
         m_framegraph->GetRTRegistry().RegisterRT("rt_HiZ", m_hizPyramid);
 
-    // Import previous frame normals for ReSTIR temporal validation
     framegraph::VirtualResourceHandle prevNormalsHandle;
-    if (m_hasPrevFrameData && m_prevFrameNormals) {
+    if (m_hasPrevFrameData && m_normals[readIdx]) {
         framegraph::ResourceDesc prevNormalsDesc;
         prevNormalsDesc.type = framegraph::ResourceDesc::Type::Texture2D;
         prevNormalsDesc.debugName = "rt_PrevNormals";
@@ -1047,12 +1083,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         prevNormalsDesc.isRenderTarget = true;
         prevNormalsDesc.isImported = true;
         prevNormalsDesc.isTransient = false;
-        prevNormalsHandle = m_framegraph->ImportTexture("rt_PrevNormals", m_prevFrameNormals, prevNormalsDesc);
+        prevNormalsHandle = m_framegraph->ImportTexture("rt_PrevNormals", m_normals[readIdx], prevNormalsDesc);
         m_framegraph->GetRTRegistry().RegisterRT("rt_PrevNormals", prevNormalsHandle);
     }
 
     framegraph::VirtualResourceHandle prevWorldPosHandle;
-    if (m_hasPrevFrameData && m_prevFrameWorldPos) {
+    if (m_hasPrevFrameData && m_worldPos[readIdx]) {
         framegraph::ResourceDesc prevWorldPosDesc;
         prevWorldPosDesc.type = framegraph::ResourceDesc::Type::Texture2D;
         prevWorldPosDesc.debugName = "rt_PrevWorldPos";
@@ -1062,7 +1098,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         prevWorldPosDesc.isRenderTarget = true;
         prevWorldPosDesc.isImported = true;
         prevWorldPosDesc.isTransient = false;
-        prevWorldPosHandle = m_framegraph->ImportTexture("rt_PrevWorldPos", m_prevFrameWorldPos, prevWorldPosDesc);
+        prevWorldPosHandle = m_framegraph->ImportTexture("rt_PrevWorldPos", m_worldPos[readIdx], prevWorldPosDesc);
         m_framegraph->GetRTRegistry().RegisterRT("rt_PrevWorldPos", prevWorldPosHandle);
     }
 
@@ -1505,31 +1541,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     auto sceneColor = smokeOutputs.albedo;
 
     if (particleOutputs.distortionRT.is_valid()) {
-        framegraph::ResourceDesc snapDesc;
-        snapDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-        snapDesc.width = width;
-        snapDesc.height = height;
-        snapDesc.format = nvrhi::Format::RGBA16_FLOAT;
-        snapDesc.isRenderTarget = true;
-        snapDesc.isTransient = true;
-        snapDesc.isUAV = true;
-        snapDesc.debugName = "rt_SceneSnapshot";
-        auto snapshotHandle = m_framegraph->CreateTexture("rt_SceneSnapshot", snapDesc);
-
-        framegraph::PassHandle copyPass = m_framegraph->AddPass("SceneSnapshotCopy");
-        m_framegraph->PassRead(copyPass, sceneColor, framegraph::ResourceState::CopySource);
-        m_framegraph->PassWrite(copyPass, snapshotHandle, framegraph::ResourceState::CopyDest);
-        m_framegraph->SetPassCallback(copyPass,
-            [sceneColor, snapshotHandle](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
-                auto* src = fg.GetPhysicalTexture(sceneColor);
-                auto* dst = fg.GetPhysicalTexture(snapshotHandle);
-                if (src && dst)
-                    ctx.GetCommandList()->copyTexture(dst, nvrhi::TextureSlice(), src, nvrhi::TextureSlice());
-            });
-
         sceneColor = passes::setupDistortionApplyPass(
-            *m_framegraph, snapshotHandle, particleOutputs.distortionRT,
-            particleOutputs.layout.worldPos, width, height);
+            *m_framegraph, sceneColor, particleOutputs.distortionRT,
+            particleOutputs.layout.worldPos, width, height,
+            m_passStates->distortionApply);
     }
 
     // ═══════════════════════════════════════════════════════
@@ -1929,97 +1944,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  NORMAL COPY PASS (Save normals for next frame's ReSTIR temporal resampling)
-    // ═══════════════════════════════════════════════════════
-    {
-        nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
-
-        if (!m_prevFrameNormals || m_prevFrameWidth != width || m_prevFrameHeight != height) {
-            nvrhi::TextureDesc desc;
-            desc.width = width;
-            desc.height = height;
-            desc.format = nvrhi::Format::RGBA16_FLOAT;
-            desc.isShaderResource = true;
-            desc.debugName = "PrevFrameNormals";
-            desc.initialState = nvrhi::ResourceStates::ShaderResource;
-            desc.keepInitialState = true;
-            m_prevFrameNormals = nvDevice->createTexture(desc);
-        }
-
-        if (m_prevFrameNormals) {
-            framegraph::ResourceDesc importDesc;
-            importDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-            importDesc.debugName = "rt_PrevNormalsCopyDest";
-            importDesc.width = width;
-            importDesc.height = height;
-            importDesc.format = nvrhi::Format::RGBA16_FLOAT;
-            importDesc.isRenderTarget = true;
-            importDesc.isImported = true;
-            importDesc.isTransient = false;
-
-            auto prevNormalsCopyDest = m_framegraph->ImportTexture("rt_PrevNormalsCopyDest", m_prevFrameNormals, importDesc);
-
-            auto finalNormals = transparentOutputs.normal;
-            framegraph::PassHandle normalsCopyPass = m_framegraph->AddPass("NormalsCopy");
-            m_framegraph->PassRead(normalsCopyPass, finalNormals, framegraph::ResourceState::CopySource);
-            m_framegraph->PassWrite(normalsCopyPass, prevNormalsCopyDest, framegraph::ResourceState::CopyDest);
-            m_framegraph->SetPassCallback(normalsCopyPass,
-                [finalNormals, prevNormalsCopyDest](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
-                    nvrhi::ITexture* src = fg.GetPhysicalTexture(finalNormals);
-                    nvrhi::ITexture* dst = fg.GetPhysicalTexture(prevNormalsCopyDest);
-                    if (src && dst)
-                        ctx.GetCommandList()->copyTexture(dst, nvrhi::TextureSlice(), src, nvrhi::TextureSlice());
-                }
-            );
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  WORLD POS COPY PASS (Save world positions for next frame's ReSTIR temporal resampling)
-    // ═══════════════════════════════════════════════════════
-    {
-        nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
-
-        if (!m_prevFrameWorldPos || m_prevFrameWidth != width || m_prevFrameHeight != height) {
-            nvrhi::TextureDesc desc;
-            desc.width = width;
-            desc.height = height;
-            desc.format = nvrhi::Format::RGBA32_FLOAT;
-            desc.isShaderResource = true;
-            desc.debugName = "PrevFrameWorldPos";
-            desc.initialState = nvrhi::ResourceStates::ShaderResource;
-            desc.keepInitialState = true;
-            m_prevFrameWorldPos = nvDevice->createTexture(desc);
-        }
-
-        if (m_prevFrameWorldPos) {
-            framegraph::ResourceDesc importDesc;
-            importDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-            importDesc.debugName = "rt_PrevWorldPosCopyDest";
-            importDesc.width = width;
-            importDesc.height = height;
-            importDesc.format = nvrhi::Format::RGBA32_FLOAT;
-            importDesc.isRenderTarget = true;
-            importDesc.isImported = true;
-            importDesc.isTransient = false;
-
-            auto prevWorldPosCopyDest = m_framegraph->ImportTexture("rt_PrevWorldPosCopyDest", m_prevFrameWorldPos, importDesc);
-
-            auto finalWorldPos = transparentOutputs.worldPos;
-            framegraph::PassHandle worldPosCopyPass = m_framegraph->AddPass("WorldPosCopy");
-            m_framegraph->PassRead(worldPosCopyPass, finalWorldPos, framegraph::ResourceState::CopySource);
-            m_framegraph->PassWrite(worldPosCopyPass, prevWorldPosCopyDest, framegraph::ResourceState::CopyDest);
-            m_framegraph->SetPassCallback(worldPosCopyPass,
-                [finalWorldPos, prevWorldPosCopyDest](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
-                    nvrhi::ITexture* src = fg.GetPhysicalTexture(finalWorldPos);
-                    nvrhi::ITexture* dst = fg.GetPhysicalTexture(prevWorldPosCopyDest);
-                    if (src && dst)
-                        ctx.GetCommandList()->copyTexture(dst, nvrhi::TextureSlice(), src, nvrhi::TextureSlice());
-                }
-            );
-        }
-    }
+    m_prevFrameWidth = width;
+    m_prevFrameHeight = height;
 }
 
 void FrameGraphRenderer::PrintStats() const {

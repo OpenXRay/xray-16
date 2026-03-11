@@ -17,6 +17,7 @@
 #include "RibbonPassSetup.h"
 #include "TrailPassSetup.h"
 #include "SmokeTrailPassSetup.h"
+#include "DistortionApplyPassSetup.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -38,6 +39,7 @@ struct PassStates {
     RibbonPassState ribbon;
     TrailPassState trail;
     SmokeTrailPassState smokeTrail;
+    DistortionApplyPassState distortionApply;
 
     void ResetAll()
     {

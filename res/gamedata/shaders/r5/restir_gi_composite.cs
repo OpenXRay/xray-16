@@ -15,10 +15,10 @@ Texture2D<float4> t_DirectLighting : register(t0);
 Texture2D<float4> t_ReservoirA : register(t1);
 Texture2D<float4> t_ReservoirB : register(t2);
 Texture2D<float> t_Depth : register(t3);
-Texture2D<float4> t_Normal : register(t4);
 Texture2D<float4> t_BaseColor : register(t5);
 Texture2D<float4> t_SceneColorIn : register(t6);
 Texture2D<float4> t_WorldPos : register(t7);
+Texture2D<float4> t_Normal : register(t8);
 
 RWTexture2D<float4> u_SceneColor : register(u0);
 
