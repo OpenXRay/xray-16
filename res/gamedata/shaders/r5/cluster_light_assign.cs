@@ -10,6 +10,8 @@ cbuffer ClusterParams : register(b5)
 };
 
 StructuredBuffer<GPULightData> g_Lights : register(t0);
+StructuredBuffer<uint> g_VisibleLightIndices : register(t1);
+ByteAddressBuffer g_VisibleLightCount : register(t2);
 
 RWStructuredBuffer<uint2> g_ClusterGrid : register(u0);
 RWStructuredBuffer<uint> g_LightIndexList : register(u1);
@@ -25,7 +27,6 @@ void main(uint3 dtid : SV_DispatchThreadID)
     uint tilesX = (uint)cb_gridDims.x;
     uint tilesY = (uint)cb_gridDims.y;
     uint numSlices = (uint)cb_gridDims.z;
-    uint numLights = (uint)cb_gridDims.w;
     float tileSize = cb_depthParams.w;
 
     if (tileX >= tilesX || tileY >= tilesY || slice >= numSlices)
@@ -45,17 +46,19 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float2 tileMax = float2(min((tileX + 1) * tileSize, cb_screenSize.x),
                              min((tileY + 1) * tileSize, cb_screenSize.y));
 
+    uint numVisible = min(g_VisibleLightCount.Load(0), 1024u);
+
     uint lightCount = 0;
     uint lightIndices[256];
 
-    for (uint i = 0; i < numLights; i++)
+    for (uint iter = 0; iter < numVisible; iter++)
     {
+        uint i = g_VisibleLightIndices[iter];
         GPULightData ld = g_Lights[i];
         float3 lightPos = ld.positionAndInvRangeSq.xyz;
         float range = ld.colorAndRange.w;
 
         float4 clipPos = mul(m_VP, float4(lightPos, 1.0));
-
         float lightDepth = clipPos.w;
 
         float depthNear = lightDepth - range;

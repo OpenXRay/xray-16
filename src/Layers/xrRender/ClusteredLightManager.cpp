@@ -3,6 +3,7 @@
 #include "light.h"
 #include "Light_Package.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "xrCore/Threading/ParallelFor.hpp"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -18,6 +19,9 @@ void ClusteredLightManager::Initialize(ng::RenderDevice* device)
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     m_device = nvDevice;
     m_lightsCPU.reserve(MAX_LIGHTS);
+
+    for (u32 i = 0; i < MAX_LIGHTS; i++)
+        m_identityIndices[i] = i;
 
     {
         nvrhi::BufferDesc desc;
@@ -65,6 +69,28 @@ void ClusteredLightManager::Initialize(ng::RenderDevice* device)
         m_lightIndexCounterBuffer = nvDevice->createBuffer(desc);
     }
 
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = MAX_LIGHTS * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.debugName = "ClusteredLights_VisibleIndices";
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        desc.canHaveUAVs = true;
+        m_visibleLightIndicesBuffer = nvDevice->createBuffer(desc);
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = sizeof(u32);
+        desc.debugName = "ClusteredLights_VisibleCount";
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        m_visibleLightCountBuffer = nvDevice->createBuffer(desc);
+    }
+
     Msg("* [ClusteredLights] Created GPU buffers (max %u lights, %u max clusters)",
         MAX_LIGHTS, maxClusters);
 }
@@ -75,15 +101,26 @@ void ClusteredLightManager::Shutdown()
     m_clusterGridBuffer = nullptr;
     m_lightIndexListBuffer = nullptr;
     m_lightIndexCounterBuffer = nullptr;
+    m_visibleLightIndicesBuffer = nullptr;
+    m_visibleLightCountBuffer = nullptr;
+    m_statsReadbackBuffer = nullptr;
+    m_statsReadbackPending = false;
+    m_visibleLightCountCPU = 0;
     m_lightsCPU.clear();
     m_device = nullptr;
 }
 
-void ClusteredLightManager::AddLight(const light* L, u32 type)
+void ClusteredLightManager::BeginFrame()
 {
-    if (m_numLights >= MAX_LIGHTS)
-        return;
+    m_lightsCPU.clear();
+    m_numLights = 0;
+    m_numPoint = 0;
+    m_numSpot = 0;
+    m_numOmni = 0;
+}
 
+static GPULightData BuildGPULightData(const light* L)
+{
     GPULightData gpu;
 
     const float range = L->range;
@@ -92,7 +129,10 @@ void ClusteredLightManager::AddLight(const light* L, u32 type)
     gpu.positionAndInvRangeSq.set(L->position.x, L->position.y, L->position.z, invRangeSq);
     gpu.colorAndRange.set(L->color.r, L->color.g, L->color.b, range);
 
-    if (type == 1)
+    const u32 lightType = L->flags.type;
+    const bool isSpot = (lightType == IRender_Light::SPOT || lightType == IRender_Light::OMNIPART);
+
+    if (isSpot)
     {
         const float cosOuter = _cos(L->cone);
         const float cosInner = _cos(L->cone * 0.8f);
@@ -110,7 +150,53 @@ void ClusteredLightManager::AddLight(const light* L, u32 type)
         gpu.spotVP = Fidentity;
     }
 
-    m_lightsCPU.push_back(gpu);
+    return gpu;
+}
+
+void ClusteredLightManager::CollectLight(const light* L)
+{
+    if (m_numLights >= MAX_LIGHTS)
+        return;
+
+    m_lightsCPU.push_back(BuildGPULightData(L));
+    m_numLights++;
+}
+
+void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>& lights)
+{
+    const u32 count = std::min(static_cast<u32>(lights.size()), MAX_LIGHTS);
+    if (count == 0)
+        return;
+
+    m_lightsCPU.resize(count);
+    m_numLights = count;
+
+    xr_parallel_for(TaskRange<u32>(0, count), [&](const TaskRange<u32>& range) {
+        for (u32 i = range.begin(); i != range.end(); ++i)
+            m_lightsCPU[i] = BuildGPULightData(lights[i]);
+    });
+
+    if (psDeviceFlags.test(rsStatistic))
+    {
+        for (u32 i = 0; i < count; i++)
+        {
+            const u32 lt = lights[i]->flags.type;
+            if (lt == IRender_Light::POINT)
+                m_numPoint++;
+            else if (lt == IRender_Light::SPOT)
+                m_numSpot++;
+            else if (lt == IRender_Light::OMNIPART)
+                m_numOmni++;
+        }
+    }
+}
+
+void ClusteredLightManager::AddLight(const light* L, u32 type)
+{
+    if (m_numLights >= MAX_LIGHTS)
+        return;
+
+    m_lightsCPU.push_back(BuildGPULightData(L));
     m_numLights++;
 }
 
@@ -147,6 +233,16 @@ void ClusteredLightManager::Upload(nvrhi::ICommandList* cmdList)
     cmdList->writeBuffer(m_lightIndexCounterBuffer, &zero, sizeof(u32));
 }
 
+void ClusteredLightManager::UploadAllVisible(nvrhi::ICommandList* cmdList)
+{
+    if (!m_visibleLightIndicesBuffer || m_numLights == 0)
+        return;
+
+    cmdList->writeBuffer(m_visibleLightIndicesBuffer, m_identityIndices.data(), m_numLights * sizeof(u32));
+    cmdList->writeBuffer(m_visibleLightCountBuffer, &m_numLights, sizeof(u32));
+    m_visibleLightCountCPU = m_numLights;
+}
+
 ClusterCB ClusteredLightManager::BuildClusterCB(u32 screenWidth, u32 screenHeight, float zNear, float zFar) const
 {
     const u32 tilesX = (screenWidth + CLUSTER_TILE_SIZE - 1) / CLUSTER_TILE_SIZE;
@@ -165,6 +261,47 @@ ClusterCB ClusteredLightManager::BuildClusterCB(u32 screenWidth, u32 screenHeigh
     const_cast<ClusteredLightManager*>(this)->m_tilesY = tilesY;
 
     return cb;
+}
+
+void ClusteredLightManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
+{
+    if (!m_visibleLightCountBuffer || !m_device || m_statsReadbackPending)
+        return;
+
+    m_statsFrameCounter++;
+    if ((m_statsFrameCounter % 30) != 0)
+        return;
+
+    if (!m_statsReadbackBuffer)
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = sizeof(u32);
+        desc.debugName = "ClusteredLights_StatsReadback";
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+        m_statsReadbackBuffer = m_device->createBuffer(desc);
+        if (!m_statsReadbackBuffer)
+            return;
+    }
+
+    cmdList->copyBuffer(m_statsReadbackBuffer, 0, m_visibleLightCountBuffer, 0, sizeof(u32));
+    m_statsReadbackPending = true;
+}
+
+void ClusteredLightManager::ProcessStatsReadback()
+{
+    if (!m_statsReadbackPending || !m_statsReadbackBuffer || !m_device)
+        return;
+
+    void* mappedData = m_device->mapBuffer(m_statsReadbackBuffer, nvrhi::CpuAccessMode::Read);
+    if (mappedData)
+    {
+        m_visibleLightCountCPU = *static_cast<const u32*>(mappedData);
+        m_device->unmapBuffer(m_statsReadbackBuffer);
+    }
+
+    m_statsReadbackPending = false;
 }
 
 }
