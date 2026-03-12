@@ -48,8 +48,13 @@ struct RenderStats
     u32 skinnedVisible = 0;      // Skinned meshes that passed culling
     u32 skinnedCulled = 0;       // Skinned meshes culled by Hi-Z
 
-    // Detail/grass stats
-    u32 detailInstances = 0;     // Total grass instances
+    u32 lightsPoint = 0;
+    u32 lightsSpot = 0;
+    u32 lightsShadowed = 0;
+    u32 lightsTotal = 0;
+    u32 lightsClustered = 0;
+
+    u32 detailInstances = 0;
     u32 detailSlots = 0;         // Detail slots
     u32 detailTrisPerBlade[3] = {0, 0, 0};  // Triangles per blade per LOD (from bladeIndexCount/3)
 
@@ -73,6 +78,7 @@ struct RenderStats
         megaBufferVertices = megaBufferIndices = 0;
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
         skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
+        lightsPoint = lightsSpot = lightsShadowed = lightsTotal = lightsClustered = 0;
         detailInstances = detailSlots = 0;
         detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;
         detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;

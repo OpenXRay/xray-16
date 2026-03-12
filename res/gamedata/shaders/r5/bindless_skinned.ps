@@ -4,6 +4,7 @@
 // Uses ResourceDescriptorHeap[NonUniformResourceIndex(index)] for texture access
 
 #define SM_6_0
+#define CLUSTERED_LIGHTING_FORWARD
 #include "common.h"
 #include "bindless_common.h"
 #include "skinned_common.h"
@@ -83,7 +84,7 @@ PS_OUTPUT main(PS_INPUT input)
 
     albedo = apply_splat_color(albedo, input.worldPos, input.texcoord);
 
-    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao);
+    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position);
     output.color = float4(fwd.color.rgb, diffuseSample.a);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;

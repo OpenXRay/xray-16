@@ -13,6 +13,7 @@
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/ClusteredLightManager.h"
 
 // Detail rendering console variables
 extern ENGINE_API float ps_r__Detail_l_aniso;
@@ -229,6 +230,9 @@ DefaultOutputLayout setupDetailPass(
                 bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
                 bsb.BufferSRV("slot_data", dm->slotDataBuffer);
                 bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
+                bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
+                bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
+                bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
                 auto bindDesc = bsb.Build();
                 bindDesc.bindings.push_back(nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection));
                 return cache.GetOrCreateBindingSet(bindDesc, dm->graphicsBindingLayout, nvDev);
@@ -247,6 +251,9 @@ DefaultOutputLayout setupDetailPass(
                 bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
                 bsb.BufferSRV("slot_data", dm->slotDataBuffer);
                 bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
+                bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
+                bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
+                bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
                 return cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDev);
             };
 
@@ -304,6 +311,9 @@ DefaultOutputLayout setupDetailPass(
                 decalBsb.BufferSRV("decal_vertices", dm->pulledVertexBuffer);
                 decalBsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
                 decalBsb.BufferSRV("slot_data", dm->slotDataBuffer);
+                decalBsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
+                decalBsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
+                decalBsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
                 nvrhi::BindingSetHandle decalBindingSet = cache.GetOrCreateBindingSet(decalBsb.Build(), dm->decalBindingLayout, nvDev);
 
                 nvrhi::GraphicsState state;

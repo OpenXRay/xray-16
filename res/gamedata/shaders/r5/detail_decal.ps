@@ -1,4 +1,5 @@
 #define SM_6_0
+#define CLUSTERED_LIGHTING_FORWARD
 #include "common.h"
 #include "bindless_common.h"
 
@@ -45,5 +46,5 @@ f_forward main(p_decal I)
 		ao = pbr.b;
 	}
 
-	return output_forward_pbr(texel.rgb, N, I.position.xyz, metallic, roughness, ao);
+	return output_forward_pbr(texel.rgb, N, I.position.xyz, metallic, roughness, ao, I.hpos);
 }

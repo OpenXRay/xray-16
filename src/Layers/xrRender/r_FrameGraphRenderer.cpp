@@ -48,6 +48,10 @@
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
 #include "FrameGraphPasses/SmokeTrailPassSetup.h"
+#include "FrameGraphPasses/ClusterLightPassSetup.h"
+#include "ClusteredLightManager.h"
+#include "light.h"
+#include "Light_DB.h"
 #include "FrameGraphPasses/MotionVectorPassSetup.h"
 #include "FrameGraphPasses/ReSTIRGIPassSetup.h"
 #include "FrameGraphPasses/RibbonPassSetup.h"
@@ -147,7 +151,8 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     bindless::MaterialBuffer::Instance().Initialize(m_device);
     bindless::TerrainMaterialBuffer::Instance().Initialize(m_device);
     bindless::VariantTextureBuffer::Instance().Initialize(m_device);
-    bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);  // Max 64K draws
+    bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);
+    RENDER_NAMESPACE::ClusteredLightManager::Instance().Initialize(m_device);
     Msg("* [FrameGraphRenderer] Bindless material buffers initialized (early)");
 
     m_uiRenderer->Initialize(device, m_uiMaterialCache.get());
@@ -238,6 +243,8 @@ void FrameGraphRenderer::Shutdown() {
         m_smokeTrailManager->Shutdown();
         m_smokeTrailManager = nullptr;
     }
+
+    RENDER_NAMESPACE::ClusteredLightManager::Instance().Shutdown();
 
     passes::ShutdownPathTracer();
 
@@ -363,6 +370,16 @@ void FrameGraphRenderer::Render() {
     auto* cmdList = m_renderContext->GetCommandList();
     auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device);
     auto staticGlobalsData = passes::BuildStaticGlobals();
+
+    auto& clm = RENDER_NAMESPACE::ClusteredLightManager::Instance();
+    if (clm.IsReady() && clm.GetLightCount() > 0) {
+        float zNear = VIEWPORT_NEAR;
+        float zFar = g_pGamePersistent->Environment().CurrentEnv.far_plane;
+        auto ccb = clm.BuildClusterCB(Device.dwWidth, Device.dwHeight, zNear, zFar);
+        staticGlobalsData.cluster_params.set(ccb.gridDims.x, ccb.gridDims.y, ccb.gridDims.z, ccb.gridDims.w);
+        staticGlobalsData.cluster_scales.set(ccb.depthParams.x, ccb.depthParams.y, ccb.depthParams.z, ccb.depthParams.w);
+    }
+
     cmdList->writeBuffer(staticGlobalsCB, &staticGlobalsData, sizeof(staticGlobalsData));
 
     auto dynamicTransformsCB = cache.GetOrCreateVolatileCB("Frame", "DynamicTransforms",
@@ -597,6 +614,16 @@ void FrameGraphRenderer::RenderStatsOverlay()
         }
 
         // Collect detail/grass stats
+        {
+            auto& clmStats = RENDER_NAMESPACE::ClusteredLightManager::Instance();
+            const auto& pkg = RImplementation.Lights.package;
+            stats.lightsPoint = static_cast<u32>(pkg.v_point.size());
+            stats.lightsSpot = static_cast<u32>(pkg.v_spot.size());
+            stats.lightsShadowed = static_cast<u32>(pkg.v_shadowed.size());
+            stats.lightsTotal = stats.lightsPoint + stats.lightsSpot + stats.lightsShadowed;
+            stats.lightsClustered = clmStats.GetLightCount();
+        }
+
         if (m_detailManager)
         {
             stats.detailSlots = m_detailManager->slot_count;
@@ -719,6 +746,9 @@ void FrameGraphRenderer::SetupFrame() {
 
     if (levelLoaded)
         CollectVisibleGeometry();
+
+    if (levelLoaded)
+        RENDER_NAMESPACE::ClusteredLightManager::Instance().BuildLightBuffer(RImplementation.Lights.package);
 
     m_geometryCollector->EndFrame();
 
@@ -1070,6 +1100,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
         if (m_gpuCullingManager->IsVariantPartitionEnabled())
             bindlessConfig.variantPartition = m_gpuCullingManager->GetStaticPartition().ToConfig();
+    }
+
+    auto& clmSetup = RENDER_NAMESPACE::ClusteredLightManager::Instance();
+    if (clmSetup.IsReady() && clmSetup.GetLightCount() > 0) {
+        passes::setupClusterLightPass(
+            *m_framegraph,
+            m_device,
+            &clmSetup,
+            width,
+            height,
+            &m_blackboard->get_or_add<passes::ClusterLightPassState>()
+        );
     }
 
     auto forwardOutputs = passes::setupForwardColorPass(
@@ -2241,9 +2283,16 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         const auto sector_id = data.sector_id;
         IRenderable* renderable = spatial->dcast_Renderable();
 
-        // Skip lights for now (we'll handle them later)
         if (data.type & STYPE_LIGHTSOURCE) {
-            notRenderable++;
+            light* L = (light*)spatial->dcast_Light();
+            if (L) {
+                float lod = L->get_LOD();
+                if (lod > EPS_L) {
+                    vis_data& vis = L->get_homdata();
+                    if (RImplementation.HOM.visible(vis))
+                        RImplementation.Lights.add_light(L);
+                }
+            }
             continue;
         }
         // Get the renderable object

@@ -22,7 +22,8 @@
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
-#include "xrCore/FMesh.hpp"  // For MT_NORMAL, MT_TREE, etc.
+#include "Layers/xrRender/ClusteredLightManager.h"
+#include "xrCore/FMesh.hpp"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -190,6 +191,8 @@ static void renderBindlessForward(
     auto* vsReflection = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
     auto* psReflection = shaderLoader->GetCachedReflection("bindless_forward", ".ps");
 
+    auto& clm = ClusteredLightManager::Instance();
+
     auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
         framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "ForwardColor");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
@@ -197,6 +200,9 @@ static void renderBindlessForward(
         bsb.BufferSRV("g_InstanceData", set.instanceBuffer);
         bsb.BufferSRV("g_CompactBatchIndices", set.compactBatchIndicesBuffer);
         bsb.BufferSRV("g_CompactMaterialIDs", set.compactMaterialIDBuffer);
+        bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
+        bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
+        bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
 
         return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), ps.bindlessLayout, nvDevice);
     };
@@ -326,6 +332,9 @@ static void renderBindlessForward(
             terrainBsb.BufferSRV("g_InstanceData", config.terrainInstanceBuffer);
             terrainBsb.BufferSRV("g_CompactBatchIndices", config.terrainCompactBatchIndicesBuffer);
             terrainBsb.BufferSRV("g_CompactMaterialIDs", config.terrainCompactMaterialIDBuffer);
+            terrainBsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
+            terrainBsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
+            terrainBsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
 
             auto terrainBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainBsb.Build(), ps.terrainLayout, nvDevice);
             R_ASSERT2(terrainBindingSet, "Terrain binding set creation failed");

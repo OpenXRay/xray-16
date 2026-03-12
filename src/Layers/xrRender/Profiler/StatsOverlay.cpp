@@ -545,6 +545,15 @@ void StatsOverlay::RenderGeometrySection()
 
             ImGui::Unindent();
         }
+
+        if (s.lightsClustered > 0)
+        {
+            ImGui::Text("Lights:");
+            ImGui::Indent();
+            ImGui::Text("Clustered: %u  (point: %u, spot: %u, shadowed: %u)",
+                s.lightsClustered, s.lightsPoint, s.lightsSpot, s.lightsShadowed);
+            ImGui::Unindent();
+        }
     }
     else
     {

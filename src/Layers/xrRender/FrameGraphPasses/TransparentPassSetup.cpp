@@ -14,6 +14,7 @@
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
+#include "Layers/xrRender/ClusteredLightManager.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
@@ -190,6 +191,9 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
             bsb.BufferSRV("g_CompactBatchIndices", cfg.compactBatchIndicesBuffer);
             bsb.BufferSRV("g_CompactMaterialIDs", cfg.compactMaterialIDBuffer);
+            bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
+            bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
+            bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
 
             auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
             R_ASSERT2(bindingSet, "Transparent binding set creation failed");

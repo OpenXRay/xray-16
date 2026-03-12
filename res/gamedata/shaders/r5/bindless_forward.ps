@@ -5,6 +5,7 @@
 // Uses static_globals (b2) for lighting - same values as legacy renderer
 
 #define SM_6_0
+#define CLUSTERED_LIGHTING_FORWARD
 #include "common.h"
 #include "bindless_common.h"
 
@@ -105,7 +106,7 @@ PS_OUTPUT main(PS_INPUT input)
         ao = pbrSample.b;
     }
 
-    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao);
+    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position);
     output.color = float4(fwd.color.rgb, diffuseSample.a);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;

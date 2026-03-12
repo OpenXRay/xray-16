@@ -26,6 +26,7 @@
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/Decals/OverlayManager.h"
 #include "PassCommon.h"
+#include "Layers/xrRender/ClusteredLightManager.h"
 #include "xrCore/FMesh.hpp"
 
 extern ENGINE_API float psHUD_FOV;
@@ -374,6 +375,9 @@ static void RenderSkinnedBatch(
     bsb.ConstantBuffer("SkinnedMaterialCB", materialIdCB);
     bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
     bsb.BufferSRV("g_PaintSplats", splatBuffer);
+    bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
+    bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
+    bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
 
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), activeLayout, nvDevice);
     if (!bindingSet)
