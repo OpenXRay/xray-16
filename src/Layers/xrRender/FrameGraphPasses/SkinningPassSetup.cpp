@@ -199,6 +199,12 @@ void InitializeSkinningResources(ng::RenderDevice* device, const nvrhi::Framebuf
         initVariant(state.hq3w, "bindless_skinned_3w", "SkinningPass_hq3w", attribs, 5);
     }
 
+    initHudVariant(state.hudNonHQ, state.nonHQ, "SkinningPass_hud_nonHQ");
+    initHudVariant(state.hudHQ1w, state.hq1w, "SkinningPass_hud_hq1w");
+    initHudVariant(state.hudHQ2w, state.hq2w, "SkinningPass_hud_hq2w");
+    initHudVariant(state.hudHQ3w, state.hq3w, "SkinningPass_hud_hq3w");
+    initHudVariant(state.hudHQ4w, state.hq4w, "SkinningPass_hud_hq4w");
+
     state.initialized = true;
     Msg("* [SkinningPass] Pipeline initialization complete");
 }
@@ -221,31 +227,45 @@ enum {
     RM_SKINNING_4B_HQ = 10
 };
 
-static nvrhi::IGraphicsPipeline* SelectSkinnedPipeline(const SkinningPassState& state, u32 vertexStride, u16 renderMode)
+static nvrhi::IGraphicsPipeline* SelectSkinnedPipelineFromVariants(
+    const SkinningPipelineVariant& nonHQ, const SkinningPipelineVariant& hq1w,
+    const SkinningPipelineVariant& hq2w, const SkinningPipelineVariant& hq3w,
+    const SkinningPipelineVariant& hq4w, u32 vertexStride, u16 renderMode)
 {
     if (renderMode == RM_SKINNING_3B || renderMode == RM_SKINNING_3B_HQ)
-        return state.hq3w.pipeline.Get();
+        return hq3w.pipeline.Get();
     if (renderMode == RM_SKINNING_2B || renderMode == RM_SKINNING_2B_HQ)
-        return state.hq2w.pipeline.Get();
+        return hq2w.pipeline.Get();
     if (renderMode == RM_SKINNING_4B || renderMode == RM_SKINNING_4B_HQ)
-        return state.hq4w.pipeline.Get();
+        return hq4w.pipeline.Get();
     if (renderMode == RM_SKINNING_1B_HQ || renderMode == RM_SINGLE_HQ)
-        return state.hq1w.pipeline.Get();
+        return hq1w.pipeline.Get();
     if (renderMode == RM_SKINNING_1B || renderMode == RM_SINGLE)
-        return state.nonHQ.pipeline.Get();
+        return nonHQ.pipeline.Get();
 
     if (vertexStride == 36)
-        return state.hq1w.pipeline.Get();
+        return hq1w.pipeline.Get();
     if (vertexStride == 40)
-        return state.hq4w.pipeline.Get();
+        return hq4w.pipeline.Get();
     if (vertexStride == 44)
-        return state.hq2w.pipeline.Get();
+        return hq2w.pipeline.Get();
     if (vertexStride == 24)
-        return state.nonHQ.pipeline.Get();
+        return nonHQ.pipeline.Get();
 
     if (vertexStride >= 36)
-        return state.hq1w.pipeline.Get();
-    return state.nonHQ.pipeline.Get();
+        return hq1w.pipeline.Get();
+    return nonHQ.pipeline.Get();
+}
+
+static nvrhi::IGraphicsPipeline* SelectSkinnedPipeline(const SkinningPassState& state, u32 vertexStride, u16 renderMode)
+{
+    return SelectSkinnedPipelineFromVariants(state.nonHQ, state.hq1w, state.hq2w, state.hq3w, state.hq4w, vertexStride, renderMode);
+}
+
+static nvrhi::IGraphicsPipeline* SelectHUDSkinnedPipeline(const SkinningPassState& state, u32 vertexStride, u16 renderMode)
+{
+    auto* hudPipe = SelectSkinnedPipelineFromVariants(state.hudNonHQ, state.hudHQ1w, state.hudHQ2w, state.hudHQ3w, state.hudHQ4w, vertexStride, renderMode);
+    return hudPipe ? hudPipe : SelectSkinnedPipeline(state, vertexStride, renderMode);
 }
 
 static u32 GetSkinnedVertexFormatID(u16 renderMode, u32 vertexStride)
@@ -364,7 +384,7 @@ static void RenderSkinnedBatch(
 
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     auto* vsReflection = shaderLoader->GetCachedReflection("bindless_skinned", ".vs");
-    const char* psShaderName = isHUD ? "bindless_skinned" : "bindless_skinned";
+    const char* psShaderName = (isHUD && state.hudPS) ? "bindless_skinned_hud" : "bindless_skinned";
     auto* psReflection = shaderLoader->GetCachedReflection(psShaderName, ".ps");
     auto activeLayout = isHUD ? state.hudLayout : state.layout;
 
@@ -400,7 +420,9 @@ static void RenderSkinnedBatch(
                 nvDevice, framebuffer, variantIdx, *variant, p, fmt,
                 GetSkinnedInputLayout(state, fmt), state.layout, bindlessLayout);
         } else {
-            pipeline = SelectSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode);
+            pipeline = isHUD
+                ? SelectHUDSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode)
+                : SelectSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode);
         }
         if (!pipeline)
             continue;

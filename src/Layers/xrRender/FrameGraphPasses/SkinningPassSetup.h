@@ -52,6 +52,11 @@ struct SkinningPassState {
     nvrhi::BindingLayoutHandle hudLayout;
     nvrhi::ShaderHandle ps;
     nvrhi::ShaderHandle hudPS;
+    SkinningPipelineVariant hudNonHQ;
+    SkinningPipelineVariant hudHQ1w;
+    SkinningPipelineVariant hudHQ2w;
+    SkinningPipelineVariant hudHQ3w;
+    SkinningPipelineVariant hudHQ4w;
     nvrhi::SamplerHandle linearSampler;
     bool initialized = false;
 };

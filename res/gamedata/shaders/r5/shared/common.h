@@ -40,6 +40,7 @@ cbuffer	static_globals : register(b2)
 	float3		L_sun_color;
 	float		pbr_diffuse_mode;
 	float3		L_sun_dir_w;
+	float		hud_fov;
 	float4		L_hemi_color;
 
 	float3 		eye_position;
