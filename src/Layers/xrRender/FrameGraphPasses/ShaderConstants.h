@@ -10,6 +10,7 @@ extern ENGINE_API Fvector4 ps_dev_param_1;
 extern ENGINE_API Fvector4 ps_dev_param_2;
 extern ENGINE_API Fvector4 ps_dev_param_3;
 extern ENGINE_API Fvector4 ps_dev_param_4;
+extern ENGINE_API float psHUD_FOV;
 namespace xray::render {
     namespace RENDER_NAMESPACE {
         extern float r__dtex_range;
@@ -75,7 +76,7 @@ struct alignas(16) StaticGlobals {
     Fvector3 L_sun_color;
     float pbr_diffuse_mode;
     Fvector3 L_sun_dir_w;
-    float padding2;
+    float hud_fov;
     Fvector4 L_hemi_color;
 
     Fvector3 eye_position;
@@ -152,7 +153,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
         1.0f / (float)Device.dwHeight
     );
 
-    cb.padding2 = 0.0f;
+    cb.hud_fov = psHUD_FOV;
     cb.padding3 = 0.0f;
 
     cb.m_InvVP.invert(cb.m_VP);

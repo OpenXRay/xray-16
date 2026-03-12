@@ -1,0 +1,92 @@
+#define SM_6_0
+#define CLUSTERED_LIGHTING_FORWARD
+#include "common.h"
+#include "bindless_common.h"
+#include "skinned_common.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+};
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 baseColor : SV_Target2;
+    float4 worldPos : SV_Target3;
+};
+
+float3 UndoHUDFOVAdjustment(float3 adjustedWorldPos)
+{
+    float3 viewPos = mul(m_V, float4(adjustedWorldPos, 1.0)).xyz;
+    viewPos.xy *= hud_fov;
+    float3x3 invRot = transpose(float3x3(m_V[0].xyz, m_V[1].xyz, m_V[2].xyz));
+    return mul(invRot, viewPos) + eye_position;
+}
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    PS_OUTPUT output;
+
+    float3 correctedWorldPos = UndoHUDFOVAdjustment(input.worldPos);
+
+    uint materialID = g_SkinnedMaterialID;
+    MaterialData mat = g_Materials[materialID];
+
+    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+
+    if (mat.flags & MAT_FLAG_ALPHA_TEST)
+    {
+        clip(diffuseSample.a - mat.alphaRef);
+    }
+
+    float3 albedo = diffuseSample.rgb;
+
+    float3 N = normalize(input.normal);
+    float gloss = 0.0;
+    if (mat.flags & MAT_FLAG_HAS_NORMAL)
+    {
+        BumpSample bump = SampleNormal(mat, input.texcoord);
+        float3x3 TBN = float3x3(
+            normalize(input.tangent),
+            normalize(input.bitangent),
+            N
+        );
+        N = normalize(mul(bump.normal, TBN));
+        gloss = bump.gloss;
+    }
+
+    if (mat.flags & MAT_FLAG_HAS_DETAIL)
+    {
+        float4 detailSample = SampleDetail(mat, input.texcoord);
+        albedo = albedo * (detailSample.rgb * 2.0);
+    }
+
+    float metallic = 0.0;
+    float roughness = 1.0 - gloss;
+    float ao = 1.0;
+
+    if (mat.flags & MAT_FLAG_HAS_PBR)
+    {
+        float3 pbrSample = SamplePBR(mat, input.texcoord);
+        metallic = pbrSample.r;
+        roughness = pbrSample.g;
+        ao = pbrSample.b;
+    }
+
+    albedo = apply_splat_color(albedo, input.worldPos, input.texcoord);
+
+    f_forward fwd = output_forward_pbr(albedo, N, correctedWorldPos, metallic, roughness, ao, input.position);
+    output.color = float4(fwd.color.rgb, diffuseSample.a);
+    output.normal = fwd.normal;
+    output.baseColor = fwd.baseColor;
+    output.worldPos = float4(correctedWorldPos, 2.0);
+    return output;
+}
