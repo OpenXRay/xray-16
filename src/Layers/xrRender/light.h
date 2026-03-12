@@ -30,6 +30,7 @@ public:
     float virtual_size;
     float cone;
     Fcolor color;
+    shared_str spot_texture_name;
 
     vis_data hom;
     u32 frame_render;
