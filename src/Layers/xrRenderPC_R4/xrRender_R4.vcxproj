@@ -165,6 +165,8 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\TrailPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\SmokeTrailManager.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\SmokeTrailPassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\ClusterLightPassSetup.h" />
+    <ClInclude Include="..\xrRender\ClusteredLightManager.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\DecalPassSetup.h" />
 
     <ClInclude Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.h" />
@@ -437,6 +439,8 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\TrailPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\SmokeTrailManager.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\SmokeTrailPassSetup.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\ClusterLightPassSetup.cpp" />
+    <ClCompile Include="..\xrRender\ClusteredLightManager.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\DecalPassSetup.cpp" />
 
     <ClCompile Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.cpp" />

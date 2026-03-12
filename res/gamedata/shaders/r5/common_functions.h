@@ -173,6 +173,7 @@ float gbuf_unpack_mtl( float mtl_hemi )
 }
 
 #include "shared/pbr_brdf.h"
+#include "shared/clustered_lighting.h"
 
 float3 worldNormalToView(float3 N)
 {
@@ -195,7 +196,8 @@ f_forward output_forward_pbr(
 	float3 worldPos,
 	float metallic,
 	float roughness,
-	float ao)
+	float ao,
+	float4 svPosition = float4(0, 0, 0, 0))
 {
 	f_forward res;
 
@@ -217,6 +219,17 @@ f_forward output_forward_pbr(
 	);
 
 	float3 finalColor = sunLight + ambient;
+
+#ifdef CLUSTERED_LIGHTING_FORWARD
+	if (svPosition.w != 0)
+	{
+		float linearDepth = mul(m_V, float4(worldPos, 1.0)).z;
+		float3 clusterLights = EvaluateClusteredLights(
+			worldPos, N, V, albedo, metallic, roughness,
+			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode);
+		finalColor += clusterLights;
+	}
+#endif
 
 	res.color = float4(finalColor, 1.0);
 	res.normal = float4(N, roughness);

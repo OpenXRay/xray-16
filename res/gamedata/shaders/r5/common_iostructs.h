@@ -363,6 +363,7 @@ struct	p_flat
     float3	rotatedNormal2 : TEXCOORD8;
     nointerpolation uint objectId : TEXCOORD9;
     float	bladeHash : TEXCOORD10;
+    float4	hpos : SV_Position;
 };
 
 struct	v2p_decal
@@ -386,6 +387,7 @@ struct	p_decal
 #endif
     float4	position : TEXCOORD1;
     float3	N : TEXCOORD2;
+    float4	hpos : SV_Position;
 };
 
 struct	v2p_billboard
@@ -413,6 +415,7 @@ struct	p_billboard
     float3	N : TEXCOORD2;
     float	heightParam : TEXCOORD3;
     float	bladeHash : TEXCOORD4;
+    float4	hpos : SV_Position;
 };
 
 struct	v_shadow_direct_aref
