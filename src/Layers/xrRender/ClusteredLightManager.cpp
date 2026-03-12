@@ -3,6 +3,9 @@
 #include "light.h"
 #include "Light_Package.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
+#include "xrEngine/IRenderBackend.h"
 #include "xrCore/Threading/ParallelFor.hpp"
 
 namespace xray::render::RENDER_NAMESPACE
@@ -107,6 +110,7 @@ void ClusteredLightManager::Shutdown()
     m_statsReadbackPending = false;
     m_visibleLightCountCPU = 0;
     m_lightsCPU.clear();
+    m_spotTextureCache.clear();
     m_device = nullptr;
 }
 
@@ -119,7 +123,7 @@ void ClusteredLightManager::BeginFrame()
     m_numOmni = 0;
 }
 
-static GPULightData BuildGPULightData(const light* L)
+GPULightData ClusteredLightManager::BuildGPULightData(const light* L)
 {
     GPULightData gpu;
 
@@ -128,6 +132,8 @@ static GPULightData BuildGPULightData(const light* L)
 
     gpu.positionAndInvRangeSq.set(L->position.x, L->position.y, L->position.z, invRangeSq);
     gpu.colorAndRange.set(L->color.r, L->color.g, L->color.b, range);
+
+    std::memset(&gpu.spotVP, 0, sizeof(gpu.spotVP));
 
     const u32 lightType = L->flags.type;
     const bool isSpot = (lightType == IRender_Light::SPOT || lightType == IRender_Light::OMNIPART);
@@ -139,15 +145,60 @@ static GPULightData BuildGPULightData(const light* L)
         const float scale = 1.0f / std::max(cosInner - cosOuter, 0.001f);
         const float offset = -cosOuter * scale;
 
+        u32 texIdx = 0;
+        if (!L->spot_texture_name.empty())
+            texIdx = GetOrLoadSpotTexture(L->spot_texture_name);
+
         gpu.directionAndSpotScale.set(L->direction.x, L->direction.y, L->direction.z, scale);
-        gpu.spotParamsAndType.set(offset, 1.0f, 0.0f, 0.0f);
-        gpu.spotVP = Fidentity;
+
+        float texIdxBits;
+        std::memcpy(&texIdxBits, &texIdx, sizeof(float));
+        gpu.spotParamsAndType.set(offset, 1.0f, texIdxBits, 0.0f);
+
+        if (texIdx != 0)
+        {
+            Fvector L_dir, L_up, L_right;
+            L_dir.set(L->direction);
+            float l_dir_m = L_dir.magnitude();
+            if (_valid(l_dir_m) && l_dir_m > EPS_S)
+                L_dir.div(l_dir_m);
+            else
+                L_dir.set(0, 0, 1);
+
+            if (L->right.square_magnitude() > EPS)
+            {
+                L_right.set(L->right);
+                L_right.normalize();
+                L_up.crossproduct(L_dir, L_right);
+                L_up.normalize();
+                L_right.crossproduct(L_up, L_dir);
+                L_right.normalize();
+            }
+            else
+            {
+                L_up.set(0, 1, 0);
+                if (_abs(L_up.dotproduct(L_dir)) > .99f)
+                    L_up.set(0, 0, 1);
+                L_right.crossproduct(L_up, L_dir);
+                L_right.normalize();
+                L_up.crossproduct(L_dir, L_right);
+                L_up.normalize();
+            }
+
+            Fmatrix spotView;
+            spotView.build_camera_dir(L->position, L_dir, L_up);
+
+            Fmatrix spotProj;
+            float nearPlane = std::max(L->virtual_size, 0.01f);
+            spotProj.build_projection(L->cone + deg2rad(3.5f), 1.f, nearPlane, range + EPS_S);
+
+            gpu.spotVP.mul(spotProj, spotView);
+        }
     }
     else
     {
         gpu.directionAndSpotScale.set(0.0f, -1.0f, 0.0f, 0.0f);
         gpu.spotParamsAndType.set(0.0f, 0.0f, 0.0f, 0.0f);
-        gpu.spotVP = Fidentity;
     }
 
     return gpu;
@@ -167,6 +218,15 @@ void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>&
     const u32 count = std::min(static_cast<u32>(lights.size()), MAX_LIGHTS);
     if (count == 0)
         return;
+
+    for (u32 i = 0; i < count; i++)
+    {
+        const light* L = lights[i];
+        const u32 lt = L->flags.type;
+        const bool isSpot = (lt == IRender_Light::SPOT || lt == IRender_Light::OMNIPART);
+        if (isSpot && !L->spot_texture_name.empty())
+            GetOrLoadSpotTexture(L->spot_texture_name);
+    }
 
     m_lightsCPU.resize(count);
     m_numLights = count;
@@ -302,6 +362,44 @@ void ClusteredLightManager::ProcessStatsReadback()
     }
 
     m_statsReadbackPending = false;
+}
+
+u32 ClusteredLightManager::GetOrLoadSpotTexture(const shared_str& name)
+{
+    auto it = m_spotTextureCache.find(name);
+    if (it != m_spotTextureCache.end())
+        return it->second;
+
+    auto* renderDevice = RImplementation.m_renderDevice;
+    if (!renderDevice)
+        return 0;
+
+    auto* resMgr = renderDevice->GetFGResourceManager();
+    auto* backend = renderDevice->GetBackend();
+    if (!resMgr || !backend)
+        return 0;
+
+    auto* texManager = resMgr->GetTextureManager();
+    if (!texManager)
+        return 0;
+
+    auto handle = texManager->LoadTexture(name.c_str());
+    if (!handle.IsValid())
+    {
+        m_spotTextureCache[name] = 0;
+        return 0;
+    }
+
+    nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+    if (!nvrhiTex)
+    {
+        m_spotTextureCache[name] = 0;
+        return 0;
+    }
+
+    u32 bindlessIdx = backend->RegisterBindlessTexture(nvrhiTex);
+    m_spotTextureCache[name] = bindlessIdx;
+    return bindlessIdx;
 }
 
 }

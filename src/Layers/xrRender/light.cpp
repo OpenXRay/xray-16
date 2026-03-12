@@ -62,15 +62,16 @@ light::~light()
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
 void light::set_texture(LPCSTR name)
 {
-    return; // YOHJI TODO - Port light logic to framegraph/nvrhi
     if ((nullptr == name) || (0 == name[0]))
     {
-        // default shaders
+        spot_texture_name = nullptr;
         s_spot.destroy();
         s_point.destroy();
         s_volumetric.destroy();
         return;
     }
+
+    spot_texture_name = name;
 
 #pragma todo("Only shadowed spot implements projective texture")
     string256 temp;

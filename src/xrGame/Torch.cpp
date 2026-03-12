@@ -23,8 +23,8 @@ constexpr pcstr TORCH_DEFINITION = "torch_definition";
 static const float TORCH_INERTION_CLAMP = PI_DIV_6;
 static const float TORCH_INERTION_SPEED_MAX = 7.5f;
 static const float TORCH_INERTION_SPEED_MIN = 0.5f;
-static Fvector TORCH_OFFSET = {-0.2f, +0.1f, -0.3f};
-static const Fvector OMNI_OFFSET = {-0.2f, +0.1f, -0.1f};
+static Fvector TORCH_OFFSET = {0.0f, 0.0f, 0.0f};
+static const Fvector OMNI_OFFSET = {0.0f, 0.0f, 0.0f};
 static const float OPTIMIZATION_DISTANCE = 100.f;
 
 CTorch::CTorch()
@@ -206,7 +206,7 @@ void CTorch::Switch(bool light_on)
         u16 bi = pVisual->LL_BoneID(light_trace_bone);
 
         pVisual->LL_SetBoneVisible(bi, light_on, TRUE);
-        pVisual->CalculateBones(TRUE);
+        pVisual->CalculateBonesFG(TRUE);
     }
 }
 bool CTorch::torch_active() const { return (m_switched_on); }
@@ -323,13 +323,13 @@ void CTorch::UpdateCL()
     {
         CActor* actor = smart_cast<CActor*>(H_Parent());
         if (actor)
-            smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones_Invalidate();
+            smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones_InvalidateFG();
 
         if (H_Parent()->XFORM().c.distance_to_sqr(Device.vCameraPosition) < _sqr(OPTIMIZATION_DISTANCE) ||
             GameID() != eGameIDSingle)
         {
             // near camera
-            smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones();
+            smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBonesFG();
             M.mul_43(XFORM(), BI.mTransform);
         }
         else
