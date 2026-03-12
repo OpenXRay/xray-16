@@ -548,11 +548,13 @@ void StatsOverlay::RenderGeometrySection()
 
         if (s.lightsClustered > 0)
         {
-            ImGui::Text("Lights:");
-            ImGui::Indent();
-            ImGui::Text("Clustered: %u  (point: %u, spot: %u, shadowed: %u)",
-                s.lightsClustered, s.lightsPoint, s.lightsSpot, s.lightsShadowed);
-            ImGui::Unindent();
+            u32 culled = (s.lightsHiZVisible > 0 && s.lightsHiZVisible < s.lightsClustered)
+                ? (s.lightsClustered - s.lightsHiZVisible) : 0;
+            if (culled > 0)
+                ImGui::Text("Lights: %u visible / %u total (%u Hi-Z culled)", s.lightsHiZVisible, s.lightsClustered, culled);
+            else
+                ImGui::Text("Lights: %u clustered", s.lightsClustered);
+            ImGui::TextDisabled("  %u point, %u spot, %u omni", s.lightsPoint, s.lightsSpot, s.lightsOmni);
         }
     }
     else

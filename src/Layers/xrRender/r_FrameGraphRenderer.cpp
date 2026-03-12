@@ -51,7 +51,6 @@
 #include "FrameGraphPasses/ClusterLightPassSetup.h"
 #include "ClusteredLightManager.h"
 #include "light.h"
-#include "Light_DB.h"
 #include "FrameGraphPasses/MotionVectorPassSetup.h"
 #include "FrameGraphPasses/ReSTIRGIPassSetup.h"
 #include "FrameGraphPasses/RibbonPassSetup.h"
@@ -616,12 +615,12 @@ void FrameGraphRenderer::RenderStatsOverlay()
         // Collect detail/grass stats
         {
             auto& clmStats = RENDER_NAMESPACE::ClusteredLightManager::Instance();
-            const auto& pkg = RImplementation.Lights.package;
-            stats.lightsPoint = static_cast<u32>(pkg.v_point.size());
-            stats.lightsSpot = static_cast<u32>(pkg.v_spot.size());
-            stats.lightsShadowed = static_cast<u32>(pkg.v_shadowed.size());
-            stats.lightsTotal = stats.lightsPoint + stats.lightsSpot + stats.lightsShadowed;
             stats.lightsClustered = clmStats.GetLightCount();
+            stats.lightsPoint = clmStats.GetPointCount();
+            stats.lightsSpot = clmStats.GetSpotCount();
+            stats.lightsOmni = clmStats.GetOmniCount();
+            u32 visCount = clmStats.GetVisibleLightCount();
+            stats.lightsHiZVisible = (visCount > 0) ? visCount : stats.lightsClustered;
         }
 
         if (m_detailManager)
@@ -716,6 +715,9 @@ void FrameGraphRenderer::SetupFrame() {
         m_detailManager->ProcessStatsReadback(m_device->GetNVRHIDevice());
     }
 
+    if (psDeviceFlags.test(rsStatistic))
+        RENDER_NAMESPACE::ClusteredLightManager::Instance().ProcessStatsReadback();
+
     m_bufferHandleCache.clear();
     m_lstRenderables.clear();
 
@@ -744,11 +746,10 @@ void FrameGraphRenderer::SetupFrame() {
     m_worldParticleBatches.clear();
     m_hudParticleBatches.clear();
 
-    if (levelLoaded)
-        CollectVisibleGeometry();
+    RENDER_NAMESPACE::ClusteredLightManager::Instance().BeginFrame();
 
     if (levelLoaded)
-        RENDER_NAMESPACE::ClusteredLightManager::Instance().BuildLightBuffer(RImplementation.Lights.package);
+        CollectVisibleGeometry();
 
     m_geometryCollector->EndFrame();
 
@@ -1110,7 +1111,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             &clmSetup,
             width,
             height,
-            &m_blackboard->get_or_add<passes::ClusterLightPassState>()
+            &m_blackboard->get_or_add<passes::ClusterLightPassState>(),
+            hizOutput.pyramid,
+            hizOutput.width,
+            hizOutput.height,
+            hizOutput.mipLevels,
+            m_prevViewProj,
+            m_hasPrevFrameData
         );
     }
 
@@ -2277,33 +2284,32 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     // Process each visible dynamic object (from cached list)
     u32 portalTraversalMarker = dsgraph.PortalTraverser.i_marker;
 
+    xr_vector<const light*> collectedLights;
+    collectedLights.reserve(256);
+
     for (ISpatial* spatial : m_lstRenderables)
     {
         const auto& data = spatial->GetSpatialData();
-        const auto sector_id = data.sector_id;
-        IRenderable* renderable = spatial->dcast_Renderable();
 
         if (data.type & STYPE_LIGHTSOURCE) {
-            light* L = (light*)spatial->dcast_Light();
-            if (L) {
-                float lod = L->get_LOD();
-                if (lod > EPS_L) {
-                    vis_data& vis = L->get_homdata();
-                    if (RImplementation.HOM.visible(vis))
-                        RImplementation.Lights.add_light(L);
-                }
-            }
+            const light* L = (const light*)spatial->dcast_Light();
+            if (L)
+                collectedLights.push_back(L);
             continue;
         }
-        // Get the renderable object
+
+        IRenderable* renderable = spatial->dcast_Renderable();
         if (!renderable) {
             notRenderable++;
             continue;
         }
 
         renderable->renderable_Render(0, renderable);
-        submittedDynamic++;  // Count objects that got a chance to render
+        submittedDynamic++;
     }
+
+    if (!collectedLights.empty())
+        RENDER_NAMESPACE::ClusteredLightManager::Instance().CollectLightsParallel(collectedLights);
 
     // ═══════════════════════════════════════════════════════
     //  HUD RENDERING (after dynamic objects)
