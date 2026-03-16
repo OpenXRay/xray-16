@@ -190,8 +190,8 @@ public:
     // Extracts bounding sphere data from geometry batches
     void UploadSceneObjects(ng::RenderContext* ctx, const GeometryCollector* geometry);
 
-    // Invalidate static GPU culling data (call on level load/unload)
     void InvalidateStaticCullingData();
+    void InvalidateShadersAndPipelines();
 
     // Setup GPU culling pass in FrameGraph
     // Returns handles to culled results for forward pass

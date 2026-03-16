@@ -1947,6 +1947,54 @@ void GPUCullingManager::InvalidateStaticCullingData()
     Msg("* [GPUCulling] Static culling data invalidated");
 }
 
+void GPUCullingManager::InvalidateShadersAndPipelines()
+{
+    m_cullPipeline = nullptr;
+    m_clearArgsPipeline = nullptr;
+    m_compactCountPipeline = nullptr;
+    m_compactScanPipeline = nullptr;
+    m_compactScatterPipeline = nullptr;
+    m_cullLayout = nullptr;
+    m_clearArgsLayout = nullptr;
+    m_compactCountLayout = nullptr;
+    m_compactScanLayout = nullptr;
+    m_compactScatterLayout = nullptr;
+
+    m_variantPartitionPipeline = nullptr;
+    m_variantPartitionLayout = nullptr;
+
+    m_terrainApplyVisibilityPipeline = nullptr;
+    m_terrainApplyVisibilityLayout = nullptr;
+
+    m_debugComputePipeline = nullptr;
+    m_particleDebugComputePipeline = nullptr;
+    m_debugComputeLayout = nullptr;
+    m_debugGraphicsPipeline = nullptr;
+    m_debugGraphicsLayout = nullptr;
+    m_debugInputLayout = nullptr;
+
+    m_particleCullPipeline = nullptr;
+    m_particleCullLayout = nullptr;
+
+    m_pointSampler = nullptr;
+
+    m_initialized = false;
+    m_computeEnabled = false;
+    m_compactEnabled = false;
+    m_variantPartitionEnabled = false;
+    m_particleCullEnabled = false;
+    m_skinnedCullEnabled = false;
+
+    m_staticDataCached = false;
+    m_staticTerrainDrawArgsUploaded = false;
+    m_staticSet.objectsUploaded = false;
+    m_staticSet.drawArgsUploaded = false;
+    m_dynamicSet.objectsUploaded = false;
+    m_dynamicSet.drawArgsUploaded = false;
+
+    Msg("* [GPUCulling] Shaders and pipelines invalidated for hot-reload");
+}
+
 // ═══════════════════════════════════════════════════════
 //  UPLOAD SKINNED OBJECTS
 // ═══════════════════════════════════════════════════════

@@ -22,6 +22,8 @@ public:
     void OnDeviceResetBegin() override;
     void OnDeviceResetEnd() override;
 
+    void InvalidateShadersAndPipeline();
+
     // Render with explicit framebuffer and command list (called inline after FrameGraph)
     void Render(ImDrawData* data, nvrhi::IFramebuffer* framebuffer, nvrhi::ICommandList* cmdList);
 

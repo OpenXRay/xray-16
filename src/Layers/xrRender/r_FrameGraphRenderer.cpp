@@ -333,6 +333,16 @@ void FrameGraphRenderer::Render() {
                     if (m_detailManager)
                         m_detailManager->InvalidateShadersAndPipelines();
 
+                    if (m_gpuCullingManager)
+                        m_gpuCullingManager->InvalidateShadersAndPipelines();
+
+                    if (m_rtAccelMgr)
+                        RENDER_NAMESPACE::RTAccelStructManager::InvalidateShaderPipelines();
+
+                    ng::ImGuiRendererNVRHI* imguiReload = RImplementation.GetImGuiRendererNVRHI();
+                    if (imguiReload)
+                        imguiReload->InvalidateShadersAndPipeline();
+
                     Msg("* Shader hot-reload complete");
                 }
             }
