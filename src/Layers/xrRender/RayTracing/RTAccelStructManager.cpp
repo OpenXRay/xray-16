@@ -139,6 +139,27 @@ void RTAccelStructManager::Shutdown()
     s_billboardInitialized = false;
 }
 
+void RTAccelStructManager::InvalidateShaderPipelines()
+{
+    s_skinPipeline = nullptr;
+    s_skinLayout = nullptr;
+    s_skinCB = ng::BufferHandle();
+    s_skinInitialized = false;
+
+    s_grassPipeline = nullptr;
+    s_grassLayout = nullptr;
+    s_grassCB = ng::BufferHandle();
+    s_grassSampler = nullptr;
+    s_grassInitialized = false;
+
+    s_billboardPipeline = nullptr;
+    s_billboardLayout = nullptr;
+    s_billboardCB = ng::BufferHandle();
+    s_billboardInitialized = false;
+
+    Msg("* [RTAccel] Shader pipelines invalidated for hot-reload");
+}
+
 void RTAccelStructManager::BuildIfNeeded(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling)
 {
     if (m_isReady || !m_rtSupported || !gpuCulling)

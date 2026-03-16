@@ -110,6 +110,25 @@ void ImGuiRendererNVRHI::OnDeviceResetEnd()
     CreateDeviceObjects();
 }
 
+void ImGuiRendererNVRHI::InvalidateShadersAndPipeline()
+{
+    m_vertexShader = nullptr;
+    m_pixelShader = nullptr;
+    m_inputLayout = nullptr;
+    m_bindingLayout = nullptr;
+    m_resourceBindings = nullptr;
+    m_pipeline = nullptr;
+
+    if (!CreateShaders() || !CreatePipelineState())
+    {
+        Msg("! ImGui shader hot-reload failed");
+        return;
+    }
+
+    if (m_fontTexture)
+        CreateResourceBindings();
+}
+
 bool ImGuiRendererNVRHI::CreateDeviceObjects()
 {
     if (!m_device)

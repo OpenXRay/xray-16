@@ -149,6 +149,7 @@ public:
     void UploadSceneObjects(ng::RenderContext* ctx, const GeometryCollector* geometry);
 
     void InvalidateStaticCullingData();
+    void InvalidateShadersAndPipelines();
 
     GPUCullOutput SetupCullingPass(
         framegraph::FrameGraph& fg,

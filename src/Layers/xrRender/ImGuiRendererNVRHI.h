@@ -21,6 +21,8 @@ public:
     void OnDeviceResetBegin() override;
     void OnDeviceResetEnd() override;
 
+    void InvalidateShadersAndPipeline();
+
     void Render(ImDrawData* data, nvrhi::IFramebuffer* framebuffer, nvrhi::ICommandList* cmdList);
 
 private:

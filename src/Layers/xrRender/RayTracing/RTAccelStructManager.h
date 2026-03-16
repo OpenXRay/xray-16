@@ -50,6 +50,7 @@ public:
     void RebuildDynamic(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
     void InvalidateSkinned();
     void InvalidateGrass();
+    static void InvalidateShaderPipelines();
 
     bool IsReady() const { return m_isReady; }
     bool IsSupported() const { return m_rtSupported; }
