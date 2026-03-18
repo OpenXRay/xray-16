@@ -1,11 +1,5 @@
 
 out vec4 SV_Target;
-#ifdef GBUFFER_OPTIMIZATION
-in vec4 gl_FragCoord;
-#endif
-#ifdef MSAA_OPTIMIZATION
-in int gl_SampleID;
-#endif
 
 layout(location = TEXCOORD0)	in float2 	p_aa_AA_sun_tc		; // TEXCOORD0;
 layout(location = TEXCOORD1)	in float2	p_aa_AA_sun_unused	; // TEXCOORD1;

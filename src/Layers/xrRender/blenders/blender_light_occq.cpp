@@ -42,9 +42,11 @@ void CBlender_light_occq::Compile(CBlender_Compile& C)
         C.r_Pass("stub_notransform_t", "dumb", false, FALSE, FALSE, FALSE);
         C.r_ColorWriteEnable(false, false, false, false);
         C.r_CullMode(D3DCULL_NONE);
+#ifdef USE_DX11
         if (RImplementation.o.msaa)
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0x00, 0x7E, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO);
         else
+#endif
         {
             // Clear all bits except the last one
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0x00, 0xFE, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO);

@@ -145,7 +145,7 @@ static bool must_enable_old_cascades()
     {
         IReader* accumSunNear = open_shader("accum_sun_near.ps");
         R_ASSERT3(accumSunNear, "Can't open shader", "accum_sun_near.ps");
-        do
+        while (accumSunNear != nullptr)
         {
             xr_string str(static_cast<cpcstr>(accumSunNear->pointer()), accumSunNear->length());
 
@@ -172,7 +172,7 @@ static bool must_enable_old_cascades()
             {
                 oldCascades = false;
             }
-        } while (false);
+        }
         FS.r_close(accumSunNear);
     }
 #endif
@@ -421,10 +421,16 @@ void CRender::create()
     o.msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
     o.msaa_hybrid &= !o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
 #elif defined(USE_OGL)
-    // TODO: OGL: temporary disabled, need to fix it
-    o.msaa = false;
-    o.msaa_samples = 0;
+    o.msaa_samples = (1 << ps_r3_msaa);
+    o.msaa = o.msaa_samples > 1;
+
+    if (!o.msaa) o.msaa_samples = 0;
+    // Important! DX10 related, for OpenGL same as o.msaa
+    // It's messing with shader predefines
     o.msaa_opt = o.msaa;
+    // DX related ?
+    o.gbuffer_opt = true;
+    // Important! DX10 related, for OpenGL always false
     o.msaa_hybrid = false;
 #else
 #   error No graphics API selected or enabled!

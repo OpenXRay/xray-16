@@ -20,7 +20,11 @@ void CRenderTarget::create_minmax_SM(CBackend& cmd_list)
     pv++;
     RImplementation.Vertex.Unlock(4, g_combine_2UV->vb_stride);
     //u_setrt	(rt_smap_depth_minmax_temp,NULL,NULL,NULL);
-    u_setrt(cmd_list, rt_smap_depth_minmax, 0, 0, 0);
+#ifdef USE_OGL
+    u_setrt_(cmd_list, rt_smap_depth_minmax);
+#else
+    u_setrt(cmd_list, rt_smap_depth_minmax, nullptr, nullptr, nullptr);
+#endif
     cmd_list.set_Element(s_create_minmax_sm->E[0]);
     cmd_list.set_Geometry(g_combine_2UV);
     cmd_list.set_Stencil(FALSE, D3DCMP_ALWAYS, 0x80, 0xFF, 0x80,

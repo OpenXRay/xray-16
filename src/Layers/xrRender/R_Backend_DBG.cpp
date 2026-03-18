@@ -52,7 +52,7 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, u32 vcnt, u16* pIdx,
         RImplementation.Index.Unlock(count);
     }
     set_Geometry(vs_L);
-    set_RT(RImplementation.Target->get_base_rt());
+    set_RT(RImplementation.Target->get_base_rt(), 0);
     RImplementation.rmNormal(RCache);
     set_Stencil(FALSE);
     Render(T, vBase, 0, vcnt, iBase, pcnt);
@@ -70,7 +70,7 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
         RImplementation.Vertex.Unlock(count, vs_L->vb_stride);
     }
     set_Geometry(vs_L);
-    set_RT(RImplementation.Target->get_base_rt());
+    set_RT(RImplementation.Target->get_base_rt(), 0);
     RImplementation.rmFar(RCache);
     set_Stencil(FALSE);
     Render(T, vBase, pcnt);

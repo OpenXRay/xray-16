@@ -10,7 +10,12 @@ void CRenderTarget::phase_ssao()
     RCache.ClearRT(rt_ssao_temp, {});
 
     // low/hi RTs
+#ifdef USE_OGL
+    u_setrt_(RCache, rt_ssao_temp);
+#else
     u_setrt(RCache, rt_ssao_temp, nullptr, nullptr, nullptr /*rt_MSAADepth*/);
+#endif
+
 
     RCache.set_Stencil(FALSE);
 
@@ -102,7 +107,12 @@ void CRenderTarget::phase_downsamp()
     // Fvector2	p0,p1;
     u32 Offset = 0;
 
+#ifdef USE_OGL
+    u_setrt_(RCache, rt_half_depth);
+#else
     u_setrt(RCache, rt_half_depth, nullptr, nullptr, nullptr /*rt_MSAADepth*/);
+#endif
+
     RCache.ClearRT(rt_half_depth, {}); // black
     u32 w = Device.dwWidth;
     u32 h = Device.dwHeight;

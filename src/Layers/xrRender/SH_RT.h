@@ -2,7 +2,10 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
-//////////////////////////////////////////////////////////////////////////
+class CRT;
+struct resptrcode_crt;
+typedef resptr_core<CRT, resptrcode_crt> ref_rt;
+
 class CRT : public xr_resource_named
 {
 public:
@@ -25,7 +28,11 @@ public:
     void set_slice_read(int slice);
     void set_slice_write(u32 context_id, int slice);
 
+#ifdef USE_OGL
+    void resolve_into(ref_rt& destination) const;
+#else
     void resolve_into(CRT& destination) const; // only RTs with same format supported
+#endif
 
 public:
 #if defined(USE_DX11)
@@ -63,7 +70,6 @@ struct resptrcode_crt : public resptr_base<CRT>
     void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, u32 slices_num, Flags32 flags);
     void destroy() { _set(nullptr); }
 };
-typedef resptr_core<CRT, resptrcode_crt> ref_rt;
 
 /*	//	DX10 cut
 //////////////////////////////////////////////////////////////////////////

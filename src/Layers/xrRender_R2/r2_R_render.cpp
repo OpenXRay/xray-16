@@ -23,18 +23,30 @@ void CRender::RenderMenu()
 
     // Main Render
     {
+#ifdef USE_OGL
+        Target->u_setrtzb(RCache, Target->rt_Generic_0, Target->rt_Base_Depth); // LDR RT
+#else
         Target->u_setrt(RCache, Target->rt_Generic_0, nullptr, nullptr, Target->rt_Base_Depth); // LDR RT
+#endif
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
     // Distort
     {
+#ifdef USE_OGL
+        Target->u_setrtzb(RCache, Target->rt_Generic_1, Target->rt_Base_Depth); // Now RT is a distortion mask
+#else
         Target->u_setrt(RCache, Target->rt_Generic_1, nullptr, nullptr, Target->rt_Base_Depth); // Now RT is a distortion mask
+#endif
         RCache.ClearRT(Target->rt_Generic_1, color_rgba(127, 127, 0, 127));
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
 
     // Actual Display
+#ifdef USE_OGL
+    Target->u_setrtzb(RCache, Target->get_base_rt(), Target->get_base_zb());
+#else
     Target->u_setrt(RCache, Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
+#endif
     RCache.set_Shader(Target->s_menu);
     RCache.set_Geometry(Target->g_menu);
 
@@ -94,7 +106,11 @@ void CRender::Render()
     // if (!(g_pGameLevel && g_hud) || bMenu)
     if (!g_pGameLevel || bMenu)
     {
+#ifdef USE_OGL
+        Target->u_setrtzb(RCache, Target->get_base_rt(), 0, 0, Target->get_base_zb());
+#else
         Target->u_setrt(RCache, Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
+#endif
         return;
     }
 
@@ -207,7 +223,7 @@ void CRender::Render()
 #if defined(USE_DX11)
         dsgraph.cmd_list.set_ZB(Target->rt_MSAADepth->pZRT[dsgraph.cmd_list.context_id]);
 #elif defined(USE_OGL)
-        dsgraph.cmd_list.set_ZB(Target->rt_MSAADepth->pZRT);
+        dsgraph.cmd_list.set_ZB(Target->rt_MSAADepth);
 #endif
     }
     {
@@ -262,10 +278,15 @@ void CRender::Render()
     if (split_the_scene_to_minimize_wait)
     {
         PIX_EVENT(DEFER_PART1_SPLIT);
+        //@TODO: REMOVE dead code
         // skybox can be drawn here
         if (false)
         {
+#ifdef USE_OGL
+            Target->u_setrtzb(dsgraph.cmd_list, Target->rt_Generic_0_r, Target->rt_Generic_1_r, Target->rt_MSAADepth);
+#else
             Target->u_setrt(dsgraph.cmd_list, Target->rt_Generic_0_r, Target->rt_Generic_1_r, nullptr, Target->rt_MSAADepth);
+#endif
             dsgraph.cmd_list.set_CullMode(CULL_NONE);
             dsgraph.cmd_list.set_Stencil(FALSE);
 

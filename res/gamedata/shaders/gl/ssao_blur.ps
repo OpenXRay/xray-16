@@ -19,7 +19,7 @@ float ssao_blur_ps(int2 centerTC, int iSample)
 #ifndef USE_MSAA
 	float2 centerData = tex2D(s_occ, centerTC).rg;
 #else
-	float2 centerData = texelFetch(s_occ, centerTC, iSample).rg;
+	float2 centerData = texelFetch(s_occ, centerTC, int(iSample)).rg;
 #endif
 
 	float  fOcclusion  = centerData.r * fSumWeight;
@@ -46,7 +46,7 @@ float ssao_blur_ps(int2 centerTC, int iSample)
 		float2 sampleData = tex2D(s_occ, sampleTC).rg;
 #else
 		int2	sampleTC   = centerTC + arrOffsets[i];
-		float2 sampleData = texelFetch(s_occ, sampleTC, iSample).rg;
+		float2 sampleData = texelFetch(s_occ, sampleTC, int(iSample)).rg;
 #endif
 	 
 		float fDepth  = sampleData.g;

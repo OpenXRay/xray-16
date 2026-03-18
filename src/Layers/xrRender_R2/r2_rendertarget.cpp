@@ -438,9 +438,13 @@ CRenderTarget::CRenderTarget()
 
                 for (u32 i = 0; i < BoundSamples; ++i)
                 {
-                    // CBlender_accum_direct_volumetric_sun_msaa b_accum_direct_volumetric_sun_msaa{ "ISAMPLE", SAMPLE_DEFS[i] };
-                    // s_accum_direct_volumetric_msaa[i].create(&b_accum_direct_volumetric_sun_msaa, "r2" DELIMITER "accum_direct");
+#ifdef USE_OGL
+                    CBlender_accum_direct_volumetric_sun_msaa b_accum_direct_volumetric_sun_msaa{ "ISAMPLE", SAMPLE_DEFS[i] };
+                    s_accum_direct_volumetric_msaa[i].create(&b_accum_direct_volumetric_sun_msaa, "r2" DELIMITER "accum_direct");
+#else
                     s_accum_direct_volumetric_msaa[i].create(snames[i]);
+#endif
+
                     manually_assign_texture(s_accum_direct_volumetric_msaa[i], "s_smap", smapTarget);
                 }
             }
@@ -639,7 +643,11 @@ CRenderTarget::CRenderTarget()
             rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
             RCache.ClearRT(rt_LUM_pool[it], 0x7f7f7f7f);
         }
+#ifdef USE_OGL
+        u_setrtzb(RCache, get_base_rt(), get_base_zb());
+#else
         u_setrt(RCache, Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
+#endif
     }
 
     // COMBINE

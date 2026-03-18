@@ -42,7 +42,7 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
             0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
         };
 #elif defined(USE_OGL)
-        Fmatrix m_TexelAdjust =
+        const Fmatrix m_TexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
             0.0f, 0.5f, 0.0f, 0.0f,
@@ -65,8 +65,12 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
     L_dir.normalize();
 
     {
+        ref_shader shader_accum_reflected = s_accum_reflected;
+#ifdef USE_OGL
+        shader_accum_reflected = RImplementation.o.msaa ? s_accum_reflected_msaa[0] : shader_accum_reflected;
+#endif
         // Lighting
-        cmd_list.set_Shader(s_accum_reflected);
+        cmd_list.set_Shader(shader_accum_reflected);
 
         // Constants
         cmd_list.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, 1 / (L->range * L->range));
@@ -74,12 +78,8 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
         cmd_list.set_c("direction", L_dir.x, L_dir.y, L_dir.z, 0.f);
         cmd_list.set_c("m_texgen", m_Texgen);
 
-        if (!RImplementation.o.msaa)
-        {
-            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
-            draw_volume(cmd_list, L);
-        }
-        else // checked Holger
+#ifdef USE_DX11
+        if (RImplementation.o.msaa)
         {
             // per pixel
             cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0x00);
@@ -98,7 +98,6 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
             }
             else // checked Holger
             {
-#   if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Shader(s_accum_reflected_msaa[i]);
@@ -111,26 +110,30 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
                     draw_volume(cmd_list, L);
                 }
                 cmd_list.StateManager.SetSampleMask(0xffffffff);
-#   elif defined(USE_OGL)
-                VERIFY(!"Only optimized MSAA is supported in OpenGL");
-#   endif // USE_DX11
             }
+        }
+        else
+#endif
+        {
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
+            draw_volume(cmd_list, L);
         }
     }
 
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
+        ref_shader shader_accum_mask = s_accum_mask;
+#ifdef USE_OGL
+        shader_accum_mask = RImplementation.o.msaa ? s_accum_mask_msaa[0] : shader_accum_mask;
+        u_setrtzb(cmd_list, rt_Accumulator, rt_MSAADepth);
+#else
         u_setrt(cmd_list, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
-        cmd_list.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
+#endif
+        cmd_list.set_Element(shader_accum_mask->E[SE_MASK_ACCUM_VOL]);
         cmd_list.set_c("m_texgen", m_Texgen);
-        if (!RImplementation.o.msaa)
-        {
-            // per pixel
-            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
-            draw_volume(cmd_list, L);
-        }
-        else // checked holger
+#ifdef USE_DX11
+        if (RImplementation.o.msaa)
         {
             // per pixel
             cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0x00);
@@ -144,7 +147,6 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
             }
             else // checked holger
             {
-#   if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
@@ -153,17 +155,18 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
                     draw_volume(cmd_list, L);
                 }
                 cmd_list.StateManager.SetSampleMask(0xffffffff);
-#   elif defined(USE_OGL)
-                VERIFY(!"Only optimized MSAA is supported in OpenGL");
-#   endif // USE_DX11
             }
-#   if defined(USE_DX11) // XXX: not sure why this is needed. Just preserving original behaviour
             cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
-#   endif // !USE_OGL
+        }
+        else
+#endif
+        {
+            // per pixel
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
+            draw_volume(cmd_list, L);
         }
     }
 
-    //
     u_DBT_disable();
 }
 } // namespace xray::render::RENDER_NAMESPACE

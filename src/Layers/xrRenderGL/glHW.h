@@ -52,6 +52,7 @@ public:
     u32 CurrentBackBuffer{};
 
     GLuint pFB{};
+    GLuint pResolveFB{};
 
     SDL_Window* m_window{};
 

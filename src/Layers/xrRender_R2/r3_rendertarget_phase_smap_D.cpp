@@ -6,7 +6,11 @@ void CRenderTarget::phase_smap_direct(CBackend& cmd_list, light *L, u32 sub_phas
 {
     if (sub_phase == SE_SUN_RAIN_SMAP)
     {
+#ifdef USE_OGL
+        u_set_zb(cmd_list, rt_smap_rain);
+#else
         u_setrt(cmd_list, nullptr, nullptr, nullptr, rt_smap_rain);
+#endif
         cmd_list.ClearZB(rt_smap_rain, 1.0f);
         cmd_list.SetViewport({0, 0, rt_smap_rain->dwWidth, rt_smap_rain->dwHeight, 0.0, 1.0});
     }

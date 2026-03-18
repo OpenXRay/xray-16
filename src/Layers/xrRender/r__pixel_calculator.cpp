@@ -16,11 +16,12 @@ void r_pixel_calculator::begin()
     rt.create("$user$pixel_calculator_rt", rt_dimensions, rt_dimensions, HW.Caps.fTarget);
     zb.create("$user$pixel_calculator_zb", rt_dimensions, rt_dimensions, HW.Caps.fDepth, 1, { CRT::CreateSurface });
 
-    RCache.set_RT(rt->pRT);
 #ifdef USE_DX11
+    RCache.set_RT(rt->pRT);
     RCache.set_ZB(zb->pZRT[RCache.context_id]);
 #elif defined(USE_OGL)
-    RCache.set_ZB(zb->pRT);
+    RCache.set_RT(rt, 0);
+    RCache.set_ZB(zb);
 #endif
 
     R_ASSERT(Device.RenderBegin());
@@ -30,7 +31,7 @@ void r_pixel_calculator::end()
 {
     Device.RenderEnd();
 
-    RCache.set_RT(RImplementation.Target->get_base_rt());
+    RCache.set_RT(RImplementation.Target->get_base_rt(), 0);
     RCache.set_ZB(RImplementation.Target->get_base_zb());
 
     zb = nullptr;

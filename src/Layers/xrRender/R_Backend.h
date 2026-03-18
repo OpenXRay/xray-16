@@ -97,9 +97,12 @@ private:
     ID3DRenderTargetView* pRT[4];
     ID3DDepthStencilView* pZB;
 #elif defined(USE_OGL)
+    // TODO make it valid(?), set target as GL_NONE
+    ref_rt ref_invalid{};
+
     GLuint pFB;
-    GLuint pRT[4];
-    GLuint pZB;
+    ref_rt* pRT[4] = {&ref_invalid, &ref_invalid, &ref_invalid, &ref_invalid};
+    ref_rt* pZB = &ref_invalid;
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -274,13 +277,25 @@ public:
     IC void set_ZB(ID3DDepthStencilView* ZB);
     IC ID3DRenderTargetView* get_RT(u32 ID = 0);
     IC ID3DDepthStencilView* get_ZB();
+    IC void unset_RT(u32 ID)
+    {
+        set_RT(nullptr, ID);
+    }
 #elif defined(USE_OGL)
     IC void set_FB(GLuint FB = 0);
-    IC void set_RT(GLuint RT, u32 ID = 0);
-    IC void set_ZB(GLuint ZB);
+    IC void set_RT(const ref_rt& RT, u32 ID);
+    IC void unset_RT(u32 ID);
+    IC void set_ZB(const ref_rt&  ZB);
+    IC void unset_ZB();
     IC GLuint get_FB();
-    IC GLuint get_RT(u32 ID = 0);
-    IC GLuint get_ZB();
+    IC ref_rt& get_RT(u32 ID = 0);
+    IC ref_rt& get_ZB();
+
+    IC void ClearZB(const ref_rt& zb, float depth);
+    IC void ClearZB(const ref_rt& zb, float depth, u8 stencil);
+    IC bool ClearZBRect(const ref_rt& zb, float depth, size_t numRects, const Irect* rects);
+    IC bool ClearRTRect(const ref_rt& rt, const Fcolor& color, size_t numRects, const Irect* rects);
+    IC void ClearRT(ref_rt& rt, const Fcolor& color);
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -293,40 +308,17 @@ public:
 
     IC bool ClearRTRect(ID3DRenderTargetView* rt, const Fcolor& color, size_t numRects, const Irect* rects);
     IC bool ClearZBRect(ID3DDepthStencilView* zb, float depth, size_t numRects, const Irect* rects);
-#elif defined(USE_OGL)
-    IC void ClearRT(GLuint rt, const Fcolor& color);
-
-    IC void ClearZB(GLuint zb, float depth);
-    IC void ClearZB(GLuint zb, float depth, u8 stencil);
-
-    IC bool ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, const Irect* rects);
-    IC bool ClearZBRect(GLuint zb, float depth, size_t numRects, const Irect* rects);
-#else
-#   error No graphics API selected or enabled!
-#endif
-
     ICF void ClearRT(ref_rt& rt, const Fcolor& color) { ClearRT(rt->pRT, color); }
-    ICF bool ClearRTRect(ref_rt& rt, const Fcolor& color, size_t numRects, const Irect* rects)
-    {
-        return ClearRTRect(rt->pRT, color, numRects, rects);
-    }
-
-#if defined(USE_OGL)
-    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pRT, depth);}
-    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pRT, depth, stencil);}
-    ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
-    {
-        return ClearZBRect(zb->pRT, depth, numRects, rects);
-    }
-#elif defined(USE_DX11)
     ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT[context_id], depth); }
     ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT[context_id], depth, stencil); }
     ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
     {
         return ClearZBRect(zb->pZRT[context_id], depth, numRects, rects);
     }
-#else
-#   error No graphics API selected or enabled!
+    ICF bool ClearRTRect(ref_rt& rt, const Fcolor& color, size_t numRects, const Irect* rects)
+    {
+        return ClearRTRect(rt->pRT, color, numRects, rects);
+    }
 #endif
 
     IC void set_Constants(R_constant_table* C);

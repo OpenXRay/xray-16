@@ -21,27 +21,39 @@ void CRenderTarget::phase_scene_prepare()
     if (RImplementation.o.advancedpp && (ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES | R2FLAG_DOF) ||
                                             ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
     {
+#ifdef USE_DX11
         //	TODO: DX11: Check if we need to set RT here.
         u_setrt(RCache, Device.dwWidth, Device.dwHeight, rt_Position->pRT, 0, 0, rt_MSAADepth);
+#else
+        /* TODO investigate: it should be rt_Normal, (maybe) rt_Color(albedo) and rt_MSAADepth
+         * rt_Position should be always single-sampled */
+        u_setrtzb(RCache, rt_Position,rt_MSAADepth);
+#endif
 
         const Fcolor color{}; // black
         RCache.ClearRT(rt_Position, color);
         // RCache.ClearRT(rt_Normal, color);
         // RCache.ClearRT(rt_Color, color);
+        //@TODO: do we need this if ?
         if (!RImplementation.o.msaa)
             RCache.ClearZB(get_base_zb(), 1.0f, 0);
         else
         {
+            // TODO Clear all at once
             RCache.ClearRT(rt_Color, color);
             RCache.ClearRT(rt_Accumulator, color);
             RCache.ClearZB(rt_MSAADepth, 1.0f, 0);
-            RCache.ClearZB(get_base_zb(), 1.0f, 0);
+            //RCache.ClearZB(get_base_zb(), 1.0f, 0); rt_MSAADepth != get_base_zb()
         }
     }
     else
     {
         //	TODO: DX11: Check if we need to set RT here.
+#ifdef USE_OGL
+        u_setrtzb(RCache, get_base_rt(),rt_MSAADepth);
+#else
         u_setrt(RCache, Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, rt_MSAADepth);
+#endif
         RCache.ClearZB(rt_MSAADepth, 1.0f, 0);
     }
 
@@ -54,6 +66,11 @@ void CRenderTarget::phase_scene_prepare()
 void CRenderTarget::phase_scene_begin()
 {
     // Targets, use accumulator for temporary storage
+#ifdef USE_OGL
+    // TODO Investigate should be color always
+    auto& _2 = RImplementation.o.albedo_wo ? rt_Accumulator : rt_Color;
+    u_setrtzb(RCache, rt_Position, _2, rt_MSAADepth);
+#else
     if (!RImplementation.o.gbuffer_opt)
     {
         if (RImplementation.o.albedo_wo)
@@ -69,6 +86,7 @@ void CRenderTarget::phase_scene_begin()
             u_setrt(RCache, rt_Position, rt_Color, rt_MSAADepth);
         // else								u_setrt		(rt_Position,	rt_Color, rt_Normal,		rt_MSAADepth);
     }
+#endif
 
     // Stencil - write 0x1 at pixel pos
     RCache.set_Stencil(
@@ -98,7 +116,12 @@ void CRenderTarget::phase_scene_end()
         return;
 
     // transfer from "rt_Accumulator" into "rt_Color"
+#ifdef USE_OGL
+    u_setrtzb(RCache, rt_Color, rt_MSAADepth);
+#else
     u_setrt(RCache, rt_Color, nullptr, nullptr, rt_MSAADepth);
+#endif
+
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     if (RImplementation.o.nvstencil)

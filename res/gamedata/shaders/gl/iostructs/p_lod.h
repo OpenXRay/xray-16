@@ -5,13 +5,7 @@ out vec4 SV_Target1;
 #ifndef GBUFFER_OPTIMIZATION
 out vec4 SV_Target2;
 #endif // GBUFFER_OPTIMIZATION
-#ifdef EXTEND_F_DEFFER
-out int gl_SampleMask[];
-#endif // EXTEND_F_DEFFER
-#ifdef	MSAA_ALPHATEST_DX10_1_ATOC
-in vec4 gl_FragCoord;
-#endif // MSAA_ALPHATEST_DX10_1_ATOC
-#endif // #endif 
+#endif // #endif
 
 struct v2p
 {
@@ -52,7 +46,6 @@ void main()
 #else
 	f_deffer O	= _main (I);
 #endif	// MSAA_ALPHATEST_DX10_1_ATOC
-
 #endif	// ATOC
 
 	SV_Target0 = O.position;
@@ -63,6 +56,6 @@ void main()
 	SV_Target2 = O.C;
 #endif	// GBUFFER_OPTIMIZATION
 #ifdef EXTEND_F_DEFFER
-	gl_SampleMask[0] = O.mask;
+	gl_SampleMask[0] = int(O.mask);
 #endif
 }

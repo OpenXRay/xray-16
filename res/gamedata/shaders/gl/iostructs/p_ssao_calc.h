@@ -1,10 +1,6 @@
 out vec4 SV_Target;
 in vec4 gl_FragCoord;
 
-#ifdef MSAA_OPTIMIZATION
-in int gl_SampleID;
-#endif
-
 struct	_input
 {
 #ifdef USE_VTF

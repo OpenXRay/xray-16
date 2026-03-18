@@ -4,10 +4,10 @@ out vec4 SV_Target;
 in vec4 gl_FragCoord;
 
 #ifdef ISAMPLE
-#	undef ISAMPLE
-#endif // #ifdef ISAMPLE
+#undef ISAMPLE
+#endif
 
-#define ISAMPLE uint(0)
+#define ISAMPLE int(0)
 
 uniform float3x4	m_v2w;
 
