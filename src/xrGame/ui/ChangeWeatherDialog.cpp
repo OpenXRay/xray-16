@@ -87,26 +87,23 @@ void ChangeWeatherDialog::InitChangeWeather(CUIXml& xmlDoc)
     auto& gameWeathers = gMapListHelper.GetGameWeathers();
     Initialize(gameWeathers.size());
     weathers.resize(gameWeathers.size());
-
-    // There is no mistake. Vanilla algorithm sorted config keys by alphabet.
-    // We did it for vanilla bug fixes and compatibility with game data.
-    string256 path;
     for (u32 i = 0; i < weathers.size(); i++)
     {
-        xr_sprintf(path, "change_weather:btn_%d", i+1);
-        CUIXmlInit::Init3tButton(xmlDoc, path, 0, GetButton(i).Button);
-        xr_sprintf(path, "change_weather:txt_%d", i+1);
-        CUIXmlInit::InitStatic(xmlDoc, path, 0, GetButton(i).Text);
+        string256 temp;
+        xr_sprintf(temp, "change_weather:btn_%d", i + 1);
+        CUIXmlInit::Init3tButton(xmlDoc, temp, 0, GetButton(i).Button);
+        xr_sprintf(temp, "change_weather:txt_%d", i + 1);
+        CUIXmlInit::InitStatic(xmlDoc, temp, 0, GetButton(i).Text);
+
+        // Because XML loader preserves the original order and CInifile doesn't,
+        // the order of elements in xmlDoc may differ from the one in gameWeathers,
+        // which results in a mess up.
+        // Override the text, to define only one source of truth.
+        xr_sprintf(temp, "%u. %s", i + 1, StringTable().translate(gameWeathers[i].Name).c_str());
+        GetButton(i).Text->SetText(temp);
+        weathers[i].Name = gameWeathers[i].Name;
+        weathers[i].Time = gameWeathers[i].StartTime;
     }
-    Log("! Weathers name sorted by alphabet !");
-    weathers[0].Name = gameWeathers[0].Name;
-    weathers[0].Time = gameWeathers[0].StartTime;
-    weathers[1].Name = gameWeathers[3].Name;
-    weathers[1].Time = gameWeathers[3].StartTime;
-    weathers[2].Name = gameWeathers[2].Name;
-    weathers[2].Time = gameWeathers[2].StartTime;
-    weathers[3].Name = gameWeathers[1].Name;
-    weathers[3].Time = gameWeathers[1].StartTime;
 }
 
 void ChangeWeatherDialog::OnButtonClick(int i)
