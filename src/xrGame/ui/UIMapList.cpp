@@ -204,11 +204,14 @@ const char* CUIMapList::GetCommandLine(LPCSTR player_name)
     m_command += m_srv_params;
     m_command += "/ver=";
     m_command += M.map_ver.c_str();
-    m_command += "/estime=";
 
-    u32 id = m_pWeatherSelector->m_list_box.GetSelectedItem()->GetTAG();
+    if (const auto selected = m_pWeatherSelector->m_list_box.GetSelectedItem())
+    {
+        m_command += "/estime=";
+        const u32 id = selected->GetTAG();
+        m_command += m_mapWeather[id].weather_time.c_str();
+    }
 
-    m_command += m_mapWeather[id].weather_time.c_str();
     m_command += ")";
 
     m_command += " client(localhost/name=";
@@ -289,9 +292,7 @@ void CUIMapList::AddWeather(const shared_str& WeatherType, const shared_str& Wea
     R_ASSERT2(m_pWeatherSelector, "m_pWeatherSelector == NULL");
     m_pWeatherSelector->AddItem_(WeatherType.c_str(), 0)->SetTAG(_id);
 
-    m_mapWeather.resize(m_mapWeather.size() + 1);
-    m_mapWeather.back().weather_name = WeatherType;
-    m_mapWeather.back().weather_time = WeatherTime;
+    m_mapWeather.emplace_back(WeatherType, WeatherTime);
 }
 
 void CUIMapList::InitFromXml(CUIXml& xml_doc, const char* path)
