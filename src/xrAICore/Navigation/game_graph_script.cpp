@@ -61,6 +61,27 @@ void CGameGraph::script_register(lua_State* luaState)
             .def("level_point", &CVertex__level_point)
             .def("game_point", &CVertex__game_point)
             .def("level_id", &CGameVertex::level_id)
-            .def("level_vertex_id", &CGameVertex::level_vertex_id)
+            .def("level_vertex_id", &CGameVertex::level_vertex_id),
+
+        def("gg_vertex_level_id", +[](u32 vertex_id)
+        {
+            return GEnv.AISpace->game_graph().vertex(vertex_id)->level_id();
+        }),
+        def("gg_level_id", [](_LEVEL_ID idx)
+        {
+            const GameGraph::LEVEL_MAP& levels = GEnv.AISpace->game_graph().header().levels();
+            return (levels.begin() + idx)->second.id();
+        }),
+        def("gg_levels_count", +[]()
+        {
+            return GEnv.AISpace->game_graph().header().level_count();
+        }),
+        def("gg_distance", +[](u32 vid1, u32 vid2)
+        {
+            const auto game_graph = GEnv.AISpace->game_graph();
+            const auto p1 = game_graph.vertex(vid1)->game_point();
+            const auto p2 = game_graph.vertex(vid2)->game_point();
+            return p1.distance_to(p2);
+        })
     ];
 }
