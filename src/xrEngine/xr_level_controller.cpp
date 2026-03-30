@@ -766,7 +766,7 @@ bool IsGroupMatching(EKeyGroup g1, EKeyGroup g2)
 
 bool IsContextNotConflicted(EKeyContext c1, EKeyContext c2)
 {
-    return c1 != c2;
+    return c1 != c2 || (c1 == EKeyContext::Undefined && c2 == EKeyContext::Undefined);
 }
 
 bool IsContextMatching(EKeyContext c1, EKeyContext c2)
