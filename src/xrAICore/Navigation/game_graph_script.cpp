@@ -40,7 +40,6 @@ void CGameGraph::script_register(lua_State* luaState)
     using namespace luabind;
     using namespace luabind::policy;
 
-    typedef CGameGraph::CGameVertex CGameVertex;
     module(luaState)
     [
         class_<GameGraph::LEVEL_MAP::value_type>("GameGraph__LEVEL_MAP__value_type")
@@ -67,7 +66,7 @@ void CGameGraph::script_register(lua_State* luaState)
         {
             return GEnv.AISpace->game_graph().vertex(vertex_id)->level_id();
         }),
-        def("gg_level_id", [](_LEVEL_ID idx)
+        def("gg_level_id", +[](_LEVEL_ID idx)
         {
             const GameGraph::LEVEL_MAP& levels = GEnv.AISpace->game_graph().header().levels();
             return (levels.begin() + idx)->second.id();
