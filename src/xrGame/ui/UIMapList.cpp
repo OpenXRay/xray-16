@@ -292,7 +292,7 @@ void CUIMapList::AddWeather(const shared_str& WeatherType, const shared_str& Wea
     R_ASSERT2(m_pWeatherSelector, "m_pWeatherSelector == NULL");
     m_pWeatherSelector->AddItem_(WeatherType.c_str(), 0)->SetTAG(_id);
 
-    m_mapWeather.emplace_back(WeatherType, WeatherTime);
+    m_mapWeather.emplace_back(CUIMapList::Sw{ WeatherType, WeatherTime });
 }
 
 void CUIMapList::InitFromXml(CUIXml& xml_doc, const char* path)

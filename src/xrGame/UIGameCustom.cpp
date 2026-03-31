@@ -402,7 +402,7 @@ void CMapListHelper::LoadMapInfo(const char* cfgName, const xr_string& levelName
             if (!suitableLevels)
             {
                 Msg("--unknown game type-%s", gameType.c_str());
-                suitableLevels = &m_storage.emplace_back(gameType, ParseStringToGameType(gameType.c_str()));
+                suitableLevels = &m_storage.emplace_back(SGameTypeMaps{ gameType, ParseStringToGameType(gameType.c_str()) });
             }
             MPLevelDesc levelDesc;
             levelDesc.map_name = shLevelName;
@@ -474,7 +474,7 @@ void CMapListHelper::Load()
     m_weathers.reserve(weatherCfg.Data.size());
     for (const auto& weatherDesc : weatherCfg.Data)
     {
-        m_weathers.emplace_back(weatherDesc.first, weatherDesc.second);
+        m_weathers.emplace_back(MPWeatherDesc{ weatherDesc.first, weatherDesc.second });
     }
 
     if (m_weathers.empty())
