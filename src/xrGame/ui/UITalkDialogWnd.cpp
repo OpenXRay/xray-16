@@ -305,12 +305,14 @@ void CUITalkDialogWnd::SetOsoznanieMode(bool b)
     UIToTradeButton.Show(!b);
     if (mechanic_mode)
     {
-        UIToTradeButton.m_hint_text = "ui_st_upgrade_hint";
+        if (StringTable().has_translation("ui_st_upgrade_hint"))
+            UIToTradeButton.m_hint_text = "ui_st_upgrade_hint";
         UIToTradeButton.TextItemControl()->SetTextST("ui_st_upgrade");
     }
     else
     {
-        UIToTradeButton.m_hint_text = "ui_st_trade_hint";
+        if (StringTable().has_translation("ui_st_trade_hint"))
+            UIToTradeButton.m_hint_text = "ui_st_trade_hint";
         UIToTradeButton.TextItemControl()->SetTextST("ui_st_trade");
     }
 }
