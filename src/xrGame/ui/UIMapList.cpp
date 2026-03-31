@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "UIMapList.h"
+#include "UIGameCustom.h"
 #include "xrUICore/ListBox/UIListBox.h"
 #include "xrUICore/Windows/UIFrameWindow.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
@@ -205,11 +206,16 @@ const char* CUIMapList::GetCommandLine(LPCSTR player_name)
     m_command += "/ver=";
     m_command += M.map_ver.c_str();
 
-    if (const auto selected = m_pWeatherSelector->m_list_box.GetSelectedItem())
+    if (m_pWeatherSelector)
     {
-        m_command += "/estime=";
-        const u32 id = selected->GetTAG();
-        m_command += m_mapWeather[id].weather_time.c_str();
+        const auto selected = m_pWeatherSelector->GetSelectedIDX();
+        if (selected != u32(-1))
+        {
+            const auto& weathers = gMapListHelper.GetGameWeathers();
+
+            m_command += "/estime=";
+            m_command += weathers[selected].StartTime.c_str();
+        }
     }
 
     m_command += ")";
@@ -236,15 +242,18 @@ const char* CUIMapList::GetCommandLine(LPCSTR player_name)
 
     return m_command.c_str();
 }
-#include "UIGameCustom.h"
+
 void CUIMapList::LoadMapList()
 {
+    R_ASSERT2_CURE(m_pWeatherSelector, "m_pWeatherSelector == NULL", { return; });
     const auto& weathers = gMapListHelper.GetGameWeathers();
-    u32 cnt = 0;
+
     if (m_pWeatherSelector->GetSize() > 0)
         m_pWeatherSelector->ClearList();
+
     for (const MPWeatherDesc& weather : weathers)
-        AddWeather(weather.Name, weather.StartTime, cnt++);
+        m_pWeatherSelector->AddItem_(weather.Name.c_str(), 0);
+
     if (weathers.size() > 0)
         m_pWeatherSelector->SetItemIDX(0);
 }
@@ -286,14 +295,6 @@ void CUIMapList::SetModeSelector(CUIWindow* ms) { m_pModeSelector = ms; }
 void CUIMapList::SetMapPic(CUIStatic* map_pic) { m_pMapPic = map_pic; }
 void CUIMapList::SetMapInfo(CUIMapInfo* map_info) { m_pMapInfo = map_info; }
 void CUIMapList::SetServerParams(LPCSTR params) { m_srv_params = params; }
-
-void CUIMapList::AddWeather(const shared_str& WeatherType, const shared_str& WeatherTime, u32 _id)
-{
-    R_ASSERT2(m_pWeatherSelector, "m_pWeatherSelector == NULL");
-    m_pWeatherSelector->AddItem_(WeatherType.c_str(), 0)->SetTAG(_id);
-
-    m_mapWeather.emplace_back(CUIMapList::Sw{ WeatherType, WeatherTime });
-}
 
 void CUIMapList::InitFromXml(CUIXml& xml_doc, const char* path)
 {
