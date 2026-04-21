@@ -28,7 +28,7 @@ public:
     ~NVRHIUIRenderer();
 
     // Initialize the renderer with device and material cache
-    void Initialize(ng::RenderDevice* device, MaterialCache* matCache);
+    void Initialize(fg::RenderDevice* device, MaterialCache* matCache);
     void Shutdown();
 
     // Render collected UI batches
@@ -42,7 +42,7 @@ public:
 
 private:
     // Dependencies
-    ng::RenderDevice* m_device{nullptr};
+    fg::RenderDevice* m_device{nullptr};
     MaterialCache* m_matCache{nullptr};
 
     // Shared geometry buffers (all batches share these)

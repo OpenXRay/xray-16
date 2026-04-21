@@ -57,10 +57,10 @@ public:
 
     // Get or create a VCB for the given layout
     // Returns existing VCB if layout was already registered
-    ng::BufferHandle GetOrCreateVCB(const CBLayout& layout);
+    fg::BufferHandle GetOrCreateVCB(const CBLayout& layout);
 
     // Get VCB by layout (returns invalid handle if not found)
-    ng::BufferHandle GetVCB(const CBLayout& layout) const;
+    fg::BufferHandle GetVCB(const CBLayout& layout) const;
 
     // Check if a layout is already registered
     bool HasLayout(const CBLayout& layout) const;
@@ -80,7 +80,7 @@ public:
 
 private:
     // Map from layout to VCB
-    xr_map<CBLayout, ng::BufferHandle> m_vcbs;
+    xr_map<CBLayout, fg::BufferHandle> m_vcbs;
 
     // Statistics
     mutable Stats m_stats;

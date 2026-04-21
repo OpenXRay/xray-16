@@ -3,7 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng { class RenderDevice; }
+namespace xray::render::fg { class RenderDevice; }
 namespace xray::render::framegraph { class FrameGraph; }
 
 namespace xray::render::RENDER_NAMESPACE::passes {
@@ -21,7 +21,7 @@ struct MotionVectorOutput {
 
 MotionVectorOutput setupMotionVectorPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depthInput,
     const Fmatrix& invViewProj,
     const Fmatrix& prevViewProj,

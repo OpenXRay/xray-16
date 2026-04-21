@@ -20,7 +20,7 @@ ParticleGPUCullingManager::~ParticleGPUCullingManager()
     Shutdown();
 }
 
-bool ParticleGPUCullingManager::Initialize(ng::RenderDevice* device, u32 maxParticles)
+bool ParticleGPUCullingManager::Initialize(fg::RenderDevice* device, u32 maxParticles)
 {
     if (m_initialized)
         return true;

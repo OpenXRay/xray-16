@@ -17,7 +17,7 @@ namespace xray::render::RENDER_NAMESPACE {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-bool SmokeTrailManager::Initialize(ng::RenderDevice* device)
+bool SmokeTrailManager::Initialize(fg::RenderDevice* device)
 {
     m_device = device;
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();

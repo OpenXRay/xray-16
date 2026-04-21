@@ -15,7 +15,7 @@ namespace xray::render {
     class SlangCompiler;
 }
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 // Forward declarations
 class RenderContext;
@@ -430,4 +430,4 @@ private:
     RenderDevice& operator=(const RenderDevice&) = delete;
 };
 
-} // namespace xray::render::ng
+} // namespace xray::render::fg

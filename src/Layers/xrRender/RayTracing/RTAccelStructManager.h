@@ -11,7 +11,7 @@ namespace xray::render::RENDER_NAMESPACE {
     class FGDetailManager;
 }
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 class RenderDevice;
 class RenderContext;
 }
@@ -38,7 +38,7 @@ struct RTBatchCounts {
 
 class RTAccelStructManager {
 public:
-    void Initialize(ng::RenderDevice* device);
+    void Initialize(fg::RenderDevice* device);
     void Shutdown();
 
     void BuildIfNeeded(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
@@ -121,7 +121,7 @@ private:
     void InitBillboardPipeline();
     u32 GetSkinningFormatID(u16 renderMode, u32 stride);
 
-    ng::RenderDevice* m_device = nullptr;
+    fg::RenderDevice* m_device = nullptr;
     bool m_rtSupported = false;
     bool m_isReady = false;
     u32 m_batchCount = 0;
@@ -154,18 +154,18 @@ private:
 
     static nvrhi::ComputePipelineHandle s_skinPipeline;
     static nvrhi::BindingLayoutHandle s_skinLayout;
-    static ng::BufferHandle s_skinCB;
+    static fg::BufferHandle s_skinCB;
     static bool s_skinInitialized;
 
     static nvrhi::ComputePipelineHandle s_grassPipeline;
     static nvrhi::BindingLayoutHandle s_grassLayout;
-    static ng::BufferHandle s_grassCB;
+    static fg::BufferHandle s_grassCB;
     static nvrhi::SamplerHandle s_grassSampler;
     static bool s_grassInitialized;
 
     static nvrhi::ComputePipelineHandle s_billboardPipeline;
     static nvrhi::BindingLayoutHandle s_billboardLayout;
-    static ng::BufferHandle s_billboardCB;
+    static fg::BufferHandle s_billboardCB;
     static bool s_billboardInitialized;
 };
 

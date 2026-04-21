@@ -2,7 +2,7 @@
 
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 // ═══════════════════════════════════════════════════
 //  SHADER WRAPPER
@@ -33,4 +33,4 @@ private:
     shared_str m_debugName;
 };
 
-} // namespace xray::render::ng
+} // namespace xray::render::fg

@@ -33,7 +33,7 @@ namespace xray::render::framegraph {
 namespace xray::render {
 
 // Forward declarations
-namespace ng {
+namespace fg {
     class PipelineState;
     struct PipelineStateDesc;
 }
@@ -160,7 +160,7 @@ struct MaterialKey {
 
 struct MaterialPSO {
     // Graphics pipeline
-    ng::PipelineState* pso = nullptr;
+    fg::PipelineState* pso = nullptr;
 
     // Binding layouts and sets (PER-STAGE to handle VS/PS having different slots)
     // VS: b0=$Globals, b1=dynamic_transforms, b2=static_globals
@@ -213,7 +213,7 @@ struct MaterialPSO {
         u32 slot;                     // CB slot (b0, b1, etc.)
         u32 size;                     // Required size in bytes
         shared_str name;              // CB name (e.g. "dynamic_transforms", "$Globals")
-        ng::BufferHandle vcbHandle;   // VCB from pool (filled after registration)
+        fg::BufferHandle vcbHandle;   // VCB from pool (filled after registration)
     };
     xr_vector<VCBRequirement> vcbRequirements;
 
@@ -316,7 +316,7 @@ nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat);
 class MaterialCache {
 public:
     MaterialCache(
-        ng::RenderDevice* device,
+        fg::RenderDevice* device,
         resources::FGResourceManager* resourceManager,
         framegraph::VolatileConstantBufferPool* vcbPool = nullptr
     );
@@ -362,7 +362,7 @@ public:
     framegraph::VolatileConstantBufferPool* GetVCBPool() const { return m_vcbPool; }
 
 private:
-    ng::RenderDevice* m_device;
+    fg::RenderDevice* m_device;
     resources::FGResourceManager* m_resourceManager;  // NEW: Direct access to resource management
     framegraph::VolatileConstantBufferPool* m_vcbPool;  // VCB pool for dynamic CB management
     xr_map<MaterialKey, xr_unique_ptr<MaterialPSO>> m_cache;
@@ -506,12 +506,12 @@ public:
 
     // Finalize pending terrain materials (register textures to descriptor heap)
     // Call once per frame when RenderContext is available
-    void FinalizePendingTerrainMaterials(ng::RenderContext* ctx);
+    void FinalizePendingTerrainMaterials(fg::RenderContext* ctx);
 
     // Finalize pending materials (register textures to bindless descriptor heap)
     // Call once per frame when RenderContext is available
     // This registers textures to D3D12 descriptor heap for any materials registered this frame
-    void FinalizePendingMaterials(ng::RenderContext* ctx);
+    void FinalizePendingMaterials(fg::RenderContext* ctx);
 
     // Shader handle cache (shared across all materials to avoid recreating identical shaders)
     // Key format: "VS_<shadername>" or "PS_<shadername>" to distinguish stages
@@ -521,7 +521,7 @@ public:
     // Returns direct NVRHI handles (no wrapper layer!)
     nvrhi::ShaderHandle GetOrCreateShaderVS(SVS* vs);
     nvrhi::ShaderHandle GetOrCreateShaderPS(SPS* ps);
-    void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
+    void SetupRenderStates(SPass* pass, fg::PipelineStateDesc& psoDesc);
 
     MaterialPSO* GetOrCreateFontPSO(
         dxFontRender* fontRender,
@@ -542,12 +542,12 @@ private:
     // Validate that geometry provides all vertex attributes the shader expects
     bool ValidateVertexLayoutCompatibility(dxRender_Visual* visual, MaterialPSO* matPSO);
 
-    void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc);
+    void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, fg::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
         MaterialPSO* matPSO,  // Pass MaterialPSO for shader reflection data
         const framegraph::DefaultOutputLayout& outputs,
         const framegraph::FrameGraph& fg,
-        ng::PipelineStateDesc& psoDesc);
+        fg::PipelineStateDesc& psoDesc);
 };
 
 } // namespace xray::render

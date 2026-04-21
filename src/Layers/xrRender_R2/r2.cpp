@@ -20,18 +20,11 @@
 #endif
 
 #if defined(USE_DX11) && RENDER == R_R4
-#include "Layers/xrRender/NVRHI/NVRHIDevice.h"
-#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/r5.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
-#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
-#include "Layers/xrRender/Backend/D3D11BackendWrapper.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
-#include "Layers/xrRender/UIRenderCollector.h"  // For UIRenderCollector -> IUIRender cast
-
-// Forward declaration for ImGui initialization
-namespace xray::render {
-    void InitializeImGuiRenderer(ng::RenderDevice* renderDevice);
-}
+#include "Layers/xrRender/FrameGraph/ShaderCache.h"
 #endif
 
 namespace xray::render::RENDER_NAMESPACE
@@ -513,61 +506,7 @@ void CRender::create()
 #endif
 
 #if RENDER == R_R4
-    // Initialize RenderDevice from the backend (D3D12 or D3D11)
-    // This ensures ShaderLoader is available for shader compilation during Target creation
-    if (GEnv.Backend && GEnv.Backend->IsInitialized())
-    {
-        m_renderDevice = xr_new<xray::render::ng::RenderDevice>();
-
-        if (m_renderDevice->InitializeFromBackend(GEnv.Backend))
-        {
-            Msg("* RenderDevice initialized successfully");
-
-            // Initialize ImGui renderer with NVRHI backend
-            xray::render::InitializeImGuiRenderer(m_renderDevice);
-
-            // Initialize FrameGraphRenderer
-            m_framegraphRenderer = xr_new<xray::render::FrameGraphRenderer>();
-
-            if (m_framegraphRenderer->Initialize(m_renderDevice))
-            {
-                Msg("* FrameGraphRenderer initialized successfully");
-
-                // Expose through GEnv for global access
-                GEnv.FrameGraphRenderer = m_framegraphRenderer;
-                auto* uiCollector = m_framegraphRenderer->GetUICollector();
-                GEnv.UIRender = uiCollector;
-                m_framegraphRenderer->SetEnabled(true);
-                Msg("* FrameGraphRenderer enabled");
-
-                // Initialize ShaderLoader for Slang compilation
-                m_shaderLoader = xr_new<framegraph::ShaderLoader>(
-                    m_renderDevice->GetSlangCompiler());
-                if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
-                    m_shaderLoader->SetTarget(xray::render::SlangCompiler::Target::SPIRV);
-                else
-                    m_shaderLoader->SetTarget(xray::render::SlangCompiler::Target::DXIL);
-                Msg("* ShaderLoader initialized (target: %s)",
-                    m_shaderLoader->GetTarget() == xray::render::SlangCompiler::Target::SPIRV ? "SPIRV" : "DXIL");
-
-                // Initialize MaterialSystem for D3D12 material handling
-                xray::render::MaterialSystem::Instance().Initialize(
-                    m_renderDevice->GetFGResourceManager(),
-                    m_shaderLoader);
-                Msg("* MaterialSystem initialized");
-            }
-            else
-            {
-                Msg("! FrameGraphRenderer initialization failed");
-                xr_delete(m_framegraphRenderer);
-            }
-        }
-        else
-        {
-            Msg("! RenderDevice initialization failed");
-            xr_delete(m_renderDevice);
-        }
-    }
+    r5::InitializeFrameGraph();
 #endif
 
     Target = xr_new<CRenderTarget>(); // Main target
@@ -609,34 +548,8 @@ void CRender::destroy()
 #endif
 
 #if defined(USE_DX11) && RENDER == R_R4
-    // Shutdown MaterialSystem before ShaderLoader (depends on it)
-    xray::render::MaterialSystem::Instance().Shutdown();
-    Msg("* MaterialSystem shutdown");
+    r5::ShutdownFrameGraph();
 
-    // Cleanup ShaderLoader
-    if (m_shaderLoader)
-    {
-        xr_delete(m_shaderLoader);
-        Msg("* ShaderLoader destroyed");
-    }
-
-    // Cleanup FrameGraphRenderer and RenderDevice
-    if (m_framegraphRenderer)
-    {
-        m_framegraphRenderer->Shutdown();
-        GEnv.FrameGraphRenderer = nullptr;
-        xr_delete(m_framegraphRenderer);
-        Msg("* FrameGraphRenderer destroyed");
-    }
-
-    if (m_renderDevice)
-    {
-        m_renderDevice->Shutdown();
-        xr_delete(m_renderDevice);
-        Msg("* RenderDevice destroyed");
-    }
-
-    // Cleanup Backend
     if (m_backend)
     {
         GEnv.Backend = nullptr;
@@ -1087,7 +1000,7 @@ bool CRender::CreatePrecompiledPSO(
     CompiledLevelShader::PrecompiledPSOs::PSOVariant variant;
     variant.vertexFormatID = vertexFormatID;
     variant.passType = passType;
-    variant.pso = nullptr;  // ng::PipelineState not used here - we store nvrhi handle directly
+    variant.pso = nullptr;  // fg::PipelineState not used here - we store nvrhi handle directly
     variant.materialPSO = nullptr;  // MaterialPSO creation deferred until first use
 
     compiled.precompiledPSOs.variants.push_back(variant);

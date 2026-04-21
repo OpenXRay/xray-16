@@ -251,7 +251,7 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
 // ══════════════════════════════════════════════════════════
 
 MaterialCache::MaterialCache(
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     resources::FGResourceManager* resourceManager,
     framegraph::VolatileConstantBufferPool* vcbPool)
     : m_device(device)
@@ -642,7 +642,7 @@ MaterialPSO* MaterialCache::CreatePSO(
     //  BUILD PIPELINE STATE DESCRIPTOR
     // ═══════════════════════════════════════════════════════
 
-    ng::PipelineStateDesc psoDesc;
+    fg::PipelineStateDesc psoDesc;
     psoDesc.vertexShader = nvrhiVS.Get();  // Direct NVRHI shader pointer
     psoDesc.pixelShader = nvrhiPS.Get();   // No wrapper layer!
 
@@ -675,7 +675,7 @@ MaterialPSO* MaterialCache::CreatePSO(
         // - Alpha-tested geometry wasn't in prepass, needs LessEqual to render
         psoDesc.depthStencilState.depthTestEnable = true;
         psoDesc.depthStencilState.depthWriteEnable = true;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::LessEqual;
+        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::LessEqual;
         psoDesc.depthStencilState.stencilEnable = false;
         break;
 
@@ -683,7 +683,7 @@ MaterialPSO* MaterialCache::CreatePSO(
         // HUD renders in front using viewport depth compression [0.0, 0.1]
         psoDesc.depthStencilState.depthTestEnable = true;
         psoDesc.depthStencilState.depthWriteEnable = true;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::LessEqual;
+        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::LessEqual;
         psoDesc.depthStencilState.stencilEnable = false;
         break;
 
@@ -691,7 +691,7 @@ MaterialPSO* MaterialCache::CreatePSO(
         // Depth prepass: write depth, normal Less test
         psoDesc.depthStencilState.depthTestEnable = true;
         psoDesc.depthStencilState.depthWriteEnable = true;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::Less;
         psoDesc.depthStencilState.stencilEnable = false;
         break;
 
@@ -718,12 +718,12 @@ MaterialPSO* MaterialCache::CreatePSO(
     //  CREATE PIPELINE STATE
     // ═══════════════════════════════════════════════════════
 
-    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    fg::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
         return nullptr;
     }
 
-    ng::PipelineState* nvrhiPSO = nullptr;
+    fg::PipelineState* nvrhiPSO = nullptr;
 
     try {
         nvrhiPSO = psoCache->GetOrCreate(psoDesc);
@@ -1053,7 +1053,7 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                     cbReq.size
                 );
 
-                ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(layout);
+                fg::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(layout);
 
                 MaterialPSO::VCBRequirement req;
                 req.slot = cbReq.vsSlot;
@@ -1393,7 +1393,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     // Collect ALL VCBs from vcbRequirements (per-draw data)
     for (const auto& vcbReq : matPSO->vcbRequirements) {
         // Query VCB pool for latest handle (FGConstantSystem might have updated it)
-        ng::BufferHandle latestHandle = m_vcbPool->GetOrCreateVCB(
+        fg::BufferHandle latestHandle = m_vcbPool->GetOrCreateVCB(
             framegraph::VolatileConstantBufferPool::CBLayout(
                 vcbReq.name.c_str(), vcbReq.slot, vcbReq.size
             )
@@ -1742,7 +1742,7 @@ bool MaterialCache::ValidateVertexLayoutCompatibility(dxRender_Visual* visual, M
     return true;  // All shader requirements satisfied
 }
 
-void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc)
+void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, fg::PipelineStateDesc& psoDesc)
 {
     psoDesc.vertexAttributes.clear();
 
@@ -1860,7 +1860,7 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* 
             // Create vertex attribute using:
             // - Shader element ORDER (iteration order determines final order)
             // - Vertex decl's semantic name, index, format, and offset (actual data layout)
-            ng::VertexAttribute attr;
+            fg::VertexAttribute attr;
             attr.semanticName = matchingDeclElem->SemanticName;
             attr.semanticIndex = matchingDeclElem->SemanticIndex;  // Use decl's index (TEXCOORD0 vs TEXCOORD1)
             attr.format = ConvertDxgiFormatToNvrhi(matchingDeclElem->Format);
@@ -1883,7 +1883,7 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* 
 //  SETUP RENDER STATES
 // ══════════════════════════════════════════════════════════
 
-void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc)
+void MaterialCache::SetupRenderStates(SPass* pass, fg::PipelineStateDesc& psoDesc)
 {
     VERIFY(pass);
 
@@ -1891,11 +1891,11 @@ void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDes
     SState* xrState = pass->state._get();
     if (!xrState || !xrState->state) {
         // Fallback to safe defaults if no state
-        psoDesc.rasterizerState.cullMode = ng::CullMode::Back;
-        psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
+        psoDesc.rasterizerState.cullMode = fg::CullMode::Back;
+        psoDesc.rasterizerState.fillMode = fg::FillMode::Solid;
         psoDesc.depthStencilState.depthTestEnable = true;
         psoDesc.depthStencilState.depthWriteEnable = true;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::Less;
         psoDesc.blendState.renderTargets[0].blendEnable = false;
         return;
     }
@@ -2010,7 +2010,7 @@ void MaterialCache::SetupRenderTargets(
     MaterialPSO* matPSO,
     const framegraph::DefaultOutputLayout& outputs,
     const framegraph::FrameGraph& fg,
-    ng::PipelineStateDesc& psoDesc)
+    fg::PipelineStateDesc& psoDesc)
 {
     // Extract actual formats from FrameGraph resources
     // Forward+ only uses albedo (color) and depth - no separate normal/material RTs
@@ -2216,7 +2216,7 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
     //  BUILD DEPTH-ONLY PSO DESCRIPTOR
     // ═══════════════════════════════════════════════════════
 
-    ng::PipelineStateDesc psoDesc;
+    fg::PipelineStateDesc psoDesc;
     psoDesc.vertexShader = materialVS.Get();       // Material's VS (has correct constant layout)
     psoDesc.pixelShader = nullptr;                 // NULL PS for depth-only (D3D11 standard)
 
@@ -2234,19 +2234,19 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
     // Override depth state (must be after SetupRenderStates)
     psoDesc.depthStencilState.depthTestEnable = true;
     psoDesc.depthStencilState.depthWriteEnable = true;
-    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+    psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::Less;
     psoDesc.depthStencilState.stencilEnable = false;
 
     // ═══════════════════════════════════════════════════════
     //  CREATE PIPELINE STATE VIA CACHE
     // ═══════════════════════════════════════════════════════
 
-    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    fg::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
         return nullptr;
     }
 
-    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    fg::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
     if (!nvrhiPSO) {
         Msg("! [MaterialCache::CreateDepthPSO] PSO creation failed");
         return nullptr;
@@ -2441,7 +2441,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     CreateBindingLayouts(pso.get());
 
     // Build pipeline state descriptor
-    ng::PipelineStateDesc psoDesc;
+    fg::PipelineStateDesc psoDesc;
     psoDesc.vertexShader = nvrhiVS.Get();  // Direct NVRHI shader pointer
     psoDesc.pixelShader = nvrhiPS.Get();   // No wrapper layer!
 
@@ -2481,7 +2481,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
             continue;
         }
 
-        ng::VertexAttribute attr;
+        fg::VertexAttribute attr;
         attr.semanticName = shaderElem.semanticName.c_str();
         attr.semanticIndex = shaderElem.semanticIndex;
         attr.format = it->second.format;
@@ -2528,7 +2528,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     if (hasDepth) {
         psoDesc.depthStencilFormat = fbDesc.depthAttachment.texture->getDesc().format;
         psoDesc.depthStencilState.depthTestEnable = true;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Always;  // Always pass
+        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::Always;  // Always pass
         psoDesc.depthStencilState.depthWriteEnable = false;  // Don't write depth
         psoDesc.depthStencilState.stencilEnable = true;      // Enable stencil for UI effects
     } else {
@@ -2539,17 +2539,17 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     // Standard premultiplied alpha blending (matches vanilla)
     psoDesc.blendState.renderTargets[0].blendEnable = true;
-    psoDesc.blendState.renderTargets[0].srcBlend = ng::BlendFactor::SrcAlpha;
-    psoDesc.blendState.renderTargets[0].dstBlend = ng::BlendFactor::InvSrcAlpha;
-    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::SrcAlpha;
-    psoDesc.blendState.renderTargets[0].dstBlendAlpha = ng::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].srcBlend = fg::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlend = fg::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].srcBlendAlpha = fg::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlendAlpha = fg::BlendFactor::InvSrcAlpha;
 
-    psoDesc.rasterizerState.cullMode = ng::CullMode::None;
+    psoDesc.rasterizerState.cullMode = fg::CullMode::None;
     psoDesc.rasterizerState.frontCounterClockwise = false;
     psoDesc.rasterizerState.scissorEnable = true;  // Enable scissor for UI clipping
 
     // Set primitive topology (UI uses triangle lists) - already defaults to TriangleList but being explicit
-    psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
+    psoDesc.primitiveTopology = fg::PrimitiveTopology::TriangleList;
 
     // Use binding layouts created by CreateBindingLayouts() from shader reflection
     // These layouts were built from the shader's actual resource declarations
@@ -2568,13 +2568,13 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     psoDesc.debugName = "UI_PSO";
 
     // Create pipeline state via cache
-    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    fg::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
         Msg("! [MaterialCache::CreateUIPSO] No PSO cache");
         return nullptr;
     }
 
-    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    fg::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
     if (!nvrhiPSO) {
         Msg("! [MaterialCache::CreateUIPSO] Failed to create pipeline state");
         return nullptr;
@@ -2723,7 +2723,7 @@ MaterialPSO* MaterialCache::CreateFontPSO(
     CreateBindingLayouts(pso.get());
 
     // Create graphics PSO descriptor
-    ng::PipelineStateDesc psoDesc;
+    fg::PipelineStateDesc psoDesc;
     psoDesc.vertexShader = nvrhiVS.Get();
     psoDesc.pixelShader = nvrhiPS.Get();
 
@@ -2750,7 +2750,7 @@ MaterialPSO* MaterialCache::CreateFontPSO(
             continue;
         }
 
-        ng::VertexAttribute attr;
+        fg::VertexAttribute attr;
         attr.semanticName = shaderElem.semanticName.c_str();
         attr.semanticIndex = shaderElem.semanticIndex;
         attr.format = it->second.format;
@@ -2794,17 +2794,17 @@ MaterialPSO* MaterialCache::CreateFontPSO(
 
     psoDesc.blendState.alphaToCoverageEnable = false;
     psoDesc.blendState.renderTargets[0].blendEnable = true;
-    psoDesc.blendState.renderTargets[0].srcBlend = ng::BlendFactor::SrcAlpha;
-    psoDesc.blendState.renderTargets[0].dstBlend = ng::BlendFactor::InvSrcAlpha;
-    psoDesc.blendState.renderTargets[0].blendOp = ng::BlendOp::Add;
-    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::SrcAlpha;
-    psoDesc.blendState.renderTargets[0].dstBlendAlpha = ng::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].srcBlend = fg::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlend = fg::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].blendOp = fg::BlendOp::Add;
+    psoDesc.blendState.renderTargets[0].srcBlendAlpha = fg::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlendAlpha = fg::BlendFactor::InvSrcAlpha;
 
-    psoDesc.rasterizerState.cullMode = ng::CullMode::None;
+    psoDesc.rasterizerState.cullMode = fg::CullMode::None;
     psoDesc.rasterizerState.frontCounterClockwise = false;
     psoDesc.rasterizerState.scissorEnable = true;
 
-    psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
+    psoDesc.primitiveTopology = fg::PrimitiveTopology::TriangleList;
 
     if (pso->vsBindingLayout) {
         psoDesc.bindingLayouts.push_back(pso->vsBindingLayout);
@@ -2820,13 +2820,13 @@ MaterialPSO* MaterialCache::CreateFontPSO(
 
     psoDesc.debugName = "Font_PSO";
 
-    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    fg::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
         Msg("! [MaterialCache::CreateFontPSO] No PSO cache");
         return nullptr;
     }
 
-    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    fg::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
     if (!nvrhiPSO) {
         Msg("! [MaterialCache::CreateFontPSO] Failed to create pipeline state");
         return nullptr;
@@ -3139,7 +3139,7 @@ u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
 // ══════════════════════════════════════════════════════════
 // Registers all 14 terrain textures (base, mask, 4x detail, 4x normal, 4x pbr)
 
-void MaterialCache::FinalizePendingTerrainMaterials(ng::RenderContext* ctx)
+void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
 {
     using namespace RENDER_NAMESPACE::bindless;
 
@@ -3503,7 +3503,7 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
 // Called once per frame when RenderContext is available
 // Registers textures to D3D12 descriptor heap and updates material buffer
 
-void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
+void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
 {
     using namespace RENDER_NAMESPACE::bindless;
 

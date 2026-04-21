@@ -14,7 +14,7 @@ NVRHIUIRenderer::~NVRHIUIRenderer()
     Shutdown();
 }
 
-void NVRHIUIRenderer::Initialize(ng::RenderDevice* device, MaterialCache* matCache)
+void NVRHIUIRenderer::Initialize(fg::RenderDevice* device, MaterialCache* matCache)
 {
     VERIFY(device);
     VERIFY(matCache);

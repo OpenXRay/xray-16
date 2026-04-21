@@ -28,7 +28,7 @@ using namespace bindless;
 //  Initialize compute pipelines (once, lazy)
 // ═══════════════════════════════════════════════════════
 
-static void InitSmokeComputePipelines(ng::RenderDevice* device, SmokeTrailPassState& state)
+static void InitSmokeComputePipelines(fg::RenderDevice* device, SmokeTrailPassState& state)
 {
     if (state.initialized)
         return;
@@ -85,7 +85,7 @@ static void InitSmokeComputePipelines(ng::RenderDevice* device, SmokeTrailPassSt
 // ═══════════════════════════════════════════════════════
 
 static void InitSmokeDrawPipeline(
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     SmokeTrailPassState& state)
 {
     if (state.drawPipeline)
@@ -169,21 +169,21 @@ static void InitSmokeDrawPipeline(
 
 struct SmokeEmitPassData
 {
-    ng::RenderDevice*    device  = nullptr;
+    fg::RenderDevice*    device  = nullptr;
     SmokeTrailManager*   manager = nullptr;
     SmokeTrailPassState* state   = nullptr;
 };
 
 struct SmokeSimPassData
 {
-    ng::RenderDevice*    device  = nullptr;
+    fg::RenderDevice*    device  = nullptr;
     SmokeTrailManager*   manager = nullptr;
     SmokeTrailPassState* state   = nullptr;
 };
 
 struct SmokeCompactPassData
 {
-    ng::RenderDevice*    device  = nullptr;
+    fg::RenderDevice*    device  = nullptr;
     SmokeTrailManager*   manager = nullptr;
     SmokeTrailPassState* state   = nullptr;
 };
@@ -193,7 +193,7 @@ struct SmokeDrawPassData
     VirtualResourceHandle inputColor;
     VirtualResourceHandle outputColor;
     VirtualResourceHandle depth;
-    ng::RenderDevice*    device     = nullptr;
+    fg::RenderDevice*    device     = nullptr;
     SmokeTrailManager*   manager    = nullptr;
     SmokeTrailPassState* smokeState = nullptr;
     DefaultOutputLayout  outputs;
@@ -209,7 +209,7 @@ struct SmokeDrawPassData
 
 DefaultOutputLayout setupSmokeTrailPass(
     FrameGraph&                      fg,
-    ng::RenderDevice*                device,
+    fg::RenderDevice*                device,
     const DefaultOutputLayout&       inputs,
     SmokeTrailManager*               manager,
     u32                              width,
@@ -230,7 +230,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             data.manager = manager;
             data.state   = &state;
         },
-        [](const SmokeEmitPassData& data, const FrameGraph&, ng::RenderContext* ctx)
+        [](const SmokeEmitPassData& data, const FrameGraph&, fg::RenderContext* ctx)
         {
             auto* mgr = data.manager;
             auto* st  = data.state;
@@ -282,7 +282,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             data.manager = manager;
             data.state   = &state;
         },
-        [](const SmokeSimPassData& data, const FrameGraph&, ng::RenderContext* ctx)
+        [](const SmokeSimPassData& data, const FrameGraph&, fg::RenderContext* ctx)
         {
             auto* mgr = data.manager;
             auto* st  = data.state;
@@ -330,7 +330,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             data.manager = manager;
             data.state   = &state;
         },
-        [](const SmokeCompactPassData& data, const FrameGraph&, ng::RenderContext* ctx)
+        [](const SmokeCompactPassData& data, const FrameGraph&, fg::RenderContext* ctx)
         {
             auto* mgr = data.manager;
             auto* st  = data.state;
@@ -388,7 +388,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             data.outputColor = passBuilder.write(inputs.albedo, ResourceState::RenderTarget);
             data.depth       = passBuilder.readWrite(inputs.depth, ResourceState::DepthStencilWrite);
         },
-        [](const SmokeDrawPassData& data, const FrameGraph& fg, ng::RenderContext* ctx)
+        [](const SmokeDrawPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
             auto* mgr   = data.manager;
             auto* st    = data.smokeState;

@@ -7,7 +7,7 @@
 // Creates render targets as native NVRHI resources from the start
 // No wrapping of legacy DX11 resources!
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;  // Forward declaration
 }
 
@@ -23,7 +23,7 @@ class TextureManager;  // Forward declaration
 
 class NativeRTFactory {
 public:
-    explicit NativeRTFactory(xray::render::ng::RenderDevice* device, TextureManager* textureManager);
+    explicit NativeRTFactory(xray::render::fg::RenderDevice* device, TextureManager* textureManager);
     ~NativeRTFactory();
 
     // ═══════════════════════════════════════════════════
@@ -159,7 +159,7 @@ private:
         shared_str name;
     };
 
-    xray::render::ng::RenderDevice* m_device;
+    xray::render::fg::RenderDevice* m_device;
     TextureManager* m_textureManager;
     xr_vector<ManagedRT> m_managedRTs;
 

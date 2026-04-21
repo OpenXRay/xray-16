@@ -94,7 +94,7 @@ static void CreatePlaceholders(nvrhi::IDevice* nvDevice)
     }
 }
 
-static void InitializeResources(ng::RenderDevice* device, ReSTIRGIPassState& state)
+static void InitializeResources(fg::RenderDevice* device, ReSTIRGIPassState& state)
 {
     if (state.initialized) return;
 
@@ -211,7 +211,7 @@ static void EnsurePersistentTextures(nvrhi::IDevice* nvDevice, ReSTIRGIPassState
 }
 
 struct InitialPassData {
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     RTAccelStructManager* accelMgr;
     ReSTIRGIPassState* state;
     VirtualResourceHandle depth;
@@ -226,7 +226,7 @@ struct InitialPassData {
 };
 
 struct TemporalPassData {
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     ReSTIRGIPassState* state;
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
@@ -242,7 +242,7 @@ struct TemporalPassData {
 };
 
 struct CompositePassData {
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     ReSTIRGIPassState* state;
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
@@ -257,7 +257,7 @@ struct CompositePassData {
 
 ReSTIRGIOutput setupReSTIRGIPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     RTAccelStructManager* accelMgr,
     VirtualResourceHandle depth,
     VirtualResourceHandle normal,
@@ -295,7 +295,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 RenderPassBuilder pb(builder, passHandle);
                 data.sceneColor = pb.write(outHandle, ResourceState::UnorderedAccess);
             },
-            [](const CompositePassData&, const FrameGraph&, ng::RenderContext*) {}
+            [](const CompositePassData&, const FrameGraph&, fg::RenderContext*) {}
         );
         return { passData.sceneColor };
     }
@@ -405,7 +405,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
             data.sky1 = sky1Tex;
             data.writeIdx = writeIdx;
         },
-        [](const InitialPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const InitialPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             auto* depthTex = fg.GetPhysicalTexture(data.depth);
             auto* normalTex = fg.GetPhysicalTexture(data.normal);
             auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
@@ -542,7 +542,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 data.readIdx = readIdx;
                 data.writeIdx = writeIdx;
             },
-            [](const TemporalPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+            [](const TemporalPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
                 auto* depthTex = fg.GetPhysicalTexture(data.depth);
                 auto* normalTex = fg.GetPhysicalTexture(data.normal);
                 auto* prevNormalsTex = data.prevNormals.is_valid() ? fg.GetPhysicalTexture(data.prevNormals) : normalTex;
@@ -619,7 +619,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
             data.height = height;
             data.reservoirIdx = writeIdx;
         },
-        [](const CompositePassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const CompositePassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             auto* depthTex = fg.GetPhysicalTexture(data.depth);
             auto* normalTex = fg.GetPhysicalTexture(data.normal);
             auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);

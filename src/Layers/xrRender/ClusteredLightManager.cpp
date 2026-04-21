@@ -17,7 +17,7 @@ ClusteredLightManager& ClusteredLightManager::Instance()
     return instance;
 }
 
-void ClusteredLightManager::Initialize(ng::RenderDevice* device)
+void ClusteredLightManager::Initialize(fg::RenderDevice* device)
 {
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     m_device = nvDevice;

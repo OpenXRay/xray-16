@@ -38,9 +38,9 @@ struct GeometryBatch {
     u32 bindlessMaterialID = UINT32_MAX;  // Index into g_Materials for GPU-driven rendering
 
     // Textures
-    ng::TextureHandle albedoTexture;
-    ng::TextureHandle normalTexture;
-    ng::TextureHandle materialTexture;  // Metallic/roughness
+    fg::TextureHandle albedoTexture;
+    fg::TextureHandle normalTexture;
+    fg::TextureHandle materialTexture;  // Metallic/roughness
 
     // Transform
     Fmatrix worldMatrix;

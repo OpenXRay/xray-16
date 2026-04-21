@@ -12,7 +12,7 @@ namespace xray::render::resources {
 //  RING BUFFER IMPLEMENTATION
 // ═══════════════════════════════════════════════════
 
-RingBuffer::RingBuffer(xray::render::ng::RenderDevice* device, u64 size, const char* debugName)
+RingBuffer::RingBuffer(xray::render::fg::RenderDevice* device, u64 size, const char* debugName)
     : m_device(device)
     , m_size(size)
     , m_head(0)
@@ -98,7 +98,7 @@ void RingBuffer::AdvanceFrame() {
 //  BUFFER MANAGER IMPLEMENTATION
 // ═══════════════════════════════════════════════════
 
-BufferManager::BufferManager(xray::render::ng::RenderDevice* device)
+BufferManager::BufferManager(xray::render::fg::RenderDevice* device)
     : m_device(device)
 {
     VERIFY(m_device);
@@ -186,7 +186,7 @@ BufferHandle BufferManager::CreateBuffer(
         nvrhiDesc.isVolatile = true;
         nvrhiDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
         if (desc.type == BufferType::Constant)
-            nvrhiDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+            nvrhiDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     }
 
     if (desc.gpuWrite) {

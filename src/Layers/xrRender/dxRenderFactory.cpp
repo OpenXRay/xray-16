@@ -41,20 +41,12 @@ RENDER_FACTORY_IMPLEMENT(ObjectSpaceRender)
 #endif // DEBUG
 IWallMarkArray* dxRenderFactory::CreateWallMarkArray()
 {
-#if RENDER == R_R4
     return xr_new<decals::fgWallMarkArray>();
-#else
-    return xr_new<dxWallMarkArray>();
-#endif
 }
 void dxRenderFactory::DestroyWallMarkArray(IWallMarkArray* pObject)
 {
-#if RENDER == R_R4
     auto* p = static_cast<decals::fgWallMarkArray*>(pObject);
     xr_delete(p);
-#else
-    xr_delete((dxWallMarkArray*&)pObject);
-#endif
 }
 #endif // _EDITOR
 
@@ -63,11 +55,6 @@ RENDER_FACTORY_IMPLEMENT(ThunderboltRender)
 RENDER_FACTORY_IMPLEMENT(ThunderboltDescRender)
 RENDER_FACTORY_IMPLEMENT(RainRender)
 RENDER_FACTORY_IMPLEMENT(LensFlareRender)
-#if RENDER == R_R4
-// ImGuiRender implementation is in dxRenderFactory_ImGui.cpp for NVRHI support
-#else
-RENDER_FACTORY_IMPLEMENT(ImGuiRender)
-#endif
 RENDER_FACTORY_IMPLEMENT(EnvironmentRender)
 RENDER_FACTORY_IMPLEMENT(EnvDescriptorRender)
 RENDER_FACTORY_IMPLEMENT(FlareRender)

@@ -261,7 +261,7 @@ void FGConstantSystem::SetStaticArray(const char* name, const Fmatrix* values, u
 //  FREQUENCY-BASED COMMIT (VOLATILE)
 // ═══════════════════════════════════════════════════
 
-void FGConstantSystem::CommitEngine(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitEngine(fg::RenderContext* ctx) {
     // Engine-frequency CBs (uploaded once per frame)
     // Uses same reflection-driven approach as CommitInstance
     if (!m_vcbPool) return;
@@ -270,7 +270,7 @@ void FGConstantSystem::CommitEngine(ng::RenderContext* ctx) {
         if (!staging.dirty) continue;
 
         const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
-        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+        fg::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
             framegraph::VolatileConstantBufferPool::CBLayout(
                 cbInfo.name.c_str(), cbInfo.slot, cbInfo.size
             )
@@ -286,7 +286,7 @@ void FGConstantSystem::CommitEngine(ng::RenderContext* ctx) {
     }
 }
 
-void FGConstantSystem::CommitPass(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitPass(fg::RenderContext* ctx) {
     // Pass-frequency CBs (uploaded once per render pass)
     if (!m_vcbPool) return;
 
@@ -294,7 +294,7 @@ void FGConstantSystem::CommitPass(ng::RenderContext* ctx) {
         if (!staging.dirty) continue;
 
         const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
-        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+        fg::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
             framegraph::VolatileConstantBufferPool::CBLayout(
                 cbInfo.name.c_str(), cbInfo.slot, cbInfo.size
             )
@@ -310,7 +310,7 @@ void FGConstantSystem::CommitPass(ng::RenderContext* ctx) {
     }
 }
 
-void FGConstantSystem::CommitMaterial(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitMaterial(fg::RenderContext* ctx) {
     // Material-frequency CBs (uploaded once per material)
     if (!m_vcbPool) return;
 
@@ -318,7 +318,7 @@ void FGConstantSystem::CommitMaterial(ng::RenderContext* ctx) {
         if (!staging.dirty) continue;
 
         const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
-        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+        fg::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
             framegraph::VolatileConstantBufferPool::CBLayout(
                 cbInfo.name.c_str(), cbInfo.slot, cbInfo.size
             )
@@ -334,7 +334,7 @@ void FGConstantSystem::CommitMaterial(ng::RenderContext* ctx) {
     }
 }
 
-void FGConstantSystem::CommitInstance(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitInstance(fg::RenderContext* ctx) {
     // ═══════════════════════════════════════════════════
     //  REFLECTION-DRIVEN: Upload ONLY dirty CBs
     // ═══════════════════════════════════════════════════
@@ -359,7 +359,7 @@ void FGConstantSystem::CommitInstance(ng::RenderContext* ctx) {
         const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
 
         // Get VCB from pool (based on CB name + slot from reflection)
-        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+        fg::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
             framegraph::VolatileConstantBufferPool::CBLayout(
                 cbInfo.name.c_str(),
                 cbInfo.slot,
@@ -385,7 +385,7 @@ void FGConstantSystem::CommitInstance(ng::RenderContext* ctx) {
     }
 }
 
-void FGConstantSystem::CommitAll(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitAll(fg::RenderContext* ctx) {
     CommitEngine(ctx);
     CommitPass(ctx);
     CommitMaterial(ctx);
@@ -396,7 +396,7 @@ void FGConstantSystem::CommitAll(ng::RenderContext* ctx) {
 //  STATIC CONSTANT COMMIT
 // ═══════════════════════════════════════════════════
 
-void FGConstantSystem::CommitStatic(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitStatic(fg::RenderContext* ctx) {
     // Upload static constants from MaterialPSO->constantBuffers (not vcbRequirements!)
     // Static CBs are persistent GPU buffers, uploaded once and reused across frames
 

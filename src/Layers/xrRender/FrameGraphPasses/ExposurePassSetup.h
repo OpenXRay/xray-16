@@ -7,7 +7,7 @@
 
 // Forward declarations
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -80,7 +80,7 @@ struct ExposurePassData {
     framegraph::VirtualResourceHandle sceneColor;
     framegraph::VirtualResourceHandle exposureTexture;
     framegraph::VirtualResourceHandle histogramBuffer;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     ExposureConfig config;
     float deltaTime;
     u32 width;
@@ -94,13 +94,13 @@ struct ExposureOutput {
     framegraph::VirtualResourceHandle histogramBuffer;  // 64 u32 bins (for debug)
 };
 
-void InitializeExposureResources(ng::RenderDevice* device, ExposurePassState& state);
+void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& state);
 
 // Setup the exposure pass
 // Returns handle to 1x1 exposure texture
 ExposureOutput setupExposurePass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle hdrSceneColor,
     const ExposureConfig& config,
     float deltaTime,

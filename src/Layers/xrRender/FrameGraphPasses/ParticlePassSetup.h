@@ -19,7 +19,7 @@ namespace xray::render::RENDER_NAMESPACE {
 
 namespace xray::render {
     class MaterialCache;
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -89,7 +89,7 @@ struct ParticlePassData {
     framegraph::VirtualResourceHandle hiZPyramid;
     framegraph::VirtualResourceHandle distortionRT;
     framegraph::VirtualResourceHandle worldPosCopy;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     const xr_vector<ParticleBatch>* worldParticleBatches;
     const xr_vector<ParticleBatch>* hudParticleBatches;
     MaterialCache* materialCache;
@@ -108,7 +108,7 @@ struct ParticlePassOutput {
     framegraph::VirtualResourceHandle distortionRT;
 };
 
-void InitializeParticleResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state);
+void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state);
 
 // ═══════════════════════════════════════════════════════
 //  PARTICLE PASS SETUP
@@ -120,7 +120,7 @@ void InitializeParticleResources(ng::RenderDevice* device, const nvrhi::Framebuf
 // When hiZPyramid is valid, uses GPU frustum + occlusion culling
 ParticlePassOutput setupParticlePass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& forwardInputs,
     const xr_vector<ParticleBatch>* worldParticleBatches,
     const xr_vector<ParticleBatch>* hudParticleBatches,

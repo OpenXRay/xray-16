@@ -2,7 +2,7 @@
 
 #include "ResourceHandle.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 // Forward declarations
 class ResourceManager;
@@ -387,4 +387,4 @@ private:
     RenderContext& operator=(const RenderContext&) = delete;
 };
 
-} // namespace xray::render::ng
+} // namespace xray::render::fg

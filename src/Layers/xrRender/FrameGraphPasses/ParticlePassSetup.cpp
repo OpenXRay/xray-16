@@ -399,7 +399,7 @@ static const ParticleBlendDesc s_blendDescs[PARTICLE_BLEND_COUNT] = {
     { nvrhi::BlendFactor::SrcAlpha,  nvrhi::BlendFactor::One,         nvrhi::BlendFactor::One, nvrhi::BlendFactor::One,         true,  false, "ParticlePass_alphaAdd" },
 };
 
-void InitializeParticleResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state)
+void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state)
 {
     if (state.initialized)
         return;
@@ -488,7 +488,7 @@ void InitializeParticleResources(ng::RenderDevice* device, const nvrhi::Framebuf
     }
 }
 
-static void InitializeDistortionPipeline(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state)
+static void InitializeDistortionPipeline(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state)
 {
     if (state.distortInitialized)
         return;
@@ -541,7 +541,7 @@ static void InitializeDistortionPipeline(ng::RenderDevice* device, const nvrhi::
 
 ParticlePassOutput setupParticlePass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     const DefaultOutputLayout& forwardInputs,
     const xr_vector<ParticleBatch>* worldParticleBatches,
     const xr_vector<ParticleBatch>* hudParticleBatches,
@@ -636,7 +636,7 @@ ParticlePassOutput setupParticlePass(
             data.outputs.worldPos = data.worldPos;
             data.outputs.depth = data.depth;
         },
-        [](const ParticlePassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const ParticlePassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             u32 totalWorld = data.worldParticleBatches ? (u32)data.worldParticleBatches->size() : 0;
             u32 totalHUD = data.hudParticleBatches ? (u32)data.hudParticleBatches->size() : 0;
 

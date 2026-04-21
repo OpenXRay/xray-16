@@ -21,7 +21,7 @@ namespace RENDER_NAMESPACE {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-void InitializeSunPass(ng::RenderDevice* device, SunPassState& state) {
+void InitializeSunPass(fg::RenderDevice* device, SunPassState& state) {
     if (state.initialized || !device) return;
 
     auto* nvrhiDevice = device->GetNVRHIDevice();
@@ -133,7 +133,7 @@ void ShutdownSunPass(SunPassState& state) {
 
 framegraph::VirtualResourceHandle setupSunPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle colorInput,
     CEnvironment* environment,
     u32 width,
@@ -166,7 +166,7 @@ framegraph::VirtualResourceHandle setupSunPass(
         // Execute lambda
         [](const SunPassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 

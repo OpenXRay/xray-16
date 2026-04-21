@@ -139,7 +139,7 @@ static void EnsureControlPointBuffer(nvrhi::IDevice* nvDevice, u32 pointCount, R
 //  Pipeline initialization
 // ═══════════════════════════════════════════════════════
 
-void InitializeRibbonResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, RibbonPassState& state)
+void InitializeRibbonResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, RibbonPassState& state)
 {
     if (state.initialized)
         return;
@@ -212,7 +212,7 @@ void InitializeRibbonResources(ng::RenderDevice* device, const nvrhi::Framebuffe
 
 RibbonPassOutput setupRibbonPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     const DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
@@ -245,7 +245,7 @@ RibbonPassOutput setupRibbonPass(
             data.outputs.worldPos = forwardInputs.worldPos;
             data.outputs.depth = data.depth;
         },
-        [](const RibbonPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const RibbonPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             if (!data.passState || data.passState->pointCount < 2)
                 return;
 

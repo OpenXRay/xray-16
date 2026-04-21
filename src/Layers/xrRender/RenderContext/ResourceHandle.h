@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 // ═══════════════════════════════════════════════════
 //  OPAQUE RESOURCE HANDLES (Strongly Typed)
@@ -88,7 +88,7 @@ struct BindingSetHandle : ResourceHandle {
     }
 };
 
-} // namespace xray::render::ng
+} // namespace xray::render::fg
 
 // ═══════════════════════════════════════════════════
 //  HASH SUPPORT (for xr_map/xr_unordered_map)
@@ -96,8 +96,8 @@ struct BindingSetHandle : ResourceHandle {
 
 namespace std {
     template<>
-    struct hash<xray::render::ng::ResourceHandle> {
-        size_t operator()(const xray::render::ng::ResourceHandle& h) const {
+    struct hash<xray::render::fg::ResourceHandle> {
+        size_t operator()(const xray::render::fg::ResourceHandle& h) const {
             // Combine index and generation into single hash
             return hash<u64>()((u64(h.generation) << 32) | u64(h.index));
         }
@@ -105,37 +105,37 @@ namespace std {
 
     // Derived handles use same hash
     template<>
-    struct hash<xray::render::ng::BufferHandle> {
-        size_t operator()(const xray::render::ng::BufferHandle& h) const {
-            return hash<xray::render::ng::ResourceHandle>()(h);
+    struct hash<xray::render::fg::BufferHandle> {
+        size_t operator()(const xray::render::fg::BufferHandle& h) const {
+            return hash<xray::render::fg::ResourceHandle>()(h);
         }
     };
 
     template<>
-    struct hash<xray::render::ng::TextureHandle> {
-        size_t operator()(const xray::render::ng::TextureHandle& h) const {
-            return hash<xray::render::ng::ResourceHandle>()(h);
+    struct hash<xray::render::fg::TextureHandle> {
+        size_t operator()(const xray::render::fg::TextureHandle& h) const {
+            return hash<xray::render::fg::ResourceHandle>()(h);
         }
     };
 
     template<>
-    struct hash<xray::render::ng::SamplerHandle> {
-        size_t operator()(const xray::render::ng::SamplerHandle& h) const {
-            return hash<xray::render::ng::ResourceHandle>()(h);
+    struct hash<xray::render::fg::SamplerHandle> {
+        size_t operator()(const xray::render::fg::SamplerHandle& h) const {
+            return hash<xray::render::fg::ResourceHandle>()(h);
         }
     };
 
     template<>
-    struct hash<xray::render::ng::ShaderHandle> {
-        size_t operator()(const xray::render::ng::ShaderHandle& h) const {
-            return hash<xray::render::ng::ResourceHandle>()(h);
+    struct hash<xray::render::fg::ShaderHandle> {
+        size_t operator()(const xray::render::fg::ShaderHandle& h) const {
+            return hash<xray::render::fg::ResourceHandle>()(h);
         }
     };
 
     template<>
-    struct hash<xray::render::ng::PipelineStateHandle> {
-        size_t operator()(const xray::render::ng::PipelineStateHandle& h) const {
-            return hash<xray::render::ng::ResourceHandle>()(h);
+    struct hash<xray::render::fg::PipelineStateHandle> {
+        size_t operator()(const xray::render::fg::PipelineStateHandle& h) const {
+            return hash<xray::render::fg::ResourceHandle>()(h);
         }
     };
 }

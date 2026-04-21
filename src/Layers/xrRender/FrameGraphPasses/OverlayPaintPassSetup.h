@@ -4,7 +4,7 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-namespace ng { class RenderDevice; }
+namespace fg { class RenderDevice; }
 }
 
 namespace xray::render::framegraph { class FrameGraph; }
@@ -22,11 +22,11 @@ struct OverlayPaintPassState {
     bool enabled = false;
 };
 
-void InitializeOverlayPaintResources(ng::RenderDevice* device, OverlayPaintPassState& state);
+void InitializeOverlayPaintResources(fg::RenderDevice* device, OverlayPaintPassState& state);
 
 void setupOverlayPaintPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     decals::OverlayManager* overlayMgr,
     OverlayPaintPassState& state
 );

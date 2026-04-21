@@ -11,7 +11,7 @@ VariantTextureBuffer& VariantTextureBuffer::Instance()
     return instance;
 }
 
-void VariantTextureBuffer::Initialize(ng::RenderDevice* device)
+void VariantTextureBuffer::Initialize(fg::RenderDevice* device)
 {
     if (IsInitialized())
         return;

@@ -3,7 +3,7 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
         class RenderContext;
     }
@@ -14,9 +14,9 @@ namespace xray::render::RENDER_NAMESPACE::bindless {
 template<typename T>
 class GPUStructuredBuffer {
 public:
-    bool Initialize(ng::RenderDevice* device, const char* debugName, u32 maxElements);
+    bool Initialize(fg::RenderDevice* device, const char* debugName, u32 maxElements);
     void Shutdown();
-    void Upload(ng::RenderContext* ctx);
+    void Upload(fg::RenderContext* ctx);
 
     void Set(u32 index, const T& data)
     {
@@ -40,7 +40,7 @@ protected:
     GPUStructuredBuffer() = default;
     ~GPUStructuredBuffer() { Shutdown(); }
 
-    ng::RenderDevice* m_device = nullptr;
+    fg::RenderDevice* m_device = nullptr;
     nvrhi::BufferHandle m_buffer;
     xr_vector<T> m_data;
     u32 m_maxElements = 0;

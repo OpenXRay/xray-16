@@ -107,7 +107,7 @@ FrameGraphRenderer::~FrameGraphRenderer() {
     Shutdown();
 }
 
-bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
+bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     VERIFY(device != nullptr);
     m_device = device;
 
@@ -339,7 +339,7 @@ void FrameGraphRenderer::Render() {
                     if (m_rtAccelMgr)
                         RENDER_NAMESPACE::RTAccelStructManager::InvalidateShaderPipelines();
 
-                    ng::ImGuiRendererNVRHI* imguiReload = RImplementation.GetImGuiRendererNVRHI();
+                    fg::ImGuiRendererNVRHI* imguiReload = RImplementation.GetImGuiRendererNVRHI();
                     if (imguiReload)
                         imguiReload->InvalidateShadersAndPipeline();
 
@@ -487,7 +487,7 @@ void FrameGraphRenderer::RenderMenu() {
     framegraph::PassHandle clearPass = m_framegraph->AddPass("ClearBackground");
     m_framegraph->PassWrite(clearPass, backgroundTarget, framegraph::ResourceState::RenderTarget);
     m_framegraph->SetPassCallback(clearPass,
-        [backgroundTarget](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
+        [backgroundTarget](fg::RenderContext& ctx, const framegraph::FrameGraph& fg) {
             auto* bgRT = fg.GetPhysicalTexture(backgroundTarget);
             if (bgRT) {
                 nvrhi::ICommandList* cmdList = ctx.GetCommandList();
@@ -511,7 +511,7 @@ void FrameGraphRenderer::RenderMenu() {
         m_blackboard->get_or_add<passes::TonemapPassState>()
     );
 
-    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
+    fg::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
         ldrOutput,  // LDR input (RGBA8_UNORM)
@@ -1228,7 +1228,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 passBuilder.sideEffects();
                 data.dm = m_detailManager.get();
             },
-            [](const Perlin4DGenData& data, const framegraph::FrameGraph&, ng::RenderContext* ctx)
+            [](const Perlin4DGenData& data, const framegraph::FrameGraph&, fg::RenderContext* ctx)
             {
                 auto* cmdList = ctx->GetCommandList();
                 auto* device  = cmdList->getDevice();
@@ -1431,7 +1431,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                     data.geometry = m_geometryCollector.get();
                     data.hudBatches = &m_hudBatches;
                 },
-                [](const DynamicBLASData& data, const framegraph::FrameGraph&, ng::RenderContext* ctx) {
+                [](const DynamicBLASData& data, const framegraph::FrameGraph&, fg::RenderContext* ctx) {
                     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
                     xr_vector<GeometryBatch> worldSkinned;
@@ -1608,7 +1608,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 struct DebugPreviewData {
                     framegraph::VirtualResourceHandle source;
                     framegraph::VirtualResourceHandle dest;
-                    ng::RenderDevice* device;
+                    fg::RenderDevice* device;
                     u32 sourceW, sourceH;
                     int channelMode;
                     int mipLevel;
@@ -1632,7 +1632,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                         builder.PassRead(pass, selectedHandle, framegraph::ResourceState::ShaderResource);
                         builder.PassWrite(pass, previewHandle, framegraph::ResourceState::UnorderedAccess);
                     },
-                    [](const DebugPreviewData& data, const framegraph::FrameGraph& fg, ng::RenderContext* ctx) {
+                    [](const DebugPreviewData& data, const framegraph::FrameGraph& fg, fg::RenderContext* ctx) {
                         static nvrhi::ComputePipelineHandle s_pipeline;
                         static nvrhi::BindingLayoutHandle s_layout;
                         static nvrhi::BufferHandle s_cb;
@@ -1656,7 +1656,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                             cbDesc.byteSize = 32;
                             cbDesc.isConstantBuffer = true;
                             cbDesc.isVolatile = true;
-                            cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+                            cbDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
                             cbDesc.keepInitialState = true;
                             cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
                             s_cb = nvDevice->createBuffer(cbDesc);
@@ -1703,7 +1703,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
-    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
+    fg::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
         ldrOutput,
@@ -1756,7 +1756,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_framegraph->PassRead(depthCopyPass, finalDepth, framegraph::ResourceState::CopySource);
             m_framegraph->PassWrite(depthCopyPass, prevDepthCopyDest, framegraph::ResourceState::CopyDest);
             m_framegraph->SetPassCallback(depthCopyPass,
-                [finalDepth, prevDepthCopyDest](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
+                [finalDepth, prevDepthCopyDest](fg::RenderContext& ctx, const framegraph::FrameGraph& fg) {
                     nvrhi::ITexture* src = fg.GetPhysicalTexture(finalDepth);
                     nvrhi::ITexture* dst = fg.GetPhysicalTexture(prevDepthCopyDest);
                     if (src && dst)
@@ -2434,7 +2434,7 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
     }
 }
 
-void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer) {
+void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, fg::ImGuiRendererNVRHI* imguiRenderer) {
     if (!drawData || drawData->TotalVtxCount == 0)
         return;
 

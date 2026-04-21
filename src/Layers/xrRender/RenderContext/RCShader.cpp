@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "RCShader.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 RCShader::RCShader(ShaderStage stage,
                    nvrhi::ShaderHandle nvrhiShader,
@@ -13,4 +13,4 @@ RCShader::RCShader(ShaderStage stage,
     VERIFY(m_nvrhiShader);
 }
 
-} // namespace xray::render::ng
+} // namespace xray::render::fg

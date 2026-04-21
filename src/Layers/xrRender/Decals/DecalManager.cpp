@@ -29,7 +29,7 @@ static const u16 s_cubeIndices[CUBE_INDEX_COUNT] = {
     1,5,6, 1,6,2,
 };
 
-void DecalManager::Initialize(ng::RenderDevice* device)
+void DecalManager::Initialize(fg::RenderDevice* device)
 {
     m_device = device;
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -337,7 +337,7 @@ void DecalManager::Update(float dt, float currentTime)
     m_lock.Leave();
 }
 
-void DecalManager::Upload(ng::RenderContext* ctx)
+void DecalManager::Upload(fg::RenderContext* ctx)
 {
     if (m_gpuDecalCount == 0 || !m_decalBuffer)
         return;

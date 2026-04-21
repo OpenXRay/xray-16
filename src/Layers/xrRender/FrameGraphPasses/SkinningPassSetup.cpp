@@ -62,7 +62,7 @@ static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
 //  PIPELINE INITIALIZATION
 // ═══════════════════════════════════════════════════════════════════════════
 
-void InitializeSkinningResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state)
+void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state)
 {
     if (state.initialized)
         return;
@@ -453,7 +453,7 @@ static void RenderSkinnedBatch(
 
 framegraph::DefaultOutputLayout setupSkinningPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     const GeometryCollector* geometry,
     const xr_vector<GeometryBatch>* hudBatches,
@@ -513,7 +513,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
         // ═══════════════════════════════════════════════════════
         //  EXECUTE LAMBDA
         // ═══════════════════════════════════════════════════════
-        [](const SkinningPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const SkinningPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             using namespace RENDER_NAMESPACE;
 
             // Check if any skinned batches to render

@@ -16,7 +16,7 @@ namespace RENDER_NAMESPACE
 namespace xray::render::RENDER_NAMESPACE::passes {
 using namespace framegraph;
 
-static void InitializeResources(ng::RenderDevice* device, MotionVectorPassState& state)
+static void InitializeResources(fg::RenderDevice* device, MotionVectorPassState& state)
 {
     if (state.initialized) return;
 
@@ -40,7 +40,7 @@ static void InitializeResources(ng::RenderDevice* device, MotionVectorPassState&
 
 MotionVectorOutput setupMotionVectorPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     VirtualResourceHandle depthInput,
     const Fmatrix& invViewProj,
     const Fmatrix& prevViewProj,
@@ -65,7 +65,7 @@ MotionVectorOutput setupMotionVectorPass(
     struct PassData {
         VirtualResourceHandle depth;
         VirtualResourceHandle motionVectors;
-        ng::RenderDevice* device;
+        fg::RenderDevice* device;
         MotionVectorPassState* state;
         Fmatrix invViewProj;
         Fmatrix prevViewProj;
@@ -85,7 +85,7 @@ MotionVectorOutput setupMotionVectorPass(
             data.width = width;
             data.height = height;
         },
-        [](const PassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const PassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             auto* depthTex = fg.GetPhysicalTexture(data.depth);
             auto* mvTex = fg.GetPhysicalTexture(data.motionVectors);
             if (!depthTex || !mvTex) return;

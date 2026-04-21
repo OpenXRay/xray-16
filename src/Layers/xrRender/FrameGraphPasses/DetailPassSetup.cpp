@@ -48,7 +48,7 @@ using namespace framegraph;
 
 DefaultOutputLayout setupDetailPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     RENDER_NAMESPACE::FGDetailManager* detailManager,
     const DefaultOutputLayout& forwardInputs,
     u32 width,
@@ -94,7 +94,7 @@ DefaultOutputLayout setupDetailPass(
             data.outputs.worldPos = data.worldPos;
             data.outputs.depth = data.depth;
         },
-        [](const DetailPassData& data, const FrameGraph& fg, ng::RenderContext* ctx)
+        [](const DetailPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
             ZoneScoped;
             ZoneName("DetailPass", 10);

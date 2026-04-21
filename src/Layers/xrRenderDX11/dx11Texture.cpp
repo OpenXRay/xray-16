@@ -9,7 +9,7 @@
 #include "Layers/xrRender/ResourceManager/TextureManager.h"      // TextureManager
 #include <nvrhi/nvrhi.h>                                         // getNativeObject
 
-using namespace xray::render::ng;
+using namespace xray::render::fg;
 using namespace xray::render::resources;
 
 namespace xray::render::RENDER_NAMESPACE

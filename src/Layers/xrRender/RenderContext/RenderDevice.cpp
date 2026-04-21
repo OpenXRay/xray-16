@@ -5,7 +5,7 @@
 #include "../ResourceManager/FGResourceManager.h"
 #include "../Shaders/SlangCompiler.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 // ═══════════════════════════════════════════════════
 //  UPLOAD HELPER - Batched or Immediate execution
@@ -1156,4 +1156,4 @@ nvrhi::ShaderDesc RenderDevice::ConvertShaderDesc(ShaderStage stage, const char*
     return nvrhiDesc;
 }
 
-} // namespace xray::render::ng
+} // namespace xray::render::fg

@@ -6,7 +6,7 @@
 // Sampler Cache for Modern ResourceManager
 // Week 2 - Day 4: Task 4.3
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;  // Forward declaration
 }
 
@@ -58,7 +58,7 @@ struct SamplerDesc {
 
 class SamplerCache {
 public:
-    explicit SamplerCache(xray::render::ng::RenderDevice* device);
+    explicit SamplerCache(xray::render::fg::RenderDevice* device);
     ~SamplerCache();
 
     // Get or create sampler
@@ -78,7 +78,7 @@ public:
     u32 GetCacheSize() const { return (u32)m_cache.size(); }
 
 private:
-    xray::render::ng::RenderDevice* m_device;
+    xray::render::fg::RenderDevice* m_device;
 
     // Hash → Sampler cache
     xr_map<u64, SamplerHandle> m_cache;

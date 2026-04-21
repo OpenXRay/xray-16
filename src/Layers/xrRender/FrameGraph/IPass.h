@@ -7,7 +7,7 @@
 namespace xray::render {
     struct GeometryBatch;  // Forward declaration
 
-    namespace ng {
+    namespace fg {
         class RenderContext;  // Forward declaration
     }
 }
@@ -42,7 +42,7 @@ struct DefaultOutputLayout {
 //       void Setup(FrameGraph& fg) override {
 //           // Declare resources
 //       }
-//       void Execute(ng::RenderContext& ctx, const FrameGraph& fg) override {
+//       void Execute(fg::RenderContext& ctx, const FrameGraph& fg) override {
 //           // Draw batches
 //       }
 //   };
@@ -61,7 +61,7 @@ public:
 
     // Execute pass (called by FrameGraph during Execute())
     // Draw all assigned batches using the provided context
-    virtual void Execute(ng::RenderContext& ctx, const FrameGraph& fg) = 0;
+    virtual void Execute(fg::RenderContext& ctx, const FrameGraph& fg) = 0;
 
     // Get phase this pass handles
     virtual RenderPhase GetPhase() const = 0;
@@ -113,7 +113,7 @@ protected:
         }
 
         // Set execution callback (calls derived class's Execute())
-        fg.SetPassCallback(pass, [this](ng::RenderContext& ctx, const FrameGraph& fg) {
+        fg.SetPassCallback(pass, [this](fg::RenderContext& ctx, const FrameGraph& fg) {
             this->Execute(ctx, fg);
         });
     }

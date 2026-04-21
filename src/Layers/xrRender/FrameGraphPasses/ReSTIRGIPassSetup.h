@@ -4,7 +4,7 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng { class RenderDevice; }
+namespace xray::render::fg { class RenderDevice; }
 namespace xray::render::framegraph { class FrameGraph; }
 namespace xray::render::RENDER_NAMESPACE { class RTAccelStructManager; }
 
@@ -38,7 +38,7 @@ struct ReSTIRGIOutput {
 
 ReSTIRGIOutput setupReSTIRGIPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     RTAccelStructManager* accelMgr,
     framegraph::VirtualResourceHandle depth,
     framegraph::VirtualResourceHandle normal,

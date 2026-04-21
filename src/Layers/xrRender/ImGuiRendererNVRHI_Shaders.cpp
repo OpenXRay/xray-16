@@ -5,7 +5,7 @@
 #include "FrameGraph/BindingSetBuilder.h"
 #include <d3dcompiler.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 //=============================================================================
 // Phase 4: Shader and Pipeline State Creation
@@ -185,4 +185,4 @@ bool ImGuiRendererNVRHI::CreateResourceBindings()
     return true;
 }
 
-} // namespace xray::render::ng
+} // namespace xray::render::fg

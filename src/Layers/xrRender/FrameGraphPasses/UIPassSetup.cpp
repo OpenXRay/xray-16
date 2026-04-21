@@ -73,7 +73,7 @@ framegraph::VirtualResourceHandle setupUIPass(
         // Execute lambda
         [](const UIPassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
@@ -169,7 +169,7 @@ framegraph::VirtualResourceHandle setupTextPass(
 
         [](const TextPassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
@@ -247,7 +247,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                             if (fontRender && fontRender->m_textureName.size() > 0) {
                                 auto* resMgr = device->GetFGResourceManager();
                                 auto* texMgr = resMgr->GetTextureManager();
-                                ng::TextureHandle texHandle = texMgr->LoadTexture(fontRender->m_textureName.c_str());
+                                fg::TextureHandle texHandle = texMgr->LoadTexture(fontRender->m_textureName.c_str());
                                 if (texHandle.IsValid()) {
                                     nvrhi::ITexture* nvrhiTex = texMgr->GetNVRHITexture(texHandle);
                                     if (nvrhiTex) {
@@ -353,7 +353,7 @@ framegraph::VirtualResourceHandle setupTextPass(
             auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
 
             // Begin render pass
-            ng::RenderPassDesc passDesc;
+            fg::RenderPassDesc passDesc;
             passDesc.passName = "UI Pass";
             passDesc.renderTargets[0] = uiRT;
             passDesc.numRenderTargets = 1;
@@ -370,7 +370,7 @@ framegraph::VirtualResourceHandle setupTextPass(
 
             ctx->SetViewport(0, 0, (float)data.width, (float)data.height);
 
-            ng::Rect scissor;
+            fg::Rect scissor;
             scissor.x = 0;
             scissor.y = 0;
             scissor.width = data.width;
@@ -480,7 +480,7 @@ framegraph::VirtualResourceHandle setupCursorPass(
         // Execute lambda
         [](const CursorPassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 

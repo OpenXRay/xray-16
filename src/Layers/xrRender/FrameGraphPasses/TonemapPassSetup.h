@@ -9,7 +9,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;
 }
 
@@ -42,7 +42,7 @@ struct TonemapPassData {
 // If outputTarget is invalid, creates internal rt_Final texture
 framegraph::VirtualResourceHandle setupTonemapPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle hdrInput,
     framegraph::VirtualResourceHandle exposureTexture,
     framegraph::VirtualResourceHandle outputTarget,

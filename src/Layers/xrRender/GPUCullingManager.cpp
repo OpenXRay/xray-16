@@ -121,7 +121,7 @@ GPUCullingManager::~GPUCullingManager()
 //  INITIALIZATION
 // ═══════════════════════════════════════════════════════
 
-void GPUCullingManager::Initialize(ng::RenderDevice* device)
+void GPUCullingManager::Initialize(fg::RenderDevice* device)
 {
     if (m_initialized)
         return;
@@ -157,7 +157,7 @@ void GPUCullingManager::Initialize(ng::RenderDevice* device)
         m_maxObjects, m_maxParticles, m_compactEnabled ? "yes" : "no");
 }
 
-void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
+void GPUCullingManager::CreateBuffers(fg::RenderDevice* device)
 {
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
@@ -248,7 +248,7 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
 
     // Constant buffer
     {
-        ng::RenderDevice::BufferDesc desc;
+        fg::RenderDevice::BufferDesc desc;
         desc.debugName = "GPUCull_Params";
         desc.byteSize = sizeof(CullParamsCB);
         desc.isConstantBuffer = true;
@@ -459,7 +459,7 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
     CreateSkinnedCullingBuffers(device);
 }
 
-void GPUCullingManager::CreateSkinnedCullingBuffers(ng::RenderDevice* device)
+void GPUCullingManager::CreateSkinnedCullingBuffers(fg::RenderDevice* device)
 {
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
@@ -605,7 +605,7 @@ void GPUCullingManager::EnsureSkinnedBufferCapacity(u32 count)
     m_maxSkinnedObjects = newCapacity;
 }
 
-void GPUCullingManager::CreateComputePipeline(ng::RenderDevice* device)
+void GPUCullingManager::CreateComputePipeline(fg::RenderDevice* device)
 {
     if (!m_computeEnabled)
         return;
@@ -650,7 +650,7 @@ void GPUCullingManager::CreateComputePipeline(ng::RenderDevice* device)
     Msg("* [GPUCulling] Compute pipeline created successfully");
 }
 
-void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
+void GPUCullingManager::CreateCompactionResources(fg::RenderDevice* device)
 {
     if (!m_computeEnabled)
         return;
@@ -1001,7 +1001,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
     }
 
     {
-        ng::RenderDevice::BufferDesc desc;
+        fg::RenderDevice::BufferDesc desc;
         desc.debugName = "GPUCull_CompactParams";
         desc.byteSize = 16;
         desc.isConstantBuffer = true;
@@ -1087,7 +1087,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
     }
 }
 
-void GPUCullingManager::CreateVariantPartitionResources(ng::RenderDevice* device)
+void GPUCullingManager::CreateVariantPartitionResources(fg::RenderDevice* device)
 {
     if (!m_compactEnabled)
         return;
@@ -1127,12 +1127,12 @@ void GPUCullingManager::CreateVariantPartitionResources(ng::RenderDevice* device
     }
 
     {
-        ng::RenderDevice::BufferDesc desc;
+        fg::RenderDevice::BufferDesc desc;
         desc.debugName = "VariantPartition_Params";
         desc.byteSize = 16;
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+        desc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
         m_variantPartitionParamsCB = m_device->CreateBuffer(desc);
         R_ASSERT2(m_variantPartitionParamsCB.IsValid(), "Failed to create variant partition params CB");
     }
@@ -1327,12 +1327,12 @@ void GPUCullingManager::Shutdown()
 
     m_transparentSet = {};
 
-    m_cullParamsCB = ng::BufferHandle();
+    m_cullParamsCB = fg::BufferHandle();
     m_cullPipeline = nullptr;
     m_cullLayout = nullptr;
     m_pointSampler = nullptr;
 
-    m_compactParamsCB = ng::BufferHandle();
+    m_compactParamsCB = fg::BufferHandle();
     m_compactCountPipeline = nullptr;
     m_compactScanPipeline = nullptr;
     m_compactScatterPipeline = nullptr;
@@ -1342,14 +1342,14 @@ void GPUCullingManager::Shutdown()
 
     m_variantPartitionPipeline = nullptr;
     m_variantPartitionLayout = nullptr;
-    m_variantPartitionParamsCB = ng::BufferHandle();
+    m_variantPartitionParamsCB = fg::BufferHandle();
     m_staticPartition = {};
     m_transparentPartition = {};
     m_variantPartitionEnabled = false;
 
     m_debugBuffer = nullptr;
-    m_debugComputeParamsCB = ng::BufferHandle();
-    m_debugGraphicsParamsCB = ng::BufferHandle();
+    m_debugComputeParamsCB = fg::BufferHandle();
+    m_debugGraphicsParamsCB = fg::BufferHandle();
     m_debugComputePipeline = nullptr;
     m_particleDebugComputePipeline = nullptr;
     m_debugComputeLayout = nullptr;
@@ -1360,7 +1360,7 @@ void GPUCullingManager::Shutdown()
     m_particleBuffer = nullptr;
     m_particleDrawArgsBuffer = nullptr;
     m_particleVisibleCountBuffer = nullptr;
-    m_particleCullParamsCB = ng::BufferHandle();
+    m_particleCullParamsCB = fg::BufferHandle();
     m_particleCullPipeline = nullptr;
     m_particleCullLayout = nullptr;
 
@@ -1523,7 +1523,7 @@ void GPUCullingManager::ProcessStatsReadback()
 //  UPLOAD SCENE OBJECTS
 // ═══════════════════════════════════════════════════════
 
-void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const GeometryCollector* geometry)
+void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const GeometryCollector* geometry)
 {
     ZoneScopedN("GPUCull::UploadSceneObjects");
 
@@ -1999,7 +1999,7 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
 //  UPLOAD SKINNED OBJECTS
 // ═══════════════════════════════════════════════════════
 
-void GPUCullingManager::UploadSkinnedObjects(ng::RenderContext* ctx, const GeometryCollector* geometry)
+void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const GeometryCollector* geometry)
 {
     ZoneScopedN("GPUCull::UploadSkinnedObjects");
 
@@ -2337,7 +2337,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
         // Execute lambda
         [](const GPUCullPassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             GPUCullingManager* mgr = data.manager;
             if (!mgr->m_computeEnabled)
@@ -2942,7 +2942,7 @@ void GPUCullingManager::SetupSkinnedCullingPass(
         // Execute lambda
         [](const SkinnedCullPassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             GPUCullingManager* mgr = data.manager;
             if (!mgr->m_skinnedCullEnabled)
@@ -3028,7 +3028,7 @@ bool GPUCullingManager::IsDebugEnabled() const
     return ps_r4_debug_gpu_culling != 0 && m_computeEnabled && m_debugComputePipeline && m_debugGraphicsPipeline;
 }
 
-void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
+void GPUCullingManager::CreateDebugResources(fg::RenderDevice* device)
 {
     if (!m_computeEnabled)
         return;
@@ -3077,12 +3077,12 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
     // ─────────────────────────────────────────────────────
     {
         // Compute shader constant buffer
-        ng::RenderDevice::BufferDesc desc;
+        fg::RenderDevice::BufferDesc desc;
         desc.debugName = "GPUCull_DebugComputeParams";
         desc.byteSize = sizeof(CullDebugParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+        desc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
         m_debugComputeParamsCB = m_device->CreateBuffer(desc);
         if (!m_debugComputeParamsCB.IsValid()) {
@@ -3092,12 +3092,12 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
     }
     {
         // Graphics shader constant buffer
-        ng::RenderDevice::BufferDesc desc;
+        fg::RenderDevice::BufferDesc desc;
         desc.debugName = "GPUCull_DebugGraphicsParams";
         desc.byteSize = sizeof(CullDebugVSParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+        desc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
         m_debugGraphicsParamsCB = m_device->CreateBuffer(desc);
         if (!m_debugGraphicsParamsCB.IsValid()) {
@@ -3245,7 +3245,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
         // Execute lambda
         [](const DebugPassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             GPUCullingManager* mgr = data.manager;
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
@@ -3412,7 +3412,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
     );
 }
 
-void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
+void GPUCullingManager::CreateParticleResources(fg::RenderDevice* device)
 {
     if (!m_computeEnabled)
         return;
@@ -3475,12 +3475,12 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
     }
 
     {
-        ng::RenderDevice::BufferDesc desc;
+        fg::RenderDevice::BufferDesc desc;
         desc.debugName = "GPUCull_ParticleParams";
         desc.byteSize = sizeof(CullParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
-        desc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+        desc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
 
         m_particleCullParamsCB = m_device->CreateBuffer(desc);
         if (!m_particleCullParamsCB.IsValid()) {
@@ -3521,7 +3521,7 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
     Msg("* [GPUCulling] Particle culling resources created");
 }
 
-void GPUCullingManager::UploadParticleBatches(ng::RenderContext* ctx, const xr_vector<passes::ParticleBatch>* batches)
+void GPUCullingManager::UploadParticleBatches(fg::RenderContext* ctx, const xr_vector<passes::ParticleBatch>* batches)
 {
     ZoneScopedN("GPUCull::UploadParticles");
 
@@ -3636,7 +3636,7 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
 
         [](const ParticleCullPassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             GPUCullingManager* mgr = data.manager;
             if (!mgr->m_particleCullEnabled || data.particleCount == 0)
@@ -3904,7 +3904,7 @@ void GPUCullingManager::EndLevelLoad()
     Msg("* [GPUCulling] Mega-buffers ready for GPU upload");
 }
 
-void GPUCullingManager::UploadInstanceData(ng::RenderContext* ctx, const GeometryCollector* geometry)
+void GPUCullingManager::UploadInstanceData(fg::RenderContext* ctx, const GeometryCollector* geometry)
 {
     (void)ctx;
     (void)geometry;

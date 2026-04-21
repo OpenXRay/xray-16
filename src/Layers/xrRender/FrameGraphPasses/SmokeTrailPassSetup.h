@@ -9,7 +9,7 @@
 #include "TrailPassSetup.h"  // TrailParamsCB, shared structs
 
 namespace xray::render {
-namespace ng {
+namespace fg {
     class RenderDevice;
 }
 }
@@ -48,7 +48,7 @@ struct SmokeTrailPassState
 // Setup: inserts 4 passes (3 compute + 1 draw) into the framegraph.
 framegraph::DefaultOutputLayout setupSmokeTrailPass(
     framegraph::FrameGraph&              fg,
-    ng::RenderDevice*                    device,
+    fg::RenderDevice*                    device,
     const framegraph::DefaultOutputLayout& inputs,
     SmokeTrailManager*                   manager,
     u32                                  width,

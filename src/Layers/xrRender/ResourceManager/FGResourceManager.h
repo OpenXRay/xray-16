@@ -9,7 +9,7 @@
 // Manages all resources (textures, buffers, samplers) for the FrameGraph renderer
 // Provides streaming, memory management, and LRU eviction
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;  // Forward declaration
 }
 
@@ -21,7 +21,7 @@ namespace xray::render::resources {
 
 class FGResourceManager {
 public:
-    explicit FGResourceManager(xray::render::ng::RenderDevice* device);
+    explicit FGResourceManager(xray::render::fg::RenderDevice* device);
     ~FGResourceManager();
 
     // ═══════════════════════════════════════════════════
@@ -60,7 +60,7 @@ public:
     void PrintStatistics() const;
 
 private:
-    xray::render::ng::RenderDevice* m_device;
+    xray::render::fg::RenderDevice* m_device;
 
     xr_unique_ptr<TextureManager> m_textureManager;
     xr_unique_ptr<BufferManager> m_bufferManager;

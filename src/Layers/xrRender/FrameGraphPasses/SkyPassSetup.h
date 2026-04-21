@@ -6,7 +6,7 @@
 
 // Forward declarations
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -49,7 +49,7 @@ struct SkyPassState {
 struct SkyPassData {
     framegraph::VirtualResourceHandle colorOutput;
     framegraph::VirtualResourceHandle depthOutput;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     CEnvironment* environment;
     SkyPassState* passState;
     u32 width;
@@ -58,7 +58,7 @@ struct SkyPassData {
 
 framegraph::VirtualResourceHandle setupSkyPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle colorInput,
     framegraph::VirtualResourceHandle depthInput,
     CEnvironment* environment,
@@ -67,7 +67,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
     SkyPassState& state
 );
 
-void InitializeSkyGeometry(ng::RenderDevice* device, SkyPassState& state);
+void InitializeSkyGeometry(fg::RenderDevice* device, SkyPassState& state);
 void ShutdownSkyGeometry(SkyPassState& state);
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

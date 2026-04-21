@@ -400,7 +400,7 @@ bool PassResourceCache::HasStaticBuffer(const char* passName, const char* buffer
 
 nvrhi::IBuffer* PassResourceCache::GetOrCreateVolatileCB(
     const char* passName, const char* bufferName,
-    u32 byteSize, ng::RenderDevice* device, u32 maxVersions)
+    u32 byteSize, fg::RenderDevice* device, u32 maxVersions)
 {
     u64 key = HashCombine(HashString(passName), HashString(bufferName));
     auto it = m_volatileCBs.find(key);
@@ -410,7 +410,7 @@ nvrhi::IBuffer* PassResourceCache::GetOrCreateVolatileCB(
     }
     m_stats.bufferMisses++;
 
-    ng::RenderDevice::BufferDesc desc;
+    fg::RenderDevice::BufferDesc desc;
     desc.byteSize = byteSize;
     desc.isConstantBuffer = true;
     desc.isVolatile = true;
@@ -420,7 +420,7 @@ nvrhi::IBuffer* PassResourceCache::GetOrCreateVolatileCB(
     xr_sprintf(debugStr, "VCB_%s_%s", passName, bufferName);
     desc.debugName = debugStr;
 
-    ng::BufferHandle handle = device->CreateBuffer(desc);
+    fg::BufferHandle handle = device->CreateBuffer(desc);
     if (handle.IsValid()) {
         m_volatileCBs[key] = handle;
         Msg("* [VCB] Created '%s' (%u bytes, %u versions, total %u bytes)",

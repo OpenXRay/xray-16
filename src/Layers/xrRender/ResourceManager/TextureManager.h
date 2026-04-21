@@ -8,7 +8,7 @@
 // Week 1 - Day 1: Tasks 1.2-1.3
 // Week 3 - Day 5: Task 5.4 - Thread safety
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;  // Forward declaration
 }
 
@@ -151,7 +151,7 @@ struct TextureMetadata {
 
 class TextureManager {
 public:
-    explicit TextureManager(xray::render::ng::RenderDevice* device);
+    explicit TextureManager(xray::render::fg::RenderDevice* device);
     ~TextureManager();
 
     // ═══════════════════════════════════════════════════
@@ -267,7 +267,7 @@ public:
     StreamingManager* GetStreamingManager() { return m_streamingManager.get(); }
 
 private:
-    xray::render::ng::RenderDevice* m_device;
+    xray::render::fg::RenderDevice* m_device;
 
     // ═══════════════════════════════════════════════════
     //  RESOURCE STORAGE (Sparse Array)

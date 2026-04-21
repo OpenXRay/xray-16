@@ -15,7 +15,7 @@ namespace xray::render::RENDER_NAMESPACE::passes
 using namespace framegraph;
 
 struct ClusterLightPassData {
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     ClusteredLightManager* lightManager;
     ClusterLightPassState* passState;
     u32 screenWidth;
@@ -108,7 +108,7 @@ static void InitCullPipeline(nvrhi::IDevice* nvDevice, ClusterLightPassState& st
 
 void setupClusterLightPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     ClusteredLightManager* lightManager,
     u32 screenWidth,
     u32 screenHeight,
@@ -144,7 +144,7 @@ void setupClusterLightPass(
             data.prevViewProj = prevViewProj;
             data.useHiZ = useHiZ;
         },
-        [](const ClusterLightPassData& data, const FrameGraph& fg, ng::RenderContext* ctx)
+        [](const ClusterLightPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
             ZoneScoped;
             ZoneName("ClusterLightAssign", 18);

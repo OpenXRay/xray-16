@@ -15,7 +15,7 @@ class FrameGraph;
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
 // User-defined function executed during render
-using PassExecuteCallback = std::function<void(xray::render::ng::RenderContext&, const FrameGraph&)>;
+using PassExecuteCallback = std::function<void(xray::render::fg::RenderContext&, const FrameGraph&)>;
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  RESOURCE ACCESS

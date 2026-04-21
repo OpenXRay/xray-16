@@ -5,7 +5,7 @@
 #include "FrameGraph/ShaderCache.h"
 #include "FrameGraph/ShaderLoader.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 //=============================================================================
 // Phase 5: Vertex/Index Buffer Handling
@@ -236,4 +236,4 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
     }
 }
 
-} // namespace xray::render::ng
+} // namespace xray::render::fg

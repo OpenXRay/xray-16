@@ -11,7 +11,7 @@ MaterialBuffer& MaterialBuffer::Instance()
     return instance;
 }
 
-void MaterialBuffer::Initialize(ng::RenderDevice* device)
+void MaterialBuffer::Initialize(fg::RenderDevice* device)
 {
     if (IsInitialized())
         return;
@@ -62,7 +62,7 @@ DrawMaterialIDBuffer& DrawMaterialIDBuffer::Instance()
     return instance;
 }
 
-void DrawMaterialIDBuffer::Initialize(ng::RenderDevice* device, u32 maxDraws)
+void DrawMaterialIDBuffer::Initialize(fg::RenderDevice* device, u32 maxDraws)
 {
     if (m_initialized)
         return;
@@ -104,7 +104,7 @@ void DrawMaterialIDBuffer::SetMaterialID(u32 drawIndex, u32 materialID)
         m_materialIDs[drawIndex] = materialID;
 }
 
-void DrawMaterialIDBuffer::Upload(ng::RenderContext* ctx, u32 drawCount)
+void DrawMaterialIDBuffer::Upload(fg::RenderContext* ctx, u32 drawCount)
 {
     if (!m_initialized || !m_buffer)
         return;

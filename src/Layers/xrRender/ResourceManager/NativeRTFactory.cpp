@@ -9,7 +9,7 @@
 
 namespace xray::render::resources {
 
-NativeRTFactory::NativeRTFactory(xray::render::ng::RenderDevice* device, TextureManager* textureManager)
+NativeRTFactory::NativeRTFactory(xray::render::fg::RenderDevice* device, TextureManager* textureManager)
     : m_device(device)
     , m_textureManager(textureManager)
     , m_stats{}

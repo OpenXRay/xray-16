@@ -20,7 +20,7 @@ VolatileConstantBufferPool::~VolatileConstantBufferPool()
 //  GET OR CREATE VCB
 // ═══════════════════════════════════════════════════
 
-ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layout)
+fg::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layout)
 {
     // Check if we already have a VCB for this layout
     auto it = m_vcbs.find(layout);
@@ -34,7 +34,7 @@ ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layo
     Msg("* [VCBPool] Creating new VCB for '%s' (slot b%u, %u bytes)",
         layout.name.c_str(), layout.slot, layout.size);
 
-    ng::RenderDevice::BufferDesc cbDesc;
+    fg::RenderDevice::BufferDesc cbDesc;
     cbDesc.byteSize = layout.size;
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
@@ -45,12 +45,12 @@ ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layo
     xr_sprintf(debugName, "VCB_%s_b%u_%ub", layout.name.c_str(), layout.slot, layout.size);
     cbDesc.debugName = debugName;
 
-    ng::BufferHandle vcb = GEnv.FrameGraphRenderer->GetRenderDevice()->CreateBuffer(cbDesc);
+    fg::BufferHandle vcb = GEnv.FrameGraphRenderer->GetRenderDevice()->CreateBuffer(cbDesc);
 
     if (!vcb.IsValid())
     {
         Msg("! [VCBPool] Failed to create VCB for '%s'", layout.name.c_str());
-        return ng::BufferHandle();  // Invalid handle
+        return fg::BufferHandle();  // Invalid handle
     }
 
     // Store in map
@@ -71,13 +71,13 @@ ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layo
 //  GET VCB (WITHOUT CREATING)
 // ═══════════════════════════════════════════════════
 
-ng::BufferHandle VolatileConstantBufferPool::GetVCB(const CBLayout& layout) const
+fg::BufferHandle VolatileConstantBufferPool::GetVCB(const CBLayout& layout) const
 {
     auto it = m_vcbs.find(layout);
     if (it != m_vcbs.end())
         return it->second;
 
-    return ng::BufferHandle();  // Invalid handle
+    return fg::BufferHandle();  // Invalid handle
 }
 
 // ═══════════════════════════════════════════════════

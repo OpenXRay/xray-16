@@ -11,7 +11,7 @@ namespace xray::render {
 static xr_unique_ptr<IImGuiRender> g_ImGuiRenderer;
 
 // Global pointer to the NVRHI render device (set during initialization)
-static ng::RenderDevice* g_RenderDevice = nullptr;
+static fg::RenderDevice* g_RenderDevice = nullptr;
 
 //=============================================================================
 // Phase 8: Integration with existing system
@@ -26,14 +26,14 @@ namespace RENDER_NAMESPACE {
 }
 
 // Initialize the ImGui renderer based on available backends
-void InitializeImGuiRenderer(ng::RenderDevice* renderDevice)
+void InitializeImGuiRenderer(fg::RenderDevice* renderDevice)
 {
     g_RenderDevice = renderDevice;
 
     if (renderDevice && renderDevice->IsInitialized())
     {
         // Use NVRHI-based renderer - create as base class pointer
-        ng::ImGuiRendererNVRHI* nvrhiRenderer = xr_new<ng::ImGuiRendererNVRHI>(renderDevice);
+        fg::ImGuiRendererNVRHI* nvrhiRenderer = xr_new<fg::ImGuiRendererNVRHI>(renderDevice);
         g_ImGuiRenderer.reset(nvrhiRenderer);
 
         // Store pointer in RImplementation for FrameGraphRenderer access
@@ -86,7 +86,7 @@ void SetImGuiCommandListProvider(ImGuiCommandListProvider* provider)
 // Modified ImGuiRendererNVRHI to work with command list provider
 //=============================================================================
 
-namespace ng {
+namespace fg {
 
 // Extension to support command list acquisition
 class ImGuiRendererNVRHI_Integrated : public ImGuiRendererNVRHI
@@ -123,7 +123,7 @@ public:
         g_CommandListProvider->SubmitImGuiCommands(cmdList);
     }
 };
-} // namespace ng
+} // namespace fg
 
 //=============================================================================
 // Integration with existing dxRenderFactory
@@ -134,7 +134,7 @@ IImGuiRender* CreateModernImGuiRenderer()
 {
     if (g_RenderDevice && g_RenderDevice->IsInitialized())
     {
-        auto renderer = ng::ImGuiRendererFactory::Create(g_RenderDevice);
+        auto renderer = fg::ImGuiRendererFactory::Create(g_RenderDevice);
         return renderer.release(); // Transfer ownership
     }
 

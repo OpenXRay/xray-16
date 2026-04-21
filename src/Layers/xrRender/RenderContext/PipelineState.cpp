@@ -2,7 +2,7 @@
 #include "PipelineState.h"
 #include "RenderDevice.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 // ═══════════════════════════════════════════════════
 //  DESCRIPTOR HASH COMPUTATION
@@ -442,4 +442,4 @@ void PipelineStateCache::ResetStats() {
     m_stats.cacheMisses = 0;
 }
 
-} // namespace xray::render::ng
+} // namespace xray::render::fg

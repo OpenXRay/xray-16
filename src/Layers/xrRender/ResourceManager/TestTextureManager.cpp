@@ -12,7 +12,7 @@
 namespace xray::render::RENDER_NAMESPACE {
     class CRender;
 
-    static ng::RenderDevice* GetGlobalRenderDevice() {
+    static fg::RenderDevice* GetGlobalRenderDevice() {
         auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(RImplementation);
         return render.m_renderDevice;
     }
@@ -50,7 +50,7 @@ static u32 g_testsFailed = 0;
 bool Test_HandleAllocation() {
     Msg("! [TEST] Handle allocation and validation...");
 
-    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
     if (!device || !device->IsInitialized()) {
         Msg("! [TEST SKIPPED] RenderDevice not initialized - run in-game");
         return true;  // Skip, don't fail
@@ -76,7 +76,7 @@ bool Test_HandleAllocation() {
 bool Test_HandleReuse() {
     Msg("! [TEST] Handle reuse after release...");
 
-    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     // Allocate and release a handle
@@ -104,7 +104,7 @@ bool Test_HandleReuse() {
 bool Test_HandleValidation() {
     Msg("! [TEST] Handle validation...");
 
-    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     // Test invalid handle
@@ -211,7 +211,7 @@ bool Test_DDSLoader_SizeCalculation() {
 bool Test_TextureDeduplication() {
     Msg("! [TEST] Texture deduplication...");
 
-    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     // Load same texture twice
@@ -236,7 +236,7 @@ bool Test_TextureDeduplication() {
 bool Test_ReferenceCounting() {
     Msg("! [TEST] Reference counting...");
 
-    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     TextureHandle handle = texManager.LoadTexture("$game_textures$\\act\\act_arm_1");
@@ -267,7 +267,7 @@ bool Test_ReferenceCounting() {
 bool Test_MemoryTracking() {
     Msg("! [TEST] Memory tracking...");
 
-    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     // Get initial stats
@@ -285,7 +285,7 @@ bool Test_MemoryTracking() {
 bool Test_Statistics() {
     Msg("! [TEST] Statistics tracking...");
 
-    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     auto stats = texManager.GetStatistics();
@@ -309,7 +309,7 @@ bool Test_Statistics() {
 bool Test_AsyncMultipleTextures() {
     Msg("! [TEST] Async loading multiple textures...");
 
-    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     // Submit multiple async load requests
@@ -379,7 +379,7 @@ bool Test_AsyncMultipleTextures() {
 bool Test_AsyncIOStatistics() {
     Msg("! [TEST] Async I/O statistics tracking...");
 
-    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     // Get initial async I/O stats
@@ -430,7 +430,7 @@ bool Test_AsyncIOStatistics() {
 bool Test_ThreadSafeLoading() {
     Msg("! [TEST] Thread-safe texture loading...");
 
-    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     // Load same texture multiple times concurrently (simulates multi-threaded access)
@@ -464,7 +464,7 @@ bool Test_ThreadSafeLoading() {
 bool Test_AsyncLoadingPerformance() {
     Msg("! [TEST] Async loading performance...");
 
-    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     // Time loading multiple large textures

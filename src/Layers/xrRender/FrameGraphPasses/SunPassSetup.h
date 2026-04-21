@@ -8,7 +8,7 @@
 class CEnvironment;
 
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -44,7 +44,7 @@ struct SunPassState {
 
 struct SunPassData {
     framegraph::VirtualResourceHandle colorOutput;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     CEnvironment* environment;
     u32 width;
     u32 height;
@@ -53,7 +53,7 @@ struct SunPassData {
 
 framegraph::VirtualResourceHandle setupSunPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle colorInput,
     CEnvironment* environment,
     u32 width,
@@ -61,7 +61,7 @@ framegraph::VirtualResourceHandle setupSunPass(
     SunPassState& state
 );
 
-void InitializeSunPass(ng::RenderDevice* device, SunPassState& state);
+void InitializeSunPass(fg::RenderDevice* device, SunPassState& state);
 void ShutdownSunPass(SunPassState& state);
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

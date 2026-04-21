@@ -16,10 +16,10 @@ namespace xray::render::resources {
 // ═══════════════════════════════════════════════════
 
 // Import base handle types from RenderContext
-using xray::render::ng::ResourceHandle;
-using xray::render::ng::TextureHandle;
-using xray::render::ng::BufferHandle;
-using xray::render::ng::SamplerHandle;
+using xray::render::fg::ResourceHandle;
+using xray::render::fg::TextureHandle;
+using xray::render::fg::BufferHandle;
+using xray::render::fg::SamplerHandle;
 
 // Note: We reuse the existing handle types from RenderContext rather than
 // creating separate streaming-specific handles. The streaming metadata

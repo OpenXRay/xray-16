@@ -12,29 +12,14 @@ namespace xray::render {
 namespace xray::render::RENDER_NAMESPACE
 {
 
-// Always use our new integration approach
 IImGuiRender* dxRenderFactory::CreateImGuiRender()
 {
-    // Check if we already have an ImGui renderer initialized
-    IImGuiRender* existingRenderer = xray::render::GetImGuiRenderer();
-    if (existingRenderer)
-    {
-        Msg("* ImGui: Using existing renderer");
+    if (IImGuiRender* existingRenderer = xray::render::GetImGuiRenderer())
         return existingRenderer;
-    }
 
-    // Create NVRHI-based ImGui renderer for D3D12
-    // Get RenderDevice from the renderer
     auto& render = RImplementation;
-    if (render.m_renderDevice)
-    {
-        Msg("* ImGui: Creating NVRHI renderer");
-        return xr_new<xray::render::ng::ImGuiRendererNVRHI>(render.m_renderDevice);
-    }
-
-    // Fallback to legacy DX11 implementation (should not happen with D3D12)
-    Msg("! ImGui: No RenderDevice available, falling back to legacy DX11 renderer");
-    return xr_new<dxImGuiRender>();
+    R_ASSERT2(render.m_renderDevice, "ImGui: RenderDevice not initialized");
+    return xr_new<xray::render::fg::ImGuiRendererNVRHI>(render.m_renderDevice);
 }
 
 void dxRenderFactory::DestroyImGuiRender(IImGuiRender* pObject)

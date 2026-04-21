@@ -230,7 +230,7 @@ public:
     nvrhi::ShaderHandle perlin4dComputeShader;
     nvrhi::BindingLayoutHandle perlin4dBindingLayout;
     nvrhi::ComputePipelineHandle perlin4dPipeline;
-    ng::BufferHandle perlin4dCB;
+    fg::BufferHandle perlin4dCB;
 
     // Wind parameters (set from environment, consumed by detail/grass passes)
     Fvector2 windDirection = {1.0f, 0.0f};
@@ -260,8 +260,8 @@ public:
 
     nvrhi::BufferHandle cachedDummySlotIndirection;
 
-    ng::BufferHandle cachedCullParamsCB;
-    ng::BufferHandle cachedInstanceGenParamsCB;
+    fg::BufferHandle cachedCullParamsCB;
+    fg::BufferHandle cachedInstanceGenParamsCB;
 
     nvrhi::BufferHandle cachedGrassTintsBuffer;
 
@@ -313,11 +313,11 @@ public:
     bool LoadCullComputeShader(class framegraph::ShaderLoader* shaderLoader);
     bool LoadInstanceGenShader(class framegraph::ShaderLoader* shaderLoader);
     bool LoadGraphicsShaders(class framegraph::ShaderLoader* shaderLoader);
-    bool CreateGraphicsPipeline(ng::RenderDevice* device, const nvrhi::FramebufferInfo& fbInfo);
-    bool CreateComputePipeline(ng::RenderDevice* device);
-    bool CreateInstanceGenPipeline(ng::RenderDevice* device);
+    bool CreateGraphicsPipeline(fg::RenderDevice* device, const nvrhi::FramebufferInfo& fbInfo);
+    bool CreateComputePipeline(fg::RenderDevice* device);
+    bool CreateInstanceGenPipeline(fg::RenderDevice* device);
     bool LoadPrefixSumShaders(class framegraph::ShaderLoader* shaderLoader);
-    bool CreatePrefixSumPipeline(ng::RenderDevice* device);
+    bool CreatePrefixSumPipeline(fg::RenderDevice* device);
 
     void DispatchCulling(
         nvrhi::ICommandList* cmdList,

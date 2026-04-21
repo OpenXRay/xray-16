@@ -58,13 +58,13 @@ public:
     // ═══════════════════════════════════════════════════
 
     // Commit volatile constants (uploaded every frame/pass/draw)
-    void CommitEngine(ng::RenderContext* ctx);   // Once per frame
-    void CommitPass(ng::RenderContext* ctx);     // Once per pass
-    void CommitMaterial(ng::RenderContext* ctx); // Per material
-    void CommitInstance(ng::RenderContext* ctx); // Per draw call
+    void CommitEngine(fg::RenderContext* ctx);   // Once per frame
+    void CommitPass(fg::RenderContext* ctx);     // Once per pass
+    void CommitMaterial(fg::RenderContext* ctx); // Per material
+    void CommitInstance(fg::RenderContext* ctx); // Per draw call
 
     // Batch commit (for efficiency when all frequencies need update)
-    void CommitAll(ng::RenderContext* ctx);
+    void CommitAll(fg::RenderContext* ctx);
 
     // ═══════════════════════════════════════════════════
     //  STATIC CONSTANT API (PERSISTENT CONSTANTS)
@@ -83,7 +83,7 @@ public:
     // Commit static constants (upload if dirty, bind always)
     // First frame: Uploads data to GPU
     // Later frames: Just binds existing buffer (no upload)
-    void CommitStatic(ng::RenderContext* ctx);
+    void CommitStatic(fg::RenderContext* ctx);
 
     // Invalidate static constant (force re-upload on next commit)
     void InvalidateStatic(const char* name);

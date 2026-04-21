@@ -14,7 +14,7 @@ namespace xray::render::resources {
 static nvrhi::CommandListHandle s_streamingCmdList;
 static std::mutex s_streamingCmdListMutex;
 
-StreamingManager::StreamingManager(xray::render::ng::RenderDevice* device, TextureManager* texManager)
+StreamingManager::StreamingManager(xray::render::fg::RenderDevice* device, TextureManager* texManager)
     : m_device(device)
     , m_texManager(texManager)
     , m_asyncIO(nullptr)

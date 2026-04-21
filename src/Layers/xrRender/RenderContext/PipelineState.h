@@ -3,7 +3,7 @@
 #include "RCShader.h"
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 // Forward declarations
 class RenderDevice;
@@ -299,4 +299,4 @@ private:
     static nvrhi::PrimitiveType ConvertPrimitiveTopology(PrimitiveTopology topology);
 };
 
-} // namespace xray::render::ng
+} // namespace xray::render::fg

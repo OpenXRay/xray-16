@@ -1280,7 +1280,7 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
 
     auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
 
-    ng::RenderDevice::BufferDesc cbDesc;
+    fg::RenderDevice::BufferDesc cbDesc;
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
     cbDesc.maxVersions = 512;
@@ -1289,7 +1289,7 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
     cbDesc.debugName = "DetailCullParams";
     cachedCullParamsCB = renderDevice->CreateBuffer(cbDesc);
 
-    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    cbDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     cbDesc.byteSize = sizeof(InstanceGenParams);
     cbDesc.debugName = "InstanceGenParams";
     cachedInstanceGenParamsCB = renderDevice->CreateBuffer(cbDesc);
@@ -1374,7 +1374,7 @@ void FGDetailManager::DestroyGPUBuffers()
     perlin4dComputeShader = nullptr;
     perlin4dBindingLayout = nullptr;
     perlin4dPipeline = nullptr;
-    perlin4dCB = ng::BufferHandle();
+    perlin4dCB = fg::BufferHandle();
 
     statsReadbackBuffer = nullptr;
     statsReadbackPending = false;
@@ -1384,8 +1384,8 @@ void FGDetailManager::DestroyGPUBuffers()
     cachedSmp_LinearClamp = nullptr;
     cachedSmp_AnisoWrap = nullptr;
     cachedDummySlotIndirection = nullptr;
-    cachedCullParamsCB = ng::BufferHandle();
-    cachedInstanceGenParamsCB = ng::BufferHandle();
+    cachedCullParamsCB = fg::BufferHandle();
+    cachedInstanceGenParamsCB = fg::BufferHandle();
     cachedGrassTintsBuffer = nullptr;
     cachedResourcesInitialized = false;
 }
@@ -1507,10 +1507,10 @@ bool FGDetailManager::CreatePerlin4DPipeline(nvrhi::IDevice* device)
     }
 
     // Volatile constant buffer for per-frame dispatch params
-    ng::RenderDevice::BufferDesc perlinCBDesc;
+    fg::RenderDevice::BufferDesc perlinCBDesc;
     perlinCBDesc.byteSize         = 16;
     perlinCBDesc.isVolatile       = true;
-    perlinCBDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    perlinCBDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     perlinCBDesc.isConstantBuffer = true;
     perlinCBDesc.debugName        = "Perlin4DGenCB";
     perlin4dCB = GEnv.FrameGraphRenderer->GetRenderDevice()->CreateBuffer(perlinCBDesc);
@@ -1763,7 +1763,7 @@ bool FGDetailManager::LoadPrefixSumShaders(framegraph::ShaderLoader* shaderLoade
     return true;
 }
 
-bool FGDetailManager::CreatePrefixSumPipeline(ng::RenderDevice* renderDevice)
+bool FGDetailManager::CreatePrefixSumPipeline(fg::RenderDevice* renderDevice)
 {
     if (!renderDevice || !prefixSumScanShader || !prefixSumTopShader)
     {
@@ -1905,7 +1905,7 @@ void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
     cmdList->writeBuffer(slotAABBBuffer, slot_aabbs.data(), slot_aabbs.size() * sizeof(SlotAABB));
 }
 
-bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
+bool FGDetailManager::CreateComputePipeline(fg::RenderDevice* renderDevice)
 {
     if (!renderDevice || !cullComputeShader || !slotCullComputeShader)
     {
@@ -1973,7 +1973,7 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
     return true;
 }
 
-bool FGDetailManager::CreateInstanceGenPipeline(ng::RenderDevice* renderDevice)
+bool FGDetailManager::CreateInstanceGenPipeline(fg::RenderDevice* renderDevice)
 {
     if (!renderDevice || !instanceGenComputeShader)
     {
@@ -2013,7 +2013,7 @@ bool FGDetailManager::CreateInstanceGenPipeline(ng::RenderDevice* renderDevice)
     return true;
 }
 
-bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, const nvrhi::FramebufferInfo& fbInfo)
+bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, const nvrhi::FramebufferInfo& fbInfo)
 {
     if (!renderDevice || !vertexShader || !pixelShader)
     {

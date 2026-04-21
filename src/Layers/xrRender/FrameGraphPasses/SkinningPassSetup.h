@@ -11,7 +11,7 @@ namespace xray::render {
     class MaterialCache;
     class GeometryCollector;
     class dxRender_Visual;
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -61,7 +61,7 @@ struct SkinningPassState {
     bool initialized = false;
 };
 
-void InitializeSkinningResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state);
+void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state);
 
 // Callback to update skinned culling stats
 using SkinnedStatsCallback = void(*)(u32 rendered, u32 culled, void* userData);
@@ -88,7 +88,7 @@ struct SkinningPassData {
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle depth;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     const GeometryCollector* geometry;
     const xr_vector<GeometryBatch>* hudBatches;
     MaterialCache* materialCache;
@@ -103,7 +103,7 @@ struct SkinningPassData {
 // Renders world skinned meshes followed by HUD skinned meshes
 framegraph::DefaultOutputLayout setupSkinningPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     const GeometryCollector* geometry,       // Contains world skinned batches
     const xr_vector<GeometryBatch>* hudBatches,  // HUD skinned batches (weapons, hands)

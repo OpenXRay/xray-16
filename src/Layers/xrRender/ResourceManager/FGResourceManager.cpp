@@ -6,7 +6,7 @@
 
 namespace xray::render::resources {
 
-FGResourceManager::FGResourceManager(xray::render::ng::RenderDevice* device)
+FGResourceManager::FGResourceManager(xray::render::fg::RenderDevice* device)
     : m_device(device)
 {
     VERIFY(m_device);

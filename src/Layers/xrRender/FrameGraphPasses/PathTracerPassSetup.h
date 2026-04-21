@@ -4,7 +4,7 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 class RenderDevice;
 }
 
@@ -29,7 +29,7 @@ struct PathTracerOutput {
 
 PathTracerOutput setupPathTracerPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     RTAccelStructManager* accelMgr,
     const PathTracerConfig& config,
     const Fmatrix& invViewProj,

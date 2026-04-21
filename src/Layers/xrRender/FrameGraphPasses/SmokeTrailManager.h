@@ -9,7 +9,7 @@
 #include "TrailPassSetup.h"  // GPUTrailControlPoint (32B)
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;
 }
 
@@ -89,7 +89,7 @@ public:
     SmokeTrailManager()  = default;
     ~SmokeTrailManager() { Shutdown(); }
 
-    bool Initialize(ng::RenderDevice* device);
+    bool Initialize(fg::RenderDevice* device);
     void Shutdown();
 
     // Call once per frame with current weapon muzzle transform.
@@ -132,7 +132,7 @@ private:
     SmokeSimParams     m_simParams     = {};
     SmokeCompactParams m_compactParams = {};
 
-    ng::RenderDevice* m_device      = nullptr;
+    fg::RenderDevice* m_device      = nullptr;
     bool              m_initialized = false;
 };
 

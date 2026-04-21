@@ -56,10 +56,10 @@ public:
      */
     struct TextureSet
     {
-        ng::TextureHandle albedo;    // Base color / diffuse
-        ng::TextureHandle normal;    // Normal map
-        ng::TextureHandle pbr;       // Packed PBR (R=AO, G=Roughness, B=Metallic)
-        ng::TextureHandle detail;    // Detail texture (optional)
+        fg::TextureHandle albedo;    // Base color / diffuse
+        fg::TextureHandle normal;    // Normal map
+        fg::TextureHandle pbr;       // Packed PBR (R=AO, G=Roughness, B=Metallic)
+        fg::TextureHandle detail;    // Detail texture (optional)
 
         bool IsValid() const;
     };

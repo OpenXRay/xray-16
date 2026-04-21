@@ -127,8 +127,8 @@ public:
         const char* passName,
         const char* bufferName,
         u32 byteSize,
-        ng::RenderDevice* device,
-        u32 maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS);
+        fg::RenderDevice* device,
+        u32 maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS);
 
     bool HasStaticBuffer(const char* passName, const char* bufferName) const;
 
@@ -186,7 +186,7 @@ private:
     xr_map<u64, nvrhi::FramebufferHandle> m_framebuffers;
     xr_map<u64, nvrhi::InputLayoutHandle> m_inputLayouts;
     xr_map<u64, nvrhi::BufferHandle> m_staticBuffers;
-    xr_map<u64, ng::BufferHandle> m_volatileCBs;
+    xr_map<u64, fg::BufferHandle> m_volatileCBs;
     xr_map<u64, nvrhi::BindingSetHandle> m_bindingSets;
 
     nvrhi::SamplerHandle m_commonAnisoWrap;

@@ -34,7 +34,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
     class SmokeTrailManager;
 }
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class ImGuiRendererNVRHI;
 }
 
@@ -69,7 +69,7 @@ public:
     ~FrameGraphRenderer();
 
     // Initialize
-    bool Initialize(ng::RenderDevice* device);
+    bool Initialize(fg::RenderDevice* device);
     void Shutdown();
 
     // IFrameGraphRender interface
@@ -80,10 +80,10 @@ public:
     bool IsEnabled() const override { return m_enabled; }
 
     // Render ImGui onto final output (called after FrameGraph execution)
-    void RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer);
+    void RenderImGui(ImDrawData* drawData, fg::ImGuiRendererNVRHI* imguiRenderer);
 
     // Access RenderContext
-    ng::RenderContext* GetRenderContext() const { return m_renderContext.get(); }
+    fg::RenderContext* GetRenderContext() const { return m_renderContext.get(); }
 
     // Statistics
     struct Stats {
@@ -104,7 +104,7 @@ public:
     void ToggleStatsOverlay() { if (m_statsOverlay) m_statsOverlay->ToggleVisible(); }
 
     // Accessors for lambda passes to access shared infrastructure (override IFrameGraphRender)
-    ng::RenderDevice* GetRenderDevice() const override { return m_device; }
+    fg::RenderDevice* GetRenderDevice() const override { return m_device; }
     MaterialCache* GetMaterialCache() const override { return m_materialCache.get(); }
     MaterialCache* GetUIMaterialCache() const override { return m_uiMaterialCache.get(); }
     ui::UIRenderCollector* GetUICollector() const override { return m_uiCollector.get(); }
@@ -129,7 +129,7 @@ public:
 
 private:
     bool m_enabled = false;
-    ng::RenderDevice* m_device = nullptr;
+    fg::RenderDevice* m_device = nullptr;
 
     xr_unique_ptr<framegraph::Blackboard> m_blackboard;
 
@@ -148,19 +148,19 @@ private:
     // Created once via NativeRTFactory, imported into FrameGraph
 
     // Native handles (owned by FGResourceManager)
-    ng::TextureHandle m_native_Position;
-    ng::TextureHandle m_native_Normal;
-    ng::TextureHandle m_native_Albedo;
-    ng::TextureHandle m_native_Depth;
-    ng::TextureHandle m_native_Accumulator;
-    ng::TextureHandle m_native_Generic_0;
-    ng::TextureHandle m_native_Generic_1;
-    ng::TextureHandle m_native_Generic_2;
+    fg::TextureHandle m_native_Position;
+    fg::TextureHandle m_native_Normal;
+    fg::TextureHandle m_native_Albedo;
+    fg::TextureHandle m_native_Depth;
+    fg::TextureHandle m_native_Accumulator;
+    fg::TextureHandle m_native_Generic_0;
+    fg::TextureHandle m_native_Generic_1;
+    fg::TextureHandle m_native_Generic_2;
 
     // Menu-specific native RTs (for main menu rendering pipeline)
-    ng::TextureHandle m_native_MenuMain;      // Main UI RT (replaces rt_Generic_0 in menu)
-    ng::TextureHandle m_native_MenuDistort;   // Distortion mask RT (replaces rt_Generic_1 in menu)
-    ng::TextureHandle m_native_FinalComposite; // Final composited output (scene + UI)
+    fg::TextureHandle m_native_MenuMain;      // Main UI RT (replaces rt_Generic_0 in menu)
+    fg::TextureHandle m_native_MenuDistort;   // Distortion mask RT (replaces rt_Generic_1 in menu)
+    fg::TextureHandle m_native_FinalComposite; // Final composited output (scene + UI)
 
     // FrameGraph virtual handles (imported from native RTs)
     framegraph::VirtualResourceHandle m_rt_Position;
@@ -274,7 +274,7 @@ private:
     bool m_staticBatchesCached = false;
 
     // RenderContext for execution
-    xr_unique_ptr<ng::RenderContext> m_renderContext;
+    xr_unique_ptr<fg::RenderContext> m_renderContext;
 
     // Buffer handle cache (D3D11 buffer ptr → NVRHI handle)
     xr_map<ID3D11Buffer*, nvrhi::BufferHandle> m_bufferHandleCache;

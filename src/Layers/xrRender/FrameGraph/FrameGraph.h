@@ -18,7 +18,7 @@ namespace xray::profiler {
 namespace xray::render::framegraph {
 
 // Forward declaration
-namespace ng = xray::render::ng;
+namespace fg = xray::render::fg;
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  FRAMEGRAPH (MAIN CLASS)
@@ -26,7 +26,7 @@ namespace ng = xray::render::ng;
 
 class FrameGraph {
 public:
-    FrameGraph(ng::RenderDevice* renderDevice);
+    FrameGraph(fg::RenderDevice* renderDevice);
     ~FrameGraph();
 
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -77,7 +77,7 @@ public:
     PassData& addCallbackPass(
         const char* name,
         std::function<void(FrameGraph&, PassHandle, PassData&)> setupFunc,
-        std::function<void(const PassData&, const FrameGraph&, ng::RenderContext*)> executeFunc)
+        std::function<void(const PassData&, const FrameGraph&, fg::RenderContext*)> executeFunc)
     {
         PassHandle passHandle = AddPass(name);
 
@@ -85,7 +85,7 @@ public:
 
         setupFunc(*this, passHandle, *passData);
 
-        PassExecuteCallback callback = [passData, executeFunc](ng::RenderContext& ctx, const FrameGraph& fg) {
+        PassExecuteCallback callback = [passData, executeFunc](fg::RenderContext& ctx, const FrameGraph& fg) {
             executeFunc(*passData, fg, &ctx);
         };
 
@@ -99,7 +99,7 @@ public:
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     // Set RenderContext for execution (must be called before Execute)
-    void SetRenderContext(ng::RenderContext* context) { m_context = context; }
+    void SetRenderContext(fg::RenderContext* context) { m_context = context; }
 
     // Set GPUProfiler for per-pass timing (optional, can be nullptr)
     void SetGPUProfiler(xray::profiler::GPUProfiler* profiler) { m_gpuProfiler = profiler; }
@@ -195,9 +195,9 @@ private:
     //  INTERNAL STATE
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
-    ng::RenderDevice* m_renderDevice;
+    fg::RenderDevice* m_renderDevice;
     nvrhi::IDevice* m_device;
-    ng::RenderContext* m_context = nullptr;
+    fg::RenderContext* m_context = nullptr;
     xray::profiler::GPUProfiler* m_gpuProfiler = nullptr;
     nvrhi::ICommandList* m_computeCommandList = nullptr;
     IRenderBackend* m_asyncComputeBackend = nullptr;

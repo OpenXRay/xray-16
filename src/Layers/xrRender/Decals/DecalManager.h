@@ -5,7 +5,7 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-namespace ng {
+namespace fg {
     class RenderDevice;
     class RenderContext;
 }
@@ -58,7 +58,7 @@ struct SkeletonDecalInstance {
 
 class DecalManager {
 public:
-    void Initialize(ng::RenderDevice* device);
+    void Initialize(fg::RenderDevice* device);
     void Shutdown();
 
     void AddStaticDecal(const Fvector& pos, const Fvector& normal, float size, u32 materialID);
@@ -70,7 +70,7 @@ public:
                                   float size, u32 materialID);
 
     void Update(float dt, float currentTime);
-    void Upload(ng::RenderContext* ctx);
+    void Upload(fg::RenderContext* ctx);
 
     nvrhi::IBuffer* GetDecalBuffer() const { return m_decalBuffer.Get(); }
     nvrhi::IBuffer* GetCubeVB() const { return m_cubeVB.Get(); }
@@ -85,7 +85,7 @@ private:
     static Fmatrix BuildOBBMatrix(const Fvector& pos, const Fvector& normal, float size, float angle);
     void UpdateSkeletonDecals(float currentTime);
 
-    ng::RenderDevice* m_device = nullptr;
+    fg::RenderDevice* m_device = nullptr;
 
     xr_vector<DecalInstance> m_staticDecals;
     xr_vector<SkeletonDecalInstance> m_skeletonDecals;

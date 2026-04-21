@@ -6,7 +6,7 @@
 #include <imgui.h>
 #include <map>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 class ImGuiRendererNVRHI : public IImGuiRender {
 public:
@@ -100,4 +100,4 @@ public:
     static xr_unique_ptr<IImGuiRender> Create(RenderDevice* device);
 };
 
-} // namespace xray::render::ng
+} // namespace xray::render::fg

@@ -4,7 +4,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -33,7 +33,7 @@ struct ClusterLightPassState {
 
 void setupClusterLightPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     ClusteredLightManager* lightManager,
     u32 screenWidth,
     u32 screenHeight,

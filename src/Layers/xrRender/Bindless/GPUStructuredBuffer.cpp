@@ -8,7 +8,7 @@
 namespace xray::render::RENDER_NAMESPACE::bindless {
 
 template<typename T>
-bool GPUStructuredBuffer<T>::Initialize(ng::RenderDevice* device, const char* debugName, u32 maxElements)
+bool GPUStructuredBuffer<T>::Initialize(fg::RenderDevice* device, const char* debugName, u32 maxElements)
 {
     if (m_initialized)
         return true;
@@ -47,7 +47,7 @@ void GPUStructuredBuffer<T>::Shutdown()
 }
 
 template<typename T>
-void GPUStructuredBuffer<T>::Upload(ng::RenderContext* ctx)
+void GPUStructuredBuffer<T>::Upload(fg::RenderContext* ctx)
 {
     if (!m_initialized || !m_buffer)
         return;

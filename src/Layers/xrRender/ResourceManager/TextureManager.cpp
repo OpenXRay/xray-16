@@ -11,7 +11,7 @@
 
 namespace xray::render::resources {
 
-using namespace xray::render::ng;
+using namespace xray::render::fg;
 
 // ═══════════════════════════════════════════════════
 //  TEXTURE DESC - MEMORY CALCULATION
@@ -748,7 +748,7 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     }
 
     // Create NVRHI texture (without initial data)
-    ng::RenderDevice::TextureDesc deviceDesc;
+    fg::RenderDevice::TextureDesc deviceDesc;
     deviceDesc.width = ddsData.desc.width;
     deviceDesc.height = ddsData.desc.height;
     deviceDesc.depth = ddsData.desc.depth;
@@ -760,21 +760,21 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     // Determine dimension
     switch (ddsData.desc.type) {
         case TextureDesc::Texture1D:
-            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture1D;
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture1D;
             break;
         case TextureDesc::Texture2D:
-            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture2D;
             break;
         case TextureDesc::Texture3D:
-            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture3D;
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture3D;
             break;
         case TextureDesc::TextureCube:
-            deviceDesc.dimension = ng::RenderDevice::TextureDesc::TextureCube;
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::TextureCube;
             break;
     }
 
     // Create texture (no initial data - we'll upload separately)
-    ng::TextureHandle deviceHandle = m_device->CreateTexture(deviceDesc, nullptr);
+    fg::TextureHandle deviceHandle = m_device->CreateTexture(deviceDesc, nullptr);
     if (!deviceHandle.IsValid()) {
         Msg("! [TextureManager] Failed to create NVRHI texture: %s", meta.filePath.c_str());
         meta.state = TextureState::Unloaded;
@@ -782,11 +782,11 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     }
 
     // Upload all mip levels using RenderDevice's upload API
-    xr_vector<ng::RenderDevice::TextureSliceData> slices;
+    xr_vector<fg::RenderDevice::TextureSliceData> slices;
     slices.reserve(ddsData.mipLevels.size());
 
     for (const DDSMipLevel& mip : ddsData.mipLevels) {
-        ng::RenderDevice::TextureSliceData slice;
+        fg::RenderDevice::TextureSliceData slice;
 
         // Calculate which array slice and mip this belongs to
         // DDS stores: [slice0_mip0, slice0_mip1, ..., slice1_mip0, slice1_mip1, ...]

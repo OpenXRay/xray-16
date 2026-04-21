@@ -12,7 +12,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 framegraph::VirtualResourceHandle setupImGuiPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle inputTarget,
-    ng::ImGuiRendererNVRHI* imguiRenderer,
+    fg::ImGuiRendererNVRHI* imguiRenderer,
     u32 width,
     u32 height)
 {
@@ -39,7 +39,7 @@ framegraph::VirtualResourceHandle setupImGuiPass(
         // Execute lambda
         [](const ImGuiPassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 

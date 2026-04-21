@@ -35,7 +35,7 @@ bool SamplerDesc::operator==(const SamplerDesc& other) const {
 //  SAMPLER CACHE IMPLEMENTATION
 // ═══════════════════════════════════════════════════
 
-SamplerCache::SamplerCache(xray::render::ng::RenderDevice* device)
+SamplerCache::SamplerCache(xray::render::fg::RenderDevice* device)
     : m_device(device)
 {
     VERIFY(m_device);

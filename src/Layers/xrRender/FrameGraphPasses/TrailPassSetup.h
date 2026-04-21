@@ -10,7 +10,7 @@
 #include "RibbonPassSetup.h"  // Shared enums: RibbonSmoothingMode, RibbonUVPolicy, RibbonUVTransform
 
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -142,7 +142,7 @@ struct TrailPassData {
     framegraph::VirtualResourceHandle inputColor;
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle depth;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     framegraph::DefaultOutputLayout outputs;
     u32 width;
     u32 height;
@@ -153,7 +153,7 @@ struct TrailPassOutput {
     framegraph::DefaultOutputLayout layout;
 };
 
-void InitializeTrailResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, TrailPassState& state);
+void InitializeTrailResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, TrailPassState& state);
 
 // ═══════════════════════════════════════════════════════
 //  TRAIL PASS SETUP
@@ -163,7 +163,7 @@ void InitializeTrailResources(ng::RenderDevice* device, const nvrhi::Framebuffer
 // Supports Stride-compatible smoothing, UV policies, EdgePolicy, and group splitting.
 TrailPassOutput setupTrailPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,

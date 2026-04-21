@@ -31,18 +31,18 @@ extern int ps_r__detail_gpu;
 
 nvrhi::ComputePipelineHandle RTAccelStructManager::s_skinPipeline;
 nvrhi::BindingLayoutHandle RTAccelStructManager::s_skinLayout;
-ng::BufferHandle RTAccelStructManager::s_skinCB;
+fg::BufferHandle RTAccelStructManager::s_skinCB;
 bool RTAccelStructManager::s_skinInitialized = false;
 
 nvrhi::ComputePipelineHandle RTAccelStructManager::s_grassPipeline;
 nvrhi::BindingLayoutHandle RTAccelStructManager::s_grassLayout;
-ng::BufferHandle RTAccelStructManager::s_grassCB;
+fg::BufferHandle RTAccelStructManager::s_grassCB;
 nvrhi::SamplerHandle RTAccelStructManager::s_grassSampler;
 bool RTAccelStructManager::s_grassInitialized = false;
 
 nvrhi::ComputePipelineHandle RTAccelStructManager::s_billboardPipeline;
 nvrhi::BindingLayoutHandle RTAccelStructManager::s_billboardLayout;
-ng::BufferHandle RTAccelStructManager::s_billboardCB;
+fg::BufferHandle RTAccelStructManager::s_billboardCB;
 bool RTAccelStructManager::s_billboardInitialized = false;
 
 struct RTSkinningCB {
@@ -87,7 +87,7 @@ static void FmatrixToRTTransform(const Fmatrix& m, nvrhi::rt::AffineTransform& o
     out[8]  = m._13; out[9]  = m._23; out[10] = m._33; out[11] = m._43;
 }
 
-void RTAccelStructManager::Initialize(ng::RenderDevice* device)
+void RTAccelStructManager::Initialize(fg::RenderDevice* device)
 {
     m_device = device;
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -124,18 +124,18 @@ void RTAccelStructManager::Shutdown()
 
     s_skinPipeline = nullptr;
     s_skinLayout = nullptr;
-    s_skinCB = ng::BufferHandle();
+    s_skinCB = fg::BufferHandle();
     s_skinInitialized = false;
 
     s_grassPipeline = nullptr;
     s_grassLayout = nullptr;
-    s_grassCB = ng::BufferHandle();
+    s_grassCB = fg::BufferHandle();
     s_grassSampler = nullptr;
     s_grassInitialized = false;
 
     s_billboardPipeline = nullptr;
     s_billboardLayout = nullptr;
-    s_billboardCB = ng::BufferHandle();
+    s_billboardCB = fg::BufferHandle();
     s_billboardInitialized = false;
 }
 
@@ -143,18 +143,18 @@ void RTAccelStructManager::InvalidateShaderPipelines()
 {
     s_skinPipeline = nullptr;
     s_skinLayout = nullptr;
-    s_skinCB = ng::BufferHandle();
+    s_skinCB = fg::BufferHandle();
     s_skinInitialized = false;
 
     s_grassPipeline = nullptr;
     s_grassLayout = nullptr;
-    s_grassCB = ng::BufferHandle();
+    s_grassCB = fg::BufferHandle();
     s_grassSampler = nullptr;
     s_grassInitialized = false;
 
     s_billboardPipeline = nullptr;
     s_billboardLayout = nullptr;
-    s_billboardCB = ng::BufferHandle();
+    s_billboardCB = fg::BufferHandle();
     s_billboardInitialized = false;
 
     Msg("* [RTAccel] Shader pipelines invalidated for hot-reload");
@@ -552,12 +552,12 @@ void RTAccelStructManager::InitSkinningPipeline()
         return;
     }
 
-    ng::RenderDevice::BufferDesc cbDesc;
+    fg::RenderDevice::BufferDesc cbDesc;
     cbDesc.debugName = "RTSkinningCB";
     cbDesc.byteSize = sizeof(RTSkinningCB);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    cbDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     s_skinCB = m_device->CreateBuffer(cbDesc);
 
     s_skinLayout = cache.GetOrCreateBindingLayoutFromReflection("RTSkinning", *skinResult.reflection, nvDevice);
@@ -781,12 +781,12 @@ void RTAccelStructManager::InitGrassPipeline()
         return;
     }
 
-    ng::RenderDevice::BufferDesc grassCBDesc;
+    fg::RenderDevice::BufferDesc grassCBDesc;
     grassCBDesc.debugName = "GrassRTCB";
     grassCBDesc.byteSize = sizeof(GrassRTCB);
     grassCBDesc.isConstantBuffer = true;
     grassCBDesc.isVolatile = true;
-    grassCBDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    grassCBDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     s_grassCB = m_device->CreateBuffer(grassCBDesc);
 
     nvrhi::SamplerDesc samplerDesc;
@@ -820,12 +820,12 @@ void RTAccelStructManager::InitBillboardPipeline()
         return;
     }
 
-    ng::RenderDevice::BufferDesc bbCBDesc;
+    fg::RenderDevice::BufferDesc bbCBDesc;
     bbCBDesc.debugName = "BillboardRTCB";
     bbCBDesc.byteSize = sizeof(BillboardRTCB);
     bbCBDesc.isConstantBuffer = true;
     bbCBDesc.isVolatile = true;
-    bbCBDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    bbCBDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     s_billboardCB = m_device->CreateBuffer(bbCBDesc);
 
     s_billboardLayout = cache.GetOrCreateBindingLayoutFromReflection("RTBillboard", *billboardResult.reflection, nvDevice);

@@ -32,7 +32,7 @@ namespace xray::render::RENDER_NAMESPACE
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-void InitializeForwardResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ForwardColorPassState& state)
+void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ForwardColorPassState& state)
 {
     if (state.bindlessInitialized)
         return;
@@ -131,8 +131,8 @@ void InitializeForwardResources(ng::RenderDevice* device, const nvrhi::Framebuff
 }
 
 static void renderBindlessForward(
-    ng::RenderContext* ctx,
-    ng::RenderDevice* device,
+    fg::RenderContext* ctx,
+    fg::RenderDevice* device,
     const GeometryCollector* geometry,
     nvrhi::ITexture* colorRT,
     nvrhi::ITexture* normalRT,
@@ -374,7 +374,7 @@ static void renderBindlessForward(
 
 framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depthInput,
     framegraph::VirtualResourceHandle colorInput,
     framegraph::VirtualResourceHandle normalInput,
@@ -441,7 +441,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
         // ═══════════════════════════════════════════════════════
         [](const ForwardColorPassData& data,
             const FrameGraph& fg,
-            ng::RenderContext* ctx) {
+            fg::RenderContext* ctx) {
 
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             auto* colorRT = fg.GetPhysicalTexture(data.color);

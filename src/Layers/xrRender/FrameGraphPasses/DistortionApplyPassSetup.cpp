@@ -67,7 +67,7 @@ void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassSt
 
 VirtualResourceHandle setupDistortionApplyPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     VirtualResourceHandle sceneColor,
     VirtualResourceHandle distortionRT,
     VirtualResourceHandle worldPos,
@@ -103,7 +103,7 @@ VirtualResourceHandle setupDistortionApplyPass(
             data.output = passBuilder.write(outputHandle, ResourceState::RenderTarget);
         },
 
-        [](const DistortionApplyData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const DistortionApplyData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             auto* sceneTex = fg.GetPhysicalTexture(data.sceneInput);
             auto* distortTex = fg.GetPhysicalTexture(data.distortionInput);
