@@ -8,10 +8,7 @@
 #include <nvrhi/vulkan.h>
 #include <nvrhi/validation.h>
 #include <SDL.h>
-#include <SDL_syswm.h>
-#ifdef XR_PLATFORM_WINDOWS
-#include <vulkan/vulkan_win32.h>
-#endif
+#include <SDL_vulkan.h>
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -70,7 +67,7 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
     Msg("* [VulkanBackend] Initializing...");
     m_validationEnabled = enableValidation;
 
-    if (!CreateInstance(enableValidation)) { Shutdown(); return false; }
+    if (!CreateInstance(window, enableValidation)) { Shutdown(); return false; }
     Msg("* [VulkanBackend] Instance created, m_instance=%p", m_instance);
 
     VULKAN_HPP_DEFAULT_DISPATCHER.init(m_instance, vkGetInstanceProcAddr);
@@ -106,15 +103,13 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
         deviceDesc.computeQueueIndex = static_cast<int>(m_computeQueueFamily);
     }
 
-    const char* instanceExts[] = {
-        VK_KHR_SURFACE_EXTENSION_NAME,
-#ifdef XR_PLATFORM_WINDOWS
-        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-#endif
-        VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-    };
-    deviceDesc.instanceExtensions = instanceExts;
-    deviceDesc.numInstanceExtensions = std::size(instanceExts);
+    u32 sdlExtCount = 0;
+    SDL_Vulkan_GetInstanceExtensions(window, &sdlExtCount, nullptr);
+    xr_vector<const char*> instanceExts(sdlExtCount);
+    SDL_Vulkan_GetInstanceExtensions(window, &sdlExtCount, instanceExts.data());
+    instanceExts.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    deviceDesc.instanceExtensions = instanceExts.data();
+    deviceDesc.numInstanceExtensions = instanceExts.size();
 
     const char* deviceExts[] = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
@@ -223,7 +218,7 @@ void VulkanBackend::Shutdown() {
     Msg("* [VulkanBackend] Shutdown complete");
 }
 
-bool VulkanBackend::CreateInstance(bool enableValidation) {
+bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
     VkApplicationInfo appInfo = {};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "OpenXRay";
@@ -232,11 +227,16 @@ bool VulkanBackend::CreateInstance(bool enableValidation) {
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_API_VERSION_1_2;
 
-    xr_vector<const char*> extensions;
-    extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-#ifdef XR_PLATFORM_WINDOWS
-    extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-#endif
+    u32 sdlExtCount = 0;
+    if (!SDL_Vulkan_GetInstanceExtensions(window, &sdlExtCount, nullptr)) {
+        Msg("! [VulkanBackend] SDL_Vulkan_GetInstanceExtensions(count) failed: %s", SDL_GetError());
+        return false;
+    }
+    xr_vector<const char*> extensions(sdlExtCount);
+    if (!SDL_Vulkan_GetInstanceExtensions(window, &sdlExtCount, extensions.data())) {
+        Msg("! [VulkanBackend] SDL_Vulkan_GetInstanceExtensions(names) failed: %s", SDL_GetError());
+        return false;
+    }
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
     xr_vector<const char*> layers;
@@ -315,29 +315,11 @@ bool VulkanBackend::SelectPhysicalDevice() {
 }
 
 bool VulkanBackend::CreateSurface(SDL_Window* window) {
-#ifdef XR_PLATFORM_WINDOWS
-    SDL_SysWMinfo wmInfo;
-    SDL_VERSION(&wmInfo.version);
-    if (!SDL_GetWindowWMInfo(window, &wmInfo)) {
-        Msg("! [VulkanBackend] SDL_GetWindowWMInfo failed: %s", SDL_GetError());
-        return false;
-    }
-
-    VkWin32SurfaceCreateInfoKHR surfaceInfo = {};
-    surfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-    surfaceInfo.hinstance = GetModuleHandle(nullptr);
-    surfaceInfo.hwnd = wmInfo.info.win.window;
-
-    VkResult result = vkCreateWin32SurfaceKHR(m_instance, &surfaceInfo, nullptr, &m_surface);
-    if (result != VK_SUCCESS) {
-        Msg("! [VulkanBackend] vkCreateWin32SurfaceKHR failed: %d", result);
+    if (!SDL_Vulkan_CreateSurface(window, m_instance, &m_surface)) {
+        Msg("! [VulkanBackend] SDL_Vulkan_CreateSurface failed: %s", SDL_GetError());
         return false;
     }
     return true;
-#else
-    Msg("! [VulkanBackend] Vulkan surface creation not implemented for this platform");
-    return false;
-#endif
 }
 
 bool VulkanBackend::CreateLogicalDevice() {

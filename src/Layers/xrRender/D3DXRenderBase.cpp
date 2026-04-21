@@ -3,13 +3,11 @@
 #include "D3DXRenderBase.h"
 #include "D3DUtils.h"
 #include "dxUIRender.h"
+#include "FGRenderHost.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
 #include <SDL.h>
-#include "Layers/xrRender/Backend/D3D12Backend.h"
-// Factory function - avoids pulling vulkan/vulkan.h into this TU
-IRenderBackend* CreateVulkanBackend(SDL_Window* window, u32 width, u32 height, bool enableValidation);
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"  // Phase 2.5.3
 #include "xrEngine/IFrameGraphRender.h"
 
@@ -103,15 +101,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     reset_begin();
     Memory.mem_compact();
 
-    // Resize the swap chain via backend
-    if (GEnv.Backend)
-    {
-        // Get new window size
-        int w, h;
-        SDL_GetWindowSize(hWnd, &w, &h);
-        GEnv.Backend->ResizeSwapChain(static_cast<u32>(w), static_cast<u32>(h));
-        std::tie(dwWidth, dwHeight) = GEnv.Backend->GetBackBufferSize();
-    }
+    FGRenderHost::ResizeBackend(hWnd, dwWidth, dwHeight);
 
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);
@@ -129,6 +119,8 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
 void D3DXRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 {
     windowFlags |= SDL_WINDOW_SHOWN;
+    if (ps_fg_render_mode == FG_RENDER_VULKAN)
+        windowFlags |= SDL_WINDOW_VULKAN;
 }
 
 void D3DXRenderBase::SetupStates()
@@ -228,53 +220,10 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
     }
 #endif
 
-    // Get initial window size
-    int w, h;
-    SDL_GetWindowSize(hWnd, &w, &h);
-    dwWidth = static_cast<u32>(w);
-    dwHeight = static_cast<u32>(h);
-
     auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
     const bool enableValidation = !!strstr(Core.Params, "-d3ddebug");
 
-    if (ps_fg_render_mode == FG_RENDER_VULKAN)
-    {
-        auto* vkBackend = CreateVulkanBackend(hWnd, dwWidth, dwHeight, enableValidation);
-        if (vkBackend)
-        {
-            render.m_backend = vkBackend;
-            GEnv.Backend = vkBackend;
-            Msg("* [CRender] Vulkan backend initialized successfully");
-            Msg("*   Bindless textures: %s (max %u)",
-                vkBackend->GetCapabilities().bindlessTextures ? "Yes" : "No",
-                vkBackend->GetCapabilities().maxBindlessResources);
-        }
-        else
-        {
-            FATAL("Vulkan initialization failed");
-        }
-    }
-    else
-    {
-        auto* dx12Backend = xr_new<D3D12Backend>();
-        if (dx12Backend->Initialize(hWnd, dwWidth, dwHeight, enableValidation))
-        {
-            render.m_backend = dx12Backend;
-            GEnv.Backend = dx12Backend;
-            Msg("* [CRender] D3D12 backend initialized successfully");
-            Msg("*   Bindless textures: %s (max %u)",
-                dx12Backend->GetCapabilities().bindlessTextures ? "Yes" : "No",
-                dx12Backend->GetCapabilities().maxBindlessResources);
-        }
-        else
-        {
-            Msg("! [CRender] D3D12 backend initialization failed");
-            xr_delete(dx12Backend);
-            FATAL("D3D12 initialization failed - no fallback available");
-        }
-    }
-
-    std::tie(dwWidth, dwHeight) = GEnv.Backend->GetBackBufferSize();
+    render.m_backend = FGRenderHost::CreateBackend(hWnd, dwWidth, dwHeight, enableValidation);
 
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);

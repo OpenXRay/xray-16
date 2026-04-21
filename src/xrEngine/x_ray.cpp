@@ -268,11 +268,13 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
     InitConsole();
 
     Engine.Initialize(game, modules);
+
+    execUserScript();
+
     Device.Initialize();
 
     Console->OnDeviceInitialize();
 
-    execUserScript();
     InitializeDiscord();
 
     TaskScheduler->Wait(createSoundDevicesList);
