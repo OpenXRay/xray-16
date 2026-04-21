@@ -174,6 +174,250 @@ target_sources(xrRenderPC_R4 PRIVATE
     # Vulkan Backend
     ../xrRender/Backend/VulkanBackend.h
     ../xrRender/Backend/VulkanBackend.cpp
+
+    # === ported from xrRender_R4.vcxproj ===
+    ../../../Externals/meshoptimizer/src/allocator.cpp
+    ../../../Externals/meshoptimizer/src/clusterizer.cpp
+    ../../../Externals/meshoptimizer/src/indexanalyzer.cpp
+    ../../../Externals/meshoptimizer/src/indexcodec.cpp
+    ../../../Externals/meshoptimizer/src/indexgenerator.cpp
+    ../../../Externals/meshoptimizer/src/overdrawoptimizer.cpp
+    ../../../Externals/meshoptimizer/src/partition.cpp
+    ../../../Externals/meshoptimizer/src/quantization.cpp
+    ../../../Externals/meshoptimizer/src/rasterizer.cpp
+    ../../../Externals/meshoptimizer/src/simplifier.cpp
+    ../../../Externals/meshoptimizer/src/spatialorder.cpp
+    ../../../Externals/meshoptimizer/src/stripifier.cpp
+    ../../../Externals/meshoptimizer/src/vcacheoptimizer.cpp
+    ../../../Externals/meshoptimizer/src/vertexcodec.cpp
+    ../../../Externals/meshoptimizer/src/vertexfilter.cpp
+    ../../../Externals/meshoptimizer/src/vfetchoptimizer.cpp
+
+    ../xrRender/Animation.cpp
+    ../xrRender/Backend/D3D11BackendWrapper.cpp
+    ../xrRender/Backend/D3D12Backend.cpp
+    ../xrRender/Bindless/MaterialBuffer.cpp
+    ../xrRender/Bindless/TerrainMaterialBuffer.cpp
+    ../xrRender/Bindless/VertexConverter.cpp
+    ../xrRender/Blender.cpp
+    ../xrRender/Blender_Recorder.cpp
+    ../xrRender/Blender_Recorder_R2.cpp
+    ../xrRender/Blender_Recorder_StandartBinding.cpp
+    ../xrRender/ClusteredLightManager.cpp
+    ../xrRender/ColorMapManager.cpp
+    ../xrRender/ConstantSystem/FGConstantSystem.cpp
+    ../xrRender/D3DUtils.cpp
+    ../xrRender/D3DXRenderBase.cpp
+    ../xrRender/DetailManager.cpp
+    ../xrRender/DetailManager_CACHE.cpp
+    ../xrRender/DetailManager_Decompress.cpp
+    ../xrRender/DetailManager_VS.cpp
+    ../xrRender/DetailManager_soft.cpp
+    ../xrRender/DetailModel.cpp
+    ../xrRender/ETextureParams.cpp
+    ../xrRender/FBasicVisual.cpp
+    ../xrRender/FHierrarhyVisual.cpp
+    ../xrRender/FLOD.cpp
+    ../xrRender/FProgressive.cpp
+    ../xrRender/FSkinned.cpp
+    ../xrRender/FTreeVisual.cpp
+    ../xrRender/FVisual.cpp
+    ../xrRender/FrameGraph/BindingLayoutBuilder.cpp
+    ../xrRender/FrameGraph/BindingSetBuilder.cpp
+    ../xrRender/FrameGraph/FGResourcePool.cpp
+    ../xrRender/FrameGraph/PassResourceCache.cpp
+    ../xrRender/FrameGraph/ShaderPhaseCache.cpp
+    ../xrRender/FrameGraph/ShaderReflection.cpp
+    ../xrRender/FrameGraphPasses/ClusterLightPassSetup.cpp
+    ../xrRender/GPUCullingManager.cpp
+    ../xrRender/Geometry/MaterialCache.cpp
+    ../xrRender/HOM.cpp
+    ../xrRender/LightTrack.cpp
+    ../xrRender/Light_DB.cpp
+    ../xrRender/Light_Package.cpp
+    ../xrRender/Light_Render_Direct.cpp
+    ../xrRender/Light_Render_Direct_ComputeXFS.cpp
+    ../xrRender/Materials/MaterialSystem.cpp
+    ../xrRender/ModelPool.cpp
+    ../xrRender/NvTriStrip.cpp
+    ../xrRender/NvTriStripObjects.cpp
+    ../xrRender/PBRConverter/ONNXModelRunner.cpp
+    ../xrRender/PBRConverter/PBRTextureConverter.cpp
+    ../xrRender/PSLibrary.cpp
+    ../xrRender/ParticleEffect.cpp
+    ../xrRender/ParticleEffectDef.cpp
+    ../xrRender/ParticleGroup.cpp
+    ../xrRender/Profiler/GPUProfiler.cpp
+    ../xrRender/Profiler/StatsOverlay.cpp
+    ../xrRender/R_Backend.cpp
+    ../xrRender/R_Backend_DBG.cpp
+    ../xrRender/R_Backend_Runtime.cpp
+    ../xrRender/R_Backend_hemi.cpp
+    ../xrRender/R_Backend_tree.cpp
+    ../xrRender/R_Backend_xform.cpp
+    ../xrRender/R_DStreams.cpp
+    ../xrRender/ResourceManager.cpp
+    ../xrRender/ResourceManager/AsyncIO.cpp
+    ../xrRender/ResourceManager/BufferManager.cpp
+    ../xrRender/ResourceManager/DDSLoader.cpp
+    ../xrRender/ResourceManager/FGResourceManager.cpp
+    ../xrRender/ResourceManager/NativeRTFactory.cpp
+    ../xrRender/ResourceManager/SamplerCache.cpp
+    ../xrRender/ResourceManager/TestTextureManager.cpp
+    ../xrRender/ResourceManager/TextureManager.cpp
+    ../xrRender/ResourceManager/TextureStreaming.cpp
+    ../xrRender/ResourceManager_Loader.cpp
+    ../xrRender/ResourceManager_Reset.cpp
+    ../xrRender/ResourceManager_Resources.cpp
+    ../xrRender/SH_Atomic.cpp
+    ../xrRender/SH_Constant.cpp
+    ../xrRender/SH_Matrix.cpp
+    ../xrRender/Shader.cpp
+    ../xrRender/ShaderKey.cpp
+    ../xrRender/Shaders/SlangReflectionWrapper.cpp
+    ../xrRender/SkeletonAnimated.cpp
+    ../xrRender/SkeletonCustom.cpp
+    ../xrRender/SkeletonRigid.cpp
+    ../xrRender/SkeletonX.cpp
+    ../xrRender/SkeletonXSkinXW_CPP.cpp
+    ../xrRender/SkeletonXSkinXW_SSE.cpp
+    ../xrRender/TextureDescrManager.cpp
+    ../xrRender/Utils/dxHashHelper.cpp
+    ../xrRender/VertexCache.cpp
+    ../xrRender/WallmarksEngine.cpp
+    ../xrRender/blenders/Blender_BmmD_deferred.cpp
+    ../xrRender/blenders/Blender_Detail_GPU.cpp
+    ../xrRender/blenders/Blender_Editor_Selection.cpp
+    ../xrRender/blenders/Blender_Editor_Wire.cpp
+    "../xrRender/blenders/Blender_Lm(EbB).cpp"
+    ../xrRender/blenders/Blender_Model_EbB_deferred.cpp
+    ../xrRender/blenders/Blender_Particle_deferred.cpp
+    ../xrRender/blenders/Blender_Screen_SET.cpp
+    ../xrRender/blenders/Blender_detail_still_deferred.cpp
+    ../xrRender/blenders/Blender_tree_deferred.cpp
+    ../xrRender/blenders/blender_bloom_build.cpp
+    ../xrRender/blenders/blender_combine.cpp
+    ../xrRender/blenders/blender_deffer_aref.cpp
+    ../xrRender/blenders/blender_deffer_flat.cpp
+    ../xrRender/blenders/blender_deffer_model.cpp
+    ../xrRender/blenders/blender_light_direct.cpp
+    ../xrRender/blenders/blender_light_mask.cpp
+    ../xrRender/blenders/blender_light_occq.cpp
+    ../xrRender/blenders/blender_light_point.cpp
+    ../xrRender/blenders/blender_light_reflected.cpp
+    ../xrRender/blenders/blender_light_spot.cpp
+    ../xrRender/blenders/blender_luminance.cpp
+    ../xrRender/blenders/blender_ssao.cpp
+    ../xrRender/blenders/dx11HDAOCSBlender.cpp
+    ../xrRender/blenders/dx11MSAABlender.cpp
+    ../xrRender/blenders/dx11MinMaxSMBlender.cpp
+    ../xrRender/blenders/dx11RainBlender.cpp
+    ../xrRender/blenders/uber_deffer.cpp
+    ../xrRender/du_box.cpp
+    ../xrRender/du_cone.cpp
+    ../xrRender/du_cylinder.cpp
+    ../xrRender/du_sphere.cpp
+    ../xrRender/du_sphere_part.cpp
+    ../xrRender/dxDebugRender.cpp
+    ../xrRender/dxEnvironmentRender.cpp
+    ../xrRender/dxFontRender.cpp
+    ../xrRender/dxLensFlareRender.cpp
+    ../xrRender/dxObjectSpaceRender.cpp
+    ../xrRender/dxParticleCustom.cpp
+    ../xrRender/dxRainRender.cpp
+    ../xrRender/dxRenderFactory.cpp
+    ../xrRender/dxStatGraphRender.cpp
+    ../xrRender/dxThunderboltDescRender.cpp
+    ../xrRender/dxThunderboltRender.cpp
+    ../xrRender/dxUIRender.cpp
+    ../xrRender/dxUISequenceVideoItem.cpp
+    ../xrRender/dxUIShader.cpp
+    ../xrRender/dxWallMarkArray.cpp
+    ../xrRender/light.cpp
+    ../xrRender/light_GI.cpp
+    ../xrRender/light_smapvis.cpp
+    ../xrRender/light_vis.cpp
+    ../xrRender/occRasterizer.cpp
+    ../xrRender/occRasterizer_core.cpp
+    ../xrRender/r__dsgraph_build.cpp
+    ../xrRender/r__dsgraph_render.cpp
+    ../xrRender/r__dsgraph_render_lods.cpp
+    ../xrRender/r__occlusion.cpp
+    ../xrRender/r__pixel_calculator.cpp
+    ../xrRender/r__sector.cpp
+    ../xrRender/r__sector_detect.cpp
+    ../xrRender/r__sector_traversal.cpp
+    ../xrRender/r__sync_point.cpp
+    ../xrRender/r_constants.cpp
+    ../xrRender/stats_manager.cpp
+    ../xrRender/tss_def.cpp
+    ../xrRender/xrRender_console.cpp
+    ../xrRender/xrStripify.cpp
+    ../xrRender/xr_effgamma.cpp
+
+    ../xrRenderDX11/3DFluid/dx113DFluidBlenders.cpp
+    ../xrRenderDX11/3DFluid/dx113DFluidData.cpp
+    ../xrRenderDX11/3DFluid/dx113DFluidEmitters.cpp
+    ../xrRenderDX11/3DFluid/dx113DFluidGrid.cpp
+    ../xrRenderDX11/3DFluid/dx113DFluidManager.cpp
+    ../xrRenderDX11/3DFluid/dx113DFluidObstacles.cpp
+    ../xrRenderDX11/3DFluid/dx113DFluidRenderer.cpp
+    ../xrRenderDX11/3DFluid/dx113DFluidVolume.cpp
+    ../xrRenderDX11/Blender_Recorder_R3.cpp
+    ../xrRenderDX11/StateManager/dx11SamplerStateCache.cpp
+    ../xrRenderDX11/StateManager/dx11ShaderResourceStateCache.cpp
+    ../xrRenderDX11/StateManager/dx11State.cpp
+    ../xrRenderDX11/StateManager/dx11StateCache.cpp
+    ../xrRenderDX11/StateManager/dx11StateManager.cpp
+    ../xrRenderDX11/dx11BufferUtils.cpp
+    ../xrRenderDX11/dx11ComputeTest.cpp
+    ../xrRenderDX11/dx11ComputeTest_Matrices.cpp
+    ../xrRenderDX11/dx11ComputeTest_SIMD.cpp
+    ../xrRenderDX11/dx11ConstantBuffer.cpp
+    ../xrRenderDX11/dx11DetailManager_VS.cpp
+    ../xrRenderDX11/dx11HW.cpp
+    ../xrRenderDX11/dx11HWCaps.cpp
+    ../xrRenderDX11/dx11ResourceManager_Resources.cpp
+    ../xrRenderDX11/dx11ResourceManager_Scripting.cpp
+    ../xrRenderDX11/dx11SH_RT.cpp
+    ../xrRenderDX11/dx11SH_Texture.cpp
+    ../xrRenderDX11/dx11StateUtils.cpp
+    ../xrRenderDX11/dx11Texture.cpp
+    ../xrRenderDX11/dx11TextureUtils.cpp
+    ../xrRenderDX11/dx11r_constants.cpp
+    ../xrRenderDX11/dx11r_constants_cache.cpp
+    ../xrRenderDX11/dx11r_screenshot.cpp
+
+    ../xrRender_R2/r2.cpp
+    ../xrRender_R2/r2_R_calculate.cpp
+    ../xrRender_R2/r2_R_lights.cpp
+    ../xrRender_R2/r2_R_render.cpp
+    ../xrRender_R2/r2_blenders.cpp
+    ../xrRender_R2/r2_loader.cpp
+    ../xrRender_R2/r2_rendertarget.cpp
+    ../xrRender_R2/r2_rendertarget_accum_omnipart_geom.cpp
+    ../xrRender_R2/r2_rendertarget_accum_point_geom.cpp
+    ../xrRender_R2/r2_rendertarget_accum_reflected.cpp
+    ../xrRender_R2/r2_rendertarget_accum_spot_geom.cpp
+    ../xrRender_R2/r2_rendertarget_draw_volume.cpp
+    ../xrRender_R2/r2_rendertarget_enable_scissor.cpp
+    ../xrRender_R2/r2_rendertarget_phase_PP.cpp
+    ../xrRender_R2/r2_rendertarget_phase_accumulator.cpp
+    ../xrRender_R2/r2_rendertarget_phase_bloom.cpp
+    ../xrRender_R2/r2_rendertarget_phase_luminance.cpp
+    ../xrRender_R2/r2_rendertarget_phase_smap_S.cpp
+    ../xrRender_R2/r3_R_rain.cpp
+    ../xrRender_R2/r3_rendertarget_accum_point.cpp
+    ../xrRender_R2/r3_rendertarget_accum_spot.cpp
+    ../xrRender_R2/r3_rendertarget_create_minmaxSM.cpp
+    ../xrRender_R2/r3_rendertarget_draw_rain.cpp
+    ../xrRender_R2/r3_rendertarget_mark_msaa_edges.cpp
+    ../xrRender_R2/r3_rendertarget_phase_occq.cpp
+    ../xrRender_R2/r3_rendertarget_phase_scene.cpp
+    ../xrRender_R2/r3_rendertarget_phase_smap_D.cpp
+    ../xrRender_R2/r3_rendertarget_phase_ssao.cpp
+    ../xrRender_R2/render_phase_sun.cpp
+    ../xrRender_R2/render_phase_sun_old.cpp
 )
 
 target_include_directories(xrRenderPC_R4
@@ -183,11 +427,15 @@ target_include_directories(xrRenderPC_R4
     "${CMAKE_SOURCE_DIR}/src/Layers/xrRender"
     "${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2"
     "${CMAKE_SOURCE_DIR}/sdk/include"
+    "${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh"
+    "${CMAKE_SOURCE_DIR}/sdk/include/nvapi"
+    "${CMAKE_SOURCE_DIR}/Externals/AGS_SDK"
     "${CMAKE_SOURCE_DIR}/src/packages/directxtex_desktop_2019.2024.10.29.1/include"
     "${CMAKE_SOURCE_DIR}/src/packages/directxmath.2024.10.15.1/include"
     "${CMAKE_SOURCE_DIR}/Externals/nvrhi/include"
     "${CMAKE_SOURCE_DIR}/Externals/slang/include"
     "${CMAKE_SOURCE_DIR}/Externals/nvrhi/thirdparty/Vulkan-Headers/include"
+    "${CMAKE_SOURCE_DIR}/Externals/nvrhi/thirdparty/DirectX-Headers/include"
 )
 
 find_package(Vulkan REQUIRED)
@@ -202,8 +450,10 @@ target_link_libraries(xrRenderPC_R4
     xrAPI
     xrMiscMath
     nvrhi
-    nvrhi-d3d11
+    nvrhi_d3d11
+    nvrhi_d3d12
     nvrhi_vk
+    d3dcompiler
     ${Vulkan_LIBRARIES}
     slang
 )
@@ -213,6 +463,7 @@ target_compile_definitions(xrRenderPC_R4
     XRRENDER_R4_EXPORTS
     USE_DX11
     USE_NVRHI_IMGUI
+    RENDER_NAMESPACE=render_r4
 )
 
 set_target_properties(xrRenderPC_R4 PROPERTIES

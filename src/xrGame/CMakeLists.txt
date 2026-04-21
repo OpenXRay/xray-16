@@ -247,8 +247,8 @@ target_sources(xrGame PRIVATE
     animation_script_callback.h
     animation_utils.cpp
     animation_utils.h
-    #AnselManager.cpp
-    #AnselManager.h
+    AnselManager.cpp
+    AnselManager.h
     anticheat_dumpable_object.h
     antirad.cpp
     antirad.h
@@ -2495,6 +2495,7 @@ target_link_libraries(xrGame
     xrCDB
     xrPhysics
     xrNetServer
+    $<$<PLATFORM_ID:Windows>:xray_ansel>
 )
 
 target_compile_definitions(xrGame

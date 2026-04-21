@@ -53,6 +53,9 @@ add_compile_options(${XRAY_DISABLE_WARNINGS})
 
 add_subdirectory(GameSpy)
 add_subdirectory(imgui-proj)
+if (WIN32)
+    add_subdirectory(DiscordGameSDK)
+endif()
 
 if (NOT TARGET xrLuabind)
     message(FATAL_ERROR

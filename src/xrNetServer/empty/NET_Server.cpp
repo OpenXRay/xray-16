@@ -562,7 +562,7 @@ bool IPureServer::DisconnectAddress(const ip_address& Address, pcstr reason)
     return true;
 }
 
-bool IPureServer::GetClientAddress(ClientID ID, ip_address& Address, u32* pPort)
+bool IPureServer::GetClientAddress(ClientID ID, ip_address& Address, DWORD* pPort)
 {
     return true;
 }
