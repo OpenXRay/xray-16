@@ -19,6 +19,7 @@ option(XRAY_USE_ASAN     "Use AddressSanitizer"       OFF)
 option(XRAY_ENABLE_TRACY "Enable tracy profiler"      OFF)
 
 include(XRay.Build)
+include(XRay.Windows.Externals)
 include(XRay.Packaging)
 
 add_subdirectory(Externals)

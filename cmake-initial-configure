@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    cat >&2 <<USAGE
+Usage: $0 [RMG|release|mixed]
+
+Cleans and re-configures the CMake+Ninja build for the current platform.
+
+  WSL / Windows (Git Bash, MSYS2, Cygwin)  -> Windows build via vcvars + Clang
+  Linux / macOS                            -> native build
+
+Configs:
+  RMG       ReleaseMasterGold (default)
+  release   Release
+  mixed     Mixed
+
+Build dir: cmake_builds/<config-lowercased>
+USAGE
+    exit 1
+}
+
+CONFIG_INPUT="${1:-RMG}"
+case "${CONFIG_INPUT,,}" in
+    rmg|releasemastergold)  CONFIG="ReleaseMasterGold" ;;
+    release|rel)            CONFIG="Release" ;;
+    mixed)                  CONFIG="Mixed" ;;
+    -h|--help|help)         usage ;;
+    *) echo "Unknown config: $CONFIG_INPUT" >&2; usage ;;
+esac
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+BUILD_DIR="cmake_builds/$(echo "$CONFIG" | tr '[:upper:]' '[:lower:]')"
+
+detect_platform() {
+    case "$(uname -s)" in
+        Darwin) echo "macos" ;;
+        Linux)
+            if grep -qi microsoft /proc/version 2>/dev/null; then echo "wsl"
+            else echo "linux"; fi ;;
+        MINGW*|MSYS*|CYGWIN*) echo "windows" ;;
+        *) echo "unknown" ;;
+    esac
+}
+
+PLATFORM=$(detect_platform)
+
+to_win_path() {
+    case "$PLATFORM" in
+        wsl)     wslpath -w "$1" ;;
+        windows) cygpath -w "$1" ;;
+    esac
+}
+
+run_cmd_file() {
+    local cmd_file_win
+    cmd_file_win=$(to_win_path "$1")
+    case "$PLATFORM" in
+        wsl)     cmd.exe /c "$cmd_file_win" ;;
+        windows) cmd.exe //c "$cmd_file_win" ;;
+    esac
+}
+
+configure_windows_build() {
+    local c_drive
+    case "$PLATFORM" in
+        wsl)     c_drive="/mnt/c" ;;
+        windows) c_drive="$(cygpath -u 'C:/' 2>/dev/null | sed 's#/$##')" ;;
+    esac
+
+    local vswhere="${c_drive}/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
+    if [[ ! -x "$vswhere" ]]; then
+        echo "vswhere not found at: $vswhere" >&2
+        echo "Install Visual Studio 2022 (or Build Tools)." >&2
+        exit 1
+    fi
+
+    local vs_install
+    vs_install=$("$vswhere" -latest -property installationPath 2>/dev/null | tr -d '\r')
+    if [[ -z "$vs_install" ]]; then
+        echo "vswhere found no VS 2022 install." >&2
+        exit 1
+    fi
+
+    local vcvars64_win="${vs_install}\\VC\\Auxiliary\\Build\\vcvars64.bat"
+    local repo_win
+    repo_win=$(to_win_path "$SCRIPT_DIR")
+
+    local clang_candidates=(
+        "${c_drive}/Program Files/LLVM/bin/clang.exe"
+        "${c_drive}/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/Llvm/x64/bin/clang.exe"
+    )
+    local clang_win="" p
+    for p in "${clang_candidates[@]}"; do
+        if [[ -x "$p" ]]; then clang_win=$(to_win_path "$p"); break; fi
+    done
+
+    if [[ -z "$clang_win" ]]; then
+        echo ">> Clang not found. Installing LLVM via winget..."
+        local winget_cmd="winget install --exact --id LLVM.LLVM --accept-source-agreements --accept-package-agreements"
+        case "$PLATFORM" in
+            wsl)     cmd.exe /c  "$winget_cmd" ;;
+            windows) cmd.exe //c "$winget_cmd" ;;
+        esac
+        for p in "${clang_candidates[@]}"; do
+            if [[ -x "$p" ]]; then clang_win=$(to_win_path "$p"); break; fi
+        done
+        if [[ -z "$clang_win" ]]; then
+            echo "Clang install via winget failed. Install LLVM manually from https://releases.llvm.org and re-run." >&2
+            exit 1
+        fi
+    fi
+    local clangxx_win="${clang_win%clang.exe}clang++.exe"
+
+    echo ">> Cleaning $BUILD_DIR"
+    rm -rf "$BUILD_DIR"
+    mkdir -p "$BUILD_DIR"
+
+    echo ">> Configuring $CONFIG -> $BUILD_DIR ($PLATFORM -> Windows)"
+    echo ">> VS install:  $vs_install"
+    echo ">> Clang C:     $clang_win"
+    echo ">> Clang C++:   $clangxx_win"
+    echo
+
+    local build_dir_win="${repo_win}\\${BUILD_DIR//\//\\}"
+    local tmp_cmd="${BUILD_DIR}/_configure.cmd"
+
+    cat > "$tmp_cmd" <<CMDEOF
+@echo off
+call "${vcvars64_win}" >nul
+if errorlevel 1 exit /b 1
+cmake -G Ninja ^
+    -S "${repo_win}" ^
+    -B "${build_dir_win}" ^
+    -DCMAKE_BUILD_TYPE=${CONFIG} ^
+    -DCMAKE_C_COMPILER="${clang_win}" ^
+    -DCMAKE_CXX_COMPILER="${clangxx_win}"
+exit /b %ERRORLEVEL%
+CMDEOF
+
+    local rc=0
+    run_cmd_file "$tmp_cmd" || rc=$?
+    rm -f "$tmp_cmd"
+    exit $rc
+}
+
+configure_native() {
+    local label="$1"
+    echo ">> Cleaning $BUILD_DIR"
+    rm -rf "$BUILD_DIR"
+    mkdir -p "$BUILD_DIR"
+
+    echo ">> Configuring $CONFIG -> $BUILD_DIR ($label, native)"
+    echo
+
+    cmake -G Ninja \
+        -S "$SCRIPT_DIR" \
+        -B "$BUILD_DIR" \
+        -DCMAKE_BUILD_TYPE="$CONFIG"
+}
+
+case "$PLATFORM" in
+    wsl|windows) configure_windows_build ;;
+    linux)       configure_native "Linux" ;;
+    macos)       configure_native "macOS" ;;
+    *) echo "Unsupported platform: $(uname -s)" >&2; exit 1 ;;
+esac

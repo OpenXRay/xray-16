@@ -150,7 +150,8 @@ void WINAPI DXGetErrorDescriptionA(_In_ HRESULT hr, _Out_cap_(count) CHAR* desc,
 HRESULT WINAPI DXTraceW(_In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr,
     _In_opt_ const WCHAR* strMsg, _In_ bool bPopMsgBox)
 {
-#define DX_STR_WRAP(...) L##__VA_ARGS__
+#define DX_STR_WRAP_IMPL(...) L##__VA_ARGS__
+#define DX_STR_WRAP(...) DX_STR_WRAP_IMPL(__VA_ARGS__)
 #define DX_CHAR WCHAR
 #define DX_SPRINTF_S swprintf_s
 #define DX_STRCPY_S wcscpy_s
@@ -161,6 +162,7 @@ HRESULT WINAPI DXTraceW(_In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRE
 #define DX_GETERRORSTRING DXGetErrorStringW
 #include "DXTrace.inl"
 #undef DX_STR_WRAP
+#undef DX_STR_WRAP_IMPL
 #undef DX_CHAR
 #undef DX_SPRINTF_S
 #undef DX_STRCPY_S

@@ -46,7 +46,11 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     )
 endif()
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB)
+if (WIN32)
+    add_compile_definitions(WIN32 _WINDOWS)
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB AND NOT WIN32)
     if (NOT XRAY_CXX_LIB)
         include(CheckCXXCompilerFlag)
         CHECK_CXX_COMPILER_FLAG("-stdlib=libc++" LIBCPP_AVAILABLE)
@@ -80,7 +84,7 @@ endif()
 add_compile_options(-Wno-attributes)
 if (APPLE)
     add_compile_options(-Wl,-undefined,error)
-else()
+elseif (NOT WIN32)
     add_compile_options(-Wl,--no-undefined)
 endif()
 
@@ -185,16 +189,27 @@ set(XRAY_ENABLE_WARNINGS
     -Wno-unused-parameter
     -Wno-switch
     -Wno-trigraphs
-    #-Wno-padded
-    #-Wno-c++98-compat
-    #-Wno-c++98-compat-pedantic
-    #-Wno-c++11-compat
-    #-Wno-c++11-compat-pedantic
-    #-Wno-c++14-compat
-    #-Wno-c++14-compat-pedantic
-    #-Wno-newline-eof
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-deprecated-declarations>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-microsoft-include>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-missing-field-initializers>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-missing-braces>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-overloaded-virtual>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unnecessary-virtual-specifier>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-but-set-variable>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-private-field>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-const-variable>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-sign-compare>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-variable>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-function>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-delayed-template-parsing-in-cxx20>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-c++11-narrowing>
     $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>>
     $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-interference-size>>
+)
+
+add_compile_definitions(
+    $<$<CONFIG:ReleaseMasterGold>:_CRT_SECURE_NO_WARNINGS>
+    $<$<CONFIG:ReleaseMasterGold>:_CRT_NONSTDC_NO_WARNINGS>
 )
 
 set(XRAY_DISABLE_WARNINGS "-w")

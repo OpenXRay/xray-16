@@ -65,7 +65,9 @@
 #   error Unsupported architecture
 #endif
 
-#if defined(_MSC_VER)
+#if defined(__clang__)
+#define XR_COMPILER_CLANG __clang_major__
+#elif defined(_MSC_VER)
 #define XR_COMPILER_MSVC _MSC_VER
 #elif defined(__GNUC__)
 #define XR_COMPILER_GCC __GNUC__

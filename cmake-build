@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    cat >&2 <<USAGE
+Usage: $0 [target]  [-k]  [-j N]
+
+Runs the CMake+Ninja build for the current platform.
+
+  WSL / Windows (Git Bash, MSYS2, Cygwin)  -> Windows build via vcvars + Clang
+  Linux / macOS                            -> native build
+
+No arg:     build all targets
+With arg:   build specified target (e.g. xr_3da, xrRenderPC_R4, xrCore)
+
+-k:         keep going after errors (useful to collect all errors in one pass)
+-j N:       parallel job count (default: nproc)
+
+Uses the most recently configured cmake_builds/* dir. Run cmake-initial-configure first.
+USAGE
+    exit 1
+}
+
+KEEP_GOING=""
+JOBS="$(nproc 2>/dev/null || sysctl -n hw.logicalcpu 2>/dev/null || echo 8)"
+ARGS=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help|help) usage ;;
+        -k|--keep-going) KEEP_GOING="-k 0"; shift ;;
+        -j|--jobs) JOBS="$2"; shift 2 ;;
+        -j*) JOBS="${1#-j}"; shift ;;
+        --jobs=*) JOBS="${1#--jobs=}"; shift ;;
+        *) ARGS+=("$1"); shift ;;
+    esac
+done
+
+TARGET="${ARGS[0]:-}"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+BUILD_DIR=""
+shopt -s nullglob
+DIRS=(cmake_builds/*/)
+shopt -u nullglob
+if [[ ${#DIRS[@]} -eq 0 ]]; then
+    echo "No cmake_builds/* dir found. Run ./cmake-initial-configure first." >&2
+    exit 1
+elif [[ ${#DIRS[@]} -eq 1 ]]; then
+    BUILD_DIR="${DIRS[0]%/}"
+else
+    BUILD_DIR=$(ls -td cmake_builds/*/ | head -1 | sed 's|/$||')
+    echo ">> Multiple build dirs found, using most recent: $BUILD_DIR"
+fi
+
+detect_platform() {
+    case "$(uname -s)" in
+        Darwin) echo "macos" ;;
+        Linux)
+            if grep -qi microsoft /proc/version 2>/dev/null; then echo "wsl"
+            else echo "linux"; fi ;;
+        MINGW*|MSYS*|CYGWIN*) echo "windows" ;;
+        *) echo "unknown" ;;
+    esac
+}
+
+PLATFORM=$(detect_platform)
+
+to_win_path() {
+    case "$PLATFORM" in
+        wsl)     wslpath -w "$1" ;;
+        windows) cygpath -w "$1" ;;
+    esac
+}
+
+run_cmd_file() {
+    local cmd_file_win
+    cmd_file_win=$(to_win_path "$1")
+    case "$PLATFORM" in
+        wsl)     cmd.exe /c "$cmd_file_win" ;;
+        windows) cmd.exe //c "$cmd_file_win" ;;
+    esac
+}
+
+NINJA_ARGS="-j ${JOBS}"
+if [[ -n "$KEEP_GOING" ]]; then
+    NINJA_ARGS="${NINJA_ARGS} ${KEEP_GOING}"
+fi
+STATUS_SUFFIX=" (j=${JOBS}${KEEP_GOING:+, keep-going})"
+
+build_windows() {
+    local c_drive
+    case "$PLATFORM" in
+        wsl)     c_drive="/mnt/c" ;;
+        windows) c_drive="$(cygpath -u 'C:/' 2>/dev/null | sed 's#/$##')" ;;
+    esac
+
+    local vswhere="${c_drive}/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
+    if [[ ! -x "$vswhere" ]]; then
+        echo "vswhere not found at: $vswhere" >&2
+        exit 1
+    fi
+
+    local vs_install
+    vs_install=$("$vswhere" -latest -property installationPath 2>/dev/null | tr -d '\r')
+    if [[ -z "$vs_install" ]]; then
+        echo "vswhere found no VS 2022 install." >&2
+        exit 1
+    fi
+
+    local vcvars64_win="${vs_install}\\VC\\Auxiliary\\Build\\vcvars64.bat"
+    local repo_win
+    repo_win=$(to_win_path "$SCRIPT_DIR")
+    local build_dir_win="${repo_win}\\${BUILD_DIR//\//\\}"
+    local tmp_cmd="${BUILD_DIR}/_build.cmd"
+
+    local target_arg=""
+    if [[ -n "$TARGET" ]]; then
+        target_arg="--target ${TARGET}"
+        echo ">> Building target '$TARGET' in $BUILD_DIR${STATUS_SUFFIX}"
+    else
+        echo ">> Building all targets in $BUILD_DIR${STATUS_SUFFIX}"
+    fi
+    echo
+
+    cat > "$tmp_cmd" <<CMDEOF
+@echo off
+call "${vcvars64_win}" >nul
+if errorlevel 1 exit /b 1
+cmake --build "${build_dir_win}" ${target_arg} -- ${NINJA_ARGS}
+exit /b %ERRORLEVEL%
+CMDEOF
+
+    local rc=0
+    run_cmd_file "$tmp_cmd" || rc=$?
+    rm -f "$tmp_cmd"
+    exit $rc
+}
+
+build_native() {
+    local label="$1"
+    if [[ -n "$TARGET" ]]; then
+        echo ">> Building target '$TARGET' in $BUILD_DIR${STATUS_SUFFIX} ($label, native)"
+        echo
+        cmake --build "$BUILD_DIR" --target "$TARGET" -- $NINJA_ARGS
+    else
+        echo ">> Building all targets in $BUILD_DIR${STATUS_SUFFIX} ($label, native)"
+        echo
+        cmake --build "$BUILD_DIR" -- $NINJA_ARGS
+    fi
+}
+
+case "$PLATFORM" in
+    wsl|windows) build_windows ;;
+    linux)       build_native "Linux" ;;
+    macos)       build_native "macOS" ;;
+    *) echo "Unsupported platform: $(uname -s)" >&2; exit 1 ;;
+esac

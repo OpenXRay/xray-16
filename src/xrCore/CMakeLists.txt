@@ -137,16 +137,29 @@ target_sources_grouped(
     xrDebug_macros.h
 )
 
-#target_sources_grouped(
-#    TARGET xrCore
-#    NAME "Debug core\\DxErr"
-#    FILES
-#    Debug/dxerr.cpp
-#    Debug/dxerr.h
-#    Debug/DXGetErrorDescription.inl
-#    Debug/DXGetErrorString.inl
-#    Debug/DXTrace.inl
-#)
+if (WIN32)
+    target_sources_grouped(
+        TARGET xrCore
+        NAME "Debug core\\DxErr"
+        FILES
+        Debug/dxerr.cpp
+        Debug/dxerr.h
+        Debug/DXGetErrorDescription.inl
+        Debug/DXGetErrorString.inl
+        Debug/DXTrace.inl
+    )
+endif()
+
+target_sources_grouped(
+    TARGET xrCore
+    NAME "Profiler"
+    FILES
+    Profiler/CPUProfiler.cpp
+    Profiler/CPUProfiler.h
+    Profiler/Profiler.cpp
+    Profiler/Profiler.h
+    Profiler/ProfilerTypes.h
+)
 
 target_sources_grouped(
     TARGET xrCore
@@ -454,13 +467,15 @@ target_include_directories(xrCore
 
 target_link_libraries(xrCore
     PUBLIC
-    pthread
+    $<$<NOT:$<PLATFORM_ID:Windows>>:pthread>
     $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
     SDL2::SDL2
 
     PRIVATE
     xrMiscMath
-    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
+    $<$<AND:$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>,$<NOT:$<PLATFORM_ID:Windows>>>:mimalloc>
+    $<$<PLATFORM_ID:Windows>:xray_mimalloc>
+    $<$<PLATFORM_ID:Windows>:xray_bugtrap>
     $<$<BOOL:${JPEG_FOUND}>:JPEG::JPEG>
     LZO::LZO
 )
