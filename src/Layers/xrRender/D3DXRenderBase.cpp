@@ -54,28 +54,16 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
     if (!GEnv.isDedicatedServer)
     {
         UIRenderImpl.DestroyUIGeom();
-        DUImpl.OnDeviceDestroy();
-        m_PortalFadeGeom.destroy();
-        m_PortalFadeShader.destroy();
-        m_SelectionShader.destroy();
-        m_WireShader.destroy();
     }
     destroy();
 
     Resources->OnDeviceDestroy(bKeepTextures);
-#if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.OnDeviceDestroy();
     }
-#else
-    RCache.OnDeviceDestroy();
-#endif
 
-    // Quad
     QuadIB.Release();
-
-    // streams
     Index.Destroy();
     Vertex.Destroy();
 }
@@ -125,14 +113,10 @@ void D3DXRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 void D3DXRenderBase::SetupStates()
 {
     GEnv.Backend->UpdateCapabilities();
-#if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.SetupStates();
     }
-#else
-    RCache.SetupStates();
-#endif
 }
 
 void D3DXRenderBase::OnDeviceCreate(const char* shName)
@@ -147,30 +131,17 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 
     CreateQuadIB();
 
-#if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.context_id = id;
         contexts_pool[id].cmd_list.OnDeviceCreate();
     }
-#else
-    RCache.OnDeviceCreate();
-#endif
     m_Gamma.Update();
     Resources->OnDeviceCreate(shName);
     Resources->CompatibilityCheck();
     create();
     if (!GEnv.isDedicatedServer)
     {
-        const bool useFrameGraph = GEnv.Backend && GEnv.Backend->IsFrameGraph();
-        if (!useFrameGraph)
-        {
-            m_WireShader.create("editor" DELIMITER "wire");
-            m_SelectionShader.create("editor" DELIMITER "selection");
-            m_PortalFadeShader.create("portal");
-            m_PortalFadeGeom.create(FVF::F_L, RImplementation.Vertex.Buffer(), 0);
-            DUImpl.OnDeviceCreate();
-        }
         UIRenderImpl.CreateUIGeom();
     }
 }
@@ -230,12 +201,10 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
 
 void D3DXRenderBase::overdrawBegin()
 {
-    RCache.dbg_OverdrawBegin();
 }
 
 void D3DXRenderBase::overdrawEnd()
 {
-    RCache.dbg_OverdrawEnd();
 }
 
 void D3DXRenderBase::DeferredLoad(bool E)
@@ -280,62 +249,15 @@ u32 D3DXRenderBase::GetCacheStatPolys()
 void D3DXRenderBase::Begin()
 {
     GEnv.Backend->BeginFrame();
-
-    if (GEnv.FrameGraphRenderer->IsEnabled())
-        return;
-
-#if RENDER == R_R4
-    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
-    {
-        contexts_pool[id].cmd_list.OnFrameBegin();
-        contexts_pool[id].cmd_list.set_CullMode(CULL_CW);
-        contexts_pool[id].cmd_list.set_CullMode(CULL_CCW);
-    }
-#else
-    RCache.OnFrameBegin();
-    RCache.set_CullMode(CULL_CW);
-    RCache.set_CullMode(CULL_CCW);
-#endif
-    Vertex.Flush();
-    Index.Flush();
-    if (GEnv.Backend->GetCapabilities().SceneMode)
-        overdrawBegin();
 }
 
 void D3DXRenderBase::Clear()
 {
-    RCache.ClearZB(RCache.get_ZB(), 1.0f, 0);
-    if (psDeviceFlags.test(rsClearBB))
-    {
-        RCache.ClearRT(RCache.get_RT(), {}); // black
-    }
 }
 
 void D3DXRenderBase::End()
 {
     ZoneScopedN("D3DXRenderBase::BackendEnd");
-
-    if (GEnv.FrameGraphRenderer->IsEnabled())
-    {
-        GEnv.Backend->EndFrame();
-        GEnv.Backend->Present(psDeviceFlags.test(rsVSync));
-        return;
-    }
-
-    if (GEnv.Backend->GetCapabilities().SceneMode)
-        overdrawEnd();
-
-#if RENDER == R_R4
-    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
-    {
-        contexts_pool[id].cmd_list.OnFrameEnd();
-    }
-#else
-    RCache.OnFrameEnd();
-#endif
-
-    // we're done with rendering
-    cleanup_contexts();
 
     GEnv.Backend->EndFrame();
     GEnv.Backend->Present(psDeviceFlags.test(rsVSync));
@@ -347,32 +269,20 @@ void D3DXRenderBase::ResourcesDestroyNecessaryTextures()
 }
 void D3DXRenderBase::ClearTarget()
 {
-    RCache.ClearRT(RCache.get_RT(), {}); // black
 }
 
 void D3DXRenderBase::SetCacheXform(Fmatrix& mView, Fmatrix& mProject)
 {
-#if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.set_xform_view(mView);
         contexts_pool[id].cmd_list.set_xform_project(mProject);
     }
-#else
-    RCache.set_xform_view(mView);
-    RCache.set_xform_project(mProject);
-#endif
 }
 
 bool D3DXRenderBase::HWSupportsShaderYUV2RGB()
 {
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
-        return false;
-
-    const auto& caps = GEnv.Backend->GetCapabilities();
-    u32 v_dev = CAP_VERSION(caps.raster_major, caps.raster_minor);
-    u32 v_need = CAP_VERSION(2, 0);
-    return v_dev >= v_need;
+    return false;
 }
 
 void D3DXRenderBase::OnAssetsChanged()

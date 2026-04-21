@@ -57,23 +57,6 @@ LPCSTR dxUIRender::UpdateShaderName(LPCSTR tex_name, LPCSTR sh_name)
     else
         return sh_name;
 }
-/*
-void dxUIRender::PushPoint(float x, float y, u32 c, float u, float v)
-{
-    VERIFY(m_PointType==pttNone);
-    pv->set(x, y, 0.0f, c, u, v);
-    ++pv;
-}
-*/
-/*
-void dxUIRender::PushPoint(int x, int y, u32 c, float u, float v)
-{
-    VERIFY(m_PointType==pttNone);
-    pv->set(x, y, 0, c, u, v);
-    ++pv;
-}
-*/
-
 void dxUIRender::PushPoint(float x, float y, float z, u32 C, float u, float v)
 {
     //.	VERIFY(m_PointType==pttLIT);
