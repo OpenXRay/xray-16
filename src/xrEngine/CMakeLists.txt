@@ -333,8 +333,12 @@ target_sources_grouped(
     TARGET xrEngine
     NAME "Render\\Execution & 3D\\Shaders\\Textures"
     FILES
-    #tntQAVI.cpp
-    #tntQAVI.h
+    tntQAVI.cpp
+    tntQAVI.h
+    IRenderBackend.h
+    IRenderBackend.cpp
+    IFrameGraphRender.h
+    IFrameGraphRender.cpp
     xrImage_Resampler.cpp
     xrImage_Resampler.h
     xrTheora_Stream.cpp
@@ -343,14 +347,16 @@ target_sources_grouped(
     xrTheora_Surface.h
 )
 
-#target_sources_grouped(
-#    TARGET xrEngine
-#    NAME "Render\\Execution & 3D\\TextConsole"
-#    FILES
-#    Text_Console.cpp
-#    Text_Console.h
-#    Text_Console_WndProc.cpp
-#)
+if (WIN32)
+    target_sources_grouped(
+        TARGET xrEngine
+        NAME "Render\\Execution & 3D\\TextConsole"
+        FILES
+        Text_Console.cpp
+        Text_Console.h
+        Text_Console_WndProc.cpp
+    )
+endif()
 
 target_sources_grouped(
     TARGET xrEngine
@@ -436,6 +442,8 @@ target_link_libraries(xrEngine
     Ogg::Ogg
     Theora::Theora
     SDL2::SDL2
+    $<$<PLATFORM_ID:Windows>:DiscordGameSDK>
+    $<$<PLATFORM_ID:Windows>:vfw32>
 )
 
 target_compile_definitions(xrEngine

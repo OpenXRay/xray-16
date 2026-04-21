@@ -12,6 +12,8 @@
 using namespace xray::render::fg;
 using namespace xray::render::resources;
 
+ENGINE_API bool is_enough_address_space_available();
+
 namespace xray::render::RENDER_NAMESPACE
 {
 void fix_texture_name(pstr fn)
@@ -30,7 +32,6 @@ int get_texture_load_lod(LPCSTR fn)
     auto it_ = sect.Data.cbegin();
     auto it_e_ = sect.Data.cend();
 
-    ENGINE_API bool is_enough_address_space_available();
     static bool enough_address_space_available = is_enough_address_space_available();
 
     auto it = it_;

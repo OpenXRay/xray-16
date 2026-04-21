@@ -68,7 +68,7 @@ static nvrhi::BufferHandle CreateNvrhiBuffer(nvrhi::IDevice* device, const void*
         {
             Msg("! [NVRHI] ERROR: Device Removed!");
         }
-        Msg("! [NVRHI] Failed to create %s (size=%u bytes)", desc.debugName, dataSize);
+        Msg("! [NVRHI] Failed to create %s (size=%u bytes)", desc.debugName.c_str(), dataSize);
         return nullptr;
     }
 

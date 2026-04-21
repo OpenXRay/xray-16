@@ -33,6 +33,10 @@ target_link_libraries(xr_3da
     $<$<PLATFORM_ID:Windows>:xrRenderPC_R4>
 )
 
+if (WIN32)
+    target_link_options(xr_3da PRIVATE "LINKER:/ERRORLIMIT:0")
+endif()
+
 set_target_properties(xr_3da PROPERTIES
     PREFIX ""
 )

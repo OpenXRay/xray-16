@@ -52,6 +52,19 @@ set_target_properties(JPEG::JPEG PROPERTIES
     IMPORTED_LOCATION "${XRAY_SDK_LIB_DIR}/jpeg-static.lib"
     INTERFACE_INCLUDE_DIRECTORIES "${XRAY_SDK_INC_DIR}"
 )
+set(JPEG_FOUND TRUE CACHE BOOL "libjpeg provided via sdk/" FORCE)
+
+add_library(xray_ansel UNKNOWN IMPORTED GLOBAL)
+set_target_properties(xray_ansel PROPERTIES
+    IMPORTED_LOCATION "${XRAY_SDK_LIB_DIR}/AnselSDK64.lib"
+    INTERFACE_INCLUDE_DIRECTORIES "${XRAY_SDK_INC_DIR}"
+)
+
+add_library(xray_discord UNKNOWN IMPORTED GLOBAL)
+set_target_properties(xray_discord PROPERTIES
+    IMPORTED_LOCATION "${XRAY_SDK_LIB_DIR}/discord_game_sdk.dll.lib"
+    INTERFACE_INCLUDE_DIRECTORIES "${XRAY_SDK_INC_DIR}"
+)
 
 add_library(LZO::LZO STATIC IMPORTED GLOBAL)
 set_target_properties(LZO::LZO PROPERTIES

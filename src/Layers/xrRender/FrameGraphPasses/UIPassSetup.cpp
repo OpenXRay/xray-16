@@ -23,6 +23,8 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"
 
+extern ENGINE_API Fvector2 g_current_font_scale;
+
 namespace xray::render::RENDER_NAMESPACE::passes {
 
 using RENDER_NAMESPACE::dxFontRender;
@@ -188,8 +190,6 @@ framegraph::VirtualResourceHandle setupTextPass(
                 Msg("! [TextPass] Text infrastructure not initialized");
                 return;
             }
-            extern ENGINE_API Fvector2 g_current_font_scale;
-
             if (!data.passState->initialized) {
                 constexpr u32 MAX_TEXT_VERTICES = 16384;
                 constexpr u32 MAX_TEXT_INDICES = MAX_TEXT_VERTICES / 4 * 6;

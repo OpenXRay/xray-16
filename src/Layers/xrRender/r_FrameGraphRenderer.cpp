@@ -71,6 +71,10 @@
 #include "blenders/Blender_Particle.h"
 
 extern ENGINE_API float psHUD_FOV;
+extern ENGINE_API int ps_r_rt_gi;
+extern ENGINE_API float ps_r_rt_gi_intensity;
+extern ENGINE_API int ps_r_path_tracer;
+extern ENGINE_API int ps_r_path_tracer_bounces;
 
 namespace xray::render {
 
@@ -1380,9 +1384,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     //  ReSTIR GI (RT Shadows + Indirect Lighting)
     // ═══════════════════════════════════════════════════════
 
-    extern ENGINE_API int ps_r_rt_gi;
-    extern ENGINE_API float ps_r_rt_gi_intensity;
-
     if (ps_r_rt_gi && m_rtAccelMgr && m_rtAccelMgr->IsSupported() && m_rtAccelMgr->IsReady()) {
         auto rtgiOutput = passes::setupReSTIRGIPass(
             *m_framegraph, m_device, m_rtAccelMgr.get(),
@@ -1402,9 +1403,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  DYNAMIC BLAS BUILD (shared by Path Tracer + ReSTIR GI)
     // ═══════════════════════════════════════════════════════
-    extern ENGINE_API int ps_r_path_tracer;
-    extern ENGINE_API int ps_r_path_tracer_bounces;
-
     bool needsRT = (ps_r_path_tracer || ps_r_rt_gi) && m_rtAccelMgr && m_rtAccelMgr->IsSupported();
 
     if (needsRT && m_rtAccelMgr->IsReady()) {
@@ -1440,7 +1438,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                             worldSkinned.push_back(b);
                     }
 
-                    extern ENGINE_API float psHUD_FOV;
                     float fovScale = 1.0f / psHUD_FOV;
                     Fmatrix viewMatrix = Device.mView;
                     Fmatrix invView;

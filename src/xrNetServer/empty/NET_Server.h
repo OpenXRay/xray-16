@@ -220,7 +220,7 @@ public:
     bool HasBandwidth(IClient* C);
 
     int GetPort() const { return psNET_Port; }
-    bool GetClientAddress(ClientID ID, ip_address& Address, u32* pPort = nullptr);
+    bool GetClientAddress(ClientID ID, ip_address& Address, DWORD* pPort = nullptr);
     //bool DisconnectClient(IClient* C);
     virtual bool DisconnectClient(IClient* C, pcstr Reason);
     virtual bool DisconnectAddress(const ip_address& Address, pcstr reason);
