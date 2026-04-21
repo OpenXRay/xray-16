@@ -317,20 +317,6 @@ private:
 
     float GetDetailScale(const shared_str& textureName);
 
-    MaterialPSO* CreatePSO(
-        dxRender_Visual* visual,
-        ShaderElement* elem,
-        SPass* pass,
-        const framegraph::DefaultOutputLayout& outputs,
-        const framegraph::FrameGraph& fg,
-        RenderPassType passType);
-
-    MaterialPSO* CreateDepthPSO(
-        dxRender_Visual* visual,
-        ShaderElement* elem,
-        SPass* pass,
-        const framegraph::FrameGraph& fg);
-
     MaterialPSO* CreateUIPSO(
         IUIShader* uiShader,
         ShaderElement* elem,
@@ -340,12 +326,6 @@ private:
     MaterialPSO* CreateFontPSO(
         dxFontRender* fontRender,
         nvrhi::IFramebuffer* framebuffer);
-
-    void ExtractTextures(SPass* pass, MaterialPSO* matPSO);
-
-    bool ExtractShaders(SPass* pass, MaterialPSO* matPSO);
-
-    void ExtractSamplers(SPass* pass, MaterialPSO* matPSO);
 
 public:
     void CreateBindingLayouts(MaterialPSO* matPSO);
@@ -376,30 +356,13 @@ public:
 
     xr_map<shared_str, nvrhi::ShaderHandle> m_shaderHandles;
 
-    nvrhi::ShaderHandle GetOrCreateShaderVS(SVS* vs);
-    nvrhi::ShaderHandle GetOrCreateShaderPS(SPS* ps);
-    void SetupRenderStates(SPass* pass, fg::PipelineStateDesc& psoDesc);
-
     MaterialPSO* GetOrCreateFontPSO(
         dxFontRender* fontRender,
         nvrhi::IFramebuffer* framebuffer);
 
 private:
 
-    static u64 ComputeTextureHash(SPass* pass);
-
-    static u64 ComputeStateHash(SPass* pass);
-
     static u32 GetVertexFormatID(dxRender_Visual* visual);
-
-    bool ValidateVertexLayoutCompatibility(dxRender_Visual* visual, MaterialPSO* matPSO);
-
-    void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, fg::PipelineStateDesc& psoDesc);
-    void SetupRenderTargets(
-        MaterialPSO* matPSO,
-        const framegraph::DefaultOutputLayout& outputs,
-        const framegraph::FrameGraph& fg,
-        fg::PipelineStateDesc& psoDesc);
 };
 
 }
