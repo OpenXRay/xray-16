@@ -24,7 +24,8 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
 
     if (extractedReflection)
     {
-        nvrhi::ShaderDesc shaderDesc(T::GetShaderType());
+        nvrhi::ShaderDesc shaderDesc{};
+        shaderDesc.shaderType = T::GetShaderType();
         shaderDesc.debugName = file_name;
         shaderDesc.entryName = "main";
 

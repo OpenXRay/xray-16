@@ -152,10 +152,6 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/NVRHIUIRenderer.h
     ../xrRender/NVRHIUIRenderer.cpp
 
-    # Debug Tools (Phase 3) - Renderer agnostic
-    ../xrRender/Debug/GBufferVisualization.h
-    ../xrRender/Debug/GBufferVisualization.cpp
-
     # FrameGraph Renderer (Phase 3) - Renderer agnostic
     ../xrRender/r_FrameGraphRenderer.h
     ../xrRender/r_FrameGraphRenderer.cpp
@@ -182,8 +178,13 @@ target_sources(xrRenderPC_R4 PRIVATE
 
 target_include_directories(xrRenderPC_R4
     PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_SOURCE_DIR}/src"
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender"
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2"
     "${CMAKE_SOURCE_DIR}/sdk/include"
+    "${CMAKE_SOURCE_DIR}/src/packages/directxtex_desktop_2019.2024.10.29.1/include"
+    "${CMAKE_SOURCE_DIR}/src/packages/directxmath.2024.10.15.1/include"
     "${CMAKE_SOURCE_DIR}/Externals/nvrhi/include"
     "${CMAKE_SOURCE_DIR}/Externals/slang/include"
     "${CMAKE_SOURCE_DIR}/Externals/nvrhi/thirdparty/Vulkan-Headers/include"

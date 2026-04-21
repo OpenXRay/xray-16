@@ -410,10 +410,12 @@ target_sources(xrEngine
 )
 
 target_include_directories(xrEngine
+    PUBLIC
+    "${XRAY_SOURCE_DIR}/Externals/imgui"
+
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${XRAY_SOURCE_DIR}/src"
-    "${XRAY_SOURCE_DIR}/Externals/imgui"
     "${XRAY_SOURCE_DIR}/Externals/OpenAutomate/inc"
 )
 

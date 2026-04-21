@@ -8,6 +8,7 @@
 # exclude binaries and temporary files
 [Bb]in/
 [Bb]uild*/
+cmake_builds/
 
 # User-specific files
 *.user

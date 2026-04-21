@@ -1,4 +1,4 @@
-add_executable(xr_3da)
+add_executable(xr_3da WIN32)
 
 target_sources(xr_3da PRIVATE
     entry_point.cpp
@@ -30,6 +30,7 @@ target_link_libraries(xr_3da
     xrAPI
     xrEngine
     xrGame
+    $<$<PLATFORM_ID:Windows>:xrRenderPC_R4>
 )
 
 set_target_properties(xr_3da PROPERTIES
