@@ -104,7 +104,6 @@ public:
     void LS_Unload();
     // Miscelaneous
     void _ParseList(sh_list& dest, LPCSTR names);
-    IBlender* _GetBlender(LPCSTR Name);
     IBlender* _FindBlender(LPCSTR Name);
     void _GetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps);
     void _DumpMemoryUsage();
@@ -127,7 +126,6 @@ public:
     bool GetBlenderProperties(LPCSTR blenderName, BlenderProperties& outProps);
     //.	BOOL							_GetDetailTexture	(LPCSTR Name, LPCSTR& T, R_constant_setup* &M);
 
-    map_Blender& _GetBlenders() { return m_blenders; }
     // Debug
     void DBG_VerifyGeoms();
     void DBG_VerifyTextures();

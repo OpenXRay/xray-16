@@ -422,24 +422,6 @@ private:
     // Helper: Get detail scale for texture (queries TextureDescrManager and caches result)
     float GetDetailScale(const shared_str& textureName);
 
-    // Create new PSO from shader element
-    MaterialPSO* CreatePSO(
-        dxRender_Visual* visual,
-        ShaderElement* elem,
-        SPass* pass,
-        const framegraph::DefaultOutputLayout& outputs,
-        const framegraph::FrameGraph& fg,
-        RenderPassType passType);
-
-    // Create depth-only PSO (Phase 2.4)
-    MaterialPSO* CreateDepthPSO(
-        dxRender_Visual* visual,
-        ShaderElement* elem,
-        SPass* pass,
-        const framegraph::FrameGraph& fg);
-
-    // Create UI PSO (no visual, fixed vertex layout)
-    // Takes IUIShader* to access NVRHI handles directly
     MaterialPSO* CreateUIPSO(
         IUIShader* uiShader,
         ShaderElement* elem,
@@ -450,15 +432,6 @@ private:
     MaterialPSO* CreateFontPSO(
         dxFontRender* fontRender,
         nvrhi::IFramebuffer* framebuffer);
-
-    // Extract textures from SPass
-    void ExtractTextures(SPass* pass, MaterialPSO* matPSO);
-
-    // Extract shader bytecode from SPass
-    bool ExtractShaders(SPass* pass, MaterialPSO* matPSO);
-
-    // Extract samplers from SPass state
-    void ExtractSamplers(SPass* pass, MaterialPSO* matPSO);
 
 public:
     // Create binding layouts for material (separate VS and PS)
@@ -517,37 +490,13 @@ public:
     // Key format: "VS_<shadername>" or "PS_<shadername>" to distinguish stages
     xr_map<shared_str, nvrhi::ShaderHandle> m_shaderHandles;  // Direct NVRHI handles (no wrapper needed)
 
-    // Get or create cached shader handle (stage-aware caching)
-    // Returns direct NVRHI handles (no wrapper layer!)
-    nvrhi::ShaderHandle GetOrCreateShaderVS(SVS* vs);
-    nvrhi::ShaderHandle GetOrCreateShaderPS(SPS* ps);
-    void SetupRenderStates(SPass* pass, fg::PipelineStateDesc& psoDesc);
-
     MaterialPSO* GetOrCreateFontPSO(
         dxFontRender* fontRender,
         nvrhi::IFramebuffer* framebuffer);
 
 private:
 
-    // Compute texture hash from SPass
-    static u64 ComputeTextureHash(SPass* pass);
-
-    // Compute state hash
-    static u64 ComputeStateHash(SPass* pass);
-
-    // D3D12: Extract vertex format ID from visual's geometry
     static u32 GetVertexFormatID(dxRender_Visual* visual);
-
-    // Setup PSO descriptor helpers
-    // Validate that geometry provides all vertex attributes the shader expects
-    bool ValidateVertexLayoutCompatibility(dxRender_Visual* visual, MaterialPSO* matPSO);
-
-    void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, fg::PipelineStateDesc& psoDesc);
-    void SetupRenderTargets(
-        MaterialPSO* matPSO,  // Pass MaterialPSO for shader reflection data
-        const framegraph::DefaultOutputLayout& outputs,
-        const framegraph::FrameGraph& fg,
-        fg::PipelineStateDesc& psoDesc);
 };
 
 } // namespace xray::render

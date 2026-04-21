@@ -41,22 +41,6 @@ void fix_texture_name(LPSTR fn)
 }
 */
 
-//--------------------------------------------------------------------------------------------------------------
-IBlender* CResourceManager::_GetBlender(LPCSTR Name)
-{
-    R_ASSERT(Name && Name[0]);
-
-    pstr N = pstr(Name);
-    map_Blender::iterator I = m_blenders.find(N);
-
-    if (I == m_blenders.end())
-    {
-        Msg("! Shader '%s' not found in library.", Name);
-        return nullptr;
-    }
-
-    return I->second;
-}
 
 IBlender* CResourceManager::_FindBlender(LPCSTR Name)
 {
@@ -269,111 +253,7 @@ void CResourceManager::_DeleteElement(const ShaderElement* S)
     Msg("! ERROR: Failed to find compiled 'shader-element'");
 }
 
-Shader* CResourceManager::_cpp_Create(
-    IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
-{
-    CBlender_Compile C;
-    Shader S;
 
-    //.
-    // if (strstr(s_shader,"transparent"))	__asm int 3;
-
-    // Access to template
-    C.BT = B;
-    C.bFFP = RImplementation.o.ffp;
-    C.bDetail = FALSE;
-#ifdef _EDITOR
-    if (!C.BT)
-    {
-        ELog.Msg(mtError, "Can't find shader '%s'", s_shader);
-        return 0;
-    }
-    C.bFFP = true;
-#else
-    UNUSED(s_shader);
-#endif
-
-    // Parse names
-    _ParseList(C.L_textures, s_textures);
-    _ParseList(C.L_constants, s_constants);
-    _ParseList(C.L_matrices, s_matrices);
-
-    // Compile element	(LOD0 - HQ)
-    {
-        C.iElement = SE_R1_NORMAL_HQ;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[SE_R1_NORMAL_HQ] = _CreateElement(std::move(E));
-    }
-
-    // Compile element	(LOD1)
-    {
-        C.iElement = SE_R1_NORMAL_LQ;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[SE_R1_NORMAL_LQ] = _CreateElement(std::move(E));
-    }
-
-    // Compile element
-    {
-        C.iElement = SE_R1_LPOINT;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[SE_R1_LPOINT] = _CreateElement(std::move(E));
-    }
-
-    // Compile element
-    {
-        C.iElement = SE_R1_LSPOT;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[SE_R1_LSPOT] = _CreateElement(std::move(E));
-    }
-
-    // Compile element
-    {
-        C.iElement = SE_R1_LMODELS;
-        C.bDetail = TRUE; //.$$$ HACK :)
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[SE_R1_LMODELS] = _CreateElement(std::move(E));
-    }
-
-    // Compile element
-    {
-        C.iElement = 5;
-        C.bDetail = FALSE;
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[5] = _CreateElement(std::move(E));
-    }
-
-    // Search equal in shaders array
-    for (u32 it = 0; it < v_shaders.size(); it++)
-        if (S.equal(v_shaders[it]))
-            return v_shaders[it];
-
-    // Create _new_ entry
-    Shader* N = v_shaders.emplace_back(xr_new<Shader>(std::move(S)));
-    N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    return N;
-}
-
-Shader* CResourceManager::_cpp_Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
-{
-    if (!GEnv.isDedicatedServer)
-    {
-        IBlender* pBlender = _GetBlender(s_shader ? s_shader : "null");
-        if (!pBlender)
-            return nullptr;
-        return _cpp_Create(pBlender, s_shader, s_textures, s_constants, s_matrices);
-    }
-    return nullptr;
-}
 
 IReader* open_shader(pcstr shader)
 {
