@@ -48,57 +48,14 @@ light::~light()
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     for (auto& f : omnipart)
         xr_delete(f);
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
+#endif
     set_active(false);
-
-// remove from Lights_LastFrame
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-    for (auto& p_light : RImplementation.Lights_LastFrame)
-        if (this == p_light)
-            p_light = nullptr;
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 }
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
 void light::set_texture(LPCSTR name)
 {
-    if ((nullptr == name) || (0 == name[0]))
-    {
-        spot_texture_name = nullptr;
-        s_spot.destroy();
-        s_point.destroy();
-        s_volumetric.destroy();
-        return;
-    }
-
-    spot_texture_name = name;
-
-#pragma todo("Only shadowed spot implements projective texture")
-    string256 temp;
-
-    strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_spot_", name);
-    // strconcat(sizeof(temp),temp,"_nomsaa",name);
-    s_spot.create(RImplementation.Target->b_accum_spot, temp, name);
-
-#if (RENDER != R_R3) && (RENDER != R_R4) && (RENDER != R_GL)
-    s_volumetric.create("accum_volumetric", name);
-#else //    (RENDER!=R_R3) && (RENDER!=R_R4) && (RENDER!=R_GL)
-    s_volumetric.create("accum_volumetric_nomsaa", name);
-    if (RImplementation.o.msaa)
-    {
-        u32 bound = 1;
-        if (!RImplementation.o.msaa_opt)
-            bound = RImplementation.o.msaa_samples;
-
-        for (u32 i = 0; i < bound; ++i)
-        {
-            s_spot_msaa[i].create(RImplementation.Target->b_accum_spot_msaa[i],
-                strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_spot_", name), name);
-            s_volumetric_msaa[i].create(RImplementation.Target->b_accum_volumetric_msaa[i],
-                strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_volumetric_", name), name);
-        }
-    }
-#endif // (RENDER!=R_R3) || (RENDER!=R_R4) || (RENDER!=R_GL)
+    spot_texture_name = (name && name[0]) ? name : nullptr;
 }
 #endif
 
@@ -210,15 +167,7 @@ void light::spatial_move()
     break;
     }
 
-    // update spatial DB
     SpatialBase::spatial_move();
-
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-    if (flags.bActive)
-        gi_generate();
-    for (u32 id = 0; id < R__NUM_CONTEXTS; ++id)
-        svis[id].invalidate();
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER == R_GL)
 }
 
 vis_data& light::get_homdata()

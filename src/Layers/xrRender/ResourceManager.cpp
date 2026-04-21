@@ -432,54 +432,11 @@ void CResourceManager::CompatibilityCheck()
 
 Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
-    if (GEnv.isDedicatedServer)
-        return nullptr;
-
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
-    {
-        return nullptr;
-    }
-
-    return _cpp_Create(B, s_shader, s_textures, s_constants, s_matrices);
+    return nullptr;
 }
 
 Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
-    if (!GEnv.isDedicatedServer)
-    {
-        // D3D12: Skip legacy shader creation - use NVRHI ShaderLoader instead
-        // Individual systems (UI, lensflares, etc.) handle DX12 path in their create() methods
-        if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
-        {
-            return nullptr;  // No legacy shader object for DX12
-        }
-
-#if defined(USE_DX9)
-        const bool useCppBlender = RImplementation.o.ffp && _GetBlender(s_shader);
-        if (!useCppBlender && _lua_HasShader(s_shader))
-            return _lua_Create(s_shader, s_textures);
-        return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
-#else // TODO: DX11: When all shaders are ready switch to common path
-        if (_lua_HasShader(s_shader))
-            return _lua_Create(s_shader, s_textures);
-        else
-        {
-            Shader* pShader = _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
-            if (pShader)
-                return pShader;
-            else
-            {
-                if (_lua_HasShader("stub_default"))
-                    return _lua_Create("stub_default", s_textures);
-                else
-                {
-                    FATAL("Can't find stub_default.s");
-                    return 0;
-                }
-            }
-        }
-#endif
-    }
     return nullptr;
 }
 

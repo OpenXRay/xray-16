@@ -317,134 +317,27 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
         return nullptr;
     }
 
-    // ═══════════════════════════════════════════════════
-    //  D3D12: FAST PATH - Precompiled PSO Lookup
-    // ═══════════════════════════════════════════════════
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph()) {
-        // Check if this is level geometry with precompiled PSOs
-        u32 shaderID = visual->shader_id;
-        if (shaderID != UINT32_MAX) {
-            auto* compiled = RImplementation.getCompiledShader(shaderID);
-            if (compiled) {
-                // Extract vertex format from visual
-                u32 vertexFormatID = GetVertexFormatID(visual);
-
-                // Compute cache key
-                u64 cacheKey = RImplementation.ComputePSOCacheKey(vertexFormatID, passType);
-
-                // Look up precompiled PSO
-                auto it = compiled->precompiledPSOs.psoCache.find(cacheKey);
-                if (it != compiled->precompiledPSOs.psoCache.end() && it->second) {
-                    // ✅ CACHE HIT! Return precompiled PSO
-                    m_stats.numCacheHits++;
-                    return it->second;
-                }
-
-                // Cache miss - PSO not precompiled for this format combination
-                m_stats.numCacheMisses++;
-                Msg("! [MaterialCache] PSO cache miss for shader %u (format %u, pass %u)",
-                    shaderID, vertexFormatID, (u32)passType);
-            }
-        }
-
-        // Fallback: use bindless pipeline (dynamic objects, or cache miss)
+    u32 shaderID = visual->shader_id;
+    if (shaderID == UINT32_MAX)
         return nullptr;
-    }
 
-    // Legacy D3D11 path below
-    // Get or compile shader
-    Shader* shader = nullptr;
-
-    // Check if visual has pre-compiled shader (legacy path or header-based shaders)
-    if (visual->shader && visual->shader._get()) {
-        shader = visual->shader._get();
-    }
-    // Otherwise, compile from stored names (FrameGraph deferred compilation)
-    else if (visual->shaderName.c_str() && visual->shaderName.size() > 0 &&
-             visual->textureName.c_str() && visual->textureName.size() > 0) {
-
-        // Compile shader now (on first use)
-        // Note: This may fail if blender tries to compile broken tessellation shaders
-        visual->shader.create(visual->shaderName.c_str(), visual->textureName.c_str());
-        shader = visual->shader._get();
-
-        if (!shader) {
-            return nullptr;
-        }
-    } else {
+    auto* compiled = RImplementation.getCompiledShader(shaderID);
+    if (!compiled)
         return nullptr;
-    }
 
-    // ═══════════════════════════════════════════════════════
-    //  EXTRACT SHADER ELEMENT (E[0] = DEFERRED RENDERING)
-    // ═══════════════════════════════════════════════════════
+    u32 vertexFormatID = GetVertexFormatID(visual);
+    u64 cacheKey = RImplementation.ComputePSOCacheKey(vertexFormatID, passType);
 
-    // E[0] = SE_R2_NORMAL_HQ (deferred rendering mode)
-    ShaderElement* elem = shader->E[0]._get();
-    if (!elem) {
-        return nullptr;
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  EXTRACT FIRST PASS (GBUFFER PASS)
-    // ═══════════════════════════════════════════════════════
-
-    if (elem->passes.empty()) {
-        return nullptr;
-    }
-
-    SPass* pass = elem->passes[0]._get();
-    if (!pass) {
-        return nullptr;
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  COMPUTE MATERIAL KEY (includes pass type for different depth states)
-    // ═══════════════════════════════════════════════════════
-
-    // Compute hash based on X-Ray texture pointers (stable across frames)
-    u64 textureHash = ComputeTextureHash(pass);
-    u64 stateHash = ComputeStateHash(pass);
-
-    // Include pass type in state hash so different passes get different PSOs
-    stateHash ^= (static_cast<u64>(passType) << 56);
-
-    MaterialKey key(shader, textureHash, stateHash);
-
-    // Get shader name for logging
-    const char* shaderName = "unknown";
-    if (pass->vs._get() && pass->vs._get()->cName.c_str()) {
-        shaderName = pass->vs._get()->cName.c_str();
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  CHECK CACHE
-    // ═══════════════════════════════════════════════════════
-
-    auto it = m_cache.find(key);
-    if (it != m_cache.end()) {
+    auto it = compiled->precompiledPSOs.psoCache.find(cacheKey);
+    if (it != compiled->precompiledPSOs.psoCache.end() && it->second) {
         m_stats.numCacheHits++;
-        return it->second.get();
+        return it->second;
     }
-
-    // ═══════════════════════════════════════════════════════
-    //  CACHE MISS - CREATE NEW PSO
-    // ═══════════════════════════════════════════════════════
 
     m_stats.numCacheMisses++;
-
-
-    MaterialPSO* pso = CreatePSO(visual, elem, pass, outputs, fg, passType);
-    if (!pso) {
-        Msg("! [MaterialCache::GetOrCreatePSO] CreatePSO failed for shader '%s'", shaderName);
-        return nullptr;
-    }
-
-    // Store in cache
-    m_cache[key] = xr_unique_ptr<MaterialPSO>(pso);
-    m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
-
-    return pso;
+    Msg("! [MaterialCache] PSO cache miss for shader %u (format %u, pass %u)",
+        shaderID, vertexFormatID, (u32)passType);
+    return nullptr;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -455,81 +348,9 @@ MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
     dxRender_Visual* visual,
     const framegraph::FrameGraph& fg)
 {
-    if (!visual) {
+    if (!visual)
         Msg("! [MaterialCache::GetOrCreateDepthPSO] Visual is NULL");
-        return nullptr;
-    }
-
-    // D3D12/FrameGraph mode: Return null - uses bindless depth prepass instead
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph()) {
-        return nullptr;
-    }
-
-    // Legacy D3D11 path below
-    // Get or compile shader
-    Shader* shader = nullptr;
-
-    if (visual->shader && visual->shader._get()) {
-        shader = visual->shader._get();
-    }
-    else if (visual->shaderName.c_str() && visual->shaderName.size() > 0 &&
-             visual->textureName.c_str() && visual->textureName.size() > 0) {
-        visual->shader.create(visual->shaderName.c_str(), visual->textureName.c_str());
-        shader = visual->shader._get();
-
-        if (!shader) {
-            return nullptr;
-        }
-    } else {
-        return nullptr;
-    }
-
-    // Extract shader element
-    ShaderElement* elem = shader->E[0]._get();
-    if (!elem || elem->passes.empty()) {
-        return nullptr;
-    }
-
-    SPass* pass = elem->passes[0]._get();
-    if (!pass) {
-        return nullptr;
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  COMPUTE DEPTH PSO KEY
-    // ═══════════════════════════════════════════════════════
-    // Depth PSOs are keyed by shader + texture hash only
-    // (state hash doesn't matter as we override render state)
-
-    u64 textureHash = ComputeTextureHash(pass);
-    MaterialKey key(shader, textureHash, 0, PSOType::Depth);
-
-    // Check cache
-    auto it = m_cache.find(key);
-    if (it != m_cache.end()) {
-        m_stats.numCacheHits++;
-        return it->second.get();
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  CACHE MISS - CREATE DEPTH PSO
-    // ═══════════════════════════════════════════════════════
-
-    m_stats.numCacheMisses++;
-
-    MaterialPSO* pso = CreateDepthPSO(visual, elem, pass, fg);
-    if (!pso) {
-        const char* shaderName = (pass->vs._get() && pass->vs._get()->cName.c_str())
-            ? pass->vs._get()->cName.c_str() : "unknown";
-        Msg("! [MaterialCache::GetOrCreateDepthPSO] CreateDepthPSO failed for shader '%s'", shaderName);
-        return nullptr;
-    }
-
-    // Store in cache
-    m_cache[key] = xr_unique_ptr<MaterialPSO>(pso);
-    m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
-
-    return pso;
+    return nullptr;
 }
 
 // ══════════════════════════════════════════════════════════
