@@ -32,31 +32,22 @@ dxRainRender::dxRainRender()
 
     DM_Drop = RImplementation.model_CreateDM(F);
 
-    // DX12: Compile rain shaders using NVRHI
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
+    auto* shaderLoader = RImplementation.GetShaderLoader();
+    if (shaderLoader)
     {
-        auto* shaderLoader = RImplementation.GetShaderLoader();
-        if (shaderLoader)
-        {
-            auto vsResult = shaderLoader->LoadVertexShader("effects" DELIMITER "rain", "main");
-            auto psResult = shaderLoader->LoadPixelShader("effects" DELIMITER "rain", "main");
+        auto vsResult = shaderLoader->LoadVertexShader("effects" DELIMITER "rain", "main");
+        auto psResult = shaderLoader->LoadPixelShader("effects" DELIMITER "rain", "main");
 
-            if (vsResult.handle && psResult.handle)
-            {
-                SH_Rain_VS = vsResult.handle;
-                SH_Rain_PS = psResult.handle;
-                Msg("* [dxRainRender] Compiled rain shader");
-            }
-            else
-            {
-                Msg("! [dxRainRender] Failed to compile rain shader");
-            }
+        if (vsResult.handle && psResult.handle)
+        {
+            SH_Rain_VS = vsResult.handle;
+            SH_Rain_PS = psResult.handle;
+            Msg("* [dxRainRender] Compiled rain shader");
         }
-    }
-    else
-    {
-        // Legacy D3D11
-        SH_Rain.create("effects" DELIMITER "rain", "fx" DELIMITER "fx_rain");
+        else
+        {
+            Msg("! [dxRainRender] Failed to compile rain shader");
+        }
     }
 
     hGeom_Rain.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
