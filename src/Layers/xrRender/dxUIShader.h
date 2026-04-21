@@ -25,9 +25,7 @@ public:
     virtual void create(LPCSTR sh, LPCSTR tex = nullptr);
     virtual bool inited()
     {
-        if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
-            return m_vsHandle && m_psHandle;
-        return hShader;
+        return m_vsHandle && m_psHandle;
     }
     virtual void destroy();
 

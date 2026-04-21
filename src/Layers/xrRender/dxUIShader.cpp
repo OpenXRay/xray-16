@@ -15,90 +15,66 @@ void dxUIShader::Copy(IUIShader& _in) { *this = *((dxUIShader*)&_in); }
 
 void dxUIShader::create(LPCSTR sh, LPCSTR tex)
 {
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
+    auto* shaderLoader = RImplementation.GetShaderLoader();
+    if (!shaderLoader)
     {
-        auto* shaderLoader = RImplementation.GetShaderLoader();
-        if (!shaderLoader)
-        {
-            Msg("! [dxUIShader] ShaderLoader is NULL for shader: %s", sh);
-            return;
-        }
-
-        if (tex) {
-            bool prevDeferredLoad = RImplementation.Resources->bDeferredLoad;
-            RImplementation.Resources->bDeferredLoad = true;
-
-            m_baseTexture = RImplementation.Resources->_CreateTexture(tex);
-
-            RImplementation.Resources->bDeferredLoad = prevDeferredLoad;
-        }
-
-        auto vsResult = shaderLoader->LoadVertexShader(sh, "main");
-        auto psResult = shaderLoader->LoadPixelShader(sh, "main");
-
-        if (!vsResult.handle || !psResult.handle)
-        {
-            Msg("* [dxUIShader] Shader '%s' not found, falling back to stub_notransform_t", sh);
-            vsResult = shaderLoader->LoadVertexShader("stub_notransform_t", "main");
-            psResult = shaderLoader->LoadPixelShader("stub_default", "main");
-        }
-
-        if (vsResult.handle && psResult.handle)
-        {
-            m_vsHandle = vsResult.handle;
-            m_psHandle = psResult.handle;
-
-            m_vsReflection = vsResult.reflection;
-            m_psReflection = psResult.reflection;
-            vsResult.reflection = nullptr;
-            psResult.reflection = nullptr;
-
-            Msg("* [dxUIShader] Compiled UI shader: %s (tex: %s)", sh, tex ? tex : "none");
-        }
-        else
-        {
-            Msg("! [dxUIShader] Failed to compile UI shader: %s (VS=%s, PS=%s)",
-                sh,
-                vsResult.handle ? "OK" : "FAILED",
-                psResult.handle ? "OK" : "FAILED");
-        }
-
+        Msg("! [dxUIShader] ShaderLoader is NULL for shader: %s", sh);
         return;
     }
 
-    hShader.create(sh, tex);
-
-    CTexture* baseTexture = GetBaseTexture();
-    if (baseTexture && baseTexture->get_Width() == 0)
+    if (tex)
     {
-        baseTexture->Load();
+        bool prevDeferredLoad = RImplementation.Resources->bDeferredLoad;
+        RImplementation.Resources->bDeferredLoad = true;
+        m_baseTexture = RImplementation.Resources->_CreateTexture(tex);
+        RImplementation.Resources->bDeferredLoad = prevDeferredLoad;
+    }
+
+    auto vsResult = shaderLoader->LoadVertexShader(sh, "main");
+    auto psResult = shaderLoader->LoadPixelShader(sh, "main");
+
+    if (!vsResult.handle || !psResult.handle)
+    {
+        Msg("* [dxUIShader] Shader '%s' not found, falling back to stub_notransform_t", sh);
+        vsResult = shaderLoader->LoadVertexShader("stub_notransform_t", "main");
+        psResult = shaderLoader->LoadPixelShader("stub_default", "main");
+    }
+
+    if (vsResult.handle && psResult.handle)
+    {
+        m_vsHandle = vsResult.handle;
+        m_psHandle = psResult.handle;
+        m_vsReflection = vsResult.reflection;
+        m_psReflection = psResult.reflection;
+        vsResult.reflection = nullptr;
+        psResult.reflection = nullptr;
+        Msg("* [dxUIShader] Compiled UI shader: %s (tex: %s)", sh, tex ? tex : "none");
     }
     else
     {
-        Msg("! [dxUIShader::create] GetBaseTexture returned NULL!");
+        Msg("! [dxUIShader] Failed to compile UI shader: %s (VS=%s, PS=%s)",
+            sh,
+            vsResult.handle ? "OK" : "FAILED",
+            psResult.handle ? "OK" : "FAILED");
     }
 }
 
 void dxUIShader::destroy()
 {
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
+    m_vsHandle = nullptr;
+    m_psHandle = nullptr;
+    m_baseTexture = nullptr;
+
+    if (m_vsReflection)
     {
-        m_vsHandle = nullptr;
-        m_psHandle = nullptr;
-        m_baseTexture = nullptr;
-
-        if (m_vsReflection) {
-            xr_delete(m_vsReflection);
-            m_vsReflection = nullptr;
-        }
-        if (m_psReflection) {
-            xr_delete(m_psReflection);
-            m_psReflection = nullptr;
-        }
-        return;
+        xr_delete(m_vsReflection);
+        m_vsReflection = nullptr;
     }
-
-    hShader.destroy();
+    if (m_psReflection)
+    {
+        xr_delete(m_psReflection);
+        m_psReflection = nullptr;
+    }
 }
 
 bool dxUIShader::operator==(const IUIShader& other) const
@@ -108,53 +84,7 @@ bool dxUIShader::operator==(const IUIShader& other) const
 
 CTexture* dxUIShader::GetBaseTexture() const
 {
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
-    {
-        return m_baseTexture;
-    }
-
-    if (!hShader)
-        return nullptr;
-
-    const SPass& pass = *hShader->E[0]->passes[0];
-    if (!pass.T)
-    {
-        return nullptr;
-    }
-
-    const STextureList& textures = *pass.T;
-    if (textures.empty())
-    {
-        return nullptr;
-    }
-
-    const char* baseTextureName = nullptr;
-
-    SPS* ps = pass.ps._get();
-    if (ps && ps->reflection)
-    {
-        const auto& inputTextures = ps->reflection->rtBindings.inputTextures;
-        for (const auto& tex : inputTextures)
-        {
-            if (tex.name == baseTexture.c_str())
-            {
-                u32 expectedSlot = tex.slot + CTexture::rstPixel;
-
-                for (const auto& [slot, textureName] : textures)
-                {
-                    if (slot == expectedSlot)
-                    {
-                        baseTextureName = textureName.c_str();
-                        break;
-                    }
-                }
-
-                break;
-            }
-        }
-    }
-
-    return RImplementation.Resources->_CreateTexture(baseTextureName);
+    return m_baseTexture;
 }
 
 xrImTextureData dxUIShader::GetImGuiTextureId()
