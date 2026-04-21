@@ -159,6 +159,10 @@ target_sources(xrRenderPC_R4 PRIVATE
     # FrameGraph Renderer (Phase 3) - Renderer agnostic
     ../xrRender/r_FrameGraphRenderer.h
     ../xrRender/r_FrameGraphRenderer.cpp
+    ../xrRender/r5.h
+    ../xrRender/r5.cpp
+    ../xrRender/FGRenderHost.h
+    ../xrRender/FGRenderHost.cpp
 
     # ImGui NVRHI Renderer - Backend agnostic
     ../xrRender/dxImGuiRender.h

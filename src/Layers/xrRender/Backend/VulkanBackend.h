@@ -63,7 +63,7 @@ private:
     static constexpr u32 BACK_BUFFER_COUNT = 2;
     static constexpr u32 MAX_BINDLESS_TEXTURES = 65536;
 
-    bool CreateInstance(bool enableValidation);
+    bool CreateInstance(SDL_Window* window, bool enableValidation);
     bool SelectPhysicalDevice();
     bool CreateSurface(SDL_Window* window);
     bool CreateLogicalDevice();

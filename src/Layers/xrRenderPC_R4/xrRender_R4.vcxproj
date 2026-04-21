@@ -343,6 +343,8 @@
     <ClInclude Include="..\xrRender\Geometry\GeometryBatch.h" />
     <ClInclude Include="..\xrRender\GPUCullingManager.h" />
     <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h" />
+    <ClInclude Include="..\xrRender\r5.h" />
+    <ClInclude Include="..\xrRender\FGRenderHost.h" />
     <ClInclude Include="..\xrRender\Profiler\GPUProfiler.h" />
     <ClInclude Include="..\xrRender\Profiler\StatsOverlay.h" />
     <ClInclude Include="stdafx.h" />
@@ -708,6 +710,8 @@
     <ClCompile Include="..\xrRender\Geometry\GeometryBatch.cpp" />
     <ClCompile Include="..\xrRender\GPUCullingManager.cpp" />
     <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp" />
+    <ClCompile Include="..\xrRender\r5.cpp" />
+    <ClCompile Include="..\xrRender\FGRenderHost.cpp" />
     <ClCompile Include="..\xrRender\Profiler\GPUProfiler.cpp" />
     <ClCompile Include="..\xrRender\Profiler\StatsOverlay.cpp" />
     <ClCompile Include="stdafx.cpp">
