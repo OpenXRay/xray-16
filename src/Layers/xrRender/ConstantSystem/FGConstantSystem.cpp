@@ -223,14 +223,14 @@ void FGConstantSystem::SetStaticArray(const char* name, const Fmatrix* values, u
     m_dirtyStatic = ~0ull;
 }
 
-void FGConstantSystem::CommitEngine(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitEngine(fg::RenderContext* ctx) {
     if (!m_vcbPool) return;
 
     for (auto& [cbIndex, staging] : m_engineStaging) {
         if (!staging.dirty) continue;
 
         const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
-        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+        fg::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
             framegraph::VolatileConstantBufferPool::CBLayout(
                 cbInfo.name.c_str(), cbInfo.slot, cbInfo.size
             )
@@ -246,14 +246,14 @@ void FGConstantSystem::CommitEngine(ng::RenderContext* ctx) {
     }
 }
 
-void FGConstantSystem::CommitPass(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitPass(fg::RenderContext* ctx) {
     if (!m_vcbPool) return;
 
     for (auto& [cbIndex, staging] : m_passStaging) {
         if (!staging.dirty) continue;
 
         const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
-        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+        fg::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
             framegraph::VolatileConstantBufferPool::CBLayout(
                 cbInfo.name.c_str(), cbInfo.slot, cbInfo.size
             )
@@ -269,14 +269,14 @@ void FGConstantSystem::CommitPass(ng::RenderContext* ctx) {
     }
 }
 
-void FGConstantSystem::CommitMaterial(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitMaterial(fg::RenderContext* ctx) {
     if (!m_vcbPool) return;
 
     for (auto& [cbIndex, staging] : m_materialStaging) {
         if (!staging.dirty) continue;
 
         const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
-        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+        fg::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
             framegraph::VolatileConstantBufferPool::CBLayout(
                 cbInfo.name.c_str(), cbInfo.slot, cbInfo.size
             )
@@ -292,7 +292,7 @@ void FGConstantSystem::CommitMaterial(ng::RenderContext* ctx) {
     }
 }
 
-void FGConstantSystem::CommitInstance(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitInstance(fg::RenderContext* ctx) {
 
     if (!m_vcbPool) {
         return;
@@ -309,7 +309,7 @@ void FGConstantSystem::CommitInstance(ng::RenderContext* ctx) {
 
         const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
 
-        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+        fg::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
             framegraph::VolatileConstantBufferPool::CBLayout(
                 cbInfo.name.c_str(),
                 cbInfo.slot,
@@ -332,14 +332,14 @@ void FGConstantSystem::CommitInstance(ng::RenderContext* ctx) {
     }
 }
 
-void FGConstantSystem::CommitAll(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitAll(fg::RenderContext* ctx) {
     CommitEngine(ctx);
     CommitPass(ctx);
     CommitMaterial(ctx);
     CommitInstance(ctx);
 }
 
-void FGConstantSystem::CommitStatic(ng::RenderContext* ctx) {
+void FGConstantSystem::CommitStatic(fg::RenderContext* ctx) {
 
     if (m_dirtyStatic == 0 && m_staticInitialized) {
         return;

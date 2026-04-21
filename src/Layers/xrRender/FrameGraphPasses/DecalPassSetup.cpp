@@ -27,13 +27,13 @@ struct DecalPassData {
     VirtualResourceHandle normal;
     VirtualResourceHandle sceneColor;
     VirtualResourceHandle worldPos;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     decals::DecalManager* decalMgr;
     DecalPassState* passState;
     u32 width, height;
 };
 
-static void InitializeDecalResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, DecalPassState& state)
+static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, DecalPassState& state)
 {
     if (state.initialized)
         return;
@@ -89,7 +89,7 @@ static void InitializeDecalResources(ng::RenderDevice* device, const nvrhi::Fram
 
 DefaultOutputLayout setupDecalPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     const DefaultOutputLayout& inputs,
     decals::DecalManager* decalMgr,
     u32 width, u32 height,
@@ -115,7 +115,7 @@ DefaultOutputLayout setupDecalPass(
             data.worldPos = passBuilder.read(inputs.worldPos, ResourceState::ShaderResource);
         },
 
-        [](const DecalPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const DecalPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             nvrhi::IDevice* nvDevice = cmdList->getDevice();
 

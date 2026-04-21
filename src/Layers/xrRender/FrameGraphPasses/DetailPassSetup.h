@@ -12,7 +12,7 @@ namespace xray::render::RENDER_NAMESPACE {
 }
 
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
         class RenderContext;
     }
@@ -40,7 +40,7 @@ struct DetailPassData {
     framegraph::VirtualResourceHandle outputNormal;
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle worldPos;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     RENDER_NAMESPACE::FGDetailManager* detailManager;
     framegraph::DefaultOutputLayout outputs;
     u32 width;
@@ -49,7 +49,7 @@ struct DetailPassData {
 };
 framegraph::DefaultOutputLayout setupDetailPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     RENDER_NAMESPACE::FGDetailManager* detailManager,
     const framegraph::DefaultOutputLayout& forwardInputs,
     u32 width,

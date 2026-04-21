@@ -37,10 +37,10 @@ public:
 
     struct TextureSet
     {
-        ng::TextureHandle albedo;
-        ng::TextureHandle normal;
-        ng::TextureHandle pbr;
-        ng::TextureHandle detail;
+        fg::TextureHandle albedo;
+        fg::TextureHandle normal;
+        fg::TextureHandle pbr;
+        fg::TextureHandle detail;
 
         bool IsValid() const;
     };

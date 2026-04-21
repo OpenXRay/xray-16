@@ -23,7 +23,7 @@ public:
     NVRHIUIRenderer();
     ~NVRHIUIRenderer();
 
-    void Initialize(ng::RenderDevice* device, MaterialCache* matCache);
+    void Initialize(fg::RenderDevice* device, MaterialCache* matCache);
     void Shutdown();
 
     void RenderBatches(
@@ -35,7 +35,7 @@ public:
     );
 
 private:
-    ng::RenderDevice* m_device{nullptr};
+    fg::RenderDevice* m_device{nullptr};
     MaterialCache* m_matCache{nullptr};
 
     nvrhi::BufferHandle m_vertexBuffer;

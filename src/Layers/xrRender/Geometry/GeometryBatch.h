@@ -29,9 +29,9 @@ struct GeometryBatch {
     u32 materialID = 0;
     u32 bindlessMaterialID = UINT32_MAX;
 
-    ng::TextureHandle albedoTexture;
-    ng::TextureHandle normalTexture;
-    ng::TextureHandle materialTexture;
+    fg::TextureHandle albedoTexture;
+    fg::TextureHandle normalTexture;
+    fg::TextureHandle materialTexture;
 
     Fmatrix worldMatrix;
 

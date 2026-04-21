@@ -5,7 +5,7 @@
 #include "SamplerCache.h"
 #include "NativeRTFactory.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;
 }
 
@@ -13,7 +13,7 @@ namespace xray::render::resources {
 
 class FGResourceManager {
 public:
-    explicit FGResourceManager(xray::render::ng::RenderDevice* device);
+    explicit FGResourceManager(xray::render::fg::RenderDevice* device);
     ~FGResourceManager();
 
     TextureManager* GetTextureManager() { return m_textureManager.get(); }
@@ -40,7 +40,7 @@ public:
     void PrintStatistics() const;
 
 private:
-    xray::render::ng::RenderDevice* m_device;
+    xray::render::fg::RenderDevice* m_device;
 
     xr_unique_ptr<TextureManager> m_textureManager;
     xr_unique_ptr<BufferManager> m_bufferManager;

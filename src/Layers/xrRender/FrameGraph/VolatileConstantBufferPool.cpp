@@ -15,7 +15,7 @@ VolatileConstantBufferPool::~VolatileConstantBufferPool()
         m_stats.numLayouts, m_stats.numVCBs, m_stats.totalMemory);
 }
 
-ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layout)
+fg::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layout)
 {
     auto it = m_vcbs.find(layout);
     if (it != m_vcbs.end())
@@ -26,7 +26,7 @@ ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layo
     Msg("* [VCBPool] Creating new VCB for '%s' (slot b%u, %u bytes)",
         layout.name.c_str(), layout.slot, layout.size);
 
-    ng::RenderDevice::BufferDesc cbDesc;
+    fg::RenderDevice::BufferDesc cbDesc;
     cbDesc.byteSize = layout.size;
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
@@ -36,12 +36,12 @@ ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layo
     xr_sprintf(debugName, "VCB_%s_b%u_%ub", layout.name.c_str(), layout.slot, layout.size);
     cbDesc.debugName = debugName;
 
-    ng::BufferHandle vcb = GEnv.FrameGraphRenderer->GetRenderDevice()->CreateBuffer(cbDesc);
+    fg::BufferHandle vcb = GEnv.FrameGraphRenderer->GetRenderDevice()->CreateBuffer(cbDesc);
 
     if (!vcb.IsValid())
     {
         Msg("! [VCBPool] Failed to create VCB for '%s'", layout.name.c_str());
-        return ng::BufferHandle();
+        return fg::BufferHandle();
     }
 
     m_vcbs[layout] = vcb;
@@ -56,13 +56,13 @@ ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layo
     return vcb;
 }
 
-ng::BufferHandle VolatileConstantBufferPool::GetVCB(const CBLayout& layout) const
+fg::BufferHandle VolatileConstantBufferPool::GetVCB(const CBLayout& layout) const
 {
     auto it = m_vcbs.find(layout);
     if (it != m_vcbs.end())
         return it->second;
 
-    return ng::BufferHandle();
+    return fg::BufferHandle();
 }
 
 bool VolatileConstantBufferPool::HasLayout(const CBLayout& layout) const

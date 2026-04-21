@@ -32,7 +32,7 @@ namespace xray::render::RENDER_NAMESPACE::nvrhi_wrapper
 class NVRHIDevice;
 }
 
-namespace xray::render::ng
+namespace xray::render::fg
 {
 class RenderContext;
 class RenderDevice;
@@ -45,7 +45,7 @@ class FrameGraphRenderer;
 struct MaterialPSO;
 }
 
-namespace xray::render::ng
+namespace xray::render::fg
 {
 class PipelineState;
 }
@@ -358,7 +358,7 @@ public:
             struct PSOVariant {
                 u32 vertexFormatID;
                 RenderPassType passType;
-                ng::PipelineState* pso;
+                fg::PipelineState* pso;
                 MaterialPSO* materialPSO;
             };
 
@@ -618,8 +618,8 @@ public:
     void TestNVRHI_Render();
 
     bool m_renderContextTestMode{ false };
-    xray::render::ng::RenderContext* m_renderContext{ nullptr };
-    xray::render::ng::RenderDevice* m_renderDevice{ nullptr };
+    xray::render::fg::RenderContext* m_renderContext{ nullptr };
+    xray::render::fg::RenderDevice* m_renderDevice{ nullptr };
 
     IRenderBackend* m_backend{ nullptr };
 
@@ -627,8 +627,8 @@ public:
 
     framegraph::ShaderLoader* m_shaderLoader{ nullptr };
 
-    xray::render::ng::ImGuiRendererNVRHI* m_imguiRendererNVRHI{ nullptr };
-    xray::render::ng::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return m_imguiRendererNVRHI; }
+    xray::render::fg::ImGuiRendererNVRHI* m_imguiRendererNVRHI{ nullptr };
+    xray::render::fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return m_imguiRendererNVRHI; }
 
     framegraph::ShaderLoader* GetShaderLoader() const { return m_shaderLoader; }
 

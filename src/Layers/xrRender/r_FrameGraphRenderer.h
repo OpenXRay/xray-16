@@ -32,7 +32,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
     class SmokeTrailManager;
 }
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class ImGuiRendererNVRHI;
 }
 
@@ -61,7 +61,7 @@ public:
     FrameGraphRenderer();
     ~FrameGraphRenderer();
 
-    bool Initialize(ng::RenderDevice* device);
+    bool Initialize(fg::RenderDevice* device);
     void Shutdown();
 
     void Render() override;
@@ -70,9 +70,9 @@ public:
     void SetEnabled(bool enabled) override { m_enabled = enabled; }
     bool IsEnabled() const override { return m_enabled; }
 
-    void RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer);
+    void RenderImGui(ImDrawData* drawData, fg::ImGuiRendererNVRHI* imguiRenderer);
 
-    ng::RenderContext* GetRenderContext() const { return m_renderContext.get(); }
+    fg::RenderContext* GetRenderContext() const { return m_renderContext.get(); }
 
     struct Stats {
         float totalFrameMs = 0.0f;
@@ -90,7 +90,7 @@ public:
     xray::profiler::StatsOverlay* GetStatsOverlay() const { return m_statsOverlay.get(); }
     void ToggleStatsOverlay() { if (m_statsOverlay) m_statsOverlay->ToggleVisible(); }
 
-    ng::RenderDevice* GetRenderDevice() const override { return m_device; }
+    fg::RenderDevice* GetRenderDevice() const override { return m_device; }
     MaterialCache* GetMaterialCache() const override { return m_materialCache.get(); }
     MaterialCache* GetUIMaterialCache() const override { return m_uiMaterialCache.get(); }
     ui::UIRenderCollector* GetUICollector() const override { return m_uiCollector.get(); }
@@ -111,7 +111,7 @@ public:
 
 private:
     bool m_enabled = false;
-    ng::RenderDevice* m_device = nullptr;
+    fg::RenderDevice* m_device = nullptr;
 
     xr_unique_ptr<framegraph::Blackboard> m_blackboard;
 
@@ -121,18 +121,18 @@ private:
 
     framegraph::VirtualResourceHandle m_finalOutput;
 
-    ng::TextureHandle m_native_Position;
-    ng::TextureHandle m_native_Normal;
-    ng::TextureHandle m_native_Albedo;
-    ng::TextureHandle m_native_Depth;
-    ng::TextureHandle m_native_Accumulator;
-    ng::TextureHandle m_native_Generic_0;
-    ng::TextureHandle m_native_Generic_1;
-    ng::TextureHandle m_native_Generic_2;
+    fg::TextureHandle m_native_Position;
+    fg::TextureHandle m_native_Normal;
+    fg::TextureHandle m_native_Albedo;
+    fg::TextureHandle m_native_Depth;
+    fg::TextureHandle m_native_Accumulator;
+    fg::TextureHandle m_native_Generic_0;
+    fg::TextureHandle m_native_Generic_1;
+    fg::TextureHandle m_native_Generic_2;
 
-    ng::TextureHandle m_native_MenuMain;
-    ng::TextureHandle m_native_MenuDistort;
-    ng::TextureHandle m_native_FinalComposite;
+    fg::TextureHandle m_native_MenuMain;
+    fg::TextureHandle m_native_MenuDistort;
+    fg::TextureHandle m_native_FinalComposite;
 
     framegraph::VirtualResourceHandle m_rt_Position;
     framegraph::VirtualResourceHandle m_rt_Normal;
@@ -203,7 +203,7 @@ private:
     xr_vector<GeometryBatch> m_cachedStaticBatches;
     bool m_staticBatchesCached = false;
 
-    xr_unique_ptr<ng::RenderContext> m_renderContext;
+    xr_unique_ptr<fg::RenderContext> m_renderContext;
 
     xr_map<ID3D11Buffer*, nvrhi::BufferHandle> m_bufferHandleCache;
 

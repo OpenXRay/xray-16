@@ -32,9 +32,9 @@ public:
         }
     };
 
-    ng::BufferHandle GetOrCreateVCB(const CBLayout& layout);
+    fg::BufferHandle GetOrCreateVCB(const CBLayout& layout);
 
-    ng::BufferHandle GetVCB(const CBLayout& layout) const;
+    fg::BufferHandle GetVCB(const CBLayout& layout) const;
 
     bool HasLayout(const CBLayout& layout) const;
 
@@ -48,7 +48,7 @@ public:
     void LogStats() const;
 
 private:
-    xr_map<CBLayout, ng::BufferHandle> m_vcbs;
+    xr_map<CBLayout, fg::BufferHandle> m_vcbs;
 
     mutable Stats m_stats;
 };

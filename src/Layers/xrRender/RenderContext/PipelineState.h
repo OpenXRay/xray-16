@@ -3,7 +3,7 @@
 #include "RCShader.h"
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 class RenderDevice;
 

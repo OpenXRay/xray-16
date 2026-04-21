@@ -3,7 +3,7 @@
 #include "ResourceHandle.h"
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;
 }
 
@@ -56,7 +56,7 @@ struct BufferMetadata {
 
 class RingBuffer {
 public:
-    RingBuffer(xray::render::ng::RenderDevice* device, u64 size, const char* debugName);
+    RingBuffer(xray::render::fg::RenderDevice* device, u64 size, const char* debugName);
     ~RingBuffer();
 
     struct Allocation {
@@ -75,7 +75,7 @@ public:
     u64 GetAvailable() const { return m_size - m_used; }
 
 private:
-    xray::render::ng::RenderDevice* m_device;
+    xray::render::fg::RenderDevice* m_device;
     nvrhi::BufferHandle m_buffer;
 
     u64 m_size;
@@ -87,7 +87,7 @@ private:
 
 class BufferManager {
 public:
-    explicit BufferManager(xray::render::ng::RenderDevice* device);
+    explicit BufferManager(xray::render::fg::RenderDevice* device);
     ~BufferManager();
 
     BufferHandle CreateBuffer(
@@ -137,7 +137,7 @@ public:
     void PrintStatistics() const;
 
 private:
-    xray::render::ng::RenderDevice* m_device;
+    xray::render::fg::RenderDevice* m_device;
 
     xr_vector<BufferMetadata> m_buffers;
     xr_vector<u32> m_freeSlots;

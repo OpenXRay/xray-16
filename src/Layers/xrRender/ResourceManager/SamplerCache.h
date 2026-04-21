@@ -3,7 +3,7 @@
 #include "ResourceHandle.h"
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;
 }
 
@@ -45,7 +45,7 @@ struct SamplerDesc {
 
 class SamplerCache {
 public:
-    explicit SamplerCache(xray::render::ng::RenderDevice* device);
+    explicit SamplerCache(xray::render::fg::RenderDevice* device);
     ~SamplerCache();
 
     SamplerHandle GetSampler(const SamplerDesc& desc);
@@ -61,7 +61,7 @@ public:
     u32 GetCacheSize() const { return (u32)m_cache.size(); }
 
 private:
-    xray::render::ng::RenderDevice* m_device;
+    xray::render::fg::RenderDevice* m_device;
 
     xr_map<u64, SamplerHandle> m_cache;
 

@@ -6,7 +6,7 @@
 namespace xray::render {
     struct GeometryBatch;
 
-    namespace ng {
+    namespace fg {
         class RenderContext;
     }
 }
@@ -28,7 +28,7 @@ public:
 
     virtual void Setup(FrameGraph& fg) = 0;
 
-    virtual void Execute(ng::RenderContext& ctx, const FrameGraph& fg) = 0;
+    virtual void Execute(fg::RenderContext& ctx, const FrameGraph& fg) = 0;
 
     virtual RenderPhase GetPhase() const = 0;
 
@@ -62,7 +62,7 @@ protected:
             fg.PassWrite(pass, resource, state);
         }
 
-        fg.SetPassCallback(pass, [this](ng::RenderContext& ctx, const FrameGraph& fg) {
+        fg.SetPassCallback(pass, [this](fg::RenderContext& ctx, const FrameGraph& fg) {
             this->Execute(ctx, fg);
         });
     }

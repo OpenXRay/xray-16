@@ -9,7 +9,7 @@ class MaterialBuffer : public GPUStructuredBuffer<MaterialData> {
 public:
     static MaterialBuffer& Instance();
 
-    void Initialize(ng::RenderDevice* device);
+    void Initialize(fg::RenderDevice* device);
     void Shutdown();
 
     u32 RegisterMaterial(const MaterialData& material);
@@ -33,11 +33,11 @@ class DrawMaterialIDBuffer {
 public:
     static DrawMaterialIDBuffer& Instance();
 
-    void Initialize(ng::RenderDevice* device, u32 maxDraws);
+    void Initialize(fg::RenderDevice* device, u32 maxDraws);
     void Shutdown();
 
     void SetMaterialID(u32 drawIndex, u32 materialID);
-    void Upload(ng::RenderContext* ctx, u32 drawCount);
+    void Upload(fg::RenderContext* ctx, u32 drawCount);
 
     nvrhi::IBuffer* GetBuffer() const { return m_buffer.Get(); }
     bool IsInitialized() const { return m_initialized; }
@@ -46,7 +46,7 @@ private:
     DrawMaterialIDBuffer() = default;
     ~DrawMaterialIDBuffer();
 
-    ng::RenderDevice* m_device = nullptr;
+    fg::RenderDevice* m_device = nullptr;
     nvrhi::BufferHandle m_buffer;
     bool m_initialized = false;
 

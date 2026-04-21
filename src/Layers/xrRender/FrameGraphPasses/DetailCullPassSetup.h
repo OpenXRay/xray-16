@@ -11,7 +11,7 @@ namespace xray::render::RENDER_NAMESPACE {
 }
 
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -28,7 +28,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 
 void setupDetailCullPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     RENDER_NAMESPACE::FGDetailManager* detailManager,
     framegraph::VirtualResourceHandle hiZPyramid,
     u32 hiZWidth,

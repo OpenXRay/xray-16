@@ -3,7 +3,7 @@
 #include "TextureManager.h"
 #include "AsyncIO.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;
 }
 
@@ -37,7 +37,7 @@ struct StreamingRequest {
 
 class StreamingManager {
 public:
-    StreamingManager(xray::render::ng::RenderDevice* device, TextureManager* texManager);
+    StreamingManager(xray::render::fg::RenderDevice* device, TextureManager* texManager);
     ~StreamingManager();
 
     void RequestMips(TextureHandle handle, u32 targetMips, TexturePriority priority);
@@ -70,7 +70,7 @@ public:
     void PrintStatistics() const;
 
 private:
-    xray::render::ng::RenderDevice* m_device;
+    xray::render::fg::RenderDevice* m_device;
     TextureManager* m_texManager;
     AsyncIOManager* m_asyncIO;
 

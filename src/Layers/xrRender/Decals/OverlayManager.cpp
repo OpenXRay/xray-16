@@ -6,7 +6,7 @@ namespace xray::render::RENDER_NAMESPACE::decals {
 
 static constexpr u32 MAX_GPU_SPLATS = 1024;
 
-void OverlayManager::Initialize(ng::RenderDevice* device)
+void OverlayManager::Initialize(fg::RenderDevice* device)
 {
     m_device = device;
     m_gpuSplats.reserve(MAX_GPU_SPLATS);

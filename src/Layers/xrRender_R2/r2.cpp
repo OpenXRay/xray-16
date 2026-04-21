@@ -20,17 +20,11 @@
 #endif
 
 #if defined(USE_DX11) && RENDER == R_R4
-#include "Layers/xrRender/NVRHI/NVRHIDevice.h"
-#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/r5.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
-#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
-#include "Layers/xrRender/Backend/D3D11BackendWrapper.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
-#include "Layers/xrRender/UIRenderCollector.h"
-
-namespace xray::render {
-    void InitializeImGuiRenderer(ng::RenderDevice* renderDevice);
-}
+#include "Layers/xrRender/FrameGraph/ShaderCache.h"
 #endif
 
 namespace xray::render::RENDER_NAMESPACE
@@ -511,54 +505,7 @@ void CRender::create()
 #endif
 
 #if RENDER == R_R4
-    if (GEnv.Backend && GEnv.Backend->IsInitialized())
-    {
-        m_renderDevice = xr_new<xray::render::ng::RenderDevice>();
-
-        if (m_renderDevice->InitializeFromBackend(GEnv.Backend))
-        {
-            Msg("* RenderDevice initialized successfully");
-
-            xray::render::InitializeImGuiRenderer(m_renderDevice);
-
-            m_framegraphRenderer = xr_new<xray::render::FrameGraphRenderer>();
-
-            if (m_framegraphRenderer->Initialize(m_renderDevice))
-            {
-                Msg("* FrameGraphRenderer initialized successfully");
-
-                GEnv.FrameGraphRenderer = m_framegraphRenderer;
-                auto* uiCollector = m_framegraphRenderer->GetUICollector();
-                GEnv.UIRender = uiCollector;
-                m_framegraphRenderer->SetEnabled(true);
-                Msg("* FrameGraphRenderer enabled");
-
-                m_shaderLoader = xr_new<framegraph::ShaderLoader>(
-                    m_renderDevice->GetSlangCompiler());
-                if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
-                    m_shaderLoader->SetTarget(xray::render::SlangCompiler::Target::SPIRV);
-                else
-                    m_shaderLoader->SetTarget(xray::render::SlangCompiler::Target::DXIL);
-                Msg("* ShaderLoader initialized (target: %s)",
-                    m_shaderLoader->GetTarget() == xray::render::SlangCompiler::Target::SPIRV ? "SPIRV" : "DXIL");
-
-                xray::render::MaterialSystem::Instance().Initialize(
-                    m_renderDevice->GetFGResourceManager(),
-                    m_shaderLoader);
-                Msg("* MaterialSystem initialized");
-            }
-            else
-            {
-                Msg("! FrameGraphRenderer initialization failed");
-                xr_delete(m_framegraphRenderer);
-            }
-        }
-        else
-        {
-            Msg("! RenderDevice initialization failed");
-            xr_delete(m_renderDevice);
-        }
-    }
+    r5::InitializeFrameGraph();
 #endif
 
     Target = xr_new<CRenderTarget>(); // Main target
@@ -597,29 +544,7 @@ void CRender::destroy()
 #endif
 
 #if defined(USE_DX11) && RENDER == R_R4
-    xray::render::MaterialSystem::Instance().Shutdown();
-    Msg("* MaterialSystem shutdown");
-
-    if (m_shaderLoader)
-    {
-        xr_delete(m_shaderLoader);
-        Msg("* ShaderLoader destroyed");
-    }
-
-    if (m_framegraphRenderer)
-    {
-        m_framegraphRenderer->Shutdown();
-        GEnv.FrameGraphRenderer = nullptr;
-        xr_delete(m_framegraphRenderer);
-        Msg("* FrameGraphRenderer destroyed");
-    }
-
-    if (m_renderDevice)
-    {
-        m_renderDevice->Shutdown();
-        xr_delete(m_renderDevice);
-        Msg("* RenderDevice destroyed");
-    }
+    r5::ShutdownFrameGraph();
 
     if (m_backend)
     {

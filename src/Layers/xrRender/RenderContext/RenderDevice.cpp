@@ -5,7 +5,7 @@
 #include "../ResourceManager/FGResourceManager.h"
 #include "../Shaders/SlangCompiler.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 static nvrhi::CommandListHandle s_textureUploadCmdList;
 static std::mutex s_textureUploadMutex;

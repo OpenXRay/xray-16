@@ -6,7 +6,7 @@
 
 namespace xray::render::framegraph {
 
-FrameGraph::FrameGraph(ng::RenderDevice* renderDevice)
+FrameGraph::FrameGraph(fg::RenderDevice* renderDevice)
     : m_renderDevice(renderDevice)
     , m_device(renderDevice->GetNVRHIDevice())
     , m_resourceManager(renderDevice->GetFGResourceManager())

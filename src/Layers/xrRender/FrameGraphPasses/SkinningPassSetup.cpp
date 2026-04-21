@@ -52,7 +52,7 @@ static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
     return result;
 }
 
-void InitializeSkinningResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state)
+void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state)
 {
     if (state.initialized)
         return;
@@ -429,7 +429,7 @@ static void RenderSkinnedBatch(
 
 framegraph::DefaultOutputLayout setupSkinningPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     const GeometryCollector* geometry,
     const xr_vector<GeometryBatch>* hudBatches,
@@ -483,7 +483,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             data.outputs.depth = data.depth;
         },
 
-        [](const SkinningPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const SkinningPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             using namespace RENDER_NAMESPACE;
 
             bool hasWorldSkinned = data.geometry && !data.geometry->GetBatches().empty();

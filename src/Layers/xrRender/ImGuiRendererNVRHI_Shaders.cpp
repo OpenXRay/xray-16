@@ -5,7 +5,7 @@
 #include "FrameGraph/BindingSetBuilder.h"
 #include <d3dcompiler.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 bool ImGuiRendererNVRHI::CreateShaders()
 {

@@ -2,7 +2,7 @@
 
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderContext;
     class RenderDevice;
 }
@@ -13,10 +13,10 @@ namespace xray::render::resources {
 
 namespace xray::render::framegraph {
 
-void TestSimpleTriangle(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer);
+void TestSimpleTriangle(fg::RenderDevice* renderDevice, fg::RenderContext* context, nvrhi::ITexture* backbuffer);
 
-void TestTwoPassRender(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer);
+void TestTwoPassRender(fg::RenderDevice* renderDevice, fg::RenderContext* context, nvrhi::ITexture* backbuffer);
 
-void TestResourceAliasing(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer);
+void TestResourceAliasing(fg::RenderDevice* renderDevice, fg::RenderContext* context, nvrhi::ITexture* backbuffer);
 
 }

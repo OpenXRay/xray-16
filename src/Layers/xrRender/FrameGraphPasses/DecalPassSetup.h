@@ -5,7 +5,7 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-namespace ng {
+namespace fg {
     class RenderDevice;
 }
 }
@@ -32,7 +32,7 @@ struct DecalPassState {
 
 framegraph::DefaultOutputLayout setupDecalPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     decals::DecalManager* decalMgr,
     u32 width, u32 height,

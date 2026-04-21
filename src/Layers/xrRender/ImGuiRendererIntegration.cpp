@@ -9,7 +9,7 @@ namespace xray::render {
 
 static xr_unique_ptr<IImGuiRender> g_ImGuiRenderer;
 
-static ng::RenderDevice* g_RenderDevice = nullptr;
+static fg::RenderDevice* g_RenderDevice = nullptr;
 
 namespace RENDER_NAMESPACE {
     IImGuiRender* CreateLegacyImGuiRendererImpl()
@@ -18,13 +18,13 @@ namespace RENDER_NAMESPACE {
     }
 }
 
-void InitializeImGuiRenderer(ng::RenderDevice* renderDevice)
+void InitializeImGuiRenderer(fg::RenderDevice* renderDevice)
 {
     g_RenderDevice = renderDevice;
 
     if (renderDevice && renderDevice->IsInitialized())
     {
-        ng::ImGuiRendererNVRHI* nvrhiRenderer = xr_new<ng::ImGuiRendererNVRHI>(renderDevice);
+        fg::ImGuiRendererNVRHI* nvrhiRenderer = xr_new<fg::ImGuiRendererNVRHI>(renderDevice);
         g_ImGuiRenderer.reset(nvrhiRenderer);
 
         RENDER_NAMESPACE::RImplementation.m_imguiRendererNVRHI = nvrhiRenderer;
@@ -63,7 +63,7 @@ void SetImGuiCommandListProvider(ImGuiCommandListProvider* provider)
     g_CommandListProvider = provider;
 }
 
-namespace ng {
+namespace fg {
 
 class ImGuiRendererNVRHI_Integrated : public ImGuiRendererNVRHI
 {
@@ -102,7 +102,7 @@ IImGuiRender* CreateModernImGuiRenderer()
 {
     if (g_RenderDevice && g_RenderDevice->IsInitialized())
     {
-        auto renderer = ng::ImGuiRendererFactory::Create(g_RenderDevice);
+        auto renderer = fg::ImGuiRendererFactory::Create(g_RenderDevice);
         return renderer.release();
     }
 

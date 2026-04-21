@@ -90,7 +90,7 @@ static void CreatePlaceholderBuffer(nvrhi::IDevice* nvDevice)
     s_placeholderBuffer = nvDevice->createBuffer(desc);
 }
 
-static void InitializeResources(ng::RenderDevice* device)
+static void InitializeResources(fg::RenderDevice* device)
 {
     if (s_initialized) return;
 
@@ -157,7 +157,7 @@ static void EnsureAccumulationBuffer(nvrhi::IDevice* nvDevice, u32 width, u32 he
 }
 
 struct PathTracerData {
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     RTAccelStructManager* accelMgr;
     VirtualResourceHandle outputTex;
     PathTracerCB cbData;
@@ -168,7 +168,7 @@ struct PathTracerData {
 
 PathTracerOutput setupPathTracerPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     RTAccelStructManager* accelMgr,
     const PathTracerConfig& config,
     const Fmatrix& invViewProj,
@@ -197,7 +197,7 @@ PathTracerOutput setupPathTracerPass(
                 RenderPassBuilder passBuilder(builder, passHandle);
                 data.outputTex = passBuilder.write(outHandle, ResourceState::UnorderedAccess);
             },
-            [](const PathTracerData&, const FrameGraph&, ng::RenderContext*) {}
+            [](const PathTracerData&, const FrameGraph&, fg::RenderContext*) {}
         );
         return { passData.outputTex };
     }
@@ -290,7 +290,7 @@ PathTracerOutput setupPathTracerPass(
             data.outputTex = passBuilder.write(outHandle, ResourceState::UnorderedAccess);
         },
 
-        [](const PathTracerData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const PathTracerData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             if (!s_enabled) return;
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();

@@ -6,7 +6,7 @@
 #include "TrailPassSetup.h"
 
 namespace xray::render {
-namespace ng {
+namespace fg {
     class RenderDevice;
 }
 }
@@ -41,7 +41,7 @@ struct SmokeTrailPassState
 
 framegraph::DefaultOutputLayout setupSmokeTrailPass(
     framegraph::FrameGraph&              fg,
-    ng::RenderDevice*                    device,
+    fg::RenderDevice*                    device,
     const framegraph::DefaultOutputLayout& inputs,
     SmokeTrailManager*                   manager,
     u32                                  width,

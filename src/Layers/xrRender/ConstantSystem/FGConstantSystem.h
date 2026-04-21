@@ -23,12 +23,12 @@ public:
 
     void SetArray(const char* name, const Fmatrix* values, u32 count);
 
-    void CommitEngine(ng::RenderContext* ctx);
-    void CommitPass(ng::RenderContext* ctx);
-    void CommitMaterial(ng::RenderContext* ctx);
-    void CommitInstance(ng::RenderContext* ctx);
+    void CommitEngine(fg::RenderContext* ctx);
+    void CommitPass(fg::RenderContext* ctx);
+    void CommitMaterial(fg::RenderContext* ctx);
+    void CommitInstance(fg::RenderContext* ctx);
 
-    void CommitAll(ng::RenderContext* ctx);
+    void CommitAll(fg::RenderContext* ctx);
 
     void SetStatic(const char* name, float value);
     void SetStatic(const char* name, const Fvector2& value);
@@ -38,7 +38,7 @@ public:
 
     void SetStaticArray(const char* name, const Fmatrix* values, u32 count);
 
-    void CommitStatic(ng::RenderContext* ctx);
+    void CommitStatic(fg::RenderContext* ctx);
 
     void InvalidateStatic(const char* name);
     void InvalidateAllStatic();

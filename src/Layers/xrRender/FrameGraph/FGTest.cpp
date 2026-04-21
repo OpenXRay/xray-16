@@ -4,9 +4,9 @@
 
 namespace xray::render::framegraph {
 
-namespace ng = xray::render::ng;
+namespace fg = xray::render::fg;
 
-void TestSimpleTriangle(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
+void TestSimpleTriangle(fg::RenderDevice* renderDevice, fg::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Triangle Test ===");
 
     FrameGraph fg(renderDevice);
@@ -28,10 +28,10 @@ void TestSimpleTriangle(ng::RenderDevice* renderDevice, ng::RenderContext* conte
 
     auto clearPass = fg.AddPass("Clear");
     fg.PassWrite(clearPass, backbufferHandle, ResourceState::RenderTarget);
-    fg.SetPassCallback(clearPass, [backbufferHandle](ng::RenderContext& ctx, const FrameGraph& fg) {
+    fg.SetPassCallback(clearPass, [backbufferHandle](fg::RenderContext& ctx, const FrameGraph& fg) {
         nvrhi::ITexture* rt = fg.GetPhysicalTexture(backbufferHandle);
 
-        ng::RenderPassDesc passDesc;
+        fg::RenderPassDesc passDesc;
         passDesc.renderTargets[0] = rt;
         passDesc.numRenderTargets = 1;
         passDesc.clearColor = true;
@@ -48,10 +48,10 @@ void TestSimpleTriangle(ng::RenderDevice* renderDevice, ng::RenderContext* conte
     auto trianglePass = fg.AddPass("RenderTriangle");
     fg.PassRead(trianglePass, backbufferHandle, ResourceState::RenderTarget);
     fg.PassWrite(trianglePass, backbufferHandle, ResourceState::RenderTarget);
-    fg.SetPassCallback(trianglePass, [backbufferHandle](ng::RenderContext& ctx, const FrameGraph& fg) {
+    fg.SetPassCallback(trianglePass, [backbufferHandle](fg::RenderContext& ctx, const FrameGraph& fg) {
         nvrhi::ITexture* rt = fg.GetPhysicalTexture(backbufferHandle);
 
-        ng::RenderPassDesc passDesc;
+        fg::RenderPassDesc passDesc;
         passDesc.renderTargets[0] = rt;
         passDesc.numRenderTargets = 1;
         passDesc.clearColor = false;
@@ -76,7 +76,7 @@ void TestSimpleTriangle(ng::RenderDevice* renderDevice, ng::RenderContext* conte
     Msg("=== FrameGraph Triangle Test Complete ===");
 }
 
-void TestTwoPassRender(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
+void TestTwoPassRender(fg::RenderDevice* renderDevice, fg::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Two-Pass Test ===");
 
     FrameGraph fg(renderDevice);
@@ -109,10 +109,10 @@ void TestTwoPassRender(ng::RenderDevice* renderDevice, ng::RenderContext* contex
 
     auto renderPass = fg.AddPass("RenderHDR");
     fg.PassWrite(renderPass, hdrBuffer, ResourceState::RenderTarget);
-    fg.SetPassCallback(renderPass, [hdrBuffer](ng::RenderContext& ctx, const FrameGraph& fg) {
+    fg.SetPassCallback(renderPass, [hdrBuffer](fg::RenderContext& ctx, const FrameGraph& fg) {
         nvrhi::ITexture* rt = fg.GetPhysicalTexture(hdrBuffer);
 
-        ng::RenderPassDesc passDesc;
+        fg::RenderPassDesc passDesc;
         passDesc.renderTargets[0] = rt;
         passDesc.numRenderTargets = 1;
         passDesc.clearColor = true;
@@ -131,11 +131,11 @@ void TestTwoPassRender(ng::RenderDevice* renderDevice, ng::RenderContext* contex
     auto tonemapPass = fg.AddPass("Tonemap");
     fg.PassRead(tonemapPass, hdrBuffer, ResourceState::ShaderResource);
     fg.PassWrite(tonemapPass, backbufferHandle, ResourceState::RenderTarget);
-    fg.SetPassCallback(tonemapPass, [hdrBuffer, backbufferHandle](ng::RenderContext& ctx, const FrameGraph& fg) {
+    fg.SetPassCallback(tonemapPass, [hdrBuffer, backbufferHandle](fg::RenderContext& ctx, const FrameGraph& fg) {
         nvrhi::ITexture* rt = fg.GetPhysicalTexture(backbufferHandle);
         nvrhi::ITexture* hdrTex = fg.GetPhysicalTexture(hdrBuffer);
 
-        ng::RenderPassDesc passDesc;
+        fg::RenderPassDesc passDesc;
         passDesc.renderTargets[0] = rt;
         passDesc.numRenderTargets = 1;
         passDesc.clearColor = true;
@@ -164,7 +164,7 @@ void TestTwoPassRender(ng::RenderDevice* renderDevice, ng::RenderContext* contex
     Msg("=== FrameGraph Two-Pass Test Complete ===");
 }
 
-void TestResourceAliasing(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
+void TestResourceAliasing(fg::RenderDevice* renderDevice, fg::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Resource Aliasing Test ===");
 
     FrameGraph fg(renderDevice);
@@ -223,21 +223,21 @@ void TestResourceAliasing(ng::RenderDevice* renderDevice, ng::RenderContext* con
     auto pass1 = fg.AddPass("HorizontalBlur");
     fg.PassRead(pass1, backbufferHandle, ResourceState::ShaderResource);
     fg.PassWrite(pass1, temp1, ResourceState::UnorderedAccess);
-    fg.SetPassCallback(pass1, [](ng::RenderContext& ctx, const FrameGraph& fg) {
+    fg.SetPassCallback(pass1, [](fg::RenderContext& ctx, const FrameGraph& fg) {
         Msg("  ~ Pass 1: Horizontal Blur (compute shader would go here)");
     });
 
     auto pass2 = fg.AddPass("VerticalBlur");
     fg.PassRead(pass2, temp1, ResourceState::ShaderResource);
     fg.PassWrite(pass2, temp2, ResourceState::UnorderedAccess);
-    fg.SetPassCallback(pass2, [](ng::RenderContext& ctx, const FrameGraph& fg) {
+    fg.SetPassCallback(pass2, [](fg::RenderContext& ctx, const FrameGraph& fg) {
         Msg("  ~ Pass 2: Vertical Blur");
     });
 
     auto pass3 = fg.AddPass("BloomThreshold");
     fg.PassRead(pass3, temp2, ResourceState::ShaderResource);
     fg.PassWrite(pass3, temp3, ResourceState::UnorderedAccess);
-    fg.SetPassCallback(pass3, [](ng::RenderContext& ctx, const FrameGraph& fg) {
+    fg.SetPassCallback(pass3, [](fg::RenderContext& ctx, const FrameGraph& fg) {
         Msg("  ~ Pass 3: Bloom Threshold");
     });
 
@@ -245,10 +245,10 @@ void TestResourceAliasing(ng::RenderDevice* renderDevice, ng::RenderContext* con
     fg.PassRead(pass4, temp3, ResourceState::ShaderResource);
     fg.PassRead(pass4, backbufferHandle, ResourceState::RenderTarget);
     fg.PassWrite(pass4, backbufferHandle, ResourceState::RenderTarget);
-    fg.SetPassCallback(pass4, [backbufferHandle](ng::RenderContext& ctx, const FrameGraph& fg) {
+    fg.SetPassCallback(pass4, [backbufferHandle](fg::RenderContext& ctx, const FrameGraph& fg) {
         nvrhi::ITexture* rt = fg.GetPhysicalTexture(backbufferHandle);
 
-        ng::RenderPassDesc passDesc;
+        fg::RenderPassDesc passDesc;
         passDesc.renderTargets[0] = rt;
         passDesc.numRenderTargets = 1;
         passDesc.clearColor = false;

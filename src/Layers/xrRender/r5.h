@@ -1,7 +1,7 @@
 #pragma once
 
-class CRender;
-
 namespace r5
 {
+    void InitializeFrameGraph();
+    void ShutdownFrameGraph();
 }

@@ -4,10 +4,10 @@
 
 namespace xray::render::resources {
 
-using xray::render::ng::ResourceHandle;
-using xray::render::ng::TextureHandle;
-using xray::render::ng::BufferHandle;
-using xray::render::ng::SamplerHandle;
+using xray::render::fg::ResourceHandle;
+using xray::render::fg::TextureHandle;
+using xray::render::fg::BufferHandle;
+using xray::render::fg::SamplerHandle;
 
 constexpr u32 INVALID_RESOURCE_INDEX = 0xFFFFFFFF;
 

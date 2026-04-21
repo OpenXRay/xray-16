@@ -4,7 +4,7 @@
 #include <nvrhi/nvrhi.h>
 #include <mutex>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;
 }
 
@@ -113,7 +113,7 @@ struct TextureMetadata {
 
 class TextureManager {
 public:
-    explicit TextureManager(xray::render::ng::RenderDevice* device);
+    explicit TextureManager(xray::render::fg::RenderDevice* device);
     ~TextureManager();
 
     TextureHandle LoadTexture(
@@ -186,7 +186,7 @@ public:
     StreamingManager* GetStreamingManager() { return m_streamingManager.get(); }
 
 private:
-    xray::render::ng::RenderDevice* m_device;
+    xray::render::fg::RenderDevice* m_device;
 
     xr_vector<TextureMetadata> m_textures;
     xr_vector<u32> m_freeSlots;

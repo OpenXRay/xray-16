@@ -24,7 +24,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 
 using namespace framegraph;
 
-void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 height, HiZBuildPassState& state)
+void InitializeHiZResources(fg::RenderDevice* device, u32 width, u32 height, HiZBuildPassState& state)
 {
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice) {
@@ -86,7 +86,7 @@ void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 height, HiZ
 
 HiZPyramidOutput setupHiZBuildPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     VirtualResourceHandle depthInput,
     u32 width,
     u32 height,
@@ -139,7 +139,7 @@ HiZPyramidOutput setupHiZBuildPass(
 
         [](const HiZBuildData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             if (!data.passState->computeEnabled || !data.passState->pipeline) {
                 return;

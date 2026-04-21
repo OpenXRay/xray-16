@@ -15,7 +15,7 @@ using namespace framegraph;
 
 struct DetailCullPassData {
     VirtualResourceHandle hiZPyramid;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     RENDER_NAMESPACE::FGDetailManager* detailManager;
     u32 hiZWidth;
     u32 hiZHeight;
@@ -28,7 +28,7 @@ struct DetailCullPassData {
 
 void setupDetailCullPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     RENDER_NAMESPACE::FGDetailManager* detailManager,
     VirtualResourceHandle hiZPyramid,
     u32 hiZWidth,
@@ -65,7 +65,7 @@ void setupDetailCullPass(
 
             data.hiZPyramid = passBuilder.read(hiZPyramid, ResourceState::ShaderResource);
         },
-        [](const DetailCullPassData& data, const FrameGraph& fg, ng::RenderContext* ctx)
+        [](const DetailCullPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
             ZoneScoped;
             ZoneName("DetailCullPass", 14);

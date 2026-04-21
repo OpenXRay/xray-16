@@ -77,7 +77,7 @@ void ShutdownTonemapPass(TonemapPassState& state) {
 
 framegraph::VirtualResourceHandle setupTonemapPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle hdrInput,
     framegraph::VirtualResourceHandle exposureTexture,
     framegraph::VirtualResourceHandle outputTarget,
@@ -130,7 +130,7 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
         [](const TonemapPassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             auto* ps = data.passState;
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();

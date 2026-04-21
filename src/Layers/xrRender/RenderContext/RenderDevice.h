@@ -14,7 +14,7 @@ namespace xray::render {
     class SlangCompiler;
 }
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 class RenderContext;
 

@@ -28,7 +28,7 @@ namespace xray::render::framegraph {
 
 namespace xray::render {
 
-namespace ng {
+namespace fg {
     class PipelineState;
     struct PipelineStateDesc;
 }
@@ -130,7 +130,7 @@ struct MaterialKey {
 };
 
 struct MaterialPSO {
-    ng::PipelineState* pso = nullptr;
+    fg::PipelineState* pso = nullptr;
 
     nvrhi::BindingLayoutHandle vsBindingLayout;
     nvrhi::BindingLayoutHandle psBindingLayout;
@@ -171,7 +171,7 @@ struct MaterialPSO {
         u32 slot;
         u32 size;
         shared_str name;
-        ng::BufferHandle vcbHandle;
+        fg::BufferHandle vcbHandle;
     };
     xr_vector<VCBRequirement> vcbRequirements;
 
@@ -246,7 +246,7 @@ nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat);
 class MaterialCache {
 public:
     MaterialCache(
-        ng::RenderDevice* device,
+        fg::RenderDevice* device,
         resources::FGResourceManager* resourceManager,
         framegraph::VolatileConstantBufferPool* vcbPool = nullptr
     );
@@ -282,7 +282,7 @@ public:
     framegraph::VolatileConstantBufferPool* GetVCBPool() const { return m_vcbPool; }
 
 private:
-    ng::RenderDevice* m_device;
+    fg::RenderDevice* m_device;
     resources::FGResourceManager* m_resourceManager;
     framegraph::VolatileConstantBufferPool* m_vcbPool;
     xr_map<MaterialKey, xr_unique_ptr<MaterialPSO>> m_cache;
@@ -370,15 +370,15 @@ public:
 
     u32 PreRegisterTerrainMaterial(dxRender_Visual* visual);
 
-    void FinalizePendingTerrainMaterials(ng::RenderContext* ctx);
+    void FinalizePendingTerrainMaterials(fg::RenderContext* ctx);
 
-    void FinalizePendingMaterials(ng::RenderContext* ctx);
+    void FinalizePendingMaterials(fg::RenderContext* ctx);
 
     xr_map<shared_str, nvrhi::ShaderHandle> m_shaderHandles;
 
     nvrhi::ShaderHandle GetOrCreateShaderVS(SVS* vs);
     nvrhi::ShaderHandle GetOrCreateShaderPS(SPS* ps);
-    void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
+    void SetupRenderStates(SPass* pass, fg::PipelineStateDesc& psoDesc);
 
     MaterialPSO* GetOrCreateFontPSO(
         dxFontRender* fontRender,
@@ -394,12 +394,12 @@ private:
 
     bool ValidateVertexLayoutCompatibility(dxRender_Visual* visual, MaterialPSO* matPSO);
 
-    void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc);
+    void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, fg::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
         MaterialPSO* matPSO,
         const framegraph::DefaultOutputLayout& outputs,
         const framegraph::FrameGraph& fg,
-        ng::PipelineStateDesc& psoDesc);
+        fg::PipelineStateDesc& psoDesc);
 };
 
 }

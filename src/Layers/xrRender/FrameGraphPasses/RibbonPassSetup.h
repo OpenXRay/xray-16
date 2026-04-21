@@ -5,7 +5,7 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -104,7 +104,7 @@ struct RibbonPassData {
     framegraph::VirtualResourceHandle inputColor;
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle depth;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     framegraph::DefaultOutputLayout outputs;
     u32 width;
     u32 height;
@@ -115,11 +115,11 @@ struct RibbonPassOutput {
     framegraph::DefaultOutputLayout layout;
 };
 
-void InitializeRibbonResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, RibbonPassState& state);
+void InitializeRibbonResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, RibbonPassState& state);
 
 RibbonPassOutput setupRibbonPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,

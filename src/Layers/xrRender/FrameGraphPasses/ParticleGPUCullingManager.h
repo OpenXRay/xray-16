@@ -5,7 +5,7 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
         class RenderContext;
     }
@@ -39,7 +39,7 @@ public:
     ParticleGPUCullingManager() = default;
     ~ParticleGPUCullingManager();
 
-    bool Initialize(ng::RenderDevice* device, u32 maxParticles);
+    bool Initialize(fg::RenderDevice* device, u32 maxParticles);
 
     void Shutdown();
 
@@ -76,7 +76,7 @@ private:
     bool CreateBindingLayouts();
     bool CreatePipelines();
 
-    ng::RenderDevice* m_device = nullptr;
+    fg::RenderDevice* m_device = nullptr;
     u32 m_maxParticles = 0;
     bool m_initialized = false;
 

@@ -9,7 +9,7 @@
 namespace xray::render {
     class GeometryCollector;
     class MaterialCache;
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -96,7 +96,7 @@ struct ForwardColorPassData {
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle drawArgsBuffer;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     const GeometryCollector* geometry;
     MaterialCache* materialCache;
     ForwardColorPassState* passState;
@@ -106,11 +106,11 @@ struct ForwardColorPassData {
     BindlessForwardConfig bindlessConfig;
 };
 
-void InitializeForwardResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ForwardColorPassState& state);
+void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ForwardColorPassState& state);
 
 framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depthInput,
     framegraph::VirtualResourceHandle colorInput,
     framegraph::VirtualResourceHandle normalInput,

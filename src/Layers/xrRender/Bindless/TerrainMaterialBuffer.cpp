@@ -11,7 +11,7 @@ TerrainMaterialBuffer& TerrainMaterialBuffer::Instance()
     return instance;
 }
 
-void TerrainMaterialBuffer::Initialize(ng::RenderDevice* device)
+void TerrainMaterialBuffer::Initialize(fg::RenderDevice* device)
 {
     if (IsInitialized())
         return;

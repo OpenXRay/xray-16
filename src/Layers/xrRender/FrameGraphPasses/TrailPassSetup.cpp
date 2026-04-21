@@ -154,7 +154,7 @@ static void EnsureDummyStateBuffer(nvrhi::IDevice* nvDevice, TrailPassState& sta
     state.dummyStateBuffer = nvDevice->createBuffer(desc);
 }
 
-void InitializeTrailResources(ng::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, TrailPassState& state)
+void InitializeTrailResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, TrailPassState& state)
 {
     if (state.initialized)
         return;
@@ -223,7 +223,7 @@ void InitializeTrailResources(ng::RenderDevice* device, const nvrhi::Framebuffer
 
 TrailPassOutput setupTrailPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     const DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
@@ -256,7 +256,7 @@ TrailPassOutput setupTrailPass(
             data.outputs.worldPos = forwardInputs.worldPos;
             data.outputs.depth = data.depth;
         },
-        [](const TrailPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const TrailPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             if (!data.passState)
                 return;
 

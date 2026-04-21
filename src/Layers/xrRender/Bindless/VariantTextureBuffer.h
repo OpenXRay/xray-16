@@ -16,7 +16,7 @@ class VariantTextureBuffer : public GPUStructuredBuffer<VariantTextureData> {
 public:
     static VariantTextureBuffer& Instance();
 
-    void Initialize(ng::RenderDevice* device);
+    void Initialize(fg::RenderDevice* device);
 
     void SetVariantTextures(u32 materialID, const VariantTextureData& data) { Set(materialID, data); }
     const VariantTextureData* GetVariantTextures(u32 materialID) const { return Get(materialID); }

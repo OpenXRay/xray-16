@@ -2,7 +2,7 @@
 
 #include "ResourceHandle.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 class ResourceManager;
 

@@ -8,7 +8,7 @@ namespace xray::render::framegraph {
 
 class FrameGraph;
 
-using PassExecuteCallback = std::function<void(xray::render::ng::RenderContext&, const FrameGraph&)>;
+using PassExecuteCallback = std::function<void(xray::render::fg::RenderContext&, const FrameGraph&)>;
 
 struct ResourceAccess {
     enum class Type : u8 {

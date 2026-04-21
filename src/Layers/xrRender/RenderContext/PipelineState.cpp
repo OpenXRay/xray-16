@@ -2,7 +2,7 @@
 #include "PipelineState.h"
 #include "RenderDevice.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 u64 PipelineStateDesc::ComputeHash() const {
     u64 hash = 0xcbf29ce484222325ull;

@@ -5,7 +5,7 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-namespace ng {
+namespace fg {
     class RenderDevice;
 }
 }
@@ -49,7 +49,7 @@ struct ObjectSplats {
 
 class OverlayManager {
 public:
-    void Initialize(ng::RenderDevice* device);
+    void Initialize(fg::RenderDevice* device);
     void Shutdown();
 
     void AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
@@ -73,7 +73,7 @@ public:
     const xr_map<CKinematics*, ObjectSplats>& GetDebugObjects() const { return m_objects; }
 
 private:
-    ng::RenderDevice* m_device = nullptr;
+    fg::RenderDevice* m_device = nullptr;
     xr_map<CKinematics*, ObjectSplats> m_objects;
     nvrhi::BufferHandle m_splatBuffer;
     xr_vector<GPUPaintSplat> m_gpuSplats;

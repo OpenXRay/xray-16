@@ -15,7 +15,7 @@ namespace xray::render {
     class GeometryCollector;
     struct GeometryBatch;
     class dxRender_Visual;
-    namespace ng {
+    namespace fg {
         class RenderDevice;
         class RenderContext;
     }
@@ -142,11 +142,11 @@ public:
     GPUCullingManager();
     ~GPUCullingManager();
 
-    void Initialize(ng::RenderDevice* device);
+    void Initialize(fg::RenderDevice* device);
 
     void Shutdown();
 
-    void UploadSceneObjects(ng::RenderContext* ctx, const GeometryCollector* geometry);
+    void UploadSceneObjects(fg::RenderContext* ctx, const GeometryCollector* geometry);
 
     void InvalidateStaticCullingData();
     void InvalidateShadersAndPipelines();
@@ -187,7 +187,7 @@ public:
     nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
     bool IsCompactionEnabled() const { return m_compactEnabled; }
 
-    void UploadInstanceData(ng::RenderContext* ctx, const GeometryCollector* geometry);
+    void UploadInstanceData(fg::RenderContext* ctx, const GeometryCollector* geometry);
 
     u32 GetTotalVertexCount() const { return m_totalVertexCount; }
     u32 GetTotalIndexCount() const { return m_totalIndexCount; }
@@ -217,7 +217,7 @@ public:
 
     bool IsDebugEnabled() const;
 
-    void UploadParticleBatches(ng::RenderContext* ctx, const xr_vector<passes::ParticleBatch>* batches);
+    void UploadParticleBatches(fg::RenderContext* ctx, const xr_vector<passes::ParticleBatch>* batches);
 
     GPUParticleCullOutput SetupParticleCullingPass(
         framegraph::FrameGraph& fg,
@@ -293,7 +293,7 @@ public:
 
     void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
 
-    void UploadSkinnedObjects(ng::RenderContext* ctx, const GeometryCollector* geometry);
+    void UploadSkinnedObjects(fg::RenderContext* ctx, const GeometryCollector* geometry);
 
     void SetupSkinnedCullingPass(
         framegraph::FrameGraph& fg,
@@ -342,11 +342,11 @@ public:
     nvrhi::IBuffer* GetTerrainCompactMaterialIDBuffer() const { return m_terrainCompactMaterialIDBuffer.Get(); }
 
 private:
-    void CreateBuffers(ng::RenderDevice* device);
-    void CreateComputePipeline(ng::RenderDevice* device);
-    void CreateCompactionResources(ng::RenderDevice* device);
-    void CreateDebugResources(ng::RenderDevice* device);
-    void CreateParticleResources(ng::RenderDevice* device);
+    void CreateBuffers(fg::RenderDevice* device);
+    void CreateComputePipeline(fg::RenderDevice* device);
+    void CreateCompactionResources(fg::RenderDevice* device);
+    void CreateDebugResources(fg::RenderDevice* device);
+    void CreateParticleResources(fg::RenderDevice* device);
     void CreateMegaBuffers();
 
     void ExtractFrustumPlanes(Fmatrix& viewProj, Fvector4* outPlanes);
@@ -376,7 +376,7 @@ private:
     CullSetBuffers m_staticSet;
     CullSetBuffers m_dynamicSet;
 
-    ng::BufferHandle m_cullParamsCB;
+    fg::BufferHandle m_cullParamsCB;
 
     nvrhi::ComputePipelineHandle m_cullPipeline;
     nvrhi::ComputePipelineHandle m_clearArgsPipeline;
@@ -390,16 +390,16 @@ private:
     nvrhi::BindingLayoutHandle m_compactScatterLayout;
     nvrhi::SamplerHandle m_pointSampler;
 
-    ng::BufferHandle m_compactParamsCB;
+    fg::BufferHandle m_compactParamsCB;
 
     nvrhi::ComputePipelineHandle m_variantPartitionPipeline;
     nvrhi::BindingLayoutHandle m_variantPartitionLayout;
-    ng::BufferHandle m_variantPartitionParamsCB;
+    fg::BufferHandle m_variantPartitionParamsCB;
     VariantPartitionBuffers m_staticPartition;
     VariantPartitionBuffers m_transparentPartition;
     bool m_variantPartitionEnabled = false;
 
-    void CreateVariantPartitionResources(ng::RenderDevice* device);
+    void CreateVariantPartitionResources(fg::RenderDevice* device);
     void InitPartitionBuffers(nvrhi::IDevice* nvDevice, VariantPartitionBuffers& part,
         const char* prefix, u32 variantCount, u32 maxObjects);
     void DispatchVariantPartition(
@@ -437,8 +437,8 @@ private:
     CullSetBuffers m_transparentSet;
 
     nvrhi::BufferHandle m_debugBuffer;
-    ng::BufferHandle m_debugComputeParamsCB;
-    ng::BufferHandle m_debugGraphicsParamsCB;
+    fg::BufferHandle m_debugComputeParamsCB;
+    fg::BufferHandle m_debugGraphicsParamsCB;
 
     nvrhi::ComputePipelineHandle m_debugComputePipeline;
     nvrhi::ComputePipelineHandle m_particleDebugComputePipeline;
@@ -451,7 +451,7 @@ private:
     nvrhi::BufferHandle m_particleBuffer;
     nvrhi::BufferHandle m_particleDrawArgsBuffer;
     nvrhi::BufferHandle m_particleVisibleCountBuffer;
-    ng::BufferHandle m_particleCullParamsCB;
+    fg::BufferHandle m_particleCullParamsCB;
     nvrhi::ComputePipelineHandle m_particleCullPipeline;
     nvrhi::BindingLayoutHandle m_particleCullLayout;
 
@@ -460,7 +460,7 @@ private:
     bool m_particleCullEnabled = false;
     xr_vector<GPUParticleData> m_particleData;
     xr_vector<IndirectDrawArgs> m_particleDrawArgsData;
-    ng::RenderDevice* m_device = nullptr;
+    fg::RenderDevice* m_device = nullptr;
     RTAccelStructManager* m_rtAccelMgr = nullptr;
     u32 m_objectCount = 0;
     u32 m_maxObjects = 0;
@@ -518,7 +518,7 @@ private:
     u32 m_currentBoneOffset = 0;
     bool m_boneBufferInitialized = false;
 
-    void CreateSkinnedCullingBuffers(ng::RenderDevice* device);
+    void CreateSkinnedCullingBuffers(fg::RenderDevice* device);
     void EnsureSkinnedBufferCapacity(u32 count);
     void UploadSkeletonBones(nvrhi::ICommandList* cmdList, CKinematics* skeleton, u32 boneOffset);
 

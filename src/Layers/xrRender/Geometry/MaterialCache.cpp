@@ -199,7 +199,7 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
 }
 
 MaterialCache::MaterialCache(
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     resources::FGResourceManager* resourceManager,
     framegraph::VolatileConstantBufferPool* vcbPool)
     : m_device(device)
@@ -466,7 +466,7 @@ MaterialPSO* MaterialCache::CreatePSO(
     LogConstantLayout(pso->constantLayout, shaderName);
 #endif
 
-    ng::PipelineStateDesc psoDesc;
+    fg::PipelineStateDesc psoDesc;
     psoDesc.vertexShader = nvrhiVS.Get();
     psoDesc.pixelShader = nvrhiPS.Get();
 
@@ -484,21 +484,21 @@ MaterialPSO* MaterialCache::CreatePSO(
     case RenderPassType::ForwardColor:
         psoDesc.depthStencilState.depthTestEnable = true;
         psoDesc.depthStencilState.depthWriteEnable = true;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::LessEqual;
+        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::LessEqual;
         psoDesc.depthStencilState.stencilEnable = false;
         break;
 
     case RenderPassType::HUD:
         psoDesc.depthStencilState.depthTestEnable = true;
         psoDesc.depthStencilState.depthWriteEnable = true;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::LessEqual;
+        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::LessEqual;
         psoDesc.depthStencilState.stencilEnable = false;
         break;
 
     case RenderPassType::DepthPrepass:
         psoDesc.depthStencilState.depthTestEnable = true;
         psoDesc.depthStencilState.depthWriteEnable = true;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::Less;
         psoDesc.depthStencilState.stencilEnable = false;
         break;
 
@@ -517,12 +517,12 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     psoDesc.debugName = pso->debugName;
 
-    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    fg::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
         return nullptr;
     }
 
-    ng::PipelineState* nvrhiPSO = nullptr;
+    fg::PipelineState* nvrhiPSO = nullptr;
 
     try {
         nvrhiPSO = psoCache->GetOrCreate(psoDesc);
@@ -771,7 +771,7 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                     cbReq.size
                 );
 
-                ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(layout);
+                fg::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(layout);
 
                 MaterialPSO::VCBRequirement req;
                 req.slot = cbReq.vsSlot;
@@ -1053,7 +1053,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     xr_vector<TempBinding> vsBindings;
 
     for (const auto& vcbReq : matPSO->vcbRequirements) {
-        ng::BufferHandle latestHandle = m_vcbPool->GetOrCreateVCB(
+        fg::BufferHandle latestHandle = m_vcbPool->GetOrCreateVCB(
             framegraph::VolatileConstantBufferPool::CBLayout(
                 vcbReq.name.c_str(), vcbReq.slot, vcbReq.size
             )
@@ -1345,7 +1345,7 @@ bool MaterialCache::ValidateVertexLayoutCompatibility(dxRender_Visual* visual, M
     return true;
 }
 
-void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc)
+void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, fg::PipelineStateDesc& psoDesc)
 {
     psoDesc.vertexAttributes.clear();
 
@@ -1430,7 +1430,7 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* 
                 continue;
             }
 
-            ng::VertexAttribute attr;
+            fg::VertexAttribute attr;
             attr.semanticName = matchingDeclElem->SemanticName;
             attr.semanticIndex = matchingDeclElem->SemanticIndex;
             attr.format = ConvertDxgiFormatToNvrhi(matchingDeclElem->Format);
@@ -1444,17 +1444,17 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* 
     }
 }
 
-void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc)
+void MaterialCache::SetupRenderStates(SPass* pass, fg::PipelineStateDesc& psoDesc)
 {
     VERIFY(pass);
 
     SState* xrState = pass->state._get();
     if (!xrState || !xrState->state) {
-        psoDesc.rasterizerState.cullMode = ng::CullMode::Back;
-        psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
+        psoDesc.rasterizerState.cullMode = fg::CullMode::Back;
+        psoDesc.rasterizerState.fillMode = fg::FillMode::Solid;
         psoDesc.depthStencilState.depthTestEnable = true;
         psoDesc.depthStencilState.depthWriteEnable = true;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::Less;
         psoDesc.blendState.renderTargets[0].blendEnable = false;
         return;
     }
@@ -1547,7 +1547,7 @@ void MaterialCache::SetupRenderTargets(
     MaterialPSO* matPSO,
     const framegraph::DefaultOutputLayout& outputs,
     const framegraph::FrameGraph& fg,
-    ng::PipelineStateDesc& psoDesc)
+    fg::PipelineStateDesc& psoDesc)
 {
     nvrhi::ITexture* albedoTex = fg.GetPhysicalTexture(outputs.albedo);
     nvrhi::ITexture* depthTex = fg.GetPhysicalTexture(outputs.depth);
@@ -1697,7 +1697,7 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
         }
     }
 
-    ng::PipelineStateDesc psoDesc;
+    fg::PipelineStateDesc psoDesc;
     psoDesc.vertexShader = materialVS.Get();
     psoDesc.pixelShader = nullptr;
 
@@ -1712,15 +1712,15 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
 
     psoDesc.depthStencilState.depthTestEnable = true;
     psoDesc.depthStencilState.depthWriteEnable = true;
-    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+    psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::Less;
     psoDesc.depthStencilState.stencilEnable = false;
 
-    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    fg::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
         return nullptr;
     }
 
-    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    fg::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
     if (!nvrhiPSO) {
         Msg("! [MaterialCache::CreateDepthPSO] PSO creation failed");
         return nullptr;
@@ -1889,7 +1889,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     CreateBindingLayouts(pso.get());
 
-    ng::PipelineStateDesc psoDesc;
+    fg::PipelineStateDesc psoDesc;
     psoDesc.vertexShader = nvrhiVS.Get();
     psoDesc.pixelShader = nvrhiPS.Get();
 
@@ -1919,7 +1919,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
             continue;
         }
 
-        ng::VertexAttribute attr;
+        fg::VertexAttribute attr;
         attr.semanticName = shaderElem.semanticName.c_str();
         attr.semanticIndex = shaderElem.semanticIndex;
         attr.format = it->second.format;
@@ -1959,7 +1959,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     if (hasDepth) {
         psoDesc.depthStencilFormat = fbDesc.depthAttachment.texture->getDesc().format;
         psoDesc.depthStencilState.depthTestEnable = true;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Always;
+        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::Always;
         psoDesc.depthStencilState.depthWriteEnable = false;
         psoDesc.depthStencilState.stencilEnable = true;
     } else {
@@ -1969,16 +1969,16 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     }
 
     psoDesc.blendState.renderTargets[0].blendEnable = true;
-    psoDesc.blendState.renderTargets[0].srcBlend = ng::BlendFactor::SrcAlpha;
-    psoDesc.blendState.renderTargets[0].dstBlend = ng::BlendFactor::InvSrcAlpha;
-    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::SrcAlpha;
-    psoDesc.blendState.renderTargets[0].dstBlendAlpha = ng::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].srcBlend = fg::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlend = fg::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].srcBlendAlpha = fg::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlendAlpha = fg::BlendFactor::InvSrcAlpha;
 
-    psoDesc.rasterizerState.cullMode = ng::CullMode::None;
+    psoDesc.rasterizerState.cullMode = fg::CullMode::None;
     psoDesc.rasterizerState.frontCounterClockwise = false;
     psoDesc.rasterizerState.scissorEnable = true;
 
-    psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
+    psoDesc.primitiveTopology = fg::PrimitiveTopology::TriangleList;
 
     if (pso->vsBindingLayout) {
         psoDesc.bindingLayouts.push_back(pso->vsBindingLayout);
@@ -1994,13 +1994,13 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     psoDesc.debugName = "UI_PSO";
 
-    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    fg::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
         Msg("! [MaterialCache::CreateUIPSO] No PSO cache");
         return nullptr;
     }
 
-    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    fg::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
     if (!nvrhiPSO) {
         Msg("! [MaterialCache::CreateUIPSO] Failed to create pipeline state");
         return nullptr;
@@ -2126,7 +2126,7 @@ MaterialPSO* MaterialCache::CreateFontPSO(
 
     CreateBindingLayouts(pso.get());
 
-    ng::PipelineStateDesc psoDesc;
+    fg::PipelineStateDesc psoDesc;
     psoDesc.vertexShader = nvrhiVS.Get();
     psoDesc.pixelShader = nvrhiPS.Get();
 
@@ -2150,7 +2150,7 @@ MaterialPSO* MaterialCache::CreateFontPSO(
             continue;
         }
 
-        ng::VertexAttribute attr;
+        fg::VertexAttribute attr;
         attr.semanticName = shaderElem.semanticName.c_str();
         attr.semanticIndex = shaderElem.semanticIndex;
         attr.format = it->second.format;
@@ -2191,17 +2191,17 @@ MaterialPSO* MaterialCache::CreateFontPSO(
 
     psoDesc.blendState.alphaToCoverageEnable = false;
     psoDesc.blendState.renderTargets[0].blendEnable = true;
-    psoDesc.blendState.renderTargets[0].srcBlend = ng::BlendFactor::SrcAlpha;
-    psoDesc.blendState.renderTargets[0].dstBlend = ng::BlendFactor::InvSrcAlpha;
-    psoDesc.blendState.renderTargets[0].blendOp = ng::BlendOp::Add;
-    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::SrcAlpha;
-    psoDesc.blendState.renderTargets[0].dstBlendAlpha = ng::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].srcBlend = fg::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlend = fg::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].blendOp = fg::BlendOp::Add;
+    psoDesc.blendState.renderTargets[0].srcBlendAlpha = fg::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlendAlpha = fg::BlendFactor::InvSrcAlpha;
 
-    psoDesc.rasterizerState.cullMode = ng::CullMode::None;
+    psoDesc.rasterizerState.cullMode = fg::CullMode::None;
     psoDesc.rasterizerState.frontCounterClockwise = false;
     psoDesc.rasterizerState.scissorEnable = true;
 
-    psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
+    psoDesc.primitiveTopology = fg::PrimitiveTopology::TriangleList;
 
     if (pso->vsBindingLayout) {
         psoDesc.bindingLayouts.push_back(pso->vsBindingLayout);
@@ -2217,13 +2217,13 @@ MaterialPSO* MaterialCache::CreateFontPSO(
 
     psoDesc.debugName = "Font_PSO";
 
-    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    fg::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
         Msg("! [MaterialCache::CreateFontPSO] No PSO cache");
         return nullptr;
     }
 
-    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    fg::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
     if (!nvrhiPSO) {
         Msg("! [MaterialCache::CreateFontPSO] Failed to create pipeline state");
         return nullptr;
@@ -2459,7 +2459,7 @@ u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
     return terrainMaterialID;
 }
 
-void MaterialCache::FinalizePendingTerrainMaterials(ng::RenderContext* ctx)
+void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
 {
     using namespace RENDER_NAMESPACE::bindless;
 
@@ -2774,7 +2774,7 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
     return materialID;
 }
 
-void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
+void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
 {
     using namespace RENDER_NAMESPACE::bindless;
 

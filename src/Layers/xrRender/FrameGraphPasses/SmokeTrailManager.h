@@ -5,7 +5,7 @@
 #include "TrailPassSetup.h"
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;
 }
 
@@ -73,7 +73,7 @@ public:
     SmokeTrailManager()  = default;
     ~SmokeTrailManager() { Shutdown(); }
 
-    bool Initialize(ng::RenderDevice* device);
+    bool Initialize(fg::RenderDevice* device);
     void Shutdown();
 
     void Update(float dt, const Fvector& muzzlePos, const Fvector& muzzleDir);
@@ -108,7 +108,7 @@ private:
     SmokeSimParams     m_simParams     = {};
     SmokeCompactParams m_compactParams = {};
 
-    ng::RenderDevice* m_device      = nullptr;
+    fg::RenderDevice* m_device      = nullptr;
     bool              m_initialized = false;
 };
 

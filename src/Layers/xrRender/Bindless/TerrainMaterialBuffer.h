@@ -9,7 +9,7 @@ class TerrainMaterialBuffer : public GPUStructuredBuffer<TerrainMaterialData> {
 public:
     static TerrainMaterialBuffer& Instance();
 
-    void Initialize(ng::RenderDevice* device);
+    void Initialize(fg::RenderDevice* device);
     void Shutdown();
 
     u32 RegisterMaterial(const TerrainMaterialData& material);

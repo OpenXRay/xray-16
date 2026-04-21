@@ -5,7 +5,7 @@
 #include "FrameGraph/ShaderCache.h"
 #include "FrameGraph/ShaderLoader.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 void ImGuiRendererNVRHI::UploadDrawData(ImDrawData* drawData, nvrhi::ICommandList* cmdList)
 {

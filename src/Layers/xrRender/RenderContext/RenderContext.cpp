@@ -2,7 +2,7 @@
 #include "RenderContext.h"
 #include "RenderDevice.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 RenderContext::RenderContext(RenderDevice* device,
                              nvrhi::CommandListHandle commandList)

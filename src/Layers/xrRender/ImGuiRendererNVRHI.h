@@ -6,7 +6,7 @@
 #include <imgui.h>
 #include <map>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 class ImGuiRendererNVRHI : public IImGuiRender {
 public:

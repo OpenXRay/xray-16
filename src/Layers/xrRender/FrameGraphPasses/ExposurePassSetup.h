@@ -5,7 +5,7 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -49,7 +49,7 @@ struct ExposurePassData {
     framegraph::VirtualResourceHandle sceneColor;
     framegraph::VirtualResourceHandle exposureTexture;
     framegraph::VirtualResourceHandle histogramBuffer;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     ExposureConfig config;
     float deltaTime;
     u32 width;
@@ -62,11 +62,11 @@ struct ExposureOutput {
     framegraph::VirtualResourceHandle histogramBuffer;
 };
 
-void InitializeExposureResources(ng::RenderDevice* device, ExposurePassState& state);
+void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& state);
 
 ExposureOutput setupExposurePass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle hdrSceneColor,
     const ExposureConfig& config,
     float deltaTime,

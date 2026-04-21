@@ -29,7 +29,7 @@ struct alignas(16) OverlayPaintCB {
     u32 pad;
 };
 
-void InitializeOverlayPaintResources(ng::RenderDevice* device, OverlayPaintPassState& state)
+void InitializeOverlayPaintResources(fg::RenderDevice* device, OverlayPaintPassState& state)
 {
     if (state.initialized)
         return;
@@ -67,7 +67,7 @@ void InitializeOverlayPaintResources(ng::RenderDevice* device, OverlayPaintPassS
 
 void setupOverlayPaintPass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     decals::OverlayManager* overlayMgr,
     OverlayPaintPassState& state)
 {
@@ -83,7 +83,7 @@ void setupOverlayPaintPass(
         return;
 
     struct OverlayPaintPassData {
-        ng::RenderDevice* device;
+        fg::RenderDevice* device;
         decals::OverlayManager* overlayMgr;
         xr_vector<decals::PaintCommand> commands;
         OverlayPaintPassState* passState;
@@ -103,7 +103,7 @@ void setupOverlayPaintPass(
             overlayMgr->ClearPendingPaints();
         },
 
-        [](const OverlayPaintPassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
+        [](const OverlayPaintPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
             auto& cache = GetPassResourceCache();

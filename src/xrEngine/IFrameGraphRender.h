@@ -3,7 +3,7 @@
 #include "xrEngine/Engine.h"
 
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
     class MaterialCache;
@@ -27,7 +27,7 @@ public:
     virtual void SetEnabled(bool enabled) = 0;
     virtual bool IsEnabled() const = 0;
 
-    virtual xray::render::ng::RenderDevice* GetRenderDevice() const = 0;
+    virtual xray::render::fg::RenderDevice* GetRenderDevice() const = 0;
     virtual xray::render::MaterialCache* GetMaterialCache() const = 0;
     virtual xray::render::MaterialCache* GetUIMaterialCache() const = 0;
     virtual xray::render::ui::UIRenderCollector* GetUICollector() const = 0;

@@ -44,7 +44,7 @@ nvrhi::ITexture* GetExposureTexture(const ExposurePassState& state)
     return state.exposureTexture.Get();
 }
 
-void InitializeExposureResources(ng::RenderDevice* device, ExposurePassState& state)
+void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& state)
 {
     if (state.initialized)
         return;
@@ -160,7 +160,7 @@ static float ComputeFallbackExposure(const ExposureConfig& config, float deltaTi
 
 ExposureOutput setupExposurePass(
     FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     VirtualResourceHandle hdrSceneColor,
     const ExposureConfig& config,
     float deltaTime,
@@ -212,7 +212,7 @@ ExposureOutput setupExposurePass(
 
         [](const ExposurePassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             auto* ps = data.passState;

@@ -59,7 +59,7 @@ static const u16 hbox_faces[20 * 3] = {
     4,   6, 11
 };
 
-void InitializeSkyGeometry(ng::RenderDevice* device, SkyPassState& state) {
+void InitializeSkyGeometry(fg::RenderDevice* device, SkyPassState& state) {
     if (state.initialized || !device) return;
 
     auto* nvrhiDevice = device->GetNVRHIDevice();
@@ -179,7 +179,7 @@ void ShutdownSkyGeometry(SkyPassState& state) {
 
 framegraph::VirtualResourceHandle setupSkyPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle colorInput,
     framegraph::VirtualResourceHandle depthInput,
     CEnvironment* environment,
@@ -212,7 +212,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
 
         [](const SkyPassData& data,
            const FrameGraph& fg,
-           ng::RenderContext* ctx) {
+           fg::RenderContext* ctx) {
 
             if (!data.environment || !data.passState->initialized) {
                 return;

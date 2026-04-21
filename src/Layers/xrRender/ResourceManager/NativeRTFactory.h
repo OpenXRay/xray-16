@@ -3,7 +3,7 @@
 #include "ResourceHandle.h"
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;
 }
 
@@ -13,7 +13,7 @@ class TextureManager;
 
 class NativeRTFactory {
 public:
-    explicit NativeRTFactory(xray::render::ng::RenderDevice* device, TextureManager* textureManager);
+    explicit NativeRTFactory(xray::render::fg::RenderDevice* device, TextureManager* textureManager);
     ~NativeRTFactory();
 
     TextureHandle CreatePositionBuffer(u32 width, u32 height, const char* name = "rt_Position");
@@ -101,7 +101,7 @@ private:
         shared_str name;
     };
 
-    xray::render::ng::RenderDevice* m_device;
+    xray::render::fg::RenderDevice* m_device;
     TextureManager* m_textureManager;
     xr_vector<ManagedRT> m_managedRTs;
 

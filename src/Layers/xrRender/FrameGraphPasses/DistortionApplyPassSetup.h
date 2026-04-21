@@ -8,7 +8,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::ng {
+namespace xray::render::fg {
     class RenderDevice;
 }
 
@@ -24,7 +24,7 @@ void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassSt
 
 framegraph::VirtualResourceHandle setupDistortionApplyPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle sceneColor,
     framegraph::VirtualResourceHandle distortionRT,
     framegraph::VirtualResourceHandle worldPos,

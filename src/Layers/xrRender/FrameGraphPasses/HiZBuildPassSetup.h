@@ -5,7 +5,7 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-    namespace ng {
+    namespace fg {
         class RenderDevice;
     }
 }
@@ -29,7 +29,7 @@ struct HiZBuildPassState {
 struct HiZBuildData {
     framegraph::VirtualResourceHandle depthInput;
     framegraph::VirtualResourceHandle hizPyramid;
-    ng::RenderDevice* device;
+    fg::RenderDevice* device;
     u32 width;
     u32 height;
     u32 mipLevels;
@@ -43,11 +43,11 @@ struct HiZPyramidOutput {
     u32 height;
 };
 
-void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 height, HiZBuildPassState& state);
+void InitializeHiZResources(fg::RenderDevice* device, u32 width, u32 height, HiZBuildPassState& state);
 
 HiZPyramidOutput setupHiZBuildPass(
     framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
+    fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depthInput,
     u32 width,
     u32 height,

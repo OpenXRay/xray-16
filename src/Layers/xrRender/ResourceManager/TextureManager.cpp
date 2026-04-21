@@ -7,7 +7,7 @@
 
 namespace xray::render::resources {
 
-using namespace xray::render::ng;
+using namespace xray::render::fg;
 
 u64 TextureDesc::CalculateMemorySize(u32 startMip, u32 mipCount) const {
     if (mipCount == 0) {
@@ -582,7 +582,7 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         return;
     }
 
-    ng::RenderDevice::TextureDesc deviceDesc;
+    fg::RenderDevice::TextureDesc deviceDesc;
     deviceDesc.width = ddsData.desc.width;
     deviceDesc.height = ddsData.desc.height;
     deviceDesc.depth = ddsData.desc.depth;
@@ -593,31 +593,31 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
 
     switch (ddsData.desc.type) {
         case TextureDesc::Texture1D:
-            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture1D;
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture1D;
             break;
         case TextureDesc::Texture2D:
-            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture2D;
             break;
         case TextureDesc::Texture3D:
-            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture3D;
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture3D;
             break;
         case TextureDesc::TextureCube:
-            deviceDesc.dimension = ng::RenderDevice::TextureDesc::TextureCube;
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::TextureCube;
             break;
     }
 
-    ng::TextureHandle deviceHandle = m_device->CreateTexture(deviceDesc, nullptr);
+    fg::TextureHandle deviceHandle = m_device->CreateTexture(deviceDesc, nullptr);
     if (!deviceHandle.IsValid()) {
         Msg("! [TextureManager] Failed to create NVRHI texture: %s", meta.filePath.c_str());
         meta.state = TextureState::Unloaded;
         return;
     }
 
-    xr_vector<ng::RenderDevice::TextureSliceData> slices;
+    xr_vector<fg::RenderDevice::TextureSliceData> slices;
     slices.reserve(ddsData.mipLevels.size());
 
     for (const DDSMipLevel& mip : ddsData.mipLevels) {
-        ng::RenderDevice::TextureSliceData slice;
+        fg::RenderDevice::TextureSliceData slice;
 
         u32 totalMips = ddsData.desc.mipLevels;
         u32 mipIndex = (u32)(&mip - &ddsData.mipLevels[0]);

@@ -7,7 +7,7 @@
 #include "Layers/xrRender_R2/r2.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 
-namespace xray::render::ng {
+namespace xray::render::fg {
 
 ImGuiRendererNVRHI::ImGuiRendererNVRHI(RenderDevice* renderDevice)
     : m_renderDevice(renderDevice)
@@ -151,7 +151,7 @@ bool ImGuiRendererNVRHI::CreateDeviceObjects()
     cbDesc.byteSize = sizeof(ImGuiConstants);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = ng::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    cbDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     cbDesc.debugName = "ImGui Constants";
     m_constantBuffer = m_device->createBuffer(cbDesc);
 

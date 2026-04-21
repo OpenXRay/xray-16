@@ -4,7 +4,7 @@
 #include <array>
 #include "xrCore/xrCore.h"
 
-namespace xray::render::ng { class RenderDevice; }
+namespace xray::render::fg { class RenderDevice; }
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -48,7 +48,7 @@ class ClusteredLightManager {
 public:
     static ClusteredLightManager& Instance();
 
-    void Initialize(ng::RenderDevice* device);
+    void Initialize(fg::RenderDevice* device);
     void Shutdown();
     void BeginFrame();
     void CollectLight(const light* L);

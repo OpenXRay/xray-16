@@ -16,11 +16,11 @@ namespace xray::profiler {
 
 namespace xray::render::framegraph {
 
-namespace ng = xray::render::ng;
+namespace fg = xray::render::fg;
 
 class FrameGraph {
 public:
-    FrameGraph(ng::RenderDevice* renderDevice);
+    FrameGraph(fg::RenderDevice* renderDevice);
     ~FrameGraph();
 
     VirtualResourceHandle CreateTexture(const char* name, const ResourceDesc& desc);
@@ -59,7 +59,7 @@ public:
     PassData& addCallbackPass(
         const char* name,
         std::function<void(FrameGraph&, PassHandle, PassData&)> setupFunc,
-        std::function<void(const PassData&, const FrameGraph&, ng::RenderContext*)> executeFunc)
+        std::function<void(const PassData&, const FrameGraph&, fg::RenderContext*)> executeFunc)
     {
         PassHandle passHandle = AddPass(name);
 
@@ -67,7 +67,7 @@ public:
 
         setupFunc(*this, passHandle, *passData);
 
-        PassExecuteCallback callback = [passData, executeFunc](ng::RenderContext& ctx, const FrameGraph& fg) {
+        PassExecuteCallback callback = [passData, executeFunc](fg::RenderContext& ctx, const FrameGraph& fg) {
             executeFunc(*passData, fg, &ctx);
         };
 
@@ -76,7 +76,7 @@ public:
         return *passData;
     }
 
-    void SetRenderContext(ng::RenderContext* context) { m_context = context; }
+    void SetRenderContext(fg::RenderContext* context) { m_context = context; }
 
     void SetGPUProfiler(xray::profiler::GPUProfiler* profiler) { m_gpuProfiler = profiler; }
 
@@ -133,9 +133,9 @@ public:
 
 private:
 
-    ng::RenderDevice* m_renderDevice;
+    fg::RenderDevice* m_renderDevice;
     nvrhi::IDevice* m_device;
-    ng::RenderContext* m_context = nullptr;
+    fg::RenderContext* m_context = nullptr;
     xray::profiler::GPUProfiler* m_gpuProfiler = nullptr;
     nvrhi::ICommandList* m_computeCommandList = nullptr;
     IRenderBackend* m_asyncComputeBackend = nullptr;

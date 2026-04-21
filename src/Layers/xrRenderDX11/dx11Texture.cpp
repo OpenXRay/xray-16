@@ -8,7 +8,7 @@
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include <nvrhi/nvrhi.h>
 
-using namespace xray::render::ng;
+using namespace xray::render::fg;
 using namespace xray::render::resources;
 
 namespace xray::render::RENDER_NAMESPACE
