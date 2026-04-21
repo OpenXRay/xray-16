@@ -37,117 +37,6 @@ void dxUIRender::SetAlphaRef(int aref)
     // CHK_DX(HW.pDevice->SetRenderState(D3DRS_ALPHAREF,aref));
     RCache.set_AlphaRef(aref);
 }
-/*
-void dxUIRender::StartTriList(u32 iMaxVerts)
-{
-    VERIFY(PrimitiveType==ptNone);
-    m_PointType = pttLIT;
-    m_iMaxVerts = iMaxVerts;
-    start_pv	= (FVF::LIT*)RImplementation.Vertex.Lock	(m_iMaxVerts,hGeom_fan.stride(),vOffset);
-    pv			= start_pv;
-    PrimitiveType = ptTriList;
-}
-
-void dxUIRender::FlushTriList()
-{
-    VERIFY(PrimitiveType==ptTriList);
-    VERIFY(u32(pv-start_pv)<=m_iMaxVerts);
-
-    std::ptrdiff_t p_cnt		= (pv-start_pv)/3;
-    RImplementation.Vertex.Unlock		(u32(pv-start_pv),hGeom_fan.stride());
-    RCache.set_Geometry			(hGeom_fan);
-    // TODO: TEMPORARILY DISABLED - NVRHI texture uploads corrupt D3D11 state
-    // if (p_cnt!=0)RCache.Render	(D3DPT_TRIANGLELIST,vOffset,u32(p_cnt));
-
-    PrimitiveType = ptNone;
-}
-
-void dxUIRender::StartTriFan(u32 iMaxVerts)
-{
-    VERIFY(PrimitiveType==ptNone);
-    m_iMaxVerts = iMaxVerts;
-    start_pv	= (FVF::LIT*)RImplementation.Vertex.Lock	(m_iMaxVerts,hGeom_fan.stride(),vOffset);
-    pv			= start_pv;
-    PrimitiveType = ptTriFan;
-    m_PointType	= pttLIT;
-
-}
-
-void dxUIRender::FlushTriFan()
-{
-    VERIFY(PrimitiveType==ptTriFan);
-    VERIFY(u32(pv-start_pv)<=m_iMaxVerts);
-
-    std::ptrdiff_t p_cnt		= pv-start_pv;
-    RImplementation.Vertex.Unlock		(u32(p_cnt),hGeom_fan.stride());
-    RCache.set_Geometry	 		(hGeom_fan);
-    // TODO: TEMPORARILY DISABLED - NVRHI texture uploads corrupt D3D11 state
-    // if (p_cnt>2) RCache.Render	(D3DPT_TRIANGLEFAN,vOffset,u32(p_cnt-2));
-
-    PrimitiveType = ptNone;
-}
-
-void dxUIRender::StartTriStrip(u32 iMaxVerts)
-{
-    VERIFY(PrimitiveType==ptNone);
-    m_iMaxVerts = iMaxVerts;
-    start_pv	= (FVF::TL*)RImplementation.Vertex.Lock	(m_iMaxVerts,hGeom_fan.stride(),vOffset);
-    pv			= start_pv;
-    PrimitiveType = ptTriStrip;
-}
-
-void dxUIRender::FlushTriStrip()
-{
-}
-
-
-void dxUIRender::StartLineStrip(u32 iMaxVerts)
-{
-    VERIFY(PrimitiveType==ptNone);
-    m_iMaxVerts = iMaxVerts;
-    start_pv	= (FVF::LIT*)RImplementation.Vertex.Lock	(m_iMaxVerts,hGeom_fan.stride(),vOffset);
-    pv			= start_pv;
-    PrimitiveType = ptLineStrip;
-    m_PointType = pttLIT;
-}
-
-void dxUIRender::FlushLineStrip()
-{
-    VERIFY(PrimitiveType==ptLineStrip);
-    VERIFY(u32(pv-start_pv)<=m_iMaxVerts);
-
-    std::ptrdiff_t p_cnt		= pv-start_pv;
-    RImplementation.Vertex.Unlock		(u32(p_cnt),hGeom_fan.stride());
-    RCache.set_Geometry	 		(hGeom_fan);
-    // TODO: TEMPORARILY DISABLED - NVRHI texture uploads corrupt D3D11 state
-    // if (p_cnt>1) RCache.Render	(D3DPT_LINESTRIP,vOffset,u32(p_cnt-1));
-
-    PrimitiveType = ptNone;
-}
-
-void dxUIRender::StartLineList(u32 iMaxVerts)
-{
-    VERIFY(PrimitiveType==ptNone);
-    m_iMaxVerts = iMaxVerts;
-    start_pv	= (FVF::LIT*)RImplementation.Vertex.Lock	(m_iMaxVerts,hGeom_fan.stride(),vOffset);
-    pv			= start_pv;
-    PrimitiveType = ptLineList;
-}
-
-void dxUIRender::FlushLineList()
-{
-    VERIFY(PrimitiveType==ptLineList);
-    VERIFY(u32(pv-start_pv)<=m_iMaxVerts);
-
-    std::ptrdiff_t p_cnt		= pv-start_pv;
-    RImplementation.Vertex.Unlock		(u32(p_cnt),hGeom_fan.stride());
-    RCache.set_Geometry	 		(hGeom_fan);
-    // TODO: TEMPORARILY DISABLED - NVRHI texture uploads corrupt D3D11 state
-    // if (p_cnt>1) RCache.Render	(D3DPT_LINELIST,vOffset,u32(p_cnt)/2);
-
-    PrimitiveType = ptNone;
-}
-*/
 void dxUIRender::SetScissor(Irect* rect)
 {
 #if (RENDER == R_R3) || (RENDER == R_R4)
@@ -170,23 +59,6 @@ LPCSTR dxUIRender::UpdateShaderName(LPCSTR tex_name, LPCSTR sh_name)
     else
         return sh_name;
 }
-/*
-void dxUIRender::PushPoint(float x, float y, u32 c, float u, float v)
-{
-    VERIFY(m_PointType==pttNone);
-    pv->set(x, y, 0.0f, c, u, v);
-    ++pv;
-}
-*/
-/*
-void dxUIRender::PushPoint(int x, int y, u32 c, float u, float v)
-{
-    VERIFY(m_PointType==pttNone);
-    pv->set(x, y, 0, c, u, v);
-    ++pv;
-}
-*/
-
 void dxUIRender::PushPoint(float x, float y, float z, u32 C, float u, float v)
 {
     //.	VERIFY(m_PointType==pttLIT);
@@ -272,10 +144,6 @@ void dxUIRender::FlushPrimitive()
         break;
     default: NODEFAULT;
     }
-
-    // TODO: TEMPORARILY DISABLED - NVRHI texture uploads corrupt D3D11 state
-    // if (primCount > 0)
-    //     RCache.Render(d3dPrimType, vOffset, primCount);
 
     PrimitiveType = ptNone;
     m_PointType = pttNone;

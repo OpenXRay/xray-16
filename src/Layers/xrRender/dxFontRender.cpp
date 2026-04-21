@@ -15,103 +15,72 @@ namespace xray::render::RENDER_NAMESPACE
 {
 dxFontRender::~dxFontRender()
 {
-    // DX12: Clean up NVRHI resources
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
-    {
-        m_vsHandle = nullptr;
-        m_psHandle = nullptr;
-        m_baseTexture = nullptr;  // Release texture reference
+    m_vsHandle = nullptr;
+    m_psHandle = nullptr;
+    m_baseTexture = nullptr;
 
-        // Clean up reflection data
-        if (m_vsReflection) {
-            xr_delete(m_vsReflection);
-            m_vsReflection = nullptr;
-        }
-        if (m_psReflection) {
-            xr_delete(m_psReflection);
-            m_psReflection = nullptr;
-        }
+    if (m_vsReflection)
+    {
+        xr_delete(m_vsReflection);
+        m_vsReflection = nullptr;
+    }
+    if (m_psReflection)
+    {
+        xr_delete(m_psReflection);
+        m_psReflection = nullptr;
     }
 
-    // Legacy D3D11 path
-    pShader.destroy();
     pGeom.destroy();
 }
 
 void dxFontRender::Initialize(cpcstr cShader, cpcstr cTexture)
 {
-    // DX12/FrameGraph: Compile shaders using NVRHI ShaderLoader
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
+    auto* shaderLoader = RImplementation.GetShaderLoader();
+    if (!shaderLoader)
     {
-        auto* shaderLoader = RImplementation.GetShaderLoader();
-        if (!shaderLoader)
-        {
-            Msg("! [dxFontRender] ShaderLoader is NULL for shader: %s", cShader);
-            return;
-        }
-
-        // Store shader and texture names for later use
-        m_shaderName = cShader;
-        m_textureName = cTexture;
-
-        // Cache the base texture for rendering
-        // For DX12, we defer texture loading - it will be loaded via TextureManager when creating the PSO
-        if (cTexture) {
-            // Set deferred load flag to prevent _CreateTexture from calling Load()
-            bool prevDeferredLoad = RImplementation.Resources->bDeferredLoad;
-            RImplementation.Resources->bDeferredLoad = true;
-
-            m_baseTexture = RImplementation.Resources->_CreateTexture(cTexture);
-
-            RImplementation.Resources->bDeferredLoad = prevDeferredLoad;
-        }
-
-        // Try to load the requested shader
-        // Font shaders use stub_notransform_t.vs for vertex shader (screen-space coordinates)
-        auto vsResult = shaderLoader->LoadVertexShader("stub_notransform_t", "main");
-        auto psResult = shaderLoader->LoadPixelShader(cShader, "main");
-
-        // If pixel shader not found, try falling back to hud_font
-        if (!psResult.handle)
-        {
-            Msg("* [dxFontRender] Pixel shader '%s' not found, falling back to hud_font", cShader);
-            psResult = shaderLoader->LoadPixelShader("hud_font", "main");
-        }
-
-        if (vsResult.handle && psResult.handle)
-        {
-            m_vsHandle = vsResult.handle;
-            m_psHandle = psResult.handle;
-
-            // Store reflection data (transfer ownership from ShaderResult)
-            m_vsReflection = vsResult.reflection;
-            m_psReflection = psResult.reflection;
-            vsResult.reflection = nullptr;  // Transfer ownership
-            psResult.reflection = nullptr;  // Transfer ownership
-
-            Msg("* [dxFontRender] Compiled font shader: %s (tex: %s)", cShader, cTexture ? cTexture : "none");
-        }
-        else
-        {
-            Msg("! [dxFontRender] Failed to compile font shader: %s (VS=%s, PS=%s)",
-                cShader,
-                vsResult.handle ? "OK" : "FAILED",
-                psResult.handle ? "OK" : "FAILED");
-        }
-
-        // Create geometry buffer (used for both D3D11 and D3D12)
-        pGeom.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
-
-        // Texture loading is deferred to PSO creation time (via TextureManager)
-        // Don't call Load() here as it would use legacy D3D11 HW.pDevice
-
+        Msg("! [dxFontRender] ShaderLoader is NULL for shader: %s", cShader);
         return;
     }
 
-    // Legacy D3D11 path
-    //pShader.create(cShader, cTexture);  // Still commented out for now
+    m_shaderName = cShader;
+    m_textureName = cTexture;
+
+    if (cTexture)
+    {
+        bool prevDeferredLoad = RImplementation.Resources->bDeferredLoad;
+        RImplementation.Resources->bDeferredLoad = true;
+        m_baseTexture = RImplementation.Resources->_CreateTexture(cTexture);
+        RImplementation.Resources->bDeferredLoad = prevDeferredLoad;
+    }
+
+    auto vsResult = shaderLoader->LoadVertexShader("stub_notransform_t", "main");
+    auto psResult = shaderLoader->LoadPixelShader(cShader, "main");
+
+    if (!psResult.handle)
+    {
+        Msg("* [dxFontRender] Pixel shader '%s' not found, falling back to hud_font", cShader);
+        psResult = shaderLoader->LoadPixelShader("hud_font", "main");
+    }
+
+    if (vsResult.handle && psResult.handle)
+    {
+        m_vsHandle = vsResult.handle;
+        m_psHandle = psResult.handle;
+        m_vsReflection = vsResult.reflection;
+        m_psReflection = psResult.reflection;
+        vsResult.reflection = nullptr;
+        psResult.reflection = nullptr;
+        Msg("* [dxFontRender] Compiled font shader: %s (tex: %s)", cShader, cTexture ? cTexture : "none");
+    }
+    else
+    {
+        Msg("! [dxFontRender] Failed to compile font shader: %s (VS=%s, PS=%s)",
+            cShader,
+            vsResult.handle ? "OK" : "FAILED",
+            psResult.handle ? "OK" : "FAILED");
+    }
+
     pGeom.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
-    m_textureName = cTexture;  // Store for FrameGraph access
 }
 
 void dxFontRender::OnRender(CGameFont& owner)
@@ -258,22 +227,8 @@ void dxFontRender::OnRender(CGameFont& owner)
             }
         }
 
-        // Unlock and draw
         u32 vCount = (u32)(v - start);
         RImplementation.Vertex.Unlock(vCount, pGeom.stride());
-        if (vCount)
-        {
-            // TODO: TEMPORARILY DISABLED
-            // The legacy font renderer uses RCache which makes raw D3D11 calls.
-            // NVRHI texture upload operations corrupt D3D11 state, causing crashes here.
-            // We need to either:
-            // 1. Port this to use RenderContext for proper NVRHI state management
-            // 2. Save/restore D3D11 state around NVRHI operations
-            // For now, disable to allow testing ImGui renderer
-
-            // RCache.set_Geometry(pGeom);
-            // RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, 0, vCount / 2);
-        }
     }
 }
 
