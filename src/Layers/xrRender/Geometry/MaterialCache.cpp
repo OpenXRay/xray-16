@@ -252,158 +252,36 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
         return nullptr;
     }
 
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph()) {
-        u32 shaderID = visual->shader_id;
-        if (shaderID != UINT32_MAX) {
-            auto* compiled = RImplementation.getCompiledShader(shaderID);
-            if (compiled) {
-                u32 vertexFormatID = GetVertexFormatID(visual);
-
-                u64 cacheKey = RImplementation.ComputePSOCacheKey(vertexFormatID, passType);
-
-                auto it = compiled->precompiledPSOs.psoCache.find(cacheKey);
-                if (it != compiled->precompiledPSOs.psoCache.end() && it->second) {
-                    m_stats.numCacheHits++;
-                    return it->second;
-                }
-
-                m_stats.numCacheMisses++;
-                Msg("! [MaterialCache] PSO cache miss for shader %u (format %u, pass %u)",
-                    shaderID, vertexFormatID, (u32)passType);
-            }
-        }
-
+    u32 shaderID = visual->shader_id;
+    if (shaderID == UINT32_MAX)
         return nullptr;
-    }
 
-    Shader* shader = nullptr;
-
-    if (visual->shader && visual->shader._get()) {
-        shader = visual->shader._get();
-    }
-    else if (visual->shaderName.c_str() && visual->shaderName.size() > 0 &&
-             visual->textureName.c_str() && visual->textureName.size() > 0) {
-
-        visual->shader.create(visual->shaderName.c_str(), visual->textureName.c_str());
-        shader = visual->shader._get();
-
-        if (!shader) {
-            return nullptr;
-        }
-    } else {
+    auto* compiled = RImplementation.getCompiledShader(shaderID);
+    if (!compiled)
         return nullptr;
-    }
 
-    ShaderElement* elem = shader->E[0]._get();
-    if (!elem) {
-        return nullptr;
-    }
+    u32 vertexFormatID = GetVertexFormatID(visual);
+    u64 cacheKey = RImplementation.ComputePSOCacheKey(vertexFormatID, passType);
 
-    if (elem->passes.empty()) {
-        return nullptr;
-    }
-
-    SPass* pass = elem->passes[0]._get();
-    if (!pass) {
-        return nullptr;
-    }
-
-    u64 textureHash = ComputeTextureHash(pass);
-    u64 stateHash = ComputeStateHash(pass);
-
-    stateHash ^= (static_cast<u64>(passType) << 56);
-
-    MaterialKey key(shader, textureHash, stateHash);
-
-    const char* shaderName = "unknown";
-    if (pass->vs._get() && pass->vs._get()->cName.c_str()) {
-        shaderName = pass->vs._get()->cName.c_str();
-    }
-
-    auto it = m_cache.find(key);
-    if (it != m_cache.end()) {
+    auto it = compiled->precompiledPSOs.psoCache.find(cacheKey);
+    if (it != compiled->precompiledPSOs.psoCache.end() && it->second) {
         m_stats.numCacheHits++;
-        return it->second.get();
+        return it->second;
     }
 
     m_stats.numCacheMisses++;
-
-
-    MaterialPSO* pso = CreatePSO(visual, elem, pass, outputs, fg, passType);
-    if (!pso) {
-        Msg("! [MaterialCache::GetOrCreatePSO] CreatePSO failed for shader '%s'", shaderName);
-        return nullptr;
-    }
-
-    m_cache[key] = xr_unique_ptr<MaterialPSO>(pso);
-    m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
-
-    return pso;
+    Msg("! [MaterialCache] PSO cache miss for shader %u (format %u, pass %u)",
+        shaderID, vertexFormatID, (u32)passType);
+    return nullptr;
 }
 
 MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
     dxRender_Visual* visual,
     const framegraph::FrameGraph& fg)
 {
-    if (!visual) {
+    if (!visual)
         Msg("! [MaterialCache::GetOrCreateDepthPSO] Visual is NULL");
-        return nullptr;
-    }
-
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph()) {
-        return nullptr;
-    }
-
-    Shader* shader = nullptr;
-
-    if (visual->shader && visual->shader._get()) {
-        shader = visual->shader._get();
-    }
-    else if (visual->shaderName.c_str() && visual->shaderName.size() > 0 &&
-             visual->textureName.c_str() && visual->textureName.size() > 0) {
-        visual->shader.create(visual->shaderName.c_str(), visual->textureName.c_str());
-        shader = visual->shader._get();
-
-        if (!shader) {
-            return nullptr;
-        }
-    } else {
-        return nullptr;
-    }
-
-    ShaderElement* elem = shader->E[0]._get();
-    if (!elem || elem->passes.empty()) {
-        return nullptr;
-    }
-
-    SPass* pass = elem->passes[0]._get();
-    if (!pass) {
-        return nullptr;
-    }
-
-    u64 textureHash = ComputeTextureHash(pass);
-    MaterialKey key(shader, textureHash, 0, PSOType::Depth);
-
-    auto it = m_cache.find(key);
-    if (it != m_cache.end()) {
-        m_stats.numCacheHits++;
-        return it->second.get();
-    }
-
-    m_stats.numCacheMisses++;
-
-    MaterialPSO* pso = CreateDepthPSO(visual, elem, pass, fg);
-    if (!pso) {
-        const char* shaderName = (pass->vs._get() && pass->vs._get()->cName.c_str())
-            ? pass->vs._get()->cName.c_str() : "unknown";
-        Msg("! [MaterialCache::GetOrCreateDepthPSO] CreateDepthPSO failed for shader '%s'", shaderName);
-        return nullptr;
-    }
-
-    m_cache[key] = xr_unique_ptr<MaterialPSO>(pso);
-    m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
-
-    return pso;
+    return nullptr;
 }
 
 MaterialPSO* MaterialCache::CreatePSO(

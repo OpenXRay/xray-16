@@ -51,63 +51,15 @@ void R_sync_point::End()
     CHK_GL(glDeleteSync((GLsync)q_sync_point[q_sync_count]));
 }
 #elif defined(USE_DX11)
-void R_sync_point::Create()
-{
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
-    {
-        Msg("* [R_sync_point] Disabled - NVRHI handles synchronization");
-        return;
-    }
-
-    const u32 gpuNum = GEnv.Backend->GetCapabilities().iGPUNum;
-    for (u32 i = 0; i < gpuNum; ++i)
-        R_CHK(CreateQuery((ID3DQuery**)&q_sync_point[i], D3D_QUERY_EVENT));
-    // Prevent error on first get data
-    CHK_DX(EndQuery((ID3DQuery*)q_sync_point[0]));
-}
-
-void R_sync_point::Destroy()
-{
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
-        return;
-
-    const u32 gpuNum = GEnv.Backend->GetCapabilities().iGPUNum;
-    for (u32 i = 0; i < gpuNum; ++i)
-        R_CHK(ReleaseQuery((ID3DQuery*)q_sync_point[i]));
-}
-
+void R_sync_point::Create() {}
+void R_sync_point::Destroy() {}
 bool R_sync_point::Wait(u32 wait_sleep, u64 timeout)
 {
-    ZoneScoped;
-
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
-        return true;
-
-    CTimer T;
-    T.Start();
-    BOOL result = FALSE;
-    HRESULT hr = S_FALSE;
-    while ((hr = GetData((ID3DQuery*)q_sync_point[q_sync_count], &result, sizeof(result))) == S_FALSE)
-    {
-        if (!SwitchToThread())
-            Sleep(wait_sleep);
-        if (T.GetElapsed_ms() > timeout)
-        {
-            result = FALSE;
-            break;
-        }
-    }
-    return result;
+    (void)wait_sleep;
+    (void)timeout;
+    return true;
 }
-
-void R_sync_point::End()
-{
-    if (GEnv.Backend && GEnv.Backend->IsFrameGraph())
-        return;
-
-    q_sync_count = (q_sync_count + 1) % GEnv.Backend->GetCapabilities().iGPUNum;
-    CHK_DX(EndQuery((ID3DQuery*)q_sync_point[q_sync_count]));
-}
+void R_sync_point::End() {}
 #else
 #   error No graphics API selected or enabled!
 #endif
