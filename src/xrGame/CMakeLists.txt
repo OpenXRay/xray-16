@@ -247,8 +247,6 @@ target_sources(xrGame PRIVATE
     animation_script_callback.h
     animation_utils.cpp
     animation_utils.h
-    AnselManager.cpp
-    AnselManager.h
     anticheat_dumpable_object.h
     antirad.cpp
     antirad.h
@@ -2510,6 +2508,15 @@ target_compile_definitions(xrGame
     PRIVATE
     XRGAME_EXPORTS
 )
+
+# AnselManager wraps NVIDIA's Ansel SDK (Windows-only); GamePersistent
+# already gates every ansel->* call on XR_PLATFORM_WINDOWS.
+if (WIN32)
+    target_sources(xrGame PRIVATE
+        AnselManager.cpp
+        AnselManager.h
+    )
+endif()
 
 # E2K hack: MCST lcc compiler does not support object files greater than 4Gb due to a bug in EDG frontend
 if (CMAKE_CXX_COMPILER_ID MATCHES "LCC")

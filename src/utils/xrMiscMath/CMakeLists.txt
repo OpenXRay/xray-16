@@ -15,6 +15,11 @@ target_include_directories(xrMiscMath
     "${CMAKE_SOURCE_DIR}/src"
 )
 
+target_link_libraries(xrMiscMath
+    PRIVATE
+    sse2neon
+)
+
 set_target_properties(xrMiscMath PROPERTIES
     POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS}
 )
