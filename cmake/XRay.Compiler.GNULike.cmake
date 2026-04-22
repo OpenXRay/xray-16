@@ -2,11 +2,18 @@ include_guard()
 
 if (APPLE)
     if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-        if ($ENV{MACOSX_DEPLOYMENT_TARGET})
+        if (DEFINED ENV{MACOSX_DEPLOYMENT_TARGET} AND NOT "$ENV{MACOSX_DEPLOYMENT_TARGET}" STREQUAL "")
             set(CMAKE_OSX_DEPLOYMENT_TARGET $ENV{MACOSX_DEPLOYMENT_TARGET})
         else()
-            message(NOTICE "CMAKE_OSX_DEPLOYMENT_TARGET is not set, defaulting it to your system's version: ${CMAKE_SYSTEM_VERSION}")
-            set(CMAKE_OSX_DEPLOYMENT_TARGET ${CMAKE_SYSTEM_VERSION})
+            # CMAKE_SYSTEM_VERSION is the Darwin kernel version (e.g. 25.4.0), not the
+            # macOS product version clang expects for MACOSX_DEPLOYMENT_TARGET.
+            execute_process(
+                COMMAND sw_vers -productVersion
+                OUTPUT_VARIABLE _MACOS_PRODUCT_VERSION
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+            )
+            message(NOTICE "CMAKE_OSX_DEPLOYMENT_TARGET is not set, defaulting it to your system's macOS version: ${_MACOS_PRODUCT_VERSION}")
+            set(CMAKE_OSX_DEPLOYMENT_TARGET ${_MACOS_PRODUCT_VERSION})
         endif()
     endif()
     message(STATUS "CMAKE_OSX_DEPLOYMENT_TARGET: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
