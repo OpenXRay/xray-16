@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../xr_types.h"
-#include "../xrCommon/xr_vector.h"
-#include "../xrCommon/xr_map.h"
-#include "../xrstring.h"
+#include "xrCore/xr_types.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_map.h"
+#include "xrCore/xrstring.h"
 
 namespace xray::profiler
 {

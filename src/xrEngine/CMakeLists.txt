@@ -333,8 +333,6 @@ target_sources_grouped(
     TARGET xrEngine
     NAME "Render\\Execution & 3D\\Shaders\\Textures"
     FILES
-    tntQAVI.cpp
-    tntQAVI.h
     IRenderBackend.h
     IRenderBackend.cpp
     IFrameGraphRender.h
@@ -346,6 +344,18 @@ target_sources_grouped(
     xrTheora_Surface.cpp
     xrTheora_Surface.h
 )
+
+# tntQAVI wraps Video-for-Windows (vfw.h / winmm); its only consumers live
+# under xrRenderPC_R4, which is itself WIN32-gated.
+if (WIN32)
+    target_sources_grouped(
+        TARGET xrEngine
+        NAME "Render\\Execution & 3D\\Shaders\\Textures"
+        FILES
+        tntQAVI.cpp
+        tntQAVI.h
+    )
+endif()
 
 if (WIN32)
     target_sources_grouped(
