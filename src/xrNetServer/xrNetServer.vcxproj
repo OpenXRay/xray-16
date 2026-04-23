@@ -23,10 +23,27 @@
       <PreprocessorDefinitions>XR_NETSERVER_EXPORTS;STEAMNETWORKINGSOCKETS_STATIC_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Ws2_32.lib;Crypt32.lib;bcrypt.lib;Iphlpapi.lib;winmm.lib;GameNetworkingSockets_s.lib;libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\cmake_builds\releasemastergold\Externals\GameNetworkingSockets\src;$(SolutionDir)..\cmake_builds\releasemastergold\Externals\protobuf;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+
+  <!-- Ensure GNS + protobuf are built via CMake before xrNetServer's link step.
+       CMake is invoked directly (no bash). If the build dir has not been configured
+       yet, run cmake-initial-configure first manually; this target only (re)builds
+       the externals into the matching $(xrCMakeBuildDir). -->
+  <Target Name="xrBuildNetExternals"
+          BeforeTargets="ClCompile"
+          Condition="Exists('$(xrCMakeBuildDir)build.ninja') And !Exists('$(xrCMakeBuildDir)Externals\GameNetworkingSockets\src\GameNetworkingSockets_s.lib')">
+    <Message Importance="high" Text="[xrNetServer] Building GameNetworkingSockets + protobuf via CMake in $(xrCMakeBuildDir)" />
+    <Exec Command='cmake --build "$(xrCMakeBuildDir.TrimEnd(`\`))" --target GameNetworkingSockets_s libprotobuf'
+          WorkingDirectory="$(SolutionDir).." />
+  </Target>
+
+  <Target Name="xrWarnMissingCMakeBuild"
+          BeforeTargets="ClCompile"
+          Condition="!Exists('$(xrCMakeBuildDir)build.ninja')">
+    <Warning Text="[xrNetServer] $(xrCMakeBuildDir) has not been configured. Run ./cmake-initial-configure from the repo root so GameNetworkingSockets + protobuf can be built before xr_3da.exe links." />
+  </Target>
   <ItemGroup>
     <ClCompile Include="guids.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
