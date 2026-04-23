@@ -10,8 +10,6 @@ target_sources(xrRenderPC_R4 PRIVATE
     r4_rendertarget_phase_hdao.cpp
     r4_rendertarget_u_set_rt.cpp
     r4_shaders.cpp
-    R_Backend_LOD.cpp
-    R_Backend_LOD.h
     stdafx.cpp
     stdafx.h
     xrRender_R4.cpp
@@ -159,6 +157,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/r5.cpp
     ../xrRender/FGRenderHost.h
     ../xrRender/FGRenderHost.cpp
+    ../xrRender/FrameGraphRendererModule.h
+    ../xrRender/FrameGraphRendererModule.cpp
 
     # ImGui NVRHI Renderer - Backend agnostic
     ../xrRender/dxImGuiRender.h
@@ -251,6 +251,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/Profiler/StatsOverlay.cpp
     ../xrRender/R_Backend.cpp
     ../xrRender/R_Backend_DBG.cpp
+    ../xrRender/R_Backend_LOD.h
+    ../xrRender/R_Backend_LOD.cpp
     ../xrRender/R_Backend_Runtime.cpp
     ../xrRender/R_Backend_hemi.cpp
     ../xrRender/R_Backend_tree.cpp

@@ -16,7 +16,7 @@
 #include "R_Backend_tree.h"
 
 #ifdef USE_DX11
-#include "Layers/xrRenderPC_R4/r_backend_lod.h"
+#include "R_Backend_LOD.h"
 #include "Layers/xrRenderDX11/StateManager/dx11StateManager.h"
 #include "Layers/xrRenderDX11/StateManager/dx11ShaderResourceStateCache.h"
 #include "Layers/xrRenderDX11/StateManager/dx11StateCache.h"
