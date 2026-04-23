@@ -2,11 +2,7 @@
 
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
-#if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Client.h"
-#else // XXX: multiplayer on Linux
-#include "xrNetServer/empty/NET_Client.h"
-#endif
 #include "xrEngine/StatGraph.h"
 #include "xrMessages.h"
 #include "alife_space.h"
@@ -57,7 +53,7 @@ namespace file_transfer
 class client_site;
 }
 
-class CLevel : public IGame_Level, public IPureClient
+class CLevel : public IGame_Level, public NET_CLIENT_CLASS
 {
 public:
     struct AIStatistics

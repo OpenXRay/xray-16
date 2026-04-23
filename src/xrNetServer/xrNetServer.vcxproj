@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets">
     <Import Project="..\xray_project_configurations.props" />
@@ -20,38 +20,59 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>XR_NETSERVER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XR_NETSERVER_EXPORTS;STEAMNETWORKINGSOCKETS_STATIC_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;Crypt32.lib;bcrypt.lib;Iphlpapi.lib;winmm.lib;GameNetworkingSockets_s.lib;libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\cmake_builds\releasemastergold\Externals\GameNetworkingSockets\src;$(SolutionDir)..\cmake_builds\releasemastergold\Externals\protobuf;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="guids.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="BaseClient.cpp" />
+    <ClCompile Include="BaseServer.cpp" />
+    <ClCompile Include="IBannedClient.cpp" />
+    <ClCompile Include="IClient.cpp" />
+    <ClCompile Include="IClientStatistic.cpp" />
+    <ClCompile Include="INetQueue.cpp" />
+    <ClCompile Include="ip_address.cpp" />
     <ClCompile Include="ip_filter.cpp" />
     <ClCompile Include="NET_AuthCheck.cpp" />
-    <ClCompile Include="empty\NET_Client.cpp" />
     <ClCompile Include="NET_Common.cpp" />
     <ClCompile Include="NET_Compressor.cpp" />
     <ClCompile Include="NET_Log.cpp" />
-    <ClCompile Include="empty\NET_Server.cpp" />
+    <ClCompile Include="SteamNetClient.cpp" />
+    <ClCompile Include="SteamNetServer.cpp" />
+    <ClCompile Include="WinsocksHelper.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseClient.h" />
+    <ClInclude Include="BaseServer.h" />
+    <ClInclude Include="ClientConnectionOptions.h" />
+    <ClInclude Include="IBannedClient.h" />
+    <ClInclude Include="IClient.h" />
+    <ClInclude Include="IClientStatistic.h" />
+    <ClInclude Include="INetQueue.h" />
+    <ClInclude Include="ip_address.h" />
     <ClInclude Include="ip_filter.h" />
     <ClInclude Include="NET_AuthCheck.h" />
-    <ClInclude Include="empty\NET_Client.h" />
+    <ClInclude Include="NET_Client.h" />
     <ClInclude Include="NET_Common.h" />
     <ClInclude Include="NET_Compressor.h" />
     <ClInclude Include="NET_Log.h" />
     <ClInclude Include="NET_Messages.h" />
-    <ClInclude Include="NET_PlayersMonitor.h" />
-    <ClInclude Include="empty\NET_Server.h" />
+    <ClInclude Include="NET_Server.h" />
     <ClInclude Include="NET_Shared.h" />
+    <ClInclude Include="PlayersMonitor.h" />
+    <ClInclude Include="ServerConnectionOptions.h" />
+    <ClInclude Include="SteamNetClient.h" />
+    <ClInclude Include="SteamNetServer.h" />
+    <ClInclude Include="WinsocksHelper.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

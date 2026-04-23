@@ -488,4 +488,4 @@ void CLevel::ClientReceive()
         ProcessGameSpawns();
 }
 
-void CLevel::OnMessage(void* data, u32 size) { IPureClient::OnMessage(data, size); };
+void CLevel::OnMessage(void* data, u32 size) { NET_CLIENT_CLASS::OnMessage(data, size); };

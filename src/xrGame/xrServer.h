@@ -93,7 +93,7 @@ class server_site;
 class clientdata_proxy;
 class server_info_uploader;
 
-class xrServer : public IPureServer
+class xrServer : public NET_SERVER_CLASS
 {
 private:
     xrS_entities entities;
@@ -176,22 +176,22 @@ protected:
     void PerformCheckClientsForMaxPing();
 
 public:
-    virtual IServerGameState* GetGameState() override { return game; }
+    virtual IServerGameState* GetGameState() { return game; }
     void Export_game_type(IClient* CL);
     void Perform_game_export();
     BOOL PerformRP(CSE_Abstract* E);
     void PerformMigration(CSE_Abstract* E, xrClientData* from, xrClientData* to);
 
     IC void clear_ids() { m_tID_Generator = id_generator_type(); }
-    virtual u16 PerformIDgen(u16 ID) override { return (m_tID_Generator.tfGetID(ID)); }
-    virtual void FreeID(u16 ID, u32 time) override { return (m_tID_Generator.vfFreeID(ID, time)); }
+    virtual u16 PerformIDgen(u16 ID) { return (m_tID_Generator.tfGetID(ID)); }
+    virtual void FreeID(u16 ID, u32 time) { return (m_tID_Generator.vfFreeID(ID, time)); }
     void Perform_connect_spawn(CSE_Abstract* E, xrClientData* to, NET_Packet& P);
     void Perform_transfer(NET_Packet& PR, NET_Packet& PT, CSE_Abstract* what, CSE_Abstract* from, CSE_Abstract* to);
     void Perform_reject(CSE_Abstract* what, CSE_Abstract* from, int delta);
-    virtual void Perform_destroy(CSE_Abstract* tpSE_Abstract, u32 mode) override;
+    virtual void Perform_destroy(CSE_Abstract* tpSE_Abstract, u32 mode);
 
     CSE_Abstract* Process_spawn(NET_Packet& P, ClientID sender, bool bSpawnWithClientsMainEntityAsParent = false,
-        CSE_Abstract* tpExistedEntity = nullptr) override;
+        CSE_Abstract* tpExistedEntity = nullptr);
     void Process_update(NET_Packet& P, ClientID sender);
     void Process_save(NET_Packet& P, ClientID sender);
     void Process_event(NET_Packet& P, ClientID sender);
@@ -257,14 +257,14 @@ public:
     virtual void client_Destroy(IClient* C); // destroy client info
 
     // utilities
-    virtual CSE_Abstract* entity_Create(pcstr name) override;
-    virtual void entity_Destroy(CSE_Abstract*& P) override;
+    virtual CSE_Abstract* entity_Create(pcstr name);
+    virtual void entity_Destroy(CSE_Abstract*& P);
     u32 GetEntitiesNum() { return entities.size(); };
     CSE_Abstract* GetEntity(u32 Num);
     u32 const GetLastUpdatesSize() const { return m_last_updates_size; };
     xrClientData* ID_to_client(ClientID ID, bool ScanAll = false)
     {
-        return (xrClientData*)(IPureServer::ID_to_client(ID, ScanAll));
+        return (xrClientData*)(NET_SERVER_CLASS::ID_to_client(ID, ScanAll));
     }
     CSE_Abstract* ID_to_entity(u16 ID);
 
