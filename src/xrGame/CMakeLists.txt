@@ -2503,7 +2503,6 @@ target_link_libraries(xrGame
 target_compile_definitions(xrGame
     PUBLIC
     DECLARE_SPECIALIZATION
-    PURE_DYNAMIC_CAST
 
     PRIVATE
     XRGAME_EXPORTS

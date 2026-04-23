@@ -1,9 +1,16 @@
-#if defined(__GNUC__)
+#if defined(_MSC_VER)
+#include <intrin.h> // for __debugbreak
+
+#define NO_INLINE               __declspec(noinline)
+#define FORCE_INLINE            __forceinline
+#define ALIGN(a)                __declspec(align(a))
+#define DEBUG_BREAK             __debugbreak()
+
+#elif defined(__GNUC__)
 #define NO_INLINE               __attribute__((noinline))
 #define FORCE_INLINE            __attribute__((always_inline)) inline
 #define ALIGN(a)                __attribute__((aligned(a)))
 
-// Debugger trap implementation
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #define DEBUG_BREAK             do { __asm__ volatile ("int $3"); } while(0)
 #elif defined(XR_ARCHITECTURE_ARM)
@@ -17,21 +24,14 @@
 #elif __has_include(<signal.h>)
 #include <signal.h>
 #if defined(SIGTRAP)
-#define DEBUG_BREAK             raise(SIGTRAP) // SIGTRAP is preferred
+#define DEBUG_BREAK             raise(SIGTRAP)
 #else
-#define DEBUG_BREAK             __builtin_trap() // raises SIGILL
+#define DEBUG_BREAK             __builtin_trap()
 #endif
 #else
-#define DEBUG_BREAK             __builtin_trap() // raises SIGILL
+#define DEBUG_BREAK             __builtin_trap()
 #endif
 
-#elif defined(_MSC_VER)
-#include <intrin.h> // for __debugbreak
-
-#define NO_INLINE               __declspec(noinline)
-#define FORCE_INLINE            __forceinline
-#define ALIGN(a)                __declspec(align(a))
-#define DEBUG_BREAK             __debugbreak()
 #else
 #error Provide your definitions here
 #endif
@@ -43,20 +43,20 @@
 
 #define UNUSED(...) (void)(__VA_ARGS__)
 
-#if defined(__GNUC__)
-#define XR_ASSUME(expr)  if (expr){} else __builtin_unreachable()
-
-#define XR_EXPORT __attribute__ ((visibility("default")))
-#define XR_IMPORT __attribute__ ((visibility("default")))
-
-#define XR_NOVTABLE
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 #define XR_ASSUME(expr) __assume(expr)
 
 #define XR_EXPORT __declspec(dllexport)
 #define XR_IMPORT __declspec(dllimport)
 
 #define XR_NOVTABLE __declspec(novtable)
+#elif defined(__GNUC__)
+#define XR_ASSUME(expr)  if (expr){} else __builtin_unreachable()
+
+#define XR_EXPORT __attribute__ ((visibility("default")))
+#define XR_IMPORT __attribute__ ((visibility("default")))
+
+#define XR_NOVTABLE
 #else
 #error Provide your definitions here
 #endif

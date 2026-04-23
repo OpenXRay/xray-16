@@ -144,7 +144,6 @@ target_link_libraries(xrUICore
 target_compile_definitions(xrUICore
     PRIVATE
     XRUICORE_EXPORTS
-    PURE_DYNAMIC_CAST
 )
 
 set_target_properties(xrUICore PROPERTIES
