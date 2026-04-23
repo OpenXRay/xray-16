@@ -42,8 +42,8 @@
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <ImportLibrary>$(xrLibDir)xr_3da.lib</ImportLibrary>
       <ImageHasSafeExceptionHandlers Condition="'$(Configuration)|$(Platform)'=='Release Master Gold|Win32'" />
-      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;GameNetworkingSockets_s.lib;protobuf.lib;bcrypt.lib;Crypt32.lib;Iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\lib;$(xrCMakeBuildDir)Externals\GameNetworkingSockets\src;$(xrCMakeBuildDir)Externals\protobuf;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>as-invoker-manifest-part.xml %(AdditionalManifestFiles)</AdditionalManifestFiles>

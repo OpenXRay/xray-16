@@ -13,5 +13,12 @@
     <xrIntDir>$(SolutionDir)..\build\intermediate\$(xrPlatform)\$(Configuration)\</xrIntDir>
     <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
     <xrExternals>$(SolutionDir)..\Externals\</xrExternals>
+
+    <!-- CMake build dir maps VS config name to lowercase-no-spaces to match cmake-initial-configure output layout. -->
+    <xrCMakeConfigName Condition="'$(Configuration)'=='Debug'">debug</xrCMakeConfigName>
+    <xrCMakeConfigName Condition="'$(Configuration)'=='Mixed'">mixed</xrCMakeConfigName>
+    <xrCMakeConfigName Condition="'$(Configuration)'=='Release'">release</xrCMakeConfigName>
+    <xrCMakeConfigName Condition="'$(Configuration)'=='Release Master Gold'">releasemastergold</xrCMakeConfigName>
+    <xrCMakeBuildDir>$(SolutionDir)..\cmake_builds\$(xrCMakeConfigName)\</xrCMakeBuildDir>
   </PropertyGroup>
 </Project>
