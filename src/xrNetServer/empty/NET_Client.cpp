@@ -1,9 +1,9 @@
+#include "stdafx.h"
 #include "NET_Client.h"
 #include "NET_Common.h"
 #include "NET_Log.h"
 #include "NET_Messages.h"
 #include "NET_Server.h"
-#include "stdafx.h"
 #include "xrCore/Threading/Lock.hpp"
 
 #include "xrGameSpy/xrGameSpy_MainDefs.h"

@@ -1,8 +1,8 @@
+#include "stdafx.h"
 #include "NET_Server.h"
 #include "NET_Common.h"
 #include "NET_Log.h"
 #include "NET_Messages.h"
-#include "stdafx.h" // XXX: why PCH is not on the top of the file???
 #include "xrCore/buffer_vector.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 
@@ -469,10 +469,10 @@ bool IPureServer::HasBandwidth(IClient* C)
     if (psNET_Flags.test(NETFLAG_MINIMIZEUPDATES))
         dwInterval = 1000; // approx 2 times per second
 
-    HRESULT hr;
+    HRESULT hr = S_OK;
     if (psNET_ServerUpdate != 0 && (dwTime - C->dwTime_LastUpdate) > dwInterval) {
         // check queue for "empty" state
-        u32 dwPending;
+        u32 dwPending = 0;
         if (FAILED(hr))
             return false;
 
