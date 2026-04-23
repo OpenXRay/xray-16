@@ -40,3 +40,9 @@
 [submodule "Externals/meshoptimizer"]
 	path = Externals/meshoptimizer
 	url = https://github.com/zeux/meshoptimizer.git
+[submodule "Externals/GameNetworkingSockets"]
+	path = Externals/GameNetworkingSockets
+	url = https://github.com/ValveSoftware/GameNetworkingSockets.git
+[submodule "Externals/protobuf"]
+	path = Externals/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git
