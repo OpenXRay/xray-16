@@ -58,6 +58,7 @@ if (WIN32)
 endif()
 
 set(protobuf_INSTALL          ON  CACHE BOOL "protobuf: export targets so GNS install export set is consistent")
+set(protobuf_MSVC_STATIC_RUNTIME OFF CACHE BOOL "protobuf: use dynamic MSVC runtime to match rest of build" FORCE)
 set(protobuf_BUILD_TESTS      OFF CACHE BOOL "protobuf: no tests")
 set(protobuf_BUILD_CONFORMANCE OFF CACHE BOOL "protobuf: no conformance")
 set(protobuf_BUILD_EXAMPLES   OFF CACHE BOOL "protobuf: no examples")

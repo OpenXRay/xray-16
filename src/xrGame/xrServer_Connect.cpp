@@ -83,7 +83,7 @@ xrServer::EConnect xrServer::Connect(shared_str& session_name, GameDescriptionDa
 
     game->Create(session_name);
 
-    return IPureServer::Connect(*session_name, game_descr);
+    return NET_SERVER_CLASS::Connect(*session_name, game_descr);
 }
 
 IClient* xrServer::new_client(SClientConnectData* cl_data)

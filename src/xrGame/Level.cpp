@@ -68,7 +68,7 @@ float g_cl_lvInterp = 0.1;
 u32 lvInterpSteps = 0;
 
 CLevel::CLevel()
-    : IPureClient(Device.GetTimerGlobal())
+    : NET_CLIENT_CLASS(Device.GetTimerGlobal())
 #ifdef CONFIG_PROFILE_LOCKS
       ,
       DemoCS(MUTEX_PROFILE_ID(DemoCS))
@@ -513,7 +513,7 @@ void CLevel::OnFrame()
             }
             if (IsClient())
             {
-                IPureClient::UpdateStatistic();
+                NET_CLIENT_CLASS::UpdateStatistic();
                 F->SetHeightI(0.015f);
                 F->OutSetI(0.0f, 0.5f);
                 F->SetColor(color_xrgb(0, 255, 0));

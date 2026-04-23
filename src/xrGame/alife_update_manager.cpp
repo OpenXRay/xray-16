@@ -49,7 +49,7 @@ public:
     }
 };
 
-CALifeUpdateManager::CALifeUpdateManager(IPureServer* server, LPCSTR section)
+CALifeUpdateManager::CALifeUpdateManager(xrServer* server, LPCSTR section)
     : CALifeSimulatorBase(server, section), CALifeSwitchManager(server, section),
       CALifeSurgeManager(server, section), CALifeStorageManager(server, section)
 {

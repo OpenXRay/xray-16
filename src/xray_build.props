@@ -25,6 +25,7 @@
         IMGUI_DISABLE_OBSOLETE_KEYIO;
         IMGUI_DISABLE_OBSOLETE_FUNCTIONS;
         IMGUI_DEFINE_MATH_OPERATORS;
+        STEAMNETWORKINGSOCKETS_STATIC_LINK;
         %(PreprocessorDefinitions)
       </PreprocessorDefinitions>
       <BufferSecurityCheck>false</BufferSecurityCheck>

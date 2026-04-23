@@ -1,13 +1,32 @@
 add_library(xrNetServer)
 
 target_sources(xrNetServer PRIVATE
-    guids.cpp
+    BaseClient.cpp
+    BaseClient.h
+    BaseServer.cpp
+    BaseServer.h
+    ClientConnectionOptions.h
+    ServerConnectionOptions.h
+    IBannedClient.cpp
+    IBannedClient.h
+    IClient.cpp
+    IClient.h
+    IClientStatistic.cpp
+    IClientStatistic.h
+    INetQueue.cpp
+    INetQueue.h
+    SteamNetClient.cpp
+    SteamNetClient.h
+    SteamNetServer.cpp
+    SteamNetServer.h
+    PlayersMonitor.h
+    ip_address.cpp
+    ip_address.h
     ip_filter.cpp
     ip_filter.h
     NET_AuthCheck.cpp
     NET_AuthCheck.h
-    #NET_Client.cpp
-    #NET_Client.h
+    NET_Client.h
     NET_Common.cpp
     NET_Common.h
     NET_Compressor.cpp
@@ -15,17 +34,19 @@ target_sources(xrNetServer PRIVATE
     NET_Log.cpp
     NET_Log.h
     NET_Messages.h
-    NET_PlayersMonitor.h
-    #NET_Server.cpp
-    #NET_Server.h
+    NET_Server.h
     NET_Shared.h
+    guids.cpp
     stdafx.cpp
     stdafx.h
-    empty/NET_Client.cpp
-    empty/NET_Client.h
-    empty/NET_Server.cpp
-    empty/NET_Server.h
 )
+
+if (WIN32)
+    target_sources(xrNetServer PRIVATE
+        WinsocksHelper.cpp
+        WinsocksHelper.h
+    )
+endif()
 
 target_include_directories(xrNetServer
     PRIVATE
@@ -33,14 +54,25 @@ target_include_directories(xrNetServer
     "${CMAKE_SOURCE_DIR}/src"
 )
 
+target_include_directories(xrNetServer
+    PUBLIC
+    "${CMAKE_SOURCE_DIR}/Externals/GameNetworkingSockets/include"
+)
+
 target_link_libraries(xrNetServer
     PRIVATE
     xrCore
+    GameNetworkingSockets_s
 )
+
+if (WIN32)
+    target_link_libraries(xrNetServer PRIVATE Ws2_32)
+endif()
 
 target_compile_definitions(xrNetServer
     PRIVATE
     XR_NETSERVER_EXPORTS
+    STEAMNETWORKINGSOCKETS_STATIC_LINK
 )
 
 set_target_properties(xrNetServer PROPERTIES
