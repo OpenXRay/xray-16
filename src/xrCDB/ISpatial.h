@@ -14,9 +14,6 @@
 // Distance in meters an object may drift from the point where its sector was last detected before the cached
 // sector is invalidated. Exposed as the "r__sector_update_distance" console command; 0 re-detects on any move.
 XRCDB_API extern float ps_r__sector_update_distance;
-
-#pragma pack(push, 4)
-
 //////////////////////////////////////////////////////////////////////////
 // definition (Portal)
 class IRender_Portal
@@ -116,7 +113,7 @@ public:
     ISpatial_DB* space; // allow different spaces
 };
 
-class XRCDB_API XR_NOVTABLE ISpatial
+class XRCDB_API ISpatial
 {
 public:
     virtual ~ISpatial() = 0;
@@ -135,7 +132,7 @@ public:
 
 inline ISpatial::~ISpatial() = default;
 
-class XRCDB_API XR_NOVTABLE SpatialBase : public virtual ISpatial
+class XRCDB_API SpatialBase : public virtual ISpatial
 {
 public:
     SpatialData spatial;
@@ -292,5 +289,3 @@ public:
     void q_sphere(xr_vector<ISpatial*>& R, u32 _o, u32 _mask_or, const Fvector& _center, const float _radius);
     void q_frustum(xr_vector<ISpatial*>& R, u32 _o, u32 _mask_or, const CFrustum& _frustum);
 };
-
-#pragma pack(pop)
