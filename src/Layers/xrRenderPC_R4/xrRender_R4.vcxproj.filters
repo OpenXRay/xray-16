@@ -408,7 +408,7 @@
     <ClInclude Include="..\xrRender\R_Backend_hemi.h">
       <Filter>Refactored\Backend</Filter>
     </ClInclude>
-    <ClInclude Include="R_Backend_LOD.h">
+    <ClInclude Include="..\xrRender\R_Backend_LOD.h">
       <Filter>Refactored\Backend</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\R_Backend_Runtime.h">
@@ -904,6 +904,9 @@
     <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphRendererModule.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\GPUCullingManager.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
@@ -1260,7 +1263,7 @@
     <ClCompile Include="..\xrRender\R_Backend_hemi.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="R_Backend_LOD.cpp">
+    <ClCompile Include="..\xrRender\R_Backend_LOD.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\R_Backend_Runtime.cpp">
@@ -1779,6 +1782,9 @@
       <Filter>Framegraph</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphRendererModule.cpp">
       <Filter>Framegraph</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\GPUCullingManager.cpp">

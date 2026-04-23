@@ -16,4 +16,4 @@ public:
 
     CBackend& cmd_list;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

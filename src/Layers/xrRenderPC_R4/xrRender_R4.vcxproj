@@ -318,7 +318,7 @@
     <ClInclude Include="..\xrRender\Light_Render_Direct.h" />
     <ClInclude Include="..\xrRender\light_smapvis.h" />
     <ClInclude Include="r4_rendertarget.h" />
-    <ClInclude Include="R_Backend_LOD.h" />
+    <ClInclude Include="..\xrRender\R_Backend_LOD.h" />
     <ClInclude Include="..\xrRender\NVRHI\NVRHIDevice.h" />
     <ClInclude Include="..\xrRender\RenderContext\ResourceHandle.h" />
     <ClInclude Include="..\xrRender\RenderContext\RCShader.h" />
@@ -345,6 +345,7 @@
     <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h" />
     <ClInclude Include="..\xrRender\r5.h" />
     <ClInclude Include="..\xrRender\FGRenderHost.h" />
+    <ClInclude Include="..\xrRender\FrameGraphRendererModule.h" />
     <ClInclude Include="..\xrRender\Profiler\GPUProfiler.h" />
     <ClInclude Include="..\xrRender\Profiler\StatsOverlay.h" />
     <ClInclude Include="stdafx.h" />
@@ -687,7 +688,7 @@
     <ClCompile Include="r4_rendertarget_phase_combine.cpp" />
     <ClCompile Include="r4_rendertarget_phase_hdao.cpp" />
     <ClCompile Include="r4_shaders.cpp" />
-    <ClCompile Include="R_Backend_LOD.cpp" />
+    <ClCompile Include="..\xrRender\R_Backend_LOD.cpp" />
     <ClCompile Include="..\xrRender\NVRHI\NVRHIDevice.cpp" />
     <ClCompile Include="..\xrRender\RenderContext\RCShader.cpp" />
     <ClCompile Include="..\xrRender\RenderContext\PipelineState.cpp" />
@@ -712,6 +713,7 @@
     <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp" />
     <ClCompile Include="..\xrRender\r5.cpp" />
     <ClCompile Include="..\xrRender\FGRenderHost.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphRendererModule.cpp" />
     <ClCompile Include="..\xrRender\Profiler\GPUProfiler.cpp" />
     <ClCompile Include="..\xrRender\Profiler\StatsOverlay.cpp" />
     <ClCompile Include="stdafx.cpp">

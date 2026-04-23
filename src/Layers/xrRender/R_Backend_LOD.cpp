@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "r_backend_lod.h"
+#include "R_Backend_LOD.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -16,4 +16,4 @@ void R_LOD::set_LOD(float LOD)
         cmd_list.set_c(c_LOD, factor);
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}
