@@ -9,8 +9,8 @@
 #endif
 
 #include "Layers/xrRender/BufferUtils.h"
-#include "R_DStreams.h"
-#include "r_constants_cache.h"
+#include "Layers/xrRender/R_DStreams.h"
+#include "Layers/xrRender/r_constants_cache.h"
 #include "R_Backend_xform.h"
 #include "R_Backend_hemi.h"
 #include "R_Backend_tree.h"
@@ -22,7 +22,7 @@
 #include "Layers/xrRenderDX11/StateManager/dx11StateCache.h"
 #endif
 
-#include "FVF.h"
+#include "Layers/xrRender/FVF.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {

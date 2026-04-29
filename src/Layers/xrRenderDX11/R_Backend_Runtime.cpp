@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "LightTrack.h"
+#include "Layers/xrRender/LightTrack.h"
 #include "xrEngine/IRenderable.h"
 
 #if defined(USE_DX11)

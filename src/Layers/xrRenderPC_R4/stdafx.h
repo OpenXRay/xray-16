@@ -54,8 +54,8 @@
 
 #include "Layers/xrRender/Shader.h"
 
-#include "Layers/xrRender/R_Backend.h"
-#include "Layers/xrRender/R_Backend_Runtime.h"
+#include "Layers/xrRenderDX11/R_Backend.h"
+#include "Layers/xrRenderDX11/R_Backend_Runtime.h"
 
 #include "Layers/xrRenderDX11/Blender.h"
 #include "Layers/xrRenderDX11/Blender_CLSID.h"

@@ -402,22 +402,22 @@
     <ClInclude Include="..\xrRender\FVF.h">
       <Filter>Refactored\Backend</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\R_Backend.h">
+    <ClInclude Include="..\xrRenderDX11\R_Backend.h">
       <Filter>Refactored\Backend</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\R_Backend_hemi.h">
+    <ClInclude Include="..\xrRenderDX11\R_Backend_hemi.h">
       <Filter>Refactored\Backend</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\R_Backend_LOD.h">
+    <ClInclude Include="..\xrRenderDX11\R_Backend_LOD.h">
       <Filter>Refactored\Backend</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\R_Backend_Runtime.h">
+    <ClInclude Include="..\xrRenderDX11\R_Backend_Runtime.h">
       <Filter>Refactored\Backend</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\R_Backend_tree.h">
+    <ClInclude Include="..\xrRenderDX11\R_Backend_tree.h">
       <Filter>Refactored\Backend</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\R_Backend_xform.h">
+    <ClInclude Include="..\xrRenderDX11\R_Backend_xform.h">
       <Filter>Refactored\Backend</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\R_DStreams.h">
@@ -1254,25 +1254,25 @@
     <ClCompile Include="..\xrRenderDX11\dx11HW.cpp">
       <Filter>Refactored\HW</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\R_Backend.cpp">
+    <ClCompile Include="..\xrRenderDX11\R_Backend.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\R_Backend_DBG.cpp">
+    <ClCompile Include="..\xrRenderDX11\R_Backend_DBG.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\R_Backend_hemi.cpp">
+    <ClCompile Include="..\xrRenderDX11\R_Backend_hemi.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\R_Backend_LOD.cpp">
+    <ClCompile Include="..\xrRenderDX11\R_Backend_LOD.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\R_Backend_Runtime.cpp">
+    <ClCompile Include="..\xrRenderDX11\R_Backend_Runtime.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\R_Backend_tree.cpp">
+    <ClCompile Include="..\xrRenderDX11\R_Backend_tree.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\R_Backend_xform.cpp">
+    <ClCompile Include="..\xrRenderDX11\R_Backend_xform.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\R_DStreams.cpp">

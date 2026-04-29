@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SH_Texture.h"
-#include "SH_Matrix.h"
-#include "SH_Constant.h"
-#include "SH_RT.h"
+#include "Layers/xrRender/SH_Texture.h"
+#include "Layers/xrRender/SH_Matrix.h"
+#include "Layers/xrRender/SH_Constant.h"
+#include "Layers/xrRender/SH_RT.h"
 
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
