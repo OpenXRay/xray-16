@@ -3,8 +3,8 @@
 
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/tss.h"
-#include "Layers/xrRender/blender.h"
-#include "Layers/xrRender/blender_recorder.h"
+#include "Layers/xrRenderDX11/Blender.h"
+#include "Layers/xrRenderDX11/Blender_Recorder.h"
 #include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"

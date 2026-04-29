@@ -57,8 +57,8 @@
 #include "Layers/xrRender/R_Backend.h"
 #include "Layers/xrRender/R_Backend_Runtime.h"
 
-#include "Layers/xrRender/Blender.h"
-#include "Layers/xrRender/Blender_CLSID.h"
+#include "Layers/xrRenderDX11/Blender.h"
+#include "Layers/xrRenderDX11/Blender_CLSID.h"
 
 #include "Common/_d3d_extensions.h"
 

@@ -2,8 +2,8 @@
 #pragma hdrstop
 
 #include "ResourceManager.h"
-#include "Blender.h"
-#include "Blender_CLSID.h"
+#include "Layers/xrRenderDX11/Blender.h"
+#include "Layers/xrRenderDX11/Blender_CLSID.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {

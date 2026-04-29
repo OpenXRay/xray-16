@@ -29,8 +29,8 @@
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"   // Terrain material buffer (t9)
 // SM6 bindless texture registration uses GEnv.Backend->RegisterBindlessTexture()
 #include "xrEngine/IRenderBackend.h"                          // For IRenderBackend
-#include "Layers/xrRender/Blender_CLSID.h"                    // For B_BmmD, B_LmBmmD CLASS_IDs
-#include "Layers/xrRender/blenders/Blender_BmmD.h"            // For CBlender_BmmD detail texture accessors
+#include "Layers/xrRenderDX11/Blender_CLSID.h"                    // For B_BmmD, B_LmBmmD CLASS_IDs
+#include "Layers/xrRenderDX11/blenders/Blender_BmmD.h"            // For CBlender_BmmD detail texture accessors
 #include "Layers/xrRender/r_constants.h"                      // For R_constant_setup
 #include "Layers/xrRender/Materials/MaterialSystem.h"         // For MaterialSystem (D3D12)
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"

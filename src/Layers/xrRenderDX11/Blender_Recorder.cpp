@@ -10,7 +10,7 @@
 #include "Blender.h"
 
 #ifdef USE_DX11
-#include "FrameGraph/ShaderCache.h"
+#include "Layers/xrRender/FrameGraph/ShaderCache.h"
 #endif
 
 namespace xray::render::RENDER_NAMESPACE

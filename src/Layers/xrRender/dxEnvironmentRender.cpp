@@ -2,7 +2,7 @@
 
 #include "dxEnvironmentRender.h"
 
-#include "Blender.h"
+#include "Layers/xrRenderDX11/Blender.h"
 #include "ResourceManager.h"
 
 #include "xrEngine/Environment.h"

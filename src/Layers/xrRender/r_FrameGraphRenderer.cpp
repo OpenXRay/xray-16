@@ -68,7 +68,7 @@
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrParticles/psystem.h"
-#include "blenders/Blender_Particle.h"
+#include "Layers/xrRenderDX11/blenders/Blender_Particle.h"
 
 extern ENGINE_API float psHUD_FOV;
 extern ENGINE_API int ps_r_rt_gi;
