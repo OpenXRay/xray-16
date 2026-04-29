@@ -31,8 +31,6 @@ void r5::InitializeFrameGraph()
     }
     Msg("* RenderDevice initialized successfully");
 
-    xray::render::InitializeImGuiRenderer(self.m_renderDevice);
-
     self.m_framegraphRenderer = xr_new<xray::render::FrameGraphRenderer>();
     if (!self.m_framegraphRenderer->Initialize(self.m_renderDevice))
     {
@@ -43,6 +41,8 @@ void r5::InitializeFrameGraph()
     Msg("* FrameGraphRenderer initialized successfully");
 
     GEnv.FrameGraphRenderer = self.m_framegraphRenderer;
+
+    xray::render::InitializeImGuiRenderer(self.m_renderDevice);
     GEnv.UIRender = self.m_framegraphRenderer->GetUICollector();
     self.m_framegraphRenderer->SetEnabled(true);
     Msg("* FrameGraphRenderer enabled");
