@@ -144,7 +144,7 @@
     <ClInclude Include="..\xrRender\D3DXRenderBase.h" />
     <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h" />
     <ClInclude Include="..\xrRender\DetailFormat.h" />
-    <ClInclude Include="..\xrRender\DetailManager.h" />
+    <ClInclude Include="..\xrRenderDX11\DetailManager.h" />
     <ClInclude Include="..\xrRender\DetailModel.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ComputeTest.h" />
     <ClInclude Include="..\xrRender\du_box.h" />
@@ -418,11 +418,11 @@
     <ClCompile Include="..\xrRender\ConstantSystem\FGConstantSystem.cpp" />
     <ClCompile Include="..\xrRender\D3DUtils.cpp" />
     <ClCompile Include="..\xrRender\D3DXRenderBase.cpp" />
-    <ClCompile Include="..\xrRender\DetailManager.cpp" />
-    <ClCompile Include="..\xrRender\DetailManager_CACHE.cpp" />
-    <ClCompile Include="..\xrRender\DetailManager_Decompress.cpp" />
-    <ClCompile Include="..\xrRender\DetailManager_soft.cpp" />
-    <ClCompile Include="..\xrRender\DetailManager_VS.cpp" />
+    <ClCompile Include="..\xrRenderDX11\DetailManager.cpp" />
+    <ClCompile Include="..\xrRenderDX11\DetailManager_CACHE.cpp" />
+    <ClCompile Include="..\xrRenderDX11\DetailManager_Decompress.cpp" />
+    <ClCompile Include="..\xrRenderDX11\DetailManager_soft.cpp" />
+    <ClCompile Include="..\xrRenderDX11\DetailManager_VS.cpp" />
     <ClCompile Include="..\xrRender\DetailModel.cpp" />
     <ClCompile Include="..\xrRender\du_box.cpp" />
     <ClCompile Include="..\xrRender\du_cone.cpp" />

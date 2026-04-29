@@ -5,8 +5,8 @@
 #pragma once
 
 #include "xrCore/xrPool.h"
-#include "DetailFormat.h"
-#include "DetailModel.h"
+#include "Layers/xrRender/DetailFormat.h"
+#include "Layers/xrRender/DetailModel.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
