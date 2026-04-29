@@ -7,6 +7,7 @@
 
 #include "SkeletonX.h"
 #include "SkeletonXSkinXW.h"
+#include "r__hw_compat.h"
 #include "xrCore/FMesh.hpp"
 #include "xrCDB/Intersect.hpp"
 
@@ -58,7 +59,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
     u16 hw_bones_cnt = u16((caps.geometry.dwRegisters - 22 - 3) / 3);
 
 #if RENDER == R_R1
-    if (ps_r1_SoftwareSkinning == 1 || RImplementation.o.ffp)
+    if (ps_r1_SoftwareSkinning == 1 || CompatHW::ffp())
         hw_bones_cnt = 0;
 #endif // RENDER == R_R1
 
@@ -69,7 +70,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
     dwVertCount = data->r_u32();
 
     RenderMode = RM_SKINNING_SOFT;
-    RImplementation.shader_option_skinning(-1);
+    CompatHW::shader_option_skinning(-1);
 
     switch (dwVertType)
     {
@@ -92,21 +93,21 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 
         // Still allow HW skinning for single bone case
         // go full SW skinning only if FFP is forced
-        if (!RImplementation.o.ffp)
+        if (!CompatHW::ffp())
         {
             if (1 == bids.size())
             {
                 // HW- single bone
-                RenderMode = RImplementation.m_hq_skinning ? RM_SINGLE_HQ : RM_SINGLE;
+                RenderMode = CompatHW::hq_skinning() ? RM_SINGLE_HQ : RM_SINGLE;
                 RMS_boneid = *bids.begin();
-                RImplementation.shader_option_skinning(0);
+                CompatHW::shader_option_skinning(0);
             }
             else if (sw_bones_cnt <= hw_bones_cnt)
             {
                 // HW- one weight
-                RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_1B_HQ : RM_SKINNING_1B;
+                RenderMode = CompatHW::hq_skinning() ? RM_SKINNING_1B_HQ : RM_SKINNING_1B;
                 RMS_bonecount = sw_bones_cnt + 1;
-                RImplementation.shader_option_skinning(1);
+                CompatHW::shader_option_skinning(1);
             }
         }
         else
@@ -114,7 +115,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
             // software
             crc = crc32(data->pointer(), size);
             Vertices1W.create(crc, dwVertCount, (vertBoned1W*)data->pointer());
-            RImplementation.shader_option_skinning(-1);
+            CompatHW::shader_option_skinning(-1);
         }
     }
     break;
@@ -140,16 +141,16 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         if (sw_bones_cnt <= hw_bones_cnt)
         {
             // HW- two weights
-            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_2B_HQ : RM_SKINNING_2B;
+            RenderMode = CompatHW::hq_skinning() ? RM_SKINNING_2B_HQ : RM_SKINNING_2B;
             RMS_bonecount = sw_bones_cnt + 1;
-            RImplementation.shader_option_skinning(2);
+            CompatHW::shader_option_skinning(2);
         }
         else
         {
             // software
             crc = crc32(data->pointer(), size);
             Vertices2W.create(crc, dwVertCount, (vertBoned2W*)data->pointer());
-            RImplementation.shader_option_skinning(-1);
+            CompatHW::shader_option_skinning(-1);
         }
     }
     break;
@@ -173,15 +174,15 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         //.			R_ASSERT(sw_bones_cnt<=hw_bones_cnt);
         if ((sw_bones_cnt <= hw_bones_cnt))
         {
-            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_3B_HQ : RM_SKINNING_3B;
+            RenderMode = CompatHW::hq_skinning() ? RM_SKINNING_3B_HQ : RM_SKINNING_3B;
             RMS_bonecount = sw_bones_cnt + 1;
-            RImplementation.shader_option_skinning(3);
+            CompatHW::shader_option_skinning(3);
         }
         else
         {
             crc = crc32(data->pointer(), size);
             Vertices3W.create(crc, dwVertCount, (vertBoned3W*)data->pointer());
-            RImplementation.shader_option_skinning(-1);
+            CompatHW::shader_option_skinning(-1);
         }
     }
     break;
@@ -206,15 +207,15 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         //.			R_ASSERT(sw_bones_cnt<=hw_bones_cnt);
         if (sw_bones_cnt <= hw_bones_cnt)
         {
-            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_4B_HQ : RM_SKINNING_4B;
+            RenderMode = CompatHW::hq_skinning() ? RM_SKINNING_4B_HQ : RM_SKINNING_4B;
             RMS_bonecount = sw_bones_cnt + 1;
-            RImplementation.shader_option_skinning(4);
+            CompatHW::shader_option_skinning(4);
         }
         else
         {
             crc = crc32(data->pointer(), size);
             Vertices4W.create(crc, dwVertCount, (vertBoned4W*)data->pointer());
-            RImplementation.shader_option_skinning(-1);
+            CompatHW::shader_option_skinning(-1);
         }
     }
     break;
