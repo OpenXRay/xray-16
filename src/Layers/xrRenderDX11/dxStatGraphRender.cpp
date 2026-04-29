@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "dxStatGraphRender.h"
+#include "Layers/xrRender/dxStatGraphRender.h"
 
 namespace xray::render::fg
 {

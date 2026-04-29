@@ -1,13 +1,13 @@
 #include "stdafx.h"
 
-#include "dxEnvironmentRender.h"
+#include "Layers/xrRender/dxEnvironmentRender.h"
 
 #include "Layers/xrRenderDX11/Blender.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/xr_efflensflare.h"
-#include "FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render::fg
 {

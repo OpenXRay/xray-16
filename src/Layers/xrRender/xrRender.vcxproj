@@ -278,8 +278,6 @@
     <ClCompile Include="du_cylinder.cpp"/>
     <ClCompile Include="du_sphere.cpp"/>
     <ClCompile Include="du_sphere_part.cpp"/>
-    <ClCompile Include="dxDebugRender.cpp"/>
-    <ClCompile Include="dxEnvironmentRender.cpp"/>
     <ClCompile Include="FrameGraphPasses\ForwardColorPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\HiZBuildPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\SkinningPassSetup.cpp"/>
@@ -319,15 +317,8 @@
     <ClCompile Include="ImGuiRendererIntegration.cpp"/>
     <ClCompile Include="dxRenderFactory_ImGui.cpp"/>
     <ClCompile Include="GlobalRenderDevice.cpp"/>
-    <ClCompile Include="dxLensFlareRender.cpp"/>
-    <ClCompile Include="dxObjectSpaceRender.cpp"/>
     <ClCompile Include="dxParticleCustom.cpp"/>
-    <ClCompile Include="dxRainRender.cpp"/>
     <ClCompile Include="dxRenderFactory.cpp"/>
-    <ClCompile Include="dxStatGraphRender.cpp"/>
-    <ClCompile Include="dxThunderboltDescRender.cpp"/>
-    <ClCompile Include="dxThunderboltRender.cpp"/>
-    <ClCompile Include="dxUIRender.cpp"/>
     <ClCompile Include="dxUISequenceVideoItem.cpp"/>
     <ClCompile Include="dxWallMarkArray.cpp"/>
     <ClCompile Include="ETextureParams.cpp"/>

@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "dxRainRender.h"
+#include "Layers/xrRender/dxRainRender.h"
 
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Rain.h"
-#include "FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render::fg
 {

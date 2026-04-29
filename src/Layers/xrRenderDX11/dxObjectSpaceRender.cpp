@@ -2,7 +2,7 @@
 
 #ifdef DEBUG
 
-#include "dxObjectSpaceRender.h"
+#include "Layers/xrRender/dxObjectSpaceRender.h"
 
 namespace xray::render::fg
 {

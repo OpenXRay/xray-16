@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "dxThunderboltRender.h"
+#include "Layers/xrRender/dxThunderboltRender.h"
 
 #include "xrEngine/thunderbolt.h"
-#include "dxThunderboltDescRender.h"
-#include "dxLensFlareRender.h"
+#include "Layers/xrRender/dxThunderboltDescRender.h"
+#include "Layers/xrRender/dxLensFlareRender.h"
 
 namespace xray::render::fg
 {

@@ -2,8 +2,8 @@
 
 #ifdef DEBUG
 
-#include "dxDebugRender.h"
-#include "dxUIShader.h"
+#include "Layers/xrRender/dxDebugRender.h"
+#include "Layers/xrRender/dxUIShader.h"
 
 namespace xray::render::fg
 {

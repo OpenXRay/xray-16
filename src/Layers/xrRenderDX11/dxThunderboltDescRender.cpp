@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "dxThunderboltDescRender.h"
+#include "Layers/xrRender/dxThunderboltDescRender.h"
 
 namespace xray::render::fg
 {

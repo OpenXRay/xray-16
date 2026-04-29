@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "dxUIRender.h"
+#include "Layers/xrRender/dxUIRender.h"
 
-#include "dxUIShader.h"
+#include "Layers/xrRender/dxUIShader.h"
 
 namespace xray::render::fg
 {
