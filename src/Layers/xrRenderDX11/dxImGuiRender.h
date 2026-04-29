@@ -19,4 +19,4 @@ public:
     void OnDeviceResetBegin() override;
     void OnDeviceResetEnd() override;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

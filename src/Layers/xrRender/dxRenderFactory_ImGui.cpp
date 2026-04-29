@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "dxRenderFactory.h"
-#include "dxImGuiRender.h"
+#include "Layers/xrRenderDX11/dxImGuiRender.h"
 #include "ImGuiRendererNVRHI.h"
 #include "RenderContext/RenderDevice.h"
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "tss_def.h"
+#include "Layers/xrRender/tss_def.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/dx11StateUtils.h"
@@ -11,7 +11,6 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
-// TODO: DX11: Implement equivalent for SimulatorStates::record for DX11
 void SimulatorStates::record(ID3DState*& state)
 {
 #if defined(USE_DX9)
@@ -33,21 +32,17 @@ void SimulatorStates::record(ID3DState*& state)
     }
     CHK_DX(HW.pDevice->EndStateBlock(&state));
 #elif defined(USE_DX11)
-    // VERIFY(!"SimulatorStates::record not implemented!");
     state = ID3DState::Create(*this);
 #elif defined(USE_OGL)
     state = ID3DState::Create();
     for (SimulatorStates::State& S : States)
     {
-        // Update aniso value
         if (S.type == 2 && S.v2 == D3DSAMP_MAXANISOTROPY)
             S.v3 = ps_r__tf_Anisotropic;
 
-        // Update states
         switch (S.type)
         {
         case 0:	state->UpdateRenderState(S.v1, S.v2); break;
-        //case 1: VERIFY(!"Texture environment not supported"); break;
         case 2: state->UpdateSamplerState(S.v1, S.v2, S.v3); break;
         }
     }
@@ -58,7 +53,6 @@ void SimulatorStates::record(ID3DState*& state)
 
 void SimulatorStates::set_RS(u32 a, u32 b)
 {
-    // Search duplicates
     for (int t = 0; t < int(States.size()); t++)
     {
         State& S = States[t];
@@ -69,7 +63,6 @@ void SimulatorStates::set_RS(u32 a, u32 b)
         }
     }
 
-    // Register
     State st;
     st.set_RS(a, b);
     States.push_back(st);
@@ -77,7 +70,6 @@ void SimulatorStates::set_RS(u32 a, u32 b)
 
 void SimulatorStates::set_TSS(u32 a, u32 b, u32 c)
 {
-    // Search duplicates
     for (int t = 0; t < int(States.size()); t++)
     {
         State& S = States[t];
@@ -88,7 +80,6 @@ void SimulatorStates::set_TSS(u32 a, u32 b, u32 c)
         }
     }
 
-    // Register
     State st;
     st.set_TSS(a, b, c);
     States.push_back(st);
@@ -96,7 +87,6 @@ void SimulatorStates::set_TSS(u32 a, u32 b, u32 c)
 
 void SimulatorStates::set_SAMP(u32 a, u32 b, u32 c)
 {
-    // Search duplicates
     for (int t = 0; t < int(States.size()); t++)
     {
         State& S = States[t];
@@ -107,7 +97,6 @@ void SimulatorStates::set_SAMP(u32 a, u32 b, u32 c)
         }
     }
 
-    // Register
     State st;
     st.set_SAMP(a, b, c);
     States.push_back(st);
@@ -148,7 +137,6 @@ void SimulatorStates::UpdateDesc(D3D_RASTERIZER_DESC& desc) const
         const State& S = States[it];
         if (S.type == 0)
         {
-            // CHK_DX(HW.pDevice->SetRenderState        ((D3DRENDERSTATETYPE)S.v1,S.v2));
             switch (S.v1)
             {
             case D3DRS_FILLMODE:
@@ -164,56 +152,22 @@ void SimulatorStates::UpdateDesc(D3D_RASTERIZER_DESC& desc) const
             case D3DRS_CULLMODE:
                 desc.CullMode = dx11StateUtils::ConvertCullMode((D3DCULL)S.v2);
                 break;
-            /*
-            switch (S.v2)
-            {
-            case D3DCULL_NONE:
-                desc.CullMode = D3Dxx_CULL_NONE;
-                break;
-            case D3DCULL_CW:
-                desc.CullMode = D3Dxx_CULL_FRONT;
-                break;
-            case D3DCULL_CCW:
-                desc.CullMode = D3Dxx_CULL_BACK;
-                break;
-            default:
-                VERIFY(!"Unexpected cull mode!");
-            }
-        break;
-        */
 
-            //  desc.FrontCounterClockwise = FALSE;
-
-            //  TODO: DX11: Check how to scale unit for depth bias
             case D3DRS_DEPTHBIAS:
                 VERIFY(0);
                 break;
 
-            //  desc.DepthBiasClamp = 0.0f;
-
-            //  TODO: DX11: Check slope scaled depth bias is used
             case D3DRS_SLOPESCALEDEPTHBIAS:
-                // desc.SlopeScaledDepthBias = 0.0f;
                 VERIFY(0);
                 break;
-
-            //  desc.DepthClipEnable = TRUE;
 
             case D3DRS_SCISSORTESTENABLE:
                 desc.ScissorEnable = S.v2;
                 break;
 
-                // desc.MultisampleEnable = FALSE;
-                // desc.AntialiasedLineEnable = FALSE;
             }
         }
 
-        // case 1:
-        //
-        // CHK_DX(HW.pDevice->SetTextureStageState  (S.v1,(D3DTEXTURESTAGESTATETYPE)S.v2,S.v3));
-        //  TODO: DX11: Enable
-        //  VERIFY(!"DirectX 10 doesn't support texture stage states. Implement shader instead!");
-        //  break;
     }
 }
 
@@ -300,8 +254,6 @@ void SimulatorStates::UpdateDesc(D3D_BLEND_DESC& desc) const
                     desc.RenderTarget[i].DestBlend = dx11StateUtils::ConvertBlendArg((D3DBLEND)S.v2);
                 break;
 
-            // D3DRS_ALPHAFUNC
-
             case D3DRS_BLENDOP:
                 for (int i = 0; i < 8; ++i)
                     desc.RenderTarget[i].BlendOp = dx11StateUtils::ConvertBlendOp((D3DBLENDOP)S.v2);
@@ -365,47 +317,41 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
 
             switch (S.v2)
             {
-            // D3D_FILTER Filter;
-            case D3DSAMP_MAGFILTER: /* D3DTEXTUREFILTER filter to use for magnification */
+            case D3DSAMP_MAGFILTER:
                 switch (S.v3)
                 {
                 case D3DTEXF_NONE:
                 case D3DTEXF_POINT: desc.Filter = (D3D_FILTER)(desc.Filter & (~MagfilterLinear)); break;
                 case D3DTEXF_LINEAR:
                     desc.Filter = (D3D_FILTER)(desc.Filter | MagfilterLinear);
-                    //desc.Filter |= MagfilterLinear;
                     break;
                 default: NODEFAULT;
                 }
                 break;
 
-            case D3DSAMP_MINFILTER: /* D3DTEXTUREFILTER filter to use for minification */
+            case D3DSAMP_MINFILTER:
                 switch (S.v3)
                 {
                 case D3DTEXF_NONE:
                 case D3DTEXF_POINT:
-                    // desc.Filter &= ~MinfilterLinear;
                     desc.Filter = (D3D_FILTER)(desc.Filter & (~MinfilterLinear));
                     break;
                 case D3DTEXF_LINEAR:
                     desc.Filter = (D3D_FILTER)(desc.Filter | MinfilterLinear);
-                    // desc.Filter |= MinfilterLinear;
                     break;
                 default: NODEFAULT;
                 }
                 break;
 
-            case D3DSAMP_MIPFILTER: /* D3DTEXTUREFILTER filter to use between mipmaps during minification */
+            case D3DSAMP_MIPFILTER:
                 switch (S.v3)
                 {
                 case D3DTEXF_NONE:
                 case D3DTEXF_POINT:
                     desc.Filter = (D3D_FILTER)(desc.Filter & (~MipfilterLinear));
-                    // desc.Filter &= ~MipfilterLinear;
                     break;
                 case D3DTEXF_LINEAR:
                     desc.Filter = (D3D_FILTER)(desc.Filter | MipfilterLinear);
-                    // desc.Filter |= MipfilterLinear;
                     break;
                 default: NODEFAULT;
                 }
@@ -414,50 +360,41 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
             case XRDX11SAMP_ANISOTROPICFILTER:
                 if (S.v3)
                     desc.Filter = (D3D_FILTER)(desc.Filter | FilterAnisotropic);
-                // desc.Filter |= FilterAnisotropic;
                 else
                     desc.Filter = (D3D_FILTER)(desc.Filter & (~FilterAnisotropic));
-                // desc.Filter &= ~FilterAnisotropic;
                 break;
 
             case XRDX11SAMP_COMPARISONFILTER:
                 if (S.v3)
                     desc.Filter = (D3D_FILTER)(desc.Filter | FilterComparison);
-                // desc.Filter |= FilterComparison;
                 else
                     desc.Filter = (D3D_FILTER)(desc.Filter & (~FilterComparison));
-                // desc.Filter &= ~FilterComparison;
                 break;
 
-            // D3Dxx_TEXTURE_ADDRESS_MODE AddressU;
-            case D3DSAMP_ADDRESSU: /* D3DTEXTUREADDRESS for U coordinate */
+            case D3DSAMP_ADDRESSU:
                 desc.AddressU = dx11StateUtils::ConvertTextureAddressMode(D3DTEXTUREADDRESS(S.v3));
                 break;
 
-            case D3DSAMP_ADDRESSV: /* D3DTEXTUREADDRESS for V coordinate */
+            case D3DSAMP_ADDRESSV:
                 desc.AddressV = dx11StateUtils::ConvertTextureAddressMode(D3DTEXTUREADDRESS(S.v3));
                 break;
 
-            case D3DSAMP_ADDRESSW: /* D3DTEXTUREADDRESS for W coordinate */
+            case D3DSAMP_ADDRESSW:
                 desc.AddressW = dx11StateUtils::ConvertTextureAddressMode(D3DTEXTUREADDRESS(S.v3));
                 break;
 
-            // FLOAT MipLODBias
             case D3DSAMP_MIPMAPLODBIAS:
                 desc.MipLODBias = *((float*)(&(S.v3)));
                 break;
 
-            // UINT MaxAnisotropy;
             case D3DSAMP_MAXANISOTROPY:
                 desc.MaxAnisotropy = S.v3;
                 break;
 
-            // D3Dxx_COMPARISON_FUNC ComparisonFunc;
             case XRDX11SAMP_COMPARISONFUNC:
                 desc.ComparisonFunc = (D3D_COMPARISON_FUNC)S.v3;
                 break;
 
-            // FLOAT BorderColor[4];
             case D3DSAMP_BORDERCOLOR:
             {
                 desc.BorderColor[0] = ((S.v3 >> 16) & 0xff) / 255.0f;
@@ -467,25 +404,21 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
             }
             break;
 
-            // FLOAT MinLOD;
             case XRDX11SAMP_MINLOD:
                 desc.MinLOD = (FLOAT)S.v3;
                 break;
 
-            // FLOAT MaxLOD;
             case D3DSAMP_MAXMIPLEVEL: desc.MaxLOD = (FLOAT)S.v3; break;
             }
         }
     }
 
-    // Validate data
     for (int i = 0; i < D3D_COMMONSHADER_SAMPLER_SLOT_COUNT; ++i)
     {
         D3D_SAMPLER_DESC& desc = descArray[i];
         if (desc.Filter & FilterAnisotropic)
         {
             desc.Filter = (D3D_FILTER)(desc.Filter | AllfilterLinear);
-            // desc.Filter |= AllfilterLinear;
         }
 
         VERIFY(desc.MinLOD <= desc.MaxLOD);
@@ -494,5 +427,5 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
     }
 }
 
-#endif // !USE_DX9 && !USE_OGL
-} // namespace xray::render::RENDER_NAMESPACE
+#endif
+}
