@@ -161,9 +161,7 @@ void CLight_DB::add_light(light* L)
     if (ps_r1_flags.test(R1FLAG_DLIGHTS))
         RImplementation.L_Dynamic->add(L);
 #else
-    if (RImplementation.o.noshadows)
-        L->flags.bShadow = FALSE;
-    if (L->flags.bStatic && !ps_r2_ls_flags.test(R2FLAG_R1LIGHTS))
+    if (L->flags.bStatic)
         return;
     L->Export(package);
 #endif
@@ -199,7 +197,7 @@ void CLight_DB::Update()
         VERIFY2(E.sun_dir.y < 0, "Invalid sun direction settings in evironment-config");
         Fvector dir, pos;
 
-        if (!RImplementation.is_sun_static() && !ShadowOfChernobylMode)
+        if (!ShadowOfChernobylMode)
         {
             // true sunlight direction
             dir.set(E.sun_dir).normalize();
