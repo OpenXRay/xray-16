@@ -305,8 +305,8 @@ void CTexture::set_slice(int slice)
 
 void CTexture::Preload()
 {
-    m_bumpmap = RImplementation.Resources->m_textures_description.GetBumpName(cName);
-    m_material = RImplementation.Resources->m_textures_description.GetMaterial(cName);
+    m_bumpmap = TextureDescr.GetBumpName(cName);
+    m_material = TextureDescr.GetMaterial(cName);
 }
 
 void CTexture::Load()

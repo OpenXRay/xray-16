@@ -77,4 +77,6 @@ public:
     // Consolidated packed PBR texture (R=metallic, G=roughness, B=ao, A=parallax):
     shared_str GetPBRName(const shared_str& tex_name) const;
 };
+
+extern ECORE_API CTextureDescrMngr TextureDescr;
 } // namespace xray::render::fg

@@ -71,7 +71,7 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
                 xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", lst[0].c_str());
             base = lst[id].c_str();
         }
-        if (!RImplementation.Resources->m_textures_description.GetDetailTexture(base, detail_texture, detail_scaler))
+        if (!TextureDescr.GetDetailTexture(base, detail_texture, detail_scaler))
             bDetail = false;
     }
     else
@@ -110,7 +110,7 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
 
     if (bDetail)
     {
-        RImplementation.Resources->m_textures_description.GetTextureUsage(base, bDetail_Diffuse, bDetail_Bump);
+        TextureDescr.GetTextureUsage(base, bDetail_Diffuse, bDetail_Bump);
 
 #ifndef _EDITOR
 #if RENDER != R_R1
@@ -125,12 +125,12 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
     }
 
     bUseSteepParallax =
-        RImplementation.Resources->m_textures_description.UseSteepParallax(base) && BT->canUseSteepParallax();
+        TextureDescr.UseSteepParallax(base) && BT->canUseSteepParallax();
 /*
-    if (DEV->m_textures_description.UseSteepParallax(base))
+    if (TextureDescr.UseSteepParallax(base))
     {
         bool bSteep = BT->canUseSteepParallax();
-        DEV->m_textures_description.UseSteepParallax(base);
+        TextureDescr.UseSteepParallax(base);
         bUseSteepParallax = true;
     }
 */

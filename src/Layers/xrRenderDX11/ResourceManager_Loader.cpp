@@ -11,7 +11,7 @@ void CResourceManager::OnDeviceDestroy(BOOL)
 {
     if (Device.b_is_Ready)
         return;
-    m_textures_description.UnLoad();
+    TextureDescr.UnLoad();
 
     // Matrices
     for (map_Matrix::iterator m = m_matrices.begin(); m != m_matrices.end(); ++m)
@@ -131,7 +131,7 @@ void CResourceManager::OnDeviceCreate(IReader* F)
         fs->close();
     }
 
-    m_textures_description.Load();
+    TextureDescr.Load();
 }
 
 void CResourceManager::OnDeviceCreate(LPCSTR shName)

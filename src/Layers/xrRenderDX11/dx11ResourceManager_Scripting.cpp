@@ -505,7 +505,7 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     {
         // Analyze possibility to detail this shader
         C.iElement = 0;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
+        C.bDetail = TextureDescr.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
 
         if (C.bDetail)
             S.E[0] = C._lua_Compile(s_shader, "normal_hq");
@@ -517,7 +517,7 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
         if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION))
         {
             C.iElement = 0;
-            C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
+            C.bDetail = TextureDescr.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
             S.E[0] = C._lua_Compile(s_shader, "normal");
         }
     }
@@ -526,7 +526,7 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION))
     {
         C.iElement = 1;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
+        C.bDetail = TextureDescr.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         S.E[1] = C._lua_Compile(s_shader, "normal");
     }
 

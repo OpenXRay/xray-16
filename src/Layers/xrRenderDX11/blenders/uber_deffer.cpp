@@ -40,7 +40,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
     bool bHasDetailBump = false;
     if (C.bDetail_Bump)
     {
-        LPCSTR detail_bump_texture = RImplementation.Resources->m_textures_description.GetBumpName(dt).c_str();
+        LPCSTR detail_bump_texture = TextureDescr.GetBumpName(dt).c_str();
         // Detect and use detail bump
         if (detail_bump_texture)
         {
@@ -279,7 +279,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
     bool bHasDetailBump = false;
     if (C.bDetail_Bump)
     {
-        LPCSTR detail_bump_texture = RImplementation.Resources->m_textures_description.GetBumpName(dt).c_str();
+        LPCSTR detail_bump_texture = TextureDescr.GetBumpName(dt).c_str();
         //  Detect and use detail bump
         if (detail_bump_texture)
         {

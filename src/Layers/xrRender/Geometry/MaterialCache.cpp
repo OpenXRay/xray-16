@@ -1607,7 +1607,7 @@ float MaterialCache::GetDetailScale(const shared_str& textureName)
 
     // Query TextureDescrManager via clean public API
     // This internally queries m_detail_scalers map (populated from .ltx files)
-    float scale = RImplementation.Resources->m_textures_description.GetDetailScale(textureName);
+    float scale = TextureDescr.GetDetailScale(textureName);
 
     // Cache for next time
     m_detailScaleCache[textureName.c_str()] = scale;
@@ -1910,7 +1910,7 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
 
         // 7-10. Detail normal textures (s_dn_r/g/b/a)
         // Convention: detail texture name + "_bump"
-        auto& texDescMgr = RImplementation.Resources->m_textures_description;
+        auto& texDescMgr = TextureDescr;
         if (detailR && detailR[0]) {
             shared_str bumpR = texDescMgr.GetBumpName(detailR);
             if (bumpR.size()) {
@@ -2223,7 +2223,7 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
         }
 
         // Get normal/bump map from texture description (proper X-Ray way)
-        auto& texDescMgr = RImplementation.Resources->m_textures_description;
+        auto& texDescMgr = TextureDescr;
         shared_str bumpName = texDescMgr.GetBumpName(diffuseName);
         if (bumpName.size() && bumpName[0]) {
             resources::TextureHandle handle = texManager->LoadTexture(bumpName.c_str());

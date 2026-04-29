@@ -289,8 +289,8 @@ bool D3DXRenderBase::HWSupportsShaderYUV2RGB()
 void D3DXRenderBase::OnAssetsChanged()
 {
     ZoneScoped;
-    Resources->m_textures_description.UnLoad();
-    Resources->m_textures_description.Load();
+    TextureDescr.UnLoad();
+    TextureDescr.Load();
 }
 
 xrImTextureData D3DXRenderBase::GetImGuiTextureId(pcstr texture_name)

@@ -7,6 +7,8 @@
 
 namespace xray::render::fg
 {
+CTextureDescrMngr TextureDescr;
+
 // eye-params
 float r__dtex_range = 50;
 class cl_dt_scaler : public R_constant_setup
