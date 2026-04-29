@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Shader.h"
+#include "Layers/xrRender/Shader.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
 
 namespace xray::render::fg

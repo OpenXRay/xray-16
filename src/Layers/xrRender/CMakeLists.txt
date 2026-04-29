@@ -196,10 +196,8 @@ target_sources(xrRender PRIVATE
     ResourceManager/TestTextureManager.cpp
     ResourceManager/TextureManager.cpp
     ResourceManager/TextureStreaming.cpp
-    SH_Atomic.cpp
     SH_Constant.cpp
     SH_Matrix.cpp
-    Shader.cpp
     ShaderKey.cpp
     SkeletonAnimated.cpp
     SkeletonCustom.cpp
@@ -226,7 +224,6 @@ target_sources(xrRender PRIVATE
     du_sphere_part.cpp
     dxDebugRender.cpp
     dxEnvironmentRender.cpp
-    dxFontRender.cpp
     dxLensFlareRender.cpp
     dxObjectSpaceRender.cpp
     dxParticleCustom.cpp
@@ -237,7 +234,6 @@ target_sources(xrRender PRIVATE
     dxThunderboltRender.cpp
     dxUIRender.cpp
     dxUISequenceVideoItem.cpp
-    dxUIShader.cpp
     dxWallMarkArray.cpp
     light.cpp
     light_GI.cpp

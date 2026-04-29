@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "SH_Atomic.h"
+#include "Layers/xrRender/SH_Atomic.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
 
 #if defined(USE_DX11)

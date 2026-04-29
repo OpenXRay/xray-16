@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#include "dxUIShader.h"
-#include "xrRender_console.h"
-#include "RenderContext/RenderDevice.h"
-#include "ResourceManager/FGResourceManager.h"
-#include "ResourceManager/TextureManager.h"
-#include "FrameGraph/ShaderCache.h"
-#include "FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/xrRender_console.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
+#include "Layers/xrRender/FrameGraph/ShaderCache.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 using namespace xray::render::resources;
 

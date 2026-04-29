@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
-#include "dxFontRender.h"
+#include "Layers/xrRender/dxFontRender.h"
 
 #include "xrEngine/GameFont.h"
 #include "xrCore/Text/StringConversion.hpp"
-#include "RenderContext/RenderDevice.h"
-#include "ResourceManager/FGResourceManager.h"
-#include "FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 extern ENGINE_API bool g_bRendering;
 extern ENGINE_API Fvector2 g_current_font_scale;

@@ -746,6 +746,18 @@
     <ClCompile Include="..\xrRenderDX11\ShaderInfo.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\Shader.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\SH_Atomic.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dxFontRender.cpp">
+      <Filter>Interface implementations\FontRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dxUIShader.cpp">
+      <Filter>Interface implementations\UI\UIShader</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_BmmD_deferred.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
