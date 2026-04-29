@@ -67,48 +67,7 @@ void FProgressive::Load(const char* N, IReader* data, u32 dwFlags)
 #endif
 }
 
-void FProgressive::Render(CBackend& cmd_list, float LOD, bool use_fast_geo)
-{
-#if RENDER != R_R1
-    if (m_fast && use_fast_geo)
-    {
-        int lod_id = iFloor((1.f - clampr(LOD, 0.f, 1.f)) * float(xSWI->count - 1) + 0.5f);
-        VERIFY(lod_id >= 0 && lod_id < int(xSWI->count));
-        FSlideWindow& SW = xSWI->sw[lod_id];
-        cmd_list.set_Geometry(m_fast->rm_geom);
-        cmd_list.Render(D3DPT_TRIANGLELIST, m_fast->vBase, 0, SW.num_verts, m_fast->iBase + SW.offset, SW.num_tris);
-        cmd_list.stat.r.s_static.add(SW.num_verts);
-    }
-    else
-    {
-        int lod_id = last_lod;
-        if (LOD >= 0.f)
-        {
-            clamp(LOD, 0.f, 1.f);
-            lod_id = iFloor((1.f - LOD) * float(nSWI.count - 1) + 0.5f);
-            last_lod = lod_id;
-        }
-        VERIFY(lod_id >= 0 && lod_id < int(nSWI.count));
-        FSlideWindow& SW = nSWI.sw[lod_id];
-        cmd_list.set_Geometry(rm_geom);
-        cmd_list.Render(D3DPT_TRIANGLELIST, vBase, 0, SW.num_verts, iBase + SW.offset, SW.num_tris);
-        cmd_list.stat.r.s_static.add(SW.num_verts);
-    }
-#else
-    int lod_id = last_lod;
-    if (LOD >= 0.f)
-    {
-        clamp(LOD, 0.f, 1.f);
-        lod_id = iFloor((1.f - LOD) * float(nSWI.count - 1) + 0.5f);
-        last_lod = lod_id;
-    }
-    VERIFY(lod_id >= 0 && lod_id < int(nSWI.count));
-    FSlideWindow& SW = nSWI.sw[lod_id];
-    RCache.set_Geometry(rm_geom);
-    RCache.Render(D3DPT_TRIANGLELIST, vBase, 0, SW.num_verts, iBase + SW.offset, SW.num_tris);
-    RCache.stat.r.s_static.add(SW.num_verts);
-#endif
-}
+void FProgressive::Render(CBackend&, float, bool) {}
 
 #define PCOPY(a) a = pFrom->a
 void FProgressive::Copy(dxRender_Visual* pSrc)

@@ -302,8 +302,7 @@ void light::Export(light_Package& package)
                 L->s_spot = s_spot;
                 L->s_point = s_point;
 
-// Holger - do we need to export msaa stuff as well ?
-#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
+#if 0
                 if (RImplementation.o.msaa)
                 {
                     int bound = 1;
