@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="14.0">
   <ImportGroup Label="PropertySheets">
-    <Import Project="..\..\xray_project_configurations.props" />
+    <Import Project="..\..\xray_project_configurations.props"/>
   </ImportGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}</ProjectGuid>
     <RootNamespace>xrRender_R4</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
   <ImportGroup Label="PropertySheets">
-    <Import Project="..\..\xray_project_configuration.props" />
+    <Import Project="..\..\xray_project_configuration.props"/>
   </ImportGroup>
   <PropertyGroup Label="Configuration">
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\xray.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+    <Import Project="..\..\xray.props"/>
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros"/>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;$(xrExternals)nvrhi\thirdparty\Vulkan-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -59,667 +59,233 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Include\xrRender\DebugRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\DebugShader.h" />
-    <ClInclude Include="..\..\Include\xrRender\DrawUtils.h" />
-    <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\FactoryPtr.h" />
-    <ClInclude Include="..\..\Include\xrRender\FontRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\Kinematics.h" />
-    <ClInclude Include="..\..\Include\xrRender\KinematicsAnimated.h" />
-    <ClInclude Include="..\..\Include\xrRender\LensFlareRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\ObjectSpaceRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\ParticleCustom.h" />
-    <ClInclude Include="..\..\Include\xrRender\RainRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\RenderDetailModel.h" />
-    <ClInclude Include="..\..\Include\xrRender\RenderFactory.h" />
-    <ClInclude Include="..\..\Include\xrRender\RenderVisual.h" />
-    <ClInclude Include="..\..\Include\xrRender\StatGraphRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\ThunderboltDescRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\ThunderboltRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\UIRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h" />
-    <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
-    <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
-    <ClInclude Include="..\utils\xrLC_Light\R_light.h" />
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.h" />
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidData.h" />
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.h" />
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.h" />
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.h" />
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h" />
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h" />
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h" />
-    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_Matrices.h" />
-    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_SIMD.h" />
-    <ClInclude Include="..\xrRender\Backend\D3D11BackendWrapper.h" />
-    <ClInclude Include="..\xrRender\Backend\D3D12Backend.h" />
-    <ClInclude Include="..\xrRender\Backend\VulkanBackend.h" />
-    <ClInclude Include="..\xrRender\Bindless\BindlessTypes.h" />
-    <ClInclude Include="..\xrRender\Bindless\GPUStructuredBuffer.h" />
-    <ClInclude Include="..\xrRender\Bindless\MaterialBuffer.h" />
-    <ClInclude Include="..\xrRender\Bindless\TerrainMaterialBuffer.h" />
-    <ClInclude Include="..\xrRender\Bindless\VariantTextureBuffer.h" />
-    <ClInclude Include="..\xrRender\Bindless\UnifiedVertex.h" />
-    <ClInclude Include="..\xrRender\Bindless\VertexConverter.h" />
-    <ClInclude Include="..\xrRender\ShaderVariant\ShaderVariantRegistry.h" />
-    <ClInclude Include="..\xrRender\ShaderVariant\JsonParser.h" />
-    <ClInclude Include="..\xrRender\ShaderVariant\VariantPartitionConfig.h" />
-    <ClInclude Include="..\xrRender\ShaderVariant\VariantPSOCache.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Detail_GPU.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\dx11RainBlender.h" />
-    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h" />
-    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer_impl.h" />
-    <ClInclude Include="..\xrRenderDX11\dx11HW.h" />
-    <ClInclude Include="..\xrRenderDX11\dx11R_Backend_Runtime.h" />
-    <ClInclude Include="..\xrRenderDX11\dx11r_constants_cache.h" />
-    <ClInclude Include="..\xrRenderDX11\dx11StateUtils.h" />
-    <ClInclude Include="..\xrRenderDX11\dx11TextureUtils.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\dx11MSAABlender.h" />
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.h" />
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.h" />
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx11State.h" />
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateCache.h" />
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateCacheImpl.h" />
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateManager.h" />
-    <ClInclude Include="..\xrRenderDX11\CommonTypes.h" />
-    <ClInclude Include="..\xrRender\Animation.h" />
-    <ClInclude Include="..\xrRenderDX11\Blender.h" />
-    <ClInclude Include="..\xrRenderDX11\Blender_CLSID.h" />
-    <ClInclude Include="..\xrRenderDX11\Blender_Recorder.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\Blender_BmmD.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\Blender_detail_still.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Editor_Selection.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Editor_Wire.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Lm(EbB).h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Model_EbB.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Particle.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Screen_SET.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\Blender_tree.h" />
-    <ClInclude Include="..\xrRender\BufferUtils.h" />
-    <ClInclude Include="..\xrRender\ColorMapManager.h" />
-    <ClInclude Include="..\xrRender\ConstantSystem\FGConstantSystem.h" />
-    <ClInclude Include="..\xrRender\D3DUtils.h" />
-    <ClInclude Include="..\xrRender\D3DXRenderBase.h" />
-    <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h" />
-    <ClInclude Include="..\xrRender\DetailFormat.h" />
-    <ClInclude Include="..\xrRenderDX11\DetailManager.h" />
-    <ClInclude Include="..\xrRender\DetailModel.h" />
-    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest.h" />
-    <ClInclude Include="..\xrRender\du_box.h" />
-    <ClInclude Include="..\xrRender\du_cone.h" />
-    <ClInclude Include="..\xrRender\du_cylinder.h" />
-    <ClInclude Include="..\xrRender\du_sphere.h" />
-    <ClInclude Include="..\xrRender\du_sphere_part.h" />
-    <ClInclude Include="..\xrRender\dxDebugRender.h" />
-    <ClInclude Include="..\xrRender\dxEnvironmentRender.h" />
-    <ClInclude Include="..\xrRender\dxFontRender.h" />
-    <ClInclude Include="..\xrRenderDX11\dxImGuiRender.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\SkinningPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\RibbonPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\TrailPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\SmokeTrailManager.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\SmokeTrailPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\ClusterLightPassSetup.h" />
-    <ClInclude Include="..\xrRender\ClusteredLightManager.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\DecalPassSetup.h" />
-
-    <ClInclude Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.h" />
-    <ClInclude Include="..\xrRender\Decals\DecalManager.h" />
-    <ClInclude Include="..\xrRender\Decals\fgWallMarkArray.h" />
-    <ClInclude Include="..\xrRender\Decals\MeshPicker.h" />
-    <ClInclude Include="..\xrRender\Decals\OverlayManager.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\PassVertexFormats.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\ParticleGPUCullingManager.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\UIPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\ShaderConstants.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\SkyPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\SunPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\DetailCullPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\DetailPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\PassCommon.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\Blackboard.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\PathTracerPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\MotionVectorPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\ReSTIRGIPassSetup.h" />
-    <ClInclude Include="..\xrRender\RayTracing\RTAccelStructManager.h" />
-    <ClInclude Include="..\xrRender\FGDetailManager.h" />
-    <ClInclude Include="..\..\..\Externals\meshoptimizer\src\meshoptimizer.h" />
-    <ClInclude Include="..\xrRender\ImGuiRendererNVRHI.h" />
-    <ClInclude Include="..\xrRender\dxLensFlareRender.h" />
-    <ClInclude Include="..\xrRender\dxObjectSpaceRender.h" />
-    <ClInclude Include="..\xrRender\dxParticleCustom.h" />
-    <ClInclude Include="..\xrRender\dxRainRender.h" />
-    <ClInclude Include="..\xrRender\dxRenderFactory.h" />
-    <ClInclude Include="..\xrRender\dxStatGraphRender.h" />
-    <ClInclude Include="..\xrRender\dxThunderboltDescRender.h" />
-    <ClInclude Include="..\xrRender\dxThunderboltRender.h" />
-    <ClInclude Include="..\xrRender\dxUIRender.h" />
-    <ClInclude Include="..\xrRender\dxUISequenceVideoItem.h" />
-    <ClInclude Include="..\xrRender\dxUIShader.h" />
-    <ClInclude Include="..\xrRender\dxWallMarkArray.h" />
-    <ClInclude Include="..\xrRender\ETextureParams.h" />
-    <ClInclude Include="..\xrRender\FBasicVisual.h" />
-    <ClInclude Include="..\xrRender\FHierrarhyVisual.h" />
-    <ClInclude Include="..\xrRender\FLOD.h" />
-    <ClInclude Include="..\xrRender\FProgressive.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\RenderTargetRegistry.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\ShaderPhaseCache.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\ShaderReflection.h" />
-    <ClInclude Include="..\xrRender\FSkinned.h" />
-    <ClInclude Include="..\xrRender\FSkinnedTypes.h" />
-    <ClInclude Include="..\xrRender\FTreeVisual.h" />
-    <ClInclude Include="..\xrRender\FVF.h" />
-    <ClInclude Include="..\xrRender\FVisual.h" />
-    <ClInclude Include="..\xrRender\Geometry\MaterialCache.h" />
-    <ClInclude Include="..\xrRender\Materials\MaterialSystem.h" />
-    <ClInclude Include="..\xrRender\HOM.h" />
-    <ClInclude Include="..\xrRender\HWCaps.h" />
-    <ClInclude Include="..\xrRender\IRenderDetailModel.h" />
-    <ClInclude Include="..\xrRender\KinematicsAddBoneTransform.hpp" />
-    <ClInclude Include="..\xrRender\light.h" />
-    <ClInclude Include="..\xrRender\LightTrack.h" />
-    <ClInclude Include="..\xrRender\Light_DB.h" />
-    <ClInclude Include="..\xrRender\Light_Package.h" />
-    <ClInclude Include="..\xrRender\ModelPool.h" />
-    <ClInclude Include="..\xrRender\NVRHIUIRenderer.h" />
-    <ClInclude Include="..\xrRender\NvTriStrip.h" />
-    <ClInclude Include="..\xrRender\NvTriStripObjects.h" />
-    <ClInclude Include="..\xrRender\occRasterizer.h" />
-    <ClInclude Include="..\xrRender\ParticleEffect.h" />
-    <ClInclude Include="..\xrRender\ParticleEffectDef.h" />
-    <ClInclude Include="..\xrRender\ParticleGroup.h" />
-    <ClInclude Include="..\xrRender\PBRConverter\ONNXModelRunner.h" Condition="'$(Configuration)'!='Release Master Gold'" />
-    <ClInclude Include="..\xrRender\PBRConverter\PBRTextureConverter.h" />
-    <ClInclude Include="..\xrRender\PSLibrary.h" />
-    <ClInclude Include="..\xrRender\QueryHelper.h" />
-    <ClInclude Include="..\xrRenderDX11\ResourceManager.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\DDSLoader.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\ResourceHandle.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\TestTextureManager.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\TextureManager.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\TextureStreaming.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\AsyncIO.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\BufferManager.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\SamplerCache.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\FGResourceManager.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\NativeRTFactory.h" />
-    <ClInclude Include="..\xrRenderDX11\R_Backend.h" />
-    <ClInclude Include="..\xrRenderDX11\R_Backend_hemi.h" />
-    <ClInclude Include="..\xrRenderDX11\R_Backend_Runtime.h" />
-    <ClInclude Include="..\xrRenderDX11\R_Backend_tree.h" />
-    <ClInclude Include="..\xrRenderDX11\R_Backend_xform.h" />
-    <ClInclude Include="..\xrRender\r_constants.h" />
-    <ClInclude Include="..\xrRender\r_constants_cache.h" />
-    <ClInclude Include="..\xrRender\R_DStreams.h" />
-    <ClInclude Include="..\xrRender\r_sun_cascades.h" />
-    <ClInclude Include="..\xrRender\r__dsgraph_structure.h" />
-    <ClInclude Include="..\xrRender\r__dsgraph_types.h" />
-    <ClInclude Include="..\xrRender\r__occlusion.h" />
-    <ClInclude Include="..\xrRender\r__pixel_calculator.h" />
-    <ClInclude Include="..\xrRender\r__sector.h" />
-    <ClInclude Include="..\xrRender\r__sync_point.h" />
-    <ClInclude Include="..\xrRender\Shader.h" />
-    <ClInclude Include="..\xrRender\ShaderKey.h" />
-    <ClInclude Include="..\xrRenderDX11\ShaderResourceTraits.h" />
-    <ClInclude Include="..\xrRender\Shaders\SlangReflectionWrapper.h" />
-    <ClInclude Include="..\xrRender\Shaders\SlangVFSAdapter.h" />
-    <ClInclude Include="..\xrRender\SH_Atomic.h" />
-    <ClInclude Include="..\xrRender\SH_Constant.h" />
-    <ClInclude Include="..\xrRender\SH_Matrix.h" />
-    <ClInclude Include="..\xrRender\SH_RT.h" />
-    <ClInclude Include="..\xrRender\SH_Texture.h" />
-    <ClInclude Include="..\xrRender\SkeletonAnimated.h" />
-    <ClInclude Include="..\xrRender\SkeletonCustom.h" />
-    <ClInclude Include="..\xrRender\SkeletonX.h" />
-    <ClInclude Include="..\xrRender\SkeletonXSkinXW.h" />
-    <ClInclude Include="..\xrRender\stats_manager.h" />
-    <ClInclude Include="..\xrRender\TextureDescrManager.h" />
-    <ClInclude Include="..\xrRender\tss.h" />
-    <ClInclude Include="..\xrRender\tss_def.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\uber_deffer.h" />
-    <ClInclude Include="..\xrRender\UIGeometryBatch.h" />
-    <ClInclude Include="..\xrRender\UIRenderCollector.h" />
-    <ClInclude Include="..\xrRender\Utils\dxHashHelper.h" />
-    <ClInclude Include="..\xrRender\VertexCache.h" />
-    <ClInclude Include="..\xrRender\WallmarksEngine.h" />
-    <ClInclude Include="..\xrRender\xrRender_console.h" />
-    <ClInclude Include="..\xrRender\xrStripify.h" />
-    <ClInclude Include="..\xrRenderDX11\xr_effgamma.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_bloom_build.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_combine.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_deffer_aref.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_deffer_flat.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_deffer_model.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_direct.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_mask.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_occq.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_point.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_reflected.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_spot.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_luminance.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\blender_ssao.h" />
-    <ClInclude Include="..\xrRender_R2\r2.h" />
-    <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h" />
-    <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h" />
-    <ClInclude Include="..\xrRender_R2\r2_types.h" />
-    <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\dx11HDAOCSBlender.h" />
-    <ClInclude Include="..\xrRenderDX11\blenders\dx11MinMaxSMBlender.h" />
-    <ClInclude Include="..\xrRender\light_gi.h" />
-    <ClInclude Include="..\xrRender\Light_Render_Direct.h" />
-    <ClInclude Include="..\xrRender\light_smapvis.h" />
-    <ClInclude Include="r4_rendertarget.h" />
-    <ClInclude Include="..\xrRenderDX11\R_Backend_LOD.h" />
-    <ClInclude Include="..\xrRender\NVRHI\NVRHIDevice.h" />
-    <ClInclude Include="..\xrRender\RenderContext\ResourceHandle.h" />
-    <ClInclude Include="..\xrRender\RenderContext\RCShader.h" />
-    <ClInclude Include="..\xrRender\RenderContext\PipelineState.h" />
-    <ClInclude Include="..\xrRender\RenderContext\RenderDevice.h" />
-    <ClInclude Include="..\xrRender\RenderContext\RenderContext.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FGTypes.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FGResource.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FGResourcePool.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FGPass.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FrameGraph.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\PassResourceCache.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\BindingLayoutBuilder.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\BindingSetBuilder.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\ResourceShape.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FGTest.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\ShaderLoader.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\ShaderCache.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.h" />
-    <ClInclude Include="..\xrRender\Shaders\SlangCompiler.h" />
-    <ClInclude Include="..\xrRender\Shaders\SlangCompilerTest.h" />
-    <ClInclude Include="..\xrRender\Geometry\GeometryBatch.h" />
-    <ClInclude Include="..\xrRender\GPUCullingManager.h" />
-    <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h" />
-    <ClInclude Include="..\xrRender\r5.h" />
-    <ClInclude Include="..\xrRender\FGRenderHost.h" />
-    <ClInclude Include="..\xrRender\FrameGraphRendererModule.h" />
-    <ClInclude Include="..\xrRender\Profiler\GPUProfiler.h" />
-    <ClInclude Include="..\xrRender\Profiler\StatsOverlay.h" />
-    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="..\..\Include\xrRender\DebugRender.h"/>
+    <ClInclude Include="..\..\Include\xrRender\DebugShader.h"/>
+    <ClInclude Include="..\..\Include\xrRender\DrawUtils.h"/>
+    <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h"/>
+    <ClInclude Include="..\..\Include\xrRender\FactoryPtr.h"/>
+    <ClInclude Include="..\..\Include\xrRender\FontRender.h"/>
+    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h"/>
+    <ClInclude Include="..\..\Include\xrRender\Kinematics.h"/>
+    <ClInclude Include="..\..\Include\xrRender\KinematicsAnimated.h"/>
+    <ClInclude Include="..\..\Include\xrRender\LensFlareRender.h"/>
+    <ClInclude Include="..\..\Include\xrRender\ObjectSpaceRender.h"/>
+    <ClInclude Include="..\..\Include\xrRender\ParticleCustom.h"/>
+    <ClInclude Include="..\..\Include\xrRender\RainRender.h"/>
+    <ClInclude Include="..\..\Include\xrRender\RenderDetailModel.h"/>
+    <ClInclude Include="..\..\Include\xrRender\RenderFactory.h"/>
+    <ClInclude Include="..\..\Include\xrRender\RenderVisual.h"/>
+    <ClInclude Include="..\..\Include\xrRender\StatGraphRender.h"/>
+    <ClInclude Include="..\..\Include\xrRender\ThunderboltDescRender.h"/>
+    <ClInclude Include="..\..\Include\xrRender\ThunderboltRender.h"/>
+    <ClInclude Include="..\..\Include\xrRender\UIRender.h"/>
+    <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h"/>
+    <ClInclude Include="..\..\Include\xrRender\UIShader.h"/>
+    <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h"/>
+    <ClInclude Include="..\utils\xrLC_Light\R_light.h"/>
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.h"/>
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidData.h"/>
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.h"/>
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.h"/>
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.h"/>
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h"/>
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h"/>
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h"/>
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_Matrices.h"/>
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_SIMD.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Detail_GPU.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\dx11RainBlender.h"/>
+    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h"/>
+    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer_impl.h"/>
+    <ClInclude Include="..\xrRenderDX11\dx11HW.h"/>
+    <ClInclude Include="..\xrRenderDX11\dx11R_Backend_Runtime.h"/>
+    <ClInclude Include="..\xrRenderDX11\dx11r_constants_cache.h"/>
+    <ClInclude Include="..\xrRenderDX11\dx11StateUtils.h"/>
+    <ClInclude Include="..\xrRenderDX11\dx11TextureUtils.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\dx11MSAABlender.h"/>
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.h"/>
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.h"/>
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11State.h"/>
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateCache.h"/>
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateCacheImpl.h"/>
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateManager.h"/>
+    <ClInclude Include="..\xrRenderDX11\CommonTypes.h"/>
+    <ClInclude Include="..\xrRenderDX11\Blender.h"/>
+    <ClInclude Include="..\xrRenderDX11\Blender_CLSID.h"/>
+    <ClInclude Include="..\xrRenderDX11\Blender_Recorder.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\Blender_BmmD.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\Blender_detail_still.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Editor_Selection.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Editor_Wire.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Lm(EbB).h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Model_EbB.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Particle.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\Blender_Screen_SET.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\Blender_tree.h"/>
+    <ClInclude Include="..\xrRenderDX11\DetailManager.h"/>
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest.h"/>
+    <ClInclude Include="..\xrRenderDX11\dxImGuiRender.h"/>
+    <ClInclude Include="..\xrRenderDX11\ResourceManager.h"/>
+    <ClInclude Include="..\xrRenderDX11\R_Backend.h"/>
+    <ClInclude Include="..\xrRenderDX11\R_Backend_hemi.h"/>
+    <ClInclude Include="..\xrRenderDX11\R_Backend_Runtime.h"/>
+    <ClInclude Include="..\xrRenderDX11\R_Backend_tree.h"/>
+    <ClInclude Include="..\xrRenderDX11\R_Backend_xform.h"/>
+    <ClInclude Include="..\xrRenderDX11\ShaderResourceTraits.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\uber_deffer.h"/>
+    <ClInclude Include="..\xrRenderDX11\xr_effgamma.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_bloom_build.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_combine.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_deffer_aref.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_deffer_flat.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_deffer_model.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_direct.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_mask.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_occq.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_point.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_reflected.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_light_spot.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_luminance.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\blender_ssao.h"/>
+    <ClInclude Include="..\xrRender_R2\r2.h"/>
+    <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h"/>
+    <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h"/>
+    <ClInclude Include="..\xrRender_R2\r2_types.h"/>
+    <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\dx11HDAOCSBlender.h"/>
+    <ClInclude Include="..\xrRenderDX11\blenders\dx11MinMaxSMBlender.h"/>
+    <ClInclude Include="r4_rendertarget.h"/>
+    <ClInclude Include="..\xrRenderDX11\R_Backend_LOD.h"/>
+    <ClInclude Include="stdafx.h"/>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.cpp" />
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidData.cpp" />
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.cpp" />
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.cpp" />
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.cpp" />
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.cpp" />
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.cpp" />
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp" />
-    <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_Matrices.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_SIMD.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp" />
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
-    <ClCompile Include="..\xrRender\Backend\D3D11BackendWrapper.cpp" />
-    <ClCompile Include="..\xrRender\Backend\D3D12Backend.cpp" />
-    <ClCompile Include="..\xrRender\Backend\VulkanBackend.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidData.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_Matrices.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_SIMD.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp"/>
     <ClCompile Include="..\..\..\Externals\nvrhi\src\common\dxgi-format.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\xrRender\Bindless\GPUStructuredBuffer.cpp" />
-    <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
-    <ClCompile Include="..\xrRender\Bindless\TerrainMaterialBuffer.cpp" />
-    <ClCompile Include="..\xrRender\Bindless\VariantTextureBuffer.cpp" />
-    <ClCompile Include="..\xrRender\Bindless\VertexConverter.cpp" />
-    <ClCompile Include="..\xrRender\ShaderVariant\ShaderVariantRegistry.cpp" />
-    <ClCompile Include="..\xrRender\ShaderVariant\JsonParser.cpp" />
-    <ClCompile Include="..\xrRender\ShaderVariant\VariantPSOCache.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\Blender_BmmD_deferred.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Detail_GPU.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\Blender_detail_still_deferred.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Model_EbB_deferred.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Particle_deferred.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\Blender_tree_deferred.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\dx11RainBlender.cpp" />
-    <ClCompile Include="..\xrRender\BufferUtils.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11HW.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11HWCaps.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Resources.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Scripting.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11r_constants.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11r_constants_cache.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11SH_RT.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11SH_Texture.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11StateUtils.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11Texture.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11TextureUtils.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\dx11MSAABlender.cpp" />
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.cpp" />
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.cpp" />
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx11State.cpp" />
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateManager.cpp" />
-    <ClCompile Include="..\xrRender\Animation.cpp" />
-    <ClCompile Include="..\xrRenderDX11\Blender.cpp" />
-    <ClCompile Include="..\xrRenderDX11\Blender_Recorder.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Editor_Selection.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Editor_Wire.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Lm(EbB).cpp" />
-    <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R2.cpp" />
-    <ClCompile Include="..\xrRenderDX11\Blender_Recorder_StandartBinding.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Screen_SET.cpp" />
-    <ClCompile Include="..\xrRender\ColorMapManager.cpp" />
-    <ClCompile Include="..\xrRender\ConstantSystem\FGConstantSystem.cpp" />
-    <ClCompile Include="..\xrRender\D3DUtils.cpp" />
-    <ClCompile Include="..\xrRender\D3DXRenderBase.cpp" />
-    <ClCompile Include="..\xrRenderDX11\DetailManager.cpp" />
-    <ClCompile Include="..\xrRenderDX11\DetailManager_CACHE.cpp" />
-    <ClCompile Include="..\xrRenderDX11\DetailManager_Decompress.cpp" />
-    <ClCompile Include="..\xrRenderDX11\DetailManager_soft.cpp" />
-    <ClCompile Include="..\xrRenderDX11\DetailManager_VS.cpp" />
-    <ClCompile Include="..\xrRender\DetailModel.cpp" />
-    <ClCompile Include="..\xrRender\du_box.cpp" />
-    <ClCompile Include="..\xrRender\du_cone.cpp" />
-    <ClCompile Include="..\xrRender\du_cylinder.cpp" />
-    <ClCompile Include="..\xrRender\du_sphere.cpp" />
-    <ClCompile Include="..\xrRender\du_sphere_part.cpp" />
-    <ClCompile Include="..\xrRender\dxDebugRender.cpp" />
-    <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp" />
-    <ClCompile Include="..\xrRender\dxFontRender.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dxImGuiRender.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\SkinningPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\RibbonPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\TrailPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\SmokeTrailManager.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\SmokeTrailPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\ClusterLightPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\ClusteredLightManager.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\DecalPassSetup.cpp" />
-
-    <ClCompile Include="..\xrRender\FrameGraphPasses\DistortionApplyPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\Decals\DecalManager.cpp" />
-    <ClCompile Include="..\xrRender\Decals\fgWallMarkArray.cpp" />
-    <ClCompile Include="..\xrRender\Decals\MeshPicker.cpp" />
-    <ClCompile Include="..\xrRender\Decals\OverlayManager.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\ParticleGPUCullingManager.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\UIPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\ShaderConstants.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\SkyPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\SunPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\DetailCullPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\DetailPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\TransparentPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\PassCommon.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\PathTracerPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\MotionVectorPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\ReSTIRGIPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\RayTracing\RTAccelStructManager.cpp" />
-    <ClCompile Include="..\xrRender\FGDetailManager.cpp" />
-    <ClCompile Include="..\xrRender\ImGuiRendererNVRHI.cpp" />
-    <ClCompile Include="..\xrRender\ImGuiRendererNVRHI_Shaders.cpp" />
-    <ClCompile Include="..\xrRender\ImGuiRendererNVRHI_Render.cpp" />
-    <ClCompile Include="..\xrRender\ImGuiRendererIntegration.cpp" />
-    <ClCompile Include="..\xrRender\dxRenderFactory_ImGui.cpp" />
-    <ClCompile Include="..\xrRender\GlobalRenderDevice.cpp" />
-    <ClCompile Include="..\xrRender\dxLensFlareRender.cpp" />
-    <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp" />
-    <ClCompile Include="..\xrRender\dxParticleCustom.cpp" />
-    <ClCompile Include="..\xrRender\dxRainRender.cpp" />
-    <ClCompile Include="..\xrRender\dxRenderFactory.cpp" />
-    <ClCompile Include="..\xrRender\dxStatGraphRender.cpp" />
-    <ClCompile Include="..\xrRender\dxThunderboltDescRender.cpp" />
-    <ClCompile Include="..\xrRender\dxThunderboltRender.cpp" />
-    <ClCompile Include="..\xrRender\dxUIRender.cpp" />
-    <ClCompile Include="..\xrRender\dxUISequenceVideoItem.cpp" />
-    <ClCompile Include="..\xrRender\dxUIShader.cpp" />
-    <ClCompile Include="..\xrRender\dxWallMarkArray.cpp" />
-    <ClCompile Include="..\xrRender\ETextureParams.cpp" />
-    <ClCompile Include="..\xrRender\FBasicVisual.cpp" />
-    <ClCompile Include="..\xrRender\FHierrarhyVisual.cpp" />
-    <ClCompile Include="..\xrRender\FLOD.cpp" />
-    <ClCompile Include="..\xrRender\FProgressive.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\ShaderPhaseCache.cpp" />
-    <ClCompile Include="..\xrRender\FSkinned.cpp" />
-    <ClCompile Include="..\xrRender\FTreeVisual.cpp" />
-    <ClCompile Include="..\xrRender\FVisual.cpp" />
-    <ClCompile Include="..\xrRender\Geometry\MaterialCache.cpp" />
-    <ClCompile Include="..\xrRender\Materials\MaterialSystem.cpp" />
-    <ClCompile Include="..\xrRender\HOM.cpp" />
-    <ClCompile Include="..\xrRender\light.cpp" />
-    <ClCompile Include="..\xrRender\LightTrack.cpp" />
-    <ClCompile Include="..\xrRender\Light_DB.cpp" />
-    <ClCompile Include="..\xrRender\Light_Package.cpp" />
-    <ClCompile Include="..\xrRender\ModelPool.cpp" />
-    <ClCompile Include="..\xrRender\NVRHIUIRenderer.cpp" />
-    <ClCompile Include="..\xrRender\NvTriStrip.cpp" />
-    <ClCompile Include="..\xrRender\NvTriStripObjects.cpp" />
-    <ClCompile Include="..\xrRender\occRasterizer.cpp" />
-    <ClCompile Include="..\xrRender\occRasterizer_core.cpp" />
-    <ClCompile Include="..\xrRender\ParticleEffect.cpp" />
-    <ClCompile Include="..\xrRender\ParticleEffectDef.cpp" />
-    <ClCompile Include="..\xrRender\ParticleGroup.cpp" />
-    <ClCompile Include="..\xrRender\PBRConverter\ONNXModelRunner.cpp" Condition="'$(Configuration)'!='Release Master Gold'" />
-    <ClCompile Include="..\xrRender\PBRConverter\PBRTextureConverter.cpp" />
-    <ClCompile Include="..\xrRender\PSLibrary.cpp" />
-    <ClCompile Include="..\xrRenderDX11\ResourceManager.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\DDSLoader.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\TestTextureManager.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\TextureManager.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\TextureStreaming.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\AsyncIO.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\BufferManager.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\SamplerCache.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\FGResourceManager.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\NativeRTFactory.cpp" />
-    <ClCompile Include="..\xrRenderDX11\ResourceManager_Loader.cpp" />
-    <ClCompile Include="..\xrRenderDX11\ResourceManager_Reset.cpp" />
-    <ClCompile Include="..\xrRenderDX11\ResourceManager_Resources.cpp" />
-    <ClCompile Include="..\xrRenderDX11\R_Backend.cpp" />
-    <ClCompile Include="..\xrRenderDX11\R_Backend_DBG.cpp" />
-    <ClCompile Include="..\xrRenderDX11\R_Backend_hemi.cpp" />
-    <ClCompile Include="..\xrRenderDX11\R_Backend_Runtime.cpp" />
-    <ClCompile Include="..\xrRenderDX11\R_Backend_tree.cpp" />
-    <ClCompile Include="..\xrRenderDX11\R_Backend_xform.cpp" />
-    <ClCompile Include="..\xrRender\r_constants.cpp" />
-    <ClCompile Include="..\xrRender\R_DStreams.cpp" />
-    <ClCompile Include="..\xrRender\r__dsgraph_build.cpp" />
-    <ClCompile Include="..\xrRender\r__dsgraph_render.cpp" />
-    <ClCompile Include="..\xrRender\r__dsgraph_render_lods.cpp" />
-    <ClCompile Include="..\xrRender\r__occlusion.cpp" />
-    <ClCompile Include="..\xrRender\r__pixel_calculator.cpp" />
-    <ClCompile Include="..\xrRender\r__sector.cpp" />
-    <ClCompile Include="..\xrRender\r__sector_detect.cpp" />
-    <ClCompile Include="..\xrRender\r__sector_traversal.cpp" />
-    <ClCompile Include="..\xrRender\r__sync_point.cpp" />
-    <ClCompile Include="..\xrRender\Shader.cpp" />
-    <ClCompile Include="..\xrRender\ShaderKey.cpp" />
-    <ClCompile Include="..\xrRender\Shaders\SlangReflectionWrapper.cpp" />
-    <ClCompile Include="..\xrRender\Shaders\SlangVFSAdapter.cpp" />
-    <ClCompile Include="..\xrRender\SH_Atomic.cpp" />
-    <ClCompile Include="..\xrRender\SH_Constant.cpp" />
-    <ClCompile Include="..\xrRender\SH_Matrix.cpp" />
-    <ClCompile Include="..\xrRender\SkeletonAnimated.cpp" />
-    <ClCompile Include="..\xrRender\SkeletonCustom.cpp" />
-    <ClCompile Include="..\xrRender\SkeletonRigid.cpp" />
-    <ClCompile Include="..\xrRender\SkeletonX.cpp" />
-    <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp" />
-    <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp" />
-    <ClCompile Include="..\xrRender\stats_manager.cpp" />
-    <ClCompile Include="..\xrRender\TextureDescrManager.cpp" />
-    <ClCompile Include="..\xrRenderDX11\tss_def.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\uber_deffer.cpp" />
-    <ClCompile Include="..\xrRender\UIRenderCollector.cpp" />
-    <ClCompile Include="..\xrRender\Utils\dxHashHelper.cpp" />
-    <ClCompile Include="..\xrRender\VertexCache.cpp" />
-    <ClCompile Include="..\xrRender\WallmarksEngine.cpp" />
-    <ClCompile Include="..\xrRenderDX11\xrRender_console.cpp" />
-    <ClCompile Include="..\xrRender\xrStripify.cpp" />
-    <ClCompile Include="..\xrRenderDX11\xr_effgamma.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_bloom_build.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_combine.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_deffer_aref.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_deffer_flat.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_deffer_model.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_direct.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_mask.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_occq.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_point.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_reflected.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_spot.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_luminance.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\blender_ssao.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_blenders.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_loader.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_omnipart_geom.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_point_geom.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_reflected.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_spot_geom.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget_draw_volume.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget_enable_scissor.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_accumulator.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_bloom.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_luminance.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_PP.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_smap_S.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_R_render.cpp" />
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_point.cpp" />
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_spot.cpp" />
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_create_minmaxSM.cpp" />
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_draw_rain.cpp" />
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_mark_msaa_edges.cpp" />
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_occq.cpp" />
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp" />
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_smap_D.cpp" />
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_ssao.cpp" />
-    <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp" />
-    <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp" />
-    <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\dx11HDAOCSBlender.cpp" />
-    <ClCompile Include="..\xrRenderDX11\blenders\dx11MinMaxSMBlender.cpp" />
-    <ClCompile Include="..\xrRender\light_GI.cpp" />
-    <ClCompile Include="..\xrRender\Light_Render_Direct.cpp" />
-    <ClCompile Include="..\xrRender\Light_Render_Direct_ComputeXFS.cpp" />
-    <ClCompile Include="..\xrRender\light_smapvis.cpp" />
-    <ClCompile Include="..\xrRender\light_vis.cpp" />
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\allocator.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\clusterizer.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexanalyzer.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexcodec.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexgenerator.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\overdrawoptimizer.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\partition.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\quantization.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\rasterizer.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\simplifier.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\spatialorder.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\stripifier.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vcacheoptimizer.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexcodec.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexfilter.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vfetchoptimizer.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_build_textures.cpp" />
-    <ClCompile Include="r4_rendertarget_u_set_rt.cpp" />
-    <ClCompile Include="r2_test_hw.cpp" />
-    <ClCompile Include="r4_rendertarget_accum_direct.cpp" />
-    <ClCompile Include="r4_rendertarget_phase_combine.cpp" />
-    <ClCompile Include="r4_rendertarget_phase_hdao.cpp" />
-    <ClCompile Include="r4_shaders.cpp" />
-    <ClCompile Include="..\xrRenderDX11\R_Backend_LOD.cpp" />
-    <ClCompile Include="..\xrRender\NVRHI\NVRHIDevice.cpp" />
-    <ClCompile Include="..\xrRender\RenderContext\RCShader.cpp" />
-    <ClCompile Include="..\xrRender\RenderContext\PipelineState.cpp" />
-    <ClCompile Include="..\xrRender\RenderContext\RenderDevice.cpp" />
-    <ClCompile Include="..\xrRender\RenderContext\RenderContext.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\FGResource.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\FGResourcePool.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\FGPass.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\PassResourceCache.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\BindingLayoutBuilder.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\BindingSetBuilder.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\ShaderReflection.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\ShaderLoader.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\ShaderCache.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.cpp" />
-    <ClCompile Include="..\xrRender\Shaders\SlangCompiler.cpp" />
-    <ClCompile Include="..\xrRender\Shaders\SlangCompilerTest.cpp" />
-    <ClCompile Include="..\xrRender\Geometry\GeometryBatch.cpp" />
-    <ClCompile Include="..\xrRender\GPUCullingManager.cpp" />
-    <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp" />
-    <ClCompile Include="..\xrRender\r5.cpp" />
-    <ClCompile Include="..\xrRender\FGRenderHost.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphRendererModule.cpp" />
-    <ClCompile Include="..\xrRender\Profiler\GPUProfiler.cpp" />
-    <ClCompile Include="..\xrRender\Profiler\StatsOverlay.cpp" />
+    <ClCompile Include="..\xrRenderDX11\blenders\Blender_BmmD_deferred.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Detail_GPU.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\Blender_detail_still_deferred.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Model_EbB_deferred.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Particle_deferred.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\Blender_tree_deferred.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\dx11RainBlender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11HW.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11HWCaps.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Resources.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Scripting.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11r_constants.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11r_constants_cache.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11SH_RT.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11SH_Texture.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11StateUtils.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11Texture.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11TextureUtils.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\dx11MSAABlender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11State.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateManager.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\Blender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\Blender_Recorder.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Editor_Selection.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Editor_Wire.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Lm(EbB).cpp"/>
+    <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R2.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\Blender_Recorder_StandartBinding.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\Blender_Screen_SET.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\DetailManager.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\DetailManager_CACHE.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\DetailManager_Decompress.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\DetailManager_soft.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\DetailManager_VS.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dxImGuiRender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\ResourceManager.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\ResourceManager_Loader.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\ResourceManager_Reset.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\ResourceManager_Resources.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\R_Backend.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\R_Backend_DBG.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\R_Backend_hemi.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\R_Backend_Runtime.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\R_Backend_tree.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\R_Backend_xform.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\tss_def.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\uber_deffer.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\xrRender_console.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\xr_effgamma.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_bloom_build.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_combine.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_deffer_aref.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_deffer_flat.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_deffer_model.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_direct.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_mask.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_occq.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_point.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_reflected.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_light_spot.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_luminance.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\blender_ssao.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_blenders.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_loader.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_omnipart_geom.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_point_geom.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_reflected.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_spot_geom.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_draw_volume.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_enable_scissor.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_accumulator.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_bloom.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_luminance.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_PP.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_smap_S.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r2_R_render.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_point.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_spot.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_create_minmaxSM.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_draw_rain.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_mark_msaa_edges.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_occq.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_smap_D.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_ssao.cpp"/>
+    <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp"/>
+    <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp"/>
+    <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\dx11HDAOCSBlender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\blenders\dx11MinMaxSMBlender.cpp"/>
+    <ClCompile Include="r4_rendertarget_build_textures.cpp"/>
+    <ClCompile Include="r4_rendertarget_u_set_rt.cpp"/>
+    <ClCompile Include="r2_test_hw.cpp"/>
+    <ClCompile Include="r4_rendertarget_accum_direct.cpp"/>
+    <ClCompile Include="r4_rendertarget_phase_combine.cpp"/>
+    <ClCompile Include="r4_rendertarget_phase_hdao.cpp"/>
+    <ClCompile Include="r4_shaders.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\R_Backend_LOD.cpp"/>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="xrRender_R4.cpp" />
+    <ClCompile Include="xrRender_R4.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
@@ -761,26 +327,27 @@
     <ProjectReference Include="..\..\..\Externals\slang\vs_build\slang.vcxproj" Condition="Exists('..\..\..\Externals\slang\vs_build\slang.vcxproj')">
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
+    <ProjectReference Include="..\xrRender\xrRender.vcxproj">
+      <Project>{DBE09F0B-6535-4EE4-8370-FF91EE444181}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config"/>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\..\OpenXRay.natvis" />
+    <Natvis Include="..\..\OpenXRay.natvis"/>
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets" Condition="Exists('..\..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets')" />
-    <Import Project="..\..\packages\directxmath.2024.10.15.1\build\native\directxmath.targets" Condition="Exists('..\..\packages\directxmath.2024.10.15.1\build\native\directxmath.targets')" />
-    <Import Project="..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets" Condition="Exists('..\..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets')"/>
+    <Import Project="..\..\packages\directxmath.2024.10.15.1\build\native\directxmath.targets" Condition="Exists('..\..\packages\directxmath.2024.10.15.1\build\native\directxmath.targets')"/>
+    <Import Project="..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets')"/>
+    <Import Project="..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets')"/>
   </ImportGroup>
   <Target Name="ConfigureAndBuildONNXRuntime" BeforeTargets="PrepareForBuild" Condition="'$(Configuration)'!='Release Master Gold'">
     <PropertyGroup>
       <ONNXRuntimeDir>$(xrExternals)onnxruntime</ONNXRuntimeDir>
       <ONNXRuntimeBuildDir>$(ONNXRuntimeDir)\vs_build</ONNXRuntimeBuildDir>
-      <!-- CUDA/cuDNN/TensorRT paths: Use environment variables if set, otherwise use detected defaults -->
-      <!-- Users can override by setting: CUDA_HOME, CUDNN_HOME, TENSORRT_HOME environment variables -->
       <CudaHome Condition="'$(CUDA_HOME)'!=''">$(CUDA_HOME)</CudaHome>
       <CudaHome Condition="'$(CUDA_HOME)'==''">C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6</CudaHome>
       <CudnnHome Condition="'$(CUDNN_HOME)'!=''">$(CUDNN_HOME)</CudnnHome>
@@ -788,64 +355,51 @@
       <TensorRTHome Condition="'$(TENSORRT_HOME)'!=''">$(TENSORRT_HOME)</TensorRTHome>
       <TensorRTHome Condition="'$(TENSORRT_HOME)'==''">C:\Program Files\NVIDIA GPU Computing Toolkit\TensorRT-10.14.1.48</TensorRTHome>
       <ONNXCMakeOptions>-DONNX_USE_MSVC_STATIC_RUNTIME=OFF -Dprotobuf_MSVC_STATIC_RUNTIME=OFF -Donnxruntime_BUILD_SHARED_LIB=ON -Donnxruntime_BUILD_UNIT_TESTS=OFF -Donnxruntime_USE_DML=OFF -Donnxruntime_USE_CUDA=ON -Donnxruntime_USE_TENSORRT=ON -Donnxruntime_CUDA_HOME="$(CudaHome)" -Donnxruntime_CUDNN_HOME="$(CudnnHome)" -Donnxruntime_TENSORRT_HOME="$(TensorRTHome)" "-DCMAKE_CXX_FLAGS=/MD /MP" "-DCMAKE_CXX_FLAGS_RELEASE=/MD /O2 /Ob2 /DNDEBUG" "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=/MD /Zi /O2 /Ob1 /DNDEBUG"</ONNXCMakeOptions>
-      <!-- Map OpenXRay configurations to ONNX Runtime build configs -->
       <ONNXConfig Condition="'$(Configuration)'=='Debug'">RelWithDebInfo</ONNXConfig>
       <ONNXConfig Condition="'$(Configuration)'=='Mixed'">RelWithDebInfo</ONNXConfig>
       <ONNXConfig Condition="'$(Configuration)'=='Release'">Release</ONNXConfig>
       <ONNXConfig Condition="'$(Configuration)'=='Release Master Gold'">Release</ONNXConfig>
       <ONNXParallelCount>$([System.Environment]::ProcessorCount)</ONNXParallelCount>
     </PropertyGroup>
-    <!-- Display detected/configured paths -->
-    <Message Text="[ONNX Runtime] CUDA Path: $(CudaHome)" Importance="high" />
-    <Message Text="[ONNX Runtime] cuDNN Path: $(CudnnHome)" Importance="high" />
-    <Message Text="[ONNX Runtime] TensorRT Path: $(TensorRTHome)" Importance="high" />
-    <Message Text="[ONNX Runtime] Tip: Override with CUDA_HOME, CUDNN_HOME, TENSORRT_HOME environment variables" Importance="normal" />
-    <!-- Configure ONNX Runtime with CMake if vs_build doesn't exist -->
-    <Exec Command="cmake -A x64 $(ONNXCMakeOptions) -S $(ONNXRuntimeDir)\cmake -B $(ONNXRuntimeBuildDir)" Condition="!Exists('$(ONNXRuntimeBuildDir)\onnxruntime.sln')" />
-    <!-- Build ONNX Runtime + CUDA/TensorRT providers for current configuration with parallel jobs -->
-    <Message Text="[ONNX Runtime Build] Processor Count: $(ONNXParallelCount)" Importance="high" />
-    <Message Text="[ONNX Runtime Build] Building: onnxruntime + providers (CUDA, TensorRT, shared)" Importance="high" />
-    <Exec Command="cmake --build $(ONNXRuntimeBuildDir) --config $(ONNXConfig) --target onnxruntime onnxruntime_providers_cuda onnxruntime_providers_tensorrt onnxruntime_providers_shared --parallel $(ONNXParallelCount)" Condition="Exists('$(ONNXRuntimeBuildDir)\onnxruntime.sln')" />
-    <!-- Copy ONNX Runtime DLLs to output directory -->
-    <Message Text="[ONNX Runtime] Copying DLLs to $(OutDir)" Importance="high" />
-    <Copy SourceFiles="$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime.dll')" />
-    <Copy SourceFiles="$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_shared.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_shared.dll')" />
-    <Copy SourceFiles="$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll')" />
-    <Copy SourceFiles="$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_tensorrt.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_tensorrt.dll')" />
-    <Warning Text="[ONNX Runtime] WARNING: onnxruntime_providers_cuda.dll not found - CUDA support will not be available!" Condition="!Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll')" />
-    <Warning Text="[ONNX Runtime] WARNING: onnxruntime_providers_tensorrt.dll not found - TensorRT support will not be available!" Condition="!Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_tensorrt.dll')" />
-    <!-- Copy CUDA/cuDNN/TensorRT runtime dependencies if CUDA provider was built -->
-    <!-- This ensures the engine works without requiring users to modify PATH -->
+    <Message Text="[ONNX Runtime] CUDA Path: $(CudaHome)" Importance="high"/>
+    <Message Text="[ONNX Runtime] cuDNN Path: $(CudnnHome)" Importance="high"/>
+    <Message Text="[ONNX Runtime] TensorRT Path: $(TensorRTHome)" Importance="high"/>
+    <Message Text="[ONNX Runtime] Tip: Override with CUDA_HOME, CUDNN_HOME, TENSORRT_HOME environment variables" Importance="normal"/>
+    <Exec Command="cmake -A x64 $(ONNXCMakeOptions) -S $(ONNXRuntimeDir)\cmake -B $(ONNXRuntimeBuildDir)" Condition="!Exists('$(ONNXRuntimeBuildDir)\onnxruntime.sln')"/>
+    <Message Text="[ONNX Runtime Build] Processor Count: $(ONNXParallelCount)" Importance="high"/>
+    <Message Text="[ONNX Runtime Build] Building: onnxruntime + providers (CUDA, TensorRT, shared)" Importance="high"/>
+    <Exec Command="cmake --build $(ONNXRuntimeBuildDir) --config $(ONNXConfig) --target onnxruntime onnxruntime_providers_cuda onnxruntime_providers_tensorrt onnxruntime_providers_shared --parallel $(ONNXParallelCount)" Condition="Exists('$(ONNXRuntimeBuildDir)\onnxruntime.sln')"/>
+    <Message Text="[ONNX Runtime] Copying DLLs to $(OutDir)" Importance="high"/>
+    <Copy SourceFiles="$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime.dll')"/>
+    <Copy SourceFiles="$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_shared.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_shared.dll')"/>
+    <Copy SourceFiles="$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll')"/>
+    <Copy SourceFiles="$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_tensorrt.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_tensorrt.dll')"/>
+    <Warning Text="[ONNX Runtime] WARNING: onnxruntime_providers_cuda.dll not found - CUDA support will not be available!" Condition="!Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll')"/>
+    <Warning Text="[ONNX Runtime] WARNING: onnxruntime_providers_tensorrt.dll not found - TensorRT support will not be available!" Condition="!Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_tensorrt.dll')"/>
     <ItemGroup Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll')">
-      <!-- CUDA Runtime DLLs -->
-      <CudaRuntimeDlls Include="$(CudaHome)\bin\cudart64_12.dll" />
-      <CudaRuntimeDlls Include="$(CudaHome)\bin\cublas64_12.dll" />
-      <CudaRuntimeDlls Include="$(CudaHome)\bin\cublasLt64_12.dll" />
-      <CudaRuntimeDlls Include="$(CudaHome)\bin\cufft64_11.dll" />
-      <CudaRuntimeDlls Include="$(CudaHome)\bin\cusparse64_12.dll" />
-      <!-- cuDNN DLLs -->
-      <CudnnDlls Include="$(CudnnHome)\bin\cudnn64_9.dll" />
-      <CudnnDlls Include="$(CudnnHome)\bin\cudnn_ops_infer64_9.dll" />
-      <CudnnDlls Include="$(CudnnHome)\bin\cudnn_cnn_infer64_9.dll" />
-      <CudnnDlls Include="$(CudnnHome)\bin\cudnn_adv_infer64_9.dll" />
-      <CudnnDlls Include="$(CudnnHome)\bin\cudnn_graph64_9.dll" />
-      <!-- TensorRT DLLs (in bin directory with _10 suffix for v10) -->
-      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_10.dll" />
-      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_plugin_10.dll" />
-      <TensorRTDlls Include="$(TensorRTHome)\bin\nvonnxparser_10.dll" />
-      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_lean_10.dll" />
-      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_dispatch_10.dll" />
-      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_vc_plugin_10.dll" />
-      <!-- Also include the builder resource DLLs for your GPU architecture -->
-      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_builder_resource_sm86_10.dll" />
-      <!-- RTX 3080 is SM86 -->
-      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_builder_resource_ptx_10.dll" />
-      <!-- PTX for JIT compilation -->
+      <CudaRuntimeDlls Include="$(CudaHome)\bin\cudart64_12.dll"/>
+      <CudaRuntimeDlls Include="$(CudaHome)\bin\cublas64_12.dll"/>
+      <CudaRuntimeDlls Include="$(CudaHome)\bin\cublasLt64_12.dll"/>
+      <CudaRuntimeDlls Include="$(CudaHome)\bin\cufft64_11.dll"/>
+      <CudaRuntimeDlls Include="$(CudaHome)\bin\cusparse64_12.dll"/>
+      <CudnnDlls Include="$(CudnnHome)\bin\cudnn64_9.dll"/>
+      <CudnnDlls Include="$(CudnnHome)\bin\cudnn_ops_infer64_9.dll"/>
+      <CudnnDlls Include="$(CudnnHome)\bin\cudnn_cnn_infer64_9.dll"/>
+      <CudnnDlls Include="$(CudnnHome)\bin\cudnn_adv_infer64_9.dll"/>
+      <CudnnDlls Include="$(CudnnHome)\bin\cudnn_graph64_9.dll"/>
+      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_10.dll"/>
+      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_plugin_10.dll"/>
+      <TensorRTDlls Include="$(TensorRTHome)\bin\nvonnxparser_10.dll"/>
+      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_lean_10.dll"/>
+      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_dispatch_10.dll"/>
+      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_vc_plugin_10.dll"/>
+      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_builder_resource_sm86_10.dll"/>
+      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_builder_resource_ptx_10.dll"/>
     </ItemGroup>
-    <Copy SourceFiles="@(CudaRuntimeDlls)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('%(Identity)')" />
-    <Copy SourceFiles="@(CudnnDlls)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('%(Identity)')" />
-    <Copy SourceFiles="@(TensorRTDlls)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('%(Identity)')" />
-    <Message Text="[ONNX Runtime] Copied CUDA/cuDNN/TensorRT runtime DLLs for zero-config GPU acceleration" Importance="high" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll')" />
+    <Copy SourceFiles="@(CudaRuntimeDlls)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('%(Identity)')"/>
+    <Copy SourceFiles="@(CudnnDlls)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('%(Identity)')"/>
+    <Copy SourceFiles="@(TensorRTDlls)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('%(Identity)')"/>
+    <Message Text="[ONNX Runtime] Copied CUDA/cuDNN/TensorRT runtime DLLs for zero-config GPU acceleration" Importance="high" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll')"/>
   </Target>
   <Target Name="ConfigureAndBuildNVRHI" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -853,49 +407,42 @@
       <NVRHIBuildDir Condition="'$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build_static</NVRHIBuildDir>
       <NVRHICMakeOptions Condition="'$(Configuration)'!='Release Master Gold'">-DNVRHI_BUILD_SHARED=ON -DNVRHI_WITH_DX11=ON -DNVRHI_WITH_DX12=ON -DNVRHI_WITH_VULKAN=ON -DNVRHI_WITH_VALIDATION=ON -DNVRHI_INSTALL=OFF</NVRHICMakeOptions>
       <NVRHICMakeOptions Condition="'$(Configuration)'=='Release Master Gold'">-DNVRHI_BUILD_SHARED=OFF -DNVRHI_WITH_DX11=ON -DNVRHI_WITH_DX12=ON -DNVRHI_WITH_VULKAN=ON -DNVRHI_WITH_VALIDATION=ON -DNVRHI_INSTALL=OFF</NVRHICMakeOptions>
-      <!-- Map OpenXRay configurations to CMake standard configurations -->
       <NVRHIConfig Condition="'$(Configuration)'=='Debug'">RelWithDebInfo</NVRHIConfig>
       <NVRHIConfig Condition="'$(Configuration)'=='Mixed'">RelWithDebInfo</NVRHIConfig>
       <NVRHIConfig Condition="'$(Configuration)'=='Release'">Release</NVRHIConfig>
       <NVRHIConfig Condition="'$(Configuration)'=='Release Master Gold'">Release</NVRHIConfig>
       <NVRHIParallelCount>$([System.Environment]::ProcessorCount)</NVRHIParallelCount>
     </PropertyGroup>
-    <!-- Configure NVRHI with CMake if build dir doesn't exist -->
-    <Exec Command="cmake -A x64 $(NVRHICMakeOptions) -S $(xrExternals)nvrhi -B $(NVRHIBuildDir)" Condition="!Exists('$(NVRHIBuildDir)\nvrhi.sln')" />
-    <!-- Build NVRHI for current configuration with parallel jobs -->
-    <Message Text="[NVRHI Build] Processor Count: $(NVRHIParallelCount)" Importance="high" />
-    <Message Text="[NVRHI Build] Build Command: cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --parallel $(NVRHIParallelCount)" Importance="high" />
-    <Exec Command="cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --parallel $(NVRHIParallelCount)" Condition="Exists('$(NVRHIBuildDir)\nvrhi.sln')" />
-    <!-- Copy shared DLL for non-Release Master Gold configs -->
-    <Copy SourceFiles="$(NVRHIBuildDir)\$(NVRHIConfig)\nvrhi.dll" DestinationFolder="$(xrBinDir)" SkipUnchangedFiles="true" Condition="'$(Configuration)'!='Release Master Gold' AND Exists('$(NVRHIBuildDir)\$(NVRHIConfig)\nvrhi.dll')" />
+    <Exec Command="cmake -A x64 $(NVRHICMakeOptions) -S $(xrExternals)nvrhi -B $(NVRHIBuildDir)" Condition="!Exists('$(NVRHIBuildDir)\nvrhi.sln')"/>
+    <Message Text="[NVRHI Build] Processor Count: $(NVRHIParallelCount)" Importance="high"/>
+    <Message Text="[NVRHI Build] Build Command: cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --parallel $(NVRHIParallelCount)" Importance="high"/>
+    <Exec Command="cmake --build $(NVRHIBuildDir) --config $(NVRHIConfig) --parallel $(NVRHIParallelCount)" Condition="Exists('$(NVRHIBuildDir)\nvrhi.sln')"/>
+    <Copy SourceFiles="$(NVRHIBuildDir)\$(NVRHIConfig)\nvrhi.dll" DestinationFolder="$(xrBinDir)" SkipUnchangedFiles="true" Condition="'$(Configuration)'!='Release Master Gold' AND Exists('$(NVRHIBuildDir)\$(NVRHIConfig)\nvrhi.dll')"/>
   </Target>
   <Target Name="ConfigureAndBuildSlang" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <SlangBuildDir>$(xrExternals)slang\vs_build</SlangBuildDir>
       <SlangCMakeOptions>-DSLANG_ENABLE_CUDA=OFF -DSLANG_ENABLE_OPTIX=OFF -DSLANG_ENABLE_NVAPI=OFF -DSLANG_ENABLE_XLIB=OFF -DSLANG_ENABLE_DXIL=ON -DSLANG_ENABLE_GFX=OFF -DSLANG_ENABLE_SLANGD=OFF -DSLANG_ENABLE_SLANGC=OFF -DSLANG_ENABLE_SLANGI=OFF -DSLANG_ENABLE_SLANGRT=OFF -DSLANG_ENABLE_TESTS=OFF -DSLANG_ENABLE_EXAMPLES=OFF -DSLANG_ENABLE_REPLAYER=OFF -DSLANG_ENABLE_PREBUILT_BINARIES=OFF "-DCMAKE_CXX_FLAGS=/MP"</SlangCMakeOptions>
-      <!-- Map OpenXRay configurations to CMake standard configurations -->
       <SlangConfig Condition="'$(Configuration)'=='Debug'">Debug</SlangConfig>
       <SlangConfig Condition="'$(Configuration)'=='Mixed'">Release</SlangConfig>
       <SlangConfig Condition="'$(Configuration)'=='Release'">Release</SlangConfig>
       <SlangConfig Condition="'$(Configuration)'=='Release Master Gold'">Release</SlangConfig>
     </PropertyGroup>
-    <!-- Configure Slang with CMake if vs_build doesn't exist -->
-    <Exec Command="cmake -A x64 $(SlangCMakeOptions) -S $(xrExternals)slang -B $(SlangBuildDir)" Condition="!Exists('$(SlangBuildDir)\slang.sln')" />
-    <!-- Build Slang for current configuration with parallel jobs -->
+    <Exec Command="cmake -A x64 $(SlangCMakeOptions) -S $(xrExternals)slang -B $(SlangBuildDir)" Condition="!Exists('$(SlangBuildDir)\slang.sln')"/>
     <PropertyGroup>
       <SlangParallelCount>$([System.Environment]::ProcessorCount)</SlangParallelCount>
     </PropertyGroup>
-    <Message Text="[Slang Build] Processor Count: $(SlangParallelCount)" Importance="high" />
-    <Message Text="[Slang Build] Build Command: cmake --build $(SlangBuildDir) --config $(SlangConfig) --target slang --parallel $(SlangParallelCount)" Importance="high" />
-    <Exec Command="cmake --build $(SlangBuildDir) --config $(SlangConfig) --target slang --parallel $(SlangParallelCount)" Condition="Exists('$(SlangBuildDir)\slang.sln')" />
+    <Message Text="[Slang Build] Processor Count: $(SlangParallelCount)" Importance="high"/>
+    <Message Text="[Slang Build] Build Command: cmake --build $(SlangBuildDir) --config $(SlangConfig) --target slang --parallel $(SlangParallelCount)" Importance="high"/>
+    <Exec Command="cmake --build $(SlangBuildDir) --config $(SlangConfig) --target slang --parallel $(SlangParallelCount)" Condition="Exists('$(SlangBuildDir)\slang.sln')"/>
   </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets'))" />
-    <Error Condition="!Exists('..\..\packages\directxmath.2024.10.15.1\build\native\directxmath.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\directxmath.2024.10.15.1\build\native\directxmath.targets'))" />
-    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets'))"/>
+    <Error Condition="!Exists('..\..\packages\directxmath.2024.10.15.1\build\native\directxmath.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\directxmath.2024.10.15.1\build\native\directxmath.targets'))"/>
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets'))"/>
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets'))"/>
   </Target>
 </Project>
