@@ -625,12 +625,8 @@ public:
 
     xray::render::FrameGraphRenderer* m_framegraphRenderer{ nullptr };
 
-    framegraph::ShaderLoader* m_shaderLoader{ nullptr };
-
     xray::render::fg::ImGuiRendererNVRHI* m_imguiRendererNVRHI{ nullptr };
     xray::render::fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return m_imguiRendererNVRHI; }
-
-    framegraph::ShaderLoader* GetShaderLoader() const { return m_shaderLoader; }
 
     nvrhi::BufferHandle m_testVertexBuffer;
     nvrhi::BufferHandle m_testIndexBuffer;

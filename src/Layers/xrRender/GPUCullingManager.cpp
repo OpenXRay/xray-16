@@ -108,7 +108,7 @@ void GPUCullingManager::Initialize(fg::RenderDevice* device)
         return;
     }
 
-    auto cullResult = RImplementation.m_shaderLoader->LoadComputeShader("object_cull");
+    auto cullResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("object_cull");
     if (cullResult.handle) {
         Msg("* [GPUCulling] Loaded object_cull compute shader: OK");
         m_computeEnabled = true;
@@ -552,7 +552,7 @@ void GPUCullingManager::CreateComputePipeline(fg::RenderDevice* device)
 
     {
         auto& cache = framegraph::GetPassResourceCache();
-        auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
+        auto* objectCullRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("object_cull", ".cs");
         m_cullLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ObjectCull", *objectCullRefl, nvDevice);
         if (!m_cullLayout) {
             Msg("! [GPUCulling] Failed to create binding layout");
@@ -563,7 +563,7 @@ void GPUCullingManager::CreateComputePipeline(fg::RenderDevice* device)
 
     {
         nvrhi::ComputePipelineDesc pipeDesc;
-        auto cullShader = RImplementation.m_shaderLoader->LoadComputeShader("object_cull");
+        auto cullShader = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("object_cull");
         pipeDesc.CS = cullShader.handle;
         pipeDesc.bindingLayouts = { m_cullLayout };
 
@@ -585,13 +585,13 @@ void GPUCullingManager::CreateCompactionResources(fg::RenderDevice* device)
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    auto compactCountResult = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact_count");
+    auto compactCountResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("batch_compact_count");
     R_ASSERT2(compactCountResult.handle,
         "batch_compact_count.cs not found - compaction requires this shader");
-    auto compactScanResult = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact_scan");
+    auto compactScanResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("batch_compact_scan");
     R_ASSERT2(compactScanResult.handle,
         "batch_compact_scan.cs not found - compaction requires this shader");
-    auto compactScatterResult = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact");
+    auto compactScatterResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("batch_compact");
     R_ASSERT2(compactScatterResult.handle,
         "batch_compact.cs not found - compaction requires this shader");
 
@@ -938,28 +938,28 @@ void GPUCullingManager::CreateCompactionResources(fg::RenderDevice* device)
 
     {
         auto& cache = framegraph::GetPassResourceCache();
-        auto* compactCountRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_count", ".cs");
+        auto* compactCountRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("batch_compact_count", ".cs");
         m_compactCountLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_CompactCount", *compactCountRefl, nvDevice);
         R_ASSERT2(m_compactCountLayout, "Failed to create compact count binding layout");
     }
 
     {
         auto& cache = framegraph::GetPassResourceCache();
-        auto* compactScanRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_scan", ".cs");
+        auto* compactScanRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("batch_compact_scan", ".cs");
         m_compactScanLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_CompactScan", *compactScanRefl, nvDevice);
         R_ASSERT2(m_compactScanLayout, "Failed to create compact scan binding layout");
     }
 
     {
         auto& cache = framegraph::GetPassResourceCache();
-        auto* compactScatterRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact", ".cs");
+        auto* compactScatterRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("batch_compact", ".cs");
         m_compactScatterLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_CompactScatter", *compactScatterRefl, nvDevice);
         R_ASSERT2(m_compactScatterLayout, "Failed to create compact scatter binding layout");
     }
 
     {
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact_count").handle;
+        pipeDesc.CS = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("batch_compact_count").handle;
         pipeDesc.bindingLayouts = { m_compactCountLayout };
 
         m_compactCountPipeline = nvDevice->createComputePipeline(pipeDesc);
@@ -968,7 +968,7 @@ void GPUCullingManager::CreateCompactionResources(fg::RenderDevice* device)
 
     {
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact_scan").handle;
+        pipeDesc.CS = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("batch_compact_scan").handle;
         pipeDesc.bindingLayouts = { m_compactScanLayout };
 
         m_compactScanPipeline = nvDevice->createComputePipeline(pipeDesc);
@@ -977,7 +977,7 @@ void GPUCullingManager::CreateCompactionResources(fg::RenderDevice* device)
 
     {
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = RImplementation.m_shaderLoader->LoadComputeShader("batch_compact").handle;
+        pipeDesc.CS = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("batch_compact").handle;
         pipeDesc.bindingLayouts = { m_compactScatterLayout };
 
         m_compactScatterPipeline = nvDevice->createComputePipeline(pipeDesc);
@@ -987,7 +987,7 @@ void GPUCullingManager::CreateCompactionResources(fg::RenderDevice* device)
     m_compactEnabled = true;
     Msg("* [GPUCulling] Compaction resources created");
 
-    auto terrainVisResult = RImplementation.m_shaderLoader->LoadComputeShader("terrain_apply_visibility");
+    auto terrainVisResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("terrain_apply_visibility");
     if (terrainVisResult.handle) {
         auto& cache = framegraph::GetPassResourceCache();
         m_terrainApplyVisibilityLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_TerrainVisibility", *terrainVisResult.reflection, nvDevice);
@@ -1025,7 +1025,7 @@ void GPUCullingManager::CreateVariantPartitionResources(fg::RenderDevice* device
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    auto variantPartResult = RImplementation.m_shaderLoader->LoadComputeShader("variant_partition");
+    auto variantPartResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("variant_partition");
     if (!variantPartResult.handle) {
         Msg("! [GPUCulling] variant_partition.cs not found - variant partition disabled");
         return;
@@ -1174,7 +1174,7 @@ void GPUCullingManager::DispatchVariantPartition(
     params.padding1 = 0;
     cmdList->writeBuffer(m_device->GetNativeBuffer(m_variantPartitionParamsCB), &params, sizeof(params));
 
-    auto* variantPartRefl = RImplementation.m_shaderLoader->GetCachedReflection("variant_partition", ".cs");
+    auto* variantPartRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("variant_partition", ".cs");
     framegraph::BindingSetBuilder bsb(*variantPartRefl, nvDevice, "GPUCull.VariantPart");
     bsb.ConstantBuffer("PartitionParams", m_device->GetNativeBuffer(m_variantPartitionParamsCB))
        .BufferSRV("g_CompactCount", set.compactCountBuffer)
@@ -2189,7 +2189,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                 cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB), &cb, sizeof(cb));
 
-                auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
+                auto* objectCullRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("object_cull", ".cs");
                 framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice, "GPUCull.ObjectCull");
                 bsb.ConstantBuffer("CullParams", mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB))
                    .BufferSRV("g_Objects", set.objectBuffer)
@@ -2246,7 +2246,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                         cmdList->setBufferState(set.compactLocalPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
                         cmdList->setBufferState(set.compactGroupCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                        auto* compactCountRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_count", ".cs");
+                        auto* compactCountRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("batch_compact_count", ".cs");
                         framegraph::BindingSetBuilder countBsb(*compactCountRefl, nvDevice);
                         countBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                .BufferSRV("g_Visibility", set.visibilityBuffer)
@@ -2267,7 +2267,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                         cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
                         cmdList->setBufferState(set.compactDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                        auto* compactScanRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_scan", ".cs");
+                        auto* compactScanRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("batch_compact_scan", ".cs");
                         framegraph::BindingSetBuilder scanBsb(*compactScanRefl, nvDevice);
                         scanBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                .BufferSRV("g_GroupCounts", set.compactGroupCountsBuffer)
@@ -2292,7 +2292,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                         cmdList->setBufferState(set.compactBatchIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
                         cmdList->setBufferState(set.compactMaterialIDBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                        auto* compactScatterRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact", ".cs");
+                        auto* compactScatterRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("batch_compact", ".cs");
                         framegraph::BindingSetBuilder scatterBsb(*compactScatterRefl, nvDevice);
                         scatterBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                   .BufferSRV("g_InputDrawArgs", set.drawArgsBuffer)
@@ -2350,7 +2350,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 mgr->ExtractFrustumPlanes(Device.mFullTransform, terrainCB.frustumPlanes);
                 cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB), &terrainCB, sizeof(terrainCB));
 
-                auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
+                auto* objectCullRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("object_cull", ".cs");
                 framegraph::BindingSetBuilder terrainBsb(*objectCullRefl, nvDevice, "GPUCull.TerrainCull");
                 terrainBsb.ConstantBuffer("CullParams", mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB))
                           .BufferSRV("g_Objects", mgr->m_terrainObjectBuffer)
@@ -2406,7 +2406,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     cmdList->setBufferState(mgr->m_terrainCompactLocalPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
                     cmdList->setBufferState(mgr->m_terrainCompactGroupCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                    auto* compactCountRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_count", ".cs");
+                    auto* compactCountRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("batch_compact_count", ".cs");
                     framegraph::BindingSetBuilder terrainCountBsb(*compactCountRefl, nvDevice);
                     terrainCountBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                    .BufferSRV("g_Visibility", mgr->m_terrainVisibilityBuffer)
@@ -2428,7 +2428,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     cmdList->setBufferState(mgr->m_terrainCompactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
                     cmdList->setBufferState(mgr->m_terrainCompactDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                    auto* compactScanRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact_scan", ".cs");
+                    auto* compactScanRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("batch_compact_scan", ".cs");
                     framegraph::BindingSetBuilder terrainScanBsb(*compactScanRefl, nvDevice);
                     terrainScanBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                   .BufferSRV("g_GroupCounts", mgr->m_terrainCompactGroupCountsBuffer)
@@ -2454,7 +2454,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     cmdList->setBufferState(mgr->m_terrainCompactBatchIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
                     cmdList->setBufferState(mgr->m_terrainCompactMaterialIDBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-                    auto* compactScatterRefl = RImplementation.m_shaderLoader->GetCachedReflection("batch_compact", ".cs");
+                    auto* compactScatterRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("batch_compact", ".cs");
                     framegraph::BindingSetBuilder terrainScatterBsb(*compactScatterRefl, nvDevice);
                     terrainScatterBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
                                      .BufferSRV("g_InputDrawArgs", mgr->m_terrainDrawArgsBuffer)
@@ -2732,7 +2732,7 @@ void GPUCullingManager::SetupSkinnedCullingPass(
 
             cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB), &cb, sizeof(cb));
 
-            auto* objectCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull", ".cs");
+            auto* objectCullRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("object_cull", ".cs");
                 framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice, "GPUCull.DynamicCull");
             bsb.ConstantBuffer("CullParams", mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB))
                .BufferSRV("g_Objects", mgr->m_skinnedObjectBuffer)
@@ -2769,10 +2769,10 @@ void GPUCullingManager::CreateDebugResources(fg::RenderDevice* device)
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    auto debugCsResult = RImplementation.m_shaderLoader->LoadComputeShader("object_cull_debug");
-    auto particleDebugCsResult = RImplementation.m_shaderLoader->LoadComputeShader("particle_cull_debug");
-    auto debugVsResult = RImplementation.m_shaderLoader->LoadVertexShader("cull_debug");
-    auto debugPsResult = RImplementation.m_shaderLoader->LoadPixelShader("cull_debug");
+    auto debugCsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("object_cull_debug");
+    auto particleDebugCsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("particle_cull_debug");
+    auto debugVsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadVertexShader("cull_debug");
+    auto debugPsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadPixelShader("cull_debug");
 
     if (!debugCsResult.handle) {
         Msg("! [GPUCulling] object_cull_debug.cs not found - debug visualization disabled");
@@ -2837,7 +2837,7 @@ void GPUCullingManager::CreateDebugResources(fg::RenderDevice* device)
 
     {
         auto& cache = framegraph::GetPassResourceCache();
-        auto* debugCsRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull_debug", ".cs");
+        auto* debugCsRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("object_cull_debug", ".cs");
         m_debugComputeLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_DebugCompute", *debugCsRefl, nvDevice);
         if (!m_debugComputeLayout) {
             Msg("! [GPUCulling] Failed to create debug compute binding layout");
@@ -2845,7 +2845,7 @@ void GPUCullingManager::CreateDebugResources(fg::RenderDevice* device)
         }
 
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = RImplementation.m_shaderLoader->LoadComputeShader("object_cull_debug").handle;
+        pipeDesc.CS = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("object_cull_debug").handle;
         pipeDesc.bindingLayouts = { m_debugComputeLayout };
 
         m_debugComputePipeline = nvDevice->createComputePipeline(pipeDesc);
@@ -2854,7 +2854,7 @@ void GPUCullingManager::CreateDebugResources(fg::RenderDevice* device)
             return;
         }
 
-        auto particleDebugHandle = RImplementation.m_shaderLoader->LoadComputeShader("particle_cull_debug");
+        auto particleDebugHandle = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("particle_cull_debug");
         if (particleDebugHandle.handle) {
             nvrhi::ComputePipelineDesc particlePipeDesc;
             particlePipeDesc.CS = particleDebugHandle.handle;
@@ -2865,8 +2865,8 @@ void GPUCullingManager::CreateDebugResources(fg::RenderDevice* device)
 
     {
         auto& cache = framegraph::GetPassResourceCache();
-        auto* debugVsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".vs");
-        auto* debugPsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".ps");
+        auto* debugVsRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("cull_debug", ".vs");
+        auto* debugPsRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("cull_debug", ".ps");
         m_debugGraphicsLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_DebugGraphics", *debugVsRefl, *debugPsRefl, nvDevice);
         if (!m_debugGraphicsLayout) {
             Msg("! [GPUCulling] Failed to create debug graphics binding layout");
@@ -2874,8 +2874,8 @@ void GPUCullingManager::CreateDebugResources(fg::RenderDevice* device)
         }
 
         nvrhi::GraphicsPipelineDesc pipeDesc;
-        pipeDesc.VS = RImplementation.m_shaderLoader->LoadVertexShader("cull_debug").handle;
-        pipeDesc.PS = RImplementation.m_shaderLoader->LoadPixelShader("cull_debug").handle;
+        pipeDesc.VS = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadVertexShader("cull_debug").handle;
+        pipeDesc.PS = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadPixelShader("cull_debug").handle;
         pipeDesc.bindingLayouts = { m_debugGraphicsLayout };
         pipeDesc.primType = nvrhi::PrimitiveType::TriangleStrip;
         pipeDesc.inputLayout = nullptr;
@@ -2999,7 +2999,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
                 cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_debugComputeParamsCB), &cb, sizeof(cb));
 
-                auto* debugCsRefl = RImplementation.m_shaderLoader->GetCachedReflection("object_cull_debug", ".cs");
+                auto* debugCsRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("object_cull_debug", ".cs");
                 framegraph::BindingSetBuilder bsb(*debugCsRefl, nvDevice, "GPUCull.Debug");
                 bsb.ConstantBuffer("CullDebugParams", mgr->m_device->GetNativeBuffer(mgr->m_debugComputeParamsCB))
                    .BufferSRV("g_Objects", objectBuffer)
@@ -3057,7 +3057,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                     mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
                     cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_debugComputeParamsCB), &cb, sizeof(cb));
 
-                    auto* particleDebugRefl = RImplementation.m_shaderLoader->GetCachedReflection("particle_cull_debug", ".cs");
+                    auto* particleDebugRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("particle_cull_debug", ".cs");
                     framegraph::BindingSetBuilder bsb(*particleDebugRefl, nvDevice, "GPUCull.ParticleDebug");
                     bsb.ConstantBuffer("CullDebugParams", mgr->m_device->GetNativeBuffer(mgr->m_debugComputeParamsCB))
                        .BufferSRV("g_Particles", mgr->m_particleBuffer)
@@ -3088,8 +3088,8 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
                 cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_debugGraphicsParamsCB), &vsCB, sizeof(vsCB));
 
-                auto* debugVsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".vs");
-                auto* debugPsRefl = RImplementation.m_shaderLoader->GetCachedReflection("cull_debug", ".ps");
+                auto* debugVsRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("cull_debug", ".vs");
+                auto* debugPsRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("cull_debug", ".ps");
                 framegraph::BindingSetBuilder bsb(*debugVsRefl, *debugPsRefl, nvDevice, "GPUCull.DebugDraw");
                 bsb.ConstantBuffer("CullDebugVSParams", mgr->m_device->GetNativeBuffer(mgr->m_debugGraphicsParamsCB))
                    .BufferSRV("g_DebugData", mgr->m_debugBuffer);
@@ -3137,7 +3137,7 @@ void GPUCullingManager::CreateParticleResources(fg::RenderDevice* device)
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    auto particleCullResult = RImplementation.m_shaderLoader->LoadComputeShader("particle_cull");
+    auto particleCullResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("particle_cull");
     if (!particleCullResult.handle) {
         Msg("! [GPUCulling] particle_cull.cs not found - particle culling disabled");
         return;
@@ -3209,7 +3209,7 @@ void GPUCullingManager::CreateParticleResources(fg::RenderDevice* device)
 
     {
         auto& cache = framegraph::GetPassResourceCache();
-        auto* particleCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("particle_cull", ".cs");
+        auto* particleCullRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("particle_cull", ".cs");
         m_particleCullLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ParticleCull", *particleCullRefl, nvDevice);
         if (!m_particleCullLayout) {
             Msg("! [GPUCulling] Failed to create particle binding layout");
@@ -3219,7 +3219,7 @@ void GPUCullingManager::CreateParticleResources(fg::RenderDevice* device)
 
     {
         nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = RImplementation.m_shaderLoader->LoadComputeShader("particle_cull").handle;
+        pipeDesc.CS = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("particle_cull").handle;
         pipeDesc.bindingLayouts = { m_particleCullLayout };
 
         Msg("* [GPUCulling] Creating particle compute pipeline:");
@@ -3394,7 +3394,7 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
 
             cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_particleCullParamsCB), &cb, sizeof(cb));
 
-            auto* particleCullRefl = RImplementation.m_shaderLoader->GetCachedReflection("particle_cull", ".cs");
+            auto* particleCullRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("particle_cull", ".cs");
             framegraph::BindingSetBuilder bsb(*particleCullRefl, nvDevice, "GPUCull.ParticleCull");
             bsb.ConstantBuffer("ParticleCullParams", mgr->m_device->GetNativeBuffer(mgr->m_particleCullParamsCB))
                .BufferSRV("g_ParticleData", mgr->m_particleBuffer)

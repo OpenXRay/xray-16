@@ -172,12 +172,12 @@ void CRender::CompileLevelShader(u32 shaderID, const char* shaderName, const cha
     compiled.shaderName = shaderName;
     compiled.textureName = textureName;
 
-    if (!m_shaderLoader) {
+    if (!GEnv.FrameGraphRenderer->GetShaderLoader()) {
         Msg("! [ERROR] ShaderLoader not available for shader: %s", shaderName);
         return;
     }
 
-    auto vsResult = m_shaderLoader->LoadVertexShader(shaderName, "main");
+    auto vsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadVertexShader(shaderName, "main");
 
     if (vsResult.handle) {
         compiled.vsHandle = vsResult.handle;
@@ -188,7 +188,7 @@ void CRender::CompileLevelShader(u32 shaderID, const char* shaderName, const cha
         return;
     }
 
-    auto psResult = m_shaderLoader->LoadPixelShader(shaderName, "main");
+    auto psResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadPixelShader(shaderName, "main");
 
     if (psResult.handle) {
         compiled.psHandle = psResult.handle;

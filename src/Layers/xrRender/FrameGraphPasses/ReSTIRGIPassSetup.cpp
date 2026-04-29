@@ -111,7 +111,7 @@ static void InitializeResources(fg::RenderDevice* device, ReSTIRGIPassState& sta
         (u32)std::max({ sizeof(ReSTIRGICB), sizeof(TemporalCB), sizeof(CompositeCB) }), device);
 
     {
-        auto csResult = RImplementation.m_shaderLoader->LoadComputeShader("restir_gi_initial");
+        auto csResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("restir_gi_initial");
         if (csResult.handle) {
             state.initialLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Initial", *csResult.reflection, nvDevice);
             auto* backend = dynamic_cast<D3D12Backend*>(GEnv.Backend);
@@ -128,7 +128,7 @@ static void InitializeResources(fg::RenderDevice* device, ReSTIRGIPassState& sta
     }
 
     {
-        auto csResult = RImplementation.m_shaderLoader->LoadComputeShader("restir_gi_temporal");
+        auto csResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("restir_gi_temporal");
         if (csResult.handle) {
             state.temporalLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Temporal", *csResult.reflection, nvDevice);
             nvrhi::ComputePipelineDesc pipeDesc;
@@ -139,7 +139,7 @@ static void InitializeResources(fg::RenderDevice* device, ReSTIRGIPassState& sta
     }
 
     {
-        auto csResult = RImplementation.m_shaderLoader->LoadComputeShader("restir_gi_composite");
+        auto csResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("restir_gi_composite");
         if (csResult.handle) {
             state.compositeLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Composite", *csResult.reflection, nvDevice);
             nvrhi::ComputePipelineDesc pipeDesc;

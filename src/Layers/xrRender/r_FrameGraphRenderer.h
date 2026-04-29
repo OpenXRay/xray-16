@@ -25,6 +25,7 @@ namespace xray::render::fg {
 
 namespace xray::render::framegraph {
     class Blackboard;
+    class ShaderLoader;
 }
 
 namespace xray::render::fg::passes {
@@ -91,6 +92,7 @@ public:
     void ToggleStatsOverlay() { if (m_statsOverlay) m_statsOverlay->ToggleVisible(); }
 
     fg::RenderDevice* GetRenderDevice() const override { return m_device; }
+    framegraph::ShaderLoader* GetShaderLoader() const override { return m_shaderLoader; }
     MaterialCache* GetMaterialCache() const override { return m_materialCache.get(); }
     MaterialCache* GetUIMaterialCache() const override { return m_uiMaterialCache.get(); }
     ui::UIRenderCollector* GetUICollector() const override { return m_uiCollector.get(); }
@@ -112,6 +114,7 @@ public:
 private:
     bool m_enabled = false;
     fg::RenderDevice* m_device = nullptr;
+    framegraph::ShaderLoader* m_shaderLoader = nullptr;
 
     xr_unique_ptr<framegraph::Blackboard> m_blackboard;
 
