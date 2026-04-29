@@ -5,6 +5,7 @@
 namespace xray::render {
     namespace fg {
         class RenderDevice;
+        class ImGuiRendererNVRHI;
     }
     class MaterialCache;
     namespace ui {
@@ -32,6 +33,7 @@ public:
 
     virtual xray::render::fg::RenderDevice* GetRenderDevice() const = 0;
     virtual xray::render::framegraph::ShaderLoader* GetShaderLoader() const = 0;
+    virtual xray::render::fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const = 0;
     virtual xray::render::MaterialCache* GetMaterialCache() const = 0;
     virtual xray::render::MaterialCache* GetUIMaterialCache() const = 0;
     virtual xray::render::ui::UIRenderCollector* GetUICollector() const = 0;

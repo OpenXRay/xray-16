@@ -758,11 +758,6 @@ IRenderVisual* CRender::getVisual(int id)
     return Visuals[id];
 }
 
-u64 CRender::ComputePSOCacheKey(u32 vertexFormatID, RenderPassType passType)
-{
-    return ((u64)vertexFormatID << 32) | (u64)passType;
-}
-
 u32 CRender::GetVertexStride(u32 vertexFormatID)
 {
     if (vertexFormatID >= nDC.size())
@@ -957,7 +952,7 @@ bool CRender::CreatePrecompiledPSO(
         return false;
     }
 
-    u64 cacheKey = ComputePSOCacheKey(vertexFormatID, passType);
+    u64 cacheKey = ((u64)vertexFormatID << 32) | (u64)passType;
 
     CompiledLevelShader::PrecompiledPSOs::PSOVariant variant;
     variant.vertexFormatID = vertexFormatID;

@@ -8,6 +8,7 @@
 #include "FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
 #include "xrEngine/xr_object.h"
+#include "Layers/xrRender/Materials/ShaderInfo.h"
 
 namespace xray::render::fg
 {
@@ -65,12 +66,7 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
     }
     else if (hdr.shader_id)
     {
-        auto* compiled = RImplementation.getCompiledShader(hdr.shader_id);
-        if (compiled)
-        {
-            shaderName = compiled->shaderName;
-            textureName = compiled->textureName;
-        }
+        xray::render::shader_info::GetCompiledShaderNames(hdr.shader_id, shaderName, textureName);
     }
 
 // desc

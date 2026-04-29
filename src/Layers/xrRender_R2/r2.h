@@ -421,7 +421,6 @@ private:
     void SetupBlendState(const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc);
 
 public:
-    u64 ComputePSOCacheKey(u32 vertexFormatID, RenderPassType passType);
 
     void render_forward();
     void render_indirect(light* L) const;
@@ -623,9 +622,6 @@ public:
     IRenderBackend* m_backend{ nullptr };
 
     xray::render::FrameGraphRenderer* m_framegraphRenderer{ nullptr };
-
-    xray::render::fg::ImGuiRendererNVRHI* m_imguiRendererNVRHI{ nullptr };
-    xray::render::fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return m_imguiRendererNVRHI; }
 
     framegraph::ShaderLoader* GetShaderLoader() const override;
 
