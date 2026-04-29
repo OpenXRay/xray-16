@@ -1,0 +1,314 @@
+add_library(xrRender STATIC)
+
+target_sources(xrRender PRIVATE
+    stdafx.h
+    stdafx.cpp
+
+    NVRHI/NVRHIDevice.h
+    NVRHI/NVRHIDevice.cpp
+
+    RenderContext/ResourceHandle.h
+    RenderContext/RCShader.h
+    RenderContext/RCShader.cpp
+    RenderContext/PipelineState.h
+    RenderContext/PipelineState.cpp
+    RenderContext/RenderDevice.h
+    RenderContext/RenderDevice.cpp
+    RenderContext/RenderContext.h
+    RenderContext/RenderContext.cpp
+
+    FrameGraph/FGTypes.h
+    FrameGraph/FGResource.h
+    FrameGraph/FGResource.cpp
+    FrameGraph/FGPass.h
+    FrameGraph/FGPass.cpp
+    FrameGraph/FrameGraph.h
+    FrameGraph/FrameGraph.cpp
+    FrameGraph/FGTest.h
+    FrameGraph/FGTest.cpp
+    FrameGraph/ShaderLoader.h
+    FrameGraph/ShaderLoader.cpp
+    FrameGraph/ShaderCache.h
+    FrameGraph/ShaderCache.cpp
+    FrameGraph/VolatileConstantBufferPool.h
+    FrameGraph/VolatileConstantBufferPool.cpp
+    FrameGraph/BindingLayoutBuilder.cpp
+    FrameGraph/BindingSetBuilder.cpp
+    FrameGraph/FGResourcePool.cpp
+    FrameGraph/PassResourceCache.cpp
+    FrameGraph/ShaderPhaseCache.cpp
+    FrameGraph/ShaderReflection.cpp
+
+    ShaderVariant/ShaderVariantRegistry.h
+    ShaderVariant/ShaderVariantRegistry.cpp
+    ShaderVariant/JsonParser.h
+    ShaderVariant/JsonParser.cpp
+    ShaderVariant/VariantPartitionConfig.h
+    ShaderVariant/VariantPSOCache.h
+    ShaderVariant/VariantPSOCache.cpp
+
+    Bindless/GPUStructuredBuffer.h
+    Bindless/GPUStructuredBuffer.cpp
+    Bindless/VariantTextureBuffer.h
+    Bindless/VariantTextureBuffer.cpp
+    Bindless/MaterialBuffer.cpp
+    Bindless/TerrainMaterialBuffer.cpp
+    Bindless/VertexConverter.cpp
+
+    Shaders/SlangCompiler.h
+    Shaders/SlangCompiler.cpp
+    Shaders/SlangCompilerTest.cpp
+    Shaders/SlangVFSAdapter.h
+    Shaders/SlangVFSAdapter.cpp
+    Shaders/SlangReflectionWrapper.cpp
+
+    FrameGraphPasses/ShaderConstants.h
+    FrameGraphPasses/ShaderConstants.cpp
+    FrameGraphPasses/ForwardColorPassSetup.h
+    FrameGraphPasses/ForwardColorPassSetup.cpp
+    FrameGraphPasses/HiZBuildPassSetup.h
+    FrameGraphPasses/HiZBuildPassSetup.cpp
+    FrameGraphPasses/SkinningPassSetup.h
+    FrameGraphPasses/SkinningPassSetup.cpp
+    FrameGraphPasses/ImGuiPassSetup.h
+    FrameGraphPasses/ImGuiPassSetup.cpp
+    FrameGraphPasses/ParticlePassSetup.h
+    FrameGraphPasses/ParticlePassSetup.cpp
+    FrameGraphPasses/RibbonPassSetup.h
+    FrameGraphPasses/RibbonPassSetup.cpp
+    FrameGraphPasses/TrailPassSetup.h
+    FrameGraphPasses/TrailPassSetup.cpp
+    FrameGraphPasses/SmokeTrailManager.h
+    FrameGraphPasses/SmokeTrailManager.cpp
+    FrameGraphPasses/SmokeTrailPassSetup.h
+    FrameGraphPasses/SmokeTrailPassSetup.cpp
+    FrameGraphPasses/DecalPassSetup.h
+    FrameGraphPasses/DecalPassSetup.cpp
+    FrameGraphPasses/DistortionApplyPassSetup.h
+    FrameGraphPasses/DistortionApplyPassSetup.cpp
+    FrameGraphPasses/ParticleGPUCullingManager.h
+    FrameGraphPasses/ParticleGPUCullingManager.cpp
+    FrameGraphPasses/ExposurePassSetup.h
+    FrameGraphPasses/ExposurePassSetup.cpp
+    FrameGraphPasses/TonemapPassSetup.h
+    FrameGraphPasses/TonemapPassSetup.cpp
+    FrameGraphPasses/UIPassSetup.h
+    FrameGraphPasses/UIPassSetup.cpp
+    FrameGraphPasses/SkyPassSetup.h
+    FrameGraphPasses/SkyPassSetup.cpp
+    FrameGraphPasses/SunPassSetup.h
+    FrameGraphPasses/SunPassSetup.cpp
+    FrameGraphPasses/DetailCullPassSetup.h
+    FrameGraphPasses/DetailCullPassSetup.cpp
+    FrameGraphPasses/DetailPassSetup.h
+    FrameGraphPasses/DetailPassSetup.cpp
+    FrameGraphPasses/TransparentPassSetup.h
+    FrameGraphPasses/TransparentPassSetup.cpp
+    FrameGraphPasses/PassCommon.h
+    FrameGraphPasses/PassCommon.cpp
+    FrameGraphPasses/PathTracerPassSetup.h
+    FrameGraphPasses/PathTracerPassSetup.cpp
+    FrameGraphPasses/MotionVectorPassSetup.h
+    FrameGraphPasses/MotionVectorPassSetup.cpp
+    FrameGraphPasses/ReSTIRGIPassSetup.h
+    FrameGraphPasses/ReSTIRGIPassSetup.cpp
+    FrameGraphPasses/ClusterLightPassSetup.cpp
+
+    RayTracing/RTAccelStructManager.h
+    RayTracing/RTAccelStructManager.cpp
+
+    FGDetailManager.h
+    FGDetailManager.cpp
+
+    Geometry/GeometryBatch.h
+    Geometry/GeometryBatch.cpp
+    Geometry/MaterialCache.cpp
+
+    UIGeometryBatch.h
+    UIRenderCollector.h
+    UIRenderCollector.cpp
+    NVRHIUIRenderer.h
+    NVRHIUIRenderer.cpp
+
+    r_FrameGraphRenderer.h
+    r_FrameGraphRenderer.cpp
+    r5.h
+    r5.cpp
+    FGRenderHost.h
+    FGRenderHost.cpp
+    FrameGraphRendererModule.h
+    FrameGraphRendererModule.cpp
+
+    ImGuiRendererNVRHI.h
+    ImGuiRendererNVRHI.cpp
+    ImGuiRendererNVRHI_Shaders.cpp
+    ImGuiRendererNVRHI_Render.cpp
+    ImGuiRendererIntegration.cpp
+    dxRenderFactory_ImGui.cpp
+    GlobalRenderDevice.cpp
+
+    Backend/VulkanBackend.h
+    Backend/VulkanBackend.cpp
+    Backend/D3D11BackendWrapper.cpp
+    Backend/D3D12Backend.cpp
+
+    Animation.cpp
+    ClusteredLightManager.cpp
+    ColorMapManager.cpp
+    ConstantSystem/FGConstantSystem.cpp
+    D3DUtils.cpp
+    D3DXRenderBase.cpp
+    DetailModel.cpp
+    ETextureParams.cpp
+    FBasicVisual.cpp
+    FHierrarhyVisual.cpp
+    FLOD.cpp
+    FProgressive.cpp
+    FSkinned.cpp
+    FTreeVisual.cpp
+    FVisual.cpp
+    GPUCullingManager.cpp
+    HOM.cpp
+    LightTrack.cpp
+    Light_DB.cpp
+    Light_Package.cpp
+    Light_Render_Direct.cpp
+    Light_Render_Direct_ComputeXFS.cpp
+    Materials/MaterialSystem.cpp
+    ModelPool.cpp
+    NvTriStrip.cpp
+    NvTriStripObjects.cpp
+    PBRConverter/ONNXModelRunner.cpp
+    PBRConverter/PBRTextureConverter.cpp
+    PSLibrary.cpp
+    ParticleEffect.cpp
+    ParticleEffectDef.cpp
+    ParticleGroup.cpp
+    Profiler/GPUProfiler.cpp
+    Profiler/StatsOverlay.cpp
+    R_DStreams.cpp
+    ResourceManager/AsyncIO.cpp
+    ResourceManager/BufferManager.cpp
+    ResourceManager/DDSLoader.cpp
+    ResourceManager/FGResourceManager.cpp
+    ResourceManager/NativeRTFactory.cpp
+    ResourceManager/SamplerCache.cpp
+    ResourceManager/TestTextureManager.cpp
+    ResourceManager/TextureManager.cpp
+    ResourceManager/TextureStreaming.cpp
+    SH_Atomic.cpp
+    SH_Constant.cpp
+    SH_Matrix.cpp
+    Shader.cpp
+    ShaderKey.cpp
+    SkeletonAnimated.cpp
+    SkeletonCustom.cpp
+    SkeletonRigid.cpp
+    SkeletonX.cpp
+    SkeletonXSkinXW_CPP.cpp
+    SkeletonXSkinXW_SSE.cpp
+    TextureDescrManager.cpp
+    Utils/dxHashHelper.cpp
+    VertexCache.cpp
+    WallmarksEngine.cpp
+    Decals/DecalManager.h
+    Decals/DecalManager.cpp
+    Decals/fgWallMarkArray.h
+    Decals/fgWallMarkArray.cpp
+    Decals/MeshPicker.h
+    Decals/MeshPicker.cpp
+    Decals/OverlayManager.h
+    Decals/OverlayManager.cpp
+    du_box.cpp
+    du_cone.cpp
+    du_cylinder.cpp
+    du_sphere.cpp
+    du_sphere_part.cpp
+    dxDebugRender.cpp
+    dxEnvironmentRender.cpp
+    dxFontRender.cpp
+    dxLensFlareRender.cpp
+    dxObjectSpaceRender.cpp
+    dxParticleCustom.cpp
+    dxRainRender.cpp
+    dxRenderFactory.cpp
+    dxStatGraphRender.cpp
+    dxThunderboltDescRender.cpp
+    dxThunderboltRender.cpp
+    dxUIRender.cpp
+    dxUISequenceVideoItem.cpp
+    dxUIShader.cpp
+    dxWallMarkArray.cpp
+    light.cpp
+    light_GI.cpp
+    light_smapvis.cpp
+    light_vis.cpp
+    occRasterizer.cpp
+    occRasterizer_core.cpp
+    r__dsgraph_build.cpp
+    r__dsgraph_render.cpp
+    r__dsgraph_render_lods.cpp
+    r__occlusion.cpp
+    r__pixel_calculator.cpp
+    r__sector.cpp
+    r__sector_detect.cpp
+    r__sector_traversal.cpp
+    r__sync_point.cpp
+    r_constants.cpp
+    stats_manager.cpp
+    xrStripify.cpp
+    BufferUtils.cpp
+)
+
+target_include_directories(xrRender
+    PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_SOURCE_DIR}/src"
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2"
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRenderPC_R4"
+    "${CMAKE_SOURCE_DIR}/sdk/include"
+    "${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh"
+    "${CMAKE_SOURCE_DIR}/sdk/include/nvapi"
+    "${CMAKE_SOURCE_DIR}/Externals/AGS_SDK"
+    "${CMAKE_SOURCE_DIR}/src/packages/directxtex_desktop_2019.2024.10.29.1/include"
+    "${CMAKE_SOURCE_DIR}/src/packages/directxmath.2024.10.15.1/include"
+    "${CMAKE_SOURCE_DIR}/Externals/nvrhi/include"
+    "${CMAKE_SOURCE_DIR}/Externals/slang/include"
+    "${CMAKE_SOURCE_DIR}/Externals/nvrhi/thirdparty/Vulkan-Headers/include"
+    "${CMAKE_SOURCE_DIR}/Externals/nvrhi/thirdparty/DirectX-Headers/include"
+)
+
+find_package(Vulkan REQUIRED)
+
+target_link_libraries(xrRender
+    PRIVATE
+    xrCore
+    xrCDB
+    xrEngine
+    xrParticles
+    xrScriptEngine
+    xrAPI
+    xrMiscMath
+    nvrhi
+    nvrhi_d3d11
+    nvrhi_d3d12
+    nvrhi_vk
+    d3dcompiler
+    ${Vulkan_LIBRARIES}
+    slang
+)
+
+target_compile_definitions(xrRender
+    PRIVATE
+    USE_DX11
+    USE_NVRHI_IMGUI
+)
+
+set_target_properties(xrRender PROPERTIES
+    PREFIX ""
+)
+
+target_precompile_headers(xrRender
+    PRIVATE
+    stdafx.h
+)
