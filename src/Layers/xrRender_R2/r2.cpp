@@ -34,6 +34,11 @@ CRender RImplementation;
 // Global storage for failed shader compilation tracking
 xr_vector<xr_string> g_failedShaders;
 
+framegraph::ShaderLoader* CRender::GetShaderLoader() const
+{
+    return m_framegraphRenderer ? m_framegraphRenderer->GetShaderLoader() : nullptr;
+}
+
 void CRender::PrintFailedShadersSummary()
 {
     if (g_failedShaders.empty())
