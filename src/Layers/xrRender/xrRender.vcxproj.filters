@@ -606,6 +606,9 @@
     <ClInclude Include="Materials\MaterialSystem.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
+    <ClInclude Include="Materials\ShaderInfo.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
     <ClInclude Include="Geometry\GeometryBatch.h">
       <Filter>Framegraph</Filter>
     </ClInclude>

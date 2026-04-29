@@ -31,6 +31,7 @@
 #include "Layers/xrRenderDX11/blenders/Blender_BmmD.h"
 #include "Layers/xrRender/r_constants.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
+#include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "xrEngine/xr_object.h"
@@ -1368,13 +1369,7 @@ bool MaterialCache::IsTerrainMaterial(dxRender_Visual* visual)
 {
     if (!visual || !visual->shaderName.size())
         return false;
-
-    IBlender* blender = RImplementation.Resources->_FindBlender(visual->shaderName.c_str());
-    if (!blender)
-        return false;
-
-    CLASS_ID cls = blender->getDescription().CLS;
-    return (cls == B_BmmD || cls == B_LmBmmD);
+    return shader_info::IsTerrainShader(visual->shaderName.c_str());
 }
 
 u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
@@ -1480,14 +1475,8 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
         bool updated = false;
         xr_vector<xr_string> missingTextures;
 
-        IBlender* blender = RImplementation.Resources->_FindBlender(visual->shaderName.c_str());
-        CBlender_BmmD* terrainBlender = nullptr;
-        if (blender) {
-            CLASS_ID cls = blender->getDescription().CLS;
-            if (cls == B_BmmD || cls == B_LmBmmD) {
-                terrainBlender = static_cast<CBlender_BmmD*>(blender);
-            }
-        }
+        shader_info::TerrainDetailNames detailNames;
+        bool hasTerrainDetail = shader_info::GetTerrainDetailNames(visual->shaderName.c_str(), detailNames);
 
         auto RegisterTexture = [&](const char* texName, const char* slotName) -> u32 {
             if (!texName || !texName[0]) {
@@ -1532,10 +1521,10 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
             }
         }
 
-        const char* detailR = terrainBlender ? terrainBlender->GetDetailR() : nullptr;
-        const char* detailG = terrainBlender ? terrainBlender->GetDetailG() : nullptr;
-        const char* detailB = terrainBlender ? terrainBlender->GetDetailB() : nullptr;
-        const char* detailA = terrainBlender ? terrainBlender->GetDetailA() : nullptr;
+        const char* detailR = hasTerrainDetail ? detailNames.r : nullptr;
+        const char* detailG = hasTerrainDetail ? detailNames.g : nullptr;
+        const char* detailB = hasTerrainDetail ? detailNames.b : nullptr;
+        const char* detailA = hasTerrainDetail ? detailNames.a : nullptr;
 
         {
             u32 idx = RegisterTexture(detailR, "detailR");

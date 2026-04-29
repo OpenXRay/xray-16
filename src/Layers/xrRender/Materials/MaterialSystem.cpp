@@ -5,6 +5,7 @@
 #include "Layers/xrRenderDX11/ResourceManager.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
+#include "Layers/xrRender/Materials/ShaderInfo.h"
 
 using namespace xray::render::resources;
 using namespace xray::render::framegraph;
@@ -76,11 +77,11 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* 
 
     MaterialInfo info = GetDefaultMaterialInfo();
 
-    using BlendMode = fg::CResourceManager::BlendMode;
-    fg::CResourceManager::BlenderProperties blenderProps;
-    if (fg::RImplementation.Resources->GetBlenderProperties(shaderName, blenderProps))
+    using BlendMode = shader_info::ShaderBlendMode;
+    shader_info::ShaderBlendInfo blendInfo;
+    if (shader_info::GetShaderBlendInfo(shaderName, blendInfo))
     {
-        switch (blenderProps.blendMode)
+        switch (blendInfo.mode)
         {
         case BlendMode::Opaque:
             info.alphaTest = false;
@@ -89,7 +90,7 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* 
             break;
         case BlendMode::AlphaTest:
             info.alphaTest = true;
-            info.alphaRef = blenderProps.alphaRef;
+            info.alphaRef = blendInfo.alphaRef;
             info.transparent = false;
             break;
         case BlendMode::AlphaBlend:
@@ -101,7 +102,7 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* 
             info.transparent = true;
             break;
         }
-        if (blenderProps.strictB2F)
+        if (blendInfo.strictB2F)
             info.transparent = true;
         m_stats.materialsFromBlender++;
     }

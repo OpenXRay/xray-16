@@ -219,6 +219,7 @@
     <ClCompile Include="..\xrRenderDX11\ResourceManager_Loader.cpp"/>
     <ClCompile Include="..\xrRenderDX11\ResourceManager_Reset.cpp"/>
     <ClCompile Include="..\xrRenderDX11\ResourceManager_Resources.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\ShaderInfo.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_DBG.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_hemi.cpp"/>

@@ -743,6 +743,9 @@
     <ClCompile Include="..\xrRenderDX11\ResourceManager_Resources.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\ShaderInfo.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_BmmD_deferred.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
