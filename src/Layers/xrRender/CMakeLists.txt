@@ -225,6 +225,9 @@ target_sources(xrRender PRIVATE
     light.cpp
     light_GI.cpp
     light_vis.cpp
+    r__buffer_pool.cpp
+    r__buffer_pool.h
+    r__hw_compat.h
     r__pixel_calculator.cpp
     r__sector.cpp
     r__sector_detect.cpp

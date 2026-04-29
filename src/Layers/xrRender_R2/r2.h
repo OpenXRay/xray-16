@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Layers/xrRender/D3DXRenderBase.h"
+#include "Layers/xrRender/r__buffer_pool.h"
 #include "Layers/xrRender/r__occlusion.h"
 #include "Layers/xrRender/r__sync_point.h"
 
@@ -340,8 +341,7 @@ public:
     Task* ProcessHOMTask;
     R_occlusion HWOCC;
 
-    // Global vertex-buffer container
-    xr_vector<FSlideWindowItem> SWIs;
+    xr_vector<FSlideWindowItem>& SWIs = ::xray::render::fg::BufferPool.SWIs;
 
     // ═══════════════════════════════════════════════════
     //  D3D12: CompiledLevelShader (replaces ref_shader + ShaderNameEntry)
@@ -380,11 +380,14 @@ public:
 
     xr_vector<CompiledLevelShader> CompiledLevelShaders;  // D3D12: Replaces legacy Shaders + ShaderNames
 
-    typedef svector<VertexElement, MAXD3DDECLLENGTH + 1> VertexDeclarator;
-    xr_vector<VertexDeclarator> nDC, xDC;
-    xr_vector<VertexStagingBuffer> nVB, xVB;
-    xr_vector<IndexStagingBuffer> nIB, xIB;
-    xr_vector<dxRender_Visual*> Visuals;
+    using VertexDeclarator = ::xray::render::fg::VertexDeclarator;
+    xr_vector<VertexDeclarator>&    nDC = ::xray::render::fg::BufferPool.nDC;
+    xr_vector<VertexDeclarator>&    xDC = ::xray::render::fg::BufferPool.xDC;
+    xr_vector<VertexStagingBuffer>& nVB = ::xray::render::fg::BufferPool.nVB;
+    xr_vector<VertexStagingBuffer>& xVB = ::xray::render::fg::BufferPool.xVB;
+    xr_vector<IndexStagingBuffer>&  nIB = ::xray::render::fg::BufferPool.nIB;
+    xr_vector<IndexStagingBuffer>&  xIB = ::xray::render::fg::BufferPool.xIB;
+    xr_vector<dxRender_Visual*>&    Visuals = ::xray::render::fg::BufferPool.Visuals;
     CPSLibrary PSLibrary;
 
     CDetailManager* Details;
@@ -405,7 +408,7 @@ public:
 
     bool m_bFirstFrameAfterReset{}; // Determines weather the frame is the first after resetting device.
 
-    bool m_fast_geom_loaded{};
+    bool& m_fast_geom_loaded = ::xray::render::fg::BufferPool.fastGeomLoaded;
 
 private:
     // Loading / Unloading
@@ -449,10 +452,10 @@ public:
     auto get_largest_sector() const { return largest_sector_id; }
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
-    VertexElement* getVB_Format(int id, bool alternative = false);
-    VertexStagingBuffer* getVB(int id, bool alternative = false);
-    IndexStagingBuffer* getIB(int id, bool alternative = false);
-    FSlideWindowItem* getSWI(int id);
+    VertexElement*       getVB_Format(int id, bool alternative = false) { return ::xray::render::fg::BufferPool.getVB_Format(id, alternative); }
+    VertexStagingBuffer* getVB(int id, bool alternative = false)        { return ::xray::render::fg::BufferPool.getVB(id, alternative); }
+    IndexStagingBuffer*  getIB(int id, bool alternative = false)        { return ::xray::render::fg::BufferPool.getIB(id, alternative); }
+    FSlideWindowItem*    getSWI(int id)                                 { return ::xray::render::fg::BufferPool.getSWI(id); }
     IRenderVisual* model_CreatePE(LPCSTR name);
 
     // HW-occlusion culling

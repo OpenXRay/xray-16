@@ -354,6 +354,7 @@
     <ClCompile Include="ResourceManager\SamplerCache.cpp"/>
     <ClCompile Include="ResourceManager\FGResourceManager.cpp"/>
     <ClCompile Include="ResourceManager\NativeRTFactory.cpp"/>
+    <ClCompile Include="r__buffer_pool.cpp"/>
     <ClCompile Include="r__pixel_calculator.cpp"/>
     <ClCompile Include="r__sector.cpp"/>
     <ClCompile Include="r__sector_detect.cpp"/>
