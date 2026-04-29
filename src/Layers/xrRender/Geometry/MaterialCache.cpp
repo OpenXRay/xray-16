@@ -837,7 +837,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
         for (const auto& tex : dxShader->m_psReflection->rtBindings.inputTextures) {
             if (xr_strcmp(tex.name.c_str(), "s_base") != 0)
-                break;
+                continue;
 
             CTexture* baseTexture = dxShader->GetBaseTexture();
             if (baseTexture) {
@@ -1287,6 +1287,20 @@ MaterialPSO* MaterialCache::CreateFontPSO(
 
 void MaterialCache::Clear()
 {
+    if (m_resourceManager)
+    {
+        if (resources::TextureManager* texMgr = m_resourceManager->GetTextureManager())
+        {
+            for (auto& [key, pso] : m_cache)
+            {
+                if (!pso) continue;
+                for (auto& slot : pso->textures)
+                    if (slot.handle.IsValid())
+                        texMgr->Release(slot.handle);
+                pso->textures.clear();
+            }
+        }
+    }
     m_cache.clear();
     m_textureHandleCache.clear();
     m_detailScaleCache.clear();
