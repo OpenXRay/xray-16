@@ -1311,7 +1311,7 @@ float MaterialCache::GetDetailScale(const shared_str& textureName)
         return cacheIt->second;
     }
 
-    float scale = RImplementation.Resources->m_textures_description.GetDetailScale(textureName);
+    float scale = TextureDescr.GetDetailScale(textureName);
 
     m_detailScaleCache[textureName.c_str()] = scale;
 
@@ -1554,7 +1554,7 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
             if (idx != INVALID_TEXTURE_INDEX) { matData.detailA_Index = idx; updated = true; }
         }
 
-        auto& texDescMgr = RImplementation.Resources->m_textures_description;
+        auto& texDescMgr = TextureDescr;
         if (detailR && detailR[0]) {
             shared_str bumpR = texDescMgr.GetBumpName(detailR);
             if (bumpR.size()) {
@@ -1821,7 +1821,7 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
             }
         }
 
-        auto& texDescMgr = RImplementation.Resources->m_textures_description;
+        auto& texDescMgr = TextureDescr;
         shared_str bumpName = texDescMgr.GetBumpName(diffuseName);
         if (bumpName.size() && bumpName[0]) {
             resources::TextureHandle handle = texManager->LoadTexture(bumpName.c_str());

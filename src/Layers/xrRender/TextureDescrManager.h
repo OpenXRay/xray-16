@@ -70,4 +70,6 @@ public:
     shared_str GetParallaxName(const shared_str& tex_name) const;
     shared_str GetPBRName(const shared_str& tex_name) const;
 };
+
+extern ECORE_API CTextureDescrMngr TextureDescr;
 }

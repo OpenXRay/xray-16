@@ -81,7 +81,6 @@ private:
 
     xr_vector<ref_texture> m_necessary;
 public:
-    CTextureDescrMngr m_textures_description;
     xr_vector<std::pair<shared_str, R_constant_setup*>> v_constant_setup;
     BOOL bDeferredLoad;
     bool m_shader_fallback_allowed;
