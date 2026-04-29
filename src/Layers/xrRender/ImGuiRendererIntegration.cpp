@@ -32,12 +32,11 @@ void InitializeImGuiRenderer(fg::RenderDevice* renderDevice)
 
     if (renderDevice && renderDevice->IsInitialized())
     {
-        // Use NVRHI-based renderer - create as base class pointer
         fg::ImGuiRendererNVRHI* nvrhiRenderer = xr_new<fg::ImGuiRendererNVRHI>(renderDevice);
         g_ImGuiRenderer.reset(nvrhiRenderer);
 
-        // Store pointer in RImplementation for FrameGraphRenderer access
-        fg::RImplementation.m_imguiRendererNVRHI = nvrhiRenderer;
+        if (fg::RImplementation.m_framegraphRenderer)
+            fg::RImplementation.m_framegraphRenderer->SetImGuiRendererNVRHI(nvrhiRenderer);
 
         Msg("* ImGui: Using NVRHI renderer (supports DX11/DX12/Vulkan)");
     }

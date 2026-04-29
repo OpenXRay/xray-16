@@ -770,12 +770,6 @@ IRenderVisual* CRender::getVisual(int id)
 //  D3D12: PSO PRECOMPILATION HELPER FUNCTIONS
 // ═══════════════════════════════════════════════════
 
-u64 CRender::ComputePSOCacheKey(u32 vertexFormatID, RenderPassType passType)
-{
-    // Simple hash: combine vertex format ID and pass type
-    return ((u64)vertexFormatID << 32) | (u64)passType;
-}
-
 u32 CRender::GetVertexStride(u32 vertexFormatID)
 {
     if (vertexFormatID >= nDC.size())
@@ -1000,7 +994,7 @@ bool CRender::CreatePrecompiledPSO(
     }
 
     // Store NVRHI handle in precompiled PSO cache (MaterialCache will wrap it in MaterialPSO later)
-    u64 cacheKey = ComputePSOCacheKey(vertexFormatID, passType);
+    u64 cacheKey = ((u64)vertexFormatID << 32) | (u64)passType;
 
     CompiledLevelShader::PrecompiledPSOs::PSOVariant variant;
     variant.vertexFormatID = vertexFormatID;

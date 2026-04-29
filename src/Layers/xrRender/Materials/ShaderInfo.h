@@ -36,3 +36,26 @@ bool GetShaderBlendInfo(const char* shaderName, ShaderBlendInfo& out);
 bool GetParticleBlendIndex(const char* shaderName, u32& outIndex);
 
 }
+
+namespace xray::render
+{
+struct MaterialPSO;
+enum class RenderPassType : u8;
+}
+
+namespace xray::render::shader_info
+{
+bool GetCompiledShaderNames(int shaderID, shared_str& outShaderName, shared_str& outTextureName);
+xray::render::MaterialPSO* GetCompiledShaderPSO(int shaderID, u32 vertexFormatID, xray::render::RenderPassType passType);
+}
+
+namespace xray::render::fg
+{
+class CSector;
+}
+
+namespace xray::render::scene_info
+{
+const xr_vector<xray::render::fg::CSector*>& GetSceneSectors();
+u32 GetPortalTraversalMarker();
+}

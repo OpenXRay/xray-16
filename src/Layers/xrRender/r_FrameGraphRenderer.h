@@ -107,6 +107,8 @@ public:
     // Accessors for lambda passes to access shared infrastructure (override IFrameGraphRender)
     fg::RenderDevice* GetRenderDevice() const override { return m_device; }
     framegraph::ShaderLoader* GetShaderLoader() const override { return m_shaderLoader; }
+    fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const override { return m_imguiRendererNVRHI; }
+    void SetImGuiRendererNVRHI(fg::ImGuiRendererNVRHI* r) { m_imguiRendererNVRHI = r; }
     MaterialCache* GetMaterialCache() const override { return m_materialCache.get(); }
     MaterialCache* GetUIMaterialCache() const override { return m_uiMaterialCache.get(); }
     ui::UIRenderCollector* GetUICollector() const override { return m_uiCollector.get(); }
@@ -133,6 +135,7 @@ private:
     bool m_enabled = false;
     fg::RenderDevice* m_device = nullptr;
     framegraph::ShaderLoader* m_shaderLoader = nullptr;
+    fg::ImGuiRendererNVRHI* m_imguiRendererNVRHI = nullptr;
 
     xr_unique_ptr<framegraph::Blackboard> m_blackboard;
 

@@ -322,17 +322,10 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     if (shaderID == UINT32_MAX)
         return nullptr;
 
-    auto* compiled = RImplementation.getCompiledShader(shaderID);
-    if (!compiled)
-        return nullptr;
-
     u32 vertexFormatID = GetVertexFormatID(visual);
-    u64 cacheKey = RImplementation.ComputePSOCacheKey(vertexFormatID, passType);
-
-    auto it = compiled->precompiledPSOs.psoCache.find(cacheKey);
-    if (it != compiled->precompiledPSOs.psoCache.end() && it->second) {
+    if (auto* pso = shader_info::GetCompiledShaderPSO(shaderID, vertexFormatID, passType)) {
         m_stats.numCacheHits++;
-        return it->second;
+        return pso;
     }
 
     m_stats.numCacheMisses++;

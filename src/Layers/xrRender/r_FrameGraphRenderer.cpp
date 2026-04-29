@@ -357,7 +357,7 @@ void FrameGraphRenderer::Render() {
                     if (m_rtAccelMgr)
                         fg::RTAccelStructManager::InvalidateShaderPipelines();
 
-                    fg::ImGuiRendererNVRHI* imguiReload = RImplementation.GetImGuiRendererNVRHI();
+                    fg::ImGuiRendererNVRHI* imguiReload = GEnv.FrameGraphRenderer->GetImGuiRendererNVRHI();
                     if (imguiReload)
                         imguiReload->InvalidateShadersAndPipeline();
 
@@ -529,7 +529,7 @@ void FrameGraphRenderer::RenderMenu() {
         m_blackboard->get_or_add<passes::TonemapPassState>()
     );
 
-    fg::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
+    fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.FrameGraphRenderer->GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
         ldrOutput,  // LDR input (RGBA8_UNORM)
@@ -1714,7 +1714,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
-    fg::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
+    fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.FrameGraphRenderer->GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
         ldrOutput,
@@ -2231,16 +2231,16 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     if (!g_pGamePersistent)
         return;
 
-    auto& dsgraph = RImplementation.get_imm_context();
+    const auto& sectors = scene_info::GetSceneSectors();
     u32 submittedStatic = 0;
 
-    if (!m_staticBatchesCached && !dsgraph.Sectors.empty()) {
-        Msg("* [GeomCache] Building static geometry cache from %zu sectors...", dsgraph.Sectors.size());
+    if (!m_staticBatchesCached && !sectors.empty()) {
+        Msg("* [GeomCache] Building static geometry cache from %zu sectors...", sectors.size());
 
         xr_vector<dxRender_Visual*> staticVisuals;
         xr_set<dxRender_Visual*> uniqueVisuals;
 
-        for (CSector* sector : dsgraph.Sectors) {
+        for (CSector* sector : sectors) {
             if (sector && sector->root()) {
                 ExtractStaticLeafVisuals(sector->root(), staticVisuals);
             }
@@ -2277,7 +2277,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         m_staticBatchesCached = true;
 
         Msg("* [GeomCache] Cached %zu static batches from %zu unique visuals (total sectors: %zu)",
-            m_cachedStaticBatches.size(), uniqueVisuals.size(), dsgraph.Sectors.size());
+            m_cachedStaticBatches.size(), uniqueVisuals.size(), sectors.size());
     }
     else if (m_staticBatchesCached) {
         for (const auto& batch : m_cachedStaticBatches) {
@@ -2293,7 +2293,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     u32 notRenderable = 0;
 
     // Process each visible dynamic object (from cached list)
-    u32 portalTraversalMarker = dsgraph.PortalTraverser.i_marker;
+    u32 portalTraversalMarker = scene_info::GetPortalTraversalMarker();
 
     xr_vector<const light*> collectedLights;
     collectedLights.reserve(256);

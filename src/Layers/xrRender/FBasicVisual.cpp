@@ -8,6 +8,7 @@
 #include "FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
 #include "xrEngine/xr_object.h"  // For GEnv
+#include "Layers/xrRender/Materials/ShaderInfo.h"
 
 namespace xray::render::fg
 {
@@ -67,14 +68,7 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
     }
     else if (hdr.shader_id)
     {
-        // Level geometry uses shader_id to reference precompiled NVRHI shaders
-        auto* compiled = RImplementation.getCompiledShader(hdr.shader_id);
-        if (compiled)
-        {
-            shaderName = compiled->shaderName;
-            textureName = compiled->textureName;
-            // NVRHI shader handles are in compiled->vsHandle, compiled->psHandle
-        }
+        xray::render::shader_info::GetCompiledShaderNames(hdr.shader_id, shaderName, textureName);
     }
 
 // desc

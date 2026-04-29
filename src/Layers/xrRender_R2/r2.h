@@ -432,7 +432,6 @@ private:
 
 public:
     // D3D12: Public PSO cache key computation (used by MaterialCache)
-    u64 ComputePSOCacheKey(u32 vertexFormatID, RenderPassType passType);
 
     void render_forward();
     void render_indirect(light* L) const;
@@ -641,10 +640,6 @@ public:
 
     // FrameGraph Renderer (Phase 3)
     xray::render::FrameGraphRenderer* m_framegraphRenderer{ nullptr };
-
-    // ImGui NVRHI Renderer
-    xray::render::fg::ImGuiRendererNVRHI* m_imguiRendererNVRHI{ nullptr };
-    xray::render::fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return m_imguiRendererNVRHI; }
 
     framegraph::ShaderLoader* GetShaderLoader() const override;
 
