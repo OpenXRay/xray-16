@@ -2,12 +2,12 @@
 #pragma hdrstop
 
 #include "xrEngine/GameFont.h"
-#include "D3DUtils.h"
-#include "du_box.h"
-#include "du_sphere.h"
-#include "du_sphere_part.h"
-#include "du_cone.h"
-#include "du_cylinder.h"
+#include "Layers/xrRender/D3DUtils.h"
+#include "Layers/xrRender/du_box.h"
+#include "Layers/xrRender/du_sphere.h"
+#include "Layers/xrRender/du_sphere_part.h"
+#include "Layers/xrRender/du_cone.h"
+#include "Layers/xrRender/du_cylinder.h"
 #include "xrCore/_obb.h"
 
 namespace xray::render::fg

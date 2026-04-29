@@ -826,23 +826,8 @@
     <ClCompile Include="r__sector_traversal.cpp">
       <Filter>Visibility\Sector/Portal</Filter>
     </ClCompile>
-    <ClCompile Include="HOM.cpp">
-      <Filter>Visibility\HOM Occlusion</Filter>
-    </ClCompile>
-    <ClCompile Include="occRasterizer.cpp">
-      <Filter>Visibility\HOM Occlusion</Filter>
-    </ClCompile>
-    <ClCompile Include="occRasterizer_core.cpp">
-      <Filter>Visibility\HOM Occlusion</Filter>
-    </ClCompile>
     <ClCompile Include="ColorMapManager.cpp">
       <Filter>Core_Target\ColorMap</Filter>
-    </ClCompile>
-    <ClCompile Include="R_DStreams.cpp">
-      <Filter>Refactored\Backend</Filter>
-    </ClCompile>
-    <ClCompile Include="r_constants.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
     <ClCompile Include="SH_Constant.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
@@ -855,9 +840,6 @@
     </ClCompile>
     <ClCompile Include="TextureDescrManager.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
-    </ClCompile>
-    <ClCompile Include="D3DUtils.cpp">
-      <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
     </ClCompile>
     <ClCompile Include="du_box.cpp">
       <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>

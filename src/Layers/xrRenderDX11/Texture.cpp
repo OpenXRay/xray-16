@@ -44,7 +44,7 @@ int get_texture_load_lod(LPCSTR fn)
         {
             if (psTextureLOD < 1)
             {
-                if (enough_address_space_available || RImplementation.GenerationIsR1())
+                if (enough_address_space_available)
                     return 0;
                 else
                     return 1;

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "occRasterizer.h"
+#include "Layers/xrRender/occRasterizer.h"
 
 namespace xray::render::fg
 {

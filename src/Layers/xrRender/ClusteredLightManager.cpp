@@ -6,6 +6,7 @@
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "xrEngine/IRenderBackend.h"
+#include "xrEngine/IFrameGraphRender.h"
 #include "xrCore/Threading/ParallelFor.hpp"
 
 namespace xray::render::fg
@@ -370,7 +371,7 @@ u32 ClusteredLightManager::GetOrLoadSpotTexture(const shared_str& name)
     if (it != m_spotTextureCache.end())
         return it->second;
 
-    auto* renderDevice = RImplementation.m_renderDevice;
+    auto* renderDevice = GEnv.FrameGraphRenderer ? GEnv.FrameGraphRenderer->GetRenderDevice() : nullptr;
     if (!renderDevice)
         return 0;
 

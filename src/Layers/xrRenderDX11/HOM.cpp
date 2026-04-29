@@ -6,8 +6,8 @@
 
 #include "xrCore/Threading/ParallelFor.hpp"
 
-#include "HOM.h"
-#include "occRasterizer.h"
+#include "Layers/xrRender/HOM.h"
+#include "Layers/xrRender/occRasterizer.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 

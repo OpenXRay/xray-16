@@ -3,10 +3,10 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "occRasterizer.h"
+#include "Layers/xrRender/occRasterizer.h"
 
 #ifdef DEBUG
-#include "xrRender_console.h"
+#include "Layers/xrRender/xrRender_console.h"
 #endif
 
 namespace xray::render::fg
