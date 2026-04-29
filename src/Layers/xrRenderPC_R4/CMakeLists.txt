@@ -371,7 +371,7 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRenderDX11/StateManager/dx11State.cpp
     ../xrRenderDX11/StateManager/dx11StateCache.cpp
     ../xrRenderDX11/StateManager/dx11StateManager.cpp
-    ../xrRenderDX11/dx11BufferUtils.cpp
+    ../xrRender/BufferUtils.cpp
     ../xrRenderDX11/dx11ComputeTest.cpp
     ../xrRenderDX11/dx11ComputeTest_Matrices.cpp
     ../xrRenderDX11/dx11ComputeTest_SIMD.cpp

@@ -462,7 +462,7 @@
     <ClInclude Include="..\xrRenderDX11\ResourceManager.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\ShaderResourceTraits.h">
+    <ClInclude Include="..\xrRenderDX11\ShaderResourceTraits.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\TextureDescrManager.h">
@@ -1440,7 +1440,7 @@
     <ClCompile Include="..\xrRenderDX11\blenders\dx11MSAABlender.cpp">
       <Filter>Shading templates\DX11 MSAA</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx11BufferUtils.cpp">
+    <ClCompile Include="..\xrRender\BufferUtils.cpp">
       <Filter>dx9 to dx11 Utils</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX11\dx11StateUtils.cpp">

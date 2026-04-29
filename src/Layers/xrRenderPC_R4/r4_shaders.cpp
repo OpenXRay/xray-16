@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "r2.h"
-#include "Layers/xrRender/ShaderResourceTraits.h"
+#include "Layers/xrRenderDX11/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
 #include "Layers/xrRender/Shaders/SlangCompiler.h"
 #include "Layers/xrRender/Shaders/SlangReflectionWrapper.h"

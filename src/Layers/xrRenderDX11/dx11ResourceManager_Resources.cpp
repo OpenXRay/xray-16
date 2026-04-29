@@ -7,7 +7,7 @@
 #include "Layers/xrRenderDX11/Blender_Recorder.h"
 #include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
-#include "Layers/xrRender/ShaderResourceTraits.h"
+#include "Layers/xrRenderDX11/ShaderResourceTraits.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
