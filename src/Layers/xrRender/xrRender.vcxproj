@@ -270,7 +270,6 @@
     <ClCompile Include="Animation.cpp"/>
     <ClCompile Include="ColorMapManager.cpp"/>
     <ClCompile Include="ConstantSystem\FGConstantSystem.cpp"/>
-    <ClCompile Include="D3DUtils.cpp"/>
     <ClCompile Include="D3DXRenderBase.cpp"/>
     <ClCompile Include="DetailModel.cpp"/>
     <ClCompile Include="du_box.cpp"/>
@@ -332,7 +331,6 @@
     <ClCompile Include="FVisual.cpp"/>
     <ClCompile Include="Geometry\MaterialCache.cpp"/>
     <ClCompile Include="Materials\MaterialSystem.cpp"/>
-    <ClCompile Include="HOM.cpp"/>
     <ClCompile Include="light.cpp"/>
     <ClCompile Include="LightTrack.cpp"/>
     <ClCompile Include="Light_DB.cpp"/>
@@ -341,8 +339,6 @@
     <ClCompile Include="NVRHIUIRenderer.cpp"/>
     <ClCompile Include="NvTriStrip.cpp"/>
     <ClCompile Include="NvTriStripObjects.cpp"/>
-    <ClCompile Include="occRasterizer.cpp"/>
-    <ClCompile Include="occRasterizer_core.cpp"/>
     <ClCompile Include="ParticleEffect.cpp"/>
     <ClCompile Include="ParticleEffectDef.cpp"/>
     <ClCompile Include="ParticleGroup.cpp"/>
@@ -358,8 +354,6 @@
     <ClCompile Include="ResourceManager\SamplerCache.cpp"/>
     <ClCompile Include="ResourceManager\FGResourceManager.cpp"/>
     <ClCompile Include="ResourceManager\NativeRTFactory.cpp"/>
-    <ClCompile Include="r_constants.cpp"/>
-    <ClCompile Include="R_DStreams.cpp"/>
     <ClCompile Include="r__pixel_calculator.cpp"/>
     <ClCompile Include="r__sector.cpp"/>
     <ClCompile Include="r__sector_detect.cpp"/>

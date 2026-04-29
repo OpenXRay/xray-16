@@ -238,6 +238,12 @@
     <ClCompile Include="..\xrRenderDX11\light_smapvis.cpp"/>
     <ClCompile Include="..\xrRenderDX11\r__occlusion.cpp"/>
     <ClCompile Include="..\xrRenderDX11\WallmarksEngine.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\D3DUtils.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\HOM.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\occRasterizer.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\occRasterizer_core.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\R_DStreams.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\r_constants.cpp"/>
     <ClCompile Include="..\xrRenderDX11\ShaderInfo.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_DBG.cpp"/>

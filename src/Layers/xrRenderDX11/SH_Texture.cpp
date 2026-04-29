@@ -13,9 +13,6 @@
 namespace xray::render::fg
 {
 void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 CTexture::CTexture()
 {
     pAVI = nullptr;
@@ -29,21 +26,19 @@ CTexture::CTexture()
     m_material = 1.0f;
     bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_load);
 }
-// XXX: render scripts should call this destructor before resource manager gets destroyed
 CTexture::~CTexture()
 {
     Unload();
-    // release external reference
     RImplementation.Resources->_DeleteTexture(this);
 }
 
 void CTexture::surface_set(ID3DBaseTexture* surf)
 {
-#if 0//def DEBUG
+#if 0
     string_path msg_buff;
     xr_sprintf(msg_buff, "* Changing texture surface [%s] current pSurface RefCount =", cName.c_str());
     _SHOW_REF(msg_buff, pSurface);
-#endif // DEBUG
+#endif
 
     if (surf)
         surf->AddRef();
@@ -113,15 +108,12 @@ void CTexture::apply_avi(CBackend& cmd_list, u32 dwStage) const
         R_ASSERT(D3DRTYPE_TEXTURE == pSurface->GetType());
         ID3DTexture2D* T2D = static_cast<ID3DTexture2D*>(pTempSurface);
 
-        // AVI
         D3DLOCKED_RECT R;
         R_CHK(T2D->LockRect(0, &R, NULL, 0));
         R_ASSERT(R.Pitch == int(pAVI->m_dwWidth * 4));
-        //		R_ASSERT(pAVI->DecompressFrame((u32*)(R.pBits)));
         u8* ptr{};
         pAVI->GetFrame(&ptr);
         CopyMemory(R.pBits, ptr, pAVI->m_dwWidth * pAVI->m_dwHeight * 4);
-        //		R_ASSERT(pAVI->GetFrame((u8*)(&R.pBits)));
 
         R_CHK(T2D->UnlockRect(0));
         R_CHK(HW.pDevice->UpdateTexture(pTempSurface, pSurface));
@@ -130,8 +122,7 @@ void CTexture::apply_avi(CBackend& cmd_list, u32 dwStage) const
 };
 void CTexture::apply_seq(CBackend& cmd_list, u32 dwStage)
 {
-    // SEQ
-    u32 frame = Device.dwTimeContinual / seqMSPF; // Device.dwTimeGlobal
+    u32 frame = Device.dwTimeContinual / seqMSPF;
     u32 frame_data = seqDATA.size();
     if (flags.seqCycles)
     {
@@ -174,8 +165,6 @@ void CTexture::Load()
     flags.MemoryUsage = 0;
     if (0 == xr_stricmp(*cName, "$null"))
         return;
-    // we need to check only the beginning of the string,
-    // so let's use strncmp instead of strstr.
     if (0 == strncmp(cName.c_str(), "$user$", sizeof("$user$") - 1))
     {
         flags.bUser = true;
@@ -185,11 +174,9 @@ void CTexture::Load()
     Preload();
     if (!GEnv.isDedicatedServer)
     {
-        // Check for OGM
         string_path fn;
         if (FS.exist(fn, "$game_textures$", *cName, ".ogm"))
         {
-            // AVI
             pTheora = xr_new<CTheoraSurface>();
             m_play_time = 0xFFFFFFFF;
 
@@ -204,7 +191,6 @@ void CTexture::Load()
                 BOOL bstop_at_end = (nullptr != strstr(cName.c_str(), "intro" DELIMITER)) || (nullptr != strstr(cName.c_str(), "outro" DELIMITER));
                 pTheora->Play(!bstop_at_end, Device.dwTimeContinual);
 
-                // Now create texture
                 u32 _w = pTheora->Width(false);
                 u32 _h = pTheora->Height(false);
 
@@ -224,7 +210,6 @@ void CTexture::Load()
         }
         else if (FS.exist(fn, "$game_textures$", *cName, ".avi"))
         {
-            // AVI
             pAVI = xr_new<CAviPlayerCustom>();
 
             if (!pAVI->Load(fn))
@@ -236,7 +221,6 @@ void CTexture::Load()
             {
                 flags.MemoryUsage = pAVI->m_dwWidth * pAVI->m_dwHeight * 4;
 
-                // Now create texture
                 const auto hr = HW.pDevice->CreateTexture(pAVI->m_dwWidth, pAVI->m_dwHeight, 1, 0,
                     D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, reinterpret_cast<ID3DTexture2D**>(&pSurface), nullptr);
                 const auto hr2 = HW.pDevice->CreateTexture(pAVI->m_dwWidth, pAVI->m_dwHeight, 1, 0,
@@ -253,7 +237,6 @@ void CTexture::Load()
         }
         else if (FS.exist(fn, "$game_textures$", *cName, ".seq"))
         {
-            // Sequence
             string256 buffer;
             IReader* _fs = FS.r_open(fn);
 
@@ -273,12 +256,10 @@ void CTexture::Load()
                 _Trim(buffer);
                 if (buffer[0])
                 {
-                    // Load another texture
                     u32 mem = 0;
                     pSurface = RImplementation.texture_load(buffer, mem);
                     if (pSurface)
                     {
-                        // pSurface->SetPriority	(PRIORITY_LOW);
                         seqDATA.push_back(pSurface);
                         flags.MemoryUsage += mem;
                     }
@@ -289,14 +270,11 @@ void CTexture::Load()
         }
         else
         {
-            // Normal texture
             u32 mem = 0;
             pSurface = RImplementation.texture_load(*cName, mem);
 
-            // Calc memory usage and preload into vid-mem
             if (pSurface)
             {
-                // pSurface->SetPriority	(PRIORITY_NORMAL);
                 flags.MemoryUsage = mem;
             }
         }
@@ -310,9 +288,7 @@ void CTexture::Unload()
     string_path msg_buff;
     xr_sprintf(msg_buff, "* Unloading texture [%s] pSurface RefCount =", cName.c_str());
     _SHOW_REF(msg_buff, pSurface);
-#endif // DEBUG
-
-    //.	if (flags.bLoaded)		Msg		("* Unloaded: %s",cName.c_str());
+#endif
 
     flags.bLoaded = FALSE;
     if (!seqDATA.empty())

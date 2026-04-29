@@ -218,8 +218,7 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
         {
             scissor = R_scissor;
 
-            // Cull by HOM (slower algo)
-            if ((i_options & CPortalTraverser::VQ_HOM) && (!RImplementation.HOM.visible(*P)))
+            if (false)
                 continue;
         }
 

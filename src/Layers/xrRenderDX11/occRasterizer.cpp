@@ -1,12 +1,8 @@
-// occRasterizer.cpp: implementation of the occRasterizer class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
-#include "occRasterizer.h"
+#include "Layers/xrRender/occRasterizer.h"
 
 #ifdef DEBUG
-#include "xrRender_console.h"
+#include "Layers/xrRender/xrRender_console.h"
 #endif
 
 namespace xray::render::fg
@@ -40,10 +36,6 @@ static void propagade_depth(LPVOID p_dest, LPVOID p_src, int dim)
     }
 }
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 occRasterizer::occRasterizer()
 #ifdef DEBUG
     : dbg_HOM_draw_initialized(false)
@@ -72,7 +64,6 @@ void occRasterizer::propagade()
 {
     ZoneScoped;
 
-    // Clip-and-propagade zero level
     occTri** pFrame = get_frame();
     float* pDepth = get_depth();
     for (int y = 0; y < occ_dim_0; y++)
@@ -81,7 +72,6 @@ void occRasterizer::propagade()
         {
             int ox = x + 2, oy = y + 2;
 
-            // Y2-connect
             int pos = oy * occ_dim + ox;
             int pos_up = pos - occ_dim;
             int pos_down = pos + occ_dim;
@@ -90,10 +80,8 @@ void occRasterizer::propagade()
             occTri* Tu1 = pFrame[pos_up];
             if (Tu1)
             {
-                // We has pixel 1scan up
                 if (shared(Tu1, pFrame[pos_down]))
                 {
-                    // We has pixel 1scan down
                     float ZR = (pDepth[pos_up] + pDepth[pos_down]) / 2;
                     if (ZR < pDepth[pos])
                     {
@@ -103,7 +91,6 @@ void occRasterizer::propagade()
                 }
                 else if (shared(Tu1, pFrame[pos_down2]))
                 {
-                    // We has pixel 2scan down
                     float ZR = (pDepth[pos_up] + pDepth[pos_down2]) / 2;
                     if (ZR < pDepth[pos])
                     {
@@ -113,14 +100,12 @@ void occRasterizer::propagade()
                 }
             }
 
-            //
             float d = pDepth[pos];
             clamp(d, -1.99f, 1.99f);
             bufDepth_0[y][x] = df_2_s32(d);
         }
     }
 
-    // Propagate other levels
     propagade_depth(bufDepth_1, bufDepth_0, occ_dim_1);
     propagade_depth(bufDepth_2, bufDepth_1, occ_dim_2);
     propagade_depth(bufDepth_3, bufDepth_2, occ_dim_3);
@@ -173,7 +158,6 @@ void occRasterizer::on_dbg_render()
             Transform.identity();
             Transform.translate(tmp.center);
 
-            // draw wire
             Device.SetNearer(TRUE);
 
             RCache.set_Shader(RImplementation.m_SelectionShader);
@@ -212,13 +196,5 @@ BOOL occRasterizer::test(float _x0, float _y0, float _x1, float _y1, float _z)
 {
     occD z = df_2_s32up(_z) + 1;
     return test_Level(get_depth_level(0), occ_dim_0, _x0, _y0, _x1, _y1, z);
-    /*
-    if	(test_Level(get_depth_level(2),occ_dim_2,_x0,_y0,_x1,_y1,z))
-    {
-        // Visbible on level 2 - test level 0
-        return test_Level(get_depth_level(0),occ_dim_0,_x0,_y0,_x1,_y1,z);
-    }
-    return FALSE;
-    */
 }
 }

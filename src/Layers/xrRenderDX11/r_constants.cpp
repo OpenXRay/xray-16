@@ -1,14 +1,10 @@
 #include "stdafx.h"
 
-#include "r_constants.h"
+#include "Layers/xrRender/r_constants.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
-
-//.#include "xrCore/xrPool.h"
 
 namespace xray::render::fg
 {
-// pool
-//.static	poolSS<R_constant,512>			g_constant_allocator;
 
 R_constant_table::~R_constant_table()
 {
@@ -20,9 +16,8 @@ void R_constant_table::fatal(LPCSTR S)
     FATAL(S);
 }
 
-ref_constant R_constant_table::get(pcstr S, u16 type /*= u16(-1)*/) const
+ref_constant R_constant_table::get(pcstr S, u16 type ) const
 {
-    // assumption - sorted by name
     c_table::const_iterator it;
     if (type == u16(-1))
     {
@@ -44,9 +39,8 @@ ref_constant R_constant_table::get(pcstr S, u16 type /*= u16(-1)*/) const
     return *it;
 }
 
-ref_constant R_constant_table::get(const shared_str& S, u16 type /*= u16(-1)*/) const
+ref_constant R_constant_table::get(const shared_str& S, u16 type ) const
 {
-    // linear search, but only ptr-compare
     if (type == u16(-1))
     {
         for (const ref_constant& C : table)
@@ -67,7 +61,6 @@ ref_constant R_constant_table::get(const shared_str& S, u16 type /*= u16(-1)*/) 
     return nullptr;
 }
 
-/// !!!!!!!!FIX THIS FOR DX11!!!!!!!!!
 void R_constant_table::merge(R_constant_table* T)
 {
     if (nullptr == T)
@@ -76,7 +69,6 @@ void R_constant_table::merge(R_constant_table* T)
     if (T->dx9compatibility)
         dx9compatibility = true;
 
-    // Real merge
     xr_vector<ref_constant> table_tmp;
     table_tmp.reserve(table.size());
     for (u32 it = 0; it < T->table.size(); it++)
@@ -85,7 +77,7 @@ void R_constant_table::merge(R_constant_table* T)
         ref_constant C = get(src->name.c_str(), dx9compatibility ? src->type : u16(-1));
         if (!C || (dx9compatibility && C->type != src->type))
         {
-            C = xr_new<R_constant>(); //.g_constant_allocator.create();
+            C = xr_new<R_constant>();
             C->name = src->name;
             C->destination = src->destination;
             C->type = src->type;
@@ -114,16 +106,14 @@ void R_constant_table::merge(R_constant_table* T)
 #ifdef USE_OGL
             dL.location = sL.location;
             dL.program = sL.program;
-#endif // USE_OGL
+#endif
         }
     }
 
     if (!table_tmp.empty())
     {
-        // Append
         std::move(table_tmp.begin(), table_tmp.end(), std::back_inserter(table));
 
-        // Sort
         std::sort(table.begin(), table.end(), [](const ref_constant& C1, const ref_constant& C2)
         {
             return xr_strcmp(C1->name, C2->name) < 0;
@@ -131,7 +121,6 @@ void R_constant_table::merge(R_constant_table* T)
     }
 
 #if defined(USE_DX11)
-    //	TODO:	DX11:	Implement merge with validity check
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         m_CBTable[id].reserve(m_CBTable[id].size() + T->m_CBTable[id].size());
@@ -143,9 +132,8 @@ void R_constant_table::merge(R_constant_table* T)
 
 void R_constant_table::clear()
 {
-    //.
     for (u32 it = 0; it < table.size(); it++)
-        table[it] = 0; //.g_constant_allocator.destroy(table[it]);
+        table[it] = 0;
     table.clear();
 #if defined(USE_DX11)
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)

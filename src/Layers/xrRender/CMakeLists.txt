@@ -156,7 +156,6 @@ target_sources(xrRender PRIVATE
     ClusteredLightManager.cpp
     ColorMapManager.cpp
     ConstantSystem/FGConstantSystem.cpp
-    D3DUtils.cpp
     D3DXRenderBase.cpp
     DetailModel.cpp
     ETextureParams.cpp
@@ -168,7 +167,6 @@ target_sources(xrRender PRIVATE
     FTreeVisual.cpp
     FVisual.cpp
     GPUCullingManager.cpp
-    HOM.cpp
     LightTrack.cpp
     Light_DB.cpp
     Light_Package.cpp
@@ -186,7 +184,6 @@ target_sources(xrRender PRIVATE
     ParticleGroup.cpp
     Profiler/GPUProfiler.cpp
     Profiler/StatsOverlay.cpp
-    R_DStreams.cpp
     ResourceManager/AsyncIO.cpp
     ResourceManager/BufferManager.cpp
     ResourceManager/DDSLoader.cpp
@@ -228,14 +225,11 @@ target_sources(xrRender PRIVATE
     light.cpp
     light_GI.cpp
     light_vis.cpp
-    occRasterizer.cpp
-    occRasterizer_core.cpp
     r__pixel_calculator.cpp
     r__sector.cpp
     r__sector_detect.cpp
     r__sector_traversal.cpp
     r__sync_point.cpp
-    r_constants.cpp
     stats_manager.cpp
     xrStripify.cpp
     BufferUtils.cpp

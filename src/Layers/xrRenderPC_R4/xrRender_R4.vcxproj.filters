@@ -803,6 +803,24 @@
     <ClCompile Include="..\xrRenderDX11\WallmarksEngine.cpp">
       <Filter>Wallmarks</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\D3DUtils.cpp">
+      <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\HOM.cpp">
+      <Filter>Visibility\HOM Occlusion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\occRasterizer.cpp">
+      <Filter>Visibility\HOM Occlusion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\occRasterizer_core.cpp">
+      <Filter>Visibility\HOM Occlusion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\R_DStreams.cpp">
+      <Filter>Refactored\Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\r_constants.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_BmmD_deferred.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>

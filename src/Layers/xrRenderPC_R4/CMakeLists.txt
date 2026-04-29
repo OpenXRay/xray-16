@@ -105,6 +105,12 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRenderDX11/light_smapvis.cpp
     ../xrRenderDX11/r__occlusion.cpp
     ../xrRenderDX11/WallmarksEngine.cpp
+    ../xrRenderDX11/D3DUtils.cpp
+    ../xrRenderDX11/HOM.cpp
+    ../xrRenderDX11/occRasterizer.cpp
+    ../xrRenderDX11/occRasterizer_core.cpp
+    ../xrRenderDX11/R_DStreams.cpp
+    ../xrRenderDX11/r_constants.cpp
     ../xrRenderDX11/ShaderInfo.cpp
     ../xrRenderDX11/blenders/Blender_BmmD_deferred.cpp
     ../xrRenderDX11/blenders/Blender_Detail_GPU.cpp

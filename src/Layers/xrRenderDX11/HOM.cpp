@@ -1,23 +1,15 @@
-// HOM.cpp: implementation of the CHOM class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 
 #include "xrCore/Threading/ParallelFor.hpp"
 
-#include "HOM.h"
-#include "occRasterizer.h"
+#include "Layers/xrRender/HOM.h"
+#include "Layers/xrRender/occRasterizer.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
 namespace xray::render::fg
 {
 float psOSSR = .001f;
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CHOM::CHOM() : xrc("HOM")
 {
@@ -61,7 +53,6 @@ void CHOM::Load()
 
     ZoneScoped;
 
-    // Find and open file
     string_path fName;
     FS.update_path(fName, "$level$", "level.hom");
     if (!FS.exist(fName))
@@ -73,14 +64,12 @@ void CHOM::Load()
 
     IReader* fs = FS.r_open(fName);
 
-    // Prepare AABB-tree
     static const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
 
     m_pModel = xr_new<CDB::MODEL>();
     if (use_cache)
         m_pModel->set_model_crc32(crc32(fs->pointer(), fs->length()));
 
-    // Load tris and merge them
     CDB::Collector CL;
     {
         IReader* S = fs->open_chunk(1);
@@ -93,11 +82,9 @@ void CHOM::Load()
         S->close();
     }
 
-    // Determine adjacency
     xr_vector<u32> adjacency;
     CL.calc_adjacency(adjacency);
 
-    // Create RASTER-triangles
     m_pTris = xr_alloc<occTri>(CL.getTS());
 
     xr_parallel_for(TaskRange<size_t>(0, CL.getTS()), [&](const TaskRange<size_t>& range)
@@ -125,7 +112,6 @@ void CHOM::Load()
         }
     });
 
-    // Create AABB-tree
     static const bool skip_crc32_check = strstr(Core.Params, "-skip_cdb_cache_crc32_check");
 
     strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
@@ -164,7 +150,6 @@ void CHOM::Render_DB(CFrustum& base)
 {
     ZoneScoped;
 
-    // Update projection matrices on every frame to ensure valid HOM culling
     float view_dim = occ_dim_0;
 #if defined(USE_DX11)
     Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
@@ -182,12 +167,10 @@ void CHOM::Render_DB(CFrustum& base)
     m_xform.mul(m_viewport, Device.mFullTransform);
     m_xform_01.mul(m_viewport_01, Device.mFullTransform);
 
-    // Query DB
     xrc.frustum_query(0, m_pModel, base);
     if (0 == xrc.r_count())
         return;
 
-    // Prepare
     auto it = xrc.r_get()->begin();
     auto end = xrc.r_get()->end();
 
@@ -204,7 +187,6 @@ void CHOM::Render_DB(CFrustum& base)
         return COP.distance_to_sqr(t0.center) < COP.distance_to_sqr(t1.center);
     });
 
-    // Build frustum with near plane only
     CFrustum clip;
     clip.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_NEAR);
     sPoly src, dst;
@@ -212,21 +194,17 @@ void CHOM::Render_DB(CFrustum& base)
     stats.FrustumTriangleCount = static_cast<u32>(xrc.r_count());
     stats.VisibleTriangleCount = 0;
 
-    // Perfrom selection, sorting, culling
     for (auto &it : *xrc.r_get())
     {
-        // Control skipping
         occTri& T = m_pTris[it.id];
         u32 next = _frame + ::Random.randI(3, 10);
 
-        // Test for good occluder - should be improved :)
         if (!(T.flags || (T.plane.classify(COP) > 0)))
         {
             T.skip = next;
             continue;
         }
 
-        // Access to triangle vertices
         CDB::TRI& t = m_pModel->get_tris()[it.id];
         Fvector* v = m_pModel->get_verts();
         src.clear();
@@ -241,7 +219,6 @@ void CHOM::Render_DB(CFrustum& base)
             continue;
         }
 
-        // XForm and Rasterize
         stats.VisibleTriangleCount++;
         u32 pixels = 0;
         int limit = int(P->size()) - 1;
@@ -321,7 +298,6 @@ ICF BOOL xform_b1(Fvector2& min, Fvector2& max, float& minz, const Fmatrix& X, f
 
 IC BOOL _visible(const Fbox& B, const Fmatrix& m_xform_01)
 {
-    // Find min/max points of xformed-box
     Fvector2 min, max;
     float z;
     if (xform_b0(min, max, z, m_xform_01, B.vMin.x, B.vMin.y, B.vMin.z))
@@ -362,32 +338,24 @@ BOOL CHOM::visible(const Fbox2& B, float depth) const
 BOOL CHOM::visible(vis_data& vis) const
 {
     if (Device.dwFrame < vis.hom_frame)
-        return TRUE; // not at this time :)
+        return TRUE;
     if (!bEnabled)
-        return TRUE; // return - everything visible
+        return TRUE;
     if (!vis.box.is_valid() || !_valid(vis.box))
-        return TRUE; // invalid box
+        return TRUE;
 
     ScopeStatTimer scopeStats(stats.Total, stats.TotalTimerLock);
 
-    // Now, the test time comes
-    // 0. The object was hidden, and we must prove that each frame	- test		| frame-old, tested-new, hom_res =
-    // false;
-    // 1. The object was visible, but we must to re-check it		- test		| frame-new, tested-???, hom_res = true;
-    // 2. New object slides into view								- delay test| frame-old, tested-old, hom_res = ???;
     const u32 frame_current = Device.dwFrame;
-    // u32	frame_prev		= frame_current-1;
 
     const BOOL result = _visible(vis.box, m_xform_01);
     u32 delay = 1;
     if (result)
     {
-        // visible	- delay next test
         delay = ::Random.randI(5 * 2, 5 * 5);
     }
     else
     {
-        // hidden	- shedule to next frame
     }
     vis.hom_frame = frame_current + delay;
     vis.hom_tested = frame_current;
@@ -399,7 +367,6 @@ BOOL CHOM::visible(const sPoly& P) const
     if (!bEnabled)
         return TRUE;
 
-    // Find min/max points of xformed-box
     Fvector2 min, max;
     float z;
 
@@ -453,16 +420,14 @@ void CHOM::OnRender()
                 line[it * 6 + 5].set(*(verts + T->verts[0]), 0xFFFFFFFF);
             }
             RCache.set_xform_world(Fidentity);
-            // draw solid
             Device.SetNearer(TRUE);
             RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9 // when we don't have FFP support
+#ifndef USE_DX9
             RCache.set_c("tfactor", float(color_get_R(0x80FFFFFF)) / 255.f, float(color_get_G(0x80FFFFFF)) / 255.f, \
                 float(color_get_B(0x80FFFFFF)) / 255.f, float(color_get_A(0x80FFFFFF)) / 255.f);
 #endif
             RCache.dbg_Draw(D3DPT_TRIANGLELIST, &*poly.begin(), poly.size() / 3);
             Device.SetNearer(FALSE);
-            // draw wire
             if (bDebug)
             {
                 RImplementation.rmNear(RCache);
@@ -472,7 +437,7 @@ void CHOM::OnRender()
                 Device.SetNearer(TRUE);
             }
             RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9 // when we don't have FFP support
+#ifndef USE_DX9
             RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);
 #endif
             RCache.dbg_Draw(D3DPT_LINELIST, &*line.begin(), line.size() / 2);
