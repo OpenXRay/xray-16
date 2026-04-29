@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
-#include "dxFontRender.h"
+#include "Layers/xrRender/dxFontRender.h"
 
 #include "xrEngine/GameFont.h"
 #include "xrCore/Text/StringConversion.hpp"
-#include "RenderContext/RenderDevice.h"
-#include "ResourceManager/FGResourceManager.h"
-#include "FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 extern ENGINE_API bool g_bRendering;
 extern ENGINE_API Fvector2 g_current_font_scale;
@@ -92,7 +92,7 @@ void dxFontRender::OnRender(CGameFont& owner)
     if (!(owner.uFlags & CGameFont::fsValid))
     {
         R_ASSERT(pShader);
-        R_constant* C = RCache.get_c(c_sbase)._get(); // get sampler
+        R_constant* C = RCache.get_c(c_sbase)._get();
         CTexture* T = RCache.get_ActiveTexture(C ? C->samp.index : 0);
         R_ASSERT(T);
         owner.vTS.set((int)T->get_Width(), (int)T->get_Height());
@@ -102,7 +102,6 @@ void dxFontRender::OnRender(CGameFont& owner)
 
     for (u32 i = 0; i < owner.strings.size();)
     {
-        // calculate first-fit
         int count = 1;
 
         u32 length = owner.smart_strlen(owner.strings[i].string);
@@ -124,12 +123,10 @@ void dxFontRender::OnRender(CGameFont& owner)
                 break;
         }
 
-        // lock AGP memory
         u32 vOffset;
         FVF::TL* v = (FVF::TL*)RImplementation.Vertex.Lock(length * 4, pGeom.stride(), vOffset);
         FVF::TL* start = v;
 
-        // fill vertices
         u32 last = i + count;
         for (; i < last; i++)
         {
@@ -167,11 +164,11 @@ void dxFontRender::OnRender(CGameFont& owner)
                     clr2 = color_rgba(r, g, b, a);
                 }
 
-#ifndef USE_DX9 // Vertex shader will cancel a DX9 correction, so make fake offset
+#ifndef USE_DX9
                 X -= 0.5f;
                 Y -= 0.5f;
                 Y2 -= 0.5f;
-#endif // !USE_DX9
+#endif
 
                 for (u16 j = 0; j < len; j++)
                 {
@@ -240,8 +237,6 @@ inline void dxFontRender::ImprintChar(Fvector l, const CGameFont& owner, FVF::TL
 
     if (!fis_zero(l.z))
     {
-        //float tu = (l.x / owner.vTS.x) + (0.5f / owner.vTS.x);
-        //float tv = (l.y / owner.vTS.y) + (0.5f / owner.vTS.y);
         float tu = (l.x / owner.vTS.x);
         float tv = (l.y / owner.vTS.y);
 

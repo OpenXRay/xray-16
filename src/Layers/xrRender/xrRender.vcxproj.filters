@@ -862,16 +862,10 @@
     <ClCompile Include="r_constants.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="SH_Atomic.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="SH_Constant.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
     <ClCompile Include="SH_Matrix.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
     <ClCompile Include="ETextureParams.cpp">
@@ -943,9 +937,6 @@
     <ClCompile Include="dxObjectSpaceRender.cpp">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>
     </ClCompile>
-    <ClCompile Include="dxFontRender.cpp">
-      <Filter>Interface implementations\FontRender</Filter>
-    </ClCompile>
     <ClCompile Include="dxWallMarkArray.cpp">
       <Filter>Interface implementations\WallMarkArray</Filter>
     </ClCompile>
@@ -960,9 +951,6 @@
     </ClCompile>
     <ClCompile Include="dxUIRender.cpp">
       <Filter>Interface implementations\UI\UIRender</Filter>
-    </ClCompile>
-    <ClCompile Include="dxUIShader.cpp">
-      <Filter>Interface implementations\UI\UIShader</Filter>
     </ClCompile>
     <ClCompile Include="dxUISequenceVideoItem.cpp">
       <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>

@@ -280,7 +280,6 @@
     <ClCompile Include="du_sphere_part.cpp"/>
     <ClCompile Include="dxDebugRender.cpp"/>
     <ClCompile Include="dxEnvironmentRender.cpp"/>
-    <ClCompile Include="dxFontRender.cpp"/>
     <ClCompile Include="FrameGraphPasses\ForwardColorPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\HiZBuildPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\SkinningPassSetup.cpp"/>
@@ -330,7 +329,6 @@
     <ClCompile Include="dxThunderboltRender.cpp"/>
     <ClCompile Include="dxUIRender.cpp"/>
     <ClCompile Include="dxUISequenceVideoItem.cpp"/>
-    <ClCompile Include="dxUIShader.cpp"/>
     <ClCompile Include="dxWallMarkArray.cpp"/>
     <ClCompile Include="ETextureParams.cpp"/>
     <ClCompile Include="FBasicVisual.cpp"/>
@@ -380,11 +378,9 @@
     <ClCompile Include="r__sector_detect.cpp"/>
     <ClCompile Include="r__sector_traversal.cpp"/>
     <ClCompile Include="r__sync_point.cpp"/>
-    <ClCompile Include="Shader.cpp"/>
     <ClCompile Include="ShaderKey.cpp"/>
     <ClCompile Include="Shaders\SlangReflectionWrapper.cpp"/>
     <ClCompile Include="Shaders\SlangVFSAdapter.cpp"/>
-    <ClCompile Include="SH_Atomic.cpp"/>
     <ClCompile Include="SH_Constant.cpp"/>
     <ClCompile Include="SH_Matrix.cpp"/>
     <ClCompile Include="SkeletonAnimated.cpp"/>

@@ -86,6 +86,10 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRenderDX11/ResourceManager_Loader.cpp
     ../xrRenderDX11/ResourceManager_Reset.cpp
     ../xrRenderDX11/ResourceManager_Resources.cpp
+    ../xrRenderDX11/Shader.cpp
+    ../xrRenderDX11/SH_Atomic.cpp
+    ../xrRenderDX11/dxFontRender.cpp
+    ../xrRenderDX11/dxUIShader.cpp
     ../xrRenderDX11/ShaderInfo.cpp
     ../xrRenderDX11/blenders/Blender_BmmD_deferred.cpp
     ../xrRenderDX11/blenders/Blender_Detail_GPU.cpp

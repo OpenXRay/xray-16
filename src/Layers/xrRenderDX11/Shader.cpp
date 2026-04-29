@@ -1,16 +1,11 @@
-// Shader.cpp: implementation of the CShader class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Shader.h"
+#include "Layers/xrRender/Shader.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
 
 namespace xray::render::fg
 {
-// XXX: render scripts should call these destructors before resource manager gets destroyed
 STextureList::~STextureList() { RImplementation.Resources->_DeleteTextureList(this); }
 SMatrixList::~SMatrixList() { RImplementation.Resources->_DeleteMatrixList(this); }
 SConstantList::~SConstantList() { RImplementation.Resources->_DeleteConstantList(this); }
@@ -18,7 +13,6 @@ SPass::~SPass() { RImplementation.Resources->_DeletePass(this); }
 ShaderElement::~ShaderElement() { RImplementation.Resources->_DeleteElement(this); }
 SGeometry::~SGeometry() { RImplementation.Resources->DeleteGeom(this); }
 Shader::~Shader() { RImplementation.Resources->Delete(this); }
-//////////////////////////////////////////////////////////////////////////
 void resptrcode_shader::create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
     _set(RImplementation.Resources->Create(s_shader, s_textures, s_constants, s_matrices));
@@ -28,7 +22,6 @@ void resptrcode_shader::create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, 
     _set(RImplementation.Resources->Create(B, s_shader, s_textures, s_constants, s_matrices));
 }
 
-//////////////////////////////////////////////////////////////////////////
 void resptrcode_geom::create(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib)
 {
     _set(RImplementation.Resources->CreateGeom(FVF, vb, ib));
@@ -44,9 +37,6 @@ void resptrcode_cs::create(LPCSTR name)
     _set(RImplementation.Resources->_CreateCS(name));
 }
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 bool SPass::equal(const SPass& other) const
 {
     if (state != other.state)
@@ -69,7 +59,7 @@ bool SPass::equal(const SPass& other) const
         return false;
 #endif
     if (constants != other.constants)
-        return false; // is this nessesary??? (ps+vs already combines)
+        return false;
 
     if (T != other.T)
         return false;
@@ -82,7 +72,6 @@ bool SPass::equal(const SPass& other) const
     return true;
 }
 
-//
 ShaderElement::ShaderElement()
 {
     flags.iPriority = 1;
@@ -137,7 +126,7 @@ void STextureList::clear()
     erase(begin(), end());
 }
 
-u32 STextureList::find_texture_stage(const shared_str& TexName, bool warnIfMissing /*= true*/) const
+u32 STextureList::find_texture_stage(const shared_str& TexName, bool warnIfMissing ) const
 {
     for (const auto& [stage, textureName] : *this)
     {

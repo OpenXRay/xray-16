@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "SH_Atomic.h"
+#include "Layers/xrRender/SH_Atomic.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
 
 #if defined(USE_DX11)
@@ -10,30 +10,7 @@
 
 namespace xray::render::fg
 {
-// Atomic
-//SVS::~SVS()
-//{
-//    _RELEASE(vs);
-//    dxRenderDeviceRender::Instance().Resources->_DeleteVS(this);
-//}
-//SPS::~SPS()
-//{
-//     _RELEASE(ps);
-//     dxRenderDeviceRender::Instance().Resources->_DeletePS(this);
-//}
-//SState::~SState()
-//{
-//    _RELEASE(state);
-//    dxRenderDeviceRender::Instance().Resources->_DeleteState(this);
-//}
-//SDeclaration::~SDeclaration()
-//{
-//    _RELEASE(dcl);
-//    dxRenderDeviceRender::Instance().Resources->_DeleteDecl(this);
-//}
 
-///////////////////////////////////////////////////////////////////////
-//  SVS
 SVS::~SVS()
 {
 
@@ -46,8 +23,6 @@ SVS::~SVS()
     RImplementation.Resources->_DeleteVS(this);
 }
 
-///////////////////////////////////////////////////////////////////////
-// SPS
 SPS::~SPS()
 {
 
@@ -60,8 +35,6 @@ SPS::~SPS()
     RImplementation.Resources->_DeletePS(this);
 }
 
-///////////////////////////////////////////////////////////////////////
-// SGS
 SGS::~SGS()
 {
 
@@ -120,12 +93,10 @@ SPP::~SPP()
 
     RImplementation.Resources->_DeletePP(this);
 }
-#endif // USE_OGL
+#endif
 
 
 #if defined(USE_DX11)
-///////////////////////////////////////////////////////////////////////
-//	SInputSignature
 SInputSignature::SInputSignature(ID3DBlob* pBlob)
 {
     VERIFY(pBlob);
@@ -138,28 +109,22 @@ SInputSignature::~SInputSignature()
     _RELEASE(signature);
     RImplementation.Resources->_DeleteInputSignature(this);
 }
-#endif // USE_DX11
+#endif
 
-///////////////////////////////////////////////////////////////////////
-//	SState
 SState::~SState()
 {
     _RELEASE(state);
     RImplementation.Resources->_DeleteState(this);
 }
 
-///////////////////////////////////////////////////////////////////////
-//	SDeclaration
 SDeclaration::~SDeclaration()
 {
     RImplementation.Resources->_DeleteDecl(this);
-    //	Release vertex layout
 #if defined(USE_DX11)
     xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
     iLayout = vs_to_layout.begin();
     for (; iLayout != vs_to_layout.end(); ++iLayout)
     {
-        //	Release vertex layout
         _RELEASE(iLayout->second);
     }
 #elif defined(USE_OGL)
