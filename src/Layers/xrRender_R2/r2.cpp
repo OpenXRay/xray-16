@@ -516,6 +516,7 @@ void CRender::create()
     Target = xr_new<CRenderTarget>(); // Main target
 
     Models = xr_new<CModelPool>();
+    g_pModelPool = Models;
     PSLibrary.OnCreate();
     HWOCC.occq_create(occq_size);
 
@@ -562,6 +563,7 @@ void CRender::destroy()
     q_sync_point.Destroy();
     HWOCC.occq_destroy();
     xr_delete(Models);
+    g_pModelPool = nullptr;
     xr_delete(Target);
     PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);
@@ -752,11 +754,7 @@ bool CRender::getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::Shader
     return true;
 }
 
-IRenderVisual* CRender::getVisual(int id)
-{
-    VERIFY(id < int(Visuals.size()));
-    return Visuals[id];
-}
+IRenderVisual* CRender::getVisual(int id) { return BufferPool.getVisual(id); }
 
 u32 CRender::GetVertexStride(u32 vertexFormatID)
 {
@@ -967,45 +965,6 @@ bool CRender::CreatePrecompiledPSO(
         shaderID, compiled.shaderName.c_str(), vertexFormatID, (u32)passType);
 
     return true;
-}
-
-VertexElement* CRender::getVB_Format(int id, bool alternative)
-{
-    if (alternative)
-    {
-        VERIFY(id < int(xDC.size()));
-        return xDC[id].begin();
-    }
-    VERIFY(id < int(nDC.size()));
-    return nDC[id].begin();
-}
-
-VertexStagingBuffer* CRender::getVB(int id, bool alternative)
-{
-    if (alternative)
-    {
-        VERIFY(id<int(xVB.size()));
-        return &xVB[id];
-    }
-    VERIFY(id < int(nVB.size()));
-    return &nVB[id];
-}
-
-IndexStagingBuffer* CRender::getIB(int id, bool alternative)
-{
-    if (alternative)
-    {
-        VERIFY(id < int(xIB.size()));
-        return &xIB[id];
-    }
-    VERIFY(id < int(nIB.size()));
-    return &nIB[id];
-}
-
-FSlideWindowItem* CRender::getSWI(int id)
-{
-    VERIFY(id < int(SWIs.size()));
-    return &SWIs[id];
 }
 
 IRender_Light* CRender::light_create() { return Lights.Create(); }
