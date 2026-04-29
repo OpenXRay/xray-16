@@ -31,7 +31,6 @@ void simplify_texture(string_path& fn)
 
 SState* CResourceManager::_CreateState(SimulatorStates& state_code)
 {
-    // Search equal state-code
     for (SState* C : v_states)
     {
         SimulatorStates& base = C->state_code;
@@ -39,9 +38,8 @@ SState* CResourceManager::_CreateState(SimulatorStates& state_code)
             return C;
     }
 
-    // Create New
     SState* S = v_states.emplace_back(xr_new<SState>());
-    state_code.record(S->state); // S->state will be assigned here
+    state_code.record(S->state);
     S->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     S->state_code = state_code;
     return S;
@@ -107,42 +105,6 @@ void CResourceManager::_DeleteRT(const CRT*)
 {
 }
 
-//	DX10 cut
-/*
-CRTC* CResourceManager::_CreateRTC(LPCSTR Name, u32 size, D3DFORMAT f)
-{
-    R_ASSERT(Name && Name[0] && size);
-
-    // ***** first pass - search already created RTC
-    LPSTR N = LPSTR(Name);
-    map_RTC::iterator I = m_rtargets_c.find(N);
-    if (I != m_rtargets_c.end())
-        return I->second;
-    else
-    {
-        CRTC* RT = xr_new<CRTC>();
-        RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_rtargets_c.emplace(RT->set_name(Name), RT);
-        if (Device.b_is_Ready)
-            RT->create(Name, size, f);
-        return RT;
-    }
-}
-void	CResourceManager::_DeleteRTC(const CRTC* RT)
-{
-    if (0 == (RT->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    LPSTR N = LPSTR(*RT->cName);
-    map_RTC::iterator I = m_rtargets_c.find(N);
-    if (I != m_rtargets_c.end())
-    {
-        m_rtargets_c.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find render-target '%s'", *RT->cName);
-}
-*/
-
 SGeometry* CResourceManager::CreateGeom(const VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib)
 {
     R_ASSERT(decl && vb);
@@ -150,7 +112,6 @@ SGeometry* CResourceManager::CreateGeom(const VertexElement* decl, VertexBufferH
     SDeclaration* dcl = _CreateDecl(decl);
     u32 vb_stride = GetDeclVertexSize(decl, 0);
 
-    // ***** first pass - search already loaded shader
     for (SGeometry* geom : v_geoms)
     {
         SGeometry& G = *geom;
@@ -188,36 +149,21 @@ void CResourceManager::DeleteGeom(const SGeometry* Geom)
 
 void CResourceManager::DBG_VerifyGeoms()
 {
-    /*
-    for (u32 it=0; it<v_geoms.size(); it++)
-    {
-    SGeometry* G					= v_geoms[it];
-
-    D3DVERTEXELEMENT9		test	[MAX_FVF_DECL_SIZE];
-    u32						size	= 0;
-    G->dcl->GetDeclaration			(test,(unsigned int*)&size);
-    u32 vb_stride					= GetDeclVertexSize	(test,0);
-    u32 vb_stride_cached			= G->vb_stride;
-    R_ASSERT						(vb_stride == vb_stride_cached);
-    }
-    */
 }
 
 CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
 {
-    // DBG_VerifyTextures	();
     if (0 == xr_strcmp(_Name, "null"))
         return nullptr;
     R_ASSERT(_Name && _Name[0]);
     string_path Name;
-    xr_strcpy(Name, _Name); //. andy if (strext(Name)) *strext(Name)=0;
+    xr_strcpy(Name, _Name);
     fix_texture_name(Name);
 
 #ifdef DEBUG
     simplify_texture(Name);
-#endif //	DEBUG
+#endif
 
-    // ***** first pass - search already loaded texture
     pstr N = pstr(Name);
     auto I = m_textures.find(N);
     if (I != m_textures.end())
@@ -234,7 +180,6 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
 
 void CResourceManager::_DeleteTexture(const CTexture* T)
 {
-    // DBG_VerifyTextures();
 
     if (0 == (T->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
@@ -441,4 +386,4 @@ void CResourceManager::_DeleteConstantList(const SConstantList* L)
     Msg("! ERROR: Failed to find compiled list of r1-constant-defs");
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+}

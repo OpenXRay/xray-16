@@ -258,7 +258,7 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRenderDX11/R_Backend_tree.cpp
     ../xrRenderDX11/R_Backend_xform.cpp
     ../xrRender/R_DStreams.cpp
-    ../xrRender/ResourceManager.cpp
+    ../xrRenderDX11/ResourceManager.cpp
     ../xrRender/ResourceManager/AsyncIO.cpp
     ../xrRender/ResourceManager/BufferManager.cpp
     ../xrRender/ResourceManager/DDSLoader.cpp
@@ -268,9 +268,9 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/ResourceManager/TestTextureManager.cpp
     ../xrRender/ResourceManager/TextureManager.cpp
     ../xrRender/ResourceManager/TextureStreaming.cpp
-    ../xrRender/ResourceManager_Loader.cpp
-    ../xrRender/ResourceManager_Reset.cpp
-    ../xrRender/ResourceManager_Resources.cpp
+    ../xrRenderDX11/ResourceManager_Loader.cpp
+    ../xrRenderDX11/ResourceManager_Reset.cpp
+    ../xrRenderDX11/ResourceManager_Resources.cpp
     ../xrRender/SH_Atomic.cpp
     ../xrRender/SH_Constant.cpp
     ../xrRender/SH_Matrix.cpp

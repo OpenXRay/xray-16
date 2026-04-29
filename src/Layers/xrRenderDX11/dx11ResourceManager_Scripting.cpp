@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 #include "Layers/xrRender/tss.h"
 #include "Layers/xrRenderDX11/Blender.h"
 #include "Layers/xrRenderDX11/Blender_Recorder.h"

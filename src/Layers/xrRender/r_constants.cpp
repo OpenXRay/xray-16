@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "r_constants.h"
-#include "ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 
 //.#include "xrCore/xrPool.h"
 

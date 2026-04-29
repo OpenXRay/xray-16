@@ -459,7 +459,7 @@
     <ClInclude Include="..\xrRender\ETextureParams.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\ResourceManager.h">
+    <ClInclude Include="..\xrRenderDX11\ResourceManager.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\ShaderResourceTraits.h">
@@ -1317,13 +1317,13 @@
     <ClCompile Include="..\xrRender\ETextureParams.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\ResourceManager.cpp">
+    <ClCompile Include="..\xrRenderDX11\ResourceManager.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\ResourceManager_Loader.cpp">
+    <ClCompile Include="..\xrRenderDX11\ResourceManager_Loader.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\ResourceManager_Reset.cpp">
+    <ClCompile Include="..\xrRenderDX11\ResourceManager_Reset.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp">
@@ -1491,7 +1491,7 @@
     <ClCompile Include="..\xrRenderDX11\dx11HWCaps.cpp">
       <Filter>Refactored\HW</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\ResourceManager_Resources.cpp">
+    <ClCompile Include="..\xrRenderDX11\ResourceManager_Resources.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_BmmD_deferred.cpp">

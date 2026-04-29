@@ -1,12 +1,8 @@
-// TextureManager.h: interface for the CTextureManager class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #pragma once
 
-#include "Shader.h"
-#include "tss_def.h"
-#include "TextureDescrManager.h"
+#include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/tss_def.h"
+#include "Layers/xrRender/TextureDescrManager.h"
 
 #include "xrScriptEngine/script_engine.hpp"
 
@@ -16,7 +12,6 @@ namespace xray::render::RENDER_NAMESPACE
 {
 class dx11ConstantBuffer;
 
-// defs
 class ECORE_API CResourceManager
 {
 private:
@@ -36,7 +31,6 @@ public:
     using map_Matrix = xr_map<const char*, CMatrix*, str_pred>;
     using map_Constant = xr_map<const char*, CConstant*, str_pred>;
     using map_RT = xr_map<const char*, CRT*, str_pred>;
-    //	DX10 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
     using map_VS = xr_map<const char*, SVS*, str_pred>;
     using map_GS = xr_map<const char*, SGS*, str_pred>;
     using map_HS = xr_map<const char*, SHS*, str_pred>;
@@ -49,13 +43,11 @@ public:
     using map_TD = xr_map<const char*, texture_detail, str_pred>;
 
 private:
-    // data
     map_Blender m_blenders;
     map_Texture m_textures;
     map_Matrix m_matrices;
     map_Constant m_constants;
     map_RT m_rtargets;
-    //	DX10 cut map_RTC												m_rtargets_c;
     map_VS m_vs;
     map_PS m_ps;
     map_GS m_gs;
@@ -78,22 +70,18 @@ private:
     xr_vector<SInputSignature*> v_input_signature;
 #endif
 
-    // lists
     xr_vector<STextureList*> lst_textures;
     xr_vector<SMatrixList*> lst_matrices;
     xr_vector<SConstantList*> lst_constants;
 
-    // main shader-array
     xr_vector<SPass*> v_passes;
     xr_vector<ShaderElement*> v_elements;
     xr_vector<Shader*> v_shaders;
     Lock v_shaders_lock;
 
     xr_vector<ref_texture> m_necessary;
-    // misc
 public:
     CTextureDescrMngr m_textures_description;
-    //.	CInifile*											m_textures_description;
     xr_vector<std::pair<shared_str, R_constant_setup*>> v_constant_setup;
     BOOL bDeferredLoad;
     bool m_shader_fallback_allowed;
@@ -102,7 +90,6 @@ public:
 
     void LS_Load();
     void LS_Unload();
-    // Miscelaneous
     void _ParseList(sh_list& dest, LPCSTR names);
     IBlender* _FindBlender(LPCSTR Name);
     void _GetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps);
@@ -123,13 +110,10 @@ public:
         bool strictB2F = false;
     };
     bool GetBlenderProperties(LPCSTR blenderName, BlenderProperties& outProps);
-    //.	BOOL							_GetDetailTexture	(LPCSTR Name, LPCSTR& T, R_constant_setup* &M);
 
-    // Debug
     void DBG_VerifyGeoms();
     void DBG_VerifyTextures();
 
-    // Editor cooperation
     void ED_UpdateBlender(LPCSTR Name, IBlender* data);
     void ED_UpdateMatrix(LPCSTR Name, CMatrix* data);
     void ED_UpdateConstant(LPCSTR Name, CConstant* data);
@@ -137,7 +121,6 @@ public:
     void ED_UpdateTextures(AStringVec* names);
 #endif
 
-    // Low level resource creation
     CTexture* _CreateTexture(LPCSTR Name);
     void _DeleteTexture(const CTexture* T);
 
@@ -161,9 +144,6 @@ public:
 
     CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {});
     void _DeleteRT(const CRT* RT);
-
-//	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);
-//	DX10 cut void							_DeleteRTC			(const CRTC*	RT	);
 
 #if defined(USE_OGL)
     SPP* _CreatePP(pcstr vs, pcstr ps, pcstr gs, pcstr hs, pcstr ds);
@@ -192,7 +172,6 @@ public:
     SPass* _CreatePass(const SPass& proto);
     void _DeletePass(const SPass* P);
 
-    // Shader compiling / optimizing
     SState* _CreateState(SimulatorStates& Code);
     void _DeleteState(const SState* SB);
 
@@ -221,7 +200,7 @@ public:
     {
 #if RENDER == R_R1 || RENDER == R_R2
         m_shader_fallback_allowed = !!strstr(Core.Params, "-lack_of_shaders");
-#else // For another renderers we should always allow fallback
+#else
         m_shader_fallback_allowed = true;
 #endif
     }
@@ -237,7 +216,6 @@ public:
 
     void CompatibilityCheck();
 
-    // Creation/Destroying
     Shader* Create(LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
     Shader* Create(
         IBlender* B, LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
@@ -286,4 +264,4 @@ private:
         return false;
     }
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

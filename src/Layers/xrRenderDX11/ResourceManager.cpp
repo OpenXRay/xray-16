@@ -1,14 +1,10 @@
-// TextureManager.cpp: implementation of the CResourceManager class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #pragma hdrstop
 
 #include "xrCore/Threading/ParallelForEach.hpp"
 
 #include "ResourceManager.h"
-#include "tss.h"
+#include "Layers/xrRender/tss.h"
 #include "Layers/xrRenderDX11/Blender.h"
 #include "Layers/xrRenderDX11/Blender_Recorder.h"
 
@@ -26,20 +22,7 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
-//	Already defined in Texture.cpp
 void fix_texture_name(pstr fn);
-/*
-void fix_texture_name(LPSTR fn)
-{
-    LPSTR _ext = strext(fn);
-    if (_ext &&
-        (0==xr_stricmp(_ext, ".tga") ||
-        0==xr_stricmp(_ext, ".dds") ||
-        0==xr_stricmp(_ext, ".bmp") ||
-        0==xr_stricmp(_ext, ".ogm")))
-        *_ext = 0;
-}
-*/
 
 
 IBlender* CResourceManager::_FindBlender(LPCSTR Name)
@@ -175,9 +158,6 @@ void CResourceManager::ED_UpdateBlender(LPCSTR Name, IBlender* data)
     }
 }
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
 {
     if (nullptr == names || 0 == names[0])
@@ -191,12 +171,10 @@ void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
     {
         if (*P == ',')
         {
-            // flush
             N.push_back(0);
             xr_strlwr(N.begin());
 
             fix_texture_name(N.begin());
-            //. andy			if (strext(N.begin())) *strext(N.begin())=0;
             dest.push_back(N.begin());
             N.clear();
         }
@@ -208,12 +186,10 @@ void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
     }
     if (N.size())
     {
-        // flush
         N.push_back(0);
         xr_strlwr(N.begin());
 
         fix_texture_name(N.begin());
-        //. andy		if (strext(N.begin())) *strext(N.begin())=0;
         dest.push_back(N.begin());
     }
 }
@@ -223,12 +199,10 @@ ShaderElement* CResourceManager::_CreateElement(ShaderElement&& S)
     if (S.passes.empty())
         return nullptr;
 
-    // Search equal in shaders array
     for (ShaderElement* elem : v_elements)
         if (S.equal(*elem))
             return elem;
 
-    // Create _new_ entry
     ShaderElement* N = v_elements.emplace_back(xr_new<ShaderElement>(std::move(S)));
     N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     return N;
@@ -259,14 +233,12 @@ void CResourceManager::CompatibilityCheck()
 {
     ZoneScoped;
 
-    // Check Shoker HQ Geometry Fix support
     {
         IReader* skinh = open_shader("skin.h");
         R_ASSERT3(skinh, "Can't open shader", "skin.h");
         xr_string str(static_cast<pcstr>(skinh->pointer()), skinh->length());
 
         bool hq_skinning = true;
-        // search for (12.f / 32768.f)
         const auto check = [&](cpcstr searchBegin, cpcstr searchEnd) -> bool
         {
             cpcstr begin = strstr(str.c_str(), searchBegin);
@@ -280,12 +252,12 @@ void CResourceManager::CompatibilityCheck()
             str.assign(begin, end);
             pcstr ptr = str.data();
 
-            if ((ptr = strstr(ptr, "12.")))     // 12.f or 12.0
+            if ((ptr = strstr(ptr, "12.")))
             {
-                if ((ptr = strstr(ptr, "/")))   // /
-                    if (strstr(ptr, "32768."))  // 32768.f or 32768.0
+                if ((ptr = strstr(ptr, "/")))
+                    if (strstr(ptr, "32768."))
                     {
-                        hq_skinning = false;    // found
+                        hq_skinning = false;
                         return true;
                     }
             }
@@ -329,7 +301,7 @@ void CResourceManager::DeferredUpload()
 #if defined(USE_DX11)
     for (auto& texture : m_textures)
         texture.second->Load();
-#elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
+#elif defined(USE_OGL)
     for (auto& texture : m_textures)
         texture.second->Load();
 #else
@@ -346,7 +318,7 @@ void CResourceManager::DeferredUnload()
 
 #if defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
-#elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
+#elif defined(USE_OGL)
     for (auto& texture : m_textures)
         texture.second->Unload();
 #else
@@ -357,7 +329,6 @@ void CResourceManager::DeferredUnload()
 #ifdef _EDITOR
 void CResourceManager::ED_UpdateTextures(AStringVec* names)
 {
-    // 1. Unload
     if (names)
     {
         for (u32 nid = 0; nid < names->size(); nid++)
@@ -373,8 +344,6 @@ void CResourceManager::ED_UpdateTextures(AStringVec* names)
             t->second->Unload();
     }
 
-    // 2. Load
-    // DeferredUpload	();
 }
 #endif
 
@@ -403,7 +372,6 @@ void CResourceManager::_DumpMemoryUsage()
 {
     xr_multimap<u32, std::pair<u32, shared_str>> mtex;
 
-    // sort
     {
         map_Texture::iterator I = m_textures.begin();
         map_Texture::iterator E = m_textures.end();
@@ -415,7 +383,6 @@ void CResourceManager::_DumpMemoryUsage()
         }
     }
 
-    // dump
     {
         xr_multimap<u32, std::pair<u32, shared_str>>::iterator I = mtex.begin();
         xr_multimap<u32, std::pair<u32, shared_str>>::iterator E = mtex.end();
@@ -426,20 +393,5 @@ void CResourceManager::_DumpMemoryUsage()
 
 void CResourceManager::Evict()
 {
-    // TODO: DX11: check if we really need this method
 }
-/*
-BOOL	CResourceManager::_GetDetailTexture(LPCSTR Name,LPCSTR& T, R_constant_setup* &CS)
-{
-    LPSTR N = LPSTR(Name);
-    map_TD::iterator I = m_td.find	(N);
-    if (I!=m_td.end())
-    {
-        T	= I->second.T;
-        CS	= I->second.cs;
-        return TRUE;
-    } else {
-        return FALSE;
-    }
-}*/
-} // namespace xray::render::RENDER_NAMESPACE
+}

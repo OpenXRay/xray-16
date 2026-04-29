@@ -13,7 +13,6 @@ void CResourceManager::OnDeviceDestroy(BOOL)
         return;
     m_textures_description.UnLoad();
 
-    // Matrices
     for (map_Matrix::iterator m = m_matrices.begin(); m != m_matrices.end(); ++m)
     {
         R_ASSERT(1 == m->second->ref_count);
@@ -21,7 +20,6 @@ void CResourceManager::OnDeviceDestroy(BOOL)
     }
     m_matrices.clear();
 
-    // Constants
     for (map_Constant::iterator c = m_constants.begin(); c != m_constants.end(); ++c)
     {
         R_ASSERT(1 == c->second->ref_count);
@@ -29,7 +27,6 @@ void CResourceManager::OnDeviceDestroy(BOOL)
     }
     m_constants.clear();
 
-    // Release blenders
     for (auto b = m_blenders.begin(); b != m_blenders.end(); ++b)
     {
         xr_free((char*&)b->first);
@@ -37,7 +34,6 @@ void CResourceManager::OnDeviceDestroy(BOOL)
     }
     m_blenders.clear();
 
-    // destroy TD
     for (auto _t = m_td.begin(); _t != m_td.end(); ++_t)
     {
         xr_free((char*&)_t->first);
@@ -59,11 +55,9 @@ void CResourceManager::OnDeviceCreate(IReader* F)
     string256 name;
 
 #ifndef _EDITOR
-    // scripting
     LS_Load();
 #endif
     IReader* fs = nullptr;
-    // Load constants
     fs = F->open_chunk(0);
     if (fs)
     {
@@ -77,7 +71,6 @@ void CResourceManager::OnDeviceCreate(IReader* F)
         fs->close();
     }
 
-    // Load matrices
     fs = F->open_chunk(1);
     if (fs)
     {
@@ -91,7 +84,6 @@ void CResourceManager::OnDeviceCreate(IReader* F)
         fs->close();
     }
 
-    // Load blenders
     fs = F->open_chunk(2);
     if (fs)
     {
@@ -114,8 +106,6 @@ void CResourceManager::OnDeviceCreate(IReader* F)
                 chunk->seek(0);
                 B->Load(*chunk, desc.version);
 
-                // XXX: SDK must prevent the duplication,
-                // the engine should just work
                 auto I = m_blenders.emplace(xr_strdup(desc.cName), B);
                 R_ASSERT2(I.second, "shader.xr - found duplicate name!!!");
             }
@@ -143,7 +133,6 @@ void CResourceManager::OnDeviceCreate(LPCSTR shName)
         return;
 #endif
 
-    // Check if file is compressed already
     string32 ID = "shENGINE";
     string32 id;
     IReader* F = FS.r_open(shName);
@@ -178,4 +167,4 @@ void CResourceManager::StoreNecessaryTextures()
 }
 
 void CResourceManager::DestroyNecessaryTextures() { m_necessary.clear(); }
-} // namespace xray::render::RENDER_NAMESPACE
+}
