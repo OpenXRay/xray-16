@@ -9,7 +9,7 @@
 #include "xrCore/FMesh.hpp"
 #include "xrEngine/xr_object.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -101,4 +101,4 @@ void dxRender_Visual::Copy(dxRender_Visual* pFrom)
     PCOPY(dbg_name);
 #endif
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 constexpr CLASS_ID B_DEFAULT        = make_clsid("LM      ");
 constexpr CLASS_ID B_DEFAULT_AREF   = make_clsid("LM_AREF ");

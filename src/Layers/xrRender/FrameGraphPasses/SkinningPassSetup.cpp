@@ -28,7 +28,7 @@
 
 extern ENGINE_API float psHUD_FOV;
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 using namespace bindless;
 
 static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
@@ -339,8 +339,8 @@ static void RenderSkinnedBatch(
     decals::OverlayManager::SplatRange splatRange = {0, 0},
     bool isHUD = false)
 {
-    using namespace RENDER_NAMESPACE;
-    using namespace RENDER_NAMESPACE::bindless;
+    using namespace fg;
+    using namespace fg::bindless;
 
     if (!batch.vertexBuffer || !batch.indexBuffer)
         return;
@@ -484,7 +484,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
         },
 
         [](const SkinningPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
-            using namespace RENDER_NAMESPACE;
+            using namespace fg;
 
             bool hasWorldSkinned = data.geometry && !data.geometry->GetBatches().empty();
             bool hasHUDSkinned = data.hudBatches && !data.hudBatches->empty();

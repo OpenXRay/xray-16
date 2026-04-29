@@ -15,7 +15,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct SunPassState {
     nvrhi::TextureHandle placeholderTexture;

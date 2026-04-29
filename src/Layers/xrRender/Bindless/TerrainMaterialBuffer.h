@@ -3,7 +3,7 @@
 #include "GPUStructuredBuffer.h"
 #include "BindlessTypes.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 class TerrainMaterialBuffer : public GPUStructuredBuffer<TerrainMaterialData> {
 public:

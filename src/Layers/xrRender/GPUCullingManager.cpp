@@ -19,12 +19,12 @@
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
-namespace RENDER_NAMESPACE
+namespace fg
 {
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 
 constexpr u32 MAX_CULLING_OBJECTS = 65536;
 constexpr u32 CULL_THREAD_GROUP_SIZE = 64;

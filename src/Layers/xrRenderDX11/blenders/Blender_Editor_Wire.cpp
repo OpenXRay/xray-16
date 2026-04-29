@@ -3,7 +3,7 @@
 
 #include "Blender_Editor_Wire.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Editor_Wire::CBlender_Editor_Wire()
 {

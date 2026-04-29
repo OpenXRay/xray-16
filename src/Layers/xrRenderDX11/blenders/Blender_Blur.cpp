@@ -3,7 +3,7 @@
 
 #include "Blender_Blur.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Blur::CBlender_Blur()
 {

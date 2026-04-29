@@ -16,7 +16,7 @@ namespace xray::render::framegraph {
     struct DefaultOutputLayout;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct SmokeTrailPassState
 {

@@ -2,7 +2,7 @@
 #include "dx11ComputeTest.h"
 #include "dx11HW.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 ID3DBuffer* ComputeTest::s_input_buffer = nullptr;

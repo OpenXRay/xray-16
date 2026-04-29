@@ -4,11 +4,11 @@
 #include "DDSLoader.h"
 #include "../RenderContext/RenderDevice.h"
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class CRender;
 
     static fg::RenderDevice* GetGlobalRenderDevice() {
-        auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(RImplementation);
+        auto& render = static_cast<xray::render::fg::CRender&>(RImplementation);
         return render.m_renderDevice;
     }
 
@@ -38,7 +38,7 @@ static u32 g_testsFailed = 0;
 bool Test_HandleAllocation() {
     Msg("! [TEST] Handle allocation and validation...");
 
-    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::fg::GetGlobalRenderDevice();
     if (!device || !device->IsInitialized()) {
         Msg("! [TEST SKIPPED] RenderDevice not initialized - run in-game");
         return true;
@@ -62,7 +62,7 @@ bool Test_HandleAllocation() {
 bool Test_HandleReuse() {
     Msg("! [TEST] Handle reuse after release...");
 
-    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::fg::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     TextureHandle handle1 = texManager.LoadTexture("$game_textures$\\$alphadxt1");
@@ -87,7 +87,7 @@ bool Test_HandleReuse() {
 bool Test_HandleValidation() {
     Msg("! [TEST] Handle validation...");
 
-    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::fg::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     TextureHandle invalidHandle;
@@ -174,7 +174,7 @@ bool Test_DDSLoader_SizeCalculation() {
 bool Test_TextureDeduplication() {
     Msg("! [TEST] Texture deduplication...");
 
-    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::fg::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     TextureHandle handle1 = texManager.LoadTexture("$game_textures$\\$shadertest");
@@ -196,7 +196,7 @@ bool Test_TextureDeduplication() {
 bool Test_ReferenceCounting() {
     Msg("! [TEST] Reference counting...");
 
-    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::fg::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     TextureHandle handle = texManager.LoadTexture("$game_textures$\\act\\act_arm_1");
@@ -224,7 +224,7 @@ bool Test_ReferenceCounting() {
 bool Test_MemoryTracking() {
     Msg("! [TEST] Memory tracking...");
 
-    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::fg::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     auto initialStats = texManager.GetStatistics();
@@ -239,7 +239,7 @@ bool Test_MemoryTracking() {
 bool Test_Statistics() {
     Msg("! [TEST] Statistics tracking...");
 
-    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::fg::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     auto stats = texManager.GetStatistics();
@@ -257,7 +257,7 @@ bool Test_Statistics() {
 bool Test_AsyncMultipleTextures() {
     Msg("! [TEST] Async loading multiple textures...");
 
-    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::fg::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     xr_vector<TextureHandle> textures;
@@ -323,7 +323,7 @@ bool Test_AsyncMultipleTextures() {
 bool Test_AsyncIOStatistics() {
     Msg("! [TEST] Async I/O statistics tracking...");
 
-    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::fg::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     auto* streamingMgr = texManager.GetStreamingManager();
@@ -369,7 +369,7 @@ bool Test_AsyncIOStatistics() {
 bool Test_ThreadSafeLoading() {
     Msg("! [TEST] Thread-safe texture loading...");
 
-    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::fg::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     TextureHandle handle1 = texManager.LoadTextureThreadSafe("$game_textures$\\$alphadxt1", TexturePriority::High);
@@ -400,7 +400,7 @@ bool Test_ThreadSafeLoading() {
 bool Test_AsyncLoadingPerformance() {
     Msg("! [TEST] Async loading performance...");
 
-    fg::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    fg::RenderDevice* device = xray::render::fg::GetGlobalRenderDevice();
     TextureManager texManager(device);
 
     float startTime = Device.fTimeGlobal;

@@ -3,7 +3,7 @@
 
 #include "R_Backend_tree.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 R_tree::R_tree(CBackend& cmd_list_in) : cmd_list(cmd_list_in) { unmap(); }
 void R_tree::unmap()

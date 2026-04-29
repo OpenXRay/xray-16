@@ -2,7 +2,7 @@
 
 #include "xrCore/xrCore.h"
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 #pragma pack(push, 1)
 struct SkyVertex {

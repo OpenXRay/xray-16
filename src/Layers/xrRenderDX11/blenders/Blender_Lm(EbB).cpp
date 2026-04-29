@@ -3,7 +3,7 @@
 
 #include "Blender_Lm(EbB).h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_LmEbB::CBlender_LmEbB()
 {

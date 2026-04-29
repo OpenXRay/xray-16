@@ -10,7 +10,7 @@
 
 extern ENGINE_API int dm_debug_trails;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #define BIND_DECLARE(xf)\
     class cl_xform_##xf : public R_constant_setup\

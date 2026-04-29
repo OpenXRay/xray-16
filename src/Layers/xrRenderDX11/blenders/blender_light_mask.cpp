@@ -3,7 +3,7 @@
 
 #include "blender_light_mask.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_accum_direct_mask::CBlender_accum_direct_mask() { description.CLS = 0; }
 CBlender_accum_direct_mask::~CBlender_accum_direct_mask() {}

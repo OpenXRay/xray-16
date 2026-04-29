@@ -10,7 +10,7 @@
 
 #include "xrEngine/IFrameGraphRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CBackend::OnFrameEnd()
 {

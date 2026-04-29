@@ -8,7 +8,7 @@
 #include "xrEngine/IRenderBackend.h"
 #include "xrCore/Threading/ParallelFor.hpp"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 ClusteredLightManager& ClusteredLightManager::Instance()

@@ -6,9 +6,9 @@
 
 namespace xray::render::fg { class RenderDevice; }
 namespace xray::render::framegraph { class FrameGraph; }
-namespace xray::render::RENDER_NAMESPACE { class RTAccelStructManager; }
+namespace xray::render::fg { class RTAccelStructManager; }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct ReSTIRGIPassState {
     nvrhi::ComputePipelineHandle initialPipeline;

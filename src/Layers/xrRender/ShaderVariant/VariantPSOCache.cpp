@@ -181,7 +181,7 @@ void DrawVariantPartition(
 
         cmdList->setGraphicsState(state);
         cmdList->drawIndexedIndirectCount(
-            v * p.binCapacity * sizeof(RENDER_NAMESPACE::IndirectDrawArgs),
+            v * p.binCapacity * sizeof(fg::IndirectDrawArgs),
             v * sizeof(u32),
             p.binCapacity);
     }

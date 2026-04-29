@@ -4,7 +4,7 @@
 #include "Layers/xrRenderDX11/blenders/uber_deffer.h"
 #include "blender_deffer_model.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_deffer_model::CBlender_deffer_model()
 {

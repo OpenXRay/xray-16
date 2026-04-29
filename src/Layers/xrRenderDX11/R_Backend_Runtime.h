@@ -14,7 +14,7 @@
 #include "Layers/xrRenderGL/glState.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 IC void R_xforms::set_c_w(R_constant* C)
 {

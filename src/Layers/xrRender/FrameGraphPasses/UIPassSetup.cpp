@@ -24,9 +24,9 @@
 
 extern ENGINE_API Fvector2 g_current_font_scale;
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
-using RENDER_NAMESPACE::dxFontRender;
+using fg::dxFontRender;
 using namespace xray::render::fgconstants;
 
 static void UploadStaticGlobals(FGConstantSystem& constants, const StaticGlobals& cb) {

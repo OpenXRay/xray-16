@@ -13,7 +13,7 @@ using namespace xray::render::resources;
 
 ENGINE_API bool is_enough_address_space_available();
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void fix_texture_name(pstr fn)
 {
@@ -159,4 +159,4 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 
     return d3d11Texture;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

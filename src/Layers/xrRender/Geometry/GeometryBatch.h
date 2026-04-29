@@ -7,13 +7,13 @@
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class dxRender_Visual;
 }
 
 namespace xray::render {
 
-using RENDER_NAMESPACE::dxRender_Visual;
+using fg::dxRender_Visual;
 
 struct MaterialPSO;
 
@@ -63,7 +63,7 @@ struct GeometryBatch {
 
     shared_str debugName;
 
-    RENDER_NAMESPACE::MeshAllocation megaBufferAlloc;
+    fg::MeshAllocation megaBufferAlloc;
 
     bool IsAlphaTested() const {
         if (!visual || !visual->shaderName.size())

@@ -4,7 +4,7 @@
 #include "xrCore/_vector2.h"
 #include "xrCore/_vector3d.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 #pragma pack(push, 1)
 struct UnifiedVertex {

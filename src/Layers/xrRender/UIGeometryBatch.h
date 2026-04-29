@@ -6,7 +6,7 @@
 
 namespace xray::render::ui
 {
-using namespace xray::render::RENDER_NAMESPACE;
+using namespace xray::render::fg;
 
 struct UIVertex
 {

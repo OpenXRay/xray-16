@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "DetailManager.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CDetailManager::cache_Initialize()
 {

@@ -18,7 +18,7 @@ namespace xray::render::framegraph {
     struct ExtractedReflection;
 }
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #pragma pack(push, 4)
 //////////////////////////////////////////////////////////////////////////
@@ -176,4 +176,4 @@ struct ECORE_API SDeclaration : public xr_resource_flagged
 typedef resptr_core<SDeclaration, resptr_base<SDeclaration>> ref_declaration;
 
 #pragma pack(pop)
-} // namespace xray::render::RENDER_NAMESPACE
+}

@@ -17,7 +17,7 @@ namespace xray::render
 
 void r5::InitializeFrameGraph()
 {
-    auto& self = xray::render::RENDER_NAMESPACE::RImplementation;
+    auto& self = xray::render::fg::RImplementation;
 
     if (!GEnv.Backend || !GEnv.Backend->IsInitialized())
         return;
@@ -64,7 +64,7 @@ void r5::InitializeFrameGraph()
 
 void r5::ShutdownFrameGraph()
 {
-    auto& self = xray::render::RENDER_NAMESPACE::RImplementation;
+    auto& self = xray::render::fg::RImplementation;
 
     xray::render::MaterialSystem::Instance().Shutdown();
     Msg("* MaterialSystem shutdown");

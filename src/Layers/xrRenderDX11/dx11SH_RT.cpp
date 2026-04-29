@@ -3,7 +3,7 @@
 
 #include "Layers/xrRenderDX11/ResourceManager.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 CRT::~CRT()
@@ -53,4 +53,4 @@ void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCo
     _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, slices_num, flags));
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+}

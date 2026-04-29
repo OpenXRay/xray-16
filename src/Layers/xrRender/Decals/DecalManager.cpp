@@ -7,7 +7,7 @@
 #include "xrCDB/Intersect.hpp"
 #include "xrEngine/device.h"
 
-namespace xray::render::RENDER_NAMESPACE::decals {
+namespace xray::render::fg::decals {
 
 static const Fvector s_cubeVerts[CUBE_VERTEX_COUNT] = {
     { -0.5f, -0.5f, -0.5f },

@@ -4,7 +4,7 @@
 #include "Blender_tree.h"
 #include "uber_deffer.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Tree::CBlender_Tree()
 {

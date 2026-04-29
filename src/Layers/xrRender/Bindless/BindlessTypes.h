@@ -2,7 +2,7 @@
 
 #include "xrCore/xrCore.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 constexpr u32 MAX_MATERIALS = 16384;
 

@@ -8,7 +8,7 @@ namespace xray::render::framegraph {
     struct ExtractedReflection;
 }
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dxFontRender : public IFontRender
 {
@@ -34,4 +34,4 @@ public:
     shared_str m_textureName;
     CTexture* m_baseTexture = nullptr;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

@@ -15,7 +15,7 @@
 #define MDB
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class adopt_sampler
 {

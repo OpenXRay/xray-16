@@ -3,7 +3,7 @@
 
 #include "R_Backend_xform.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void R_xforms::set_W(const Fmatrix& m)
 {

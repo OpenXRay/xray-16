@@ -13,7 +13,7 @@
 #include <queue>
 #include <DirectXTex.h>
 
-using namespace xray::render::RENDER_NAMESPACE;
+using namespace xray::render::fg;
 namespace xray::render::pbr {
 
 extern ENGINE_API int ps_r4_use_pbr;

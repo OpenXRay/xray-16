@@ -3,7 +3,7 @@
 
 #include "blender_bloom_build.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_bloom_build::CBlender_bloom_build() { description.CLS = 0; }
 CBlender_bloom_build::~CBlender_bloom_build() {}

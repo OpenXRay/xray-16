@@ -11,7 +11,7 @@
 
 struct ImDrawData;
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class dxRender_Visual;
     class RTAccelStructManager;
     namespace PS {
@@ -27,7 +27,7 @@ namespace xray::render::framegraph {
     class Blackboard;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
     struct ParticleBatch;
     class SmokeTrailManager;
 }
@@ -37,12 +37,12 @@ namespace xray::render::fg {
 }
 
 namespace xray::render {
-using RENDER_NAMESPACE::dxRender_Visual;
+using fg::dxRender_Visual;
 
 class GeometryCollector;
 class MaterialCache;
 
-namespace RENDER_NAMESPACE {
+namespace fg {
     class GPUCullingManager;
     class FGDetailManager;
 }
@@ -100,14 +100,14 @@ public:
 
     void UpdateSmokeTrail(const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode) override;
     void NotifySmokeShot() override;
-    RENDER_NAMESPACE::passes::SmokeTrailManager* GetSmokeTrailManager() const { return m_smokeTrailManager.get(); }
+    fg::passes::SmokeTrailManager* GetSmokeTrailManager() const { return m_smokeTrailManager.get(); }
 
-    RENDER_NAMESPACE::GPUCullingManager* GetGPUCullingManager() const { return m_gpuCullingManager.get(); }
+    fg::GPUCullingManager* GetGPUCullingManager() const { return m_gpuCullingManager.get(); }
 
-    RENDER_NAMESPACE::FGDetailManager* GetDetailManager() const { return m_detailManager.get(); }
+    fg::FGDetailManager* GetDetailManager() const { return m_detailManager.get(); }
 
-    RENDER_NAMESPACE::decals::DecalManager* GetDecalManager() const { return m_decalManager.get(); }
-    RENDER_NAMESPACE::decals::OverlayManager* GetOverlayManager() const { return m_overlayManager.get(); }
+    fg::decals::DecalManager* GetDecalManager() const { return m_decalManager.get(); }
+    fg::decals::OverlayManager* GetOverlayManager() const { return m_overlayManager.get(); }
 
 private:
     bool m_enabled = false;
@@ -170,17 +170,17 @@ private:
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_geometryVCBPool;
     xr_unique_ptr<MaterialCache> m_materialCache;
 
-    xr_unique_ptr<RENDER_NAMESPACE::GPUCullingManager> m_gpuCullingManager;
+    xr_unique_ptr<fg::GPUCullingManager> m_gpuCullingManager;
 
-    xr_unique_ptr<RENDER_NAMESPACE::FGDetailManager> m_detailManager;
+    xr_unique_ptr<fg::FGDetailManager> m_detailManager;
 
-    xr_unique_ptr<RENDER_NAMESPACE::decals::DecalManager> m_decalManager;
+    xr_unique_ptr<fg::decals::DecalManager> m_decalManager;
 
-    xr_unique_ptr<RENDER_NAMESPACE::decals::OverlayManager> m_overlayManager;
+    xr_unique_ptr<fg::decals::OverlayManager> m_overlayManager;
 
-    xr_unique_ptr<RENDER_NAMESPACE::passes::SmokeTrailManager> m_smokeTrailManager;
+    xr_unique_ptr<fg::passes::SmokeTrailManager> m_smokeTrailManager;
 
-    xr_unique_ptr<RENDER_NAMESPACE::RTAccelStructManager> m_rtAccelMgr;
+    xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
     u32 m_ptSampleIndex = 0;
     Fvector m_ptPrevCameraPos = {0, 0, 0};
     Fvector m_ptPrevCameraDir = {0, 0, 0};
@@ -197,8 +197,8 @@ private:
 
     xr_vector<GeometryBatch> m_hudBatches;
 
-    xr_vector<RENDER_NAMESPACE::passes::ParticleBatch> m_worldParticleBatches;
-    xr_vector<RENDER_NAMESPACE::passes::ParticleBatch> m_hudParticleBatches;
+    xr_vector<fg::passes::ParticleBatch> m_worldParticleBatches;
+    xr_vector<fg::passes::ParticleBatch> m_hudParticleBatches;
 
     xr_vector<GeometryBatch> m_cachedStaticBatches;
     bool m_staticBatchesCached = false;
@@ -231,7 +231,7 @@ private:
     bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr, bool isStatic = false);
     bool ProcessHudGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr);
     bool ProcessParticleGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr, bool isHUD = false);
-    void ProcessSingleParticleEffect(RENDER_NAMESPACE::PS::CParticleEffect* pEffect, const Fmatrix& worldTransform, IRenderable* renderable, bool isHUD);
+    void ProcessSingleParticleEffect(fg::PS::CParticleEffect* pEffect, const Fmatrix& worldTransform, IRenderable* renderable, bool isHUD);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
 
     struct PassEntry {

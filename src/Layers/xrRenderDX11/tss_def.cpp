@@ -9,7 +9,7 @@
 #include "../xrRenderGL/glState.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void SimulatorStates::record(ID3DState*& state)
 {

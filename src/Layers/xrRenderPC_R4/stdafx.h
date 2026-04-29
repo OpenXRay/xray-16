@@ -65,7 +65,7 @@
 #include "r2.h"
 #include "r4_rendertarget.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 IC void jitter(CBlender_Compile& C)
 {
@@ -81,4 +81,4 @@ IC void jitter(CBlender_Compile& C)
     C.r_dx11Texture("jitterMipped", r2_jitter_mipped);
     C.r_dx11Sampler("smp_jitter");
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

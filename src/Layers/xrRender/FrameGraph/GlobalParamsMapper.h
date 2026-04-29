@@ -9,7 +9,7 @@ namespace slang {
 
 namespace xray::render {
 
-namespace RENDER_NAMESPACE {
+namespace fg {
     class R_constant_table;
     class CBackend;
 }
@@ -30,8 +30,8 @@ public:
 
     void PopulateBuffer(
         void* bufferData,
-        const RENDER_NAMESPACE::R_constant_table* constantTable,
-        RENDER_NAMESPACE::CBackend& backend);
+        const fg::R_constant_table* constantTable,
+        fg::CBackend& backend);
 
     bool HasGlobalParams() const { return !m_members.empty(); }
 

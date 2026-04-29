@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void D3DXRenderBase::CreateQuadIB()
 {

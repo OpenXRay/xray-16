@@ -2,7 +2,7 @@
 
 #include "Layers/xrRenderDX11/ResourceManager.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #ifdef USE_OGL
 static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)

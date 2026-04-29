@@ -5,7 +5,7 @@
 #include <nvrhi/nvrhi.h>
 #include "xrEngine/IRenderBackend.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 u32 GetFVFVertexSize(u32 FVF)
 {
@@ -114,7 +114,7 @@ namespace BufferUtils
 {
 ConstantBufferHandle CreateConstantBuffer(u32 DataSize)
 {
-    return RENDER_NAMESPACE::CreateConstantBufferInternal(DataSize);
+    return fg::CreateConstantBufferInternal(DataSize);
 }
 };
 

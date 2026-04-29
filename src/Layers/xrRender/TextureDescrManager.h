@@ -5,7 +5,7 @@
 #include "ETextureParams.h"
 #include "xrCommon/xr_unordered_map.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class cl_dt_scaler;
 
@@ -70,4 +70,4 @@ public:
     shared_str GetParallaxName(const shared_str& tex_name) const;
     shared_str GetPBRName(const shared_str& tex_name) const;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

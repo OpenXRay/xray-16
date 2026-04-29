@@ -15,11 +15,11 @@
 #include "Layers/xrRender/dxEnvironmentRender.h"
 #include "xrEngine/Environment.h"
 
-namespace RENDER_NAMESPACE {
+namespace fg {
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 static const Fvector3 hbox_verts[24] = {
     {-1.f, -1.f,   -1.f}, {-1.f, -1.01f, -1.f},

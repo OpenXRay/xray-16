@@ -3,7 +3,7 @@
 
 #include "blender_light_direct.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_accum_direct::CBlender_accum_direct() { description.CLS = 0; }
 CBlender_accum_direct::~CBlender_accum_direct() {}

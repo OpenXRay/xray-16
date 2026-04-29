@@ -7,7 +7,7 @@
 
 #include "Layers/xrRenderDX11/dx11HW.h"
 
-using xray::render::RENDER_NAMESPACE::HW;
+using xray::render::fg::HW;
 D3D11BackendWrapper::D3D11BackendWrapper() = default;
 
 D3D11BackendWrapper::~D3D11BackendWrapper()

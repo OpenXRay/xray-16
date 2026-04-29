@@ -3,7 +3,7 @@
 
 #include "blender_combine.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_combine::CBlender_combine() { description.CLS = 0; }
 CBlender_combine::~CBlender_combine() {}

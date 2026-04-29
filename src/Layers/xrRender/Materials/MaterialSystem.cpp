@@ -76,9 +76,9 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* 
 
     MaterialInfo info = GetDefaultMaterialInfo();
 
-    using BlendMode = RENDER_NAMESPACE::CResourceManager::BlendMode;
-    RENDER_NAMESPACE::CResourceManager::BlenderProperties blenderProps;
-    if (RENDER_NAMESPACE::RImplementation.Resources->GetBlenderProperties(shaderName, blenderProps))
+    using BlendMode = fg::CResourceManager::BlendMode;
+    fg::CResourceManager::BlenderProperties blenderProps;
+    if (fg::RImplementation.Resources->GetBlenderProperties(shaderName, blenderProps))
     {
         switch (blenderProps.blendMode)
         {

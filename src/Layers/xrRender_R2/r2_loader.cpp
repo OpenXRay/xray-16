@@ -20,7 +20,7 @@
 #include "Layers/xrRender/FGDetailManager.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CRender::level_Load(IReader* fs)
 {
@@ -706,4 +706,4 @@ void CRender::Load3DFluid()
     }
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+}

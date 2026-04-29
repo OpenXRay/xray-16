@@ -5,7 +5,7 @@
 #include "Blender_Recorder.h"
 #include "Blender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void fix_texture_name(pstr fn);
 

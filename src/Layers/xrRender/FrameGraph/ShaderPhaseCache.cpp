@@ -30,7 +30,7 @@ RenderPhase ShaderPhaseCache::GetPhase(dxRender_Visual* visual) {
     }
 
     ShaderKey key;
-    if (!RENDER_NAMESPACE::ExtractShaderKey(visual, key)) {
+    if (!fg::ExtractShaderKey(visual, key)) {
         Msg("! [ShaderPhaseCache] Failed to extract shader key from visual");
         return RenderPhase::Geometry;
     }
@@ -67,7 +67,7 @@ RenderPhase ShaderPhaseCache::ExtractPhase(dxRender_Visual* visual) {
     }
 
     ShaderKey key;
-    RENDER_NAMESPACE::ExtractShaderKey(visual, key);
+    fg::ExtractShaderKey(visual, key);
     std::string shaderName = key.ToString();
 
     auto* ps = pass->ps._get();

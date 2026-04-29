@@ -4,7 +4,7 @@
 #include "Layers/xrRender/DetailFormat.h"
 #include "Layers/xrRender/DetailModel.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #ifdef _EDITOR
 const int dm_max_decompress = 14;

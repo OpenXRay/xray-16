@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "xr_effgamma.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 IC u16 clr2gamma(float c)
 {

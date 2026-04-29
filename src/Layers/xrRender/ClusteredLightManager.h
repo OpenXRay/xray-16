@@ -6,7 +6,7 @@
 
 namespace xray::render::fg { class RenderDevice; }
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class light;
 class light_Package;

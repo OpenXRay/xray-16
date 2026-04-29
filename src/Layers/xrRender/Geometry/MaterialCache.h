@@ -5,7 +5,7 @@
 #include "Layers/xrRender/FrameGraph/GlobalParamsMapper.h"
 #include "Layers/xrRender/ResourceManager/ResourceHandle.h"
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     struct Shader;
     struct ShaderElement;
     struct SPass;
@@ -37,13 +37,13 @@ namespace framegraph {
     struct DefaultOutputLayout;
 }
 
-using RENDER_NAMESPACE::Shader;
-using RENDER_NAMESPACE::ShaderElement;
-using RENDER_NAMESPACE::SPass;
-using RENDER_NAMESPACE::dxRender_Visual;
-using RENDER_NAMESPACE::SVS;
-using RENDER_NAMESPACE::SPS;
-using RENDER_NAMESPACE::dxFontRender;
+using fg::Shader;
+using fg::ShaderElement;
+using fg::SPass;
+using fg::dxRender_Visual;
+using fg::SVS;
+using fg::SPS;
+using fg::dxFontRender;
 
 enum class RenderPassType : u8 {
     DepthPrepass,

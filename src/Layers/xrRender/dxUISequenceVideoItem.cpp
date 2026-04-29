@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dxUISequenceVideoItem.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dxUISequenceVideoItem::dxUISequenceVideoItem()
     : m_texture(nullptr)
@@ -47,4 +47,4 @@ void dxUISequenceVideoItem::video_Stop()
 {
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+}

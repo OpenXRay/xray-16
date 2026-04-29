@@ -4,7 +4,7 @@
 #include "FBasicVisual.h"
 #include "SH_Atomic.h"
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 
 bool ExtractShaderKey(dxRender_Visual* visual, ShaderKey& outKey) {
     if (!visual) {

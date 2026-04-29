@@ -10,7 +10,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 
-namespace xray::render::RENDER_NAMESPACE::passes
+namespace xray::render::fg::passes
 {
 using namespace framegraph;
 

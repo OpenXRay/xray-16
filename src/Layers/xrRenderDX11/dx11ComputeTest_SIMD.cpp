@@ -2,7 +2,7 @@
 #include "dx11ComputeTest_SIMD.h"
 #include "dx11HW.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 ID3DBuffer* ComputeTest_SIMD::s_input_buffer = nullptr;

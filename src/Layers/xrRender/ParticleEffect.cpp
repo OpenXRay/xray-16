@@ -19,7 +19,7 @@
 
 extern ENGINE_API float psHUD_FOV;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 using namespace PAPI;
 using namespace PS;
@@ -877,4 +877,4 @@ void CParticleEffect::Render(float, bool)
 }
 
 #endif // _EDITOR
-} // namespace xray::render::RENDER_NAMESPACE
+}

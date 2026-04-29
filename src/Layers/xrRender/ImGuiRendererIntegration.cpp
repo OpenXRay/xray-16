@@ -11,7 +11,7 @@ static xr_unique_ptr<IImGuiRender> g_ImGuiRenderer;
 
 static fg::RenderDevice* g_RenderDevice = nullptr;
 
-namespace RENDER_NAMESPACE {
+namespace fg {
     IImGuiRender* CreateLegacyImGuiRendererImpl()
     {
         return xr_new<dxImGuiRender>();
@@ -27,13 +27,13 @@ void InitializeImGuiRenderer(fg::RenderDevice* renderDevice)
         fg::ImGuiRendererNVRHI* nvrhiRenderer = xr_new<fg::ImGuiRendererNVRHI>(renderDevice);
         g_ImGuiRenderer.reset(nvrhiRenderer);
 
-        RENDER_NAMESPACE::RImplementation.m_imguiRendererNVRHI = nvrhiRenderer;
+        fg::RImplementation.m_imguiRendererNVRHI = nvrhiRenderer;
 
         Msg("* ImGui: Using NVRHI renderer (supports DX11/DX12/Vulkan)");
     }
     else
     {
-        g_ImGuiRenderer.reset(RENDER_NAMESPACE::CreateLegacyImGuiRendererImpl());
+        g_ImGuiRenderer.reset(fg::CreateLegacyImGuiRendererImpl());
         Msg("* ImGui: Using legacy DX11 renderer");
     }
 }

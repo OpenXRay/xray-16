@@ -13,7 +13,7 @@ extern ENGINE_API float ps_r3_grass_wind_displacement;
 extern ENGINE_API float ps_r3_grass_interaction_displacement;
 extern ENGINE_API u32 ps_r3_grass_wind_octaves;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 extern int ps_r__detail_gpu;
 namespace detail_manager
@@ -3053,4 +3053,4 @@ void CDetailManager::UploadSlotDataToGPU(uint32_t physical_page, const uint8_t* 
 
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+}

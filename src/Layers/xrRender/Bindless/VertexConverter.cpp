@@ -9,7 +9,7 @@ static_assert(sizeof(r1v_vert_unpacked) == 28, "r1v_vert_unpacked must be 28 byt
 static_assert(sizeof(mu_model_vert_unpacked) == 28, "mu_model_vert_unpacked must be 28 bytes");
 static_assert(sizeof(x_vert) == 12, "x_vert must be 12 bytes");
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 float VertexConverter::UnpackS24_UV(s16 primary, float alphaFrac)
 {

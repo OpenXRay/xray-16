@@ -3,7 +3,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "xrEngine/IRenderBackend.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 VariantTextureBuffer& VariantTextureBuffer::Instance()
 {

@@ -14,11 +14,11 @@
 #include "xrEngine/Environment.h"
 #include "xrEngine/xr_efflensflare.h"
 
-namespace RENDER_NAMESPACE {
+namespace fg {
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 void InitializeSunPass(fg::RenderDevice* device, SunPassState& state) {
     if (state.initialized || !device) return;

@@ -12,11 +12,11 @@ namespace xray::render::framegraph {
 class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 class RTAccelStructManager;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct PathTracerConfig {
     u32 maxBounces = 8;

@@ -8,7 +8,7 @@
 
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dx11ConstantBuffer;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #if RENDER == R_R2
 class CBlender_SSAO : public IBlender

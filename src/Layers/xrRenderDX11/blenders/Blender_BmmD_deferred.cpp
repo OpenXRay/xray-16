@@ -4,7 +4,7 @@
 #include "Blender_BmmD.h"
 #include "uber_deffer.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_BmmD::CBlender_BmmD()
 {

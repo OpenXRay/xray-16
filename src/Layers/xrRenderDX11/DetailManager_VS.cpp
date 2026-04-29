@@ -2,7 +2,7 @@
 #pragma hdrstop
 #include "DetailManager.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 extern int ps_r__detail_gpu;
 namespace detail_manager

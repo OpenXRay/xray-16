@@ -7,7 +7,7 @@
 
 #include <SDL.h>
 
-using namespace xray::render::RENDER_NAMESPACE;
+using namespace xray::render::fg;
 
 IRenderBackend* CreateVulkanBackend(SDL_Window* window, u32 width, u32 height, bool enableValidation);
 

@@ -3,7 +3,7 @@
 
 #include "Blender_detail_still.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Detail_Still::CBlender_Detail_Still()
 {

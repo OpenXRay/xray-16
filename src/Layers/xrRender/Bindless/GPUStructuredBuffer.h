@@ -9,7 +9,7 @@ namespace xray::render {
     }
 }
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 template<typename T>
 class GPUStructuredBuffer {

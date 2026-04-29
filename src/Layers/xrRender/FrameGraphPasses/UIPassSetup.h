@@ -11,7 +11,7 @@ namespace xray::render::framegraph {
 
 class CGameFont;
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct UIPassData {
     framegraph::VirtualResourceHandle sceneInput;

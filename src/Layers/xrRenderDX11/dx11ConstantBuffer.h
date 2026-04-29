@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 struct R_constant;
 struct R_constant_load;
@@ -87,4 +87,4 @@ private:
 };
 
 typedef resptr_core<dx11ConstantBuffer, resptr_base<dx11ConstantBuffer>> ref_cbuffer;
-} // namespace xray::render::RENDER_NAMESPACE
+}

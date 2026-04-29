@@ -3,12 +3,12 @@
 #include "xrCore/xrstring.h"
 #include <string>
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     struct SPass;
     class dxRender_Visual;
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 
 struct ShaderKey {
     shared_str vsName;

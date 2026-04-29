@@ -3,7 +3,7 @@
 
 #include "blender_light_spot.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_accum_spot::CBlender_accum_spot() { description.CLS = 0; }
 CBlender_accum_spot::~CBlender_accum_spot() {}

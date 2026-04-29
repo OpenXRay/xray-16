@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CRender::render_lights(light_Package& LP)
 {
@@ -360,4 +360,4 @@ void CRender::render_indirect(light* L) const
         Target->accum_reflected(cmd_list, &LIGEN);
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

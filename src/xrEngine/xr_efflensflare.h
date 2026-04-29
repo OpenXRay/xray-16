@@ -11,7 +11,7 @@ class ENGINE_API CEnvironment;
 
 namespace xray::render
 {
-namespace render_r4
+namespace fg
 {
 class dxLensFlareRender;
 }
@@ -80,7 +80,7 @@ public:
 
 class ENGINE_API CLensFlare
 {
-    friend class xray::render::render_r4::dxLensFlareRender;
+    friend class xray::render::fg::dxLensFlareRender;
     friend class xray::render::render_gl::dxLensFlareRender;
 
 public:

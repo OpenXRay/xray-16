@@ -3,7 +3,7 @@
 
 #include "R_Backend_hemi.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 R_hemi::R_hemi(CBackend& cmd_list_in) : cmd_list(cmd_list_in) { unmap(); }
 void R_hemi::unmap()

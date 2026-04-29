@@ -6,7 +6,7 @@
 #include "Layers/xrRender/Shaders/SlangReflectionWrapper.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 extern xr_vector<xr_string> g_failedShaders;
 
@@ -602,4 +602,4 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     return _result;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

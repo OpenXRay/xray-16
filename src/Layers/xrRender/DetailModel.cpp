@@ -6,7 +6,7 @@
 #include "xrstripify.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CDetail::~CDetail() {}
 void CDetail::Unload()
@@ -211,4 +211,4 @@ void CDetail::Optimize()
     }
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+}

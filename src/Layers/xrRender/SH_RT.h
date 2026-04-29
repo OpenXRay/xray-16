@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////////
 class CRT : public xr_resource_named
@@ -97,4 +97,4 @@ struct 		resptrcode_crtc	: public resptr_base<CRTC>
 };
 typedef	resptr_core<CRTC,resptrcode_crtc>		ref_rtc;
 */
-} // namespace xray::render::RENDER_NAMESPACE
+}

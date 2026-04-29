@@ -3,7 +3,7 @@
 
 #include "Blender_tree.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Tree::CBlender_Tree()
 {

@@ -5,7 +5,7 @@
 #include "Layers/xrRenderDX11/Blender.h"
 #include "Layers/xrRenderDX11/Blender_CLSID.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CResourceManager::OnDeviceDestroy(BOOL)
 {

@@ -55,7 +55,7 @@ bool GlobalParamsMapper::ExtractLayout(slang::ShaderReflection* reflection)
 void GlobalParamsMapper::PopulateBuffer(
     void* bufferData,
     const R_constant_table* constantTable,
-    RENDER_NAMESPACE::CBackend& backend)
+    fg::CBackend& backend)
 {
     VERIFY(bufferData);
     VERIFY(constantTable);

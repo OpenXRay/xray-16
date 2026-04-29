@@ -5,7 +5,7 @@
 #include "Layers/xrRender/xrRender_console.h"
 
 namespace xray::render::framegraph {
-using namespace RENDER_NAMESPACE;
+using namespace fg;
 
 namespace {
 

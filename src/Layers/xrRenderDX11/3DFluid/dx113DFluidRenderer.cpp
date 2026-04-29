@@ -2,7 +2,7 @@
 #include "dx113DFluidRenderer.h"
 #include "dx113DFluidData.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 LPCSTR dx113DFluidRenderer::m_pRTNames[RRT_NumRT] = {
@@ -18,4 +18,4 @@ void dx113DFluidRenderer::Destroy() {}
 void dx113DFluidRenderer::SetScreenSize(int, int) {}
 void dx113DFluidRenderer::Draw(const dx113DFluidData&) {}
 
-} // namespace xray::render::RENDER_NAMESPACE
+}

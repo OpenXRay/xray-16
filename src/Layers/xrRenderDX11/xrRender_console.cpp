@@ -40,7 +40,7 @@
 
 extern ENGINE_API int dm_debug_trails;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 u32 ps_Preset = 2;
 const xr_token qpreset_token[] =
@@ -440,7 +440,7 @@ public:
         if (!render.m_nvrhiDevice)
         {
             Msg("~ [NVRHI] Initializing on-demand...");
-            render.m_nvrhiDevice = xr_new<xray::render::RENDER_NAMESPACE::nvrhi_wrapper::NVRHIDevice>();
+            render.m_nvrhiDevice = xr_new<xray::render::fg::nvrhi_wrapper::NVRHIDevice>();
 
             bool nvrhiSuccess = render.m_nvrhiDevice->Initialize(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID));
 

@@ -12,12 +12,12 @@ extern ENGINE_API Fvector4 ps_dev_param_3;
 extern ENGINE_API Fvector4 ps_dev_param_4;
 extern ENGINE_API float psHUD_FOV;
 namespace xray::render {
-    namespace RENDER_NAMESPACE {
+    namespace fg {
         extern float r__dtex_range;
     }
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 constexpr u32 TEX_SLOT_DIFFUSE   = 0;
 constexpr u32 TEX_SLOT_BUMP      = 1;

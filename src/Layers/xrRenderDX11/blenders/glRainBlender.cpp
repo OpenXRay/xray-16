@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dx11RainBlender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CBlender_rain::Compile(CBlender_Compile& C)
 {

@@ -3,7 +3,7 @@
 
 #include "blender_ssao.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #if RENDER == R_R2
 CBlender_SSAO::CBlender_SSAO() { description.CLS = 0; }

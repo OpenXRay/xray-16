@@ -3,7 +3,7 @@
 #include "UnifiedVertex.h"
 #include "Common/OGF_GContainer_Vertices.hpp"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 class VertexConverter {
 public:
