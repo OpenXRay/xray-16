@@ -1,10 +1,7 @@
 #include "stdafx.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/light.h"
-
-namespace fg {
-    extern CRender RImplementation;
-}
+#include "Layers/xrRender/Light_DB.h"
 
 namespace xray::render::fg::passes {
 

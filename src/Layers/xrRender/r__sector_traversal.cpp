@@ -60,96 +60,11 @@ extern float r_ssaDISCARD;
 extern float r_ssaLOD_A, r_ssaLOD_B;
 void CPortalTraverser::fade_render()
 {
-    if (f_portals.empty())
-        return;
-
-    // re-sort, back to front
-    std::sort(f_portals.begin(), f_portals.end(), [this](const auto& p1, const auto& p2)
-    {
-        const float d1 = i_vBase.distance_to_sqr(p1.first->S.P);
-        const float d2 = i_vBase.distance_to_sqr(p2.first->S.P);
-        return d2 > d1; // descending, back to front
-    });
-
-    // calc poly-count
-    u32 _pcount = 0;
-    for (u32 _it = 0; _it < f_portals.size(); _it++)
-        _pcount += f_portals[_it].first->getPoly().size() - 2;
-
-    // fill buffers
-    u32 _offset = 0;
-    FVF::L* _v = (FVF::L*)RImplementation.Vertex.Lock(_pcount * 3, RImplementation.m_PortalFadeGeom.stride(), _offset);
-    float ssaRange = r_ssaLOD_A - r_ssaLOD_B;
-    Fvector _ambient_f = g_pGamePersistent->Environment().CurrentEnv.ambient;
-    u32 _ambient = color_rgba_f(_ambient_f.x, _ambient_f.y, _ambient_f.z, 0);
-    for (u32 _it = 0; _it < f_portals.size(); _it++)
-    {
-        std::pair<CPortal*, float>& fp = f_portals[_it];
-        CPortal* portal = fp.first;
-        float _ssa = fp.second;
-        float ssaDiff = _ssa - r_ssaLOD_B;
-        float ssaScale = ssaDiff / ssaRange;
-        int iA = iFloor((1 - ssaScale) * 255.5f);
-        clamp(iA, 0, 255);
-        u32 _clr = subst_alpha(_ambient, u32(iA));
-
-        // fill polys
-        u32 _polys = portal->getPoly().size() - 2;
-        for (u32 _pit = 0; _pit < _polys; _pit++)
-        {
-            _v->set(portal->getPoly()[0], _clr);
-            _v++;
-            _v->set(portal->getPoly()[_pit + 1], _clr);
-            _v++;
-            _v->set(portal->getPoly()[_pit + 2], _clr);
-            _v++;
-        }
-    }
-    RImplementation.Vertex.Unlock(_pcount * 3, RImplementation.m_PortalFadeGeom.stride());
-
-    // render
-    RCache.set_xform_world(Fidentity);
-    RCache.set_Shader(RImplementation.m_PortalFadeShader);
-    RCache.set_Geometry(RImplementation.m_PortalFadeGeom);
-    RCache.set_CullMode(CULL_NONE);
-    RCache.Render(D3DPT_TRIANGLELIST, _offset, _pcount);
-    RCache.set_CullMode(CULL_CCW);
-
-    // cleanup
     f_portals.clear();
 }
 
 #ifdef DEBUG
-void CPortalTraverser::dbg_draw()
-{
-    RCache.OnFrameEnd();
-
-    RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Fidentity);
-    RCache.set_xform_project(Fidentity);
-#ifndef USE_DX9 // when we don't have FFP support
-    RCache.set_Shader(RImplementation.m_WireShader);
-    RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);
-#endif
-
-    for (u32 s = 0; s < dbg_sectors.size(); s++)
-    {
-        CSector* S = (CSector*)dbg_sectors[s];
-        FVF::L verts[5];
-        Fbox2 bb = S->r_scissor_merged;
-        bb.min.x = bb.min.x * 2 - 1;
-        bb.max.x = bb.max.x * 2 - 1;
-        bb.min.y = (1 - bb.min.y) * 2 - 1;
-        bb.max.y = (1 - bb.max.y) * 2 - 1;
-
-        verts[0].set(bb.min.x, bb.min.y, EPS, 0xffffffff);
-        verts[1].set(bb.max.x, bb.min.y, EPS, 0xffffffff);
-        verts[2].set(bb.max.x, bb.max.y, EPS, 0xffffffff);
-        verts[3].set(bb.min.x, bb.max.y, EPS, 0xffffffff);
-        verts[4].set(bb.min.x, bb.min.y, EPS, 0xffffffff);
-        RCache.dbg_Draw(D3DPT_LINESTRIP, verts, 4);
-    }
-}
+void CPortalTraverser::dbg_draw() {}
 #endif
 
 void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R_scissor)
@@ -262,7 +177,7 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
                 scissor = R_scissor;
 
                 // Cull by HOM (slower algo)
-                if ((i_options & CPortalTraverser::VQ_HOM) && (!RImplementation.HOM.visible(*P)))
+                if (false)
                     continue;
             }
             else
@@ -293,9 +208,7 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
                 if (scissor.min.y >= scissor.max.y)
                     continue;
 
-                // Cull by HOM (faster algo)
-                if ((i_options & CPortalTraverser::VQ_HOM) &&
-                    !RImplementation.HOM.visible(scissor, depth))
+                if (false)
                 {
                     continue;
                 }
