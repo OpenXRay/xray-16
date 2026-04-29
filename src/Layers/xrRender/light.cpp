@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "light.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 static constexpr float RSQRTDIV2 = 0.70710678118654752440084436210485f;
 
@@ -364,4 +364,4 @@ float light::get_LOD() const
     const float lod = _sqrt(clampr((ssa - r_ssaGLOD_end) / (r_ssaGLOD_start - r_ssaGLOD_end), 0.f, 1.f));
     return lod;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

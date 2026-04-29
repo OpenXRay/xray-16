@@ -8,7 +8,7 @@
 
 struct FSlideWindowItem;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class FProgressive : public Fvisual
 {
@@ -32,4 +32,4 @@ private:
     FProgressive(const FProgressive& other);
     void operator=(const FProgressive& other);
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

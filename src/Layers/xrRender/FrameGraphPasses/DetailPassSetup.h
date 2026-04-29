@@ -8,7 +8,7 @@
 
 struct Fmatrix;
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class FGDetailManager;
 }
 
@@ -27,7 +27,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct DetailPassState {
     bool detailDataUploaded = false;
@@ -42,7 +42,7 @@ struct DetailPassData {
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle worldPos;
     fg::RenderDevice* device;
-    RENDER_NAMESPACE::FGDetailManager* detailManager;
+    fg::FGDetailManager* detailManager;
     framegraph::DefaultOutputLayout outputs;
     u32 width;
     u32 height;
@@ -58,11 +58,11 @@ struct DetailPassData {
 framegraph::DefaultOutputLayout setupDetailPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
-    RENDER_NAMESPACE::FGDetailManager* detailManager,
+    fg::FGDetailManager* detailManager,
     const framegraph::DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
     xray::profiler::GPUProfiler* gpuProfiler = nullptr
 );
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

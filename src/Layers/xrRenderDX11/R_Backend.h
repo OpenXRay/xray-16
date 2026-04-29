@@ -24,7 +24,7 @@
 
 #include "Layers/xrRender/FVF.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 const u32 CULL_CCW = D3DCULL_CCW;
 const u32 CULL_CW = D3DCULL_CW;
@@ -619,4 +619,4 @@ public:
 #pragma warning(pop)
 
 #define RCache RImplementation.get_imm_context().cmd_list
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

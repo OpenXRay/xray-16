@@ -9,17 +9,17 @@
 #ifndef PARTICLES_SYSTEMS_LIBRARY_INTERFACE_HPP_INCLUDED
 #define PARTICLES_SYSTEMS_LIBRARY_INTERFACE_HPP_INCLUDED
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace PS
 {
 class CPGDef;
 } // namespace PS
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg
 
 namespace particles_systems
 {
-namespace PS = xray::render::RENDER_NAMESPACE::PS;
+namespace PS = xray::render::fg::PS;
 
 class library_interface
 {

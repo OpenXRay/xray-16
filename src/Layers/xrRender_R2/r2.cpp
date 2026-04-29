@@ -27,7 +27,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderCache.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CRender RImplementation;
 
@@ -1334,4 +1334,4 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     HOM.DumpStatistics(font, alert);
     Sectors_xrc.DumpStatistics(font, alert);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

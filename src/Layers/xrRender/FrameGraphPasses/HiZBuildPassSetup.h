@@ -15,7 +15,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // ═══════════════════════════════════════════════════════
 //  HI-Z PYRAMID BUILD PASS (Phase 3.5: GPU Culling Foundation)
@@ -104,4 +104,4 @@ inline u32 CalculateHiZMipLevels(u32 width, u32 height) {
     return mipLevels;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

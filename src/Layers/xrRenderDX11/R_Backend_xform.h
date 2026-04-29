@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class ECORE_API R_xforms
 {
@@ -46,4 +46,4 @@ private:
 
     CBackend& cmd_list;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

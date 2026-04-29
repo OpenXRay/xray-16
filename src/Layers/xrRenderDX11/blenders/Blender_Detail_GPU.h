@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_Detail_GPU : public IBlender
 {
@@ -11,4 +11,4 @@ public:
     LPCSTR getComment() override;
     void Compile(CBlender_Compile& C) override;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

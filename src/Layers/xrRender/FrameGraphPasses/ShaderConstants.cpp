@@ -5,13 +5,13 @@
 #include "ShaderConstants.h"
 #include "Layers/xrRender/light.h"
 
-namespace RENDER_NAMESPACE {
+namespace fg {
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
-using namespace xray::render::RENDER_NAMESPACE;
+using namespace xray::render::fg;
 
 void GetSunLightData(SunLightData& outSun, float hdrIntensity) {
     auto* sun = static_cast<light*>(RImplementation.Lights.sun._get());
@@ -22,4 +22,4 @@ void GetSunLightData(SunLightData& outSun, float hdrIntensity) {
     }
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

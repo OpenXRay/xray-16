@@ -5,7 +5,7 @@
 class IReader;
 class IWriter;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class ECORE_API CConstant : public xr_resource_named
 {
@@ -65,4 +65,4 @@ public:
 };
 
 typedef resptr_core<CConstant, resptr_base<CConstant>> ref_constant_obsolette;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

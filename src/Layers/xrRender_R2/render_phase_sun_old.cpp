@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "r2_R_sun_support.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void render_sun_old::init()
 {
@@ -739,4 +739,4 @@ void render_sun_old::flush()
     RImplementation.release_context(context_id);
     RImplementation.get_imm_command_list().Invalidate();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

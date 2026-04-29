@@ -3,7 +3,7 @@
 
 #include "blender_combine.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_combine::CBlender_combine() { description.CLS = 0; }
 CBlender_combine::~CBlender_combine() {}
@@ -460,4 +460,4 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
     RImplementation.m_MSAASample = -1;
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

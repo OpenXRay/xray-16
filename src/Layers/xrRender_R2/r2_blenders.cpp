@@ -15,7 +15,7 @@
 #include "Layers/xrRenderDX11/blenders/Blender_Model_EbB.h"
 #include "Layers/xrRenderDX11/blenders/Blender_Lm(EbB).h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 IBlender* CRender::blender_create(CLASS_ID cls)
 {
@@ -51,4 +51,4 @@ void CRender::blender_destroy(IBlender*& B)
 {
     xr_delete(B);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

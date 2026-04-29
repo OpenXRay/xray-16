@@ -10,7 +10,7 @@
 
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //---------------------------------------------------------------------------
 using namespace PAPI;
@@ -496,4 +496,4 @@ void PS::CPEDef::Compile(EPAVec& v)
     m_Actions.w_u32(cnt);
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

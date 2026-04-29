@@ -28,7 +28,7 @@
 #include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 
-namespace xray::render::RENDER_NAMESPACE::nvrhi_wrapper
+namespace xray::render::fg::nvrhi_wrapper
 {
 class NVRHIDevice;
 }
@@ -57,7 +57,7 @@ class ShaderLoader;
 struct ExtractedReflection;
 }
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CRenderTarget;
 class dxRender_Visual;
@@ -627,7 +627,7 @@ private:
 public:
 #if defined(USE_DX11) && RENDER == R_R4
     // NVRHI integration (R4 only)
-    xray::render::RENDER_NAMESPACE::nvrhi_wrapper::NVRHIDevice* m_nvrhiDevice{ nullptr };
+    xray::render::fg::nvrhi_wrapper::NVRHIDevice* m_nvrhiDevice{ nullptr };
     bool m_nvrhiTestMode{ false };
 
     void TestNVRHI_Render();
@@ -670,4 +670,4 @@ public:
 };
 
 extern CRender RImplementation;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

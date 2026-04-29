@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dx11StateCache.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dx11StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC> RSManager;
 dx11StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC> DSSManager;
@@ -142,4 +142,4 @@ dx11StateCache< ID3DxxBlendState , D3D_BLEND_DESC >
     }
 }
 */
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

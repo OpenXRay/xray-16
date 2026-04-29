@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/UISequenceVideoItem.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dxUISequenceVideoItem : public IUISequenceVideoItem
 {
@@ -21,4 +21,4 @@ private:
     CTexture* m_texture;
     bool m_framegraph_mode;  // True when using framegraph (texture auto-updates)
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

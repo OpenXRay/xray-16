@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #if defined(MASTER_GOLD)
 #   define PIX_EVENT(Name) do { } while (false)
@@ -35,4 +35,4 @@ public:
 #   error No graphics API selected or enabled!
 #endif // USE_OGL
 #endif // MASTER_GOLD
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

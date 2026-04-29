@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_rain : public IBlender
 {
@@ -26,4 +26,4 @@ public:
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

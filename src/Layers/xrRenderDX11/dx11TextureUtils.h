@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // hack for dx9... That's it. I don't know if there's already DS64 format.
 // If true, then replace with another 4 chars
@@ -11,4 +11,4 @@ namespace dx11TextureUtils
 DXGI_FORMAT ConvertTextureFormat(D3DFORMAT dx9FMT);
 D3DFORMAT ConvertTextureFormat(DXGI_FORMAT dx11FMT);
 } // namespace dx11TextureUtils
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

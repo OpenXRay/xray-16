@@ -9,7 +9,7 @@
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #include "Layers/xrRenderDX11/ShaderResourceTraits.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //--------------------------------------------------------------------------------------------------------------
 SPass* CResourceManager::_CreatePass(const SPass& proto)
@@ -232,4 +232,4 @@ void CResourceManager::_DeleteInputSignature(const SInputSignature* pSignature)
     Msg("! ERROR: Failed to find input signature");
 #endif
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

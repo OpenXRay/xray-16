@@ -3,7 +3,7 @@
 
 #include "blender_light_direct_cascade.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_accum_direct_cascade::CBlender_accum_direct_cascade() { description.CLS = 0; }
 CBlender_accum_direct_cascade::~CBlender_accum_direct_cascade() {}
@@ -78,4 +78,4 @@ void CBlender_accum_direct_cascade::Compile(CBlender_Compile& C)
         break;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -4,7 +4,7 @@
 #include "Blender_detail_still.h"
 #include "uber_deffer.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Detail_Still::CBlender_Detail_Still()
 {
@@ -99,4 +99,4 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
     }
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

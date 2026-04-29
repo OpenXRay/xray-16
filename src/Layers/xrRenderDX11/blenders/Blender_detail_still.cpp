@@ -3,7 +3,7 @@
 
 #include "Blender_detail_still.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Detail_Still::CBlender_Detail_Still()
 {
@@ -122,4 +122,4 @@ void CBlender_Detail_Still::CompileProgrammable(CBlender_Compile& C) const
         break;
     } // switch (C.iElement)
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

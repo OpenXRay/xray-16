@@ -2,7 +2,7 @@
 
 extern ENGINE_API int ps_r__Supersample;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // Common
 extern ECORE_API u32 ps_r_sun_shafts; //=	0;
@@ -244,4 +244,4 @@ extern ECORE_API float ps_r_smoke_turbulence;
 
 extern void xrRender_initconsole();
 extern BOOL xrRender_test_hw();
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

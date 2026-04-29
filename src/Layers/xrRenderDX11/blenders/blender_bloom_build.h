@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_bloom_build : public IBlender
 {
@@ -39,4 +39,4 @@ public:
     virtual ~CBlender_postprocess_msaa();
 };
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

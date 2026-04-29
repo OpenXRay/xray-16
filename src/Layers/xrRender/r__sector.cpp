@@ -9,7 +9,7 @@
 #include "FBasicVisual.h"
 #include "xrEngine/IGame_Persistent.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -152,4 +152,4 @@ void CSector::setup(const level_sector_data_t& data, const xr_vector<CPortal*> &
         m_root = static_cast<dxRender_Visual*>(RImplementation.getVisual(data.root_id));
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

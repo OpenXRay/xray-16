@@ -8,7 +8,7 @@
 #include "Layers/xrRender/DetailFormat.h"
 #include "Layers/xrRender/DetailModel.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #ifdef _EDITOR
 //.	#include	"ESceneClassList.h"
@@ -687,4 +687,4 @@ public:
     CDetailManager();
     virtual ~CDetailManager();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -23,7 +23,7 @@
 
 extern ENGINE_API int ps_r4_use_pbr;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #ifdef USE_RENDERDOC
 RENDERDOC_API_1_0_0* g_renderdoc_api;
@@ -76,7 +76,7 @@ void D3DXRenderBase::Destroy()
     if (GEnv.Backend)
     {
         GEnv.Backend->Shutdown();
-        auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
+        auto& render = static_cast<xray::render::fg::CRender&>(*this);
         xr_delete(render.m_backend);
         GEnv.Backend = nullptr;
     }
@@ -190,7 +190,7 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
     }
 #endif
 
-    auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
+    auto& render = static_cast<xray::render::fg::CRender&>(*this);
     const bool enableValidation = !!strstr(Core.Params, "-d3ddebug");
 
     render.m_backend = FGRenderHost::CreateBackend(hWnd, dwWidth, dwHeight, enableValidation);
@@ -443,4 +443,4 @@ void D3DXRenderBase::ConvertLegacyAssetsToPBR()
     }
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

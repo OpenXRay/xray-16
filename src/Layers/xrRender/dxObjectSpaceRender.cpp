@@ -4,7 +4,7 @@
 
 #include "dxObjectSpaceRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dxObjectSpaceRender::dxObjectSpaceRender() { m_shDebug.create("debug" DELIMITER "wireframe", "$null"); }
 dxObjectSpaceRender::~dxObjectSpaceRender() { m_shDebug.destroy(); }
@@ -41,5 +41,5 @@ void dxObjectSpaceRender::dbgRender()
 }
 
 void dxObjectSpaceRender::SetShader() { RCache.set_Shader(m_shDebug); }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg
 #endif // DEBUG

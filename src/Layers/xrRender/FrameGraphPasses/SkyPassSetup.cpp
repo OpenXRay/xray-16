@@ -16,11 +16,11 @@
 #include "Layers/xrRender/dxEnvironmentRender.h"
 #include "xrEngine/Environment.h"
 
-namespace RENDER_NAMESPACE {
+namespace fg {
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // ═══════════════════════════════════════════════════════
 //  SKY GEOMETRY (Half-box for sky dome)
@@ -375,4 +375,4 @@ framegraph::VirtualResourceHandle setupSkyPass(
     return passData.colorOutput;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

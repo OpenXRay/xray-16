@@ -11,16 +11,16 @@
 
 using namespace DirectX;
 #elif defined(USE_OGL)
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void XRMatrixOrthoOffCenterLH(Fmatrix* pout, float l, float r, float b, float t, float zn, float zf);
 void XRMatrixInverse(Fmatrix* pout, float *pdeterminant, const Fmatrix& pm);
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg
 #else
 #   error No graphics API selected or enabled!
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 const float tweak_rain_COP_initial_offs = 1200.f;
 const float tweak_rain_ortho_xform_initial_offs = 1000.f; //. ?
@@ -362,4 +362,4 @@ void render_rain::flush()
     RImplementation.Target->draw_rain(cmd_list_imm, RainLight);
     RainLight.frame_render = Device.dwFrame;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

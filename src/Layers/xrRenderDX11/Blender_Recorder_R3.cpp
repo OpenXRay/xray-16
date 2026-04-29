@@ -7,7 +7,7 @@
 #include "Layers/xrRender/tss.h"
 #include "Layers/xrRender/FrameGraph/ShaderCache.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void fix_texture_name(pstr fn);
 
@@ -188,4 +188,4 @@ void CBlender_Compile::r_ComputePass(LPCSTR cs)
 {
     dest.cs = RImplementation.Resources->_CreateCS(cs);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -7,7 +7,7 @@
 
 #include <SDL.h>
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CHW
     : public pureAppActivate,
@@ -109,4 +109,4 @@ public:
 };
 
 extern ECORE_API CHW HW;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

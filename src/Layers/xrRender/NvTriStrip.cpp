@@ -4,7 +4,7 @@
 
 #pragma warning(disable : 4018)
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 ////////////////////////////////////////////////////////////////////////////////////////
 // private data
@@ -257,4 +257,4 @@ void RemapIndices(
 
     xr_free(indexCache);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

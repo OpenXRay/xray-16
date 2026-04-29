@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // Main blenders for level
 constexpr CLASS_ID B_DEFAULT        = make_clsid("LM      ");
@@ -33,4 +33,4 @@ constexpr CLASS_ID B_MODEL_EbB      = make_clsid("MODELEbB");
 // Editor
 constexpr CLASS_ID B_EDITOR_WIRE    = make_clsid("E_WIRE  ");
 constexpr CLASS_ID B_EDITOR_SEL     = make_clsid("E_SEL   ");
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

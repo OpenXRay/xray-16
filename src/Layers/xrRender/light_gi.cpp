@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Layers/xrRender/light.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void light::gi_generate()
 {
@@ -82,4 +82,4 @@ void light::gi_generate()
             light.E *= scale_E;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

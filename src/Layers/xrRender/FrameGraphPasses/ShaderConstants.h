@@ -14,12 +14,12 @@ extern ENGINE_API Fvector4 ps_dev_param_3;
 extern ENGINE_API Fvector4 ps_dev_param_4;
 extern ENGINE_API float psHUD_FOV;
 namespace xray::render {
-    namespace RENDER_NAMESPACE {
+    namespace fg {
         extern float r__dtex_range;  // Detail texture range (defined in TextureDescrManager.cpp)
     }
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // ══════════════════════════════════════════════════════════
 //  PBR TEXTURE SLOT ASSIGNMENTS (Forward+ Rendering)
@@ -269,4 +269,4 @@ inline StaticGlobals BuildStaticGlobals(float hdrIntensity = 2.0f) {
     return sg;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dx11State;
 
@@ -281,4 +281,4 @@ using HostBufferHandle      = void*;
 
 using VertexElement         = D3DVERTEXELEMENT9;
 using InputElementDesc      = D3D11_INPUT_ELEMENT_DESC;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

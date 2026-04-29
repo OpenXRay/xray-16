@@ -2,7 +2,7 @@
 
 #include "Layers/xrRender/du_cone.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CRenderTarget::accum_spot_geom_create()
 {
@@ -100,4 +100,4 @@ void CRenderTarget::accum_volumetric_geom_destroy()
     if (g_accum_volumetric_vb)
         g_accum_volumetric_vb.Release();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

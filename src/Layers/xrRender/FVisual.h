@@ -5,7 +5,7 @@
 
 #include "FBasicVisual.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class Fvisual : public dxRender_Visual, public IRender_Mesh
 {
@@ -21,4 +21,4 @@ public:
     Fvisual();
     virtual ~Fvisual();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

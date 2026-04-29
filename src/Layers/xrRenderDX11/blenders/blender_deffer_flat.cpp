@@ -4,7 +4,7 @@
 #include "Layers/xrRenderDX11/blenders/uber_deffer.h"
 #include "blender_deffer_flat.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_deffer_flat::CBlender_deffer_flat()
 {
@@ -132,4 +132,4 @@ void CBlender_deffer_flat::Compile(CBlender_Compile& C)
     }
 #endif
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

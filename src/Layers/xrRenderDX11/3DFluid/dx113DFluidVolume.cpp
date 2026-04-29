@@ -3,7 +3,7 @@
 
 #include "dx113DFluidManager.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dx113DFluidVolume::dx113DFluidVolume() {}
 dx113DFluidVolume::~dx113DFluidVolume() {}
@@ -197,4 +197,4 @@ void dx113DFluidVolume::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_
 
 void dx113DFluidVolume::Copy(dxRender_Visual* pFrom) { dxRender_Visual::Copy(pFrom); }
 void dx113DFluidVolume::Release() { dxRender_Visual::Release(); }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

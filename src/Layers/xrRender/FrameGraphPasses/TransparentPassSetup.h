@@ -16,7 +16,7 @@ namespace xray::render::framegraph {
     struct DefaultOutputLayout;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct TransparentPassConfig {
     nvrhi::IBuffer* megaVertexBuffer = nullptr;
@@ -68,4 +68,4 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     TransparentPassState& state
 );
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

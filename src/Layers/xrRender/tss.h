@@ -2,7 +2,7 @@
 
 #include "tss_def.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 enum XRDX11SAMPLERSTATETYPE
 {
@@ -94,4 +94,4 @@ public:
     void SetRS(u32 N, u32 V) { RS.Set(container, N, V); }
     SimulatorStates& GetContainer() { return container; }
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

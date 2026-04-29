@@ -2,7 +2,7 @@
 #include "dx113DFluidGrid.h"
 #include "Layers/xrRender/BufferUtils.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 struct VS_INPUT_FLUIDSIM_STRUCT
 {
@@ -309,4 +309,4 @@ void dx113DFluidGrid::DrawBoundaryLines(void)
     RCache.set_Geometry(m_GeomBoundaryLines);
     RCache.Render(D3DPT_TRIANGLELIST, 0, m_iNumVerticesBoundaryLines / 3);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -15,7 +15,7 @@
 namespace xray::render
 {
 #ifdef XR_PLATFORM_WINDOWS
-namespace render_r4
+namespace fg
 {
 XRRENDER_R4_API RendererModule* GetRendererModule();
 }

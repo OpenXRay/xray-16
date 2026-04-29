@@ -3,7 +3,7 @@
 #include "GPUStructuredBuffer.h"
 #include "BindlessTypes.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 class MaterialBuffer : public GPUStructuredBuffer<MaterialData> {
 public:
@@ -54,4 +54,4 @@ private:
     u32 m_maxDraws = 0;
 };
 
-} // namespace xray::render::RENDER_NAMESPACE::bindless
+} // namespace xray::render::fg::bindless

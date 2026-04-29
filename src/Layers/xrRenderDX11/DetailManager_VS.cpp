@@ -2,7 +2,7 @@
 #pragma hdrstop
 #include "DetailManager.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 extern int ps_r__detail_gpu;
 namespace detail_manager
@@ -458,4 +458,4 @@ void CDetailManager::GenerateGrassBlade(xr_vector<BladeVertex>& vertices, xr_vec
         size.x, size.y, size.z);
     Msg("! [Bezier Blade] Mesh generation complete!");
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

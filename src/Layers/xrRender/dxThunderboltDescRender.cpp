@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dxThunderboltDescRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void dxThunderboltDescRender::Copy(IThunderboltDescRender& _in) { *this = *((dxThunderboltDescRender*)&_in); }
 void dxThunderboltDescRender::CreateModel(LPCSTR m_name)
@@ -14,4 +14,4 @@ void dxThunderboltDescRender::CreateModel(LPCSTR m_name)
 }
 
 void dxThunderboltDescRender::DestroyModel() { RImplementation.model_Delete(l_model); }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

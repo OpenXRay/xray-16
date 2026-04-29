@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "occRasterizer.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 static occTri* currentTri = nullptr;
 static u32 dwPixels = 0;
@@ -431,4 +431,4 @@ u32 occRasterizer::rasterize(occTri* T)
     }
     return dwPixels;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

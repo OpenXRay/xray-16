@@ -14,7 +14,7 @@
 #endif
 #include "xrEngine/IFrameGraphRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 int psSkeletonUpdate = 32;
 Lock UCalc_Mutex
@@ -917,4 +917,4 @@ CSkeletonWallmark::~CSkeletonWallmark()
     }
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

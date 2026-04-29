@@ -8,12 +8,12 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
-namespace RENDER_NAMESPACE
+namespace fg
 {
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 using namespace framegraph;
 
 static void InitializeResources(fg::RenderDevice* device, MotionVectorPassState& state)

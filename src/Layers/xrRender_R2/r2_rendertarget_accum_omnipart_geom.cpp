@@ -2,7 +2,7 @@
 
 #include "Layers/xrRender/du_sphere_part.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CRenderTarget::accum_omnip_geom_create()
 {
@@ -37,4 +37,4 @@ void CRenderTarget::accum_omnip_geom_destroy()
     g_accum_omnip_ib.Release();
     g_accum_omnip_vb.Release();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

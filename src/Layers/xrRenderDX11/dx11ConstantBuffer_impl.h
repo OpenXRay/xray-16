@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 IC Fvector4* dx11ConstantBuffer::Access(u16 offset)
 {
@@ -196,4 +196,4 @@ IC void* dx11ConstantBuffer::AccessDirect(R_constant_load& L, size_t DataSize)
     else
         return 0;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

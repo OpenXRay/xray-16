@@ -10,7 +10,7 @@
 #include "xrCore/FMesh.hpp"
 #include "xrCDB/Intersect.hpp"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 shared_str s_bones_array_const;
 
@@ -666,4 +666,4 @@ void CSkeletonX::_FillVerticesSoft4W(const Fmatrix& view, CSkeletonWallmark& wm,
         }
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

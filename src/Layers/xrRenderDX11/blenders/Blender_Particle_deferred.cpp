@@ -5,7 +5,7 @@
 
 #define oBlendCount 6
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Particle::CBlender_Particle()
 {
@@ -162,4 +162,4 @@ void CBlender_Particle::Compile(CBlender_Compile& C)
         break;
     };
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

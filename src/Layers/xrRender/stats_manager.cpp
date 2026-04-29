@@ -7,7 +7,7 @@
 #include "stdafx.h"
 #include "stats_manager.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void stats_manager::increment_stats(u32 size, enum_stats_buffer_type type, _D3DPOOL location)
 {
@@ -249,4 +249,4 @@ u32 get_format_pixel_size(DXGI_FORMAT format)
         return 0;
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

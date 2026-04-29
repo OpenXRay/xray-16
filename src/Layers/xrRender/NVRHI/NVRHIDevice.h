@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE::nvrhi_wrapper
+namespace xray::render::fg::nvrhi_wrapper
 {
 
 class NVRHIDevice
@@ -32,4 +32,4 @@ private:
     NVRHIDevice& operator=(const NVRHIDevice&) = delete;
 };
 
-} // namespace xray::render::RENDER_NAMESPACE::nvrhi_wrapper
+} // namespace xray::render::fg::nvrhi_wrapper

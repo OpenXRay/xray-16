@@ -2,7 +2,7 @@
 
 #include "IRenderDetailModel.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class ECORE_API CDetail : public IRender_DetailModel
 {
@@ -21,4 +21,4 @@ public:
     virtual void transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, u32 iOffset, float du, float dv);
     virtual ~CDetail();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

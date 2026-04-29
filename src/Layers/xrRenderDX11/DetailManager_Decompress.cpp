@@ -21,7 +21,7 @@
 #include "utils/ETools/ETools.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //--------------------------------------------------- Decompression
 IC float Interpolate(float* base, u32 x, u32 y, u32 size)
@@ -875,4 +875,4 @@ void CDetailManager::ValidateSlotAABBs()
     }
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

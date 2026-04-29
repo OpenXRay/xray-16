@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 struct r_aabb_ssa
 {
@@ -19,4 +19,4 @@ public:
 
     void run();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

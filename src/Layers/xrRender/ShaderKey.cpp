@@ -5,7 +5,7 @@
 #include "FBasicVisual.h"
 #include "SH_Atomic.h"
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 
 bool ExtractShaderKey(dxRender_Visual* visual, ShaderKey& outKey) {
     if (!visual) {
@@ -86,4 +86,4 @@ bool ExtractShaderKeyFromPass(SPass* pass, ShaderKey& outKey) {
     return outKey.IsValid();
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

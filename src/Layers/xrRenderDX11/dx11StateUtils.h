@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace dx11StateUtils
 {
@@ -36,4 +36,4 @@ void ValidateState(D3D_DEPTH_STENCIL_DESC& desc);
 void ValidateState(D3D_BLEND_DESC& desc);
 void ValidateState(D3D_SAMPLER_DESC& desc);
 } // namespace dx11StateUtils
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

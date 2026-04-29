@@ -7,7 +7,7 @@
 #include "dx113DFluidObstacles.h"
 #include "dx113DFluidEmitters.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dx113DFluidManager FluidManager;
 
@@ -283,4 +283,4 @@ void dx113DFluidManager::UpdateProfiles()
 }
 
 #endif // !MASTER_GOLD
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -13,7 +13,7 @@
 #include "SH_Constant.h"
 #include "SH_RT.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 using sh_list = xr_vector<shared_str>;
 class CBlender_Compile;
@@ -173,4 +173,4 @@ enum SE_R1
 //  E[4] Can use for lightmap capturing.
 
 #pragma pack(pop)
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

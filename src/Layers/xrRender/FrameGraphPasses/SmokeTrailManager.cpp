@@ -5,7 +5,7 @@
 #include "SmokeTrailManager.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     extern float ps_r_smoke_max_emit_rate;
     extern float ps_r_smoke_point_lifetime;
     extern float ps_r_smoke_max_width;
@@ -15,7 +15,7 @@ namespace xray::render::RENDER_NAMESPACE {
     extern int   ps_r_smoke_trail_enabled;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 bool SmokeTrailManager::Initialize(fg::RenderDevice* device)
 {
@@ -108,7 +108,7 @@ void SmokeTrailManager::Shutdown()
 
 void SmokeTrailManager::Update(float dt, const Fvector& muzzlePos, const Fvector& muzzleDir)
 {
-    using namespace xray::render::RENDER_NAMESPACE;
+    using namespace xray::render::fg;
 
     if (!m_initialized || !ps_r_smoke_trail_enabled)
         return;
@@ -172,4 +172,4 @@ void SmokeTrailManager::Update(float dt, const Fvector& muzzlePos, const Fvector
     m_compactParams.pad1           = 0.f;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

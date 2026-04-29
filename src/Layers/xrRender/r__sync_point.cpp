@@ -3,7 +3,7 @@
 
 #include "QueryHelper.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #ifdef USE_OGL
 // Assert this just in case
@@ -59,4 +59,4 @@ void R_sync_point::End() {}
 #else
 #   error No graphics API selected or enabled!
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

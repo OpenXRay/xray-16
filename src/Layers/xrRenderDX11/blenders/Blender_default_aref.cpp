@@ -3,7 +3,7 @@
 
 #include "Blender_default_aref.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_default_aref::CBlender_default_aref()
 {
@@ -258,4 +258,4 @@ void CBlender_default_aref::CompileProgrammable(CBlender_Compile& C) const
         break;
     } // switch (C.iElement)
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

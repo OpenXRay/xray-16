@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dx11HDAOCSBlender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CBlender_CS_HDAO::Compile(CBlender_Compile& C)
 {
@@ -38,4 +38,4 @@ void CBlender_CS_HDAO_MSAA::Compile(CBlender_Compile& C)
         break;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

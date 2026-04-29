@@ -10,7 +10,7 @@ using namespace DirectX;
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/matrix_access.hpp"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 inline void XRVec3TransformCoordArray(glm::vec3* out, const glm::vec3* in, const glm::mat4& matrix, unsigned int elements)
 {
@@ -34,7 +34,7 @@ inline void XRMatrixInverse(Fmatrix* pout, float* pdeterminant, const Fmatrix& p
     glm::mat4 out = glm::inverse(glm::make_mat4x4(&pm.m[0][0]));
     *pout = *(Fmatrix*)glm::value_ptr(out);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg
 #endif
 
 #define DW_AS_FLT(DW) (*(float*)&(DW))
@@ -43,7 +43,7 @@ inline void XRMatrixInverse(Fmatrix* pout, float* pdeterminant, const Fmatrix& p
 #define ALMOST_ZERO(F) ((FLT_AS_DW(F) & 0x7f800000L) == 0)
 #define IS_SPECIAL(F) ((FLT_AS_DW(F) & 0x7f800000L) == 0x7f800000L)
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 const u32 LIGHT_CUBOIDSIDEPOLYS_COUNT = 4;
 const u32 LIGHT_CUBOIDVERTICES_COUNT = 2 * LIGHT_CUBOIDSIDEPOLYS_COUNT;
@@ -1034,4 +1034,4 @@ public:
             light_cuboid_polys[i].plane.d -= translate.dotproduct(light_cuboid_polys[i].plane.n);
     }
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

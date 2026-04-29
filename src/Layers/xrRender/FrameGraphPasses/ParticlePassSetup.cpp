@@ -25,13 +25,13 @@
 
 extern ENGINE_API float psHUD_FOV;
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 using namespace framegraph;
 using namespace bindless;
-using RENDER_NAMESPACE::PS::CParticleEffect;
-using RENDER_NAMESPACE::PS::CParticleGroup;
-using RENDER_NAMESPACE::PS::CPEDef;
+using fg::PS::CParticleEffect;
+using fg::PS::CParticleGroup;
+using fg::PS::CPEDef;
 
 static constexpr u32 MAX_GPU_PARTICLES = 65536;
 
@@ -872,4 +872,4 @@ ParticlePassOutput setupParticlePass(
     return output;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

@@ -8,7 +8,7 @@
 #include "Include/xrAPI/xrAPI.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CResourceManager::reset_begin()
 {
@@ -126,4 +126,4 @@ void CResourceManager::Dump(bool bBrief)
     Msg("* RM_Dump: v_elements: %d", v_elements.size());
     Msg("* RM_Dump: v_shaders : %d", v_shaders.size());
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

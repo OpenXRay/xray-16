@@ -4,7 +4,7 @@
 #include "Blender_Model_EbB.h"
 #include "uber_deffer.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Model_EbB::CBlender_Model_EbB()
 {
@@ -194,4 +194,4 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
     }
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/RenderDetailModel.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////////
 // definition (Detail Model)
@@ -41,4 +41,4 @@ public:
     virtual void transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, u32 iOffset, float du, float dv) = 0;
     virtual ~IRender_DetailModel(){};
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

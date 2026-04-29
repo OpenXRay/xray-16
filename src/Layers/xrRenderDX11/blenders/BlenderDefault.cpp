@@ -8,7 +8,7 @@
 #error "The blender can't be used in this renderer generation"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_default::CBlender_default()
 {
@@ -250,4 +250,4 @@ void CBlender_default::CompileProgrammable(CBlender_Compile& C) const
         break;
     } // switch (C.iElement)
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

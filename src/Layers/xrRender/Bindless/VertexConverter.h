@@ -6,7 +6,7 @@
 #include "UnifiedVertex.h"
 #include "Common/OGF_GContainer_Vertices.hpp"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 // ═══════════════════════════════════════════════════════════════════
 //  VERTEX CONVERTER
@@ -91,4 +91,4 @@ private:
     static constexpr u32 DEFAULT_NORMAL = 0xFF808080;  // +Z normal
 };
 
-} // namespace xray::render::RENDER_NAMESPACE::bindless
+} // namespace xray::render::fg::bindless

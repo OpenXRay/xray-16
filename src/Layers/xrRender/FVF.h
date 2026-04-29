@@ -8,7 +8,7 @@
 #   error No graphics API selected or enabled!
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace FVF
 {
@@ -205,4 +205,4 @@ struct TL4uv
 const u32 F_TL4uv = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX4;
 #pragma pack(pop)
 } // namespace FVF
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

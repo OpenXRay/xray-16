@@ -5,7 +5,7 @@
 #include "FVisual.h"
 #include "Layers/xrRender/BufferUtils.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -231,4 +231,4 @@ void Fvisual::Copy(dxRender_Visual* pSrc)
 
     PCOPY(m_fast);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

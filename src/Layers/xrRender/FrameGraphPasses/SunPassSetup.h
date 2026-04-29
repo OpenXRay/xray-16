@@ -17,7 +17,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // ═══════════════════════════════════════════════════════
 //  SUN PASS (Sun disc rendering)
@@ -64,4 +64,4 @@ framegraph::VirtualResourceHandle setupSunPass(
 void InitializeSunPass(fg::RenderDevice* device, SunPassState& state);
 void ShutdownSunPass(SunPassState& state);
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

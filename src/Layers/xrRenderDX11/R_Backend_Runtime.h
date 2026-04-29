@@ -14,7 +14,7 @@
 #include "Layers/xrRenderGL/glState.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 IC void R_xforms::set_c_w(R_constant* C)
 {
@@ -140,4 +140,4 @@ IC void CBackend::set_Pass(SPass* P)
 
 ICF void CBackend::set_Element(ShaderElement* S, u32 pass) { set_Pass(S->passes[pass]); }
 ICF void CBackend::set_Shader(Shader* S, u32 pass) { set_Element(S->E[0], pass); }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

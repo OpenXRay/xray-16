@@ -5,7 +5,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 template<typename T>
 bool GPUStructuredBuffer<T>::Initialize(fg::RenderDevice* device, const char* debugName, u32 maxElements)
@@ -78,4 +78,4 @@ template class GPUStructuredBuffer<MaterialData>;
 template class GPUStructuredBuffer<TerrainMaterialData>;
 template class GPUStructuredBuffer<VariantTextureData>;
 
-} // namespace xray::render::RENDER_NAMESPACE::bindless
+} // namespace xray::render::fg::bindless

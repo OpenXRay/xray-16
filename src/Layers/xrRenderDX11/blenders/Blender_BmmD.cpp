@@ -3,7 +3,7 @@
 
 #include "Blender_BmmD.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_BmmD::CBlender_BmmD()
 {
@@ -173,4 +173,4 @@ void CBlender_BmmD::CompileProgrammable(CBlender_Compile& C) const
         break;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -20,7 +20,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // ═══════════════════════════════════════════════════════
 //  FORWARD COLOR PASS (Phase 1: Single-RT Forward Rendering)
@@ -164,4 +164,4 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     ForwardColorPassState* state = nullptr
 );
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

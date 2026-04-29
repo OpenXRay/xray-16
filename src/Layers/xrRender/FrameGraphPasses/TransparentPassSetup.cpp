@@ -16,7 +16,7 @@
 #include "PassCommon.h"
 #include "Layers/xrRender/ClusteredLightManager.h"
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, TransparentPassState& state)
 {
@@ -167,7 +167,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             if (!data.passState->initialized || !data.passState->pipeline)
                 return;
 
-            using namespace RENDER_NAMESPACE::bindless;
+            using namespace fg::bindless;
             auto& matBuffer = MaterialBuffer::Instance();
 
             auto lightingCB = cache.GetOrCreateVolatileCB("TransparentPass", "LightingCB", sizeof(LightingConstants), data.device);
@@ -259,4 +259,4 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     return outputs;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

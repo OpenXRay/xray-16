@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 struct VS_INPUT_FLUIDSIM_STRUCT;
 
@@ -48,4 +48,4 @@ private:
     int m_iNumVerticesBoundarySlices;
     int m_iNumVerticesBoundaryLines;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

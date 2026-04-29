@@ -4,7 +4,7 @@
 #include "../xrRenderGL/glState.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class SimulatorStates
 {
@@ -88,4 +88,4 @@ public:
         bool SamplerUsed[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT], int iBaseSamplerIndex) const;
 #endif
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

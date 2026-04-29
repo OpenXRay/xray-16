@@ -6,12 +6,12 @@
 #include "Layers/xrRender/Bindless/BindlessTypes.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class CRender;
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE::decals {
+namespace xray::render::fg::decals {
 
 void fgWallMarkArray::Copy(IWallMarkArray& _in)
 {
@@ -92,4 +92,4 @@ u32 fgWallMarkArray::GenerateBindlessMaterialID(shared_str* outTextureName)
     return m_materialIDs[idx];
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::decals
+} // namespace xray::render::fg::decals

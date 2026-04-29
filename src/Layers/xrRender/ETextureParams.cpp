@@ -8,7 +8,7 @@
 #include "xrServerEntities/PropertiesListHelper.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 const xr_token tparam_token[] = {{"Advanced", STextureParams::kMIPFilterAdvanced},
 
@@ -452,4 +452,4 @@ u32 STextureParams::MemoryUsage(LPCSTR base_name)
     return mem_usage;
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/WallMarkArray.h"
 
-namespace xray::render::RENDER_NAMESPACE::decals {
+namespace xray::render::fg::decals {
 
 class fgWallMarkArray : public IWallMarkArray
 {
@@ -23,4 +23,4 @@ private:
     xr_vector<shared_str> m_textureNames;
 };
 
-} // namespace xray::render::RENDER_NAMESPACE::decals
+} // namespace xray::render::fg::decals

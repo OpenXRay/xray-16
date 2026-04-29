@@ -3,7 +3,7 @@
 // TODO: Implement NVRHI-based screenshot functionality
 // This replaces the legacy D3D11 screenshot code
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nullptr*/)
@@ -12,4 +12,4 @@ void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nul
     Msg("! Screenshot not yet implemented for FrameGraph renderer");
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

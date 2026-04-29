@@ -8,7 +8,7 @@
 
 namespace xray::profiler { class GPUProfiler; }
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 class FGDetailManager
@@ -360,4 +360,4 @@ private:
     void BuildDetailModelGPUData();
 };
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

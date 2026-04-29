@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CRenderTarget::create_minmax_SM(CBackend& cmd_list)
 {
@@ -33,4 +33,4 @@ void CRenderTarget::create_minmax_SM(CBackend& cmd_list)
 
     cmd_list.set_ColorWriteEnable();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

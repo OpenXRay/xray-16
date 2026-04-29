@@ -5,7 +5,7 @@
 
 #include "xrCore/xrCore.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 // ═══════════════════════════════════════════════════════
 //  CONFIGURATION
@@ -119,4 +119,4 @@ struct alignas(16) TerrainMaterialData {
 };
 static_assert(sizeof(TerrainMaterialData) == 64, "TerrainMaterialData must be 64 bytes for GPU alignment");
 
-} // namespace xray::render::RENDER_NAMESPACE::bindless
+} // namespace xray::render::fg::bindless

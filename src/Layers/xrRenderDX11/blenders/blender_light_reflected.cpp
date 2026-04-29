@@ -3,7 +3,7 @@
 
 #include "blender_light_reflected.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_accum_reflected::CBlender_accum_reflected() { description.CLS = 0; }
 CBlender_accum_reflected::~CBlender_accum_reflected() {}
@@ -79,4 +79,4 @@ void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
     RImplementation.m_MSAASample = -1;
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ColorMapManager.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 ColorMapManager::ColorMapManager()
 {
@@ -69,4 +69,4 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
 #endif
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

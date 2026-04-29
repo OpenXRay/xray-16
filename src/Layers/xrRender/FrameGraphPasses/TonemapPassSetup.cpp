@@ -11,12 +11,12 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class CRender;
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state) {
     if (state.initialized || !device) return;
@@ -184,4 +184,4 @@ framegraph::VirtualResourceHandle setupTonemapPass(
     return passData.ldrOutput;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

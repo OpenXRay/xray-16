@@ -5,7 +5,7 @@
 #include "dxThunderboltDescRender.h"
 #include "dxLensFlareRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dxThunderboltRender::dxThunderboltRender()
 {
@@ -111,4 +111,4 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
 #endif
     RCache.Render(D3DPT_TRIANGLELIST, VS_Offset + 4, 0, 4, 0, 2);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

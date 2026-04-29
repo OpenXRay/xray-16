@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------------------------------------
 // Gamma control
 //-----------------------------------------------------------------------------------------------------------
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CGammaControl
 {
@@ -41,4 +41,4 @@ private:
     void GenLUT(const DXGI_GAMMA_CONTROL_CAPABILITIES& GC, DXGI_GAMMA_CONTROL& G) const;
 #endif
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

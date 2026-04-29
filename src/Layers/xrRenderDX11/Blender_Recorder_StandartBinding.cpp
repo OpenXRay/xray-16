@@ -11,7 +11,7 @@
 // Detail Manager debug
 extern ENGINE_API int dm_debug_trails;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // matrices
 #define BIND_DECLARE(xf)\
@@ -463,4 +463,4 @@ void CBlender_Compile::SetMapping()
     r_Constant("dm_debug_trails", &dm_debug_trails_binder);
 
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

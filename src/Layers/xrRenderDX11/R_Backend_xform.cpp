@@ -3,7 +3,7 @@
 
 #include "R_Backend_xform.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void R_xforms::set_W(const Fmatrix& m)
 {
@@ -88,4 +88,4 @@ R_xforms::R_xforms(CBackend& cmd_list_in)
     m_wvp.identity();
     m_bInvWValid = true;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

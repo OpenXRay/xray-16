@@ -465,7 +465,6 @@ target_compile_definitions(xrRenderPC_R4
     XRRENDER_R4_EXPORTS
     USE_DX11
     USE_NVRHI_IMGUI
-    RENDER_NAMESPACE=render_r4
 )
 
 set_target_properties(xrRenderPC_R4 PROPERTIES

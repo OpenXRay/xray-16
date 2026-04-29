@@ -3,7 +3,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "xrEngine/IRenderBackend.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 VariantTextureBuffer& VariantTextureBuffer::Instance()
 {
@@ -36,4 +36,4 @@ void VariantTextureBuffer::Initialize(fg::RenderDevice* device)
         MAX_MATERIALS, (MAX_MATERIALS * sizeof(VariantTextureData)) / 1024);
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::bindless
+} // namespace xray::render::fg::bindless

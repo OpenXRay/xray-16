@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // refs
 class dxRender_Visual;
@@ -79,4 +79,4 @@ public:
     void RenderSingle(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, float m_fLOD);
 #endif
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

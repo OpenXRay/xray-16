@@ -5,7 +5,7 @@
 #include "dx113DFluidData.h"
 #include "dx113DFluidGrid.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dx113DFluidEmitters::dx113DFluidEmitters(int gridWidth, int gridHeight, int gridDepth, dx113DFluidGrid* pGrid)
     : m_pGrid(pGrid)
@@ -158,4 +158,4 @@ void dx113DFluidEmitters::ApplyVelocity(const CEmitter& Emitter)
 
     m_pGrid->DrawSlices();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

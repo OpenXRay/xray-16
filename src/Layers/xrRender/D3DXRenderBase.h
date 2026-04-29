@@ -7,7 +7,7 @@
 #include "r__sector.h"
 #include "Layers/xrRenderDX11/xr_effgamma.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // Common part of interface implementation for all D3D renderers
 class D3DXRenderBase : public IRender, public pureFrame
@@ -177,4 +177,4 @@ private:
 protected:
     bool b_loaded{};
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

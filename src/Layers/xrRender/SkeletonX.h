@@ -10,7 +10,7 @@
 
 struct SEnumVerticesCallback;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CKinematics;
 class Fvisual;
@@ -150,4 +150,4 @@ BOOL pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result&
     }
     return FALSE;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

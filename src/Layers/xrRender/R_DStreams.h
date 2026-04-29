@@ -2,7 +2,7 @@
 
 #include "BufferUtils.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class ECORE_API _VertexStream
 {
@@ -79,4 +79,4 @@ private:
         mDiscardID = 0;
     }
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

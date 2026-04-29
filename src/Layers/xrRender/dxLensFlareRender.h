@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/LensFlareRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dxFlareRender : public IFlareRender
 {
@@ -37,4 +37,4 @@ public:
 private:
     ref_geom hGeom;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

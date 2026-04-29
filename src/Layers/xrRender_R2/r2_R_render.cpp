@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include "r2.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 void CRender::RenderMenu()
@@ -24,4 +24,4 @@ void CRender::render_forward()
 void CRender::BeforeWorldRender() {}
 void CRender::AfterWorldRender() {}
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

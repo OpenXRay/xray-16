@@ -2,7 +2,7 @@
 
 #include "KinematicAnimatedDefs.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace animation
 {
@@ -49,4 +49,4 @@ public:
     }
 };
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

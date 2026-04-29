@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // Base targets
 #define     r2_RT_base          "$user$base_"
@@ -127,4 +127,4 @@ IC float u_diffuse2s(Fvector3& c)
 {
     return u_diffuse2s(c.x, c.y, c.z);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

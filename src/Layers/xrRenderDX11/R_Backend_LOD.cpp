@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "R_Backend_LOD.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 R_LOD::R_LOD(CBackend& cmd_list_in) : cmd_list(cmd_list_in)
 {

@@ -10,7 +10,7 @@
 #define DU_DRAW_DP RCache.dbg_DP
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 struct SPrimitiveBuffer
 {
@@ -196,4 +196,4 @@ public:
 };
 extern ECORE_API CDrawUtilities DUImpl;
 //----------------------------------------------------
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

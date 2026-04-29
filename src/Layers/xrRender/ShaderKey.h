@@ -5,12 +5,12 @@
 #include <string>
 
 // Forward declarations
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     struct SPass;
     class dxRender_Visual;
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 
 // ═══════════════════════════════════════════════════
 //  SHADER KEY
@@ -146,4 +146,4 @@ bool ExtractShaderKey(dxRender_Visual* visual, ShaderKey& outKey);
 // Returns true if successful, false if pass is invalid
 bool ExtractShaderKeyFromPass(SPass* pass, ShaderKey& outKey);
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

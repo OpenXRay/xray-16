@@ -20,12 +20,12 @@ extern ENGINE_API float ps_r3_grass_blade_width;
 extern ENGINE_API float ps_r3_grass_blade_height;
 extern ENGINE_API float ps_r3_grass_wind_displacement;
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class CRender;
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 
 extern int ps_r__detail_gpu;
 

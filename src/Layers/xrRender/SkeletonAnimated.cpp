@@ -14,7 +14,7 @@
 
 extern ENGINE_API shared_str current_player_hud_sect;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 extern int psSkeletonUpdate;
 using namespace animation;
@@ -1053,4 +1053,4 @@ MotionID CKinematicsAnimated::ID_Motion(LPCSTR N, u16 slot)
     return motion_ID;
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

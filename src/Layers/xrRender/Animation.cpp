@@ -2,7 +2,7 @@
 
 #include "Animation.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 using namespace animation;
 
@@ -15,4 +15,4 @@ void channels::set_factor(u16 channel, float factor)
     VERIFY(channel < max);
     factors[channel] = factor;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

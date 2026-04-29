@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 u32 GetFVFVertexSize(u32 FVF);
 u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream);
@@ -258,4 +258,4 @@ private:
     size_t m_MappedSize{};
     bool m_MappedFlush{};
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

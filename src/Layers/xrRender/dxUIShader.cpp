@@ -9,7 +9,7 @@
 
 using namespace xray::render::resources;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void dxUIShader::Copy(IUIShader& _in) { *this = *((dxUIShader*)&_in); }
 
@@ -124,4 +124,4 @@ bool dxUIShader::GetBaseTextureResolution(Fvector2& res)
     res = { float(desc.width), float(desc.height) };
     return true;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

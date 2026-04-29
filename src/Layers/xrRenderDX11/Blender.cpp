@@ -10,7 +10,7 @@
 
 #include "Blender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CBlender_DESC::Setup(LPCSTR N)
 {
@@ -95,4 +95,4 @@ void IBlender::Destroy(IBlender*& B)
 {
     RImplementation.blender_destroy(B);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

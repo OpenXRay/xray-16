@@ -11,7 +11,7 @@ namespace slang {
 
 namespace xray::render {
 
-namespace RENDER_NAMESPACE {
+namespace fg {
     // Forward declarations (renderer-specific)
     class R_constant_table;
     class CBackend;
@@ -61,8 +61,8 @@ public:
     /// <param name="backend">X-Ray render backend (for calling setup())</param>
     void PopulateBuffer(
         void* bufferData,
-        const RENDER_NAMESPACE::R_constant_table* constantTable,
-        RENDER_NAMESPACE::CBackend& backend);
+        const fg::R_constant_table* constantTable,
+        fg::CBackend& backend);
 
     /// <summary>
     /// Check if this mapper has a valid layout

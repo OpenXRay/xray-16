@@ -9,12 +9,12 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class CRender;
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 using namespace framegraph;
 
@@ -159,4 +159,4 @@ VirtualResourceHandle setupDistortionApplyPass(
     return passData.output;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

@@ -47,7 +47,7 @@
 
 namespace xray::render {
 
-using namespace xray::render::RENDER_NAMESPACE;  // For Shader types (STextureList, etc.)
+using namespace xray::render::fg;  // For Shader types (STextureList, etc.)
 
 
 // ══════════════════════════════════════════════════════════
@@ -1621,7 +1621,7 @@ float MaterialCache::GetDetailScale(const shared_str& textureName)
 
 u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
 {
-    using namespace RENDER_NAMESPACE::bindless;
+    using namespace fg::bindless;
 
     if (!matPSO)
         return UINT32_MAX;
@@ -1655,7 +1655,7 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
     // Extract material properties from shader/pass
     if (matPSO->pass) {
         // Check texture list for material flags
-        RENDER_NAMESPACE::STextureList* texList = matPSO->pass->T._get();
+        fg::STextureList* texList = matPSO->pass->T._get();
         if (texList && !texList->empty()) {
             // Check for normal map (usually slot 1 or named with _bump)
             for (size_t i = 0; i < texList->size(); i++) {
@@ -1707,7 +1707,7 @@ bool MaterialCache::IsTerrainMaterial(dxRender_Visual* visual)
 
 u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
 {
-    using namespace RENDER_NAMESPACE::bindless;
+    using namespace fg::bindless;
 
     if (!visual)
         return UINT32_MAX;
@@ -1792,7 +1792,7 @@ u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
 
 void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
 {
-    using namespace RENDER_NAMESPACE::bindless;
+    using namespace fg::bindless;
 
     if (m_pendingTerrainMaterials.empty())
         return;
@@ -2028,7 +2028,7 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
 
 u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
 {
-    using namespace RENDER_NAMESPACE::bindless;
+    using namespace fg::bindless;
 
     if (!visual)
         return UINT32_MAX;
@@ -2103,7 +2103,7 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
 // Particles have their texture name in CPEDef, not in visual
 u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
 {
-    using namespace RENDER_NAMESPACE::bindless;
+    using namespace fg::bindless;
 
     if (!textureName.size() || !textureName[0])
         return UINT32_MAX;
@@ -2156,7 +2156,7 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
 
 void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
 {
-    using namespace RENDER_NAMESPACE::bindless;
+    using namespace fg::bindless;
 
     if (m_pendingMaterials.empty()) {
         return;

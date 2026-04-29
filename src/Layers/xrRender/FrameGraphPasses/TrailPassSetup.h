@@ -19,7 +19,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // ═══════════════════════════════════════════════════════
 //  Trail-specific enums (Stride ShapeBuilderTrail)
@@ -170,4 +170,4 @@ TrailPassOutput setupTrailPass(
     TrailPassState* state = nullptr
 );
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

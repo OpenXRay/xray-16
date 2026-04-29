@@ -28,7 +28,7 @@ class CLensFlareDescriptor;
 
 namespace xray::render
 {
-namespace render_r4
+namespace fg
 {
 class dxEnvironmentRender;
 }
@@ -238,7 +238,7 @@ public:
 
 class ENGINE_API CEnvironment : public xray::editor::ide_tool
 {
-    friend class xray::render::render_r4::dxEnvironmentRender;
+    friend class xray::render::fg::dxEnvironmentRender;
     friend class xray::render::render_gl::dxEnvironmentRender;
 
     struct str_pred

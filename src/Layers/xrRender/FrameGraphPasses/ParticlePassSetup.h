@@ -8,7 +8,7 @@
 #include "PassVertexFormats.h"
 #include "ParticleGPUCullingManager.h"
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class dxRender_Visual;
     namespace PS {
         class CParticleEffect;
@@ -28,7 +28,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 enum class ParticleShaderVariant : u8 {
     Standard,
@@ -49,7 +49,7 @@ enum ParticleBlendMode : u8 {
 };
 
 struct ParticleBatch {
-    RENDER_NAMESPACE::dxRender_Visual* visual = nullptr;
+    fg::dxRender_Visual* visual = nullptr;
     Fmatrix worldMatrix;
     IRenderable* renderable = nullptr;
     bool isHUDMode = false;
@@ -134,4 +134,4 @@ ParticlePassOutput setupParticlePass(
     ParticlePassState* state = nullptr
 );
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

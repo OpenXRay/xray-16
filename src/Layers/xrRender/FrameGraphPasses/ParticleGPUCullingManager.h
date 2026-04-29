@@ -13,7 +13,7 @@ namespace xray::render {
     }
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // Constant buffer for culling parameters
 struct ParticleCullParams {
@@ -120,4 +120,4 @@ private:
     nvrhi::BindingSetHandle m_billboardBindingSet;
 };
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

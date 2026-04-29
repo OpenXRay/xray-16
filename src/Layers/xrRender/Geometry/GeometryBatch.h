@@ -8,13 +8,13 @@
 #include "Layers/xrRender/GPUCullingManager.h"  // For MeshAllocation
 #include "Layers/xrRender/Materials/MaterialSystem.h"  // For D3D12 material info
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class dxRender_Visual;  // Forward declaration
 }
 
 namespace xray::render {
 
-using RENDER_NAMESPACE::dxRender_Visual;
+using fg::dxRender_Visual;
 
 struct MaterialPSO;  // Forward declaration
 
@@ -106,7 +106,7 @@ struct GeometryBatch {
     // ═══════════════════════════════════════════════════
     // Contains offsets into the unified mega vertex/index buffers
     // Set during ProcessVisualGeometry using pool IDs from mesh
-    RENDER_NAMESPACE::MeshAllocation megaBufferAlloc;
+    fg::MeshAllocation megaBufferAlloc;
 
     // ═══════════════════════════════════════════════════
     //  SHADER FLAG HELPERS

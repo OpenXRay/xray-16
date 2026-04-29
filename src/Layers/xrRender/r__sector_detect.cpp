@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 IRender_Sector::sector_id_t R_dsgraph_structure::detect_sector(const Fvector& P)
 {
@@ -66,4 +66,4 @@ IRender_Sector::sector_id_t R_dsgraph_structure::detect_sector(const Fvector& P,
     CDB::TRI* pTri = g_pGameLevel->ObjectSpace.GetStaticTris() + ID;
     return static_cast<IRender_Sector::sector_id_t>(pTri->sector);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

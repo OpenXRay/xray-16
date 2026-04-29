@@ -10,7 +10,7 @@
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 constexpr u32 CULL_THREAD_GROUP_SIZE = 64;
 constexpr u32 BILLBOARD_THREAD_GROUP_SIZE = 64;
@@ -400,4 +400,4 @@ void ParticleGPUCullingManager::DispatchBillboardGeneration(
 
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

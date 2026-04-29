@@ -19,7 +19,7 @@ namespace xray::render::framegraph {
     struct DefaultOutputLayout;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // Persistent pass state — compute pipelines + dedicated draw pipeline
 struct SmokeTrailPassState
@@ -56,4 +56,4 @@ framegraph::DefaultOutputLayout setupSmokeTrailPass(
     SmokeTrailPassState&                 state,
     nvrhi::ITexture*                     perlin4dVolume = nullptr);
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

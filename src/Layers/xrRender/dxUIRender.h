@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/UIRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dxUIRender : public IUIRender
 {
@@ -56,4 +56,4 @@ private:
 };
 
 extern dxUIRender UIRenderImpl;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

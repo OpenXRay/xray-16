@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dxUISequenceVideoItem.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dxUISequenceVideoItem::dxUISequenceVideoItem()
     : m_texture(nullptr)
@@ -55,4 +55,4 @@ void dxUISequenceVideoItem::video_Stop()
     // With framegraph, we don't stop videos (they auto-update)
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

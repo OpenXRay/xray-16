@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace sun
 {
@@ -23,4 +23,4 @@ struct cascade
 };
 
 } // namespace sun
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

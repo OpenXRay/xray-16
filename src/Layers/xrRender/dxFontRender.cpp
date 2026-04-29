@@ -11,7 +11,7 @@
 extern ENGINE_API bool g_bRendering;
 extern ENGINE_API Fvector2 g_current_font_scale;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dxFontRender::~dxFontRender()
 {
@@ -262,4 +262,4 @@ inline void dxFontRender::ImprintChar(Fvector l, const CGameFont& owner, FVF::TL
             X += owner.fXStep;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

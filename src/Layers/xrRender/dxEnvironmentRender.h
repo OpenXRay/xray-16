@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/EnvironmentRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dxEnvironmentRender;
 
@@ -67,4 +67,4 @@ private:
     u32 tonemap_tstage_2sky{ u32(-1) };
     u32 tonemap_tstage_clouds{ u32(-1) };
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

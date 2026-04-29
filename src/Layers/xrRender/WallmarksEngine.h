@@ -5,7 +5,7 @@
 #include "xrCore/intrusive_ptr.h"
 #include "xrEngine/Render.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace WallmarksEngine
 {
@@ -77,4 +77,4 @@ public:
 
     void clear();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

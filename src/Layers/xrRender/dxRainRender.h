@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/RainRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dxRainRender : public IRainRender
 {
@@ -30,4 +30,4 @@ private:
     IRender_DetailModel* DM_Drop;
     ref_geom hGeom_Drops;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/RenderVisual.h" //--#SM+#--
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class ECORE_API R_hemi
 {
@@ -29,4 +29,4 @@ public:
 
     CBackend& cmd_list;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

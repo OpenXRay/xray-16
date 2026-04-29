@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_accum_direct_cascade : public IBlender
 {
@@ -13,4 +13,4 @@ public:
     CBlender_accum_direct_cascade();
     virtual ~CBlender_accum_direct_cascade();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

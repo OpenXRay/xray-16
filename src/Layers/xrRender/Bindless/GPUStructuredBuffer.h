@@ -9,7 +9,7 @@ namespace xray::render {
     }
 }
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 template<typename T>
 class GPUStructuredBuffer {
@@ -51,4 +51,4 @@ protected:
     u32 m_dirtyRangeEnd = 0;
 };
 
-} // namespace xray::render::RENDER_NAMESPACE::bindless
+} // namespace xray::render::fg::bindless

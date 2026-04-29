@@ -11,11 +11,11 @@ namespace fg {
 }
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 class CKinematics;
 }
 
-namespace xray::render::RENDER_NAMESPACE::decals {
+namespace xray::render::fg::decals {
 
 constexpr u32 MAX_DECALS = 4096;
 constexpr u32 CUBE_INDEX_COUNT = 36;
@@ -100,4 +100,4 @@ private:
     Lock m_lock;
 };
 
-} // namespace xray::render::RENDER_NAMESPACE::decals
+} // namespace xray::render::fg::decals

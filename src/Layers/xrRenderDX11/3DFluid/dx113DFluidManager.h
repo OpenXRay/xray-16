@@ -2,7 +2,7 @@
 
 #include "dx113DFluidRenderer.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dx113DFluidData;
 class dx113DFluidGrid;
@@ -145,4 +145,4 @@ private:
 };
 
 extern dx113DFluidManager FluidManager;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

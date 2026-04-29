@@ -4,7 +4,7 @@
 #include "Blender_Detail_GPU.h"
 #include "uber_deffer.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Detail_GPU::CBlender_Detail_GPU()
 {
@@ -64,4 +64,4 @@ void CBlender_Detail_GPU::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

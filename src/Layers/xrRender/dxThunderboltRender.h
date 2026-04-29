@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/ThunderboltRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dxThunderboltRender : public IThunderboltRender
 {
@@ -18,4 +18,4 @@ private:
     ref_geom hGeom_model;
     ref_geom hGeom_gradient;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -24,7 +24,7 @@
 #include "Layers/xrRenderDX11/blenders/Blender_Screen_SET.h"
 #include "Layers/xrRenderDX11/blenders/Blender_Particle.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //	Already defined in Texture.cpp
 void fix_texture_name(pstr fn);
@@ -452,4 +452,4 @@ BOOL	CResourceManager::_GetDetailTexture(LPCSTR Name,LPCSTR& T, R_constant_setup
         return FALSE;
     }
 }*/
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -2,7 +2,7 @@
 
 #include <FlexibleVertexFormat.h>
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void fix_texture_name(pstr fn);
 
@@ -443,4 +443,4 @@ void CResourceManager::_DeleteConstantList(const SConstantList* L)
     Msg("! ERROR: Failed to find compiled list of r1-constant-defs");
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

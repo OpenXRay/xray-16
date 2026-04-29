@@ -3,7 +3,7 @@
 
 #include "DetailManager.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 const u32 vs_size = 3000;
 
@@ -175,4 +175,4 @@ void CDetailManager::soft_Render()
         }
     }
 */
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

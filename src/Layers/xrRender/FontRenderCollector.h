@@ -6,7 +6,7 @@
 
 namespace xray::render::ui
 {
-using namespace xray::render::RENDER_NAMESPACE;  // For dxFontRender
+using namespace xray::render::fg;  // For dxFontRender
 
 // Collector for font geometry
 // Fonts use the same vertex format as UI (FVF::TL = UIVertex)

@@ -4,7 +4,7 @@
 // TODO: Implement NVRHI-based debug drawing
 // This replaces the legacy D3D11/RCache debug code
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 void CBackend::InitializeDebugDraw()
@@ -79,4 +79,4 @@ void CBackend::dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
     // TODO: Implement via NVRHI
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

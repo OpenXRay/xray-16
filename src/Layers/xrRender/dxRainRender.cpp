@@ -5,7 +5,7 @@
 #include "xrEngine/Rain.h"
 #include "FrameGraph/ShaderLoader.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //	Warning: duplicated in rain.cpp
 static const int max_desired_items = 2500;
@@ -298,4 +298,4 @@ void dxRainRender::Render(CEffect_Rain& owner)
 }
 
 const Fsphere& dxRainRender::GetDropBounds() const { return DM_Drop->bv_sphere; }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

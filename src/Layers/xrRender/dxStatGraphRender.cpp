@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dxStatGraphRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void dxStatGraphRender::Copy(IStatGraphRender& _in) { *this = *((dxStatGraphRender*)&_in); }
 void dxStatGraphRender::OnDeviceCreate()
@@ -350,4 +350,4 @@ void dxStatGraphRender::RenderMarkers(CStatGraph& owner, FVF::L** ppv, CStatGrap
         (*ppv)++;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

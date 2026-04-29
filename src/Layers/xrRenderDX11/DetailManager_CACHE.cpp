@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "DetailManager.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CDetailManager::cache_Initialize()
 {
@@ -274,4 +274,4 @@ DetailSlot& CDetailManager::QueryDB(int sx, int sz)
         return DS_empty;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -13,7 +13,7 @@ namespace xray::render::fg {
     class RenderDevice;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct ExposurePassState;
 
@@ -55,4 +55,4 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state);
 void ShutdownTonemapPass(TonemapPassState& state);
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

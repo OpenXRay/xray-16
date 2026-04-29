@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 struct light_indirect
 {
@@ -9,4 +9,4 @@ struct light_indirect
     float E;
     IRender_Sector::sector_id_t S;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

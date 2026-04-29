@@ -17,7 +17,7 @@ namespace xray::render::framegraph {
 
 namespace xray::render::ui
 {
-using namespace xray::render::RENDER_NAMESPACE;  // For HW
+using namespace xray::render::fg;  // For HW
 
 // NVRHI-based UI renderer backend
 // Uses MaterialCache directly to extract shader bytecode and bindings from ref_shader

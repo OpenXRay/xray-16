@@ -2,7 +2,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
@@ -1365,4 +1365,4 @@ void CRenderTarget::accum_direct_volumetric(CBackend& cmd_list, u32 sub_phase,
         //		u_DBT_disable	();
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

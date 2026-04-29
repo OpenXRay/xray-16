@@ -30,7 +30,7 @@
 
 extern bool ENGINE_API g_bRendering;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dxRender_Visual* CModelPool::Instance_Create(u32 type)
 {
@@ -643,4 +643,4 @@ void CModelPool::RenderSingle(dxRender_Visual* m_pVisual, const Fmatrix& mTransf
 }
 void CModelPool::OnDeviceDestroy() { Destroy(); }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

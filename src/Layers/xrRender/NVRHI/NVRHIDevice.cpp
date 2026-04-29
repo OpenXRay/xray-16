@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "NVRHIDevice.h"
 
-namespace xray::render::RENDER_NAMESPACE::nvrhi_wrapper
+namespace xray::render::fg::nvrhi_wrapper
 {
 
 NVRHIDevice::NVRHIDevice() = default;
@@ -105,4 +105,4 @@ void NVRHIDevice::WaitForIdle()
     }
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::nvrhi_wrapper
+} // namespace xray::render::fg::nvrhi_wrapper

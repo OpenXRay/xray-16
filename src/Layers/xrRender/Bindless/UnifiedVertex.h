@@ -8,7 +8,7 @@
 #include "xrCore/_vector2.h"
 #include "xrCore/_vector3d.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 // ═══════════════════════════════════════════════════════════════════
 //  UNIFIED VERTEX FORMAT (48 bytes)
@@ -109,4 +109,4 @@ inline SourceVertexFormat DetectVertexFormat(u32 stride, bool hasLightmap, bool 
 
 constexpr u32 UNIFIED_VERTEX_STRIDE = 48;
 
-} // namespace xray::render::RENDER_NAMESPACE::bindless
+} // namespace xray::render::fg::bindless

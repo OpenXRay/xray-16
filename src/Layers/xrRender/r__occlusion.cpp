@@ -3,7 +3,7 @@
 
 #include "QueryHelper.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 R_occlusion::~R_occlusion(void) { occq_destroy(); }
 void R_occlusion::occq_create(u32 limit)
@@ -144,4 +144,4 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
     ID = 0;
     return fragments;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

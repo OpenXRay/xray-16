@@ -2,7 +2,7 @@
 #include "Layers/xrRender/light.h"
 #include "xrCDB/Intersect.hpp"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 const u32 delay_small_min = 1;
 const u32 delay_small_max = 3;
@@ -91,4 +91,4 @@ void light::vis_update()
         vis.frame2test = frame + 1;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

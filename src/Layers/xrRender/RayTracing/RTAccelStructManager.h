@@ -7,7 +7,7 @@ namespace xray::render {
     struct GeometryBatch;
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class FGDetailManager;
 }
 
@@ -16,7 +16,7 @@ class RenderDevice;
 class RenderContext;
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 class GPUCullingManager;
 
 struct RTBatchInfo {

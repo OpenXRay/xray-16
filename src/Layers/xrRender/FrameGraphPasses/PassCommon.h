@@ -3,7 +3,7 @@
 #include <nvrhi/nvrhi.h>
 #include "xrCore/xrCore.h"
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct LightingConstants {
     Fvector4 sunDirection;
@@ -59,4 +59,4 @@ LightingConstants FillLightingConstants();
 
 u32 ExtractFrustumPlanes(Fvector4 outPlanes[6]);
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

@@ -9,7 +9,7 @@
 #include "xrEngine/xr_efflensflare.h"
 #include "FrameGraph/ShaderLoader.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////////
 // half box def
@@ -403,4 +403,4 @@ void dxEnvironmentRender::OnDeviceDestroy()
     tonemap_tstage_2sky = u32(-1);
     tonemap_tstage_clouds = u32(-1);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

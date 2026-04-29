@@ -8,7 +8,7 @@
  * Consider removing.
  */
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Blur::CBlender_Blur()
 {

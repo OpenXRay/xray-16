@@ -25,12 +25,12 @@
 #include "Layers/xrRender/ClusteredLightManager.h"
 #include "xrCore/FMesh.hpp"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
     extern float r__dtex_range;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ForwardColorPassState& state)
 {
@@ -143,7 +143,7 @@ static void renderBindlessForward(
     MaterialCache* materialCache,
     ForwardColorPassState& ps)
 {
-    using namespace RENDER_NAMESPACE::bindless;
+    using namespace fg::bindless;
 
     if (!config.UseGPUCulling() || !geometry || geometry->GetBatches().empty())
         return;
@@ -503,4 +503,4 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     outputs.depth = passData.depth;
     return outputs;
 }
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

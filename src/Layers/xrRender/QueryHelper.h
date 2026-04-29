@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //	Interface
 #if defined(USE_DX11)
@@ -94,4 +94,4 @@ IC HRESULT ReleaseQuery(GLuint query)
 #else
 #   error No graphics API selected or enabled!
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

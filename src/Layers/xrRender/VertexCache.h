@@ -3,7 +3,7 @@
 #include"xrCore/xr_types.h"
 //#include"xrCore/_stl_extensions.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class VertexCache
 {
@@ -56,4 +56,4 @@ IC int VertexCache::AddEntry(int entry)
 
     return removed;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void phase_wallmarks();
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

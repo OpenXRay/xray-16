@@ -9,12 +9,12 @@
 #include "Layers/xrRender/Decals/OverlayManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
-namespace RENDER_NAMESPACE
+namespace fg
 {
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 using namespace framegraph;
 
@@ -152,4 +152,4 @@ void setupOverlayPaintPass(
     );
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

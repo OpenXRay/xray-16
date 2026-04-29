@@ -17,7 +17,7 @@ namespace xray::render::framegraph {
 
 class CEnvironment;
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // ═══════════════════════════════════════════════════════
 //  SKY PASS (Sky dome + Sun disc rendering)
@@ -70,4 +70,4 @@ framegraph::VirtualResourceHandle setupSkyPass(
 void InitializeSkyGeometry(fg::RenderDevice* device, SkyPassState& state);
 void ShutdownSkyGeometry(SkyPassState& state);
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

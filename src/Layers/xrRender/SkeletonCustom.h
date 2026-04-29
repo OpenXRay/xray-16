@@ -8,7 +8,7 @@ class CInifile;
 class CBoneData;
 struct SEnumVerticesCallback;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // consts
 extern Lock UCalc_Mutex;
@@ -339,4 +339,4 @@ private:
 };
 
 IC CKinematics* PCKinematics(dxRender_Visual* V) { return V ? (CKinematics*)V->dcast_PKinematics() : 0; }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -4,7 +4,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #pragma pack(push, 1)
 inline float u_P(float v)
@@ -500,4 +500,4 @@ constexpr VertexElement* get_decl<vertHW_4W<float>>()
     return dwDecl_4W_HQ;
 }
 #pragma pack(pop)
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

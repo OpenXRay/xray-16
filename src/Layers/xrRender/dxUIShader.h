@@ -10,7 +10,7 @@ namespace xray::render::framegraph {
     struct ExtractedReflection;  // Forward declaration
 }
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dxUIShader : public IUIShader
 {
@@ -45,4 +45,4 @@ public:
 
     shared_str baseTexture{ "s_base" };
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

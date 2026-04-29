@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CRenderTarget::phase_occq()
 {
@@ -13,4 +13,4 @@ void CRenderTarget::phase_occq()
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
     RCache.set_ColorWriteEnable(FALSE);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

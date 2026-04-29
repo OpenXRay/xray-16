@@ -20,12 +20,12 @@
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
-namespace RENDER_NAMESPACE
+namespace fg
 {
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 
 // ═══════════════════════════════════════════════════════
 //  CONSTANTS
@@ -4156,4 +4156,4 @@ MeshAllocation GPUCullingManager::GetMeshAllocation(
     return alloc;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

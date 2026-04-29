@@ -5,7 +5,7 @@
 class IReader;
 class IWriter;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class ECORE_API CMatrix : public xr_resource_named
 {
@@ -72,4 +72,4 @@ public:
 };
 
 typedef resptr_core<CMatrix, resptr_base<CMatrix>> ref_matrix;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

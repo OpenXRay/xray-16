@@ -4,11 +4,11 @@
 #include "xrCore/_matrix.h"
 #include "xrCore/_vector2.h"
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 class CKinematics;
 }
 
-namespace xray::render::RENDER_NAMESPACE::decals {
+namespace xray::render::fg::decals {
 
 struct TriVertexSkin {
     Fvector restPos;
@@ -39,4 +39,4 @@ bool PickMeshDirect(
     float maxDist,
     MeshPickResult& result);
 
-} // namespace xray::render::RENDER_NAMESPACE::decals
+} // namespace xray::render::fg::decals

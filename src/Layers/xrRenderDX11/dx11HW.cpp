@@ -7,7 +7,7 @@
 
 #include <SDL_syswm.h>
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CHW HW;
 
@@ -566,4 +566,4 @@ DeviceState CHW::GetDeviceState()
 
     return DeviceState::Normal;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

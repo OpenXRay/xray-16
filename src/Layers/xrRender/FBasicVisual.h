@@ -8,7 +8,7 @@
 
 class IParticleCustom;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // The class itself
 class CKinematicsAnimated;
@@ -98,4 +98,4 @@ public:
     dxRender_Visual();
     virtual ~dxRender_Visual();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -3,7 +3,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 MaterialBuffer& MaterialBuffer::Instance()
 {
@@ -118,4 +118,4 @@ void DrawMaterialIDBuffer::Upload(fg::RenderContext* ctx, u32 drawCount)
     }
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::bindless
+} // namespace xray::render::fg::bindless

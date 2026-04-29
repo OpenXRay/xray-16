@@ -9,11 +9,11 @@ namespace fg { class RenderDevice; }
 
 namespace xray::render::framegraph { class FrameGraph; }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 namespace decals { class OverlayManager; }
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct OverlayPaintPassState {
     nvrhi::ComputePipelineHandle pipeline;
@@ -31,4 +31,4 @@ void setupOverlayPaintPass(
     OverlayPaintPassState& state
 );
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

@@ -6,7 +6,7 @@
 
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 enum enum_stats_buffer_type
 {
@@ -55,4 +55,4 @@ u32 get_format_pixel_size(D3DFORMAT format);
 #if defined(USE_DX11)
 u32 get_format_pixel_size(DXGI_FORMAT format);
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

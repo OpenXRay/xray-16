@@ -5,7 +5,7 @@
 class CAviPlayerCustom;
 class ENGINE_API CTheoraSurface;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class ECORE_API CTexture : public xr_resource_named
 {
@@ -239,4 +239,4 @@ struct resptrcode_texture : public resptr_base<CTexture>
 };
 
 typedef resptr_core<CTexture, resptrcode_texture> ref_texture;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

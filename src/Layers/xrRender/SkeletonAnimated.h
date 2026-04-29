@@ -6,7 +6,7 @@
 
 #include "Include/xrRender/KinematicsAnimated.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //*** Bone Instance *******************************************************************************
 #pragma pack(push, 8)
@@ -226,4 +226,4 @@ IC CKinematicsAnimated* PKinematicsAnimated(IRenderVisual* V)
 {
     return V ? (CKinematicsAnimated*)V->dcast_PKinematicsAnimated() : 0;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -10,11 +10,11 @@ namespace fg {
 }
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 class CKinematics;
 }
 
-namespace xray::render::RENDER_NAMESPACE::decals {
+namespace xray::render::fg::decals {
 
 static constexpr u32 MAX_SPLATS_PER_OBJECT = 32;
 
@@ -81,4 +81,4 @@ private:
     bool m_dirty = false;
 };
 
-} // namespace xray::render::RENDER_NAMESPACE::decals
+} // namespace xray::render::fg::decals

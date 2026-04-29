@@ -2,7 +2,7 @@
 #include "xrCDB/Intersect.hpp"
 #include "Layers/xrRender/du_cone.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // extern Fvector du_cone_vertices			[DU_CONE_NUMVERTEX];
 
@@ -179,4 +179,4 @@ bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
     }
 }
 */
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

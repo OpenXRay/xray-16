@@ -6,7 +6,7 @@
 // TODO: Implement NVRHI-based pixel calculator
 // This replaces the legacy D3D11/RCache pixel calculation code
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 void r_pixel_calculator::begin()
@@ -32,4 +32,4 @@ void r_pixel_calculator::run()
     Log("----- ssa build not yet implemented for FrameGraph -----");
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

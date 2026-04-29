@@ -10,7 +10,7 @@
 #include "PSLibrary.h"
 #include "ParticleEffect.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 using namespace PS;
 
@@ -626,4 +626,4 @@ BOOL CParticleGroup::GetHudMode()
     }
     return false;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

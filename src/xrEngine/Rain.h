@@ -16,7 +16,7 @@ class ENGINE_API IRender_DetailModel;
 
 namespace xray::render
 {
-namespace render_r4
+namespace fg
 {
 class dxRainRender;
 }
@@ -28,7 +28,7 @@ class dxRainRender;
 
 class ENGINE_API CEffect_Rain
 {
-    friend class xray::render::render_r4::dxRainRender;
+    friend class xray::render::fg::dxRainRender;
     friend class xray::render::render_gl::dxRainRender;
 
 private:

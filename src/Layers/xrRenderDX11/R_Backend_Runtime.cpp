@@ -10,7 +10,7 @@
 
 #include "xrEngine/IFrameGraphRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CBackend::OnFrameEnd()
 {
@@ -517,4 +517,4 @@ void CBackend::apply_lmaterial()
                                 o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
                                 o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

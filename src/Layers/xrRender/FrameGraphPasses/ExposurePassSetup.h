@@ -16,7 +16,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // ═══════════════════════════════════════════════════════
 //  EXPOSURE PASS (Auto-Exposure / Eye Adaptation)
@@ -113,4 +113,4 @@ ExposureConfig GetDefaultExposureConfig();
 
 nvrhi::ITexture* GetExposureTexture(const ExposurePassState& state);
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

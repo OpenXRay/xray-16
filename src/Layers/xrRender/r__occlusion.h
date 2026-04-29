@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 constexpr u32 occq_size_base = 768; // // queue for occlusion queries
 constexpr u32 occq_size = 2 * occq_size_base * R__NUM_PARALLEL_CONTEXTS; // // queue for occlusion queries
@@ -55,4 +55,4 @@ public:
     void occq_end(u32& ID);
     occq_result occq_get(u32& ID);
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

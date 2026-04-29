@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_Model_EbB : public IBlender
 {
@@ -23,4 +23,4 @@ public:
 
     void Compile(CBlender_Compile& C) override;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

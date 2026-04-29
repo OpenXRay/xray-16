@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
 {
@@ -166,4 +166,4 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
     //
     u_DBT_disable();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

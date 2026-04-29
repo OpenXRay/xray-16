@@ -19,7 +19,7 @@
 #    include "Layers/xrRenderDX11/blenders/dx11HDAOCSBlender.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM)
 {
@@ -322,4 +322,4 @@ bool CRenderTarget::use_minmax_sm_this_frame()
     default: return false;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -3,7 +3,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 TerrainMaterialBuffer& TerrainMaterialBuffer::Instance()
 {
@@ -72,4 +72,4 @@ void TerrainMaterialBuffer::UpdateMaterial(u32 materialID, const TerrainMaterial
     Set(materialID, material);
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::bindless
+} // namespace xray::render::fg::bindless

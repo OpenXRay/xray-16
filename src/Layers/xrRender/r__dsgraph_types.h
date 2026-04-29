@@ -2,7 +2,7 @@
 
 #include "xrCore/Containers/FixedMap.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dxRender_Visual;
 
@@ -69,4 +69,4 @@ using mapSorted_T = xr_fixed_map<float, _MatrixItemS>;
 using mapHUD_T    = xr_fixed_map<float, _MatrixItemS>;
 using mapLOD_T    = xr_fixed_map<float, _LodItem>;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

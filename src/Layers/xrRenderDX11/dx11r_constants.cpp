@@ -7,7 +7,7 @@
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #include "Layers/xrRender/Shaders/SlangReflectionWrapper.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable, u32 destination)
 {
@@ -534,4 +534,4 @@ BOOL R_constant_table::parseSlangReflection(slang::ShaderReflection* reflection,
 
     return TRUE;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

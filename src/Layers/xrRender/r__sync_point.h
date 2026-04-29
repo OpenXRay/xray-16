@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class R_sync_point
 {
@@ -16,4 +16,4 @@ public:
     bool Wait(u32 wait_sleep, u64 timeout);
     void End();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

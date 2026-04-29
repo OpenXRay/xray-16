@@ -16,7 +16,7 @@
 #include <queue>
 #include <DirectXTex.h>  // For normal map generation from diffuse
 
-using namespace xray::render::RENDER_NAMESPACE;
+using namespace xray::render::fg;
 namespace xray::render::pbr {
 
 // Runtime PBR flag

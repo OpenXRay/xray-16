@@ -15,11 +15,11 @@ namespace xray::render::framegraph {
     struct DefaultOutputLayout;
 }
 
-namespace xray::render::RENDER_NAMESPACE::decals {
+namespace xray::render::fg::decals {
     class DecalManager;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct DecalPassState {
     nvrhi::GraphicsPipelineHandle pipeline;
@@ -38,4 +38,4 @@ framegraph::DefaultOutputLayout setupDecalPass(
     u32 width, u32 height,
     DecalPassState& state);
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

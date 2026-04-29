@@ -37,19 +37,19 @@ extern ENGINE_API Fvector3 ps_r3_grass_object_tints[64];
 extern ENGINE_API float ps_r3_grass_blade_width;
 extern ENGINE_API float ps_r3_grass_blade_height;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
     extern int ps_r__detail_gpu;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes
+namespace xray::render::fg::passes
 {
 using namespace framegraph;
 
 DefaultOutputLayout setupDetailPass(
     FrameGraph& fg,
     fg::RenderDevice* device,
-    RENDER_NAMESPACE::FGDetailManager* detailManager,
+    fg::FGDetailManager* detailManager,
     const DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
@@ -344,4 +344,4 @@ DefaultOutputLayout setupDetailPass(
     return outputs;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

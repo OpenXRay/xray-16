@@ -4,7 +4,7 @@
 #include "NvTriStrip.h"
 #include "VertexCache.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 int xrSimulate(xr_vector<u16>& indices, int iCacheSize)
 {
@@ -57,4 +57,4 @@ void xrStripify(xr_vector<u16>& indices, xr_vector<u16>& perturb, int iCacheSize
     xPGROUP.clear();
     PGROUP.clear();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

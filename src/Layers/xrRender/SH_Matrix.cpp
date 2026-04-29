@@ -2,7 +2,7 @@
 
 #include "SH_Matrix.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CMatrix::Calculate()
 {
@@ -102,4 +102,4 @@ void CMatrix::Save(IWriter* fs)
     fs->w(&scrollU, sizeof(WaveForm));
     fs->w(&scrollV, sizeof(WaveForm));
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 static unsigned int g_uGroupTexelDimension = 56;
 static unsigned int g_uGroupTexelOverlap = 12;
@@ -37,4 +37,4 @@ void CRenderTarget::phase_hdao()
         HW.get_context(CHW::IMM_CTX_ID)->CSSetShaderResources(0, 16, srv);
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

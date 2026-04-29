@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/ThunderboltDescRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class IRender_DetailModel;
 
@@ -17,4 +17,4 @@ public:
 public:
     IRender_DetailModel* l_model;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

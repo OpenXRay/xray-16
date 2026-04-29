@@ -2,7 +2,7 @@
 
 #include "dx113DFluidEmitters.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dx113DFluidData
 {
@@ -91,4 +91,4 @@ private:
     ID3DRenderTargetView* m_pRenderTargetViews[VP_NUM_TARGETS];
     ID3DTexture3D* m_pRTTextures[VP_NUM_TARGETS];
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -2,7 +2,7 @@
 
 #include "dx11SamplerStateCache.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class SimulatorStates;
 
@@ -64,4 +64,4 @@ private:
     //	Private data
 private:
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

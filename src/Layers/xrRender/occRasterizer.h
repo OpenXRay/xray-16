@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 const int occ_dim_0 = 64;
 const int occ_dim_1 = occ_dim_0 / 2;
@@ -81,4 +81,4 @@ public:
 };
 
 extern occRasterizer Raster;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

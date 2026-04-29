@@ -5,7 +5,7 @@
 #include "du_cylinder.h"
 //---------------------------------------------------------------------------
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //#pragma package(smart_init)
 Fvector du_cylinder_vertices[DU_CYLINDER_NUMVERTEX] = {
@@ -64,4 +64,4 @@ u16 du_cylinder_lines[DU_CYLINDER_NUMLINES * 2] = {
     // cape1
     0, 3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 13, 13, 15, 15, 17, 17, 19, 19, 21, 21, 23, 23, 0,
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

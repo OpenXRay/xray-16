@@ -9,7 +9,7 @@
 #include "Layers/xrRender/dxParticleCustom.h"
 #endif // _EDITOR
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace PS
 {
@@ -107,4 +107,4 @@ extern const u32 uDT_STEP;
 extern const float fDT_STEP;
 }
 //---------------------------------------------------------------------------
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

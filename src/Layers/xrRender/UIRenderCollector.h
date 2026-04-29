@@ -6,7 +6,7 @@
 
 namespace xray::render::ui
 {
-using namespace xray::render::RENDER_NAMESPACE;  // For HW
+using namespace xray::render::fg;  // For HW
 
 // Collector that implements IUIRender interface to record UI geometry
 // instead of immediately rendering it

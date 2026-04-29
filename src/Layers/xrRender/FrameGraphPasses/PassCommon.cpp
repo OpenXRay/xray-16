@@ -6,7 +6,7 @@
 #include "xrEngine/device.h"
 #include "xrCDB/Frustum.h"
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 nvrhi::BufferHandle GetOrCreateDrawIndexBuffer(const char* passName, nvrhi::IDevice* device)
 {
@@ -71,4 +71,4 @@ u32 ExtractFrustumPlanes(Fvector4 outPlanes[6])
     return count;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

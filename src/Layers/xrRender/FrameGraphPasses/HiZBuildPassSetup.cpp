@@ -12,12 +12,12 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include <nvrhi/utils.h>  // For TextureUavBarrier
 
-namespace RENDER_NAMESPACE
+namespace fg
 {
     extern CRender RImplementation;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 using namespace framegraph;
 
@@ -266,4 +266,4 @@ HiZPyramidOutput setupHiZBuildPass(
     return output;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

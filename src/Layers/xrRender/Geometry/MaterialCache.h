@@ -6,9 +6,9 @@
 #include "Layers/xrRender/FrameGraph/GlobalParamsMapper.h"
 #include "Layers/xrRender/ResourceManager/ResourceHandle.h"  // For TextureHandle definition
 
-// Forward declarations - must be in RENDER_NAMESPACE
-// Note: RENDER_NAMESPACE is defined as render_r4 in preprocessor
-namespace xray::render::RENDER_NAMESPACE {
+// Forward declarations - must be in fg
+// Note: fg is defined as fg in preprocessor
+namespace xray::render::fg {
     struct Shader;
     struct ShaderElement;
     struct SPass;
@@ -42,14 +42,14 @@ namespace framegraph {
     struct DefaultOutputLayout;  // Shared geometry pass output layout (defined in IPass.h)
 }
 
-// Bring RENDER_NAMESPACE types into scope for easier usage
-using RENDER_NAMESPACE::Shader;
-using RENDER_NAMESPACE::ShaderElement;
-using RENDER_NAMESPACE::SPass;
-using RENDER_NAMESPACE::dxRender_Visual;
-using RENDER_NAMESPACE::SVS;
-using RENDER_NAMESPACE::SPS;
-using RENDER_NAMESPACE::dxFontRender;
+// Bring fg types into scope for easier usage
+using fg::Shader;
+using fg::ShaderElement;
+using fg::SPass;
+using fg::dxRender_Visual;
+using fg::SVS;
+using fg::SPS;
+using fg::dxFontRender;
 
 // Pass types for different depth state requirements
 enum class RenderPassType : u8 {

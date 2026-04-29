@@ -10,7 +10,7 @@
 #define PRIORITY_NORMAL 8
 #define PRIORITY_LOW 4
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
 //////////////////////////////////////////////////////////////////////
@@ -371,4 +371,4 @@ BOOL CTexture::video_IsPlaying() const
 {
     return (pTheora) ? pTheora->IsPlaying() : FALSE;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

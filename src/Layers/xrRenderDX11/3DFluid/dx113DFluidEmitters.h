@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dx113DFluidGrid;
 class dx113DFluidData;
@@ -67,4 +67,4 @@ private:
 
     dx113DFluidGrid* m_pGrid;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

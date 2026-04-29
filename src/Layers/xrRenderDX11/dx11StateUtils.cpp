@@ -2,7 +2,7 @@
 #include "dx11StateUtils.h"
 #include "Layers/xrRender/Utils/dxHashHelper.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace dx11StateUtils
 {
@@ -631,4 +631,4 @@ void ValidateState(D3D_SAMPLER_DESC& desc)
     }
 }
 } // namespace dx11StateUtils
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

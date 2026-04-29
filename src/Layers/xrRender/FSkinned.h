@@ -9,7 +9,7 @@
 
 struct SEnumVerticesCallback;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CSkeletonX_ext : public CSkeletonX // shared code for SkeletonX derivates
 {
@@ -83,4 +83,4 @@ private:
     CSkeletonX_PM(const CSkeletonX_PM& other);
     void operator=(const CSkeletonX_PM& other);
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -4,7 +4,7 @@
 #include "SkeletonXVertRender.h"
 #include "SkeletonXSkinXW.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #if defined(XR_PLATFORM_WINDOWS) && defined(XR_ARCHITECTURE_X86)
 #define transform_dir(idx, res, SX, SY, SZ, T1) \
@@ -413,4 +413,4 @@ void Skin1W(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
 #undef transform_tiny2
 
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

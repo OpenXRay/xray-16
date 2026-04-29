@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CRenderTarget::phase_smap_spot_clear(CBackend& cmd_list)
 {
@@ -99,4 +99,4 @@ void CRenderTarget::phase_smap_spot_tsh(CBackend& cmd_list, light* L)
         cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

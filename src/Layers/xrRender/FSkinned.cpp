@@ -20,7 +20,7 @@
 #include "xrCore/dump_string.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////
 // Body Part
@@ -923,4 +923,4 @@ void CSkeletonX_ext::_EnumBoneVertices(SEnumVerticesCallback& C, Fvisual* V, u16
         V->p_rm_Vertices->Unmap();
     V->p_rm_Indices->Unmap();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

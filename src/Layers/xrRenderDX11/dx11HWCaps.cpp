@@ -9,7 +9,7 @@
 #include <ags_lib/inc/amd_ags.h>
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace
 {
@@ -244,4 +244,4 @@ void CHWCaps::Update()
 
     iGPUNum = GetGpuNum();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

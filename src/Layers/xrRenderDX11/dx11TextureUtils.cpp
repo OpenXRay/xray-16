@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dx11TextureUtils.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace dx11TextureUtils
 {
@@ -140,4 +140,4 @@ D3DFORMAT ConvertTextureFormat(DXGI_FORMAT dx11FMT)
     return D3DFMT_UNKNOWN;
 }
 } // namespace dx11TextureUtils
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

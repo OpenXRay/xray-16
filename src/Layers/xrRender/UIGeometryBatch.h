@@ -7,7 +7,7 @@
 
 namespace xray::render::ui
 {
-using namespace xray::render::RENDER_NAMESPACE;  // For HW
+using namespace xray::render::fg;  // For HW
 
 // Vertex format for UI rendering - matches FVF::TL and FVF::LIT
 // Memory layout matches vanilla (28 bytes total):

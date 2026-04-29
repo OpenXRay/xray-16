@@ -12,7 +12,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct ImGuiPassData {
     framegraph::VirtualResourceHandle input;
@@ -32,4 +32,4 @@ framegraph::VirtualResourceHandle setupImGuiPass(
     u32 height
 );
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

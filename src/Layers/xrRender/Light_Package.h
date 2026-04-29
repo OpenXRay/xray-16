@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class light;
 class light_Package
@@ -14,4 +14,4 @@ public:
     void clear();
     void sort();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

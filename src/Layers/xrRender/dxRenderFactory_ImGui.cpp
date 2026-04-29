@@ -9,7 +9,7 @@ namespace xray::render {
     IImGuiRender* GetImGuiRenderer();
 }
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 IImGuiRender* dxRenderFactory::CreateImGuiRender()
@@ -31,4 +31,4 @@ void dxRenderFactory::DestroyImGuiRender(IImGuiRender* pObject)
     }
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

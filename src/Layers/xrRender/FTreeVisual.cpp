@@ -7,7 +7,7 @@
 #include "FTreeVisual.h"
 #include "Common/OGF_GContainer_Vertices.hpp"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 shared_str m_xform;
 shared_str m_xform_v;
@@ -251,4 +251,4 @@ void FTreeVisual_PM::Copy(dxRender_Visual* pSrc)
     FTreeVisual_PM* pFrom = dynamic_cast<FTreeVisual_PM*>(pSrc);
     PCOPY(pSWI);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

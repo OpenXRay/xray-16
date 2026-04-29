@@ -14,7 +14,7 @@
 #endif
 */
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 /*
 static void draw_obb        ( const Fmatrix &matrix, const u32 &color )
@@ -417,4 +417,4 @@ void dx113DFluidObstacles::RenderDynamicOOBB(
 
     m_pGrid->DrawSlices();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

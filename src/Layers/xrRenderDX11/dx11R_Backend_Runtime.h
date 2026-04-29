@@ -2,7 +2,7 @@
 
 #include "StateManager/dx11ShaderResourceStateCache.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 IC void CBackend::set_xform(u32 ID, const Fmatrix& M)
 {
@@ -700,4 +700,4 @@ IC void CBackend::set_pass_targets(const ref_rt& _1, const ref_rt& _2, const ref
     const D3D_VIEWPORT viewport = { 0, 0, curr_rt_width, curr_rt_height, 0.f, 1.f };
     SetViewport(viewport);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -13,7 +13,7 @@ namespace xray::render::fg {
     class RenderDevice;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // ────────────────────────────────────────────────────────
 //  GPU simulation struct (must match smoke_common.hlsli SmokeSimPoint)
@@ -136,4 +136,4 @@ private:
     bool              m_initialized = false;
 };
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

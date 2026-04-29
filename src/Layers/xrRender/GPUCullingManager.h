@@ -8,7 +8,7 @@
 #include "Layers/xrRender/Bindless/UnifiedVertex.h"
 #include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
     struct ParticleBatch;
 }
 
@@ -25,12 +25,12 @@ namespace xray::render {
     }
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class CKinematics;
     class RTAccelStructManager;
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
 
 // ═══════════════════════════════════════════════════════
 //  GPU OBJECT DATA (matches HLSL GPUObjectData struct)
@@ -752,4 +752,4 @@ public:
     );
 };
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

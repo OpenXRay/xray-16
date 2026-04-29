@@ -4,7 +4,7 @@
 
 #include "Include/xrRender/DebugRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dxDebugRender : public IDebugRender
 {
@@ -59,5 +59,5 @@ private:
 
 extern dxDebugRender DebugRenderImpl;
 extern dxDebugRender* rdebug_render;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg
 #endif // DEBUG

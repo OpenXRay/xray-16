@@ -3,7 +3,7 @@
 
 #include "blender_light_occq.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_light_occq::CBlender_light_occq() { description.CLS = 0; }
 CBlender_light_occq::~CBlender_light_occq() {}
@@ -56,4 +56,4 @@ void CBlender_light_occq::Compile(CBlender_Compile& C)
     }
 #endif
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -78,10 +78,10 @@ extern ENGINE_API int ps_r_path_tracer_bounces;
 
 namespace xray::render {
 
-using namespace RENDER_NAMESPACE;
+using namespace fg;
 
 // Forward declaration and extern for accessing RImplementation
-namespace RENDER_NAMESPACE {
+namespace fg {
     class CRender;
     extern CRender RImplementation;
 }
@@ -143,19 +143,19 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     g_geometryCollector = m_geometryCollector.get();
 
 
-    m_gpuCullingManager = xr_make_unique<RENDER_NAMESPACE::GPUCullingManager>();
-    m_detailManager = xr_make_unique<RENDER_NAMESPACE::FGDetailManager>();
-    m_decalManager = xr_make_unique<RENDER_NAMESPACE::decals::DecalManager>();
-    m_overlayManager = xr_make_unique<RENDER_NAMESPACE::decals::OverlayManager>();
-    m_rtAccelMgr = xr_make_unique<RENDER_NAMESPACE::RTAccelStructManager>();
-    m_smokeTrailManager = xr_make_unique<RENDER_NAMESPACE::passes::SmokeTrailManager>();
+    m_gpuCullingManager = xr_make_unique<fg::GPUCullingManager>();
+    m_detailManager = xr_make_unique<fg::FGDetailManager>();
+    m_decalManager = xr_make_unique<fg::decals::DecalManager>();
+    m_overlayManager = xr_make_unique<fg::decals::OverlayManager>();
+    m_rtAccelMgr = xr_make_unique<fg::RTAccelStructManager>();
+    m_smokeTrailManager = xr_make_unique<fg::passes::SmokeTrailManager>();
 
 
     bindless::MaterialBuffer::Instance().Initialize(m_device);
     bindless::TerrainMaterialBuffer::Instance().Initialize(m_device);
     bindless::VariantTextureBuffer::Instance().Initialize(m_device);
     bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);
-    RENDER_NAMESPACE::ClusteredLightManager::Instance().Initialize(m_device);
+    fg::ClusteredLightManager::Instance().Initialize(m_device);
     Msg("* [FrameGraphRenderer] Bindless material buffers initialized (early)");
 
     m_uiRenderer->Initialize(device, m_uiMaterialCache.get());
@@ -247,7 +247,7 @@ void FrameGraphRenderer::Shutdown() {
         m_smokeTrailManager = nullptr;
     }
 
-    RENDER_NAMESPACE::ClusteredLightManager::Instance().Shutdown();
+    fg::ClusteredLightManager::Instance().Shutdown();
 
     passes::ShutdownPathTracer();
 
@@ -341,7 +341,7 @@ void FrameGraphRenderer::Render() {
                         m_gpuCullingManager->InvalidateShadersAndPipelines();
 
                     if (m_rtAccelMgr)
-                        RENDER_NAMESPACE::RTAccelStructManager::InvalidateShaderPipelines();
+                        fg::RTAccelStructManager::InvalidateShaderPipelines();
 
                     fg::ImGuiRendererNVRHI* imguiReload = RImplementation.GetImGuiRendererNVRHI();
                     if (imguiReload)
@@ -384,7 +384,7 @@ void FrameGraphRenderer::Render() {
     auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device);
     auto staticGlobalsData = passes::BuildStaticGlobals();
 
-    auto& clm = RENDER_NAMESPACE::ClusteredLightManager::Instance();
+    auto& clm = fg::ClusteredLightManager::Instance();
     if (clm.IsReady() && clm.GetLightCount() > 0) {
         float zNear = VIEWPORT_NEAR;
         float zFar = g_pGamePersistent->Environment().CurrentEnv.far_plane;
@@ -628,7 +628,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
 
         // Collect detail/grass stats
         {
-            auto& clmStats = RENDER_NAMESPACE::ClusteredLightManager::Instance();
+            auto& clmStats = fg::ClusteredLightManager::Instance();
             stats.lightsClustered = clmStats.GetLightCount();
             stats.lightsPoint = clmStats.GetPointCount();
             stats.lightsSpot = clmStats.GetSpotCount();
@@ -730,7 +730,7 @@ void FrameGraphRenderer::SetupFrame() {
     }
 
     if (psDeviceFlags.test(rsStatistic))
-        RENDER_NAMESPACE::ClusteredLightManager::Instance().ProcessStatsReadback();
+        fg::ClusteredLightManager::Instance().ProcessStatsReadback();
 
     m_bufferHandleCache.clear();
     m_lstRenderables.clear();
@@ -760,7 +760,7 @@ void FrameGraphRenderer::SetupFrame() {
     m_worldParticleBatches.clear();
     m_hudParticleBatches.clear();
 
-    RENDER_NAMESPACE::ClusteredLightManager::Instance().BeginFrame();
+    fg::ClusteredLightManager::Instance().BeginFrame();
 
     if (levelLoaded)
         CollectVisibleGeometry();
@@ -1117,7 +1117,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.variantPartition = m_gpuCullingManager->GetStaticPartition().ToConfig();
     }
 
-    auto& clmSetup = RENDER_NAMESPACE::ClusteredLightManager::Instance();
+    auto& clmSetup = fg::ClusteredLightManager::Instance();
     if (clmSetup.IsReady() && clmSetup.GetLightCount() > 0) {
         passes::setupClusterLightPass(
             *m_framegraph,
@@ -1922,8 +1922,8 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 
-    RENDER_NAMESPACE::ShaderKey shaderKey;
-    if (RENDER_NAMESPACE::ExtractShaderKey(visual, shaderKey)) {
+    fg::ShaderKey shaderKey;
+    if (fg::ExtractShaderKey(visual, shaderKey)) {
         static thread_local std::string s_debugNameBuffer;
         s_debugNameBuffer = shaderKey.ToString();
         batch.debugName = s_debugNameBuffer.c_str();
@@ -2040,8 +2040,8 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
         batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
     }
 
-    RENDER_NAMESPACE::ShaderKey shaderKey;
-    if (RENDER_NAMESPACE::ExtractShaderKey(visual, shaderKey)) {
+    fg::ShaderKey shaderKey;
+    if (fg::ExtractShaderKey(visual, shaderKey)) {
         static thread_local std::string s_hudDebugNameBuffer;
         s_hudDebugNameBuffer = "HUD_" + shaderKey.ToString();
         batch.debugName = s_hudDebugNameBuffer.c_str();
@@ -2058,12 +2058,12 @@ static u8 QueryParticleBlendMode(LPCSTR shaderName)
     if (!shaderName || !shaderName[0])
         return passes::PARTICLE_BLEND_BLEND;
 
-    IBlender* B = RENDER_NAMESPACE::RImplementation.Resources->_FindBlender(shaderName);
+    IBlender* B = fg::RImplementation.Resources->_FindBlender(shaderName);
     if (!B)
         return passes::PARTICLE_BLEND_BLEND;
 
     if (B->getDescription().CLS == B_PARTICLE) {
-        auto* bp = static_cast<RENDER_NAMESPACE::CBlender_Particle*>(B);
+        auto* bp = static_cast<fg::CBlender_Particle*>(B);
         u32 id = bp->oBlend.IDselected;
         return (id < passes::PARTICLE_BLEND_COUNT) ? (u8)id : passes::PARTICLE_BLEND_BLEND;
     }
@@ -2072,7 +2072,7 @@ static u8 QueryParticleBlendMode(LPCSTR shaderName)
 }
 
 void FrameGraphRenderer::ProcessSingleParticleEffect(
-    RENDER_NAMESPACE::PS::CParticleEffect* pEffect,
+    fg::PS::CParticleEffect* pEffect,
     const Fmatrix& worldTransform,
     IRenderable* renderable,
     bool isHUD)
@@ -2124,28 +2124,28 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
     u32 vType = visual->getType();
 
     if (vType == MT_PARTICLE_EFFECT) {
-        auto* pEffect = static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(visual);
+        auto* pEffect = static_cast<fg::PS::CParticleEffect*>(visual);
         ProcessSingleParticleEffect(pEffect, worldTransform, renderable, isHUD);
         return true;
     }
 
     if (vType == MT_PARTICLE_GROUP) {
-        auto* pGroup = static_cast<RENDER_NAMESPACE::PS::CParticleGroup*>(visual);
+        auto* pGroup = static_cast<fg::PS::CParticleGroup*>(visual);
         for (auto& item : pGroup->items) {
             if (item._effect) {
-                auto* childEffect = static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(item._effect);
+                auto* childEffect = static_cast<fg::PS::CParticleEffect*>(item._effect);
                 ProcessSingleParticleEffect(childEffect, worldTransform, renderable, isHUD);
             }
             for (auto* child : item._children_related) {
                 if (child && child->getType() == MT_PARTICLE_EFFECT)
                     ProcessSingleParticleEffect(
-                        static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(child),
+                        static_cast<fg::PS::CParticleEffect*>(child),
                         worldTransform, renderable, isHUD);
             }
             for (auto* child : item._children_free) {
                 if (child && child->getType() == MT_PARTICLE_EFFECT)
                     ProcessSingleParticleEffect(
-                        static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(child),
+                        static_cast<fg::PS::CParticleEffect*>(child),
                         worldTransform, renderable, isHUD);
             }
         }
@@ -2316,7 +2316,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     }
 
     if (!collectedLights.empty())
-        RENDER_NAMESPACE::ClusteredLightManager::Instance().CollectLightsParallel(collectedLights);
+        fg::ClusteredLightManager::Instance().CollectLightsParallel(collectedLights);
 
     // ═══════════════════════════════════════════════════════
     //  HUD RENDERING (after dynamic objects)

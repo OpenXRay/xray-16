@@ -16,7 +16,7 @@ namespace xray::render {
     }
 }
 
-namespace xray::render::RENDER_NAMESPACE::decals {
+namespace xray::render::fg::decals {
     class OverlayManager;
 }
 
@@ -24,7 +24,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  SKINNING PASS - Consolidated skinned mesh rendering
@@ -115,4 +115,4 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     decals::OverlayManager* overlayMgr = nullptr
 );
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

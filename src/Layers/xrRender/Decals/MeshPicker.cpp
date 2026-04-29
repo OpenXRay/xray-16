@@ -6,7 +6,7 @@
 #include "Layers/xrRender/FSkinnedTypes.h"
 #include "xrCDB/Intersect.hpp"
 
-namespace xray::render::RENDER_NAMESPACE::decals {
+namespace xray::render::fg::decals {
 
 struct TriPickResult {
     float dist;
@@ -362,4 +362,4 @@ bool PickMeshDirect(
     return true;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::decals
+} // namespace xray::render::fg::decals

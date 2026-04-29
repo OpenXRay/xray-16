@@ -3,7 +3,7 @@
 
 #include "dxUIShader.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dxUIRender UIRenderImpl;
 
@@ -151,4 +151,4 @@ void dxUIRender::FlushPrimitive()
 
 void dxUIRender::CacheSetXformWorld(const Fmatrix& M) { RCache.set_xform_world(M); }
 void dxUIRender::CacheSetCullMode(CullMode m) { RCache.set_CullMode(CULL_NONE + m); }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

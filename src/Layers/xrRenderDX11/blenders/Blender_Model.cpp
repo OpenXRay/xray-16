@@ -3,7 +3,7 @@
 
 #include "Blender_Model.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Model::CBlender_Model()
 {
@@ -212,4 +212,4 @@ void CBlender_Model::CompileProgrammable(CBlender_Compile& C) const
         break;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

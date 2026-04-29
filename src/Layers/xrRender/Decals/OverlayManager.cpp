@@ -2,7 +2,7 @@
 #include "OverlayManager.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
-namespace xray::render::RENDER_NAMESPACE::decals {
+namespace xray::render::fg::decals {
 
 static constexpr u32 MAX_GPU_SPLATS = 1024;
 
@@ -171,4 +171,4 @@ void OverlayManager::CleanupExpired(float currentTime, float maxAge)
     }
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::decals
+} // namespace xray::render::fg::decals

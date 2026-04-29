@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class DX11TestHelper
 {
@@ -49,4 +49,4 @@ BOOL xrRender_test_hw()
         return TRUE;
     return FALSE;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

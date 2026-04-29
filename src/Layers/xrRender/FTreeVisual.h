@@ -4,7 +4,7 @@
 
 struct FSlideWindowItem;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class FTreeVisual : public dxRender_Visual, public IRender_Mesh
 {
@@ -77,4 +77,4 @@ private:
 
 const int FTreeVisual_tile = 16;
 const int FTreeVisual_quant = 32768 / FTreeVisual_tile;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

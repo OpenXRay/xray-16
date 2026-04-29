@@ -3,7 +3,7 @@
 #include "r2_R_sun_support.h"
 #include "xrCore/Threading/ParallelFor.hpp"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void render_sun::init()
 {
@@ -406,4 +406,4 @@ void render_sun::accumulate_cascade(u32 cascade_ind)
     dsgraph.cmd_list.submit(); // TODO: move into release (rename to submit?)
     RImplementation.release_context(dsgraph.context_id);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

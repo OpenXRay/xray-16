@@ -16,7 +16,7 @@ class ENGINE_API CEnvDescriptorMixer;
 
 namespace xray::render
 {
-namespace render_r4
+namespace fg
 {
 class dxThunderboltRender;
 }
@@ -85,7 +85,7 @@ struct ENGINE_API SThunderboltCollection
 //
 class ENGINE_API CEffect_Thunderbolt
 {
-    friend class xray::render::render_r4::dxThunderboltRender;
+    friend class xray::render::fg::dxThunderboltRender;
     friend class xray::render::render_gl::dxThunderboltRender;
 
 protected:

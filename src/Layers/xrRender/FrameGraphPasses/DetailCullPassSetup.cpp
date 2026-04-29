@@ -9,14 +9,14 @@
 
 extern ENGINE_API float ps_r3_grass_blade_width;
 
-namespace xray::render::RENDER_NAMESPACE::passes
+namespace xray::render::fg::passes
 {
 using namespace framegraph;
 
 struct DetailCullPassData {
     VirtualResourceHandle hiZPyramid;
     fg::RenderDevice* device;
-    RENDER_NAMESPACE::FGDetailManager* detailManager;
+    fg::FGDetailManager* detailManager;
     u32 hiZWidth;
     u32 hiZHeight;
     u32 hiZMipLevels;
@@ -29,7 +29,7 @@ struct DetailCullPassData {
 void setupDetailCullPass(
     FrameGraph& fg,
     fg::RenderDevice* device,
-    RENDER_NAMESPACE::FGDetailManager* detailManager,
+    fg::FGDetailManager* detailManager,
     VirtualResourceHandle hiZPyramid,
     u32 hiZWidth,
     u32 hiZHeight,
@@ -117,4 +117,4 @@ void setupDetailCullPass(
     );
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

@@ -7,7 +7,7 @@
 #define VER_4_oBlendCount 9
 #define VER_5_oBlendCount 10
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Screen_SET::CBlender_Screen_SET()
 {
@@ -270,4 +270,4 @@ void CBlender_Screen_SET::Compile(CBlender_Compile& C)
     }
     C.PassEnd();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

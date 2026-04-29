@@ -9,7 +9,7 @@
 
 extern ENGINE_API float psHUD_FOV;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 using namespace R_dsgraph;
 
@@ -415,4 +415,4 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
         }
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_deffer_aref : public IBlender
 {
@@ -21,4 +21,4 @@ public:
     CBlender_deffer_aref(bool _lmapped = false);
     virtual ~CBlender_deffer_aref();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

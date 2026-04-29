@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dx11MinMaxSMBlender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CBlender_createminmax::Compile(CBlender_Compile& C)
 {
@@ -20,4 +20,4 @@ void CBlender_createminmax::Compile(CBlender_Compile& C)
         break;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

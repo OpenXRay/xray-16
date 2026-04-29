@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 struct SMAP_Rect
 {
@@ -104,4 +104,4 @@ public:
         return false;
     }
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

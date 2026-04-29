@@ -4,7 +4,7 @@
 #include "Layers/xrRenderDX11/blenders/uber_deffer.h"
 #include "blender_deffer_aref.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_deffer_aref::CBlender_deffer_aref(bool _lmapped) : lmapped(_lmapped)
 {
@@ -296,4 +296,4 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
     }
 #endif
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

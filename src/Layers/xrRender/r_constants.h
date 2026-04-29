@@ -12,7 +12,7 @@ namespace slang
     struct ShaderReflection;
 }
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBackend;
 class ECORE_API R_constant_setup;
@@ -218,7 +218,7 @@ public:
 private:
 };
 typedef resptr_core<R_constant_table, resptr_base<R_constant_table>> ref_ctable;
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg
 
 #if defined(USE_DX11)
 #include "../xrRenderDX11/dx11ConstantBuffer_impl.h"

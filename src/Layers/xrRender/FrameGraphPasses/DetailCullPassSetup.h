@@ -6,7 +6,7 @@
 
 struct Fmatrix;
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class FGDetailManager;
 }
 
@@ -24,12 +24,12 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 void setupDetailCullPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
-    RENDER_NAMESPACE::FGDetailManager* detailManager,
+    fg::FGDetailManager* detailManager,
     framegraph::VirtualResourceHandle hiZPyramid,
     u32 hiZWidth,
     u32 hiZHeight,
@@ -39,4 +39,4 @@ void setupDetailCullPass(
     DetailPassState* detailState
 );
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

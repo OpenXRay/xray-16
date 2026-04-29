@@ -2,7 +2,7 @@
 
 #include <DirectXTex.h>
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 static void generate_jitter(u32* dest, u32 elem_count)
 {
@@ -280,4 +280,4 @@ void CRenderTarget::build_textures()
         }
  }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

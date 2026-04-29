@@ -13,7 +13,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderCache.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void fix_texture_name(pstr);
 
@@ -476,4 +476,4 @@ u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str textur
 
     return samplerStage;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

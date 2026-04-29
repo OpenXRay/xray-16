@@ -7,7 +7,7 @@
 
 #include "Include/xrRender/xrRender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 constexpr pcstr RENDERER_R2A_MODE  = "renderer_r2a";  // id 1
 constexpr pcstr RENDERER_R2_MODE   = "renderer_r2";   // id 2
@@ -125,5 +125,5 @@ RendererModule* GetRendererModule()
 {
     return &s_r4_module;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg
 

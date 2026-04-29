@@ -3,7 +3,7 @@
 #include "GPUStructuredBuffer.h"
 #include "BindlessTypes.h"
 
-namespace xray::render::RENDER_NAMESPACE::bindless {
+namespace xray::render::fg::bindless {
 
 constexpr u32 MAX_VARIANT_TEXTURE_SLOTS = 8;
 
@@ -25,4 +25,4 @@ private:
     VariantTextureBuffer() = default;
 };
 
-} // namespace xray::render::RENDER_NAMESPACE::bindless
+} // namespace xray::render::fg::bindless

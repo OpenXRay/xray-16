@@ -3,7 +3,7 @@
 
 #include "Blender_Editor_Wire.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CBlender_Editor_Wire::CBlender_Editor_Wire()
 {
@@ -66,4 +66,4 @@ void CBlender_Editor_Wire::Compile(CBlender_Compile& C)
     }
     C.PassEnd();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -5,7 +5,7 @@
 #include "Layers/xrRender/ShaderKey.h"
 
 // Forward declarations
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     struct Shader;
     struct ShaderElement;
     struct SPass;
@@ -14,11 +14,11 @@ namespace xray::render::RENDER_NAMESPACE {
 
 namespace xray::render::framegraph {
 
-using RENDER_NAMESPACE::Shader;
-using RENDER_NAMESPACE::ShaderElement;
-using RENDER_NAMESPACE::SPass;
-using RENDER_NAMESPACE::dxRender_Visual;
-using RENDER_NAMESPACE::ShaderKey;
+using fg::Shader;
+using fg::ShaderElement;
+using fg::SPass;
+using fg::dxRender_Visual;
+using fg::ShaderKey;
 
 // ═══════════════════════════════════════════════════
 //  SHADER PHASE CACHE

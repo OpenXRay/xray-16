@@ -8,7 +8,7 @@
 #include "light_gi.h"
 #endif //(RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class light : public IRender_Light, public SpatialBase
 {
@@ -173,4 +173,4 @@ public:
     light();
     ~light() override;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -4,7 +4,7 @@
 #include "dx11ComputeTest_Matrices.h"
 #include "dx11HW.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 // Static members
@@ -513,4 +513,4 @@ void ComputeTest_Matrices::DestroyTestBuffers()
     Msg("* [ComputeTest_Matrices] Buffers and queries destroyed");
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

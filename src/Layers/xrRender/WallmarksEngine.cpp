@@ -8,7 +8,7 @@
 #include "xrEngine/GameFont.h"
 #include "SkeletonCustom.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 u32 g_r = 1;
 
@@ -492,4 +492,4 @@ void CWallmarksEngine::Render()
     cmd_list.set_xform_view(Device.mView);
     cmd_list.set_xform_project(Device.mProject);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -7,7 +7,7 @@
 #include "Layers/xrRender/ImGuiRendererNVRHI.h"
 #include <imgui.h>
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 framegraph::VirtualResourceHandle setupImGuiPass(
     framegraph::FrameGraph& fg,
@@ -77,4 +77,4 @@ framegraph::VirtualResourceHandle setupImGuiPass(
     return passData.output;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes

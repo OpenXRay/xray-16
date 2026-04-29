@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 const float lt_inc = 4.f;
 const float lt_dec = 2.f;
@@ -141,4 +141,4 @@ private:
     void smart_update(IRenderable* O);
 #endif //	RENDER!=R_R1
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

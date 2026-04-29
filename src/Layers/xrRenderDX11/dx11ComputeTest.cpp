@@ -4,7 +4,7 @@
 #include "dx11ComputeTest.h"
 #include "dx11HW.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 // Static members
@@ -480,4 +480,4 @@ void ComputeTest::DestroyTestBuffers()
     Msg("* [ComputeTest] Buffers and queries destroyed");
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

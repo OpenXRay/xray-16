@@ -3,7 +3,7 @@
 #include "light.h"
 #include "Light_Package.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CLight_DB
 {
@@ -30,4 +30,4 @@ public:
     CLight_DB();
     ~CLight_DB();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

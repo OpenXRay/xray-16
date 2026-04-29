@@ -7,7 +7,7 @@
 #include "xrCDB/Intersect.hpp"
 #include "xrEngine/device.h"
 
-namespace xray::render::RENDER_NAMESPACE::decals {
+namespace xray::render::fg::decals {
 
 static const Fvector s_cubeVerts[CUBE_VERTEX_COUNT] = {
     { -0.5f, -0.5f, -0.5f },
@@ -346,4 +346,4 @@ void DecalManager::Upload(fg::RenderContext* ctx)
     cmdList->writeBuffer(m_decalBuffer, m_gpuData.data(), m_gpuDecalCount * sizeof(GPUDecalData));
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::decals
+} // namespace xray::render::fg::decals

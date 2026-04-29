@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_BmmD : public IBlender
 {
@@ -34,4 +34,4 @@ public:
     CBlender_BmmD();
     ~CBlender_BmmD() override = default;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

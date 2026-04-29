@@ -3,7 +3,7 @@
 #include "dx113DFluidData.h"
 #include "Layers/xrRender/FBasicVisual.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dx113DFluidVolume : public dxRender_Visual
 {
@@ -22,4 +22,4 @@ private:
 
     dx113DFluidData m_FluidData;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

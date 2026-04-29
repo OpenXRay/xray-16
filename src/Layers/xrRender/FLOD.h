@@ -1,7 +1,7 @@
 #pragma once
 #include "FHierrarhyVisual.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class FLOD : public FHierrarhyVisual
 {
@@ -42,4 +42,4 @@ public:
     virtual void Load(LPCSTR N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

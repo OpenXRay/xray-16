@@ -5,7 +5,7 @@
 #pragma once
 #include "xrCore/_fbox2.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CPortal;
 class CSector;
@@ -132,4 +132,4 @@ public:
     void dbg_draw();
 #endif
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -13,11 +13,11 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::RENDER_NAMESPACE {
+namespace xray::render::fg {
     class ClusteredLightManager;
 }
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 
 struct ClusterLightPassState {
     nvrhi::ComputePipelineHandle assignPipeline;

@@ -10,7 +10,7 @@
 #include "du_cylinder.h"
 #include "xrCore/_obb.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 CDrawUtilities DUImpl;
 
@@ -1507,4 +1507,4 @@ void CDrawUtilities::OutText(const Fvector& pos, LPCSTR text, u32 color, u32 sha
         m_Font->Out(p.x - 1, p.y - 1, (pstr)text);
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

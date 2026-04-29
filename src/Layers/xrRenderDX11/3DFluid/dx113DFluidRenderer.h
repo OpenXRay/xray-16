@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dx113DFluidData;
 
@@ -107,4 +107,4 @@ private:
     //	TODO: DX11: Reserve memory on object creation
     xr_vector<ISpatial*> m_lstRenderables;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

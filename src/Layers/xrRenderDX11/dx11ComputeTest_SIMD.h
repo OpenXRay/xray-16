@@ -2,7 +2,7 @@
 //
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 class ComputeTest_SIMD
@@ -61,4 +61,4 @@ private:
     static ID3D11Query* s_timestamp_end;
 };
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

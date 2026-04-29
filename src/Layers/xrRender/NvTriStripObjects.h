@@ -9,7 +9,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 struct MyVertex
 {
@@ -235,4 +235,4 @@ protected:
     // to these protected stripificaton methods if they want
     friend NvStripInfo;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -34,7 +34,7 @@ extern ENGINE_API float ps_r3_grass_lod_mid;
 extern ENGINE_API float ps_r3_grass_blade_width;
 extern ENGINE_API float ps_r3_grass_blade_height;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 extern int ps_r__detail_gpu;
 extern float ps_current_detail_height;
@@ -2721,4 +2721,4 @@ void FGDetailManager::ResizeVisibleBuffersIfNeeded(nvrhi::IDevice* device)
     visibleBillboardInstancesBuffer = device->createBuffer(bbDesc);
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

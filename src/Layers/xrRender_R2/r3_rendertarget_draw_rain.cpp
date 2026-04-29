@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
 {
@@ -407,4 +407,4 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
         //		u_DBT_disable	();
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

@@ -4,7 +4,7 @@
 #include "dx11ComputeTest_SIMD.h"
 #include "dx11HW.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 
 // Static members
@@ -521,4 +521,4 @@ void ComputeTest_SIMD::DestroyTestBuffers()
     Msg("* [ComputeTest_SIMD] Buffers and queries destroyed");
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

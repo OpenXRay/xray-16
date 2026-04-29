@@ -7,7 +7,7 @@
 
 #define FAR_DIST g_pGamePersistent->Environment().CurrentEnv.far_plane
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void dxFlareRender::Copy(IFlareRender& _in) { *this = *(dxFlareRender*)&_in; }
 void dxFlareRender::CreateShader(LPCSTR sh_name, LPCSTR tex_name)
@@ -164,4 +164,4 @@ void dxLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
 
 void dxLensFlareRender::OnDeviceCreate() { hGeom.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB); }
 void dxLensFlareRender::OnDeviceDestroy() { hGeom.destroy(); }
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

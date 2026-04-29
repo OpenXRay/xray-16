@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class dx11ShaderResourceStateCache
 {
@@ -51,4 +51,4 @@ private:
     bool m_bUpdateDSViews;
     bool m_bUpdateCSViews;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+} // namespace xray::render::fg

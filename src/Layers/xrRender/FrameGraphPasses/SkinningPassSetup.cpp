@@ -31,7 +31,7 @@
 
 extern ENGINE_API float psHUD_FOV;
 
-namespace xray::render::RENDER_NAMESPACE::passes {
+namespace xray::render::fg::passes {
 using namespace bindless;
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -359,8 +359,8 @@ static void RenderSkinnedBatch(
     decals::OverlayManager::SplatRange splatRange = {0, 0},
     bool isHUD = false)
 {
-    using namespace RENDER_NAMESPACE;
-    using namespace RENDER_NAMESPACE::bindless;
+    using namespace fg;
+    using namespace fg::bindless;
 
     if (!batch.vertexBuffer || !batch.indexBuffer)
         return;
@@ -514,7 +514,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
         //  EXECUTE LAMBDA
         // ═══════════════════════════════════════════════════════
         [](const SkinningPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
-            using namespace RENDER_NAMESPACE;
+            using namespace fg;
 
             // Check if any skinned batches to render
             bool hasWorldSkinned = data.geometry && !data.geometry->GetBatches().empty();
@@ -739,4 +739,4 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     return outputs;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE::passes
+} // namespace xray::render::fg::passes
