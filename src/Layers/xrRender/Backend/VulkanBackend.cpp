@@ -188,7 +188,12 @@ void VulkanBackend::Shutdown() {
     m_commandList = nullptr;
     m_computeCommandList = nullptr;
     m_uploadCommandList = nullptr;
+
     m_nvrhiDevice = nullptr;
+    if (m_nvrhiVulkanDevice) {
+        m_nvrhiVulkanDevice->waitForIdle();
+        m_nvrhiVulkanDevice->runGarbageCollection();
+    }
     m_nvrhiVulkanDevice = nullptr;
 
     DestroySyncObjects();
@@ -417,6 +422,7 @@ bool VulkanBackend::CreateLogicalDevice() {
     features2.features.samplerAnisotropy = VK_TRUE;
     features2.features.fillModeNonSolid = VK_TRUE;
     features2.features.multiDrawIndirect = VK_TRUE;
+    features2.features.drawIndirectFirstInstance = VK_TRUE;
     features2.features.independentBlend = VK_TRUE;
     features2.features.shaderStorageImageReadWithoutFormat = VK_TRUE;
     features2.features.shaderStorageImageWriteWithoutFormat = VK_TRUE;
