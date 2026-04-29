@@ -1,16 +1,16 @@
 #include "stdafx.h"
 
-#include "FHierrarhyVisual.h"
-#include "SkeletonCustom.h"
+#include "Layers/xrRender/FHierrarhyVisual.h"
+#include "Layers/xrRender/SkeletonCustom.h"
 #include "xrCore/Threading/ParallelFor.hpp"
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/IRenderable.h"
 #include "xrEngine/xr_object.h"
 
-#include "FLOD.h"
-#include "LightTrack.h"
-#include "ParticleGroup.h"
-#include "FTreeVisual.h"
+#include "Layers/xrRender/FLOD.h"
+#include "Layers/xrRender/LightTrack.h"
+#include "Layers/xrRender/ParticleGroup.h"
+#include "Layers/xrRender/FTreeVisual.h"
 
 namespace xray::render::fg
 {

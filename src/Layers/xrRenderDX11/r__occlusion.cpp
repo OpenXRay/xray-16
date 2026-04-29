@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "r__occlusion.h"
+#include "Layers/xrRender/r__occlusion.h"
 
-#include "QueryHelper.h"
+#include "Layers/xrRender/QueryHelper.h"
 
 namespace xray::render::fg
 {

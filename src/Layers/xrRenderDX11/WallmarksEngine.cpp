@@ -3,10 +3,10 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "WallmarksEngine.h"
+#include "Layers/xrRender/WallmarksEngine.h"
 #include "xrEngine/xr_object.h"
 #include "xrEngine/GameFont.h"
-#include "SkeletonCustom.h"
+#include "Layers/xrRender/SkeletonCustom.h"
 
 namespace xray::render::fg
 {

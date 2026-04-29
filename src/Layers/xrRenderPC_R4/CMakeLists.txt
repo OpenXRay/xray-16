@@ -99,6 +99,12 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRenderDX11/dxRainRender.cpp
     ../xrRenderDX11/dxEnvironmentRender.cpp
     ../xrRenderDX11/dxObjectSpaceRender.cpp
+    ../xrRenderDX11/r__dsgraph_render.cpp
+    ../xrRenderDX11/r__dsgraph_render_lods.cpp
+    ../xrRenderDX11/r__dsgraph_build.cpp
+    ../xrRenderDX11/light_smapvis.cpp
+    ../xrRenderDX11/r__occlusion.cpp
+    ../xrRenderDX11/WallmarksEngine.cpp
     ../xrRenderDX11/ShaderInfo.cpp
     ../xrRenderDX11/blenders/Blender_BmmD_deferred.cpp
     ../xrRenderDX11/blenders/Blender_Detail_GPU.cpp

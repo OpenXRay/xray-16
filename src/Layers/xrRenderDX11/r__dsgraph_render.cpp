@@ -3,9 +3,9 @@
 #include "xrEngine/IRenderable.h"
 #include "xrEngine/CustomHUD.h"
 
-#include "FBasicVisual.h"
-#include "SkeletonCustom.h"
-#include "FLOD.h"
+#include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/SkeletonCustom.h"
+#include "Layers/xrRender/FLOD.h"
 
 extern ENGINE_API float psHUD_FOV;
 

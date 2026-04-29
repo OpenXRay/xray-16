@@ -208,7 +208,6 @@ target_sources(xrRender PRIVATE
     TextureDescrManager.cpp
     Utils/dxHashHelper.cpp
     VertexCache.cpp
-    WallmarksEngine.cpp
     Decals/DecalManager.h
     Decals/DecalManager.cpp
     Decals/fgWallMarkArray.h
@@ -228,14 +227,9 @@ target_sources(xrRender PRIVATE
     dxWallMarkArray.cpp
     light.cpp
     light_GI.cpp
-    light_smapvis.cpp
     light_vis.cpp
     occRasterizer.cpp
     occRasterizer_core.cpp
-    r__dsgraph_build.cpp
-    r__dsgraph_render.cpp
-    r__dsgraph_render_lods.cpp
-    r__occlusion.cpp
     r__pixel_calculator.cpp
     r__sector.cpp
     r__sector_detect.cpp

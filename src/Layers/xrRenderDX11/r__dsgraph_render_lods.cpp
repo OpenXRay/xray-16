@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FLOD.h"
+#include "Layers/xrRender/FLOD.h"
 #include "xrCommon/xr_array.h"
 
 #ifdef _EDITOR

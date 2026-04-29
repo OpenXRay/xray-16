@@ -785,6 +785,24 @@
     <ClCompile Include="..\xrRenderDX11\dxObjectSpaceRender.cpp">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\r__dsgraph_render.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\r__dsgraph_render_lods.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\r__dsgraph_build.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\r__occlusion.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\light_smapvis.cpp">
+      <Filter>Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\WallmarksEngine.cpp">
+      <Filter>Wallmarks</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_BmmD_deferred.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
