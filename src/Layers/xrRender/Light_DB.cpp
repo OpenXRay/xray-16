@@ -8,6 +8,8 @@
 
 namespace xray::render::fg
 {
+CLight_DB Lights;
+
 CLight_DB::CLight_DB() : sun(nullptr) {}
 CLight_DB::~CLight_DB() {}
 void CLight_DB::Load(IReader* fs)

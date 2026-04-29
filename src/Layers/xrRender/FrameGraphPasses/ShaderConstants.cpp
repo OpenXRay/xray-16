@@ -14,7 +14,7 @@ namespace xray::render::fg::passes {
 using namespace xray::render::fg;
 
 void GetSunLightData(SunLightData& outSun, float hdrIntensity) {
-    auto* sun = static_cast<light*>(RImplementation.Lights.sun._get());
+    auto* sun = static_cast<light*>(Lights.sun._get());
     if (sun) {
         outSun.color.set(sun->color.r, sun->color.g, sun->color.b);
         outSun.direction = sun->direction;

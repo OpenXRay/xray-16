@@ -393,7 +393,6 @@ public:
 
     CRenderTarget* Target; // Render-target
 
-    CLight_DB Lights;
     CLight_Compute_XFORM_and_VIS LR;
     xr_vector<light*> Lights_LastFrame;
     SMAP_Allocator LP_smap_pool;

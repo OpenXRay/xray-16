@@ -300,7 +300,7 @@ void FrameGraphRenderer::Render() {
 
     auto frameStart = std::chrono::high_resolution_clock::now();
     
-    RImplementation.Lights.Update();
+    Lights.Update();
 
     if (m_device && m_device->GetFGResourceManager()) {
         m_device->GetFGResourceManager()->Update(Device.fTimeDelta);

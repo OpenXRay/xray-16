@@ -30,4 +30,6 @@ public:
     CLight_DB();
     ~CLight_DB();
 };
+
+extern ECORE_API CLight_DB Lights;
 } // namespace xray::render::fg

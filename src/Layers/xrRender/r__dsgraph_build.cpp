@@ -853,7 +853,7 @@ void R_dsgraph_structure::build_subspace()
                     // TODO: check for HOM flag
                     vis_data& vis = L->get_homdata();
                     if (RImplementation.HOM.visible(vis))
-                        RImplementation.Lights.add_light(L);
+                        Lights.add_light(L);
                 }
                 continue;
             }

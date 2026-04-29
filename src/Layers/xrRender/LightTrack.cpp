@@ -368,7 +368,7 @@ void CROS_impl::update_smooth(IRenderable* O)
 
 void CROS_impl::calc_sun_value(Fvector& position, IGameObject* _object)
 {
-    light* sun = (light*)RImplementation.Lights.sun._get();
+    light* sun = (light*)Lights.sun._get();
 
     if (MODE & IRender_ObjectSpecific::TRACE_SUN)
     {
@@ -531,7 +531,7 @@ void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
         }
 
 #if RENDER == R_R1
-        light* sun = (light*)RImplementation.Lights.sun._get();
+        light* sun = (light*)Lights.sun._get();
 
         // Sun
         float E = sun_smooth * sun->color.intensity();
