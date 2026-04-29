@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="14.0">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\xray_project_configurations.props"/>
+  </ImportGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{DBE09F0B-6535-4EE4-8370-FF91EE444181}</ProjectGuid>
+    <RootNamespace>xrRender</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\xray_project_configuration.props"/>
+  </ImportGroup>
+  <PropertyGroup Label="Configuration">
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+    <Import Project="..\..\xray.props"/>
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros"/>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;$(xrExternals)nvrhi\thirdparty\Vulkan-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)'!='Release Master Gold'">$(xrExternals)onnxruntime\include\onnxruntime\core\session;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_LIB;USE_DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)'!='Release Master Gold'">%(PreprocessorDefinitions);USE_AI_PBR</PreprocessorDefinitions>
+      <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Release Master Gold'">dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;nvrhi_vk.lib;vulkan-1.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;vulkan-1.lib;slang.lib;onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;$(VULKAN_SDK)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build_static\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Release Master Gold'">dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;nvrhi_vk.lib;vulkan-1.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;vulkan-1.lib;slang.lib;onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;$(VULKAN_SDK)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build_static\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Backend\D3D11BackendWrapper.h"/>
+    <ClInclude Include="Backend\D3D12Backend.h"/>
+    <ClInclude Include="Backend\VulkanBackend.h"/>
+    <ClInclude Include="Bindless\BindlessTypes.h"/>
+    <ClInclude Include="Bindless\GPUStructuredBuffer.h"/>
+    <ClInclude Include="Bindless\MaterialBuffer.h"/>
+    <ClInclude Include="Bindless\TerrainMaterialBuffer.h"/>
+    <ClInclude Include="Bindless\VariantTextureBuffer.h"/>
+    <ClInclude Include="Bindless\UnifiedVertex.h"/>
+    <ClInclude Include="Bindless\VertexConverter.h"/>
+    <ClInclude Include="ShaderVariant\ShaderVariantRegistry.h"/>
+    <ClInclude Include="ShaderVariant\JsonParser.h"/>
+    <ClInclude Include="ShaderVariant\VariantPartitionConfig.h"/>
+    <ClInclude Include="ShaderVariant\VariantPSOCache.h"/>
+    <ClInclude Include="Animation.h"/>
+    <ClInclude Include="BufferUtils.h"/>
+    <ClInclude Include="ColorMapManager.h"/>
+    <ClInclude Include="ConstantSystem\FGConstantSystem.h"/>
+    <ClInclude Include="D3DUtils.h"/>
+    <ClInclude Include="D3DXRenderBase.h"/>
+    <ClInclude Include="Debug\dxPixEventWrapper.h"/>
+    <ClInclude Include="DetailFormat.h"/>
+    <ClInclude Include="DetailModel.h"/>
+    <ClInclude Include="du_box.h"/>
+    <ClInclude Include="du_cone.h"/>
+    <ClInclude Include="du_cylinder.h"/>
+    <ClInclude Include="du_sphere.h"/>
+    <ClInclude Include="du_sphere_part.h"/>
+    <ClInclude Include="dxDebugRender.h"/>
+    <ClInclude Include="dxEnvironmentRender.h"/>
+    <ClInclude Include="dxFontRender.h"/>
+    <ClInclude Include="FrameGraphPasses\ForwardColorPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\HiZBuildPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\SkinningPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\ImGuiPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\ParticlePassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\RibbonPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\TrailPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\SmokeTrailManager.h"/>
+    <ClInclude Include="FrameGraphPasses\SmokeTrailPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\ClusterLightPassSetup.h"/>
+    <ClInclude Include="ClusteredLightManager.h"/>
+    <ClInclude Include="FrameGraphPasses\DecalPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\DistortionApplyPassSetup.h"/>
+    <ClInclude Include="Decals\DecalManager.h"/>
+    <ClInclude Include="Decals\fgWallMarkArray.h"/>
+    <ClInclude Include="Decals\MeshPicker.h"/>
+    <ClInclude Include="Decals\OverlayManager.h"/>
+    <ClInclude Include="FrameGraphPasses\PassVertexFormats.h"/>
+    <ClInclude Include="FrameGraphPasses\ParticleGPUCullingManager.h"/>
+    <ClInclude Include="FrameGraphPasses\ExposurePassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\TonemapPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\UIPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\ShaderConstants.h"/>
+    <ClInclude Include="FrameGraphPasses\SkyPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\SunPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\DetailCullPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\DetailPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\TransparentPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\PassCommon.h"/>
+    <ClInclude Include="FrameGraph\Blackboard.h"/>
+    <ClInclude Include="FrameGraphPasses\PathTracerPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\MotionVectorPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\ReSTIRGIPassSetup.h"/>
+    <ClInclude Include="RayTracing\RTAccelStructManager.h"/>
+    <ClInclude Include="FGDetailManager.h"/>
+    <ClInclude Include="..\..\..\Externals\meshoptimizer\src\meshoptimizer.h"/>
+    <ClInclude Include="ImGuiRendererNVRHI.h"/>
+    <ClInclude Include="dxLensFlareRender.h"/>
+    <ClInclude Include="dxObjectSpaceRender.h"/>
+    <ClInclude Include="dxParticleCustom.h"/>
+    <ClInclude Include="dxRainRender.h"/>
+    <ClInclude Include="dxRenderFactory.h"/>
+    <ClInclude Include="dxStatGraphRender.h"/>
+    <ClInclude Include="dxThunderboltDescRender.h"/>
+    <ClInclude Include="dxThunderboltRender.h"/>
+    <ClInclude Include="dxUIRender.h"/>
+    <ClInclude Include="dxUISequenceVideoItem.h"/>
+    <ClInclude Include="dxUIShader.h"/>
+    <ClInclude Include="dxWallMarkArray.h"/>
+    <ClInclude Include="ETextureParams.h"/>
+    <ClInclude Include="FBasicVisual.h"/>
+    <ClInclude Include="FHierrarhyVisual.h"/>
+    <ClInclude Include="FLOD.h"/>
+    <ClInclude Include="FProgressive.h"/>
+    <ClInclude Include="FrameGraph\RenderTargetRegistry.h"/>
+    <ClInclude Include="FrameGraph\ShaderPhaseCache.h"/>
+    <ClInclude Include="FrameGraph\ShaderReflection.h"/>
+    <ClInclude Include="FSkinned.h"/>
+    <ClInclude Include="FSkinnedTypes.h"/>
+    <ClInclude Include="FTreeVisual.h"/>
+    <ClInclude Include="FVF.h"/>
+    <ClInclude Include="FVisual.h"/>
+    <ClInclude Include="Geometry\MaterialCache.h"/>
+    <ClInclude Include="Materials\MaterialSystem.h"/>
+    <ClInclude Include="HOM.h"/>
+    <ClInclude Include="HWCaps.h"/>
+    <ClInclude Include="IRenderDetailModel.h"/>
+    <ClInclude Include="KinematicsAddBoneTransform.hpp"/>
+    <ClInclude Include="light.h"/>
+    <ClInclude Include="LightTrack.h"/>
+    <ClInclude Include="Light_DB.h"/>
+    <ClInclude Include="Light_Package.h"/>
+    <ClInclude Include="ModelPool.h"/>
+    <ClInclude Include="NVRHIUIRenderer.h"/>
+    <ClInclude Include="NvTriStrip.h"/>
+    <ClInclude Include="NvTriStripObjects.h"/>
+    <ClInclude Include="occRasterizer.h"/>
+    <ClInclude Include="ParticleEffect.h"/>
+    <ClInclude Include="ParticleEffectDef.h"/>
+    <ClInclude Include="ParticleGroup.h"/>
+    <ClInclude Include="PBRConverter\ONNXModelRunner.h" Condition="'$(Configuration)'!='Release Master Gold'"/>
+    <ClInclude Include="PBRConverter\PBRTextureConverter.h"/>
+    <ClInclude Include="PSLibrary.h"/>
+    <ClInclude Include="QueryHelper.h"/>
+    <ClInclude Include="ResourceManager\DDSLoader.h"/>
+    <ClInclude Include="ResourceManager\ResourceHandle.h"/>
+    <ClInclude Include="ResourceManager\TestTextureManager.h"/>
+    <ClInclude Include="ResourceManager\TextureManager.h"/>
+    <ClInclude Include="ResourceManager\TextureStreaming.h"/>
+    <ClInclude Include="ResourceManager\AsyncIO.h"/>
+    <ClInclude Include="ResourceManager\BufferManager.h"/>
+    <ClInclude Include="ResourceManager\SamplerCache.h"/>
+    <ClInclude Include="ResourceManager\FGResourceManager.h"/>
+    <ClInclude Include="ResourceManager\NativeRTFactory.h"/>
+    <ClInclude Include="r_constants.h"/>
+    <ClInclude Include="r_constants_cache.h"/>
+    <ClInclude Include="R_DStreams.h"/>
+    <ClInclude Include="r_sun_cascades.h"/>
+    <ClInclude Include="r__dsgraph_structure.h"/>
+    <ClInclude Include="r__dsgraph_types.h"/>
+    <ClInclude Include="r__occlusion.h"/>
+    <ClInclude Include="r__pixel_calculator.h"/>
+    <ClInclude Include="r__sector.h"/>
+    <ClInclude Include="r__sync_point.h"/>
+    <ClInclude Include="Shader.h"/>
+    <ClInclude Include="ShaderKey.h"/>
+    <ClInclude Include="Shaders\SlangReflectionWrapper.h"/>
+    <ClInclude Include="Shaders\SlangVFSAdapter.h"/>
+    <ClInclude Include="SH_Atomic.h"/>
+    <ClInclude Include="SH_Constant.h"/>
+    <ClInclude Include="SH_Matrix.h"/>
+    <ClInclude Include="SH_RT.h"/>
+    <ClInclude Include="SH_Texture.h"/>
+    <ClInclude Include="SkeletonAnimated.h"/>
+    <ClInclude Include="SkeletonCustom.h"/>
+    <ClInclude Include="SkeletonX.h"/>
+    <ClInclude Include="SkeletonXSkinXW.h"/>
+    <ClInclude Include="stats_manager.h"/>
+    <ClInclude Include="TextureDescrManager.h"/>
+    <ClInclude Include="tss.h"/>
+    <ClInclude Include="tss_def.h"/>
+    <ClInclude Include="UIGeometryBatch.h"/>
+    <ClInclude Include="UIRenderCollector.h"/>
+    <ClInclude Include="Utils\dxHashHelper.h"/>
+    <ClInclude Include="VertexCache.h"/>
+    <ClInclude Include="WallmarksEngine.h"/>
+    <ClInclude Include="xrRender_console.h"/>
+    <ClInclude Include="xrStripify.h"/>
+    <ClInclude Include="light_gi.h"/>
+    <ClInclude Include="Light_Render_Direct.h"/>
+    <ClInclude Include="light_smapvis.h"/>
+    <ClInclude Include="NVRHI\NVRHIDevice.h"/>
+    <ClInclude Include="RenderContext\ResourceHandle.h"/>
+    <ClInclude Include="RenderContext\RCShader.h"/>
+    <ClInclude Include="RenderContext\PipelineState.h"/>
+    <ClInclude Include="RenderContext\RenderDevice.h"/>
+    <ClInclude Include="RenderContext\RenderContext.h"/>
+    <ClInclude Include="FrameGraph\FGTypes.h"/>
+    <ClInclude Include="FrameGraph\FGResource.h"/>
+    <ClInclude Include="FrameGraph\FGResourcePool.h"/>
+    <ClInclude Include="FrameGraph\FGPass.h"/>
+    <ClInclude Include="FrameGraph\FrameGraph.h"/>
+    <ClInclude Include="FrameGraph\PassResourceCache.h"/>
+    <ClInclude Include="FrameGraph\BindingLayoutBuilder.h"/>
+    <ClInclude Include="FrameGraph\BindingSetBuilder.h"/>
+    <ClInclude Include="FrameGraph\ResourceShape.h"/>
+    <ClInclude Include="FrameGraph\FGTest.h"/>
+    <ClInclude Include="FrameGraph\ShaderLoader.h"/>
+    <ClInclude Include="FrameGraph\ShaderCache.h"/>
+    <ClInclude Include="FrameGraph\VolatileConstantBufferPool.h"/>
+    <ClInclude Include="Shaders\SlangCompiler.h"/>
+    <ClInclude Include="Shaders\SlangCompilerTest.h"/>
+    <ClInclude Include="Geometry\GeometryBatch.h"/>
+    <ClInclude Include="GPUCullingManager.h"/>
+    <ClInclude Include="r_FrameGraphRenderer.h"/>
+    <ClInclude Include="r5.h"/>
+    <ClInclude Include="FGRenderHost.h"/>
+    <ClInclude Include="FrameGraphRendererModule.h"/>
+    <ClInclude Include="Profiler\GPUProfiler.h"/>
+    <ClInclude Include="Profiler\StatsOverlay.h"/>
+    <ClInclude Include="stdafx.h"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Backend\D3D11BackendWrapper.cpp"/>
+    <ClCompile Include="Backend\D3D12Backend.cpp"/>
+    <ClCompile Include="Backend\VulkanBackend.cpp"/>
+    <ClCompile Include="Bindless\GPUStructuredBuffer.cpp"/>
+    <ClCompile Include="Bindless\MaterialBuffer.cpp"/>
+    <ClCompile Include="Bindless\TerrainMaterialBuffer.cpp"/>
+    <ClCompile Include="Bindless\VariantTextureBuffer.cpp"/>
+    <ClCompile Include="Bindless\VertexConverter.cpp"/>
+    <ClCompile Include="ShaderVariant\ShaderVariantRegistry.cpp"/>
+    <ClCompile Include="ShaderVariant\JsonParser.cpp"/>
+    <ClCompile Include="ShaderVariant\VariantPSOCache.cpp"/>
+    <ClCompile Include="BufferUtils.cpp"/>
+    <ClCompile Include="Animation.cpp"/>
+    <ClCompile Include="ColorMapManager.cpp"/>
+    <ClCompile Include="ConstantSystem\FGConstantSystem.cpp"/>
+    <ClCompile Include="D3DUtils.cpp"/>
+    <ClCompile Include="D3DXRenderBase.cpp"/>
+    <ClCompile Include="DetailModel.cpp"/>
+    <ClCompile Include="du_box.cpp"/>
+    <ClCompile Include="du_cone.cpp"/>
+    <ClCompile Include="du_cylinder.cpp"/>
+    <ClCompile Include="du_sphere.cpp"/>
+    <ClCompile Include="du_sphere_part.cpp"/>
+    <ClCompile Include="dxDebugRender.cpp"/>
+    <ClCompile Include="dxEnvironmentRender.cpp"/>
+    <ClCompile Include="dxFontRender.cpp"/>
+    <ClCompile Include="FrameGraphPasses\ForwardColorPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\HiZBuildPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\SkinningPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\ImGuiPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\ParticlePassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\RibbonPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\TrailPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\SmokeTrailManager.cpp"/>
+    <ClCompile Include="FrameGraphPasses\SmokeTrailPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\ClusterLightPassSetup.cpp"/>
+    <ClCompile Include="ClusteredLightManager.cpp"/>
+    <ClCompile Include="FrameGraphPasses\DecalPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\DistortionApplyPassSetup.cpp"/>
+    <ClCompile Include="Decals\DecalManager.cpp"/>
+    <ClCompile Include="Decals\fgWallMarkArray.cpp"/>
+    <ClCompile Include="Decals\MeshPicker.cpp"/>
+    <ClCompile Include="Decals\OverlayManager.cpp"/>
+    <ClCompile Include="FrameGraphPasses\ParticleGPUCullingManager.cpp"/>
+    <ClCompile Include="FrameGraphPasses\ExposurePassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\TonemapPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\UIPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\ShaderConstants.cpp"/>
+    <ClCompile Include="FrameGraphPasses\SkyPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\SunPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\DetailCullPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\DetailPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\TransparentPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\PassCommon.cpp"/>
+    <ClCompile Include="FrameGraphPasses\PathTracerPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\MotionVectorPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\ReSTIRGIPassSetup.cpp"/>
+    <ClCompile Include="RayTracing\RTAccelStructManager.cpp"/>
+    <ClCompile Include="FGDetailManager.cpp"/>
+    <ClCompile Include="ImGuiRendererNVRHI.cpp"/>
+    <ClCompile Include="ImGuiRendererNVRHI_Shaders.cpp"/>
+    <ClCompile Include="ImGuiRendererNVRHI_Render.cpp"/>
+    <ClCompile Include="ImGuiRendererIntegration.cpp"/>
+    <ClCompile Include="dxRenderFactory_ImGui.cpp"/>
+    <ClCompile Include="GlobalRenderDevice.cpp"/>
+    <ClCompile Include="dxLensFlareRender.cpp"/>
+    <ClCompile Include="dxObjectSpaceRender.cpp"/>
+    <ClCompile Include="dxParticleCustom.cpp"/>
+    <ClCompile Include="dxRainRender.cpp"/>
+    <ClCompile Include="dxRenderFactory.cpp"/>
+    <ClCompile Include="dxStatGraphRender.cpp"/>
+    <ClCompile Include="dxThunderboltDescRender.cpp"/>
+    <ClCompile Include="dxThunderboltRender.cpp"/>
+    <ClCompile Include="dxUIRender.cpp"/>
+    <ClCompile Include="dxUISequenceVideoItem.cpp"/>
+    <ClCompile Include="dxUIShader.cpp"/>
+    <ClCompile Include="dxWallMarkArray.cpp"/>
+    <ClCompile Include="ETextureParams.cpp"/>
+    <ClCompile Include="FBasicVisual.cpp"/>
+    <ClCompile Include="FHierrarhyVisual.cpp"/>
+    <ClCompile Include="FLOD.cpp"/>
+    <ClCompile Include="FProgressive.cpp"/>
+    <ClCompile Include="FrameGraph\ShaderPhaseCache.cpp"/>
+    <ClCompile Include="FSkinned.cpp"/>
+    <ClCompile Include="FTreeVisual.cpp"/>
+    <ClCompile Include="FVisual.cpp"/>
+    <ClCompile Include="Geometry\MaterialCache.cpp"/>
+    <ClCompile Include="Materials\MaterialSystem.cpp"/>
+    <ClCompile Include="HOM.cpp"/>
+    <ClCompile Include="light.cpp"/>
+    <ClCompile Include="LightTrack.cpp"/>
+    <ClCompile Include="Light_DB.cpp"/>
+    <ClCompile Include="Light_Package.cpp"/>
+    <ClCompile Include="ModelPool.cpp"/>
+    <ClCompile Include="NVRHIUIRenderer.cpp"/>
+    <ClCompile Include="NvTriStrip.cpp"/>
+    <ClCompile Include="NvTriStripObjects.cpp"/>
+    <ClCompile Include="occRasterizer.cpp"/>
+    <ClCompile Include="occRasterizer_core.cpp"/>
+    <ClCompile Include="ParticleEffect.cpp"/>
+    <ClCompile Include="ParticleEffectDef.cpp"/>
+    <ClCompile Include="ParticleGroup.cpp"/>
+    <ClCompile Include="PBRConverter\ONNXModelRunner.cpp" Condition="'$(Configuration)'!='Release Master Gold'"/>
+    <ClCompile Include="PBRConverter\PBRTextureConverter.cpp"/>
+    <ClCompile Include="PSLibrary.cpp"/>
+    <ClCompile Include="ResourceManager\DDSLoader.cpp"/>
+    <ClCompile Include="ResourceManager\TestTextureManager.cpp"/>
+    <ClCompile Include="ResourceManager\TextureManager.cpp"/>
+    <ClCompile Include="ResourceManager\TextureStreaming.cpp"/>
+    <ClCompile Include="ResourceManager\AsyncIO.cpp"/>
+    <ClCompile Include="ResourceManager\BufferManager.cpp"/>
+    <ClCompile Include="ResourceManager\SamplerCache.cpp"/>
+    <ClCompile Include="ResourceManager\FGResourceManager.cpp"/>
+    <ClCompile Include="ResourceManager\NativeRTFactory.cpp"/>
+    <ClCompile Include="r_constants.cpp"/>
+    <ClCompile Include="R_DStreams.cpp"/>
+    <ClCompile Include="r__dsgraph_build.cpp"/>
+    <ClCompile Include="r__dsgraph_render.cpp"/>
+    <ClCompile Include="r__dsgraph_render_lods.cpp"/>
+    <ClCompile Include="r__occlusion.cpp"/>
+    <ClCompile Include="r__pixel_calculator.cpp"/>
+    <ClCompile Include="r__sector.cpp"/>
+    <ClCompile Include="r__sector_detect.cpp"/>
+    <ClCompile Include="r__sector_traversal.cpp"/>
+    <ClCompile Include="r__sync_point.cpp"/>
+    <ClCompile Include="Shader.cpp"/>
+    <ClCompile Include="ShaderKey.cpp"/>
+    <ClCompile Include="Shaders\SlangReflectionWrapper.cpp"/>
+    <ClCompile Include="Shaders\SlangVFSAdapter.cpp"/>
+    <ClCompile Include="SH_Atomic.cpp"/>
+    <ClCompile Include="SH_Constant.cpp"/>
+    <ClCompile Include="SH_Matrix.cpp"/>
+    <ClCompile Include="SkeletonAnimated.cpp"/>
+    <ClCompile Include="SkeletonCustom.cpp"/>
+    <ClCompile Include="SkeletonRigid.cpp"/>
+    <ClCompile Include="SkeletonX.cpp"/>
+    <ClCompile Include="SkeletonXSkinXW_CPP.cpp"/>
+    <ClCompile Include="SkeletonXSkinXW_SSE.cpp"/>
+    <ClCompile Include="stats_manager.cpp"/>
+    <ClCompile Include="TextureDescrManager.cpp"/>
+    <ClCompile Include="UIRenderCollector.cpp"/>
+    <ClCompile Include="Utils\dxHashHelper.cpp"/>
+    <ClCompile Include="VertexCache.cpp"/>
+    <ClCompile Include="WallmarksEngine.cpp"/>
+    <ClCompile Include="xrStripify.cpp"/>
+    <ClCompile Include="light_GI.cpp"/>
+    <ClCompile Include="Light_Render_Direct.cpp"/>
+    <ClCompile Include="Light_Render_Direct_ComputeXFS.cpp"/>
+    <ClCompile Include="light_smapvis.cpp"/>
+    <ClCompile Include="light_vis.cpp"/>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\allocator.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\clusterizer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexanalyzer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexcodec.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexgenerator.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\overdrawoptimizer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\partition.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\quantization.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\rasterizer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\simplifier.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\spatialorder.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\stripifier.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vcacheoptimizer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexcodec.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexfilter.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vfetchoptimizer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="NVRHI\NVRHIDevice.cpp"/>
+    <ClCompile Include="RenderContext\RCShader.cpp"/>
+    <ClCompile Include="RenderContext\PipelineState.cpp"/>
+    <ClCompile Include="RenderContext\RenderDevice.cpp"/>
+    <ClCompile Include="RenderContext\RenderContext.cpp"/>
+    <ClCompile Include="FrameGraph\FGResource.cpp"/>
+    <ClCompile Include="FrameGraph\FGResourcePool.cpp"/>
+    <ClCompile Include="FrameGraph\FGPass.cpp"/>
+    <ClCompile Include="FrameGraph\FrameGraph.cpp"/>
+    <ClCompile Include="FrameGraph\PassResourceCache.cpp"/>
+    <ClCompile Include="FrameGraph\BindingLayoutBuilder.cpp"/>
+    <ClCompile Include="FrameGraph\BindingSetBuilder.cpp"/>
+    <ClCompile Include="FrameGraph\ShaderReflection.cpp"/>
+    <ClCompile Include="FrameGraph\FGTest.cpp"/>
+    <ClCompile Include="FrameGraph\ShaderLoader.cpp"/>
+    <ClCompile Include="FrameGraph\ShaderCache.cpp"/>
+    <ClCompile Include="FrameGraph\VolatileConstantBufferPool.cpp"/>
+    <ClCompile Include="Shaders\SlangCompiler.cpp"/>
+    <ClCompile Include="Shaders\SlangCompilerTest.cpp"/>
+    <ClCompile Include="Geometry\GeometryBatch.cpp"/>
+    <ClCompile Include="GPUCullingManager.cpp"/>
+    <ClCompile Include="r_FrameGraphRenderer.cpp"/>
+    <ClCompile Include="r5.cpp"/>
+    <ClCompile Include="FGRenderHost.cpp"/>
+    <ClCompile Include="FrameGraphRendererModule.cpp"/>
+    <ClCompile Include="Profiler\GPUProfiler.cpp"/>
+    <ClCompile Include="Profiler\StatsOverlay.cpp"/>
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrEngine\xrEngine.vcxproj">
+      <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrParticles\xrParticles.vcxproj">
+      <Project>{94a1c366-3d19-48e6-8170-4adc2e70df97}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrScriptEngine\xrScriptEngine.vcxproj">
+      <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)Layers\xrAPI\xrAPI.vcxproj">
+      <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
+      <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrCDB\xrCDB.vcxproj">
+      <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)luabind.vcxproj">
+      <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)LuaJIT-proj\LuaJIT.vcxproj">
+      <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrMaterialSystem\xrMaterialSystem.vcxproj">
+      <Project>{2c419512-6eee-4707-bc51-2e834855552e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\nvrhi\vs_build\nvrhi.vcxproj" Condition="Exists('..\..\..\Externals\nvrhi\vs_build\nvrhi.vcxproj')">
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\slang\vs_build\slang.vcxproj" Condition="Exists('..\..\..\Externals\slang\vs_build\slang.vcxproj')">
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis"/>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+</Project>
