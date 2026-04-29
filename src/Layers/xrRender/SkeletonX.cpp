@@ -223,7 +223,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
     }
 
     // Look at single bone case in the switch above
-    const size_t count = RImplementation.o.ffp ? 0 : 1;
+    const size_t count = CompatHW::ffp() ? 0 : 1;
 
     if (bids.size() > count)
     {

@@ -66,6 +66,8 @@ public:
     virtual shared_str const& particles_group_id(PS::CPGDef const& particles_group) const;
 };
 
+extern ECORE_API CPSLibrary* g_pPSLibrary;
+
 #define PS_LIB_SIGN "PS_LIB"
 
 #define PS_VERSION 0x0001

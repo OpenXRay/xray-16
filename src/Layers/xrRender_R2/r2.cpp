@@ -518,6 +518,7 @@ void CRender::create()
 
     Models = xr_new<CModelPool>();
     g_pModelPool = Models;
+    g_pPSLibrary = &PSLibrary;
     PSLibrary.OnCreate();
     HWOCC.occq_create(occq_size);
 
@@ -568,6 +569,7 @@ void CRender::destroy()
     HWOCC.occq_destroy();
     xr_delete(Models);
     g_pModelPool = nullptr;
+    g_pPSLibrary = nullptr;
     xr_delete(Target);
     PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);

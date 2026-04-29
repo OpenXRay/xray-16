@@ -197,7 +197,9 @@ void CParticleGroup::SItem::Clear()
 }
 void CParticleGroup::SItem::StartRelatedChild(CParticleEffect* emitter, LPCSTR eff_name, PAPI::Particle& m)
 {
-    CParticleEffect* C = static_cast<CParticleEffect*>(RImplementation.model_CreatePE(eff_name));
+    PS::CPEDef* SE = g_pPSLibrary->FindPED(eff_name);
+    R_ASSERT3(SE, "Particle effect doesn't exist", eff_name);
+    CParticleEffect* C = static_cast<CParticleEffect*>(g_pModelPool->CreatePE(SE));
 
     C->SetHudMode(emitter->GetHudMode());
 
@@ -229,7 +231,9 @@ void CParticleGroup::SItem::StopRelatedChild(u32 idx)
 }
 void CParticleGroup::SItem::StartFreeChild(CParticleEffect* emitter, LPCSTR nm, PAPI::Particle& m)
 {
-    CParticleEffect* C = static_cast<CParticleEffect*>(RImplementation.model_CreatePE(nm));
+    PS::CPEDef* SE2 = g_pPSLibrary->FindPED(nm);
+    R_ASSERT3(SE2, "Particle effect doesn't exist", nm);
+    CParticleEffect* C = static_cast<CParticleEffect*>(g_pModelPool->CreatePE(SE2));
     C->SetHudMode(emitter->GetHudMode());
     if (!C->IsLooped())
     {
@@ -557,7 +561,9 @@ BOOL CParticleGroup::Compile(CPGDef* def)
         items.resize(m_Def->m_Effects.size());
         for (CPGDef::EffectVec::const_iterator e_it = m_Def->m_Effects.begin(); e_it != m_Def->m_Effects.end(); ++e_it)
         {
-            CParticleEffect* eff = (CParticleEffect*)RImplementation.model_CreatePE((*e_it)->m_EffectName.c_str());
+            PS::CPEDef* SE3 = g_pPSLibrary->FindPED((*e_it)->m_EffectName.c_str());
+            R_ASSERT3(SE3, "Particle effect doesn't exist", (*e_it)->m_EffectName.c_str());
+            CParticleEffect* eff = (CParticleEffect*)g_pModelPool->CreatePE(SE3);
             eff->SetBirthDeadCB(OnGroupParticleBirth, OnGroupParticleDead, this, u32(e_it - m_Def->m_Effects.begin()));
             items[e_it - def->m_Effects.begin()].Set(eff);
         }
