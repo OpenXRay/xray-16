@@ -9,6 +9,8 @@
 #include "ParticleGroup.h"
 #include "PSLibrary.h"
 #include "ParticleEffect.h"
+#include "Layers/xrRender/r__buffer_pool.h"
+#include "Layers/xrRender/ModelPool.h"
 
 namespace xray::render::fg
 {
@@ -185,7 +187,7 @@ void CParticleGroup::SItem::Clear()
     VisualVec visuals;
     GetVisuals(visuals);
     for (auto& visual : visuals)
-        RImplementation.model_Delete((IRenderVisual*&)visual, false);
+        g_pModelPool->Delete(visual, FALSE);
 
     //	Igor: zero all pointers! Previous code didn't zero _source_ pointers,
     //	just temporary ones.
@@ -279,10 +281,10 @@ void CParticleGroup::SItem::Stop(BOOL def_stop)
     if (!def_stop)
     {
         for (auto& child : _children_related)
-            RImplementation.model_Delete((IRenderVisual*&)child, false);
+            g_pModelPool->Delete(child, FALSE);
 
         for (auto& child : _children_free)
-            RImplementation.model_Delete((IRenderVisual*&)child, false);
+            g_pModelPool->Delete(child, FALSE);
 
         _children_related.clear();
         _children_free.clear();
@@ -422,7 +424,7 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
             else
             {
                 rem_cnt++;
-                RImplementation.model_Delete((IRenderVisual*&)child, false);
+                g_pModelPool->Delete(child, FALSE);
             }
         }
         // remove if stopped
