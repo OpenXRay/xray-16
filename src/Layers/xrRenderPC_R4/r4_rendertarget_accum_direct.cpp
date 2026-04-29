@@ -367,7 +367,7 @@ void CRenderTarget::accum_direct_cascade(CBackend& cmd_list, u32 sub_phase, Fmat
 
     //	TODO: DX11: Remove half pixe offset
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = (light*)Lights.sun._get();
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -861,7 +861,7 @@ void CRenderTarget::accum_direct_f(CBackend& cmd_list, u32 sub_phase)
     u_setrt(cmd_list, rt_Generic_0_r, nullptr, nullptr, rt_MSAADepth);
 
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = (light*)Lights.sun._get();
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -1082,7 +1082,7 @@ void CRenderTarget::accum_direct_lum(CBackend& cmd_list)
     phase_accumulator(cmd_list);
 
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = (light*)Lights.sun._get();
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -1246,7 +1246,7 @@ void CRenderTarget::accum_direct_volumetric(CBackend& cmd_list, u32 sub_phase,
     // Perform lighting
     {
         // *** assume accumulator setted up ***
-        light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+        light* fuckingsun = (light*)Lights.sun._get();
 
         // Common constants (light-related)
         Fvector L_dir, L_clr;
