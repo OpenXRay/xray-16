@@ -1,32 +1,30 @@
 #include "stdafx.h"
 
-#include "dxEnvironmentRender.h"
+#include "Layers/xrRender/dxEnvironmentRender.h"
 
 #include "Layers/xrRenderDX11/Blender.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/xr_efflensflare.h"
-#include "FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render::fg
 {
-//////////////////////////////////////////////////////////////////////////
-// half box def
 static Fvector3 hbox_verts[24] =
 {
-    {-1.f,   -1.f, -1.f}, { -1.f, -1.01f, -1.f}, // down
-    { 1.f,   -1.f, -1.f}, {  1.f, -1.01f, -1.f}, // down
-    {-1.f,   -1.f,  1.f}, { -1.f, -1.01f,  1.f}, // down
-    { 1.f,   -1.f,  1.f}, {  1.f, -1.01f,  1.f}, // down
+    {-1.f,   -1.f, -1.f}, { -1.f, -1.01f, -1.f},
+    { 1.f,   -1.f, -1.f}, {  1.f, -1.01f, -1.f},
+    {-1.f,   -1.f,  1.f}, { -1.f, -1.01f,  1.f},
+    { 1.f,   -1.f,  1.f}, {  1.f, -1.01f,  1.f},
     {-1.f,    1.f, -1.f}, { -1.f,  1.f,   -1.f},
     { 1.f,    1.f, -1.f}, {  1.f,  1.f,   -1.f},
     {-1.f,    1.f,  1.f}, { -1.f,  1.f,    1.f},
     { 1.f,    1.f,  1.f}, {  1.f,  1.f,    1.f},
-    {-1.f, -0.01f, -1.f}, { -1.f, -1.f,   -1.f}, // half
-    { 1.f, -0.01f, -1.f}, {  1.f, -1.f,   -1.f}, // half
-    { 1.f, -0.01f,  1.f}, {  1.f, -1.f,    1.f}, // half
-    {-1.f, -0.01f,  1.f}, { -1.f, -1.f,    1.f}  // half
+    {-1.f, -0.01f, -1.f}, { -1.f, -1.f,   -1.f},
+    { 1.f, -0.01f, -1.f}, {  1.f, -1.f,   -1.f},
+    { 1.f, -0.01f,  1.f}, {  1.f, -1.f,    1.f},
+    {-1.f, -0.01f,  1.f}, { -1.f, -1.f,    1.f}
 };
 
 static u16 hbox_faces[20 * 3] =
@@ -95,18 +93,15 @@ public:
     {
         C.r_Pass("sky2", "sky2", FALSE, TRUE, FALSE);
 #if defined(USE_DX11)
-        // C.r_Sampler_clf		("s_sky0",		"$null"			);
-        // C.r_Sampler_clf		("s_sky1",		"$null"			);
         C.r_dx11Texture("s_sky0", "$null");
         C.r_dx11Texture("s_sky1", "$null");
         C.r_dx11Sampler("smp_rtlinear");
-        // C.r_Sampler_rtf		("s_tonemap",	"$user$tonemap"	);	//. hack
-        C.r_dx11Texture("s_tonemap", "$user$tonemap"); //. hack
+        C.r_dx11Texture("s_tonemap", "$user$tonemap");
         C.PassSET_ZB(FALSE, FALSE);
 #elif defined(USE_OGL)
         C.r_Sampler_clf("s_sky0", "$null");
         C.r_Sampler_clf("s_sky1", "$null");
-        C.r_Sampler_rtf("s_tonemap", "$user$tonemap"); //. hack
+        C.r_Sampler_rtf("s_tonemap", "$user$tonemap");
         C.PassSET_ZB(FALSE, FALSE);
 #else
 #   error No graphics API selected or enabled!
@@ -182,18 +177,17 @@ void dxEnvironmentRender::lerp(CEnvDescriptorMixer& currentEnv, IEnvDescriptorRe
     if (tonemap_tstage_clouds != u32(-1))
         clouds_r_textures.emplace_back(tonemap_tstage_clouds, tonemap);
 
-    //. Setup skybox textures, somewhat ugly
     auto e0 = sky_r_textures[0].second->surface_get();
     auto e1 = sky_r_textures[1].second->surface_get();
 #ifdef USE_OGL
     tsky0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
     tsky1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
-#else // USE_OGL
+#else
     tsky0->surface_set(e0);
     _RELEASE(e0);
     tsky1->surface_set(e1);
     _RELEASE(e1);
-#endif // USE_OGL
+#endif
 
     const bool menu_pp = g_pGamePersistent->OnRenderPPUI_query();
     e0 = menu_pp ? 0 : pA->sky_texture_env->surface_get();
@@ -201,14 +195,13 @@ void dxEnvironmentRender::lerp(CEnvDescriptorMixer& currentEnv, IEnvDescriptorRe
 #   ifdef USE_OGL
     t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
     t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
-#   else // USE_OGL
+#   else
     t_envmap_0->surface_set(e0);
     _RELEASE(e0);
     t_envmap_1->surface_set(e1);
     _RELEASE(e1);
-#   endif // USE_OGL
+#   endif
 
-    // ******************** Environment params (setting)
 #if defined(USE_DX9)
 #   if RENDER == R_R1
     Fvector3 fog_color = currentEnv.fog_color;
@@ -220,7 +213,6 @@ void dxEnvironmentRender::lerp(CEnvDescriptorMixer& currentEnv, IEnvDescriptorRe
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGSTART, *(u32*)(&currentEnv.fog_near)));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGEND, *(u32*)(&currentEnv.fog_far)));
 #else
-    //	TODO: DX11: Implement environment parameters setting for DX11 (if necessary)
 #endif
 }
 
@@ -228,7 +220,6 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 {
     RImplementation.rmFar(RCache);
 
-    // draw sky box
     Fmatrix mSky;
     mSky.rotateY(env.CurrentEnv.sky_rotation);
     mSky.translate_over(Device.vCameraPosition);
@@ -237,18 +228,15 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     u32 C = color_rgba(iFloor(env.CurrentEnv.sky_color.x * 255.f), iFloor(env.CurrentEnv.sky_color.y * 255.f),
         iFloor(env.CurrentEnv.sky_color.z * 255.f), iFloor(env.CurrentEnv.weight * 255.f));
 
-    // Fill index buffer
     u16* pib = RImplementation.Index.Lock(20 * 3, i_offset);
     CopyMemory(pib, hbox_faces, 20 * 3 * 2);
     RImplementation.Index.Unlock(20 * 3);
 
-    // Fill vertex buffer
     v_skybox* pv = (v_skybox*)RImplementation.Vertex.Lock(12, sh_2geom.stride(), v_offset);
     for (u32 v = 0; v < 12; v++)
         pv[v].set(hbox_verts[v * 2], C, hbox_verts[v * 2 + 1]);
     RImplementation.Vertex.Unlock(12, sh_2geom.stride());
 
-    // Render
     RCache.set_xform_world(mSky);
     RCache.set_Geometry(sh_2geom);
     RCache.set_Shader(sh_2sky);
@@ -263,36 +251,28 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, 12, i_offset, 20);
 
 #ifdef USE_OGL
-    // Sun must be rendered to generic0 only as it is done in DX
     if (!RImplementation.o.msaa)
         RImplementation.Target->u_setrt(RCache, RImplementation.Target->rt_Generic_0, nullptr, nullptr, RImplementation.Target->rt_Base_Depth);
     else
         RImplementation.Target->u_setrt(RCache, RImplementation.Target->rt_Generic_0_r, nullptr, nullptr, RImplementation.Target->rt_MSAADepth);
-#endif // USE_OGL
+#endif
 
-    // Sun
     RImplementation.rmNormal(RCache);
 #if RENDER != R_R1
-    //
-    // This hack is done to make sure that the state is set for sure:
-    // The state may be not set by RCache if the state is changed using API SetRenderState() function before
-    // and the RCache flag will remain unchanged to it's old value.
-    //
     RCache.set_Z(FALSE);
     RCache.set_Z(TRUE);
     env.eff_LensFlare->Render(TRUE, FALSE, FALSE);
     RCache.set_Z(FALSE);
-#else // RENDER != R_R1
+#else
     env.eff_LensFlare->Render(TRUE, FALSE, FALSE);
-#endif // RENDER != R_R1
+#endif
 
 #ifdef USE_OGL
-    // set low/hi RTs for clouds
     if (!RImplementation.o.msaa)
         RImplementation.Target->u_setrt(RCache, RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Generic_1, nullptr, RImplementation.Target->rt_Base_Depth);
     else
         RImplementation.Target->u_setrt(RCache, RImplementation.Target->rt_Generic_0_r, RImplementation.Target->rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth);
-#endif // USE_OGL
+#endif
 }
 
 void dxEnvironmentRender::RenderClouds(CEnvironment& env)
@@ -318,18 +298,15 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     u32 C1 = color_rgba(iFloor(env.CurrentEnv.clouds_color.x * 255.f), iFloor(env.CurrentEnv.clouds_color.y * 255.f),
         iFloor(env.CurrentEnv.clouds_color.z * 255.f), iFloor(env.CurrentEnv.clouds_color.w * 255.f));
 
-    // Fill index buffer
     u16* pib = RImplementation.Index.Lock(env.CloudsIndices.size(), i_offset);
     CopyMemory(pib, &env.CloudsIndices.front(), env.CloudsIndices.size() * sizeof(u16));
     RImplementation.Index.Unlock(env.CloudsIndices.size());
 
-    // Fill vertex buffer
     v_clouds* pv = (v_clouds*)RImplementation.Vertex.Lock(env.CloudsVerts.size(), clouds_geom.stride(), v_offset);
     for (auto it = env.CloudsVerts.begin(); it != env.CloudsVerts.end(); ++it, pv++)
         pv->set(*it, C0, C1);
     RImplementation.Vertex.Unlock(env.CloudsVerts.size(), clouds_geom.stride());
 
-    // Render
     RCache.set_xform_world(mXFORM);
     RCache.set_Geometry(clouds_geom);
     RCache.set_Shader(clouds_sh);

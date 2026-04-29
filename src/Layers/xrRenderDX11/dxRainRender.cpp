@@ -1,13 +1,12 @@
 #include "stdafx.h"
-#include "dxRainRender.h"
+#include "Layers/xrRender/dxRainRender.h"
 
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Rain.h"
-#include "FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render::fg
 {
-//	Warning: duplicated in rain.cpp
 static const int max_desired_items = 2500;
 static const float source_radius = 12.5f;
 static const float source_offset = 40.f;
@@ -67,7 +66,6 @@ void dxRainRender::Render(CEffect_Rain& owner)
 
     const u32 desired_items = iFloor(0.5f * (1.f + factor) * float(max_desired_items));
 
-    // born _new_ if needed
     if (owner.items.size() < desired_items)
     {
         owner.items.reserve(desired_items);
@@ -79,28 +77,24 @@ void dxRainRender::Render(CEffect_Rain& owner)
         }
     }
 
-    // visual
     const float factor_visual = factor / 2.f + .5f;
     const Fvector3 f_rain_color = g_pGamePersistent->Environment().CurrentEnv.rain_color;
     const u32 u_rain_color = color_rgba_f(f_rain_color.x, f_rain_color.y, f_rain_color.z, factor_visual);
 
     const float b_radius_wrap_sqr = _sqr((source_radius + .5f));
 
-    // build source plane
     Fplane src_plane;
     Fvector norm = {0.f, -1.f, 0.f};
     Fvector upper;
     upper.set(Device.vCameraPosition.x, Device.vCameraPosition.y + source_offset, Device.vCameraPosition.z);
     src_plane.build(upper, norm);
 
-    // perform update
     u32 vOffset;
     FVF::LIT* verts = (FVF::LIT*)RImplementation.Vertex.Lock(desired_items * 4, hGeom_Rain->vb_stride, vOffset);
     FVF::LIT* start = verts;
     const Fvector& vEye = Device.vCameraPosition;
     for (u32 I = 0; I < desired_items; I++)
     {
-        // physics and time control
         CEffect_Rain::Item& one = owner.items[I];
 
         if (one.dwTime_Hit < Device.dwTimeGlobal)
@@ -108,9 +102,6 @@ void dxRainRender::Render(CEffect_Rain& owner)
         if (one.dwTime_Life < Device.dwTimeGlobal)
             owner.Born(one, source_radius);
 
-        // последняя дельта ??
-        //.		float xdt		= float(one.dwTime_Hit-Device.dwTimeGlobal)/1000.f;
-        //.		float dt		= Device.fTimeDelta;//xdt<Device.fTimeDelta?xdt:Device.fTimeDelta;
         float dt = Device.fTimeDelta;
         one.P.mad(one.D, one.fSpeed * dt);
         Fvector wdir;
@@ -119,10 +110,8 @@ void dxRainRender::Render(CEffect_Rain& owner)
         if (wlen > b_radius_wrap_sqr)
         {
             wlen = _sqrt(wlen);
-            //.			Device.Statistic->TEST3.Begin();
             if ((one.P.y - vEye.y) < sink_offset)
             {
-                // need born
                 one.invalidate();
             }
             else
@@ -139,36 +128,28 @@ void dxRainRender::Render(CEffect_Rain& owner)
                     {
                         if (_sqr(height) <= dist_sqr)
                         {
-                            one.invalidate(); // need born
-                            //							Log("1");
+                            one.invalidate();
                         }
                         else
                         {
-                            owner.RenewItem(one, height - _sqrt(dist_sqr), TRUE); // fly to point
-                            //							Log("2",height-dist);
+                            owner.RenewItem(one, height - _sqrt(dist_sqr), TRUE);
                         }
                     }
                     else
                     {
-                        owner.RenewItem(one, max_distance - _sqrt(dist_sqr), FALSE); // fly ...
-                        //						Log("3",1.5f*b_height-dist);
+                        owner.RenewItem(one, max_distance - _sqrt(dist_sqr), FALSE);
                     }
                 }
                 else
                 {
-                    // need born
                     one.invalidate();
-                    //					Log("4");
                 }
             }
-            //.			Device.Statistic->TEST3.End();
         }
-        // Build line
         Fvector& pos_head = one.P;
         Fvector pos_trail;
         pos_trail.mad(pos_head, one.D, -drop_length * factor_visual);
 
-        // Culling
         Fvector sC, lineD;
         float sR;
         sC.sub(pos_head, pos_trail);
@@ -181,7 +162,6 @@ void dxRainRender::Render(CEffect_Rain& owner)
 
         static Fvector2 UV[2][4] = {{{0, 1}, {0, 0}, {1, 1}, {1, 0}}, {{1, 0}, {1, 1}, {0, 0}, {0, 1}}};
 
-        // Everything OK - build vertices
         Fvector P, lineTop, camDir;
         camDir.sub(sC, vEye);
         camDir.normalize();
@@ -204,20 +184,16 @@ void dxRainRender::Render(CEffect_Rain& owner)
     u32 vCount = (u32)(verts - start);
     RImplementation.Vertex.Unlock(vCount, hGeom_Rain->vb_stride);
 
-    // Render if needed
     if (vCount)
     {
-        // HW.pDevice->SetRenderState	(D3DRS_CULLMODE,D3DCULL_NONE);
         RCache.set_CullMode(CULL_NONE);
         RCache.set_xform_world(Fidentity);
         RCache.set_Shader(SH_Rain);
         RCache.set_Geometry(hGeom_Rain);
         RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, 0, vCount / 2);
-        // HW.pDevice->SetRenderState	(D3DRS_CULLMODE,D3DCULL_CCW);
         RCache.set_CullMode(CULL_CCW);
     }
 
-    // Particles
     CEffect_Rain::Particle* P = owner.particle_active;
     if (nullptr == P)
         return;
@@ -239,8 +215,6 @@ void dxRainRender::Render(CEffect_Rain& owner)
         {
             CEffect_Rain::Particle* next = P->next;
 
-            // Update
-            // P can be zero sometimes and it crashes
             P->time -= dt;
             if (P->time < 0)
             {
@@ -249,15 +223,12 @@ void dxRainRender::Render(CEffect_Rain& owner)
                 continue;
             }
 
-            // Render
             if (RImplementation.ViewBase.testSphere_dirty(P->bounds.P, P->bounds.R))
             {
-                // Build matrix
                 float scale = P->time / particles_time;
                 mScale.scale(scale, scale, scale);
                 mXform.mul_43(P->mXForm, mScale);
 
-                // XForm verts
                 DM_Drop->transfer(mXform, v_ptr, u_rain_color, i_ptr, pcount * DM_Drop->number_vertices);
                 v_ptr += DM_Drop->number_vertices;
                 i_ptr += DM_Drop->number_indices;
@@ -265,7 +236,6 @@ void dxRainRender::Render(CEffect_Rain& owner)
 
                 if (pcount >= particles_cache)
                 {
-                    // flush
                     u32 dwNumPrimitives = iCount_Lock / 3;
                     RImplementation.Vertex.Unlock(vCount_Lock, hGeom_Drops->vb_stride);
                     _IS.Unlock(iCount_Lock);
@@ -283,7 +253,6 @@ void dxRainRender::Render(CEffect_Rain& owner)
             P = next;
         }
 
-        // Flush if needed
         vCount_Lock = pcount * DM_Drop->number_vertices;
         iCount_Lock = pcount * DM_Drop->number_indices;
         u32 dwNumPrimitives = iCount_Lock / 3;

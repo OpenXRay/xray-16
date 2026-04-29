@@ -758,6 +758,33 @@
     <ClCompile Include="..\xrRenderDX11\dxUIShader.cpp">
       <Filter>Interface implementations\UI\UIShader</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dxDebugRender.cpp">
+      <Filter>Interface implementations\Debug\DebugRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dxLensFlareRender.cpp">
+      <Filter>Interface implementations\LensFlare</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dxStatGraphRender.cpp">
+      <Filter>Interface implementations\StatGraphRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dxThunderboltRender.cpp">
+      <Filter>Interface implementations\ThunderboltRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dxThunderboltDescRender.cpp">
+      <Filter>Interface implementations\ThunderboltDescRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dxUIRender.cpp">
+      <Filter>Interface implementations\UI\UIRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dxRainRender.cpp">
+      <Filter>Interface implementations\RainRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dxEnvironmentRender.cpp">
+      <Filter>Interface implementations\EnvironmentRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dxObjectSpaceRender.cpp">
+      <Filter>Interface implementations\ObjectSpaceRender</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_BmmD_deferred.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>

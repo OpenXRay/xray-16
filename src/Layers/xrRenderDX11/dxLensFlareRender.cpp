@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "dxLensFlareRender.h"
+#include "Layers/xrRender/dxLensFlareRender.h"
 #include "xrEngine/xr_efflensflare.h"
 #include "xrEngine/IGame_Persistent.h"
-#include "FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #define MAX_Flares 24
 
 #define FAR_DIST g_pGamePersistent->Environment().CurrentEnv.far_plane
@@ -119,7 +119,6 @@ void dxLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
                 }
             }
         }
-        // gradient
         if (bGradient && (owner.fGradientValue >= EPS_L))
         {
             if (owner.m_Current->m_Flags.is(CLensFlareDescriptor::flGradient))

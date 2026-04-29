@@ -2,8 +2,8 @@
 
 #ifdef DEBUG
 
-#include "dxDebugRender.h"
-#include "dxUIShader.h"
+#include "Layers/xrRender/dxDebugRender.h"
+#include "Layers/xrRender/dxUIShader.h"
 
 namespace xray::render::fg
 {
@@ -20,12 +20,12 @@ void dxDebugRender::Render()
         return;
 
     RCache.set_xform_world(Fidentity);
-#ifndef USE_DX9 // when we don't have FFP support
+#ifndef USE_DX9
     RCache.set_Shader(RImplementation.m_WireShader);
     const u32 color = m_line_vertices[0].color;
     RCache.set_c("tfactor", float(color_get_R(color)) / 255.f, float(color_get_G(color)) / 255.f, \
         float(color_get_B(color)) / 255.f, float(color_get_A(color)) / 255.f);
-#endif // !USE_DX9
+#endif
 
     RCache.dbg_Draw(D3DPT_LINELIST, &*m_line_vertices.begin(), m_line_vertices.size(), &*m_line_indices.begin(),
         m_line_indices.size() / 2);
@@ -82,7 +82,6 @@ void dxDebugRender::add_lines(
 
 void dxDebugRender::NextSceneMode()
 {
-    // XXX: Fix overdraw on DX10+, OpenGL
 #ifdef USE_DX9
     GEnv.Backend->GetMutableCapabilities().SceneMode = (GEnv.Backend->GetCapabilities().SceneMode + 1) % 3;
 #endif
@@ -90,7 +89,6 @@ void dxDebugRender::NextSceneMode()
 
 void dxDebugRender::ZEnable(bool bEnable)
 {
-    // CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE,bEnable));
     RCache.set_Z(bEnable);
 }
 
@@ -100,7 +98,6 @@ void dxDebugRender::CacheSetXformWorld(const Fmatrix& M) { RCache.set_xform_worl
 void dxDebugRender::CacheSetCullMode(CullMode m) { RCache.set_CullMode(CULL_NONE + m); }
 void dxDebugRender::SetAmbient(u32 colour)
 {
-    //	TODO: DX11: Check if need this for DX11
     VERIFY(!"Not implemented for DX11");
     UNUSED(colour);
 }
@@ -110,7 +107,7 @@ void dxDebugRender::SetDebugShader(dbgShaderHandle shdHandle)
     R_ASSERT(shdHandle < dbgShaderCount);
 
     static const LPCSTR dbgShaderParams[][2] = {
-        {"hud" DELIMITER "default", "ui" DELIMITER "ui_pop_up_active_back"}, // dbgShaderWindow
+        {"hud" DELIMITER "default", "ui" DELIMITER "ui_pop_up_active_back"},
     };
 
     if (!m_dbgShaders[shdHandle])
@@ -166,4 +163,4 @@ public:
 dxDebugRender* rdebug_render = &rdebug_render_impl;
 
 }
-#endif //	DEBUG
+#endif

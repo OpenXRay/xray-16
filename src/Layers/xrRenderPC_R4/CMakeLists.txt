@@ -90,6 +90,15 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRenderDX11/SH_Atomic.cpp
     ../xrRenderDX11/dxFontRender.cpp
     ../xrRenderDX11/dxUIShader.cpp
+    ../xrRenderDX11/dxDebugRender.cpp
+    ../xrRenderDX11/dxLensFlareRender.cpp
+    ../xrRenderDX11/dxStatGraphRender.cpp
+    ../xrRenderDX11/dxThunderboltRender.cpp
+    ../xrRenderDX11/dxThunderboltDescRender.cpp
+    ../xrRenderDX11/dxUIRender.cpp
+    ../xrRenderDX11/dxRainRender.cpp
+    ../xrRenderDX11/dxEnvironmentRender.cpp
+    ../xrRenderDX11/dxObjectSpaceRender.cpp
     ../xrRenderDX11/ShaderInfo.cpp
     ../xrRenderDX11/blenders/Blender_BmmD_deferred.cpp
     ../xrRenderDX11/blenders/Blender_Detail_GPU.cpp

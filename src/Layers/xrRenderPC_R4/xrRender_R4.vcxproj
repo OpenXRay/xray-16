@@ -223,6 +223,15 @@
     <ClCompile Include="..\xrRenderDX11\SH_Atomic.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxFontRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxUIShader.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dxDebugRender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dxLensFlareRender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dxStatGraphRender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dxThunderboltRender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dxThunderboltDescRender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dxUIRender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dxRainRender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dxEnvironmentRender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dxObjectSpaceRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\ShaderInfo.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_DBG.cpp"/>

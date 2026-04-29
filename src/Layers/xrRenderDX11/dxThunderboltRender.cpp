@@ -1,15 +1,14 @@
 #include "stdafx.h"
-#include "dxThunderboltRender.h"
+#include "Layers/xrRender/dxThunderboltRender.h"
 
 #include "xrEngine/thunderbolt.h"
-#include "dxThunderboltDescRender.h"
-#include "dxLensFlareRender.h"
+#include "Layers/xrRender/dxThunderboltDescRender.h"
+#include "Layers/xrRender/dxLensFlareRender.h"
 
 namespace xray::render::fg
 {
 dxThunderboltRender::dxThunderboltRender()
 {
-    // geom
     hGeom_model.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
     hGeom_gradient.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 }
@@ -25,7 +24,6 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
 {
     VERIFY(owner.current);
 
-    // lightning model
     float dv = owner.lightning_phase * 0.5f;
     dv = (owner.lightning_phase > 0.5f) ? Random.randI(2) * 0.5f : dv;
 
@@ -39,9 +37,7 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
     IRender_DetailModel::fvfVertexOut* v_ptr =
         (IRender_DetailModel::fvfVertexOut*)RImplementation.Vertex.Lock(vCount_Lock, hGeom_model->vb_stride, v_offset);
     u16* i_ptr = RImplementation.Index.Lock(iCount_Lock, i_offset);
-    // XForm verts
     pThRen->l_model->transfer(owner.current_xform, v_ptr, 0xffffffff, i_ptr, 0, 0.f, dv);
-    // Flush if needed
     RImplementation.Vertex.Unlock(vCount_Lock, hGeom_model->vb_stride);
     RImplementation.Index.Unlock(iCount_Lock);
     RCache.set_xform_world(Fidentity);
@@ -50,11 +46,9 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, vCount_Lock, i_offset, iCount_Lock / 3);
     RCache.set_CullMode(CULL_CCW);
 
-    // gradient
     Fvector vecSx, vecSy;
     u32 VS_Offset;
     FVF::LIT* pv = (FVF::LIT*)RImplementation.Vertex.Lock(8, hGeom_gradient.stride(), VS_Offset);
-    // top
     {
         u32 c_val = iFloor(owner.current->m_GradientTop->fOpacity * owner.lightning_phase * 255.f);
         u32 c = color_rgba(c_val, c_val, c_val, c_val);
@@ -73,7 +67,6 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
             owner.current_xform.c.z - vecSx.z + vecSy.z, c, 1, 1);
         pv++;
     }
-    // center
     {
         u32 c_val = iFloor(owner.current->m_GradientTop->fOpacity * owner.lightning_phase * 255.f);
         u32 c = color_rgba(c_val, c_val, c_val, c_val);
@@ -96,16 +89,14 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
     RCache.set_xform_world(Fidentity);
     RCache.set_Geometry(hGeom_gradient);
     RCache.set_Shader(((dxFlareRender*)&*owner.current->m_GradientTop->m_pFlare)->hShader);
-#if defined(USE_DX11) // XXX: check if it's needed on OGL
-    //	Hack. Since lightning gradient uses sun shader override z write settings manually
+#if defined(USE_DX11)
     RCache.set_Z(TRUE);
     RCache.set_ZFunc(D3DCMP_LESSEQUAL);
 #endif
     RCache.Render(D3DPT_TRIANGLELIST, VS_Offset, 0, 4, 0, 2);
 
     RCache.set_Shader(((dxFlareRender*)&*owner.current->m_GradientCenter->m_pFlare)->hShader);
-#if defined(USE_DX11) // XXX: check if it's needed on OGL
-    //	Hack. Since lightning gradient uses sun shader override z write settings manually
+#if defined(USE_DX11)
     RCache.set_Z(TRUE);
     RCache.set_ZFunc(D3DCMP_LESSEQUAL);
 #endif

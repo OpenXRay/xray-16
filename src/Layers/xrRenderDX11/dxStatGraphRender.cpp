@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "dxStatGraphRender.h"
+#include "Layers/xrRender/dxStatGraphRender.h"
 
 namespace xray::render::fg
 {
@@ -52,7 +52,6 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
             LineElem += it->elements.size() * 4;
             break;
         case CStatGraph::stPoint:
-            // TriElem += it->elements.size() * 4;
             break;
         };
     };
@@ -127,46 +126,39 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
 
 void dxStatGraphRender::RenderBack(CStatGraph& owner)
 {
-    // draw back
     u32 dwOffset, dwCount;
     FVF::L* pv_start = (FVF::L*)RImplementation.Vertex.Lock(4, hGeomTri->vb_stride, dwOffset);
     FVF::L* pv = pv_start;
-    // base rect
     pv->set(owner.lt.x, owner.rb.y, owner.back_color);
-    pv++; // 0
+    pv++;
     pv->set(owner.lt.x, owner.lt.y, owner.back_color);
-    pv++; // 1
+    pv++;
     pv->set(owner.rb.x, owner.rb.y, owner.back_color);
-    pv++; // 2
+    pv++;
     pv->set(owner.rb.x, owner.lt.y, owner.back_color);
-    pv++; // 3
-    // render
+    pv++;
     dwCount = u32(pv - pv_start);
     RImplementation.Vertex.Unlock(dwCount, hGeomTri->vb_stride);
     RCache.set_Geometry(hGeomTri);
     RCache.Render(D3DPT_TRIANGLELIST, dwOffset, 0, dwCount, 0, dwCount / 2);
 
-    // draw rect
     pv_start = (FVF::L*)RImplementation.Vertex.Lock(5, hGeomLine->vb_stride, dwOffset);
     pv = pv_start;
-    // base rect
     pv->set(owner.lt.x, owner.lt.y, owner.rect_color);
-    pv++; // 0
+    pv++;
     pv->set(owner.rb.x - 1, owner.lt.y, owner.rect_color);
-    pv++; // 1
+    pv++;
     pv->set(owner.rb.x - 1, owner.rb.y, owner.rect_color);
-    pv++; // 2
+    pv++;
     pv->set(owner.lt.x, owner.rb.y, owner.rect_color);
-    pv++; // 3
+    pv++;
     pv->set(owner.lt.x, owner.lt.y, owner.rect_color);
-    pv++; // 0
-    // render
+    pv++;
     dwCount = u32(pv - pv_start);
     RImplementation.Vertex.Unlock(dwCount, hGeomLine->vb_stride);
     RCache.set_Geometry(hGeomLine);
     RCache.Render(D3DPT_LINESTRIP, dwOffset, 4);
 
-    // draw owner.grid
     float elem_factor = float(owner.rb.y - owner.lt.y) / float(owner.mx - owner.mn);
     float base_y = float(owner.rb.y) + (owner.mn * elem_factor);
 
@@ -178,14 +170,10 @@ void dxStatGraphRender::RenderBack(CStatGraph& owner)
     pv_start = (FVF::L*)RImplementation.Vertex.Lock(
         2 + 2 * owner.grid.x + Num_H_LinesUp * 2 + Num_H_LinesDwn * 2, hGeomLine->vb_stride, dwOffset);
     pv = pv_start;
-    // base Coordinate Line
     pv->set(owner.lt.x, base_y, owner.base_color);
-    pv++; // 0
+    pv++;
     pv->set(owner.rb.x, base_y, owner.base_color);
-    pv++; // 0
-    // owner.grid
-    //    float grid_offs_x     = float(owner.rb.x-owner.lt.x)/float(owner.grid.x+1);
-    //    float grid_offs_y     = float(owner.rb.y-owner.lt.y)/float(owner.grid.y+1);
+    pv++;
     for (int g_x = 1; g_x <= owner.grid.x; g_x++)
     {
         pv->set(owner.lt.x + g_x * owner.grid_step.x * elem_factor, owner.lt.y, owner.grid_color);
@@ -208,14 +196,6 @@ void dxStatGraphRender::RenderBack(CStatGraph& owner)
         pv->set(owner.rb.x, base_y - g_y * owner.grid_step.y * elem_factor, owner.grid_color);
         pv++;
     }
-
-    //for (int g_y = 1; g_y<=owner.grid.y; g_y++)
-    //{
-    //    pv->set(owner.lt.x, iFloor(g_y*grid_offs_y+owner.lt.y), owner.grid_color);
-    //    pv++;
-    //    pv->set(owner.rb.x, iFloor(g_y*grid_offs_y+owner.lt.y), owner.grid_color);
-    //    pv++;
-    //}
 
     dwCount = u32(pv - pv_start);
     RImplementation.Vertex.Unlock(dwCount, hGeomLine->vb_stride);

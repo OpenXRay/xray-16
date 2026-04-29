@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "dxUIRender.h"
+#include "Layers/xrRender/dxUIRender.h"
 
-#include "dxUIShader.h"
+#include "Layers/xrRender/dxUIShader.h"
 
 namespace xray::render::fg
 {
@@ -32,7 +32,6 @@ void dxUIRender::SetShader(IUIShader& shader)
 
 void dxUIRender::SetAlphaRef(int aref)
 {
-    // CHK_DX(HW.pDevice->SetRenderState(D3DRS_ALPHAREF,aref));
     RCache.set_AlphaRef(aref);
 }
 void dxUIRender::SetScissor(Irect* rect)
@@ -40,9 +39,9 @@ void dxUIRender::SetScissor(Irect* rect)
 #if (RENDER == R_R3) || (RENDER == R_R4)
     RCache.set_Scissor(rect);
     RCache.StateManager.OverrideScissoring(rect ? true : false, TRUE);
-#else //	(RENDER == R_R3) || (RENDER == R_R4)
+#else
     RCache.set_Scissor(rect);
-#endif //	(RENDER == R_R3) || (RENDER == R_R4)
+#endif
 }
 
 LPCSTR dxUIRender::UpdateShaderName(LPCSTR tex_name, LPCSTR sh_name)
@@ -51,7 +50,6 @@ LPCSTR dxUIRender::UpdateShaderName(LPCSTR tex_name, LPCSTR sh_name)
     const auto& caps = GEnv.Backend->GetCapabilities();
     u32 v_dev = CAP_VERSION(caps.raster_major, caps.raster_minor);
     u32 v_need = CAP_VERSION(2, 0);
-    // strstr(Core.Params,"-ps_movie") &&
     if ((v_dev >= v_need) && FS.exist(buff, "$game_textures$", tex_name, ".ogm"))
         return "hud" DELIMITER "movie";
     else
@@ -59,7 +57,6 @@ LPCSTR dxUIRender::UpdateShaderName(LPCSTR tex_name, LPCSTR sh_name)
 }
 void dxUIRender::PushPoint(float x, float y, float z, u32 C, float u, float v)
 {
-    //.	VERIFY(m_PointType==pttLIT);
     switch (m_PointType)
     {
     case pttLIT:
@@ -77,7 +74,6 @@ void dxUIRender::StartPrimitive(u32 iMaxVerts, ePrimitiveType primType, ePointTy
 {
     VERIFY(PrimitiveType == ptNone);
     VERIFY(m_PointType == pttNone);
-    //.	R_ASSERT(pointType==pttLIT);
 
     m_iMaxVerts = iMaxVerts;
     PrimitiveType = primType;
@@ -121,7 +117,6 @@ void dxUIRender::FlushPrimitive()
     default: NODEFAULT;
     }
 
-    //	Update data for primitive type
     switch (PrimitiveType)
     {
     case ptTriStrip:

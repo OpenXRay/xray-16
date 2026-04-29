@@ -222,17 +222,8 @@ target_sources(xrRender PRIVATE
     du_cylinder.cpp
     du_sphere.cpp
     du_sphere_part.cpp
-    dxDebugRender.cpp
-    dxEnvironmentRender.cpp
-    dxLensFlareRender.cpp
-    dxObjectSpaceRender.cpp
     dxParticleCustom.cpp
-    dxRainRender.cpp
     dxRenderFactory.cpp
-    dxStatGraphRender.cpp
-    dxThunderboltDescRender.cpp
-    dxThunderboltRender.cpp
-    dxUIRender.cpp
     dxUISequenceVideoItem.cpp
     dxWallMarkArray.cpp
     light.cpp

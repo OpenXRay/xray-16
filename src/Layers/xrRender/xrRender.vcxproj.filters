@@ -922,35 +922,8 @@
     <ClCompile Include="dxRenderFactory.cpp">
       <Filter>Interface implementations\RenderFactory</Filter>
     </ClCompile>
-    <ClCompile Include="dxLensFlareRender.cpp">
-      <Filter>Interface implementations\LensFlare</Filter>
-    </ClCompile>
-    <ClCompile Include="dxRainRender.cpp">
-      <Filter>Interface implementations\RainRender</Filter>
-    </ClCompile>
-    <ClCompile Include="dxThunderboltRender.cpp">
-      <Filter>Interface implementations\ThunderboltRender</Filter>
-    </ClCompile>
-    <ClCompile Include="dxEnvironmentRender.cpp">
-      <Filter>Interface implementations\EnvironmentRender</Filter>
-    </ClCompile>
-    <ClCompile Include="dxObjectSpaceRender.cpp">
-      <Filter>Interface implementations\ObjectSpaceRender</Filter>
-    </ClCompile>
     <ClCompile Include="dxWallMarkArray.cpp">
       <Filter>Interface implementations\WallMarkArray</Filter>
-    </ClCompile>
-    <ClCompile Include="dxStatGraphRender.cpp">
-      <Filter>Interface implementations\StatGraphRender</Filter>
-    </ClCompile>
-    <ClCompile Include="dxThunderboltDescRender.cpp">
-      <Filter>Interface implementations\ThunderboltDescRender</Filter>
-    </ClCompile>
-    <ClCompile Include="dxDebugRender.cpp">
-      <Filter>Interface implementations\Debug\DebugRender</Filter>
-    </ClCompile>
-    <ClCompile Include="dxUIRender.cpp">
-      <Filter>Interface implementations\UI\UIRender</Filter>
     </ClCompile>
     <ClCompile Include="dxUISequenceVideoItem.cpp">
       <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
