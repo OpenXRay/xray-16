@@ -269,7 +269,7 @@
     <ClInclude Include="..\xrRender\r__sync_point.h" />
     <ClInclude Include="..\xrRender\Shader.h" />
     <ClInclude Include="..\xrRender\ShaderKey.h" />
-    <ClInclude Include="..\xrRender\ShaderResourceTraits.h" />
+    <ClInclude Include="..\xrRenderDX11\ShaderResourceTraits.h" />
     <ClInclude Include="..\xrRender\Shaders\SlangReflectionWrapper.h" />
     <ClInclude Include="..\xrRender\Shaders\SlangVFSAdapter.h" />
     <ClInclude Include="..\xrRender\SH_Atomic.h" />
@@ -385,7 +385,7 @@
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_Particle_deferred.cpp" />
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_tree_deferred.cpp" />
     <ClCompile Include="..\xrRenderDX11\blenders\dx11RainBlender.cpp" />
-    <ClCompile Include="..\xrRenderDX11\dx11BufferUtils.cpp" />
+    <ClCompile Include="..\xrRender\BufferUtils.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11ComputeTest.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp" />

@@ -204,14 +204,12 @@ void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vec
         ZeroMemory(&declOut[iDeclSize], sizeof(declOut[iDeclSize]));
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 VertexStagingBuffer::~VertexStagingBuffer()
 {
     Destroy();
 }
 
-void VertexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/)
+void VertexStagingBuffer::Create(size_t size, bool allowReadBack )
 {
     m_Size = size;
     m_AllowReadBack = allowReadBack;
@@ -225,7 +223,7 @@ bool VertexStagingBuffer::IsValid() const
     return m_DeviceBuffer != nullptr;
 }
 
-void* VertexStagingBuffer::Map(size_t offset /*= 0*/, size_t size /*= 0*/, bool read /*= false*/)
+void* VertexStagingBuffer::Map(size_t offset , size_t size , bool read )
 {
     VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
     VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
@@ -234,7 +232,7 @@ void* VertexStagingBuffer::Map(size_t offset /*= 0*/, size_t size /*= 0*/, bool 
     return static_cast<u8*>(m_HostBuffer) + offset;
 }
 
-void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
+void VertexStagingBuffer::Unmap(bool doFlush )
 {
     if (!doFlush)
         return;
@@ -286,14 +284,12 @@ size_t VertexStagingBuffer::GetVideoMemoryUsage() const
     return 0;
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 IndexStagingBuffer::~IndexStagingBuffer()
 {
     Destroy();
 }
 
-void IndexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/, bool /*managed = true*/)
+void IndexStagingBuffer::Create(size_t size, bool allowReadBack , bool )
 {
     m_Size = size;
     m_AllowReadBack = allowReadBack;
@@ -307,7 +303,7 @@ bool IndexStagingBuffer::IsValid() const
     return m_DeviceBuffer != nullptr;
 }
 
-void* IndexStagingBuffer::Map(size_t offset /*= 0*/, size_t size /*= 0*/, bool read /*= false*/)
+void* IndexStagingBuffer::Map(size_t offset , size_t size , bool read )
 {
     VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
     VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
@@ -316,7 +312,7 @@ void* IndexStagingBuffer::Map(size_t offset /*= 0*/, size_t size /*= 0*/, bool r
     return static_cast<u8*>(m_HostBuffer) + offset;
 }
 
-void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
+void IndexStagingBuffer::Unmap(bool doFlush )
 {
     if (!doFlush)
         return;
@@ -389,7 +385,7 @@ void VertexStreamBuffer::Destroy()
     m_DeviceBuffer = nullptr;
 }
 
-void* VertexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
+void* VertexStreamBuffer::Map(size_t offset, size_t size, bool flush )
 {
 
     if (!m_DeviceBuffer)
@@ -447,7 +443,7 @@ void IndexStreamBuffer::Destroy()
     m_DeviceBuffer = nullptr;
 }
 
-void* IndexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
+void* IndexStreamBuffer::Map(size_t offset, size_t size, bool flush )
 {
     if (!m_DeviceBuffer)
         return nullptr;
@@ -483,4 +479,4 @@ bool IndexStreamBuffer::IsValid() const
     return m_DeviceBuffer != nullptr;
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+}

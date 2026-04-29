@@ -55,7 +55,7 @@ inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr
     {
         show_compile_errors(name, 0, shader);
         CHK_GL(glDeleteShader(shader));
-        return { 's', 0 }; // 's' means "shader", 0 means error
+        return { 's', 0 };
     }
 
     if (!GLAD_GL_ARB_separate_shader_objects)
@@ -70,7 +70,7 @@ inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr
         CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
 
     CHK_GL(glAttachShader(program, shader));
-#ifndef XR_PLATFORM_WEB // GLSL ES declares output locations in the shader itself
+#ifndef XR_PLATFORM_WEB
     CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
     CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
     CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
@@ -85,7 +85,7 @@ inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr
     {
         show_compile_errors(name, program, 0);
         CHK_GL(glDeleteProgram(program));
-        return { 'p', 0 }; // 'p' means "program", 0 means error
+        return { 'p', 0 };
     }
 
     return { 'p', program };
@@ -101,7 +101,7 @@ inline std::pair<char, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLe
         CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
 
-#ifndef XR_PLATFORM_WEB // GLSL ES declares output locations in the shader itself
+#ifndef XR_PLATFORM_WEB
     CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
     CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
     CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
@@ -114,7 +114,7 @@ inline std::pair<char, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLe
     {
         show_compile_errors(name, program, 0);
         CHK_GL(glDeleteProgram(program));
-        return { 'p', 0 }; // 'p' means "program", 0 means error
+        return { 'p', 0 };
     }
 
     return { 'p', program };
@@ -151,15 +151,12 @@ static GLuint GLLinkMonolithicProgram(pcstr name, GLuint ps, GLuint vs, GLuint g
     R_ASSERT(program);
     if (glObjectLabel)
         CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
-    // XXX: support caching for monolithic programs
-    //if (HW.ShaderBinarySupported)
-    //    CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
 
     CHK_GL(glAttachShader(program, ps));
     CHK_GL(glAttachShader(program, vs));
     if (gs)
         CHK_GL(glAttachShader(program, gs));
-#ifndef XR_PLATFORM_WEB // GLSL ES declares output locations in the shader itself
+#ifndef XR_PLATFORM_WEB
     CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
     CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
     CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
@@ -177,7 +174,7 @@ static GLuint GLLinkMonolithicProgram(pcstr name, GLuint ps, GLuint vs, GLuint g
     {
         show_compile_errors(name, program, 0);
         CHK_GL(glDeleteProgram(program));
-        return 0; // 0 means error
+        return 0;
     }
     return program;
 }
@@ -238,7 +235,7 @@ struct ShaderTypeTraits<SVS>
             target = "vs_2_0";
             entry = "main_vs_2_0";
         }
-#ifdef USE_DX9 // For DX10+ we always should use SM4.0 or higher
+#ifdef USE_DX9
         else
 #endif
         {
@@ -323,7 +320,7 @@ struct ShaderTypeTraits<SPS>
             target = "ps_2_0";
             entry = "main_ps_2_0";
         }
-#ifdef USE_DX9 // For DX10+ we always should use SM4.0 or higher
+#ifdef USE_DX9
         else
 #endif
         {
@@ -392,12 +389,12 @@ struct ShaderTypeTraits<SGS>
 #       endif
             return "gs_5_0";
         }
-#   endif // USE_DX11
+#   endif
         NODEFAULT;
         return "gs_4_0";
     }
 
-    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* )
     {
         target = GetCompilationTarget();
         entry = "main";
@@ -452,7 +449,7 @@ struct ShaderTypeTraits<SHS>
         return "hs_5_0";
     }
 
-    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* )
     {
         target = GetCompilationTarget();
         entry = "main";
@@ -507,7 +504,7 @@ struct ShaderTypeTraits<SDS>
         return "ds_5_0";
     }
 
-    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* )
     {
         target = GetCompilationTarget();
         entry = "main";
@@ -576,12 +573,12 @@ struct ShaderTypeTraits<SCS>
             return "cs_6_0";
 #       endif
         }
-#   endif // USE_DX11
+#   endif
 
         return "cs_6_0";
     }
 
-    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* )
     {
         target = GetCompilationTarget();
         entry = "main";
@@ -647,7 +644,7 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 }
 
 template <typename T>
-T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32 flags /*= 0*/)
+T* CResourceManager::CreateShader(cpcstr name, pcstr filename , u32 flags )
 {
     typename ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<typename ShaderTypeTraits<T>::MapType>();
     pstr N = pstr(name);
@@ -666,7 +663,6 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
             return sh;
         }
 
-        // Remove ( and everything after it
         string_path shName;
         {
             if (filename == nullptr)
@@ -678,16 +674,13 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
             shName[size] = 0;
         }
 
-        // Open file
         string_path cname;
         strconcat(cname, RImplementation.getShaderPath(), shName,
             ShaderTypeTraits<T>::GetShaderExt());
         FS.update_path(cname, "$game_shaders$", cname);
 
-        // Try to open
         IReader* file = FS.r_open(cname);
 
-        // Here we can fallback to "stub_default"
         bool fallback = m_shader_fallback_allowed;
         if (!file && fallback)
         {
@@ -704,13 +697,11 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
         }
         R_ASSERT3(file, "Shader file doesnt exist", cname);
 
-        // Duplicate and zero-terminate
         const auto size = file->length();
         char* const data = (pstr)xr_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);
         data[size] = 0;
 
-        // Select target
         pcstr c_target, c_entry;
         ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
 
@@ -728,7 +719,6 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
 #   endif
 #endif
 
-        // Compile
         HRESULT const _hr = RImplementation.shader_compile(name, file, c_entry, c_target, flags, (void*&)sh);
 
         FS.r_close(file);
@@ -764,4 +754,4 @@ bool CResourceManager::DestroyShader(const T* sh)
     Msg("! ERROR: Failed to find compiled shader '%s'", sh->cName.c_str());
     return false;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}
