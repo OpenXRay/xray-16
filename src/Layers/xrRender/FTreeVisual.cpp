@@ -5,6 +5,7 @@
 #include "xrEngine/Environment.h"
 #include "xrCore/FMesh.hpp"
 #include "FTreeVisual.h"
+#include "Layers/xrRender/r__buffer_pool.h"
 #include "Common/OGF_GContainer_Vertices.hpp"
 
 namespace xray::render::fg
@@ -34,10 +35,10 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
         u32 vbID = data->r_u32();
         vBase = data->r_u32();
         vCount = data->r_u32();
-        vFormat = RImplementation.getVB_Format(vbID);
+        vFormat = BufferPool.getVB_Format(vbID);
 
         VERIFY(nullptr == p_rm_Vertices);
-        p_rm_Vertices = RImplementation.getVB(vbID);
+        p_rm_Vertices = BufferPool.getVB(vbID);
         p_rm_Vertices->AddRef();
 
         // GPU-driven: Store VB pool ID for mega-buffer lookup
@@ -51,7 +52,7 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
         dwPrimitives = iCount / 3;
 
         VERIFY(nullptr == p_rm_Indices);
-        p_rm_Indices = RImplementation.getIB(ibID);
+        p_rm_Indices = BufferPool.getIB(ibID);
         p_rm_Indices->AddRef();
 
         // GPU-driven: Store IB pool ID for mega-buffer lookup
@@ -194,7 +195,7 @@ void FTreeVisual_PM::Load(const char* N, IReader* data, u32 dwFlags)
     R_ASSERT(data->find_chunk(OGF_SWICONTAINER));
     {
         u32 ID = data->r_u32();
-        pSWI = RImplementation.getSWI(ID);
+        pSWI = BufferPool.getSWI(ID);
     }
 }
 void FTreeVisual_PM::Render(CBackend&, float, bool) {}

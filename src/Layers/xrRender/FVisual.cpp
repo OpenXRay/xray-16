@@ -4,6 +4,7 @@
 #include "xrCore/FMesh.hpp"
 #include "FVisual.h"
 #include "Layers/xrRender/BufferUtils.h"
+#include "Layers/xrRender/r__buffer_pool.h"
 
 namespace xray::render::fg
 {
@@ -36,10 +37,10 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         vCount = data->r_u32();
 
         VERIFY(nullptr == p_rm_Vertices);
-        p_rm_Vertices = RImplementation.getVB(ID);
+        p_rm_Vertices = BufferPool.getVB(ID);
         p_rm_Vertices->AddRef();
 
-        vFormat = RImplementation.getVB_Format(ID);
+        vFormat = BufferPool.getVB_Format(ID);
         loaded_v = true;
 
         // GPU-driven: Store VB pool ID for mega-buffer lookup
@@ -52,7 +53,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         dwPrimitives = iCount / 3;
 
         VERIFY(nullptr == p_rm_Indices);
-        p_rm_Indices = RImplementation.getIB(ibID);
+        p_rm_Indices = BufferPool.getIB(ibID);
         p_rm_Indices->AddRef();
 
         // GPU-driven: Store IB pool ID for mega-buffer lookup
@@ -61,9 +62,9 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
 #endif
         // check for fast-vertices
 #if RENDER == R_R1
-        if (RImplementation.IsFastGeomSupported() && data->find_chunk(OGF_FASTPATH) && ps_r1_force_geomx)
+        if (BufferPool.fastGeomLoaded && data->find_chunk(OGF_FASTPATH) && ps_r1_force_geomx)
 #else
-        if (RImplementation.IsFastGeomSupported() && data->find_chunk(OGF_FASTPATH))
+        if (BufferPool.fastGeomLoaded && data->find_chunk(OGF_FASTPATH))
 #endif
         {
             destructor<IReader> geomdef(data->open_chunk(OGF_FASTPATH));
@@ -79,10 +80,10 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             m_fast->vCount = def().r_u32();
 
             VERIFY(nullptr == m_fast->p_rm_Vertices);
-            m_fast->p_rm_Vertices = RImplementation.getVB(fastVbID, true);
+            m_fast->p_rm_Vertices = BufferPool.getVB(fastVbID, true);
             m_fast->p_rm_Vertices->AddRef();
 
-            fmt = RImplementation.getVB_Format(fastVbID, true);
+            fmt = BufferPool.getVB_Format(fastVbID, true);
 
             // GPU-driven: Store VB pool ID for mega-buffer lookup (alternative geometry)
             m_fast->vbPoolID = fastVbID;
@@ -94,7 +95,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             m_fast->dwPrimitives = m_fast->iCount / 3;
 
             VERIFY(nullptr == m_fast->p_rm_Indices);
-            m_fast->p_rm_Indices = RImplementation.getIB(fastIbID, true);
+            m_fast->p_rm_Indices = BufferPool.getIB(fastIbID, true);
             m_fast->p_rm_Indices->AddRef();
 
             // GPU-driven: Store IB pool ID for mega-buffer lookup (alternative geometry)
@@ -118,10 +119,10 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             vCount = data->r_u32();
 
             VERIFY(nullptr == p_rm_Vertices);
-            p_rm_Vertices = RImplementation.getVB(ID);
+            p_rm_Vertices = BufferPool.getVB(ID);
             p_rm_Vertices->AddRef();
 
-            vFormat = RImplementation.getVB_Format(ID);
+            vFormat = BufferPool.getVB_Format(ID);
 #endif // !_EDITOR
         }
         else
@@ -154,7 +155,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             iCount = data->r_u32();
             dwPrimitives = iCount / 3;
             VERIFY(nullptr == p_rm_Indices);
-            p_rm_Indices = RImplementation.getIB(ID);
+            p_rm_Indices = BufferPool.getIB(ID);
             p_rm_Indices->AddRef();
 #endif // !_EDITOR
         }
