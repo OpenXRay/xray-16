@@ -7,6 +7,7 @@
 #include "Common/LevelStructure.hpp"
 #include "xrEngine/xr_object.h"
 #include "FBasicVisual.h"
+#include "Layers/xrRender/r__buffer_pool.h"
 #include "xrEngine/IGame_Persistent.h"
 
 namespace xray::render::fg
@@ -149,7 +150,7 @@ void CSector::setup(const level_sector_data_t& data, const xr_vector<CPortal*> &
     else
     {
         // Assign visual
-        m_root = static_cast<dxRender_Visual*>(RImplementation.getVisual(data.root_id));
+        m_root = BufferPool.getVisual(data.root_id);
     }
 }
 } // namespace xray::render::fg

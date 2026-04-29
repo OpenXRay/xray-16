@@ -6,6 +6,8 @@
 #include "SkeletonX.h"
 #include "xrCore/FMesh.hpp"
 #include "xrCDB/Intersect.hpp"
+#include "Layers/xrRender/r__buffer_pool.h"
+#include "Layers/xrRender/ModelPool.h"
 
 #ifndef _EDITOR
 #include "xrServerEntities/smart_cast.h"
@@ -186,7 +188,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
             string_path lod_name;
             LD->r_string(lod_name, sizeof(lod_name));
             //.         strconcat       (sizeof(name_load),name_load, short_name, ":lod:", lod_name.c_str());
-            m_lod = (dxRender_Visual*)RImplementation.model_CreateChild(lod_name, nullptr);
+            m_lod = g_pModelPool->CreateChild(lod_name, nullptr);
 
             if (CKinematics* lod_kinematics = dynamic_cast<CKinematics*>(m_lod))
             {
@@ -198,7 +200,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
             //    m_lod->Type==MT_NORMAL,lod_name.c_str());
             /*
                 strconcat(name_load, short_name, ":lod:1");
-                m_lod = RImplementation.model_CreateChild(name_load, LD);
+                m_lod = g_pModelPool->CreateChild(name_load, LD);
                 VERIFY(m_lod->Type==MT_SKELETON_GEOMDEF_PM || m_lod->Type==MT_SKELETON_GEOMDEF_ST);
             */
         }
@@ -443,7 +445,7 @@ void CKinematics::Copy(dxRender_Visual* P)
 
     CalculateBones_Invalidate();
 
-    m_lod = (pFrom->m_lod) ? (dxRender_Visual*)RImplementation.model_Duplicate(pFrom->m_lod) : 0;
+    m_lod = (pFrom->m_lod) ? g_pModelPool->Instance_Duplicate(pFrom->m_lod) : nullptr;
 }
 
 void CKinematics::CalculateBones_InvalidateFG()
