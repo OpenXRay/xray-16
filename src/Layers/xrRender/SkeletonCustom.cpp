@@ -774,9 +774,7 @@ void CKinematics::CalculateWallmarks(bool hud)
             float w = (Device.fTimeGlobal - wm->TimeStart()) / ps_r__WallmarkTTL;
             if (w < 1.f)
             {
-                // append wm to WallmarkEngine
-                if (!hud && RImplementation.ViewBase.testSphere_dirty(wm->m_Bounds.P, wm->m_Bounds.R))
-                    RImplementation.add_SkeletonWallmark(wm);
+                (void)hud;
             }
             else
             {

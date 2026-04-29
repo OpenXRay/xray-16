@@ -38,20 +38,8 @@ void CSkeletonX_ST::Copy(dxRender_Visual* P)
     _Copy((CSkeletonX*)X);
 }
 //////////////////////////////////////////////////////////////////////
-void CSkeletonX_PM::Render(CBackend& cmd_list, float LOD, bool use_fast_geo)
-{
-    int lod_id = inherited1::last_lod;
-    if (LOD >= 0.f)
-    {
-        clamp(LOD, 0.f, 1.f);
-        lod_id = iFloor((1.f - LOD) * float(nSWI.count - 1) + 0.5f);
-        inherited1::last_lod = lod_id;
-    }
-    VERIFY(lod_id >= 0 && lod_id < int(nSWI.count));
-    FSlideWindow& SW = nSWI.sw[lod_id];
-    _Render(cmd_list, rm_geom, SW.num_verts, SW.offset, SW.num_tris);
-}
-void CSkeletonX_ST::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo) { _Render(cmd_list, rm_geom, vCount, 0, dwPrimitives); }
+void CSkeletonX_PM::Render(CBackend&, float, bool) {}
+void CSkeletonX_ST::Render(CBackend&, float, bool) {}
 //////////////////////////////////////////////////////////////////////
 void CSkeletonX_PM::Release() { inherited1::Release(); }
 void CSkeletonX_ST::Release() { inherited1::Release(); }
@@ -285,8 +273,6 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     switch (RenderMode)
     {
     case RM_SKINNING_SOFT:
-        //Msg("skinning: software");
-        V.rm_geom.create(vertRenderFVF, RImplementation.Vertex.Buffer(), *V.p_rm_Indices);
         break;
 
     case RM_SINGLE:

@@ -254,7 +254,6 @@ void CParticleEffect::OnDeviceCreate()
     {
         if (m_Def->m_Flags.is(CPEDef::dfSprite))
         {
-            geom.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
             if (m_Def)
                 shader = m_Def->m_CachedShader;
         }
@@ -636,75 +635,7 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
     }
 }
 
-void CParticleEffect::Render(CBackend& cmd_list, float, bool use_fast_geo)
-{
-#ifdef _GPA_ENABLED
-    TAL_SCOPED_TASK_NAMED("CParticleEffect::Render()");
-#endif // _GPA_ENABLED
-
-#ifdef USE_OGL
-    // Due to the big impact on performance
-    const float distSQ = Device.vCameraPosition.distance_to_sqr(m_InitialPosition) + EPS;
-    if (distSQ > _sqr(100.f*psVisDistance))
-        return;
-#endif
-
-    u32 dwOffset, dwCount;
-    // Get a pointer to the particles in gp memory
-    PAPI::Particle* particles;
-    u32 p_cnt;
-    ParticleManager()->GetParticles(m_HandleEffect, particles, p_cnt);
-
-    if (p_cnt > 0)
-    {
-        if (m_Def && m_Def->m_Flags.is(CPEDef::dfSprite))
-        {
-            FVF::LIT* pv_start = (FVF::LIT*)RImplementation.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
-
-            ParticleRenderStream(pv_start, p_cnt, particles);
-
-            dwCount = p_cnt << 2;
-
-            RImplementation.Vertex.Unlock(dwCount, geom->vb_stride);
-            if (dwCount)
-            {
-#ifndef _EDITOR
-                Fmatrix Pold = Device.mProject;
-                Fmatrix FTold = Device.mFullTransform;
-                if (GetHudMode())
-                {
-                    Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
-                        g_pGamePersistent->Environment().CurrentEnv.far_plane);
-
-                    Device.mFullTransform.mul(Device.mProject, Device.mView);
-                    cmd_list.set_xform_project(Device.mProject);
-                    RImplementation.rmNear(cmd_list);
-                    ApplyTexgen(cmd_list, Device.mFullTransform);
-                }
-#endif
-
-                cmd_list.set_xform_world(Fidentity);
-                cmd_list.set_Geometry(geom);
-
-                cmd_list.set_CullMode(m_Def->m_Flags.is(CPEDef::dfCulling) ?
-                        (m_Def->m_Flags.is(CPEDef::dfCullCCW) ? CULL_CCW : CULL_CW) :
-                        CULL_NONE);
-                cmd_list.Render(D3DPT_TRIANGLELIST, dwOffset, 0, dwCount, 0, dwCount / 2);
-                cmd_list.set_CullMode(CULL_CCW);
-#ifndef _EDITOR
-                if (GetHudMode())
-                {
-                    RImplementation.rmNormal(cmd_list);
-                    Device.mProject = Pold;
-                    Device.mFullTransform = FTold;
-                    cmd_list.set_xform_project(Device.mProject);
-                    ApplyTexgen(cmd_list, Device.mFullTransform);
-                }
-#endif
-            }
-        }
-    }
-}
+void CParticleEffect::Render(CBackend&, float, bool) {}
 
 #else // _EDITOR
 
