@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "r__occlusion.h"
+#include "Layers/xrRender/r__occlusion.h"
 
-#include "QueryHelper.h"
+#include "Layers/xrRender/QueryHelper.h"
 
 namespace xray::render::fg
 {
@@ -118,7 +118,7 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
 
         if (T.GetElapsed_ms() > 500)
         {
-            fragments = (occq_result)-1; // 0xffffffff;
+            fragments = (occq_result)-1;
             break;
         }
     }
@@ -128,7 +128,6 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
     if (0 == fragments)
         RImplementation.BasicStats.OcclusionCulled++;
 
-    // insert into pool (sorting in decreasing order)
     Query& Q = used[ID];
     if (pool.empty())
         pool.emplace_back(Q);
@@ -140,7 +139,6 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
         pool.emplace(pool.begin() + it + 1, std::move(Q));
     }
 
-    // remove from used and shrink as nesessary
     used[ID].Q = 0;
     fids.emplace_back(ID);
     ID = 0;

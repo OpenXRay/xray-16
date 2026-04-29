@@ -3,9 +3,9 @@
 #include "xrEngine/IRenderable.h"
 #include "xrEngine/CustomHUD.h"
 
-#include "FBasicVisual.h"
-#include "SkeletonCustom.h"
-#include "FLOD.h"
+#include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/SkeletonCustom.h"
+#include "Layers/xrRender/FLOD.h"
 
 extern ENGINE_API float psHUD_FOV;
 
@@ -16,7 +16,7 @@ using namespace R_dsgraph;
 extern float r_ssaHZBvsTEX;
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
 
-ICF float calcLOD(float ssa /*fDistSq*/, float /*R*/)
+ICF float calcLOD(float ssa , float )
 {
     return _sqrt(clampr((ssa - r_ssaGLOD_end) / (r_ssaGLOD_start - r_ssaGLOD_end), 0.f, 1.f));
 }
@@ -27,7 +27,6 @@ bool cmp_ssa(const T &lhs, const T &rhs)
     return lhs.ssa > rhs.ssa;
 }
 
-// Sorting by SSA and changes minimizations
 template <typename T>
 bool cmp_pass(const T& left, const T& right)
 {
@@ -39,14 +38,10 @@ bool cmp_pass(const T& left, const T& right)
 void R_dsgraph_structure::render_graph(u32 _priority)
 {
     PIX_EVENT_CTX(cmd_list, dsgraph_render_graph);
-    RImplementation.BasicStats.Primitives.Begin(); // XXX: Refactor a bit later
+    RImplementation.BasicStats.Primitives.Begin();
 
     cmd_list.set_xform_world(Fidentity);
 
-    // **************************************************** NORMAL
-    // Perform sorting based on ScreenSpaceArea
-    // Sorting by SSA and changes minimizations
-    // Render several passes
     {
         ZoneScopedN("dsgraph_render_static");
         PIX_EVENT_CTX(cmd_list, dsgraph_render_static);
@@ -72,8 +67,6 @@ void R_dsgraph_structure::render_graph(u32 _priority)
 #ifdef USE_DX11
                     cmd_list.LOD.set_LOD(LOD);
 #endif
-                    // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
-                    // RCache.hemi.c_update(item.pVisual);
 
                     item.pVisual->Render(cmd_list, LOD, o.phase == CRender::PHASE_SMAP);
                 }
@@ -85,10 +78,6 @@ void R_dsgraph_structure::render_graph(u32 _priority)
         }
     }
 
-    // **************************************************** MATRIX
-    // Perform sorting based on ScreenSpaceArea
-    // Sorting by SSA and changes minimizations
-    // Render several passes
     {
         ZoneScopedN("dsgraph_render_dynamic");
         PIX_EVENT_CTX(cmd_list, dsgraph_render_dynamic);
@@ -117,8 +106,6 @@ void R_dsgraph_structure::render_graph(u32 _priority)
 #ifdef USE_DX11
                     cmd_list.LOD.set_LOD(LOD);
 #endif
-                    // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
-                    // RCache.hemi.c_update(item.pVisual);
 
                     item.pVisual->Render(cmd_list, LOD, o.phase == CRender::PHASE_SMAP);
                 }
@@ -129,15 +116,9 @@ void R_dsgraph_structure::render_graph(u32 _priority)
         }
     }
 
-    RImplementation.BasicStats.Primitives.End(); // XXX: Refactor a bit later
+    RImplementation.BasicStats.Primitives.End();
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Helper classes and functions
-
-/*
-Предназначен для установки режима отрисовки HUD и возврата оригинального после отрисовки.
-*/
 class hud_transform_helper
 {
     Fmatrix Pold;
@@ -150,33 +131,15 @@ public:
     explicit hud_transform_helper(CBackend& cmd_list_in)
         : cmd_list(cmd_list_in)
     {
-        // Change projection
         Pold  = Device.mProject;
 
-        // XXX: Xottab_DUTY: custom FOV. Implement it someday
-        // It should be something like this:
-        // float customFOV;
-        // if (isCustomFOV)
-        //     customFOV = V->getVisData().obj_data->m_hud_custom_fov;
-        // else
-        //     customFOV = psHUD_FOV * Device.fFOV;
-        //
-        // Device.mProject.build_projection(deg2rad(customFOV), Device.fASPECT,
-        //    VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv.far_plane);
-        //
-        // Look at the function:
-        // void __fastcall sorted_L1_HUD(mapSorted_Node* N)
-        // In the commit:
-        // https://github.com/ShokerStlk/xray-16-SWM/commit/869de0b6e74ac05990f541e006894b6fe78bd2a5#diff-4199ef700b18ce4da0e2b45dee1924d0R83
-
         Fmatrix prj_new;
-        prj_new.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
+        prj_new.build_projection(deg2rad(psHUD_FOV * Device.fFOV ), Device.fASPECT,
             HUD_VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv.far_plane);
         cmd_list.set_xform_project(prj_new);
 
         RImplementation.rmNear(cmd_list);
 
-        // preserve culling mode
         cullMode = cmd_list.get_CullMode();
         isActive = true;
     }
@@ -185,9 +148,7 @@ public:
     {
         RImplementation.rmNormal(cmd_list);
 
-        // Restore projection
         cmd_list.set_xform_project(Pold);
-        // restore culling mode
         cmd_list.set_CullMode(cullMode);
         isActive = false;
     }
@@ -197,7 +158,6 @@ public:
         if (!isActive || !psHUD_Flags.test(HUD_LEFT_HANDED))
             return;
 
-        // Change culling mode if HUD meshes were flipped
         if (cullMode != CULL_NONE)
         {
             cmd_list.set_CullMode(cullMode == CULL_CW ? CULL_CCW : CULL_CW);
@@ -220,8 +180,6 @@ void __fastcall render_item(u32 context_id, const T& item)
     RImplementation.apply_object(dsgraph.cmd_list, item.second.pObject);
     dsgraph.cmd_list.apply_lmaterial();
     hud_transform_helper::apply_custom_state(dsgraph.cmd_list);
-    //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
-    //RCache.hemi.c_update(V);
     V->Render(dsgraph.cmd_list, calcLOD(item.first, V->vis.sphere.R), dsgraph.o.phase == CRender::PHASE_SMAP);
 }
 
@@ -239,8 +197,6 @@ ICF void sort_back_to_front_render_and_clean(u32 context_id, T& vec)
     vec.clear();
 }
 
-//////////////////////////////////////////////////////////////////////////
-// HUD render
 void R_dsgraph_structure::render_hud()
 {
     ZoneScoped;
@@ -254,7 +210,7 @@ void R_dsgraph_structure::render_hud()
 
 #if RENDER == R_R1
     if (g_pGameLevel->pHUD && g_pGameLevel->pHUD->RenderActiveItemUIQuery())
-        render_hud_ui(); // hud ui
+        render_hud_ui();
 #endif
 }
 
@@ -269,7 +225,6 @@ void R_dsgraph_structure::render_hud_ui()
     hud_transform_helper helper{ cmd_list };
 
 #if RENDER != R_R1
-    // Targets, use accumulator for temporary storage
     const ref_rt rt_null;
     cmd_list.set_RT(0, 1);
     cmd_list.set_RT(0, 2);
@@ -283,13 +238,11 @@ void R_dsgraph_structure::render_hud_ui()
     RImplementation.Target->u_setrt(cmd_list,
         RImplementation.o.albedo_wo ? RImplementation.Target->rt_Accumulator : RImplementation.Target->rt_Color,
         rt_null, rt_null, zb);
-#endif // RENDER!=R_R1
+#endif
 
     levelHud->RenderActiveItemUI();
 }
 
-//////////////////////////////////////////////////////////////////////////
-// strict-sorted render
 void R_dsgraph_structure::render_sorted()
 {
     ZoneScoped;
@@ -304,8 +257,6 @@ void R_dsgraph_structure::render_sorted()
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-// strict-sorted render
 void R_dsgraph_structure::render_emissive()
 {
 #if RENDER != R_R1
@@ -322,8 +273,6 @@ void R_dsgraph_structure::render_emissive()
 #endif
 }
 
-//////////////////////////////////////////////////////////////////////////
-// strict-sorted render
 void R_dsgraph_structure::render_wmarks()
 {
 #if RENDER != R_R1
@@ -334,8 +283,6 @@ void R_dsgraph_structure::render_wmarks()
 #endif
 }
 
-//////////////////////////////////////////////////////////////////////////
-// strict-sorted render
 void R_dsgraph_structure::render_distort()
 {
     ZoneScoped;
@@ -358,12 +305,10 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
     {
         dxRender_Visual* V = lstVisuals[test];
 
-        // Visual is 100% visible - simply add it
         switch (V->Type)
         {
         case MT_HIERRARHY:
         {
-            // Add all children
             FHierrarhyVisual* pV = (FHierrarhyVisual*)V;
             for (auto& i : pV->children)
             {
@@ -376,7 +321,6 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
         case MT_SKELETON_ANIM:
         case MT_SKELETON_RIGID:
         {
-            // Add all children	(s)
             CKinematics* pV = (CKinematics*)V;
             pV->CalculateBones(TRUE);
             for (auto& i : pV->children)
@@ -400,7 +344,6 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
         break;
         default:
         {
-            // Renderable visual
             ShaderElement* E2 = V->shader->E[sh]._get();
             if (E2 && !(E2->flags.bDistort))
             {

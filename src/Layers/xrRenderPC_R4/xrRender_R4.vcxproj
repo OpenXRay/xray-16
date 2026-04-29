@@ -232,6 +232,12 @@
     <ClCompile Include="..\xrRenderDX11\dxRainRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxEnvironmentRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxObjectSpaceRender.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\r__dsgraph_render.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\r__dsgraph_render_lods.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\r__dsgraph_build.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\light_smapvis.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\r__occlusion.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\WallmarksEngine.cpp"/>
     <ClCompile Include="..\xrRenderDX11\ShaderInfo.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_DBG.cpp"/>

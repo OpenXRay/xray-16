@@ -360,10 +360,6 @@
     <ClCompile Include="ResourceManager\NativeRTFactory.cpp"/>
     <ClCompile Include="r_constants.cpp"/>
     <ClCompile Include="R_DStreams.cpp"/>
-    <ClCompile Include="r__dsgraph_build.cpp"/>
-    <ClCompile Include="r__dsgraph_render.cpp"/>
-    <ClCompile Include="r__dsgraph_render_lods.cpp"/>
-    <ClCompile Include="r__occlusion.cpp"/>
     <ClCompile Include="r__pixel_calculator.cpp"/>
     <ClCompile Include="r__sector.cpp"/>
     <ClCompile Include="r__sector_detect.cpp"/>
@@ -385,12 +381,10 @@
     <ClCompile Include="UIRenderCollector.cpp"/>
     <ClCompile Include="Utils\dxHashHelper.cpp"/>
     <ClCompile Include="VertexCache.cpp"/>
-    <ClCompile Include="WallmarksEngine.cpp"/>
     <ClCompile Include="xrStripify.cpp"/>
     <ClCompile Include="light_GI.cpp"/>
     <ClCompile Include="Light_Render_Direct.cpp"/>
     <ClCompile Include="Light_Render_Direct_ComputeXFS.cpp"/>
-    <ClCompile Include="light_smapvis.cpp"/>
     <ClCompile Include="light_vis.cpp"/>
     <ClCompile Include="..\..\..\Externals\meshoptimizer\src\allocator.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>

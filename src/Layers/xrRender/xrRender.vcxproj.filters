@@ -751,18 +751,6 @@
     <ClCompile Include="PSLibrary.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="r__dsgraph_build.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r__dsgraph_render.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r__dsgraph_render_lods.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r__occlusion.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="r__pixel_calculator.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -799,17 +787,11 @@
     <ClCompile Include="Light_Render_Direct_ComputeXFS.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
-    <ClCompile Include="light_smapvis.cpp">
-      <Filter>Lights</Filter>
-    </ClCompile>
     <ClCompile Include="light_vis.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
     <ClCompile Include="LightTrack.cpp">
       <Filter>Lights</Filter>
-    </ClCompile>
-    <ClCompile Include="WallmarksEngine.cpp">
-      <Filter>Wallmarks</Filter>
     </ClCompile>
     <ClCompile Include="ModelPool.cpp">
       <Filter>Models</Filter>

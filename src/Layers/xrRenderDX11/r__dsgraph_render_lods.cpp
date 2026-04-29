@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FLOD.h"
+#include "Layers/xrRender/FLOD.h"
 #include "xrCommon/xr_array.h"
 
 #ifdef _EDITOR
@@ -27,14 +27,13 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
         return;
 
     if (_setup_zb)
-        mapLOD.get_left_right(lstLODs); // front-to-back
+        mapLOD.get_left_right(lstLODs);
     else
-        mapLOD.get_right_left(lstLODs);	// back-to-front
+        mapLOD.get_right_left(lstLODs);
 
     if (lstLODs.empty())
         return;
 
-    // *** Fill VB and generate groups
     u32 shid = _setup_zb ? SE_R1_LMODELS : SE_R1_NORMAL_LQ;
     FLOD* firstV = (FLOD*)lstLODs[0].pVisual;
     ref_selement cur_S = firstV->shader->E[shid];
@@ -44,10 +43,6 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
 
     const u32 uiVertexPerImposter = 4;
     const u32 uiImpostersFit = RImplementation.Vertex.GetSize() / (firstV->geom->vb_stride * uiVertexPerImposter);
-
-    //Msg("dbg_lods: shid[%d],firstV[%X]",shid,u32((void*)firstV));
-    //Msg("dbg_lods: shader[%X]",u32((void*)firstV->shader._get()));
-    //Msg("dbg_lods: shader_E[%X]",u32((void*)cur_S._get()));
 
     for (u32 i = 0; i < lstLODs.size(); i++)
     {
@@ -59,7 +54,6 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
 
         for (u32 j = 0; j < iBatchSize; ++j, ++i)
         {
-            // sort out redundancy
             R_dsgraph::_LodItem& P = lstLODs[i];
             if (P.pVisual->shader->E[shid] == cur_S)
                 cur_count++;
@@ -70,19 +64,16 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
                 cur_count = 1;
             }
 
-            // calculate alpha
             float ssaDiff = P.ssa - r_ssaLOD_B;
             float scale = ssaDiff / ssaRange;
             int iA = iFloor((1 - scale) * 255.f);
             u32 uA = u32(clampr(iA, 0, 255));
 
-            // calculate direction and shift
             FLOD* lodV = (FLOD*)P.pVisual;
             Fvector Ldir, shift;
             Ldir.sub(lodV->vis.sphere.P, Device.vCameraPosition).normalize();
             shift.mul(Ldir, -.5f * lodV->vis.sphere.R);
 
-            // gen geometry
             FLOD::_face* facets = lodV->facets;
             svector<std::pair<float, u32>, 8> selector;
             for (u32 s = 0; s < 8; s++)
@@ -98,13 +89,11 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
             size_t id_best = selector[selector.size() - 1].second;
             size_t id_next = selector[selector.size() - 2].second;
 
-            // Now we have two "best" planes, calculate factor, and approx normal
             const float fA = dot_best, fB = dot_next, fC = dot_next_2;
             const float alpha = 0.5f + 0.5f * (1 - (fB - fC) / (fA - fC));
             const int iF = iFloor(alpha * 255.5f);
             const u32 uF = u32(clampr(iF, 0, 255));
 
-            // Fill VB
             const FLOD::_face& FA = facets[id_best];
             const FLOD::_face& FB = facets[id_next];
             xr_array<int, 4> vid = {3, 0, 2, 1};
@@ -125,7 +114,6 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
         lstLODgroups.push_back(cur_count);
         RImplementation.Vertex.Unlock(iBatchSize * uiVertexPerImposter, firstV->geom->vb_stride);
 
-        // *** Render
         cmd_list.set_xform_world(Fidentity);
         for (u32 uiPass = 0; uiPass < SHADER_PASSES_MAX; ++uiPass)
         {

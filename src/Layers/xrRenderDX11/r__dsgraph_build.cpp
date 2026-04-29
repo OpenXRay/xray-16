@@ -1,24 +1,21 @@
 #include "stdafx.h"
 
-#include "FHierrarhyVisual.h"
-#include "SkeletonCustom.h"
+#include "Layers/xrRender/FHierrarhyVisual.h"
+#include "Layers/xrRender/SkeletonCustom.h"
 #include "xrCore/Threading/ParallelFor.hpp"
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/IRenderable.h"
 #include "xrEngine/xr_object.h"
 
-#include "FLOD.h"
-#include "LightTrack.h"
-#include "ParticleGroup.h"
-#include "FTreeVisual.h"
+#include "Layers/xrRender/FLOD.h"
+#include "Layers/xrRender/LightTrack.h"
+#include "Layers/xrRender/ParticleGroup.h"
+#include "Layers/xrRender/FTreeVisual.h"
 
 namespace xray::render::fg
 {
 using namespace R_dsgraph;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// Scene graph actual insertion and sorting ////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 float r_ssaDISCARD;
 float r_ssaDONTSORT;
 float r_ssaLOD_A, r_ssaLOD_B;
@@ -58,28 +55,23 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
     if (SSA <= r_ssaDISCARD)
         return;
 
-    // Distortive geometry should be marked and R2 special-cases it
-    // a) Allow to optimize RT order
-    // b) Should be rendered to special distort buffer in another pass
     VERIFY(pVisual->shader._get());
     const Shader* vis_sh = pVisual->shader._get();
-    ShaderElement* sh_d = vis_sh ? vis_sh->E[4]._get() : nullptr; // 4=L_special
+    ShaderElement* sh_d = vis_sh ? vis_sh->E[4]._get() : nullptr;
     if (sh_d)
     {
         if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && o.pmask[sh_d->flags.iPriority / 2])
         {
-            mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
+            mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d }));
         }
     }
 
-    // Select shader
     ShaderElement* sh = RImplementation.rimp_select_sh_dynamic(pVisual, distSQ, o.phase);
     if (nullptr == sh)
         return;
     if (!o.pmask[sh->flags.iPriority / 2])
         return;
 
-    // HUD rendering
     if (root && root->renderable_HUD())
     {
         if (sh->flags.bStrictB2F)
@@ -91,19 +83,17 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
 
 #if RENDER != R_R1
         if (sh->flags.bEmissive && sh_d)
-            mapHUDEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
+            mapHUDEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d }));
 #endif
         return;
     }
 
-// Shadows registering
 #if RENDER == R_R1
     RI.L_Shadows->add_element(_MatrixItem{ SSA, root, pVisual, xform });
 #endif
     if (root && root->renderable_Invisible())
         return;
 
-    // strict-sorting selection
     if (sh->flags.bStrictB2F)
     {
         mapSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
@@ -111,14 +101,9 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
     }
 
 #if RENDER != R_R1
-    // Emissive geometry should be marked and R2 special-cases it
-    // a) Allow to skeep already lit pixels
-    // b) Allow to make them 100% lit and really bright
-    // c) Should not cast shadows
-    // d) Should be rendered to accumulation buffer in the second pass
     if (sh->flags.bEmissive)
     {
-        mapEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
+        mapEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d }));
     }
     if (sh->flags.bWmark && o.pmask_wmark)
     {
@@ -133,11 +118,8 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
         mapMatrix_T& map = mapMatrixPasses[sh->flags.iPriority / 2][iPass];
         mapMatrixItems& matrixItems = map[pass];
 
-        // Create common node
-        // NOTE: Invisible elements exist only in R1
         matrixItems.emplace_back(_MatrixItem{ SSA, root, pVisual, xform });
 
-        // Need to sort for HZB efficient use
         if (SSA > matrixItems.ssa)
         {
             matrixItems.ssa = SSA;
@@ -175,45 +157,33 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
     if (SSA <= r_ssaDISCARD)
         return;
 
-    // Distortive geometry should be marked and R2 special-cases it
-    // a) Allow to optimize RT order
-    // b) Should be rendered to special distort buffer in another pass
     VERIFY(pVisual->shader._get());
     const Shader* vis_sh = pVisual->shader._get();
-    ShaderElement* sh_d = vis_sh ? vis_sh->E[4]._get() : nullptr; // 4=L_special
+    ShaderElement* sh_d = vis_sh ? vis_sh->E[4]._get() : nullptr;
     if (sh_d)
     {
         if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && o.pmask[sh_d->flags.iPriority / 2])
         {
-            mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
+            mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d }));
         }
     }
 
-    // Select shader
     ShaderElement* sh = RImplementation.rimp_select_sh_static(pVisual, distSQ, o.phase);
     if (nullptr == sh)
         return;
     if (!o.pmask[sh->flags.iPriority / 2])
         return;
 
-    // strict-sorting selection
     if (sh->flags.bStrictB2F)
     {
-        // TODO: Выяснить, почему в единственном месте параметр ssa не используется
-        // Визуально различий не замечено
-        mapSorted.insert_anyway(distSQ, _MatrixItemS({ /*0*/SSA, nullptr, pVisual, Fidentity, sh }));
+        mapSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh }));
         return;
     }
 
 #if RENDER != R_R1
-    // Emissive geometry should be marked and R2 special-cases it
-    // a) Allow to skeep already lit pixels
-    // b) Allow to make them 100% lit and really bright
-    // c) Should not cast shadows
-    // d) Should be rendered to accumulation buffer in the second pass
     if (sh->flags.bEmissive && sh_d)
     {
-        mapEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
+        mapEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d }));
     }
     if (sh->flags.bWmark && o.pmask_wmark)
     {
@@ -235,7 +205,6 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
 
         normalItems.emplace_back(_NormalItem{ SSA, pVisual });
 
-        // Need to sort for HZB efficient use
         if (SSA > normalItems.ssa)
         {
             normalItems.ssa = SSA;
@@ -250,9 +219,6 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
 #endif
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform)
 {
     ZoneScoped;
@@ -260,12 +226,10 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
     if (nullptr == pVisual)
         return;
 
-    // Visual is 100% visible - simply add it
     switch (pVisual->Type)
     {
     case MT_PARTICLE_GROUP:
     {
-        // Add all children, doesn't perform any tests
         PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
         for (auto& it : pG->items)
         {
@@ -281,12 +245,9 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
         return;
     case MT_HIERRARHY:
     {
-        // Add all children, doesn't perform any tests
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
         for (auto& i : pV->children)
         {
-            //i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                         // [use shader data from parent model, rather than it childrens]
 
             add_leafs_dynamic(root, i, xform);
         }
@@ -295,7 +256,6 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
     case MT_SKELETON_ANIM:
     case MT_SKELETON_RIGID:
     {
-        // Add all children, doesn't perform any tests
         CKinematics* pV = (CKinematics*)pVisual;
         BOOL _use_lod = FALSE;
         if (pV->m_lod)
@@ -303,7 +263,7 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
             Fvector Tpos;
             float D;
             xform.transform_tiny(Tpos, pV->vis.sphere.P);
-            float ssa = CalcSSA(D, Tpos, pV->vis.sphere.R / 2.f); // assume dynamics never consume full sphere
+            float ssa = CalcSSA(D, Tpos, pV->vis.sphere.R / 2.f);
             if (ssa < r_ssaLOD_A)
                 _use_lod = TRUE;
         }
@@ -316,12 +276,10 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
             pV->CalculateBones(TRUE);
             if (o.phase == CRender::PHASE_NORMAL)
             {
-                pV->CalculateWallmarks(root ? root->renderable_HUD() : false); //. bug?
+                pV->CalculateWallmarks(root ? root->renderable_HUD() : false);
             }
             for (auto& i : pV->children)
             {
-                //i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                             // [use shader data from parent model, rather than it childrens]
                 add_leafs_dynamic(root, i, xform);
             }
         }
@@ -329,8 +287,6 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
         return;
     default:
     {
-        // General type of visual
-        // Calculate distance to it's center
         Fvector Tpos;
         xform.transform_tiny(Tpos, pVisual->vis.sphere.P);
         insert_dynamic(root, pVisual, xform, Tpos);
@@ -346,38 +302,20 @@ void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
     if (o.use_hom && !RImplementation.HOM.visible(pVisual->vis))
         return;
 
-    // Visual is 100% visible - simply add it
     switch (pVisual->Type)
     {
     case MT_PARTICLE_GROUP:
     {
-        // Xottab_DUTY: for dynamic objects we need matrixб
-        // which is nullptr, when we use add_leafs_Static
         Log("Dynamic particles added via static procedure. Please, contact Xottab_DUTY and tell him about the issue.");
         NODEFAULT;
 
-        // Add all children, doesn't perform any tests
-        /*PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
-        for (auto& it : pG->items)
-        {
-            PS::CParticleGroup::SItem& I = it;
-            if (I._effect)
-                add_leafs_Dynamic(I._effect);
-            for (auto& pit : I._children_related)
-                add_leafs_Dynamic(pit);
-            for (auto& pit : I._children_free)
-                add_leafs_Dynamic(pit);
-        }*/
     }
     return;
     case MT_HIERRARHY:
     {
-        // Add all children, doesn't perform any tests
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
         for (auto& i : pV->children)
         {
-            //i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                         // [use shader data from parent model, rather than it childrens]
             add_leafs_static(i);
         }
     }
@@ -385,13 +323,10 @@ void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
     case MT_SKELETON_ANIM:
     case MT_SKELETON_RIGID:
     {
-        // Add all children, doesn't perform any tests
         CKinematics* pV = (CKinematics*)pVisual;
         pV->CalculateBones(TRUE);
         for (auto& i : pV->children)
         {
-            //i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                         // [use shader data from parent model, rather than it childrens]
             add_leafs_static(i);
         }
     }
@@ -414,11 +349,8 @@ void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
         if (ssa > r_ssaLOD_B)
 #endif
         {
-            // Add all children, doesn't perform any tests
             for (auto& i : pV->children)
             {
-                //i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                             // [use shader data from parent model, rather than it childrens]
                 add_leafs_static(i);
             }
         }
@@ -427,120 +359,16 @@ void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
     case MT_TREE_PM:
     case MT_TREE_ST:
     {
-        // General type of visual
         insert_static(pVisual);
     }
     return;
     default:
     {
-        // General type of visual
         insert_static(pVisual);
     }
     return;
     }
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/* Xottab_DUTY: this function is only called from add_Static,
- * but we need a matrix, which is nullptr at this point
-BOOL R_dsgraph_structure::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // normal processing
-{
-    // Check frustum visibility and calculate distance to visual's center
-    Fvector Tpos; // transformed position
-    EFC_Visible VIS;
-
-    val_pTransform->transform_tiny(Tpos, pVisual->vis.sphere.P);
-    VIS = View->testSphere(Tpos, pVisual->vis.sphere.R, planes);
-    if (fcvNone == VIS)
-        return FALSE;
-
-    // If we get here visual is visible or partially visible
-    switch (pVisual->Type)
-    {
-    case MT_PARTICLE_GROUP:
-    {
-        // Add all children, doesn't perform any tests
-        PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
-        for (auto& it : pG->items)
-        {
-            PS::CParticleGroup::SItem& I = it;
-            if (fcvPartial == VIS)
-            {
-                if (I._effect)
-                    add_Dynamic(I._effect, planes);
-                for (auto& pit : I._children_related)
-                    add_Dynamic(pit, planes);
-                for (auto& pit : I._children_free)
-                    add_Dynamic(pit, planes);
-            }
-            else
-            {
-                if (I._effect)
-                    add_leafs_Dynamic(I._effect);
-                for (auto& pit : I._children_related)
-                    add_leafs_Dynamic(pit);
-                for (auto& pit : I._children_free)
-                    add_leafs_Dynamic(pit);
-            }
-        }
-    }
-    break;
-    case MT_HIERRARHY:
-    {
-        // Add all children
-        FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
-        if (fcvPartial == VIS)
-        {
-            for (auto& i : pV->children)
-                add_Dynamic(i, planes);
-        }
-        else
-        {
-            for (auto& i : pV->children)
-                add_leafs_Dynamic(i);
-        }
-    }
-    break;
-    case MT_SKELETON_ANIM:
-    case MT_SKELETON_RIGID:
-    {
-        // Add all children, doesn't perform any tests
-        CKinematics* pV = (CKinematics*)pVisual;
-        BOOL _use_lod = FALSE;
-        if (pV->m_lod)
-        {
-            Fvector Tpos2;
-            float D;
-            val_pTransform->transform_tiny(Tpos2, pV->vis.sphere.P);
-            float ssa = CalcSSA(D, Tpos2, pV->vis.sphere.R / 2.f); // assume dynamics never consume full sphere
-            if (ssa < r_ssaLOD_A)
-                _use_lod = TRUE;
-        }
-        if (_use_lod)
-        {
-            add_leafs_Dynamic(pV->m_lod);
-        }
-        else
-        {
-            pV->CalculateBones(TRUE);
-            pV->CalculateWallmarks(val_pObject ? val_pObject->renderable_HUD() : false); //. bug?
-            for (auto& i : pV->children)
-                add_leafs_Dynamic(i);
-        }
-    }
-    break;
-    default:
-    {
-        // General type of visual
-        r_dsgraph_insert_dynamic(pVisual, Tpos);
-    }
-    break;
-    }
-    return TRUE;
-}*/
 
 void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes)
 {
@@ -548,7 +376,6 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
 
     vis_data& vis = pVisual->vis;
 
-    // Check frustum visibility and calculate distance to visual's center
     const EFC_Visible VIS = view.testSAABB(vis.sphere.P, vis.sphere.R, vis.box.data(), planes);
     if (fcvNone == VIS)
         return;
@@ -556,45 +383,17 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     if (o.use_hom && !RImplementation.HOM.visible(vis))
         return;
 
-    // If we get here visual is visible or partially visible
     switch (pVisual->Type)
     {
     case MT_PARTICLE_GROUP:
     {
-        // Xottab_DUTY: for dynamic objects we need matrix,
-        // which is nullptr, when we use add_Static
         Log("Dynamic particles added via static procedure. Please, contact Xottab_DUTY and tell him about the issue.");
         NODEFAULT;
 
-        // Add all children, doesn't perform any tests
-        /*PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
-        for (auto& it : pG->items)
-        {
-            PS::CParticleGroup::SItem& I = it;
-            if (fcvPartial == VIS)
-            {
-                if (I._effect)
-                    add_Dynamic(I._effect, planes);
-                for (auto& pit : I._children_related)
-                    add_Dynamic(pit, planes);
-                for (auto& pit : I._children_free)
-                    add_Dynamic(pit, planes);
-            }
-            else
-            {
-                if (I._effect)
-                    add_leafs_Dynamic(I._effect);
-                for (auto& pit : I._children_related)
-                    add_leafs_Dynamic(pit);
-                for (auto& pit : I._children_free)
-                    add_leafs_Dynamic(pit);
-            }
-        }*/
     }
     break;
     case MT_HIERRARHY:
     {
-        // Add all children
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
         if (fcvPartial == VIS)
         {
@@ -611,7 +410,6 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     case MT_SKELETON_ANIM:
     case MT_SKELETON_RIGID:
     {
-        // Add all children, doesn't perform any tests
         CKinematics* pV = (CKinematics*)pVisual;
         pV->CalculateBones(TRUE);
         if (fcvPartial == VIS)
@@ -644,7 +442,6 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
         if (ssa > r_ssaLOD_B)
 #endif
         {
-            // Add all children, perform tests
             for (auto& i : pV->children)
                 add_leafs_static(i);
         }
@@ -653,13 +450,11 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     case MT_TREE_ST:
     case MT_TREE_PM:
     {
-        // General type of visual
         insert_static(pVisual);
     }
         return;
     default:
     {
-        // General type of visual
         insert_static(pVisual);
     }
     break;
@@ -712,16 +507,14 @@ void R_dsgraph_structure::unload()
 }
 
 
-// sub-space rendering - main procedure
 void R_dsgraph_structure::build_subspace()
 {
     ZoneScoped;
 
-    marker++; // !!! critical here
+    marker++;
 
     if (o.precise_portals && RImplementation.rmPortals)
     {
-        // Check if camera is too near to some portal - if so force DualRender
         Fvector box_radius;
         box_radius.set(o.query_box_side, o.query_box_side, o.query_box_side);
         Sectors_xrc.box_query(CDB::OPT_FULL_TEST, RImplementation.rmPortals, o.view_pos, box_radius);
@@ -739,10 +532,8 @@ void R_dsgraph_structure::build_subspace()
         return;
     }
 
-    // Traverse sector/portal structure
     PortalTraverser.traverse(Sectors[o.sector_id], o.view_frustum, o.view_pos, o.xform, o.portal_traverse_flags);
 
-    // Determine visibility for static geometry hierarchy
 #if 0
     static xr_vector<Task*> static_geo_tasks;
     static_geo_tasks.resize(PortalTraverser.r_sectors.size());
@@ -754,7 +545,6 @@ void R_dsgraph_structure::build_subspace()
         {
             CSector* sector = PortalTraverser.r_sectors[s_it];
             dxRender_Visual* root = sector->root();
-            //VERIFY(root->getType() == MT_HIERRARHY);
 
             const auto &children = static_cast<FHierrarhyVisual*>(root)->children;
 
@@ -770,7 +560,7 @@ void R_dsgraph_structure::build_subspace()
                     }
                 };
 
-                if (o.mt_calculate) // NOTE: this code doesn't work until visuals maps are separated by worker ID.
+                if (o.mt_calculate)
                 {
                     static_geo_tasks[s_it] = &xr_parallel_for(TaskRange<size_t>(0, children.size()), false, traverse_children);
                 }
@@ -790,12 +580,10 @@ void R_dsgraph_structure::build_subspace()
 
     if (collect_dynamic_any)
     {
-        // Traverse object database
         g_pGamePersistent->SpatialSpace.q_frustum(lstRenderables, o.spatial_traverse_flags, o.spatial_types, o.view_frustum);
 
-        if (o.spatial_traverse_flags & ISpatial_DB::O_ORDERED) // this should be inside of query functions
+        if (o.spatial_traverse_flags & ISpatial_DB::O_ORDERED)
         {
-            // Exact sorting order (front-to-back)
             std::sort(lstRenderables.begin(), lstRenderables.end(), [&](ISpatial* s1, ISpatial* s2)
                 {
                     const float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(o.view_pos);
@@ -805,7 +593,7 @@ void R_dsgraph_structure::build_subspace()
         }
 
         u32 uID_LTRACK = 0xffffffff;
-        if (o.is_main_pass) // temporary
+        if (o.is_main_pass)
         {
             if (o.phase == CRender::PHASE_NORMAL)
             {
@@ -813,7 +601,6 @@ void R_dsgraph_structure::build_subspace()
                 if (!lstRenderables.empty())
                     uID_LTRACK = RImplementation.uLastLTRACK % lstRenderables.size();
 
-                // update light-vis for current entity / actor
                 IGameObject* O = g_pGameLevel->CurrentViewEntity();
                 if (O)
                 {
@@ -826,12 +613,9 @@ void R_dsgraph_structure::build_subspace()
 
         const bool collect_lights = o.spatial_types & STYPE_LIGHTSOURCE;
 
-        // Determine visibility for dynamic part of scene
         for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
         {
             ISpatial* spatial = lstRenderables[o_it];
-            // Re-detect the sector only when it was invalidated by a move (spatial_move). Static objects keep
-            // their cached sector and skip the 2 ray_query casts entirely - this is the bulk of per-frame rays.
             if (o.is_main_pass && (spatial->GetSpatialData().type & STYPEFLAG_INVALIDSECTOR))
             {
                 const auto& entity_pos = spatial->spatial_sector_point();
@@ -841,18 +625,16 @@ void R_dsgraph_structure::build_subspace()
             const auto& data = spatial->GetSpatialData();
             const auto& [type, sphere, sector_id] = std::tuple(data.type, data.sphere, data.sector_id);
             if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
-                continue; // disassociated from S/P structure
+                continue;
             auto* sector = Sectors[sector_id];
 
             if (collect_lights && (type & STYPE_LIGHTSOURCE))
             {
-                // lightsource
                 light* L = (light*)spatial->dcast_Light();
                 VERIFY(L);
                 float lod = L->get_LOD();
                 if (lod > EPS_L)
                 {
-                    // TODO: check for HOM flag
                     vis_data& vis = L->get_homdata();
                     if (RImplementation.HOM.visible(vis))
                         Lights.add_light(L);
@@ -861,7 +643,7 @@ void R_dsgraph_structure::build_subspace()
             }
 
             if (PortalTraverser.i_marker != sector->r_marker)
-                continue; // inactive (untouched) sector
+                continue;
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
                 const CFrustum& view = sector->r_frustums[v_it];
@@ -872,12 +654,9 @@ void R_dsgraph_structure::build_subspace()
                 {
                     if (type & STYPE_RENDERABLE)
                     {
-                        // renderable
                         IRenderable* renderable = spatial->dcast_Renderable();
                         VERIFY(renderable);
 
-                        // Occlusion
-                        //	casting is faster then using getVis method
                         vis_data& v_orig = ((dxRender_Visual*)renderable->GetRenderData().visual)->vis;
                         vis_data v_copy = v_orig;
                         v_copy.box.xform(renderable->GetRenderData().xform);
@@ -887,27 +666,23 @@ void R_dsgraph_structure::build_subspace()
                         v_orig.hom_frame = v_copy.hom_frame;
                         v_orig.hom_tested = v_copy.hom_tested;
                         if (!bVisible)
-                            break; // exit loop on frustums
+                            break;
 
-                        // update light-vis for selected entity
                         if (o_it == uID_LTRACK && renderable->renderable_ROS())
                         {
-                            // track lighting environment
                             CROS_impl* T = (CROS_impl*)renderable->renderable_ROS();
                             T->update(renderable);
                         }
 
-                        // Rendering
                         renderable->renderable_Render(context_id, renderable);
                     }
-                    break; // exit loop on frustums
+                    break;
                 }
                 else
                 {
-                    // renderable
                     IRenderable* renderable = spatial->dcast_Renderable();
                     if (nullptr == renderable)
-                        continue; // unknown, but renderable object (r1_glow???)
+                        continue;
 
                     renderable->renderable_Render(context_id, nullptr);
                 }
@@ -917,7 +692,6 @@ void R_dsgraph_structure::build_subspace()
         if (g_pGameLevel)
         {
 #if RENDER != R_R1
-            // Actor Shadow (Sun + Light)
             if (o.phase == CRender::PHASE_SMAP && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW))
             {
                 do
@@ -929,17 +703,16 @@ void R_dsgraph_structure::build_subspace()
                     viewEntity->spatial_updatesector(detect_sector(entity_pos));
                     const auto sector_id = viewEntity->GetSpatialData().sector_id;
                     if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
-                        break; // disassociated from S/P structure
+                        break;
                     CSector* sector = Sectors[sector_id];
                     if (PortalTraverser.i_marker != sector->r_marker)
-                        break; // inactive (untouched) sector
+                        break;
                     for (const CFrustum& view : sector->r_frustums)
                     {
                         if (!view.testSphere_dirty(
                             viewEntity->GetSpatialData().sphere.P, viewEntity->GetSpatialData().sphere.R))
                             continue;
 
-                        // renderable
                         g_pGameLevel->pHUD->Render_First(context_id);
                     }
                 } while (0);
@@ -952,7 +725,6 @@ void R_dsgraph_structure::build_subspace()
     }
 
 #if 0
-    // wait for static geo collecting to be done.
     for (auto* task : static_geo_tasks)
     {
         if (task)
