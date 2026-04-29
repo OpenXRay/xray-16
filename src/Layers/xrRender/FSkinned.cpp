@@ -4,6 +4,7 @@
 #include "FSkinned.h"
 #include "FSkinnedTypes.h"
 #include "SkeletonX.h"
+#include "r__hw_compat.h"
 #include "Layers/xrRender/BufferUtils.h"
 #include "xrEngine/EnnumerateVertices.h"
 #include "xrCore/xrDebug_macros.h"
@@ -49,7 +50,7 @@ void CSkeletonX_PM::Load(const char* N, IReader* data, u32 dwFlags)
     _Load(N, data, vCount);
     void* _verts_ = data->pointer();
     inherited1::Load(N, data, dwFlags | VLOAD_NOVERTICES);
-    RImplementation.shader_option_skinning(-1);
+    CompatHW::shader_option_skinning(-1);
     vBase = 0;
     _Load_hw(*this, _verts_);
 }
@@ -58,7 +59,7 @@ void CSkeletonX_ST::Load(const char* N, IReader* data, u32 dwFlags)
     _Load(N, data, vCount);
     void* _verts_ = data->pointer();
     inherited1::Load(N, data, dwFlags | VLOAD_NOVERTICES);
-    RImplementation.shader_option_skinning(-1);
+    CompatHW::shader_option_skinning(-1);
     vBase = 0;
     _Load_hw(*this, _verts_);
 }
