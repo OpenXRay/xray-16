@@ -91,6 +91,9 @@ u64 PipelineStateDesc::ComputeHash() const {
     hashValue(sampleCount);
     hashValue(sampleQuality);
 
+    for (const auto& layout : bindingLayouts)
+        hashValue((u64)layout.Get());
+
     return hash;
 }
 

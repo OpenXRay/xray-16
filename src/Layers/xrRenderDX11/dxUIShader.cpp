@@ -117,11 +117,13 @@ bool dxUIShader::GetBaseTextureResolution(Fvector2& res)
         return false;
 
     nvrhi::ITexture* nvrhiTexture = texManager->GetNVRHITexture(handle);
-    if (!nvrhiTexture)
-        return false;
-
-    nvrhi::TextureDesc desc = nvrhiTexture->getDesc();
-    res = { float(desc.width), float(desc.height) };
-    return true;
+    bool ok = (nvrhiTexture != nullptr);
+    if (ok)
+    {
+        nvrhi::TextureDesc desc = nvrhiTexture->getDesc();
+        res = { float(desc.width), float(desc.height) };
+    }
+    texManager->Release(handle);
+    return ok;
 }
 } // namespace xray::render::fg

@@ -256,6 +256,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                                         font->fTCHeight = font->fHeight / float(font->vTS.y);
                                         font->uFlags |= CGameFont::fsValid;
                                     }
+                                    texMgr->Release(texHandle);
                                 }
                             }
                         }
