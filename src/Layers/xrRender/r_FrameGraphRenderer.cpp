@@ -15,6 +15,7 @@
 #include "Shader.h"
 #include "r__dsgraph_structure.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 #include "Layers/xrRender/UIRenderCollector.h"
 #include "Layers/xrRender/NVRHIUIRenderer.h"
@@ -2068,20 +2069,10 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
 
 static u8 QueryParticleBlendMode(LPCSTR shaderName)
 {
-    if (!shaderName || !shaderName[0])
+    u32 id = 0;
+    if (!shader_info::GetParticleBlendIndex(shaderName, id))
         return passes::PARTICLE_BLEND_BLEND;
-
-    IBlender* B = fg::RImplementation.Resources->_FindBlender(shaderName);
-    if (!B)
-        return passes::PARTICLE_BLEND_BLEND;
-
-    if (B->getDescription().CLS == B_PARTICLE) {
-        auto* bp = static_cast<fg::CBlender_Particle*>(B);
-        u32 id = bp->oBlend.IDselected;
-        return (id < passes::PARTICLE_BLEND_COUNT) ? (u8)id : passes::PARTICLE_BLEND_BLEND;
-    }
-
-    return passes::PARTICLE_BLEND_BLEND;
+    return (id < passes::PARTICLE_BLEND_COUNT) ? (u8)id : passes::PARTICLE_BLEND_BLEND;
 }
 
 void FrameGraphRenderer::ProcessSingleParticleEffect(

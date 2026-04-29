@@ -155,6 +155,7 @@
     <ClInclude Include="FVisual.h"/>
     <ClInclude Include="Geometry\MaterialCache.h"/>
     <ClInclude Include="Materials\MaterialSystem.h"/>
+    <ClInclude Include="Materials\ShaderInfo.h"/>
     <ClInclude Include="HOM.h"/>
     <ClInclude Include="HWCaps.h"/>
     <ClInclude Include="IRenderDetailModel.h"/>

@@ -33,6 +33,7 @@
 #include "Layers/xrRenderDX11/blenders/Blender_BmmD.h"            // For CBlender_BmmD detail texture accessors
 #include "Layers/xrRender/r_constants.h"                      // For R_constant_setup
 #include "Layers/xrRender/Materials/MaterialSystem.h"         // For MaterialSystem (D3D12)
+#include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "xrEngine/xr_object.h"                               // For GEnv
@@ -1688,15 +1689,7 @@ bool MaterialCache::IsTerrainMaterial(dxRender_Visual* visual)
 {
     if (!visual || !visual->shaderName.size())
         return false;
-
-    // Get blender from shader name
-    IBlender* blender = RImplementation.Resources->_FindBlender(visual->shaderName.c_str());
-    if (!blender)
-        return false;
-
-    // Check CLASS_ID for terrain blenders
-    CLASS_ID cls = blender->getDescription().CLS;
-    return (cls == B_BmmD || cls == B_LmBmmD);
+    return shader_info::IsTerrainShader(visual->shaderName.c_str());
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1827,15 +1820,8 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
         bool updated = false;
         xr_vector<xr_string> missingTextures;  // Track missing textures for logging
 
-        // Get blender to access detail texture names
-        IBlender* blender = RImplementation.Resources->_FindBlender(visual->shaderName.c_str());
-        CBlender_BmmD* terrainBlender = nullptr;
-        if (blender) {
-            CLASS_ID cls = blender->getDescription().CLS;
-            if (cls == B_BmmD || cls == B_LmBmmD) {
-                terrainBlender = static_cast<CBlender_BmmD*>(blender);
-            }
-        }
+        shader_info::TerrainDetailNames detailNames;
+        bool hasTerrainDetail = shader_info::GetTerrainDetailNames(visual->shaderName.c_str(), detailNames);
 
         // Helper lambda to register a texture with failure tracking
         auto RegisterTexture = [&](const char* texName, const char* slotName) -> u32 {
@@ -1884,11 +1870,10 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
             }
         }
 
-        // Get detail texture names from blender (oR_Name, oG_Name, oB_Name, oA_Name)
-        const char* detailR = terrainBlender ? terrainBlender->GetDetailR() : nullptr;
-        const char* detailG = terrainBlender ? terrainBlender->GetDetailG() : nullptr;
-        const char* detailB = terrainBlender ? terrainBlender->GetDetailB() : nullptr;
-        const char* detailA = terrainBlender ? terrainBlender->GetDetailA() : nullptr;
+        const char* detailR = hasTerrainDetail ? detailNames.r : nullptr;
+        const char* detailG = hasTerrainDetail ? detailNames.g : nullptr;
+        const char* detailB = hasTerrainDetail ? detailNames.b : nullptr;
+        const char* detailA = hasTerrainDetail ? detailNames.a : nullptr;
 
         // 3-6. Detail color textures (s_dt_r/g/b/a)
         {
