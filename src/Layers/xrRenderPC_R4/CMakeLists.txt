@@ -161,8 +161,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphRendererModule.cpp
 
     # ImGui NVRHI Renderer - Backend agnostic
-    ../xrRender/dxImGuiRender.h
-    ../xrRender/dxImGuiRender.cpp
+    ../xrRenderDX11/dxImGuiRender.h
+    ../xrRenderDX11/dxImGuiRender.cpp
     ../xrRender/ImGuiRendererNVRHI.h
     ../xrRender/ImGuiRendererNVRHI.cpp
     ../xrRender/ImGuiRendererNVRHI_Shaders.cpp
@@ -352,10 +352,10 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/r__sync_point.cpp
     ../xrRender/r_constants.cpp
     ../xrRender/stats_manager.cpp
-    ../xrRender/tss_def.cpp
-    ../xrRender/xrRender_console.cpp
+    ../xrRenderDX11/tss_def.cpp
+    ../xrRenderDX11/xrRender_console.cpp
     ../xrRender/xrStripify.cpp
-    ../xrRender/xr_effgamma.cpp
+    ../xrRenderDX11/xr_effgamma.cpp
 
     ../xrRenderDX11/3DFluid/dx113DFluidBlenders.cpp
     ../xrRenderDX11/3DFluid/dx113DFluidData.cpp

@@ -5,7 +5,7 @@
 #include "r__dsgraph_types.h"
 #include "r__dsgraph_structure.h"
 #include "r__sector.h"
-#include "xr_effgamma.h"
+#include "Layers/xrRenderDX11/xr_effgamma.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {

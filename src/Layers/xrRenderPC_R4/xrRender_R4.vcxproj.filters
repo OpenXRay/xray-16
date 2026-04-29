@@ -537,7 +537,7 @@
     <ClInclude Include="..\xrRender\SkeletonX.h">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\xr_effgamma.h">
+    <ClInclude Include="..\xrRenderDX11\xr_effgamma.h">
       <Filter>Refactored\Execution &amp; 3D\Gamma</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\IRenderDetailModel.h">
@@ -750,7 +750,7 @@
     <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h">
       <Filter>Interface implementations\ImGuiRender</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\dxImGuiRender.h">
+    <ClInclude Include="..\xrRenderDX11\dxImGuiRender.h">
       <Filter>Interface implementations\ImGuiRender</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\ImGuiRendererNVRHI.h">
@@ -1035,7 +1035,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\xrRender_console.cpp">
+    <ClCompile Include="..\xrRenderDX11\xrRender_console.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="xrRender_R4.cpp">
@@ -1344,7 +1344,7 @@
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_StandartBinding.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\tss_def.cpp">
+    <ClCompile Include="..\xrRenderDX11\tss_def.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\D3DUtils.cpp">
@@ -1389,7 +1389,7 @@
     <ClCompile Include="..\xrRender\SkeletonX.cpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\xr_effgamma.cpp">
+    <ClCompile Include="..\xrRenderDX11\xr_effgamma.cpp">
       <Filter>Refactored\Execution &amp; 3D\Gamma</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\stats_manager.cpp">
@@ -1611,7 +1611,7 @@
     <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
+    <ClCompile Include="..\xrRenderDX11\dxImGuiRender.cpp">
       <Filter>Interface implementations\ImGuiRender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ImGuiRendererNVRHI.cpp">

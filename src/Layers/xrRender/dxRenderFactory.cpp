@@ -4,7 +4,7 @@
 #include "dxStatGraphRender.h"
 #ifndef _EDITOR
 #include "dxLensFlareRender.h"
-#include "dxImGuiRender.h"
+#include "Layers/xrRenderDX11/dxImGuiRender.h"
 #endif
 #ifndef _EDITOR
 #include "dxThunderboltRender.h"

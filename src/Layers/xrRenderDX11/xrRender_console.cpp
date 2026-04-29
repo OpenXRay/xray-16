@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "xrRender_console.h"
+#include "Layers/xrRender/xrRender_console.h"
 #include "xrCore/xr_token.h"
 #include "xrCore/Animation/SkeletonMotions.hpp"
 
@@ -9,7 +9,7 @@
 #include "xrEngine/xr_ioc_cmd.h"
 
 #if RENDER != R_R1
-#include "r__pixel_calculator.h"
+#include "Layers/xrRender/r__pixel_calculator.h"
 #endif
 
 #if defined(USE_DX11)

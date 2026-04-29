@@ -155,7 +155,7 @@
     <ClInclude Include="..\xrRender\dxDebugRender.h" />
     <ClInclude Include="..\xrRender\dxEnvironmentRender.h" />
     <ClInclude Include="..\xrRender\dxFontRender.h" />
-    <ClInclude Include="..\xrRender\dxImGuiRender.h" />
+    <ClInclude Include="..\xrRenderDX11\dxImGuiRender.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\SkinningPassSetup.h" />
@@ -293,7 +293,7 @@
     <ClInclude Include="..\xrRender\WallmarksEngine.h" />
     <ClInclude Include="..\xrRender\xrRender_console.h" />
     <ClInclude Include="..\xrRender\xrStripify.h" />
-    <ClInclude Include="..\xrRender\xr_effgamma.h" />
+    <ClInclude Include="..\xrRenderDX11\xr_effgamma.h" />
     <ClInclude Include="..\xrRenderDX11\blenders\blender_bloom_build.h" />
     <ClInclude Include="..\xrRenderDX11\blenders\blender_combine.h" />
     <ClInclude Include="..\xrRenderDX11\blenders\blender_deffer_aref.h" />
@@ -432,7 +432,7 @@
     <ClCompile Include="..\xrRender\dxDebugRender.cpp" />
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp" />
     <ClCompile Include="..\xrRender\dxFontRender.cpp" />
-    <ClCompile Include="..\xrRender\dxImGuiRender.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dxImGuiRender.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\SkinningPassSetup.cpp" />
@@ -558,15 +558,15 @@
     <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp" />
     <ClCompile Include="..\xrRender\stats_manager.cpp" />
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp" />
-    <ClCompile Include="..\xrRender\tss_def.cpp" />
+    <ClCompile Include="..\xrRenderDX11\tss_def.cpp" />
     <ClCompile Include="..\xrRenderDX11\blenders\uber_deffer.cpp" />
     <ClCompile Include="..\xrRender\UIRenderCollector.cpp" />
     <ClCompile Include="..\xrRender\Utils\dxHashHelper.cpp" />
     <ClCompile Include="..\xrRender\VertexCache.cpp" />
     <ClCompile Include="..\xrRender\WallmarksEngine.cpp" />
-    <ClCompile Include="..\xrRender\xrRender_console.cpp" />
+    <ClCompile Include="..\xrRenderDX11\xrRender_console.cpp" />
     <ClCompile Include="..\xrRender\xrStripify.cpp" />
-    <ClCompile Include="..\xrRender\xr_effgamma.cpp" />
+    <ClCompile Include="..\xrRenderDX11\xr_effgamma.cpp" />
     <ClCompile Include="..\xrRenderDX11\blenders\blender_bloom_build.cpp" />
     <ClCompile Include="..\xrRenderDX11\blenders\blender_combine.cpp" />
     <ClCompile Include="..\xrRenderDX11\blenders\blender_deffer_aref.cpp" />
