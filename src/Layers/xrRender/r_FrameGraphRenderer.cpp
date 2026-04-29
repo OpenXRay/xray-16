@@ -117,6 +117,14 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
 
     Msg("* [FrameGraphRenderer] Initializing...");
 
+    m_shaderLoader = xr_new<framegraph::ShaderLoader>(device->GetSlangCompiler());
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
+        m_shaderLoader->SetTarget(SlangCompiler::Target::SPIRV);
+    else
+        m_shaderLoader->SetTarget(SlangCompiler::Target::DXIL);
+    Msg("* [FrameGraphRenderer] ShaderLoader initialized (target: %s)",
+        m_shaderLoader->GetTarget() == SlangCompiler::Target::SPIRV ? "SPIRV" : "DXIL");
+
     m_framegraph = xr_make_unique<framegraph::FrameGraph>(device);
     m_shaderPhaseCache = xr_make_unique<framegraph::ShaderPhaseCache>();
     m_geometryVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
@@ -203,6 +211,11 @@ void FrameGraphRenderer::Shutdown() {
     if (!m_device) return;
 
     Msg("* [FrameGraphRenderer] Shutting down");
+
+    if (m_shaderLoader) {
+        xr_delete(m_shaderLoader);
+        Msg("* [FrameGraphRenderer] ShaderLoader destroyed");
+    }
 
     g_geometryCollector = nullptr;
     m_statsOverlay = nullptr;
@@ -313,10 +326,10 @@ void FrameGraphRenderer::Render() {
         if (++frameCounter >= 60)
         {
             frameCounter = 0;
-            if (RImplementation.m_shaderLoader && RImplementation.m_shaderLoader->CheckForChangedFiles())
+            if (GEnv.FrameGraphRenderer->GetShaderLoader() && GEnv.FrameGraphRenderer->GetShaderLoader()->CheckForChangedFiles())
             {
                 Msg("* Shader hot-reload detected, validating changed shaders...");
-                if (!RImplementation.m_shaderLoader->ValidateChangedFiles())
+                if (!GEnv.FrameGraphRenderer->GetShaderLoader()->ValidateChangedFiles())
                 {
                     Msg("! Shader hot-reload skipped: validation failed, keeping current shaders");
                 }
@@ -327,7 +340,7 @@ void FrameGraphRenderer::Render() {
                     // Ensure no in-flight work references old pipelines/shaders.
                     m_device->GetNVRHIDevice()->waitForIdle();
 
-                    RImplementation.m_shaderLoader->ClearAllCaches();
+                    GEnv.FrameGraphRenderer->GetShaderLoader()->ClearAllCaches();
                     framegraph::GetPassResourceCache().Clear();
                     if (m_blackboard)
                     {
@@ -1638,7 +1651,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                         nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
 
                         if (!s_init) {
-                            auto csResult = RImplementation.m_shaderLoader->LoadComputeShader("debug_preview");
+                            auto csResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("debug_preview");
                             if (!csResult.handle) return;
 
                             s_layout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DebugPreview", *csResult.reflection, nvDevice);
@@ -1683,7 +1696,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                         nvrhi::ICommandList* cmdList = ctx->GetCommandList();
                         cmdList->writeBuffer(s_cb, &cb, sizeof(cb));
 
-                        auto* debugRefl = RImplementation.m_shaderLoader->GetCachedReflection("debug_preview", ".cs");
+                        auto* debugRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("debug_preview", ".cs");
                         framegraph::BindingSetBuilder bsb(*debugRefl, nvDevice, "FGRenderer.Debug");
                         bsb.ConstantBuffer("DebugPreviewParams", s_cb)
                            .Texture("t_source", srcTex)

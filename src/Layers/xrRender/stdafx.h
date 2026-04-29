@@ -7,6 +7,7 @@
 #include "xrEngine/vis_common.h"
 #include "xrEngine/Render.h"
 #include "xrEngine/IGame_Level.h"
+#include "xrEngine/IFrameGraphRender.h"
 
 #include "xrParticles/psystem.h"
 

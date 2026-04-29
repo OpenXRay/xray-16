@@ -38,9 +38,9 @@ void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state) {
     cmdList->close();
     device->executeCommandList(cmdList);
 
-    if (RImplementation.m_shaderLoader) {
-        auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("tonemap");
-        auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("tonemap");
+    if (GEnv.FrameGraphRenderer->GetShaderLoader()) {
+        auto vsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadVertexShader("tonemap");
+        auto psResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadPixelShader("tonemap");
         if (vsResult.handle && psResult.handle) {
             auto& cache = framegraph::GetPassResourceCache();
 
@@ -147,8 +147,8 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             auto& cache = framegraph::GetPassResourceCache();
 
-            auto* vsRefl = RImplementation.m_shaderLoader->GetCachedReflection("tonemap", ".vs");
-            auto* psRefl = RImplementation.m_shaderLoader->GetCachedReflection("tonemap", ".ps");
+            auto* vsRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("tonemap", ".vs");
+            auto* psRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("tonemap", ".ps");
             if (!vsRefl || !psRefl)
                 return;
 

@@ -508,7 +508,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     options.finish();
     sh_name.finish();
 
-    if (!m_shaderLoader)
+    if (!GEnv.FrameGraphRenderer->GetShaderLoader())
     {
         Msg("! [shader_compile] ShaderLoader not initialized!");
         R_ASSERT2(false, "ShaderLoader must be initialized");
@@ -575,7 +575,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     char extWithDot[4] = ".";
     xr_strcat(extWithDot, extension);
-    bool success = m_shaderLoader->CompileShaderWithDefines(
+    bool success = GEnv.FrameGraphRenderer->GetShaderLoader()->CompileShaderWithDefines(
         name,           // Shader name
         extWithDot,     // Extension (.vs, .ps, etc.)
         pFunctionName,  // Entry point
@@ -601,7 +601,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     // Get reflection data from ShaderLoader's cache
-    auto* reflection = m_shaderLoader->GetCachedReflection(name, extWithDot);
+    auto* reflection = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection(name, extWithDot);
 
     // Create the hardware shader object
     HRESULT _result = create_shader(

@@ -12,6 +12,9 @@ namespace xray::render {
         class UIRenderCollector;
         class NVRHIUIRenderer;
     }
+    namespace framegraph {
+        class ShaderLoader;
+    }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -40,6 +43,7 @@ public:
 
     // Accessors for lambda passes to access shared infrastructure
     virtual xray::render::fg::RenderDevice* GetRenderDevice() const = 0;
+    virtual xray::render::framegraph::ShaderLoader* GetShaderLoader() const = 0;
     virtual xray::render::MaterialCache* GetMaterialCache() const = 0;
     virtual xray::render::MaterialCache* GetUIMaterialCache() const = 0;
     virtual xray::render::ui::UIRenderCollector* GetUICollector() const = 0;

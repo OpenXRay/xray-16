@@ -47,18 +47,9 @@ void r5::InitializeFrameGraph()
     self.m_framegraphRenderer->SetEnabled(true);
     Msg("* FrameGraphRenderer enabled");
 
-    self.m_shaderLoader = xr_new<xray::render::framegraph::ShaderLoader>(
-        self.m_renderDevice->GetSlangCompiler());
-    if (GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
-        self.m_shaderLoader->SetTarget(xray::render::SlangCompiler::Target::SPIRV);
-    else
-        self.m_shaderLoader->SetTarget(xray::render::SlangCompiler::Target::DXIL);
-    Msg("* ShaderLoader initialized (target: %s)",
-        self.m_shaderLoader->GetTarget() == xray::render::SlangCompiler::Target::SPIRV ? "SPIRV" : "DXIL");
-
     xray::render::MaterialSystem::Instance().Initialize(
         self.m_renderDevice->GetFGResourceManager(),
-        self.m_shaderLoader);
+        self.m_framegraphRenderer->GetShaderLoader());
     Msg("* MaterialSystem initialized");
 }
 
@@ -68,12 +59,6 @@ void r5::ShutdownFrameGraph()
 
     xray::render::MaterialSystem::Instance().Shutdown();
     Msg("* MaterialSystem shutdown");
-
-    if (self.m_shaderLoader)
-    {
-        xr_delete(self.m_shaderLoader);
-        Msg("* ShaderLoader destroyed");
-    }
 
     if (self.m_framegraphRenderer)
     {

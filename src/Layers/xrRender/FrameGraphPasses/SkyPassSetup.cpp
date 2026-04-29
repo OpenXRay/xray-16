@@ -121,15 +121,15 @@ void InitializeSkyGeometry(fg::RenderDevice* device, SkyPassState& state) {
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
 
-    if (!RImplementation.m_shaderLoader)
+    if (!GEnv.FrameGraphRenderer->GetShaderLoader())
         return;
 
-    auto vsResult = RImplementation.m_shaderLoader->LoadVertexShader("sky_forward");
-    auto psResult = RImplementation.m_shaderLoader->LoadPixelShader("sky_forward");
+    auto vsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadVertexShader("sky_forward");
+    auto psResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadPixelShader("sky_forward");
 
     if (!vsResult.handle || !psResult.handle) {
-        vsResult = RImplementation.m_shaderLoader->LoadVertexShader("sky2");
-        psResult = RImplementation.m_shaderLoader->LoadPixelShader("sky2");
+        vsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadVertexShader("sky2");
+        psResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadPixelShader("sky2");
         if (!vsResult.handle || !psResult.handle)
             return;
     }
@@ -327,8 +327,8 @@ framegraph::VirtualResourceHandle setupSkyPass(
             if (!sky0Tex) sky0Tex = data.passState->placeholderCubemap.Get();
             if (!sky1Tex) sky1Tex = data.passState->placeholderCubemap.Get();
 
-            auto* vsRefl = RImplementation.m_shaderLoader->GetCachedReflection("sky_forward", ".vs");
-            auto* psRefl = RImplementation.m_shaderLoader->GetCachedReflection("sky_forward", ".ps");
+            auto* vsRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("sky_forward", ".vs");
+            auto* psRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("sky_forward", ".ps");
             if (!vsRefl || !psRefl) return;
             framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, device, "Sky");
             bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer);

@@ -643,14 +643,9 @@ public:
     // FrameGraph Renderer (Phase 3)
     xray::render::FrameGraphRenderer* m_framegraphRenderer{ nullptr };
 
-    // ShaderLoader for FrameGraph (Slang compiler)
-    framegraph::ShaderLoader* m_shaderLoader{ nullptr };
-
     // ImGui NVRHI Renderer
     xray::render::fg::ImGuiRendererNVRHI* m_imguiRendererNVRHI{ nullptr };
     xray::render::fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return m_imguiRendererNVRHI; }
-
-    framegraph::ShaderLoader* GetShaderLoader() const { return m_shaderLoader; }
 
     // Test resources for triangle
     nvrhi::BufferHandle m_testVertexBuffer;
