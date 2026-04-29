@@ -12,10 +12,6 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include <nvrhi/utils.h>  // For TextureUavBarrier
 
-#if defined(USE_DX11)
-#include "Layers/xrRenderDX11/dx11HW.h"
-#endif
-
 namespace RENDER_NAMESPACE
 {
     extern CRender RImplementation;
