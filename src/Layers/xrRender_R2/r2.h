@@ -9,7 +9,7 @@
 #include "r2_types.h"
 
 #include "Layers/xrRender/HOM.h"
-#include "Layers/xrRender/DetailManager.h"
+#include "Layers/xrRenderDX11/DetailManager.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/WallmarksEngine.h"
 

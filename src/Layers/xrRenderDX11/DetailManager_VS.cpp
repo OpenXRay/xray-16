@@ -13,8 +13,8 @@ const int c_size = 4;
 
 static VertexElement dwDecl[] =
 {
-    {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
-    {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // uv
+    {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+    {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
     D3DDECL_END()
 };
 
@@ -45,7 +45,7 @@ short QC(float v)
     clamp(t, -32768, 32767);
     return short(t & 0xffff);
 }
-} // namespace detail_manager
+}
 
 float sdCircle(Fvector2 p, float r)
 {
@@ -98,13 +98,11 @@ void CDetailManager::hw_Load_Geom()
 {
     using namespace detail_manager;
 
-    // Analyze batch-size
     const auto& caps = GEnv.Backend->GetCapabilities();
     hw_BatchSize = (caps.geometry.dwRegisters - c_hdr) / c_size;
     clamp<size_t>(hw_BatchSize, 0, 64);
     Msg("* [DETAILS] VertexConsts(%u), Batch(%zu)", caps.geometry.dwRegisters, hw_BatchSize);
 
-    // Pre-process objects
     u32 dwVerts = 0;
     u32 dwIndices = 0;
     for (u32 o = 0; o < objects.size(); o++)
@@ -117,7 +115,6 @@ void CDetailManager::hw_Load_Geom()
     Msg("* [DETAILS] %d v(%d), %d p", dwVerts, vSize, dwIndices / 3);
     Msg("* [DETAILS] Batch(%d), VB(%dK), IB(%dK)", hw_BatchSize, (dwVerts * vSize) / 1024, (dwIndices * 2) / 1024);
 
-    // Fill VB
     hw_VB.Create(dwVerts * vSize);
     {
         vertHW* pV = static_cast<vertHW*>(hw_VB.Map());
@@ -141,10 +138,9 @@ void CDetailManager::hw_Load_Geom()
                 }
             }
         }
-        hw_VB.Unmap(true); // upload vertex data
+        hw_VB.Unmap(true);
     }
 
-    // Fill IB
     hw_IB.Create(dwIndices * sizeof(u16));
     {
         u16* pI = static_cast<u16*>(hw_IB.Map());
@@ -159,10 +155,9 @@ void CDetailManager::hw_Load_Geom()
                 offset = u16(offset + u16(D.number_vertices));
             }
         }
-        hw_IB.Unmap(true); // upload index data
+        hw_IB.Unmap(true);
     }
 
-    // Declare geometry
     hw_Geom.create(dwDecl, hw_VB, hw_IB);
 
     for (u32 vis_id = 0; vis_id < 3; vis_id++)
@@ -400,4 +395,4 @@ void CDetailManager::GenerateGrassBlade(xr_vector<BladeVertex>& vertices, xr_vec
         size.x, size.y, size.z);
     Msg("! [Bezier Blade] Mesh generation complete!");
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

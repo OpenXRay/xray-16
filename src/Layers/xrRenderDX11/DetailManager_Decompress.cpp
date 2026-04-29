@@ -23,7 +23,6 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
-//--------------------------------------------------- Decompression
 IC float Interpolate(float* base, u32 x, u32 y, u32 size)
 {
     float f = float(size);
@@ -59,14 +58,14 @@ IC bool InterpolateAndDither(float* alpha255, u32 x, u32 y, u32 sx, u32 sy, u32 
 static void draw_obb(const Fmatrix& matrix, const u32& color)
 {
     Fvector aabb[8];
-    matrix.transform_tiny(aabb[0], Fvector().set(-1, -1, -1)); // 0
-    matrix.transform_tiny(aabb[1], Fvector().set(-1, +1, -1)); // 1
-    matrix.transform_tiny(aabb[2], Fvector().set(+1, +1, -1)); // 2
-    matrix.transform_tiny(aabb[3], Fvector().set(+1, -1, -1)); // 3
-    matrix.transform_tiny(aabb[4], Fvector().set(-1, -1, +1)); // 4
-    matrix.transform_tiny(aabb[5], Fvector().set(-1, +1, +1)); // 5
-    matrix.transform_tiny(aabb[6], Fvector().set(+1, +1, +1)); // 6
-    matrix.transform_tiny(aabb[7], Fvector().set(+1, -1, +1)); // 7
+    matrix.transform_tiny(aabb[0], Fvector().set(-1, -1, -1));
+    matrix.transform_tiny(aabb[1], Fvector().set(-1, +1, -1));
+    matrix.transform_tiny(aabb[2], Fvector().set(+1, +1, -1));
+    matrix.transform_tiny(aabb[3], Fvector().set(+1, -1, -1));
+    matrix.transform_tiny(aabb[4], Fvector().set(-1, -1, +1));
+    matrix.transform_tiny(aabb[5], Fvector().set(-1, +1, +1));
+    matrix.transform_tiny(aabb[6], Fvector().set(+1, +1, +1));
+    matrix.transform_tiny(aabb[7], Fvector().set(+1, -1, +1));
 
     u16 aabb_id[12 * 2] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 1, 5, 2, 6, 3, 7, 0, 4};
 
@@ -77,7 +76,6 @@ static void draw_obb(const Fmatrix& matrix, const u32& color)
 bool det_render_debug = false;
 #endif
 
-//#define		DBG_SWITCHOFF_RANDOMIZE
 void CDetailManager::cache_Decompress(Slot* S)
 {
     VERIFY(S);
@@ -88,7 +86,6 @@ void CDetailManager::cache_Decompress(Slot* S)
 
     DetailSlot& DS = QueryDB(D.sx, D.sz);
 
-    // Select polygons
     Fvector bC, bD;
     D.vis.box.get_CD(bC, bD);
 
@@ -101,7 +98,6 @@ void CDetailManager::cache_Decompress(Slot* S)
     if (0 == triCount)
         return;
 
-    // Build shading table
     float alpha255[dm_obj_in_slot][4];
     for (int i = 0; i < dm_obj_in_slot; i++)
     {
@@ -111,28 +107,24 @@ void CDetailManager::cache_Decompress(Slot* S)
         alpha255[i][3] = 255.f * float(DS.palette[i].a3) / 15.f;
     }
 
-    // Prepare to selection
     float density = ps_r__Detail_density;
     float jitter = density / 1.7f;
     u32 d_size = iCeil(dm_slot_size / density);
     svector<int, dm_obj_in_slot> selected;
 
-    u32 p_rnd = D.sx * D.sz; // нужно для того чтобы убрать полосы(ряды)
+    u32 p_rnd = D.sx * D.sz;
     CRandom r_selection(0x12071980 ^ p_rnd);
     CRandom r_jitter(0x12071980 ^ p_rnd);
     CRandom r_yaw(0x12071980 ^ p_rnd);
     CRandom r_scale(0x12071980 ^ p_rnd);
 
-    // Prepare to actual-bounds-calculations
     Fbox Bounds;
     Bounds.invalidate();
 
-    // Decompressing itself
     for (u32 z = 0; z <= d_size; z++)
     {
         for (u32 x = 0; x <= d_size; x++)
         {
-// shift
 #ifndef DBG_SWITCHOFF_RANDOMIZE
             u32 shift_x = r_jitter.randI(16);
             u32 shift_z = r_jitter.randI(16);
@@ -140,7 +132,6 @@ void CDetailManager::cache_Decompress(Slot* S)
             u32 shift_x = 8;
             u32 shift_z = 8;
 #endif
-            // Iterpolate and dither palette
             selected.clear();
 
 #ifndef DBG_SWITCHOFF_RANDOMIZE
@@ -167,7 +158,6 @@ void CDetailManager::cache_Decompress(Slot* S)
                 selected.push_back(3);
 #endif
 
-            // Select
             if (selected.empty())
                 continue;
 #ifndef DBG_SWITCHOFF_RANDOMIZE
@@ -185,7 +175,6 @@ void CDetailManager::cache_Decompress(Slot* S)
             SlotItem* ItemP = new SlotItem();
             SlotItem& Item = *ItemP;
 
-            // Position (XZ)
             float rx = (float(x) / float(d_size)) * dm_slot_size + D.vis.box.vMin.x;
             float rz = (float(z) / float(d_size)) * dm_slot_size + D.vis.box.vMin.z;
             Fvector Item_P;
@@ -196,7 +185,6 @@ void CDetailManager::cache_Decompress(Slot* S)
             Item_P.set(rx, D.vis.box.vMax.y, rz);
 #endif
 
-            // Position (Y)
             float y = D.vis.box.vMin.y - 5;
             Fvector dir;
             dir.set(0, -1, 0);
@@ -224,14 +212,11 @@ void CDetailManager::cache_Decompress(Slot* S)
                 continue;
             Item_P.y = y;
 
-// Angles and scale
 #ifndef DBG_SWITCHOFF_RANDOMIZE
             Item.scale = r_scale.randF(Dobj->m_fMinScale * 0.5f, Dobj->m_fMaxScale * 0.9f) * ps_current_detail_height;
 #else
             Item.scale = (Dobj->m_fMinScale * 0.5f + Dobj->m_fMaxScale * 0.9f) / 2;
-// Item.scale	= 0.1f;
 #endif
-            // X-Form BBox
             Fmatrix mScale, mXform;
             Fbox ItemBB;
 
@@ -250,23 +235,10 @@ void CDetailManager::cache_Decompress(Slot* S)
 #ifndef _EDITOR
 #ifdef DEBUG
             if (det_render_debug)
-                draw_obb(mXform, color_rgba(255, 0, 0, 255)); // Fmatrix().mul_43( mXform, Fmatrix().scale(5,5,5) )
+                draw_obb(mXform, color_rgba(255, 0, 0, 255));
 #endif
 #endif
 
-// Color
-/*
-DetailPalette*	c_pal			= (DetailPalette*)&DS.color;
-float gray255	[4];
-gray255[0]						=	255.f*float(c_pal->a0)/15.f;
-gray255[1]						=	255.f*float(c_pal->a1)/15.f;
-gray255[2]						=	255.f*float(c_pal->a2)/15.f;
-gray255[3]						=	255.f*float(c_pal->a3)/15.f;
-*/
-// float c_f						=	1.f;	//Interpolate		(gray255,x,z,d_size)+.5f;
-// int c_dw						=	255;	//iFloor			(c_f);
-// clamp							(c_dw,0,255);
-// Item.C_dw						=	color_rgba		(c_dw,c_dw,c_dw,255);
 #if RENDER == R_R1
             Item.c_rgb.x = DS.r_qclr(DS.c_r, 15);
             Item.c_rgb.y = DS.r_qclr(DS.c_g, 15);
@@ -275,14 +247,9 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
             Item.c_hemi = DS.r_qclr(DS.c_hemi, 15);
             Item.c_sun = DS.r_qclr(DS.c_dir, 15);
 
-//? hack: RGB = hemi
-//? Item.c_rgb.add					(ps_r__Detail_rainbow_hemi*Item.c_hemi);
-
-// Vis-sorting
 #ifndef DBG_SWITCHOFF_RANDOMIZE
             if (!UseVS())
             {
-                // Always still on CPU pipe
                 Item.vis_ID = 0;
             }
             else
@@ -292,20 +259,18 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
                 else
                 {
                     if (::Random.randI(0, 3) == 0)
-                        Item.vis_ID = 2; // Second wave
+                        Item.vis_ID = 2;
                     else
-                        Item.vis_ID = 1; // First wave
+                        Item.vis_ID = 1;
                 }
             }
 #else
             Item.vis_ID = 0;
 #endif
-            // Save it
             D.G[index].items.emplace_back(ItemP);
         }
     }
 
-    // Update bounds to more tight and real ones
     D.vis.clear();
     D.vis.box.set(Bounds);
     D.vis.box.getsphere(D.vis.sphere.P, D.vis.sphere.R);
@@ -825,4 +790,4 @@ void CDetailManager::ValidateSlotAABBs()
     }
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+}

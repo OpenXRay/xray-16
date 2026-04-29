@@ -237,7 +237,7 @@
     <ClInclude Include="..\xrRender\r_sun_cascades.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\DetailManager.h">
+    <ClInclude Include="..\xrRenderDX11\DetailManager.h">
       <Filter>Details</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\DetailModel.h">
@@ -1065,19 +1065,19 @@
     <ClCompile Include="..\xrRender\r__pixel_calculator.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\DetailManager.cpp">
+    <ClCompile Include="..\xrRenderDX11\DetailManager.cpp">
       <Filter>Details</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\DetailManager_CACHE.cpp">
+    <ClCompile Include="..\xrRenderDX11\DetailManager_CACHE.cpp">
       <Filter>Details</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\DetailManager_Decompress.cpp">
+    <ClCompile Include="..\xrRenderDX11\DetailManager_Decompress.cpp">
       <Filter>Details</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\DetailManager_soft.cpp">
+    <ClCompile Include="..\xrRenderDX11\DetailManager_soft.cpp">
       <Filter>Details</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\DetailManager_VS.cpp">
+    <ClCompile Include="..\xrRenderDX11\DetailManager_VS.cpp">
       <Filter>Details</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\DetailModel.cpp">

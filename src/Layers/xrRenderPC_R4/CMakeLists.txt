@@ -208,11 +208,11 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/ConstantSystem/FGConstantSystem.cpp
     ../xrRender/D3DUtils.cpp
     ../xrRender/D3DXRenderBase.cpp
-    ../xrRender/DetailManager.cpp
-    ../xrRender/DetailManager_CACHE.cpp
-    ../xrRender/DetailManager_Decompress.cpp
-    ../xrRender/DetailManager_VS.cpp
-    ../xrRender/DetailManager_soft.cpp
+    ../xrRenderDX11/DetailManager.cpp
+    ../xrRenderDX11/DetailManager_CACHE.cpp
+    ../xrRenderDX11/DetailManager_Decompress.cpp
+    ../xrRenderDX11/DetailManager_VS.cpp
+    ../xrRenderDX11/DetailManager_soft.cpp
     ../xrRender/DetailModel.cpp
     ../xrRender/ETextureParams.cpp
     ../xrRender/FBasicVisual.cpp

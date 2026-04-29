@@ -1,7 +1,3 @@
-// DetailManager.cpp: implementation of the CDetailManager class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #pragma hdrstop
 
@@ -37,23 +33,11 @@ extern int ps_r__detail_gpu;
 const float dbgOffset = 0.f;
 const int dbgItems = 128;
 
-//--------------------------------------------------- Decompression
 static int magic4x4[4][4] = {{0, 14, 3, 13}, {11, 5, 8, 6}, {12, 2, 15, 1}, {7, 9, 4, 10}};
 
 void bwdithermap(int levels, int magic[16][16])
 {
-    /* Get size of each step */
     float N = 255.0f / (levels - 1);
-
-    /*
-     * Expand 4x4 dither pattern to 16x16.  4x4 leaves obvious patterning,
-     * and doesn't give us full intensity range (only 17 sublevels).
-     *
-     * magicfact is (N - 1)/16 so that we get numbers in the matrix from 0 to
-     * N - 1: mod N gives numbers in 0 to N - 1, don't ever want all
-     * pixels incremented to the next level (this is reserved for the
-     * pixel value with mod N == 0 at the next level).
-     */
 
     float magicfact = (N - 1) / 16;
     for (int i = 0; i < 4; i++)
@@ -71,7 +55,6 @@ void bwdithermap(int levels, int magic[16][16])
         }
     }
 }
-//--------------------------------------------------- Decompression
 
 void CDetailManager::SSwingValue::lerp(const SSwingValue& A, const SSwingValue& B, float f)
 {
@@ -82,12 +65,7 @@ void CDetailManager::SSwingValue::lerp(const SSwingValue& A, const SSwingValue& 
     rot2 = fi * A.rot2 + f * B.rot2;
     speed = fi * A.speed + f * B.speed;
 }
-//---------------------------------------------------
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-// XXX stats: add to statistics
 CDetailManager::CDetailManager() : xrc("detail manager")
 {
     ZoneScoped;
@@ -102,7 +80,6 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     m_time_pos = 0;
     m_global_time_old = 0;
 
-    // KD: variable detail radius
     dm_size = dm_current_size;
     dm_cache_line = dm_current_cache_line;
     dm_cache1_line = dm_current_cache1_line;
@@ -175,11 +152,6 @@ CDetailManager::CDetailManager() : xrc("detail manager")
 
     for (u32 i = 0; i < dm_cache_size; ++i)
         new(&cache_pool[i]) Slot();
-    /*
-    CacheSlot1 cache_level1[dm_cache1_line][dm_cache1_line];
-    Slot* cache [dm_cache_line][dm_cache_line]; // grid-cache itself
-    Slot cache_pool [dm_cache_size]; // just memory for slots
-    */
 }
 
 CDetailManager::~CDetailManager()
@@ -205,20 +177,10 @@ CDetailManager::~CDetailManager()
 
 #ifndef _EDITOR
 
-/*
-void dump(CDetailManager::vis_list& lst)
-{
-    for (int i = 0; i<lst.size(); i++)
-    {
-        Msg("%8x / %8x / %8x",  lst[i]._M_start, lst[i]._M_finish, lst[i]._M_end_of_storage._M_data);
-    }
-}
-*/
 void CDetailManager::Load()
 {
     ZoneScoped;
 
-    // Open file stream
     if (!FS.exist("$level$", "level.details"))
     {
         dtFS = nullptr;
@@ -229,13 +191,11 @@ void CDetailManager::Load()
     FS.update_path(fn, "$level$", "level.details");
     dtFS = FS.r_open(fn);
 
-    // Header
     dtFS->r_chunk_safe(0, &dtH, sizeof(dtH));
     R_ASSERT(dtH.version() == DETAIL_VERSION);
     u32 m_count = dtH.object_count();
     objects.reserve(m_count);
 
-    // Models
     IReader* m_fs = dtFS->open_chunk(1);
     for (u32 m_id = 0; m_id < m_count; m_id++)
     {
@@ -247,20 +207,16 @@ void CDetailManager::Load()
     }
     m_fs->close();
 
-    // Get pointer to database (slots)
     IReader* m_slots = dtFS->open_chunk(2);
     dtSlots = (DetailSlot*)m_slots->pointer();
     m_slots->close();
 
-    // Initialize 'vis' and 'cache'
     for (u32 i = 0; i < 3; ++i)
         m_visibles[i].resize(objects.size());
     cache_Initialize();
 
-    // Make dither matrix
     bwdithermap(2, dither);
 
-    // Hardware specific optimizations
     if (UseVS())
         hw_Load();
     else
@@ -308,14 +264,11 @@ void CDetailManager::Load()
     }
 #endif
 
-    // swing desc
-    // normal
     swing_desc[0].amp1 = pSettings->r_float("details", "swing_normal_amp1");
     swing_desc[0].amp2 = pSettings->r_float("details", "swing_normal_amp2");
     swing_desc[0].rot1 = pSettings->r_float("details", "swing_normal_rot1");
     swing_desc[0].rot2 = pSettings->r_float("details", "swing_normal_rot2");
     swing_desc[0].speed = pSettings->r_float("details", "swing_normal_speed");
-    // fast
     swing_desc[1].amp1 = pSettings->r_float("details", "swing_fast_amp1");
     swing_desc[1].amp2 = pSettings->r_float("details", "swing_fast_amp2");
     swing_desc[1].rot1 = pSettings->r_float("details", "swing_fast_rot1");
@@ -406,8 +359,6 @@ void CDetailManager::UpdateVisibleM()
     float fade_range = fade_limit - fade_start;
     float r_ssaCHEAP = 16 * r_ssaDISCARD;
 
-    // Initialize 'vis' and 'cache'
-    // Collect objects for rendering
     RImplementation.BasicStats.DetailVisibility.Begin();
     for (u32 _mz = 0; _mz < dm_cache1_line; _mz++)
     {
@@ -422,9 +373,8 @@ void CDetailManager::UpdateVisibleM()
             u32 res = View.testSAABB(MS.vis.sphere.P, MS.vis.sphere.R, MS.vis.box.data(), mask);
             if (fcvNone == res)
             {
-                continue; // invisible-view frustum
+                continue;
             }
-            // test slots
 
             u32 dwCC = dm_cache1_count * dm_cache1_count;
 
@@ -433,35 +383,28 @@ void CDetailManager::UpdateVisibleM()
                 Slot* PS = *MS.slots[_i];
                 Slot& S = *PS;
 
-                //if (_i+1<dwCC);
-                //    _mm_prefetch((char*)*MS.slots[_i+1], _MM_HINT_T1);
-
-                // if slot empty - continue
                 if (S.empty)
                 {
                     continue;
                 }
 
-                // if upper test = fcvPartial - test inner slots
                 if (fcvPartial == res)
                 {
                     u32 _mask = mask;
                     u32 _res = View.testSAABB(S.vis.sphere.P, S.vis.sphere.R, S.vis.box.data(), _mask);
                     if (fcvNone == _res)
                     {
-                        continue; // invisible-view frustum
+                        continue;
                     }
                 }
 #ifndef _EDITOR
                 if (!RImplementation.HOM.visible(S.vis))
                 {
-                    continue; // invisible-occlusion
+                    continue;
                 }
 #endif
-                // Add to visibility structures
                 if (Device.dwFrame > S.frame)
                 {
-                    // Calc fade factor (per slot)
                     float dist_sq = EYE.distance_to_sqr(S.vis.sphere.P);
                     if (dist_sq > fade_limit)
                         continue;
@@ -481,7 +424,7 @@ void CDetailManager::UpdateVisibleM()
                         sp.r_items[2].clear();
 
                         float R = objects[sp.id]->bv_sphere.R;
-                        float Rq_drcp = R * R * dist_sq_rcp; // reordered expression for 'ssa' calc
+                        float Rq_drcp = R * R * dist_sq_rcp;
 
                         for(auto& siIT : sp.items)
                         {
@@ -498,7 +441,6 @@ void CDetailManager::UpdateVisibleM()
 
                             sp.r_items[vis_id].push_back(siIT);
 
-                            // 2 visible[vis_id][sp.id].push_back(&Item);
                         }
                     }
                 }
@@ -546,7 +488,7 @@ void CDetailManager::Render(CBackend& cmd_list)
         TaskScheduler->Wait(*m_calc_task);
 
     RImplementation.BasicStats.DetailRender.Begin();
-    g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 1.0f; //--#SM+#-- Флаг начала рендера травы [begin of grass render]
+    g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 1.0f;
 
 #ifndef _EDITOR
     float factor = g_pGamePersistent->Environment().wind_strength_factor;
@@ -565,7 +507,7 @@ void CDetailManager::Render(CBackend& cmd_list)
         soft_Render();
     cmd_list.set_CullMode(CULL_CCW);
 
-    g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]
+    g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f;
     RImplementation.BasicStats.DetailRender.End();
 }
 
@@ -578,7 +520,7 @@ void CDetailManager::DispatchMTCalc()
     {
 #ifndef _EDITOR
         if (nullptr == RImplementation.Details)
-            return; // possibly deleted
+            return;
         if (nullptr == dtFS)
             return;
         if (!psDeviceFlags.is(rsDrawDetails))
@@ -599,4 +541,4 @@ void CDetailManager::DispatchMTCalc()
         UpdateVisibleM();
     });
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

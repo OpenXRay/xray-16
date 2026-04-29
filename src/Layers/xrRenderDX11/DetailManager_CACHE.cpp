@@ -5,11 +5,9 @@ namespace xray::render::RENDER_NAMESPACE
 {
 void CDetailManager::cache_Initialize()
 {
-    // Centroid
     cache_cx = 0;
     cache_cz = 0;
 
-    // Initialize cache-grid
     Slot* slt = cache_pool;
     for (u32 i = 0; i < dm_cache_line; i++)
         for (u32 j = 0; j < dm_cache_line; j++, slt++)
@@ -54,7 +52,6 @@ void CDetailManager::cache_Task(int gx, int gz, Slot* D)
     D->empty = (DS.id0 == DetailSlot::ID_Empty) && (DS.id1 == DetailSlot::ID_Empty) &&
         (DS.id2 == DetailSlot::ID_Empty) && (DS.id3 == DetailSlot::ID_Empty);
 
-    // Unpacking
     u32 old_type = D->type;
     D->type = stPending;
     D->sx = sx;
@@ -103,12 +100,10 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
     ZoneScoped;
 
     bool bNeedMegaUpdate = (cache_cx != v_x) || (cache_cz != v_z);
-    // ***** Cache shift
     while (cache_cx != v_x)
     {
         if (v_x > cache_cx)
         {
-            // shift matrix to left
             cache_cx++;
             for (u32 z = 0; z < dm_cache_line; z++)
             {
@@ -118,11 +113,9 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
                 cache[z][dm_cache_line - 1] = S;
                 cache_Task(dm_cache_line - 1, z, S);
             }
-            //R_ASSERT(cache_Validate());
         }
         else
         {
-            // shift matrix to right
             cache_cx--;
             for (u32 z = 0; z < dm_cache_line; z++)
             {
@@ -132,14 +125,12 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
                 cache[z][0] = S;
                 cache_Task(0, z, S);
             }
-            //R_ASSERT(cache_Validate());
         }
     }
     while (cache_cz != v_z)
     {
         if (v_z > cache_cz)
         {
-            // shift matrix down a bit
             cache_cz++;
             for (u32 x = 0; x < dm_cache_line; x++)
             {
@@ -149,11 +140,9 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
                 cache[0][x] = S;
                 cache_Task(x, 0, S);
             }
-            //R_ASSERT(cache_Validate());
         }
         else
         {
-            // shift matrix up
             cache_cz--;
             for (u32 x = 0; x < dm_cache_line; x++)
             {
@@ -163,16 +152,13 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
                 cache[dm_cache_line - 1][x] = S;
                 cache_Task(x, dm_cache_line - 1, S);
             }
-            // R_ASSERT (cache_Validate());
         }
     }
 
-    // Task performer
-    if (cache_task.size() == dm_cache_size) // full unpack, first time
+    if (cache_task.size() == dm_cache_size)
     {
         while (!cache_task.empty())
         {
-            // Decompress and remove task
             const u32 bestId = cache_task.size() - 1;
             cache_Decompress(cache_task[bestId]);
             cache_task.erase(bestId);
@@ -193,16 +179,13 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
 
         for (u32 i = 0, size = cache_task.size(); i < size; ++i)
         {
-            // Gain access to data
             Slot* S = cache_task[i];
             VERIFY(stPending == S->type);
 
-            // Estimate
             Fvector C;
             S->vis.box.getcenter(C);
             float D = view.distance_to_sqr(C);
 
-            // Select
             if (D < bestDistances[maxIdx])
             {
                 bestDistances[maxIdx] = D;
@@ -213,7 +196,6 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
             }
         }
 
-        // Because indexes become invalid after an erase, sort them and process in the reverse order to erase everything correctly
         std::sort(bestIndexes, bestIndexes + dm_max_decompress);
 
         for (int i = dm_max_decompress - 1; i >= 0; --i)
@@ -222,7 +204,6 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
 
             if (bestId != invalidIndex)
             {
-                // Decompress and remove task
                 cache_Decompress(cache_task[bestId]);
                 cache_task.erase(bestId);
             }
@@ -265,7 +246,6 @@ DetailSlot& CDetailManager::QueryDB(int sx, int sz)
     }
     else
     {
-        // Empty slot
         DS_empty.w_id(0, DetailSlot::ID_Empty);
         DS_empty.w_id(1, DetailSlot::ID_Empty);
         DS_empty.w_id(2, DetailSlot::ID_Empty);
@@ -273,4 +253,4 @@ DetailSlot& CDetailManager::QueryDB(int sx, int sz)
         return DS_empty;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}
