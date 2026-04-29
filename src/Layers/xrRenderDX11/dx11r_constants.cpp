@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 #include "xrCore/xrPool.h"
 #include "Layers/xrRender/r_constants.h"
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"

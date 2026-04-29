@@ -8,7 +8,7 @@
 #include "xrCore/Threading/ParallelForEach.hpp"
 
 #include "ResourceManager.h"
-#include "tss.h"
+#include "Layers/xrRender/tss.h"
 #include "Layers/xrRenderDX11/Blender.h"
 #include "Layers/xrRenderDX11/Blender_Recorder.h"
 

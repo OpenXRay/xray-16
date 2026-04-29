@@ -62,7 +62,7 @@
 
 #include "Common/_d3d_extensions.h"
 
-#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 #include "Layers/xrRender/xrRender_console.h"
 
 #include "r2.h"

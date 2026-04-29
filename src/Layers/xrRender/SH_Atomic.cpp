@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "SH_Atomic.h"
-#include "ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRender/FrameGraph/ShaderCache.h"  // For ExtractedReflection

@@ -6,7 +6,7 @@
 #pragma hdrstop
 
 #include "Shader.h"
-#include "ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {

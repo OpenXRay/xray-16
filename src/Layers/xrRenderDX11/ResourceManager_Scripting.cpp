@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "ResourceManager.h"
-#include "tss.h"
+#include "Layers/xrRender/tss.h"
 #include "Layers/xrRenderDX11/Blender.h"
 #include "Layers/xrRenderDX11/Blender_Recorder.h"
 #include "xrScriptEngine/script_engine.hpp"

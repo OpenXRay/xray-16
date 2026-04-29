@@ -3,7 +3,7 @@
 #include "dxEnvironmentRender.h"
 
 #include "Layers/xrRenderDX11/Blender.h"
-#include "ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/xr_efflensflare.h"

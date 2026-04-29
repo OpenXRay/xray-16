@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
-#include "ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 #include "R_DStreams.h"
 
 namespace xray::render::RENDER_NAMESPACE

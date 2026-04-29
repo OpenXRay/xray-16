@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "Shader.h"
-#include "tss_def.h"
-#include "TextureDescrManager.h"
+#include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/tss_def.h"
+#include "Layers/xrRender/TextureDescrManager.h"
 
 #include "xrScriptEngine/script_engine.hpp"
 

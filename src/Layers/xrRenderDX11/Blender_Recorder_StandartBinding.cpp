@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 #include "Blender_Recorder.h"
 #include "Blender.h"
 

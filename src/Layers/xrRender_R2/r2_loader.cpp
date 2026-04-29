@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
 #include "Common/LevelStructure.hpp"

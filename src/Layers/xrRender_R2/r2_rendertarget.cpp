@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 #include "Layers/xrRenderDX11/blenders/blender_light_occq.h"
 #include "Layers/xrRenderDX11/blenders/blender_light_mask.h"
 #include "Layers/xrRenderDX11/blenders/blender_light_direct.h"

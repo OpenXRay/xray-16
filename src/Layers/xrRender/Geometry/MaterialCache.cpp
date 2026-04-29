@@ -13,7 +13,7 @@
 #include "Layers/xrRender/FTreeVisual.h"
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/SH_Atomic.h"
-#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRenderDX11/ResourceManager.h"
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/RenderContext/RCShader.h"
 #include "Layers/xrRender/RenderContext/RenderStateConversion.h"  // State conversion helpers
