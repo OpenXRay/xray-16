@@ -1,0 +1,128 @@
+#include "stdafx.h"
+#pragma hdrstop
+
+#include "blender_ssao.h"
+
+namespace xray::render::RENDER_NAMESPACE
+{
+#if RENDER == R_R2
+CBlender_SSAO::CBlender_SSAO() { description.CLS = 0; }
+CBlender_SSAO::~CBlender_SSAO() {}
+void CBlender_SSAO::Compile(CBlender_Compile& C)
+{
+    IBlender::Compile(C);
+
+    switch (C.iElement)
+    {
+    case 0:
+        C.r_Pass("combine_1", "ssao_calc", FALSE, FALSE, FALSE);
+        C.r_Sampler_rtf("s_position", r2_RT_P);
+        C.r_Sampler_rtf("s_normal", r2_RT_N);
+        C.r_Sampler_rtf("s_half_depth", r2_RT_half_depth);
+        jitter(C);
+        C.r_End();
+        break;
+    case 1:
+        C.r_Pass("combine_1", "depth_downs", FALSE, FALSE, FALSE);
+        C.r_Sampler_rtf("s_position", r2_RT_P);
+        C.r_End();
+        break;
+    }
+}
+#else
+CBlender_SSAO_noMSAA::CBlender_SSAO_noMSAA() { description.CLS = 0; }
+CBlender_SSAO_noMSAA::~CBlender_SSAO_noMSAA() {}
+void CBlender_SSAO_noMSAA::Compile(CBlender_Compile& C)
+{
+    IBlender::Compile(C);
+
+    switch (C.iElement)
+    {
+    case 0:
+        C.r_Pass("combine_1", "ssao_calc_nomsaa", FALSE, FALSE, FALSE);
+        C.r_Stencil(TRUE, D3DCMP_LESSEQUAL, 0xFF);
+        C.r_StencilRef(0x01);
+        C.r_CullMode(D3DCULL_NONE);
+
+#if RENDER == R_GL
+        C.r_Sampler_rtf("s_position", r2_RT_P);
+        C.r_Sampler_rtf("s_normal", r2_RT_N);
+        C.r_Sampler_rtf("s_tonemap", r2_RT_luminance_cur);
+        C.r_Sampler_rtf("s_half_depth",r2_RT_half_depth);
+
+        jitter(C);
+#else
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_tonemap", r2_RT_luminance_cur);
+        C.r_dx11Texture("s_half_depth", r2_RT_half_depth);
+
+        jitter(C);
+
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_material");
+        C.r_dx11Sampler("smp_rtlinear");
+#endif
+        C.r_End();
+        break;
+    case 1:
+        C.r_Pass("combine_1", "depth_downs", FALSE, FALSE, FALSE);
+        C.r_CullMode(D3DCULL_NONE);
+
+#if RENDER == R_GL
+        C.r_Sampler_rtf("s_position", r2_RT_P);
+        C.r_Sampler_rtf("s_normal", r2_RT_N);
+        C.r_Sampler_rtf("s_tonemap", r2_RT_luminance_cur);
+#else
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_tonemap", r2_RT_luminance_cur);
+
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_material");
+        C.r_dx11Sampler("smp_rtlinear");
+#endif
+        C.r_End();
+        break;
+    }
+}
+
+void CBlender_SSAO_MSAA::Compile(CBlender_Compile& C)
+{
+    IBlender::Compile(C);
+
+    if (Name)
+        RImplementation.m_MSAASample = atoi(Definition);
+    else
+        RImplementation.m_MSAASample = -1;
+
+    switch (C.iElement)
+    {
+    case 0:
+        C.r_Pass("combine_1", "ssao_calc_msaa", FALSE, FALSE, FALSE);
+        C.r_Stencil(TRUE, D3DCMP_EQUAL, 0x81);
+        C.r_StencilRef(0x81);
+        C.r_CullMode(D3DCULL_NONE);
+
+#if RENDER == R_GL
+        C.r_Sampler_rtf("s_position", r2_RT_P);
+        C.r_Sampler_rtf("s_normal", r2_RT_N);
+
+        jitter(C);
+#else
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+
+        jitter(C);
+
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_material");
+        C.r_dx11Sampler("smp_rtlinear");
+#endif
+        C.r_End();
+        break;
+    }
+    RImplementation.m_MSAASample = -1;
+}
+#endif
+}

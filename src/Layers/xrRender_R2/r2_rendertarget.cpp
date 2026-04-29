@@ -1,22 +1,22 @@
 #include "stdafx.h"
 #include "Layers/xrRender/ResourceManager.h"
-#include "Layers/xrRender/blenders/blender_light_occq.h"
-#include "Layers/xrRender/blenders/blender_light_mask.h"
-#include "Layers/xrRender/blenders/blender_light_direct.h"
-#include "Layers/xrRender/blenders/blender_light_point.h"
-#include "Layers/xrRender/blenders/blender_light_spot.h"
-#include "Layers/xrRender/blenders/blender_light_reflected.h"
-#include "Layers/xrRender/blenders/blender_combine.h"
-#include "Layers/xrRender/blenders/blender_bloom_build.h"
-#include "Layers/xrRender/blenders/blender_luminance.h"
-#include "Layers/xrRender/blenders/blender_ssao.h"
+#include "Layers/xrRenderDX11/blenders/blender_light_occq.h"
+#include "Layers/xrRenderDX11/blenders/blender_light_mask.h"
+#include "Layers/xrRenderDX11/blenders/blender_light_direct.h"
+#include "Layers/xrRenderDX11/blenders/blender_light_point.h"
+#include "Layers/xrRenderDX11/blenders/blender_light_spot.h"
+#include "Layers/xrRenderDX11/blenders/blender_light_reflected.h"
+#include "Layers/xrRenderDX11/blenders/blender_combine.h"
+#include "Layers/xrRenderDX11/blenders/blender_bloom_build.h"
+#include "Layers/xrRenderDX11/blenders/blender_luminance.h"
+#include "Layers/xrRenderDX11/blenders/blender_ssao.h"
 
-#include "Layers/xrRender/blenders/dx11MSAABlender.h"
-#include "Layers/xrRender/blenders/dx11RainBlender.h"
+#include "Layers/xrRenderDX11/blenders/dx11MSAABlender.h"
+#include "Layers/xrRenderDX11/blenders/dx11RainBlender.h"
 
-#include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
+#include "Layers/xrRenderDX11/blenders/dx11MinMaxSMBlender.h"
 #if defined(USE_DX11)
-#    include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
+#    include "Layers/xrRenderDX11/blenders/dx11HDAOCSBlender.h"
 #endif
 
 namespace xray::render::RENDER_NAMESPACE

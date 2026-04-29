@@ -3,8 +3,8 @@
 
 #include "ResourceManager.h"
 #include "tss.h"
-#include "Blender.h"
-#include "Blender_Recorder.h"
+#include "Layers/xrRenderDX11/Blender.h"
+#include "Layers/xrRenderDX11/Blender_Recorder.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "xrScriptEngine/script_space.hpp"
 #include "xrCore/Threading/ScopeLock.hpp"

@@ -1,0 +1,347 @@
+#include "stdafx.h"
+#pragma hdrstop
+
+#include "blender_LaEmB.h"
+
+#if RENDER != R_R1
+#error "The blender can't be used in this renderer generation"
+#endif
+
+namespace xray::render::RENDER_NAMESPACE
+{
+CBlender_LaEmB::CBlender_LaEmB()
+{
+    description.CLS = B_LaEmB;
+    xr_strcpy(oT2_Name, "$null");
+    xr_strcpy(oT2_xform, "$null");
+    xr_strcpy(oT2_const, "$null");
+}
+
+LPCSTR CBlender_LaEmB::getComment()
+{
+    return "LEVEL: (lmap+env*const)*base";
+}
+
+BOOL CBlender_LaEmB::canBeLMAPped()
+{
+    return TRUE;
+}
+
+void CBlender_LaEmB::Save(IWriter& fs)
+{
+    IBlender::Save(fs);
+
+    xrPWRITE_MARKER(fs, "Environment map");
+    xrPWRITE_PROP(fs, "Name", xrPID_TEXTURE, oT2_Name);
+    xrPWRITE_PROP(fs, "Transform", xrPID_MATRIX, oT2_xform);
+    xrPWRITE_PROP(fs, "Constant", xrPID_CONSTANT, oT2_const);
+}
+
+void CBlender_LaEmB::Load(IReader& fs, u16 version)
+{
+    IBlender::Load(fs, version);
+
+    xrPREAD_MARKER(fs);
+    xrPREAD_PROP(fs, xrPID_TEXTURE, oT2_Name);
+    xrPREAD_PROP(fs, xrPID_MATRIX, oT2_xform);
+    xrPREAD_PROP(fs, xrPID_CONSTANT, oT2_const);
+}
+
+void CBlender_LaEmB::compile_ED(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        C.PassSET_ZB(true, true);
+        C.PassSET_Blend_SET();
+        C.PassSET_LightFog(true, true);
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_DIFFUSE);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_DIFFUSE);
+        C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
+        C.StageEnd();
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_CURRENT);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_CURRENT);
+        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
+void CBlender_LaEmB::compile_EDc(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        C.PassSET_ZB(true, true);
+        C.PassSET_Blend_SET();
+        C.PassSET_LightFog(true, true);
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_TFACTOR);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_TFACTOR);
+        C.StageSET_TMC(oT2_Name, oT2_xform, oT2_const, 0);
+        C.StageEnd();
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_DIFFUSE, D3DTOP_ADD, D3DTA_CURRENT);
+        C.StageSET_Alpha(D3DTA_DIFFUSE, D3DTOP_ADD, D3DTA_CURRENT);
+        C.Stage_Texture("$null");
+        C.Stage_Matrix("$null", 0);
+        C.Stage_Constant("$null");
+        C.StageEnd();
+    }
+    C.PassEnd();
+
+    C.PassBegin();
+    {
+        C.PassSET_ZB(true, false);
+        C.PassSET_Blend_MUL();
+        C.PassSET_LightFog(false, true);
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
+void CBlender_LaEmB::Compile(CBlender_Compile& C)
+{
+    IBlender::Compile(C);
+
+    const bool bConstant = (0 != xr_stricmp(oT2_const, "$null"));
+
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
+    {
+        if (bConstant)
+            compile_EDc(C);
+        else
+            compile_ED(C);
+        return;
+    }
+
+    switch (C.iElement)
+    {
+    case SE_R1_NORMAL_HQ:
+    case SE_R1_NORMAL_LQ:
+    {
+        switch (GEnv.Backend->GetCapabilities().raster.dwStages)
+        {
+        case 2:
+            if (bConstant)
+                compile_2c(C);
+            else
+                compile_2(C);
+            break;
+        case 3:
+        default:
+            if (bConstant)
+                compile_3c(C);
+            else
+                compile_3(C);
+            break;
+        }
+        break;
+    }
+    case SE_R1_LMODELS:
+    {
+        if (bConstant)
+            compile_Lc(C);
+        else
+            compile_L(C);
+        break;
+    }
+    }
+}
+void CBlender_LaEmB::compile_2(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_Blend_SET();
+        C.PassSET_LightFog(FALSE, TRUE);
+
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageTemplate_LMAP0();
+            C.StageEnd();
+        }
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+        C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
+        C.StageEnd();
+    }
+    C.PassEnd();
+
+    C.PassBegin();
+    {
+        C.PassSET_ZB(TRUE, FALSE);
+        C.PassSET_Blend_MUL2X();
+        C.PassSET_LightFog(FALSE, TRUE);
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+void CBlender_LaEmB::compile_2c(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_Blend_SET();
+        C.PassSET_LightFog(FALSE, TRUE);
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_TFACTOR);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_TFACTOR);
+        C.StageSET_TMC(oT2_Name, oT2_xform, oT2_const, 0);
+        C.StageEnd();
+
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_TMC("$base1", "$null", "$null", 1);
+            C.StageEnd();
+        }
+    }
+    C.PassEnd();
+
+    C.PassBegin();
+    {
+        C.PassSET_ZB(TRUE, FALSE);
+        C.PassSET_Blend_MUL2X();
+        C.PassSET_LightFog(FALSE, TRUE);
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
+void CBlender_LaEmB::compile_3(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_Blend_SET();
+        C.PassSET_LightFog(FALSE, TRUE);
+
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageTemplate_LMAP0();
+            C.StageEnd();
+        }
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+        C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
+        C.StageEnd();
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
+void CBlender_LaEmB::compile_3c(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_Blend_SET();
+        C.PassSET_LightFog(FALSE, TRUE);
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_TFACTOR);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_TFACTOR);
+        C.StageSET_TMC(oT2_Name, oT2_xform, oT2_const, 0);
+        C.StageEnd();
+
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_TMC("$base1", "$null", "$null", 1);
+            C.StageEnd();
+        }
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
+void CBlender_LaEmB::compile_L(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_Blend_SET();
+        C.PassSET_LightFog(FALSE, FALSE);
+
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageTemplate_LMAP0();
+            C.StageEnd();
+        }
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+        C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+void CBlender_LaEmB::compile_Lc(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_Blend_SET();
+        C.PassSET_LightFog(FALSE, FALSE);
+
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_TFACTOR);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_TFACTOR);
+        C.StageSET_TMC(oT2_Name, oT2_xform, oT2_const, 0);
+        C.StageEnd();
+
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_TMC("$base1", "$null", "$null", 1);
+            C.StageEnd();
+        }
+    }
+    C.PassEnd();
+}
+}

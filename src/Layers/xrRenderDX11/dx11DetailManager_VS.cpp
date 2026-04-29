@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Layers/xrRender/DetailManager.h"
-#include "Layers/xrRender/blenders/Blender_Detail_GPU.h"
+#include "Layers/xrRenderDX11/blenders/Blender_Detail_GPU.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #include "Layers/xrRender/BufferUtils.h"

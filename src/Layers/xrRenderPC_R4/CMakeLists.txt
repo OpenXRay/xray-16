@@ -199,10 +199,10 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/Bindless/MaterialBuffer.cpp
     ../xrRender/Bindless/TerrainMaterialBuffer.cpp
     ../xrRender/Bindless/VertexConverter.cpp
-    ../xrRender/Blender.cpp
-    ../xrRender/Blender_Recorder.cpp
-    ../xrRender/Blender_Recorder_R2.cpp
-    ../xrRender/Blender_Recorder_StandartBinding.cpp
+    ../xrRenderDX11/Blender.cpp
+    ../xrRenderDX11/Blender_Recorder.cpp
+    ../xrRenderDX11/Blender_Recorder_R2.cpp
+    ../xrRenderDX11/Blender_Recorder_StandartBinding.cpp
     ../xrRender/ClusteredLightManager.cpp
     ../xrRender/ColorMapManager.cpp
     ../xrRender/ConstantSystem/FGConstantSystem.cpp
@@ -287,34 +287,34 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/Utils/dxHashHelper.cpp
     ../xrRender/VertexCache.cpp
     ../xrRender/WallmarksEngine.cpp
-    ../xrRender/blenders/Blender_BmmD_deferred.cpp
-    ../xrRender/blenders/Blender_Detail_GPU.cpp
-    ../xrRender/blenders/Blender_Editor_Selection.cpp
-    ../xrRender/blenders/Blender_Editor_Wire.cpp
-    "../xrRender/blenders/Blender_Lm(EbB).cpp"
-    ../xrRender/blenders/Blender_Model_EbB_deferred.cpp
-    ../xrRender/blenders/Blender_Particle_deferred.cpp
-    ../xrRender/blenders/Blender_Screen_SET.cpp
-    ../xrRender/blenders/Blender_detail_still_deferred.cpp
-    ../xrRender/blenders/Blender_tree_deferred.cpp
-    ../xrRender/blenders/blender_bloom_build.cpp
-    ../xrRender/blenders/blender_combine.cpp
-    ../xrRender/blenders/blender_deffer_aref.cpp
-    ../xrRender/blenders/blender_deffer_flat.cpp
-    ../xrRender/blenders/blender_deffer_model.cpp
-    ../xrRender/blenders/blender_light_direct.cpp
-    ../xrRender/blenders/blender_light_mask.cpp
-    ../xrRender/blenders/blender_light_occq.cpp
-    ../xrRender/blenders/blender_light_point.cpp
-    ../xrRender/blenders/blender_light_reflected.cpp
-    ../xrRender/blenders/blender_light_spot.cpp
-    ../xrRender/blenders/blender_luminance.cpp
-    ../xrRender/blenders/blender_ssao.cpp
-    ../xrRender/blenders/dx11HDAOCSBlender.cpp
-    ../xrRender/blenders/dx11MSAABlender.cpp
-    ../xrRender/blenders/dx11MinMaxSMBlender.cpp
-    ../xrRender/blenders/dx11RainBlender.cpp
-    ../xrRender/blenders/uber_deffer.cpp
+    ../xrRenderDX11/blenders/Blender_BmmD_deferred.cpp
+    ../xrRenderDX11/blenders/Blender_Detail_GPU.cpp
+    ../xrRenderDX11/blenders/Blender_Editor_Selection.cpp
+    ../xrRenderDX11/blenders/Blender_Editor_Wire.cpp
+    "../xrRenderDX11/blenders/Blender_Lm(EbB).cpp"
+    ../xrRenderDX11/blenders/Blender_Model_EbB_deferred.cpp
+    ../xrRenderDX11/blenders/Blender_Particle_deferred.cpp
+    ../xrRenderDX11/blenders/Blender_Screen_SET.cpp
+    ../xrRenderDX11/blenders/Blender_detail_still_deferred.cpp
+    ../xrRenderDX11/blenders/Blender_tree_deferred.cpp
+    ../xrRenderDX11/blenders/blender_bloom_build.cpp
+    ../xrRenderDX11/blenders/blender_combine.cpp
+    ../xrRenderDX11/blenders/blender_deffer_aref.cpp
+    ../xrRenderDX11/blenders/blender_deffer_flat.cpp
+    ../xrRenderDX11/blenders/blender_deffer_model.cpp
+    ../xrRenderDX11/blenders/blender_light_direct.cpp
+    ../xrRenderDX11/blenders/blender_light_mask.cpp
+    ../xrRenderDX11/blenders/blender_light_occq.cpp
+    ../xrRenderDX11/blenders/blender_light_point.cpp
+    ../xrRenderDX11/blenders/blender_light_reflected.cpp
+    ../xrRenderDX11/blenders/blender_light_spot.cpp
+    ../xrRenderDX11/blenders/blender_luminance.cpp
+    ../xrRenderDX11/blenders/blender_ssao.cpp
+    ../xrRenderDX11/blenders/dx11HDAOCSBlender.cpp
+    ../xrRenderDX11/blenders/dx11MSAABlender.cpp
+    ../xrRenderDX11/blenders/dx11MinMaxSMBlender.cpp
+    ../xrRenderDX11/blenders/dx11RainBlender.cpp
+    ../xrRenderDX11/blenders/uber_deffer.cpp
     ../xrRender/du_box.cpp
     ../xrRender/du_cone.cpp
     ../xrRender/du_cylinder.cpp
