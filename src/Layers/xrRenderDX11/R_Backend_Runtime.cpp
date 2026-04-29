@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "LightTrack.h"
+#include "Layers/xrRender/LightTrack.h"
 #include "xrEngine/IRenderable.h"
 
 #if defined(USE_DX11)
@@ -90,8 +90,6 @@ void CBackend::Invalidate()
     colorwrite_mask = u32(-1);
 #endif
 
-    // Since constant buffers are unmapped (for DirecX 10)
-    // transform setting handlers should be unmapped too.
     xforms.unmap();
 
 #if defined(USE_DX11)
@@ -109,8 +107,6 @@ void CBackend::Invalidate()
         m_aComputeConstants[i] = 0;
     }
     StateManager.Reset();
-    // Redundant call. Just no note that we need to unmap const
-    // if we create dedicated class.
     StateManager.UnmapConstants();
     SRVSManager.ResetDeviceState();
 
@@ -124,7 +120,7 @@ void CBackend::Invalidate()
         textures_cs[cs_it++] = 0;
 
     context_id = CHW::IMM_CTX_ID;
-#endif // USE_DX11
+#endif
 
     for (u32 ps_it = 0; ps_it < CTexture::mtMaxPixelShaderTextures;)
         textures_ps[ps_it++] = nullptr;
@@ -134,12 +130,9 @@ void CBackend::Invalidate()
         matrix = nullptr;
 }
 
-void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count /* =0*/)
+void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes , u32 count )
 {
 #if defined(USE_DX11) || defined(USE_OGL)
-    // TODO: DX11: Implement in the corresponding vertex shaders
-    // Use this to set up location, were shader setup code will get data
-    // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
     UNUSED(_enable);
     UNUSED(_planes);
     UNUSED(count);
@@ -150,16 +143,13 @@ void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count
 }
 
 #ifndef DEDICATED_SREVER
-void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask /* =0xff */)
+void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform , u32 fmask )
 {
     if (0 == GEnv.Backend->GetCapabilities().geometry.dwClipPlanes)
         return;
     if (!_enable)
     {
 #if defined(USE_DX11) || defined(USE_OGL)
-    // TODO: DX11: Implement in the corresponding vertex shaders
-    // Use this to set up location, were shader setup code will get data
-    // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -173,11 +163,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask
 
 void CBackend::set_Textures(STextureList* textures_list)
 {
-    // TODO: expose T invalidation method
-    //if (T == textures_list) // disabled due to cases when the set of resources the same, but different srv is need to be bind
-    //    return;
     T = textures_list;
-    // If resources weren't set at all we should clear from resource #0.
 #ifdef XR_PLATFORM_WEB
     u32 usedPS = 0;
     u32 usedVS = 0;
@@ -200,12 +186,9 @@ void CBackend::set_Textures(STextureList* textures_list)
         CTexture* load_surf = loader.second.c_str() && loader.second[0]
             ? RImplementation.Resources->_CreateTexture(loader.second.c_str())
             : nullptr;
-        //if (load_id < 256) {
         if (load_id < CTexture::rstVertex)
         {
-            // Set up pixel shader resources
             VERIFY(load_id < CTexture::mtMaxPixelShaderTextures);
-            // ordinary pixel surface
             if ((int)load_id > _last_ps)
                 _last_ps = load_id;
 #ifdef XR_PLATFORM_WEB
@@ -220,7 +203,6 @@ void CBackend::set_Textures(STextureList* textures_list)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
                     load_surf->bind(*this, load_id);
-                    //load_surf->Apply(load_id);
                     load_surf->last_slice = load_surf->curr_slice;
 #ifdef XR_PLATFORM_WEB
                     occupied_texture_units |= 1u << load_id;
@@ -233,10 +215,8 @@ void CBackend::set_Textures(STextureList* textures_list)
         if (load_id < CTexture::rstGeometry)
 #endif
         {
-            // Set up pixel shader resources
             VERIFY(load_id < CTexture::rstVertex + CTexture::mtMaxVertexShaderTextures);
 
-            // vertex only //d-map or vertex
             u32 load_id_remapped = load_id - CTexture::rstVertex;
             if ((int)load_id_remapped > _last_vs)
                 _last_vs = load_id_remapped;
@@ -252,7 +232,6 @@ void CBackend::set_Textures(STextureList* textures_list)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
                     load_surf->bind(*this, load_id);
-                    //load_surf->Apply(load_id);
 #ifdef XR_PLATFORM_WEB
                     occupied_texture_units |= 1u << load_id;
 #endif
@@ -262,10 +241,8 @@ void CBackend::set_Textures(STextureList* textures_list)
 #if defined(USE_DX11)
         else if (load_id < CTexture::rstHull)
         {
-            // Set up pixel shader resources
             VERIFY(load_id < CTexture::rstGeometry + CTexture::mtMaxGeometryShaderTextures);
 
-            // vertex only //d-map or vertex
             u32 load_id_remapped = load_id - CTexture::rstGeometry;
             if ((int)load_id_remapped > _last_gs)
                 _last_gs = load_id_remapped;
@@ -278,16 +255,13 @@ void CBackend::set_Textures(STextureList* textures_list)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
                     load_surf->bind(*this, load_id);
-                    //load_surf->Apply(load_id);
                 }
             }
         }
         else if (load_id < CTexture::rstDomain)
         {
-            //  Set up pixel shader resources
             VERIFY(load_id < CTexture::rstHull + CTexture::mtMaxHullShaderTextures);
 
-            // vertex only //d-map or vertex
             u32 load_id_remapped = load_id - CTexture::rstHull;
             if ((int)load_id_remapped > _last_hs)
                 _last_hs = load_id_remapped;
@@ -300,16 +274,13 @@ void CBackend::set_Textures(STextureList* textures_list)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
                     load_surf->bind(*this, load_id);
-                    //load_surf->Apply(load_id);
                 }
             }
         }
         else if (load_id < CTexture::rstCompute)
         {
-            // Set up pixel shader resources
             VERIFY(load_id < CTexture::rstDomain + CTexture::mtMaxDomainShaderTextures);
 
-            // vertex only //d-map or vertex
             u32 load_id_remapped = load_id - CTexture::rstDomain;
             if ((int)load_id_remapped > _last_ds)
                 _last_ds = load_id_remapped;
@@ -322,16 +293,13 @@ void CBackend::set_Textures(STextureList* textures_list)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
                     load_surf->bind(*this, load_id);
-                    //load_surf->Apply(load_id);
                 }
             }
         }
         else if (load_id < CTexture::rstInvalid)
         {
-            // Set up pixel shader resources
             VERIFY(load_id < CTexture::rstCompute + CTexture::mtMaxComputeShaderTextures);
 
-            // vertex only //d-map or vertex
             u32 load_id_remapped = load_id - CTexture::rstCompute;
             if ((int)load_id_remapped > _last_cs)
                 _last_cs = load_id_remapped;
@@ -344,7 +312,6 @@ void CBackend::set_Textures(STextureList* textures_list)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
                     load_surf->bind(*this, load_id);
-                    //load_surf->Applyload_id);
                 }
             }
         }
@@ -352,10 +319,9 @@ void CBackend::set_Textures(STextureList* textures_list)
         {
             VERIFY("Invalid enum");
         }
-#endif // USE_DX11
+#endif
     }
 
-    // clear remaining stages (PS)
 #ifdef XR_PLATFORM_WEB
     for (u32 _last_ps = 0; _last_ps < CTexture::mtMaxPixelShaderTextures; _last_ps++)
     {
@@ -374,9 +340,7 @@ void CBackend::set_Textures(STextureList* textures_list)
         textures_ps[_last_ps] = nullptr;
 #endif
 #if defined(USE_DX11)
-        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
-        // HW.pDevice->PSSetShaderResources(_last_ps, 1, &pRes);
         SRVSManager.SetPSResource(_last_ps, pRes);
 #elif defined(USE_OGL)
         CHK_GL(glActiveTexture(GL_TEXTURE0 + _last_ps));
@@ -389,7 +353,6 @@ void CBackend::set_Textures(STextureList* textures_list)
 #   error No graphics API selected or enabled!
 #endif
     }
-    // clear remaining stages (VS)
 #ifdef XR_PLATFORM_WEB
     for (u32 _last_vs = 0; _last_vs < CTexture::mtMaxVertexShaderTextures; _last_vs++)
     {
@@ -409,9 +372,7 @@ void CBackend::set_Textures(STextureList* textures_list)
         textures_vs[_last_vs] = nullptr;
 #endif
 #if defined(USE_DX11)
-        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
-        // HW.pDevice->VSSetShaderResources(_last_vs, 1, &pRes);
         SRVSManager.SetVSResource(_last_vs, pRes);
 #elif defined(USE_OGL)
         CHK_GL(glActiveTexture(GL_TEXTURE0 + CTexture::rstVertex + _last_vs));
@@ -426,7 +387,6 @@ void CBackend::set_Textures(STextureList* textures_list)
     }
 
 #if defined(USE_DX11)
-    // clear remaining stages (VS)
     for (++_last_gs; _last_gs < CTexture::mtMaxGeometryShaderTextures; _last_gs++)
     {
         if (!textures_gs[_last_gs])
@@ -434,9 +394,7 @@ void CBackend::set_Textures(STextureList* textures_list)
 
         textures_gs[_last_gs] = 0;
 
-        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
-        // HW.pDevice->GSSetShaderResources(_last_gs, 1, &pRes);
         SRVSManager.SetGSResource(_last_gs, pRes);
     }
     for (++_last_hs; _last_hs < CTexture::mtMaxHullShaderTextures; _last_hs++)
@@ -446,7 +404,6 @@ void CBackend::set_Textures(STextureList* textures_list)
 
         textures_hs[_last_hs] = 0;
 
-        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         SRVSManager.SetHSResource(_last_hs, pRes);
     }
@@ -457,7 +414,6 @@ void CBackend::set_Textures(STextureList* textures_list)
 
         textures_ds[_last_ds] = 0;
 
-        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         SRVSManager.SetDSResource(_last_ds, pRes);
     }
@@ -468,18 +424,17 @@ void CBackend::set_Textures(STextureList* textures_list)
 
         textures_cs[_last_cs] = 0;
 
-        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         SRVSManager.SetCSResource(_last_cs, pRes);
     }
-#endif // USE_DX11
+#endif
 }
 #else
 
-void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask /* =0xff */) {}
+void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform , u32 fmask ) {}
 void CBackend::set_Textures(STextureList* textures_list) {}
 
-#endif // DEDICATED SERVER
+#endif
 
 void CBackend::SetupStates()
 {
@@ -488,31 +443,24 @@ void CBackend::SetupStates()
     SSManager.SetMaxAnisotropy(ps_r__tf_Anisotropic);
     SSManager.SetMipLODBias(ps_r__tf_Mipbias);
 #elif defined(USE_OGL)
-    // TODO: OGL: Implement SetupStates().
 #else
 #   error No graphics API selected or enabled!
 #endif
 }
 
 
-// Device dependance
 void CBackend::OnDeviceCreate()
 {
     ZoneScoped;
 
-    // Debug Draw
-
-    // invalidate caching
     Invalidate();
 }
 
 void CBackend::OnDeviceDestroy()
 {
-    // Debug Draw
     DestroyDebugDraw();
 
 #if defined(USE_DX11)
-    //  Destroy state managers
     StateManager.Reset();
 #endif
 
@@ -523,7 +471,7 @@ void CBackend::OnDeviceDestroy()
 
 void CBackend::apply_lmaterial()
 {
-    R_constant* C = get_c(c_sbase)._get(); // get sampler
+    R_constant* C = get_c(c_sbase)._get();
     if (!C)
         return;
 
@@ -551,4 +499,4 @@ void CBackend::apply_lmaterial()
                                 o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
                                 o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

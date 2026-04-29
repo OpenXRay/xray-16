@@ -30,6 +30,6 @@ void D3DXRenderBase::CreateQuadIB()
             Cnt += 4;
         }
     }
-    QuadIB.Unmap(true); // upload index data
+    QuadIB.Unmap(true);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

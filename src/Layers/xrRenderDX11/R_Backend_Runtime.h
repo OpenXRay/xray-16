@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SH_Texture.h"
-#include "SH_Matrix.h"
-#include "SH_Constant.h"
-#include "SH_RT.h"
+#include "Layers/xrRender/SH_Texture.h"
+#include "Layers/xrRender/SH_Matrix.h"
+#include "Layers/xrRender/SH_Constant.h"
+#include "Layers/xrRender/SH_RT.h"
 
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
@@ -140,4 +140,4 @@ IC void CBackend::set_Pass(SPass* P)
 
 ICF void CBackend::set_Element(ShaderElement* S, u32 pass) { set_Pass(S->passes[pass]); }
 ICF void CBackend::set_Shader(Shader* S, u32 pass) { set_Element(S->E[0], pass); }
-} // namespace xray::render::RENDER_NAMESPACE
+}

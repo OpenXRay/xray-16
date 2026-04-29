@@ -5,13 +5,13 @@ namespace xray::render::RENDER_NAMESPACE
 class ECORE_API R_xforms
 {
 public:
-    Fmatrix m_w; // Basic	- world
-    Fmatrix m_invw; // derived	- world2local, cached
-    Fmatrix m_v; // Basic	- view
-    Fmatrix m_p; // Basic	- projection
-    Fmatrix m_wv; // Derived	- world2view
-    Fmatrix m_vp; // Derived	- view2projection
-    Fmatrix m_wvp; // Derived	- world2view2projection
+    Fmatrix m_w;
+    Fmatrix m_invw;
+    Fmatrix m_v;
+    Fmatrix m_p;
+    Fmatrix m_wv;
+    Fmatrix m_vp;
+    Fmatrix m_wvp;
 
     R_constant* c_w;
     R_constant* c_invw;
@@ -46,4 +46,4 @@ private:
 
     CBackend& cmd_list;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

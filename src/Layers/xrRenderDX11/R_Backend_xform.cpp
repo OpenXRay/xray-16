@@ -48,7 +48,6 @@ void R_xforms::set_P(const Fmatrix& m)
         cmd_list.set_c(c_vp, m_vp);
     if (c_wvp)
         cmd_list.set_c(c_wvp, m_wvp);
-    // always setup projection - D3D relies on it to work correctly :(
     cmd_list.set_xform(D3DTS_PROJECTION, m);
 }
 
@@ -88,4 +87,4 @@ R_xforms::R_xforms(CBackend& cmd_list_in)
     m_wvp.identity();
     m_bInvWValid = true;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

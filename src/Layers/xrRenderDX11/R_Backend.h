@@ -1,7 +1,5 @@
 #pragma once
 
-//#define RBackend_PGO
-
 #ifdef RBackend_PGO
 #define PGO(a) a
 #else
@@ -9,8 +7,8 @@
 #endif
 
 #include "Layers/xrRender/BufferUtils.h"
-#include "R_DStreams.h"
-#include "r_constants_cache.h"
+#include "Layers/xrRender/R_DStreams.h"
+#include "Layers/xrRender/r_constants_cache.h"
 #include "R_Backend_xform.h"
 #include "R_Backend_hemi.h"
 #include "R_Backend_tree.h"
@@ -22,7 +20,7 @@
 #include "Layers/xrRenderDX11/StateManager/dx11StateCache.h"
 #endif
 
-#include "FVF.h"
+#include "Layers/xrRender/FVF.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -30,7 +28,6 @@ const u32 CULL_CCW = D3DCULL_CCW;
 const u32 CULL_CW = D3DCULL_CW;
 const u32 CULL_NONE = D3DCULL_NONE;
 
-///		detailed statistic
 struct R_statistics_element
 {
     u32 verts, dips;
@@ -87,12 +84,11 @@ public:
 
     D3D_PRIMITIVE_TOPOLOGY m_PrimitiveTopology;
     ID3DInputLayout* m_pInputLayout;
-    u32 dummy0; // Padding to avoid warning
-    u32 dummy1; // Padding to avoid warning
-    u32 dummy2; // Padding to avoid warning
+    u32 dummy0;
+    u32 dummy1;
+    u32 dummy2;
 #endif
 private:
-    // Render-targets
 #if defined (USE_DX11)
     ID3DRenderTargetView* pRT[4];
     ID3DDepthStencilView* pZB;
@@ -104,17 +100,14 @@ private:
 #   error No graphics API selected or enabled!
 #endif
 
-    // Vertices/Indices/etc
     SDeclaration* decl;
     VertexBufferHandle vb;
     IndexBufferHandle ib;
     u32 vb_stride;
 
-    // Pixel/Vertex constants
     alignas(16) R_constants constants;
     R_constant_table* ctable;
 
-    // Shaders/State
     ID3DState* state;
 #if defined(USE_DX11)
     ID3DPixelShader* ps;
@@ -144,7 +137,7 @@ private:
 #   ifdef USE_OGL
     pcstr pp_name;
 #   endif
-#endif // DEBUG
+#endif
 
 #ifdef XR_PLATFORM_WEB
     static inline u32 stencil_enable = u32(-1);
@@ -185,26 +178,23 @@ private:
 #endif
     u32 alpha_ref;
 
-    // Lists
     STextureList* T;
     SMatrixList* M;
     SConstantList* C;
 
-    // Lists-expanded
-    CTexture* textures_ps[CTexture::mtMaxPixelShaderTextures]; // stages
-    //CTexture* textures_vs[5]; // dmap + 4 vs
-    CTexture* textures_vs[CTexture::mtMaxVertexShaderTextures]; // 4 vs
-    CTexture* textures_gs[CTexture::mtMaxGeometryShaderTextures]; // 4 vs
+    CTexture* textures_ps[CTexture::mtMaxPixelShaderTextures];
+    CTexture* textures_vs[CTexture::mtMaxVertexShaderTextures];
+    CTexture* textures_gs[CTexture::mtMaxGeometryShaderTextures];
 #ifdef XR_PLATFORM_WEB
     static inline u32 occupied_texture_units = u32(-1);
 #endif
 #if defined(USE_DX11)
-    CTexture* textures_hs[CTexture::mtMaxHullShaderTextures]; // 4 vs
-    CTexture* textures_ds[CTexture::mtMaxDomainShaderTextures]; // 4 vs
-    CTexture* textures_cs[CTexture::mtMaxComputeShaderTextures]; // 4 vs
+    CTexture* textures_hs[CTexture::mtMaxHullShaderTextures];
+    CTexture* textures_ds[CTexture::mtMaxDomainShaderTextures];
+    CTexture* textures_cs[CTexture::mtMaxComputeShaderTextures];
 #endif
 
-    CMatrix* matrices[8]{}; // matrices are supported only for FFP
+    CMatrix* matrices[8]{};
 
 public:
     struct _stats
@@ -232,10 +222,10 @@ public:
         u32 decl;
         u32 vb;
         u32 ib;
-        u32 states; // Number of times the shader-state changes
-        u32 textures; // Number of times the shader-tex changes
-        u32 matrices; // Number of times the shader-xform changes
-        u32 constants; // Number of times the shader-consts changes
+        u32 states;
+        u32 textures;
+        u32 matrices;
+        u32 constants;
         u32 xforms;
         u32 target_rt;
         u32 target_zb;
@@ -265,13 +255,13 @@ public:
 
         if (stage < CTexture::rstInvalid)
             return textures_cs[stage - CTexture::rstCompute];
-#endif // USE_DX11
+#endif
         VERIFY(!"Invalid texture stage");
         return nullptr;
     }
 
     float o_hemi;
-    float o_hemi_cube[/*CROS_impl::NUM_FACES*/6];
+    float o_hemi_cube[ 6];
     float o_sun;
 
     void apply_lmaterial();
@@ -282,7 +272,6 @@ public:
 
     void Invalidate();
 
-    // API
     IC void set_xform(u32 ID, const Fmatrix& M);
     IC void set_xform_world(const Fmatrix& M);
     IC void set_xform_view(const Fmatrix& M);
@@ -474,7 +463,6 @@ public:
     IC void SetTextureFactor(u32 factor) const;
     IC void SetAmbient(u32 ambient) const;
 
-    // constants
     ICF ref_constant get_c(LPCSTR n)
     {
         if (ctable)
@@ -489,7 +477,6 @@ public:
         return nullptr;
     }
 
-    // constants - direct (fast)
     template<typename... Args>
     ICF void set_c(R_constant* C, Args&&... args)
     {
@@ -514,7 +501,6 @@ public:
         constants.seta(C, std::forward<Args>(args)...);
     }
 
-    // constants - raw string (slow)
     template<typename... Args>
     ICF void set_c(cpcstr name, Args&&... args)
     {
@@ -531,7 +517,6 @@ public:
         set_ca(ctable->get(name)._get(), std::forward<Args>(args)...);
     }
 
-    // constants - shared_str (average)
     template<typename... Args>
     ICF void set_c(const shared_str& name, Args&& ... args)
     {
@@ -548,7 +533,6 @@ public:
         set_ca(ctable->get(name)._get(), std::forward<Args>(args)...);
     }
 
-    // Rendering
     ICF void Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
     ICF void Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC);
 #ifdef USE_DX11
@@ -570,14 +554,12 @@ public:
     void gpu_mark_begin(const wchar_t* name);
     void gpu_mark_end();
 
-    // Device create / destroy / frame signaling
     void OnFrameBegin();
     void OnFrameEnd();
     void OnDeviceCreate();
     void OnDeviceDestroy();
     void SetupStates();
 
-    // Debug render
     void dbg_DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc);
     void dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
     void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2);
@@ -618,7 +600,6 @@ public:
     }
 
 private:
-    // Debug Draw
     void InitializeDebugDraw();
     void DestroyDebugDraw();
 
@@ -627,9 +608,6 @@ private:
 
 #if defined(USE_DX11)
 private:
-    //	DirectX 11+ internal functionality
-    // void CreateConstantBuffers();
-    // void DestroyConstantBuffers();
     void ApplyVertexLayout();
     void ApplyRTandZB();
     void ApplyPrimitieTopology(D3D_PRIMITIVE_TOPOLOGY Topology);
@@ -644,9 +622,9 @@ private:
 public:
     dx11StateManager StateManager;
     dx11ShaderResourceStateCache SRVSManager;
-#endif // USE_DX11
+#endif
 };
 #pragma warning(pop)
 
 #define RCache RImplementation.get_imm_context().cmd_list
-} // namespace xray::render::RENDER_NAMESPACE
+}

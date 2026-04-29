@@ -65,4 +65,4 @@ void R_tree::set_c_sun(float x, float y, float z, float w)
     if (c_c_sun)
         cmd_list.set_c(c_c_sun, x, y, z, w);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

@@ -62,4 +62,4 @@ void CBackend::dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
 {
 }
 
-} // namespace xray::render::RENDER_NAMESPACE
+}

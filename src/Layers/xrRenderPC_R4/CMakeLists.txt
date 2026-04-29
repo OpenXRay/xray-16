@@ -249,14 +249,14 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/ParticleGroup.cpp
     ../xrRender/Profiler/GPUProfiler.cpp
     ../xrRender/Profiler/StatsOverlay.cpp
-    ../xrRender/R_Backend.cpp
-    ../xrRender/R_Backend_DBG.cpp
-    ../xrRender/R_Backend_LOD.h
-    ../xrRender/R_Backend_LOD.cpp
-    ../xrRender/R_Backend_Runtime.cpp
-    ../xrRender/R_Backend_hemi.cpp
-    ../xrRender/R_Backend_tree.cpp
-    ../xrRender/R_Backend_xform.cpp
+    ../xrRenderDX11/R_Backend.cpp
+    ../xrRenderDX11/R_Backend_DBG.cpp
+    ../xrRenderDX11/R_Backend_LOD.h
+    ../xrRenderDX11/R_Backend_LOD.cpp
+    ../xrRenderDX11/R_Backend_Runtime.cpp
+    ../xrRenderDX11/R_Backend_hemi.cpp
+    ../xrRenderDX11/R_Backend_tree.cpp
+    ../xrRenderDX11/R_Backend_xform.cpp
     ../xrRender/R_DStreams.cpp
     ../xrRender/ResourceManager.cpp
     ../xrRender/ResourceManager/AsyncIO.cpp
