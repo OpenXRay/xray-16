@@ -11,8 +11,6 @@ namespace xray::render::fg
 {
 float psOSSR = .001f;
 
-Task* g_pProcessHOMTask = nullptr;
-
 CHOM::CHOM() : xrc("HOM")
 {
     bEnabled = FALSE;

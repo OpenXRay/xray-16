@@ -13,13 +13,6 @@ namespace xray::render::fg
 class CPortal;
 class CSector;
 
-extern ECORE_API CDB::MODEL* g_pRmPortals;
-extern ECORE_API xrXRC g_Sectors_xrc;
-extern ECORE_API IRender_Sector::sector_id_t g_last_sector_id;
-extern ECORE_API IRender_Sector::sector_id_t g_largest_sector_id;
-extern ECORE_API u32 g_uLastLTRACK;
-extern ECORE_API bool g_bFirstFrameAfterReset;
-extern ECORE_API xr_vector<Fbox3> g_main_coarse_structure;
 
 struct _scissor : public Fbox2
 {

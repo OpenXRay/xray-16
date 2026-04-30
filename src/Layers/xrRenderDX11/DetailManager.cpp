@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "DetailManager.h"
 #include "xrCDB/Intersect.hpp"
 
@@ -519,7 +521,7 @@ void CDetailManager::DispatchMTCalc()
     m_calc_task = &TaskScheduler->AddTask([this]
     {
 #ifndef _EDITOR
-        if (nullptr == g_pDetailManager)
+        if (nullptr == RImplementation.m_framegraphRenderer->m_pDetailManager)
             return;
         if (nullptr == dtFS)
             return;

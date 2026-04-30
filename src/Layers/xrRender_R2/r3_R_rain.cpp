@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "r2_R_sun_support.h"
 
 #include "xrEngine/IGame_Persistent.h"
@@ -277,7 +279,7 @@ void render_rain::calculate()
     {
         dsgraph.o.phase = CRender::PHASE_SMAP;
         dsgraph.r_pmask(true, false);
-        dsgraph.o.sector_id = g_largest_sector_id;
+        dsgraph.o.sector_id = RImplementation.m_framegraphRenderer->m_largest_sector_id;
         dsgraph.o.xform = cull_xform;
         dsgraph.o.view_frustum = cull_frustum;
         dsgraph.o.view_pos = cull_COP;

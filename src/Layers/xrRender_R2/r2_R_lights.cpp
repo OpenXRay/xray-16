@@ -1,5 +1,8 @@
 #include "stdafx.h"
 
+#include "r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
+
 namespace xray::render::fg
 {
 void CRender::render_lights(light_Package& LP)
@@ -120,7 +123,7 @@ void CRender::render_lights(light_Package& LP)
                 dsgraph.cmd_list.set_xform_project(L->X.S.project);
                 dsgraph.render_graph(0);
                 if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                    g_pDetailManager->Render(dsgraph.cmd_list);
+                    m_framegraphRenderer->m_pDetailManager->Render(dsgraph.cmd_list);
                 L->X.S.transluent = FALSE;
                 if (bSpecial)
                 {

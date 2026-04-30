@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "r2_R_sun_support.h"
 #include "xrCore/Threading/ParallelFor.hpp"
 
@@ -265,7 +267,7 @@ void render_sun::calculate()
                 //		sun->svis.begin					();
                 dsgraph.o.phase = CRender::PHASE_SMAP;
                 dsgraph.r_pmask(true, RImplementation.o.Tshadows);
-                dsgraph.o.sector_id = g_largest_sector_id;
+                dsgraph.o.sector_id = RImplementation.m_framegraphRenderer->m_largest_sector_id;
                 dsgraph.o.xform = cull_xform[cascade_ind];
                 dsgraph.o.view_frustum = cull_frustum[cascade_ind];
                 dsgraph.o.view_pos = cull_COP[cascade_ind];
@@ -316,7 +318,7 @@ void render_sun::render()
                 dsgraph.cmd_list.set_xform_project(sun->X.D[cascade_ind].combine);
                 dsgraph.render_graph(0);
                 if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                    g_pDetailManager->Render(dsgraph.cmd_list);
+                    RImplementation.m_framegraphRenderer->m_pDetailManager->Render(dsgraph.cmd_list);
                 sun->X.D[cascade_ind].transluent = FALSE;
                 if (bSpecial)
                 {
