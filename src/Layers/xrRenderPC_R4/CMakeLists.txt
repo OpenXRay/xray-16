@@ -4,9 +4,7 @@ target_sources(xrRenderPC_R4 PRIVATE
     packages.config
     r2_test_hw.cpp
     r4_rendertarget.h
-    r4_rendertarget_accum_direct.cpp
     r4_rendertarget_build_textures.cpp
-    r4_rendertarget_phase_combine.cpp
     r4_rendertarget_phase_hdao.cpp
     r4_rendertarget_u_set_rt.cpp
     r4_shaders.cpp
@@ -177,9 +175,6 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRenderDX11/dx11r_screenshot.cpp
 
     ../xrRender_R2/r2.cpp
-    ../xrRender_R2/r2_R_calculate.cpp
-    ../xrRender_R2/r2_R_lights.cpp
-    ../xrRender_R2/r2_R_render.cpp
     ../xrRender_R2/r2_blenders.cpp
     ../xrRender_R2/r2_loader.cpp
     ../xrRender_R2/r2_rendertarget.cpp
@@ -194,7 +189,6 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender_R2/r2_rendertarget_phase_bloom.cpp
     ../xrRender_R2/r2_rendertarget_phase_luminance.cpp
     ../xrRender_R2/r2_rendertarget_phase_smap_S.cpp
-    ../xrRender_R2/r3_R_rain.cpp
     ../xrRender_R2/r3_rendertarget_accum_point.cpp
     ../xrRender_R2/r3_rendertarget_accum_spot.cpp
     ../xrRender_R2/r3_rendertarget_create_minmaxSM.cpp
@@ -204,8 +198,6 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender_R2/r3_rendertarget_phase_scene.cpp
     ../xrRender_R2/r3_rendertarget_phase_smap_D.cpp
     ../xrRender_R2/r3_rendertarget_phase_ssao.cpp
-    ../xrRender_R2/render_phase_sun.cpp
-    ../xrRender_R2/render_phase_sun_old.cpp
 )
 
 target_include_directories(xrRenderPC_R4

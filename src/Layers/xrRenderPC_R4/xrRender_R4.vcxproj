@@ -149,7 +149,6 @@
     <ClInclude Include="..\xrRenderDX11\blenders\blender_ssao.h"/>
     <ClInclude Include="..\xrRender_R2\r2.h"/>
     <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h"/>
-    <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h"/>
     <ClInclude Include="..\xrRender_R2\r2_types.h"/>
     <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\dx11HDAOCSBlender.h"/>
@@ -283,9 +282,6 @@
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_luminance.cpp"/>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_PP.cpp"/>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_smap_S.cpp"/>
-    <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp"/>
-    <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp"/>
-    <ClCompile Include="..\xrRender_R2\r2_R_render.cpp"/>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_point.cpp"/>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_spot.cpp"/>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_create_minmaxSM.cpp"/>
@@ -295,16 +291,11 @@
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp"/>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_smap_D.cpp"/>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_ssao.cpp"/>
-    <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp"/>
-    <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp"/>
-    <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\dx11HDAOCSBlender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\dx11MinMaxSMBlender.cpp"/>
     <ClCompile Include="r4_rendertarget_build_textures.cpp"/>
     <ClCompile Include="r4_rendertarget_u_set_rt.cpp"/>
     <ClCompile Include="r2_test_hw.cpp"/>
-    <ClCompile Include="r4_rendertarget_accum_direct.cpp"/>
-    <ClCompile Include="r4_rendertarget_phase_combine.cpp"/>
     <ClCompile Include="r4_rendertarget_phase_hdao.cpp"/>
     <ClCompile Include="r4_shaders.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_LOD.cpp"/>

@@ -480,9 +480,6 @@
     <ClInclude Include="..\xrRender_R2\r2_types.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender_R2\r2.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -610,12 +607,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp">
       <Filter>Models\Visuals</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_accum_direct.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_phase_combine.cpp">
-      <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r4_rendertarget_phase_hdao.cpp">
       <Filter>Core_Target</Filter>
@@ -836,9 +827,6 @@
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_tree_deferred.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_draw_volume.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
@@ -847,9 +835,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_omnipart_geom.cpp">
       <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_point_geom.cpp">
       <Filter>Core_Target</Filter>
@@ -877,9 +862,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_accumulator.cpp">
       <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender_R2\r2_R_render.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_smap_S.cpp">
       <Filter>Core_Target</Filter>
@@ -914,9 +896,6 @@
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_mark_msaa_edges.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_point.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
@@ -928,12 +907,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderDX11\dxImGuiRender.cpp">
       <Filter>Interface implementations\ImGuiRender</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp">
       <Filter>StateManager</Filter>
