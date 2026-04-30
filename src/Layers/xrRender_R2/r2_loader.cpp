@@ -115,8 +115,8 @@ void CRender::level_Load(IReader* fs)
     }
 
     // Components
-    g_pWallmarksEngine = xr_new<CWallmarksEngine>();
-    g_pDetailManager = xr_new<CDetailManager>();
+    m_framegraphRenderer->m_pWallmarksEngine = xr_new<CWallmarksEngine>();
+    m_framegraphRenderer->m_pDetailManager = xr_new<CDetailManager>();
 
     if (!GEnv.isDedicatedServer)
     {
@@ -345,12 +345,12 @@ void CRender::level_Unload()
     HOM.Unload();
 
     //*** Details
-    g_pDetailManager->Unload();
+    m_framegraphRenderer->m_pDetailManager->Unload();
 
     //*** Sectors
     // 1.
-    xr_delete(g_pRmPortals);
-    g_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
+    xr_delete(m_framegraphRenderer->m_pRmPortals);
+    m_framegraphRenderer->m_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
     Device.vCameraPositionSaved.set(0, 0, 0);
 
     // 2.
@@ -404,8 +404,8 @@ void CRender::level_Unload()
     m_fast_geom_loaded = false;
 
     //*** Components
-    xr_delete(g_pDetailManager);
-    xr_delete(g_pWallmarksEngine);
+    xr_delete(m_framegraphRenderer->m_pDetailManager);
+    xr_delete(m_framegraphRenderer->m_pWallmarksEngine);
 
     //*** Shaders
     CompiledLevelShaders.clear();  // D3D12: Clear compiled NVRHI shaders
@@ -601,7 +601,7 @@ void CRender::LoadSectors(IReader* fs)
             if (vol > largest_sector_vol)
             {
                 largest_sector_vol = vol;
-                g_largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
+                m_framegraphRenderer->m_largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
             }
         }
         P->close();
@@ -620,15 +620,15 @@ void CRender::LoadSectors(IReader* fs)
         bool do_rebuild = true;
         const auto chunk_size = fs->find_chunk(fsL_PORTALS);
 
-        g_pRmPortals = xr_new<CDB::MODEL>();
+        m_framegraphRenderer->m_pRmPortals = xr_new<CDB::MODEL>();
         if (use_cache)
-            g_pRmPortals->set_model_crc32(crc32(fs->pointer(), chunk_size));
+            m_framegraphRenderer->m_pRmPortals->set_model_crc32(crc32(fs->pointer(), chunk_size));
 
         string_path file_name;
         strconcat(file_name, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
         FS.update_path(file_name, "$app_data_root$", file_name);
 
-        if (use_cache && FS.exist(file_name) && g_pRmPortals->deserialize(file_name, skip_crc32_check))
+        if (use_cache && FS.exist(file_name) && m_framegraphRenderer->m_pRmPortals->deserialize(file_name, skip_crc32_check))
         {
 #ifndef MASTER_GOLD
             Msg("* Loaded portals cache (%s)...", file_name);
@@ -667,14 +667,14 @@ void CRender::LoadSectors(IReader* fs)
                 v3.set(-20002.f, -20002.f, -20002.f);
                 CL.add_face_packed_D(v1, v2, v3, 0);
             }
-            g_pRmPortals->build(CL.getV(), CL.getVS(), CL.getT(), CL.getTS());
+            m_framegraphRenderer->m_pRmPortals->build(CL.getV(), CL.getVS(), CL.getT(), CL.getTS());
             if (use_cache)
-                g_pRmPortals->serialize(file_name);
+                m_framegraphRenderer->m_pRmPortals->serialize(file_name);
         }
     }
     else
     {
-        g_pRmPortals = nullptr;
+        m_framegraphRenderer->m_pRmPortals = nullptr;
     }
 
     for (u32 id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
@@ -689,7 +689,7 @@ void CRender::LoadSectors(IReader* fs)
     dsgraph.reset();
     dsgraph.load(sectors_data, portals_data);
 
-    g_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
+    m_framegraphRenderer->m_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
 
 void CRender::LoadSWIs(CStreamReader* base_fs)

@@ -2,6 +2,8 @@
 #pragma once
 
 #include "xrEngine/IFrameGraphRender.h"
+#include "xrEngine/Render.h"
+#include "xrCDB/xrXRC.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
@@ -13,9 +15,14 @@
 // Forward declarations
 struct ImDrawData;
 
+namespace CDB { class MODEL; }
+class xrXRC;
+
 namespace xray::render::fg {
     class dxRender_Visual;
     class RTAccelStructManager;
+    class CDetailManager;
+    class CWallmarksEngine;
     namespace PS {
         class CParticleEffect;
     }
@@ -130,6 +137,18 @@ public:
     // Decal Manager accessor (for wallmark routing)
     fg::decals::DecalManager* GetDecalManager() const { return m_decalManager.get(); }
     fg::decals::OverlayManager* GetOverlayManager() const { return m_overlayManager.get(); }
+
+public:
+    CDB::MODEL* m_pRmPortals{ nullptr };
+    xrXRC m_Sectors_xrc{ "render" };
+    IRender_Sector::sector_id_t m_last_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
+    IRender_Sector::sector_id_t m_largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
+    u32 m_uLastLTRACK{ 0 };
+    Task* m_pProcessHOMTask{ nullptr };
+    bool m_bFirstFrameAfterReset{ false };
+    xr_vector<Fbox3> m_main_coarse_structure;
+    fg::CDetailManager* m_pDetailManager{ nullptr };
+    fg::CWallmarksEngine* m_pWallmarksEngine{ nullptr };
 
 private:
     bool m_enabled = false;

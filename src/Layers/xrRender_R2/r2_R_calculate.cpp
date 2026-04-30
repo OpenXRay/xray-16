@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "xrEngine/CustomHUD.h"
 #include "xrCore/Threading/TaskManager.hpp"
 
@@ -41,12 +43,12 @@ void render_main::calculate()
     dsgraph_main.o.phase = CRender::PHASE_NORMAL;
     dsgraph_main.r_pmask(true, true, true); // enable priority "0,1",+ capture wmarks
     if (RImplementation.r_sun.o.active && RImplementation.o.oldshadowcascades)
-        dsgraph_main.set_Recorder(&g_main_coarse_structure); // this is a show-stopper. Can't be paralleled with sun
+        dsgraph_main.set_Recorder(&RImplementation.m_framegraphRenderer->m_main_coarse_structure); // this is a show-stopper. Can't be paralleled with sun
     else
         dsgraph_main.set_Recorder(nullptr);
     dsgraph_main.o.use_hom = true;
     dsgraph_main.o.is_main_pass = true;
-    dsgraph_main.o.sector_id = g_last_sector_id;
+    dsgraph_main.o.sector_id = RImplementation.m_framegraphRenderer->m_last_sector_id;
     dsgraph_main.o.portal_traverse_flags =
         CPortalTraverser::VQ_HOM | CPortalTraverser::VQ_SSA | CPortalTraverser::VQ_FADE;
     dsgraph_main.o.spatial_traverse_flags = ISpatial_DB::O_ORDERED;
@@ -101,7 +103,7 @@ void CRender::Calculate()
     o.mt_render     = 0; // OpenGL does not support parallel draw calls
 #endif
 
-    if (g_bFirstFrameAfterReset)
+    if (m_framegraphRenderer->m_bFirstFrameAfterReset)
         return;
 
     auto& dsgraph_main = get_imm_context();
@@ -112,10 +114,10 @@ void CRender::Calculate()
         const auto sector_id = dsgraph_main.detect_sector(Device.vCameraPosition);
         if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
         {
-            if (sector_id != g_last_sector_id)
+            if (sector_id != m_framegraphRenderer->m_last_sector_id)
                 g_pGamePersistent->OnSectorChanged(sector_id);
 
-            g_last_sector_id = sector_id;
+            m_framegraphRenderer->m_last_sector_id = sector_id;
         }
     }
 
@@ -140,7 +142,7 @@ void CRender::Calculate()
         Lights.add_light(L);
     }
 
-    TaskScheduler->Wait(*g_pProcessHOMTask);
+    TaskScheduler->Wait(*m_framegraphRenderer->m_pProcessHOMTask);
 
     r_main.init();
     if (o.oldshadowcascades)

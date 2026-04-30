@@ -103,6 +103,12 @@ void CRender::NotifySmokeShot()
         m_framegraphRenderer->NotifySmokeShot();
 }
 
+void CRender::RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type)
+{
+    if (m_framegraphRenderer && m_framegraphRenderer->m_pDetailManager)
+        m_framegraphRenderer->m_pDetailManager->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
+}
+
 void CRender::PrintFailedShadersSummary()
 {
     if (g_failedShaders.empty())
@@ -675,8 +681,8 @@ void CRender::reset_begin()
         !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
         !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
     {
-        g_pDetailManager->Unload();
-        xr_delete(g_pDetailManager);
+        m_framegraphRenderer->m_pDetailManager->Unload();
+        xr_delete(m_framegraphRenderer->m_pDetailManager);
     }
     //-AVO
 
@@ -696,8 +702,8 @@ void CRender::reset_end()
         !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
         !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
     {
-        g_pDetailManager = xr_new<CDetailManager>();
-        g_pDetailManager->Load();
+        m_framegraphRenderer->m_pDetailManager = xr_new<CDetailManager>();
+        m_framegraphRenderer->m_pDetailManager->Load();
     }
     //-AVO
 
@@ -709,7 +715,7 @@ void CRender::reset_end()
 
     // Set this flag true to skip the first render frame,
     // that some data is not ready in the first frame (for example device camera position)
-    g_bFirstFrameAfterReset = true;
+    m_framegraphRenderer->m_bFirstFrameAfterReset = true;
 }
 
 void CRender::OnCameraUpdated()
@@ -722,9 +728,9 @@ void CRender::OnCameraUpdated()
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
 
-    g_pProcessHOMTask = &HOM.DispatchMTRender();
-    if (g_pDetailManager)
-        g_pDetailManager->DispatchMTCalc();
+    m_framegraphRenderer->m_pProcessHOMTask = &HOM.DispatchMTRender();
+    if (m_framegraphRenderer->m_pDetailManager)
+        m_framegraphRenderer->m_pDetailManager->DispatchMTCalc();
 }
 
 void CRender::OnFrame()
@@ -1110,7 +1116,7 @@ void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::
     if (T->suppress_wm)
         return;
     VERIFY2(_valid(P) && _valid(s) && verts && (s > EPS_L), "Invalid static wallmark params");
-    g_pWallmarksEngine->AddStaticWallmark(T, verts, P, &*S, s);
+    m_framegraphRenderer->m_pWallmarksEngine->AddStaticWallmark(T, verts, P, &*S, s);
 }
 
 void CRender::add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
@@ -1144,8 +1150,8 @@ void CRender::add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, 
     add_StaticWallmark(pShader->hShader, P, s, T, V);
 }
 
-void CRender::clear_static_wallmarks() { g_pWallmarksEngine->clear(); }
-void CRender::add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm) { g_pWallmarksEngine->AddSkeletonWallmark(wm); }
+void CRender::clear_static_wallmarks() { m_framegraphRenderer->m_pWallmarksEngine->clear(); }
+void CRender::add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm) { m_framegraphRenderer->m_pWallmarksEngine->AddSkeletonWallmark(wm); }
 
 static float EstimateSplatUVRadius(const decals::MeshPickResult& pickResult, float worldRadius)
 {
@@ -1189,7 +1195,7 @@ static float EstimateSplatUVRadius(const decals::MeshPickResult& pickResult, flo
 void CRender::add_SkeletonWallmark(
     const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size)
 {
-    g_pWallmarksEngine->AddSkeletonWallmark(xf, obj, sh, start, dir, size);
+    m_framegraphRenderer->m_pWallmarksEngine->AddSkeletonWallmark(xf, obj, sh, start, dir, size);
 }
 void CRender::add_SkeletonWallmark(
     const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start, const Fvector& dir, float size)
@@ -1348,6 +1354,6 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     font.OutNext("- culled:     %u", Stats.ic_culled);
     Stats.FrameStart();
     HOM.DumpStatistics(font, alert);
-    g_Sectors_xrc.DumpStatistics(font, alert);
+    m_framegraphRenderer->m_Sectors_xrc.DumpStatistics(font, alert);
 }
 } // namespace xray::render::fg

@@ -12,14 +12,6 @@
 
 namespace xray::render::fg
 {
-CDB::MODEL* g_pRmPortals = nullptr;
-xrXRC g_Sectors_xrc("render");
-IRender_Sector::sector_id_t g_last_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
-IRender_Sector::sector_id_t g_largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
-u32 g_uLastLTRACK{ 0 };
-bool g_bFirstFrameAfterReset{ false };
-xr_vector<Fbox3> g_main_coarse_structure;
-
 CPortal::CPortal()
 {
 #ifdef DEBUG

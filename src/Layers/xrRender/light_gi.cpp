@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Layers/xrRender/light.h"
+#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::fg
 {
@@ -13,7 +15,7 @@ void light::gi_generate()
     CRandom random;
     random.seed(0x12071980);
 
-    xrXRC& xrc = g_Sectors_xrc;
+    xrXRC& xrc = RImplementation.m_framegraphRenderer->m_Sectors_xrc;
     const CDB::MODEL* model = g_pGameLevel->ObjectSpace.GetStaticModel();
     const CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     const Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();

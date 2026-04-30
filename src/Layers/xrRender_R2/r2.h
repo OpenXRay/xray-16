@@ -585,12 +585,7 @@ public:
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
     void PrintFailedShadersSummary();
 
-    // Phase 3: A-Life grass interaction wrapper (thread-safe)
-    void RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type = 0) override
-    {
-        if (g_pDetailManager)
-            g_pDetailManager->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
-    }
+    void RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type = 0) override;
 
 private:
 #if defined(USE_DX11)

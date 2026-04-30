@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "r2_R_sun_support.h"
 
 namespace xray::render::fg
@@ -129,7 +131,7 @@ void render_sun_old::render_sun()
     }
 
     // Begin SMAP-render
-    xr_vector<Fbox3>& s_receivers = g_main_coarse_structure;
+    xr_vector<Fbox3>& s_receivers = RImplementation.m_framegraphRenderer->m_main_coarse_structure;
     s_casters.reserve(s_receivers.size());
 
     auto& dsgraph = RImplementation.get_context(context_id);
@@ -137,7 +139,7 @@ void render_sun_old::render_sun()
         //		sun->svis.begin					();
         dsgraph.o.phase = CRender::PHASE_SMAP;
         dsgraph.r_pmask(true, RImplementation.o.Tshadows);
-        dsgraph.o.sector_id = g_largest_sector_id;
+        dsgraph.o.sector_id = RImplementation.m_framegraphRenderer->m_largest_sector_id;
         dsgraph.o.xform = cull_xform;
         dsgraph.o.view_frustum = cull_frustum;
         dsgraph.o.view_pos = cull_COP;
@@ -654,7 +656,7 @@ void render_sun_old::render_sun_near()
         dsgraph.o.use_hom = false;
         dsgraph.o.phase = CRender::PHASE_SMAP;
         dsgraph.r_pmask(true, RImplementation.o.Tshadows);
-        dsgraph.o.sector_id = g_largest_sector_id;
+        dsgraph.o.sector_id = RImplementation.m_framegraphRenderer->m_largest_sector_id;
         dsgraph.o.xform = cull_xform;
         dsgraph.o.view_frustum = cull_frustum;
         dsgraph.o.view_pos = cull_COP;
@@ -678,7 +680,7 @@ void render_sun_old::render_sun_near()
             dsgraph.cmd_list.set_xform_project(sun->X.D[SE_SUN_NEAR].combine);
             dsgraph.render_graph(0);
             if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                g_pDetailManager->Render(dsgraph.cmd_list);
+                RImplementation.m_framegraphRenderer->m_pDetailManager->Render(dsgraph.cmd_list);
             sun->X.D[SE_SUN_NEAR].transluent = FALSE;
             if (bSpecial)
             {
