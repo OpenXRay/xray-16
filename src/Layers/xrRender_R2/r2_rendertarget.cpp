@@ -229,24 +229,6 @@ CRenderTarget::~CRenderTarget()
 #else
 #   error No graphics API selected or enabled!
 #endif
-    //
-    accum_spot_geom_destroy();
-    accum_omnip_geom_destroy();
-    accum_point_geom_destroy();
-    accum_volumetric_geom_destroy();
-
-    // Blenders
-    xr_delete(b_accum_spot);
-    if (RImplementation.o.msaa)
-    {
-        const u32 bound = RImplementation.o.msaa_opt ? 1 : RImplementation.o.msaa_samples;
-
-        for (u32 i = 0; i < bound; ++i)
-        {
-            xr_delete(b_accum_spot_msaa[i]);
-            xr_delete(b_accum_volumetric_msaa[i]);
-        }
-    }
 }
 
 void CRenderTarget::reset_light_marker(CBackend& cmd_list, bool bResetStencil)

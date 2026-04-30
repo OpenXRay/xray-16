@@ -5,7 +5,6 @@ target_sources(xrRenderPC_R4 PRIVATE
     r2_test_hw.cpp
     r4_rendertarget.h
     r4_rendertarget_build_textures.cpp
-    r4_rendertarget_phase_hdao.cpp
     r4_rendertarget_u_set_rt.cpp
     r4_shaders.cpp
     stdafx.cpp
@@ -178,26 +177,6 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender_R2/r2_blenders.cpp
     ../xrRender_R2/r2_loader.cpp
     ../xrRender_R2/r2_rendertarget.cpp
-    ../xrRender_R2/r2_rendertarget_accum_omnipart_geom.cpp
-    ../xrRender_R2/r2_rendertarget_accum_point_geom.cpp
-    ../xrRender_R2/r2_rendertarget_accum_reflected.cpp
-    ../xrRender_R2/r2_rendertarget_accum_spot_geom.cpp
-    ../xrRender_R2/r2_rendertarget_draw_volume.cpp
-    ../xrRender_R2/r2_rendertarget_enable_scissor.cpp
-    ../xrRender_R2/r2_rendertarget_phase_PP.cpp
-    ../xrRender_R2/r2_rendertarget_phase_accumulator.cpp
-    ../xrRender_R2/r2_rendertarget_phase_bloom.cpp
-    ../xrRender_R2/r2_rendertarget_phase_luminance.cpp
-    ../xrRender_R2/r2_rendertarget_phase_smap_S.cpp
-    ../xrRender_R2/r3_rendertarget_accum_point.cpp
-    ../xrRender_R2/r3_rendertarget_accum_spot.cpp
-    ../xrRender_R2/r3_rendertarget_create_minmaxSM.cpp
-    ../xrRender_R2/r3_rendertarget_draw_rain.cpp
-    ../xrRender_R2/r3_rendertarget_mark_msaa_edges.cpp
-    ../xrRender_R2/r3_rendertarget_phase_occq.cpp
-    ../xrRender_R2/r3_rendertarget_phase_scene.cpp
-    ../xrRender_R2/r3_rendertarget_phase_smap_D.cpp
-    ../xrRender_R2/r3_rendertarget_phase_ssao.cpp
 )
 
 target_include_directories(xrRenderPC_R4
