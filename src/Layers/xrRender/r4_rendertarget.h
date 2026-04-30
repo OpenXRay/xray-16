@@ -6,11 +6,6 @@ namespace xray::render::fg
 {
 class light;
 
-//#define DU_SPHERE_NUMVERTEX 92
-//#define DU_SPHERE_NUMFACES	180
-//#define DU_CONE_NUMVERTEX	18
-//#define DU_CONE_NUMFACES	32
-//	no less than 2
 #define VOLUMETRIC_SLICES 100
 
 class CRenderTarget
@@ -22,8 +17,8 @@ class CRenderTarget
 public:
     enum eStencilOptimizeMode
     {
-        SO_Light = 0, //	Default
-        SO_Combine, //	Default
+        SO_Light = 0,
+        SO_Combine,
     };
 
     u32 dwLightMarkerID;
@@ -43,55 +38,46 @@ public:
     xr_vector<Fplane> dbg_planes;
 #endif
 
-    // Base targets
     xr_vector<ref_rt> rt_Base;
     ref_rt rt_Base_Depth;
 
-    // MRT-path
-    ref_rt rt_Depth; // Z-buffer like - initial depth
-    ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading. If MSAA is disabled, points to rt_Base_Depth so we can reduce branching
-    ref_rt rt_Generic_0_r; // MRT generic 0, if MSAA is disabled, just an alias of rt_Generic_0
-    ref_rt rt_Generic_1_r; // MRT generic 1, if MSAA is disabled, just an alias of rt_Generic_1
+    ref_rt rt_Depth;
+    ref_rt rt_MSAADepth;
+    ref_rt rt_Generic_0_r;
+    ref_rt rt_Generic_1_r;
     ref_rt rt_Generic;
-    ref_rt rt_Position; // 64bit,	fat	(x,y,z,?)				(eye-space)
-    ref_rt rt_Normal; // 64bit,	fat	(x,y,z,hemi)			(eye-space)
-    ref_rt rt_Color; // 64/32bit,fat	(r,g,b,specular-gloss)	(or decompressed MET-8-8-8-8)
+    ref_rt rt_Position;
+    ref_rt rt_Normal;
+    ref_rt rt_Color;
 
-    //
-    ref_rt rt_Accumulator; // 64bit		(r,g,b,specular)
-    ref_rt rt_Accumulator_temp; // only for HW which doesn't feature fp16 blend
-    ref_rt rt_Generic_0; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
-    ref_rt rt_Generic_1; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
-    //	Igor: for volumetric lights
-    ref_rt rt_Generic_2; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
-    ref_rt rt_Bloom_1; // 32bit, dim/4	(r,g,b,?)
-    ref_rt rt_Bloom_2; // 32bit, dim/4	(r,g,b,?)
-    ref_rt rt_LUM_64; // 64bit, 64x64,	log-average in all components
-    ref_rt rt_LUM_8; // 64bit, 8x8,		log-average in all components
+    ref_rt rt_Accumulator;
+    ref_rt rt_Accumulator_temp;
+    ref_rt rt_Generic_0;
+    ref_rt rt_Generic_1;
+    ref_rt rt_Generic_2;
+    ref_rt rt_Bloom_1;
+    ref_rt rt_Bloom_2;
+    ref_rt rt_LUM_64;
+    ref_rt rt_LUM_8;
 
-    ref_rt rt_LUM_pool[CHWCaps::MAX_GPUS * 2]; // 1xfp32,1x1,		exp-result -> scaler
-    ref_texture t_LUM_src; // source
-    ref_texture t_LUM_dest; // destination & usage for current frame
+    ref_rt rt_LUM_pool[CHWCaps::MAX_GPUS * 2];
+    ref_texture t_LUM_src;
+    ref_texture t_LUM_dest;
 
-    // smap
-    ref_rt rt_smap_surf; // 32bit,		color
-    ref_rt rt_smap_depth; // 24(32) bit,	depth
+    ref_rt rt_smap_surf;
+    ref_rt rt_smap_depth;
     ref_rt rt_smap_rain;
-    ref_rt rt_smap_depth_minmax; //	is used for min/max sm
+    ref_rt rt_smap_depth_minmax;
 
-    //	Igor: for async screenshots
-    ID3DTexture2D* t_ss_async; // 32bit		(r,g,b,a) is situated in the system memory
+    ID3DTexture2D* t_ss_async;
 
-    // Textures
     ref_texture t_material;
     ref_texture t_noise[TEX_jitter_count];
     ref_texture t_noise_mipped;
 
 private:
-    // OCCq
     ref_shader s_occq;
 
-    // Accum
     ref_shader s_accum_mask;
     ref_shader s_accum_mask_msaa[8];
     ref_shader s_accum_direct;
@@ -108,14 +94,11 @@ private:
     ref_shader s_accum_volume;
     ref_shader s_accum_volume_msaa[8];
 
-    //	generate min/max
     ref_shader s_create_minmax_sm;
 
-    //	DX11 Rain
     ref_shader s_rain;
-    ref_shader s_rain_msaa[8]; // up to 8 shaders for DX10.0 support
+    ref_shader s_rain_msaa[8];
 
-    // Mark MSAA-edge pixels
     ref_shader s_mark_msaa_edges;
 
     ref_geom g_accum_point;
@@ -135,29 +118,25 @@ private:
     VertexStagingBuffer g_accum_volumetric_vb;
     IndexStagingBuffer g_accum_volumetric_ib;
 
-    // SSAO
     ref_rt rt_ssao_temp;
     ref_rt rt_half_depth;
     ref_shader s_ssao;
     ref_shader s_ssao_msaa[8];
-    ref_shader s_hdao_cs;      // HDAO compute shader
+    ref_shader s_hdao_cs;
 
-    // Bloom
     ref_geom g_bloom_build;
     ref_geom g_bloom_filter;
     ref_shader s_bloom_dbg_1;
     ref_shader s_bloom_dbg_2;
     ref_shader s_bloom;
-    ref_shader s_bloom_msaa; // if MSAA is disabled, just an alias of s_bloom
+    ref_shader s_bloom_msaa;
     float f_bloom_factor;
 
-    // Luminance
     ref_shader s_luminance;
     float f_luminance_adapt;
 
-    // Combine
     ref_geom g_combine;
-    ref_geom g_combine_VP; // xy=p,zw=tc
+    ref_geom g_combine_VP;
     ref_geom g_combine_2UV;
     ref_geom g_combine_cuboid;
     ref_geom g_aa_blur;
@@ -171,11 +150,11 @@ private:
 
 public:
     ref_shader s_postprocess;
-    ref_shader s_postprocess_msaa; // if MSAA is disabled, just an alias of s_bloom
+    ref_shader s_postprocess_msaa;
     ref_geom g_postprocess;
     ref_shader s_menu;
     ref_geom g_menu;
-#if 0 // kept for historical reasons
+#if 0
     ref_shader s_flip;
     ref_geom g_flip;
 #endif
@@ -195,12 +174,10 @@ private:
     u32 param_color_gray;
     Fvector param_color_add;
 
-    //	Color mapping
     float param_color_map_influence;
     float param_color_map_interpolate;
     ColorMapManager color_map_manager;
 
-    //	Igor: used for volumetric lights
     bool m_bHasActiveVolumetric;
 
 public:
@@ -215,7 +192,6 @@ public:
     void accum_omnip_geom_destroy();
     void accum_spot_geom_create();
     void accum_spot_geom_destroy();
-    //	Igor: used for volumetric lights
     void accum_volumetric_geom_create();
     void accum_volumetric_geom_destroy();
 
@@ -267,7 +243,6 @@ public:
     void phase_accumulator(CBackend& cmd_list);
     void phase_vol_accumulator(CBackend& cmd_list);
 
-    //	Generates min/max sm
     void create_minmax_SM(CBackend& cmd_list);
 
     void phase_rain(CBackend& cmd_list);
@@ -278,7 +253,7 @@ public:
     bool need_to_render_sunshafts();
     bool use_minmax_sm_this_frame();
 
-    bool enable_scissor(light* L); // true if intersects near plane
+    bool enable_scissor(light* L);
     void enable_dbt_bounds(light* L);
 
     void disable_aniso();
@@ -293,7 +268,6 @@ public:
     void accum_point(CBackend& cmd_list, light* L);
     void accum_spot(CBackend& cmd_list, light* L);
     void accum_reflected(CBackend& cmd_list, light* L);
-    //	Igor: for volumetric lights
     void accum_volumetric(CBackend& cmd_list, light* L);
 
     void phase_bloom();
@@ -301,7 +275,7 @@ public:
     void phase_combine();
     void phase_combine_volumetric();
     void phase_pp();
-#if 0 // kept for historical reasons
+#if 0
     void phase_flip();
 #endif
 
@@ -325,8 +299,6 @@ public:
         color_map_manager.SetTextures(tex0, tex1);
     }
 
-    //	Need to reset stencil only when marker overflows.
-    //	Don't clear when render for the first time
     void reset_light_marker(CBackend& cmd_list, bool bResetStencil = false);
     void increment_light_marker(CBackend& cmd_list);
 
@@ -373,10 +345,10 @@ public:
         dbg_addline(p3, p7, color);
         dbg_addline(p4, p8, color);
     }
-    void dbg_addplane(Fplane& P0, u32 /*c*/) { dbg_planes.emplace_back(P0); }
+    void dbg_addplane(Fplane& P0, u32 ) { dbg_planes.emplace_back(P0); }
 #else
-    void dbg_addline(Fvector& /*P0*/, Fvector& /*P1*/, u32 /*c*/) {}
-    void dbg_addplane(Fplane& /*P0*/, u32 /*c*/) {}
+    void dbg_addline(Fvector& , Fvector& , u32 ) {}
+    void dbg_addplane(Fplane& , u32 ) {}
 #endif
 };
 }

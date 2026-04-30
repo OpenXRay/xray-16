@@ -31,7 +31,6 @@ static void generate_jitter(u32* dest, u32 elem_count)
 
 void CRenderTarget::build_textures()
 {
-    // Texture for async sreenshots
     {
         D3D_TEXTURE2D_DESC desc;
         desc.Width = Device.dwWidth;
@@ -48,12 +47,7 @@ void CRenderTarget::build_textures()
 
         R_CHK(HW.pDevice->CreateTexture2D(&desc, 0, &t_ss_async));
     }
-    // Build material(s)
     {
-        // Surface
-        // Create immutable texture.
-        // So we need to init data _before_ the creation.
-        // Use DXGI_FORMAT_R8G8_UNORM
 
         u16 tempData[TEX_material_LdotN * TEX_material_LdotH * TEX_material_Count];
 
@@ -74,7 +68,6 @@ void CRenderTarget::build_textures()
         subData.SysMemPitch = desc.Width * 2;
         subData.SysMemSlicePitch = desc.Height * subData.SysMemPitch;
 
-        // Fill it (addr: x=dot(L,N),y=dot(L,H))
         for (u32 slice = 0; slice < TEX_material_Count; slice++)
         {
             for (u32 y = 0; y < TEX_material_LdotH; y++)
@@ -91,29 +84,29 @@ void CRenderTarget::build_textures()
                     switch (slice)
                     {
                     case 0:
-                    { // looks like OrenNayar
-                        fd = powf(ld, 0.75f); // 0.75
+                    {
+                        fd = powf(ld, 0.75f);
                         fs = powf(ls, 16.f) * .5f;
                     }
                     break;
                     case 1:
-                    { // looks like Blinn
-                        fd = powf(ld, 0.90f); // 0.90
+                    {
+                        fd = powf(ld, 0.90f);
                         fs = powf(ls, 24.f);
                     }
                     break;
                     case 2:
-                    { // looks like Phong
-                        fd = ld; // 1.0
+                    {
+                        fd = ld;
                         fs = powf(ls * 1.01f, 128.f);
                     }
                     break;
                     case 3:
-                    { // looks like Metal
+                    {
                         float s0 = _abs(1 - _abs(0.05f * _sin(33.f * ld) + ld - ls));
                         float s1 = _abs(1 - _abs(0.05f * _cos(33.f * ld * ls) + ld - ls));
                         float s2 = _abs(1 - _abs(ld - ls));
-                        fd = ld; // 1.0
+                        fd = ld;
                         fs = powf(_max(_max(s0, s1), s2), 24.f);
                         fs *= powf(ld, 1 / 7.f);
                     }
@@ -139,10 +132,7 @@ void CRenderTarget::build_textures()
         _RELEASE(t_material_surf);
     }
 
-    // Build noise table
     {
-        // Surfaces
-        // Use DXGI_FORMAT_R8G8B8A8_SNORM
 
         static const int sampleSize = 4;
         u32 tempData[TEX_jitter_count][TEX_jitter * TEX_jitter];
@@ -155,7 +145,6 @@ void CRenderTarget::build_textures()
         desc.SampleDesc.Count = 1;
         desc.SampleDesc.Quality = 0;
         desc.Format = DXGI_FORMAT_R8G8B8A8_SNORM;
-        // desc.Usage = D3D_USAGE_IMMUTABLE;
         desc.Usage = D3D_USAGE_DEFAULT;
         desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
         desc.CPUAccessFlags = 0;
@@ -169,7 +158,6 @@ void CRenderTarget::build_textures()
             subData[it].SysMemPitch = desc.Width * sampleSize;
         }
 
-        // Fill it,
         for (u32 y = 0; y < TEX_jitter; y++)
         {
             for (u32 x = 0; x < TEX_jitter; x++)
@@ -198,7 +186,6 @@ void CRenderTarget::build_textures()
 
         float tempDataHBAO[TEX_jitter * TEX_jitter * 4];
 
-        // generate HBAO jitter texture (last)
         D3D_TEXTURE2D_DESC descHBAO;
         descHBAO.Width = TEX_jitter;
         descHBAO.Height = TEX_jitter;
@@ -207,7 +194,6 @@ void CRenderTarget::build_textures()
         descHBAO.SampleDesc.Count = 1;
         descHBAO.SampleDesc.Quality = 0;
         descHBAO.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-        // desc.Usage = D3D_USAGE_IMMUTABLE;
         descHBAO.Usage = D3D_USAGE_DEFAULT;
         descHBAO.BindFlags = D3D_BIND_SHADER_RESOURCE;
         descHBAO.CPUAccessFlags = 0;
@@ -217,7 +203,6 @@ void CRenderTarget::build_textures()
         subData[it].pSysMem = tempDataHBAO;
         subData[it].SysMemPitch = descHBAO.Width * sampleSize * sizeof(float);
 
-        // Fill it,
         for (u32 y = 0; y < TEX_jitter; y++)
         {
             for (u32 x = 0; x < TEX_jitter; x++)
@@ -248,23 +233,19 @@ void CRenderTarget::build_textures()
         t_noise[it] = RImplementation.Resources->_CreateTexture(name);
         t_noise[it]->surface_set(t_noise_surf[it]);
 
-        //	Create noise mipped
         {
-            //	Autogen mipmaps
             ID3DTexture2D* t_noise_surf_mipped{};
             DirectX::ScratchImage mippedNoise;
             DirectX::Image img
             {
-                /*.width      =*/ TEX_jitter,
-                /*.height     =*/ TEX_jitter,
-                /*.format     =*/ desc.Format,
-                /*.rowPitch   =*/ desc.Width * sampleSize,
-                /*.slicePitch =*/ 0,
-                /*.pixels     =*/ (uint8_t*)tempData[0],
+TEX_jitter,
+TEX_jitter,
+desc.Format,
+desc.Width * sampleSize,
+0,
+(uint8_t*)tempData[0],
             };
 
-            //	Update texture. Generate mips.
-            // WIC produces bad texture, non-WIC gives 100% identical texture as from D3DX11FilterTexture
             GenerateMipMaps(img, DirectX::TEX_FILTER_POINT | DirectX::TEX_FILTER_FORCE_NON_WIC, 0, mippedNoise);
 
             R_CHK(CreateTexture(HW.pDevice, mippedNoise.GetImages(), mippedNoise.GetImageCount(),

@@ -31,7 +31,6 @@ namespace xray::render::fg
 {
 CRender RImplementation;
 
-xr_vector<xr_string> g_failedShaders;
 
 framegraph::ShaderLoader* CRender::GetShaderLoader() const
 {
@@ -108,7 +107,12 @@ void CRender::RequestGrassInteraction(const Fvector& world_pos, float radius, fl
         m_framegraphRenderer->m_pDetailManager->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
 }
 
-void CRender::clearAllShaderOptions() { m_framegraphRenderer->m_ShaderOptions.clear(); }
+void CRender::clearAllShaderOptions()                       { m_framegraphRenderer->clearAllShaderOptions(); }
+void CRender::addShaderOption(pcstr name, pcstr value)      { m_framegraphRenderer->addShaderOption(name, value); }
+void CRender::level_Load(IReader* fs)                       { m_framegraphRenderer->level_Load(fs); }
+void CRender::level_Unload()                                { m_framegraphRenderer->level_Unload(); }
+HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result)
+                                                            { return m_framegraphRenderer->shader_compile(name, fs, pFunctionName, pTarget, Flags, result); }
 
 u32 CRender::occq_begin(u32& ID) { return m_framegraphRenderer->m_HWOCC.occq_begin(ID); }
 void CRender::occq_end(u32& ID) { m_framegraphRenderer->m_HWOCC.occq_end(ID); }
@@ -116,16 +120,16 @@ R_occlusion::occq_result CRender::occq_get(u32& ID) { return m_framegraphRendere
 
 void CRender::PrintFailedShadersSummary()
 {
-    if (g_failedShaders.empty())
+    if (::xray::render::g_failedShaders.empty())
         return;
 
     Msg("\n");
     Msg("╔══════════════════════════════════════════════════════════════");
     Msg("║ SHADER COMPILATION SUMMARY");
     Msg("╠══════════════════════════════════════════════════════════════");
-    Msg("║ %zu shader(s) failed to compile:", g_failedShaders.size());
+    Msg("║ %zu shader(s) failed to compile:", ::xray::render::g_failedShaders.size());
     Msg("╠══════════════════════════════════════════════════════════════");
-    for (const auto& failedShader : g_failedShaders)
+    for (const auto& failedShader : ::xray::render::g_failedShaders)
     {
         Msg("%s", failedShader.c_str());
     }
@@ -830,217 +834,6 @@ bool CRender::getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::Shader
 }
 
 IRenderVisual* CRender::getVisual(int id) { return BufferPool.getVisual(id); }
-
-u32 CRender::GetVertexStride(u32 vertexFormatID)
-{
-    if (vertexFormatID >= BufferPool.nDC.size())
-        return 0;
-    const VertexDeclarator& decl = BufferPool.nDC[vertexFormatID];
-    return GetDeclVertexSize(decl.begin(), 0);
-}
-
-bool CRender::IsFormatCompatible(u8 d3dFormat, nvrhi::Format nvrhiFormat)
-{
-    return true;
-}
-
-bool CRender::MatchesSemanticName(const VertexElement& elem, const xr_string& semanticName)
-{
-    static const char* semanticNames[] = {
-        "POSITION",
-        "BLENDWEIGHT",
-        "BLENDINDICES",
-        "NORMAL",
-        "PSIZE",
-        "TEXCOORD",
-        "TANGENT",
-        "BINORMAL",
-        "TESSFACTOR",
-        "POSITIONT",
-        "COLOR",
-        "FOG",
-        "DEPTH",
-        "SAMPLE",
-    };
-
-    if (elem.Usage >= sizeof(semanticNames) / sizeof(semanticNames[0]))
-        return false;
-
-    const char* declSemantic = semanticNames[elem.Usage];
-
-    char expected[64];
-    xr_sprintf(expected, "%s%u", declSemantic, elem.UsageIndex);
-
-    return semanticName == expected || semanticName == declSemantic;
-}
-
-bool CRender::IsVertexFormatCompatible(const VertexDeclarator& decl, const framegraph::ExtractedReflection* vsReflection)
-{
-    if (!vsReflection)
-        return false;
-
-    for (const auto& input : vsReflection->vertexInputSignature.elements) {
-        bool found = false;
-
-        for (u32 i = 0; decl[i].Stream != 0xFF; ++i) {
-            if (MatchesSemanticName(decl[i], input.semanticName.c_str())) {
-                if (IsFormatCompatible(decl[i].Type, input.format)) {
-                    found = true;
-                    break;
-                }
-            }
-        }
-
-        if (!found) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void CRender::SetupDepthState(RenderPassType passType, const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc)
-{
-    using RenderPassType = RenderPassType;
-
-    switch (passType) {
-    case RenderPassType::DepthPrepass:
-        psoDesc.renderState.depthStencilState.depthTestEnable = true;
-        psoDesc.renderState.depthStencilState.depthWriteEnable = true;
-        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Less;
-        psoDesc.renderState.depthStencilState.stencilEnable = false;
-        break;
-
-    case RenderPassType::ForwardColor:
-        psoDesc.renderState.depthStencilState.depthTestEnable = true;
-        psoDesc.renderState.depthStencilState.depthWriteEnable = false;
-        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
-        psoDesc.renderState.depthStencilState.stencilEnable = false;
-        break;
-
-    case RenderPassType::HUD:
-        psoDesc.renderState.depthStencilState.depthTestEnable = true;
-        psoDesc.renderState.depthStencilState.depthWriteEnable = true;
-        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-        psoDesc.renderState.depthStencilState.stencilEnable = false;
-        break;
-
-    case RenderPassType::UI:
-        psoDesc.renderState.depthStencilState.depthTestEnable = false;
-        psoDesc.renderState.depthStencilState.depthWriteEnable = false;
-        psoDesc.renderState.depthStencilState.stencilEnable = false;
-        break;
-
-    default:
-        psoDesc.renderState.depthStencilState.depthTestEnable = true;
-        psoDesc.renderState.depthStencilState.depthWriteEnable = true;
-        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Less;
-        psoDesc.renderState.depthStencilState.stencilEnable = false;
-        break;
-    }
-}
-
-void CRender::SetupBlendState(const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc)
-{
-    if (materialInfo.transparent) {
-        psoDesc.renderState.blendState.targets[0].blendEnable = true;
-        psoDesc.renderState.blendState.targets[0].srcBlend = nvrhi::BlendFactor::SrcAlpha;
-        psoDesc.renderState.blendState.targets[0].destBlend = nvrhi::BlendFactor::InvSrcAlpha;
-        psoDesc.renderState.blendState.targets[0].blendOp = nvrhi::BlendOp::Add;
-        psoDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
-        psoDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
-        psoDesc.renderState.blendState.targets[0].blendOpAlpha = nvrhi::BlendOp::Add;
-    } else {
-        psoDesc.renderState.blendState.targets[0].blendEnable = false;
-    }
-
-    psoDesc.renderState.blendState.alphaToCoverageEnable = materialInfo.alphaTest;
-}
-
-bool CRender::CreatePrecompiledPSO(
-    u32 shaderID,
-    u32 vertexFormatID,
-    RenderPassType passType,
-    nvrhi::Format colorFormat,
-    nvrhi::Format depthFormat,
-    MaterialCache* materialCache)
-{
-    auto& compiled = m_framegraphRenderer->m_CompiledLevelShaders[shaderID];
-
-    nvrhi::GraphicsPipelineDesc psoDesc;
-    psoDesc.VS = compiled.vsHandle;
-    psoDesc.PS = compiled.psHandle;
-
-    const VertexDeclarator& decl = BufferPool.nDC[vertexFormatID];
-    u32 vb_stride = GetVertexStride(vertexFormatID);
-
-    xr_vector<nvrhi::VertexAttributeDesc> attributes;
-    for (const auto& input : compiled.vsReflection->vertexInputSignature.elements) {
-        for (u32 i = 0; decl[i].Stream != 0xFF; ++i) {
-            if (MatchesSemanticName(decl[i], input.semanticName.c_str())) {
-                nvrhi::VertexAttributeDesc attr;
-                attr.name = input.semanticName.c_str();
-                attr.format = input.format;
-                attr.offset = decl[i].Offset;
-                attr.bufferIndex = 0;
-                attr.elementStride = vb_stride;
-                attr.isInstanced = false;
-                attributes.push_back(attr);
-                break;
-            }
-        }
-    }
-
-    auto* nvrhiDevice = m_renderDevice->GetNVRHIDevice();
-    if (!nvrhiDevice) {
-        Msg("! NVRHI device not available");
-        return false;
-    }
-
-    if (!attributes.empty()) {
-        psoDesc.inputLayout = nvrhiDevice->createInputLayout(
-            attributes.data(),
-            (uint32_t)attributes.size(),
-            compiled.vsHandle);
-    }
-
-    SetupDepthState(passType, compiled.materialInfo, psoDesc);
-    SetupBlendState(compiled.materialInfo, psoDesc);
-
-    psoDesc.primType = nvrhi::PrimitiveType::TriangleList;
-
-    nvrhi::FramebufferInfoEx fbInfo;
-    if (passType == RenderPassType::ForwardColor) {
-        fbInfo.addColorFormat(colorFormat);
-        fbInfo.setDepthFormat(depthFormat);
-    } else if (passType == RenderPassType::DepthPrepass) {
-        fbInfo.setDepthFormat(depthFormat);
-    }
-
-    nvrhi::GraphicsPipelineHandle pso = nvrhiDevice->createGraphicsPipeline(psoDesc, fbInfo);
-
-    if (!pso) {
-        Msg("! Failed to create PSO for shader %u (%s), format %u, pass %u",
-            shaderID, compiled.shaderName.c_str(), vertexFormatID, (u32)passType);
-        return false;
-    }
-
-    u64 cacheKey = ((u64)vertexFormatID << 32) | (u64)passType;
-
-    xray::render::CompiledLevelShader::PrecompiledPSOs::PSOVariant variant;
-    variant.vertexFormatID = vertexFormatID;
-    variant.passType = passType;
-    variant.pso = nullptr;
-    variant.materialPSO = nullptr;
-
-    compiled.precompiledPSOs.variants.push_back(variant);
-    compiled.precompiledPSOs.psoCache[cacheKey] = reinterpret_cast<MaterialPSO*>(pso.Get());
-
-    Msg("* Precompiled PSO for shader %u (%s), format %u, pass %u",
-        shaderID, compiled.shaderName.c_str(), vertexFormatID, (u32)passType);
-
-    return true;
-}
 
 IRender_Light* CRender::light_create() { return Lights.Create(); }
 IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }

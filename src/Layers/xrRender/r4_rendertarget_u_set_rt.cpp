@@ -46,7 +46,6 @@ void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& 
     else
         cmd_list.set_RT(NULL, 2);
     cmd_list.set_ZB(zb);
-    //	RImplementation.rmNormal				();
 }
 
 void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb)
@@ -88,20 +87,16 @@ void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& 
     else
         cmd_list.set_RT(NULL, 1);
     cmd_list.set_ZB(zb);
-    //	RImplementation.rmNormal				();
 }
 
 void CRenderTarget::u_setrt(CBackend& cmd_list, u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
     ID3DDepthStencilView* zb)
 {
-    // VERIFY									(_1);
     dwWidth[cmd_list.context_id] = W;
     dwHeight[cmd_list.context_id] = H;
-    // VERIFY									(_1);
     cmd_list.set_RT(_1, 0);
     cmd_list.set_RT(_2, 1);
     cmd_list.set_RT(_3, 2);
     cmd_list.set_ZB(zb);
-    //	RImplementation.rmNormal				();
 }
 }
