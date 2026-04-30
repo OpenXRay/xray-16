@@ -13,7 +13,7 @@
 #include "Layers/xrRender/PSLibrary.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
-#include "Layers/xrRender_R2/SMAP_Allocator.h"
+#include "Layers/xrRender/SMAP_Allocator.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
@@ -565,4 +565,9 @@ private:
         void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& xform);
 };
 
+}
+
+namespace xray::render::fg
+{
+extern xray::render::FrameGraphRenderer RImplementation;
 }

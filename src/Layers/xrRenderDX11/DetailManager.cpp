@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "DetailManager.h"
 #include "xrCDB/Intersect.hpp"

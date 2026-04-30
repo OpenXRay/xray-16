@@ -25,7 +25,7 @@
   <PropertyGroup Label="UserMacros"/>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;$(xrExternals)nvrhi\thirdparty\Vulkan-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;$(xrExternals)nvrhi\thirdparty\Vulkan-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)'!='Release Master Gold'">$(xrExternals)onnxruntime\include\onnxruntime\core\session;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'!='Release Master Gold'">%(PreprocessorDefinitions);USE_AI_PBR</PreprocessorDefinitions>
@@ -147,10 +147,6 @@
     <ClInclude Include="..\xrRenderDX11\blenders\blender_light_spot.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\blender_luminance.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\blender_ssao.h"/>
-    <ClInclude Include="..\xrRender_R2\r2.h"/>
-    <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h"/>
-    <ClInclude Include="..\xrRender_R2\r2_types.h"/>
-    <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\dx11HDAOCSBlender.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\dx11MinMaxSMBlender.h"/>
     <ClInclude Include="..\xrRenderDX11\R_Backend_LOD.h"/>

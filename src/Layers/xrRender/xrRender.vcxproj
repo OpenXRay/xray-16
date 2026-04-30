@@ -26,7 +26,7 @@
   <PropertyGroup Label="UserMacros"/>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;$(xrExternals)nvrhi\thirdparty\Vulkan-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;$(xrExternals)nvrhi\thirdparty\Vulkan-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)'!='Release Master Gold'">$(xrExternals)onnxruntime\include\onnxruntime\core\session;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;USE_DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'!='Release Master Gold'">%(PreprocessorDefinitions);USE_AI_PBR</PreprocessorDefinitions>

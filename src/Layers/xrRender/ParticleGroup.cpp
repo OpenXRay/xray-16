@@ -11,7 +11,7 @@
 #include "ParticleEffect.h"
 #include "Layers/xrRender/r__buffer_pool.h"
 #include "Layers/xrRender/ModelPool.h"
-#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::fg

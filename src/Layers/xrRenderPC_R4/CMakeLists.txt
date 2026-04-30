@@ -173,7 +173,7 @@ target_include_directories(xrRenderPC_R4
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/src/Layers/xrRender"
-    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2"
+    
     "${CMAKE_SOURCE_DIR}/sdk/include"
     "${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh"
     "${CMAKE_SOURCE_DIR}/sdk/include/nvapi"

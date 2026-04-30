@@ -4,7 +4,7 @@
 #include <backends/imgui_impl_dx11.h>
 #include <d3d11.h>
 
-#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 
 namespace xray::render::fg {

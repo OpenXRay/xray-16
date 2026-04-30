@@ -6,7 +6,7 @@
 #include "Layers/xrRenderDX11/blenders/Blender_BmmD.h"
 #include "Layers/xrRenderDX11/blenders/Blender_Particle.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
-#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::shader_info

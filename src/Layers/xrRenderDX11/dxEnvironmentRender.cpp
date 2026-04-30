@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Layers/xrRender/dxEnvironmentRender.h"
-#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 #include "Layers/xrRenderDX11/Blender.h"

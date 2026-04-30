@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRenderDX11/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
