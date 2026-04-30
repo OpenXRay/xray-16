@@ -663,21 +663,21 @@ void CRender::reset_begin()
     // BUG-ID: 10646
     {
         u32 it = 0;
-        for (it = 0; it < Lights_LastFrame.size(); it++)
+        for (it = 0; it < m_framegraphRenderer->m_Lights_LastFrame.size(); it++)
         {
-            if (0 == Lights_LastFrame[it])
+            if (0 == m_framegraphRenderer->m_Lights_LastFrame[it])
                 continue;
             try
             {
                 for (int id = 0; id < 3; ++id)
-                    Lights_LastFrame[it]->svis[id].resetoccq();
+                    m_framegraphRenderer->m_Lights_LastFrame[it]->svis[id].resetoccq();
             }
             catch (...)
             {
-                Msg("! Failed to flush-OCCq on light [%d] %X", it, *(u32*)(&Lights_LastFrame[it]));
+                Msg("! Failed to flush-OCCq on light [%d] %X", it, *(u32*)(&m_framegraphRenderer->m_Lights_LastFrame[it]));
             }
         }
-        Lights_LastFrame.clear();
+        m_framegraphRenderer->m_Lights_LastFrame.clear();
     }
 
     //AVO: let's reload details while changed details options on vid_restart

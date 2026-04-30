@@ -348,11 +348,6 @@ public:
 
     CRenderTarget* Target; // Render-target
 
-    CLight_Compute_XFORM_and_VIS LR;
-    xr_vector<light*> Lights_LastFrame;
-    SMAP_Allocator LP_smap_pool;
-    light_Package LP_normal;
-    light_Package LP_pending;
 
 
     bool& m_fast_geom_loaded = ::xray::render::fg::BufferPool.fastGeomLoaded;
