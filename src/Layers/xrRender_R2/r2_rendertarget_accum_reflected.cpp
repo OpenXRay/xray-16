@@ -1,11 +1,13 @@
 #include "stdafx.h"
+#include "r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::fg
 {
 void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
 {
     phase_accumulator(cmd_list);
-    RImplementation.Stats.l_visible++;
+    RImplementation.m_framegraphRenderer->m_Stats.l_visible++;
 
     // *** assume accumulator setted up ***
     // *****************************	Mask by stencil		*************************************

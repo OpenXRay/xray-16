@@ -115,7 +115,7 @@ void CRender::render_lights(light_Package& LP)
             {
                 PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHT);
 
-                Stats.s_merged++;
+                m_framegraphRenderer->m_Stats.s_merged++;
                 L_spot_s.push_back(L);
                 Target->phase_smap_spot(dsgraph.cmd_list, L);
                 dsgraph.cmd_list.set_xform_world(Fidentity);
@@ -137,7 +137,7 @@ void CRender::render_lights(light_Package& LP)
             }
             else
             {
-                Stats.s_finalclip++;
+                m_framegraphRenderer->m_Stats.s_finalclip++;
             }
 
             L->svis[batch_id].end(); // NOTE(DX11): occqs are fetched here, this should be done on the imm context only
@@ -150,7 +150,7 @@ void CRender::render_lights(light_Package& LP)
     while (!LP.v_shadowed.empty())
     {
         // if (has_spot_shadowed)
-        Stats.s_used++;
+        m_framegraphRenderer->m_Stats.s_used++;
 
         // generate spot shadowmap
         Target->phase_smap_spot_clear(cmd_list);
