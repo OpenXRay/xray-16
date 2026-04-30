@@ -36,7 +36,6 @@ target_sources(xrNetServer PRIVATE
     NET_Messages.h
     NET_Server.h
     NET_Shared.h
-    guids.cpp
     stdafx.cpp
     stdafx.h
 )

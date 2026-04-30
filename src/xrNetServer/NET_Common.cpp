@@ -82,23 +82,23 @@ void MultipacketSender::SendPacket(const void* packet_data, u32 packet_sz, u32 f
     {
     case NET_GUARANTEEDPACKET_IGNORE:
     {
-        flags &= ~DPNSEND_GUARANTEED;
+        flags &= ~xr_send_GUARANTEED;
     }
         break;
 
     case NET_GUARANTEEDPACKET_SEPARATE:
     {
-        if (flags & DPNSEND_GUARANTEED)
+        if (flags & xr_send_GUARANTEED)
             buf = &_gbuf;
     }
         break;
     }
 
-    u32 old_flags = buf->last_flags & ~DPNSEND_IMMEDIATELLY;
-    u32 new_flags = flags & (~DPNSEND_IMMEDIATELLY);
+    u32 old_flags = buf->last_flags & ~xr_send_IMMEDIATELLY;
+    u32 new_flags = flags & (~xr_send_IMMEDIATELLY);
 
     if ((buf->buffer.B.count + packet_sz + sizeof(u16) >= NET_PacketSizeLimit) || (old_flags != new_flags) ||
-        (flags & DPNSEND_IMMEDIATELLY))
+        (flags & xr_send_IMMEDIATELLY))
     {
         _FlushSendBuffer(timeout, buf);
     }
@@ -107,7 +107,7 @@ void MultipacketSender::SendPacket(const void* packet_data, u32 packet_sz, u32 f
     buf->buffer.w(packet_data, packet_sz);
     buf->last_flags = flags;
 
-    if (flags & DPNSEND_IMMEDIATELLY)
+    if (flags & xr_send_IMMEDIATELLY)
         _FlushSendBuffer(timeout, buf);
 
 #endif
@@ -152,7 +152,7 @@ void MultipacketSender::_FlushSendBuffer(u32 timeout, Buffer* buf)
         // dump/log if needed
 
 #if NET_LOG_PACKETS
-        Msg("# send %smulti-packet %u    flags= %08X", (buf->last_flags & DPNSEND_IMMEDIATELLY) ? "IMMEDIATE " : "",
+        Msg("# send %smulti-packet %u    flags= %08X", (buf->last_flags & xr_send_IMMEDIATELLY) ? "IMMEDIATE " : "",
             buf->buffer.B.count, buf->last_flags);
 #endif // NET_LOG_PACKETS
 

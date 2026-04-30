@@ -25,7 +25,9 @@ void ClSteamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCa
 void steam_net_update_client(void* P)
 {
 	Msg("- [SteamNetClient] Thread for steam network client is started");
+#if defined(XR_PLATFORM_WINDOWS)
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+#endif
 	SteamNetClient*	C = (SteamNetClient*)P;
 	C->Update();
 }

@@ -45,9 +45,6 @@
     <Warning Text="[xrNetServer] $(xrCMakeBuildDir) has not been configured. Run ./cmake-initial-configure from the repo root so GameNetworkingSockets + protobuf can be built before xr_3da.exe links." />
   </Target>
   <ItemGroup>
-    <ClCompile Include="guids.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="BaseClient.cpp" />
     <ClCompile Include="BaseServer.cpp" />
     <ClCompile Include="IBannedClient.cpp" />

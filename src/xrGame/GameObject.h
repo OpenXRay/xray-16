@@ -220,7 +220,7 @@ public:
     // Utilities
     // XXX: move out
     static void u_EventGen(NET_Packet& P, u32 type, u32 dest);
-    static void u_EventSend(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/);
+    static void u_EventSend(NET_Packet& P, u32 dwFlags = 0x0008 /*xr_send_GUARANTEED*/);
     // Methods
     virtual void Load(LPCSTR section) override;
     void PostLoad(LPCSTR section) override; //--#SM+#--

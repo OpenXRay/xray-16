@@ -300,7 +300,7 @@ void BaseServer::ClearStatistic()
 bool BaseServer::DisconnectAddress(const ip_address& Address, LPCSTR reason)
 {
     u32 players_count = net_players.ClientsCount();
-    buffer_vector<IClient*>	PlayersToDisconnect(_alloca(players_count * sizeof(IClient*)), players_count);
+    buffer_vector<IClient*>	PlayersToDisconnect(xr_alloca(players_count * sizeof(IClient*)), players_count);
     ToDisconnectFillerFunctor tmp_functor(this, &PlayersToDisconnect, &Address);
     net_players.ForEachClientDo(tmp_functor);
 
