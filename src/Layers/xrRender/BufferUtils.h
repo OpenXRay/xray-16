@@ -19,7 +19,7 @@ inline bool dcl_equal(const VertexElement* a, const VertexElement* b)
 struct SDeclaration;
 
 void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl);
-void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<InputElementDesc>& declOut);
+void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<D3D_INPUT_ELEMENT_DESC>& declOut);
 
 #ifdef USE_OGL
 void SetGLVertexPointer(SDeclaration* decl);

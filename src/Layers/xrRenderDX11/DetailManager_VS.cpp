@@ -14,9 +14,9 @@ const int c_size = 4;
 // Original vertex format for DX9/GL batching
 static VertexElement dwDecl[] =
 {
-    {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
-    {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // uv
-    D3DDECL_END()
+    {0, 0,  VF_FLOAT3, 0, VS_POSITION, 0},
+    {0, 12, VF_SHORT4, 0, VS_TEXCOORD, 0},
+    XR_VERTEX_ELEMENT_END
 };
 
 #pragma pack(push, 1)
@@ -30,9 +30,9 @@ struct vertHW
 // Phase 1, Milestone 1.2: Use same vertex format as per-object geometry (CDetail)
 static VertexElement dwDecl_unified[] =
 {
-    {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos.frac
-    {0, 16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // uv
-    D3DDECL_END()
+    {0, 0,  VF_FLOAT4, 0, VS_POSITION, 0},
+    {0, 16, VF_FLOAT2, 0, VS_TEXCOORD, 0},
+    XR_VERTEX_ELEMENT_END
 };
 
 struct vertHW_unified

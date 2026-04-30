@@ -130,7 +130,7 @@ void CResourceManager::_DeleteCS(const SCS* CS) { DestroyShader(CS); }
 
 //--------------------------------------------------------------------------------------------------------------
 
-SDeclaration* CResourceManager::_CreateDecl(const D3DVERTEXELEMENT9* dcl)
+SDeclaration* CResourceManager::_CreateDecl(const VertexElement* dcl)
 {
     // Search equal code
     for (SDeclaration* D : v_declarations)

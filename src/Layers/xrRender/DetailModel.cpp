@@ -149,11 +149,11 @@ void CDetail::Load(IReader* S)
             Fvector2 uv;       // texture coordinates
         };
 
-        static D3DVERTEXELEMENT9 dwDecl[] =
+        static VertexElement dwDecl[] =
         {
-            { 0, 0,  D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }, // pos.frac
-            { 0, 16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 }, // uv
-            D3DDECL_END()
+            { 0, 0,  VF_FLOAT4, 0, VS_POSITION, 0 },
+            { 0, 16, VF_FLOAT2, 0, VS_TEXCOORD, 0 },
+            XR_VERTEX_ELEMENT_END
         };
 
         xr_vector<vertHW> pV;

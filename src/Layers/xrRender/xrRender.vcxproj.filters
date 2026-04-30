@@ -468,6 +468,9 @@
     <ClInclude Include="BufferUtils.h">
       <Filter>dx9 to dx11 Utils</Filter>
     </ClInclude>
+    <ClInclude Include="VertexLayout.h">
+      <Filter>dx9 to dx11 Utils</Filter>
+    </ClInclude>
     <ClInclude Include="FSkinnedTypes.h">
       <Filter>Models\Visuals</Filter>
     </ClInclude>

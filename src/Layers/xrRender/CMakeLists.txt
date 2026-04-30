@@ -234,6 +234,7 @@ target_sources(xrRender PRIVATE
     r__buffer_pool.cpp
     r__buffer_pool.h
     r__hw_compat.h
+    VertexLayout.h
     r__pixel_calculator.cpp
     r__sector.cpp
     r__sector_detect.cpp

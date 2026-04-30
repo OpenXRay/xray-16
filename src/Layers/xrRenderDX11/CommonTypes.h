@@ -279,6 +279,4 @@ using IndexBufferHandle     = nvrhi::BufferHandle;
 using ConstantBufferHandle  = nvrhi::BufferHandle;
 using HostBufferHandle      = void*;
 
-using VertexElement         = D3DVERTEXELEMENT9;
-using InputElementDesc      = D3D11_INPUT_ELEMENT_DESC;
-} // namespace xray::render::fg
+}

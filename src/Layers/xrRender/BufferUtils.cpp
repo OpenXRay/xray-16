@@ -15,12 +15,57 @@ u32 GetFVFVertexSize(u32 FVF)
 
 u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream)
 {
-    return static_cast<u32>(::FVF::ComputeVertexSize(decl, Stream));
+    return static_cast<u32>(::FVF::ComputeVertexSize(reinterpret_cast<const D3DVERTEXELEMENT9*>(decl), Stream));
 }
 
 u32 GetDeclLength(const VertexElement* decl)
 {
-    return static_cast<u32>(::FVF::GetDeclLength(decl));
+    return static_cast<u32>(::FVF::GetDeclLength(reinterpret_cast<const D3DVERTEXELEMENT9*>(decl)));
+}
+
+nvrhi::Format ToNvrhiFormat(u32 vertexFormat)
+{
+    switch (vertexFormat)
+    {
+    case VF_FLOAT1:    return nvrhi::Format::R32_FLOAT;
+    case VF_FLOAT2:    return nvrhi::Format::RG32_FLOAT;
+    case VF_FLOAT3:    return nvrhi::Format::RGB32_FLOAT;
+    case VF_FLOAT4:    return nvrhi::Format::RGBA32_FLOAT;
+    case VF_COLOR:     return nvrhi::Format::RGBA8_UNORM;
+    case VF_UBYTE4:    return nvrhi::Format::RGBA8_UINT;
+    case VF_SHORT2:    return nvrhi::Format::RG16_SINT;
+    case VF_SHORT4:    return nvrhi::Format::RGBA16_SINT;
+    case VF_UBYTE4N:   return nvrhi::Format::RGBA8_UNORM;
+    case VF_SHORT2N:   return nvrhi::Format::RG16_SNORM;
+    case VF_SHORT4N:   return nvrhi::Format::RGBA16_SNORM;
+    case VF_USHORT2N:  return nvrhi::Format::RG16_UNORM;
+    case VF_USHORT4N:  return nvrhi::Format::RGBA16_UNORM;
+    case VF_FLOAT16_2: return nvrhi::Format::RG16_FLOAT;
+    case VF_FLOAT16_4: return nvrhi::Format::RGBA16_FLOAT;
+    default:           return nvrhi::Format::UNKNOWN;
+    }
+}
+
+const char* ToSemanticName(u32 vertexSemantic)
+{
+    switch (vertexSemantic)
+    {
+    case VS_POSITION:     return "POSITION";
+    case VS_BLENDWEIGHT:  return "BLENDWEIGHT";
+    case VS_BLENDINDICES: return "BLENDINDICES";
+    case VS_NORMAL:       return "NORMAL";
+    case VS_PSIZE:        return "PSIZE";
+    case VS_TEXCOORD:     return "TEXCOORD";
+    case VS_TANGENT:      return "TANGENT";
+    case VS_BINORMAL:     return "BINORMAL";
+    case VS_TESSFACTOR:   return "TESSFACTOR";
+    case VS_POSITIONT:    return "POSITIONT";
+    case VS_COLOR:        return "COLOR";
+    case VS_FOG:          return "FOG";
+    case VS_DEPTH:        return "DEPTH";
+    case VS_SAMPLE:       return "SAMPLE";
+    default:              return "";
+    }
 }
 
 // NVRHI-based buffer creation
@@ -125,82 +170,44 @@ ConstantBufferHandle CreateConstantBuffer(u32 DataSize)
 }
 };
 
-struct VertexFormatPairs
+static DXGI_FORMAT VertexFormatToDxgi(u32 vertexFormat)
 {
-    D3DDECLTYPE m_dx9FMT;
-    DXGI_FORMAT m_dx11FMT;
-};
-
-VertexFormatPairs VertexFormatList[] = {{D3DDECLTYPE_FLOAT1, DXGI_FORMAT_R32_FLOAT},
-    {D3DDECLTYPE_FLOAT2, DXGI_FORMAT_R32G32_FLOAT}, {D3DDECLTYPE_FLOAT3, DXGI_FORMAT_R32G32B32_FLOAT},
-    {D3DDECLTYPE_FLOAT4, DXGI_FORMAT_R32G32B32A32_FLOAT},
-    {D3DDECLTYPE_D3DCOLOR, DXGI_FORMAT_R8G8B8A8_UNORM},
-    {D3DDECLTYPE_UBYTE4, DXGI_FORMAT_R8G8B8A8_UINT},
-    {D3DDECLTYPE_SHORT2, DXGI_FORMAT_R16G16_SINT},
-    {D3DDECLTYPE_SHORT4, DXGI_FORMAT_R16G16B16A16_SINT},
-    {D3DDECLTYPE_UBYTE4N, DXGI_FORMAT_R8G8B8A8_UNORM},
-    {D3DDECLTYPE_SHORT2N, DXGI_FORMAT_R16G16_SNORM}, {D3DDECLTYPE_SHORT4N, DXGI_FORMAT_R16G16B16A16_SNORM},
-    {D3DDECLTYPE_USHORT2N, DXGI_FORMAT_R16G16_UNORM}, {D3DDECLTYPE_USHORT4N, DXGI_FORMAT_R16G16B16A16_UNORM},
-    {D3DDECLTYPE_FLOAT16_2, DXGI_FORMAT_R16G16_FLOAT}, {D3DDECLTYPE_FLOAT16_4, DXGI_FORMAT_R16G16B16A16_FLOAT}};
-
-DXGI_FORMAT ConvertVertexFormat(D3DDECLTYPE dx9FMT)
-{
-    size_t arrayLength = sizeof(VertexFormatList) / sizeof(VertexFormatList[0]);
-    for (size_t i = 0; i < arrayLength; ++i)
+    switch (vertexFormat)
     {
-        if (VertexFormatList[i].m_dx9FMT == dx9FMT)
-            return VertexFormatList[i].m_dx11FMT;
+    case VF_FLOAT1:    return DXGI_FORMAT_R32_FLOAT;
+    case VF_FLOAT2:    return DXGI_FORMAT_R32G32_FLOAT;
+    case VF_FLOAT3:    return DXGI_FORMAT_R32G32B32_FLOAT;
+    case VF_FLOAT4:    return DXGI_FORMAT_R32G32B32A32_FLOAT;
+    case VF_COLOR:     return DXGI_FORMAT_R8G8B8A8_UNORM;
+    case VF_UBYTE4:    return DXGI_FORMAT_R8G8B8A8_UINT;
+    case VF_SHORT2:    return DXGI_FORMAT_R16G16_SINT;
+    case VF_SHORT4:    return DXGI_FORMAT_R16G16B16A16_SINT;
+    case VF_UBYTE4N:   return DXGI_FORMAT_R8G8B8A8_UNORM;
+    case VF_SHORT2N:   return DXGI_FORMAT_R16G16_SNORM;
+    case VF_SHORT4N:   return DXGI_FORMAT_R16G16B16A16_SNORM;
+    case VF_USHORT2N:  return DXGI_FORMAT_R16G16_UNORM;
+    case VF_USHORT4N:  return DXGI_FORMAT_R16G16B16A16_UNORM;
+    case VF_FLOAT16_2: return DXGI_FORMAT_R16G16_FLOAT;
+    case VF_FLOAT16_4: return DXGI_FORMAT_R16G16B16A16_FLOAT;
+    default:
+        VERIFY(!"VertexFormatToDxgi: unsupported format");
+        return DXGI_FORMAT_UNKNOWN;
     }
-
-    VERIFY(!"ConvertVertexFormat didn't find appropriate dx11 vertex format!");
-    return DXGI_FORMAT_UNKNOWN;
 }
 
-struct VertexSemanticPairs
-{
-    D3DDECLUSAGE m_dx9Semantic;
-    LPCSTR m_dx11Semantic;
-};
-
-VertexSemanticPairs VertexSemanticList[] = {
-    {D3DDECLUSAGE_POSITION, "POSITION"},
-    {D3DDECLUSAGE_BLENDWEIGHT, "BLENDWEIGHT"},
-    {D3DDECLUSAGE_BLENDINDICES, "BLENDINDICES"},
-    {D3DDECLUSAGE_NORMAL, "NORMAL"},
-    {D3DDECLUSAGE_PSIZE, "PSIZE"},
-    {D3DDECLUSAGE_TEXCOORD, "TEXCOORD"},
-    {D3DDECLUSAGE_TANGENT, "TANGENT"},
-    {D3DDECLUSAGE_BINORMAL, "BINORMAL"},
-    {D3DDECLUSAGE_POSITIONT, "POSITIONT"},
-    {D3DDECLUSAGE_COLOR, "COLOR"},
-};
-
-LPCSTR ConvertSemantic(D3DDECLUSAGE Semantic)
-{
-    size_t arrayLength = sizeof(VertexSemanticList) / sizeof(VertexSemanticList[0]);
-    for (size_t i = 0; i < arrayLength; ++i)
-    {
-        if (VertexSemanticList[i].m_dx9Semantic == Semantic)
-            return VertexSemanticList[i].m_dx11Semantic;
-    }
-
-    VERIFY(!"ConvertSemantic didn't find appropriate dx11 input semantic!");
-    return 0;
-}
-
-void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vector<D3D_INPUT_ELEMENT_DESC>& declOut)
+void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<D3D_INPUT_ELEMENT_DESC>& declOut)
 {
     s32 iDeclSize = declIn.size() - 1;
     declOut.resize(iDeclSize + 1);
 
     for (s32 i = 0; i < iDeclSize; ++i)
     {
-        const D3DVERTEXELEMENT9& descIn = declIn[i];
+        const VertexElement& descIn = declIn[i];
         D3D_INPUT_ELEMENT_DESC& descOut = declOut[i];
 
-        descOut.SemanticName = ConvertSemantic((D3DDECLUSAGE)descIn.Usage);
+        descOut.SemanticName = ToSemanticName(descIn.Usage);
         descOut.SemanticIndex = descIn.UsageIndex;
-        descOut.Format = ConvertVertexFormat((D3DDECLTYPE)descIn.Type);
+        descOut.Format = VertexFormatToDxgi(descIn.Type);
         descOut.InputSlot = descIn.Stream;
         descOut.AlignedByteOffset = descIn.Offset;
         descOut.InputSlotClass = D3D_INPUT_PER_VERTEX_DATA;
