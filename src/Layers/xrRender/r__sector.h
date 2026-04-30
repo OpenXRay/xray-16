@@ -6,6 +6,7 @@
 #include "xrCore/_fbox2.h"
 
 namespace CDB { class MODEL; }
+class xrXRC;
 
 namespace xray::render::fg
 {
@@ -13,6 +14,7 @@ class CPortal;
 class CSector;
 
 extern ECORE_API CDB::MODEL* g_pRmPortals;
+extern ECORE_API xrXRC g_Sectors_xrc;
 
 struct _scissor : public Fbox2
 {

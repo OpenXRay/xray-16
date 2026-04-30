@@ -1330,10 +1330,7 @@ void CRender::SetPostProcessParams(const SPPInfo& ppi)
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-CRender::CRender()
-    : Sectors_xrc("render")
-{
-}
+CRender::CRender() = default;
 
 CRender::~CRender() {}
 
@@ -1356,6 +1353,6 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     font.OutNext("- culled:     %u", Stats.ic_culled);
     Stats.FrameStart();
     HOM.DumpStatistics(font, alert);
-    Sectors_xrc.DumpStatistics(font, alert);
+    g_Sectors_xrc.DumpStatistics(font, alert);
 }
 } // namespace xray::render::fg

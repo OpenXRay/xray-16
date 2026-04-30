@@ -13,6 +13,7 @@
 namespace xray::render::fg
 {
 CDB::MODEL* g_pRmPortals = nullptr;
+xrXRC g_Sectors_xrc("render");
 
 CPortal::CPortal()
 {
