@@ -18,6 +18,7 @@ namespace xray::render
 namespace fg
 {
 XRRENDER_R4_API RendererModule* GetRendererModule();
+XRRENDER_R4_API RendererModule* GetFrameGraphRendererModule();
 }
 #endif
 } // namespace xray::render

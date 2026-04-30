@@ -24,7 +24,7 @@ XR_EXPORT u32 AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress 
 std::array<RendererModule*, 1> s_render_modules =
 {
 #if defined(XR_PLATFORM_WINDOWS)
-    xray::render::fg::GetRendererModule(),
+    xray::render::fg::GetFrameGraphRendererModule(),
 #else
     nullptr,
 #endif
