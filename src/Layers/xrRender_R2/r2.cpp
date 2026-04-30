@@ -109,6 +109,8 @@ void CRender::RequestGrassInteraction(const Fvector& world_pos, float radius, fl
         m_framegraphRenderer->m_pDetailManager->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
 }
 
+void CRender::clearAllShaderOptions() { m_framegraphRenderer->m_ShaderOptions.clear(); }
+
 u32 CRender::occq_begin(u32& ID) { return m_framegraphRenderer->m_HWOCC.occq_begin(ID); }
 void CRender::occq_end(u32& ID) { m_framegraphRenderer->m_HWOCC.occq_end(ID); }
 R_occlusion::occq_result CRender::occq_get(u32& ID) { return m_framegraphRenderer->m_HWOCC.occq_get(ID); }

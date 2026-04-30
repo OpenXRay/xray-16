@@ -191,6 +191,11 @@ public:
     fg::SMAP_Allocator m_LP_smap_pool;
     fg::CRenderTarget* m_pTarget{ nullptr };
     fg::CPSLibrary m_PSLibrary;
+#if defined(USE_DX11)
+    xr_vector<D3D_SHADER_MACRO> m_ShaderOptions;
+#elif defined(USE_OGL)
+    xr_string m_ShaderOptions;
+#endif
 
 private:
     bool m_enabled = false;

@@ -529,19 +529,10 @@ public:
     ~CRender() override;
 
     void addShaderOption(pcstr name, pcstr value);
-    void clearAllShaderOptions() { m_ShaderOptions.clear(); }
+    void clearAllShaderOptions();
     void PrintFailedShadersSummary();
 
     void RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type = 0) override;
-
-private:
-#if defined(USE_DX11)
-    xr_vector<D3D_SHADER_MACRO> m_ShaderOptions;
-#elif defined(USE_OGL)
-    xr_string m_ShaderOptions;
-#else
-#   error No graphics API selected or enabled!
-#endif
 
 public:
 #if defined(USE_DX11) && RENDER == R_R4

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRenderDX11/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
 #include "Layers/xrRender/Shaders/SlangCompiler.h"
@@ -14,7 +15,7 @@ extern xr_vector<xr_string> g_failedShaders;
 void CRender::addShaderOption(const char* name, const char* value)
 {
     D3D_SHADER_MACRO macro = {name, value};
-    m_ShaderOptions.push_back(macro);
+    m_framegraphRenderer->m_ShaderOptions.push_back(macro);
 }
 
 template <typename T>
@@ -258,7 +259,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     };
 
     // External defines
-    options.add(m_ShaderOptions);
+    options.add(m_framegraphRenderer->m_ShaderOptions);
 
     // Shadow map size
     {
