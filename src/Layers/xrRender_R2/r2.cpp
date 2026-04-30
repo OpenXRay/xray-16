@@ -580,8 +580,7 @@ void CRender::create()
 
     Target = xr_new<CRenderTarget>(); // Main target
 
-    Models = xr_new<CModelPool>();
-    g_pModelPool = Models;
+    g_pModelPool = xr_new<CModelPool>();
     g_pPSLibrary = &PSLibrary;
     PSLibrary.OnCreate();
     HWOCC.occq_create(occq_size);
@@ -631,7 +630,7 @@ void CRender::destroy()
 
     q_sync_point.Destroy();
     HWOCC.occq_destroy();
-    xr_delete(Models);
+    xr_delete(g_pModelPool);
     g_pModelPool = nullptr;
     g_pPSLibrary = nullptr;
     xr_delete(Target);
@@ -678,8 +677,8 @@ void CRender::reset_begin()
         !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
         !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
     {
-        Details->Unload();
-        xr_delete(Details);
+        g_pDetailManager->Unload();
+        xr_delete(g_pDetailManager);
     }
     //-AVO
 
@@ -701,8 +700,8 @@ void CRender::reset_end()
         !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
         !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
     {
-        Details = xr_new<CDetailManager>();
-        Details->Load();
+        g_pDetailManager = xr_new<CDetailManager>();
+        g_pDetailManager->Load();
     }
     //-AVO
 
@@ -728,15 +727,15 @@ void CRender::OnCameraUpdated()
         return;
 
     g_pProcessHOMTask = &HOM.DispatchMTRender();
-    if (Details)
-        Details->DispatchMTCalc();
+    if (g_pDetailManager)
+        g_pDetailManager->DispatchMTCalc();
 }
 
 void CRender::OnFrame()
 {
     ZoneScoped;
 
-    Models->DeleteQueue();
+    g_pModelPool->DeleteQueue();
 
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
@@ -758,14 +757,14 @@ void CRender::MakeContextCurrent(RenderContext context)
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return xr_new<CROS_impl>(); }
 void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
-IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
-IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
-IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate((dxRender_Visual*)V); }
+IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return g_pModelPool->Create(name, data); }
+IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return g_pModelPool->CreateChild(name, data); }
+IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return g_pModelPool->Instance_Duplicate((dxRender_Visual*)V); }
 
 void CRender::model_Delete(IRenderVisual*& V, bool bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
-    Models->Delete(pVisual, bDiscard);
+    g_pModelPool->Delete(pVisual, bDiscard);
     V = nullptr;
 }
 
@@ -791,21 +790,21 @@ IRenderVisual* CRender::model_CreatePE(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
     R_ASSERT3(SE, "Particle effect doesn't exist", name);
-    return Models->CreatePE(SE);
+    return g_pModelPool->CreatePE(SE);
 }
 
 IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
     if (SE)
-        return Models->CreatePE(SE);
+        return g_pModelPool->CreatePE(SE);
 
     PS::CPGDef* SG = PSLibrary.FindPGD(name);
     R_ASSERT3(SG, "Particle effect or group doesn't exist", name);
-    return Models->CreatePG(SG);
+    return g_pModelPool->CreatePG(SG);
 }
-void CRender::models_Prefetch() { Models->Prefetch(); }
-void CRender::models_Clear(bool b_complete) { Models->ClearPool(b_complete); }
+void CRender::models_Prefetch() { g_pModelPool->Prefetch(); }
+void CRender::models_Clear(bool b_complete) { g_pModelPool->ClearPool(b_complete); }
 // D3D12: New shader access using CompiledLevelShader
 CRender::CompiledLevelShader* CRender::getCompiledShader(int id)
 {
@@ -1115,7 +1114,7 @@ void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::
     if (T->suppress_wm)
         return;
     VERIFY2(_valid(P) && _valid(s) && verts && (s > EPS_L), "Invalid static wallmark params");
-    Wallmarks->AddStaticWallmark(T, verts, P, &*S, s);
+    g_pWallmarksEngine->AddStaticWallmark(T, verts, P, &*S, s);
 }
 
 void CRender::add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
@@ -1149,8 +1148,8 @@ void CRender::add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, 
     add_StaticWallmark(pShader->hShader, P, s, T, V);
 }
 
-void CRender::clear_static_wallmarks() { Wallmarks->clear(); }
-void CRender::add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm) { Wallmarks->AddSkeletonWallmark(wm); }
+void CRender::clear_static_wallmarks() { g_pWallmarksEngine->clear(); }
+void CRender::add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm) { g_pWallmarksEngine->AddSkeletonWallmark(wm); }
 
 static float EstimateSplatUVRadius(const decals::MeshPickResult& pickResult, float worldRadius)
 {
@@ -1194,7 +1193,7 @@ static float EstimateSplatUVRadius(const decals::MeshPickResult& pickResult, flo
 void CRender::add_SkeletonWallmark(
     const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size)
 {
-    Wallmarks->AddSkeletonWallmark(xf, obj, sh, start, dir, size);
+    g_pWallmarksEngine->AddSkeletonWallmark(xf, obj, sh, start, dir, size);
 }
 void CRender::add_SkeletonWallmark(
     const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start, const Fvector& dir, float size)

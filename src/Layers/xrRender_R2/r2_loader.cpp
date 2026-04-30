@@ -115,8 +115,8 @@ void CRender::level_Load(IReader* fs)
     }
 
     // Components
-    Wallmarks = xr_new<CWallmarksEngine>();
-    Details = xr_new<CDetailManager>();
+    g_pWallmarksEngine = xr_new<CWallmarksEngine>();
+    g_pDetailManager = xr_new<CDetailManager>();
 
     if (!GEnv.isDedicatedServer)
     {
@@ -345,7 +345,7 @@ void CRender::level_Unload()
     HOM.Unload();
 
     //*** Details
-    Details->Unload();
+    g_pDetailManager->Unload();
 
     //*** Sectors
     // 1.
@@ -404,15 +404,15 @@ void CRender::level_Unload()
     m_fast_geom_loaded = false;
 
     //*** Components
-    xr_delete(Details);
-    xr_delete(Wallmarks);
+    xr_delete(g_pDetailManager);
+    xr_delete(g_pWallmarksEngine);
 
     //*** Shaders
     CompiledLevelShaders.clear();  // D3D12: Clear compiled NVRHI shaders
     b_loaded = FALSE;
     if (ps_r__clear_models_on_unload)
     {
-        Models->ClearPool(true);
+        g_pModelPool->ClearPool(true);
         Visuals.clear();
         Resources->Dump(false);
         //static int unload_counter = 0;
@@ -536,7 +536,7 @@ void CRender::LoadVisuals(IReader* fs)
         ogf_header H;
         chunk->r_chunk_safe(OGF_HEADER, &H, sizeof(H));
 
-        dxRender_Visual* visual = Models->Instance_Create(H.type);
+        dxRender_Visual* visual = g_pModelPool->Instance_Create(H.type);
         visual->Load(nullptr, chunk, 0);
         Visuals.push_back(visual);
 

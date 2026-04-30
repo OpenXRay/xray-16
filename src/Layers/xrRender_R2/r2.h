@@ -378,9 +378,6 @@ public:
     xr_vector<dxRender_Visual*>&    Visuals = ::xray::render::fg::BufferPool.Visuals;
     CPSLibrary PSLibrary;
 
-    CDetailManager* Details;
-    CModelPool* Models;
-    CWallmarksEngine* Wallmarks;
 
     CRenderTarget* Target; // Render-target
 
@@ -548,7 +545,7 @@ public:
     IRenderVisual* model_Duplicate(IRenderVisual* V) override;
     void model_Delete(IRenderVisual*& V, bool bDiscard) override;
     void model_Delete(IRender_DetailModel*& F);
-    void model_Logging(bool bEnable) override { Models->Logging(bEnable); }
+    void model_Logging(bool bEnable) override { g_pModelPool->Logging(bEnable); }
     void models_Prefetch() override;
     void models_Clear(bool b_complete) override;
 
@@ -593,8 +590,8 @@ public:
     // Phase 3: A-Life grass interaction wrapper (thread-safe)
     void RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type = 0) override
     {
-        if (Details)
-            Details->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
+        if (g_pDetailManager)
+            g_pDetailManager->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
     }
 
 private:
