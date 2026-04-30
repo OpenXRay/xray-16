@@ -427,77 +427,6 @@ public:
     virtual void Execute(LPCSTR ) { RImplementation.Models->dump(); }
 };
 
-#if RENDER == R_R4
-class CCC_NVRHITest : public IConsole_Command
-{
-public:
-    CCC_NVRHITest(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR )
-    {
-#if defined(USE_DX11)
-        auto& render = static_cast<CRender&>(RImplementation);
-
-        if (!render.m_nvrhiDevice)
-        {
-            Msg("~ [NVRHI] Initializing on-demand...");
-            render.m_nvrhiDevice = xr_new<xray::render::fg::nvrhi_wrapper::NVRHIDevice>();
-
-            bool nvrhiSuccess = render.m_nvrhiDevice->Initialize(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID));
-
-            if (!nvrhiSuccess)
-            {
-                Msg("! [NVRHI] Initialization failed");
-                xr_delete(render.m_nvrhiDevice);
-                render.m_nvrhiDevice = nullptr;
-                return;
-            }
-        }
-
-        render.m_nvrhiTestMode = !render.m_nvrhiTestMode;
-
-        if (render.m_nvrhiTestMode)
-        {
-            Msg("~ [NVRHI] Test mode ENABLED - will render blue screen");
-        }
-        else
-        {
-            Msg("~ [NVRHI] Test mode DISABLED - normal rendering");
-        }
-#endif
-    }
-};
-
-class CCC_RenderContextTest : public IConsole_Command
-{
-public:
-    CCC_RenderContextTest(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR )
-    {
-#if defined(USE_DX11)
-        auto& render = static_cast<CRender&>(RImplementation);
-
-        if (!render.m_nvrhiDevice || !render.m_nvrhiDevice->IsInitialized())
-        {
-            Msg("! [RenderContext] NVRHI not initialized - run r4_nvrhi_test first");
-            return;
-        }
-
-        render.m_renderContextTestMode = !render.m_renderContextTestMode;
-
-        if (render.m_renderContextTestMode)
-        {
-            Msg("~ [RenderContext] Test mode ENABLED - will render colored triangle");
-        }
-        else
-        {
-            Msg("~ [RenderContext] Test mode DISABLED - normal rendering");
-        }
-#endif
-    }
-};
-
-#endif
-
 class CCC_SSAO_Mode : public CCC_Token
 {
 public:
@@ -1141,8 +1070,6 @@ void xrRender_initconsole()
 #endif
 
 #if RENDER == R_R4
-    CMD1(CCC_NVRHITest, "r4_nvrhi_test");
-    CMD1(CCC_RenderContextTest, "r4_rendercontext_test");
     CMD4(CCC_Integer, "r4_use_pbr", &ps_r4_use_pbr, 0, 1);
     CMD4(CCC_Integer, "fg_pbr_diffuse_mode", &ps_fg_pbr_diffuse_mode, 0, 1);
     CMD4(CCC_Integer, "r4_debug_gpu_culling", &ps_r4_debug_gpu_culling, 0, 1);
