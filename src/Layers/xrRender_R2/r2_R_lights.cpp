@@ -26,7 +26,7 @@ void CRender::render_lights(light_Package& LP)
             }
             else
             {
-                LR.compute_xf_spot(L);
+                m_framegraphRenderer->m_LR.compute_xf_spot(L);
             }
         }
     }
@@ -40,7 +40,7 @@ void CRender::render_lights(light_Package& LP)
 
         for (u16 smap_ID = 0; refactored.size() != total; ++smap_ID)
         {
-            LP_smap_pool.initialize(RImplementation.o.smapsize);
+            m_framegraphRenderer->m_LP_smap_pool.initialize(RImplementation.o.smapsize);
             std::sort(source.begin(), source.end(), [](light* l1, light* l2)
             {
                 const u32 a0 = l1->X.S.size;
@@ -51,7 +51,7 @@ void CRender::render_lights(light_Package& LP)
             {
                 light* L = source[test];
                 SMAP_Rect R{};
-                if (LP_smap_pool.push(R, L->X.S.size))
+                if (m_framegraphRenderer->m_LP_smap_pool.push(R, L->X.S.size))
                 {
                     // OK
                     L->X.S.posX = R.min.x;
@@ -174,7 +174,7 @@ void CRender::render_lights(light_Package& LP)
             }
 
             source.pop_back();
-            Lights_LastFrame.push_back(L);
+            m_framegraphRenderer->m_Lights_LastFrame.push_back(L);
 
             task_data_t data{};
             data.batch_id = batch_id;
@@ -245,7 +245,7 @@ void CRender::render_lights(light_Package& LP)
             L2->vis_update();
             if (L2->vis.visible)
             {
-                LR.compute_xf_spot(L2);
+                m_framegraphRenderer->m_LR.compute_xf_spot(L2);
                 Target->accum_spot(cmd_list, L2);
                 render_indirect(L2);
             }
@@ -299,7 +299,7 @@ void CRender::render_lights(light_Package& LP)
             p_light->vis_update();
             if (p_light->vis.visible)
             {
-                LR.compute_xf_spot(p_light);
+                m_framegraphRenderer->m_LR.compute_xf_spot(p_light);
                 render_indirect(p_light);
                 Target->accum_spot(cmd_list, p_light);
             }

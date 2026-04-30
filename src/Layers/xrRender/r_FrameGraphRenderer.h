@@ -5,6 +5,8 @@
 #include "xrCDB/xrXRC.h"
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/r__occlusion.h"
+#include "Layers/xrRender/Light_Render_Direct.h"
+#include "Layers/xrRender_R2/SMAP_Allocator.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
@@ -23,6 +25,7 @@ namespace xray::render::fg {
     class RTAccelStructManager;
     class CDetailManager;
     class CWallmarksEngine;
+    class light;
     namespace PS {
         class CParticleEffect;
     }
@@ -163,6 +166,9 @@ public:
     fg::CHOM m_HOM;
     fg::R_occlusion m_HWOCC;
     Statistics m_Stats;
+    fg::CLight_Compute_XFORM_and_VIS m_LR;
+    xr_vector<fg::light*> m_Lights_LastFrame;
+    fg::SMAP_Allocator m_LP_smap_pool;
 
 private:
     bool m_enabled = false;
