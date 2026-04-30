@@ -68,7 +68,7 @@ void CRender::level_Load(IReader* fs)
         {
             LoadBuffers(geom, true);
             FS.r_close(geom);
-            m_fast_geom_loaded = true;
+            BufferPool.fastGeomLoaded = true;
         }
     }
 
@@ -120,7 +120,7 @@ void CRender::level_Load(IReader* fs)
 
     if (!GEnv.isDedicatedServer)
     {
-        // Visuals
+        // BufferPool.Visuals
         g_pGamePersistent->LoadTitle("st_loading_spatial_db");
         chunk = fs->open_chunk(fsL_VISUALS);
         LoadVisuals(chunk);
@@ -284,8 +284,8 @@ void CRender::PrecompileLevelPSOs()
         //  FIND COMPATIBLE VERTEX FORMATS
         // ═══════════════════════════════════════════════════
         xr_vector<u32> compatibleFormats;
-        for (u32 dcl_id = 0; dcl_id < nDC.size(); ++dcl_id) {
-            if (IsVertexFormatCompatible(nDC[dcl_id], compiled.vsReflection.get())) {
+        for (u32 dcl_id = 0; dcl_id < BufferPool.nDC.size(); ++dcl_id) {
+            if (IsVertexFormatCompatible(BufferPool.nDC[dcl_id], compiled.vsReflection.get())) {
                 compatibleFormats.push_back(dcl_id);
             }
         }
@@ -329,7 +329,7 @@ void CRender::PrecompileLevelPSOs()
     }
 
     Msg("* Precompiled %u PSOs for %u shaders across %u vertex formats",
-        totalPSOs, CompiledLevelShaders.size(), nDC.size());
+        totalPSOs, CompiledLevelShaders.size(), BufferPool.nDC.size());
 }
 
 void CRender::level_Unload()
@@ -360,48 +360,48 @@ void CRender::level_Unload()
     // Glows.Unload			();
     Lights.Unload();
 
-    //*** Visuals
-    for (dxRender_Visual* visual : Visuals)
+    //*** BufferPool.Visuals
+    for (dxRender_Visual* visual : BufferPool.Visuals)
     {
         visual->Release();
         xr_delete(visual);
     }
-    Visuals.clear();
+    BufferPool.Visuals.clear();
 
     //*** SWI
-    for (auto& swi : SWIs)
+    for (auto& swi : BufferPool.SWIs)
         xr_free(swi.sw);
-    SWIs.clear();
+    BufferPool.SWIs.clear();
 
     //*** VB/IB
-    for (auto& indexBuffer : nVB)
+    for (auto& indexBuffer : BufferPool.nVB)
     {
         indexBuffer.Release();
     }
-    nVB.clear();
+    BufferPool.nVB.clear();
 
-    for (auto& vertexBuffer : xVB)
+    for (auto& vertexBuffer : BufferPool.xVB)
     {
         vertexBuffer.Release();
     }
-    xVB.clear();
+    BufferPool.xVB.clear();
 
-    for (auto& indexBuffer : nIB)
+    for (auto& indexBuffer : BufferPool.nIB)
     {
         indexBuffer.Release();
     }
-    nIB.clear();
+    BufferPool.nIB.clear();
 
-    for (auto& vertexBuffer : xIB)
+    for (auto& vertexBuffer : BufferPool.xIB)
     {
         vertexBuffer.Release();
     }
-    xIB.clear();
+    BufferPool.xIB.clear();
 
-    nDC.clear();
-    xDC.clear();
+    BufferPool.nDC.clear();
+    BufferPool.xDC.clear();
 
-    m_fast_geom_loaded = false;
+    BufferPool.fastGeomLoaded = false;
 
     //*** Components
     xr_delete(m_framegraphRenderer->m_pDetailManager);
@@ -413,7 +413,7 @@ void CRender::level_Unload()
     if (ps_r__clear_models_on_unload)
     {
         g_pModelPool->ClearPool(true);
-        Visuals.clear();
+        BufferPool.Visuals.clear();
         Resources->Dump(false);
         //static int unload_counter = 0;
         //Msg("The Level Unloaded.======================== %d", ++unload_counter);
@@ -436,8 +436,8 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
     // Vertex buffers
     {
         ZoneScopedN("Load VBs");
-        xr_vector<VertexDeclarator>& decls = alternative ? xDC : nDC;
-        xr_vector<VertexStagingBuffer>& vbuffers = alternative ? xVB : nVB;
+        xr_vector<VertexDeclarator>& decls = alternative ? BufferPool.xDC : BufferPool.nDC;
+        xr_vector<VertexStagingBuffer>& vbuffers = alternative ? BufferPool.xVB : BufferPool.nVB;
 
         // Use DX9-style declarators
         CStreamReader* fs = base_fs->open_chunk(fsL_VB);
@@ -490,7 +490,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
     // Index buffers
     {
         ZoneScopedN("Load IBs");
-        xr_vector<IndexStagingBuffer>& ibuffers = alternative ? xIB : nIB;
+        xr_vector<IndexStagingBuffer>& ibuffers = alternative ? BufferPool.xIB : BufferPool.nIB;
 
         CStreamReader* fs = base_fs->open_chunk(fsL_IB);
         const u32 count = fs->r_u32();
@@ -538,7 +538,7 @@ void CRender::LoadVisuals(IReader* fs)
 
         dxRender_Visual* visual = g_pModelPool->Instance_Create(H.type);
         visual->Load(nullptr, chunk, 0);
-        Visuals.push_back(visual);
+        BufferPool.Visuals.push_back(visual);
 
         chunk->close();
         index++;
@@ -702,15 +702,15 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
         CStreamReader* fs = base_fs->open_chunk(fsL_SWIS);
         u32 item_count = fs->r_u32();
 
-        for (auto& SWI : SWIs)
+        for (auto& SWI : BufferPool.SWIs)
             xr_free(SWI.sw);
 
-        SWIs.clear();
+        BufferPool.SWIs.clear();
 
-        SWIs.resize(item_count);
+        BufferPool.SWIs.resize(item_count);
         for (u32 c = 0; c < item_count; c++)
         {
-            FSlideWindowItem& swi = SWIs[c];
+            FSlideWindowItem& swi = BufferPool.SWIs[c];
             swi.reserved[0] = fs->r_u32();
             swi.reserved[1] = fs->r_u32();
             swi.reserved[2] = fs->r_u32();
