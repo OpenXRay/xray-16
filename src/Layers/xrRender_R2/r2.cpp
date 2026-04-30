@@ -715,30 +715,8 @@ void CRender::reset_end()
     m_framegraphRenderer->m_bFirstFrameAfterReset = true;
 }
 
-void CRender::OnCameraUpdated()
-{
-    ZoneScoped;
-
-    // Frustum
-    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-
-    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
-        return;
-
-    m_framegraphRenderer->m_pProcessHOMTask = &m_framegraphRenderer->m_HOM.DispatchMTRender();
-    if (m_framegraphRenderer->m_pDetailManager)
-        m_framegraphRenderer->m_pDetailManager->DispatchMTCalc();
-}
-
-void CRender::OnFrame()
-{
-    ZoneScoped;
-
-    g_pModelPool->DeleteQueue();
-
-    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
-        return;
-}
+void CRender::OnCameraUpdated() { m_framegraphRenderer->OnCameraUpdated(); }
+void CRender::OnFrame()         { m_framegraphRenderer->OnFrame(); }
 
 #ifdef USE_OGL
 IRender::RenderContext CRender::GetCurrentContext() const
@@ -754,18 +732,12 @@ void CRender::MakeContextCurrent(RenderContext context)
 #endif
 
 // Implementation
-IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return xr_new<CROS_impl>(); }
-void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
-IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return g_pModelPool->Create(name, data); }
-IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return g_pModelPool->CreateChild(name, data); }
-IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return g_pModelPool->Instance_Duplicate((dxRender_Visual*)V); }
-
-void CRender::model_Delete(IRenderVisual*& V, bool bDiscard)
-{
-    dxRender_Visual* pVisual = (dxRender_Visual*)V;
-    g_pModelPool->Delete(pVisual, bDiscard);
-    V = nullptr;
-}
+IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent)              { return m_framegraphRenderer->ros_create(parent); }
+void                    CRender::ros_destroy(IRender_ObjectSpecific*& p)      { m_framegraphRenderer->ros_destroy(p); }
+IRenderVisual*          CRender::model_Create(LPCSTR name, IReader* data)     { return m_framegraphRenderer->model_Create(name, data); }
+IRenderVisual*          CRender::model_CreateChild(LPCSTR name, IReader* data){ return m_framegraphRenderer->model_CreateChild(name, data); }
+IRenderVisual*          CRender::model_Duplicate(IRenderVisual* V)            { return m_framegraphRenderer->model_Duplicate(V); }
+void                    CRender::model_Delete(IRenderVisual*& V, bool bDiscard){ m_framegraphRenderer->model_Delete(V, bDiscard); }
 
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 {
@@ -792,91 +764,33 @@ IRenderVisual* CRender::model_CreatePE(LPCSTR name)
     return g_pModelPool->CreatePE(SE);
 }
 
-IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
-{
-    PS::CPEDef* SE = m_framegraphRenderer->m_PSLibrary.FindPED(name);
-    if (SE)
-        return g_pModelPool->CreatePE(SE);
+IRenderVisual* CRender::model_CreateParticles(LPCSTR name)                    { return m_framegraphRenderer->model_CreateParticles(name); }
+void           CRender::models_Prefetch()                                     { m_framegraphRenderer->models_Prefetch(); }
+void           CRender::models_Clear(bool b_complete)                         { m_framegraphRenderer->models_Clear(b_complete); }
 
-    PS::CPGDef* SG = m_framegraphRenderer->m_PSLibrary.FindPGD(name);
-    R_ASSERT3(SG, "Particle effect or group doesn't exist", name);
-    return g_pModelPool->CreatePG(SG);
-}
-void CRender::models_Prefetch() { g_pModelPool->Prefetch(); }
-void CRender::models_Clear(bool b_complete) { g_pModelPool->ClearPool(b_complete); }
-
-void CRender::Render()
-{
-    if (m_framegraphRenderer)
-        m_framegraphRenderer->Render();
-}
-void CRender::RenderMenu()
-{
-    if (m_framegraphRenderer)
-        m_framegraphRenderer->RenderMenu();
-}
-void CRender::Calculate() {}
-void CRender::BeforeWorldRender() {}
-void CRender::AfterWorldRender() {}
-// D3D12: New shader access using CompiledLevelShader
-xray::render::CompiledLevelShader* CRender::getCompiledShader(int id)
-{
-    if (id < 0 || id >= int(m_framegraphRenderer->m_CompiledLevelShaders.size()))
-        return nullptr;
-    return &m_framegraphRenderer->m_CompiledLevelShaders[id];
-}
-
+void CRender::Render()                                                        { if (m_framegraphRenderer) m_framegraphRenderer->Render(); }
+void CRender::RenderMenu()                                                    { if (m_framegraphRenderer) m_framegraphRenderer->RenderMenu(); }
+void CRender::Calculate()                                                     {}
+void CRender::BeforeWorldRender()                                             {}
+void CRender::AfterWorldRender()                                              {}
+xray::render::CompiledLevelShader* CRender::getCompiledShader(int id)         { return m_framegraphRenderer->getCompiledShader(id); }
 bool CRender::getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::ShaderHandle& outPS)
-{
-    auto* compiled = getCompiledShader(id);
-    if (!compiled || !compiled->vsHandle || !compiled->psHandle)
-        return false;
-
-    outVS = compiled->vsHandle;
-    outPS = compiled->psHandle;
-    return true;
-}
+                                                                              { return m_framegraphRenderer->getShaderHandles(id, outVS, outPS); }
 
 // Legacy D3D11 functions - removed for D3D12
 // ref_shader CRender::getShader(int id) - REMOVED
 // bool CRender::getShaderNames(...) - REMOVED
 IRenderVisual* CRender::getVisual(int id) { return BufferPool.getVisual(id); }
 
-IRender_Light* CRender::light_create() { return Lights.Create(); }
-IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
-bool CRender::occ_visible(vis_data& P) { return m_framegraphRenderer->m_HOM.visible(P); }
-bool CRender::occ_visible(sPoly& P) { return m_framegraphRenderer->m_HOM.visible(P); }
-bool CRender::occ_visible(Fbox& P) { return m_framegraphRenderer->m_HOM.visible(P); }
-void CRender::add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m)
-{
-#if defined(USE_DX11) && RENDER == R_R4
-    // ═══════════════════════════════════════════════════════
-    //  FRAMEGRAPH INTEGRATION
-    // ═══════════════════════════════════════════════════════
-    // When FrameGraph is active, route geometry collection through FrameGraph renderer
-    // This allows game objects to add their visuals via renderable_Render() callbacks
-    // without going through legacy dsgraph
-    //
-    // This is CRITICAL for rendering:
-    // - NPCs with their weapons/equipment
-    // - Player weapons and attachments
-    // - HUD items
-    // - Dynamic objects with sub-objects
-    // ═══════════════════════════════════════════════════════
-
-    if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled())
-    {
-        m_framegraphRenderer->add_Visual(root, V, m);
-        return;
-    }
-#endif
-}
+IRender_Light* CRender::light_create()                  { return m_framegraphRenderer->light_create(); }
+IRender_Glow*  CRender::glow_create()                   { return m_framegraphRenderer->glow_create(); }
+bool           CRender::occ_visible(vis_data& P)        { return m_framegraphRenderer->occ_visible(P); }
+bool           CRender::occ_visible(sPoly& P)           { return m_framegraphRenderer->occ_visible(P); }
+bool           CRender::occ_visible(Fbox& P)            { return m_framegraphRenderer->occ_visible(P); }
+void           CRender::add_Visual(u32 ctx, IRenderable* root, IRenderVisual* V, Fmatrix& m)
+                                                        { m_framegraphRenderer->add_Visual(ctx, root, V, m); }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
-#if RENDER == R_R4
-    if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled())
-        return;
-#endif
     VERIFY2(T, "Invalid static wallmark triangle");
     if (T->suppress_wm)
         return;
@@ -886,76 +800,16 @@ void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::
 
 void CRender::add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
 {
-#if RENDER == R_R4
-    if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled()) {
-        if (!T || T->suppress_wm || !V || s <= EPS_L)
-            return;
-        auto* fgArray = static_cast<decals::fgWallMarkArray*>(pArray);
-        u32 matID = fgArray->GenerateBindlessMaterialID();
-        if (matID == UINT32_MAX)
-            return;
-        Fvector N;
-        N.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
-        float decalSize = s * 2.0f;
-        m_framegraphRenderer->GetDecalManager()->AddStaticDecal(P, N, decalSize, matID);
-        Msg("[Decal] STATIC pos=(%.1f,%.1f,%.1f) size=%.3f matID=%u count=%u",
-            P.x, P.y, P.z, decalSize, matID, m_framegraphRenderer->GetDecalManager()->GetActiveCount());
-        return;
-    }
-#endif
-    dxWallMarkArray* pWMA = (dxWallMarkArray*)pArray;
-    ref_shader* pShader = pWMA->dxGenerateWallmark();
-    if (pShader)
-        add_StaticWallmark(*pShader, P, s, T, V);
+    m_framegraphRenderer->add_StaticWallmark(pArray, P, s, T, V);
 }
 
 void CRender::add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
 {
-    dxUIShader* pShader = (dxUIShader*)&*S;
-    add_StaticWallmark(pShader->hShader, P, s, T, V);
+    m_framegraphRenderer->add_StaticWallmark(S, P, s, T, V);
 }
 
-void CRender::clear_static_wallmarks() { m_framegraphRenderer->m_pWallmarksEngine->clear(); }
+void CRender::clear_static_wallmarks() { m_framegraphRenderer->clear_static_wallmarks(); }
 void CRender::add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm) { m_framegraphRenderer->m_pWallmarksEngine->AddSkeletonWallmark(wm); }
-
-static float EstimateSplatUVRadius(const decals::MeshPickResult& pickResult, float worldRadius)
-{
-    const float du1 = pickResult.triUV[1].x - pickResult.triUV[0].x;
-    const float dv1 = pickResult.triUV[1].y - pickResult.triUV[0].y;
-    const float du2 = pickResult.triUV[2].x - pickResult.triUV[0].x;
-    const float dv2 = pickResult.triUV[2].y - pickResult.triUV[0].y;
-
-    const float det = du1 * dv2 - dv1 * du2;
-    if (_abs(det) > EPS_S)
-    {
-        const float invDet = 1.f / det;
-
-        Fvector dpdu;
-        dpdu.set(
-            (pickResult.triWorldEdge1.x * dv2 - pickResult.triWorldEdge2.x * dv1) * invDet,
-            (pickResult.triWorldEdge1.y * dv2 - pickResult.triWorldEdge2.y * dv1) * invDet,
-            (pickResult.triWorldEdge1.z * dv2 - pickResult.triWorldEdge2.z * dv1) * invDet);
-
-        Fvector dpdv;
-        dpdv.set(
-            (pickResult.triWorldEdge2.x * du1 - pickResult.triWorldEdge1.x * du2) * invDet,
-            (pickResult.triWorldEdge2.y * du1 - pickResult.triWorldEdge1.y * du2) * invDet,
-            (pickResult.triWorldEdge2.z * du1 - pickResult.triWorldEdge1.z * du2) * invDet);
-
-        const float worldPerUV = 0.5f * (dpdu.magnitude() + dpdv.magnitude());
-        if (worldPerUV > EPS_S)
-            return _max(worldRadius / worldPerUV, 1e-4f);
-    }
-
-    const float worldEdge = _max(pickResult.triWorldEdge1.magnitude(), pickResult.triWorldEdge2.magnitude());
-    const float uvEdge1 = _sqrt(_sqr(du1) + _sqr(dv1));
-    const float uvEdge2 = _sqrt(_sqr(du2) + _sqr(dv2));
-    const float uvEdge = _max(uvEdge1, uvEdge2);
-    if (worldEdge > EPS_S && uvEdge > EPS_S)
-        return _max(worldRadius * (uvEdge / worldEdge), 1e-4f);
-
-    return 0.02f;
-}
 
 void CRender::add_SkeletonWallmark(
     const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size)
@@ -965,133 +819,13 @@ void CRender::add_SkeletonWallmark(
 void CRender::add_SkeletonWallmark(
     const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start, const Fvector& dir, float size)
 {
-#if RENDER == R_R4
-    if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled()) {
-        if (!xf || !obj || size <= EPS_L) {
-            Msg("[Splat] SKIP: bad params xf=%p obj=%p size=%.3f", xf, obj, size);
-            return;
-        }
-        float distSq = xf->c.distance_to_sqr(Device.vCameraPosition);
-        if (distSq > _sqr(50.f)) {
-            Msg("[Splat] SKIP: too far dist=%.1f", _sqrt(distSq));
-            return;
-        }
-        const u32 splatMode = ps_r4_skeleton_wallmark_mode > 0
-            ? decals::SPLAT_MODE_PROCEDURAL_BLOOD
-            : decals::SPLAT_MODE_DECAL;
-
-        shared_str wallmarkTexture;
-        u32 matID = UINT32_MAX;
-        if (splatMode == decals::SPLAT_MODE_DECAL)
-        {
-            if (!pArray) {
-                Msg("[Splat] SKIP: missing wallmark array for decal mode");
-                return;
-            }
-
-            auto* fgArray = static_cast<decals::fgWallMarkArray*>(pArray);
-            matID = fgArray->GenerateBindlessMaterialID(&wallmarkTexture);
-            if (matID == UINT32_MAX) {
-                Msg("[Splat] SKIP: matID invalid");
-                return;
-            }
-        }
-        float decalSize = size * 2.0f;
-        decals::MeshPickResult entryPick;
-        Msg("[Splat] Picking obj=%p dir=(%.2f,%.2f,%.2f)", obj, dir.x, dir.y, dir.z);
-        if (decals::PickMeshDirect((CKinematics*)obj, *xf, start, dir, 100.f, entryPick)) {
-            auto* overlayMgr = m_framegraphRenderer->GetOverlayManager();
-            float worldRadius = decalSize * 0.5f;
-            Fvector bloodColor = { 0.4f, 0.02f, 0.02f };
-            const float lifetime = splatMode == decals::SPLAT_MODE_PROCEDURAL_BLOOD ? 18.f : 12.f;
-
-            auto queueSplat = [&](const decals::MeshPickResult& pick, const char* hitKind)
-            {
-                const float uvRadius = EstimateSplatUVRadius(pick, worldRadius);
-                overlayMgr->AddSplat((CKinematics*)obj, pick.triVerts,
-                                      pick.baryU, pick.baryV,
-                                      worldRadius, bloodColor, 0.8f,
-                                      pick.uv, uvRadius, matID,
-                                      splatMode, lifetime,
-                                      pick.hitTextureName.c_str(),
-                                      wallmarkTexture.c_str());
-                Msg("[Splat] %s: mode=%s r=%.3f uv=(%.3f,%.3f) uvR=%.4f bary=(%.3f,%.3f) obj=%p wm=%s",
-                    hitKind,
-                    splatMode == decals::SPLAT_MODE_PROCEDURAL_BLOOD ? "proc" : "decal",
-                    worldRadius, pick.uv.x, pick.uv.y,
-                    uvRadius, pick.baryU, pick.baryV, obj,
-                    wallmarkTexture.size() ? wallmarkTexture.c_str() : "<none>");
-            };
-
-            queueSplat(entryPick, "ENTRY");
-
-            Fvector shotDir = dir;
-            shotDir.normalize_safe();
-            const float entryAdvance = entryPick.dist + 0.01f;
-            const float remaining = 100.f - entryAdvance;
-            if (remaining > 0.01f)
-            {
-                Fvector exitStart;
-                exitStart.mad(start, shotDir, entryAdvance);
-
-                decals::MeshPickResult exitPick;
-                if (decals::PickMeshDirect((CKinematics*)obj, *xf, exitStart, shotDir, remaining, exitPick))
-                {
-                    const float minSeparation = _max(0.02f, worldRadius * 0.25f);
-                    if (entryPick.worldPos.distance_to(exitPick.worldPos) > minSeparation)
-                        queueSplat(exitPick, "EXIT");
-                }
-            }
-        } else {
-            Msg("[Splat] MISS: no triangle hit for obj=%p", obj);
-        }
-        return;
-    }
-#endif
-    dxWallMarkArray* pWMA = (dxWallMarkArray*)pArray;
-    ref_shader* pShader = pWMA->dxGenerateWallmark();
-    if (pShader)
-        add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
+    m_framegraphRenderer->add_SkeletonWallmark(xf, obj, pArray, start, dir, size);
 }
 
-void CRender::rmNear(CBackend& cmd_list)
-{
-    const D3D_VIEWPORT viewport = { 0, 0, m_framegraphRenderer->m_pTarget->get_width(cmd_list), m_framegraphRenderer->m_pTarget->get_height(cmd_list), 0.f, 0.02f };
-    cmd_list.SetViewport(viewport);
-}
-
-void CRender::rmFar(CBackend& cmd_list)
-{
-    const D3D_VIEWPORT viewport = { 0, 0, m_framegraphRenderer->m_pTarget->get_width(cmd_list), m_framegraphRenderer->m_pTarget->get_height(cmd_list), 0.99999f, 1.f };
-    cmd_list.SetViewport(viewport);
-}
-
-void CRender::rmNormal(CBackend& cmd_list)
-{
-    const D3D_VIEWPORT viewport = { 0, 0, m_framegraphRenderer->m_pTarget->get_width(cmd_list), m_framegraphRenderer->m_pTarget->get_height(cmd_list), 0.f, 1.f };
-    cmd_list.SetViewport(viewport);
-}
-
-void CRender::SetPostProcessParams(const SPPInfo& ppi)
-{
-    m_framegraphRenderer->m_pTarget->set_blur(ppi.blur);
-    m_framegraphRenderer->m_pTarget->set_gray(ppi.gray);
-
-    m_framegraphRenderer->m_pTarget->set_duality_h(ppi.duality.h);
-    m_framegraphRenderer->m_pTarget->set_duality_v(ppi.duality.v);
-
-    m_framegraphRenderer->m_pTarget->set_noise(ppi.noise.intensity);
-    m_framegraphRenderer->m_pTarget->set_noise_scale(ppi.noise.grain);
-    m_framegraphRenderer->m_pTarget->set_noise_fps(ppi.noise.fps);
-
-    m_framegraphRenderer->m_pTarget->set_color_base(ppi.color_base);
-    m_framegraphRenderer->m_pTarget->set_color_gray(ppi.color_gray);
-    m_framegraphRenderer->m_pTarget->set_color_add(ppi.color_add);
-
-    m_framegraphRenderer->m_pTarget->set_cm_imfluence(ppi.cm_influence);
-    m_framegraphRenderer->m_pTarget->set_cm_interpolate(ppi.cm_interpolate);
-    m_framegraphRenderer->m_pTarget->set_cm_textures(ppi.cm_tex1, ppi.cm_tex2);
-}
+void CRender::rmNear(CBackend& cmd_list)              { m_framegraphRenderer->rmNear(cmd_list); }
+void CRender::rmFar(CBackend& cmd_list)               { m_framegraphRenderer->rmFar(cmd_list); }
+void CRender::rmNormal(CBackend& cmd_list)            { m_framegraphRenderer->rmNormal(cmd_list); }
+void CRender::SetPostProcessParams(const SPPInfo& ppi){ m_framegraphRenderer->SetPostProcessParams(ppi); }
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -1102,23 +836,6 @@ CRender::~CRender() {}
 
 void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
-    D3DXRenderBase::DumpStatistics(font, alert);
-    m_framegraphRenderer->m_Stats.FrameEnd();
-    font.OutNext("Lights:");
-    font.OutNext("- total:      %u", m_framegraphRenderer->m_Stats.l_total);
-    font.OutNext("- visible:    %u", m_framegraphRenderer->m_Stats.l_visible);
-    font.OutNext("- shadowed:   %u", m_framegraphRenderer->m_Stats.l_shadowed);
-    font.OutNext("- unshadowed: %u", m_framegraphRenderer->m_Stats.l_unshadowed);
-    font.OutNext("Shadow maps:");
-    font.OutNext("- used:       %d", m_framegraphRenderer->m_Stats.s_used);
-    font.OutNext("- merged:     %d", m_framegraphRenderer->m_Stats.s_merged - m_framegraphRenderer->m_Stats.s_used);
-    font.OutNext("- finalclip:  %d", m_framegraphRenderer->m_Stats.s_finalclip);
-    u32 ict = m_framegraphRenderer->m_Stats.ic_total + m_framegraphRenderer->m_Stats.ic_culled;
-    font.OutNext("ICULL:        %03.1f", 100.f * f32(m_framegraphRenderer->m_Stats.ic_culled) / f32(ict ? ict : 1));
-    font.OutNext("- visible:    %u", m_framegraphRenderer->m_Stats.ic_total);
-    font.OutNext("- culled:     %u", m_framegraphRenderer->m_Stats.ic_culled);
-    m_framegraphRenderer->m_Stats.FrameStart();
-    m_framegraphRenderer->m_HOM.DumpStatistics(font, alert);
-    m_framegraphRenderer->m_Sectors_xrc.DumpStatistics(font, alert);
+    m_framegraphRenderer->DumpStatistics(font, alert);
 }
 } // namespace xray::render::fg

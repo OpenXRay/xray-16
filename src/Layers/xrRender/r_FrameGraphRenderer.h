@@ -127,6 +127,9 @@ public:
     HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result) override;
     void addShaderOption(pcstr name, pcstr value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
+
+    CompiledLevelShader* getCompiledShader(int id);
+    bool getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::ShaderHandle& outPS);
 private:
     using VertexDeclarator = ::xray::render::fg::VertexDeclarator;
     void LoadBuffers(CStreamReader* fs, bool alternative);

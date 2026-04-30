@@ -2746,6 +2746,23 @@ void FrameGraphRenderer::add_SkeletonWallmark(
         m_pWallmarksEngine->AddSkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
 
+CompiledLevelShader* FrameGraphRenderer::getCompiledShader(int id)
+{
+    if (id < 0 || id >= int(m_CompiledLevelShaders.size()))
+        return nullptr;
+    return &m_CompiledLevelShaders[id];
+}
+
+bool FrameGraphRenderer::getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::ShaderHandle& outPS)
+{
+    auto* compiled = getCompiledShader(id);
+    if (!compiled || !compiled->vsHandle || !compiled->psHandle)
+        return false;
+    outVS = compiled->vsHandle;
+    outPS = compiled->psHandle;
+    return true;
+}
+
 void FrameGraphRenderer::Calculate() {}
 
 void FrameGraphRenderer::OnFrame()
