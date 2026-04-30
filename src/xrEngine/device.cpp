@@ -253,7 +253,7 @@ void CRenderDevice::DoRender()
     renderTotalReal.Begin();
     if (b_is_Active && RenderBegin())
     {
-        GEnv.FrameGraphRenderer->Render();
+        GEnv.Render->Render();
 
         CalcFrameStats();
 
@@ -520,8 +520,8 @@ void CRenderDevice::FrameMove()
     stats.EngineTotal.FrameEnd();
 
     // Render stats overlay here (between NewFrame and EndFrame for proper input)
-    if (GEnv.FrameGraphRenderer && g_pGameLevel)
-        GEnv.FrameGraphRenderer->RenderStatsOverlay();
+    if (GEnv.Render && g_pGameLevel)
+        GEnv.Render->RenderStatsOverlay();
 
     ImGui::EndFrame();
 }

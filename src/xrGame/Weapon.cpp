@@ -913,12 +913,12 @@ void CWeapon::UpdateCL()
         m_zoom_params.m_pVision->Update();
 
     // Feed muzzle position to GPU smoke trail system
-    if (GEnv.FrameGraphRenderer && GEnv.FrameGraphRenderer->IsEnabled() && IsGameTypeSingle())
+    if (GEnv.Render && GEnv.Render->IsEnabled() && IsGameTypeSingle())
     {
         CActor* pActor = smart_cast<CActor*>(H_Parent());
         if (pActor && pActor->inventory().ActiveItem() == this)
         {
-            GEnv.FrameGraphRenderer->UpdateSmokeTrail(
+            GEnv.Render->UpdateSmokeTrail(
                 get_LastFP(), get_LastFD(), Device.fTimeDelta, !!GetHUDmode());
         }
     }

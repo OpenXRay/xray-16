@@ -476,9 +476,9 @@ void CMainMenu::OnRender()
         return;
 
     // Use FrameGraph renderer for main menu
-    if (GEnv.FrameGraphRenderer && GEnv.FrameGraphRenderer->IsEnabled())
+    if (GEnv.Render && GEnv.Render->IsEnabled())
     {
-        GEnv.FrameGraphRenderer->RenderMenu();
+        GEnv.Render->RenderMenu();
     }
     else
     {

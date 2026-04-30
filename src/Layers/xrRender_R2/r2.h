@@ -646,6 +646,19 @@ public:
 
     framegraph::ShaderLoader* GetShaderLoader() const override;
 
+    void RenderStatsOverlay() override;
+    void SetEnabled(bool enabled) override;
+    bool IsEnabled() const override;
+    xray::render::fg::RenderDevice* GetRenderDevice() const override;
+    xray::render::fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const override;
+    xray::render::MaterialCache* GetMaterialCache() const override;
+    xray::render::MaterialCache* GetUIMaterialCache() const override;
+    xray::render::ui::UIRenderCollector* GetUICollector() const override;
+    xray::render::ui::NVRHIUIRenderer* GetUIRenderer() const override;
+    xray::render::MaterialCache* GetTextMaterialCache() const override;
+    void UpdateSmokeTrail(const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode) override;
+    void NotifySmokeShot() override;
+
     // Test resources for triangle
     nvrhi::BufferHandle m_testVertexBuffer;
     nvrhi::BufferHandle m_testIndexBuffer;

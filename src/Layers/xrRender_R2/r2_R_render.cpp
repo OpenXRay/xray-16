@@ -1,24 +1,24 @@
-// r2_R_render.cpp
-// Stub implementations - FrameGraph handles all rendering
 #include "stdafx.h"
 #include "r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::fg
 {
 
 void CRender::RenderMenu()
 {
-    // FrameGraph handles menu rendering via UIPass
+    if (m_framegraphRenderer)
+        m_framegraphRenderer->RenderMenu();
 }
 
 void CRender::Render()
 {
-    // FrameGraph handles all rendering via FrameGraphRenderer::Render()
+    if (m_framegraphRenderer)
+        m_framegraphRenderer->Render();
 }
 
 void CRender::render_forward()
 {
-    // FrameGraph handles forward rendering
 }
 
 void CRender::BeforeWorldRender() {}

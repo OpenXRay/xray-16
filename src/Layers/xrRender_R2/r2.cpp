@@ -39,6 +39,70 @@ framegraph::ShaderLoader* CRender::GetShaderLoader() const
     return m_framegraphRenderer ? m_framegraphRenderer->GetShaderLoader() : nullptr;
 }
 
+void CRender::RenderStatsOverlay()
+{
+    if (m_framegraphRenderer)
+        m_framegraphRenderer->RenderStatsOverlay();
+}
+
+void CRender::SetEnabled(bool enabled)
+{
+    if (m_framegraphRenderer)
+        m_framegraphRenderer->SetEnabled(enabled);
+}
+
+bool CRender::IsEnabled() const
+{
+    return m_framegraphRenderer && m_framegraphRenderer->IsEnabled();
+}
+
+xray::render::fg::RenderDevice* CRender::GetRenderDevice() const
+{
+    return m_framegraphRenderer ? m_framegraphRenderer->GetRenderDevice() : nullptr;
+}
+
+xray::render::fg::ImGuiRendererNVRHI* CRender::GetImGuiRendererNVRHI() const
+{
+    return m_framegraphRenderer ? m_framegraphRenderer->GetImGuiRendererNVRHI() : nullptr;
+}
+
+xray::render::MaterialCache* CRender::GetMaterialCache() const
+{
+    return m_framegraphRenderer ? m_framegraphRenderer->GetMaterialCache() : nullptr;
+}
+
+xray::render::MaterialCache* CRender::GetUIMaterialCache() const
+{
+    return m_framegraphRenderer ? m_framegraphRenderer->GetUIMaterialCache() : nullptr;
+}
+
+xray::render::ui::UIRenderCollector* CRender::GetUICollector() const
+{
+    return m_framegraphRenderer ? m_framegraphRenderer->GetUICollector() : nullptr;
+}
+
+xray::render::ui::NVRHIUIRenderer* CRender::GetUIRenderer() const
+{
+    return m_framegraphRenderer ? m_framegraphRenderer->GetUIRenderer() : nullptr;
+}
+
+xray::render::MaterialCache* CRender::GetTextMaterialCache() const
+{
+    return m_framegraphRenderer ? m_framegraphRenderer->GetTextMaterialCache() : nullptr;
+}
+
+void CRender::UpdateSmokeTrail(const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode)
+{
+    if (m_framegraphRenderer)
+        m_framegraphRenderer->UpdateSmokeTrail(muzzlePos, muzzleDir, dt, isHUDMode);
+}
+
+void CRender::NotifySmokeShot()
+{
+    if (m_framegraphRenderer)
+        m_framegraphRenderer->NotifySmokeShot();
+}
+
 void CRender::PrintFailedShadersSummary()
 {
     if (g_failedShaders.empty())
