@@ -37,6 +37,7 @@ class ImGuiRendererNVRHI;
 namespace xray::render
 {
 class FrameGraphRenderer;
+struct CompiledLevelShader;
 struct MaterialPSO;
 }
 
@@ -296,43 +297,6 @@ public:
 
 public:
 
-    // ═══════════════════════════════════════════════════
-    //  D3D12: CompiledLevelShader (replaces ref_shader + ShaderNameEntry)
-    // ═══════════════════════════════════════════════════
-    struct CompiledLevelShader {
-        // Metadata
-        shared_str shaderName;
-        shared_str textureName;
-
-        // NVRHI shader handles (replaces ref_shader)
-        nvrhi::ShaderHandle vsHandle;
-        nvrhi::ShaderHandle psHandle;
-
-        // Reflection data (needed for PSO creation)
-        xr_unique_ptr<framegraph::ExtractedReflection> vsReflection;
-        xr_unique_ptr<framegraph::ExtractedReflection> psReflection;
-
-        // Material info (alpha test, transparency, etc.)
-        MaterialSystem::MaterialInfo materialInfo;
-
-        // Precompiled PSOs (indexed by vertex format + pass type)
-        struct PrecompiledPSOs {
-            struct PSOVariant {
-                u32 vertexFormatID;
-                RenderPassType passType;
-                fg::PipelineState* pso;
-                MaterialPSO* materialPSO;
-            };
-
-            xr_vector<PSOVariant> variants;
-            xr_map<u64, MaterialPSO*> psoCache;  // hash(vertexFormatID, passType) → MaterialPSO*
-        };
-
-        PrecompiledPSOs precompiledPSOs;
-    };
-
-    xr_vector<CompiledLevelShader> CompiledLevelShaders;  // D3D12: Replaces legacy Shaders + ShaderNames
-
     using VertexDeclarator = ::xray::render::fg::VertexDeclarator;
 
 
@@ -448,7 +412,7 @@ public:
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
     // D3D12/NVRHI: New shader access (replaces getShader/getShaderNames)
-    CompiledLevelShader* getCompiledShader(int id);
+    xray::render::CompiledLevelShader* getCompiledShader(int id);
     bool getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::ShaderHandle& outPS);
 
     // Legacy D3D11: Old shader access

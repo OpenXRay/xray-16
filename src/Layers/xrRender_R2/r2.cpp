@@ -812,11 +812,11 @@ IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 void CRender::models_Prefetch() { g_pModelPool->Prefetch(); }
 void CRender::models_Clear(bool b_complete) { g_pModelPool->ClearPool(b_complete); }
 // D3D12: New shader access using CompiledLevelShader
-CRender::CompiledLevelShader* CRender::getCompiledShader(int id)
+xray::render::CompiledLevelShader* CRender::getCompiledShader(int id)
 {
-    if (id < 0 || id >= int(CompiledLevelShaders.size()))
+    if (id < 0 || id >= int(m_framegraphRenderer->m_CompiledLevelShaders.size()))
         return nullptr;
-    return &CompiledLevelShaders[id];
+    return &m_framegraphRenderer->m_CompiledLevelShaders[id];
 }
 
 bool CRender::getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::ShaderHandle& outPS)
@@ -988,7 +988,7 @@ bool CRender::CreatePrecompiledPSO(
     nvrhi::Format depthFormat,
     MaterialCache* materialCache)
 {
-    auto& compiled = CompiledLevelShaders[shaderID];
+    auto& compiled = m_framegraphRenderer->m_CompiledLevelShaders[shaderID];
 
     // ═══════════════════════════════════════════════════
     //  CREATE PSO DESCRIPTOR
@@ -1065,7 +1065,7 @@ bool CRender::CreatePrecompiledPSO(
     // Store NVRHI handle in precompiled PSO cache (MaterialCache will wrap it in MaterialPSO later)
     u64 cacheKey = ((u64)vertexFormatID << 32) | (u64)passType;
 
-    CompiledLevelShader::PrecompiledPSOs::PSOVariant variant;
+    xray::render::CompiledLevelShader::PrecompiledPSOs::PSOVariant variant;
     variant.vertexFormatID = vertexFormatID;
     variant.passType = passType;
     variant.pso = nullptr;  // fg::PipelineState not used here - we store nvrhi handle directly
