@@ -283,6 +283,7 @@ void FrameGraphRenderer::level_Unload()
 
     m_pDetailManager->Unload();
 
+    m_immContext.unload();
     xr_delete(m_pRmPortals);
     m_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
     Device.vCameraPositionSaved.set(0, 0, 0);
@@ -572,6 +573,7 @@ void FrameGraphRenderer::LoadSectors(IReader* fs)
         m_pRmPortals = nullptr;
     }
 
+    m_immContext.load(sectors_data, portals_data);
     m_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
 
