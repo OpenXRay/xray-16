@@ -295,7 +295,7 @@ void CRender::level_Unload()
     //*** Sectors
     // 1.
     xr_delete(g_pRmPortals);
-    last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
+    g_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
     Device.vCameraPositionSaved.set(0, 0, 0);
 
     // 2.
@@ -539,7 +539,7 @@ void CRender::LoadSectors(IReader* fs)
             if (vol > largest_sector_vol)
             {
                 largest_sector_vol = vol;
-                largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
+                g_largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
             }
         }
         P->close();
@@ -627,7 +627,7 @@ void CRender::LoadSectors(IReader* fs)
     dsgraph.reset();
     dsgraph.load(sectors_data, portals_data);
 
-    last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
+    g_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
 
 void CRender::LoadSWIs(CStreamReader* base_fs)

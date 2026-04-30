@@ -265,7 +265,7 @@ void render_sun::calculate()
                 //		sun->svis.begin					();
                 dsgraph.o.phase = CRender::PHASE_SMAP;
                 dsgraph.r_pmask(true, RImplementation.o.Tshadows);
-                dsgraph.o.sector_id = RImplementation.get_largest_sector();
+                dsgraph.o.sector_id = g_largest_sector_id;
                 dsgraph.o.xform = cull_xform[cascade_ind];
                 dsgraph.o.view_frustum = cull_frustum[cascade_ind];
                 dsgraph.o.view_pos = cull_COP[cascade_ind];

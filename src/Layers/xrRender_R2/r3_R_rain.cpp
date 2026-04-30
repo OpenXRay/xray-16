@@ -277,7 +277,7 @@ void render_rain::calculate()
     {
         dsgraph.o.phase = CRender::PHASE_SMAP;
         dsgraph.r_pmask(true, false);
-        dsgraph.o.sector_id = RImplementation.get_largest_sector();
+        dsgraph.o.sector_id = g_largest_sector_id;
         dsgraph.o.xform = cull_xform;
         dsgraph.o.view_frustum = cull_frustum;
         dsgraph.o.view_pos = cull_COP;

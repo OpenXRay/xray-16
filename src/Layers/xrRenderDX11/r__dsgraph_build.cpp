@@ -597,9 +597,9 @@ void R_dsgraph_structure::build_subspace()
         {
             if (o.phase == CRender::PHASE_NORMAL)
             {
-                RImplementation.uLastLTRACK++;
+                g_uLastLTRACK++;
                 if (!lstRenderables.empty())
-                    uID_LTRACK = RImplementation.uLastLTRACK % lstRenderables.size();
+                    uID_LTRACK = g_uLastLTRACK % lstRenderables.size();
 
                 IGameObject* O = g_pGameLevel->CurrentViewEntity();
                 if (O)
