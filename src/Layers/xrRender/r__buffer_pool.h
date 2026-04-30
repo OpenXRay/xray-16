@@ -69,6 +69,10 @@ struct R_buffer_pool
 extern ECORE_API R_buffer_pool BufferPool;
 
 class CModelPool;
+class CDetailManager;
+class CWallmarksEngine;
 extern ECORE_API CModelPool* g_pModelPool;
+extern ECORE_API CDetailManager* g_pDetailManager;
+extern ECORE_API CWallmarksEngine* g_pWallmarksEngine;
 
 }

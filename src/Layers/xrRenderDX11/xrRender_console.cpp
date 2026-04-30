@@ -424,7 +424,7 @@ class CCC_ModelPoolStat : public IConsole_Command
 {
 public:
     CCC_ModelPoolStat(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR ) { RImplementation.Models->dump(); }
+    virtual void Execute(LPCSTR ) { g_pModelPool->dump(); }
 };
 
 class CCC_SSAO_Mode : public CCC_Token
@@ -559,7 +559,7 @@ public:
 
     void Execute(pcstr ) override
     {
-        RImplementation.Models->dump();
+        g_pModelPool->dump();
         RImplementation.Resources->Dump(false);
     }
 };

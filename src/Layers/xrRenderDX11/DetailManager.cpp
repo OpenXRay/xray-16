@@ -519,7 +519,7 @@ void CDetailManager::DispatchMTCalc()
     m_calc_task = &TaskScheduler->AddTask([this]
     {
 #ifndef _EDITOR
-        if (nullptr == RImplementation.Details)
+        if (nullptr == g_pDetailManager)
             return;
         if (nullptr == dtFS)
             return;

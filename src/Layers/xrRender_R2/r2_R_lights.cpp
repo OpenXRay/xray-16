@@ -120,12 +120,7 @@ void CRender::render_lights(light_Package& LP)
                 dsgraph.cmd_list.set_xform_project(L->X.S.project);
                 dsgraph.render_graph(0);
                 if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                {
-                    // Details beyond the light range cannot shadow anything it lights.
-                    Fsphere lightBounds;
-                    lightBounds.set(L->position, L->range);
-                    Details->Render(dsgraph.cmd_list, &lightBounds);
-                }
+                    g_pDetailManager->Render(dsgraph.cmd_list);
                 L->X.S.transluent = FALSE;
                 if (bSpecial)
                 {
