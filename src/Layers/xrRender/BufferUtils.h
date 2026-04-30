@@ -5,6 +5,7 @@ namespace xray::render::fg
 u32 GetFVFVertexSize(u32 FVF);
 u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream);
 u32 GetDeclLength(const VertexElement* decl);
+bool CreateDeclFromFVF(u32 fvfCode, xr_vector<VertexElement>& decl);
 
 inline bool dcl_equal(const VertexElement* a, const VertexElement* b)
 {
