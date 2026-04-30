@@ -562,7 +562,7 @@ public:
         const void* vertices,
         u32 vertexCount,
         u32 vertexStride,
-        const D3DVERTEXELEMENT9* decl,
+        const VertexElement* decl,
         bool alternative = false
     );
 
@@ -579,7 +579,7 @@ public:
     ) const;
 
     static bindless::SourceVertexFormat DetectFormatFromDecl(
-        const D3DVERTEXELEMENT9* decl,
+        const VertexElement* decl,
         u32 stride
     );
 };

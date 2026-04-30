@@ -3611,7 +3611,7 @@ void GPUCullingManager::UploadInstanceData(fg::RenderContext* ctx, const Geometr
 }
 
 bindless::SourceVertexFormat GPUCullingManager::DetectFormatFromDecl(
-    const D3DVERTEXELEMENT9* decl,
+    const VertexElement* decl,
     u32 stride)
 {
     if (!decl)
@@ -3624,16 +3624,16 @@ bindless::SourceVertexFormat GPUCullingManager::DetectFormatFromDecl(
     u32 texcoord0Type = 0;
 
     for (int i = 0; decl[i].Stream != 0xFF; i++) {
-        const D3DVERTEXELEMENT9& elem = decl[i];
+        const VertexElement& elem = decl[i];
 
-        if (elem.Usage == D3DDECLUSAGE_COLOR && elem.UsageIndex == 0) {
+        if (elem.Usage == VS_COLOR && elem.UsageIndex == 0) {
             hasColor = true;
         }
-        else if (elem.Usage == D3DDECLUSAGE_TEXCOORD) {
+        else if (elem.Usage == VS_TEXCOORD) {
             if (elem.UsageIndex == 0) {
                 texcoord0Type = elem.Type;
-                if (elem.Type == D3DDECLTYPE_SHORT4) hasShort4TexCoord = true;
-                if (elem.Type == D3DDECLTYPE_FLOAT2) hasFloat2TexCoord = true;
+                if (elem.Type == VF_SHORT4) hasShort4TexCoord = true;
+                if (elem.Type == VF_FLOAT2) hasFloat2TexCoord = true;
             }
             else if (elem.UsageIndex == 1) {
                 hasTexCoord1 = true;
@@ -3673,7 +3673,7 @@ u32 GPUCullingManager::RegisterVBPool(
     const void* vertices,
     u32 vertexCount,
     u32 vertexStride,
-    const D3DVERTEXELEMENT9* decl,
+    const VertexElement* decl,
     bool alternative)
 {
     if (!m_levelLoadInProgress) {

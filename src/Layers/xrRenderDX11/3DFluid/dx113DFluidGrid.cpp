@@ -62,9 +62,10 @@ void dx113DFluidGrid::CreateVertexBuffers()
     //	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT,       0,12, D3Dxx_INPUT_PER_VERTEX_DATA, 0 },
     //};
 
-    static D3DVERTEXELEMENT9 layoutDesc[] = {
-        {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-        {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, D3DDECL_END()};
+    static VertexElement layoutDesc[] = {
+        {0, 0,  VF_FLOAT3, 0, VS_POSITION, 0},
+        {0, 12, VF_FLOAT3, 0, VS_TEXCOORD, 0},
+        XR_VERTEX_ELEMENT_END};
 
     u32 vSize = GetDeclVertexSize(layoutDesc, 0);
 

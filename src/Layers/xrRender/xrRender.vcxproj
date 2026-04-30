@@ -76,6 +76,7 @@
     <ClInclude Include="ShaderVariant\VariantPSOCache.h"/>
     <ClInclude Include="Animation.h"/>
     <ClInclude Include="BufferUtils.h"/>
+    <ClInclude Include="VertexLayout.h"/>
     <ClInclude Include="ColorMapManager.h"/>
     <ClInclude Include="ConstantSystem\FGConstantSystem.h"/>
     <ClInclude Include="D3DUtils.h"/>
