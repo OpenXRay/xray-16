@@ -3,6 +3,7 @@
 
 #include "xrEngine/IFrameGraphRender.h"
 #include "xrEngine/Render.h"
+#include "Layers/xrRender/FGRenderBase.h"
 #include "xrCDB/xrXRC.h"
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/r__occlusion.h"
@@ -101,10 +102,63 @@ namespace framegraph {
 //  FRAMEGRAPH RENDERER
 // ══════════════════════════════════════════════════════════
 
-class FrameGraphRenderer: public IFrameGraphRender{
+class FrameGraphRenderer: public IFrameGraphRender, public xray::render::fg::FGRenderBase {
 public:
     FrameGraphRenderer();
     ~FrameGraphRenderer();
+
+    GenerationLevel GetGeneration() const override { return IRender::GENERATION_R2; }
+    IRender::BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D11; }
+    bool is_sun_static() override { return false; }
+    u32 get_dx_level() override { return 0x000B0000; }
+
+    void create() override {}
+    void destroy() override {}
+    void reset_begin() override {}
+    void reset_end() override {}
+
+    void level_Load(IReader*) override {}
+    void level_Unload() override {}
+
+    HRESULT shader_compile(pcstr, IReader*, pcstr, pcstr, u32, void*&) override { return 0; }
+
+    pcstr getShaderPath() override { return "r5\\"; }
+    IRenderVisual* getVisual(int) override { return nullptr; }
+
+    void add_Visual(u32, IRenderable*, IRenderVisual*, Fmatrix&) override {}
+    void add_StaticWallmark(const wm_shader&, const Fvector&, float, CDB::TRI*, Fvector*) override {}
+    void add_StaticWallmark(IWallMarkArray*, const Fvector&, float, CDB::TRI*, Fvector*) override {}
+    void clear_static_wallmarks() override {}
+    void add_SkeletonWallmark(const Fmatrix*, IKinematics*, IWallMarkArray*, const Fvector&, const Fvector&, float) override {}
+
+    IRender_ObjectSpecific* ros_create(IRenderable*) override { return nullptr; }
+    void ros_destroy(IRender_ObjectSpecific*&) override {}
+    IRender_Light* light_create() override { return nullptr; }
+    IRender_Glow* glow_create() override { return nullptr; }
+
+    IRenderVisual* model_CreateParticles(pcstr) override { return nullptr; }
+    IRenderVisual* model_Create(pcstr, IReader*) override { return nullptr; }
+    IRenderVisual* model_CreateChild(pcstr, IReader*) override { return nullptr; }
+    IRenderVisual* model_Duplicate(IRenderVisual*) override { return nullptr; }
+    void model_Delete(IRenderVisual*&, bool) override {}
+    void model_Logging(bool) override {}
+    void models_Prefetch() override {}
+    void models_Clear(bool) override {}
+
+    bool occ_visible(vis_data&) override { return true; }
+    bool occ_visible(Fbox&) override { return true; }
+    bool occ_visible(sPoly&) override { return true; }
+
+    void Calculate() override {}
+    void BeforeWorldRender() override {}
+    void AfterWorldRender() override {}
+
+    void OnFrame() override {}
+
+    void Screenshot(IRender::ScreenshotMode, pcstr) override {}
+    void SetPostProcessParams(const SPPInfo&) override {}
+    void OnCameraUpdated() override {}
+    void RequestGrassInteraction(const Fvector&, float, float, uint8_t) override {}
 
     // Initialize
     bool Initialize(fg::RenderDevice* device);
