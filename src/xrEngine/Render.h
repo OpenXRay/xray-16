@@ -27,6 +27,12 @@ class IReader;
 class CMemoryWriter;
 
 namespace xray::render::framegraph { class ShaderLoader; }
+namespace xray::render
+{
+    class MaterialCache;
+    namespace fg { class RenderDevice; class ImGuiRendererNVRHI; }
+    namespace ui { class UIRenderCollector; class NVRHIUIRenderer; }
+}
 
 #ifndef _EDITOR
 extern const float fLightSmoothFactor;
@@ -398,4 +404,17 @@ public:
     virtual void MakeContextCurrent(RenderContext context) = 0;
 
     virtual void RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type = 0) = 0;
+
+    virtual void RenderStatsOverlay() {}
+    virtual void SetEnabled(bool) {}
+    virtual bool IsEnabled() const { return false; }
+    virtual xray::render::fg::RenderDevice* GetRenderDevice() const { return nullptr; }
+    virtual xray::render::fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return nullptr; }
+    virtual xray::render::MaterialCache* GetMaterialCache() const { return nullptr; }
+    virtual xray::render::MaterialCache* GetUIMaterialCache() const { return nullptr; }
+    virtual xray::render::ui::UIRenderCollector* GetUICollector() const { return nullptr; }
+    virtual xray::render::ui::NVRHIUIRenderer* GetUIRenderer() const { return nullptr; }
+    virtual xray::render::MaterialCache* GetTextMaterialCache() const { return nullptr; }
+    virtual void UpdateSmokeTrail(const Fvector&, const Fvector&, float, bool) {}
+    virtual void NotifySmokeShot() {}
 };

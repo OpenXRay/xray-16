@@ -475,9 +475,9 @@ void CMainMenu::OnRender()
     if (m_Flags.test(flGameSaveScreenshot))
         return;
 
-    if (GEnv.FrameGraphRenderer && GEnv.FrameGraphRenderer->IsEnabled())
+    if (GEnv.Render && GEnv.Render->IsEnabled())
     {
-        GEnv.FrameGraphRenderer->RenderMenu();
+        GEnv.Render->RenderMenu();
     }
     else
     {

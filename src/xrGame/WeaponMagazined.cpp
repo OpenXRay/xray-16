@@ -621,11 +621,11 @@ void CWeaponMagazined::state_MagEmpty(float dt) {}
 void CWeaponMagazined::SetDefaults() { CWeapon::SetDefaults(); }
 void CWeaponMagazined::OnShot()
 {
-    if (GEnv.FrameGraphRenderer && GEnv.FrameGraphRenderer->IsEnabled() && IsGameTypeSingle())
+    if (GEnv.Render && GEnv.Render->IsEnabled() && IsGameTypeSingle())
     {
         auto* actor = smart_cast<CActor*>(H_Parent());
         if (actor && actor->inventory().ActiveItem() == this)
-            GEnv.FrameGraphRenderer->NotifySmokeShot();
+            GEnv.Render->NotifySmokeShot();
     }
 
     // Sound
