@@ -459,6 +459,9 @@
     <ClInclude Include="D3DXRenderBase.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="FGRenderBase.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="KinematicsAddBoneTransform.hpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
@@ -896,6 +899,9 @@
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="D3DXRenderBase.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="FGRenderBase.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="r__sector_detect.cpp">

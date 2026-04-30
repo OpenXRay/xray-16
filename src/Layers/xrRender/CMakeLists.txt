@@ -157,6 +157,8 @@ target_sources(xrRender PRIVATE
     ColorMapManager.cpp
     ConstantSystem/FGConstantSystem.cpp
     D3DXRenderBase.cpp
+    FGRenderBase.h
+    FGRenderBase.cpp
     DetailModel.cpp
     ETextureParams.cpp
     FBasicVisual.cpp
