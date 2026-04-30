@@ -125,6 +125,10 @@ public:
     void level_Load(IReader* fs) override;
     void level_Unload() override;
     HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result) override;
+
+    IBlender* blender_create(CLASS_ID cls);
+    void blender_destroy(IBlender*& B);
+
     void addShaderOption(pcstr name, pcstr value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
 

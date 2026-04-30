@@ -107,6 +107,8 @@ void CRender::RequestGrassInteraction(const Fvector& world_pos, float radius, fl
         m_framegraphRenderer->m_pDetailManager->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
 }
 
+IBlender* CRender::blender_create(CLASS_ID cls)             { return m_framegraphRenderer->blender_create(cls); }
+void CRender::blender_destroy(IBlender*& B)                 { m_framegraphRenderer->blender_destroy(B); }
 void CRender::clearAllShaderOptions()                       { m_framegraphRenderer->clearAllShaderOptions(); }
 void CRender::addShaderOption(pcstr name, pcstr value)      { m_framegraphRenderer->addShaderOption(name, value); }
 void CRender::level_Load(IReader* fs)                       { m_framegraphRenderer->level_Load(fs); }

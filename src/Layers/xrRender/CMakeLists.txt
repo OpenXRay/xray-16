@@ -134,6 +134,7 @@ target_sources(xrRender PRIVATE
     r_FrameGraphRenderer.cpp
     r_FrameGraphRenderer_Loader.cpp
     r_FrameGraphRenderer_Shaders.cpp
+    r_FrameGraphRenderer_Blenders.cpp
     r5.h
     r5.cpp
     FGRenderHost.h

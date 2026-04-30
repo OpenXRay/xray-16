@@ -15,9 +15,9 @@
 #include "Layers/xrRenderDX11/blenders/Blender_Model_EbB.h"
 #include "Layers/xrRenderDX11/blenders/Blender_Lm(EbB).h"
 
-namespace xray::render::fg
+namespace xray::render
 {
-IBlender* CRender::blender_create(CLASS_ID cls)
+IBlender* FrameGraphRenderer::blender_create(CLASS_ID cls)
 {
     switch (cls)
     {
@@ -47,8 +47,8 @@ IBlender* CRender::blender_create(CLASS_ID cls)
     return nullptr;
 }
 
-void CRender::blender_destroy(IBlender*& B)
+void FrameGraphRenderer::blender_destroy(IBlender*& B)
 {
     xr_delete(B);
 }
-} // namespace xray::render::fg
+} // namespace xray::render
