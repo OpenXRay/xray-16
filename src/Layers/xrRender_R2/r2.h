@@ -36,6 +36,7 @@ class ImGuiRendererNVRHI;
 namespace xray::render
 {
 class FrameGraphRenderer;
+struct CompiledLevelShader;
 struct MaterialPSO;
 }
 
@@ -295,35 +296,6 @@ public:
 
 public:
 
-    struct CompiledLevelShader {
-        shared_str shaderName;
-        shared_str textureName;
-
-        nvrhi::ShaderHandle vsHandle;
-        nvrhi::ShaderHandle psHandle;
-
-        xr_unique_ptr<framegraph::ExtractedReflection> vsReflection;
-        xr_unique_ptr<framegraph::ExtractedReflection> psReflection;
-
-        MaterialSystem::MaterialInfo materialInfo;
-
-        struct PrecompiledPSOs {
-            struct PSOVariant {
-                u32 vertexFormatID;
-                RenderPassType passType;
-                fg::PipelineState* pso;
-                MaterialPSO* materialPSO;
-            };
-
-            xr_vector<PSOVariant> variants;
-            xr_map<u64, MaterialPSO*> psoCache;
-        };
-
-        PrecompiledPSOs precompiledPSOs;
-    };
-
-    xr_vector<CompiledLevelShader> CompiledLevelShaders;
-
     using VertexDeclarator = ::xray::render::fg::VertexDeclarator;
 
 
@@ -436,7 +408,7 @@ public:
     // Information
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
-    CompiledLevelShader* getCompiledShader(int id);
+    xray::render::CompiledLevelShader* getCompiledShader(int id);
     bool getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::ShaderHandle& outPS);
 
     ref_shader getShader(int id);

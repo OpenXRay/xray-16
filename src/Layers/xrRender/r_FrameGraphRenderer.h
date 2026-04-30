@@ -7,6 +7,8 @@
 #include "Layers/xrRender/r__occlusion.h"
 #include "Layers/xrRender/Light_Render_Direct.h"
 #include "Layers/xrRender/PSLibrary.h"
+#include "Layers/xrRender/Materials/MaterialSystem.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender_R2/SMAP_Allocator.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
@@ -56,6 +58,27 @@ using fg::dxRender_Visual;
 
 class GeometryCollector;
 class MaterialCache;
+
+struct CompiledLevelShader {
+    shared_str shaderName;
+    shared_str textureName;
+    nvrhi::ShaderHandle vsHandle;
+    nvrhi::ShaderHandle psHandle;
+    xr_unique_ptr<framegraph::ExtractedReflection> vsReflection;
+    xr_unique_ptr<framegraph::ExtractedReflection> psReflection;
+    MaterialSystem::MaterialInfo materialInfo;
+    struct PrecompiledPSOs {
+        struct PSOVariant {
+            u32 vertexFormatID;
+            RenderPassType passType;
+            fg::PipelineState* pso;
+            MaterialPSO* materialPSO;
+        };
+        xr_vector<PSOVariant> variants;
+        xr_map<u64, MaterialPSO*> psoCache;
+    };
+    PrecompiledPSOs precompiledPSOs;
+};
 
 namespace fg {
     class GPUCullingManager;
@@ -178,6 +201,8 @@ public:
 #elif defined(USE_OGL)
     xr_string m_ShaderOptions;
 #endif
+
+    xr_vector<CompiledLevelShader> m_CompiledLevelShaders;
 
 private:
     bool m_enabled = false;

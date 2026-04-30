@@ -68,7 +68,7 @@ void CRender::level_Load(IReader* fs)
         chunk = fs->open_chunk(fsL_SHADERS);
         R_ASSERT2(chunk, "Level doesn't builded correctly.");
         u32 count = chunk->r_u32();
-        CompiledLevelShaders.resize(count);
+        m_framegraphRenderer->m_CompiledLevelShaders.resize(count);
         for (u32 i = 0; i < count; i++)
         {
             string512 n_sh, n_tlist;
@@ -167,7 +167,7 @@ void CRender::CompileLevelShader(u32 shaderID, const char* shaderName, const cha
 {
     ZoneScopedN("Compile Level Shader");
 
-    auto& compiled = CompiledLevelShaders[shaderID];
+    auto& compiled = m_framegraphRenderer->m_CompiledLevelShaders[shaderID];
     compiled.shaderName = shaderName;
     compiled.textureName = textureName;
 
@@ -223,13 +223,13 @@ void CRender::PrecompileLevelPSOs()
 
     u32 totalPSOs = 0;
 
-    for (u32 shaderID = 0; shaderID < CompiledLevelShaders.size(); ++shaderID) {
-        auto& compiled = CompiledLevelShaders[shaderID];
+    for (u32 shaderID = 0; shaderID < m_framegraphRenderer->m_CompiledLevelShaders.size(); ++shaderID) {
+        auto& compiled = m_framegraphRenderer->m_CompiledLevelShaders[shaderID];
 
         if (!compiled.vsHandle || !compiled.psHandle)
             continue;
 
-        float progress = float(shaderID) / float(CompiledLevelShaders.size());
+        float progress = float(shaderID) / float(m_framegraphRenderer->m_CompiledLevelShaders.size());
         g_pGamePersistent->LoadTitle("st_precompiling_pso", progress);
 
         xr_vector<u32> compatibleFormats;
@@ -273,7 +273,7 @@ void CRender::PrecompileLevelPSOs()
     }
 
     Msg("* Precompiled %u PSOs for %u shaders across %u vertex formats",
-        totalPSOs, CompiledLevelShaders.size(), BufferPool.nDC.size());
+        totalPSOs, m_framegraphRenderer->m_CompiledLevelShaders.size(), BufferPool.nDC.size());
 }
 
 void CRender::level_Unload()
@@ -351,7 +351,7 @@ void CRender::level_Unload()
     xr_delete(m_framegraphRenderer->m_pWallmarksEngine);
 
     //*** Shaders
-    CompiledLevelShaders.clear();
+    m_framegraphRenderer->m_CompiledLevelShaders.clear();
     b_loaded = FALSE;
     if (ps_r__clear_models_on_unload)
     {
