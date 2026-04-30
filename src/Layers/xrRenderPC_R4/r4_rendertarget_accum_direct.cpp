@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
+#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::fg
 {
@@ -53,7 +55,7 @@ void CRenderTarget::accum_direct(CBackend& cmd_list, u32 sub_phase)
 
     //	TODO: DX11: Remove half pixe offset
     // *** assume accumulator setted up ***
-    light* fuckingsun = RImplementation.r_sun_old.sun;
+    light* fuckingsun = RImplementation.m_framegraphRenderer->m_r_sun_old->sun;
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -189,7 +191,7 @@ void CRenderTarget::accum_direct(CBackend& cmd_list, u32 sub_phase)
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
-            xf_project.mul(m_TexelAdjust, RImplementation.r_sun_old.sun->X.D[sub_phase].combine); // TODO: move into render_sun
+            xf_project.mul(m_TexelAdjust, RImplementation.m_framegraphRenderer->m_r_sun_old->sun->X.D[sub_phase].combine); // TODO: move into render_sun
             m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
@@ -766,7 +768,7 @@ void CRenderTarget::accum_direct_cascade(CBackend& cmd_list, u32 sub_phase, Fmat
         // if (ps_r2_ls_flags.test(R2FLAG_SUN_SHAFTS))
         if (RImplementation.o.advancedpp && (ps_r_sun_shafts > 0) && sub_phase == SE_SUN_FAR)
         {
-            const float max = RImplementation.r_sun.m_sun_cascades[R__NUM_SUN_CASCADES - 1].size;
+            const float max = RImplementation.m_framegraphRenderer->m_r_sun->m_sun_cascades[R__NUM_SUN_CASCADES - 1].size;
             accum_direct_volumetric(cmd_list, sub_phase, Offset, m_shadow, 0, max);
         }
     }
