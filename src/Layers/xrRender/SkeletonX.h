@@ -41,7 +41,7 @@ public:
 protected:
     enum
     {
-        vertRenderFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1
+        vertRenderFVF = FVF::XYZ | FVF::NORMAL | FVF::TEX1
     };
 
     CKinematics* Parent; // setted up by parent

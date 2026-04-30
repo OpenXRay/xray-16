@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#include <FlexibleVertexFormat.h>
-
 namespace xray::render::fg
 {
 void fix_texture_name(pstr fn);
@@ -172,13 +170,9 @@ SGeometry* CResourceManager::CreateGeom(const VertexElement* decl, VertexBufferH
 
 SGeometry* CResourceManager::CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib)
 {
-    thread_local xr_vector<D3DVERTEXELEMENT9> dx9decl;
     thread_local xr_vector<VertexElement> decl;
-    [[maybe_unused]] const bool result = ::FVF::CreateDeclFromFVF(FVF, dx9decl);
+    [[maybe_unused]] const bool result = CreateDeclFromFVF(FVF, decl);
     VERIFY(result);
-    static_assert(sizeof(VertexElement) == sizeof(D3DVERTEXELEMENT9), "Layout mismatch");
-    decl.assign(reinterpret_cast<const VertexElement*>(dx9decl.data()),
-                reinterpret_cast<const VertexElement*>(dx9decl.data() + dx9decl.size()));
     SGeometry* g = CreateGeom(decl.data(), vb, ib);
     return g;
 }

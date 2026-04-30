@@ -2,25 +2,216 @@
 #include "stdafx.h"
 #include "Layers/xrRender/BufferUtils.h"
 
-#include <FlexibleVertexFormat.h>
 #include <nvrhi/nvrhi.h>
-#include "xrEngine/IRenderBackend.h"  // For DeviceState enum
+#include "xrEngine/IRenderBackend.h"
 
 namespace xray::render::fg
 {
-u32 GetFVFVertexSize(u32 FVF)
+namespace
 {
-    return static_cast<u32>(::FVF::ComputeVertexSize(FVF));
+constexpr u8 g_declTypeSizes[] =
+{
+    4, 8, 12, 16, 4, 4, 4, 8, 4, 4, 8, 4, 8, 4, 4, 4, 8,
+};
+static_assert(std::size(g_declTypeSizes) == VF_UNUSED, "g_declTypeSizes covers every VertexFormat");
+}
+
+u32 GetFVFVertexSize(u32 fvfCode)
+{
+    if ((fvfCode & ((FVF::RESERVED0 | FVF::RESERVED2) & ~FVF::POSITION_MASK)) != 0)
+        return 0;
+
+    const u32 numCoords = (fvfCode & FVF::TEXCOUNT_MASK) >> FVF::TEXCOUNT_SHIFT;
+    if (numCoords > 8)
+        return 0;
+
+    u32 vertexSize = 0;
+    switch (fvfCode & FVF::POSITION_MASK)
+    {
+    case 0:           break;
+    case FVF::XYZ:    vertexSize = 3 * sizeof(float); break;
+    case FVF::XYZRHW:
+    case FVF::XYZB1:
+    case FVF::XYZW:   vertexSize = 4 * sizeof(float); break;
+    case FVF::XYZB2:  vertexSize = 5 * sizeof(float); break;
+    case FVF::XYZB3:  vertexSize = 6 * sizeof(float); break;
+    case FVF::XYZB4:  vertexSize = 7 * sizeof(float); break;
+    case FVF::XYZB5:  vertexSize = 8 * sizeof(float); break;
+    default:          return 0;
+    }
+
+    if (fvfCode & FVF::NORMAL)   vertexSize += 3 * sizeof(float);
+    if (fvfCode & FVF::PSIZE)    vertexSize += sizeof(u32);
+    if (fvfCode & FVF::DIFFUSE)  vertexSize += sizeof(u32);
+    if (fvfCode & FVF::SPECULAR) vertexSize += sizeof(u32);
+
+    u32 textureFormats = fvfCode >> 16u;
+    if (textureFormats)
+    {
+        for (u32 i = 0; i < numCoords; ++i)
+        {
+            switch (textureFormats & 3)
+            {
+            case 0: vertexSize += 2 * sizeof(float); break;
+            case 1: vertexSize += 3 * sizeof(float); break;
+            case 2: vertexSize += 4 * sizeof(float); break;
+            case 3: vertexSize += 1 * sizeof(float); break;
+            }
+            textureFormats >>= 2;
+        }
+    }
+    else
+    {
+        vertexSize += numCoords * (2 * sizeof(float));
+    }
+    return vertexSize;
 }
 
 u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream)
 {
-    return static_cast<u32>(::FVF::ComputeVertexSize(reinterpret_cast<const D3DVERTEXELEMENT9*>(decl), Stream));
+    if (!decl || Stream >= 16u)
+        return 0;
+
+    u32 currentSize = 0;
+    u32 count = 0;
+    while (decl->Stream != 0xFF)
+    {
+        if (++count > XR_MAX_DECL_LENGTH)
+            return 0;
+        if (decl->Stream == Stream && decl->Type < std::size(g_declTypeSizes))
+        {
+            const u32 slotSize = g_declTypeSizes[decl->Type];
+            if (currentSize < slotSize + decl->Offset)
+                currentSize = slotSize + decl->Offset;
+        }
+        ++decl;
+    }
+    return currentSize;
 }
 
 u32 GetDeclLength(const VertexElement* decl)
 {
-    return static_cast<u32>(::FVF::GetDeclLength(reinterpret_cast<const D3DVERTEXELEMENT9*>(decl)));
+    if (!decl)
+        return 0;
+    u32 length = 0;
+    while (decl->Stream != 0xFF)
+    {
+        if (length >= XR_MAX_DECL_LENGTH)
+            return 0;
+        ++decl;
+        ++length;
+    }
+    return length;
+}
+
+bool CreateDeclFromFVF(u32 fvfCode, xr_vector<VertexElement>& decl)
+{
+    static constexpr u32 s_texCoordSizes[] =
+    {
+        2 * sizeof(float),
+        3 * sizeof(float),
+        4 * sizeof(float),
+        sizeof(float),
+    };
+
+    decl.clear();
+
+    if ((fvfCode & ((FVF::RESERVED0 | FVF::RESERVED2) & ~FVF::POSITION_MASK)) != 0)
+        return false;
+
+    const u32 nTexCoords = (fvfCode & FVF::TEXCOUNT_MASK) >> FVF::TEXCOUNT_SHIFT;
+    if (nTexCoords > 8)
+        return false;
+
+    u16 offset = 0;
+    switch (fvfCode & FVF::POSITION_MASK)
+    {
+    case 0:
+        break;
+    case FVF::XYZRHW:
+        decl.push_back(VertexElement{0, 0, VF_FLOAT4, 0, VS_POSITIONT, 0});
+        offset = sizeof(float) * 4;
+        break;
+    case FVF::XYZW:
+        decl.push_back(VertexElement{0, 0, VF_FLOAT4, 0, VS_POSITION, 0});
+        offset = sizeof(float) * 4;
+        break;
+    default:
+        decl.push_back(VertexElement{0, 0, VF_FLOAT3, 0, VS_POSITION, 0});
+        offset = sizeof(float) * 3;
+        break;
+    }
+
+    u32 weights = 0;
+    switch (fvfCode & FVF::POSITION_MASK)
+    {
+    case FVF::XYZB1: weights = 1; break;
+    case FVF::XYZB2: weights = 2; break;
+    case FVF::XYZB3: weights = 3; break;
+    case FVF::XYZB4: weights = 4; break;
+    case FVF::XYZB5: weights = 5; break;
+    }
+
+    if (weights > 0)
+    {
+        if (fvfCode & (FVF::LASTBETA_UBYTE4 | FVF::LASTBETA_D3DCOLOR))
+        {
+            if (weights > 1)
+            {
+                decl.push_back(VertexElement{0, offset, static_cast<u8>(weights - 2),
+                    0, VS_BLENDWEIGHT, 0});
+                offset += static_cast<u16>(sizeof(float) * (weights - 1));
+            }
+            decl.push_back(VertexElement{0, offset,
+                static_cast<u8>((fvfCode & FVF::LASTBETA_UBYTE4) ? VF_UBYTE4 : VF_COLOR),
+                0, VS_BLENDINDICES, 0});
+            offset += sizeof(u32);
+        }
+        else if (weights == 5)
+        {
+            decl.clear();
+            return false;
+        }
+        else
+        {
+            decl.push_back(VertexElement{0, offset, static_cast<u8>(weights - 1),
+                0, VS_BLENDWEIGHT, 0});
+            offset += static_cast<u16>(sizeof(float) * (weights - 1));
+        }
+    }
+
+    if (fvfCode & FVF::NORMAL)
+    {
+        decl.push_back(VertexElement{0, offset, VF_FLOAT3, 0, VS_NORMAL, 0});
+        offset += sizeof(float) * 3;
+    }
+    if (fvfCode & FVF::PSIZE)
+    {
+        decl.push_back(VertexElement{0, offset, VF_FLOAT1, 0, VS_PSIZE, 0});
+        offset += sizeof(float);
+    }
+    if (fvfCode & FVF::DIFFUSE)
+    {
+        decl.push_back(VertexElement{0, offset, VF_COLOR, 0, VS_COLOR, 0});
+        offset += sizeof(u32);
+    }
+    if (fvfCode & FVF::SPECULAR)
+    {
+        decl.push_back(VertexElement{0, offset, VF_COLOR, 0, VS_COLOR, 1});
+        offset += sizeof(u32);
+    }
+
+    for (u32 t = 0; t < nTexCoords; ++t)
+    {
+        const u32 texCoordSize = s_texCoordSizes[(fvfCode >> (16 + t * 2)) & 0x3];
+        decl.push_back(VertexElement{0, offset,
+            static_cast<u8>(texCoordSize / sizeof(float) - 1),
+            0, VS_TEXCOORD, static_cast<u8>(t)});
+        offset += static_cast<u16>(texCoordSize);
+    }
+
+    decl.push_back(VertexElement{0xFF, 0, VF_UNUSED, 0, 0, 0});
+    return true;
 }
 
 nvrhi::Format ToNvrhiFormat(u32 vertexFormat)

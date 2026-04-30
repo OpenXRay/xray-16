@@ -48,7 +48,7 @@ void CBlender_accum_direct_cascade::Compile(CBlender_Compile& C)
         // 		{
         // 			u32 s = C.i_Sampler("s_smap");
         // 			C.i_Address		(s, D3DTADDRESS_BORDER);
-        // 			C.i_BorderColor	(s, D3DCOLOR_ARGB(255, 255, 255, 255));
+        // 			C.i_BorderColor	(s, color_argb(255, 255, 255, 255));
         // 		}
         C.r_End();
         break;
@@ -72,7 +72,7 @@ void CBlender_accum_direct_cascade::Compile(CBlender_Compile& C)
         {
             u32 s = C.i_Sampler("s_smap");
             C.i_Address(s, D3DTADDRESS_BORDER);
-            C.i_BorderColor(s, D3DCOLOR_ARGB(255, 255, 255, 255));
+            C.i_BorderColor(s, color_argb(255, 255, 255, 255));
         }
         C.r_End();
         break;

@@ -11,7 +11,7 @@ namespace xray::render::fg
 dxThunderboltRender::dxThunderboltRender()
 {
     // geom
-    hGeom_model.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
+    hGeom_model.create(FVF::XYZ | FVF::DIFFUSE | FVF::TEX1, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
     hGeom_gradient.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 }
 

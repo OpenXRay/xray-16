@@ -12,7 +12,7 @@ void CDetailManager::soft_Load()
     R_ASSERT(RImplementation.Vertex.Buffer());
     R_ASSERT(RImplementation.Index.Buffer());
     // Vertex Stream
-    soft_Geom.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
+    soft_Geom.create(FVF::XYZ | FVF::DIFFUSE | FVF::TEX1, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 }
 
 void CDetailManager::soft_Unload() { soft_Geom.destroy(); }

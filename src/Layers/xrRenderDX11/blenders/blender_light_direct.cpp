@@ -259,7 +259,7 @@ void CBlender_accum_direct::Compile(CBlender_Compile& C)
         {
             u32 s = C.r_dx11Sampler("smp_smap");
             C.i_Address(s, D3DTADDRESS_BORDER);
-            C.i_BorderColor(s, D3DCOLOR_ARGB(255, 255, 255, 255));
+            C.i_BorderColor(s, color_argb(255, 255, 255, 255));
         }
 
         C.r_End();
@@ -524,7 +524,7 @@ void CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
         {
             u32 s = C.r_dx11Sampler("smp_smap");
             C.i_Address(s, D3DTADDRESS_BORDER);
-            C.i_BorderColor(s, D3DCOLOR_ARGB(255, 255, 255, 255));
+            C.i_BorderColor(s, color_argb(255, 255, 255, 255));
         }
 
         C.r_End();

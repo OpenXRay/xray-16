@@ -70,7 +70,7 @@ struct v_skybox
         uv[1] = _tc;
     }
 };
-constexpr u32 v_skybox_fvf = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX2 | D3DFVF_TEXCOORDSIZE3(0) | D3DFVF_TEXCOORDSIZE3(1);
+constexpr u32 v_skybox_fvf = FVF::XYZ | FVF::DIFFUSE | FVF::TEX2 | FVF::TEXCOORDSIZE3(0) | FVF::TEXCOORDSIZE3(1);
 struct v_clouds
 {
     Fvector3 p;
@@ -83,7 +83,7 @@ struct v_clouds
         intensity = _i;
     }
 };
-const u32 v_clouds_fvf = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR;
+const u32 v_clouds_fvf = FVF::XYZ | FVF::DIFFUSE | FVF::SPECULAR;
 #pragma pack(pop)
 
 class CBlender_skybox : public IBlender

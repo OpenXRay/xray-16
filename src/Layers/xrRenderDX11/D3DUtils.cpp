@@ -20,7 +20,7 @@ static Fvector circledef1[LINE_DIVISION];
 static Fvector circledef2[LINE_DIVISION];
 static Fvector circledef3[LINE_DIVISION];
 
-constexpr u32 boxcolor = D3DCOLOR_RGBA(255, 255, 255, 0);
+constexpr u32 boxcolor = color_rgba(255, 255, 255, 0);
 static constexpr int boxvertcount = 48;
 static Fvector boxvert[boxvertcount];
 
@@ -62,7 +62,7 @@ static Fvector boxvert[boxvertcount];
 #endif
 
 // identity box
-constexpr u32 identboxcolor = D3DCOLOR_RGBA(255, 255, 255, 0);
+constexpr u32 identboxcolor = color_rgba(255, 255, 255, 0);
 static constexpr int identboxwirecount = 24;
 static constexpr Fvector identboxwire[identboxwirecount] = {{-0.5f, -0.5f, -0.5f}, {-0.5f, +0.5f, -0.5f}, {-0.5f, +0.5f, -0.5f},
     {+0.5f, +0.5f, -0.5f}, {+0.5f, +0.5f, -0.5f}, {+0.5f, -0.5f, -0.5f}, {+0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f, -0.5f},
@@ -99,7 +99,7 @@ static FLvertexVec m_GridPoints;
 constexpr u32 m_ColorAxis = 0xff000000;
 constexpr u32 m_ColorGrid = 0xff909090;
 constexpr u32 m_ColorGridTh = 0xffb4b4b4;
-constexpr u32 m_SelectionRect = D3DCOLOR_RGBA(127, 255, 127, 64);
+constexpr u32 m_SelectionRect = color_rgba(127, 255, 127, 64);
 
 constexpr u32 m_ColorSafeRect = 0xffB040B0;
 
@@ -197,25 +197,25 @@ void CDrawUtilities::OnDeviceCreate()
     ZoneScoped;
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
 
-    m_SolidBox.CreateFromData(D3DPT_TRIANGLELIST, DU_BOX_NUMFACES, D3DFVF_XYZ | D3DFVF_DIFFUSE, du_box_vertices,
+    m_SolidBox.CreateFromData(D3DPT_TRIANGLELIST, DU_BOX_NUMFACES, FVF::XYZ | FVF::DIFFUSE, du_box_vertices,
         DU_BOX_NUMVERTEX, du_box_faces, DU_BOX_NUMFACES * 3);
-    m_SolidCone.CreateFromData(D3DPT_TRIANGLELIST, DU_CONE_NUMFACES, D3DFVF_XYZ | D3DFVF_DIFFUSE, du_cone_vertices,
+    m_SolidCone.CreateFromData(D3DPT_TRIANGLELIST, DU_CONE_NUMFACES, FVF::XYZ | FVF::DIFFUSE, du_cone_vertices,
         DU_CONE_NUMVERTEX, du_cone_faces, DU_CONE_NUMFACES * 3);
-    m_SolidSphere.CreateFromData(D3DPT_TRIANGLELIST, DU_SPHERE_NUMFACES, D3DFVF_XYZ | D3DFVF_DIFFUSE,
+    m_SolidSphere.CreateFromData(D3DPT_TRIANGLELIST, DU_SPHERE_NUMFACES, FVF::XYZ | FVF::DIFFUSE,
         du_sphere_vertices, DU_SPHERE_NUMVERTEX, du_sphere_faces, DU_SPHERE_NUMFACES * 3);
-    m_SolidSpherePart.CreateFromData(D3DPT_TRIANGLELIST, DU_SPHERE_PART_NUMFACES, D3DFVF_XYZ | D3DFVF_DIFFUSE,
+    m_SolidSpherePart.CreateFromData(D3DPT_TRIANGLELIST, DU_SPHERE_PART_NUMFACES, FVF::XYZ | FVF::DIFFUSE,
         du_sphere_part_vertices, DU_SPHERE_PART_NUMVERTEX, du_sphere_part_faces, DU_SPHERE_PART_NUMFACES * 3);
-    m_SolidCylinder.CreateFromData(D3DPT_TRIANGLELIST, DU_CYLINDER_NUMFACES, D3DFVF_XYZ | D3DFVF_DIFFUSE,
+    m_SolidCylinder.CreateFromData(D3DPT_TRIANGLELIST, DU_CYLINDER_NUMFACES, FVF::XYZ | FVF::DIFFUSE,
         du_cylinder_vertices, DU_CYLINDER_NUMVERTEX, du_cylinder_faces, DU_CYLINDER_NUMFACES * 3);
-    m_WireBox.CreateFromData(D3DPT_LINELIST, DU_BOX_NUMLINES, D3DFVF_XYZ | D3DFVF_DIFFUSE, du_box_vertices,
+    m_WireBox.CreateFromData(D3DPT_LINELIST, DU_BOX_NUMLINES, FVF::XYZ | FVF::DIFFUSE, du_box_vertices,
         DU_BOX_NUMVERTEX, du_box_lines, DU_BOX_NUMLINES * 2);
-    m_WireCone.CreateFromData(D3DPT_LINELIST, DU_CONE_NUMLINES, D3DFVF_XYZ | D3DFVF_DIFFUSE, du_cone_vertices,
+    m_WireCone.CreateFromData(D3DPT_LINELIST, DU_CONE_NUMLINES, FVF::XYZ | FVF::DIFFUSE, du_cone_vertices,
         DU_CONE_NUMVERTEX, du_cone_lines, DU_CONE_NUMLINES * 2);
-    m_WireSphere.CreateFromData(D3DPT_LINELIST, DU_SPHERE_NUMLINES, D3DFVF_XYZ | D3DFVF_DIFFUSE, du_sphere_verticesl,
+    m_WireSphere.CreateFromData(D3DPT_LINELIST, DU_SPHERE_NUMLINES, FVF::XYZ | FVF::DIFFUSE, du_sphere_verticesl,
         DU_SPHERE_NUMVERTEXL, du_sphere_lines, DU_SPHERE_NUMLINES * 2);
-    m_WireSpherePart.CreateFromData(D3DPT_LINELIST, DU_SPHERE_PART_NUMLINES, D3DFVF_XYZ | D3DFVF_DIFFUSE,
+    m_WireSpherePart.CreateFromData(D3DPT_LINELIST, DU_SPHERE_PART_NUMLINES, FVF::XYZ | FVF::DIFFUSE,
         du_sphere_part_vertices, DU_SPHERE_PART_NUMVERTEX, du_sphere_part_lines, DU_SPHERE_PART_NUMLINES * 2);
-    m_WireCylinder.CreateFromData(D3DPT_LINELIST, DU_CYLINDER_NUMLINES, D3DFVF_XYZ | D3DFVF_DIFFUSE,
+    m_WireCylinder.CreateFromData(D3DPT_LINELIST, DU_CYLINDER_NUMLINES, FVF::XYZ | FVF::DIFFUSE,
         du_cylinder_vertices, DU_CYLINDER_NUMVERTEX, du_cylinder_lines, DU_CYLINDER_NUMLINES * 2);
 
     for (int i = 0; i < LINE_DIVISION; i++)

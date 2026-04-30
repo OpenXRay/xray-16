@@ -12,6 +12,41 @@ namespace xray::render::fg
 {
 namespace FVF
 {
+constexpr u32 RESERVED0          = 0x001;
+constexpr u32 POSITION_MASK      = 0x400E;
+constexpr u32 XYZ                = 0x002;
+constexpr u32 XYZRHW             = 0x004;
+constexpr u32 XYZB1              = 0x006;
+constexpr u32 XYZB2              = 0x008;
+constexpr u32 XYZB3              = 0x00a;
+constexpr u32 XYZB4              = 0x00c;
+constexpr u32 XYZB5              = 0x00e;
+constexpr u32 XYZW               = 0x4002;
+constexpr u32 NORMAL             = 0x010;
+constexpr u32 PSIZE              = 0x020;
+constexpr u32 DIFFUSE            = 0x040;
+constexpr u32 SPECULAR           = 0x080;
+constexpr u32 TEXCOUNT_MASK      = 0xf00;
+constexpr u32 TEXCOUNT_SHIFT     = 8;
+constexpr u32 TEX0               = 0x000;
+constexpr u32 TEX1               = 0x100;
+constexpr u32 TEX2               = 0x200;
+constexpr u32 TEX3               = 0x300;
+constexpr u32 TEX4               = 0x400;
+constexpr u32 TEX5               = 0x500;
+constexpr u32 TEX6               = 0x600;
+constexpr u32 TEX7               = 0x700;
+constexpr u32 TEX8               = 0x800;
+constexpr u32 LASTBETA_UBYTE4    = 0x1000;
+constexpr u32 LASTBETA_D3DCOLOR  = 0x8000;
+constexpr u32 RESERVED2          = 0x6000;
+constexpr u32 TEXTUREFORMAT2     = 0;
+constexpr u32 TEXTUREFORMAT1     = 3;
+constexpr u32 TEXTUREFORMAT3     = 1;
+constexpr u32 TEXTUREFORMAT4     = 2;
+
+constexpr u32 TEXCOORDSIZE3(u32 idx) { return 1u << (idx * 2 + 16); }
+
 #pragma pack(push, 4)
 struct L
 {
@@ -37,7 +72,7 @@ struct L
         color = C;
     }
 };
-const u32 F_L = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+const u32 F_L = XYZ | DIFFUSE;
 
 struct V
 {
@@ -57,7 +92,7 @@ struct V
         t.set(u, v);
     }
 };
-const u32 F_V = D3DFVF_XYZ | D3DFVF_TEX1;
+const u32 F_V = XYZ | TEX1;
 
 struct LIT
 {
@@ -80,7 +115,7 @@ struct LIT
         t.set(u, v);
     }
 };
-const u32 F_LIT = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+const u32 F_LIT = XYZ | DIFFUSE | TEX1;
 
 struct TL
 {
@@ -112,7 +147,7 @@ struct TL
         p.z = (matSet._13 * v.x + matSet._23 * v.y + matSet._33 * v.z + matSet._43) / p.w;
     };
 };
-const u32 F_TL = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+const u32 F_TL = XYZRHW | DIFFUSE | TEX1;
 
 struct TL2uv
 {
@@ -163,7 +198,7 @@ struct TL2uv
         p.z = (matSet._13 * v.x + matSet._23 * v.y + matSet._33 * v.z + matSet._43) / p.w;
     };
 };
-const u32 F_TL2uv = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX2;
+const u32 F_TL2uv = XYZRHW | DIFFUSE | TEX2;
 
 struct TL4uv
 {
@@ -202,7 +237,7 @@ struct TL4uv
         uv[1].y = v2;
     };
 };
-const u32 F_TL4uv = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX4;
+const u32 F_TL4uv = XYZRHW | DIFFUSE | TEX4;
 #pragma pack(pop)
 } // namespace FVF
 } // namespace xray::render::fg

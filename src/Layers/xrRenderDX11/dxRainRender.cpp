@@ -52,7 +52,7 @@ dxRainRender::dxRainRender()
     }
 
     hGeom_Rain.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
-    hGeom_Drops.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
+    hGeom_Drops.create(FVF::XYZ | FVF::DIFFUSE | FVF::TEX1, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 
     FS.r_close(F);
 }
