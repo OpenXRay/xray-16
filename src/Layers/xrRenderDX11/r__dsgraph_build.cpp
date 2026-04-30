@@ -719,15 +719,15 @@ void R_dsgraph_structure::build_subspace()
 
     marker++; // !!! critical here
 
-    if (o.precise_portals && RImplementation.rmPortals)
+    if (o.precise_portals && g_pRmPortals)
     {
         // Check if camera is too near to some portal - if so force DualRender
         Fvector box_radius;
         box_radius.set(o.query_box_side, o.query_box_side, o.query_box_side);
-        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, RImplementation.rmPortals, o.view_pos, box_radius);
+        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, g_pRmPortals, o.view_pos, box_radius);
         for (size_t K = 0; K < Sectors_xrc.r_count(); K++)
         {
-            CPortal* pPortal = Portals[RImplementation.rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
+            CPortal* pPortal = Portals[g_pRmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
             pPortal->bDualRender = TRUE;
         }
     }

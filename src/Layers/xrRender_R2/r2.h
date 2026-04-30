@@ -330,7 +330,6 @@ public:
     IRender_Sector::sector_id_t last_sector_id{IRender_Sector::INVALID_SECTOR_ID};
     u32 uLastLTRACK;
     xrXRC Sectors_xrc;
-    CDB::MODEL* rmPortals;
     CHOM HOM;
     Task* ProcessHOMTask;
     R_occlusion HWOCC;

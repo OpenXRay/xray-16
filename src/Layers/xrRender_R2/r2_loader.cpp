@@ -349,7 +349,7 @@ void CRender::level_Unload()
 
     //*** Sectors
     // 1.
-    xr_delete(rmPortals);
+    xr_delete(g_pRmPortals);
     last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
     Device.vCameraPositionSaved.set(0, 0, 0);
 
@@ -620,15 +620,15 @@ void CRender::LoadSectors(IReader* fs)
         bool do_rebuild = true;
         const auto chunk_size = fs->find_chunk(fsL_PORTALS);
 
-        rmPortals = xr_new<CDB::MODEL>();
+        g_pRmPortals = xr_new<CDB::MODEL>();
         if (use_cache)
-            rmPortals->set_model_crc32(crc32(fs->pointer(), chunk_size));
+            g_pRmPortals->set_model_crc32(crc32(fs->pointer(), chunk_size));
 
         string_path file_name;
         strconcat(file_name, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
         FS.update_path(file_name, "$app_data_root$", file_name);
 
-        if (use_cache && FS.exist(file_name) && rmPortals->deserialize(file_name, skip_crc32_check))
+        if (use_cache && FS.exist(file_name) && g_pRmPortals->deserialize(file_name, skip_crc32_check))
         {
 #ifndef MASTER_GOLD
             Msg("* Loaded portals cache (%s)...", file_name);
@@ -667,14 +667,14 @@ void CRender::LoadSectors(IReader* fs)
                 v3.set(-20002.f, -20002.f, -20002.f);
                 CL.add_face_packed_D(v1, v2, v3, 0);
             }
-            rmPortals->build(CL.getV(), CL.getVS(), CL.getT(), CL.getTS());
+            g_pRmPortals->build(CL.getV(), CL.getVS(), CL.getT(), CL.getTS());
             if (use_cache)
-                rmPortals->serialize(file_name);
+                g_pRmPortals->serialize(file_name);
         }
     }
     else
     {
-        rmPortals = nullptr;
+        g_pRmPortals = nullptr;
     }
 
     for (u32 id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)

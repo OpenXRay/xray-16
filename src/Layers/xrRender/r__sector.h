@@ -5,10 +5,14 @@
 #pragma once
 #include "xrCore/_fbox2.h"
 
+namespace CDB { class MODEL; }
+
 namespace xray::render::fg
 {
 class CPortal;
 class CSector;
+
+extern ECORE_API CDB::MODEL* g_pRmPortals;
 
 struct _scissor : public Fbox2
 {
