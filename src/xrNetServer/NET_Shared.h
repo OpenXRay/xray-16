@@ -15,11 +15,6 @@
 #   endif
 #endif
 
-// XXX: review and delete
-//#include "xrCore/net_utils.h"
-//#include <dplay/dplay8.h>
-//#include "NET_Messages.h"
-
 #include "NET_Compressor.h"
 
 // #define USE_DIRECT_PLAY
@@ -55,10 +50,3 @@ enum
 IC u32 TimeGlobal(CTimer* timer) { return timer->GetElapsed_ms(); }
 IC u32 TimerAsync(CTimer* timer) { return TimeGlobal(timer); }
 
-#if defined(XR_PLATFORM_WINDOWS)
-// DPlay
-extern "C"
-{
-    typedef struct _DPN_CONNECTION_INFO DPN_CONNECTION_INFO;
-}
-#endif

@@ -1,5 +1,6 @@
 #pragma once
 #include "NET_Shared.h"
+#include "NET_Messages.h"
 #include "ip_filter.h"
 #include "PlayersMonitor.h"
 #include "IClient.h"
@@ -175,7 +176,7 @@ protected:
 	virtual bool  GetClientPendingMessagesCount(ClientID ID, DWORD& dwPending) = 0;
 
 	virtual void _Recieve(const void* data, u32 data_size, u32 param) override;
-	virtual void _SendTo_LL(ClientID ID, void* data, u32 size, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0) = 0;
+	virtual void _SendTo_LL(ClientID ID, void* data, u32 size, u32 dwFlags = xr_send_GUARANTEED, u32 dwTimeout = 0) = 0;
 	// Pavel: Calls from xrServer (from game thread)
 	virtual void ProcessMessagesQueue();
 	virtual IClient* new_client(SClientConnectData* cl_data) = 0;
@@ -210,13 +211,13 @@ public:
 	virtual bool DisconnectAddress(const ip_address& Address, LPCSTR reason);
 
 	// send
-	virtual void SendTo_LL(ClientID ID, void* data, u32 size, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
-	virtual void SendTo_Buf(ClientID ID, void* data, u32 size, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
+	virtual void SendTo_LL(ClientID ID, void* data, u32 size, u32 dwFlags = xr_send_GUARANTEED, u32 dwTimeout = 0);
+	virtual void SendTo_Buf(ClientID ID, void* data, u32 size, u32 dwFlags = xr_send_GUARANTEED, u32 dwTimeout = 0);
 	virtual void Flush_Clients_Buffers();
 
-	void SendTo(ClientID ID, NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
-	void SendBroadcast_LL(ClientID exclude, void* data, u32 size, u32 dwFlags = DPNSEND_GUARANTEED);
-	virtual void SendBroadcast(ClientID exclude, NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED);
+	void SendTo(ClientID ID, NET_Packet& P, u32 dwFlags = xr_send_GUARANTEED, u32 dwTimeout = 0);
+	void SendBroadcast_LL(ClientID exclude, void* data, u32 size, u32 dwFlags = xr_send_GUARANTEED);
+	virtual void SendBroadcast(ClientID exclude, NET_Packet& P, u32 dwFlags = xr_send_GUARANTEED);
 
 
 	IC const shared_str& GetConnectOptions() const { return connect_options; }

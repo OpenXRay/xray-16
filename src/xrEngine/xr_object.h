@@ -268,7 +268,7 @@ public:
     // Utilities
     // XXX: move out
     // static void u_EventGen(NET_Packet& P, u32 type, u32 dest);
-    // static void u_EventSend(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED);
+    // static void u_EventSend(NET_Packet& P, u32 dwFlags = xr_send_GUARANTEED);
     // Methods
     // object serialization
     virtual void net_Save(NET_Packet& packet) = 0;

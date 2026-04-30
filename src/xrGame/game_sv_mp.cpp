@@ -220,7 +220,7 @@ struct real_sender
     u32 flags_to_send;
 
 #ifdef XR_PLATFORM_WINDOWS // XXX: remove this ifdef
-    real_sender(xrServer* server, NET_Packet* Packet, u32 flags = DPNSEND_GUARANTEED)
+    real_sender(xrServer* server, NET_Packet* Packet, u32 flags = xr_send_GUARANTEED)
 #else
     real_sender(xrServer* server, NET_Packet* Packet, u32 flags = 0)
 #endif

@@ -153,7 +153,9 @@ void BaseClient::Flush_Send_Buffer()
 
 void client_sync_thread(void* P)
 {
+#if defined(XR_PLATFORM_WINDOWS)
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+#endif
 	BaseClient*	C = (BaseClient*)P;
 	C->Sync_Thread();
 }
@@ -201,18 +203,11 @@ bool BaseClient::Sync_Thread()
 		clPing.dwTime_ClientSend = TimerAsync(device_timer);
 
 		// Send it
-		__try {
-			if (!IsConnectionInit() || net_Disconnected)
-                break;
+		if (!IsConnectionInit() || net_Disconnected)
+            break;
 
-			if (!SendPingMessage(clPing))
-            {
-				Msg("* DirectPlayClient: SyncThread: EXIT. (failed to send - disconnected?)");
-				break;
-			}
-		}
-		__except (EXCEPTION_EXECUTE_HANDLER)
-		{
+		if (!SendPingMessage(clPing))
+        {
 			Msg("* CLIENT: SyncThread: EXIT. (failed to send - disconnected?)");
 			break;
 		}

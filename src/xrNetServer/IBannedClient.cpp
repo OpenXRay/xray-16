@@ -34,7 +34,7 @@ xr_string IBannedClient::BannedTimeTo() const
 {
 	string256			res;
 	tm*					_tm_banned;
-	_tm_banned = _localtime64(&BanTime);
+	_tm_banned = localtime(&BanTime);
 	xr_sprintf(res, sizeof(res),
 		"%02d.%02d.%d_%02d:%02d:%02d",
 		_tm_banned->tm_mday,

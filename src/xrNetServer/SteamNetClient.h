@@ -40,7 +40,7 @@ protected:
 
 	virtual bool CreateConnection(ClientConnectionOptions& opt) override;
 	virtual void DestroyConnection() override;
-	virtual	void SendTo_LL(void* data, u32 size, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0) override;
+	virtual	void SendTo_LL(void* data, u32 size, u32 dwFlags = xr_send_GUARANTEED, u32 dwTimeout = 0) override;
 
 	virtual bool GetPendingMessagesCount(DWORD& dwPending) override;
 	virtual bool SendPingMessage(MSYS_PING& clPing) override;

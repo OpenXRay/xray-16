@@ -96,7 +96,7 @@ protected:
 	virtual bool GetPendingMessagesCount(DWORD& dwPending) = 0;
 	virtual bool SendPingMessage(MSYS_PING& clPing) = 0;
 
-	virtual	void SendTo_LL(void* data, u32 size, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0) = 0;
+	virtual	void SendTo_LL(void* data, u32 size, u32 dwFlags = xr_send_GUARANTEED, u32 dwTimeout = 0) = 0;
 
 public:
 	bool Connect(LPCSTR options);
@@ -125,7 +125,7 @@ public:
 	IC void EndProcessQueue() { net_Queue.Unlock(); };
 
 	// send
-	virtual	void Send(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
+	virtual	void Send(NET_Packet& P, u32 dwFlags = xr_send_GUARANTEED, u32 dwTimeout = 0);
 	virtual void Flush_Send_Buffer();
 
 	virtual void OnMessage(void* data, u32 size);
