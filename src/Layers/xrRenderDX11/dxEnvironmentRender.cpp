@@ -117,7 +117,7 @@ void dxEnvironmentRender::Copy(IEnvironmentRender& _in) { *this = *(dxEnvironmen
 
 particles_systems::library_interface const& dxEnvironmentRender::particles_systems_library()
 {
-    return (RImplementation.PSLibrary);
+    return (RImplementation.m_framegraphRenderer->m_PSLibrary);
 }
 
 void dxEnvDescriptorRender::OnDeviceCreate(CEnvDescriptor& owner)

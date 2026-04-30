@@ -7,5 +7,4 @@ namespace xray::render::fg
 {
 R_buffer_pool BufferPool;
 CModelPool* g_pModelPool = nullptr;
-CPSLibrary* g_pPSLibrary = nullptr;
 }
