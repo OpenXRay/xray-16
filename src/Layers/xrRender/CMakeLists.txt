@@ -163,6 +163,7 @@ target_sources(xrRender PRIVATE
     FGRenderBase.h
     FGRenderBase.cpp
     r4_rendertarget.h
+    r4_rendertarget.cpp
     r4_rendertarget_build_textures.cpp
     r4_rendertarget_u_set_rt.cpp
     DetailModel.cpp

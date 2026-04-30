@@ -267,7 +267,6 @@
     <ClCompile Include="..\xrRenderDX11\blenders\blender_luminance.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\blender_ssao.cpp"/>
     <ClCompile Include="..\xrRender_R2\r2.cpp"/>
-    <ClCompile Include="..\xrRender_R2\r2_rendertarget.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\dx11HDAOCSBlender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\dx11MinMaxSMBlender.cpp"/>
     <ClCompile Include="r2_test_hw.cpp"/>

@@ -23,51 +23,10 @@ namespace xray::render::fg
 {
 void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM)
 {
-    PIX_EVENT(stencil_optimize);
-
-#if defined(USE_DX11)
-    // TODO: DX11: remove half pixel offset?
-    VERIFY(RImplementation.o.nvstencil);
-    u32 Offset;
-    float _w = float(Device.dwWidth);
-    float _h = float(Device.dwHeight);
-    u32 C = color_rgba(255, 255, 255, 255);
-    FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
-    float eps = 0;
-    float _dw = 0.5f;
-    float _dh = 0.5f;
-    pv->set(-_dw, _h - _dh, eps, 1.f, C, 0, 0);
-    pv++;
-    pv->set(-_dw, -_dh, eps, 1.f, C, 0, 0);
-    pv++;
-    pv->set(_w - _dw, _h - _dh, eps, 1.f, C, 0, 0);
-    pv++;
-    pv->set(_w - _dw, -_dh, eps, 1.f, C, 0, 0);
-    pv++;
-    RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
-
-    cmd_list.set_Element(s_occq->E[1]);
-
-    switch (eSOM)
-    {
-    case SO_Light: cmd_list.StateManager.SetStencilRef(dwLightMarkerID); break;
-    case SO_Combine: cmd_list.StateManager.SetStencilRef(0x01); break;
-    default: VERIFY(!"CRenderTarget::u_stencil_optimize. switch no default!");
-    }
-
-    cmd_list.set_Geometry(g_combine);
-    cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
-#elif defined(USE_OGL)
-    //	TODO: OGL: should we implement stencil optimization?
-    VERIFY(RImplementation.o.nvstencil);
-    VERIFY(!"CRenderTarget::u_stencil_optimize no implemented");
+    UNUSED(cmd_list);
     UNUSED(eSOM);
-#else
-#   error No graphics API selected or enabled!
-#endif // USE_DX11
 }
 
-// 2D texgen (texture adjustment matrix)
 void CRenderTarget::u_compute_texgen_screen(CBackend& cmd_list, Fmatrix& m_Texgen)
 {
 #if defined(USE_DX11)
@@ -93,10 +52,8 @@ void CRenderTarget::u_compute_texgen_screen(CBackend& cmd_list, Fmatrix& m_Texge
     m_Texgen.mul(m_TexelAdjust, cmd_list.xforms.m_wvp);
 }
 
-// 2D texgen for jitter (texture adjustment matrix)
 void CRenderTarget::u_compute_texgen_jitter(CBackend& cmd_list, Fmatrix& m_Texgen_J)
 {
-    // place into 0..1 space
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
@@ -112,7 +69,6 @@ void CRenderTarget::u_compute_texgen_jitter(CBackend& cmd_list, Fmatrix& m_Texge
     };
     m_Texgen_J.mul(m_TexelAdjust, cmd_list.xforms.m_wvp);
 
-    // rescale - tile it
     float scale_X = float(Device.dwWidth) / float(TEX_jitter);
     float scale_Y = float(Device.dwHeight) / float(TEX_jitter);
     m_TexelAdjust.scale(scale_X, scale_Y, 1.f);
@@ -153,7 +109,6 @@ Ivector vpack(const Fvector& src)
     int bx = fpack(src.x);
     int by = fpack(src.y);
     int bz = fpackZ(src.z);
-    // dumb test
     float e_best = flt_max;
     int r = bx, g = by, b = bz;
 #ifdef DEBUG
@@ -207,7 +162,6 @@ CRenderTarget::~CRenderTarget()
 #if defined(USE_DX11)
     _RELEASE(t_ss_async);
 #elif defined(USE_OGL)
-    // Textures
     t_material->surface_set(GL_TEXTURE_3D, 0);
     glDeleteTextures(1, &t_material_surf);
     t_material.destroy();
@@ -217,7 +171,6 @@ CRenderTarget::~CRenderTarget()
     t_LUM_src.destroy();
     t_LUM_dest.destroy();
 
-    // Jitter
     for (u32 it = 0; it < TEX_jitter_count; it++)
     {
         t_noise[it]->surface_set(GL_TEXTURE_2D, 0);
@@ -233,30 +186,9 @@ CRenderTarget::~CRenderTarget()
 
 void CRenderTarget::reset_light_marker(CBackend& cmd_list, bool bResetStencil)
 {
+    UNUSED(cmd_list);
+    UNUSED(bResetStencil);
     dwLightMarkerID = 5;
-    if (bResetStencil)
-    {
-        u32 Offset;
-        float _w = float(Device.dwWidth);
-        float _h = float(Device.dwHeight);
-        u32 C = color_rgba(255, 255, 255, 255);
-        float eps = 0;
-        float _dw = 0.5f;
-        float _dh = 0.5f;
-        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
-        pv->set(-_dw, _h - _dh, eps, 1.f, C, 0, 0);
-        pv++;
-        pv->set(-_dw, -_dh, eps, 1.f, C, 0, 0);
-        pv++;
-        pv->set(_w - _dw, _h - _dh, eps, 1.f, C, 0, 0);
-        pv++;
-        pv->set(_w - _dw, -_dh, eps, 1.f, C, 0, 0);
-        pv++;
-        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
-        cmd_list.set_Element(s_occq->E[2]);
-        cmd_list.set_Geometry(g_combine);
-        cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
-    }
 }
 
 void CRenderTarget::increment_light_marker(CBackend& cmd_list)
@@ -277,7 +209,6 @@ bool CRenderTarget::need_to_render_sunshafts()
     {
         const auto& env = g_pGamePersistent->Environment().CurrentEnv;
         const float fValue = env.m_fSunShaftsIntensity;
-        // TODO: add multiplication by sun color here
         if (fValue < 0.0001)
             return false;
     }
@@ -289,9 +220,9 @@ bool CRenderTarget::use_minmax_sm_this_frame()
 {
     switch (RImplementation.o.minmax_sm)
     {
-    case CRender::MMSM_ON: return true;
-    case CRender::MMSM_AUTO: return need_to_render_sunshafts();
-    case CRender::MMSM_AUTODETECT:
+    case FrameGraphRenderer::MMSM_ON: return true;
+    case FrameGraphRenderer::MMSM_AUTO: return need_to_render_sunshafts();
+    case FrameGraphRenderer::MMSM_AUTODETECT:
     {
         const auto& [width, height] = GEnv.Backend->GetBackBufferSize();
         u32 dwScreenArea = width * height;

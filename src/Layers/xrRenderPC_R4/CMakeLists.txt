@@ -170,7 +170,6 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRenderDX11/dx11r_screenshot.cpp
 
     ../xrRender_R2/r2.cpp
-    ../xrRender_R2/r2_rendertarget.cpp
 )
 
 target_include_directories(xrRenderPC_R4
