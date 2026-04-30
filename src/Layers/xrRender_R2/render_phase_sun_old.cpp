@@ -450,7 +450,7 @@ void render_sun_old::render_sun()
             !dsgraph.mapSorted.empty();
         if (bNormal || bSpecial)
         {
-            RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, sun, SE_SUN_FAR);
+            RImplementation.m_framegraphRenderer->m_pTarget->phase_smap_direct(dsgraph.cmd_list, sun, SE_SUN_FAR);
             dsgraph.cmd_list.set_xform_world(Fidentity);
             dsgraph.cmd_list.set_xform_view(Fidentity);
             dsgraph.cmd_list.set_xform_project(sun->X.D[SE_SUN_FAR].combine);
@@ -459,7 +459,7 @@ void render_sun_old::render_sun()
             if (bSpecial)
             {
                 sun->X.D[SE_SUN_FAR].transluent = TRUE;
-                RImplementation.Target->phase_smap_direct_tsh(dsgraph.cmd_list, sun, SE_SUN_FAR);
+                RImplementation.m_framegraphRenderer->m_pTarget->phase_smap_direct_tsh(dsgraph.cmd_list, sun, SE_SUN_FAR);
                 dsgraph.render_graph(1); // normal level, secondary priority
                 dsgraph.render_sorted(); // strict-sorted geoms
             }
@@ -467,17 +467,17 @@ void render_sun_old::render_sun()
     }
 
     // Accumulate
-    RImplementation.Target->phase_accumulator(dsgraph.cmd_list);
+    RImplementation.m_framegraphRenderer->m_pTarget->phase_accumulator(dsgraph.cmd_list);
 
-    if (RImplementation.Target->use_minmax_sm_this_frame())
+    if (RImplementation.m_framegraphRenderer->m_pTarget->use_minmax_sm_this_frame())
     {
         PIX_EVENT(SE_SUN_FAR_MINMAX_GENERATE);
-        RImplementation.Target->create_minmax_SM(dsgraph.cmd_list);
+        RImplementation.m_framegraphRenderer->m_pTarget->create_minmax_SM(dsgraph.cmd_list);
     }
 
     PIX_EVENT(SE_SUN_FAR);
-    RImplementation.Target->rt_smap_depth->set_slice_read(SE_SUN_FAR);
-    RImplementation.Target->accum_direct(dsgraph.cmd_list, SE_SUN_FAR);
+    RImplementation.m_framegraphRenderer->m_pTarget->rt_smap_depth->set_slice_read(SE_SUN_FAR);
+    RImplementation.m_framegraphRenderer->m_pTarget->accum_direct(dsgraph.cmd_list, SE_SUN_FAR);
 
     // Restore XForms
     dsgraph.cmd_list.set_xform_world(Fidentity);
@@ -533,7 +533,7 @@ void render_sun_old::render_sun_near()
         hull.compute_caster_model(cull_planes, sun->direction);
 #ifdef _DEBUG
         for (u32 it = 0; it < cull_planes.size(); it++)
-            RImplementation.Target->dbg_addplane(cull_planes[it], 0xffffffff);
+            RImplementation.m_framegraphRenderer->m_pTarget->dbg_addplane(cull_planes[it], 0xffffffff);
 #endif
 
         // COP - 100 km away
@@ -674,7 +674,7 @@ void render_sun_old::render_sun_near()
             !dsgraph.mapSorted.empty();
         if (bNormal || bSpecial)
         {
-            RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, sun, SE_SUN_NEAR);
+            RImplementation.m_framegraphRenderer->m_pTarget->phase_smap_direct(dsgraph.cmd_list, sun, SE_SUN_NEAR);
             dsgraph.cmd_list.set_xform_world(Fidentity);
             dsgraph.cmd_list.set_xform_view(Fidentity);
             dsgraph.cmd_list.set_xform_project(sun->X.D[SE_SUN_NEAR].combine);
@@ -685,7 +685,7 @@ void render_sun_old::render_sun_near()
             if (bSpecial)
             {
                 sun->X.D[SE_SUN_NEAR].transluent = TRUE;
-                RImplementation.Target->phase_smap_direct_tsh(dsgraph.cmd_list, sun, SE_SUN_NEAR);
+                RImplementation.m_framegraphRenderer->m_pTarget->phase_smap_direct_tsh(dsgraph.cmd_list, sun, SE_SUN_NEAR);
                 dsgraph.render_graph(1); // normal level, secondary priority
                 dsgraph.render_sorted(); // strict-sorted geoms
             }
@@ -693,17 +693,17 @@ void render_sun_old::render_sun_near()
     }
 
     // Accumulate
-    RImplementation.Target->phase_accumulator(dsgraph.cmd_list);
+    RImplementation.m_framegraphRenderer->m_pTarget->phase_accumulator(dsgraph.cmd_list);
 
-    if (RImplementation.Target->use_minmax_sm_this_frame())
+    if (RImplementation.m_framegraphRenderer->m_pTarget->use_minmax_sm_this_frame())
     {
         PIX_EVENT(SE_SUN_NEAR_MINMAX_GENERATE);
-        RImplementation.Target->create_minmax_SM(dsgraph.cmd_list);
+        RImplementation.m_framegraphRenderer->m_pTarget->create_minmax_SM(dsgraph.cmd_list);
     }
 
     PIX_EVENT(SE_SUN_NEAR);
-    RImplementation.Target->rt_smap_depth->set_slice_read(SE_SUN_NEAR);
-    RImplementation.Target->accum_direct(dsgraph.cmd_list, SE_SUN_NEAR);
+    RImplementation.m_framegraphRenderer->m_pTarget->rt_smap_depth->set_slice_read(SE_SUN_NEAR);
+    RImplementation.m_framegraphRenderer->m_pTarget->accum_direct(dsgraph.cmd_list, SE_SUN_NEAR);
 
     // Restore XForms
     dsgraph.cmd_list.set_xform_world(Fidentity);
@@ -716,9 +716,9 @@ void render_sun_old::render_sun_filtered() const
     if (!RImplementation.o.sunfilter)
         return;
     auto& dsgraph = RImplementation.get_context(context_id);
-    RImplementation.Target->phase_accumulator(dsgraph.cmd_list);
+    RImplementation.m_framegraphRenderer->m_pTarget->phase_accumulator(dsgraph.cmd_list);
     PIX_EVENT(SE_SUN_LUMINANCE);
-    RImplementation.Target->accum_direct(dsgraph.cmd_list, SE_SUN_LUMINANCE);
+    RImplementation.m_framegraphRenderer->m_pTarget->accum_direct(dsgraph.cmd_list, SE_SUN_LUMINANCE);
 }
 
 void render_sun_old::render()

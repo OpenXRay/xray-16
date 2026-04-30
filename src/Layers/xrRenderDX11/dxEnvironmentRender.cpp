@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "Layers/xrRender/dxEnvironmentRender.h"
+#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 #include "Layers/xrRenderDX11/Blender.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
@@ -252,9 +254,9 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 
 #ifdef USE_OGL
     if (!RImplementation.o.msaa)
-        RImplementation.Target->u_setrt(RCache, RImplementation.Target->rt_Generic_0, nullptr, nullptr, RImplementation.Target->rt_Base_Depth);
+        RImplementation.m_framegraphRenderer->m_pTarget->u_setrt(RCache, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_0, nullptr, nullptr, RImplementation.m_framegraphRenderer->m_pTarget->rt_Base_Depth);
     else
-        RImplementation.Target->u_setrt(RCache, RImplementation.Target->rt_Generic_0_r, nullptr, nullptr, RImplementation.Target->rt_MSAADepth);
+        RImplementation.m_framegraphRenderer->m_pTarget->u_setrt(RCache, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_0_r, nullptr, nullptr, RImplementation.m_framegraphRenderer->m_pTarget->rt_MSAADepth);
 #endif
 
     RImplementation.rmNormal(RCache);
@@ -269,9 +271,9 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 
 #ifdef USE_OGL
     if (!RImplementation.o.msaa)
-        RImplementation.Target->u_setrt(RCache, RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Generic_1, nullptr, RImplementation.Target->rt_Base_Depth);
+        RImplementation.m_framegraphRenderer->m_pTarget->u_setrt(RCache, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_0, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_1, nullptr, RImplementation.m_framegraphRenderer->m_pTarget->rt_Base_Depth);
     else
-        RImplementation.Target->u_setrt(RCache, RImplementation.Target->rt_Generic_0_r, RImplementation.Target->rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth);
+        RImplementation.m_framegraphRenderer->m_pTarget->u_setrt(RCache, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_0_r, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_1_r, nullptr, RImplementation.m_framegraphRenderer->m_pTarget->rt_MSAADepth);
 #endif
 }
 

@@ -25,6 +25,7 @@ namespace xray::render::fg {
     class RTAccelStructManager;
     class CDetailManager;
     class CWallmarksEngine;
+    class CRenderTarget;
     class light;
     namespace PS {
         class CParticleEffect;
@@ -169,6 +170,7 @@ public:
     fg::CLight_Compute_XFORM_and_VIS m_LR;
     xr_vector<fg::light*> m_Lights_LastFrame;
     fg::SMAP_Allocator m_LP_smap_pool;
+    fg::CRenderTarget* m_pTarget{ nullptr };
 
 private:
     bool m_enabled = false;
