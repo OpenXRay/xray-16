@@ -592,11 +592,6 @@ void CRender::create()
 
     m_framegraphRenderer->m_pTarget = xr_new<CRenderTarget>(); // Main target
 
-    m_framegraphRenderer->m_r_main = xr_new<render_main>();
-    m_framegraphRenderer->m_r_rain = xr_new<render_rain>();
-    m_framegraphRenderer->m_r_sun = xr_new<render_sun>();
-    m_framegraphRenderer->m_r_sun_old = xr_new<render_sun_old>();
-
     g_pModelPool = xr_new<CModelPool>();
     m_framegraphRenderer->m_PSLibrary.OnCreate();
     m_framegraphRenderer->m_HWOCC.occq_create(occq_size);
@@ -647,10 +642,6 @@ void CRender::destroy()
     xr_delete(g_pModelPool);
     g_pModelPool = nullptr;
     xr_delete(m_framegraphRenderer->m_pTarget);
-    xr_delete(m_framegraphRenderer->m_r_main);
-    xr_delete(m_framegraphRenderer->m_r_rain);
-    xr_delete(m_framegraphRenderer->m_r_sun);
-    xr_delete(m_framegraphRenderer->m_r_sun_old);
     m_framegraphRenderer->m_PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);
 }
@@ -659,13 +650,6 @@ void CRender::reset_begin()
 {
     ZoneScoped;
     // Wait for tasks to be done
-    m_framegraphRenderer->m_r_main->sync();
-    m_framegraphRenderer->m_r_sun->sync();
-    m_framegraphRenderer->m_r_sun_old->sync();
-#if RENDER != R_R2
-    m_framegraphRenderer->m_r_rain->sync();
-#endif
-
     Resources->reset_begin();
 
     // Update incremental shadowmap-visibility solver
@@ -820,6 +804,20 @@ IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 }
 void CRender::models_Prefetch() { g_pModelPool->Prefetch(); }
 void CRender::models_Clear(bool b_complete) { g_pModelPool->ClearPool(b_complete); }
+
+void CRender::Render()
+{
+    if (m_framegraphRenderer)
+        m_framegraphRenderer->Render();
+}
+void CRender::RenderMenu()
+{
+    if (m_framegraphRenderer)
+        m_framegraphRenderer->RenderMenu();
+}
+void CRender::Calculate() {}
+void CRender::BeforeWorldRender() {}
+void CRender::AfterWorldRender() {}
 // D3D12: New shader access using CompiledLevelShader
 xray::render::CompiledLevelShader* CRender::getCompiledShader(int id)
 {

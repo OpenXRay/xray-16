@@ -32,10 +32,6 @@ namespace xray::render::fg {
     class CWallmarksEngine;
     class CRenderTarget;
     class light;
-    struct render_main;
-    struct render_rain;
-    struct render_sun;
-    struct render_sun_old;
     namespace PS {
         class CParticleEffect;
     }
@@ -218,10 +214,6 @@ public:
     fg::SMAP_Allocator m_LP_smap_pool;
     fg::CRenderTarget* m_pTarget{ nullptr };
     fg::CPSLibrary m_PSLibrary;
-    fg::render_main* m_r_main{ nullptr };
-    fg::render_rain* m_r_rain{ nullptr };
-    fg::render_sun* m_r_sun{ nullptr };
-    fg::render_sun_old* m_r_sun_old{ nullptr };
 #if defined(USE_DX11)
     xr_vector<D3D_SHADER_MACRO> m_ShaderOptions;
 #elif defined(USE_OGL)
