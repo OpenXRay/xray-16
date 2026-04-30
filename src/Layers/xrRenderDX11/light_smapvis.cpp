@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Layers/xrRender/light.h"
 #include "Layers/xrRender/FBasicVisual.h"
-#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::fg

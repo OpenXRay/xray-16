@@ -2,7 +2,7 @@
 #include "ImGuiRendererNVRHI.h"
 #include "Layers/xrRenderDX11/dxImGuiRender.h"
 #include "RenderContext/RenderDevice.h"
-#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render {

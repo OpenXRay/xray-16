@@ -247,7 +247,7 @@ target_include_directories(xrRender
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2"
+    
     "${CMAKE_SOURCE_DIR}/src/Layers/xrRenderPC_R4"
     "${CMAKE_SOURCE_DIR}/sdk/include"
     "${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh"

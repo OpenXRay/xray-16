@@ -5,7 +5,7 @@
 #include <d3d11.h>
 
 // Include CRender for accessing backbuffer
-#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 
 namespace xray::render::fg {
