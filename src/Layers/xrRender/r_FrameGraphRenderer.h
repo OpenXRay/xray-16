@@ -123,31 +123,31 @@ public:
     HRESULT shader_compile(pcstr, IReader*, pcstr, pcstr, u32, void*&) override { return 0; }
 
     pcstr getShaderPath() override { return "r5\\"; }
-    IRenderVisual* getVisual(int) override { return nullptr; }
+    IRenderVisual* getVisual(int id) override;
 
-    void add_Visual(u32, IRenderable*, IRenderVisual*, Fmatrix&) override {}
-    void add_StaticWallmark(const wm_shader&, const Fvector&, float, CDB::TRI*, Fvector*) override {}
-    void add_StaticWallmark(IWallMarkArray*, const Fvector&, float, CDB::TRI*, Fvector*) override {}
-    void clear_static_wallmarks() override {}
-    void add_SkeletonWallmark(const Fmatrix*, IKinematics*, IWallMarkArray*, const Fvector&, const Fvector&, float) override {}
+    void add_Visual(u32, IRenderable* root, IRenderVisual* V, Fmatrix& m) override;
+    void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override;
+    void add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override;
+    void clear_static_wallmarks() override;
+    void add_SkeletonWallmark(const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start, const Fvector& dir, float size) override;
 
-    IRender_ObjectSpecific* ros_create(IRenderable*) override { return nullptr; }
-    void ros_destroy(IRender_ObjectSpecific*&) override {}
-    IRender_Light* light_create() override { return nullptr; }
-    IRender_Glow* glow_create() override { return nullptr; }
+    IRender_ObjectSpecific* ros_create(IRenderable* parent) override;
+    void ros_destroy(IRender_ObjectSpecific*& p) override;
+    IRender_Light* light_create() override;
+    IRender_Glow* glow_create() override;
 
-    IRenderVisual* model_CreateParticles(pcstr) override { return nullptr; }
-    IRenderVisual* model_Create(pcstr, IReader*) override { return nullptr; }
-    IRenderVisual* model_CreateChild(pcstr, IReader*) override { return nullptr; }
-    IRenderVisual* model_Duplicate(IRenderVisual*) override { return nullptr; }
-    void model_Delete(IRenderVisual*&, bool) override {}
-    void model_Logging(bool) override {}
-    void models_Prefetch() override {}
-    void models_Clear(bool) override {}
+    IRenderVisual* model_CreateParticles(pcstr name) override;
+    IRenderVisual* model_Create(pcstr name, IReader* data) override;
+    IRenderVisual* model_CreateChild(pcstr name, IReader* data) override;
+    IRenderVisual* model_Duplicate(IRenderVisual* V) override;
+    void model_Delete(IRenderVisual*& V, bool bDiscard) override;
+    void model_Logging(bool bEnable) override;
+    void models_Prefetch() override;
+    void models_Clear(bool b_complete) override;
 
-    bool occ_visible(vis_data&) override { return true; }
-    bool occ_visible(Fbox&) override { return true; }
-    bool occ_visible(sPoly&) override { return true; }
+    bool occ_visible(vis_data& V) override;
+    bool occ_visible(Fbox& B) override;
+    bool occ_visible(sPoly& P) override;
 
     void Calculate() override {}
     void BeforeWorldRender() override {}

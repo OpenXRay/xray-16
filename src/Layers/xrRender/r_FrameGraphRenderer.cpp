@@ -71,6 +71,18 @@
 #include "xrParticles/psystem.h"
 #include "Layers/xrRenderDX11/blenders/Blender_Particle.h"
 
+#include "Layers/xrRender/HOM.h"
+#include "Layers/xrRender/Light_DB.h"
+#include "Layers/xrRender/LightTrack.h"
+#include "Layers/xrRender/ModelPool.h"
+#include "Layers/xrRender/r__buffer_pool.h"
+#include "Layers/xrRender/dxWallMarkArray.h"
+#include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/WallmarksEngine.h"
+#include "Layers/xrRender/PSLibrary.h"
+#include "Layers/xrRender/Decals/fgWallMarkArray.h"
+#include "Layers/xrRender/Decals/MeshPicker.h"
+
 extern ENGINE_API float psHUD_FOV;
 extern ENGINE_API int ps_r_rt_gi;
 extern ENGINE_API float ps_r_rt_gi_intensity;
@@ -2501,6 +2513,231 @@ void FrameGraphRenderer::UpdateSmokeTrail(
 void FrameGraphRenderer::NotifySmokeShot()
 {
     // TODO: forward to m_smokeTrailManager->OnShot() when heat system is added
+}
+
+namespace
+{
+class CGlow : public IRender_Glow
+{
+public:
+    bool bActive{ false };
+    void set_active(bool b) override { bActive = b; }
+    bool get_active() override { return bActive; }
+    void set_position(const Fvector&) override {}
+    void set_direction(const Fvector&) override {}
+    void set_radius(float) override {}
+    void set_texture(LPCSTR) override {}
+    void set_color(const Fcolor&) override {}
+    void set_color(float, float, float) override {}
+};
+
+float EstimateSplatUVRadius(const fg::decals::MeshPickResult& pickResult, float worldRadius)
+{
+    const float du1 = pickResult.triUV[1].x - pickResult.triUV[0].x;
+    const float dv1 = pickResult.triUV[1].y - pickResult.triUV[0].y;
+    const float du2 = pickResult.triUV[2].x - pickResult.triUV[0].x;
+    const float dv2 = pickResult.triUV[2].y - pickResult.triUV[0].y;
+
+    const float det = du1 * dv2 - dv1 * du2;
+    if (_abs(det) > EPS_S)
+    {
+        const float invDet = 1.f / det;
+
+        Fvector dpdu;
+        dpdu.set(
+            (pickResult.triWorldEdge1.x * dv2 - pickResult.triWorldEdge2.x * dv1) * invDet,
+            (pickResult.triWorldEdge1.y * dv2 - pickResult.triWorldEdge2.y * dv1) * invDet,
+            (pickResult.triWorldEdge1.z * dv2 - pickResult.triWorldEdge2.z * dv1) * invDet);
+
+        Fvector dpdv;
+        dpdv.set(
+            (pickResult.triWorldEdge2.x * du1 - pickResult.triWorldEdge1.x * du2) * invDet,
+            (pickResult.triWorldEdge2.y * du1 - pickResult.triWorldEdge1.y * du2) * invDet,
+            (pickResult.triWorldEdge2.z * du1 - pickResult.triWorldEdge1.z * du2) * invDet);
+
+        const float worldPerUV = 0.5f * (dpdu.magnitude() + dpdv.magnitude());
+        if (worldPerUV > EPS_S)
+            return _max(worldRadius / worldPerUV, 1e-4f);
+    }
+
+    const float worldEdge = _max(pickResult.triWorldEdge1.magnitude(), pickResult.triWorldEdge2.magnitude());
+    const float uvEdge1 = _sqrt(_sqr(du1) + _sqr(dv1));
+    const float uvEdge2 = _sqrt(_sqr(du2) + _sqr(dv2));
+    const float uvEdge = _max(uvEdge1, uvEdge2);
+    if (worldEdge > EPS_S && uvEdge > EPS_S)
+        return _max(worldRadius * (uvEdge / worldEdge), 1e-4f);
+
+    return 0.02f;
+}
+}
+
+IRender_ObjectSpecific* FrameGraphRenderer::ros_create(IRenderable*) { return xr_new<CROS_impl>(); }
+void FrameGraphRenderer::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
+
+IRender_Light* FrameGraphRenderer::light_create() { return Lights.Create(); }
+IRender_Glow*  FrameGraphRenderer::glow_create()  { return xr_new<CGlow>(); }
+
+IRenderVisual* FrameGraphRenderer::model_Create(pcstr name, IReader* data)        { return g_pModelPool->Create(name, data); }
+IRenderVisual* FrameGraphRenderer::model_CreateChild(pcstr name, IReader* data)   { return g_pModelPool->CreateChild(name, data); }
+IRenderVisual* FrameGraphRenderer::model_Duplicate(IRenderVisual* V)              { return g_pModelPool->Instance_Duplicate((fg::dxRender_Visual*)V); }
+
+void FrameGraphRenderer::model_Delete(IRenderVisual*& V, bool bDiscard)
+{
+    auto* pVisual = (fg::dxRender_Visual*)V;
+    g_pModelPool->Delete(pVisual, bDiscard);
+    V = nullptr;
+}
+
+IRenderVisual* FrameGraphRenderer::model_CreateParticles(pcstr name)
+{
+    fg::PS::CPEDef* SE = m_PSLibrary.FindPED(name);
+    if (SE)
+        return g_pModelPool->CreatePE(SE);
+
+    fg::PS::CPGDef* SG = m_PSLibrary.FindPGD(name);
+    R_ASSERT3(SG, "Particle effect or group doesn't exist", name);
+    return g_pModelPool->CreatePG(SG);
+}
+
+void FrameGraphRenderer::model_Logging(bool bEnable) { g_pModelPool->Logging(bEnable); }
+void FrameGraphRenderer::models_Prefetch()           { g_pModelPool->Prefetch(); }
+void FrameGraphRenderer::models_Clear(bool b)        { g_pModelPool->ClearPool(b); }
+
+bool FrameGraphRenderer::occ_visible(vis_data& V) { return m_HOM.visible(V); }
+bool FrameGraphRenderer::occ_visible(Fbox& B)     { return m_HOM.visible(B); }
+bool FrameGraphRenderer::occ_visible(sPoly& P)    { return m_HOM.visible(P); }
+
+IRenderVisual* FrameGraphRenderer::getVisual(int id) { return fg::BufferPool.getVisual(id); }
+
+void FrameGraphRenderer::add_Visual(u32, IRenderable* root, IRenderVisual* V, Fmatrix& m)
+{
+    if (IsEnabled())
+        add_Visual(root, V, m);
+}
+
+void FrameGraphRenderer::add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
+{
+    if (IsEnabled())
+        return;
+    auto* pUIShader = (dxUIShader*)&*S;
+    if (!pUIShader)
+        return;
+    auto& sh = pUIShader->hShader;
+    VERIFY2(T, "Invalid static wallmark triangle");
+    if (T->suppress_wm)
+        return;
+    VERIFY2(_valid(P) && _valid(s) && V && (s > EPS_L), "Invalid static wallmark params");
+    m_pWallmarksEngine->AddStaticWallmark(T, V, P, &*sh, s);
+}
+
+void FrameGraphRenderer::add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
+{
+    if (IsEnabled())
+    {
+        if (!T || T->suppress_wm || !V || s <= EPS_L)
+            return;
+        auto* fgArray = static_cast<fg::decals::fgWallMarkArray*>(pArray);
+        u32 matID = fgArray->GenerateBindlessMaterialID();
+        if (matID == UINT32_MAX)
+            return;
+        Fvector N;
+        N.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
+        float decalSize = s * 2.0f;
+        GetDecalManager()->AddStaticDecal(P, N, decalSize, matID);
+        return;
+    }
+    auto* pWMA = (dxWallMarkArray*)pArray;
+    ref_shader* pShader = pWMA->dxGenerateWallmark();
+    if (pShader)
+    {
+        VERIFY2(T, "Invalid static wallmark triangle");
+        if (T->suppress_wm)
+            return;
+        VERIFY2(_valid(P) && _valid(s) && V && (s > EPS_L), "Invalid static wallmark params");
+        m_pWallmarksEngine->AddStaticWallmark(T, V, P, &**pShader, s);
+    }
+}
+
+void FrameGraphRenderer::clear_static_wallmarks()
+{
+    if (m_pWallmarksEngine)
+        m_pWallmarksEngine->clear();
+}
+
+void FrameGraphRenderer::add_SkeletonWallmark(
+    const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start, const Fvector& dir, float size)
+{
+    if (IsEnabled())
+    {
+        if (!xf || !obj || size <= EPS_L)
+            return;
+        float distSq = xf->c.distance_to_sqr(Device.vCameraPosition);
+        if (distSq > _sqr(50.f))
+            return;
+
+        const u32 splatMode = ps_r4_skeleton_wallmark_mode > 0
+            ? fg::decals::SPLAT_MODE_PROCEDURAL_BLOOD
+            : fg::decals::SPLAT_MODE_DECAL;
+
+        shared_str wallmarkTexture;
+        u32 matID = UINT32_MAX;
+        if (splatMode == fg::decals::SPLAT_MODE_DECAL)
+        {
+            if (!pArray)
+                return;
+            auto* fgArray = static_cast<fg::decals::fgWallMarkArray*>(pArray);
+            matID = fgArray->GenerateBindlessMaterialID(&wallmarkTexture);
+            if (matID == UINT32_MAX)
+                return;
+        }
+        float decalSize = size * 2.0f;
+        fg::decals::MeshPickResult entryPick;
+        if (fg::decals::PickMeshDirect((CKinematics*)obj, *xf, start, dir, 100.f, entryPick))
+        {
+            auto* overlayMgr = GetOverlayManager();
+            float worldRadius = decalSize * 0.5f;
+            Fvector bloodColor = { 0.4f, 0.02f, 0.02f };
+            const float lifetime = splatMode == fg::decals::SPLAT_MODE_PROCEDURAL_BLOOD ? 18.f : 12.f;
+
+            auto queueSplat = [&](const fg::decals::MeshPickResult& pick)
+            {
+                const float uvRadius = EstimateSplatUVRadius(pick, worldRadius);
+                overlayMgr->AddSplat((CKinematics*)obj, pick.triVerts,
+                                      pick.baryU, pick.baryV,
+                                      worldRadius, bloodColor, 0.8f,
+                                      pick.uv, uvRadius, matID,
+                                      splatMode, lifetime,
+                                      pick.hitTextureName.c_str(),
+                                      wallmarkTexture.c_str());
+            };
+
+            queueSplat(entryPick);
+
+            Fvector shotDir = dir;
+            shotDir.normalize_safe();
+            const float entryAdvance = entryPick.dist + 0.01f;
+            const float remaining = 100.f - entryAdvance;
+            if (remaining > 0.01f)
+            {
+                Fvector exitStart;
+                exitStart.mad(start, shotDir, entryAdvance);
+
+                fg::decals::MeshPickResult exitPick;
+                if (fg::decals::PickMeshDirect((CKinematics*)obj, *xf, exitStart, shotDir, remaining, exitPick))
+                {
+                    const float minSeparation = _max(0.02f, worldRadius * 0.25f);
+                    if (entryPick.worldPos.distance_to(exitPick.worldPos) > minSeparation)
+                        queueSplat(exitPick);
+                }
+            }
+        }
+        return;
+    }
+
+    auto* pWMA = (dxWallMarkArray*)pArray;
+    ref_shader* pShader = pWMA->dxGenerateWallmark();
+    if (pShader)
+        m_pWallmarksEngine->AddSkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
 
 } // namespace xray::render
