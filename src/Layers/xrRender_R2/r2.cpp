@@ -592,8 +592,6 @@ void CRender::create()
     m_framegraphRenderer->m_pTarget = xr_new<CRenderTarget>(); // Main target
 
     g_pModelPool = xr_new<CModelPool>();
-    m_framegraphRenderer->m_PSLibrary.OnCreate();
-    m_framegraphRenderer->m_HWOCC.occq_create(occq_size);
 
     rmNormal(RCache);
 
@@ -623,6 +621,10 @@ void CRender::destroy()
     }
 #endif
 
+    xr_delete(m_framegraphRenderer->m_pTarget);
+    xr_delete(g_pModelPool);
+    g_pModelPool = nullptr;
+
 #if defined(USE_DX11) && RENDER == R_R4
     r5::ShutdownFrameGraph();
 
@@ -634,11 +636,6 @@ void CRender::destroy()
     }
 #endif
 
-    m_framegraphRenderer->m_HWOCC.occq_destroy();
-    xr_delete(g_pModelPool);
-    g_pModelPool = nullptr;
-    xr_delete(m_framegraphRenderer->m_pTarget);
-    m_framegraphRenderer->m_PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);
 }
 
