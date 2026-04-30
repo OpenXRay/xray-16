@@ -80,6 +80,7 @@
     <ClInclude Include="ConstantSystem\FGConstantSystem.h"/>
     <ClInclude Include="D3DUtils.h"/>
     <ClInclude Include="D3DXRenderBase.h"/>
+    <ClInclude Include="FGRenderBase.h"/>
     <ClInclude Include="Debug\dxPixEventWrapper.h"/>
     <ClInclude Include="DetailFormat.h"/>
     <ClInclude Include="DetailModel.h"/>
@@ -270,6 +271,7 @@
     <ClCompile Include="ColorMapManager.cpp"/>
     <ClCompile Include="ConstantSystem\FGConstantSystem.cpp"/>
     <ClCompile Include="D3DXRenderBase.cpp"/>
+    <ClCompile Include="FGRenderBase.cpp"/>
     <ClCompile Include="DetailModel.cpp"/>
     <ClCompile Include="du_box.cpp"/>
     <ClCompile Include="du_cone.cpp"/>
