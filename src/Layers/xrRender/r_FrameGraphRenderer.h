@@ -114,10 +114,13 @@ public:
     bool is_sun_static() override { return false; }
     u32 get_dx_level() override { return 0x000B0000; }
 
-    void create() override {}
-    void destroy() override {}
-    void reset_begin() override {}
-    void reset_end() override {}
+    void create() override;
+    void destroy() override;
+    void reset_begin() override;
+    void reset_end() override;
+    void rmNear(fg::CBackend& cmd_list);
+    void rmFar(fg::CBackend& cmd_list);
+    void rmNormal(fg::CBackend& cmd_list);
 
     void level_Load(IReader* fs) override;
     void level_Unload() override;
@@ -178,9 +181,9 @@ public:
     void OnCameraUpdated() override;
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
-    void Screenshot(IRender::ScreenshotMode, pcstr) override {}
-    void SetPostProcessParams(const SPPInfo&) override {}
-    void RequestGrassInteraction(const Fvector&, float, float, uint8_t) override {}
+    void Screenshot(IRender::ScreenshotMode mode, pcstr name) override;
+    void SetPostProcessParams(const SPPInfo&) override;
+    void RequestGrassInteraction(const Fvector&, float, float, uint8_t) override;
 
     // Initialize
     bool Initialize(fg::RenderDevice* device);
@@ -245,6 +248,76 @@ public:
     fg::decals::OverlayManager* GetOverlayManager() const { return m_overlayManager.get(); }
 
 public:
+    struct _options
+    {
+        u32 bug : 1;
+
+        u32 ssao_blur_on : 1;
+        u32 ssao_opt_data : 1;
+        u32 ssao_half_data : 1;
+        u32 ssao_hbao : 1;
+        u32 ssao_hdao : 1;
+        u32 ssao_ultra : 1;
+        u32 hbao_vectorized : 1;
+
+        u32 rain_smapsize : 16;
+        u32 smapsize : 16;
+        u32 depth16 : 1;
+        u32 mrt : 1;
+        u32 mrtmixdepth : 1;
+        u32 fp16_filter : 1;
+        u32 fp16_blend : 1;
+        u32 albedo_wo : 1;
+        u32 HW_smap : 1;
+        u32 HW_smap_PCF : 1;
+        u32 HW_smap_FETCH4 : 1;
+
+        u32 HW_smap_FORMAT : 32;
+
+        u32 nvstencil : 1;
+        u32 nvdbt : 1;
+
+        u32 nullrt : 1;
+        u32 ffp : 1;
+
+        u32 distortion : 1;
+        u32 distortion_enabled : 1;
+        u32 mblur : 1;
+
+        u32 sunfilter : 1;
+        u32 sunstatic : 1;
+        u32 sjitter : 1;
+        u32 noshadows : 1;
+        u32 Tshadows : 1;
+        u32 oldshadowcascades : 1;
+        u32 disasm : 1;
+        u32 advancedpp : 1;
+        u32 volumetricfog : 1;
+
+        u32 msaa : 1;
+        u32 msaa_hybrid : 1;
+        u32 msaa_opt : 1;
+        u32 gbuffer_opt : 1;
+        u32 dx11_sm4_1 : 1;
+        u32 msaa_alphatest : 2;
+        u32 msaa_samples : 4;
+
+        u32 minmax_sm : 2;
+        u32 minmax_sm_screenarea_threshold;
+
+        u32 tessellation : 1;
+
+        u32 forcegloss : 1;
+        u32 forceskinw : 1;
+
+        u32 mt_calculate : 1;
+        u32 mt_render : 1;
+
+        u32 support_rt_arrays : 1;
+
+        float forcegloss_v;
+    } o;
+
     struct Statistics
     {
         u32 l_total{ 0 };

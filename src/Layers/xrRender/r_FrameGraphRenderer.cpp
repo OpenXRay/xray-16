@@ -85,6 +85,9 @@
 #include "Layers/xrRenderDX11/DetailManager.h"
 #include "xrEngine/IGameFont.hpp"
 #include "xrEngine/IPerformanceAlert.hpp"
+#include "xrCore/PostProcess/PPInfo.hpp"
+
+namespace xray::render { void InitializeImGuiRenderer(fg::RenderDevice* renderDevice); }
 
 extern ENGINE_API float psHUD_FOV;
 extern ENGINE_API int ps_r_rt_gi;
@@ -2762,6 +2765,324 @@ void FrameGraphRenderer::OnCameraUpdated()
     m_pProcessHOMTask = &m_HOM.DispatchMTRender();
     if (m_pDetailManager)
         m_pDetailManager->DispatchMTCalc();
+}
+
+namespace
+{
+IReader* fg_open_shader(pcstr shader)
+{
+    string_path sname;
+    strconcat(sname, "r5\\", shader);
+    return FS.r_open("$game_shaders$", sname);
+}
+
+bool ssao_hdao_cs_shaders_exist()
+{
+    IReader* hdao_cs      = fg_open_shader("ssao_hdao.cs");
+    IReader* hdao_cs_msaa = fg_open_shader("ssao_hdao_msaa.cs");
+    const bool exist      = hdao_cs && hdao_cs_msaa;
+    FS.r_close(hdao_cs);
+    FS.r_close(hdao_cs_msaa);
+    return exist;
+}
+}
+
+void FrameGraphRenderer::create()
+{
+    ZoneScoped;
+
+    Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 0x12345679);
+
+    m_skinning = -1;
+    m_MSAASample = -1;
+
+    const auto& caps = GEnv.Backend->GetCapabilities();
+    o.mrt = (caps.raster.dwMRT_count >= 3);
+    o.mrtmixdepth = (caps.raster.b_MRT_mixdepth);
+    o.nullrt = false;
+
+    o.HW_smap_FETCH4 = FALSE;
+    o.HW_smap = true;
+    o.HW_smap_PCF = o.HW_smap;
+    if (o.HW_smap)
+    {
+        if (caps.id_vendor == 0x1002)
+            o.HW_smap_FORMAT = D3DFMT_D32F_LOCKABLE;
+        else
+            o.HW_smap_FORMAT = D3DFMT_D24X8;
+    }
+
+    o.fp16_filter = true;
+    o.fp16_blend = true;
+
+    if (strstr(Core.Params, "-r4xx"))
+    {
+        o.mrtmixdepth = FALSE;
+        o.HW_smap = FALSE;
+        o.HW_smap_PCF = FALSE;
+        o.fp16_filter = FALSE;
+        o.fp16_blend = FALSE;
+    }
+
+    if (o.mrtmixdepth)        o.albedo_wo = FALSE;
+    else if (o.fp16_blend)    o.albedo_wo = FALSE;
+    else                      o.albedo_wo = TRUE;
+
+    o.nvstencil = FALSE;
+    o.nvdbt = false;
+    o.ffp = false;
+
+    if      (strstr(Core.Params, "-smap1024")) o.smapsize = 1024;
+    else if (strstr(Core.Params, "-smap1536")) o.smapsize = 1536;
+    else if (strstr(Core.Params, "-smap2048")) o.smapsize = 2048;
+    else if (strstr(Core.Params, "-smap2560")) o.smapsize = 2560;
+    else if (strstr(Core.Params, "-smap3072")) o.smapsize = 3072;
+    else if (strstr(Core.Params, "-smap4096")) o.smapsize = 4096;
+    else if (strstr(Core.Params, "-smap8192")) o.smapsize = 8192;
+    else                                       o.smapsize = ps_r2_smapsize;
+
+    cpcstr g = strstr(Core.Params, "-gloss ");
+    o.forcegloss = g ? TRUE : FALSE;
+    if (g) o.forcegloss_v = float(atoi(g + xr_strlen("-gloss "))) / 255.f;
+
+    o.bug = (strstr(Core.Params, "-bug")) ? TRUE : FALSE;
+    o.sunfilter = (strstr(Core.Params, "-sunfilter")) ? TRUE : FALSE;
+    o.sunstatic = ps_r2_sun_static;
+    o.advancedpp = ps_r2_advanced_pp;
+    o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
+    o.sjitter = (strstr(Core.Params, "-sjitter")) ? TRUE : FALSE;
+    o.depth16 = (strstr(Core.Params, "-depth16")) ? TRUE : FALSE;
+    o.noshadows = (strstr(Core.Params, "-noshadows")) ? TRUE : FALSE;
+    o.Tshadows = (strstr(Core.Params, "-tsh")) ? TRUE : FALSE;
+    o.oldshadowcascades = ps_r2_ls_flags_ext.test(R2FLAGEXT_SUN_OLD);
+    o.mblur = (strstr(Core.Params, "-mblur")) ? TRUE : FALSE;
+    o.distortion_enabled = (strstr(Core.Params, "-nodistort")) ? FALSE : TRUE;
+    o.distortion = o.distortion_enabled;
+    o.disasm = (strstr(Core.Params, "-disasm")) ? TRUE : FALSE;
+    o.forceskinw = (strstr(Core.Params, "-skinw")) ? TRUE : FALSE;
+
+    o.ssao_blur_on = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && (ps_r_ssao != 0);
+    o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);
+    o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && (ps_r_ssao != 0);
+    o.ssao_hdao = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HDAO) && (ps_r_ssao != 0);
+    o.ssao_ultra = HW.ComputeShadersSupported && ssao_hdao_cs_shaders_exist();
+    o.ssao_hbao = !o.ssao_hdao && ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HBAO) && (ps_r_ssao != 0);
+    o.hbao_vectorized = (o.ssao_hbao && caps.id_vendor == 0x1002);
+
+    o.dx11_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1) && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+
+    o.msaa = !!ps_r3_msaa;
+    o.msaa_samples = (1 << ps_r3_msaa);
+    o.msaa_opt = ps_r2_ls_flags.test(R3FLAG_MSAA_OPT);
+    o.msaa_opt = (o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1)) ||
+                 (o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0));
+    o.msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
+    o.msaa_hybrid &= !o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+
+    o.msaa_alphatest = 0;
+    if (o.msaa)
+    {
+        if (o.msaa_opt || o.msaa_hybrid)
+        {
+            if (ps_r3_msaa_atest == 1) o.msaa_alphatest = fg::CRender::MSAA_ATEST_DX10_1_ATOC;
+            else if (ps_r3_msaa_atest == 2) o.msaa_alphatest = fg::CRender::MSAA_ATEST_DX10_1_NATIVE;
+        }
+        else if (ps_r3_msaa_atest)
+            o.msaa_alphatest = fg::CRender::MSAA_ATEST_DX10_0_ATOC;
+    }
+
+    o.gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
+    o.minmax_sm = ps_r3_minmax_sm;
+    o.minmax_sm_screenarea_threshold = 1600 * 1200;
+
+    o.tessellation = HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
+    o.support_rt_arrays = true;
+
+    if (o.minmax_sm == fg::CRender::MMSM_AUTODETECT)
+    {
+        o.minmax_sm = fg::CRender::MMSM_OFF;
+        if (caps.id_vendor == 0x1002)
+        {
+            if (ps_r_sun_quality >= 3) o.minmax_sm = fg::CRender::MMSM_AUTO;
+            else if (ps_r_sun_shafts >= 2)
+            {
+                o.minmax_sm = fg::CRender::MMSM_AUTODETECT;
+                o.minmax_sm_screenarea_threshold = 1600 * 1200;
+            }
+        }
+        if (caps.id_vendor == 0x10DE)
+        {
+            if (ps_r_sun_shafts >= 2)
+            {
+                o.minmax_sm = fg::CRender::MMSM_AUTODETECT;
+                o.minmax_sm_screenarea_threshold = 1280 * 1024;
+            }
+        }
+    }
+
+    if (!GEnv.Backend || !GEnv.Backend->IsInitialized())
+        return;
+
+    auto* renderDevice = xr_new<fg::RenderDevice>();
+    if (!renderDevice->InitializeFromBackend(GEnv.Backend))
+    {
+        Msg("! RenderDevice initialization failed");
+        xr_delete(renderDevice);
+        return;
+    }
+    m_device = renderDevice;
+
+    if (!Initialize(m_device))
+    {
+        Msg("! FrameGraphRenderer initialization failed");
+        return;
+    }
+    GEnv.FrameGraphRenderer = this;
+
+    InitializeImGuiRenderer(m_device);
+    GEnv.UIRender = GetUICollector();
+
+    MaterialSystem::Instance().Initialize(m_device->GetFGResourceManager(), GetShaderLoader());
+
+    SetEnabled(true);
+
+    m_pTarget = xr_new<fg::CRenderTarget>();
+
+    if (!g_pModelPool)
+        g_pModelPool = xr_new<CModelPool>();
+
+    m_PSLibrary.OnCreate();
+    m_HWOCC.occq_create(occq_size);
+}
+
+void FrameGraphRenderer::destroy()
+{
+    m_HWOCC.occq_destroy();
+    m_PSLibrary.OnDestroy();
+
+    xr_delete(m_pTarget);
+
+    if (g_pModelPool)
+    {
+        xr_delete(g_pModelPool);
+        g_pModelPool = nullptr;
+    }
+
+    MaterialSystem::Instance().Shutdown();
+
+    Shutdown();
+    GEnv.FrameGraphRenderer = nullptr;
+
+    if (m_device)
+    {
+        m_device->Shutdown();
+        xr_delete(m_device);
+    }
+
+    Device.seqFrame.Remove(this);
+}
+
+void FrameGraphRenderer::reset_begin()
+{
+    ZoneScoped;
+    if (Resources)
+        Resources->reset_begin();
+
+    for (u32 it = 0; it < m_Lights_LastFrame.size(); it++)
+    {
+        if (!m_Lights_LastFrame[it])
+            continue;
+        try
+        {
+            for (int id = 0; id < 3; ++id)
+                m_Lights_LastFrame[it]->svis[id].resetoccq();
+        }
+        catch (...)
+        {
+            Msg("! Failed to flush-OCCq on light [%d]", it);
+        }
+    }
+    m_Lights_LastFrame.clear();
+
+    if (b_loaded && m_pDetailManager &&
+        (dm_current_size != dm_size ||
+         !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
+         !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
+    {
+        m_pDetailManager->Unload();
+        xr_delete(m_pDetailManager);
+    }
+
+    xr_delete(m_pTarget);
+    m_HWOCC.occq_destroy();
+}
+
+void FrameGraphRenderer::reset_end()
+{
+    ZoneScoped;
+    m_HWOCC.occq_create(occq_size);
+    m_pTarget = xr_new<fg::CRenderTarget>();
+
+    if (b_loaded && !m_pDetailManager &&
+        (dm_current_size != dm_size ||
+         !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
+         !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
+    {
+        m_pDetailManager = xr_new<fg::CDetailManager>();
+        m_pDetailManager->Load();
+    }
+
+    m_bFirstFrameAfterReset = true;
+}
+
+void FrameGraphRenderer::rmNear(fg::CBackend& cmd_list)
+{
+    const D3D_VIEWPORT viewport = { 0, 0, m_pTarget->get_width(cmd_list), m_pTarget->get_height(cmd_list), 0.f, 0.02f };
+    cmd_list.SetViewport(viewport);
+}
+
+void FrameGraphRenderer::rmFar(fg::CBackend& cmd_list)
+{
+    const D3D_VIEWPORT viewport = { 0, 0, m_pTarget->get_width(cmd_list), m_pTarget->get_height(cmd_list), 0.99999f, 1.f };
+    cmd_list.SetViewport(viewport);
+}
+
+void FrameGraphRenderer::rmNormal(fg::CBackend& cmd_list)
+{
+    const D3D_VIEWPORT viewport = { 0, 0, m_pTarget->get_width(cmd_list), m_pTarget->get_height(cmd_list), 0.f, 1.f };
+    cmd_list.SetViewport(viewport);
+}
+
+void FrameGraphRenderer::SetPostProcessParams(const SPPInfo& ppi)
+{
+    if (!m_pTarget)
+        return;
+    m_pTarget->set_blur(ppi.blur);
+    m_pTarget->set_gray(ppi.gray);
+    m_pTarget->set_duality_h(ppi.duality.h);
+    m_pTarget->set_duality_v(ppi.duality.v);
+    m_pTarget->set_noise(ppi.noise.intensity);
+    m_pTarget->set_noise_scale(ppi.noise.grain);
+    m_pTarget->set_noise_fps(ppi.noise.fps);
+    m_pTarget->set_color_base(ppi.color_base);
+    m_pTarget->set_color_gray(ppi.color_gray);
+    m_pTarget->set_color_add(ppi.color_add);
+    m_pTarget->set_cm_imfluence(ppi.cm_influence);
+    m_pTarget->set_cm_interpolate(ppi.cm_interpolate);
+    m_pTarget->set_cm_textures(ppi.cm_tex1, ppi.cm_tex2);
+}
+
+void FrameGraphRenderer::Screenshot(IRender::ScreenshotMode mode, pcstr name)
+{
+    UNUSED(mode);
+    UNUSED(name);
+    Msg("! Screenshot not yet implemented for FrameGraph renderer");
+}
+
+void FrameGraphRenderer::RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type)
+{
+    if (m_pDetailManager)
+        m_pDetailManager->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
 }
 
 void FrameGraphRenderer::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
