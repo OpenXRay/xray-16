@@ -2,7 +2,7 @@
 #include "SteamNetServer.h"
 #include <steam/isteamnetworkingutils.h>
 
-SteamNetServer* s_pCallbackInstance = nullptr;
+static SteamNetServer* s_pCallbackInstance = nullptr;
 
 void SvSteamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t *pInfo)
 {
