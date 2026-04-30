@@ -203,6 +203,9 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
         m_inspectorPreview = device->GetNVRHIDevice()->createTexture(previewDesc);
     }
 
+    m_PSLibrary.OnCreate();
+    m_HWOCC.occq_create(occq_size);
+
     Msg("* [FrameGraphRenderer] initialized");
 
     return true;
@@ -212,6 +215,9 @@ void FrameGraphRenderer::Shutdown() {
     if (!m_device) return;
 
     Msg("* [FrameGraphRenderer] Shutting down");
+
+    m_HWOCC.occq_destroy();
+    m_PSLibrary.OnDestroy();
 
     if (m_shaderLoader) {
         xr_delete(m_shaderLoader);
