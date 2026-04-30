@@ -52,7 +52,7 @@ void render_sun::calculate()
 {
     ZoneScoped;
 
-    need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
+    need_to_render_sunshafts = RImplementation.m_framegraphRenderer->m_pTarget->need_to_render_sunshafts();
     last_cascade_chain_mode = m_sun_cascades[R__NUM_SUN_CASCADES - 1].reset_chain;
     if (need_to_render_sunshafts)
         m_sun_cascades[R__NUM_SUN_CASCADES - 1].reset_chain = true;
@@ -191,7 +191,7 @@ void render_sun::calculate()
         static bool draw_debug = false;
         if (draw_debug && cascade_ind == 0)
             for (u32 it = 0; it < cull_planes.size(); it++)
-                RImplementation.Target->dbg_addplane(cull_planes[it], it * 0xFFF);
+                RImplementation.m_framegraphRenderer->m_pTarget->dbg_addplane(cull_planes[it], it * 0xFFF);
 #endif
 
         Fvector cam_shifted = L_pos;
@@ -312,7 +312,7 @@ void render_sun::render()
                 !dsgraph.mapSorted.empty();
             if (bNormal || bSpecial)
             {
-                RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, sun, cascade_ind);
+                RImplementation.m_framegraphRenderer->m_pTarget->phase_smap_direct(dsgraph.cmd_list, sun, cascade_ind);
                 dsgraph.cmd_list.set_xform_world(Fidentity);
                 dsgraph.cmd_list.set_xform_view(Fidentity);
                 dsgraph.cmd_list.set_xform_project(sun->X.D[cascade_ind].combine);
@@ -324,7 +324,7 @@ void render_sun::render()
                 {
                     VERIFY(RImplementation.o.Tshadows);
                     sun->X.D[cascade_ind].transluent = TRUE;
-                    RImplementation.Target->phase_smap_direct_tsh(dsgraph.cmd_list, sun, cascade_ind);
+                    RImplementation.m_framegraphRenderer->m_pTarget->phase_smap_direct_tsh(dsgraph.cmd_list, sun, cascade_ind);
                     dsgraph.render_graph(1); // normal level, secondary priority
                     dsgraph.render_sorted(); // strict-sorted geoms
                 }
@@ -375,7 +375,7 @@ void render_sun::accumulate_cascade(u32 cascade_ind)
     //TracyD3D11Zone(HW.profiler_ctx, "render_sun::accumulate_cascade");
 #endif
 
-    auto* target  = RImplementation.Target;
+    auto* target  = RImplementation.m_framegraphRenderer->m_pTarget;
     auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
 
     if ((cascade_ind == SE_SUN_NEAR) && target->use_minmax_sm_this_frame())

@@ -70,7 +70,7 @@ void CRender::render_lights(light_Package& LP)
     }
 
     auto& cmd_list = get_imm_context().cmd_list;
-    Target->rt_smap_depth->set_slice_read(0);
+    m_framegraphRenderer->m_pTarget->rt_smap_depth->set_slice_read(0);
 
     PIX_EVENT(SHADOWED_LIGHTS);
 
@@ -117,7 +117,7 @@ void CRender::render_lights(light_Package& LP)
 
                 m_framegraphRenderer->m_Stats.s_merged++;
                 L_spot_s.push_back(L);
-                Target->phase_smap_spot(dsgraph.cmd_list, L);
+                m_framegraphRenderer->m_pTarget->phase_smap_spot(dsgraph.cmd_list, L);
                 dsgraph.cmd_list.set_xform_world(Fidentity);
                 dsgraph.cmd_list.set_xform_view(L->X.S.view);
                 dsgraph.cmd_list.set_xform_project(L->X.S.project);
@@ -128,7 +128,7 @@ void CRender::render_lights(light_Package& LP)
                 if (bSpecial)
                 {
                     L->X.S.transluent = TRUE;
-                    Target->phase_smap_spot_tsh(dsgraph.cmd_list, L);
+                    m_framegraphRenderer->m_pTarget->phase_smap_spot_tsh(dsgraph.cmd_list, L);
                     PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHTS_RENDER_GRAPH);
                     dsgraph.render_graph(1); // normal level, secondary priority
                     PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHTS_RENDER_SORTED);
@@ -153,7 +153,7 @@ void CRender::render_lights(light_Package& LP)
         m_framegraphRenderer->m_Stats.s_used++;
 
         // generate spot shadowmap
-        Target->phase_smap_spot_clear(cmd_list);
+        m_framegraphRenderer->m_pTarget->phase_smap_spot_clear(cmd_list);
         xr_vector<light*>& source = LP.v_shadowed;
         light* L = source.back();
         const u16 sid = L->vis.smap_ID;
@@ -218,7 +218,7 @@ void CRender::render_lights(light_Package& LP)
         PIX_EVENT(UNSHADOWED_LIGHTS);
 
         //		switch-to-accumulator
-        Target->phase_accumulator(cmd_list);
+        m_framegraphRenderer->m_pTarget->phase_accumulator(cmd_list);
 
         PIX_EVENT(POINT_LIGHTS);
 
@@ -230,7 +230,7 @@ void CRender::render_lights(light_Package& LP)
             L2->vis_update();
             if (L2->vis.visible)
             {
-                Target->accum_point(cmd_list, L2);
+                m_framegraphRenderer->m_pTarget->accum_point(cmd_list, L2);
                 render_indirect(L2);
             }
         }
@@ -246,7 +246,7 @@ void CRender::render_lights(light_Package& LP)
             if (L2->vis.visible)
             {
                 m_framegraphRenderer->m_LR.compute_xf_spot(L2);
-                Target->accum_spot(cmd_list, L2);
+                m_framegraphRenderer->m_pTarget->accum_spot(cmd_list, L2);
                 render_indirect(L2);
             }
         }
@@ -259,14 +259,14 @@ void CRender::render_lights(light_Package& LP)
             PIX_EVENT(ACCUM_SPOT);
             for (light* p_light : L_spot_s)
             {
-                Target->accum_spot(cmd_list, p_light);
+                m_framegraphRenderer->m_pTarget->accum_spot(cmd_list, p_light);
                 render_indirect(p_light);
             }
 
             PIX_EVENT(ACCUM_VOLUMETRIC);
             if (RImplementation.o.advancedpp && ps_r2_ls_flags.is(R2FLAG_VOLUMETRIC_LIGHTS))
                 for (light* p_light : L_spot_s)
-                    Target->accum_volumetric(cmd_list, p_light);
+                    m_framegraphRenderer->m_pTarget->accum_volumetric(cmd_list, p_light);
 
             L_spot_s.clear();
         }
@@ -283,7 +283,7 @@ void CRender::render_lights(light_Package& LP)
             if (p_light->vis.visible)
             {
                 render_indirect(p_light);
-                Target->accum_point(cmd_list, p_light);
+                m_framegraphRenderer->m_pTarget->accum_point(cmd_list, p_light);
             }
         }
         Lvec.clear();
@@ -301,7 +301,7 @@ void CRender::render_lights(light_Package& LP)
             {
                 m_framegraphRenderer->m_LR.compute_xf_spot(p_light);
                 render_indirect(p_light);
-                Target->accum_spot(cmd_list, p_light);
+                m_framegraphRenderer->m_pTarget->accum_spot(cmd_list, p_light);
             }
         }
         Lvec.clear();
@@ -355,7 +355,7 @@ void CRender::render_indirect(light* L) const
             continue;
         LIGEN.set_range(x);
 
-        Target->accum_reflected(cmd_list, &LIGEN);
+        m_framegraphRenderer->m_pTarget->accum_reflected(cmd_list, &LIGEN);
     }
 }
 } // namespace xray::render::fg

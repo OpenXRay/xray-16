@@ -672,7 +672,7 @@ public:
 
     void compute_caster_model(xr_vector<Fplane>& dest, Fvector3 direction)
     {
-        CRenderTarget& T = *RImplementation.Target;
+        CRenderTarget& T = *RImplementation.m_framegraphRenderer->m_pTarget;
 
         // COG
         Fvector3 cog = { 0, 0, 0 };

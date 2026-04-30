@@ -144,7 +144,7 @@ void render_rain::calculate()
         hull.compute_caster_model(cull_planes, RainLight.direction);
 #ifdef _DEBUG
         for (u32 it = 0; it < cull_planes.size(); it++)
-            RImplementation.Target->dbg_addplane(cull_planes[it], 0xffffffff);
+            RImplementation.m_framegraphRenderer->m_pTarget->dbg_addplane(cull_planes[it], 0xffffffff);
 #endif
 
         // COP - 100 km away
@@ -310,7 +310,7 @@ void render_rain::render()
             {
                 PIX_EVENT_CTX(dsgraph.cmd_list, RAIN);
 
-                RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, &RainLight, SE_SUN_RAIN_SMAP);
+                RImplementation.m_framegraphRenderer->m_pTarget->phase_smap_direct(dsgraph.cmd_list, &RainLight, SE_SUN_RAIN_SMAP);
                 dsgraph.cmd_list.set_xform_world(Fidentity);
                 dsgraph.cmd_list.set_xform_view(Fidentity);
                 dsgraph.cmd_list.set_xform_project(RainLight.X.D[0].combine);
@@ -356,12 +356,12 @@ void render_rain::flush()
     PIX_EVENT_CTX(cmd_list_imm, RainApply);
 
     cmd_list_imm.set_pass_targets(
-        RImplementation.Target->rt_Color, /*rt_Normal*/
+        RImplementation.m_framegraphRenderer->m_pTarget->rt_Color, /*rt_Normal*/
         nullptr,
         nullptr,
-        RImplementation.Target->rt_MSAADepth
+        RImplementation.m_framegraphRenderer->m_pTarget->rt_MSAADepth
     );
-    RImplementation.Target->draw_rain(cmd_list_imm, RainLight);
+    RImplementation.m_framegraphRenderer->m_pTarget->draw_rain(cmd_list_imm, RainLight);
     RainLight.frame_render = Device.dwFrame;
 }
 } // namespace xray::render::fg

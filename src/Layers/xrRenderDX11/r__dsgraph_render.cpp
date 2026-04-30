@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "xrEngine/IRenderable.h"
 #include "xrEngine/CustomHUD.h"
 
@@ -273,15 +275,15 @@ void R_dsgraph_structure::render_hud_ui()
     const ref_rt rt_null;
     cmd_list.set_RT(0, 1);
     cmd_list.set_RT(0, 2);
-    auto zb = RImplementation.Target->rt_Base_Depth;
+    auto zb = RImplementation.m_framegraphRenderer->m_pTarget->rt_Base_Depth;
 
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
     if (RImplementation.o.msaa)
-        zb = RImplementation.Target->rt_MSAADepth;
+        zb = RImplementation.m_framegraphRenderer->m_pTarget->rt_MSAADepth;
 #endif
 
-    RImplementation.Target->u_setrt(cmd_list,
-        RImplementation.o.albedo_wo ? RImplementation.Target->rt_Accumulator : RImplementation.Target->rt_Color,
+    RImplementation.m_framegraphRenderer->m_pTarget->u_setrt(cmd_list,
+        RImplementation.o.albedo_wo ? RImplementation.m_framegraphRenderer->m_pTarget->rt_Accumulator : RImplementation.m_framegraphRenderer->m_pTarget->rt_Color,
         rt_null, rt_null, zb);
 #endif // RENDER!=R_R1
 

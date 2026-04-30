@@ -588,7 +588,7 @@ void CRender::create()
     r5::InitializeFrameGraph();
 #endif
 
-    Target = xr_new<CRenderTarget>(); // Main target
+    m_framegraphRenderer->m_pTarget = xr_new<CRenderTarget>(); // Main target
 
     g_pModelPool = xr_new<CModelPool>();
     g_pPSLibrary = &PSLibrary;
@@ -641,7 +641,7 @@ void CRender::destroy()
     xr_delete(g_pModelPool);
     g_pModelPool = nullptr;
     g_pPSLibrary = nullptr;
-    xr_delete(Target);
+    xr_delete(m_framegraphRenderer->m_pTarget);
     PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);
 }
@@ -690,7 +690,7 @@ void CRender::reset_begin()
     }
     //-AVO
 
-    xr_delete(Target);
+    xr_delete(m_framegraphRenderer->m_pTarget);
     m_framegraphRenderer->m_HWOCC.occq_destroy();
 }
 
@@ -699,7 +699,7 @@ void CRender::reset_end()
     ZoneScoped;
     m_framegraphRenderer->m_HWOCC.occq_create(occq_size);
 
-    Target = xr_new<CRenderTarget>();
+    m_framegraphRenderer->m_pTarget = xr_new<CRenderTarget>();
 
     //AVO: let's reload details while changed details options on vid_restart
     if (b_loaded && (dm_current_size != dm_size ||
@@ -1295,41 +1295,41 @@ void CRender::add_SkeletonWallmark(
 
 void CRender::rmNear(CBackend& cmd_list)
 {
-    const D3D_VIEWPORT viewport = { 0, 0, Target->get_width(cmd_list), Target->get_height(cmd_list), 0.f, 0.02f };
+    const D3D_VIEWPORT viewport = { 0, 0, m_framegraphRenderer->m_pTarget->get_width(cmd_list), m_framegraphRenderer->m_pTarget->get_height(cmd_list), 0.f, 0.02f };
     cmd_list.SetViewport(viewport);
 }
 
 void CRender::rmFar(CBackend& cmd_list)
 {
-    const D3D_VIEWPORT viewport = { 0, 0, Target->get_width(cmd_list), Target->get_height(cmd_list), 0.99999f, 1.f };
+    const D3D_VIEWPORT viewport = { 0, 0, m_framegraphRenderer->m_pTarget->get_width(cmd_list), m_framegraphRenderer->m_pTarget->get_height(cmd_list), 0.99999f, 1.f };
     cmd_list.SetViewport(viewport);
 }
 
 void CRender::rmNormal(CBackend& cmd_list)
 {
-    const D3D_VIEWPORT viewport = { 0, 0, Target->get_width(cmd_list), Target->get_height(cmd_list), 0.f, 1.f };
+    const D3D_VIEWPORT viewport = { 0, 0, m_framegraphRenderer->m_pTarget->get_width(cmd_list), m_framegraphRenderer->m_pTarget->get_height(cmd_list), 0.f, 1.f };
     cmd_list.SetViewport(viewport);
 }
 
 void CRender::SetPostProcessParams(const SPPInfo& ppi)
 {
-    Target->set_blur(ppi.blur);
-    Target->set_gray(ppi.gray);
+    m_framegraphRenderer->m_pTarget->set_blur(ppi.blur);
+    m_framegraphRenderer->m_pTarget->set_gray(ppi.gray);
 
-    Target->set_duality_h(ppi.duality.h);
-    Target->set_duality_v(ppi.duality.v);
+    m_framegraphRenderer->m_pTarget->set_duality_h(ppi.duality.h);
+    m_framegraphRenderer->m_pTarget->set_duality_v(ppi.duality.v);
 
-    Target->set_noise(ppi.noise.intensity);
-    Target->set_noise_scale(ppi.noise.grain);
-    Target->set_noise_fps(ppi.noise.fps);
+    m_framegraphRenderer->m_pTarget->set_noise(ppi.noise.intensity);
+    m_framegraphRenderer->m_pTarget->set_noise_scale(ppi.noise.grain);
+    m_framegraphRenderer->m_pTarget->set_noise_fps(ppi.noise.fps);
 
-    Target->set_color_base(ppi.color_base);
-    Target->set_color_gray(ppi.color_gray);
-    Target->set_color_add(ppi.color_add);
+    m_framegraphRenderer->m_pTarget->set_color_base(ppi.color_base);
+    m_framegraphRenderer->m_pTarget->set_color_gray(ppi.color_gray);
+    m_framegraphRenderer->m_pTarget->set_color_add(ppi.color_add);
 
-    Target->set_cm_imfluence(ppi.cm_influence);
-    Target->set_cm_interpolate(ppi.cm_interpolate);
-    Target->set_cm_textures(ppi.cm_tex1, ppi.cm_tex2);
+    m_framegraphRenderer->m_pTarget->set_cm_imfluence(ppi.cm_influence);
+    m_framegraphRenderer->m_pTarget->set_cm_interpolate(ppi.cm_interpolate);
+    m_framegraphRenderer->m_pTarget->set_cm_textures(ppi.cm_tex1, ppi.cm_tex2);
 }
 
 //////////////////////////////////////////////////////////////////////

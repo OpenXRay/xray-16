@@ -346,7 +346,6 @@ public:
     CPSLibrary PSLibrary;
 
 
-    CRenderTarget* Target; // Render-target
 
 
 
