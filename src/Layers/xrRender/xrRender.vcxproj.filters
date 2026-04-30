@@ -468,9 +468,6 @@
     <ClInclude Include="FSkinnedTypes.h">
       <Filter>Models\Visuals</Filter>
     </ClInclude>
-    <ClInclude Include="r__sync_point.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="r__dsgraph_structure.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -899,9 +896,6 @@
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="D3DXRenderBase.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r__sync_point.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="r__sector_detect.cpp">
