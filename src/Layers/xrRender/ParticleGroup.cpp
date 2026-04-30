@@ -11,6 +11,8 @@
 #include "ParticleEffect.h"
 #include "Layers/xrRender/r__buffer_pool.h"
 #include "Layers/xrRender/ModelPool.h"
+#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::fg
 {
@@ -197,7 +199,7 @@ void CParticleGroup::SItem::Clear()
 }
 void CParticleGroup::SItem::StartRelatedChild(CParticleEffect* emitter, LPCSTR eff_name, PAPI::Particle& m)
 {
-    PS::CPEDef* SE = g_pPSLibrary->FindPED(eff_name);
+    PS::CPEDef* SE = RImplementation.m_framegraphRenderer->m_PSLibrary.FindPED(eff_name);
     R_ASSERT3(SE, "Particle effect doesn't exist", eff_name);
     CParticleEffect* C = static_cast<CParticleEffect*>(g_pModelPool->CreatePE(SE));
 
@@ -231,7 +233,7 @@ void CParticleGroup::SItem::StopRelatedChild(u32 idx)
 }
 void CParticleGroup::SItem::StartFreeChild(CParticleEffect* emitter, LPCSTR nm, PAPI::Particle& m)
 {
-    PS::CPEDef* SE2 = g_pPSLibrary->FindPED(nm);
+    PS::CPEDef* SE2 = RImplementation.m_framegraphRenderer->m_PSLibrary.FindPED(nm);
     R_ASSERT3(SE2, "Particle effect doesn't exist", nm);
     CParticleEffect* C = static_cast<CParticleEffect*>(g_pModelPool->CreatePE(SE2));
     C->SetHudMode(emitter->GetHudMode());
@@ -561,7 +563,7 @@ BOOL CParticleGroup::Compile(CPGDef* def)
         items.resize(m_Def->m_Effects.size());
         for (CPGDef::EffectVec::const_iterator e_it = m_Def->m_Effects.begin(); e_it != m_Def->m_Effects.end(); ++e_it)
         {
-            PS::CPEDef* SE3 = g_pPSLibrary->FindPED((*e_it)->m_EffectName.c_str());
+            PS::CPEDef* SE3 = RImplementation.m_framegraphRenderer->m_PSLibrary.FindPED((*e_it)->m_EffectName.c_str());
             R_ASSERT3(SE3, "Particle effect doesn't exist", (*e_it)->m_EffectName.c_str());
             CParticleEffect* eff = (CParticleEffect*)g_pModelPool->CreatePE(SE3);
             eff->SetBirthDeadCB(OnGroupParticleBirth, OnGroupParticleDead, this, u32(e_it - m_Def->m_Effects.begin()));

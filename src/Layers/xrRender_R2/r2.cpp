@@ -591,8 +591,7 @@ void CRender::create()
     m_framegraphRenderer->m_pTarget = xr_new<CRenderTarget>(); // Main target
 
     g_pModelPool = xr_new<CModelPool>();
-    g_pPSLibrary = &PSLibrary;
-    PSLibrary.OnCreate();
+    m_framegraphRenderer->m_PSLibrary.OnCreate();
     m_framegraphRenderer->m_HWOCC.occq_create(occq_size);
 
     rmNormal(RCache);
@@ -640,9 +639,8 @@ void CRender::destroy()
     m_framegraphRenderer->m_HWOCC.occq_destroy();
     xr_delete(g_pModelPool);
     g_pModelPool = nullptr;
-    g_pPSLibrary = nullptr;
     xr_delete(m_framegraphRenderer->m_pTarget);
-    PSLibrary.OnDestroy();
+    m_framegraphRenderer->m_PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);
 }
 
@@ -794,18 +792,18 @@ void CRender::model_Delete(IRender_DetailModel*& F)
 
 IRenderVisual* CRender::model_CreatePE(LPCSTR name)
 {
-    PS::CPEDef* SE = PSLibrary.FindPED(name);
+    PS::CPEDef* SE = m_framegraphRenderer->m_PSLibrary.FindPED(name);
     R_ASSERT3(SE, "Particle effect doesn't exist", name);
     return g_pModelPool->CreatePE(SE);
 }
 
 IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 {
-    PS::CPEDef* SE = PSLibrary.FindPED(name);
+    PS::CPEDef* SE = m_framegraphRenderer->m_PSLibrary.FindPED(name);
     if (SE)
         return g_pModelPool->CreatePE(SE);
 
-    PS::CPGDef* SG = PSLibrary.FindPGD(name);
+    PS::CPGDef* SG = m_framegraphRenderer->m_PSLibrary.FindPGD(name);
     R_ASSERT3(SG, "Particle effect or group doesn't exist", name);
     return g_pModelPool->CreatePG(SG);
 }

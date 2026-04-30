@@ -343,7 +343,6 @@ public:
     xr_vector<IndexStagingBuffer>&  nIB = ::xray::render::fg::BufferPool.nIB;
     xr_vector<IndexStagingBuffer>&  xIB = ::xray::render::fg::BufferPool.xIB;
     xr_vector<dxRender_Visual*>&    Visuals = ::xray::render::fg::BufferPool.Visuals;
-    CPSLibrary PSLibrary;
 
 
 

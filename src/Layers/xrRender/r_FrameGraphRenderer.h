@@ -7,6 +7,7 @@
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/r__occlusion.h"
 #include "Layers/xrRender/Light_Render_Direct.h"
+#include "Layers/xrRender/PSLibrary.h"
 #include "Layers/xrRender_R2/SMAP_Allocator.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
@@ -189,6 +190,7 @@ public:
     xr_vector<fg::light*> m_Lights_LastFrame;
     fg::SMAP_Allocator m_LP_smap_pool;
     fg::CRenderTarget* m_pTarget{ nullptr };
+    fg::CPSLibrary m_PSLibrary;
 
 private:
     bool m_enabled = false;
