@@ -29,14 +29,8 @@
 #include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 
-namespace xray::render::fg::nvrhi_wrapper
-{
-class NVRHIDevice;
-}
-
 namespace xray::render::fg
 {
-class RenderContext;
 class RenderDevice;
 class ImGuiRendererNVRHI;
 }
@@ -627,21 +621,10 @@ private:
 
 public:
 #if defined(USE_DX11) && RENDER == R_R4
-    // NVRHI integration (R4 only)
-    xray::render::fg::nvrhi_wrapper::NVRHIDevice* m_nvrhiDevice{ nullptr };
-    bool m_nvrhiTestMode{ false };
-
-    void TestNVRHI_Render();
-
-    // RenderContext testing (Phase 1)
-    bool m_renderContextTestMode{ false };
-    xray::render::fg::RenderContext* m_renderContext{ nullptr };
     xray::render::fg::RenderDevice* m_renderDevice{ nullptr };
 
-    // Modern render backend (replaces HW) - exposed via GEnv.Backend
     IRenderBackend* m_backend{ nullptr };
 
-    // FrameGraph Renderer (Phase 3)
     xray::render::FrameGraphRenderer* m_framegraphRenderer{ nullptr };
 
     framegraph::ShaderLoader* GetShaderLoader() const override;
@@ -658,21 +641,6 @@ public:
     xray::render::MaterialCache* GetTextMaterialCache() const override;
     void UpdateSmokeTrail(const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode) override;
     void NotifySmokeShot() override;
-
-    // Test resources for triangle
-    nvrhi::BufferHandle m_testVertexBuffer;
-    nvrhi::BufferHandle m_testIndexBuffer;
-    nvrhi::ShaderHandle m_testVS;
-    nvrhi::ShaderHandle m_testPS;
-    nvrhi::GraphicsPipelineHandle m_testPipeline;
-
-    // Textured triangle test resources
-    nvrhi::TextureHandle m_testTexture;
-    nvrhi::SamplerHandle m_testSampler;
-    nvrhi::BindingLayoutHandle m_testBindingLayout;
-    nvrhi::BindingSetHandle m_testBindingSet;
-
-    void TestRenderContext_Triangle();
 #endif
 };
 
