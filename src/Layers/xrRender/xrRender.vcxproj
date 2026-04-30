@@ -195,7 +195,6 @@
     <ClInclude Include="r__occlusion.h"/>
     <ClInclude Include="r__pixel_calculator.h"/>
     <ClInclude Include="r__sector.h"/>
-    <ClInclude Include="r__sync_point.h"/>
     <ClInclude Include="Shader.h"/>
     <ClInclude Include="ShaderKey.h"/>
     <ClInclude Include="Shaders\SlangReflectionWrapper.h"/>
@@ -359,7 +358,6 @@
     <ClCompile Include="r__sector.cpp"/>
     <ClCompile Include="r__sector_detect.cpp"/>
     <ClCompile Include="r__sector_traversal.cpp"/>
-    <ClCompile Include="r__sync_point.cpp"/>
     <ClCompile Include="ShaderKey.cpp"/>
     <ClCompile Include="Shaders\SlangReflectionWrapper.cpp"/>
     <ClCompile Include="Shaders\SlangVFSAdapter.cpp"/>

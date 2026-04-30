@@ -3,7 +3,6 @@
 #include "Layers/xrRender/D3DXRenderBase.h"
 #include "Layers/xrRender/r__buffer_pool.h"
 #include "Layers/xrRender/r__occlusion.h"
-#include "Layers/xrRender/r__sync_point.h"
 
 #include "Layers/xrRender/PSLibrary.h"
 
