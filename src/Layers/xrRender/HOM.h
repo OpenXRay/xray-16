@@ -68,4 +68,6 @@ public:
     virtual void OnRender();
 #endif
 };
+
+extern ECORE_API Task* g_pProcessHOMTask;
 } // namespace xray::render::fg

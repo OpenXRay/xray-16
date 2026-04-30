@@ -41,7 +41,7 @@ void render_main::calculate()
     dsgraph_main.o.phase = CRender::PHASE_NORMAL;
     dsgraph_main.r_pmask(true, true, true); // enable priority "0,1",+ capture wmarks
     if (RImplementation.r_sun.o.active && RImplementation.o.oldshadowcascades)
-        dsgraph_main.set_Recorder(&RImplementation.main_coarse_structure); // this is a show-stopper. Can't be paralleled with sun
+        dsgraph_main.set_Recorder(&g_main_coarse_structure); // this is a show-stopper. Can't be paralleled with sun
     else
         dsgraph_main.set_Recorder(nullptr);
     dsgraph_main.o.use_hom = true;
@@ -101,7 +101,7 @@ void CRender::Calculate()
     o.mt_render     = 0; // OpenGL does not support parallel draw calls
 #endif
 
-    if (m_bFirstFrameAfterReset)
+    if (g_bFirstFrameAfterReset)
         return;
 
     auto& dsgraph_main = get_imm_context();
@@ -140,7 +140,7 @@ void CRender::Calculate()
         Lights.add_light(L);
     }
 
-    TaskScheduler->Wait(*ProcessHOMTask);
+    TaskScheduler->Wait(*g_pProcessHOMTask);
 
     r_main.init();
     if (o.oldshadowcascades)
