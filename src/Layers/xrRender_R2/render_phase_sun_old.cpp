@@ -129,7 +129,7 @@ void render_sun_old::render_sun()
     }
 
     // Begin SMAP-render
-    xr_vector<Fbox3>& s_receivers = RImplementation.main_coarse_structure;
+    xr_vector<Fbox3>& s_receivers = g_main_coarse_structure;
     s_casters.reserve(s_receivers.size());
 
     auto& dsgraph = RImplementation.get_context(context_id);

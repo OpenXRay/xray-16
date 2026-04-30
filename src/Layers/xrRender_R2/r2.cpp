@@ -710,7 +710,7 @@ void CRender::reset_end()
 
     // Set this flag true to skip the first render frame,
     // that some data is not ready in the first frame (for example device camera position)
-    m_bFirstFrameAfterReset = true;
+    g_bFirstFrameAfterReset = true;
 }
 
 void CRender::OnCameraUpdated()
@@ -723,7 +723,7 @@ void CRender::OnCameraUpdated()
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
 
-    ProcessHOMTask = &HOM.DispatchMTRender();
+    g_pProcessHOMTask = &HOM.DispatchMTRender();
     if (Details)
         Details->DispatchMTCalc();
 }

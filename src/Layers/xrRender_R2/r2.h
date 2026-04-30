@@ -326,7 +326,6 @@ public:
 public:
     RenderR2Statistics Stats;
     CHOM HOM;
-    Task* ProcessHOMTask;
     R_occlusion HWOCC;
 
     xr_vector<FSlideWindowItem>& SWIs = ::xray::render::fg::BufferPool.SWIs;
@@ -382,11 +381,7 @@ public:
     light_Package LP_normal;
     light_Package LP_pending;
 
-    xr_vector<Fbox3> main_coarse_structure;
-
     R_sync_point q_sync_point;
-
-    bool m_bFirstFrameAfterReset{}; // Determines weather the frame is the first after resetting device.
 
     bool& m_fast_geom_loaded = ::xray::render::fg::BufferPool.fastGeomLoaded;
 
