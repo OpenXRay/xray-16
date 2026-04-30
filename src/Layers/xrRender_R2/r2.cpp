@@ -586,7 +586,7 @@ void CRender::create()
     HWOCC.occq_create(occq_size);
 
     rmNormal(RCache);
-    q_sync_point.Create();
+    g_q_sync_point.Create();
 
     //	TODO: OGL: Implement FluidManager.
 #if defined(USE_DX11)
@@ -628,7 +628,7 @@ void CRender::destroy()
     }
 #endif
 
-    q_sync_point.Destroy();
+    g_q_sync_point.Destroy();
     HWOCC.occq_destroy();
     xr_delete(g_pModelPool);
     g_pModelPool = nullptr;
@@ -684,13 +684,13 @@ void CRender::reset_begin()
 
     xr_delete(Target);
     HWOCC.occq_destroy();
-    q_sync_point.Destroy();
+    g_q_sync_point.Destroy();
 }
 
 void CRender::reset_end()
 {
     ZoneScoped;
-    q_sync_point.Create();
+    g_q_sync_point.Create();
     HWOCC.occq_create(occq_size);
 
     Target = xr_new<CRenderTarget>();

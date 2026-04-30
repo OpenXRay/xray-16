@@ -387,7 +387,6 @@ public:
     light_Package LP_normal;
     light_Package LP_pending;
 
-    R_sync_point q_sync_point;
 
     bool& m_fast_geom_loaded = ::xray::render::fg::BufferPool.fastGeomLoaded;
 

@@ -16,4 +16,6 @@ public:
     bool Wait(u32 wait_sleep, u64 timeout);
     void End();
 };
+
+extern ECORE_API R_sync_point g_q_sync_point;
 } // namespace xray::render::fg

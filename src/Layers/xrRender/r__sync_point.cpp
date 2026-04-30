@@ -5,6 +5,8 @@
 
 namespace xray::render::fg
 {
+R_sync_point g_q_sync_point;
+
 #ifdef USE_OGL
 // Assert this just in case
 static_assert(sizeof(void*) == sizeof(GLsync), "void* is used instead of GLsync, sizes should match");
