@@ -46,7 +46,7 @@ void render_main::calculate()
         dsgraph_main.set_Recorder(nullptr);
     dsgraph_main.o.use_hom = true;
     dsgraph_main.o.is_main_pass = true;
-    dsgraph_main.o.sector_id = RImplementation.last_sector_id;
+    dsgraph_main.o.sector_id = g_last_sector_id;
     dsgraph_main.o.portal_traverse_flags =
         CPortalTraverser::VQ_HOM | CPortalTraverser::VQ_SSA | CPortalTraverser::VQ_FADE;
     dsgraph_main.o.spatial_traverse_flags = ISpatial_DB::O_ORDERED;
@@ -112,10 +112,10 @@ void CRender::Calculate()
         const auto sector_id = dsgraph_main.detect_sector(Device.vCameraPosition);
         if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
         {
-            if (sector_id != last_sector_id)
+            if (sector_id != g_last_sector_id)
                 g_pGamePersistent->OnSectorChanged(sector_id);
 
-            last_sector_id = sector_id;
+            g_last_sector_id = sector_id;
         }
     }
 

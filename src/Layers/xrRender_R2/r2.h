@@ -326,9 +326,6 @@ public:
 
 public:
     RenderR2Statistics Stats;
-    // Sector detection and visibility
-    IRender_Sector::sector_id_t last_sector_id{IRender_Sector::INVALID_SECTOR_ID};
-    u32 uLastLTRACK;
     CHOM HOM;
     Task* ProcessHOMTask;
     R_occlusion HWOCC;
@@ -441,7 +438,6 @@ public:
     render_sun_old r_sun_old;
 
 public:
-    auto get_largest_sector() const { return largest_sector_id; }
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     VertexElement*       getVB_Format(int id, bool alternative = false) { return ::xray::render::fg::BufferPool.getVB_Format(id, alternative); }
@@ -614,8 +610,6 @@ private:
 #else
 #   error No graphics API selected or enabled!
 #endif
-
-    IRender_Sector::sector_id_t largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
 
 public:
 #if defined(USE_DX11) && RENDER == R_R4
