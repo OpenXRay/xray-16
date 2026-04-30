@@ -2901,11 +2901,11 @@ void FrameGraphRenderer::create()
     {
         if (o.msaa_opt || o.msaa_hybrid)
         {
-            if (ps_r3_msaa_atest == 1) o.msaa_alphatest = fg::CRender::MSAA_ATEST_DX10_1_ATOC;
-            else if (ps_r3_msaa_atest == 2) o.msaa_alphatest = fg::CRender::MSAA_ATEST_DX10_1_NATIVE;
+            if (ps_r3_msaa_atest == 1) o.msaa_alphatest = FrameGraphRenderer::MSAA_ATEST_DX10_1_ATOC;
+            else if (ps_r3_msaa_atest == 2) o.msaa_alphatest = FrameGraphRenderer::MSAA_ATEST_DX10_1_NATIVE;
         }
         else if (ps_r3_msaa_atest)
-            o.msaa_alphatest = fg::CRender::MSAA_ATEST_DX10_0_ATOC;
+            o.msaa_alphatest = FrameGraphRenderer::MSAA_ATEST_DX10_0_ATOC;
     }
 
     o.gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
@@ -2915,15 +2915,15 @@ void FrameGraphRenderer::create()
     o.tessellation = HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
     o.support_rt_arrays = true;
 
-    if (o.minmax_sm == fg::CRender::MMSM_AUTODETECT)
+    if (o.minmax_sm == FrameGraphRenderer::MMSM_AUTODETECT)
     {
-        o.minmax_sm = fg::CRender::MMSM_OFF;
+        o.minmax_sm = FrameGraphRenderer::MMSM_OFF;
         if (caps.id_vendor == 0x1002)
         {
-            if (ps_r_sun_quality >= 3) o.minmax_sm = fg::CRender::MMSM_AUTO;
+            if (ps_r_sun_quality >= 3) o.minmax_sm = FrameGraphRenderer::MMSM_AUTO;
             else if (ps_r_sun_shafts >= 2)
             {
-                o.minmax_sm = fg::CRender::MMSM_AUTODETECT;
+                o.minmax_sm = FrameGraphRenderer::MMSM_AUTODETECT;
                 o.minmax_sm_screenarea_threshold = 1600 * 1200;
             }
         }
@@ -2931,7 +2931,7 @@ void FrameGraphRenderer::create()
         {
             if (ps_r_sun_shafts >= 2)
             {
-                o.minmax_sm = fg::CRender::MMSM_AUTODETECT;
+                o.minmax_sm = FrameGraphRenderer::MMSM_AUTODETECT;
                 o.minmax_sm_screenarea_threshold = 1280 * 1024;
             }
         }

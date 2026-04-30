@@ -106,6 +106,28 @@ namespace framegraph {
 
 class FrameGraphRenderer: public IFrameGraphRender, public xray::render::fg::FGRenderBase {
 public:
+    enum
+    {
+        PHASE_NORMAL = 0,
+        PHASE_SMAP = 1,
+    };
+
+    enum
+    {
+        MSAA_ATEST_NONE = 0x0,
+        MSAA_ATEST_DX10_0_ATOC = 0x1,
+        MSAA_ATEST_DX10_1_NATIVE = 0x2,
+        MSAA_ATEST_DX10_1_ATOC = 0x3,
+    };
+
+    enum
+    {
+        MMSM_OFF = 0,
+        MMSM_ON,
+        MMSM_AUTO,
+        MMSM_AUTODETECT
+    };
+
     FrameGraphRenderer();
     ~FrameGraphRenderer();
 

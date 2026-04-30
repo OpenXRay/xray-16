@@ -23,48 +23,8 @@ namespace xray::render::fg
 {
 void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM)
 {
-    PIX_EVENT(stencil_optimize);
-
-#if defined(USE_DX11)
-    // TODO: DX11: remove half pixel offset?
-    VERIFY(RImplementation.o.nvstencil);
-    u32 Offset;
-    float _w = float(Device.dwWidth);
-    float _h = float(Device.dwHeight);
-    u32 C = color_rgba(255, 255, 255, 255);
-    FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
-    float eps = 0;
-    float _dw = 0.5f;
-    float _dh = 0.5f;
-    pv->set(-_dw, _h - _dh, eps, 1.f, C, 0, 0);
-    pv++;
-    pv->set(-_dw, -_dh, eps, 1.f, C, 0, 0);
-    pv++;
-    pv->set(_w - _dw, _h - _dh, eps, 1.f, C, 0, 0);
-    pv++;
-    pv->set(_w - _dw, -_dh, eps, 1.f, C, 0, 0);
-    pv++;
-    RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
-
-    cmd_list.set_Element(s_occq->E[1]);
-
-    switch (eSOM)
-    {
-    case SO_Light: cmd_list.StateManager.SetStencilRef(dwLightMarkerID); break;
-    case SO_Combine: cmd_list.StateManager.SetStencilRef(0x01); break;
-    default: VERIFY(!"CRenderTarget::u_stencil_optimize. switch no default!");
-    }
-
-    cmd_list.set_Geometry(g_combine);
-    cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
-#elif defined(USE_OGL)
-    //	TODO: OGL: should we implement stencil optimization?
-    VERIFY(RImplementation.o.nvstencil);
-    VERIFY(!"CRenderTarget::u_stencil_optimize no implemented");
+    UNUSED(cmd_list);
     UNUSED(eSOM);
-#else
-#   error No graphics API selected or enabled!
-#endif // USE_DX11
 }
 
 // 2D texgen (texture adjustment matrix)
@@ -233,30 +193,9 @@ CRenderTarget::~CRenderTarget()
 
 void CRenderTarget::reset_light_marker(CBackend& cmd_list, bool bResetStencil)
 {
+    UNUSED(cmd_list);
+    UNUSED(bResetStencil);
     dwLightMarkerID = 5;
-    if (bResetStencil)
-    {
-        u32 Offset;
-        float _w = float(Device.dwWidth);
-        float _h = float(Device.dwHeight);
-        u32 C = color_rgba(255, 255, 255, 255);
-        float eps = 0;
-        float _dw = 0.5f;
-        float _dh = 0.5f;
-        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
-        pv->set(-_dw, _h - _dh, eps, 1.f, C, 0, 0);
-        pv++;
-        pv->set(-_dw, -_dh, eps, 1.f, C, 0, 0);
-        pv++;
-        pv->set(_w - _dw, _h - _dh, eps, 1.f, C, 0, 0);
-        pv++;
-        pv->set(_w - _dw, -_dh, eps, 1.f, C, 0, 0);
-        pv++;
-        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
-        cmd_list.set_Element(s_occq->E[2]);
-        cmd_list.set_Geometry(g_combine);
-        cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
-    }
 }
 
 void CRenderTarget::increment_light_marker(CBackend& cmd_list)
@@ -289,9 +228,9 @@ bool CRenderTarget::use_minmax_sm_this_frame()
 {
     switch (RImplementation.o.minmax_sm)
     {
-    case CRender::MMSM_ON: return true;
-    case CRender::MMSM_AUTO: return need_to_render_sunshafts();
-    case CRender::MMSM_AUTODETECT:
+    case FrameGraphRenderer::MMSM_ON: return true;
+    case FrameGraphRenderer::MMSM_AUTO: return need_to_render_sunshafts();
+    case FrameGraphRenderer::MMSM_AUTODETECT:
     {
         const auto& [width, height] = GEnv.Backend->GetBackBufferSize();
         u32 dwScreenArea = width * height;
