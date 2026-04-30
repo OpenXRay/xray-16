@@ -592,6 +592,11 @@ void CRender::create()
 
     m_framegraphRenderer->m_pTarget = xr_new<CRenderTarget>(); // Main target
 
+    m_framegraphRenderer->m_r_main = xr_new<render_main>();
+    m_framegraphRenderer->m_r_rain = xr_new<render_rain>();
+    m_framegraphRenderer->m_r_sun = xr_new<render_sun>();
+    m_framegraphRenderer->m_r_sun_old = xr_new<render_sun_old>();
+
     g_pModelPool = xr_new<CModelPool>();
     m_framegraphRenderer->m_PSLibrary.OnCreate();
     m_framegraphRenderer->m_HWOCC.occq_create(occq_size);
@@ -642,6 +647,10 @@ void CRender::destroy()
     xr_delete(g_pModelPool);
     g_pModelPool = nullptr;
     xr_delete(m_framegraphRenderer->m_pTarget);
+    xr_delete(m_framegraphRenderer->m_r_main);
+    xr_delete(m_framegraphRenderer->m_r_rain);
+    xr_delete(m_framegraphRenderer->m_r_sun);
+    xr_delete(m_framegraphRenderer->m_r_sun_old);
     m_framegraphRenderer->m_PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);
 }
@@ -650,11 +659,11 @@ void CRender::reset_begin()
 {
     ZoneScoped;
     // Wait for tasks to be done
-    r_main.sync();
-    r_sun.sync();
-    r_sun_old.sync();
+    m_framegraphRenderer->m_r_main->sync();
+    m_framegraphRenderer->m_r_sun->sync();
+    m_framegraphRenderer->m_r_sun_old->sync();
 #if RENDER != R_R2
-    r_rain.sync();
+    m_framegraphRenderer->m_r_rain->sync();
 #endif
 
     Resources->reset_begin();

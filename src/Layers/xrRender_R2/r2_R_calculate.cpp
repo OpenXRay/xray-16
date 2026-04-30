@@ -42,7 +42,7 @@ void render_main::calculate()
 
     dsgraph_main.o.phase = CRender::PHASE_NORMAL;
     dsgraph_main.r_pmask(true, true, true); // enable priority "0,1",+ capture wmarks
-    if (RImplementation.r_sun.o.active && RImplementation.o.oldshadowcascades)
+    if (RImplementation.m_framegraphRenderer->m_r_sun->o.active && RImplementation.o.oldshadowcascades)
         dsgraph_main.set_Recorder(&RImplementation.m_framegraphRenderer->m_main_coarse_structure); // this is a show-stopper. Can't be paralleled with sun
     else
         dsgraph_main.set_Recorder(nullptr);
@@ -144,31 +144,31 @@ void CRender::Calculate()
 
     TaskScheduler->Wait(*m_framegraphRenderer->m_pProcessHOMTask);
 
-    r_main.init();
+    m_framegraphRenderer->m_r_main->init();
     if (o.oldshadowcascades)
-        r_sun_old.init();
+        m_framegraphRenderer->m_r_sun_old->init();
     else
-        r_sun.init();
+        m_framegraphRenderer->m_r_sun->init();
 #if RENDER != R_R2
-    r_rain.init();
+    m_framegraphRenderer->m_r_rain->init();
 #endif
 
     // Main calc
     BasicStats.Culling.Begin();
     {
-        r_main.run();
+        m_framegraphRenderer->m_r_main->run();
     }
     BasicStats.Culling.End();
 
     // Rain calc
 #if RENDER != R_R2
-    r_rain.run();
+    m_framegraphRenderer->m_r_rain->run();
 #endif
 
     // Sun calc
     if (o.oldshadowcascades)
-        r_sun_old.run();
+        m_framegraphRenderer->m_r_sun_old->run();
     else
-        r_sun.run();
+        m_framegraphRenderer->m_r_sun->run();
 }
 } // namespace xray::render::fg

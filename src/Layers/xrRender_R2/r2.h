@@ -331,14 +331,6 @@ public:
     void render_indirect(light* L) const;
     void render_lights(light_Package& LP);
 
-    render_main r_main;
-#if RENDER != R_R2
-    render_rain r_rain;
-#endif
-
-    render_sun r_sun;
-    render_sun_old r_sun_old;
-
 public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
