@@ -19,9 +19,9 @@ IRender_Sector::sector_id_t R_dsgraph_structure::detect_sector(const Fvector& P,
     // Portals model
     int id1 = -1;
     float range1 = 500.f;
-    if (RImplementation.rmPortals)
+    if (g_pRmPortals)
     {
-        Sectors_xrc.ray_query(CDB::OPT_ONLYNEAREST, RImplementation.rmPortals, P, dir, range1);
+        Sectors_xrc.ray_query(CDB::OPT_ONLYNEAREST, g_pRmPortals, P, dir, range1);
         if (Sectors_xrc.r_count())
         {
             CDB::RESULT* RP1 = Sectors_xrc.r_begin();
@@ -58,7 +58,7 @@ IRender_Sector::sector_id_t R_dsgraph_structure::detect_sector(const Fvector& P,
     if (ID == id1)
     {
         // Take sector, facing to our point from portal
-        CDB::TRI* pTri = RImplementation.rmPortals->get_tris() + ID;
+        CDB::TRI* pTri = g_pRmPortals->get_tris() + ID;
         CPortal* pPortal = Portals[pTri->dummy];
         return pPortal->getSectorFacing(P)->unique_id;
     }
