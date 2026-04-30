@@ -30,7 +30,7 @@ target_link_libraries(xr_3da
     xrAPI
     xrEngine
     xrGame
-    $<$<PLATFORM_ID:Windows>:xrRender>
+    xrRender
 )
 
 if (WIN32)
