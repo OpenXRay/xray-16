@@ -5,11 +5,9 @@
 #include "../RenderContext/RenderDevice.h"
 
 namespace xray::render::fg {
-    class CRender;
 
     static fg::RenderDevice* GetGlobalRenderDevice() {
-        auto& render = static_cast<xray::render::fg::CRender&>(RImplementation);
-        return render.m_renderDevice;
+        return RImplementation.GetRenderDevice();
     }
 
 }

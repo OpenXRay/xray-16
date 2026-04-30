@@ -17,6 +17,8 @@
 
 namespace xray::render
 {
+using namespace fg;
+
 IBlender* FrameGraphRenderer::blender_create(CLASS_ID cls)
 {
     switch (cls)

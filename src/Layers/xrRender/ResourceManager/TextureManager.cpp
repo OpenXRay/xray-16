@@ -3,7 +3,6 @@
 #include "DDSLoader.h"
 #include "TextureStreaming.h"
 #include "../RenderContext/RenderDevice.h"
-#include "xrEngine/IFrameGraphRender.h"
 
 namespace xray::render::resources {
 

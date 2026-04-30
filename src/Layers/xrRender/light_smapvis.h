@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Layers/xrRender/r__dsgraph_structure.h"
+
 namespace xray::render::fg
 {
 class smapvis : public R_feedback

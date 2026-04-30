@@ -13,8 +13,7 @@
 #include "Layers/xrRender/Decals/DecalManager.h"
 
 namespace xray::render::fg {
-    class CRender;
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::passes {
@@ -41,8 +40,8 @@ static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::Fram
     auto& cache = GetPassResourceCache();
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    auto vsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadVertexShader("decal_box");
-    auto psResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadPixelShader("decal_box");
+    auto vsResult = GEnv.Render->GetShaderLoader()->LoadVertexShader("decal_box");
+    auto psResult = GEnv.Render->GetShaderLoader()->LoadPixelShader("decal_box");
     if (!vsResult.handle || !psResult.handle)
         return;
 
@@ -142,8 +141,8 @@ DefaultOutputLayout setupDecalPass(
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
 
-            auto* vsReflection = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("decal_box", ".vs");
-            auto* psReflection = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("decal_box", ".ps");
+            auto* vsReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("decal_box", ".vs");
+            auto* psReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("decal_box", ".ps");
 
             auto* materialBuffer = MaterialBuffer::Instance().GetBuffer();
 

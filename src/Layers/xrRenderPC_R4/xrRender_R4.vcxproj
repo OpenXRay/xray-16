@@ -168,7 +168,6 @@
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_Matrices.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_SIMD.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp"/>
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp"/>
     <ClCompile Include="..\..\..\Externals\nvrhi\src\common\dxgi-format.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -243,7 +242,6 @@
     <ClCompile Include="..\xrRenderDX11\R_DStreams.cpp"/>
     <ClCompile Include="..\xrRenderDX11\r_constants.cpp"/>
     <ClCompile Include="..\xrRenderDX11\ShaderInfo.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\R_Backend.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_DBG.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_hemi.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_Runtime.cpp"/>
@@ -266,7 +264,6 @@
     <ClCompile Include="..\xrRenderDX11\blenders\blender_light_spot.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\blender_luminance.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\blender_ssao.cpp"/>
-    <ClCompile Include="..\xrRender_R2\r2.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\dx11HDAOCSBlender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\dx11MinMaxSMBlender.cpp"/>
     <ClCompile Include="r2_test_hw.cpp"/>
@@ -274,7 +271,6 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="xrRender_R4.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">

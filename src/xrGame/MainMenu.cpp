@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "MainMenu.h"
 #include "Include/xrAPI/xrAPI.h"
-#include "xrEngine/IFrameGraphRender.h"
 #include "ui/UIDialogWnd.h"
 #include "ui/UIMessageBoxEx.h"
 #include "xrEngine/XR_IOConsole.h"

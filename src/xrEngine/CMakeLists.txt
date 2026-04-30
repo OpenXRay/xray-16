@@ -335,8 +335,6 @@ target_sources_grouped(
     FILES
     IRenderBackend.h
     IRenderBackend.cpp
-    IFrameGraphRender.h
-    IFrameGraphRender.cpp
     xrImage_Resampler.cpp
     xrImage_Resampler.h
     xrTheora_Stream.cpp

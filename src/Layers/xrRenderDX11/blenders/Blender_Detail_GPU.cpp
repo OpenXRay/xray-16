@@ -24,7 +24,7 @@ void CBlender_Detail_GPU::Compile(CBlender_Compile& C)
     VERIFY(!C.L_textures.empty());
     LPCSTR texture_path = C.L_textures[0].c_str();
 
-    bool bUseATOC = (RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
+    bool bUseATOC = (RImplementation.o.msaa_alphatest == FrameGraphRenderer::MSAA_ATEST_DX10_0_ATOC);
 
     switch (C.iElement)
     {

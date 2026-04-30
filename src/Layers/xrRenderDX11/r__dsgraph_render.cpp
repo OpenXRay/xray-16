@@ -70,7 +70,7 @@ void R_dsgraph_structure::render_graph(u32 _priority)
                     cmd_list.LOD.set_LOD(LOD);
 #endif
 
-                    item.pVisual->Render(cmd_list, LOD, o.phase == CRender::PHASE_SMAP);
+                    item.pVisual->Render(cmd_list, LOD, o.phase == FrameGraphRenderer::PHASE_SMAP);
                 }
                 items.clear();
 
@@ -109,7 +109,7 @@ void R_dsgraph_structure::render_graph(u32 _priority)
                     cmd_list.LOD.set_LOD(LOD);
 #endif
 
-                    item.pVisual->Render(cmd_list, LOD, o.phase == CRender::PHASE_SMAP);
+                    item.pVisual->Render(cmd_list, LOD, o.phase == FrameGraphRenderer::PHASE_SMAP);
                 }
                 items.clear();
             }
@@ -182,7 +182,7 @@ void __fastcall render_item(u32 context_id, const T& item)
     RImplementation.apply_object(dsgraph.cmd_list, item.second.pObject);
     dsgraph.cmd_list.apply_lmaterial();
     hud_transform_helper::apply_custom_state(dsgraph.cmd_list);
-    V->Render(dsgraph.cmd_list, calcLOD(item.first, V->vis.sphere.R), dsgraph.o.phase == CRender::PHASE_SMAP);
+    V->Render(dsgraph.cmd_list, calcLOD(item.first, V->vis.sphere.R), dsgraph.o.phase == FrameGraphRenderer::PHASE_SMAP);
 }
 
 template<class T>
@@ -230,15 +230,15 @@ void R_dsgraph_structure::render_hud_ui()
     const ref_rt rt_null;
     cmd_list.set_RT(0, 1);
     cmd_list.set_RT(0, 2);
-    auto zb = RImplementation.m_framegraphRenderer->m_pTarget->rt_Base_Depth;
+    auto zb = RImplementation.m_pTarget->rt_Base_Depth;
 
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
     if (RImplementation.o.msaa)
-        zb = RImplementation.m_framegraphRenderer->m_pTarget->rt_MSAADepth;
+        zb = RImplementation.m_pTarget->rt_MSAADepth;
 #endif
 
-    RImplementation.m_framegraphRenderer->m_pTarget->u_setrt(cmd_list,
-        RImplementation.o.albedo_wo ? RImplementation.m_framegraphRenderer->m_pTarget->rt_Accumulator : RImplementation.m_framegraphRenderer->m_pTarget->rt_Color,
+    RImplementation.m_pTarget->u_setrt(cmd_list,
+        RImplementation.o.albedo_wo ? RImplementation.m_pTarget->rt_Accumulator : RImplementation.m_pTarget->rt_Color,
         rt_null, rt_null, zb);
 #endif
 
@@ -352,7 +352,7 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
                 for (u32 pass = 0; pass < E2->passes.size(); pass++)
                 {
                     cmd_list.set_Element(E2, pass);
-                    V->Render(cmd_list, -1.f, o.phase == CRender::PHASE_SMAP);
+                    V->Render(cmd_list, -1.f, o.phase == FrameGraphRenderer::PHASE_SMAP);
                 }
             }
         }

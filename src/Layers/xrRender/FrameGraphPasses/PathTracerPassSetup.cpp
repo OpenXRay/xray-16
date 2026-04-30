@@ -19,7 +19,7 @@
 
 namespace fg
 {
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::passes {
@@ -97,7 +97,7 @@ static void InitializeResources(fg::RenderDevice* device)
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     auto& cache = GetPassResourceCache();
 
-    auto csResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("rt_pathtrace");
+    auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("rt_pathtrace");
     if (!csResult.handle) {
         Msg("! [PathTracer] Failed to load rt_pathtrace shader");
         s_initialized = true;

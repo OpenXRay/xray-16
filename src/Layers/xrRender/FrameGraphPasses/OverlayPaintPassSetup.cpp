@@ -11,7 +11,7 @@
 
 namespace fg
 {
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::passes {
@@ -40,7 +40,7 @@ void InitializeOverlayPaintResources(fg::RenderDevice* device, OverlayPaintPassS
         return;
     }
 
-    auto csResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("overlay_paint");
+    auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("overlay_paint");
 
     if (!csResult.handle) {
         Msg("! [OverlayPaintPass] overlay_paint.cs not found");
@@ -132,7 +132,7 @@ void setupOverlayPaintPass(
 
                 cmdList->writeBuffer(cbHandle, &cb, sizeof(cb));
 
-                auto* paintRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("overlay_paint", ".cs");
+                auto* paintRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("overlay_paint", ".cs");
                 BindingSetBuilder bsb(*paintRefl, nvDevice, "OverlayPaint");
                 bsb.ConstantBuffer("PaintParams", cbHandle)
                    .TextureUAV("g_Overlay", overlay.colorOverlay);

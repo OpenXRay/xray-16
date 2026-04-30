@@ -14,7 +14,6 @@
 #else
 #include "Include/xrAPI/xrAPI.h"
 #endif
-#include "xrEngine/IFrameGraphRender.h"
 
 namespace xray::render::fg
 {
@@ -451,7 +450,7 @@ void CKinematics::CalculateBones_InvalidateFG()
 
 void CKinematics::CalculateBones_Invalidate()
 {
-    if (GEnv.FrameGraphRenderer->IsEnabled())
+    if (GEnv.Render->IsEnabled())
         return;
 
     UCalc_Time = 0x0;

@@ -21,7 +21,6 @@
 #include "xrScriptEngine/script_callback_ex.h"
 #include "script_game_object.h"
 #include "HudSound.h"
-#include "xrEngine/IFrameGraphRender.h"
 
 CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon(), m_bStopedAfterQueueFired(false)
 {

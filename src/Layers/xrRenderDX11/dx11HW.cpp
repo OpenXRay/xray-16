@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "dx11HW.h"
+#include "xrCore/Threading/TaskManager.hpp"
 
 #include "StateManager/dx11SamplerStateCache.h"
 #include "dx11TextureUtils.h"

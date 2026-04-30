@@ -1,11 +1,14 @@
 #pragma once
 
-#include "xrEngine/IFrameGraphRender.h"
 #include "xrEngine/Render.h"
 #include "Layers/xrRender/FGRenderBase.h"
+#include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/r__buffer_pool.h"
 #include "xrCDB/xrXRC.h"
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/r__occlusion.h"
+#include "Layers/xrRender/r__dsgraph_structure.h"
+#include "Layers/xrRender/R_DStreams.h"
 #include "Layers/xrRender/Light_Render_Direct.h"
 #include "Layers/xrRender/PSLibrary.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
@@ -20,6 +23,12 @@
 #include "Layers/xrRender/Profiler/StatsOverlay.h"
 
 struct ImDrawData;
+struct ID3D11Resource;
+
+namespace xray::render::fg
+{
+class IRender_DetailModel;
+}
 
 namespace CDB { class MODEL; }
 class xrXRC;
@@ -97,7 +106,7 @@ namespace framegraph {
     class VolatileConstantBufferPool;
 }
 
-class FrameGraphRenderer: public IFrameGraphRender, public xray::render::fg::FGRenderBase {
+class FrameGraphRenderer: public xray::render::fg::FGRenderBase {
 public:
     enum
     {
@@ -141,8 +150,8 @@ public:
     void level_Unload() override;
     HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result) override;
 
-    IBlender* blender_create(CLASS_ID cls);
-    void blender_destroy(IBlender*& B);
+    fg::IBlender* blender_create(CLASS_ID cls);
+    void blender_destroy(fg::IBlender*& B);
 
     void addShaderOption(pcstr name, pcstr value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
@@ -169,6 +178,9 @@ private:
 public:
 
     pcstr getShaderPath() override { return "r5\\"; }
+
+    ID3D11Resource* texture_load(pcstr fname, u32& msize);
+
     IRenderVisual* getVisual(int id) override;
 
     void add_Visual(u32, IRenderable* root, IRenderVisual* V, Fmatrix& m) override;
@@ -187,6 +199,8 @@ public:
     IRenderVisual* model_CreateChild(pcstr name, IReader* data) override;
     IRenderVisual* model_Duplicate(IRenderVisual* V) override;
     void model_Delete(IRenderVisual*& V, bool bDiscard) override;
+    fg::IRender_DetailModel* model_CreateDM(IReader* F);
+    void model_Delete(fg::IRender_DetailModel*& F);
     void model_Logging(bool bEnable) override;
     void models_Prefetch() override;
     void models_Clear(bool b_complete) override;
@@ -374,6 +388,27 @@ public:
     fg::SMAP_Allocator m_LP_smap_pool;
     fg::CRenderTarget* m_pTarget{ nullptr };
     fg::CPSLibrary m_PSLibrary;
+
+    fg::R_dsgraph_structure m_immContext;
+    fg::R_dsgraph_structure& get_imm_context() { return m_immContext; }
+    fg::R_dsgraph_structure& get_context(u32) { return m_immContext; }
+    void apply_object(fg::CBackend& cmd_list, IRenderable* O);
+
+    u32 occq_begin(u32& ID) { return m_HWOCC.occq_begin(ID); }
+    void occq_end(u32& ID) { m_HWOCC.occq_end(ID); }
+    fg::R_occlusion::occq_result occq_get(u32& ID) { return m_HWOCC.occq_get(ID); }
+
+    fg::ref_shader m_WireShader;
+    fg::ref_shader m_SelectionShader;
+    fg::ref_shader m_PortalFadeShader;
+    fg::_VertexStream Vertex;
+    fg::_IndexStream Index;
+    fg::IndexStagingBuffer QuadIB;
+    fg::IndexBufferHandle old_QuadIB;
+    void CreateQuadIB();
+
+    fg::ShaderElement* rimp_select_sh_static(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase);
+    fg::ShaderElement* rimp_select_sh_dynamic(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase);
 #if defined(USE_DX11)
     xr_vector<D3D_SHADER_MACRO> m_ShaderOptions;
 #elif defined(USE_OGL)

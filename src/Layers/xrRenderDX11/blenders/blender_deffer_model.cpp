@@ -149,7 +149,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
     {
         BOOL bAref = oBlend.value;
 
-        bool bUseATOC = (bAref && RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
+        bool bUseATOC = (bAref && RImplementation.o.msaa_alphatest == FrameGraphRenderer::MSAA_ATEST_DX10_0_ATOC);
 
         switch (C.iElement)
         {
@@ -236,7 +236,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
     {
         BOOL bAref = oBlend.value;
 
-        bool bUseATOC = (bAref && (RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC));
+        bool bUseATOC = (bAref && (RImplementation.o.msaa_alphatest == FrameGraphRenderer::MSAA_ATEST_DX10_0_ATOC));
 
 #if RENDER == R_R4
         C.TessMethod = oTessellation.IDselected;

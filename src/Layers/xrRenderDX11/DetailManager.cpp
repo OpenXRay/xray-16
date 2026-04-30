@@ -400,7 +400,7 @@ void CDetailManager::UpdateVisibleM()
                     }
                 }
 #ifndef _EDITOR
-                if (!RImplementation.m_framegraphRenderer->m_HOM.visible(S.vis))
+                if (!RImplementation.m_HOM.visible(S.vis))
                 {
                     continue;
                 }
@@ -521,7 +521,7 @@ void CDetailManager::DispatchMTCalc()
     m_calc_task = &TaskScheduler->AddTask([this]
     {
 #ifndef _EDITOR
-        if (nullptr == RImplementation.m_framegraphRenderer->m_pDetailManager)
+        if (nullptr == RImplementation.m_pDetailManager)
             return;
         if (nullptr == dtFS)
             return;

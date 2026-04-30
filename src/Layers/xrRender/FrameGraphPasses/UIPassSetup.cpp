@@ -90,7 +90,7 @@ framegraph::VirtualResourceHandle setupUIPass(
                 return;
             }
 
-            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.FrameGraphRenderer);
+            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
             auto* uiCollector = fgRenderer->GetUICollector();
             auto* uiRenderer = fgRenderer->GetUIRenderer();
             auto* uiMatCache = fgRenderer->GetUIMaterialCache();
@@ -170,7 +170,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                 return;
             }
 
-            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.FrameGraphRenderer);
+            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
             auto* device = fgRenderer->GetRenderDevice();
             auto* textMatCache = fgRenderer->GetTextMaterialCache();
 
@@ -474,7 +474,7 @@ framegraph::VirtualResourceHandle setupCursorPass(
                 return;
             }
 
-            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.FrameGraphRenderer);
+            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
             auto* uiCollector = fgRenderer->GetUICollector();
             auto* uiRenderer = fgRenderer->GetUIRenderer();
             auto* uiMatCache = fgRenderer->GetUIMaterialCache();

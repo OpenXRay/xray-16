@@ -7,8 +7,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render::fg {
-    class CRender;
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::decals {
@@ -25,7 +24,7 @@ u32 fgWallMarkArray::TryRegisterMaterial(u32 index)
     if (index >= m_textureNames.size())
         return UINT32_MAX;
 
-    auto* renderDevice = RImplementation.m_renderDevice;
+    auto* renderDevice = RImplementation.GetRenderDevice();
     if (!renderDevice)
         return UINT32_MAX;
     auto* resMgr = renderDevice->GetFGResourceManager();

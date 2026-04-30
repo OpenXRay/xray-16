@@ -117,7 +117,7 @@ void dxEnvironmentRender::Copy(IEnvironmentRender& _in) { *this = *(dxEnvironmen
 
 particles_systems::library_interface const& dxEnvironmentRender::particles_systems_library()
 {
-    return (RImplementation.m_framegraphRenderer->m_PSLibrary);
+    return (RImplementation.m_PSLibrary);
 }
 
 void dxEnvDescriptorRender::OnDeviceCreate(CEnvDescriptor& owner)
@@ -254,9 +254,9 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 
 #ifdef USE_OGL
     if (!RImplementation.o.msaa)
-        RImplementation.m_framegraphRenderer->m_pTarget->u_setrt(RCache, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_0, nullptr, nullptr, RImplementation.m_framegraphRenderer->m_pTarget->rt_Base_Depth);
+        RImplementation.m_pTarget->u_setrt(RCache, RImplementation.m_pTarget->rt_Generic_0, nullptr, nullptr, RImplementation.m_pTarget->rt_Base_Depth);
     else
-        RImplementation.m_framegraphRenderer->m_pTarget->u_setrt(RCache, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_0_r, nullptr, nullptr, RImplementation.m_framegraphRenderer->m_pTarget->rt_MSAADepth);
+        RImplementation.m_pTarget->u_setrt(RCache, RImplementation.m_pTarget->rt_Generic_0_r, nullptr, nullptr, RImplementation.m_pTarget->rt_MSAADepth);
 #endif
 
     RImplementation.rmNormal(RCache);
@@ -271,9 +271,9 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 
 #ifdef USE_OGL
     if (!RImplementation.o.msaa)
-        RImplementation.m_framegraphRenderer->m_pTarget->u_setrt(RCache, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_0, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_1, nullptr, RImplementation.m_framegraphRenderer->m_pTarget->rt_Base_Depth);
+        RImplementation.m_pTarget->u_setrt(RCache, RImplementation.m_pTarget->rt_Generic_0, RImplementation.m_pTarget->rt_Generic_1, nullptr, RImplementation.m_pTarget->rt_Base_Depth);
     else
-        RImplementation.m_framegraphRenderer->m_pTarget->u_setrt(RCache, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_0_r, RImplementation.m_framegraphRenderer->m_pTarget->rt_Generic_1_r, nullptr, RImplementation.m_framegraphRenderer->m_pTarget->rt_MSAADepth);
+        RImplementation.m_pTarget->u_setrt(RCache, RImplementation.m_pTarget->rt_Generic_0_r, RImplementation.m_pTarget->rt_Generic_1_r, nullptr, RImplementation.m_pTarget->rt_MSAADepth);
 #endif
 }
 

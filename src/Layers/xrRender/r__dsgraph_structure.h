@@ -1,5 +1,6 @@
 #pragma once
 
+#include "r__dsgraph_types.h"
 #include "r__sector.h"
 
 namespace xray::render::fg

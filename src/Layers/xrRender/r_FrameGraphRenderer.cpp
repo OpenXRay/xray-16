@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "r_FrameGraphRenderer.h"
+#include "xrEngine/IRenderable.h"
+#include "Layers/xrRender/DetailModel.h"
+#include "Layers/xrRender/LightTrack.h"
 #include "xrCore/FMesh.hpp"
 #include "FHierrarhyVisual.h"
 #include "SkeletonAnimated.h"
@@ -84,6 +87,86 @@
 #include "xrEngine/IPerformanceAlert.hpp"
 #include "xrCore/PostProcess/PPInfo.hpp"
 
+namespace xray::render::fg { xray::render::FrameGraphRenderer RImplementation; }
+
+namespace xray::render
+{
+fg::ShaderElement* FrameGraphRenderer::rimp_select_sh_static(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase)
+{
+    if (!pVisual->shader)
+        return nullptr;
+    int id = SE_R2_SHADOW;
+    if (FrameGraphRenderer::PHASE_NORMAL == phase)
+    {
+        id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < fg::r__dtex_range) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
+    }
+    return pVisual->shader->E[id]._get();
+}
+
+fg::ShaderElement* FrameGraphRenderer::rimp_select_sh_dynamic(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase)
+{
+    int id = SE_R2_SHADOW;
+    if (FrameGraphRenderer::PHASE_NORMAL == phase)
+    {
+        id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < fg::r__dtex_range) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
+    }
+    return pVisual->shader->E[id]._get();
+}
+
+void FrameGraphRenderer::apply_object(fg::CBackend& cmd_list, IRenderable* O)
+{
+    if (!O || !O->renderable_ROS())
+        return;
+
+    fg::CROS_impl& LT = *(fg::CROS_impl*)O->renderable_ROS();
+    LT.update_smooth(O);
+    cmd_list.o_hemi = 0.75f * LT.get_hemi();
+    cmd_list.o_sun = 0.75f * LT.get_sun();
+    CopyMemory(cmd_list.o_hemi_cube, LT.get_hemi_cube(), fg::CROS_impl::NUM_FACES * sizeof(float));
+}
+
+fg::IRender_DetailModel* FrameGraphRenderer::model_CreateDM(IReader* F)
+{
+    fg::CDetail* D = xr_new<fg::CDetail>();
+    D->Load(F);
+    return D;
+}
+
+void FrameGraphRenderer::model_Delete(fg::IRender_DetailModel*& F)
+{
+    if (F)
+    {
+        fg::CDetail* D = (fg::CDetail*)F;
+        D->Unload();
+        xr_delete(D);
+        F = nullptr;
+    }
+}
+
+void FrameGraphRenderer::CreateQuadIB()
+{
+    constexpr auto triCount = 4 * 1024;
+    constexpr auto idxCount = triCount * 2 * 3;
+    constexpr auto idxSize = idxCount * sizeof(u16);
+
+    QuadIB.Create(idxSize, false, false);
+
+    u16* Indices = static_cast<u16*>(QuadIB.Map());
+    int Cnt = 0;
+    int ICnt = 0;
+    for (int i = 0; i < triCount; i++)
+    {
+        Indices[ICnt++] = u16(Cnt + 0);
+        Indices[ICnt++] = u16(Cnt + 1);
+        Indices[ICnt++] = u16(Cnt + 2);
+        Indices[ICnt++] = u16(Cnt + 3);
+        Indices[ICnt++] = u16(Cnt + 2);
+        Indices[ICnt++] = u16(Cnt + 1);
+        Cnt += 4;
+    }
+    QuadIB.Unmap(true);
+}
+}
 namespace xray::render { void InitializeImGuiRenderer(fg::RenderDevice* renderDevice); }
 
 extern ENGINE_API float psHUD_FOV;
@@ -97,8 +180,7 @@ namespace xray::render {
 using namespace fg;
 
 namespace fg {
-    class CRender;
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 static Fmatrix BuildHUDFOVMatrix()
@@ -338,10 +420,10 @@ void FrameGraphRenderer::Render() {
         if (++frameCounter >= 60)
         {
             frameCounter = 0;
-            if (GEnv.FrameGraphRenderer->GetShaderLoader() && GEnv.FrameGraphRenderer->GetShaderLoader()->CheckForChangedFiles())
+            if (GEnv.Render->GetShaderLoader() && GEnv.Render->GetShaderLoader()->CheckForChangedFiles())
             {
                 Msg("* Shader hot-reload detected, validating changed shaders...");
-                if (!GEnv.FrameGraphRenderer->GetShaderLoader()->ValidateChangedFiles())
+                if (!GEnv.Render->GetShaderLoader()->ValidateChangedFiles())
                 {
                     Msg("! Shader hot-reload skipped: validation failed, keeping current shaders");
                 }
@@ -351,7 +433,7 @@ void FrameGraphRenderer::Render() {
 
                     m_device->GetNVRHIDevice()->waitForIdle();
 
-                    GEnv.FrameGraphRenderer->GetShaderLoader()->ClearAllCaches();
+                    GEnv.Render->GetShaderLoader()->ClearAllCaches();
                     framegraph::GetPassResourceCache().Clear();
                     if (m_blackboard)
                     {
@@ -367,7 +449,7 @@ void FrameGraphRenderer::Render() {
                     if (m_rtAccelMgr)
                         fg::RTAccelStructManager::InvalidateShaderPipelines();
 
-                    fg::ImGuiRendererNVRHI* imguiReload = GEnv.FrameGraphRenderer->GetImGuiRendererNVRHI();
+                    fg::ImGuiRendererNVRHI* imguiReload = GEnv.Render->GetImGuiRendererNVRHI();
                     if (imguiReload)
                         imguiReload->InvalidateShadersAndPipeline();
 
@@ -525,7 +607,7 @@ void FrameGraphRenderer::RenderMenu() {
         m_blackboard->get_or_add<passes::TonemapPassState>()
     );
 
-    fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.FrameGraphRenderer->GetImGuiRendererNVRHI();
+    fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.Render->GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
         ldrOutput,
@@ -1560,7 +1642,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                         nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
 
                         if (!s_init) {
-                            auto csResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("debug_preview");
+                            auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("debug_preview");
                             if (!csResult.handle) return;
 
                             s_layout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DebugPreview", *csResult.reflection, nvDevice);
@@ -1605,7 +1687,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                         nvrhi::ICommandList* cmdList = ctx->GetCommandList();
                         cmdList->writeBuffer(s_cb, &cb, sizeof(cb));
 
-                        auto* debugRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("debug_preview", ".cs");
+                        auto* debugRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("debug_preview", ".cs");
                         framegraph::BindingSetBuilder bsb(*debugRefl, nvDevice, "FGRenderer.Debug");
                         bsb.ConstantBuffer("DebugPreviewParams", s_cb)
                            .Texture("t_source", srcTex)
@@ -1622,7 +1704,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
-    fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.FrameGraphRenderer->GetImGuiRendererNVRHI();
+    fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.Render->GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
         ldrOutput,
@@ -2798,7 +2880,11 @@ void FrameGraphRenderer::create()
         Msg("! FrameGraphRenderer initialization failed");
         return;
     }
-    GEnv.FrameGraphRenderer = this;
+    GEnv.Render = this;
+
+    Vertex.Create();
+    Index.Create();
+    CreateQuadIB();
 
     InitializeImGuiRenderer(m_device);
     GEnv.UIRender = GetUICollector();
@@ -2818,6 +2904,10 @@ void FrameGraphRenderer::create()
 
 void FrameGraphRenderer::destroy()
 {
+    QuadIB.Release();
+    Index.Destroy();
+    Vertex.Destroy();
+
     m_HWOCC.occq_destroy();
     m_PSLibrary.OnDestroy();
 
@@ -2832,7 +2922,7 @@ void FrameGraphRenderer::destroy()
     MaterialSystem::Instance().Shutdown();
 
     Shutdown();
-    GEnv.FrameGraphRenderer = nullptr;
+    GEnv.Render = nullptr;
 
     if (m_device)
     {

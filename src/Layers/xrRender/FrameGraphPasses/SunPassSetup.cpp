@@ -15,7 +15,7 @@
 #include "xrEngine/xr_efflensflare.h"
 
 namespace fg {
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::passes {
@@ -60,11 +60,11 @@ void InitializeSunPass(fg::RenderDevice* device, SunPassState& state) {
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
 
-    if (!GEnv.FrameGraphRenderer->GetShaderLoader())
+    if (!GEnv.Render->GetShaderLoader())
         return;
 
-    auto vsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadVertexShader("sun_forward");
-    auto psResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadPixelShader("sun_forward");
+    auto vsResult = GEnv.Render->GetShaderLoader()->LoadVertexShader("sun_forward");
+    auto psResult = GEnv.Render->GetShaderLoader()->LoadPixelShader("sun_forward");
 
     if (!vsResult.handle || !psResult.handle)
         return;
@@ -290,8 +290,8 @@ framegraph::VirtualResourceHandle setupSunPass(
                 sunTex = data.passState->placeholderTexture.Get();
             }
 
-            auto* vsRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("sun_forward", ".vs");
-            auto* psRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("sun_forward", ".ps");
+            auto* vsRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("sun_forward", ".vs");
+            auto* psRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("sun_forward", ".ps");
             if (!vsRefl || !psRefl) return;
             framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, device, "Sun");
             bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer)

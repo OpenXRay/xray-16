@@ -10,8 +10,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render::fg {
-    class CRender;
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::passes {
@@ -31,11 +30,11 @@ struct DistortionApplyData {
 void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassState& state) {
     if (state.initialized || !device) return;
 
-    if (!GEnv.FrameGraphRenderer->GetShaderLoader())
+    if (!GEnv.Render->GetShaderLoader())
         return;
 
-    auto vsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadVertexShader("fullscreen");
-    auto psResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadPixelShader("distortion_apply");
+    auto vsResult = GEnv.Render->GetShaderLoader()->LoadVertexShader("fullscreen");
+    auto psResult = GEnv.Render->GetShaderLoader()->LoadPixelShader("distortion_apply");
     if (!vsResult.handle || !psResult.handle) {
         state.initialized = true;
         return;
@@ -121,8 +120,8 @@ VirtualResourceHandle setupDistortionApplyPass(
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), ctx->GetDevice());
 
-            auto* vsRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("fullscreen", ".vs");
-            auto* psRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("distortion_apply", ".ps");
+            auto* vsRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("fullscreen", ".vs");
+            auto* psRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("distortion_apply", ".ps");
             if (!vsRefl || !psRefl)
                 return;
 

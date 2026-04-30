@@ -59,7 +59,6 @@
     <ClInclude Include="GameFont.h" />
     <ClInclude Include="GrassInteractionCollector.h" />
     <ClInclude Include="ICollidable.h" />
-    <ClInclude Include="IFrameGraphRender.h" />
     <ClInclude Include="IGameFont.hpp" />
     <ClInclude Include="IGame_Level.h" />
     <ClInclude Include="IGame_ObjectPool.h" />
@@ -148,7 +147,6 @@
     <ClCompile Include="GameFont.cpp" />
     <ClCompile Include="GrassInteractionCollector.cpp" />
     <ClCompile Include="ICollidable.cpp" />
-    <ClCompile Include="IFrameGraphRender.cpp" />
     <ClCompile Include="IGame_Level.cpp" />
     <ClCompile Include="IGame_Level_check_textures.cpp" />
     <ClCompile Include="IGame_ObjectPool.cpp" />

@@ -2,6 +2,8 @@
 
 namespace xray::render::fg
 {
+class light;
+
 class CLight_Compute_XFORM_and_VIS
 {
 public:

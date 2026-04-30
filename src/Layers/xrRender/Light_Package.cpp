@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Light_Package.h"
+#include "Layers/xrRender/light.h"
 
 namespace xray::render::fg
 {

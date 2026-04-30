@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "BufferManager.h"
 #include "../RenderContext/RenderDevice.h"
-#include "xrEngine/IFrameGraphRender.h"
 
 namespace xray::render::resources {
 

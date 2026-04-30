@@ -103,14 +103,17 @@ IC void Reduce(size_t& w, size_t& h, size_t& l, int skip)
         h = 1;
 }
 
-ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
+}
+namespace xray::render
+{
+ID3D11Resource* FrameGraphRenderer::texture_load(LPCSTR fRName, u32& ret_msize)
 {
     ret_msize = 0;
     R_ASSERT1_CURE(fRName && fRName[0], { return nullptr; });
 
-    if (!m_renderDevice || !m_renderDevice->GetFGResourceManager())
+    auto* device = GetRenderDevice();
+    if (!device || !device->GetFGResourceManager())
         return nullptr;
-
 
     string_path fname;
     xr_strcpy(fname, fRName);
@@ -121,7 +124,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 
     Msg("* [FrameGraph] Loading texture through TextureManager: %s", fname);
 
-    FGResourceManager* resourceMgr = m_renderDevice->GetFGResourceManager();
+    FGResourceManager* resourceMgr = device->GetFGResourceManager();
     TextureManager* texManager = resourceMgr->GetTextureManager();
 
     TextureHandle handle = texManager->LoadTexture(fRName, TexturePriority::High);
