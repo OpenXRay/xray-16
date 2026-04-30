@@ -7,15 +7,16 @@
 #include "Layers/xrRender/Shaders/SlangReflectionWrapper.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
-namespace xray::render::fg
+namespace xray::render
 {
-// Extern reference to global failed shaders list (defined in r2.cpp)
-extern xr_vector<xr_string> g_failedShaders;
+using namespace fg;
 
-void CRender::addShaderOption(const char* name, const char* value)
+xr_vector<xr_string> g_failedShaders;
+
+void FrameGraphRenderer::addShaderOption(const char* name, const char* value)
 {
     D3D_SHADER_MACRO macro = {name, value};
-    m_framegraphRenderer->m_ShaderOptions.push_back(macro);
+    m_ShaderOptions.push_back(macro);
 }
 
 template <typename T>
@@ -234,7 +235,7 @@ public:
     D3D_SHADER_MACRO* data() { return m_options; }
 };
 
-HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
+HRESULT FrameGraphRenderer::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     pcstr pTarget, u32 Flags, void*& result)
 {
     shader_options_holder options;
@@ -259,7 +260,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     };
 
     // External defines
-    options.add(m_framegraphRenderer->m_ShaderOptions);
+    options.add(m_ShaderOptions);
 
     // Shadow map size
     {
@@ -269,22 +270,22 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     // FP16 Filter
-    appendShaderOption(o.fp16_filter, "FP16_FILTER", "1");
+    appendShaderOption(RImplementation.o.fp16_filter, "FP16_FILTER", "1");
 
     // FP16 Blend
-    appendShaderOption(o.fp16_blend, "FP16_BLEND", "1");
+    appendShaderOption(RImplementation.o.fp16_blend, "FP16_BLEND", "1");
 
     // HW smap
-    appendShaderOption(o.HW_smap, "USE_HWSMAP", "1");
+    appendShaderOption(RImplementation.o.HW_smap, "USE_HWSMAP", "1");
 
     // HW smap PCF
-    appendShaderOption(o.HW_smap_PCF, "USE_HWSMAP_PCF", "1");
+    appendShaderOption(RImplementation.o.HW_smap_PCF, "USE_HWSMAP_PCF", "1");
 
     // Fetch4
-    appendShaderOption(o.HW_smap_FETCH4, "USE_FETCH4", "1");
+    appendShaderOption(RImplementation.o.HW_smap_FETCH4, "USE_FETCH4", "1");
 
     // SJitter
-    appendShaderOption(o.sjitter, "USE_SJITTER", "1");
+    appendShaderOption(RImplementation.o.sjitter, "USE_SJITTER", "1");
 
     // Branching
     const auto& caps = GEnv.Backend->GetCapabilities();
@@ -294,31 +295,31 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     appendShaderOption(caps.geometry.bVTF, "USE_VTF", "1");
 
     // Tshadows
-    appendShaderOption(o.Tshadows, "USE_TSHADOWS", "1");
+    appendShaderOption(RImplementation.o.Tshadows, "USE_TSHADOWS", "1");
 
     // Motion blur
-    appendShaderOption(o.mblur, "USE_MBLUR", "1");
+    appendShaderOption(RImplementation.o.mblur, "USE_MBLUR", "1");
 
     // Sun filter
-    appendShaderOption(o.sunfilter, "USE_SUNFILTER", "1");
+    appendShaderOption(RImplementation.o.sunfilter, "USE_SUNFILTER", "1");
 
     // Static sun on R2 and higher
-    appendShaderOption(o.sunstatic, "USE_R2_STATIC_SUN", "1");
+    appendShaderOption(RImplementation.o.sunstatic, "USE_R2_STATIC_SUN", "1");
 
     // Force gloss
     {
-        xr_sprintf(c_gloss, "%f", o.forcegloss_v);
-        appendShaderOption(o.forcegloss, "FORCE_GLOSS", c_gloss);
+        xr_sprintf(c_gloss, "%f", RImplementation.o.forcegloss_v);
+        appendShaderOption(RImplementation.o.forcegloss, "FORCE_GLOSS", c_gloss);
     }
 
     // Force skinw
-    appendShaderOption(o.forceskinw, "SKIN_COLOR", "1");
+    appendShaderOption(RImplementation.o.forceskinw, "SKIN_COLOR", "1");
 
     // SSAO Blur
-    appendShaderOption(o.ssao_blur_on, "USE_SSAO_BLUR", "1");
+    appendShaderOption(RImplementation.o.ssao_blur_on, "USE_SSAO_BLUR", "1");
 
     // SSAO HDAO
-    if (o.ssao_hdao)
+    if (RImplementation.o.ssao_hdao)
     {
         options.add("HDAO", "1");
         sh_name.append(static_cast<u32>(1)); // HDAO on
@@ -328,17 +329,17 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     else // SSAO HBAO
     {
         sh_name.append(static_cast<u32>(0)); // HDAO off
-        sh_name.append(o.ssao_hbao);         // HBAO on/off
-        sh_name.append(o.ssao_half_data);    // Half data on/off
+        sh_name.append(RImplementation.o.ssao_hbao);         // HBAO on/off
+        sh_name.append(RImplementation.o.ssao_half_data);    // Half data on/off
 
-        if (o.ssao_hbao)
+        if (RImplementation.o.ssao_hbao)
         {
-            if (o.ssao_half_data)
+            if (RImplementation.o.ssao_half_data)
                 options.add("SSAO_OPT_DATA", "2");
             else
                 options.add("SSAO_OPT_DATA", "1");
 
-            if (o.hbao_vectorized)
+            if (RImplementation.o.hbao_vectorized)
                 options.add("VECTORIZED_CODE", "1");
 
             options.add("USE_HBAO", "1");
@@ -419,10 +420,10 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     // Geometry buffer optimization
-    appendShaderOption(o.gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
+    appendShaderOption(RImplementation.o.gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
 
     // Shader Model 4.1
-    appendShaderOption(o.dx11_sm4_1, "SM_4_1", "1");
+    appendShaderOption(RImplementation.o.dx11_sm4_1, "SM_4_1", "1");
 
     // Shader Model 5.0
     appendShaderOption(HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0, "SM_5", "1");
@@ -437,24 +438,24 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     appendShaderOption(HW.SAD4ShaderInstructions, "SAD4_SUPPORTED", "1");
 
     // Minmax SM
-    appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");
+    appendShaderOption(RImplementation.o.minmax_sm, "USE_MINMAX_SM", "1");
 
     // Be carefull!!!!! this should be at the end to correctly generate
     // compiled shader name;
     // add a #define for DX10_1 MSAA support
-    if (o.msaa)
+    if (RImplementation.o.msaa)
     {
-        appendShaderOption(o.msaa, "USE_MSAA", "1");
+        appendShaderOption(RImplementation.o.msaa, "USE_MSAA", "1");
 
         // Number of samples
         {
-            c_msaa_samples[0] = char(o.msaa_samples) + '0';
+            c_msaa_samples[0] = char(RImplementation.o.msaa_samples) + '0';
             c_msaa_samples[1] = 0;
-            appendShaderOption(o.msaa_samples, "MSAA_SAMPLES", c_msaa_samples);
+            appendShaderOption(RImplementation.o.msaa_samples, "MSAA_SAMPLES", c_msaa_samples);
         }
         // Current sample
         {
-            if (m_MSAASample < 0 || o.msaa_opt)
+            if (m_MSAASample < 0 || RImplementation.o.msaa_opt)
                 c_msaa_current_sample[0] = '0';
             else
                 c_msaa_current_sample[0] = '0' + char(m_MSAASample);
@@ -464,25 +465,25 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
                 "ISAMPLE", c_msaa_current_sample);
         }
 
-        appendShaderOption(o.msaa_opt, "MSAA_OPTIMIZATION", "1");
+        appendShaderOption(RImplementation.o.msaa_opt, "MSAA_OPTIMIZATION", "1");
 
-        switch (o.msaa_alphatest)
+        switch (RImplementation.o.msaa_alphatest)
         {
-        case MSAA_ATEST_DX10_0_ATOC:
+        case CRender::MSAA_ATEST_DX10_0_ATOC:
             options.add("MSAA_ALPHATEST_DX10_0_ATOC", "1");
 
             sh_name.append(static_cast<u32>(1)); // DX10_0_ATOC   on
             sh_name.append(static_cast<u32>(0)); // DX10_1_ATOC   off
             sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
             break;
-        case MSAA_ATEST_DX10_1_ATOC:
+        case CRender::MSAA_ATEST_DX10_1_ATOC:
             options.add("MSAA_ALPHATEST_DX10_1_ATOC", "1");
 
             sh_name.append(static_cast<u32>(0)); // DX10_0_ATOC   off
             sh_name.append(static_cast<u32>(1)); // DX10_1_ATOC   on
             sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
             break;
-        case MSAA_ATEST_DX10_1_NATIVE:
+        case CRender::MSAA_ATEST_DX10_1_NATIVE:
             options.add("MSAA_ALPHATEST_DX10_1", "1");
 
             sh_name.append(static_cast<u32>(0)); // DX10_0_ATOC   off
@@ -611,7 +612,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         bytecode.size(),                  // Size
         name,                             // Name
         result,                           // Output shader object
-        o.disasm,                         // Disassembly flag
+        RImplementation.o.disasm,                         // Disassembly flag
         reflection                        // Reflection data
     );
 
@@ -623,4 +624,4 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     return _result;
 }
-} // namespace xray::render::fg
+} // namespace xray::render

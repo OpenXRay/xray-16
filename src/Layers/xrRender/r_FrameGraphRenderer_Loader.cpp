@@ -22,9 +22,11 @@
 #include "Layers/xrRender/FGDetailManager.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
 
-namespace xray::render::fg
+namespace xray::render
 {
-void CRender::level_Load(IReader* fs)
+using namespace fg;
+
+void FrameGraphRenderer::level_Load(IReader* fs)
 {
     ZoneScoped;
 
@@ -45,8 +47,8 @@ void CRender::level_Load(IReader* fs)
         //  MEGA-BUFFER SYSTEM: Begin level load
         // ═══════════════════════════════════════════════════════
         GPUCullingManager* gpuCulling = nullptr;
-        if (m_framegraphRenderer) {
-            gpuCulling = m_framegraphRenderer->GetGPUCullingManager();
+        if (true) {
+            gpuCulling = GetGPUCullingManager();
             if (gpuCulling) {
                 // Estimate geometry size (will be refined during LoadBuffers)
                 gpuCulling->BeginLevelLoad(2000000, 6000000);
@@ -79,7 +81,7 @@ void CRender::level_Load(IReader* fs)
         chunk = fs->open_chunk(fsL_SHADERS);
         R_ASSERT2(chunk, "Level doesn't builded correctly.");
         u32 count = chunk->r_u32();
-        m_framegraphRenderer->m_CompiledLevelShaders.resize(count);  // D3D12: Compiled NVRHI shaders
+        m_CompiledLevelShaders.resize(count);  // D3D12: Compiled NVRHI shaders
         for (u32 i = 0; i < count; i++)
         {
             string512 n_sh, n_tlist;
@@ -99,7 +101,7 @@ void CRender::level_Load(IReader* fs)
                 *comma = 0;  // Truncate at first comma
 
             // D3D12: Compile NVRHI shaders directly (NO legacy ref_shader!)
-            if (m_framegraphRenderer) {
+            if (true) {
                 CompileLevelShader(i, n_sh, firstTexture);
             }
         }
@@ -109,14 +111,14 @@ void CRender::level_Load(IReader* fs)
     // ═══════════════════════════════════════════════════
     // D3D12: PSO PRECOMPILATION (eliminates runtime hitches!)
     // ═══════════════════════════════════════════════════
-    if (m_framegraphRenderer && !GEnv.isDedicatedServer) {
+    if ((true) && !GEnv.isDedicatedServer) {
         g_pGamePersistent->LoadTitle("st_precompiling_pso");
         PrecompileLevelPSOs();
     }
 
     // Components
-    m_framegraphRenderer->m_pWallmarksEngine = xr_new<CWallmarksEngine>();
-    m_framegraphRenderer->m_pDetailManager = xr_new<CDetailManager>();
+    m_pWallmarksEngine = xr_new<CWallmarksEngine>();
+    m_pDetailManager = xr_new<CDetailManager>();
 
     if (!GEnv.isDedicatedServer)
     {
@@ -129,7 +131,7 @@ void CRender::level_Load(IReader* fs)
         // ═══════════════════════════════════════════════════════
         //  MEGA-BUFFER SYSTEM: End level load
         // ═══════════════════════════════════════════════════════
-        auto* gpuCulling = m_framegraphRenderer->GetGPUCullingManager();
+        auto* gpuCulling = GetGPUCullingManager();
         if (gpuCulling) {
             gpuCulling->EndLevelLoad();
         }
@@ -138,17 +140,17 @@ void CRender::level_Load(IReader* fs)
         g_pGamePersistent->LoadTitle("st_loading_details");
 
         // FGDetailManager: Load details for framegraph renderer
-        if (m_framegraphRenderer) {
-            auto* detailMgr = m_framegraphRenderer->GetDetailManager();
+        if (true) {
+            auto* detailMgr = GetDetailManager();
             if (detailMgr && detailMgr->Load()) {
                 detailMgr->BakeHeightmap();
-                detailMgr->LoadHeightmapTexture(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
+                detailMgr->LoadHeightmapTexture(GetRenderDevice()->GetNVRHIDevice());
                 pbr::PBRConversionParams pbrParams;
                 pbrParams.generate_mipmaps = true;
                 pbr::ConvertSingleTextureToPBR("$level$", "build_details.dds", pbrParams);
-                detailMgr->LoadBuildDetailsTexture(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
+                detailMgr->LoadBuildDetailsTexture(GetRenderDevice()->GetNVRHIDevice());
                 detailMgr->ComputeSlotAABBs();
-                detailMgr->CreateGPUBuffers(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
+                detailMgr->CreateGPUBuffers(GetRenderDevice()->GetNVRHIDevice());
 
                 // NOTE: Initial grass generation happens automatically on first frame
                 // (m_lastDensity starts at -1, triggering regeneration in DispatchCulling)
@@ -163,15 +165,10 @@ void CRender::level_Load(IReader* fs)
     g_pGamePersistent->LoadTitle("st_loading_sectors_portals");
     LoadSectors(fs);
 
-#if defined(USE_DX11)
-    // 3D Fluid
-    Load3DFluid();
-#endif
-
     // HOM - Skip if using FrameGraph renderer (GPU Hi-Z culling replaces CPU HOM)
-    if (!m_framegraphRenderer)
+    if (!true)
     {
-        m_framegraphRenderer->m_HOM.Load();
+        m_HOM.Load();
     }
     else
     {
@@ -192,11 +189,11 @@ void CRender::level_Load(IReader* fs)
 // ═══════════════════════════════════════════════════
 //  D3D12: Compile shaders using NVRHI ShaderLoader
 // ═══════════════════════════════════════════════════
-void CRender::CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName)
+void FrameGraphRenderer::CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName)
 {
     ZoneScopedN("Compile Level Shader");
 
-    auto& compiled = m_framegraphRenderer->m_CompiledLevelShaders[shaderID];
+    auto& compiled = m_CompiledLevelShaders[shaderID];
     compiled.shaderName = shaderName;
     compiled.textureName = textureName;
 
@@ -252,11 +249,11 @@ void CRender::CompileLevelShader(u32 shaderID, const char* shaderName, const cha
 // ═══════════════════════════════════════════════════
 //  D3D12: Precompile PSOs for all level shaders
 // ═══════════════════════════════════════════════════
-void CRender::PrecompileLevelPSOs()
+void FrameGraphRenderer::PrecompileLevelPSOs()
 {
     ZoneScopedN("Precompile Level PSOs");
 
-    auto* materialCache = m_framegraphRenderer->GetMaterialCache();
+    auto* materialCache = GetMaterialCache();
     if (!materialCache) {
         Msg("! [ERROR] MaterialCache not available - skipping PSO precompilation");
         return;
@@ -270,14 +267,14 @@ void CRender::PrecompileLevelPSOs()
 
     u32 totalPSOs = 0;
 
-    for (u32 shaderID = 0; shaderID < m_framegraphRenderer->m_CompiledLevelShaders.size(); ++shaderID) {
-        auto& compiled = m_framegraphRenderer->m_CompiledLevelShaders[shaderID];
+    for (u32 shaderID = 0; shaderID < m_CompiledLevelShaders.size(); ++shaderID) {
+        auto& compiled = m_CompiledLevelShaders[shaderID];
 
         if (!compiled.vsHandle || !compiled.psHandle)
             continue;  // Skip failed compilations
 
         // Update progress
-        float progress = float(shaderID) / float(m_framegraphRenderer->m_CompiledLevelShaders.size());
+        float progress = float(shaderID) / float(m_CompiledLevelShaders.size());
         g_pGamePersistent->LoadTitle("st_precompiling_pso", progress);
 
         // ═══════════════════════════════════════════════════
@@ -329,10 +326,10 @@ void CRender::PrecompileLevelPSOs()
     }
 
     Msg("* Precompiled %u PSOs for %u shaders across %u vertex formats",
-        totalPSOs, m_framegraphRenderer->m_CompiledLevelShaders.size(), BufferPool.nDC.size());
+        totalPSOs, m_CompiledLevelShaders.size(), BufferPool.nDC.size());
 }
 
-void CRender::level_Unload()
+void FrameGraphRenderer::level_Unload()
 {
     ZoneScoped;
 
@@ -342,19 +339,16 @@ void CRender::level_Unload()
         return;
 
     // HOM
-    m_framegraphRenderer->m_HOM.Unload();
+    m_HOM.Unload();
 
     //*** Details
-    m_framegraphRenderer->m_pDetailManager->Unload();
+    m_pDetailManager->Unload();
 
     //*** Sectors
     // 1.
-    xr_delete(m_framegraphRenderer->m_pRmPortals);
-    m_framegraphRenderer->m_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
+    xr_delete(m_pRmPortals);
+    m_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
     Device.vCameraPositionSaved.set(0, 0, 0);
-
-    // 2.
-    cleanup_contexts();
 
     //*** Lights
     // Glows.Unload			();
@@ -404,11 +398,11 @@ void CRender::level_Unload()
     BufferPool.fastGeomLoaded = false;
 
     //*** Components
-    xr_delete(m_framegraphRenderer->m_pDetailManager);
-    xr_delete(m_framegraphRenderer->m_pWallmarksEngine);
+    xr_delete(m_pDetailManager);
+    xr_delete(m_pWallmarksEngine);
 
     //*** Shaders
-    m_framegraphRenderer->m_CompiledLevelShaders.clear();  // D3D12: Clear compiled NVRHI shaders
+    m_CompiledLevelShaders.clear();  // D3D12: Clear compiled NVRHI shaders
     b_loaded = FALSE;
     if (ps_r__clear_models_on_unload)
     {
@@ -420,7 +414,7 @@ void CRender::level_Unload()
     }
 }
 
-void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
+void FrameGraphRenderer::LoadBuffers(CStreamReader* base_fs, bool alternative)
 {
     ZoneScoped;
 
@@ -429,8 +423,8 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
     // Get GPUCullingManager for mega-buffer registration
     GPUCullingManager* gpuCulling = nullptr;
-    if (m_framegraphRenderer) {
-        gpuCulling = m_framegraphRenderer->GetGPUCullingManager();
+    if (true) {
+        gpuCulling = GetGPUCullingManager();
     }
 
     // Vertex buffers
@@ -524,7 +518,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
     }
 }
 
-void CRender::LoadVisuals(IReader* fs)
+void FrameGraphRenderer::LoadVisuals(IReader* fs)
 {
     u32 index = 0;
     IReader* chunk = nullptr;
@@ -545,7 +539,7 @@ void CRender::LoadVisuals(IReader* fs)
     }
 }
 
-void CRender::LoadLights(IReader* fs)
+void FrameGraphRenderer::LoadLights(IReader* fs)
 {
     ZoneScoped;
     // lights
@@ -553,7 +547,7 @@ void CRender::LoadLights(IReader* fs)
     Lights.LoadHemi();
 }
 
-void CRender::LoadSectors(IReader* fs)
+void FrameGraphRenderer::LoadSectors(IReader* fs)
 {
     ZoneScoped;
 
@@ -601,7 +595,7 @@ void CRender::LoadSectors(IReader* fs)
             if (vol > largest_sector_vol)
             {
                 largest_sector_vol = vol;
-                m_framegraphRenderer->m_largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
+                m_largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
             }
         }
         P->close();
@@ -620,15 +614,15 @@ void CRender::LoadSectors(IReader* fs)
         bool do_rebuild = true;
         const auto chunk_size = fs->find_chunk(fsL_PORTALS);
 
-        m_framegraphRenderer->m_pRmPortals = xr_new<CDB::MODEL>();
+        m_pRmPortals = xr_new<CDB::MODEL>();
         if (use_cache)
-            m_framegraphRenderer->m_pRmPortals->set_model_crc32(crc32(fs->pointer(), chunk_size));
+            m_pRmPortals->set_model_crc32(crc32(fs->pointer(), chunk_size));
 
         string_path file_name;
         strconcat(file_name, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
         FS.update_path(file_name, "$app_data_root$", file_name);
 
-        if (use_cache && FS.exist(file_name) && m_framegraphRenderer->m_pRmPortals->deserialize(file_name, skip_crc32_check))
+        if (use_cache && FS.exist(file_name) && m_pRmPortals->deserialize(file_name, skip_crc32_check))
         {
 #ifndef MASTER_GOLD
             Msg("* Loaded portals cache (%s)...", file_name);
@@ -667,32 +661,20 @@ void CRender::LoadSectors(IReader* fs)
                 v3.set(-20002.f, -20002.f, -20002.f);
                 CL.add_face_packed_D(v1, v2, v3, 0);
             }
-            m_framegraphRenderer->m_pRmPortals->build(CL.getV(), CL.getVS(), CL.getT(), CL.getTS());
+            m_pRmPortals->build(CL.getV(), CL.getVS(), CL.getT(), CL.getTS());
             if (use_cache)
-                m_framegraphRenderer->m_pRmPortals->serialize(file_name);
+                m_pRmPortals->serialize(file_name);
         }
     }
     else
     {
-        m_framegraphRenderer->m_pRmPortals = nullptr;
+        m_pRmPortals = nullptr;
     }
 
-    for (u32 id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
-    {
-        auto& dsgraph = contexts_pool[id];
-        dsgraph.reset();
-        dsgraph.load(sectors_data, portals_data);
-        contexts_used.set(id, false);
-    }
-
-    auto& dsgraph = get_imm_context();
-    dsgraph.reset();
-    dsgraph.load(sectors_data, portals_data);
-
-    m_framegraphRenderer->m_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
+    m_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
 
-void CRender::LoadSWIs(CStreamReader* base_fs)
+void FrameGraphRenderer::LoadSWIs(CStreamReader* base_fs)
 {
     ZoneScoped;
 
@@ -724,48 +706,246 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
     }
 }
 
-#if defined(USE_DX11)
-void CRender::Load3DFluid()
+u32 FrameGraphRenderer::GetVertexStride(u32 vertexFormatID)
 {
-    ZoneScoped;
+    if (vertexFormatID >= BufferPool.nDC.size())
+        return 0;
+    const VertexDeclarator& decl = BufferPool.nDC[vertexFormatID];
+    return GetDeclVertexSize(decl.begin(), 0);  // Stream 0
+}
 
-    // if (strstr(Core.Params,"-no_volumetric_fog"))
-    if (!o.volumetricfog)
-        return;
+bool FrameGraphRenderer::IsFormatCompatible(u8 d3dFormat, nvrhi::Format nvrhiFormat)
+{
+    // TODO: Implement proper D3D format → NVRHI format conversion check
+    // For now, assume compatible (vertex layout matching will catch real issues)
+    return true;
+}
 
-    string_path fn_game;
-    if (FS.exist(fn_game, "$level$", "level.fog_vol"))
-    {
-        IReader* F = FS.r_open(fn_game);
-        u16 version = F->r_u16();
+bool FrameGraphRenderer::MatchesSemanticName(const VertexElement& elem, const xr_string& semanticName)
+{
+    // Map D3D11_DECL_USAGE to HLSL semantic names
+    static const char* semanticNames[] = {
+        "POSITION",     // D3DDECLUSAGE_POSITION = 0
+        "BLENDWEIGHT",  // D3DDECLUSAGE_BLENDWEIGHT = 1
+        "BLENDINDICES", // D3DDECLUSAGE_BLENDINDICES = 2
+        "NORMAL",       // D3DDECLUSAGE_NORMAL = 3
+        "PSIZE",        // D3DDECLUSAGE_PSIZE = 4
+        "TEXCOORD",     // D3DDECLUSAGE_TEXCOORD = 5
+        "TANGENT",      // D3DDECLUSAGE_TANGENT = 6
+        "BINORMAL",     // D3DDECLUSAGE_BINORMAL = 7
+        "TESSFACTOR",   // D3DDECLUSAGE_TESSFACTOR = 8
+        "POSITIONT",    // D3DDECLUSAGE_POSITIONT = 9
+        "COLOR",        // D3DDECLUSAGE_COLOR = 10
+        "FOG",          // D3DDECLUSAGE_FOG = 11
+        "DEPTH",        // D3DDECLUSAGE_DEPTH = 12
+        "SAMPLE",       // D3DDECLUSAGE_SAMPLE = 13
+    };
 
-        if (version == 3)
-        {
-            u32 cnt = F->r_u32();
-            for (u32 i = 0; i < cnt; ++i)
-            {
-                dx113DFluidVolume* pVolume = xr_new<dx113DFluidVolume>();
-                pVolume->Load("", F, 0);
+    if (elem.Usage >= sizeof(semanticNames) / sizeof(semanticNames[0]))
+        return false;
 
-                auto& dsgraph = get_imm_context();
+    const char* declSemantic = semanticNames[elem.Usage];
 
-                //	Attach to sector's static geometry
-                const auto sector_id = dsgraph.detect_sector(pVolume->getVisData().sphere.P);
-                auto* pSector = static_cast<CSector*>(dsgraph.get_sector(sector_id));
-                //	3DFluid volume must be in render sector
-                VERIFY(pSector);
+    // Match semantic name + index (e.g., "TEXCOORD0")
+    char expected[64];
+    xr_sprintf(expected, "%s%u", declSemantic, elem.UsageIndex);
 
-                dxRender_Visual* pRoot = pSector->root();
-                //	Sector must have root
-                VERIFY(pRoot);
-                VERIFY(pRoot->getType() == MT_HIERRARHY);
+    return semanticName == expected || semanticName == declSemantic;
+}
 
-                ((FHierrarhyVisual*)pRoot)->children.push_back(pVolume);
+bool FrameGraphRenderer::IsVertexFormatCompatible(const VertexDeclarator& decl, const framegraph::ExtractedReflection* vsReflection)
+{
+    if (!vsReflection)
+        return false;
+
+    // Check if vertex declaration provides all inputs required by shader
+    for (const auto& input : vsReflection->vertexInputSignature.elements) {
+        bool found = false;
+
+        for (u32 i = 0; decl[i].Stream != 0xFF; ++i) {
+            if (MatchesSemanticName(decl[i], input.semanticName.c_str())) {
+                // Check format compatibility
+                if (IsFormatCompatible(decl[i].Type, input.format)) {
+                    found = true;
+                    break;
+                }
             }
         }
 
-        FS.r_close(F);
+        // If required input not found, formats are incompatible
+        if (!found) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void FrameGraphRenderer::SetupDepthState(RenderPassType passType, const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc)
+{
+    using RenderPassType = RenderPassType;
+
+    switch (passType) {
+    case RenderPassType::DepthPrepass:
+        // Depth prepass: write depth, test with Less
+        psoDesc.renderState.depthStencilState.depthTestEnable = true;
+        psoDesc.renderState.depthStencilState.depthWriteEnable = true;
+        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Less;
+        psoDesc.renderState.depthStencilState.stencilEnable = false;
+        break;
+
+    case RenderPassType::ForwardColor:
+        // Forward color: read depth (early-Z), no write, test with Equal
+        psoDesc.renderState.depthStencilState.depthTestEnable = true;
+        psoDesc.renderState.depthStencilState.depthWriteEnable = false;
+        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
+        psoDesc.renderState.depthStencilState.stencilEnable = false;
+        break;
+
+    case RenderPassType::HUD:
+        // HUD: test and write with LessEqual (renders in front)
+        psoDesc.renderState.depthStencilState.depthTestEnable = true;
+        psoDesc.renderState.depthStencilState.depthWriteEnable = true;
+        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+        psoDesc.renderState.depthStencilState.stencilEnable = false;
+        break;
+
+    case RenderPassType::UI:
+        // UI: depth disabled
+        psoDesc.renderState.depthStencilState.depthTestEnable = false;
+        psoDesc.renderState.depthStencilState.depthWriteEnable = false;
+        psoDesc.renderState.depthStencilState.stencilEnable = false;
+        break;
+
+    default:
+        // Default: standard depth test
+        psoDesc.renderState.depthStencilState.depthTestEnable = true;
+        psoDesc.renderState.depthStencilState.depthWriteEnable = true;
+        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Less;
+        psoDesc.renderState.depthStencilState.stencilEnable = false;
+        break;
     }
 }
-#endif
-} // namespace xray::render::fg
+
+void FrameGraphRenderer::SetupBlendState(const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc)
+{
+    if (materialInfo.transparent) {
+        // Transparent: alpha blending enabled
+        psoDesc.renderState.blendState.targets[0].blendEnable = true;
+        psoDesc.renderState.blendState.targets[0].srcBlend = nvrhi::BlendFactor::SrcAlpha;
+        psoDesc.renderState.blendState.targets[0].destBlend = nvrhi::BlendFactor::InvSrcAlpha;
+        psoDesc.renderState.blendState.targets[0].blendOp = nvrhi::BlendOp::Add;
+        psoDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
+        psoDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
+        psoDesc.renderState.blendState.targets[0].blendOpAlpha = nvrhi::BlendOp::Add;
+    } else {
+        // Opaque: no blending
+        psoDesc.renderState.blendState.targets[0].blendEnable = false;
+    }
+
+    // Alpha-to-coverage for alpha test materials (optional quality improvement)
+    psoDesc.renderState.blendState.alphaToCoverageEnable = materialInfo.alphaTest;
+}
+
+bool FrameGraphRenderer::CreatePrecompiledPSO(
+    u32 shaderID,
+    u32 vertexFormatID,
+    RenderPassType passType,
+    nvrhi::Format colorFormat,
+    nvrhi::Format depthFormat,
+    MaterialCache* materialCache)
+{
+    auto& compiled = m_CompiledLevelShaders[shaderID];
+
+    // ═══════════════════════════════════════════════════
+    //  CREATE PSO DESCRIPTOR
+    // ═══════════════════════════════════════════════════
+    nvrhi::GraphicsPipelineDesc psoDesc;
+    psoDesc.VS = compiled.vsHandle;
+    psoDesc.PS = compiled.psHandle;
+
+    // Setup vertex input layout
+    const VertexDeclarator& decl = BufferPool.nDC[vertexFormatID];
+    u32 vb_stride = GetVertexStride(vertexFormatID);
+
+    xr_vector<nvrhi::VertexAttributeDesc> attributes;
+    for (const auto& input : compiled.vsReflection->vertexInputSignature.elements) {
+        // Find matching element in vertex declaration
+        for (u32 i = 0; decl[i].Stream != 0xFF; ++i) {
+            if (MatchesSemanticName(decl[i], input.semanticName.c_str())) {
+                nvrhi::VertexAttributeDesc attr;
+                attr.name = input.semanticName.c_str();
+                attr.format = input.format;  // Use format from reflection
+                attr.offset = decl[i].Offset;
+                attr.bufferIndex = 0;
+                attr.elementStride = vb_stride;
+                attr.isInstanced = false;
+                attributes.push_back(attr);
+                break;
+            }
+        }
+    }
+
+    auto* nvrhiDevice = GetRenderDevice()->GetNVRHIDevice();
+    if (!nvrhiDevice) {
+        Msg("! NVRHI device not available");
+        return false;
+    }
+
+    if (!attributes.empty()) {
+        psoDesc.inputLayout = nvrhiDevice->createInputLayout(
+            attributes.data(),
+            (uint32_t)attributes.size(),
+            compiled.vsHandle);
+    }
+
+    // Setup depth/blend states
+    SetupDepthState(passType, compiled.materialInfo, psoDesc);
+    SetupBlendState(compiled.materialInfo, psoDesc);
+
+    // Set topology (always triangles for level geometry)
+    psoDesc.primType = nvrhi::PrimitiveType::TriangleList;
+
+    // ═══════════════════════════════════════════════════
+    //  CREATE FRAMEBUFFER INFO (required for PSO creation)
+    // ═══════════════════════════════════════════════════
+    nvrhi::FramebufferInfoEx fbInfo;
+    if (passType == RenderPassType::ForwardColor) {
+        fbInfo.addColorFormat(colorFormat);
+        fbInfo.setDepthFormat(depthFormat);
+    } else if (passType == RenderPassType::DepthPrepass) {
+        // Depth-only: no color output
+        fbInfo.setDepthFormat(depthFormat);
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  CREATE PSO
+    // ═══════════════════════════════════════════════════
+    nvrhi::GraphicsPipelineHandle pso = nvrhiDevice->createGraphicsPipeline(psoDesc, fbInfo);
+
+    if (!pso) {
+        Msg("! Failed to create PSO for shader %u (%s), format %u, pass %u",
+            shaderID, compiled.shaderName.c_str(), vertexFormatID, (u32)passType);
+        return false;
+    }
+
+    // Store NVRHI handle in precompiled PSO cache (MaterialCache will wrap it in MaterialPSO later)
+    u64 cacheKey = ((u64)vertexFormatID << 32) | (u64)passType;
+
+    xray::render::CompiledLevelShader::PrecompiledPSOs::PSOVariant variant;
+    variant.vertexFormatID = vertexFormatID;
+    variant.passType = passType;
+    variant.pso = nullptr;  // fg::PipelineState not used here - we store nvrhi handle directly
+    variant.materialPSO = nullptr;  // MaterialPSO creation deferred until first use
+
+    compiled.precompiledPSOs.variants.push_back(variant);
+    // Store the NVRHI handle as a MaterialPSO (temporary - will be wrapped properly on first use)
+    compiled.precompiledPSOs.psoCache[cacheKey] = reinterpret_cast<MaterialPSO*>(pso.Get());
+
+    Msg("* Precompiled PSO for shader %u (%s), format %u, pass %u",
+        shaderID, compiled.shaderName.c_str(), vertexFormatID, (u32)passType);
+
+    return true;
+}
+
+} // namespace xray::render

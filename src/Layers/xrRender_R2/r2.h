@@ -160,29 +160,6 @@ public:
 
 
 
-private:
-    // Loading / Unloading
-    void LoadBuffers(CStreamReader* fs, bool alternative);
-    void LoadVisuals(IReader* fs);
-    void LoadLights(IReader* fs);
-    void LoadSectors(IReader* fs);
-    void LoadSWIs(CStreamReader* fs);
-#if RENDER != R_R2
-    void Load3DFluid();
-#endif
-
-    // D3D12: Shader compilation and PSO precompilation (private helpers)
-    void CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName);
-    void PrecompileLevelPSOs();
-    bool IsVertexFormatCompatible(const VertexDeclarator& decl, const framegraph::ExtractedReflection* vsReflection);
-    bool MatchesSemanticName(const VertexElement& elem, const xr_string& semanticName);
-    bool IsFormatCompatible(u8 d3dFormat, nvrhi::Format nvrhiFormat);
-    u32 GetVertexStride(u32 vertexFormatID);
-    bool CreatePrecompiledPSO(u32 shaderID, u32 vertexFormatID, RenderPassType passType,
-                               nvrhi::Format colorFormat, nvrhi::Format depthFormat, MaterialCache* materialCache);
-    void SetupDepthState(RenderPassType passType, const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc);
-    void SetupBlendState(const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc);
-
 public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq, u32 phase);

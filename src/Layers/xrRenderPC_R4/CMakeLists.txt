@@ -3,10 +3,6 @@ add_library(xrRenderPC_R4)
 target_sources(xrRenderPC_R4 PRIVATE
     packages.config
     r2_test_hw.cpp
-    r4_rendertarget.h
-    r4_rendertarget_build_textures.cpp
-    r4_rendertarget_u_set_rt.cpp
-    r4_shaders.cpp
     stdafx.cpp
     stdafx.h
     xrRender_R4.cpp
@@ -175,7 +171,6 @@ target_sources(xrRenderPC_R4 PRIVATE
 
     ../xrRender_R2/r2.cpp
     ../xrRender_R2/r2_blenders.cpp
-    ../xrRender_R2/r2_loader.cpp
     ../xrRender_R2/r2_rendertarget.cpp
 )
 

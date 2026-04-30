@@ -31,8 +31,6 @@ namespace xray::render::fg
 {
 CRender RImplementation;
 
-// Global storage for failed shader compilation tracking
-xr_vector<xr_string> g_failedShaders;
 
 framegraph::ShaderLoader* CRender::GetShaderLoader() const
 {
@@ -109,7 +107,12 @@ void CRender::RequestGrassInteraction(const Fvector& world_pos, float radius, fl
         m_framegraphRenderer->m_pDetailManager->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
 }
 
-void CRender::clearAllShaderOptions() { m_framegraphRenderer->m_ShaderOptions.clear(); }
+void CRender::clearAllShaderOptions()                       { m_framegraphRenderer->clearAllShaderOptions(); }
+void CRender::addShaderOption(pcstr name, pcstr value)      { m_framegraphRenderer->addShaderOption(name, value); }
+void CRender::level_Load(IReader* fs)                       { m_framegraphRenderer->level_Load(fs); }
+void CRender::level_Unload()                                { m_framegraphRenderer->level_Unload(); }
+HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result)
+                                                            { return m_framegraphRenderer->shader_compile(name, fs, pFunctionName, pTarget, Flags, result); }
 
 u32 CRender::occq_begin(u32& ID) { return m_framegraphRenderer->m_HWOCC.occq_begin(ID); }
 void CRender::occq_end(u32& ID) { m_framegraphRenderer->m_HWOCC.occq_end(ID); }
@@ -117,16 +120,16 @@ R_occlusion::occq_result CRender::occq_get(u32& ID) { return m_framegraphRendere
 
 void CRender::PrintFailedShadersSummary()
 {
-    if (g_failedShaders.empty())
+    if (::xray::render::g_failedShaders.empty())
         return;
 
     Msg("\n");
     Msg("╔══════════════════════════════════════════════════════════════");
     Msg("║ SHADER COMPILATION SUMMARY");
     Msg("╠══════════════════════════════════════════════════════════════");
-    Msg("║ %zu shader(s) failed to compile:", g_failedShaders.size());
+    Msg("║ %zu shader(s) failed to compile:", ::xray::render::g_failedShaders.size());
     Msg("╠══════════════════════════════════════════════════════════════");
-    for (const auto& failedShader : g_failedShaders)
+    for (const auto& failedShader : ::xray::render::g_failedShaders)
     {
         Msg("%s", failedShader.c_str());
     }
@@ -838,252 +841,6 @@ bool CRender::getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::Shader
 // ref_shader CRender::getShader(int id) - REMOVED
 // bool CRender::getShaderNames(...) - REMOVED
 IRenderVisual* CRender::getVisual(int id) { return BufferPool.getVisual(id); }
-
-// ═══════════════════════════════════════════════════
-//  D3D12: PSO PRECOMPILATION HELPER FUNCTIONS
-// ═══════════════════════════════════════════════════
-
-u32 CRender::GetVertexStride(u32 vertexFormatID)
-{
-    if (vertexFormatID >= BufferPool.nDC.size())
-        return 0;
-    const VertexDeclarator& decl = BufferPool.nDC[vertexFormatID];
-    return GetDeclVertexSize(decl.begin(), 0);  // Stream 0
-}
-
-bool CRender::IsFormatCompatible(u8 d3dFormat, nvrhi::Format nvrhiFormat)
-{
-    // TODO: Implement proper D3D format → NVRHI format conversion check
-    // For now, assume compatible (vertex layout matching will catch real issues)
-    return true;
-}
-
-bool CRender::MatchesSemanticName(const VertexElement& elem, const xr_string& semanticName)
-{
-    // Map D3D11_DECL_USAGE to HLSL semantic names
-    static const char* semanticNames[] = {
-        "POSITION",     // D3DDECLUSAGE_POSITION = 0
-        "BLENDWEIGHT",  // D3DDECLUSAGE_BLENDWEIGHT = 1
-        "BLENDINDICES", // D3DDECLUSAGE_BLENDINDICES = 2
-        "NORMAL",       // D3DDECLUSAGE_NORMAL = 3
-        "PSIZE",        // D3DDECLUSAGE_PSIZE = 4
-        "TEXCOORD",     // D3DDECLUSAGE_TEXCOORD = 5
-        "TANGENT",      // D3DDECLUSAGE_TANGENT = 6
-        "BINORMAL",     // D3DDECLUSAGE_BINORMAL = 7
-        "TESSFACTOR",   // D3DDECLUSAGE_TESSFACTOR = 8
-        "POSITIONT",    // D3DDECLUSAGE_POSITIONT = 9
-        "COLOR",        // D3DDECLUSAGE_COLOR = 10
-        "FOG",          // D3DDECLUSAGE_FOG = 11
-        "DEPTH",        // D3DDECLUSAGE_DEPTH = 12
-        "SAMPLE",       // D3DDECLUSAGE_SAMPLE = 13
-    };
-
-    if (elem.Usage >= sizeof(semanticNames) / sizeof(semanticNames[0]))
-        return false;
-
-    const char* declSemantic = semanticNames[elem.Usage];
-
-    // Match semantic name + index (e.g., "TEXCOORD0")
-    char expected[64];
-    xr_sprintf(expected, "%s%u", declSemantic, elem.UsageIndex);
-
-    return semanticName == expected || semanticName == declSemantic;
-}
-
-bool CRender::IsVertexFormatCompatible(const VertexDeclarator& decl, const framegraph::ExtractedReflection* vsReflection)
-{
-    if (!vsReflection)
-        return false;
-
-    // Check if vertex declaration provides all inputs required by shader
-    for (const auto& input : vsReflection->vertexInputSignature.elements) {
-        bool found = false;
-
-        for (u32 i = 0; decl[i].Stream != 0xFF; ++i) {
-            if (MatchesSemanticName(decl[i], input.semanticName.c_str())) {
-                // Check format compatibility
-                if (IsFormatCompatible(decl[i].Type, input.format)) {
-                    found = true;
-                    break;
-                }
-            }
-        }
-
-        // If required input not found, formats are incompatible
-        if (!found) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void CRender::SetupDepthState(RenderPassType passType, const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc)
-{
-    using RenderPassType = RenderPassType;
-
-    switch (passType) {
-    case RenderPassType::DepthPrepass:
-        // Depth prepass: write depth, test with Less
-        psoDesc.renderState.depthStencilState.depthTestEnable = true;
-        psoDesc.renderState.depthStencilState.depthWriteEnable = true;
-        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Less;
-        psoDesc.renderState.depthStencilState.stencilEnable = false;
-        break;
-
-    case RenderPassType::ForwardColor:
-        // Forward color: read depth (early-Z), no write, test with Equal
-        psoDesc.renderState.depthStencilState.depthTestEnable = true;
-        psoDesc.renderState.depthStencilState.depthWriteEnable = false;
-        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
-        psoDesc.renderState.depthStencilState.stencilEnable = false;
-        break;
-
-    case RenderPassType::HUD:
-        // HUD: test and write with LessEqual (renders in front)
-        psoDesc.renderState.depthStencilState.depthTestEnable = true;
-        psoDesc.renderState.depthStencilState.depthWriteEnable = true;
-        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-        psoDesc.renderState.depthStencilState.stencilEnable = false;
-        break;
-
-    case RenderPassType::UI:
-        // UI: depth disabled
-        psoDesc.renderState.depthStencilState.depthTestEnable = false;
-        psoDesc.renderState.depthStencilState.depthWriteEnable = false;
-        psoDesc.renderState.depthStencilState.stencilEnable = false;
-        break;
-
-    default:
-        // Default: standard depth test
-        psoDesc.renderState.depthStencilState.depthTestEnable = true;
-        psoDesc.renderState.depthStencilState.depthWriteEnable = true;
-        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Less;
-        psoDesc.renderState.depthStencilState.stencilEnable = false;
-        break;
-    }
-}
-
-void CRender::SetupBlendState(const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc)
-{
-    if (materialInfo.transparent) {
-        // Transparent: alpha blending enabled
-        psoDesc.renderState.blendState.targets[0].blendEnable = true;
-        psoDesc.renderState.blendState.targets[0].srcBlend = nvrhi::BlendFactor::SrcAlpha;
-        psoDesc.renderState.blendState.targets[0].destBlend = nvrhi::BlendFactor::InvSrcAlpha;
-        psoDesc.renderState.blendState.targets[0].blendOp = nvrhi::BlendOp::Add;
-        psoDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
-        psoDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
-        psoDesc.renderState.blendState.targets[0].blendOpAlpha = nvrhi::BlendOp::Add;
-    } else {
-        // Opaque: no blending
-        psoDesc.renderState.blendState.targets[0].blendEnable = false;
-    }
-
-    // Alpha-to-coverage for alpha test materials (optional quality improvement)
-    psoDesc.renderState.blendState.alphaToCoverageEnable = materialInfo.alphaTest;
-}
-
-bool CRender::CreatePrecompiledPSO(
-    u32 shaderID,
-    u32 vertexFormatID,
-    RenderPassType passType,
-    nvrhi::Format colorFormat,
-    nvrhi::Format depthFormat,
-    MaterialCache* materialCache)
-{
-    auto& compiled = m_framegraphRenderer->m_CompiledLevelShaders[shaderID];
-
-    // ═══════════════════════════════════════════════════
-    //  CREATE PSO DESCRIPTOR
-    // ═══════════════════════════════════════════════════
-    nvrhi::GraphicsPipelineDesc psoDesc;
-    psoDesc.VS = compiled.vsHandle;
-    psoDesc.PS = compiled.psHandle;
-
-    // Setup vertex input layout
-    const VertexDeclarator& decl = BufferPool.nDC[vertexFormatID];
-    u32 vb_stride = GetVertexStride(vertexFormatID);
-
-    xr_vector<nvrhi::VertexAttributeDesc> attributes;
-    for (const auto& input : compiled.vsReflection->vertexInputSignature.elements) {
-        // Find matching element in vertex declaration
-        for (u32 i = 0; decl[i].Stream != 0xFF; ++i) {
-            if (MatchesSemanticName(decl[i], input.semanticName.c_str())) {
-                nvrhi::VertexAttributeDesc attr;
-                attr.name = input.semanticName.c_str();
-                attr.format = input.format;  // Use format from reflection
-                attr.offset = decl[i].Offset;
-                attr.bufferIndex = 0;
-                attr.elementStride = vb_stride;
-                attr.isInstanced = false;
-                attributes.push_back(attr);
-                break;
-            }
-        }
-    }
-
-    auto* nvrhiDevice = m_renderDevice->GetNVRHIDevice();
-    if (!nvrhiDevice) {
-        Msg("! NVRHI device not available");
-        return false;
-    }
-
-    if (!attributes.empty()) {
-        psoDesc.inputLayout = nvrhiDevice->createInputLayout(
-            attributes.data(),
-            (uint32_t)attributes.size(),
-            compiled.vsHandle);
-    }
-
-    // Setup depth/blend states
-    SetupDepthState(passType, compiled.materialInfo, psoDesc);
-    SetupBlendState(compiled.materialInfo, psoDesc);
-
-    // Set topology (always triangles for level geometry)
-    psoDesc.primType = nvrhi::PrimitiveType::TriangleList;
-
-    // ═══════════════════════════════════════════════════
-    //  CREATE FRAMEBUFFER INFO (required for PSO creation)
-    // ═══════════════════════════════════════════════════
-    nvrhi::FramebufferInfoEx fbInfo;
-    if (passType == RenderPassType::ForwardColor) {
-        fbInfo.addColorFormat(colorFormat);
-        fbInfo.setDepthFormat(depthFormat);
-    } else if (passType == RenderPassType::DepthPrepass) {
-        // Depth-only: no color output
-        fbInfo.setDepthFormat(depthFormat);
-    }
-
-    // ═══════════════════════════════════════════════════
-    //  CREATE PSO
-    // ═══════════════════════════════════════════════════
-    nvrhi::GraphicsPipelineHandle pso = nvrhiDevice->createGraphicsPipeline(psoDesc, fbInfo);
-
-    if (!pso) {
-        Msg("! Failed to create PSO for shader %u (%s), format %u, pass %u",
-            shaderID, compiled.shaderName.c_str(), vertexFormatID, (u32)passType);
-        return false;
-    }
-
-    // Store NVRHI handle in precompiled PSO cache (MaterialCache will wrap it in MaterialPSO later)
-    u64 cacheKey = ((u64)vertexFormatID << 32) | (u64)passType;
-
-    xray::render::CompiledLevelShader::PrecompiledPSOs::PSOVariant variant;
-    variant.vertexFormatID = vertexFormatID;
-    variant.passType = passType;
-    variant.pso = nullptr;  // fg::PipelineState not used here - we store nvrhi handle directly
-    variant.materialPSO = nullptr;  // MaterialPSO creation deferred until first use
-
-    compiled.precompiledPSOs.variants.push_back(variant);
-    // Store the NVRHI handle as a MaterialPSO (temporary - will be wrapped properly on first use)
-    compiled.precompiledPSOs.psoCache[cacheKey] = reinterpret_cast<MaterialPSO*>(pso.Get());
-
-    Msg("* Precompiled PSO for shader %u (%s), format %u, pass %u",
-        shaderID, compiled.shaderName.c_str(), vertexFormatID, (u32)passType);
-
-    return true;
-}
 
 IRender_Light* CRender::light_create() { return Lights.Create(); }
 IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }

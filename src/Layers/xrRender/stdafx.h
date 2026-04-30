@@ -67,7 +67,7 @@
 #include "Layers/xrRender/xrRender_console.h"
 
 #include "Layers/xrRender_R2/r2.h"
-#include "Layers/xrRenderPC_R4/r4_rendertarget.h"
+#include "Layers/xrRender/r4_rendertarget.h"
 
 namespace xray::render::fg
 {

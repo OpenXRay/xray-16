@@ -132,6 +132,8 @@ target_sources(xrRender PRIVATE
 
     r_FrameGraphRenderer.h
     r_FrameGraphRenderer.cpp
+    r_FrameGraphRenderer_Loader.cpp
+    r_FrameGraphRenderer_Shaders.cpp
     r5.h
     r5.cpp
     FGRenderHost.h
@@ -159,6 +161,9 @@ target_sources(xrRender PRIVATE
     D3DXRenderBase.cpp
     FGRenderBase.h
     FGRenderBase.cpp
+    r4_rendertarget.h
+    r4_rendertarget_build_textures.cpp
+    r4_rendertarget_u_set_rt.cpp
     DetailModel.cpp
     ETextureParams.cpp
     FBasicVisual.cpp

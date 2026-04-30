@@ -59,6 +59,8 @@ namespace xray::render::fg {
 namespace xray::render {
 using fg::dxRender_Visual;
 
+extern xr_vector<xr_string> g_failedShaders;
+
 // Forward declarations
 class GeometryCollector;
 class MaterialCache;
@@ -117,10 +119,29 @@ public:
     void reset_begin() override {}
     void reset_end() override {}
 
-    void level_Load(IReader*) override {}
-    void level_Unload() override {}
-
-    HRESULT shader_compile(pcstr, IReader*, pcstr, pcstr, u32, void*&) override { return 0; }
+    void level_Load(IReader* fs) override;
+    void level_Unload() override;
+    HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result) override;
+    void addShaderOption(pcstr name, pcstr value);
+    void clearAllShaderOptions() { m_ShaderOptions.clear(); }
+private:
+    using VertexDeclarator = ::xray::render::fg::VertexDeclarator;
+    void LoadBuffers(CStreamReader* fs, bool alternative);
+    void LoadVisuals(IReader* fs);
+    void LoadLights(IReader* fs);
+    void LoadSectors(IReader* fs);
+    void LoadSWIs(CStreamReader* fs);
+    void CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName);
+    void PrecompileLevelPSOs();
+    bool IsVertexFormatCompatible(const VertexDeclarator& decl, const framegraph::ExtractedReflection* vsReflection);
+    bool MatchesSemanticName(const fg::VertexElement& elem, const xr_string& semanticName);
+    bool IsFormatCompatible(u8 d3dFormat, nvrhi::Format nvrhiFormat);
+    u32 GetVertexStride(u32 vertexFormatID);
+    bool CreatePrecompiledPSO(u32 shaderID, u32 vertexFormatID, RenderPassType passType,
+                               nvrhi::Format colorFormat, nvrhi::Format depthFormat, MaterialCache* materialCache);
+    void SetupDepthState(RenderPassType passType, const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc);
+    void SetupBlendState(const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc);
+public:
 
     pcstr getShaderPath() override { return "r5\\"; }
     IRenderVisual* getVisual(int id) override;
