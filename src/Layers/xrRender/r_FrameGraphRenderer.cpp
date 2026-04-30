@@ -82,6 +82,9 @@
 #include "Layers/xrRender/PSLibrary.h"
 #include "Layers/xrRender/Decals/fgWallMarkArray.h"
 #include "Layers/xrRender/Decals/MeshPicker.h"
+#include "Layers/xrRenderDX11/DetailManager.h"
+#include "xrEngine/IGameFont.hpp"
+#include "xrEngine/IPerformanceAlert.hpp"
 
 extern ENGINE_API float psHUD_FOV;
 extern ENGINE_API int ps_r_rt_gi;
@@ -2738,6 +2741,49 @@ void FrameGraphRenderer::add_SkeletonWallmark(
     ref_shader* pShader = pWMA->dxGenerateWallmark();
     if (pShader)
         m_pWallmarksEngine->AddSkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
+}
+
+void FrameGraphRenderer::Calculate() {}
+
+void FrameGraphRenderer::OnFrame()
+{
+    ZoneScoped;
+    g_pModelPool->DeleteQueue();
+    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
+        return;
+}
+
+void FrameGraphRenderer::OnCameraUpdated()
+{
+    ZoneScoped;
+    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
+        return;
+    m_pProcessHOMTask = &m_HOM.DispatchMTRender();
+    if (m_pDetailManager)
+        m_pDetailManager->DispatchMTCalc();
+}
+
+void FrameGraphRenderer::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
+{
+    FGRenderBase::DumpStatistics(font, alert);
+    m_Stats.FrameEnd();
+    font.OutNext("Lights:");
+    font.OutNext("- total:      %u", m_Stats.l_total);
+    font.OutNext("- visible:    %u", m_Stats.l_visible);
+    font.OutNext("- shadowed:   %u", m_Stats.l_shadowed);
+    font.OutNext("- unshadowed: %u", m_Stats.l_unshadowed);
+    font.OutNext("Shadow maps:");
+    font.OutNext("- used:       %d", m_Stats.s_used);
+    font.OutNext("- merged:     %d", m_Stats.s_merged - m_Stats.s_used);
+    font.OutNext("- finalclip:  %d", m_Stats.s_finalclip);
+    u32 ict = m_Stats.ic_total + m_Stats.ic_culled;
+    font.OutNext("ICULL:        %03.1f", 100.f * f32(m_Stats.ic_culled) / f32(ict ? ict : 1));
+    font.OutNext("- visible:    %u", m_Stats.ic_total);
+    font.OutNext("- culled:     %u", m_Stats.ic_culled);
+    m_Stats.FrameStart();
+    m_HOM.DumpStatistics(font, alert);
+    m_Sectors_xrc.DumpStatistics(font, alert);
 }
 
 } // namespace xray::render

@@ -149,15 +149,16 @@ public:
     bool occ_visible(Fbox& B) override;
     bool occ_visible(sPoly& P) override;
 
-    void Calculate() override {}
+    void Calculate() override;
     void BeforeWorldRender() override {}
     void AfterWorldRender() override {}
 
-    void OnFrame() override {}
+    void OnFrame() override;
+    void OnCameraUpdated() override;
+    void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
     void Screenshot(IRender::ScreenshotMode, pcstr) override {}
     void SetPostProcessParams(const SPPInfo&) override {}
-    void OnCameraUpdated() override {}
     void RequestGrassInteraction(const Fvector&, float, float, uint8_t) override {}
 
     // Initialize
