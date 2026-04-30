@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Layers/xrRender/ColorMapManager.h"
+#include "Layers/xrRender_R2/r2_types.h"
 
 namespace xray::render::fg
 {

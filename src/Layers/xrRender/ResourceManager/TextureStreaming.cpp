@@ -2,7 +2,6 @@
 #include "TextureStreaming.h"
 #include "DDSLoader.h"
 #include "../RenderContext/RenderDevice.h"
-#include "xrEngine/IFrameGraphRender.h"
 
 // Texture Streaming System Implementation
 // Week 2 - Day 3: Task 3.2

@@ -79,7 +79,6 @@
     <ClInclude Include="ColorMapManager.h"/>
     <ClInclude Include="ConstantSystem\FGConstantSystem.h"/>
     <ClInclude Include="D3DUtils.h"/>
-    <ClInclude Include="D3DXRenderBase.h"/>
     <ClInclude Include="FGRenderBase.h"/>
     <ClInclude Include="r4_rendertarget.h"/>
     <ClInclude Include="Debug\dxPixEventWrapper.h"/>
@@ -248,7 +247,6 @@
     <ClInclude Include="Geometry\GeometryBatch.h"/>
     <ClInclude Include="GPUCullingManager.h"/>
     <ClInclude Include="r_FrameGraphRenderer.h"/>
-    <ClInclude Include="r5.h"/>
     <ClInclude Include="FGRenderHost.h"/>
     <ClInclude Include="FrameGraphRendererModule.h"/>
     <ClInclude Include="Profiler\GPUProfiler.h"/>
@@ -271,7 +269,6 @@
     <ClCompile Include="Animation.cpp"/>
     <ClCompile Include="ColorMapManager.cpp"/>
     <ClCompile Include="ConstantSystem\FGConstantSystem.cpp"/>
-    <ClCompile Include="D3DXRenderBase.cpp"/>
     <ClCompile Include="FGRenderBase.cpp"/>
     <ClCompile Include="r4_rendertarget.cpp"/>
     <ClCompile Include="r4_rendertarget_build_textures.cpp"/>
@@ -474,7 +471,6 @@
     <ClCompile Include="Geometry\GeometryBatch.cpp"/>
     <ClCompile Include="GPUCullingManager.cpp"/>
     <ClCompile Include="r_FrameGraphRenderer.cpp"/>
-    <ClCompile Include="r5.cpp"/>
     <ClCompile Include="FGRenderHost.cpp"/>
     <ClCompile Include="FrameGraphRendererModule.cpp"/>
     <ClCompile Include="Profiler\GPUProfiler.cpp"/>

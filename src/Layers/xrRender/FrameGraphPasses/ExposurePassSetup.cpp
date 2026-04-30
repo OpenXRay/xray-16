@@ -13,7 +13,7 @@
 
 namespace fg
 {
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::passes {
@@ -61,8 +61,8 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
         return;
     }
 
-    auto histogramResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("luminance_histogram");
-    auto adaptResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("exposure_adapt");
+    auto histogramResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("luminance_histogram");
+    auto adaptResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("exposure_adapt");
 
     bool histogramOK = histogramResult.handle != nullptr;
     bool adaptOK = adaptResult.handle != nullptr;
@@ -256,7 +256,7 @@ ExposureOutput setupExposurePass(
 
                         cmdList->writeBuffer(histogramCB, &histCB, sizeof(histCB));
 
-                        auto* histRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("luminance_histogram", ".cs");
+                        auto* histRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("luminance_histogram", ".cs");
                         BindingSetBuilder bsb(*histRefl, nvDevice, "Exposure.Histogram");
                         bsb.ConstantBuffer("ExposureParams", histogramCB)
                            .Texture("g_scene_color", sceneTexture)
@@ -290,7 +290,7 @@ ExposureOutput setupExposurePass(
 
                         cmdList->writeBuffer(adaptCBHandle, &adaptCB, sizeof(adaptCB));
 
-                        auto* adaptRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("exposure_adapt", ".cs");
+                        auto* adaptRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("exposure_adapt", ".cs");
                         BindingSetBuilder bsb(*adaptRefl, nvDevice, "Exposure.Adapt");
                         bsb.ConstantBuffer("ExposureAdaptParams", adaptCBHandle)
                            .BufferSRV("g_histogram", ps->histogramBuffer)

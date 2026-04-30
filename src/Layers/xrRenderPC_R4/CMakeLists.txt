@@ -5,7 +5,6 @@ target_sources(xrRenderPC_R4 PRIVATE
     r2_test_hw.cpp
     stdafx.cpp
     stdafx.h
-    xrRender_R4.cpp
 
     # NVRHI wrapper - Renderer agnostic
 
@@ -67,7 +66,6 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRenderDX11/DetailManager_Decompress.cpp
     ../xrRenderDX11/DetailManager_VS.cpp
     ../xrRenderDX11/DetailManager_soft.cpp
-    ../xrRenderDX11/R_Backend.cpp
     ../xrRenderDX11/R_Backend_DBG.cpp
     ../xrRenderDX11/R_Backend_LOD.h
     ../xrRenderDX11/R_Backend_LOD.cpp
@@ -167,9 +165,7 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRenderDX11/dx11TextureUtils.cpp
     ../xrRenderDX11/dx11r_constants.cpp
     ../xrRenderDX11/dx11r_constants_cache.cpp
-    ../xrRenderDX11/dx11r_screenshot.cpp
 
-    ../xrRender_R2/r2.cpp
 )
 
 target_include_directories(xrRenderPC_R4

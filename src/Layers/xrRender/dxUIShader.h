@@ -17,7 +17,7 @@ class dxUIShader : public IUIShader
     friend class dxUIRender;
     friend class dxDebugRender;
     friend class dxWallMarkArray;
-    friend class CRender;
+    friend class FrameGraphRenderer;
     friend class xray::render::ui::UIRenderCollector;  // Allow UI collector to access shader
 
 public:

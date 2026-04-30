@@ -8,13 +8,10 @@
 // Week 1 - Day 2: Testing
 // Week 3 - Day 5: Async tests
 
-// Forward declare CRender to access m_renderDevice
 namespace xray::render::fg {
-    class CRender;
 
     static fg::RenderDevice* GetGlobalRenderDevice() {
-        auto& render = static_cast<xray::render::fg::CRender&>(RImplementation);
-        return render.m_renderDevice;
+        return RImplementation.GetRenderDevice();
     }
 
 }

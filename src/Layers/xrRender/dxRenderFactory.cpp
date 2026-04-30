@@ -18,7 +18,6 @@
 #include "dxFontRender.h"
 #include "dxWallMarkArray.h"
 #include "Decals/fgWallMarkArray.h"
-#include "xrEngine/IFrameGraphRender.h"
 #include "dxUISequenceVideoItem.h"
 #include "dxUIShader.h"
 

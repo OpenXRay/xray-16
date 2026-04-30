@@ -124,7 +124,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
     {
         C.SetParams(1, false); //.
 
-        bool bUseATOC = RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
+        bool bUseATOC = RImplementation.o.msaa_alphatest == FrameGraphRenderer::MSAA_ATEST_DX10_0_ATOC;
 
         // codepath is the same, only the shaders differ
         // ***only pixel shaders differ***
@@ -229,7 +229,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
     {
         C.SetParams(1, false); //.
 
-        bool bUseATOC = (RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
+        bool bUseATOC = (RImplementation.o.msaa_alphatest == FrameGraphRenderer::MSAA_ATEST_DX10_0_ATOC);
 
         // codepath is the same, only the shaders differ
         // ***only pixel shaders differ***

@@ -8,13 +8,12 @@
 #include <DirectXMath.h>
 #endif
 
-#include "xrEngine/IFrameGraphRender.h"
 
 namespace xray::render::fg
 {
 void CBackend::OnFrameEnd()
 {
-    if (GEnv.FrameGraphRenderer->IsEnabled())
+    if (GEnv.Render->IsEnabled())
         return;
 
     if (!GEnv.isDedicatedServer)
@@ -25,7 +24,7 @@ void CBackend::OnFrameEnd()
 
 void CBackend::OnFrameBegin()
 {
-    if (GEnv.FrameGraphRenderer->IsEnabled())
+    if (GEnv.Render->IsEnabled())
         return;
 
     if (!GEnv.isDedicatedServer)

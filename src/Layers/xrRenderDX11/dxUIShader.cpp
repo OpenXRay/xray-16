@@ -107,7 +107,7 @@ bool dxUIShader::GetBaseTextureResolution(Fvector2& res)
         return false;
     }
 
-    FGResourceManager* resourceMgr = RImplementation.m_renderDevice->GetFGResourceManager();
+    FGResourceManager* resourceMgr = RImplementation.GetRenderDevice()->GetFGResourceManager();
     if (!resourceMgr)
         return false;
 

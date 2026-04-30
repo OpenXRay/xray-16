@@ -21,6 +21,11 @@
 #include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "Layers/xrRender/FGDetailManager.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
+#include "Layers/xrRender/Light_DB.h"
+#include "Layers/xrRender/ModelPool.h"
+#include "Layers/xrRender/WallmarksEngine.h"
+#include "Layers/xrRender/r__sector.h"
+#include "Layers/xrRenderDX11/DetailManager.h"
 
 namespace xray::render
 {
@@ -198,7 +203,7 @@ void FrameGraphRenderer::CompileLevelShader(u32 shaderID, const char* shaderName
     compiled.textureName = textureName;
 
     // Use the CRender's ShaderLoader instance
-    if (!GEnv.FrameGraphRenderer->GetShaderLoader()) {
+    if (!GEnv.Render->GetShaderLoader()) {
         Msg("! [ERROR] ShaderLoader not available for shader: %s", shaderName);
         return;
     }
@@ -206,7 +211,7 @@ void FrameGraphRenderer::CompileLevelShader(u32 shaderID, const char* shaderName
     // ═══════════════════════════════════════════════════
     //  COMPILE VERTEX SHADER
     // ═══════════════════════════════════════════════════
-    auto vsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadVertexShader(shaderName, "main");
+    auto vsResult = GEnv.Render->GetShaderLoader()->LoadVertexShader(shaderName, "main");
 
     if (vsResult.handle) {
         compiled.vsHandle = vsResult.handle;
@@ -221,7 +226,7 @@ void FrameGraphRenderer::CompileLevelShader(u32 shaderID, const char* shaderName
     // ═══════════════════════════════════════════════════
     //  COMPILE PIXEL SHADER
     // ═══════════════════════════════════════════════════
-    auto psResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadPixelShader(shaderName, "main");
+    auto psResult = GEnv.Render->GetShaderLoader()->LoadPixelShader(shaderName, "main");
 
     if (psResult.handle) {
         compiled.psHandle = psResult.handle;

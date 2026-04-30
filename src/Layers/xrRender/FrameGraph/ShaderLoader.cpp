@@ -245,7 +245,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
         desc.shaderType = nvrhi::ShaderType::Vertex;
         desc.debugName = name;
 
-        result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+        result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc,
             result.bytecode.data(),
             result.bytecode.size()
@@ -302,7 +302,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     desc.shaderType = nvrhi::ShaderType::Vertex;
     desc.debugName = name;
 
-    result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+    result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc,
         compileResult.bytecode.data(),
         compileResult.bytecode.size()
@@ -380,7 +380,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
         desc.shaderType = nvrhi::ShaderType::Pixel;
         desc.debugName = name;
 
-        result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+        result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc,
             result.bytecode.data(),
             result.bytecode.size()
@@ -437,7 +437,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     desc.shaderType = nvrhi::ShaderType::Pixel;
     desc.debugName = name;
 
-    result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+    result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc,
         compileResult.bytecode.data(),
         compileResult.bytecode.size()
@@ -527,7 +527,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
         desc.shaderType = nvrhi::ShaderType::Compute;
         desc.debugName = name;
 
-        result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+        result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc,
             result.bytecode.data(),
             result.bytecode.size()
@@ -584,7 +584,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     desc.shaderType = nvrhi::ShaderType::Compute;
     desc.debugName = name;
 
-    result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+    result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc,
         compileResult.bytecode.data(),
         compileResult.bytecode.size()
@@ -664,7 +664,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
         desc.shaderType = nvrhi::ShaderType::Amplification;
         desc.debugName = name;
 
-        result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+        result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc, result.bytecode.data(), result.bytecode.size()
         );
 
@@ -705,7 +705,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
     desc.shaderType = nvrhi::ShaderType::Amplification;
     desc.debugName = name;
 
-    result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+    result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc, compileResult.bytecode.data(), compileResult.bytecode.size()
     );
 
@@ -774,7 +774,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
         desc.shaderType = nvrhi::ShaderType::Mesh;
         desc.debugName = name;
 
-        result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+        result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc, result.bytecode.data(), result.bytecode.size()
         );
 
@@ -815,7 +815,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
     desc.shaderType = nvrhi::ShaderType::Mesh;
     desc.debugName = name;
 
-    result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+    result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc, compileResult.bytecode.data(), compileResult.bytecode.size()
     );
 
@@ -1002,7 +1002,7 @@ bool ShaderLoader::CheckForChangedFiles()
 
 bool ShaderLoader::ValidateChangedFiles()
 {
-    if (!GEnv.FrameGraphRenderer || !GEnv.FrameGraphRenderer->GetRenderDevice())
+    if (!GEnv.Render || !GEnv.Render->GetRenderDevice())
     {
         Msg("! [ShaderLoader] Hot-reload validation failed: render device is unavailable");
         return false;
@@ -1066,7 +1066,7 @@ bool ShaderLoader::ValidateChangedFiles()
         desc.shaderType = shaderType;
         desc.debugName = info.shaderName.c_str();
 
-        nvrhi::ShaderHandle testHandle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+        nvrhi::ShaderHandle testHandle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc,
             compileResult.bytecode.data(),
             compileResult.bytecode.size());

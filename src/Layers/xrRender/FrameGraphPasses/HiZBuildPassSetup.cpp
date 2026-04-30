@@ -14,7 +14,7 @@
 
 namespace fg
 {
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::passes {
@@ -38,7 +38,7 @@ void InitializeHiZResources(fg::RenderDevice* device, u32 width, u32 height, HiZ
     }
 
     if (!state.initialized) {
-        auto csResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("hiz_build");
+        auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("hiz_build");
 
         if (csResult.handle) {
             Msg("* [HiZBuild] Loaded hiz_build compute shader: OK");
@@ -218,7 +218,7 @@ HiZPyramidOutput setupHiZBuildPass(
                 outputSubres.baseArraySlice = 0;
                 outputSubres.numArraySlices = 1;
 
-                auto* hizRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("hiz_build", ".cs");
+                auto* hizRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("hiz_build", ".cs");
                 framegraph::BindingSetBuilder bsb(*hizRefl, nvDevice, "HiZBuild");
                 if (mip == 0)
                     bsb.Texture("g_input_depth", depthTexture);

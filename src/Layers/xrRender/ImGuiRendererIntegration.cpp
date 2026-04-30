@@ -35,8 +35,7 @@ void InitializeImGuiRenderer(fg::RenderDevice* renderDevice)
         fg::ImGuiRendererNVRHI* nvrhiRenderer = xr_new<fg::ImGuiRendererNVRHI>(renderDevice);
         g_ImGuiRenderer.reset(nvrhiRenderer);
 
-        if (fg::RImplementation.m_framegraphRenderer)
-            fg::RImplementation.m_framegraphRenderer->SetImGuiRendererNVRHI(nvrhiRenderer);
+        fg::RImplementation.SetImGuiRendererNVRHI(nvrhiRenderer);
 
         Msg("* ImGui: Using NVRHI renderer (supports DX11/DX12/Vulkan)");
     }

@@ -15,8 +15,7 @@
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 
 namespace xray::render::fg {
-    class CRender;
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::passes {
@@ -36,9 +35,9 @@ static void InitSmokeComputePipelines(fg::RenderDevice* device, SmokeTrailPassSt
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     auto& cache = GetPassResourceCache();
 
-    auto emitResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("smoke_trail_emit", "main");
-    auto simResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("smoke_trail_simulate", "main");
-    auto compactResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("smoke_trail_compact", "main");
+    auto emitResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("smoke_trail_emit", "main");
+    auto simResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("smoke_trail_simulate", "main");
+    auto compactResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("smoke_trail_compact", "main");
 
     if (!emitResult.handle || !simResult.handle || !compactResult.handle)
     {
@@ -252,7 +251,7 @@ DefaultOutputLayout setupSmokeTrailPass(
                 "SmokeTrail", "emit", sizeof(SmokeEmitParams), data.device);
             cmdList->writeBuffer(emitCB, &emitParams, sizeof(emitParams));
 
-            auto* emitReflection = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("smoke_trail_emit", ".cs");
+            auto* emitReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("smoke_trail_emit", ".cs");
             BindingSetBuilder bsb(*emitReflection, nvDevice, "SmokeTrail.Emit");
             bsb.ConstantBuffer("SmokeEmitCB", emitCB)
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer())
@@ -301,7 +300,7 @@ DefaultOutputLayout setupSmokeTrailPass(
                 "SmokeTrail", "sim", sizeof(SmokeSimParams), data.device);
             cmdList->writeBuffer(simCB, &simParams, sizeof(simParams));
 
-            auto* simReflection = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("smoke_trail_simulate", ".cs");
+            auto* simReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("smoke_trail_simulate", ".cs");
             BindingSetBuilder bsb(*simReflection, nvDevice, "SmokeTrail.Sim");
             bsb.ConstantBuffer("SmokeSimCB", simCB)
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer());
@@ -349,7 +348,7 @@ DefaultOutputLayout setupSmokeTrailPass(
                 "SmokeTrail", "compact", sizeof(SmokeCompactParams), data.device);
             cmdList->writeBuffer(compactCB, &compactParams, sizeof(compactParams));
 
-            auto* compactReflection = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("smoke_trail_compact", ".cs");
+            auto* compactReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("smoke_trail_compact", ".cs");
             BindingSetBuilder bsb(*compactReflection, nvDevice, "SmokeTrail.Compact");
             bsb.ConstantBuffer("SmokeCompactCB", compactCB)
                .BufferUAV("g_CompactBuffer", mgr->GetCompactBuffer())

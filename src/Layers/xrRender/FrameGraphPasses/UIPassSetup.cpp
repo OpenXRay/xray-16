@@ -97,7 +97,7 @@ framegraph::VirtualResourceHandle setupUIPass(
             }
 
             // Get UI infrastructure from FrameGraphRenderer
-            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.FrameGraphRenderer);
+            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
             auto* uiCollector = fgRenderer->GetUICollector();
             auto* uiRenderer = fgRenderer->GetUIRenderer();
             auto* uiMatCache = fgRenderer->GetUIMaterialCache();
@@ -115,7 +115,6 @@ framegraph::VirtualResourceHandle setupUIPass(
             }
             g_pGamePersistent->OnRenderSequencers();
 
-            // Update global constant buffers and render
             if (!uiCollector->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
@@ -182,7 +181,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                 return;
             }
 
-            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.FrameGraphRenderer);
+            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
             auto* device = fgRenderer->GetRenderDevice();
             auto* textMatCache = fgRenderer->GetTextMaterialCache();
 
@@ -505,7 +504,7 @@ framegraph::VirtualResourceHandle setupCursorPass(
             }
 
             // Get UI infrastructure from FrameGraphRenderer
-            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.FrameGraphRenderer);
+            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
             auto* uiCollector = fgRenderer->GetUICollector();
             auto* uiRenderer = fgRenderer->GetUIRenderer();
             auto* uiMatCache = fgRenderer->GetUIMaterialCache();

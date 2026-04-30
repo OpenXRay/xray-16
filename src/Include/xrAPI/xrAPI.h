@@ -18,12 +18,10 @@ class CDUInterface;
 struct xr_token;
 class IUIRender;
 class CGameMtlLibrary;
-class CRender;
 class CScriptEngine;
 class AISpaceBase;
 class ISoundManager;
 class UICore;
-class IFrameGraphRender;
 
 class XRAPI_API EngineGlobalEnvironment
 {
@@ -38,7 +36,6 @@ public:
     AISpaceBase* AISpace;
     ISoundManager* Sound;
     UICore* UI;
-    IFrameGraphRender* FrameGraphRenderer;  // Modern FrameGraph-based renderer
 
     bool isDedicatedServer;
 };

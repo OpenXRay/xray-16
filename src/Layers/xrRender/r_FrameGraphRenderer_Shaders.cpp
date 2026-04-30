@@ -33,7 +33,7 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
         shaderDesc.debugName = file_name;
         shaderDesc.entryName = "main";
 
-        result->nvrhiShader = RImplementation.m_renderDevice->GetNativeDevice()->createShader(
+        result->nvrhiShader = RImplementation.GetRenderDevice()->GetNativeDevice()->createShader(
             shaderDesc,
             buffer,
             buffer_size
@@ -469,21 +469,21 @@ HRESULT FrameGraphRenderer::shader_compile(pcstr name, IReader* fs, pcstr pFunct
 
         switch (RImplementation.o.msaa_alphatest)
         {
-        case CRender::MSAA_ATEST_DX10_0_ATOC:
+        case FrameGraphRenderer::MSAA_ATEST_DX10_0_ATOC:
             options.add("MSAA_ALPHATEST_DX10_0_ATOC", "1");
 
             sh_name.append(static_cast<u32>(1)); // DX10_0_ATOC   on
             sh_name.append(static_cast<u32>(0)); // DX10_1_ATOC   off
             sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
             break;
-        case CRender::MSAA_ATEST_DX10_1_ATOC:
+        case FrameGraphRenderer::MSAA_ATEST_DX10_1_ATOC:
             options.add("MSAA_ALPHATEST_DX10_1_ATOC", "1");
 
             sh_name.append(static_cast<u32>(0)); // DX10_0_ATOC   off
             sh_name.append(static_cast<u32>(1)); // DX10_1_ATOC   on
             sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
             break;
-        case CRender::MSAA_ATEST_DX10_1_NATIVE:
+        case FrameGraphRenderer::MSAA_ATEST_DX10_1_NATIVE:
             options.add("MSAA_ALPHATEST_DX10_1", "1");
 
             sh_name.append(static_cast<u32>(0)); // DX10_0_ATOC   off
@@ -510,7 +510,7 @@ HRESULT FrameGraphRenderer::shader_compile(pcstr name, IReader* fs, pcstr pFunct
     options.finish();
     sh_name.finish();
 
-    if (!GEnv.FrameGraphRenderer->GetShaderLoader())
+    if (!GEnv.Render->GetShaderLoader())
     {
         Msg("! [shader_compile] ShaderLoader not initialized!");
         R_ASSERT2(false, "ShaderLoader must be initialized");
@@ -577,7 +577,7 @@ HRESULT FrameGraphRenderer::shader_compile(pcstr name, IReader* fs, pcstr pFunct
 
     char extWithDot[4] = ".";
     xr_strcat(extWithDot, extension);
-    bool success = GEnv.FrameGraphRenderer->GetShaderLoader()->CompileShaderWithDefines(
+    bool success = GEnv.Render->GetShaderLoader()->CompileShaderWithDefines(
         name,           // Shader name
         extWithDot,     // Extension (.vs, .ps, etc.)
         pFunctionName,  // Entry point
@@ -603,7 +603,7 @@ HRESULT FrameGraphRenderer::shader_compile(pcstr name, IReader* fs, pcstr pFunct
     }
 
     // Get reflection data from ShaderLoader's cache
-    auto* reflection = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection(name, extWithDot);
+    auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection(name, extWithDot);
 
     // Create the hardware shader object
     HRESULT _result = create_shader(

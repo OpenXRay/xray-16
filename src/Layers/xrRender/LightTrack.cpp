@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "LightTrack.h"
+#include "Layers/xrRender/light.h"
+#include "Layers/xrRender/Light_DB.h"
 #include "Include/xrRender/RenderVisual.h"
 #include "xrEngine/xr_object.h"
 

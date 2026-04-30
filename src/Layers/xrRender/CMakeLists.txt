@@ -135,8 +135,6 @@ target_sources(xrRender PRIVATE
     r_FrameGraphRenderer_Loader.cpp
     r_FrameGraphRenderer_Shaders.cpp
     r_FrameGraphRenderer_Blenders.cpp
-    r5.h
-    r5.cpp
     FGRenderHost.h
     FGRenderHost.cpp
     FrameGraphRendererModule.h
@@ -159,7 +157,6 @@ target_sources(xrRender PRIVATE
     ClusteredLightManager.cpp
     ColorMapManager.cpp
     ConstantSystem/FGConstantSystem.cpp
-    D3DXRenderBase.cpp
     FGRenderBase.h
     FGRenderBase.cpp
     r4_rendertarget.h

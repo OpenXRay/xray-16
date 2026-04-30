@@ -14,7 +14,7 @@ struct SEmitter;
 // defs
 class ECORE_API CModelPool
 {
-    friend class CRender;
+    friend class FrameGraphRenderer;
 
     struct str_pred
     {

@@ -22,7 +22,7 @@ class adopt_dx10options
 public:
     bool _dx10_msaa_alphatest_atoc()
     {
-        return RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
+        return RImplementation.o.msaa_alphatest == FrameGraphRenderer::MSAA_ATEST_DX10_0_ATOC;
     }
 
     LPCSTR _get_level()

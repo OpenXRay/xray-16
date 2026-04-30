@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Layers/xrRender/dxRainRender.h"
+#include "Layers/xrRender/IRenderDetailModel.h"
 
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Rain.h"

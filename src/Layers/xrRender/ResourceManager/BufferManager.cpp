@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "BufferManager.h"
 #include "../RenderContext/RenderDevice.h"
-#include "xrEngine/IFrameGraphRender.h"
 
 // Buffer Manager Implementation
 // Week 2 - Day 4: Task 4.2

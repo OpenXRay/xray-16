@@ -3,7 +3,6 @@
 #pragma hdrstop
 
 #include "SkeletonCustom.h"
-#include "xrEngine/IFrameGraphRender.h"
 
 namespace xray::render::fg
 {
@@ -19,7 +18,7 @@ void CKinematics::CalculateBonesFG(BOOL bForceExact)
 
 void CKinematics::CalculateBones(BOOL bForceExact)
 {
-    if (GEnv.FrameGraphRenderer->IsEnabled())
+    if (GEnv.Render->IsEnabled())
         return;
 
     CalcBones(bForceExact);

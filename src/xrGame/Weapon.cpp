@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "Weapon.h"
-#include "xrEngine/IFrameGraphRender.h"
 #include "ParticlesObject.h"
 #include "entity_alive.h"
 #include "inventory_item_impl.h"

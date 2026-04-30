@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "SamplerCache.h"
 #include "../RenderContext/RenderDevice.h"
-#include "xrEngine/IFrameGraphRender.h"
 
 // Sampler Cache Implementation
 // Week 2 - Day 4: Task 4.3

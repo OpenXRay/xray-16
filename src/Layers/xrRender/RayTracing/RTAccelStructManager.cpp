@@ -21,8 +21,7 @@ extern ENGINE_API float ps_r3_grass_blade_height;
 extern ENGINE_API float ps_r3_grass_wind_displacement;
 
 namespace xray::render::fg {
-    class CRender;
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg {
@@ -546,7 +545,7 @@ void RTAccelStructManager::InitSkinningPipeline()
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
     auto& cache = framegraph::GetPassResourceCache();
 
-    auto skinResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("rt_skin_vertices");
+    auto skinResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("rt_skin_vertices");
     if (!skinResult.handle) {
         Msg("! [RT] Failed to load rt_skin_vertices shader");
         return;
@@ -685,7 +684,7 @@ void RTAccelStructManager::BuildSkinnedBLAS(
     for (const auto& sb : m_skinnedBatchData) {
         auto it = bindingSetCache.find(sb.srcVB);
         if (it == bindingSetCache.end()) {
-            auto* skinRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("rt_skin_vertices", ".cs");
+            auto* skinRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_skin_vertices", ".cs");
             framegraph::BindingSetBuilder bsb(*skinRefl, nvDevice, "RT.SkinVertices");
             bsb.BufferSRV("g_SrcVB", sb.srcVB)
                .BufferSRV("g_BoneMatrices", boneBuffer)
@@ -775,7 +774,7 @@ void RTAccelStructManager::InitGrassPipeline()
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
     auto& cache = framegraph::GetPassResourceCache();
 
-    auto grassResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("rt_grass_vertices");
+    auto grassResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("rt_grass_vertices");
     if (!grassResult.handle) {
         Msg("! [RT] Failed to load rt_grass_vertices shader");
         return;
@@ -814,7 +813,7 @@ void RTAccelStructManager::InitBillboardPipeline()
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
     auto& cache = framegraph::GetPassResourceCache();
 
-    auto billboardResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("rt_grass_billboard");
+    auto billboardResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("rt_grass_billboard");
     if (!billboardResult.handle) {
         Msg("! [RT] Failed to load rt_grass_billboard shader");
         return;
@@ -895,7 +894,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
         cb.maxVertsPerBillboard = maxVPB;
         cb.pad[0] = cb.pad[1] = cb.pad[2] = 0;
 
-        auto* billboardRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("rt_grass_billboard", ".cs");
+        auto* billboardRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_grass_billboard", ".cs");
         framegraph::BindingSetBuilder bsb(*billboardRefl, nvDevice, "RT.Billboard");
         bsb.BufferSRV("g_AllInstances", detailMgr->generatedInstancesBuffer)
            .BufferSRV("g_VisibleIndices", detailMgr->visibleBillboardInstancesBuffer)
@@ -984,7 +983,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
         for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++) {
             if (lodCounts[lod] == 0) continue;
 
-            auto* grassRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("rt_grass_vertices", ".cs");
+            auto* grassRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_grass_vertices", ".cs");
             framegraph::BindingSetBuilder bsb(*grassRefl, nvDevice, "RT.Grass");
             bsb.BufferSRV("g_AllInstances", detailMgr->generatedInstancesBuffer)
                .BufferSRV("g_SlotData", detailMgr->slotDataBuffer)

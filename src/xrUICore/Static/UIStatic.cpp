@@ -86,7 +86,7 @@ void CUIStatic::DrawText()
         GetAbsolutePos(p);
         m_pTextControl->Draw(p.x, p.y);
     }
-    if (g_statHint->Owner() == this)
+    if (g_statHint && g_statHint->Owner() == this)
         g_statHint->Draw_();
 }
 

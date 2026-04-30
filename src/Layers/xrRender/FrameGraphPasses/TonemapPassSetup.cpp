@@ -12,8 +12,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render::fg {
-    class CRender;
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::passes {
@@ -38,9 +37,9 @@ void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state) {
     cmdList->close();
     device->executeCommandList(cmdList);
 
-    if (GEnv.FrameGraphRenderer->GetShaderLoader()) {
-        auto vsResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadVertexShader("tonemap");
-        auto psResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadPixelShader("tonemap");
+    if (GEnv.Render->GetShaderLoader()) {
+        auto vsResult = GEnv.Render->GetShaderLoader()->LoadVertexShader("tonemap");
+        auto psResult = GEnv.Render->GetShaderLoader()->LoadPixelShader("tonemap");
         if (vsResult.handle && psResult.handle) {
             auto& cache = framegraph::GetPassResourceCache();
 
@@ -147,8 +146,8 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             auto& cache = framegraph::GetPassResourceCache();
 
-            auto* vsRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("tonemap", ".vs");
-            auto* psRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("tonemap", ".ps");
+            auto* vsRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("tonemap", ".vs");
+            auto* psRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("tonemap", ".ps");
             if (!vsRefl || !psRefl)
                 return;
 

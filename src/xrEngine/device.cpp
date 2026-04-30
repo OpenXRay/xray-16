@@ -13,7 +13,6 @@
 
 #include "xrScriptEngine/script_space.hpp"
 
-#include "IFrameGraphRender.h"
 
 #include <SDL.h>
 

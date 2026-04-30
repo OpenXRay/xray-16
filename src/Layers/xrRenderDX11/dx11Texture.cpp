@@ -104,28 +104,28 @@ IC void Reduce(size_t& w, size_t& h, size_t& l, int skip)
         h = 1;
 }
 
-ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
+}
+namespace xray::render
+{
+ID3D11Resource* FrameGraphRenderer::texture_load(LPCSTR fRName, u32& ret_msize)
 {
     ret_msize = 0;
     R_ASSERT1_CURE(fRName && fRName[0], { return nullptr; });
 
-    if (!m_renderDevice || !m_renderDevice->GetFGResourceManager())
+    auto* device = GetRenderDevice();
+    if (!device || !device->GetFGResourceManager())
         return nullptr;
 
-
-    // Fix texture name (remove extension)
     string_path fname;
     xr_strcpy(fname, fRName);
     fix_texture_name(fname);
 
-    // Build VFS path for DDS texture
     string_path vfsPath;
     xr_sprintf(vfsPath, "$game_textures$\\%s", fname);
 
     Msg("* [FrameGraph] Loading texture through TextureManager: %s", fname);
 
-    // Load through FGResourceManager
-    FGResourceManager* resourceMgr = m_renderDevice->GetFGResourceManager();
+    FGResourceManager* resourceMgr = device->GetFGResourceManager();
     TextureManager* texManager = resourceMgr->GetTextureManager();
 
     // Load texture and get handle
@@ -166,4 +166,4 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 
     return d3d11Texture;
 }
-} // namespace xray::render::fg
+}

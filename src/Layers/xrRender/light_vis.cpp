@@ -64,7 +64,7 @@ void light::vis_prepare(CBackend& cmd_list)
         cmd_list.set_Stencil(FALSE);
     else
         cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
-    RImplementation.m_framegraphRenderer->m_pTarget->draw_volume(cmd_list, this);
+    RImplementation.m_pTarget->draw_volume(cmd_list, this);
     RImplementation.occq_end(vis.query_id);
 }
 

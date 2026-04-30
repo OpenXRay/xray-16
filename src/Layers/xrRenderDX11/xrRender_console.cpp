@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include "Layers/xrRender/xrRender_console.h"
+#include "Layers/xrRender/ModelPool.h"
 #include "xrCore/xr_token.h"
 #include "xrCore/Animation/SkeletonMotions.hpp"
 

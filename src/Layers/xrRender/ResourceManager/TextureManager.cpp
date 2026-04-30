@@ -3,7 +3,6 @@
 #include "DDSLoader.h"
 #include "TextureStreaming.h"
 #include "../RenderContext/RenderDevice.h"
-#include "xrEngine/IFrameGraphRender.h"
 
 // Modern Texture Manager Implementation
 // Week 1 - Day 1-2: Tasks 1.4, 2.2

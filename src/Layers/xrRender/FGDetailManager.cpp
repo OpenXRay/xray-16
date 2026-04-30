@@ -7,7 +7,6 @@
 #include "ResourceManager/TextureManager.h"
 #include "xrRender_console.h"
 #include "xrEngine/device.h"
-#include "xrEngine/IFrameGraphRender.h"
 #include "xrCDB/Frustum.h"
 #include "xrCDB/Intersect.hpp"
 #include "xrCDB/xrXRC.h"
@@ -38,6 +37,7 @@ namespace xray::render::fg
 {
 extern int ps_r__detail_gpu;
 extern float ps_current_detail_height;
+extern float ps_current_detail_density;
 
 static int magic4x4[4][4] = {{0, 14, 3, 13}, {11, 5, 8, 6}, {12, 2, 15, 1}, {7, 9, 4, 10}};
 
@@ -587,7 +587,7 @@ bool FGDetailManager::LoadBuildDetailsTexture(nvrhi::IDevice* device)
         return false;
     }
 
-    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
+    auto* renderDevice = GEnv.Render->GetRenderDevice();
     for (u32 mip = 0; mip < ddsData.mipLevels.size(); mip++)
     {
         const auto& ml = ddsData.mipLevels[mip];
@@ -1278,7 +1278,7 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
         cachedDummySlotIndirection = device->createBuffer(desc);
     }
 
-    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
+    auto* renderDevice = GEnv.Render->GetRenderDevice();
 
     fg::RenderDevice::BufferDesc cbDesc;
     cbDesc.isConstantBuffer = true;
@@ -1513,7 +1513,7 @@ bool FGDetailManager::CreatePerlin4DPipeline(nvrhi::IDevice* device)
     perlinCBDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     perlinCBDesc.isConstantBuffer = true;
     perlinCBDesc.debugName        = "Perlin4DGenCB";
-    perlin4dCB = GEnv.FrameGraphRenderer->GetRenderDevice()->CreateBuffer(perlinCBDesc);
+    perlin4dCB = GEnv.Render->GetRenderDevice()->CreateBuffer(perlinCBDesc);
 
     return true;
 }
@@ -1539,7 +1539,7 @@ void FGDetailManager::DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrh
     params.pad0        = 0.f;
 
     // writeBuffer BEFORE setComputeState (NVRHI volatile CB ordering)
-    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
+    auto* renderDevice = GEnv.Render->GetRenderDevice();
     cmdList->writeBuffer(renderDevice->GetNativeBuffer(perlin4dCB), &params, sizeof(params));
 
     auto* perlin4dRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("perlin4d_gen", ".cs");
@@ -2179,7 +2179,7 @@ void FGDetailManager::DispatchCulling(
     if (!computePipeline || !slotCullPipeline)
         return;
 
-    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
+    auto* renderDevice = GEnv.Render->GetRenderDevice();
 
     float current_density = ps_current_detail_density;
     if (std::abs(current_density - m_lastDensity) > 0.001f)
@@ -2525,7 +2525,7 @@ void FGDetailManager::BuildDetailModelGPUData()
 
 nvrhi::BindingSetHandle FGDetailManager::CreateInstanceGenBindingSet(nvrhi::IDevice* device) const
 {
-    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
+    auto* renderDevice = GEnv.Render->GetRenderDevice();
     auto* instGenRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_instance_gen", ".cs");
     framegraph::BindingSetBuilder bsb(*instGenRefl, device, "Detail.InstanceGen");
     bsb.ConstantBuffer("DetailCullParams", renderDevice->GetNativeBuffer(cachedCullParamsCB))
@@ -2555,7 +2555,7 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
         return;
     }
 
-    auto* renderDevice = GEnv.FrameGraphRenderer->GetRenderDevice();
+    auto* renderDevice = GEnv.Render->GetRenderDevice();
 
     constexpr u32 MAX_DISPATCH_1D = 65535;
     u32 numBlocks = (slot_count + PREFIX_SUM_BLOCK_SIZE - 1) / PREFIX_SUM_BLOCK_SIZE;

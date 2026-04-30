@@ -17,9 +17,9 @@ IImGuiRender* dxRenderFactory::CreateImGuiRender()
     if (IImGuiRender* existingRenderer = xray::render::GetImGuiRenderer())
         return existingRenderer;
 
-    auto& render = RImplementation;
-    R_ASSERT2(render.m_renderDevice, "ImGui: RenderDevice not initialized");
-    return xr_new<xray::render::fg::ImGuiRendererNVRHI>(render.m_renderDevice);
+    auto* renderDevice = RImplementation.GetRenderDevice();
+    R_ASSERT2(renderDevice, "ImGui: RenderDevice not initialized");
+    return xr_new<xray::render::fg::ImGuiRendererNVRHI>(renderDevice);
 }
 
 void dxRenderFactory::DestroyImGuiRender(IImGuiRender* pObject)

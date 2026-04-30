@@ -2,6 +2,8 @@
 
 #include "Layers/xrRender_R2/r2.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/light.h"
+#include "Layers/xrRender/Light_DB.h"
 #include "Layers/xrRender/FHierrarhyVisual.h"
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "xrCore/Threading/ParallelFor.hpp"
@@ -43,7 +45,7 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
 {
     ZoneScoped;
 
-    CRender& RI = RImplementation;
+    FrameGraphRenderer& RI = RImplementation;
 
     if (pVisual->vis.marker[context_id] == marker)
         return;
@@ -160,7 +162,7 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
 {
     ZoneScoped;
 
-    CRender& RI = RImplementation;
+    FrameGraphRenderer& RI = RImplementation;
 
     if (pVisual->vis.marker[context_id] == marker)
         return;
@@ -316,7 +318,7 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
         else
         {
             pV->CalculateBones(TRUE);
-            if (o.phase == CRender::PHASE_NORMAL)
+            if (o.phase == FrameGraphRenderer::PHASE_NORMAL)
             {
                 pV->CalculateWallmarks(root ? root->renderable_HUD() : false); //. bug?
             }
@@ -345,7 +347,7 @@ void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
 {
     ZoneScoped;
 
-    if (o.use_hom && !RImplementation.m_framegraphRenderer->m_HOM.visible(pVisual->vis))
+    if (o.use_hom && !RImplementation.m_HOM.visible(pVisual->vis))
         return;
 
     // Visual is 100% visible - simply add it
@@ -411,7 +413,7 @@ void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
             mapLOD.insert_anyway(D, _LodItem({ ssa, pVisual }));
         }
 #if RENDER != R_R1
-        if (ssa > r_ssaLOD_B || o.phase == CRender::PHASE_SMAP)
+        if (ssa > r_ssaLOD_B || o.phase == FrameGraphRenderer::PHASE_SMAP)
 #else
         if (ssa > r_ssaLOD_B)
 #endif
@@ -555,7 +557,7 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     if (fcvNone == VIS)
         return;
 
-    if (o.use_hom && !RImplementation.m_framegraphRenderer->m_HOM.visible(vis))
+    if (o.use_hom && !RImplementation.m_HOM.visible(vis))
         return;
 
     // If we get here visual is visible or partially visible
@@ -641,7 +643,7 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
             mapLOD.insert_anyway(D, _LodItem({ ssa, pVisual }));
         }
 #if RENDER != R_R1
-        if (ssa > r_ssaLOD_B || o.phase == CRender::PHASE_SMAP)
+        if (ssa > r_ssaLOD_B || o.phase == FrameGraphRenderer::PHASE_SMAP)
 #else
         if (ssa > r_ssaLOD_B)
 #endif
@@ -721,15 +723,15 @@ void R_dsgraph_structure::build_subspace()
 
     marker++; // !!! critical here
 
-    if (o.precise_portals && RImplementation.m_framegraphRenderer->m_pRmPortals)
+    if (o.precise_portals && RImplementation.m_pRmPortals)
     {
         // Check if camera is too near to some portal - if so force DualRender
         Fvector box_radius;
         box_radius.set(o.query_box_side, o.query_box_side, o.query_box_side);
-        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, RImplementation.m_framegraphRenderer->m_pRmPortals, o.view_pos, box_radius);
+        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, RImplementation.m_pRmPortals, o.view_pos, box_radius);
         for (size_t K = 0; K < Sectors_xrc.r_count(); K++)
         {
-            CPortal* pPortal = Portals[RImplementation.m_framegraphRenderer->m_pRmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
+            CPortal* pPortal = Portals[RImplementation.m_pRmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
             pPortal->bDualRender = TRUE;
         }
     }
@@ -809,11 +811,11 @@ void R_dsgraph_structure::build_subspace()
         u32 uID_LTRACK = 0xffffffff;
         if (o.is_main_pass) // temporary
         {
-            if (o.phase == CRender::PHASE_NORMAL)
+            if (o.phase == FrameGraphRenderer::PHASE_NORMAL)
             {
-                RImplementation.m_framegraphRenderer->m_uLastLTRACK++;
+                RImplementation.m_uLastLTRACK++;
                 if (!lstRenderables.empty())
-                    uID_LTRACK = RImplementation.m_framegraphRenderer->m_uLastLTRACK % lstRenderables.size();
+                    uID_LTRACK = RImplementation.m_uLastLTRACK % lstRenderables.size();
 
                 // update light-vis for current entity / actor
                 IGameObject* O = g_pGameLevel->CurrentViewEntity();
@@ -854,7 +856,7 @@ void R_dsgraph_structure::build_subspace()
                 {
                     // TODO: check for HOM flag
                     vis_data& vis = L->get_homdata();
-                    if (RImplementation.m_framegraphRenderer->m_HOM.visible(vis))
+                    if (RImplementation.m_HOM.visible(vis))
                         Lights.add_light(L);
                 }
                 continue;
@@ -881,7 +883,7 @@ void R_dsgraph_structure::build_subspace()
                         vis_data& v_orig = ((dxRender_Visual*)renderable->GetRenderData().visual)->vis;
                         vis_data v_copy = v_orig;
                         v_copy.box.xform(renderable->GetRenderData().xform);
-                        BOOL bVisible = RImplementation.m_framegraphRenderer->m_HOM.visible(v_copy);
+                        BOOL bVisible = RImplementation.m_HOM.visible(v_copy);
                         memcpy(v_orig.marker, v_copy.marker, sizeof(v_copy.marker));
                         v_orig.accept_frame = v_copy.accept_frame;
                         v_orig.hom_frame = v_copy.hom_frame;
@@ -918,7 +920,7 @@ void R_dsgraph_structure::build_subspace()
         {
 #if RENDER != R_R1
             // Actor Shadow (Sun + Light)
-            if (o.phase == CRender::PHASE_SMAP && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW))
+            if (o.phase == FrameGraphRenderer::PHASE_SMAP && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW))
             {
                 do
                 {

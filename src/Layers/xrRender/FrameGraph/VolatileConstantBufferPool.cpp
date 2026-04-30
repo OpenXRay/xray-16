@@ -45,7 +45,7 @@ fg::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layo
     xr_sprintf(debugName, "VCB_%s_b%u_%ub", layout.name.c_str(), layout.slot, layout.size);
     cbDesc.debugName = debugName;
 
-    fg::BufferHandle vcb = GEnv.FrameGraphRenderer->GetRenderDevice()->CreateBuffer(cbDesc);
+    fg::BufferHandle vcb = GEnv.Render->GetRenderDevice()->CreateBuffer(cbDesc);
 
     if (!vcb.IsValid())
     {

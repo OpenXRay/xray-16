@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Layers/xrRender/dxThunderboltRender.h"
+#include "Layers/xrRender/IRenderDetailModel.h"
 
 #include "xrEngine/thunderbolt.h"
 #include "Layers/xrRender/dxThunderboltDescRender.h"

@@ -77,8 +77,10 @@ CUICursor::~CUICursor()
 u32 last_render_frame = 0;
 void CUICursor::OnRender()
 {
-    g_btnHint->OnRender();
-    g_statHint->OnRender();
+    if (g_btnHint)
+        g_btnHint->OnRender();
+    if (g_statHint)
+        g_statHint->OnRender();
 
     if (!IsVisible())
         return;

@@ -10,7 +10,7 @@
 
 namespace fg
 {
-    extern CRender RImplementation;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::passes {
@@ -23,7 +23,7 @@ static void InitializeResources(fg::RenderDevice* device, MotionVectorPassState&
     auto& cache = GetPassResourceCache();
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    auto csResult = GEnv.FrameGraphRenderer->GetShaderLoader()->LoadComputeShader("restir_motion_vectors");
+    auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("restir_motion_vectors");
     if (!csResult.handle) return;
 
     state.layout = cache.GetOrCreateBindingLayoutFromReflection("MotionVector", *csResult.reflection, nvDevice);
@@ -108,7 +108,7 @@ MotionVectorOutput setupMotionVectorPass(
 
             cmdList->writeBuffer(data.state->cb, &cb, sizeof(cb));
 
-            auto* mvRefl = GEnv.FrameGraphRenderer->GetShaderLoader()->GetCachedReflection("restir_motion_vectors", ".cs");
+            auto* mvRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("restir_motion_vectors", ".cs");
             BindingSetBuilder bsb(*mvRefl, nvDevice, "MotionVector");
             bsb.ConstantBuffer("MotionVectorParams", data.state->cb)
                .Texture("t_Depth", depthTex)
