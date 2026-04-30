@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Layers/xrRender/light.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::fg
 {
@@ -50,7 +52,7 @@ void smapvis::end()
     // Gather stats
     u32 ts, td;
     dsgraph.get_Counters(ts, td);
-    RImplementation.Stats.ic_total += ts;
+    RImplementation.m_framegraphRenderer->m_Stats.ic_total += ts;
     dsgraph.set_Feedback(0, 0);
 
     switch (state)
@@ -123,7 +125,7 @@ void smapvis::resetoccq()
 void smapvis::mark()
 {
     auto& dsgraph = RImplementation.get_context(id);
-    RImplementation.Stats.ic_culled += invisible.size();
+    RImplementation.m_framegraphRenderer->m_Stats.ic_culled += invisible.size();
     u32 marker = dsgraph.marker + 1; // we are called befor marker increment
     for (u32 it = 0; it < invisible.size(); it++)
         invisible[it]->vis.marker[id] = marker; // this effectively disables processing

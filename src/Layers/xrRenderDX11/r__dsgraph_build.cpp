@@ -345,7 +345,7 @@ void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
 {
     ZoneScoped;
 
-    if (o.use_hom && !RImplementation.HOM.visible(pVisual->vis))
+    if (o.use_hom && !RImplementation.m_framegraphRenderer->m_HOM.visible(pVisual->vis))
         return;
 
     // Visual is 100% visible - simply add it
@@ -555,7 +555,7 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     if (fcvNone == VIS)
         return;
 
-    if (o.use_hom && !RImplementation.HOM.visible(vis))
+    if (o.use_hom && !RImplementation.m_framegraphRenderer->m_HOM.visible(vis))
         return;
 
     // If we get here visual is visible or partially visible
@@ -854,7 +854,7 @@ void R_dsgraph_structure::build_subspace()
                 {
                     // TODO: check for HOM flag
                     vis_data& vis = L->get_homdata();
-                    if (RImplementation.HOM.visible(vis))
+                    if (RImplementation.m_framegraphRenderer->m_HOM.visible(vis))
                         Lights.add_light(L);
                 }
                 continue;
@@ -881,7 +881,7 @@ void R_dsgraph_structure::build_subspace()
                         vis_data& v_orig = ((dxRender_Visual*)renderable->GetRenderData().visual)->vis;
                         vis_data v_copy = v_orig;
                         v_copy.box.xform(renderable->GetRenderData().xform);
-                        BOOL bVisible = RImplementation.HOM.visible(v_copy);
+                        BOOL bVisible = RImplementation.m_framegraphRenderer->m_HOM.visible(v_copy);
                         memcpy(v_orig.marker, v_copy.marker, sizeof(v_copy.marker));
                         v_orig.accept_frame = v_copy.accept_frame;
                         v_orig.hom_frame = v_copy.hom_frame;

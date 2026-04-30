@@ -294,39 +294,7 @@ public:
         float forcegloss_v;
     } o;
 
-    struct RenderR2Statistics
-    {
-        u32 l_total;
-        u32 l_visible;
-        u32 l_shadowed;
-        u32 l_unshadowed;
-        s32 s_used;
-        s32 s_merged;
-        s32 s_finalclip;
-        u32 ic_total;
-        u32 ic_culled;
-
-        RenderR2Statistics() { FrameStart(); }
-        void FrameStart()
-        {
-            l_total = 0;
-            l_visible = 0;
-            l_shadowed = 0;
-            l_unshadowed = 0;
-            s_used = 0;
-            s_merged = 0;
-            s_finalclip = 0;
-            ic_total = 0;
-            ic_culled = 0;
-        }
-
-        void FrameEnd() {}
-    };
-
 public:
-    RenderR2Statistics Stats;
-    CHOM HOM;
-    R_occlusion HWOCC;
 
     xr_vector<FSlideWindowItem>& SWIs = ::xray::render::fg::BufferPool.SWIs;
 
@@ -436,10 +404,9 @@ public:
     FSlideWindowItem*    getSWI(int id)                                 { return ::xray::render::fg::BufferPool.getSWI(id); }
     IRenderVisual* model_CreatePE(LPCSTR name);
 
-    // HW-occlusion culling
-    u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
-    void occq_end(u32& ID) { HWOCC.occq_end(ID); }
-    auto occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+    u32 occq_begin(u32& ID);
+    void occq_end(u32& ID);
+    R_occlusion::occq_result occq_get(u32& ID);
 
     ICF void apply_object(CBackend& cmd_list, IRenderable* O)
     {

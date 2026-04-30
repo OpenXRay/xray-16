@@ -109,6 +109,10 @@ void CRender::RequestGrassInteraction(const Fvector& world_pos, float radius, fl
         m_framegraphRenderer->m_pDetailManager->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
 }
 
+u32 CRender::occq_begin(u32& ID) { return m_framegraphRenderer->m_HWOCC.occq_begin(ID); }
+void CRender::occq_end(u32& ID) { m_framegraphRenderer->m_HWOCC.occq_end(ID); }
+R_occlusion::occq_result CRender::occq_get(u32& ID) { return m_framegraphRenderer->m_HWOCC.occq_get(ID); }
+
 void CRender::PrintFailedShadersSummary()
 {
     if (g_failedShaders.empty())
@@ -589,7 +593,7 @@ void CRender::create()
     g_pModelPool = xr_new<CModelPool>();
     g_pPSLibrary = &PSLibrary;
     PSLibrary.OnCreate();
-    HWOCC.occq_create(occq_size);
+    m_framegraphRenderer->m_HWOCC.occq_create(occq_size);
 
     rmNormal(RCache);
 
@@ -633,7 +637,7 @@ void CRender::destroy()
     }
 #endif
 
-    HWOCC.occq_destroy();
+    m_framegraphRenderer->m_HWOCC.occq_destroy();
     xr_delete(g_pModelPool);
     g_pModelPool = nullptr;
     g_pPSLibrary = nullptr;
@@ -687,13 +691,13 @@ void CRender::reset_begin()
     //-AVO
 
     xr_delete(Target);
-    HWOCC.occq_destroy();
+    m_framegraphRenderer->m_HWOCC.occq_destroy();
 }
 
 void CRender::reset_end()
 {
     ZoneScoped;
-    HWOCC.occq_create(occq_size);
+    m_framegraphRenderer->m_HWOCC.occq_create(occq_size);
 
     Target = xr_new<CRenderTarget>();
 
@@ -728,7 +732,7 @@ void CRender::OnCameraUpdated()
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
 
-    m_framegraphRenderer->m_pProcessHOMTask = &HOM.DispatchMTRender();
+    m_framegraphRenderer->m_pProcessHOMTask = &m_framegraphRenderer->m_HOM.DispatchMTRender();
     if (m_framegraphRenderer->m_pDetailManager)
         m_framegraphRenderer->m_pDetailManager->DispatchMTCalc();
 }
@@ -1079,9 +1083,9 @@ bool CRender::CreatePrecompiledPSO(
 
 IRender_Light* CRender::light_create() { return Lights.Create(); }
 IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
-bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
-bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
-bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
+bool CRender::occ_visible(vis_data& P) { return m_framegraphRenderer->m_HOM.visible(P); }
+bool CRender::occ_visible(sPoly& P) { return m_framegraphRenderer->m_HOM.visible(P); }
+bool CRender::occ_visible(Fbox& P) { return m_framegraphRenderer->m_HOM.visible(P); }
 void CRender::add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
 #if defined(USE_DX11) && RENDER == R_R4
@@ -1338,22 +1342,22 @@ CRender::~CRender() {}
 void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     D3DXRenderBase::DumpStatistics(font, alert);
-    Stats.FrameEnd();
+    m_framegraphRenderer->m_Stats.FrameEnd();
     font.OutNext("Lights:");
-    font.OutNext("- total:      %u", Stats.l_total);
-    font.OutNext("- visible:    %u", Stats.l_visible);
-    font.OutNext("- shadowed:   %u", Stats.l_shadowed);
-    font.OutNext("- unshadowed: %u", Stats.l_unshadowed);
+    font.OutNext("- total:      %u", m_framegraphRenderer->m_Stats.l_total);
+    font.OutNext("- visible:    %u", m_framegraphRenderer->m_Stats.l_visible);
+    font.OutNext("- shadowed:   %u", m_framegraphRenderer->m_Stats.l_shadowed);
+    font.OutNext("- unshadowed: %u", m_framegraphRenderer->m_Stats.l_unshadowed);
     font.OutNext("Shadow maps:");
-    font.OutNext("- used:       %d", Stats.s_used);
-    font.OutNext("- merged:     %d", Stats.s_merged - Stats.s_used);
-    font.OutNext("- finalclip:  %d", Stats.s_finalclip);
-    u32 ict = Stats.ic_total + Stats.ic_culled;
-    font.OutNext("ICULL:        %03.1f", 100.f * f32(Stats.ic_culled) / f32(ict ? ict : 1));
-    font.OutNext("- visible:    %u", Stats.ic_total);
-    font.OutNext("- culled:     %u", Stats.ic_culled);
-    Stats.FrameStart();
-    HOM.DumpStatistics(font, alert);
+    font.OutNext("- used:       %d", m_framegraphRenderer->m_Stats.s_used);
+    font.OutNext("- merged:     %d", m_framegraphRenderer->m_Stats.s_merged - m_framegraphRenderer->m_Stats.s_used);
+    font.OutNext("- finalclip:  %d", m_framegraphRenderer->m_Stats.s_finalclip);
+    u32 ict = m_framegraphRenderer->m_Stats.ic_total + m_framegraphRenderer->m_Stats.ic_culled;
+    font.OutNext("ICULL:        %03.1f", 100.f * f32(m_framegraphRenderer->m_Stats.ic_culled) / f32(ict ? ict : 1));
+    font.OutNext("- visible:    %u", m_framegraphRenderer->m_Stats.ic_total);
+    font.OutNext("- culled:     %u", m_framegraphRenderer->m_Stats.ic_culled);
+    m_framegraphRenderer->m_Stats.FrameStart();
+    m_framegraphRenderer->m_HOM.DumpStatistics(font, alert);
     m_framegraphRenderer->m_Sectors_xrc.DumpStatistics(font, alert);
 }
 } // namespace xray::render::fg

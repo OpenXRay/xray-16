@@ -171,7 +171,7 @@ void CRender::level_Load(IReader* fs)
     // HOM - Skip if using FrameGraph renderer (GPU Hi-Z culling replaces CPU HOM)
     if (!m_framegraphRenderer)
     {
-        HOM.Load();
+        m_framegraphRenderer->m_HOM.Load();
     }
     else
     {
@@ -342,7 +342,7 @@ void CRender::level_Unload()
         return;
 
     // HOM
-    HOM.Unload();
+    m_framegraphRenderer->m_HOM.Unload();
 
     //*** Details
     m_framegraphRenderer->m_pDetailManager->Unload();

@@ -1,11 +1,13 @@
 #include "stdafx.h"
+#include "r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::fg
 {
 void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
 {
     phase_accumulator(cmd_list);
-    RImplementation.Stats.l_visible++;
+    RImplementation.m_framegraphRenderer->m_Stats.l_visible++;
 
     ref_shader shader = L->s_point;
     ref_shader* shader_msaa = L->s_point_msaa;

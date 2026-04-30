@@ -4,6 +4,8 @@
 #include "xrEngine/IFrameGraphRender.h"
 #include "xrEngine/Render.h"
 #include "xrCDB/xrXRC.h"
+#include "Layers/xrRender/HOM.h"
+#include "Layers/xrRender/r__occlusion.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
@@ -139,6 +141,33 @@ public:
     fg::decals::OverlayManager* GetOverlayManager() const { return m_overlayManager.get(); }
 
 public:
+    struct Statistics
+    {
+        u32 l_total{ 0 };
+        u32 l_visible{ 0 };
+        u32 l_shadowed{ 0 };
+        u32 l_unshadowed{ 0 };
+        s32 s_used{ 0 };
+        s32 s_merged{ 0 };
+        s32 s_finalclip{ 0 };
+        u32 ic_total{ 0 };
+        u32 ic_culled{ 0 };
+
+        void FrameStart()
+        {
+            l_total = 0;
+            l_visible = 0;
+            l_shadowed = 0;
+            l_unshadowed = 0;
+            s_used = 0;
+            s_merged = 0;
+            s_finalclip = 0;
+            ic_total = 0;
+            ic_culled = 0;
+        }
+        void FrameEnd() {}
+    };
+
     CDB::MODEL* m_pRmPortals{ nullptr };
     xrXRC m_Sectors_xrc{ "render" };
     IRender_Sector::sector_id_t m_last_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
@@ -149,6 +178,9 @@ public:
     xr_vector<Fbox3> m_main_coarse_structure;
     fg::CDetailManager* m_pDetailManager{ nullptr };
     fg::CWallmarksEngine* m_pWallmarksEngine{ nullptr };
+    fg::CHOM m_HOM;
+    fg::R_occlusion m_HWOCC;
+    Statistics m_Stats;
 
 private:
     bool m_enabled = false;

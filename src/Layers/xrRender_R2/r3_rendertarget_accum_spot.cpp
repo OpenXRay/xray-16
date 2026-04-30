@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Layers/xrRender/du_cone.h"
+#include "r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::fg
 {
@@ -8,7 +10,7 @@ namespace xray::render::fg
 void CRenderTarget::accum_spot(CBackend& cmd_list, light* L)
 {
     phase_accumulator(cmd_list);
-    RImplementation.Stats.l_visible++;
+    RImplementation.m_framegraphRenderer->m_Stats.l_visible++;
 
     // *** assume accumulator already setup ***
     // *****************************	Mask by stencil		*************************************

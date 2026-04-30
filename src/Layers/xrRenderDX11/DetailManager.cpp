@@ -477,7 +477,7 @@ void CDetailManager::UpdateVisibleM()
                     }
                 }
 #ifndef _EDITOR
-                if (!RImplementation.HOM.visible(S.vis))
+                if (!RImplementation.m_framegraphRenderer->m_HOM.visible(S.vis))
                 {
                     continue; // invisible-occlusion
                 }
