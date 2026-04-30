@@ -295,8 +295,6 @@ public:
 
 public:
 
-    xr_vector<FSlideWindowItem>& SWIs = ::xray::render::fg::BufferPool.SWIs;
-
     struct CompiledLevelShader {
         shared_str shaderName;
         shared_str textureName;
@@ -327,19 +325,8 @@ public:
     xr_vector<CompiledLevelShader> CompiledLevelShaders;
 
     using VertexDeclarator = ::xray::render::fg::VertexDeclarator;
-    xr_vector<VertexDeclarator>&    nDC = ::xray::render::fg::BufferPool.nDC;
-    xr_vector<VertexDeclarator>&    xDC = ::xray::render::fg::BufferPool.xDC;
-    xr_vector<VertexStagingBuffer>& nVB = ::xray::render::fg::BufferPool.nVB;
-    xr_vector<VertexStagingBuffer>& xVB = ::xray::render::fg::BufferPool.xVB;
-    xr_vector<IndexStagingBuffer>&  nIB = ::xray::render::fg::BufferPool.nIB;
-    xr_vector<IndexStagingBuffer>&  xIB = ::xray::render::fg::BufferPool.xIB;
-    xr_vector<dxRender_Visual*>&    Visuals = ::xray::render::fg::BufferPool.Visuals;
 
 
-
-
-
-    bool& m_fast_geom_loaded = ::xray::render::fg::BufferPool.fastGeomLoaded;
 
 private:
     // Loading / Unloading
@@ -423,7 +410,7 @@ public:
     [[nodiscard]]
     bool IsFastGeomSupported() const
     {
-        return m_fast_geom_loaded;
+        return BufferPool.fastGeomLoaded;
     }
 
     // Loading / Unloading

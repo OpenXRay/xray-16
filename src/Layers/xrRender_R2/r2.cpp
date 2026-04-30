@@ -827,9 +827,9 @@ IRenderVisual* CRender::getVisual(int id) { return BufferPool.getVisual(id); }
 
 u32 CRender::GetVertexStride(u32 vertexFormatID)
 {
-    if (vertexFormatID >= nDC.size())
+    if (vertexFormatID >= BufferPool.nDC.size())
         return 0;
-    const VertexDeclarator& decl = nDC[vertexFormatID];
+    const VertexDeclarator& decl = BufferPool.nDC[vertexFormatID];
     return GetDeclVertexSize(decl.begin(), 0);
 }
 
@@ -965,7 +965,7 @@ bool CRender::CreatePrecompiledPSO(
     psoDesc.VS = compiled.vsHandle;
     psoDesc.PS = compiled.psHandle;
 
-    const VertexDeclarator& decl = nDC[vertexFormatID];
+    const VertexDeclarator& decl = BufferPool.nDC[vertexFormatID];
     u32 vb_stride = GetVertexStride(vertexFormatID);
 
     xr_vector<nvrhi::VertexAttributeDesc> attributes;
