@@ -62,10 +62,13 @@
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "FrameGraphPasses/ImGuiPassSetup.h"
 #include "FrameGraphPasses/RainPassSetup.h"
+#include "FrameGraphPasses/ThunderboltPassSetup.h"
 #include "FrameGraphPasses/PathTracerPassSetup.h"
 #include "Layers/xrRender/fgRainRender.h"
+#include "Layers/xrRender/fgThunderboltRender.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/Rain.h"
+#include "xrEngine/thunderbolt.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
@@ -1651,6 +1654,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                     sceneColor,
                     transparentOutputs.depth,
                     fgRain);
+            }
+        }
+    }
+
+    if (g_pGamePersistent && g_pGamePersistent->Environment().eff_Thunderbolt)
+    {
+        auto* effTB = g_pGamePersistent->Environment().eff_Thunderbolt;
+        effTB->Render();
+        if (auto* fgTB = dynamic_cast<FGThunderboltRender*>(effTB->GetRenderer()))
+        {
+            if (fgTB->HasWork())
+            {
+                sceneColor = passes::setupThunderboltPass(
+                    *m_framegraph,
+                    sceneColor,
+                    transparentOutputs.depth,
+                    fgTB);
             }
         }
     }
