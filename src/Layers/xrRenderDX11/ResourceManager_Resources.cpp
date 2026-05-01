@@ -94,7 +94,7 @@ void CResourceManager::_DeleteConstantTable(const R_constant_table* C)
     Msg("! ERROR: Failed to find compiled constant-table");
 }
 
-CRT* CResourceManager::_CreateRT(LPCSTR, u32, u32, D3DFORMAT, u32, u32, Flags32)
+CRT* CResourceManager::_CreateRT(LPCSTR, u32, u32, nvrhi::Format, u32, u32, Flags32)
 {
     return nullptr;
 }
