@@ -176,7 +176,7 @@
     <ClInclude Include="Light_DB.h"/>
     <ClInclude Include="Light_Package.h"/>
     <ClInclude Include="ModelPool.h"/>
-    <ClInclude Include="NVRHIUIRenderer.h"/>
+    <ClInclude Include="fgUIRender.h"/>
     <ClInclude Include="NvTriStrip.h"/>
     <ClInclude Include="NvTriStripObjects.h"/>
     <ClInclude Include="occRasterizer.h"/>
@@ -224,7 +224,6 @@
     <ClInclude Include="tss.h"/>
     <ClInclude Include="tss_def.h"/>
     <ClInclude Include="UIGeometryBatch.h"/>
-    <ClInclude Include="UIRenderCollector.h"/>
     <ClInclude Include="Utils\dxHashHelper.h"/>
     <ClInclude Include="VertexCache.h"/>
     <ClInclude Include="WallmarksEngine.h"/>
@@ -429,7 +428,7 @@
     <ClCompile Include="Light_DB.cpp"/>
     <ClCompile Include="Light_Package.cpp"/>
     <ClCompile Include="ModelPool.cpp"/>
-    <ClCompile Include="NVRHIUIRenderer.cpp"/>
+    <ClCompile Include="fgUIRender.cpp"/>
     <ClCompile Include="NvTriStrip.cpp"/>
     <ClCompile Include="NvTriStripObjects.cpp"/>
     <ClCompile Include="ParticleEffect.cpp"/>
@@ -465,7 +464,6 @@
     <ClCompile Include="SkeletonXSkinXW_SSE.cpp"/>
     <ClCompile Include="stats_manager.cpp"/>
     <ClCompile Include="TextureDescrManager.cpp"/>
-    <ClCompile Include="UIRenderCollector.cpp"/>
     <ClCompile Include="Utils\dxHashHelper.cpp"/>
     <ClCompile Include="VertexCache.cpp"/>
     <ClCompile Include="xrStripify.cpp"/>

@@ -1,6 +1,8 @@
 // xrRender/FrameGraphPasses/UIPassSetup.cpp
 #include "stdafx.h"
+
 #include "UIPassSetup.h"
+
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
@@ -9,8 +11,7 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
-#include "Layers/xrRender/UIRenderCollector.h"
-#include "Layers/xrRender/NVRHIUIRenderer.h"
+#include "Layers/xrRender/fgUIRender.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/GameFont.h"
@@ -98,11 +99,10 @@ framegraph::VirtualResourceHandle setupUIPass(
 
             // Get UI infrastructure from FrameGraphRenderer
             auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
-            auto* uiCollector = fgRenderer->GetUICollector();
-            auto* uiRenderer = fgRenderer->GetUIRenderer();
+            auto* uiRender = fgRenderer->GetUIRender();
             auto* uiMatCache = fgRenderer->GetUIMaterialCache();
 
-            if (!uiCollector || !uiRenderer || !uiMatCache) {
+            if (!uiRender || !uiMatCache) {
                 Msg("! [UIPass] UI infrastructure not initialized");
                 return;
             }
@@ -115,12 +115,12 @@ framegraph::VirtualResourceHandle setupUIPass(
             }
             g_pGamePersistent->OnRenderSequencers();
 
-            if (!uiCollector->GetBatches().empty()) {
+            if (!uiRender->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
 
                 // Upload static_globals using FGConstantSystem (type-safe, automatic VCB lookup)
-                for (const auto& batch : uiCollector->GetBatches()) {
+                for (const auto& batch : uiRender->GetBatches()) {
                     if (batch.uiShader && uiMatCache) {
                         MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(
                             batch.uiShader,
@@ -137,7 +137,7 @@ framegraph::VirtualResourceHandle setupUIPass(
                     }
                 }
 
-                uiRenderer->RenderBatches(cmdList, uiCollector->GetBatches(), framebuffer, data.width, data.height);
+                uiRender->Draw(cmdList, framebuffer, data.width, data.height);
             }
         }
     );
@@ -505,19 +505,18 @@ framegraph::VirtualResourceHandle setupCursorPass(
 
             // Get UI infrastructure from FrameGraphRenderer
             auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
-            auto* uiCollector = fgRenderer->GetUICollector();
-            auto* uiRenderer = fgRenderer->GetUIRenderer();
+            auto* uiRender = fgRenderer->GetUIRender();
             auto* uiMatCache = fgRenderer->GetUIMaterialCache();
 
-            if (!uiCollector || !uiRenderer || !uiMatCache) {
+            if (!uiRender || !uiMatCache) {
                 Msg("! [CursorPass] UI infrastructure not initialized");
                 return;
             }
 
             // Collect cursor geometry
             IUIRender* oldRenderer = GEnv.UIRender;
-            uiCollector->Clear();
-            GEnv.UIRender = uiCollector;
+            uiRender->Clear();
+            GEnv.UIRender = uiRender;
 
             // Call cursor rendering callback
             g_pGamePersistent->OnRenderCursor();
@@ -525,12 +524,12 @@ framegraph::VirtualResourceHandle setupCursorPass(
             GEnv.UIRender = oldRenderer;
 
             // Render cursor batches if any were collected
-            if (!uiCollector->GetBatches().empty()) {
+            if (!uiRender->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
 
                 // Upload static_globals using FGConstantSystem (type-safe, automatic VCB lookup)
-                for (const auto& batch : uiCollector->GetBatches()) {
+                for (const auto& batch : uiRender->GetBatches()) {
                     if (batch.uiShader && uiMatCache) {
                         MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(
                             batch.uiShader,
@@ -547,7 +546,7 @@ framegraph::VirtualResourceHandle setupCursorPass(
                     }
                 }
 
-                uiRenderer->RenderBatches(cmdList, uiCollector->GetBatches(), framebuffer, data.width, data.height);
+                uiRender->Draw(cmdList, framebuffer, data.width, data.height);
             }
         }
     );

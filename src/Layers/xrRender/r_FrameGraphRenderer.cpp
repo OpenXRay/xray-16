@@ -20,8 +20,7 @@
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
-#include "Layers/xrRender/UIRenderCollector.h"
-#include "Layers/xrRender/NVRHIUIRenderer.h"
+#include "Layers/xrRender/fgUIRender.h"
 #include "Layers/xrRender/ShaderKey.h"
 #include "xrEngine/CustomHUD.h"
 #include "ImGuiRendererNVRHI.h"
@@ -251,8 +250,7 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
         device->GetFGResourceManager(),
         m_uiVCBPool.get()
     );
-    m_uiCollector = xr_make_unique<ui::UIRenderCollector>();
-    m_uiRenderer = xr_make_unique<ui::NVRHIUIRenderer>();
+    m_uiRender = xr_make_unique<fg::FGUIRender>();
     m_textVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
     m_textMaterialCache = xr_make_unique<MaterialCache>(
         device,
@@ -278,7 +276,7 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     fg::ClusteredLightManager::Instance().Initialize(m_device);
     Msg("* [FrameGraphRenderer] Bindless material buffers initialized (early)");
 
-    m_uiRenderer->Initialize(device, m_uiMaterialCache.get());
+    m_uiRender->Initialize(device, m_uiMaterialCache.get());
     m_decalManager->Initialize(device);
     m_overlayManager->Initialize(device);
     m_rtAccelMgr->Initialize(device);
@@ -346,8 +344,7 @@ void FrameGraphRenderer::Shutdown() {
     m_renderContext = nullptr;
     m_geometryCollector = nullptr;
     m_materialCache = nullptr;
-    m_uiRenderer = nullptr;
-    m_uiCollector = nullptr;
+    m_uiRender = nullptr;
     m_uiMaterialCache = nullptr;
     m_uiVCBPool = nullptr;
     m_textMaterialCache = nullptr;
@@ -3105,7 +3102,7 @@ void FrameGraphRenderer::create()
     CreateQuadIB();
 
     InitializeImGuiRenderer(m_device);
-    GEnv.UIRender = GetUICollector();
+    GEnv.UIRender = GetUIRender();
 
     MaterialSystem::Instance().Initialize(m_device->GetFGResourceManager(), GetShaderLoader());
 

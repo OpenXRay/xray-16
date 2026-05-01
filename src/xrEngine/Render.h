@@ -30,8 +30,7 @@ namespace xray::render::framegraph { class ShaderLoader; }
 namespace xray::render
 {
     class MaterialCache;
-    namespace fg { class RenderDevice; class ImGuiRendererNVRHI; }
-    namespace ui { class UIRenderCollector; class NVRHIUIRenderer; }
+    namespace fg { class RenderDevice; class ImGuiRendererNVRHI; class FGUIRender; }
 }
 
 #ifndef _EDITOR
@@ -416,8 +415,7 @@ public:
     virtual xray::render::fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return nullptr; }
     virtual xray::render::MaterialCache* GetMaterialCache() const { return nullptr; }
     virtual xray::render::MaterialCache* GetUIMaterialCache() const { return nullptr; }
-    virtual xray::render::ui::UIRenderCollector* GetUICollector() const { return nullptr; }
-    virtual xray::render::ui::NVRHIUIRenderer* GetUIRenderer() const { return nullptr; }
+    virtual xray::render::fg::FGUIRender* GetUIRender() const { return nullptr; }
     virtual xray::render::MaterialCache* GetTextMaterialCache() const { return nullptr; }
     virtual void UpdateSmokeTrail(const Fvector&, const Fvector&, float, bool) {}
     virtual void NotifySmokeShot() {}
