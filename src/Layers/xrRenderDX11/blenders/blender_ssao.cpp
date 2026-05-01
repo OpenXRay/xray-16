@@ -40,9 +40,9 @@ void CBlender_SSAO_noMSAA::Compile(CBlender_Compile& C)
     {
     case 0:
         C.r_Pass("combine_1", "ssao_calc_nomsaa", FALSE, FALSE, FALSE);
-        C.r_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, 0xFF);
+        C.r_Stencil(TRUE, nvrhi::ComparisonFunc::LessOrEqual, 0xFF);
         C.r_StencilRef(0x01);
-        C.r_CullMode(D3D_CULL_NONE);
+        C.r_CullMode(nvrhi::RasterCullMode::None);
 
 #if RENDER == R_GL
         C.r_Sampler_rtf("s_position", r2_RT_P);
@@ -67,7 +67,7 @@ void CBlender_SSAO_noMSAA::Compile(CBlender_Compile& C)
         break;
     case 1:
         C.r_Pass("combine_1", "depth_downs", FALSE, FALSE, FALSE);
-        C.r_CullMode(D3D_CULL_NONE);
+        C.r_CullMode(nvrhi::RasterCullMode::None);
 
 #if RENDER == R_GL
         C.r_Sampler_rtf("s_position", r2_RT_P);
@@ -100,9 +100,9 @@ void CBlender_SSAO_MSAA::Compile(CBlender_Compile& C)
     {
     case 0:
         C.r_Pass("combine_1", "ssao_calc_msaa", FALSE, FALSE, FALSE);
-        C.r_Stencil(TRUE, D3D_COMPARISON_EQUAL, 0x81);
+        C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Equal, 0x81);
         C.r_StencilRef(0x81);
-        C.r_CullMode(D3D_CULL_NONE);
+        C.r_CullMode(nvrhi::RasterCullMode::None);
 
 #if RENDER == R_GL
         C.r_Sampler_rtf("s_position", r2_RT_P);

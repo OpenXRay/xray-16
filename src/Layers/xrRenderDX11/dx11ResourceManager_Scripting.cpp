@@ -85,109 +85,109 @@ public:
     adopt_sampler& _clamp()
     {
         if (C)
-            C->i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
+            C->i_Address(stage, nvrhi::SamplerAddressMode::Clamp);
         return *this;
     }
     adopt_sampler& _wrap()
     {
         if (C)
-            C->i_Address(stage, D3D_TEXTURE_ADDRESS_WRAP);
+            C->i_Address(stage, nvrhi::SamplerAddressMode::Wrap);
         return *this;
     }
     adopt_sampler& _mirror()
     {
         if (C)
-            C->i_Address(stage, D3D_TEXTURE_ADDRESS_MIRROR);
+            C->i_Address(stage, nvrhi::SamplerAddressMode::Mirror);
         return *this;
     }
     adopt_sampler& _f_anisotropic()
     {
         if (C)
-            C->i_Filter(stage, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC);
+            C->i_Filter(stage, SamplerFilter::Anisotropic, SamplerFilter::Linear, SamplerFilter::Anisotropic);
         return *this;
     }
     adopt_sampler& _f_trilinear()
     {
         if (C)
-            C->i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR);
+            C->i_Filter(stage, SamplerFilter::Linear, SamplerFilter::Linear, SamplerFilter::Linear);
         return *this;
     }
     adopt_sampler& _f_bilinear()
     {
         if (C)
-            C->i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_POINT, D3D_TEXF_LINEAR);
+            C->i_Filter(stage, SamplerFilter::Linear, SamplerFilter::Point, SamplerFilter::Linear);
         return *this;
     }
     adopt_sampler& _f_linear()
     {
         if (C)
-            C->i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
+            C->i_Filter(stage, SamplerFilter::Linear, SamplerFilter::Point, SamplerFilter::Linear);
         return *this;
     }
     adopt_sampler& _f_none()
     {
         if (C)
-            C->i_Filter(stage, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
+            C->i_Filter(stage, SamplerFilter::Point, SamplerFilter::Point, SamplerFilter::Point);
         return *this;
     }
     adopt_sampler& _fmin_none()
     {
         if (C)
-            C->i_Filter_Min(stage, D3D_TEXF_NONE);
+            C->i_Filter_Min(stage, SamplerFilter::Point);
         return *this;
     }
     adopt_sampler& _fmin_point()
     {
         if (C)
-            C->i_Filter_Min(stage, D3D_TEXF_POINT);
+            C->i_Filter_Min(stage, SamplerFilter::Point);
         return *this;
     }
     adopt_sampler& _fmin_linear()
     {
         if (C)
-            C->i_Filter_Min(stage, D3D_TEXF_LINEAR);
+            C->i_Filter_Min(stage, SamplerFilter::Linear);
         return *this;
     }
     adopt_sampler& _fmin_aniso()
     {
         if (C)
-            C->i_Filter_Min(stage, D3D_TEXF_ANISOTROPIC);
+            C->i_Filter_Min(stage, SamplerFilter::Anisotropic);
         return *this;
     }
     adopt_sampler& _fmip_none()
     {
         if (C)
-            C->i_Filter_Mip(stage, D3D_TEXF_NONE);
+            C->i_Filter_Mip(stage, SamplerFilter::Point);
         return *this;
     }
     adopt_sampler& _fmip_point()
     {
         if (C)
-            C->i_Filter_Mip(stage, D3D_TEXF_POINT);
+            C->i_Filter_Mip(stage, SamplerFilter::Point);
         return *this;
     }
     adopt_sampler& _fmip_linear()
     {
         if (C)
-            C->i_Filter_Mip(stage, D3D_TEXF_LINEAR);
+            C->i_Filter_Mip(stage, SamplerFilter::Linear);
         return *this;
     }
     adopt_sampler& _fmag_none()
     {
         if (C)
-            C->i_Filter_Mag(stage, D3D_TEXF_NONE);
+            C->i_Filter_Mag(stage, SamplerFilter::Point);
         return *this;
     }
     adopt_sampler& _fmag_point()
     {
         if (C)
-            C->i_Filter_Mag(stage, D3D_TEXF_POINT);
+            C->i_Filter_Mag(stage, SamplerFilter::Point);
         return *this;
     }
     adopt_sampler& _fmag_linear()
     {
         if (C)
-            C->i_Filter_Mag(stage, D3D_TEXF_LINEAR);
+            C->i_Filter_Mag(stage, SamplerFilter::Linear);
         return *this;
     }
 };
@@ -254,7 +254,7 @@ public:
     }
     adopt_compiler& _blend(bool _blend, u32 abSRC, u32 abDST)
     {
-        C->PassSET_ablend_mode(_blend, abSRC, abDST);
+        C->PassSET_ablend_mode(_blend, static_cast<nvrhi::BlendFactor>(abSRC), static_cast<nvrhi::BlendFactor>(abDST));
         return *this;
     }
     adopt_compiler& _aref(bool _aref, u32 aref)
@@ -286,7 +286,8 @@ public:
     }
     adopt_compiler& _dx10Stencil(bool Enable, u32 Func, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
     {
-        C->r_Stencil(Enable, Func, Mask, WriteMask, Fail, Pass, ZFail);
+        C->r_Stencil(Enable, static_cast<nvrhi::ComparisonFunc>(Func), Mask, WriteMask,
+            static_cast<nvrhi::StencilOp>(Fail), static_cast<nvrhi::StencilOp>(Pass), static_cast<nvrhi::StencilOp>(ZFail));
         return *this;
     }
     adopt_compiler& _dx10StencilRef(u32 Ref)
@@ -296,17 +297,17 @@ public:
     }
     adopt_compiler& _dx10CullMode(u32 Ref)
     {
-        C->r_CullMode((D3D_CULL_MODE)Ref);
+        C->r_CullMode(static_cast<nvrhi::RasterCullMode>(Ref));
         return *this;
     }
     adopt_compiler& _dx10ATOC(bool Enable)
     {
-        C->RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, Enable);
+        C->RS.SetAlphaToCoverage(Enable);
         return *this;
     }
     adopt_compiler& _dx10ZFunc(u32 Func)
     {
-        C->RS.SetRS(D3DRS_ZFUNC, Func);
+        C->RS.SetDepthFunc(static_cast<nvrhi::ComparisonFunc>(Func));
         return *this;
     }
 
@@ -399,43 +400,43 @@ void CResourceManager::LS_Load()
             class_<adopt_blend>("blend")
                 .enum_("blend")
                 [
-                    value("zero",         int(D3D_BLEND_ZERO)),
-                    value("one",          int(D3D_BLEND_ONE)),
-                    value("srccolor",     int(D3D_BLEND_SRC_COLOR)),
-                    value("invsrccolor",  int(D3D_BLEND_INV_SRC_COLOR)),
-                    value("srcalpha",     int(D3D_BLEND_SRC_ALPHA)),
-                    value("invsrcalpha",  int(D3D_BLEND_INV_SRC_ALPHA)),
-                    value("destalpha",    int(D3D_BLEND_DEST_ALPHA)),
-                    value("invdestalpha", int(D3D_BLEND_INV_DEST_ALPHA)),
-                    value("destcolor",    int(D3D_BLEND_DEST_COLOR)),
-                    value("invdestcolor", int(D3D_BLEND_INV_DEST_COLOR)),
-                    value("srcalphasat",  int(D3D_BLEND_SRC_ALPHA_SAT))
+                    value("zero",         int(nvrhi::BlendFactor::Zero)),
+                    value("one",          int(nvrhi::BlendFactor::One)),
+                    value("srccolor",     int(nvrhi::BlendFactor::SrcColor)),
+                    value("invsrccolor",  int(nvrhi::BlendFactor::InvSrcColor)),
+                    value("srcalpha",     int(nvrhi::BlendFactor::SrcAlpha)),
+                    value("invsrcalpha",  int(nvrhi::BlendFactor::InvSrcAlpha)),
+                    value("destalpha",    int(nvrhi::BlendFactor::DstAlpha)),
+                    value("invdestalpha", int(nvrhi::BlendFactor::InvDstAlpha)),
+                    value("destcolor",    int(nvrhi::BlendFactor::DstColor)),
+                    value("invdestcolor", int(nvrhi::BlendFactor::InvDstColor)),
+                    value("srcalphasat",  int(nvrhi::BlendFactor::SrcAlphaSaturate))
                 ],
 
             class_<adopt_cmp_func>("cmp_func")
                 .enum_("cmp_func")
                 [
-                    value("never",        int(D3D_COMPARISON_NEVER)),
-                    value("less",         int(D3D_COMPARISON_LESS)),
-                    value("equal",        int(D3D_COMPARISON_EQUAL)),
-                    value("lessequal",    int(D3D_COMPARISON_LESS_EQUAL)),
-                    value("greater",      int(D3D_COMPARISON_GREATER)),
-                    value("notequal",     int(D3D_COMPARISON_NOT_EQUAL)),
-                    value("greaterequal", int(D3D_COMPARISON_GREATER_EQUAL)),
-                    value("always",       int(D3D_COMPARISON_ALWAYS))
+                    value("never",        int(nvrhi::ComparisonFunc::Never)),
+                    value("less",         int(nvrhi::ComparisonFunc::Less)),
+                    value("equal",        int(nvrhi::ComparisonFunc::Equal)),
+                    value("lessequal",    int(nvrhi::ComparisonFunc::LessOrEqual)),
+                    value("greater",      int(nvrhi::ComparisonFunc::Greater)),
+                    value("notequal",     int(nvrhi::ComparisonFunc::NotEqual)),
+                    value("greaterequal", int(nvrhi::ComparisonFunc::GreaterOrEqual)),
+                    value("always",       int(nvrhi::ComparisonFunc::Always))
                 ],
 
             class_<adopt_stencil_op>("stencil_op")
                 .enum_("stencil_op")
                 [
-                    value("keep",    int(D3D_STENCIL_OP_KEEP)),
-                    value("zero",    int(D3D_STENCIL_OP_ZERO)),
-                    value("replace", int(D3D_STENCIL_OP_REPLACE)),
-                    value("incrsat", int(D3D_STENCIL_OP_INCR_SAT)),
-                    value("decrsat", int(D3D_STENCIL_OP_DECR_SAT)),
-                    value("invert",  int(D3D_STENCIL_OP_INVERT)),
-                    value("incr",    int(D3D_STENCIL_OP_INCR)),
-                    value("decr",    int(D3D_STENCIL_OP_DECR))
+                    value("keep",    int(nvrhi::StencilOp::Keep)),
+                    value("zero",    int(nvrhi::StencilOp::Zero)),
+                    value("replace", int(nvrhi::StencilOp::Replace)),
+                    value("incrsat", int(nvrhi::StencilOp::IncrementAndClamp)),
+                    value("decrsat", int(nvrhi::StencilOp::DecrementAndClamp)),
+                    value("invert",  int(nvrhi::StencilOp::Invert)),
+                    value("incr",    int(nvrhi::StencilOp::IncrementAndWrap)),
+                    value("decr",    int(nvrhi::StencilOp::DecrementAndWrap))
                 ]
         ];
     };

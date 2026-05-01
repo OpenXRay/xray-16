@@ -57,7 +57,7 @@ struct VertexElement
 };
 static_assert(sizeof(VertexElement) == 8, "VertexElement OGF disk-format size");
 
-#define XR_VERTEX_ELEMENT_END {0xFF, 0, VF_UNUSED, 0, 0, 0}
+#define XR_VERTEX_ELEMENT_END {0xFF, 0, ::xray::render::fg::VF_UNUSED, 0, 0, 0}
 
 nvrhi::Format ToNvrhiFormat(u32 vertexFormat);
 const char*   ToSemanticName(u32 vertexSemantic);

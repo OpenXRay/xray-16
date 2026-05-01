@@ -19,7 +19,7 @@ void R_xforms::set_W(const Fmatrix& m)
     m_bInvWValid = false;
     if (c_invw)
         apply_invw();
-    cmd_list.set_xform(D3DTS_WORLD, m);
+    cmd_list.set_xform(256u, m);
 }
 void R_xforms::set_V(const Fmatrix& m)
 {
@@ -35,7 +35,7 @@ void R_xforms::set_V(const Fmatrix& m)
         cmd_list.set_c(c_wv, m_wv);
     if (c_wvp)
         cmd_list.set_c(c_wvp, m_wvp);
-    cmd_list.set_xform(D3DTS_VIEW, m);
+    cmd_list.set_xform(2u, m);
 }
 void R_xforms::set_P(const Fmatrix& m)
 {
@@ -48,7 +48,7 @@ void R_xforms::set_P(const Fmatrix& m)
         cmd_list.set_c(c_vp, m_vp);
     if (c_wvp)
         cmd_list.set_c(c_wvp, m_wvp);
-    cmd_list.set_xform(D3DTS_PROJECTION, m);
+    cmd_list.set_xform(3u, m);
 }
 
 void R_xforms::apply_invw()

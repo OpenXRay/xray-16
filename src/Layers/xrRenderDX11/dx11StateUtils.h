@@ -4,14 +4,6 @@ namespace xray::render::fg
 {
 namespace dx11StateUtils
 {
-D3D_FILL_MODE ConvertFillMode(D3D_FILL_MODE Mode);
-D3D_CULL_MODE ConvertCullMode(D3D_CULL_MODE Mode);
-D3D_COMPARISON_FUNC ConvertCmpFunction(D3D_COMPARISON_FUNC Func);
-D3D_STENCIL_OP ConvertStencilOp(D3D_STENCIL_OP Op);
-D3D_BLEND ConvertBlendArg(D3D_BLEND Arg);
-D3D_BLEND_OP ConvertBlendOp(D3D_BLEND_OP Op);
-D3D_TEXTURE_ADDRESS_MODE ConvertTextureAddressMode(D3D_TEXTURE_ADDRESS_MODE Mode);
-
 //	Set description to default values
 void ResetDescription(D3D_RASTERIZER_DESC& desc);
 void ResetDescription(D3D_DEPTH_STENCIL_DESC& desc);

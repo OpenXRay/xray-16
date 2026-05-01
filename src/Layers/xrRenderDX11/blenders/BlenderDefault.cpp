@@ -82,8 +82,6 @@ void CBlender_default::CompileFFP(CBlender_Compile& C) const
             C.PassSET_LightFog(true, true);
 
             C.StageBegin();
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
             C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
             C.StageEnd();
         }
@@ -110,8 +108,6 @@ void CBlender_default::CompileFFP(CBlender_Compile& C) const
                 }
 
                 C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
                 C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
                 C.StageEnd();
             }
@@ -194,7 +190,7 @@ void CBlender_default::CompileProgrammable(CBlender_Compile& C) const
             C.PassSET_Shaders("lmap_point", "add_point");
 
             C.PassSET_ZB(true, false);
-            C.PassSET_ablend_mode(true, D3D_BLEND_ONE, D3D_BLEND_ONE);
+            C.PassSET_ablend_mode(true, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
             C.PassSET_ablend_aref(true, 0);
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);
@@ -212,7 +208,7 @@ void CBlender_default::CompileProgrammable(CBlender_Compile& C) const
             C.PassSET_Shaders("lmap_spot", "add_spot");
 
             C.PassSET_ZB(true, false);
-            C.PassSET_ablend_mode(true, D3D_BLEND_ONE, D3D_BLEND_ONE);
+            C.PassSET_ablend_mode(true, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
             C.PassSET_ablend_aref(true, 0);
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);

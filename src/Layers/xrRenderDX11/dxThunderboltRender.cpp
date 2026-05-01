@@ -92,14 +92,14 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
     RCache.set_Shader(((dxFlareRender*)&*owner.current->m_GradientTop->m_pFlare)->hShader);
 #if defined(USE_DX11)
     RCache.set_Z(TRUE);
-    RCache.set_ZFunc(D3D_COMPARISON_LESS_EQUAL);
+    RCache.set_ZFunc(static_cast<u32>(nvrhi::ComparisonFunc::LessOrEqual));
 #endif
     RCache.Render(D3D_PT_TRIANGLELIST, VS_Offset, 0, 4, 0, 2);
 
     RCache.set_Shader(((dxFlareRender*)&*owner.current->m_GradientCenter->m_pFlare)->hShader);
 #if defined(USE_DX11)
     RCache.set_Z(TRUE);
-    RCache.set_ZFunc(D3D_COMPARISON_LESS_EQUAL);
+    RCache.set_ZFunc(static_cast<u32>(nvrhi::ComparisonFunc::LessOrEqual));
 #endif
     RCache.Render(D3D_PT_TRIANGLELIST, VS_Offset + 4, 0, 4, 0, 2);
 }

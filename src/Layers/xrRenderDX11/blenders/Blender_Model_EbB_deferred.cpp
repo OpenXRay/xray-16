@@ -56,9 +56,9 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
         case 0:
         case 1:
             vsname = psname = "model_env_lq";
-            C.r_Pass(vsname, psname, TRUE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, 0);
+            C.r_Pass(vsname, psname, TRUE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE, 0);
             C.r_Sampler("s_base", C.L_textures[0]);
-            C.r_Sampler("s_env", oT2_Name, false, D3D_TEXTURE_ADDRESS_CLAMP);
+            C.r_Sampler("s_env", oT2_Name, false, nvrhi::SamplerAddressMode::Clamp);
             C.r_End();
             break;
         }
@@ -98,9 +98,9 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
         case 0:
         case 1:
             vsname = psname = "model_env_lq";
-            C.r_Pass(vsname, psname, TRUE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, 0);
+            C.r_Pass(vsname, psname, TRUE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE, 0);
             C.r_Sampler			("s_base",	C.L_textures[0]);
-            C.r_Sampler			("s_env",	oT2_Name,false,D3D_TEXTURE_ADDRESS_CLAMP);
+            C.r_Sampler			("s_env",	oT2_Name,false,nvrhi::SamplerAddressMode::Clamp);
             C.r_End();
             break;
         }
@@ -111,13 +111,13 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
         {
         case SE_R2_NORMAL_HQ:
             uber_deffer(C, true, "model", "base", false, 0, true);
-            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+            C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
             C.r_StencilRef(0x01);
             C.r_End();
             break;
         case SE_R2_NORMAL_LQ:
             uber_deffer(C, false, "model", "base", false, 0, true);
-            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+            C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
             C.r_StencilRef(0x01);
             C.r_End();
             break;
@@ -143,7 +143,7 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
         case 0:
         case 1:
             vsname = psname = "model_env_lq";
-            C.r_Pass(vsname, psname, TRUE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, 0);
+            C.r_Pass(vsname, psname, TRUE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE, 0);
             C.r_dx11Texture("s_base", C.L_textures[0]);
             C.r_dx11Texture("s_env", oT2_Name);
 
@@ -159,13 +159,13 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
         {
         case SE_R2_NORMAL_HQ:
             uber_deffer(C, true, "model", "base", false, 0, true);
-            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+            C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
             C.r_StencilRef(0x01);
             C.r_End();
             break;
         case SE_R2_NORMAL_LQ:
             uber_deffer(C, false, "model", "base", false, 0, true);
-            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+            C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
             C.r_StencilRef(0x01);
             C.r_End();
             break;

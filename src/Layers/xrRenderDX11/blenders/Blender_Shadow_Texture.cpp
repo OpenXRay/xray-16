@@ -33,14 +33,11 @@ void CBlender_ShTex::Compile(CBlender_Compile& C)
         C.PassSET_LightFog(FALSE, FALSE);
 
         C.StageBegin();
-        C.StageSET_Color(D3DTA_TFACTOR, D3DTOP_SELECTARG1, D3DTA_TFACTOR);
-        C.StageSET_Alpha(D3DTA_TFACTOR, D3DTOP_SELECTARG1, D3DTA_TFACTOR);
         C.Stage_Texture("$null");
         C.Stage_Matrix("$null", 0);
         C.Stage_Constant("$null");
         C.StageEnd();
 
-        C.R().SetRS(D3DRS_TEXTUREFACTOR, 0);
     }
     C.PassEnd();
 }

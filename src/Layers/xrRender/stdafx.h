@@ -10,11 +10,6 @@
 
 #include "xrParticles/psystem.h"
 
-#ifdef _DEBUG
-#define D3D_DEBUG_INFO
-#endif
-#include <D3D9.h>
-
 #include <D3D11.h>
 #include <D3DCompiler.h>
 

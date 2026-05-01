@@ -43,69 +43,69 @@ inline s16 s16_tc_lmap(float uv) // [-1 .. +1]
     return s16(t);
 }
 
-constexpr D3DVERTEXELEMENT9 r1_decl_lmap[] = // 12+4+4+4+4+4 = 32
+constexpr xray::render::fg::VertexElement r1_decl_lmap[] =
 {
-    { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-    { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
-    { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0 },
-    { 0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0 },
-    { 0, 24, D3DDECLTYPE_SHORT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
-    { 0, 28, D3DDECLTYPE_SHORT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1 },
-    D3DDECL_END()
+    { 0, 0,  xray::render::fg::VF_FLOAT3, 0, xray::render::fg::VS_POSITION, 0 },
+    { 0, 12, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_NORMAL,   0 },
+    { 0, 16, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_TANGENT,  0 },
+    { 0, 20, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_BINORMAL, 0 },
+    { 0, 24, xray::render::fg::VF_SHORT2, 0, xray::render::fg::VS_TEXCOORD, 0 },
+    { 0, 28, xray::render::fg::VF_SHORT2, 0, xray::render::fg::VS_TEXCOORD, 1 },
+    XR_VERTEX_ELEMENT_END
 };
 
-constexpr D3DVERTEXELEMENT9 r1_decl_lmap_unpacked[] = // 12+4+8+8 = 32
+constexpr xray::render::fg::VertexElement r1_decl_lmap_unpacked[] =
 {
-    { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-    { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
-    { 0, 16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
-    { 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1 },
-    D3DDECL_END()
+    { 0, 0,  xray::render::fg::VF_FLOAT3, 0, xray::render::fg::VS_POSITION, 0 },
+    { 0, 12, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_NORMAL,   0 },
+    { 0, 16, xray::render::fg::VF_FLOAT2, 0, xray::render::fg::VS_TEXCOORD, 0 },
+    { 0, 24, xray::render::fg::VF_FLOAT2, 0, xray::render::fg::VS_TEXCOORD, 1 },
+    XR_VERTEX_ELEMENT_END
 };
 
-constexpr D3DVERTEXELEMENT9 r1_decl_vert[] = // 12+4+4+4+4+4 = 32
+constexpr xray::render::fg::VertexElement r1_decl_vert[] =
 {
-    { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-    { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
-    { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0 },
-    { 0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0 },
-    { 0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
-    { 0, 28, D3DDECLTYPE_SHORT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
-    D3DDECL_END()
+    { 0, 0,  xray::render::fg::VF_FLOAT3, 0, xray::render::fg::VS_POSITION, 0 },
+    { 0, 12, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_NORMAL,   0 },
+    { 0, 16, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_TANGENT,  0 },
+    { 0, 20, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_BINORMAL, 0 },
+    { 0, 24, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_COLOR,    0 },
+    { 0, 28, xray::render::fg::VF_SHORT2, 0, xray::render::fg::VS_TEXCOORD, 0 },
+    XR_VERTEX_ELEMENT_END
 };
 
-constexpr D3DVERTEXELEMENT9 r1_decl_vert_unpacked[] = // 12+4+4+8 = 28
+constexpr xray::render::fg::VertexElement r1_decl_vert_unpacked[] =
 {
-    { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-    { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
-    { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
-    { 0, 20, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
-    D3DDECL_END()
+    { 0, 0,  xray::render::fg::VF_FLOAT3, 0, xray::render::fg::VS_POSITION, 0 },
+    { 0, 12, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_NORMAL,   0 },
+    { 0, 16, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_COLOR,    0 },
+    { 0, 20, xray::render::fg::VF_FLOAT2, 0, xray::render::fg::VS_TEXCOORD, 0 },
+    XR_VERTEX_ELEMENT_END
 };
 
-constexpr D3DVERTEXELEMENT9 x_decl_vert[] = // 12
+constexpr xray::render::fg::VertexElement x_decl_vert[] =
 {
-    { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-    D3DDECL_END()
+    { 0, 0, xray::render::fg::VF_FLOAT3, 0, xray::render::fg::VS_POSITION, 0 },
+    XR_VERTEX_ELEMENT_END
 };
 
-constexpr D3DVERTEXELEMENT9 mu_model_decl[] = // 12+4+4+4+8 = 32
+constexpr xray::render::fg::VertexElement mu_model_decl[] =
 {
-    { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-    { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
-    { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0 },
-    { 0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0 },
-    { 0, 24, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
-    D3DDECL_END()
+    { 0, 0,  xray::render::fg::VF_FLOAT3, 0, xray::render::fg::VS_POSITION, 0 },
+    { 0, 12, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_NORMAL,   0 },
+    { 0, 16, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_TANGENT,  0 },
+    { 0, 20, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_BINORMAL, 0 },
+    { 0, 24, xray::render::fg::VF_SHORT4, 0, xray::render::fg::VS_TEXCOORD, 0 },
+    XR_VERTEX_ELEMENT_END
 };
 
-constexpr D3DVERTEXELEMENT9 mu_model_decl_unpacked[] = // 12+4+4+8 = 28
+constexpr xray::render::fg::VertexElement mu_model_decl_unpacked[] =
 {
-    { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-    { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
-    { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
-    { 0, 20, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
-    D3DDECL_END()
+    { 0, 0,  xray::render::fg::VF_FLOAT3, 0, xray::render::fg::VS_POSITION, 0 },
+    { 0, 12, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_NORMAL,   0 },
+    { 0, 16, xray::render::fg::VF_COLOR,  0, xray::render::fg::VS_COLOR,    0 },
+    { 0, 20, xray::render::fg::VF_FLOAT2, 0, xray::render::fg::VS_TEXCOORD, 0 },
+    XR_VERTEX_ELEMENT_END
 };
 #pragma pack(push, 1)
 struct x_vert

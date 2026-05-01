@@ -54,11 +54,11 @@ void CBackend::dbg_OverdrawEnd()
 {
 }
 
-void CBackend::dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2)
+void CBackend::dbg_SetRS(u32, u32)
 {
 }
 
-void CBackend::dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
+void CBackend::dbg_SetSS(u32, u32, u32)
 {
 }
 

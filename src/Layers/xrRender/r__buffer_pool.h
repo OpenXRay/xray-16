@@ -8,7 +8,7 @@ namespace xray::render::fg
 {
 class dxRender_Visual;
 
-typedef svector<VertexElement, MAXD3DDECLLENGTH + 1> VertexDeclarator;
+typedef svector<VertexElement, XR_MAX_DECL_LENGTH + 1> VertexDeclarator;
 
 struct R_buffer_pool
 {

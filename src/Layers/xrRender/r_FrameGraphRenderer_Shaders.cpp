@@ -152,13 +152,13 @@ public:
 
         *ppData = data;
         *pBytes = size;
-        return D3D_OK;
+        return S_OK;
     }
     HRESULT __stdcall Close(LPCVOID pData)
     {
         auto mutableData = const_cast<LPVOID>(pData);
         xr_free(mutableData);
-        return D3D_OK;
+        return S_OK;
     }
 };
 
