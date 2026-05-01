@@ -326,7 +326,6 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/dx11SH_Texture.cpp
     ../xrRenderDX11/dx11StateUtils.cpp
     ../xrRenderDX11/dx11Texture.cpp
-    ../xrRenderDX11/dx11TextureUtils.cpp
     ../xrRenderDX11/dx11r_constants.cpp
     ../xrRenderDX11/dx11r_constants_cache.cpp
 

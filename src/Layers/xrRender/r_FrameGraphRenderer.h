@@ -313,7 +313,7 @@ public:
         u32 HW_smap_PCF : 1;
         u32 HW_smap_FETCH4 : 1;
 
-        u32 HW_smap_FORMAT : 32;
+        nvrhi::Format HW_smap_FORMAT;
 
         u32 nvstencil : 1;
         u32 nvdbt : 1;

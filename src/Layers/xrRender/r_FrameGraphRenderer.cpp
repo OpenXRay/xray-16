@@ -2906,9 +2906,9 @@ void FrameGraphRenderer::create()
     if (o.HW_smap)
     {
         if (caps.id_vendor == 0x1002)
-            o.HW_smap_FORMAT = D3DFMT_D32F_LOCKABLE;
+            o.HW_smap_FORMAT = nvrhi::Format::D32;
         else
-            o.HW_smap_FORMAT = D3DFMT_D24X8;
+            o.HW_smap_FORMAT = nvrhi::Format::D24S8;
     }
 
     o.fp16_filter = true;

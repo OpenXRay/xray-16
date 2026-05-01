@@ -44,9 +44,6 @@ public:
 
     u32 iGPUNum;
 
-    // device format
-    D3DFORMAT fTarget;
-    D3DFORMAT fDepth;
     u32 dwRefreshRate;
 
     // caps itself

@@ -274,7 +274,6 @@
     <ClInclude Include="..\xrRenderDX11\dx11R_Backend_Runtime.h"/>
     <ClInclude Include="..\xrRenderDX11\dx11r_constants_cache.h"/>
     <ClInclude Include="..\xrRenderDX11\dx11StateUtils.h"/>
-    <ClInclude Include="..\xrRenderDX11\dx11TextureUtils.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\dx11MSAABlender.h"/>
     <ClInclude Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.h"/>
     <ClInclude Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.h"/>
@@ -613,7 +612,6 @@
     <ClCompile Include="..\xrRenderDX11\dx11SH_Texture.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11StateUtils.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11Texture.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11TextureUtils.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11r_constants.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11r_constants_cache.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_BmmD_deferred.cpp"/>

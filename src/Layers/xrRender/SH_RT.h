@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nvrhi/nvrhi.h>
+
 namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////////
@@ -16,7 +18,7 @@ public:
 
     CRT() = default;
     ~CRT();
-    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {});
+    void create(LPCSTR Name, u32 w, u32 h, nvrhi::Format f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {});
     void destroy();
     void reset_begin();
     void reset_end();
@@ -47,7 +49,7 @@ public:
 
     u32 dwWidth{};
     u32 dwHeight{};
-    D3DFORMAT fmt{};
+    nvrhi::Format fmt{};
     u32 sampleCount{};
     u32 n_slices{};
 
@@ -56,11 +58,11 @@ public:
 
 struct resptrcode_crt : public resptr_base<CRT>
 {
-    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, Flags32 flags = {})
+    void create(LPCSTR Name, u32 w, u32 h, nvrhi::Format f, u32 SampleCount = 1, Flags32 flags = {})
     {
         create(Name, w, h, f, SampleCount, 1, flags);
     }
-    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, u32 slices_num, Flags32 flags);
+    void create(LPCSTR Name, u32 w, u32 h, nvrhi::Format f, u32 SampleCount, u32 slices_num, Flags32 flags);
     void destroy() { _set(nullptr); }
 };
 typedef resptr_core<CRT, resptrcode_crt> ref_rt;
@@ -74,14 +76,14 @@ public:
     ref_texture				pTexture;
 
     u32						dwSize;
-    D3DFORMAT				fmt;
+    nvrhi::Format				fmt;
 
     u64						_order;
 
     CRTC					();
     ~CRTC					();
 
-    void				create			(LPCSTR name, u32 size, D3DFORMAT f);
+    void				create			(LPCSTR name, u32 size, nvrhi::Format f);
     void				destroy			();
     void				reset_begin		();
     void				reset_end		();
@@ -89,7 +91,7 @@ public:
 };
 struct 		resptrcode_crtc	: public resptr_base<CRTC>
 {
-    void				create			(LPCSTR Name, u32 size, D3DFORMAT f);
+    void				create			(LPCSTR Name, u32 size, nvrhi::Format f);
     void				destroy			()	{ _set(NULL);		}
 };
 typedef	resptr_core<CRTC,resptrcode_crtc>		ref_rtc;

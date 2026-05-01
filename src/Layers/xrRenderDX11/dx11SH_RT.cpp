@@ -15,7 +15,7 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, u32 slices_num, Flags32 flags)
+void CRT::create(LPCSTR Name, u32 w, u32 h, nvrhi::Format f, u32 SampleCount, u32 slices_num, Flags32 flags)
 {
     // Stubbed - FrameGraph handles render targets
     dwWidth = w;
@@ -55,7 +55,7 @@ void CRT::resolve_into(CRT&) const
     // Stubbed
 }
 
-void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, u32 slices_num, Flags32 flags)
+void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, nvrhi::Format f, u32 SampleCount, u32 slices_num, Flags32 flags)
 {
     _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, slices_num, flags));
 }

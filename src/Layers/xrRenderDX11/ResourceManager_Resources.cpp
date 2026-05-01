@@ -97,7 +97,7 @@ void CResourceManager::_DeleteConstantTable(const R_constant_table* C)
 }
 
 // Legacy RT functions - stubbed out, FrameGraph handles all render targets
-CRT* CResourceManager::_CreateRT(LPCSTR, u32, u32, D3DFORMAT, u32, u32, Flags32)
+CRT* CResourceManager::_CreateRT(LPCSTR, u32, u32, nvrhi::Format, u32, u32, Flags32)
 {
     return nullptr;
 }

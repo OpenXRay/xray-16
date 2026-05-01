@@ -4,7 +4,6 @@
 #include "xrCore/Threading/TaskManager.hpp"
 
 #include "StateManager/dx11SamplerStateCache.h"
-#include "dx11TextureUtils.h"
 
 #include <SDL_syswm.h>
 
@@ -277,8 +276,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
             "Please try to restart the game.");
         xrDebug::DoExit("Failed to initialize graphics hardware.\nPlease try to restart the game.");
     }
-    Caps.fDepth = dx11TextureUtils::ConvertTextureFormat(selectedFormat);
-
     const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
 }
@@ -305,7 +302,6 @@ bool CHW::CreateSwapChain(HWND hwnd)
 
     // Select back-buffer format
     sd.BufferDesc.Format = SelectFormat(D3D_FORMAT_SUPPORT_DISPLAY, formats);
-    Caps.fTarget = dx11TextureUtils::ConvertTextureFormat(sd.BufferDesc.Format);
 
     // Buffering
     BackBufferCount = 1;
@@ -365,7 +361,6 @@ bool CHW::CreateSwapChain2(HWND hwnd)
 
     // Select back-buffer format
     desc.Format = SelectFormat(D3D11_FORMAT_SUPPORT_DISPLAY, formats);
-    Caps.fTarget = dx11TextureUtils::ConvertTextureFormat(desc.Format);
 
     // Buffering
     BackBufferCount = 1; // For DXGI_SWAP_EFFECT_FLIP_DISCARD we need at least two
