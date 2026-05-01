@@ -423,6 +423,16 @@ target_sources(xrEngine
     TODO.txt
 )
 
+if (APPLE)
+    target_sources_grouped(
+        TARGET xrEngine
+        NAME "Platform\\macOS"
+        FILES
+        macos/GameDataResolver.cpp
+        macos/GameDataResolver.h
+    )
+endif()
+
 target_include_directories(xrEngine
     PUBLIC
     "${CMAKE_SOURCE_DIR}/Externals/imgui"
