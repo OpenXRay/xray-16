@@ -30,7 +30,6 @@
 
 #pragma warning(push, 0)
 #include <nvrhi/nvrhi.h>
-#include <nvrhi/d3d11.h>
 #pragma warning(pop)
 
 #define R_GL 0
