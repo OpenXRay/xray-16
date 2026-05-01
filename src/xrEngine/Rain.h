@@ -19,6 +19,7 @@ namespace xray::render
 namespace fg
 {
 class dxRainRender;
+class FGRainRender;
 }
 namespace render_gl
 {
@@ -29,6 +30,7 @@ class dxRainRender;
 class ENGINE_API CEffect_Rain
 {
     friend class xray::render::fg::dxRainRender;
+    friend class xray::render::fg::FGRainRender;
     friend class xray::render::render_gl::dxRainRender;
 
 private:
@@ -94,6 +96,8 @@ public:
 
     void Render();
     void OnFrame();
+
+    IRainRender* GetRenderer() const { return &*m_pRender; }
 };
 
 #endif // RainH

@@ -61,7 +61,12 @@
 #include "FrameGraphPasses/TrailPassSetup.h"
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "FrameGraphPasses/ImGuiPassSetup.h"
+#include "FrameGraphPasses/RainPassSetup.h"
 #include "FrameGraphPasses/PathTracerPassSetup.h"
+#include "Layers/xrRender/fgRainRender.h"
+#include "xrEngine/Environment.h"
+#include "xrEngine/Rain.h"
+#include "xrEngine/IGame_Persistent.h"
 #include "RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
@@ -1629,6 +1634,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             if (m_rtAccelMgr) {
                 m_rtAccelMgr->InvalidateSkinned();
                 m_rtAccelMgr->InvalidateGrass();
+            }
+        }
+    }
+
+    if (g_pGamePersistent && g_pGamePersistent->Environment().eff_Rain)
+    {
+        auto* effRain = g_pGamePersistent->Environment().eff_Rain;
+        effRain->Render();
+        if (auto* fgRain = dynamic_cast<FGRainRender*>(effRain->GetRenderer()))
+        {
+            if (fgRain->HasWork())
+            {
+                sceneColor = passes::setupRainPass(
+                    *m_framegraph,
+                    sceneColor,
+                    transparentOutputs.depth,
+                    fgRain);
             }
         }
     }
