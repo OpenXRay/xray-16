@@ -129,7 +129,7 @@ typedef resptr_core<SPP, resptr_base<SPP>> ref_pp;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SState : public xr_resource_flagged
 {
-    ID3DState* state;
+    void* state = nullptr;
     SimulatorStates state_code;
     SState() = default;
     ~SState();
