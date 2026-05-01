@@ -71,25 +71,25 @@ void CBlender_Particle::Compile(CBlender_Compile& C)
     switch (oBlend.IDselected)
     {
     case 0:
-        C.r_Pass("particle", "particle", TRUE, TRUE, TRUE, FALSE, D3D_BLEND_ONE, D3D_BLEND_ZERO, TRUE, 200);
+        C.r_Pass("particle", "particle", TRUE, TRUE, TRUE, FALSE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero, TRUE, 200);
         break; // SET
     case 1:
-        C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, 0);
+        C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE, 0);
         break; // BLEND
     case 2:
-        C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE, 0);
+        C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, TRUE, 0);
         break; // ADD
     case 3:
-        C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_ZERO, TRUE, 0);
+        C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::DstColor, nvrhi::BlendFactor::Zero, TRUE, 0);
         break; // MUL
     case 4:
-        C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_SRC_COLOR, TRUE, 0);
+        C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::DstColor, nvrhi::BlendFactor::SrcColor, TRUE, 0);
         break; // MUL_2X
     case 5:
-        C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_ONE, TRUE, 0);
+        C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::One, TRUE, 0);
         break; // ALPHA-ADD
     }
-    C.r_Sampler("s_base", C.L_textures[0], false, oClamp.value ? D3D_TEXTURE_ADDRESS_CLAMP : D3D_TEXTURE_ADDRESS_WRAP);
+    C.r_Sampler("s_base", C.L_textures[0], false, oClamp.value ? nvrhi::SamplerAddressMode::Clamp : nvrhi::SamplerAddressMode::Wrap);
     C.r_End();
 }
 } // namespace xray::render::fg

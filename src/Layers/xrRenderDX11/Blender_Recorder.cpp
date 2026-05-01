@@ -174,16 +174,12 @@ void CBlender_Compile::PassBegin()
 
     // Set default pipeline state
     PassSET_ZB(true, true);
-    PassSET_Blend(false, D3D_BLEND_ONE, D3D_BLEND_ZERO, false, 0);
+    PassSET_Blend(false, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero, false, 0);
     PassSET_LightFog(false, false);
 }
 
 void CBlender_Compile::PassEnd()
 {
-    // Last Stage - disable
-    RS.SetTSS(Stage(), D3DTSS_COLOROP, D3DTOP_DISABLE);
-    RS.SetTSS(Stage(), D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-
     // Create pass
     if (!dest.vs) // XXX: remove
     {
@@ -222,43 +218,30 @@ void CBlender_Compile::PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs /*= nullp
 
 void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)
 {
-    if (Pass())
-        bZWrite = FALSE;
-    RS.SetRS(D3DRS_ZFUNC, bZTest ? (bInvertZTest ? D3D_COMPARISON_GREATER : D3D_COMPARISON_LESS_EQUAL) : D3D_COMPARISON_ALWAYS);
-    RS.SetRS(D3DRS_ZWRITEENABLE, BC(bZWrite));
-    /*
-    if (bZWrite || bZTest)				RS.SetRS	(D3DRS_ZENABLE,	D3DZB_TRUE);
-    else								RS.SetRS	(D3DRS_ZENABLE,	D3DZB_FALSE);
-    */
+    RS.SetDepthFunc(bZTest ? (bInvertZTest ? nvrhi::ComparisonFunc::Greater : nvrhi::ComparisonFunc::LessOrEqual) : nvrhi::ComparisonFunc::Always);
+    RS.SetDepthWrite(bZWrite);
+    RS.SetDepthEnable(bZWrite || bZTest);
 }
 
-void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
+void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, nvrhi::BlendFactor abSRC, nvrhi::BlendFactor abDST)
 {
-    if (bABlend && D3D_BLEND_ONE == abSRC && D3D_BLEND_ZERO == abDST)
+    if (bABlend && abSRC == nvrhi::BlendFactor::One && abDST == nvrhi::BlendFactor::Zero)
         bABlend = FALSE;
-    RS.SetRS(D3DRS_ALPHABLENDENABLE, BC(bABlend));
-    RS.SetRS(D3DRS_SRCBLEND, bABlend ? abSRC : D3D_BLEND_ONE);
-    RS.SetRS(D3DRS_DESTBLEND, bABlend ? abDST : D3D_BLEND_ZERO);
-
-    //	Since in our engine D3DRS_SEPARATEALPHABLENDENABLE state is
-    //	always set to false and in DirectX 10 blend functions for
-    //	color and alpha are always independent, assign blend options for
-    //	alpha in DX11 identical to color.
-    // XXX: do we want to change this behaviour?
-    RS.SetRS(D3DRS_SRCBLENDALPHA, bABlend ? abSRC : D3D_BLEND_ONE);
-    RS.SetRS(D3DRS_DESTBLENDALPHA, bABlend ? abDST : D3D_BLEND_ZERO);
+    RS.SetBlendEnable(bABlend);
+    RS.SetSrcBlend(bABlend ? abSRC : nvrhi::BlendFactor::One);
+    RS.SetDestBlend(bABlend ? abDST : nvrhi::BlendFactor::Zero);
+    RS.SetSrcBlendAlpha(bABlend ? abSRC : nvrhi::BlendFactor::One);
+    RS.SetDestBlendAlpha(bABlend ? abDST : nvrhi::BlendFactor::Zero);
 }
 void CBlender_Compile::PassSET_ablend_aref(BOOL bATest, u32 aRef)
 {
     clamp(aRef, 0u, 255u);
-    RS.SetRS(D3DRS_ALPHATESTENABLE, BC(bATest));
+    RS.SetAlphaTest(bATest);
     if (bATest)
-    {
-        RS.SetRS(D3DRS_ALPHAREF, u32(aRef));
-    }
+        RS.SetAlphaRef(aRef);
 }
 
-void CBlender_Compile::PassSET_Blend(BOOL bABlend, u32 abSRC, u32 abDST, BOOL bATest, u32 aRef)
+void CBlender_Compile::PassSET_Blend(BOOL bABlend, nvrhi::BlendFactor abSRC, nvrhi::BlendFactor abDST, BOOL bATest, u32 aRef)
 {
     PassSET_ablend_mode(bABlend, abSRC, abDST);
 #ifdef DEBUG
@@ -271,32 +254,23 @@ void CBlender_Compile::PassSET_Blend(BOOL bABlend, u32 abSRC, u32 abDST, BOOL bA
     PassSET_ablend_aref(bATest, aRef);
 }
 
-void CBlender_Compile::PassSET_LightFog(BOOL bLight, BOOL bFog)
-{
-    RS.SetRS(D3DRS_LIGHTING, BC(bLight));
-    RS.SetRS(D3DRS_FOGENABLE, BC(bFog));
-    // SH->Flags.bLighting				|= !!bLight;
-}
+void CBlender_Compile::PassSET_LightFog(BOOL, BOOL) {}
 
 //
 void CBlender_Compile::StageBegin()
 {
-    StageSET_Address(D3D_TEXTURE_ADDRESS_WRAP); // Wrapping enabled by default
+    StageSET_Address(nvrhi::SamplerAddressMode::Wrap); // Wrapping enabled by default
 }
 void CBlender_Compile::StageEnd() { dwStage++; }
-void CBlender_Compile::StageSET_Address(u32 adr)
+void CBlender_Compile::StageSET_Address(nvrhi::SamplerAddressMode adr)
 {
-    RS.SetSAMP(Stage(), D3DSAMP_ADDRESSU, adr);
-    RS.SetSAMP(Stage(), D3DSAMP_ADDRESSV, adr);
+    RS.SetSamplerAddressU(Stage(), adr);
+    RS.SetSamplerAddressV(Stage(), adr);
 }
-void CBlender_Compile::StageSET_XForm(u32 tf, u32 tc)
-{
-    RS.SetTSS(Stage(), D3DTSS_TEXTURETRANSFORMFLAGS, tf);
-    RS.SetTSS(Stage(), D3DTSS_TEXCOORDINDEX, tc);
-}
-void CBlender_Compile::StageSET_Color(u32 a1, u32 op, u32 a2) { RS.SetColor(Stage(), a1, op, a2); }
-void CBlender_Compile::StageSET_Color3(u32 a1, u32 op, u32 a2, u32 a3) { RS.SetColor3(Stage(), a1, op, a2, a3); }
-void CBlender_Compile::StageSET_Alpha(u32 a1, u32 op, u32 a2) { RS.SetAlpha(Stage(), a1, op, a2); }
+void CBlender_Compile::StageSET_XForm(u32, u32) {}
+void CBlender_Compile::StageSET_Color(u32, u32, u32) {}
+void CBlender_Compile::StageSET_Color3(u32, u32, u32, u32) {}
+void CBlender_Compile::StageSET_Alpha(u32, u32, u32) {}
 void CBlender_Compile::StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channel)
 {
     Stage_Texture(T);
@@ -306,13 +280,11 @@ void CBlender_Compile::StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channe
 
 void CBlender_Compile::StageTemplate_LMAP0()
 {
-    StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
-    StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-    StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+    StageSET_Address(nvrhi::SamplerAddressMode::Clamp);
     StageSET_TMC("$base1", "$null", "$null", 1);
 }
 
-void CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32 fmin, u32 fmip, u32 fmag)
+void CBlender_Compile::Stage_Texture(LPCSTR name, nvrhi::SamplerAddressMode, SamplerFilter fmin, SamplerFilter fmip, SamplerFilter fmag)
 {
     sh_list& lst = L_textures;
     int id = ParseName(name);
@@ -334,24 +306,8 @@ void CBlender_Compile::Stage_Matrix(LPCSTR name, int iChannel)
     CMatrix* M = RImplementation.Resources->_CreateMatrix((id >= 0) ? lst[id].c_str() : name);
     passMatrices.push_back(M);
 
-    // Setup transform pipeline
-    u32 ID = Stage();
-    if (M)
-    {
-        switch (M->dwMode)
-        {
-        case CMatrix::modeProgrammable: StageSET_XForm(D3DTTFF_COUNT3, D3DTSS_TCI_CAMERASPACEPOSITION | ID); break;
-        case CMatrix::modeTCM: StageSET_XForm(D3DTTFF_COUNT2, D3DTSS_TCI_PASSTHRU | iChannel); break;
-        case CMatrix::modeC_refl: StageSET_XForm(D3DTTFF_COUNT3, D3DTSS_TCI_CAMERASPACEREFLECTIONVECTOR | ID); break;
-        case CMatrix::modeS_refl: StageSET_XForm(D3DTTFF_COUNT2, D3DTSS_TCI_CAMERASPACENORMAL | ID); break;
-        default: StageSET_XForm(D3DTTFF_DISABLE, D3DTSS_TCI_PASSTHRU | iChannel); break;
-        }
-    }
-    else
-    {
-        // No XForm at all
-        StageSET_XForm(D3DTTFF_DISABLE, D3DTSS_TCI_PASSTHRU | iChannel);
-    }
+    (void)M;
+    (void)iChannel;
 }
 void CBlender_Compile::Stage_Constant(LPCSTR name)
 {
@@ -364,40 +320,40 @@ void CBlender_Compile::SetupSampler(u32 stage, pcstr sampler)
 {
     VERIFY(stage != InvalidStage);
 
-    u32 minFliter   = D3D_TEXF_LINEAR;
-    u32 mipFilter   = D3D_TEXF_LINEAR;
-    u32 magFilter   = D3D_TEXF_LINEAR;
-    u32 addressMode = D3D_TEXTURE_ADDRESS_WRAP;
+    SamplerFilter minFilter = SamplerFilter::Linear;
+    SamplerFilter mipFilter = SamplerFilter::Linear;
+    SamplerFilter magFilter = SamplerFilter::Linear;
+    nvrhi::SamplerAddressMode addressMode = nvrhi::SamplerAddressMode::Wrap;
 
     if (xr_strcmp(sampler, "smp_nofilter") == 0)
     {
-        addressMode = D3D_TEXTURE_ADDRESS_CLAMP;
-        minFliter   = D3D_TEXF_POINT;
-        mipFilter   = D3D_TEXF_NONE;
-        magFilter   = D3D_TEXF_POINT;
+        addressMode = nvrhi::SamplerAddressMode::Clamp;
+        minFilter   = SamplerFilter::Point;
+        mipFilter   = SamplerFilter::Point;
+        magFilter   = SamplerFilter::Point;
     }
     else if (xr_strcmp(sampler, "smp_rtlinear") == 0)
     {
-        addressMode = D3D_TEXTURE_ADDRESS_CLAMP;
-        mipFilter   = D3D_TEXF_NONE;
+        addressMode = nvrhi::SamplerAddressMode::Clamp;
+        mipFilter   = SamplerFilter::Point;
     }
     else if ((xr_strcmp(sampler, "s_detail") == 0) || (xr_strcmp(sampler, "s_base") == 0))
     {
-        minFliter = D3D_TEXF_ANISOTROPIC;
-        magFilter = D3D_TEXF_ANISOTROPIC;
+        minFilter = SamplerFilter::Anisotropic;
+        magFilter = SamplerFilter::Anisotropic;
     }
     else if (xr_strcmp(sampler, "smp_material") == 0)
     {
-        addressMode = D3D_TEXTURE_ADDRESS_CLAMP;
-        mipFilter   = D3D_TEXF_NONE;
-        RS.SetSAMP(stage, D3DSAMP_ADDRESSW, D3D_TEXTURE_ADDRESS_WRAP);
+        addressMode = nvrhi::SamplerAddressMode::Clamp;
+        mipFilter   = SamplerFilter::Point;
+        RS.SetSamplerAddressW(stage, nvrhi::SamplerAddressMode::Wrap);
     }
 
     i_Address(stage, addressMode);
-    i_Filter(stage, minFliter, mipFilter, magFilter);
+    i_Filter(stage, minFilter, mipFilter, magFilter);
 
     if (stage < 4)
-        i_Projective(stage, false); // disable projective division by default
+        i_Projective(stage, false);
 }
 
 u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str texture)

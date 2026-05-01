@@ -41,8 +41,6 @@ void CBlender_Editor_Wire::CompileForEditor(CBlender_Compile& C)
     {
         // Stage0 - Base texture
         C.StageBegin();
-        C.StageSET_Color(D3DTA_DIFFUSE, D3DTOP_MODULATE, D3DTA_TFACTOR);
-        C.StageSET_Alpha(D3DTA_DIFFUSE, D3DTOP_MODULATE, D3DTA_TFACTOR);
         C.Stage_Texture("$null");
         C.Stage_Matrix("$null", 0);
         C.Stage_Constant("$null");

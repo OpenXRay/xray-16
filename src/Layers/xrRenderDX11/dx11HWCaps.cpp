@@ -233,8 +233,8 @@ void CHWCaps::Update()
     bScissor = TRUE;
 
     // Stencil relative caps
-    soInc = D3D_STENCIL_OP_INCR_SAT;
-    soDec = D3D_STENCIL_OP_DECR_SAT;
+    soInc = static_cast<D3D_STENCIL_OP>(nvrhi::StencilOp::IncrementAndClamp);
+    soDec = static_cast<D3D_STENCIL_OP>(nvrhi::StencilOp::DecrementAndClamp);
     dwMaxStencilValue = (1 << 8) - 1;
 
     // FFP lights

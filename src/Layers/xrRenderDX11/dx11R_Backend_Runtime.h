@@ -486,9 +486,9 @@ IC void CBackend::SetViewport(const D3D_VIEWPORT& viewport) const
 }
 
 IC void CBackend::set_Stencil(
-    u32 _enable, u32 _func, u32 _ref, u32 _mask, u32 _writemask, u32 _fail, u32 _pass, u32 _zfail)
+    u32 _enable, nvrhi::ComparisonFunc _func, u32 _ref, u32 _mask, u32 _writemask, nvrhi::StencilOp _fail, nvrhi::StencilOp _pass, nvrhi::StencilOp _zfail)
 {
-    StateManager.SetStencil(_enable, _func, _ref, _mask, _writemask, _fail, _pass, _zfail);
+    StateManager.SetStencil(_enable, static_cast<u32>(_func), _ref, _mask, _writemask, static_cast<u32>(_fail), static_cast<u32>(_pass), static_cast<u32>(_zfail));
     // Simple filter
     // if (stencil_enable       != _enable)     { stencil_enable=_enable;       CHK_DX(HW.pDevice->SetRenderState   (
     // D3DRS_STENCILENABLE,     _enable             )); }
@@ -528,7 +528,7 @@ IC void CBackend::set_Z(u32 _enable)
 
 IC void CBackend::set_ZFunc(u32 _func)
 {
-    StateManager.SetDepthFunc(_func);
+    StateManager.SetDepthFunc(static_cast<u32>(_func));
     // if (z_func!=_func)
     //{
     //  z_func = _func;
@@ -564,9 +564,19 @@ ICF void CBackend::set_CullMode(u32 _mode)
     cull_mode = _mode;
 }
 
+ICF void CBackend::set_CullMode(nvrhi::RasterCullMode _mode)
+{
+    set_CullMode(static_cast<u32>(_mode));
+}
+
 ICF void CBackend::set_FillMode(u32 _mode)
 {
     StateManager.SetFillMode(_mode);
+}
+
+ICF void CBackend::set_FillMode(nvrhi::RasterFillMode _mode)
+{
+    StateManager.SetFillMode(static_cast<u32>(_mode));
 }
 
 ICF void CBackend::SetTextureFactor(u32 /*factor*/) const

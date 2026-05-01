@@ -111,10 +111,8 @@ void CBlender_Screen_SET::CompileFixed(CBlender_Compile& C)
         {
             if (oClamp.value)
             {
-                C.StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
+                C.StageSET_Address(nvrhi::SamplerAddressMode::Clamp);
             }
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
             C.Stage_Texture(oT_Name);
             C.Stage_Matrix("$null", 0);
             C.Stage_Constant("$null");
@@ -125,10 +123,8 @@ void CBlender_Screen_SET::CompileFixed(CBlender_Compile& C)
         {
             if (oClamp.value)
             {
-                C.StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
+                C.StageSET_Address(nvrhi::SamplerAddressMode::Clamp);
             }
-            C.StageSET_Color(D3DTA_DIFFUSE, D3DTOP_BLENDDIFFUSEALPHA, D3DTA_CURRENT);
-            C.StageSET_Alpha(D3DTA_DIFFUSE, D3DTOP_MODULATE, D3DTA_CURRENT);
             C.Stage_Texture("$null");
             C.Stage_Matrix("$null", 0);
             C.Stage_Constant("$null");
@@ -142,28 +138,22 @@ void CBlender_Screen_SET::CompileFixed(CBlender_Compile& C)
             if (9 == oBlend.IDselected)
             {
                 // 4x R
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE4X, D3DTA_DIFFUSE);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
             }
             else
             {
                 if ((7 == oBlend.IDselected) || (8 == oBlend.IDselected))
                 {
                     // 2x R
-                    C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
-                    C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
                 }
                 else
                 {
                     // 1x R
-                    C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-                    C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
                 }
             }
 
             if (oClamp.value)
             {
-                C.StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
+                C.StageSET_Address(nvrhi::SamplerAddressMode::Clamp);
             }
             C.Stage_Texture(oT_Name);
             C.Stage_Matrix(oT_xform, 0);
@@ -203,7 +193,7 @@ void CBlender_Screen_SET::CompileProgrammed(CBlender_Compile& C)
     const u32 stage = C.SampledImage("smp_base", "s_base", C.L_textures[0]);
     if (oClamp.value)
     {
-        C.i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
+        C.i_Address(stage, nvrhi::SamplerAddressMode::Clamp);
     }
 }
 
@@ -228,43 +218,43 @@ void CBlender_Screen_SET::Compile(CBlender_Compile& C)
         switch (oBlend.IDselected)
         {
         case 0: // SET
-            C.PassSET_Blend(false, D3D_BLEND_ONE, D3D_BLEND_ZERO, false, 0);
+            C.PassSET_Blend(false, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero, false, 0);
             break;
 
         case 1: // BLEND
-            C.PassSET_Blend(true, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, true, oAREF.value);
+            C.PassSET_Blend(true, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, true, oAREF.value);
             break;
 
         case 2: // ADD
-            C.PassSET_Blend(true, D3D_BLEND_ONE, D3D_BLEND_ONE, false, oAREF.value);
+            C.PassSET_Blend(true, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, false, oAREF.value);
             break;
 
         case 3: // MUL
-            C.PassSET_Blend(true, D3D_BLEND_DEST_COLOR, D3D_BLEND_ZERO, false, oAREF.value);
+            C.PassSET_Blend(true, nvrhi::BlendFactor::DstColor, nvrhi::BlendFactor::Zero, false, oAREF.value);
             break;
 
         case 4: // MUL_2X
-            C.PassSET_Blend(true, D3D_BLEND_DEST_COLOR, D3D_BLEND_SRC_COLOR, false, oAREF.value);
+            C.PassSET_Blend(true, nvrhi::BlendFactor::DstColor, nvrhi::BlendFactor::SrcColor, false, oAREF.value);
             break;
 
         case 5: // ALPHA-ADD
-            C.PassSET_Blend(true, D3D_BLEND_SRC_ALPHA, D3D_BLEND_ONE, true, oAREF.value);
+            C.PassSET_Blend(true, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::One, true, oAREF.value);
             break;
 
         case 6: // MUL_2X + A-test
-            C.PassSET_Blend(true, D3D_BLEND_DEST_COLOR, D3D_BLEND_SRC_COLOR, false, oAREF.value);
+            C.PassSET_Blend(true, nvrhi::BlendFactor::DstColor, nvrhi::BlendFactor::SrcColor, false, oAREF.value);
             break;
 
         case 7: // SET (2r)
-            C.PassSET_Blend(true, D3D_BLEND_ONE, D3D_BLEND_ZERO, true, 0);
+            C.PassSET_Blend(true, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero, true, 0);
             break;
 
         case 8: // BLEND (2r)
-            C.PassSET_Blend(true, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, true, oAREF.value);
+            C.PassSET_Blend(true, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, true, oAREF.value);
             break;
 
         case 9: // BLEND (2r)
-            C.PassSET_Blend(true, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, true, oAREF.value);
+            C.PassSET_Blend(true, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, true, oAREF.value);
             break;
         }
     }

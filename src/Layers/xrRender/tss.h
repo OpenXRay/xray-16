@@ -4,94 +4,61 @@
 
 namespace xray::render::fg
 {
-enum XRDX11SAMPLERSTATETYPE
-{
-    XRDX11SAMP_ANISOTROPICFILTER = 256,
-    XRDX11SAMP_COMPARISONFILTER,
-    XRDX11SAMP_COMPARISONFUNC,
-    XRDX11SAMP_MINLOD //	integer value. 0 - the most detailed level
-};
-enum XRDX11RENDERSTATETYPE
-{
-    XRDX11RS_ALPHATOCOVERAGE = 1024
-};
-
-class CSimulatorTSS
-{
-public:
-    void Set(SimulatorStates& container, u32 S, u32 N, u32 V) { container.set_TSS(S, N, V); }
-
-    void SetColor(SimulatorStates& container, u32 S, u32 A1, u32 OP, u32 A2)
-    {
-        Set(container, S, D3DTSS_COLOROP, OP);
-        switch (OP)
-        {
-        case D3DTOP_DISABLE: break;
-        case D3DTOP_SELECTARG1: Set(container, S, D3DTSS_COLORARG1, A1); break;
-        case D3DTOP_SELECTARG2: Set(container, S, D3DTSS_COLORARG2, A2); break;
-        default:
-            Set(container, S, D3DTSS_COLORARG1, A1);
-            Set(container, S, D3DTSS_COLORARG2, A2);
-            break;
-        }
-    }
-
-    void SetColor3(SimulatorStates& container, u32 S, u32 A1, u32 OP, u32 A2, u32 A3)
-    {
-        SetColor(container, S, A1, OP, A2);
-        Set(container, S, D3DTSS_COLORARG0, A3);
-    }
-
-    void SetAlpha(SimulatorStates& container, u32 S, u32 A1, u32 OP, u32 A2)
-    {
-        Set(container, S, D3DTSS_ALPHAOP, OP);
-        switch (OP)
-        {
-        case D3DTOP_DISABLE: break;
-        case D3DTOP_SELECTARG1: Set(container, S, D3DTSS_ALPHAARG1, A1); break;
-        case D3DTOP_SELECTARG2: Set(container, S, D3DTSS_ALPHAARG2, A2); break;
-        default:
-            Set(container, S, D3DTSS_ALPHAARG1, A1);
-            Set(container, S, D3DTSS_ALPHAARG2, A2);
-            break;
-        }
-    }
-
-    void SetAlpha3(SimulatorStates& container, u32 S, u32 A1, u32 OP, u32 A2, u32 A3)
-    {
-        SetAlpha(container, S, A1, OP, A2);
-        Set(container, S, D3DTSS_ALPHAARG0, A3);
-    }
-};
-
-class CSimulatorRS
-{
-public:
-    void Set(SimulatorStates& container, u32 N, u32 V)
-    {
-        //	Igor: XBox has render states 400 and hire
-        // R_ASSERT(N<256);
-        container.set_RS(N, V);
-    }
-};
-
 class CSimulator
 {
 public:
-    CSimulatorTSS TSS;
-    CSimulatorRS RS;
     SimulatorStates container;
 
-public:
     CSimulator() { Invalidate(); }
     void Invalidate() { container.clear(); }
-    void SetTSS(u32 S, u32 N, u32 V) { TSS.Set(container, S, N, V); }
-    void SetSAMP(u32 S, u32 N, u32 V) { container.set_SAMP(S, N, V); }
-    void SetColor(u32 S, u32 a, u32 b, u32 c) { TSS.SetColor(container, S, a, b, c); }
-    void SetColor3(u32 S, u32 a, u32 b, u32 c, u32 d) { TSS.SetColor3(container, S, a, b, c, d); }
-    void SetAlpha(u32 S, u32 a, u32 b, u32 c) { TSS.SetAlpha(container, S, a, b, c); }
-    void SetAlpha3(u32 S, u32 a, u32 b, u32 c, u32 d) { TSS.SetAlpha3(container, S, a, b, c, d); }
-    void SetRS(u32 N, u32 V) { RS.Set(container, N, V); }
     SimulatorStates& GetContainer() { return container; }
+
+    void SetDepthEnable(bool b)                          { container.SetDepthEnable(b); }
+    void SetDepthWrite(bool b)                           { container.SetDepthWrite(b); }
+    void SetDepthFunc(nvrhi::ComparisonFunc f)           { container.SetDepthFunc(f); }
+
+    void SetStencilEnable(bool b)                        { container.SetStencilEnable(b); }
+    void SetStencilReadMask(u8 m)                        { container.SetStencilReadMask(m); }
+    void SetStencilWriteMask(u8 m)                       { container.SetStencilWriteMask(m); }
+    void SetStencilRef(u8 v)                             { container.SetStencilRef(v); }
+    void SetFrontStencilFail(nvrhi::StencilOp op)        { container.SetFrontStencilFail(op); }
+    void SetFrontStencilDepthFail(nvrhi::StencilOp op)   { container.SetFrontStencilDepthFail(op); }
+    void SetFrontStencilPass(nvrhi::StencilOp op)        { container.SetFrontStencilPass(op); }
+    void SetFrontStencilFunc(nvrhi::ComparisonFunc f)    { container.SetFrontStencilFunc(f); }
+    void SetBackStencilFail(nvrhi::StencilOp op)         { container.SetBackStencilFail(op); }
+    void SetBackStencilDepthFail(nvrhi::StencilOp op)    { container.SetBackStencilDepthFail(op); }
+    void SetBackStencilPass(nvrhi::StencilOp op)         { container.SetBackStencilPass(op); }
+    void SetBackStencilFunc(nvrhi::ComparisonFunc f)     { container.SetBackStencilFunc(f); }
+
+    void SetAlphaToCoverage(bool b)                      { container.SetAlphaToCoverage(b); }
+    void SetBlendEnable(bool b)                          { container.SetBlendEnable(b); }
+    void SetSrcBlend(nvrhi::BlendFactor f)               { container.SetSrcBlend(f); }
+    void SetDestBlend(nvrhi::BlendFactor f)              { container.SetDestBlend(f); }
+    void SetBlendOp(nvrhi::BlendOp op)                   { container.SetBlendOp(op); }
+    void SetSrcBlendAlpha(nvrhi::BlendFactor f)          { container.SetSrcBlendAlpha(f); }
+    void SetDestBlendAlpha(nvrhi::BlendFactor f)         { container.SetDestBlendAlpha(f); }
+    void SetBlendOpAlpha(nvrhi::BlendOp op)              { container.SetBlendOpAlpha(op); }
+    void SetColorWriteMask(int rt, nvrhi::ColorMask m)   { container.SetColorWriteMask(rt, m); }
+
+    void SetCullMode(nvrhi::RasterCullMode m)            { container.SetCullMode(m); }
+    void SetFillMode(nvrhi::RasterFillMode m)            { container.SetFillMode(m); }
+    void SetScissor(bool b)                              { container.SetScissor(b); }
+
+    void SetAlphaTest(bool b)                            { container.SetAlphaTest(b); }
+    void SetAlphaRef(u32 r)                              { container.SetAlphaRef(r); }
+
+    void SetSamplerAddress(u32 slot, nvrhi::SamplerAddressMode mode)                                                                  { container.SetSamplerAddress(slot, mode); }
+    void SetSamplerAddress(u32 slot, nvrhi::SamplerAddressMode u, nvrhi::SamplerAddressMode v, nvrhi::SamplerAddressMode w)           { container.SetSamplerAddress(slot, u, v, w); }
+    void SetSamplerAddressU(u32 slot, nvrhi::SamplerAddressMode mode)                                                                 { container.SetSamplerAddressU(slot, mode); }
+    void SetSamplerAddressV(u32 slot, nvrhi::SamplerAddressMode mode)                                                                 { container.SetSamplerAddressV(slot, mode); }
+    void SetSamplerAddressW(u32 slot, nvrhi::SamplerAddressMode mode)                                                                 { container.SetSamplerAddressW(slot, mode); }
+    void SetSamplerFilter(u32 slot, bool _min, bool _mip, bool _mag)                                                                  { container.SetSamplerFilter(slot, _min, _mip, _mag); }
+    void SetSamplerFilterMin(u32 slot, bool linear)                                                                                   { container.SetSamplerFilterMin(slot, linear); }
+    void SetSamplerFilterMip(u32 slot, bool linear)                                                                                   { container.SetSamplerFilterMip(slot, linear); }
+    void SetSamplerFilterMag(u32 slot, bool linear)                                                                                   { container.SetSamplerFilterMag(slot, linear); }
+    void SetSamplerAnisotropic(u32 slot, u32 level)                                                                                   { container.SetSamplerAnisotropic(slot, level); }
+    void SetSamplerComparison(u32 slot, bool enable)                                                                                  { container.SetSamplerComparison(slot, enable); }
+    void SetSamplerBorderColor(u32 slot, u32 packed)                                                                                  { container.SetSamplerBorderColor(slot, packed); }
+    void SetSamplerMipLODBias(u32 slot, float bias)                                                                                   { container.SetSamplerMipLODBias(slot, bias); }
 };
-} // namespace xray::render::fg
+}

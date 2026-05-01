@@ -30,17 +30,14 @@ void CBlender_Screen_GRAY::Compile(CBlender_Compile& C)
     C.PassBegin();
     {
         C.PassSET_ZB(FALSE, FALSE);
-        C.PassSET_Blend(FALSE, D3D_BLEND_ONE, D3D_BLEND_ZERO, FALSE, 0);
+        C.PassSET_Blend(FALSE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero, FALSE, 0);
         C.PassSET_LightFog(FALSE, FALSE);
 
-        C.R().SetRS(D3DRS_TEXTUREFACTOR, color_rgba(76 + 105, 150 + 105, 29 + 105, 0));
 
         // Stage0 - Base texture
         C.StageBegin();
         {
-            C.StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_DIFFUSE);
-            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_DIFFUSE);
+            C.StageSET_Address(nvrhi::SamplerAddressMode::Clamp);
             C.Stage_Texture(oT_Name);
             C.Stage_Matrix(oT_xform, 0);
             C.Stage_Constant("$null");
@@ -50,9 +47,7 @@ void CBlender_Screen_GRAY::Compile(CBlender_Compile& C)
         // Stage1 - Base texture
         C.StageBegin();
         {
-            C.StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
-            C.StageSET_Color(D3DTA_CURRENT, D3DTOP_DOTPRODUCT3, D3DTA_TFACTOR);
-            C.StageSET_Alpha(D3DTA_CURRENT, D3DTOP_DOTPRODUCT3, D3DTA_TFACTOR);
+            C.StageSET_Address(nvrhi::SamplerAddressMode::Clamp);
             C.Stage_Texture(oT_Name);
             C.Stage_Matrix(oT_xform, 0);
             C.Stage_Constant("$null");

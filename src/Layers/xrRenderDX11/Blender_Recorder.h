@@ -68,28 +68,28 @@ public:
     void PassBegin();
     u32 Pass() { return SH->passes.size(); }
     void PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest = FALSE);
-    void PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST);
+    void PassSET_ablend_mode(BOOL bABlend, nvrhi::BlendFactor abSRC, nvrhi::BlendFactor abDST);
     void PassSET_ablend_aref(BOOL aTest, u32 aRef);
-    void PassSET_Blend(BOOL bABlend, u32 abSRC, u32 abDST, BOOL aTest, u32 aRef);
+    void PassSET_Blend(BOOL bABlend, nvrhi::BlendFactor abSRC, nvrhi::BlendFactor abDST, BOOL aTest, u32 aRef);
     void PassSET_Blend_BLEND(BOOL bAref = FALSE, u32 ref = 0)
     {
-        PassSET_Blend(TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, bAref, ref);
+        PassSET_Blend(TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, bAref, ref);
     }
     void PassSET_Blend_SET(BOOL bAref = FALSE, u32 ref = 0)
     {
-        PassSET_Blend(FALSE, D3D_BLEND_ONE, D3D_BLEND_ZERO, bAref, ref);
+        PassSET_Blend(FALSE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero, bAref, ref);
     }
     void PassSET_Blend_ADD(BOOL bAref = FALSE, u32 ref = 0)
     {
-        PassSET_Blend(TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, bAref, ref);
+        PassSET_Blend(TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, bAref, ref);
     }
     void PassSET_Blend_MUL(BOOL bAref = FALSE, u32 ref = 0)
     {
-        PassSET_Blend(TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_ZERO, bAref, ref);
+        PassSET_Blend(TRUE, nvrhi::BlendFactor::DstColor, nvrhi::BlendFactor::Zero, bAref, ref);
     }
     void PassSET_Blend_MUL2X(BOOL bAref = FALSE, u32 ref = 0)
     {
-        PassSET_Blend(TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_SRC_COLOR, bAref, ref);
+        PassSET_Blend(TRUE, nvrhi::BlendFactor::DstColor, nvrhi::BlendFactor::SrcColor, bAref, ref);
     }
     void PassSET_LightFog(BOOL bLight, BOOL bFog);
     void PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs = "null", pcstr _hs = "null", pcstr _ds = "null");
@@ -97,14 +97,14 @@ public:
 
     void StageBegin();
     u32 Stage() { return dwStage; }
-    void StageSET_Address(u32 adr);
+    void StageSET_Address(nvrhi::SamplerAddressMode adr);
     void StageSET_XForm(u32 tf, u32 tc);
     void StageSET_Color(u32 a1, u32 op, u32 a2);
     void StageSET_Color3(u32 a1, u32 op, u32 a2, u32 a3);
     void StageSET_Alpha(u32 a1, u32 op, u32 a2);
     void StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channel);
-    void Stage_Texture(LPCSTR name, u32 address = D3D_TEXTURE_ADDRESS_WRAP, u32 fmin = D3D_TEXF_LINEAR,
-        u32 fmip = D3D_TEXF_LINEAR, u32 fmag = D3D_TEXF_LINEAR);
+    void Stage_Texture(LPCSTR name, nvrhi::SamplerAddressMode address = nvrhi::SamplerAddressMode::Wrap,
+        SamplerFilter fmin = SamplerFilter::Linear, SamplerFilter fmip = SamplerFilter::Linear, SamplerFilter fmag = SamplerFilter::Linear);
     void StageTemplate_LMAP0();
     void Stage_Matrix(LPCSTR name, int UVW_channel);
     void Stage_Constant(LPCSTR name);
@@ -114,35 +114,35 @@ public:
     u32 i_Sampler(LPCSTR name) const;
     void i_Texture(u32 s, LPCSTR name);
     void i_Projective(u32 s, bool b);
-    void i_Address(u32 s, u32 address);
-    void i_Filter_Min(u32 s, u32 f);
-    void i_Filter_Mip(u32 s, u32 f);
-    void i_Filter_Mag(u32 s, u32 f);
-    void i_Filter_Aniso(u32 s, u32 f);
+    void i_Address(u32 s, nvrhi::SamplerAddressMode address);
+    void i_Filter_Min(u32 s, SamplerFilter f);
+    void i_Filter_Mip(u32 s, SamplerFilter f);
+    void i_Filter_Mag(u32 s, SamplerFilter f);
+    void i_Filter_Aniso(u32 s, u32 level);
 #if defined(USE_DX11)
     void i_dx11FilterAnizo(u32 s, BOOL value);
 #endif
-    void i_Filter(u32 s, u32 _min, u32 _mip, u32 _mag);
+    void i_Filter(u32 s, SamplerFilter _min, SamplerFilter _mip, SamplerFilter _mag);
     void i_BorderColor(u32 s, u32 color);
 
     // R1/R2-compiler	[programmable]		- templates
     void r_Pass(LPCSTR vs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE, BOOL bABlend = FALSE,
-        D3D_BLEND abSRC = D3D_BLEND_ONE, D3D_BLEND abDST = D3D_BLEND_ZERO, BOOL aTest = FALSE, u32 aRef = 0);
+        nvrhi::BlendFactor abSRC = nvrhi::BlendFactor::One, nvrhi::BlendFactor abDST = nvrhi::BlendFactor::Zero, BOOL aTest = FALSE, u32 aRef = 0);
 
     void r_Constant(LPCSTR name, R_constant_setup* s);
     void r_Pass(LPCSTR vs, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE,
-        BOOL bABlend = FALSE, D3D_BLEND abSRC = D3D_BLEND_ONE, D3D_BLEND abDST = D3D_BLEND_ZERO, BOOL aTest = FALSE,
+        BOOL bABlend = FALSE, nvrhi::BlendFactor abSRC = nvrhi::BlendFactor::One, nvrhi::BlendFactor abDST = nvrhi::BlendFactor::Zero, BOOL aTest = FALSE,
         u32 aRef = 0);
 #ifdef USE_DX11
     void r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE,
-        BOOL bZwrite = TRUE, BOOL bABlend = FALSE, D3D_BLEND abSRC = D3D_BLEND_ONE, D3D_BLEND abDST = D3D_BLEND_ZERO,
+        BOOL bZwrite = TRUE, BOOL bABlend = FALSE, nvrhi::BlendFactor abSRC = nvrhi::BlendFactor::One, nvrhi::BlendFactor abDST = nvrhi::BlendFactor::Zero,
         BOOL aTest = FALSE, u32 aRef = 0);
     void r_ComputePass(LPCSTR cs);
 #endif
-    void r_Stencil(BOOL Enable, u32 Func = D3D_COMPARISON_ALWAYS, u32 Mask = 0x00, u32 WriteMask = 0x00,
-        u32 Fail = D3D_STENCIL_OP_KEEP, u32 Pass = D3D_STENCIL_OP_KEEP, u32 ZFail = D3D_STENCIL_OP_KEEP);
+    void r_Stencil(BOOL Enable, nvrhi::ComparisonFunc Func = nvrhi::ComparisonFunc::Always, u32 Mask = 0x00, u32 WriteMask = 0x00,
+        nvrhi::StencilOp Fail = nvrhi::StencilOp::Keep, nvrhi::StencilOp Pass = nvrhi::StencilOp::Keep, nvrhi::StencilOp ZFail = nvrhi::StencilOp::Keep);
     void r_StencilRef(u32 Ref);
-    void r_CullMode(D3D_CULL_MODE Mode);
+    void r_CullMode(nvrhi::RasterCullMode Mode);
 
 #if defined(USE_DX11)
     void r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive = false);
@@ -153,10 +153,10 @@ public:
     u32 r_dx11Sampler(LPCSTR ResourceName);
 #endif // USE_DX11
 
-    u32 r_Sampler(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3D_TEXTURE_ADDRESS_WRAP,
-        u32 fmin = D3D_TEXF_LINEAR, u32 fmip = D3D_TEXF_LINEAR, u32 fmag = D3D_TEXF_LINEAR);
-    u32 r_Sampler(LPCSTR name, shared_str texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3D_TEXTURE_ADDRESS_WRAP,
-        u32 fmin = D3D_TEXF_LINEAR, u32 fmip = D3D_TEXF_LINEAR, u32 fmag = D3D_TEXF_LINEAR)
+    u32 r_Sampler(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false, nvrhi::SamplerAddressMode address = nvrhi::SamplerAddressMode::Wrap,
+        SamplerFilter fmin = SamplerFilter::Linear, SamplerFilter fmip = SamplerFilter::Linear, SamplerFilter fmag = SamplerFilter::Linear);
+    u32 r_Sampler(LPCSTR name, shared_str texture, bool b_ps1x_ProjectiveDivide = false, nvrhi::SamplerAddressMode address = nvrhi::SamplerAddressMode::Wrap,
+        SamplerFilter fmin = SamplerFilter::Linear, SamplerFilter fmip = SamplerFilter::Linear, SamplerFilter fmag = SamplerFilter::Linear)
     {
         return r_Sampler(name, texture.c_str(), b_ps1x_ProjectiveDivide, address, fmin, fmip, fmag);
     }

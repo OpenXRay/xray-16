@@ -40,13 +40,11 @@ void CBlender_Editor_Selection::CompileForEditor(CBlender_Compile& C)
     C.PassBegin();
     {
         C.PassSET_ZB(true, false);
-        C.PassSET_Blend(true, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, false, 0);
+        C.PassSET_Blend(true, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, false, 0);
 
         // Stage0 - Base texture
         C.StageBegin();
-        C.StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
-        C.StageSET_Color(D3DTA_TFACTOR, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_Alpha(D3DTA_TFACTOR, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+        C.StageSET_Address(nvrhi::SamplerAddressMode::Clamp);
         C.Stage_Texture(oT_Name);
         C.Stage_Matrix(oT_xform, 0);
         C.Stage_Constant("$null");
@@ -71,7 +69,7 @@ void CBlender_Editor_Selection::Compile(CBlender_Compile& C)
 
         C.PassSET_LightFog(false, true);
         C.PassSET_ZB(true, false);
-        C.PassSET_ablend_mode(true, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA);
+        C.PassSET_ablend_mode(true, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha);
     }
     C.PassEnd();
 }

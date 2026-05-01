@@ -12,8 +12,8 @@ void CBlender_rain::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case 0: // Test
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE);
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha);
         C.r_Pass("stub_notransform_2uv", "rain_layer", false, TRUE, FALSE, FALSE);
         C.PassSET_ZB(TRUE,FALSE,TRUE); // force inverted Z-Buffer
 
@@ -36,8 +36,8 @@ void CBlender_rain::Compile(CBlender_Compile& C)
         break;
 
     case 1: // Patch normals
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE);
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha);
         C.r_Pass("stub_notransform_2uv", "rain_patch_normal_nomsaa", false, TRUE, FALSE, FALSE);
         C.PassSET_ZB(TRUE,FALSE,TRUE); // force inverted Z-Buffer
 
@@ -66,8 +66,8 @@ void CBlender_rain::Compile(CBlender_Compile& C)
         break;
 
     case 2: // Apply normals
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE);
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha);
         C.r_Pass("stub_notransform_2uv", "rain_apply_normal_nomsaa", false, TRUE, FALSE, FALSE);
         C.PassSET_ZB(TRUE,FALSE,TRUE); // force inverted Z-Buffer
 
@@ -96,10 +96,10 @@ void CBlender_rain::Compile(CBlender_Compile& C)
         break;
 
     case 3: // Apply gloss
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE);
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA);
-        C.r_Pass("stub_notransform_2uv", "rain_apply_gloss_nomsaa", false, TRUE, FALSE, TRUE, D3D_BLEND_ONE,
-                 D3D_BLEND_ONE);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha);
+        C.r_Pass("stub_notransform_2uv", "rain_apply_gloss_nomsaa", false, TRUE, FALSE, TRUE, nvrhi::BlendFactor::One,
+                 nvrhi::BlendFactor::One);
         C.PassSET_ZB(TRUE,FALSE,TRUE); // force inverted Z-Buffer
 
         C.r_Sampler_rtf("s_position", r2_RT_P);
@@ -118,8 +118,8 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 
         //C.r_ColorWriteEnable( false, false, false, true );
 
-        C.RS.SetRS(D3DRS_SRCBLEND, D3D_BLEND_ZERO);
-        C.RS.SetRS(D3DRS_DESTBLEND, D3D_BLEND_SRC_COLOR);
+        C.RS.SetSrcBlend(nvrhi::BlendFactor::Zero);
+        C.RS.SetDestBlend(nvrhi::BlendFactor::SrcColor);
 
         C.r_End();
 
@@ -143,8 +143,8 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case 0: // Patch normals
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE);
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha);
         C.r_Pass("stub_notransform_2uv", "rain_patch_normal_msaa", false, TRUE, FALSE, FALSE);
         C.PassSET_ZB(TRUE,FALSE,TRUE); // force inverted Z-Buffer
 
@@ -173,8 +173,8 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
         break;
 
     case 1: // Apply normals
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE);
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha);
         C.r_Pass("stub_notransform_2uv", "rain_apply_normal_msaa", false, TRUE, FALSE, FALSE);
         C.PassSET_ZB(TRUE,FALSE,TRUE); // force inverted Z-Buffer
 
@@ -203,9 +203,9 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
         break;
 
     case 2: // Apply gloss
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE);
-        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA);
-        C.r_Pass("stub_notransform_2uv", "rain_apply_gloss_msaa", false, TRUE, FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
+        //C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha);
+        C.r_Pass("stub_notransform_2uv", "rain_apply_gloss_msaa", false, TRUE, FALSE, TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
         C.PassSET_ZB(TRUE,FALSE,TRUE); // force inverted Z-Buffer
 
         C.r_Sampler_rtf("s_position", r2_RT_P);
@@ -224,8 +224,8 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
 
         //C.r_ColorWriteEnable( false, false, false, true );
 
-        C.RS.SetRS(D3DRS_SRCBLEND, D3D_BLEND_ZERO);
-        C.RS.SetRS(D3DRS_DESTBLEND, D3D_BLEND_SRC_COLOR);
+        C.RS.SetSrcBlend(nvrhi::BlendFactor::Zero);
+        C.RS.SetDestBlend(nvrhi::BlendFactor::SrcColor);
 
         C.r_End();
 

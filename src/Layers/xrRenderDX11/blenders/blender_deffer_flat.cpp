@@ -73,14 +73,14 @@ void CBlender_deffer_flat::Compile(CBlender_Compile& C)
     case SE_R2_NORMAL_HQ: // deffer
         uber_deffer(C, true, "base", "base", false, nullptr, true);
 
-        C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+        C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
         C.r_StencilRef(0x01);
         C.r_End();
         break;
     case SE_R2_NORMAL_LQ: // deffer
         uber_deffer(C, false, "base", "base", false, nullptr, true);
 
-        C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+        C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
         C.r_StencilRef(0x01);
         C.r_End();
         break;
@@ -103,14 +103,14 @@ void CBlender_deffer_flat::Compile(CBlender_Compile& C)
     case SE_R2_NORMAL_HQ: // deffer
         uber_deffer(C, true, "base", "base", false, 0, true);
 
-        C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+        C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
         C.r_StencilRef(0x01);
         C.r_End();
         break;
     case SE_R2_NORMAL_LQ: // deffer
         uber_deffer(C, false, "base", "base", false, 0, true);
 
-        C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+        C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
         C.r_StencilRef(0x01);
         C.r_End();
         break;

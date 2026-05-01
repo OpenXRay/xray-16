@@ -72,17 +72,15 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
     {
         C.PassBegin();
         {
-            const D3D_BLEND blend_src = oBlend.value ? D3D_BLEND_SRC_ALPHA : D3D_BLEND_ONE;
-            const D3D_BLEND blend_dst = oBlend.value ? D3D_BLEND_INV_SRC_ALPHA : D3D_BLEND_ZERO;
+            const nvrhi::BlendFactor blend_src = oBlend.value ? nvrhi::BlendFactor::SrcAlpha : nvrhi::BlendFactor::One;
+            const nvrhi::BlendFactor blend_dst = oBlend.value ? nvrhi::BlendFactor::InvSrcAlpha : nvrhi::BlendFactor::Zero;
 
             C.PassSET_Blend(true, blend_src, blend_dst, true, oAREF.value);
             C.PassSET_LightFog(true, true);
 
             // Stage0 - Base texture
             C.StageBegin();
-            C.StageSET_Address(D3D_TEXTURE_ADDRESS_WRAP);
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.StageSET_Address(nvrhi::SamplerAddressMode::Wrap);
             C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
             C.StageEnd();
         }
@@ -100,9 +98,9 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
             {
                 C.PassSET_ZB(true, true);
                 if (oBlend.value)
-                    C.PassSET_Blend(TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, oAREF.value);
+                    C.PassSET_Blend(TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE, oAREF.value);
                 else
-                    C.PassSET_Blend(TRUE, D3D_BLEND_ONE, D3D_BLEND_ZERO, TRUE, oAREF.value);
+                    C.PassSET_Blend(TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero, TRUE, oAREF.value);
                 C.PassSET_LightFog(false, true);
 
                 // Stage0 - Lightmap
@@ -115,8 +113,6 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
 
                 // Stage1 - Base texture
                 C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
                 C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
                 C.StageEnd();
             }
@@ -151,8 +147,8 @@ void CBlender_default_aref::CompileProgrammable(CBlender_Compile& C) const
 {
     R_ASSERT2(C.L_textures.size() >= 2, "Not enough textures for shader");
 
-    const D3D_BLEND blend_src = oBlend.value ? D3D_BLEND_SRC_ALPHA : D3D_BLEND_ONE;
-    const D3D_BLEND blend_dst = oBlend.value ? D3D_BLEND_INV_SRC_ALPHA : D3D_BLEND_ZERO;
+    const nvrhi::BlendFactor blend_src = oBlend.value ? nvrhi::BlendFactor::SrcAlpha : nvrhi::BlendFactor::One;
+    const nvrhi::BlendFactor blend_dst = oBlend.value ? nvrhi::BlendFactor::InvSrcAlpha : nvrhi::BlendFactor::Zero;
 
     switch (C.iElement)
     {
@@ -210,7 +206,7 @@ void CBlender_default_aref::CompileProgrammable(CBlender_Compile& C) const
             C.PassSET_Shaders("lmap_point", "add_point");
 
             C.PassSET_ZB(true, false);
-            C.PassSET_ablend_mode(true, D3D_BLEND_ONE, D3D_BLEND_ONE);
+            C.PassSET_ablend_mode(true, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
             C.PassSET_ablend_aref(true, oAREF.value);
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);
@@ -231,7 +227,7 @@ void CBlender_default_aref::CompileProgrammable(CBlender_Compile& C) const
             C.PassSET_Shaders("lmap_spot", "add_spot");
 
             C.PassSET_ZB(true, false);
-            C.PassSET_ablend_mode(true, D3D_BLEND_ONE, D3D_BLEND_ONE);
+            C.PassSET_ablend_mode(true, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One);
             C.PassSET_ablend_aref(true, oAREF.value);
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);

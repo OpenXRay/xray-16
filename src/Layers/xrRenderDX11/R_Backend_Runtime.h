@@ -107,7 +107,7 @@ IC void CBackend::set_Matrices(SMatrixList* matrix_list)
                 {
                     matrices[it] = mat;
                     mat->Calculate();
-                    set_xform(D3DTS_TEXTURE0 + it, mat->xform);
+                    set_xform(16u + it, mat->xform);
                     stat.matrices++;
                 }
             }

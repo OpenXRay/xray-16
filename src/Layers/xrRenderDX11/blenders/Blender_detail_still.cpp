@@ -54,8 +54,6 @@ void CBlender_Detail_Still::CompileFFP(CBlender_Compile& C) const
 
         // Stage1 - Base texture
         C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
         C.StageSET_TMC(oT_Name, "$null", "$null", 0);
         C.StageEnd();
     }
@@ -76,8 +74,6 @@ void CBlender_Detail_Still::CompileFFP(CBlender_Compile& C) const
 
             // Stage1 - Base texture
             C.StageBegin();
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
-            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
             C.StageSET_TMC(oT_Name, "$null", "$null", 0);
             C.StageEnd();
             break;
@@ -88,8 +84,6 @@ void CBlender_Detail_Still::CompileFFP(CBlender_Compile& C) const
 
             // Stage1 - Base texture
             C.StageBegin();
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_DIFFUSE);
-            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
             C.StageSET_TMC(oT_Name, "$null", "$null", 0);
             C.StageEnd();
             break;
@@ -105,14 +99,14 @@ void CBlender_Detail_Still::CompileProgrammable(CBlender_Compile& C) const
     switch (C.iElement)
     {
     case SE_R1_NORMAL_HQ:
-        C.r_Pass("detail_wave", "detail", FALSE, TRUE, TRUE, FALSE, D3D_BLEND_ONE, D3D_BLEND_ZERO,
+        C.r_Pass("detail_wave", "detail", FALSE, TRUE, TRUE, FALSE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero,
             oBlend.value ? TRUE : FALSE, oBlend.value ? 200 : 0);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_End();
         break;
 
     case SE_R1_NORMAL_LQ:
-        C.r_Pass("detail_still", "detail", FALSE, TRUE, TRUE, FALSE, D3D_BLEND_ONE, D3D_BLEND_ZERO,
+        C.r_Pass("detail_still", "detail", FALSE, TRUE, TRUE, FALSE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero,
             oBlend.value ? TRUE : FALSE, oBlend.value ? 200 : 0);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_End();

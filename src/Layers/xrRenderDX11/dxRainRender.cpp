@@ -208,13 +208,13 @@ void dxRainRender::Render(CEffect_Rain& owner)
     // Render if needed
     if (vCount)
     {
-        // HW.pDevice->SetRenderState	(D3DRS_CULLMODE,D3D_CULL_NONE);
+        // HW.pDevice->SetRenderState	(D3DRS_CULLMODE,nvrhi::RasterCullMode::None);
         RCache.set_CullMode(CULL_NONE);
         RCache.set_xform_world(Fidentity);
         RCache.set_Shader(SH_Rain);
         RCache.set_Geometry(hGeom_Rain);
         RCache.Render(D3D_PT_TRIANGLELIST, vOffset, 0, vCount, 0, vCount / 2);
-        // HW.pDevice->SetRenderState	(D3DRS_CULLMODE,D3D_CULL_BACK);
+        // HW.pDevice->SetRenderState	(D3DRS_CULLMODE,nvrhi::RasterCullMode::Back);
         RCache.set_CullMode(CULL_CCW);
     }
 

@@ -84,7 +84,7 @@ dx11StateCache<ID3DxxRasterizerState, D3D_RASTERIZER_DESC>
 ::ResetDescription( D3D_RASTERIZER_DESC &desc )
 {
     ZeroMemory(&desc, sizeof(desc));
-    desc.FillMode = D3D_FILL_SOLID;
+    desc.FillMode = nvrhi::RasterFillMode::Solid;
     desc.CullMode = D3Dxx_CULL_BACK;
     desc.FrontCounterClockwise = FALSE;
     desc.DepthBias = 0;

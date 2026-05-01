@@ -94,14 +94,14 @@ struct ShaderRTBindings {
         // Sampler state metadata (from X-Ray naming conventions)
         // See gamedata/shaders/r5/common_samplers.h for authoritative definitions
         enum class FilterMode : u8 {
-            Point,        // D3D_TEXF_POINT
-            Linear,       // D3D_TEXF_LINEAR
-            Anisotropic   // D3D_TEXF_ANISOTROPIC
+            Point,        // SamplerFilter::Point
+            Linear,       // SamplerFilter::Linear
+            Anisotropic   // SamplerFilter::Anisotropic
         };
 
         enum class AddressMode : u8 {
-            Wrap,   // D3D_TEXTURE_ADDRESS_WRAP
-            Clamp   // D3D_TEXTURE_ADDRESS_CLAMP
+            Wrap,   // nvrhi::SamplerAddressMode::Wrap
+            Clamp   // nvrhi::SamplerAddressMode::Clamp
         };
 
         struct SamplerState {
@@ -128,7 +128,7 @@ struct ShaderRTBindings {
             SamplerState state;
 
             if (strstr(name.c_str(), "smp_rtlinear") != nullptr) {
-                // D3D_TEXTURE_ADDRESS_CLAMP, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR
+                // nvrhi::SamplerAddressMode::Clamp, SamplerFilter::Linear, SamplerFilter::Point, SamplerFilter::Linear
                 state.addressMode = AddressMode::Clamp;
                 state.minFilter = FilterMode::Linear;
                 state.magFilter = FilterMode::Linear;
@@ -136,7 +136,7 @@ struct ShaderRTBindings {
                 state.maxAnisotropy = 1;
             }
             else if (strstr(name.c_str(), "smp_linear") != nullptr) {
-                // D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR
+                // nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Linear, SamplerFilter::Linear, SamplerFilter::Linear
                 state.addressMode = AddressMode::Wrap;
                 state.minFilter = FilterMode::Linear;
                 state.magFilter = FilterMode::Linear;
@@ -146,7 +146,7 @@ struct ShaderRTBindings {
             else if (strstr(name.c_str(), "smp_base") != nullptr ||
                      strstr(name.c_str(), "smp_material") != nullptr ||
                      strstr(name.c_str(), "smp_bump") != nullptr) {
-                // D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC
+                // nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Anisotropic, SamplerFilter::Linear, SamplerFilter::Anisotropic
                 state.addressMode = AddressMode::Wrap;
                 state.minFilter = FilterMode::Anisotropic;
                 state.magFilter = FilterMode::Anisotropic;

@@ -10,11 +10,6 @@
 
 #include "xrParticles/psystem.h"
 
-#ifdef _DEBUG
-#define D3D_DEBUG_INFO
-#endif
-#include <D3D9.h>
-
 #include <D3D11.h>
 #include <D3DCompiler.h>
 
@@ -73,10 +68,10 @@ namespace xray::render::fg
 {
 IC void jitter(CBlender_Compile& C)
 {
-    //	C.r_Sampler	("jitter0",	JITTER(0), true, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
-    //	C.r_Sampler	("jitter1",	JITTER(1), true, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
-    //	C.r_Sampler	("jitter2",	JITTER(2), true, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
-    //	C.r_Sampler	("jitter3",	JITTER(3), true, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
+    //	C.r_Sampler	("jitter0",	JITTER(0), true, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Point, SamplerFilter::Point, SamplerFilter::Point);
+    //	C.r_Sampler	("jitter1",	JITTER(1), true, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Point, SamplerFilter::Point, SamplerFilter::Point);
+    //	C.r_Sampler	("jitter2",	JITTER(2), true, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Point, SamplerFilter::Point, SamplerFilter::Point);
+    //	C.r_Sampler	("jitter3",	JITTER(3), true, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Point, SamplerFilter::Point, SamplerFilter::Point);
     C.r_dx11Texture("jitter0", JITTER(0));
     C.r_dx11Texture("jitter1", JITTER(1));
     C.r_dx11Texture("jitter2", JITTER(2));

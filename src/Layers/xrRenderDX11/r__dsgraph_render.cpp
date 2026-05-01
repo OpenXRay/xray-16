@@ -200,14 +200,14 @@ public:
             return;
 
         // Change culling mode if HUD meshes were flipped
-        if (cullMode != CULL_NONE)
+        if (cullMode != static_cast<u32>(CULL_NONE))
         {
-            cmd_list.set_CullMode(cullMode == CULL_CW ? CULL_CCW : CULL_CW);
+            cmd_list.set_CullMode(cullMode == static_cast<u32>(CULL_CW) ? CULL_CCW : CULL_CW);
         }
     }
 };
 
-u32 hud_transform_helper::cullMode = CULL_NONE;
+u32 hud_transform_helper::cullMode = static_cast<u32>(CULL_NONE);
 bool hud_transform_helper::isActive = false;
 
 template<class T>

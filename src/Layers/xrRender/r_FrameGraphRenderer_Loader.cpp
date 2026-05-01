@@ -447,7 +447,7 @@ void FrameGraphRenderer::LoadBuffers(CStreamReader* base_fs, bool alternative)
         decls.resize(count);
         vbuffers.resize(count);
 
-        constexpr size_t buffer_size = (MAXD3DDECLLENGTH + 1) * sizeof(VertexElement);
+        constexpr size_t buffer_size = (XR_MAX_DECL_LENGTH + 1) * sizeof(VertexElement);
         for (u32 i = 0; i < count; i++)
         {
             // decl

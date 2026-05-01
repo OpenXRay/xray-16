@@ -11,28 +11,25 @@ namespace xray::render::fg
 {
 void fix_texture_name(pstr fn);
 
-void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
+void CBlender_Compile::r_Stencil(BOOL Enable, nvrhi::ComparisonFunc Func, u32 Mask, u32 WriteMask, nvrhi::StencilOp Fail, nvrhi::StencilOp Pass, nvrhi::StencilOp ZFail)
 {
-    RS.SetRS(D3DRS_STENCILENABLE, BC(Enable));
+    RS.SetStencilEnable(BC(Enable));
     if (!Enable)
         return;
-    RS.SetRS(D3DRS_STENCILFUNC, Func);
-    RS.SetRS(D3DRS_STENCILMASK, Mask);
-    RS.SetRS(D3DRS_STENCILWRITEMASK, WriteMask);
-    RS.SetRS(D3DRS_STENCILFAIL, Fail);
-    RS.SetRS(D3DRS_STENCILPASS, Pass);
-    RS.SetRS(D3DRS_STENCILZFAIL, ZFail);
-    //	Since we never really support different options for
-    //	CW/CCW stencil use it to mimic DX9 behaviour for
-    //	single-sided stencil
-    RS.SetRS(D3DRS_CCW_STENCILFUNC, Func);
-    RS.SetRS(D3DRS_CCW_STENCILFAIL, Fail);
-    RS.SetRS(D3DRS_CCW_STENCILPASS, Pass);
-    RS.SetRS(D3DRS_CCW_STENCILZFAIL, ZFail);
+    RS.SetFrontStencilFunc(Func);
+    RS.SetStencilReadMask((u8)(Mask));
+    RS.SetStencilWriteMask((u8)(WriteMask));
+    RS.SetFrontStencilFail(Fail);
+    RS.SetFrontStencilPass(Pass);
+    RS.SetFrontStencilDepthFail(ZFail);
+    RS.SetBackStencilFunc(Func);
+    RS.SetBackStencilFail(Fail);
+    RS.SetBackStencilPass(Pass);
+    RS.SetBackStencilDepthFail(ZFail);
 }
 
-void CBlender_Compile::r_StencilRef(u32 Ref) { RS.SetRS(D3DRS_STENCILREF, Ref); }
-void CBlender_Compile::r_CullMode(D3D_CULL_MODE Mode) { RS.SetRS(D3DRS_CULLMODE, (u32)Mode); }
+void CBlender_Compile::r_StencilRef(u32 Ref) { RS.SetStencilRef((u8)(Ref)); }
+void CBlender_Compile::r_CullMode(nvrhi::RasterCullMode Mode) { RS.SetCullMode(Mode); }
 void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive /*= false*/)
 {
     VERIFY(ResourceName);
@@ -73,7 +70,7 @@ void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool r
 void CBlender_Compile::i_dx11FilterAnizo(u32 s, BOOL value)
 {
     VERIFY(s != u32(-1));
-    RS.SetSAMP(s, XRDX11SAMP_ANISOTROPICFILTER, value);
+    RS.SetSamplerAnisotropic(s, value ? 16 : 1);
 }
 
 u32 CBlender_Compile::r_dx11Sampler(LPCSTR ResourceName)
@@ -86,62 +83,61 @@ u32 CBlender_Compile::r_dx11Sampler(LPCSTR ResourceName)
 
     //	init defaults here:
 
-    //	Use D3D_TEXTURE_ADDRESS_CLAMP,	D3D_TEXF_POINT,			D3D_TEXF_NONE,	D3D_TEXF_POINT
+    //	Use nvrhi::SamplerAddressMode::Clamp,	SamplerFilter::Point,			SamplerFilter::Point,	SamplerFilter::Point
     if (0 == xr_strcmp(ResourceName, "smp_nofilter"))
     {
-        i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
-        i_Filter(stage, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
+        i_Address(stage, nvrhi::SamplerAddressMode::Clamp);
+        i_Filter(stage, SamplerFilter::Point, SamplerFilter::Point, SamplerFilter::Point);
     }
 
-    //	Use D3D_TEXTURE_ADDRESS_CLAMP,	D3D_TEXF_LINEAR,			D3D_TEXF_NONE,	D3D_TEXF_LINEAR
+    //	Use nvrhi::SamplerAddressMode::Clamp,	SamplerFilter::Linear,			SamplerFilter::Point,	SamplerFilter::Linear
     else if (0 == xr_strcmp(ResourceName, "smp_rtlinear"))
     {
-        i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
-        i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
+        i_Address(stage, nvrhi::SamplerAddressMode::Clamp);
+        i_Filter(stage, SamplerFilter::Linear, SamplerFilter::Point, SamplerFilter::Linear);
     }
 
-    //	Use	D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_LINEAR,			D3D_TEXF_LINEAR,	D3D_TEXF_LINEAR
+    //	Use	nvrhi::SamplerAddressMode::Wrap,	SamplerFilter::Linear,			SamplerFilter::Linear,	SamplerFilter::Linear
     else if (0 == xr_strcmp(ResourceName, "smp_linear"))
     {
-        i_Address(stage, D3D_TEXTURE_ADDRESS_WRAP);
-        i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR);
+        i_Address(stage, nvrhi::SamplerAddressMode::Wrap);
+        i_Filter(stage, SamplerFilter::Linear, SamplerFilter::Linear, SamplerFilter::Linear);
     }
 
-    //	Use D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_ANISOTROPIC, 	D3D_TEXF_LINEAR,	D3D_TEXF_ANISOTROPIC
+    //	Use nvrhi::SamplerAddressMode::Wrap,	SamplerFilter::Anisotropic, 	SamplerFilter::Linear,	SamplerFilter::Anisotropic
     else if (0 == xr_strcmp(ResourceName, "smp_base"))
     {
-        i_Address(stage, D3D_TEXTURE_ADDRESS_WRAP);
+        i_Address(stage, nvrhi::SamplerAddressMode::Wrap);
         i_dx11FilterAnizo(stage, TRUE);
-        // i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR);
+        // i_Filter(stage, SamplerFilter::Linear, SamplerFilter::Linear, SamplerFilter::Linear);
     }
 
-    //	Use D3D_TEXTURE_ADDRESS_CLAMP,	D3D_TEXF_LINEAR,			D3D_TEXF_NONE,	D3D_TEXF_LINEAR
+    //	Use nvrhi::SamplerAddressMode::Clamp,	SamplerFilter::Linear,			SamplerFilter::Point,	SamplerFilter::Linear
     else if (0 == xr_strcmp(ResourceName, "smp_material"))
     {
-        i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
-        i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
-        RS.SetSAMP(stage, D3DSAMP_ADDRESSW, D3D_TEXTURE_ADDRESS_WRAP);
+        i_Address(stage, nvrhi::SamplerAddressMode::Clamp);
+        i_Filter(stage, SamplerFilter::Linear, SamplerFilter::Point, SamplerFilter::Linear);
+        RS.SetSamplerAddressW(stage, nvrhi::SamplerAddressMode::Wrap);
     }
 
     else if (0 == xr_strcmp(ResourceName, "smp_smap"))
     {
-        i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
-        i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
-        RS.SetSAMP(stage, XRDX11SAMP_COMPARISONFILTER, TRUE);
-        RS.SetSAMP(stage, XRDX11SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
+        i_Address(stage, nvrhi::SamplerAddressMode::Clamp);
+        i_Filter(stage, SamplerFilter::Linear, SamplerFilter::Point, SamplerFilter::Linear);
+        RS.SetSamplerComparison(stage, true);
     }
 
     else if (0 == xr_strcmp(ResourceName, "smp_jitter"))
     {
-        i_Address(stage, D3D_TEXTURE_ADDRESS_WRAP);
-        i_Filter(stage, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
+        i_Address(stage, nvrhi::SamplerAddressMode::Wrap);
+        i_Filter(stage, SamplerFilter::Point, SamplerFilter::Point, SamplerFilter::Point);
     }
 
     return stage;
 }
 
 void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite, BOOL bABlend,
-                              D3D_BLEND abSRC, D3D_BLEND abDST, BOOL aTest, u32 aRef)
+                              nvrhi::BlendFactor abSRC, nvrhi::BlendFactor abDST, BOOL aTest, u32 aRef)
 {
     RS.Invalidate();
     ctable.clear();
@@ -170,13 +166,11 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     // Last Stage - disable
     if (0 == xr_stricmp(_ps, "null"))
     {
-        RS.SetTSS(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-        RS.SetTSS(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     }
 }
 
 void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest,
-    BOOL bZwrite, BOOL bABlend, D3D_BLEND abSRC, D3D_BLEND abDST, BOOL aTest, u32 aRef)
+    BOOL bZwrite, BOOL bABlend, nvrhi::BlendFactor abSRC, nvrhi::BlendFactor abDST, BOOL aTest, u32 aRef)
 {
     r_Pass(vs, gs, ps, bFog, bZtest, bZwrite, bABlend, abSRC, abDST, aTest, aRef);
 

@@ -78,8 +78,6 @@ void CBlender_Vertex::CompileFFP(CBlender_Compile& C) const
 
             // Stage0 - Base texture
             C.StageBegin();
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
             C.Stage_Texture(oT_Name);
             C.Stage_Matrix(oT_xform, 0);
             C.Stage_Constant("$null");
@@ -98,13 +96,11 @@ void CBlender_Vertex::CompileFFP(CBlender_Compile& C) const
             C.PassBegin();
             {
                 C.PassSET_ZB(TRUE, TRUE);
-                C.PassSET_Blend(FALSE, D3D_BLEND_ONE, D3D_BLEND_ZERO, FALSE, 0);
+                C.PassSET_Blend(FALSE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero, FALSE, 0);
                 C.PassSET_LightFog(FALSE, TRUE);
 
                 // Stage0 - Base texture
                 C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
                 C.Stage_Texture(oT_Name);
                 C.Stage_Matrix(oT_xform, 0);
                 C.Stage_Constant("$null");
@@ -124,8 +120,6 @@ void CBlender_Vertex::CompileFFP(CBlender_Compile& C) const
 
                 // Stage0 - diffuse
                 C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_DIFFUSE);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_DIFFUSE);
                 C.Stage_Texture("$null");
                 C.Stage_Matrix("$null", 0);
                 C.Stage_Constant("$null");
@@ -181,7 +175,7 @@ void CBlender_Vertex::CompileProgrammable(CBlender_Compile& C) const
             C.PassSET_Shaders("vert_point", "add_point");
 
             C.PassSET_ZB(true, false);
-            C.PassSET_Blend(true, D3D_BLEND_ONE, D3D_BLEND_ONE, true, 0);
+            C.PassSET_Blend(true, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, true, 0);
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);
             C.SampledImage("smp_rtlinear", "s_lmap", TEX_POINT_ATT);
@@ -196,7 +190,7 @@ void CBlender_Vertex::CompileProgrammable(CBlender_Compile& C) const
             C.PassSET_Shaders("vert_spot", "add_spot");
 
             C.PassSET_ZB(true, false);
-            C.PassSET_Blend(true, D3D_BLEND_ONE, D3D_BLEND_ONE, true, 0);
+            C.PassSET_Blend(true, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, true, 0);
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);
             u32 stage = C.SampledImage("smp_rtlinear", "s_lmap", "internal" DELIMITER "internal_light_att");

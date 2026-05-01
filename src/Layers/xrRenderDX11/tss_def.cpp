@@ -11,488 +11,225 @@
 
 namespace xray::render::fg
 {
-// TODO: DX11: Implement equivalent for SimulatorStates::record for DX11
+namespace
+{
+D3D_TEXTURE_ADDRESS_MODE NvrhiToD3DAddress(nvrhi::SamplerAddressMode m)
+{
+    switch (m)
+    {
+    case nvrhi::SamplerAddressMode::Clamp:      return D3D11_TEXTURE_ADDRESS_CLAMP;
+    case nvrhi::SamplerAddressMode::Wrap:       return D3D11_TEXTURE_ADDRESS_WRAP;
+    case nvrhi::SamplerAddressMode::Border:     return D3D11_TEXTURE_ADDRESS_BORDER;
+    case nvrhi::SamplerAddressMode::Mirror:     return D3D11_TEXTURE_ADDRESS_MIRROR;
+    case nvrhi::SamplerAddressMode::MirrorOnce: return D3D11_TEXTURE_ADDRESS_MIRROR_ONCE;
+    }
+    return D3D11_TEXTURE_ADDRESS_WRAP;
+}
+}
+
+void SimulatorStates::SetSamplerAddress(u32 slot, nvrhi::SamplerAddressMode u, nvrhi::SamplerAddressMode v, nvrhi::SamplerAddressMode w)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].addressU = u;
+    samplers[slot].addressV = v;
+    samplers[slot].addressW = w;
+}
+
+void SimulatorStates::SetSamplerAddress(u32 slot, nvrhi::SamplerAddressMode mode)
+{
+    SetSamplerAddress(slot, mode, mode, mode);
+}
+
+void SimulatorStates::SetSamplerAddressU(u32 slot, nvrhi::SamplerAddressMode mode)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].addressU = mode;
+}
+
+void SimulatorStates::SetSamplerAddressV(u32 slot, nvrhi::SamplerAddressMode mode)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].addressV = mode;
+}
+
+void SimulatorStates::SetSamplerAddressW(u32 slot, nvrhi::SamplerAddressMode mode)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].addressW = mode;
+}
+
+void SimulatorStates::SetSamplerFilter(u32 slot, bool _min, bool _mip, bool _mag)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].minFilter = _min;
+    samplers[slot].mipFilter = _mip;
+    samplers[slot].magFilter = _mag;
+}
+
+void SimulatorStates::SetSamplerFilterMin(u32 slot, bool linear)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].minFilter = linear;
+}
+
+void SimulatorStates::SetSamplerFilterMip(u32 slot, bool linear)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].mipFilter = linear;
+}
+
+void SimulatorStates::SetSamplerFilterMag(u32 slot, bool linear)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].magFilter = linear;
+}
+
+void SimulatorStates::SetSamplerAnisotropic(u32 slot, u32 level)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].maxAnisotropy = static_cast<float>(level);
+}
+
+void SimulatorStates::SetSamplerComparison(u32 slot, bool enable)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].reductionType = enable ? nvrhi::SamplerReductionType::Comparison : nvrhi::SamplerReductionType::Standard;
+}
+
+void SimulatorStates::SetSamplerBorderColor(u32 slot, u32 packed_argb)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].borderColor.r = ((packed_argb >> 16) & 0xff) / 255.0f;
+    samplers[slot].borderColor.g = ((packed_argb >> 8)  & 0xff) / 255.0f;
+    samplers[slot].borderColor.b = ((packed_argb)       & 0xff) / 255.0f;
+    samplers[slot].borderColor.a = ((packed_argb >> 24) & 0xff) / 255.0f;
+}
+
+void SimulatorStates::SetSamplerMipLODBias(u32 slot, float bias)
+{
+    samplerUsed[slot] = true;
+    samplers[slot].mipBias = bias;
+}
+
 void SimulatorStates::record(ID3DState*& state)
 {
-#if defined(USE_DX9)
-    CHK_DX(HW.pDevice->BeginStateBlock());
-    for (u32 it = 0; it < States.size(); it++)
-    {
-        State& S = States[it];
-        switch (S.type)
-        {
-        case 0: CHK_DX(HW.pDevice->SetRenderState((D3DRENDERSTATETYPE)S.v1, S.v2)); break;
-        case 1: CHK_DX(HW.pDevice->SetTextureStageState(S.v1, (D3DTEXTURESTAGESTATETYPE)S.v2, S.v3)); break;
-        case 2:
-        {
-            CHK_DX(HW.pDevice->SetSamplerState(S.v1, (D3DSAMPLERSTATETYPE)S.v2,
-                ((D3DSAMPLERSTATETYPE)S.v2==D3DSAMP_MAGFILTER && S.v3==D3D_TEXF_ANISOTROPIC) ? D3D_TEXF_LINEAR : S.v3));
-        }
-        break;
-        }
-    }
-    CHK_DX(HW.pDevice->EndStateBlock(&state));
-#elif defined(USE_DX11)
-    // VERIFY(!"SimulatorStates::record not implemented!");
+#if defined(USE_DX11)
     state = ID3DState::Create(*this);
 #elif defined(USE_OGL)
     state = ID3DState::Create();
-    for (SimulatorStates::State& S : States)
-    {
-        // Update aniso value
-        if (S.type == 2 && S.v2 == D3DSAMP_MAXANISOTROPY)
-            S.v3 = ps_r__tf_Anisotropic;
-
-        // Update states
-        switch (S.type)
-        {
-        case 0:	state->UpdateRenderState(S.v1, S.v2); break;
-        //case 1: VERIFY(!"Texture environment not supported"); break;
-        case 2: state->UpdateSamplerState(S.v1, S.v2, S.v3); break;
-        }
-    }
 #else
 #   error No graphics API selected or enabled!
 #endif
 }
 
-void SimulatorStates::set_RS(u32 a, u32 b)
+void SimulatorStates::clear() { *this = SimulatorStates{}; }
+
+BOOL SimulatorStates::equal(const SimulatorStates& other) const
 {
-    // Search duplicates
-    for (int t = 0; t < int(States.size()); t++)
-    {
-        State& S = States[t];
-        if ((0 == S.type) && (a == S.v1))
-        {
-            States.erase(States.begin() + t);
-            break;
-        }
-    }
-
-    // Register
-    State st;
-    st.set_RS(a, b);
-    States.push_back(st);
+    return std::memcmp(this, &other, sizeof(*this)) == 0;
 }
-
-void SimulatorStates::set_TSS(u32 a, u32 b, u32 c)
-{
-    // Search duplicates
-    for (int t = 0; t < int(States.size()); t++)
-    {
-        State& S = States[t];
-        if ((1 == S.type) && (a == S.v1) && (b == S.v2))
-        {
-            States.erase(States.begin() + t);
-            break;
-        }
-    }
-
-    // Register
-    State st;
-    st.set_TSS(a, b, c);
-    States.push_back(st);
-}
-
-void SimulatorStates::set_SAMP(u32 a, u32 b, u32 c)
-{
-    // Search duplicates
-    for (int t = 0; t < int(States.size()); t++)
-    {
-        State& S = States[t];
-        if ((2 == S.type) && (a == S.v1) && (b == S.v2))
-        {
-            States.erase(States.begin() + t);
-            break;
-        }
-    }
-
-    // Register
-    State st;
-    st.set_SAMP(a, b, c);
-    States.push_back(st);
-}
-
-BOOL SimulatorStates::equal(SimulatorStates& S)
-{
-    if (States.size() != S.States.size())
-        return FALSE;
-    if (0 != memcmp(&*States.begin(), &*S.States.begin(), States.size() * sizeof(State)))
-        return FALSE;
-    return TRUE;
-}
-
-void SimulatorStates::clear() { States.clear(); }
 
 #if defined(USE_DX11)
 void SimulatorStates::UpdateState(dx11State& state) const
 {
-    for (u32 it = 0; it < States.size(); it++)
-    {
-        const State& S = States[it];
-        if (S.type == 0)
-        {
-            switch (S.v1)
-            {
-            case D3DRS_STENCILREF: state.UpdateStencilRef(S.v2); break;
-            case D3DRS_ALPHAREF: state.UpdateAlphaRef(S.v2); break;
-            }
-        }
-    }
+    state.UpdateStencilRef(depthStencil.stencilRefValue);
+    state.UpdateAlphaRef(alphaRef);
 }
 
 void SimulatorStates::UpdateDesc(D3D_RASTERIZER_DESC& desc) const
 {
-    for (u32 it = 0; it < States.size(); it++)
+    desc.FillMode      = (raster.fillMode == nvrhi::RasterFillMode::Wireframe) ? D3D11_FILL_WIREFRAME : D3D11_FILL_SOLID;
+    switch (raster.cullMode)
     {
-        const State& S = States[it];
-        if (S.type == 0)
-        {
-            // CHK_DX(HW.pDevice->SetRenderState        ((D3DRENDERSTATETYPE)S.v1,S.v2));
-            switch (S.v1)
-            {
-            case D3DRS_FILLMODE:
-                if (S.v2 == D3D_FILL_SOLID)
-                    desc.FillMode = D3D_FILL_SOLID;
-                else
-                {
-                    VERIFY(S.v2 == D3D_FILL_WIREFRAME);
-                    desc.FillMode = D3D_FILL_WIREFRAME;
-                }
-                break;
-
-            case D3DRS_CULLMODE:
-                desc.CullMode = dx11StateUtils::ConvertCullMode((D3D_CULL_MODE)S.v2);
-                break;
-            /*
-            switch (S.v2)
-            {
-            case D3D_CULL_NONE:
-                desc.CullMode = D3Dxx_CULL_NONE;
-                break;
-            case D3D_CULL_FRONT:
-                desc.CullMode = D3Dxx_CULL_FRONT;
-                break;
-            case D3D_CULL_BACK:
-                desc.CullMode = D3Dxx_CULL_BACK;
-                break;
-            default:
-                VERIFY(!"Unexpected cull mode!");
-            }
-        break;
-        */
-
-            //  desc.FrontCounterClockwise = FALSE;
-
-            //  TODO: DX11: Check how to scale unit for depth bias
-            case D3DRS_DEPTHBIAS:
-                VERIFY(0);
-                break;
-
-            //  desc.DepthBiasClamp = 0.0f;
-
-            //  TODO: DX11: Check slope scaled depth bias is used
-            case D3DRS_SLOPESCALEDEPTHBIAS:
-                // desc.SlopeScaledDepthBias = 0.0f;
-                VERIFY(0);
-                break;
-
-            //  desc.DepthClipEnable = TRUE;
-
-            case D3DRS_SCISSORTESTENABLE:
-                desc.ScissorEnable = S.v2;
-                break;
-
-                // desc.MultisampleEnable = FALSE;
-                // desc.AntialiasedLineEnable = FALSE;
-            }
-        }
-
-        // case 1:
-        //
-        // CHK_DX(HW.pDevice->SetTextureStageState  (S.v1,(D3DTEXTURESTAGESTATETYPE)S.v2,S.v3));
-        //  TODO: DX11: Enable
-        //  VERIFY(!"DirectX 10 doesn't support texture stage states. Implement shader instead!");
-        //  break;
+    case nvrhi::RasterCullMode::None:  desc.CullMode = D3D11_CULL_NONE;  break;
+    case nvrhi::RasterCullMode::Front: desc.CullMode = D3D11_CULL_FRONT; break;
+    case nvrhi::RasterCullMode::Back:  desc.CullMode = D3D11_CULL_BACK;  break;
     }
+    desc.ScissorEnable = raster.scissorEnable;
 }
 
 void SimulatorStates::UpdateDesc(D3D_DEPTH_STENCIL_DESC& desc) const
 {
-    for (u32 it = 0; it < States.size(); it++)
-    {
-        const State& S = States[it];
-        if (S.type == 0)
-        {
-            switch (S.v1)
-            {
-            case D3DRS_ZENABLE: desc.DepthEnable = S.v2 ? 1 : 0; break;
+    desc.DepthEnable    = depthStencil.depthTestEnable ? 1 : 0;
+    desc.DepthWriteMask = depthStencil.depthWriteEnable ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+    desc.DepthFunc      = static_cast<D3D11_COMPARISON_FUNC>(depthStencil.depthFunc);
 
-            case D3DRS_ZWRITEENABLE:
-                desc.DepthWriteMask = S.v2 ? D3D_DEPTH_WRITE_MASK_ALL : D3D_DEPTH_WRITE_MASK_ZERO;
-                break;
+    desc.StencilEnable    = depthStencil.stencilEnable ? 1 : 0;
+    desc.StencilReadMask  = depthStencil.stencilReadMask;
+    desc.StencilWriteMask = depthStencil.stencilWriteMask;
 
-            case D3DRS_ZFUNC: desc.DepthFunc = dx11StateUtils::ConvertCmpFunction((D3D_COMPARISON_FUNC)S.v2); break;
+    desc.FrontFace.StencilFailOp      = static_cast<D3D11_STENCIL_OP>(depthStencil.frontFaceStencil.failOp);
+    desc.FrontFace.StencilDepthFailOp = static_cast<D3D11_STENCIL_OP>(depthStencil.frontFaceStencil.depthFailOp);
+    desc.FrontFace.StencilPassOp      = static_cast<D3D11_STENCIL_OP>(depthStencil.frontFaceStencil.passOp);
+    desc.FrontFace.StencilFunc        = static_cast<D3D11_COMPARISON_FUNC>(depthStencil.frontFaceStencil.stencilFunc);
 
-            case D3DRS_STENCILENABLE: desc.StencilEnable = S.v2 ? 1 : 0; break;
-
-            case D3DRS_STENCILMASK: desc.StencilReadMask = (u8)S.v2; break;
-
-            case D3DRS_STENCILWRITEMASK: desc.StencilWriteMask = (u8)S.v2; break;
-
-            case D3DRS_STENCILFAIL:
-                desc.FrontFace.StencilFailOp = dx11StateUtils::ConvertStencilOp((D3D_STENCIL_OP)S.v2);
-                break;
-
-            case D3DRS_STENCILZFAIL:
-                desc.FrontFace.StencilDepthFailOp = dx11StateUtils::ConvertStencilOp((D3D_STENCIL_OP)S.v2);
-                break;
-
-            case D3DRS_STENCILPASS:
-                desc.FrontFace.StencilPassOp = dx11StateUtils::ConvertStencilOp((D3D_STENCIL_OP)S.v2);
-                break;
-
-            case D3DRS_STENCILFUNC:
-                desc.FrontFace.StencilFunc = dx11StateUtils::ConvertCmpFunction((D3D_COMPARISON_FUNC)S.v2);
-                break;
-
-            case D3DRS_CCW_STENCILFAIL:
-                desc.BackFace.StencilFailOp = dx11StateUtils::ConvertStencilOp((D3D_STENCIL_OP)S.v2);
-                break;
-
-            case D3DRS_CCW_STENCILZFAIL:
-                desc.BackFace.StencilDepthFailOp = dx11StateUtils::ConvertStencilOp((D3D_STENCIL_OP)S.v2);
-                break;
-
-            case D3DRS_CCW_STENCILPASS:
-                desc.BackFace.StencilPassOp = dx11StateUtils::ConvertStencilOp((D3D_STENCIL_OP)S.v2);
-                break;
-
-            case D3DRS_CCW_STENCILFUNC:
-                desc.BackFace.StencilFunc = dx11StateUtils::ConvertCmpFunction((D3D_COMPARISON_FUNC)S.v2);
-                break;
-            }
-        }
-    }
+    desc.BackFace.StencilFailOp      = static_cast<D3D11_STENCIL_OP>(depthStencil.backFaceStencil.failOp);
+    desc.BackFace.StencilDepthFailOp = static_cast<D3D11_STENCIL_OP>(depthStencil.backFaceStencil.depthFailOp);
+    desc.BackFace.StencilPassOp      = static_cast<D3D11_STENCIL_OP>(depthStencil.backFaceStencil.passOp);
+    desc.BackFace.StencilFunc        = static_cast<D3D11_COMPARISON_FUNC>(depthStencil.backFaceStencil.stencilFunc);
 }
 
 void SimulatorStates::UpdateDesc(D3D_BLEND_DESC& desc) const
 {
-    for (u32 it = 0; it < States.size(); it++)
+    desc.AlphaToCoverageEnable = blend.alphaToCoverageEnable ? 1 : 0;
+    for (int i = 0; i < 8; ++i)
     {
-        const State& S = States[it];
-        if (S.type == 0)
-        {
-            switch (S.v1)
-            {
-            case XRDX11RS_ALPHATOCOVERAGE:
-                for (int i = 0; i < 8; ++i)
-                    desc.AlphaToCoverageEnable = S.v2 ? 1 : 0;
-                break;
-
-            case D3DRS_SRCBLEND:
-                for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].SrcBlend = dx11StateUtils::ConvertBlendArg((D3D_BLEND)S.v2);
-                break;
-
-            case D3DRS_DESTBLEND:
-                for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].DestBlend = dx11StateUtils::ConvertBlendArg((D3D_BLEND)S.v2);
-                break;
-
-            // D3DRS_ALPHAFUNC
-
-            case D3DRS_BLENDOP:
-                for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].BlendOp = dx11StateUtils::ConvertBlendOp((D3D_BLEND_OP)S.v2);
-                break;
-
-            case D3DRS_SRCBLENDALPHA:
-                for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].SrcBlendAlpha = dx11StateUtils::ConvertBlendArg((D3D_BLEND)S.v2);
-                break;
-
-            case D3DRS_DESTBLENDALPHA:
-                for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].DestBlendAlpha = dx11StateUtils::ConvertBlendArg((D3D_BLEND)S.v2);
-                break;
-
-            case D3DRS_BLENDOPALPHA:
-                for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].BlendOpAlpha = dx11StateUtils::ConvertBlendOp((D3D_BLEND_OP)S.v2);
-                break;
-
-            case D3DRS_ALPHABLENDENABLE:
-                for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].BlendEnable = S.v2 ? 1 : 0;
-                break;
-
-            case D3DRS_COLORWRITEENABLE: desc.RenderTarget[0].RenderTargetWriteMask = (u8)S.v2; break;
-
-            case D3DRS_COLORWRITEENABLE1: desc.RenderTarget[1].RenderTargetWriteMask = (u8)S.v2; break;
-
-            case D3DRS_COLORWRITEENABLE2: desc.RenderTarget[2].RenderTargetWriteMask = (u8)S.v2; break;
-
-            case D3DRS_COLORWRITEENABLE3: desc.RenderTarget[3].RenderTargetWriteMask = (u8)S.v2; break;
-            }
-        }
+        const auto& rt = blend.targets[i];
+        desc.RenderTarget[i].BlendEnable           = rt.blendEnable ? 1 : 0;
+        desc.RenderTarget[i].SrcBlend              = static_cast<D3D11_BLEND>(rt.srcBlend);
+        desc.RenderTarget[i].DestBlend             = static_cast<D3D11_BLEND>(rt.destBlend);
+        desc.RenderTarget[i].BlendOp               = static_cast<D3D11_BLEND_OP>(rt.blendOp);
+        desc.RenderTarget[i].SrcBlendAlpha         = static_cast<D3D11_BLEND>(rt.srcBlendAlpha);
+        desc.RenderTarget[i].DestBlendAlpha        = static_cast<D3D11_BLEND>(rt.destBlendAlpha);
+        desc.RenderTarget[i].BlendOpAlpha          = static_cast<D3D11_BLEND_OP>(rt.blendOpAlpha);
+        desc.RenderTarget[i].RenderTargetWriteMask = static_cast<u8>(rt.colorWriteMask);
     }
 }
 
 void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT],
     bool SamplerUsed[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT], int iBaseSamplerIndex) const
 {
-    const int MipfilterLinear = 0x01;
-    const int MagfilterLinear = 0x04;
-    const int MinfilterLinear = 0x10;
-    const int AllfilterLinear = 0x15;
-    const int FilterAnisotropic = 0x40;
-    const int FilterComparison = 0x80;
-
-    for (u32 it = 0; it < States.size(); it++)
+    for (int slot = 0; slot < 16; ++slot)
     {
-        const State& S = States[it];
-        if (S.type == 2)
-        {
-            int iSamplerIndex = int(S.v1);
-            iSamplerIndex -= iBaseSamplerIndex;
+        if (!samplerUsed[slot])
+            continue;
 
-            if ((iSamplerIndex >= D3D_COMMONSHADER_SAMPLER_SLOT_COUNT) || iSamplerIndex < 0)
-                continue;
+        int outIndex = slot - iBaseSamplerIndex;
+        if (outIndex < 0 || outIndex >= D3D_COMMONSHADER_SAMPLER_SLOT_COUNT)
+            continue;
 
-            SamplerUsed[iSamplerIndex] = true;
-            D3D_SAMPLER_DESC& desc = descArray[iSamplerIndex];
+        const nvrhi::SamplerDesc& src = samplers[slot];
+        D3D_SAMPLER_DESC& desc = descArray[outIndex];
+        SamplerUsed[outIndex] = true;
 
-            switch (S.v2)
-            {
-            // D3D_FILTER Filter;
-            case D3DSAMP_MAGFILTER: /* D3DTEXTUREFILTER filter to use for magnification */
-                switch (S.v3)
-                {
-                case D3D_TEXF_NONE:
-                case D3D_TEXF_POINT: desc.Filter = (D3D_FILTER)(desc.Filter & (~MagfilterLinear)); break;
-                case D3D_TEXF_LINEAR:
-                    desc.Filter = (D3D_FILTER)(desc.Filter | MagfilterLinear);
-                    //desc.Filter |= MagfilterLinear;
-                    break;
-                default: NODEFAULT;
-                }
-                break;
+        constexpr int FilterMipLinear   = 0x01;
+        constexpr int FilterMagLinear   = 0x04;
+        constexpr int FilterMinLinear   = 0x10;
+        constexpr int FilterAnisotropic = 0x40;
+        constexpr int FilterComparison  = 0x80;
 
-            case D3DSAMP_MINFILTER: /* D3DTEXTUREFILTER filter to use for minification */
-                switch (S.v3)
-                {
-                case D3D_TEXF_NONE:
-                case D3D_TEXF_POINT:
-                    // desc.Filter &= ~MinfilterLinear;
-                    desc.Filter = (D3D_FILTER)(desc.Filter & (~MinfilterLinear));
-                    break;
-                case D3D_TEXF_LINEAR:
-                    desc.Filter = (D3D_FILTER)(desc.Filter | MinfilterLinear);
-                    // desc.Filter |= MinfilterLinear;
-                    break;
-                default: NODEFAULT;
-                }
-                break;
+        int filter = 0;
+        if (src.minFilter) filter |= FilterMinLinear;
+        if (src.mipFilter) filter |= FilterMipLinear;
+        if (src.magFilter) filter |= FilterMagLinear;
+        if (src.maxAnisotropy > 1.f) filter |= FilterAnisotropic | FilterMinLinear | FilterMipLinear | FilterMagLinear;
+        if (src.reductionType == nvrhi::SamplerReductionType::Comparison) filter |= FilterComparison;
+        desc.Filter = static_cast<D3D11_FILTER>(filter);
 
-            case D3DSAMP_MIPFILTER: /* D3DTEXTUREFILTER filter to use between mipmaps during minification */
-                switch (S.v3)
-                {
-                case D3D_TEXF_NONE:
-                case D3D_TEXF_POINT:
-                    desc.Filter = (D3D_FILTER)(desc.Filter & (~MipfilterLinear));
-                    // desc.Filter &= ~MipfilterLinear;
-                    break;
-                case D3D_TEXF_LINEAR:
-                    desc.Filter = (D3D_FILTER)(desc.Filter | MipfilterLinear);
-                    // desc.Filter |= MipfilterLinear;
-                    break;
-                default: NODEFAULT;
-                }
-                break;
+        desc.AddressU      = NvrhiToD3DAddress(src.addressU);
+        desc.AddressV      = NvrhiToD3DAddress(src.addressV);
+        desc.AddressW      = NvrhiToD3DAddress(src.addressW);
+        desc.MipLODBias    = src.mipBias;
+        desc.MaxAnisotropy = static_cast<u32>(src.maxAnisotropy);
 
-            case XRDX11SAMP_ANISOTROPICFILTER:
-                if (S.v3)
-                    desc.Filter = (D3D_FILTER)(desc.Filter | FilterAnisotropic);
-                // desc.Filter |= FilterAnisotropic;
-                else
-                    desc.Filter = (D3D_FILTER)(desc.Filter & (~FilterAnisotropic));
-                // desc.Filter &= ~FilterAnisotropic;
-                break;
+        desc.BorderColor[0] = src.borderColor.r;
+        desc.BorderColor[1] = src.borderColor.g;
+        desc.BorderColor[2] = src.borderColor.b;
+        desc.BorderColor[3] = src.borderColor.a;
 
-            case XRDX11SAMP_COMPARISONFILTER:
-                if (S.v3)
-                    desc.Filter = (D3D_FILTER)(desc.Filter | FilterComparison);
-                // desc.Filter |= FilterComparison;
-                else
-                    desc.Filter = (D3D_FILTER)(desc.Filter & (~FilterComparison));
-                // desc.Filter &= ~FilterComparison;
-                break;
-
-            // D3Dxx_TEXTURE_ADDRESS_MODE AddressU;
-            case D3DSAMP_ADDRESSU: /* D3D_TEXTURE_ADDRESS_MODE for U coordinate */
-                desc.AddressU = dx11StateUtils::ConvertTextureAddressMode(D3D_TEXTURE_ADDRESS_MODE(S.v3));
-                break;
-
-            case D3DSAMP_ADDRESSV: /* D3D_TEXTURE_ADDRESS_MODE for V coordinate */
-                desc.AddressV = dx11StateUtils::ConvertTextureAddressMode(D3D_TEXTURE_ADDRESS_MODE(S.v3));
-                break;
-
-            case D3DSAMP_ADDRESSW: /* D3D_TEXTURE_ADDRESS_MODE for W coordinate */
-                desc.AddressW = dx11StateUtils::ConvertTextureAddressMode(D3D_TEXTURE_ADDRESS_MODE(S.v3));
-                break;
-
-            // FLOAT MipLODBias
-            case D3DSAMP_MIPMAPLODBIAS:
-                desc.MipLODBias = *((float*)(&(S.v3)));
-                break;
-
-            // UINT MaxAnisotropy;
-            case D3DSAMP_MAXANISOTROPY:
-                desc.MaxAnisotropy = S.v3;
-                break;
-
-            // D3Dxx_COMPARISON_FUNC ComparisonFunc;
-            case XRDX11SAMP_COMPARISONFUNC:
-                desc.ComparisonFunc = (D3D_COMPARISON_FUNC)S.v3;
-                break;
-
-            // FLOAT BorderColor[4];
-            case D3DSAMP_BORDERCOLOR:
-            {
-                desc.BorderColor[0] = ((S.v3 >> 16) & 0xff) / 255.0f;
-                desc.BorderColor[1] = ((S.v3 >> 8) & 0xff) / 255.0f;
-                desc.BorderColor[2] = ((S.v3) & 0xff) / 255.0f;
-                desc.BorderColor[3] = ((S.v3 >> 24) & 0xff) / 255.0f;
-            }
-            break;
-
-            // FLOAT MinLOD;
-            case XRDX11SAMP_MINLOD:
-                desc.MinLOD = (FLOAT)S.v3;
-                break;
-
-            // FLOAT MaxLOD;
-            case D3DSAMP_MAXMIPLEVEL: desc.MaxLOD = (FLOAT)S.v3; break;
-            }
-        }
-    }
-
-    // Validate data
-    for (int i = 0; i < D3D_COMMONSHADER_SAMPLER_SLOT_COUNT; ++i)
-    {
-        D3D_SAMPLER_DESC& desc = descArray[i];
-        if (desc.Filter & FilterAnisotropic)
-        {
-            desc.Filter = (D3D_FILTER)(desc.Filter | AllfilterLinear);
-            // desc.Filter |= AllfilterLinear;
-        }
-
-        VERIFY(desc.MinLOD <= desc.MaxLOD);
         if (desc.MinLOD > desc.MaxLOD)
             desc.MaxLOD = desc.MinLOD;
     }
 }
-
-#endif // !USE_DX9 && !USE_OGL
-} // namespace xray::render::fg
+#endif
+}

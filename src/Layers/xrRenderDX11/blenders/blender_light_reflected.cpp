@@ -11,22 +11,22 @@ void CBlender_accum_reflected::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
     BOOL blend = RImplementation.o.fp16_blend;
-    D3D_BLEND dest = blend ? D3D_BLEND_ONE : D3D_BLEND_ZERO;
+    nvrhi::BlendFactor dest = blend ? nvrhi::BlendFactor::One : nvrhi::BlendFactor::Zero;
 
 #if RENDER == R_R2
-    C.r_Pass("accum_volume", "accum_indirect", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
+    C.r_Pass("accum_volume", "accum_indirect", false, FALSE, FALSE, blend, nvrhi::BlendFactor::One, dest);
     C.r_Sampler_rtf("s_position", r2_RT_P);
     C.r_Sampler_rtf("s_normal", r2_RT_N);
     C.r_Sampler_clw("s_material", r2_material);
     C.r_Sampler_rtf("s_accumulator", r2_RT_accum);
 #elif RENDER == R_GL
-    C.r_Pass("accum_volume", "accum_indirect_nomsaa", false, FALSE,FALSE, blend, D3D_BLEND_ONE, dest);
+    C.r_Pass("accum_volume", "accum_indirect_nomsaa", false, FALSE,FALSE, blend, nvrhi::BlendFactor::One, dest);
     C.r_Sampler_rtf("s_position", r2_RT_P);
     C.r_Sampler_rtf("s_normal", r2_RT_N);
     C.r_Sampler_clw("s_material", r2_material);
     C.r_Sampler_rtf("s_accumulator", r2_RT_accum);
 #else
-    C.r_Pass("accum_volume", "accum_indirect_nomsaa", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
+    C.r_Pass("accum_volume", "accum_indirect_nomsaa", false, FALSE, FALSE, blend, nvrhi::BlendFactor::One, dest);
     // C.r_Sampler_rtf		("s_position",		r2_RT_P);
     // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
     // C.r_Sampler_clw		("s_material",		r2_material);
@@ -47,7 +47,7 @@ void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
     BOOL blend = RImplementation.o.fp16_blend;
-    D3D_BLEND dest = blend ? D3D_BLEND_ONE : D3D_BLEND_ZERO;
+    nvrhi::BlendFactor dest = blend ? nvrhi::BlendFactor::One : nvrhi::BlendFactor::Zero;
 
     if (Name)
         RImplementation.m_MSAASample = atoi(Definition);
@@ -55,13 +55,13 @@ void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
         RImplementation.m_MSAASample = -1;
 
 #if RENDER == R_GL
-    C.r_Pass("accum_volume", "accum_indirect_msaa", false, FALSE,FALSE, blend, D3D_BLEND_ONE, dest);
+    C.r_Pass("accum_volume", "accum_indirect_msaa", false, FALSE,FALSE, blend, nvrhi::BlendFactor::One, dest);
     C.r_Sampler_rtf("s_position", r2_RT_P);
     C.r_Sampler_rtf("s_normal", r2_RT_N);
     C.r_Sampler_clw("s_material", r2_material);
     C.r_Sampler_rtf("s_accumulator", r2_RT_accum);
 #else
-    C.r_Pass("accum_volume", "accum_indirect_msaa", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
+    C.r_Pass("accum_volume", "accum_indirect_msaa", false, FALSE, FALSE, blend, nvrhi::BlendFactor::One, dest);
     // C.r_Sampler_rtf		("s_position",		r2_RT_P);
     // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
     // C.r_Sampler_clw		("s_material",		r2_material);

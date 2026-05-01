@@ -30,8 +30,6 @@ void CBlender_ShWorld::Compile(CBlender_Compile& C)
 
         // Stage0 - Base texture
         C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_DIFFUSE);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_DIFFUSE);
         C.Stage_Texture("$base0");
         C.Stage_Matrix("$null", 0);
         C.Stage_Constant("$null");

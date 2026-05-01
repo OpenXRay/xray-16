@@ -39,7 +39,7 @@ public:
     {
         rstPixel = 0,
         // Default texture offset
-        rstVertex = D3DVERTEXTEXTURESAMPLER0,
+        rstVertex = 257,
         rstGeometry = rstVertex + 256,
         rstHull = rstGeometry + 256,
         rstDomain = rstHull + 256,

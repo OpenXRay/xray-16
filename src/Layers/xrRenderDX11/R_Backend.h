@@ -26,9 +26,9 @@
 
 namespace xray::render::fg
 {
-const u32 CULL_CCW = D3D_CULL_BACK;
-const u32 CULL_CW = D3D_CULL_FRONT;
-const u32 CULL_NONE = D3D_CULL_NONE;
+constexpr nvrhi::RasterCullMode CULL_CCW  = nvrhi::RasterCullMode::Back;
+constexpr nvrhi::RasterCullMode CULL_CW   = nvrhi::RasterCullMode::Front;
+constexpr nvrhi::RasterCullMode CULL_NONE = nvrhi::RasterCullMode::None;
 
 ///		detailed statistic
 struct R_statistics_element
@@ -424,18 +424,18 @@ public:
     ICF void set_Indices(IndexBufferHandle _ib);
     ICF void set_Geometry(SGeometry* _geom);
     ICF void set_Geometry(ref_geom& _geom) { set_Geometry(&*_geom); }
-    IC void set_Stencil(u32 _enable, u32 _func = D3D_COMPARISON_ALWAYS, u32 _ref = 0x00, u32 _mask = 0x00,
-                        u32 _writemask = 0x00, u32 _fail = D3D_STENCIL_OP_KEEP, u32 _pass = D3D_STENCIL_OP_KEEP,
-                        u32 _zfail = D3D_STENCIL_OP_KEEP);
+    IC void set_Stencil(u32 _enable, nvrhi::ComparisonFunc _func = nvrhi::ComparisonFunc::Always, u32 _ref = 0x00, u32 _mask = 0x00,
+                        u32 _writemask = 0x00, nvrhi::StencilOp _fail = nvrhi::StencilOp::Keep, nvrhi::StencilOp _pass = nvrhi::StencilOp::Keep,
+                        nvrhi::StencilOp _zfail = nvrhi::StencilOp::Keep);
     IC void set_Z(u32 _enable);
     IC void set_ZFunc(u32 _func);
     IC void set_AlphaRef(u32 _value);
-    IC void set_ColorWriteEnable(
-        u32 _mask = D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE |
-            D3DCOLORWRITEENABLE_ALPHA);
+    IC void set_ColorWriteEnable(u32 _mask = 0xF);
     IC void set_CullMode(u32 _mode);
+    IC void set_CullMode(nvrhi::RasterCullMode _mode);
     u32 get_CullMode() { return cull_mode; }
     IC void set_FillMode(u32 _mode);
+    IC void set_FillMode(nvrhi::RasterFillMode _mode);
     void set_ClipPlanes(u32 _enable, Fplane* _planes = nullptr, u32 count = 0);
     void set_ClipPlanes(u32 _enable, Fmatrix* _xform = nullptr, u32 fmask = 0xff);
     IC void set_Scissor(const Irect* rect = nullptr);
@@ -550,8 +550,8 @@ public:
     // Debug render
     void dbg_DP(D3D_PRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc);
     void dbg_DIP(D3D_PRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
-    void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2);
-    void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value);
+    void dbg_SetRS(u32 p1, u32 p2);
+    void dbg_SetSS(u32 sampler, u32 type, u32 value);
 #ifdef DEBUG
     void dbg_Draw(D3D_PRIMITIVETYPE T, FVF::L* pVerts, u32 vcnt, u16* pIdx, int pcnt);
     void dbg_Draw(D3D_PRIMITIVETYPE T, FVF::L* pVerts, int pcnt);

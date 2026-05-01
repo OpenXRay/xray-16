@@ -47,17 +47,17 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
         case SE_R2_NORMAL_LQ:
             if (lmapped)
             {
-                C.r_Pass("lmapE", "lmapE", TRUE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE,
+                C.r_Pass("lmapE", "lmapE", TRUE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE,
                     oAREF.value);
                 C.r_Sampler("s_base", C.L_textures[0]);
                 C.r_Sampler("s_lmap", C.L_textures[1]);
                 C.r_Sampler_clf("s_hemi", *C.L_textures[2]);
-                C.r_Sampler("s_env", r2_T_envs0, false, D3D_TEXTURE_ADDRESS_CLAMP);
+                C.r_Sampler("s_env", r2_T_envs0, false, nvrhi::SamplerAddressMode::Clamp);
                 C.r_End();
             }
             else
             {
-                C.r_Pass("vert", "vert", TRUE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE,
+                C.r_Pass("vert", "vert", TRUE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE,
                     oAREF.value);
                 C.r_Sampler("s_base", C.L_textures[0]);
                 C.r_End();
@@ -82,8 +82,8 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
             break;
         case SE_R2_SHADOW: // smap
             if (RImplementation.o.HW_smap)
-                C.r_Pass("shadow_direct_base_aref", "shadow_direct_base_aref", FALSE, TRUE, TRUE, FALSE, D3D_BLEND_ZERO,
-                    D3D_BLEND_ONE, TRUE, 220);
+                C.r_Pass("shadow_direct_base_aref", "shadow_direct_base_aref", FALSE, TRUE, TRUE, FALSE, nvrhi::BlendFactor::Zero,
+                    nvrhi::BlendFactor::One, TRUE, 220);
             else
                 C.r_Pass("shadow_direct_base_aref", "shadow_direct_base_aref", FALSE);
             C.r_Sampler("s_base", C.L_textures[0]);
@@ -100,17 +100,17 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
         case SE_R2_NORMAL_LQ:
             if (lmapped)
             {
-                C.r_Pass("lmapE", "lmapE", TRUE,TRUE,FALSE,TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE,
+                C.r_Pass("lmapE", "lmapE", TRUE,TRUE,FALSE,TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE,
                          oAREF.value);
                 C.r_Sampler("s_base", C.L_textures[0]);
                 C.r_Sampler("s_lmap", C.L_textures[1]);
                 C.r_Sampler_clf("s_hemi", C.L_textures[2].c_str());
-                C.r_Sampler("s_env", r2_T_envs0, false, D3D_TEXTURE_ADDRESS_CLAMP);
+                C.r_Sampler("s_env", r2_T_envs0, false, nvrhi::SamplerAddressMode::Clamp);
                 C.r_End();
             }
             else
             {
-                C.r_Pass("vert", "vert", TRUE,TRUE,FALSE,TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE,
+                C.r_Pass("vert", "vert", TRUE,TRUE,FALSE,TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE,
                          oAREF.value);
                 C.r_Sampler("s_base", C.L_textures[0]);
                 C.r_End();
@@ -135,20 +135,20 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
             if (bUseATOC)
             {
                 uber_deffer(C, true, "base", "base_atoc", true, nullptr, true);
-                C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE,
-                            D3D_STENCIL_OP_KEEP);
+                C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace,
+                            nvrhi::StencilOp::Keep);
                 C.r_ColorWriteEnable(false, false, false, false);
                 C.r_StencilRef(0x01);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetAlphaToCoverage(TRUE);
                 C.r_End();
             }
 
 
             uber_deffer(C, true, "base", "base", true, nullptr, true);
-            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+            C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
             C.r_StencilRef(0x01);
-            if (bUseATOC) C.RS.SetRS(D3DRS_ZFUNC, D3D_COMPARISON_EQUAL);
+            if (bUseATOC) C.RS.SetDepthFunc(nvrhi::ComparisonFunc::Equal);
             C.r_End();
             break;
 
@@ -158,26 +158,26 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
             if (bUseATOC)
             {
                 uber_deffer(C, false, "base", "base_atoc", true, nullptr, true);
-                C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE,
-                            D3D_STENCIL_OP_KEEP);
+                C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace,
+                            nvrhi::StencilOp::Keep);
                 C.r_StencilRef(0x01);
                 C.r_ColorWriteEnable(false, false, false, false);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetAlphaToCoverage(TRUE);
                 C.r_End();
             }
 
 
             uber_deffer(C, false, "base", "base", true, nullptr, true);
-            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+            C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
             C.r_StencilRef(0x01);
-            if (bUseATOC) C.RS.SetRS(D3DRS_ZFUNC, D3D_COMPARISON_EQUAL);
+            if (bUseATOC) C.RS.SetDepthFunc(nvrhi::ComparisonFunc::Equal);
             C.r_End();
             break;
 
 
         case SE_R2_SHADOW: // smap
-            //			if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_base_aref","shadow_direct_base_aref",FALSE,TRUE,TRUE,FALSE,D3D_BLEND_ZERO,D3D_BLEND_ONE,TRUE,220);
+            //			if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_base_aref","shadow_direct_base_aref",FALSE,TRUE,TRUE,FALSE,nvrhi::BlendFactor::Zero,nvrhi::BlendFactor::One,TRUE,220);
             //			else							C.r_Pass	("shadow_direct_base_aref","shadow_direct_base_aref",FALSE);
             C.r_Pass("shadow_direct_base_aref", "shadow_direct_base_aref", FALSE, TRUE,TRUE,FALSE);
             C.r_Sampler("s_base", C.L_textures[0]);
@@ -195,12 +195,12 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
         case SE_R2_NORMAL_LQ:
             if (lmapped)
             {
-                C.r_Pass("lmapE", "lmapE", TRUE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE,
+                C.r_Pass("lmapE", "lmapE", TRUE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE,
                     oAREF.value);
                 // C.r_Sampler			("s_base",	C.L_textures[0]	);
                 // C.r_Sampler			("s_lmap",	C.L_textures[1]	);
                 // C.r_Sampler_clf		("s_hemi",	*C.L_textures[2]);
-                // C.r_Sampler			("s_env",	r2_T_envs0,		false,D3D_TEXTURE_ADDRESS_CLAMP);
+                // C.r_Sampler			("s_env",	r2_T_envs0,		false,nvrhi::SamplerAddressMode::Clamp);
 
                 C.r_dx11Texture("s_base", C.L_textures[0]);
                 C.r_dx11Texture("s_lmap", C.L_textures[1]);
@@ -214,7 +214,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
             }
             else
             {
-                C.r_Pass("vert", "vert", TRUE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE,
+                C.r_Pass("vert", "vert", TRUE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE,
                     oAREF.value);
                 // C.r_Sampler			("s_base",	C.L_textures[0]	);
                 C.r_dx11Texture("s_base", C.L_textures[0]);
@@ -241,19 +241,19 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
             {
                 uber_deffer(C, true, "base", "base_atoc", true, 0, true);
                 C.r_Stencil(
-                    TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+                    TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
                 C.r_ColorWriteEnable(false, false, false, false);
                 C.r_StencilRef(0x01);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetAlphaToCoverage(TRUE);
                 C.r_End();
             }
 
             uber_deffer(C, true, "base", "base", true, 0, true);
-            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+            C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
             C.r_StencilRef(0x01);
             if (bUseATOC)
-                C.RS.SetRS(D3DRS_ZFUNC, D3D_COMPARISON_EQUAL);
+                C.RS.SetDepthFunc(nvrhi::ComparisonFunc::Equal);
             C.r_End();
             break;
 
@@ -263,25 +263,25 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
             {
                 uber_deffer(C, false, "base", "base_atoc", true, 0, true);
                 C.r_Stencil(
-                    TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+                    TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
                 C.r_StencilRef(0x01);
                 C.r_ColorWriteEnable(false, false, false, false);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetAlphaToCoverage(TRUE);
                 C.r_End();
             }
 
             uber_deffer(C, false, "base", "base", true, 0, true);
-            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+            C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
             C.r_StencilRef(0x01);
             if (bUseATOC)
-                C.RS.SetRS(D3DRS_ZFUNC, D3D_COMPARISON_EQUAL);
+                C.RS.SetDepthFunc(nvrhi::ComparisonFunc::Equal);
             C.r_End();
             break;
 
         case SE_R2_SHADOW: // smap
             //			if (RImplementation.o.HW_smap)	C.r_Pass
-            //("shadow_direct_base_aref","shadow_direct_base_aref",FALSE,TRUE,TRUE,FALSE,D3D_BLEND_ZERO,D3D_BLEND_ONE,TRUE,220);
+            //("shadow_direct_base_aref","shadow_direct_base_aref",FALSE,TRUE,TRUE,FALSE,nvrhi::BlendFactor::Zero,nvrhi::BlendFactor::One,TRUE,220);
             //			else							C.r_Pass
             //("shadow_direct_base_aref","shadow_direct_base_aref",FALSE);
             C.r_Pass("shadow_direct_base_aref", "shadow_direct_base_aref", FALSE, TRUE, TRUE, FALSE);

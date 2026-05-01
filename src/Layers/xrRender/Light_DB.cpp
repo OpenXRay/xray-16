@@ -102,7 +102,7 @@ void CLight_DB::LoadHemi()
                     R_Light Ldata;
                     chunk->r(&Ldata, sizeof(R_Light));
 
-                    if (Ldata.type == D3DLIGHT_POINT)
+                    if (Ldata.type == LT_POINT)
                     {
                         Fvector tmp_D, tmp_R;
                         tmp_D.set(0, 0, -1); // forward

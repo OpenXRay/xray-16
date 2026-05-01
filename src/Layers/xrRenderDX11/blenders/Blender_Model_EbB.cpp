@@ -55,7 +55,7 @@ void CBlender_Model_EbB::CompileFFP(CBlender_Compile& C) const
 {
     const bool constant_lighting = !ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS);
     const size_t element = constant_lighting ? SE_R1_NORMAL_LQ : C.iElement;
-    const auto modulate = constant_lighting ? D3DTOP_MODULATE : D3DTOP_MODULATE2X;
+    const auto modulate = constant_lighting ? 0u : 0u;
 
     C.PassBegin();
     {
@@ -82,7 +82,7 @@ void CBlender_Model_EbB::CompileFFP(CBlender_Compile& C) const
 
             // Stage1 - Env texture
             C.StageBegin();
-            C.StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
+            C.StageSET_Address(nvrhi::SamplerAddressMode::Clamp);
             C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
             C.StageEnd();
 
@@ -98,23 +98,17 @@ void CBlender_Model_EbB::CompileFFP(CBlender_Compile& C) const
         {
             // Stage1 - Env texture
             C.StageBegin();
-            C.StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+            C.StageSET_Address(nvrhi::SamplerAddressMode::Clamp);
             C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
             C.StageEnd();
 
             // Stage2 - Base texture
             C.StageBegin();
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_BLENDTEXTUREALPHA, D3DTA_CURRENT);
-            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
             C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
             C.StageEnd();
 
             // Stage3 - Lighting - should work on all 2tex hardware
             C.StageBegin();
-            C.StageSET_Color(D3DTA_DIFFUSE, modulate, D3DTA_CURRENT);
-            C.StageSET_Alpha(D3DTA_DIFFUSE, D3DTOP_SELECTARG2, D3DTA_CURRENT);
             C.Stage_Texture("$null");
             C.Stage_Matrix("$null", 0);
             C.Stage_Constant("$null");
@@ -135,28 +129,28 @@ void CBlender_Model_EbB::CompileProgrammable(CBlender_Compile& C) const
     case SE_R1_NORMAL_HQ:
         vsname = psname = "model_env_hq";
         if (oBlend.value)
-            C.r_Pass(vsname, psname, TRUE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, 0);
+            C.r_Pass(vsname, psname, TRUE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE, 0);
         else
             C.r_Pass(vsname, psname, TRUE);
         C.r_Sampler("s_base", C.L_textures[0]);
-        C.r_Sampler("s_env", oT2_Name, false, D3D_TEXTURE_ADDRESS_CLAMP);
+        C.r_Sampler("s_env", oT2_Name, false, nvrhi::SamplerAddressMode::Clamp);
         C.r_Sampler_clf("s_lmap", "$user$projector", true);
         C.r_End();
         break;
     case SE_R1_NORMAL_LQ:
         vsname = psname = "model_env_lq";
         if (oBlend.value)
-            C.r_Pass(vsname, psname, TRUE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, 0);
+            C.r_Pass(vsname, psname, TRUE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, TRUE, 0);
         else
             C.r_Pass(vsname, psname, TRUE);
         C.r_Sampler("s_base", C.L_textures[0]);
-        C.r_Sampler("s_env", oT2_Name, false, D3D_TEXTURE_ADDRESS_CLAMP);
+        C.r_Sampler("s_env", oT2_Name, false, nvrhi::SamplerAddressMode::Clamp);
         C.r_End();
         break;
     case SE_R1_LPOINT:
         vsname = "model_def_point";
         psname = "add_point";
-        C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE);
+        C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, TRUE);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_Sampler_clf("s_lmap", TEX_POINT_ATT);
         C.r_Sampler_clf("s_att", TEX_POINT_ATT);
@@ -165,7 +159,7 @@ void CBlender_Model_EbB::CompileProgrammable(CBlender_Compile& C) const
     case SE_R1_LSPOT:
         vsname = "model_def_spot";
         psname = "add_spot";
-        C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE);
+        C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, TRUE);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_Sampler_clf("s_lmap", "internal" DELIMITER "internal_light_att", true);
         C.r_Sampler_clf("s_att", TEX_SPOT_ATT);
@@ -174,7 +168,7 @@ void CBlender_Model_EbB::CompileProgrammable(CBlender_Compile& C) const
     case SE_R1_LMODELS:
         vsname = "model_def_shadow";
         psname = "model_shadow";
-        C.r_Pass(vsname, psname, FALSE, FALSE, FALSE, TRUE, D3D_BLEND_ZERO, D3D_BLEND_SRC_COLOR, FALSE, 0);
+        C.r_Pass(vsname, psname, FALSE, FALSE, FALSE, TRUE, nvrhi::BlendFactor::Zero, nvrhi::BlendFactor::SrcColor, FALSE, 0);
         C.r_End();
         break;
     } // switch (C.iElement)

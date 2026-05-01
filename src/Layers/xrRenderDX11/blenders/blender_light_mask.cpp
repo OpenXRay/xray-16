@@ -25,7 +25,7 @@ void CBlender_accum_direct_mask::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_MASK_DIRECT: // stencil mask for directional light
-        C.r_Pass("null", "accum_sun_mask", false, FALSE, FALSE, TRUE, D3D_BLEND_ZERO, D3D_BLEND_ONE, TRUE, 1);
+        C.r_Pass("null", "accum_sun_mask", false, FALSE, FALSE, TRUE, nvrhi::BlendFactor::Zero, nvrhi::BlendFactor::One, TRUE, 1);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_End();
         break;
@@ -62,9 +62,9 @@ void CBlender_accum_direct_mask::Compile(CBlender_Compile& C)
         break;
     case SE_MASK_DIRECT: // stencil mask for directional light
         //	FVF::F_TL
-        //C.r_Pass			("null",			"accum_sun_mask",	false,	FALSE,FALSE,TRUE,D3D_BLEND_ZERO,D3D_BLEND_ONE,TRUE,1);
-        //C.r_Pass			("stub_notransform","accum_sun_mask",	false,	FALSE,FALSE,TRUE,D3D_BLEND_ZERO,D3D_BLEND_ONE,TRUE,1);
-        C.r_Pass("stub_notransform_t", "accum_sun_mask_nomsaa", false, FALSE,FALSE,TRUE, D3D_BLEND_ZERO, D3D_BLEND_ONE,
+        //C.r_Pass			("null",			"accum_sun_mask",	false,	FALSE,FALSE,TRUE,nvrhi::BlendFactor::Zero,nvrhi::BlendFactor::One,TRUE,1);
+        //C.r_Pass			("stub_notransform","accum_sun_mask",	false,	FALSE,FALSE,TRUE,nvrhi::BlendFactor::Zero,nvrhi::BlendFactor::One,TRUE,1);
+        C.r_Pass("stub_notransform_t", "accum_sun_mask_nomsaa", false, FALSE,FALSE,TRUE, nvrhi::BlendFactor::Zero, nvrhi::BlendFactor::One,
                  TRUE, 1);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_rtf("s_position", r2_RT_P);
@@ -115,10 +115,10 @@ void CBlender_accum_direct_mask::Compile(CBlender_Compile& C)
     case SE_MASK_DIRECT: // stencil mask for directional light
         //	FVF::F_TL
         // C.r_Pass			("null",			"accum_sun_mask",	false,
-        // FALSE,FALSE,TRUE,D3D_BLEND_ZERO,D3D_BLEND_ONE,TRUE,1);
+        // FALSE,FALSE,TRUE,nvrhi::BlendFactor::Zero,nvrhi::BlendFactor::One,TRUE,1);
         // C.r_Pass			("stub_notransform","accum_sun_mask",	false,
-        // FALSE,FALSE,TRUE,D3D_BLEND_ZERO,D3D_BLEND_ONE,TRUE,1);
-        C.r_Pass("stub_notransform_t", "accum_sun_mask_nomsaa", false, FALSE, FALSE, TRUE, D3D_BLEND_ZERO, D3D_BLEND_ONE,
+        // FALSE,FALSE,TRUE,nvrhi::BlendFactor::Zero,nvrhi::BlendFactor::One,TRUE,1);
+        C.r_Pass("stub_notransform_t", "accum_sun_mask_nomsaa", false, FALSE, FALSE, TRUE, nvrhi::BlendFactor::Zero, nvrhi::BlendFactor::One,
             TRUE, 1);
         // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
         C.r_dx11Texture("s_normal", r2_RT_N);
@@ -185,9 +185,9 @@ void CBlender_accum_direct_mask_msaa::Compile(CBlender_Compile& C)
         break;
     case SE_MASK_DIRECT: // stencil mask for directional light
         //	FVF::F_TL
-        //C.r_Pass			("null",			"accum_sun_mask",	false,	FALSE,FALSE,TRUE,D3D_BLEND_ZERO,D3D_BLEND_ONE,TRUE,1);
-        //C.r_Pass			("stub_notransform","accum_sun_mask",	false,	FALSE,FALSE,TRUE,D3D_BLEND_ZERO,D3D_BLEND_ONE,TRUE,1);
-        C.r_Pass("stub_notransform_t", "accum_sun_mask_msaa", false, FALSE,FALSE,TRUE, D3D_BLEND_ZERO, D3D_BLEND_ONE,TRUE,
+        //C.r_Pass			("null",			"accum_sun_mask",	false,	FALSE,FALSE,TRUE,nvrhi::BlendFactor::Zero,nvrhi::BlendFactor::One,TRUE,1);
+        //C.r_Pass			("stub_notransform","accum_sun_mask",	false,	FALSE,FALSE,TRUE,nvrhi::BlendFactor::Zero,nvrhi::BlendFactor::One,TRUE,1);
+        C.r_Pass("stub_notransform_t", "accum_sun_mask_msaa", false, FALSE,FALSE,TRUE, nvrhi::BlendFactor::Zero, nvrhi::BlendFactor::One,TRUE,
                  1);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_rtf("s_position", r2_RT_P);
@@ -238,10 +238,10 @@ void CBlender_accum_direct_mask_msaa::Compile(CBlender_Compile& C)
     case SE_MASK_DIRECT: // stencil mask for directional light
         //	FVF::F_TL
         // C.r_Pass			("null",			"accum_sun_mask",	false,
-        // FALSE,FALSE,TRUE,D3D_BLEND_ZERO,D3D_BLEND_ONE,TRUE,1);
+        // FALSE,FALSE,TRUE,nvrhi::BlendFactor::Zero,nvrhi::BlendFactor::One,TRUE,1);
         // C.r_Pass			("stub_notransform","accum_sun_mask",	false,
-        // FALSE,FALSE,TRUE,D3D_BLEND_ZERO,D3D_BLEND_ONE,TRUE,1);
-        C.r_Pass("stub_notransform_t", "accum_sun_mask_msaa", false, FALSE, FALSE, TRUE, D3D_BLEND_ZERO, D3D_BLEND_ONE,
+        // FALSE,FALSE,TRUE,nvrhi::BlendFactor::Zero,nvrhi::BlendFactor::One,TRUE,1);
+        C.r_Pass("stub_notransform_t", "accum_sun_mask_msaa", false, FALSE, FALSE, TRUE, nvrhi::BlendFactor::Zero, nvrhi::BlendFactor::One,
             TRUE, 1);
         // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
         C.r_dx11Texture("s_normal", r2_RT_N);

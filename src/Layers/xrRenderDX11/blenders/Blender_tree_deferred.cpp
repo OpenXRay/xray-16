@@ -65,7 +65,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     case SE_R2_SHADOW: // smap-spot
         //	TODO: DX11: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
         if (oBlend.value)
-            C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3D_BLEND_ZERO, D3D_BLEND_ONE, TRUE, 200);
+            C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, nvrhi::BlendFactor::Zero, nvrhi::BlendFactor::One, TRUE, 200);
         else
             C.r_Pass(tvs_s, "shadow_direct_base", FALSE);
         C.r_Sampler("s_base", C.L_textures[0]);
@@ -106,20 +106,20 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         if (bUseATOC)
         {
             uber_deffer(C, true, tvs, "base_atoc", oBlend.value, 0, true);
-            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+            C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_StencilRef(0x01);
             //	Alpha to coverage.
-            C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
+            C.RS.SetAlphaToCoverage(TRUE);
             C.r_End();
         }
 
         uber_deffer(C, true, tvs, "base", oBlend.value, 0, true);
-        C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+        C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
         C.r_StencilRef(0x01);
         // Need only for ATOC to emulate stencil test
         if (bUseATOC)
-            C.RS.SetRS(D3DRS_ZFUNC, D3D_COMPARISON_EQUAL);
+            C.RS.SetDepthFunc(nvrhi::ComparisonFunc::Equal);
         C.r_End();
         break;
 
@@ -127,27 +127,27 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         if (bUseATOC)
         {
             uber_deffer(C, false, tvs, "base_atoc", oBlend.value, 0, true);
-            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+            C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
             C.r_StencilRef(0x01);
             C.r_ColorWriteEnable(false, false, false, false);
             //	Alpha to coverage.
-            C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
+            C.RS.SetAlphaToCoverage(TRUE);
             C.r_End();
         }
 
         uber_deffer(C, false, tvs, "base", oBlend.value, 0, true);
-        C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+        C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
         C.r_StencilRef(0x01);
         // Need only for ATOC to emulate stencil test
         if (bUseATOC)
-            C.RS.SetRS(D3DRS_ZFUNC, D3D_COMPARISON_EQUAL);
+            C.RS.SetDepthFunc(nvrhi::ComparisonFunc::Equal);
         C.r_End();
         break;
 
     case SE_R2_SHADOW:  // smap-spot
         // TODO: DX11: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
         if (oBlend.value)
-            C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3D_BLEND_ZERO, D3D_BLEND_ONE, TRUE, 200);
+            C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, nvrhi::BlendFactor::Zero, nvrhi::BlendFactor::One, TRUE, 200);
         else
             C.r_Pass(tvs_s, "null", FALSE);
         C.SampledImage("smp_linear", "s_base", C.L_textures[0]);

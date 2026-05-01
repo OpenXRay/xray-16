@@ -150,5 +150,5 @@ void dxUIRender::FlushPrimitive()
 }
 
 void dxUIRender::CacheSetXformWorld(const Fmatrix& M) { RCache.set_xform_world(M); }
-void dxUIRender::CacheSetCullMode(CullMode m) { RCache.set_CullMode(CULL_NONE + m); }
+void dxUIRender::CacheSetCullMode(CullMode m) { RCache.set_CullMode(static_cast<u32>(CULL_NONE) + m); }
 } // namespace xray::render::fg

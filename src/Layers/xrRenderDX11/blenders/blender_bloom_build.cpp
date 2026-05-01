@@ -15,7 +15,7 @@ void CBlender_bloom_build::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case 0: // transfer into bloom-target
-        C.r_Pass("null", "bloom_build", FALSE, FALSE, FALSE, FALSE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA);
+        C.r_Pass("null", "bloom_build", FALSE, FALSE, FALSE, FALSE, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha);
         C.r_Sampler_clf("s_image", r2_RT_generic1);
         C.r_End();
         break;
@@ -44,8 +44,8 @@ void CBlender_bloom_build::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case 0: // transfer into bloom-target
-        C.r_Pass("stub_notransform_build", "bloom_build", false, FALSE, FALSE, FALSE, D3D_BLEND_SRC_ALPHA,
-                 D3D_BLEND_INV_SRC_ALPHA);
+        C.r_Pass("stub_notransform_build", "bloom_build", false, FALSE, FALSE, FALSE, nvrhi::BlendFactor::SrcAlpha,
+                 nvrhi::BlendFactor::InvSrcAlpha);
         C.r_Sampler_clf("s_image", r2_RT_generic1);
         C.r_End();
         break;
@@ -74,8 +74,8 @@ void CBlender_bloom_build::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case 0: // transfer into bloom-target
-        C.r_Pass("stub_notransform_build", "bloom_build", FALSE, FALSE, FALSE, FALSE, D3D_BLEND_SRC_ALPHA,
-            D3D_BLEND_INV_SRC_ALPHA);
+        C.r_Pass("stub_notransform_build", "bloom_build", FALSE, FALSE, FALSE, FALSE, nvrhi::BlendFactor::SrcAlpha,
+            nvrhi::BlendFactor::InvSrcAlpha);
         // C.r_Sampler_clf		("s_image",			r2_RT_generic1);
         C.r_dx11Texture("s_image", r2_RT_generic1);
         C.r_dx11Sampler("smp_rtlinear");
@@ -124,8 +124,8 @@ void CBlender_bloom_build_msaa::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case 0: // transfer into bloom-target
-        C.r_Pass("stub_notransform_build", "bloom_build", false, FALSE, FALSE, FALSE, D3D_BLEND_SRC_ALPHA,
-                 D3D_BLEND_INV_SRC_ALPHA);
+        C.r_Pass("stub_notransform_build", "bloom_build", false, FALSE, FALSE, FALSE, nvrhi::BlendFactor::SrcAlpha,
+                 nvrhi::BlendFactor::InvSrcAlpha);
         C.r_Sampler_clf("s_image", r2_RT_generic1);
         C.r_End();
         break;
@@ -154,8 +154,8 @@ void CBlender_bloom_build_msaa::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case 0: // transfer into bloom-target
-        C.r_Pass("stub_notransform_build", "bloom_build", FALSE, FALSE, FALSE, FALSE, D3D_BLEND_SRC_ALPHA,
-            D3D_BLEND_INV_SRC_ALPHA);
+        C.r_Pass("stub_notransform_build", "bloom_build", FALSE, FALSE, FALSE, FALSE, nvrhi::BlendFactor::SrcAlpha,
+            nvrhi::BlendFactor::InvSrcAlpha);
         // C.r_Sampler_clf		("s_image",			r2_RT_generic1);
         C.r_dx11Texture("s_image", r2_RT_generic1);
         C.r_dx11Sampler("smp_rtlinear");
@@ -203,8 +203,8 @@ void CBlender_postprocess_msaa::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case 0: // transfer into bloom-target
-        C.r_Pass("stub_notransform_postpr", "postprocess", false, FALSE, FALSE, FALSE, D3D_BLEND_SRC_ALPHA,
-                 D3D_BLEND_INV_SRC_ALPHA);
+        C.r_Pass("stub_notransform_postpr", "postprocess", false, FALSE, FALSE, FALSE, nvrhi::BlendFactor::SrcAlpha,
+                 nvrhi::BlendFactor::InvSrcAlpha);
         C.r_Sampler_clf("s_base0", r2_RT_generic);
         C.r_Sampler_clf("s_base1", r2_RT_generic);
         C.r_Sampler("s_noise", "fx\\fx_noise2");
@@ -212,8 +212,8 @@ void CBlender_postprocess_msaa::Compile(CBlender_Compile& C)
         break;
 
     case 4: // use color map
-        C.r_Pass("stub_notransform_postpr", "postprocess_CM", false, FALSE, FALSE, FALSE, D3D_BLEND_SRC_ALPHA,
-                 D3D_BLEND_INV_SRC_ALPHA);
+        C.r_Pass("stub_notransform_postpr", "postprocess_CM", false, FALSE, FALSE, FALSE, nvrhi::BlendFactor::SrcAlpha,
+                 nvrhi::BlendFactor::InvSrcAlpha);
         C.r_Sampler_clf("s_base0", r2_RT_generic);
         C.r_Sampler_clf("s_base1", r2_RT_generic);
         C.r_Sampler("s_noise", "fx\\fx_noise2");
@@ -227,8 +227,8 @@ void CBlender_postprocess_msaa::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case 0: // transfer into bloom-target
-        C.r_Pass("stub_notransform_postpr", "postprocess", FALSE, FALSE, FALSE, FALSE, D3D_BLEND_SRC_ALPHA,
-            D3D_BLEND_INV_SRC_ALPHA);
+        C.r_Pass("stub_notransform_postpr", "postprocess", FALSE, FALSE, FALSE, FALSE, nvrhi::BlendFactor::SrcAlpha,
+            nvrhi::BlendFactor::InvSrcAlpha);
         C.r_dx11Texture("s_base0", r2_RT_generic);
         C.r_dx11Texture("s_base1", r2_RT_generic);
         C.r_dx11Texture("s_noise", "fx" DELIMITER "fx_noise2");
@@ -239,8 +239,8 @@ void CBlender_postprocess_msaa::Compile(CBlender_Compile& C)
         break;
 
     case 4: // use color map
-        C.r_Pass("stub_notransform_postpr", "postprocess_CM", FALSE, FALSE, FALSE, FALSE, D3D_BLEND_SRC_ALPHA,
-            D3D_BLEND_INV_SRC_ALPHA);
+        C.r_Pass("stub_notransform_postpr", "postprocess_CM", FALSE, FALSE, FALSE, FALSE, nvrhi::BlendFactor::SrcAlpha,
+            nvrhi::BlendFactor::InvSrcAlpha);
         C.r_dx11Texture("s_base0", r2_RT_generic);
         C.r_dx11Texture("s_base1", r2_RT_generic);
         C.r_dx11Texture("s_noise", "fx" DELIMITER "fx_noise2");

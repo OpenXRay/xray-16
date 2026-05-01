@@ -87,13 +87,13 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         C.r_Sampler("s_lmap", C.L_textures[1]);
 
         C.r_Sampler(
-            "s_dt_r", oR_Name, false, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC);
+            "s_dt_r", oR_Name, false, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Anisotropic, SamplerFilter::Linear, SamplerFilter::Anisotropic);
         C.r_Sampler(
-            "s_dt_g", oG_Name, false, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC);
+            "s_dt_g", oG_Name, false, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Anisotropic, SamplerFilter::Linear, SamplerFilter::Anisotropic);
         C.r_Sampler(
-            "s_dt_b", oB_Name, false, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC);
+            "s_dt_b", oB_Name, false, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Anisotropic, SamplerFilter::Linear, SamplerFilter::Anisotropic);
         C.r_Sampler(
-            "s_dt_a", oA_Name, false, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC);
+            "s_dt_a", oA_Name, false, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Anisotropic, SamplerFilter::Linear, SamplerFilter::Anisotropic);
 
         C.r_Sampler("s_dn_r", strconcat(sizeof(mask), mask, oR_Name, "_bump"));
         C.r_Sampler("s_dn_g", strconcat(sizeof(mask), mask, oG_Name, "_bump"));
@@ -143,10 +143,10 @@ void	CBlender_BmmD::Compile	(CBlender_Compile& C)
 		C.r_Sampler		("s_mask",	mask);
 		C.r_Sampler		("s_lmap",	C.L_textures[1]);
 
-		C.r_Sampler		("s_dt_r",	oR_Name,	false,	D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,	D3D_TEXF_ANISOTROPIC);
-		C.r_Sampler		("s_dt_g",	oG_Name,	false,	D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,	D3D_TEXF_ANISOTROPIC);
-		C.r_Sampler		("s_dt_b",	oB_Name,	false,	D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,	D3D_TEXF_ANISOTROPIC);
-		C.r_Sampler		("s_dt_a",	oA_Name,	false,	D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,	D3D_TEXF_ANISOTROPIC);
+		C.r_Sampler		("s_dt_r",	oR_Name,	false,	nvrhi::SamplerAddressMode::Wrap,	SamplerFilter::Anisotropic,SamplerFilter::Linear,	SamplerFilter::Anisotropic);
+		C.r_Sampler		("s_dt_g",	oG_Name,	false,	nvrhi::SamplerAddressMode::Wrap,	SamplerFilter::Anisotropic,SamplerFilter::Linear,	SamplerFilter::Anisotropic);
+		C.r_Sampler		("s_dt_b",	oB_Name,	false,	nvrhi::SamplerAddressMode::Wrap,	SamplerFilter::Anisotropic,SamplerFilter::Linear,	SamplerFilter::Anisotropic);
+		C.r_Sampler		("s_dt_a",	oA_Name,	false,	nvrhi::SamplerAddressMode::Wrap,	SamplerFilter::Anisotropic,SamplerFilter::Linear,	SamplerFilter::Anisotropic);
 
 		C.r_Sampler		("s_dn_r",	strconcat(sizeof(mask),mask,oR_Name,"_bump") );
 		C.r_Sampler		("s_dn_g",	strconcat(sizeof(mask),mask,oG_Name,"_bump") );
@@ -161,7 +161,7 @@ void	CBlender_BmmD::Compile	(CBlender_Compile& C)
 		    C.r_Sampler	("s_dn_aX",	strconcat(sizeof(mask),mask,oA_Name,"_bump#") );
         }
 
-		C.r_Stencil		( TRUE,D3D_COMPARISON_ALWAYS,0xff,0x7f,D3D_STENCIL_OP_KEEP,D3D_STENCIL_OP_REPLACE,D3D_STENCIL_OP_KEEP);
+		C.r_Stencil		( TRUE,nvrhi::ComparisonFunc::Always,0xff,0x7f,nvrhi::StencilOp::Keep,nvrhi::StencilOp::Replace,nvrhi::StencilOp::Keep);
 		C.r_StencilRef	(0x01);
 
 		C.r_End			();
@@ -171,7 +171,7 @@ void	CBlender_BmmD::Compile	(CBlender_Compile& C)
 
 		C.r_Sampler		("s_lmap",	C.L_textures[1]);
 
-		C.r_Stencil		( TRUE,D3D_COMPARISON_ALWAYS,0xff,0x7f,D3D_STENCIL_OP_KEEP,D3D_STENCIL_OP_REPLACE,D3D_STENCIL_OP_KEEP);
+		C.r_Stencil		( TRUE,nvrhi::ComparisonFunc::Always,0xff,0x7f,nvrhi::StencilOp::Keep,nvrhi::StencilOp::Replace,nvrhi::StencilOp::Keep);
 		C.r_StencilRef	(0x01);
 
 		C.r_End			();
@@ -200,14 +200,14 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         // C.r_Sampler		("s_mask",	mask);
         // C.r_Sampler		("s_lmap",	C.L_textures[1]);
 
-        // C.r_Sampler		("s_dt_r",	oR_Name,	false,	D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,
-        // D3D_TEXF_ANISOTROPIC);
-        // C.r_Sampler		("s_dt_g",	oG_Name,	false,	D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,
-        // D3D_TEXF_ANISOTROPIC);
-        // C.r_Sampler		("s_dt_b",	oB_Name,	false,	D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,
-        // D3D_TEXF_ANISOTROPIC);
-        // C.r_Sampler		("s_dt_a",	oA_Name,	false,	D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,
-        // D3D_TEXF_ANISOTROPIC);
+        // C.r_Sampler		("s_dt_r",	oR_Name,	false,	nvrhi::SamplerAddressMode::Wrap,	SamplerFilter::Anisotropic,SamplerFilter::Linear,
+        // SamplerFilter::Anisotropic);
+        // C.r_Sampler		("s_dt_g",	oG_Name,	false,	nvrhi::SamplerAddressMode::Wrap,	SamplerFilter::Anisotropic,SamplerFilter::Linear,
+        // SamplerFilter::Anisotropic);
+        // C.r_Sampler		("s_dt_b",	oB_Name,	false,	nvrhi::SamplerAddressMode::Wrap,	SamplerFilter::Anisotropic,SamplerFilter::Linear,
+        // SamplerFilter::Anisotropic);
+        // C.r_Sampler		("s_dt_a",	oA_Name,	false,	nvrhi::SamplerAddressMode::Wrap,	SamplerFilter::Anisotropic,SamplerFilter::Linear,
+        // SamplerFilter::Anisotropic);
 
         // C.r_Sampler		("s_dn_r",	strconcat(sizeof(mask),mask,oR_Name,"_bump")	);
         // C.r_Sampler		("s_dn_g",	strconcat(sizeof(mask),mask,oG_Name,"_bump") );
@@ -244,7 +244,7 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         C.r_dx11Sampler("smp_base");
         C.r_dx11Sampler("smp_linear");
 
-        C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+        C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
         C.r_StencilRef(0x01);
 
         C.r_End();
@@ -257,7 +257,7 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_lmap", C.L_textures[1]);
         C.r_dx11Sampler("smp_linear");
 
-        C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+        C.r_Stencil(TRUE, nvrhi::ComparisonFunc::Always, 0xff, 0x7f, nvrhi::StencilOp::Keep, nvrhi::StencilOp::Replace, nvrhi::StencilOp::Keep);
         C.r_StencilRef(0x01);
 
         C.r_End();
