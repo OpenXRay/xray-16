@@ -85,14 +85,5 @@ public:
     void clear();
     void Invalidate() { clear(); }
     void record(void*& state);
-
-#if defined(USE_DX11)
-    void UpdateState(dx11State& state) const;
-    void UpdateDesc(D3D_RASTERIZER_DESC& desc) const;
-    void UpdateDesc(D3D_DEPTH_STENCIL_DESC& desc) const;
-    void UpdateDesc(D3D_BLEND_DESC& desc) const;
-    void UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT],
-        bool SamplerUsed[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT], int iBaseSamplerIndex) const;
-#endif
 };
 }

@@ -130,51 +130,51 @@ BOOL SimulatorStates::equal(const SimulatorStates& other) const
 }
 
 #if defined(USE_DX11)
-void SimulatorStates::UpdateState(dx11State& state) const
+void UpdateStateDX11(const SimulatorStates& s, dx11State& state)
 {
-    state.UpdateStencilRef(depthStencil.stencilRefValue);
-    state.UpdateAlphaRef(alphaRef);
+    state.UpdateStencilRef(s.depthStencil.stencilRefValue);
+    state.UpdateAlphaRef(s.alphaRef);
 }
 
-void SimulatorStates::UpdateDesc(D3D_RASTERIZER_DESC& desc) const
+void UpdateDescDX11(const SimulatorStates& s, D3D_RASTERIZER_DESC& desc)
 {
-    desc.FillMode      = (raster.fillMode == nvrhi::RasterFillMode::Wireframe) ? D3D11_FILL_WIREFRAME : D3D11_FILL_SOLID;
-    switch (raster.cullMode)
+    desc.FillMode      = (s.raster.fillMode == nvrhi::RasterFillMode::Wireframe) ? D3D11_FILL_WIREFRAME : D3D11_FILL_SOLID;
+    switch (s.raster.cullMode)
     {
     case nvrhi::RasterCullMode::None:  desc.CullMode = D3D11_CULL_NONE;  break;
     case nvrhi::RasterCullMode::Front: desc.CullMode = D3D11_CULL_FRONT; break;
     case nvrhi::RasterCullMode::Back:  desc.CullMode = D3D11_CULL_BACK;  break;
     }
-    desc.ScissorEnable = raster.scissorEnable;
+    desc.ScissorEnable = s.raster.scissorEnable;
 }
 
-void SimulatorStates::UpdateDesc(D3D_DEPTH_STENCIL_DESC& desc) const
+void UpdateDescDX11(const SimulatorStates& s, D3D_DEPTH_STENCIL_DESC& desc)
 {
-    desc.DepthEnable    = depthStencil.depthTestEnable ? 1 : 0;
-    desc.DepthWriteMask = depthStencil.depthWriteEnable ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
-    desc.DepthFunc      = static_cast<D3D11_COMPARISON_FUNC>(depthStencil.depthFunc);
+    desc.DepthEnable    = s.depthStencil.depthTestEnable ? 1 : 0;
+    desc.DepthWriteMask = s.depthStencil.depthWriteEnable ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+    desc.DepthFunc      = static_cast<D3D11_COMPARISON_FUNC>(s.depthStencil.depthFunc);
 
-    desc.StencilEnable    = depthStencil.stencilEnable ? 1 : 0;
-    desc.StencilReadMask  = depthStencil.stencilReadMask;
-    desc.StencilWriteMask = depthStencil.stencilWriteMask;
+    desc.StencilEnable    = s.depthStencil.stencilEnable ? 1 : 0;
+    desc.StencilReadMask  = s.depthStencil.stencilReadMask;
+    desc.StencilWriteMask = s.depthStencil.stencilWriteMask;
 
-    desc.FrontFace.StencilFailOp      = static_cast<D3D11_STENCIL_OP>(depthStencil.frontFaceStencil.failOp);
-    desc.FrontFace.StencilDepthFailOp = static_cast<D3D11_STENCIL_OP>(depthStencil.frontFaceStencil.depthFailOp);
-    desc.FrontFace.StencilPassOp      = static_cast<D3D11_STENCIL_OP>(depthStencil.frontFaceStencil.passOp);
-    desc.FrontFace.StencilFunc        = static_cast<D3D11_COMPARISON_FUNC>(depthStencil.frontFaceStencil.stencilFunc);
+    desc.FrontFace.StencilFailOp      = static_cast<D3D11_STENCIL_OP>(s.depthStencil.frontFaceStencil.failOp);
+    desc.FrontFace.StencilDepthFailOp = static_cast<D3D11_STENCIL_OP>(s.depthStencil.frontFaceStencil.depthFailOp);
+    desc.FrontFace.StencilPassOp      = static_cast<D3D11_STENCIL_OP>(s.depthStencil.frontFaceStencil.passOp);
+    desc.FrontFace.StencilFunc        = static_cast<D3D11_COMPARISON_FUNC>(s.depthStencil.frontFaceStencil.stencilFunc);
 
-    desc.BackFace.StencilFailOp      = static_cast<D3D11_STENCIL_OP>(depthStencil.backFaceStencil.failOp);
-    desc.BackFace.StencilDepthFailOp = static_cast<D3D11_STENCIL_OP>(depthStencil.backFaceStencil.depthFailOp);
-    desc.BackFace.StencilPassOp      = static_cast<D3D11_STENCIL_OP>(depthStencil.backFaceStencil.passOp);
-    desc.BackFace.StencilFunc        = static_cast<D3D11_COMPARISON_FUNC>(depthStencil.backFaceStencil.stencilFunc);
+    desc.BackFace.StencilFailOp      = static_cast<D3D11_STENCIL_OP>(s.depthStencil.backFaceStencil.failOp);
+    desc.BackFace.StencilDepthFailOp = static_cast<D3D11_STENCIL_OP>(s.depthStencil.backFaceStencil.depthFailOp);
+    desc.BackFace.StencilPassOp      = static_cast<D3D11_STENCIL_OP>(s.depthStencil.backFaceStencil.passOp);
+    desc.BackFace.StencilFunc        = static_cast<D3D11_COMPARISON_FUNC>(s.depthStencil.backFaceStencil.stencilFunc);
 }
 
-void SimulatorStates::UpdateDesc(D3D_BLEND_DESC& desc) const
+void UpdateDescDX11(const SimulatorStates& s, D3D_BLEND_DESC& desc)
 {
-    desc.AlphaToCoverageEnable = blend.alphaToCoverageEnable ? 1 : 0;
+    desc.AlphaToCoverageEnable = s.blend.alphaToCoverageEnable ? 1 : 0;
     for (int i = 0; i < 8; ++i)
     {
-        const auto& rt = blend.targets[i];
+        const auto& rt = s.blend.targets[i];
         desc.RenderTarget[i].BlendEnable           = rt.blendEnable ? 1 : 0;
         desc.RenderTarget[i].SrcBlend              = static_cast<D3D11_BLEND>(rt.srcBlend);
         desc.RenderTarget[i].DestBlend             = static_cast<D3D11_BLEND>(rt.destBlend);
@@ -186,19 +186,19 @@ void SimulatorStates::UpdateDesc(D3D_BLEND_DESC& desc) const
     }
 }
 
-void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT],
-    bool SamplerUsed[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT], int iBaseSamplerIndex) const
+void UpdateDescDX11(const SimulatorStates& s, D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT],
+    bool SamplerUsed[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT], int iBaseSamplerIndex)
 {
     for (int slot = 0; slot < 16; ++slot)
     {
-        if (!samplerUsed[slot])
+        if (!s.samplerUsed[slot])
             continue;
 
         int outIndex = slot - iBaseSamplerIndex;
         if (outIndex < 0 || outIndex >= D3D_COMMONSHADER_SAMPLER_SLOT_COUNT)
             continue;
 
-        const nvrhi::SamplerDesc& src = samplers[slot];
+        const nvrhi::SamplerDesc& src = s.samplers[slot];
         D3D_SAMPLER_DESC& desc = descArray[outIndex];
         SamplerUsed[outIndex] = true;
 

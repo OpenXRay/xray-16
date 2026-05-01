@@ -2,6 +2,7 @@
 #include "dx11State.h"
 
 #include "dx11StateCache.h"
+#include "Layers/xrRenderDX11/dx11SimulatorStateConvert.h"
 
 namespace xray::render::fg
 {
@@ -20,7 +21,7 @@ dx11State* dx11State::Create(SimulatorStates& state_code)
 {
     dx11State* pState = xr_new<dx11State>();
 
-    state_code.UpdateState(*pState);
+    UpdateStateDX11(state_code, *pState);
 
     // TODO: possibly lock on state managers access
 
@@ -92,7 +93,7 @@ void dx11State::InitSamplers(tSamplerHArray& SamplerArray, SimulatorStates& stat
         dx11StateUtils::ResetDescription(descArray[i]);
     }
 
-    state_code.UpdateDesc(descArray, SamplerUsed, iBaseSamplerIndex);
+    UpdateDescDX11(state_code, descArray, SamplerUsed, iBaseSamplerIndex);
 
     int iMaxSampler = D3D_COMMONSHADER_SAMPLER_SLOT_COUNT - 1;
     for (; iMaxSampler > -1; --iMaxSampler)
