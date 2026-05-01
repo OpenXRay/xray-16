@@ -49,21 +49,6 @@ namespace xray::render {
 using namespace xray::render::fg;
 
 
-nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat) {
-    for (uint32_t i = 0; i < uint32_t(nvrhi::Format::COUNT); i++) {
-        nvrhi::Format nvrhiFormat = static_cast<nvrhi::Format>(i);
-        const nvrhi::DxgiFormatMapping& mapping = nvrhi::getDxgiFormatMapping(nvrhiFormat);
-
-        if (mapping.resourceFormat == dxgiFormat ||
-            mapping.srvFormat == dxgiFormat ||
-            mapping.rtvFormat == dxgiFormat) {
-            return nvrhiFormat;
-        }
-    }
-
-    return nvrhi::Format::UNKNOWN;
-}
-
 #ifdef DEBUG
 static void LogConstantLayout(const framegraph::ShaderConstantLayout& layout, const char* shaderName) {
     using namespace framegraph;

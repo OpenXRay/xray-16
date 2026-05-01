@@ -79,23 +79,23 @@ struct DDS_HEADER {
     u32 dwReserved2;
 };
 
-enum DXGI_FORMAT : u32 {
-    DXGI_FORMAT_UNKNOWN = 0,
-    DXGI_FORMAT_R32_FLOAT = 41,
-    DXGI_FORMAT_BC1_UNORM = 71,
-    DXGI_FORMAT_BC1_UNORM_SRGB = 72,
-    DXGI_FORMAT_BC2_UNORM = 74,
-    DXGI_FORMAT_BC2_UNORM_SRGB = 75,
-    DXGI_FORMAT_BC3_UNORM = 77,
-    DXGI_FORMAT_BC3_UNORM_SRGB = 78,
-    DXGI_FORMAT_BC4_UNORM = 80,
-    DXGI_FORMAT_BC4_SNORM = 81,
-    DXGI_FORMAT_BC5_UNORM = 83,
-    DXGI_FORMAT_BC5_SNORM = 84,
-    DXGI_FORMAT_BC6H_UF16 = 95,
-    DXGI_FORMAT_BC6H_SF16 = 96,
-    DXGI_FORMAT_BC7_UNORM = 98,
-    DXGI_FORMAT_BC7_UNORM_SRGB = 99,
+enum DDSDxgiFormat : u32 {
+    DDSDxgiFormat_UNKNOWN = 0,
+    DDSDxgiFormat_R32_FLOAT = 41,
+    DDSDxgiFormat_BC1_UNORM = 71,
+    DDSDxgiFormat_BC1_UNORM_SRGB = 72,
+    DDSDxgiFormat_BC2_UNORM = 74,
+    DDSDxgiFormat_BC2_UNORM_SRGB = 75,
+    DDSDxgiFormat_BC3_UNORM = 77,
+    DDSDxgiFormat_BC3_UNORM_SRGB = 78,
+    DDSDxgiFormat_BC4_UNORM = 80,
+    DDSDxgiFormat_BC4_SNORM = 81,
+    DDSDxgiFormat_BC5_UNORM = 83,
+    DDSDxgiFormat_BC5_SNORM = 84,
+    DDSDxgiFormat_BC6H_UF16 = 95,
+    DDSDxgiFormat_BC6H_SF16 = 96,
+    DDSDxgiFormat_BC7_UNORM = 98,
+    DDSDxgiFormat_BC7_UNORM_SRGB = 99,
 };
 
 enum D3D10_RESOURCE_DIMENSION : u32 {
@@ -105,7 +105,7 @@ enum D3D10_RESOURCE_DIMENSION : u32 {
 };
 
 struct DDS_HEADER_DX10 {
-    DXGI_FORMAT dxgiFormat;
+    DDSDxgiFormat dxgiFormat;
     D3D10_RESOURCE_DIMENSION resourceDimension;
     u32 miscFlag;
     u32 arraySize;
@@ -218,7 +218,7 @@ public:
 
     static nvrhi::Format GetFormatFromFourCC(u32 fourCC);
 
-    static nvrhi::Format GetFormatFromDXGI(DXGI_FORMAT dxgiFormat);
+    static nvrhi::Format GetFormatFromDXGI(DDSDxgiFormat dxgiFormat);
 
     static u32 CalculateMipSize(
         u32 width,

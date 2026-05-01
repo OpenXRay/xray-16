@@ -94,8 +94,6 @@ inline fg::ColorWriteMask ConvertColorWriteMask(u8 d3dMask) {
     return mask;
 }
 
-nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat);
-
 #endif
 
 }

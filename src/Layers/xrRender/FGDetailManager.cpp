@@ -397,7 +397,7 @@ bool FGDetailManager::BakeHeightmap()
     writer->w(&header, sizeof(header));
 
     xray::render::resources::DDS_HEADER_DX10 header10 = {};
-    header10.dxgiFormat = xray::render::resources::DXGI_FORMAT_R32_FLOAT;
+    header10.dxgiFormat = xray::render::resources::DDSDxgiFormat_R32_FLOAT;
     header10.resourceDimension = xray::render::resources::D3D10_RESOURCE_DIMENSION_TEXTURE2D;
     header10.arraySize = 1;
     writer->w(&header10, sizeof(header10));

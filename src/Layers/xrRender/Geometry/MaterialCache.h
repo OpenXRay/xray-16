@@ -241,8 +241,6 @@ struct MaterialPSO {
     }
 };
 
-nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat);
-
 class MaterialCache {
 public:
     MaterialCache(
