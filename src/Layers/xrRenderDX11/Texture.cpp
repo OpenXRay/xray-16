@@ -122,7 +122,7 @@ ID3DTexture2D* TW_LoadTextureFromTexture(
     if (D3DX_DEFAULT == t_dest_fmt)
         t_dest_fmt = t_from_desc0.Format;
     R_CHK(D3DXCreateTexture(HW.pDevice, top_width, top_height, levels_exist,
-        0, t_dest_fmt, D3DPOOL_DEFAULT, &t_dest));
+        0, t_dest_fmt, D3D_POOL_DEFAULT, &t_dest));
 
     // Copy surfaces & destroy temporary
     ID3DTexture2D* T_src = t_from;
@@ -325,7 +325,7 @@ _DDS:
 _DDS_CUBE:
 {
     result = D3DXCreateCubeTextureFromFileInMemoryEx(HW.pDevice, S->pointer(), S->length(),
-        D3DX_DEFAULT, IMG.MipLevels, 0, IMG.Format, D3DPOOL_DEFAULT,
+        D3DX_DEFAULT, IMG.MipLevels, 0, IMG.Format, D3D_POOL_DEFAULT,
         D3DX_DEFAULT, D3DX_DEFAULT, 0, &IMG, nullptr, &pTextureCUBE);
     FS.r_close(S);
 
@@ -354,7 +354,7 @@ _DDS_2D:
     ID3DTexture2D* T_sysmem;
     HRESULT const result =
         D3DXCreateTextureFromFileInMemoryEx(HW.pDevice, S->pointer(), S->length(), D3DX_DEFAULT, D3DX_DEFAULT,
-            IMG.MipLevels, 0, IMG.Format, D3DPOOL_SYSTEMMEM, D3DX_DEFAULT, D3DX_DEFAULT, 0, &IMG, nullptr, &T_sysmem);
+            IMG.MipLevels, 0, IMG.Format, D3D_POOL_SYSTEMMEM, D3DX_DEFAULT, D3DX_DEFAULT, 0, &IMG, nullptr, &T_sysmem);
     FS.r_close(S);
 
     if (FAILED(result))
@@ -414,13 +414,13 @@ _BUMP_from_base:
     img_size = S->length();
     ID3DTexture2D* T_base;
     R_CHK2(D3DXCreateTextureFromFileInMemoryEx(HW.pDevice, S->pointer(), S->length(), D3DX_DEFAULT, D3DX_DEFAULT,
-        D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, D3DX_DEFAULT, D3DX_DEFAULT, 0, &IMG, nullptr, &T_base), fn);
+        D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8, D3D_POOL_SYSTEMMEM, D3DX_DEFAULT, D3DX_DEFAULT, 0, &IMG, nullptr, &T_base), fn);
     FS.r_close(S);
 
     // Create HW-surface
     ID3DTexture2D* T_normal_1 = nullptr;
     R_CHK(D3DXCreateTexture(
-        HW.pDevice, IMG.Width, IMG.Height, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &T_normal_1));
+        HW.pDevice, IMG.Width, IMG.Height, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8, D3D_POOL_SYSTEMMEM, &T_normal_1));
     R_CHK(D3DXComputeNormalMap(
         T_normal_1, T_base, nullptr, D3DX_NORMALMAP_COMPUTE_OCCLUSION, D3DX_CHANNEL_LUMINANCE, _BUMPHEIGH));
 
@@ -441,7 +441,7 @@ _BUMP_from_base:
     // Calculate difference
     ID3DTexture2D* T_normal_1D = 0;
     R_CHK(D3DXCreateTexture(HW.pDevice, dwWidth, dwHeight, T_normal_1U->GetLevelCount(), 0, D3DFMT_A8R8G8B8,
-        D3DPOOL_SYSTEMMEM, &T_normal_1D));
+        D3D_POOL_SYSTEMMEM, &T_normal_1D));
     TW_Iterate_2OP(T_normal_1D, T_normal_1, T_normal_1U, it_difference);
 
     // Reverse channels back + transfer heightmap

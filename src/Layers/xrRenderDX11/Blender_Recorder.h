@@ -73,23 +73,23 @@ public:
     void PassSET_Blend(BOOL bABlend, u32 abSRC, u32 abDST, BOOL aTest, u32 aRef);
     void PassSET_Blend_BLEND(BOOL bAref = FALSE, u32 ref = 0)
     {
-        PassSET_Blend(TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, bAref, ref);
+        PassSET_Blend(TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, bAref, ref);
     }
     void PassSET_Blend_SET(BOOL bAref = FALSE, u32 ref = 0)
     {
-        PassSET_Blend(FALSE, D3DBLEND_ONE, D3DBLEND_ZERO, bAref, ref);
+        PassSET_Blend(FALSE, D3D_BLEND_ONE, D3D_BLEND_ZERO, bAref, ref);
     }
     void PassSET_Blend_ADD(BOOL bAref = FALSE, u32 ref = 0)
     {
-        PassSET_Blend(TRUE, D3DBLEND_ONE, D3DBLEND_ONE, bAref, ref);
+        PassSET_Blend(TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, bAref, ref);
     }
     void PassSET_Blend_MUL(BOOL bAref = FALSE, u32 ref = 0)
     {
-        PassSET_Blend(TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_ZERO, bAref, ref);
+        PassSET_Blend(TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_ZERO, bAref, ref);
     }
     void PassSET_Blend_MUL2X(BOOL bAref = FALSE, u32 ref = 0)
     {
-        PassSET_Blend(TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_SRCCOLOR, bAref, ref);
+        PassSET_Blend(TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_SRC_COLOR, bAref, ref);
     }
     void PassSET_LightFog(BOOL bLight, BOOL bFog);
     void PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs = "null", pcstr _hs = "null", pcstr _ds = "null");
@@ -103,8 +103,8 @@ public:
     void StageSET_Color3(u32 a1, u32 op, u32 a2, u32 a3);
     void StageSET_Alpha(u32 a1, u32 op, u32 a2);
     void StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channel);
-    void Stage_Texture(LPCSTR name, u32 address = D3DTADDRESS_WRAP, u32 fmin = D3DTEXF_LINEAR,
-        u32 fmip = D3DTEXF_LINEAR, u32 fmag = D3DTEXF_LINEAR);
+    void Stage_Texture(LPCSTR name, u32 address = D3D_TEXTURE_ADDRESS_WRAP, u32 fmin = D3D_TEXF_LINEAR,
+        u32 fmip = D3D_TEXF_LINEAR, u32 fmag = D3D_TEXF_LINEAR);
     void StageTemplate_LMAP0();
     void Stage_Matrix(LPCSTR name, int UVW_channel);
     void Stage_Constant(LPCSTR name);
@@ -127,22 +127,22 @@ public:
 
     // R1/R2-compiler	[programmable]		- templates
     void r_Pass(LPCSTR vs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE, BOOL bABlend = FALSE,
-        D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO, BOOL aTest = FALSE, u32 aRef = 0);
+        D3D_BLEND abSRC = D3D_BLEND_ONE, D3D_BLEND abDST = D3D_BLEND_ZERO, BOOL aTest = FALSE, u32 aRef = 0);
 
     void r_Constant(LPCSTR name, R_constant_setup* s);
     void r_Pass(LPCSTR vs, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE,
-        BOOL bABlend = FALSE, D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO, BOOL aTest = FALSE,
+        BOOL bABlend = FALSE, D3D_BLEND abSRC = D3D_BLEND_ONE, D3D_BLEND abDST = D3D_BLEND_ZERO, BOOL aTest = FALSE,
         u32 aRef = 0);
 #ifdef USE_DX11
     void r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE,
-        BOOL bZwrite = TRUE, BOOL bABlend = FALSE, D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO,
+        BOOL bZwrite = TRUE, BOOL bABlend = FALSE, D3D_BLEND abSRC = D3D_BLEND_ONE, D3D_BLEND abDST = D3D_BLEND_ZERO,
         BOOL aTest = FALSE, u32 aRef = 0);
     void r_ComputePass(LPCSTR cs);
 #endif
-    void r_Stencil(BOOL Enable, u32 Func = D3DCMP_ALWAYS, u32 Mask = 0x00, u32 WriteMask = 0x00,
-        u32 Fail = D3DSTENCILOP_KEEP, u32 Pass = D3DSTENCILOP_KEEP, u32 ZFail = D3DSTENCILOP_KEEP);
+    void r_Stencil(BOOL Enable, u32 Func = D3D_COMPARISON_ALWAYS, u32 Mask = 0x00, u32 WriteMask = 0x00,
+        u32 Fail = D3D_STENCIL_OP_KEEP, u32 Pass = D3D_STENCIL_OP_KEEP, u32 ZFail = D3D_STENCIL_OP_KEEP);
     void r_StencilRef(u32 Ref);
-    void r_CullMode(D3DCULL Mode);
+    void r_CullMode(D3D_CULL_MODE Mode);
 
 #if defined(USE_DX11)
     void r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive = false);
@@ -153,10 +153,10 @@ public:
     u32 r_dx11Sampler(LPCSTR ResourceName);
 #endif // USE_DX11
 
-    u32 r_Sampler(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3DTADDRESS_WRAP,
-        u32 fmin = D3DTEXF_LINEAR, u32 fmip = D3DTEXF_LINEAR, u32 fmag = D3DTEXF_LINEAR);
-    u32 r_Sampler(LPCSTR name, shared_str texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3DTADDRESS_WRAP,
-        u32 fmin = D3DTEXF_LINEAR, u32 fmip = D3DTEXF_LINEAR, u32 fmag = D3DTEXF_LINEAR)
+    u32 r_Sampler(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3D_TEXTURE_ADDRESS_WRAP,
+        u32 fmin = D3D_TEXF_LINEAR, u32 fmip = D3D_TEXF_LINEAR, u32 fmag = D3D_TEXF_LINEAR);
+    u32 r_Sampler(LPCSTR name, shared_str texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3D_TEXTURE_ADDRESS_WRAP,
+        u32 fmin = D3D_TEXF_LINEAR, u32 fmip = D3D_TEXF_LINEAR, u32 fmag = D3D_TEXF_LINEAR)
     {
         return r_Sampler(name, texture.c_str(), b_ps1x_ProjectiveDivide, address, fmin, fmip, fmag);
     }

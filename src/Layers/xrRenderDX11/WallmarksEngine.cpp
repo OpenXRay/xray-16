@@ -352,7 +352,7 @@ ICF u32 FlushStream(
         RCache.set_Geometry(hGeom);
         if (bSuppressCull)
             RCache.set_CullMode(CULL_NONE);
-        RCache.Render(D3DPT_TRIANGLELIST, w_offset, w_count / 3);
+        RCache.Render(D3D_PT_TRIANGLELIST, w_offset, w_count / 3);
         if (bSuppressCull)
             RCache.set_CullMode(CULL_CCW);
     }

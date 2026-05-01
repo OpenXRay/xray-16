@@ -152,14 +152,14 @@ void CBlender_BmmD::CompileProgrammable(CBlender_Compile& C) const
         C.r_End();
         break;
     case SE_R1_LPOINT:
-        C.r_Pass("impl_point", "add_point", FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE);
+        C.r_Pass("impl_point", "add_point", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_Sampler_clf("s_lmap", TEX_POINT_ATT);
         C.r_Sampler_clf("s_att", TEX_POINT_ATT);
         C.r_End();
         break;
     case SE_R1_LSPOT:
-        C.r_Pass("impl_spot", "add_spot", FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE);
+        C.r_Pass("impl_spot", "add_spot", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_Sampler_clf("s_lmap", "internal" DELIMITER "internal_light_att", true);
         C.r_Sampler_clf("s_att", TEX_SPOT_ATT);

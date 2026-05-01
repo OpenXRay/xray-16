@@ -32,7 +32,7 @@ void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask,
 }
 
 void CBlender_Compile::r_StencilRef(u32 Ref) { RS.SetRS(D3DRS_STENCILREF, Ref); }
-void CBlender_Compile::r_CullMode(D3DCULL Mode) { RS.SetRS(D3DRS_CULLMODE, (u32)Mode); }
+void CBlender_Compile::r_CullMode(D3D_CULL_MODE Mode) { RS.SetRS(D3DRS_CULLMODE, (u32)Mode); }
 void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive /*= false*/)
 {
     VERIFY(ResourceName);
@@ -86,62 +86,62 @@ u32 CBlender_Compile::r_dx11Sampler(LPCSTR ResourceName)
 
     //	init defaults here:
 
-    //	Use D3DTADDRESS_CLAMP,	D3DTEXF_POINT,			D3DTEXF_NONE,	D3DTEXF_POINT
+    //	Use D3D_TEXTURE_ADDRESS_CLAMP,	D3D_TEXF_POINT,			D3D_TEXF_NONE,	D3D_TEXF_POINT
     if (0 == xr_strcmp(ResourceName, "smp_nofilter"))
     {
-        i_Address(stage, D3DTADDRESS_CLAMP);
-        i_Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
+        i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
+        i_Filter(stage, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
     }
 
-    //	Use D3DTADDRESS_CLAMP,	D3DTEXF_LINEAR,			D3DTEXF_NONE,	D3DTEXF_LINEAR
+    //	Use D3D_TEXTURE_ADDRESS_CLAMP,	D3D_TEXF_LINEAR,			D3D_TEXF_NONE,	D3D_TEXF_LINEAR
     else if (0 == xr_strcmp(ResourceName, "smp_rtlinear"))
     {
-        i_Address(stage, D3DTADDRESS_CLAMP);
-        i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
+        i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
+        i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
     }
 
-    //	Use	D3DTADDRESS_WRAP,	D3DTEXF_LINEAR,			D3DTEXF_LINEAR,	D3DTEXF_LINEAR
+    //	Use	D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_LINEAR,			D3D_TEXF_LINEAR,	D3D_TEXF_LINEAR
     else if (0 == xr_strcmp(ResourceName, "smp_linear"))
     {
-        i_Address(stage, D3DTADDRESS_WRAP);
-        i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
+        i_Address(stage, D3D_TEXTURE_ADDRESS_WRAP);
+        i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR);
     }
 
-    //	Use D3DTADDRESS_WRAP,	D3DTEXF_ANISOTROPIC, 	D3DTEXF_LINEAR,	D3DTEXF_ANISOTROPIC
+    //	Use D3D_TEXTURE_ADDRESS_WRAP,	D3D_TEXF_ANISOTROPIC, 	D3D_TEXF_LINEAR,	D3D_TEXF_ANISOTROPIC
     else if (0 == xr_strcmp(ResourceName, "smp_base"))
     {
-        i_Address(stage, D3DTADDRESS_WRAP);
+        i_Address(stage, D3D_TEXTURE_ADDRESS_WRAP);
         i_dx11FilterAnizo(stage, TRUE);
-        // i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
+        // i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR);
     }
 
-    //	Use D3DTADDRESS_CLAMP,	D3DTEXF_LINEAR,			D3DTEXF_NONE,	D3DTEXF_LINEAR
+    //	Use D3D_TEXTURE_ADDRESS_CLAMP,	D3D_TEXF_LINEAR,			D3D_TEXF_NONE,	D3D_TEXF_LINEAR
     else if (0 == xr_strcmp(ResourceName, "smp_material"))
     {
-        i_Address(stage, D3DTADDRESS_CLAMP);
-        i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
-        RS.SetSAMP(stage, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
+        i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
+        i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
+        RS.SetSAMP(stage, D3DSAMP_ADDRESSW, D3D_TEXTURE_ADDRESS_WRAP);
     }
 
     else if (0 == xr_strcmp(ResourceName, "smp_smap"))
     {
-        i_Address(stage, D3DTADDRESS_CLAMP);
-        i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
+        i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
+        i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
         RS.SetSAMP(stage, XRDX11SAMP_COMPARISONFILTER, TRUE);
         RS.SetSAMP(stage, XRDX11SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
     }
 
     else if (0 == xr_strcmp(ResourceName, "smp_jitter"))
     {
-        i_Address(stage, D3DTADDRESS_WRAP);
-        i_Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
+        i_Address(stage, D3D_TEXTURE_ADDRESS_WRAP);
+        i_Filter(stage, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
     }
 
     return stage;
 }
 
 void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite, BOOL bABlend,
-                              D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
+                              D3D_BLEND abSRC, D3D_BLEND abDST, BOOL aTest, u32 aRef)
 {
     RS.Invalidate();
     ctable.clear();
@@ -176,7 +176,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
 }
 
 void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest,
-    BOOL bZwrite, BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
+    BOOL bZwrite, BOOL bABlend, D3D_BLEND abSRC, D3D_BLEND abDST, BOOL aTest, u32 aRef)
 {
     r_Pass(vs, gs, ps, bFog, bZtest, bZwrite, bABlend, abSRC, abDST, aTest, aRef);
 

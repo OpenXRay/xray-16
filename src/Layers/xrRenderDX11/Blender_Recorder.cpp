@@ -174,7 +174,7 @@ void CBlender_Compile::PassBegin()
 
     // Set default pipeline state
     PassSET_ZB(true, true);
-    PassSET_Blend(false, D3DBLEND_ONE, D3DBLEND_ZERO, false, 0);
+    PassSET_Blend(false, D3D_BLEND_ONE, D3D_BLEND_ZERO, false, 0);
     PassSET_LightFog(false, false);
 }
 
@@ -224,7 +224,7 @@ void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)
 {
     if (Pass())
         bZWrite = FALSE;
-    RS.SetRS(D3DRS_ZFUNC, bZTest ? (bInvertZTest ? D3DCMP_GREATER : D3DCMP_LESSEQUAL) : D3DCMP_ALWAYS);
+    RS.SetRS(D3DRS_ZFUNC, bZTest ? (bInvertZTest ? D3D_COMPARISON_GREATER : D3D_COMPARISON_LESS_EQUAL) : D3D_COMPARISON_ALWAYS);
     RS.SetRS(D3DRS_ZWRITEENABLE, BC(bZWrite));
     /*
     if (bZWrite || bZTest)				RS.SetRS	(D3DRS_ZENABLE,	D3DZB_TRUE);
@@ -234,19 +234,19 @@ void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)
 
 void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
 {
-    if (bABlend && D3DBLEND_ONE == abSRC && D3DBLEND_ZERO == abDST)
+    if (bABlend && D3D_BLEND_ONE == abSRC && D3D_BLEND_ZERO == abDST)
         bABlend = FALSE;
     RS.SetRS(D3DRS_ALPHABLENDENABLE, BC(bABlend));
-    RS.SetRS(D3DRS_SRCBLEND, bABlend ? abSRC : D3DBLEND_ONE);
-    RS.SetRS(D3DRS_DESTBLEND, bABlend ? abDST : D3DBLEND_ZERO);
+    RS.SetRS(D3DRS_SRCBLEND, bABlend ? abSRC : D3D_BLEND_ONE);
+    RS.SetRS(D3DRS_DESTBLEND, bABlend ? abDST : D3D_BLEND_ZERO);
 
     //	Since in our engine D3DRS_SEPARATEALPHABLENDENABLE state is
     //	always set to false and in DirectX 10 blend functions for
     //	color and alpha are always independent, assign blend options for
     //	alpha in DX11 identical to color.
     // XXX: do we want to change this behaviour?
-    RS.SetRS(D3DRS_SRCBLENDALPHA, bABlend ? abSRC : D3DBLEND_ONE);
-    RS.SetRS(D3DRS_DESTBLENDALPHA, bABlend ? abDST : D3DBLEND_ZERO);
+    RS.SetRS(D3DRS_SRCBLENDALPHA, bABlend ? abSRC : D3D_BLEND_ONE);
+    RS.SetRS(D3DRS_DESTBLENDALPHA, bABlend ? abDST : D3D_BLEND_ZERO);
 }
 void CBlender_Compile::PassSET_ablend_aref(BOOL bATest, u32 aRef)
 {
@@ -281,7 +281,7 @@ void CBlender_Compile::PassSET_LightFog(BOOL bLight, BOOL bFog)
 //
 void CBlender_Compile::StageBegin()
 {
-    StageSET_Address(D3DTADDRESS_WRAP); // Wrapping enabled by default
+    StageSET_Address(D3D_TEXTURE_ADDRESS_WRAP); // Wrapping enabled by default
 }
 void CBlender_Compile::StageEnd() { dwStage++; }
 void CBlender_Compile::StageSET_Address(u32 adr)
@@ -306,7 +306,7 @@ void CBlender_Compile::StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channe
 
 void CBlender_Compile::StageTemplate_LMAP0()
 {
-    StageSET_Address(D3DTADDRESS_CLAMP);
+    StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
     StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
     StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
     StageSET_TMC("$base1", "$null", "$null", 1);
@@ -364,33 +364,33 @@ void CBlender_Compile::SetupSampler(u32 stage, pcstr sampler)
 {
     VERIFY(stage != InvalidStage);
 
-    u32 minFliter   = D3DTEXF_LINEAR;
-    u32 mipFilter   = D3DTEXF_LINEAR;
-    u32 magFilter   = D3DTEXF_LINEAR;
-    u32 addressMode = D3DTADDRESS_WRAP;
+    u32 minFliter   = D3D_TEXF_LINEAR;
+    u32 mipFilter   = D3D_TEXF_LINEAR;
+    u32 magFilter   = D3D_TEXF_LINEAR;
+    u32 addressMode = D3D_TEXTURE_ADDRESS_WRAP;
 
     if (xr_strcmp(sampler, "smp_nofilter") == 0)
     {
-        addressMode = D3DTADDRESS_CLAMP;
-        minFliter   = D3DTEXF_POINT;
-        mipFilter   = D3DTEXF_NONE;
-        magFilter   = D3DTEXF_POINT;
+        addressMode = D3D_TEXTURE_ADDRESS_CLAMP;
+        minFliter   = D3D_TEXF_POINT;
+        mipFilter   = D3D_TEXF_NONE;
+        magFilter   = D3D_TEXF_POINT;
     }
     else if (xr_strcmp(sampler, "smp_rtlinear") == 0)
     {
-        addressMode = D3DTADDRESS_CLAMP;
-        mipFilter   = D3DTEXF_NONE;
+        addressMode = D3D_TEXTURE_ADDRESS_CLAMP;
+        mipFilter   = D3D_TEXF_NONE;
     }
     else if ((xr_strcmp(sampler, "s_detail") == 0) || (xr_strcmp(sampler, "s_base") == 0))
     {
-        minFliter = D3DTEXF_ANISOTROPIC;
-        magFilter = D3DTEXF_ANISOTROPIC;
+        minFliter = D3D_TEXF_ANISOTROPIC;
+        magFilter = D3D_TEXF_ANISOTROPIC;
     }
     else if (xr_strcmp(sampler, "smp_material") == 0)
     {
-        addressMode = D3DTADDRESS_CLAMP;
-        mipFilter   = D3DTEXF_NONE;
-        RS.SetSAMP(stage, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
+        addressMode = D3D_TEXTURE_ADDRESS_CLAMP;
+        mipFilter   = D3D_TEXF_NONE;
+        RS.SetSAMP(stage, D3DSAMP_ADDRESSW, D3D_TEXTURE_ADDRESS_WRAP);
     }
 
     i_Address(stage, addressMode);

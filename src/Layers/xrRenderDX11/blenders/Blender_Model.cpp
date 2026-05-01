@@ -163,7 +163,7 @@ void CBlender_Model::CompileProgrammable(CBlender_Compile& C) const
         vsname = psname = "model_def_hq";
         if (oBlend.value)
             C.r_Pass(
-                vsname, psname, TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
+                vsname, psname, TRUE, TRUE, TRUE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, oAREF.value);
         else
             C.r_Pass(vsname, psname, TRUE);
         C.r_Sampler("s_base", C.L_textures[0]);
@@ -174,7 +174,7 @@ void CBlender_Model::CompileProgrammable(CBlender_Compile& C) const
         vsname = psname = "model_def_lq";
         if (oBlend.value)
             C.r_Pass(
-                vsname, psname, TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
+                vsname, psname, TRUE, TRUE, TRUE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, oAREF.value);
         else
             C.r_Pass(vsname, psname, TRUE);
         C.r_Sampler("s_base", C.L_textures[0]);
@@ -184,9 +184,9 @@ void CBlender_Model::CompileProgrammable(CBlender_Compile& C) const
         vsname = "model_def_point";
         psname = "add_point";
         if (oBlend.value)
-            C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE, oAREF.value);
+            C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE, oAREF.value);
         else
-            C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE);
+            C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_Sampler_clf("s_lmap", TEX_POINT_ATT);
         C.r_Sampler_clf("s_att", TEX_POINT_ATT);
@@ -196,9 +196,9 @@ void CBlender_Model::CompileProgrammable(CBlender_Compile& C) const
         vsname = "model_def_spot";
         psname = "add_spot";
         if (oBlend.value)
-            C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE, oAREF.value);
+            C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE, oAREF.value);
         else
-            C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE);
+            C.r_Pass(vsname, psname, FALSE, TRUE, FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_Sampler_clf("s_lmap", "internal" DELIMITER "internal_light_att", true);
         C.r_Sampler_clf("s_att", TEX_SPOT_ATT);
@@ -207,7 +207,7 @@ void CBlender_Model::CompileProgrammable(CBlender_Compile& C) const
     case SE_R1_LMODELS:
         vsname = "model_def_shadow";
         psname = "model_shadow";
-        C.r_Pass(vsname, psname, FALSE, FALSE, FALSE, TRUE, D3DBLEND_ZERO, D3DBLEND_SRCCOLOR, FALSE, 0);
+        C.r_Pass(vsname, psname, FALSE, FALSE, FALSE, TRUE, D3D_BLEND_ZERO, D3D_BLEND_SRC_COLOR, FALSE, 0);
         C.r_End();
         break;
     }

@@ -48,7 +48,7 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
     RCache.set_xform_world(Fidentity);
     RCache.set_Shader(pThRen->l_model->shader);
     RCache.set_Geometry(hGeom_model);
-    RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, vCount_Lock, i_offset, iCount_Lock / 3);
+    RCache.Render(D3D_PT_TRIANGLELIST, v_offset, 0, vCount_Lock, i_offset, iCount_Lock / 3);
     RCache.set_CullMode(CULL_CCW);
 
     // gradient
@@ -100,16 +100,16 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
 #if defined(USE_DX11) // XXX: check if it's needed on OGL
     //	Hack. Since lightning gradient uses sun shader override z write settings manually
     RCache.set_Z(TRUE);
-    RCache.set_ZFunc(D3DCMP_LESSEQUAL);
+    RCache.set_ZFunc(D3D_COMPARISON_LESS_EQUAL);
 #endif
-    RCache.Render(D3DPT_TRIANGLELIST, VS_Offset, 0, 4, 0, 2);
+    RCache.Render(D3D_PT_TRIANGLELIST, VS_Offset, 0, 4, 0, 2);
 
     RCache.set_Shader(((dxFlareRender*)&*owner.current->m_GradientCenter->m_pFlare)->hShader);
 #if defined(USE_DX11) // XXX: check if it's needed on OGL
     //	Hack. Since lightning gradient uses sun shader override z write settings manually
     RCache.set_Z(TRUE);
-    RCache.set_ZFunc(D3DCMP_LESSEQUAL);
+    RCache.set_ZFunc(D3D_COMPARISON_LESS_EQUAL);
 #endif
-    RCache.Render(D3DPT_TRIANGLELIST, VS_Offset + 4, 0, 4, 0, 2);
+    RCache.Render(D3D_PT_TRIANGLELIST, VS_Offset + 4, 0, 4, 0, 2);
 }
 } // namespace xray::render::fg

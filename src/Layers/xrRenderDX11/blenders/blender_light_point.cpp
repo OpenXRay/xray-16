@@ -15,7 +15,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
     BOOL b_HW_smap = RImplementation.o.HW_smap;
     BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
     BOOL blend = RImplementation.o.fp16_blend;
-    D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
+    D3D_BLEND dest = blend ? D3D_BLEND_ONE : D3D_BLEND_ZERO;
     switch (C.iElement)
     {
     case SE_L_FILL: // fill projective
@@ -24,7 +24,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_UNSHADOWED: // unshadowed
-        C.r_Pass("accum_volume", "accum_omni_unshadowed", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_unshadowed", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -33,7 +33,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_NORMAL: // normal
-        C.r_Pass("accum_volume", "accum_omni_normal", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_normal", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -52,7 +52,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_FULLSIZE: // normal-fullsize
-        C.r_Pass("accum_volume", "accum_omni_normal", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_normal", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -71,7 +71,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_TRANSLUENT: // shadowed + transluency
-        C.r_Pass("accum_volume", "accum_omni_transluent", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_transluent", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -94,7 +94,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
     //BOOL	b_HW_smap		= RImplementation.o.HW_smap;
     //BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
     BOOL blend = RImplementation.o.fp16_blend;
-    D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
+    D3D_BLEND dest = blend ? D3D_BLEND_ONE : D3D_BLEND_ZERO;
 
     switch (C.iElement)
     {
@@ -105,7 +105,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_UNSHADOWED: // unshadowed
-        C.r_Pass("accum_volume", "accum_omni_unshadowed_nomsaa", false, FALSE,FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_unshadowed_nomsaa", false, FALSE,FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -114,7 +114,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_NORMAL: // normal
-        C.r_Pass("accum_volume", "accum_omni_normal_nomsaa", false, FALSE,FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_normal_nomsaa", false, FALSE,FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -125,7 +125,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_FULLSIZE: // normal-fullsize
-        C.r_Pass("accum_volume", "accum_omni_normal_nomsaa", false, FALSE,FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_normal_nomsaa", false, FALSE,FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -136,7 +136,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_TRANSLUENT: // shadowed + transluency
-        C.r_Pass("accum_volume", "accum_omni_transluent_nomsaa", false, FALSE,FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_transluent_nomsaa", false, FALSE,FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -151,7 +151,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
     // BOOL	b_HW_smap		= RImplementation.o.HW_smap;
     // BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
     BOOL blend = RImplementation.o.fp16_blend;
-    D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
+    D3D_BLEND dest = blend ? D3D_BLEND_ONE : D3D_BLEND_ZERO;
     switch (C.iElement)
     {
     case SE_L_FILL: // fill projective
@@ -163,7 +163,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_UNSHADOWED: // unshadowed
-        C.r_Pass("accum_volume", "accum_omni_unshadowed_nomsaa", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_unshadowed_nomsaa", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         // C.r_Sampler_rtf		("s_position",		r2_RT_P);
         // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
         // C.r_Sampler_clw		("s_material",		r2_material);
@@ -181,7 +181,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_NORMAL: // normal
-        C.r_Pass("accum_volume", "accum_omni_normal_nomsaa", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_normal_nomsaa", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         // C.r_Sampler_rtf		("s_position",		r2_RT_P);
         // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
         // C.r_Sampler_clw		("s_material",		r2_material);
@@ -208,7 +208,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_FULLSIZE: // normal-fullsize
-        C.r_Pass("accum_volume", "accum_omni_normal_nomsaa", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_normal_nomsaa", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         // C.r_Sampler_rtf		("s_position",		r2_RT_P);
         // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
         // C.r_Sampler_clw		("s_material",		r2_material);
@@ -235,7 +235,7 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_TRANSLUENT: // shadowed + transluency
-        C.r_Pass("accum_volume", "accum_omni_transluent_nomsaa", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_transluent_nomsaa", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         // C.r_Sampler_rtf		("s_position",		r2_RT_P);
         // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
         // C.r_Sampler_clw		("s_material",		r2_material);
@@ -278,7 +278,7 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
     // BOOL	b_HW_smap		= RImplementation.o.HW_smap;
     // BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
     BOOL blend = RImplementation.o.fp16_blend;
-    D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
+    D3D_BLEND dest = blend ? D3D_BLEND_ONE : D3D_BLEND_ZERO;
 #if RENDER == R_GL
     switch (C.iElement)
     {
@@ -289,7 +289,7 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_UNSHADOWED: // unshadowed
-        C.r_Pass("accum_volume", "accum_omni_unshadowed_msaa", false, FALSE,FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_unshadowed_msaa", false, FALSE,FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -298,7 +298,7 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_NORMAL: // normal
-        C.r_Pass("accum_volume", "accum_omni_normal_msaa", false, FALSE,FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_normal_msaa", false, FALSE,FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -309,7 +309,7 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_FULLSIZE: // normal-fullsize
-        C.r_Pass("accum_volume", "accum_omni_normal_msaa", false, FALSE,FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_normal_msaa", false, FALSE,FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -320,7 +320,7 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_TRANSLUENT: // shadowed + transluency
-        C.r_Pass("accum_volume", "accum_omni_transluent_msaa", false, FALSE,FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_transluent_msaa", false, FALSE,FALSE, blend, D3D_BLEND_ONE, dest);
         C.r_Sampler_rtf("s_position", r2_RT_P);
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_clw("s_material", r2_material);
@@ -343,7 +343,7 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_UNSHADOWED: // unshadowed
-        C.r_Pass("accum_volume", "accum_omni_unshadowed_msaa", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_unshadowed_msaa", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         // C.r_Sampler_rtf		("s_position",		r2_RT_P);
         // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
         // C.r_Sampler_clw		("s_material",		r2_material);
@@ -361,7 +361,7 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_NORMAL: // normal
-        C.r_Pass("accum_volume", "accum_omni_normal_msaa", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_normal_msaa", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         // C.r_Sampler_rtf		("s_position",		r2_RT_P);
         // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
         // C.r_Sampler_clw		("s_material",		r2_material);
@@ -388,7 +388,7 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_FULLSIZE: // normal-fullsize
-        C.r_Pass("accum_volume", "accum_omni_normal_msaa", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_normal_msaa", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         // C.r_Sampler_rtf		("s_position",		r2_RT_P);
         // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
         // C.r_Sampler_clw		("s_material",		r2_material);
@@ -415,7 +415,7 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_L_TRANSLUENT: // shadowed + transluency
-        C.r_Pass("accum_volume", "accum_omni_transluent_msaa", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
+        C.r_Pass("accum_volume", "accum_omni_transluent_msaa", false, FALSE, FALSE, blend, D3D_BLEND_ONE, dest);
         // C.r_Sampler_rtf		("s_position",		r2_RT_P);
         // C.r_Sampler_rtf		("s_normal",		r2_RT_N);
         // C.r_Sampler_clw		("s_material",		r2_material);

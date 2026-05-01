@@ -29,12 +29,12 @@ void CBlender_LIGHT::Compile(CBlender_Compile& C)
     C.PassBegin();
     {
         C.PassSET_ZB(true, false);
-        C.PassSET_Blend(true, D3DBLEND_ONE, D3DBLEND_ONE, true, 0);
+        C.PassSET_Blend(true, D3D_BLEND_ONE, D3D_BLEND_ONE, true, 0);
         C.PassSET_LightFog(false, false);
 
         // Stage0 - 2D map
         C.StageBegin();
-        C.StageSET_Address(D3DTADDRESS_CLAMP);
+        C.StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
         C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_TFACTOR);
         C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_TFACTOR);
         C.Stage_Texture("$base0");
@@ -44,7 +44,7 @@ void CBlender_LIGHT::Compile(CBlender_Compile& C)
 
         // Stage1 - 1D map
         C.StageBegin();
-        C.StageSET_Address(D3DTADDRESS_CLAMP);
+        C.StageSET_Address(D3D_TEXTURE_ADDRESS_CLAMP);
         C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_CURRENT);
         C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_CURRENT);
         C.Stage_Texture("$base1");

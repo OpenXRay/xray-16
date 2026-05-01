@@ -17,23 +17,23 @@ void CBackend::DestroyDebugDraw()
     // TODO: Cleanup NVRHI debug drawing resources
 }
 
-void CBackend::dbg_DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc)
+void CBackend::dbg_DP(D3D_PRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc)
 {
     // TODO: Implement via NVRHI
 }
 
-void CBackend::dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC)
+void CBackend::dbg_DIP(D3D_PRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC)
 {
     // TODO: Implement via NVRHI
 }
 
 #ifdef DEBUG
-void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, u32 vcnt, u16* pIdx, int pcnt)
+void CBackend::dbg_Draw(D3D_PRIMITIVETYPE T, FVF::L* pVerts, u32 vcnt, u16* pIdx, int pcnt)
 {
     // TODO: Implement via NVRHI
 }
 
-void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
+void CBackend::dbg_Draw(D3D_PRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
 {
     // TODO: Implement via NVRHI
 }

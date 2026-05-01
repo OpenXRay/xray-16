@@ -132,9 +132,9 @@ void CBlender_Tree::CompileProgrammable(CBlender_Compile& C) const
             }
             if (oBlend.value)
                 C.r_Pass(
-                    tsv, tsp, TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, tree_aref);
+                    tsv, tsp, TRUE, TRUE, TRUE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, tree_aref);
             else
-                C.r_Pass(tsv, tsp, TRUE, TRUE, TRUE, TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, tree_aref);
+                C.r_Pass(tsv, tsp, TRUE, TRUE, TRUE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ZERO, TRUE, tree_aref);
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_Sampler("s_detail", C.detail_texture);
             C.r_End();
@@ -145,10 +145,10 @@ void CBlender_Tree::CompileProgrammable(CBlender_Compile& C) const
             if (C.bDetail_Diffuse)
             {
                 if (oBlend.value)
-                    C.r_Pass("tree_w_dt", "vert_dt", TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA,
-                        D3DBLEND_INVSRCALPHA, TRUE, tree_aref);
+                    C.r_Pass("tree_w_dt", "vert_dt", TRUE, TRUE, TRUE, TRUE, D3D_BLEND_SRC_ALPHA,
+                        D3D_BLEND_INV_SRC_ALPHA, TRUE, tree_aref);
                 else
-                    C.r_Pass("tree_w_dt", "vert_dt", TRUE, TRUE, TRUE, TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE,
+                    C.r_Pass("tree_w_dt", "vert_dt", TRUE, TRUE, TRUE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ZERO, TRUE,
                         tree_aref);
                 C.r_Sampler("s_base", C.L_textures[0]);
                 C.r_Sampler("s_detail", C.detail_texture);
@@ -157,11 +157,11 @@ void CBlender_Tree::CompileProgrammable(CBlender_Compile& C) const
             else
             {
                 if (oBlend.value)
-                    C.r_Pass("tree_w", "vert", TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA,
+                    C.r_Pass("tree_w", "vert", TRUE, TRUE, TRUE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA,
                         TRUE, tree_aref);
                 else
                     C.r_Pass(
-                        "tree_w", "vert", TRUE, TRUE, TRUE, TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, tree_aref);
+                        "tree_w", "vert", TRUE, TRUE, TRUE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ZERO, TRUE, tree_aref);
                 C.r_Sampler("s_base", C.L_textures[0]);
                 C.r_Sampler("s_detail", C.detail_texture);
                 C.r_End();
@@ -172,15 +172,15 @@ void CBlender_Tree::CompileProgrammable(CBlender_Compile& C) const
         // Level view
         if (oBlend.value)
             C.r_Pass(
-                "tree_s", "vert", TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, tree_aref);
+                "tree_s", "vert", TRUE, TRUE, TRUE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, tree_aref);
         else
-            C.r_Pass("tree_s", "vert", TRUE, TRUE, TRUE, TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, tree_aref);
+            C.r_Pass("tree_s", "vert", TRUE, TRUE, TRUE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ZERO, TRUE, tree_aref);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_End();
         break;
     case SE_R1_LPOINT:
         C.r_Pass((oNotAnTree.value) ? "tree_s_point" : "tree_w_point", "add_point", FALSE, TRUE, FALSE, TRUE,
-            D3DBLEND_ONE, D3DBLEND_ONE, TRUE, 0);
+            D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE, 0);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_Sampler_clf("s_lmap", TEX_POINT_ATT);
         C.r_Sampler_clf("s_att", TEX_POINT_ATT);
@@ -188,7 +188,7 @@ void CBlender_Tree::CompileProgrammable(CBlender_Compile& C) const
         break;
     case SE_R1_LSPOT:
         C.r_Pass((oNotAnTree.value) ? "tree_s_spot" : "tree_w_spot", "add_spot", FALSE, TRUE, FALSE, TRUE,
-            D3DBLEND_ONE, D3DBLEND_ONE, TRUE, 0);
+            D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE, 0);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_Sampler_clf("s_lmap", "internal" DELIMITER "internal_light_att", true);
         C.r_Sampler_clf("s_att", TEX_SPOT_ATT);

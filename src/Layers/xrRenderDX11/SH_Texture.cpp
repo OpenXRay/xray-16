@@ -210,9 +210,9 @@ void CTexture::Load()
                 u32 _h = pTheora->Height(false);
 
                 const auto hr = HW.pDevice->CreateTexture(_w, _h, 1, 0,
-                    D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, reinterpret_cast<ID3DTexture2D**>(&pSurface), nullptr);
+                    D3DFMT_A8R8G8B8, D3D_POOL_DEFAULT, reinterpret_cast<ID3DTexture2D**>(&pSurface), nullptr);
                 const auto hr2 = HW.pDevice->CreateTexture(_w, _h, 1, 0,
-                    D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, reinterpret_cast<ID3DTexture2D**>(&pTempSurface), nullptr);
+                    D3DFMT_A8R8G8B8, D3D_POOL_SYSTEMMEM, reinterpret_cast<ID3DTexture2D**>(&pTempSurface), nullptr);
 
                 if (FAILED(hr) || FAILED(hr2))
                 {
@@ -239,9 +239,9 @@ void CTexture::Load()
 
                 // Now create texture
                 const auto hr = HW.pDevice->CreateTexture(pAVI->m_dwWidth, pAVI->m_dwHeight, 1, 0,
-                    D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, reinterpret_cast<ID3DTexture2D**>(&pSurface), nullptr);
+                    D3DFMT_A8R8G8B8, D3D_POOL_DEFAULT, reinterpret_cast<ID3DTexture2D**>(&pSurface), nullptr);
                 const auto hr2 = HW.pDevice->CreateTexture(pAVI->m_dwWidth, pAVI->m_dwHeight, 1, 0,
-                    D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, reinterpret_cast<ID3DTexture2D**>(&pTempSurface), nullptr);
+                    D3DFMT_A8R8G8B8, D3D_POOL_SYSTEMMEM, reinterpret_cast<ID3DTexture2D**>(&pTempSurface), nullptr);
 
                 if (FAILED(hr) || FAILED(hr2))
                 {

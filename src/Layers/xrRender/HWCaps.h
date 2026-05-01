@@ -65,7 +65,7 @@ public:
     BOOL bTableFog; //
 
     // some precalculated values
-    D3DSTENCILOP soDec, soInc; // best stencil OPs for shadows
+    D3D_STENCIL_OP soDec, soInc; // best stencil OPs for shadows
     u32 dwMaxStencilValue; // maximum value the stencil buffer can hold
 
     bool hasFixedPipeline{};     // device has support for fixed pipeline

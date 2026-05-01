@@ -85,109 +85,109 @@ public:
     adopt_sampler& _clamp()
     {
         if (C)
-            C->i_Address(stage, D3DTADDRESS_CLAMP);
+            C->i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
         return *this;
     }
     adopt_sampler& _wrap()
     {
         if (C)
-            C->i_Address(stage, D3DTADDRESS_WRAP);
+            C->i_Address(stage, D3D_TEXTURE_ADDRESS_WRAP);
         return *this;
     }
     adopt_sampler& _mirror()
     {
         if (C)
-            C->i_Address(stage, D3DTADDRESS_MIRROR);
+            C->i_Address(stage, D3D_TEXTURE_ADDRESS_MIRROR);
         return *this;
     }
     adopt_sampler& _f_anisotropic()
     {
         if (C)
-            C->i_Filter(stage, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR, D3DTEXF_ANISOTROPIC);
+            C->i_Filter(stage, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC);
         return *this;
     }
     adopt_sampler& _f_trilinear()
     {
         if (C)
-            C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
+            C->i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _f_bilinear()
     {
         if (C)
-            C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_POINT, D3DTEXF_LINEAR);
+            C->i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_POINT, D3D_TEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _f_linear()
     {
         if (C)
-            C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
+            C->i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _f_none()
     {
         if (C)
-            C->i_Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
+            C->i_Filter(stage, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmin_none()
     {
         if (C)
-            C->i_Filter_Min(stage, D3DTEXF_NONE);
+            C->i_Filter_Min(stage, D3D_TEXF_NONE);
         return *this;
     }
     adopt_sampler& _fmin_point()
     {
         if (C)
-            C->i_Filter_Min(stage, D3DTEXF_POINT);
+            C->i_Filter_Min(stage, D3D_TEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmin_linear()
     {
         if (C)
-            C->i_Filter_Min(stage, D3DTEXF_LINEAR);
+            C->i_Filter_Min(stage, D3D_TEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _fmin_aniso()
     {
         if (C)
-            C->i_Filter_Min(stage, D3DTEXF_ANISOTROPIC);
+            C->i_Filter_Min(stage, D3D_TEXF_ANISOTROPIC);
         return *this;
     }
     adopt_sampler& _fmip_none()
     {
         if (C)
-            C->i_Filter_Mip(stage, D3DTEXF_NONE);
+            C->i_Filter_Mip(stage, D3D_TEXF_NONE);
         return *this;
     }
     adopt_sampler& _fmip_point()
     {
         if (C)
-            C->i_Filter_Mip(stage, D3DTEXF_POINT);
+            C->i_Filter_Mip(stage, D3D_TEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmip_linear()
     {
         if (C)
-            C->i_Filter_Mip(stage, D3DTEXF_LINEAR);
+            C->i_Filter_Mip(stage, D3D_TEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _fmag_none()
     {
         if (C)
-            C->i_Filter_Mag(stage, D3DTEXF_NONE);
+            C->i_Filter_Mag(stage, D3D_TEXF_NONE);
         return *this;
     }
     adopt_sampler& _fmag_point()
     {
         if (C)
-            C->i_Filter_Mag(stage, D3DTEXF_POINT);
+            C->i_Filter_Mag(stage, D3D_TEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmag_linear()
     {
         if (C)
-            C->i_Filter_Mag(stage, D3DTEXF_LINEAR);
+            C->i_Filter_Mag(stage, D3D_TEXF_LINEAR);
         return *this;
     }
 };
@@ -296,7 +296,7 @@ public:
     }
     adopt_compiler& _dx10CullMode(u32 Ref)
     {
-        C->r_CullMode((D3DCULL)Ref);
+        C->r_CullMode((D3D_CULL_MODE)Ref);
         return *this;
     }
     adopt_compiler& _dx10ATOC(bool Enable)
@@ -399,43 +399,43 @@ void CResourceManager::LS_Load()
             class_<adopt_blend>("blend")
                 .enum_("blend")
                 [
-                    value("zero",         int(D3DBLEND_ZERO)),
-                    value("one",          int(D3DBLEND_ONE)),
-                    value("srccolor",     int(D3DBLEND_SRCCOLOR)),
-                    value("invsrccolor",  int(D3DBLEND_INVSRCCOLOR)),
-                    value("srcalpha",     int(D3DBLEND_SRCALPHA)),
-                    value("invsrcalpha",  int(D3DBLEND_INVSRCALPHA)),
-                    value("destalpha",    int(D3DBLEND_DESTALPHA)),
-                    value("invdestalpha", int(D3DBLEND_INVDESTALPHA)),
-                    value("destcolor",    int(D3DBLEND_DESTCOLOR)),
-                    value("invdestcolor", int(D3DBLEND_INVDESTCOLOR)),
-                    value("srcalphasat",  int(D3DBLEND_SRCALPHASAT))
+                    value("zero",         int(D3D_BLEND_ZERO)),
+                    value("one",          int(D3D_BLEND_ONE)),
+                    value("srccolor",     int(D3D_BLEND_SRC_COLOR)),
+                    value("invsrccolor",  int(D3D_BLEND_INV_SRC_COLOR)),
+                    value("srcalpha",     int(D3D_BLEND_SRC_ALPHA)),
+                    value("invsrcalpha",  int(D3D_BLEND_INV_SRC_ALPHA)),
+                    value("destalpha",    int(D3D_BLEND_DEST_ALPHA)),
+                    value("invdestalpha", int(D3D_BLEND_INV_DEST_ALPHA)),
+                    value("destcolor",    int(D3D_BLEND_DEST_COLOR)),
+                    value("invdestcolor", int(D3D_BLEND_INV_DEST_COLOR)),
+                    value("srcalphasat",  int(D3D_BLEND_SRC_ALPHA_SAT))
                 ],
 
             class_<adopt_cmp_func>("cmp_func")
                 .enum_("cmp_func")
                 [
-                    value("never",        int(D3DCMP_NEVER)),
-                    value("less",         int(D3DCMP_LESS)),
-                    value("equal",        int(D3DCMP_EQUAL)),
-                    value("lessequal",    int(D3DCMP_LESSEQUAL)),
-                    value("greater",      int(D3DCMP_GREATER)),
-                    value("notequal",     int(D3DCMP_NOTEQUAL)),
-                    value("greaterequal", int(D3DCMP_GREATEREQUAL)),
-                    value("always",       int(D3DCMP_ALWAYS))
+                    value("never",        int(D3D_COMPARISON_NEVER)),
+                    value("less",         int(D3D_COMPARISON_LESS)),
+                    value("equal",        int(D3D_COMPARISON_EQUAL)),
+                    value("lessequal",    int(D3D_COMPARISON_LESS_EQUAL)),
+                    value("greater",      int(D3D_COMPARISON_GREATER)),
+                    value("notequal",     int(D3D_COMPARISON_NOT_EQUAL)),
+                    value("greaterequal", int(D3D_COMPARISON_GREATER_EQUAL)),
+                    value("always",       int(D3D_COMPARISON_ALWAYS))
                 ],
 
             class_<adopt_stencil_op>("stencil_op")
                 .enum_("stencil_op")
                 [
-                    value("keep",    int(D3DSTENCILOP_KEEP)),
-                    value("zero",    int(D3DSTENCILOP_ZERO)),
-                    value("replace", int(D3DSTENCILOP_REPLACE)),
-                    value("incrsat", int(D3DSTENCILOP_INCRSAT)),
-                    value("decrsat", int(D3DSTENCILOP_DECRSAT)),
-                    value("invert",  int(D3DSTENCILOP_INVERT)),
-                    value("incr",    int(D3DSTENCILOP_INCR)),
-                    value("decr",    int(D3DSTENCILOP_DECR))
+                    value("keep",    int(D3D_STENCIL_OP_KEEP)),
+                    value("zero",    int(D3D_STENCIL_OP_ZERO)),
+                    value("replace", int(D3D_STENCIL_OP_REPLACE)),
+                    value("incrsat", int(D3D_STENCIL_OP_INCR_SAT)),
+                    value("decrsat", int(D3D_STENCIL_OP_DECR_SAT)),
+                    value("invert",  int(D3D_STENCIL_OP_INVERT)),
+                    value("incr",    int(D3D_STENCIL_OP_INCR)),
+                    value("decr",    int(D3D_STENCIL_OP_DECR))
                 ]
         ];
     };

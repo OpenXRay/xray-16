@@ -26,9 +26,9 @@
 
 namespace xray::render::fg
 {
-const u32 CULL_CCW = D3DCULL_CCW;
-const u32 CULL_CW = D3DCULL_CW;
-const u32 CULL_NONE = D3DCULL_NONE;
+const u32 CULL_CCW = D3D_CULL_BACK;
+const u32 CULL_CW = D3D_CULL_FRONT;
+const u32 CULL_NONE = D3D_CULL_NONE;
 
 ///		detailed statistic
 struct R_statistics_element
@@ -424,9 +424,9 @@ public:
     ICF void set_Indices(IndexBufferHandle _ib);
     ICF void set_Geometry(SGeometry* _geom);
     ICF void set_Geometry(ref_geom& _geom) { set_Geometry(&*_geom); }
-    IC void set_Stencil(u32 _enable, u32 _func = D3DCMP_ALWAYS, u32 _ref = 0x00, u32 _mask = 0x00,
-                        u32 _writemask = 0x00, u32 _fail = D3DSTENCILOP_KEEP, u32 _pass = D3DSTENCILOP_KEEP,
-                        u32 _zfail = D3DSTENCILOP_KEEP);
+    IC void set_Stencil(u32 _enable, u32 _func = D3D_COMPARISON_ALWAYS, u32 _ref = 0x00, u32 _mask = 0x00,
+                        u32 _writemask = 0x00, u32 _fail = D3D_STENCIL_OP_KEEP, u32 _pass = D3D_STENCIL_OP_KEEP,
+                        u32 _zfail = D3D_STENCIL_OP_KEEP);
     IC void set_Z(u32 _enable);
     IC void set_ZFunc(u32 _func);
     IC void set_AlphaRef(u32 _value);
@@ -519,11 +519,11 @@ public:
     }
 
     // Rendering
-    ICF void Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
-    ICF void Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC);
+    ICF void Render(D3D_PRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
+    ICF void Render(D3D_PRIMITIVETYPE T, u32 startV, u32 PC);
 #ifdef USE_DX11
-    ICF void RenderInstancedIndexed(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC, u32 instanceCount, u32 startInstanceLocation);
-    ICF void RenderIndexedInstancedIndirect(D3DPRIMITIVETYPE T, ID3DBuffer* pBufferForArgs, u32 AlignedByteOffsetForArgs);
+    ICF void RenderInstancedIndexed(D3D_PRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC, u32 instanceCount, u32 startInstanceLocation);
+    ICF void RenderIndexedInstancedIndirect(D3D_PRIMITIVETYPE T, ID3DBuffer* pBufferForArgs, u32 AlignedByteOffsetForArgs);
 #endif
 
     ICF void submit()
@@ -548,13 +548,13 @@ public:
     void SetupStates();
 
     // Debug render
-    void dbg_DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc);
-    void dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
+    void dbg_DP(D3D_PRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc);
+    void dbg_DIP(D3D_PRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
     void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2);
     void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value);
 #ifdef DEBUG
-    void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, u32 vcnt, u16* pIdx, int pcnt);
-    void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt);
+    void dbg_Draw(D3D_PRIMITIVETYPE T, FVF::L* pVerts, u32 vcnt, u16* pIdx, int pcnt);
+    void dbg_Draw(D3D_PRIMITIVETYPE T, FVF::L* pVerts, int pcnt);
 
     void dbg_DrawAABB(Fvector& T, float sx, float sy, float sz, u32 C)
     {

@@ -554,23 +554,23 @@ public:
         const float MiB = 1024*1024; // XXX: use it as common enum value (like in X-Ray 2.0)
         const u32* mem_usage = HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex];
 
-        float vb_video = mem_usage[D3DPOOL_DEFAULT] / MiB;
-        float vb_managed = mem_usage[D3DPOOL_MANAGED] / MiB;
-        float vb_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
+        float vb_video = mem_usage[D3D_POOL_DEFAULT] / MiB;
+        float vb_managed = mem_usage[D3D_POOL_MANAGED] / MiB;
+        float vb_system = mem_usage[D3D_POOL_SYSTEMMEM] / MiB;
         Msg("vertex buffer      \t \t %f \t %f \t %f ", vb_video, vb_managed, vb_system);
 
-        float ib_video = mem_usage[D3DPOOL_DEFAULT] / MiB;
-        float ib_managed = mem_usage[D3DPOOL_MANAGED] / MiB;
-        float ib_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
+        float ib_video = mem_usage[D3D_POOL_DEFAULT] / MiB;
+        float ib_managed = mem_usage[D3D_POOL_MANAGED] / MiB;
+        float ib_system = mem_usage[D3D_POOL_SYSTEMMEM] / MiB;
         Msg("index buffer      \t \t %f \t %f \t %f ", ib_video, ib_managed, ib_system);
 
         float textures_video = (m_base+m_lmaps)/MiB;
         Msg("textures          \t \t %f \t %f \t %f ", textures_video, 0.f, 0.f);
 
         mem_usage = HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget];
-        float rt_video = mem_usage[D3DPOOL_DEFAULT] / MiB;
-        float rt_managed = mem_usage[D3DPOOL_MANAGED] / MiB;
-        float rt_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
+        float rt_video = mem_usage[D3D_POOL_DEFAULT] / MiB;
+        float rt_managed = mem_usage[D3D_POOL_MANAGED] / MiB;
+        float rt_system = mem_usage[D3D_POOL_SYSTEMMEM] / MiB;
         Msg("R-Targets         \t \t %f \t %f \t %f ", rt_video, rt_managed, rt_system);
 
         Msg("\nTotal             \t \t %f \t %f \t %f ", vb_video + ib_video + textures_video + rt_video,

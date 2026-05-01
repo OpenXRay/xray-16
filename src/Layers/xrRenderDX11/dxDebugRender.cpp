@@ -27,7 +27,7 @@ void dxDebugRender::Render()
         float(color_get_B(color)) / 255.f, float(color_get_A(color)) / 255.f);
 #endif // !USE_DX9
 
-    RCache.dbg_Draw(D3DPT_LINELIST, &*m_line_vertices.begin(), m_line_vertices.size(), &*m_line_indices.begin(),
+    RCache.dbg_Draw(D3D_PT_LINELIST, &*m_line_vertices.begin(), m_line_vertices.size(), &*m_line_indices.begin(),
         m_line_indices.size() / 2);
     m_line_vertices.resize(0);
     m_line_indices.resize(0);

@@ -10,7 +10,7 @@ namespace xray::render::fg
 void fix_texture_name(pstr fn);
 
 void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite,
-    BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
+    BOOL bABlend, D3D_BLEND abSRC, D3D_BLEND abDST, BOOL aTest, u32 aRef)
 {
     RS.Invalidate();
     ctable.clear();
@@ -115,7 +115,7 @@ void CBlender_Compile::i_Filter(u32 s, u32 _min, u32 _mip, u32 _mag)
     i_Filter_Mip(s, _mip);
     i_Filter_Mag(s, _mag);
 #if defined(USE_OGL)
-    if (_min == D3DTEXF_ANISOTROPIC && _mag == D3DTEXF_ANISOTROPIC)
+    if (_min == D3D_TEXF_ANISOTROPIC && _mag == D3D_TEXF_ANISOTROPIC)
         i_Filter_Aniso(s, ps_r__tf_Anisotropic);
 #endif
 }
@@ -135,46 +135,46 @@ u32 CBlender_Compile::r_Sampler(
 #endif
 
         // force ANISO-TF for "s_base"
-        if ((0 == xr_strcmp(_name, "s_base")) && (fmin == D3DTEXF_LINEAR))
+        if ((0 == xr_strcmp(_name, "s_base")) && (fmin == D3D_TEXF_LINEAR))
         {
-            fmin = D3DTEXF_ANISOTROPIC;
-            fmag = D3DTEXF_ANISOTROPIC;
+            fmin = D3D_TEXF_ANISOTROPIC;
+            fmag = D3D_TEXF_ANISOTROPIC;
         }
 
         if (0 == xr_strcmp(_name, "s_base_hud"))
         {
-            fmin = D3DTEXF_GAUSSIANQUAD; // D3DTEXF_PYRAMIDALQUAD; //D3DTEXF_ANISOTROPIC; //D3DTEXF_LINEAR;
-            // //D3DTEXF_POINT; //D3DTEXF_NONE
-            fmag = D3DTEXF_GAUSSIANQUAD; // D3DTEXF_PYRAMIDALQUAD; //D3DTEXF_ANISOTROPIC; //D3DTEXF_LINEAR;
-            // //D3DTEXF_POINT; //D3DTEXF_NONE;
+            fmin = D3D_TEXF_GAUSSIANQUAD; // D3D_TEXF_PYRAMIDALQUAD; //D3D_TEXF_ANISOTROPIC; //D3D_TEXF_LINEAR;
+            // //D3D_TEXF_POINT; //D3D_TEXF_NONE
+            fmag = D3D_TEXF_GAUSSIANQUAD; // D3D_TEXF_PYRAMIDALQUAD; //D3D_TEXF_ANISOTROPIC; //D3D_TEXF_LINEAR;
+            // //D3D_TEXF_POINT; //D3D_TEXF_NONE;
         }
 
-        if ((0 == xr_strcmp(_name, "s_detail")) && (fmin == D3DTEXF_LINEAR))
+        if ((0 == xr_strcmp(_name, "s_detail")) && (fmin == D3D_TEXF_LINEAR))
         {
-            fmin = D3DTEXF_ANISOTROPIC;
-            fmag = D3DTEXF_ANISOTROPIC;
+            fmin = D3D_TEXF_ANISOTROPIC;
+            fmag = D3D_TEXF_ANISOTROPIC;
         }
 
 #if defined(USE_OGL)
         if (0 == xr_strcmp(_name, "s_position"))
         {
-            address = D3DTADDRESS_CLAMP;
-            fmin = D3DTEXF_POINT;
-            fmip = D3DTEXF_NONE;
-            fmag = D3DTEXF_POINT;
+            address = D3D_TEXTURE_ADDRESS_CLAMP;
+            fmin = D3D_TEXF_POINT;
+            fmip = D3D_TEXF_NONE;
+            fmag = D3D_TEXF_POINT;
         }
 
         if (0 == xr_strcmp(_name, "s_smap"))
         {
-            address = D3DTADDRESS_CLAMP;
-            fmip = D3DTEXF_NONE;
+            address = D3D_TEXTURE_ADDRESS_CLAMP;
+            fmip = D3D_TEXF_NONE;
         }
 #endif
 
         // Sampler states
         i_Address(dwStage, address);
         i_Filter(dwStage, fmin, fmip, fmag);
-        //.i_Filter				(dwStage,D3DTEXF_POINT,D3DTEXF_POINT,D3DTEXF_POINT); // show pixels
+        //.i_Filter				(dwStage,D3D_TEXF_POINT,D3D_TEXF_POINT,D3D_TEXF_POINT); // show pixels
         if (dwStage < 4)
             i_Projective(dwStage, b_ps1x_ProjectiveDivide);
     }
@@ -183,18 +183,18 @@ u32 CBlender_Compile::r_Sampler(
 
 void CBlender_Compile::r_Sampler_rtf(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide)
 {
-    r_Sampler(name, texture, b_ps1x_ProjectiveDivide, D3DTADDRESS_CLAMP, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
+    r_Sampler(name, texture, b_ps1x_ProjectiveDivide, D3D_TEXTURE_ADDRESS_CLAMP, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
 }
 void CBlender_Compile::r_Sampler_clf(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide)
 {
-    r_Sampler(name, texture, b_ps1x_ProjectiveDivide, D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
+    r_Sampler(name, texture, b_ps1x_ProjectiveDivide, D3D_TEXTURE_ADDRESS_CLAMP, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
 }
 void CBlender_Compile::r_Sampler_clw(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide)
 {
     u32 s = r_Sampler(
-        name, texture, b_ps1x_ProjectiveDivide, D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
+        name, texture, b_ps1x_ProjectiveDivide, D3D_TEXTURE_ADDRESS_CLAMP, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
     if (u32(-1) != s)
-        RS.SetSAMP(s, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
+        RS.SetSAMP(s, D3DSAMP_ADDRESSW, D3D_TEXTURE_ADDRESS_WRAP);
 }
 
 void CBlender_Compile::r_End()

@@ -145,7 +145,7 @@ void CDetailManager::soft_Render()
                 // Render
                 u32 dwNumPrimitives = iCount_Lock / 3;
                 RCache.set_Geometry(soft_Geom);
-                RCache.Render(D3DPT_TRIANGLELIST, vBase, 0, vCount_Lock, iBase, dwNumPrimitives);
+                RCache.Render(D3D_PT_TRIANGLELIST, vBase, 0, vCount_Lock, iBase, dwNumPrimitives);
             }
         }
         // Clean up

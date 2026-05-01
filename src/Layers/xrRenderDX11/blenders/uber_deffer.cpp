@@ -157,11 +157,11 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
         u32 stage = C.r_dx11Sampler("smp_bump_ds");
         if (stage != -1)
         {
-            C.i_Address(stage, D3DTADDRESS_WRAP);
+            C.i_Address(stage, D3D_TEXTURE_ADDRESS_WRAP);
             C.i_dx11FilterAnizo(stage, TRUE);
         }
         if (ps_r2_ls_flags_ext.test(R2FLAGEXT_WIREFRAME))
-            C.R().SetRS(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+            C.R().SetRS(D3DRS_FILLMODE, D3D_FILL_WIREFRAME);
         C.r_dx11Texture("s_tbump", fnameA);
         C.r_dx11Texture("s_tbumpX", fnameB); // should be before base bump
         if (bHasDetailBump)
@@ -173,21 +173,21 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
     {
         C.r_Pass(vs, ps, FALSE);
     }
-    // C.r_Sampler("s_base", C.L_textures[0], false, D3DTADDRESS_WRAP,
-    // D3DTEXF_ANISOTROPIC,D3DTEXF_LINEAR,
-    // D3DTEXF_ANISOTROPIC);
-    // C.r_Sampler("s_bumpX", fnameB, false, D3DTADDRESS_WRAP,
-    // D3DTEXF_ANISOTROPIC,D3DTEXF_LINEAR,
-    // D3DTEXF_ANISOTROPIC); // should be before base bump
-    // C.r_Sampler("s_bump", fnameA, false, D3DTADDRESS_WRAP,
-    // D3DTEXF_ANISOTROPIC,D3DTEXF_LINEAR,
-    // D3DTEXF_ANISOTROPIC);
-    // C.r_Sampler("s_bumpD", dt, false, D3DTADDRESS_WRAP,
-    // D3DTEXF_ANISOTROPIC,D3DTEXF_LINEAR,
-    // D3DTEXF_ANISOTROPIC);
-    // C.r_Sampler("s_detail", dt, false, D3DTADDRESS_WRAP,
-    // D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR,
-    // D3DTEXF_ANISOTROPIC);
+    // C.r_Sampler("s_base", C.L_textures[0], false, D3D_TEXTURE_ADDRESS_WRAP,
+    // D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,
+    // D3D_TEXF_ANISOTROPIC);
+    // C.r_Sampler("s_bumpX", fnameB, false, D3D_TEXTURE_ADDRESS_WRAP,
+    // D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,
+    // D3D_TEXF_ANISOTROPIC); // should be before base bump
+    // C.r_Sampler("s_bump", fnameA, false, D3D_TEXTURE_ADDRESS_WRAP,
+    // D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,
+    // D3D_TEXF_ANISOTROPIC);
+    // C.r_Sampler("s_bumpD", dt, false, D3D_TEXTURE_ADDRESS_WRAP,
+    // D3D_TEXF_ANISOTROPIC,D3D_TEXF_LINEAR,
+    // D3D_TEXF_ANISOTROPIC);
+    // C.r_Sampler("s_detail", dt, false, D3D_TEXTURE_ADDRESS_WRAP,
+    // D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR,
+    // D3D_TEXF_ANISOTROPIC);
     C.r_dx11Texture("s_base", C.L_textures[0]);
     C.r_dx11Texture("s_bumpX", fnameB); // should be before base bump
     C.r_dx11Texture("s_bump", fnameA);
@@ -203,8 +203,8 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
     C.r_dx11Sampler("smp_base");
     if (lmap)
     {
-        // C.r_Sampler("s_hemi", C.L_textures[2], false, D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE,
-        // D3DTEXF_LINEAR);
+        // C.r_Sampler("s_hemi", C.L_textures[2], false, D3D_TEXTURE_ADDRESS_CLAMP, D3D_TEXF_LINEAR, D3D_TEXF_NONE,
+        // D3D_TEXF_LINEAR);
         C.r_dx11Texture("s_hemi", C.L_textures[2]);
         C.r_dx11Sampler("smp_rtlinear");
     }
@@ -223,21 +223,21 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
         VERIFY2(xr_strlen(texDetailBumpX), C.L_textures[0].c_str());
     }
     C.r_Sampler(
-        "s_base", C.L_textures[0], false, D3DTADDRESS_WRAP, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR, D3DTEXF_ANISOTROPIC);
-    C.r_Sampler("s_bumpX", fnameB, false, D3DTADDRESS_WRAP, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR,
-        D3DTEXF_ANISOTROPIC); // should be before base bump
-    C.r_Sampler("s_bump", fnameA, false, D3DTADDRESS_WRAP, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR, D3DTEXF_ANISOTROPIC);
-    C.r_Sampler("s_bumpD", dt, false, D3DTADDRESS_WRAP, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR, D3DTEXF_ANISOTROPIC);
-    C.r_Sampler("s_detail", dt, false, D3DTADDRESS_WRAP, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR, D3DTEXF_ANISOTROPIC);
+        "s_base", C.L_textures[0], false, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC);
+    C.r_Sampler("s_bumpX", fnameB, false, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR,
+        D3D_TEXF_ANISOTROPIC); // should be before base bump
+    C.r_Sampler("s_bump", fnameA, false, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC);
+    C.r_Sampler("s_bumpD", dt, false, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC);
+    C.r_Sampler("s_detail", dt, false, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC);
     if (bHasDetailBump)
     {
-        C.r_Sampler("s_detailBump", texDetailBump, false, D3DTADDRESS_WRAP, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR,
-            D3DTEXF_ANISOTROPIC);
-        C.r_Sampler("s_detailBumpX", texDetailBumpX, false, D3DTADDRESS_WRAP, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR,
-            D3DTEXF_ANISOTROPIC);
+        C.r_Sampler("s_detailBump", texDetailBump, false, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR,
+            D3D_TEXF_ANISOTROPIC);
+        C.r_Sampler("s_detailBumpX", texDetailBumpX, false, D3D_TEXTURE_ADDRESS_WRAP, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR,
+            D3D_TEXF_ANISOTROPIC);
     }
     if (lmap)
-        C.r_Sampler("s_hemi", C.L_textures[2], false, D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
+        C.r_Sampler("s_hemi", C.L_textures[2], false, D3D_TEXTURE_ADDRESS_CLAMP, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
 #else
 #   error No graphics API selected or enabled!
 #endif // USE_DX11
@@ -354,11 +354,11 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
         u32 stage = C.r_dx11Sampler("smp_bump_ds");
         if (stage != -1)
         {
-            C.i_Address(stage, D3DTADDRESS_WRAP);
+            C.i_Address(stage, D3D_TEXTURE_ADDRESS_WRAP);
             C.i_dx11FilterAnizo(stage, TRUE);
         }
         if (ps_r2_ls_flags_ext.test(R2FLAGEXT_WIREFRAME))
-            C.R().SetRS(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+            C.R().SetRS(D3DRS_FILLMODE, D3D_FILL_WIREFRAME);
     }
     else
         C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);

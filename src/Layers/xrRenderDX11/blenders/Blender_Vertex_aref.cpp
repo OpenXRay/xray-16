@@ -66,8 +66,8 @@ void CBlender_Vertex_aref::CompileFFP(CBlender_Compile& C) const
     {
         C.PassBegin();
         {
-            const D3DBLEND blend_src = oBlend.value ? D3DBLEND_SRCALPHA : D3DBLEND_ONE;
-            const D3DBLEND blend_dst = oBlend.value ? D3DBLEND_INVSRCALPHA : D3DBLEND_ZERO;
+            const D3D_BLEND blend_src = oBlend.value ? D3D_BLEND_SRC_ALPHA : D3D_BLEND_ONE;
+            const D3D_BLEND blend_dst = oBlend.value ? D3D_BLEND_INV_SRC_ALPHA : D3D_BLEND_ZERO;
 
             //C.PassSET_Blend(true, blend_src, blend_dst, true, oAREF.value);
             C.PassSET_LightFog(true, true);
@@ -95,9 +95,9 @@ void CBlender_Vertex_aref::CompileFFP(CBlender_Compile& C) const
             {
                 C.PassSET_ZB(TRUE, TRUE);
                 if (oBlend.value)
-                    C.PassSET_Blend(TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
+                    C.PassSET_Blend(TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, oAREF.value);
                 else
-                    C.PassSET_Blend(TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, oAREF.value);
+                    C.PassSET_Blend(TRUE, D3D_BLEND_ONE, D3D_BLEND_ZERO, TRUE, oAREF.value);
                 C.PassSET_LightFog(FALSE, TRUE);
 
                 // Stage1 - Base texture
@@ -119,9 +119,9 @@ void CBlender_Vertex_aref::CompileFFP(CBlender_Compile& C) const
             {
                 C.PassSET_ZB(TRUE, TRUE);
                 if (oBlend.value)
-                    C.PassSET_Blend(TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
+                    C.PassSET_Blend(TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, oAREF.value);
                 else
-                    C.PassSET_Blend(TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, oAREF.value);
+                    C.PassSET_Blend(TRUE, D3D_BLEND_ONE, D3D_BLEND_ZERO, TRUE, oAREF.value);
                 C.PassSET_LightFog(FALSE, FALSE);
 
                 // Stage1 - Base texture
@@ -145,8 +145,8 @@ void CBlender_Vertex_aref::CompileFFP(CBlender_Compile& C) const
 
 void CBlender_Vertex_aref::CompileProgrammable(CBlender_Compile& C) const
 {
-    const D3DBLEND blend_src = oBlend.value ? D3DBLEND_SRCALPHA : D3DBLEND_ONE;
-    const D3DBLEND blend_dst = oBlend.value ? D3DBLEND_INVSRCALPHA : D3DBLEND_ZERO;
+    const D3D_BLEND blend_src = oBlend.value ? D3D_BLEND_SRC_ALPHA : D3D_BLEND_ONE;
+    const D3D_BLEND blend_dst = oBlend.value ? D3D_BLEND_INV_SRC_ALPHA : D3D_BLEND_ZERO;
 
     switch (C.iElement)
     {
@@ -193,7 +193,7 @@ void CBlender_Vertex_aref::CompileProgrammable(CBlender_Compile& C) const
             C.PassSET_Shaders("vert_point", "add_point");
 
             C.PassSET_ZB(true, false);
-            C.PassSET_ablend_mode(true, D3DBLEND_ONE, D3DBLEND_ONE);
+            C.PassSET_ablend_mode(true, D3D_BLEND_ONE, D3D_BLEND_ONE);
             C.PassSET_ablend_aref(true, oAREF.value);
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);
@@ -213,7 +213,7 @@ void CBlender_Vertex_aref::CompileProgrammable(CBlender_Compile& C) const
             C.PassSET_Shaders("vert_spot", "add_spot");
 
             C.PassSET_ZB(true, false);
-            C.PassSET_ablend_mode(true, D3DBLEND_ONE, D3DBLEND_ONE);
+            C.PassSET_ablend_mode(true, D3D_BLEND_ONE, D3D_BLEND_ONE);
             C.PassSET_ablend_aref(true, oAREF.value);
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);

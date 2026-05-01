@@ -50,109 +50,109 @@ public:
     adopt_sampler& _clamp()
     {
         if (C)
-            C->i_Address(stage, D3DTADDRESS_CLAMP);
+            C->i_Address(stage, D3D_TEXTURE_ADDRESS_CLAMP);
         return *this;
     }
     adopt_sampler& _wrap()
     {
         if (C)
-            C->i_Address(stage, D3DTADDRESS_WRAP);
+            C->i_Address(stage, D3D_TEXTURE_ADDRESS_WRAP);
         return *this;
     }
     adopt_sampler& _mirror()
     {
         if (C)
-            C->i_Address(stage, D3DTADDRESS_MIRROR);
+            C->i_Address(stage, D3D_TEXTURE_ADDRESS_MIRROR);
         return *this;
     }
     adopt_sampler& _f_anisotropic()
     {
         if (C)
-            C->i_Filter(stage, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR, D3DTEXF_ANISOTROPIC);
+            C->i_Filter(stage, D3D_TEXF_ANISOTROPIC, D3D_TEXF_LINEAR, D3D_TEXF_ANISOTROPIC);
         return *this;
     }
     adopt_sampler& _f_trilinear()
     {
         if (C)
-            C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
+            C->i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR, D3D_TEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _f_bilinear()
     {
         if (C)
-            C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_POINT, D3DTEXF_LINEAR);
+            C->i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_POINT, D3D_TEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _f_linear()
     {
         if (C)
-            C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
+            C->i_Filter(stage, D3D_TEXF_LINEAR, D3D_TEXF_NONE, D3D_TEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _f_none()
     {
         if (C)
-            C->i_Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
+            C->i_Filter(stage, D3D_TEXF_POINT, D3D_TEXF_NONE, D3D_TEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmin_none()
     {
         if (C)
-            C->i_Filter_Min(stage, D3DTEXF_NONE);
+            C->i_Filter_Min(stage, D3D_TEXF_NONE);
         return *this;
     }
     adopt_sampler& _fmin_point()
     {
         if (C)
-            C->i_Filter_Min(stage, D3DTEXF_POINT);
+            C->i_Filter_Min(stage, D3D_TEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmin_linear()
     {
         if (C)
-            C->i_Filter_Min(stage, D3DTEXF_LINEAR);
+            C->i_Filter_Min(stage, D3D_TEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _fmin_aniso()
     {
         if (C)
-            C->i_Filter_Min(stage, D3DTEXF_ANISOTROPIC);
+            C->i_Filter_Min(stage, D3D_TEXF_ANISOTROPIC);
         return *this;
     }
     adopt_sampler& _fmip_none()
     {
         if (C)
-            C->i_Filter_Mip(stage, D3DTEXF_NONE);
+            C->i_Filter_Mip(stage, D3D_TEXF_NONE);
         return *this;
     }
     adopt_sampler& _fmip_point()
     {
         if (C)
-            C->i_Filter_Mip(stage, D3DTEXF_POINT);
+            C->i_Filter_Mip(stage, D3D_TEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmip_linear()
     {
         if (C)
-            C->i_Filter_Mip(stage, D3DTEXF_LINEAR);
+            C->i_Filter_Mip(stage, D3D_TEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _fmag_none()
     {
         if (C)
-            C->i_Filter_Mag(stage, D3DTEXF_NONE);
+            C->i_Filter_Mag(stage, D3D_TEXF_NONE);
         return *this;
     }
     adopt_sampler& _fmag_point()
     {
         if (C)
-            C->i_Filter_Mag(stage, D3DTEXF_POINT);
+            C->i_Filter_Mag(stage, D3D_TEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmag_linear()
     {
         if (C)
-            C->i_Filter_Mag(stage, D3DTEXF_LINEAR);
+            C->i_Filter_Mag(stage, D3D_TEXF_LINEAR);
         return *this;
     }
 };
@@ -278,17 +278,17 @@ void CResourceManager::LS_Load()
             class_<adopt_blend>("blend")
                 .enum_("blend")
                 [
-                    value("zero",         int(D3DBLEND_ZERO)),
-                    value("one",          int(D3DBLEND_ONE)),
-                    value("srccolor",     int(D3DBLEND_SRCCOLOR)),
-                    value("invsrccolor",  int(D3DBLEND_INVSRCCOLOR)),
-                    value("srcalpha",     int(D3DBLEND_SRCALPHA)),
-                    value("invsrcalpha",  int(D3DBLEND_INVSRCALPHA)),
-                    value("destalpha",    int(D3DBLEND_DESTALPHA)),
-                    value("invdestalpha", int(D3DBLEND_INVDESTALPHA)),
-                    value("destcolor",    int(D3DBLEND_DESTCOLOR)),
-                    value("invdestcolor", int(D3DBLEND_INVDESTCOLOR)),
-                    value("srcalphasat",  int(D3DBLEND_SRCALPHASAT))
+                    value("zero",         int(D3D_BLEND_ZERO)),
+                    value("one",          int(D3D_BLEND_ONE)),
+                    value("srccolor",     int(D3D_BLEND_SRC_COLOR)),
+                    value("invsrccolor",  int(D3D_BLEND_INV_SRC_COLOR)),
+                    value("srcalpha",     int(D3D_BLEND_SRC_ALPHA)),
+                    value("invsrcalpha",  int(D3D_BLEND_INV_SRC_ALPHA)),
+                    value("destalpha",    int(D3D_BLEND_DEST_ALPHA)),
+                    value("invdestalpha", int(D3D_BLEND_INV_DEST_ALPHA)),
+                    value("destcolor",    int(D3D_BLEND_DEST_COLOR)),
+                    value("invdestcolor", int(D3D_BLEND_INV_DEST_COLOR)),
+                    value("srcalphasat",  int(D3D_BLEND_SRC_ALPHA_SAT))
                 ]
         ];
     };

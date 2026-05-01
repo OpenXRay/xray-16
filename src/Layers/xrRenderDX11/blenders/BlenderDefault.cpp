@@ -201,7 +201,7 @@ void CBlender_default::CompileProgrammable(CBlender_Compile& C) const
             C.PassSET_Shaders("lmap_point", "add_point");
 
             C.PassSET_ZB(true, false);
-            C.PassSET_ablend_mode(true, D3DBLEND_ONE, D3DBLEND_ONE);
+            C.PassSET_ablend_mode(true, D3D_BLEND_ONE, D3D_BLEND_ONE);
             C.PassSET_ablend_aref(true, 0);
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);
@@ -219,7 +219,7 @@ void CBlender_default::CompileProgrammable(CBlender_Compile& C) const
             C.PassSET_Shaders("lmap_spot", "add_spot");
 
             C.PassSET_ZB(true, false);
-            C.PassSET_ablend_mode(true, D3DBLEND_ONE, D3DBLEND_ONE);
+            C.PassSET_ablend_mode(true, D3D_BLEND_ONE, D3D_BLEND_ONE);
             C.PassSET_ablend_aref(true, 0);
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);
