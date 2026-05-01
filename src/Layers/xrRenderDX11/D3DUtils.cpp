@@ -24,20 +24,6 @@ constexpr u32 boxcolor = color_rgba(255, 255, 255, 0);
 static constexpr int boxvertcount = 48;
 static Fvector boxvert[boxvertcount];
 
-#ifdef _EDITOR
-#define DU_DRAW_RS dxRenderDeviceRender::Instance().SetRS
-#define DU_DRAW_SH_C(a, c)\
-    {\
-        dxRenderDeviceRender::Instance().SetShader(a);\
-        dxRenderDeviceRender::Instance().SetRS(D3DRS_TEXTUREFACTOR, c);\
-    }
-#define DU_DRAW_SH(a)\
-    {\
-        dxRenderDeviceRender::Instance().SetShader(a);\
-        dxRenderDeviceRender::Instance().SetRS(D3DRS_TEXTUREFACTOR, 0xFFFFFFFF);\
-    }
-#else
-#define DU_DRAW_RS RCache.dbg_SetRS
 #define DU_DRAW_SH_C(sh, c)\
     {\
         RCache.set_Shader(sh);\
@@ -49,17 +35,10 @@ static Fvector boxvert[boxvertcount];
         RCache.set_Shader(sh);\
         RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);\
     }
-#endif
 
-#ifdef _EDITOR
-#define FILL_MODE dxRenderDeviceRender::Instance().dwFillMode
-#define SHADE_MODE dxRenderDeviceRender::Instance().dwShadeMode
-#define SCREEN_QUALITY dxRenderDeviceRender::Instance().m_ScreenQuality
-#else
 #define FILL_MODE nvrhi::RasterFillMode::Solid
 #define SHADE_MODE 2
 #define SCREEN_QUALITY 1.f
-#endif
 
 // identity box
 constexpr u32 identboxcolor = color_rgba(255, 255, 255, 0);

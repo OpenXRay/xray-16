@@ -161,7 +161,7 @@ void CBlender_Compile::r_End()
 {
     SetMapping();
     dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
-    dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
+    dest.state = RImplementation.Resources->_CreateState(RS);
     dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
     dest.C = nullptr;
     dest.M = nullptr;

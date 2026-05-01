@@ -30,7 +30,7 @@ public:
     int iElement;
 
 public:
-    CSimulator RS;
+    SimulatorStates RS;
     IBlender* BT;
     ShaderElement* SH;
 #ifdef USE_DX11
@@ -60,7 +60,7 @@ private:
 public:
     u32 SampledImage(pcstr sampler, pcstr image, shared_str texture);
 
-    CSimulator& R() { return RS; }
+    SimulatorStates& R() { return RS; }
     void SetParams(int iPriority, bool bStrictB2F);
     void SetMapping();
 
@@ -98,10 +98,6 @@ public:
     void StageBegin();
     u32 Stage() { return dwStage; }
     void StageSET_Address(nvrhi::SamplerAddressMode adr);
-    void StageSET_XForm(u32 tf, u32 tc);
-    void StageSET_Color(u32 a1, u32 op, u32 a2);
-    void StageSET_Color3(u32 a1, u32 op, u32 a2, u32 a3);
-    void StageSET_Alpha(u32 a1, u32 op, u32 a2);
     void StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channel);
     void Stage_Texture(LPCSTR name, nvrhi::SamplerAddressMode address = nvrhi::SamplerAddressMode::Wrap,
         SamplerFilter fmin = SamplerFilter::Linear, SamplerFilter fmip = SamplerFilter::Linear, SamplerFilter fmag = SamplerFilter::Linear);

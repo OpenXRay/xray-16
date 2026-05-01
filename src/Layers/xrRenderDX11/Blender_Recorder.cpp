@@ -192,7 +192,7 @@ void CBlender_Compile::PassEnd()
     }
 
     SetMapping();
-    dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
+    dest.state = RImplementation.Resources->_CreateState(RS);
     dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
 
     dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
@@ -267,10 +267,6 @@ void CBlender_Compile::StageSET_Address(nvrhi::SamplerAddressMode adr)
     RS.SetSamplerAddressU(Stage(), adr);
     RS.SetSamplerAddressV(Stage(), adr);
 }
-void CBlender_Compile::StageSET_XForm(u32, u32) {}
-void CBlender_Compile::StageSET_Color(u32, u32, u32) {}
-void CBlender_Compile::StageSET_Color3(u32, u32, u32, u32) {}
-void CBlender_Compile::StageSET_Alpha(u32, u32, u32) {}
 void CBlender_Compile::StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channel)
 {
     Stage_Texture(T);
