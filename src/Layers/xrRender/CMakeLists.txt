@@ -78,12 +78,16 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/RainPassSetup.cpp
     FrameGraphPasses/ThunderboltPassSetup.h
     FrameGraphPasses/ThunderboltPassSetup.cpp
+    FrameGraphPasses/LensFlarePassSetup.h
+    FrameGraphPasses/LensFlarePassSetup.cpp
     fgStatGraphRender.h
     fgStatGraphRender.cpp
     fgRainRender.h
     fgRainRender.cpp
     fgThunderboltRender.h
     fgThunderboltRender.cpp
+    fgLensFlareRender.h
+    fgLensFlareRender.cpp
     FrameGraphPasses/ParticlePassSetup.h
     FrameGraphPasses/ParticlePassSetup.cpp
     FrameGraphPasses/RibbonPassSetup.h

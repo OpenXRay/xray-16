@@ -63,12 +63,15 @@
 #include "FrameGraphPasses/ImGuiPassSetup.h"
 #include "FrameGraphPasses/RainPassSetup.h"
 #include "FrameGraphPasses/ThunderboltPassSetup.h"
+#include "FrameGraphPasses/LensFlarePassSetup.h"
 #include "FrameGraphPasses/PathTracerPassSetup.h"
 #include "Layers/xrRender/fgRainRender.h"
 #include "Layers/xrRender/fgThunderboltRender.h"
+#include "Layers/xrRender/fgLensFlareRender.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/Rain.h"
 #include "xrEngine/thunderbolt.h"
+#include "xrEngine/xr_efflensflare.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
@@ -1671,6 +1674,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                     sceneColor,
                     transparentOutputs.depth,
                     fgTB);
+            }
+        }
+    }
+
+    if (g_pGamePersistent && g_pGamePersistent->Environment().eff_LensFlare)
+    {
+        auto* effLF = g_pGamePersistent->Environment().eff_LensFlare;
+        effLF->Render(true, true, true);
+        if (auto* fgLF = dynamic_cast<FGLensFlareRender*>(effLF->GetRenderer()))
+        {
+            if (fgLF->HasWork())
+            {
+                sceneColor = passes::setupLensFlarePass(
+                    *m_framegraph,
+                    sceneColor,
+                    transparentOutputs.depth,
+                    fgLF);
             }
         }
     }

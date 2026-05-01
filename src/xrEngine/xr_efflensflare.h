@@ -14,6 +14,7 @@ namespace xray::render
 namespace fg
 {
 class dxLensFlareRender;
+class FGLensFlareRender;
 }
 namespace render_gl
 {
@@ -76,6 +77,7 @@ public:
 class ENGINE_API CLensFlare
 {
     friend class xray::render::fg::dxLensFlareRender;
+    friend class xray::render::fg::FGLensFlareRender;
     friend class xray::render::render_gl::dxLensFlareRender;
 
 public:
@@ -130,6 +132,8 @@ public:
     void __fastcall Render(bool bSun, bool bFlares, bool bGradient);
     void OnDeviceCreate();
     void OnDeviceDestroy();
+
+    ILensFlareRender* GetRenderer() const { return &*m_pRender; }
 
     CLensFlareDescriptor* AppendDef(shared_str sect);
 
