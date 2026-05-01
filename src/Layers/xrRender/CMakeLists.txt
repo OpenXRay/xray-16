@@ -74,8 +74,12 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/ImGuiPassSetup.cpp
     FrameGraphPasses/StatGraphPassSetup.h
     FrameGraphPasses/StatGraphPassSetup.cpp
+    FrameGraphPasses/RainPassSetup.h
+    FrameGraphPasses/RainPassSetup.cpp
     fgStatGraphRender.h
     fgStatGraphRender.cpp
+    fgRainRender.h
+    fgRainRender.cpp
     FrameGraphPasses/ParticlePassSetup.h
     FrameGraphPasses/ParticlePassSetup.cpp
     FrameGraphPasses/RibbonPassSetup.h

@@ -98,7 +98,9 @@
     <ClInclude Include="FrameGraphPasses\SkinningPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\ImGuiPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\StatGraphPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\RainPassSetup.h"/>
     <ClInclude Include="fgStatGraphRender.h"/>
+    <ClInclude Include="fgRainRender.h"/>
     <ClInclude Include="FrameGraphPasses\ParticlePassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\RibbonPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\TrailPassSetup.h"/>
@@ -359,7 +361,9 @@
     <ClCompile Include="FrameGraphPasses\SkinningPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\ImGuiPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\StatGraphPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\RainPassSetup.cpp"/>
     <ClCompile Include="fgStatGraphRender.cpp"/>
+    <ClCompile Include="fgRainRender.cpp"/>
     <ClCompile Include="FrameGraphPasses\ParticlePassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\RibbonPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\TrailPassSetup.cpp"/>
