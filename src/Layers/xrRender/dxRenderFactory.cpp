@@ -15,6 +15,7 @@
 #include "dxLensFlareRender.h"
 #include "fgLensFlareRender.h"
 #include "dxEnvironmentRender.h"
+#include "fgEnvironmentRender.h"
 #include "dxObjectSpaceRender.h"
 #endif // _EDITOR
 
@@ -81,8 +82,24 @@ void dxRenderFactory::DestroyLensFlareRender(ILensFlareRender* pObject)
     auto* p = static_cast<FGLensFlareRender*>(pObject);
     xr_delete(p);
 }
-RENDER_FACTORY_IMPLEMENT(EnvironmentRender)
-RENDER_FACTORY_IMPLEMENT(EnvDescriptorRender)
+IEnvironmentRender* dxRenderFactory::CreateEnvironmentRender()
+{
+    return xr_new<FGEnvironmentRender>();
+}
+void dxRenderFactory::DestroyEnvironmentRender(IEnvironmentRender* pObject)
+{
+    auto* p = static_cast<FGEnvironmentRender*>(pObject);
+    xr_delete(p);
+}
+IEnvDescriptorRender* dxRenderFactory::CreateEnvDescriptorRender()
+{
+    return xr_new<FGEnvDescriptorRender>();
+}
+void dxRenderFactory::DestroyEnvDescriptorRender(IEnvDescriptorRender* pObject)
+{
+    auto* p = static_cast<FGEnvDescriptorRender*>(pObject);
+    xr_delete(p);
+}
 RENDER_FACTORY_IMPLEMENT(FlareRender)
 #endif
 RENDER_FACTORY_IMPLEMENT(FontRender)
