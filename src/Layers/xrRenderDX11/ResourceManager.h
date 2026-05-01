@@ -7,6 +7,7 @@
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/tss_def.h"
 #include "Layers/xrRender/TextureDescrManager.h"
+#include "Layers/xrRenderDX11/dx11SH_Atomic.h"
 
 #include "xrScriptEngine/script_engine.hpp"
 

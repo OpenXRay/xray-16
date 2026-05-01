@@ -26,16 +26,6 @@ namespace xray::render::fg
 //////////////////////////////////////////////////////////////////////////
 // Atomic resources
 //////////////////////////////////////////////////////////////////////////
-#if defined(USE_DX11)
-struct ECORE_API SInputSignature : public xr_resource_flagged
-{
-    ID3DBlob* signature;
-    SInputSignature(ID3DBlob* pBlob);
-    ~SInputSignature();
-};
-typedef resptr_core<SInputSignature, resptr_base<SInputSignature>> ref_input_sign;
-#endif // USE_DX11
-//////////////////////////////////////////////////////////////////////////
 struct ECORE_API SVS : public xr_resource_named
 {
     nvrhi::ShaderHandle nvrhiShader;  // NVRHI shader handle
