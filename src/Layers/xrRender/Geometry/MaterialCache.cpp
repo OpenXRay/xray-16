@@ -55,29 +55,6 @@ using namespace xray::render::fg;  // For Shader types (STextureList, etc.)
 //  FORMAT CONVERSION HELPER
 // ══════════════════════════════════════════════════════════
 
-// Convert DXGI_FORMAT to nvrhi::Format for textures
-// IMPORTANT: Do NOT use static_cast! DXGI_FORMAT and nvrhi::Format have different enum values!
-// We need to search NVRHI's format mapping table to find the correct conversion.
-nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat) {
-    // Search through all NVRHI formats to find one that matches this DXGI format
-    for (uint32_t i = 0; i < uint32_t(nvrhi::Format::COUNT); i++) {
-        nvrhi::Format nvrhiFormat = static_cast<nvrhi::Format>(i);
-        const nvrhi::DxgiFormatMapping& mapping = nvrhi::getDxgiFormatMapping(nvrhiFormat);
-
-        // Check if any of the DXGI formats in the mapping match our input
-        if (mapping.resourceFormat == dxgiFormat ||
-            mapping.srvFormat == dxgiFormat ||
-            mapping.rtvFormat == dxgiFormat) {
-            return nvrhiFormat;
-        }
-    }
-
-    // Not found - return UNKNOWN
-    return nvrhi::Format::UNKNOWN;
-}
-
-// Deleted ConvertVertexFormat - use ConvertDxgiFormatToNvrhi instead
-
 // ══════════════════════════════════════════════════════════
 //  DEBUG LOGGING FOR CONSTANT LAYOUT
 // ══════════════════════════════════════════════════════════

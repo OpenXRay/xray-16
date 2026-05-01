@@ -397,7 +397,7 @@ nvrhi::Format DDSLoader::GetFormatFromFourCC(u32 fourCC) {
     }
 }
 
-nvrhi::Format DDSLoader::GetFormatFromDXGI(DXGI_FORMAT dxgiFormat) {
+nvrhi::Format DDSLoader::GetFormatFromDXGI(DDSDxgiFormat dxgiFormat) {
     switch (dxgiFormat) {
         case DXGI_FORMAT_BC1_UNORM:
             return nvrhi::Format::BC1_UNORM;

@@ -152,9 +152,9 @@ bool Test_DDSLoader_FormatConversion() {
                 "BC4U should map to BC4_UNORM");
 
     // Test DXGI conversions
-    TEST_ASSERT(DDSLoader::GetFormatFromDXGI(DXGI_FORMAT_BC7_UNORM) == nvrhi::Format::BC7_UNORM,
+    TEST_ASSERT(DDSLoader::GetFormatFromDXGI(DDSDxgiFormat_BC7_UNORM) == nvrhi::Format::BC7_UNORM,
                 "DXGI BC7 should map to BC7_UNORM");
-    TEST_ASSERT(DDSLoader::GetFormatFromDXGI(DXGI_FORMAT_BC1_UNORM_SRGB) == nvrhi::Format::BC1_UNORM_SRGB,
+    TEST_ASSERT(DDSLoader::GetFormatFromDXGI(DDSDxgiFormat_BC1_UNORM_SRGB) == nvrhi::Format::BC1_UNORM_SRGB,
                 "DXGI BC1 SRGB should map correctly");
 
     TEST_PASS();

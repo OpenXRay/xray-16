@@ -108,10 +108,6 @@ inline fg::ColorWriteMask ConvertColorWriteMask(u8 d3dMask) {
     return mask;
 }
 
-// Convert DXGI format to NVRHI format
-// Defined in MaterialCache.cpp
-nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat);
-
-#endif // USE_DX11
+#endif
 
 } // namespace xray::render

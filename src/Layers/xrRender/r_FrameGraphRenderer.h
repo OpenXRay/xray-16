@@ -26,6 +26,7 @@
 // Forward declarations
 struct ImDrawData;
 struct ID3D11Resource;
+struct ID3D11Buffer;
 
 namespace xray::render::fg
 {

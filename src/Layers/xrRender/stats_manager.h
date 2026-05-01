@@ -49,8 +49,4 @@ private:
     xr_vector<stats_item> m_buffers_list;
 #endif
 }; // class stats_manager
-
-#if defined(USE_DX11)
-u32 get_format_pixel_size(DXGI_FORMAT format);
-#endif
 } // namespace xray::render::fg

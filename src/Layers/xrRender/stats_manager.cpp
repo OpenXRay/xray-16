@@ -9,6 +9,10 @@
 
 namespace xray::render::fg
 {
+#if defined(USE_DX11)
+static u32 get_format_pixel_size(DXGI_FORMAT format);
+#endif
+
 void stats_manager::increment_stats(u32 size, enum_stats_buffer_type type, D3D_POOL location)
 {
     if (GEnv.isDedicatedServer)
@@ -191,7 +195,7 @@ stats_manager::~stats_manager()
 }
 
 #if defined(USE_DX11)
-u32 get_format_pixel_size(DXGI_FORMAT format)
+static u32 get_format_pixel_size(DXGI_FORMAT format)
 {
     if (format >= DXGI_FORMAT_R32G32B32A32_TYPELESS && format <= DXGI_FORMAT_R32G32B32A32_SINT)
         return 16;
