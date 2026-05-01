@@ -519,11 +519,11 @@ public:
     }
 
     // Rendering
-    ICF void Render(D3D_PRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
-    ICF void Render(D3D_PRIMITIVETYPE T, u32 startV, u32 PC);
+    ICF void Render(nvrhi::PrimitiveType T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
+    ICF void Render(nvrhi::PrimitiveType T, u32 startV, u32 PC);
 #ifdef USE_DX11
-    ICF void RenderInstancedIndexed(D3D_PRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC, u32 instanceCount, u32 startInstanceLocation);
-    ICF void RenderIndexedInstancedIndirect(D3D_PRIMITIVETYPE T, ID3DBuffer* pBufferForArgs, u32 AlignedByteOffsetForArgs);
+    ICF void RenderInstancedIndexed(nvrhi::PrimitiveType T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC, u32 instanceCount, u32 startInstanceLocation);
+    ICF void RenderIndexedInstancedIndirect(nvrhi::PrimitiveType T, ID3DBuffer* pBufferForArgs, u32 AlignedByteOffsetForArgs);
 #endif
 
     ICF void submit()
@@ -548,13 +548,13 @@ public:
     void SetupStates();
 
     // Debug render
-    void dbg_DP(D3D_PRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc);
-    void dbg_DIP(D3D_PRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
+    void dbg_DP(nvrhi::PrimitiveType pt, ref_geom geom, u32 vBase, u32 pc);
+    void dbg_DIP(nvrhi::PrimitiveType pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
     void dbg_SetRS(u32 p1, u32 p2);
     void dbg_SetSS(u32 sampler, u32 type, u32 value);
 #ifdef DEBUG
-    void dbg_Draw(D3D_PRIMITIVETYPE T, FVF::L* pVerts, u32 vcnt, u16* pIdx, int pcnt);
-    void dbg_Draw(D3D_PRIMITIVETYPE T, FVF::L* pVerts, int pcnt);
+    void dbg_Draw(nvrhi::PrimitiveType T, FVF::L* pVerts, u32 vcnt, u16* pIdx, int pcnt);
+    void dbg_Draw(nvrhi::PrimitiveType T, FVF::L* pVerts, int pcnt);
 
     void dbg_DrawAABB(Fvector& T, float sx, float sy, float sz, u32 C)
     {

@@ -710,7 +710,7 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
 
     // UNIFIED: Single DrawIndexedInstancedIndirect call for ALL grass!
     // The GPU determines instance count from the unified indirect args buffer
-    // Use D3D_PT_TRIANGLELIST because we generate indexed triangles (blade clumps)
+    // Use nvrhi::PrimitiveType::TriangleList because we generate indexed triangles (blade clumps)
 
     // DEBUG: Read back indirect args to verify InstanceCount
     static bool logged_draw = false;
@@ -746,7 +746,7 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
         logged_draw = true;
     }
 
-    cmd_list.RenderIndexedInstancedIndirect(D3D_PT_TRIANGLESTRIP, gpu_indirect_args_unified, 0);
+    cmd_list.RenderIndexedInstancedIndirect(nvrhi::PrimitiveType::TriangleStrip, gpu_indirect_args_unified, 0);
 
     cmd_list.set_CullMode(CULL_CCW);
 
@@ -921,7 +921,7 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                             u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;
                             // RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;
                             // RCache.get_ConstantCache_Vertex().get_array_f().dirty	(c_base,c_base+dwBatch*4);
-                            cmd_list.Render(D3D_PT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
+                            cmd_list.Render(nvrhi::PrimitiveType::TriangleList, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
                             cmd_list.stat.r.s_details.add(dwCNT_verts);
 
                             // restart
@@ -945,7 +945,7 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                     u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;
                     // RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;
                     // RCache.get_ConstantCache_Vertex().get_array_f().dirty	(c_base,c_base+dwBatch*4);
-                    cmd_list.Render(D3D_PT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
+                    cmd_list.Render(nvrhi::PrimitiveType::TriangleList, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
                     cmd_list.stat.r.s_details.add(dwCNT_verts);
                 }
             }
@@ -1082,7 +1082,7 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
     u32 numIndices = Object.number_indices;
 
     cmd_list.RenderInstancedIndexed(
-        D3D_PT_TRIANGLELIST,
+        nvrhi::PrimitiveType::TriangleList,
         0, 0,
         numVertices,
         baseIndex,

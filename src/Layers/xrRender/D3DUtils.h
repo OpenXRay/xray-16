@@ -19,7 +19,7 @@ struct SPrimitiveBuffer
     ref_geom pGeom{};
     u32 v_cnt;
     u32 i_cnt;
-    D3D_PRIMITIVETYPE p_type;
+    nvrhi::PrimitiveType p_type;
     u32 p_cnt;
     typedef fastdelegate::FastDelegate0<> TOnRender;
     TOnRender OnRender;
@@ -27,7 +27,7 @@ struct SPrimitiveBuffer
     void RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
 
     void CreateFromData(
-        D3D_PRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices = nullptr, u32 _i_cnt = 0);
+        nvrhi::PrimitiveType _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices = nullptr, u32 _i_cnt = 0);
     void Destroy();
     void Render() { OnRender(); }
 };
@@ -183,11 +183,11 @@ public:
     virtual void DrawIndexedPrimitive(int prim_type, u32 pc, const Fvector& pos, const Fvector* vb,
         const u32& vb_size, const u32* ib, const u32& ib_size, const u32& clr_argb, float scale = 1.0f){};
     virtual void DrawPrimitiveL(
-        D3D_PRIMITIVETYPE pt, u32 pc, Fvector* vertices, int vc, u32 color, BOOL bCull, BOOL bCycle);
+        nvrhi::PrimitiveType pt, u32 pc, Fvector* vertices, int vc, u32 color, BOOL bCull, BOOL bCycle);
     virtual void DrawPrimitiveTL(
-        D3D_PRIMITIVETYPE pt, u32 pc, FVF::TL* vertices, int vc, BOOL bCull, BOOL bCycle);
+        nvrhi::PrimitiveType pt, u32 pc, FVF::TL* vertices, int vc, BOOL bCull, BOOL bCycle);
     virtual void DrawPrimitiveLIT(
-        D3D_PRIMITIVETYPE pt, u32 pc, FVF::LIT* vertices, int vc, BOOL bCull, BOOL bCycle);
+        nvrhi::PrimitiveType pt, u32 pc, FVF::LIT* vertices, int vc, BOOL bCull, BOOL bCycle);
 
     virtual void OutText(
         const Fvector& pos, LPCSTR text, u32 color = 0xFF000000, u32 shadow_color = 0xFF909090);

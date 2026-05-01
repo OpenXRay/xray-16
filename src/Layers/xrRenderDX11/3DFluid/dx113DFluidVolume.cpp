@@ -176,13 +176,13 @@ void dx113DFluidVolume::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_
     RImplementation.Vertex.Unlock(dwCount, m_Geom->vb_stride);
     cmd_list.set_Geometry(m_Geom);
 
-    // RCache.Render(D3D_PT_TRIANGLELIST,dwOffset,0,dwCount,0,dwCount/2);
+    // RCache.Render(nvrhi::PrimitiveType::TriangleList,dwOffset,0,dwCount,0,dwCount/2);
 
     //	Render obstacles
     for (const Fmatrix& obstacle : m_FluidData.GetObstaclesList())
     {
         cmd_list.set_xform_world(obstacle);
-        // RCache.Render(D3D_PT_TRIANGLELIST,dwOffset,0,dwCount,0,dwCount/2);
+        // RCache.Render(nvrhi::PrimitiveType::TriangleList,dwOffset,0,dwCount,0,dwCount/2);
     }
 
     //	FluidManager.Update( m_FluidData, 1.0f/30.0f);

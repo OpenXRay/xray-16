@@ -240,41 +240,34 @@ ICF void CBackend::set_Indices(IndexBufferHandle _ib)
     }
 }
 
-IC D3D_PRIMITIVE_TOPOLOGY TranslateTopology(D3D_PRIMITIVETYPE T)
-{
-    static D3D_PRIMITIVE_TOPOLOGY translateTable[] = {
-        D3D_PRIMITIVE_TOPOLOGY_UNDEFINED, // None
-        D3D_PRIMITIVE_TOPOLOGY_POINTLIST, // D3D_PT_POINTLIST = 1,
-        D3D_PRIMITIVE_TOPOLOGY_LINELIST, // D3D_PT_LINELIST = 2,
-        D3D_PRIMITIVE_TOPOLOGY_LINESTRIP, // D3D_PT_LINESTRIP = 3,
-        D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, // D3D_PT_TRIANGLELIST = 4,
-        D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, // D3D_PT_TRIANGLESTRIP = 5,
-        D3D_PRIMITIVE_TOPOLOGY_UNDEFINED, // D3D_PT_TRIANGLEFAN = 6,
-    };
-
-    VERIFY(T < sizeof(translateTable) / sizeof(translateTable[0]));
-    VERIFY(T >= 0);
-
-    D3D_PRIMITIVE_TOPOLOGY result = translateTable[T];
-
-    VERIFY(result != D3D_PRIMITIVE_TOPOLOGY_UNDEFINED);
-
-    return result;
-}
-
-IC u32 GetIndexCount(D3D_PRIMITIVETYPE T, u32 iPrimitiveCount)
+IC D3D_PRIMITIVE_TOPOLOGY TranslateTopology(nvrhi::PrimitiveType T)
 {
     switch (T)
     {
-    case D3D_PT_POINTLIST: return iPrimitiveCount;
-    case D3D_PT_LINELIST: return iPrimitiveCount * 2;
-    case D3D_PT_LINESTRIP: return iPrimitiveCount + 1;
-    case D3D_PT_TRIANGLELIST: return iPrimitiveCount * 3;
-    case D3D_PT_TRIANGLESTRIP: return iPrimitiveCount + 2;
+    case nvrhi::PrimitiveType::PointList:     return D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
+    case nvrhi::PrimitiveType::LineList:      return D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+    case nvrhi::PrimitiveType::LineStrip:     return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
+    case nvrhi::PrimitiveType::TriangleList:  return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    case nvrhi::PrimitiveType::TriangleStrip: return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+    default:
+        VERIFY2(false, "Unsupported primitive topology");
+        return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    }
+}
+
+IC u32 GetIndexCount(nvrhi::PrimitiveType T, u32 iPrimitiveCount)
+{
+    switch (T)
+    {
+    case nvrhi::PrimitiveType::PointList:     return iPrimitiveCount;
+    case nvrhi::PrimitiveType::LineList:      return iPrimitiveCount * 2;
+    case nvrhi::PrimitiveType::LineStrip:     return iPrimitiveCount + 1;
+    case nvrhi::PrimitiveType::TriangleList:  return iPrimitiveCount * 3;
+    case nvrhi::PrimitiveType::TriangleStrip: return iPrimitiveCount + 2;
     default: NODEFAULT;
 #ifdef DEBUG
         return 0;
-#endif // #ifdef DEBUG
+#endif
     }
 }
 
@@ -302,7 +295,7 @@ IC void CBackend::Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 Thre
     HW.get_context(context_id)->Dispatch(ThreadGroupCountX, ThreadGroupCountY, ThreadGroupCountZ);
 }
 
-IC void CBackend::RenderInstancedIndexed(D3D_PRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC, u32 instanceCount, u32 startInstanceLocation)
+IC void CBackend::RenderInstancedIndexed(nvrhi::PrimitiveType T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC, u32 instanceCount, u32 startInstanceLocation)
 {
     D3D_PRIMITIVE_TOPOLOGY Topology = TranslateTopology(T);
     u32 iIndexCount = GetIndexCount(T, PC);
@@ -332,7 +325,7 @@ IC void CBackend::RenderInstancedIndexed(D3D_PRIMITIVETYPE T, u32 baseV, u32 sta
     PGO(Msg("PGO:DIP:%dv/%df", countV, PC));
 }
 
-IC void CBackend::RenderIndexedInstancedIndirect(D3D_PRIMITIVETYPE T, ID3DBuffer* pBufferForArgs, u32 AlignedByteOffsetForArgs)
+IC void CBackend::RenderIndexedInstancedIndirect(nvrhi::PrimitiveType T, ID3DBuffer* pBufferForArgs, u32 AlignedByteOffsetForArgs)
 {
     D3D_PRIMITIVE_TOPOLOGY Topology = TranslateTopology(T);
 
@@ -361,7 +354,7 @@ IC void CBackend::RenderIndexedInstancedIndirect(D3D_PRIMITIVETYPE T, ID3DBuffer
 }
 #endif
 
-IC void CBackend::Render(D3D_PRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC)
+IC void CBackend::Render(nvrhi::PrimitiveType T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC)
 {
     // VERIFY(vs);
     // HW.pDevice->VSSetShader(vs);
@@ -410,10 +403,10 @@ IC void CBackend::Render(D3D_PRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV,
     PGO(Msg("PGO:DIP:%dv/%df", countV, PC));
 }
 
-IC void CBackend::Render(D3D_PRIMITIVETYPE T, u32 startV, u32 PC)
+IC void CBackend::Render(nvrhi::PrimitiveType T, u32 startV, u32 PC)
 {
     //  TODO: DX11: Remove triangle fan usage from the engine
-    if (T == D3D_PT_TRIANGLEFAN)
+    if (T == nvrhi::PrimitiveType::TriangleFan)
         return;
 
     // VERIFY(vs);

@@ -139,7 +139,7 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
                 {
                     cmd_list.set_Element(lstLODs[current].pVisual->shader->E[shid], uiPass);
                     cmd_list.set_Geometry(firstV->geom);
-                    cmd_list.Render(D3D_PT_TRIANGLELIST, vCurOffset, 0, 4 * p_count, 0, 2 * p_count);
+                    cmd_list.Render(nvrhi::PrimitiveType::TriangleList, vCurOffset, 0, 4 * p_count, 0, 2 * p_count);
                 }
                 cmd_list.stat.r.s_flora_lods.add(4 * p_count);
                 current += p_count;

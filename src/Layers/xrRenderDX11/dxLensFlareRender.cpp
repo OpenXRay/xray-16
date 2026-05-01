@@ -157,7 +157,7 @@ void dxLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
         {
             u32 vBase = i * 4 + VS_Offset;
             RCache.set_Shader(_2render[i]);
-            RCache.Render(D3D_PT_TRIANGLELIST, vBase, 0, 4, 0, 2);
+            RCache.Render(nvrhi::PrimitiveType::TriangleList, vBase, 0, 4, 0, 2);
         }
     }
 }
