@@ -9,6 +9,7 @@
 #ifndef _EDITOR
 #include "dxThunderboltRender.h"
 #include "dxThunderboltDescRender.h"
+#include "fgThunderboltRender.h"
 #include "dxRainRender.h"
 #include "fgRainRender.h"
 #include "dxLensFlareRender.h"
@@ -51,7 +52,15 @@ void dxRenderFactory::DestroyWallMarkArray(IWallMarkArray* pObject)
 #endif // _EDITOR
 
 #ifndef _EDITOR
-RENDER_FACTORY_IMPLEMENT(ThunderboltRender)
+IThunderboltRender* dxRenderFactory::CreateThunderboltRender()
+{
+    return xr_new<FGThunderboltRender>();
+}
+void dxRenderFactory::DestroyThunderboltRender(IThunderboltRender* pObject)
+{
+    auto* p = static_cast<FGThunderboltRender*>(pObject);
+    xr_delete(p);
+}
 RENDER_FACTORY_IMPLEMENT(ThunderboltDescRender)
 IRainRender* dxRenderFactory::CreateRainRender()
 {

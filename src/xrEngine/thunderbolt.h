@@ -19,6 +19,7 @@ namespace xray::render
 namespace fg
 {
 class dxThunderboltRender;
+class FGThunderboltRender;
 }
 namespace render_gl
 {
@@ -93,6 +94,7 @@ struct ENGINE_API SThunderboltCollection
 class ENGINE_API CEffect_Thunderbolt
 {
     friend class xray::render::fg::dxThunderboltRender;
+    friend class xray::render::fg::FGThunderboltRender;
     friend class xray::render::render_gl::dxThunderboltRender;
 
 protected:
@@ -148,6 +150,8 @@ public:
 
     void OnFrame(CEnvDescriptorMixer& currentEnv);
     void Render();
+
+    IThunderboltRender* GetRenderer() const { return &*m_pRender; }
 
     SThunderboltCollection* AppendDef(const shared_str& sect);
 
