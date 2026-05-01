@@ -44,7 +44,7 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
     RCache.set_xform_world(Fidentity);
     RCache.set_Shader(pThRen->l_model->shader);
     RCache.set_Geometry(hGeom_model);
-    RCache.Render(D3D_PT_TRIANGLELIST, v_offset, 0, vCount_Lock, i_offset, iCount_Lock / 3);
+    RCache.Render(nvrhi::PrimitiveType::TriangleList, v_offset, 0, vCount_Lock, i_offset, iCount_Lock / 3);
     RCache.set_CullMode(CULL_CCW);
 
     Fvector vecSx, vecSy;
@@ -94,13 +94,13 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
     RCache.set_Z(TRUE);
     RCache.set_ZFunc(static_cast<u32>(nvrhi::ComparisonFunc::LessOrEqual));
 #endif
-    RCache.Render(D3D_PT_TRIANGLELIST, VS_Offset, 0, 4, 0, 2);
+    RCache.Render(nvrhi::PrimitiveType::TriangleList, VS_Offset, 0, 4, 0, 2);
 
     RCache.set_Shader(((dxFlareRender*)&*owner.current->m_GradientCenter->m_pFlare)->hShader);
 #if defined(USE_DX11)
     RCache.set_Z(TRUE);
     RCache.set_ZFunc(static_cast<u32>(nvrhi::ComparisonFunc::LessOrEqual));
 #endif
-    RCache.Render(D3D_PT_TRIANGLELIST, VS_Offset + 4, 0, 4, 0, 2);
+    RCache.Render(nvrhi::PrimitiveType::TriangleList, VS_Offset + 4, 0, 4, 0, 2);
 }
 }

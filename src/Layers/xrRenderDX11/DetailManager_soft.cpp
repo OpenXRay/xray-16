@@ -130,7 +130,7 @@ void CDetailManager::soft_Render(const Fsphere* bounds)
 
                 u32 dwNumPrimitives = iCount_Lock / 3;
                 RCache.set_Geometry(soft_Geom);
-                RCache.Render(D3D_PT_TRIANGLELIST, vBase, 0, vCount_Lock, iBase, dwNumPrimitives);
+                RCache.Render(nvrhi::PrimitiveType::TriangleList, vBase, 0, vCount_Lock, iBase, dwNumPrimitives);
             }
         }
         _vis.clear();
