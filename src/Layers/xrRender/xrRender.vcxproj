@@ -612,6 +612,7 @@
     <ClCompile Include="..\xrRenderDX11\dx11SH_Texture.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11StateUtils.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11Texture.cpp"/>
+    <ClCompile Include="..\xrRenderDX11\dx11VertexLayoutCache.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11r_constants.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11r_constants_cache.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_BmmD_deferred.cpp"/>

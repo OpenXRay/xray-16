@@ -3,6 +3,7 @@
 
 #include "Layers/xrRender/SH_Atomic.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
+#include "Layers/xrRenderDX11/dx11VertexLayoutCache.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRender/FrameGraph/ShaderCache.h"
@@ -121,11 +122,12 @@ SDeclaration::~SDeclaration()
 {
     RImplementation.Resources->_DeleteDecl(this);
 #if defined(USE_DX11)
-    xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
-    iLayout = vs_to_layout.begin();
-    for (; iLayout != vs_to_layout.end(); ++iLayout)
+    if (auto* data = static_cast<DX11DeclBackendData*>(backend_data))
     {
-        _RELEASE(iLayout->second);
+        for (auto& kv : data->vs_to_layout)
+            _RELEASE(kv.second);
+        xr_delete(data);
+        backend_data = nullptr;
     }
 #elif defined(USE_OGL)
 #   ifdef XR_PLATFORM_WEB
