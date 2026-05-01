@@ -103,6 +103,7 @@
     <ClInclude Include="FrameGraphPasses\LensFlarePassSetup.h"/>
     <ClInclude Include="fgThunderboltRender.h"/>
     <ClInclude Include="fgLensFlareRender.h"/>
+    <ClInclude Include="fgEnvironmentRender.h"/>
     <ClInclude Include="fgStatGraphRender.h"/>
     <ClInclude Include="fgRainRender.h"/>
     <ClInclude Include="FrameGraphPasses\ParticlePassSetup.h"/>
@@ -370,6 +371,7 @@
     <ClCompile Include="FrameGraphPasses\LensFlarePassSetup.cpp"/>
     <ClCompile Include="fgThunderboltRender.cpp"/>
     <ClCompile Include="fgLensFlareRender.cpp"/>
+    <ClCompile Include="fgEnvironmentRender.cpp"/>
     <ClCompile Include="fgStatGraphRender.cpp"/>
     <ClCompile Include="fgRainRender.cpp"/>
     <ClCompile Include="FrameGraphPasses\ParticlePassSetup.cpp"/>

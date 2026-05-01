@@ -88,6 +88,8 @@ target_sources(xrRender PRIVATE
     fgThunderboltRender.cpp
     fgLensFlareRender.h
     fgLensFlareRender.cpp
+    fgEnvironmentRender.h
+    fgEnvironmentRender.cpp
     FrameGraphPasses/ParticlePassSetup.h
     FrameGraphPasses/ParticlePassSetup.cpp
     FrameGraphPasses/RibbonPassSetup.h
