@@ -11,6 +11,7 @@ namespace xray::render
 namespace fg
 {
 class dxStatGraphRender;
+class FGStatGraphRender;
 }
 namespace render_gl
 {
@@ -22,6 +23,7 @@ class dxStatGraphRender;
 class ENGINE_API CStatGraph : public pureRender
 {
     friend class xray::render::fg::dxStatGraphRender;
+    friend class xray::render::fg::FGStatGraphRender;
     friend class xray::render::render_gl::dxStatGraphRender;
 
 public:

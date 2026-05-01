@@ -72,6 +72,10 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/SkinningPassSetup.cpp
     FrameGraphPasses/ImGuiPassSetup.h
     FrameGraphPasses/ImGuiPassSetup.cpp
+    FrameGraphPasses/StatGraphPassSetup.h
+    FrameGraphPasses/StatGraphPassSetup.cpp
+    fgStatGraphRender.h
+    fgStatGraphRender.cpp
     FrameGraphPasses/ParticlePassSetup.h
     FrameGraphPasses/ParticlePassSetup.cpp
     FrameGraphPasses/RibbonPassSetup.h
