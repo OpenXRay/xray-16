@@ -1,6 +1,7 @@
 #pragma once
 
 #include "StateManager/dx11ShaderResourceStateCache.h"
+#include "dx11VertexLayoutCache.h"
 
 namespace xray::render::fg
 {
@@ -588,18 +589,19 @@ IC void CBackend::ApplyVertexLayout()
     VERIFY(decl);
     VERIFY(m_pInputSignature);
 
-    xr_map<ID3DBlob*, ID3DInputLayout*>::iterator it;
+    auto* data = GetDX11Data(decl);
+    VERIFY(data);
 
-    it = decl->vs_to_layout.find(m_pInputSignature);
+    auto it = data->vs_to_layout.find(m_pInputSignature);
 
-    if (it == decl->vs_to_layout.end())
+    if (it == data->vs_to_layout.end())
     {
         ID3DInputLayout* pLayout;
 
-        CHK_DX(HW.pDevice->CreateInputLayout(&decl->dx11_dcl_code[0], decl->dx11_dcl_code.size() - 1,
+        CHK_DX(HW.pDevice->CreateInputLayout(&data->dx11_dcl_code[0], data->dx11_dcl_code.size() - 1,
             m_pInputSignature->GetBufferPointer(), m_pInputSignature->GetBufferSize(), &pLayout));
 
-        it = decl->vs_to_layout.insert(std::pair<ID3DBlob*, ID3DInputLayout*>(m_pInputSignature, pLayout)).first;
+        it = data->vs_to_layout.insert(std::pair<ID3DBlob*, ID3DInputLayout*>(m_pInputSignature, pLayout)).first;
     }
 
     if (m_pInputLayout != it->second)

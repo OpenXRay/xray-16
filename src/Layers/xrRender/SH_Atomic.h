@@ -151,18 +151,12 @@ typedef resptr_core<SState, resptr_base<SState>> ref_state;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SDeclaration : public xr_resource_flagged
 {
-#if defined(USE_DX11)
-    //	Maps input signature to input layout
-    xr_map<ID3DBlob*, ID3DInputLayout*> vs_to_layout;
-    xr_vector<D3D_INPUT_ELEMENT_DESC> dx11_dcl_code;
-#elif defined(USE_OGL)
-    GLuint dcl;
-#else
-#   error No graphics API selected or enabled!
-#endif
-
-    //	Use this for DirectX10 to cache DX9 declaration for comparison purpose only
     xr_vector<VertexElement> dcl_code;
+#if defined(USE_OGL)
+    GLuint dcl;
+#endif
+    void* backend_data = nullptr;
+
     SDeclaration() = default;
     ~SDeclaration();
 };

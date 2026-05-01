@@ -7,6 +7,7 @@
 #include "Layers/xrRenderDX11/Blender_Recorder.h"
 #include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
+#include "Layers/xrRenderDX11/dx11VertexLayoutCache.h"
 #include "Layers/xrRenderDX11/ShaderResourceTraits.h"
 
 namespace xray::render::fg
@@ -139,13 +140,14 @@ SDeclaration* CResourceManager::_CreateDecl(const VertexElement* dcl)
             return D;
     }
 
-    // Create _new
     SDeclaration* D = v_declarations.emplace_back(xr_new<SDeclaration>());
     u32 dcl_size = GetDeclLength(dcl) + 1;
-    //	Don't need it for DirectX 10 here
-    // CHK_DX					(HW.pDevice->CreateVertexDeclaration(dcl,&D->dcl));
     D->dcl_code.assign(dcl, dcl + dcl_size);
-    ConvertVertexDeclaration(D->dcl_code, D->dx11_dcl_code);
+
+    auto* data = xr_new<DX11DeclBackendData>();
+    ConvertVertexDeclarationDX11(D->dcl_code, data->dx11_dcl_code);
+    D->backend_data = data;
+
     D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 
     return D;
