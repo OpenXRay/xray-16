@@ -13,6 +13,7 @@
 #include "dxRainRender.h"
 #include "fgRainRender.h"
 #include "dxLensFlareRender.h"
+#include "fgLensFlareRender.h"
 #include "dxEnvironmentRender.h"
 #include "dxObjectSpaceRender.h"
 #endif // _EDITOR
@@ -71,7 +72,15 @@ void dxRenderFactory::DestroyRainRender(IRainRender* pObject)
     auto* p = static_cast<FGRainRender*>(pObject);
     xr_delete(p);
 }
-RENDER_FACTORY_IMPLEMENT(LensFlareRender)
+ILensFlareRender* dxRenderFactory::CreateLensFlareRender()
+{
+    return xr_new<FGLensFlareRender>();
+}
+void dxRenderFactory::DestroyLensFlareRender(ILensFlareRender* pObject)
+{
+    auto* p = static_cast<FGLensFlareRender*>(pObject);
+    xr_delete(p);
+}
 RENDER_FACTORY_IMPLEMENT(EnvironmentRender)
 RENDER_FACTORY_IMPLEMENT(EnvDescriptorRender)
 RENDER_FACTORY_IMPLEMENT(FlareRender)
