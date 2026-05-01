@@ -28,10 +28,8 @@
 #define HAS_DX11_3
 #endif
 
-// NVRHI includes (suppress warnings from external library)
 #pragma warning(push, 0)
 #include <nvrhi/nvrhi.h>
-#include <nvrhi/d3d11.h>
 #pragma warning(pop)
 
 // Tracy D3D11 replaced by custom profiler (macros in xrCore/Profiler/Profiler.h)

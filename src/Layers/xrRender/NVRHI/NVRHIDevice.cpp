@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "NVRHIDevice.h"
 
+#include <nvrhi/d3d11.h>
+
 namespace xray::render::fg::nvrhi_wrapper
 {
 
