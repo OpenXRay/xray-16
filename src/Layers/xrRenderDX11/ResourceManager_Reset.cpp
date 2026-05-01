@@ -15,7 +15,11 @@ void CResourceManager::reset_begin()
     ZoneScoped;
     // destroy state-blocks
     for (SState* sstate : v_states)
-        _RELEASE(sstate->state);
+    {
+        auto* p = static_cast<ID3DState*>(sstate->state);
+        _RELEASE(p);
+        sstate->state = p;
+    }
 
     // destroy RTs - stubbed, FrameGraph handles render targets
     //  DX10 cut    for (map_RTCIt rtc_it=m_rtargets_c.begin(); rtc_it!=m_rtargets_c.end(); rtc_it++)

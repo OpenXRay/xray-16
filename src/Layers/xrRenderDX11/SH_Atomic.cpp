@@ -157,7 +157,9 @@ SInputSignature::~SInputSignature()
 //	SState
 SState::~SState()
 {
-    _RELEASE(state);
+    auto* p = static_cast<ID3DState*>(state);
+    _RELEASE(p);
+    state = nullptr;
     RImplementation.Resources->_DeleteState(this);
 }
 

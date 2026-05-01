@@ -111,7 +111,7 @@ void SimulatorStates::SetSamplerMipLODBias(u32 slot, float bias)
     samplers[slot].mipBias = bias;
 }
 
-void SimulatorStates::record(ID3DState*& state)
+void SimulatorStates::record(void*& state)
 {
 #if defined(USE_DX11)
     state = ID3DState::Create(*this);

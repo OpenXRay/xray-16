@@ -85,7 +85,7 @@ ICF void CBackend::set_States(SState* _state)
 {
     PGO(Msg("PGO:state_block"));
     stat.states++;
-    state = _state->state;
+    state = static_cast<ID3DState*>(_state->state);
 #if defined(USE_DX11)
     state->Apply(*this);
 #else

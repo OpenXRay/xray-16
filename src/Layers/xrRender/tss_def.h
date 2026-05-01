@@ -84,7 +84,7 @@ public:
     BOOL equal(const SimulatorStates& other) const;
     void clear();
     void Invalidate() { clear(); }
-    void record(ID3DState*& state);
+    void record(void*& state);
 
 #if defined(USE_DX11)
     void UpdateState(dx11State& state) const;
