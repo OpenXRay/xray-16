@@ -250,7 +250,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 #else
 #   error No graphics API selected or enabled!
 #endif
-    RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, 12, i_offset, 20);
+    RCache.Render(D3D_PT_TRIANGLELIST, v_offset, 0, 12, i_offset, 20);
 
 #ifdef USE_OGL
     if (!RImplementation.o.msaa)
@@ -313,7 +313,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     RCache.set_Geometry(clouds_geom);
     RCache.set_Shader(clouds_sh);
     RCache.set_Textures(reinterpret_cast<STextureList*>(&clouds_r_textures));
-    RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, env.CloudsVerts.size(), i_offset, env.CloudsIndices.size() / 3);
+    RCache.Render(D3D_PT_TRIANGLELIST, v_offset, 0, env.CloudsVerts.size(), i_offset, env.CloudsIndices.size() / 3);
 
     RImplementation.rmNormal(RCache);
 }

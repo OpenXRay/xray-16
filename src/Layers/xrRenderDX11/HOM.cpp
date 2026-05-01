@@ -426,7 +426,7 @@ void CHOM::OnRender()
             RCache.set_c("tfactor", float(color_get_R(0x80FFFFFF)) / 255.f, float(color_get_G(0x80FFFFFF)) / 255.f, \
                 float(color_get_B(0x80FFFFFF)) / 255.f, float(color_get_A(0x80FFFFFF)) / 255.f);
 #endif
-            RCache.dbg_Draw(D3DPT_TRIANGLELIST, &*poly.begin(), poly.size() / 3);
+            RCache.dbg_Draw(D3D_PT_TRIANGLELIST, &*poly.begin(), poly.size() / 3);
             Device.SetNearer(FALSE);
             if (bDebug)
             {
@@ -440,7 +440,7 @@ void CHOM::OnRender()
 #ifndef USE_DX9
             RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);
 #endif
-            RCache.dbg_Draw(D3DPT_LINELIST, &*line.begin(), line.size() / 2);
+            RCache.dbg_Draw(D3D_PT_LINELIST, &*line.begin(), line.size() / 2);
             if (bDebug)
             {
                 RImplementation.rmNormal(RCache);

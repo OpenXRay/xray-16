@@ -33,19 +33,19 @@ void CBlender_light_occq::Compile(CBlender_Compile& C)
     case 1:
         C.r_Pass("stub_notransform_t", "dumb", false, FALSE, FALSE, FALSE);
         C.r_ColorWriteEnable(false, false, false, false);
-        C.r_CullMode(D3DCULL_NONE);
-        C.r_Stencil(TRUE, D3DCMP_LESSEQUAL, 0xff, 0x00);
+        C.r_CullMode(D3D_CULL_NONE);
+        C.r_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, 0xff, 0x00);
         C.r_End();
         break;
     case 2:
         C.r_Pass("stub_notransform_t", "dumb", false, FALSE, FALSE, FALSE);
         C.r_ColorWriteEnable(false, false, false, false);
-        C.r_CullMode(D3DCULL_NONE);
+        C.r_CullMode(D3D_CULL_NONE);
         if (RImplementation.o.msaa)
-            C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0x00, 0x7E, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO);
+            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0x00, 0x7E, D3D_STENCIL_OP_ZERO, D3D_STENCIL_OP_ZERO, D3D_STENCIL_OP_ZERO);
         else
         {
-            C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0x00, 0xFE, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO);
+            C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0x00, 0xFE, D3D_STENCIL_OP_ZERO, D3D_STENCIL_OP_ZERO, D3D_STENCIL_OP_ZERO);
         }
         C.r_End();
         break;

@@ -42,16 +42,16 @@ void CBlender_Detail_GPU::Compile(CBlender_Compile& C)
 
         if (C.iElement != -1)
         {
-            C.i_Address(0, D3DTADDRESS_WRAP);
+            C.i_Address(0, D3D_TEXTURE_ADDRESS_WRAP);
             C.i_dx11FilterAnizo(0, TRUE);
         }
 
         if (ps_r2_ls_flags_ext.test(R2FLAGEXT_WIREFRAME))
-            C.R().SetRS(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+            C.R().SetRS(D3DRS_FILLMODE, D3D_FILL_WIREFRAME);
 
-        C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+        C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
         C.r_StencilRef(0x01);
-        C.r_CullMode(D3DCULL_NONE);
+        C.r_CullMode(D3D_CULL_NONE);
 
         C.r_End();
         break;

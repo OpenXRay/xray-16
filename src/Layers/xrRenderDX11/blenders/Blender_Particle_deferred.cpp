@@ -74,24 +74,24 @@ void CBlender_Particle::Compile(CBlender_Compile& C)
         switch (oBlend.IDselected)
         {
         case 0:
-            C.r_Pass("deffer_particle", "deffer_particle", FALSE, TRUE, TRUE, FALSE, D3DBLEND_ONE, D3DBLEND_ZERO, FALSE,
+            C.r_Pass("deffer_particle", "deffer_particle", FALSE, TRUE, TRUE, FALSE, D3D_BLEND_ONE, D3D_BLEND_ZERO, FALSE,
                 200);
             break;
         case 1:
             C.r_Pass(
-                "particle", "particle", FALSE, TRUE, FALSE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, 0);
+                "particle", "particle", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_INV_SRC_ALPHA, TRUE, 0);
             break;
         case 2:
-            C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE, 0);
+            C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_ONE, D3D_BLEND_ONE, TRUE, 0);
             break;
         case 3:
-            C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_ZERO, TRUE, 0);
+            C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_ZERO, TRUE, 0);
             break;
         case 4:
-            C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_SRCCOLOR, TRUE, 0);
+            C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_SRC_COLOR, TRUE, 0);
             break;
         case 5:
-            C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_ONE, TRUE, 0);
+            C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_SRC_ALPHA, D3D_BLEND_ONE, TRUE, 0);
             break;
         };
 #if RENDER == R_R3 || RENDER == R_R4
@@ -99,12 +99,12 @@ void CBlender_Particle::Compile(CBlender_Compile& C)
             C.r_dx11Texture("s_base", C.L_textures[0]);
             u32 hSampler = C.r_dx11Sampler("smp_base");
             if (oClamp.value && (hSampler != (u32)-1))
-                C.i_Address(hSampler, D3DTADDRESS_CLAMP);
+                C.i_Address(hSampler, D3D_TEXTURE_ADDRESS_CLAMP);
             C.r_dx11Texture("s_position", "$user$position");
             C.r_dx11Sampler("smp_nofilter");
         }
 #else
-        C.r_Sampler("s_base", C.L_textures[0], false, oClamp.value ? D3DTADDRESS_CLAMP : D3DTADDRESS_WRAP);
+        C.r_Sampler("s_base", C.L_textures[0], false, oClamp.value ? D3D_TEXTURE_ADDRESS_CLAMP : D3D_TEXTURE_ADDRESS_WRAP);
         C.r_Sampler("s_position", "$user$position");
 #endif
         C.r_End();
@@ -113,26 +113,26 @@ void CBlender_Particle::Compile(CBlender_Compile& C)
         switch (oBlend.IDselected)
         {
         case 0:
-            C.r_Pass("particle", "particle", FALSE, TRUE, TRUE, FALSE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, 200);
+            C.r_Pass("particle", "particle", FALSE, TRUE, TRUE, FALSE, D3D_BLEND_ONE, D3D_BLEND_ZERO, TRUE, 200);
             break;
         case 1:
-            C.r_Pass("particle-clip", "particle_s-blend", FALSE, TRUE, FALSE, TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_ZERO,
+            C.r_Pass("particle-clip", "particle_s-blend", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_ZERO,
                 TRUE, 0);
             break;
         case 2:
-            C.r_Pass("particle-clip", "particle_s-add", FALSE, TRUE, FALSE, TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_ZERO,
+            C.r_Pass("particle-clip", "particle_s-add", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_ZERO,
                 TRUE, 0);
             break;
         case 3:
-            C.r_Pass("particle-clip", "particle_s-mul", FALSE, TRUE, FALSE, TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_ZERO,
+            C.r_Pass("particle-clip", "particle_s-mul", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_ZERO,
                 TRUE, 0);
             break;
         case 4:
-            C.r_Pass("particle-clip", "particle_s-mul", FALSE, TRUE, FALSE, TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_ZERO,
+            C.r_Pass("particle-clip", "particle_s-mul", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_ZERO,
                 TRUE, 0);
             break;
         case 5:
-            C.r_Pass("particle-clip", "particle_s-aadd", FALSE, TRUE, FALSE, TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_ZERO,
+            C.r_Pass("particle-clip", "particle_s-aadd", FALSE, TRUE, FALSE, TRUE, D3D_BLEND_DEST_COLOR, D3D_BLEND_ZERO,
                 TRUE, 0);
             break;
         };
@@ -141,12 +141,12 @@ void CBlender_Particle::Compile(CBlender_Compile& C)
             C.r_dx11Texture("s_base", C.L_textures[0]);
             u32 hSampler = C.r_dx11Sampler("smp_base");
             if (oClamp.value && (hSampler != (u32)-1))
-                C.i_Address(hSampler, D3DTADDRESS_CLAMP);
+                C.i_Address(hSampler, D3D_TEXTURE_ADDRESS_CLAMP);
             C.r_dx11Texture("s_position", "$user$position");
             C.r_dx11Sampler("smp_nofilter");
         }
 #else
-        C.r_Sampler("s_base", C.L_textures[0], false, oClamp.value ? D3DTADDRESS_CLAMP : D3DTADDRESS_WRAP);
+        C.r_Sampler("s_base", C.L_textures[0], false, oClamp.value ? D3D_TEXTURE_ADDRESS_CLAMP : D3D_TEXTURE_ADDRESS_WRAP);
         C.r_Sampler("s_position", "$user$position");
 #endif
         C.r_End();

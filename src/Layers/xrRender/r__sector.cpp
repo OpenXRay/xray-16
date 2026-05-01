@@ -60,7 +60,7 @@ void CPortal::OnRender()
         RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
             float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
 #endif
-        RCache.dbg_Draw(D3DPT_TRIANGLELIST, &*V.begin(), V.size() / 3);
+        RCache.dbg_Draw(D3D_PT_TRIANGLELIST, &*V.begin(), V.size() / 3);
 
         // draw wire
         V.resize(poly.size()+1); // SkyLoader: change vertex array for wire
@@ -78,7 +78,7 @@ void CPortal::OnRender()
         RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
             float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
 #endif
-        RCache.dbg_Draw(D3DPT_LINESTRIP, &*V.begin(), V.size() - 1);
+        RCache.dbg_Draw(D3D_PT_LINESTRIP, &*V.begin(), V.size() - 1);
         if (bDebug)
             RImplementation.rmNormal(RCache);
         else

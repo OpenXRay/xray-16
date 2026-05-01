@@ -63,7 +63,7 @@ void light::vis_prepare(CBackend& cmd_list)
     if ((flags.type == IRender_Light::SPOT) && flags.bShadow && flags.bVolumetric)
         cmd_list.set_Stencil(FALSE);
     else
-        cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
+        cmd_list.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, 0x01, 0xff, 0x00);
     RImplementation.m_pTarget->draw_volume(cmd_list, this);
     RImplementation.occq_end(vis.query_id);
 }
