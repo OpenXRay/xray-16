@@ -1,5 +1,6 @@
 #pragma once
 #include "Layers/xrRenderDX11/dx11StateUtils.h"
+#include "Layers/xrRenderDX11/dx11SimulatorStateConvert.h"
 
 namespace xray::render::fg
 {
@@ -10,7 +11,7 @@ IDeviceState* dx11StateCache<IDeviceState, StateDecs>::GetState(SimulatorStates&
 {
     StateDecs desc;
     dx11StateUtils::ResetDescription(desc);
-    state_code.UpdateDesc(desc);
+    UpdateDescDX11(state_code, desc);
 
     return GetState(desc);
 
