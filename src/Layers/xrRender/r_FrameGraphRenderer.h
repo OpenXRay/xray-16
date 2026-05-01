@@ -96,11 +96,7 @@ struct CompiledLevelShader {
 namespace fg {
     class GPUCullingManager;
     class FGDetailManager;
-}
-
-namespace ui {
-    class UIRenderCollector;
-    class NVRHIUIRenderer;
+    class FGUIRender;
 }
 
 namespace framegraph {
@@ -257,8 +253,7 @@ public:
     void SetImGuiRendererNVRHI(fg::ImGuiRendererNVRHI* r) { m_imguiRendererNVRHI = r; }
     MaterialCache* GetMaterialCache() const override { return m_materialCache.get(); }
     MaterialCache* GetUIMaterialCache() const override { return m_uiMaterialCache.get(); }
-    ui::UIRenderCollector* GetUICollector() const override { return m_uiCollector.get(); }
-    ui::NVRHIUIRenderer* GetUIRenderer() const override { return m_uiRenderer.get(); }
+    fg::FGUIRender* GetUIRender() const override { return m_uiRender.get(); }
     MaterialCache* GetTextMaterialCache() const override { return m_textMaterialCache.get(); }
     framegraph::VolatileConstantBufferPool* GetTextVCBPool() const { return m_textVCBPool.get(); }
 
@@ -498,8 +493,7 @@ private:
     int m_ptPrevBounces = 0;
     bool m_ptWasEnabled = false;
 
-    xr_unique_ptr<ui::UIRenderCollector> m_uiCollector;
-    xr_unique_ptr<ui::NVRHIUIRenderer> m_uiRenderer;
+    xr_unique_ptr<fg::FGUIRender> m_uiRender;
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_uiVCBPool;
     xr_unique_ptr<MaterialCache> m_uiMaterialCache;
 

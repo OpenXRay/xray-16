@@ -143,10 +143,8 @@ target_sources(xrRender PRIVATE
     Geometry/MaterialCache.cpp
 
     UIGeometryBatch.h
-    UIRenderCollector.h
-    UIRenderCollector.cpp
-    NVRHIUIRenderer.h
-    NVRHIUIRenderer.cpp
+    fgUIRender.h
+    fgUIRender.cpp
 
     r_FrameGraphRenderer.h
     r_FrameGraphRenderer.cpp
