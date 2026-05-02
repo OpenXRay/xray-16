@@ -330,7 +330,6 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/dx11r_constants_cache.cpp
 
     ../xrRenderDX11/blenders/Blender_BmmD_deferred.cpp
-    ../xrRenderDX11/blenders/Blender_Detail_GPU.cpp
     ../xrRenderDX11/blenders/Blender_Editor_Selection.cpp
     ../xrRenderDX11/blenders/Blender_Editor_Wire.cpp
     "../xrRenderDX11/blenders/Blender_Lm(EbB).cpp"
@@ -339,23 +338,9 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/blenders/Blender_Screen_SET.cpp
     ../xrRenderDX11/blenders/Blender_detail_still_deferred.cpp
     ../xrRenderDX11/blenders/Blender_tree_deferred.cpp
-    ../xrRenderDX11/blenders/blender_bloom_build.cpp
-    ../xrRenderDX11/blenders/blender_combine.cpp
     ../xrRenderDX11/blenders/blender_deffer_aref.cpp
     ../xrRenderDX11/blenders/blender_deffer_flat.cpp
     ../xrRenderDX11/blenders/blender_deffer_model.cpp
-    ../xrRenderDX11/blenders/blender_light_direct.cpp
-    ../xrRenderDX11/blenders/blender_light_mask.cpp
-    ../xrRenderDX11/blenders/blender_light_occq.cpp
-    ../xrRenderDX11/blenders/blender_light_point.cpp
-    ../xrRenderDX11/blenders/blender_light_reflected.cpp
-    ../xrRenderDX11/blenders/blender_light_spot.cpp
-    ../xrRenderDX11/blenders/blender_luminance.cpp
-    ../xrRenderDX11/blenders/blender_ssao.cpp
-    ../xrRenderDX11/blenders/dx11HDAOCSBlender.cpp
-    ../xrRenderDX11/blenders/dx11MSAABlender.cpp
-    ../xrRenderDX11/blenders/dx11MinMaxSMBlender.cpp
-    ../xrRenderDX11/blenders/dx11RainBlender.cpp
     ../xrRenderDX11/blenders/uber_deffer.cpp
 
     ../xrRenderDX11/3DFluid/dx113DFluidBlenders.cpp

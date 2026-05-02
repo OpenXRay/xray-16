@@ -130,9 +130,8 @@ bool CResourceManager::GetBlenderProperties(LPCSTR shaderName, BlenderProperties
         outProps.writesDepth = false;
         return true;
     }
-    if (cls == B_DEFAULT || cls == B_VERT || cls == B_LmBmmD || cls == B_LaEmB || cls == B_LmEbB ||
-        cls == B_B || cls == B_BmmD || cls == B_SCREEN_GRAY || cls == B_LIGHT || cls == B_BLUR ||
-        cls == B_SHADOW_TEX || cls == B_SHADOW_WORLD || cls == B_EDITOR_WIRE || cls == B_EDITOR_SEL)
+    if (cls == B_DEFAULT || cls == B_VERT || cls == B_LmBmmD || cls == B_LmEbB
+        || cls == B_B || cls == B_BmmD || cls == B_EDITOR_WIRE || cls == B_EDITOR_SEL)
     {
         outProps.blendMode = BlendMode::Opaque;
         outProps.writesDepth = true;
