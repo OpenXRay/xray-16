@@ -26,17 +26,10 @@ struct SThunderboltDesc;
 struct SThunderboltCollection;
 class CLensFlareDescriptor;
 
-namespace xray::render
+namespace xray::render::fg
 {
-namespace fg
-{
-class dxEnvironmentRender;
+class FGEnvironmentRender;
 }
-namespace render_gl
-{
-class dxEnvironmentRender;
-}
-} // namespace xray::render
 
 #define DAY_LENGTH 86400.f
 
@@ -238,8 +231,7 @@ public:
 
 class ENGINE_API CEnvironment : public xray::editor::ide_tool
 {
-    friend class xray::render::fg::dxEnvironmentRender;
-    friend class xray::render::render_gl::dxEnvironmentRender;
+    friend class xray::render::fg::FGEnvironmentRender;
 
     struct str_pred
     {

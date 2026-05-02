@@ -9,18 +9,10 @@ class ENGINE_API CInifile;
 class ENGINE_API CEnvDescriptorMixer;
 class ENGINE_API CEnvironment;
 
-namespace xray::render
+namespace xray::render::fg
 {
-namespace fg
-{
-class dxLensFlareRender;
 class FGLensFlareRender;
 }
-namespace render_gl
-{
-class dxLensFlareRender;
-}
-} // namespace xray::render
 
 class ENGINE_API CLensFlareDescriptor
 {
@@ -76,9 +68,7 @@ public:
 
 class ENGINE_API CLensFlare
 {
-    friend class xray::render::fg::dxLensFlareRender;
     friend class xray::render::fg::FGLensFlareRender;
-    friend class xray::render::render_gl::dxLensFlareRender;
 
 public:
     enum

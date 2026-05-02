@@ -1,20 +1,15 @@
 #include "stdafx.h"
 #include "dxRenderFactory.h"
 
-#include "dxStatGraphRender.h"
+#include "fgStatGraphRender.h"
 #ifndef _EDITOR
-#include "dxLensFlareRender.h"
 #include "Layers/xrRenderDX11/dxImGuiRender.h"
 #endif
 #ifndef _EDITOR
-#include "dxThunderboltRender.h"
 #include "dxThunderboltDescRender.h"
 #include "fgThunderboltRender.h"
-#include "dxRainRender.h"
 #include "fgRainRender.h"
-#include "dxLensFlareRender.h"
 #include "fgLensFlareRender.h"
-#include "dxEnvironmentRender.h"
 #include "fgEnvironmentRender.h"
 #include "dxObjectSpaceRender.h"
 #endif // _EDITOR
@@ -38,7 +33,15 @@ dxRenderFactory RenderFactoryImpl;
 #ifndef _EDITOR
 RENDER_FACTORY_IMPLEMENT(UISequenceVideoItem)
 RENDER_FACTORY_IMPLEMENT(UIShader)
-RENDER_FACTORY_IMPLEMENT(StatGraphRender)
+IStatGraphRender* dxRenderFactory::CreateStatGraphRender()
+{
+    return xr_new<FGStatGraphRender>();
+}
+void dxRenderFactory::DestroyStatGraphRender(IStatGraphRender* pObject)
+{
+    auto* p = static_cast<FGStatGraphRender*>(pObject);
+    xr_delete(p);
+}
 #ifdef DEBUG
 RENDER_FACTORY_IMPLEMENT(ObjectSpaceRender)
 #endif // DEBUG

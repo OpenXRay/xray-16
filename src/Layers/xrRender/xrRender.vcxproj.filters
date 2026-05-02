@@ -405,18 +405,6 @@
     <ClInclude Include="dxRenderFactory.h">
       <Filter>Interface implementations\RenderFactory</Filter>
     </ClInclude>
-    <ClInclude Include="dxLensFlareRender.h">
-      <Filter>Interface implementations\LensFlare</Filter>
-    </ClInclude>
-    <ClInclude Include="dxRainRender.h">
-      <Filter>Interface implementations\RainRender</Filter>
-    </ClInclude>
-    <ClInclude Include="dxThunderboltRender.h">
-      <Filter>Interface implementations\ThunderboltRender</Filter>
-    </ClInclude>
-    <ClInclude Include="dxEnvironmentRender.h">
-      <Filter>Interface implementations\EnvironmentRender</Filter>
-    </ClInclude>
     <ClInclude Include="dxObjectSpaceRender.h">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>
     </ClInclude>
@@ -425,9 +413,6 @@
     </ClInclude>
     <ClInclude Include="dxWallMarkArray.h">
       <Filter>Interface implementations\WallMarkArray</Filter>
-    </ClInclude>
-    <ClInclude Include="dxStatGraphRender.h">
-      <Filter>Interface implementations\StatGraphRender</Filter>
     </ClInclude>
     <ClInclude Include="dxThunderboltDescRender.h">
       <Filter>Interface implementations\ThunderboltDescRender</Filter>

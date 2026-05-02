@@ -14,24 +14,14 @@
 // refs
 class ENGINE_API IRender_DetailModel;
 
-namespace xray::render
+namespace xray::render::fg
 {
-namespace fg
-{
-class dxRainRender;
 class FGRainRender;
 }
-namespace render_gl
-{
-class dxRainRender;
-}
-} // namespace xray::render
 
 class ENGINE_API CEffect_Rain
 {
-    friend class xray::render::fg::dxRainRender;
     friend class xray::render::fg::FGRainRender;
-    friend class xray::render::render_gl::dxRainRender;
 
 private:
     struct Item
