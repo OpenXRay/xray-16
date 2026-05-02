@@ -97,21 +97,6 @@ SPP::~SPP()
 #endif
 
 
-#if defined(USE_DX11)
-SInputSignature::SInputSignature(ID3DBlob* pBlob)
-{
-    VERIFY(pBlob);
-    signature = pBlob;
-    signature->AddRef();
-};
-
-SInputSignature::~SInputSignature()
-{
-    _RELEASE(signature);
-    RImplementation.Resources->_DeleteInputSignature(this);
-}
-#endif
-
 SState::~SState()
 {
     auto* p = static_cast<ID3DState*>(state);
