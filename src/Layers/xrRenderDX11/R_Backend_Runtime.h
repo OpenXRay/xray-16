@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommonTypes.h"
+
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/SH_Matrix.h"
 #include "Layers/xrRender/SH_Constant.h"

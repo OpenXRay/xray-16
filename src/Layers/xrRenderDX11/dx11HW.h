@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CommonTypes.h"
 #include "xrCore/ModuleLookup.hpp"
 
 #include "Layers/xrRender/HWCaps.h"

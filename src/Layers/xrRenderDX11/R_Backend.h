@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommonTypes.h"
+
 #ifdef RBackend_PGO
 #define PGO(a) a
 #else
