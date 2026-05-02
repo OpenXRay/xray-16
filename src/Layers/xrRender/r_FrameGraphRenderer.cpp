@@ -26,6 +26,7 @@
 #include "xrEngine/device.h"
 #include <imgui.h>
 
+#include "FrameGraphPasses/DebugDrawPassSetup.h"
 #include "FrameGraphPasses/HiZBuildPassSetup.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "GPUCullingManager.h"
@@ -93,7 +94,6 @@
 #include "Layers/xrRender/PSLibrary.h"
 #include "Layers/xrRender/Decals/fgWallMarkArray.h"
 #include "Layers/xrRender/Decals/MeshPicker.h"
-#include "Layers/xrRenderDX11/DetailManager.h"
 #include "xrEngine/IGameFont.hpp"
 #include "xrEngine/IPerformanceAlert.hpp"
 #include "xrCore/PostProcess/PPInfo.hpp"
@@ -600,7 +600,8 @@ void FrameGraphRenderer::RenderMenu() {
     auto sceneWithUI = passes::setupUIPass(*m_framegraph, backgroundTarget, width, height);
     sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height, m_blackboard->get_or_add<passes::UITextPassState>());
     sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
-    
+    sceneWithUI = passes::setupDebugDrawPass(*m_framegraph, sceneWithUI, width, height);
+
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
         m_device,
@@ -1615,6 +1616,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width,
         height
     );
+
+    sceneWithUI = passes::setupDebugDrawPass(*m_framegraph, sceneWithUI, width, height);
 
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
@@ -2761,8 +2764,6 @@ void FrameGraphRenderer::OnCameraUpdated()
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
     m_pProcessHOMTask = &m_HOM.DispatchMTRender();
-    if (m_pDetailManager)
-        m_pDetailManager->DispatchMTCalc();
 }
 
 namespace
@@ -3010,15 +3011,6 @@ void FrameGraphRenderer::reset_begin()
     }
     m_Lights_LastFrame.clear();
 
-    if (b_loaded && m_pDetailManager &&
-        (dm_current_size != dm_size ||
-         !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
-         !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
-    {
-        m_pDetailManager->Unload();
-        xr_delete(m_pDetailManager);
-    }
-
     xr_delete(m_pTarget);
     m_HWOCC.occq_destroy();
 }
@@ -3028,15 +3020,6 @@ void FrameGraphRenderer::reset_end()
     ZoneScoped;
     m_HWOCC.occq_create(occq_size);
     m_pTarget = xr_new<fg::CRenderTarget>();
-
-    if (b_loaded && !m_pDetailManager &&
-        (dm_current_size != dm_size ||
-         !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
-         !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
-    {
-        m_pDetailManager = xr_new<fg::CDetailManager>();
-        m_pDetailManager->Load();
-    }
 
     m_bFirstFrameAfterReset = true;
 }
@@ -3087,8 +3070,6 @@ void FrameGraphRenderer::Screenshot(IRender::ScreenshotMode mode, pcstr name)
 
 void FrameGraphRenderer::RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type)
 {
-    if (m_pDetailManager)
-        m_pDetailManager->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
 }
 
 void FrameGraphRenderer::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)

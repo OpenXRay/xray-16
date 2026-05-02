@@ -8,6 +8,7 @@
 #include "xrCDB/Intersect.hpp"
 #include "Layers/xrRender/r__buffer_pool.h"
 #include "Layers/xrRender/ModelPool.h"
+#include "Layers/xrRender/FGDebugDraw.h"
 
 #ifndef _EDITOR
 #include "xrServerEntities/smart_cast.h"
@@ -88,12 +89,12 @@ void CKinematics::DebugRender(Fmatrix& XFORM)
         Fvector P1, P2;
         M1.transform_tiny(P1, Z);
         M2.transform_tiny(P2, Z);
-        RCache.dbg_DrawLINE(XFORM, P1, P2, color_xrgb(0, 255, 0));
+        g_debug_draw.DrawLine(XFORM, P1, P2, color_xrgb(0, 255, 0));
 
         Fmatrix M;
         M.mul_43(XFORM, M2);
-        RCache.dbg_DrawOBB(M, H1, color_xrgb(255, 255, 255));
-        RCache.dbg_DrawOBB(M, H2, color_xrgb(255, 255, 255));
+        g_debug_draw.DrawOBB(M, H1, color_xrgb(255, 255, 255));
+        g_debug_draw.DrawOBB(M, H2, color_xrgb(255, 255, 255));
     }
 
     for (u32 b = 0; b < bones->size(); b++)
@@ -106,7 +107,7 @@ void CKinematics::DebugRender(Fmatrix& XFORM)
         X.mul(Mbone, Mbox);
         Fmatrix W;
         W.mul(XFORM, X);
-        RCache.dbg_DrawOBB(W, obb.m_halfsize, color_xrgb(0, 0, 255));
+        g_debug_draw.DrawOBB(W, obb.m_halfsize, color_xrgb(0, 0, 255));
     }
 }
 #endif

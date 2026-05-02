@@ -457,8 +457,6 @@ void CBackend::OnDeviceCreate()
 
 void CBackend::OnDeviceDestroy()
 {
-    DestroyDebugDraw();
-
 #if defined(USE_DX11)
     StateManager.Reset();
 #endif

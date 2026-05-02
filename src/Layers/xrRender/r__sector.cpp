@@ -8,6 +8,7 @@
 #include "xrEngine/xr_object.h"
 #include "FBasicVisual.h"
 #include "Layers/xrRender/r__buffer_pool.h"
+#include "Layers/xrRender/FGDebugDraw.h"
 #include "xrEngine/IGame_Persistent.h"
 
 namespace xray::render::fg
@@ -60,7 +61,7 @@ void CPortal::OnRender()
         RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
             float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
 #endif
-        RCache.dbg_Draw(nvrhi::PrimitiveType::TriangleList, &*V.begin(), V.size() / 3);
+        g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, &*V.begin(), V.size() / 3);
 
         // draw wire
         V.resize(poly.size()+1); // SkyLoader: change vertex array for wire
@@ -78,7 +79,7 @@ void CPortal::OnRender()
         RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
             float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
 #endif
-        RCache.dbg_Draw(nvrhi::PrimitiveType::LineStrip, &*V.begin(), V.size() - 1);
+        g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, &*V.begin(), V.size() - 1);
         if (bDebug)
             RImplementation.rmNormal(RCache);
         else

@@ -97,6 +97,7 @@
     <ClInclude Include="FrameGraphPasses\SkinningPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\ImGuiPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\StatGraphPassSetup.h"/>
+    <ClInclude Include="FrameGraphPasses\DebugDrawPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\RainPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\ThunderboltPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\LensFlarePassSetup.h"/>
@@ -137,6 +138,7 @@
     <ClInclude Include="FrameGraphPasses\ReSTIRGIPassSetup.h"/>
     <ClInclude Include="RayTracing\RTAccelStructManager.h"/>
     <ClInclude Include="FGDetailManager.h"/>
+    <ClInclude Include="FGDebugDraw.h"/>
     <ClInclude Include="..\..\..\Externals\meshoptimizer\src\meshoptimizer.h"/>
     <ClInclude Include="ImGuiRendererNVRHI.h"/>
     <ClInclude Include="dxObjectSpaceRender.h"/>
@@ -296,7 +298,6 @@
     <ClInclude Include="..\xrRenderDX11\blenders\Blender_Particle.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\Blender_Screen_SET.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\Blender_tree.h"/>
-    <ClInclude Include="..\xrRenderDX11\DetailManager.h"/>
     <ClInclude Include="..\xrRenderDX11\dxImGuiRender.h"/>
     <ClInclude Include="..\xrRenderDX11\ResourceManager.h"/>
     <ClInclude Include="..\xrRenderDX11\R_Backend.h"/>
@@ -357,6 +358,7 @@
     <ClCompile Include="FrameGraphPasses\SkinningPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\ImGuiPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\StatGraphPassSetup.cpp"/>
+    <ClCompile Include="FrameGraphPasses\DebugDrawPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\RainPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\ThunderboltPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\LensFlarePassSetup.cpp"/>
@@ -395,6 +397,7 @@
     <ClCompile Include="FrameGraphPasses\ReSTIRGIPassSetup.cpp"/>
     <ClCompile Include="RayTracing\RTAccelStructManager.cpp"/>
     <ClCompile Include="FGDetailManager.cpp"/>
+    <ClCompile Include="FGDebugDraw.cpp"/>
     <ClCompile Include="ImGuiRendererNVRHI.cpp"/>
     <ClCompile Include="ImGuiRendererNVRHI_Shaders.cpp"/>
     <ClCompile Include="ImGuiRendererNVRHI_Render.cpp"/>
@@ -565,12 +568,6 @@
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R2.cpp"/>
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp"/>
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_StandartBinding.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\DetailManager.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\DetailManager_CACHE.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\DetailManager_Decompress.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\DetailManager_VS.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\DetailManager_soft.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\R_Backend_DBG.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_LOD.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_Runtime.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_hemi.cpp"/>
@@ -605,7 +602,6 @@
     <ClCompile Include="..\xrRenderDX11\xrRender_console.cpp"/>
     <ClCompile Include="xr_effgamma.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11HW.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11HWCaps.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Resources.cpp"/>

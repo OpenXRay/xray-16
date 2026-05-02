@@ -3,6 +3,7 @@
 #ifdef DEBUG
 
 #include "Layers/xrRender/dxObjectSpaceRender.h"
+#include "Layers/xrRender/FGDebugDraw.h"
 
 namespace xray::render::fg
 {
@@ -21,10 +22,10 @@ void dxObjectSpaceRender::dbgRender()
         Fobb& obb = q_debug.boxes[i];
         Fmatrix X, S, R;
         obb.xform_get(X);
-        RCache.dbg_DrawOBB(X, obb.m_halfsize, color_xrgb(255, 0, 0));
+        g_debug_draw.DrawOBB(X, obb.m_halfsize, color_xrgb(255, 0, 0));
         S.scale(obb.m_halfsize);
         R.mul(X, S);
-        RCache.dbg_DrawEllipse(R, color_xrgb(0, 0, 255));
+        g_debug_draw.DrawEllipse(R, color_xrgb(0, 0, 255));
     }
     q_debug.boxes.clear();
 
@@ -35,7 +36,7 @@ void dxObjectSpaceRender::dbgRender()
         Fmatrix M;
         M.scale(S.R, S.R, S.R);
         M.translate_over(S.P);
-        RCache.dbg_DrawEllipse(M, P.second);
+        g_debug_draw.DrawEllipse(M, P.second);
     }
     dbg_S.clear();
 }
