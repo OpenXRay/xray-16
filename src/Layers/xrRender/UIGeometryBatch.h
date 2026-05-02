@@ -3,6 +3,7 @@
 #include "xrCore/xr_types.h"
 #include "xrCommon/xr_vector.h"
 #include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/fgUIShader.h"
 
 namespace xray::render::ui
 {
@@ -13,8 +14,9 @@ struct UIVertex
     float x, y, z, w;
     u32 color;
     float u, v;
+    u32 texIndex;
 
-    void set(float _x, float _y, float _z, u32 _color, float _u, float _v)
+    void set(float _x, float _y, float _z, u32 _color, float _u, float _v, u32 _texIndex)
     {
         x = _x;
         y = _y;
@@ -23,6 +25,7 @@ struct UIVertex
         color = _color;
         u = _u;
         v = _v;
+        texIndex = _texIndex;
     }
 };
 
@@ -125,24 +128,21 @@ public:
         }
     }
 
-    bool CanMergeWith(IUIShader* otherShader, int otherAlphaRef, bool otherScissor,
-                      const Irect* otherScissorRect, int otherCullMode) const
+    bool CanMergeWith(IUIShader* incomingShader, int incomingAlphaRef, bool incomingScissor,
+                      const Irect* incomingScissorRect, int incomingCullMode) const
     {
-        if (uiShader != otherShader)
-            return false;
-        if (alphaRef != otherAlphaRef)
-            return false;
-        if (hasScissor != otherScissor)
-            return false;
-        if (hasScissor && otherScissor)
-        {
-            if (memcmp(&scissorRect, otherScissorRect, sizeof(Irect)) != 0)
+        if (alphaRef != incomingAlphaRef) return false;
+        if (hasScissor != incomingScissor) return false;
+        if (hasScissor && incomingScissor) {
+            if (memcmp(&scissorRect, incomingScissorRect, sizeof(Irect)) != 0)
                 return false;
         }
-        if (cullMode != otherCullMode)
-            return false;
+        if (cullMode != incomingCullMode) return false;
 
-        return true;
+        auto* current = static_cast<fgUIShader*>(uiShader);
+        auto* incoming = static_cast<fgUIShader*>(incomingShader);
+        if (!current || !incoming) return uiShader == incomingShader;
+        return current->SamePipelineAs(*incoming);
     }
 };
 

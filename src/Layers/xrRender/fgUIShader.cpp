@@ -6,6 +6,7 @@
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "xrEngine/IRenderBackend.h"
 
 using namespace xray::render::resources;
 
@@ -59,8 +60,31 @@ void fgUIShader::create(LPCSTR sh, LPCSTR tex)
     }
 }
 
+u32 fgUIShader::GetBindlessIndex()
+{
+    if (m_bindlessTextureIndex != UINT32_MAX)
+        return m_bindlessTextureIndex;
+    if (!m_baseTexture)
+        return UINT32_MAX;
+    auto* texManager = RImplementation.GetRenderDevice()->GetFGResourceManager()->GetTextureManager();
+    auto handle = texManager->LoadTexture(m_baseTexture->cName.c_str());
+    if (!handle.IsValid())
+        return UINT32_MAX;
+    nvrhi::ITexture* nvTex = texManager->GetNVRHITexture(handle);
+    if (!nvTex)
+        return UINT32_MAX;
+    if (!GEnv.Backend)
+        return UINT32_MAX;
+    m_bindlessTextureIndex = GEnv.Backend->RegisterBindlessTexture(nvTex);
+    return m_bindlessTextureIndex;
+}
+
 void fgUIShader::destroy()
 {
+    if (m_bindlessTextureIndex != UINT32_MAX && GEnv.Backend) {
+        GEnv.Backend->UnregisterBindlessTexture(m_bindlessTextureIndex);
+        m_bindlessTextureIndex = UINT32_MAX;
+    }
     m_vsHandle = nullptr;
     m_psHandle = nullptr;
     m_baseTexture = nullptr;

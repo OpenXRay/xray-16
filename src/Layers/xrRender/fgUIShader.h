@@ -32,6 +32,14 @@ public:
     bool GetBaseTextureResolution(Fvector2& res) override;
     xrImTextureData GetImGuiTextureId() override;
 
+    u32 GetBindlessIndex();
+
+    bool SamePipelineAs(const fgUIShader& other) const
+    {
+        return m_vsHandle.Get() == other.m_vsHandle.Get()
+            && m_psHandle.Get() == other.m_psHandle.Get();
+    }
+
     ref_shader hShader;
 
     nvrhi::ShaderHandle m_vsHandle;
@@ -39,6 +47,7 @@ public:
     framegraph::ExtractedReflection* m_vsReflection = nullptr;
     framegraph::ExtractedReflection* m_psReflection = nullptr;
     CTexture* m_baseTexture = nullptr;
+    u32 m_bindlessTextureIndex = UINT32_MAX;
 
     shared_str baseTexture{ "s_base" };
 };

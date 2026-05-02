@@ -611,8 +611,6 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     return matPSO->vsBindingSet;
 }
 
-
-
 u32 MaterialCache::GetVertexFormatID(dxRender_Visual* visual)
 {
     if (!visual)
@@ -686,17 +684,10 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
                      (reinterpret_cast<uintptr_t>(dxShader->m_psHandle.Get()) << 1);
     }
 
-    u64 textureHash = 0;
-    if (dxShader->m_baseTexture && dxShader->m_baseTexture->cName.size() > 0) {
-        textureHash = std::hash<xr_string>{}(xr_string(dxShader->m_baseTexture->cName.c_str()));
-    }
-
-    u64 combinedHash = shaderHash ^ (textureHash << 2);
-
     MaterialKey key;
     key.psoType = PSOType::UI;
     key.shader = nullptr;
-    key.textureHash = combinedHash;
+    key.textureHash = shaderHash;
     key.element = elementIndex;
     key.framebuffer = framebuffer;
 
@@ -769,26 +760,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
             pso->constantBuffers.push_back(cbInfo);
         }
 
-        for (const auto& tex : dxShader->m_psReflection->rtBindings.inputTextures) {
-            if (xr_strcmp(tex.name.c_str(), "s_base") != 0)
-                continue;
-
-            CTexture* baseTexture = dxShader->GetBaseTexture();
-            if (baseTexture) {
-                resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
-                resources::TextureHandle texHandle = texManager->LoadTexture(baseTexture->cName.c_str());
-
-                if (!texHandle.IsValid()) {
-                    Msg("! [MaterialCache::CreateUIPSO] Failed to load texture: %s", baseTexture->cName.c_str());
-                } else {
-                    MaterialPSO::TextureSlot texSlot;
-                    texSlot.slot = tex.slot;
-                    texSlot.handle = texHandle;
-                    pso->textures.push_back(texSlot);
-                }
-            }
-        }
-
         for (const auto& samp : dxShader->m_psReflection->rtBindings.samplers) {
             MaterialPSO::SamplerInfo sampInfo;
             sampInfo.name = samp.name.c_str();
@@ -837,7 +808,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     }
 
     xr_map<shared_str, nvrhi::BufferHandle> createdBuffers;
-
     for (auto& cbInfo : pso->constantBuffers) {
         auto it = createdBuffers.find(cbInfo.name);
         if (it != createdBuffers.end()) {
@@ -878,31 +848,34 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         u32 offset;
     };
 
-    std::map<std::string, VertexElement> uiVertexLayout;
-    uiVertexLayout["POSITION"]  = {nvrhi::Format::RGBA32_FLOAT, 0};
-    uiVertexLayout["POSITIONT"] = {nvrhi::Format::RGBA32_FLOAT, 0};
-    uiVertexLayout["COLOR"]     = {nvrhi::Format::RGBA8_UNORM, 16};
-    uiVertexLayout["TEXCOORD"]  = {nvrhi::Format::RG32_FLOAT, 20};
+    auto resolveUISemantic = [](const std::string& sem, u32 idx) -> std::optional<VertexElement> {
+        if (sem == "POSITION" || sem == "POSITIONT") return VertexElement{nvrhi::Format::RGBA32_FLOAT, 0};
+        if (sem == "COLOR")                          return VertexElement{nvrhi::Format::RGBA8_UNORM, 16};
+        if (sem == "TEXCOORD") {
+            if (idx == 0) return VertexElement{nvrhi::Format::RG32_FLOAT, 20};
+            if (idx == 1) return VertexElement{nvrhi::Format::R32_UINT, 28};
+        }
+        return std::nullopt;
+    };
 
     Msg("  [CreateUIPSO] Building vertex attributes from %u signature elements:", pso->vsInputSignature.elements.size());
     for (const auto& shaderElem : pso->vsInputSignature.elements) {
         std::string semantic = shaderElem.semanticName.c_str();
-
-        auto it = uiVertexLayout.find(semantic);
-        if (it == uiVertexLayout.end()) {
-            Msg("! [MaterialCache::CreateUIPSO] Unknown UI vertex semantic: %s", semantic.c_str());
+        auto resolved = resolveUISemantic(semantic, shaderElem.semanticIndex);
+        if (!resolved) {
+            Msg("! [MaterialCache::CreateUIPSO] Unknown UI vertex semantic: %s%u", semantic.c_str(), shaderElem.semanticIndex);
             continue;
         }
 
         fg::VertexAttribute attr;
         attr.semanticName = shaderElem.semanticName.c_str();
         attr.semanticIndex = shaderElem.semanticIndex;
-        attr.format = it->second.format;
-        attr.offset = it->second.offset;
+        attr.format = resolved->format;
+        attr.offset = resolved->offset;
         attr.bufferIndex = 0;
         attr.elementStride = 0;
 
-        Msg("    attr[%u]: semantic='%s' format=%d offset=%u", (u32)psoDesc.vertexAttributes.size(), semantic.c_str(), (int)attr.format, attr.offset);
+        Msg("    attr[%u]: semantic='%s%u' format=%d offset=%u", (u32)psoDesc.vertexAttributes.size(), semantic.c_str(), shaderElem.semanticIndex, (int)attr.format, attr.offset);
         psoDesc.vertexAttributes.push_back(attr);
     }
 
@@ -960,6 +933,11 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     }
     if (pso->psBindingLayout) {
         psoDesc.bindingLayouts.push_back(pso->psBindingLayout);
+    }
+
+    nvrhi::IBindingLayout* bindlessLayout = GEnv.Backend ? GEnv.Backend->GetBindlessLayout() : nullptr;
+    if (bindlessLayout) {
+        psoDesc.bindingLayouts.push_back(nvrhi::BindingLayoutHandle(bindlessLayout));
     }
 
     if (psoDesc.bindingLayouts.empty()) {
