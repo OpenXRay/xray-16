@@ -46,3 +46,6 @@
 [submodule "Externals/protobuf"]
 	path = Externals/protobuf
 	url = https://github.com/protocolbuffers/protobuf.git
+[submodule "Externals/SDL"]
+	path = Externals/SDL
+	url = https://github.com/libsdl-org/SDL.git
