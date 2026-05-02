@@ -299,6 +299,9 @@
     <ClInclude Include="r__sector.h">
       <Filter>Visibility\Sector/Portal</Filter>
     </ClInclude>
+    <ClInclude Include="r__scene.h">
+      <Filter>Visibility\Sector/Portal</Filter>
+    </ClInclude>
     <ClInclude Include="HOM.h">
       <Filter>Visibility\HOM Occlusion</Filter>
     </ClInclude>
@@ -882,7 +885,7 @@
     <ClCompile Include="FGRenderBase.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="r__sector_detect.cpp">
+    <ClCompile Include="r__scene.cpp">
       <Filter>Visibility\Sector/Portal</Filter>
     </ClCompile>
     <ClCompile Include="SkeletonXSkinXW_CPP.cpp">

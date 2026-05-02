@@ -7,7 +7,7 @@
 #include "Layers/xrRenderDX11/blenders/Blender_Particle.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
-#include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/r__scene.h"
 
 namespace xray::render::shader_info
 {
@@ -114,10 +114,10 @@ namespace xray::render::scene_info
 {
 const xr_vector<xray::render::fg::CSector*>& GetSceneSectors()
 {
-    return fg::RImplementation.get_imm_context().Sectors;
+    return xray::render::fg::Scene.Sectors;
 }
 u32 GetPortalTraversalMarker()
 {
-    return fg::RImplementation.get_imm_context().PortalTraverser.i_marker;
+    return xray::render::fg::Scene.PortalTraverser.i_marker;
 }
 }

@@ -54,11 +54,6 @@ struct R_dsgraph_structure
     R_dsgraph::mapSorted_T mapHUDEmissive;
 #endif
 
-    xr_vector<CSector*> Sectors;
-    xr_vector<CPortal*> Portals;
-    CPortalTraverser PortalTraverser;
-    xrXRC Sectors_xrc;
-
     // Runtime structures
     xr_vector<R_dsgraph::mapNormal_T::value_type*> nrmPasses;
     xr_vector<R_dsgraph::mapMatrix_T::value_type*> matPasses;
@@ -84,7 +79,7 @@ struct R_dsgraph_structure
     }
     void clear_Counters() { counter_S = counter_D = 0; }
 
-    R_dsgraph_structure() : Sectors_xrc("dsgraph")
+    R_dsgraph_structure()
     {
         r_pmask(true, true);
     };
@@ -139,22 +134,6 @@ struct R_dsgraph_structure
         o.pmask[1] = _2;
         o.pmask_wmark = _wm;
     }
-
-    void load(const xr_vector<CSector::level_sector_data_t> &sectors, const xr_vector<CPortal::level_portal_data_t> &portals);
-    void unload();
-
-    ICF IRender_Portal* get_portal(size_t id) const
-    {
-        VERIFY(id < Portals.size());
-        return Portals[id];
-    }
-    ICF IRender_Sector* get_sector(size_t id) const
-    {
-        VERIFY(id < Sectors.size());
-        return Sectors[id];
-    }
-    IRender_Sector::sector_id_t detect_sector(const Fvector& P);
-    IRender_Sector::sector_id_t detect_sector(const Fvector& P, Fvector& D);
 
     void add_static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);
     void add_leafs_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform); // if detected node's full visibility
