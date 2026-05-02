@@ -44,6 +44,7 @@ struct	v_TL_positiont
     float4	P : POSITIONT;
     float2	Tex0 : TEXCOORD0;
     float4	Color : COLOR;
+    uint	TexIdx : TEXCOORD1;
 };
 
 struct	v_TL
@@ -51,12 +52,14 @@ struct	v_TL
     float4	P : POSITION;
     float2	Tex0 : TEXCOORD0;
     float4	Color : COLOR;
+    uint	TexIdx : TEXCOORD1;
 };
 
 struct	v2p_TL
 {
     float2 	Tex0 : TEXCOORD0;
     float4	Color : COLOR;
+    nointerpolation uint TexIdx : TEXCOORD1;
     float4 	HPos : SV_Position;	// Clip-space position 	(for rasterization)
 };
 
@@ -64,7 +67,7 @@ struct	p_TL
 {
     float2 	Tex0 : TEXCOORD0;
     float4	Color : COLOR;
-    //	float4 	HPos	: SV_Position;	// Clip-space position 	(for rasterization)
+    nointerpolation uint TexIdx : TEXCOORD1;
 };
 
 ////////////////////////////////////////////////////////////////

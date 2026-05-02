@@ -750,8 +750,6 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     return matPSO->vsBindingSet;
 }
 
-
-
 // D3D12: Extract vertex format ID from visual's geometry
 u32 MaterialCache::GetVertexFormatID(dxRender_Visual* visual)
 {
@@ -852,31 +850,16 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
     if (!dxShader)
         return nullptr;
 
-    // Create cache key using VS/PS handle pointers + texture name
-    // ShaderLoader caches shaders internally, so same shader bytecode = same handle pointer
-    // Example: All UI elements using "hud\default" share the same VS/PS handles
-    // Only the texture differs, so we hash: (VS ptr, PS ptr, texture name)
-
     u64 shaderHash = 0;
     if (dxShader->m_vsHandle && dxShader->m_psHandle) {
-        // Combine VS pointer + PS pointer into hash
         shaderHash = reinterpret_cast<uintptr_t>(dxShader->m_vsHandle.Get()) ^
                      (reinterpret_cast<uintptr_t>(dxShader->m_psHandle.Get()) << 1);
     }
 
-    // Hash texture name (what actually differs between UI shader instances)
-    u64 textureHash = 0;
-    if (dxShader->m_baseTexture && dxShader->m_baseTexture->cName.size() > 0) {
-        textureHash = std::hash<xr_string>{}(xr_string(dxShader->m_baseTexture->cName.c_str()));
-    }
-
-    // Combine shader hash + texture hash
-    u64 combinedHash = shaderHash ^ (textureHash << 2);
-
     MaterialKey key;
     key.psoType = PSOType::UI;
-    key.shader = nullptr;  // Not used for UI
-    key.textureHash = combinedHash;  // VS/PS handles + texture name
+    key.shader = nullptr;
+    key.textureHash = shaderHash;
     key.element = elementIndex;
     key.framebuffer = framebuffer;
 
@@ -958,32 +941,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
             pso->constantBuffers.push_back(cbInfo);
         }
 
-        // Extract PS textures from rtBindings and load them
-        for (const auto& tex : dxShader->m_psReflection->rtBindings.inputTextures) {
-            // Load texture from UI shader
-            // For UI shaders, s_base is the main texture (from the shader's "tex" parameter)
-            if (xr_strcmp(tex.name.c_str(), "s_base") != 0)
-                continue;
-
-            CTexture* baseTexture = dxShader->GetBaseTexture();
-            if (baseTexture) {
-                // Get NVRHI texture handle from texture manager (it will load the texture if needed)
-                resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
-                resources::TextureHandle texHandle = texManager->LoadTexture(baseTexture->cName.c_str());
-
-                if (!texHandle.IsValid()) {
-                    Msg("! [MaterialCache::CreateUIPSO] Failed to load texture: %s", baseTexture->cName.c_str());
-                } else {
-                    // Only add to textures list if we successfully loaded it
-                    MaterialPSO::TextureSlot texSlot;
-                    texSlot.slot = tex.slot;
-                    texSlot.handle = texHandle;
-                    pso->textures.push_back(texSlot);
-                }
-            }
-        }
-
-        // Extract PS samplers from rtBindings and create NVRHI sampler objects
         for (const auto& samp : dxShader->m_psReflection->rtBindings.samplers) {
             MaterialPSO::SamplerInfo sampInfo;
             sampInfo.name = samp.name.c_str();
@@ -1036,20 +993,14 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         }
     }
 
-    // Create NVRHI buffers for all constant buffers
-    // Group constant buffers by name to create shared buffers for VS+PS
     xr_map<shared_str, nvrhi::BufferHandle> createdBuffers;
-
     for (auto& cbInfo : pso->constantBuffers) {
-        // Check if we already created a buffer for this CB name
         auto it = createdBuffers.find(cbInfo.name);
         if (it != createdBuffers.end()) {
-            // Reuse existing buffer
             cbInfo.nvrhiBuffer = it->second;
             continue;
         }
 
-        // Create new buffer
         nvrhi::BufferDesc bufferDesc;
         bufferDesc.byteSize = cbInfo.size;
         bufferDesc.isConstantBuffer = true;
@@ -1089,37 +1040,39 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         return nullptr;
     }
 
-    // Map semantic -> (format, offset) for UIVertex structure
     struct VertexElement {
         nvrhi::Format format;
         u32 offset;
     };
 
-    std::map<std::string, VertexElement> uiVertexLayout;
-    uiVertexLayout["POSITION"]  = {nvrhi::Format::RGBA32_FLOAT, 0};   // float4 at offset 0 (16 bytes)
-    uiVertexLayout["POSITIONT"] = {nvrhi::Format::RGBA32_FLOAT, 0};   // Alias for POSITION
-    uiVertexLayout["COLOR"]     = {nvrhi::Format::RGBA8_UNORM, 16};   // u32 at offset 16 (4 bytes)
-    uiVertexLayout["TEXCOORD"]  = {nvrhi::Format::RG32_FLOAT, 20};    // float2 at offset 20 (8 bytes)
+    auto resolveUISemantic = [](const std::string& sem, u32 idx) -> std::optional<VertexElement> {
+        if (sem == "POSITION" || sem == "POSITIONT") return VertexElement{nvrhi::Format::RGBA32_FLOAT, 0};
+        if (sem == "COLOR")                          return VertexElement{nvrhi::Format::RGBA8_UNORM, 16};
+        if (sem == "TEXCOORD") {
+            if (idx == 0) return VertexElement{nvrhi::Format::RG32_FLOAT, 20};
+            if (idx == 1) return VertexElement{nvrhi::Format::R32_UINT, 28};
+        }
+        return std::nullopt;
+    };
 
     Msg("  [CreateUIPSO] Building vertex attributes from %u signature elements:", pso->vsInputSignature.elements.size());
     for (const auto& shaderElem : pso->vsInputSignature.elements) {
         std::string semantic = shaderElem.semanticName.c_str();
-
-        auto it = uiVertexLayout.find(semantic);
-        if (it == uiVertexLayout.end()) {
-            Msg("! [MaterialCache::CreateUIPSO] Unknown UI vertex semantic: %s", semantic.c_str());
+        auto resolved = resolveUISemantic(semantic, shaderElem.semanticIndex);
+        if (!resolved) {
+            Msg("! [MaterialCache::CreateUIPSO] Unknown UI vertex semantic: %s%u", semantic.c_str(), shaderElem.semanticIndex);
             continue;
         }
 
         fg::VertexAttribute attr;
         attr.semanticName = shaderElem.semanticName.c_str();
         attr.semanticIndex = shaderElem.semanticIndex;
-        attr.format = it->second.format;
-        attr.offset = it->second.offset;
+        attr.format = resolved->format;
+        attr.offset = resolved->offset;
         attr.bufferIndex = 0;
         attr.elementStride = 0;
 
-        Msg("    attr[%u]: semantic='%s' format=%d offset=%u", (u32)psoDesc.vertexAttributes.size(), semantic.c_str(), (int)attr.format, attr.offset);
+        Msg("    attr[%u]: semantic='%s%u' format=%d offset=%u", (u32)psoDesc.vertexAttributes.size(), semantic.c_str(), shaderElem.semanticIndex, (int)attr.format, attr.offset);
         psoDesc.vertexAttributes.push_back(attr);
     }
 
@@ -1188,6 +1141,11 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     }
     if (pso->psBindingLayout) {
         psoDesc.bindingLayouts.push_back(pso->psBindingLayout);
+    }
+
+    nvrhi::IBindingLayout* bindlessLayout = GEnv.Backend ? GEnv.Backend->GetBindlessLayout() : nullptr;
+    if (bindlessLayout) {
+        psoDesc.bindingLayouts.push_back(nvrhi::BindingLayoutHandle(bindlessLayout));
     }
 
     if (psoDesc.bindingLayouts.empty()) {

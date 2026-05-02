@@ -19,6 +19,7 @@ v2p_TL main ( v_TL_positiont I )
 
 	O.Tex0 = I.Tex0;
 	O.Color = I.Color.bgra;	//	swizzle vertex colour
+	O.TexIdx = I.TexIdx;
 
  	return O;
 }

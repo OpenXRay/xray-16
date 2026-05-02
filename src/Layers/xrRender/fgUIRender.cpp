@@ -7,6 +7,7 @@
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/fgUIShader.h"
 #include "Layers/xrRender/HWCaps.h"
+#include "xrEngine/IRenderBackend.h"
 
 namespace xray::render::fg
 {
@@ -52,8 +53,12 @@ void FGUIRender::PushPoint(float x, float y, float z, u32 C, float u, float v)
     VERIFY(m_primitiveType != ptNone);
     VERIFY(m_currentVertices.size() < m_maxVerts);
 
+    u32 texIdx = UINT32_MAX;
+    if (auto* dxShader = static_cast<fgUIShader*>(m_currentUIShader))
+        texIdx = dxShader->GetBindlessIndex();
+
     UIVertex vert;
-    vert.set(x, y, z, C, u, v);
+    vert.set(x, y, z, C, u, v, texIdx);
     m_currentVertices.push_back(vert);
 }
 
@@ -280,7 +285,6 @@ void FGUIRender::RenderBatchWithShader(nvrhi::ICommandList* cmdList, const UIGeo
         return;
 
     m_matCache->GetOrCreateBindingSet(pso);
-
     if (!pso->vsBindingSet)
         return;
 
@@ -293,6 +297,8 @@ void FGUIRender::RenderBatchWithShader(nvrhi::ICommandList* cmdList, const UIGeo
     state.addBindingSet(pso->vsBindingSet);
     if (pso->psBindingSet)
         state.addBindingSet(pso->psBindingSet);
+    if (auto* bindlessTable = GEnv.Backend ? GEnv.Backend->GetBindlessDescriptorTable() : nullptr)
+        state.addBindingSet(bindlessTable);
 
     nvrhi::VertexBufferBinding vbBinding;
     vbBinding.buffer = m_vertexBuffer;
