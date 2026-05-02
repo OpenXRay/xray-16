@@ -15,9 +15,6 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
-#include "Layers/xrRenderDX11/dx11ComputeTest.h"
-#include "Layers/xrRenderDX11/dx11ComputeTest_Matrices.h"
-#include "Layers/xrRenderDX11/dx11ComputeTest_SIMD.h"
 #endif
 
 #if (RENDER == R_R3) || (RENDER == R_R4)
@@ -613,91 +610,6 @@ public:
     }
 };
 
-#if defined(USE_DX11)
-class CCC_TestComputeVector final : public IConsole_Command
-{
-public:
-    CCC_TestComputeVector(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = false; }
-
-    void Execute(pcstr args) override
-    {
-        int iteration_count = 10;  // Default: 10 cycles per thread
-        if (args && args[0])
-        {
-            if (sscanf(args, "%d", &iteration_count) != 1 || iteration_count < 1)
-            {
-                Msg("! [COMPUTE TEST] Invalid argument. Usage: test_compute_vector <N>");
-                Msg("! [COMPUTE TEST] N = number of computation cycles per thread (default: 10)");
-                return;
-            }
-        }
-
-        Msg("=== [COMPUTE TEST VECTOR] Running with %d computation cycles per thread ===", iteration_count);
-        bool success = ComputeTest::RunTest(iteration_count);
-
-        if (success)
-            Msg("* [COMPUTE TEST VECTOR] PASSED");
-        else
-            Msg("! [COMPUTE TEST VECTOR] FAILED");
-    }
-};
-
-class CCC_TestComputeMatrices final : public IConsole_Command
-{
-public:
-    CCC_TestComputeMatrices(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = false; }
-
-    void Execute(pcstr args) override
-    {
-        int iteration_count = 10;  // Default: 10 cycles per thread
-        if (args && args[0])
-        {
-            if (sscanf(args, "%d", &iteration_count) != 1 || iteration_count < 1)
-            {
-                Msg("! [COMPUTE TEST] Invalid argument. Usage: test_compute_matrices <N>");
-                Msg("! [COMPUTE TEST] N = number of computation cycles per thread (default: 10)");
-                return;
-            }
-        }
-
-        Msg("=== [COMPUTE TEST MATRICES] Running with %d computation cycles per thread ===", iteration_count);
-        bool success = ComputeTest_Matrices::RunTest(iteration_count);
-
-        if (success)
-            Msg("* [COMPUTE TEST MATRICES] PASSED");
-        else
-            Msg("! [COMPUTE TEST MATRICES] FAILED");
-    }
-};
-
-class CCC_TestComputeSIMD final : public IConsole_Command
-{
-public:
-    CCC_TestComputeSIMD(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = false; }
-
-    void Execute(pcstr args) override
-    {
-        int iteration_count = 10;  // Default: 10 cycles per thread
-        if (args && args[0])
-        {
-            if (sscanf(args, "%d", &iteration_count) != 1 || iteration_count < 1)
-            {
-                Msg("! [COMPUTE TEST] Invalid argument. Usage: test_compute_simd <N>");
-                Msg("! [COMPUTE TEST] N = number of computation cycles per thread (default: 10)");
-                return;
-            }
-        }
-
-        Msg("=== [COMPUTE TEST SIMD] Running with %d computation cycles per thread ===", iteration_count);
-        bool success = ComputeTest_SIMD::RunTest(iteration_count);
-
-        if (success)
-            Msg("* [COMPUTE TEST SIMD] PASSED");
-        else
-            Msg("! [COMPUTE TEST SIMD] FAILED");
-    }
-};
-
 #if RENDER == R_R4
 class CCC_TestSlangCompiler final : public IConsole_Command
 {
@@ -716,7 +628,6 @@ public:
     }
 };
 #endif // RENDER == R_R4
-#endif // USE_DX11
 
 #if RENDER != R_R1
 class CCC_BuildSSA : public IConsole_Command
@@ -1135,11 +1046,6 @@ void xrRender_initconsole()
     // Detail Manager debug
 #if defined(USE_DX11)
     CMD4(CCC_Integer, "dm_debug_trails", &dm_debug_trails, 0, 1);
-#if !defined(MASTER_GOLD)
-    CMD1(CCC_TestComputeVector, "test_compute_vector");
-    CMD1(CCC_TestComputeMatrices, "test_compute_matrices");
-    CMD1(CCC_TestComputeSIMD, "test_compute_simd");
-#endif
 #if RENDER == R_R4
     CMD1(CCC_TestSlangCompiler, "test_slang_compiler");
 #endif

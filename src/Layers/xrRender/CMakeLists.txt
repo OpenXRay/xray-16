@@ -179,7 +179,6 @@ target_sources(xrRender PRIVATE
     FGRenderBase.cpp
     r4_rendertarget.h
     r4_rendertarget.cpp
-    r4_rendertarget_build_textures.cpp
     r4_rendertarget_u_set_rt.cpp
     DetailModel.cpp
     ETextureParams.cpp
@@ -222,6 +221,8 @@ target_sources(xrRender PRIVATE
     ShaderKey.cpp
     SkeletonAnimated.cpp
     SkeletonCustom.cpp
+    SH_Texture.h
+    SH_Texture.cpp
     SkeletonRigid.cpp
     SkeletonX.cpp
     SkeletonXSkinXW_CPP.cpp
@@ -326,20 +327,13 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/tss_def.cpp
     ../xrRenderDX11/xrRender_console.cpp
     xr_effgamma.cpp
-    ../xrRenderDX11/dx11ComputeTest.cpp
-    ../xrRenderDX11/dx11ComputeTest_Matrices.cpp
-    ../xrRenderDX11/dx11ComputeTest_SIMD.cpp
     ../xrRenderDX11/dx11ConstantBuffer.cpp
     ../xrRenderDX11/dx11DetailManager_VS.cpp
     ../xrRenderDX11/dx11HW.cpp
     ../xrRenderDX11/dx11HWCaps.cpp
     ../xrRenderDX11/dx11ResourceManager_Resources.cpp
     ../xrRenderDX11/dx11ResourceManager_Scripting.cpp
-    ../xrRenderDX11/dx11SH_RT.cpp
-    ../xrRenderDX11/dx11SH_Texture.cpp
     ../xrRenderDX11/dx11StateUtils.cpp
-    ../xrRenderDX11/dx11Texture.cpp
-    ../xrRenderDX11/dx11_texture_load.h
     ../xrRenderDX11/dx11VertexLayoutCache.cpp
     ../xrRenderDX11/dx11r_constants.cpp
     ../xrRenderDX11/dx11r_constants_cache.cpp

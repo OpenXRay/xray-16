@@ -30,25 +30,13 @@ void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode 
 // 2D texgen (texture adjustment matrix)
 void CRenderTarget::u_compute_texgen_screen(CBackend& cmd_list, Fmatrix& m_Texgen)
 {
-#if defined(USE_DX11)
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
         0.0f, -0.5f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
-};
-#elif defined(USE_OGL)
-    Fmatrix m_TexelAdjust =
-    {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
     };
-#else
-#   error No graphics API selected or enabled!
-#endif
 
     m_Texgen.mul(m_TexelAdjust, cmd_list.xforms.m_wvp);
 }
@@ -60,13 +48,7 @@ void CRenderTarget::u_compute_texgen_jitter(CBackend& cmd_list, Fmatrix& m_Texge
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
-#if defined(USE_DX11)
         0.0f, -0.5f, 0.0f, 0.0f,
-#elif defined(USE_OGL)
-        0.0f, 0.5f, 0.0f, 0.0f,
-#else
-#   error No graphics API selected or enabled!
-#endif
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
     };
@@ -162,34 +144,7 @@ CRenderTarget::CRenderTarget()
     return;
 }
 
-CRenderTarget::~CRenderTarget()
-{
-#if defined(USE_DX11)
-    _RELEASE(t_ss_async);
-#elif defined(USE_OGL)
-    // Textures
-    t_material->surface_set(GL_TEXTURE_3D, 0);
-    glDeleteTextures(1, &t_material_surf);
-    t_material.destroy();
-
-    t_LUM_src->surface_set(GL_TEXTURE_2D, 0);
-    t_LUM_dest->surface_set(GL_TEXTURE_2D, 0);
-    t_LUM_src.destroy();
-    t_LUM_dest.destroy();
-
-    // Jitter
-    for (u32 it = 0; it < TEX_jitter_count; it++)
-    {
-        t_noise[it]->surface_set(GL_TEXTURE_2D, 0);
-    }
-    glDeleteTextures(TEX_jitter_count, t_noise_surf);
-
-    t_noise_mipped->surface_set(GL_TEXTURE_2D, 0);
-    glDeleteTextures(1, &t_noise_surf_mipped);
-#else
-#   error No graphics API selected or enabled!
-#endif
-}
+CRenderTarget::~CRenderTarget() {}
 
 void CRenderTarget::reset_light_marker(CBackend& cmd_list, bool bResetStencil)
 {

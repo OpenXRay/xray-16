@@ -24,49 +24,24 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
 
     if (strTexName.size())
     {
+        ref_texture src;
         auto I = m_TexCache.find(strTexName);
         if (I != m_TexCache.end())
         {
-
-#if defined(USE_DX11)
-            ID3DBaseTexture* e0 = I->second->surface_get();
-            m_CMap[iTex]->surface_set(e0);
-            _RELEASE(e0);
-#elif defined(USE_OGL)
-            GLuint e0 = I->second->surface_get();
-            m_CMap[iTex]->surface_set(GL_TEXTURE_2D, e0);
-#else
-#    error No graphics API selected or in use!
-#endif
+            src = I->second;
         }
         else
         {
-            ref_texture tmp;
-            tmp.create(strTexName.c_str());
-
-            m_TexCache.emplace(strTexName, tmp);
-
-#if defined(USE_DX11)
-            ID3DBaseTexture* e0 = tmp->surface_get();
-            m_CMap[iTex]->surface_set(e0);
-            _RELEASE(e0);
-#elif defined(USE_OGL)
-            GLuint e0 = tmp->surface_get();
-            m_CMap[iTex]->surface_set(GL_TEXTURE_2D, e0);
-#else
-#    error No graphics API selected or in use!
-#endif
+            src.create(strTexName.c_str());
+            m_TexCache.emplace(strTexName, src);
         }
+        if (!src->flags.bLoaded)
+            src->Load();
+        m_CMap[iTex]->surface_set(nvrhi::TextureHandle(src->surface_get_native()));
     }
     else
     {
-#if defined(USE_DX11)
-        m_CMap[iTex]->surface_set(nullptr);
-#elif defined(USE_OGL)
-        m_CMap[iTex]->surface_set(GL_TEXTURE_2D, 0);
-#else
-#    error No graphics API selected or in use!
-#endif
+        m_CMap[iTex]->surface_set(nvrhi::TextureHandle());
     }
 }
 } // namespace xray::render::fg

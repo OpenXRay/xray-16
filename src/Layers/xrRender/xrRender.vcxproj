@@ -268,8 +268,6 @@
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h"/>
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h"/>
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h"/>
-    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_Matrices.h"/>
-    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_SIMD.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\Blender_Detail_GPU.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\dx11RainBlender.h"/>
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h"/>
@@ -299,7 +297,6 @@
     <ClInclude Include="..\xrRenderDX11\blenders\Blender_Screen_SET.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\Blender_tree.h"/>
     <ClInclude Include="..\xrRenderDX11\DetailManager.h"/>
-    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest.h"/>
     <ClInclude Include="..\xrRenderDX11\dxImGuiRender.h"/>
     <ClInclude Include="..\xrRenderDX11\ResourceManager.h"/>
     <ClInclude Include="..\xrRenderDX11\R_Backend.h"/>
@@ -345,7 +342,6 @@
     <ClCompile Include="ConstantSystem\FGConstantSystem.cpp"/>
     <ClCompile Include="FGRenderBase.cpp"/>
     <ClCompile Include="r4_rendertarget.cpp"/>
-    <ClCompile Include="r4_rendertarget_build_textures.cpp"/>
     <ClCompile Include="r4_rendertarget_u_set_rt.cpp"/>
     <ClCompile Include="r_FrameGraphRenderer_Loader.cpp"/>
     <ClCompile Include="r_FrameGraphRenderer_Shaders.cpp"/>
@@ -453,6 +449,7 @@
     <ClCompile Include="Shaders\SlangVFSAdapter.cpp"/>
     <ClCompile Include="SH_Constant.cpp"/>
     <ClCompile Include="SH_Matrix.cpp"/>
+    <ClCompile Include="SH_Texture.cpp"/>
     <ClCompile Include="SkeletonAnimated.cpp"/>
     <ClCompile Include="SkeletonCustom.cpp"/>
     <ClCompile Include="SkeletonRigid.cpp"/>
@@ -607,20 +604,13 @@
     <ClCompile Include="..\xrRenderDX11\tss_def.cpp"/>
     <ClCompile Include="..\xrRenderDX11\xrRender_console.cpp"/>
     <ClCompile Include="xr_effgamma.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_Matrices.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_SIMD.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11HW.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11HWCaps.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Resources.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Scripting.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11SH_RT.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11SH_Texture.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11StateUtils.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11Texture.cpp"/>
-    <ClInclude Include="..\xrRenderDX11\dx11_texture_load.h"/>
     <ClCompile Include="..\xrRenderDX11\dx11VertexLayoutCache.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11r_constants.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11r_constants_cache.cpp"/>
