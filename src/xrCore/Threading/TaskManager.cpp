@@ -21,7 +21,7 @@
 #include "ScopeLock.hpp"
 
 #include <thread>
-#include <SDL_events.h>
+#include <SDL3/SDL_events.h>
 
 #include "Math/fast_lc16.hpp"
 

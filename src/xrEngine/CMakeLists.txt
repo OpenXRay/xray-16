@@ -449,7 +449,7 @@ target_link_libraries(xrEngine
     OpenAL::OpenAL
     Ogg::Ogg
     Theora::Theora
-    SDL2::SDL2
+    SDL3::SDL3-static
     $<$<PLATFORM_ID:Windows>:DiscordGameSDK>
     $<$<PLATFORM_ID:Windows>:vfw32>
 )

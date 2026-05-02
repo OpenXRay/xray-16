@@ -16,6 +16,9 @@
         4458 : declaration of 'x' hides class member
         -->
       <DisableSpecificWarnings>4201;4251;4275;4458</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(xrExternals)SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile>
       <!-- MSVC;dSINGLE;WIN32 : for ODE and xrPhysics -->
       <PreprocessorDefinitions>
         MSVC;
@@ -146,4 +149,8 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="xray_build.user.props" Condition="Exists('xray_build.user.props')"/>
   </ImportGroup>
+
+  <PropertyGroup>
+    <SDL3StaticLibPath>$(xrExternals)SDL\vs_build\Release\SDL3-static.lib</SDL3StaticLibPath>
+  </PropertyGroup>
 </Project>

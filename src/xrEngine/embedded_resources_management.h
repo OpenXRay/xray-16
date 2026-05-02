@@ -2,10 +2,6 @@
 
 #include "xr_3da/resource.h"
 
-#ifdef XR_PLATFORM_WINDOWS
-#   include <SDL_syswm.h>
-#endif
-
 inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
 {
     ZoneScoped;
@@ -49,22 +45,17 @@ inline SDL_Surface* CreateSurfaceFromBitmap(HBITMAP bitmapHandle)
         return nullptr;
     }
 
-    constexpr Uint32 alpha = 0xFF000000;
-    constexpr Uint32 red = 0x00FF0000;
-    constexpr Uint32 green = 0x0000FF00;
-    constexpr Uint32 blue = 0x000000FF;
-
-    SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(
-        bitmap.bmBits, bitmap.bmWidth, bitmap.bmHeight,
-        bitmap.bmBitsPixel, bitmap.bmWidthBytes,
-        red, green, blue, alpha);
+    SDL_Surface* surface = SDL_CreateSurfaceFrom(
+        bitmap.bmWidth, bitmap.bmHeight,
+        SDL_PIXELFORMAT_BGRA8888,
+        bitmap.bmBits, bitmap.bmWidthBytes);
 
     if (!surface)
         return nullptr;
 
     if (!surface->pixels)
     {
-        SDL_FreeSurface(surface);
+        SDL_DestroySurface(surface);
         return nullptr;
     }
 
@@ -89,12 +80,8 @@ inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
     ZoneScoped;
 
     const HICON icon = (HICON)ExtractImage(iconIdx, IMAGE_ICON);
-
-    SDL_SysWMinfo info;
-    SDL_VERSION(&info.version);
-    R_ASSERT2(SDL_GetWindowWMInfo(wnd, &info), SDL_GetError());
-
-    const HWND hwnd = info.info.win.window;
+    const HWND hwnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(wnd), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+    R_ASSERT2(hwnd, SDL_GetError());
     SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
     SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
 }

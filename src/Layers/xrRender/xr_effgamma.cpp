@@ -26,8 +26,6 @@ void CGammaControl::GenLUT(u16* r, u16* g, u16* b, u16 count) const
 
 void CGammaControl::Update() const
 {
-    u16 red[256], green[256], blue[256];
-    GenLUT(red, green, blue, 256);
-    SDL_SetWindowGammaRamp(Device.m_sdlWnd, red, green, blue);
+    (void)Device;
 }
 }

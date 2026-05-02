@@ -7,7 +7,7 @@
 #endif
 #include "xrRender_console.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 using namespace xray::render::fg;
 
