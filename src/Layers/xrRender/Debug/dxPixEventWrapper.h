@@ -5,8 +5,7 @@ namespace xray::render::fg
 #if defined(MASTER_GOLD)
 #   define PIX_EVENT(Name) do { } while (false)
 #   define PIX_EVENT_CTX(C,Name) do { } while (false)
-#else
-#if defined(USE_DX11)
+#elif defined(USE_DX11)
 #   define PIX_EVENT(Name) dxPixEventWrapper pixEvent##Name(RCache,L ## #Name)
 #   define PIX_EVENT_CTX(C,Name) dxPixEventWrapper pixEvent##Name(C,L ## #Name)
 
@@ -21,18 +20,8 @@ public:
     }
     ~dxPixEventWrapper() { cmd_list.gpu_mark_end(); }
 };
-#elif defined(USE_OGL)
-#   define PIX_EVENT(Name) dxPixEventWrapper pixEvent##Name(#Name)
-#   define PIX_EVENT_CTX(C,Name) dxPixEventWrapper pixEvent##Name(#Name)
-
-class dxPixEventWrapper
-{
-public:
-    dxPixEventWrapper(const char* name) { HW.BeginPixEvent(name); }
-    ~dxPixEventWrapper() { HW.EndPixEvent(); }
-};
 #else
-#   error No graphics API selected or enabled!
-#endif // USE_OGL
-#endif // MASTER_GOLD
+#   define PIX_EVENT(Name) do { } while (false)
+#   define PIX_EVENT_CTX(C,Name) do { } while (false)
+#endif
 } // namespace xray::render::fg

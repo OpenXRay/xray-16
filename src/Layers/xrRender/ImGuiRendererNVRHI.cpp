@@ -1,10 +1,7 @@
 #include "stdafx.h"
 #include "ImGuiRendererNVRHI.h"
 #include "RenderContext/RenderContext.h"
-#include <backends/imgui_impl_dx11.h> // For ImDrawVert layout reference
-#include <d3d11.h>
 
-// Include CRender for accessing backbuffer
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 

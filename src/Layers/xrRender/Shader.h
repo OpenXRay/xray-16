@@ -94,13 +94,9 @@ struct ECORE_API SPass : public xr_resource_flagged
     ref_ps ps; // may be NULL = FFP, in that case "state" must contain TSS setup
     ref_vs vs; // may be NULL = FFP, in that case "state" must contain RS setup, *and* FVF-compatible declaration must be used
     ref_gs gs; // may be NULL = don't use geometry shader at all
-#ifdef USE_DX11
-    ref_hs hs; // may be NULL = don't use hull shader at all
-    ref_ds ds; // may be NULL = don't use domain shader at all
-    ref_cs cs; // may be NULL = don't use compute shader at all
-#elif defined(USE_OGL)
-    ref_pp pp; // may be NULL = don't use program pipeline at all
-#endif
+    ref_hs hs;
+    ref_ds ds;
+    ref_cs cs;
     ref_ctable constants; // may be NULL
 
     ref_texture_list T;

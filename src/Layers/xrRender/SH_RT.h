@@ -37,12 +37,6 @@ public:
     ID3DDepthStencilView* dsv_all{};
     xr_vector<ID3DDepthStencilView*> dsv_per_slice;
     ID3DUnorderedAccessView* pUAView{};
-#elif defined(USE_OGL)
-    GLuint pRT{};
-    GLuint pZRT{};
-    GLenum target{};
-#else
-#   error No graphics API selected or enabled!
 #endif
 
     ref_texture pTexture;

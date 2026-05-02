@@ -3,7 +3,6 @@
 #include "FrameGraph/ShaderLoader.h"
 #include "FrameGraph/PassResourceCache.h"
 #include "FrameGraph/BindingSetBuilder.h"
-#include <d3dcompiler.h>
 
 namespace xray::render::fg {
 

@@ -5,8 +5,6 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
-#elif defined(USE_OGL)
-#include "Layers/xrRenderGL/glState.h"
 #endif
 
 // Forward declarations for Slang reflection
@@ -113,21 +111,6 @@ struct ECORE_API resptrcode_cs : public resptr_base<SCS>
 
 typedef resptr_core<SCS, resptrcode_cs> ref_cs;
 
-#if defined(USE_OGL)
-struct ECORE_API SPP : public xr_resource_named
-{
-    // Program pipeline object
-    // or shader program if ARB_separate_shader_objects is unavailabe
-    GLuint pp{};
-    R_constant_table constants;
-
-    SPP() = default;
-    SPP(GLuint _pp) : pp(_pp) {}
-    ~SPP();
-};
-typedef resptr_core<SPP, resptr_base<SPP>> ref_pp;
-#endif // USE_OGL
-
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SState : public xr_resource_flagged
 {
@@ -142,9 +125,6 @@ typedef resptr_core<SState, resptr_base<SState>> ref_state;
 struct ECORE_API SDeclaration : public xr_resource_flagged
 {
     xr_vector<VertexElement> dcl_code;
-#if defined(USE_OGL)
-    GLuint dcl;
-#endif
     void* backend_data = nullptr;
 
     SDeclaration() = default;

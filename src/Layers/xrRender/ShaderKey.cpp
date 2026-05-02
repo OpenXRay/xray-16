@@ -60,29 +60,16 @@ bool ExtractShaderKeyFromPass(SPass* pass, ShaderKey& outKey) {
         outKey.gsName = pass->gs->cName;
     }
 
-#ifdef USE_DX11
-    // Extract hull shader name
     if (pass->hs._get()) {
         outKey.hsName = pass->hs->cName;
     }
-
-    // Extract domain shader name
     if (pass->ds._get()) {
         outKey.dsName = pass->ds->cName;
     }
-
-    // Extract compute shader name
     if (pass->cs._get()) {
         outKey.csName = pass->cs->cName;
     }
-#elif defined(USE_OGL)
-    // Extract program pipeline name
-    if (pass->pp._get()) {
-        outKey.ppName = pass->pp->cName;
-    }
-#endif
 
-    // Verify we got at least one shader
     return outKey.IsValid();
 }
 

@@ -34,7 +34,6 @@ static void ApplyTexgen(CBackend& cmd_list, const Fmatrix& mVP)
 {
     Fmatrix mTexgen;
 
-#if defined(USE_DX11)
     Fmatrix mTexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
@@ -42,17 +41,6 @@ static void ApplyTexgen(CBackend& cmd_list, const Fmatrix& mVP)
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
     };
-#elif defined(USE_OGL)
-    Fmatrix mTexelAdjust =
-    {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    };
-#else
-#   error No graphics API selected or enabled!
-#endif
 
     mTexgen.mul(mTexelAdjust, mVP);
     cmd_list.set_c("mVPTexgen", mTexgen);

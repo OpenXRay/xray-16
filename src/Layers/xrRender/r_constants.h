@@ -83,26 +83,11 @@ struct ECORE_API R_constant_load
     u16 index; // linear index (pixel)
     u16 cls; // element class
 
-#if defined(USE_DX11)
-    R_constant_load() : index(u16(-1)), cls(u16(-1)) {};
-#elif defined(USE_OGL)
-    GLuint location;
-    GLuint program;
-
-    R_constant_load() : index(u16(-1)), cls(u16(-1)), location(0), program(0) {};
-#else
-#   error No graphics API selected or enabled!
-#endif
+    R_constant_load() : index(u16(-1)), cls(u16(-1)) {}
 
     BOOL equal(R_constant_load& C)
     {
-#if defined(USE_DX11)
         return (index == C.index) && (cls == C.cls);
-#elif defined(USE_OGL)
-        return (index == C.index) && (cls == C.cls) && (location == C.location) && (program == C.program);
-#else
-#   error No graphics API selected or enabled!
-#endif
     }
 };
 
@@ -115,18 +100,14 @@ struct ECORE_API R_constant : public xr_resource
     R_constant_load ps;
     R_constant_load vs;
     R_constant_load gs;
-#if defined(USE_DX11)
     R_constant_load hs;
     R_constant_load ds;
     R_constant_load cs;
-#elif defined(USE_OGL)
-    R_constant_load pp;
-#endif
 
     R_constant_load samp;
     R_constant_setup* handler;
 
-    R_constant() : type(u16(-1)), destination(0), handler(nullptr){};
+    R_constant() : type(u16(-1)), destination(0), handler(nullptr) {}
 
     R_constant_load& get_load(u32 destination)
     {
@@ -137,13 +118,9 @@ struct ECORE_API R_constant : public xr_resource
         case RC_dest_pixel: return ps;
         case RC_dest_sampler: return samp;
         case RC_dest_geometry: return gs;
-#if defined(USE_DX11)
         case RC_dest_hull: return hs;
         case RC_dest_domain: return ds;
         case RC_dest_compute: return cs;
-#elif defined(USE_OGL)
-        case RC_dest_all: return pp;
-#endif
         default: FATAL("invalid enumeration for shader");
         }
         return fake;
@@ -157,13 +134,9 @@ struct ECORE_API R_constant : public xr_resource
             && ps.equal(C.ps)
             && vs.equal(C.vs)
             && gs.equal(C.gs)
-#if defined(USE_DX11)
             && hs.equal(C.hs)
             && ds.equal(C.ds)
             && cs.equal(C.cs)
-#elif defined(USE_OGL)
-            && pp.equal(C.pp)
-#endif
             && samp.equal(C.samp)
             && handler == C.handler;
     }

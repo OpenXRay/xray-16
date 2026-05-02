@@ -2,10 +2,6 @@
 
 #include <nvrhi/nvrhi.h>
 
-#if defined(USE_OGL)
-#include "../xrRenderGL/glState.h"
-#endif
-
 namespace xray::render::fg
 {
 enum class SamplerFilter : u8
