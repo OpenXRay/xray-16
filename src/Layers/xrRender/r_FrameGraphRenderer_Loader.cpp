@@ -23,6 +23,7 @@
 #include "Layers/xrRender/Light_DB.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/r__sector.h"
+#include "Layers/xrRender/r__scene.h"
 
 namespace xray::render
 {
@@ -340,9 +341,7 @@ void FrameGraphRenderer::level_Unload()
     m_HOM.Unload();
 
     //*** Sectors
-    // 1.
-    m_immContext.unload();
-    xr_delete(m_pRmPortals);
+    Scene.unload();
     m_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
     Device.vCameraPositionSaved.set(0, 0, 0);
 
@@ -587,7 +586,7 @@ void FrameGraphRenderer::LoadSectors(IReader* fs)
             if (vol > largest_sector_vol)
             {
                 largest_sector_vol = vol;
-                m_largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
+                Scene.largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
             }
         }
         P->close();
@@ -606,15 +605,15 @@ void FrameGraphRenderer::LoadSectors(IReader* fs)
         bool do_rebuild = true;
         const auto chunk_size = fs->find_chunk(fsL_PORTALS);
 
-        m_pRmPortals = xr_new<CDB::MODEL>();
+        Scene.rmPortals = xr_new<CDB::MODEL>();
         if (use_cache)
-            m_pRmPortals->set_model_crc32(crc32(fs->pointer(), chunk_size));
+            Scene.rmPortals->set_model_crc32(crc32(fs->pointer(), chunk_size));
 
         string_path file_name;
         strconcat(file_name, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
         FS.update_path(file_name, "$app_data_root$", file_name);
 
-        if (use_cache && FS.exist(file_name) && m_pRmPortals->deserialize(file_name, skip_crc32_check))
+        if (use_cache && FS.exist(file_name) && Scene.rmPortals->deserialize(file_name, skip_crc32_check))
         {
 #ifndef MASTER_GOLD
             Msg("* Loaded portals cache (%s)...", file_name);
@@ -653,17 +652,17 @@ void FrameGraphRenderer::LoadSectors(IReader* fs)
                 v3.set(-20002.f, -20002.f, -20002.f);
                 CL.add_face_packed_D(v1, v2, v3, 0);
             }
-            m_pRmPortals->build(CL.getV(), CL.getVS(), CL.getT(), CL.getTS());
+            Scene.rmPortals->build(CL.getV(), CL.getVS(), CL.getT(), CL.getTS());
             if (use_cache)
-                m_pRmPortals->serialize(file_name);
+                Scene.rmPortals->serialize(file_name);
         }
     }
     else
     {
-        m_pRmPortals = nullptr;
+        Scene.rmPortals = nullptr;
     }
 
-    m_immContext.load(sectors_data, portals_data);
+    Scene.load(sectors_data, portals_data);
     m_last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
 

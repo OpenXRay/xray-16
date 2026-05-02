@@ -376,10 +376,7 @@ public:
         void FrameEnd() {}
     };
 
-    CDB::MODEL* m_pRmPortals{ nullptr };
-    xrXRC m_Sectors_xrc{ "render" };
     IRender_Sector::sector_id_t m_last_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
-    IRender_Sector::sector_id_t m_largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
     u32 m_uLastLTRACK{ 0 };
     Task* m_pProcessHOMTask{ nullptr };
     bool m_bFirstFrameAfterReset{ false };

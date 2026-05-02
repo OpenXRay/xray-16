@@ -198,6 +198,7 @@
     <ClInclude Include="r__dsgraph_types.h"/>
     <ClInclude Include="r__occlusion.h"/>
     <ClInclude Include="r__pixel_calculator.h"/>
+    <ClInclude Include="r__scene.h"/>
     <ClInclude Include="r__sector.h"/>
     <ClInclude Include="Shader.h"/>
     <ClInclude Include="ShaderKey.h"/>
@@ -395,8 +396,8 @@
     <ClCompile Include="ResourceManager\NativeRTFactory.cpp"/>
     <ClCompile Include="r__buffer_pool.cpp"/>
     <ClCompile Include="r__pixel_calculator.cpp"/>
+    <ClCompile Include="r__scene.cpp"/>
     <ClCompile Include="r__sector.cpp"/>
-    <ClCompile Include="r__sector_detect.cpp"/>
     <ClCompile Include="r__sector_traversal.cpp"/>
     <ClCompile Include="ShaderKey.cpp"/>
     <ClCompile Include="Shaders\SlangReflectionWrapper.cpp"/>

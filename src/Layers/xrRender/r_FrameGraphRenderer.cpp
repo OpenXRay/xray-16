@@ -17,6 +17,7 @@
 #include "ParticleEffectDef.h"
 #include "Shader.h"
 #include "r__dsgraph_structure.h"
+#include "r__scene.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
@@ -3153,7 +3154,7 @@ void FrameGraphRenderer::DumpStatistics(IGameFont& font, IPerformanceAlert* aler
     font.OutNext("- culled:     %u", m_Stats.ic_culled);
     m_Stats.FrameStart();
     m_HOM.DumpStatistics(font, alert);
-    m_Sectors_xrc.DumpStatistics(font, alert);
+    fg::Scene.Sectors_xrc.DumpStatistics(font, alert);
 }
 
 } // namespace xray::render

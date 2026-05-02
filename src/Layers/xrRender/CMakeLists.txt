@@ -260,8 +260,9 @@ target_sources(xrRender PRIVATE
     r__hw_compat.h
     VertexLayout.h
     r__pixel_calculator.cpp
+    r__scene.cpp
+    r__scene.h
     r__sector.cpp
-    r__sector_detect.cpp
     r__sector_traversal.cpp
     stats_manager.cpp
     xrStripify.cpp

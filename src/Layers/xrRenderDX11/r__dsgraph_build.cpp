@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
-#include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/r__scene.h"
 #include "Layers/xrRender/light.h"
 #include "Layers/xrRender/Light_DB.h"
 #include "Layers/xrRender/FHierrarhyVisual.h"
@@ -667,68 +667,20 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     }
 }
 
-void R_dsgraph_structure::load(const xr_vector<CSector::level_sector_data_t>& sectors_data,
-    const xr_vector<CPortal::level_portal_data_t>& portals_data)
-{
-    ZoneScoped;
-
-    const auto portals_count = portals_data.size();
-    const auto sectors_count = sectors_data.size();
-
-    Sectors.resize(sectors_count);
-    Portals.resize(portals_count);
-
-    for (u32 idx = 0; idx < portals_count; ++idx)
-    {
-        auto* portal = xr_new<CPortal>();
-        Portals[idx] = portal;
-    }
-
-    for (u32 idx = 0; idx < sectors_count; ++idx)
-    {
-        auto* sector = xr_new<CSector>();
-
-        sector->unique_id = static_cast<IRender_Sector::sector_id_t>(idx);
-        sector->setup(sectors_data[idx], Portals);
-        Sectors[idx] = sector;
-    }
-
-    for (u32 idx = 0; idx < portals_count; ++idx)
-    {
-        auto* portal = static_cast<CPortal*>(Portals[idx]);
-
-        portal->setup(portals_data[idx], Sectors);
-    }
-}
-
-void R_dsgraph_structure::unload()
-{
-    for (auto* sector : Sectors)
-        xr_delete(sector);
-    Sectors.clear();
-
-    for (auto* portal : Portals)
-        xr_delete(portal);
-    Portals.clear();
-}
-
-
-// sub-space rendering - main procedure
 void R_dsgraph_structure::build_subspace()
 {
     ZoneScoped;
 
-    marker++; // !!! critical here
+    marker++;
 
-    if (o.precise_portals && RImplementation.m_pRmPortals)
+    if (o.precise_portals && Scene.rmPortals)
     {
-        // Check if camera is too near to some portal - if so force DualRender
         Fvector box_radius;
         box_radius.set(o.query_box_side, o.query_box_side, o.query_box_side);
-        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, RImplementation.m_pRmPortals, o.view_pos, box_radius);
-        for (size_t K = 0; K < Sectors_xrc.r_count(); K++)
+        Scene.Sectors_xrc.box_query(CDB::OPT_FULL_TEST, Scene.rmPortals, o.view_pos, box_radius);
+        for (size_t K = 0; K < Scene.Sectors_xrc.r_count(); K++)
         {
-            CPortal* pPortal = Portals[RImplementation.m_pRmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
+            CPortal* pPortal = Scene.Portals[Scene.rmPortals->get_tris()[Scene.Sectors_xrc.r_begin()[K].id].dummy];
             pPortal->bDualRender = TRUE;
         }
     }
@@ -740,20 +692,19 @@ void R_dsgraph_structure::build_subspace()
         return;
     }
 
-    // Traverse sector/portal structure
-    PortalTraverser.traverse(Sectors[o.sector_id], o.view_frustum, o.view_pos, o.xform, o.portal_traverse_flags);
+    Scene.PortalTraverser.traverse(Scene.Sectors[o.sector_id], o.view_frustum, o.view_pos, o.xform, o.portal_traverse_flags);
 
     // Determine visibility for static geometry hierarchy
 #if 0
     static xr_vector<Task*> static_geo_tasks;
-    static_geo_tasks.resize(PortalTraverser.r_sectors.size());
+    static_geo_tasks.resize(Scene.PortalTraverser.r_sectors.size());
 #endif
 
     if (psDeviceFlags.test(rsDrawStatic))
     {
-        for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
+        for (u32 s_it = 0; s_it < Scene.PortalTraverser.r_sectors.size(); s_it++)
         {
-            CSector* sector = PortalTraverser.r_sectors[s_it];
+            CSector* sector = Scene.PortalTraverser.r_sectors[s_it];
             dxRender_Visual* root = sector->root();
             //VERIFY(root->getType() == MT_HIERRARHY);
 
@@ -834,14 +785,14 @@ void R_dsgraph_structure::build_subspace()
             if (o.is_main_pass)
             {
                 const auto& entity_pos = spatial->spatial_sector_point();
-                const auto sector_id = detect_sector(entity_pos);
+                const auto sector_id = Scene.detect_sector(entity_pos);
                 spatial->spatial_updatesector(sector_id);
             }
             const auto& data = spatial->GetSpatialData();
             const auto& [type, sphere, sector_id] = std::tuple(data.type, data.sphere, data.sector_id);
             if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                 continue; // disassociated from S/P structure
-            auto* sector = Sectors[sector_id];
+            auto* sector = Scene.Sectors[sector_id];
 
             if (collect_lights && (type & STYPE_LIGHTSOURCE))
             {
@@ -859,7 +810,7 @@ void R_dsgraph_structure::build_subspace()
                 continue;
             }
 
-            if (PortalTraverser.i_marker != sector->r_marker)
+            if (Scene.PortalTraverser.i_marker != sector->r_marker)
                 continue; // inactive (untouched) sector
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
@@ -925,12 +876,12 @@ void R_dsgraph_structure::build_subspace()
                     if (viewEntity == nullptr)
                         break;
                     const auto& entity_pos = viewEntity->spatial_sector_point();
-                    viewEntity->spatial_updatesector(detect_sector(entity_pos));
+                    viewEntity->spatial_updatesector(Scene.detect_sector(entity_pos));
                     const auto sector_id = viewEntity->GetSpatialData().sector_id;
                     if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                         break; // disassociated from S/P structure
-                    CSector* sector = Sectors[sector_id];
-                    if (PortalTraverser.i_marker != sector->r_marker)
+                    CSector* sector = Scene.Sectors[sector_id];
+                    if (Scene.PortalTraverser.i_marker != sector->r_marker)
                         break; // inactive (untouched) sector
                     for (const CFrustum& view : sector->r_frustums)
                     {
