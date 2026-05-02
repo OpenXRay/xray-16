@@ -3,12 +3,6 @@
 
 namespace xray::render::fg
 {
-void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM)
-{
-    UNUSED(cmd_list);
-    UNUSED(eSOM);
-}
-
 u8 fpack(float v)
 {
     s32 _v = iFloor(((v + 1) * .5f) * 255.f + .5f);
@@ -93,23 +87,6 @@ CRenderTarget::CRenderTarget()
 }
 
 CRenderTarget::~CRenderTarget() {}
-
-void CRenderTarget::reset_light_marker(CBackend& cmd_list, bool bResetStencil)
-{
-    UNUSED(cmd_list);
-    UNUSED(bResetStencil);
-    dwLightMarkerID = 5;
-}
-
-void CRenderTarget::increment_light_marker(CBackend& cmd_list)
-{
-    dwLightMarkerID += 2;
-
-    const u32 iMaxMarkerValue = RImplementation.o.msaa ? 127 : 255;
-
-    if (dwLightMarkerID > iMaxMarkerValue)
-        reset_light_marker(cmd_list, true);
-}
 
 bool CRenderTarget::need_to_render_sunshafts()
 {

@@ -148,9 +148,6 @@ public:
     void destroy() override;
     void reset_begin() override;
     void reset_end() override;
-    void rmNear(fg::CBackend& cmd_list);
-    void rmFar(fg::CBackend& cmd_list);
-    void rmNormal(fg::CBackend& cmd_list);
 
     void level_Load(IReader* fs) override;
     void level_Unload() override;

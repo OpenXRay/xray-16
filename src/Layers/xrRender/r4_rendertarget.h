@@ -27,8 +27,6 @@ public:
         SO_Combine, //	Default
     };
 
-    u32 dwLightMarkerID;
-
     IBlender* b_accum_spot{};
     IBlender* b_accum_spot_msaa[8]{};
     IBlender* b_accum_volumetric_msaa[8]{};
@@ -213,25 +211,6 @@ public:
     ID3DRenderTargetView* get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
     ID3DDepthStencilView* get_base_zb() { return rt_Base_Depth->pZRT[CHW::IMM_CTX_ID]; }
 
-    void u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb);
-    void u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb)
-    {
-        u_setrt(cmd_list, _1, _2, _3, _zb ? _zb->pZRT[cmd_list.context_id] : nullptr);
-    }
-    void u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb);
-    void u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb)
-    {
-        u_setrt(cmd_list, _1, _2, _zb ? _zb->pZRT[cmd_list.context_id] : nullptr);
-    }
-    void u_setrt(CBackend& cmd_list, u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
-        ID3DDepthStencilView* zb);
-    void u_setrt(CBackend& cmd_list, u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
-        const ref_rt& _zb)
-    {
-        u_setrt(cmd_list, W, H, _1, _2, _3, _zb ? _zb->pZRT[cmd_list.context_id] : nullptr);
-    }
-
-    void u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM = SO_Light);
     void u_calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
     bool u_need_PP();
@@ -248,20 +227,6 @@ public:
     void phase_downsamp();
     void phase_wallmarks();
 
-    void phase_smap_direct(CBackend& cmd_list, light *L, u32 sub_phase);
-    void phase_smap_direct_tsh(CBackend& cmd_list, light *L, u32 sub_phase);
-    void phase_smap_spot_clear(CBackend& cmd_list);
-    void phase_smap_spot(CBackend& cmd_list, light* L);
-    void phase_smap_spot_tsh(CBackend& cmd_list, light* L);
-    void phase_accumulator(CBackend& cmd_list);
-    void phase_vol_accumulator(CBackend& cmd_list);
-
-    //	Generates min/max sm
-    void create_minmax_SM(CBackend& cmd_list);
-
-    void phase_rain(CBackend& cmd_list);
-    void draw_rain(CBackend& cmd_list, light& RainSetup);
-
     void mark_msaa_edges();
 
     bool need_to_render_sunshafts();
@@ -272,19 +237,6 @@ public:
 
     void disable_aniso();
 
-    void draw_volume(CBackend& cmd_list, light* L);
-    void accum_direct(CBackend& cmd_list, u32 sub_phase);
-    void accum_direct_cascade(CBackend& cmd_list, u32 sub_phase, Fmatrix& xform, Fmatrix& xform_prev, float fBias);
-    void accum_direct_f(CBackend& cmd_list, u32 sub_phase);
-    void accum_direct_lum(CBackend& cmd_list);
-    void accum_direct_blend(CBackend& cmd_list);
-    void accum_direct_volumetric(CBackend& cmd_list, u32 sub_phase, const u32 Offset, const Fmatrix& mShadow, float zMin, float zMax);
-    void accum_point(CBackend& cmd_list, light* L);
-    void accum_spot(CBackend& cmd_list, light* L);
-    void accum_reflected(CBackend& cmd_list, light* L);
-    //	Igor: for volumetric lights
-    void accum_volumetric(CBackend& cmd_list, light* L);
-
     void phase_bloom();
     void phase_luminance();
     void phase_combine();
@@ -293,9 +245,6 @@ public:
 #if 0 // kept for historical reasons
     void phase_flip();
 #endif
-
-    u32 get_width(CBackend& cmd_list) { return dwWidth[cmd_list.context_id]; }
-    u32 get_height(CBackend& cmd_list) { return dwHeight[cmd_list.context_id]; }
 
     void set_blur(float f) { param_blur = f; }
     void set_gray(float f) { param_gray = f; }
@@ -313,11 +262,6 @@ public:
     {
         color_map_manager.SetTextures(tex0, tex1);
     }
-
-    //	Need to reset stencil only when marker overflows.
-    //	Don't clear when render for the first time
-    void reset_light_marker(CBackend& cmd_list, bool bResetStencil = false);
-    void increment_light_marker(CBackend& cmd_list);
 
 #ifdef DEBUG
     void dbg_addline(const Fvector& P0, const Fvector& P1, u32 c)

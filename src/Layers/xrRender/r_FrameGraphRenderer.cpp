@@ -3154,24 +3154,6 @@ void FrameGraphRenderer::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
-void FrameGraphRenderer::rmNear(fg::CBackend& cmd_list)
-{
-    const D3D_VIEWPORT viewport = { 0, 0, m_pTarget->get_width(cmd_list), m_pTarget->get_height(cmd_list), 0.f, 0.02f };
-    cmd_list.SetViewport(viewport);
-}
-
-void FrameGraphRenderer::rmFar(fg::CBackend& cmd_list)
-{
-    const D3D_VIEWPORT viewport = { 0, 0, m_pTarget->get_width(cmd_list), m_pTarget->get_height(cmd_list), 0.99999f, 1.f };
-    cmd_list.SetViewport(viewport);
-}
-
-void FrameGraphRenderer::rmNormal(fg::CBackend& cmd_list)
-{
-    const D3D_VIEWPORT viewport = { 0, 0, m_pTarget->get_width(cmd_list), m_pTarget->get_height(cmd_list), 0.f, 1.f };
-    cmd_list.SetViewport(viewport);
-}
-
 void FrameGraphRenderer::SetPostProcessParams(const SPPInfo& ppi)
 {
     if (!m_pTarget)
