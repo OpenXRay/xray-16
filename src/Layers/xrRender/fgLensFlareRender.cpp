@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "fgLensFlareRender.h"
+#include "fgFlareRender.h"
 
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
@@ -215,7 +216,7 @@ void FGLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
             color.set(dwLight);
         color.a *= owner.m_StateBlend;
 
-        auto* flare = static_cast<dxFlareRender*>(&*owner.m_Current->m_Source.m_pRender);
+        auto* flare = static_cast<FGFlareRender*>(&*owner.m_Current->m_Source.m_pRender);
         nvrhi::ITexture* tex = ResolveTexture(flare ? flare->m_textureName : shared_str{});
         PushQuad(owner.vecLight, vecSx, vecSy, color.get(), tex);
     }
@@ -241,7 +242,7 @@ void FGLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
                 color.set(dwLight);
                 color.mul_rgba(cl);
 
-                auto* flare = static_cast<dxFlareRender*>(&*F.m_pRender);
+                auto* flare = static_cast<FGFlareRender*>(&*F.m_pRender);
                 nvrhi::ITexture* tex = ResolveTexture(flare ? flare->m_textureName : shared_str{});
                 PushQuad(vec, vecSx, vecSy, color.get(), tex);
             }
@@ -256,7 +257,7 @@ void FGLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
             color.set(dwLight);
             color.mul_rgba(owner.fGradientValue * owner.m_StateBlend);
 
-            auto* flare = static_cast<dxFlareRender*>(&*owner.m_Current->m_Gradient.m_pRender);
+            auto* flare = static_cast<FGFlareRender*>(&*owner.m_Current->m_Gradient.m_pRender);
             nvrhi::ITexture* tex = ResolveTexture(flare ? flare->m_textureName : shared_str{});
             PushQuad(owner.vecLight, vecSx, vecSy, color.get(), tex);
         }
