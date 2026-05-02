@@ -35,11 +35,6 @@
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "xrEngine/xr_object.h"
 
-#if defined(USE_DX11)
-#include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
-#include "../Externals/nvrhi/src/common/dxgi-format.h"
-#include "../Externals/nvrhi/src/d3d11/d3d11-backend.h"
-#endif
 
 namespace xray::render {
 

@@ -10,8 +10,6 @@
 
 namespace xray::render::fg
 {
-class dx11ConstantBuffer;
-
 class ECORE_API CResourceManager
 {
 private:
@@ -63,10 +61,6 @@ private:
     xr_vector<SDeclaration*> v_declarations;
     xr_vector<SGeometry*> v_geoms;
     xr_vector<R_constant_table*> v_constant_tables;
-
-#if defined(USE_DX11)
-    xr_vector<dx11ConstantBuffer*> v_constant_buffer[R__NUM_CONTEXTS];
-#endif
 
     xr_vector<STextureList*> lst_textures;
     xr_vector<SMatrixList*> lst_matrices;
@@ -128,11 +122,6 @@ public:
 
     R_constant_table* _CreateConstantTable(R_constant_table& C);
     void _DeleteConstantTable(const R_constant_table* C);
-
-#if defined(USE_DX11)
-    dx11ConstantBuffer* _CreateConstantBufferSlang(u32 context_id, const char* name, u32 size);
-    void _DeleteConstantBuffer(u32 context_id, const dx11ConstantBuffer* pBuffer);
-#endif
 
     CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, nvrhi::Format f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {});
     void _DeleteRT(const CRT* RT);
