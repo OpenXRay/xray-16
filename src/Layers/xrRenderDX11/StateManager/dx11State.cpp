@@ -42,39 +42,6 @@ dx11State* dx11State::Create(SimulatorStates& state_code)
     return pState;
 }
 
-HRESULT dx11State::Apply(CBackend& cmd_list)
-{
-    const auto context_id = cmd_list.context_id;
-
-    VERIFY(m_pRasterizerState);
-    cmd_list.StateManager.SetRasterizerState(m_pRasterizerState);
-    VERIFY(m_pDepthStencilState);
-    cmd_list.StateManager.SetDepthStencilState(m_pDepthStencilState);
-    if (m_uiStencilRef != -1)
-        cmd_list.StateManager.SetStencilRef(m_uiStencilRef);
-    VERIFY(m_pBlendState);
-    cmd_list.StateManager.SetBlendState(m_pBlendState);
-    cmd_list.StateManager.SetAlphaRef(m_uiAlphaRef);
-
-    SSManager.GSApplySamplers(context_id, m_GSSamplers);
-    SSManager.VSApplySamplers(context_id, m_VSSamplers);
-    SSManager.PSApplySamplers(context_id, m_PSSamplers);
-    SSManager.HSApplySamplers(context_id, m_HSSamplers);
-    SSManager.DSApplySamplers(context_id, m_DSSamplers);
-    SSManager.CSApplySamplers(context_id, m_CSSamplers);
-
-    //	static const float BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
-    //	static const UINT SampleMask = 0xffffffff;
-
-    //	VERIFY(m_pRasterizerState);
-    //	HW.pDevice->RSSetState(m_pRasterizerState);
-    //	VERIFY(m_pDepthStencilState);
-    //	HW.pDevice->OMSetDepthStencilState(m_pDepthStencilState, m_uiStencilRef);
-    //	VERIFY(m_pBlendState);
-    //	HW.pDevice->OMSetBlendState(m_pBlendState, BlendFactor, SampleMask);
-
-    return S_OK;
-}
 
 void dx11State::Release()
 {

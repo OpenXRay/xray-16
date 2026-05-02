@@ -4,6 +4,7 @@
 #include "xrCore/Threading/TaskManager.hpp"
 
 #include "StateManager/dx11SamplerStateCache.h"
+#include "StateManager/dx11StateCache.h"
 
 #include <SDL_syswm.h>
 

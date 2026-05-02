@@ -28,9 +28,7 @@
 #include "Layers/xrRenderDX11/dx11HW.h"
 
 #include "Layers/xrRender/Shader.h"
-
-#include "Layers/xrRenderDX11/R_Backend.h"
-#include "Layers/xrRenderDX11/R_Backend_Runtime.h"
+#include "Layers/xrRender/FVF.h"
 
 #include "Layers/xrRenderDX11/Blender.h"
 #include "Layers/xrRenderDX11/Blender_CLSID.h"

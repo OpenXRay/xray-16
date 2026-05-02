@@ -14,8 +14,6 @@ namespace slang
 
 namespace xray::render::fg
 {
-class CBackend;
-
 enum
 {
     RC_float = 0,

@@ -30,22 +30,6 @@ const float PS::fDT_STEP = float(uDT_STEP) / 1000.f;
 #pragma warning(disable : 4701) // " potentially uninitialized local variable" (magnitude_sse does initialize it)
 #endif
 
-static void ApplyTexgen(CBackend& cmd_list, const Fmatrix& mVP)
-{
-    Fmatrix mTexgen;
-
-    Fmatrix mTexelAdjust =
-    {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    };
-
-    mTexgen.mul(mTexelAdjust, mVP);
-    cmd_list.set_c("mVPTexgen", mTexgen);
-}
-
 void PS::OnEffectParticleBirth(void* owner, u32, PAPI::Particle& m, u32)
 {
     CParticleEffect* PE = static_cast<CParticleEffect*>(owner);
