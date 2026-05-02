@@ -765,6 +765,7 @@ u32 MaterialCache::GetVertexFormatID(dxRender_Visual* visual)
     return 0;  // Default to first format
 }
 
+#if defined(USE_DX11) && defined(XR_PLATFORM_WINDOWS)
 // Helper: Get size in bytes of a DXGI format
 static u32 GetFormatSize(DXGI_FORMAT format) {
     switch (format) {
@@ -807,7 +808,7 @@ static u32 GetFormatSize(DXGI_FORMAT format) {
             return 4;  // Default fallback
     }
 }
-
+#endif
 // ══════════════════════════════════════════════════════════
 //  SETUP VERTEX ATTRIBUTES
 // ══════════════════════════════════════════════════════════

@@ -3,7 +3,7 @@
 
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) && defined(XR_PLATFORM_WINDOWS)
 #include <d3d11.h>
 #endif
 
@@ -15,7 +15,7 @@ namespace xray::render {
 // Convert D3D11 render states to NVRHI/our abstraction
 // Used by MaterialCache and ParticlePass to extract render state from shader passes
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) && defined(XR_PLATFORM_WINDOWS)
 
 // Convert D3D11 cull mode to NVRHI
 inline fg::CullMode ConvertCullMode(D3D11_CULL_MODE d3dCull) {

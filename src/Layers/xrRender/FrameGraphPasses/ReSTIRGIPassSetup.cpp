@@ -9,7 +9,9 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
+#if defined(XR_PLATFORM_WINDOWS)
 #include "Layers/xrRender/Backend/D3D12Backend.h"
+#endif
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "xrEngine/Environment.h"
@@ -115,8 +117,12 @@ static void InitializeResources(fg::RenderDevice* device, ReSTIRGIPassState& sta
         auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("restir_gi_initial");
         if (csResult.handle) {
             state.initialLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Initial", *csResult.reflection, nvDevice);
+#if defined(XR_PLATFORM_WINDOWS)
             auto* backend = dynamic_cast<D3D12Backend*>(GEnv.Backend);
             nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+#else
+            nvrhi::IBindingLayout* bindlessLayout = nullptr;
+#endif
 
             nvrhi::ComputePipelineDesc pipeDesc;
             pipeDesc.CS = csResult.handle;
@@ -492,12 +498,14 @@ ReSTIRGIOutput setupReSTIRGIPass(
             cs.pipeline = data.state->initialPipeline;
             cs.bindings = { bindingSet };
 
+#if defined(XR_PLATFORM_WINDOWS)
             auto* backend = dynamic_cast<D3D12Backend*>(GEnv.Backend);
             if (backend) {
                 auto* bindlessTable = backend->GetBindlessDescriptorTable();
                 if (bindlessTable)
                     cs.addBindingSet(bindlessTable);
             }
+#endif
 
             cmdList->setComputeState(cs);
             cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);

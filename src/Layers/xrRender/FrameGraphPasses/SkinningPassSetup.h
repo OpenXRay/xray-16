@@ -10,8 +10,8 @@ namespace xray::render {
     struct GeometryBatch;
     class MaterialCache;
     class GeometryCollector;
-    class dxRender_Visual;
     namespace fg {
+        class dxRender_Visual;
         class RenderDevice;
     }
 }

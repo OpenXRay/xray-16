@@ -174,7 +174,6 @@ target_sources(xrRender PRIVATE
 
     Backend/VulkanBackend.h
     Backend/VulkanBackend.cpp
-    Backend/D3D12Backend.cpp
 
     Animation.cpp
     ClusteredLightManager.cpp
@@ -204,7 +203,6 @@ target_sources(xrRender PRIVATE
     NvTriStrip.cpp
     NvTriStripObjects.cpp
     PBRConverter/ONNXModelRunner.cpp
-    PBRConverter/PBRTextureConverter.cpp
     PSLibrary.cpp
     ParticleEffect.cpp
     ParticleEffectDef.cpp
@@ -323,6 +321,17 @@ target_sources(xrRender PRIVATE
 
 )
 
+if(WIN32)
+    target_sources(xrRender PRIVATE
+        Backend/D3D12Backend.cpp
+        PBRConverter/PBRTextureConverter.cpp
+    )
+else()
+    target_sources(xrRender PRIVATE
+        PBRConverter/PBRTextureConverter_Stub.cpp
+    )
+endif()
+
 target_include_directories(xrRender
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -351,13 +360,14 @@ target_link_libraries(xrRender
     xrAPI
     xrMiscMath
     nvrhi
-    nvrhi_d3d11
-    nvrhi_d3d12
     nvrhi_vk
-    d3dcompiler
     ${Vulkan_LIBRARIES}
     slang
 )
+
+if(WIN32)
+    target_link_libraries(xrRender PRIVATE nvrhi_d3d11 nvrhi_d3d12 d3dcompiler)
+endif()
 
 target_compile_definitions(xrRender
     PRIVATE

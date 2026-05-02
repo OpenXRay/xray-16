@@ -5,7 +5,9 @@
 #include "RenderContext/RenderDevice.h"
 #include "r_FrameGraphRenderer.h"
 
+#if defined(XR_PLATFORM_WINDOWS)
 #include "xrEngine/tntQAVI.h"
+#endif
 #include "xrEngine/xrTheora_Surface.h"
 
 namespace xray::render::fg
@@ -196,6 +198,7 @@ void CTexture::Load()
             }
         }
     }
+#if defined(XR_PLATFORM_WINDOWS)
     else if (FS.exist(fn, "$game_textures$", cName.c_str(), ".avi"))
     {
         pAVI = xr_new<CAviPlayerCustom>();
@@ -215,6 +218,7 @@ void CTexture::Load()
             }
         }
     }
+#endif
     else if (FS.exist(fn, "$game_textures$", cName.c_str(), ".seq"))
     {
         string256 buffer;
@@ -270,7 +274,9 @@ void CTexture::Unload()
     nvrhiTexture = nullptr;
     desc_cache = nullptr;
 
+#if defined(XR_PLATFORM_WINDOWS)
     xr_delete(pAVI);
+#endif
     xr_delete(pTheora);
 }
 

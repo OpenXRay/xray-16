@@ -15,7 +15,6 @@ namespace xray::render::fg::passes {
 namespace xray::render {
     class GeometryCollector;
     struct GeometryBatch;
-    class dxRender_Visual;  // Forward declaration for visual pointer map
     namespace fg {
         class RenderDevice;
         class RenderContext;
@@ -26,6 +25,7 @@ namespace xray::render {
 }
 
 namespace xray::render::fg {
+    class dxRender_Visual;  // Forward declaration for visual pointer map
     class CKinematics;
     class RTAccelStructManager;
 }
