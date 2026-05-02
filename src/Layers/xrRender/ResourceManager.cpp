@@ -9,20 +9,20 @@
 
 #include "ResourceManager.h"
 #include "Layers/xrRender/tss.h"
-#include "Layers/xrRenderDX11/Blender.h"
-#include "Layers/xrRenderDX11/Blender_Recorder.h"
+#include "Layers/xrRender/Blender.h"
+#include "Layers/xrRender/Blender_Recorder.h"
 
-#include "Layers/xrRenderDX11/Blender_CLSID.h"
-#include "Layers/xrRenderDX11/blenders/blender_deffer_aref.h"
-#include "Layers/xrRenderDX11/blenders/blender_deffer_model.h"
-#include "Layers/xrRenderDX11/blenders/Blender_Vertex_aref.h"
-#include "Layers/xrRenderDX11/blenders/Blender_default_aref.h"
-#include "Layers/xrRenderDX11/blenders/Blender_tree.h"
-#include "Layers/xrRenderDX11/blenders/Blender_detail_still.h"
-#include "Layers/xrRenderDX11/blenders/Blender_Model.h"
-#include "Layers/xrRenderDX11/blenders/Blender_Model_EbB.h"
-#include "Layers/xrRenderDX11/blenders/Blender_Screen_SET.h"
-#include "Layers/xrRenderDX11/blenders/Blender_Particle.h"
+#include "Layers/xrRender/Blender_CLSID.h"
+#include "Layers/xrRender/blenders/blender_deffer_aref.h"
+#include "Layers/xrRender/blenders/blender_deffer_model.h"
+#include "Layers/xrRender/blenders/Blender_Vertex_aref.h"
+#include "Layers/xrRender/blenders/Blender_default_aref.h"
+#include "Layers/xrRender/blenders/Blender_tree.h"
+#include "Layers/xrRender/blenders/Blender_detail_still.h"
+#include "Layers/xrRender/blenders/Blender_Model.h"
+#include "Layers/xrRender/blenders/Blender_Model_EbB.h"
+#include "Layers/xrRender/blenders/Blender_Screen_SET.h"
+#include "Layers/xrRender/blenders/Blender_Particle.h"
 
 namespace xray::render::fg
 {

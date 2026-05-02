@@ -2,7 +2,7 @@
 
 #include "FGRenderBase.h"
 #include "FGRenderHost.h"
-#include "Layers/xrRenderDX11/ResourceManager.h"
+#include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
 
 #include "xrEngine/IRenderBackend.h"

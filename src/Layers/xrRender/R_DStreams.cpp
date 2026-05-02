@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
-#include "Layers/xrRenderDX11/ResourceManager.h"
+#include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/R_DStreams.h"
 
 namespace xray::render::fg

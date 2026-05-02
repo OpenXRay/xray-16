@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
-#include "Layers/xrRenderDX11/ResourceManager.h"
+#include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/tss.h"
-#include "Layers/xrRenderDX11/Blender.h"
-#include "Layers/xrRenderDX11/Blender_Recorder.h"
+#include "Layers/xrRender/Blender.h"
+#include "Layers/xrRender/Blender_Recorder.h"
 //	adopt_compiler don't have = operator And it can't have = operator
 #include "xrScriptEngine/script_engine.hpp"
 #include "xrScriptEngine/script_space.hpp"

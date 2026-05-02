@@ -4,10 +4,10 @@
 
 namespace xray::render::fg
 {
-class dxUISequenceVideoItem : public IUISequenceVideoItem
+class fgUISequenceVideoItem : public IUISequenceVideoItem
 {
 public:
-    dxUISequenceVideoItem();
+    fgUISequenceVideoItem();
     virtual void Copy(IUISequenceVideoItem& _in);
 
     virtual bool HasTexture();

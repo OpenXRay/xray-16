@@ -8,7 +8,7 @@
 
 namespace xray::render::fg
 {
-class dxRenderFactory : public IRenderFactory
+class fgRenderFactory : public IRenderFactory
 {
 #ifndef _EDITOR
     RENDER_FACTORY_DECLARE(UISequenceVideoItem)
@@ -33,5 +33,5 @@ class dxRenderFactory : public IRenderFactory
     RENDER_FACTORY_DECLARE(FontRender)
 };
 
-extern dxRenderFactory RenderFactoryImpl;
+extern fgRenderFactory RenderFactoryImpl;
 } // namespace xray::render::fg

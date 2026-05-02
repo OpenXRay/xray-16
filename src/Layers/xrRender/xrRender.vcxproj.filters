@@ -398,13 +398,10 @@
     <ClInclude Include="IRenderDetailModel.h">
       <Filter>Refactored\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="stats_manager.h">
-      <Filter>Refactored\stats_manager</Filter>
-    </ClInclude>
-    <ClInclude Include="dxRenderFactory.h">
+    <ClInclude Include="fgRenderFactory.h">
       <Filter>Interface implementations\RenderFactory</Filter>
     </ClInclude>
-    <ClInclude Include="dxObjectSpaceRender.h">
+    <ClInclude Include="fgObjectSpaceRender.h">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>
     </ClInclude>
     <ClInclude Include="dxFontRender.h">
@@ -413,7 +410,7 @@
     <ClInclude Include="dxWallMarkArray.h">
       <Filter>Interface implementations\WallMarkArray</Filter>
     </ClInclude>
-    <ClInclude Include="dxThunderboltDescRender.h">
+    <ClInclude Include="fgThunderboltDescRender.h">
       <Filter>Interface implementations\ThunderboltDescRender</Filter>
     </ClInclude>
     <ClInclude Include="dxDebugRender.h">
@@ -422,10 +419,10 @@
     <ClInclude Include="dxUIRender.h">
       <Filter>Interface implementations\UI\UIRender</Filter>
     </ClInclude>
-    <ClInclude Include="dxUIShader.h">
+    <ClInclude Include="fgUIShader.h">
       <Filter>Interface implementations\UI\UIShader</Filter>
     </ClInclude>
-    <ClInclude Include="dxUISequenceVideoItem.h">
+    <ClInclude Include="fgUISequenceVideoItem.h">
       <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
     </ClInclude>
     <ClInclude Include="Utils\dxHashHelper.h">
@@ -574,9 +571,6 @@
     </ClInclude>
     <ClInclude Include="FrameGraph\FGPass.h">
       <Filter>Framegraph\Passes</Filter>
-    </ClInclude>
-    <ClInclude Include="NVRHI\NVRHIDevice.h">
-      <Filter>NVRHI</Filter>
     </ClInclude>
     <ClInclude Include="NVRHIUIRenderer.h">
       <Filter>NVRHI</Filter>
@@ -855,16 +849,13 @@
     <ClCompile Include="SkeletonX.cpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
-    <ClCompile Include="stats_manager.cpp">
-      <Filter>Refactored\stats_manager</Filter>
-    </ClCompile>
-    <ClCompile Include="dxRenderFactory.cpp">
+    <ClCompile Include="fgRenderFactory.cpp">
       <Filter>Interface implementations\RenderFactory</Filter>
     </ClCompile>
     <ClCompile Include="dxWallMarkArray.cpp">
       <Filter>Interface implementations\WallMarkArray</Filter>
     </ClCompile>
-    <ClCompile Include="dxUISequenceVideoItem.cpp">
+    <ClCompile Include="fgUISequenceVideoItem.cpp">
       <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
     </ClCompile>
     <ClCompile Include="BufferUtils.cpp">
@@ -900,7 +891,7 @@
     <ClCompile Include="ImGuiRendererIntegration.cpp">
       <Filter>Interface implementations\ImGuiRender</Filter>
     </ClCompile>
-    <ClCompile Include="dxRenderFactory_ImGui.cpp">
+    <ClCompile Include="fgRenderFactory_ImGui.cpp">
       <Filter>Interface implementations\ImGuiRender</Filter>
     </ClCompile>
     <ClCompile Include="GlobalRenderDevice.cpp">
@@ -1013,9 +1004,6 @@
     </ClCompile>
     <ClCompile Include="FrameGraph\FGPass.cpp">
       <Filter>Framegraph\Passes</Filter>
-    </ClCompile>
-    <ClCompile Include="NVRHI\NVRHIDevice.cpp">
-      <Filter>NVRHI</Filter>
     </ClCompile>
     <ClCompile Include="NVRHIUIRenderer.cpp">
       <Filter>NVRHI</Filter>

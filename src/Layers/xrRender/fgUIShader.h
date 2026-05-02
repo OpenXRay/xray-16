@@ -12,7 +12,7 @@ namespace xray::render::framegraph {
 
 namespace xray::render::fg
 {
-class dxUIShader : public IUIShader
+class fgUIShader : public IUIShader
 {
     friend class FrameGraphRenderer;
     friend class xray::render::ui::UIRenderCollector;  // Allow UI collector to access shader
@@ -36,8 +36,8 @@ public:
     // DX12: NVRHI shader handles + reflection
     nvrhi::ShaderHandle m_vsHandle;
     nvrhi::ShaderHandle m_psHandle;
-    framegraph::ExtractedReflection* m_vsReflection = nullptr;  // Owned by dxUIShader
-    framegraph::ExtractedReflection* m_psReflection = nullptr;  // Owned by dxUIShader
+    framegraph::ExtractedReflection* m_vsReflection = nullptr;  // Owned by fgUIShader
+    framegraph::ExtractedReflection* m_psReflection = nullptr;  // Owned by fgUIShader
     CTexture* m_baseTexture = nullptr;  // DX12: Cached base texture pointer
 
     shared_str baseTexture{ "s_base" };

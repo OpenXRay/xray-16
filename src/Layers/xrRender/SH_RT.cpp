@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Layers/xrRenderDX11/ResourceManager.h"
+#include "Layers/xrRender/ResourceManager.h"
 
 // Legacy CRT implementation - stubbed out, FrameGraph handles all render targets
 

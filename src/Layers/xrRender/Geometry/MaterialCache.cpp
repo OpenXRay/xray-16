@@ -5,14 +5,14 @@
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
-#include "Layers/xrRender/dxUIShader.h"  // For dxUIShader NVRHI handles
+#include "Layers/xrRender/fgUIShader.h"  // For fgUIShader NVRHI handles
 #include "Layers/xrRender/FVisual.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/FProgressive.h"
 #include "Layers/xrRender/FTreeVisual.h"
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/SH_Atomic.h"
-#include "Layers/xrRenderDX11/ResourceManager.h"
+#include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/RenderContext/RCShader.h"
 #include "Layers/xrRender/RenderContext/RenderStateConversion.h"  // State conversion helpers
@@ -28,8 +28,8 @@
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"   // Terrain material buffer (t9)
 // SM6 bindless texture registration uses GEnv.Backend->RegisterBindlessTexture()
 #include "xrEngine/IRenderBackend.h"                          // For IRenderBackend
-#include "Layers/xrRenderDX11/Blender_CLSID.h"                    // For B_BmmD, B_LmBmmD CLASS_IDs
-#include "Layers/xrRenderDX11/blenders/Blender_BmmD.h"            // For CBlender_BmmD detail texture accessors
+#include "Layers/xrRender/Blender_CLSID.h"                    // For B_BmmD, B_LmBmmD CLASS_IDs
+#include "Layers/xrRender/blenders/Blender_BmmD.h"            // For CBlender_BmmD detail texture accessors
 #include "Layers/xrRender/r_constants.h"                      // For R_constant_setup
 #include "Layers/xrRender/Materials/MaterialSystem.h"         // For MaterialSystem (D3D12)
 #include "Layers/xrRender/Materials/ShaderInfo.h"
@@ -846,8 +846,8 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
     if (!uiShader || !framebuffer)
         return nullptr;
 
-    // Cast to dxUIShader to access NVRHI handles
-    dxUIShader* dxShader = static_cast<dxUIShader*>(uiShader);
+    // Cast to fgUIShader to access NVRHI handles
+    fgUIShader* dxShader = static_cast<fgUIShader*>(uiShader);
     if (!dxShader)
         return nullptr;
 
@@ -909,24 +909,24 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     auto pso = xr_make_unique<MaterialPSO>();
     // Note: pso->pass is nullptr for DX12 (no legacy shader system)
 
-    // Cast to dxUIShader to access NVRHI handles
-    dxUIShader* dxShader = static_cast<dxUIShader*>(uiShader);
+    // Cast to fgUIShader to access NVRHI handles
+    fgUIShader* dxShader = static_cast<fgUIShader*>(uiShader);
     if (!dxShader) {
         Msg("! [MaterialCache::CreateUIPSO] Invalid uiShader pointer");
         return nullptr;
     }
 
-    // Get NVRHI shader handles directly from dxUIShader (compiled in dxUIShader::create)
+    // Get NVRHI shader handles directly from fgUIShader (compiled in fgUIShader::create)
     nvrhi::ShaderHandle nvrhiVS = dxShader->m_vsHandle;
     nvrhi::ShaderHandle nvrhiPS = dxShader->m_psHandle;
 
     if (!nvrhiVS || !nvrhiPS) {
-        Msg("! [MaterialCache::CreateUIPSO] Missing NVRHI shader handles in dxUIShader (VS=%p PS=%p)",
+        Msg("! [MaterialCache::CreateUIPSO] Missing NVRHI shader handles in fgUIShader (VS=%p PS=%p)",
             nvrhiVS.Get(), nvrhiPS.Get());
         return nullptr;
     }
 
-    // Extract reflection from dxUIShader
+    // Extract reflection from fgUIShader
     if (dxShader->m_vsReflection) {
         pso->vsInputSignature = framegraph::ShaderReflector::GetVertexInputSignature(dxShader->m_vsReflection);
         pso->constantLayout = dxShader->m_vsReflection->constantLayout;

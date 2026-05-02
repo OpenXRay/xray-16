@@ -54,7 +54,7 @@ public:
     UIPrimitiveType primitiveType{UIPrimitiveType::TriList};
 
     // Rendering state
-    IUIShader* uiShader{nullptr};  // Backend-agnostic: Pointer to shader (dxUIShader has NVRHI handles)
+    IUIShader* uiShader{nullptr};  // Backend-agnostic: Pointer to shader (fgUIShader has NVRHI handles)
     u32 shaderElement{0};       // Shader element index (always 0 for UI = SE_R2_NORMAL_HQ)
     int alphaRef{0};            // Alpha reference value
     bool hasScissor{false};     // Whether scissor rect is active

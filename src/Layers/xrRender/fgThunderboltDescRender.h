@@ -6,7 +6,7 @@ namespace xray::render::fg
 {
 class IRender_DetailModel;
 
-class dxThunderboltDescRender : public IThunderboltDescRender
+class fgThunderboltDescRender : public IThunderboltDescRender
 {
 public:
     virtual void Copy(IThunderboltDescRender& _in);

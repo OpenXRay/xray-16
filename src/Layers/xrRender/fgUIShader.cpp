@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/fgUIShader.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
@@ -11,14 +11,14 @@ using namespace xray::render::resources;
 
 namespace xray::render::fg
 {
-void dxUIShader::Copy(IUIShader& _in) { *this = *((dxUIShader*)&_in); }
+void fgUIShader::Copy(IUIShader& _in) { *this = *((fgUIShader*)&_in); }
 
-void dxUIShader::create(LPCSTR sh, LPCSTR tex)
+void fgUIShader::create(LPCSTR sh, LPCSTR tex)
 {
     auto* shaderLoader = RImplementation.GetShaderLoader();
     if (!shaderLoader)
     {
-        Msg("! [dxUIShader] ShaderLoader is NULL for shader: %s", sh);
+        Msg("! [fgUIShader] ShaderLoader is NULL for shader: %s", sh);
         return;
     }
 
@@ -35,7 +35,7 @@ void dxUIShader::create(LPCSTR sh, LPCSTR tex)
 
     if (!vsResult.handle || !psResult.handle)
     {
-        Msg("* [dxUIShader] Shader '%s' not found, falling back to stub_notransform_t", sh);
+        Msg("* [fgUIShader] Shader '%s' not found, falling back to stub_notransform_t", sh);
         vsResult = shaderLoader->LoadVertexShader("stub_notransform_t", "main");
         psResult = shaderLoader->LoadPixelShader("stub_default", "main");
     }
@@ -48,18 +48,18 @@ void dxUIShader::create(LPCSTR sh, LPCSTR tex)
         m_psReflection = psResult.reflection;
         vsResult.reflection = nullptr;
         psResult.reflection = nullptr;
-        Msg("* [dxUIShader] Compiled UI shader: %s (tex: %s)", sh, tex ? tex : "none");
+        Msg("* [fgUIShader] Compiled UI shader: %s (tex: %s)", sh, tex ? tex : "none");
     }
     else
     {
-        Msg("! [dxUIShader] Failed to compile UI shader: %s (VS=%s, PS=%s)",
+        Msg("! [fgUIShader] Failed to compile UI shader: %s (VS=%s, PS=%s)",
             sh,
             vsResult.handle ? "OK" : "FAILED",
             psResult.handle ? "OK" : "FAILED");
     }
 }
 
-void dxUIShader::destroy()
+void fgUIShader::destroy()
 {
     m_vsHandle = nullptr;
     m_psHandle = nullptr;
@@ -77,12 +77,12 @@ void dxUIShader::destroy()
     }
 }
 
-CTexture* dxUIShader::GetBaseTexture() const
+CTexture* fgUIShader::GetBaseTexture() const
 {
     return m_baseTexture;
 }
 
-xrImTextureData dxUIShader::GetImGuiTextureId()
+xrImTextureData fgUIShader::GetImGuiTextureId()
 {
     const auto texture = GetBaseTexture();
     if (!texture)
@@ -98,7 +98,7 @@ xrImTextureData dxUIShader::GetImGuiTextureId()
     };
 }
 
-bool dxUIShader::GetBaseTextureResolution(Fvector2& res)
+bool fgUIShader::GetBaseTextureResolution(Fvector2& res)
 {
     const auto texture = GetBaseTexture();
     if (!texture)

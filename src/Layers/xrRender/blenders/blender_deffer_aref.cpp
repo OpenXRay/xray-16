@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Layers/xrRenderDX11/blenders/uber_deffer.h"
+#include "Layers/xrRender/blenders/uber_deffer.h"
 #include "blender_deffer_aref.h"
 
 namespace xray::render::fg

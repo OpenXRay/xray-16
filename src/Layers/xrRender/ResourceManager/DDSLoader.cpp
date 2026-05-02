@@ -3,6 +3,8 @@
 #include "xrCore/FS.h"
 #include "xrEngine/xrTheora_Surface.h"
 
+#include <directx/dxgiformat.h>
+
 // DDS File Format Loader Implementation
 // Week 1 - Day 2: Task 2.1
 // Week 6: Added video texture support (.ogm/.avi)

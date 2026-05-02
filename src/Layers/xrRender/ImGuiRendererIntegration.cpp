@@ -95,10 +95,10 @@ public:
 } // namespace fg
 
 //=============================================================================
-// Integration with existing dxRenderFactory
+// Integration with existing fgRenderFactory
 //=============================================================================
 
-// This needs to be called from dxRenderFactory::CreateImGuiRender()
+// This needs to be called from fgRenderFactory::CreateImGuiRender()
 IImGuiRender* CreateModernImGuiRenderer()
 {
     if (g_RenderDevice && g_RenderDevice->IsInitialized())

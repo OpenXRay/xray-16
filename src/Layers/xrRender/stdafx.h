@@ -25,17 +25,23 @@
 
 #include "Layers/xrRender/VertexLayout.h"
 
-#include "Layers/xrRenderDX11/CommonTypes.h"
+namespace xray::render::fg
+{
+using VertexBufferHandle   = nvrhi::BufferHandle;
+using IndexBufferHandle    = nvrhi::BufferHandle;
+using ConstantBufferHandle = nvrhi::BufferHandle;
+using HostBufferHandle     = void*;
+}
 
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/FVF.h"
 
-#include "Layers/xrRenderDX11/Blender.h"
-#include "Layers/xrRenderDX11/Blender_CLSID.h"
+#include "Layers/xrRender/Blender.h"
+#include "Layers/xrRender/Blender_CLSID.h"
 
 #include "Common/_d3d_extensions.h"
 
-#include "Layers/xrRenderDX11/ResourceManager.h"
+#include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/xrRender_console.h"
 
 #include "Layers/xrRender/r_FrameGraphRenderer.h"

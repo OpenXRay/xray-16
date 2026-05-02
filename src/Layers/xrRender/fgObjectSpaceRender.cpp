@@ -2,17 +2,17 @@
 
 #ifdef DEBUG
 
-#include "Layers/xrRender/dxObjectSpaceRender.h"
+#include "Layers/xrRender/fgObjectSpaceRender.h"
 #include "Layers/xrRender/FGDebugDraw.h"
 
 namespace xray::render::fg
 {
-dxObjectSpaceRender::dxObjectSpaceRender() { m_shDebug.create("debug" DELIMITER "wireframe", "$null"); }
-dxObjectSpaceRender::~dxObjectSpaceRender() { m_shDebug.destroy(); }
-void dxObjectSpaceRender::Copy(IObjectSpaceRender& _in) { *this = *(dxObjectSpaceRender*)&_in; }
-void dxObjectSpaceRender::dbgAddSphere(const Fsphere& sphere, u32 colour) { dbg_S.emplace_back(sphere, colour); }
-void dxObjectSpaceRender::dbgReserveSphere(size_t count) { dbg_S.reserve(count); }
-void dxObjectSpaceRender::dbgRender()
+fgObjectSpaceRender::fgObjectSpaceRender() { m_shDebug.create("debug" DELIMITER "wireframe", "$null"); }
+fgObjectSpaceRender::~fgObjectSpaceRender() { m_shDebug.destroy(); }
+void fgObjectSpaceRender::Copy(IObjectSpaceRender& _in) { *this = *(fgObjectSpaceRender*)&_in; }
+void fgObjectSpaceRender::dbgAddSphere(const Fsphere& sphere, u32 colour) { dbg_S.emplace_back(sphere, colour); }
+void fgObjectSpaceRender::dbgReserveSphere(size_t count) { dbg_S.reserve(count); }
+void fgObjectSpaceRender::dbgRender()
 {
     R_ASSERT(bDebug);
 
@@ -41,6 +41,6 @@ void dxObjectSpaceRender::dbgRender()
     dbg_S.clear();
 }
 
-void dxObjectSpaceRender::SetShader() { RCache.set_Shader(m_shDebug); }
+void fgObjectSpaceRender::SetShader() { RCache.set_Shader(m_shDebug); }
 } // namespace xray::render::fg
 #endif // DEBUG

@@ -6,11 +6,11 @@
 
 namespace xray::render::fg
 {
-class dxObjectSpaceRender : public IObjectSpaceRender
+class fgObjectSpaceRender : public IObjectSpaceRender
 {
 public:
-    dxObjectSpaceRender();
-    virtual ~dxObjectSpaceRender();
+    fgObjectSpaceRender();
+    virtual ~fgObjectSpaceRender();
     virtual void Copy(IObjectSpaceRender& _in);
 
     virtual void dbgRender();
