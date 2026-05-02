@@ -27,7 +27,6 @@ private:
     struct texture_detail
     {
         const char* T;
-        R_constant_setup* cs;
     };
 
 public:
@@ -90,7 +89,6 @@ private:
 
     xr_vector<ref_texture> m_necessary;
 public:
-    xr_vector<std::pair<shared_str, R_constant_setup*>> v_constant_setup;
     BOOL bDeferredLoad;
     bool m_shader_fallback_allowed;
     CScriptEngine ScriptEngine;
@@ -235,10 +233,6 @@ public:
     Shader* Create(
         IBlender* B, LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
     void Delete(const Shader* S);
-    void RegisterConstantSetup(LPCSTR name, R_constant_setup* s)
-    {
-        v_constant_setup.emplace_back(shared_str(name), s);
-    }
 
     SGeometry* CreateGeom(const VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib);
     SGeometry* CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib);

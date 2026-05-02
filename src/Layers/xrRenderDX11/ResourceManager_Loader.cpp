@@ -42,7 +42,6 @@ void CResourceManager::OnDeviceDestroy(BOOL)
     {
         xr_free((char*&)_t->first);
         xr_free((char*&)_t->second.T);
-        xr_delete(_t->second.cs);
     }
     m_td.clear();
 #ifndef _EDITOR

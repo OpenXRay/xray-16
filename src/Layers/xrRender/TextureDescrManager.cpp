@@ -10,16 +10,7 @@ namespace xray::render::fg
 {
 CTextureDescrMngr TextureDescr;
 
-// eye-params
 float r__dtex_range = 50;
-class cl_dt_scaler : public R_constant_setup
-{
-public:
-    float scale;
-
-    cl_dt_scaler(float s) : scale(s) {}
-    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, scale, scale, scale, 1 / r__dtex_range); }
-};
 
 void fix_texture_thm_name(pstr fn)
 {
@@ -65,7 +56,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 
             lock.Enter();
             texture_desc& desc = m_texture_details[item.first];
-            cl_dt_scaler*& dts = m_detail_scalers[item.first];
+            float& scale = m_detail_scalers[item.first];
             lock.Leave();
 
             if (desc.m_assoc)
@@ -79,10 +70,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             const int res = sscanf(item.second.c_str(), "%[^,],%f", T, &s);
             R_ASSERT4(res == 2, "Bad texture association", item.first.c_str(), fname);
             desc.m_assoc->detail_name = T;
-            if (dts)
-                dts->scale = s;
-            else
-                dts = xr_new<cl_dt_scaler>(s);
+            scale = s;
 
             if (strstr(item.second.c_str(), "usage[diffuse_or_bump]"))
                 desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail | texture_assoc::flBumpDetail);
@@ -174,7 +162,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
         {
             lock.Enter();
             texture_desc& desc = m_texture_details[fn];
-            cl_dt_scaler*& dts = m_detail_scalers[fn];
+            float& scale = m_detail_scalers[fn];
             lock.Leave();
 
             if (tp.detail_name.size() &&
@@ -185,10 +173,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
 
                 desc.m_assoc = xr_new<texture_assoc>();
                 desc.m_assoc->detail_name = tp.detail_name;
-                if (dts)
-                    dts->scale = tp.detail_scale;
-                else
-                    dts = xr_new<cl_dt_scaler>(tp.detail_scale);
+                scale = tp.detail_scale;
 
                 if (tp.flags.is(STextureParams::flDiffuseDetail))
                     desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail);
@@ -266,10 +251,6 @@ void CTextureDescrMngr::UnLoad()
 CTextureDescrMngr::~CTextureDescrMngr()
 {
     ZoneScoped;
-
-    for (auto& it : m_detail_scalers)
-        xr_delete(it.second);
-
     m_detail_scalers.clear();
 }
 
@@ -427,7 +408,7 @@ void CTextureDescrMngr::GetTextureUsage(const shared_str& tex_name, bool& bDiffu
     }
 }
 
-BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res, R_constant_setup*& CS) const
+BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res) const
 {
     map_TD::const_iterator I = m_texture_details.find(tex_name);
     if (I != m_texture_details.end())
@@ -436,8 +417,6 @@ BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res
         {
             texture_assoc* TA = I->second.m_assoc;
             res = TA->detail_name.c_str();
-            map_CS::const_iterator It2 = m_detail_scalers.find(tex_name);
-            CS = It2 == m_detail_scalers.end() ? 0 : It2->second;
             return TRUE;
         }
     }
@@ -447,10 +426,9 @@ BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res
 float CTextureDescrMngr::GetDetailScale(const shared_str& tex_name) const
 {
     auto it = m_detail_scalers.find(tex_name);
-    if (it != m_detail_scalers.end() && it->second) {
-        return it->second->scale;
-    }
-    return 1.0f;  // Default scale
+    if (it != m_detail_scalers.end())
+        return it->second;
+    return 1.0f;
 }
 
 } // namespace xray::render::fg

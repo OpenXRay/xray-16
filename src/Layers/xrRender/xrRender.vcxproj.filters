@@ -166,7 +166,6 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{f535a92e-7512-4130-864e-2d0e6360a0c0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3DFluid">
       <UniqueIdentifier>{dbf14a7f-83de-4240-b3b6-0965c460a1c6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Debug">

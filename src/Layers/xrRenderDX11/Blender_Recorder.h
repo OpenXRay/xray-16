@@ -20,7 +20,6 @@ public:
     sh_list L_matrices;
 
     LPCSTR detail_texture;
-    R_constant_setup* detail_scaler;
 
     bool bFFP;
     bool bDetail;
@@ -62,7 +61,7 @@ public:
 
     SimulatorStates& R() { return RS; }
     void SetParams(int iPriority, bool bStrictB2F);
-    void SetMapping();
+    void SetMapping() {}
 
     // R1-compiler
     void PassBegin();
@@ -125,7 +124,6 @@ public:
     void r_Pass(LPCSTR vs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE, BOOL bABlend = FALSE,
         nvrhi::BlendFactor abSRC = nvrhi::BlendFactor::One, nvrhi::BlendFactor abDST = nvrhi::BlendFactor::Zero, BOOL aTest = FALSE, u32 aRef = 0);
 
-    void r_Constant(LPCSTR name, R_constant_setup* s);
     void r_Pass(LPCSTR vs, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE,
         BOOL bABlend = FALSE, nvrhi::BlendFactor abSRC = nvrhi::BlendFactor::One, nvrhi::BlendFactor abDST = nvrhi::BlendFactor::Zero, BOOL aTest = FALSE,
         u32 aRef = 0);

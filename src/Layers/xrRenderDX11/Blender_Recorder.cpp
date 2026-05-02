@@ -55,9 +55,7 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
     //	base texture name detection. Perhapse it's done for
     //	optimization?
 
-    // Analyze possibility to detail this shader
     detail_texture = nullptr;
-    detail_scaler = nullptr;
     LPCSTR base = nullptr;
     if (bDetail && BT->canBeDetailed())
     {
@@ -71,7 +69,7 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
                 xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", lst[0].c_str());
             base = lst[id].c_str();
         }
-        if (!TextureDescr.GetDetailTexture(base, detail_texture, detail_scaler))
+        if (!TextureDescr.GetDetailTexture(base, detail_texture))
             bDetail = false;
     }
     else

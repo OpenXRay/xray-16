@@ -15,7 +15,6 @@ namespace slang
 namespace xray::render::fg
 {
 class CBackend;
-class ECORE_API R_constant_setup;
 
 enum
 {
@@ -105,9 +104,8 @@ struct ECORE_API R_constant : public xr_resource
     R_constant_load cs;
 
     R_constant_load samp;
-    R_constant_setup* handler;
 
-    R_constant() : type(u16(-1)), destination(0), handler(nullptr) {}
+    R_constant() : type(u16(-1)), destination(0) {}
 
     R_constant_load& get_load(u32 destination)
     {
@@ -137,20 +135,10 @@ struct ECORE_API R_constant : public xr_resource
             && hs.equal(C.hs)
             && ds.equal(C.ds)
             && cs.equal(C.cs)
-            && samp.equal(C.samp)
-            && handler == C.handler;
+            && samp.equal(C.samp);
     }
 };
 typedef resptr_core<R_constant, resptr_base<R_constant>> ref_constant;
-
-// Automatic constant setup
-class ECORE_API XR_NOVTABLE R_constant_setup
-{
-public:
-    R_constant_setup() = default;
-    virtual void setup(CBackend& cmd_list, R_constant* C) = 0;
-    virtual ~R_constant_setup() = default;
-};
 
 class ECORE_API R_constant_table : public xr_resource_flagged
 {

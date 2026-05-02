@@ -7,8 +7,6 @@
 
 namespace xray::render::fg
 {
-class cl_dt_scaler;
-
 class CTextureDescrMngr
 {
     struct texture_assoc
@@ -45,10 +43,10 @@ class CTextureDescrMngr
     };
 
     using map_TD = xr_unordered_map<shared_str, texture_desc>;
-    using map_CS = xr_unordered_map<shared_str, cl_dt_scaler*>;
+    using map_DS = xr_unordered_map<shared_str, float>;
 
     map_TD m_texture_details;
-    map_CS m_detail_scalers;
+    map_DS m_detail_scalers;
 
     void LoadTHM(pcstr initial, bool listTHM);
     void LoadLTX(pcstr initial, bool listTHM);
@@ -62,7 +60,7 @@ public:
     shared_str GetBumpName(const shared_str& tex_name) const;
     float GetMaterial(const shared_str& tex_name) const;
     void GetTextureUsage(const shared_str& tex_name, bool& bDiffuse, bool& bBump) const;
-    BOOL GetDetailTexture(const shared_str& tex_name, LPCSTR& res, R_constant_setup*& CS) const;
+    BOOL GetDetailTexture(const shared_str& tex_name, LPCSTR& res) const;
     BOOL UseSteepParallax(const shared_str& tex_name) const;
 
     // Get detail scale for a texture (returns 1.0 if no detail texture)

@@ -9,7 +9,6 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRender/FHierrarhyVisual.h"
-#include "Layers/xrRenderDX11/3DFluid/dx113DFluidVolume.h"
 #endif
 
 // Mega-buffer system integration

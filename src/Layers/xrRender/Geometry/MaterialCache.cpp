@@ -2209,10 +2209,8 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
             }
         }
 
-        // Get detail texture from texture description
         LPCSTR detailTexName = nullptr;
-        R_constant_setup* detailCS = nullptr;
-        if (texDescMgr.GetDetailTexture(diffuseName, detailTexName, detailCS)) {
+        if (texDescMgr.GetDetailTexture(diffuseName, detailTexName)) {
             if (detailTexName && detailTexName[0]) {
                 resources::TextureHandle handle = texManager->LoadTexture(detailTexName);
                 if (handle.IsValid()) {

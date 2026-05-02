@@ -17,11 +17,6 @@
 #include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
 #endif
 
-#if (RENDER == R_R3) || (RENDER == R_R4)
-#   ifndef MASTER_GOLD
-#   include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
-#   endif // MASTER_GOLD
-#endif // (RENDER == R_R3) || (RENDER == R_R4)
 
 #if RENDER == R_R4
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
@@ -773,16 +768,6 @@ public:
 #endif
 
 //  Allow real-time fog config reload
-#if (RENDER == R_R3) || (RENDER == R_R4)
-#   ifndef MASTER_GOLD
-class CCC_Fog_Reload : public IConsole_Command
-{
-public:
-    CCC_Fog_Reload(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR /*args*/) { FluidManager.UpdateProfiles(); }
-};
-#   endif // MASTER_GOLD
-#endif // (RENDER == R_R3) || (RENDER == R_R4)
 
 //-----------------------------------------------------------------------
 void xrRender_initconsole()
@@ -1022,11 +1007,6 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "r3_minmax_sm", &ps_r3_minmax_sm, qminmax_sm_token);
 
 //  Allow real-time fog config reload
-#if (RENDER == R_R3) || (RENDER == R_R4)
-#   ifndef MASTER_GOLD
-    CMD1(CCC_Fog_Reload, "r3_fog_reload");
-#   endif
-#endif // (RENDER == R_R3) || (RENDER == R_R4)
 
     CMD3(CCC_Mask, "r3_dynamic_wet_surfaces", &ps_r2_ls_flags, R3FLAG_DYN_WET_SURF);
     CMD4(CCC_Float, "r3_dynamic_wet_surfaces_near", &ps_r3_dyn_wet_surf_near, 5, 70);

@@ -41,14 +41,6 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
     }
 }
 
-void CBlender_Compile::r_Constant(LPCSTR name, R_constant_setup* s)
-{
-    R_ASSERT(s);
-    ref_constant C = ctable.get(name);
-    if (C)
-        C->handler = s;
-}
-
 void CBlender_Compile::r_ColorWriteEnable(bool cR, bool cG, bool cB, bool cA)
 {
     u8 Mask = 0;
