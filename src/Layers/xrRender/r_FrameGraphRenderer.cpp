@@ -64,6 +64,7 @@
 #include "Layers/xrRender/fgRainRender.h"
 #include "Layers/xrRender/fgThunderboltRender.h"
 #include "Layers/xrRender/fgLensFlareRender.h"
+#include "Layers/xrRender/fgEnvironmentRender.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/Rain.h"
 #include "xrEngine/thunderbolt.h"
@@ -378,10 +379,6 @@ void FrameGraphRenderer::Shutdown() {
     m_framegraph = nullptr;
 
     if (m_blackboard) {
-        if (auto* sky = m_blackboard->try_get<passes::SkyPassState>())
-            passes::ShutdownSkyGeometry(*sky);
-        if (auto* sun = m_blackboard->try_get<passes::SunPassState>())
-            passes::ShutdownSunPass(*sun);
         if (auto* tonemap = m_blackboard->try_get<passes::TonemapPassState>())
             passes::ShutdownTonemapPass(*tonemap);
         m_blackboard.reset();
@@ -1122,25 +1119,25 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     auto skyColorHandle = m_framegraph->CreateTexture("rt_SceneColor", colorDesc);
 
+    FGEnvironmentRender* fgEnv = nullptr;
+    if (g_pGamePersistent)
+        fgEnv = dynamic_cast<FGEnvironmentRender*>(&*g_pGamePersistent->Environment().m_pRender);
+
     auto skyOutput = passes::setupSkyPass(
         *m_framegraph,
-        m_device,
         skyColorHandle,
         depthBuffer,
-        g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
+        fgEnv,
         width,
-        height,
-        m_blackboard->get_or_add<passes::SkyPassState>()
+        height
     );
 
     auto sunOutput = passes::setupSunPass(
         *m_framegraph,
-        m_device,
         skyOutput,
-        g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
+        fgEnv,
         width,
-        height,
-        m_blackboard->get_or_add<passes::SunPassState>()
+        height
     );
 
     passes::BindlessForwardConfig bindlessConfig;
