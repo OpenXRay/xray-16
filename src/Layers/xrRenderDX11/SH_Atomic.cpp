@@ -136,23 +136,6 @@ SPP::~SPP()
 #endif // USE_OGL
 
 
-#if defined(USE_DX11)
-///////////////////////////////////////////////////////////////////////
-//	SInputSignature
-SInputSignature::SInputSignature(ID3DBlob* pBlob)
-{
-    VERIFY(pBlob);
-    signature = pBlob;
-    signature->AddRef();
-};
-
-SInputSignature::~SInputSignature()
-{
-    _RELEASE(signature);
-    RImplementation.Resources->_DeleteInputSignature(this);
-}
-#endif // USE_DX11
-
 ///////////////////////////////////////////////////////////////////////
 //	SState
 SState::~SState()

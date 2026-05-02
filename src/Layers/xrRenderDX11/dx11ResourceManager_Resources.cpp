@@ -154,25 +154,6 @@ SDeclaration* CResourceManager::_CreateDecl(const VertexElement* dcl)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-dx11ConstantBuffer* CResourceManager::_CreateConstantBuffer(u32 context_id, ID3DShaderReflectionConstantBuffer* pTable)
-{
-    VERIFY(pTable);
-    dx11ConstantBuffer* pTempBuffer = xr_new<dx11ConstantBuffer>(pTable);
-
-    for (dx11ConstantBuffer* buf : v_constant_buffer[context_id])
-    {
-        if (pTempBuffer->Similar(*buf))
-        {
-            xr_delete(pTempBuffer);
-            return buf;
-        }
-    }
-
-    pTempBuffer->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    v_constant_buffer[context_id].emplace_back(pTempBuffer);
-    return pTempBuffer;
-}
-
 dx11ConstantBuffer* CResourceManager::_CreateConstantBufferSlang(u32 context_id, const char* name, u32 size)
 {
     VERIFY(name);
@@ -204,34 +185,4 @@ void CResourceManager::_DeleteConstantBuffer(u32 context_id, const dx11ConstantB
 #endif
 }
 
-//--------------------------------------------------------------------------------------------------------------
-SInputSignature* CResourceManager::_CreateInputSignature(ID3DBlob* pBlob)
-{
-    VERIFY(pBlob);
-
-    for (SInputSignature* sign : v_input_signature)
-    {
-        if ((pBlob->GetBufferSize() == sign->signature->GetBufferSize()) &&
-            (!(memcmp(pBlob->GetBufferPointer(), sign->signature->GetBufferPointer(), pBlob->GetBufferSize()))))
-        {
-            return sign;
-        }
-    }
-
-    SInputSignature* pSign = v_input_signature.emplace_back(xr_new<SInputSignature>(pBlob));
-    pSign->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-
-    return pSign;
-}
-
-void CResourceManager::_DeleteInputSignature(const SInputSignature* pSignature)
-{
-    if (0 == (pSignature->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    if (reclaim(v_input_signature, pSignature))
-        return;
-#ifndef MASTER_GOLD
-    Msg("! ERROR: Failed to find input signature");
-#endif
-}
 } // namespace xray::render::fg

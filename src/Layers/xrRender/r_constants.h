@@ -169,18 +169,12 @@ public:
 private:
     void fatal(LPCSTR s);
 
-#if defined(USE_DX11)
-    BOOL parseConstants(ID3DShaderReflectionConstantBuffer* pTable, u32 destination);
-    BOOL parseResources(ID3DShaderReflection* pReflection, int ResNum, u32 destination);
-#endif
-
 public:
     R_constant_table() = default;
     ~R_constant_table();
 
     void clear();
-    BOOL parse(void* desc, u32 destination);
-    BOOL parseSlangReflection(slang::ShaderReflection* reflection, u32 destination);  // Slang reflection path
+    BOOL parseSlangReflection(slang::ShaderReflection* reflection, u32 destination);
     void merge(R_constant_table* C);
     ref_constant get(pcstr name, u16 type = u16(-1)) const; // slow search
     ref_constant get(const shared_str& name, u16 type = u16(-1)) const; // fast search

@@ -7,7 +7,6 @@
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/tss_def.h"
 #include "Layers/xrRender/TextureDescrManager.h"
-#include "Layers/xrRenderDX11/dx11SH_Atomic.h"
 
 #include "xrScriptEngine/script_engine.hpp"
 
@@ -76,7 +75,6 @@ private:
 
 #if defined(USE_DX11)
     xr_vector<dx11ConstantBuffer*> v_constant_buffer[R__NUM_CONTEXTS];
-    xr_vector<SInputSignature*> v_input_signature;
 #endif
 
     // lists
@@ -150,12 +148,8 @@ public:
     void _DeleteConstantTable(const R_constant_table* C);
 
 #if defined(USE_DX11)
-    dx11ConstantBuffer* _CreateConstantBuffer(u32 context_id, ID3DShaderReflectionConstantBuffer* pTable);
     dx11ConstantBuffer* _CreateConstantBufferSlang(u32 context_id, const char* name, u32 size);
     void _DeleteConstantBuffer(u32 context_id, const dx11ConstantBuffer* pBuffer);
-
-    SInputSignature* _CreateInputSignature(ID3DBlob* pBlob);
-    void _DeleteInputSignature(const SInputSignature* pSignature);
 #endif
 
     CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, nvrhi::Format f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {});
