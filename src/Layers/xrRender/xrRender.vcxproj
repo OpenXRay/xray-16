@@ -60,7 +60,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Backend\D3D11BackendWrapper.h"/>
     <ClInclude Include="Backend\D3D12Backend.h"/>
     <ClInclude Include="Backend\VulkanBackend.h"/>
     <ClInclude Include="Bindless\BindlessTypes.h"/>
@@ -181,7 +180,6 @@
     <ClInclude Include="PBRConverter\ONNXModelRunner.h" Condition="'$(Configuration)'!='Release Master Gold'"/>
     <ClInclude Include="PBRConverter\PBRTextureConverter.h"/>
     <ClInclude Include="PSLibrary.h"/>
-    <ClInclude Include="QueryHelper.h"/>
     <ClInclude Include="ResourceManager\DDSLoader.h"/>
     <ClInclude Include="ResourceManager\ResourceHandle.h"/>
     <ClInclude Include="ResourceManager\TestTextureManager.h"/>
@@ -257,9 +255,9 @@
     <ClInclude Include="r2_types.h"/>
     <ClInclude Include="r2_rendertarget_wallmarks.h"/>
     <ClInclude Include="SMAP_Allocator.h"/>
+    <ClInclude Include="..\xrRenderDX11\dx11HW.h"/>
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h"/>
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer_impl.h"/>
-    <ClInclude Include="..\xrRenderDX11\dx11HW.h"/>
     <ClInclude Include="..\xrRenderDX11\dx11StateUtils.h"/>
     <ClInclude Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.h"/>
     <ClInclude Include="..\xrRenderDX11\StateManager\dx11State.h"/>
@@ -287,7 +285,6 @@
     <ClInclude Include="..\xrRenderDX11\blenders\blender_deffer_model.h"/>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Backend\D3D11BackendWrapper.cpp"/>
     <ClCompile Include="Backend\D3D12Backend.cpp"/>
     <ClCompile Include="Backend\VulkanBackend.cpp"/>
     <ClCompile Include="Bindless\GPUStructuredBuffer.cpp"/>
@@ -518,7 +515,6 @@
     <ClCompile Include="FrameGraphRendererModule.cpp"/>
     <ClCompile Include="Profiler\GPUProfiler.cpp"/>
     <ClCompile Include="Profiler\StatsOverlay.cpp"/>
-    <ClCompile Include="r2_test_hw.cpp"/>
     <ClCompile Include="..\..\..\Externals\nvrhi\src\common\dxgi-format.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -536,7 +532,6 @@
     <ClCompile Include="..\xrRenderDX11\dxThunderboltDescRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxObjectSpaceRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\r__dsgraph_build.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\r__occlusion.cpp"/>
     <ClCompile Include="D3DUtils.cpp"/>
     <ClCompile Include="..\xrRenderDX11\HOM.cpp"/>
     <ClCompile Include="..\xrRenderDX11\occRasterizer.cpp"/>

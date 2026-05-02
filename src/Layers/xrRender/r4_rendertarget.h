@@ -68,7 +68,7 @@ public:
     ref_rt rt_LUM_64; // 64bit, 64x64,	log-average in all components
     ref_rt rt_LUM_8; // 64bit, 8x8,		log-average in all components
 
-    ref_rt rt_LUM_pool[CHWCaps::MAX_GPUS * 2]; // 1xfp32,1x1,		exp-result -> scaler
+    ref_rt rt_LUM_pool[16];
     ref_texture t_LUM_src; // source
     ref_texture t_LUM_dest; // destination & usage for current frame
 
@@ -207,9 +207,6 @@ public:
     //	Igor: used for volumetric lights
     void accum_volumetric_geom_create();
     void accum_volumetric_geom_destroy();
-
-    ID3DRenderTargetView* get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
-    ID3DDepthStencilView* get_base_zb() { return rt_Base_Depth->pZRT[CHW::IMM_CTX_ID]; }
 
     void u_calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);

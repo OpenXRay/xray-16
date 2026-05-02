@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
-#include "Layers/xrRenderDX11/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
 #include "Layers/xrRender/Shaders/SlangCompiler.h"
 #include "Layers/xrRender/Shaders/SlangReflectionWrapper.h"
@@ -424,17 +423,7 @@ HRESULT FrameGraphRenderer::shader_compile(pcstr name, IReader* fs, pcstr pFunct
     // Shader Model 4.1
     appendShaderOption(RImplementation.o.dx11_sm4_1, "SM_4_1", "1");
 
-    // Shader Model 5.0
-    appendShaderOption(HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0, "SM_5", "1");
-
-    // Double precision
-    appendShaderOption(HW.DoublePrecisionFloatShaderOps, "DOUBLE_PRECISION", "1");
-
-    // Extended doubles instructions
-    appendShaderOption(HW.ExtendedDoublesShaderInstructions, "EXTENDED_DOUBLES", "1");
-
-    // SAD4 intrinsic support
-    appendShaderOption(HW.SAD4ShaderInstructions, "SAD4_SUPPORTED", "1");
+    appendShaderOption(true, "SM_5", "1");
 
     // Minmax SM
     appendShaderOption(RImplementation.o.minmax_sm, "USE_MINMAX_SM", "1");

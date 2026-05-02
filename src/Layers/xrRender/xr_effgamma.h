@@ -37,8 +37,5 @@ public:
 
 private:
     void GenLUT(u16* r, u16* g, u16* b, u16 count) const;
-#if defined(USE_DX11)
-    void GenLUT(const DXGI_GAMMA_CONTROL_CAPABILITIES& GC, DXGI_GAMMA_CONTROL& G) const;
-#endif
 };
 } // namespace xray::render::fg

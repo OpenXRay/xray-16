@@ -2959,19 +2959,18 @@ void FrameGraphRenderer::create()
     o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);
     o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && (ps_r_ssao != 0);
     o.ssao_hdao = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HDAO) && (ps_r_ssao != 0);
-    o.ssao_ultra = HW.ComputeShadersSupported && ssao_hdao_cs_shaders_exist();
+    o.ssao_ultra = ssao_hdao_cs_shaders_exist();
     o.ssao_hbao = !o.ssao_hdao && ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HBAO) && (ps_r_ssao != 0);
     o.hbao_vectorized = (o.ssao_hbao && caps.id_vendor == 0x1002);
 
-    o.dx11_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1) && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+    o.dx11_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
 
     o.msaa = !!ps_r3_msaa;
     o.msaa_samples = (1 << ps_r3_msaa);
     o.msaa_opt = ps_r2_ls_flags.test(R3FLAG_MSAA_OPT);
-    o.msaa_opt = (o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1)) ||
-                 (o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0));
+    o.msaa_opt = (o.msaa_opt && o.msaa) || o.msaa;
     o.msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
-    o.msaa_hybrid &= !o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+    o.msaa_hybrid &= !o.msaa_opt && o.msaa;
 
     o.msaa_alphatest = 0;
     if (o.msaa)
@@ -2989,7 +2988,7 @@ void FrameGraphRenderer::create()
     o.minmax_sm = ps_r3_minmax_sm;
     o.minmax_sm_screenarea_threshold = 1600 * 1200;
 
-    o.tessellation = HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
+    o.tessellation = ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
     o.support_rt_arrays = true;
 
     if (o.minmax_sm == FrameGraphRenderer::MMSM_AUTODETECT)

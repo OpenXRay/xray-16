@@ -177,7 +177,6 @@ target_sources(xrRender PRIVATE
 
     Backend/VulkanBackend.h
     Backend/VulkanBackend.cpp
-    Backend/D3D11BackendWrapper.cpp
     Backend/D3D12Backend.cpp
 
     Animation.cpp
@@ -267,7 +266,6 @@ target_sources(xrRender PRIVATE
     stats_manager.cpp
     xrStripify.cpp
     BufferUtils.cpp
-    r2_test_hw.cpp
 
     ../../../Externals/meshoptimizer/src/allocator.cpp
     ../../../Externals/meshoptimizer/src/clusterizer.cpp
@@ -300,7 +298,6 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/dxThunderboltDescRender.cpp
     ../xrRenderDX11/dxObjectSpaceRender.cpp
     ../xrRenderDX11/r__dsgraph_build.cpp
-    ../xrRenderDX11/r__occlusion.cpp
     D3DUtils.cpp
     ../xrRenderDX11/HOM.cpp
     ../xrRenderDX11/occRasterizer.cpp

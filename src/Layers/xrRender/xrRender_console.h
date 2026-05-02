@@ -243,5 +243,4 @@ extern ECORE_API float ps_r_smoke_buoyancy;
 extern ECORE_API float ps_r_smoke_turbulence;
 
 extern void xrRender_initconsole();
-extern BOOL xrRender_test_hw();
 } // namespace xray::render::fg

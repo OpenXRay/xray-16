@@ -6,6 +6,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/HWCaps.h"
 
 namespace xray::render::fg
 {
