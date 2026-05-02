@@ -86,6 +86,10 @@ target_sources(xrRender PRIVATE
     fgStatGraphRender.cpp
     fgRainRender.h
     fgRainRender.cpp
+    fgFontRender.h
+    fgFontRender.cpp
+    FrameGraphPasses/FontPassSetup.h
+    FrameGraphPasses/FontPassSetup.cpp
     fgThunderboltRender.h
     fgThunderboltRender.cpp
     fgLensFlareRender.h
@@ -294,7 +298,6 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/ResourceManager_Resources.cpp
     ../xrRenderDX11/Shader.cpp
     ../xrRenderDX11/SH_Atomic.cpp
-    ../xrRenderDX11/dxFontRender.cpp
     ../xrRenderDX11/dxUIShader.cpp
     ../xrRenderDX11/dxThunderboltDescRender.cpp
     ../xrRenderDX11/dxObjectSpaceRender.cpp

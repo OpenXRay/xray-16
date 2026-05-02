@@ -251,8 +251,6 @@ public:
     MaterialCache* GetMaterialCache() const override { return m_materialCache.get(); }
     MaterialCache* GetUIMaterialCache() const override { return m_uiMaterialCache.get(); }
     fg::FGUIRender* GetUIRender() const override { return m_uiRender.get(); }
-    MaterialCache* GetTextMaterialCache() const override { return m_textMaterialCache.get(); }
-    framegraph::VolatileConstantBufferPool* GetTextVCBPool() const { return m_textVCBPool.get(); }
 
     void UpdateSmokeTrail(const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode) override;
     void NotifySmokeShot() override;
@@ -486,9 +484,6 @@ private:
     xr_unique_ptr<fg::FGUIRender> m_uiRender;
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_uiVCBPool;
     xr_unique_ptr<MaterialCache> m_uiMaterialCache;
-
-    xr_unique_ptr<MaterialCache> m_textMaterialCache;
-    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_textVCBPool;
 
     xr_vector<GeometryBatch> m_hudBatches;
 

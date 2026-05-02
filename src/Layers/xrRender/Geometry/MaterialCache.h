@@ -12,7 +12,6 @@ namespace xray::render::fg {
     struct SVS;
     struct SPS;
     class CTexture;
-    class dxFontRender;
 }
 
 namespace xray::render::resources {
@@ -42,7 +41,6 @@ using fg::SPass;
 using fg::dxRender_Visual;
 using fg::SVS;
 using fg::SPS;
-using fg::dxFontRender;
 
 enum class RenderPassType : u8 {
     DepthPrepass,
@@ -318,10 +316,6 @@ private:
         SPass* pass,
         nvrhi::IFramebuffer* framebuffer);
 
-    MaterialPSO* CreateFontPSO(
-        dxFontRender* fontRender,
-        nvrhi::IFramebuffer* framebuffer);
-
 public:
     void CreateBindingLayouts(MaterialPSO* matPSO);
     nvrhi::BindingLayoutHandle CreateStageBindingLayout(
@@ -350,10 +344,6 @@ public:
     void FinalizePendingMaterials(fg::RenderContext* ctx);
 
     xr_map<shared_str, nvrhi::ShaderHandle> m_shaderHandles;
-
-    MaterialPSO* GetOrCreateFontPSO(
-        dxFontRender* fontRender,
-        nvrhi::IFramebuffer* framebuffer);
 
 private:
 
