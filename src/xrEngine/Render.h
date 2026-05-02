@@ -416,7 +416,6 @@ public:
     virtual xray::render::MaterialCache* GetMaterialCache() const { return nullptr; }
     virtual xray::render::MaterialCache* GetUIMaterialCache() const { return nullptr; }
     virtual xray::render::fg::FGUIRender* GetUIRender() const { return nullptr; }
-    virtual xray::render::MaterialCache* GetTextMaterialCache() const { return nullptr; }
     virtual void UpdateSmokeTrail(const Fvector&, const Fvector&, float, bool) {}
     virtual void NotifySmokeShot() {}
 };

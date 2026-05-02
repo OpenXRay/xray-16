@@ -15,7 +15,6 @@ namespace xray::render::fg {
     struct SVS;
     struct SPS;
     class CTexture;  // Legacy - will be replaced by FGResourceManager
-    class dxFontRender;  // Font rendering system
 }
 
 // Forward declare FGResourceManager
@@ -48,7 +47,6 @@ using fg::SPass;
 using fg::dxRender_Visual;
 using fg::SVS;
 using fg::SPS;
-using fg::dxFontRender;
 
 // Pass types for different depth state requirements
 enum class RenderPassType : u8 {
@@ -421,11 +419,6 @@ private:
         SPass* pass,
         nvrhi::IFramebuffer* framebuffer);
 
-    // Create Font PSO (similar to UI PSO but uses dxFontRender)
-    MaterialPSO* CreateFontPSO(
-        dxFontRender* fontRender,
-        nvrhi::IFramebuffer* framebuffer);
-
 public:
     // Create binding layouts for material (separate VS and PS)
     void CreateBindingLayouts(MaterialPSO* matPSO);
@@ -482,10 +475,6 @@ public:
     // Shader handle cache (shared across all materials to avoid recreating identical shaders)
     // Key format: "VS_<shadername>" or "PS_<shadername>" to distinguish stages
     xr_map<shared_str, nvrhi::ShaderHandle> m_shaderHandles;  // Direct NVRHI handles (no wrapper needed)
-
-    MaterialPSO* GetOrCreateFontPSO(
-        dxFontRender* fontRender,
-        nvrhi::IFramebuffer* framebuffer);
 
 private:
 

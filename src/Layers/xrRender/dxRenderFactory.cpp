@@ -14,7 +14,7 @@
 #include "dxObjectSpaceRender.h"
 #endif // _EDITOR
 
-#include "dxFontRender.h"
+#include "fgFontRender.h"
 #include "Decals/fgWallMarkArray.h"
 #include "dxUISequenceVideoItem.h"
 #include "dxUIShader.h"
@@ -112,5 +112,13 @@ void dxRenderFactory::DestroyFlareRender(IFlareRender* pObject)
     xr_delete(p);
 }
 #endif
-RENDER_FACTORY_IMPLEMENT(FontRender)
+IFontRender* dxRenderFactory::CreateFontRender()
+{
+    return xr_new<FGFontRender>();
+}
+void dxRenderFactory::DestroyFontRender(IFontRender* pObject)
+{
+    auto* p = static_cast<FGFontRender*>(pObject);
+    xr_delete(p);
+}
 } // namespace xray::render::fg

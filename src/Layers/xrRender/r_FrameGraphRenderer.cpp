@@ -50,6 +50,7 @@
 #include "Decals/OverlayManager.h"                    // Per-NPC overlay textures
 #include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
+#include "FrameGraphPasses/FontPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
 #include "FrameGraphPasses/SmokeTrailPassSetup.h"
 #include "FrameGraphPasses/ClusterLightPassSetup.h"
@@ -238,12 +239,6 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
         m_uiVCBPool.get()
     );
     m_uiRender = xr_make_unique<fg::FGUIRender>();
-    m_textVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
-    m_textMaterialCache = xr_make_unique<MaterialCache>(
-        device,
-        device->GetFGResourceManager(),
-        m_textVCBPool.get()
-    );
     m_geometryCollector = xr_make_unique<GeometryCollector>();
     g_geometryCollector = m_geometryCollector.get();
 
@@ -334,8 +329,6 @@ void FrameGraphRenderer::Shutdown() {
     m_uiRender = nullptr;
     m_uiMaterialCache = nullptr;
     m_uiVCBPool = nullptr;
-    m_textMaterialCache = nullptr;
-    m_textVCBPool = nullptr;
     m_cachedStaticBatches.clear();
     m_staticBatchesCached = false;
     if (m_gpuCullingManager) {
@@ -612,7 +605,7 @@ void FrameGraphRenderer::RenderMenu() {
     );
 
     auto sceneWithUI = passes::setupUIPass(*m_framegraph, backgroundTarget, width, height);
-    sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height, m_blackboard->get_or_add<passes::UITextPassState>());
+    sceneWithUI = passes::setupFontPass(*m_framegraph, sceneWithUI);
     sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
     sceneWithUI = passes::setupDebugDrawPass(*m_framegraph, sceneWithUI, width, height);
 
@@ -1699,13 +1692,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
-    sceneWithUI = passes::setupTextPass(
-        *m_framegraph,
-        sceneWithUI,
-        width,
-        height,
-        m_blackboard->get_or_add<passes::UITextPassState>()
-    );
+    sceneWithUI = passes::setupFontPass(*m_framegraph, sceneWithUI);
 
     // 5. Cursor Pass - Renders cursor on top of UI+Text
     sceneWithUI = passes::setupCursorPass(

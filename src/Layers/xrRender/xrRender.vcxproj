@@ -89,7 +89,6 @@
     <ClInclude Include="du_cylinder.h"/>
     <ClInclude Include="du_sphere.h"/>
     <ClInclude Include="du_sphere_part.h"/>
-    <ClInclude Include="dxFontRender.h"/>
     <ClInclude Include="FrameGraphPasses\ForwardColorPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\HiZBuildPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\SkinningPassSetup.h"/>
@@ -105,6 +104,8 @@
     <ClInclude Include="fgEnvironmentRender.h"/>
     <ClInclude Include="fgStatGraphRender.h"/>
     <ClInclude Include="fgRainRender.h"/>
+    <ClInclude Include="fgFontRender.h"/>
+    <ClInclude Include="FrameGraphPasses\FontPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\ParticlePassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\RibbonPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\TrailPassSetup.h"/>
@@ -334,6 +335,8 @@
     <ClCompile Include="fgEnvironmentRender.cpp"/>
     <ClCompile Include="fgStatGraphRender.cpp"/>
     <ClCompile Include="fgRainRender.cpp"/>
+    <ClCompile Include="fgFontRender.cpp"/>
+    <ClCompile Include="FrameGraphPasses\FontPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\ParticlePassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\RibbonPassSetup.cpp"/>
     <ClCompile Include="FrameGraphPasses\TrailPassSetup.cpp"/>
@@ -538,7 +541,6 @@
     <ClCompile Include="..\xrRenderDX11\ResourceManager_Resources.cpp"/>
     <ClCompile Include="..\xrRenderDX11\Shader.cpp"/>
     <ClCompile Include="..\xrRenderDX11\SH_Atomic.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dxFontRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxUIShader.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxThunderboltDescRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxObjectSpaceRender.cpp"/>

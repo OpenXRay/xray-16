@@ -1,0 +1,15 @@
+SamplerState smp_base : register(s0);
+Texture2D    s_base   : register(t0);
+
+struct PSInput
+{
+    float4 position : SV_Position;
+    float4 color    : COLOR;
+    float2 texcoord : TEXCOORD0;
+};
+
+float4 main(PSInput input) : SV_Target
+{
+    float glyph_alpha = s_base.Sample(smp_base, input.texcoord).r;
+    return float4(input.color.rgb, glyph_alpha * input.color.a);
+}
