@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "RenderDevice.h"
 #include "RenderContext.h"
-#include "../Backend/D3D11BackendWrapper.h"
 #include "../ResourceManager/FGResourceManager.h"
 #include "../Shaders/SlangCompiler.h"
 
@@ -89,47 +88,6 @@ xray::render::SlangCompiler* RenderDevice::GetSlangCompiler() const {
 // ═══════════════════════════════════════════════════
 //  INITIALIZATION
 // ═══════════════════════════════════════════════════
-
-bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* context) {
-    VERIFY(device);
-    VERIFY(context);
-
-    // Create D3D11 backend wrapper
-    auto* backendWrapper = xr_new<D3D11BackendWrapper>();
-    if (!backendWrapper->Initialize(device, context)) {
-        Msg("! [RenderDevice] Failed to initialize D3D11 backend");
-        xr_delete(backendWrapper);
-        return false;
-    }
-
-    m_backend.reset(backendWrapper);
-    Msg("* [RenderDevice] Backend initialized: %s", m_backend->GetAPIName());
-
-    // Create pipeline state cache
-    m_pipelineCache = xr_make_unique<PipelineStateCache>(this);
-
-    // Create Slang compiler
-    m_slangCompiler = xr_make_unique<xray::render::SlangCompiler>();
-    if (!m_slangCompiler->Initialize()) {
-        Msg("! [RenderDevice] Failed to initialize Slang compiler");
-        return false;
-    }
-    Msg("* [RenderDevice] Slang compiler initialized");
-
-    // Create modern resource manager (Week 2-3)
-    m_modernResourceManager = xr_make_unique<xray::render::resources::FGResourceManager>(this);
-    Msg("* [RenderDevice] FGResourceManager initialized");
-
-    // Reserve initial capacity
-    m_textures.reserve(256);
-    m_buffers.reserve(512);
-    m_samplers.reserve(64);
-    m_shaders.reserve(128);
-
-    m_initialized = true;
-
-    return true;
-}
 
 bool RenderDevice::InitializeFromBackend(IRenderBackend* backend) {
     VERIFY(backend);
@@ -284,43 +242,6 @@ TextureHandle RenderDevice::CreateTexture(
     return handle;
 }
 
-TextureHandle RenderDevice::CreateTextureFromD3D11(
-    ID3D11Resource* d3d11Texture,
-    const TextureDesc& desc) {
-
-    VERIFY(m_initialized);
-    VERIFY(d3d11Texture);
-
-    // Convert to NVRHI descriptor
-    nvrhi::TextureDesc nvrhiDesc = ConvertTextureDesc(desc);
-
-    // Wrap D3D11 resource
-    nvrhi::TextureHandle nvrhiTexture = GetNativeDevice()->createHandleForNativeTexture(
-        nvrhi::ObjectTypes::D3D11_Resource,
-        nvrhi::Object(d3d11Texture),
-        nvrhiDesc
-    );
-
-    if (!nvrhiTexture) {
-        Msg("! [RenderDevice] Failed to wrap D3D11 texture: %s", desc.debugName.c_str());
-        return TextureHandle{};
-    }
-
-    // Allocate handle
-    TextureHandle handle = AllocateTextureHandle();
-
-    // Store texture info
-    TextureInfo& info = m_textures[handle.index];
-    info.nvrhiHandle = nvrhiTexture;
-    info.desc = desc;
-
-    // Update statistics
-    m_stats.texturesAlive++;
-    m_stats.texturesCreated++;
-
-    return handle;
-}
-
 void RenderDevice::DestroyTexture(TextureHandle handle) {
     if (!ValidateTextureHandle(handle)) {
         Msg("! [RenderDevice] DestroyTexture: Invalid handle");
@@ -435,7 +356,6 @@ void RenderDevice::UploadTextureData(
 
     ScopedUpload upload(m_backend.get(), GetNativeDevice());
 
-    // Upload all slices
     for (u32 i = 0; i < sliceCount; ++i) {
         const TextureSliceData& slice = slices[i];
         upload.Get()->writeTexture(nvrhiTexture, slice.arraySlice, slice.mipLevel,

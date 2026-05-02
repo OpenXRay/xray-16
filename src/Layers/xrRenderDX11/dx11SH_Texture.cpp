@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include "Layers/xrRenderDX11/ResourceManager.h"
+#include "Layers/xrRenderDX11/dx11_texture_load.h"
 
 #include "xrEngine/tntQAVI.h"
 #include "xrEngine/xrTheora_Surface.h"
@@ -455,7 +456,7 @@ void CTexture::Load()
             {
                 // Load another texture
                 u32 mem = 0;
-                pSurface = RImplementation.texture_load(buffer, mem);
+                pSurface = texture_load(buffer, mem);
                 if (pSurface)
                 {
                     seqDATA.push_back(pSurface);
@@ -472,7 +473,7 @@ void CTexture::Load()
     {
         // Normal texture
         u32 mem = 0;
-        pSurface = RImplementation.texture_load(cName.c_str(), mem);
+        pSurface = texture_load(cName.c_str(), mem);
 
         // Calc memory usage and preload into vid-mem
         if (pSurface)

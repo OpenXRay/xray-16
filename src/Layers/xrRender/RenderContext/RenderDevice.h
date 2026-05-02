@@ -33,7 +33,6 @@ public:
     //  INITIALIZATION
     // ═══════════════════════════════════════════════════
 
-    bool InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* context);
     bool InitializeFromBackend(IRenderBackend* backend);  // For D3D12
     void Shutdown();
 
@@ -108,11 +107,6 @@ public:
     TextureHandle CreateTexture(
         const TextureDesc& desc,
         const void* initialData = nullptr);
-
-    // Wrap existing D3D11 texture (for backbuffer, etc.)
-    TextureHandle CreateTextureFromD3D11(
-        ID3D11Resource* d3d11Texture,
-        const TextureDesc& desc);
 
     void DestroyTexture(TextureHandle handle);
 

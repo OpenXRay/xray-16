@@ -104,15 +104,12 @@ IC void Reduce(size_t& w, size_t& h, size_t& l, int skip)
         h = 1;
 }
 
-}
-namespace xray::render
-{
-ID3D11Resource* FrameGraphRenderer::texture_load(LPCSTR fRName, u32& ret_msize)
+ID3D11Resource* texture_load(LPCSTR fRName, u32& ret_msize)
 {
     ret_msize = 0;
     R_ASSERT1_CURE(fRName && fRName[0], { return nullptr; });
 
-    auto* device = GetRenderDevice();
+    auto* device = RImplementation.GetRenderDevice();
     if (!device || !device->GetFGResourceManager())
         return nullptr;
 

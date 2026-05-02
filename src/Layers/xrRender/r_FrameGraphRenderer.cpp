@@ -857,7 +857,6 @@ void FrameGraphRenderer::SetupFrame() {
     if (psDeviceFlags.test(rsStatistic))
         fg::ClusteredLightManager::Instance().ProcessStatsReadback();
 
-    m_bufferHandleCache.clear();
     m_lstRenderables.clear();
 
     if (levelLoaded)
