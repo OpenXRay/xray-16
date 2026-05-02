@@ -331,14 +331,20 @@ void FGThunderboltRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer
 
         if (b.texture != currentTexture)
         {
-            nvrhi::BindingSetDesc bindingSetDesc;
-            bindingSetDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
-                nvrhi::BindingSetItem::Texture_SRV(0, b.texture),
-                nvrhi::BindingSetItem::Sampler(0, m_sampler),
-            };
-            currentBindingSet = m_device->createBindingSet(bindingSetDesc, m_bindingLayout);
-            R_ASSERT2(currentBindingSet, "FGThunderboltRender: createBindingSet failed");
+            auto it = m_bindingSetCache.find(b.texture);
+            if (it == m_bindingSetCache.end())
+            {
+                nvrhi::BindingSetDesc bindingSetDesc;
+                bindingSetDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
+                    nvrhi::BindingSetItem::Texture_SRV(0, b.texture),
+                    nvrhi::BindingSetItem::Sampler(0, m_sampler),
+                };
+                nvrhi::BindingSetHandle bs = m_device->createBindingSet(bindingSetDesc, m_bindingLayout);
+                R_ASSERT2(bs, "FGThunderboltRender: createBindingSet failed");
+                it = m_bindingSetCache.emplace(b.texture, std::move(bs)).first;
+            }
+            currentBindingSet = it->second;
             currentTexture = b.texture;
         }
 

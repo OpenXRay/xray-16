@@ -102,6 +102,15 @@ void FGRainRender::InitResources()
     m_bindingLayout = m_device->createBindingLayout(bindingLayoutDesc);
     R_ASSERT2(m_bindingLayout, "FGRainRender: createBindingLayout failed");
 
+    nvrhi::BindingSetDesc bindingSetDesc;
+    bindingSetDesc.bindings = {
+        nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
+        nvrhi::BindingSetItem::Texture_SRV(0, m_streakTexture),
+        nvrhi::BindingSetItem::Sampler(0, m_sampler),
+    };
+    m_bindingSet = m_device->createBindingSet(bindingSetDesc, m_bindingLayout);
+    R_ASSERT2(m_bindingSet, "FGRainRender: createBindingSet failed at init");
+
     nvrhi::FramebufferInfo fbInfo;
     fbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
     fbInfo.setDepthFormat(nvrhi::Format::D32);
@@ -315,17 +324,8 @@ void FGRainRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* frame
 void FGRainRender::DrawBatches(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer,
                                const xr_vector<Batch>& batches, nvrhi::ITexture* texture)
 {
-    if (!texture || batches.empty())
+    if (!texture || batches.empty() || !m_bindingSet)
         return;
-
-    nvrhi::BindingSetDesc bindingSetDesc;
-    bindingSetDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
-        nvrhi::BindingSetItem::Texture_SRV(0, texture),
-        nvrhi::BindingSetItem::Sampler(0, m_sampler),
-    };
-    nvrhi::BindingSetHandle bindingSet = m_device->createBindingSet(bindingSetDesc, m_bindingLayout);
-    R_ASSERT2(bindingSet, "FGRainRender: createBindingSet failed");
 
     nvrhi::VertexBufferBinding vertexBinding;
     vertexBinding.buffer = m_vertexBuffer;
@@ -337,7 +337,7 @@ void FGRainRender::DrawBatches(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer
     nvrhi::GraphicsState state;
     state.pipeline = m_pipeline;
     state.framebuffer = framebuffer;
-    state.bindings = { bindingSet };
+    state.bindings = { m_bindingSet };
     state.vertexBuffers = { vertexBinding };
     state.indexBuffer.buffer = m_indexBuffer;
     state.indexBuffer.format = nvrhi::Format::R16_UINT;

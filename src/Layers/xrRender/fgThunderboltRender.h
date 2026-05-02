@@ -48,6 +48,7 @@ private:
     xr_vector<u16> m_indices;
     xr_vector<Batch> m_batches;
     xr_map<shared_str, nvrhi::TextureHandle> m_textureCache;
+    xr_unordered_map<nvrhi::ITexture*, nvrhi::BindingSetHandle> m_bindingSetCache;
 
     nvrhi::IDevice* m_device = nullptr;
     nvrhi::ShaderHandle m_vs;

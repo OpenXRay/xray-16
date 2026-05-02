@@ -54,6 +54,7 @@ private:
     nvrhi::InputLayoutHandle         m_inputLayout;
     nvrhi::SamplerHandle             m_sampler;
     nvrhi::BindingLayoutHandle       m_bindingLayout;
+    nvrhi::BindingSetHandle          m_bindingSet;
     nvrhi::BufferHandle              m_constantBuffer;
     nvrhi::BufferHandle              m_vertexBuffer;
     nvrhi::BufferHandle              m_indexBuffer;
