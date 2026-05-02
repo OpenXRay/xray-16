@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "xrCore/_fbox2.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Render.h"
 

@@ -116,8 +116,4 @@ const xr_vector<xray::render::fg::CSector*>& GetSceneSectors()
 {
     return xray::render::fg::Scene.Sectors;
 }
-u32 GetPortalTraversalMarker()
-{
-    return xray::render::fg::Scene.PortalTraverser.i_marker;
-}
 }

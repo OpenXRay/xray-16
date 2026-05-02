@@ -15,7 +15,6 @@
 #include "ParticleEffect.h"
 #include "ParticleEffectDef.h"
 #include "Shader.h"
-#include "r__dsgraph_structure.h"
 #include "r__scene.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/Materials/ShaderInfo.h"
@@ -2281,8 +2280,6 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
     u32 submittedDynamic = 0;
     u32 notRenderable = 0;
-
-    u32 portalTraversalMarker = scene_info::GetPortalTraversalMarker();
 
     xr_vector<const light*> collectedLights;
     collectedLights.reserve(256);
