@@ -67,20 +67,6 @@ Ivector vpack(const Fvector& src)
     return ipck;
 }
 
-void manually_assign_texture(ref_shader& shader, pcstr textureName, pcstr rendertargetTextureName)
-{
-    SPass& pass = *shader->E[0]->passes[0];
-    if (!pass.constants)
-        return;
-
-    const ref_constant constant = pass.constants->get(textureName);
-    if (!constant)
-        return;
-
-    const auto index = constant->samp.index;
-    pass.T->create_texture(index, rendertargetTextureName, false);
-}
-
 CRenderTarget::CRenderTarget()
 {
     return;

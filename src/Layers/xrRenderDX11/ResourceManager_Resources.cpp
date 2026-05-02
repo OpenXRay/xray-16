@@ -54,6 +54,30 @@ void CResourceManager::_DeleteState(const SState* state)
     Msg("! ERROR: Failed to find compiled stateblock");
 }
 
+SPass* CResourceManager::_CreatePass(const SPass& proto)
+{
+    for (SPass* pass : v_passes)
+        if (pass->equal(proto))
+            return pass;
+
+    SPass* P = v_passes.emplace_back(xr_new<SPass>());
+    P->dwFlags |= xr_resource_flagged::RF_REGISTERED;
+    P->state = proto.state;
+    P->ps = proto.ps;
+    P->vs = proto.vs;
+    P->gs = proto.gs;
+    P->hs = proto.hs;
+    P->ds = proto.ds;
+    P->cs = proto.cs;
+    P->constants = proto.constants;
+    P->T = proto.T;
+#ifdef _EDITOR
+    P->M = proto.M;
+#endif
+    P->C = proto.C;
+    return P;
+}
+
 void CResourceManager::_DeletePass(const SPass* P)
 {
     if (0 == (P->dwFlags & xr_resource_flagged::RF_REGISTERED))
@@ -61,6 +85,34 @@ void CResourceManager::_DeletePass(const SPass* P)
     if (reclaim(v_passes, P))
         return;
     Msg("! ERROR: Failed to find compiled pass");
+}
+
+SVS* CResourceManager::_CreateVS(cpcstr, u32) { return nullptr; }
+void CResourceManager::_DeleteVS(const SVS*) {}
+SPS* CResourceManager::_CreatePS(LPCSTR) { return nullptr; }
+void CResourceManager::_DeletePS(const SPS*) {}
+SGS* CResourceManager::_CreateGS(LPCSTR) { return nullptr; }
+void CResourceManager::_DeleteGS(const SGS*) {}
+SHS* CResourceManager::_CreateHS(LPCSTR) { return nullptr; }
+void CResourceManager::_DeleteHS(const SHS*) {}
+SDS* CResourceManager::_CreateDS(LPCSTR) { return nullptr; }
+void CResourceManager::_DeleteDS(const SDS*) {}
+SCS* CResourceManager::_CreateCS(LPCSTR) { return nullptr; }
+void CResourceManager::_DeleteCS(const SCS*) {}
+
+SDeclaration* CResourceManager::_CreateDecl(const VertexElement* dcl)
+{
+    for (SDeclaration* D : v_declarations)
+    {
+        if (dcl_equal(dcl, &D->dcl_code.front()))
+            return D;
+    }
+
+    SDeclaration* D = v_declarations.emplace_back(xr_new<SDeclaration>());
+    u32 dcl_size = GetDeclLength(dcl) + 1;
+    D->dcl_code.assign(dcl, dcl + dcl_size);
+    D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
+    return D;
 }
 
 void CResourceManager::_DeleteDecl(const SDeclaration* dcl)

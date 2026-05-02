@@ -2,10 +2,6 @@
 
 #include "xrCore/xr_resource.h"
 
-#if defined(USE_DX11)
-#include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
-#endif
-
 // Forward declaration for Slang reflection API
 namespace slang
 {
@@ -146,11 +142,6 @@ public:
     typedef xr_vector<ref_constant> c_table;
     c_table table;
 
-#if defined(USE_DX11)
-    typedef std::pair<u32, ref_cbuffer> cb_table_record;
-    typedef xr_vector<cb_table_record> cb_table;
-    cb_table m_CBTable[R__NUM_CONTEXTS];
-#endif
 
 private:
     void fatal(LPCSTR s);
@@ -173,6 +164,3 @@ private:
 typedef resptr_core<R_constant_table, resptr_base<R_constant_table>> ref_ctable;
 } // namespace xray::render::fg
 
-#if defined(USE_DX11)
-#include "../xrRenderDX11/dx11ConstantBuffer_impl.h"
-#endif

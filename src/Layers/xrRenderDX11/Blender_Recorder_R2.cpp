@@ -26,10 +26,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
 
     // Create shaders
     dest.ps = RImplementation.Resources->_CreatePS(_ps);
-    u32 flags = 0;
-    if (dest.ps->constants.dx9compatibility)
-        flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-    dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
+    dest.vs = RImplementation.Resources->_CreateVS(_vs, 0);
     dest.gs = RImplementation.Resources->_CreateGS("null");
     dest.hs = RImplementation.Resources->_CreateHS("null");
     dest.ds = RImplementation.Resources->_CreateDS("null");

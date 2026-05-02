@@ -204,10 +204,7 @@ void CBlender_Compile::PassEnd()
 void CBlender_Compile::PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs /*= nullptr*/, pcstr _hs /*= nullptr*/, pcstr _ds /*= nullptr*/)
 {
     dest.ps = RImplementation.Resources->_CreatePS(_ps);
-    u32 flags = 0;
-    if (dest.ps->constants.dx9compatibility)
-        flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-    dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
+    dest.vs = RImplementation.Resources->_CreateVS(_vs, 0);
     dest.gs = RImplementation.Resources->_CreateGS(_gs);
     dest.hs = RImplementation.Resources->_CreateHS(_hs);
     dest.ds = RImplementation.Resources->_CreateDS(_ds);

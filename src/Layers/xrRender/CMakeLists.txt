@@ -308,10 +308,7 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/tss_def.cpp
     ../xrRenderDX11/xrRender_console.cpp
     xr_effgamma.cpp
-    ../xrRenderDX11/dx11ConstantBuffer.cpp
-    ../xrRenderDX11/dx11ResourceManager_Resources.cpp
     ../xrRenderDX11/dx11ResourceManager_Scripting.cpp
-    ../xrRenderDX11/dx11r_constants.cpp
 
     ../xrRenderDX11/blenders/Blender_BmmD_deferred.cpp
     ../xrRenderDX11/blenders/Blender_Editor_Selection.cpp

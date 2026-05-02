@@ -37,11 +37,6 @@
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "xrEngine/xr_object.h"                               // For GEnv
 
-#if defined(USE_DX11)
-#include "Layers/xrRenderDX11/dx11ConstantBuffer.h"  // For CB size extraction
-#include "../Externals/nvrhi/src/common/dxgi-format.h"  // For DXGI <-> NVRHI format conversion
-#include "../Externals/nvrhi/src/d3d11/d3d11-backend.h"  // For D3D11 BindingSet access
-#endif
 
 namespace xray::render {
 

@@ -255,8 +255,6 @@
     <ClInclude Include="r2_types.h"/>
     <ClInclude Include="r2_rendertarget_wallmarks.h"/>
     <ClInclude Include="SMAP_Allocator.h"/>
-    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h"/>
-    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer_impl.h"/>
     <ClInclude Include="..\xrRenderDX11\CommonTypes.h"/>
     <ClInclude Include="..\xrRenderDX11\Blender.h"/>
     <ClInclude Include="..\xrRenderDX11\Blender_CLSID.h"/>
@@ -533,10 +531,7 @@
     <ClCompile Include="..\xrRenderDX11\tss_def.cpp"/>
     <ClCompile Include="..\xrRenderDX11\xrRender_console.cpp"/>
     <ClCompile Include="xr_effgamma.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Resources.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Scripting.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dx11r_constants.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_BmmD_deferred.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_Editor_Selection.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\Blender_Editor_Wire.cpp"/>
