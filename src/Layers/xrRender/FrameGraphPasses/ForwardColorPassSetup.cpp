@@ -271,7 +271,7 @@ static void renderBindlessForward(
         state.indirectCountBuffer = set.compactCountBuffer;
 
         cmdList->setGraphicsState(state);
-        cmdList->drawIndexedIndirectCount(0, 0, set.totalObjectCount);
+        DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, set.totalObjectCount);
     };
 
     if (config.variantPartition.Enabled()) {
@@ -363,7 +363,7 @@ static void renderBindlessForward(
             terrainState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
             cmdList->setGraphicsState(terrainState);
-            cmdList->drawIndexedIndirectCount(0, 0, config.terrainObjectCount);
+            DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, config.terrainObjectCount);
 
         }
     }
