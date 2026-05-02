@@ -70,12 +70,6 @@ public:
     ref_rt rt_smap_rain;
     ref_rt rt_smap_depth_minmax;
 
-    ID3DTexture2D* t_ss_async;
-
-    ref_texture t_material;
-    ref_texture t_noise[TEX_jitter_count];
-    ref_texture t_noise_mipped;
-
 private:
     ref_shader s_occq;
 
@@ -184,8 +178,6 @@ private:
 public:
     CRenderTarget();
     ~CRenderTarget();
-
-    void build_textures();
 
     void accum_point_geom_create();
     void accum_point_geom_destroy();

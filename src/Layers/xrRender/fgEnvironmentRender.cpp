@@ -120,20 +120,12 @@ void FGEnvironmentRender::lerp(CEnvDescriptorMixer& currentEnv, IEnvDescriptorRe
     if (tonemap_tstage_clouds != u32(-1))
         clouds_r_textures.emplace_back(tonemap_tstage_clouds, tonemap);
 
-    auto e0 = sky_r_textures[0].second->surface_get();
-    auto e1 = sky_r_textures[1].second->surface_get();
-    tsky0->surface_set(e0);
-    _RELEASE(e0);
-    tsky1->surface_set(e1);
-    _RELEASE(e1);
+    tsky0->surface_set(nvrhi::TextureHandle(sky_r_textures[0].second->surface_get_native()));
+    tsky1->surface_set(nvrhi::TextureHandle(sky_r_textures[1].second->surface_get_native()));
 
     const bool menu_pp = g_pGamePersistent->OnRenderPPUI_query();
-    e0 = menu_pp ? nullptr : pA->sky_texture_env->surface_get();
-    e1 = menu_pp ? nullptr : pB->sky_texture_env->surface_get();
-    t_envmap_0->surface_set(e0);
-    _RELEASE(e0);
-    t_envmap_1->surface_set(e1);
-    _RELEASE(e1);
+    t_envmap_0->surface_set(menu_pp ? nvrhi::TextureHandle() : nvrhi::TextureHandle(pA->sky_texture_env->surface_get_native()));
+    t_envmap_1->surface_set(menu_pp ? nvrhi::TextureHandle() : nvrhi::TextureHandle(pB->sky_texture_env->surface_get_native()));
 }
 
 void FGEnvironmentRender::OnDeviceCreate()
@@ -147,11 +139,11 @@ void FGEnvironmentRender::OnDeviceDestroy()
     sky_r_textures.clear();
     clouds_r_textures.clear();
 
-    tsky0->surface_set(nullptr);
-    tsky1->surface_set(nullptr);
-    t_envmap_0->surface_set(nullptr);
-    t_envmap_1->surface_set(nullptr);
-    tonemap->surface_set(nullptr);
+    tsky0->surface_set(nvrhi::TextureHandle());
+    tsky1->surface_set(nvrhi::TextureHandle());
+    t_envmap_0->surface_set(nvrhi::TextureHandle());
+    t_envmap_1->surface_set(nvrhi::TextureHandle());
+    tonemap->surface_set(nvrhi::TextureHandle());
 
     tsky0_tstage = 0;
     tsky1_tstage = 0;
