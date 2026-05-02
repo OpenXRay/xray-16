@@ -246,6 +246,8 @@ public:
     // - .avi → AVI video texture (not yet implemented)
     static bool LoadFromFile(const char* filePath, DDSData& outData);
 
+    static bool TextureExists(const char* basePath);
+
     // Load DDS from memory buffer
     static bool LoadFromMemory(
         const u8* data,
