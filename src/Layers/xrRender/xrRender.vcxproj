@@ -145,7 +145,6 @@
     <ClInclude Include="dxThunderboltDescRender.h"/>
     <ClInclude Include="dxUISequenceVideoItem.h"/>
     <ClInclude Include="dxUIShader.h"/>
-    <ClInclude Include="dxWallMarkArray.h"/>
     <ClInclude Include="ETextureParams.h"/>
     <ClInclude Include="FBasicVisual.h"/>
     <ClInclude Include="FHierrarhyVisual.h"/>
@@ -221,7 +220,6 @@
     <ClInclude Include="UIGeometryBatch.h"/>
     <ClInclude Include="Utils\dxHashHelper.h"/>
     <ClInclude Include="VertexCache.h"/>
-    <ClInclude Include="WallmarksEngine.h"/>
     <ClInclude Include="xrRender_console.h"/>
     <ClInclude Include="xrStripify.h"/>
     <ClInclude Include="light_gi.h"/>
@@ -376,7 +374,6 @@
     <ClCompile Include="dxParticleCustom.cpp"/>
     <ClCompile Include="dxRenderFactory.cpp"/>
     <ClCompile Include="dxUISequenceVideoItem.cpp"/>
-    <ClCompile Include="dxWallMarkArray.cpp"/>
     <ClCompile Include="ETextureParams.cpp"/>
     <ClCompile Include="FBasicVisual.cpp"/>
     <ClCompile Include="FHierrarhyVisual.cpp"/>
@@ -549,7 +546,6 @@
     <ClCompile Include="..\xrRenderDX11\dxObjectSpaceRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\r__dsgraph_build.cpp"/>
     <ClCompile Include="..\xrRenderDX11\r__occlusion.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\WallmarksEngine.cpp"/>
     <ClCompile Include="D3DUtils.cpp"/>
     <ClCompile Include="..\xrRenderDX11\HOM.cpp"/>
     <ClCompile Include="..\xrRenderDX11\occRasterizer.cpp"/>

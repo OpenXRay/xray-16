@@ -60,6 +60,7 @@ class DecalManager {
 public:
     void Initialize(fg::RenderDevice* device);
     void Shutdown();
+    void Clear();
 
     void AddStaticDecal(const Fvector& pos, const Fvector& normal, float size, u32 materialID);
     void AddSkeletonDecal(CKinematics* parent, const Fmatrix* parentXForm,

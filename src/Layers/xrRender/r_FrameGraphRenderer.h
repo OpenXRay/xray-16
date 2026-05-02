@@ -42,7 +42,6 @@ class xrXRC;
 namespace xray::render::fg {
     class dxRender_Visual;
     class RTAccelStructManager;
-    class CWallmarksEngine;
     class CRenderTarget;
     class light;
     namespace PS {
@@ -387,7 +386,6 @@ public:
     Task* m_pProcessHOMTask{ nullptr };
     bool m_bFirstFrameAfterReset{ false };
     xr_vector<Fbox3> m_main_coarse_structure;
-    fg::CWallmarksEngine* m_pWallmarksEngine{ nullptr };
     fg::CHOM m_HOM;
     fg::R_occlusion m_HWOCC;
     Statistics m_Stats;

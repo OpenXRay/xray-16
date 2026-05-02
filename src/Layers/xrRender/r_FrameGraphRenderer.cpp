@@ -91,9 +91,7 @@
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/r__buffer_pool.h"
-#include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
-#include "Layers/xrRender/WallmarksEngine.h"
 #include "Layers/xrRender/PSLibrary.h"
 #include "Layers/xrRender/Decals/fgWallMarkArray.h"
 #include "Layers/xrRender/Decals/MeshPicker.h"
@@ -2749,129 +2747,95 @@ void FrameGraphRenderer::add_Visual(u32, IRenderable* root, IRenderVisual* V, Fm
         add_Visual(root, V, m);
 }
 
-void FrameGraphRenderer::add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
+void FrameGraphRenderer::add_StaticWallmark(const wm_shader&, const Fvector&, float, CDB::TRI*, Fvector*)
 {
-    if (IsEnabled())
-        return;
-    auto* pUIShader = (dxUIShader*)&*S;
-    if (!pUIShader)
-        return;
-    auto& sh = pUIShader->hShader;
-    VERIFY2(T, "Invalid static wallmark triangle");
-    if (T->suppress_wm)
-        return;
-    VERIFY2(_valid(P) && _valid(s) && V && (s > EPS_L), "Invalid static wallmark params");
-    m_pWallmarksEngine->AddStaticWallmark(T, V, P, &*sh, s);
 }
 
 void FrameGraphRenderer::add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
 {
-    if (IsEnabled())
-    {
-        if (!T || T->suppress_wm || !V || s <= EPS_L)
-            return;
-        auto* fgArray = static_cast<fg::decals::fgWallMarkArray*>(pArray);
-        u32 matID = fgArray->GenerateBindlessMaterialID();
-        if (matID == UINT32_MAX)
-            return;
-        Fvector N;
-        N.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
-        float decalSize = s * 2.0f;
-        GetDecalManager()->AddStaticDecal(P, N, decalSize, matID);
+    if (!T || T->suppress_wm || !V || s <= EPS_L)
         return;
-    }
-    auto* pWMA = (dxWallMarkArray*)pArray;
-    ref_shader* pShader = pWMA->dxGenerateWallmark();
-    if (pShader)
-    {
-        VERIFY2(T, "Invalid static wallmark triangle");
-        if (T->suppress_wm)
-            return;
-        VERIFY2(_valid(P) && _valid(s) && V && (s > EPS_L), "Invalid static wallmark params");
-        m_pWallmarksEngine->AddStaticWallmark(T, V, P, &**pShader, s);
-    }
+    auto* fgArray = static_cast<fg::decals::fgWallMarkArray*>(pArray);
+    u32 matID = fgArray->GenerateBindlessMaterialID();
+    if (matID == UINT32_MAX)
+        return;
+    Fvector N;
+    N.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
+    float decalSize = s * 2.0f;
+    GetDecalManager()->AddStaticDecal(P, N, decalSize, matID);
 }
 
 void FrameGraphRenderer::clear_static_wallmarks()
 {
-    if (m_pWallmarksEngine)
-        m_pWallmarksEngine->clear();
+    if (m_decalManager)
+        m_decalManager->Clear();
 }
 
 void FrameGraphRenderer::add_SkeletonWallmark(
     const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start, const Fvector& dir, float size)
 {
-    if (IsEnabled())
+    if (!xf || !obj || size <= EPS_L)
+        return;
+    float distSq = xf->c.distance_to_sqr(Device.vCameraPosition);
+    if (distSq > _sqr(50.f))
+        return;
+
+    const u32 splatMode = ps_r4_skeleton_wallmark_mode > 0
+        ? fg::decals::SPLAT_MODE_PROCEDURAL_BLOOD
+        : fg::decals::SPLAT_MODE_DECAL;
+
+    shared_str wallmarkTexture;
+    u32 matID = UINT32_MAX;
+    if (splatMode == fg::decals::SPLAT_MODE_DECAL)
     {
-        if (!xf || !obj || size <= EPS_L)
+        if (!pArray)
             return;
-        float distSq = xf->c.distance_to_sqr(Device.vCameraPosition);
-        if (distSq > _sqr(50.f))
+        auto* fgArray = static_cast<fg::decals::fgWallMarkArray*>(pArray);
+        matID = fgArray->GenerateBindlessMaterialID(&wallmarkTexture);
+        if (matID == UINT32_MAX)
             return;
+    }
+    float decalSize = size * 2.0f;
+    fg::decals::MeshPickResult entryPick;
+    if (fg::decals::PickMeshDirect((CKinematics*)obj, *xf, start, dir, 100.f, entryPick))
+    {
+        auto* overlayMgr = GetOverlayManager();
+        float worldRadius = decalSize * 0.5f;
+        Fvector bloodColor = { 0.4f, 0.02f, 0.02f };
+        const float lifetime = splatMode == fg::decals::SPLAT_MODE_PROCEDURAL_BLOOD ? 18.f : 12.f;
 
-        const u32 splatMode = ps_r4_skeleton_wallmark_mode > 0
-            ? fg::decals::SPLAT_MODE_PROCEDURAL_BLOOD
-            : fg::decals::SPLAT_MODE_DECAL;
-
-        shared_str wallmarkTexture;
-        u32 matID = UINT32_MAX;
-        if (splatMode == fg::decals::SPLAT_MODE_DECAL)
+        auto queueSplat = [&](const fg::decals::MeshPickResult& pick)
         {
-            if (!pArray)
-                return;
-            auto* fgArray = static_cast<fg::decals::fgWallMarkArray*>(pArray);
-            matID = fgArray->GenerateBindlessMaterialID(&wallmarkTexture);
-            if (matID == UINT32_MAX)
-                return;
-        }
-        float decalSize = size * 2.0f;
-        fg::decals::MeshPickResult entryPick;
-        if (fg::decals::PickMeshDirect((CKinematics*)obj, *xf, start, dir, 100.f, entryPick))
+            const float uvRadius = EstimateSplatUVRadius(pick, worldRadius);
+            overlayMgr->AddSplat((CKinematics*)obj, pick.triVerts,
+                                  pick.baryU, pick.baryV,
+                                  worldRadius, bloodColor, 0.8f,
+                                  pick.uv, uvRadius, matID,
+                                  splatMode, lifetime,
+                                  pick.hitTextureName.c_str(),
+                                  wallmarkTexture.c_str());
+        };
+
+        queueSplat(entryPick);
+
+        Fvector shotDir = dir;
+        shotDir.normalize_safe();
+        const float entryAdvance = entryPick.dist + 0.01f;
+        const float remaining = 100.f - entryAdvance;
+        if (remaining > 0.01f)
         {
-            auto* overlayMgr = GetOverlayManager();
-            float worldRadius = decalSize * 0.5f;
-            Fvector bloodColor = { 0.4f, 0.02f, 0.02f };
-            const float lifetime = splatMode == fg::decals::SPLAT_MODE_PROCEDURAL_BLOOD ? 18.f : 12.f;
+            Fvector exitStart;
+            exitStart.mad(start, shotDir, entryAdvance);
 
-            auto queueSplat = [&](const fg::decals::MeshPickResult& pick)
+            fg::decals::MeshPickResult exitPick;
+            if (fg::decals::PickMeshDirect((CKinematics*)obj, *xf, exitStart, shotDir, remaining, exitPick))
             {
-                const float uvRadius = EstimateSplatUVRadius(pick, worldRadius);
-                overlayMgr->AddSplat((CKinematics*)obj, pick.triVerts,
-                                      pick.baryU, pick.baryV,
-                                      worldRadius, bloodColor, 0.8f,
-                                      pick.uv, uvRadius, matID,
-                                      splatMode, lifetime,
-                                      pick.hitTextureName.c_str(),
-                                      wallmarkTexture.c_str());
-            };
-
-            queueSplat(entryPick);
-
-            Fvector shotDir = dir;
-            shotDir.normalize_safe();
-            const float entryAdvance = entryPick.dist + 0.01f;
-            const float remaining = 100.f - entryAdvance;
-            if (remaining > 0.01f)
-            {
-                Fvector exitStart;
-                exitStart.mad(start, shotDir, entryAdvance);
-
-                fg::decals::MeshPickResult exitPick;
-                if (fg::decals::PickMeshDirect((CKinematics*)obj, *xf, exitStart, shotDir, remaining, exitPick))
-                {
-                    const float minSeparation = _max(0.02f, worldRadius * 0.25f);
-                    if (entryPick.worldPos.distance_to(exitPick.worldPos) > minSeparation)
-                        queueSplat(exitPick);
-                }
+                const float minSeparation = _max(0.02f, worldRadius * 0.25f);
+                if (entryPick.worldPos.distance_to(exitPick.worldPos) > minSeparation)
+                    queueSplat(exitPick);
             }
         }
-        return;
     }
-
-    auto* pWMA = (dxWallMarkArray*)pArray;
-    ref_shader* pShader = pWMA->dxGenerateWallmark();
-    if (pShader)
-        m_pWallmarksEngine->AddSkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
 
 CompiledLevelShader* FrameGraphRenderer::getCompiledShader(int id)

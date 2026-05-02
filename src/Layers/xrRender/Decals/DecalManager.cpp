@@ -57,6 +57,17 @@ void DecalManager::Shutdown()
     m_staticDecals.clear();
     m_skeletonDecals.clear();
     m_gpuData.clear();
+    m_gpuDecalCount = 0;
+}
+
+void DecalManager::Clear()
+{
+    m_lock.Enter();
+    m_staticDecals.clear();
+    m_skeletonDecals.clear();
+    m_gpuData.clear();
+    m_gpuDecalCount = 0;
+    m_lock.Leave();
 }
 
 void DecalManager::CreateCubeMesh(nvrhi::IDevice* device)

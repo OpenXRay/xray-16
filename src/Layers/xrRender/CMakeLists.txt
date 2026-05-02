@@ -250,7 +250,6 @@ target_sources(xrRender PRIVATE
     dxParticleCustom.cpp
     dxRenderFactory.cpp
     dxUISequenceVideoItem.cpp
-    dxWallMarkArray.cpp
     light.cpp
     light_GI.cpp
     r__buffer_pool.cpp
@@ -303,7 +302,6 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/dxObjectSpaceRender.cpp
     ../xrRenderDX11/r__dsgraph_build.cpp
     ../xrRenderDX11/r__occlusion.cpp
-    ../xrRenderDX11/WallmarksEngine.cpp
     D3DUtils.cpp
     ../xrRenderDX11/HOM.cpp
     ../xrRenderDX11/occRasterizer.cpp

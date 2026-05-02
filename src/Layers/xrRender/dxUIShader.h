@@ -14,7 +14,6 @@ namespace xray::render::fg
 {
 class dxUIShader : public IUIShader
 {
-    friend class dxWallMarkArray;
     friend class FrameGraphRenderer;
     friend class xray::render::ui::UIRenderCollector;  // Allow UI collector to access shader
 
