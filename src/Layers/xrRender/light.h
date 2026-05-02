@@ -4,7 +4,6 @@
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
 #include "Light_Package.h"
-#include "light_smapvis.h"
 #include "light_gi.h"
 #endif //(RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
@@ -50,8 +49,6 @@ public:
     light* omnipart[6];
     xr_vector<light_indirect> indirect;
     u32 indirect_photons;
-
-    smapvis svis[R__NUM_CONTEXTS]; // used for 6-cubemap faces
 
     ref_shader s_spot;
     ref_shader s_point;

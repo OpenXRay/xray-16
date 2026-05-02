@@ -403,7 +403,6 @@ public:
     fg::R_dsgraph_structure m_immContext;
     fg::R_dsgraph_structure& get_imm_context() { return m_immContext; }
     fg::R_dsgraph_structure& get_context(u32) { return m_immContext; }
-    void apply_object(fg::CBackend& cmd_list, IRenderable* O);
 
     u32 occq_begin(u32& ID) { return m_HWOCC.occq_begin(ID); }
     void occq_end(u32& ID) { m_HWOCC.occq_end(ID); }

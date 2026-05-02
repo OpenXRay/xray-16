@@ -28,43 +28,6 @@ BIND_DECLARE(wv);
 BIND_DECLARE(vp);
 BIND_DECLARE(wvp);
 
-#define DECLARE_TREE_BIND(c)\
-    class cl_tree_##c : public R_constant_setup\
-    {\
-        void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.tree.set_c_##c(C); }\
-    };\
-    static cl_tree_##c tree_binder_##c
-
-DECLARE_TREE_BIND(m_xform_v);
-DECLARE_TREE_BIND(m_xform);
-DECLARE_TREE_BIND(consts);
-DECLARE_TREE_BIND(wave);
-DECLARE_TREE_BIND(wind);
-DECLARE_TREE_BIND(c_scale);
-DECLARE_TREE_BIND(c_bias);
-DECLARE_TREE_BIND(c_sun);
-
-class cl_hemi_cube_pos_faces : public R_constant_setup
-{
-    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.set_c_pos_faces(C); }
-};
-
-static cl_hemi_cube_pos_faces binder_hemi_cube_pos_faces;
-
-class cl_hemi_cube_neg_faces : public R_constant_setup
-{
-    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.set_c_neg_faces(C); }
-};
-
-static cl_hemi_cube_neg_faces binder_hemi_cube_neg_faces;
-
-class cl_material : public R_constant_setup
-{
-    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.set_c_material(C); }
-};
-
-static cl_material binder_material;
-
 class cl_texgen : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override
@@ -334,7 +297,6 @@ static class cl_screen_res : public R_constant_setup
     }
 } binder_screen_res;
 
-// SM_TODO: cmd_list.hemi заменить на более "логичное" место
 static class cl_hud_params : public R_constant_setup //--#SM+#--
 {
     void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, g_pGamePersistent->m_pGShaderConstants->hud_params); }
@@ -349,24 +311,6 @@ static class cl_blend_mode : public R_constant_setup //--#SM+#--
 {
     void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, g_pGamePersistent->m_pGShaderConstants->m_blender_mode); }
 } binder_blend_mode;
-
-class cl_camo_data : public R_constant_setup //--#SM+#--
-{
-    void setup(CBackend& cmd_list, R_constant* C) override  { cmd_list.hemi.c_camo_data = C; }
-};
-static cl_camo_data binder_camo_data;
-
-class cl_custom_data : public R_constant_setup //--#SM+#--
-{
-    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.c_custom_data = C; }
-};
-static cl_custom_data binder_custom_data;
-
-class cl_entity_data : public R_constant_setup //--#SM+#--
-{
-    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.c_entity_data = C; }
-};
-static cl_entity_data binder_entity_data;
 
 class cl_dm_debug_trails_binder : public R_constant_setup
 {
@@ -387,11 +331,6 @@ void CBlender_Compile::SetMapping()
     r_Constant("m_script_params", &binder_script_params); //--#SM+#--
     r_Constant("m_blender_mode", &binder_blend_mode); //--#SM+#--
 
-    // objects data
-    r_Constant("m_obj_camo_data", &binder_camo_data); //--#SM+#--
-    r_Constant("m_obj_custom_data", &binder_custom_data); //--#SM+#--
-    r_Constant("m_obj_entity_data", &binder_entity_data); //--#SM+#--
-
     // matrices
     r_Constant("m_W", &binder_w);
     r_Constant("m_invW", &binder_invw);
@@ -400,20 +339,6 @@ void CBlender_Compile::SetMapping()
     r_Constant("m_WV", &binder_wv);
     r_Constant("m_VP", &binder_vp);
     r_Constant("m_WVP", &binder_wvp);
-
-    r_Constant("m_xform_v", &tree_binder_m_xform_v);
-    r_Constant("m_xform", &tree_binder_m_xform);
-    r_Constant("consts", &tree_binder_consts);
-    r_Constant("wave", &tree_binder_wave);
-    r_Constant("wind", &tree_binder_wind);
-    r_Constant("c_scale", &tree_binder_c_scale);
-    r_Constant("c_bias", &tree_binder_c_bias);
-    r_Constant("c_sun", &tree_binder_c_sun);
-
-    // hemi cube
-    r_Constant("L_material", &binder_material);
-    r_Constant("hemi_cube_pos_faces", &binder_hemi_cube_pos_faces);
-    r_Constant("hemi_cube_neg_faces", &binder_hemi_cube_neg_faces);
 
     // Igor temp solution for the texgen functionality in the shader
     r_Constant("m_texgen", &binder_texgen);

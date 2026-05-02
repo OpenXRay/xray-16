@@ -483,34 +483,4 @@ void CBackend::OnDeviceDestroy()
 #endif
 }
 
-void CBackend::apply_lmaterial()
-{
-    R_constant* C = get_c(c_sbase)._get(); // get sampler
-    if (!C)
-        return;
-
-    VERIFY(RC_dest_sampler == C->destination);
-#if defined(USE_DX11)
-    VERIFY(RC_dx11texture == C->type);
-#elif defined(USE_OGL)
-    VERIFY(RC_sampler == C->type);
-#else
-#   error No graphics API selected or enabled!
-#endif
-
-    CTexture* T = get_ActiveTexture(u32(C->samp.index));
-    VERIFY(T);
-    float mtl = T->m_material;
-#ifdef DEBUG
-    if (ps_r2_ls_flags.test(R2FLAG_GLOBALMATERIAL))
-        mtl = ps_r2_gmaterial;
-#endif
-    hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
-    hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X],
-                                o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
-                                o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
-    hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X],
-                                o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
-                                o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
-}
 } // namespace xray::render::fg

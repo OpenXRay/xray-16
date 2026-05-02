@@ -5,13 +5,6 @@
 
 namespace xray::render::fg
 {
-// feedback	for receiving visuals
-class R_feedback
-{
-public:
-    virtual void rfeedback_static(dxRender_Visual* V) = 0;
-};
-
 struct R_dsgraph_structure
 {
     static constexpr auto INVALID_CONTEXT_ID = static_cast<u32>(-1);
@@ -21,8 +14,6 @@ struct R_dsgraph_structure
     static constexpr auto IMM_CTX_ID = R__NUM_PARALLEL_CONTEXTS; // the next after pooled
 #endif
 
-    R_feedback* val_feedback{}; // feedback for geometry being rendered
-    u32 val_feedback_breakp{}; // breakpoint
     xr_vector<Fbox3>* val_recorder; // coarse structure recorder
     u32 marker{};
     u32 context_id{ INVALID_CONTEXT_ID };
@@ -82,11 +73,6 @@ struct R_dsgraph_structure
     u32 counter_S{};
     u32 counter_D{};
 
-    void set_Feedback(R_feedback* V, u32 id)
-    {
-        val_feedback_breakp = id;
-        val_feedback = V;
-    }
     void set_Recorder(xr_vector<Fbox3>* dest)
     {
         val_recorder = dest;
@@ -119,7 +105,6 @@ struct R_dsgraph_structure
         o.spatial_types = STYPE_RENDERABLE;
 
         val_recorder = nullptr;
-        val_feedback = nullptr;
 
         nrmPasses.clear();
         matPasses.clear();
@@ -180,17 +165,6 @@ struct R_dsgraph_structure
 
     void insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center);
     void insert_static(dxRender_Visual* pVisual);
-
-    // render primitives
-    void render_graph(u32 _priority);
-    void render_hud();
-    void render_hud_ui();
-    void render_lods(bool _setup_zb, bool _clear);
-    void render_sorted();
-    void render_emissive();
-    void render_wmarks();
-    void render_distort();
-    void render_R1_box(IRender_Sector::sector_id_t sector_id, Fbox& _bb, int _element);
 
     void build_subspace();
 };

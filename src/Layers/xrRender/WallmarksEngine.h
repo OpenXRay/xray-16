@@ -72,9 +72,6 @@ public:
     void AddSkeletonWallmark(
         const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size);
 
-    // render
-    void Render();
-
     void clear();
 };
 } // namespace xray::render::fg

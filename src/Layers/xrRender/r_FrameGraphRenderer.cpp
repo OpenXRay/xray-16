@@ -127,18 +127,6 @@ fg::ShaderElement* FrameGraphRenderer::rimp_select_sh_dynamic(fg::dxRender_Visua
     return pVisual->shader->E[id]._get();
 }
 
-void FrameGraphRenderer::apply_object(fg::CBackend& cmd_list, IRenderable* O)
-{
-    if (!O || !O->renderable_ROS())
-        return;
-
-    fg::CROS_impl& LT = *(fg::CROS_impl*)O->renderable_ROS();
-    LT.update_smooth(O);
-    cmd_list.o_hemi = 0.75f * LT.get_hemi();
-    cmd_list.o_sun = 0.75f * LT.get_sun();
-    CopyMemory(cmd_list.o_hemi_cube, LT.get_hemi_cube(), fg::CROS_impl::NUM_FACES * sizeof(float));
-}
-
 fg::IRender_DetailModel* FrameGraphRenderer::model_CreateDM(IReader* F)
 {
     fg::CDetail* D = xr_new<fg::CDetail>();
@@ -3151,20 +3139,6 @@ void FrameGraphRenderer::reset_begin()
     if (Resources)
         Resources->reset_begin();
 
-    for (u32 it = 0; it < m_Lights_LastFrame.size(); it++)
-    {
-        if (!m_Lights_LastFrame[it])
-            continue;
-        try
-        {
-            for (int id = 0; id < 3; ++id)
-                m_Lights_LastFrame[it]->svis[id].resetoccq();
-        }
-        catch (...)
-        {
-            Msg("! Failed to flush-OCCq on light [%d]", it);
-        }
-    }
     m_Lights_LastFrame.clear();
 
     xr_delete(m_pTarget);

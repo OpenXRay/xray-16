@@ -264,9 +264,6 @@
     <ClInclude Include="Light_Render_Direct.h">
       <Filter>Lights</Filter>
     </ClInclude>
-    <ClInclude Include="light_smapvis.h">
-      <Filter>Lights</Filter>
-    </ClInclude>
     <ClInclude Include="LightTrack.h">
       <Filter>Lights</Filter>
     </ClInclude>

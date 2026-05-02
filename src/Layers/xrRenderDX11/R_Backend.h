@@ -14,11 +14,8 @@
 #include "Layers/xrRender/R_DStreams.h"
 #include "Layers/xrRender/r_constants_cache.h"
 #include "R_Backend_xform.h"
-#include "R_Backend_hemi.h"
-#include "R_Backend_tree.h"
 
 #ifdef USE_DX11
-#include "R_Backend_LOD.h"
 #include "Layers/xrRenderDX11/StateManager/dx11StateManager.h"
 #include "Layers/xrRenderDX11/StateManager/dx11ShaderResourceStateCache.h"
 #include "Layers/xrRenderDX11/StateManager/dx11StateCache.h"
@@ -71,11 +68,6 @@ public:
 
 public:
     R_xforms xforms;
-    R_hemi hemi;
-    R_tree tree;
-#ifdef USE_DX11
-    R_LOD LOD;
-#endif
 
 #if defined(USE_DX11)
     ref_cbuffer m_aVertexConstants[MaxCBuffers];
@@ -244,12 +236,6 @@ public:
         VERIFY(!"Invalid texture stage");
         return nullptr;
     }
-
-    float o_hemi;
-    float o_hemi_cube[/*CROS_impl::NUM_FACES*/6];
-    float o_sun;
-
-    void apply_lmaterial();
 
 #if defined(USE_DX11)
     IC void get_ConstantDirect(const shared_str& n, size_t DataSize, void** pVData, void** pGData, void** pPData);
@@ -551,10 +537,7 @@ public:
 
     CBackend()
         : xforms(*this)
-        , tree(*this)
-        , hemi(*this)
 #if defined(USE_DX11)
-        , LOD(*this)
         , constants(*this)
         , StateManager(*this)
 #endif

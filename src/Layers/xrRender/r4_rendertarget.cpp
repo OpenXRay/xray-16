@@ -27,40 +27,6 @@ void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode 
     UNUSED(eSOM);
 }
 
-// 2D texgen (texture adjustment matrix)
-void CRenderTarget::u_compute_texgen_screen(CBackend& cmd_list, Fmatrix& m_Texgen)
-{
-    Fmatrix m_TexelAdjust =
-    {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    };
-
-    m_Texgen.mul(m_TexelAdjust, cmd_list.xforms.m_wvp);
-}
-
-// 2D texgen for jitter (texture adjustment matrix)
-void CRenderTarget::u_compute_texgen_jitter(CBackend& cmd_list, Fmatrix& m_Texgen_J)
-{
-    // place into 0..1 space
-    Fmatrix m_TexelAdjust =
-    {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    };
-    m_Texgen_J.mul(m_TexelAdjust, cmd_list.xforms.m_wvp);
-
-    // rescale - tile it
-    float scale_X = float(Device.dwWidth) / float(TEX_jitter);
-    float scale_Y = float(Device.dwHeight) / float(TEX_jitter);
-    m_TexelAdjust.scale(scale_X, scale_Y, 1.f);
-    m_Texgen_J.mulA_44(m_TexelAdjust);
-}
-
 u8 fpack(float v)
 {
     s32 _v = iFloor(((v + 1) * .5f) * 255.f + .5f);

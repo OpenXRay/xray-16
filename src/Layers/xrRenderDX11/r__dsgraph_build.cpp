@@ -226,9 +226,6 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
     }
 #endif
 
-    if (val_feedback && counter_S == val_feedback_breakp)
-        val_feedback->rfeedback_static(pVisual);
-
     counter_S++;
 
     for (u32 iPass = 0; iPass < sh->passes.size(); ++iPass)
