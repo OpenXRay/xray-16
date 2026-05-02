@@ -11,14 +11,22 @@ void FillResolutionsForMonitor(const int monitorID)
     const int modeCount = SDL_GetNumDisplayModes(monitorID);
     R_ASSERT3(modeCount > 0, "Failed to find display modes", SDL_GetError());
 
-    for (int i = modeCount - 1; i >= 0; --i)
+    xr_vector<std::pair<u32, u32>> seen;
+    seen.reserve(modeCount);
+
+    for (int i = 0; i < modeCount; ++i)
     {
         SDL_DisplayMode mode;
         const int result = SDL_GetDisplayMode(monitorID, i, &mode);
         R_ASSERT3(result == 0, "Failed to find specified display mode", SDL_GetError());
 
-        string256 buf;
-        xr_sprintf(buf, sizeof(buf), "%ux%u (%dHz)", mode.w, mode.h, mode.refresh_rate);
+        const auto wh = std::make_pair(static_cast<u32>(mode.w), static_cast<u32>(mode.h));
+        if (std::find(seen.begin(), seen.end(), wh) != seen.end())
+            continue;
+        seen.push_back(wh);
+
+        string64 buf;
+        xr_sprintf(buf, sizeof(buf), "%ux%u", mode.w, mode.h);
         vid_mode_token[monitorID].emplace_back(xr_strdup(buf), i);
     }
 
@@ -99,7 +107,7 @@ void CRenderDevice::CleanupVideoModes()
 void CRenderDevice::SetWindowDraggable(bool draggable)
 {
     // Only draggable if resizable too
-    const bool windowed = psDeviceMode.WindowStyle == rsWindowed || psDeviceMode.WindowStyle == rsWindowedBorderless;
+    const bool windowed = psDeviceMode.WindowStyle == rsWindowed;
     const bool resizable = SDL_GetWindowFlags(Device.m_sdlWnd) & SDL_WINDOW_RESIZABLE;
     m_allowWindowDrag = draggable && windowed && resizable;
 
@@ -199,38 +207,24 @@ void CRenderDevice::SelectResolution(const bool windowed)
         psDeviceMode.Height = current.h;
         psDeviceMode.RefreshRate = current.refresh_rate;
     }
-    else if (!windowed) // check if safe for fullscreen
+    else if (!windowed)
     {
-        string256 buf;
-        xr_sprintf(buf, "%ux%u (%dHz)", psDeviceMode.Width, psDeviceMode.Height, psDeviceMode.RefreshRate);
-
-        auto modes = vid_mode_token[psDeviceMode.Monitor];
-        const auto it = std::find_if(modes.begin(), modes.end(), [&buf](const xr_token& token)
+        SDL_DisplayMode requested =
         {
-            return token.name && xr_strcmp(token.name, buf) == 0;
-        });
+            SDL_PIXELFORMAT_UNKNOWN,
+            (int)psDeviceMode.Width,
+            (int)psDeviceMode.Height,
+            (int)psDeviceMode.RefreshRate,
+            nullptr
+        };
 
-        if (it == modes.end()) // not found
-        {
-            SDL_DisplayMode current =
-            {
-                SDL_PIXELFORMAT_UNKNOWN,
-                (int)psDeviceMode.Width,
-                (int)psDeviceMode.Height,
-                (int)psDeviceMode.RefreshRate,
-                nullptr
-            };
+        SDL_DisplayMode closest;
+        if (!SDL_GetClosestDisplayMode(psDeviceMode.Monitor, &requested, &closest))
+            SDL_GetCurrentDisplayMode(psDeviceMode.Monitor, &closest);
 
-            SDL_DisplayMode closest; // try closest or fallback to desktop mode
-            if (!SDL_GetClosestDisplayMode(psDeviceMode.Monitor, &current, &closest))
-            {
-                SDL_GetCurrentDisplayMode(psDeviceMode.Monitor, &closest);
-            }
-
-            psDeviceMode.Width = closest.w;
-            psDeviceMode.Height = closest.h;
-            psDeviceMode.RefreshRate = closest.refresh_rate;
-        }
+        psDeviceMode.Width = closest.w;
+        psDeviceMode.Height = closest.h;
+        psDeviceMode.RefreshRate = closest.refresh_rate;
     }
 
     dwWidth = psDeviceMode.Width;
