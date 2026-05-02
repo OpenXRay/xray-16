@@ -623,8 +623,6 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
     }
 }
 
-void CParticleEffect::Render(CBackend&, float, bool) {}
-
 #else // _EDITOR
 
 //----------------------------------------------------

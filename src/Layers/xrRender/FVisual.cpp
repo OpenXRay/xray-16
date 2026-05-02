@@ -183,8 +183,6 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         rm_geom.create(vFormat, *p_rm_Vertices, *p_rm_Indices);
 }
 
-void Fvisual::Render(CBackend&, float, bool) {}
-
 #define PCOPY(a) a = pFrom->a
 void Fvisual::Copy(dxRender_Visual* pSrc)
 {

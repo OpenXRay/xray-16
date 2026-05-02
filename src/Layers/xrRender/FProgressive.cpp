@@ -67,8 +67,6 @@ void FProgressive::Load(const char* N, IReader* data, u32 dwFlags)
 #endif
 }
 
-void FProgressive::Render(CBackend&, float, bool) {}
-
 #define PCOPY(a) a = pFrom->a
 void FProgressive::Copy(dxRender_Visual* pSrc)
 {
