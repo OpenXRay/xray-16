@@ -306,9 +306,18 @@ PipelineState* PipelineStateCache::CreatePipelineState(
             if (!first.semanticName) { ++i; continue; }
 
             u32 count = 1;
-            while (i + count < desc.vertexAttributes.size() &&
-                   desc.vertexAttributes[i + count].semanticName &&
-                   xr_strcmp(desc.vertexAttributes[i + count].semanticName, first.semanticName) == 0) {
+            while (i + count < desc.vertexAttributes.size()) {
+                const auto& next = desc.vertexAttributes[i + count];
+                if (!next.semanticName)
+                    break;
+                if (xr_strcmp(next.semanticName, first.semanticName) != 0)
+                    break;
+                if (next.format != first.format)
+                    break;
+                if (next.bufferIndex != first.bufferIndex)
+                    break;
+                if (next.isInstanced != first.isInstanced)
+                    break;
                 ++count;
             }
 

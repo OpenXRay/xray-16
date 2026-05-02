@@ -1048,10 +1048,8 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     auto resolveUISemantic = [](const std::string& sem, u32 idx) -> std::optional<VertexElement> {
         if (sem == "POSITION" || sem == "POSITIONT") return VertexElement{nvrhi::Format::RGBA32_FLOAT, 0};
         if (sem == "COLOR")                          return VertexElement{nvrhi::Format::RGBA8_UNORM, 16};
-        if (sem == "TEXCOORD") {
-            if (idx == 0) return VertexElement{nvrhi::Format::RG32_FLOAT, 20};
-            if (idx == 1) return VertexElement{nvrhi::Format::R32_UINT, 28};
-        }
+        if (sem == "TEXCOORD") return VertexElement{nvrhi::Format::RG32_FLOAT, 20};
+        if (sem == "TEXINDEX") return VertexElement{nvrhi::Format::R32_UINT,   28};
         return std::nullopt;
     };
 
@@ -1175,11 +1173,11 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
     if (nativePipeline) {
         const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
-        if (actualDesc.bindingLayouts.size() >= 1) {
+        const bool hadPS = (pso->psBindingLayout != nullptr);
+        if (actualDesc.bindingLayouts.size() >= 1)
             pso->vsBindingLayout = actualDesc.bindingLayouts[0];
-            if (actualDesc.bindingLayouts.size() >= 2)
-                pso->psBindingLayout = actualDesc.bindingLayouts[1];
-        }
+        if (hadPS && actualDesc.bindingLayouts.size() >= 2)
+            pso->psBindingLayout = actualDesc.bindingLayouts[1];
     }
 
     return pso.release();
