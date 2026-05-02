@@ -40,12 +40,6 @@ public:
     };
 
 public:
-    void apply_load(CBackend& cmd_list, u32 stage);
-    void apply_theora(CBackend& cmd_list, u32 stage);
-    void apply_avi(CBackend& cmd_list, u32 stage);
-    void apply_seq(CBackend& cmd_list, u32 stage);
-    void apply_normal(CBackend& cmd_list, u32 stage);
-
     void set_slice(int slice);
 
     void Preload();
@@ -95,8 +89,6 @@ private:
 
     void desc_update();
 
-    void Apply(CBackend& cmd_list, u32 dwStage);
-
 public:
     struct
     {
@@ -105,8 +97,6 @@ public:
         u32 seqCycles : 1;
         u32 MemoryUsage : 28;
     } flags;
-
-    fastdelegate::FastDelegate2<CBackend&, u32> bind;
 
     CAviPlayerCustom* pAVI;
     CTheoraSurface* pTheora;

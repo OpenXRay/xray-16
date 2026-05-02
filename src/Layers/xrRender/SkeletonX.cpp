@@ -42,9 +42,6 @@ void CSkeletonX::_Copy(CSkeletonX* B)
     RMS_bonecount = B->RMS_bonecount;
 }
 //////////////////////////////////////////////////////////////////////
-void CSkeletonX::_Render(CBackend&, ref_geom&, u32, u32, u32) {}
-void CSkeletonX::_Render_soft(CBackend&, ref_geom&, u32, u32, u32) {}
-
 void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 {
     s_bones_array_const = "sbones_array";

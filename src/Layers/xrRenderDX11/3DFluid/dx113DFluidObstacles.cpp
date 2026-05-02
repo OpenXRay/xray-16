@@ -91,7 +91,6 @@ void dx113DFluidObstacles::DestroyShaders()
 
 void dx113DFluidObstacles::ProcessObstacles(const dx113DFluidData& FluidData, float timestep)
 {
-    PIX_EVENT(ProcessObstacles);
 
     //  Prepare world-space to grid transform
     Fmatrix WorldToFluid;
@@ -126,7 +125,6 @@ void dx113DFluidObstacles::RenderStaticOOBB(const Fmatrix& Transform)
 {
     static shared_str strOOBBClipPlane("OOBBClipPlane");
 
-    PIX_EVENT(RenderObstacle);
 
     //  Shader must be already set up!
     Fmatrix InvTransform;
@@ -312,7 +310,6 @@ timestep)
 {
     static shared_str strOOBBClipPlane("OOBBClipPlane");
 
-    PIX_EVENT(RenderDynamicObstacle);
 
     //  dsdad;
 
@@ -384,7 +381,6 @@ void dx113DFluidObstacles::RenderDynamicOOBB(
 {
     static shared_str strOOBBClipPlane("OOBBClipPlane");
 
-    PIX_EVENT(RenderDynamicObstacle);
 
     //  dsdad;
 
