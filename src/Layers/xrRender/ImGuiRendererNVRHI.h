@@ -35,6 +35,7 @@ private:
     nvrhi::BufferHandle m_constantBuffer;
 
     nvrhi::GraphicsPipelineHandle m_pipeline;
+    nvrhi::GraphicsPipelineDesc m_pipelineDesc;
     nvrhi::BindingLayoutHandle m_bindingLayout;
     nvrhi::BindingSetHandle m_resourceBindings;
     nvrhi::InputLayoutHandle m_inputLayout;
@@ -73,10 +74,10 @@ private:
     bool CreatePipelineState();
     bool CreateResourceBindings();
     bool CreateBuffers(size_t vtxSize, size_t idxSize);
-    bool ResizeBuffers(size_t vtxSize, size_t idxSize);
 
     nvrhi::ITexture* GetTextureFromImTextureID(ImTextureID id);
     void UpdateTextureBinding(ImTextureID textureId);
+    nvrhi::IGraphicsPipeline* GetOrCreatePipelineForFramebuffer(nvrhi::IFramebuffer* fb);
 };
 
 class ImGuiRendererFactory {

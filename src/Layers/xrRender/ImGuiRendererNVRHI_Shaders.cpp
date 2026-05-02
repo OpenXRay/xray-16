@@ -99,26 +99,26 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
         return false;
     }
 
-    nvrhi::GraphicsPipelineDesc pipelineDesc;
-    pipelineDesc.setVertexShader(m_vertexShader);
-    pipelineDesc.setPixelShader(m_pixelShader);
-    pipelineDesc.setInputLayout(m_inputLayout);
-    pipelineDesc.addBindingLayout(m_bindingLayout);
-    pipelineDesc.setRenderState(m_renderState);
-    pipelineDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
-
-    nvrhi::FramebufferInfoEx framebufferInfo;
-    framebufferInfo.addColorFormat(nvrhi::Format::RGBA8_UNORM);
-
-    m_pipeline = m_device->createGraphicsPipeline(pipelineDesc, framebufferInfo);
-
-    if (!m_pipeline)
-    {
-        Msg("! Failed to create ImGui graphics pipeline");
-        return false;
-    }
+    m_pipelineDesc = nvrhi::GraphicsPipelineDesc();
+    m_pipelineDesc.setVertexShader(m_vertexShader);
+    m_pipelineDesc.setPixelShader(m_pixelShader);
+    m_pipelineDesc.setInputLayout(m_inputLayout);
+    m_pipelineDesc.addBindingLayout(m_bindingLayout);
+    m_pipelineDesc.setRenderState(m_renderState);
+    m_pipelineDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
 
     return true;
+}
+
+nvrhi::IGraphicsPipeline* ImGuiRendererNVRHI::GetOrCreatePipelineForFramebuffer(nvrhi::IFramebuffer* fb)
+{
+    if (!fb || !m_pipelineDesc.VS)
+        return nullptr;
+
+    const auto& fbInfo = fb->getFramebufferInfo();
+    auto& cache = framegraph::GetPassResourceCache();
+    auto handle = cache.GetOrCreatePipeline("ImGui", m_pipelineDesc, fbInfo, m_device.Get());
+    return handle.Get();
 }
 
 bool ImGuiRendererNVRHI::CreateResourceBindings()
