@@ -21,7 +21,7 @@ framegraph::VirtualResourceHandle setupRainPass(
             RenderPassBuilder passBuilder(builder, passHandle);
             data.renderer = renderer;
             data.depth = passBuilder.read(depthTarget, ResourceState::DepthStencilRead);
-            data.output = passBuilder.write(inputTarget, ResourceState::RenderTarget);
+            data.output = passBuilder.readWrite(inputTarget, ResourceState::RenderTarget);
         },
         [](const RainPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             if (!data.renderer || !data.renderer->HasWork()) return;
