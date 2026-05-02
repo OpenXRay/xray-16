@@ -23,8 +23,6 @@
 #include "Layers/xrRender/Profiler/StatsOverlay.h"
 
 struct ImDrawData;
-struct ID3D11Resource;
-struct ID3D11Buffer;
 
 namespace xray::render::fg
 {
@@ -175,8 +173,6 @@ private:
 public:
 
     pcstr getShaderPath() override { return "r5\\"; }
-
-    ID3D11Resource* texture_load(pcstr fname, u32& msize);
 
     IRenderVisual* getVisual(int id) override;
 
@@ -509,8 +505,6 @@ private:
     bool m_staticBatchesCached = false;
 
     xr_unique_ptr<fg::RenderContext> m_renderContext;
-
-    xr_map<ID3D11Buffer*, nvrhi::BufferHandle> m_bufferHandleCache;
 
     Stats m_stats;
 

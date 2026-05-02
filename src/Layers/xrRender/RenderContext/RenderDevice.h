@@ -23,7 +23,6 @@ public:
     RenderDevice();
     ~RenderDevice();
 
-    bool InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* context);
     bool InitializeFromBackend(IRenderBackend* backend);
     void Shutdown();
 
@@ -86,10 +85,6 @@ public:
     TextureHandle CreateTexture(
         const TextureDesc& desc,
         const void* initialData = nullptr);
-
-    TextureHandle CreateTextureFromD3D11(
-        ID3D11Resource* d3d11Texture,
-        const TextureDesc& desc);
 
     void DestroyTexture(TextureHandle handle);
 
