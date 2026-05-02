@@ -309,12 +309,8 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/xrRender_console.cpp
     xr_effgamma.cpp
     ../xrRenderDX11/dx11ConstantBuffer.cpp
-    ../xrRenderDX11/dx11HW.cpp
-    ../xrRenderDX11/dx11HWCaps.cpp
     ../xrRenderDX11/dx11ResourceManager_Resources.cpp
     ../xrRenderDX11/dx11ResourceManager_Scripting.cpp
-    ../xrRenderDX11/dx11StateUtils.cpp
-    ../xrRenderDX11/dx11VertexLayoutCache.cpp
     ../xrRenderDX11/dx11r_constants.cpp
 
     ../xrRenderDX11/blenders/Blender_BmmD_deferred.cpp
@@ -332,9 +328,6 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/blenders/uber_deffer.cpp
 
 
-    ../xrRenderDX11/StateManager/dx11SamplerStateCache.cpp
-    ../xrRenderDX11/StateManager/dx11State.cpp
-    ../xrRenderDX11/StateManager/dx11StateCache.cpp
 )
 
 target_include_directories(xrRender

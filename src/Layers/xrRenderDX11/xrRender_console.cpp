@@ -14,7 +14,6 @@
 #endif
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
 #endif
 
 
@@ -338,58 +337,12 @@ public:
 class CCC_tf_Aniso : public CCC_Integer
 {
 public:
-    void apply()
-    {
-#if defined(USE_DX11)
-        if (nullptr == HW.pDevice)
-            return;
-#endif
-        int val = *value;
-        clamp(val, 1, 16);
-#if defined(USE_DX11)
-        SSManager.SetMaxAnisotropy(val);
-#elif defined(USE_OGL)
-        // OGL: don't set aniso here because it will be updated after vid restart
-#else
-#   error No graphics API selected or enabled!
-#endif
-    }
-    CCC_tf_Aniso(LPCSTR N, int* v) : CCC_Integer(N, v, 1, 16){};
-    virtual void Execute(LPCSTR args)
-    {
-        CCC_Integer::Execute(args);
-        apply();
-    }
-    virtual void GetStatus(TStatus& S)
-    {
-        CCC_Integer::GetStatus(S);
-        apply();
-    }
+    CCC_tf_Aniso(LPCSTR N, int* v) : CCC_Integer(N, v, 1, 16) {}
 };
 class CCC_tf_MipBias : public CCC_Float
 {
 public:
-    void apply()
-    {
-#if defined(USE_DX11)
-        if (nullptr == HW.pDevice)
-            return;
-
-        SSManager.SetMipLODBias(*value);
-#endif
-    }
-
     CCC_tf_MipBias(LPCSTR N, float* v) : CCC_Float(N, v, -3.f, +3.f) {}
-    virtual void Execute(LPCSTR args)
-    {
-        CCC_Float::Execute(args);
-        apply();
-    }
-    virtual void GetStatus(TStatus& S)
-    {
-        CCC_Float::GetStatus(S);
-        apply();
-    }
 };
 class CCC_R2GM : public CCC_Float
 {
@@ -529,46 +482,8 @@ public:
 class CCC_memory_stats : public IConsole_Command
 {
 public:
-    CCC_memory_stats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR /*args*/)
-    {
-        // TODO: OGL: Implement memory usage statistics.
-#if defined(USE_DX11)
-        u32 m_base = 0;
-        u32 c_base = 0;
-        u32 m_lmaps = 0;
-        u32 c_lmaps = 0;
-
-        RImplementation.ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
-
-        Msg("memory usage  mb \t \t video    \t managed      \t system \n");
-
-        const float MiB = 1024*1024; // XXX: use it as common enum value (like in X-Ray 2.0)
-        const u32* mem_usage = HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex];
-
-        float vb_video = mem_usage[D3D_POOL_DEFAULT] / MiB;
-        float vb_managed = mem_usage[D3D_POOL_MANAGED] / MiB;
-        float vb_system = mem_usage[D3D_POOL_SYSTEMMEM] / MiB;
-        Msg("vertex buffer      \t \t %f \t %f \t %f ", vb_video, vb_managed, vb_system);
-
-        float ib_video = mem_usage[D3D_POOL_DEFAULT] / MiB;
-        float ib_managed = mem_usage[D3D_POOL_MANAGED] / MiB;
-        float ib_system = mem_usage[D3D_POOL_SYSTEMMEM] / MiB;
-        Msg("index buffer      \t \t %f \t %f \t %f ", ib_video, ib_managed, ib_system);
-
-        float textures_video = (m_base+m_lmaps)/MiB;
-        Msg("textures          \t \t %f \t %f \t %f ", textures_video, 0.f, 0.f);
-
-        mem_usage = HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget];
-        float rt_video = mem_usage[D3D_POOL_DEFAULT] / MiB;
-        float rt_managed = mem_usage[D3D_POOL_MANAGED] / MiB;
-        float rt_system = mem_usage[D3D_POOL_SYSTEMMEM] / MiB;
-        Msg("R-Targets         \t \t %f \t %f \t %f ", rt_video, rt_managed, rt_system);
-
-        Msg("\nTotal             \t \t %f \t %f \t %f ", vb_video + ib_video + textures_video + rt_video,
-            vb_managed + ib_managed + rt_managed, vb_system + ib_system + rt_system);
-#endif // !USE_OGL
-    }
+    CCC_memory_stats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
+    virtual void Execute(LPCSTR) {}
 };
 
 class CCC_DumpResources final : public IConsole_Command

@@ -3,10 +3,6 @@
 #include "xrCore/xr_resource.h"
 #include "tss_def.h"
 
-#if defined(USE_DX11)
-#include "Layers/xrRenderDX11/StateManager/dx11State.h"
-#endif
-
 // Forward declarations for Slang reflection
 namespace slang {
     struct ShaderReflection;

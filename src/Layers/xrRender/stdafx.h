@@ -25,7 +25,7 @@
 
 #include "Layers/xrRender/VertexLayout.h"
 
-#include "Layers/xrRenderDX11/dx11HW.h"
+#include "Layers/xrRenderDX11/CommonTypes.h"
 
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/FVF.h"

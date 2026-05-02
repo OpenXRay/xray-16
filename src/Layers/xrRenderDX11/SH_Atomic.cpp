@@ -3,7 +3,6 @@
 
 #include "Layers/xrRender/SH_Atomic.h"
 #include "Layers/xrRenderDX11/ResourceManager.h"
-#include "Layers/xrRenderDX11/dx11VertexLayoutCache.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRender/FrameGraph/ShaderCache.h"
@@ -140,8 +139,6 @@ SPP::~SPP()
 //	SState
 SState::~SState()
 {
-    auto* p = static_cast<ID3DState*>(state);
-    _RELEASE(p);
     state = nullptr;
     RImplementation.Resources->_DeleteState(this);
 }
@@ -151,18 +148,5 @@ SState::~SState()
 SDeclaration::~SDeclaration()
 {
     RImplementation.Resources->_DeleteDecl(this);
-#if defined(USE_DX11)
-    if (auto* data = static_cast<DX11DeclBackendData*>(backend_data))
-    {
-        for (auto& kv : data->vs_to_layout)
-            _RELEASE(kv.second);
-        xr_delete(data);
-        backend_data = nullptr;
-    }
-#elif defined(USE_OGL)
-    glDeleteVertexArrays(1, &dcl);
-#else
-#   error No graphics API selected or enabled!
-#endif
 }
 } // namespace xray::render::fg
