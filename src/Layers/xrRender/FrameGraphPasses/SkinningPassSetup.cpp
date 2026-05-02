@@ -337,47 +337,49 @@ static decals::OverlayManager::SplatRange GetSplatRange(const GeometryBatch& bat
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-static void RenderSkinnedBatch(
+
+struct SkinnedPhaseContext {
+    nvrhi::IBindingSet* bindingSet = nullptr;
+    nvrhi::IBuffer* dynTransformsCB = nullptr;
+    nvrhi::IBuffer* materialIdCB = nullptr;
+    nvrhi::IFramebuffer* framebuffer = nullptr;
+    nvrhi::IDescriptorTable* bindlessTable = nullptr;
+    nvrhi::IBindingLayout* bindlessLayout = nullptr;
+    nvrhi::Viewport viewport;
+    nvrhi::Rect scissor;
+    bool isHUD = false;
+};
+
+static SkinnedPhaseContext BuildSkinnedPhaseContext(
     const SkinningPassState& state,
-    nvrhi::ICommandList* cmdList,
     nvrhi::IDevice* nvDevice,
     nvrhi::IFramebuffer* framebuffer,
     nvrhi::IBuffer* dynTransformsCB,
-    nvrhi::IBuffer* shaderParamsCB,
     nvrhi::IBuffer* staticGlobalsCB,
     nvrhi::IBuffer* materialIdCB,
     nvrhi::IBuffer* globalBoneBuffer,
-    nvrhi::IBuffer* terrainMaterialsSB,
     nvrhi::IDescriptorTable* bindlessTable,
     nvrhi::IBindingLayout* bindlessLayout,
+    nvrhi::IBuffer* splatBuffer,
     const nvrhi::Viewport& viewport,
     const nvrhi::Rect& scissor,
-    const GeometryBatch& batch,
-    const Fmatrix& worldMatrix,
-    u32 skeletonBoneOffset,
-    nvrhi::IBuffer* splatBuffer,
-    decals::OverlayManager::SplatRange splatRange = {0, 0},
-    bool isHUD = false)
+    bool isHUD)
 {
     using namespace fg;
     using namespace fg::bindless;
 
-    if (!batch.vertexBuffer || !batch.indexBuffer)
-        return;
-
-    DynamicTransforms dynTransData = {};
-    FillDynamicTransforms(dynTransData, worldMatrix);
-    cmdList->writeBuffer(dynTransformsCB, &dynTransData, sizeof(dynTransData));
-
-    SkinnedMaterialCB matIdData = {};
-    matIdData.materialID = batch.bindlessMaterialID;
-    matIdData.skeletonBoneOffset = skeletonBoneOffset;
-    matIdData.splatOffset = splatRange.offset;
-    matIdData.splatCount = splatRange.count;
-    cmdList->writeBuffer(materialIdCB, &matIdData, sizeof(matIdData));
+    SkinnedPhaseContext ctx;
+    ctx.dynTransformsCB = dynTransformsCB;
+    ctx.materialIdCB = materialIdCB;
+    ctx.framebuffer = framebuffer;
+    ctx.bindlessTable = bindlessTable;
+    ctx.bindlessLayout = bindlessLayout;
+    ctx.viewport = viewport;
+    ctx.scissor = scissor;
+    ctx.isHUD = isHUD;
 
     if (!globalBoneBuffer)
-        return;
+        return ctx;
 
     auto& matBuffer = MaterialBuffer::Instance();
     auto& cache = framegraph::GetPassResourceCache();
@@ -399,9 +401,36 @@ static void RenderSkinnedBatch(
     bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
     bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
 
-    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), activeLayout, nvDevice);
-    if (!bindingSet)
+    ctx.bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), activeLayout, nvDevice);
+    return ctx;
+}
+
+static void DrawSkinnedBatch(
+    const SkinningPassState& state,
+    nvrhi::ICommandList* cmdList,
+    nvrhi::IDevice* nvDevice,
+    const SkinnedPhaseContext& ctx,
+    const GeometryBatch& batch,
+    const Fmatrix& worldMatrix,
+    u32 skeletonBoneOffset,
+    decals::OverlayManager::SplatRange splatRange = {0, 0})
+{
+    using namespace fg;
+    using namespace fg::bindless;
+
+    if (!batch.vertexBuffer || !batch.indexBuffer || !ctx.bindingSet)
         return;
+
+    DynamicTransforms dynTransData = {};
+    FillDynamicTransforms(dynTransData, worldMatrix);
+    cmdList->writeBuffer(ctx.dynTransformsCB, &dynTransData, sizeof(dynTransData));
+
+    SkinnedMaterialCB matIdData = {};
+    matIdData.materialID = batch.bindlessMaterialID;
+    matIdData.skeletonBoneOffset = skeletonBoneOffset;
+    matIdData.splatOffset = splatRange.offset;
+    matIdData.splatCount = splatRange.count;
+    cmdList->writeBuffer(ctx.materialIdCB, &matIdData, sizeof(matIdData));
 
     u32 variantIdx = MaterialBuffer::Instance().GetShaderVariant(batch.bindlessMaterialID);
     const ShaderVariantDesc* variant = nullptr;
@@ -417,10 +446,10 @@ static void RenderSkinnedBatch(
         if (variant) {
             u32 fmt = GetSkinnedVertexFormatID(batch.skinningRenderMode, batch.vertexStride);
             pipeline = VariantPSOCache::Instance().GetOrCreatePSO(
-                nvDevice, framebuffer, variantIdx, *variant, p, fmt,
-                GetSkinnedInputLayout(state, fmt), state.layout, bindlessLayout);
+                nvDevice, ctx.framebuffer, variantIdx, *variant, p, fmt,
+                GetSkinnedInputLayout(state, fmt), state.layout, ctx.bindlessLayout);
         } else {
-            pipeline = isHUD
+            pipeline = ctx.isHUD
                 ? SelectHUDSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode)
                 : SelectSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode);
         }
@@ -429,14 +458,14 @@ static void RenderSkinnedBatch(
 
         nvrhi::GraphicsState gfxState;
         gfxState.pipeline = pipeline;
-        gfxState.framebuffer = framebuffer;
-        gfxState.bindings = { bindingSet };
-        if (bindlessTable)
-            gfxState.addBindingSet(bindlessTable);
+        gfxState.framebuffer = ctx.framebuffer;
+        gfxState.bindings = { ctx.bindingSet };
+        if (ctx.bindlessTable)
+            gfxState.addBindingSet(ctx.bindlessTable);
         gfxState.vertexBuffers = { {batch.vertexBuffer, 0, 0} };
         gfxState.indexBuffer = { batch.indexBuffer, nvrhi::Format::R16_UINT, 0 };
-        gfxState.viewport.addViewport(viewport);
-        gfxState.viewport.addScissorRect(scissor);
+        gfxState.viewport.addViewport(ctx.viewport);
+        gfxState.viewport.addScissorRect(ctx.scissor);
 
         cmdList->setGraphicsState(gfxState);
         cmdList->drawIndexed(
@@ -628,27 +657,26 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 nvrhi::Viewport worldViewport(
                     0.0f, static_cast<float>(rtDesc.width),
                     0.0f, static_cast<float>(rtDesc.height),
-                    0.0f, 1.0f  // Normal depth range
+                    0.0f, 1.0f
                 );
 
-                // Use GPU culling visibility if available (visual-based lookup)
+                SkinnedPhaseContext worldCtx = BuildSkinnedPhaseContext(
+                    *data.passState, nvDevice, framebuffer,
+                    dynTransformsCB, staticGlobalsCB, materialIdCB,
+                    globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer,
+                    worldViewport, scissor, false);
+
                 const bool useGPUCulling = data.visibilityData.enabled &&
                                            data.visibilityData.visibilityByVisualCallback != nullptr;
 
                 if (useGPUCulling) {
-                    // Render using visibility data (GPU-culled path)
-                    // Visual-based lookup handles batch reordering correctly
-                    // NOTE: We use data from N-2 frames ago (double-buffer readback delay)
-
                     u32 renderedCount = 0;
                     u32 culledCount = 0;
 
-                    // Iterate over current frame's batches
                     for (const auto& batch : data.geometry->GetBatches()) {
                         if (!batch.isSkinned)
                             continue;
 
-                        // Check visibility using visual pointer lookup
                         u32 visibilityValue = batch.visual
                             ? data.visibilityData.visibilityByVisualCallback(
                                 batch.visual, data.visibilityData.visibilityByVisualUserData)
@@ -662,25 +690,16 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
                         auto sr = GetSplatRange(batch, data.overlayMgr);
 
-                        RenderSkinnedBatch(
-                            *data.passState,
-                            cmdList, nvDevice, framebuffer,
-                            dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
-                            globalBoneBuffer, terrainMatBuffer.GetBuffer(),
-                            bindlessTable, bindlessLayout, worldViewport, scissor,
-                            batch, batch.worldMatrix, boneOffset, splatBuffer, sr
-                        );
+                        DrawSkinnedBatch(*data.passState, cmdList, nvDevice, worldCtx,
+                            batch, batch.worldMatrix, boneOffset, sr);
                         renderedCount++;
                     }
 
-                    // Report stats via callback
                     if (data.visibilityData.statsCallback) {
                         data.visibilityData.statsCallback(renderedCount, culledCount,
                             data.visibilityData.statsUserData);
                     }
                 } else {
-                    // Render all skinned batches (no GPU culling)
-                    u32 drawCount = 0;
                     for (const auto& batch : data.geometry->GetBatches()) {
                         if (!batch.isSkinned)
                             continue;
@@ -688,15 +707,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
                         auto sr = GetSplatRange(batch, data.overlayMgr);
 
-                        RenderSkinnedBatch(
-                            *data.passState,
-                            cmdList, nvDevice, framebuffer,
-                            dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
-                            globalBoneBuffer, terrainMatBuffer.GetBuffer(),
-                            bindlessTable, bindlessLayout, worldViewport, scissor,
-                            batch, batch.worldMatrix, boneOffset, splatBuffer, sr
-                        );
-                        drawCount++;
+                        DrawSkinnedBatch(*data.passState, cmdList, nvDevice, worldCtx,
+                            batch, batch.worldMatrix, boneOffset, sr);
                     }
                 }
             }
@@ -708,23 +720,22 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 nvrhi::Viewport hudViewport(
                     0.0f, static_cast<float>(rtDesc.width),
                     0.0f, static_cast<float>(rtDesc.height),
-                    0.0f, 0.1f  // Compressed depth range for HUD
+                    0.0f, 0.1f
                 );
+
+                SkinnedPhaseContext hudCtx = BuildSkinnedPhaseContext(
+                    *data.passState, nvDevice, framebuffer,
+                    dynTransformsCB, staticGlobalsCB, materialIdCB,
+                    globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer,
+                    hudViewport, scissor, true);
 
                 for (const auto& batch : *data.hudBatches) {
                     Fmatrix adjustedWorldMatrix = ApplyHUDFOVAdjustment(batch.worldMatrix);
                     u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
 
-                    RenderSkinnedBatch(
-                        *data.passState,
-                        cmdList, nvDevice, framebuffer,
-                        dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB,
-                        globalBoneBuffer, terrainMatBuffer.GetBuffer(),
-                        bindlessTable, bindlessLayout, hudViewport, scissor,
-                        batch, adjustedWorldMatrix, boneOffset, splatBuffer, {0, 0}, true
-                    );
+                    DrawSkinnedBatch(*data.passState, cmdList, nvDevice, hudCtx,
+                        batch, adjustedWorldMatrix, boneOffset, {0, 0});
                 }
-
             }
         }
     );
