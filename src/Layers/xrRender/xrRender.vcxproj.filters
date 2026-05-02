@@ -302,6 +302,9 @@
     <ClInclude Include="r__scene.h">
       <Filter>Visibility\Sector/Portal</Filter>
     </ClInclude>
+    <ClInclude Include="RenderView.h">
+      <Filter>Visibility\Sector/Portal</Filter>
+    </ClInclude>
     <ClInclude Include="HOM.h">
       <Filter>Visibility\HOM Occlusion</Filter>
     </ClInclude>

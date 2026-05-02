@@ -260,6 +260,7 @@ target_sources(xrRender PRIVATE
     r__hw_compat.h
     VertexLayout.h
     r__pixel_calculator.cpp
+    RenderView.h
     r__scene.cpp
     r__scene.h
     r__sector.cpp
