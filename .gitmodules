@@ -40,3 +40,6 @@
 [submodule "Externals/meshoptimizer"]
 	path = Externals/meshoptimizer
 	url = https://github.com/zeux/meshoptimizer.git
+[submodule "Externals/SDL"]
+	path = Externals/SDL
+	url = https://github.com/libsdl-org/SDL.git
