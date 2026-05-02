@@ -2,6 +2,7 @@
 
 #include "r__dsgraph_types.h"
 #include "r__sector.h"
+#include "RenderView.h"
 
 namespace xray::render::fg
 {
@@ -18,24 +19,7 @@ struct R_dsgraph_structure
     u32 marker{};
     u32 context_id{ INVALID_CONTEXT_ID };
 
-    struct options_t
-    {
-        u32 phase{};
-        u32 portal_traverse_flags{};
-        u32 spatial_traverse_flags{};
-        u32 spatial_types{ STYPE_RENDERABLE };
-        float query_box_side{ EPS_L * 20.0f };
-        Fvector view_pos{};
-        Fmatrix xform{};
-        CFrustum view_frustum{};
-        IRender_Sector::sector_id_t sector_id;
-        bool pmask[2];
-        bool pmask_wmark;
-        bool use_hom{ false };
-        bool precise_portals{ false };
-        bool is_main_pass{ false };
-        bool mt_calculate{ false };
-    } o;
+    RenderView view;
 
     // Dynamic scene graph
     // R_dsgraph::mapNormal_T										mapNormal	[2]		;	// 2==(priority/2)
@@ -86,16 +70,9 @@ struct R_dsgraph_structure
 
     void reset()
     {
-        //marker = 0;
         context_id = INVALID_CONTEXT_ID;
 
-        o.query_box_side = EPS_L * 20;
-        o.use_hom = false;
-        o.precise_portals = false;
-        o.is_main_pass = false;
-        o.spatial_traverse_flags = 0;
-        o.portal_traverse_flags = 0;
-        o.spatial_types = STYPE_RENDERABLE;
+        view.reset();
 
         val_recorder = nullptr;
 
@@ -130,9 +107,7 @@ struct R_dsgraph_structure
 
     void r_pmask(bool _1, bool _2, bool _wm = false)
     {
-        o.pmask[0] = _1;
-        o.pmask[1] = _2;
-        o.pmask_wmark = _wm;
+        view.r_pmask(_1, _2, _wm);
     }
 
     void add_static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);

@@ -198,6 +198,7 @@
     <ClInclude Include="r__dsgraph_types.h"/>
     <ClInclude Include="r__occlusion.h"/>
     <ClInclude Include="r__pixel_calculator.h"/>
+    <ClInclude Include="RenderView.h"/>
     <ClInclude Include="r__scene.h"/>
     <ClInclude Include="r__sector.h"/>
     <ClInclude Include="Shader.h"/>
