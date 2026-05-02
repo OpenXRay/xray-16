@@ -281,7 +281,6 @@
     <ClInclude Include="..\xrRenderDX11\blenders\Blender_Particle.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\Blender_Screen_SET.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\Blender_tree.h"/>
-    <ClInclude Include="..\xrRenderDX11\dxImGuiRender.h"/>
     <ClInclude Include="..\xrRenderDX11\ResourceManager.h"/>
     <ClInclude Include="..\xrRenderDX11\R_Backend.h"/>
     <ClInclude Include="..\xrRenderDX11\R_Backend_Runtime.h"/>
@@ -527,7 +526,6 @@
     <ClCompile Include="..\..\..\Externals\nvrhi\src\common\dxgi-format.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dxImGuiRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\Blender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder.cpp"/>
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R2.cpp"/>

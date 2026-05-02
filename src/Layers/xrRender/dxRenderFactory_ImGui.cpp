@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "dxRenderFactory.h"
-#include "Layers/xrRenderDX11/dxImGuiRender.h"
 #include "ImGuiRendererNVRHI.h"
 #include "RenderContext/RenderDevice.h"
 
@@ -24,9 +23,7 @@ IImGuiRender* dxRenderFactory::CreateImGuiRender()
 void dxRenderFactory::DestroyImGuiRender(IImGuiRender* pObject)
 {
     if (pObject != xray::render::GetImGuiRenderer())
-    {
         xr_delete(pObject);
-    }
 }
 
 }

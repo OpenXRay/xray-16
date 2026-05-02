@@ -1,41 +1,21 @@
 #include "stdafx.h"
 #include "ImGuiRendererNVRHI.h"
-#include "Layers/xrRenderDX11/dxImGuiRender.h"
 #include "RenderContext/RenderDevice.h"
-#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render {
 
 static xr_unique_ptr<IImGuiRender> g_ImGuiRenderer;
-
 static fg::RenderDevice* g_RenderDevice = nullptr;
-
-namespace fg {
-    IImGuiRender* CreateLegacyImGuiRendererImpl()
-    {
-        return xr_new<dxImGuiRender>();
-    }
-}
 
 void InitializeImGuiRenderer(fg::RenderDevice* renderDevice)
 {
     g_RenderDevice = renderDevice;
+    R_ASSERT2(renderDevice && renderDevice->IsInitialized(), "ImGui: RenderDevice required");
 
-    if (renderDevice && renderDevice->IsInitialized())
-    {
-        fg::ImGuiRendererNVRHI* nvrhiRenderer = xr_new<fg::ImGuiRendererNVRHI>(renderDevice);
-        g_ImGuiRenderer.reset(nvrhiRenderer);
-
-        fg::RImplementation.SetImGuiRendererNVRHI(nvrhiRenderer);
-
-        Msg("* ImGui: Using NVRHI renderer (supports DX11/DX12/Vulkan)");
-    }
-    else
-    {
-        g_ImGuiRenderer.reset(fg::CreateLegacyImGuiRendererImpl());
-        Msg("* ImGui: Using legacy DX11 renderer");
-    }
+    fg::ImGuiRendererNVRHI* nvrhiRenderer = xr_new<fg::ImGuiRendererNVRHI>(renderDevice);
+    g_ImGuiRenderer.reset(nvrhiRenderer);
+    fg::RImplementation.SetImGuiRendererNVRHI(nvrhiRenderer);
 }
 
 IImGuiRender* GetImGuiRenderer()

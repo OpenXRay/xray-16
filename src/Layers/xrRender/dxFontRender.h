@@ -20,11 +20,6 @@ public:
     void Initialize(cpcstr cShader, cpcstr cTexture) override;
     void OnRender(CGameFont& owner) override;
 
-    inline void ImprintChar(Fvector l, const CGameFont& owner, FVF::TL*& v, float& X, float Y2, u32 clr2, float Y, u32 clr, xr_wide_char* wsStr, int j);
-
-    ref_shader pShader;
-    ref_geom pGeom;
-
     nvrhi::ShaderHandle m_vsHandle;
     nvrhi::ShaderHandle m_psHandle;
     framegraph::ExtractedReflection* m_vsReflection = nullptr;

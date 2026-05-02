@@ -3,7 +3,6 @@
 
 #include "fgStatGraphRender.h"
 #ifndef _EDITOR
-#include "Layers/xrRenderDX11/dxImGuiRender.h"
 #endif
 #ifndef _EDITOR
 #include "dxThunderboltDescRender.h"
