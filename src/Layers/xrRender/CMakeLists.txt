@@ -305,13 +305,8 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/dxFontRender.cpp
     ../xrRenderDX11/dxUIShader.cpp
     ../xrRenderDX11/dxDebugRender.cpp
-    ../xrRenderDX11/dxLensFlareRender.cpp
-    ../xrRenderDX11/dxStatGraphRender.cpp
-    ../xrRenderDX11/dxThunderboltRender.cpp
     ../xrRenderDX11/dxThunderboltDescRender.cpp
     ../xrRenderDX11/dxUIRender.cpp
-    ../xrRenderDX11/dxRainRender.cpp
-    ../xrRenderDX11/dxEnvironmentRender.cpp
     ../xrRenderDX11/dxObjectSpaceRender.cpp
     ../xrRenderDX11/r__dsgraph_render.cpp
     ../xrRenderDX11/r__dsgraph_render_lods.cpp

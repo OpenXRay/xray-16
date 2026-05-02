@@ -6,7 +6,6 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
-#include "Layers/xrRender/dxLensFlareRender.h"
 #include "Layers/xrRender/dxThunderboltDescRender.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 
