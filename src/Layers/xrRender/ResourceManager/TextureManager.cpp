@@ -199,10 +199,23 @@ void TextureManager::FreeHandle(TextureHandle handle) {
     TextureMetadata& meta = m_textures[handle.index];
     meta.isAlive = false;
 
-    // Remove from path lookup
     if (!meta.filePath.empty()) {
         m_pathToHandle.erase(meta.filePath);
     }
+
+    meta.nvrhiTexture = nullptr;
+    meta.videoTextureData.reset();
+    meta.sequenceTextureData.reset();
+    meta.filePath = shared_str();
+    meta.state = TextureState::Unloaded;
+    meta.refCount = 0;
+    meta.memoryUsed = 0;
+    meta.residentMips = 0;
+    meta.requestedMips = 0;
+    meta.totalMips = 0;
+    meta.lastAccessTime = 0.0f;
+    meta.accessCount = 0;
+    meta.videoActiveThisFrame = false;
 
     m_freeSlots.push_back(handle.index);
 }
