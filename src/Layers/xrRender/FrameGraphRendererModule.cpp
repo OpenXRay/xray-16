@@ -19,10 +19,7 @@ public:
     {
         ZoneScoped;
         if (modes.empty())
-        {
-            if (xrRender_test_hw())
-                modes.emplace_back(RENDERER_FG_MODE, RENDERER_FG_ID);
-        }
+            modes.emplace_back(RENDERER_FG_MODE, RENDERER_FG_ID);
         return modes;
     }
 
