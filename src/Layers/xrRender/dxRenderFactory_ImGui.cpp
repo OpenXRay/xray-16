@@ -1,10 +1,8 @@
 #include "stdafx.h"
 #include "dxRenderFactory.h"
-#include "Layers/xrRenderDX11/dxImGuiRender.h"
 #include "ImGuiRendererNVRHI.h"
 #include "RenderContext/RenderDevice.h"
 
-// Forward declarations for integration
 namespace xray::render {
     IImGuiRender* GetImGuiRenderer();
 }
@@ -24,11 +22,8 @@ IImGuiRender* dxRenderFactory::CreateImGuiRender()
 
 void dxRenderFactory::DestroyImGuiRender(IImGuiRender* pObject)
 {
-    // Don't delete if it's the global renderer
     if (pObject != xray::render::GetImGuiRenderer())
-    {
         xr_delete(pObject);
-    }
 }
 
 } // namespace xray::render::fg

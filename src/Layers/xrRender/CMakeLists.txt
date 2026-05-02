@@ -282,8 +282,6 @@ target_sources(xrRender PRIVATE
     ../../../Externals/meshoptimizer/src/vertexfilter.cpp
     ../../../Externals/meshoptimizer/src/vfetchoptimizer.cpp
 
-    ../xrRenderDX11/dxImGuiRender.h
-    ../xrRenderDX11/dxImGuiRender.cpp
     ../xrRenderDX11/Blender.cpp
     ../xrRenderDX11/Blender_Recorder.cpp
     ../xrRenderDX11/Blender_Recorder_R2.cpp
