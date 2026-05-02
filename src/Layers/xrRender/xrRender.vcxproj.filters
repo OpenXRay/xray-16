@@ -224,9 +224,6 @@
     <ClInclude Include="QueryHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="r__dsgraph_types.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="r__occlusion.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -457,9 +454,6 @@
     </ClInclude>
     <ClInclude Include="FSkinnedTypes.h">
       <Filter>Models\Visuals</Filter>
-    </ClInclude>
-    <ClInclude Include="r__dsgraph_structure.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="SkeletonXSkinXW.h">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
@@ -805,9 +799,6 @@
       <Filter>Models\Visuals</Filter>
     </ClCompile>
     <ClCompile Include="r__sector.cpp">
-      <Filter>Visibility\Sector/Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="r__sector_traversal.cpp">
       <Filter>Visibility\Sector/Portal</Filter>
     </ClCompile>
     <ClCompile Include="ColorMapManager.cpp">

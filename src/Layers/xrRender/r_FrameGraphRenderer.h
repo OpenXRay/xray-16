@@ -8,7 +8,6 @@
 #include "xrCDB/xrXRC.h"
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/r__occlusion.h"
-#include "Layers/xrRender/r__dsgraph_structure.h"
 #include "Layers/xrRender/R_DStreams.h"
 #include "Layers/xrRender/Light_Render_Direct.h"
 #include "Layers/xrRender/PSLibrary.h"
@@ -389,10 +388,6 @@ public:
     fg::SMAP_Allocator m_LP_smap_pool;
     fg::CRenderTarget* m_pTarget{ nullptr };
     fg::CPSLibrary m_PSLibrary;
-
-    fg::R_dsgraph_structure m_immContext;
-    fg::R_dsgraph_structure& get_imm_context() { return m_immContext; }
-    fg::R_dsgraph_structure& get_context(u32) { return m_immContext; }
 
     u32 occq_begin(u32& ID) { return m_HWOCC.occq_begin(ID); }
     void occq_end(u32& ID) { m_HWOCC.occq_end(ID); }

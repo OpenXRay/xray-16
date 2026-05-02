@@ -264,7 +264,6 @@ target_sources(xrRender PRIVATE
     r__scene.cpp
     r__scene.h
     r__sector.cpp
-    r__sector_traversal.cpp
     stats_manager.cpp
     xrStripify.cpp
     BufferUtils.cpp
@@ -299,7 +298,6 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/dxUIShader.cpp
     ../xrRenderDX11/dxThunderboltDescRender.cpp
     ../xrRenderDX11/dxObjectSpaceRender.cpp
-    ../xrRenderDX11/r__dsgraph_build.cpp
     D3DUtils.cpp
     ../xrRenderDX11/HOM.cpp
     ../xrRenderDX11/occRasterizer.cpp

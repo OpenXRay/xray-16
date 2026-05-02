@@ -194,8 +194,6 @@
     <ClInclude Include="r_constants_cache.h"/>
     <ClInclude Include="R_DStreams.h"/>
     <ClInclude Include="r_sun_cascades.h"/>
-    <ClInclude Include="r__dsgraph_structure.h"/>
-    <ClInclude Include="r__dsgraph_types.h"/>
     <ClInclude Include="r__occlusion.h"/>
     <ClInclude Include="r__pixel_calculator.h"/>
     <ClInclude Include="RenderView.h"/>
@@ -399,7 +397,6 @@
     <ClCompile Include="r__pixel_calculator.cpp"/>
     <ClCompile Include="r__scene.cpp"/>
     <ClCompile Include="r__sector.cpp"/>
-    <ClCompile Include="r__sector_traversal.cpp"/>
     <ClCompile Include="ShaderKey.cpp"/>
     <ClCompile Include="Shaders\SlangReflectionWrapper.cpp"/>
     <ClCompile Include="Shaders\SlangVFSAdapter.cpp"/>
@@ -526,7 +523,6 @@
     <ClCompile Include="..\xrRenderDX11\dxUIShader.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxThunderboltDescRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxObjectSpaceRender.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\r__dsgraph_build.cpp"/>
     <ClCompile Include="D3DUtils.cpp"/>
     <ClCompile Include="..\xrRenderDX11\HOM.cpp"/>
     <ClCompile Include="..\xrRenderDX11\occRasterizer.cpp"/>

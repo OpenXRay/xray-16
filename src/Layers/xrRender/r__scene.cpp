@@ -32,7 +32,7 @@ void R_scene_geometry::load(const xr_vector<CSector::level_sector_data_t>& secto
         auto* sector = xr_new<CSector>();
 
         sector->unique_id = static_cast<IRender_Sector::sector_id_t>(idx);
-        sector->setup(sectors_data[idx], Portals);
+        sector->setup(sectors_data[idx]);
         Sectors[idx] = sector;
     }
 

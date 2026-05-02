@@ -106,7 +106,6 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
     poly.assign(V, vcnt);
     pFace = face;
     pBack = back;
-    marker = 0xffffffff;
 
     Fvector N, T;
     N.set(0, 0, 0);
@@ -132,23 +131,11 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
     */
 }
 
-void CSector::setup(const level_sector_data_t& data, const xr_vector<CPortal*> &portals)
+void CSector::setup(const level_sector_data_t& data)
 {
-    // Assign portal polygons
-    const auto num_portals = data.portals_id.size();
-    m_portals.resize(num_portals);
-    for (u32 idx = 0; idx < num_portals; ++idx)
-    {
-        const auto ID = data.portals_id[idx];
-        m_portals[idx] = portals[ID];
-    }
-
     if (GEnv.isDedicatedServer)
         m_root = nullptr;
     else
-    {
-        // Assign visual
         m_root = BufferPool.getVisual(data.root_id);
-    }
 }
 } // namespace xray::render::fg

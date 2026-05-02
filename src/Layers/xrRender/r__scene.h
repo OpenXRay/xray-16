@@ -10,7 +10,6 @@ struct R_scene_geometry
 {
     xr_vector<CSector*> Sectors;
     xr_vector<CPortal*> Portals;
-    CPortalTraverser PortalTraverser;
     xrXRC Sectors_xrc;
     CDB::MODEL* rmPortals{ nullptr };
     IRender_Sector::sector_id_t largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
