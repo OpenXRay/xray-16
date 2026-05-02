@@ -299,9 +299,7 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/SH_Atomic.cpp
     ../xrRenderDX11/dxFontRender.cpp
     ../xrRenderDX11/dxUIShader.cpp
-    ../xrRenderDX11/dxDebugRender.cpp
     ../xrRenderDX11/dxThunderboltDescRender.cpp
-    ../xrRenderDX11/dxUIRender.cpp
     ../xrRenderDX11/dxObjectSpaceRender.cpp
     ../xrRenderDX11/r__dsgraph_build.cpp
     ../xrRenderDX11/r__occlusion.cpp

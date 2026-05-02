@@ -2,8 +2,6 @@
 
 #include "FrameGraphRendererModule.h"
 #include "Layers/xrRender/dxRenderFactory.h"
-#include "Layers/xrRender/dxUIRender.h"
-#include "Layers/xrRender/dxDebugRender.h"
 #include "Layers/xrRender/D3DUtils.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 
@@ -46,9 +44,7 @@ public:
         GEnv.Render = &RImplementation;
         GEnv.RenderFactory = &RenderFactoryImpl;
         GEnv.DU = &DUImpl;
-        GEnv.UIRender = &UIRenderImpl;
 #ifdef DEBUG
-        GEnv.DRender = &DebugRenderImpl;
         rdebug_render->Register();
 #endif
         xrRender_initconsole();
