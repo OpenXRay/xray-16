@@ -21,7 +21,7 @@ framegraph::VirtualResourceHandle setupLensFlarePass(framegraph::FrameGraph& fg,
             RenderPassBuilder passBuilder(builder, passHandle);
             data.renderer = renderer;
             data.depth = passBuilder.read(depthTarget, ResourceState::DepthStencilRead);
-            data.output = passBuilder.write(inputTarget, ResourceState::RenderTarget);
+            data.output = passBuilder.readWrite(inputTarget, ResourceState::RenderTarget);
         },
         [](const LensFlarePassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {

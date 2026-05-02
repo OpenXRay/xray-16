@@ -21,7 +21,7 @@ framegraph::VirtualResourceHandle setupThunderboltPass(framegraph::FrameGraph& f
             RenderPassBuilder passBuilder(builder, passHandle);
             data.renderer = renderer;
             data.depth = passBuilder.read(depthTarget, ResourceState::DepthStencilRead);
-            data.output = passBuilder.write(inputTarget, ResourceState::RenderTarget);
+            data.output = passBuilder.readWrite(inputTarget, ResourceState::RenderTarget);
         },
         [](const ThunderboltPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
