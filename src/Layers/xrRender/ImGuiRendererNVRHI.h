@@ -38,8 +38,9 @@ private:
     nvrhi::BufferHandle m_indexBuffer;
     nvrhi::BufferHandle m_constantBuffer;
 
-    // Pipeline state objects
+    // Pipeline state objects (pipeline created via PassResourceCache keyed by framebuffer info)
     nvrhi::GraphicsPipelineHandle m_pipeline;
+    nvrhi::GraphicsPipelineDesc m_pipelineDesc;
     nvrhi::BindingLayoutHandle m_bindingLayout;
     nvrhi::BindingSetHandle m_resourceBindings;
     nvrhi::InputLayoutHandle m_inputLayout;
@@ -87,11 +88,11 @@ private:
     bool CreatePipelineState();
     bool CreateResourceBindings(); // Create bindings after font texture is available
     bool CreateBuffers(size_t vtxSize, size_t idxSize);
-    bool ResizeBuffers(size_t vtxSize, size_t idxSize);
 
     // Utility
     nvrhi::ITexture* GetTextureFromImTextureID(ImTextureID id);
     void UpdateTextureBinding(ImTextureID textureId);
+    nvrhi::IGraphicsPipeline* GetOrCreatePipelineForFramebuffer(nvrhi::IFramebuffer* fb);
 };
 
 // Factory for creating the appropriate ImGui renderer

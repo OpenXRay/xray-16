@@ -66,14 +66,19 @@ void ImGuiRendererNVRHI::Render(ImDrawData* data, nvrhi::IFramebuffer* framebuff
     // Process texture requests
     ProcessTextureRequests(data);
 
-    // Check if we have all required resources
-    if (!m_pipeline || !m_resourceBindings)
+    if (!m_resourceBindings)
     {
-        Msg("! ImGuiRendererNVRHI::Render - Pipeline or bindings not ready");
+        Msg("! ImGuiRendererNVRHI::Render - Bindings not ready");
         return;
     }
 
-    // Store framebuffer so RenderDrawData can use it in graphics state
+    m_pipeline = GetOrCreatePipelineForFramebuffer(framebuffer);
+    if (!m_pipeline)
+    {
+        Msg("! ImGuiRendererNVRHI::Render - Failed to obtain pipeline for framebuffer");
+        return;
+    }
+
     m_currentFramebuffer = framebuffer;
 
     // Render ImGui draw data
@@ -263,15 +268,6 @@ bool ImGuiRendererNVRHI::CreateBuffers(size_t vtxSize, size_t idxSize)
     return true;
 }
 
-bool ImGuiRendererNVRHI::ResizeBuffers(size_t vtxSize, size_t idxSize)
-{
-    // Release old buffers
-    m_vertexBuffer = nullptr;
-    m_indexBuffer = nullptr;
-
-    // Create new ones with increased size
-    return CreateBuffers(vtxSize, idxSize);
-}
 
 void ImGuiRendererNVRHI::ProcessTextureRequests(ImDrawData* drawData)
 {

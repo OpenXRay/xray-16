@@ -13,18 +13,36 @@ namespace xray::render::fg {
 
 void ImGuiRendererNVRHI::UploadDrawData(ImDrawData* drawData, nvrhi::ICommandList* cmdList)
 {
-    // Check if we need to grow vertex/index buffers
     if (drawData->TotalVtxCount > (int)m_vertexBufferSize)
     {
-        int newVtxSize = drawData->TotalVtxCount + 5000; // Add some slack
-        ResizeBuffers(newVtxSize, m_indexBufferSize);
+        size_t newVtxSize = drawData->TotalVtxCount + 5000;
+        m_vertexBuffer = nullptr;
+        nvrhi::BufferDesc vbDesc;
+        vbDesc.byteSize = newVtxSize * sizeof(ImDrawVert);
+        vbDesc.isVertexBuffer = true;
+        vbDesc.debugName = "ImGui Vertex Buffer";
+        vbDesc.keepInitialState = true;
+        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+        m_vertexBuffer = m_device->createBuffer(vbDesc);
+        m_vertexBufferSize = m_vertexBuffer ? newVtxSize : 0;
     }
 
     if (drawData->TotalIdxCount > (int)m_indexBufferSize)
     {
-        int newIdxSize = drawData->TotalIdxCount + 10000; // Add some slack
-        ResizeBuffers(m_vertexBufferSize, newIdxSize);
+        size_t newIdxSize = drawData->TotalIdxCount + 10000;
+        m_indexBuffer = nullptr;
+        nvrhi::BufferDesc ibDesc;
+        ibDesc.byteSize = newIdxSize * sizeof(ImDrawIdx);
+        ibDesc.isIndexBuffer = true;
+        ibDesc.debugName = "ImGui Index Buffer";
+        ibDesc.keepInitialState = true;
+        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+        m_indexBuffer = m_device->createBuffer(ibDesc);
+        m_indexBufferSize = m_indexBuffer ? newIdxSize : 0;
     }
+
+    if (!m_vertexBuffer || !m_indexBuffer)
+        return;
 
     // Upload vertex and index data for all command lists
     size_t vtxOffset = 0;
@@ -136,8 +154,9 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
     if (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f)
         return;
 
-    // Upload vertex/index buffers
     UploadDrawData(drawData, cmdList);
+    if (!m_vertexBuffer || !m_indexBuffer)
+        return;
 
     // Setup render state
     SetupRenderState(drawData, cmdList);
