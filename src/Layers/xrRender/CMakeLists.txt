@@ -292,11 +292,7 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/Blender_Recorder_R2.cpp
     ../xrRenderDX11/Blender_Recorder_R3.cpp
     ../xrRenderDX11/Blender_Recorder_StandartBinding.cpp
-    ../xrRenderDX11/R_Backend_LOD.h
-    ../xrRenderDX11/R_Backend_LOD.cpp
     ../xrRenderDX11/R_Backend_Runtime.cpp
-    ../xrRenderDX11/R_Backend_hemi.cpp
-    ../xrRenderDX11/R_Backend_tree.cpp
     ../xrRenderDX11/R_Backend_xform.cpp
     ../xrRenderDX11/ResourceManager.cpp
     ../xrRenderDX11/ResourceManager_Loader.cpp
@@ -310,10 +306,7 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/dxThunderboltDescRender.cpp
     ../xrRenderDX11/dxUIRender.cpp
     ../xrRenderDX11/dxObjectSpaceRender.cpp
-    ../xrRenderDX11/r__dsgraph_render.cpp
-    ../xrRenderDX11/r__dsgraph_render_lods.cpp
     ../xrRenderDX11/r__dsgraph_build.cpp
-    ../xrRenderDX11/light_smapvis.cpp
     ../xrRenderDX11/r__occlusion.cpp
     ../xrRenderDX11/WallmarksEngine.cpp
     D3DUtils.cpp

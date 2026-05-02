@@ -229,7 +229,6 @@
     <ClInclude Include="xrStripify.h"/>
     <ClInclude Include="light_gi.h"/>
     <ClInclude Include="Light_Render_Direct.h"/>
-    <ClInclude Include="light_smapvis.h"/>
     <ClInclude Include="NVRHI\NVRHIDevice.h"/>
     <ClInclude Include="RenderContext\ResourceHandle.h"/>
     <ClInclude Include="RenderContext\RCShader.h"/>
@@ -301,9 +300,7 @@
     <ClInclude Include="..\xrRenderDX11\dxImGuiRender.h"/>
     <ClInclude Include="..\xrRenderDX11\ResourceManager.h"/>
     <ClInclude Include="..\xrRenderDX11\R_Backend.h"/>
-    <ClInclude Include="..\xrRenderDX11\R_Backend_hemi.h"/>
     <ClInclude Include="..\xrRenderDX11\R_Backend_Runtime.h"/>
-    <ClInclude Include="..\xrRenderDX11\R_Backend_tree.h"/>
     <ClInclude Include="..\xrRenderDX11\R_Backend_xform.h"/>
     <ClInclude Include="..\xrRenderDX11\ShaderResourceTraits.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\uber_deffer.h"/>
@@ -323,7 +320,6 @@
     <ClInclude Include="..\xrRenderDX11\blenders\blender_ssao.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\dx11HDAOCSBlender.h"/>
     <ClInclude Include="..\xrRenderDX11\blenders\dx11MinMaxSMBlender.h"/>
-    <ClInclude Include="..\xrRenderDX11\R_Backend_LOD.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Backend\D3D11BackendWrapper.cpp"/>
@@ -568,10 +564,7 @@
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R2.cpp"/>
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp"/>
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_StandartBinding.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\R_Backend_LOD.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_Runtime.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\R_Backend_hemi.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\R_Backend_tree.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_xform.cpp"/>
     <ClCompile Include="..\xrRenderDX11\ResourceManager.cpp"/>
     <ClCompile Include="..\xrRenderDX11\ResourceManager_Loader.cpp"/>
@@ -585,10 +578,7 @@
     <ClCompile Include="..\xrRenderDX11\dxThunderboltDescRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxUIRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxObjectSpaceRender.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\r__dsgraph_render.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\r__dsgraph_render_lods.cpp"/>
     <ClCompile Include="..\xrRenderDX11\r__dsgraph_build.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\light_smapvis.cpp"/>
     <ClCompile Include="..\xrRenderDX11\r__occlusion.cpp"/>
     <ClCompile Include="..\xrRenderDX11\WallmarksEngine.cpp"/>
     <ClCompile Include="D3DUtils.cpp"/>
