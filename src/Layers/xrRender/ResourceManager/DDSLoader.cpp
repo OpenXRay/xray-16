@@ -3,6 +3,8 @@
 #include "xrCore/FS.h"
 #include "xrEngine/xrTheora_Surface.h"
 
+#include <directx/dxgiformat.h>
+
 namespace xray::render::resources {
 
 DDSData::~DDSData() {

@@ -4,14 +4,14 @@
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
-#include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/fgUIShader.h"
 #include "Layers/xrRender/FVisual.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/FProgressive.h"
 #include "Layers/xrRender/FTreeVisual.h"
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/SH_Atomic.h"
-#include "Layers/xrRenderDX11/ResourceManager.h"
+#include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/RenderContext/RCShader.h"
 #include "Layers/xrRender/RenderContext/RenderStateConversion.h"
@@ -26,8 +26,8 @@
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
 #include "xrEngine/IRenderBackend.h"
-#include "Layers/xrRenderDX11/Blender_CLSID.h"
-#include "Layers/xrRenderDX11/blenders/Blender_BmmD.h"
+#include "Layers/xrRender/Blender_CLSID.h"
+#include "Layers/xrRender/blenders/Blender_BmmD.h"
 #include "Layers/xrRender/r_constants.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "Layers/xrRender/Materials/ShaderInfo.h"
@@ -674,7 +674,7 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
     if (!uiShader || !framebuffer)
         return nullptr;
 
-    dxUIShader* dxShader = static_cast<dxUIShader*>(uiShader);
+    fgUIShader* dxShader = static_cast<fgUIShader*>(uiShader);
     if (!dxShader)
         return nullptr;
 
@@ -725,7 +725,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 {
     auto pso = xr_make_unique<MaterialPSO>();
 
-    dxUIShader* dxShader = static_cast<dxUIShader*>(uiShader);
+    fgUIShader* dxShader = static_cast<fgUIShader*>(uiShader);
     if (!dxShader) {
         Msg("! [MaterialCache::CreateUIPSO] Invalid uiShader pointer");
         return nullptr;
@@ -735,7 +735,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     nvrhi::ShaderHandle nvrhiPS = dxShader->m_psHandle;
 
     if (!nvrhiVS || !nvrhiPS) {
-        Msg("! [MaterialCache::CreateUIPSO] Missing NVRHI shader handles in dxUIShader (VS=%p PS=%p)",
+        Msg("! [MaterialCache::CreateUIPSO] Missing NVRHI shader handles in fgUIShader (VS=%p PS=%p)",
             nvrhiVS.Get(), nvrhiPS.Get());
         return nullptr;
     }

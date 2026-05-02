@@ -4,9 +4,6 @@ target_sources(xrRender PRIVATE
     stdafx.h
     stdafx.cpp
 
-    NVRHI/NVRHIDevice.h
-    NVRHI/NVRHIDevice.cpp
-
     RenderContext/ResourceHandle.h
     RenderContext/RCShader.h
     RenderContext/RCShader.cpp
@@ -172,7 +169,7 @@ target_sources(xrRender PRIVATE
     ImGuiRendererNVRHI_Shaders.cpp
     ImGuiRendererNVRHI_Render.cpp
     ImGuiRendererIntegration.cpp
-    dxRenderFactory_ImGui.cpp
+    fgRenderFactory_ImGui.cpp
     GlobalRenderDevice.cpp
 
     Backend/VulkanBackend.h
@@ -251,8 +248,8 @@ target_sources(xrRender PRIVATE
     du_sphere.cpp
     du_sphere_part.cpp
     dxParticleCustom.cpp
-    dxRenderFactory.cpp
-    dxUISequenceVideoItem.cpp
+    fgRenderFactory.cpp
+    fgUISequenceVideoItem.cpp
     light.cpp
     light_GI.cpp
     r__buffer_pool.cpp
@@ -264,7 +261,6 @@ target_sources(xrRender PRIVATE
     r__scene.cpp
     r__scene.h
     r__sector.cpp
-    stats_manager.cpp
     xrStripify.cpp
     BufferUtils.cpp
 
@@ -285,44 +281,44 @@ target_sources(xrRender PRIVATE
     ../../../Externals/meshoptimizer/src/vertexfilter.cpp
     ../../../Externals/meshoptimizer/src/vfetchoptimizer.cpp
 
-    ../xrRenderDX11/Blender.cpp
-    ../xrRenderDX11/Blender_Recorder.cpp
-    ../xrRenderDX11/Blender_Recorder_R2.cpp
-    ../xrRenderDX11/Blender_Recorder_R3.cpp
-    ../xrRenderDX11/ResourceManager.cpp
-    ../xrRenderDX11/ResourceManager_Loader.cpp
-    ../xrRenderDX11/ResourceManager_Reset.cpp
-    ../xrRenderDX11/ResourceManager_Resources.cpp
-    ../xrRenderDX11/Shader.cpp
-    ../xrRenderDX11/SH_Atomic.cpp
-    ../xrRenderDX11/dxUIShader.cpp
-    ../xrRenderDX11/dxThunderboltDescRender.cpp
-    ../xrRenderDX11/dxObjectSpaceRender.cpp
+    ./Blender.cpp
+    ./Blender_Recorder.cpp
+    ./Blender_Recorder_R2.cpp
+    ./Blender_Recorder_R3.cpp
+    ./ResourceManager.cpp
+    ./ResourceManager_Loader.cpp
+    ./ResourceManager_Reset.cpp
+    ./ResourceManager_Resources.cpp
+    ./Shader.cpp
+    ./SH_Atomic.cpp
+    ./fgUIShader.cpp
+    ./fgThunderboltDescRender.cpp
+    ./fgObjectSpaceRender.cpp
     D3DUtils.cpp
-    ../xrRenderDX11/HOM.cpp
-    ../xrRenderDX11/occRasterizer.cpp
-    ../xrRenderDX11/occRasterizer_core.cpp
-    ../xrRenderDX11/R_DStreams.cpp
-    ../xrRenderDX11/r_constants.cpp
+    ./HOM.cpp
+    ./occRasterizer.cpp
+    ./occRasterizer_core.cpp
+    ./R_DStreams.cpp
+    ./r_constants.cpp
     ShaderInfo.cpp
-    ../xrRenderDX11/tss_def.cpp
-    ../xrRenderDX11/xrRender_console.cpp
+    ./tss_def.cpp
+    ./xrRender_console.cpp
     xr_effgamma.cpp
-    ../xrRenderDX11/dx11ResourceManager_Scripting.cpp
+    ./ResourceManager_Scripting.cpp
 
-    ../xrRenderDX11/blenders/Blender_BmmD_deferred.cpp
-    ../xrRenderDX11/blenders/Blender_Editor_Selection.cpp
-    ../xrRenderDX11/blenders/Blender_Editor_Wire.cpp
-    "../xrRenderDX11/blenders/Blender_Lm(EbB).cpp"
-    ../xrRenderDX11/blenders/Blender_Model_EbB_deferred.cpp
-    ../xrRenderDX11/blenders/Blender_Particle_deferred.cpp
-    ../xrRenderDX11/blenders/Blender_Screen_SET.cpp
-    ../xrRenderDX11/blenders/Blender_detail_still_deferred.cpp
-    ../xrRenderDX11/blenders/Blender_tree_deferred.cpp
-    ../xrRenderDX11/blenders/blender_deffer_aref.cpp
-    ../xrRenderDX11/blenders/blender_deffer_flat.cpp
-    ../xrRenderDX11/blenders/blender_deffer_model.cpp
-    ../xrRenderDX11/blenders/uber_deffer.cpp
+    ./blenders/Blender_BmmD_deferred.cpp
+    ./blenders/Blender_Editor_Selection.cpp
+    ./blenders/Blender_Editor_Wire.cpp
+    "./blenders/Blender_Lm(EbB).cpp"
+    ./blenders/Blender_Model_EbB_deferred.cpp
+    ./blenders/Blender_Particle_deferred.cpp
+    ./blenders/Blender_Screen_SET.cpp
+    ./blenders/Blender_detail_still_deferred.cpp
+    ./blenders/Blender_tree_deferred.cpp
+    ./blenders/blender_deffer_aref.cpp
+    ./blenders/blender_deffer_flat.cpp
+    ./blenders/blender_deffer_model.cpp
+    ./blenders/uber_deffer.cpp
 
 
 )

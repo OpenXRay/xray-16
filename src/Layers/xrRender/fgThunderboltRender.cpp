@@ -7,7 +7,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
-#include "Layers/xrRender/dxThunderboltDescRender.h"
+#include "Layers/xrRender/fgThunderboltDescRender.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::fg
@@ -141,7 +141,7 @@ void FGThunderboltRender::Render(CEffect_Thunderbolt& owner)
     if (!owner.current)
         return;
 
-    auto* pThRen = static_cast<dxThunderboltDescRender*>(&*owner.current->m_pRender);
+    auto* pThRen = static_cast<fgThunderboltDescRender*>(&*owner.current->m_pRender);
     if (!pThRen || !pThRen->l_model)
         return;
 

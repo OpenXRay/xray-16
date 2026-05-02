@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "FrameGraphRendererModule.h"
-#include "Layers/xrRender/dxRenderFactory.h"
+#include "Layers/xrRender/fgRenderFactory.h"
 #include "Layers/xrRender/D3DUtils.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 

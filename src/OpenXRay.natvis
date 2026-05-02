@@ -181,7 +181,7 @@
   <Type Name="FactoryPtr&lt;*&gt;">
     <DisplayString>{m_pObject}</DisplayString>
   </Type>
-  <Type Name="dxUIShader">
+  <Type Name="fgUIShader">
     <DisplayString>{hShader}</DisplayString>
   </Type>
   <!-- /xrRender -->

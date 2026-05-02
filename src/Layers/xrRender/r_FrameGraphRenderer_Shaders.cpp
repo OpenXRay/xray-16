@@ -68,97 +68,26 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
 }
 
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
-    void*& result, bool const disasm, xray::render::framegraph::ExtractedReflection* extractedReflection)
+    void*& result, xray::render::framegraph::ExtractedReflection* extractedReflection)
 {
-    HRESULT _result = E_FAIL;
-    pcstr extension = ".hlsl";
     if (pTarget[0] == 'p')
+        return create_shader(buffer, buffer_size, file_name, (SPS*&)result, extractedReflection);
+    if (pTarget[0] == 'v')
     {
-        extension = ".ps";
-        _result = create_shader(buffer, buffer_size, file_name, (SPS*&)result, extractedReflection);
-    }
-    else if (pTarget[0] == 'v')
-    {
-        extension = ".vs";
         SVS* svs_result = (SVS*)result;
-        _result = create_shader(buffer, buffer_size, file_name, svs_result, extractedReflection);
+        return create_shader(buffer, buffer_size, file_name, svs_result, extractedReflection);
     }
-    else if (pTarget[0] == 'g')
-    {
-        extension = ".gs";
-        _result = create_shader(buffer, buffer_size, file_name, (SGS*&)result, extractedReflection);
-    }
-    else if (pTarget[0] == 'c')
-    {
-        extension = ".cs";
-        _result = create_shader(buffer, buffer_size, file_name, (SCS*&)result, extractedReflection);
-    }
-    else if (pTarget[0] == 'h')
-    {
-        extension = ".hs";
-        _result = create_shader(buffer, buffer_size, file_name, (SHS*&)result, extractedReflection);
-    }
-    else if (pTarget[0] == 'd')
-    {
-        extension = ".ds";
-        _result = create_shader(buffer, buffer_size, file_name, (SDS*&)result, extractedReflection);
-    }
-    else
-    {
-        NODEFAULT;
-    }
-
-    if (disasm)
-    {
-        ID3DBlob* disasm = 0;
-        D3DDisassemble(buffer, buffer_size, FALSE, 0, &disasm);
-        if (!disasm)
-            return _result;
-
-        string_path dname;
-        strconcat(sizeof(dname), dname, "disasm" DELIMITER, file_name, extension);
-        IWriter* W = FS.w_open("$app_data_root$", dname);
-        W->w(disasm->GetBufferPointer(), disasm->GetBufferSize());
-        FS.w_close(W);
-        _RELEASE(disasm);
-    }
-
-    return _result;
+    if (pTarget[0] == 'g')
+        return create_shader(buffer, buffer_size, file_name, (SGS*&)result, extractedReflection);
+    if (pTarget[0] == 'c')
+        return create_shader(buffer, buffer_size, file_name, (SCS*&)result, extractedReflection);
+    if (pTarget[0] == 'h')
+        return create_shader(buffer, buffer_size, file_name, (SHS*&)result, extractedReflection);
+    if (pTarget[0] == 'd')
+        return create_shader(buffer, buffer_size, file_name, (SDS*&)result, extractedReflection);
+    NODEFAULT;
+    return E_FAIL;
 }
-
-class includer : public ID3DInclude
-{
-public:
-    HRESULT __stdcall Open(
-        D3D10_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
-    {
-        string_path pname;
-        strconcat(pname, RImplementation.getShaderPath(), pFileName);
-        IReader* R = FS.r_open("$game_shaders$", pname);
-        if (nullptr == R)
-        {
-            R = FS.r_open("$game_shaders$", pFileName);
-            if (nullptr == R)
-                return E_FAIL;
-        }
-
-        const size_t size = R->length();
-        u8* data = xr_alloc<u8>(size + 1);
-        CopyMemory(data, R->pointer(), size);
-        data[size] = 0;
-        FS.r_close(R);
-
-        *ppData = data;
-        *pBytes = size;
-        return S_OK;
-    }
-    HRESULT __stdcall Close(LPCVOID pData)
-    {
-        auto mutableData = const_cast<LPVOID>(pData);
-        xr_free(mutableData);
-        return S_OK;
-    }
-};
 
 class shader_name_holder
 {
@@ -536,7 +465,6 @@ HRESULT FrameGraphRenderer::shader_compile(pcstr name, IReader* fs, pcstr pFunct
         bytecode.size(),
         name,
         result,
-        RImplementation.o.disasm,
         reflection
     );
 

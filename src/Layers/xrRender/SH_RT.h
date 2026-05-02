@@ -33,15 +33,6 @@ public:
 #endif
 
 public:
-#if defined(USE_DX11)
-    ID3DTexture2D* pSurface{};
-    ID3DRenderTargetView* pRT{};
-    ID3DDepthStencilView* pZRT[R__NUM_CONTEXTS]{};
-    ID3DDepthStencilView* dsv_all{};
-    xr_vector<ID3DDepthStencilView*> dsv_per_slice;
-    ID3DUnorderedAccessView* pUAView{};
-#endif
-
     ref_texture pTexture;
 
     u32 dwWidth{};
