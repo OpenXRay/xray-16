@@ -2,7 +2,9 @@
 
 #include "FHierrarhyVisual.h"
 #include "xrCore/Animation/Bone.hpp"
+#include "xrCore/intrusive_ptr.h"
 #include "Include/xrRender/Kinematics.h"
+#include "Include/xrRender/RenderVisual.h"
 
 class CInifile;
 class CBoneData;

@@ -2,7 +2,9 @@
 #include "FGRenderHost.h"
 
 #include "xrEngine/IRenderBackend.h"
+#if defined(XR_PLATFORM_WINDOWS)
 #include "Layers/xrRender/Backend/D3D12Backend.h"
+#endif
 #include "xrRender_console.h"
 
 #include <SDL.h>
@@ -32,6 +34,7 @@ IRenderBackend* FGRenderHost::CreateBackend(SDL_Window* hWnd, u32& dwWidth, u32&
     }
     else
     {
+#if defined(XR_PLATFORM_WINDOWS)
         auto* dx12Backend = xr_new<D3D12Backend>();
         if (!dx12Backend->Initialize(hWnd, dwWidth, dwHeight, enableValidation))
         {
@@ -42,6 +45,10 @@ IRenderBackend* FGRenderHost::CreateBackend(SDL_Window* hWnd, u32& dwWidth, u32&
         }
         backend = dx12Backend;
         Msg("* [FGRenderHost] D3D12 backend initialized successfully");
+#else
+        FATAL("D3D12 backend not available on this platform");
+        return nullptr;
+#endif
     }
 
     Msg("*   Bindless textures: %s (max %u)",

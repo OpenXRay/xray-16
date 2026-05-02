@@ -2,13 +2,13 @@
 
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) && defined(XR_PLATFORM_WINDOWS)
 #include <d3d11.h>
 #endif
 
 namespace xray::render {
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) && defined(XR_PLATFORM_WINDOWS)
 
 inline fg::CullMode ConvertCullMode(D3D11_CULL_MODE d3dCull) {
     switch (d3dCull) {

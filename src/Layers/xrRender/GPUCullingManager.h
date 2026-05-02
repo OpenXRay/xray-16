@@ -14,7 +14,6 @@ namespace xray::render::fg::passes {
 namespace xray::render {
     class GeometryCollector;
     struct GeometryBatch;
-    class dxRender_Visual;
     namespace fg {
         class RenderDevice;
         class RenderContext;
@@ -25,6 +24,7 @@ namespace xray::render {
 }
 
 namespace xray::render::fg {
+    class dxRender_Visual;
     class CKinematics;
     class RTAccelStructManager;
 }

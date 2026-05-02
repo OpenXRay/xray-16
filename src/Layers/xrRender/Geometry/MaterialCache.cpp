@@ -621,6 +621,7 @@ u32 MaterialCache::GetVertexFormatID(dxRender_Visual* visual)
     return 0;
 }
 
+#if defined(USE_DX11) && defined(XR_PLATFORM_WINDOWS)
 static u32 GetFormatSize(DXGI_FORMAT format) {
     switch (format) {
         case DXGI_FORMAT_R32G32B32A32_FLOAT: return 16;
@@ -661,6 +662,7 @@ static u32 GetFormatSize(DXGI_FORMAT format) {
             return 4;
     }
 }
+#endif
 
 
 
