@@ -16,7 +16,6 @@
 #endif // _EDITOR
 
 #include "dxFontRender.h"
-#include "dxWallMarkArray.h"
 #include "Decals/fgWallMarkArray.h"
 #include "dxUISequenceVideoItem.h"
 #include "dxUIShader.h"

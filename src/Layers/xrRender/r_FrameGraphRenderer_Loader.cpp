@@ -20,7 +20,6 @@
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
 #include "Layers/xrRender/Light_DB.h"
 #include "Layers/xrRender/ModelPool.h"
-#include "Layers/xrRender/WallmarksEngine.h"
 #include "Layers/xrRender/r__sector.h"
 
 namespace xray::render
@@ -100,8 +99,6 @@ void FrameGraphRenderer::level_Load(IReader* fs)
         g_pGamePersistent->LoadTitle("st_precompiling_pso");
         PrecompileLevelPSOs();
     }
-
-    m_pWallmarksEngine = xr_new<CWallmarksEngine>();
 
     if (!GEnv.isDedicatedServer)
     {
@@ -324,8 +321,6 @@ void FrameGraphRenderer::level_Unload()
     BufferPool.xDC.clear();
 
     BufferPool.fastGeomLoaded = false;
-
-    xr_delete(m_pWallmarksEngine);
 
     m_CompiledLevelShaders.clear();
     b_loaded = FALSE;
