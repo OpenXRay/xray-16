@@ -17,11 +17,6 @@
 #include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
 #endif
 
-#if (RENDER == R_R3) || (RENDER == R_R4)
-#   ifndef MASTER_GOLD
-#   include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
-#   endif
-#endif
 
 #if RENDER == R_R4
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
@@ -734,17 +729,6 @@ public:
     }
 };
 
-#if (RENDER == R_R3) || (RENDER == R_R4)
-#   ifndef MASTER_GOLD
-class CCC_Fog_Reload : public IConsole_Command
-{
-public:
-    CCC_Fog_Reload(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR ) { FluidManager.UpdateProfiles(); }
-};
-#   endif
-#endif
-
 void xrRender_initconsole()
 {
     ZoneScoped;
@@ -950,12 +934,6 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r3_use_dx10_1", &ps_r2_ls_flags, (u32)R3FLAG_USE_DX10_1);
     CMD3(CCC_Token, "r3_msaa_alphatest", &ps_r3_msaa_atest, qmsaa__atest_token);
     CMD3(CCC_Token, "r3_minmax_sm", &ps_r3_minmax_sm, qminmax_sm_token);
-
-#if (RENDER == R_R3) || (RENDER == R_R4)
-#   ifndef MASTER_GOLD
-    CMD1(CCC_Fog_Reload, "r3_fog_reload");
-#   endif
-#endif
 
     CMD3(CCC_Mask, "r3_dynamic_wet_surfaces", &ps_r2_ls_flags, R3FLAG_DYN_WET_SURF);
     CMD4(CCC_Float, "r3_dynamic_wet_surfaces_near", &ps_r3_dyn_wet_surf_near, 5, 70);

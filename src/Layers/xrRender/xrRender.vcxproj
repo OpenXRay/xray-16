@@ -260,14 +260,6 @@
     <ClInclude Include="r2_types.h"/>
     <ClInclude Include="r2_rendertarget_wallmarks.h"/>
     <ClInclude Include="SMAP_Allocator.h"/>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.h"/>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidData.h"/>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.h"/>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.h"/>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.h"/>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h"/>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h"/>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h"/>
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h"/>
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer_impl.h"/>
     <ClInclude Include="..\xrRenderDX11\dx11HW.h"/>
@@ -545,7 +537,6 @@
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder.cpp"/>
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R2.cpp"/>
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\Blender_Recorder_StandartBinding.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_Runtime.cpp"/>
     <ClCompile Include="..\xrRenderDX11\R_Backend_xform.cpp"/>
     <ClCompile Include="..\xrRenderDX11\ResourceManager.cpp"/>
@@ -595,14 +586,6 @@
     <ClCompile Include="..\xrRenderDX11\blenders\blender_deffer_flat.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\blender_deffer_model.cpp"/>
     <ClCompile Include="..\xrRenderDX11\blenders\uber_deffer.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidData.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp"/>
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.cpp"/>
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.cpp"/>
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11State.cpp"/>

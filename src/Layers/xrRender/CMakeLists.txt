@@ -289,7 +289,6 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/Blender_Recorder.cpp
     ../xrRenderDX11/Blender_Recorder_R2.cpp
     ../xrRenderDX11/Blender_Recorder_R3.cpp
-    ../xrRenderDX11/Blender_Recorder_StandartBinding.cpp
     ../xrRenderDX11/R_Backend_Runtime.cpp
     ../xrRenderDX11/R_Backend_xform.cpp
     ../xrRenderDX11/ResourceManager.cpp
@@ -341,14 +340,6 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/blenders/blender_deffer_model.cpp
     ../xrRenderDX11/blenders/uber_deffer.cpp
 
-    ../xrRenderDX11/3DFluid/dx113DFluidBlenders.cpp
-    ../xrRenderDX11/3DFluid/dx113DFluidData.cpp
-    ../xrRenderDX11/3DFluid/dx113DFluidEmitters.cpp
-    ../xrRenderDX11/3DFluid/dx113DFluidGrid.cpp
-    ../xrRenderDX11/3DFluid/dx113DFluidManager.cpp
-    ../xrRenderDX11/3DFluid/dx113DFluidObstacles.cpp
-    ../xrRenderDX11/3DFluid/dx113DFluidRenderer.cpp
-    ../xrRenderDX11/3DFluid/dx113DFluidVolume.cpp
 
     ../xrRenderDX11/StateManager/dx11SamplerStateCache.cpp
     ../xrRenderDX11/StateManager/dx11ShaderResourceStateCache.cpp
