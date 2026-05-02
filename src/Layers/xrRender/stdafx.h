@@ -23,7 +23,6 @@
 #define R_R4 4
 #define RENDER R_R4
 
-#include "Layers/xrRenderDX11/CommonTypes.h"
 #include "Layers/xrRender/VertexLayout.h"
 
 #include "Layers/xrRenderDX11/dx11HW.h"
