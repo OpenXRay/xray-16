@@ -1,7 +1,7 @@
 #pragma once
 
 #include "xrEngine/Render.h"
-#include "Layers/xrRenderDX11/xr_effgamma.h"
+#include "Layers/xrRender/xr_effgamma.h"
 
 class CResourceManager;
 

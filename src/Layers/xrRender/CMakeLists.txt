@@ -316,16 +316,16 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/light_smapvis.cpp
     ../xrRenderDX11/r__occlusion.cpp
     ../xrRenderDX11/WallmarksEngine.cpp
-    ../xrRenderDX11/D3DUtils.cpp
+    D3DUtils.cpp
     ../xrRenderDX11/HOM.cpp
     ../xrRenderDX11/occRasterizer.cpp
     ../xrRenderDX11/occRasterizer_core.cpp
     ../xrRenderDX11/R_DStreams.cpp
     ../xrRenderDX11/r_constants.cpp
-    ../xrRenderDX11/ShaderInfo.cpp
+    ShaderInfo.cpp
     ../xrRenderDX11/tss_def.cpp
     ../xrRenderDX11/xrRender_console.cpp
-    ../xrRenderDX11/xr_effgamma.cpp
+    xr_effgamma.cpp
     ../xrRenderDX11/dx11ComputeTest.cpp
     ../xrRenderDX11/dx11ComputeTest_Matrices.cpp
     ../xrRenderDX11/dx11ComputeTest_SIMD.cpp
