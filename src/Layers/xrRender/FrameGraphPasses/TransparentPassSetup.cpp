@@ -245,7 +245,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 DrawVariantPartition(cmdList, nvDevice, framebuffer, state, vpCfg);
             } else {
                 cmdList->setGraphicsState(state);
-                cmdList->drawIndexedIndirectCount(0, 0, cfg.objectCount);
+                DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, cfg.objectCount);
             }
         }
     );

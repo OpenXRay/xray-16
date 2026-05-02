@@ -2,6 +2,7 @@
 #include "VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/FrameGraphPasses/PassCommon.h"
 
 namespace xray::render
 {
@@ -180,7 +181,8 @@ void DrawVariantPartition(
         state.indirectCountBuffer = p.countBuffer;
 
         cmdList->setGraphicsState(state);
-        cmdList->drawIndexedIndirectCount(
+        fg::passes::DrawIndexedIndirectCountOrFallback(
+            cmdList,
             v * p.binCapacity * sizeof(fg::IndirectDrawArgs),
             v * sizeof(u32),
             p.binCapacity);
