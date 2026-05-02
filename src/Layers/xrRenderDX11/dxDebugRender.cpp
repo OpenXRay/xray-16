@@ -4,6 +4,7 @@
 
 #include "Layers/xrRender/dxDebugRender.h"
 #include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/FGDebugDraw.h"
 
 namespace xray::render::fg
 {
@@ -27,8 +28,8 @@ void dxDebugRender::Render()
         float(color_get_B(color)) / 255.f, float(color_get_A(color)) / 255.f);
 #endif // !USE_DX9
 
-    RCache.dbg_Draw(nvrhi::PrimitiveType::LineList, &*m_line_vertices.begin(), m_line_vertices.size(), &*m_line_indices.begin(),
-        m_line_indices.size() / 2);
+    g_debug_draw.AddIndexedLines(&*m_line_vertices.begin(), m_line_vertices.size(), &*m_line_indices.begin(),
+        m_line_indices.size());
     m_line_vertices.resize(0);
     m_line_indices.resize(0);
 }
@@ -128,7 +129,7 @@ void dxDebugRender::DestroyDebugShader(dbgShaderHandle shdHandle)
 
 void dxDebugRender::dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u32 C)
 {
-    RCache.dbg_DrawTRI(T, p1, p2, p3, C);
+    g_debug_draw.DrawTRI(T, p1, p2, p3, C);
 }
 
 struct RDebugRender : public dxDebugRender, public pureRender

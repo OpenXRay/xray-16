@@ -2,14 +2,6 @@
 
 #include "Include/xrRender/DrawUtils.h"
 
-#ifdef _EDITOR
-#define DU_DRAW_DIP EDevice.DIP
-#define DU_DRAW_DP EDevice.DP
-#else
-#define DU_DRAW_DIP RCache.dbg_DIP
-#define DU_DRAW_DP RCache.dbg_DP
-#endif
-
 namespace xray::render::fg
 {
 struct SPrimitiveBuffer
@@ -23,8 +15,6 @@ struct SPrimitiveBuffer
     u32 p_cnt;
     typedef fastdelegate::FastDelegate0<> TOnRender;
     TOnRender OnRender;
-    void RenderDIP() { DU_DRAW_DIP(p_type, pGeom, 0, 0, v_cnt, 0, p_cnt); }
-    void RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
 
     void CreateFromData(
         nvrhi::PrimitiveType _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices = nullptr, u32 _i_cnt = 0);

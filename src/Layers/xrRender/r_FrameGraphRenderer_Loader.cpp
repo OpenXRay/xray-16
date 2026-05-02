@@ -25,7 +25,6 @@
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/WallmarksEngine.h"
 #include "Layers/xrRender/r__sector.h"
-#include "Layers/xrRenderDX11/DetailManager.h"
 
 namespace xray::render
 {
@@ -123,7 +122,6 @@ void FrameGraphRenderer::level_Load(IReader* fs)
 
     // Components
     m_pWallmarksEngine = xr_new<CWallmarksEngine>();
-    m_pDetailManager = xr_new<CDetailManager>();
 
     if (!GEnv.isDedicatedServer)
     {
@@ -346,9 +344,6 @@ void FrameGraphRenderer::level_Unload()
     // HOM
     m_HOM.Unload();
 
-    //*** Details
-    m_pDetailManager->Unload();
-
     //*** Sectors
     // 1.
     m_immContext.unload();
@@ -404,7 +399,6 @@ void FrameGraphRenderer::level_Unload()
     BufferPool.fastGeomLoaded = false;
 
     //*** Components
-    xr_delete(m_pDetailManager);
     xr_delete(m_pWallmarksEngine);
 
     //*** Shaders

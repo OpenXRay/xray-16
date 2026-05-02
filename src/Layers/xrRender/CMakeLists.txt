@@ -74,6 +74,8 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/ImGuiPassSetup.cpp
     FrameGraphPasses/StatGraphPassSetup.h
     FrameGraphPasses/StatGraphPassSetup.cpp
+    FrameGraphPasses/DebugDrawPassSetup.h
+    FrameGraphPasses/DebugDrawPassSetup.cpp
     FrameGraphPasses/RainPassSetup.h
     FrameGraphPasses/RainPassSetup.cpp
     FrameGraphPasses/ThunderboltPassSetup.h
@@ -139,6 +141,9 @@ target_sources(xrRender PRIVATE
 
     FGDetailManager.h
     FGDetailManager.cpp
+
+    FGDebugDraw.h
+    FGDebugDraw.cpp
 
     Geometry/GeometryBatch.h
     Geometry/GeometryBatch.cpp
@@ -287,12 +292,6 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/Blender_Recorder_R2.cpp
     ../xrRenderDX11/Blender_Recorder_R3.cpp
     ../xrRenderDX11/Blender_Recorder_StandartBinding.cpp
-    ../xrRenderDX11/DetailManager.cpp
-    ../xrRenderDX11/DetailManager_CACHE.cpp
-    ../xrRenderDX11/DetailManager_Decompress.cpp
-    ../xrRenderDX11/DetailManager_VS.cpp
-    ../xrRenderDX11/DetailManager_soft.cpp
-    ../xrRenderDX11/R_Backend_DBG.cpp
     ../xrRenderDX11/R_Backend_LOD.h
     ../xrRenderDX11/R_Backend_LOD.cpp
     ../xrRenderDX11/R_Backend_Runtime.cpp
@@ -328,7 +327,6 @@ target_sources(xrRender PRIVATE
     ../xrRenderDX11/xrRender_console.cpp
     xr_effgamma.cpp
     ../xrRenderDX11/dx11ConstantBuffer.cpp
-    ../xrRenderDX11/dx11DetailManager_VS.cpp
     ../xrRenderDX11/dx11HW.cpp
     ../xrRenderDX11/dx11HWCaps.cpp
     ../xrRenderDX11/dx11ResourceManager_Resources.cpp

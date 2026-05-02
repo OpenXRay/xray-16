@@ -549,33 +549,6 @@ public:
     void OnDeviceDestroy();
     void SetupStates();
 
-    // Debug render
-    void dbg_DP(nvrhi::PrimitiveType pt, ref_geom geom, u32 vBase, u32 pc);
-    void dbg_DIP(nvrhi::PrimitiveType pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
-    void dbg_SetRS(u32 p1, u32 p2);
-    void dbg_SetSS(u32 sampler, u32 type, u32 value);
-#ifdef DEBUG
-    void dbg_Draw(nvrhi::PrimitiveType T, FVF::L* pVerts, u32 vcnt, u16* pIdx, int pcnt);
-    void dbg_Draw(nvrhi::PrimitiveType T, FVF::L* pVerts, int pcnt);
-
-    void dbg_DrawAABB(Fvector& T, float sx, float sy, float sz, u32 C)
-    {
-        Fvector half_dim;
-        half_dim.set(sx, sy, sz);
-        Fmatrix TM;
-        TM.translate(T);
-        dbg_DrawOBB(TM, half_dim, C);
-    }
-
-    void dbg_DrawOBB(Fmatrix& T, Fvector& half_dim, u32 C);
-    void dbg_DrawTRI(Fmatrix& T, Fvector* p, u32 C) { dbg_DrawTRI(T, p[0], p[1], p[2], C); }
-    void dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u32 C);
-    void dbg_DrawLINE(Fmatrix& T, Fvector& p1, Fvector& p2, u32 C);
-    void dbg_DrawEllipse(Fmatrix& T, u32 C);
-#endif
-    void dbg_OverdrawBegin();
-    void dbg_OverdrawEnd();
-
     CBackend()
         : xforms(*this)
         , tree(*this)
@@ -590,10 +563,6 @@ public:
     }
 
 private:
-    // Debug Draw
-    void InitializeDebugDraw();
-    void DestroyDebugDraw();
-
     ref_geom vs_L;
     ref_geom vs_TL;
 

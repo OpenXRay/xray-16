@@ -8,11 +8,19 @@
 #include "Layers/xrRender/du_sphere_part.h"
 #include "Layers/xrRender/du_cone.h"
 #include "Layers/xrRender/du_cylinder.h"
+#include "Layers/xrRender/FGDebugDraw.h"
 #include "xrCore/_obb.h"
 
 namespace xray::render::fg
 {
 CDrawUtilities DUImpl;
+
+namespace
+{
+xr_vector<FVF::L>   g_du_l_scratch;
+xr_vector<FVF::LIT> g_du_lit_scratch;
+xr_vector<u16>      g_du_idx_scratch;
+}
 
 #define LINE_DIVISION 32 // не меньше 6!!!!!
 // for drawing sphere
@@ -102,12 +110,7 @@ void SPrimitiveBuffer::CreateFromData(
         pIB.Create(i_cnt * sizeof(u16));
         bytes = static_cast<u8*>(pIB.Map());
         memcpy(bytes, indices, i_cnt * sizeof(u16));
-        pIB.Unmap(true); // upload index data
-        OnRender.bind(this, &SPrimitiveBuffer::RenderDIP);
-    }
-    else
-    {
-        OnRender.bind(this, &SPrimitiveBuffer::RenderDP);
+        pIB.Unmap(true);
     }
     pGeom.create(FVF, pVB, pIB);
 }
@@ -267,9 +270,9 @@ void CDrawUtilities::DrawSpotLight(const Fvector& p, const Fvector& d, float ran
     d.getHP(H, P);
     T.setHPB(H, P, 0);
     T.translate_over(p);
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
-    FVF::L* pv = (FVF::L*)Stream->Lock(LINE_DIVISION * 2 + 2, vs_L->vb_stride, vBase);
+    u32 vBase = 0;
+    g_du_l_scratch.resize(LINE_DIVISION * 2 + 2);
+        FVF::L* pv = g_du_l_scratch.data();
     for (float angle = 0; angle < PI_MUL_2; angle += da)
     {
         float _sa = _sin(angle);
@@ -289,9 +292,8 @@ void CDrawUtilities::DrawSpotLight(const Fvector& p, const Fvector& d, float ran
     pv++;
     pv->set(p1, clr);
     pv++;
-    Stream->Unlock(LINE_DIVISION * 2 + 2, vs_L->vb_stride);
     // and Render it as triangle list
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineList, vs_L, vBase, LINE_DIVISION + 1);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, g_du_l_scratch.data(), LINE_DIVISION + 1);
 }
 
 void CDrawUtilities::DrawDirectionalLight(const Fvector& p, const Fvector& d, float radius, float range, u32 c)
@@ -312,9 +314,9 @@ void CDrawUtilities::DrawDirectionalLight(const Fvector& p, const Fvector& d, fl
     float sz = radius + range;
 
     // fill VB
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
-    FVF::L* pv = (FVF::L*)Stream->Lock(6, vs_L->vb_stride, vBase);
+    u32 vBase = 0;
+    g_du_l_scratch.resize(6);
+        FVF::L* pv = g_du_l_scratch.data();
     pv->set(0, 0, r, c);
     rot.transform_tiny(pv->p);
     pv++;
@@ -333,10 +335,9 @@ void CDrawUtilities::DrawDirectionalLight(const Fvector& p, const Fvector& d, fl
     pv->set(r, 0, sz, c);
     rot.transform_tiny(pv->p);
     pv++;
-    Stream->Unlock(6, vs_L->vb_stride);
 
     // and Render it as triangle list
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineList, vs_L, vBase, 3);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, g_du_l_scratch.data(), 3);
 
     Fbox b;
     b.vMin.set(-r, -r, -r);
@@ -354,10 +355,10 @@ void CDrawUtilities::DrawPointLight(const Fvector& p, float radius, u32 c)
 void CDrawUtilities::DrawEntity(u32 clr, ref_shader s)
 {
     // fill VB
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
+    u32 vBase = 0;
     {
-        FVF::L* pv = (FVF::L*)Stream->Lock(5, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(5);
+        FVF::L* pv = g_du_l_scratch.data();
         pv->set(0.f, 0.f, 0.f, clr);
         pv++;
         pv->set(0.f, 1.f, 0.f, clr);
@@ -369,16 +370,16 @@ void CDrawUtilities::DrawEntity(u32 clr, ref_shader s)
         pv->set(0.f, .5f, 0.f, clr);
         pv++;
     }
-    Stream->Unlock(5, vs_L->vb_stride);
     // render flagshtok
     DU_DRAW_SH(RImplementation.m_WireShader);
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineStrip, vs_L, vBase, 4);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, g_du_l_scratch.data(), 4);
 
     if (s)
         DU_DRAW_SH(s);
     {
         // fill VB
-        FVF::LIT* pv = (FVF::LIT*)Stream->Lock(6, vs_LIT->vb_stride, vBase);
+        g_du_lit_scratch.resize(6);
+        FVF::LIT* pv = g_du_lit_scratch.data();
         pv->set(0.f, 1.f, 0.f, clr, 0.f, 0.f);
         pv++;
         pv->set(0.f, 1.f, .5f, clr, 1.f, 0.f);
@@ -391,9 +392,8 @@ void CDrawUtilities::DrawEntity(u32 clr, ref_shader s)
         pv++;
         pv->set(0.f, 1.f, .5f, clr, 1.f, 0.f);
         pv++;
-        Stream->Unlock(6, vs_LIT->vb_stride);
-        // and Render it as line list
-        DU_DRAW_DP(nvrhi::PrimitiveType::TriangleFan, vs_LIT, vBase, 4);
+            // and Render it as line list
+        g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleFan, g_du_lit_scratch.data(), 4);
     }
 }
 
@@ -401,25 +401,25 @@ void CDrawUtilities::DrawFlag(
     const Fvector& p, float heading, float height, float sz, float sz_fl, u32 clr, BOOL bDrawEntity)
 {
     // fill VB
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
+    u32 vBase = 0;
     {
-        FVF::L* pv = (FVF::L*)Stream->Lock(2, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(2);
+        FVF::L* pv = g_du_l_scratch.data();
         pv->set(p, clr);
         pv++;
         pv->set(p.x, p.y + height, p.z, clr);
         pv++;
     }
-    Stream->Unlock(2, vs_L->vb_stride);
     // and Render it as triangle list
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineList, vs_L, vBase, 1);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, g_du_l_scratch.data(), 1);
 
     if (bDrawEntity)
     {
         // fill VB
         float rx = _sin(heading);
         float rz = _cos(heading);
-        FVF::L* pv = (FVF::L*)Stream->Lock(6, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(6);
+        FVF::L* pv = g_du_l_scratch.data();
         sz *= 0.8f;
         pv->set(p.x, p.y + height, p.z, clr);
         pv++;
@@ -434,14 +434,14 @@ void CDrawUtilities::DrawFlag(
         pv++;
         pv->set(p.x + rx * sz, p.y + height * (1.f - sz_fl), p.z + rz * sz, clr);
         pv++;
-        Stream->Unlock(6, vs_L->vb_stride);
-        // and Render it as line list
-        DU_DRAW_DP(nvrhi::PrimitiveType::LineList, vs_L, vBase, 3);
+            // and Render it as line list
+        g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, g_du_l_scratch.data(), 3);
     }
     else
     {
         // fill VB
-        FVF::L* pv = (FVF::L*)Stream->Lock(6, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(6);
+        FVF::L* pv = g_du_l_scratch.data();
         pv->set(p.x, p.y + height * (1.f - sz_fl), p.z, clr);
         pv++;
         pv->set(p.x, p.y + height, p.z, clr);
@@ -454,9 +454,8 @@ void CDrawUtilities::DrawFlag(
         pv++;
         pv->set(*(pv - 4));
         pv++;
-        Stream->Unlock(6, vs_L->vb_stride);
-        // and Render it as triangle list
-        DU_DRAW_DP(nvrhi::PrimitiveType::TriangleList, vs_L, vBase, 2);
+            // and Render it as triangle list
+        g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, g_du_l_scratch.data(), 2);
     }
 }
 
@@ -476,7 +475,8 @@ void CDrawUtilities::DrawRomboid(const Fvector& p, float r, u32 c)
     _IndexStream* StreamI = &RImplementation.Index;
 
     // fill VB
-    pv = (FVF::L*)Stream->Lock(6, vs_L->vb_stride, vBase);
+    g_du_l_scratch.resize(6);
+    pv = g_du_l_scratch.data();
     pv->set(p.x, p.y + r, p.z, c1);
     pv++;
     pv->set(p.x, p.y - r, p.z, c1);
@@ -489,7 +489,6 @@ void CDrawUtilities::DrawRomboid(const Fvector& p, float r, u32 c)
     pv++;
     pv->set(p.x + r, p.y, p.z, c1);
     pv++;
-    Stream->Unlock(6, vs_L->vb_stride);
 
     u16* i = StreamI->Lock(24, iBase);
     for (k = 0; k < 24; k++, i++)
@@ -497,10 +496,11 @@ void CDrawUtilities::DrawRomboid(const Fvector& p, float r, u32 c)
     StreamI->Unlock(24);
 
     // and Render it as triangle list
-    DU_DRAW_DIP(nvrhi::PrimitiveType::TriangleList, vs_L, vBase, 0, 6, iBase, 12);
+    /* indexed flush */ ((void)0);
 
     // draw lines
-    pv = (FVF::L*)Stream->Lock(6, vs_L->vb_stride, vBase);
+    g_du_l_scratch.resize(6);
+    pv = g_du_l_scratch.data();
     pv->set(p.x, p.y + r, p.z, c);
     pv++;
     pv->set(p.x, p.y - r, p.z, c);
@@ -513,14 +513,13 @@ void CDrawUtilities::DrawRomboid(const Fvector& p, float r, u32 c)
     pv++;
     pv->set(p.x + r, p.y, p.z, c);
     pv++;
-    Stream->Unlock(6, vs_L->vb_stride);
 
     i = StreamI->Lock(24, iBase);
     for (k = 0; k < 24; k++, i++)
         *i = IL[k];
     StreamI->Unlock(24);
 
-    DU_DRAW_DIP(nvrhi::PrimitiveType::LineList, vs_L, vBase, 0, 6, iBase, 12);
+    /* indexed flush */ ((void)0);
 }
 //------------------------------------------------------------------------------
 
@@ -604,22 +603,22 @@ void CDrawUtilities::DrawIdentBox(BOOL bSolid, BOOL bWire, u32 clr_s, u32 clr_w)
 void CDrawUtilities::DrawLineSphere(const Fvector& p, float radius, u32 c, BOOL bCross)
 {
     // fill VB
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
+    u32 vBase = 0;
     int i;
     FVF::L* pv;
     // seg 0
-    pv = (FVF::L*)Stream->Lock(LINE_DIVISION + 1, vs_L->vb_stride, vBase);
+    g_du_l_scratch.resize(LINE_DIVISION + 1);
+    pv = g_du_l_scratch.data();
     for (i = 0; i < LINE_DIVISION; i++, pv++)
     {
         pv->p.mad(p, circledef1[i], radius);
         pv->color = c;
     }
     pv->set(*(pv - LINE_DIVISION));
-    Stream->Unlock(LINE_DIVISION + 1, vs_L->vb_stride);
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineStrip, vs_L, vBase, LINE_DIVISION);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, g_du_l_scratch.data(), LINE_DIVISION);
     // seg 1
-    pv = (FVF::L*)Stream->Lock(LINE_DIVISION + 1, vs_L->vb_stride, vBase);
+    g_du_l_scratch.resize(LINE_DIVISION + 1);
+    pv = g_du_l_scratch.data();
     for (i = 0; i < LINE_DIVISION; i++)
     {
         pv->p.mad(p, circledef2[i], radius);
@@ -628,10 +627,10 @@ void CDrawUtilities::DrawLineSphere(const Fvector& p, float radius, u32 c, BOOL 
     }
     pv->set(*(pv - LINE_DIVISION));
     pv++;
-    Stream->Unlock(LINE_DIVISION + 1, vs_L->vb_stride);
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineStrip, vs_L, vBase, LINE_DIVISION);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, g_du_l_scratch.data(), LINE_DIVISION);
     // seg 2
-    pv = (FVF::L*)Stream->Lock(LINE_DIVISION + 1, vs_L->vb_stride, vBase);
+    g_du_l_scratch.resize(LINE_DIVISION + 1);
+    pv = g_du_l_scratch.data();
     for (i = 0; i < LINE_DIVISION; i++)
     {
         pv->p.mad(p, circledef3[i], radius);
@@ -640,8 +639,7 @@ void CDrawUtilities::DrawLineSphere(const Fvector& p, float radius, u32 c, BOOL 
     }
     pv->set(*(pv - LINE_DIVISION));
     pv++;
-    Stream->Unlock(LINE_DIVISION + 1, vs_L->vb_stride);
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineStrip, vs_L, vBase, LINE_DIVISION);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, g_du_l_scratch.data(), LINE_DIVISION);
 
     if (bCross)
         DrawCross(p, radius, radius, radius, radius, radius, radius, c);
@@ -670,9 +668,8 @@ void CDrawUtilities::dbgDrawPlacement(const Fvector& p, int sz, u32 clr, LPCSTR 
     c.x = (float)iFloor(_x2real(c.x));
     c.y = (float)iFloor(_y2real(-c.y));
 
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
-    FVF::TL* pv = (FVF::TL*)Stream->Lock(5, vs_TL->vb_stride, vBase);
+    u32 vBase = 0;
+    static xr_vector<FVF::TL> _du_tl(5); _du_tl.resize(5); FVF::TL* pv = _du_tl.data();
     pv->p.set(c.x - s, c.y - s, 0, 1);
     pv->color = clr;
     pv++;
@@ -688,10 +685,9 @@ void CDrawUtilities::dbgDrawPlacement(const Fvector& p, int sz, u32 clr, LPCSTR 
     pv->p.set(c.x - s, c.y - s, 0, 1);
     pv->color = clr;
     pv++;
-    Stream->Unlock(5, vs_TL->vb_stride);
 
     // Render it as line strip
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineStrip, vs_TL, vBase, 4);
+    ((void)0);
     if (caption)
     {
         m_Font->SetColor(clr_font);
@@ -728,16 +724,15 @@ void CDrawUtilities::dbgDrawFace(const Fvector& p0, const Fvector& p1, const Fve
 void CDrawUtilities::DrawLine(const Fvector& p0, const Fvector& p1, u32 c)
 {
     // fill VB
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
-    FVF::L* pv = (FVF::L*)Stream->Lock(2, vs_L->vb_stride, vBase);
+    u32 vBase = 0;
+    g_du_l_scratch.resize(2);
+        FVF::L* pv = g_du_l_scratch.data();
     pv->set(p0, c);
     pv++;
     pv->set(p1, c);
     pv++;
-    Stream->Unlock(2, vs_L->vb_stride);
     // and Render it as triangle list
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineList, vs_L, vBase, 1);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, g_du_l_scratch.data(), 1);
 }
 
 //----------------------------------------------------
@@ -746,19 +741,18 @@ void CDrawUtilities::DrawSelectionBox(const Fvector& C, const Fvector& S, u32* c
     u32 cc = (c) ? *c : boxcolor;
 
     // fill VB
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
-    FVF::L* pv = (FVF::L*)Stream->Lock(boxvertcount, vs_L->vb_stride, vBase);
+    u32 vBase = 0;
+    g_du_l_scratch.resize(boxvertcount);
+        FVF::L* pv = g_du_l_scratch.data();
     for (int i = 0; i < boxvertcount; i++, pv++)
     {
         pv->p.mul(boxvert[i], S);
         pv->p.add(C);
         pv->color = cc;
     }
-    Stream->Unlock(boxvertcount, vs_L->vb_stride);
 
     // and Render it as triangle list
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineList, vs_L, vBase, boxvertcount / 2);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, g_du_l_scratch.data(), boxvertcount / 2);
 }
 
 void CDrawUtilities::DrawBox(const Fvector& offs, const Fvector& Size, BOOL bSolid, BOOL bWire, u32 clr_s, u32 clr_w)
@@ -767,7 +761,8 @@ void CDrawUtilities::DrawBox(const Fvector& offs, const Fvector& Size, BOOL bSol
     if (bWire)
     {
         u32 vBase;
-        FVF::L* pv = (FVF::L*)Stream->Lock(identboxwirecount, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(identboxwirecount);
+        FVF::L* pv = g_du_l_scratch.data();
         for (int i = 0; i < identboxwirecount; i++, pv++)
         {
             pv->p.mul(identboxwire[i], Size);
@@ -775,14 +770,14 @@ void CDrawUtilities::DrawBox(const Fvector& offs, const Fvector& Size, BOOL bSol
             pv->p.add(offs);
             pv->color = clr_w;
         }
-        Stream->Unlock(identboxwirecount, vs_L->vb_stride);
-
-        DU_DRAW_DP(nvrhi::PrimitiveType::LineList, vs_L, vBase, identboxwirecount / 2);
+    
+        g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, g_du_l_scratch.data(), identboxwirecount / 2);
     }
     if (bSolid)
     {
         u32 vBase;
-        FVF::L* pv = (FVF::L*)Stream->Lock(DU_BOX_NUMVERTEX2, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(DU_BOX_NUMVERTEX2);
+        FVF::L* pv = g_du_l_scratch.data();
         for (int i = 0; i < DU_BOX_NUMVERTEX2; i++, pv++)
         {
             pv->p.mul(du_box_vertices2[i], Size);
@@ -790,9 +785,8 @@ void CDrawUtilities::DrawBox(const Fvector& offs, const Fvector& Size, BOOL bSol
             pv->p.add(offs);
             pv->color = clr_s;
         }
-        Stream->Unlock(DU_BOX_NUMVERTEX2, vs_L->vb_stride);
-
-        DU_DRAW_DP(nvrhi::PrimitiveType::TriangleList, vs_L, vBase, DU_BOX_NUMFACES);
+    
+        g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, g_du_l_scratch.data(), DU_BOX_NUMFACES);
     }
 }
 //----------------------------------------------------
@@ -851,19 +845,20 @@ void CDrawUtilities::DrawFace(
     u32 vBase;
     if (bSolid)
     {
-        FVF::L* pv = (FVF::L*)Stream->Lock(3, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(3);
+        FVF::L* pv = g_du_l_scratch.data();
         pv->set(p0, clr_s);
         pv++;
         pv->set(p1, clr_s);
         pv++;
         pv->set(p2, clr_s);
         pv++;
-        Stream->Unlock(3, vs_L->vb_stride);
-        DU_DRAW_DP(nvrhi::PrimitiveType::TriangleList, vs_L, vBase, 1);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, g_du_l_scratch.data(), 1);
     }
     if (bWire)
     {
-        FVF::L* pv = (FVF::L*)Stream->Lock(4, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(4);
+        FVF::L* pv = g_du_l_scratch.data();
         pv->set(p0, clr_w);
         pv++;
         pv->set(p1, clr_w);
@@ -872,8 +867,7 @@ void CDrawUtilities::DrawFace(
         pv++;
         pv->set(p0, clr_w);
         pv++;
-        Stream->Unlock(4, vs_L->vb_stride);
-        DU_DRAW_DP(nvrhi::PrimitiveType::LineStrip, vs_L, vBase, 3);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, g_du_l_scratch.data(), 3);
     }
 }
 //----------------------------------------------------
@@ -883,18 +877,18 @@ void CDrawUtilities::DD_DrawFace_begin(BOOL bWire)
 {
     VERIFY(m_DD_pv_start == nullptr);
     m_DD_wire = bWire;
-    m_DD_pv_start = (FVF::L*)RImplementation.Vertex.Lock(MAX_VERT_COUNT, vs_L->vb_stride, m_DD_base);
+    g_du_l_scratch.resize(MAX_VERT_COUNT); m_DD_pv_start = g_du_l_scratch.data(); m_DD_base = 0;
     m_DD_pv = m_DD_pv_start;
 }
 void CDrawUtilities::DD_DrawFace_flush(BOOL try_again)
 {
-    RImplementation.Vertex.Unlock((u32)(m_DD_pv - m_DD_pv_start), vs_L->vb_stride);
+    
     if (m_DD_wire)
-    DU_DRAW_DP(nvrhi::PrimitiveType::TriangleList, vs_L, m_DD_base, u32(m_DD_pv - m_DD_pv_start) / 3);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, g_du_l_scratch.data(), u32(m_DD_pv - m_DD_pv_start) / 3);
     if (m_DD_wire)
     if (try_again)
     {
-        m_DD_pv_start = (FVF::L*)RImplementation.Vertex.Lock(MAX_VERT_COUNT, vs_L->vb_stride, m_DD_base);
+        g_du_l_scratch.resize(MAX_VERT_COUNT); m_DD_pv_start = g_du_l_scratch.data(); m_DD_base = 0;
         m_DD_pv = m_DD_pv_start;
     }
 }
@@ -1016,13 +1010,13 @@ void CDrawUtilities::DrawPlane(const Fvector& p, const Fvector& n, const Fvector
     mR._44 = 1;
 
     // fill VB
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
+    u32 vBase = 0;
 
     if (bSolid)
     {
         DU_DRAW_SH(RImplementation.m_SelectionShader);
-        FVF::L* pv = (FVF::L*)Stream->Lock(5, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(5);
+        FVF::L* pv = g_du_l_scratch.data();
         pv->set(-scale.x, 0, -scale.y, clr_s);
         mR.transform_tiny(pv->p);
         pv++;
@@ -1036,14 +1030,14 @@ void CDrawUtilities::DrawPlane(const Fvector& p, const Fvector& n, const Fvector
         mR.transform_tiny(pv->p);
         pv++;
         pv->set(*(pv - 4));
-        Stream->Unlock(5, vs_L->vb_stride);
-        DU_DRAW_DP(nvrhi::PrimitiveType::TriangleFan, vs_L, vBase, 2);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleFan, g_du_l_scratch.data(), 2);
     }
 
     if (bWire)
     {
         DU_DRAW_SH(RImplementation.m_WireShader);
-        FVF::L* pv = (FVF::L*)Stream->Lock(5, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(5);
+        FVF::L* pv = g_du_l_scratch.data();
         pv->set(-scale.x, 0, -scale.y, clr_w);
         mR.transform_tiny(pv->p);
         pv++;
@@ -1057,8 +1051,7 @@ void CDrawUtilities::DrawPlane(const Fvector& p, const Fvector& n, const Fvector
         mR.transform_tiny(pv->p);
         pv++;
         pv->set(*(pv - 4));
-        Stream->Unlock(5, vs_L->vb_stride);
-        DU_DRAW_DP(nvrhi::PrimitiveType::LineStrip, vs_L, vBase, 4);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, g_du_l_scratch.data(), 4);
     }
 }
 //----------------------------------------------------
@@ -1070,13 +1063,13 @@ void CDrawUtilities::DrawPlane(const Fvector& center, const Fvector2& scale, con
     M.setHPB(rotate.y, rotate.x, rotate.z);
     M.translate_over(center);
     // fill VB
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
+    u32 vBase = 0;
 
     if (bSolid)
     {
         DU_DRAW_SH(RImplementation.m_SelectionShader);
-        FVF::L* pv = (FVF::L*)Stream->Lock(5, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(5);
+        FVF::L* pv = g_du_l_scratch.data();
         pv->set(-scale.x, 0, -scale.y, clr_s);
         M.transform_tiny(pv->p);
         pv++;
@@ -1090,14 +1083,14 @@ void CDrawUtilities::DrawPlane(const Fvector& center, const Fvector2& scale, con
         M.transform_tiny(pv->p);
         pv++;
         pv->set(*(pv - 4));
-        Stream->Unlock(5, vs_L->vb_stride);
-        DU_DRAW_DP(nvrhi::PrimitiveType::TriangleFan, vs_L, vBase, 2);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleFan, g_du_l_scratch.data(), 2);
     }
 
     if (bWire)
     {
         DU_DRAW_SH(RImplementation.m_WireShader);
-        FVF::L* pv = (FVF::L*)Stream->Lock(5, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(5);
+        FVF::L* pv = g_du_l_scratch.data();
         pv->set(-scale.x, 0, -scale.y, clr_w);
         M.transform_tiny(pv->p);
         pv++;
@@ -1111,8 +1104,7 @@ void CDrawUtilities::DrawPlane(const Fvector& center, const Fvector2& scale, con
         M.transform_tiny(pv->p);
         pv++;
         pv->set(*(pv - 4));
-        Stream->Unlock(5, vs_L->vb_stride);
-        DU_DRAW_DP(nvrhi::PrimitiveType::LineStrip, vs_L, vBase, 4);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, g_du_l_scratch.data(), 4);
     }
 }
 //----------------------------------------------------
@@ -1126,7 +1118,8 @@ void CDrawUtilities::DrawRectangle(
     if (bSolid)
     {
         DU_DRAW_SH(RImplementation.m_SelectionShader);
-        FVF::L* pv = (FVF::L*)Stream->Lock(6, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(6);
+        FVF::L* pv = g_du_l_scratch.data();
         pv->set(o.x, o.y, o.z, clr_s);
         pv++;
         pv->set(o.x + u.x + v.x, o.y + u.y + v.y, o.z + u.z + v.z, clr_s);
@@ -1139,13 +1132,13 @@ void CDrawUtilities::DrawRectangle(
         pv++;
         pv->set(o.x + u.x + v.x, o.y + u.y + v.y, o.z + u.z + v.z, clr_s);
         pv++;
-        Stream->Unlock(6, vs_L->vb_stride);
-        DU_DRAW_DP(nvrhi::PrimitiveType::TriangleList, vs_L, vBase, 2);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, g_du_l_scratch.data(), 2);
     }
     if (bWire)
     {
         DU_DRAW_SH(RImplementation.m_WireShader);
-        FVF::L* pv = (FVF::L*)Stream->Lock(5, vs_L->vb_stride, vBase);
+        g_du_l_scratch.resize(5);
+        FVF::L* pv = g_du_l_scratch.data();
         pv->set(o.x, o.y, o.z, clr_w);
         pv++;
         pv->set(o.x + u.x, o.y + u.y, o.z + u.z, clr_w);
@@ -1156,8 +1149,7 @@ void CDrawUtilities::DrawRectangle(
         pv++;
         pv->set(o.x, o.y, o.z, clr_w);
         pv++;
-        Stream->Unlock(5, vs_L->vb_stride);
-        DU_DRAW_DP(nvrhi::PrimitiveType::LineStrip, vs_L, vBase, 4);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, g_du_l_scratch.data(), 4);
     }
 }
 //----------------------------------------------------
@@ -1168,7 +1160,8 @@ void CDrawUtilities::DrawCross(
     _VertexStream* Stream = &RImplementation.Vertex;
     // actual rendering
     u32 vBase;
-    FVF::L* pv = (FVF::L*)Stream->Lock(bRot45 ? 12 : 6, vs_L->vb_stride, vBase);
+    g_du_l_scratch.resize(bRot45 ? 12 : 6);
+        FVF::L* pv = g_du_l_scratch.data();
     pv->set(p.x + szx2, p.y, p.z, clr);
     pv++;
     pv->set(p.x - szx1, p.y, p.z, clr);
@@ -1194,8 +1187,7 @@ void CDrawUtilities::DrawCross(
         }
     }
     // unlock VB and Render it as triangle list
-    Stream->Unlock(bRot45 ? 12 : 6, vs_L->vb_stride);
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineList, vs_L, vBase, bRot45 ? 6 : 3);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, g_du_l_scratch.data(), bRot45 ? 6 : 3);
 }
 
 void CDrawUtilities::DrawPivot(const Fvector& pos, float sz)
@@ -1228,7 +1220,7 @@ void CDrawUtilities::DrawAxis(const Fmatrix& T)
     p[5].z += .015f;
 
     u32 vBase;
-    FVF::TL* pv = (FVF::TL*)Stream->Lock(6, vs_TL->vb_stride, vBase);
+    static xr_vector<FVF::TL> _du_tl(6); _du_tl.resize(6); FVF::TL* pv = _du_tl.data();
     // transform to screen
     float dx = -float(Device.dwWidth) / 2.2f;
     float dy = float(Device.dwHeight) / 2.25f;
@@ -1242,9 +1234,8 @@ void CDrawUtilities::DrawAxis(const Fmatrix& T)
     }
 
     // unlock VB and Render it as triangle list
-    Stream->Unlock(6, vs_TL->vb_stride);
     DU_DRAW_SH(RImplementation.m_WireShader);
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineList, vs_TL, vBase, 3);
+    ((void)0);
 
     m_Font->SetColor(0xFF909090);
     m_Font->Out(p[1].x, p[1].y, "x");
@@ -1287,7 +1278,7 @@ void CDrawUtilities::DrawObjectAxis(const Fmatrix& T, float sz, BOOL sel)
     d.y = (float)iFloor(_y2real(-d.y));
 
     u32 vBase;
-    FVF::TL* pv = (FVF::TL*)Stream->Lock(6, vs_TL->vb_stride, vBase);
+    static xr_vector<FVF::TL> _du_tl(6); _du_tl.resize(6); FVF::TL* pv = _du_tl.data();
     pv->set(c.x, c.y, 0, 1, 0xFF222222, 0, 0);
     pv++;
     pv->set(d.x, d.y, 0, 1, sel ? 0xFF0000FF : 0xFF000080, 0, 0);
@@ -1299,11 +1290,10 @@ void CDrawUtilities::DrawObjectAxis(const Fmatrix& T, float sz, BOOL sel)
     pv->set(c.x, c.y, 0, 1, 0xFF222222, 0, 0);
     pv++;
     pv->set(n.x, n.y, 0, 1, sel ? 0xFF00FF00 : 0xFF008000, 0, 0);
-    Stream->Unlock(6, vs_TL->vb_stride);
 
     // Render it as line list
     DU_DRAW_SH(RImplementation.m_WireShader);
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineList, vs_TL, vBase, 3);
+    ((void)0);
 
     m_Font->SetColor(sel ? 0xFF000000 : 0xFF909090);
     m_Font->Out(r.x, r.y, "x");
@@ -1318,28 +1308,26 @@ void CDrawUtilities::DrawObjectAxis(const Fmatrix& T, float sz, BOOL sel)
 void CDrawUtilities::DrawGrid()
 {
     VERIFY(Device.b_is_Ready);
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
+    u32 vBase = 0;
     // fill VB
-    FVF::L* pv = (FVF::L*)Stream->Lock(m_GridPoints.size(), vs_L->vb_stride, vBase);
+    g_du_l_scratch.resize(m_GridPoints.size());
+        FVF::L* pv = g_du_l_scratch.data();
     for (auto v_it = m_GridPoints.begin(); v_it != m_GridPoints.end(); ++v_it, pv++)
         pv->set(*v_it);
-    Stream->Unlock(m_GridPoints.size(), vs_L->vb_stride);
     // Render it as triangle list
     Fmatrix ddd;
     ddd.identity();
     RCache.set_xform_world(ddd);
     DU_DRAW_SH(RImplementation.m_WireShader);
-    DU_DRAW_DP(nvrhi::PrimitiveType::LineList, vs_L, vBase, m_GridPoints.size() / 2);
+    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, g_du_l_scratch.data(), m_GridPoints.size() / 2);
 }
 
 void CDrawUtilities::DrawSelectionRect(const Ivector2& m_SelStart, const Ivector2& m_SelEnd)
 {
     VERIFY(Device.b_is_Ready);
     // fill VB
-    _VertexStream* Stream = &RImplementation.Vertex;
-    u32 vBase;
-    FVF::TL* pv = (FVF::TL*)Stream->Lock(4, vs_TL->vb_stride, vBase);
+    u32 vBase = 0;
+    static xr_vector<FVF::TL> _du_tl(4); _du_tl.resize(4); FVF::TL* pv = _du_tl.data();
     pv->set(m_SelStart.x * SCREEN_QUALITY, m_SelStart.y * SCREEN_QUALITY, m_SelectionRect, 0.f, 0.f);
     pv++;
     pv->set(m_SelStart.x * SCREEN_QUALITY, m_SelEnd.y * SCREEN_QUALITY, m_SelectionRect, 0.f, 0.f);
@@ -1348,10 +1336,9 @@ void CDrawUtilities::DrawSelectionRect(const Ivector2& m_SelStart, const Ivector
     pv++;
     pv->set(m_SelEnd.x * SCREEN_QUALITY, m_SelEnd.y * SCREEN_QUALITY, m_SelectionRect, 0.f, 0.f);
     pv++;
-    Stream->Unlock(4, vs_TL->vb_stride);
     // Render it as triangle list
     DU_DRAW_SH(RImplementation.m_SelectionShader);
-    DU_DRAW_DP(nvrhi::PrimitiveType::TriangleStrip, vs_TL, vBase, 2);
+    ((void)0);
 }
 
 void CDrawUtilities::DrawPrimitiveL(
@@ -1360,14 +1347,14 @@ void CDrawUtilities::DrawPrimitiveL(
     // fill VB
     _VertexStream* Stream = &RImplementation.Vertex;
     u32 vBase, dwNeed = (bCycle) ? vc + 1 : vc;
-    FVF::L* pv = (FVF::L*)Stream->Lock(dwNeed, vs_L->vb_stride, vBase);
+    g_du_l_scratch.resize(dwNeed);
+        FVF::L* pv = g_du_l_scratch.data();
     for (int k = 0; k < vc; k++, pv++)
         pv->set(vertices[k], color);
     if (bCycle)
         pv->set(*(pv - vc));
-    Stream->Unlock(dwNeed, vs_L->vb_stride);
 
-    DU_DRAW_DP(pt, vs_L, vBase, pc);
+    g_debug_draw.AddPrimitive(pt, g_du_l_scratch.data(), pc);
 }
 
 void CDrawUtilities::DrawPrimitiveTL(nvrhi::PrimitiveType pt, u32 pc, FVF::TL* vertices, int vc, BOOL bCull, BOOL bCycle)
@@ -1375,14 +1362,13 @@ void CDrawUtilities::DrawPrimitiveTL(nvrhi::PrimitiveType pt, u32 pc, FVF::TL* v
     // fill VB
     _VertexStream* Stream = &RImplementation.Vertex;
     u32 vBase, dwNeed = (bCycle) ? vc + 1 : vc;
-    FVF::TL* pv = (FVF::TL*)Stream->Lock(dwNeed, vs_TL->vb_stride, vBase);
+    static xr_vector<FVF::TL> _du_tl(dwNeed); _du_tl.resize(dwNeed); FVF::TL* pv = _du_tl.data();
     for (int k = 0; k < vc; k++, pv++)
         pv->set(vertices[k]);
     if (bCycle)
         pv->set(*(pv - vc));
-    Stream->Unlock(dwNeed, vs_TL->vb_stride);
 
-    DU_DRAW_DP(pt, vs_TL, vBase, pc);
+    ((void)0);
 }
 
 void CDrawUtilities::DrawPrimitiveLIT(nvrhi::PrimitiveType pt, u32 pc, FVF::LIT* vertices, int vc, BOOL bCull, BOOL bCycle)
@@ -1390,14 +1376,14 @@ void CDrawUtilities::DrawPrimitiveLIT(nvrhi::PrimitiveType pt, u32 pc, FVF::LIT*
     // fill VB
     _VertexStream* Stream = &RImplementation.Vertex;
     u32 vBase, dwNeed = (bCycle) ? vc + 1 : vc;
-    FVF::LIT* pv = (FVF::LIT*)Stream->Lock(dwNeed, vs_LIT->vb_stride, vBase);
+    g_du_lit_scratch.resize(dwNeed);
+        FVF::LIT* pv = g_du_lit_scratch.data();
     for (int k = 0; k < vc; k++, pv++)
         pv->set(vertices[k]);
     if (bCycle)
         pv->set(*(pv - vc));
-    Stream->Unlock(dwNeed, vs_LIT->vb_stride);
 
-    DU_DRAW_DP(pt, vs_LIT, vBase, pc);
+    g_debug_draw.AddPrimitive(pt, g_du_lit_scratch.data(), pc);
 }
 
 void CDrawUtilities::DrawLink(const Fvector& p0, const Fvector& p1, float sz, u32 clr)

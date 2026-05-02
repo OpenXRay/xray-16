@@ -28,6 +28,12 @@ struct ImDrawData;
 namespace xray::render::fg
 {
 class IRender_DetailModel;
+
+struct ShaderMacro
+{
+    const char* Name;
+    const char* Definition;
+};
 }
 
 namespace CDB { class MODEL; }
@@ -36,7 +42,6 @@ class xrXRC;
 namespace xray::render::fg {
     class dxRender_Visual;
     class RTAccelStructManager;
-    class CDetailManager;
     class CWallmarksEngine;
     class CRenderTarget;
     class light;
@@ -385,7 +390,6 @@ public:
     Task* m_pProcessHOMTask{ nullptr };
     bool m_bFirstFrameAfterReset{ false };
     xr_vector<Fbox3> m_main_coarse_structure;
-    fg::CDetailManager* m_pDetailManager{ nullptr };
     fg::CWallmarksEngine* m_pWallmarksEngine{ nullptr };
     fg::CHOM m_HOM;
     fg::R_occlusion m_HWOCC;
@@ -416,11 +420,7 @@ public:
 
     fg::ShaderElement* rimp_select_sh_static(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     fg::ShaderElement* rimp_select_sh_dynamic(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase);
-#if defined(USE_DX11)
-    xr_vector<D3D_SHADER_MACRO> m_ShaderOptions;
-#elif defined(USE_OGL)
-    xr_string m_ShaderOptions;
-#endif
+    xr_vector<fg::ShaderMacro> m_ShaderOptions;
 
     xr_vector<CompiledLevelShader> m_CompiledLevelShaders;
 

@@ -473,9 +473,6 @@ void CBackend::OnDeviceCreate()
 
 void CBackend::OnDeviceDestroy()
 {
-    // Debug Draw
-    DestroyDebugDraw();
-
 #if defined(USE_DX11)
     //  Destroy state managers
     StateManager.Reset();
