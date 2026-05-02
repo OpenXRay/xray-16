@@ -2,6 +2,7 @@
 
 #include "TextureDescrManager.h"
 #include "ETextureParams.h"
+#include "ResourceManager/DDSLoader.h"
 
 #include "xrCore/Threading/ParallelForEach.hpp"
 
@@ -286,10 +287,7 @@ shared_str CTextureDescrMngr::GetBumpName(const shared_str& tex_name) const
 
 static bool TextureFileExists(const char* tex_name)
 {
-    string_path fn;
-    FS.update_path(fn, "$game_textures$", tex_name);
-    xr_strcat(fn, ".dds");
-    return FS.exist(fn).Exists;
+    return xray::render::resources::DDSLoader::TextureExists(tex_name);
 }
 
 shared_str CTextureDescrMngr::GetMetallicName(const shared_str& tex_name) const

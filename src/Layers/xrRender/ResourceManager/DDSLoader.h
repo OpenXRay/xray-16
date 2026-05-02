@@ -194,6 +194,8 @@ public:
 
     static bool LoadFromFile(const char* filePath, DDSData& outData);
 
+    static bool TextureExists(const char* basePath);
+
     static bool LoadFromMemory(
         const u8* data,
         size_t dataSize,

@@ -68,6 +68,12 @@ DDSData& DDSData::operator=(DDSData&& other) noexcept {
     return *this;
 }
 
+bool DDSLoader::TextureExists(const char* basePath) {
+    string_path resolved;
+    return FS.exist(resolved, "$game_textures$", basePath, ".dds")
+        || FS.exist(resolved, "$level$", basePath, ".dds");
+}
+
 bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
 
     string_path basePath;
