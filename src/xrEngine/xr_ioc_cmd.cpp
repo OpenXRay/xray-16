@@ -413,7 +413,7 @@ public:
     void fill_tips(vecTips& tips, u32 /*mode*/) override
     {
         TStatus buf;
-        xr_sprintf(buf, "%ux%u (%dHz) (current)", psDeviceMode.Width, psDeviceMode.Height, psDeviceMode.RefreshRate);
+        xr_sprintf(buf, "%ux%u (current)", psDeviceMode.Width, psDeviceMode.Height);
         tips.push_back(buf);
 
         const xr_token* tok = GetToken();
@@ -454,14 +454,17 @@ class CCC_VidWindowMode final : public CCC_Token
     inline static xr_token vid_window_mode_token[] =
     {
         { "st_opt_windowed",                rsWindowed             },
-        { "st_opt_windowed_borderless",     rsWindowedBorderless   },
+        { "st_opt_borderless",              rsFullscreenBorderless },
         { "st_opt_fullscreen",              rsFullscreen           },
-        { "st_opt_fullscreen_borderless",   rsFullscreenBorderless },
         { nullptr,                          -1                     },
     };
 
 public:
-    CCC_VidWindowMode(pcstr name) : CCC_Token(name, &psDeviceMode.WindowStyle, vid_window_mode_token) {}
+    CCC_VidWindowMode(pcstr name) : CCC_Token(name, &psDeviceMode.WindowStyle, vid_window_mode_token)
+    {
+        if (psDeviceMode.WindowStyle == rsWindowedBorderless)
+            psDeviceMode.WindowStyle = rsFullscreenBorderless;
+    }
 
     void Execute(pcstr args) override
     {
@@ -488,7 +491,7 @@ public:
             if (GetValue())
                 psDeviceMode.WindowStyle = rsFullscreen;
             else
-                psDeviceMode.WindowStyle = rsWindowedBorderless;
+                psDeviceMode.WindowStyle = rsFullscreenBorderless;
         }
     };
 };
