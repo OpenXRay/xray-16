@@ -545,7 +545,7 @@ void FrameGraphRenderer::RenderMenu() {
         backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
         backbufferDesc.width = width;
         backbufferDesc.height = height;
-        backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
+        backbufferDesc.format = backbufferTexture->getDesc().format;
         backbufferDesc.isRenderTarget = true;
         backbufferDesc.isImported = true;
         backbufferDesc.isTransient = false;
@@ -869,7 +869,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
         backbufferDesc.width = width;
         backbufferDesc.height = height;
-        backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
+        backbufferDesc.format = backbufferTexture->getDesc().format;
         backbufferDesc.isRenderTarget = true;
         backbufferDesc.isImported = true;
         backbufferDesc.isTransient = false;
