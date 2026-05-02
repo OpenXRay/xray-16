@@ -14,11 +14,7 @@ void CResourceManager::reset_begin()
 {
     ZoneScoped;
     for (SState* sstate : v_states)
-    {
-        auto* p = static_cast<ID3DState*>(sstate->state);
-        _RELEASE(p);
-        sstate->state = p;
-    }
+        sstate->state = nullptr;
 
     RImplementation.old_QuadIB = RImplementation.QuadIB;
     RImplementation.QuadIB.Release();

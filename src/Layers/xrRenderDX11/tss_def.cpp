@@ -3,30 +3,8 @@
 
 #include "Layers/xrRender/tss_def.h"
 
-#if defined(USE_DX11)
-#include "Layers/xrRenderDX11/dx11StateUtils.h"
-#elif defined(USE_OGL)
-#include "../xrRenderGL/glState.h"
-#endif
-
 namespace xray::render::fg
 {
-namespace
-{
-D3D_TEXTURE_ADDRESS_MODE NvrhiToD3DAddress(nvrhi::SamplerAddressMode m)
-{
-    switch (m)
-    {
-    case nvrhi::SamplerAddressMode::Clamp:      return D3D11_TEXTURE_ADDRESS_CLAMP;
-    case nvrhi::SamplerAddressMode::Wrap:       return D3D11_TEXTURE_ADDRESS_WRAP;
-    case nvrhi::SamplerAddressMode::Border:     return D3D11_TEXTURE_ADDRESS_BORDER;
-    case nvrhi::SamplerAddressMode::Mirror:     return D3D11_TEXTURE_ADDRESS_MIRROR;
-    case nvrhi::SamplerAddressMode::MirrorOnce: return D3D11_TEXTURE_ADDRESS_MIRROR_ONCE;
-    }
-    return D3D11_TEXTURE_ADDRESS_WRAP;
-}
-}
-
 void SimulatorStates::SetSamplerAddress(u32 slot, nvrhi::SamplerAddressMode u, nvrhi::SamplerAddressMode v, nvrhi::SamplerAddressMode w)
 {
     samplerUsed[slot] = true;
@@ -111,16 +89,7 @@ void SimulatorStates::SetSamplerMipLODBias(u32 slot, float bias)
     samplers[slot].mipBias = bias;
 }
 
-void SimulatorStates::record(void*& state)
-{
-#if defined(USE_DX11)
-    state = ID3DState::Create(*this);
-#elif defined(USE_OGL)
-    state = ID3DState::Create();
-#else
-#   error No graphics API selected or enabled!
-#endif
-}
+void SimulatorStates::record(void*& state) { state = nullptr; }
 
 void SimulatorStates::clear() { *this = SimulatorStates{}; }
 
@@ -128,108 +97,4 @@ BOOL SimulatorStates::equal(const SimulatorStates& other) const
 {
     return std::memcmp(this, &other, sizeof(*this)) == 0;
 }
-
-#if defined(USE_DX11)
-void UpdateStateDX11(const SimulatorStates& s, dx11State& state)
-{
-    state.UpdateStencilRef(s.depthStencil.stencilRefValue);
-    state.UpdateAlphaRef(s.alphaRef);
-}
-
-void UpdateDescDX11(const SimulatorStates& s, D3D_RASTERIZER_DESC& desc)
-{
-    desc.FillMode      = (s.raster.fillMode == nvrhi::RasterFillMode::Wireframe) ? D3D11_FILL_WIREFRAME : D3D11_FILL_SOLID;
-    switch (s.raster.cullMode)
-    {
-    case nvrhi::RasterCullMode::None:  desc.CullMode = D3D11_CULL_NONE;  break;
-    case nvrhi::RasterCullMode::Front: desc.CullMode = D3D11_CULL_FRONT; break;
-    case nvrhi::RasterCullMode::Back:  desc.CullMode = D3D11_CULL_BACK;  break;
-    }
-    desc.ScissorEnable = s.raster.scissorEnable;
-}
-
-void UpdateDescDX11(const SimulatorStates& s, D3D_DEPTH_STENCIL_DESC& desc)
-{
-    desc.DepthEnable    = s.depthStencil.depthTestEnable ? 1 : 0;
-    desc.DepthWriteMask = s.depthStencil.depthWriteEnable ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
-    desc.DepthFunc      = static_cast<D3D11_COMPARISON_FUNC>(s.depthStencil.depthFunc);
-
-    desc.StencilEnable    = s.depthStencil.stencilEnable ? 1 : 0;
-    desc.StencilReadMask  = s.depthStencil.stencilReadMask;
-    desc.StencilWriteMask = s.depthStencil.stencilWriteMask;
-
-    desc.FrontFace.StencilFailOp      = static_cast<D3D11_STENCIL_OP>(s.depthStencil.frontFaceStencil.failOp);
-    desc.FrontFace.StencilDepthFailOp = static_cast<D3D11_STENCIL_OP>(s.depthStencil.frontFaceStencil.depthFailOp);
-    desc.FrontFace.StencilPassOp      = static_cast<D3D11_STENCIL_OP>(s.depthStencil.frontFaceStencil.passOp);
-    desc.FrontFace.StencilFunc        = static_cast<D3D11_COMPARISON_FUNC>(s.depthStencil.frontFaceStencil.stencilFunc);
-
-    desc.BackFace.StencilFailOp      = static_cast<D3D11_STENCIL_OP>(s.depthStencil.backFaceStencil.failOp);
-    desc.BackFace.StencilDepthFailOp = static_cast<D3D11_STENCIL_OP>(s.depthStencil.backFaceStencil.depthFailOp);
-    desc.BackFace.StencilPassOp      = static_cast<D3D11_STENCIL_OP>(s.depthStencil.backFaceStencil.passOp);
-    desc.BackFace.StencilFunc        = static_cast<D3D11_COMPARISON_FUNC>(s.depthStencil.backFaceStencil.stencilFunc);
-}
-
-void UpdateDescDX11(const SimulatorStates& s, D3D_BLEND_DESC& desc)
-{
-    desc.AlphaToCoverageEnable = s.blend.alphaToCoverageEnable ? 1 : 0;
-    for (int i = 0; i < 8; ++i)
-    {
-        const auto& rt = s.blend.targets[i];
-        desc.RenderTarget[i].BlendEnable           = rt.blendEnable ? 1 : 0;
-        desc.RenderTarget[i].SrcBlend              = static_cast<D3D11_BLEND>(rt.srcBlend);
-        desc.RenderTarget[i].DestBlend             = static_cast<D3D11_BLEND>(rt.destBlend);
-        desc.RenderTarget[i].BlendOp               = static_cast<D3D11_BLEND_OP>(rt.blendOp);
-        desc.RenderTarget[i].SrcBlendAlpha         = static_cast<D3D11_BLEND>(rt.srcBlendAlpha);
-        desc.RenderTarget[i].DestBlendAlpha        = static_cast<D3D11_BLEND>(rt.destBlendAlpha);
-        desc.RenderTarget[i].BlendOpAlpha          = static_cast<D3D11_BLEND_OP>(rt.blendOpAlpha);
-        desc.RenderTarget[i].RenderTargetWriteMask = static_cast<u8>(rt.colorWriteMask);
-    }
-}
-
-void UpdateDescDX11(const SimulatorStates& s, D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT],
-    bool SamplerUsed[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT], int iBaseSamplerIndex)
-{
-    for (int slot = 0; slot < 16; ++slot)
-    {
-        if (!s.samplerUsed[slot])
-            continue;
-
-        int outIndex = slot - iBaseSamplerIndex;
-        if (outIndex < 0 || outIndex >= D3D_COMMONSHADER_SAMPLER_SLOT_COUNT)
-            continue;
-
-        const nvrhi::SamplerDesc& src = s.samplers[slot];
-        D3D_SAMPLER_DESC& desc = descArray[outIndex];
-        SamplerUsed[outIndex] = true;
-
-        constexpr int FilterMipLinear   = 0x01;
-        constexpr int FilterMagLinear   = 0x04;
-        constexpr int FilterMinLinear   = 0x10;
-        constexpr int FilterAnisotropic = 0x40;
-        constexpr int FilterComparison  = 0x80;
-
-        int filter = 0;
-        if (src.minFilter) filter |= FilterMinLinear;
-        if (src.mipFilter) filter |= FilterMipLinear;
-        if (src.magFilter) filter |= FilterMagLinear;
-        if (src.maxAnisotropy > 1.f) filter |= FilterAnisotropic | FilterMinLinear | FilterMipLinear | FilterMagLinear;
-        if (src.reductionType == nvrhi::SamplerReductionType::Comparison) filter |= FilterComparison;
-        desc.Filter = static_cast<D3D11_FILTER>(filter);
-
-        desc.AddressU      = NvrhiToD3DAddress(src.addressU);
-        desc.AddressV      = NvrhiToD3DAddress(src.addressV);
-        desc.AddressW      = NvrhiToD3DAddress(src.addressW);
-        desc.MipLODBias    = src.mipBias;
-        desc.MaxAnisotropy = static_cast<u32>(src.maxAnisotropy);
-
-        desc.BorderColor[0] = src.borderColor.r;
-        desc.BorderColor[1] = src.borderColor.g;
-        desc.BorderColor[2] = src.borderColor.b;
-        desc.BorderColor[3] = src.borderColor.a;
-
-        if (desc.MinLOD > desc.MaxLOD)
-            desc.MaxLOD = desc.MinLOD;
-    }
-}
-#endif
 }
