@@ -39,9 +39,6 @@ void CSkeletonX_ST::Copy(dxRender_Visual* P)
     _Copy((CSkeletonX*)X);
 }
 //////////////////////////////////////////////////////////////////////
-void CSkeletonX_PM::Render(CBackend&, float, bool) {}
-void CSkeletonX_ST::Render(CBackend&, float, bool) {}
-//////////////////////////////////////////////////////////////////////
 void CSkeletonX_PM::Release() { inherited1::Release(); }
 void CSkeletonX_ST::Release() { inherited1::Release(); }
 //////////////////////////////////////////////////////////////////////
