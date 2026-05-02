@@ -32,18 +32,6 @@ constexpr u32 boxcolor = color_rgba(255, 255, 255, 0);
 static constexpr int boxvertcount = 48;
 static Fvector boxvert[boxvertcount];
 
-#define DU_DRAW_SH_C(sh, c)\
-    {\
-        RCache.set_Shader(sh);\
-        RCache.set_c("tfactor", float(color_get_R(c)) / 255.f, float(color_get_G(c)) / 255.f,\
-            float(color_get_B(c)) / 255.f, float(color_get_A(c)) / 255.f);\
-    }
-#define DU_DRAW_SH(sh)\
-    {\
-        RCache.set_Shader(sh);\
-        RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);\
-    }
-
 #define FILL_MODE nvrhi::RasterFillMode::Solid
 #define SHADE_MODE 2
 #define SCREEN_QUALITY 1.f
@@ -348,7 +336,6 @@ void CDrawUtilities::DrawDirectionalLight(const Fvector& p, const Fvector& d, fl
 
 void CDrawUtilities::DrawPointLight(const Fvector& p, float radius, u32 c)
 {
-    RCache.set_xform_world(Fidentity);
     DrawCross(p, radius, radius, radius, radius, radius, radius, c, true);
 }
 
@@ -371,11 +358,9 @@ void CDrawUtilities::DrawEntity(u32 clr, ref_shader s)
         pv++;
     }
     // render flagshtok
-    DU_DRAW_SH(RImplementation.m_WireShader);
     g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, g_du_l_scratch.data(), 4);
 
     if (s)
-        DU_DRAW_SH(s);
     {
         // fill VB
         g_du_lit_scratch.resize(6);
@@ -529,13 +514,10 @@ void CDrawUtilities::DrawIdentCone(BOOL bSolid, BOOL bWire, u32 clr_s, u32 clr_w
 {
     if (bWire)
     {
-        DU_DRAW_SH_C(RImplementation.m_WireShader, clr_w);
         m_WireCone.Render();
     }
     if (bSolid)
     {
-        DU_DRAW_SH_C(
-            color_get_A(clr_s) >= 254 ? RImplementation.m_WireShader : RImplementation.m_SelectionShader, clr_s);
         m_SolidCone.Render();
     }
 }
@@ -544,13 +526,10 @@ void CDrawUtilities::DrawIdentSphere(BOOL bSolid, BOOL bWire, u32 clr_s, u32 clr
 {
     if (bWire)
     {
-        DU_DRAW_SH_C(RImplementation.m_WireShader, clr_w);
         m_WireSphere.Render();
     }
     if (bSolid)
     {
-        DU_DRAW_SH_C(
-            color_get_A(clr_s) >= 254 ? RImplementation.m_WireShader : RImplementation.m_SelectionShader, clr_s);
         m_SolidSphere.Render();
     }
 }
@@ -559,13 +538,10 @@ void CDrawUtilities::DrawIdentSpherePart(BOOL bSolid, BOOL bWire, u32 clr_s, u32
 {
     if (bWire)
     {
-        DU_DRAW_SH_C(RImplementation.m_WireShader, clr_w);
         m_WireSpherePart.Render();
     }
     if (bSolid)
     {
-        DU_DRAW_SH_C(
-            color_get_A(clr_s) >= 254 ? RImplementation.m_WireShader : RImplementation.m_SelectionShader, clr_s);
         m_SolidSpherePart.Render();
     }
 }
@@ -574,13 +550,10 @@ void CDrawUtilities::DrawIdentCylinder(BOOL bSolid, BOOL bWire, u32 clr_s, u32 c
 {
     if (bWire)
     {
-        DU_DRAW_SH_C(RImplementation.m_WireShader, clr_w);
         m_WireCylinder.Render();
     }
     if (bSolid)
     {
-        DU_DRAW_SH_C(
-            color_get_A(clr_s) >= 254 ? RImplementation.m_WireShader : RImplementation.m_SelectionShader, clr_s);
         m_SolidCylinder.Render();
     }
 }
@@ -589,13 +562,10 @@ void CDrawUtilities::DrawIdentBox(BOOL bSolid, BOOL bWire, u32 clr_s, u32 clr_w)
 {
     if (bWire)
     {
-        DU_DRAW_SH_C(RImplementation.m_WireShader, clr_w);
         m_WireBox.Render();
     }
     if (bSolid)
     {
-        DU_DRAW_SH_C(
-            color_get_A(clr_s) >= 254 ? RImplementation.m_WireShader : RImplementation.m_SelectionShader, clr_s);
         m_SolidBox.Render();
     }
 }
@@ -793,12 +763,6 @@ void CDrawUtilities::DrawBox(const Fvector& offs, const Fvector& Size, BOOL bSol
 
 void CDrawUtilities::DrawOBB(const Fmatrix& parent, const Fobb& box, u32 clr_s, u32 clr_w)
 {
-    Fmatrix R, S, X;
-    box.xform_get(R);
-    S.scale(box.m_halfsize.x * 2.f, box.m_halfsize.y * 2.f, box.m_halfsize.z * 2.f);
-    X.mul_43(R, S);
-    R.mul_43(parent, X);
-    RCache.set_xform_world(R);
     DrawIdentBox(true, true, clr_s, clr_w);
 }
 //----------------------------------------------------
@@ -806,33 +770,17 @@ void CDrawUtilities::DrawOBB(const Fmatrix& parent, const Fobb& box, u32 clr_s, 
 void CDrawUtilities::DrawAABB(
     const Fmatrix& parent, const Fvector& center, const Fvector& size, u32 clr_s, u32 clr_w, BOOL bSolid, BOOL bWire)
 {
-    Fmatrix R, S;
-    S.scale(size.x * 2.f, size.y * 2.f, size.z * 2.f);
-    S.translate_over(center);
-    R.mul_43(parent, S);
-    RCache.set_xform_world(R);
     DrawIdentBox(bSolid, bWire, clr_s, clr_w);
 }
 
 void CDrawUtilities::DrawAABB(const Fvector& p0, const Fvector& p1, u32 clr_s, u32 clr_w, BOOL bSolid, BOOL bWire)
 {
-    Fmatrix R;
-    Fvector C;
-    C.set((p1.x + p0.x) * 0.5f, (p1.y + p0.y) * 0.5f, (p1.z + p0.z) * 0.5f);
-    R.scale(_abs(p1.x - p0.x), _abs(p1.y - p0.y), _abs(p1.z - p0.z));
-    R.translate_over(C);
-    RCache.set_xform_world(R);
     DrawIdentBox(bSolid, bWire, clr_s, clr_w);
 }
 
 void CDrawUtilities::DrawSphere(
     const Fmatrix& parent, const Fvector& center, float radius, u32 clr_s, u32 clr_w, BOOL bSolid, BOOL bWire)
 {
-    Fmatrix B;
-    B.scale(radius, radius, radius);
-    B.translate_over(center);
-    B.mulA_43(parent);
-    RCache.set_xform_world(B);
     DrawIdentSphere(bSolid, bWire, clr_s, clr_w);
 }
 //----------------------------------------------------
@@ -913,36 +861,6 @@ void CDrawUtilities::DD_DrawFace_end()
 void CDrawUtilities::DrawCylinder(const Fmatrix& parent, const Fvector& center, const Fvector& dir, float height,
     float radius, u32 clr_s, u32 clr_w, BOOL bSolid, BOOL bWire)
 {
-    Fmatrix mScale;
-    mScale.scale(2.f * radius, 2.f * radius, height);
-
-    // build final rotation / translation
-    Fvector L_dir, L_up, L_right;
-    L_dir.set(dir);
-    L_dir.normalize();
-    L_up.set(0, 1, 0);
-    if (_abs(L_up.dotproduct(L_dir)) > .99f)
-        L_up.set(0, 0, 1);
-    L_right.crossproduct(L_up, L_dir);
-    L_right.normalize();
-    L_up.crossproduct(L_dir, L_right);
-    L_up.normalize();
-
-    Fmatrix mR;
-    mR.i = L_right;
-    mR._14 = 0;
-    mR.j = L_up;
-    mR._24 = 0;
-    mR.k = L_dir;
-    mR._34 = 0;
-    mR.c = center;
-    mR._44 = 1;
-
-    // final xform
-    Fmatrix xf;
-    xf.mul(mR, mScale);
-    xf.mulA_43(parent);
-    RCache.set_xform_world(xf);
     DrawIdentCylinder(bSolid, bWire, clr_s, clr_w);
 }
 //----------------------------------------------------
@@ -950,36 +868,6 @@ void CDrawUtilities::DrawCylinder(const Fmatrix& parent, const Fvector& center, 
 void CDrawUtilities::DrawCone(const Fmatrix& parent, const Fvector& apex, const Fvector& dir, float height,
     float radius, u32 clr_s, u32 clr_w, BOOL bSolid, BOOL bWire)
 {
-    Fmatrix mScale;
-    mScale.scale(2.f * radius, 2.f * radius, height);
-
-    // build final rotation / translation
-    Fvector L_dir, L_up, L_right;
-    L_dir.set(dir);
-    L_dir.normalize();
-    L_up.set(0, 1, 0);
-    if (_abs(L_up.dotproduct(L_dir)) > .99f)
-        L_up.set(0, 0, 1);
-    L_right.crossproduct(L_up, L_dir);
-    L_right.normalize();
-    L_up.crossproduct(L_dir, L_right);
-    L_up.normalize();
-
-    Fmatrix mR;
-    mR.i = L_right;
-    mR._14 = 0;
-    mR.j = L_up;
-    mR._24 = 0;
-    mR.k = L_dir;
-    mR._34 = 0;
-    mR.c = apex;
-    mR._44 = 1;
-
-    // final xform
-    Fmatrix xf;
-    xf.mul(mR, mScale);
-    xf.mulA_43(parent);
-    RCache.set_xform_world(xf);
     DrawIdentCone(bSolid, bWire, clr_s, clr_w);
 }
 //----------------------------------------------------
@@ -1014,7 +902,6 @@ void CDrawUtilities::DrawPlane(const Fvector& p, const Fvector& n, const Fvector
 
     if (bSolid)
     {
-        DU_DRAW_SH(RImplementation.m_SelectionShader);
         g_du_l_scratch.resize(5);
         FVF::L* pv = g_du_l_scratch.data();
         pv->set(-scale.x, 0, -scale.y, clr_s);
@@ -1035,7 +922,6 @@ void CDrawUtilities::DrawPlane(const Fvector& p, const Fvector& n, const Fvector
 
     if (bWire)
     {
-        DU_DRAW_SH(RImplementation.m_WireShader);
         g_du_l_scratch.resize(5);
         FVF::L* pv = g_du_l_scratch.data();
         pv->set(-scale.x, 0, -scale.y, clr_w);
@@ -1067,7 +953,6 @@ void CDrawUtilities::DrawPlane(const Fvector& center, const Fvector2& scale, con
 
     if (bSolid)
     {
-        DU_DRAW_SH(RImplementation.m_SelectionShader);
         g_du_l_scratch.resize(5);
         FVF::L* pv = g_du_l_scratch.data();
         pv->set(-scale.x, 0, -scale.y, clr_s);
@@ -1088,7 +973,6 @@ void CDrawUtilities::DrawPlane(const Fvector& center, const Fvector2& scale, con
 
     if (bWire)
     {
-        DU_DRAW_SH(RImplementation.m_WireShader);
         g_du_l_scratch.resize(5);
         FVF::L* pv = g_du_l_scratch.data();
         pv->set(-scale.x, 0, -scale.y, clr_w);
@@ -1117,7 +1001,6 @@ void CDrawUtilities::DrawRectangle(
     u32 vBase;
     if (bSolid)
     {
-        DU_DRAW_SH(RImplementation.m_SelectionShader);
         g_du_l_scratch.resize(6);
         FVF::L* pv = g_du_l_scratch.data();
         pv->set(o.x, o.y, o.z, clr_s);
@@ -1136,7 +1019,6 @@ void CDrawUtilities::DrawRectangle(
     }
     if (bWire)
     {
-        DU_DRAW_SH(RImplementation.m_WireShader);
         g_du_l_scratch.resize(5);
         FVF::L* pv = g_du_l_scratch.data();
         pv->set(o.x, o.y, o.z, clr_w);
@@ -1192,7 +1074,6 @@ void CDrawUtilities::DrawCross(
 
 void CDrawUtilities::DrawPivot(const Fvector& pos, float sz)
 {
-    DU_DRAW_SH(RImplementation.m_WireShader);
     DrawCross(pos, sz, sz, sz, sz, sz, sz, 0xFF7FFF7F);
 }
 
@@ -1234,7 +1115,6 @@ void CDrawUtilities::DrawAxis(const Fmatrix& T)
     }
 
     // unlock VB and Render it as triangle list
-    DU_DRAW_SH(RImplementation.m_WireShader);
     ((void)0);
 
     m_Font->SetColor(0xFF909090);
@@ -1292,7 +1172,6 @@ void CDrawUtilities::DrawObjectAxis(const Fmatrix& T, float sz, BOOL sel)
     pv->set(n.x, n.y, 0, 1, sel ? 0xFF00FF00 : 0xFF008000, 0, 0);
 
     // Render it as line list
-    DU_DRAW_SH(RImplementation.m_WireShader);
     ((void)0);
 
     m_Font->SetColor(sel ? 0xFF000000 : 0xFF909090);
@@ -1315,10 +1194,6 @@ void CDrawUtilities::DrawGrid()
     for (auto v_it = m_GridPoints.begin(); v_it != m_GridPoints.end(); ++v_it, pv++)
         pv->set(*v_it);
     // Render it as triangle list
-    Fmatrix ddd;
-    ddd.identity();
-    RCache.set_xform_world(ddd);
-    DU_DRAW_SH(RImplementation.m_WireShader);
     g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, g_du_l_scratch.data(), m_GridPoints.size() / 2);
 }
 
@@ -1337,7 +1212,6 @@ void CDrawUtilities::DrawSelectionRect(const Ivector2& m_SelStart, const Ivector
     pv->set(m_SelEnd.x * SCREEN_QUALITY, m_SelEnd.y * SCREEN_QUALITY, m_SelectionRect, 0.f, 0.f);
     pv++;
     // Render it as triangle list
-    DU_DRAW_SH(RImplementation.m_SelectionShader);
     ((void)0);
 }
 
