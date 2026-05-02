@@ -103,7 +103,6 @@ CTexture::CTexture()
     flags.bUser = false;
     flags.seqCycles = FALSE;
     flags.MemoryUsage = 0;
-    bind = fastdelegate::FastDelegate2<CBackend&, u32>(this, &CTexture::apply_load);
 }
 
 CTexture::~CTexture()
@@ -134,92 +133,7 @@ void CTexture::desc_update()
     }
 }
 
-void CTexture::PostLoad()
-{
-    if (pTheora)
-        bind = fastdelegate::FastDelegate2<CBackend&, u32>(this, &CTexture::apply_theora);
-    else if (pAVI)
-        bind = fastdelegate::FastDelegate2<CBackend&, u32>(this, &CTexture::apply_avi);
-    else if (!seqNvrhiTextures.empty())
-        bind = fastdelegate::FastDelegate2<CBackend&, u32>(this, &CTexture::apply_seq);
-    else
-        bind = fastdelegate::FastDelegate2<CBackend&, u32>(this, &CTexture::apply_normal);
-}
-
-void CTexture::Apply(CBackend& cmd_list, u32 dwStage)
-{
-}
-
-void CTexture::apply_load(CBackend& cmd_list, u32 dwStage)
-{
-    if (!flags.bLoaded)
-        Load();
-    else
-        PostLoad();
-    bind(cmd_list, dwStage);
-}
-
-void CTexture::apply_theora(CBackend& cmd_list, u32 dwStage)
-{
-    if (pTheora && nvrhiTexture)
-    {
-        const u32 t = (m_play_time != 0xFFFFFFFF) ? m_play_time : Device.dwTimeContinual;
-        if (pTheora->Update(t))
-        {
-            const u32 w = pTheora->Width(false);
-            const u32 h = pTheora->Height(false);
-            xr_vector<u32> frame(static_cast<size_t>(w) * h, 0);
-            int pos = 0;
-            pTheora->DecompressFrame(frame.data(), w - pTheora->Width(true), pos);
-            auto* renderDevice = GEnv.Render->GetRenderDevice();
-            renderDevice->UploadTextureDataToNVRHI(nvrhiTexture, 0, 0, frame.data(), frame.size() * sizeof(u32), w * sizeof(u32), 0);
-        }
-    }
-    Apply(cmd_list, dwStage);
-}
-
-void CTexture::apply_avi(CBackend& cmd_list, u32 dwStage)
-{
-    if (pAVI && nvrhiTexture && pAVI->NeedUpdate())
-    {
-        u8* ptr = nullptr;
-        pAVI->GetFrame(&ptr);
-        if (ptr)
-        {
-            const size_t rowPitch = static_cast<size_t>(pAVI->m_dwWidth) * 4;
-            auto* renderDevice = GEnv.Render->GetRenderDevice();
-            renderDevice->UploadTextureDataToNVRHI(nvrhiTexture, 0, 0, ptr, rowPitch * pAVI->m_dwHeight, static_cast<u32>(rowPitch), 0);
-        }
-    }
-    Apply(cmd_list, dwStage);
-}
-
-void CTexture::apply_seq(CBackend& cmd_list, u32 dwStage)
-{
-    if (!seqNvrhiTextures.empty())
-    {
-        const u32 frame = Device.dwTimeContinual / seqMSPF;
-        const u32 frame_data = static_cast<u32>(seqNvrhiTextures.size());
-        u32 frame_id;
-        if (flags.seqCycles)
-        {
-            frame_id = frame % (frame_data * 2);
-            if (frame_id >= frame_data)
-                frame_id = (frame_data - 1) - (frame_id % frame_data);
-        }
-        else
-        {
-            frame_id = frame % frame_data;
-        }
-        nvrhiTexture = seqNvrhiTextures[frame_id];
-    }
-    Apply(cmd_list, dwStage);
-}
-
-void CTexture::apply_normal(CBackend& cmd_list, u32 dwStage)
-{
-    Apply(cmd_list, dwStage);
-}
+void CTexture::PostLoad() {}
 
 void CTexture::set_slice(int slice)
 {
@@ -358,8 +272,6 @@ void CTexture::Unload()
 
     xr_delete(pAVI);
     xr_delete(pTheora);
-
-    bind = fastdelegate::FastDelegate2<CBackend&, u32>(this, &CTexture::apply_load);
 }
 
 void CTexture::video_Play(BOOL looped, u32 _time)

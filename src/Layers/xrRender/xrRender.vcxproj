@@ -82,7 +82,6 @@
     <ClInclude Include="D3DUtils.h"/>
     <ClInclude Include="FGRenderBase.h"/>
     <ClInclude Include="r4_rendertarget.h"/>
-    <ClInclude Include="Debug\dxPixEventWrapper.h"/>
     <ClInclude Include="DetailFormat.h"/>
     <ClInclude Include="DetailModel.h"/>
     <ClInclude Include="du_box.h"/>
@@ -324,7 +323,6 @@
     <ClCompile Include="ConstantSystem\FGConstantSystem.cpp"/>
     <ClCompile Include="FGRenderBase.cpp"/>
     <ClCompile Include="r4_rendertarget.cpp"/>
-    <ClCompile Include="r4_rendertarget_u_set_rt.cpp"/>
     <ClCompile Include="r_FrameGraphRenderer_Loader.cpp"/>
     <ClCompile Include="r_FrameGraphRenderer_Shaders.cpp"/>
     <ClCompile Include="r_FrameGraphRenderer_Blenders.cpp"/>
@@ -448,7 +446,6 @@
     <ClCompile Include="light_GI.cpp"/>
     <ClCompile Include="Light_Render_Direct.cpp"/>
     <ClCompile Include="Light_Render_Direct_ComputeXFS.cpp"/>
-    <ClCompile Include="light_vis.cpp"/>
     <ClCompile Include="..\..\..\Externals\meshoptimizer\src\allocator.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <TreatWarningAsError>false</TreatWarningAsError>

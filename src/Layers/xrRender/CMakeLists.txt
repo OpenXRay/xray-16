@@ -184,7 +184,6 @@ target_sources(xrRender PRIVATE
     FGRenderBase.cpp
     r4_rendertarget.h
     r4_rendertarget.cpp
-    r4_rendertarget_u_set_rt.cpp
     DetailModel.cpp
     ETextureParams.cpp
     FBasicVisual.cpp
@@ -254,7 +253,6 @@ target_sources(xrRender PRIVATE
     dxWallMarkArray.cpp
     light.cpp
     light_GI.cpp
-    light_vis.cpp
     r__buffer_pool.cpp
     r__buffer_pool.h
     r__hw_compat.h

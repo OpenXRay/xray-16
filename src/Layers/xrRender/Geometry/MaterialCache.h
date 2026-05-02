@@ -2,7 +2,6 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
-#include "Layers/xrRender/FrameGraph/GlobalParamsMapper.h"
 #include "Layers/xrRender/ResourceManager/ResourceHandle.h"
 
 namespace xray::render::fg {
@@ -224,8 +223,6 @@ struct MaterialPSO {
         std::sort(slots.begin(), slots.end());
         return slots;
     }
-
-    xr_unique_ptr<GlobalParamsMapper> globalParamsMapper;
 
     framegraph::ShaderConstantLayout constantLayout;
 

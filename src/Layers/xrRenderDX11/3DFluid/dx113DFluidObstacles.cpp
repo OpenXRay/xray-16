@@ -91,7 +91,6 @@ void dx113DFluidObstacles::DestroyShaders()
 
 void dx113DFluidObstacles::ProcessObstacles(const dx113DFluidData& FluidData, float timestep)
 {
-    PIX_EVENT(ProcessObstacles);
 
     //  Prepare world-space to grid transform
     Fmatrix WorldToFluid;
@@ -126,7 +125,6 @@ void dx113DFluidObstacles::RenderStaticOOBB(const Fmatrix& Transform)
 {
     static shared_str strOOBBClipPlane("OOBBClipPlane");
 
-    PIX_EVENT(RenderObstacle);
 
     //  Shader must be already set up!
     Fmatrix InvTransform;
@@ -306,85 +304,11 @@ void dx113DFluidObstacles::RenderPhysicsElement(
     }
 }
 
-/*
-void dx113DFluidObstacles::RenderDynamicOOBB( const IPhysicsElement &Element, const Fmatrix &WorldToFluid, float
-timestep)
-{
-    static shared_str strOOBBClipPlane("OOBBClipPlane");
-
-    PIX_EVENT(RenderDynamicObstacle);
-
-    //  dsdad;
-
-    Fmatrix Transform;
-    //Transform.mul(WorldToFluid, Element.XFORM());
-
-    Fvector3 BoxSize;
-    Fvector3 BoxCenter;
-    Element.get_Box( BoxSize, BoxCenter );
-
-    //  Get bone transform
-    Fmatrix OOBBTransform = Element.XFORM();
-    //  Overwrite bone position with oobb world position
-    OOBBTransform.c = BoxCenter;
-
-    Transform.mul(WorldToFluid, OOBBTransform);
-
-    //  Shader must be already set up!
-    Fmatrix InvTransform;
-    Fmatrix ClipTransform;
-    InvTransform.invert(Transform);
-    ClipTransform.transpose(InvTransform);
-
-    for ( int i=0; i<6; ++i)
-    {
-        Fvector4    UpdatedPlane = UnitClipPlanes[i];
-        UpdatedPlane.w *= BoxSize[i/2];
-        //UpdatedPlane.w += (i%2) ? (-BoxCenter[i/2]) : BoxCenter[i/2];
-        Fvector4    TransformedPlane;
-        ClipTransform.transform(TransformedPlane, UpdatedPlane);
-        TransformedPlane.normalize_as_plane();
-        RCache.set_ca(strOOBBClipPlane, i, TransformedPlane);
-    }
-
-    const Fvector3  &MassCenter3 = Element.mass_Center();
-    Fvector3    AngularVelocity3;
-    Fvector3    TranslationVelocity3;
-    Element.get_AngularVel(AngularVelocity3);
-    Element.get_LinearVel(TranslationVelocity3);
-
-    Fvector4    MassCenter;
-    Fvector4    AngularVelocity;
-    Fvector4    TranslationVelocity;
-    MassCenter.set( MassCenter3.x, MassCenter3.y, MassCenter3.z, 0.0f);
-    AngularVelocity.set( AngularVelocity3.x, AngularVelocity3.y, AngularVelocity3.z, 0.0f);
-    TranslationVelocity.set( TranslationVelocity3.x, TranslationVelocity3.y, TranslationVelocity3.z, 0.0f);
-
-    float   fVelocityScale;
-
-    VERIFY(timestep!=0);
-
-    fVelocityScale = 1/timestep;
-
-    fVelocityScale *= Device.fTimeDelta;
-
-    AngularVelocity.mul( fVelocityScale );
-    TranslationVelocity.mul( fVelocityScale );
-
-    RCache.set_c(strMassCenter, MassCenter);
-    RCache.set_c(strOOBBWorldAngularVelocity, AngularVelocity);
-    RCache.set_c(strOOBBWorldTranslationVelocity, TranslationVelocity);
-
-    m_pGrid->DrawSlices();
-}
-*/
-
 void dx113DFluidObstacles::RenderDynamicOOBB(
     const IPhysicsGeometry& Geometry, const Fmatrix& WorldToFluid, float /*timestep*/)
 {
     static shared_str strOOBBClipPlane("OOBBClipPlane");
 
-    PIX_EVENT(RenderDynamicObstacle);
 
     //  dsdad;
 

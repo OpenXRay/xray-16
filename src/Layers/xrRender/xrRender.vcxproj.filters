@@ -429,9 +429,6 @@
     <ClInclude Include="Utils\dxHashHelper.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Debug\dxPixEventWrapper.h">
-      <Filter>Debug</Filter>
-    </ClInclude>
     <ClInclude Include="DetailFormat.h">
       <Filter>Details</Filter>
     </ClInclude>
@@ -770,9 +767,6 @@
       <Filter>Lights</Filter>
     </ClCompile>
     <ClCompile Include="Light_Render_Direct_ComputeXFS.cpp">
-      <Filter>Lights</Filter>
-    </ClCompile>
-    <ClCompile Include="light_vis.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
     <ClCompile Include="LightTrack.cpp">
