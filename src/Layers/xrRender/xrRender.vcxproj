@@ -89,7 +89,6 @@
     <ClInclude Include="du_cylinder.h"/>
     <ClInclude Include="du_sphere.h"/>
     <ClInclude Include="du_sphere_part.h"/>
-    <ClInclude Include="dxDebugRender.h"/>
     <ClInclude Include="dxFontRender.h"/>
     <ClInclude Include="FrameGraphPasses\ForwardColorPassSetup.h"/>
     <ClInclude Include="FrameGraphPasses\HiZBuildPassSetup.h"/>
@@ -144,7 +143,6 @@
     <ClInclude Include="dxParticleCustom.h"/>
     <ClInclude Include="dxRenderFactory.h"/>
     <ClInclude Include="dxThunderboltDescRender.h"/>
-    <ClInclude Include="dxUIRender.h"/>
     <ClInclude Include="dxUISequenceVideoItem.h"/>
     <ClInclude Include="dxUIShader.h"/>
     <ClInclude Include="dxWallMarkArray.h"/>
@@ -547,9 +545,7 @@
     <ClCompile Include="..\xrRenderDX11\SH_Atomic.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxFontRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxUIShader.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dxDebugRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxThunderboltDescRender.cpp"/>
-    <ClCompile Include="..\xrRenderDX11\dxUIRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\dxObjectSpaceRender.cpp"/>
     <ClCompile Include="..\xrRenderDX11\r__dsgraph_build.cpp"/>
     <ClCompile Include="..\xrRenderDX11\r__occlusion.cpp"/>
