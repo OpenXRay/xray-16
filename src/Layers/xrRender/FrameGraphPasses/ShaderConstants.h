@@ -131,15 +131,8 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
 
     cb.eye_position = Device.vCameraPosition;
 
-#if defined(USE_DX11)
     const float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
     const float HorzTan = -VertTan / Device.fASPECT;
-#elif defined(USE_OGL)
-    const float VertTan = tanf(deg2rad(Device.fFOV / 2.0f));
-    const float HorzTan = VertTan / Device.fASPECT;
-#else
-#   error No graphics API selected or enabled!
-#endif
 
     cb.pos_decompression_params.set(HorzTan, VertTan, (2.0f * HorzTan) / (float)Device.dwWidth, (2.0f * VertTan) / (float)Device.dwHeight);
     cb.pos_decompression_params2.set((float)Device.dwWidth, (float)Device.dwHeight, 1.0f / (float)Device.dwWidth, 1.0f / (float)Device.dwHeight);

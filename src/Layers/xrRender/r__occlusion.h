@@ -22,10 +22,6 @@ private:
     {
 #if defined(USE_DX11)
         ID3DQuery* Q;
-#elif defined(USE_OGL)
-        GLuint Q;
-#else
-#   error No graphics API selected or enabled!
 #endif
         u32 order;
     };
@@ -41,10 +37,6 @@ private:
 public:
 #if defined(USE_DX11)
     typedef u64 occq_result;
-#elif defined(USE_OGL)
-    typedef u32 occq_result;
-#else
-#   error No graphics API selected or enabled!
 #endif
 public:
     ~R_occlusion();

@@ -19,10 +19,6 @@ inline bool dcl_equal(const VertexElement* a, const VertexElement* b)
 
 struct SDeclaration;
 
-#ifdef USE_OGL
-void SetGLVertexPointer(SDeclaration* decl);
-#endif
-
 namespace BufferUtils
 {
 ConstantBufferHandle CreateConstantBuffer(u32 DataSize);

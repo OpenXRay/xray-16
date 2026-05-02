@@ -52,23 +52,15 @@ bool ExtractShaderKeyFromPass(SPass* pass, ShaderKey& outKey) {
         outKey.gsName = pass->gs->cName;
     }
 
-#ifdef USE_DX11
     if (pass->hs._get()) {
         outKey.hsName = pass->hs->cName;
     }
-
     if (pass->ds._get()) {
         outKey.dsName = pass->ds->cName;
     }
-
     if (pass->cs._get()) {
         outKey.csName = pass->cs->cName;
     }
-#elif defined(USE_OGL)
-    if (pass->pp._get()) {
-        outKey.ppName = pass->pp->cName;
-    }
-#endif
 
     return outKey.IsValid();
 }

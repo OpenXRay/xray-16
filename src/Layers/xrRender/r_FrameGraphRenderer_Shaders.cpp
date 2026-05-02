@@ -15,8 +15,7 @@ xr_vector<xr_string> g_failedShaders;
 
 void FrameGraphRenderer::addShaderOption(const char* name, const char* value)
 {
-    D3D_SHADER_MACRO macro = {name, value};
-    m_ShaderOptions.push_back(macro);
+    m_ShaderOptions.push_back(ShaderMacro{name, value});
 }
 
 template <typename T>
@@ -195,10 +194,10 @@ public:
 class shader_options_holder
 {
     size_t pos{};
-    D3D_SHADER_MACRO m_options[128];
+    ShaderMacro m_options[128];
 
 public:
-    void add(const xr_vector<D3D_SHADER_MACRO>& macros)
+    void add(const xr_vector<ShaderMacro>& macros)
     {
         for (auto macro : macros)
         {
@@ -218,7 +217,7 @@ public:
         m_options[pos] = { nullptr, nullptr };
     }
 
-    D3D_SHADER_MACRO* data() { return m_options; }
+    ShaderMacro* data() { return m_options; }
 };
 
 HRESULT FrameGraphRenderer::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
@@ -463,7 +462,7 @@ HRESULT FrameGraphRenderer::shader_compile(pcstr name, IReader* fs, pcstr pFunct
     bool isPixelShader = (strcmp(extension, "ps") == 0);
 
     xr_string definesStr;
-    for (const D3D_SHADER_MACRO* macro = options.data(); macro->Name != nullptr; ++macro)
+    for (const ShaderMacro* macro = options.data(); macro->Name != nullptr; ++macro)
     {
         definesStr.append(macro->Name);
         definesStr.append("=");
@@ -497,7 +496,7 @@ HRESULT FrameGraphRenderer::shader_compile(pcstr name, IReader* fs, pcstr pFunct
     }
 
     size_t defineCount = 0;
-    for (const D3D_SHADER_MACRO* macro = options.data(); macro->Name != nullptr; ++macro)
+    for (const ShaderMacro* macro = options.data(); macro->Name != nullptr; ++macro)
         defineCount++;
 
     xr_vector<xray::render::SlangCompiler::Define> slangDefines;
