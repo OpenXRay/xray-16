@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "fgThunderboltRender.h"
+#include "fgFlareRender.h"
 
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
@@ -245,7 +246,7 @@ void FGThunderboltRender::Render(CEffect_Thunderbolt& owner)
 
     if (owner.current->m_GradientTop)
     {
-        auto* flare = static_cast<dxFlareRender*>(&*owner.current->m_GradientTop->m_pFlare);
+        auto* flare = static_cast<FGFlareRender*>(&*owner.current->m_GradientTop->m_pFlare);
         nvrhi::ITexture* tex = ResolveTexture(flare ? flare->m_textureName : shared_str{});
         const u32 c_val = iFloor(owner.current->m_GradientTop->fOpacity * owner.lightning_phase * 255.f);
         const u32 c = color_rgba(c_val, c_val, c_val, c_val);
@@ -254,7 +255,7 @@ void FGThunderboltRender::Render(CEffect_Thunderbolt& owner)
 
     if (owner.current->m_GradientCenter)
     {
-        auto* flare = static_cast<dxFlareRender*>(&*owner.current->m_GradientCenter->m_pFlare);
+        auto* flare = static_cast<FGFlareRender*>(&*owner.current->m_GradientCenter->m_pFlare);
         nvrhi::ITexture* tex = ResolveTexture(flare ? flare->m_textureName : shared_str{});
         const u32 c_val = iFloor(owner.current->m_GradientTop->fOpacity * owner.lightning_phase * 255.f);
         const u32 c = color_rgba(c_val, c_val, c_val, c_val);

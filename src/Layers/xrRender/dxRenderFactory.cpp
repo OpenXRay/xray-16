@@ -10,6 +10,7 @@
 #include "fgThunderboltRender.h"
 #include "fgRainRender.h"
 #include "fgLensFlareRender.h"
+#include "fgFlareRender.h"
 #include "fgEnvironmentRender.h"
 #include "dxObjectSpaceRender.h"
 #endif // _EDITOR
@@ -103,7 +104,15 @@ void dxRenderFactory::DestroyEnvDescriptorRender(IEnvDescriptorRender* pObject)
     auto* p = static_cast<FGEnvDescriptorRender*>(pObject);
     xr_delete(p);
 }
-RENDER_FACTORY_IMPLEMENT(FlareRender)
+IFlareRender* dxRenderFactory::CreateFlareRender()
+{
+    return xr_new<FGFlareRender>();
+}
+void dxRenderFactory::DestroyFlareRender(IFlareRender* pObject)
+{
+    auto* p = static_cast<FGFlareRender*>(pObject);
+    xr_delete(p);
+}
 #endif
 RENDER_FACTORY_IMPLEMENT(FontRender)
 } // namespace xray::render::fg
