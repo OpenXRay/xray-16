@@ -7,7 +7,7 @@
 #include "log.h"
 #include "Threading/ScopeLock.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <csignal>
 

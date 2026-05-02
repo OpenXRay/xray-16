@@ -7,8 +7,8 @@
 #include <vulkan/vulkan.hpp>
 #include <nvrhi/vulkan.h>
 #include <nvrhi/validation.h>
-#include <SDL.h>
-#include <SDL_vulkan.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -103,10 +103,9 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
         deviceDesc.computeQueueIndex = static_cast<int>(m_computeQueueFamily);
     }
 
-    u32 sdlExtCount = 0;
-    SDL_Vulkan_GetInstanceExtensions(window, &sdlExtCount, nullptr);
-    xr_vector<const char*> instanceExts(sdlExtCount);
-    SDL_Vulkan_GetInstanceExtensions(window, &sdlExtCount, instanceExts.data());
+    Uint32 sdlExtCount = 0;
+    const char* const* sdlExts = SDL_Vulkan_GetInstanceExtensions(&sdlExtCount);
+    xr_vector<const char*> instanceExts(sdlExts, sdlExts + sdlExtCount);
     instanceExts.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     deviceDesc.instanceExtensions = instanceExts.data();
     deviceDesc.numInstanceExtensions = instanceExts.size();
@@ -232,16 +231,13 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_API_VERSION_1_2;
 
-    u32 sdlExtCount = 0;
-    if (!SDL_Vulkan_GetInstanceExtensions(window, &sdlExtCount, nullptr)) {
-        Msg("! [VulkanBackend] SDL_Vulkan_GetInstanceExtensions(count) failed: %s", SDL_GetError());
+    Uint32 sdlExtCount = 0;
+    const char* const* sdlExts = SDL_Vulkan_GetInstanceExtensions(&sdlExtCount);
+    if (!sdlExts) {
+        Msg("! [VulkanBackend] SDL_Vulkan_GetInstanceExtensions failed: %s", SDL_GetError());
         return false;
     }
-    xr_vector<const char*> extensions(sdlExtCount);
-    if (!SDL_Vulkan_GetInstanceExtensions(window, &sdlExtCount, extensions.data())) {
-        Msg("! [VulkanBackend] SDL_Vulkan_GetInstanceExtensions(names) failed: %s", SDL_GetError());
-        return false;
-    }
+    xr_vector<const char*> extensions(sdlExts, sdlExts + sdlExtCount);
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #if defined(XR_PLATFORM_APPLE)
     extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
@@ -327,7 +323,7 @@ bool VulkanBackend::SelectPhysicalDevice() {
 }
 
 bool VulkanBackend::CreateSurface(SDL_Window* window) {
-    if (!SDL_Vulkan_CreateSurface(window, m_instance, &m_surface)) {
+    if (!SDL_Vulkan_CreateSurface(window, m_instance, nullptr, &m_surface)) {
         Msg("! [VulkanBackend] SDL_Vulkan_CreateSurface failed: %s", SDL_GetError());
         return false;
     }

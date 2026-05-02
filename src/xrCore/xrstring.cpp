@@ -6,7 +6,7 @@
 #include "xrCore/_std_extensions.h"
 
 #include "FS_impl.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 XRCORE_API str_container* g_pStringContainer = nullptr;
 

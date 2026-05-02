@@ -73,27 +73,34 @@ CInput::CInput(const bool exclusive)
     //===================== Dummy pack
     iCapture(&dummyController);
 
-    SDL_SetHint(SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4, "1"); // We need to handle it manually
 
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH);
 
-    mouseCursors[SDL_SYSTEM_CURSOR_ARROW]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-    mouseCursors[SDL_SYSTEM_CURSOR_IBEAM]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
+    mouseCursors[SDL_SYSTEM_CURSOR_DEFAULT]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
+    mouseCursors[SDL_SYSTEM_CURSOR_TEXT]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_TEXT);
     mouseCursors[SDL_SYSTEM_CURSOR_WAIT]      = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
     mouseCursors[SDL_SYSTEM_CURSOR_CROSSHAIR] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
-    mouseCursors[SDL_SYSTEM_CURSOR_WAITARROW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAITARROW);
-    mouseCursors[SDL_SYSTEM_CURSOR_SIZENWSE]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
-    mouseCursors[SDL_SYSTEM_CURSOR_SIZENESW]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
-    mouseCursors[SDL_SYSTEM_CURSOR_SIZEWE]    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
-    mouseCursors[SDL_SYSTEM_CURSOR_SIZENS]    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
-    mouseCursors[SDL_SYSTEM_CURSOR_SIZEALL]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
-    mouseCursors[SDL_SYSTEM_CURSOR_NO]        = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
-    mouseCursors[SDL_SYSTEM_CURSOR_HAND]      = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+    mouseCursors[SDL_SYSTEM_CURSOR_PROGRESS] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_PROGRESS);
+    mouseCursors[SDL_SYSTEM_CURSOR_NWSE_RESIZE]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NWSE_RESIZE);
+    mouseCursors[SDL_SYSTEM_CURSOR_NESW_RESIZE]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NESW_RESIZE);
+    mouseCursors[SDL_SYSTEM_CURSOR_EW_RESIZE]    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_EW_RESIZE);
+    mouseCursors[SDL_SYSTEM_CURSOR_NS_RESIZE]    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NS_RESIZE);
+    mouseCursors[SDL_SYSTEM_CURSOR_MOVE]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_MOVE);
+    mouseCursors[SDL_SYSTEM_CURSOR_NOT_ALLOWED]        = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NOT_ALLOWED);
+    mouseCursors[SDL_SYSTEM_CURSOR_POINTER]      = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_POINTER);
 
-    for (int i = 0; i < SDL_NumJoysticks(); ++i)
-        OpenController(i);
+    {
+        int joystickCount = 0;
+        SDL_JoystickID* joysticks = SDL_GetJoysticks(&joystickCount);
+        if (joysticks)
+        {
+            for (int i = 0; i < joystickCount; ++i)
+                OpenController(joysticks[i]);
+            SDL_free(joysticks);
+        }
+    }
 }
 
 CInput::~CInput()
@@ -103,11 +110,11 @@ CInput::~CInput()
     GrabInput(false);
 
     for (auto& controller : controllers)
-        SDL_GameControllerClose(controller);
+        SDL_CloseGamepad(controller);
 
     for (auto& cursor : mouseCursors)
     {
-        SDL_FreeCursor(cursor);
+        SDL_DestroyCursor(cursor);
         cursor = nullptr;
     }
     lastCursor = nullptr;
@@ -119,15 +126,15 @@ CInput::~CInput()
 
 void CInput::OpenController(int idx)
 {
-    if (!SDL_IsGameController(idx))
+    if (!SDL_IsGamepad(idx))
         return;
 
-    const auto controller = SDL_GameControllerOpen(idx);
+    const auto controller = SDL_OpenGamepad(idx);
     if (!controller)
         return;
 
     if (psControllerFlags.test(ControllerEnableSensors))
-        SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
+        SDL_SetGamepadSensorEnabled(controller, SDL_SENSOR_GYRO, true);
 
     controllers.emplace_back(controller);
 }
@@ -150,7 +157,7 @@ void CInput::SetCurrentInputType(InputType type)
         if (psControllerFlags.test(ControllerEnableSensors))
         {
             for (auto controller : controllers)
-                SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_FALSE);
+                SDL_SetGamepadSensorEnabled(controller, SDL_SENSOR_GYRO, false);
         }
         break;
 
@@ -158,14 +165,14 @@ void CInput::SetCurrentInputType(InputType type)
         if (psControllerFlags.test(ControllerEnableSensors))
         {
             for (auto controller : controllers)
-                SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
+                SDL_SetGamepadSensorEnabled(controller, SDL_SENSOR_GYRO, true);
         }
         break;
     }
     // Always flush it. On the first controller invocation,
     // prefer to receive sensor updates "from scratch",
     // on the next frame.
-    SDL_FlushEvent(SDL_CONTROLLERSENSORUPDATE);
+    SDL_FlushEvent(SDL_EVENT_GAMEPAD_SENSOR_UPDATE);
 }
 
 void CInput::MouseUpdate()
@@ -189,7 +196,7 @@ void CInput::MouseUpdate()
     SDL_Event events[MAX_MOUSE_EVENTS];
     SDL_PumpEvents();
     const auto count = SDL_PeepEvents(events, MAX_MOUSE_EVENTS,
-        SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
+        SDL_GETEVENT, SDL_EVENT_MOUSE_MOTION, SDL_EVENT_MOUSE_WHEEL);
 
     for (int i = 0; i < count; ++i)
     {
@@ -197,34 +204,34 @@ void CInput::MouseUpdate()
 
         switch (event.type)
         {
-        case SDL_MOUSEMOTION:
+        case SDL_EVENT_MOUSE_MOTION:
             mouseMoved = true;
-            offs[0] += event.motion.xrel;
-            offs[1] += event.motion.yrel;
-            mouseAxisState[0] = event.motion.x;
-            mouseAxisState[1] = event.motion.y;
+            offs[0] += static_cast<int>(event.motion.xrel);
+            offs[1] += static_cast<int>(event.motion.yrel);
+            mouseAxisState[0] = static_cast<int>(event.motion.x);
+            mouseAxisState[1] = static_cast<int>(event.motion.y);
             break;
 
-        case SDL_MOUSEBUTTONDOWN:
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
         {
             const auto idx = RemapIdx[event.button.button - 1];
             mouseState[idx] = true;
             cbStack.back()->IR_OnMousePress(IdxToKey[idx]);
             break;
         }
-        case SDL_MOUSEBUTTONUP:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
         {
             const auto idx = RemapIdx[event.button.button - 1];
             mouseState[idx] = false;
             cbStack.back()->IR_OnMouseRelease(IdxToKey[idx]);
             break;
         }
-        case SDL_MOUSEWHEEL:
+        case SDL_EVENT_MOUSE_WHEEL:
             mouseMoved = true;
-            scroll[0] += event.wheel.preciseX;
-            scroll[1] += event.wheel.preciseY;
-            mouseAxisState[2] += event.wheel.x;
-            mouseAxisState[3] += event.wheel.y;
+            scroll[0] += event.wheel.x;
+            scroll[1] += event.wheel.y;
+            mouseAxisState[2] += static_cast<int>(event.wheel.x);
+            mouseAxisState[3] += static_cast<int>(event.wheel.y);
             break;
         }
     }
@@ -251,7 +258,7 @@ void CInput::KeyUpdate()
 
     SDL_Event events[MAX_KEYBOARD_EVENTS];
     const auto count = SDL_PeepEvents(events, MAX_KEYBOARD_EVENTS,
-        SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED);
+        SDL_GETEVENT, SDL_EVENT_KEY_DOWN, SDL_EVENT_KEYMAP_CHANGED);
 
     // Let iGetAsyncKeyState work correctly during this frame immediately
     for (int i = 0; i < count; ++i)
@@ -260,14 +267,14 @@ void CInput::KeyUpdate()
 
         switch (event.type)
         {
-        case SDL_KEYDOWN:
+        case SDL_EVENT_KEY_DOWN:
             if (event.key.repeat)
                 continue;
-            keyboardState[event.key.keysym.scancode] = true;
+            keyboardState[event.key.scancode] = true;
             break;
 
-        case SDL_KEYUP:
-            keyboardState[event.key.keysym.scancode] = false;
+        case SDL_EVENT_KEY_UP:
+            keyboardState[event.key.scancode] = false;
             break;
         }
     }
@@ -296,23 +303,23 @@ void CInput::KeyUpdate()
 
         switch (event.type)
         {
-        case SDL_KEYDOWN:
+        case SDL_EVENT_KEY_DOWN:
             if (event.key.repeat)
                 continue;
-            cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
+            cbStack.back()->IR_OnKeyboardPress(event.key.scancode);
             break;
 
-        case SDL_KEYUP:
-            cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
+        case SDL_EVENT_KEY_UP:
+            cbStack.back()->IR_OnKeyboardRelease(event.key.scancode);
             break;
 
-        case SDL_TEXTINPUT:
+        case SDL_EVENT_TEXT_INPUT:
             if (cnt != textInputCounter)
                 continue; // if input target changed, skip this frame
             cbStack.back()->IR_OnTextInput(event.text.text);
             break;
 
-        case SDL_KEYMAPCHANGED:
+        case SDL_EVENT_KEYMAP_CHANGED:
             seqKeyMapChanged.Process();
             break;
         }
@@ -360,27 +367,27 @@ void CInput::ControllerUpdate()
 
     SDL_Event events[MAX_CONTROLLER_EVENTS];
     auto count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
-        SDL_GETEVENT, SDL_CONTROLLERDEVICEADDED, SDL_CONTROLLERDEVICEREMAPPED);
+        SDL_GETEVENT, SDL_EVENT_GAMEPAD_ADDED, SDL_EVENT_GAMEPAD_REMAPPED);
 
     for (int i = 0; i < count; ++i)
     {
         const SDL_Event& event = events[i];
         switch (event.type)
         {
-        case SDL_CONTROLLERDEVICEADDED:
-            OpenController(event.cdevice.which);
+        case SDL_EVENT_GAMEPAD_ADDED:
+            OpenController(event.gdevice.which);
             break;
 
-        case SDL_CONTROLLERDEVICEREMOVED:
+        case SDL_EVENT_GAMEPAD_REMOVED:
         {
-            const auto controller = SDL_GameControllerFromInstanceID(event.cdevice.which);
+            const auto controller = SDL_GetGamepadFromID(event.gdevice.which);
             const auto it = std::find(controllers.begin(), controllers.end(), controller);
             if (it != controllers.end())
                 controllers.erase(it);
             break;
         }
 
-        case SDL_CONTROLLERDEVICEREMAPPED:
+        case SDL_EVENT_GAMEPAD_REMAPPED:
             // We are skipping it,
             // but it's in the SDL_PeepEvents call
             // to make sure it's removed from event queue
@@ -392,7 +399,7 @@ void CInput::ControllerUpdate()
         return;
 
     count = SDL_PeepEvents(nullptr, 0,
-        SDL_PEEKEVENT, SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERTOUCHPADUP);
+        SDL_PEEKEVENT, SDL_EVENT_GAMEPAD_AXIS_MOTION, SDL_EVENT_GAMEPAD_TOUCHPAD_UP);
 
     if (count)
         SetCurrentInputType(Controller);
@@ -401,14 +408,14 @@ void CInput::ControllerUpdate()
 
     SDL_PumpEvents();
     count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
-        SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERSENSORUPDATE);
+        SDL_GETEVENT, SDL_EVENT_GAMEPAD_AXIS_MOTION, SDL_EVENT_GAMEPAD_SENSOR_UPDATE);
 
     constexpr ControllerAxisState pressedAxis{ 1.0f };
     constexpr ControllerAxisState releasedAxis{};
 
-    static_assert(SDL_CONTROLLER_AXIS_MAX == 6, "Align the depending code with the changes in SDL_GameControllerAxis.");
-    static float axes[SDL_CONTROLLER_AXIS_MAX]{};
-    bool axisMoved[SDL_CONTROLLER_AXIS_MAX]{};
+    static_assert(SDL_GAMEPAD_AXIS_COUNT == 6, "Align the depending code with the changes in SDL_GamepadAxis.");
+    static float axes[SDL_GAMEPAD_AXIS_COUNT]{};
+    bool axisMoved[SDL_GAMEPAD_AXIS_COUNT]{};
     const auto controllerPrev = controllerState;
 
     for (int i = 0; i < count; ++i)
@@ -417,40 +424,40 @@ void CInput::ControllerUpdate()
 
         switch (event.type)
         {
-        case SDL_CONTROLLERAXISMOTION:
+        case SDL_EVENT_GAMEPAD_AXIS_MOTION:
         {
-            if (controllerState.id != event.caxis.which) // don't write if don't really need to
-                controllerState.id = event.caxis.which;
+            if (controllerState.id != event.gaxis.which) // don't write if don't really need to
+                controllerState.id = event.gaxis.which;
 
-            axisMoved[event.caxis.axis] = true;
-            axes[event.caxis.axis] = event.caxis.value;
+            axisMoved[event.gaxis.axis] = true;
+            axes[event.gaxis.axis] = event.gaxis.value;
             break;
         }
 
-        case SDL_CONTROLLERBUTTONDOWN:
-            if (controllerState.id != event.cbutton.which) // don't write if don't really need to
-                controllerState.id = event.cbutton.which;
+        case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+            if (controllerState.id != event.gbutton.which) // don't write if don't really need to
+                controllerState.id = event.gbutton.which;
 
-            controllerState.buttons[event.cbutton.button] = true;
-            cbStack.back()->IR_OnControllerPress(ControllerButtonToKey[event.cbutton.button], pressedAxis);
+            controllerState.buttons[event.gbutton.button] = true;
+            cbStack.back()->IR_OnControllerPress(ControllerButtonToKey[event.gbutton.button], pressedAxis);
             break;
 
-        case SDL_CONTROLLERBUTTONUP:
-            if (controllerState.id != event.cbutton.which) // don't write if don't really need to
-                controllerState.id = event.cbutton.which;
+        case SDL_EVENT_GAMEPAD_BUTTON_UP:
+            if (controllerState.id != event.gbutton.which) // don't write if don't really need to
+                controllerState.id = event.gbutton.which;
 
-            controllerState.buttons[event.cbutton.button] = false;
-            cbStack.back()->IR_OnControllerRelease(ControllerButtonToKey[event.cbutton.button], releasedAxis);
+            controllerState.buttons[event.gbutton.button] = false;
+            cbStack.back()->IR_OnControllerRelease(ControllerButtonToKey[event.gbutton.button], releasedAxis);
             break;
 
-        case SDL_CONTROLLERSENSORUPDATE:
+        case SDL_EVENT_GAMEPAD_SENSOR_UPDATE:
         {
-            if (controllerState.id != event.csensor.which)
+            if (controllerState.id != event.gsensor.which)
                 break; // only use data from the recently used controller
-            if (event.csensor.sensor != SDL_SENSOR_GYRO)
+            if (event.gsensor.sensor != SDL_SENSOR_GYRO)
                 break;
 
-            controllerState.gyroscope = Fvector{ -event.csensor.data[1], -event.csensor.data[0], -event.csensor.data[2] };
+            controllerState.gyroscope = Fvector{ -event.gsensor.data[1], -event.gsensor.data[0], -event.gsensor.data[2] };
             if (controllerState.attitude_changed())
                 cbStack.back()->IR_OnControllerAttitudeChange(controllerState.gyroscope);
             break;
@@ -523,7 +530,7 @@ bool KbdKeyToButtonName(const int dik, xr_string& result)
 
     if (dik >= 0)
     {
-        cpcstr name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik));
+        cpcstr name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik, SDL_KMOD_NONE, false));
         if (name && name[0])
         {
             result = StringFromUTF8(name, locale);
@@ -595,17 +602,17 @@ void CInput::iGetAsyncScrollPos(Ivector2& p) const
 
 bool CInput::iGetAsyncMousePos(Ivector2& p, bool global /*= false*/) const
 {
+    float fx = 0.0f, fy = 0.0f;
     if (global)
     {
-#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE
-        SDL_GetGlobalMouseState(&p.x, &p.y);
+        SDL_GetGlobalMouseState(&fx, &fy);
+        p.x = static_cast<int>(fx);
+        p.y = static_cast<int>(fy);
         return true;
-#endif
-        // if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE unavailable
-        // fallback to SDL_GetMouseState
-        // but report false
     }
-    SDL_GetMouseState(&p.x, &p.y);
+    SDL_GetMouseState(&fx, &fy);
+    p.x = static_cast<int>(fx);
+    p.y = static_cast<int>(fy);
     return !global;
 }
 
@@ -613,31 +620,22 @@ bool CInput::iSetMousePos(const Ivector2& p, bool global /*= false*/) const
 {
     if (global)
     {
-#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE
-        SDL_WarpMouseGlobal(p.x, p.y);
+        SDL_WarpMouseGlobal(static_cast<float>(p.x), static_cast<float>(p.y));
         return true;
-#endif
-        // if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE unavailable
-        // fallback to SDL_WarpMouseInWindow
-        // but report false
     }
 
-    SDL_WarpMouseInWindow(Device.m_sdlWnd, p.x, p.y);
+    SDL_WarpMouseInWindow(Device.m_sdlWnd, static_cast<float>(p.x), static_cast<float>(p.y));
     return !global;
 }
 
 void CInput::GrabInput(const bool grab)
 {
-    // Self descriptive
     ShowCursor(!grab);
 
-    // Clip cursor to the current window
-    // If SDL_HINT_GRAB_KEYBOARD is set then the keyboard will be grabbed too
-    SDL_SetWindowGrab(Device.m_sdlWnd, grab ? SDL_TRUE : SDL_FALSE);
+    SDL_SetWindowMouseGrab(Device.m_sdlWnd, grab);
 
-    // Grab the mouse
     if (exclusiveInput)
-        SDL_SetRelativeMouseMode(grab ? SDL_TRUE : SDL_FALSE);
+        SDL_SetWindowRelativeMouseMode(Device.m_sdlWnd, grab);
 
     // We're done here.
     inputGrabbed = grab;
@@ -650,7 +648,10 @@ bool CInput::InputIsGrabbed() const
 
 void CInput::ShowCursor(const bool show)
 {
-    SDL_ShowCursor(show ? SDL_TRUE : SDL_FALSE);
+    if (show)
+        SDL_ShowCursor();
+    else
+        SDL_HideCursor();
 }
 
 void CInput::SetCursor(const SDL_SystemCursor cursor)
@@ -668,10 +669,10 @@ void CInput::EnableTextInput()
     ++textInputCounter;
 
     if (textInputCounter == 1)
-        SDL_StartTextInput();
+        SDL_StartTextInput(Device.m_sdlWnd);
 
     SDL_PumpEvents();
-    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+    SDL_FlushEvents(SDL_EVENT_TEXT_EDITING, SDL_EVENT_TEXT_INPUT);
 }
 
 void CInput::DisableTextInput()
@@ -681,10 +682,10 @@ void CInput::DisableTextInput()
         textInputCounter = 0;
 
     if (textInputCounter == 0)
-        SDL_StopTextInput();
+        SDL_StopTextInput(Device.m_sdlWnd);
 
     SDL_PumpEvents();
-    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+    SDL_FlushEvents(SDL_EVENT_TEXT_EDITING, SDL_EVENT_TEXT_INPUT);
 }
 
 bool CInput::IsTextInputEnabled() const
@@ -813,8 +814,8 @@ void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
     {
         if (controllerState.id != -1)
         {
-            const auto controller = SDL_GameControllerFromInstanceID(controllerState.id);
-            SDL_GameControllerRumble(controller, s1_rumble, s2_rumble, duration_ms);
+            const auto controller = SDL_GetGamepadFromID(controllerState.id);
+            SDL_RumbleGamepad(controller, s1_rumble, s2_rumble, duration_ms);
         }
         break;
     }
@@ -823,8 +824,8 @@ void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
     {
         if (controllerState.id != -1)
         {
-            const auto controller = SDL_GameControllerFromInstanceID(controllerState.id);
-            SDL_GameControllerRumbleTriggers(controller, s1_rumble, s2_rumble, duration_ms);
+            const auto controller = SDL_GetGamepadFromID(controllerState.id);
+            SDL_RumbleGamepadTriggers(controller, s1_rumble, s2_rumble, duration_ms);
         }
         break;
     }

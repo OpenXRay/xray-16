@@ -125,27 +125,14 @@ void ide::ProcessEvent(const SDL_Event& event)
 
     switch (event.type)
     {
-    case SDL_WINDOWEVENT:
-    {
-        const auto window = SDL_GetWindowFromID(event.window.windowID);
-        if (!window)
-            break;
-        const ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window);
-        if (!viewport)
-            break;
-
-        switch (event.window.event)
-        {
-        case SDL_WINDOWEVENT_ENTER:
-            bd.mouse_window_id = event.window.windowID;
-            bd.mouse_last_leave_frame = 0;
-            break;
-        case SDL_WINDOWEVENT_LEAVE:
-            bd.mouse_last_leave_frame = ImGui::GetFrameCount() + 1;
-            break;
-        } // switch (event.window.event)
+    case SDL_EVENT_WINDOW_MOUSE_ENTER:
+        bd.mouse_window_id = event.window.windowID;
+        bd.mouse_last_leave_frame = 0;
+        break;
+    case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+        bd.mouse_last_leave_frame = ImGui::GetFrameCount() + 1;
+        break;
     }
-    } // switch (event.type)
 }
 
 void ide::UpdateMouseData()
@@ -168,9 +155,9 @@ void ide::UpdateMouseData()
     else
         io.BackendFlags &= ~ImGuiBackendFlags_HasMouseHoveredViewport;
 
-    // We forward mouse input when hovered or captured (via SDL_MOUSEMOTION) or when focused (below)
+    // We forward mouse input when hovered or captured (via SDL_EVENT_MOUSE_MOTION) or when focused (below)
 #if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE && defined(IMGUI_ENABLE_VIEWPORTS)
-    SDL_CaptureMouse(anyMouseButtonPressed ? SDL_TRUE : SDL_FALSE);
+    SDL_CaptureMouse(anyMouseButtonPressed ? true : false);
     SDL_Window* focused_window = SDL_GetKeyboardFocus();
     const bool is_app_focused = focused_window && (Device.m_sdlWnd == focused_window || ImGui::FindViewportByPlatformHandle(focused_window));
 #else
@@ -206,15 +193,15 @@ SDL_SystemCursor get_sdl_cursor(ImGuiMouseCursor cursor)
         VERIFY(false);
         [[fallthrough]];
 
-    case ImGuiMouseCursor_Arrow:        return SDL_SYSTEM_CURSOR_ARROW;
-    case ImGuiMouseCursor_TextInput:    return SDL_SYSTEM_CURSOR_IBEAM;
-    case ImGuiMouseCursor_ResizeAll:    return SDL_SYSTEM_CURSOR_SIZEALL;
-    case ImGuiMouseCursor_ResizeNS:     return SDL_SYSTEM_CURSOR_SIZENS;
-    case ImGuiMouseCursor_ResizeEW:     return SDL_SYSTEM_CURSOR_SIZEWE;
-    case ImGuiMouseCursor_ResizeNESW:   return SDL_SYSTEM_CURSOR_SIZENESW;
-    case ImGuiMouseCursor_ResizeNWSE:   return SDL_SYSTEM_CURSOR_SIZENWSE;
-    case ImGuiMouseCursor_Hand:         return SDL_SYSTEM_CURSOR_HAND;
-    case ImGuiMouseCursor_NotAllowed:   return SDL_SYSTEM_CURSOR_NO;
+    case ImGuiMouseCursor_Arrow:        return SDL_SYSTEM_CURSOR_DEFAULT;
+    case ImGuiMouseCursor_TextInput:    return SDL_SYSTEM_CURSOR_TEXT;
+    case ImGuiMouseCursor_ResizeAll:    return SDL_SYSTEM_CURSOR_MOVE;
+    case ImGuiMouseCursor_ResizeNS:     return SDL_SYSTEM_CURSOR_NS_RESIZE;
+    case ImGuiMouseCursor_ResizeEW:     return SDL_SYSTEM_CURSOR_EW_RESIZE;
+    case ImGuiMouseCursor_ResizeNESW:   return SDL_SYSTEM_CURSOR_NESW_RESIZE;
+    case ImGuiMouseCursor_ResizeNWSE:   return SDL_SYSTEM_CURSOR_NWSE_RESIZE;
+    case ImGuiMouseCursor_Hand:         return SDL_SYSTEM_CURSOR_POINTER;
+    case ImGuiMouseCursor_NotAllowed:   return SDL_SYSTEM_CURSOR_NOT_ALLOWED;
     }
 }
 
@@ -475,22 +462,22 @@ void ide::IR_OnControllerPress(int key, const ControllerAxisState& state)
 #define MAP_ANALOG(KEY_NO, AXIS_NO, V0, V1)                                                              \
     do                                                                                                   \
     {                                                                                                    \
-        float vn = (float)(SDL_GameControllerGetAxis(nullptr, AXIS_NO) - V0) / (float)(V1 - V0); \
+        float vn = (float)(SDL_GetGamepadAxis(nullptr, AXIS_NO) - V0) / (float)(V1 - V0); \
         vn = IM_SATURATE(vn);                                                                            \
         io.AddKeyAnalogEvent(KEY_NO, vn > 0.1f, vn);                                                     \
     } while (false)
 
     const int thumb_dead_zone = 8000;           // SDL_gamecontroller.h suggests using this value.
 
-    MAP_ANALOG(ImGuiKey_GamepadLStickLeft,  SDL_CONTROLLER_AXIS_LEFTX,  -thumb_dead_zone, -32768);
-    MAP_ANALOG(ImGuiKey_GamepadLStickRight, SDL_CONTROLLER_AXIS_LEFTX,  +thumb_dead_zone, +32767);
-    MAP_ANALOG(ImGuiKey_GamepadLStickUp,    SDL_CONTROLLER_AXIS_LEFTY,  -thumb_dead_zone, -32768);
-    MAP_ANALOG(ImGuiKey_GamepadLStickDown,  SDL_CONTROLLER_AXIS_LEFTY,  +thumb_dead_zone, +32767);
+    MAP_ANALOG(ImGuiKey_GamepadLStickLeft,  SDL_GAMEPAD_AXIS_LEFTX,  -thumb_dead_zone, -32768);
+    MAP_ANALOG(ImGuiKey_GamepadLStickRight, SDL_GAMEPAD_AXIS_LEFTX,  +thumb_dead_zone, +32767);
+    MAP_ANALOG(ImGuiKey_GamepadLStickUp,    SDL_GAMEPAD_AXIS_LEFTY,  -thumb_dead_zone, -32768);
+    MAP_ANALOG(ImGuiKey_GamepadLStickDown,  SDL_GAMEPAD_AXIS_LEFTY,  +thumb_dead_zone, +32767);
 
-    MAP_ANALOG(ImGuiKey_GamepadRStickLeft,  SDL_CONTROLLER_AXIS_RIGHTX, -thumb_dead_zone, -32768);
-    MAP_ANALOG(ImGuiKey_GamepadRStickRight, SDL_CONTROLLER_AXIS_RIGHTX, +thumb_dead_zone, +32767);
-    MAP_ANALOG(ImGuiKey_GamepadRStickUp,    SDL_CONTROLLER_AXIS_RIGHTY, -thumb_dead_zone, -32768);
-    MAP_ANALOG(ImGuiKey_GamepadRStickDown,  SDL_CONTROLLER_AXIS_RIGHTY, +thumb_dead_zone, +32767);
+    MAP_ANALOG(ImGuiKey_GamepadRStickLeft,  SDL_GAMEPAD_AXIS_RIGHTX, -thumb_dead_zone, -32768);
+    MAP_ANALOG(ImGuiKey_GamepadRStickRight, SDL_GAMEPAD_AXIS_RIGHTX, +thumb_dead_zone, +32767);
+    MAP_ANALOG(ImGuiKey_GamepadRStickUp,    SDL_GAMEPAD_AXIS_RIGHTY, -thumb_dead_zone, -32768);
+    MAP_ANALOG(ImGuiKey_GamepadRStickDown,  SDL_GAMEPAD_AXIS_RIGHTY, +thumb_dead_zone, +32767);
 #undef MAP_ANALOG
 #undef IM_SATURATE*/
 }

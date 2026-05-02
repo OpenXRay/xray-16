@@ -2,7 +2,7 @@
 
 #include <bitset>
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include "xrCore/_vector2.h"
 
@@ -16,7 +16,7 @@ DECLARE_MESSAGE(KeyMapChanged);
 
 enum EMouseButton
 {
-    MOUSE_INVALID = SDL_NUM_SCANCODES,
+    MOUSE_INVALID = SDL_SCANCODE_COUNT,
     MOUSE_1, // Left
     MOUSE_2, // Right
     MOUSE_3, // Middle
@@ -66,8 +66,8 @@ enum EControllerAxis
     XR_CONTROLLER_AXIS_COUNT = XR_CONTROLLER_AXIS_MAX - XR_CONTROLLER_AXIS_INVALID - 1
 };
 
-static_assert(SDL_CONTROLLER_AXIS_MAX == 6,
-    "EControllerAxis needs to be updated to match changes in SDL_GameControllerAxis.");
+static_assert(SDL_GAMEPAD_AXIS_COUNT == 6,
+    "EControllerAxis needs to be updated to match changes in SDL_GamepadAxis.");
 
 struct ControllerAxisState
 {
@@ -166,7 +166,7 @@ public:
     {
         COUNT_MOUSE_BUTTONS = MOUSE_COUNT,
         COUNT_MOUSE_AXIS = 4,
-        COUNT_KB_BUTTONS = SDL_NUM_SCANCODES,
+        COUNT_KB_BUTTONS = SDL_SCANCODE_COUNT,
     };
 
     struct InputStatistics
@@ -187,7 +187,7 @@ private:
 
     xr_vector<IInputReceiver*> cbStack;
 
-    xr_vector<SDL_GameController*> controllers;
+    xr_vector<SDL_Gamepad*> controllers;
 
     void SetCurrentInputType(InputType type);
 
@@ -206,7 +206,7 @@ private:
     bool exclusiveInput;
     bool inputGrabbed;
 
-    SDL_Cursor* mouseCursors[SDL_NUM_SYSTEM_CURSORS]{};
+    SDL_Cursor* mouseCursors[SDL_SYSTEM_CURSOR_COUNT]{};
     SDL_Cursor* lastCursor{};
 
 public:

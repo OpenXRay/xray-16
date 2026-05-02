@@ -464,17 +464,13 @@ void key_binding_registrator::script_register(lua_State* luaState)
 
                 value("DIK_MODE",                   int(SDL_SCANCODE_MODE)),
 
-                value("DIK_AUDIONEXT",              int(SDL_SCANCODE_AUDIONEXT)),
-                value("DIK_AUDIOPREV",              int(SDL_SCANCODE_AUDIOPREV)),
-                value("DIK_AUDIOSTOP",              int(SDL_SCANCODE_AUDIOSTOP)),
-                value("DIK_AUDIOPLAY",              int(SDL_SCANCODE_AUDIOPLAY)),
-                value("DIK_AUDIOMUTE",              int(SDL_SCANCODE_AUDIOMUTE)),
+                value("DIK_AUDIONEXT",              int(SDL_SCANCODE_MEDIA_NEXT_TRACK)),
+                value("DIK_AUDIOPREV",              int(SDL_SCANCODE_MEDIA_PREVIOUS_TRACK)),
+                value("DIK_AUDIOSTOP",              int(SDL_SCANCODE_MEDIA_STOP)),
+                value("DIK_AUDIOPLAY",              int(SDL_SCANCODE_MEDIA_PLAY)),
+                value("DIK_AUDIOMUTE",              int(SDL_SCANCODE_MUTE)),
 
-                value("DIK_NUMPAD_MEDIASELECT",     int(SDL_SCANCODE_MEDIASELECT)),
-                value("DIK_NUMPAD_WWW",             int(SDL_SCANCODE_WWW)),
-                value("DIK_NUMPAD_MAIL",            int(SDL_SCANCODE_MAIL)),
-                value("DIK_NUMPAD_CALCULATOR",      int(SDL_SCANCODE_CALCULATOR)),
-                value("DIK_NUMPAD_COMPUTER",        int(SDL_SCANCODE_COMPUTER)),
+                value("DIK_NUMPAD_MEDIASELECT",     int(SDL_SCANCODE_MEDIA_SELECT)),
 
                 value("DIK_NUMPAD_AC_SEARCH",       int(SDL_SCANCODE_AC_SEARCH)),
                 value("DIK_NUMPAD_AC_HOME",         int(SDL_SCANCODE_AC_HOME)),
@@ -484,19 +480,8 @@ void key_binding_registrator::script_register(lua_State* luaState)
                 value("DIK_NUMPAD_AC_REFRESH",      int(SDL_SCANCODE_AC_REFRESH)),
                 value("DIK_NUMPAD_AC_BOOKMARKS",    int(SDL_SCANCODE_AC_BOOKMARKS)),
 
-                value("DIK_BRIGHTNESSDOWN",         int(SDL_SCANCODE_BRIGHTNESSDOWN)),
-                value("DIK_BRIGHTNESSUP",           int(SDL_SCANCODE_BRIGHTNESSUP)),
-                value("DIK_DISPLAYSWITCH",          int(SDL_SCANCODE_DISPLAYSWITCH)),
-
-                value("DIK_KBDILLUMTOGGLE)",        int(SDL_SCANCODE_KBDILLUMTOGGLE)),
-                value("DIK_KBDILLUMDOWN",           int(SDL_SCANCODE_KBDILLUMDOWN)),
-                value("DIK_KBDILLUMUP",             int(SDL_SCANCODE_KBDILLUMUP)),
-
-                value("DIK_EJECT",                  int(SDL_SCANCODE_EJECT)),
+                value("DIK_EJECT",                  int(SDL_SCANCODE_MEDIA_EJECT)),
                 value("DIK_SLEEP",                  int(SDL_SCANCODE_SLEEP)),
-
-                value("DIK_APP1",                   int(SDL_SCANCODE_APP1)),
-                value("DIK_APP2",                   int(SDL_SCANCODE_APP2)),
 
                 value("MOUSE_1",                    int(MOUSE_1)),
                 value("MOUSE_2",                    int(MOUSE_2)),

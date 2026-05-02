@@ -1,23 +1,58 @@
 #include "stdafx.h"
 
 #include <thread>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
-// Initialized on startup
+#if defined(_MSC_VER) || defined(__clang__)
+#   include <intrin.h>
+#endif
+
 XRCORE_API Fmatrix Fidentity;
 XRCORE_API CRandom Random;
 
+namespace
+{
+    struct CpuFeatures
+    {
+        bool sse{}, sse2{}, sse3{}, ssse3{}, sse4_1{}, sse4_2{}, avx{}, avx2{}, avx512f{};
+        CpuFeatures()
+        {
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_X86)
+            int leaf1[4]{}, leaf7[4]{};
+#   if defined(_MSC_VER) || defined(__clang__)
+            __cpuidex(leaf1, 1, 0);
+            __cpuidex(leaf7, 7, 0);
+#   else
+            __asm__ __volatile__("cpuid" : "=a"(leaf1[0]), "=b"(leaf1[1]), "=c"(leaf1[2]), "=d"(leaf1[3]) : "a"(1), "c"(0));
+            __asm__ __volatile__("cpuid" : "=a"(leaf7[0]), "=b"(leaf7[1]), "=c"(leaf7[2]), "=d"(leaf7[3]) : "a"(7), "c"(0));
+#   endif
+            sse     = (leaf1[3] >> 25) & 1;
+            sse2    = (leaf1[3] >> 26) & 1;
+            sse3    = (leaf1[2] >>  0) & 1;
+            ssse3   = (leaf1[2] >>  9) & 1;
+            sse4_1  = (leaf1[2] >> 19) & 1;
+            sse4_2  = (leaf1[2] >> 20) & 1;
+            avx     = (leaf1[2] >> 28) & 1;
+            avx2    = (leaf7[1] >>  5) & 1;
+            avx512f = (leaf7[1] >> 16) & 1;
+#endif
+        }
+    };
+    const CpuFeatures& cpu()
+    {
+        static const CpuFeatures features;
+        return features;
+    }
+}
+
 namespace CPU
 {
-XRCORE_API bool HasSSE     = SDL_HasSSE();
-XRCORE_API bool HasSSE2    = SDL_HasSSE2();
-XRCORE_API bool HasSSE42   = SDL_HasSSE42();
-
-XRCORE_API bool HasAVX     = SDL_HasAVX();
-
-XRCORE_API bool HasAVX2    = SDL_HasAVX2();
-
-XRCORE_API bool HasAVX512F = SDL_HasAVX512F();
+XRCORE_API bool HasSSE     = cpu().sse;
+XRCORE_API bool HasSSE2    = cpu().sse2;
+XRCORE_API bool HasSSE42   = cpu().sse4_2;
+XRCORE_API bool HasAVX     = cpu().avx;
+XRCORE_API bool HasAVX2    = cpu().avx2;
+XRCORE_API bool HasAVX512F = cpu().avx512f;
 
 XRCORE_API u64 qpc_freq = SDL_GetPerformanceFrequency();
 
@@ -32,7 +67,7 @@ XRCORE_API u64 QPC() noexcept
 
 XRCORE_API u32 GetTicks()
 {
-    return SDL_GetTicks();
+    return static_cast<u32>(SDL_GetTicks());
 }
 } // namespace CPU
 
@@ -59,26 +94,21 @@ void _initialize_cpu()
     };
 
     // x86
-    listFeature("RDTSC",   SDL_HasRDTSC());
-    listFeature("MMX",     SDL_HasMMX());
-    listFeature("3DNow!",  SDL_Has3DNow());
-    listFeature("SSE",     SDL_HasSSE());
+    listFeature("SSE",     CPU::HasSSE);
     listFeature("SSE2",    CPU::HasSSE2);
-    listFeature("SSE3",    SDL_HasSSE3());
-    listFeature("SSE41",   SDL_HasSSE41());
+    listFeature("SSE3",    cpu().sse3);
+    listFeature("SSSE3",   cpu().ssse3);
+    listFeature("SSE41",   cpu().sse4_1);
     listFeature("SSE42",   CPU::HasSSE42);
     listFeature("AVX",     CPU::HasAVX);
     listFeature("AVX2",    CPU::HasAVX2);
     listFeature("AVX512F", CPU::HasAVX512F);
 
-    // Other architectures
     listFeature("AltiVec", SDL_HasAltiVec());
     listFeature("ARMSIMD", SDL_HasARMSIMD());
     listFeature("NEON",    SDL_HasNEON());
-#if SDL_VERSION_ATLEAST(2, 24, 0)
     listFeature("LSX",     SDL_HasLSX());
     listFeature("LASX",    SDL_HasLASX());
-#endif
 
     Msg("* CPU features: %s", features);
     Msg("* CPU threads: %d", std::thread::hardware_concurrency());

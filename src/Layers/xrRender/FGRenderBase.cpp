@@ -9,7 +9,7 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 extern ENGINE_API int ps_r4_use_pbr;
 
@@ -63,7 +63,6 @@ void FGRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& f
 
 void FGRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 {
-    windowFlags |= SDL_WINDOW_SHOWN;
     if (ps_fg_render_mode == FG_RENDER_VULKAN)
         windowFlags |= SDL_WINDOW_VULKAN;
 }

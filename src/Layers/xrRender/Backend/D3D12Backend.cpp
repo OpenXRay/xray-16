@@ -11,8 +11,7 @@
 #include <dxgi1_5.h>  // For IDXGIFactory5 and DXGI_FEATURE_PRESENT_ALLOW_TEARING
 #include <nvrhi/d3d12.h>
 #include <nvrhi/validation.h>
-#include <SDL.h>
-#include <SDL_syswm.h>
+#include <SDL3/SDL.h>
 
 // Link D3D12 libraries
 #pragma comment(lib, "d3d12.lib")
@@ -67,13 +66,11 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
     Msg("* [D3D12Backend] Initializing...");
 
     // Get HWND from SDL window
-    SDL_SysWMinfo wmInfo;
-    SDL_VERSION(&wmInfo.version);
-    if (!SDL_GetWindowWMInfo(window, &wmInfo)) {
-        Msg("! [D3D12Backend] Failed to get window info: %s", SDL_GetError());
+    HWND hwnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+    if (!hwnd) {
+        Msg("! [D3D12Backend] Failed to get HWND: %s", SDL_GetError());
         return false;
     }
-    HWND hwnd = wmInfo.info.win.window;
 
     if (!CreateDXGIFactory(enableValidation)) {
         Shutdown();

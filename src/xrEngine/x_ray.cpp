@@ -216,8 +216,8 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         ZoneScopedN("SDL_Init");
         u32 flags = SDL_INIT_VIDEO;
         if (!strstr(commandLine, "-no_gamepad"))
-            flags |= SDL_INIT_GAMECONTROLLER;
-        R_ASSERT3(SDL_Init(flags) == 0, "Unable to initialize SDL", SDL_GetError());
+            flags |= SDL_INIT_GAMEPAD;
+        R_ASSERT3(SDL_Init(flags), "Unable to initialize SDL", SDL_GetError());
     }
 
 #ifdef XR_PLATFORM_WINDOWS
@@ -232,7 +232,6 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         ShowSplash(topmost);
     }
 
-    SDL_StopTextInput(); // It's enabled by default for some reason, we don't want it
     const auto& inputTask = TaskManager::AddTask([]
     {
         const bool captureInput = !strstr(Core.Params, "-i");
@@ -370,7 +369,12 @@ int CApplication::Run()
     HideSplash();
     Device.Run();
 
-    while (!SDL_QuitRequested()) // SDL_PumpEvents is here
+    auto quitRequested = []() {
+        SDL_PumpEvents();
+        return SDL_PeepEvents(nullptr, 0, SDL_PEEKEVENT, SDL_EVENT_QUIT, SDL_EVENT_QUIT) > 0;
+    };
+
+    while (!quitRequested())
     {
         FrameMarkStart(FRAME_MARK_APPLICATION_RUN);
         bool canCallActivate = false;
@@ -378,24 +382,20 @@ int CApplication::Run()
 
         SDL_Event events[MAX_WINDOW_EVENTS];
         const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
-            SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
+            SDL_GETEVENT, SDL_EVENT_WINDOW_FIRST, SDL_EVENT_WINDOW_LAST);
 
         for (int i = 0; i < count; ++i)
         {
             const SDL_Event event = events[i];
 
+            const auto window = SDL_GetWindowFromID(event.window.windowID);
+
             switch (event.type)
             {
-            case SDL_WINDOWEVENT:
-            {
-                const auto window = SDL_GetWindowFromID(event.window.windowID);
-
-                switch (event.window.event)
-                {
-                case SDL_WINDOWEVENT_SHOWN:
-                case SDL_WINDOWEVENT_FOCUS_GAINED:
-                case SDL_WINDOWEVENT_RESTORED:
-                case SDL_WINDOWEVENT_MAXIMIZED:
+                case SDL_EVENT_WINDOW_SHOWN:
+                case SDL_EVENT_WINDOW_FOCUS_GAINED:
+                case SDL_EVENT_WINDOW_RESTORED:
+                case SDL_EVENT_WINDOW_MAXIMIZED:
                     if (window != Device.m_sdlWnd)
                         Device.OnWindowActivate(window, true);
                     else
@@ -405,9 +405,9 @@ int CApplication::Run()
                     }
                     continue;
 
-                case SDL_WINDOWEVENT_HIDDEN:
-                case SDL_WINDOWEVENT_FOCUS_LOST:
-                case SDL_WINDOWEVENT_MINIMIZED:
+                case SDL_EVENT_WINDOW_HIDDEN:
+                case SDL_EVENT_WINDOW_FOCUS_LOST:
+                case SDL_EVENT_WINDOW_MINIMIZED:
                     if (window != Device.m_sdlWnd)
                         Device.OnWindowActivate(window, false);
                     else
@@ -416,9 +416,7 @@ int CApplication::Run()
                         shouldActivate = false;
                     }
                     continue;
-                } // switch (event.window.event)
             }
-            } // switch (event.type)
 
             // Only process event in Device
             // if it wasn't processed in the switch above
@@ -461,7 +459,9 @@ void CApplication::ShowSplash(bool topmost)
     if (topmost)
         flags |= SDL_WINDOW_ALWAYS_ON_TOP;
 
-    m_window = SDL_CreateWindow("OpenXRay", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_surface->w, m_surface->h, flags);
+    m_window = SDL_CreateWindow("OpenXRay", m_surface->w, m_surface->h, flags);
+    if (m_window)
+        SDL_SetWindowPosition(m_window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     SDL_ShowWindow(m_window);
 
     m_splash_thread = Threading::RunThread("Splash Thread", &CApplication::SplashProc, this);
@@ -498,7 +498,7 @@ void CApplication::HideSplash()
     SDL_DestroyWindow(m_window);
     m_window = nullptr;
 
-    SDL_FreeSurface(m_surface);
+    SDL_DestroySurface(m_surface);
 }
 
 void CApplication::InitializeDiscord()

@@ -373,81 +373,8 @@ class CCC_VidMode : public CCC_Token
 
 public:
     CCC_VidMode(pcstr name) : CCC_Token(name, &_dummy, nullptr) {}
-
-    void Execute(pcstr args) override
-    {
-        u32 w, h, r = 0;
-        const int cnt = sscanf(args, "%ux%u (%uHz)", &w, &h, &r);
-        if (cnt >= 2)
-        {
-            psDeviceMode.Width = w;
-            psDeviceMode.Height = h;
-
-            if (cnt == 3)
-            {
-                psDeviceMode.RefreshRate = r;
-                m_Refresh60hz.set(fl_Refresh60hz, psDeviceMode.RefreshRate == 60);
-            }
-        }
-        else
-        {
-            Msg("! Wrong video mode [%s]", args);
-        }
-    }
-
-    const xr_token* GetToken() noexcept override
-    {
-        return vid_mode_token[psDeviceMode.Monitor].data();
-    }
-
-    void GetStatus(TStatus& S) override
-    {
-        xr_sprintf(S, "%ux%u (%uHz)", psDeviceMode.Width, psDeviceMode.Height, psDeviceMode.RefreshRate);
-    }
-
-    void Info(TInfo& I) override
-    {
-        xr_strcpy(I, sizeof(I), "change screen resolution WxH (RHz)");
-    }
-
-    void fill_tips(vecTips& tips, u32 /*mode*/) override
-    {
-        TStatus buf;
-        xr_sprintf(buf, "%ux%u (current)", psDeviceMode.Width, psDeviceMode.Height);
-        tips.push_back(buf);
-
-        const xr_token* tok = GetToken();
-        while (tok->name)
-        {
-            tips.push_back(tok->name);
-            tok++;
-        }
-    }
-
-private:
-    enum { fl_Refresh60hz = 1u << 0u };
-    inline static Flags32 m_Refresh60hz; // for rs_refresh_60hz backwards compatibility
-
-public:
-    class CCC_Refresh60hz final : public CCC_Mask
-    {
-    public:
-        CCC_Refresh60hz(pcstr name) : CCC_Mask(name, &m_Refresh60hz, fl_Refresh60hz)
-        {
-            m_Refresh60hz.set(fl_Refresh60hz, psDeviceMode.RefreshRate == 60);
-        }
-
-        void Execute(pcstr args) override
-        {
-            CCC_Mask::Execute(args);
-            if (GetValue())
-                psDeviceMode.RefreshRate = 60;
-            else
-                psDeviceMode.RefreshRate = 0; // Device will adjust
-        }
-    };
 };
-using CCC_Refresh60hz = CCC_VidMode::CCC_Refresh60hz;
+
 //-----------------------------------------------------------------------
 class CCC_VidWindowMode final : public CCC_Token
 {
@@ -783,7 +710,6 @@ void CCC_Register()
     CMD3(CCC_Mask, "rs_v_sync", &psDeviceFlags, rsVSync);
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );
     CMD1(CCC_Fullscreen, "rs_fullscreen");
-    CMD1(CCC_Refresh60hz, "rs_refresh_60hz");
     CMD3(CCC_Mask, "rs_stats", &psDeviceFlags, rsStatistic);
     CMD3(CCC_Mask, "rs_fps", &psDeviceFlags, rsShowFPS);
     CMD3(CCC_Mask, "rs_fps_graph", &psDeviceFlags, rsShowFPSGraph);

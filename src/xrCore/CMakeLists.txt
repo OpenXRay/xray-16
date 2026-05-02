@@ -469,7 +469,7 @@ target_link_libraries(xrCore
     PUBLIC
     $<$<NOT:$<PLATFORM_ID:Windows>>:pthread>
     $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
-    SDL2::SDL2
+    SDL3::SDL3-static
     # _matrix.h (a public xrCore header) includes sse2neon on ARM, so the
     # include path must propagate to every consumer of xrCore.
     $<$<OR:$<BOOL:${PROJECT_PLATFORM_ARM}>,$<BOOL:${PROJECT_PLATFORM_ARM64}>>:sse2neon>

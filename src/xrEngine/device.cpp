@@ -14,7 +14,7 @@
 #include "xrScriptEngine/script_space.hpp"
 
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -337,90 +337,71 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
 
     switch (event.type)
     {
-    case SDL_DISPLAYEVENT:
-    {
-        switch (event.display.type)
-        {
-        case SDL_DISPLAYEVENT_ORIENTATION:
-        case SDL_DISPLAYEVENT_CONNECTED:
-        case SDL_DISPLAYEVENT_DISCONNECTED:
-            CleanupVideoModes();
-            FillVideoModes();
-            if (event.display.display == psDeviceMode.Monitor && event.display.type != SDL_DISPLAYEVENT_CONNECTED)
-                Reset();
-            else
-                UpdateWindowProps();
-            break;
-        } // switch (event.display.type)
+    case SDL_EVENT_DISPLAY_ORIENTATION:
+    case SDL_EVENT_DISPLAY_ADDED:
+    case SDL_EVENT_DISPLAY_REMOVED:
+        CleanupVideoModes();
+        FillVideoModes();
+        if (event.display.displayID == psDeviceMode.Monitor && event.type != SDL_EVENT_DISPLAY_ADDED)
+            Reset();
+        else
+            UpdateWindowProps();
         break;
-    }
-    case SDL_WINDOWEVENT:
+
+    case SDL_EVENT_WINDOW_MOVED:
     {
         const auto window = SDL_GetWindowFromID(event.window.windowID);
-        if (!window)
-            break;
-        ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window);
-        if (!viewport)
-            break;
+        if (window == m_sdlWnd)
+            UpdateWindowRects();
+        if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
+            viewport->PlatformRequestMove = true;
+        break;
+    }
 
-        switch (event.window.event)
+    case SDL_EVENT_WINDOW_DISPLAY_CHANGED:
+        psDeviceMode.Monitor = event.window.data1;
+        break;
+
+    case SDL_EVENT_WINDOW_RESIZED:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (window == m_sdlWnd)
+            UpdateWindowRects();
+        break;
+    }
+
+    case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (window == m_sdlWnd)
         {
-        case SDL_WINDOWEVENT_MOVED:
-        {
-            if (window == m_sdlWnd)
+            UpdateWindowRects();
+            if (static_cast<int>(psDeviceMode.Width) != event.window.data1 ||
+                static_cast<int>(psDeviceMode.Height) != event.window.data2)
             {
-                UpdateWindowRects();
-            }
-            if (viewport)
-                viewport->PlatformRequestMove = true;
-            break;
-        }
-
-        case SDL_WINDOWEVENT_DISPLAY_CHANGED:
-            psDeviceMode.Monitor = event.window.data1;
-            break;
-
-        case SDL_WINDOWEVENT_RESIZED:
-            if (window == m_sdlWnd)
-                UpdateWindowRects();
-            break;
-
-        case SDL_WINDOWEVENT_SIZE_CHANGED:
-        {
-            if (window == m_sdlWnd)
-            {
-                UpdateWindowRects();
-
-                if (static_cast<int>(psDeviceMode.Width) == event.window.data1 &&
-                    static_cast<int>(psDeviceMode.Height) == event.window.data2)
-                    break; // we don't need to reset device if resolution wasn't really changed
-
                 psDeviceMode.Width = event.window.data1;
                 psDeviceMode.Height = event.window.data2;
-
                 Reset();
             }
-            if (viewport)
-                viewport->PlatformRequestResize = true;
-
-            break;
         }
-
-        case SDL_WINDOWEVENT_CLOSE:
-        {
-            if (viewport)
-                viewport->PlatformRequestClose = true;
-
-            if (window == m_sdlWnd)
-            {
-                Engine.Event.Defer("KERNEL:disconnect");
-                Engine.Event.Defer("KERNEL:quit");
-            }
-            break;
-        }
-        } // switch (event.window.event)
+        if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
+            viewport->PlatformRequestResize = true;
+        break;
     }
-    } // switch (event.type)
+
+    case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
+            viewport->PlatformRequestClose = true;
+        if (window == m_sdlWnd)
+        {
+            Engine.Event.Defer("KERNEL:disconnect");
+            Engine.Event.Defer("KERNEL:quit");
+        }
+        break;
+    }
+    }
 
     editor().ProcessEvent(event);
 }
