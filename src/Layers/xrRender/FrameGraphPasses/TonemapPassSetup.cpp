@@ -58,7 +58,10 @@ void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state) {
                 pipeDesc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
 
                 nvrhi::FramebufferInfoEx fbInfo;
-                fbInfo.addColorFormat(nvrhi::Format::RGBA8_UNORM);
+                nvrhi::Format fbFmt = nvrhi::Format::RGBA8_UNORM;
+                if (GEnv.Backend && GEnv.Backend->GetBackBuffer())
+                    fbFmt = GEnv.Backend->GetBackBuffer()->getDesc().format;
+                fbInfo.addColorFormat(fbFmt);
 
                 state.pipeline = cache.GetOrCreatePipeline("TonemapPass", pipeDesc, fbInfo, device);
             }

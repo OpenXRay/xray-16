@@ -243,6 +243,10 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
         return false;
     }
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#if defined(XR_PLATFORM_APPLE)
+    extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+    extensions.push_back("VK_KHR_get_physical_device_properties2");
+#endif
 
     xr_vector<const char*> layers;
     if (enableValidation) {
@@ -256,6 +260,9 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
     createInfo.ppEnabledExtensionNames = extensions.data();
     createInfo.enabledLayerCount = static_cast<u32>(layers.size());
     createInfo.ppEnabledLayerNames = layers.data();
+#if defined(XR_PLATFORM_APPLE)
+    createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
 
     VkResult result = vkCreateInstance(&createInfo, nullptr, &m_instance);
     if (result != VK_SUCCESS) {
@@ -382,12 +389,15 @@ bool VulkanBackend::CreateLogicalDevice() {
         queueCreateInfos.push_back(computeQueueInfo);
     }
 
-    const char* deviceExtensions[] = {
+    xr_vector<const char*> deviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
         VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
         VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
         VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
     };
+#if defined(XR_PLATFORM_APPLE)
+    deviceExtensions.push_back("VK_KHR_portability_subset");
+#endif
 
     VkPhysicalDeviceVulkan12Features vulkan12Features = {};
     vulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
@@ -433,8 +443,42 @@ bool VulkanBackend::CreateLogicalDevice() {
     deviceCreateInfo.pNext = &features2;
     deviceCreateInfo.queueCreateInfoCount = static_cast<u32>(queueCreateInfos.size());
     deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-    deviceCreateInfo.enabledExtensionCount = static_cast<u32>(std::size(deviceExtensions));
-    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions;
+    deviceCreateInfo.enabledExtensionCount = static_cast<u32>(deviceExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+
+    {
+        VkPhysicalDeviceVulkan12Features sup12 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
+        VkPhysicalDeviceVulkan11Features sup11 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES };
+        VkPhysicalDeviceFeatures2 sup2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
+        sup2.pNext = &sup12;
+        sup12.pNext = &sup11;
+        vkGetPhysicalDeviceFeatures2(m_physicalDevice, &sup2);
+
+#define CLAMP12(F) do { if (vulkan12Features.F && !sup12.F) { Msg("! [VulkanBackend] vk12 feature unsupported: " #F); vulkan12Features.F = VK_FALSE; } } while(0)
+        CLAMP12(drawIndirectCount);
+        CLAMP12(descriptorIndexing);
+        CLAMP12(shaderSampledImageArrayNonUniformIndexing);
+        CLAMP12(runtimeDescriptorArray);
+        CLAMP12(descriptorBindingPartiallyBound);
+        CLAMP12(descriptorBindingVariableDescriptorCount);
+        CLAMP12(descriptorBindingSampledImageUpdateAfterBind);
+        CLAMP12(descriptorBindingStorageBufferUpdateAfterBind);
+        CLAMP12(timelineSemaphore);
+#undef CLAMP12
+#define CLAMPF(F) do { if (features2.features.F && !sup2.features.F) { Msg("! [VulkanBackend] feature unsupported: " #F); features2.features.F = VK_FALSE; } } while(0)
+        CLAMPF(samplerAnisotropy);
+        CLAMPF(fillModeNonSolid);
+        CLAMPF(multiDrawIndirect);
+        CLAMPF(independentBlend);
+        CLAMPF(shaderStorageImageReadWithoutFormat);
+        CLAMPF(shaderStorageImageWriteWithoutFormat);
+        CLAMPF(multiViewport);
+#undef CLAMPF
+        if (vulkan11Features.shaderDrawParameters && !sup11.shaderDrawParameters) {
+            Msg("! [VulkanBackend] vk11 feature unsupported: shaderDrawParameters");
+            vulkan11Features.shaderDrawParameters = VK_FALSE;
+        }
+    }
 
     VkResult result = vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);
     if (result != VK_SUCCESS) {
