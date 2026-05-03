@@ -9,51 +9,40 @@ on:
 
 jobs:
   windows:
-    name: Windows ${{ matrix.Configuration }} ${{ matrix.Platform }} (msvc)
+    name: Windows ${{ matrix.configuration }} x64 (vs-sln)
     runs-on: windows-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
-        Configuration: [Debug, Mixed, Release, Release Master Gold]
-        Platform: [x64, x86]
+        configuration: [Debug, Mixed, Release, ReleaseMasterGold]
     steps:
     - uses: actions/checkout@main
       with:
         submodules: recursive
 
-    - uses: microsoft/setup-msbuild@main
+    - name: Configure (cmake-initial-configure)
+      run: ./cmake-initial-configure ${{ matrix.configuration }} --vs
 
-    - uses: nuget/setup-nuget@main
+    - name: Build (cmake-build)
+      run: ./cmake-build
 
-    - name: Restore NuGet packages
-      run: nuget restore src\engine.sln
-
-    - name: Build
-      working-directory: src
-      run: msbuild /m /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
-
-    - name: Prepare artifacts
-      shell: cmd
-      run: misc/windows/xr_pack_build.cmd "${{ matrix.Configuration }}" "${{ matrix.Platform }}"
+    - name: Package
+      id: package
+      run: |
+        cfg_lc=$(echo "${{ matrix.configuration }}" | tr '[:upper:]' '[:lower:]')
+        cd "cmake_builds/vs_${cfg_lc}"
+        cpack -B artifacts -C "${{ matrix.configuration }}" -DCPACK_THREADS=4
 
     - name: Upload OpenXRay artifact
+      if: steps.package.outcome == 'success'
       uses: actions/upload-artifact@main
       with:
-        name: OpenXRay.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
-        path: res/OpenXRay.*.7z
-
-    - name: Upload Symbols
-      uses: actions/upload-artifact@main
-      with:
-        name: Symbols.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
-        path: res/Symbols.*.7z
-
-    - name: Upload Utils
-      uses: actions/upload-artifact@main
-      with:
-        name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
-        path: res/Utils.*.7z
+        name: Windows ${{ matrix.configuration }} x64 (vs-sln github-${{ github.run_number }})
+        path: cmake_builds/vs_*/artifacts/openxray*.*
 
     - name: Update latest-nightly tag
       uses: EndBug/latest-tag@latest
@@ -66,7 +55,7 @@ jobs:
       if: ${{ steps.update-latest-nightly-tag.outcome == 'success' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: gh release upload --clobber latest-nightly (get-item res/*.*.7z)
+      run: gh release upload --clobber latest-nightly cmake_builds/vs_*/artifacts/openxray*.*
 
   cmake:
     name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc || 'unknown compiler' }})

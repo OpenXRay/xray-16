@@ -13,7 +13,7 @@ configuration:
 - Debug
 - Mixed
 - Release
-- Release Master Gold
+- ReleaseMasterGold
 
 platform:
 - x64
@@ -22,30 +22,22 @@ branches:
   except:
     - dependabot/*
 
-cache:
-- src/packages -> **/packages.config
-
 for:
 -
   before_build:
     - git submodule update --init --recursive
-    - nuget restore src\engine.sln
 
-  build:
-    project: src/engine.sln
-    parallel: true
-    verbosity: minimal
+  build_script:
+    - cmd: >
+        bash -c "./cmake-initial-configure $CONFIGURATION --vs && ./cmake-build"
 
   after_build:
-    - cmd: misc/windows/xr_pack_build.cmd "%CONFIGURATION%" "%PLATFORM%"
+    - cmd: >
+        bash -c "cd cmake_builds/vs_$(echo $CONFIGURATION | tr '[:upper:]' '[:lower:]') && cpack -B artifacts -C $CONFIGURATION -DCPACK_THREADS=4"
 
   artifacts:
-    - path: res/OpenXRay.*.7z
-      name: OpenXRay.*.7z
-    - path: res/Symbols.*.7z
-      name: Symbols.*.7z
-    - path: res/Utils.*.7z
-      name: Utils.*.7z
+    - path: cmake_builds/vs_*/artifacts/openxray*.*
+      name: openxray
 
 test: off
 
@@ -57,6 +49,6 @@ deploy:
   auth_token:
     secure: kGVniXDR926BfVcA97y25BzALbijvgboBsozZzY9yc8RPz15Q4YG474h7vl14/J1
   artifact:
-    OpenXRay.*.7z, Symbols.*.7z, Utils.*.7z
+    openxray
   draft: true
   force_update: true
