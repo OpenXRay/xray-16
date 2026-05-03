@@ -51,6 +51,7 @@ enum class RenderPassType : u8 {
     Default
 };
 
+
 enum class PSOType : u8 {
     Material = 0,
     Depth = 1,
@@ -58,6 +59,7 @@ enum class PSOType : u8 {
     Shadow = 3,
     PostProcess = 4
 };
+
 
 struct MaterialKey {
     PSOType psoType;
@@ -126,6 +128,7 @@ struct MaterialKey {
                stateHash == other.stateHash;
     }
 };
+
 
 struct MaterialPSO {
     fg::PipelineState* pso = nullptr;
@@ -200,6 +203,7 @@ struct MaterialPSO {
     u32 GetOutputRTCount() const {
         return (u32)rtBindings.outputRTs.size();
     }
+
 
     u32 GetSlotForSemantic(framegraph::ShaderRTBindings::RTSemantic semantic) const {
         for (const auto& output : rtBindings.outputRTs) {
@@ -298,6 +302,7 @@ private:
 
     xr_map<shared_str, u32> m_particleTextureToMaterialID;
 
+
     xr_unordered_map<shared_str, u32> m_shaderToTerrainMaterialID;
 
     struct PendingTerrainMaterial {
@@ -337,6 +342,7 @@ public:
     u32 PreRegisterBindlessMaterial(dxRender_Visual* visual);
 
     u32 PreRegisterParticleMaterial(const shared_str& textureName);
+
 
     bool IsTerrainMaterial(dxRender_Visual* visual);
 

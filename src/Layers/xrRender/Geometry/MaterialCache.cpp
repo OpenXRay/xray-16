@@ -42,6 +42,8 @@ namespace xray::render {
 using namespace xray::render::fg;
 
 
+
+
 #ifdef DEBUG
 static void LogConstantLayout(const framegraph::ShaderConstantLayout& layout, const char* shaderName) {
     using namespace framegraph;
@@ -64,6 +66,7 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
     using namespace framegraph;
 
     ShaderConstantLayout merged;
+
 
     struct CBDeduplicationInfo {
         shared_str name;
@@ -101,6 +104,7 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
         merged.constantBuffers.buffers.push_back(mergedCB);
     }
 
+
     xr_map<u16, u16> vsIndexToMerged;
 
     for (u16 vsIdx = 0; vsIdx < vsLayout.constantBuffers.buffers.size(); ++vsIdx) {
@@ -112,6 +116,7 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
         }
     }
 
+
     xr_map<u16, u16> psIndexToMerged;
 
     for (u16 psIdx = 0; psIdx < psLayout.constantBuffers.buffers.size(); ++psIdx) {
@@ -122,6 +127,7 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
             psIndexToMerged[psIdx] = it->second.mergedIndex;
         }
     }
+
 
     for (const auto& vsConstant : vsLayout.constants) {
         ShaderConstant mergedConstant = vsConstant;
@@ -137,6 +143,7 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
 
         merged.constants.push_back(mergedConstant);
     }
+
 
     for (const auto& psConstant : psLayout.constants) {
         bool isDuplicate = false;
@@ -177,6 +184,7 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
     return merged;
 }
 
+
 MaterialCache::MaterialCache(
     fg::RenderDevice* device,
     resources::FGResourceManager* resourceManager,
@@ -199,6 +207,7 @@ void MaterialCache::CreateDefaultPBRTextures()
         return;
     }
 
+
     resources::TextureDesc desc;
     desc.type = resources::TextureDesc::Texture2D;
     desc.width = 1;
@@ -219,6 +228,7 @@ void MaterialCache::CreateDefaultPBRTextures()
 MaterialCache::~MaterialCache() {
     Clear();
 }
+
 
 MaterialPSO* MaterialCache::GetOrCreatePSO(
     dxRender_Visual* visual,
@@ -247,6 +257,7 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     return nullptr;
 }
 
+
 MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
     dxRender_Visual* visual,
     const framegraph::FrameGraph& fg)
@@ -255,6 +266,10 @@ MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
         Msg("! [MaterialCache::GetOrCreateDepthPSO] Visual is NULL");
     return nullptr;
 }
+
+
+
+
 
 
 
@@ -277,6 +292,7 @@ void MaterialCache::CreateBindingLayouts(MaterialPSO* matPSO)
             matPSO, MaterialPSO::ShaderStage::Pixel, nvrhi::ShaderType::Pixel);
     }
 }
+
 
 nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
     const MaterialPSO* matPSO,
@@ -360,6 +376,7 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
         }
     }
 
+
     nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(layoutDesc);
     if (!layout) {
         return nullptr;
@@ -430,8 +447,10 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateCombinedBindingLayout(const Mate
         layoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::Sampler(samplerInfo.slot));
     }
 
+
     return m_device->CreateBindingLayout(layoutDesc);
 }
+
 
 nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO)
 {
@@ -450,6 +469,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         return matPSO->vsBindingSet;
 
     matPSO->needsBindingSetRebuild = false;
+
 
     struct TempBinding {
         u32 slot;
@@ -495,6 +515,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         vsBindingDesc.bindings.push_back(
             nvrhi::BindingSetItem::ConstantBuffer(binding.slot, binding.buffer));
     }
+
 
     struct PSBinding {
         u32 slot;
@@ -662,6 +683,11 @@ static u32 GetFormatSize(DXGI_FORMAT format) {
     }
 }
 #endif
+
+
+
+
+
 
 
 
@@ -841,6 +867,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     psoDesc.vertexShader = nvrhiVS.Get();
     psoDesc.pixelShader = nvrhiPS.Get();
 
+
     if (pso->vsInputSignature.elements.empty()) {
         Msg("! [MaterialCache::CreateUIPSO] No vertex input signature from shader reflection!");
         return nullptr;
@@ -959,6 +986,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 }
 
 
+
 void MaterialCache::Clear()
 {
     if (m_resourceManager)
@@ -986,6 +1014,8 @@ void MaterialCache::Clear()
 
 
 
+
+
 float MaterialCache::GetDetailScale(const shared_str& textureName)
 {
     auto cacheIt = m_detailScaleCache.find(textureName.c_str());
@@ -999,6 +1029,7 @@ float MaterialCache::GetDetailScale(const shared_str& textureName)
 
     return scale;
 }
+
 
 u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
 {
@@ -1040,11 +1071,13 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
         }
     }
 
+
     u32 materialID = materialBuffer.RegisterMaterial(matData);
     matPSO->bindlessMaterialID = materialID;
 
     return materialID;
 }
+
 
 bool MaterialCache::IsTerrainMaterial(dxRender_Visual* visual)
 {
@@ -1052,6 +1085,7 @@ bool MaterialCache::IsTerrainMaterial(dxRender_Visual* visual)
         return false;
     return shader_info::IsTerrainShader(visual->shaderName.c_str());
 }
+
 
 u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
 {
@@ -1119,6 +1153,7 @@ u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
 
     return terrainMaterialID;
 }
+
 
 void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
 {
@@ -1325,6 +1360,7 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
     }
 }
 
+
 u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
 {
     using namespace fg::bindless;
@@ -1428,6 +1464,7 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
 
     return materialID;
 }
+
 
 void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
 {
