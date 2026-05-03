@@ -153,8 +153,8 @@ bool RenderDevice::InitializeFromBackend(IRenderBackend* backend) {
 void RenderDevice::Shutdown() {
     if (!m_initialized) return;
 
-    // Clear pipeline cache FIRST, before releasing ANY NVRHI resources
-    // This must happen while the device is in a fully functional state
+    s_textureUploadCmdList = nullptr;
+
     if (m_pipelineCache) {
         m_pipelineCache->Clear();
         Msg("* [PipelineStateCache] Cleared cache before shutdown");

@@ -533,13 +533,23 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     xr_vector<VkPresentModeKHR> presentModes(presentModeCount);
     vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, presentModes.data());
 
+    const bool wantVSync = psDeviceFlags.test(rsVSync);
     VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
-    for (auto mode : presentModes) {
-        if (mode == VK_PRESENT_MODE_MAILBOX_KHR) {
-            presentMode = mode;
-            break;
+    if (!wantVSync)
+    {
+        bool hasImmediate = false, hasMailbox = false;
+        for (auto mode : presentModes)
+        {
+            if (mode == VK_PRESENT_MODE_IMMEDIATE_KHR) hasImmediate = true;
+            else if (mode == VK_PRESENT_MODE_MAILBOX_KHR) hasMailbox = true;
         }
+        if (hasImmediate)      presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+        else if (hasMailbox)   presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
     }
+    Msg("* [VulkanBackend] Present mode: %s (vsync=%s)",
+        presentMode == VK_PRESENT_MODE_IMMEDIATE_KHR ? "IMMEDIATE" :
+        presentMode == VK_PRESENT_MODE_MAILBOX_KHR   ? "MAILBOX"   : "FIFO",
+        wantVSync ? "on" : "off");
 
     VkExtent2D extent = { width, height };
     if (surfaceCaps.currentExtent.width != UINT32_MAX)

@@ -4,6 +4,10 @@
 #include "FGRenderHost.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
+#include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 
 #include "xrEngine/IRenderBackend.h"
 #include "xrEngine/GameFont.h"
@@ -30,6 +34,13 @@ void FGRenderBase::OnDeviceDestroy(bool bKeepTextures)
 void FGRenderBase::Destroy()
 {
     xr_delete(Resources);
+
+    bindless::DrawMaterialIDBuffer::Instance().Shutdown();
+    bindless::VariantTextureBuffer::Instance().Shutdown();
+    bindless::MaterialBuffer::Instance().Shutdown();
+    bindless::TerrainMaterialBuffer::Instance().Shutdown();
+
+    framegraph::GetPassResourceCache().Clear();
 
     if (GEnv.Backend)
     {

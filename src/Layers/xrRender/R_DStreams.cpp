@@ -30,6 +30,7 @@ void _VertexStream::Create()
 void _VertexStream::Destroy()
 {
     pVB.Release();
+    old_pVB = nullptr;
     _clear();
 }
 
@@ -110,6 +111,7 @@ void _IndexStream::Create()
 void _IndexStream::Destroy()
 {
     pIB.Release();
+    old_pIB = nullptr;
     _clear();
 }
 

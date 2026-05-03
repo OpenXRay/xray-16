@@ -168,7 +168,7 @@ void FrameGraphRenderer::CreateQuadIB()
     QuadIB.Unmap(true);
 }
 }
-namespace xray::render { void InitializeImGuiRenderer(fg::RenderDevice* renderDevice); }
+namespace xray::render { void InitializeImGuiRenderer(fg::RenderDevice* renderDevice); void ShutdownImGuiRenderer(); }
 
 extern ENGINE_API float psHUD_FOV;
 extern ENGINE_API int ps_r_rt_gi;
@@ -325,6 +325,7 @@ void FrameGraphRenderer::Shutdown() {
     m_inspectorPreview = nullptr;
     m_renderContext = nullptr;
     m_geometryCollector = nullptr;
+    m_geometryVCBPool = nullptr;
     m_materialCache = nullptr;
     m_uiRender = nullptr;
     m_uiMaterialCache = nullptr;
@@ -333,7 +334,9 @@ void FrameGraphRenderer::Shutdown() {
     m_staticBatchesCached = false;
     if (m_gpuCullingManager) {
         m_gpuCullingManager->InvalidateStaticCullingData();
+        m_gpuCullingManager = nullptr;
     }
+    m_detailManager = nullptr;
 
     if (m_decalManager) {
         m_decalManager->Shutdown();
@@ -368,11 +371,13 @@ void FrameGraphRenderer::Shutdown() {
         m_blackboard.reset();
     }
 
-    bindless::VariantTextureBuffer::Instance().Shutdown();
-    bindless::MaterialBuffer::Instance().Shutdown();
-    bindless::TerrainMaterialBuffer::Instance().Shutdown();
-
-    m_device = nullptr;
+    m_prevFrameDepth = nullptr;
+    m_normals[0] = nullptr;
+    m_normals[1] = nullptr;
+    m_worldPos[0] = nullptr;
+    m_worldPos[1] = nullptr;
+    m_inspectorPreview = nullptr;
+    old_QuadIB = nullptr;
 }
 
 void FrameGraphRenderer::Render() {
@@ -3068,13 +3073,15 @@ void FrameGraphRenderer::destroy()
 
     MaterialSystem::Instance().Shutdown();
 
+    ShutdownImGuiRenderer();
+
     Shutdown();
-    GEnv.Render = nullptr;
 
     if (m_device)
     {
         m_device->Shutdown();
         xr_delete(m_device);
+        m_device = nullptr;
     }
 
     Device.seqFrame.Remove(this);

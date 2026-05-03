@@ -41,6 +41,8 @@ StreamingManager::~StreamingManager() {
 
     // Destroy async I/O manager
     xr_delete(m_asyncIO);
+
+    s_streamingCmdList = nullptr;
 }
 
 // ═══════════════════════════════════════════════════

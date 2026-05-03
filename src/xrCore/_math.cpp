@@ -3,7 +3,7 @@
 #include <thread>
 #include <SDL3/SDL.h>
 
-#if defined(_MSC_VER) || defined(__clang__)
+#if (defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_X86)) && (defined(_MSC_VER) || defined(__clang__))
 #   include <intrin.h>
 #endif
 

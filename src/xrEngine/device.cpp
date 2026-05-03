@@ -373,6 +373,22 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
         psDeviceMode.Monitor = IndexFromDisplayID(static_cast<SDL_DisplayID>(event.window.data1));
         break;
 
+    case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (window == m_sdlWnd && psDeviceMode.WindowStyle == rsWindowed)
+            psDeviceMode.WindowStyle = rsFullscreen;
+        break;
+    }
+
+    case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (window == m_sdlWnd && psDeviceMode.WindowStyle != rsWindowed)
+            psDeviceMode.WindowStyle = rsWindowed;
+        break;
+    }
+
     case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
     {
         const auto window = SDL_GetWindowFromID(event.window.windowID);
