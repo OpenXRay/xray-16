@@ -49,3 +49,6 @@
 [submodule "Externals/SDL"]
 	path = Externals/SDL
 	url = https://github.com/libsdl-org/SDL.git
+[submodule "Externals/entt"]
+	path = Externals/entt
+	url = https://github.com/skypjack/entt.git
