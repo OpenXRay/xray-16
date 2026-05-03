@@ -3,36 +3,52 @@ set -euo pipefail
 
 usage() {
     cat >&2 <<USAGE
-Usage: $0 [RMG|release|mixed]
+Usage: $0 [RMG|release|mixed] [--vs]
 
-Cleans and re-configures the CMake+Ninja build for the current platform.
+Cleans and re-configures CMake for the current platform.
 
-  WSL / Windows (Git Bash, MSYS2, Cygwin)  -> Windows build via vcvars + Clang
-  Linux / macOS                            -> native build
+  WSL / Windows (Git Bash, MSYS2, Cygwin)  -> Ninja+Clang (default), or VS sln (--vs)
+  Linux / macOS                            -> native Ninja
 
 Configs:
   RMG       ReleaseMasterGold (default)
   release   Release
   mixed     Mixed
 
-Build dir: cmake_builds/<config-lowercased>
+Flags:
+  --vs      Windows-only. Generate Visual Studio 2022 sln/vcxproj instead of Ninja.
+            Build dir: cmake_builds/vs_<config>. Open <dir>/xray.sln in VS.
+
+Build dir: cmake_builds/<config-lowercased>  (or cmake_builds/vs_<config> with --vs)
 USAGE
     exit 1
 }
 
-CONFIG_INPUT="${1:-RMG}"
+CONFIG_INPUT=""
+USE_VS=0
+for arg in "$@"; do
+    case "$arg" in
+        --vs) USE_VS=1 ;;
+        -h|--help|help) usage ;;
+        *) CONFIG_INPUT="$arg" ;;
+    esac
+done
+CONFIG_INPUT="${CONFIG_INPUT:-RMG}"
 case "${CONFIG_INPUT,,}" in
     rmg|releasemastergold)  CONFIG="ReleaseMasterGold" ;;
     release|rel)            CONFIG="Release" ;;
     mixed)                  CONFIG="Mixed" ;;
-    -h|--help|help)         usage ;;
     *) echo "Unknown config: $CONFIG_INPUT" >&2; usage ;;
 esac
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-BUILD_DIR="cmake_builds/$(echo "$CONFIG" | tr '[:upper:]' '[:lower:]')"
+if [[ $USE_VS -eq 1 ]]; then
+    BUILD_DIR="cmake_builds/vs_$(echo "$CONFIG" | tr '[:upper:]' '[:lower:]')"
+else
+    BUILD_DIR="cmake_builds/$(echo "$CONFIG" | tr '[:upper:]' '[:lower:]')"
+fi
 
 detect_platform() {
     case "$(uname -s)" in
@@ -118,16 +134,31 @@ configure_windows_build() {
     rm -rf "$BUILD_DIR"
     mkdir -p "$BUILD_DIR"
 
-    echo ">> Configuring $CONFIG -> $BUILD_DIR ($PLATFORM -> Windows)"
-    echo ">> VS install:  $vs_install"
-    echo ">> Clang C:     $clang_win"
-    echo ">> Clang C++:   $clangxx_win"
-    echo
-
     local build_dir_win="${repo_win}\\${BUILD_DIR//\//\\}"
     local tmp_cmd="${BUILD_DIR}/_configure.cmd"
 
-    cat > "$tmp_cmd" <<CMDEOF
+    if [[ $USE_VS -eq 1 ]]; then
+        echo ">> Configuring $CONFIG -> $BUILD_DIR (VS 2022 generator)"
+        echo ">> VS install:  $vs_install"
+        echo
+
+        cat > "$tmp_cmd" <<CMDEOF
+@echo off
+call "${vcvars64_win}" >nul
+if errorlevel 1 exit /b 1
+cmake -G "Visual Studio 17 2022" -A x64 ^
+    -S "${repo_win}" ^
+    -B "${build_dir_win}"
+exit /b %ERRORLEVEL%
+CMDEOF
+    else
+        echo ">> Configuring $CONFIG -> $BUILD_DIR ($PLATFORM -> Windows, Ninja)"
+        echo ">> VS install:  $vs_install"
+        echo ">> Clang C:     $clang_win"
+        echo ">> Clang C++:   $clangxx_win"
+        echo
+
+        cat > "$tmp_cmd" <<CMDEOF
 @echo off
 call "${vcvars64_win}" >nul
 if errorlevel 1 exit /b 1
@@ -139,6 +170,7 @@ cmake -G Ninja ^
     -DCMAKE_CXX_COMPILER="${clangxx_win}"
 exit /b %ERRORLEVEL%
 CMDEOF
+    fi
 
     local rc=0
     run_cmd_file "$tmp_cmd" || rc=$?
@@ -160,6 +192,11 @@ configure_native() {
         -B "$BUILD_DIR" \
         -DCMAKE_BUILD_TYPE="$CONFIG"
 }
+
+if [[ $USE_VS -eq 1 && "$PLATFORM" != "wsl" && "$PLATFORM" != "windows" ]]; then
+    echo "--vs is Windows-only (current platform: $PLATFORM)" >&2
+    exit 1
+fi
 
 case "$PLATFORM" in
     wsl|windows) configure_windows_build ;;
