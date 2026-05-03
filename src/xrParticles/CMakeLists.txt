@@ -39,6 +39,7 @@ target_link_libraries(xrParticles
     xrCore
     xrMiscMath
     xrEngine
+    xrLuabindApi
 )
 
 target_compile_definitions(xrParticles
