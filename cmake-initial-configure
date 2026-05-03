@@ -14,6 +14,7 @@ Configs:
   RMG       ReleaseMasterGold (default)
   release   Release
   mixed     Mixed
+  debug     Debug
 
 Flags:
   --vs      Windows-only. Generate Visual Studio sln/vcxproj instead of Ninja.
@@ -39,6 +40,7 @@ case "$(echo "$CONFIG_INPUT" | tr '[:upper:]' '[:lower:]')" in
     rmg|releasemastergold)  CONFIG="ReleaseMasterGold" ;;
     release|rel)            CONFIG="Release" ;;
     mixed)                  CONFIG="Mixed" ;;
+    debug|dbg)              CONFIG="Debug" ;;
     *) echo "Unknown config: $CONFIG_INPUT" >&2; usage ;;
 esac
 
