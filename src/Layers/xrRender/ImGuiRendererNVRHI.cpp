@@ -124,7 +124,15 @@ void ImGuiRendererNVRHI::OnDeviceDestroy()
 
 void ImGuiRendererNVRHI::OnDeviceResetBegin()
 {
-    // Release resources that depend on swapchain
+    if (m_imguiContext)
+    {
+        ImGui::SetCurrentContext(m_imguiContext);
+        for (ImTextureData* tex : ImGui::GetPlatformIO().Textures)
+        {
+            if (tex && tex->Status == ImTextureStatus_OK)
+                tex->SetStatus(ImTextureStatus_WantCreate);
+        }
+    }
     DestroyDeviceObjects();
 }
 

@@ -17,8 +17,6 @@ xr_vector<xr_token> VidQualityToken;
 extern xr_vector<xr_token> vid_monitor_token;
 extern xr_map<u32, xr_vector<xr_token>> vid_mode_token;
 
-const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
-
 ENGINE_API int dm_debug_trails = 0;
 ENGINE_API int g_debug_utils = 0;
 ENGINE_API bool renderer_allow_override = false;
@@ -433,11 +431,7 @@ class CCC_VidWindowMode final : public CCC_Token
     };
 
 public:
-    CCC_VidWindowMode(pcstr name) : CCC_Token(name, &psDeviceMode.WindowStyle, vid_window_mode_token)
-    {
-        if (psDeviceMode.WindowStyle == rsWindowedBorderless)
-            psDeviceMode.WindowStyle = rsFullscreenBorderless;
-    }
+    CCC_VidWindowMode(pcstr name) : CCC_Token(name, &psDeviceMode.WindowStyle, vid_window_mode_token) {}
 
     void Execute(pcstr args) override
     {
@@ -750,8 +744,8 @@ void CCC_Register()
 
     CMD1(CCC_Editor, "rs_editor");
 
-    CMD4(CCC_Integer, "rs_fps_limit", &ps_fps_limit, 30, 501);
-    CMD4(CCC_Integer, "rs_fps_limit_in_menu", &ps_fps_limit_in_menu, 30, 501);
+    CMD4(CCC_Integer, "rs_fps_limit", &ps_fps_limit, 0, 1000);
+    CMD4(CCC_Integer, "rs_fps_limit_in_menu", &ps_fps_limit_in_menu, 0, 1000);
     CMD3(CCC_Mask, "rs_always_active", &psDeviceFlags, rsAlwaysActive);
     CMD3(CCC_Mask, "rs_v_sync", &psDeviceFlags, rsVSync);
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );
@@ -781,10 +775,6 @@ void CCC_Register()
     CMD1(CCC_VidMonitor, "vid_monitor");
     CMD1(CCC_VidMode, "vid_mode");
     CMD1(CCC_VidWindowMode, "vid_window_mode");
-
-#ifdef DEBUG
-    CMD3(CCC_Token, "vid_bpp", &psDeviceMode.BitsPerPixel, vid_bpp_token);
-#endif // DEBUG
 
     CMD1(CCC_VID_Reset, "vid_restart");
 

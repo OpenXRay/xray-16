@@ -38,8 +38,8 @@ void CUICursor::InitInternal()
 
 void CUICursor::OnDeviceReset()
 {
-    correction.x = UI_BASE_WIDTH  / (float)Device.m_rcWindowClient.w;
-    correction.y = UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.h;
+    correction.x = UI_BASE_WIDTH  / (float)Device.dwWidth;
+    correction.y = UI_BASE_HEIGHT / (float)Device.dwHeight;
 
     SDL_Rect display;
     if (SDL_GetDisplayBounds(SDL_GetPrimaryDisplay(), &display))
@@ -48,8 +48,6 @@ void CUICursor::OnDeviceReset()
         const u32 screen_size_y = display.h - display.y;
         m_bound_to_system_cursor = screen_size_y >= Device.dwHeight && screen_size_x >= Device.dwWidth;
     }
-    if (m_bound_to_system_cursor) // sanity
-        Device.UpdateWindowRects();
 }
 
 void CUICursor::OnUIReset()

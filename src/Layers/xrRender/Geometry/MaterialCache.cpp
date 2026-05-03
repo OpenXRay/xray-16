@@ -703,11 +703,11 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
         return nullptr;
 
     fgUIShader* dxShader = static_cast<fgUIShader*>(uiShader);
-    if (!dxShader)
+    if (!dxShader || !dxShader->IsAlive())
         return nullptr;
 
     u64 shaderHash = 0;
-    if (dxShader->m_vsHandle && dxShader->m_psHandle) {
+    if (dxShader->m_vsHandle.Get() && dxShader->m_psHandle.Get()) {
         shaderHash = reinterpret_cast<uintptr_t>(dxShader->m_vsHandle.Get()) ^
                      (reinterpret_cast<uintptr_t>(dxShader->m_psHandle.Get()) << 1);
     }
@@ -748,19 +748,19 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     auto pso = xr_make_unique<MaterialPSO>();
 
     fgUIShader* dxShader = static_cast<fgUIShader*>(uiShader);
-    if (!dxShader) {
-        Msg("! [MaterialCache::CreateUIPSO] Invalid uiShader pointer");
+    if (!dxShader || !dxShader->IsAlive()) {
+        Msg("! [MaterialCache::CreateUIPSO] Stale or null uiShader pointer (%p)", dxShader);
+        return nullptr;
+    }
+
+    if (!dxShader->m_vsHandle.Get() || !dxShader->m_psHandle.Get()) {
+        Msg("! [MaterialCache::CreateUIPSO] Missing NVRHI shader handles in fgUIShader (VS=%p PS=%p)",
+            dxShader->m_vsHandle.Get(), dxShader->m_psHandle.Get());
         return nullptr;
     }
 
     nvrhi::ShaderHandle nvrhiVS = dxShader->m_vsHandle;
     nvrhi::ShaderHandle nvrhiPS = dxShader->m_psHandle;
-
-    if (!nvrhiVS || !nvrhiPS) {
-        Msg("! [MaterialCache::CreateUIPSO] Missing NVRHI shader handles in fgUIShader (VS=%p PS=%p)",
-            nvrhiVS.Get(), nvrhiPS.Get());
-        return nullptr;
-    }
 
     if (dxShader->m_vsReflection) {
         pso->vsInputSignature = framegraph::ShaderReflector::GetVertexInputSignature(dxShader->m_vsReflection);

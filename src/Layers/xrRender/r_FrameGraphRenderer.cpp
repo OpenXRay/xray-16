@@ -3101,6 +3101,22 @@ void FrameGraphRenderer::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
+void FrameGraphRenderer::OnBackBufferResizing(u32, u32)
+{
+    ZoneScoped;
+    framegraph::GetPassResourceCache().ClearFramebufferDependent();
+    if (m_materialCache)
+        m_materialCache->Clear();
+    if (m_uiMaterialCache)
+        m_uiMaterialCache->Clear();
+}
+
+void FrameGraphRenderer::OnBackBufferResized(u32, u32)
+{
+    ZoneScoped;
+    m_bFirstFrameAfterReset = true;
+}
+
 void FrameGraphRenderer::SetPostProcessParams(const SPPInfo& ppi)
 {
     if (!m_pTarget)

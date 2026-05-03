@@ -42,7 +42,11 @@ void FGRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& f
 {
     ZoneScoped;
 
+    const u32 oldWidth = dwWidth;
+    const u32 oldHeight = dwHeight;
+
     reset_begin();
+    OnBackBufferResizing(oldWidth, oldHeight);
     Memory.mem_compact();
 
     FGRenderHost::ResizeBackend(hWnd, dwWidth, dwHeight);
@@ -53,6 +57,7 @@ void FGRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& f
     if (Resources)
         Resources->reset_end();
 
+    OnBackBufferResized(dwWidth, dwHeight);
     reset_end();
 
 #ifndef MASTER_GOLD

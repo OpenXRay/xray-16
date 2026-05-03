@@ -285,13 +285,22 @@ void CRenderDevice::ProcessFrame()
     {
         ZoneScoped;
 
+        UpdateWindowState();
+
+        if (!m_windowVisible)
+        {
+            Sleep(16);
+            xray::profiler::FrameEnd();
+            return;
+        }
+
         if (!BeforeFrame())
         {
             xray::profiler::FrameEnd();
             return;
         }
 
-        const u64 frameStartTime = TimerGlobal.GetElapsed_ms();
+        const u64 frameStartNs = SDL_GetTicksNS();
 
         FrameMove();
 
@@ -310,22 +319,23 @@ void CRenderDevice::ProcessFrame()
 
         TaskScheduler->Wait(processSeqParallel);
 
-        const u64 frameEndTime = TimerGlobal.GetElapsed_ms();
-        const u64 frameTime = frameEndTime - frameStartTime;
-
-        u32 updateDelta = 1000 / ps_fps_limit;
-
+        int fpsCap = ps_fps_limit;
         if (GEnv.isDedicatedServer)
-            updateDelta = 1000 / g_svDedicateServerUpdateReate;
-
+            fpsCap = g_svDedicateServerUpdateReate;
         else if (Paused() || g_pGameLevel == nullptr)
-            updateDelta = 1000 / ps_fps_limit_in_menu;
+            fpsCap = ps_fps_limit_in_menu;
 
-        if (frameTime < updateDelta)
-            Sleep(updateDelta - frameTime);
+        if (fpsCap > 0)
+        {
+            const u64 targetFrameNs = 1'000'000'000ull / static_cast<u64>(fpsCap);
+            const u64 deadlineNs = frameStartNs + targetFrameNs;
+            const u64 nowNs = SDL_GetTicksNS();
+            if (nowNs < deadlineNs)
+                SDL_DelayPrecise(deadlineNs - nowNs);
+        }
 
         if (!b_is_Active)
-            Sleep(1);
+            SDL_DelayNS(1'000'000ull);
     } // ZoneScoped ends here, ProcessFrame timing captured
 
     xray::profiler::FrameEnd();
@@ -349,17 +359,11 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
     case SDL_EVENT_DISPLAY_REMOVED:
         CleanupVideoModes();
         FillVideoModes();
-        if (IndexFromDisplayID(event.display.displayID) == psDeviceMode.Monitor && event.type != SDL_EVENT_DISPLAY_ADDED)
-            Reset();
-        else
-            UpdateWindowProps();
         break;
 
     case SDL_EVENT_WINDOW_MOVED:
     {
         const auto window = SDL_GetWindowFromID(event.window.windowID);
-        if (window == m_sdlWnd)
-            UpdateWindowRects();
         if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
             viewport->PlatformRequestMove = true;
         break;
@@ -369,27 +373,13 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
         psDeviceMode.Monitor = IndexFromDisplayID(static_cast<SDL_DisplayID>(event.window.data1));
         break;
 
-    case SDL_EVENT_WINDOW_RESIZED:
-    {
-        const auto window = SDL_GetWindowFromID(event.window.windowID);
-        if (window == m_sdlWnd)
-            UpdateWindowRects();
-        break;
-    }
-
     case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
     {
         const auto window = SDL_GetWindowFromID(event.window.windowID);
-        if (window == m_sdlWnd)
+        if (window == m_sdlWnd && psDeviceMode.WindowStyle == rsWindowed)
         {
-            UpdateWindowRects();
-            if (static_cast<int>(psDeviceMode.Width) != event.window.data1 ||
-                static_cast<int>(psDeviceMode.Height) != event.window.data2)
-            {
-                psDeviceMode.Width = event.window.data1;
-                psDeviceMode.Height = event.window.data2;
-                Reset();
-            }
+            psDeviceMode.Width = static_cast<u32>(event.window.data1);
+            psDeviceMode.Height = static_cast<u32>(event.window.data2);
         }
         if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
             viewport->PlatformRequestResize = true;
@@ -432,8 +422,8 @@ void CRenderDevice::Run()
         Timer_MM_Delta = time_system - time_local;
     }
 
-    SDL_HideWindow(m_sdlWnd); // workaround for SDL bug
-    UpdateWindowProps();
+    SDL_HideWindow(m_sdlWnd);
+    SyncWindowToPsDeviceMode();
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
 }

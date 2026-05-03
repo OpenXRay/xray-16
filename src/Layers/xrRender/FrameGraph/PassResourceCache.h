@@ -146,7 +146,8 @@ public:
     // ═══════════════════════════════════════════════════════
     //  LIFECYCLE
     // ═══════════════════════════════════════════════════════
-    void Clear();  // Clear all caches (on shutdown or device reset)
+    void Clear();
+    void ClearFramebufferDependent();
 
     // Statistics
     struct Stats {

@@ -43,12 +43,13 @@ enum
     // 20-32 bit - reserved to Editor
 };
 
-enum
+enum WindowMode : u32
 {
-    rsWindowed,
-    rsWindowedBorderless,
-    rsFullscreenBorderless, // windowed + topmost + window is scaled to desktop resolution + without borders = looks like fullscreen
-    rsFullscreen,           // true, exclusive fullscreen
+    rsWindowed   = 0,
+    rsBorderless = 1,
+    rsFullscreen = 2,
+    rsWindowedBorderless   = rsBorderless,
+    rsFullscreenBorderless = rsBorderless,
 };
 
 struct DeviceMode
@@ -58,7 +59,6 @@ struct DeviceMode
     u32 Width;
     u32 Height;
     u32 RefreshRate;
-    u32 BitsPerPixel;
 };
 
 ENGINE_API extern DeviceMode psDeviceMode;

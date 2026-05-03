@@ -18,6 +18,14 @@ class fgUIShader : public IUIShader
     friend class xray::render::ui::UIRenderCollector;
 
 public:
+    static constexpr u32 ALIVE_SENTINEL = 0xF6A1B3C5u;
+    static constexpr u32 DEAD_SENTINEL  = 0xDEADF6A1u;
+
+    fgUIShader() : m_aliveSentinel(ALIVE_SENTINEL) {}
+    ~fgUIShader() { m_aliveSentinel = DEAD_SENTINEL; }
+
+    bool IsAlive() const { return m_aliveSentinel == ALIVE_SENTINEL; }
+
     virtual void Copy(IUIShader& _in);
     virtual void create(LPCSTR sh, LPCSTR tex = nullptr);
     virtual bool inited()
@@ -48,5 +56,8 @@ public:
     u32 m_bindlessTextureIndex = UINT32_MAX;
 
     shared_str baseTexture{ "s_base" };
+
+private:
+    u32 m_aliveSentinel{ ALIVE_SENTINEL };
 };
 }

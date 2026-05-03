@@ -147,6 +147,12 @@ public:
     void reset_begin() override;
     void reset_end() override;
 
+protected:
+    void OnBackBufferResizing(u32 oldWidth, u32 oldHeight) override;
+    void OnBackBufferResized(u32 newWidth, u32 newHeight) override;
+
+public:
+
     void level_Load(IReader* fs) override;
     void level_Unload() override;
     HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result) override;
