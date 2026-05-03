@@ -16,7 +16,8 @@ Configs:
   mixed     Mixed
 
 Flags:
-  --vs      Windows-only. Generate Visual Studio 2022 sln/vcxproj instead of Ninja.
+  --vs      Windows-only. Generate Visual Studio sln/vcxproj instead of Ninja.
+            Prefers VS 2026 (v18) when installed, falls back to VS 2022 (v17).
             Build dir: cmake_builds/vs_<config>. Open <dir>/xray.sln in VS.
 
 Build dir: cmake_builds/<config-lowercased>  (or cmake_builds/vs_<config> with --vs)
@@ -89,14 +90,38 @@ configure_windows_build() {
     local vswhere="${c_drive}/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
     if [[ ! -x "$vswhere" ]]; then
         echo "vswhere not found at: $vswhere" >&2
-        echo "Install Visual Studio 2022 (or Build Tools)." >&2
+        echo "Install Visual Studio 2026 or 2022 (or Build Tools)." >&2
         exit 1
     fi
 
-    local vs_install
-    vs_install=$("$vswhere" -latest -property installationPath 2>/dev/null | tr -d '\r')
+    # Prefer the newest installed VS (VS 2026 / v18.x, then VS 2022 / v17.x) for vcvars + toolset.
+    local vs_install vs_install_label
+    vs_install=$("$vswhere" -version "[18.0,19.0)" -latest -property installationPath 2>/dev/null | tr -d '\r')
+    if [[ -n "$vs_install" ]]; then
+        vs_install_label="VS 2026"
+    else
+        vs_install=$("$vswhere" -version "[17.0,18.0)" -latest -property installationPath 2>/dev/null | tr -d '\r')
+        if [[ -n "$vs_install" ]]; then
+            vs_install_label="VS 2022"
+        fi
+    fi
     if [[ -z "$vs_install" ]]; then
-        echo "vswhere found no VS 2022 install." >&2
+        echo "vswhere found no VS 2026 or VS 2022 install." >&2
+        exit 1
+    fi
+
+    # Pick the newest VS generator CMake actually supports (VS 2026 generator support may
+    # not exist yet on older CMake; falling back to VS 2022 still works with a VS 2026 toolset).
+    local cmake_help vs_generator vs_gen_label
+    cmake_help=$(cmake.exe --help 2>/dev/null)
+    if echo "$cmake_help" | grep -q "^[* ] *Visual Studio 18 2026"; then
+        vs_generator="Visual Studio 18 2026"
+        vs_gen_label="VS 2026 generator"
+    elif echo "$cmake_help" | grep -q "^[* ] *Visual Studio 17 2022"; then
+        vs_generator="Visual Studio 17 2022"
+        vs_gen_label="VS 2022 generator"
+    else
+        echo "CMake reports no supported Visual Studio generator (need 2022 or newer). Update CMake." >&2
         exit 1
     fi
 
@@ -138,15 +163,15 @@ configure_windows_build() {
     local tmp_cmd="${BUILD_DIR}/_configure.cmd"
 
     if [[ $USE_VS -eq 1 ]]; then
-        echo ">> Configuring $CONFIG -> $BUILD_DIR (VS 2022 generator)"
-        echo ">> VS install:  $vs_install"
+        echo ">> Configuring $CONFIG -> $BUILD_DIR (${vs_gen_label})"
+        echo ">> VS install:  $vs_install (${vs_install_label} toolset)"
         echo
 
         cat > "$tmp_cmd" <<CMDEOF
 @echo off
 call "${vcvars64_win}" >nul
 if errorlevel 1 exit /b 1
-cmake -G "Visual Studio 17 2022" -A x64 ^
+cmake -G "${vs_generator}" -A x64 ^
     -S "${repo_win}" ^
     -B "${build_dir_win}"
 exit /b %ERRORLEVEL%

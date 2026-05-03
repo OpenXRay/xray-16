@@ -33,7 +33,7 @@ target_include_directories(buildvm
 target_compile_options(buildvm
 	PRIVATE
 	${HOST_ACFLAGS}
-    -Wno-discarded-qualifiers
+    $<$<C_COMPILER_ID:GNU,Clang,AppleClang>:-Wno-discarded-qualifiers>
 )
 
 target_link_options(buildvm
