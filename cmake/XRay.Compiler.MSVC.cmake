@@ -32,3 +32,8 @@ add_compile_options(
 add_link_options("/LARGEADDRESSAWARE")
 
 set(XRAY_DISABLE_WARNINGS "/w")
+
+add_compile_options(
+    $<$<CONFIG:Release,ReleaseMasterGold>:/Ot>
+    $<$<CONFIG:Release,ReleaseMasterGold>:/GS->
+)
