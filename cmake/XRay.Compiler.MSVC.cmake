@@ -17,9 +17,8 @@ add_compile_definitions($<$<CONFIG:ReleaseMasterGold>:_HAS_EXCEPTIONS=0>)
 # Enable debug information for all configurations
 add_compile_options(/Zi)
 
-# Enable SSE2 for 32-bit build
-# (on x64 it's always enabled and produces error if try to to enable it)
 add_compile_options($<$<EQUAL:${CMAKE_SIZEOF_VOID_P},4>:/arch:SSE2>)
+add_compile_options($<$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>:/arch:AVX2>)
 
 # Disable specific warnings
 add_compile_options(
@@ -36,4 +35,12 @@ set(XRAY_DISABLE_WARNINGS "/w")
 add_compile_options(
     $<$<CONFIG:Release,ReleaseMasterGold>:/Ot>
     $<$<CONFIG:Release,ReleaseMasterGold>:/GS->
+    $<$<CONFIG:Release,ReleaseMasterGold>:/fp:fast>
+    $<$<CONFIG:Release,ReleaseMasterGold>:/Qfast_transcendentals>
+    $<$<CONFIG:Release,ReleaseMasterGold>:/Gy>
+)
+
+add_link_options(
+    $<$<CONFIG:Release,ReleaseMasterGold>:/OPT:REF>
+    $<$<CONFIG:Release,ReleaseMasterGold>:/OPT:ICF>
 )
