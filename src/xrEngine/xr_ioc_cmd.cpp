@@ -373,6 +373,52 @@ class CCC_VidMode : public CCC_Token
 
 public:
     CCC_VidMode(pcstr name) : CCC_Token(name, &_dummy, nullptr) {}
+
+    void Execute(pcstr args) override
+    {
+        u32 w = 0, h = 0, r = 0;
+        const int cnt = sscanf(args, "%ux%u (%uHz)", &w, &h, &r);
+        if (cnt >= 2)
+        {
+            psDeviceMode.Width = w;
+            psDeviceMode.Height = h;
+            if (cnt == 3)
+                psDeviceMode.RefreshRate = r;
+        }
+        else
+        {
+            Msg("! Wrong video mode [%s]", args);
+        }
+    }
+
+    const xr_token* GetToken() noexcept override
+    {
+        return vid_mode_token[psDeviceMode.Monitor].data();
+    }
+
+    void GetStatus(TStatus& S) override
+    {
+        xr_sprintf(S, "%ux%u", psDeviceMode.Width, psDeviceMode.Height);
+    }
+
+    void Info(TInfo& I) override
+    {
+        xr_strcpy(I, sizeof(I), "change screen resolution WxH");
+    }
+
+    void fill_tips(vecTips& tips, u32) override
+    {
+        TStatus buf;
+        xr_sprintf(buf, "%ux%u (current)", psDeviceMode.Width, psDeviceMode.Height);
+        tips.push_back(buf);
+
+        const xr_token* tok = GetToken();
+        while (tok && tok->name)
+        {
+            tips.push_back(tok->name);
+            tok++;
+        }
+    }
 };
 
 //-----------------------------------------------------------------------

@@ -193,6 +193,7 @@ nvrhi::PrimitiveType PipelineStateCache::ConvertPrimitiveTopology(PrimitiveTopol
     switch (topology) {
         case PrimitiveTopology::PointList:     return nvrhi::PrimitiveType::PointList;
         case PrimitiveTopology::LineList:      return nvrhi::PrimitiveType::LineList;
+        case PrimitiveTopology::LineStrip:     return nvrhi::PrimitiveType::LineStrip;
         case PrimitiveTopology::TriangleList:  return nvrhi::PrimitiveType::TriangleList;
         case PrimitiveTopology::TriangleStrip: return nvrhi::PrimitiveType::TriangleStrip;
         case PrimitiveTopology::PatchList:     return nvrhi::PrimitiveType::PatchList;

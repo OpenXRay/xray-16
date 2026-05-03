@@ -111,14 +111,14 @@ bool CUITextureMaster::InitTexture(
         sh_pair p = {it->second.file, shader_name};
         xr_map<sh_pair, ui_shader>::iterator sh_it = m_shaders.find(p);
         if (sh_it == m_shaders.end())
-            m_shaders[p]->create(shader_name.c_str(), it->second.file.c_str());  // Now uses NVRHI for DX12
+            m_shaders[p]->create(shader_name.c_str(), it->second.file.c_str());
 
         out_shader = m_shaders[p];
         out_rect = (*it).second.rect;
         return true;
     }
 
-    out_shader->create(shader_name.c_str(), texture_name.c_str());  // Now uses NVRHI for DX12
+    out_shader->create(shader_name.c_str(), texture_name.c_str());
     return false;
 }
 
@@ -130,7 +130,7 @@ bool CUITextureMaster::InitTexture(const shared_str& texture_name, CUIStaticItem
         sh_pair p = {it->second.file, shader_name};
         xr_map<sh_pair, ui_shader>::iterator sh_it = m_shaders.find(p);
         if (sh_it == m_shaders.end())
-            m_shaders[p]->create(shader_name.c_str(), it->second.file.c_str());  // Now uses NVRHI for DX12
+            m_shaders[p]->create(shader_name.c_str(), it->second.file.c_str());
 
         tc->SetShader(m_shaders[p]);
         tc->SetTextureRect((*it).second.rect);
@@ -138,7 +138,7 @@ bool CUITextureMaster::InitTexture(const shared_str& texture_name, CUIStaticItem
         return true;
     }
 
-    tc->CreateShader(texture_name.c_str(), shader_name.c_str());  // Now uses NVRHI for DX12
+    tc->CreateShader(texture_name.c_str(), shader_name.c_str());
     return false;
 }
 

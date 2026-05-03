@@ -335,6 +335,13 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
 {
     ZoneScoped;
 
+    extern xr_vector<SDL_DisplayID> g_displayIDs;
+    auto IndexFromDisplayID = [](SDL_DisplayID id) -> u32 {
+        for (size_t i = 0; i < g_displayIDs.size(); ++i)
+            if (g_displayIDs[i] == id) return static_cast<u32>(i);
+        return 0;
+    };
+
     switch (event.type)
     {
     case SDL_EVENT_DISPLAY_ORIENTATION:
@@ -342,7 +349,7 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
     case SDL_EVENT_DISPLAY_REMOVED:
         CleanupVideoModes();
         FillVideoModes();
-        if (event.display.displayID == psDeviceMode.Monitor && event.type != SDL_EVENT_DISPLAY_ADDED)
+        if (IndexFromDisplayID(event.display.displayID) == psDeviceMode.Monitor && event.type != SDL_EVENT_DISPLAY_ADDED)
             Reset();
         else
             UpdateWindowProps();
@@ -359,7 +366,7 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
     }
 
     case SDL_EVENT_WINDOW_DISPLAY_CHANGED:
-        psDeviceMode.Monitor = event.window.data1;
+        psDeviceMode.Monitor = IndexFromDisplayID(static_cast<SDL_DisplayID>(event.window.data1));
         break;
 
     case SDL_EVENT_WINDOW_RESIZED:

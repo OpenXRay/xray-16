@@ -110,10 +110,10 @@ private:
     nvrhi::CommandListHandle m_uploadCommandList;  // Persistent upload command list (out-of-frame)
     nvrhi::TextureHandle m_backBuffers[BACK_BUFFER_COUNT];
 
-    // Bindless resources
     nvrhi::BindingLayoutHandle m_bindlessLayout;
     nvrhi::DescriptorTableHandle m_bindlessDescriptorTable;
     xr_vector<u32> m_freeBindlessIndices;
+    xr_map<nvrhi::ITexture*, u32> m_bindlessTextureMap;
     u32 m_nextBindlessIndex = 0;
 
     // State

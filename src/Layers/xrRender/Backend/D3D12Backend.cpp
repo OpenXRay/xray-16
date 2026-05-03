@@ -481,7 +481,10 @@ u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
     if (!m_bindlessDescriptorTable || !texture)
         return UINT32_MAX;
 
-    // Get free slot within our descriptor table
+    auto it = m_bindlessTextureMap.find(texture);
+    if (it != m_bindlessTextureMap.end())
+        return it->second;
+
     u32 slot;
     if (!m_freeBindlessIndices.empty()) {
         slot = m_freeBindlessIndices.back();
@@ -494,7 +497,6 @@ u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
         slot = m_nextBindlessIndex++;
     }
 
-    // Write descriptor to our table at the given slot
     nvrhi::BindingSetItem item = nvrhi::BindingSetItem::Texture_SRV(0, texture);
     item.slot = slot;
 
@@ -503,12 +505,20 @@ u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
         return UINT32_MAX;
     }
 
+    m_bindlessTextureMap[texture] = slot;
     return slot;
 }
 
 void D3D12Backend::UnregisterBindlessTexture(u32 index) {
-    if (index < MAX_BINDLESS_TEXTURES)
-        m_freeBindlessIndices.push_back(index);
+    if (index >= MAX_BINDLESS_TEXTURES)
+        return;
+    for (auto it = m_bindlessTextureMap.begin(); it != m_bindlessTextureMap.end(); ++it) {
+        if (it->second == index) {
+            m_bindlessTextureMap.erase(it);
+            break;
+        }
+    }
+    m_freeBindlessIndices.push_back(index);
 }
 
 nvrhi::ITexture* D3D12Backend::GetBackBuffer() {

@@ -49,7 +49,6 @@ void fgUIShader::create(LPCSTR sh, LPCSTR tex)
         m_psReflection = psResult.reflection;
         vsResult.reflection = nullptr;
         psResult.reflection = nullptr;
-        Msg("* [fgUIShader] Compiled UI shader: %s (tex: %s)", sh, tex ? tex : "none");
     }
     else
     {
@@ -64,17 +63,23 @@ u32 fgUIShader::GetBindlessIndex()
 {
     if (m_bindlessTextureIndex != UINT32_MAX)
         return m_bindlessTextureIndex;
+
     if (!m_baseTexture)
         return UINT32_MAX;
+
     auto* texManager = RImplementation.GetRenderDevice()->GetFGResourceManager()->GetTextureManager();
     auto handle = texManager->LoadTexture(m_baseTexture->cName.c_str());
+
     if (!handle.IsValid())
         return UINT32_MAX;
+
     nvrhi::ITexture* nvTex = texManager->GetNVRHITexture(handle);
     if (!nvTex)
         return UINT32_MAX;
+
     if (!GEnv.Backend)
         return UINT32_MAX;
+
     m_bindlessTextureIndex = GEnv.Backend->RegisterBindlessTexture(nvTex);
     return m_bindlessTextureIndex;
 }
@@ -124,12 +129,10 @@ xrImTextureData fgUIShader::GetImGuiTextureId()
 
 bool fgUIShader::GetBaseTextureResolution(Fvector2& res)
 {
+    res = { 1.0f, 1.0f };
     const auto texture = GetBaseTexture();
     if (!texture)
-    {
-        res = { 1.0f, 1.0f };  // Safety fallback to avoid division by zero
         return false;
-    }
 
     FGResourceManager* resourceMgr = RImplementation.GetRenderDevice()->GetFGResourceManager();
     if (!resourceMgr)

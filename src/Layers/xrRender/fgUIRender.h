@@ -57,7 +57,7 @@ private:
         u32 screenWidth, u32 screenHeight, u32 vertexOffset, u32 indexOffset);
 
     ui::UIPrimitiveType ConvertPrimitiveType(ePrimitiveType primType);
-    ui::UIGeometryBatch* GetOrCreateBatch();
+    ui::UIGeometryBatch* GetOrCreateBatch(ui::UIPrimitiveType primType);
 
     IUIShader* m_currentUIShader = nullptr;
     int m_currentAlphaRef = 0;

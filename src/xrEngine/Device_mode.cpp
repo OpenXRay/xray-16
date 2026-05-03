@@ -5,13 +5,26 @@
 
 xr_vector<xr_token> vid_monitor_token;
 xr_map<u32, xr_vector<xr_token>> vid_mode_token;
+xr_vector<SDL_DisplayID> g_displayIDs;
 
-void FillResolutionsForMonitor(const int monitorID)
+SDL_DisplayID DisplayIDFromIndex(u32 index)
+{
+    if (index < g_displayIDs.size())
+        return g_displayIDs[index];
+    if (!g_displayIDs.empty())
+        return g_displayIDs.front();
+    return SDL_GetPrimaryDisplay();
+}
+
+void FillResolutionsForMonitor(int index, SDL_DisplayID displayID)
 {
     int modeCount = 0;
-    SDL_DisplayMode** modes = SDL_GetFullscreenDisplayModes(static_cast<SDL_DisplayID>(monitorID), &modeCount);
+    SDL_DisplayMode** modes = SDL_GetFullscreenDisplayModes(displayID, &modeCount);
     if (!modes)
+    {
+        vid_mode_token[index].emplace_back(nullptr, -1);
         return;
+    }
 
     xr_vector<std::pair<u32, u32>> seen;
     seen.reserve(modeCount);
@@ -29,38 +42,40 @@ void FillResolutionsForMonitor(const int monitorID)
 
         string64 buf;
         xr_sprintf(buf, sizeof(buf), "%dx%d", mode->w, mode->h);
-        vid_mode_token[monitorID].emplace_back(xr_strdup(buf), i);
+        vid_mode_token[index].emplace_back(xr_strdup(buf), i);
     }
 
     SDL_free(modes);
-    vid_mode_token[monitorID].emplace_back(nullptr, -1);
+    vid_mode_token[index].emplace_back(nullptr, -1);
 }
 
-void FillImGuiMonitorData(const int monitorID)
+void FillImGuiMonitorData(int index, SDL_DisplayID displayID)
 {
     ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
 
     ImGuiPlatformMonitor monitor;
     SDL_Rect r;
-    SDL_GetDisplayBounds(static_cast<SDL_DisplayID>(monitorID), &r);
+    SDL_GetDisplayBounds(displayID, &r);
     monitor.MainPos = monitor.WorkPos = ImVec2((float)r.x, (float)r.y);
     monitor.MainSize = monitor.WorkSize = ImVec2((float)r.w, (float)r.h);
 
-    SDL_GetDisplayUsableBounds(static_cast<SDL_DisplayID>(monitorID), &r);
+    SDL_GetDisplayUsableBounds(displayID, &r);
     monitor.WorkPos = ImVec2((float)r.x, (float)r.y);
     monitor.WorkSize = ImVec2((float)r.w, (float)r.h);
 
-    monitor.DpiScale = SDL_GetDisplayContentScale(static_cast<SDL_DisplayID>(monitorID));
+    monitor.DpiScale = SDL_GetDisplayContentScale(displayID);
     if (monitor.DpiScale <= 0.0f)
         monitor.DpiScale = 1.0f;
 
-    monitor.PlatformHandle = (void*)(intptr_t)monitorID;
+    monitor.PlatformHandle = (void*)(intptr_t)index;
     platform_io.Monitors.push_back(monitor);
 }
 
 void CRenderDevice::FillVideoModes()
 {
     ZoneScoped;
+
+    g_displayIDs.clear();
 
     int displayCount = 0;
     SDL_DisplayID* displays = SDL_GetDisplays(&displayCount);
@@ -70,13 +85,15 @@ void CRenderDevice::FillVideoModes()
     for (int i = 0; i < displayCount; ++i)
     {
         const SDL_DisplayID id = displays[i];
+        g_displayIDs.push_back(id);
+
         const char* name = SDL_GetDisplayName(id);
         string256 buf;
-        xr_sprintf(buf, "%d. %s", static_cast<int>(id), name ? name : "(unknown)");
-        vid_monitor_token.emplace_back(xr_strdup(buf), static_cast<int>(id));
+        xr_sprintf(buf, "%d. %s", i, name ? name : "(unknown)");
+        vid_monitor_token.emplace_back(xr_strdup(buf), i);
 
-        FillResolutionsForMonitor(static_cast<int>(id));
-        FillImGuiMonitorData(static_cast<int>(id));
+        FillResolutionsForMonitor(i, id);
+        FillImGuiMonitorData(i, id);
     }
     SDL_free(displays);
     vid_monitor_token.emplace_back(nullptr, -1);
@@ -123,12 +140,12 @@ void CRenderDevice::UpdateWindowProps()
     const bool windowed = psDeviceMode.WindowStyle != rsFullscreen;
     SelectResolution(windowed);
 
-    if (static_cast<u32>(SDL_GetDisplayForWindow(m_sdlWnd)) != psDeviceMode.Monitor)
+    if (SDL_GetDisplayForWindow(m_sdlWnd) != DisplayIDFromIndex(psDeviceMode.Monitor))
     {
         SDL_SetWindowFullscreen(m_sdlWnd, false);
 
         SDL_Rect rect;
-        SDL_GetDisplayBounds(static_cast<SDL_DisplayID>(psDeviceMode.Monitor), &rect);
+        SDL_GetDisplayBounds(DisplayIDFromIndex(psDeviceMode.Monitor), &rect);
         SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
     }
 
@@ -136,7 +153,7 @@ void CRenderDevice::UpdateWindowProps()
         SDL_SetWindowSize(m_sdlWnd, psDeviceMode.Width, psDeviceMode.Height);
     else
     {
-        const SDL_DisplayMode* current = SDL_GetCurrentDisplayMode(static_cast<SDL_DisplayID>(psDeviceMode.Monitor));
+        const SDL_DisplayMode* current = SDL_GetCurrentDisplayMode(DisplayIDFromIndex(psDeviceMode.Monitor));
         if (current)
             SDL_SetWindowSize(m_sdlWnd, current->w, current->h);
     }
@@ -163,7 +180,7 @@ void CRenderDevice::UpdateWindowProps()
         SDL_SetWindowResizable(m_sdlWnd, false);
 
         SDL_DisplayMode mode{};
-        mode.displayID = static_cast<SDL_DisplayID>(psDeviceMode.Monitor);
+        mode.displayID = DisplayIDFromIndex(psDeviceMode.Monitor);
         mode.format = SDL_PIXELFORMAT_UNKNOWN;
         mode.w = static_cast<int>(psDeviceMode.Width);
         mode.h = static_cast<int>(psDeviceMode.Height);
@@ -207,7 +224,7 @@ void CRenderDevice::SelectResolution(const bool windowed)
     }
     else if (psDeviceMode.Width == 0 && psDeviceMode.Height == 0 && psDeviceMode.RefreshRate == 0)
     {
-        const SDL_DisplayMode* current = SDL_GetCurrentDisplayMode(static_cast<SDL_DisplayID>(psDeviceMode.Monitor));
+        const SDL_DisplayMode* current = SDL_GetCurrentDisplayMode(DisplayIDFromIndex(psDeviceMode.Monitor));
         if (current)
         {
             psDeviceMode.Width = current->w;
@@ -219,7 +236,7 @@ void CRenderDevice::SelectResolution(const bool windowed)
     {
         SDL_DisplayMode closest{};
         const bool ok = SDL_GetClosestFullscreenDisplayMode(
-            static_cast<SDL_DisplayID>(psDeviceMode.Monitor),
+            DisplayIDFromIndex(psDeviceMode.Monitor),
             static_cast<int>(psDeviceMode.Width),
             static_cast<int>(psDeviceMode.Height),
             static_cast<float>(psDeviceMode.RefreshRate),
@@ -228,7 +245,7 @@ void CRenderDevice::SelectResolution(const bool windowed)
 
         if (!ok)
         {
-            const SDL_DisplayMode* fallback = SDL_GetCurrentDisplayMode(static_cast<SDL_DisplayID>(psDeviceMode.Monitor));
+            const SDL_DisplayMode* fallback = SDL_GetCurrentDisplayMode(DisplayIDFromIndex(psDeviceMode.Monitor));
             if (fallback)
                 closest = *fallback;
         }

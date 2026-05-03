@@ -720,6 +720,10 @@ u32 VulkanBackend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
     if (!m_bindlessDescriptorTable || !texture)
         return UINT32_MAX;
 
+    auto it = m_bindlessTextureMap.find(texture);
+    if (it != m_bindlessTextureMap.end())
+        return it->second;
+
     u32 slot;
     if (!m_freeBindlessIndices.empty()) {
         slot = m_freeBindlessIndices.back();
@@ -740,12 +744,20 @@ u32 VulkanBackend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
         return UINT32_MAX;
     }
 
+    m_bindlessTextureMap[texture] = slot;
     return slot;
 }
 
 void VulkanBackend::UnregisterBindlessTexture(u32 index) {
-    if (index < MAX_BINDLESS_TEXTURES)
-        m_freeBindlessIndices.push_back(index);
+    if (index >= MAX_BINDLESS_TEXTURES)
+        return;
+    for (auto it = m_bindlessTextureMap.begin(); it != m_bindlessTextureMap.end(); ++it) {
+        if (it->second == index) {
+            m_bindlessTextureMap.erase(it);
+            break;
+        }
+    }
+    m_freeBindlessIndices.push_back(index);
 }
 
 nvrhi::ITexture* VulkanBackend::GetBackBuffer() {
