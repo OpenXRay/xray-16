@@ -22,6 +22,12 @@ public:
     void Destroy() override;
     void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
 
+protected:
+    virtual void OnBackBufferResizing(u32 oldWidth, u32 oldHeight) {}
+    virtual void OnBackBufferResized(u32 newWidth, u32 newHeight) {}
+
+public:
+
     void ObtainRequiredWindowFlags(u32& windowFlags) override;
     void SetupStates() override;
     void OnDeviceCreate(pcstr shName) override;

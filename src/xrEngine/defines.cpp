@@ -9,11 +9,10 @@ ECORE_API bool bDebug = false;
 DeviceMode psDeviceMode =
 {
     .Monitor      = 0,
-    .WindowStyle  = rsFullscreenBorderless,
+    .WindowStyle  = rsBorderless,
     .Width        = 0,
     .Height       = 0,
     .RefreshRate  = 0,
-    .BitsPerPixel = 32
 };
 
 // release version always has "mt_*" enabled

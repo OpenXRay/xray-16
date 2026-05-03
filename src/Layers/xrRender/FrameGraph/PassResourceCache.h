@@ -87,6 +87,7 @@ public:
         nvrhi::IDevice* device);
 
     void Clear();
+    void ClearFramebufferDependent();
 
     struct Stats {
         u32 samplerHits = 0;

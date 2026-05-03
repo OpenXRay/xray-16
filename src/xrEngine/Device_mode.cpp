@@ -7,16 +7,14 @@ xr_vector<xr_token> vid_monitor_token;
 xr_map<u32, xr_vector<xr_token>> vid_mode_token;
 xr_vector<SDL_DisplayID> g_displayIDs;
 
-SDL_DisplayID DisplayIDFromIndex(u32 index)
+static SDL_DisplayID DisplayIDFromIndex(u32 index)
 {
     if (index < g_displayIDs.size())
         return g_displayIDs[index];
-    if (!g_displayIDs.empty())
-        return g_displayIDs.front();
     return SDL_GetPrimaryDisplay();
 }
 
-void FillResolutionsForMonitor(int index, SDL_DisplayID displayID)
+static void EnumerateMonitorModes(int index, SDL_DisplayID displayID)
 {
     int modeCount = 0;
     SDL_DisplayMode** modes = SDL_GetFullscreenDisplayModes(displayID, &modeCount);
@@ -49,12 +47,12 @@ void FillResolutionsForMonitor(int index, SDL_DisplayID displayID)
     vid_mode_token[index].emplace_back(nullptr, -1);
 }
 
-void FillImGuiMonitorData(int index, SDL_DisplayID displayID)
+static void RegisterImGuiMonitor(int index, SDL_DisplayID displayID)
 {
     ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
 
     ImGuiPlatformMonitor monitor;
-    SDL_Rect r;
+    SDL_Rect r{};
     SDL_GetDisplayBounds(displayID, &r);
     monitor.MainPos = monitor.WorkPos = ImVec2((float)r.x, (float)r.y);
     monitor.MainSize = monitor.WorkSize = ImVec2((float)r.w, (float)r.h);
@@ -92,8 +90,8 @@ void CRenderDevice::FillVideoModes()
         xr_sprintf(buf, "%d. %s", i, name ? name : "(unknown)");
         vid_monitor_token.emplace_back(xr_strdup(buf), i);
 
-        FillResolutionsForMonitor(i, id);
-        FillImGuiMonitorData(i, id);
+        EnumerateMonitorModes(i, id);
+        RegisterImGuiMonitor(i, id);
     }
     SDL_free(displays);
     vid_monitor_token.emplace_back(nullptr, -1);
@@ -103,12 +101,12 @@ void CRenderDevice::CleanupVideoModes()
 {
     ZoneScoped;
 
-    for (auto& [monitor_id, tokens] : vid_mode_token)
+    for (auto& [_, tokens] : vid_mode_token)
     {
         for (auto& token : tokens)
         {
-            auto tokenName = const_cast<pstr>(token.name);
-            xr_free(tokenName);
+            pstr name = const_cast<pstr>(token.name);
+            xr_free(name);
         }
         tokens.clear();
     }
@@ -116,147 +114,121 @@ void CRenderDevice::CleanupVideoModes()
 
     for (auto& token : vid_monitor_token)
     {
-        pstr tokenName = const_cast<pstr>(token.name);
-        xr_free(tokenName);
+        pstr name = const_cast<pstr>(token.name);
+        xr_free(name);
     }
     vid_monitor_token.clear();
+
+    g_displayIDs.clear();
 
     ImGui::GetPlatformIO().Monitors.resize(0);
 }
 
-void CRenderDevice::SetWindowDraggable(bool draggable)
+namespace
 {
-    const bool windowed = psDeviceMode.WindowStyle == rsWindowed;
-    const bool resizable = (SDL_GetWindowFlags(Device.m_sdlWnd) & SDL_WINDOW_RESIZABLE) != 0;
-    m_allowWindowDrag = draggable && windowed && resizable;
-
-    SDL_SetWindowOpacity(Device.m_sdlWnd, m_allowWindowDrag ? 0.95f : 1.0f);
-}
-
-void CRenderDevice::UpdateWindowProps()
+void SyncWindowedSize(SDL_Window* w)
 {
-    ZoneScoped;
-
-    const bool windowed = psDeviceMode.WindowStyle != rsFullscreen;
-    SelectResolution(windowed);
-
-    if (SDL_GetDisplayForWindow(m_sdlWnd) != DisplayIDFromIndex(psDeviceMode.Monitor))
-    {
-        SDL_SetWindowFullscreen(m_sdlWnd, false);
-
-        SDL_Rect rect;
-        SDL_GetDisplayBounds(DisplayIDFromIndex(psDeviceMode.Monitor), &rect);
-        SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
-    }
-
-    if (psDeviceMode.WindowStyle != rsFullscreenBorderless)
-        SDL_SetWindowSize(m_sdlWnd, psDeviceMode.Width, psDeviceMode.Height);
-    else
-    {
-        const SDL_DisplayMode* current = SDL_GetCurrentDisplayMode(DisplayIDFromIndex(psDeviceMode.Monitor));
-        if (current)
-            SDL_SetWindowSize(m_sdlWnd, current->w, current->h);
-    }
-
-    if (windowed)
-    {
-        const bool drawBorders = psDeviceMode.WindowStyle == rsWindowed;
-        const bool useDesktopFullscreen = b_is_Ready && psDeviceMode.WindowStyle == rsFullscreenBorderless;
-
-        SDL_SetWindowBordered(m_sdlWnd, drawBorders);
-        SDL_SetWindowResizable(m_sdlWnd, !useDesktopFullscreen);
-        if (useDesktopFullscreen)
-        {
-            SDL_SetWindowFullscreenMode(m_sdlWnd, nullptr);
-            SDL_SetWindowFullscreen(m_sdlWnd, true);
-        }
-        else
-        {
-            SDL_SetWindowFullscreen(m_sdlWnd, false);
-        }
-    }
-    else if (b_is_Ready)
-    {
-        SDL_SetWindowResizable(m_sdlWnd, false);
-
-        SDL_DisplayMode mode{};
-        mode.displayID = DisplayIDFromIndex(psDeviceMode.Monitor);
-        mode.format = SDL_PIXELFORMAT_UNKNOWN;
-        mode.w = static_cast<int>(psDeviceMode.Width);
-        mode.h = static_cast<int>(psDeviceMode.Height);
-        mode.refresh_rate = static_cast<float>(psDeviceMode.RefreshRate);
-        SDL_SetWindowFullscreenMode(m_sdlWnd, &mode);
-        SDL_SetWindowFullscreen(m_sdlWnd, true);
-    }
-
-    SDL_PumpEvents();
-    UpdateWindowRects();
-
-    ImGuiIO& io = ImGui::GetIO();
-
-    io.DisplaySize = { static_cast<float>(psDeviceMode.Width), static_cast<float>(psDeviceMode.Height) };
-    io.DisplayFramebufferScale = ImVec2{ float(dwWidth / m_rcWindowClient.w), float(dwHeight / m_rcWindowClient.h) };
-}
-
-void CRenderDevice::UpdateWindowRects()
-{
-    m_rcWindowClient.x = 0;
-    m_rcWindowClient.y = 0;
-    SDL_GetWindowSize(m_sdlWnd, &m_rcWindowClient.w, &m_rcWindowClient.h);
-
-    SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowBounds.x, &m_rcWindowBounds.y);
-    SDL_GetWindowSize(m_sdlWnd, &m_rcWindowBounds.w, &m_rcWindowBounds.h);
-
-    int top, left, bottom, right;
-    SDL_GetWindowBordersSize(m_sdlWnd, &top, &left, &bottom, &right);
-    m_rcWindowBounds.x -= left;
-    m_rcWindowBounds.y -= top;
-    m_rcWindowBounds.w += right;
-    m_rcWindowBounds.h += bottom;
-}
-
-void CRenderDevice::SelectResolution(const bool windowed)
-{
-    if (GEnv.isDedicatedServer)
-    {
-        psDeviceMode.Width = 640;
-        psDeviceMode.Height = 480;
-    }
-    else if (psDeviceMode.Width == 0 && psDeviceMode.Height == 0 && psDeviceMode.RefreshRate == 0)
+    if (psDeviceMode.WindowStyle != rsWindowed)
+        return;
+    if (psDeviceMode.Width == 0 || psDeviceMode.Height == 0)
     {
         const SDL_DisplayMode* current = SDL_GetCurrentDisplayMode(DisplayIDFromIndex(psDeviceMode.Monitor));
         if (current)
         {
-            psDeviceMode.Width = current->w;
-            psDeviceMode.Height = current->h;
-            psDeviceMode.RefreshRate = static_cast<u32>(current->refresh_rate);
+            psDeviceMode.Width = static_cast<u32>(current->w * 3 / 4);
+            psDeviceMode.Height = static_cast<u32>(current->h * 3 / 4);
         }
     }
-    else if (!windowed)
+    int curW = 0, curH = 0;
+    SDL_GetWindowSize(w, &curW, &curH);
+    if (curW != static_cast<int>(psDeviceMode.Width) || curH != static_cast<int>(psDeviceMode.Height))
+        SDL_SetWindowSize(w, static_cast<int>(psDeviceMode.Width), static_cast<int>(psDeviceMode.Height));
+}
+
+void SyncMonitor(SDL_Window* w)
+{
+    const SDL_DisplayID requested = DisplayIDFromIndex(psDeviceMode.Monitor);
+    if (SDL_GetDisplayForWindow(w) == requested)
+        return;
+    SDL_Rect rect{};
+    if (SDL_GetDisplayBounds(requested, &rect))
+        SDL_SetWindowPosition(w, rect.x, rect.y);
+}
+
+void SyncFullscreenMode(SDL_Window* w)
+{
+    if (psDeviceMode.WindowStyle != rsFullscreen)
     {
-        SDL_DisplayMode closest{};
-        const bool ok = SDL_GetClosestFullscreenDisplayMode(
+        SDL_SetWindowFullscreenMode(w, nullptr);
+        return;
+    }
+    SDL_DisplayMode closest{};
+    if (SDL_GetClosestFullscreenDisplayMode(
             DisplayIDFromIndex(psDeviceMode.Monitor),
             static_cast<int>(psDeviceMode.Width),
             static_cast<int>(psDeviceMode.Height),
             static_cast<float>(psDeviceMode.RefreshRate),
             false,
-            &closest);
-
-        if (!ok)
-        {
-            const SDL_DisplayMode* fallback = SDL_GetCurrentDisplayMode(DisplayIDFromIndex(psDeviceMode.Monitor));
-            if (fallback)
-                closest = *fallback;
-        }
-
-        psDeviceMode.Width = closest.w;
-        psDeviceMode.Height = closest.h;
+            &closest))
+    {
+        psDeviceMode.Width = static_cast<u32>(closest.w);
+        psDeviceMode.Height = static_cast<u32>(closest.h);
         psDeviceMode.RefreshRate = static_cast<u32>(closest.refresh_rate);
+        SDL_SetWindowFullscreenMode(w, &closest);
+    }
+    else
+    {
+        SDL_SetWindowFullscreenMode(w, nullptr);
+    }
+}
+
+void SyncWindowMode(SDL_Window* w)
+{
+    const u32 mode = psDeviceMode.WindowStyle;
+    SDL_SetWindowBordered(w, mode == rsWindowed);
+    SDL_SetWindowResizable(w, mode == rsWindowed);
+    SDL_SetWindowFullscreen(w, mode != rsWindowed);
+}
+}
+
+void CRenderDevice::SyncWindowToPsDeviceMode()
+{
+    ZoneScoped;
+    if (!m_sdlWnd)
+        return;
+
+    SyncMonitor(m_sdlWnd);
+    SyncWindowedSize(m_sdlWnd);
+    SyncFullscreenMode(m_sdlWnd);
+    SyncWindowMode(m_sdlWnd);
+}
+
+void CRenderDevice::UpdateWindowState()
+{
+    ZoneScoped;
+    if (!m_sdlWnd)
+        return;
+
+    int pxW = 0, pxH = 0;
+    SDL_GetWindowSizeInPixels(m_sdlWnd, &pxW, &pxH);
+    m_windowVisible = (pxW > 0 && pxH > 0);
+    if (!m_windowVisible)
+        return;
+
+    if (static_cast<u32>(pxW) != dwWidth || static_cast<u32>(pxH) != dwHeight)
+    {
+        if (psDeviceMode.WindowStyle == rsWindowed)
+        {
+            psDeviceMode.Width = static_cast<u32>(pxW);
+            psDeviceMode.Height = static_cast<u32>(pxH);
+        }
+        Reset();
+        return;
     }
 
-    dwWidth = psDeviceMode.Width;
-    dwHeight = psDeviceMode.Height;
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = { static_cast<float>(dwWidth), static_cast<float>(dwHeight) };
+    io.DisplayFramebufferScale = ImVec2{ 1.0f, 1.0f };
 }
 
 SDL_Window* CRenderDevice::GetApplicationWindow()
@@ -270,7 +242,7 @@ void CRenderDevice::OnErrorDialog(bool beforeDialog)
     const bool needUpdateInput = pInput && pInput->IsExclusiveMode();
 
     if (restore)
-        UpdateWindowProps();
+        SyncWindowToPsDeviceMode();
     else
         SDL_SetWindowFullscreen(m_sdlWnd, false);
 

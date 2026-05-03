@@ -35,7 +35,15 @@ void CRenderDevice::Create()
     if (GEnv.isDedicatedServer)
         psDeviceMode.WindowStyle = rsWindowed;
 
-    UpdateWindowProps();
+    SyncWindowToPsDeviceMode();
+
+    int pxW = 0, pxH = 0;
+    SDL_GetWindowSizeInPixels(m_sdlWnd, &pxW, &pxH);
+    if (pxW > 0)
+        dwWidth = static_cast<u32>(pxW);
+    if (pxH > 0)
+        dwHeight = static_cast<u32>(pxH);
+
     GEnv.Render->Create(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
     Memory.mem_compact();

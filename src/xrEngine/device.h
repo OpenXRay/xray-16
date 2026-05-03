@@ -34,12 +34,6 @@ constexpr float HUD_VIEWPORT_NEAR = 0.05f;
 class ENGINE_API CRenderDevice : public IWindowHandler
 {
 public:
-    // Main objects used for creating and rendering the 3D scene
-    // Real application window resolution
-    SDL_Rect m_rcWindowBounds{};
-
-    // Real game window resolution
-    SDL_Rect m_rcWindowClient{};
 
 private:
     u32 Timer_MM_Delta{};
@@ -154,8 +148,8 @@ public:
     float fFOV{};
     float fASPECT{};
 
-    bool m_allowWindowDrag{}; // For windowed mode
     bool IsAnselActive{};
+    bool m_windowVisible{ true };
 
     CRenderDevice()
     {
@@ -201,9 +195,8 @@ public:
     void ProcessEvent(const SDL_Event& event);
     void OnWindowActivate(SDL_Window* window, bool activated);
 
-    void UpdateWindowProps();
-    void UpdateWindowRects();
-    void SelectResolution(bool windowed);
+    void UpdateWindowState();
+    void SyncWindowToPsDeviceMode();
 
     void Initialize();
 
@@ -215,9 +208,6 @@ public:
 
     const RenderDeviceStatistics& GetStats() const { return stats; }
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
-
-    void SetWindowDraggable(bool draggable);
-    bool IsWindowDraggable() const { return m_allowWindowDrag; }
 
     void* GetApplicationWindowHandle() const override;
     SDL_Window* GetApplicationWindow() override;

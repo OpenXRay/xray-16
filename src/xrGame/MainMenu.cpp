@@ -366,7 +366,6 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     {
         IWantMyMouseBackScreamed = true;
         pInput->GrabInput(false);
-        Device.SetWindowDraggable(true);
     }
 
     switch (GetBindedAction(dik))
@@ -396,7 +395,6 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
     {
         IWantMyMouseBackScreamed = false;
         pInput->GrabInput(true);
-        Device.SetWindowDraggable(false);
     }
 
     CDialogHolder::IR_UIOnKeyboardRelease(dik);
