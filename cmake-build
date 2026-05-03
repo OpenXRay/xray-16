@@ -83,6 +83,18 @@ run_cmd_file() {
     esac
 }
 
+IS_VS=0
+VS_CONFIG=""
+if [[ -f "$BUILD_DIR/CMakeCache.txt" ]] && grep -q '^CMAKE_GENERATOR:INTERNAL=Visual Studio' "$BUILD_DIR/CMakeCache.txt"; then
+    IS_VS=1
+    VS_CONFIG="ReleaseMasterGold"
+    case "$BUILD_DIR" in
+        *vs_release)             VS_CONFIG="Release" ;;
+        *vs_mixed)               VS_CONFIG="Mixed" ;;
+        *vs_releasemastergold)   VS_CONFIG="ReleaseMasterGold" ;;
+    esac
+fi
+
 NINJA_ARGS="-j ${JOBS}"
 if [[ -n "$KEEP_GOING" ]]; then
     NINJA_ARGS="${NINJA_ARGS} ${KEEP_GOING}"
@@ -124,13 +136,24 @@ build_windows() {
     fi
     echo
 
-    cat > "$tmp_cmd" <<CMDEOF
+    if [[ $IS_VS -eq 1 ]]; then
+        echo ">> Detected Visual Studio generator, building config: $VS_CONFIG"
+        cat > "$tmp_cmd" <<CMDEOF
+@echo off
+call "${vcvars64_win}" >nul
+if errorlevel 1 exit /b 1
+cmake --build "${build_dir_win}" --config ${VS_CONFIG} ${target_arg} --parallel ${JOBS}
+exit /b %ERRORLEVEL%
+CMDEOF
+    else
+        cat > "$tmp_cmd" <<CMDEOF
 @echo off
 call "${vcvars64_win}" >nul
 if errorlevel 1 exit /b 1
 cmake --build "${build_dir_win}" ${target_arg} -- ${NINJA_ARGS}
 exit /b %ERRORLEVEL%
 CMDEOF
+    fi
 
     local rc=0
     run_cmd_file "$tmp_cmd" || rc=$?

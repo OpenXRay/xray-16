@@ -22,7 +22,24 @@ include(XRay.Build)
 include(XRay.Windows.Externals)
 include(XRay.Packaging)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if (CMAKE_GENERATOR MATCHES "Visual Studio")
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT xr_3da)
+endif()
+
 add_subdirectory(Externals)
 add_subdirectory(src)
 add_subdirectory(res)
 add_subdirectory(misc)
+
+set(XRAY_GAME_DATA_DIR "${CMAKE_SOURCE_DIR}/../scop" CACHE PATH
+    "Working directory used when launching xr_3da from the IDE (must contain fsgame.ltx)")
+
+if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET xr_3da)
+    set_target_properties(xr_3da PROPERTIES
+        VS_DEBUGGER_WORKING_DIRECTORY "${XRAY_GAME_DATA_DIR}"
+        VS_DEBUGGER_COMMAND "$<TARGET_FILE:xr_3da>"
+    )
+endif()
