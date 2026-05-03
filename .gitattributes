@@ -1,6 +1,11 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
+# Shell scripts must stay LF on all platforms (Windows runs them via Git Bash / WSL)
+*.sh                    text eol=lf
+cmake-build             text eol=lf
+cmake-initial-configure text eol=lf
+
 # Custom for Visual Studio
 *.cs     diff=csharp
 *.sln    merge=union
