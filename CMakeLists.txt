@@ -34,6 +34,25 @@ add_subdirectory(src)
 add_subdirectory(res)
 add_subdirectory(misc)
 
+if(MSVC)
+    function(xray_set_per_target_pdb dir)
+        get_property(_subdirs DIRECTORY ${dir} PROPERTY SUBDIRECTORIES)
+        foreach(_sub IN LISTS _subdirs)
+            xray_set_per_target_pdb(${_sub})
+        endforeach()
+        get_property(_targets DIRECTORY ${dir} PROPERTY BUILDSYSTEM_TARGETS)
+        foreach(_tgt IN LISTS _targets)
+            get_target_property(_type ${_tgt} TYPE)
+            if(NOT _type STREQUAL "INTERFACE_LIBRARY" AND NOT _type STREQUAL "UTILITY")
+                set_target_properties(${_tgt} PROPERTIES
+                    COMPILE_PDB_NAME ${_tgt}
+                    PDB_NAME ${_tgt})
+            endif()
+        endforeach()
+    endfunction()
+    xray_set_per_target_pdb(${CMAKE_SOURCE_DIR})
+endif()
+
 set(XRAY_GAME_DATA_DIR "${CMAKE_SOURCE_DIR}/../scop" CACHE PATH
     "Working directory used when launching xr_3da from the IDE (must contain fsgame.ltx)")
 
