@@ -9,19 +9,10 @@
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/fgThunderboltDescRender.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 
 namespace xray::render::fg
 {
-namespace
-{
-constexpr size_t kCBSize = 256;
-
-struct EffectsWorldCB
-{
-    Fmatrix m_VP;
-    Fmatrix m_W;
-};
-} // namespace
 
 FGThunderboltRender::FGThunderboltRender()
 {
@@ -57,7 +48,7 @@ void FGThunderboltRender::InitResources()
     R_ASSERT2(m_inputLayout, "FGThunderboltRender: createInputLayout failed");
 
     nvrhi::BufferDesc cbDesc;
-    cbDesc.byteSize = kCBSize;
+    cbDesc.byteSize = sizeof(passes::DynamicTransforms);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
     cbDesc.maxVersions = 16;
@@ -303,12 +294,9 @@ void FGThunderboltRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer
     if (!m_indices.empty())
         cmdList->writeBuffer(m_indexBuffer, m_indices.data(), m_indices.size() * sizeof(u16));
 
-    EffectsWorldCB cb{};
-    cb.m_VP = Device.mFullTransform;
-    cb.m_W.identity();
-    u8 cbData[kCBSize] = {};
-    std::memcpy(cbData, &cb, sizeof(cb));
-    cmdList->writeBuffer(m_constantBuffer, cbData, kCBSize);
+    passes::DynamicTransforms cb{};
+    passes::FillDynamicTransforms(cb);
+    cmdList->writeBuffer(m_constantBuffer, &cb, sizeof(cb));
 
     cmdList->setBufferState(m_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
     cmdList->setBufferState(m_indexBuffer, nvrhi::ResourceStates::IndexBuffer);

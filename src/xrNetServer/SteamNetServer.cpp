@@ -2,13 +2,13 @@
 #include "SteamNetServer.h"
 #include <steam/isteamnetworkingutils.h>
 
-static SteamNetServer* s_pCallbackInstance = nullptr;
+static SteamNetServer* s_pServerCallbackInstance = nullptr;
 
 void SvSteamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t *pInfo)
 {
-	if (s_pCallbackInstance)
+	if (s_pServerCallbackInstance)
 	{
-		s_pCallbackInstance->OnSteamNetConnectionStatusChanged(pInfo);
+		s_pServerCallbackInstance->OnSteamNetConnectionStatusChanged(pInfo);
 	}
 }
 
@@ -162,7 +162,7 @@ void SteamNetServer::Update()
 
 void SteamNetServer::PollConnectionStateChanges()
 {
-	s_pCallbackInstance = this;
+	s_pServerCallbackInstance = this;
 	m_pInterface->RunCallbacks();
 }
 

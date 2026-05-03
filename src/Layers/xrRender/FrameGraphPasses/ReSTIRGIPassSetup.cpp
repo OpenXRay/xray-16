@@ -27,8 +27,8 @@ namespace xray::render::fg::passes {
 
 using namespace framegraph;
 
-static nvrhi::BufferHandle s_placeholderBuffer;
-static nvrhi::TextureHandle s_placeholderCube;
+static nvrhi::BufferHandle s_rtgiPlaceholderBuffer;
+static nvrhi::TextureHandle s_rtgiPlaceholderCube;
 
 struct ReSTIRGICB {
     Fmatrix invViewProj;
@@ -73,16 +73,16 @@ static_assert(sizeof(CompositeCB) == 96, "CompositeCB must be 96 bytes");
 
 static void CreatePlaceholders(nvrhi::IDevice* nvDevice)
 {
-    if (!s_placeholderBuffer) {
+    if (!s_rtgiPlaceholderBuffer) {
         nvrhi::BufferDesc desc;
         desc.debugName = "RTGI_PlaceholderBuf";
         desc.byteSize = 4;
         desc.canHaveRawViews = true;
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
-        s_placeholderBuffer = nvDevice->createBuffer(desc);
+        s_rtgiPlaceholderBuffer = nvDevice->createBuffer(desc);
     }
-    if (!s_placeholderCube) {
+    if (!s_rtgiPlaceholderCube) {
         nvrhi::TextureDesc desc;
         desc.debugName = "RTGI_PlaceholderCube";
         desc.width = 1;
@@ -92,7 +92,7 @@ static void CreatePlaceholders(nvrhi::IDevice* nvDevice)
         desc.format = nvrhi::Format::RGBA8_UNORM;
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
-        s_placeholderCube = nvDevice->createTexture(desc);
+        s_rtgiPlaceholderCube = nvDevice->createTexture(desc);
     }
 }
 
@@ -316,8 +316,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
     auto* resourceManager = device->GetFGResourceManager();
     auto* texManager = resourceManager ? resourceManager->GetTextureManager() : nullptr;
 
-    nvrhi::ITexture* sky0Tex = s_placeholderCube.Get();
-    nvrhi::ITexture* sky1Tex = s_placeholderCube.Get();
+    nvrhi::ITexture* sky0Tex = s_rtgiPlaceholderCube.Get();
+    nvrhi::ITexture* sky1Tex = s_rtgiPlaceholderCube.Get();
     float skyWeight = env.CurrentEnv.weight;
 
     if (texManager && env.Current[0] && env.Current[1]) {
@@ -460,10 +460,10 @@ ReSTIRGIOutput setupReSTIRGIPass(
             nvrhi::IBuffer* skinnedIB = data.accelMgr->GetSkinnedIB();
             nvrhi::IBuffer* grassVB = data.accelMgr->GetGrassOutputVB();
             nvrhi::IBuffer* grassIB = data.accelMgr->GetGrassIB();
-            if (!skinnedVB) skinnedVB = s_placeholderBuffer.Get();
-            if (!skinnedIB) skinnedIB = s_placeholderBuffer.Get();
-            if (!grassVB) grassVB = s_placeholderBuffer.Get();
-            if (!grassIB) grassIB = s_placeholderBuffer.Get();
+            if (!skinnedVB) skinnedVB = s_rtgiPlaceholderBuffer.Get();
+            if (!skinnedIB) skinnedIB = s_rtgiPlaceholderBuffer.Get();
+            if (!grassVB) grassVB = s_rtgiPlaceholderBuffer.Get();
+            if (!grassIB) grassIB = s_rtgiPlaceholderBuffer.Get();
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_initial", ".cs");
@@ -698,8 +698,8 @@ void ShutdownReSTIRGI(ReSTIRGIPassState& state)
         state.reservoirB[i] = nullptr;
     }
     state.directLighting = nullptr;
-    s_placeholderBuffer = nullptr;
-    s_placeholderCube = nullptr;
+    s_rtgiPlaceholderBuffer = nullptr;
+    s_rtgiPlaceholderCube = nullptr;
     state.initialized = false;
     state.enabled = false;
 }

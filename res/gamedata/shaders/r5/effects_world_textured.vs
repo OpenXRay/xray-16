@@ -1,7 +1,11 @@
-cbuffer EffectsWorldCB : register(b0)
+cbuffer DynamicTransforms : register(b0)
 {
-    float4x4 m_VP;
+    float4x4 m_WVP;
+    float4x4 m_WV;
     float4x4 m_W;
+    float4 L_material;
+    float4 hemi_cube_pos_faces;
+    float4 hemi_cube_neg_faces;
 };
 
 struct VSInput
@@ -21,8 +25,7 @@ struct VSOutput
 VSOutput main(VSInput input)
 {
     VSOutput output;
-    float4 worldPos = mul(m_W, float4(input.position, 1.0));
-    output.position = mul(m_VP, worldPos);
+    output.position = mul(m_WVP, float4(input.position, 1.0));
     output.color = input.color.bgra;
     output.texcoord = input.texcoord;
     return output;

@@ -12,13 +12,13 @@ XRNETSERVER_API int     psNET_ClientUpdate = 30;
 XRNETSERVER_API int     psNET_ClientPending = 2;
 XRNETSERVER_API char    psNET_Name[32]    = "Player";
 
-static SteamNetClient* s_pCallbackInstance = nullptr;
+static SteamNetClient* s_pClientCallbackInstance = nullptr;
 
 void ClSteamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t *pInfo)
 {
-	if (s_pCallbackInstance)
+	if (s_pClientCallbackInstance)
 	{
-		s_pCallbackInstance->OnSteamNetConnectionStatusChanged(pInfo);
+		s_pClientCallbackInstance->OnSteamNetConnectionStatusChanged(pInfo);
 	}
 }
 
@@ -228,7 +228,7 @@ void SteamNetClient::PollIncomingMessages()
 
 void SteamNetClient::PollConnectionStateChanges()
 {
-	s_pCallbackInstance = this;
+	s_pClientCallbackInstance = this;
 	m_pInterface->RunCallbacks();
 }
 

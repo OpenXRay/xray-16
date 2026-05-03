@@ -34,8 +34,8 @@ static nvrhi::ComputePipelineHandle s_pipeline;
 static nvrhi::BindingLayoutHandle s_layout;
 static nvrhi::SamplerHandle s_sampler;
 static nvrhi::TextureHandle s_accumBuffer;
-static nvrhi::TextureHandle s_placeholderCube;
-static nvrhi::BufferHandle s_placeholderBuffer;
+static nvrhi::TextureHandle s_ptPlaceholderCube;
+static nvrhi::BufferHandle s_ptPlaceholderBuffer;
 static u32 s_accumWidth = 0;
 static u32 s_accumHeight = 0;
 static bool s_initialized = false;
@@ -62,7 +62,7 @@ static_assert(sizeof(PathTracerCB) == 160, "PathTracerCB must be 160 bytes");
 
 static void CreatePlaceholderCubemap(nvrhi::IDevice* nvDevice)
 {
-    if (s_placeholderCube) return;
+    if (s_ptPlaceholderCube) return;
 
     nvrhi::TextureDesc desc;
     desc.debugName = "PT_PlaceholderCube";
@@ -75,12 +75,12 @@ static void CreatePlaceholderCubemap(nvrhi::IDevice* nvDevice)
     desc.initialState = nvrhi::ResourceStates::ShaderResource;
     desc.keepInitialState = true;
 
-    s_placeholderCube = nvDevice->createTexture(desc);
+    s_ptPlaceholderCube = nvDevice->createTexture(desc);
 }
 
 static void CreatePlaceholderBuffer(nvrhi::IDevice* nvDevice)
 {
-    if (s_placeholderBuffer) return;
+    if (s_ptPlaceholderBuffer) return;
 
     nvrhi::BufferDesc desc;
     desc.debugName = "PT_PlaceholderBuffer";
@@ -89,7 +89,7 @@ static void CreatePlaceholderBuffer(nvrhi::IDevice* nvDevice)
     desc.initialState = nvrhi::ResourceStates::ShaderResource;
     desc.keepInitialState = true;
 
-    s_placeholderBuffer = nvDevice->createBuffer(desc);
+    s_ptPlaceholderBuffer = nvDevice->createBuffer(desc);
 }
 
 static void InitializeResources(fg::RenderDevice* device)
@@ -214,8 +214,8 @@ PathTracerOutput setupPathTracerPass(
     auto* resourceManager = device->GetFGResourceManager();
     resources::TextureManager* texManager = resourceManager ? resourceManager->GetTextureManager() : nullptr;
 
-    nvrhi::ITexture* sky0Tex = s_placeholderCube.Get();
-    nvrhi::ITexture* sky1Tex = s_placeholderCube.Get();
+    nvrhi::ITexture* sky0Tex = s_ptPlaceholderCube.Get();
+    nvrhi::ITexture* sky1Tex = s_ptPlaceholderCube.Get();
     float skyWeight = env.CurrentEnv.weight;
 
     if (texManager && env.Current[0] && env.Current[1]) {
@@ -311,10 +311,10 @@ PathTracerOutput setupPathTracerPass(
             nvrhi::IBuffer* skinnedIB = data.accelMgr->GetSkinnedIB();
             nvrhi::IBuffer* grassVB = data.accelMgr->GetGrassOutputVB();
             nvrhi::IBuffer* grassIB = data.accelMgr->GetGrassIB();
-            if (!skinnedVB) skinnedVB = s_placeholderBuffer.Get();
-            if (!skinnedIB) skinnedIB = s_placeholderBuffer.Get();
-            if (!grassVB) grassVB = s_placeholderBuffer.Get();
-            if (!grassIB) grassIB = s_placeholderBuffer.Get();
+            if (!skinnedVB) skinnedVB = s_ptPlaceholderBuffer.Get();
+            if (!skinnedIB) skinnedIB = s_ptPlaceholderBuffer.Get();
+            if (!grassVB) grassVB = s_ptPlaceholderBuffer.Get();
+            if (!grassIB) grassIB = s_ptPlaceholderBuffer.Get();
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* csReflection = shaderLoader->GetCachedReflection("rt_pathtrace", ".cs");
@@ -372,8 +372,8 @@ void ShutdownPathTracer()
     s_layout = nullptr;
     s_sampler = nullptr;
     s_accumBuffer = nullptr;
-    s_placeholderCube = nullptr;
-    s_placeholderBuffer = nullptr;
+    s_ptPlaceholderCube = nullptr;
+    s_ptPlaceholderBuffer = nullptr;
     s_accumWidth = 0;
     s_accumHeight = 0;
     s_initialized = false;
