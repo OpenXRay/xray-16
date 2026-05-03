@@ -14,8 +14,11 @@ add_compile_options($<$<NOT:$<CONFIG:ReleaseMasterGold>>:/EHsc>)
 # Disable MS STL exceptions on ReleaseMasterGold
 add_compile_definitions($<$<CONFIG:ReleaseMasterGold>:_HAS_EXCEPTIONS=0>)
 
-# Enable debug information for all configurations
-add_compile_options(/Zi)
+add_compile_options($<IF:$<CONFIG:ReleaseMasterGold>,/Z7,/Zi>)
+
+if (CMAKE_GENERATOR MATCHES "Visual Studio")
+    add_compile_options(/MP)
+endif()
 
 add_compile_options($<$<EQUAL:${CMAKE_SIZEOF_VOID_P},4>:/arch:SSE2>)
 add_compile_options($<$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>:/arch:AVX2>)

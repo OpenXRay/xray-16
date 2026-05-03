@@ -29,7 +29,10 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio")
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT xr_3da)
 endif()
 
-add_subdirectory(Externals)
+block()
+    set(CMAKE_UNITY_BUILD OFF)
+    add_subdirectory(Externals)
+endblock()
 add_subdirectory(src)
 add_subdirectory(res)
 add_subdirectory(misc)
@@ -53,10 +56,10 @@ if(MSVC)
     xray_set_per_target_pdb(${CMAKE_SOURCE_DIR})
 endif()
 
-set(XRAY_GAME_DATA_DIR "${CMAKE_SOURCE_DIR}/../scop" CACHE PATH
-    "Working directory used when launching xr_3da from the IDE (must contain fsgame.ltx)")
+set(XRAY_GAME_DATA_DIR "" CACHE PATH
+    "Working directory used when launching xr_3da from the IDE (must contain fsgame.ltx). Leave blank to inherit MSBuild default.")
 
-if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET xr_3da)
+if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET xr_3da AND XRAY_GAME_DATA_DIR)
     set_target_properties(xr_3da PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${XRAY_GAME_DATA_DIR}"
         VS_DEBUGGER_COMMAND "$<TARGET_FILE:xr_3da>"
