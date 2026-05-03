@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
     cat >&2 <<USAGE
-Usage: $0 [RMG|release|mixed] [--vs]
+Usage: $0 [RMG|release|mixed|debug] [--vs] [--arch x64|x86]
 
 Cleans and re-configures CMake for the current platform.
 
@@ -17,24 +17,40 @@ Configs:
   debug     Debug
 
 Flags:
-  --vs      Windows-only. Generate Visual Studio sln/vcxproj instead of Ninja.
-            Prefers VS 2026 (v18) when installed, falls back to VS 2022 (v17).
-            Build dir: cmake_builds/vs_<config>. Open <dir>/xray.sln in VS.
+  --vs              Windows-only. Generate Visual Studio sln/vcxproj instead of Ninja.
+                    Prefers VS 2026 (v18) when installed, falls back to VS 2022 (v17).
+                    Build dir: cmake_builds/vs_<config>[_x86]. Open <dir>/xray.sln in VS.
+  --arch x64|x86    Target architecture, default x64. x86 requires --vs.
 
-Build dir: cmake_builds/<config-lowercased>  (or cmake_builds/vs_<config> with --vs)
+Build dir: cmake_builds/<config-lowercased>[_x86]  (or cmake_builds/vs_<config>[_x86] with --vs)
 USAGE
     exit 1
 }
 
 CONFIG_INPUT=""
 USE_VS=0
+ARCH="x64"
+expect_arch=0
 for arg in "$@"; do
+    if [[ $expect_arch -eq 1 ]]; then
+        ARCH="$arg"; expect_arch=0; continue
+    fi
     case "$arg" in
         --vs) USE_VS=1 ;;
+        --arch) expect_arch=1 ;;
+        --arch=*) ARCH="${arg#--arch=}" ;;
         -h|--help|help) usage ;;
         *) CONFIG_INPUT="$arg" ;;
     esac
 done
+case "$ARCH" in
+    x64|x86) ;;
+    *) echo "Unknown arch: $ARCH (expected x64 or x86)" >&2; usage ;;
+esac
+if [[ "$ARCH" == "x86" && $USE_VS -ne 1 ]]; then
+    echo "--arch x86 currently requires --vs (Ninja+Clang path is x64-only)." >&2
+    exit 1
+fi
 CONFIG_INPUT="${CONFIG_INPUT:-RMG}"
 case "$(echo "$CONFIG_INPUT" | tr '[:upper:]' '[:lower:]')" in
     rmg|releasemastergold)  CONFIG="ReleaseMasterGold" ;;
@@ -47,10 +63,12 @@ esac
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+arch_suffix=""
+[[ "$ARCH" == "x86" ]] && arch_suffix="_x86"
 if [[ $USE_VS -eq 1 ]]; then
-    BUILD_DIR="cmake_builds/vs_$(echo "$CONFIG" | tr '[:upper:]' '[:lower:]')"
+    BUILD_DIR="cmake_builds/vs_$(echo "$CONFIG" | tr '[:upper:]' '[:lower:]')${arch_suffix}"
 else
-    BUILD_DIR="cmake_builds/$(echo "$CONFIG" | tr '[:upper:]' '[:lower:]')"
+    BUILD_DIR="cmake_builds/$(echo "$CONFIG" | tr '[:upper:]' '[:lower:]')${arch_suffix}"
 fi
 
 detect_platform() {
@@ -164,8 +182,11 @@ configure_windows_build() {
     local build_dir_win="${repo_win}\\${BUILD_DIR//\//\\}"
     local tmp_cmd="${BUILD_DIR}/_configure.cmd"
 
+    local vs_arch="x64"
+    [[ "$ARCH" == "x86" ]] && vs_arch="Win32"
+
     if [[ $USE_VS -eq 1 ]]; then
-        echo ">> Configuring $CONFIG -> $BUILD_DIR (${vs_gen_label})"
+        echo ">> Configuring $CONFIG -> $BUILD_DIR (${vs_gen_label}, -A ${vs_arch})"
         echo ">> VS install:  $vs_install (${vs_install_label} toolset)"
         echo
 
@@ -173,7 +194,7 @@ configure_windows_build() {
 @echo off
 call "${vcvars64_win}" >nul
 if errorlevel 1 exit /b 1
-cmake -G "${vs_generator}" -A x64 ^
+cmake -G "${vs_generator}" -A ${vs_arch} ^
     -S "${repo_win}" ^
     -B "${build_dir_win}"
 exit /b %ERRORLEVEL%
