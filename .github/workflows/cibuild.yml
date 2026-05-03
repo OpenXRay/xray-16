@@ -9,7 +9,7 @@ on:
 
 jobs:
   windows:
-    name: Windows ${{ matrix.configuration }} x64 (vs-sln)
+    name: Windows ${{ matrix.configuration }} ${{ matrix.arch }} (vs-sln)
     runs-on: windows-latest
     timeout-minutes: 30
     defaults:
@@ -19,13 +19,14 @@ jobs:
       fail-fast: false
       matrix:
         configuration: [Debug, Mixed, Release, ReleaseMasterGold]
+        arch: [x64, x86]
     steps:
     - uses: actions/checkout@main
       with:
         submodules: recursive
 
     - name: Configure (cmake-initial-configure)
-      run: ./cmake-initial-configure ${{ matrix.configuration }} --vs
+      run: ./cmake-initial-configure ${{ matrix.configuration }} --vs --arch ${{ matrix.arch }}
 
     - name: Build (cmake-build)
       run: ./cmake-build
@@ -34,14 +35,16 @@ jobs:
       id: package
       run: |
         cfg_lc=$(echo "${{ matrix.configuration }}" | tr '[:upper:]' '[:lower:]')
-        cd "cmake_builds/vs_${cfg_lc}"
+        suffix=""
+        [[ "${{ matrix.arch }}" == "x86" ]] && suffix="_x86"
+        cd "cmake_builds/vs_${cfg_lc}${suffix}"
         cpack -B artifacts -C "${{ matrix.configuration }}" -DCPACK_THREADS=4
 
     - name: Upload OpenXRay artifact
       if: steps.package.outcome == 'success'
       uses: actions/upload-artifact@main
       with:
-        name: Windows ${{ matrix.configuration }} x64 (vs-sln github-${{ github.run_number }})
+        name: Windows ${{ matrix.configuration }} ${{ matrix.arch }} (vs-sln github-${{ github.run_number }})
         path: cmake_builds/vs_*/artifacts/openxray*.*
 
     - name: Update latest-nightly tag

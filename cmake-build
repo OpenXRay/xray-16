@@ -87,11 +87,13 @@ IS_VS=0
 VS_CONFIG=""
 if [[ -f "$BUILD_DIR/CMakeCache.txt" ]] && grep -q '^CMAKE_GENERATOR:INTERNAL=Visual Studio' "$BUILD_DIR/CMakeCache.txt"; then
     IS_VS=1
-    VS_CONFIG="ReleaseMasterGold"
-    case "$BUILD_DIR" in
-        *vs_release)             VS_CONFIG="Release" ;;
-        *vs_mixed)               VS_CONFIG="Mixed" ;;
-        *vs_releasemastergold)   VS_CONFIG="ReleaseMasterGold" ;;
+    cfg_part="${BUILD_DIR##*/vs_}"
+    cfg_part="${cfg_part%_x86}"
+    case "$cfg_part" in
+        release)             VS_CONFIG="Release" ;;
+        mixed)               VS_CONFIG="Mixed" ;;
+        debug)               VS_CONFIG="Debug" ;;
+        releasemastergold|*) VS_CONFIG="ReleaseMasterGold" ;;
     esac
 fi
 

@@ -17,6 +17,7 @@ configuration:
 
 platform:
 - x64
+- x86
 
 branches:
   except:
@@ -29,11 +30,13 @@ for:
 
   build_script:
     - cmd: >
-        bash -c "./cmake-initial-configure $CONFIGURATION --vs && ./cmake-build"
+        bash -c "./cmake-initial-configure $CONFIGURATION --vs --arch $PLATFORM && ./cmake-build"
 
   after_build:
     - cmd: >
-        bash -c "cd cmake_builds/vs_$(echo $CONFIGURATION | tr '[:upper:]' '[:lower:]') && cpack -B artifacts -C $CONFIGURATION -DCPACK_THREADS=4"
+        bash -c "suffix=''; [ \"$PLATFORM\" = x86 ] && suffix=_x86;
+        cd cmake_builds/vs_$(echo $CONFIGURATION | tr '[:upper:]' '[:lower:]')$suffix &&
+        cpack -B artifacts -C $CONFIGURATION -DCPACK_THREADS=4"
 
   artifacts:
     - path: cmake_builds/vs_*/artifacts/openxray*.*
