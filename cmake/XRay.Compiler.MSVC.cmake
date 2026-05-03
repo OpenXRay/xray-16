@@ -14,11 +14,14 @@ add_compile_options($<$<NOT:$<CONFIG:ReleaseMasterGold>>:/EHsc>)
 # Disable MS STL exceptions on ReleaseMasterGold
 add_compile_definitions($<$<CONFIG:ReleaseMasterGold>:_HAS_EXCEPTIONS=0>)
 
-add_compile_options($<IF:$<CONFIG:ReleaseMasterGold>,/Z7,/Zi>)
-
 if (CMAKE_GENERATOR MATCHES "Visual Studio")
+    add_compile_options($<IF:$<CONFIG:ReleaseMasterGold>,/Z7,/Zi>)
     add_compile_options(/MP)
+else()
+    add_compile_options(/Z7)
 endif()
+
+add_compile_options(/Zc:inline)
 
 add_compile_options($<$<EQUAL:${CMAKE_SIZEOF_VOID_P},4>:/arch:SSE2>)
 add_compile_options($<$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>:/arch:AVX2>)
@@ -47,3 +50,16 @@ add_link_options(
     $<$<CONFIG:Release,ReleaseMasterGold>:/OPT:REF>
     $<$<CONFIG:Release,ReleaseMasterGold>:/OPT:ICF>
 )
+
+if (NOT CMAKE_GENERATOR MATCHES "Visual Studio")
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        if (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+            add_link_options(/fuse-ld=lld-link)
+        else()
+            add_link_options(-fuse-ld=lld-link)
+        endif()
+        message(STATUS "Linker: lld-link (Clang)")
+    endif()
+endif()
+
+add_link_options(/DEBUG:GHASH)

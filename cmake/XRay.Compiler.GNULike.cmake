@@ -151,6 +151,18 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-Og)
 endif()
 
+add_compile_options(
+    $<$<CONFIG:Release,ReleaseMasterGold>:-gline-tables-only>
+    $<$<CONFIG:Release,ReleaseMasterGold>:-ffunction-sections>
+    $<$<CONFIG:Release,ReleaseMasterGold>:-fdata-sections>
+)
+
+if (APPLE)
+    add_link_options($<$<CONFIG:Release,ReleaseMasterGold>:-Wl,-dead_strip>)
+elseif (NOT WIN32)
+    add_link_options($<$<CONFIG:Release,ReleaseMasterGold>:-Wl,--gc-sections>)
+endif()
+
 if (NOT WIN32)
     find_package(OpenAL REQUIRED)
     find_package(JPEG)
