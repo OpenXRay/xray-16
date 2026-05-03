@@ -3,6 +3,27 @@ include_guard()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+option(XRAY_UNITY_BUILD "Use unity (jumbo) builds for faster full compiles" ON)
+if (XRAY_UNITY_BUILD AND NOT DEFINED CMAKE_UNITY_BUILD)
+    set(CMAKE_UNITY_BUILD ON)
+endif()
+
+option(XRAY_USE_SCCACHE "Use sccache as compiler launcher when available" ON)
+if (XRAY_USE_SCCACHE
+    AND NOT CMAKE_C_COMPILER_LAUNCHER
+    AND NOT CMAKE_CXX_COMPILER_LAUNCHER
+    AND CMAKE_GENERATOR MATCHES "Ninja")
+    find_program(SCCACHE_PROGRAM sccache)
+    if (SCCACHE_PROGRAM)
+        set(CMAKE_C_COMPILER_LAUNCHER   "${SCCACHE_PROGRAM}")
+        set(CMAKE_CXX_COMPILER_LAUNCHER "${SCCACHE_PROGRAM}")
+        if (MSVC)
+            add_compile_options(/experimental:deterministic)
+        endif()
+        message(STATUS "sccache: ${SCCACHE_PROGRAM}")
+    endif()
+endif()
+
 set(CMAKE_C_FLAGS_RELEASEMASTERGOLD             "${CMAKE_C_FLAGS_RELEASE}"             CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_RELEASEMASTERGOLD           "${CMAKE_CXX_FLAGS_RELEASE}"           CACHE STRING "" FORCE)
 set(CMAKE_EXE_LINKER_FLAGS_RELEASEMASTERGOLD    "${CMAKE_EXE_LINKER_FLAGS_RELEASE}"    CACHE STRING "" FORCE)
