@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/ResourceManager/ResourceHandle.h"
 
@@ -258,7 +259,8 @@ public:
     MaterialPSO* GetOrCreateUIPSO(
         IUIShader* uiShader,
         u32 elementIndex,
-        nvrhi::IFramebuffer* framebuffer);
+        nvrhi::IFramebuffer* framebuffer,
+        fg::PrimitiveTopology topology = fg::PrimitiveTopology::TriangleList);
 
     void Clear();
 
@@ -314,7 +316,8 @@ private:
         IUIShader* uiShader,
         ShaderElement* elem,
         SPass* pass,
-        nvrhi::IFramebuffer* framebuffer);
+        nvrhi::IFramebuffer* framebuffer,
+        fg::PrimitiveTopology topology);
 
 public:
     void CreateBindingLayouts(MaterialPSO* matPSO);

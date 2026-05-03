@@ -101,6 +101,7 @@ private:
     nvrhi::BindingLayoutHandle m_bindlessLayout;
     nvrhi::DescriptorTableHandle m_bindlessDescriptorTable;
     xr_vector<u32> m_freeBindlessIndices;
+    xr_map<nvrhi::ITexture*, u32> m_bindlessTextureMap;
     u32 m_nextBindlessIndex = 0;
 
     bool m_initialized = false;

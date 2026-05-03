@@ -152,7 +152,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if (NOT WIN32)
-    find_package(SDL2 2.0.18 REQUIRED)
     find_package(OpenAL REQUIRED)
     find_package(JPEG)
     find_package(Ogg REQUIRED)

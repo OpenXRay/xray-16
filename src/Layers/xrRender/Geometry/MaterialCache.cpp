@@ -5,6 +5,7 @@
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/fgUIShader.h"
+#include "Layers/xrRender/UIGeometryBatch.h"
 #include "Layers/xrRender/FVisual.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/FProgressive.h"
@@ -669,7 +670,8 @@ static u32 GetFormatSize(DXGI_FORMAT format) {
 MaterialPSO* MaterialCache::GetOrCreateUIPSO(
     IUIShader* uiShader,
     u32 elementIndex,
-    nvrhi::IFramebuffer* framebuffer)
+    nvrhi::IFramebuffer* framebuffer,
+    fg::PrimitiveTopology topology)
 {
     if (!uiShader || !framebuffer)
         return nullptr;
@@ -687,7 +689,7 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
     MaterialKey key;
     key.psoType = PSOType::UI;
     key.shader = nullptr;
-    key.textureHash = shaderHash;
+    key.textureHash = shaderHash ^ (static_cast<u64>(topology) << 56);
     key.element = elementIndex;
     key.framebuffer = framebuffer;
 
@@ -699,7 +701,7 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
 
     m_stats.numCacheMisses++;
     m_stats.totalPSOCreations++;
-    MaterialPSO* pso = CreateUIPSO(uiShader, nullptr, nullptr, framebuffer);
+    MaterialPSO* pso = CreateUIPSO(uiShader, nullptr, nullptr, framebuffer, topology);
     if (!pso)
         return nullptr;
 
@@ -714,7 +716,8 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     IUIShader* uiShader,
     ShaderElement* elem,
     SPass* pass,
-    nvrhi::IFramebuffer* framebuffer)
+    nvrhi::IFramebuffer* framebuffer,
+    fg::PrimitiveTopology topology)
 {
     auto pso = xr_make_unique<MaterialPSO>();
 
@@ -856,7 +859,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         return std::nullopt;
     };
 
-    Msg("  [CreateUIPSO] Building vertex attributes from %u signature elements:", pso->vsInputSignature.elements.size());
     for (const auto& shaderElem : pso->vsInputSignature.elements) {
         std::string semantic = shaderElem.semanticName.c_str();
         auto resolved = resolveUISemantic(semantic, shaderElem.semanticIndex);
@@ -871,27 +873,11 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         attr.format = resolved->format;
         attr.offset = resolved->offset;
         attr.bufferIndex = 0;
-        attr.elementStride = 0;
+        attr.elementStride = sizeof(ui::UIVertex);
 
-        Msg("    attr[%u]: semantic='%s%u' format=%d offset=%u", (u32)psoDesc.vertexAttributes.size(), semantic.c_str(), shaderElem.semanticIndex, (int)attr.format, attr.offset);
         psoDesc.vertexAttributes.push_back(attr);
     }
-
-    u32 calculatedStride = 0;
-    for (const auto& attr : psoDesc.vertexAttributes) {
-        if (attr.bufferIndex == 0) {
-            const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(attr.format);
-            u32 formatSize = formatInfo.bytesPerBlock;
-            u32 endOffset = attr.offset + formatSize;
-            calculatedStride = std::max(calculatedStride, endOffset);
-        }
-    }
-
-    for (auto& attr : psoDesc.vertexAttributes) {
-        attr.elementStride = calculatedStride;
-    }
-
-    pso->vertexStride = calculatedStride;
+    pso->vertexStride = sizeof(ui::UIVertex);
 
     const nvrhi::FramebufferDesc& fbDesc = framebuffer->getDesc();
     psoDesc.renderTargetCount = static_cast<u32>(fbDesc.colorAttachments.size());
@@ -924,7 +910,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     psoDesc.rasterizerState.frontCounterClockwise = false;
     psoDesc.rasterizerState.scissorEnable = true;
 
-    psoDesc.primitiveTopology = fg::PrimitiveTopology::TriangleList;
+    psoDesc.primitiveTopology = topology;
 
     if (pso->vsBindingLayout) {
         psoDesc.bindingLayouts.push_back(pso->vsBindingLayout);

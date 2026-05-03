@@ -42,6 +42,22 @@ static void UploadStaticGlobals(FGConstantSystem& constants, const StaticGlobals
     constants.SetStatic("screen_res", cb.screen_res);
 }
 
+static fg::PrimitiveTopology GetBatchTopology(const ui::UIGeometryBatch& batch)
+{
+    switch (batch.primitiveType)
+    {
+    case ui::UIPrimitiveType::LineList:
+        return fg::PrimitiveTopology::LineList;
+    case ui::UIPrimitiveType::LineStrip:
+        return fg::PrimitiveTopology::LineStrip;
+    case ui::UIPrimitiveType::TriStrip:
+        return fg::PrimitiveTopology::TriangleStrip;
+    case ui::UIPrimitiveType::TriList:
+    default:
+        return fg::PrimitiveTopology::TriangleList;
+    }
+}
+
 framegraph::VirtualResourceHandle setupUIPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle sceneTarget,
@@ -109,7 +125,8 @@ framegraph::VirtualResourceHandle setupUIPass(
                         MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(
                             batch.uiShader,
                             batch.shaderElement,
-                            framebuffer
+                            framebuffer,
+                            GetBatchTopology(batch)
                         );
 
                         if (matPSO) {
@@ -196,7 +213,8 @@ framegraph::VirtualResourceHandle setupCursorPass(
                         MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(
                             batch.uiShader,
                             batch.shaderElement,
-                            framebuffer
+                            framebuffer,
+                            GetBatchTopology(batch)
                         );
 
                         if (matPSO) {

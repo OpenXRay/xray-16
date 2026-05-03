@@ -70,13 +70,21 @@ public:
         return vertices.empty();
     }
 
+    bool UsesIndexBuffer() const
+    {
+        return primitiveType == UIPrimitiveType::TriList || primitiveType == UIPrimitiveType::TriStrip;
+    }
+
     void AddPrimitive(const xr_vector<UIVertex>& verts, UIPrimitiveType primType)
     {
         primitiveType = primType;
 
-        u16 baseIndex = static_cast<u16>(vertices.size());
-
         vertices.insert(vertices.end(), verts.begin(), verts.end());
+
+        if (!UsesIndexBuffer())
+            return;
+
+        u16 baseIndex = static_cast<u16>(vertices.size() - verts.size());
 
         switch (primType)
         {
@@ -109,28 +117,19 @@ public:
                 }
             }
             break;
-
         case UIPrimitiveType::LineList:
-            for (u16 i = 0; i + 1 < verts.size(); i += 2)
-            {
-                indices.push_back(baseIndex + i);
-                indices.push_back(baseIndex + i + 1);
-            }
-            break;
-
         case UIPrimitiveType::LineStrip:
-            for (u16 i = 0; i + 1 < verts.size(); ++i)
-            {
-                indices.push_back(baseIndex + i);
-                indices.push_back(baseIndex + i + 1);
-            }
             break;
         }
     }
 
     bool CanMergeWith(IUIShader* incomingShader, int incomingAlphaRef, bool incomingScissor,
-                      const Irect* incomingScissorRect, int incomingCullMode) const
+                      const Irect* incomingScissorRect, int incomingCullMode,
+                      UIPrimitiveType incomingPrimType) const
     {
+        if (uiShader != incomingShader) return false;
+        if (primitiveType != incomingPrimType) return false;
+        if (primitiveType == UIPrimitiveType::LineStrip) return false;
         if (alphaRef != incomingAlphaRef) return false;
         if (hasScissor != incomingScissor) return false;
         if (hasScissor && incomingScissor) {
@@ -138,11 +137,7 @@ public:
                 return false;
         }
         if (cullMode != incomingCullMode) return false;
-
-        auto* current = static_cast<fgUIShader*>(uiShader);
-        auto* incoming = static_cast<fgUIShader*>(incomingShader);
-        if (!current || !incoming) return uiShader == incomingShader;
-        return current->SamePipelineAs(*incoming);
+        return true;
     }
 };
 

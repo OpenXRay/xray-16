@@ -53,12 +53,8 @@ void FGUIRender::PushPoint(float x, float y, float z, u32 C, float u, float v)
     VERIFY(m_primitiveType != ptNone);
     VERIFY(m_currentVertices.size() < m_maxVerts);
 
-    u32 texIdx = UINT32_MAX;
-    if (auto* dxShader = static_cast<fgUIShader*>(m_currentUIShader))
-        texIdx = dxShader->GetBindlessIndex();
-
     UIVertex vert;
-    vert.set(x, y, z, C, u, v, texIdx);
+    vert.set(x, y, z, C, u, v, UINT32_MAX);
     m_currentVertices.push_back(vert);
 }
 
@@ -83,10 +79,17 @@ void FGUIRender::FlushPrimitive()
         return;
     }
 
-    UIGeometryBatch* batch = GetOrCreateBatch();
-    VERIFY(batch);
+    u32 texIdx = UINT32_MAX;
+    if (auto* dxShader = static_cast<fgUIShader*>(m_currentUIShader))
+        texIdx = dxShader->GetBindlessIndex();
+    for (auto& v : m_currentVertices)
+        v.texIndex = texIdx;
 
     UIPrimitiveType uiPrimType = ConvertPrimitiveType(m_primitiveType);
+
+    UIGeometryBatch* batch = GetOrCreateBatch(uiPrimType);
+    VERIFY(batch);
+
     batch->AddPrimitive(m_currentVertices, uiPrimType);
 
     m_currentVertices.clear();
@@ -140,12 +143,12 @@ UIPrimitiveType FGUIRender::ConvertPrimitiveType(ePrimitiveType primType)
     }
 }
 
-UIGeometryBatch* FGUIRender::GetOrCreateBatch()
+UIGeometryBatch* FGUIRender::GetOrCreateBatch(UIPrimitiveType primType)
 {
     if (!m_batches.empty())
     {
         UIGeometryBatch& lastBatch = m_batches.back();
-        if (lastBatch.CanMergeWith(m_currentUIShader, m_currentAlphaRef, m_hasScissor, m_hasScissor ? &m_scissorRect : nullptr, m_cullMode))
+        if (lastBatch.CanMergeWith(m_currentUIShader, m_currentAlphaRef, m_hasScissor, m_hasScissor ? &m_scissorRect : nullptr, m_cullMode, primType))
         {
             return &lastBatch;
         }
@@ -160,6 +163,7 @@ UIGeometryBatch* FGUIRender::GetOrCreateBatch()
         newBatch.scissorRect = m_scissorRect;
     newBatch.xformWorld = m_xformWorld;
     newBatch.cullMode = m_cullMode;
+    newBatch.primitiveType = primType;
     return &newBatch;
 }
 
@@ -174,7 +178,6 @@ void FGUIRender::Initialize(RenderDevice* device, render::MaterialCache* matCach
     R_ASSERT2(CreateBuffers(), "FGUIRender: failed to create initial buffers");
 
     m_initialized = true;
-    Msg("* [FGUIRender] Initialized");
 }
 
 void FGUIRender::Shutdown()
@@ -261,17 +264,21 @@ void FGUIRender::EnsureBufferCapacity(size_t vertexCount, size_t indexCount)
 
 void FGUIRender::UploadBatchGeometry(nvrhi::ICommandList* cmdList, const UIGeometryBatch& batch, u32& vertexOffset, u32& indexOffset)
 {
-    if (batch.vertices.empty() || batch.indices.empty())
+    if (batch.vertices.empty())
         return;
 
     const size_t vertexDataSize = batch.vertices.size() * sizeof(UIVertex);
     cmdList->writeBuffer(m_vertexBuffer, batch.vertices.data(), vertexDataSize, vertexOffset * sizeof(UIVertex));
 
-    const size_t indexDataSize = batch.indices.size() * sizeof(u16);
-    cmdList->writeBuffer(m_indexBuffer, batch.indices.data(), indexDataSize, indexOffset * sizeof(u16));
+    if (batch.UsesIndexBuffer() && !batch.indices.empty())
+    {
+        const size_t indexDataSize = batch.indices.size() * sizeof(u16);
+        cmdList->writeBuffer(m_indexBuffer, batch.indices.data(), indexDataSize, indexOffset * sizeof(u16));
+    }
 
     vertexOffset += static_cast<u32>(batch.vertices.size());
-    indexOffset += static_cast<u32>(batch.indices.size());
+    if (batch.UsesIndexBuffer())
+        indexOffset += static_cast<u32>(batch.indices.size());
 }
 
 void FGUIRender::RenderBatchWithShader(nvrhi::ICommandList* cmdList, const UIGeometryBatch& batch, render::MaterialPSO* pso, nvrhi::IFramebuffer* framebuffer,
@@ -306,9 +313,12 @@ void FGUIRender::RenderBatchWithShader(nvrhi::ICommandList* cmdList, const UIGeo
     vbBinding.offset = 0;
     state.addVertexBuffer(vbBinding);
 
-    state.indexBuffer.buffer = m_indexBuffer;
-    state.indexBuffer.format = nvrhi::Format::R16_UINT;
-    state.indexBuffer.offset = 0;
+    if (batch.UsesIndexBuffer())
+    {
+        state.indexBuffer.buffer = m_indexBuffer;
+        state.indexBuffer.format = nvrhi::Format::R16_UINT;
+        state.indexBuffer.offset = 0;
+    }
 
     if (batch.hasScissor)
     {
@@ -328,11 +338,19 @@ void FGUIRender::RenderBatchWithShader(nvrhi::ICommandList* cmdList, const UIGeo
     cmdList->setGraphicsState(state);
 
     nvrhi::DrawArguments drawArgs;
-    drawArgs.vertexCount = static_cast<u32>(batch.indices.size());
     drawArgs.instanceCount = 1;
-    drawArgs.startIndexLocation = indexOffset;
     drawArgs.startVertexLocation = vertexOffset;
-    cmdList->drawIndexed(drawArgs);
+    if (batch.UsesIndexBuffer())
+    {
+        drawArgs.vertexCount = static_cast<u32>(batch.indices.size());
+        drawArgs.startIndexLocation = indexOffset;
+        cmdList->drawIndexed(drawArgs);
+    }
+    else
+    {
+        drawArgs.vertexCount = static_cast<u32>(batch.vertices.size());
+        cmdList->draw(drawArgs);
+    }
 }
 
 void FGUIRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, u32 screenWidth, u32 screenHeight)
@@ -372,17 +390,36 @@ void FGUIRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebu
     u32 vertexOffset = 0;
     u32 indexOffset = 0;
 
+    UIPrimitiveType lastTopology = UIPrimitiveType::TriList;
     for (const auto& batch : m_batches)
     {
         if (batch.IsEmpty() || !batch.uiShader)
             continue;
 
-        if (batch.uiShader != lastUIShader)
+        fg::PrimitiveTopology psoTopology = fg::PrimitiveTopology::TriangleList;
+        switch (batch.primitiveType)
         {
-            currentPSO = m_matCache->GetOrCreateUIPSO(batch.uiShader, 0, framebuffer);
+        case UIPrimitiveType::LineList:
+            psoTopology = fg::PrimitiveTopology::LineList;
+            break;
+        case UIPrimitiveType::LineStrip:
+            psoTopology = fg::PrimitiveTopology::LineStrip;
+            break;
+        case UIPrimitiveType::TriList:
+            psoTopology = fg::PrimitiveTopology::TriangleList;
+            break;
+        case UIPrimitiveType::TriStrip:
+            psoTopology = fg::PrimitiveTopology::TriangleStrip;
+            break;
+        }
+
+        if (batch.uiShader != lastUIShader || batch.primitiveType != lastTopology)
+        {
+            currentPSO = m_matCache->GetOrCreateUIPSO(batch.uiShader, 0, framebuffer, psoTopology);
             if (!currentPSO)
                 continue;
             lastUIShader = batch.uiShader;
+            lastTopology = batch.primitiveType;
         }
 
         const u32 batchVertexOffset = vertexOffset;
