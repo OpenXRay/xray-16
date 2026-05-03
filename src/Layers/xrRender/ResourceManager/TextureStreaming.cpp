@@ -30,6 +30,8 @@ StreamingManager::~StreamingManager() {
     PrintStatistics();
 
     xr_delete(m_asyncIO);
+
+    s_streamingCmdList = nullptr;
 }
 
 void StreamingManager::RequestMips(

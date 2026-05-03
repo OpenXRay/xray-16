@@ -147,6 +147,8 @@ void SyncWindowedSize(SDL_Window* w)
 
 void SyncMonitor(SDL_Window* w)
 {
+    if (psDeviceMode.WindowStyle != rsWindowed)
+        return;
     const SDL_DisplayID requested = DisplayIDFromIndex(psDeviceMode.Monitor);
     if (SDL_GetDisplayForWindow(w) == requested)
         return;
@@ -162,6 +164,9 @@ void SyncFullscreenMode(SDL_Window* w)
         SDL_SetWindowFullscreenMode(w, nullptr);
         return;
     }
+#if defined(XR_PLATFORM_APPLE)
+    SDL_SetWindowFullscreenMode(w, nullptr);
+#else
     SDL_DisplayMode closest{};
     if (SDL_GetClosestFullscreenDisplayMode(
             DisplayIDFromIndex(psDeviceMode.Monitor),
@@ -180,14 +185,22 @@ void SyncFullscreenMode(SDL_Window* w)
     {
         SDL_SetWindowFullscreenMode(w, nullptr);
     }
+#endif
 }
 
 void SyncWindowMode(SDL_Window* w)
 {
     const u32 mode = psDeviceMode.WindowStyle;
-    SDL_SetWindowBordered(w, mode == rsWindowed);
-    SDL_SetWindowResizable(w, mode == rsWindowed);
-    SDL_SetWindowFullscreen(w, mode != rsWindowed);
+    if (mode == rsWindowed)
+    {
+        SDL_SetWindowFullscreen(w, false);
+        SDL_SetWindowBordered(w, true);
+        SDL_SetWindowResizable(w, true);
+    }
+    else
+    {
+        SDL_SetWindowFullscreen(w, true);
+    }
 }
 }
 

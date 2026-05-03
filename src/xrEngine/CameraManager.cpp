@@ -162,6 +162,8 @@ void CCameraManager::OnEffectorReleased(SBaseEffector* e)
 
 void CCameraManager::UpdateFromCamera(const CCameraBase* C)
 {
+    if (!g_pGamePersistent)
+        return;
     Update(C->vPosition, C->vDirection, C->vNormal, C->f_fov, C->f_aspect,
         g_pGamePersistent->Environment().CurrentEnv.far_plane, C->m_Flags.flags);
 }

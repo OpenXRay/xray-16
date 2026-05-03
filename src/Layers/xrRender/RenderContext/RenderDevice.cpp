@@ -126,6 +126,8 @@ bool RenderDevice::InitializeFromBackend(IRenderBackend* backend) {
 void RenderDevice::Shutdown() {
     if (!m_initialized) return;
 
+    s_textureUploadCmdList = nullptr;
+
     if (m_pipelineCache) {
         m_pipelineCache->Clear();
         Msg("* [PipelineStateCache] Cleared cache before shutdown");
