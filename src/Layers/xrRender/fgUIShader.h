@@ -3,11 +3,11 @@
 #include "Include/xrRender/UIShader.h"
 
 namespace xray::render::ui {
-    class UIRenderCollector;  // Forward declaration
+    class UIRenderCollector;
 }
 
 namespace xray::render::framegraph {
-    struct ExtractedReflection;  // Forward declaration
+    struct ExtractedReflection;
 }
 
 namespace xray::render::fg
@@ -15,7 +15,7 @@ namespace xray::render::fg
 class fgUIShader : public IUIShader
 {
     friend class FrameGraphRenderer;
-    friend class xray::render::ui::UIRenderCollector;  // Allow UI collector to access shader
+    friend class xray::render::ui::UIRenderCollector;
 
 public:
     virtual void Copy(IUIShader& _in);
@@ -38,17 +38,15 @@ public:
             && m_psHandle.Get() == other.m_psHandle.Get();
     }
 
-    // Legacy D3D11
     ref_shader hShader;
 
-    // DX12: NVRHI shader handles + reflection
     nvrhi::ShaderHandle m_vsHandle;
     nvrhi::ShaderHandle m_psHandle;
-    framegraph::ExtractedReflection* m_vsReflection = nullptr;  // Owned by fgUIShader
-    framegraph::ExtractedReflection* m_psReflection = nullptr;  // Owned by fgUIShader
-    CTexture* m_baseTexture = nullptr;  // DX12: Cached base texture pointer
+    framegraph::ExtractedReflection* m_vsReflection = nullptr;
+    framegraph::ExtractedReflection* m_psReflection = nullptr;
+    CTexture* m_baseTexture = nullptr;
     u32 m_bindlessTextureIndex = UINT32_MAX;
 
     shared_str baseTexture{ "s_base" };
 };
-} // namespace xray::render::fg
+}

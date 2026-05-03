@@ -82,4 +82,4 @@ private:
     size_t m_indexBufferSize = 0;
     bool m_initialized = false;
 };
-} // namespace xray::render::fg
+}

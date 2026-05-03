@@ -1,11 +1,10 @@
-// xrRender/Geometry/MaterialCache.cpp
 #include "stdafx.h"
 #include "MaterialCache.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
-#include "Layers/xrRender/fgUIShader.h"  // For fgUIShader NVRHI handles
+#include "Layers/xrRender/fgUIShader.h"
 #include "Layers/xrRender/UIGeometryBatch.h"
 #include "Layers/xrRender/FVisual.h"
 #include "Layers/xrRender/FBasicVisual.h"
@@ -16,41 +15,34 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/RenderContext/RCShader.h"
-#include "Layers/xrRender/RenderContext/RenderStateConversion.h"  // State conversion helpers
-#include "Layers/xrRender/RenderContext/RenderDevice.h"  // For RenderDevice definition
-#include "Layers/xrRender/FrameGraph/ShaderReflection.h"  // For ShaderConstant, ExtractedReflection
-#include "Layers/xrRender/FrameGraph/ShaderCache.h"  // For ExtractedReflection definition
-#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"  // For VCB pool
-#include "Layers/xrRender/FrameGraph/FrameGraph.h"  // For FrameGraph definition
-#include "Layers/xrRender/FrameGraph/IPass.h"  // For DefaultOutputLayout
+#include "Layers/xrRender/RenderContext/RenderStateConversion.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+#include "Layers/xrRender/FrameGraph/ShaderCache.h"
+#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
+#include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
-#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"  // For PBR texture slot constants
-#include "Layers/xrRender/Bindless/MaterialBuffer.h"          // Bindless material buffer
-#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"   // Terrain material buffer (t9)
-// SM6 bindless texture registration uses GEnv.Backend->RegisterBindlessTexture()
-#include "xrEngine/IRenderBackend.h"                          // For IRenderBackend
-#include "Layers/xrRender/Blender_CLSID.h"                    // For B_BmmD, B_LmBmmD CLASS_IDs
-#include "Layers/xrRender/blenders/Blender_BmmD.h"            // For CBlender_BmmD detail texture accessors
-#include "Layers/xrRender/r_constants.h"                      // For R_constant_setup
-#include "Layers/xrRender/Materials/MaterialSystem.h"         // For MaterialSystem (D3D12)
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
+#include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
+#include "xrEngine/IRenderBackend.h"
+#include "Layers/xrRender/Blender_CLSID.h"
+#include "Layers/xrRender/blenders/Blender_BmmD.h"
+#include "Layers/xrRender/r_constants.h"
+#include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
-#include "xrEngine/xr_object.h"                               // For GEnv
+#include "xrEngine/xr_object.h"
 
 
 namespace xray::render {
 
-using namespace xray::render::fg;  // For Shader types (STextureList, etc.)
+using namespace xray::render::fg;
 
 
-// ══════════════════════════════════════════════════════════
-//  FORMAT CONVERSION HELPER
-// ══════════════════════════════════════════════════════════
 
-// ══════════════════════════════════════════════════════════
-//  DEBUG LOGGING FOR CONSTANT LAYOUT
-// ══════════════════════════════════════════════════════════
 
 #ifdef DEBUG
 static void LogConstantLayout(const framegraph::ShaderConstantLayout& layout, const char* shaderName) {
@@ -75,21 +67,17 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
 
     ShaderConstantLayout merged;
 
-    // ═══════════════════════════════════════════════════════
-    // STEP 1: Deduplicate Constant Buffers by Name
-    // ═══════════════════════════════════════════════════════
 
     struct CBDeduplicationInfo {
         shared_str name;
-        u32 vsSlot = UINT32_MAX;  // UINT32_MAX = not used in this stage
+        u32 vsSlot = UINT32_MAX;
         u32 psSlot = UINT32_MAX;
-        u32 size = 0;  // Max size across stages
-        u16 mergedIndex = 0;  // Index in merged.constantBuffers array
+        u32 size = 0;
+        u16 mergedIndex = 0;
     };
 
     xr_map<shared_str, CBDeduplicationInfo> uniqueCBs;
 
-    // Add VS constant buffers
     for (const auto& cb : vsLayout.constantBuffers.buffers) {
         auto& unique = uniqueCBs[cb.name];
         unique.name = cb.name;
@@ -97,15 +85,13 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
         unique.size = std::max(unique.size, cb.size);
     }
 
-    // Add PS constant buffers (merge with VS if name matches)
     for (const auto& cb : psLayout.constantBuffers.buffers) {
         auto& unique = uniqueCBs[cb.name];
         unique.name = cb.name;
         unique.psSlot = cb.slot;
-        unique.size = std::max(unique.size, cb.size);  // Take max size
+        unique.size = std::max(unique.size, cb.size);
     }
 
-    // Build merged CB list and assign indices
     u16 mergedIndex = 0;
     for (auto& [cbName, cbInfo] : uniqueCBs) {
         cbInfo.mergedIndex = mergedIndex++;
@@ -113,52 +99,39 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
         ConstantBufferInfo mergedCB;
         mergedCB.name = cbInfo.name;
         mergedCB.size = cbInfo.size;
-        // Use VS slot if available, otherwise PS slot
         mergedCB.slot = (cbInfo.vsSlot != UINT32_MAX) ? cbInfo.vsSlot : cbInfo.psSlot;
 
         merged.constantBuffers.buffers.push_back(mergedCB);
     }
 
-    // ═══════════════════════════════════════════════════════
-    // STEP 2: Build VS CB Name -> Merged Index Mapping
-    // ═══════════════════════════════════════════════════════
 
-    xr_map<u16, u16> vsIndexToMerged;  // Old VS cbIndex -> New merged cbIndex
+    xr_map<u16, u16> vsIndexToMerged;
 
     for (u16 vsIdx = 0; vsIdx < vsLayout.constantBuffers.buffers.size(); ++vsIdx) {
         const auto& vsCB = vsLayout.constantBuffers.buffers[vsIdx];
 
-        // Find this CB in uniqueCBs to get merged index
         auto it = uniqueCBs.find(vsCB.name);
         if (it != uniqueCBs.end()) {
             vsIndexToMerged[vsIdx] = it->second.mergedIndex;
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // STEP 3: Build PS CB Name -> Merged Index Mapping
-    // ═══════════════════════════════════════════════════════
 
-    xr_map<u16, u16> psIndexToMerged;  // Old PS cbIndex -> New merged cbIndex
+    xr_map<u16, u16> psIndexToMerged;
 
     for (u16 psIdx = 0; psIdx < psLayout.constantBuffers.buffers.size(); ++psIdx) {
         const auto& psCB = psLayout.constantBuffers.buffers[psIdx];
 
-        // Find this CB in uniqueCBs to get merged index
         auto it = uniqueCBs.find(psCB.name);
         if (it != uniqueCBs.end()) {
             psIndexToMerged[psIdx] = it->second.mergedIndex;
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // STEP 4: Add VS Constants (with remapped cbIndex)
-    // ═══════════════════════════════════════════════════════
 
     for (const auto& vsConstant : vsLayout.constants) {
         ShaderConstant mergedConstant = vsConstant;
 
-        // Remap cbIndex to merged index
         auto it = vsIndexToMerged.find(vsConstant.cbIndex);
         if (it != vsIndexToMerged.end()) {
             mergedConstant.cbIndex = it->second;
@@ -171,18 +144,13 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
         merged.constants.push_back(mergedConstant);
     }
 
-    // ═══════════════════════════════════════════════════════
-    // STEP 5: Add PS Constants (with remapped cbIndex, skip duplicates)
-    // ═══════════════════════════════════════════════════════
 
     for (const auto& psConstant : psLayout.constants) {
-        // Check if constant already exists from VS
         bool isDuplicate = false;
         for (const auto& existingConstant : merged.constants) {
             if (existingConstant.name == psConstant.name) {
                 isDuplicate = true;
 
-                // Validate that duplicate has same metadata
                 if (existingConstant.offset != psConstant.offset ||
                     existingConstant.size != psConstant.size) {
                     Msg("! [MergeConstantLayouts] WARNING: Constant '%s' differs between VS and PS",
@@ -196,10 +164,9 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
         }
 
         if (isDuplicate) {
-            continue;  // Skip - already added from VS
+            continue;
         }
 
-        // Add PS-only constant with remapped cbIndex
         ShaderConstant mergedConstant = psConstant;
 
         auto it = psIndexToMerged.find(psConstant.cbIndex);
@@ -217,9 +184,6 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
     return merged;
 }
 
-// ══════════════════════════════════════════════════════════
-//  CONSTRUCTOR / DESTRUCTOR
-// ══════════════════════════════════════════════════════════
 
 MaterialCache::MaterialCache(
     fg::RenderDevice* device,
@@ -231,9 +195,7 @@ MaterialCache::MaterialCache(
 {
     VERIFY(m_device);
     VERIFY(m_resourceManager);
-    // VCB pool is optional - can be null for legacy code
 
-    // Create default PBR textures for materials without explicit PBR maps
     CreateDefaultPBRTextures();
 }
 
@@ -245,21 +207,15 @@ void MaterialCache::CreateDefaultPBRTextures()
         return;
     }
 
-    // Create 1x1 RGBA8 default PBR texture with appropriate values:
-    // R = Metallic:  0   (dielectric)
-    // G = Roughness: 255 (fully rough, safer default)
-    // B = AO:        255 (no occlusion)
-    // A = Parallax:  128 (neutral height, no displacement)
 
     resources::TextureDesc desc;
     desc.type = resources::TextureDesc::Texture2D;
     desc.width = 1;
     desc.height = 1;
     desc.mipLevels = 1;
-    desc.format = nvrhi::Format::RGBA8_UNORM;  // Packed PBR format
+    desc.format = nvrhi::Format::RGBA8_UNORM;
     desc.debugName = "$default_pbr";
 
-    // RGBA8 pixel: R=0 (metallic), G=255 (rough), B=255 (ao), A=128 (parallax)
     u8 pbrPixel[4] = { 0, 255, 255, 128 };
     m_defaultPBR = texManager->CreateTexture(desc, pbrPixel);
     if (m_defaultPBR.IsValid()) {
@@ -273,9 +229,6 @@ MaterialCache::~MaterialCache() {
     Clear();
 }
 
-// ══════════════════════════════════════════════════════════
-//  GET OR CREATE PSO
-// ══════════════════════════════════════════════════════════
 
 MaterialPSO* MaterialCache::GetOrCreatePSO(
     dxRender_Visual* visual,
@@ -304,9 +257,6 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     return nullptr;
 }
 
-// ══════════════════════════════════════════════════════════
-//  GET OR CREATE DEPTH PSO (Phase 2.4)
-// ══════════════════════════════════════════════════════════
 
 MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
     dxRender_Visual* visual,
@@ -318,24 +268,12 @@ MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
 }
 
 
-// ══════════════════════════════════════════════════════════
-//  EXTRACT TEXTURES
-// ══════════════════════════════════════════════════════════
 
 
-// ══════════════════════════════════════════════════════════
-//  EXTRACT SHADERS
-// ══════════════════════════════════════════════════════════
 
 
-// ══════════════════════════════════════════════════════════
-//  EXTRACT SAMPLERS (Using Shader Reflection + X-Ray State)
-// ══════════════════════════════════════════════════════════
 
 
-// ══════════════════════════════════════════════════════════
-//  CREATE BINDING LAYOUTS (Per-Stage)
-// ══════════════════════════════════════════════════════════
 
 void MaterialCache::CreateBindingLayouts(MaterialPSO* matPSO)
 {
@@ -355,9 +293,6 @@ void MaterialCache::CreateBindingLayouts(MaterialPSO* matPSO)
     }
 }
 
-// ══════════════════════════════════════════════════════════
-//  CREATE STAGE BINDING LAYOUT (Helper)
-// ══════════════════════════════════════════════════════════
 
 nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
     const MaterialPSO* matPSO,
@@ -367,12 +302,10 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
     VERIFY(matPSO);
 
     nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhiStage;  // ← KEY: Per-stage visibility!
+    layoutDesc.visibility = nvrhiStage;
 
     const char* stageName = (stage == MaterialPSO::ShaderStage::Vertex) ? "VS" : "PS";
 
-    // CRITICAL: Collect ALL CBs and sort by slot number!
-    // NVRHI binding sets match by INDEX, so layout order must match shader slot order (b0, b1, b2, ...)
     struct CBBinding {
         u32 slot;
         bool isVCB;
@@ -381,26 +314,22 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
     };
     xr_vector<CBBinding> allCBs;
 
-    // Collect VCBs from vcbRequirements
     if (stage == MaterialPSO::ShaderStage::Vertex) {
         for (const auto& vcbReq : matPSO->vcbRequirements) {
             allCBs.push_back({vcbReq.slot, true, vcbReq.name, vcbReq.size});
         }
     }
 
-    // Collect global CBs from constantBuffers
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.stage == stage) {
             allCBs.push_back({cbInfo.slot, false, cbInfo.name, cbInfo.size});
         }
     }
 
-    // SORT by slot number (b0, b1, b2, b3, ...)
     std::sort(allCBs.begin(), allCBs.end(), [](const CBBinding& a, const CBBinding& b) {
         return a.slot < b.slot;
     });
 
-    // Add to layout in SORTED order
     u32 cbCount = 0;
     for (const auto& cb : allCBs) {
         if (cb.isVCB) {
@@ -411,11 +340,8 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
         cbCount++;
     }
 
-    // Textures (t0, t1, t2, ...) - currently only in PS
-    // CRITICAL: Must sort by slot to match binding set order in GetOrCreateBindingSet
     u32 texCount = 0;
     if (stage == MaterialPSO::ShaderStage::Pixel) {
-        // Sort textures by slot before adding to layout
         xr_vector<MaterialPSO::TextureSlot> sortedTextures(matPSO->textures);
         std::sort(sortedTextures.begin(), sortedTextures.end(),
             [](const MaterialPSO::TextureSlot& a, const MaterialPSO::TextureSlot& b) {
@@ -429,11 +355,8 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
         }
     }
 
-    // Samplers (s0, s1, s2, ...) - currently only in PS
-    // CRITICAL: Must sort by slot to match binding set order in GetOrCreateBindingSet
     u32 samplerCount = 0;
     if (stage == MaterialPSO::ShaderStage::Pixel) {
-        // Collect samplers for this stage
         xr_vector<MaterialPSO::SamplerInfo> stageSamplers;
         for (const auto& samplerInfo : matPSO->samplers) {
             if (samplerInfo.stage == stage) {
@@ -441,7 +364,6 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
             }
         }
 
-        // Sort samplers by slot before adding to layout
         std::sort(stageSamplers.begin(), stageSamplers.end(),
             [](const MaterialPSO::SamplerInfo& a, const MaterialPSO::SamplerInfo& b) {
                 return a.slot < b.slot;
@@ -454,8 +376,6 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
         }
     }
 
-    //if (GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
-    //    layoutDesc.bindingOffsets = { 0, 0, 0, 0 };
 
     nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(layoutDesc);
     if (!layout) {
@@ -527,15 +447,10 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateCombinedBindingLayout(const Mate
         layoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::Sampler(samplerInfo.slot));
     }
 
-    //if (GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
-    //    layoutDesc.bindingOffsets = { 0, 0, 0, 0 };
 
     return m_device->CreateBindingLayout(layoutDesc);
 }
 
-// ══════════════════════════════════════════════════════════
-//  GET OR CREATE CACHED BINDING SET (with per-object VCB)
-// ══════════════════════════════════════════════════════════
 
 nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO)
 {
@@ -547,37 +462,24 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     if (!combinedMode)
         VERIFY(matPSO->psBindingLayout);
 
-    // ═══════════════════════════════════════════════════════
-    //  CHECK CACHE - Return existing binding sets if already created
-    // ═══════════════════════════════════════════════════════
-    // With proper NVRHI VCB support (isVolatile=true, maxVersions set),
-    // binding sets can be cached even with VCBs - NVRHI handles versioning.
     bool cacheValid = combinedMode
         ? (matPSO->vsBindingSet && !matPSO->needsBindingSetRebuild)
         : (matPSO->vsBindingSet && matPSO->psBindingSet && !matPSO->needsBindingSetRebuild);
     if (cacheValid)
         return matPSO->vsBindingSet;
 
-    // Clear the rebuild flag - we're rebuilding now
     matPSO->needsBindingSetRebuild = false;
 
-    // ═══════════════════════════════════════════════════════
-    //  BUILD VS BINDING SET DESCRIPTOR
-    // ═══════════════════════════════════════════════════════
-    // CRITICAL: Binding order must match layout order (VCBs first, then global CBs).
-    // NVRHI matches bindings by INDEX, not slot number!
 
     struct TempBinding {
         u32 slot;
         nvrhi::IBuffer* buffer;
-        shared_str name;  // For logging
+        shared_str name;
         bool isVCB;
     };
     xr_vector<TempBinding> vsBindings;
 
-    // Collect ALL VCBs from vcbRequirements (per-draw data)
     for (const auto& vcbReq : matPSO->vcbRequirements) {
-        // Query VCB pool for latest handle (FGConstantSystem might have updated it)
         fg::BufferHandle latestHandle = m_vcbPool->GetOrCreateVCB(
             framegraph::VolatileConstantBufferPool::CBLayout(
                 vcbReq.name.c_str(), vcbReq.slot, vcbReq.size
@@ -596,7 +498,6 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         vsBindings.push_back({vcbReq.slot, vcbBuffer, vcbReq.name, true});
     }
 
-    // Collect global CBs from constantBuffers
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.stage == MaterialPSO::ShaderStage::Vertex) {
             if (cbInfo.nvrhiBuffer) {
@@ -605,34 +506,25 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         }
     }
 
-    // CRITICAL: SORT by slot number to match layout order!
-    // NVRHI matches bindings by INDEX, so binding set order must match layout order (b0, b1, b2, ...)
     std::sort(vsBindings.begin(), vsBindings.end(), [](const TempBinding& a, const TempBinding& b) {
         return a.slot < b.slot;
     });
 
     nvrhi::BindingSetDesc vsBindingDesc;
     for (const auto& binding : vsBindings) {
-        // ConstantBuffer() auto-detects volatile buffers (checks buffer->getDesc().isVolatile)
         vsBindingDesc.bindings.push_back(
             nvrhi::BindingSetItem::ConstantBuffer(binding.slot, binding.buffer));
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  BUILD PS BINDING SET DESCRIPTOR
-    // ═══════════════════════════════════════════════════════
-    // CRITICAL: Binding order must match layout order.
-    // Collect bindings in the same order as CreateStageBindingLayout
 
     struct PSBinding {
         u32 slot;
         nvrhi::BindingSetItem item;
-        shared_str name;  // For logging
+        shared_str name;
         enum Type { CB, Texture, Sampler } type;
     };
     xr_vector<PSBinding> psBindings;
 
-    // Collect global CBs from constantBuffers
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.stage == MaterialPSO::ShaderStage::Pixel) {
             if (cbInfo.nvrhiBuffer) {
@@ -643,8 +535,6 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         }
     }
 
-    // Collect textures
-    // Track if all textures are valid - if not, we won't cache the binding set
     bool allTexturesValid = true;
     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
     for (const auto& texSlot : matPSO->textures) {
@@ -657,13 +547,11 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
                     nvrhi::Format::UNKNOWN, nvrhi::AllSubresources, texDesc.dimension),
                 "texture", PSBinding::Texture});
         } else {
-            // Texture not ready - binding set creation will fail, so return early
             Msg("! [MaterialCache::GetOrCreateBindingSet] Texture not loaded yet (slot t%u), cannot create binding set", texSlot.slot);
             return nullptr;
         }
     }
 
-    // Collect samplers
     for (const auto& samplerInfo : matPSO->samplers) {
         if (samplerInfo.stage == MaterialPSO::ShaderStage::Pixel) {
             if (samplerInfo.nvrhiSampler) {
@@ -678,13 +566,8 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         }
     }
 
-    // CRITICAL: SORT by slot number AND type to match layout order!
-    // CreateStageBindingLayout sorts ALL CBs by slot, then adds textures, then samplers.
-    // NVRHI matches bindings by INDEX, so binding set order MUST match layout order (b0, b1, ..., t0, t1, ..., s0, s1, ...)
     std::sort(psBindings.begin(), psBindings.end(), [](const PSBinding& a, const PSBinding& b) {
-        // First sort by type (CB < Texture < Sampler) to match CreateStageBindingLayout order
         if (a.type != b.type) return a.type < b.type;
-        // Then sort by slot within each type
         return a.slot < b.slot;
     });
 
@@ -744,28 +627,21 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     }
 
     if (!allTexturesValid) {
-        // Textures not ready - mark for recreation next frame
         matPSO->needsBindingSetRebuild = true;
     }
 
     return matPSO->vsBindingSet;
 }
 
-// D3D12: Extract vertex format ID from visual's geometry
 u32 MaterialCache::GetVertexFormatID(dxRender_Visual* visual)
 {
     if (!visual)
         return 0;
 
-    // For level geometry, the VB index is stored in the visual
-    // The vertex format ID corresponds to the nDC/xDC index
-    // For now, return 0 (most common format) - will be refined when we add proper VB tracking
-    // TODO: Extract actual VB declaration ID from visual's geometry
-    return 0;  // Default to first format
+    return 0;
 }
 
 #if defined(USE_DX11) && defined(XR_PLATFORM_WINDOWS)
-// Helper: Get size in bytes of a DXGI format
 static u32 GetFormatSize(DXGI_FORMAT format) {
     switch (format) {
         case DXGI_FORMAT_R32G32B32A32_FLOAT: return 16;
@@ -793,7 +669,6 @@ static u32 GetFormatSize(DXGI_FORMAT format) {
         case DXGI_FORMAT_R32G32B32A32_UINT: return 16;
         case DXGI_FORMAT_R32G32_UINT: return 8;
         case DXGI_FORMAT_R32_UINT: return 4;
-        // SINT formats (signed integers)
         case DXGI_FORMAT_R16G16B16A16_SINT: return 8;
         case DXGI_FORMAT_R16G16_SINT: return 4;
         case DXGI_FORMAT_R16_SINT: return 2;
@@ -804,39 +679,19 @@ static u32 GetFormatSize(DXGI_FORMAT format) {
         case DXGI_FORMAT_R32G32_SINT: return 8;
         case DXGI_FORMAT_R32_SINT: return 4;
         default:
-            return 4;  // Default fallback
+            return 4;
     }
 }
 #endif
-// ══════════════════════════════════════════════════════════
-//  SETUP VERTEX ATTRIBUTES
-// ══════════════════════════════════════════════════════════
-
-// ══════════════════════════════════════════════════════════
-//  VALIDATE VERTEX LAYOUT COMPATIBILITY
-// ══════════════════════════════════════════════════════════
-// Returns true if the visual's geometry provides all attributes the shader expects
 
 
 
-// ══════════════════════════════════════════════════════════
-//  STATE CONVERSION HELPERS
-// ══════════════════════════════════════════════════════════
-// Now located in RenderStateConversion.h (shared with ParticlePass)
-
-// ══════════════════════════════════════════════════════════
-//  SETUP RENDER STATES
-// ══════════════════════════════════════════════════════════
 
 
-// ══════════════════════════════════════════════════════════
-//  SETUP RENDER TARGETS
-// ══════════════════════════════════════════════════════════
 
 
-// ══════════════════════════════════════════════════════════
-//  UI PSO CREATION (Simplified - no visual required)
-// ══════════════════════════════════════════════════════════
+
+
 
 MaterialPSO* MaterialCache::GetOrCreateUIPSO(
     IUIShader* uiShader,
@@ -891,16 +746,13 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     fg::PrimitiveTopology topology)
 {
     auto pso = xr_make_unique<MaterialPSO>();
-    // Note: pso->pass is nullptr for DX12 (no legacy shader system)
 
-    // Cast to fgUIShader to access NVRHI handles
     fgUIShader* dxShader = static_cast<fgUIShader*>(uiShader);
     if (!dxShader) {
         Msg("! [MaterialCache::CreateUIPSO] Invalid uiShader pointer");
         return nullptr;
     }
 
-    // Get NVRHI shader handles directly from fgUIShader (compiled in fgUIShader::create)
     nvrhi::ShaderHandle nvrhiVS = dxShader->m_vsHandle;
     nvrhi::ShaderHandle nvrhiPS = dxShader->m_psHandle;
 
@@ -910,12 +762,10 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         return nullptr;
     }
 
-    // Extract reflection from fgUIShader
     if (dxShader->m_vsReflection) {
         pso->vsInputSignature = framegraph::ShaderReflector::GetVertexInputSignature(dxShader->m_vsReflection);
         pso->constantLayout = dxShader->m_vsReflection->constantLayout;
 
-        // Extract VS constant buffers from constantLayout
         for (const auto& cb : dxShader->m_vsReflection->constantLayout.constantBuffers.buffers) {
             MaterialPSO::ConstantBufferInfo cbInfo;
             cbInfo.name = cb.name.c_str();
@@ -929,9 +779,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         Msg("! [MaterialCache::CreateUIPSO] No VS reflection data available");
     }
 
-    // Extract PS reflection
     if (dxShader->m_psReflection) {
-        // Extract PS constant buffers from constantLayout
         for (const auto& cb : dxShader->m_psReflection->constantLayout.constantBuffers.buffers) {
             MaterialPSO::ConstantBufferInfo cbInfo;
             cbInfo.name = cb.name.c_str();
@@ -947,10 +795,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
             sampInfo.slot = samp.slot;
             sampInfo.stage = MaterialPSO::ShaderStage::Pixel;
 
-            // Create NVRHI sampler based on X-Ray sampler naming convention
-            // smp_base -> anisotropic filter, wrap
-            // smp_rtlinear -> linear filter, clamp
-            // smp_nofilter -> point filter, clamp
             nvrhi::SamplerDesc samplerDesc;
             if (strstr(samp.name.c_str(), "smp_base")) {
                 samplerDesc.minFilter = true;
@@ -975,7 +819,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
                 samplerDesc.addressV = nvrhi::SamplerAddressMode::Clamp;
                 samplerDesc.addressW = nvrhi::SamplerAddressMode::Clamp;
             } else {
-                // Default: linear filter, wrap
                 samplerDesc.minFilter = true;
                 samplerDesc.magFilter = true;
                 samplerDesc.mipFilter = true;
@@ -1018,22 +861,12 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         createdBuffers[cbInfo.name] = buffer;
     }
 
-    // Create binding layouts
     CreateBindingLayouts(pso.get());
 
-    // Build pipeline state descriptor
     fg::PipelineStateDesc psoDesc;
-    psoDesc.vertexShader = nvrhiVS.Get();  // Direct NVRHI shader pointer
-    psoDesc.pixelShader = nvrhiPS.Get();   // No wrapper layer!
+    psoDesc.vertexShader = nvrhiVS.Get();
+    psoDesc.pixelShader = nvrhiPS.Get();
 
-    // ═══════════════════════════════════════════════════════
-    //  BUILD VERTEX ATTRIBUTES FROM SHADER REFLECTION
-    // ═══════════════════════════════════════════════════════
-    // Use shader's input signature to determine correct order and formats
-    // UIVertex in-memory layout: float x,y,z,w (16 bytes), u32 color (4 bytes), float u,v (8 bytes)
-    // - POSITIONT: offset 0, RGBA32_FLOAT (float4 - 16 bytes) - shader expects float4!
-    // - COLOR: offset 16, RGBA8_UNORM (u32 - 4 bytes)
-    // - TEXCOORD: offset 20, RG32_FLOAT (float2 - 8 bytes)
 
     if (pso->vsInputSignature.elements.empty()) {
         Msg("! [MaterialCache::CreateUIPSO] No vertex input signature from shader reflection!");
@@ -1073,7 +906,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     }
     pso->vertexStride = sizeof(ui::UIVertex);
 
-    // Set render target formats from framebuffer FIRST
     const nvrhi::FramebufferDesc& fbDesc = framebuffer->getDesc();
     psoDesc.renderTargetCount = static_cast<u32>(fbDesc.colorAttachments.size());
     for (u32 i = 0; i < fbDesc.colorAttachments.size() && i < 8; ++i) {
@@ -1082,23 +914,19 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         }
     }
 
-    // UI render state:
-    // Depth/Stencil: Only enable if framebuffer has depth
-    // Blend: standard alpha blending
     bool hasDepth = (fbDesc.depthAttachment.texture != nullptr);
     if (hasDepth) {
         psoDesc.depthStencilFormat = fbDesc.depthAttachment.texture->getDesc().format;
         psoDesc.depthStencilState.depthTestEnable = true;
-        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::Always;  // Always pass
-        psoDesc.depthStencilState.depthWriteEnable = false;  // Don't write depth
-        psoDesc.depthStencilState.stencilEnable = true;      // Enable stencil for UI effects
+        psoDesc.depthStencilState.depthFunc = fg::ComparisonFunc::Always;
+        psoDesc.depthStencilState.depthWriteEnable = false;
+        psoDesc.depthStencilState.stencilEnable = true;
     } else {
         psoDesc.depthStencilState.depthTestEnable = false;
         psoDesc.depthStencilState.depthWriteEnable = false;
         psoDesc.depthStencilState.stencilEnable = false;
     }
 
-    // Standard premultiplied alpha blending (matches vanilla)
     psoDesc.blendState.renderTargets[0].blendEnable = true;
     psoDesc.blendState.renderTargets[0].srcBlend = fg::BlendFactor::SrcAlpha;
     psoDesc.blendState.renderTargets[0].dstBlend = fg::BlendFactor::InvSrcAlpha;
@@ -1107,13 +935,10 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     psoDesc.rasterizerState.cullMode = fg::CullMode::None;
     psoDesc.rasterizerState.frontCounterClockwise = false;
-    psoDesc.rasterizerState.scissorEnable = true;  // Enable scissor for UI clipping
+    psoDesc.rasterizerState.scissorEnable = true;
 
-    // Set primitive topology (UI uses triangle lists) - already defaults to TriangleList but being explicit
     psoDesc.primitiveTopology = topology;
 
-    // Use binding layouts created by CreateBindingLayouts() from shader reflection
-    // These layouts were built from the shader's actual resource declarations
     if (pso->vsBindingLayout) {
         psoDesc.bindingLayouts.push_back(pso->vsBindingLayout);
     }
@@ -1133,7 +958,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     psoDesc.debugName = "UI_PSO";
 
-    // Create pipeline state via cache
     fg::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
         Msg("! [MaterialCache::CreateUIPSO] No PSO cache");
@@ -1148,8 +972,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     pso->pso = nvrhiPSO;
 
-    // CRITICAL FIX: NVRHI creates NEW layout objects internally when creating a pipeline.
-    // We must use the layouts FROM the pipeline, not the ones we created!
     nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
     if (nativePipeline) {
         const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
@@ -1164,9 +986,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 }
 
 
-// ══════════════════════════════════════════════════════════
-//  CLEAR CACHE
-// ══════════════════════════════════════════════════════════
 
 void MaterialCache::Clear()
 {
@@ -1185,45 +1004,32 @@ void MaterialCache::Clear()
         }
     }
     m_cache.clear();
-    m_textureHandleCache.clear();  // Updated: uses resource handles now
+    m_textureHandleCache.clear();
     m_detailScaleCache.clear();
-    m_shaderHandles.clear();  // Clear shader handle cache
-    m_visualToMaterialID.clear();  // Clear bindless material cache
-    m_pendingMaterials.clear();    // Clear pending materials
+    m_shaderHandles.clear();
+    m_visualToMaterialID.clear();
+    m_pendingMaterials.clear();
     m_stats = Stats{};
 }
 
-// ══════════════════════════════════════════════════════════
-//  SHADER HANDLE CACHING (STAGE-AWARE)
-// ══════════════════════════════════════════════════════════
 
 
 
-// ══════════════════════════════════════════════════════════
-//  GET DETAIL SCALE FROM TEXTURE METADATA
-// ══════════════════════════════════════════════════════════
 
 float MaterialCache::GetDetailScale(const shared_str& textureName)
 {
-    // Check cache first
     auto cacheIt = m_detailScaleCache.find(textureName.c_str());
     if (cacheIt != m_detailScaleCache.end()) {
         return cacheIt->second;
     }
 
-    // Query TextureDescrManager via clean public API
-    // This internally queries m_detail_scalers map (populated from .ltx files)
     float scale = TextureDescr.GetDetailScale(textureName);
 
-    // Cache for next time
     m_detailScaleCache[textureName.c_str()] = scale;
 
     return scale;
 }
 
-// ══════════════════════════════════════════════════════════
-//  REGISTER MATERIAL WITH BINDLESS SYSTEM
-// ══════════════════════════════════════════════════════════
 
 u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
 {
@@ -1232,63 +1038,46 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
     if (!matPSO)
         return UINT32_MAX;
 
-    // Already registered?
     if (matPSO->bindlessMaterialID != UINT32_MAX)
         return matPSO->bindlessMaterialID;
 
-    // Check if bindless system is initialized
     auto& materialBuffer = MaterialBuffer::Instance();
     if (!materialBuffer.IsInitialized())
         return UINT32_MAX;
 
-    // Get texture manager for NVRHI texture access
     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
     if (!texManager)
         return UINT32_MAX;
 
-    // Build MaterialData from PSO textures (SM6 bindless: simple u32 descriptor indices)
     MaterialData matData = {};
-    // Initialize with invalid texture indices
     matData.diffuseIndex = INVALID_TEXTURE_INDEX;
     matData.normalIndex = INVALID_TEXTURE_INDEX;
     matData.detailIndex = INVALID_TEXTURE_INDEX;
     matData.pbrIndex = INVALID_TEXTURE_INDEX;
     matData.detailScale = matPSO->detail_scale;
-    matData.alphaRef = 0.5f;  // Default alpha ref
+    matData.alphaRef = 0.5f;
     matData.flags = 0;
     matData.shaderVariant = 0;
 
-    // Extract material properties from shader/pass
     if (matPSO->pass) {
-        // Check texture list for material flags
         fg::STextureList* texList = matPSO->pass->T._get();
         if (texList && !texList->empty()) {
-            // Check for normal map (usually slot 1 or named with _bump)
             for (size_t i = 0; i < texList->size(); i++) {
                 const auto& texPair = (*texList)[i];
-                if (texPair.first == 1) {  // Normal map slot
+                if (texPair.first == 1) {
                     matData.flags |= MAT_FLAG_HAS_NORMAL;
                 }
             }
         }
     }
 
-    // Note: Actual texture registration to bindless descriptor heap happens lazily during rendering
-    // when RenderContext is available. For now, we just set up the material flags
-    // and register with the buffer. The descriptor indices will be updated later.
 
-    // Register with material buffer
     u32 materialID = materialBuffer.RegisterMaterial(matData);
     matPSO->bindlessMaterialID = materialID;
 
     return materialID;
 }
 
-// ══════════════════════════════════════════════════════════
-//  TERRAIN MATERIAL DETECTION
-// ══════════════════════════════════════════════════════════
-// Uses Blender CLASS_ID to detect terrain materials (B_BmmD, B_LmBmmD)
-// These use 4-layer detail blending with RGBA mask
 
 bool MaterialCache::IsTerrainMaterial(dxRender_Visual* visual)
 {
@@ -1297,11 +1086,6 @@ bool MaterialCache::IsTerrainMaterial(dxRender_Visual* visual)
     return shader_info::IsTerrainShader(visual->shaderName.c_str());
 }
 
-// ══════════════════════════════════════════════════════════
-//  PRE-REGISTER TERRAIN MATERIAL
-// ══════════════════════════════════════════════════════════
-// Creates TerrainMaterialData entry for 4-layer detail blending
-// Returns terrain material ID for batch.terrainMaterialID
 
 u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
 {
@@ -1310,17 +1094,12 @@ u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
     if (!visual)
         return UINT32_MAX;
 
-    // Cache by shader name - terrain materials are determined by shader
-    // (e.g., "levels\zaton_earth_2" defines which detail textures to use)
-    // Multiple visuals with the same shader share one terrain material
     shared_str shaderName = visual->shaderName;
 
-    // Check cache first
     auto it = m_shaderToTerrainMaterialID.find(shaderName);
     if (it != m_shaderToTerrainMaterialID.end())
         return it->second;
 
-    // Check if terrain material buffer is initialized
     auto& terrainBuffer = TerrainMaterialBuffer::Instance();
     if (!terrainBuffer.IsInitialized()) {
         static bool s_warnOnce = false;
@@ -1332,10 +1111,8 @@ u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
         return UINT32_MAX;
     }
 
-    // Build TerrainMaterialData (texture indices will be filled during finalization)
     TerrainMaterialData matData = {};
 
-    // Initialize all texture indices to invalid
     matData.baseAlbedoIndex = INVALID_TEXTURE_INDEX;
     matData.blendMaskIndex = INVALID_TEXTURE_INDEX;
     matData.detailR_Index = INVALID_TEXTURE_INDEX;
@@ -1351,29 +1128,23 @@ u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
     matData.pbrB_Index = INVALID_TEXTURE_INDEX;
     matData.pbrA_Index = INVALID_TEXTURE_INDEX;
 
-    // Set terrain flag
     matData.flags = MAT_FLAG_TERRAIN;
 
-    // Get detail scale from texture description
     if (visual->textureName.size() > 0) {
         matData.detailScale = GetDetailScale(visual->textureName);
     } else {
-        matData.detailScale = 4.0f;  // Default terrain detail scale
+        matData.detailScale = 4.0f;
     }
 
-    // Register with terrain material buffer
     u32 terrainMaterialID = terrainBuffer.RegisterMaterial(matData);
 
-    // Cache for future lookups (by shader name, not visual pointer)
     m_shaderToTerrainMaterialID[shaderName] = terrainMaterialID;
 
-    // Add to pending list for texture registration
     PendingTerrainMaterial pending;
     pending.terrainMaterialID = terrainMaterialID;
     pending.visual = visual;
     m_pendingTerrainMaterials.push_back(pending);
 
-    // Debug: log terrain materials
     static u32 logCount = 0;
     if (++logCount <= 5) {
         Msg("* [MaterialCache] PreRegisterTerrain: matID=%u visual=%p tex='%s' shader='%s'",
@@ -1383,10 +1154,6 @@ u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
     return terrainMaterialID;
 }
 
-// ══════════════════════════════════════════════════════════
-//  FINALIZE PENDING TERRAIN MATERIALS
-// ══════════════════════════════════════════════════════════
-// Registers all 14 terrain textures (base, mask, 4x detail, 4x normal, 4x pbr)
 
 void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
 {
@@ -1416,19 +1183,17 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
         if (!visual || terrainMaterialID == UINT32_MAX)
             continue;
 
-        // Get existing material data
         const TerrainMaterialData* existingMat = terrainBuffer.GetMaterial(terrainMaterialID);
         if (!existingMat)
             continue;
 
         TerrainMaterialData matData = *existingMat;
         bool updated = false;
-        xr_vector<xr_string> missingTextures;  // Track missing textures for logging
+        xr_vector<xr_string> missingTextures;
 
         shader_info::TerrainDetailNames detailNames;
         bool hasTerrainDetail = shader_info::GetTerrainDetailNames(visual->shaderName.c_str(), detailNames);
 
-        // Helper lambda to register a texture with failure tracking
         auto RegisterTexture = [&](const char* texName, const char* slotName) -> u32 {
             if (!texName || !texName[0]) {
                 missingTextures.push_back(xr_string(slotName) + ": (empty name)");
@@ -1454,7 +1219,6 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
             return idx;
         };
 
-        // 1. Base albedo texture (s_base) - from visual texture name
         if (visual->textureName.size()) {
             u32 idx = RegisterTexture(visual->textureName.c_str(), "base");
             if (idx != INVALID_TEXTURE_INDEX) {
@@ -1463,8 +1227,6 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
             }
         }
 
-        // 2. Blend mask texture (s_mask) - derived from base texture name
-        // Convention: baseTexture + "_mask" (e.g., "terrain\\terrain_zaton_mask")
         if (visual->textureName.size()) {
             xr_string maskName(visual->textureName.c_str());
             maskName += "_mask";
@@ -1480,7 +1242,6 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
         const char* detailB = hasTerrainDetail ? detailNames.b : nullptr;
         const char* detailA = hasTerrainDetail ? detailNames.a : nullptr;
 
-        // 3-6. Detail color textures (s_dt_r/g/b/a)
         {
             u32 idx = RegisterTexture(detailR, "detailR");
             if (idx != INVALID_TEXTURE_INDEX) { matData.detailR_Index = idx; updated = true; }
@@ -1498,8 +1259,6 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
             if (idx != INVALID_TEXTURE_INDEX) { matData.detailA_Index = idx; updated = true; }
         }
 
-        // 7-10. Detail normal textures (s_dn_r/g/b/a)
-        // Convention: detail texture name + "_bump"
         auto& texDescMgr = TextureDescr;
         if (detailR && detailR[0]) {
             shared_str bumpR = texDescMgr.GetBumpName(detailR);
@@ -1530,8 +1289,6 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
             }
         }
 
-        // 11-14. Detail PBR textures (s_pbr_r/g/b/a)
-        // Convention: detail texture name + "_pbr"
         if (detailR && detailR[0]) {
             shared_str pbrR = texDescMgr.GetPBRName(detailR);
             if (pbrR.size()) {
@@ -1565,12 +1322,10 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
             }
         }
 
-        // Update terrain material buffer
         if (updated) {
             terrainBuffer.UpdateMaterial(terrainMaterialID, matData);
             processedCount++;
 
-            // Debug: Log first 5 materials with ALL indices (including normals/PBR)
             static u32 s_debugLogCount = 0;
             bool hasZeroIndex = (matData.baseAlbedoIndex == 0 || matData.blendMaskIndex == 0 ||
                                  matData.detailR_Index == 0 || matData.detailG_Index == 0 ||
@@ -1583,7 +1338,6 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
             s_debugLogCount++;
         }
 
-        // Log materials with missing textures (only if there are failures)
         if (!missingTextures.empty()) {
             Msg("! [TerrainMaterial] matID=%u shader='%s' tex='%s' - missing %zu textures:",
                 terrainMaterialID, visual->shaderName.c_str(), visual->textureName.c_str(),
@@ -1594,14 +1348,11 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
         }
     }
 
-    // Clear pending list
     m_pendingTerrainMaterials.clear();
 
-    // Track finalize call count for debugging
     static u32 s_finalizeCallCount = 0;
     s_finalizeCallCount++;
 
-    // Upload to GPU
     if (processedCount > 0) {
         terrainBuffer.Upload(ctx);
         Msg("* [MaterialCache] Finalized %u terrain materials (call #%u, total registered: %u)",
@@ -1609,12 +1360,6 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
     }
 }
 
-// ══════════════════════════════════════════════════════════
-//  PRE-REGISTER BINDLESS MATERIAL BY VISUAL
-// ══════════════════════════════════════════════════════════
-// Called during geometry collection (before PSO exists)
-// Creates bindless material entry based on visual's shader/textures
-// Returns material ID for batch.bindlessMaterialID
 
 u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
 {
@@ -1623,33 +1368,28 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     if (!visual)
         return UINT32_MAX;
 
-    // Check cache first
     auto it = m_visualToMaterialID.find(visual);
     if (it != m_visualToMaterialID.end())
         return it->second;
 
-    // Check if bindless system is initialized
     auto& materialBuffer = MaterialBuffer::Instance();
     if (!materialBuffer.IsInitialized())
         return UINT32_MAX;
 
-    // Build MaterialData (SM6 bindless: simple u32 descriptor indices)
     MaterialData matData = {};
     matData.diffuseIndex = INVALID_TEXTURE_INDEX;
     matData.normalIndex = INVALID_TEXTURE_INDEX;
     matData.detailIndex = INVALID_TEXTURE_INDEX;
     matData.pbrIndex = INVALID_TEXTURE_INDEX;
     matData.detailScale = 1.0f;
-    matData.alphaRef = 0.5f;  // Default, will be overwritten if blender data available
+    matData.alphaRef = 0.5f;
     matData.flags = 0;
     matData.shaderVariant = 0;
 
-    // Get material info from MaterialSystem using shader/texture names
     if (visual->textureName.size() > 0) {
         matData.detailScale = GetDetailScale(visual->textureName);
     }
 
-    // Get material flags from MaterialSystem (queries blender properties)
     if (visual->shaderName.size() > 0) {
         const auto& matInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName.c_str(), visual->textureName.c_str());
         if (matInfo.alphaTest) {
@@ -1665,20 +1405,15 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
         matData.flags |= MAT_FLAG_HAS_NORMAL;
     }
 
-    // Register with material buffer
     u32 materialID = materialBuffer.RegisterMaterial(matData);
 
-    // Cache for future lookups
     m_visualToMaterialID[visual] = materialID;
 
-    // Add to pending list for descriptor registration
-    // This will be finalized when RenderContext is available
     PendingMaterial pending;
     pending.materialID = materialID;
     pending.visual = visual;
     m_pendingMaterials.push_back(pending);
 
-    // Debug: log first few materials added
     static u32 logCount = 0;
     if (++logCount <= 10) {
         Msg("* [MaterialCache] PreRegister: matID=%u visual=%p type=%u tex='%s' shader='%s' pending=%u",
@@ -1689,8 +1424,6 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     return materialID;
 }
 
-// Pre-register bindless material for particle effects
-// Particles have their texture name in CPEDef, not in visual
 u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
 {
     using namespace fg::bindless;
@@ -1698,38 +1431,32 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
     if (!textureName.size() || !textureName[0])
         return UINT32_MAX;
 
-    // Check cache first
     auto it = m_particleTextureToMaterialID.find(textureName);
     if (it != m_particleTextureToMaterialID.end())
         return it->second;
 
-    // Check if bindless system is initialized
     auto& materialBuffer = MaterialBuffer::Instance();
     if (!materialBuffer.IsInitialized())
         return UINT32_MAX;
 
-    // Build MaterialData for particle (just needs diffuse texture)
     MaterialData matData = {};
     matData.diffuseIndex = INVALID_TEXTURE_INDEX;
     matData.normalIndex = INVALID_TEXTURE_INDEX;
     matData.detailIndex = INVALID_TEXTURE_INDEX;
     matData.pbrIndex = INVALID_TEXTURE_INDEX;
     matData.detailScale = 1.0f;
-    matData.alphaRef = 0.01f / 255.0f;  // Minimal alpha test for particles
-    matData.flags = 0;  // No alpha test, no normal map for particles
+    matData.alphaRef = 0.01f / 255.0f;
+    matData.flags = 0;
     matData.shaderVariant = 0;
 
-    // Register with material buffer
     u32 materialID = materialBuffer.RegisterMaterial(matData);
 
-    // Cache for future lookups
     m_particleTextureToMaterialID[textureName] = materialID;
 
-    // Add to pending list for descriptor registration
     PendingMaterial pending;
     pending.materialID = materialID;
-    pending.visual = nullptr;  // No visual for particles
-    pending.textureName = textureName;  // Store texture name directly
+    pending.visual = nullptr;
+    pending.textureName = textureName;
     m_pendingMaterials.push_back(pending);
 
     Msg("* [MaterialCache] PreRegisterParticle: matID=%u tex='%s' pending=%u",
@@ -1738,11 +1465,6 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
     return materialID;
 }
 
-// ══════════════════════════════════════════════════════════
-//  FINALIZE PENDING MATERIALS (Register Textures to Bindless Descriptor Heap)
-// ══════════════════════════════════════════════════════════
-// Called once per frame when RenderContext is available
-// Registers textures to D3D12 descriptor heap and updates material buffer
 
 void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
 {
@@ -1760,7 +1482,6 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
     if (!texManager)
         return;
 
-    // Get backend for bindless texture registration (uses IRenderBackend virtual method)
     IRenderBackend* backend = GEnv.Backend;
     if (!backend) {
         Msg("! [MaterialCache] Backend not available - cannot register bindless textures");
@@ -1776,7 +1497,6 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
         if (materialID == UINT32_MAX)
             continue;
 
-        // Get material data to update
         const MaterialData* existingMat = materialBuffer.GetMaterial(materialID);
         if (!existingMat)
             continue;
@@ -1784,20 +1504,16 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
         MaterialData matData = *existingMat;
         bool updated = false;
 
-        // Get diffuse texture name from visual or pending (particle case)
         shared_str diffuseName;
         if (visual) {
             diffuseName = visual->textureName;
         } else if (pending.textureName.size()) {
-            // Particle material - texture name stored directly
             diffuseName = pending.textureName;
         }
 
-        // Skip if no diffuse texture name
         if (!diffuseName.size() || !diffuseName[0])
             continue;
 
-        // Load diffuse texture through modern resource manager
         {
             resources::TextureHandle handle = texManager->LoadTexture(diffuseName.c_str());
             if (handle.IsValid()) {
@@ -1812,7 +1528,6 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
             }
         }
 
-        // Get normal/bump map from texture description (proper X-Ray way)
         auto& texDescMgr = TextureDescr;
         shared_str bumpName = texDescMgr.GetBumpName(diffuseName);
         if (bumpName.size() && bumpName[0]) {
@@ -1849,10 +1564,7 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
             }
         }
 
-        // Get PBR texture from texture description metadata
-        // Prefer consolidated _pbr texture, fallback to legacy _metallic
         if (diffuseName.c_str() && diffuseName[0]) {
-            // Try consolidated _pbr texture first (R=metallic, G=roughness, B=ao, A=parallax)
             shared_str pbrName = texDescMgr.GetPBRName(diffuseName);
             if (!pbrName.empty()) {
                 resources::TextureHandle handle = texManager->LoadTexture(pbrName.c_str());
@@ -1870,7 +1582,6 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
             }
         }
 
-        // Update material buffer if any textures were registered
         if (updated) {
             materialBuffer.UpdateMaterial(materialID, matData);
             processedCount++;
@@ -1906,10 +1617,8 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
         }
     }
 
-    // Clear pending list
     m_pendingMaterials.clear();
 
-    // Upload updated materials to GPU
     if (processedCount > 0) {
         materialBuffer.Upload(ctx);
     }
@@ -1938,4 +1647,4 @@ nvrhi::ITexture* MaterialCache::GetNVRHITextureByName(const char* textureName)
     return handle.IsValid() ? texManager->GetNVRHITexture(handle) : nullptr;
 }
 
-} // namespace xray::render
+}

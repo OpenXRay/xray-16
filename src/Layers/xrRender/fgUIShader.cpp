@@ -153,4 +153,4 @@ bool fgUIShader::GetBaseTextureResolution(Fvector2& res)
     texManager->Release(handle);
     return ok;
 }
-} // namespace xray::render::fg
+}

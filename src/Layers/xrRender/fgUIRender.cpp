@@ -428,4 +428,4 @@ void FGUIRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebu
         RenderBatchWithShader(cmdList, batch, currentPSO, framebuffer, screenWidth, screenHeight, batchVertexOffset, batchIndexOffset);
     }
 }
-} // namespace xray::render::fg
+}

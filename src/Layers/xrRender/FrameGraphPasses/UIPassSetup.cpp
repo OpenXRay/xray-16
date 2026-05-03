@@ -1,4 +1,3 @@
-// xrRender/FrameGraphPasses/UIPassSetup.cpp
 #include "stdafx.h"
 
 #include "UIPassSetup.h"
@@ -70,33 +69,28 @@ framegraph::VirtualResourceHandle setupUIPass(
     auto& passData = fg.addCallbackPass<UIPassData>(
         "UI",
 
-        // Setup lambda
         [sceneTarget, width, height](FrameGraph& builder, PassHandle passHandle, UIPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
             data.height = height;
 
-            // Read and write to scene HDR target (UI renders on top with alpha blending)
             data.sceneInput = passBuilder.read(sceneTarget);
             data.sceneOutput = passBuilder.write(sceneTarget, ResourceState::RenderTarget);
         },
 
-        // Execute lambda
         [](const UIPassData& data,
            const FrameGraph& fg,
            fg::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
-            // Get physical scene target
             auto* sceneRT = fg.GetPhysicalTexture(data.sceneOutput);
 
             if (!sceneRT) {
                 return;
             }
 
-            // Create framebuffer (no depth buffer - UI is screen-space overlay)
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(sceneRT);
             auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
@@ -106,7 +100,6 @@ framegraph::VirtualResourceHandle setupUIPass(
                 return;
             }
 
-            // Get UI infrastructure from FrameGraphRenderer
             auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
             auto* uiRender = fgRenderer->GetUIRender();
             auto* uiMatCache = fgRenderer->GetUIMaterialCache();
@@ -116,7 +109,6 @@ framegraph::VirtualResourceHandle setupUIPass(
                 return;
             }
 
-            // Collect UI geometry
             g_pGamePersistent->OnRenderPPUI_main();
             g_pGamePersistent->OnRenderInGameUI();
             if (g_pGamePersistent->IsLoadingScreenShown()) {
@@ -128,7 +120,6 @@ framegraph::VirtualResourceHandle setupUIPass(
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
 
-                // Upload static_globals using FGConstantSystem (type-safe, automatic VCB lookup)
                 for (const auto& batch : uiRender->GetBatches()) {
                     if (batch.uiShader && uiMatCache) {
                         MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(
@@ -139,7 +130,6 @@ framegraph::VirtualResourceHandle setupUIPass(
                         );
 
                         if (matPSO) {
-                            // Use FGConstantSystem with STATIC constant API
                             FGConstantSystem constants(matPSO);
                             UploadStaticGlobals(constants, staticGlobalsCB);
                             constants.CommitStatic(ctx);
@@ -155,7 +145,6 @@ framegraph::VirtualResourceHandle setupUIPass(
     return passData.sceneOutput;
 }
 
-// Cursor pass - renders cursor on top of everything
 framegraph::VirtualResourceHandle setupCursorPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle uiTarget,
@@ -167,25 +156,21 @@ framegraph::VirtualResourceHandle setupCursorPass(
     auto& passData = fg.addCallbackPass<CursorPassData>(
         "Cursor",
 
-        // Setup lambda
         [uiTarget, width, height](FrameGraph& builder, PassHandle passHandle, CursorPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
             data.height = height;
 
-            // Read-write UI target (cursor renders on top)
             data.uiTarget = passBuilder.readWrite(uiTarget, ResourceState::RenderTarget);
         },
 
-        // Execute lambda
         [](const CursorPassData& data,
            const FrameGraph& fg,
            fg::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
-            // Get physical resource
             auto* uiRT = fg.GetPhysicalTexture(data.uiTarget);
 
             if (!uiRT) {
@@ -193,8 +178,6 @@ framegraph::VirtualResourceHandle setupCursorPass(
                 return;
             }
 
-            // Clear framebuffer (no need, cursor renders on top of existing UI)
-            // Create framebuffer
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(uiRT);
             auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
@@ -204,7 +187,6 @@ framegraph::VirtualResourceHandle setupCursorPass(
                 return;
             }
 
-            // Get UI infrastructure from FrameGraphRenderer
             auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
             auto* uiRender = fgRenderer->GetUIRender();
             auto* uiMatCache = fgRenderer->GetUIMaterialCache();
@@ -214,22 +196,18 @@ framegraph::VirtualResourceHandle setupCursorPass(
                 return;
             }
 
-            // Collect cursor geometry
             IUIRender* oldRenderer = GEnv.UIRender;
             uiRender->Clear();
             GEnv.UIRender = uiRender;
 
-            // Call cursor rendering callback
             g_pGamePersistent->OnRenderCursor();
 
             GEnv.UIRender = oldRenderer;
 
-            // Render cursor batches if any were collected
             if (!uiRender->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
 
-                // Upload static_globals using FGConstantSystem (type-safe, automatic VCB lookup)
                 for (const auto& batch : uiRender->GetBatches()) {
                     if (batch.uiShader && uiMatCache) {
                         MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(
@@ -240,7 +218,6 @@ framegraph::VirtualResourceHandle setupCursorPass(
                         );
 
                         if (matPSO) {
-                            // Use FGConstantSystem with STATIC constant API
                             FGConstantSystem constants(matPSO);
                             UploadStaticGlobals(constants, staticGlobalsCB);
                             constants.CommitStatic(ctx);
@@ -256,4 +233,4 @@ framegraph::VirtualResourceHandle setupCursorPass(
     return passData.uiTarget;
 }
 
-} // namespace xray::render::fg::passes
+}

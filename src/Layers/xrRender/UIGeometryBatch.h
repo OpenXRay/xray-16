@@ -29,7 +29,6 @@ struct UIVertex
     }
 };
 
-// Primitive type - matches IUIRender::ePrimitiveType
 enum class UIPrimitiveType
 {
     TriList,
@@ -38,26 +37,23 @@ enum class UIPrimitiveType
     LineList
 };
 
-// A batch of UI geometry with the same shader/texture
 class UIGeometryBatch
 {
 public:
     UIGeometryBatch() = default;
     ~UIGeometryBatch() = default;
 
-    // Geometry data
     xr_vector<UIVertex> vertices;
     xr_vector<u16> indices;
     UIPrimitiveType primitiveType{UIPrimitiveType::TriList};
 
-    // Rendering state
-    IUIShader* uiShader{nullptr};  // Backend-agnostic: Pointer to shader (fgUIShader has NVRHI handles)
-    u32 shaderElement{0};       // Shader element index (always 0 for UI = SE_R2_NORMAL_HQ)
-    int alphaRef{0};            // Alpha reference value
-    bool hasScissor{false};     // Whether scissor rect is active
-    Irect scissorRect;          // Scissor rectangle
-    Fmatrix xformWorld;         // World transform matrix
-    int cullMode{0};            // Cull mode (0=none, 1=CW, 2=CCW)
+    IUIShader* uiShader{nullptr};
+    u32 shaderElement{0};
+    int alphaRef{0};
+    bool hasScissor{false};
+    Irect scissorRect;
+    Fmatrix xformWorld;
+    int cullMode{0};
 
     void Clear()
     {
@@ -145,4 +141,4 @@ public:
     }
 };
 
-} // namespace xray::render::ui
+}
