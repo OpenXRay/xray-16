@@ -146,15 +146,34 @@ set(CCOPTIONS "${CCOPT};${XCFLAGS}")
 
 target_compile_options(xrLuaJIT PRIVATE ${CCOPTIONS})
 
-execute_process(
-    COMMAND ${CMAKE_C_COMPILER} ${CCOPTIONS} -E lj_arch.h -dM
-    WORKING_DIRECTORY "${LUAJIT_DIR}"
-    OUTPUT_VARIABLE TESTARCH_OUTPUT
-    ERROR_VARIABLE TESTARCH_ERROR
-)
+if (MSVC AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+    # cl.exe doesn't accept GCC-style -E -dM. Infer arch from the CMake
+    # platform/pointer width instead of preprocessing lj_arch.h.
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+        if (CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64|aarch64")
+            set(TESTARCH_OUTPUT "#define LJ_TARGET_ARM64 1")
+        else()
+            set(TESTARCH_OUTPUT "#define LJ_TARGET_X64 1")
+        endif()
+    else()
+        if (CMAKE_SYSTEM_PROCESSOR MATCHES "ARM|arm")
+            set(TESTARCH_OUTPUT "#define LJ_TARGET_ARM 1")
+        else()
+            set(TESTARCH_OUTPUT "#define LJ_TARGET_X86 1")
+        endif()
+    endif()
+    set(TESTARCH_ERROR "")
+else()
+    execute_process(
+        COMMAND ${CMAKE_C_COMPILER} ${CCOPTIONS} -E lj_arch.h -dM
+        WORKING_DIRECTORY "${LUAJIT_DIR}"
+        OUTPUT_VARIABLE TESTARCH_OUTPUT
+        ERROR_VARIABLE TESTARCH_ERROR
+    )
 
-if(NOT "${TESTARCH_ERROR}" STREQUAL "")
-    message("TESTARCH_ERROR=${TESTARCH_ERROR}")
+    if(NOT "${TESTARCH_ERROR}" STREQUAL "")
+        message("TESTARCH_ERROR=${TESTARCH_ERROR}")
+    endif()
 endif()
 
 if ("${TESTARCH_OUTPUT}" MATCHES "LJ_TARGET_X64")
