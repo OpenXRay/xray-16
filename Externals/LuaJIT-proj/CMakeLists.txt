@@ -8,7 +8,55 @@ cmake_minimum_required(VERSION 3.13)
 
 project(xrLuaJIT C CXX ASM)
 
-# Version
+set(LUAJIT_DIR ${CMAKE_SOURCE_DIR}/Externals/LuaJIT/src CACHE PATH "Location of luajit sources")
+
+if (MSVC AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang" AND WIN32)
+    get_filename_component(_lj_root "${LUAJIT_DIR}" DIRECTORY)
+    set(_lj_msvc_workdir "${CMAKE_CURRENT_BINARY_DIR}/msvcbuild")
+    set(_lj_msvc_srcdir "${_lj_msvc_workdir}/src")
+    set(_lj_msvc_lib "${_lj_msvc_srcdir}/lua51.lib")
+    set(_lj_msvc_dll "${_lj_msvc_srcdir}/lua51.dll")
+    set(_lj_msvc_args "")
+    if (NOT BUILD_SHARED_LIBS)
+        set(_lj_msvc_args "static")
+        set(_lj_msvc_outputs "${_lj_msvc_lib}")
+    else()
+        set(_lj_msvc_outputs "${_lj_msvc_lib}" "${_lj_msvc_dll}")
+    endif()
+
+    add_custom_command(
+        OUTPUT ${_lj_msvc_outputs}
+        COMMAND ${CMAKE_COMMAND} -E rm -rf "${_lj_msvc_workdir}"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${_lj_root}" "${_lj_msvc_workdir}"
+        COMMAND ${CMAKE_COMMAND} -E chdir "${_lj_msvc_srcdir}" cmd.exe /c msvcbuild.bat ${_lj_msvc_args}
+        DEPENDS "${LUAJIT_DIR}/lj_arch.h" "${LUAJIT_DIR}/msvcbuild.bat"
+        VERBATIM
+    )
+    add_custom_target(xrLuaJIT_msvcbuild DEPENDS ${_lj_msvc_outputs})
+
+    if (BUILD_SHARED_LIBS)
+        add_library(xrLuaJIT SHARED IMPORTED GLOBAL)
+        set_target_properties(xrLuaJIT PROPERTIES
+            IMPORTED_LOCATION "${_lj_msvc_dll}"
+            IMPORTED_IMPLIB "${_lj_msvc_lib}"
+            INTERFACE_INCLUDE_DIRECTORIES "${LUAJIT_DIR}"
+        )
+        add_custom_command(TARGET xrLuaJIT_msvcbuild POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${_lj_msvc_dll}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lua51.dll"
+            VERBATIM
+        )
+    else()
+        add_library(xrLuaJIT STATIC IMPORTED GLOBAL)
+        set_target_properties(xrLuaJIT PROPERTIES
+            IMPORTED_LOCATION "${_lj_msvc_lib}"
+            INTERFACE_INCLUDE_DIRECTORIES "${LUAJIT_DIR}"
+        )
+    endif()
+    add_dependencies(xrLuaJIT xrLuaJIT_msvcbuild)
+    return()
+endif()
+
 set(MAJVER 2)
 set(MINVER 0)
 set(RELVER 5)
@@ -25,7 +73,6 @@ if (APPLE AND NOT CMAKE_OSX_SYSROOT)
     )
     set(CMAKE_OSX_SYSROOT "${_LUAJIT_OSX_SDK_PATH}")
 endif()
-set(LUAJIT_DIR ${CMAKE_SOURCE_DIR}/Externals/LuaJIT/src CACHE PATH "Location of luajit sources")
 
 option(BUILD_SHARED_LIBS "Build as shared library" ON)
 option(LUAJIT_BUILD_APP "Build application" OFF)
@@ -147,21 +194,35 @@ set(CCOPTIONS "${CCOPT};${XCFLAGS}")
 target_compile_options(xrLuaJIT PRIVATE ${CCOPTIONS})
 
 if (MSVC AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
-    # cl.exe doesn't accept GCC-style -E -dM. Infer arch from the CMake
-    # platform/pointer width instead of preprocessing lj_arch.h.
+    set(_lj_common
+        "#define LJ_LE 1"
+        "#define LJ_HASJIT 1"
+        "#define LJ_HASFFI 1"
+        "#define LJ_ARCH_HASFPU 1"
+        "#define LJ_ABI_SOFTFP 0")
     if (CMAKE_SIZEOF_VOID_P EQUAL 8)
         if (CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64|aarch64")
-            set(TESTARCH_OUTPUT "#define LJ_TARGET_ARM64 1")
+            list(APPEND _lj_common
+                "#define LJ_TARGET_ARM64 1"
+                "#define LJ_ARCH_BITS 64")
         else()
-            set(TESTARCH_OUTPUT "#define LJ_TARGET_X64 1")
+            list(APPEND _lj_common
+                "#define LJ_TARGET_X64 1"
+                "#define LJ_ARCH_BITS 64"
+                "#define LJ_FR2 1")
         endif()
     else()
         if (CMAKE_SYSTEM_PROCESSOR MATCHES "ARM|arm")
-            set(TESTARCH_OUTPUT "#define LJ_TARGET_ARM 1")
+            list(APPEND _lj_common
+                "#define LJ_TARGET_ARM 1"
+                "#define LJ_ARCH_BITS 32")
         else()
-            set(TESTARCH_OUTPUT "#define LJ_TARGET_X86 1")
+            list(APPEND _lj_common
+                "#define LJ_TARGET_X86 1"
+                "#define LJ_ARCH_BITS 32")
         endif()
     endif()
+    string(REPLACE ";" "\n" TESTARCH_OUTPUT "${_lj_common}")
     set(TESTARCH_ERROR "")
 else()
     execute_process(
@@ -355,7 +416,18 @@ set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
 
 # Generate buildvm arch header
 set(MINILUA_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua")
-set(MINILUA_FILE "${MINILUA_BINARY_DIR}/minilua")
+get_property(_luajit_is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if (_luajit_is_multi_config)
+    set(_luajit_host_subdir "/Release")
+else()
+    set(_luajit_host_subdir "")
+endif()
+if (CMAKE_HOST_WIN32)
+    set(_luajit_host_exe ".exe")
+else()
+    set(_luajit_host_exe "")
+endif()
+set(MINILUA_FILE "${MINILUA_BINARY_DIR}${_luajit_host_subdir}/minilua${_luajit_host_exe}")
 
 add_custom_command(
     OUTPUT "${MINILUA_FILE}"
@@ -390,7 +462,7 @@ set_target_properties(buildvm_arch PROPERTIES
 
 # Buildvm
 set(BUILDVM_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/buildvm")
-set(BUILDVM_FILE "${BUILDVM_BINARY_DIR}/buildvm")
+set(BUILDVM_FILE "${BUILDVM_BINARY_DIR}${_luajit_host_subdir}/buildvm${_luajit_host_exe}")
 
 add_custom_command(
     OUTPUT "${BUILDVM_FILE}"

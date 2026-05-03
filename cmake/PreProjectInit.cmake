@@ -11,7 +11,8 @@ include(XRay.Configurations)
 
 include(utils)
 
-if (CMAKE_BUILD_TYPE STREQUAL "ReleaseMasterGold")
+get_property(_is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if (_is_multi_config OR CMAKE_BUILD_TYPE STREQUAL "ReleaseMasterGold")
     set(BUILD_SHARED_LIBS_DEFAULT_VALUE OFF)
 else()
     set(BUILD_SHARED_LIBS_DEFAULT_VALUE ON)

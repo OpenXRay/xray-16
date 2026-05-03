@@ -98,6 +98,7 @@ block()
 
     set(BUILD_STATIC_LIB ON  CACHE BOOL "GNS: build static library")
     set(BUILD_SHARED_LIB OFF CACHE BOOL "GNS: skip shared library")
+    set(Protobuf_USE_STATIC_LIBS ON CACHE BOOL "GNS: link protobuf as static (no PROTOBUF_USE_DLLS)")
     set(BUILD_EXAMPLES   OFF CACHE BOOL "GNS: skip examples")
     set(BUILD_TESTS      OFF CACHE BOOL "GNS: skip tests")
     set(BUILD_TOOLS      OFF CACHE BOOL "GNS: skip tools")
