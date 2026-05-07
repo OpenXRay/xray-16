@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
     cat >&2 <<USAGE
-Usage: $0 [target]  [-k]  [-j N]
+Usage: $0 [target]  [-c CONFIG]  [-k]  [-j N]
 
 Runs the CMake+Ninja build for the current platform.
 
@@ -13,20 +13,25 @@ Runs the CMake+Ninja build for the current platform.
 No arg:     build all targets
 With arg:   build specified target (e.g. xr_3da, xrRenderPC_R4, xrCore)
 
+-c CONFIG:  use cmake_builds/CONFIG (e.g. -c release, -c releasemastergold)
 -k:         keep going after errors (useful to collect all errors in one pass)
 -j N:       parallel job count (default: nproc)
 
-Uses the most recently configured cmake_builds/* dir. Run cmake-initial-configure first.
+Without -c, uses the most recently configured cmake_builds/* dir.
 USAGE
     exit 1
 }
 
 KEEP_GOING=""
+CONFIG=""
 JOBS="$(nproc 2>/dev/null || sysctl -n hw.logicalcpu 2>/dev/null || echo 8)"
 ARGS=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -h|--help|help) usage ;;
+        -c|--config) CONFIG="$2"; shift 2 ;;
+        -c*) CONFIG="${1#-c}"; shift ;;
+        --config=*) CONFIG="${1#--config=}"; shift ;;
         -k|--keep-going) KEEP_GOING="-k 0"; shift ;;
         -j|--jobs) JOBS="$2"; shift 2 ;;
         -j*) JOBS="${1#-j}"; shift ;;
@@ -41,17 +46,25 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 BUILD_DIR=""
-shopt -s nullglob
-DIRS=(cmake_builds/*/)
-shopt -u nullglob
-if [[ ${#DIRS[@]} -eq 0 ]]; then
-    echo "No cmake_builds/* dir found. Run ./cmake-initial-configure first." >&2
-    exit 1
-elif [[ ${#DIRS[@]} -eq 1 ]]; then
-    BUILD_DIR="${DIRS[0]%/}"
+if [[ -n "$CONFIG" ]]; then
+    BUILD_DIR="cmake_builds/${CONFIG}"
+    if [[ ! -d "$BUILD_DIR" ]]; then
+        echo "Build dir '$BUILD_DIR' not found. Run ./cmake-initial-configure ${CONFIG} first." >&2
+        exit 1
+    fi
 else
-    BUILD_DIR=$(ls -td cmake_builds/*/ | head -1 | sed 's|/$||')
-    echo ">> Multiple build dirs found, using most recent: $BUILD_DIR"
+    shopt -s nullglob
+    DIRS=(cmake_builds/*/)
+    shopt -u nullglob
+    if [[ ${#DIRS[@]} -eq 0 ]]; then
+        echo "No cmake_builds/* dir found. Run ./cmake-initial-configure first." >&2
+        exit 1
+    elif [[ ${#DIRS[@]} -eq 1 ]]; then
+        BUILD_DIR="${DIRS[0]%/}"
+    else
+        BUILD_DIR=$(ls -td cmake_builds/*/ | head -1 | sed 's|/$||')
+        echo ">> Multiple build dirs found, using most recent: $BUILD_DIR"
+    fi
 fi
 
 detect_platform() {

@@ -1,2 +1,2 @@
 CompileFlags:
-  CompilationDatabase: bin
+  CompilationDatabase: cmake_builds/release
