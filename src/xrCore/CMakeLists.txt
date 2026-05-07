@@ -23,7 +23,6 @@ target_sources_grouped(
     FILES
     ../Common/Common.hpp
     ../Common/Config.hpp
-    ../Common/face_smoth_flags.h
     ../Common/FSMacros.hpp
     ../Common/LevelGameDef.h
     ../Common/Noncopyable.hpp
