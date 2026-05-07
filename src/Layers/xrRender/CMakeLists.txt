@@ -355,6 +355,8 @@ target_link_libraries(xrRender
     xrCore
     xrCDB
     xrEngine
+    xrMaterialSystem
+    xrUICore
     xrParticles
     xrScriptEngine
     xrAPI
