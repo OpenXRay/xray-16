@@ -239,10 +239,6 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
     }
     xr_vector<const char*> extensions(sdlExts, sdlExts + sdlExtCount);
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-#if defined(XR_PLATFORM_APPLE)
-    extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
-    extensions.push_back("VK_KHR_get_physical_device_properties2");
-#endif
 
     xr_vector<const char*> layers;
     if (enableValidation) {
@@ -256,9 +252,6 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
     createInfo.ppEnabledExtensionNames = extensions.data();
     createInfo.enabledLayerCount = static_cast<u32>(layers.size());
     createInfo.ppEnabledLayerNames = layers.data();
-#if defined(XR_PLATFORM_APPLE)
-    createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-#endif
 
     VkResult result = vkCreateInstance(&createInfo, nullptr, &m_instance);
     if (result != VK_SUCCESS) {
@@ -474,6 +467,10 @@ bool VulkanBackend::CreateLogicalDevice() {
             Msg("! [VulkanBackend] vk11 feature unsupported: shaderDrawParameters");
             vulkan11Features.shaderDrawParameters = VK_FALSE;
         }
+
+        Msg("* [VulkanBackend] vk12.drawIndirectCount = %s (device reports: %s)",
+            vulkan12Features.drawIndirectCount ? "ENABLED" : "DISABLED",
+            sup12.drawIndirectCount ? "supported" : "unsupported");
     }
 
     VkResult result = vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);

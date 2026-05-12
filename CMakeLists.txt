@@ -12,6 +12,11 @@ project(OpenXRay
     LANGUAGES CXX C
 )
 
+if (APPLE)
+    enable_language(OBJC)
+    enable_language(OBJCXX)
+endif()
+
 option(BUILD_SHARED_LIBS "Build shared libraries"     ${BUILD_SHARED_LIBS_DEFAULT_VALUE})
 
 option(XRAY_USE_LUAJIT   "Use LuaJIT"                 ON)

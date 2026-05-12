@@ -32,6 +32,13 @@ else()
 endif()
 set(NVRHI_WITH_VALIDATION ON CACHE BOOL "Enable validation layer for development")
 set(NVRHI_INSTALL OFF CACHE BOOL "Disable NVRHI install rules")
+if (APPLE)
+    set(MVK_CONFIG_LOG_LEVEL "warn" CACHE STRING "MoltenVK log level")
+    set(MVK_EXCLUDE_SPIRV_TOOLS ON CACHE BOOL "MoltenVK: skip SPIRV-Tools (no debug disasm)")
+    set(MVK_BUILD_SHADER_CONVERTER_TOOL OFF CACHE BOOL "MoltenVK: skip standalone shader converter tool")
+    add_subdirectory(MoltenVK)
+endif()
+
 add_subdirectory(nvrhi)
 
 # Slang shader compiler

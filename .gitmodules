@@ -52,3 +52,7 @@
 [submodule "Externals/entt"]
 	path = Externals/entt
 	url = https://github.com/skypjack/entt.git
+[submodule "Externals/MoltenVK"]
+	path = Externals/MoltenVK
+	url = git@github.com:yohjimane/MoltenVK.git
+	branch = main
