@@ -11,12 +11,7 @@ inline void DrawIndexedIndirectCountOrFallback(
     uint32_t countOffsetBytes,
     uint32_t maxDrawCount)
 {
-#if defined(XR_PLATFORM_APPLE)
-    (void)countOffsetBytes;
-    cmdList->drawIndexedIndirect(paramOffsetBytes, maxDrawCount);
-#else
     cmdList->drawIndexedIndirectCount(paramOffsetBytes, countOffsetBytes, maxDrawCount);
-#endif
 }
 
 struct LightingConstants {
