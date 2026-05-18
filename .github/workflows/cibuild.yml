@@ -246,7 +246,7 @@ jobs:
         submodules: recursive
 
     - name: Setup ${{ matrix.platform.name }} and packages
-      uses: cross-platform-actions/action@v0.32.0
+      uses: cross-platform-actions/action@v1.1.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
@@ -259,7 +259,7 @@ jobs:
         run: ${{ matrix.platform.install-cmd }}
 
     - name: Run CMake
-      uses: cross-platform-actions/action@v0.32.0
+      uses: cross-platform-actions/action@v1.1.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
@@ -272,7 +272,7 @@ jobs:
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON --log-level VERBOSE
 
     - name: Run CMake Build
-      uses: cross-platform-actions/action@v0.32.0
+      uses: cross-platform-actions/action@v1.1.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
