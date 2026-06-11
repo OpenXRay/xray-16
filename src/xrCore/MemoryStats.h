@@ -70,6 +70,39 @@ constexpr int histBucketCount = 16;
 XRCORE_API void SetHistogramEnabled(bool enabled);
 XRCORE_API bool HistogramEnabled();
 
+constexpr u32 noZone = 0xffffffffu;
+
+constexpr int btReportMaxSites = 64;
+constexpr int btReportFramesPerSite = 16;
+constexpr int btSymLen = 160;
+
+struct BacktraceSite
+{
+    u64 count = 0;
+    u64 bytes = 0;
+    int depth = 0;
+    char frames[btReportFramesPerSite][btSymLen] = {};
+};
+
+struct BacktraceReport
+{
+    bool ready = false;
+    u32 zoneId = noZone;
+    const char* zoneName = nullptr;
+    int siteCount = 0;
+    u64 totalCalls = 0;
+    BacktraceSite sites[btReportMaxSites] = {};
+};
+
+XRCORE_API bool BacktraceCaptureSupported();
+XRCORE_API void ArmBacktraceCapture(u32 zoneId, const char* zoneName);
+XRCORE_API void DisarmBacktraceCapture();
+XRCORE_API bool BacktraceCaptureArmed();
+XRCORE_API const BacktraceReport& GetBacktraceReport();
+
+XRCORE_API void SetCurrentZone(u32 zoneId);
+XRCORE_API u32 CurrentZone();
+
 XRCORE_API const char* PushDisallow(const char* context);
 XRCORE_API void PopDisallow(const char* prevContext);
 XRCORE_API void PushAllow();

@@ -38,6 +38,8 @@ public:
 
     u32 RegisterZone(const ZoneInfo* info);
 
+    const ZoneInfo* RegisterDynamicZone(pcstr name);
+
     void BeginZone(u32 zoneId);
     void EndZone(u32 zoneId, float elapsedMs,
         u64 allocCalls, u64 allocBytes, u64 freeCalls, u64 freeBytes);
@@ -62,6 +64,8 @@ private:
     xr_vector<u32> m_rootZones;
     Lock m_registryLock;
     std::atomic<u32> m_nextZoneId{0};
+
+    xr_map<shared_str, ZoneInfo*> m_dynamicZones;
 
     xr_vector<ZoneData> m_displayZones;
     xr_vector<u32> m_displayRootZones;

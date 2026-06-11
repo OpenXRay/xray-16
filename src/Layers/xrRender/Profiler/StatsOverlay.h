@@ -135,6 +135,8 @@ private:
     bool m_gpuExpanded = true;
     bool m_geometryExpanded = true;
     bool m_allocExpanded = true;
+    bool m_allocObjectClassProfiling = false;
+    u64 m_arenaDemandPeak = 0;
 
     xr_vector<shared_str> m_rtNames;
     int m_inspectorSelectedRT = -1;

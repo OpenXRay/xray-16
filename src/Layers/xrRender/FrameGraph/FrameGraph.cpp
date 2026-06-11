@@ -155,17 +155,35 @@ void FrameGraph::Compile() {
 
     VERIFY(!m_compiled && "Already compiled");
 
-    BuildDependencyGraph();
+    {
+        ZoneScopedN("Compile::BuildDependencyGraph");
+        BuildDependencyGraph();
+    }
 
-    TopologicalSort();
+    {
+        ZoneScopedN("Compile::TopologicalSort");
+        TopologicalSort();
+    }
 
-    CullUnusedPasses();
+    {
+        ZoneScopedN("Compile::CullUnusedPasses");
+        CullUnusedPasses();
+    }
 
-    ComputeResourceLifetimes();
+    {
+        ZoneScopedN("Compile::ComputeResourceLifetimes");
+        ComputeResourceLifetimes();
+    }
 
-    OptimizeMemoryAliasing();
+    {
+        ZoneScopedN("Compile::OptimizeMemoryAliasing");
+        OptimizeMemoryAliasing();
+    }
 
-    AllocateResources();
+    {
+        ZoneScopedN("Compile::AllocateResources");
+        AllocateResources();
+    }
 
     m_compiled = true;
     m_stats.numPasses = static_cast<u32>(m_passes.size());
@@ -174,6 +192,9 @@ void FrameGraph::Compile() {
 
 void FrameGraph::ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList) {
     cmdList->beginMarker(pass->name.c_str());
+
+    xray::profiler::CPUZoneScope _zonePass(
+        xray::profiler::CPUProfiler::Instance().RegisterDynamicZone(pass->name.c_str()));
 
     if (m_gpuProfiler)
         m_gpuProfiler->BeginPass(cmdList, pass->name.c_str(), pass->isAsync);
@@ -294,6 +315,7 @@ const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) co
 }
 
 void FrameGraph::ResetForNextFrame() {
+    ZoneScopedN("FG::ResetForNextFrame");
 
     if (m_resourcePool) {
         for (auto& resource : m_resources) {
