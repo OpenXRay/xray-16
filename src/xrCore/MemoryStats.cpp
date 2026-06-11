@@ -101,9 +101,12 @@ namespace
     }
 
     thread_local u32 tl_currentZone = noZone;
+    thread_local int tl_targetDepth = 0;
+    thread_local u32 tl_targetGen = 0;
     thread_local bool tl_btReentry = false;
 
     std::atomic<bool> g_btArmed{ false };
+    std::atomic<u32> g_btGen{ 0 };
     u32 g_btTargetZone = noZone;
     const char* g_btZoneName = nullptr;
     BacktraceReport g_btReport;
@@ -291,11 +294,12 @@ XRCORE_API void CountAlloc(size_t size)
     }
 
 #if XR_MEMSTATS_BACKTRACE
-    if (g_btArmed.load(std::memory_order_relaxed)
-        && tl_currentZone == g_btTargetZone
-        && !tl_btReentry)
+    if (g_btArmed.load(std::memory_order_relaxed) && !tl_btReentry)
     {
-        CaptureBacktrace(size);
+        const bool inTargetSubtree = tl_targetDepth > 0
+            && tl_targetGen == g_btGen.load(std::memory_order_relaxed);
+        if (inTargetSubtree || (g_btTargetZone == noZone && tl_currentZone == noZone))
+            CaptureBacktrace(size);
     }
 #endif
 
@@ -464,7 +468,31 @@ XRCORE_API void FrameEnd(bool record)
 
 XRCORE_API const FrameReport& Report() { return g_report; }
 
-XRCORE_API void SetCurrentZone(u32 zoneId) { tl_currentZone = zoneId; }
+XRCORE_API void ZoneEntered(u32 zoneId)
+{
+    tl_currentZone = zoneId;
+    if (!g_btArmed.load(std::memory_order_relaxed))
+        return;
+    const u32 gen = g_btGen.load(std::memory_order_relaxed);
+    if (tl_targetGen != gen)
+    {
+        tl_targetGen = gen;
+        tl_targetDepth = 0;
+    }
+    if (zoneId == g_btTargetZone)
+        ++tl_targetDepth;
+}
+
+XRCORE_API void ZoneExited(u32 zoneId, u32 currentZoneId)
+{
+    tl_currentZone = currentZoneId;
+    if (!g_btArmed.load(std::memory_order_relaxed))
+        return;
+    if (tl_targetGen == g_btGen.load(std::memory_order_relaxed)
+        && zoneId == g_btTargetZone && tl_targetDepth > 0)
+        --tl_targetDepth;
+}
+
 XRCORE_API u32 CurrentZone() { return tl_currentZone; }
 
 XRCORE_API bool BacktraceCaptureSupported() { return XR_MEMSTATS_BACKTRACE != 0; }
@@ -477,6 +505,7 @@ XRCORE_API void ArmBacktraceCapture(u32 zoneId, const char* zoneName)
     g_btTargetZone = zoneId;
     g_btZoneName = zoneName;
     g_btReport.ready = false;
+    g_btGen.fetch_add(1, std::memory_order_relaxed);
     g_btArmed.store(true, std::memory_order_relaxed);
 #else
     (void)zoneId;
@@ -490,11 +519,17 @@ XRCORE_API void DisarmBacktraceCapture()
 #if XR_MEMSTATS_BACKTRACE
     BtGuard guard;
     g_btCaptureCount = 0;
+    g_btGen.fetch_add(1, std::memory_order_relaxed);
 #endif
     g_btArmed.store(false, std::memory_order_relaxed);
 }
 
 XRCORE_API bool BacktraceCaptureArmed() { return g_btArmed.load(std::memory_order_relaxed); }
+
+XRCORE_API const char* ArmedZoneName()
+{
+    return g_btArmed.load(std::memory_order_relaxed) ? g_btZoneName : nullptr;
+}
 
 XRCORE_API const BacktraceReport& GetBacktraceReport() { return g_btReport; }
 

@@ -984,7 +984,9 @@ void StatsOverlay::RenderAllocationsSection()
 
         if (memstats::BacktraceCaptureArmed())
         {
-            ImGui::TextDisabled("Backtrace capture armed (waiting for a sampled frame)...");
+            const char* armedName = memstats::ArmedZoneName();
+            ImGui::TextDisabled("Backtrace capture armed: %s (waiting for a sampled frame)...",
+                armedName ? armedName : "?");
             ImGui::SameLine();
             if (ImGui::SmallButton("disarm"))
                 memstats::DisarmBacktraceCapture();
@@ -995,6 +997,64 @@ void StatsOverlay::RenderAllocationsSection()
             ImGui::SameLine();
             if (ImGui::SmallButton("capture unattributed"))
                 memstats::ArmBacktraceCapture(memstats::noZone, "outside any zone");
+        }
+
+        static char s_armZoneName[64] = "";
+        static u32 s_armMatches[64];
+        static int s_armMatchCount = 0;
+        ImGui::SetNextItemWidth(200.0f);
+        bool armRequested = ImGui::InputText("##btarmname", s_armZoneName, sizeof(s_armZoneName),
+            ImGuiInputTextFlags_EnterReturnsTrue);
+        ImGui::SameLine();
+        armRequested |= ImGui::SmallButton("arm by name");
+        if (armRequested && s_armZoneName[0])
+        {
+            const auto& zones = GetCPUProfiler().GetZones();
+            s_armMatchCount = 0;
+            for (u32 i = 0; i < zones.size() && s_armMatchCount < 64; ++i)
+            {
+                if (zones[i].info && 0 == std::strcmp(zones[i].info->name, s_armZoneName))
+                    s_armMatches[s_armMatchCount++] = i;
+            }
+            std::sort(s_armMatches, s_armMatches + s_armMatchCount, [&](u32 a, u32 b) {
+                if (zones[a].timing.allocCalls != zones[b].timing.allocCalls)
+                    return zones[a].timing.allocCalls > zones[b].timing.allocCalls;
+                return a < b;
+            });
+            if (s_armMatchCount == 1)
+            {
+                memstats::ArmBacktraceCapture(s_armMatches[0], zones[s_armMatches[0]].info->name);
+                s_armMatchCount = 0;
+            }
+            else if (s_armMatchCount > 1)
+            {
+                ImGui::OpenPopup("##btarmpick");
+            }
+        }
+        if (ImGui::BeginPopup("##btarmpick"))
+        {
+            const auto& zones = GetCPUProfiler().GetZones();
+            for (int m = 0; m < s_armMatchCount; ++m)
+            {
+                const u32 id = s_armMatches[m];
+                if (id >= zones.size() || !zones[id].info)
+                    continue;
+                const char* file = zones[id].info->file ? zones[id].info->file : "?";
+                const char* base = file;
+                for (const char* p = file; *p; ++p)
+                    if (*p == '/' || *p == '\\')
+                        base = p + 1;
+                char label[160];
+                xr_sprintf(label, sizeof(label), "%s - %s:%u  (%u allocs)##armpick%d",
+                    zones[id].info->name, base, zones[id].info->line,
+                    (u32)zones[id].timing.allocCalls, m);
+                if (ImGui::MenuItem(label))
+                {
+                    memstats::ArmBacktraceCapture(id, zones[id].info->name);
+                    s_armMatchCount = 0;
+                }
+            }
+            ImGui::EndPopup();
         }
 
         const auto& bt = memstats::GetBacktraceReport();

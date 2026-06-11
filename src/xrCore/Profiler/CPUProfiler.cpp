@@ -164,7 +164,7 @@ void CPUProfiler::BeginZone(u32 zoneId)
     stack.Push(zoneId);
     zone.timing.callCount++;
 
-    memstats::SetCurrentZone(zoneId);
+    memstats::ZoneEntered(zoneId);
 }
 
 void CPUProfiler::EndZone(u32 zoneId, float elapsedMs,
@@ -175,7 +175,7 @@ void CPUProfiler::EndZone(u32 zoneId, float elapsedMs,
 
     ThreadZoneStack& stack = GetThreadStack();
     stack.Pop();
-    memstats::SetCurrentZone(stack.CurrentParent());
+    memstats::ZoneExited(zoneId, stack.CurrentParent());
 
     // Lock for zone data modification
     ScopeLock lock(&m_zoneLock);
