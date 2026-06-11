@@ -3,6 +3,7 @@
 #include "Render.h"
 
 #include "xrCore/FS_impl.h"
+#include "xrCore/MemoryStats.h"
 #include "xrCore/Threading/TaskManager.hpp"
 
 #include "XR_IOConsole.h"
@@ -297,6 +298,8 @@ void CRenderDevice::ProcessFrame()
             return;
         }
 
+        xray::memstats::FrameBegin();
+
         const u64 frameStartNs = SDL_GetTicksNS();
 
         FrameMove();
@@ -333,6 +336,9 @@ void CRenderDevice::ProcessFrame()
 
         if (!b_is_Active)
             SDL_DelayNS(1'000'000ull);
+
+        const bool recordAlloc = (g_pGameLevel != nullptr) && (dwPrecacheFrame == 0);
+        xray::memstats::FrameEnd(recordAlloc);
     }
 
     xray::profiler::FrameEnd();
