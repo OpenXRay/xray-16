@@ -4,6 +4,7 @@
 #include "FGRenderHost.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
+#include "Layers/xrRender/PBRConverter/PBRConversionUI.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
@@ -33,6 +34,9 @@ void FGRenderBase::OnDeviceDestroy(bool bKeepTextures)
 
 void FGRenderBase::Destroy()
 {
+    if (m_pbrConversionThread.joinable())
+        m_pbrConversionThread.join();
+
     xr_delete(Resources);
 
     bindless::DrawMaterialIDBuffer::Instance().Shutdown();
@@ -250,7 +254,28 @@ void FGRenderBase::ConvertLegacyAssetsToPBR()
     if (ps_r4_use_pbr == 0)
         return;
 
+    if (m_pbrConversionThread.joinable())
+        return;
+
     Msg("~ [PBR] PBR rendering enabled, checking texture conversion...");
+
+    m_pbrConversionThread = std::thread([this]
+    {
+        ConversionProgress::Get().BeginJob();
+        ConvertLegacyAssetsToPBRImpl();
+        ConversionProgress::Get().EndJob();
+    });
+}
+
+void FGRenderBase::RenderPBRConversionUI()
+{
+    RenderConversionProgressUI();
+}
+
+void FGRenderBase::ConvertLegacyAssetsToPBRImpl()
+{
+    auto& progress = ConversionProgress::Get();
+    progress.BeginPhase("Scanning textures", 0);
 
     TextureScanConfig scanConfig;
     scanConfig.texture_roots = {"$game_textures$"};
@@ -266,6 +291,7 @@ void FGRenderBase::ConvertLegacyAssetsToPBR()
     params.default_roughness = 0.5f;
     params.default_ao = 1.0f;
 
+    progress.BeginPhase("Verifying converted textures", 0);
     bool needsConversion = !VerifyPBROutputs(inventory, params);
 
     if (needsConversion)

@@ -518,6 +518,9 @@ void CRenderDevice::FrameMove()
     if (GEnv.Render && g_pGameLevel)
         GEnv.Render->RenderStatsOverlay();
 
+    if (GEnv.Render)
+        GEnv.Render->RenderPBRConversionUI();
+
     ImGui::EndFrame();
 }
 
