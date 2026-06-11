@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "StatsOverlay.h"
 #include "xrCore/Profiler/Profiler.h"
+#include "xrCore/MemoryStats.h"
 #include "xrEngine/Device.h"
 #include <imgui.h>
 
@@ -32,6 +33,25 @@ const char* StatsOverlay::FormatTime(float ms, int slot)
         xr_sprintf(buffer, sizeof(buffers[0]), "%.3fms", ms);
     else
         xr_sprintf(buffer, sizeof(buffers[0]), "%.0fus", ms * 1000.0f);
+    return buffer;
+}
+
+const char* StatsOverlay::FormatBytes(u64 bytes, int slot)
+{
+    // Rotating buffers, same pattern as FormatTime
+    static constexpr int NUM_BUFFERS = 6;
+    static char buffers[NUM_BUFFERS][32];
+    static int currentBuffer = 0;
+
+    int bufferIdx = (slot >= 0 && slot < NUM_BUFFERS) ? slot : (currentBuffer++ % NUM_BUFFERS);
+    char* buffer = buffers[bufferIdx];
+
+    if (bytes >= 1024ull * 1024ull)
+        xr_sprintf(buffer, sizeof(buffers[0]), "%.2f MB", double(bytes) / (1024.0 * 1024.0));
+    else if (bytes >= 1024ull)
+        xr_sprintf(buffer, sizeof(buffers[0]), "%.1f KB", double(bytes) / 1024.0);
+    else
+        xr_sprintf(buffer, sizeof(buffers[0]), "%llu B", (unsigned long long)bytes);
     return buffer;
 }
 
@@ -126,6 +146,11 @@ void StatsOverlay::Render()
 
     ImGui::Separator();
 
+    // Allocations Section
+    RenderAllocationsSection();
+
+    ImGui::Separator();
+
     // Render Inspector Section
     RenderInspectorSection();
 
@@ -212,6 +237,16 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
 
         ImGui::PopStyleColor();
 
+        if (zone.timing.allocCalls > 0)
+        {
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(215, 170, 100, 255));
+            ImGui::Text("%u alloc (%s), self %u",
+                (u32)zone.timing.allocCalls, FormatBytes(zone.timing.allocBytes, 2),
+                (u32)zone.timing.selfAllocCalls);
+            ImGui::PopStyleColor();
+        }
+
         if (open)
         {
             for (u32 childId : zone.childIds)
@@ -228,6 +263,15 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
         ImGui::SameLine();
         ImGui::TextDisabled("%s", FormatTime(totalTime));
         ImGui::PopStyleColor();
+
+        if (zone.timing.allocCalls > 0)
+        {
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(215, 170, 100, 255));
+            ImGui::Text("%u alloc (%s)",
+                (u32)zone.timing.allocCalls, FormatBytes(zone.timing.allocBytes, 2));
+            ImGui::PopStyleColor();
+        }
     }
 
     ImGui::PopID();
@@ -793,6 +837,103 @@ void StatsOverlay::RenderWallmarksSection()
 
     ImGui::Dummy(ImVec2(canvasW, canvasW));
     ImGui::TextDisabled("%d splat(s)  --  UV space [0,1]x[0,1]", (int)group.splats.size());
+}
+
+void StatsOverlay::RenderAllocationsSection()
+{
+    ImGui::SetNextItemOpen(m_allocExpanded, ImGuiCond_Once);
+    if (!ImGui::CollapsingHeader("Allocations"))
+    {
+        m_allocExpanded = false;
+        return;
+    }
+    m_allocExpanded = true;
+
+    const auto& rep = memstats::Report();
+    if (!rep.valid)
+    {
+        ImGui::TextDisabled("No allocation data yet (records in-game frames only)");
+        return;
+    }
+
+    // Always-on per-frame totals from the allocator hook. Per-zone attribution
+    // lives in the CPU tree above (sampled at the profiler interval).
+    ImGui::Text("Main thread: %s allocs (%s)",
+        FormatNumber((u32)rep.mainCalls), FormatBytes(rep.mainBytes, 0));
+    {
+        const bool pos = rep.mainBytes >= rep.mainFreeBytes;
+        const u64 net = pos ? rep.mainBytes - rep.mainFreeBytes : rep.mainFreeBytes - rep.mainBytes;
+        ImGui::TextDisabled("             %s frees (%s), net %s%s",
+            FormatNumber((u32)rep.mainFrees), FormatBytes(rep.mainFreeBytes, 1),
+            pos ? "+" : "-", FormatBytes(net, 2));
+    }
+
+    ImGui::Text("All threads: %s allocs (%s)",
+        FormatNumber((u32)rep.allCalls), FormatBytes(rep.allBytes, 0));
+    {
+        const bool pos = rep.allBytes >= rep.allFreeBytes;
+        const u64 net = pos ? rep.allBytes - rep.allFreeBytes : rep.allFreeBytes - rep.allBytes;
+        ImGui::TextDisabled("             %s frees (%s), net %s%s",
+            FormatNumber((u32)rep.allFrees), FormatBytes(rep.allFreeBytes, 1),
+            pos ? "+" : "-", FormatBytes(net, 2));
+    }
+
+    char avgCallsStr[32];
+    xr_strcpy(avgCallsStr, sizeof(avgCallsStr), FormatNumber((u32)rep.avgMainCalls));
+    ImGui::TextDisabled("avg %s / %s    peak %s / %s    (main, 120-frame)",
+        avgCallsStr, FormatBytes(rep.avgMainBytes, 0),
+        FormatNumber((u32)rep.peakMainCalls), FormatBytes(rep.peakMainBytes, 1));
+
+    if (rep.disallowViolations > 0)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 90, 90, 255));
+        ImGui::Text("DisallowHeapAlloc violations: %llu (see log)",
+            (unsigned long long)rep.disallowViolations);
+        ImGui::PopStyleColor();
+    }
+
+    bool hist = memstats::HistogramEnabled();
+    if (ImGui::Checkbox("Size histogram", &hist))
+        memstats::SetHistogramEnabled(hist);
+    ImGui::SameLine();
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("pow2 buckets, all threads\nadds two atomic adds to every allocation while enabled");
+
+    if (hist)
+    {
+        if (ImGui::BeginTable("alloc_hist", 3,
+            ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingStretchProp))
+        {
+            ImGui::TableSetupColumn("Size");
+            ImGui::TableSetupColumn("Allocs");
+            ImGui::TableSetupColumn("Bytes");
+            ImGui::TableHeadersRow();
+
+            u64 threshold = 16;
+            for (int b = 0; b < memstats::histBucketCount; ++b)
+            {
+                if (rep.histCalls[b] != 0)
+                {
+                    char sizeLabel[40];
+                    if (b == memstats::histBucketCount - 1)
+                        xr_sprintf(sizeLabel, sizeof(sizeLabel), "> %s", FormatBytes(threshold / 2, 3));
+                    else
+                        xr_sprintf(sizeLabel, sizeof(sizeLabel), "<= %s", FormatBytes(threshold, 3));
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::TextUnformatted(sizeLabel);
+                    ImGui::TableNextColumn();
+                    ImGui::TextUnformatted(FormatNumber((u32)rep.histCalls[b]));
+                    ImGui::TableNextColumn();
+                    ImGui::TextUnformatted(FormatBytes(rep.histBytes[b], 4));
+                }
+                threshold <<= 1;
+            }
+            ImGui::EndTable();
+        }
+    }
 }
 
 } // namespace xray::profiler

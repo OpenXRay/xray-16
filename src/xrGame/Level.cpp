@@ -548,10 +548,16 @@ void CLevel::OnFrame()
 #endif
     }
     g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(), game->GetEnvironmentGameTimeFactor());
-    if (!GEnv.isDedicatedServer)
-        GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
-    m_ph_commander->update();
-    m_ph_commander_scripts->update();
+    {
+        ZoneScopedN("Level::ScriptUpdate");
+        if (!GEnv.isDedicatedServer)
+            GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
+    }
+    {
+        ZoneScopedN("Level::PhCommander");
+        m_ph_commander->update();
+        m_ph_commander_scripts->update();
+    }
     stats.BulletManagerCommit.Begin();
     BulletManager().CommitRenderSet();
     stats.BulletManagerCommit.End();

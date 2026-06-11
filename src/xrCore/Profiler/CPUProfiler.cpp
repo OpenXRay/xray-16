@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "CPUProfiler.h"
 
-#include <thread>
-#include <functional>
+#include "../MemoryStats.h"
 
 namespace xray::profiler
 {
@@ -95,11 +94,10 @@ u32 CPUProfiler::RegisterZone(const ZoneInfo* info)
 
 ThreadZoneStack& CPUProfiler::GetThreadStack()
 {
-    // Use hash of std::this_thread::get_id() for cross-platform compatibility
-    u32 threadId = static_cast<u32>(std::hash<std::thread::id>{}(std::this_thread::get_id()));
-
-    ScopeLock lock(&m_stackLock);
-    return m_threadStacks[threadId];
+    // One stack per thread. A real thread_local instead of the old locked
+    // xr_map lookup - removes two lock acquisitions per zone begin/end.
+    static thread_local ThreadZoneStack stack;
+    return stack;
 }
 
 void CPUProfiler::BeginZone(u32 zoneId)
@@ -149,7 +147,8 @@ void CPUProfiler::BeginZone(u32 zoneId)
     zone.timing.callCount++;
 }
 
-void CPUProfiler::EndZone(u32 zoneId, float elapsedMs)
+void CPUProfiler::EndZone(u32 zoneId, float elapsedMs,
+    u64 allocCalls, u64 allocBytes, u64 freeCalls, u64 freeBytes)
 {
     if (!m_enabled || zoneId == INVALID_ZONE_ID)
         return;
@@ -163,7 +162,12 @@ void CPUProfiler::EndZone(u32 zoneId, float elapsedMs)
     if (zoneId >= m_zones.size())
         return;
 
-    m_zones[zoneId].timing.totalTimeMs += elapsedMs;
+    ZoneTiming& timing = m_zones[zoneId].timing;
+    timing.totalTimeMs += elapsedMs;
+    timing.allocCalls += allocCalls;
+    timing.allocBytes += allocBytes;
+    timing.freeCalls += freeCalls;
+    timing.freeBytes += freeBytes;
 }
 
 void CPUProfiler::FrameStart()
@@ -247,16 +251,27 @@ void CPUProfiler::ComputeSelfTimes(xr_vector<ZoneData>& zones)
             continue;
 
         float childTime = 0.0f;
+        u64 childAllocCalls = 0;
+        u64 childAllocBytes = 0;
         for (u32 childId : zone.childIds)
         {
             if (childId < zones.size())
             {
                 childTime += zones[childId].timing.totalTimeMs;
+                childAllocCalls += zones[childId].timing.allocCalls;
+                childAllocBytes += zones[childId].timing.allocBytes;
             }
         }
         zone.timing.selfTimeMs = zone.timing.totalTimeMs - childTime;
         if (zone.timing.selfTimeMs < 0.0f)
             zone.timing.selfTimeMs = 0.0f;
+
+        // Self-allocs play the role of an "unattributed" row at every level
+        // of the tree: allocations inside this zone but not inside any child.
+        zone.timing.selfAllocCalls =
+            zone.timing.allocCalls > childAllocCalls ? zone.timing.allocCalls - childAllocCalls : 0;
+        zone.timing.selfAllocBytes =
+            zone.timing.allocBytes > childAllocBytes ? zone.timing.allocBytes - childAllocBytes : 0;
     }
 }
 
@@ -277,6 +292,13 @@ CPUZoneScope::CPUZoneScope(const ZoneInfo* info)
     m_zoneId = profiler.RegisterZone(info);
     m_startTime = CTimerBase::Clock::now();
     profiler.BeginZone(m_zoneId);
+
+    // Snapshot AFTER BeginZone so the profiler's own bookkeeping allocations
+    // (first-frame childIds growth) are not attributed to this zone.
+    m_allocCalls0 = memstats::AllocCallsThread();
+    m_allocBytes0 = memstats::AllocBytesThread();
+    m_freeCalls0 = memstats::FreeCallsThread();
+    m_freeBytes0 = memstats::FreeBytesThread();
 }
 
 CPUZoneScope::~CPUZoneScope()
@@ -287,7 +309,11 @@ CPUZoneScope::~CPUZoneScope()
     auto endTime = CTimerBase::Clock::now();
     float elapsedMs = std::chrono::duration<float, std::milli>(endTime - m_startTime).count();
 
-    CPUProfiler::Instance().EndZone(m_zoneId, elapsedMs);
+    CPUProfiler::Instance().EndZone(m_zoneId, elapsedMs,
+        memstats::AllocCallsThread() - m_allocCalls0,
+        memstats::AllocBytesThread() - m_allocBytes0,
+        memstats::FreeCallsThread() - m_freeCalls0,
+        memstats::FreeBytesThread() - m_freeBytes0);
 }
 
 } // namespace xray::profiler
