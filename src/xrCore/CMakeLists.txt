@@ -352,6 +352,8 @@ target_sources_grouped(
     NAME "Memory"
     FILES
     Memory/xalloc.h
+    MemoryStats.cpp
+    MemoryStats.h
     xrMemory.cpp
     xrMemory.h
     #Memory/xrMemory_align.cpp

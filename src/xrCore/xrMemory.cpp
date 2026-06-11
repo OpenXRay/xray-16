@@ -2,6 +2,8 @@
 
 #include <SDL3/SDL.h>
 
+#include "MemoryStats.h"
+
 #if defined(XR_PLATFORM_WINDOWS)
 #include <Psapi.h>
 #elif defined(XR_PLATFORM_LINUX)
@@ -45,6 +47,10 @@
     #define xr_internal_free_size(ptr, size) mi_free_size(ptr, size)
     #define xr_internal_free_aligned(ptr, alignment) mi_free_aligned(ptr, alignment)
     #define xr_internal_free_size_aligned(ptr, size, alignment) mi_free_size_aligned(ptr, size, alignment)
+
+    // memstats byte counts use usable size so alloc/free totals net out exactly
+    #define xr_counted_alloc_size(ptr, size) mi_usable_size(ptr)
+    #define xr_counted_free_size(ptr) mi_usable_size(ptr)
 #elif defined(USE_XR_ALIGNED_MALLOC)
     #include "Memory/xrMemory_align.h"
 
@@ -62,6 +68,9 @@
     #define xr_internal_free_size(ptr, size) xr_aligned_free(ptr)
     #define xr_internal_free_aligned(ptr, alignment) xr_aligned_free(ptr)
     #define xr_internal_free_size_aligned(ptr, size, alignment) xr_aligned_free(ptr)
+
+    #define xr_counted_alloc_size(ptr, size) (size)
+    #define xr_counted_free_size(ptr) ((size_t)0)
 #elif defined(USE_PURE_ALLOC)
     // Additional bytes of memory to hide memory problems on Release
     // But for Debug we don't need this if we want to find these problems
@@ -85,6 +94,21 @@
     #define xr_internal_free_size(ptr, size) free(ptr)
     #define xr_internal_free_aligned(ptr, alignment) free(ptr)
     #define xr_internal_free_size_aligned(ptr, size, alignment) free(ptr)
+
+    // System malloc reports usable size on Darwin/glibc; counting it on both
+    // sides (instead of the requested size) keeps alloc/free bytes exact.
+    #if defined(XR_PLATFORM_APPLE)
+        #include <malloc/malloc.h>
+        #define xr_counted_alloc_size(ptr, size) malloc_size(ptr)
+        #define xr_counted_free_size(ptr) malloc_size(ptr)
+    #elif defined(XR_PLATFORM_LINUX)
+        #include <malloc.h>
+        #define xr_counted_alloc_size(ptr, size) malloc_usable_size(ptr)
+        #define xr_counted_free_size(ptr) malloc_usable_size(ptr)
+    #else
+        #define xr_counted_alloc_size(ptr, size) (size)
+        #define xr_counted_free_size(ptr) ((size_t)0)
+    #endif
 #else
     #error Please, define explicitly which allocator you want to use
 #endif
@@ -200,6 +224,7 @@ void xrMemory::mem_compact()
 void* xrMemory::mem_alloc(size_t size)
 {
     const auto result = xr_internal_malloc(size);
+    xray::memstats::CountAlloc(xr_counted_alloc_size(result, size));
     //TracyAlloc(result, size);
     return result;
 }
@@ -207,6 +232,7 @@ void* xrMemory::mem_alloc(size_t size)
 void* xrMemory::mem_alloc(size_t size, size_t alignment)
 {
     const auto result = xr_internal_malloc_aligned(size, alignment);
+    xray::memstats::CountAlloc(xr_counted_alloc_size(result, size));
     //TracyAlloc(result, size);
     return result;
 }
@@ -214,6 +240,7 @@ void* xrMemory::mem_alloc(size_t size, size_t alignment)
 void* xrMemory::mem_alloc(size_t size, const std::nothrow_t&) noexcept
 {
     const auto result = xr_internal_malloc_nothrow(size);
+    xray::memstats::CountAlloc(xr_counted_alloc_size(result, size));
     //TracyAlloc(result, size);
     return result;
 }
@@ -221,6 +248,7 @@ void* xrMemory::mem_alloc(size_t size, const std::nothrow_t&) noexcept
 void* xrMemory::mem_alloc(size_t size, size_t alignment, const std::nothrow_t&) noexcept
 {
     const auto result = xr_internal_malloc_nothrow_aligned(size, alignment);
+    xray::memstats::CountAlloc(xr_counted_alloc_size(result, size));
     //TracyAlloc(result, size);
     return result;
 }
@@ -228,6 +256,7 @@ void* xrMemory::mem_alloc(size_t size, size_t alignment, const std::nothrow_t&) 
 void* xrMemory::small_alloc(size_t size) noexcept
 {
     const auto result = xr_internal_small_alloc(size);
+    xray::memstats::CountAlloc(xr_counted_alloc_size(result, size));
     //TracyAllocN(result, size, "small alloc");
     return result;
 }
@@ -235,13 +264,18 @@ void* xrMemory::small_alloc(size_t size) noexcept
 void xrMemory::small_free(void* ptr) noexcept
 {
     //TracyFree(ptr);
+    if (ptr)
+        xray::memstats::CountFree(xr_counted_free_size(ptr));
     xr_internal_small_free(ptr);
 }
 
 void* xrMemory::mem_realloc(void* ptr, size_t size)
 {
     //TracyFree(ptr);
+    if (ptr)
+        xray::memstats::CountFree(xr_counted_free_size(ptr));
     const auto result = xr_internal_realloc(ptr, size);
+    xray::memstats::CountAlloc(xr_counted_alloc_size(result, size));
     //TracyAllocN(result, size, "realloc");
     return result;
 }
@@ -249,7 +283,10 @@ void* xrMemory::mem_realloc(void* ptr, size_t size)
 void* xrMemory::mem_realloc(void* ptr, size_t size, size_t alignment)
 {
     //TracyFree(ptr);
+    if (ptr)
+        xray::memstats::CountFree(xr_counted_free_size(ptr));
     const auto result = xr_internal_realloc_aligned(ptr, size, alignment);
+    xray::memstats::CountAlloc(xr_counted_alloc_size(result, size));
     //TracyAllocN(result, size, "realloc");
     return result;
 }
@@ -257,12 +294,16 @@ void* xrMemory::mem_realloc(void* ptr, size_t size, size_t alignment)
 void xrMemory::mem_free(void* ptr)
 {
     //TracyFree(ptr);
+    if (ptr)
+        xray::memstats::CountFree(xr_counted_free_size(ptr));
     xr_internal_free(ptr);
 }
 
 void xrMemory::mem_free(void* ptr, size_t alignment)
 {
     //TracyFree(ptr);
+    if (ptr)
+        xray::memstats::CountFree(xr_counted_free_size(ptr));
     xr_internal_free_aligned(ptr, alignment);
 }
 
@@ -270,7 +311,9 @@ void xrMemory::mem_free(void* ptr, size_t alignment)
 XRCORE_API pstr xr_strdup(pcstr string)
 {
 #ifdef USE_MIMALLOC
-    return mi_strdup(string);
+    const auto result = mi_strdup(string);
+    xray::memstats::CountAlloc(mi_usable_size(result));
+    return result;
 #else
     VERIFY(string);
     size_t len = xr_strlen(string) + 1;
