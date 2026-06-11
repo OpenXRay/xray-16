@@ -92,6 +92,26 @@ u32 CPUProfiler::RegisterZone(const ZoneInfo* info)
     return id;
 }
 
+const ZoneInfo* CPUProfiler::RegisterDynamicZone(pcstr name)
+{
+    if (!m_enabled || !name)
+        return nullptr;
+
+    ScopeLock lock(&m_registryLock);
+
+    shared_str key(name);
+    auto it = m_dynamicZones.find(key);
+    if (it != m_dynamicZones.end())
+        return it->second;
+
+    auto* info = xr_new<ZoneInfo>();
+    info->name = key.c_str(); // interned; stable while the map holds the key
+    info->file = "<dynamic>";
+    info->line = 0;
+    m_dynamicZones.emplace(key, info);
+    return info;
+}
+
 ThreadZoneStack& CPUProfiler::GetThreadStack()
 {
     // One stack per thread. A real thread_local instead of the old locked
@@ -145,6 +165,8 @@ void CPUProfiler::BeginZone(u32 zoneId)
 
     stack.Push(zoneId);
     zone.timing.callCount++;
+
+    memstats::SetCurrentZone(zoneId);
 }
 
 void CPUProfiler::EndZone(u32 zoneId, float elapsedMs,
@@ -155,6 +177,7 @@ void CPUProfiler::EndZone(u32 zoneId, float elapsedMs,
 
     ThreadZoneStack& stack = GetThreadStack();
     stack.Pop();
+    memstats::SetCurrentZone(stack.CurrentParent());
 
     // Lock for zone data modification
     ScopeLock lock(&m_zoneLock);

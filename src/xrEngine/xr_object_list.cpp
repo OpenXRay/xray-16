@@ -6,6 +6,7 @@
 #include "xr_object_list.h"
 
 #include "xr_object.h"
+#include "xrCore/MemoryStats.h"
 #include "xrCore/net_utils.h"
 #include "GrassInteractionCollector.h"
 
@@ -142,7 +143,14 @@ void CObjectList::SingleUpdate(IGameObject* O)
 
     // Msg ("[%d][0x%08x]IAmNotACrowAnyMore (CObjectList::SingleUpdate)", Device.dwFrame, dynamic_cast<void*>(O));
 
-    O->UpdateCL();
+    if (xray::memstats::ObjectClassProfiling())
+    {
+        // cNameSect() is interned, satisfying the pointer-keyed table contract
+        xray::memstats::ScopedNamed _memCls(xray::memstats::Table::ObjectClass, O->cNameSect().c_str());
+        O->UpdateCL();
+    }
+    else
+        O->UpdateCL();
 
     VERIFY3(O->GetDbgUpdateFrame() == Device.dwFrame, "Broken sequence of calls to 'UpdateCL'", O->cName().c_str());
 

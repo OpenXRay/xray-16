@@ -4,6 +4,8 @@
 #include "xrCore/MemoryStats.h"
 #include "xrEngine/Device.h"
 #include <imgui.h>
+#include <algorithm>
+#include <cstring>
 
 namespace xray::profiler
 {
@@ -231,6 +233,12 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
     {
         // Tree node for zones with children
         bool open = ImGui::TreeNode(label);
+        if (memstats::BacktraceCaptureSupported() && ImGui::BeginPopupContextItem("zone_ctx"))
+        {
+            if (ImGui::MenuItem("Capture alloc backtraces"))
+                memstats::ArmBacktraceCapture(zoneId, zone.info->name);
+            ImGui::EndPopup();
+        }
         ImGui::SameLine();
         // Use explicit buffer slots since we call FormatTime twice in one statement
         ImGui::TextDisabled("%s (self: %s)", FormatTime(totalTime, 0), FormatTime(selfTime, 1));
@@ -260,6 +268,12 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
     {
         // Leaf node (no children)
         ImGui::BulletText("%s", label);
+        if (memstats::BacktraceCaptureSupported() && ImGui::BeginPopupContextItem("zone_ctx"))
+        {
+            if (ImGui::MenuItem("Capture alloc backtraces"))
+                memstats::ArmBacktraceCapture(zoneId, zone.info->name);
+            ImGui::EndPopup();
+        }
         ImGui::SameLine();
         ImGui::TextDisabled("%s", FormatTime(totalTime));
         ImGui::PopStyleColor();
@@ -884,6 +898,42 @@ void StatsOverlay::RenderAllocationsSection()
         avgCallsStr, FormatBytes(rep.avgMainBytes, 0),
         FormatNumber((u32)rep.peakMainCalls), FormatBytes(rep.peakMainBytes, 1));
 
+    // FG arena sizing: bytes the framegraph setup/reset/compile path allocates
+    // per frame, minus pooled GPU resource creation - what a frame-linear
+    // arena would need to absorb. Names must match the renderer's zones.
+    {
+        const auto& zones = GetCPUProfiler().GetZones();
+        u64 demand = 0;
+        u64 allocRes = 0;
+        bool any = false;
+        for (const auto& z : zones)
+        {
+            if (!z.info || z.timing.callCount == 0)
+                continue;
+            const char* n = z.info->name;
+            if (0 == std::strcmp(n, "FG::SetupFrame") || 0 == std::strcmp(n, "FG::ResetForNextFrame") ||
+                0 == std::strcmp(n, "FG::SetupPasses") || 0 == std::strcmp(n, "FG::Compile"))
+            {
+                demand += z.timing.allocBytes;
+                any = true;
+            }
+            else if (0 == std::strcmp(n, "Compile::AllocateResources"))
+                allocRes = z.timing.allocBytes;
+        }
+        if (any)
+        {
+            demand = demand > allocRes ? demand - allocRes : 0;
+            if (demand > m_arenaDemandPeak)
+                m_arenaDemandPeak = demand;
+            ImGui::Text("FG arena demand: %s (peak %s)",
+                FormatBytes(demand, 0), FormatBytes(m_arenaDemandPeak, 1));
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("FG setup + reset + pass setup + compile alloc bytes,\n"
+                    "minus Compile::AllocateResources (pooled GPU resources)\n"
+                    "= per-frame demand a framegraph frame arena must absorb");
+        }
+    }
+
     if (rep.disallowViolations > 0)
     {
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 90, 90, 255));
@@ -933,6 +983,101 @@ void StatsOverlay::RenderAllocationsSection()
             }
             ImGui::EndTable();
         }
+    }
+
+    // Zone-targeted backtrace capture (right-click a CPU zone row to arm)
+    if (memstats::BacktraceCaptureSupported())
+    {
+        ImGui::Separator();
+
+        if (memstats::BacktraceCaptureArmed())
+        {
+            ImGui::TextDisabled("Backtrace capture armed (waiting for a sampled frame)...");
+            ImGui::SameLine();
+            if (ImGui::SmallButton("disarm"))
+                memstats::DisarmBacktraceCapture();
+        }
+        else
+        {
+            ImGui::TextDisabled("Right-click a CPU zone row to capture alloc backtraces");
+            ImGui::SameLine();
+            if (ImGui::SmallButton("capture unattributed"))
+                memstats::ArmBacktraceCapture(memstats::noZone, "outside any zone");
+        }
+
+        const auto& bt = memstats::GetBacktraceReport();
+        if (bt.ready)
+        {
+            char header[128];
+            xr_sprintf(header, sizeof(header), "Backtraces: %s (%s allocs, %d sites)###bt",
+                bt.zoneName ? bt.zoneName : "?", FormatNumber((u32)bt.totalCalls), bt.siteCount);
+            if (ImGui::TreeNode(header))
+            {
+                for (int i = 0; i < bt.siteCount; ++i)
+                {
+                    const auto& site = bt.sites[i];
+                    char label[224];
+                    const char* top = site.depth > 0 ? site.frames[0] : "?";
+                    xr_sprintf(label, sizeof(label), "%s x  %.140s  (%s)###btsite%d",
+                        FormatNumber((u32)site.count), top, FormatBytes(site.bytes, 0), i);
+                    if (ImGui::TreeNode(label))
+                    {
+                        for (int f = 0; f < site.depth; ++f)
+                            ImGui::TextUnformatted(site.frames[f]);
+                        ImGui::TreePop();
+                    }
+                }
+                ImGui::TreePop();
+            }
+        }
+    }
+
+    // Per-object-class UpdateCL breakdown (keyed table, opt-in)
+    ImGui::Separator();
+    bool objProfiling = m_allocObjectClassProfiling;
+    if (ImGui::Checkbox("Profile per-object-class allocs (UpdateCL)", &objProfiling))
+    {
+        m_allocObjectClassProfiling = objProfiling;
+        memstats::SetObjectClassProfiling(objProfiling);
+    }
+
+    if (m_allocObjectClassProfiling && ImGui::TreeNode("Object classes (this frame)"))
+    {
+        const int t = static_cast<int>(memstats::Table::ObjectClass);
+        const int used = rep.namedUsed[t];
+
+        int order[memstats::namedCapacity];
+        for (int i = 0; i < used; ++i)
+            order[i] = i;
+        std::sort(order, order + used, [&](int a, int b) {
+            return rep.named[t][a].bytes > rep.named[t][b].bytes;
+        });
+
+        const int show = used < 25 ? used : 25;
+        if (ImGui::BeginTable("alloc_objclass", 3,
+            ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingStretchProp))
+        {
+            ImGui::TableSetupColumn("Class");
+            ImGui::TableSetupColumn("Allocs");
+            ImGui::TableSetupColumn("Bytes");
+            ImGui::TableHeadersRow();
+
+            for (int i = 0; i < show; ++i)
+            {
+                const auto& e = rep.named[t][order[i]];
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::TextUnformatted(e.key ? e.key : "?");
+                ImGui::TableNextColumn();
+                ImGui::TextUnformatted(FormatNumber((u32)e.calls));
+                ImGui::TableNextColumn();
+                ImGui::TextUnformatted(FormatBytes(e.bytes, 0));
+            }
+            ImGui::EndTable();
+        }
+        if (used > show)
+            ImGui::TextDisabled("... and %d more classes", used - show);
+        ImGui::TreePop();
     }
 }
 

@@ -95,6 +95,49 @@ constexpr int histBucketCount = 16;
 XRCORE_API void SetHistogramEnabled(bool enabled);
 XRCORE_API bool HistogramEnabled();
 
+// ------------------------ zone-targeted backtraces -------------------------
+// Arm capture for one CPU-profiler zone id: every allocation made while that
+// zone is the innermost open zone on its thread is backtraced and deduped by
+// call site. Stays armed until a frame captures something (zones only record
+// on profiler-sampled frames), then the report is finalized at FrameEnd.
+// Supported on Apple/Linux (execinfo); ArmBacktraceCapture is a no-op
+// elsewhere. Target noZone to catch allocations outside every zone.
+
+constexpr u32 noZone = 0xffffffffu;
+
+constexpr int btReportMaxSites = 64;
+constexpr int btReportFramesPerSite = 16;
+constexpr int btSymLen = 160;
+
+struct BacktraceSite
+{
+    u64 count = 0;
+    u64 bytes = 0;
+    int depth = 0;
+    char frames[btReportFramesPerSite][btSymLen] = {};
+};
+
+struct BacktraceReport
+{
+    bool ready = false;
+    u32 zoneId = noZone;
+    const char* zoneName = nullptr;
+    int siteCount = 0;
+    u64 totalCalls = 0;
+    BacktraceSite sites[btReportMaxSites] = {};
+};
+
+XRCORE_API bool BacktraceCaptureSupported();
+XRCORE_API void ArmBacktraceCapture(u32 zoneId, const char* zoneName); // zoneName must be static/interned
+XRCORE_API void DisarmBacktraceCapture();
+XRCORE_API bool BacktraceCaptureArmed();
+XRCORE_API const BacktraceReport& GetBacktraceReport();
+
+// Innermost open CPU zone on this thread; maintained by the CPU profiler so
+// the allocation hook can match armed captures without calling back into it.
+XRCORE_API void SetCurrentZone(u32 zoneId);
+XRCORE_API u32 CurrentZone();
+
 // --------------------------- enforcement scopes ----------------------------
 // V8-style assert scope: while alive, any allocation through xrMemory on this
 // thread is a violation - counted in the frame report and logged (first few

@@ -8,6 +8,9 @@
 #include "FGResourcePool.h"
 #include "../RenderContext/RenderContext.h"
 #include "../ResourceManager/FGResourceManager.h"
+#include "xrCore/Profiler/CPUProfiler.h"
+
+#include <cstdio>
 
 class IRenderBackend;
 
@@ -79,6 +82,17 @@ public:
         std::function<void(FrameGraph&, PassHandle, PassData&)> setupFunc,
         std::function<void(const PassData&, const FrameGraph&, fg::RenderContext*)> executeFunc)
     {
+        // Per-pass setup attribution: covers AddPass + PassData + setupFunc +
+        // callback plumbing, as a "<pass> [setup]" zone under FG::SetupPasses
+        const xray::profiler::ZoneInfo* setupZone = nullptr;
+        if (xray::profiler::CPUProfiler::Instance().IsEnabled())
+        {
+            char setupZoneName[128];
+            std::snprintf(setupZoneName, sizeof(setupZoneName), "%s [setup]", name);
+            setupZone = xray::profiler::CPUProfiler::Instance().RegisterDynamicZone(setupZoneName);
+        }
+        xray::profiler::CPUZoneScope _zoneSetup(setupZone);
+
         PassHandle passHandle = AddPass(name);
 
         auto passData = std::make_shared<PassData>();
