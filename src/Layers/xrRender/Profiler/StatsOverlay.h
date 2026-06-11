@@ -116,6 +116,7 @@ private:
     void RenderGPUSection();
     void RenderGPUPassList(const xr_vector<GPUPassTiming>& passTimings, float totalGPU, bool asyncOnly);
     void RenderGeometrySection();
+    void RenderAllocationsSection();
     void RenderInspectorSection();
     void RenderWallmarksSection();
     void RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, float parentTime);
@@ -123,6 +124,7 @@ private:
     static const char* FormatTime(float ms, int slot = -1);
     static u32 GetTimeColor(float ms, float parentMs);
     static const char* FormatNumber(u32 value);
+    static const char* FormatBytes(u64 bytes, int slot = -1);
 
 private:
     GPUProfiler* m_gpuProfiler = nullptr;
@@ -132,6 +134,7 @@ private:
     bool m_cpuExpanded = true;
     bool m_gpuExpanded = true;
     bool m_geometryExpanded = true;
+    bool m_allocExpanded = true;
 
     xr_vector<shared_str> m_rtNames;
     int m_inspectorSelectedRT = -1;

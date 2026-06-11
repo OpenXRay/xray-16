@@ -39,7 +39,8 @@ public:
     u32 RegisterZone(const ZoneInfo* info);
 
     void BeginZone(u32 zoneId);
-    void EndZone(u32 zoneId, float elapsedMs);
+    void EndZone(u32 zoneId, float elapsedMs,
+        u64 allocCalls, u64 allocBytes, u64 freeCalls, u64 freeBytes);
 
     void FrameStart();
     void FrameEnd();
@@ -69,9 +70,6 @@ private:
     CTimerBase m_frameTimer;
     float m_frameTimeMs = 0.0f;
 
-    xr_map<u32, ThreadZoneStack> m_threadStacks;
-    Lock m_stackLock;
-
     Lock m_zoneLock;
 
     bool m_enabled = false;
@@ -91,6 +89,10 @@ public:
 private:
     u32 m_zoneId;
     CTimerBase::Time m_startTime;
+    u64 m_allocCalls0;
+    u64 m_allocBytes0;
+    u64 m_freeCalls0;
+    u64 m_freeBytes0;
 };
 
 }
