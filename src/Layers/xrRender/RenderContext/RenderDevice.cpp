@@ -32,6 +32,7 @@ public:
             if (!s_textureUploadCmdList) {
                 s_textureUploadCmdList = device->createCommandList();
             }
+            device->runGarbageCollection();
             s_textureUploadCmdList->open();
             m_cmdList = s_textureUploadCmdList.Get();
             m_ownsCommandList = true;
@@ -110,6 +111,7 @@ bool RenderDevice::InitializeFromBackend(IRenderBackend* backend) {
         nvrhi::ITexture* GetBackBuffer() override { return m_ref->GetBackBuffer(); }
         void Present(bool vsync) override { m_ref->Present(vsync); }
         std::pair<u32, u32> GetBackBufferSize() const override { return m_ref->GetBackBufferSize(); }
+        bool IsInFrame() const override { return m_ref->IsInFrame(); }
         void BeginFrame() override { m_ref->BeginFrame(); }
         void EndFrame() override { m_ref->EndFrame(); }
         const Capabilities& GetCapabilities() const override { return m_ref->GetCapabilities(); }

@@ -913,6 +913,7 @@ void VulkanBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, s
     if (m_inFrame) {
         m_commandList->writeBuffer(buffer, data, size);
     } else {
+        m_nvrhiDevice->runGarbageCollection();
         m_uploadCommandList->open();
         m_uploadCommandList->writeBuffer(buffer, data, size);
         m_uploadCommandList->close();
