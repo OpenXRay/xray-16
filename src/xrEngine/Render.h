@@ -409,6 +409,7 @@ public:
     virtual void RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type = 0) = 0;
 
     virtual void RenderStatsOverlay() {}
+    virtual void RenderPBRConversionUI() {}
     virtual void SetEnabled(bool) {}
     virtual bool IsEnabled() const { return false; }
     virtual xray::render::fg::RenderDevice* GetRenderDevice() const { return nullptr; }

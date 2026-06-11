@@ -340,8 +340,6 @@ void CRenderDevice::ProcessFrame()
         if (!b_is_Active)
             SDL_DelayNS(1'000'000ull);
 
-        // Record only in-game, non-precache frames so menu/loading noise does
-        // not pollute averages and peaks.
         const bool recordAlloc = (g_pGameLevel != nullptr) && (dwPrecacheFrame == 0);
         xray::memstats::FrameEnd(recordAlloc);
     } // ZoneScoped ends here, ProcessFrame timing captured
@@ -523,6 +521,9 @@ void CRenderDevice::FrameMove()
     // Render stats overlay here (between NewFrame and EndFrame for proper input)
     if (GEnv.Render && g_pGameLevel)
         GEnv.Render->RenderStatsOverlay();
+
+    if (GEnv.Render)
+        GEnv.Render->RenderPBRConversionUI();
 
     ImGui::EndFrame();
 }

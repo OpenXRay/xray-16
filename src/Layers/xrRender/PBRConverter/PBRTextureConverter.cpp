@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "PBRTextureConverter.h"
+#include "PBRConversionUI.h"
 #include "ONNXModelRunner.h"  // AI-based conversion
 #include "xrCore/FS.h"
 #include "xrCore/Threading/ParallelFor.hpp"
@@ -1579,6 +1580,9 @@ bool ConvertTexturesToPBR(
 
     Msg("[PBRTextureConverter] Converting %u textures (pipelined, sorted by dimensions)...", total_textures);
 
+    auto& ui_progress = ConversionProgress::Get();
+    ui_progress.BeginPhase("Converting textures", total_textures);
+
 #ifndef USE_AI_PBR
     Msg("! [PBRTextureConverter] USE_AI_PBR not defined, cannot convert any textures");
     out_stats.textures_scanned = total_textures;
@@ -1635,12 +1639,14 @@ bool ConvertTexturesToPBR(
 
             if (pbrExists && thmUpToDate) {
                 skipped_count++;
+                ui_progress.OnSkipped();
                 continue;
             }
 
             if (pbrExists && !thmUpToDate) {
                 WriteTHMFileConsolidated(params.output_root.c_str(), asset.base_name, pbr_name);
                 skipped_count++;
+                ui_progress.OnSkipped();
                 continue;
             }
 
@@ -1649,6 +1655,7 @@ bool ConvertTexturesToPBR(
             if (!resources::DDSLoader::LoadFromFile(diffuse_vfs_path.c_str(), diffuseData)) {
                 Msg("! [PBRTextureConverter] Failed to load diffuse: %s", asset.diffuse.relative_path.c_str());
                 failed_count++;
+                ui_progress.OnFailed();
                 continue;
             }
 
@@ -1674,6 +1681,7 @@ bool ConvertTexturesToPBR(
             if (!asset.has_normal) {
                 Msg("~ [PBRTextureConverter] Skipping %s (no normal map available)", asset.base_name.c_str());
                 skipped_count++;
+                ui_progress.OnSkipped();
                 continue;
             }
 
@@ -1682,6 +1690,7 @@ bool ConvertTexturesToPBR(
             if (!resources::DDSLoader::LoadFromFile(normal_vfs_path.c_str(), normalData)) {
                 Msg("! [PBRTextureConverter] Failed to load normal: %s", asset.normal.relative_path.c_str());
                 failed_count++;
+                ui_progress.OnFailed();
                 continue;
             }
 
@@ -1710,6 +1719,7 @@ bool ConvertTexturesToPBR(
                                   output.converted.width, output.converted.height, output.generate_mipmaps)) {
                     Msg("! [PBRTextureConverter] Failed to write albedo: %s", output.albedo_path.c_str());
                     failed_count++;
+                    ui_progress.OnFailed();
                     continue;
                 }
             }
@@ -1722,6 +1732,7 @@ bool ConvertTexturesToPBR(
                                    output.converted.width, output.converted.height, output.generate_mipmaps)) {
                 Msg("! [PBRTextureConverter] Failed to write packed PBR: %s", output.pbr_path.c_str());
                 failed_count++;
+                ui_progress.OnFailed();
                 continue;
             }
 
@@ -1733,6 +1744,7 @@ bool ConvertTexturesToPBR(
                 output.pbr_path.c_str(), output.converted.width, output.converted.height, write_ms);
 
             converted_count++;
+            ui_progress.OnConverted();
 
             if (progress_callback) {
                 const float progress = static_cast<float>(converted_count + skipped_count + failed_count)
@@ -1750,6 +1762,7 @@ bool ConvertTexturesToPBR(
             if (!converted.success) {
                 Msg("! [PBRTextureConverter] Conversion failed: %s [%lldms]", inter.base_name.c_str(), infer_ms);
                 failed_count++;
+                ui_progress.OnFailed();
                 return;
             }
 
@@ -1797,10 +1810,13 @@ bool ConvertTexturesToPBR(
         while (prepared_queue.pop(prepared)) {
             auto t_infer_start = std::chrono::high_resolution_clock::now();
 
+            ui_progress.SetCurrentItem(prepared.base_name.c_str());
+
             DecompressedPair decompressed = DecompressAndPrepare(&prepared.diffuseData, &prepared.normalData);
             if (!decompressed.success) {
                 Msg("! [PBRTextureConverter] Decompress failed: %s", prepared.base_name.c_str());
                 failed_count++;
+                ui_progress.OnFailed();
                 continue;
             }
 
@@ -1848,6 +1864,7 @@ bool ConvertTexturesToPBR(
                     auto infer_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t_infer_end - t_infer_start).count();
                     Msg("! [PBRTextureConverter] Stage1 failed: %s [%lldms]", prepared.base_name.c_str(), infer_ms);
                     failed_count++;
+                    ui_progress.OnFailed();
                     continue;
                 }
 
@@ -2023,11 +2040,16 @@ bool ConsolidatePBRTextures(
         return true;
     }
 
+    auto& ui_progress = ConversionProgress::Get();
+    ui_progress.BeginPhase("Consolidating PBR textures", out_stats.textures_found);
+
     u32 processed = 0;
     for (const auto& file : metallic_files) {
         // Extract base name from metallic path
         xr_string metallic_path = file.name.c_str();
         xr_string base_name = metallic_path.substr(0, metallic_path.size() - 13);  // Remove "_metallic.dds"
+
+        ui_progress.SetCurrentItem(base_name.c_str());
 
         // Build paths for all PBR textures
         xr_string roughness_path = base_name + "_roughness.dds";
@@ -2040,6 +2062,7 @@ bool ConsolidatePBRTextures(
         FS.update_path(pbr_full_path, root_alias.c_str(), pbr_path.c_str());
         if (FS.exist(pbr_full_path)) {
             processed++;
+            ui_progress.OnSkipped();
             continue;  // Already done
         }
 
@@ -2051,6 +2074,7 @@ bool ConsolidatePBRTextures(
         if (metallicData.empty()) {
             Msg("! [PBRTextureConverter] Failed to load metallic: %s", metallic_path.c_str());
             out_stats.textures_failed++;
+            ui_progress.OnFailed();
             continue;
         }
 
@@ -2058,6 +2082,7 @@ bool ConsolidatePBRTextures(
         if (roughnessData.empty() || tempW != width || tempH != height) {
             Msg("! [PBRTextureConverter] Failed to load roughness or size mismatch: %s", roughness_path.c_str());
             out_stats.textures_failed++;
+            ui_progress.OnFailed();
             continue;
         }
 
@@ -2065,6 +2090,7 @@ bool ConsolidatePBRTextures(
         if (aoData.empty() || tempW != width || tempH != height) {
             Msg("! [PBRTextureConverter] Failed to load AO or size mismatch: %s", ao_path.c_str());
             out_stats.textures_failed++;
+            ui_progress.OnFailed();
             continue;
         }
 
@@ -2083,6 +2109,7 @@ bool ConsolidatePBRTextures(
                                width, height, true)) {
             Msg("! [PBRTextureConverter] Failed to write packed PBR: %s", pbr_path.c_str());
             out_stats.textures_failed++;
+            ui_progress.OnFailed();
             continue;
         }
 
@@ -2100,6 +2127,7 @@ bool ConsolidatePBRTextures(
 
         out_stats.textures_consolidated++;
         processed++;
+        ui_progress.OnConverted();
 
         // Progress callback
         if (progress_callback) {

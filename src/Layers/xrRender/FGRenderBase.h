@@ -3,6 +3,8 @@
 #include "xrEngine/Render.h"
 #include "Layers/xrRender/xr_effgamma.h"
 
+#include <thread>
+
 class CResourceManager;
 
 namespace xray::render::fg
@@ -60,6 +62,7 @@ public:
     xrImTextureData GetImGuiTextureId(pcstr texture_name) override;
 
     void ConvertLegacyAssetsToPBR() override;
+    void RenderPBRConversionUI() override;
 
     RenderContext GetCurrentContext() const override { return IRender::PrimaryContext; }
     void MakeContextCurrent(RenderContext) override {}
@@ -71,6 +74,9 @@ protected:
     bool b_loaded{ false };
 
 private:
+    void ConvertLegacyAssetsToPBRImpl();
+
     CGammaControl m_Gamma;
+    std::thread m_pbrConversionThread;
 };
 }

@@ -203,6 +203,7 @@ target_sources(xrRender PRIVATE
     NvTriStrip.cpp
     NvTriStripObjects.cpp
     PBRConverter/ONNXModelRunner.cpp
+    PBRConverter/PBRConversionUI.cpp
     PSLibrary.cpp
     ParticleEffect.cpp
     ParticleEffectDef.cpp
