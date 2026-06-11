@@ -85,7 +85,7 @@ public:
     }
 
     // Execution callback
-    PassBuilder& Execute(PassExecuteCallback callback) {
+    PassBuilder& Execute(IPassCallback* callback) {
         m_node->executeCallback = callback;
         return *this;
     }

@@ -894,36 +894,18 @@ void StatsOverlay::RenderAllocationsSection()
         avgCallsStr, FormatBytes(rep.avgMainBytes, 0),
         FormatNumber((u32)rep.peakMainCalls), FormatBytes(rep.peakMainBytes, 1));
 
+    if (m_renderStats.fgArenaCapacity > 0)
     {
-        const auto& zones = GetCPUProfiler().GetZones();
-        u64 demand = 0;
-        u64 allocRes = 0;
-        bool any = false;
-        for (const auto& z : zones)
+        ImGui::Text("FG arena: %s / %s (peak %s)",
+            FormatBytes(m_renderStats.fgArenaUsed, 0),
+            FormatBytes(m_renderStats.fgArenaCapacity, 1),
+            FormatBytes(m_renderStats.fgArenaPeak, 2));
+        if (m_renderStats.fgArenaFallbacks > 0)
         {
-            if (!z.info || z.timing.callCount == 0)
-                continue;
-            const char* n = z.info->name;
-            if (0 == std::strcmp(n, "FG::SetupFrame") || 0 == std::strcmp(n, "FG::ResetForNextFrame") ||
-                0 == std::strcmp(n, "FG::SetupPasses") || 0 == std::strcmp(n, "FG::Compile"))
-            {
-                demand += z.timing.allocBytes;
-                any = true;
-            }
-            else if (0 == std::strcmp(n, "Compile::AllocateResources"))
-                allocRes = z.timing.allocBytes;
-        }
-        if (any)
-        {
-            demand = demand > allocRes ? demand - allocRes : 0;
-            if (demand > m_arenaDemandPeak)
-                m_arenaDemandPeak = demand;
-            ImGui::Text("FG arena demand: %s (peak %s)",
-                FormatBytes(demand, 0), FormatBytes(m_arenaDemandPeak, 1));
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("FG setup + reset + pass setup + compile alloc bytes,\n"
-                    "minus Compile::AllocateResources (pooled GPU resources)\n"
-                    "= per-frame demand a framegraph frame arena must absorb");
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 90, 90, 255));
+            ImGui::Text("%u heap fallbacks", m_renderStats.fgArenaFallbacks);
+            ImGui::PopStyleColor();
         }
     }
 

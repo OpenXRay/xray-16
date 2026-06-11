@@ -764,6 +764,14 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.detailDecalCapacity = std::max(m_detailManager->visibleBufferCapacity / 4, 10000u);
         }
 
+        if (m_framegraph) {
+            const auto& arenaStats = m_framegraph->GetFrameArenaStats();
+            stats.fgArenaUsed = arenaStats.lastUsed;
+            stats.fgArenaPeak = arenaStats.peak;
+            stats.fgArenaCapacity = arenaStats.capacity;
+            stats.fgArenaFallbacks = arenaStats.lastFallbackAllocs;
+        }
+
         m_statsOverlay->SetRenderStats(stats);
         m_statsOverlay->SetInspectorPreview(m_inspectorPreview ? m_inspectorPreview.Get() : nullptr);
 

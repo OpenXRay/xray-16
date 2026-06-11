@@ -124,14 +124,19 @@ VirtualResourceHandle FrameGraph::ImportBuffer(
 PassHandle FrameGraph::AddPass(const char* name) {
     VERIFY(!m_compiled && "Cannot add passes after compile");
 
-    // Create pass node
-    PassNode pass(name);
-    pass.handle.index = static_cast<u32>(m_passes.size());
+    PassHandle handle;
+    handle.index = static_cast<u32>(m_passes.size());
 
-    // Add to registry
-    m_passes.push_back(pass);
+    if (!m_passPool.empty()) {
+        m_passes.push_back(std::move(m_passPool.back()));
+        m_passPool.pop_back();
+        m_passes.back().Recycle(name);
+    } else {
+        m_passes.emplace_back(name);
+    }
+    m_passes.back().handle = handle;
 
-    return pass.handle;
+    return handle;
 }
 
 void FrameGraph::PassRead(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
@@ -155,7 +160,7 @@ void FrameGraph::PassReadWrite(PassHandle pass, VirtualResourceHandle resource, 
     passNode->ReadWrite(resource, state);
 }
 
-void FrameGraph::SetPassCallback(PassHandle pass, PassExecuteCallback callback) {
+void FrameGraph::SetPassCallbackPtr(PassHandle pass, IPassCallback* callback) {
     PassNode* passNode = GetPassNode(pass);
     VERIFY(passNode != nullptr);
 
@@ -238,7 +243,7 @@ void FrameGraph::ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList) {
     if (m_gpuProfiler)
         m_gpuProfiler->BeginPass(cmdList, pass->name.c_str(), pass->isAsync);
 
-    pass->executeCallback(*m_context, *this);
+    (*pass->executeCallback)(*m_context, *this);
 
     if (m_gpuProfiler)
         m_gpuProfiler->EndPass(cmdList, pass->name.c_str());
@@ -396,6 +401,8 @@ void FrameGraph::ResetForNextFrame() {
     }
 
     // Clear graph structure:
+    for (auto& pass : m_passes)
+        m_passPool.push_back(std::move(pass));
     m_passes.clear();
     m_resources.clear();
     m_sortedPasses.clear();
@@ -406,6 +413,8 @@ void FrameGraph::ResetForNextFrame() {
 
     // Reset per-frame statistics
     m_stats = Statistics();
+
+    m_frameArena.Reset();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -450,9 +459,11 @@ void FrameGraph::Reset() {
     // Clear state
     m_resources.clear();
     m_passes.clear();
+    m_passPool.clear();
     m_sortedPasses.clear();
     m_rtRegistry.Clear();  // Clear RT registry
     m_compiled = false;
+    m_frameArena.Reset();
 
     // Reset statistics (don't use memset - contains non-trivial types!)
     m_stats.numPasses = 0;

@@ -5,6 +5,8 @@
 #include "FGResource.h"
 #include "../RenderContext/RenderContext.h"
 
+#include <utility>
+
 namespace xray::render::framegraph {
 
 // Forward declarations
@@ -14,8 +16,37 @@ class FrameGraph;
 //  PASS EXECUTION CALLBACK
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
-// User-defined function executed during render
-using PassExecuteCallback = std::function<void(xray::render::fg::RenderContext&, const FrameGraph&)>;
+struct IPassCallback {
+    virtual ~IPassCallback() = default;
+    virtual void operator()(xray::render::fg::RenderContext& ctx, const FrameGraph& fg) = 0;
+};
+
+template <typename F>
+struct PassCallback final : IPassCallback {
+    F fn;
+
+    explicit PassCallback(F&& f) : fn(std::move(f)) {}
+    explicit PassCallback(const F& f) : fn(f) {}
+
+    void operator()(xray::render::fg::RenderContext& ctx, const FrameGraph& fg) override
+    {
+        fn(ctx, fg);
+    }
+};
+
+template <typename Data, typename F>
+struct DataPassCallback final : IPassCallback {
+    Data data;
+    F fn;
+
+    explicit DataPassCallback(F&& f) : fn(std::move(f)) {}
+    explicit DataPassCallback(const F& f) : fn(f) {}
+
+    void operator()(xray::render::fg::RenderContext& ctx, const FrameGraph& fg) override
+    {
+        fn(data, fg, &ctx);
+    }
+};
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  RESOURCE ACCESS
@@ -92,7 +123,7 @@ struct PassNode {
     xr_vector<PassNode*> dependents;     // Passes that depend on this
 
     // Execution
-    PassExecuteCallback executeCallback;
+    IPassCallback* executeCallback = nullptr;
 
     // Compilation state
     bool culled = false;                 // Removed during optimization
@@ -116,6 +147,27 @@ struct PassNode {
     explicit PassNode(const char* _name)
         : name(_name)
     {}
+
+    void Recycle(const char* _name)
+    {
+        name = _name;
+        resourceAccesses.clear();
+        barriersBeforePass.clear();
+        dependsOn.clear();
+        dependents.clear();
+        executeCallback = nullptr;
+        culled = false;
+        executionOrder = INVALID_INDEX;
+        depth = 0;
+        timestampQueryStart = INVALID_INDEX;
+        timestampQueryEnd = INVALID_INDEX;
+        lastExecutionTimeMs = 0.0f;
+        isAsync = false;
+        isGraphics = true;
+        isCompute = false;
+        isCopy = false;
+        hasSideEffects = false;
+    }
 
     // Add resource access
     void Read(VirtualResourceHandle resource, ResourceState state = ResourceState::ShaderResource) {
