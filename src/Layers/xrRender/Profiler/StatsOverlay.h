@@ -57,6 +57,11 @@ struct RenderStats
     u32 detailVisibleCapacity = 0;
     u32 detailDecalCapacity = 0;
 
+    u32 fgArenaUsed = 0;
+    u32 fgArenaPeak = 0;
+    u32 fgArenaCapacity = 0;
+    u32 fgArenaFallbacks = 0;
+
     void Reset()
     {
         totalBatches = staticBatches = dynamicBatches = skinnedBatches = terrainBatches = particleBatches = 0;
@@ -71,6 +76,7 @@ struct RenderStats
         detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;
         detailVisibleDecals = 0;
         detailGeneratedInstances = detailVisibleCapacity = detailDecalCapacity = 0;
+        fgArenaUsed = fgArenaPeak = fgArenaCapacity = fgArenaFallbacks = 0;
     }
 };
 
@@ -136,7 +142,6 @@ private:
     bool m_geometryExpanded = true;
     bool m_allocExpanded = true;
     bool m_allocObjectClassProfiling = false;
-    u64 m_arenaDemandPeak = 0;
 
     xr_vector<shared_str> m_rtNames;
     int m_inspectorSelectedRT = -1;

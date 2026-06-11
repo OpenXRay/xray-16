@@ -3,6 +3,7 @@
 #include "FGTypes.h"
 #include "FGResource.h"
 #include "FGPass.h"
+#include "FGFrameArena.h"
 #include "RenderTargetRegistry.h"
 #include "FGResourcePool.h"
 #include "../RenderContext/RenderContext.h"
@@ -10,6 +11,7 @@
 #include "xrCore/Profiler/CPUProfiler.h"
 
 #include <cstdio>
+#include <type_traits>
 
 class IRenderBackend;
 
@@ -52,17 +54,21 @@ public:
     void PassReadWrite(PassHandle pass, VirtualResourceHandle resource,
                       ResourceState state = ResourceState::UnorderedAccess);
 
-    void SetPassCallback(PassHandle pass, PassExecuteCallback callback);
+    void SetPassCallbackPtr(PassHandle pass, IPassCallback* callback);
+
+    template <typename F>
+    void SetPassCallback(PassHandle pass, F&& callback)
+    {
+        SetPassCallbackPtr(pass,
+            m_frameArena.Make<PassCallback<std::decay_t<F>>>(std::forward<F>(callback)));
+    }
 
     void SetPassAsyncCompute(PassHandle pass);
 
     void SetPassHasSideEffects(PassHandle pass);
 
-    template<typename PassData>
-    PassData& addCallbackPass(
-        const char* name,
-        std::function<void(FrameGraph&, PassHandle, PassData&)> setupFunc,
-        std::function<void(const PassData&, const FrameGraph&, fg::RenderContext*)> executeFunc)
+    template <typename PassData, typename Setup, typename Execute>
+    PassData& addCallbackPass(const char* name, Setup&& setupFunc, Execute&& executeFunc)
     {
         const xray::profiler::ZoneInfo* setupZone = nullptr;
         if (xray::profiler::CPUProfiler::Instance().IsEnabled())
@@ -75,22 +81,21 @@ public:
 
         PassHandle passHandle = AddPass(name);
 
-        auto passData = std::make_shared<PassData>();
+        auto* pass = m_frameArena.Make<DataPassCallback<PassData, std::decay_t<Execute>>>(
+            std::forward<Execute>(executeFunc));
 
-        setupFunc(*this, passHandle, *passData);
+        setupFunc(*this, passHandle, pass->data);
 
-        PassExecuteCallback callback = [passData, executeFunc](fg::RenderContext& ctx, const FrameGraph& fg) {
-            executeFunc(*passData, fg, &ctx);
-        };
+        SetPassCallbackPtr(passHandle, pass);
 
-        SetPassCallback(passHandle, callback);
-
-        return *passData;
+        return pass->data;
     }
 
     void SetRenderContext(fg::RenderContext* context) { m_context = context; }
 
     void SetGPUProfiler(xray::profiler::GPUProfiler* profiler) { m_gpuProfiler = profiler; }
+
+    const FrameArena::Stats& GetFrameArenaStats() const { return m_frameArena.GetStats(); }
 
     void SetAsyncCompute(nvrhi::ICommandList* computeCmdList, IRenderBackend* backend) {
         m_computeCommandList = computeCmdList;
@@ -158,6 +163,8 @@ private:
 
     xr_vector<ResourceNode> m_resources;
     xr_vector<PassNode> m_passes;
+    xr_vector<PassNode> m_passPool;
+    FrameArena m_frameArena;
 
     xr_vector<PassNode*> m_sortedPasses;
     bool m_compiled = false;
