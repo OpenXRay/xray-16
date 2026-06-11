@@ -291,7 +291,9 @@ private:
 
     xr_map<xr_string, float> m_detailScaleCache;
 
-    xr_unordered_map<dxRender_Visual*, u32> m_visualToMaterialID;
+    u32 m_visualMaterialEpoch = 1;
+
+    xr_map<std::pair<shared_str, shared_str>, u32> m_materialIDByNames;
 
     struct PendingMaterial {
         u32 materialID;
