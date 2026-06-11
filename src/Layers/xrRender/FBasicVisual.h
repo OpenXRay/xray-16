@@ -82,6 +82,13 @@ public:
     // DX12: Index into CRender::CompiledLevelShaders for precompiled PSO lookup
     u32 shader_id{UINT32_MAX};
 
+    // Bindless material registration stamp (MaterialCache). Intrusive instead
+    // of a visual*-keyed map: lookup is a member read, and a destroyed visual
+    // takes its ID with it (a side table keyed by pointer would hand recycled
+    // addresses a stale material). Valid while epoch matches the cache's.
+    u32 bindless_material_id{UINT32_MAX};
+    u32 bindless_material_epoch{0};
+
     virtual void Load(const char* N, IReader* data, u32 dwFlags);
     virtual void Release(); // Shared memory release
     virtual void Copy(dxRender_Visual* from);

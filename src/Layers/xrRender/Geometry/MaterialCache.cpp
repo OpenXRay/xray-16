@@ -1007,7 +1007,8 @@ void MaterialCache::Clear()
     m_textureHandleCache.clear();
     m_detailScaleCache.clear();
     m_shaderHandles.clear();
-    m_visualToMaterialID.clear();
+    ++m_visualMaterialEpoch; // invalidates every visual's stamped material ID
+    m_materialIDByNames.clear();
     m_pendingMaterials.clear();
     m_stats = Stats{};
 }
@@ -1368,13 +1369,24 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     if (!visual)
         return UINT32_MAX;
 
-    auto it = m_visualToMaterialID.find(visual);
-    if (it != m_visualToMaterialID.end())
-        return it->second;
+    if (visual->bindless_material_epoch == m_visualMaterialEpoch)
+        return visual->bindless_material_id;
 
     auto& materialBuffer = MaterialBuffer::Instance();
     if (!materialBuffer.IsInitialized())
         return UINT32_MAX;
+
+    // Material identity is (shader, texture) - both pre-register data and the
+    // finalize patch derive solely from these names. RegisterMaterial burns a
+    // slot per call and never reclaims, so registering per visual instance
+    // leaks slots with churning visuals (particles, respawned model clones).
+    const auto nameKey = std::make_pair(visual->shaderName, visual->textureName);
+    const auto known = m_materialIDByNames.find(nameKey);
+    if (known != m_materialIDByNames.end()) {
+        visual->bindless_material_id = known->second;
+        visual->bindless_material_epoch = m_visualMaterialEpoch;
+        return known->second;
+    }
 
     MaterialData matData = {};
     matData.diffuseIndex = INVALID_TEXTURE_INDEX;
@@ -1407,11 +1419,14 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
 
     u32 materialID = materialBuffer.RegisterMaterial(matData);
 
-    m_visualToMaterialID[visual] = materialID;
+    visual->bindless_material_id = materialID;
+    visual->bindless_material_epoch = m_visualMaterialEpoch;
+    m_materialIDByNames.emplace(nameKey, materialID);
 
     PendingMaterial pending;
     pending.materialID = materialID;
     pending.visual = visual;
+    pending.textureName = visual->textureName; // finalize fallback if the visual dies first
     m_pendingMaterials.push_back(pending);
 
     static u32 logCount = 0;

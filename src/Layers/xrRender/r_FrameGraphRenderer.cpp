@@ -2301,7 +2301,11 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
     return false;
 }
 
-void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs) {
+// Leaf-visual traversal without materialization: leaves are emitted straight
+// to the callable, so steady-state collection allocates nothing (the temp
+// vector per call/recursion level was ~90% of FG::SetupFrame's allocations).
+template <typename F>
+static void ForEachLeafVisual(dxRender_Visual* pVisual, F&& fn) {
     if (!pVisual)
         return;
 
@@ -2309,14 +2313,14 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
         case MT_HIERRARHY: {
             FHierrarhyVisual* pV = static_cast<FHierrarhyVisual*>(pVisual);
             for (auto& child : pV->children) {
-                ExtractStaticLeafVisuals(child, outLeafs);
+                ForEachLeafVisual(child, fn);
             }
             break;
         }
         case MT_LOD: {
             FLOD* pV = static_cast<FLOD*>(pVisual);
             for (auto& child : pV->children) {
-                ExtractStaticLeafVisuals(child, outLeafs);
+                ForEachLeafVisual(child, fn);
             }
             break;
         }
@@ -2325,48 +2329,55 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
             CKinematics* pV = static_cast<CKinematics*>(pVisual);
             pV->CalculateBones_InvalidateFG();
             pV->CalculateBonesFG(TRUE);
-            
+
             for (auto& child : pV->children) {
-                ExtractStaticLeafVisuals(child, outLeafs);
+                ForEachLeafVisual(child, fn);
             }
 
             // TODO: Also check for LOD model / progressive skinning
             //if (pV->m_lod) {
-                //outLeafs.push_back(pV->m_lod);
+                //fn(pV->m_lod);
             //}
             break;
         }
         case MT_SKELETON_GEOMDEF_PM:
         case MT_SKELETON_GEOMDEF_ST: {
-            outLeafs.push_back(pVisual);
+            fn(pVisual);
             break;
         }
         case MT_PROGRESSIVE: {
-            outLeafs.push_back(pVisual);
+            fn(pVisual);
             break;
         }
         case MT_PARTICLE_GROUP: {
+            // SItem visuals iterated in place - no temporary list (GetVisuals)
             PS::CParticleGroup* pG = static_cast<PS::CParticleGroup*>(pVisual);
             for (auto& item : pG->items) {
-                xr_vector<dxRender_Visual*> visuals;
-                item.GetVisuals(visuals);
-                for (auto* v : visuals) {
-                    ExtractStaticLeafVisuals(v, outLeafs);
-                }
+                if (item._effect)
+                    ForEachLeafVisual(item._effect, fn);
+                for (auto* v : item._children_related)
+                    ForEachLeafVisual(v, fn);
+                for (auto* v : item._children_free)
+                    ForEachLeafVisual(v, fn);
             }
             break;
         }
         case MT_PARTICLE_EFFECT:
-            outLeafs.push_back(pVisual);
+            fn(pVisual);
             break;
         case MT_TREE_ST:
         case MT_TREE_PM:
         case MT_NORMAL:
         default: {
-            outLeafs.push_back(pVisual);
+            fn(pVisual);
             break;
         }
     }
+}
+
+// Materializing wrapper - only for the once-per-level static cache build
+void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs) {
+    ForEachLeafVisual(pVisual, [&outLeafs](dxRender_Visual* leaf) { outLeafs.push_back(leaf); });
 }
 
 void FrameGraphRenderer::CollectVisibleGeometry() {
@@ -2481,25 +2492,16 @@ void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix
     }
     
     bool isHUD = (root && root->renderable_HUD());
-    
-    xr_vector<dxRender_Visual*> leafVisuals;
-    ExtractStaticLeafVisuals(visual, leafVisuals);
 
-    u32 processed = 0;
-    for (dxRender_Visual* leafVisual : leafVisuals) {
-        bool success = false;
+    ForEachLeafVisual(visual, [&](dxRender_Visual* leafVisual) {
         if (isHUD) {
             // HUD geometry - separate processing with different projection/culling
-            success = ProcessHudGeometry(leafVisual, xform, root);
+            ProcessHudGeometry(leafVisual, xform, root);
         } else {
             // World geometry - standard processing
-            success = ProcessVisualGeometry(leafVisual, xform, root);
+            ProcessVisualGeometry(leafVisual, xform, root);
         }
-
-        if (success) {
-            processed++;
-        }
-    }
+    });
 }
 
 xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {

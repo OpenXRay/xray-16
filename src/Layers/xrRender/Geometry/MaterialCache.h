@@ -291,7 +291,13 @@ private:
 
     xr_map<xr_string, float> m_detailScaleCache;
 
-    xr_unordered_map<dxRender_Visual*, u32> m_visualToMaterialID;
+    // Epoch for the intrusive visual material-ID stamps (FBasicVisual.h);
+    // bumping invalidates every visual's cached bindless material ID in O(1)
+    u32 m_visualMaterialEpoch = 1;
+
+    // One material slot per distinct (shader, texture) identity; inserts only
+    // for never-before-seen content, so it amortizes to zero per frame
+    xr_map<std::pair<shared_str, shared_str>, u32> m_materialIDByNames;
 
     struct PendingMaterial {
         u32 materialID;
