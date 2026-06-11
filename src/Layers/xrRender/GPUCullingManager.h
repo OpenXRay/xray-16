@@ -307,7 +307,7 @@ public:
 
     u32 GetSkinnedVisibilityByVisual(const dxRender_Visual* visual) const;
 
-    bool HasSkinnedVisibilityData() const { return !m_skinnedVisibilityByVisual.empty(); }
+    bool HasSkinnedVisibilityData() const { return !m_skinnedVisibilityValues.empty(); }
 
     u32 GetSkinnedObjectCount() const { return m_skinnedObjectCount; }
     bool IsSkinnedCullingEnabled() const { return m_initialized && m_skinnedCullEnabled; }
@@ -495,11 +495,14 @@ private:
 
     static constexpr u32 SKINNED_READBACK_FRAMES = 2;
     nvrhi::BufferHandle m_skinnedReadbackBuffers[SKINNED_READBACK_FRAMES];
-    xr_unordered_map<const dxRender_Visual*, u32> m_skinnedVisualToIndex[SKINNED_READBACK_FRAMES];
     u32 m_skinnedReadbackWriteIndex = 0;
     u32 m_skinnedReadbackFrameCount = 0;
 
-    xr_unordered_map<const dxRender_Visual*, u32> m_skinnedVisibilityByVisual;
+    u32 m_skinnedSubmitFrameId = 0;
+    u32 m_skinnedReadbackSubmitFrame[SKINNED_READBACK_FRAMES] = {};
+    u32 m_skinnedReadbackCounts[SKINNED_READBACK_FRAMES] = {};
+    xr_vector<u32> m_skinnedVisibilityValues;
+    u32 m_skinnedVisibilityFrame = 0;
 
     u32 m_skinnedObjectCount = 0;
     u32 m_maxSkinnedObjects = 0;
@@ -513,7 +516,7 @@ private:
     static constexpr u32 MAX_TOTAL_BONES = 8192;
     static constexpr u32 BONE_STRIDE = sizeof(Fmatrix);
     nvrhi::BufferHandle m_globalBoneBuffer;
-    xr_map<CKinematics*, u32> m_skeletonOffsets;
+    u32 m_boneUploadFrameId = 0;
     xr_vector<Fmatrix> m_boneStagingBuffer;
     u32 m_currentBoneOffset = 0;
     bool m_boneBufferInitialized = false;

@@ -134,6 +134,9 @@ public:
 public:
     dxRender_Visual* m_lod;
 
+    u32 fg_bone_upload_frame{0};
+    u32 fg_bone_upload_offset{0};
+
 protected:
     SkeletonWMVec wallmarks;
     u32 wm_frame;

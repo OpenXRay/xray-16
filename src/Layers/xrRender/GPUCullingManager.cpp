@@ -536,9 +536,11 @@ void GPUCullingManager::EnsureSkinnedBufferCapacity(u32 count)
     m_skinnedReadbackFrameCount = 0;
 
     for (u32 i = 0; i < SKINNED_READBACK_FRAMES; ++i) {
-        m_skinnedVisualToIndex[i].clear();
+        m_skinnedReadbackSubmitFrame[i] = 0;
+        m_skinnedReadbackCounts[i] = 0;
     }
-    m_skinnedVisibilityByVisual.clear();
+    m_skinnedVisibilityValues.clear();
+    m_skinnedVisibilityFrame = 0;
 
     m_maxSkinnedObjects = newCapacity;
 }
@@ -1901,11 +1903,14 @@ void GPUCullingManager::ScheduleSkinnedVisibilityReadback(nvrhi::ICommandList* c
         m_skinnedVisibilityBuffer, 0,
         m_skinnedObjectCount * sizeof(u32));
 
-    m_skinnedVisualToIndex[writeSlot].clear();
+    ++m_skinnedSubmitFrameId;
+    m_skinnedReadbackSubmitFrame[writeSlot] = m_skinnedSubmitFrameId;
+    m_skinnedReadbackCounts[writeSlot] = m_skinnedObjectCount;
     for (u32 i = 0; i < m_skinnedBatchPointers.size(); ++i) {
         const GeometryBatch* batch = m_skinnedBatchPointers[i];
         if (batch && batch->visual) {
-            m_skinnedVisualToIndex[writeSlot][batch->visual] = i;
+            batch->visual->skinned_cull_index = i;
+            batch->visual->skinned_cull_frame = m_skinnedSubmitFrameId;
         }
     }
 
@@ -1930,14 +1935,10 @@ void GPUCullingManager::ProcessSkinnedVisibilityReadback()
 
     if (mappedData) {
         const u32* visibilityData = static_cast<const u32*>(mappedData);
-        const auto& visualToIndex = m_skinnedVisualToIndex[readSlot];
 
-        m_skinnedVisibilityByVisual.clear();
-        for (const auto& [visual, index] : visualToIndex) {
-            if (index < m_maxSkinnedObjects) {
-                m_skinnedVisibilityByVisual[visual] = visibilityData[index];
-            }
-        }
+        const u32 count = std::min(m_skinnedReadbackCounts[readSlot], m_maxSkinnedObjects);
+        m_skinnedVisibilityValues.assign(visibilityData, visibilityData + count);
+        m_skinnedVisibilityFrame = m_skinnedReadbackSubmitFrame[readSlot];
 
         m_device->GetNVRHIDevice()->unmapBuffer(m_skinnedReadbackBuffers[readSlot]);
     }
@@ -1952,9 +1953,9 @@ void GPUCullingManager::UpdateSkinnedCullingStats(u32 rendered, u32 culled)
 
 u32 GPUCullingManager::GetSkinnedVisibilityByVisual(const dxRender_Visual* visual) const
 {
-    auto it = m_skinnedVisibilityByVisual.find(visual);
-    if (it != m_skinnedVisibilityByVisual.end()) {
-        return it->second;
+    if (visual && visual->skinned_cull_frame == m_skinnedVisibilityFrame
+        && visual->skinned_cull_index < m_skinnedVisibilityValues.size()) {
+        return m_skinnedVisibilityValues[visual->skinned_cull_index];
     }
     return 0;
 }
@@ -1962,16 +1963,18 @@ u32 GPUCullingManager::GetSkinnedVisibilityByVisual(const dxRender_Visual* visua
 void GPUCullingManager::ClearSkinnedVisibilityData()
 {
     for (u32 i = 0; i < SKINNED_READBACK_FRAMES; ++i) {
-        m_skinnedVisualToIndex[i].clear();
+        m_skinnedReadbackSubmitFrame[i] = 0;
+        m_skinnedReadbackCounts[i] = 0;
     }
-    m_skinnedVisibilityByVisual.clear();
+    m_skinnedVisibilityValues.clear();
+    m_skinnedVisibilityFrame = 0;
     m_skinnedBatchPointers.clear();
     m_skinnedReadbackFrameCount = 0;
 }
 
 void GPUCullingManager::BeginSkinnedFrame()
 {
-    m_skeletonOffsets.clear();
+    ++m_boneUploadFrameId;
     m_currentBoneOffset = 0;
 }
 
@@ -1980,9 +1983,8 @@ u32 GPUCullingManager::GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinema
     if (!m_boneBufferInitialized || !skeleton || !cmdList)
         return 0;
 
-    auto it = m_skeletonOffsets.find(skeleton);
-    if (it != m_skeletonOffsets.end()) {
-        return it->second;
+    if (skeleton->fg_bone_upload_frame == m_boneUploadFrameId) {
+        return skeleton->fg_bone_upload_offset;
     }
 
     u32 boneCount = skeleton->LL_BoneCount();
@@ -1996,7 +1998,8 @@ u32 GPUCullingManager::GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinema
     }
 
     u32 boneOffset = m_currentBoneOffset;
-    m_skeletonOffsets[skeleton] = boneOffset;
+    skeleton->fg_bone_upload_frame = m_boneUploadFrameId;
+    skeleton->fg_bone_upload_offset = boneOffset;
 
     UploadSkeletonBones(cmdList, skeleton, boneOffset);
 
