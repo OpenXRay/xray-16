@@ -98,9 +98,11 @@ XRCORE_API bool BacktraceCaptureSupported();
 XRCORE_API void ArmBacktraceCapture(u32 zoneId, const char* zoneName);
 XRCORE_API void DisarmBacktraceCapture();
 XRCORE_API bool BacktraceCaptureArmed();
+XRCORE_API const char* ArmedZoneName();
 XRCORE_API const BacktraceReport& GetBacktraceReport();
 
-XRCORE_API void SetCurrentZone(u32 zoneId);
+XRCORE_API void ZoneEntered(u32 zoneId);
+XRCORE_API void ZoneExited(u32 zoneId, u32 currentZoneId);
 XRCORE_API u32 CurrentZone();
 
 XRCORE_API const char* PushDisallow(const char* context);
