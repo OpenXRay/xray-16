@@ -232,8 +232,6 @@ void FrameGraph::Compile() {
 void FrameGraph::ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList) {
     cmdList->beginMarker(pass->name.c_str());
 
-    // Per-pass CPU zone (dynamic name): CPU time + allocation attribution for
-    // the recording of this pass, parented under FG::Execute
     xray::profiler::CPUZoneScope _zonePass(
         xray::profiler::CPUProfiler::Instance().RegisterDynamicZone(pass->name.c_str()));
 

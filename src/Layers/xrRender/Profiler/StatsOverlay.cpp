@@ -40,7 +40,6 @@ const char* StatsOverlay::FormatTime(float ms, int slot)
 
 const char* StatsOverlay::FormatBytes(u64 bytes, int slot)
 {
-    // Rotating buffers, same pattern as FormatTime
     static constexpr int NUM_BUFFERS = 6;
     static char buffers[NUM_BUFFERS][32];
     static int currentBuffer = 0;
@@ -148,7 +147,6 @@ void StatsOverlay::Render()
 
     ImGui::Separator();
 
-    // Allocations Section
     RenderAllocationsSection();
 
     ImGui::Separator();
@@ -870,8 +868,6 @@ void StatsOverlay::RenderAllocationsSection()
         return;
     }
 
-    // Always-on per-frame totals from the allocator hook. Per-zone attribution
-    // lives in the CPU tree above (sampled at the profiler interval).
     ImGui::Text("Main thread: %s allocs (%s)",
         FormatNumber((u32)rep.mainCalls), FormatBytes(rep.mainBytes, 0));
     {
@@ -898,9 +894,6 @@ void StatsOverlay::RenderAllocationsSection()
         avgCallsStr, FormatBytes(rep.avgMainBytes, 0),
         FormatNumber((u32)rep.peakMainCalls), FormatBytes(rep.peakMainBytes, 1));
 
-    // FG arena sizing: bytes the framegraph setup/reset/compile path allocates
-    // per frame, minus pooled GPU resource creation - what a frame-linear
-    // arena would need to absorb. Names must match the renderer's zones.
     {
         const auto& zones = GetCPUProfiler().GetZones();
         u64 demand = 0;
@@ -985,7 +978,6 @@ void StatsOverlay::RenderAllocationsSection()
         }
     }
 
-    // Zone-targeted backtrace capture (right-click a CPU zone row to arm)
     if (memstats::BacktraceCaptureSupported())
     {
         ImGui::Separator();
@@ -1032,7 +1024,6 @@ void StatsOverlay::RenderAllocationsSection()
         }
     }
 
-    // Per-object-class UpdateCL breakdown (keyed table, opt-in)
     ImGui::Separator();
     bool objProfiling = m_allocObjectClassProfiling;
     if (ImGui::Checkbox("Profile per-object-class allocs (UpdateCL)", &objProfiling))

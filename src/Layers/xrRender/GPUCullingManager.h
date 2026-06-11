@@ -402,7 +402,7 @@ public:
     u32 GetSkinnedVisibilityByVisual(const dxRender_Visual* visual) const;
 
     // Check if skinned visibility data is available
-    bool HasSkinnedVisibilityData() const { return !m_skinnedVisibilityByVisual.empty(); }
+    bool HasSkinnedVisibilityData() const { return !m_skinnedVisibilityValues.empty(); }
 
     u32 GetSkinnedObjectCount() const { return m_skinnedObjectCount; }
     bool IsSkinnedCullingEnabled() const { return m_initialized && m_skinnedCullEnabled; }
@@ -634,13 +634,14 @@ private:
     // This gives n-2 latency (1 frame fresher than original n-3)
     static constexpr u32 SKINNED_READBACK_FRAMES = 2;  // Double-buffer
     nvrhi::BufferHandle m_skinnedReadbackBuffers[SKINNED_READBACK_FRAMES];
-    // Visual-to-index mapping stored per readback buffer (needed to correlate old visibility with current batches)
-    xr_unordered_map<const dxRender_Visual*, u32> m_skinnedVisualToIndex[SKINNED_READBACK_FRAMES];
     u32 m_skinnedReadbackWriteIndex = 0;   // Which buffer to write to next
     u32 m_skinnedReadbackFrameCount = 0;   // Frames accumulated (0, 1, or 2)
 
-    // Final visibility map (visual* -> visibility value) populated during ProcessSkinnedVisibilityReadback
-    xr_unordered_map<const dxRender_Visual*, u32> m_skinnedVisibilityByVisual;
+    u32 m_skinnedSubmitFrameId = 0;
+    u32 m_skinnedReadbackSubmitFrame[SKINNED_READBACK_FRAMES] = {};
+    u32 m_skinnedReadbackCounts[SKINNED_READBACK_FRAMES] = {};
+    xr_vector<u32> m_skinnedVisibilityValues;
+    u32 m_skinnedVisibilityFrame = 0;
 
     u32 m_skinnedObjectCount = 0;
     u32 m_maxSkinnedObjects = 0;
@@ -657,7 +658,7 @@ private:
     static constexpr u32 MAX_TOTAL_BONES = 8192;  // ~100 skeletons * 78 bones
     static constexpr u32 BONE_STRIDE = sizeof(Fmatrix);  // 64 bytes
     nvrhi::BufferHandle m_globalBoneBuffer;
-    xr_map<CKinematics*, u32> m_skeletonOffsets;
+    u32 m_boneUploadFrameId = 0;
     xr_vector<Fmatrix> m_boneStagingBuffer;
     u32 m_currentBoneOffset = 0;
     bool m_boneBufferInitialized = false;

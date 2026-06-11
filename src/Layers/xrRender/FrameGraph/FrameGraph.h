@@ -82,8 +82,6 @@ public:
         std::function<void(FrameGraph&, PassHandle, PassData&)> setupFunc,
         std::function<void(const PassData&, const FrameGraph&, fg::RenderContext*)> executeFunc)
     {
-        // Per-pass setup attribution: covers AddPass + PassData + setupFunc +
-        // callback plumbing, as a "<pass> [setup]" zone under FG::SetupPasses
         const xray::profiler::ZoneInfo* setupZone = nullptr;
         if (xray::profiler::CPUProfiler::Instance().IsEnabled())
         {

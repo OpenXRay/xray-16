@@ -43,9 +43,6 @@ public:
     // Zone registration (thread-safe, called once per source location)
     u32 RegisterZone(const ZoneInfo* info);
 
-    // Registration for names not known at compile time (e.g. framegraph pass
-    // names). Keyed by interned string; returns a stable ZoneInfo usable with
-    // CPUZoneScope, or nullptr while profiling is disabled (scope no-ops).
     const ZoneInfo* RegisterDynamicZone(pcstr name);
 
     // Zone timing (called per invocation)
@@ -79,7 +76,6 @@ private:
     Lock m_registryLock;
     std::atomic<u32> m_nextZoneId{0};
 
-    // Dynamic-name zone infos; live for the process like static ZoneInfos
     xr_map<shared_str, ZoneInfo*> m_dynamicZones;
 
     // Display buffer (previous frame's finalized data)

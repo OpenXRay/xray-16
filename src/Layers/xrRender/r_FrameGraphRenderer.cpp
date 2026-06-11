@@ -2301,9 +2301,6 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
     return false;
 }
 
-// Leaf-visual traversal without materialization: leaves are emitted straight
-// to the callable, so steady-state collection allocates nothing (the temp
-// vector per call/recursion level was ~90% of FG::SetupFrame's allocations).
 template <typename F>
 static void ForEachLeafVisual(dxRender_Visual* pVisual, F&& fn) {
     if (!pVisual)
@@ -2350,7 +2347,6 @@ static void ForEachLeafVisual(dxRender_Visual* pVisual, F&& fn) {
             break;
         }
         case MT_PARTICLE_GROUP: {
-            // SItem visuals iterated in place - no temporary list (GetVisuals)
             PS::CParticleGroup* pG = static_cast<PS::CParticleGroup*>(pVisual);
             for (auto& item : pG->items) {
                 if (item._effect)
@@ -2375,7 +2371,6 @@ static void ForEachLeafVisual(dxRender_Visual* pVisual, F&& fn) {
     }
 }
 
-// Materializing wrapper - only for the once-per-level static cache build
 void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs) {
     ForEachLeafVisual(pVisual, [&outLeafs](dxRender_Visual* leaf) { outLeafs.push_back(leaf); });
 }

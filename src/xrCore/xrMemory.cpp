@@ -48,7 +48,6 @@
     #define xr_internal_free_aligned(ptr, alignment) mi_free_aligned(ptr, alignment)
     #define xr_internal_free_size_aligned(ptr, size, alignment) mi_free_size_aligned(ptr, size, alignment)
 
-    // memstats byte counts use usable size so alloc/free totals net out exactly
     #define xr_counted_alloc_size(ptr, size) mi_usable_size(ptr)
     #define xr_counted_free_size(ptr) mi_usable_size(ptr)
 #elif defined(USE_XR_ALIGNED_MALLOC)
@@ -95,8 +94,6 @@
     #define xr_internal_free_aligned(ptr, alignment) free(ptr)
     #define xr_internal_free_size_aligned(ptr, size, alignment) free(ptr)
 
-    // System malloc reports usable size on Darwin/glibc; counting it on both
-    // sides (instead of the requested size) keeps alloc/free bytes exact.
     #if defined(XR_PLATFORM_APPLE)
         #include <malloc/malloc.h>
         #define xr_counted_alloc_size(ptr, size) malloc_size(ptr)

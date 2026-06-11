@@ -28,12 +28,11 @@ struct ZoneTiming
     u32 parentId = INVALID_ZONE_ID;
     xr_vector<u32> childIds;
 
-    // Allocation deltas (from xray::memstats thread counters), incl. children
     u64 allocCalls = 0;
     u64 allocBytes = 0;
     u64 freeCalls = 0;
     u64 freeBytes = 0;
-    u64 selfAllocCalls = 0;      // Excluding children (computed after frame)
+    u64 selfAllocCalls = 0;
     u64 selfAllocBytes = 0;
 
     void Reset()

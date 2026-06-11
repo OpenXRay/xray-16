@@ -80,9 +80,6 @@ namespace
         return b;
     }
 
-    // Disallow scope state. The violation path may itself allocate (logging),
-    // so it is guarded against re-entry; those allocations are still counted,
-    // just not re-reported.
     thread_local int tl_disallowDepth = 0;
     thread_local int tl_allowDepth = 0;
     thread_local const char* tl_disallowContext = nullptr;
@@ -103,7 +100,6 @@ namespace
         tl_inViolationReport = false;
     }
 
-    // Zone-targeted backtrace capture
     thread_local u32 tl_currentZone = noZone;
     thread_local bool tl_btReentry = false;
 
@@ -198,9 +194,6 @@ namespace
         }
     }
 
-    // The capture happens inside the allocation counter, so the leading
-    // frames of every stack are instrumentation/allocator plumbing. Skip them
-    // so site summaries name the actual caller.
     bool MachineryFrame(const char* sym)
     {
         return std::strstr(sym, "memstats") != nullptr
@@ -219,16 +212,13 @@ namespace
         if (!g_btArmed.load(std::memory_order_relaxed))
             return;
 
-        // Copy + disarm under the lock, symbolicate outside it: the
-        // demangler's own mallocs must not be able to re-enter capture and
-        // deadlock on BtGuard.
         static BtCapture sites[btReportMaxSites];
         int n = 0;
 
         {
             BtGuard guard;
             if (g_btCaptureCount == 0)
-                return; // nothing captured this frame (zones sampled); stay armed
+                return;
 
             for (int i = 0; i < g_btCaptureCount; ++i)
                 for (int j = i + 1; j < g_btCaptureCount; ++j)

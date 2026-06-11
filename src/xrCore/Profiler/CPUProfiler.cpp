@@ -105,7 +105,7 @@ const ZoneInfo* CPUProfiler::RegisterDynamicZone(pcstr name)
         return it->second;
 
     auto* info = xr_new<ZoneInfo>();
-    info->name = key.c_str(); // interned; stable while the map holds the key
+    info->name = key.c_str();
     info->file = "<dynamic>";
     info->line = 0;
     m_dynamicZones.emplace(key, info);
@@ -114,8 +114,6 @@ const ZoneInfo* CPUProfiler::RegisterDynamicZone(pcstr name)
 
 ThreadZoneStack& CPUProfiler::GetThreadStack()
 {
-    // One stack per thread. A real thread_local instead of the old locked
-    // xr_map lookup - removes two lock acquisitions per zone begin/end.
     static thread_local ThreadZoneStack stack;
     return stack;
 }
@@ -289,8 +287,6 @@ void CPUProfiler::ComputeSelfTimes(xr_vector<ZoneData>& zones)
         if (zone.timing.selfTimeMs < 0.0f)
             zone.timing.selfTimeMs = 0.0f;
 
-        // Self-allocs play the role of an "unattributed" row at every level
-        // of the tree: allocations inside this zone but not inside any child.
         zone.timing.selfAllocCalls =
             zone.timing.allocCalls > childAllocCalls ? zone.timing.allocCalls - childAllocCalls : 0;
         zone.timing.selfAllocBytes =
@@ -316,8 +312,6 @@ CPUZoneScope::CPUZoneScope(const ZoneInfo* info)
     m_startTime = CTimerBase::Clock::now();
     profiler.BeginZone(m_zoneId);
 
-    // Snapshot AFTER BeginZone so the profiler's own bookkeeping allocations
-    // (first-frame childIds growth) are not attributed to this zone.
     m_allocCalls0 = memstats::AllocCallsThread();
     m_allocBytes0 = memstats::AllocBytesThread();
     m_freeCalls0 = memstats::FreeCallsThread();

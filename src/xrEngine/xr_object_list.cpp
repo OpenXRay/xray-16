@@ -145,7 +145,6 @@ void CObjectList::SingleUpdate(IGameObject* O)
 
     if (xray::memstats::ObjectClassProfiling())
     {
-        // cNameSect() is interned, satisfying the pointer-keyed table contract
         xray::memstats::ScopedNamed _memCls(xray::memstats::Table::ObjectClass, O->cNameSect().c_str());
         O->UpdateCL();
     }
