@@ -126,13 +126,18 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
         return false;
     }
 
-    m_nvrhiDevice = nvrhi::validation::createValidationLayer(m_nvrhiVulkanDevice);
-    if (!m_nvrhiDevice) {
-        Msg("! [VulkanBackend] Failed to create NVRHI validation layer");
-        Shutdown();
-        return false;
+    if (strstr(Core.Params, "-no_nvrhi_validation")) {
+        m_nvrhiDevice = m_nvrhiVulkanDevice;
+        Msg("* [VulkanBackend] NVRHI validation layer disabled (-no_nvrhi_validation)");
+    } else {
+        m_nvrhiDevice = nvrhi::validation::createValidationLayer(m_nvrhiVulkanDevice);
+        if (!m_nvrhiDevice) {
+            Msg("! [VulkanBackend] Failed to create NVRHI validation layer");
+            Shutdown();
+            return false;
+        }
+        Msg("* [VulkanBackend] NVRHI validation layer enabled");
     }
-    Msg("* [VulkanBackend] NVRHI validation layer enabled");
 
     nvrhi::CommandListParameters cmdParams;
     cmdParams.enableImmediateExecution = false;

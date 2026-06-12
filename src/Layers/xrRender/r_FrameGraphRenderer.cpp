@@ -424,6 +424,7 @@ void FrameGraphRenderer::Render() {
 
                     GEnv.Render->GetShaderLoader()->ClearAllCaches();
                     framegraph::GetPassResourceCache().Clear();
+                    framegraph::BindingSetBuilder::InvalidateReflectionCache();
                     if (m_blackboard)
                     {
                         m_blackboard->clear();

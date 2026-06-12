@@ -101,14 +101,19 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
         return false;
     }
 
-    m_nvrhiDevice = nvrhi::validation::createValidationLayer(baseDevice);
-    if (!m_nvrhiDevice) {
-        Msg("! [D3D12Backend] Failed to create NVRHI validation layer");
-        Shutdown();
-        return false;
-    }
+    if (strstr(Core.Params, "-no_nvrhi_validation")) {
+        m_nvrhiDevice = baseDevice;
+        Msg("* [D3D12Backend] NVRHI validation layer disabled (-no_nvrhi_validation)");
+    } else {
+        m_nvrhiDevice = nvrhi::validation::createValidationLayer(baseDevice);
+        if (!m_nvrhiDevice) {
+            Msg("! [D3D12Backend] Failed to create NVRHI validation layer");
+            Shutdown();
+            return false;
+        }
 
-    Msg("* [D3D12Backend] NVRHI validation layer enabled");
+        Msg("* [D3D12Backend] NVRHI validation layer enabled");
+    }
 
     nvrhi::CommandListParameters cmdParams;
     cmdParams.enableImmediateExecution = false;

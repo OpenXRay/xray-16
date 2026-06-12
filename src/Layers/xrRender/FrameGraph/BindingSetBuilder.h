@@ -8,6 +8,19 @@ struct ExtractedReflection;
 
 class BindingSetBuilder {
 public:
+    struct ReflectedResource {
+        const char* name;
+        u32 slot;
+        nvrhi::ResourceType layoutType;
+    };
+
+    struct ReflectedLists {
+        xr_vector<ReflectedResource> srvs;
+        xr_vector<ReflectedResource> uavs;
+        xr_vector<ReflectedResource> cbs;
+        xr_vector<nvrhi::BindingSetItem> samplerItems;
+    };
+
     BindingSetBuilder(const ExtractedReflection& reflection, nvrhi::IDevice* device,
                       const char* debugLabel = nullptr);
 
@@ -15,6 +28,8 @@ public:
                       const ExtractedReflection& psReflection,
                       nvrhi::IDevice* device,
                       const char* debugLabel = nullptr);
+
+    static void InvalidateReflectionCache();
 
     BindingSetBuilder& Texture(const char* name, nvrhi::ITexture* texture,
                                nvrhi::Format format = nvrhi::Format::UNKNOWN,
@@ -41,27 +56,15 @@ public:
 
     nvrhi::BindingSetDesc Build();
 
-public:
-    struct ReflectedResource {
-        const char* name;
-        u32 slot;
-        nvrhi::ResourceType layoutType;
-    };
-
 private:
-    xr_vector<ReflectedResource> m_srvs;
-    xr_vector<ReflectedResource> m_uavs;
-    xr_vector<ReflectedResource> m_cbs;
-    xr_vector<ReflectedResource> m_samplers;
+    const ReflectedLists* m_lists;
 
     nvrhi::BindingSetDesc m_desc;
-    nvrhi::IDevice* m_device;
 
     int FindSRVSlot(const char* name) const;
     int FindUAVSlot(const char* name) const;
     int FindCBSlot(const char* name) const;
 
-    void CollectReflection(const ExtractedReflection& reflection);
     void AddSamplers();
 };
 
