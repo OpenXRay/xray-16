@@ -38,6 +38,8 @@ void ConversionProgress::BeginJob()
 
 void ConversionProgress::EndJob()
 {
+    if (!m_job_active.load(std::memory_order_acquire))
+        return;
     {
         ScopeLock lock{ &m_string_lock };
         m_phase = "Done";
@@ -106,23 +108,21 @@ void RenderConversionProgressUI()
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(
         ImVec2(viewport->WorkPos.x + viewport->WorkSize.x - 10.f, viewport->WorkPos.y + 10.f),
-        ImGuiCond_Always, ImVec2(1.f, 0.f));
-    ImGui::SetNextWindowSize(ImVec2(420.f, 0.f), ImGuiCond_Always);
+        ImGuiCond_FirstUseEver, ImVec2(1.f, 0.f));
+    ImGui::SetNextWindowSize(ImVec2(420.f, 0.f), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowBgAlpha(0.85f);
 
-    constexpr ImGuiWindowFlags flags =
-        ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
-        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs |
-        ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoFocusOnAppearing;
+    const bool ideActive = Device.editor().IsActiveState();
 
-    if (!ImGui::Begin("##PBRConversionProgress", nullptr, flags))
+    ImGuiWindowFlags flags = ImGuiWindowFlags_None;
+    if (!ideActive)
+        flags |= ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoFocusOnAppearing;
+
+    if (!ImGui::Begin("PBR Texture Conversion", nullptr, flags))
     {
         ImGui::End();
         return;
     }
-
-    ImGui::TextUnformatted("PBR Texture Conversion");
-    ImGui::Separator();
 
     ImGui::TextUnformatted(snap.phase.c_str());
 

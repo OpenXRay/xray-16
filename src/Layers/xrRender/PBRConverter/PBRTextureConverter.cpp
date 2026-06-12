@@ -8,11 +8,11 @@
 #include "Layers/xrRender/ETextureParams.h"
 #include <atomic>
 #include <algorithm>
+#include <cmath>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <queue>
-#include <DirectXTex.h>
 
 using namespace xray::render::fg;
 namespace xray::render::pbr {
@@ -185,56 +185,49 @@ static bool GenerateNormalMapFromDiffuse(
         return false;
     }
 
-    DirectX::Image srcImage = {};
-    srcImage.width = width;
-    srcImage.height = height;
-    srcImage.format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    srcImage.rowPitch = width * 4;
-    srcImage.slicePitch = width * height * 4;
-    srcImage.pixels = const_cast<u8*>(diffuseRGBA.data());
-
-    DirectX::ScratchImage normalMap;
-    HRESULT hr = DirectX::ComputeNormalMap(
-        srcImage,
-        DirectX::CNMAP_CHANNEL_LUMINANCE,
-        amplitude,
-        DXGI_FORMAT_R8G8B8A8_UNORM,
-        normalMap
-    );
-
-    if (FAILED(hr)) {
-        Msg("! [PBRTextureConverter] DirectXTex ComputeNormalMap failed: 0x%08X", hr);
-        return false;
-    }
-
-    const DirectX::Image* result = normalMap.GetImage(0, 0, 0);
-    if (!result || !result->pixels) {
-        return false;
-    }
-
     const u32 pixelCount = width * height;
-    outNormalRGBA.resize(pixelCount * 4);
-    const u8* src = result->pixels;
-
-    if (pixelCount > 0) {
-        Msg("* [PBRTextureConverter] DirectXTex normal[0]: R=%u G=%u B=%u A=%u",
-            src[0], src[1], src[2], src[3]);
-    }
-
+    xr_vector<float> luminance(pixelCount);
     for (u32 i = 0; i < pixelCount; ++i) {
-        u8 x = src[i * 4 + 0];
-        u8 y = src[i * 4 + 1];
-        u8 z = src[i * 4 + 2];
-
-        outNormalRGBA[i * 4 + 0] = 128;
-        outNormalRGBA[i * 4 + 1] = z;
-        outNormalRGBA[i * 4 + 2] = y;
-        outNormalRGBA[i * 4 + 3] = x;
+        luminance[i] = (0.2126f * diffuseRGBA[i * 4 + 0]
+                      + 0.7152f * diffuseRGBA[i * 4 + 1]
+                      + 0.0722f * diffuseRGBA[i * 4 + 2]) / 255.0f;
     }
 
-    if (pixelCount > 0) {
-        Msg("* [PBRTextureConverter] X-Ray bump[0]: R=%u G=%u B=%u A=%u (Gloss,Z,Y,X)",
-            outNormalRGBA[0], outNormalRGBA[1], outNormalRGBA[2], outNormalRGBA[3]);
+    auto sample = [&](u32 x, u32 y) {
+        return luminance[(y % height) * width + (x % width)];
+    };
+
+    outNormalRGBA.resize(pixelCount * 4);
+
+    const float scale = amplitude * 0.25f;
+    for (u32 y = 0; y < height; ++y) {
+        for (u32 x = 0; x < width; ++x) {
+            const u32 xl = x + width - 1;
+            const u32 xr = x + 1;
+            const u32 yt = y + height - 1;
+            const u32 yb = y + 1;
+
+            const float dx =
+                (sample(xr, yt) + 2.0f * sample(xr, y) + sample(xr, yb)) -
+                (sample(xl, yt) + 2.0f * sample(xl, y) + sample(xl, yb));
+            const float dy =
+                (sample(xl, yb) + 2.0f * sample(x, yb) + sample(xr, yb)) -
+                (sample(xl, yt) + 2.0f * sample(x, yt) + sample(xr, yt));
+
+            const float nx = -dx * scale;
+            const float ny = -dy * scale;
+            const float invLen = 1.0f / std::sqrt(nx * nx + ny * ny + 1.0f);
+
+            const u8 bx = static_cast<u8>((nx * invLen * 0.5f + 0.5f) * 255.0f);
+            const u8 by = static_cast<u8>((ny * invLen * 0.5f + 0.5f) * 255.0f);
+            const u8 bz = static_cast<u8>((invLen * 0.5f + 0.5f) * 255.0f);
+
+            const u32 i = (y * width + x) * 4;
+            outNormalRGBA[i + 0] = 128;
+            outNormalRGBA[i + 1] = bz;
+            outNormalRGBA[i + 2] = by;
+            outNormalRGBA[i + 3] = bx;
+        }
     }
 
     return true;
@@ -339,6 +332,7 @@ static const char* const FOLDER_BLACKLIST[] = {
     "internal",
     "lights",
     "pfx",
+    "shaders",
     "sky",
     "ui",
     "intro",
@@ -654,137 +648,6 @@ static bool InitializeAIPipeline() {
     g_ai_available = true;
     Msg("[PBRTextureConverter] AI pipeline initialized successfully");
     return true;
-}
-
-static ConvertedPBRTextures ConvertWithAI(
-    const resources::DDSData* diffuseData,
-    const resources::DDSData* normalData,
-    const PBRConversionParams& params)
-{
-    ConvertedPBRTextures result;
-
-    if (!diffuseData || !diffuseData->isValid || diffuseData->mipLevels.empty()) {
-        return result;
-    }
-    if (!normalData || !normalData->isValid || normalData->mipLevels.empty()) {
-        return result;
-    }
-
-    u32 diffuseWidth, diffuseHeight, normalWidth, normalHeight;
-    xr_vector<u8> diffuseRGB = DecompressDDS(*diffuseData, diffuseWidth, diffuseHeight);
-    xr_vector<u8> normalRGB = DecompressDDS(*normalData, normalWidth, normalHeight);
-
-    if (diffuseRGB.empty() || normalRGB.empty()) {
-        Msg("! [PBRTextureConverter] Failed to decompress textures");
-        return result;
-    }
-
-    Msg("~ [PBRTextureConverter] Decompressed dimensions: diffuse %ux%u, normal %ux%u",
-        diffuseWidth, diffuseHeight, normalWidth, normalHeight);
-
-    constexpr u32 MIN_AI_TEXTURE_SIZE = 32;
-    if (diffuseWidth < MIN_AI_TEXTURE_SIZE || diffuseHeight < MIN_AI_TEXTURE_SIZE) {
-        u32 newWidth = std::max(diffuseWidth, MIN_AI_TEXTURE_SIZE);
-        u32 newHeight = std::max(diffuseHeight, MIN_AI_TEXTURE_SIZE);
-        Msg("~ [PBRTextureConverter] Upscaling small texture %ux%u → %ux%u for AI processing",
-            diffuseWidth, diffuseHeight, newWidth, newHeight);
-
-        xr_vector<u8> upscaledDiffuse(newWidth * newHeight * 4);
-        for (u32 y = 0; y < newHeight; ++y) {
-            for (u32 x = 0; x < newWidth; ++x) {
-                u32 srcX = x * diffuseWidth / newWidth;
-                u32 srcY = y * diffuseHeight / newHeight;
-                u32 srcIdx = (srcY * diffuseWidth + srcX) * 4;
-                u32 dstIdx = (y * newWidth + x) * 4;
-                upscaledDiffuse[dstIdx + 0] = diffuseRGB[srcIdx + 0];
-                upscaledDiffuse[dstIdx + 1] = diffuseRGB[srcIdx + 1];
-                upscaledDiffuse[dstIdx + 2] = diffuseRGB[srcIdx + 2];
-                upscaledDiffuse[dstIdx + 3] = diffuseRGB[srcIdx + 3];
-            }
-        }
-        diffuseRGB = std::move(upscaledDiffuse);
-
-        xr_vector<u8> upscaledNormal(newWidth * newHeight * 4);
-        for (u32 y = 0; y < newHeight; ++y) {
-            for (u32 x = 0; x < newWidth; ++x) {
-                u32 srcX = x * normalWidth / newWidth;
-                u32 srcY = y * normalHeight / newHeight;
-                u32 srcIdx = (srcY * normalWidth + srcX) * 4;
-                u32 dstIdx = (y * newWidth + x) * 4;
-                upscaledNormal[dstIdx + 0] = normalRGB[srcIdx + 0];
-                upscaledNormal[dstIdx + 1] = normalRGB[srcIdx + 1];
-                upscaledNormal[dstIdx + 2] = normalRGB[srcIdx + 2];
-                upscaledNormal[dstIdx + 3] = normalRGB[srcIdx + 3];
-            }
-        }
-        normalRGB = std::move(upscaledNormal);
-
-        diffuseWidth = newWidth;
-        diffuseHeight = newHeight;
-        normalWidth = newWidth;
-        normalHeight = newHeight;
-    }
-
-    result.width = diffuseWidth;
-    result.height = diffuseHeight;
-
-    if (normalWidth != diffuseWidth || normalHeight != diffuseHeight) {
-        Msg("~ [PBRTextureConverter] Upscaling normal map: %ux%u → %ux%u",
-            normalWidth, normalHeight, diffuseWidth, diffuseHeight);
-
-        xr_vector<u8> upscaledNormal(diffuseWidth * diffuseHeight * 4);
-        for (u32 y = 0; y < diffuseHeight; ++y) {
-            for (u32 x = 0; x < diffuseWidth; ++x) {
-                u32 srcX = x * normalWidth / diffuseWidth;
-                u32 srcY = y * normalHeight / diffuseHeight;
-                u32 srcIdx = (srcY * normalWidth + srcX) * 4;
-                u32 dstIdx = (y * diffuseWidth + x) * 4;
-                upscaledNormal[dstIdx + 0] = normalRGB[srcIdx + 0];
-                upscaledNormal[dstIdx + 1] = normalRGB[srcIdx + 1];
-                upscaledNormal[dstIdx + 2] = normalRGB[srcIdx + 2];
-                upscaledNormal[dstIdx + 3] = normalRGB[srcIdx + 3];
-            }
-        }
-        normalRGB = std::move(upscaledNormal);
-    }
-
-    Msg("~ [PBRTextureConverter] Calling Process with dimensions: width=%u, height=%u",
-        result.width, result.height);
-
-    PBRPipelineOutputs outputs;
-    {
-        ScopeLock lock{ &g_ai_pipeline_mutex };
-        outputs = g_ai_pipeline->Process(
-            diffuseRGB.data(),
-            normalRGB.data(),
-            result.width,
-            result.height
-        );
-    }
-
-    if (!outputs.success) {
-        Msg("! [PBRTextureConverter] AI pipeline failed");
-        return result;
-    }
-
-    xr_vector<u8> aiAlbedoRGB = outputs.albedo.ToImageData(false);
-    result.metallicData = outputs.metallic.ToImageData(true);
-    result.roughnessData = outputs.roughness.ToImageData(true);
-    result.aoData = outputs.ao.ToImageData(true);
-    result.parallaxData = outputs.parallax.ToImageData(true);
-
-    const u32 pixelCount = result.width * result.height;
-    result.albedoData.resize(pixelCount * 4);
-
-    for (u32 i = 0; i < pixelCount; ++i) {
-        result.albedoData[i * 4 + 0] = aiAlbedoRGB[i * 3 + 0];
-        result.albedoData[i * 4 + 1] = aiAlbedoRGB[i * 3 + 1];
-        result.albedoData[i * 4 + 2] = aiAlbedoRGB[i * 3 + 2];
-        result.albedoData[i * 4 + 3] = diffuseRGB[i * 4 + 3];
-    }
-
-    result.success = true;
-    return result;
 }
 
 static xr_vector<u8> NearestNeighborUpscaleRGBA(

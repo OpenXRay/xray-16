@@ -204,6 +204,7 @@ target_sources(xrRender PRIVATE
     NvTriStripObjects.cpp
     PBRConverter/ONNXModelRunner.cpp
     PBRConverter/PBRConversionUI.cpp
+    PBRConverter/PBRTextureConverter.cpp
     PSLibrary.cpp
     ParticleEffect.cpp
     ParticleEffectDef.cpp
@@ -325,11 +326,6 @@ target_sources(xrRender PRIVATE
 if(WIN32)
     target_sources(xrRender PRIVATE
         Backend/D3D12Backend.cpp
-        PBRConverter/PBRTextureConverter.cpp
-    )
-else()
-    target_sources(xrRender PRIVATE
-        PBRConverter/PBRTextureConverter_Stub.cpp
     )
 endif()
 
@@ -383,6 +379,41 @@ target_compile_definitions(xrRender
     USE_DX11
     USE_NVRHI_IMGUI
 )
+
+if(XRAY_USE_AI_PBR)
+    set(XRAY_ONNXRUNTIME_ROOT "${CMAKE_SOURCE_DIR}/Externals/onnxruntime" CACHE PATH "ONNX Runtime root directory")
+
+    find_path(XRAY_ONNXRUNTIME_INCLUDE_DIR onnxruntime_cxx_api.h
+        HINTS
+        "${XRAY_ONNXRUNTIME_ROOT}/include/onnxruntime/core/session"
+        "${XRAY_ONNXRUNTIME_ROOT}/include/onnxruntime"
+        "${XRAY_ONNXRUNTIME_ROOT}/include"
+        "/opt/homebrew/opt/onnxruntime/include/onnxruntime"
+        "/usr/local/opt/onnxruntime/include/onnxruntime"
+    )
+    find_library(XRAY_ONNXRUNTIME_LIBRARY onnxruntime
+        HINTS
+        "${XRAY_ONNXRUNTIME_ROOT}/vs_build/Release"
+        "${XRAY_ONNXRUNTIME_ROOT}/vs_build/RelWithDebInfo"
+        "${XRAY_ONNXRUNTIME_ROOT}/build/Release"
+        "${XRAY_ONNXRUNTIME_ROOT}/lib"
+        "/opt/homebrew/opt/onnxruntime/lib"
+        "/usr/local/opt/onnxruntime/lib"
+    )
+
+    if(NOT XRAY_ONNXRUNTIME_INCLUDE_DIR OR NOT XRAY_ONNXRUNTIME_LIBRARY)
+        message(FATAL_ERROR
+            "XRAY_USE_AI_PBR=ON but ONNX Runtime was not found under ${XRAY_ONNXRUNTIME_ROOT}.\n"
+            "Build Externals/onnxruntime, install onnxruntime (e.g. brew install onnxruntime), "
+            "or point XRAY_ONNXRUNTIME_ROOT at an ONNX Runtime install.")
+    endif()
+
+    message(STATUS "AI PBR converter: ON (onnxruntime: ${XRAY_ONNXRUNTIME_LIBRARY})")
+
+    target_compile_definitions(xrRender PRIVATE USE_AI_PBR)
+    target_include_directories(xrRender PRIVATE "${XRAY_ONNXRUNTIME_INCLUDE_DIR}")
+    target_link_libraries(xrRender PRIVATE "${XRAY_ONNXRUNTIME_LIBRARY}")
+endif()
 
 set_target_properties(xrRender PROPERTIES
     PREFIX ""
