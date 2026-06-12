@@ -12,36 +12,6 @@ static bool NameMatches(const char* reflName, const char* queryName)
     return reflName && queryName && xr_strcmp(reflName, queryName) == 0;
 }
 
-void BindingSetBuilder::CollectReflection(const ExtractedReflection& reflection)
-{
-    for (const auto& tex : reflection.rtBindings.inputTextures) {
-        nvrhi::ResourceType rt = nvrhi::ResourceType::Texture_SRV;
-        switch (tex.shape) {
-        case ResourceShape::StructuredBuffer: rt = nvrhi::ResourceType::StructuredBuffer_SRV; break;
-        case ResourceShape::RawBuffer:        rt = nvrhi::ResourceType::RawBuffer_SRV; break;
-        case ResourceShape::AccelStruct:      rt = nvrhi::ResourceType::RayTracingAccelStruct; break;
-        default: break;
-        }
-        m_srvs.push_back({ tex.name.c_str(), tex.slot, rt });
-    }
-
-    for (const auto& uav : reflection.rtBindings.uavBindings) {
-        nvrhi::ResourceType rt = nvrhi::ResourceType::Texture_UAV;
-        switch (uav.shape) {
-        case ResourceShape::StructuredBuffer: rt = nvrhi::ResourceType::StructuredBuffer_UAV; break;
-        case ResourceShape::RawBuffer:        rt = nvrhi::ResourceType::RawBuffer_UAV; break;
-        default: break;
-        }
-        m_uavs.push_back({ uav.name.c_str(), uav.slot, rt });
-    }
-
-    for (const auto& cb : reflection.constantLayout.constantBuffers.buffers)
-        m_cbs.push_back({ cb.name.c_str(), cb.slot, nvrhi::ResourceType::VolatileConstantBuffer });
-
-    for (const auto& smp : reflection.rtBindings.samplers)
-        m_samplers.push_back({ smp.name.c_str(), smp.slot, nvrhi::ResourceType::Sampler });
-}
-
 static void DeduplicateBySlotAndClass(xr_vector<BindingSetBuilder::ReflectedResource>& vec)
 {
     for (size_t i = 0; i < vec.size(); ++i) {
@@ -54,11 +24,85 @@ static void DeduplicateBySlotAndClass(xr_vector<BindingSetBuilder::ReflectedReso
     }
 }
 
+namespace {
+
+using ReflectionKey = std::pair<const void*, const void*>;
+xr_map<ReflectionKey, BindingSetBuilder::ReflectedLists> s_reflectedListsCache;
+
+void Collect(BindingSetBuilder::ReflectedLists& lists,
+    xr_vector<BindingSetBuilder::ReflectedResource>& samplers,
+    const ExtractedReflection& reflection)
+{
+    for (const auto& tex : reflection.rtBindings.inputTextures) {
+        nvrhi::ResourceType rt = nvrhi::ResourceType::Texture_SRV;
+        switch (tex.shape) {
+        case ResourceShape::StructuredBuffer: rt = nvrhi::ResourceType::StructuredBuffer_SRV; break;
+        case ResourceShape::RawBuffer:        rt = nvrhi::ResourceType::RawBuffer_SRV; break;
+        case ResourceShape::AccelStruct:      rt = nvrhi::ResourceType::RayTracingAccelStruct; break;
+        default: break;
+        }
+        lists.srvs.push_back({ tex.name.c_str(), tex.slot, rt });
+    }
+
+    for (const auto& uav : reflection.rtBindings.uavBindings) {
+        nvrhi::ResourceType rt = nvrhi::ResourceType::Texture_UAV;
+        switch (uav.shape) {
+        case ResourceShape::StructuredBuffer: rt = nvrhi::ResourceType::StructuredBuffer_UAV; break;
+        case ResourceShape::RawBuffer:        rt = nvrhi::ResourceType::RawBuffer_UAV; break;
+        default: break;
+        }
+        lists.uavs.push_back({ uav.name.c_str(), uav.slot, rt });
+    }
+
+    for (const auto& cb : reflection.constantLayout.constantBuffers.buffers)
+        lists.cbs.push_back({ cb.name.c_str(), cb.slot, nvrhi::ResourceType::VolatileConstantBuffer });
+
+    for (const auto& smp : reflection.rtBindings.samplers)
+        samplers.push_back({ smp.name.c_str(), smp.slot, nvrhi::ResourceType::Sampler });
+}
+
+const BindingSetBuilder::ReflectedLists& GetOrBuildReflectedLists(
+    const ExtractedReflection* a, const ExtractedReflection* b, nvrhi::IDevice* device)
+{
+    const ReflectionKey key{ a, b };
+    auto it = s_reflectedListsCache.find(key);
+    if (it != s_reflectedListsCache.end())
+        return it->second;
+
+    BindingSetBuilder::ReflectedLists lists;
+    xr_vector<BindingSetBuilder::ReflectedResource> samplers;
+    Collect(lists, samplers, *a);
+    if (b) {
+        Collect(lists, samplers, *b);
+        DeduplicateBySlotAndClass(lists.srvs);
+        DeduplicateBySlotAndClass(lists.uavs);
+        DeduplicateBySlotAndClass(lists.cbs);
+        DeduplicateBySlotAndClass(samplers);
+    }
+
+    auto& cache = GetPassResourceCache();
+    for (const auto& smp : samplers) {
+        nvrhi::ISampler* sampler = cache.GetSamplerByName(smp.name, device);
+        if (sampler)
+            lists.samplerItems.push_back(nvrhi::BindingSetItem::Sampler(smp.slot, sampler));
+    }
+
+    return s_reflectedListsCache.emplace(key, std::move(lists)).first->second;
+}
+
+}
+
+void BindingSetBuilder::InvalidateReflectionCache()
+{
+    s_reflectedListsCache.clear();
+}
+
 BindingSetBuilder::BindingSetBuilder(const ExtractedReflection& reflection, nvrhi::IDevice* device,
     const char*)
-    : m_device(device)
+    : m_lists(&GetOrBuildReflectedLists(&reflection, nullptr, device))
 {
-    CollectReflection(reflection);
+    m_desc.bindings.reserve(m_lists->srvs.size() + m_lists->uavs.size()
+        + m_lists->cbs.size() + m_lists->samplerItems.size());
 }
 
 BindingSetBuilder::BindingSetBuilder(
@@ -66,42 +110,38 @@ BindingSetBuilder::BindingSetBuilder(
     const ExtractedReflection& psReflection,
     nvrhi::IDevice* device,
     const char*)
-    : m_device(device)
+    : m_lists(&GetOrBuildReflectedLists(&vsReflection, &psReflection, device))
 {
-    CollectReflection(vsReflection);
-    CollectReflection(psReflection);
-    DeduplicateBySlotAndClass(m_srvs);
-    DeduplicateBySlotAndClass(m_uavs);
-    DeduplicateBySlotAndClass(m_cbs);
-    DeduplicateBySlotAndClass(m_samplers);
+    m_desc.bindings.reserve(m_lists->srvs.size() + m_lists->uavs.size()
+        + m_lists->cbs.size() + m_lists->samplerItems.size());
 }
 
 int BindingSetBuilder::FindSRVSlot(const char* name) const
 {
-    for (const auto& r : m_srvs)
+    for (const auto& r : m_lists->srvs)
         if (NameMatches(r.name, name)) return static_cast<int>(r.slot);
-    Msg("! [BindingSetBuilder] SRV '%s' not found in reflection (have %u SRVs)", name, m_srvs.size());
-    for (const auto& r : m_srvs)
+    Msg("! [BindingSetBuilder] SRV '%s' not found in reflection (have %u SRVs)", name, m_lists->srvs.size());
+    for (const auto& r : m_lists->srvs)
         Msg("    SRV: '%s' @ t%u", r.name ? r.name : "(null)", r.slot);
     return -1;
 }
 
 int BindingSetBuilder::FindUAVSlot(const char* name) const
 {
-    for (const auto& r : m_uavs)
+    for (const auto& r : m_lists->uavs)
         if (NameMatches(r.name, name)) return static_cast<int>(r.slot);
-    Msg("! [BindingSetBuilder] UAV '%s' not found in reflection (have %u UAVs)", name, m_uavs.size());
-    for (const auto& r : m_uavs)
+    Msg("! [BindingSetBuilder] UAV '%s' not found in reflection (have %u UAVs)", name, m_lists->uavs.size());
+    for (const auto& r : m_lists->uavs)
         Msg("    UAV: '%s' @ u%u", r.name ? r.name : "(null)", r.slot);
     return -1;
 }
 
 int BindingSetBuilder::FindCBSlot(const char* name) const
 {
-    for (const auto& r : m_cbs)
+    for (const auto& r : m_lists->cbs)
         if (NameMatches(r.name, name)) return static_cast<int>(r.slot);
-    Msg("! [BindingSetBuilder] CB '%s' not found in reflection (have %u CBs)", name, m_cbs.size());
-    for (const auto& r : m_cbs)
+    Msg("! [BindingSetBuilder] CB '%s' not found in reflection (have %u CBs)", name, m_lists->cbs.size());
+    for (const auto& r : m_lists->cbs)
         Msg("    CB: '%s' @ b%u", r.name ? r.name : "(null)", r.slot);
     return -1;
 }
@@ -128,7 +168,7 @@ BindingSetBuilder& BindingSetBuilder::BufferSRV(const char* name, nvrhi::IBuffer
 {
     int slot = FindSRVSlot(name);
     if (slot >= 0) {
-        for (const auto& r : m_srvs) {
+        for (const auto& r : m_lists->srvs) {
             if (NameMatches(r.name, name)) {
                 if (r.layoutType == nvrhi::ResourceType::RawBuffer_SRV)
                     m_desc.bindings.push_back(nvrhi::BindingSetItem::RawBuffer_SRV(slot, buffer));
@@ -145,7 +185,7 @@ BindingSetBuilder& BindingSetBuilder::BufferUAV(const char* name, nvrhi::IBuffer
 {
     int slot = FindUAVSlot(name);
     if (slot >= 0) {
-        for (const auto& r : m_uavs) {
+        for (const auto& r : m_lists->uavs) {
             if (NameMatches(r.name, name)) {
                 if (r.layoutType == nvrhi::ResourceType::RawBuffer_UAV)
                     m_desc.bindings.push_back(nvrhi::BindingSetItem::RawBuffer_UAV(slot, buffer));
@@ -208,12 +248,8 @@ BindingSetBuilder& BindingSetBuilder::ConstantBufferSlot(u32 slot, nvrhi::IBuffe
 
 void BindingSetBuilder::AddSamplers()
 {
-    auto& cache = GetPassResourceCache();
-    for (const auto& smp : m_samplers) {
-        nvrhi::ISampler* sampler = cache.GetSamplerByName(smp.name, m_device);
-        if (sampler)
-            m_desc.bindings.push_back(nvrhi::BindingSetItem::Sampler(smp.slot, sampler));
-    }
+    for (const auto& item : m_lists->samplerItems)
+        m_desc.bindings.push_back(item);
 }
 
 static int GetBindingSetRegisterClass(nvrhi::ResourceType type)
@@ -252,7 +288,7 @@ nvrhi::BindingSetDesc BindingSetBuilder::Build()
             return a.slot < b.slot;
         });
 
-    return m_desc;
+    return std::move(m_desc);
 }
 
 }
