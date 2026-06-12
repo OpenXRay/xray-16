@@ -222,6 +222,44 @@ bool ONNXModelRunner::LoadModel(const char* model_path, bool use_gpu, const char
     // Try to enable GPU acceleration
     use_gpu_ = false;
     if (use_gpu) {
+#ifdef XR_PLATFORM_APPLE
+        bool shapes_pinned = false;
+        if (trt_profile_opt && trt_profile_opt[0]) {
+            u32 c = 0, h = 0, w = 0;
+            const char* dims = strchr(trt_profile_opt, ':');
+            if (dims && sscanf(dims + 1, "1x%ux%ux%u", &c, &h, &w) == 3) {
+                session_options.AddFreeDimensionOverrideByName("batch", 1);
+                session_options.AddFreeDimensionOverrideByName("height", h);
+                session_options.AddFreeDimensionOverrideByName("width", w);
+                shapes_pinned = true;
+            }
+
+            const char* comma = strchr(trt_profile_opt, ',');
+            const char* feat_dims = comma ? strchr(comma, ':') : nullptr;
+            u32 fh = 0, fw = 0;
+            if (feat_dims && sscanf(feat_dims + 1, "1x512x%ux%u", &fh, &fw) == 2) {
+                session_options.AddFreeDimensionOverrideByName("feat_height", fh);
+                session_options.AddFreeDimensionOverrideByName("feat_width", fw);
+            }
+        }
+
+        try {
+            std::unordered_map<std::string, std::string> coreml_opts;
+            coreml_opts["ModelFormat"] = "MLProgram";
+            coreml_opts["MLComputeUnits"] = "ALL";
+            coreml_opts["RequireStaticInputShapes"] = "1";
+            if (trt_cache_path && trt_cache_path[0]) {
+                coreml_opts["ModelCacheDirectory"] = trt_cache_path;
+            }
+            session_options.AppendExecutionProvider("CoreML", coreml_opts);
+            Msg("[ONNXModelRunner] CoreML acceleration enabled (GPU/ANE, shapes %s)",
+                shapes_pinned ? "pinned" : "dynamic - CPU fallback for dynamic subgraphs");
+            use_gpu_ = true;
+        }
+        catch (const Ort::Exception& e) {
+            Msg("! [ONNXModelRunner] CoreML provider unavailable, falling back to CPU: %s", e.what());
+        }
+#else
         // Use TensorRT V2 API for NVIDIA GPUs (has advanced options like build logging)
         Ort::TensorRTProviderOptions trt_options{};
 
@@ -259,12 +297,46 @@ bool ONNXModelRunner::LoadModel(const char* model_path, bool use_gpu, const char
         session_options.AppendExecutionProvider_TensorRT_V2(*trt_options);
         Msg("[ONNXModelRunner] TensorRT V2 GPU acceleration enabled (FP16, profile shapes constrained)");
         use_gpu_ = true;
+#endif
     }
 
-    // Load model - convert to wide string for ONNX Runtime
-    std::string str_path(model_path);
-    std::wstring wide_path(str_path.begin(), str_path.end());
-    session_ = std::make_unique<Ort::Session>(*env_, wide_path.c_str(), session_options);
+    auto create_session = [&](Ort::SessionOptions& options) {
+#ifdef XR_PLATFORM_WINDOWS
+        // ONNX Runtime expects wide-string paths on Windows
+        std::string str_path(model_path);
+        std::wstring wide_path(str_path.begin(), str_path.end());
+        session_ = std::make_unique<Ort::Session>(*env_, wide_path.c_str(), options);
+#else
+        session_ = std::make_unique<Ort::Session>(*env_, model_path, options);
+#endif
+    };
+
+    try {
+        create_session(session_options);
+    }
+    catch (const Ort::Exception& e) {
+        if (!use_gpu_) {
+            Msg("! [ONNXModelRunner] Session creation failed: %s", e.what());
+            return false;
+        }
+
+        Msg("! [ONNXModelRunner] GPU session creation failed, retrying CPU-only: %s", e.what());
+        use_gpu_ = false;
+
+        Ort::SessionOptions cpu_options;
+        cpu_options.SetIntraOpNumThreads(std::thread::hardware_concurrency());
+        cpu_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
+        cpu_options.SetLogSeverityLevel(1);
+        cpu_options.SetExecutionMode(ExecutionMode::ORT_PARALLEL);
+
+        try {
+            create_session(cpu_options);
+        }
+        catch (const Ort::Exception& e2) {
+            Msg("! [ONNXModelRunner] CPU session creation failed: %s", e2.what());
+            return false;
+        }
+    }
 
     // Create memory info
     memory_info_ = std::make_unique<Ort::MemoryInfo>(
@@ -775,6 +847,10 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
     FS.update_path(metallic_path, "$game_data$", (config.model_dir + "\\unet_metallic.onnx").c_str());
     FS.update_path(roughness_path, "$game_data$", (config.model_dir + "\\unet_roughness.onnx").c_str());
 
+    char* const model_paths[] = { seg_path, albedo_path, albedo_uncond_path, parallax_path, ao_path, metallic_path, roughness_path };
+    for (char* p : model_paths)
+        convert_path_separators(p);
+
     bool all_exist = true;
     all_exist &= FS.exist(seg_path, FSType::External);
     all_exist &= FS.exist(albedo_path, FSType::External);
@@ -799,6 +875,7 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
 
     string_path cache_path;
     FS.update_path(cache_path, "$game_data$", (config.model_dir + "\\trt_cache").c_str());
+    convert_path_separators(cache_path);
     trt_cache_path_ = cache_path;
     Msg("[PBRPipeline] TensorRT cache path: %s", trt_cache_path_.c_str());
 
@@ -824,6 +901,7 @@ static std::string TRT_ProfileWithFeatures(const char* input_name, u32 channels,
 
 static void FormatResCachePath(char* buf, size_t bufSize, const char* trt_cache_path, u32 W, u32 H) {
     xr_sprintf(buf, bufSize, "%s\\%ux%u", trt_cache_path, W, H);
+    convert_path_separators(buf);
     std::filesystem::create_directories(buf);
 }
 
@@ -1472,6 +1550,10 @@ PBRPipelineOutputs PBRPipeline::Process(const u8* diffuse, const u8* normal, u32
 void PBRPipeline::WarmupTRTEngines(const xr_vector<std::pair<u32, u32>>& dimensions) {
     if (!initialized_) return;
     if (dimensions.empty()) return;
+#ifdef XR_PLATFORM_APPLE
+    Msg("[PBRPipeline] TRT warmup skipped (CoreML/CPU provider)");
+    return;
+#endif
 
     struct ModelInfo {
         const char* name;

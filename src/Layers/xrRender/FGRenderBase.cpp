@@ -261,7 +261,6 @@ void FGRenderBase::ConvertLegacyAssetsToPBR()
 
     m_pbrConversionThread = std::thread([this]
     {
-        ConversionProgress::Get().BeginJob();
         ConvertLegacyAssetsToPBRImpl();
         ConversionProgress::Get().EndJob();
     });
@@ -274,9 +273,6 @@ void FGRenderBase::RenderPBRConversionUI()
 
 void FGRenderBase::ConvertLegacyAssetsToPBRImpl()
 {
-    auto& progress = ConversionProgress::Get();
-    progress.BeginPhase("Scanning textures", 0);
-
     TextureScanConfig scanConfig;
     scanConfig.texture_roots = {"$game_textures$"};
     scanConfig.recursive = true;
@@ -291,12 +287,12 @@ void FGRenderBase::ConvertLegacyAssetsToPBRImpl()
     params.default_roughness = 0.5f;
     params.default_ao = 1.0f;
 
-    progress.BeginPhase("Verifying converted textures", 0);
     bool needsConversion = !VerifyPBROutputs(inventory, params);
 
     if (needsConversion)
     {
         Msg("~ [PBR] Starting texture conversion (outputs missing)...");
+        ConversionProgress::Get().BeginJob();
 
         PBRConversionStats stats;
         bool success = ConvertTexturesToPBR(inventory, params, stats, nullptr);

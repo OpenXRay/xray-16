@@ -21,6 +21,10 @@ Flags:
                     Prefers VS 2026 (v18) when installed, falls back to VS 2022 (v17).
                     Build dir: cmake_builds/vs_<config>[_x86]. Open <dir>/xray.sln in VS.
   --arch x64|x86    Target architecture, default x64. x86 requires --vs.
+  --ai-pbr          Enable the AI PBR texture converter (-DXRAY_USE_AI_PBR=ON).
+                    Needs ONNX Runtime: Externals/onnxruntime/vs_build/Release
+                    on Windows, or e.g. 'brew install onnxruntime' on macOS
+                    (XRAY_ONNXRUNTIME_ROOT overrides the search path).
 
 Build dir: cmake_builds/<config-lowercased>[_x86]  (or cmake_builds/vs_<config>[_x86] with --vs)
 USAGE
@@ -29,6 +33,7 @@ USAGE
 
 CONFIG_INPUT=""
 USE_VS=0
+USE_AI_PBR=0
 ARCH="x64"
 expect_arch=0
 for arg in "$@"; do
@@ -37,6 +42,7 @@ for arg in "$@"; do
     fi
     case "$arg" in
         --vs) USE_VS=1 ;;
+        --ai-pbr) USE_AI_PBR=1 ;;
         --arch) expect_arch=1 ;;
         --arch=*) ARCH="${arg#--arch=}" ;;
         -h|--help|help) usage ;;
@@ -62,6 +68,9 @@ esac
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
+
+AI_PBR_ARG=""
+[[ $USE_AI_PBR -eq 1 ]] && AI_PBR_ARG="-DXRAY_USE_AI_PBR=ON"
 
 arch_suffix=""
 [[ "$ARCH" == "x86" ]] && arch_suffix="_x86"
@@ -196,7 +205,7 @@ call "${vcvars64_win}" >nul
 if errorlevel 1 exit /b 1
 cmake -G "${vs_generator}" -A ${vs_arch} ^
     -S "${repo_win}" ^
-    -B "${build_dir_win}"
+    -B "${build_dir_win}" ${AI_PBR_ARG}
 exit /b %ERRORLEVEL%
 CMDEOF
     else
@@ -215,7 +224,7 @@ cmake -G Ninja ^
     -B "${build_dir_win}" ^
     -DCMAKE_BUILD_TYPE=${CONFIG} ^
     -DCMAKE_C_COMPILER="${clang_win}" ^
-    -DCMAKE_CXX_COMPILER="${clangxx_win}"
+    -DCMAKE_CXX_COMPILER="${clangxx_win}" ${AI_PBR_ARG}
 exit /b %ERRORLEVEL%
 CMDEOF
     fi
@@ -238,7 +247,8 @@ configure_native() {
     cmake -G Ninja \
         -S "$SCRIPT_DIR" \
         -B "$BUILD_DIR" \
-        -DCMAKE_BUILD_TYPE="$CONFIG"
+        -DCMAKE_BUILD_TYPE="$CONFIG" \
+        $AI_PBR_ARG
 }
 
 if [[ $USE_VS -eq 1 && "$PLATFORM" != "wsl" && "$PLATFORM" != "windows" ]]; then

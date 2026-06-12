@@ -1107,8 +1107,11 @@ FileStatus CLocatorAPI::exist(pcstr fn, FSType fsType /*= FSType::Virtual*/)
     }
     if ((fsType | FSType::External) == FSType::External)
     {
+        string_path conv_fn;
+        xr_strcpy(conv_fn, fn);
+        convert_path_separators(conv_fn);
         struct stat buffer;
-        return FileStatus(stat(fn, &buffer) == 0, true);
+        return FileStatus(stat(conv_fn, &buffer) == 0, true);
     }
     return FileStatus(false, false);
 }
