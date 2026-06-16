@@ -249,8 +249,10 @@ public:
     };
 
     DetailCullingStats cullingStats;
-    nvrhi::BufferHandle statsReadbackBuffer;
-    bool statsReadbackPending = false;
+    static constexpr u32 STATS_READBACK_SLOTS = 6;
+    nvrhi::BufferHandle statsReadbackBuffers[STATS_READBACK_SLOTS];
+    u32 statsWriteSlot = 0;
+    u32 statsScheduled = 0;
     u32 statsFrameCounter = 0;
 
     nvrhi::SamplerHandle cachedSmp_LinearWrap;

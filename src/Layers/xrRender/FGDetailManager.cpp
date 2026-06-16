@@ -1152,6 +1152,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
+    for (u32 slot = 0; slot < STATS_READBACK_SLOTS; ++slot)
     {
         nvrhi::BufferDesc desc;
         desc.byteSize = sizeof(u32) * 6;
@@ -1159,8 +1160,8 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
         desc.keepInitialState = true;
-        statsReadbackBuffer = device->createBuffer(desc);
-        if (!statsReadbackBuffer)
+        statsReadbackBuffers[slot] = device->createBuffer(desc);
+        if (!statsReadbackBuffers[slot])
         {
             Msg("! [FGDetailManager] Failed to create stats readback buffer");
             return false;
@@ -1376,8 +1377,10 @@ void FGDetailManager::DestroyGPUBuffers()
     perlin4dPipeline = nullptr;
     perlin4dCB = fg::BufferHandle();
 
-    statsReadbackBuffer = nullptr;
-    statsReadbackPending = false;
+    for (u32 i = 0; i < STATS_READBACK_SLOTS; ++i)
+        statsReadbackBuffers[i] = nullptr;
+    statsWriteSlot = 0;
+    statsScheduled = 0;
 
     cachedSmp_LinearWrap = nullptr;
     cachedSmp_PointClamp = nullptr;
@@ -2372,8 +2375,10 @@ void FGDetailManager::DispatchCulling(
 
 void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device)
 {
-    if (!device || !cmdList || !statsReadbackBuffer)
+    if (!device || !cmdList || !statsReadbackBuffers[statsWriteSlot])
         return;
+
+    nvrhi::IBuffer* slot = statsReadbackBuffers[statsWriteSlot];
 
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::CopySource);
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
@@ -2383,13 +2388,13 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
     if (billboardDrawArgsBuffer)
         cmdList->setBufferState(billboardDrawArgsBuffer, nvrhi::ResourceStates::CopySource);
 
-    cmdList->copyBuffer(statsReadbackBuffer, 0, visibleSlotCounterBuffer, 0, sizeof(u32));
+    cmdList->copyBuffer(slot, 0, visibleSlotCounterBuffer, 0, sizeof(u32));
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
         if (drawArgsBuffer[lod])
         {
             cmdList->copyBuffer(
-                statsReadbackBuffer, sizeof(u32) * (1 + lod),
+                slot, sizeof(u32) * (1 + lod),
                 drawArgsBuffer[lod], sizeof(u32),
                 sizeof(u32)
             );
@@ -2398,7 +2403,7 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
     if (decalDrawArgsBuffer)
     {
         cmdList->copyBuffer(
-            statsReadbackBuffer, sizeof(u32) * 4,
+            slot, sizeof(u32) * 4,
             decalDrawArgsBuffer, sizeof(u32),
             sizeof(u32)
         );
@@ -2406,18 +2411,20 @@ void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi:
     if (billboardDrawArgsBuffer)
     {
         cmdList->copyBuffer(
-            statsReadbackBuffer, sizeof(u32) * 5,
+            slot, sizeof(u32) * 5,
             billboardDrawArgsBuffer, sizeof(u32),
             sizeof(u32)
         );
     }
 
-    statsReadbackPending = true;
+    statsWriteSlot = (statsWriteSlot + 1) % STATS_READBACK_SLOTS;
+    if (statsScheduled < STATS_READBACK_SLOTS)
+        ++statsScheduled;
 }
 
 void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
 {
-    if (!statsReadbackPending || !statsReadbackBuffer || !device)
+    if (statsScheduled < STATS_READBACK_SLOTS || !device)
         return;
 
     statsFrameCounter++;
@@ -2425,7 +2432,8 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
     if ((statsFrameCounter % throttleInterval) != 0)
         return;
 
-    void* mappedData = device->mapBuffer(statsReadbackBuffer, nvrhi::CpuAccessMode::Read);
+    nvrhi::IBuffer* oldest = statsReadbackBuffers[statsWriteSlot];
+    void* mappedData = device->mapBuffer(oldest, nvrhi::CpuAccessMode::Read);
     if (mappedData)
     {
         const u32* counts = static_cast<const u32*>(mappedData);
@@ -2435,10 +2443,8 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
         cullingStats.visibleLOD2Count = counts[3];
         cullingStats.visibleDecalCount = counts[4];
         cullingStats.visibleBillboardCount = counts[5];
-        device->unmapBuffer(statsReadbackBuffer);
+        device->unmapBuffer(oldest);
     }
-
-    statsReadbackPending = false;
 }
 
 void FGDetailManager::BuildDetailModelGPUData()

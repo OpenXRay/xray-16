@@ -106,8 +106,10 @@ void ClusteredLightManager::Shutdown()
     m_lightIndexCounterBuffer = nullptr;
     m_visibleLightIndicesBuffer = nullptr;
     m_visibleLightCountBuffer = nullptr;
-    m_statsReadbackBuffer = nullptr;
-    m_statsReadbackPending = false;
+    for (u32 i = 0; i < STATS_READBACK_SLOTS; ++i)
+        m_statsReadbackBuffers[i] = nullptr;
+    m_statsWriteSlot = 0;
+    m_statsScheduled = 0;
     m_visibleLightCountCPU = 0;
     m_lightsCPU.clear();
     m_spotTextureCache.clear();
@@ -325,14 +327,15 @@ ClusterCB ClusteredLightManager::BuildClusterCB(u32 screenWidth, u32 screenHeigh
 
 void ClusteredLightManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
 {
-    if (!m_visibleLightCountBuffer || !m_device || m_statsReadbackPending)
+    if (!m_visibleLightCountBuffer || !m_device)
         return;
 
     m_statsFrameCounter++;
     if ((m_statsFrameCounter % 30) != 0)
         return;
 
-    if (!m_statsReadbackBuffer)
+    nvrhi::BufferHandle& slot = m_statsReadbackBuffers[m_statsWriteSlot];
+    if (!slot)
     {
         nvrhi::BufferDesc desc;
         desc.byteSize = sizeof(u32);
@@ -340,28 +343,29 @@ void ClusteredLightManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
         desc.keepInitialState = true;
-        m_statsReadbackBuffer = m_device->createBuffer(desc);
-        if (!m_statsReadbackBuffer)
+        slot = m_device->createBuffer(desc);
+        if (!slot)
             return;
     }
 
-    cmdList->copyBuffer(m_statsReadbackBuffer, 0, m_visibleLightCountBuffer, 0, sizeof(u32));
-    m_statsReadbackPending = true;
+    cmdList->copyBuffer(slot, 0, m_visibleLightCountBuffer, 0, sizeof(u32));
+    m_statsWriteSlot = (m_statsWriteSlot + 1) % STATS_READBACK_SLOTS;
+    if (m_statsScheduled < STATS_READBACK_SLOTS)
+        ++m_statsScheduled;
 }
 
 void ClusteredLightManager::ProcessStatsReadback()
 {
-    if (!m_statsReadbackPending || !m_statsReadbackBuffer || !m_device)
+    if (m_statsScheduled < STATS_READBACK_SLOTS || !m_device)
         return;
 
-    void* mappedData = m_device->mapBuffer(m_statsReadbackBuffer, nvrhi::CpuAccessMode::Read);
+    nvrhi::IBuffer* oldest = m_statsReadbackBuffers[m_statsWriteSlot];
+    void* mappedData = m_device->mapBuffer(oldest, nvrhi::CpuAccessMode::Read);
     if (mappedData)
     {
         m_visibleLightCountCPU = *static_cast<const u32*>(mappedData);
-        m_device->unmapBuffer(m_statsReadbackBuffer);
+        m_device->unmapBuffer(oldest);
     }
-
-    m_statsReadbackPending = false;
 }
 
 u32 ClusteredLightManager::GetOrLoadSpotTexture(const shared_str& name)

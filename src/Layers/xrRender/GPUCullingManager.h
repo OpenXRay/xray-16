@@ -632,7 +632,7 @@ private:
     // Double-buffer for async readback (no fence, trust GPU pipelining)
     // By frame N, frame N-2's GPU work is guaranteed complete
     // This gives n-2 latency (1 frame fresher than original n-3)
-    static constexpr u32 SKINNED_READBACK_FRAMES = 2;  // Double-buffer
+    static constexpr u32 SKINNED_READBACK_FRAMES = 6;
     nvrhi::BufferHandle m_skinnedReadbackBuffers[SKINNED_READBACK_FRAMES];
     u32 m_skinnedReadbackWriteIndex = 0;   // Which buffer to write to next
     u32 m_skinnedReadbackFrameCount = 0;   // Frames accumulated (0, 1, or 2)
@@ -712,9 +712,11 @@ private:
     // ───────────────────────────────────────────────────────
     //  STATS READBACK (for profiling)
     // ───────────────────────────────────────────────────────
-    nvrhi::BufferHandle m_statsReadbackBuffer;  // CPU-readable staging buffer
+    static constexpr u32 STATS_READBACK_SLOTS = 6;
+    nvrhi::BufferHandle m_statsReadbackBuffers[STATS_READBACK_SLOTS];
     CullingStats m_cullingStats;                 // Previous frame's stats
-    bool m_statsReadbackPending = false;
+    u32 m_statsWriteSlot = 0;
+    u32 m_statsScheduled = 0;
 
 public:
     // ───────────────────────────────────────────────────────
