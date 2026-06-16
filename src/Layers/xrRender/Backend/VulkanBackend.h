@@ -4,6 +4,12 @@
 #include <nvrhi/nvrhi.h>
 #include <vulkan/vulkan.h>
 
+#include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+
 struct SDL_Window;
 
 class VulkanBackend : public IRenderBackend {
@@ -22,7 +28,7 @@ public:
     DeviceState GetDeviceState() const override;
 
     nvrhi::IDevice* GetDevice() const override { return m_nvrhiDevice.Get(); }
-    nvrhi::ICommandList* GetCommandList() const override { return m_commandList.Get(); }
+    nvrhi::ICommandList* GetCommandList() const override { return m_commandLists[m_recordSlot].Get(); }
     nvrhi::ICommandList* CreateCommandList() override;
 
     bool HasAsyncCompute() const override { return m_computeCommandList != nullptr; }
@@ -46,6 +52,7 @@ public:
     void BeginFrame() override;
     void EndFrame() override;
     bool IsInFrame() const override { return m_inFrame; }
+    bool GetSubmitThreadTimings(SubmitThreadTimings& out) const override;
 
     const Capabilities& GetCapabilities() const override { return m_capabilities; }
     Capabilities& GetMutableCapabilities() override { return m_capabilities; }
@@ -60,7 +67,7 @@ public:
     void SetMarker(pcstr name) override;
 
 private:
-    static constexpr u32 BACK_BUFFER_COUNT = 2;
+    static constexpr u32 BACK_BUFFER_COUNT = 3;
     static constexpr u32 MAX_BINDLESS_TEXTURES = 65536;
 
     bool CreateInstance(SDL_Window* window, bool enableValidation);
@@ -92,7 +99,8 @@ private:
 
     nvrhi::DeviceHandle m_nvrhiDevice;
     nvrhi::DeviceHandle m_nvrhiVulkanDevice;
-    nvrhi::CommandListHandle m_commandList;
+    nvrhi::CommandListHandle m_commandLists[2];
+    u32 m_recordSlot = 0;
     nvrhi::CommandListHandle m_computeCommandList;
     nvrhi::CommandListHandle m_uploadCommandList;
     xr_vector<VkImage> m_swapchainImages;
@@ -115,5 +123,39 @@ private:
     VkFormat m_swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
 
     Task* m_gcTask = nullptr;
-    u64 m_lastGraphicsInstanceID = 0;
+    std::atomic<u64> m_lastGraphicsInstanceID{ 0 };
+
+    struct SubmitJob {
+        nvrhi::ICommandList* cl = nullptr;
+        VkSemaphore imageAvailable = VK_NULL_HANDLE;
+        VkSemaphore renderFinished = VK_NULL_HANDLE;
+        VkFence fence = VK_NULL_HANDLE;
+        u32 imageIndex = 0;
+        u32 slot = 0;
+        std::chrono::steady_clock::time_point enqueueTime;
+    };
+
+    bool m_asyncSubmit = false;
+    std::thread m_submitThread;
+    std::mutex m_submitMutex;
+    std::condition_variable m_submitCv;
+    std::condition_variable m_submitDoneCv;
+    SubmitJob m_pendingJob;
+    bool m_jobQueued = false;
+    bool m_submitRun = false;
+    bool m_slotInFlight[2] = {};
+    std::mutex m_queueMutex;
+    std::mutex m_swapchainMutex;
+
+    std::atomic<u64> m_stJobLatencyUs{0};
+    std::atomic<u64> m_stQueueLockUs{0};
+    std::atomic<u64> m_stSemWaitUs{0};
+    std::atomic<u64> m_stEncodeUs{0};
+    std::atomic<u64> m_stPresentLockUs{0};
+    std::atomic<u64> m_stPresentUs{0};
+    std::atomic<u64> m_stFenceUs{0};
+    std::atomic<u64> m_stGcUs{0};
+
+    void SubmitThreadMain();
+    void FlushSubmits();
 };

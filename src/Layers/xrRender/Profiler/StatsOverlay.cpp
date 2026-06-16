@@ -3,9 +3,24 @@
 #include "xrCore/Profiler/Profiler.h"
 #include "xrCore/MemoryStats.h"
 #include "xrEngine/Device.h"
+#include "xrEngine/IRenderBackend.h"
 #include <imgui.h>
 #include <algorithm>
 #include <cstring>
+
+static bool FormatSubmitThreadLine(char* buf, size_t size)
+{
+    IRenderBackend::SubmitThreadTimings t;
+    if (!GEnv.Backend || !GEnv.Backend->GetSubmitThreadTimings(t))
+        return false;
+    xr_sprintf(buf, size,
+        "SubmitThread (us): latency %llu | qlock %llu | semWait %llu | encode %llu | plock %llu | present %llu | fence %llu | gc %llu",
+        (unsigned long long)t.jobLatencyUs, (unsigned long long)t.queueLockUs,
+        (unsigned long long)t.semWaitUs, (unsigned long long)t.encodeUs,
+        (unsigned long long)t.presentLockUs, (unsigned long long)t.presentUs,
+        (unsigned long long)t.fenceUs, (unsigned long long)t.gcUs);
+    return true;
+}
 
 namespace xray::profiler
 {
@@ -181,6 +196,9 @@ void StatsOverlay::RenderCPUSection()
         else
         {
             ImGui::Text("Total: %s", FormatTime(frameTime));
+            char submitLine[320];
+            if (FormatSubmitThreadLine(submitLine, sizeof(submitLine)))
+                ImGui::TextDisabled("%s", submitLine);
             ImGui::Indent();
 
             for (u32 rootId : rootZones)

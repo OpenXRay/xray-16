@@ -88,6 +88,18 @@ public:
     virtual void EndFrame() = 0;
     virtual bool IsInFrame() const { return false; }  // True between BeginFrame/EndFrame
 
+    struct SubmitThreadTimings {
+        u64 jobLatencyUs;
+        u64 queueLockUs;
+        u64 semWaitUs;
+        u64 encodeUs;
+        u64 presentLockUs;
+        u64 presentUs;
+        u64 fenceUs;
+        u64 gcUs;
+    };
+    virtual bool GetSubmitThreadTimings(SubmitThreadTimings& out) const { return false; }
+
     // ═══════ Capabilities ═══════
     struct Capabilities {
         // Modern features

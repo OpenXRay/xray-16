@@ -328,6 +328,7 @@ public:
     RenderDevice* GetDevice() const { return m_device; }
 
     void SetOverrideCommandList(nvrhi::ICommandList* cmdList) { m_overrideCommandList = cmdList; }
+    void SetCommandList(nvrhi::CommandListHandle commandList) { m_commandList = commandList; }
 
 private:
     RenderDevice* m_device;  // Our abstraction layer device

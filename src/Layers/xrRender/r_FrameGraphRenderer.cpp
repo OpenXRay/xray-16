@@ -474,6 +474,7 @@ void FrameGraphRenderer::Render() {
     // ═══════════════════════════════════════════════════════
     //  COMPILE & EXECUTE
     // ═══════════════════════════════════════════════════════
+    m_renderContext->SetCommandList(GEnv.Backend->GetCommandList());
     m_framegraph->SetRenderContext(m_renderContext.get());
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
     
@@ -637,6 +638,7 @@ void FrameGraphRenderer::RenderMenu() {
 
     m_finalOutput = finalOutput;
 
+    m_renderContext->SetCommandList(GEnv.Backend->GetCommandList());
     m_framegraph->SetRenderContext(m_renderContext.get());
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
     m_framegraph->SetAsyncCompute(nullptr, nullptr);

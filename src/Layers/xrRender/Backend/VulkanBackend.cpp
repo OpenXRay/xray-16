@@ -141,11 +141,20 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
 
     nvrhi::CommandListParameters cmdParams;
     cmdParams.enableImmediateExecution = false;
-    m_commandList = m_nvrhiDevice->createCommandList(cmdParams);
-    if (!m_commandList) {
-        Msg("! [VulkanBackend] Failed to create command list");
-        Shutdown();
-        return false;
+    for (u32 i = 0; i < 2; ++i) {
+        m_commandLists[i] = m_nvrhiDevice->createCommandList(cmdParams);
+        if (!m_commandLists[i]) {
+            Msg("! [VulkanBackend] Failed to create command list");
+            Shutdown();
+            return false;
+        }
+    }
+
+    m_asyncSubmit = strstr(Core.Params, "-async_submit") != nullptr;
+    if (m_asyncSubmit) {
+        m_submitRun = true;
+        m_submitThread = std::thread([this] { SubmitThreadMain(); });
+        Msg("* [VulkanBackend] async submit thread enabled (-async_submit)");
     }
 
     m_uploadCommandList = m_nvrhiDevice->createCommandList(cmdParams);
@@ -185,11 +194,21 @@ void VulkanBackend::Shutdown() {
     Msg("* [VulkanBackend] Shutting down...");
     WaitForIdle();
 
+    if (m_submitThread.joinable()) {
+        {
+            std::lock_guard<std::mutex> lk(m_submitMutex);
+            m_submitRun = false;
+        }
+        m_submitCv.notify_one();
+        m_submitThread.join();
+    }
+
     m_bindlessDescriptorTable = nullptr;
     m_bindlessLayout = nullptr;
     for (auto& bb : m_backBuffers)
         bb = nullptr;
-    m_commandList = nullptr;
+    m_commandLists[0] = nullptr;
+    m_commandLists[1] = nullptr;
     m_computeCommandList = nullptr;
     m_uploadCommandList = nullptr;
 
@@ -777,7 +796,12 @@ nvrhi::ITexture* VulkanBackend::GetBackBuffer() {
 }
 
 void VulkanBackend::Present(bool vsync) {
+    if (m_asyncSubmit)
+        return;
+
     ZoneScopedN("VulkanBackend::Present");
+
+    std::scoped_lock sc(m_swapchainMutex, m_queueMutex);
 
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -819,27 +843,39 @@ void VulkanBackend::BeginFrame() {
         m_gcTask = nullptr;
     }
 
+    if (m_asyncSubmit) {
+        ZoneScopedN("VK::WaitSubmitSlot");
+        std::unique_lock<std::mutex> lk(m_submitMutex);
+        m_submitDoneCv.wait(lk, [&] { return !m_slotInFlight[m_recordSlot]; });
+    }
+
     vkWaitForFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex], VK_TRUE, UINT64_MAX);
     vkResetFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex]);
 
-    VkResult result = vkAcquireNextImageKHR(
-        m_device, m_swapchain, UINT64_MAX,
-        m_imageAvailable[m_currentFrameIndex], VK_NULL_HANDLE,
-        &m_currentImageIndex);
+    VkResult result;
+    {
+        std::lock_guard<std::mutex> sc(m_swapchainMutex);
+        result = vkAcquireNextImageKHR(
+            m_device, m_swapchain, UINT64_MAX,
+            m_imageAvailable[m_currentFrameIndex], VK_NULL_HANDLE,
+            &m_currentImageIndex);
+    }
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         Msg("* [VulkanBackend] Swapchain out of date during acquire");
         return;
     }
 
-    auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
-    vkDevice->queueWaitForSemaphore(
-        nvrhi::CommandQueue::Graphics,
-        m_imageAvailable[m_currentFrameIndex], 0);
+    if (!m_asyncSubmit) {
+        auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+        vkDevice->queueWaitForSemaphore(
+            nvrhi::CommandQueue::Graphics,
+            m_imageAvailable[m_currentFrameIndex], 0);
+    }
 
     {
         ZoneScopedN("VK::CommandListOpen");
-        m_commandList->open();
+        m_commandLists[m_recordSlot]->open();
     }
     m_inFrame = true;
 }
@@ -849,19 +885,50 @@ void VulkanBackend::EndFrame() {
 
     m_inFrame = false;
 
-    auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
-    vkDevice->queueSignalSemaphore(
-        nvrhi::CommandQueue::Graphics,
-        m_renderFinished[m_currentFrameIndex], 0);
+    if (m_asyncSubmit) {
+        {
+            ZoneScopedN("VK::CommandListClose");
+            m_commandLists[m_recordSlot]->close();
+        }
 
-    {
-        ZoneScopedN("VK::CommandListClose");
-        m_commandList->close();
+        SubmitJob job;
+        job.cl = m_commandLists[m_recordSlot];
+        job.imageAvailable = m_imageAvailable[m_currentFrameIndex];
+        job.renderFinished = m_renderFinished[m_currentFrameIndex];
+        job.fence = m_inFlightFence[m_currentFrameIndex];
+        job.imageIndex = m_currentImageIndex;
+        job.slot = m_recordSlot;
+        job.enqueueTime = std::chrono::steady_clock::now();
+
+        {
+            std::lock_guard<std::mutex> lk(m_submitMutex);
+            m_pendingJob = job;
+            m_jobQueued = true;
+            m_slotInFlight[m_recordSlot] = true;
+        }
+        m_submitCv.notify_one();
+
+        m_recordSlot ^= 1;
+        m_currentFrameIndex = (m_currentFrameIndex + 1) % BACK_BUFFER_COUNT;
+        return;
     }
 
+    auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
     {
-        ZoneScopedN("VK::ExecuteCommandList");
-        m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(m_commandList);
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        vkDevice->queueSignalSemaphore(
+            nvrhi::CommandQueue::Graphics,
+            m_renderFinished[m_currentFrameIndex], 0);
+
+        {
+            ZoneScopedN("VK::CommandListClose");
+            m_commandLists[m_recordSlot]->close();
+        }
+
+        {
+            ZoneScopedN("VK::ExecuteCommandList");
+            m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(m_commandLists[m_recordSlot]);
+        }
     }
 
     nvrhi::IDevice* device = m_nvrhiDevice;
@@ -870,7 +937,110 @@ void VulkanBackend::EndFrame() {
     });
 }
 
+void VulkanBackend::SubmitThreadMain() {
+    using Clock = std::chrono::steady_clock;
+    auto usBetween = [](Clock::time_point a, Clock::time_point b) -> u64 {
+        return static_cast<u64>(std::chrono::duration_cast<std::chrono::microseconds>(b - a).count());
+    };
+
+    for (;;) {
+        SubmitJob job;
+        {
+            std::unique_lock<std::mutex> lk(m_submitMutex);
+            m_submitCv.wait(lk, [&] { return m_jobQueued || !m_submitRun; });
+            if (!m_submitRun && !m_jobQueued)
+                return;
+            job = m_pendingJob;
+            m_jobQueued = false;
+        }
+
+        const auto tDequeue = Clock::now();
+        m_stJobLatencyUs.store(usBetween(job.enqueueTime, tDequeue), std::memory_order_relaxed);
+
+        auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+        {
+            std::lock_guard<std::mutex> qk(m_queueMutex);
+            const auto tLocked = Clock::now();
+            m_stQueueLockUs.store(usBetween(tDequeue, tLocked), std::memory_order_relaxed);
+
+            vkDevice->queueWaitForSemaphore(nvrhi::CommandQueue::Graphics, job.imageAvailable, 0);
+            vkDevice->queueSignalSemaphore(nvrhi::CommandQueue::Graphics, job.renderFinished, 0);
+            const auto tSem = Clock::now();
+            m_stSemWaitUs.store(usBetween(tLocked, tSem), std::memory_order_relaxed);
+
+            {
+                ZoneScopedN("VK::ExecuteCommandList");
+                m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(job.cl);
+            }
+            m_stEncodeUs.store(usBetween(tSem, Clock::now()), std::memory_order_relaxed);
+        }
+
+        {
+            std::lock_guard<std::mutex> lk(m_submitMutex);
+            m_slotInFlight[job.slot] = false;
+        }
+        m_submitDoneCv.notify_all();
+
+        {
+            ZoneScopedN("VulkanBackend::Present");
+            const auto tPre = Clock::now();
+            std::scoped_lock sc(m_swapchainMutex, m_queueMutex);
+            const auto tPresentLocked = Clock::now();
+            m_stPresentLockUs.store(usBetween(tPre, tPresentLocked), std::memory_order_relaxed);
+
+            VkPresentInfoKHR presentInfo = {};
+            presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+            presentInfo.waitSemaphoreCount = 1;
+            presentInfo.pWaitSemaphores = &job.renderFinished;
+            presentInfo.swapchainCount = 1;
+            presentInfo.pSwapchains = &m_swapchain;
+            presentInfo.pImageIndices = &job.imageIndex;
+
+            VkResult result = vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
+            if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+                Msg("* [VulkanBackend] Swapchain out of date, resize needed");
+            }
+            const auto tPresented = Clock::now();
+            m_stPresentUs.store(usBetween(tPresentLocked, tPresented), std::memory_order_relaxed);
+
+            VkSubmitInfo fenceSubmit = {};
+            fenceSubmit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+            vkQueueSubmit(m_graphicsQueue, 1, &fenceSubmit, job.fence);
+            m_stFenceUs.store(usBetween(tPresented, Clock::now()), std::memory_order_relaxed);
+        }
+
+        {
+            ZoneScopedN("SubmitThread::GC");
+            const auto tGc = Clock::now();
+            m_nvrhiDevice->runGarbageCollection();
+            m_stGcUs.store(usBetween(tGc, Clock::now()), std::memory_order_relaxed);
+        }
+    }
+}
+
+bool VulkanBackend::GetSubmitThreadTimings(SubmitThreadTimings& out) const {
+    if (!m_asyncSubmit)
+        return false;
+    out.jobLatencyUs = m_stJobLatencyUs.load(std::memory_order_relaxed);
+    out.queueLockUs = m_stQueueLockUs.load(std::memory_order_relaxed);
+    out.semWaitUs = m_stSemWaitUs.load(std::memory_order_relaxed);
+    out.encodeUs = m_stEncodeUs.load(std::memory_order_relaxed);
+    out.presentLockUs = m_stPresentLockUs.load(std::memory_order_relaxed);
+    out.presentUs = m_stPresentUs.load(std::memory_order_relaxed);
+    out.fenceUs = m_stFenceUs.load(std::memory_order_relaxed);
+    out.gcUs = m_stGcUs.load(std::memory_order_relaxed);
+    return true;
+}
+
+void VulkanBackend::FlushSubmits() {
+    if (!m_asyncSubmit)
+        return;
+    std::unique_lock<std::mutex> lk(m_submitMutex);
+    m_submitDoneCv.wait(lk, [&] { return !m_jobQueued && !m_slotInFlight[0] && !m_slotInFlight[1]; });
+}
+
 void VulkanBackend::WaitForIdle() {
+    FlushSubmits();
     if (m_gcTask) {
         TaskScheduler->Wait(*m_gcTask);
         m_gcTask = nullptr;
@@ -882,8 +1052,10 @@ void VulkanBackend::WaitForIdle() {
 }
 
 void VulkanBackend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
-    if (m_nvrhiDevice && commandList)
+    if (m_nvrhiDevice && commandList) {
+        std::lock_guard<std::mutex> qk(m_queueMutex);
         m_nvrhiDevice->executeCommandList(commandList);
+    }
 }
 
 u64 VulkanBackend::ExecuteComputeCommandList(nvrhi::ICommandList* commandList) {
@@ -916,7 +1088,7 @@ void VulkanBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, s
     if (!buffer || !data || size == 0) return;
 
     if (m_inFrame) {
-        m_commandList->writeBuffer(buffer, data, size);
+        m_commandLists[m_recordSlot]->writeBuffer(buffer, data, size);
     } else {
         m_nvrhiDevice->runGarbageCollection();
         m_uploadCommandList->open();
