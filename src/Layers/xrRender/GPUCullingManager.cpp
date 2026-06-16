@@ -1339,8 +1339,10 @@ void GPUCullingManager::Shutdown()
     m_objectCount = 0;
     m_particleCount = 0;
 
-    m_statsReadbackBuffer = nullptr;
-    m_statsReadbackPending = false;
+    for (u32 i = 0; i < STATS_READBACK_SLOTS; ++i)
+        m_statsReadbackBuffers[i] = nullptr;
+    m_statsWriteSlot = 0;
+    m_statsScheduled = 0;
     m_cullingStats = CullingStats();
 }
 
@@ -1353,7 +1355,8 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
     if (!nvDevice)
         return;
 
-    if (!m_statsReadbackBuffer)
+    nvrhi::BufferHandle& slot = m_statsReadbackBuffers[m_statsWriteSlot];
+    if (!slot)
     {
         nvrhi::BufferDesc desc;
         desc.byteSize = sizeof(u32) * 3;
@@ -1361,16 +1364,16 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
         desc.keepInitialState = true;
-        m_statsReadbackBuffer = nvDevice->createBuffer(desc);
+        slot = nvDevice->createBuffer(desc);
 
-        if (!m_statsReadbackBuffer)
+        if (!slot)
             return;
     }
 
     if (m_staticSet.compactCountBuffer)
     {
         cmdList->copyBuffer(
-            m_statsReadbackBuffer, 0,
+            slot, 0,
             m_staticSet.compactCountBuffer, 0,
             sizeof(u32)
         );
@@ -1379,7 +1382,7 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
     if (m_dynamicSet.compactCountBuffer)
     {
         cmdList->copyBuffer(
-            m_statsReadbackBuffer, sizeof(u32),
+            slot, sizeof(u32),
             m_dynamicSet.compactCountBuffer, 0,
             sizeof(u32)
         );
@@ -1388,18 +1391,20 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
     if (m_terrainCompactCountBuffer)
     {
         cmdList->copyBuffer(
-            m_statsReadbackBuffer, sizeof(u32) * 2,
+            slot, sizeof(u32) * 2,
             m_terrainCompactCountBuffer, 0,
             sizeof(u32)
         );
     }
 
-    m_statsReadbackPending = true;
+    m_statsWriteSlot = (m_statsWriteSlot + 1) % STATS_READBACK_SLOTS;
+    if (m_statsScheduled < STATS_READBACK_SLOTS)
+        ++m_statsScheduled;
 }
 
 void GPUCullingManager::ProcessStatsReadback()
 {
-    if (!m_statsReadbackPending || !m_statsReadbackBuffer || !m_device)
+    if (m_statsScheduled < STATS_READBACK_SLOTS || !m_device)
         return;
 
     static u32 frameCounter = 0;
@@ -1412,17 +1417,16 @@ void GPUCullingManager::ProcessStatsReadback()
     if (!nvDevice)
         return;
 
-    void* mappedData = nvDevice->mapBuffer(m_statsReadbackBuffer, nvrhi::CpuAccessMode::Read);
+    nvrhi::IBuffer* oldest = m_statsReadbackBuffers[m_statsWriteSlot];
+    void* mappedData = nvDevice->mapBuffer(oldest, nvrhi::CpuAccessMode::Read);
     if (mappedData)
     {
         const u32* counts = static_cast<const u32*>(mappedData);
         m_cullingStats.staticVisible = counts[0];
         m_cullingStats.dynamicVisible = counts[1];
         m_cullingStats.terrainVisible = counts[2];
-        nvDevice->unmapBuffer(m_statsReadbackBuffer);
+        nvDevice->unmapBuffer(oldest);
     }
-
-    m_statsReadbackPending = false;
 }
 
 void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const GeometryCollector* geometry)
@@ -1914,7 +1918,7 @@ void GPUCullingManager::ScheduleSkinnedVisibilityReadback(nvrhi::ICommandList* c
         }
     }
 
-    m_skinnedReadbackWriteIndex = 1 - m_skinnedReadbackWriteIndex;
+    m_skinnedReadbackWriteIndex = (m_skinnedReadbackWriteIndex + 1) % SKINNED_READBACK_FRAMES;
 
     if (m_skinnedReadbackFrameCount < SKINNED_READBACK_FRAMES) {
         m_skinnedReadbackFrameCount++;
@@ -1953,7 +1957,8 @@ void GPUCullingManager::UpdateSkinnedCullingStats(u32 rendered, u32 culled)
 
 u32 GPUCullingManager::GetSkinnedVisibilityByVisual(const dxRender_Visual* visual) const
 {
-    if (visual && visual->skinned_cull_frame == m_skinnedVisibilityFrame
+    if (visual && m_skinnedVisibilityFrame != 0
+        && visual->skinned_cull_frame >= m_skinnedVisibilityFrame
         && visual->skinned_cull_index < m_skinnedVisibilityValues.size()) {
         return m_skinnedVisibilityValues[visual->skinned_cull_index];
     }

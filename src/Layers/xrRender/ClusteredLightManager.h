@@ -100,8 +100,10 @@ private:
     nvrhi::BufferHandle m_lightIndexCounterBuffer;
     nvrhi::BufferHandle m_visibleLightIndicesBuffer;
     nvrhi::BufferHandle m_visibleLightCountBuffer;
-    nvrhi::BufferHandle m_statsReadbackBuffer;
-    bool m_statsReadbackPending = false;
+    static constexpr u32 STATS_READBACK_SLOTS = 6;
+    nvrhi::BufferHandle m_statsReadbackBuffers[STATS_READBACK_SLOTS];
+    u32 m_statsWriteSlot = 0;
+    u32 m_statsScheduled = 0;
     u32 m_visibleLightCountCPU = 0;
     u32 m_statsFrameCounter = 0;
 

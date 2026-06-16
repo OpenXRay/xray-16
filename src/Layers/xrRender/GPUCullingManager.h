@@ -493,7 +493,7 @@ private:
     nvrhi::BufferHandle m_skinnedObjectBuffer;
     nvrhi::BufferHandle m_skinnedVisibilityBuffer;
 
-    static constexpr u32 SKINNED_READBACK_FRAMES = 2;
+    static constexpr u32 SKINNED_READBACK_FRAMES = 6;
     nvrhi::BufferHandle m_skinnedReadbackBuffers[SKINNED_READBACK_FRAMES];
     u32 m_skinnedReadbackWriteIndex = 0;
     u32 m_skinnedReadbackFrameCount = 0;
@@ -555,9 +555,11 @@ private:
     xr_vector<VBPoolInfo> m_vbPoolsAlt;
     xr_vector<IBPoolInfo> m_ibPoolsAlt;
 
-    nvrhi::BufferHandle m_statsReadbackBuffer;
+    static constexpr u32 STATS_READBACK_SLOTS = 6;
+    nvrhi::BufferHandle m_statsReadbackBuffers[STATS_READBACK_SLOTS];
     CullingStats m_cullingStats;
-    bool m_statsReadbackPending = false;
+    u32 m_statsWriteSlot = 0;
+    u32 m_statsScheduled = 0;
 
 public:
 
