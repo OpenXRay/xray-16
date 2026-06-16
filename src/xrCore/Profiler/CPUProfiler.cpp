@@ -167,6 +167,8 @@ void CPUProfiler::EndZone(u32 zoneId, float elapsedMs,
         return;
 
     ZoneTiming& timing = m_zones[zoneId].timing;
+    if (timing.callCount == 0)
+        timing.callCount = 1;
     timing.totalTimeMs += elapsedMs;
     timing.allocCalls += allocCalls;
     timing.allocBytes += allocBytes;
