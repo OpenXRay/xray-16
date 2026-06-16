@@ -249,10 +249,12 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
     {
         // Tree node for zones with children
         bool open = ImGui::TreeNode(label);
-        if (memstats::BacktraceCaptureSupported() && ImGui::BeginPopupContextItem("zone_ctx"))
+        if (ImGui::BeginPopupContextItem("zone_ctx"))
         {
-            if (ImGui::MenuItem("Capture alloc backtraces"))
+            if (memstats::BacktraceCaptureSupported() && ImGui::MenuItem("Capture alloc backtraces"))
                 memstats::ArmBacktraceCapture(zoneId, zone.info->name);
+            if (ImGui::MenuItem("Copy tree to clipboard"))
+                CopyZoneTreeToClipboard();
             ImGui::EndPopup();
         }
         ImGui::SameLine();
@@ -284,10 +286,12 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
     {
         // Leaf node (no children)
         ImGui::BulletText("%s", label);
-        if (memstats::BacktraceCaptureSupported() && ImGui::BeginPopupContextItem("zone_ctx"))
+        if (ImGui::BeginPopupContextItem("zone_ctx"))
         {
-            if (ImGui::MenuItem("Capture alloc backtraces"))
+            if (memstats::BacktraceCaptureSupported() && ImGui::MenuItem("Capture alloc backtraces"))
                 memstats::ArmBacktraceCapture(zoneId, zone.info->name);
+            if (ImGui::MenuItem("Copy tree to clipboard"))
+                CopyZoneTreeToClipboard();
             ImGui::EndPopup();
         }
         ImGui::SameLine();
@@ -867,6 +871,74 @@ void StatsOverlay::RenderWallmarksSection()
 
     ImGui::Dummy(ImVec2(canvasW, canvasW));
     ImGui::TextDisabled("%d splat(s)  --  UV space [0,1]x[0,1]", (int)group.splats.size());
+}
+
+void StatsOverlay::AppendZoneText(xr_string& out, u32 zoneId, const xr_vector<ZoneData>& zones, int depth)
+{
+    if (zoneId >= zones.size())
+        return;
+
+    const ZoneData& zone = zones[zoneId];
+    if (!zone.info || zone.timing.callCount == 0)
+        return;
+
+    for (int i = 0; i < depth; ++i)
+        out += "  ";
+
+    char line[256];
+    if (zone.timing.callCount > 1)
+        xr_sprintf(line, sizeof(line), "%s x%u", zone.info->name, zone.timing.callCount);
+    else
+        xr_strcpy(line, sizeof(line), zone.info->name);
+    out += line;
+
+    if (!zone.childIds.empty())
+        xr_sprintf(line, sizeof(line), " %s (self: %s)",
+            FormatTime(zone.timing.totalTimeMs, 0), FormatTime(zone.timing.selfTimeMs, 1));
+    else
+        xr_sprintf(line, sizeof(line), " %s", FormatTime(zone.timing.totalTimeMs, 0));
+    out += line;
+
+    if (zone.timing.allocCalls > 0)
+    {
+        if (!zone.childIds.empty())
+            xr_sprintf(line, sizeof(line), "  %u alloc (%s), self %u",
+                (u32)zone.timing.allocCalls, FormatBytes(zone.timing.allocBytes, 2),
+                (u32)zone.timing.selfAllocCalls);
+        else
+            xr_sprintf(line, sizeof(line), "  %u alloc (%s)",
+                (u32)zone.timing.allocCalls, FormatBytes(zone.timing.allocBytes, 2));
+        out += line;
+    }
+    out += "\n";
+
+    for (u32 childId : zone.childIds)
+        AppendZoneText(out, childId, zones, depth + 1);
+}
+
+void StatsOverlay::CopyZoneTreeToClipboard()
+{
+    CPUProfiler& profiler = GetCPUProfiler();
+    const auto& zones = profiler.GetZones();
+
+    xr_string text;
+    text.reserve(16384);
+
+    char header[64];
+    xr_sprintf(header, sizeof(header), "Total: %s\n", FormatTime(profiler.GetFrameTimeMs(), 0));
+    text += header;
+
+    for (u32 rootId : profiler.GetRootZones())
+        AppendZoneText(text, rootId, zones, 0);
+
+    char submitLine[320];
+    if (FormatSubmitThreadLine(submitLine, sizeof(submitLine)))
+    {
+        text += submitLine;
+        text += "\n";
+    }
+
+    ImGui::SetClipboardText(text.c_str());
 }
 
 void StatsOverlay::RenderAllocationsSection()

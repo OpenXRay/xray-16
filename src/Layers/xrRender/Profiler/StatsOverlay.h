@@ -149,6 +149,8 @@ private:
     static u32 GetTimeColor(float ms, float parentMs);
     static const char* FormatNumber(u32 value);
     static const char* FormatBytes(u64 bytes, int slot = -1);
+    static void AppendZoneText(xr_string& out, u32 zoneId, const xr_vector<ZoneData>& zones, int depth);
+    static void CopyZoneTreeToClipboard();
 
 private:
     GPUProfiler* m_gpuProfiler = nullptr;

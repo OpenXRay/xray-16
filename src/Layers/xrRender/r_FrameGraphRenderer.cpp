@@ -842,16 +842,25 @@ void FrameGraphRenderer::SetupFrame() {
     const bool levelLoaded = g_pGamePersistent && g_pGameLevel;
 
     if (m_gpuCullingManager) {
-        m_gpuCullingManager->ProcessStatsReadback();
-        m_gpuCullingManager->ProcessSkinnedVisibilityReadback();
+        {
+            ZoneScopedN("Readback::CullStats");
+            m_gpuCullingManager->ProcessStatsReadback();
+        }
+        {
+            ZoneScopedN("Readback::SkinnedVisibility");
+            m_gpuCullingManager->ProcessSkinnedVisibilityReadback();
+        }
     }
 
     if (m_detailManager && m_device) {
+        ZoneScopedN("Readback::DetailStats");
         m_detailManager->ProcessStatsReadback(m_device->GetNVRHIDevice());
     }
 
-    if (psDeviceFlags.test(rsStatistic))
+    if (psDeviceFlags.test(rsStatistic)) {
+        ZoneScopedN("Readback::LightStats");
         fg::ClusteredLightManager::Instance().ProcessStatsReadback();
+    }
 
     m_lstRenderables.clear();
 
@@ -859,6 +868,8 @@ void FrameGraphRenderer::SetupFrame() {
     {
         if (levelLoaded && !g_pGamePersistent->IsLoadingScreenShown())
         {
+            ZoneScopedN("SetupFrame::FrustumQuery");
+
             CFrustum view_frustum;
             view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
@@ -875,18 +886,25 @@ void FrameGraphRenderer::SetupFrame() {
         }
     }
 
-    m_geometryCollector->BeginFrame();
-    m_hudBatches.clear();
-    m_worldParticleBatches.clear();
-    m_hudParticleBatches.clear();
+    {
+        ZoneScopedN("SetupFrame::CollectorBegin");
+        m_geometryCollector->BeginFrame();
+        m_hudBatches.clear();
+        m_worldParticleBatches.clear();
+        m_hudParticleBatches.clear();
 
-    fg::ClusteredLightManager::Instance().BeginFrame();
+        fg::ClusteredLightManager::Instance().BeginFrame();
+    }
 
-    if (levelLoaded)
+    if (levelLoaded) {
+        ZoneScopedN("SetupFrame::CollectVisibleGeometry");
         CollectVisibleGeometry();
+    }
 
-    m_geometryCollector->EndFrame();
-
+    {
+        ZoneScopedN("SetupFrame::CollectorEnd");
+        m_geometryCollector->EndFrame();
+    }
 }
 
 framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
