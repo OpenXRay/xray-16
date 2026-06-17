@@ -4,7 +4,8 @@
 
 class XRNETSERVER_API INetQueue : Noncopyable
 {
-    Lock cs;
+    using MutexType = ::Lock;
+    MutexType cs;
     xr_deque<NET_Packet*> ready;
     xr_vector<NET_Packet*> unused;
 

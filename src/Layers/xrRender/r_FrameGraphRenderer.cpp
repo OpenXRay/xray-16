@@ -203,7 +203,7 @@ static Fmatrix BuildHUDFOVMatrix()
 }
 
 FrameGraphRenderer::FrameGraphRenderer() {
-    Msg("* [FrameGraphRenderer] Created");
+    // Msg("* [FrameGraphRenderer] Created");
 }
 
 FrameGraphRenderer::~FrameGraphRenderer() {
