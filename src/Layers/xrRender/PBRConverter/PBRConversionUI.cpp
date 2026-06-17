@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "PBRConversionUI.h"
-#include "xrEngine/Device.h"
+#include "xrEngine/device.h"
 #include <imgui.h>
 #include <chrono>
 

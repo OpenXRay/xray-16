@@ -251,7 +251,7 @@ target_sources(xrRender PRIVATE
     fgRenderFactory.cpp
     fgUISequenceVideoItem.cpp
     light.cpp
-    light_GI.cpp
+    light_gi.cpp
     r__buffer_pool.cpp
     r__buffer_pool.h
     r__hw_compat.h
@@ -341,15 +341,14 @@ target_include_directories(xrRender
     "${CMAKE_SOURCE_DIR}/src/packages/directxmath.2024.10.15.1/include"
     "${CMAKE_SOURCE_DIR}/Externals/nvrhi/include"
     "${CMAKE_SOURCE_DIR}/Externals/slang/include"
-    "${CMAKE_SOURCE_DIR}/Externals/nvrhi/thirdparty/DirectX-Headers/include"
+    "${CMAKE_SOURCE_DIR}/Externals/DirectX-Headers/include"
 )
 
 if (APPLE)
     set(XRAY_VULKAN_LIBS MoltenVK Vulkan::Headers)
 else()
     find_package(Vulkan REQUIRED)
-    target_include_directories(xrRender PRIVATE
-        "${CMAKE_SOURCE_DIR}/Externals/nvrhi/thirdparty/Vulkan-Headers/include")
+    target_include_directories(xrRender PRIVATE ${Vulkan_INCLUDE_DIRS})
     set(XRAY_VULKAN_LIBS ${Vulkan_LIBRARIES})
 endif()
 
@@ -364,8 +363,8 @@ target_link_libraries(xrRender
     xrScriptEngine
     xrAPI
     xrMiscMath
-    nvrhi
     nvrhi_vk
+    nvrhi
     ${XRAY_VULKAN_LIBS}
     slang
 )

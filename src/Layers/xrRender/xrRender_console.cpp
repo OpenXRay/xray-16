@@ -259,7 +259,12 @@ int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 // R4 Debug
 int ps_r4_debug_gpu_culling = 0; // 0=off, 1=show bounding spheres with cull state colors
 
+#if defined(XR_PLATFORM_WINDOWS)
 u32 ps_fg_render_mode = FG_RENDER_DX12;
+#else
+u32 ps_fg_render_mode = FG_RENDER_VULKAN;
+#endif
+
 int ps_fg_hot_reload_shaders = 0;
 const xr_token fg_render_mode_token[] = {
     {"dx12", FG_RENDER_DX12},

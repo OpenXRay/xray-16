@@ -2,7 +2,7 @@
 #include "StatsOverlay.h"
 #include "xrCore/Profiler/Profiler.h"
 #include "xrCore/MemoryStats.h"
-#include "xrEngine/Device.h"
+#include "xrEngine/device.h"
 #include "xrEngine/IRenderBackend.h"
 #include <imgui.h>
 #include <algorithm>

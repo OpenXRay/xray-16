@@ -152,7 +152,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 add_compile_options(
-    $<$<CONFIG:Release,ReleaseMasterGold>:-gline-tables-only>
+    $<$<AND:$<CONFIG:Release,ReleaseMasterGold>,$<CXX_COMPILER_ID:Clang,AppleClang>>:-gline-tables-only>
     $<$<CONFIG:Release,ReleaseMasterGold>:-ffunction-sections>
     $<$<CONFIG:Release,ReleaseMasterGold>:-fdata-sections>
 )

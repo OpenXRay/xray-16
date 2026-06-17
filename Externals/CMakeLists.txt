@@ -39,6 +39,7 @@ if (APPLE)
     add_subdirectory(MoltenVK)
 endif()
 
+find_package(Vulkan)
 add_subdirectory(nvrhi)
 
 # Slang shader compiler
