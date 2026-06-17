@@ -3,7 +3,7 @@
 #include "DetailModel.h"
 
 #if !defined(_EDITOR) && defined(USE_DX11)
-#include "xrstripify.h"
+#include "xrStripify.h"
 #endif
 
 namespace xray::render::fg
