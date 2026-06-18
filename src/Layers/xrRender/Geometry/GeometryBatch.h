@@ -70,7 +70,7 @@ struct GeometryBatch {
             return false;
 
         return MaterialSystem::Instance()
-            .GetMaterialInfo(visual->shaderName.c_str())
+            .GetMaterialInfo(visual->shaderName)
             .alphaTest;
     }
 
@@ -79,7 +79,7 @@ struct GeometryBatch {
             return false;
 
         return MaterialSystem::Instance()
-            .GetMaterialInfo(visual->shaderName.c_str())
+            .GetMaterialInfo(visual->shaderName)
             .transparent;
     }
 

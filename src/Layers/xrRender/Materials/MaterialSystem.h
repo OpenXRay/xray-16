@@ -51,6 +51,7 @@ public:
     void Shutdown();
 
     const MaterialInfo& GetMaterialInfo(const char* shaderName, const char* textureName = "");
+    const MaterialInfo& GetMaterialInfo(const shared_str& shaderName, const shared_str& textureName = shared_str());
 
     void PreloadMaterialTextures(const char* textureName);
 
