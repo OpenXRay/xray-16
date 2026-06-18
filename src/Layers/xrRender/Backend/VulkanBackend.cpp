@@ -3,6 +3,10 @@
 
 #include "xrCore/Threading/TaskManager.hpp"
 
+#if defined(__APPLE__)
+#include <pthread/qos.h>
+#endif
+
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #include <vulkan/vulkan.hpp>
 #include <nvrhi/vulkan.h>
@@ -938,6 +942,10 @@ void VulkanBackend::EndFrame() {
 }
 
 void VulkanBackend::SubmitThreadMain() {
+#if defined(__APPLE__)
+    pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE, 0);
+#endif
+
     using Clock = std::chrono::steady_clock;
     auto usBetween = [](Clock::time_point a, Clock::time_point b) -> u64 {
         return static_cast<u64>(std::chrono::duration_cast<std::chrono::microseconds>(b - a).count());
