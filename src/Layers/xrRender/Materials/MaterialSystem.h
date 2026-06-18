@@ -77,6 +77,7 @@ public:
      * Results are cached after first lookup
      */
     const MaterialInfo& GetMaterialInfo(const char* shaderName, const char* textureName = "");
+    const MaterialInfo& GetMaterialInfo(const shared_str& shaderName, const shared_str& textureName = shared_str());
 
     /**
      * Preload textures for a texture name during level load

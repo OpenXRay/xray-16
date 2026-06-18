@@ -73,11 +73,20 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* 
     if (!shaderName || !shaderName[0])
         return m_defaultMaterialInfo;
 
-    // Check cache first
-    shared_str key(shaderName);
-    auto it = m_materialCache.find(key);
+    return GetMaterialInfo(shared_str(shaderName));
+}
+
+const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared_str& shaderNameStr, const shared_str& textureName)
+{
+    if (shaderNameStr.size() == 0)
+        return m_defaultMaterialInfo;
+
+    auto it = m_materialCache.find(shaderNameStr);
     if (it != m_materialCache.end())
         return it->second;
+
+    const char* shaderName = shaderNameStr.c_str();
+    const shared_str& key = shaderNameStr;
 
     MaterialInfo info = GetDefaultMaterialInfo();
 
