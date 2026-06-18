@@ -1650,6 +1650,8 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         instanceData.push_back(inst);
     };
 
+    {
+    ZoneScopedN("Upload::Rebuild");
     for (u32 i = 0; i < totalBatches; i++) {
         const auto& batch = batches[i];
 
@@ -1715,6 +1717,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         } else {
             appendBatch(batch, m_dynamicObjectData, m_dynamicDrawArgsData, m_dynamicMaterialIDData, m_dynamicInstanceData);
         }
+    }
     }
 
     // Set object counts with total cap
@@ -1803,6 +1806,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     }
 
     if (m_dynamicSet.objectCount > 0) {
+        ZoneScopedN("Upload::DynamicWrite");
         R_ASSERT2(m_dynamicObjectData.size() >= m_dynamicSet.objectCount, "Dynamic object data smaller than count");
         R_ASSERT2(m_dynamicDrawArgsData.size() >= m_dynamicSet.objectCount, "Dynamic draw args data smaller than count");
         R_ASSERT2(m_dynamicMaterialIDData.size() >= m_dynamicSet.objectCount, "Dynamic material ID data smaller than count");
@@ -1834,6 +1838,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     m_terrainObjectCount = std::min(static_cast<u32>(m_terrainObjectData.size()), m_maxTerrainObjects);
 
     if (m_terrainObjectCount > 0 && m_terrainObjectBuffer && m_terrainDrawArgsBuffer) {
+        ZoneScopedN("Upload::TerrainWrite");
         R_ASSERT2(m_terrainObjectCount <= m_maxTerrainObjects, "Terrain object count exceeds buffer capacity");
         R_ASSERT2(m_terrainDrawArgsData.size() >= m_terrainObjectCount, "Terrain draw args data smaller than object count");
         R_ASSERT2(m_terrainMaterialIDData.size() >= m_terrainObjectCount, "Terrain material ID data smaller than object count");
@@ -1911,6 +1916,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     m_transparentSet.objectCount = std::min(static_cast<u32>(m_transparentObjectData.size()), m_transparentSet.maxObjects);
 
     if (m_transparentSet.objectCount > 0 && m_transparentSet.objectBuffer && m_transparentSet.drawArgsBuffer) {
+        ZoneScopedN("Upload::TransparentWrite");
         for (auto& args : m_transparentDrawArgsData)
             args.instanceCount = 1;
 
