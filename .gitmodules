@@ -30,7 +30,8 @@
 	url = https://github.com/pattonkan/sse2rvv.git
 [submodule "Externals/nvrhi"]
 	path = Externals/nvrhi
-	url = https://github.com/NVIDIAGameWorks/nvrhi.git
+	url = git@github.com:yohjimane/NVRHI.git
+	branch = main
 [submodule "Externals/slang"]
 	path = Externals/slang
 	url = https://github.com/shader-slang/slang.git
