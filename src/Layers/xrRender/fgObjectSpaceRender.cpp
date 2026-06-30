@@ -16,7 +16,6 @@ void fgObjectSpaceRender::dbgRender()
 {
     R_ASSERT(bDebug);
 
-    RCache.set_Shader(m_shDebug);
     for (u32 i = 0; i < q_debug.boxes.size(); i++)
     {
         Fobb& obb = q_debug.boxes[i];
@@ -41,6 +40,6 @@ void fgObjectSpaceRender::dbgRender()
     dbg_S.clear();
 }
 
-void fgObjectSpaceRender::SetShader() { RCache.set_Shader(m_shDebug); }
+void fgObjectSpaceRender::SetShader() {}
 } // namespace xray::render::fg
 #endif // DEBUG

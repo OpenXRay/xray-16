@@ -8,6 +8,7 @@
 
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/occRasterizer.h"
+#include "Layers/xrRender/FGDebugDraw.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
@@ -450,38 +451,14 @@ void CHOM::OnRender()
                 line[it * 6 + 4].set(*(verts + T->verts[2]), 0xFFFFFFFF);
                 line[it * 6 + 5].set(*(verts + T->verts[0]), 0xFFFFFFFF);
             }
-            RCache.set_xform_world(Fidentity);
             // draw solid
             Device.SetNearer(TRUE);
-            RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9 // when we don't have FFP support
-            RCache.set_c("tfactor", float(color_get_R(0x80FFFFFF)) / 255.f, float(color_get_G(0x80FFFFFF)) / 255.f, \
-                float(color_get_B(0x80FFFFFF)) / 255.f, float(color_get_A(0x80FFFFFF)) / 255.f);
-#endif
-            RCache.dbg_Draw(nvrhi::PrimitiveType::TriangleList, &*poly.begin(), poly.size() / 3);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, &*poly.begin(), poly.size() / 3);
             Device.SetNearer(FALSE);
             // draw wire
-            if (bDebug)
-            {
-                RImplementation.rmNear(RCache);
-            }
-            else
-            {
-                Device.SetNearer(TRUE);
-            }
-            RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9 // when we don't have FFP support
-            RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);
-#endif
-            RCache.dbg_Draw(nvrhi::PrimitiveType::LineList, &*line.begin(), line.size() / 2);
-            if (bDebug)
-            {
-                RImplementation.rmNormal(RCache);
-            }
-            else
-            {
-                Device.SetNearer(FALSE);
-            }
+            Device.SetNearer(TRUE);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, &*line.begin(), line.size() / 2);
+            Device.SetNearer(FALSE);
         }
     }
 }

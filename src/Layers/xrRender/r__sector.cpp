@@ -54,13 +54,7 @@ void CPortal::OnRender()
         for (u32 k = 0; k < poly.size(); ++k)
             V[k * 3].set(vCenter, portalColor);
 
-        RCache.set_xform_world(Fidentity);
         // draw solid
-        RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9 // when we don't have FFP support
-        RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
-            float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
-#endif
         g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, &*V.begin(), V.size() / 3);
 
         // draw wire
@@ -69,21 +63,10 @@ void CPortal::OnRender()
             V[k].set(poly[k], portalColor);
         V.back().set(poly[0], portalColor);
 
-        if (bDebug)
-            RImplementation.rmNear(RCache);
-        else
-            Device.SetNearer(TRUE);
+        Device.SetNearer(TRUE);
 
-        RCache.set_Shader(RImplementation.m_WireShader);
-#ifndef USE_DX9 // when we don't have FFP support
-        RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
-            float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
-#endif
         g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, &*V.begin(), V.size() - 1);
-        if (bDebug)
-            RImplementation.rmNormal(RCache);
-        else
-            Device.SetNearer(FALSE);
+        Device.SetNearer(FALSE);
     }
 }
 #endif
