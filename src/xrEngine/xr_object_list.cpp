@@ -322,10 +322,13 @@ void CObjectList::Update(bool bForce)
         {
             VERIFY(*(*it).m_ID == (it - m_relcase_callbacks.begin()));
             for (auto& dit : destroy_queue)
-            {
                 (*it).m_Callback(dit);
-                g_pGameLevel->pHUD->net_Relcase(dit);
-            }
+        }
+
+        // Notify HUD once per destroyed object:
+        for (auto& dit : destroy_queue)
+        {
+            g_pGameLevel->pHUD->net_Relcase(dit);
         }
 
         // Destroy
