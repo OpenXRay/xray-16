@@ -322,7 +322,9 @@ void CObjectList::Update(bool bForce)
         {
             VERIFY(*(*it).m_ID == (it - m_relcase_callbacks.begin()));
             for (auto& dit : destroy_queue)
+            {
                 (*it).m_Callback(dit);
+            }
         }
 
         // Notify HUD once per destroyed object:
