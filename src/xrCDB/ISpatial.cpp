@@ -100,8 +100,13 @@ void SpatialBase::spatial_move()
     ZoneScoped;
     if (spatial.node_ptr)
     {
-        //*** somehow it was determined that object has been moved
-        spatial.type |= STYPEFLAG_INVALIDSECTOR;
+        //*** invalidate the cached sector only on a meaningful move, so stationary/jittering
+        //*** objects don't force a per-frame sector raycast (see r__dsgraph_build sector detection)
+        //*** adopted from xray-monolith
+        if (last_sector_point.distance_to_sqr(spatial_sector_point()) > 1.f)
+        {
+            spatial.type |= STYPEFLAG_INVALIDSECTOR;
+        }
 
         //*** check if we are supposed to correct it's spatial location
         if (spatial_inside())
@@ -119,6 +124,7 @@ void SpatialBase::spatial_move()
 void SpatialBase::spatial_updatesector_internal(IRender_Sector::sector_id_t sector_id)
 {
     ZoneScoped;
+    last_sector_point = spatial_sector_point();
     spatial.type &= ~STYPEFLAG_INVALIDSECTOR;
     if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
         spatial.sector_id = sector_id;

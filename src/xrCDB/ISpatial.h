@@ -137,6 +137,8 @@ public:
     SpatialData spatial;
 
 private:
+    // Point at which the sector was last (re)detected.
+    Fvector last_sector_point{};
     void spatial_updatesector_internal(IRender_Sector::sector_id_t sector_id);
 
 public:
