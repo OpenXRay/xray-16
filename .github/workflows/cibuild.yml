@@ -228,10 +228,10 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        # FreeBSD package repositories track the latest stable release; use the
-        # current version so `pkg update` doesn't fail on OS version mismatch.
-        - { name: FreeBSD, os: freebsd, os-version: '14.4', arch: x86_64,
-            install-cmd: "sudo pkg update && sudo pkg install -y cmake sdl2 lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis"
+        # FreeBSD package repositories may be ahead of the VM image; tell pkg to
+        # ignore the OS version mismatch so packages still install.
+        - { name: FreeBSD, os: freebsd, os-version: '14.3', arch: x86_64,
+            install-cmd: "sudo env IGNORE_OSVERSION=yes pkg update && sudo env IGNORE_OSVERSION=yes pkg install -y cmake sdl2 lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis"
           }
         - { name: OpenBSD, os: openbsd, os-version: '7.6',  arch: x86_64,
             install-cmd: "sudo pkg_add cmake SDL2 lzo2 jpeg openal libogg libtheora libvorbis",
