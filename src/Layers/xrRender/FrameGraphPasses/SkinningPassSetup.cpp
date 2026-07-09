@@ -138,6 +138,36 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
         hudVariant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
     };
 
+    auto mdiPsResult = shaderLoader->LoadPixelShader("bindless_skinned_mdi", "main");
+    auto mdiVsForReflection = shaderLoader->LoadVertexShader("bindless_skinned_mdi", "main");
+    if (mdiPsResult.handle && mdiVsForReflection.handle) {
+        state.mdiPS = mdiPsResult.handle;
+        state.mdiLayout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass_MDI",
+            *mdiVsForReflection.reflection, *mdiPsResult.reflection, nvDevice);
+    }
+
+    auto initMDIVariant = [&](SkinningPipelineVariant& variant, const char* shaderName, const char* cacheName,
+                              const nvrhi::VertexAttributeDesc* baseAttribs, u32 baseAttrCount) {
+        if (!state.mdiPS || !state.mdiLayout)
+            return;
+        auto vsResult = shaderLoader->LoadVertexShader(shaderName, "main");
+        if (!vsResult.handle)
+            return;
+
+        nvrhi::VertexAttributeDesc attribs[8];
+        for (u32 i = 0; i < baseAttrCount; ++i)
+            attribs[i] = baseAttribs[i];
+        attribs[baseAttrCount] = nvrhi::VertexAttributeDesc()
+            .setName("DRAWINDEX").setFormat(nvrhi::Format::R32_UINT)
+            .setBufferIndex(1).setOffset(0).setElementStride(4).setIsInstanced(true);
+
+        variant.vs = vsResult.handle;
+        variant.inputLayout = nvDevice->createInputLayout(attribs, baseAttrCount + 1, variant.vs);
+        auto pipeDesc = buildPipelineDesc(variant.vs, variant.inputLayout, state.mdiPS);
+        pipeDesc.bindingLayouts[0] = state.mdiLayout;
+        variant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
+    };
+
     {
         constexpr u32 stride = 24;
         nvrhi::VertexAttributeDesc attribs[] = {
@@ -148,6 +178,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG16_SNORM).setOffset(20).setElementStride(stride),
         };
         initVariant(state.nonHQ, "bindless_skinned", "SkinningPass_nonHQ", attribs, 5);
+        initMDIVariant(state.mdiNonHQ, "bindless_skinned_mdi", "SkinningPass_mdi_nonHQ", attribs, 5);
     }
 
     {
@@ -160,6 +191,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
         };
         initVariant(state.hq1w, "bindless_skinned_hq", "SkinningPass_hq1w", attribs, 5);
+        initMDIVariant(state.mdiHQ1w, "bindless_skinned_hq_mdi", "SkinningPass_mdi_hq1w", attribs, 5);
     }
 
     {
@@ -173,6 +205,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("BLENDINDICES").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(36).setElementStride(stride),
         };
         initVariant(state.hq4w, "bindless_skinned_4w", "SkinningPass_hq4w", attribs, 6);
+        initMDIVariant(state.mdiHQ4w, "bindless_skinned_4w_mdi", "SkinningPass_mdi_hq4w", attribs, 6);
     }
 
     {
@@ -185,6 +218,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
         };
         initVariant(state.hq2w, "bindless_skinned_2w", "SkinningPass_hq2w", attribs, 5);
+        initMDIVariant(state.mdiHQ2w, "bindless_skinned_2w_mdi", "SkinningPass_mdi_hq2w", attribs, 5);
     }
 
     {
@@ -197,6 +231,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
         };
         initVariant(state.hq3w, "bindless_skinned_3w", "SkinningPass_hq3w", attribs, 5);
+        initMDIVariant(state.mdiHQ3w, "bindless_skinned_3w_mdi", "SkinningPass_mdi_hq3w", attribs, 5);
     }
 
     initHudVariant(state.hudNonHQ, state.nonHQ, "SkinningPass_hud_nonHQ");
@@ -289,6 +324,18 @@ static nvrhi::IInputLayout* GetSkinnedInputLayout(const SkinningPassState& state
     case VF_SKINNED_HQ2W: return state.hq2w.inputLayout.Get();
     case VF_SKINNED_HQ3W: return state.hq3w.inputLayout.Get();
     default: return state.nonHQ.inputLayout.Get();
+    }
+}
+
+static const SkinningPipelineVariant* SelectMDISkinnedVariant(const SkinningPassState& state, u32 fmt)
+{
+    switch (fmt) {
+    case VF_SKINNED_NONHQ: return &state.mdiNonHQ;
+    case VF_SKINNED_HQ1W: return &state.mdiHQ1w;
+    case VF_SKINNED_HQ2W: return &state.mdiHQ2w;
+    case VF_SKINNED_HQ3W: return &state.mdiHQ3w;
+    case VF_SKINNED_HQ4W: return &state.mdiHQ4w;
+    default: return nullptr;
     }
 }
 
@@ -614,9 +661,6 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 return;
             }
 
-            // Begin frame - reset skeleton allocations
-            gpuCullMgr->BeginSkinnedFrame();
-
             // Get global bone buffer for shader binding
             nvrhi::IBuffer* globalBoneBuffer = gpuCullMgr->GetGlobalBoneBuffer();
 
@@ -674,25 +718,89 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                     globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer,
                     worldViewport, scissor, false);
 
-                nvrhi::IBuffer* indirectArgs = nullptr;
-                if (data.skinnedDrawArgs.is_valid()
+                const bool cullActive = data.skinnedDrawArgs.is_valid()
                     && gpuCullMgr->IsSkinnedCullingEnabled()
-                    && gpuCullMgr->GetSkinnedObjectCount() == worldSkinnedCount) {
-                    indirectArgs = gpuCullMgr->GetSkinnedDrawArgsBuffer();
+                    && gpuCullMgr->GetSkinnedObjectCount() == worldSkinnedCount;
+                const bool mdiActive = cullActive && gpuCullMgr->IsSkinnedMDIEnabled();
+
+                if (mdiActive) {
+                    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+                    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_mdi", ".vs");
+                    auto* mdiPsRefl = shaderLoader->GetCachedReflection("bindless_skinned_mdi", ".ps");
+                    nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("SkinningPass", nvDevice);
+                    auto& pools = gpuCullMgr->GetSkinnedPools();
+                    auto& matBuffer = MaterialBuffer::Instance();
+
+                    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
+                        const auto& bucket = gpuCullMgr->GetSkinnedBucket(f);
+                        if (bucket.count == 0)
+                            continue;
+
+                        const SkinningPipelineVariant* variant = SelectMDISkinnedVariant(*data.passState, f);
+                        nvrhi::IBuffer* poolVB = pools.GetVertexBuffer(f);
+                        nvrhi::IBuffer* poolIB = pools.GetIndexBuffer(f);
+                        if (!variant || !variant->pipeline || !poolVB || !poolIB
+                            || !mdiVsRefl || !mdiPsRefl || !drawIndexBuffer || !data.passState->mdiLayout) {
+                            Msg("! [SkinningPass] MDI bucket %u unavailable, %u batches dropped", f, bucket.count);
+                            continue;
+                        }
+
+                        framegraph::BindingSetBuilder bsb(*mdiVsRefl, *mdiPsRefl, nvDevice, "Skinning.MDI");
+                        bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                        bsb.BufferSRV("g_BoneMatrices", globalBoneBuffer);
+                        bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+                        bsb.BufferSRV("g_PaintSplats", splatBuffer);
+                        bsb.BufferSRV("g_SkinnedRecords", bucket.recordsBuffer);
+                        bsb.BufferSRV("g_SkinnedCompactIndices", bucket.compactBatchIndicesBuffer);
+                        bsb.BufferSRV("g_SkinnedCompactMaterialIDs", bucket.compactMaterialIDBuffer);
+                        bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
+                        bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
+                        bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+
+                        auto& cache = framegraph::GetPassResourceCache();
+                        nvrhi::BindingSetHandle mdiBindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->mdiLayout, nvDevice);
+                        if (!mdiBindingSet)
+                            continue;
+
+                        nvrhi::GraphicsState gfxState;
+                        gfxState.pipeline = variant->pipeline;
+                        gfxState.framebuffer = framebuffer;
+                        gfxState.bindings = { mdiBindingSet };
+                        if (bindlessTable)
+                            gfxState.addBindingSet(bindlessTable);
+                        gfxState.vertexBuffers = { {poolVB, 0, 0}, {drawIndexBuffer, 1, 0} };
+                        gfxState.indexBuffer = { poolIB, nvrhi::Format::R16_UINT, 0 };
+                        gfxState.viewport.addViewport(worldViewport);
+                        gfxState.viewport.addScissorRect(scissor);
+                        gfxState.indirectParams = bucket.compactDrawArgsBuffer;
+                        gfxState.indirectCountBuffer = bucket.compactCountBuffer;
+
+                        cmdList->setGraphicsState(gfxState);
+                        DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, bucket.count);
+                    }
                 }
 
-                u32 skinnedIdx = 0;
+                nvrhi::IBuffer* residualArgs = cullActive ? gpuCullMgr->GetSkinnedDrawArgsBuffer() : nullptr;
+                u32 residualIdx = 0;
                 for (const auto& batch : data.geometry->GetBatches()) {
                     if (!batch.isSkinned)
                         continue;
+                    if (mdiActive) {
+                        const u32 variantIdx = MaterialBuffer::Instance().GetShaderVariant(batch.bindlessMaterialID);
+                        const bool pooled = variantIdx == 0
+                            && batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
+                            && batch.skinnedPoolFormat < SkinnedGeometryPools::FORMAT_COUNT;
+                        if (pooled)
+                            continue;
+                    }
 
                     u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
                     auto sr = GetSplatRange(batch, data.overlayMgr);
 
                     DrawSkinnedBatch(*data.passState, cmdList, nvDevice, worldCtx,
                         batch, batch.worldMatrix, boneOffset, sr,
-                        indirectArgs, skinnedIdx * (u32)sizeof(IndirectDrawArgs));
-                    ++skinnedIdx;
+                        residualArgs, residualIdx * (u32)sizeof(IndirectDrawArgs));
+                    ++residualIdx;
                 }
             }
 

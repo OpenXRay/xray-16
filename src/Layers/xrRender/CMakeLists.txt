@@ -148,6 +148,8 @@ target_sources(xrRender PRIVATE
 
     Geometry/GeometryBatch.h
     Geometry/GeometryBatch.cpp
+    Geometry/SkinnedGeometryPools.h
+    Geometry/SkinnedGeometryPools.cpp
     Geometry/MaterialCache.cpp
 
     UIGeometryBatch.h
