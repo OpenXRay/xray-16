@@ -3,6 +3,8 @@
 #include "StackTrace.h"
 
 #include "Threading/ScopeLock.hpp"
+#include <cstdio>
+#include <cstdlib>
 
 #ifdef XR_PLATFORM_WINDOWS
 #   include <DbgHelp.h>
@@ -11,7 +13,8 @@
 #       include <execinfo.h>
 #       define BACKTRACE_AVAILABLE
 
-#       if __has_include(<cxxabi.h>)
+#       if __has_include(<elfutils/libdwfl.h>) && __has_include(<cxxabi.h>)
+#           include <elfutils/libdwfl.h>
 #           include <cxxabi.h>
 #           include <dlfcn.h>
 #           define CXXABI_AVAILABLE
@@ -260,6 +263,64 @@ xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount)
     return BuildStackTrace(&currentThreadCtx, maxFramesCount);
 }
 #elif defined(BACKTRACE_AVAILABLE)
+
+#ifdef CXXABI_AVAILABLE
+struct DebugInfoSession {
+    Dwfl_Callbacks callbacks = {};
+    char* debuginfo_path = nullptr;
+    Dwfl* dwfl = nullptr;
+
+    DebugInfoSession() {
+        callbacks.find_elf = dwfl_linux_proc_find_elf;
+        callbacks.find_debuginfo = dwfl_standard_find_debuginfo;
+        callbacks.debuginfo_path = &debuginfo_path;
+
+        dwfl = dwfl_begin(&callbacks);
+
+        int r;
+        r = dwfl_linux_proc_report(dwfl, getpid());
+        r = dwfl_report_end(dwfl, nullptr, nullptr);
+        static_cast<void>(r);
+    }
+
+    ~DebugInfoSession() {
+        dwfl_end(dwfl);
+    }
+
+    DebugInfoSession(DebugInfoSession const&) = delete;
+    DebugInfoSession& operator=(DebugInfoSession const&) = delete;
+};
+
+struct DebugInfo {
+    void* ip;
+    std::string function;
+    char const* file;
+    int line;
+
+    DebugInfo(DebugInfoSession const& dis, void* ip)
+        : ip(ip)
+        , file()
+        , line(-1)
+    {
+        // Get function name.
+        uintptr_t ip2 = reinterpret_cast<uintptr_t>(ip);
+        Dwfl_Module* module = dwfl_addrmodule(dis.dwfl, ip2);
+        char const* name = dwfl_module_addrname(module, ip2);
+
+        char* demangledName = abi::__cxa_demangle(name, NULL, NULL, NULL);
+
+        function = demangledName ? demangledName : name ? name : "<unknown>";
+        ::free(demangledName);
+
+        // Get source filename and line number.
+        if(Dwfl_Line* dwfl_line = dwfl_module_getsrc(module, ip2)) {
+            Dwarf_Addr addr;
+            file = dwfl_lineinfo(dwfl_line, &addr, &line, nullptr, nullptr, nullptr);
+        }
+    }
+};
+#endif
+
 xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount)
 {
     xr_vector<xr_string> result;
@@ -270,31 +331,21 @@ xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount)
 
     if (strings)
     {
-        size_t demangledBufSize = 0;
-        char* demangledName = nullptr;
+#   ifdef CXXABI_AVAILABLE
+        DebugInfoSession dis;
+#   endif
         for (int i = 1; i < nptrs; i++) // skip this function
         {
             char* functionName = strings[i];
 
 #   ifdef CXXABI_AVAILABLE
-            Dl_info info;
-
-            if (dladdr(array[i], &info))
-            {
-                if (info.dli_sname)
-                {
-                    int status = -1;
-                    demangledName = abi::__cxa_demangle(info.dli_sname, demangledName, &demangledBufSize, &status);
-                    if (status == 0)
-                    {
-                        functionName = demangledName;
-                    }
-                }
-            }
+            DebugInfo dinfo = DebugInfo(dis, array[i]);
+            char func [2048];
+            std::snprintf(func, 2048, ">> \033[31;1m%s\033[0m at \033[32;1;4m%s\033[0m:%d", dinfo.function.data(), dinfo.file, dinfo.line);
+            functionName = func;
 #   endif
             result.emplace_back(functionName);
         }
-        ::free(demangledName);
     }
 
     return result;

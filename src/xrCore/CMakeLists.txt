@@ -456,6 +456,7 @@ target_link_libraries(xrCore
     PUBLIC
     pthread
     $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
+    $<$<PLATFORM_ID:Linux>:dw>
     SDL2::SDL2
 
     PRIVATE
