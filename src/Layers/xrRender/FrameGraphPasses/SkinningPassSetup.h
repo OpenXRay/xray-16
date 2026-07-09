@@ -12,6 +12,7 @@ namespace xray::render {
     namespace fg {
         class dxRender_Visual;
         class RenderDevice;
+        class GPUCullingManager;
     }
 }
 
@@ -52,33 +53,20 @@ struct SkinningPassState {
 
 void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state);
 
-using SkinnedStatsCallback = void(*)(u32 rendered, u32 culled, void* userData);
-
-using VisibilityByVisualCallback = u32(*)(const dxRender_Visual* visual, void* userData);
-
-struct SkinnedVisibilityData {
-    bool enabled = false;
-
-    VisibilityByVisualCallback visibilityByVisualCallback = nullptr;
-    void* visibilityByVisualUserData = nullptr;
-
-    SkinnedStatsCallback statsCallback = nullptr;
-    void* statsUserData = nullptr;
-};
-
 struct SkinningPassData {
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle depth;
+    framegraph::VirtualResourceHandle skinnedDrawArgs;
     fg::RenderDevice* device;
     const GeometryCollector* geometry;
     const xr_vector<GeometryBatch>* hudBatches;
     MaterialCache* materialCache;
+    fg::GPUCullingManager* gpuCulling;
     u32 width, height;
     framegraph::DefaultOutputLayout outputs;
-    SkinnedVisibilityData visibilityData;
     SkinningPassState* passState;
     decals::OverlayManager* overlayMgr;
 };
@@ -92,7 +80,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     MaterialCache* materialCache,
     u32 width,
     u32 height,
-    const SkinnedVisibilityData& visibilityData = {},
+    fg::GPUCullingManager* gpuCulling = nullptr,
+    framegraph::VirtualResourceHandle skinnedDrawArgs = {},
     SkinningPassState* state = nullptr,
     decals::OverlayManager* overlayMgr = nullptr
 );

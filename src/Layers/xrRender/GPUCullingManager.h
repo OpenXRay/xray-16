@@ -295,7 +295,7 @@ public:
 
     void UploadSkinnedObjects(fg::RenderContext* ctx, const GeometryCollector* geometry);
 
-    void SetupSkinnedCullingPass(
+    framegraph::VirtualResourceHandle SetupSkinnedCullingPass(
         framegraph::FrameGraph& fg,
         framegraph::VirtualResourceHandle hizPyramid,
         u32 hizWidth,
@@ -305,13 +305,9 @@ public:
         const Fmatrix& prevViewProj
     );
 
-    u32 GetSkinnedVisibilityByVisual(const dxRender_Visual* visual) const;
-
-    bool HasSkinnedVisibilityData() const { return !m_skinnedVisibilityValues.empty(); }
-
     u32 GetSkinnedObjectCount() const { return m_skinnedObjectCount; }
     bool IsSkinnedCullingEnabled() const { return m_initialized && m_skinnedCullEnabled; }
-
+    nvrhi::IBuffer* GetSkinnedDrawArgsBuffer() const { return m_skinnedDrawArgsBuffer.Get(); }
 
     struct SkinnedCullingStats {
         u32 submitted = 0;
@@ -319,19 +315,12 @@ public:
         u32 culled = 0;
     };
     const SkinnedCullingStats& GetSkinnedCullingStats() const { return m_skinnedCullingStats; }
-    void UpdateSkinnedCullingStats(u32 rendered, u32 culled);
-
-    void ScheduleSkinnedVisibilityReadback(nvrhi::ICommandList* cmdList);
-
-    void ProcessSkinnedVisibilityReadback();
 
     void BeginSkinnedFrame();
 
     u32 GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinematics* skeleton);
 
     nvrhi::IBuffer* GetGlobalBoneBuffer() const { return m_globalBoneBuffer.Get(); }
-
-    void ClearSkinnedVisibilityData();
 
     void ProcessStatsReadback();
     nvrhi::IBuffer* GetTerrainInstanceBuffer() const { return m_terrainInstanceBuffer.Get(); }
@@ -492,25 +481,18 @@ private:
 
     nvrhi::BufferHandle m_skinnedObjectBuffer;
     nvrhi::BufferHandle m_skinnedVisibilityBuffer;
-
-    static constexpr u32 SKINNED_READBACK_FRAMES = 6;
-    nvrhi::BufferHandle m_skinnedReadbackBuffers[SKINNED_READBACK_FRAMES];
-    u32 m_skinnedReadbackWriteIndex = 0;
-    u32 m_skinnedReadbackFrameCount = 0;
-
-    u32 m_skinnedSubmitFrameId = 0;
-    u32 m_skinnedReadbackSubmitFrame[SKINNED_READBACK_FRAMES] = {};
-    u32 m_skinnedReadbackCounts[SKINNED_READBACK_FRAMES] = {};
-    xr_vector<u32> m_skinnedVisibilityValues;
-    u32 m_skinnedVisibilityFrame = 0;
+    nvrhi::BufferHandle m_skinnedDrawArgsBuffer;
+    nvrhi::BufferHandle m_skinnedVisibleCountBuffer;
+    nvrhi::BufferHandle m_skinnedVisibleIndexBuffer;
+    nvrhi::ComputePipelineHandle m_skinnedArgsGatePipeline;
+    nvrhi::BindingLayoutHandle m_skinnedArgsGateLayout;
 
     u32 m_skinnedObjectCount = 0;
     u32 m_maxSkinnedObjects = 0;
     bool m_skinnedCullEnabled = false;
 
     xr_vector<GPUObjectData> m_skinnedObjectData;
-    xr_vector<const GeometryBatch*> m_skinnedBatchPointers;
-    u32 m_skinnedFrameId = 0;
+    xr_vector<IndirectDrawArgs> m_skinnedDrawArgsData;
     SkinnedCullingStats m_skinnedCullingStats;
 
     static constexpr u32 MAX_TOTAL_BONES = 8192;
@@ -523,6 +505,7 @@ private:
 
     void CreateSkinnedCullingBuffers(fg::RenderDevice* device);
     void EnsureSkinnedBufferCapacity(u32 count);
+    bool EnsureSkinnedArgsGatePipeline(nvrhi::IDevice* nvDevice);
     void UploadSkeletonBones(nvrhi::ICommandList* cmdList, CKinematics* skeleton, u32 boneOffset);
 
     nvrhi::BufferHandle m_megaVertexBuffer;
@@ -557,6 +540,7 @@ private:
 
     static constexpr u32 STATS_READBACK_SLOTS = 6;
     nvrhi::BufferHandle m_statsReadbackBuffers[STATS_READBACK_SLOTS];
+    u32 m_statsSubmittedSkinned[STATS_READBACK_SLOTS] = {};
     CullingStats m_cullingStats;
     u32 m_statsWriteSlot = 0;
     u32 m_statsScheduled = 0;

@@ -811,10 +811,6 @@ void FrameGraphRenderer::SetupFrame() {
             ZoneScopedN("Readback::CullStats");
             m_gpuCullingManager->ProcessStatsReadback();
         }
-        {
-            ZoneScopedN("Readback::SkinnedVisibility");
-            m_gpuCullingManager->ProcessSkinnedVisibilityReadback();
-        }
     }
 
     if (m_detailManager && m_device) {
@@ -1057,6 +1053,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
     framegraph::VirtualResourceHandle drawArgsBuffer;
+    framegraph::VirtualResourceHandle skinnedDrawArgsBuffer;
 
     if (m_gpuCullingManager && hizOutput.pyramid.is_valid()) {
         m_gpuCullingManager->Initialize(m_device);
@@ -1110,7 +1107,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
 
         if (m_gpuCullingManager->IsSkinnedCullingEnabled()) {
-            m_gpuCullingManager->SetupSkinnedCullingPass(
+            skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedCullingPass(
                 *m_framegraph,
                 m_hizPyramid,
                 hizOutput.width,
@@ -1241,23 +1238,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    static auto skinnedStatsCallback = +[](u32 rendered, u32 culled, void* userData) {
-        static_cast<GPUCullingManager*>(userData)->UpdateSkinnedCullingStats(rendered, culled);
-    };
-
-    static auto visibilityByVisualCallback = +[](const dxRender_Visual* visual, void* userData) -> u32 {
-        return static_cast<GPUCullingManager*>(userData)->GetSkinnedVisibilityByVisual(visual);
-    };
-
-    passes::SkinnedVisibilityData skinnedVisibility;
-    if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedCullingEnabled()) {
-        skinnedVisibility.enabled = m_gpuCullingManager->HasSkinnedVisibilityData();
-        skinnedVisibility.visibilityByVisualCallback = visibilityByVisualCallback;
-        skinnedVisibility.visibilityByVisualUserData = m_gpuCullingManager.get();
-        skinnedVisibility.statsCallback = skinnedStatsCallback;
-        skinnedVisibility.statsUserData = m_gpuCullingManager.get();
-    }
-
     auto hudOutputs = passes::setupSkinningPass(
         *m_framegraph,
         m_device,
@@ -1267,7 +1247,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_materialCache.get(),
         width,
         height,
-        skinnedVisibility,
+        m_gpuCullingManager.get(),
+        skinnedDrawArgsBuffer,
         &m_blackboard->get_or_add<passes::SkinningPassState>(),
         m_overlayManager.get()
     );

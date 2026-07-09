@@ -445,26 +445,56 @@ void GPUCullingManager::CreateSkinnedCullingBuffers(fg::RenderDevice* device)
         }
     }
 
-    for (u32 i = 0; i < SKINNED_READBACK_FRAMES; ++i) {
+    {
         nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_SkinnedVisibilityReadback";
-        desc.byteSize = m_maxSkinnedObjects * sizeof(u32);
-        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
-        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.debugName = "GPUCull_SkinnedDrawArgs";
+        desc.byteSize = m_maxSkinnedObjects * sizeof(IndirectDrawArgs);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = true;
 
-        m_skinnedReadbackBuffers[i] = nvDevice->createBuffer(desc);
-        if (!m_skinnedReadbackBuffers[i]) {
-            Msg("! [GPUCulling] Failed to create skinned visibility readback buffer %u", i);
+        m_skinnedDrawArgsBuffer = nvDevice->createBuffer(desc);
+        if (!m_skinnedDrawArgsBuffer) {
+            Msg("! [GPUCulling] Failed to create skinned draw args buffer");
             return;
         }
     }
 
-    m_skinnedReadbackWriteIndex = 0;
-    m_skinnedReadbackFrameCount = 0;
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedVisibleCount";
+        desc.byteSize = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_skinnedVisibleCountBuffer = nvDevice->createBuffer(desc);
+        if (!m_skinnedVisibleCountBuffer) {
+            Msg("! [GPUCulling] Failed to create skinned visible count buffer");
+            return;
+        }
+    }
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedVisibleIndices";
+        desc.byteSize = m_maxSkinnedObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_skinnedVisibleIndexBuffer = nvDevice->createBuffer(desc);
+        if (!m_skinnedVisibleIndexBuffer) {
+            Msg("! [GPUCulling] Failed to create skinned visible index buffer");
+            return;
+        }
+    }
 
     m_skinnedObjectData.reserve(m_maxSkinnedObjects);
-    m_skinnedBatchPointers.reserve(m_maxSkinnedObjects);
+    m_skinnedDrawArgsData.reserve(m_maxSkinnedObjects);
 
     {
         nvrhi::BufferDesc desc;
@@ -522,25 +552,30 @@ void GPUCullingManager::EnsureSkinnedBufferCapacity(u32 count)
         m_skinnedVisibilityBuffer = nvDevice->createBuffer(desc);
     }
 
-    for (u32 i = 0; i < SKINNED_READBACK_FRAMES; ++i) {
+    {
         nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_SkinnedVisibilityReadback";
-        desc.byteSize = newCapacity * sizeof(u32);
-        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
-        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.debugName = "GPUCull_SkinnedDrawArgs";
+        desc.byteSize = newCapacity * sizeof(IndirectDrawArgs);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = true;
 
-        m_skinnedReadbackBuffers[i] = nvDevice->createBuffer(desc);
+        m_skinnedDrawArgsBuffer = nvDevice->createBuffer(desc);
     }
-    m_skinnedReadbackWriteIndex = 0;
-    m_skinnedReadbackFrameCount = 0;
 
-    for (u32 i = 0; i < SKINNED_READBACK_FRAMES; ++i) {
-        m_skinnedReadbackSubmitFrame[i] = 0;
-        m_skinnedReadbackCounts[i] = 0;
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedVisibleIndices";
+        desc.byteSize = newCapacity * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_skinnedVisibleIndexBuffer = nvDevice->createBuffer(desc);
     }
-    m_skinnedVisibilityValues.clear();
-    m_skinnedVisibilityFrame = 0;
 
     m_maxSkinnedObjects = newCapacity;
 }
@@ -1359,7 +1394,7 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
     if (!slot)
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32) * 3;
+        desc.byteSize = sizeof(u32) * 4;
         desc.debugName = "CullingStatsReadback";
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
@@ -1397,6 +1432,16 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
         );
     }
 
+    if (m_skinnedVisibleCountBuffer)
+    {
+        cmdList->copyBuffer(
+            slot, sizeof(u32) * 3,
+            m_skinnedVisibleCountBuffer, 0,
+            sizeof(u32)
+        );
+    }
+    m_statsSubmittedSkinned[m_statsWriteSlot] = m_skinnedObjectCount;
+
     m_statsWriteSlot = (m_statsWriteSlot + 1) % STATS_READBACK_SLOTS;
     if (m_statsScheduled < STATS_READBACK_SLOTS)
         ++m_statsScheduled;
@@ -1425,6 +1470,13 @@ void GPUCullingManager::ProcessStatsReadback()
         m_cullingStats.staticVisible = counts[0];
         m_cullingStats.dynamicVisible = counts[1];
         m_cullingStats.terrainVisible = counts[2];
+
+        const u32 skinnedSubmitted = m_statsSubmittedSkinned[m_statsWriteSlot];
+        const u32 skinnedVisible = std::min(counts[3], skinnedSubmitted);
+        m_skinnedCullingStats.submitted = skinnedSubmitted;
+        m_skinnedCullingStats.visible = skinnedVisible;
+        m_skinnedCullingStats.culled = skinnedSubmitted - skinnedVisible;
+
         nvDevice->unmapBuffer(oldest);
     }
 }
@@ -1867,7 +1919,7 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     const auto& batches = geometry->GetBatches();
 
     m_skinnedObjectData.clear();
-    m_skinnedBatchPointers.clear();
+    m_skinnedDrawArgsData.clear();
 
     for (const auto& batch : batches) {
         if (!batch.isSkinned)
@@ -1883,7 +1935,14 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         obj.pad0 = 0.0f;
         obj.pad1 = 0.0f;
         m_skinnedObjectData.push_back(obj);
-        m_skinnedBatchPointers.push_back(&batch);
+
+        IndirectDrawArgs args;
+        args.indexCountPerInstance = batch.indexCount;
+        args.instanceCount = 1;
+        args.startIndexLocation = batch.startIndex;
+        args.baseVertexLocation = batch.baseVertex;
+        args.startInstanceLocation = 0;
+        m_skinnedDrawArgsData.push_back(args);
     }
 
     m_skinnedObjectCount = static_cast<u32>(m_skinnedObjectData.size());
@@ -1899,88 +1958,44 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         m_skinnedObjectData.data(),
         m_skinnedObjectCount * sizeof(GPUObjectData));
     cmdList->setBufferState(m_skinnedObjectBuffer, nvrhi::ResourceStates::ShaderResource);
+
+    cmdList->writeBuffer(m_skinnedDrawArgsBuffer,
+        m_skinnedDrawArgsData.data(),
+        m_skinnedObjectCount * sizeof(IndirectDrawArgs));
 }
 
-void GPUCullingManager::ScheduleSkinnedVisibilityReadback(nvrhi::ICommandList* cmdList)
+bool GPUCullingManager::EnsureSkinnedArgsGatePipeline(nvrhi::IDevice* nvDevice)
 {
-    if (!m_skinnedCullEnabled || m_skinnedObjectCount == 0)
-        return;
+    if (m_skinnedArgsGatePipeline)
+        return true;
 
-    u32 writeSlot = m_skinnedReadbackWriteIndex;
+    auto& cache = framegraph::GetPassResourceCache();
+    auto* gateRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("skinned_args_gate", ".cs");
+    if (!gateRefl)
+        return false;
 
-    cmdList->copyBuffer(
-        m_skinnedReadbackBuffers[writeSlot], 0,
-        m_skinnedVisibilityBuffer, 0,
-        m_skinnedObjectCount * sizeof(u32));
-
-    ++m_skinnedSubmitFrameId;
-    m_skinnedReadbackSubmitFrame[writeSlot] = m_skinnedSubmitFrameId;
-    m_skinnedReadbackCounts[writeSlot] = m_skinnedObjectCount;
-    for (u32 i = 0; i < m_skinnedBatchPointers.size(); ++i) {
-        const GeometryBatch* batch = m_skinnedBatchPointers[i];
-        if (batch && batch->visual) {
-            batch->visual->skinned_cull_index = i;
-            batch->visual->skinned_cull_frame = m_skinnedSubmitFrameId;
-        }
+    m_skinnedArgsGateLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "GPUCull_SkinnedArgsGate", *gateRefl, nvDevice);
+    if (!m_skinnedArgsGateLayout) {
+        Msg("! [GPUCulling] Failed to create skinned args gate binding layout");
+        return false;
     }
 
-    m_skinnedReadbackWriteIndex = (m_skinnedReadbackWriteIndex + 1) % SKINNED_READBACK_FRAMES;
-
-    if (m_skinnedReadbackFrameCount < SKINNED_READBACK_FRAMES) {
-        m_skinnedReadbackFrameCount++;
+    nvrhi::ComputePipelineDesc pipeDesc;
+    auto gateShader = GEnv.Render->GetShaderLoader()->LoadComputeShader("skinned_args_gate");
+    if (!gateShader.handle) {
+        Msg("! [GPUCulling] skinned_args_gate.cs not found");
+        return false;
     }
-}
+    pipeDesc.CS = gateShader.handle;
+    pipeDesc.bindingLayouts = { m_skinnedArgsGateLayout };
 
-void GPUCullingManager::ProcessSkinnedVisibilityReadback()
-{
-    if (m_skinnedReadbackFrameCount < SKINNED_READBACK_FRAMES || m_skinnedObjectCount == 0) {
-        return;
+    m_skinnedArgsGatePipeline = nvDevice->createComputePipeline(pipeDesc);
+    if (!m_skinnedArgsGatePipeline) {
+        Msg("! [GPUCulling] Failed to create skinned args gate pipeline");
+        return false;
     }
-
-    u32 readSlot = m_skinnedReadbackWriteIndex;
-
-    void* mappedData = m_device->GetNVRHIDevice()->mapBuffer(
-        m_skinnedReadbackBuffers[readSlot],
-        nvrhi::CpuAccessMode::Read);
-
-    if (mappedData) {
-        const u32* visibilityData = static_cast<const u32*>(mappedData);
-
-        const u32 count = std::min(m_skinnedReadbackCounts[readSlot], m_maxSkinnedObjects);
-        m_skinnedVisibilityValues.assign(visibilityData, visibilityData + count);
-        m_skinnedVisibilityFrame = m_skinnedReadbackSubmitFrame[readSlot];
-
-        m_device->GetNVRHIDevice()->unmapBuffer(m_skinnedReadbackBuffers[readSlot]);
-    }
-}
-
-void GPUCullingManager::UpdateSkinnedCullingStats(u32 rendered, u32 culled)
-{
-    m_skinnedCullingStats.submitted = rendered + culled;
-    m_skinnedCullingStats.visible = rendered;
-    m_skinnedCullingStats.culled = culled;
-}
-
-u32 GPUCullingManager::GetSkinnedVisibilityByVisual(const dxRender_Visual* visual) const
-{
-    if (visual && m_skinnedVisibilityFrame != 0
-        && visual->skinned_cull_frame >= m_skinnedVisibilityFrame
-        && visual->skinned_cull_index < m_skinnedVisibilityValues.size()) {
-        return m_skinnedVisibilityValues[visual->skinned_cull_index];
-    }
-    return 0;
-}
-
-void GPUCullingManager::ClearSkinnedVisibilityData()
-{
-    for (u32 i = 0; i < SKINNED_READBACK_FRAMES; ++i) {
-        m_skinnedReadbackSubmitFrame[i] = 0;
-        m_skinnedReadbackCounts[i] = 0;
-    }
-    m_skinnedVisibilityValues.clear();
-    m_skinnedVisibilityFrame = 0;
-    m_skinnedBatchPointers.clear();
-    m_skinnedReadbackFrameCount = 0;
+    return true;
 }
 
 void GPUCullingManager::BeginSkinnedFrame()
@@ -2644,7 +2659,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     return output;
 }
 
-void GPUCullingManager::SetupSkinnedCullingPass(
+framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedCullingPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle hizPyramid,
     u32 hizWidth,
@@ -2655,13 +2670,14 @@ void GPUCullingManager::SetupSkinnedCullingPass(
 {
     using namespace framegraph;
 
-    if (!m_skinnedCullEnabled) {
-        return;
+    if (!m_skinnedCullEnabled || !m_skinnedDrawArgsBuffer) {
+        return VirtualResourceHandle{};
     }
 
     struct SkinnedCullPassData {
         VirtualResourceHandle hizPyramid;
         VirtualResourceHandle visibilityBuffer;
+        VirtualResourceHandle drawArgsBuffer;
         GPUCullingManager* manager;
         const GeometryCollector* geometry;
         Fmatrix prevViewProj;
@@ -2681,10 +2697,20 @@ void GPUCullingManager::SetupSkinnedCullingPass(
     VirtualResourceHandle visBufferHandle = fg.ImportBuffer(
         "skinned_visibility", m_skinnedVisibilityBuffer, visBufferDesc);
 
+    ResourceDesc argsBufferDesc;
+    argsBufferDesc.type = ResourceDesc::Type::Buffer;
+    argsBufferDesc.debugName = "GPUCull_SkinnedDrawArgs";
+    argsBufferDesc.bufferSize = m_maxSkinnedObjects * sizeof(IndirectDrawArgs);
+    argsBufferDesc.isUAV = true;
+    argsBufferDesc.isTransient = false;
+
+    VirtualResourceHandle argsBufferHandle = fg.ImportBuffer(
+        "skinned_draw_args", m_skinnedDrawArgsBuffer, argsBufferDesc);
+
     auto& passData = fg.addCallbackPass<SkinnedCullPassData>(
         "Skinned GPU Culling",
 
-        [&, hizWidth, hizHeight, hizMipLevels, geometry, prevViewProj, visBufferHandle](FrameGraph& builder, PassHandle passHandle, SkinnedCullPassData& data) {
+        [&, hizWidth, hizHeight, hizMipLevels, geometry, prevViewProj, visBufferHandle, argsBufferHandle](FrameGraph& builder, PassHandle passHandle, SkinnedCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             passBuilder.asyncCompute();
 
@@ -2698,6 +2724,8 @@ void GPUCullingManager::SetupSkinnedCullingPass(
             data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
 
             data.visibilityBuffer = passBuilder.write(visBufferHandle, ResourceState::UnorderedAccess);
+
+            data.drawArgsBuffer = passBuilder.write(argsBufferHandle, ResourceState::UnorderedAccess);
         },
 
         [](const SkinnedCullPassData& data,
@@ -2719,7 +2747,6 @@ void GPUCullingManager::SetupSkinnedCullingPass(
             u32 frameId = Device.dwFrame + 1u;
             if (frameId == 0)
                 frameId = 1;
-            mgr->m_skinnedFrameId = frameId;
 
             nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
             if (!hizTexture) {
@@ -2727,7 +2754,11 @@ void GPUCullingManager::SetupSkinnedCullingPass(
                 return;
             }
 
+            if (!mgr->EnsureSkinnedArgsGatePipeline(nvDevice))
+                return;
+
             cmdList->clearBufferUInt(mgr->m_skinnedVisibilityBuffer, 0);
+            cmdList->clearBufferUInt(mgr->m_skinnedVisibleCountBuffer, 0);
 
             CullParamsCB cb;
             cb.viewProj = Device.mFullTransform;
@@ -2751,8 +2782,8 @@ void GPUCullingManager::SetupSkinnedCullingPass(
             bsb.ConstantBuffer("CullParams", mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB))
                .BufferSRV("g_Objects", mgr->m_skinnedObjectBuffer)
                .Texture("g_HiZPyramid", hizTexture)
-               .BufferUAV("g_VisibleIndices", mgr->m_staticSet.visibleIndexBuffer)
-               .BufferUAV("g_VisibleCount", mgr->m_staticSet.visibleCountBuffer)
+               .BufferUAV("g_VisibleIndices", mgr->m_skinnedVisibleIndexBuffer)
+               .BufferUAV("g_VisibleCount", mgr->m_skinnedVisibleCountBuffer)
                .BufferUAV("g_Visibility", mgr->m_skinnedVisibilityBuffer);
 
             nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_cullLayout);
@@ -2766,9 +2797,24 @@ void GPUCullingManager::SetupSkinnedCullingPass(
             u32 groupCount = (mgr->m_skinnedObjectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
             cmdList->dispatch(groupCount, 1, 1);
 
-            mgr->ScheduleSkinnedVisibilityReadback(cmdList);
+            auto* gateRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("skinned_args_gate", ".cs");
+            framegraph::BindingSetBuilder gateBsb(*gateRefl, nvDevice, "GPUCull.SkinnedArgsGate");
+            gateBsb.ConstantBuffer("CullParams", mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB))
+                   .BufferSRV("g_Visibility", mgr->m_skinnedVisibilityBuffer)
+                   .BufferUAV("g_DrawArgs", mgr->m_skinnedDrawArgsBuffer);
+
+            nvrhi::BindingSetHandle gateBindingSet = nvDevice->createBindingSet(gateBsb.Build(), mgr->m_skinnedArgsGateLayout);
+            R_ASSERT2(gateBindingSet, "Failed to create skinned args gate binding set");
+
+            nvrhi::ComputeState gateState;
+            gateState.pipeline = mgr->m_skinnedArgsGatePipeline;
+            gateState.bindings = { gateBindingSet };
+            cmdList->setComputeState(gateState);
+            cmdList->dispatch(groupCount, 1, 1);
         }
     );
+
+    return argsBufferHandle;
 }
 
 bool GPUCullingManager::IsDebugEnabled() const
