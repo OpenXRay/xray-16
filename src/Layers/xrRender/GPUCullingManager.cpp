@@ -2074,14 +2074,17 @@ void GPUCullingManager::ScheduleSkinnedVisibilityReadback(nvrhi::ICommandList* c
         m_skinnedVisibilityBuffer, 0,
         m_skinnedObjectCount * sizeof(u32));
 
+    static_assert(dxRender_Visual::SKINNED_CULL_STAMP_SLOTS > SKINNED_READBACK_FRAMES);
+
     ++m_skinnedSubmitFrameId;
     m_skinnedReadbackSubmitFrame[writeSlot] = m_skinnedSubmitFrameId;
     m_skinnedReadbackCounts[writeSlot] = m_skinnedObjectCount;
+    const u32 stampSlot = m_skinnedSubmitFrameId % dxRender_Visual::SKINNED_CULL_STAMP_SLOTS;
     for (u32 i = 0; i < m_skinnedBatchPointers.size(); ++i) {
         const GeometryBatch* batch = m_skinnedBatchPointers[i];
         if (batch && batch->visual) {
-            batch->visual->skinned_cull_index = i;
-            batch->visual->skinned_cull_frame = m_skinnedSubmitFrameId;
+            batch->visual->skinned_cull_index[stampSlot] = i;
+            batch->visual->skinned_cull_frame[stampSlot] = m_skinnedSubmitFrameId;
         }
     }
 
@@ -2132,10 +2135,12 @@ void GPUCullingManager::UpdateSkinnedCullingStats(u32 rendered, u32 culled)
 
 u32 GPUCullingManager::GetSkinnedVisibilityByVisual(const dxRender_Visual* visual) const
 {
-    if (visual && m_skinnedVisibilityFrame != 0
-        && visual->skinned_cull_frame >= m_skinnedVisibilityFrame
-        && visual->skinned_cull_index < m_skinnedVisibilityValues.size()) {
-        return m_skinnedVisibilityValues[visual->skinned_cull_index];
+    if (visual && m_skinnedVisibilityFrame != 0) {
+        const u32 slot = m_skinnedVisibilityFrame % dxRender_Visual::SKINNED_CULL_STAMP_SLOTS;
+        if (visual->skinned_cull_frame[slot] == m_skinnedVisibilityFrame
+            && visual->skinned_cull_index[slot] < m_skinnedVisibilityValues.size()) {
+            return m_skinnedVisibilityValues[visual->skinned_cull_index[slot]];
+        }
     }
     return 0;  // Not found = culled (conservative)
 }
