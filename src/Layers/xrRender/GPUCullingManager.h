@@ -379,15 +379,17 @@ public:
     // ───────────────────────────────────────────────────────
     //  SKINNED MESH CULLING
     // ───────────────────────────────────────────────────────
-    // Skinned meshes use per-draw rendering (bone matrices) and cannot
-    // use multi-draw compaction. Instead, we cull them and provide a
-    // visibility buffer that the skinning pass checks before each draw.
+    // Skinned meshes draw individually (per-draw bone offsets), so instead of
+    // multi-draw compaction each batch gets a persistent indirect-args slot;
+    // the gate compute zeroes instanceCount for culled batches same-frame.
 
     // Upload skinned mesh bounding spheres (call from UploadSceneObjects)
     void UploadSkinnedObjects(fg::RenderContext* ctx, const GeometryCollector* geometry);
 
-    // Setup skinned culling pass (uses same Hi-Z pyramid as static culling)
-    void SetupSkinnedCullingPass(
+    // Setup skinned culling pass (uses same Hi-Z pyramid as static culling).
+    // Returns the imported draw-args buffer handle (invalid if disabled) so the
+    // skinning pass can declare a read dependency on it.
+    framegraph::VirtualResourceHandle SetupSkinnedCullingPass(
         framegraph::FrameGraph& fg,
         framegraph::VirtualResourceHandle hizPyramid,
         u32 hizWidth,
@@ -397,16 +399,9 @@ public:
         const Fmatrix& prevViewProj
     );
 
-    // Get skinned visibility by visual pointer (handles batch reordering)
-    // Returns 0 (culled) if visual not found, non-zero (visible) otherwise
-    u32 GetSkinnedVisibilityByVisual(const dxRender_Visual* visual) const;
-
-    // Check if skinned visibility data is available
-    bool HasSkinnedVisibilityData() const { return !m_skinnedVisibilityValues.empty(); }
-
     u32 GetSkinnedObjectCount() const { return m_skinnedObjectCount; }
     bool IsSkinnedCullingEnabled() const { return m_initialized && m_skinnedCullEnabled; }
-
+    nvrhi::IBuffer* GetSkinnedDrawArgsBuffer() const { return m_skinnedDrawArgsBuffer.Get(); }
 
     // Skinned culling stats (for profiler display)
     struct SkinnedCullingStats {
@@ -415,13 +410,6 @@ public:
         u32 culled = 0;
     };
     const SkinnedCullingStats& GetSkinnedCullingStats() const { return m_skinnedCullingStats; }
-    void UpdateSkinnedCullingStats(u32 rendered, u32 culled);
-
-    // Schedule skinned visibility readback (call after skinned culling pass)
-    void ScheduleSkinnedVisibilityReadback(nvrhi::ICommandList* cmdList);
-
-    // Process skinned visibility readback (call at frame start or before skinning pass)
-    void ProcessSkinnedVisibilityReadback();
 
     // ───────────────────────────────────────────────────────
     //  SKELETON BONE BUFFER (for GPU-driven skinned rendering)
@@ -438,9 +426,6 @@ public:
 
     // Get the global bone buffer for shader binding
     nvrhi::IBuffer* GetGlobalBoneBuffer() const { return m_globalBoneBuffer.Get(); }
-
-    // Clear skeleton visibility data (call on level unload to prevent dangling pointers)
-    void ClearSkinnedVisibilityData();
 
     // Process readback results from previous frame (call at frame start)
     void ProcessStatsReadback();
@@ -628,20 +613,11 @@ private:
 
     nvrhi::BufferHandle m_skinnedObjectBuffer;           // GPUObjectData for skinned batches
     nvrhi::BufferHandle m_skinnedVisibilityBuffer;       // Frame stamp per batch (u32)
-
-    // Double-buffer for async readback (no fence, trust GPU pipelining)
-    // By frame N, frame N-2's GPU work is guaranteed complete
-    // This gives n-2 latency (1 frame fresher than original n-3)
-    static constexpr u32 SKINNED_READBACK_FRAMES = 6;
-    nvrhi::BufferHandle m_skinnedReadbackBuffers[SKINNED_READBACK_FRAMES];
-    u32 m_skinnedReadbackWriteIndex = 0;   // Which buffer to write to next
-    u32 m_skinnedReadbackFrameCount = 0;   // Frames accumulated (0, 1, or 2)
-
-    u32 m_skinnedSubmitFrameId = 0;
-    u32 m_skinnedReadbackSubmitFrame[SKINNED_READBACK_FRAMES] = {};
-    u32 m_skinnedReadbackCounts[SKINNED_READBACK_FRAMES] = {};
-    xr_vector<u32> m_skinnedVisibilityValues;
-    u32 m_skinnedVisibilityFrame = 0;
+    nvrhi::BufferHandle m_skinnedDrawArgsBuffer;         // IndirectDrawArgs per batch, instanceCount gated by compute
+    nvrhi::BufferHandle m_skinnedVisibleCountBuffer;     // Atomic visible counter (stats)
+    nvrhi::BufferHandle m_skinnedVisibleIndexBuffer;     // Visible batch indices (debug)
+    nvrhi::ComputePipelineHandle m_skinnedArgsGatePipeline;
+    nvrhi::BindingLayoutHandle m_skinnedArgsGateLayout;
 
     u32 m_skinnedObjectCount = 0;
     u32 m_maxSkinnedObjects = 0;
@@ -649,8 +625,7 @@ private:
 
     // CPU-side data
     xr_vector<GPUObjectData> m_skinnedObjectData;
-    xr_vector<const GeometryBatch*> m_skinnedBatchPointers;  // Batch pointers (parallel to object data)
-    u32 m_skinnedFrameId = 0;
+    xr_vector<IndirectDrawArgs> m_skinnedDrawArgsData;
     SkinnedCullingStats m_skinnedCullingStats;
 
     // Global bone buffer for GPU-driven skinned rendering
@@ -665,6 +640,7 @@ private:
 
     void CreateSkinnedCullingBuffers(fg::RenderDevice* device);
     void EnsureSkinnedBufferCapacity(u32 count);
+    bool EnsureSkinnedArgsGatePipeline(nvrhi::IDevice* nvDevice);
     void UploadSkeletonBones(nvrhi::ICommandList* cmdList, CKinematics* skeleton, u32 boneOffset);
 
     // ───────────────────────────────────────────────────────
@@ -714,6 +690,7 @@ private:
     // ───────────────────────────────────────────────────────
     static constexpr u32 STATS_READBACK_SLOTS = 6;
     nvrhi::BufferHandle m_statsReadbackBuffers[STATS_READBACK_SLOTS];
+    u32 m_statsSubmittedSkinned[STATS_READBACK_SLOTS] = {};
     CullingStats m_cullingStats;                 // Previous frame's stats
     u32 m_statsWriteSlot = 0;
     u32 m_statsScheduled = 0;
