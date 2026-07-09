@@ -85,9 +85,6 @@ public:
     u32 bindless_material_id{UINT32_MAX};
     u32 bindless_material_epoch{0};
 
-    u32 skinned_cull_index{UINT32_MAX};
-    u32 skinned_cull_frame{0};
-
     virtual void Load(const char* N, IReader* data, u32 dwFlags);
     virtual void Release(); // Shared memory release
     virtual void Copy(dxRender_Visual* from);

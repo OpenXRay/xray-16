@@ -413,7 +413,9 @@ static void DrawSkinnedBatch(
     const GeometryBatch& batch,
     const Fmatrix& worldMatrix,
     u32 skeletonBoneOffset,
-    decals::OverlayManager::SplatRange splatRange = {0, 0})
+    decals::OverlayManager::SplatRange splatRange = {0, 0},
+    nvrhi::IBuffer* indirectArgs = nullptr,
+    u32 indirectOffset = 0)
 {
     using namespace fg;
     using namespace fg::bindless;
@@ -466,13 +468,18 @@ static void DrawSkinnedBatch(
         gfxState.indexBuffer = { batch.indexBuffer, nvrhi::Format::R16_UINT, 0 };
         gfxState.viewport.addViewport(ctx.viewport);
         gfxState.viewport.addScissorRect(ctx.scissor);
+        gfxState.indirectParams = indirectArgs;
 
         cmdList->setGraphicsState(gfxState);
-        cmdList->drawIndexed(
-            nvrhi::DrawArguments()
-                .setVertexCount(batch.indexCount)
-                .setStartIndexLocation(batch.startIndex)
-                .setStartVertexLocation(batch.baseVertex));
+        if (indirectArgs) {
+            cmdList->drawIndexedIndirect(indirectOffset, 1);
+        } else {
+            cmdList->drawIndexed(
+                nvrhi::DrawArguments()
+                    .setVertexCount(batch.indexCount)
+                    .setStartIndexLocation(batch.startIndex)
+                    .setStartVertexLocation(batch.baseVertex));
+        }
     }
 }
 
@@ -489,7 +496,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     MaterialCache* materialCache,
     u32 width,
     u32 height,
-    const SkinnedVisibilityData& visibilityData,
+    fg::GPUCullingManager* gpuCulling,
+    framegraph::VirtualResourceHandle skinnedDrawArgs,
     SkinningPassState* state,
     decals::OverlayManager* overlayMgr)
 {
@@ -511,7 +519,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA
         // ═══════════════════════════════════════════════════════
-        [&, width, height, visibilityData, state, overlayMgr](FrameGraph& builder, PassHandle passHandle, SkinningPassData& data) {
+        [&, width, height, gpuCulling, skinnedDrawArgs, state, overlayMgr](FrameGraph& builder, PassHandle passHandle, SkinningPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -520,9 +528,12 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             data.geometry = geometry;
             data.hudBatches = hudBatches;
             data.materialCache = materialCache;
-            data.visibilityData = visibilityData;
+            data.gpuCulling = gpuCulling;
             data.passState = state;
             data.overlayMgr = overlayMgr;
+
+            if (skinnedDrawArgs.is_valid())
+                data.skinnedDrawArgs = passBuilder.read(skinnedDrawArgs, ResourceState::IndirectArgument);
 
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
@@ -596,10 +607,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
             const auto& rtDesc = colorRT->getDesc();
 
-            // Get GPUCullingManager for bone buffer (passed via visibility data userData)
-            GPUCullingManager* gpuCullMgr = data.visibilityData.visibilityByVisualUserData
-                ? static_cast<GPUCullingManager*>(data.visibilityData.visibilityByVisualUserData)
-                : nullptr;
+            GPUCullingManager* gpuCullMgr = data.gpuCulling;
 
             if (!gpuCullMgr || !gpuCullMgr->GetGlobalBoneBuffer()) {
                 Msg("! [SkinningPass] GPUCullingManager bone buffer not available!");
@@ -616,7 +624,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             auto dynTransformsCB = cache.GetOrCreateVolatileCB("SkinningPass", "DynTransforms", sizeof(DynamicTransforms), data.device, 1024 * 8);
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             auto shaderParamsCB = cache.GetOrCreateVolatileCB("SkinningPass", "ShaderParams", sizeof(ShaderParams), data.device, 512);
-            auto materialIdCB = cache.GetOrCreateVolatileCB("SkinningPass", "MaterialId", sizeof(SkinnedMaterialCB), data.device, 1024);
+            auto materialIdCB = cache.GetOrCreateVolatileCB("SkinningPass", "MaterialId", sizeof(SkinnedMaterialCB), data.device, 1024 * 8);
 
             ShaderParams shaderParams = {};
             shaderParams.m_AlphaRef = 0.5f;
@@ -666,50 +674,25 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                     globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer,
                     worldViewport, scissor, false);
 
-                const bool useGPUCulling = data.visibilityData.enabled &&
-                                           data.visibilityData.visibilityByVisualCallback != nullptr;
+                nvrhi::IBuffer* indirectArgs = nullptr;
+                if (data.skinnedDrawArgs.is_valid()
+                    && gpuCullMgr->IsSkinnedCullingEnabled()
+                    && gpuCullMgr->GetSkinnedObjectCount() == worldSkinnedCount) {
+                    indirectArgs = gpuCullMgr->GetSkinnedDrawArgsBuffer();
+                }
 
-                if (useGPUCulling) {
-                    u32 renderedCount = 0;
-                    u32 culledCount = 0;
+                u32 skinnedIdx = 0;
+                for (const auto& batch : data.geometry->GetBatches()) {
+                    if (!batch.isSkinned)
+                        continue;
 
-                    for (const auto& batch : data.geometry->GetBatches()) {
-                        if (!batch.isSkinned)
-                            continue;
+                    u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
+                    auto sr = GetSplatRange(batch, data.overlayMgr);
 
-                        u32 visibilityValue = batch.visual
-                            ? data.visibilityData.visibilityByVisualCallback(
-                                batch.visual, data.visibilityData.visibilityByVisualUserData)
-                            : 0;
-
-                        if (visibilityValue == 0) {
-                            culledCount++;
-                            continue;
-                        }
-
-                        u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
-                        auto sr = GetSplatRange(batch, data.overlayMgr);
-
-                        DrawSkinnedBatch(*data.passState, cmdList, nvDevice, worldCtx,
-                            batch, batch.worldMatrix, boneOffset, sr);
-                        renderedCount++;
-                    }
-
-                    if (data.visibilityData.statsCallback) {
-                        data.visibilityData.statsCallback(renderedCount, culledCount,
-                            data.visibilityData.statsUserData);
-                    }
-                } else {
-                    for (const auto& batch : data.geometry->GetBatches()) {
-                        if (!batch.isSkinned)
-                            continue;
-
-                        u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
-                        auto sr = GetSplatRange(batch, data.overlayMgr);
-
-                        DrawSkinnedBatch(*data.passState, cmdList, nvDevice, worldCtx,
-                            batch, batch.worldMatrix, boneOffset, sr);
-                    }
+                    DrawSkinnedBatch(*data.passState, cmdList, nvDevice, worldCtx,
+                        batch, batch.worldMatrix, boneOffset, sr,
+                        indirectArgs, skinnedIdx * (u32)sizeof(IndirectDrawArgs));
+                    ++skinnedIdx;
                 }
             }
 
