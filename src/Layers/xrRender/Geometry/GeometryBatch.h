@@ -56,6 +56,10 @@ struct GeometryBatch {
 
     u16 skinningRenderMode = 0;
 
+    u32 skinnedPoolFormat = UINT32_MAX;
+    s32 skinnedPoolBaseVertex = 0;
+    u32 skinnedPoolFirstIndex = 0;
+
     bool isTerrain = false;
     u32 terrainMaterialID = UINT32_MAX;
 
