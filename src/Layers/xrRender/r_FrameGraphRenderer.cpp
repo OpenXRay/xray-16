@@ -846,6 +846,7 @@ void FrameGraphRenderer::SetupFrame() {
             ZoneScopedN("Readback::CullStats");
             m_gpuCullingManager->ProcessStatsReadback();
         }
+        m_gpuCullingManager->BeginSkinnedFrame();
     }
 
     if (m_detailManager && m_device) {
@@ -1160,7 +1161,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 hizOutput.height,
                 hizOutput.mipLevels,
                 m_geometryCollector.get(),
-                m_prevViewProj
+                m_prevViewProj,
+                m_overlayManager.get()
             );
         }
     }
@@ -1578,7 +1580,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                         }
                     }
 
-                    data.gpuCulling->BeginSkinnedFrame();
                     data.accelMgr->BuildSkinnedBLAS(cmdList, data.gpuCulling, worldSkinned, hudSkinned);
                     data.accelMgr->BuildGrassBLAS(cmdList, data.detailMgr);
                     data.accelMgr->RebuildDynamic(cmdList, data.gpuCulling);
@@ -2072,6 +2073,16 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
             batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
         } else {
             batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
+        }
+        if (m_gpuCullingManager && meshVisual->p_rm_Vertices && meshVisual->p_rm_Indices) {
+            u32 fmt = fg::SkinnedFormatFromRenderMode(batch.skinningRenderMode, meshVisual->vStride);
+            if (m_gpuCullingManager->GetSkinnedPools().Register(
+                    meshVisual->p_rm_Vertices, meshVisual->p_rm_Indices,
+                    meshVisual->vCount, meshVisual->vStride, meshVisual->iCount, fmt)) {
+                batch.skinnedPoolFormat = fmt;
+                batch.skinnedPoolBaseVertex = (s32)meshVisual->p_rm_Vertices->skinned_pool_base_vertex;
+                batch.skinnedPoolFirstIndex = meshVisual->p_rm_Vertices->skinned_pool_first_index + batch.startIndex;
+            }
         }
     }
     if (visualType == MT_TREE_ST || visualType == MT_TREE_PM) {

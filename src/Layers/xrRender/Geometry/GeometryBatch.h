@@ -88,6 +88,10 @@ struct GeometryBatch {
     // Used to select correct shader (1B, 2B, 3B, 4B variants)
     u16 skinningRenderMode = 0;
 
+    u32 skinnedPoolFormat = UINT32_MAX;
+    s32 skinnedPoolBaseVertex = 0;
+    u32 skinnedPoolFirstIndex = 0;
+
     // Terrain flag - determines which pipeline to use
     // Terrain uses bindless_terrain.ps with 4-layer detail blending
     bool isTerrain = false;

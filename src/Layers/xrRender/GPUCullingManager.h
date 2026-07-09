@@ -7,6 +7,7 @@
 #include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include "Layers/xrRender/Bindless/UnifiedVertex.h"
 #include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
+#include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
 
 namespace xray::render::fg::passes {
     struct ParticleBatch;
@@ -28,6 +29,9 @@ namespace xray::render::fg {
     class dxRender_Visual;  // Forward declaration for visual pointer map
     class CKinematics;
     class RTAccelStructManager;
+    namespace decals {
+        class OverlayManager;
+    }
 }
 
 namespace xray::render::fg {
@@ -384,7 +388,8 @@ public:
     // the gate compute zeroes instanceCount for culled batches same-frame.
 
     // Upload skinned mesh bounding spheres (call from UploadSceneObjects)
-    void UploadSkinnedObjects(fg::RenderContext* ctx, const GeometryCollector* geometry);
+    void UploadSkinnedObjects(fg::RenderContext* ctx, const GeometryCollector* geometry,
+        decals::OverlayManager* overlayMgr);
 
     // Setup skinned culling pass (uses same Hi-Z pyramid as static culling).
     // Returns the imported draw-args buffer handle (invalid if disabled) so the
@@ -396,12 +401,45 @@ public:
         u32 hizHeight,
         u32 hizMipLevels,
         const GeometryCollector* geometry,
-        const Fmatrix& prevViewProj
+        const Fmatrix& prevViewProj,
+        decals::OverlayManager* overlayMgr
     );
 
     u32 GetSkinnedObjectCount() const { return m_skinnedObjectCount; }
     bool IsSkinnedCullingEnabled() const { return m_initialized && m_skinnedCullEnabled; }
+    bool IsSkinnedMDIEnabled() const { return IsSkinnedCullingEnabled() && m_compactEnabled; }
     nvrhi::IBuffer* GetSkinnedDrawArgsBuffer() const { return m_skinnedDrawArgsBuffer.Get(); }
+    SkinnedGeometryPools& GetSkinnedPools() { return m_skinnedPools; }
+
+    struct SkinnedDrawRecord {
+        Fmatrix world;
+        u32 boneOffset;
+        u32 splatOffset;
+        u32 splatCount;
+        u32 pad;
+    };
+    static_assert(sizeof(SkinnedDrawRecord) == 80, "SkinnedDrawRecord must be 80 bytes");
+
+    struct SkinnedBucket {
+        nvrhi::BufferHandle objectBuffer;
+        nvrhi::BufferHandle visibilityBuffer;
+        nvrhi::BufferHandle drawArgsBuffer;
+        nvrhi::BufferHandle materialIDBuffer;
+        nvrhi::BufferHandle recordsBuffer;
+        nvrhi::BufferHandle compactDrawArgsBuffer;
+        nvrhi::BufferHandle compactBatchIndicesBuffer;
+        nvrhi::BufferHandle compactMaterialIDBuffer;
+        nvrhi::BufferHandle compactCountBuffer;
+        nvrhi::BufferHandle compactLocalPrefixBuffer;
+        nvrhi::BufferHandle compactGroupCountsBuffer;
+        nvrhi::BufferHandle compactGroupOffsetsBuffer;
+        xr_vector<GPUObjectData> objects;
+        xr_vector<IndirectDrawArgs> args;
+        xr_vector<SkinnedDrawRecord> records;
+        xr_vector<u32> materialIDs;
+        u32 count = 0;
+    };
+    const SkinnedBucket& GetSkinnedBucket(u32 formatID) const { return m_skinnedBuckets[formatID]; }
 
     // Skinned culling stats (for profiler display)
     struct SkinnedCullingStats {
@@ -616,6 +654,7 @@ private:
     nvrhi::BufferHandle m_skinnedDrawArgsBuffer;         // IndirectDrawArgs per batch, instanceCount gated by compute
     nvrhi::BufferHandle m_skinnedVisibleCountBuffer;     // Atomic visible counter (stats)
     nvrhi::BufferHandle m_skinnedVisibleIndexBuffer;     // Visible batch indices (debug)
+    nvrhi::BufferHandle m_skinnedDispatchArgsDummy;      // Scan stage dispatch-args sink (unused)
     nvrhi::ComputePipelineHandle m_skinnedArgsGatePipeline;
     nvrhi::BindingLayoutHandle m_skinnedArgsGateLayout;
 
@@ -627,6 +666,14 @@ private:
     xr_vector<GPUObjectData> m_skinnedObjectData;
     xr_vector<IndirectDrawArgs> m_skinnedDrawArgsData;
     SkinnedCullingStats m_skinnedCullingStats;
+
+    SkinnedGeometryPools m_skinnedPools;
+    SkinnedBucket m_skinnedBuckets[SkinnedGeometryPools::FORMAT_COUNT];
+    u32 m_skinnedResidualCount = 0;
+
+    void EnsureSkinnedBucketCapacity(SkinnedBucket& bucket, const char* name, u32 capacity);
+    void DispatchSkinnedBucketCompaction(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        SkinnedBucket& bucket, u32 frameId);
 
     // Global bone buffer for GPU-driven skinned rendering
     // All skeleton bones are uploaded here each frame, indexed by per-instance offset
