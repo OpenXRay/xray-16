@@ -542,7 +542,7 @@ private:
     void DispatchSkinnedBucketCompaction(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
         SkinnedBucket& bucket, u32 frameId);
 
-    static constexpr u32 MAX_TOTAL_BONES = 8192;
+    static constexpr u32 MAX_TOTAL_BONES = 16384;
     static constexpr u32 BONE_STRIDE = sizeof(Fmatrix);
     nvrhi::BufferHandle m_globalBoneBuffer;
     u32 m_boneUploadFrameId = 0;
