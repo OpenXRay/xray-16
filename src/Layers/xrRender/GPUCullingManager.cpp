@@ -1500,6 +1500,10 @@ void GPUCullingManager::DispatchVariantPartition(
 
 void GPUCullingManager::Shutdown()
 {
+    m_skinnedPools.Reset();
+    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f)
+        m_skinnedBuckets[f] = SkinnedBucket{};
+
     m_staticSet.objectBuffer = nullptr;
     m_staticSet.visibleIndexBuffer = nullptr;
     m_staticSet.visibleCountBuffer = nullptr;

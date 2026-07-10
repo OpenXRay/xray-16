@@ -677,7 +677,7 @@ private:
 
     // Global bone buffer for GPU-driven skinned rendering
     // All skeleton bones are uploaded here each frame, indexed by per-instance offset
-    static constexpr u32 MAX_TOTAL_BONES = 8192;  // ~100 skeletons * 78 bones
+    static constexpr u32 MAX_TOTAL_BONES = 16384;  // ~200 skeletons * 78 bones
     static constexpr u32 BONE_STRIDE = sizeof(Fmatrix);  // 64 bytes
     nvrhi::BufferHandle m_globalBoneBuffer;
     u32 m_boneUploadFrameId = 0;

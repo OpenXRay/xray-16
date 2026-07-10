@@ -27,7 +27,11 @@ public:
 
     void Reset();
 
+    u32 GetGeneration() const { return m_generation; }
+
 private:
+    u32 m_generation = 1;
+
     struct Pool
     {
         xr_vector<u8> vertexData;
