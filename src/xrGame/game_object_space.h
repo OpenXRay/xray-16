@@ -81,6 +81,8 @@ enum ECallbackType : u32
     eControllerAttitudeChange,
 
     // X-Ray Extensions:
+    eInventoryInfoRemoved,
+
     eKeyPress   = 123,
     eKeyRelease = 124,
     eKeyHold    = 125,
