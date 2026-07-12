@@ -113,6 +113,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         if (iPaused)
         {
             stop_target();
+            discard_prefilled_blocks();
             m_current_state = stSimulating;
             fTimeStarted += dt;
             fTimeToStop += dt;
@@ -178,6 +179,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         if (iPaused)
         {
             stop_target();
+            discard_prefilled_blocks();
             m_current_state = stSimulatingLooped;
             fTimeStarted += dt;
             fTimeToPropagade += dt;
