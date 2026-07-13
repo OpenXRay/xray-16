@@ -121,6 +121,17 @@ bool square_equation(float a, float b, float c, float& x0, float& x1) // returns
 float half_shift_restrict_up = 0.1f;
 float half_shift_restrict_down = 0.15f;
 
+void object_shift::reset()
+{
+    current = 0.f;
+    taget = 0.f;
+    taget_time = Device.fTimeGlobal;
+    current_time = Device.fTimeGlobal;
+    speed = 0.f;
+    accel = 0.f;
+    aaccel = 0.f;
+}
+
 void object_shift::set_taget(float taget_, float time)
 {
     if (b_freeze)

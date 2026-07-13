@@ -94,7 +94,7 @@ float CIKLimbsController::LegLengthShiftLimit(float current_shift, const SCalcul
         if (cd[j].state.foot_step)
         {
             float s_down = cd[j].m_limb->ObjShiftDown(current_shift, cd[j]);
-            if (shift_down < s_down)
+            if (_valid(s_down) && shift_down < s_down)
                 shift_down = s_down;
         }
     return shift_down;
@@ -102,7 +102,16 @@ float CIKLimbsController::LegLengthShiftLimit(float current_shift, const SCalcul
 static const float static_shift_object_speed = .2f;
 float CIKLimbsController::StaticObjectShift(const SCalculateData cd[max_size])
 {
-    const float current_shift = _object_shift.shift();
+    float current_shift = _object_shift.shift();
+
+    if (!_valid(current_shift))
+    {
+#ifdef DEBUG
+        Msg("! IK: reset invalid object shift for %s", m_object->cName().c_str());
+#endif
+        _object_shift.reset();
+        current_shift = 0.f;
+    }
 
     u16 cnt = 0;
     float shift_up = 0;
@@ -111,7 +120,7 @@ float CIKLimbsController::StaticObjectShift(const SCalculateData cd[max_size])
         if (cd[j].state.foot_step)
         {
             float s_up = cd[j].cl_shift.y + current_shift;
-            if (0.f < s_up)
+            if (_valid(s_up) && 0.f < s_up)
             {
                 shift_up += s_up;
                 ++cnt;
@@ -127,7 +136,17 @@ float CIKLimbsController::StaticObjectShift(const SCalculateData cd[max_size])
         shift = -shift_down;
     else
         shift = shift_up;
-    VERIFY(_valid(shift));
+
+    if (!_valid(shift))
+    {
+#ifdef DEBUG
+        Msg("! IK: reset invalid object shift for %s", m_object->cName().c_str());
+#endif
+        _object_shift.reset();
+
+        return 0.f;
+    }
+
     _object_shift.set_taget(shift, _abs(current_shift - shift) / static_shift_object_speed);
     return shift;
 }
