@@ -59,7 +59,7 @@ struct ResourceAccess {
 
     bool clearOnLoad = false;
     float clearColor[4] = {0, 0, 0, 0};
-    float clearDepth = 1.0f;
+    float clearDepth = 0.0f;
     u8 clearStencil = 0;
 
     ResourceAccess() = default;
@@ -182,7 +182,7 @@ struct PassNode {
     }
 
     void WriteDepthStencil(VirtualResourceHandle resource, bool clear = false,
-                          float clearDepth = 1.0f, u8 clearStencil = 0) {
+                          float clearDepth = 0.0f, u8 clearStencil = 0) {
         ResourceAccess access;
         access.resource = resource;
         access.accessType = ResourceAccess::Type::Write;

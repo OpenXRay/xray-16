@@ -286,24 +286,30 @@ Task& CHOM::DispatchMTRender()
     });
 }
 
-ICF BOOL xform_b0(Fvector2& min, Fvector2& max, float& minz, const Fmatrix& X, float _x, float _y, float _z)
+ICF BOOL xform_b0(Fvector2& min, Fvector2& max, float& maxz, const Fmatrix& X, float _x, float _y, float _z)
 {
-    const float z = _x * X._13 + _y * X._23 + _z * X._33 + X._43;
-    if (z < EPS)
+    const float w = _x * X._14 + _y * X._24 + _z * X._34 + X._44;
+    if (w < EPS)
         return TRUE;
-    const float iw = 1.f / (_x * X._14 + _y * X._24 + _z * X._34 + X._44);
+    const float z = _x * X._13 + _y * X._23 + _z * X._33 + X._43;
+    if (z > w - EPS)
+        return TRUE;
+    const float iw = 1.f / w;
     min.x = max.x = (_x * X._11 + _y * X._21 + _z * X._31 + X._41) * iw;
     min.y = max.y = (_x * X._12 + _y * X._22 + _z * X._32 + X._42) * iw;
-    minz = 0.f + z * iw;
+    maxz = 0.f + z * iw;
     return FALSE;
 }
 
-ICF BOOL xform_b1(Fvector2& min, Fvector2& max, float& minz, const Fmatrix& X, float _x, float _y, float _z)
+ICF BOOL xform_b1(Fvector2& min, Fvector2& max, float& maxz, const Fmatrix& X, float _x, float _y, float _z)
 {
-    const float z = _x * X._13 + _y * X._23 + _z * X._33 + X._43;
-    if (z < EPS)
+    const float w = _x * X._14 + _y * X._24 + _z * X._34 + X._44;
+    if (w < EPS)
         return TRUE;
-    const float iw = 1.f / (_x * X._14 + _y * X._24 + _z * X._34 + X._44);
+    const float z = _x * X._13 + _y * X._23 + _z * X._33 + X._43;
+    if (z > w - EPS)
+        return TRUE;
+    const float iw = 1.f / w;
     float t = (_x * X._11 + _y * X._21 + _z * X._31 + X._41) * iw;
     if (t < min.x)
         min.x = t;
@@ -315,8 +321,8 @@ ICF BOOL xform_b1(Fvector2& min, Fvector2& max, float& minz, const Fmatrix& X, f
     else if (t > max.y)
         max.y = t;
     t = 0.f + z * iw;
-    if (t < minz)
-        minz = t;
+    if (t > maxz)
+        maxz = t;
     return FALSE;
 }
 

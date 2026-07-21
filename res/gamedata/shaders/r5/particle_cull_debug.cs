@@ -67,7 +67,7 @@ float3 OcclusionTestSphereDebug(float3 center, float radius)
     float d2 = g_HiZPyramid.SampleLevel(smp_nofilter, float2(boxUV.z, boxUV.y), mipLevel);
     float d3 = g_HiZPyramid.SampleLevel(smp_nofilter, float2(boxUV.x, boxUV.w), mipLevel);
     float d4 = g_HiZPyramid.SampleLevel(smp_nofilter, float2(boxUV.z, boxUV.w), mipLevel);
-    float hiZDepth = max(max(d1, d2), max(d3, d4));
+    float hiZDepth = min(min(d1, d2), min(d3, d4));
 
     float3 viewDir = normalize(center - g_CameraPos);
     float3 frontPoint = center - viewDir * radius;
@@ -79,7 +79,7 @@ float3 OcclusionTestSphereDebug(float3 center, float radius)
     float objectDepth = saturate(frontClip.z / frontClip.w);
 
     float depthBias = 0.0001;
-    bool visible = objectDepth <= (hiZDepth + depthBias);
+    bool visible = objectDepth >= (hiZDepth - depthBias);
 
     return float3(objectDepth, hiZDepth, visible ? 1.0 : 0.0);
 }

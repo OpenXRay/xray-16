@@ -28,7 +28,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
 
     float depth = t_Depth.Load(int3(pixel, 0));
 
-    if (depth >= 1.0) {
+    if (depth <= 0.0) {
         u_MotionVectors[pixel] = float2(0, 0);
         return;
     }

@@ -451,14 +451,13 @@ void CHudItem::TransformPosFromWorldToHud(Fvector& worldPos)
         mView.build_camera_dir(trans.c, trans.k, trans.j);
     }
 
-    Fmatrix hud_project;
-    hud_project.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
-        g_pGamePersistent->Environment().CurrentEnv.far_plane);
+    const float fov_scale =
+        tanf(deg2rad(Device.fFOV) * 0.5f) / tanf(deg2rad(psHUD_FOV * Device.fFOV) * 0.5f);
 
     mView.transform_tiny(worldPos);
-    hud_project.transform_tiny(worldPos);
-
-    Fmatrix().set(Device.mProject).invert().transform_tiny(worldPos);
+    worldPos.x *= fov_scale;
+    worldPos.y *= fov_scale;
+    worldPos.z += VIEWPORT_NEAR - HUD_VIEWPORT_NEAR;
     Fmatrix().set(mView).invert().transform_tiny(worldPos);
 }
 
@@ -475,14 +474,12 @@ void CHudItem::TransformDirFromWorldToHud(Fvector& worldDir)
         mView.build_camera_dir(trans.c, trans.k, trans.j);
     }
 
-    Fmatrix hud_project;
-    hud_project.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
-        g_pGamePersistent->Environment().CurrentEnv.far_plane);
+    const float fov_scale =
+        tanf(deg2rad(Device.fFOV) * 0.5f) / tanf(deg2rad(psHUD_FOV * Device.fFOV) * 0.5f);
 
     mView.transform_dir(worldDir);
-    hud_project.transform_dir(worldDir);
-
-    Fmatrix().set(Device.mProject).invert().transform_dir(worldDir);
+    worldDir.x *= fov_scale;
+    worldDir.y *= fov_scale;
     Fmatrix().set(mView).invert().transform_dir(worldDir);
 }
 

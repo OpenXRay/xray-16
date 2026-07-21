@@ -513,20 +513,20 @@ void CFrustum::CreateFromMatrix(Fmatrix& M, u32 mask)
     // Far clipping plane
     if (mask & FRUSTUM_P_FAR)
     {
-        planes[p_count].n.x = -(M._14 - M._13);
-        planes[p_count].n.y = -(M._24 - M._23);
-        planes[p_count].n.z = -(M._34 - M._33);
-        planes[p_count].d = -(M._44 - M._43);
+        planes[p_count].n.x = -M._13;
+        planes[p_count].n.y = -M._23;
+        planes[p_count].n.z = -M._33;
+        planes[p_count].d = -M._43;
         p_count++;
     }
 
     // Near clipping plane
     if (mask & FRUSTUM_P_NEAR)
     {
-        planes[p_count].n.x = -(M._14 + M._13);
-        planes[p_count].n.y = -(M._24 + M._23);
-        planes[p_count].n.z = -(M._34 + M._33);
-        planes[p_count].d = -(M._44 + M._43);
+        planes[p_count].n.x = -(M._14 - M._13);
+        planes[p_count].n.y = -(M._24 - M._23);
+        planes[p_count].n.z = -(M._34 - M._33);
+        planes[p_count].d = -(M._44 - M._43);
         p_count++;
     }
 

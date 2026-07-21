@@ -26,7 +26,7 @@ void main(uint3 dispatch_id : SV_DispatchThreadID)
     float d2 = g_input_depth.Load(int3(input_coord + uint2(0, 1), g_input_mip_level));
     float d3 = g_input_depth.Load(int3(input_coord + uint2(1, 1), g_input_mip_level));
 
-    float max_depth = max(max(d0, d1), max(d2, d3));
+    float min_depth = min(min(d0, d1), min(d2, d3));
 
-    g_output_hiz[dispatch_id.xy] = max_depth;
+    g_output_hiz[dispatch_id.xy] = min_depth;
 }

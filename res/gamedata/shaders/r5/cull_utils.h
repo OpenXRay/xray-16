@@ -100,7 +100,7 @@ bool HiZTestSphereTemporal(
     float d3 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.w), mipLevel);
     float d4 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.w), mipLevel);
 
-    float hiZDepth = max(max(d1, d2), max(d3, d4));
+    float hiZDepth = min(min(d1, d2), min(d3, d4));
 
     float3 viewDir = normalize(center - cameraPos);
     float3 frontPoint = center - viewDir * radius;
@@ -111,7 +111,7 @@ bool HiZTestSphereTemporal(
 
     float frontDepth = frontClip.z / frontClip.w;
 
-    return frontDepth <= hiZDepth;
+    return frontDepth >= hiZDepth;
 }
 
 bool HiZTestSphere(

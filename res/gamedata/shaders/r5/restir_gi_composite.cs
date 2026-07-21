@@ -30,7 +30,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth >= 1.0) {
+    if (depth <= 0.0) {
         u_SceneColor[pixel] = t_SceneColorIn.Load(int3(pixel, 0));
         return;
     }

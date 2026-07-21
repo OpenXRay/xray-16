@@ -303,7 +303,7 @@ struct Fmatrix
         float cot = 1.0f / HAT;
         float w = fAspect * cot;
         float h = 1.0f * cot;
-        float Q = fFarPlane / (fFarPlane - fNearPlane);
+        float Q = fNearPlane / (fNearPlane - fFarPlane);
 
         _11 = w;
         _12 = 0;
@@ -319,7 +319,7 @@ struct Fmatrix
         _34 = 1.0f;
         _41 = 0;
         _42 = 0;
-        _43 = -Q * fNearPlane;
+        _43 = -Q * fFarPlane;
         _44 = 0;
         return *this;
     }
@@ -336,11 +336,11 @@ struct Fmatrix
         _24 = 0;
         _31 = 0;
         _32 = 0;
-        _33 = 1.0f / (zf - zn);
+        _33 = 1.0f / (zn - zf);
         _34 = 0;
         _41 = 0;
         _42 = 0;
-        _43 = zn / (zn - zf);
+        _43 = zf / (zf - zn);
         _44 = 1.0f;
         return *this;
     }
