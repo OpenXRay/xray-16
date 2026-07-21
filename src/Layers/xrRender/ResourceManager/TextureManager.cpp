@@ -339,7 +339,7 @@ TextureHandle TextureManager::CreateTexture(
         nvrhiDesc.isRenderTarget = true;
         nvrhiDesc.isTypeless = true;
         nvrhiDesc.useClearValue = true;
-        nvrhiDesc.clearValue = nvrhi::Color(1.0f);
+        nvrhiDesc.clearValue = nvrhi::Color(0.0f);
     }
 
     // Create texture

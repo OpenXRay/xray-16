@@ -158,8 +158,8 @@ bool HiZTestSphereTemporal(
     float d3 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.w), mipLevel);
     float d4 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.w), mipLevel);
 
-    // MAX = farthest depth in region (0=near, 1=far)
-    float hiZDepth = max(max(d1, d2), max(d3, d4));
+    // MIN = farthest depth in region (1=near, 0=far)
+    float hiZDepth = min(min(d1, d2), min(d3, d4));
 
     // Calculate front depth of sphere in PREVIOUS frame's space
     // (must match the Hi-Z data we're comparing against)
@@ -174,7 +174,7 @@ bool HiZTestSphereTemporal(
     float frontDepth = frontClip.z / frontClip.w;
 
     // Visible if front of sphere is in front of Hi-Z depth
-    return frontDepth <= hiZDepth;
+    return frontDepth >= hiZDepth;
 }
 
 // Legacy single-viewProj version (for non-temporal Hi-Z)

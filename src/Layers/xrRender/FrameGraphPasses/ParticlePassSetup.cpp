@@ -456,7 +456,7 @@ void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::Framebuf
         pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
         pipeDesc.renderState.depthStencilState.depthTestEnable = true;
         pipeDesc.renderState.depthStencilState.depthWriteEnable = bd.depthWrite;
-        pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+        pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
         pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
 
         if (bd.blendEnable) {
@@ -520,7 +520,7 @@ static void InitializeDistortionPipeline(fg::RenderDevice* device, const nvrhi::
     pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
     pipeDesc.renderState.depthStencilState.depthTestEnable = true;
     pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
-    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
     pipeDesc.renderState.blendState.targets[0].enableBlend();
     pipeDesc.renderState.blendState.targets[0].srcBlend = nvrhi::BlendFactor::One;
@@ -776,7 +776,7 @@ ParticlePassOutput setupParticlePass(
 
             if (totalHUD > 0) {
                 for (u8 mode : s_renderOrder)
-                    renderBatchGroup(*data.hudParticleBatches, mode, 0.0f, 0.1f);
+                    renderBatchGroup(*data.hudParticleBatches, mode, 0.9f, 1.0f);
             }
 
             if (!data.hasDistortion || !data.distortionRT.is_valid())
@@ -858,7 +858,7 @@ ParticlePassOutput setupParticlePass(
             if (totalWorld > 0)
                 renderDistortGroup(*data.worldParticleBatches, 0.0f, 1.0f);
             if (totalHUD > 0)
-                renderDistortGroup(*data.hudParticleBatches, 0.0f, 0.1f);
+                renderDistortGroup(*data.hudParticleBatches, 0.9f, 1.0f);
         }
     );
 

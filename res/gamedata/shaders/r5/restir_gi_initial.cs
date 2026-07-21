@@ -288,7 +288,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth >= 1.0) {
+    if (depth <= 0.0) {
         u_DirectLighting[pixel] = 0;
         u_ReservoirA[pixel] = 0;
         u_ReservoirB[pixel] = 0;

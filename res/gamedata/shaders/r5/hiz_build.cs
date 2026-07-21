@@ -56,14 +56,14 @@ void main(uint3 dispatch_id : SV_DispatchThreadID)
     // ─────────────────────────────────────────────────────
     //  CONSERVATIVE DEPTH SELECTION
     // ─────────────────────────────────────────────────────
-    // For standard Z-buffer (0=near, 1=far):
-    //   - Take MAX depth (farthest surface in region)
-    //   - Object is OCCLUDED if objectDepth > maxDepth (behind EVERYTHING in region)
-    //   - Object is VISIBLE if objectDepth <= maxDepth (might be in front of something)
+    // For reverse Z-buffer (1=near, 0=far):
+    //   - Take MIN depth (farthest surface in region)
+    //   - Object is OCCLUDED if objectDepth < minDepth (behind EVERYTHING in region)
+    //   - Object is VISIBLE if objectDepth >= minDepth (might be in front of something)
     //   - This is CONSERVATIVE: never incorrectly cull visible objects
     //
-    float max_depth = max(max(d0, d1), max(d2, d3));
+    float min_depth = min(min(d0, d1), min(d2, d3));
 
     // Write to output mip
-    g_output_hiz[dispatch_id.xy] = max_depth;
+    g_output_hiz[dispatch_id.xy] = min_depth;
 }

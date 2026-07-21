@@ -71,12 +71,12 @@ public:
         if (enabled && !m_bNearer)
         {
             m_bNearer = true;
-            mProject._43 -= EPS_L;
+            mProject._43 += EPS_L;
         }
         else if (!enabled && m_bNearer)
         {
             m_bNearer = false;
-            mProject._43 += EPS_L;
+            mProject._43 -= EPS_L;
         }
         GEnv.Render->SetCacheXform(mView, mProject);
         // R_ASSERT(0);

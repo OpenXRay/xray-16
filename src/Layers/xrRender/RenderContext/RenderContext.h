@@ -94,7 +94,7 @@ struct RenderPassDesc {
 
     struct ClearValue {
         float color[4] = {0, 0, 0, 0};
-        float depth = 1.0f;
+        float depth = 0.0f;
         u8 stencil = 0;
     } clearValue;
 

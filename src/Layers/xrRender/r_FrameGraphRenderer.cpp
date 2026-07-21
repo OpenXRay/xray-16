@@ -1308,7 +1308,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     // 2. Skinning Pass - Renders all skinned meshes (world + HUD)
     // World skinned: NPCs, monsters with normal depth [0.0, 1.0]
-    // HUD skinned: First-person weapons/hands with depth [0.0, 0.1]
+    // HUD skinned: First-person weapons/hands with depth [0.9, 1.0]
     static auto skinnedStatsCallback = +[](u32 rendered, u32 culled, void* userData) {
         static_cast<GPUCullingManager*>(userData)->UpdateSkinnedCullingStats(rendered, culled);
     };

@@ -109,7 +109,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
         pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
         pipeDesc.renderState.depthStencilState.depthTestEnable = true;
         pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-        pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+        pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
         pipeDesc.renderState.rasterState.frontCounterClockwise = false;
         pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
         return pipeDesc;
@@ -714,13 +714,13 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             }
 
             // ═══════════════════════════════════════════════════════
-            //  PHASE 2: HUD SKINNED MESHES (depth [0.0, 0.1])
+            //  PHASE 2: HUD SKINNED MESHES (depth [0.9, 1.0])
             // ═══════════════════════════════════════════════════════
             if (hasHUDSkinned) {
                 nvrhi::Viewport hudViewport(
                     0.0f, static_cast<float>(rtDesc.width),
                     0.0f, static_cast<float>(rtDesc.height),
-                    0.0f, 0.1f
+                    0.9f, 1.0f
                 );
 
                 SkinnedPhaseContext hudCtx = BuildSkinnedPhaseContext(

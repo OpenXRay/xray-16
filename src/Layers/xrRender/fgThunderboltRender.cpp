@@ -86,7 +86,7 @@ void FGThunderboltRender::InitResources()
     pipelineDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
     pipelineDesc.renderState.depthStencilState.depthTestEnable = true;
     pipelineDesc.renderState.depthStencilState.depthWriteEnable = false;
-    pipelineDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+    pipelineDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
     pipelineDesc.renderState.blendState.targets[0]
         .setBlendEnable(true)
         .setSrcBlend(nvrhi::BlendFactor::SrcAlpha)

@@ -213,7 +213,7 @@ void CBlender_Compile::PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs /*= nullp
 
 void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)
 {
-    RS.SetDepthFunc(bZTest ? (bInvertZTest ? nvrhi::ComparisonFunc::Greater : nvrhi::ComparisonFunc::LessOrEqual) : nvrhi::ComparisonFunc::Always);
+    RS.SetDepthFunc(bZTest ? (bInvertZTest ? nvrhi::ComparisonFunc::Less : nvrhi::ComparisonFunc::GreaterOrEqual) : nvrhi::ComparisonFunc::Always);
     RS.SetDepthWrite(bZWrite);
     RS.SetDepthEnable(bZWrite || bZTest);
 }

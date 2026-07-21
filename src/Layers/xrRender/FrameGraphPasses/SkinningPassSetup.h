@@ -31,7 +31,7 @@ namespace xray::render::fg::passes {
 // ═══════════════════════════════════════════════════════════════════════════
 // Renders all skinned meshes in two phases:
 //   1. World Phase - NPCs, monsters, etc. with normal depth [0.0, 1.0]
-//   2. HUD Phase - First-person weapons/hands with compressed depth [0.0, 0.1]
+//   2. HUD Phase - First-person weapons/hands with compressed depth [0.9, 1.0]
 //
 // This pass consolidates all skinned mesh rendering that was previously split
 // between ForwardColorPass (world skinned) and HUDPass (HUD skinned).

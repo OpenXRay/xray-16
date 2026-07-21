@@ -29,7 +29,7 @@ float4 main(VS_OUTPUT input) : SV_Target0
     int2 pixelCoord = int2(input.position.xy);
 
     float depth = g_Depth.Load(int3(pixelCoord, 0));
-    if (depth >= 1.0)
+    if (depth <= 0.0)
         discard;
 
     float4 worldPosData = g_WorldPos.Load(int3(pixelCoord, 0));
@@ -39,7 +39,7 @@ float4 main(VS_OUTPUT input) : SV_Target0
         discard;
     if (decal.flags == 1 && isStatic)
         discard;
-    if (decal.flags == 1 && depth < 0.1)
+    if (decal.flags == 1 && depth > 0.9)
         discard;
     float3 worldPos = worldPosData.xyz;
     float4 decalLocal = mul(decal.worldToDecal, float4(worldPos, 1.0));

@@ -30,11 +30,11 @@ static void propagade_depth(LPVOID p_dest, LPVOID p_src, int dim)
             occD f3 = base1[0];
             occD f4 = base1[1];
             occD f = f1;
-            if (f2 > f)
+            if (f2 < f)
                 f = f2;
-            if (f3 > f)
+            if (f3 < f)
                 f = f3;
-            if (f4 > f)
+            if (f4 < f)
                 f = f4;
             dest[y * dim + x] = f;
         }
@@ -62,7 +62,7 @@ occRasterizer::~occRasterizer() {}
 void occRasterizer::clear()
 {
     size_t size = occ_dim * occ_dim;
-    float f = 1.f;
+    float f = 0.f;
     ZeroMemory(bufFrame, sizeof(bufFrame));
     MemFill32(bufDepth, *(u32 *)(&f), size);
 }
@@ -96,7 +96,7 @@ void occRasterizer::propagade()
                 {
                     // We has pixel 1scan down
                     float ZR = (pDepth[pos_up] + pDepth[pos_down]) / 2;
-                    if (ZR < pDepth[pos])
+                    if (ZR > pDepth[pos])
                     {
                         pFrame[pos] = Tu1;
                         pDepth[pos] = ZR;
@@ -106,7 +106,7 @@ void occRasterizer::propagade()
                 {
                     // We has pixel 2scan down
                     float ZR = (pDepth[pos_up] + pDepth[pos_down2]) / 2;
-                    if (ZR < pDepth[pos])
+                    if (ZR > pDepth[pos])
                     {
                         pFrame[pos] = Tu1;
                         pDepth[pos] = ZR;
@@ -117,7 +117,7 @@ void occRasterizer::propagade()
             //
             float d = pDepth[pos];
             clamp(d, -1.99f, 1.99f);
-            bufDepth_0[y][x] = df_2_s32(d);
+            bufDepth_0[y][x] = df_2_s32up(d);
         }
     }
 
@@ -146,7 +146,7 @@ void occRasterizer::on_dbg_render()
                 quad.set((float)j - occ_dim_0 / 2.f, -((float)i - occ_dim_0 / 2.f), (float)bufDepth_0[i][j] / occQ_s32);
                 Device.mProject;
 
-                float z = -Device.mProject._43 / (float)(Device.mProject._33 - quad.z);
+                float z = Device.mProject._43 / (float)(quad.z - Device.mProject._33);
                 left_top.set(quad.x * z / Device.mProject._11 / (occ_dim_0 / 2.f),
                     quad.y * z / Device.mProject._22 / (occ_dim_0 / 2.f), z);
                 right_bottom.set((quad.x + 1) * z / Device.mProject._11 / (occ_dim_0 / 2.f),
@@ -202,7 +202,7 @@ static BOOL test_Level(occD* depth, int dim, float _x0, float _y0, float _x1, fl
         occD* it = base + x0;
         occD* end = base + x1;
         for (; it <= end; it++)
-            if (z < *it)
+            if (z > *it)
                 return TRUE;
     }
     return FALSE;
@@ -210,7 +210,7 @@ static BOOL test_Level(occD* depth, int dim, float _x0, float _y0, float _x1, fl
 
 BOOL occRasterizer::test(float _x0, float _y0, float _x1, float _y1, float _z)
 {
-    occD z = df_2_s32up(_z) + 1;
+    occD z = df_2_s32(_z) - 1;
     return test_Level(get_depth_level(0), occ_dim_0, _x0, _y0, _x1, _y1, z);
     /*
     if	(test_Level(get_depth_level(2),occ_dim_2,_x0,_y0,_x1,_y1,z))
