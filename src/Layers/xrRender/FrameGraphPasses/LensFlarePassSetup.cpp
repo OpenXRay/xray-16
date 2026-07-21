@@ -39,6 +39,7 @@ framegraph::VirtualResourceHandle setupLensFlarePass(framegraph::FrameGraph& fg,
                 fbDesc.setDepthAttachment(depth);
             auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
 
+            data.renderer->DispatchVisibility(cmdList, depth);
             data.renderer->Draw(cmdList, framebuffer);
         });
 
