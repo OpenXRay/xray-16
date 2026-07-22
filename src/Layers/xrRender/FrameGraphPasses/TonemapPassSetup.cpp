@@ -8,6 +8,7 @@
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderCache.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
@@ -154,8 +155,19 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             if (!vsRefl || !psRefl)
                 return;
 
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals",
+                sizeof(passes::StaticGlobals), ctx->GetDevice());
+
+            auto* exposureTexture = fg.GetPhysicalTexture(data.exposureInput);
+            if (!exposureTexture)
+                exposureTexture = ps->fallbackExposureTexture;
+
             framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, device, "Tonemap");
             bsb.Texture("t_hdr", hdrTexture);
+            if (exposureTexture)
+                bsb.Texture("t_exposure", exposureTexture);
+            if (staticGlobalsCB)
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->bindingLayout, device);
             if (!bindingSet)
                 return;

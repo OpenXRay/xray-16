@@ -126,8 +126,9 @@ struct alignas(16) StaticGlobals {
     Fvector4 dev_param_2;
     Fvector4 dev_param_3;
     Fvector4 dev_param_4;
+    Fvector4 gamma_params;  // x=invGamma, y=brightness, z=contrast
 };
-static_assert(sizeof(StaticGlobals) == 848, "StaticGlobals must be 848 bytes");
+static_assert(sizeof(StaticGlobals) == 864, "StaticGlobals must be 864 bytes");
 
 // Legacy alias for compatibility
 using GlobalConstants = StaticGlobals;

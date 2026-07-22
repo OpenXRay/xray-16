@@ -1,20 +1,16 @@
 // xrRender/Shaders/tonemap.ps.hlsl
-// Tonemap pass - currently passthrough until HDR lighting is implemented
-//
-// When HDR is ready, this will apply:
-// - Auto-exposure from ExposurePass
-// - ACES filmic tonemapping
-// - Gamma correction (if needed)
+// Tonemap pass - converts HDR scene color to LDR with gamma correction
 //
 // Inputs:
 //   t0: Scene color (RGBA16_FLOAT or RGBA8_UNORM)
-//   t1: Exposure texture (1x1 R32_FLOAT from ExposurePass) - unused for now
-//   s0: Linear sampler
+//   t1: Exposure texture (1x1 R32_FLOAT from ExposurePass)
+//   b2: static_globals (gamma_params via gamma_params.xyz)
 
 Texture2D t_hdr : register(t0);
-Texture2D<float> t_exposure : register(t1);  // Reserved for future HDR
+Texture2D<float> t_exposure : register(t1);
 
 #include "common_samplers.h"
+#include "shared/common.h"
 
 struct PS_INPUT {
     float4 position : SV_POSITION;
@@ -34,13 +30,23 @@ struct PS_INPUT {
 float4 main(PS_INPUT input) : SV_TARGET {
     float4 color = t_hdr.Sample(smp_linear, input.texcoord);
 
-    // Apply exposure uniformly to entire scene
+    // Apply exposure (unused until HDR pipeline is complete)
     // float exposure = t_exposure.Load(int3(0, 0, 0));
     // exposure = clamp(exposure, 0.1, 16.0);
     // color.rgb *= exposure;
 
-    // TODO: Enable ACES tonemapping when HDR lighting is fully implemented
+    // TODO: ACES tonemapping when HDR lighting is fully implemented
     // color.rgb = ACESFilm(color.rgb);
 
+    // Gamma/brightness/contrast correction from static_globals
+    float invGamma = gamma_params.x;
+    float brightness = gamma_params.y;
+    float contrast = gamma_params.z;
+    float halfC = contrast * 0.5;
+    float c = halfC + 0.5;
+    float b = 0.25 * (brightness - contrast);
+    float3 result = pow(max(color.rgb, 0.0), invGamma);
+    result = result * c + b;
+    color.rgb = max(result, 0.0);
     return color;
 }

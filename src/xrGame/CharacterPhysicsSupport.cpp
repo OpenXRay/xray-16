@@ -573,9 +573,8 @@ void CCharacterPhysicsSupport::in_UpdateCL()
 #endif
     update_animation_collision();
     m_character_shell_control.CalculateTimeDelta();
-    if (m_pPhysicsShell)
+    if (m_pPhysicsShell && m_pPhysicsShell->isFullActive())
     {
-        VERIFY(m_pPhysicsShell->isFullActive());
         m_pPhysicsShell->SetRagDoll(); //Теперь шела относиться к классу объектов cbClassRagDoll
 
         if (!is_imotion(m_interactive_motion)) //! m_flags.test(fl_use_death_motion)
@@ -679,9 +678,8 @@ bool CCharacterPhysicsSupport::CollisionCorrectObjPos(const Fvector& start_from,
         box.set(movement()->Box());
     else
     {
-        if (m_pPhysicsShell)
+        if (m_pPhysicsShell && m_pPhysicsShell->isFullActive())
         {
-            VERIFY(m_pPhysicsShell->isFullActive());
             Fvector sz, c;
             get_box(m_pPhysicsShell, mXFORM, sz, c);
             box.setb(Fvector().sub(c, m_EntityAlife.Position()), Fvector(sz).mul(0.5f));
