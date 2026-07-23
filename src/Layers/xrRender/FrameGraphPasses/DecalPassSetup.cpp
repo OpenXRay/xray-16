@@ -25,7 +25,6 @@ struct DecalPassData {
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
     VirtualResourceHandle sceneColor;
-    VirtualResourceHandle worldPos;
     fg::RenderDevice* device;
     decals::DecalManager* decalMgr;
     DecalPassState* passState;
@@ -111,7 +110,6 @@ DefaultOutputLayout setupDecalPass(
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
             data.normal = passBuilder.read(inputs.normal, ResourceState::ShaderResource);
             data.sceneColor = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
-            data.worldPos = passBuilder.read(inputs.worldPos, ResourceState::ShaderResource);
         },
 
         [](const DecalPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -121,8 +119,7 @@ DefaultOutputLayout setupDecalPass(
             auto* depthTex = fg.GetPhysicalTexture(data.depth);
             auto* normalTex = fg.GetPhysicalTexture(data.normal);
             auto* colorTex = fg.GetPhysicalTexture(data.sceneColor);
-            auto* worldPosTex = fg.GetPhysicalTexture(data.worldPos);
-            if (!depthTex || !normalTex || !colorTex || !worldPosTex)
+            if (!depthTex || !normalTex || !colorTex)
                 return;
 
             data.decalMgr->Upload(ctx);
@@ -150,7 +147,7 @@ DefaultOutputLayout setupDecalPass(
             bsb.ConstantBuffer("static_globals", staticGlobalsCB);
             bsb.BufferSRV("g_Decals", data.decalMgr->GetDecalBuffer());
             bsb.Texture("g_Depth", depthTex);
-            bsb.Texture("g_WorldPos", worldPosTex);
+            bsb.Texture("g_Normal", normalTex);
             bsb.BufferSRV("g_Materials", materialBuffer);
 
             auto bindingSet = cache.GetOrCreateBindingSet(

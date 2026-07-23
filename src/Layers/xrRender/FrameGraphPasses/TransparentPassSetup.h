@@ -50,7 +50,6 @@ struct TransparentPassData {
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
-    framegraph::VirtualResourceHandle worldPos;
     fg::RenderDevice* device;
     TransparentPassConfig config;
     TransparentPassState* passState;

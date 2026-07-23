@@ -5,6 +5,7 @@
 
 cbuffer ReSTIRTemporalParams : register(b5) {
     float4x4 g_InvViewProj;
+    float4x4 g_PrevInvViewProj;
     float4 g_CameraPos;
     float2 g_ScreenSize;
     float2 g_InvScreenSize;
@@ -18,8 +19,7 @@ Texture2D<float2> t_MotionVectors : register(t2);
 Texture2D<float> t_Depth : register(t3);
 Texture2D<float4> t_PrevNormal : register(t5);
 Texture2D<float4> t_BaseColor : register(t6);
-Texture2D<float4> t_WorldPos : register(t7);
-Texture2D<float4> t_PrevWorldPos : register(t8);
+Texture2D<float> t_PrevDepth : register(t8);
 Texture2D<float4> t_Normal : register(t9);
 
 RWTexture2D<float4> u_ReservoirA : register(u0);
@@ -33,7 +33,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth <= 0.0) {
+    if (depth <= 0.0 || depth >= 0.9) {
         u_ReservoirA[pixel] = 0;
         u_ReservoirB[pixel] = 0;
         return;
@@ -44,7 +44,10 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         u_ReservoirB[pixel]
     );
 
-    float3 worldPos = t_WorldPos.Load(int3(pixel, 0)).xyz;
+    float2 giUV = (float2(pixel) + 0.5) * g_InvScreenSize;
+    float4 giClip = float4(giUV.x * 2.0 - 1.0, 1.0 - giUV.y * 2.0, depth, 1.0);
+    float4 giWorld = mul(g_InvViewProj, giClip);
+    float3 worldPos = giWorld.xyz / giWorld.w;
     float4 normalData = t_Normal.Load(int3(pixel, 0));
     float3 N = normalize(normalData.xyz);
     float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
@@ -78,12 +81,19 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     if (all(prevUV >= 0) && all(prevUV < 1.0)) {
         int2 prevPixel = int2(prevUV * g_ScreenSize);
-        float3 prevWorldPos = t_PrevWorldPos.Load(int3(prevPixel, 0)).xyz;
+        float prevDepth = t_PrevDepth.Load(int3(prevPixel, 0));
         float3 prevN = normalize(t_PrevNormal.Load(int3(prevPixel, 0)).xyz);
 
         float viewDist = length(worldPos - g_CameraPos.xyz);
-        float posDist = length(worldPos - prevWorldPos);
-        bool valid = posDist < 0.1 * viewDist && dot(N, prevN) > 0.906;
+        bool valid = false;
+        if (prevDepth > 0.0 && prevDepth < 0.9) {
+            float2 prevNdcUV = (float2(prevPixel) + 0.5) * g_InvScreenSize;
+            float4 prevClip = float4(prevNdcUV.x * 2.0 - 1.0, 1.0 - prevNdcUV.y * 2.0, prevDepth, 1.0);
+            float4 prevWorld = mul(g_PrevInvViewProj, prevClip);
+            float3 prevWorldPos = prevWorld.xyz / prevWorld.w;
+            float posDist = length(worldPos - prevWorldPos);
+            valid = posDist < 0.1 * viewDist && dot(N, prevN) > 0.906;
+        }
 
         if (valid) {
             GIReservoir prevRes = UnpackReservoir(

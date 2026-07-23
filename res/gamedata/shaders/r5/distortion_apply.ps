@@ -3,7 +3,7 @@
 
 Texture2D g_Snapshot : register(t0);
 Texture2D g_Distortion : register(t1);
-Texture2D<float4> g_WorldPos : register(t2);
+Texture2D<float> g_Depth : register(t2);
 
 struct PS_INPUT
 {
@@ -23,10 +23,12 @@ float4 main(PS_INPUT input) : SV_Target0
     float sourceViewZ = distortSample.z / totalWeight;
 
     int2 pixelCoord = (int2)input.position.xy;
-    float4 currentWP = g_WorldPos.Load(int3(pixelCoord, 0));
-    if (currentWP.w > 0.5) {
-        float3 viewDir = camera_direction.xyz;
-        float currentViewZ = dot(currentWP.xyz - eye_position, viewDir);
+    float currentDepth = g_Depth.Load(int3(pixelCoord, 0));
+    float3 viewDir = camera_direction.xyz;
+    float currentViewZ = 0.0;
+    if (currentDepth > 0.0) {
+        float3 currentWP = reconstruct_world_pos(input.position.xy, currentDepth);
+        currentViewZ = dot(currentWP - eye_position, viewDir);
 
         if (currentViewZ < sourceViewZ * 0.9)
             return g_Snapshot.Sample(smp_linear, input.texcoord);
@@ -34,15 +36,12 @@ float4 main(PS_INPUT input) : SV_Target0
 
     float2 displaced = saturate(input.texcoord + offset);
 
-    if (currentWP.w > 0.5) {
-        float3 viewDir = camera_direction.xyz;
-        float currentViewZ = dot(currentWP.xyz - eye_position, viewDir);
-
-        uint2 dims;
-        g_WorldPos.GetDimensions(dims.x, dims.y);
-        float4 displacedWP = g_WorldPos.Load(int3((int2)(displaced * dims), 0));
-        if (displacedWP.w > 0.5) {
-            float displacedViewZ = dot(displacedWP.xyz - eye_position, viewDir);
+    if (currentDepth > 0.0) {
+        float2 displacedPx = displaced * screen_res.xy;
+        float displacedDepth = g_Depth.Load(int3((int2)displacedPx, 0));
+        if (displacedDepth > 0.0) {
+            float3 displacedWP = reconstruct_world_pos(displacedPx, displacedDepth);
+            float displacedViewZ = dot(displacedWP - eye_position, viewDir);
             if (displacedViewZ < currentViewZ * 0.85)
                 displaced = input.texcoord;
         }

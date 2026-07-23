@@ -446,7 +446,6 @@ private:
 
     nvrhi::TextureHandle m_prevFrameDepth;
     nvrhi::TextureHandle m_normals[2];
-    nvrhi::TextureHandle m_worldPos[2];
     u32 m_pingPongIndex = 0;
 
     Fmatrix m_prevViewProj;

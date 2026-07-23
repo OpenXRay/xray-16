@@ -20,7 +20,7 @@ using namespace framegraph;
 struct DistortionApplyData {
     VirtualResourceHandle sceneInput;
     VirtualResourceHandle distortionInput;
-    VirtualResourceHandle worldPosInput;
+    VirtualResourceHandle depthInput;
     VirtualResourceHandle output;
     u32 width;
     u32 height;
@@ -69,7 +69,7 @@ VirtualResourceHandle setupDistortionApplyPass(
     fg::RenderDevice* device,
     VirtualResourceHandle sceneColor,
     VirtualResourceHandle distortionRT,
-    VirtualResourceHandle worldPos,
+    VirtualResourceHandle depth,
     u32 width,
     u32 height,
     DistortionApplyPassState& passState)
@@ -91,14 +91,14 @@ VirtualResourceHandle setupDistortionApplyPass(
     auto& passData = fg.addCallbackPass<DistortionApplyData>(
         "DistortionApply",
 
-        [sceneColor, distortionRT, worldPos, outputHandle, width, height, &passState](FrameGraph& builder, PassHandle passHandle, DistortionApplyData& data) {
+        [sceneColor, distortionRT, depth, outputHandle, width, height, &passState](FrameGraph& builder, PassHandle passHandle, DistortionApplyData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.width = width;
             data.height = height;
             data.passState = &passState;
             data.sceneInput = passBuilder.read(sceneColor, ResourceState::ShaderResource);
             data.distortionInput = passBuilder.read(distortionRT, ResourceState::ShaderResource);
-            data.worldPosInput = passBuilder.read(worldPos, ResourceState::ShaderResource);
+            data.depthInput = passBuilder.read(depth, ResourceState::ShaderResource);
             data.output = passBuilder.write(outputHandle, ResourceState::RenderTarget);
         },
 
@@ -106,9 +106,9 @@ VirtualResourceHandle setupDistortionApplyPass(
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             auto* sceneTex = fg.GetPhysicalTexture(data.sceneInput);
             auto* distortTex = fg.GetPhysicalTexture(data.distortionInput);
-            auto* worldPosTex = fg.GetPhysicalTexture(data.worldPosInput);
+            auto* depthTex = fg.GetPhysicalTexture(data.depthInput);
             auto* outputTex = fg.GetPhysicalTexture(data.output);
-            if (!sceneTex || !distortTex || !worldPosTex || !outputTex)
+            if (!sceneTex || !distortTex || !depthTex || !outputTex)
                 return;
 
             auto* ps = data.passState;
@@ -129,7 +129,7 @@ VirtualResourceHandle setupDistortionApplyPass(
             bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                .Texture("g_Snapshot", sceneTex)
                .Texture("g_Distortion", distortTex)
-               .Texture("g_WorldPos", worldPosTex);
+               .Texture("g_Depth", depthTex);
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->bindingLayout, device);
 
             nvrhi::FramebufferDesc fbDesc;
