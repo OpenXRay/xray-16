@@ -290,7 +290,6 @@ TrailPassOutput setupTrailPass(
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = forwardInputs.normal;
             data.outputs.baseColor = forwardInputs.baseColor;
-            data.outputs.worldPos = forwardInputs.worldPos;
             data.outputs.depth = data.depth;
         },
         [](const TrailPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -419,7 +418,6 @@ TrailPassOutput setupTrailPass(
     output.layout.albedo = passData.outputColor;
     output.layout.normal = passData.outputs.normal;
     output.layout.baseColor = passData.outputs.baseColor;
-    output.layout.worldPos = passData.outputs.worldPos;
     output.layout.depth = passData.depth;
     return output;
 }

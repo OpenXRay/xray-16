@@ -75,7 +75,6 @@ struct SkinningPassData {
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
-    framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle skinnedDrawArgs;
     fg::RenderDevice* device;

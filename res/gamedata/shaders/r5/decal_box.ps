@@ -14,7 +14,7 @@ struct GPUDecalData
 
 StructuredBuffer<GPUDecalData> g_Decals : register(t3);
 Texture2D<float> g_Depth : register(t24);
-Texture2D<float4> g_WorldPos : register(t25);
+Texture2D<float4> g_Normal : register(t25);
 
 struct VS_OUTPUT
 {
@@ -32,16 +32,14 @@ float4 main(VS_OUTPUT input) : SV_Target0
     if (depth <= 0.0)
         discard;
 
-    float4 worldPosData = g_WorldPos.Load(int3(pixelCoord, 0));
-    float geoType = worldPosData.w;
-    bool isStatic = geoType < 1.5;
+    bool isStatic = g_Normal.Load(int3(pixelCoord, 0)).a >= 0.0;
     if (decal.flags == 0 && !isStatic)
         discard;
     if (decal.flags == 1 && isStatic)
         discard;
     if (decal.flags == 1 && depth > 0.9)
         discard;
-    float3 worldPos = worldPosData.xyz;
+    float3 worldPos = reconstruct_world_pos(input.position.xy, depth);
     float4 decalLocal = mul(decal.worldToDecal, float4(worldPos, 1.0));
 
     float3 absLocal = abs(decalLocal.xyz);

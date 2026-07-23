@@ -374,8 +374,6 @@ void FrameGraphRenderer::Shutdown() {
     m_prevFrameDepth = nullptr;
     m_normals[0] = nullptr;
     m_normals[1] = nullptr;
-    m_worldPos[0] = nullptr;
-    m_worldPos[1] = nullptr;
     m_inspectorPreview = nullptr;
     old_QuadIB = nullptr;
 }
@@ -979,21 +977,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
-    if (!m_worldPos[0] || m_prevFrameWidth != width || m_prevFrameHeight != height) {
-        nvrhi::TextureDesc desc;
-        desc.width = width;
-        desc.height = height;
-        desc.format = nvrhi::Format::RGBA32_FLOAT;
-        desc.isShaderResource = true;
-        desc.isRenderTarget = true;
-        desc.initialState = nvrhi::ResourceStates::RenderTarget;
-        desc.keepInitialState = true;
-        for (int i = 0; i < 2; i++) {
-            desc.debugName = (i == 0) ? "WorldPos_A" : "WorldPos_B";
-            m_worldPos[i] = nvDevice->createTexture(desc);
-        }
-    }
-
     framegraph::ResourceDesc normalImportDesc;
     normalImportDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     normalImportDesc.width = width;
@@ -1015,17 +998,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     baseColorDesc.isTransient = true;
     framegraph::VirtualResourceHandle baseColorBuffer = m_framegraph->CreateTexture("rt_BaseColor", baseColorDesc);
 
-    framegraph::ResourceDesc worldPosImportDesc;
-    worldPosImportDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    worldPosImportDesc.width = width;
-    worldPosImportDesc.height = height;
-    worldPosImportDesc.format = nvrhi::Format::RGBA32_FLOAT;
-    worldPosImportDesc.isRenderTarget = true;
-    worldPosImportDesc.isImported = true;
-    worldPosImportDesc.isTransient = false;
-    worldPosImportDesc.debugName = "rt_WorldPos";
-    framegraph::VirtualResourceHandle worldPosBuffer = m_framegraph->ImportTexture("rt_WorldPos", m_worldPos[writeIdx], worldPosImportDesc);
-
     // ═══════════════════════════════════════════════════════
     //  TEMPORAL HI-Z PYRAMID BUILD (From Previous Frame)
     // ═══════════════════════════════════════════════════════
@@ -1035,6 +1007,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     hizOutput.width = width / 2;
     hizOutput.height = height / 2;
 
+    framegraph::VirtualResourceHandle prevDepthHandle;
     bool hasPrevDepth = m_hasPrevFrameData && m_prevFrameDepth &&
                         m_prevFrameWidth == width && m_prevFrameHeight == height;
 
@@ -1049,7 +1022,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         prevDepthDesc.isImported = true;
         prevDepthDesc.isTransient = false;
 
-        auto prevDepthHandle = m_framegraph->ImportTexture("rt_PrevDepth", m_prevFrameDepth, prevDepthDesc);
+        prevDepthHandle = m_framegraph->ImportTexture("rt_PrevDepth", m_prevFrameDepth, prevDepthDesc);
 
         hizOutput = passes::setupHiZBuildPass(
             *m_framegraph,
@@ -1078,21 +1051,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         prevNormalsDesc.isTransient = false;
         prevNormalsHandle = m_framegraph->ImportTexture("rt_PrevNormals", m_normals[readIdx], prevNormalsDesc);
         m_framegraph->GetRTRegistry().RegisterRT("rt_PrevNormals", prevNormalsHandle);
-    }
-
-    framegraph::VirtualResourceHandle prevWorldPosHandle;
-    if (m_hasPrevFrameData && m_worldPos[readIdx]) {
-        framegraph::ResourceDesc prevWorldPosDesc;
-        prevWorldPosDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-        prevWorldPosDesc.debugName = "rt_PrevWorldPos";
-        prevWorldPosDesc.width = width;
-        prevWorldPosDesc.height = height;
-        prevWorldPosDesc.format = nvrhi::Format::RGBA32_FLOAT;
-        prevWorldPosDesc.isRenderTarget = true;
-        prevWorldPosDesc.isImported = true;
-        prevWorldPosDesc.isTransient = false;
-        prevWorldPosHandle = m_framegraph->ImportTexture("rt_PrevWorldPos", m_worldPos[readIdx], prevWorldPosDesc);
-        m_framegraph->GetRTRegistry().RegisterRT("rt_PrevWorldPos", prevWorldPosHandle);
     }
 
     // ═══════════════════════════════════════════════════════
@@ -1279,7 +1237,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         sunOutput,
         normalBuffer,
         baseColorBuffer,
-        worldPosBuffer,
         m_geometryCollector.get(),
         m_materialCache.get(),
         width,
@@ -1447,6 +1404,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.width,
         hizOutput.height,
         hizOutput.mipLevels,
+        prevDepthHandle,
         &m_blackboard->get_or_add<passes::ParticlePassState>()
     );
 
@@ -1497,7 +1455,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (particleOutputs.distortionRT.is_valid()) {
         sceneColor = passes::setupDistortionApplyPass(
             *m_framegraph, m_device, sceneColor, particleOutputs.distortionRT,
-            particleOutputs.layout.worldPos, width, height,
+            particleOutputs.layout.depth, width, height,
             m_blackboard->get_or_add<passes::DistortionApplyPassState>());
     }
 
@@ -1509,8 +1467,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         auto rtgiOutput = passes::setupReSTIRGIPass(
             *m_framegraph, m_device, m_rtAccelMgr.get(),
             transparentOutputs.depth, transparentOutputs.normal,
-            transparentOutputs.baseColor, transparentOutputs.worldPos,
-            prevNormalsHandle, prevWorldPosHandle,
+            transparentOutputs.baseColor,
+            prevNormalsHandle, prevDepthHandle,
             motionOutput.motionVectors,
             sceneColor,
             Device.mInvFullTransform, m_prevViewProj,
@@ -1740,7 +1698,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Normal", transparentOutputs.normal);
     m_framegraph->GetRTRegistry().RegisterRT("rt_BaseColor", baseColorBuffer);
-    m_framegraph->GetRTRegistry().RegisterRT("rt_WorldPos", worldPosBuffer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Exposure", exposureOutput.exposureTexture);
     if (motionOutput.motionVectors.is_valid())
         m_framegraph->GetRTRegistry().RegisterRT("rt_MotionVectors", motionOutput.motionVectors);

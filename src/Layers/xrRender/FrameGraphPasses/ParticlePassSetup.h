@@ -85,10 +85,9 @@ struct ParticlePassData {
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle outputNormal;
     framegraph::VirtualResourceHandle baseColor;
-    framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle hiZPyramid;
     framegraph::VirtualResourceHandle distortionRT;
-    framegraph::VirtualResourceHandle worldPosCopy;
+    framegraph::VirtualResourceHandle prevDepth;
     fg::RenderDevice* device;
     const xr_vector<ParticleBatch>* worldParticleBatches;
     const xr_vector<ParticleBatch>* hudParticleBatches;
@@ -131,6 +130,7 @@ ParticlePassOutput setupParticlePass(
     u32 hiZWidth = 0,
     u32 hiZHeight = 0,
     u32 hiZMipLevels = 0,
+    framegraph::VirtualResourceHandle prevDepth = {},
     ParticlePassState* state = nullptr
 );
 

@@ -17,7 +17,6 @@ Texture2D<float4> t_ReservoirB : register(t2);
 Texture2D<float> t_Depth : register(t3);
 Texture2D<float4> t_BaseColor : register(t5);
 Texture2D<float4> t_SceneColorIn : register(t6);
-Texture2D<float4> t_WorldPos : register(t7);
 Texture2D<float4> t_Normal : register(t8);
 
 RWTexture2D<float4> u_SceneColor : register(u0);
@@ -30,7 +29,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth <= 0.0) {
+    if (depth <= 0.0 || depth >= 0.9) {
         u_SceneColor[pixel] = t_SceneColorIn.Load(int3(pixel, 0));
         return;
     }
@@ -44,12 +43,15 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     float3 indirect = 0;
     if (IsReservoirValid(r) && r.W > 0) {
-        float3 worldPos = t_WorldPos.Load(int3(pixel, 0)).xyz;
+        float2 giUV = (float2(pixel) + 0.5) / g_ScreenSize;
+        float4 giClip = float4(giUV.x * 2.0 - 1.0, 1.0 - giUV.y * 2.0, depth, 1.0);
+        float4 giWorld = mul(g_InvViewProj, giClip);
+        float3 worldPos = giWorld.xyz / giWorld.w;
         float4 normalData = t_Normal.Load(int3(pixel, 0));
         float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
 
         float3 N = normalize(normalData.xyz);
-        float roughness = normalData.w;
+        float roughness = abs(normalData.w);
         float3 albedo = baseColorData.rgb;
         float metallic = baseColorData.a;
 

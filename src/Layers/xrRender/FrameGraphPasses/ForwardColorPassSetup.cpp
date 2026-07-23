@@ -137,7 +137,6 @@ static void renderBindlessForward(
     nvrhi::ITexture* colorRT,
     nvrhi::ITexture* normalRT,
     nvrhi::ITexture* baseColorRT,
-    nvrhi::ITexture* worldPosRT,
     nvrhi::ITexture* depthRT,
     const BindlessForwardConfig& config,
     MaterialCache* materialCache,
@@ -172,8 +171,6 @@ static void renderBindlessForward(
         fbDesc.addColorAttachment(normalRT);
     if (baseColorRT)
         fbDesc.addColorAttachment(baseColorRT);
-    if (worldPosRT)
-        fbDesc.addColorAttachment(worldPosRT);
     fbDesc.setDepthAttachment(depthRT);
     auto& cache = framegraph::GetPassResourceCache();
     auto framebuffer = cache.GetOrCreateFramebuffer("ForwardColor", fbDesc, nvDevice);
@@ -379,7 +376,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::VirtualResourceHandle colorInput,
     framegraph::VirtualResourceHandle normalInput,
     framegraph::VirtualResourceHandle baseColorInput,
-    framegraph::VirtualResourceHandle worldPosInput,
     const GeometryCollector* geometry,
     MaterialCache* materialCache,
     u32 width,
@@ -406,7 +402,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA (Declares resource usage)
         // ═══════════════════════════════════════════════════════
-        [&, width, height, colorInput, normalInput, baseColorInput, worldPosInput, drawArgsInput, bindlessConfig, state](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
+        [&, width, height, colorInput, normalInput, baseColorInput, drawArgsInput, bindlessConfig, state](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -422,8 +418,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             data.normal = passBuilder.write(normalInput, ResourceState::RenderTarget);
             if (baseColorInput.is_valid())
                 data.baseColor = passBuilder.write(baseColorInput, ResourceState::RenderTarget);
-            if (worldPosInput.is_valid())
-                data.worldPos = passBuilder.write(worldPosInput, ResourceState::RenderTarget);
 
             if (drawArgsInput.is_valid()) {
                 data.drawArgsBuffer = passBuilder.read(drawArgsInput, ResourceState::IndirectArgument);
@@ -432,7 +426,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             data.outputs.albedo = data.color;
             data.outputs.normal = data.normal;
             data.outputs.baseColor = data.baseColor;
-            data.outputs.worldPos = data.worldPos;
             data.outputs.depth = data.depth;
         },
 
@@ -447,7 +440,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
-            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
 
             if (!depthRT || !colorRT)
                 return;
@@ -459,8 +451,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                     cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
                 if (baseColorRT)
                     cmdList->clearTextureFloat(baseColorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
-                if (worldPosRT)
-                    cmdList->clearTextureFloat(worldPosRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
             }
 
             // Check if we have geometry to render
@@ -486,7 +476,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 colorRT,
                 normalRT,
                 baseColorRT,
-                worldPosRT,
                 depthRT,
                 data.bindlessConfig,
                 data.materialCache,
@@ -499,7 +488,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     outputs.albedo = passData.color;
     outputs.normal = passData.normal;
     outputs.baseColor = passData.baseColor;
-    outputs.worldPos = passData.worldPos;
     outputs.depth = passData.depth;
     return outputs;
 }

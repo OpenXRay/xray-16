@@ -108,7 +108,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
-    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
     fbInfo.depthFormat = nvrhi::Format::D32;
     InitializeTransparentResources(device, fbInfo, state);
 
@@ -128,8 +127,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
             if (inputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
-            if (inputs.worldPos.is_valid())
-                data.worldPos = passBuilder.readWrite(inputs.worldPos, ResourceState::RenderTarget);
         },
 
         [](const TransparentPassData& data,
@@ -148,7 +145,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 return;
 
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
-            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
@@ -156,8 +152,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 fbDesc.addColorAttachment(normalRT);
             if (baseColorRT)
                 fbDesc.addColorAttachment(baseColorRT);
-            if (worldPosRT)
-                fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = framegraph::GetPassResourceCache();
             auto framebuffer = cache.GetOrCreateFramebuffer("TransparentPass", fbDesc, nvDevice);
@@ -254,7 +248,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     outputs.albedo = passData.color;
     outputs.normal = passData.normal;
     outputs.baseColor = passData.baseColor;
-    outputs.worldPos = passData.worldPos;
     outputs.depth = passData.depth;
     return outputs;
 }

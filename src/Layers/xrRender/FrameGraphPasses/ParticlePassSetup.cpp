@@ -552,6 +552,7 @@ ParticlePassOutput setupParticlePass(
     u32 hiZWidth,
     u32 hiZHeight,
     u32 hiZMipLevels,
+    VirtualResourceHandle prevDepth,
     ParticlePassState* state)
 {
     if (state) {
@@ -559,7 +560,6 @@ ParticlePassOutput setupParticlePass(
         fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
         fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
         fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
-        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
         fbInfo.depthFormat = nvrhi::Format::D32;
         InitializeParticleResources(device, fbInfo, *state);
 
@@ -616,24 +616,12 @@ ParticlePassOutput setupParticlePass(
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
             if (forwardInputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
-            if (forwardInputs.worldPos.is_valid()) {
-                data.worldPos = passBuilder.readWrite(forwardInputs.worldPos, ResourceState::RenderTarget);
-
-                framegraph::ResourceDesc wpCopyDesc;
-                wpCopyDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-                wpCopyDesc.width = width;
-                wpCopyDesc.height = height;
-                wpCopyDesc.format = nvrhi::Format::RGBA32_FLOAT;
-                wpCopyDesc.isRenderTarget = true;
-                wpCopyDesc.isTransient = true;
-                wpCopyDesc.debugName = "rt_WorldPosCopy";
-                data.worldPosCopy = passBuilder.createTexture("rt_WorldPosCopy", wpCopyDesc);
-            }
+            if (prevDepth.is_valid())
+                data.prevDepth = passBuilder.read(prevDepth, ResourceState::ShaderResource);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = data.outputNormal;
             data.outputs.baseColor = data.baseColor;
-            data.outputs.worldPos = data.worldPos;
             data.outputs.depth = data.depth;
         },
         [](const ParticlePassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -660,13 +648,7 @@ ParticlePassOutput setupParticlePass(
             matBuffer.Upload(ctx);
 
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
-            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
-            auto* worldPosCopyRT = data.worldPosCopy.is_valid() ? fg.GetPhysicalTexture(data.worldPosCopy) : nullptr;
-            if (!worldPosCopyRT)
-                worldPosCopyRT = worldPosRT;
-
-            if (worldPosRT && worldPosCopyRT && worldPosCopyRT != worldPosRT)
-                cmdList->copyTexture(worldPosCopyRT, nvrhi::TextureSlice(), worldPosRT, nvrhi::TextureSlice());
+            auto* prevDepthTex = data.prevDepth.is_valid() ? fg.GetPhysicalTexture(data.prevDepth) : depthRT;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
@@ -674,8 +656,6 @@ ParticlePassOutput setupParticlePass(
                 fbDesc.addColorAttachment(normalRT);
             if (baseColorRT)
                 fbDesc.addColorAttachment(baseColorRT);
-            if (worldPosRT)
-                fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = framegraph::GetPassResourceCache();
             auto framebuffer = cache.GetOrCreateFramebuffer("ParticlePass", fbDesc, nvDevice);
@@ -695,7 +675,7 @@ ParticlePassOutput setupParticlePass(
             BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Particle");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                .BufferSRV("g_Materials", matBuffer.GetBuffer())
-               .Texture("g_SceneWorldPos", worldPosCopyRT);
+               .Texture("g_SceneDepth", prevDepthTex);
             auto bindDesc = bsb.Build();
             auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, data.passState->layout, nvDevice);
 
@@ -866,7 +846,6 @@ ParticlePassOutput setupParticlePass(
     output.layout.albedo = passData.outputColor;
     output.layout.normal = passData.outputNormal;
     output.layout.baseColor = passData.baseColor;
-    output.layout.worldPos = passData.worldPos;
     output.layout.depth = passData.depth;
     output.distortionRT = passData.distortionRT;
     return output;

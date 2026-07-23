@@ -85,13 +85,10 @@ DefaultOutputLayout setupDetailPass(
             data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
             if (forwardInputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
-            if (forwardInputs.worldPos.is_valid())
-                data.worldPos = passBuilder.readWrite(forwardInputs.worldPos, ResourceState::RenderTarget);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = data.outputNormal;
             data.outputs.baseColor = data.baseColor;
-            data.outputs.worldPos = data.worldPos;
             data.outputs.depth = data.depth;
         },
         [](const DetailPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
@@ -133,7 +130,6 @@ DefaultOutputLayout setupDetailPass(
 
             nvrhi::ITexture* normalTexture = fg.GetPhysicalTexture(data.outputNormal);
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
-            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorTexture);
@@ -141,8 +137,6 @@ DefaultOutputLayout setupDetailPass(
                 fbDesc.addColorAttachment(normalTexture);
             if (baseColorRT)
                 fbDesc.addColorAttachment(baseColorRT);
-            if (worldPosRT)
-                fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthTexture);
 
             nvrhi::FramebufferHandle framebuffer = data.device->GetNVRHIDevice()->createFramebuffer(fbDesc);
@@ -339,7 +333,6 @@ DefaultOutputLayout setupDetailPass(
     outputs.albedo = passData.outputColor;
     outputs.normal = passData.outputNormal;
     outputs.baseColor = passData.baseColor;
-    outputs.worldPos = passData.worldPos;
     outputs.depth = passData.depth;
     return outputs;
 }

@@ -242,7 +242,6 @@ RibbonPassOutput setupRibbonPass(
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = forwardInputs.normal;
             data.outputs.baseColor = forwardInputs.baseColor;
-            data.outputs.worldPos = forwardInputs.worldPos;
             data.outputs.depth = data.depth;
         },
         [](const RibbonPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -372,7 +371,6 @@ RibbonPassOutput setupRibbonPass(
     output.layout.albedo = passData.outputColor;
     output.layout.normal = passData.outputs.normal;
     output.layout.baseColor = passData.outputs.baseColor;
-    output.layout.worldPos = passData.outputs.worldPos;
     output.layout.depth = passData.depth;
     return output;
 }
