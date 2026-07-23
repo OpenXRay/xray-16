@@ -1,0 +1,38 @@
+// cas.ps — AMD FidelityFX CAS (LDR sharpen)
+#define SM_6_0
+Texture2D g_Color : register(t0);
+SamplerState smp_point : register(s0);
+
+cbuffer CASParams : register(b0)
+{
+    float2 screenSize;
+    float  sharpness; // 0..1
+    float  _pad;
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float3 CasFilter(float2 uv, float2 texel)
+{
+    float3 a = g_Color.SampleLevel(smp_point, uv + float2(0, -texel.y), 0).rgb;
+    float3 b = g_Color.SampleLevel(smp_point, uv + float2(-texel.x, 0), 0).rgb;
+    float3 c = g_Color.SampleLevel(smp_point, uv, 0).rgb;
+    float3 d = g_Color.SampleLevel(smp_point, uv + float2(+texel.x, 0), 0).rgb;
+    float3 e = g_Color.SampleLevel(smp_point, uv + float2(0, +texel.y), 0).rgb;
+
+    float3 mn = min(a, min(min(b, c), min(d, e)));
+    float3 mx = max(a, max(max(b, c), max(d, e)));
+
+    float3 amp = saturate(min(mn, 2.0 - mx) / max(mx, 1e-5));
+    amp = rsqrt(amp);
+    float peak = -3.0 * (1.0 - (1.0 - sharpness) * (1.0 - sharpness)) + 8.0;
+    float3 w = -1.0 / (amp * peak);
+    float3 rcpWeight = 1.0 / (1.0 + 4.0 * w);
+    return saturate((b * w + d * w + a * w + e * w + c) * rcpWeight);
+}
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float2 texel = 1.0 / max(screenSize, float2(1, 1));
+    return float4(CasFilter(I.uv, texel), 1.0);
+}

@@ -30,6 +30,15 @@ struct TransparentPassConfig {
 
     VariantPartitionConfig variantPartition;
 
+    // Cascaded shadow maps + sky cubes for water reflections
+    nvrhi::ITexture* shadowMapArray = nullptr;
+    nvrhi::ITexture* shadowCascades[3] = {};
+    nvrhi::ITexture* localShadowAtlas = nullptr;
+    nvrhi::ITexture* envSky0 = nullptr;
+    nvrhi::ITexture* envSky1 = nullptr;
+    nvrhi::ITexture* contactDepth = nullptr; // unused (history-only contact)
+    nvrhi::ITexture* contactHistory = nullptr; // g_ContactHistory @ t28
+
     bool IsValid() const {
         return objectCount > 0 && compactDrawArgsBuffer && megaVertexBuffer && megaIndexBuffer;
     }
@@ -38,10 +47,17 @@ struct TransparentPassConfig {
 struct TransparentPassState {
     nvrhi::GraphicsPipelineHandle pipeline;
     nvrhi::BindingLayoutHandle layout;
+    nvrhi::GraphicsPipelineHandle waterPipeline;
+    nvrhi::BindingLayoutHandle waterLayout;
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::SamplerHandle sampler;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
+    nvrhi::ShaderHandle waterVs;
+    nvrhi::ShaderHandle waterPs;
+    nvrhi::ITexture* foamTexture = nullptr;
+    nvrhi::TextureHandle waterSsrColor; // opaque HDR snapshot for SSR
+    nvrhi::TextureHandle waterSceneDepth; // depth copy (cannot sample DSV while attached)
     bool initialized = false;
 };
 

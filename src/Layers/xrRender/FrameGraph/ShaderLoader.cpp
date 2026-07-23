@@ -29,6 +29,12 @@ bool TryGetNvrhiShaderType(xray::render::SlangCompiler::Stage stage, nvrhi::Shad
     case xray::render::SlangCompiler::Stage::Mesh:
         outType = nvrhi::ShaderType::Mesh;
         return true;
+    case xray::render::SlangCompiler::Stage::Hull:
+        outType = nvrhi::ShaderType::Hull;
+        return true;
+    case xray::render::SlangCompiler::Stage::Domain:
+        outType = nvrhi::ShaderType::Domain;
+        return true;
     default:
         return false;
     }
@@ -48,6 +54,13 @@ void ResolveShaderSourceRelativePath(
         ptrdiff_t size = pchr ? pchr - name : xr_strlen(name);
         strncpy(shName, name, size);
         shName[size] = 0;
+    }
+
+    // Engine UI/legacy names may use either separator; VFS catalog keys use '\'.
+    for (char* p = shName; *p; ++p)
+    {
+        if (*p == '/')
+            *p = '\\';
     }
 
     // Only remove skinning suffix (_0, _1, _2, _3, _4) for vertex shaders
@@ -468,6 +481,146 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     m_handleCache[cacheKey] = result.handle;
     m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
 
+    return result;
+}
+
+ShaderLoader::ShaderResult ShaderLoader::LoadHullShader(const char* name, const char* entryPoint)
+{
+    ShaderResult result;
+    xr_string cacheKey = xr_string(name) + ".hs";
+    auto handleIt = m_handleCache.find(cacheKey);
+    if (handleIt != m_handleCache.end()) {
+        result.handle = handleIt->second;
+        auto reflIt = m_reflectionCache.find(cacheKey);
+        if (reflIt != m_reflectionCache.end())
+            result.reflection = xr_new<ExtractedReflection>(*reflIt->second);
+        return result;
+    }
+
+    IReader* fs = OpenShaderFile(name, ".hs");
+    if (!fs)
+        return result;
+    WatchShaderFile(cacheKey, name, ".hs", entryPoint, xray::render::SlangCompiler::Stage::Hull);
+
+    u32 sourceHash = ShaderCache::ComputeHash((const char*)fs->pointer(), fs->length());
+    ExtractedReflection deserializedReflection;
+    bool cacheHit = m_cache.TryLoad(name, ".hs", sourceHash, result.bytecode, &deserializedReflection);
+    if (cacheHit)
+    {
+        nvrhi::ShaderDesc desc;
+        desc.shaderType = nvrhi::ShaderType::Hull;
+        desc.debugName = name;
+        result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
+            desc, result.bytecode.data(), result.bytecode.size());
+        fs->close();
+        if (!result.handle)
+            return result;
+        result.reflection = xr_new<ExtractedReflection>(deserializedReflection);
+        m_handleCache[cacheKey] = result.handle;
+        m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(deserializedReflection);
+        return result;
+    }
+
+    xr_string sourceCode;
+    sourceCode.assign((const char*)fs->pointer(), fs->length());
+    string_path fullPath;
+    strconcat(sizeof(fullPath), fullPath, GEnv.Render->getShaderPath(), name, ".hs");
+    auto compileResult = m_slangCompiler->CompileFromSource(
+        sourceCode.c_str(), entryPoint, xray::render::SlangCompiler::Stage::Hull, m_target, fullPath);
+    fs->close();
+    if (!compileResult.IsValid())
+    {
+        Msg("! [ShaderLoader] Compilation failed for %s.hs", name);
+        if (!compileResult.errorMessage.empty())
+            Msg("! Error: %s", compileResult.errorMessage.c_str());
+        return result;
+    }
+
+    nvrhi::ShaderDesc desc;
+    desc.shaderType = nvrhi::ShaderType::Hull;
+    desc.debugName = name;
+    result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
+        desc, compileResult.bytecode.data(), compileResult.bytecode.size());
+    if (!result.handle)
+        return result;
+
+    result.bytecode = std::move(compileResult.bytecode);
+    auto extractedReflection = ShaderReflector::ExtractReflection(
+        compileResult.reflection, compileResult.linkedProgram, compileResult.vkShifts);
+    result.reflection = xr_new<ExtractedReflection>(extractedReflection);
+    m_cache.Save(name, ".hs", sourceHash, result.bytecode, &extractedReflection);
+    m_handleCache[cacheKey] = result.handle;
+    m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
+    return result;
+}
+
+ShaderLoader::ShaderResult ShaderLoader::LoadDomainShader(const char* name, const char* entryPoint)
+{
+    ShaderResult result;
+    xr_string cacheKey = xr_string(name) + ".ds";
+    auto handleIt = m_handleCache.find(cacheKey);
+    if (handleIt != m_handleCache.end()) {
+        result.handle = handleIt->second;
+        auto reflIt = m_reflectionCache.find(cacheKey);
+        if (reflIt != m_reflectionCache.end())
+            result.reflection = xr_new<ExtractedReflection>(*reflIt->second);
+        return result;
+    }
+
+    IReader* fs = OpenShaderFile(name, ".ds");
+    if (!fs)
+        return result;
+    WatchShaderFile(cacheKey, name, ".ds", entryPoint, xray::render::SlangCompiler::Stage::Domain);
+
+    u32 sourceHash = ShaderCache::ComputeHash((const char*)fs->pointer(), fs->length());
+    ExtractedReflection deserializedReflection;
+    bool cacheHit = m_cache.TryLoad(name, ".ds", sourceHash, result.bytecode, &deserializedReflection);
+    if (cacheHit)
+    {
+        nvrhi::ShaderDesc desc;
+        desc.shaderType = nvrhi::ShaderType::Domain;
+        desc.debugName = name;
+        result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
+            desc, result.bytecode.data(), result.bytecode.size());
+        fs->close();
+        if (!result.handle)
+            return result;
+        result.reflection = xr_new<ExtractedReflection>(deserializedReflection);
+        m_handleCache[cacheKey] = result.handle;
+        m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(deserializedReflection);
+        return result;
+    }
+
+    xr_string sourceCode;
+    sourceCode.assign((const char*)fs->pointer(), fs->length());
+    string_path fullPath;
+    strconcat(sizeof(fullPath), fullPath, GEnv.Render->getShaderPath(), name, ".ds");
+    auto compileResult = m_slangCompiler->CompileFromSource(
+        sourceCode.c_str(), entryPoint, xray::render::SlangCompiler::Stage::Domain, m_target, fullPath);
+    fs->close();
+    if (!compileResult.IsValid())
+    {
+        Msg("! [ShaderLoader] Compilation failed for %s.ds", name);
+        if (!compileResult.errorMessage.empty())
+            Msg("! Error: %s", compileResult.errorMessage.c_str());
+        return result;
+    }
+
+    nvrhi::ShaderDesc desc;
+    desc.shaderType = nvrhi::ShaderType::Domain;
+    desc.debugName = name;
+    result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
+        desc, compileResult.bytecode.data(), compileResult.bytecode.size());
+    if (!result.handle)
+        return result;
+
+    result.bytecode = std::move(compileResult.bytecode);
+    auto extractedReflection = ShaderReflector::ExtractReflection(
+        compileResult.reflection, compileResult.linkedProgram, compileResult.vkShifts);
+    result.reflection = xr_new<ExtractedReflection>(extractedReflection);
+    m_cache.Save(name, ".ds", sourceHash, result.bytecode, &extractedReflection);
+    m_handleCache[cacheKey] = result.handle;
+    m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
     return result;
 }
 

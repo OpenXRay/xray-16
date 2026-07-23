@@ -42,7 +42,10 @@ cbuffer DetailGlobals : register(b3)
     float4 grass_sss_color;         // RGB + intensity (subsurface scattering)
     float grass_color_variation;    // Per-blade color variation amount
     float grass_blade_height;       // Blade height multiplier (default 1.0)
-    float _pad0, _pad1;             // Padding to 16-byte alignment
+    uint build_details_index;
+    uint build_details_pbr_index;
+    uint grass_vein_index;
+    uint _pad0, _pad1, _pad2;
 };
 
 static const float M_PI = 3.1415926;

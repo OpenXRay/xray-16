@@ -1,0 +1,13 @@
+// shadow_cascade_terrain.ps — opaque terrain CSM caster (no alpha clip)
+// Terrain material IDs index g_TerrainMaterials, not g_Materials.
+struct PS_INPUT
+{
+	float4 position : SV_Position;
+	float2 texcoord : TEXCOORD0;
+	nointerpolation uint materialID : TEXCOORD1;
+};
+
+void main(PS_INPUT input)
+{
+	// Opaque terrain — depth only
+}

@@ -3,16 +3,17 @@
 #include <nvrhi/nvrhi.h>
 #include "xrCore/xrCore.h"
 
+namespace xray::render::framegraph {
+class BindingSetBuilder;
+}
+
 namespace xray::render::fg::passes {
 
-inline void DrawIndexedIndirectCountOrFallback(
+void DrawIndexedIndirectCountOrFallback(
     nvrhi::ICommandList* cmdList,
     uint32_t paramOffsetBytes,
     uint32_t countOffsetBytes,
-    uint32_t maxDrawCount)
-{
-    cmdList->drawIndexedIndirectCount(paramOffsetBytes, countOffsetBytes, maxDrawCount);
-}
+    uint32_t maxDrawCount);
 
 struct LightingConstants {
     Fvector4 sunDirection;
@@ -67,5 +68,8 @@ nvrhi::BufferHandle GetOrCreateDrawIndexBuffer(const char* passName, nvrhi::IDev
 LightingConstants FillLightingConstants();
 
 u32 ExtractFrustumPlanes(Fvector4 outPlanes[6]);
+
+// Resolve $user$sky0/$user$sky1 cubemaps for water reflections (falls back to dummy cubes).
+void ResolveEnvSkyCubes(fg::RenderDevice* device, nvrhi::ITexture*& outSky0, nvrhi::ITexture*& outSky1);
 
 } // namespace xray::render::fg::passes

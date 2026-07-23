@@ -1,0 +1,35 @@
+// sunshafts_combine.ps — upsample the half-res scattered-light buffer with a small tent
+// blur and add it to the full-res scene. Mirrors the original combine_volumetric step:
+// the volumetric sun is marched at reduced resolution, softened, then composited.
+#define SM_6_0
+#include "common.h"
+
+cbuffer SunShaftsCombineCB : register(b3)
+{
+    float4 combine_params; // xy = half-res shafts texel size, zw = unused
+};
+
+Texture2D g_Color : register(t0);
+Texture2D g_Shafts : register(t1);
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+};
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    float4 color = g_Color.SampleLevel(smp_nofilter, input.texcoord, 0);
+
+    float2 ts = combine_params.xy;
+    float3 shafts =
+        g_Shafts.SampleLevel(smp_linear, input.texcoord, 0).rgb * 0.5 +
+        g_Shafts.SampleLevel(smp_linear, input.texcoord + float2( ts.x,  ts.y), 0).rgb * 0.125 +
+        g_Shafts.SampleLevel(smp_linear, input.texcoord + float2(-ts.x,  ts.y), 0).rgb * 0.125 +
+        g_Shafts.SampleLevel(smp_linear, input.texcoord + float2( ts.x, -ts.y), 0).rgb * 0.125 +
+        g_Shafts.SampleLevel(smp_linear, input.texcoord + float2(-ts.x, -ts.y), 0).rgb * 0.125;
+
+    color.rgb += shafts;
+    return color;
+}

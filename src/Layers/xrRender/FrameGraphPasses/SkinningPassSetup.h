@@ -49,10 +49,18 @@ struct SkinningPassState {
     SkinningPipelineVariant hq2w;
     SkinningPipelineVariant hq3w;
     SkinningPipelineVariant hq4w;
+    // World-only PatchList variants (same VS/PS, + bindless_skinned_tess HS/DS).
+    SkinningPipelineVariant tessNonHQ;
+    SkinningPipelineVariant tessHQ1w;
+    SkinningPipelineVariant tessHQ2w;
+    SkinningPipelineVariant tessHQ3w;
+    SkinningPipelineVariant tessHQ4w;
     nvrhi::BindingLayoutHandle layout;
     nvrhi::BindingLayoutHandle hudLayout;
     nvrhi::ShaderHandle ps;
     nvrhi::ShaderHandle hudPS;
+    nvrhi::ShaderHandle tessHS;
+    nvrhi::ShaderHandle tessDS;
     SkinningPipelineVariant mdiNonHQ;
     SkinningPipelineVariant mdiHQ1w;
     SkinningPipelineVariant mdiHQ2w;
@@ -78,6 +86,7 @@ struct SkinningPassData {
     framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle skinnedDrawArgs;
+    framegraph::VirtualResourceHandle shadowMap;
     fg::RenderDevice* device;
     const GeometryCollector* geometry;
     const xr_vector<GeometryBatch>* hudBatches;
@@ -87,6 +96,14 @@ struct SkinningPassData {
     framegraph::DefaultOutputLayout outputs;
     SkinningPassState* passState;
     decals::OverlayManager* overlayMgr;
+    nvrhi::ITexture* shadowMapArray = nullptr;
+    nvrhi::ITexture* shadowCascades[3] = {};
+    nvrhi::ITexture* hudShadowMap = nullptr;
+    nvrhi::ITexture* localShadowAtlas = nullptr;
+    nvrhi::ITexture* contactDepth = nullptr;
+    nvrhi::ITexture* contactHistory = nullptr;
+    nvrhi::ITexture* envSky0 = nullptr;
+    nvrhi::ITexture* envSky1 = nullptr;
 };
 
 // Main skinning pass setup function
@@ -103,7 +120,16 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     fg::GPUCullingManager* gpuCulling = nullptr,
     framegraph::VirtualResourceHandle skinnedDrawArgs = {},
     SkinningPassState* state = nullptr,
-    decals::OverlayManager* overlayMgr = nullptr
+    decals::OverlayManager* overlayMgr = nullptr,
+    nvrhi::ITexture* shadowMapArray = nullptr,
+    framegraph::VirtualResourceHandle shadowMapHandle = {},
+    nvrhi::ITexture* contactDepth = nullptr,
+    nvrhi::ITexture* contactHistory = nullptr,
+    nvrhi::ITexture* envSky0 = nullptr,
+    nvrhi::ITexture* envSky1 = nullptr,
+    nvrhi::ITexture* hudShadowMap = nullptr,
+    nvrhi::ITexture* const* shadowCascades = nullptr,
+    nvrhi::ITexture* localShadowAtlas = nullptr
 );
 
 } // namespace xray::render::fg::passes

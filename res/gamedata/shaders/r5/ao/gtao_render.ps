@@ -1,0 +1,99 @@
+// GTAO (IX-Ray / LVutner) — FrameGraph worldPos/normal, X-Ray +Z view
+#include "ao/ao_common.h"
+
+float ComputeGTAO(float3 view_position, float3 view_normal, float2 texcoord, float2 jitter)
+{
+    const float GTAO_TAU = 6.2831854;
+    const float GTAO_HALF_PI = 1.5707964;
+
+    int GTAO_DIRECTIONS = (AoQuality() >= 3.0) ? 4 : 3;
+    int GTAO_STEPS = (AoQuality() >= 3.0) ? 6 : ((AoQuality() >= 2.0) ? 4 : 3);
+    // IX-Ray fixed world radius (quality only changes dirs/steps)
+    const float GTAO_RADIUS = 0.85;
+    float GTAO_NEG_1_OVER_RADIUSQR = -1.0 / max(GTAO_RADIUS * GTAO_RADIUS, 1e-6);
+
+    view_position *= 0.9992;
+    float3 view_direction = -normalize(view_position);
+
+    // ao_proj.x is already IX-Ray half-focal
+    float viewZ = ViewDepth(view_position);
+    float screen_radius_px = min((GTAO_RADIUS * max(ao_proj.x, 1.0)) / viewZ, 256.0);
+    float2 slice_scale = ao_screen.zw * screen_radius_px * float2(1.0, -1.0);
+    float slice_angle = GTAO_TAU / float(GTAO_DIRECTIONS);
+
+    float2 occ_weight = (0.0).xx;
+
+    [loop]
+    for (int i = 0; i < GTAO_DIRECTIONS; i++)
+    {
+        float angle = (float(i) + jitter.x) * slice_angle;
+        float3 slice_direction = float3(cos(angle), sin(angle), 0.0);
+
+        float3 axis = cross(view_direction, slice_direction);
+        float3 proj_normal = view_normal - axis * dot(view_normal, axis);
+        float3 proj_tangent = cross(axis, proj_normal);
+        float proj_normal_length = length(proj_normal);
+        float sin_n = dot(proj_tangent, view_direction) * rcp(max(proj_normal_length, 1e-5));
+
+        float max_horizon_cos = sin_n;
+
+        [loop]
+        for (int j = 0; j < GTAO_STEPS; j += 2)
+        {
+            float2 increment = (float(j) + float2(0.0, 1.0) + jitter.yy) / float(GTAO_STEPS);
+            increment *= increment;
+            float4 s_texcoord = texcoord.xyxy + slice_direction.xyxy * slice_scale.xyxy * increment.xxyy;
+
+            if (dot(s_texcoord.zw - saturate(s_texcoord.zw), 1.0) != 0.0)
+                break;
+
+            float4 wp0 = SampleWorldPos(s_texcoord.xy);
+            float4 wp1 = SampleWorldPos(s_texcoord.zw);
+
+            if (wp0.w > 0.5)
+            {
+                float3 s_vector = WorldToView(wp0.xyz) - view_position;
+                float s_vec_length = dot(s_vector, s_vector);
+                float s_horizon = dot(s_vector, view_direction) * rsqrt(max(s_vec_length, 1e-8));
+                float falloff = saturate(s_vec_length * GTAO_NEG_1_OVER_RADIUSQR + 1.0);
+                s_horizon = lerp(-1.0, s_horizon, falloff);
+                max_horizon_cos = max(max_horizon_cos, s_horizon);
+            }
+
+            if (wp1.w > 0.5)
+            {
+                float3 s_vector = WorldToView(wp1.xyz) - view_position;
+                float s_vec_length = dot(s_vector, s_vector);
+                float s_horizon = dot(s_vector, view_direction) * rsqrt(max(s_vec_length, 1e-8));
+                float falloff = saturate(s_vec_length * GTAO_NEG_1_OVER_RADIUSQR + 1.0);
+                s_horizon = lerp(-1.0, s_horizon, falloff);
+                max_horizon_cos = max(max_horizon_cos, s_horizon);
+            }
+        }
+
+        max_horizon_cos = saturate(0.5 * sin(GTAO_HALF_PI * (1.0 + sin_n) - GTAO_HALF_PI * max_horizon_cos) + 0.5);
+        occ_weight += float2(1.0 - max_horizon_cos, 1.0) * proj_normal_length;
+    }
+
+    occ_weight.x *= rcp(max(occ_weight.y, 1e-5));
+    return saturate(1.0 - occ_weight.x * 2.0);
+}
+
+uint main(PS_INPUT input) : SV_Target0
+{
+    float depth = SampleDepth(input.texcoord);
+    float4 worldPos4 = SampleWorldPos(input.texcoord);
+    if (IsSky(depth, worldPos4))
+        return asuint(f32tof16(1000.0)) | (asuint(f32tof16(1.0)) << 16);
+
+    float3 Nw = SampleWorldNormal(input.texcoord);
+    float3 Point = WorldToView(worldPos4.xyz);
+    float3 Normal = normalize(mul((float3x3)m_V, Nw));
+
+    float2 jitter = Ign2(input.position.xy + ao_proj.y);
+    float viewZ = ViewDepth(Point);
+    float occlusion = viewZ > 60.0
+        ? 1.0
+        : ComputeGTAO(Point + Normal * 0.0035, Normal, input.texcoord, jitter);
+    return asuint(f32tof16(viewZ)) | (asuint(f32tof16(occlusion)) << 16);
+}

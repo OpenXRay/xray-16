@@ -263,7 +263,7 @@ void CHOM::Render_DB(CFrustum& base)
 
 void CHOM::Render(CFrustum& base)
 {
-    if (!bEnabled)
+    if (!bEnabled || !m_pModel)
         return;
 
     ZoneScoped;

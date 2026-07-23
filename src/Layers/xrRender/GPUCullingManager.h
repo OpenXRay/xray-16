@@ -207,8 +207,12 @@ public:
         u32 hizHeight,
         u32 hizMipLevels,
         const GeometryCollector* geometry,
-        const Fmatrix& prevViewProj  // Previous frame's viewProj for temporal Hi-Z
+        const Fmatrix& prevViewProj, // Previous frame's viewProj for temporal Hi-Z
+        bool forceDisableHiz = false,
+        bool skipUpload = false
     );
+
+    nvrhi::ITexture* GetDummyHiZTexture() const { return m_dummyHizTexture.Get(); }
 
     // Get number of objects uploaded this frame (static + dynamic)
     u32 GetObjectCount() const { return m_objectCount; }
@@ -321,6 +325,41 @@ public:
     nvrhi::IBuffer* GetDynamicDrawArgsBuffer() const { return m_dynamicSet.drawArgsBuffer.Get(); }
 
     // ───────────────────────────────────────────────────────
+    //  SHADOW CASTER (view-independent, unculled) BUFFERS
+    // ───────────────────────────────────────────────────────
+    // drawArgsBuffer holds the full template (instanceCount=1 for every batch) and is
+    // never touched by the camera cull in compaction mode; materialIDBuffer/instanceBuffer
+    // are full per-batch. Combined with an identity drawID->batch map these let the shadow
+    // pass draw all casters regardless of camera direction.
+    nvrhi::IBuffer* GetStaticFullMaterialIDBuffer() const { return m_staticSet.materialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticShadowIndicesBuffer() const { return m_staticSet.shadowIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticShadowCountBuffer() const { return m_staticSet.shadowCountBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicFullMaterialIDBuffer() const { return m_dynamicSet.materialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicShadowIndicesBuffer() const { return m_dynamicSet.shadowIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicShadowCountBuffer() const { return m_dynamicSet.shadowCountBuffer.Get(); }
+
+    // Transparent set doubles as the foliage shadow caster (trees/bushes are alpha-blended).
+    nvrhi::IBuffer* GetTransparentDrawArgsBuffer() const { return m_transparentSet.drawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentFullMaterialIDBuffer() const { return m_transparentSet.materialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentShadowIndicesBuffer() const { return m_transparentSet.shadowIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentShadowCountBuffer() const { return m_transparentSet.shadowCountBuffer.Get(); }
+
+    // Light-frustum CSM caster compact (CPU filter + upload). Call once per cascade before draw.
+    void BuildLightFrustumCasters(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        const Fmatrix& lightVP, float radiusInflate = 1.25f);
+
+    /// Ensure identity shadow-caster index/count buffers exist (for cast-all fallback).
+    /// Does not frustum-filter — safe to call before local-shadow cast-all draws.
+    void EnsureShadowCasterIdentityBuffers(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice);
+
+    nvrhi::IBuffer* GetStaticShadowCompactDrawArgsBuffer() const { return m_staticSet.shadowCompactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticShadowCompactMaterialIDBuffer() const { return m_staticSet.shadowCompactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicShadowCompactDrawArgsBuffer() const { return m_dynamicSet.shadowCompactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicShadowCompactMaterialIDBuffer() const { return m_dynamicSet.shadowCompactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentShadowCompactDrawArgsBuffer() const { return m_transparentSet.shadowCompactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentShadowCompactMaterialIDBuffer() const { return m_transparentSet.shadowCompactMaterialIDBuffer.Get(); }
+
+    // ───────────────────────────────────────────────────────
     //  TERRAIN-SPECIFIC BUFFERS
     // ───────────────────────────────────────────────────────
     u32 GetTerrainObjectCount() const { return m_terrainObjectCount; }
@@ -336,6 +375,14 @@ public:
     nvrhi::IBuffer* GetTransparentCompactBatchIndicesBuffer() const { return m_transparentSet.compactBatchIndicesBuffer.Get(); }
     nvrhi::IBuffer* GetTransparentCompactMaterialIDBuffer() const { return m_transparentSet.compactMaterialIDBuffer.Get(); }
     nvrhi::IBuffer* GetTransparentCompactCountBuffer() const { return m_transparentSet.compactCountBuffer.Get(); }
+
+    // Tessellation set (opaque bump# materials — direct drawIndexed, not MDI)
+    u32 GetTessObjectCount() const { return m_tessSet.objectCount; }
+    nvrhi::IBuffer* GetTessInstanceBuffer() const { return m_tessSet.instanceBuffer.Get(); }
+    nvrhi::IBuffer* GetTessMaterialIDBuffer() const { return m_tessSet.materialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetTessBatchIndicesBuffer() const { return m_tessBatchIndicesBuffer.Get(); }
+    const xr_vector<IndirectDrawArgs>& GetTessDrawArgsData() const { return m_tessDrawArgsData; }
+    const xr_vector<GPUObjectData>& GetTessObjectData() const { return m_tessObjectData; }
 
     // ───────────────────────────────────────────────────────
     //  VARIANT PARTITIONING (multi-PSO rendering)
@@ -501,6 +548,14 @@ private:
         nvrhi::BufferHandle compactGroupCountsBuffer;   // Visible count per group (scratch)
         nvrhi::BufferHandle compactGroupOffsetsBuffer;  // Prefix offsets per group (scratch)
         nvrhi::BufferHandle instanceBuffer;             // Instance data buffer (GPUInstanceData)
+        // Shadow caster (view-independent) buffers: identity drawID->batch map + count.
+        // Used to draw ALL batches into the shadow map regardless of camera frustum,
+        // so casters that leave the camera view still cast shadows.
+        nvrhi::BufferHandle shadowIndicesBuffer;        // Identity or light-culled batch indices
+        nvrhi::BufferHandle shadowCountBuffer;          // Single u32 = caster count (indirect count)
+        nvrhi::BufferHandle shadowCompactDrawArgsBuffer; // Compacted draw args for light-frustum CSM
+        nvrhi::BufferHandle shadowCompactMaterialIDBuffer;
+        u32 shadowBuffersCapacity = 0;                  // Capacity the identity buffer was built for
         u32 objectCount = 0;
         u32 maxObjects = 0;
         bool drawArgsUploaded = false;
@@ -510,6 +565,11 @@ private:
     // Static/dynamic culling sets
     CullSetBuffers m_staticSet;
     CullSetBuffers m_dynamicSet;
+
+    // Ensure the view-independent shadow-caster identity/count buffers for a set
+    // exist and are sized/filled for the current objectCount.
+    void EnsureShadowCasterBuffers(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        CullSetBuffers& set, const char* name);
 
     // Shared constant buffer
     fg::BufferHandle m_cullParamsCB;         // Constant buffer
@@ -583,6 +643,10 @@ private:
     // ───────────────────────────────────────────────────────
     CullSetBuffers m_transparentSet;
 
+    // Opaque tessellation materials (direct drawIndexed; identity batch map)
+    CullSetBuffers m_tessSet;
+    nvrhi::BufferHandle m_tessBatchIndicesBuffer;
+
     // ───────────────────────────────────────────────────────
     //  DEBUG VISUALIZATION RESOURCES
     // ───────────────────────────────────────────────────────
@@ -617,6 +681,7 @@ private:
     u32 m_maxObjects = 0;
     bool m_initialized = false;
     bool m_computeEnabled = false;
+    nvrhi::TextureHandle m_dummyHizTexture; // 1x1 R32F when no real Hi-Z yet
 
     xr_vector<GPUObjectData> m_staticObjectData;
     xr_vector<IndirectDrawArgs> m_staticDrawArgsData;
@@ -642,6 +707,12 @@ private:
     xr_vector<IndirectDrawArgs> m_transparentDrawArgsData;
     xr_vector<u32> m_transparentMaterialIDData;
     xr_vector<GPUInstanceData> m_transparentInstanceData;
+
+    // Tessellation-specific CPU data (bump# / PN+HM materials)
+    xr_vector<GPUObjectData> m_tessObjectData;
+    xr_vector<IndirectDrawArgs> m_tessDrawArgsData;
+    xr_vector<u32> m_tessMaterialIDData;
+    xr_vector<GPUInstanceData> m_tessInstanceData;
 
     // ───────────────────────────────────────────────────────
     //  SKINNED MESH CULLING (GPU-Driven)

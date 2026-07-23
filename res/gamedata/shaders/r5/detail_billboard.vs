@@ -65,6 +65,8 @@ cbuffer DetailGlobals : register(b3)
 	float grass_blade_height;
 	uint build_details_index;
 	uint build_details_pbr_index;
+	uint grass_vein_index;
+	uint _pad0, _pad1, _pad2;
 };
 
 // Perlin4D 3D volume — bound directly at t12 (not bindless, since bindless is Texture2D only)

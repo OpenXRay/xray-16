@@ -104,7 +104,11 @@ LPCSTR FGUIRender::UpdateShaderName(LPCSTR tex_name, LPCSTR sh_name)
     u32 v_dev = CAP_VERSION(caps.raster_major, caps.raster_minor);
     u32 v_need = CAP_VERSION(2, 0);
 
-    if ((v_dev >= v_need) && FS.exist(buff, "$game_textures$", tex_name, ".ogm"))
+    // Only switch to YUV movie shader when Theora packs YUV for the GPU path.
+    // If HWSupportsShaderYUV2RGB is false, frames are already RGB — using movie
+    // would mis-decode them as YUV (classic green cast).
+    if ((v_dev >= v_need) && GEnv.Render->HWSupportsShaderYUV2RGB() &&
+        FS.exist(buff, "$game_textures$", tex_name, ".ogm"))
         return "hud" DELIMITER "movie";
     return sh_name;
 }

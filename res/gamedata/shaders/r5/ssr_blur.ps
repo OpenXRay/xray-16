@@ -1,0 +1,68 @@
+// ssr_blur.ps — roughness-aware bilateral (v39 quality)
+#define SM_6_0
+
+SamplerState smp_nofilter : register(s0);
+SamplerState smp_linear   : register(s1);
+
+Texture2D g_SSR    : register(t0);
+Texture2D g_Depth  : register(t1);
+Texture2D g_Normal : register(t2);
+
+cbuffer SSRBlurParams : register(b0)
+{
+    float2 texelSize;
+    float  blurIntensity;
+    float  _pad;
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float4 center = g_SSR.SampleLevel(smp_nofilter, I.uv, 0);
+    float centerZ = g_Depth.SampleLevel(smp_nofilter, I.uv, 0).x;
+    if (center.a < 0.008)
+        return float4(0, 0, 0, 0);
+    if (centerZ >= 0.9995)
+        return center;
+
+    float4 nC = g_Normal.SampleLevel(smp_nofilter, I.uv, 0);
+    float3 Nc = normalize(nC.xyz + 1e-5);
+    float roughness = saturate(nC.w);
+    float gloss = saturate(1.0 - roughness);
+
+    float blurAmt = saturate(blurIntensity * lerp(1.1, 0.4, gloss));
+    float radius = lerp(1.1, 4.0, blurAmt);
+    float depthSigma = lerp(90.0, 180.0, gloss);
+    float normalSigma = lerp(2.5, 7.0, gloss);
+
+    float3 sum = center.rgb * center.a;
+    float wsum = center.a;
+
+    [unroll]
+    for (int i = -4; i <= 4; ++i)
+    {
+        [unroll]
+        for (int j = -4; j <= 4; ++j)
+        {
+            if (i == 0 && j == 0)
+                continue;
+            float2 uv = I.uv + float2(i, j) * texelSize * radius;
+            float4 s = g_SSR.SampleLevel(smp_nofilter, uv, 0);
+            if (s.a < 0.008)
+                continue;
+            float z = g_Depth.SampleLevel(smp_nofilter, uv, 0).x;
+            float3 Ns = normalize(g_Normal.SampleLevel(smp_nofilter, uv, 0).xyz + 1e-5);
+            float wz = exp(-abs(z - centerZ) * depthSigma);
+            float wn = exp(-normalSigma * (1.0 - saturate(dot(Nc, Ns))));
+            float ws = exp(-0.3 * float(i * i + j * j));
+            float w = wz * wn * ws * saturate(s.a * 2.5);
+            sum += s.rgb * w;
+            wsum += w;
+        }
+    }
+
+    float3 blurred = sum / max(wsum, 1e-4);
+    float sharpMix = saturate(gloss * gloss * 0.5);
+    return float4(lerp(blurred, center.rgb, sharpMix), center.a);
+}

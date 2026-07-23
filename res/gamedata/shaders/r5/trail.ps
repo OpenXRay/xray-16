@@ -1,6 +1,4 @@
-// trail.ps
-// Trail pixel shader — identical to ribbon.ps
-// Samples diffuse from bindless material, applies vertex color alpha.
+// trail.ps — sample bindless diffuse × vertex color (matches ribbon.ps)
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
@@ -10,10 +8,23 @@ struct PS_INPUT
     float4 hpos     : SV_Position;
     float2 texcoord : TEXCOORD0;
     float4 color    : TEXCOORD1;
+    nointerpolation uint materialID : TEXCOORD2;
 };
 
 float4 main(PS_INPUT input) : SV_Target0
 {
-    // Debug: visualize UV coordinates
-    return float4(input.texcoord.x, input.texcoord.y, 0.0, input.color.a);
+    float4 result;
+    if (input.materialID != 0)
+    {
+        MaterialData mat = g_Materials[input.materialID];
+        result = SampleDiffuse(mat, input.texcoord) * input.color;
+    }
+    else
+    {
+        // No material bound yet — vertex alpha still carries age × tailFade
+        result = float4(input.color.rgb, input.color.a);
+    }
+
+    clip(result.a - (0.01 / 255.0));
+    return result;
 }

@@ -187,7 +187,12 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
 
     m_initialized = true;
     Msg("* [VulkanBackend] Initialized successfully");
-    Msg("*   Bindless textures: Yes (max %u)", m_capabilities.maxBindlessResources);
+    Msg("*   Bindless textures: %s (max %u)",
+        m_capabilities.bindlessTextures ? "Yes" : "No",
+        m_capabilities.maxBindlessResources);
+    Msg("*   drawIndirectCount: %s, multiDrawIndirect: %s",
+        m_capabilities.drawIndirectCount ? "Yes" : "No",
+        m_capabilities.multiDrawIndirect ? "Yes" : "No");
     return true;
 }
 
@@ -496,9 +501,28 @@ bool VulkanBackend::CreateLogicalDevice() {
             vulkan11Features.shaderDrawParameters = VK_FALSE;
         }
 
-        Msg("* [VulkanBackend] vk12.drawIndirectCount = %s (device reports: %s)",
-            vulkan12Features.drawIndirectCount ? "ENABLED" : "DISABLED",
+        m_featureDrawIndirectCount = vulkan12Features.drawIndirectCount == VK_TRUE;
+        m_featureMultiDrawIndirect = features2.features.multiDrawIndirect == VK_TRUE;
+        m_featureDescriptorIndexing = vulkan12Features.descriptorIndexing == VK_TRUE;
+        m_featureShaderDrawParameters = vulkan11Features.shaderDrawParameters == VK_TRUE;
+
+        Msg("* [VulkanBackend] feature clamp summary:");
+        Msg("*   drawIndirectCount      = %s (device: %s)",
+            m_featureDrawIndirectCount ? "ENABLED" : "DISABLED",
             sup12.drawIndirectCount ? "supported" : "unsupported");
+        Msg("*   multiDrawIndirect      = %s (device: %s)",
+            m_featureMultiDrawIndirect ? "ENABLED" : "DISABLED",
+            sup2.features.multiDrawIndirect ? "supported" : "unsupported");
+        Msg("*   descriptorIndexing     = %s (device: %s)",
+            m_featureDescriptorIndexing ? "ENABLED" : "DISABLED",
+            sup12.descriptorIndexing ? "supported" : "unsupported");
+        Msg("*   shaderDrawParameters   = %s (device: %s)",
+            m_featureShaderDrawParameters ? "ENABLED" : "DISABLED",
+            sup11.shaderDrawParameters ? "supported" : "unsupported");
+        Msg("*   runtimeDescriptorArray = %s",
+            vulkan12Features.runtimeDescriptorArray ? "ENABLED" : "DISABLED");
+        Msg("*   partiallyBound         = %s",
+            vulkan12Features.descriptorBindingPartiallyBound ? "ENABLED" : "DISABLED");
     }
 
     VkResult result = vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);
@@ -715,9 +739,13 @@ void VulkanBackend::CreateBindlessResources() {
 }
 
 void VulkanBackend::QueryCapabilities() {
-    m_capabilities.bindlessTextures = true;
+    m_capabilities.bindlessTextures = m_featureDescriptorIndexing;
     m_capabilities.maxBindlessResources = MAX_BINDLESS_TEXTURES;
     m_capabilities.shaderModel = 60;
+    m_capabilities.drawIndirectCount = m_featureDrawIndirectCount;
+    m_capabilities.multiDrawIndirect = m_featureMultiDrawIndirect;
+    m_capabilities.descriptorIndexing = m_featureDescriptorIndexing;
+    m_capabilities.shaderDrawParameters = m_featureShaderDrawParameters;
 
     VkPhysicalDeviceProperties props;
     vkGetPhysicalDeviceProperties(m_physicalDevice, &props);

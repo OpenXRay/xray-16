@@ -150,6 +150,12 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	ctl = xml:InitCheck("video_adv:check_r2_detail_bump", _st)
 	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
 
+-- r2_sun_details (grass cast shadows)
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r2_sun_details", _st)
+	ctl = xml:InitCheck("video_adv:check_r2_sun_details", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
+
 -- r2_steep_parallax		>r2
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r2_steep_parallax", _st)

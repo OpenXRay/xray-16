@@ -1,0 +1,11 @@
+// bindless_depth_opaque.ps — depth-only, no alpha (terrain)
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+    nointerpolation uint materialID : TEXCOORD1;
+};
+
+void main(PS_INPUT input)
+{
+}

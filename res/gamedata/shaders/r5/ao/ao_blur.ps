@@ -1,0 +1,53 @@
+// Bilateral AO blur
+#define SM_6_0
+#include "common.h"
+
+cbuffer AOConstants : register(b3)
+{
+    float4 ao_screen;
+    float4 ao_params;
+    float4 ao_proj;
+};
+
+Texture2D g_AO : register(t0);
+Texture2D g_Depth : register(t1);
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+};
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    float centerAO = g_AO.SampleLevel(smp_nofilter, input.texcoord, 0).x;
+    float centerZ = g_Depth.SampleLevel(smp_nofilter, input.texcoord, 0).x;
+    if (centerZ >= 0.9999)
+        return float4(1, 1, 1, 1);
+
+    float2 texel = ao_screen.zw;
+    float sum = centerAO;
+    float wsum = 1.0;
+
+    [unroll]
+    for (int i = -2; i <= 2; ++i)
+    {
+        [unroll]
+        for (int j = -2; j <= 2; ++j)
+        {
+            if (i == 0 && j == 0)
+                continue;
+            float2 uv = input.texcoord + float2(i, j) * texel;
+            float ao = g_AO.SampleLevel(smp_nofilter, uv, 0).x;
+            float z = g_Depth.SampleLevel(smp_nofilter, uv, 0).x;
+            float wz = exp(-abs(z - centerZ) * 80.0);
+            float ws = exp(-0.5 * float(i * i + j * j));
+            float w = wz * ws;
+            sum += ao * w;
+            wsum += w;
+        }
+    }
+
+    float outAO = sum / max(wsum, 1e-4);
+    return float4(outAO, outAO, outAO, 1);
+}

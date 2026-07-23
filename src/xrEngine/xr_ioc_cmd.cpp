@@ -26,6 +26,24 @@ ENGINE_API int ps_r_path_tracer = 0;
 ENGINE_API int ps_r_path_tracer_bounces = 8;
 ENGINE_API int ps_r_rt_gi = 0;
 ENGINE_API float ps_r_rt_gi_intensity = 1.0f;
+ENGINE_API int ps_r_taa = 1;
+ENGINE_API float ps_r_taa_sharpness = 0.65f;
+ENGINE_API int ps_r_bloom = 1;
+ENGINE_API int ps_r_cas = 1;
+ENGINE_API float ps_r_cas_sharpness = 0.6f;
+ENGINE_API int ps_r_contact_shadows = 0;
+ENGINE_API float ps_r_contact_shadows_length = 0.35f;
+ENGINE_API int ps_r_ssr = 1;
+ENGINE_API int ps_r_ssr_quality = 2;
+ENGINE_API int ps_r_ssr_debug = 0; // 0=off 1=weight 2=mirrorUV 3=confHeat
+
+ENGINE_API int ps_r_sky_ibl = 1;
+ENGINE_API float ps_r_sky_ibl_intensity = 1.0f;
+ENGINE_API int ps_r_foliage_sss = 1;
+ENGINE_API float ps_r_foliage_sss_intensity = 0.45f;
+ENGINE_API int ps_r_ssgi = 1;
+ENGINE_API int ps_r_ssgi_quality = 2;
+ENGINE_API float ps_r_ssgi_intensity = 0.65f;
 ENGINE_API Fvector4 ps_dev_param_1 = {0, 0, 0, 0};
 ENGINE_API Fvector4 ps_dev_param_2 = {0, 0, 0, 0};
 ENGINE_API Fvector4 ps_dev_param_3 = {0, 0, 0, 0};

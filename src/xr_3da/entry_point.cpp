@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <getopt.h>
+#include <system_error>
 #endif
 
 // Always request high performance GPU
@@ -92,7 +93,8 @@ int main(int argc, char *argv[])
 
             result = entry_point(commandLine);
 
-            xr_free(commandLine);
+            // Process is exiting; skip xr_free — Core._destroy already tore down allocators.
+            commandLine = nullptr;
         }
         else
             result = entry_point("");
@@ -101,6 +103,12 @@ int main(int argc, char *argv[])
     {
         _resetstkoflw();
         FATAL_F("stack overflow: %s", e.what());
+    }
+    catch (const std::system_error& e)
+    {
+        // Tracy / mutex teardown races on exit — don't abort the process noisily.
+        fprintf(stderr, "! exit system_error: %s\n", e.what());
+        result = EXIT_SUCCESS;
     }
     catch (const std::runtime_error& e)
     {

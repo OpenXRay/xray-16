@@ -22,12 +22,16 @@
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
+#include "xrCDB/Frustum.h"
 #include "Layers/xrRender/ClusteredLightManager.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/xrRender_console.h"
 #include "xrCore/FMesh.hpp"
 
 namespace xray::render::fg
 {
     extern float r__dtex_range;
+    extern xray::render::FrameGraphRenderer RImplementation;
 }
 
 namespace xray::render::fg::passes {
@@ -58,7 +62,7 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
 
     auto& cache = framegraph::GetPassResourceCache();
 
-    state.bindlessLayout = cache.GetOrCreateBindingLayoutFromReflection("ForwardColor", *vsResult.reflection, *psResult.reflection, nvDevice);
+    state.bindlessLayout = cache.GetOrCreateBindingLayoutFromReflection("ForwardColor_PBR_v3_CSMLadder", *vsResult.reflection, *psResult.reflection, nvDevice);
 
     u32 attrCount = 0;
     auto* attrs = GetUnifiedVertexAttributes(attrCount);
@@ -91,19 +95,58 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-    state.bindlessPipeline = cache.GetOrCreatePipeline("ForwardColor", pipeDesc, fbInfo, nvDevice);
+    state.bindlessPipeline = cache.GetOrCreatePipeline("ForwardColor_PBR_v3_CSMLadder", pipeDesc, fbInfo, nvDevice);
     if (!state.bindlessPipeline) {
         Msg("! [BindlessForward] Failed to create pipeline");
         return;
     }
 
+    // After DepthPrepass: Equal + no write → Hi-Z rejects overdraw, skips redundant depth stores
+    {
+        nvrhi::GraphicsPipelineDesc equalDesc = pipeDesc;
+        equalDesc.renderState.depthStencilState.depthWriteEnable = false;
+        equalDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
+        state.bindlessEqualPipeline = cache.GetOrCreatePipeline(
+            "ForwardColor_PBR_Equal_v1", equalDesc, fbInfo, nvDevice);
+    }
+
     QueryBindingLayoutFromPipeline(state.bindlessPipeline, state.bindlessLayout);
+
+    // Optional tessellation PSO (PatchList).
+    // Apple/MoltenVK: do not create — Metal tess temp buffers can kernel-panic.
+#if !defined(XR_PLATFORM_APPLE)
+    {
+        auto hsResult = shaderLoader->LoadHullShader("bindless_tess", "main");
+        auto dsResult = shaderLoader->LoadDomainShader("bindless_tess", "main");
+        if (hsResult.handle && dsResult.handle) {
+            state.bindlessHS = hsResult.handle;
+            state.bindlessDS = dsResult.handle;
+
+            nvrhi::GraphicsPipelineDesc tessDesc = pipeDesc;
+            tessDesc.HS = state.bindlessHS;
+            tessDesc.DS = state.bindlessDS;
+            tessDesc.primType = nvrhi::PrimitiveType::PatchList;
+            tessDesc.patchControlPoints = 3;
+            tessDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+            state.bindlessTessPipeline = cache.GetOrCreatePipeline(
+                "ForwardColor_Tess_v5", tessDesc, fbInfo, nvDevice);
+            if (state.bindlessTessPipeline)
+                Msg("* [BindlessForward] Tessellation pipeline ready");
+            else
+                Msg("! [BindlessForward] Tessellation pipeline create failed (VkResult logged by NVRHI)");
+        } else {
+            Msg("! [BindlessForward] Tess HS/DS shaders missing — tessellation disabled");
+        }
+    }
+#else
+    Msg("* [BindlessForward] Tessellation disabled on Apple/MoltenVK (IOGPU safety)");
+#endif
 
     auto terrainPsResult = shaderLoader->LoadPixelShader("bindless_terrain", "main");
     if (terrainPsResult.handle) {
         state.terrainPS = terrainPsResult.handle;
         state.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection(
-            "ForwardColor_Terrain", *vsResult.reflection, *terrainPsResult.reflection, nvDevice);
+            "ForwardColor_Terrain_PBR_v3_CSMLadder", *vsResult.reflection, *terrainPsResult.reflection, nvDevice);
 
         if (state.terrainLayout) {
             nvrhi::GraphicsPipelineDesc terrainPipeDesc;
@@ -120,9 +163,16 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
             terrainPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
             terrainPipeDesc.renderState.rasterState.frontCounterClockwise = false;
             terrainPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-            state.terrainPipeline = cache.GetOrCreatePipeline("ForwardColor_Terrain", terrainPipeDesc, fbInfo, nvDevice);
+            state.terrainPipeline = cache.GetOrCreatePipeline("ForwardColor_Terrain_PBR_v3_CSMLadder", terrainPipeDesc, fbInfo, nvDevice);
             if (state.terrainPipeline)
+            {
+                nvrhi::GraphicsPipelineDesc terrainEqual = terrainPipeDesc;
+                terrainEqual.renderState.depthStencilState.depthWriteEnable = false;
+                terrainEqual.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
+                state.terrainEqualPipeline = cache.GetOrCreatePipeline(
+                    "ForwardColor_Terrain_Equal_v2_CSMLadder", terrainEqual, fbInfo, nvDevice);
                 state.terrainInitialized = true;
+            }
         }
     }
 
@@ -182,6 +232,11 @@ static void renderBindlessForward(
     auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), device);
     auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("ForwardColor", nvDevice);
 
+    {
+        StaticGlobals sg = BuildStaticGlobals();
+        cmdList->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
+    }
+
     auto lightingData = FillLightingConstants();
     cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
 
@@ -192,6 +247,49 @@ static void renderBindlessForward(
     auto* psReflection = shaderLoader->GetCachedReflection("bindless_forward", ".ps");
 
     auto& clm = ClusteredLightManager::Instance();
+    auto& passCache = framegraph::GetPassResourceCache();
+
+    nvrhi::ITexture* shadowTex = config.shadowCascades[0]
+        ? config.shadowCascades[0]
+        : (config.shadowMapArray ? config.shadowMapArray : nullptr);
+    if (!shadowTex)
+        shadowTex = passCache.GetDummyShadowMap2D(nvDevice);
+    nvrhi::ITexture* sky0 = config.envSky0
+        ? config.envSky0
+        : passCache.GetDummyCubeMap(nvDevice);
+    nvrhi::ITexture* sky1 = config.envSky1
+        ? config.envSky1
+        : passCache.GetDummyCubeMap(nvDevice);
+
+    auto bindShadowMap = [&](framegraph::BindingSetBuilder& bsb) {
+        nvrhi::ITexture* dummy2D = passCache.GetDummyShadowMap2D(nvDevice);
+        static const char* kNames[3] = {"g_ShadowMap0", "g_ShadowMap1", "g_ShadowMap2"};
+        for (u32 i = 0; i < 3; ++i)
+        {
+            nvrhi::ITexture* t = (config.shadowCascades[i]) ? config.shadowCascades[i]
+                : (i == 0 && shadowTex ? shadowTex : dummy2D);
+            if (t)
+                bsb.Texture(kNames[i], t);
+        }
+        // Bind by name — unused g_ContactDepth must not be forced into the set
+        nvrhi::ITexture* contactHist = config.contactHistory
+            ? config.contactHistory
+            : passCache.GetDummyContactHistory(nvDevice);
+        if (contactHist)
+            bsb.Texture("g_ContactHistory", contactHist);
+        nvrhi::ITexture* localAtlas = config.localShadowAtlas
+            ? config.localShadowAtlas
+            : passCache.GetDummyShadowMap(nvDevice);
+        if (localAtlas)
+            bsb.Texture("g_LocalShadowAtlas", localAtlas);
+    };
+
+    auto bindSkyCubes = [&](framegraph::BindingSetBuilder& bsb) {
+        if (sky0)
+            bsb.Texture("s_env0", sky0);
+        if (sky1)
+            bsb.Texture("s_env1", sky1);
+    };
 
     auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
         framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "ForwardColor");
@@ -203,8 +301,13 @@ static void renderBindlessForward(
         bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
         bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
         bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+        bindShadowMap(bsb);
+        bindSkyCubes(bsb);
 
-        return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), ps.bindlessLayout, nvDevice);
+        auto bs = passCache.GetOrCreateBindingSet(bsb.Build(), ps.bindlessLayout, nvDevice);
+        if (!bs)
+            Msg("! [ForwardColor] Binding set create failed (missing CSM/sky?)");
+        return bs;
     };
 
     // ═══════════════════════════════════════════════════════
@@ -230,8 +333,13 @@ static void renderBindlessForward(
         return;
     }
 
+    // Equal-depth after prepass was rejected: VS path mismatch (depth vs forward)
+    // fails ComparisonFunc::Equal on MoltenVK → black indoor geometry / no torch.
+    // Keep LessOrEqual; DepthPrepass still fills Hi-Z for overdraw rejection.
+    nvrhi::IGraphicsPipeline* opaquePipe = ps.bindlessPipeline.Get();
+
     nvrhi::GraphicsState state;
-    state.pipeline = ps.bindlessPipeline;
+    state.pipeline = opaquePipe;
     state.framebuffer = framebuffer;
 
     // SM6.6 bindless: Add the descriptor table from D3D12 backend
@@ -261,7 +369,11 @@ static void renderBindlessForward(
             return;
 
         auto bindingSet = createBindingSetForSet(set);
-        R_ASSERT2(bindingSet, "Bindless forward binding set creation failed");
+        if (!bindingSet)
+        {
+            Msg("! [ForwardColor] Skipping draw — binding set is null");
+            return;
+        }
 
         state.bindings = { bindingSet };
         if (bindlessTable) {
@@ -277,7 +389,7 @@ static void renderBindlessForward(
     if (config.variantPartition.Enabled()) {
         auto* backendDev = device->GetBackend();
         VariantPartitionDrawConfig vpCfg;
-        vpCfg.defaultPipeline = ps.bindlessPipeline.Get();
+        vpCfg.defaultPipeline = opaquePipe;
         vpCfg.inputLayout = ps.bindlessInputLayout;
         vpCfg.passLayout = ps.bindlessLayout;
         vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
@@ -289,6 +401,18 @@ static void renderBindlessForward(
         vpCfg.variantTexBuffer = variantTexBuffer.GetBuffer();
         vpCfg.instanceBuffer = config.staticSet.instanceBuffer;
         vpCfg.megaVertexBuffer = config.megaVertexBuffer;
+        vpCfg.shadowMapArray = shadowTex;
+        for (u32 i = 0; i < 3; ++i)
+            vpCfg.shadowCascades[i] = config.shadowCascades[i];
+        vpCfg.localShadowAtlas = config.localShadowAtlas;
+        vpCfg.envSky0 = sky0;
+        vpCfg.envSky1 = sky1;
+        {
+            auto& clmVp = ClusteredLightManager::Instance();
+            vpCfg.lightDataBuffer = clmVp.GetLightDataBuffer();
+            vpCfg.clusterGridBuffer = clmVp.GetClusterGridBuffer();
+            vpCfg.lightIndexListBuffer = clmVp.GetLightIndexListBuffer();
+        }
         vpCfg.partition = config.variantPartition;
         vpCfg.selectTransparent = false;
 
@@ -303,6 +427,67 @@ static void renderBindlessForward(
         drawSet(config.staticSet);
     }
     drawSet(config.dynamicSet);
+
+    // Tessellation: PatchList PSO + direct drawIndexed (CPU frustum).
+    // Avoid DrawIndexedIndirect+tess — MoltenVK freezes on some camera angles.
+    // Apple/MoltenVK: hard-disabled — Metal tess temp buffers can kernel-panic
+    // (IOGPUGroupMemory::remove_memory_object) regardless of the console flag.
+#if defined(XR_PLATFORM_APPLE)
+    const bool tessEnabled = false;
+#else
+    const bool tessEnabled = ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
+#endif
+    if (tessEnabled && ps.bindlessTessPipeline &&
+        config.tessObjectCount > 0 && config.tessDrawArgs && config.tessObjects &&
+        config.tessMaterialIDBuffer && config.tessBatchIndicesBuffer && config.tessInstanceBuffer)
+    {
+        framegraph::BindingSetBuilder tessBsb(*vsReflection, *psReflection, nvDevice, "ForwardColor.Tess");
+        tessBsb.ConstantBuffer("static_globals", staticGlobalsCB);
+        tessBsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+        tessBsb.BufferSRV("g_InstanceData", config.tessInstanceBuffer);
+        tessBsb.BufferSRV("g_CompactBatchIndices", config.tessBatchIndicesBuffer);
+        tessBsb.BufferSRV("g_CompactMaterialIDs", config.tessMaterialIDBuffer);
+        tessBsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
+        tessBsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
+        tessBsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+        bindShadowMap(tessBsb);
+        bindSkyCubes(tessBsb);
+
+        auto tessBindingSet = passCache.GetOrCreateBindingSet(tessBsb.Build(), ps.bindlessLayout, nvDevice);
+        if (tessBindingSet)
+        {
+            state.pipeline = ps.bindlessTessPipeline;
+            state.bindings = { tessBindingSet };
+            if (bindlessTable)
+                state.addBindingSet(bindlessTable);
+            state.indirectParams = nullptr;
+            state.indirectCountBuffer = nullptr;
+            cmdList->setGraphicsState(state);
+
+            // No CPU frustum here: bounds for some model batches are unreliable,
+            // and exclusive tess routing would hide the whole mesh if culled.
+            for (u32 i = 0; i < config.tessObjectCount; ++i)
+            {
+                const auto& args = config.tessDrawArgs[i];
+                if (args.indexCountPerInstance == 0)
+                    continue;
+
+                nvrhi::DrawArguments da;
+                da.vertexCount = args.indexCountPerInstance;
+                da.instanceCount = 1;
+                da.startIndexLocation = args.startIndexLocation;
+                da.startVertexLocation = args.baseVertexLocation;
+                da.startInstanceLocation = i;
+                cmdList->drawIndexed(da);
+            }
+
+            state.pipeline = opaquePipe;
+        }
+        else
+        {
+            Msg("! [ForwardColor] Tess binding set create failed — skip tess draws");
+        }
+    }
 
     // ═══════════════════════════════════════════════════════
     //  TERRAIN RENDERING (4-layer detail blending)
@@ -335,36 +520,40 @@ static void renderBindlessForward(
             terrainBsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
             terrainBsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
             terrainBsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+            bindShadowMap(terrainBsb);
+            bindSkyCubes(terrainBsb);
 
             auto terrainBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainBsb.Build(), ps.terrainLayout, nvDevice);
-            R_ASSERT2(terrainBindingSet, "Terrain binding set creation failed");
-
-            // Set up terrain graphics state
-            nvrhi::GraphicsState terrainState;
-            terrainState.pipeline = ps.terrainPipeline;
-            terrainState.framebuffer = framebuffer;
-            terrainState.bindings = { terrainBindingSet };
-
-            // Add bindless descriptor table
-            if (backend) {
-                auto* bindlessTable = backend->GetBindlessDescriptorTable();
-                if (bindlessTable)
-                    terrainState.addBindingSet(bindlessTable);
+            if (!terrainBindingSet)
+            {
+                Msg("! [ForwardColor] Terrain binding set create failed");
             }
+            else
+            {
+                nvrhi::GraphicsState terrainState;
+                terrainState.pipeline = ps.terrainPipeline.Get();
+                terrainState.framebuffer = framebuffer;
+                terrainState.bindings = { terrainBindingSet };
 
-            terrainState.vertexBuffers = {
-                {config.megaVertexBuffer, 0, 0},
-                {drawIndexBuffer, 1, 0}
-            };
-            terrainState.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
-            terrainState.indirectParams = config.terrainCompactDrawArgsBuffer;
-            terrainState.indirectCountBuffer = config.terrainCompactCountBuffer;
-            terrainState.viewport.addViewport(viewport);
-            terrainState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
+                if (backend) {
+                    auto* bindlessTable = backend->GetBindlessDescriptorTable();
+                    if (bindlessTable)
+                        terrainState.addBindingSet(bindlessTable);
+                }
 
-            cmdList->setGraphicsState(terrainState);
-            DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, config.terrainObjectCount);
+                terrainState.vertexBuffers = {
+                    {config.megaVertexBuffer, 0, 0},
+                    {drawIndexBuffer, 1, 0}
+                };
+                terrainState.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
+                terrainState.indirectParams = config.terrainCompactDrawArgsBuffer;
+                terrainState.indirectCountBuffer = config.terrainCompactCountBuffer;
+                terrainState.viewport.addViewport(viewport);
+                terrainState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
+                cmdList->setGraphicsState(terrainState);
+                DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, config.terrainObjectCount);
+            }
         }
     }
 
@@ -429,6 +618,13 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 data.drawArgsBuffer = passBuilder.read(drawArgsInput, ResourceState::IndirectArgument);
             }
 
+            if (bindlessConfig.shadowMapHandle.is_valid()) {
+                passBuilder.read(bindlessConfig.shadowMapHandle, ResourceState::ShaderResource);
+            }
+            if (bindlessConfig.localShadowHandle.is_valid()) {
+                passBuilder.read(bindlessConfig.localShadowHandle, ResourceState::ShaderResource);
+            }
+
             data.outputs.albedo = data.color;
             data.outputs.normal = data.normal;
             data.outputs.baseColor = data.baseColor;
@@ -454,7 +650,9 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             if (cmdList) {
-                cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 1.0f, false, 0);
+                // DepthPrepass already cleared+filled depth — clearing here would kill early-Z.
+                if (!ps_r_depth_prepass)
+                    cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 1.0f, false, 0);
                 if (normalRT)
                     cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
                 if (baseColorRT)

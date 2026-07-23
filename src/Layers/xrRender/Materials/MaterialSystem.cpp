@@ -110,9 +110,20 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared
         case BlendMode::Additive:
         case BlendMode::Multiply:
         case BlendMode::Multiply2X:
-            info.alphaTest = false;
-            info.alphaRef = 0;
+            // Classic blenders often keep AREF together with blend (model/detail/
+            // screen_set with oAREF). Dropping aref made bindless_forward skip
+            // clip() → fringe / no cutoff on alpha effects.
             info.transparent = true;
+            if (blendInfo.alphaRef > 0)
+            {
+                info.alphaTest = true;
+                info.alphaRef = blendInfo.alphaRef;
+            }
+            else
+            {
+                info.alphaTest = false;
+                info.alphaRef = 0;
+            }
             break;
         }
         if (blendInfo.strictB2F)
@@ -134,6 +145,12 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared
             info.alphaRef = variant->passes[0].alphaTestRef;
         }
     }
+
+    // Water shaders are always transparent (r3 blender: SRCALPHA/INVSRCALPHA).
+    // Do not register a water.s.json until variant-partition cost is acceptable —
+    // water shading lives in bindless_forward.ps (MAT_FLAG_WATER).
+    if (strstr(shaderName, "water"))
+        info.transparent = true;
 
     m_materialCache[key] = info;
     return m_materialCache[key];

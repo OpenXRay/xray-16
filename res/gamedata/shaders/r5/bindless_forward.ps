@@ -6,8 +6,14 @@
 
 #define SM_6_0
 #define CLUSTERED_LIGHTING_FORWARD
+#define CSM_SHADOW_FORWARD
+#define LOCAL_SHADOW_FORWARD
+#define SKY_IBL
+// CSM: PCSS + cascade depth select (bust shader cache when sampling.h changes)
 #include "common.h"
 #include "bindless_common.h"
+// Water materials are drawn by dedicated water.vs/ps in TransparentPass.
+// s_env0/s_env1 declared via shared/sky_ibl.h (SKY_IBL)
 
 struct PS_INPUT
 {
@@ -18,6 +24,7 @@ struct PS_INPUT
     float3 tangent : TEXCOORD3;
     float3 bitangent : TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    float hemi : TEXCOORD6;
 };
 
 struct PS_OUTPUT
@@ -28,42 +35,83 @@ struct PS_OUTPUT
     float4 worldPos : SV_Target3;
 };
 
-// Lighting uses static_globals from common.h (b2):
-// - L_sun_color, L_sun_dir_w (sun)
-// - L_ambient (ambient)
-// - eye_position (camera)
-// - fog_params, fog_color (fog)
+// Object steep parallax (classic sload.h ALLOW_STEEPPARALLAX) on bump# height
+// (normalX.a). Offsets UV before texturing so relief shows on walls/props.
+// Disabled (returns uv) when: parallax off (parallax.x<=0), no bump#, grazing
+// angle, distance fade, or on alpha-test / foliage (billboards have no real depth).
+float2 ObjectParallaxUV(MaterialData mat, float2 uv, float3 worldPos,
+                        float3 T, float3 B, float3 N)
+{
+    if (parallax.x <= 0.0)
+        return uv;
+    if ((mat.flags & MAT_FLAG_HAS_NORMAL_X) == 0 || mat.normalXIndex == INVALID_TEXTURE_INDEX)
+        return uv;
+    if (mat.flags & (MAT_FLAG_ALPHA_TEST | MAT_FLAG_FOLIAGE))
+        return uv;
+
+    float3 V = normalize(eye_position - worldPos);
+    float3 Vts = normalize(float3(dot(V, T), dot(V, B), dot(V, N)));
+    if (Vts.z < 0.02)
+        return uv;
+
+    float viewZ = abs(mul(m_V, float4(worldPos, 1.0)).z);
+    const float startFade = 8.0;
+    const float stopFade = 20.0;
+    if (viewZ >= stopFade)
+        return uv;
+
+    const float maxSamples = 16.0;
+    const float minSamples = 6.0;
+    float nSteps = lerp(maxSamples, minSamples, saturate(Vts.z));
+    float stepSize = 1.0 / nSteps;
+    float2 vDelta = Vts.xy * (-parallax.x) * 1.2;
+    float2 offPerStep = stepSize * vDelta;
+
+    Texture2D hx = GetBindlessTexture(mat.normalXIndex);
+    float2 curOff = uv;
+    float curH = 0.0;
+    float curBound = 1.0;
+
+    [loop]
+    for (int i = 0; i < (int)nSteps; ++i)
+    {
+        if (curH < curBound)
+        {
+            curOff += offPerStep;
+            curH = hx.Sample(smp_linear, curOff).a;
+            curBound -= stepSize;
+        }
+    }
+
+    float2 prevOff = curOff - offPerStep;
+    float prevH = hx.Sample(smp_linear, prevOff).a;
+    float d2 = (curBound + stepSize) - prevH;
+    float d1 = curBound - curH;
+    float denom = d2 - d1;
+    float amt = (abs(denom) > 1e-5)
+        ? (curBound * d2 - (curBound + stepSize) * d1) / denom
+        : curBound;
+    float fade = smoothstep(stopFade, startFade, viewZ);
+    return uv + vDelta * ((1.0 - amt) * fade);
+}
 
 PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
 
-    // DEBUG: Visualize UVs as color to find where black areas are in UV space
-    // Uncomment ONE of these to debug:
-
-    // Option 1: Show UV coordinates as RG color (frac to see tiling)
-    //output.color = float4(frac(input.texcoord.x), frac(input.texcoord.y), 0, 1);
-    //return output;
-
-    // Option 2: Show material ID as grayscale
-    //output.color = float4(input.materialID / 255.0, input.materialID / 255.0, input.materialID / 255.0, 1);
-    //return output;
-
-    // Get material data directly using material ID
     MaterialData mat = g_Materials[input.materialID];
 
+    // ── Water drawn by dedicated water PSO (TransparentPass second draw) ──
+    if (mat.flags & MAT_FLAG_WATER)
+        clip(-1);
 
-    // Sample textures using SM6 bindless (ResourceDescriptorHeap)
-    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+    float3 Tn = normalize(input.tangent);
+    float3 Bn = normalize(input.bitangent);
+    float3 Ngeom = normalize(input.normal);
+    float2 uv = ObjectParallaxUV(mat, input.texcoord, input.worldPos, Tn, Bn, Ngeom);
 
-    // DEBUG: Visualize material ID (drawIndex) - use brighter colors
-    //float r = (input.materialID % 7) / 6.0;
-    //float g = (input.materialID % 5) / 4.0 + 0.3;
-    //float b = (input.materialID % 3) / 2.0 + 0.5;
-    //output.color = float4(r, g, b, 1);
-    //return output;
+    float4 diffuseSample = SampleDiffuse(mat, uv);
 
-    // Alpha test
     if (mat.flags & MAT_FLAG_ALPHA_TEST)
     {
         clip(diffuseSample.a - mat.alphaRef);
@@ -71,27 +119,23 @@ PS_OUTPUT main(PS_INPUT input)
 
     float3 albedo = diffuseSample.rgb;
 
-    float3 N = normalize(input.normal);
+    float3 N = Ngeom;
     float gloss = 0.0;
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
-        BumpSample bump = SampleNormal(mat, input.texcoord);
-        float3x3 TBN = float3x3(
-            normalize(input.tangent),
-            normalize(input.bitangent),
-            N
-        );
+        BumpSample bump = SampleNormal(mat, uv);
+        float3x3 TBN = float3x3(Tn, Bn, N);
         N = normalize(mul(bump.normal, TBN));
         gloss = bump.gloss;
     }
 
-    // Detail texture
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
-        // Detail sampling (uses mat.detailScale internally)
-        float4 detailSample = SampleDetail(mat, input.texcoord);
-        // Blend detail (multiply-2x style)
+        float4 detailSample = SampleDetail(mat, uv);
         albedo = albedo * (detailSample.rgb * 2.0);
+        // Non-bump detail path modulates gloss from detail alpha (sload.h)
+        if (!(mat.flags & MAT_FLAG_HAS_DETAIL_BUMP))
+            gloss = gloss * detailSample.a * 2.0;
     }
 
     float metallic = 0.0;
@@ -100,13 +144,34 @@ PS_OUTPUT main(PS_INPUT input)
 
     if (mat.flags & MAT_FLAG_HAS_PBR)
     {
-        float3 pbrSample = SamplePBR(mat, input.texcoord);
+        float3 pbrSample = SamplePBR(mat, uv);
         metallic = pbrSample.r;
         roughness = pbrSample.g;
         ao = pbrSample.b;
     }
 
-    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position);
+    // Foliage SSS: default thickness=1; optional thickness map in detailBumpX (R)
+    float sssStrength = 0.0;
+    float3 sssTint = float3(0.45, 0.65, 0.22);
+    float sssThickness = 1.0;
+    if (mat.flags & MAT_FLAG_FOLIAGE)
+    {
+        // parallax.z = global foliage SSS intensity (see FillGlobalConstants)
+        sssStrength = max(parallax.z, 0.0);
+        // Leaf alpha: thinner at transparent edges
+        if (mat.flags & MAT_FLAG_ALPHA_TEST)
+            sssThickness = saturate(diffuseSample.a + 0.2);
+        if (mat.flags & MAT_FLAG_HAS_SSS_MAP)
+        {
+            // Future: dedicated SSS thickness texture (R = thick→less scatter)
+            float thickMap = GetBindlessTexture(mat.detailBumpXIndex).Sample(smp_linear, input.texcoord).r;
+            sssThickness *= saturate(1.0 - thickMap);
+        }
+    }
+
+    f_forward fwd = output_forward_pbr(
+        albedo, N, input.worldPos, metallic, roughness, ao, input.position, input.hemi, 1.0,
+        sssStrength, sssTint, sssThickness);
     output.color = float4(fwd.color.rgb, diffuseSample.a);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;

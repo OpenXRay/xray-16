@@ -27,6 +27,7 @@ struct ImDrawData;
 namespace xray::render::fg
 {
 class IRender_DetailModel;
+class CSector;
 
 struct ShaderMacro
 {
@@ -43,6 +44,7 @@ namespace xray::render::fg {
     class RTAccelStructManager;
     class CRenderTarget;
     class light;
+    class VolumetricRenderer;
     namespace PS {
         class CParticleEffect;
     }
@@ -225,6 +227,7 @@ public:
     void Screenshot(IRender::ScreenshotMode mode, pcstr name) override;
     void SetPostProcessParams(const SPPInfo&) override;
     void RequestGrassInteraction(const Fvector&, float, float, uint8_t) override;
+    bool SampleTerrainHeight(float x, float z, float& outY) override;
 
     // Initialize
     bool Initialize(fg::RenderDevice* device);
@@ -529,6 +532,9 @@ private:
     // Smoke Trail Manager (GPU weapon muzzle smoke)
     xr_unique_ptr<fg::passes::SmokeTrailManager> m_smokeTrailManager;
 
+    // Froxel volumetric fog (MVP: world fog + sun)
+    xr_unique_ptr<fg::VolumetricRenderer> m_volumetricRenderer;
+
     // Ray Tracing acceleration structures (for path tracer)
     xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
     u32 m_ptSampleIndex = 0;
@@ -552,10 +558,17 @@ private:
     // ═══════════════════════════════════════════════════════
     //  STATIC GEOMETRY CACHE (collected once, reused every frame)
     // ═══════════════════════════════════════════════════════
-    // Static geometry from sector hierarchies doesn't change - cache it!
-    // Only dynamic objects (from spatial DB) need per-frame collection
+    // Static geometry: unique batches + per-sector index lists (built once after load)
     xr_vector<GeometryBatch> m_cachedStaticBatches;
-    bool m_staticBatchesCached = false;
+    xr_vector<xr_vector<u32>> m_sectorStaticBatchIds;
+    xr_vector<u8> m_sectorCacheReady;
+    xr_map<dxRender_Visual*, xr_vector<u32>> m_visualCacheBatchIds;
+    bool m_staticCacheInitialized = false;
+    bool m_portalTraverseActive = false;
+
+    // Ensure sector static batches exist. Returns true if built this call
+    // (batches already pushed into the live collector via ProcessVisualGeometry).
+    bool EnsureSectorStaticCache(size_t sectorIndex, const xr_vector<fg::CSector*>& sectors);
 
     // RenderContext for execution
     xr_unique_ptr<fg::RenderContext> m_renderContext;

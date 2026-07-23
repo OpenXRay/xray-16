@@ -53,23 +53,39 @@ DefaultOutputLayout setupDetailPass(
     const DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
-    xray::profiler::GPUProfiler* gpuProfiler
+    xray::profiler::GPUProfiler* gpuProfiler,
+    nvrhi::ITexture* shadowMapArray,
+    VirtualResourceHandle shadowMapHandle,
+    nvrhi::ITexture* contactDepth,
+    nvrhi::ITexture* contactHistory
+    , VirtualResourceHandle perlinReady
+    , nvrhi::ITexture* const* shadowCascades
+    , nvrhi::ITexture* localShadowAtlas
 )
 {
     if (detailManager && !detailManager->graphicsPipeline)
     {
-        nvrhi::FramebufferInfo fbInfo;
-        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
-        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
-        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
-        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
-        fbInfo.depthFormat = nvrhi::Format::D32;
-        detailManager->CreateGraphicsPipeline(device, fbInfo);
+        // Shaders must be loaded before PSO creation (else "invalid parameters")
+        if (!detailManager->vertexShader || !detailManager->pixelShader)
+        {
+            if (auto* loader = GEnv.Render->GetShaderLoader())
+                detailManager->LoadGraphicsShaders(loader);
+        }
+        if (detailManager->vertexShader && detailManager->pixelShader)
+        {
+            nvrhi::FramebufferInfo fbInfo;
+            fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+            fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+            fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
+            fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
+            fbInfo.depthFormat = nvrhi::Format::D32;
+            detailManager->CreateGraphicsPipeline(device, fbInfo);
+        }
     }
 
     auto& passData = fg.addCallbackPass<DetailPassData>(
         "DetailDraw",
-        [&, width, height, gpuProfiler](
+        [&, width, height, gpuProfiler, shadowMapArray, shadowMapHandle, contactDepth, contactHistory, perlinReady, shadowCascades, localShadowAtlas](
             FrameGraph& builder, PassHandle passHandle, DetailPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
@@ -78,6 +94,12 @@ DefaultOutputLayout setupDetailPass(
             data.device = device;
             data.detailManager = detailManager;
             data.gpuProfiler = gpuProfiler;
+            data.shadowMapArray = shadowMapArray;
+            for (int i = 0; i < 3; ++i)
+                data.shadowCascades[i] = (shadowCascades && shadowCascades[i]) ? shadowCascades[i] : shadowMapArray;
+            data.localShadowAtlas = localShadowAtlas;
+            data.contactDepth = contactDepth;
+            data.contactHistory = contactHistory;
 
             data.inputColor = passBuilder.read(forwardInputs.albedo);
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
@@ -87,6 +109,10 @@ DefaultOutputLayout setupDetailPass(
                 data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
             if (forwardInputs.worldPos.is_valid())
                 data.worldPos = passBuilder.readWrite(forwardInputs.worldPos, ResourceState::RenderTarget);
+            if (shadowMapHandle.is_valid())
+                data.shadowMap = passBuilder.read(shadowMapHandle, ResourceState::ShaderResource);
+            if (perlinReady.is_valid())
+                passBuilder.read(perlinReady);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = data.outputNormal;
@@ -145,7 +171,8 @@ DefaultOutputLayout setupDetailPass(
                 fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthTexture);
 
-            nvrhi::FramebufferHandle framebuffer = data.device->GetNVRHIDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer(
+                "DetailDraw", fbDesc, data.device->GetNVRHIDevice());
             if (!framebuffer)
                 return;
 
@@ -157,6 +184,10 @@ DefaultOutputLayout setupDetailPass(
             auto& cache = framegraph::GetPassResourceCache();
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), renderDevice);
+            {
+                StaticGlobals sg = BuildStaticGlobals();
+                cmdList->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
+            }
             auto detailGlobalsCB = cache.GetOrCreateVolatileCB("Detail", "DetailGlobals", sizeof(FGDetailManager::DetailFrameConstants), renderDevice);
             auto dynLightCB = cache.GetOrCreateVolatileCB("Detail", "DynLight", 48, renderDevice);
 
@@ -188,6 +219,8 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.grass_blade_height = ps_r3_grass_blade_height;
             frameConstants.buildDetailsIndex = dm->buildDetailsBindlessIndex;
             frameConstants.buildDetailsPbrIndex = dm->buildDetailsPbrBindlessIndex;
+            frameConstants.grassVeinIndex = dm->grassVeinBindlessIndex;
+            frameConstants.pad0 = frameConstants.pad1 = frameConstants.pad2 = 0;
             cmdList->writeBuffer(detailGlobalsCB, &frameConstants, sizeof(frameConstants));
 
             u8 dummyLight[48] = {};
@@ -215,6 +248,28 @@ DefaultOutputLayout setupDetailPass(
                 data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
 
             auto* nvDev = data.device->GetNVRHIDevice();
+            nvrhi::ITexture* dummy2D = cache.GetDummyShadowMap2D(nvDev);
+
+            auto bindShadowMap = [&](framegraph::BindingSetBuilder& bsb) {
+                static const char* kNames[3] = {"g_ShadowMap0", "g_ShadowMap1", "g_ShadowMap2"};
+                for (u32 i = 0; i < 3; ++i)
+                {
+                    nvrhi::ITexture* t = data.shadowCascades[i] ? data.shadowCascades[i]
+                        : (i == 0 && data.shadowMapArray ? data.shadowMapArray : dummy2D);
+                    if (t)
+                        bsb.Texture(kNames[i], t);
+                }
+                nvrhi::ITexture* contactHist = data.contactHistory
+                    ? data.contactHistory
+                    : cache.GetDummyContactHistory(nvDev);
+                if (contactHist)
+                    bsb.Texture("g_ContactHistory", contactHist);
+                nvrhi::ITexture* localAtlas = data.localShadowAtlas
+                    ? data.localShadowAtlas
+                    : cache.GetDummyShadowMap(nvDev);
+                if (localAtlas)
+                    bsb.Texture("g_LocalShadowAtlas", localAtlas);
+            };
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* grassVsRefl = shaderLoader->GetCachedReflection("detail_gpu", ".vs");
@@ -233,6 +288,14 @@ DefaultOutputLayout setupDetailPass(
                 bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                 bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
                 bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+                bindShadowMap(bsb);
+                nvrhi::ITexture* sky0 = nullptr;
+                nvrhi::ITexture* sky1 = nullptr;
+                ResolveEnvSkyCubes(data.device, sky0, sky1);
+                if (!sky0) sky0 = cache.GetDummyCubeMap(nvDev);
+                if (!sky1) sky1 = cache.GetDummyCubeMap(nvDev);
+                if (sky0) bsb.Texture("s_env0", sky0);
+                if (sky1) bsb.Texture("s_env1", sky1);
                 auto bindDesc = bsb.Build();
                 bindDesc.bindings.push_back(nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection));
                 return cache.GetOrCreateBindingSet(bindDesc, dm->graphicsBindingLayout, nvDev);
@@ -254,6 +317,14 @@ DefaultOutputLayout setupDetailPass(
                 bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                 bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
                 bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+                bindShadowMap(bsb);
+                nvrhi::ITexture* sky0 = nullptr;
+                nvrhi::ITexture* sky1 = nullptr;
+                ResolveEnvSkyCubes(data.device, sky0, sky1);
+                if (!sky0) sky0 = cache.GetDummyCubeMap(nvDev);
+                if (!sky1) sky1 = cache.GetDummyCubeMap(nvDev);
+                if (sky0) bsb.Texture("s_env0", sky0);
+                if (sky1) bsb.Texture("s_env1", sky1);
                 return cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDev);
             };
 
@@ -314,6 +385,14 @@ DefaultOutputLayout setupDetailPass(
                 decalBsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                 decalBsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
                 decalBsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+                bindShadowMap(decalBsb);
+                nvrhi::ITexture* sky0 = nullptr;
+                nvrhi::ITexture* sky1 = nullptr;
+                ResolveEnvSkyCubes(data.device, sky0, sky1);
+                if (!sky0) sky0 = cache.GetDummyCubeMap(nvDev);
+                if (!sky1) sky1 = cache.GetDummyCubeMap(nvDev);
+                if (sky0) decalBsb.Texture("s_env0", sky0);
+                if (sky1) decalBsb.Texture("s_env1", sky1);
                 nvrhi::BindingSetHandle decalBindingSet = cache.GetOrCreateBindingSet(decalBsb.Build(), dm->decalBindingLayout, nvDev);
 
                 nvrhi::GraphicsState state;

@@ -1,0 +1,49 @@
+// Guided GTAO filter (IX-Ray / LVutner) — Load-based (portable vs Gather)
+#define SM_6_0
+#include "common.h"
+
+Texture2D<uint> t_gtao_packed : register(t0);
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+};
+
+float main(PS_INPUT input) : SV_Target0
+{
+    int2 center = int2(input.position.xy);
+    uint centerPacked = t_gtao_packed.Load(int3(center, 0));
+    float center_depth = f16tof32(centerPacked & 0x0000ffff);
+
+    int kernel = 7;
+    int half_kernel = kernel / 2;
+
+    float4 x_x2_y_xy = (float4)0.0;
+    int count = 0;
+
+    [loop]
+    for (int i = -half_kernel; i <= half_kernel; ++i)
+    {
+        [loop]
+        for (int j = -half_kernel; j <= half_kernel; ++j)
+        {
+            int2 coord = center + int2(i, j);
+            uint tap = t_gtao_packed.Load(int3(coord, 0));
+            float depth_tap = f16tof32(tap & 0x0000ffff);
+            float occ_tap = f16tof32(tap >> 16);
+
+            x_x2_y_xy += float4(depth_tap, depth_tap * depth_tap, occ_tap, occ_tap * depth_tap);
+            count += 1;
+        }
+    }
+
+    x_x2_y_xy *= rcp(max(float(count), 1.0));
+
+    float cyx = (x_x2_y_xy.w - x_x2_y_xy.x * x_x2_y_xy.z);
+    float vx = (x_x2_y_xy.y - x_x2_y_xy.x * x_x2_y_xy.x) + 1e-4;
+    float beta = cyx * rcp(vx);
+    float alpha = x_x2_y_xy.z - beta * x_x2_y_xy.x;
+
+    return saturate(beta * center_depth + alpha);
+}

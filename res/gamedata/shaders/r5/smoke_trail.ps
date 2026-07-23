@@ -1,7 +1,37 @@
-// smoke_trail.ps
-// Pixel shader for GPU smoke trail rendering.
+// smoke_trail.ps — soft age envelope × optional bindless diffuse
 #define SM_6_0
 #include "common.h"
+#include "bindless_common.h"
+
+cbuffer TrailParams : register(b5)
+{
+    uint  g_ControlPointCount;
+    uint  g_Subdivisions;
+    float g_TexCoordsFactor;
+    uint  g_UVPolicy;
+
+    float g_TotalDist;
+    uint  g_EnableTailFade;
+    uint  g_SmoothingMode;
+    uint  g_EdgePolicy;
+
+    uint  g_FlipX;
+    uint  g_FlipY;
+    uint  g_Rotate90;
+    uint  g_MaterialID;
+
+    uint  g_UseGPUState;
+    float g_TurbAmount;
+    float g_TurbFrequency;
+    float g_TurbEvolution;
+
+    float g_SphereCenterX;
+    float g_SphereCenterY;
+    float g_SphereCenterZ;
+    float g_SphereRadius;
+
+    uint  g_pad5_0, g_pad5_1, g_pad5_2, g_pad5_3;
+};
 
 struct PS_INPUT
 {
@@ -17,5 +47,15 @@ float4 main(PS_INPUT input) : SV_Target0
     float fadeOut = 1.0 - smoothstep(0.0, 1.0, age);
     float alpha   = fadeIn * fadeOut;
 
-    return float4(1.0, 1.0, 1.0, alpha * 0.06);
+    float3 rgb = float3(1.0, 1.0, 1.0);
+    if (g_MaterialID != 0)
+    {
+        MaterialData mat = g_Materials[g_MaterialID];
+        float4 tex = SampleDiffuse(mat, input.texcoord);
+        rgb = tex.rgb;
+        alpha *= tex.a;
+    }
+
+    clip(alpha - (0.01 / 255.0));
+    return float4(rgb, alpha * 0.35);
 }

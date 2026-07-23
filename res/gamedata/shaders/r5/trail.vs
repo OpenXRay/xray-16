@@ -68,6 +68,7 @@ struct VS_OUTPUT
     float4 hpos     : SV_Position;
     float2 texcoord : TEXCOORD0;
     float4 color    : TEXCOORD1;
+    nointerpolation uint materialID : TEXCOORD2;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -299,7 +300,9 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
     // --- Output ---
     output.hpos = mul(m_VP, float4(finalPos, 1.0));
     output.texcoord = uv;
-    output.color = float4(1.0, 1.0, 1.0, smoothAge);
+    // smoothAge fades birth→death; tailFade fades along trail length (classic ribbon)
+    output.color = float4(1.0, 1.0, 1.0, smoothAge * tailFade);
+    output.materialID = g_MaterialID;
 
     return output;
 }

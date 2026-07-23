@@ -1,0 +1,37 @@
+// wet/rain_write_normal.ps — wet normals/roughness for all orientations
+#define SM_6_0
+
+SamplerState smp_rtlinear : register(s0);
+
+Texture2D g_Normal  : register(t0);
+Texture2D g_Patched : register(t1); // .a ≈ SSFX Gloss (~0.15)
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+};
+
+float4 main(PS_INPUT input) : SV_Target
+{
+    float4 orig = g_Normal.SampleLevel(smp_rtlinear, input.texcoord, 0);
+    float4 patched = g_Patched.SampleLevel(smp_rtlinear, input.texcoord, 0);
+
+    // Grass starts at ~0.55–0.85 roughness — must push below SSR wetness gate
+    float wet = saturate(patched.a / 0.18);
+    float wetAmt = smoothstep(0.02, 0.65, wet);
+
+    float3 No = normalize(orig.xyz + float3(0.0, 0.0, 0.00001));
+    float3 Np = normalize(patched.xyz + float3(0.0, 0.0, 0.00001));
+    float3 N = normalize(lerp(No, Np, wetAmt * 0.7));
+
+    float up = saturate(No.y);
+    float side = saturate(1.0 - abs(No.y));
+    // Aggressive wet roughness so NPC/grass/HUD fire SSR wetness, not just floors
+    float wetRough = lerp(0.30, 0.18, up);
+    wetRough = lerp(wetRough, 0.26, side * 0.55);
+    float applyAmt = wetAmt * saturate(0.55 + up * 0.55 + side * 0.55);
+    float rough = lerp(orig.w, min(orig.w, wetRough), applyAmt);
+
+    return float4(N, saturate(rough));
+}

@@ -39,10 +39,19 @@ struct alignas(16) LightHiZCullCB {
 };
 static_assert(sizeof(LightHiZCullCB) == 160, "LightHiZCullCB must be 160 bytes");
 
+/// One atlas slice for a shadowed spot / OMNIPART face.
+struct LocalShadowTile {
+    const light* L = nullptr;
+    Fmatrix clipVP;
+    u32 lightIndex = 0; // index into GPU light buffer
+    u32 slice = 0;
+};
+
 static constexpr u32 CLUSTER_TILE_SIZE = 64;
 static constexpr u32 CLUSTER_NUM_SLICES = 24;
 static constexpr u32 MAX_LIGHTS = 1024;
 static constexpr u32 MAX_LIGHT_INDICES = 1024 * 1024;
+static constexpr u32 MAX_LOCAL_SHADOW_TILES = 16;
 
 class ClusteredLightManager {
 public:
@@ -54,6 +63,8 @@ public:
     void CollectLight(const light* L);
     void CollectLightsParallel(const xr_vector<const light*>& lights);
     void BuildLightBuffer(const light_Package& package);
+    /// Pick top-N shadowed faces and pack tile index into GPULightData.w (call after collect, before Upload).
+    void AssignLocalShadowTiles(const Fvector& cameraPos);
     void Upload(nvrhi::ICommandList* cmdList);
     void UploadAllVisible(nvrhi::ICommandList* cmdList);
 
@@ -71,6 +82,8 @@ public:
     u32 GetTilesX() const { return m_tilesX; }
     u32 GetTilesY() const { return m_tilesY; }
 
+    const xr_vector<LocalShadowTile>& GetLocalShadowTiles() const { return m_localShadowTiles; }
+
     ClusterCB BuildClusterCB(u32 screenWidth, u32 screenHeight, float zNear, float zFar) const;
 
     void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
@@ -78,6 +91,8 @@ public:
     u32 GetVisibleLightCount() const { return m_visibleLightCountCPU; }
 
     bool IsReady() const { return m_lightDataBuffer != nullptr; }
+
+    static Fmatrix BuildSpotClipVP(const light* L);
 
 private:
     void AddLight(const light* L, u32 type);
@@ -87,6 +102,16 @@ private:
     nvrhi::DeviceHandle m_device;
 
     xr_vector<GPULightData> m_lightsCPU;
+    xr_vector<const light*> m_lightSources;
+    xr_vector<LocalShadowTile> m_localShadowTiles;
+    /// Persist light* → slice across frames to stop top-N thrashing (Skadovsk flicker).
+    struct StickyShadowSlot
+    {
+        const light* L = nullptr;
+        float score = 0.f;
+        u32 graceFrames = 0; // keep slot after brief score/list drops
+    };
+    std::array<StickyShadowSlot, MAX_LOCAL_SHADOW_TILES> m_stickyShadowSlots{};
     std::array<u32, MAX_LIGHTS> m_identityIndices;
     xr_map<shared_str, u32> m_spotTextureCache;
     u32 m_numLights = 0;

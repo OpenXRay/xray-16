@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/FrameGraphPasses/PassCommon.h"
 
@@ -45,12 +47,20 @@ static const char* GetDefaultSkinnedVS(u32 vertexFormat)
     switch (vertexFormat)
     {
     case VF_SKINNED_NONHQ: return "bindless_skinned";
-    case VF_SKINNED_HQ1W:
-    case VF_SKINNED_HQ2W:
-    case VF_SKINNED_HQ3W:
-    case VF_SKINNED_HQ4W:  return "bindless_skinned_hq";
+    case VF_SKINNED_HQ1W:  return "bindless_skinned_hq";
+    case VF_SKINNED_HQ2W:  return "bindless_skinned_2w";
+    case VF_SKINNED_HQ3W:  return "bindless_skinned_3w";
+    case VF_SKINNED_HQ4W:  return "bindless_skinned_4w";
     default: return nullptr;
     }
+}
+
+static const char* GetDefaultSkinnedPS(u32 vertexFormat)
+{
+    // All skinned VS share the same lit PS (IBL + CSM + clustered)
+    if (vertexFormat >= VF_SKINNED_NONHQ && vertexFormat <= VF_SKINNED_HQ3W)
+        return "bindless_skinned";
+    return nullptr;
 }
 
 nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
@@ -76,28 +86,78 @@ nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
     const auto& pass = variant.GetPass(passIndex);
 
     const char* vsName = pass.vsName.c_str();
-    if (vertexFormat >= VF_SKINNED_NONHQ && !xr_strcmp(vsName, "bindless_forward"))
+    const char* psName = pass.psName.c_str();
+    bool remappedToSkinned = false;
+
+    // Model materials are authored as bindless_forward; skinned draws must use
+    // bindless_skinned* so NPCs/bots get the same IBL/CSM/clustered path as world.
+    if (vertexFormat >= VF_SKINNED_NONHQ && vertexFormat <= VF_SKINNED_HQ3W)
     {
-        const char* skinnedVS = GetDefaultSkinnedVS(vertexFormat);
-        if (skinnedVS)
-            vsName = skinnedVS;
+        if (!xr_strcmp(vsName, "bindless_forward"))
+        {
+            if (const char* skinnedVS = GetDefaultSkinnedVS(vertexFormat))
+            {
+                vsName = skinnedVS;
+                remappedToSkinned = true;
+            }
+        }
+        if (!xr_strcmp(psName, "bindless_forward"))
+        {
+            if (const char* skinnedPS = GetDefaultSkinnedPS(vertexFormat))
+            {
+                psName = skinnedPS;
+                remappedToSkinned = true;
+            }
+        }
     }
 
-    auto vs = LoadShader(nvrhi::ShaderType::Vertex, vsName);
-    auto ps = LoadShader(nvrhi::ShaderType::Pixel, pass.psName.c_str());
-    if (!vs || !ps)
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    if (!shaderLoader)
+        return nullptr;
+
+    auto vsResult = shaderLoader->LoadVertexShader(vsName, "main");
+    auto psResult = shaderLoader->LoadPixelShader(psName, "main");
+    if (!vsResult.handle || !psResult.handle)
+        return nullptr;
+
+    // Cache handles for reuse
+    {
+        string256 vsKey, psKey;
+        xr_sprintf(vsKey, "%d:%s", static_cast<int>(nvrhi::ShaderType::Vertex), vsName);
+        xr_sprintf(psKey, "%d:%s", static_cast<int>(nvrhi::ShaderType::Pixel), psName);
+        m_shaderCache[shared_str(vsKey)] = vsResult.handle;
+        m_shaderCache[shared_str(psKey)] = psResult.handle;
+    }
+
+    // Remapped skinned default shaders share SkinningPass layout (IBL/CSM binds).
+    // Other custom variants (e.g. water) keep a reflection-matched layout.
+    nvrhi::BindingLayoutHandle layoutHandle = passBindingLayout;
+    const bool customShaders =
+        !remappedToSkinned &&
+        (xr_strcmp(vsName, "bindless_forward") != 0 ||
+         xr_strcmp(psName, "bindless_forward") != 0);
+    if (customShaders && vsResult.reflection && psResult.reflection)
+    {
+        string256 layoutName;
+        xr_sprintf(layoutName, "Variant_%s_p%u_fmt%u", variant.name.c_str(), passIndex, vertexFormat);
+        auto customLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(
+            layoutName, *vsResult.reflection, *psResult.reflection, device);
+        if (customLayout)
+            layoutHandle = customLayout;
+    }
+    if (!layoutHandle)
         return nullptr;
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
-    pipeDesc.VS = vs;
-    pipeDesc.PS = ps;
+    pipeDesc.VS = vsResult.handle;
+    pipeDesc.PS = psResult.handle;
     pipeDesc.inputLayout = inputLayout;
     pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
 
     if (bindlessLayout)
-        pipeDesc.bindingLayouts = {passBindingLayout, bindlessLayout};
+        pipeDesc.bindingLayouts = { layoutHandle, bindlessLayout };
     else
-        pipeDesc.bindingLayouts = {passBindingLayout};
+        pipeDesc.bindingLayouts = { layoutHandle };
 
     pipeDesc.renderState.depthStencilState = pass.depthStencil;
     pipeDesc.renderState.rasterState = pass.rasterState;
@@ -116,9 +176,9 @@ nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
         return nullptr;
     }
 
-    Msg("* [VariantPSO] Created pipeline: '%s' pass=%d vs=%s ps=%s blend=%s",
-        variant.name.c_str(), passIndex, vsName, pass.psName.c_str(),
-        pass.blendEnabled ? "yes" : "no");
+    Msg("* [VariantPSO] Created pipeline: '%s' pass=%d vs=%s ps=%s blend=%s skinnedRemap=%d",
+        variant.name.c_str(), passIndex, vsName, psName,
+        pass.blendEnabled ? "yes" : "no", remappedToSkinned ? 1 : 0);
 
     m_cache[key] = pipeline;
     return pipeline.Get();
@@ -139,11 +199,19 @@ void DrawVariantPartition(
 {
     auto& registry = ShaderVariantRegistry::Instance();
     auto& psoCache = VariantPSOCache::Instance();
+    auto& smpCache = framegraph::GetPassResourceCache();
 
     const auto& p = cfg.partition;
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    if (!shaderLoader)
+        return;
 
     for (u32 v = 0; v < p.variantCount; v++) {
         nvrhi::IGraphicsPipeline* pso;
+        const char* vsName = "bindless_forward";
+        const char* psName = "bindless_forward";
+        nvrhi::IBindingLayout* layout = cfg.passLayout;
+
         if (v == 0) {
             pso = cfg.defaultPipeline;
         } else {
@@ -153,21 +221,76 @@ void DrawVariantPartition(
             pso = psoCache.GetOrCreatePSO(nvDevice, framebuffer, v, *variant, 0, VF_MDI,
                 cfg.inputLayout, cfg.passLayout, cfg.bindlessLayout);
             if (!pso) continue;
+
+            if (!variant->passes.empty())
+            {
+                vsName = variant->passes[0].vsName.c_str();
+                psName = variant->passes[0].psName.c_str();
+            }
+            // Prefer layout baked into the variant PSO (may differ from default forward).
+            const auto& pipeDesc = pso->getDesc();
+            if (!pipeDesc.bindingLayouts.empty())
+                layout = pipeDesc.bindingLayouts[0];
         }
 
-        nvrhi::BindingSetDesc bindDesc;
-        bindDesc.bindings = {
-            nvrhi::BindingSetItem::ConstantBuffer(2, cfg.staticGlobalsCB),
-            nvrhi::BindingSetItem::ConstantBuffer(4, cfg.lightingCB),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(8, cfg.materialBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(10, cfg.variantTexBuffer),
-            nvrhi::BindingSetItem::Sampler(0, cfg.sampler),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(14, cfg.instanceBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(15, p.batchIndicesBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(16, p.materialIDsBuffer),
-        };
-        auto bindingSet = nvDevice->createBindingSet(bindDesc, cfg.passLayout);
-        if (!bindingSet) continue;
+        nvrhi::ITexture* dummy2D = smpCache.GetDummyShadowMap2D(nvDevice);
+
+        nvrhi::ITexture* sky0 = cfg.envSky0 ? cfg.envSky0 : smpCache.GetDummyCubeMap(nvDevice);
+        nvrhi::ITexture* sky1 = cfg.envSky1 ? cfg.envSky1 : smpCache.GetDummyCubeMap(nvDevice);
+
+        auto* vsReflection = shaderLoader->GetCachedReflection(vsName, ".vs");
+        auto* psReflection = shaderLoader->GetCachedReflection(psName, ".ps");
+        if (!vsReflection || !psReflection || !layout)
+        {
+            Msg("! [VariantPartition] Missing reflection/layout for %s/%s — skip variant %u",
+                vsName, psName, v);
+            continue;
+        }
+
+        framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "VariantPartition");
+        bsb.ConstantBuffer("static_globals", cfg.staticGlobalsCB);
+        bsb.BufferSRV("g_Materials", cfg.materialBuffer);
+        bsb.BufferSRV("g_VariantTextures", cfg.variantTexBuffer);
+        bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
+        bsb.BufferSRV("g_CompactBatchIndices", p.batchIndicesBuffer);
+        bsb.BufferSRV("g_CompactMaterialIDs", p.materialIDsBuffer);
+
+        if (cfg.lightDataBuffer)
+            bsb.BufferSRV("g_LightData", cfg.lightDataBuffer);
+        if (cfg.clusterGridBuffer)
+            bsb.BufferSRV("g_ClusterGrid", cfg.clusterGridBuffer);
+        if (cfg.lightIndexListBuffer)
+            bsb.BufferSRV("g_LightIndexList", cfg.lightIndexListBuffer);
+
+        // CSM is fixed-register in bindless_forward; water has no shadow map.
+        if (xr_strcmp(psName, "water") != 0)
+        {
+            static const char* kNames[3] = {"g_ShadowMap0", "g_ShadowMap1", "g_ShadowMap2"};
+            for (u32 i = 0; i < 3; ++i)
+            {
+                nvrhi::ITexture* t = cfg.shadowCascades[i] ? cfg.shadowCascades[i]
+                    : (i == 0 && cfg.shadowMapArray ? cfg.shadowMapArray : dummy2D);
+                if (t)
+                    bsb.Texture(kNames[i], t);
+            }
+            nvrhi::ITexture* localAtlas = cfg.localShadowAtlas
+                ? cfg.localShadowAtlas
+                : framegraph::GetPassResourceCache().GetDummyShadowMap(nvDevice);
+            if (localAtlas)
+                bsb.Texture("g_LocalShadowAtlas", localAtlas);
+        }
+        if (sky0)
+            bsb.Texture("s_env0", sky0);
+        if (sky1)
+            bsb.Texture("s_env1", sky1);
+
+        auto bindingSet = smpCache.GetOrCreateBindingSet(bsb.Build(), layout, nvDevice);
+        if (!bindingSet)
+        {
+            Msg("! [VariantPartition] createBindingSet failed for variant %u (%s/%s)",
+                v, vsName, psName);
+            continue;
+        }
 
         state.pipeline = pso;
         state.bindings = { bindingSet };

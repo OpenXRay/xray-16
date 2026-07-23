@@ -123,4 +123,7 @@
 	<string id="ukr">
 		<text>Ukrainian</text>
 	</string>
+	<string id="ui_mm_r2_sun_details">
+		<text>Grass shadows</text>
+	</string>
 </string_table>

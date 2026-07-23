@@ -120,7 +120,8 @@ void setupClusterLightPass(
     const Fmatrix& prevViewProj,
     bool hasPrevViewProj)
 {
-    bool useHiZ = hasPrevViewProj && hizPyramid.is_valid() && hizWidth > 0 && hizHeight > 0;
+    bool useHiZ = (ps_r_hiz_occlusion != 0) && hasPrevViewProj && hizPyramid.is_valid() &&
+        hizWidth > 0 && hizHeight > 0;
 
     fg.addCallbackPass<ClusterLightPassData>(
         "ClusterLightAssign",
@@ -128,6 +129,10 @@ void setupClusterLightPass(
             FrameGraph& builder, PassHandle passHandle, ClusterLightPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             passBuilder.sideEffects();
+            // Must stay on graphics queue: Forward+ samples cluster buffers the same
+            // frame. Async + sideEffects-only had no FG barrier → empty clusters /
+            // dead flashlight & indoor point lights on MoltenVK.
+            // passBuilder.asyncCompute();
 
             if (useHiZ && hizPyramid.is_valid())
                 passBuilder.read(hizPyramid);
@@ -234,6 +239,10 @@ void setupClusterLightPass(
                 "Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
 
             cmdList->writeBuffer(clusterParamsCB, &clusterCB, sizeof(clusterCB));
+            {
+                StaticGlobals sg = BuildStaticGlobals();
+                cmdList->writeBuffer(viewParamsCB, &sg, sizeof(sg));
+            }
 
             auto* csRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_light_assign", ".cs");
             if (!csRefl) return;

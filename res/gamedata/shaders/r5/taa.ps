@@ -1,0 +1,227 @@
+// taa.ps — temporal AA: Catmull-Rom history, k-DOP clip (SSFX), reactive blend, sharpen
+#define SM_6_0
+
+Texture2D g_Current : register(t0);
+Texture2D g_History : register(t1);
+Texture2D g_Depth   : register(t2);
+Texture2D g_Motion  : register(t22);
+SamplerState smp_rtlinear : register(s0);
+SamplerState smp_point    : register(s1);
+
+cbuffer TAAParams : register(b0)
+{
+    float2 screenSize;
+    float  blendAlpha; // base current-frame weight when static
+    float  sharpness;  // post temporal unsharp (0..1)
+    float2 jitter;     // current subpixel offset in pixels (Halton - 0.5)
+    float2 prevJitter; // previous frame jitter (motion-vector correction)
+};
+
+struct PS_INPUT
+{
+    float4 pos : SV_Position;
+    float2 uv  : TEXCOORD0;
+};
+
+float3 RGBToYCoCg(float3 c)
+{
+    float Y  = dot(c, float3(0.25, 0.5, 0.25));
+    float Co = dot(c, float3(0.5, 0.0, -0.5));
+    float Cg = dot(c, float3(-0.25, 0.5, -0.25));
+    return float3(Y, Co, Cg);
+}
+
+float3 YCoCgToRGB(float3 c)
+{
+    float t = c.x - c.z;
+    return float3(t + c.y, c.x + c.z, t - c.y);
+}
+
+// Closest-depth motion dilation (foreground MV wins at edges)
+float2 DilatedMotion(float2 uv, float2 texel)
+{
+    float bestDepth = 1.0;
+    float2 bestMotion = g_Motion.SampleLevel(smp_point, uv, 0).xy;
+    [unroll]
+    for (int y = -1; y <= 1; ++y)
+    {
+        [unroll]
+        for (int x = -1; x <= 1; ++x)
+        {
+            float2 suv = saturate(uv + float2(x, y) * texel);
+            float d = g_Depth.SampleLevel(smp_point, suv, 0).x;
+            if (d < bestDepth)
+            {
+                bestDepth = d;
+                bestMotion = g_Motion.SampleLevel(smp_point, suv, 0).xy;
+            }
+        }
+    }
+    return bestMotion;
+}
+
+float3 HistoryCatmullRom(float2 uv, float2 texel)
+{
+    float2 pos = uv * screenSize;
+    float2 center = floor(pos - 0.5) + 0.5;
+    float2 f = pos - center;
+    float2 f2 = f * f;
+    float2 f3 = f2 * f;
+
+    float2 w0 = 0.5 * (-f3 + 2.0 * f2 - f);
+    float2 w1 = 0.5 * (3.0 * f3 - 5.0 * f2 + 2.0);
+    float2 w2 = 0.5 * (-3.0 * f3 + 4.0 * f2 + f);
+    float2 w3 = 0.5 * (f3 - f2);
+
+    float2 w12 = w1 + w2;
+    float2 tc12 = texel * (center + (w2 / max(w12, 1e-5)));
+    float2 tc0  = texel * (center - 1.0);
+    float2 tc3  = texel * (center + 2.0);
+
+    float3 result = 0;
+    result += g_History.SampleLevel(smp_rtlinear, saturate(float2(tc12.x, tc0.y)), 0).rgb * (w12.x * w0.y);
+    result += g_History.SampleLevel(smp_rtlinear, saturate(float2(tc0.x, tc12.y)), 0).rgb * (w0.x * w12.y);
+    result += g_History.SampleLevel(smp_rtlinear, saturate(float2(tc12.x, tc12.y)), 0).rgb * (w12.x * w12.y);
+    result += g_History.SampleLevel(smp_rtlinear, saturate(float2(tc3.x, tc12.y)), 0).rgb * (w3.x * w12.y);
+    result += g_History.SampleLevel(smp_rtlinear, saturate(float2(tc12.x, tc3.y)), 0).rgb * (w12.x * w3.y);
+    return max(result, 0.0);
+}
+
+// k-DOP axes from SSFX ssfx_taa / "k-DOP Clipping" (Tampere)
+static const float3 kdop_axes[16] = {
+    float3(1, 0, 0),
+    float3(0, 1, 0),
+    float3(0, 0, 1),
+    float3(0.820081, 0.456727, -0.344773),
+    float3(0.540295, 0.829202, 0.143195),
+    float3(0.255800, 0.841084, -0.476597),
+    float3(-0.406935, -0.389062, 0.826459),
+    float3(-0.826708, -0.382923, -0.412219),
+    float3(0.260942, -0.577482, 0.773578),
+    float3(0.254398, 0.637821, 0.726957),
+    float3(0.310900, -0.728083, -0.610930),
+    float3(0.798513, -0.556827, -0.228738),
+    float3(0.673383, -0.163602, -0.720964),
+    float3(-0.813922, 0.369658, -0.448201),
+    float3(0.477650, -0.853722, 0.207384),
+    float3(-0.554854, -0.041550, -0.830910)
+};
+
+float3 KDopClip(float3 curY, float3 prevY, float3 colors[9])
+{
+    const float epsilon = 1e-5;
+    float3 dir = prevY - curY;
+    float nearT = -1e9, farT = 1e9;
+    [unroll]
+    for (int a = 0; a < 16; ++a)
+    {
+        float3 axis = kdop_axes[a];
+        float2 extent = float2(1e9, -1e9);
+        [unroll]
+        for (int n = 0; n < 9; ++n)
+        {
+            float t = dot(colors[n], axis);
+            extent.x = min(t, extent.x);
+            extent.y = max(t, extent.y);
+        }
+        extent += float2(-epsilon, +epsilon);
+
+        float projPos = dot(curY, axis);
+        float invDir = rcp(dot(dir, axis) + 1e-8);
+        float t0 = (extent.x - projPos) * invDir;
+        float t1 = (extent.y - projPos) * invDir;
+        nearT = max(nearT, min(t0, t1));
+        farT = min(farT, max(t0, t1));
+    }
+    if (nearT <= farT && (nearT > 0.0 || farT > 0.0))
+    {
+        float t = clamp(nearT > 0.0 ? nearT : farT, 0.0, 1.0);
+        return curY + t * dir;
+    }
+    return curY;
+}
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float2 uv = saturate(I.uv);
+    float2 texel = 1.0 / max(screenSize, float2(1, 1));
+
+    // Stable temporal resolve (projection jitter disabled in ApplyTAAJitter).
+    float2 uvUnjitter = uv;
+
+    float3 current = g_Current.SampleLevel(smp_rtlinear, saturate(uvUnjitter), 0).rgb;
+    float depth = g_Depth.SampleLevel(smp_point, uv, 0).x;
+    if (depth >= 0.9995 || blendAlpha >= 0.999)
+        return float4(current, 1.0);
+
+    float2 motion = DilatedMotion(uv, texel);
+    float2 histUV = uv + motion;
+
+    float motionPx = length(motion * screenSize);
+    bool badMotion = motionPx > 48.0;
+    bool outOfBounds = any(histUV < texel) || any(histUV > (1.0 - texel));
+    if (badMotion || outOfBounds)
+        return float4(current, 1.0);
+
+    float3 history = HistoryCatmullRom(saturate(histUV), texel);
+
+    // Neighborhood in YCoCg (unjittered)
+    float3 Neighborhood[9];
+    float3 nMin = 1e10;
+    float3 nMax = -1e10;
+    float3 m1 = 0;
+    float3 m2 = 0;
+    int idx = 0;
+    [unroll]
+    for (int y = -1; y <= 1; ++y)
+    {
+        [unroll]
+        for (int x = -1; x <= 1; ++x)
+        {
+            float3 s = RGBToYCoCg(
+                g_Current.SampleLevel(smp_point, saturate(uvUnjitter + float2(x, y) * texel), 0).rgb);
+            Neighborhood[idx++] = s;
+            nMin = min(nMin, s);
+            nMax = max(nMax, s);
+            m1 += s;
+            m2 += s * s;
+        }
+    }
+    m1 *= (1.0 / 9.0);
+    m2 *= (1.0 / 9.0);
+    float3 sigma = sqrt(max(m2 - m1 * m1, 0.0));
+
+    float3 curY = RGBToYCoCg(current);
+    float3 histUnclampedY = RGBToYCoCg(history);
+
+    // k-DOP clip (primary) + soft variance AABB (secondary floor)
+    float3 histY = KDopClip(curY, histUnclampedY, Neighborhood);
+    float gamma = lerp(1.25, 0.65, saturate(motionPx / 16.0));
+    float3 lo = max(nMin, m1 - gamma * sigma);
+    float3 hi = min(nMax, m1 + gamma * sigma);
+    histY = clamp(histY, lo, hi);
+    history = YCoCgToRGB(histY);
+
+    float clipDist = length(histUnclampedY - histY);
+    float reactive = saturate(clipDist * 4.0);
+
+    float alpha = blendAlpha;
+    alpha = saturate(alpha + motionPx * 0.035 + reactive * 0.45);
+    alpha = max(alpha, saturate(motionPx / 24.0) * 0.55);
+
+    float3 result = lerp(history, current, alpha);
+
+    if (sharpness > 1e-3)
+    {
+        float3 blur = 0;
+        blur += g_Current.SampleLevel(smp_point, saturate(uvUnjitter + float2(-1, 0) * texel), 0).rgb;
+        blur += g_Current.SampleLevel(smp_point, saturate(uvUnjitter + float2(+1, 0) * texel), 0).rgb;
+        blur += g_Current.SampleLevel(smp_point, saturate(uvUnjitter + float2(0, -1) * texel), 0).rgb;
+        blur += g_Current.SampleLevel(smp_point, saturate(uvUnjitter + float2(0, +1) * texel), 0).rgb;
+        blur *= 0.25;
+        float3 hiFreq = result - blur;
+        result = max(result + hiFreq * (sharpness * 0.65), 0.0);
+    }
+
+    return float4(result, 1.0);
+}

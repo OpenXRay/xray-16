@@ -24,8 +24,8 @@ VS_OUTPUT main(VS_INPUT v) {
     // Vertices are already in world space (billboard computed on CPU)
     o.hpos = mul(m_WVP, float4(v.position.xyz, 1.0));
 
-    // Place sun at far plane (reverse-Z: far = 0)
-    o.hpos.z = o.hpos.w * 0.0001;
+    // Place sun at far plane (standard-Z: clear=1, LessOrEqual — far = z/w = 1)
+    o.hpos.z = o.hpos.w;
 
     // Pass through color and UV
     o.color = v.color;

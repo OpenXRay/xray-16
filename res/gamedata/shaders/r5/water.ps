@@ -1,0 +1,133 @@
+// water.ps — dedicated water PSO (soft depth + foam + SSR + Fresnel)
+#define SM_6_0
+#define SSR_QUALITY 3
+#define USE_SOFT_WATER
+#define NEED_SOFT_WATER
+#define SSR_WATER_DOWNWARD_BIAS
+#include "common.h"
+#include "bindless_common.h"
+#include "shared/ssr.h"
+
+struct PS_INPUT
+{
+    float4 hpos     : SV_Position;
+    float2 tbase    : TEXCOORD0;
+    float2 tnorm0   : TEXCOORD1;
+    float2 tnorm1   : TEXCOORD2;
+    float3 M1       : TEXCOORD3;
+    float3 M2       : TEXCOORD4;
+    float3 M3       : TEXCOORD5;
+    float3 v2point  : TEXCOORD6;
+    float4 c0       : COLOR0;
+    float  fog      : TEXCOORD7;
+    nointerpolation uint materialID : TEXCOORD8;
+    float4 tctexgen : TEXCOORD9; // clip-space for soft water / SSR UV
+};
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 baseColor : SV_Target2;
+    float4 worldPos : SV_Target3;
+};
+
+TextureCube s_env0 : register(t25);
+TextureCube s_env1 : register(t26);
+Texture2D s_leaves : register(t22); // water\\water_foam
+
+cbuffer WaterParams : register(b5)
+{
+    float4 water_intensity; // rgb unused, .r = intensity like classic
+};
+
+PS_OUTPUT main(PS_INPUT I)
+{
+    PS_OUTPUT output;
+
+    MaterialData mat = g_Materials[I.materialID];
+    if ((mat.flags & MAT_FLAG_WATER) == 0)
+        clip(-1);
+
+    float4 base = SampleDiffuse(mat, I.tbase);
+
+    float3 n0 = float3(0.5, 0.5, 1.0);
+    float3 n1 = float3(0.5, 0.5, 1.0);
+    if (mat.normalIndex != INVALID_TEXTURE_INDEX)
+    {
+        Texture2D nmap = GetBindlessTexture(mat.normalIndex);
+        n0 = nmap.Sample(smp_base, I.tnorm0).xyz;
+        n1 = nmap.Sample(smp_base, I.tnorm1).xyz;
+    }
+    float3 Navg = n0 + n1 - 1.0;
+
+    float3 Nw = normalize(mul(float3x3(I.M1, I.M2, I.M3), Navg));
+    float3 v2point = normalize(I.v2point);
+    float3 vreflect = reflect(v2point, Nw);
+
+    // gl remapping (stable reflections)
+    float3 vreflectabs = abs(vreflect);
+    float vreflectmax = max(vreflectabs.x, max(vreflectabs.y, vreflectabs.z));
+    vreflect /= vreflectmax;
+    if (vreflect.y < 0.999)
+        vreflect.y = vreflect.y * 2.0 - 1.0;
+
+    float3 env0 = s_env0.Sample(smp_rtlinear, vreflect).rgb;
+    float3 env1 = s_env1.Sample(smp_rtlinear, vreflect).rgb;
+    float3 env = lerp(env0, env1, L_ambient.w);
+
+    // GL water: SSR replaces env (sky on miss), THEN artistic square boost
+    float3 worldPos = eye_position + I.v2point;
+    float4 ssr = compute_ssr(worldPos, Nw, env);
+    env = lerp(env, ssr.rgb, saturate(ssr.a * 1.35));
+    env *= env * 2.0;
+
+    float fresnel = saturate(dot(vreflect, v2point));
+    float power = pow(fresnel, 9.0);
+    float amount = 0.15 + 0.25 * power;
+
+    float3 c_reflection = env * amount;
+    float3 finalColor = lerp(c_reflection, base.rgb, base.a);
+    finalColor *= I.c0.rgb * 2.0;
+
+    float alpha = 0.75 + 0.25 * power;
+
+#ifdef USE_SOFT_WATER
+    float2 PosTc = I.hpos.xy * screen_res.zw; // pixel → UV (screen_res.zw = 1/wh)
+    float sceneDepth = g_SceneDepth.SampleLevel(smp_nofilter, PosTc, 0).x;
+    float4 clipScene = float4(PosTc.x * 2.0 - 1.0, 1.0 - PosTc.y * 2.0, sceneDepth, 1.0);
+    float4 worldSceneH = mul(m_InvVP, clipScene);
+    float3 sceneWorld = worldSceneH.xyz / max(worldSceneH.w, 1e-5);
+    // View looks down -Z: use camera distance, not signed Z difference
+    float sceneDist = length(sceneWorld - eye_position);
+    float waterDist = length(worldPos - eye_position);
+    float waterDepth = max(0.0, sceneDist - waterDist);
+
+    // Soft shore fade — never collapse base water opacity when depth is invalid/zero
+    float softFade = saturate(waterDepth * 4.0);
+    float fog_exp_intens = -4.0;
+    float wfog = 1.0 - exp(fog_exp_intens * waterDepth);
+    float3 Fc = float3(0.1, 0.1, 0.1) * water_intensity.r;
+    float shoreAlpha = max(alpha * softFade, alpha * 0.55);
+    finalColor = lerp(Fc, finalColor, shoreAlpha);
+    alpha = max(shoreAlpha, wfog * softFade);
+
+    float4 leaves = s_leaves.Sample(smp_base, I.tbase);
+    leaves.rgb *= water_intensity.r;
+    float calc_cos = -dot(float3(I.M1.z, I.M2.z, I.M3.z), normalize(v2point));
+    float calc_depth = saturate(waterDepth * calc_cos);
+    float fLeavesFactor = smoothstep(0.025, 0.05, calc_depth);
+    fLeavesFactor *= smoothstep(0.1, 0.075, calc_depth);
+    finalColor = lerp(finalColor, leaves.rgb, leaves.a * fLeavesFactor);
+    alpha = lerp(alpha, leaves.a, leaves.a * fLeavesFactor);
+#endif
+
+    finalColor = lerp(fog_color.rgb, finalColor, I.fog);
+    alpha *= I.fog * I.fog;
+
+    output.color = float4(finalColor, saturate(alpha));
+    output.normal = float4(Nw, 0.0);
+    output.baseColor = float4(base.rgb, base.a);
+    output.worldPos = float4(worldPos, 1.0);
+    return output;
+}

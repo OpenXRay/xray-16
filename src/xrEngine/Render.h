@@ -408,6 +408,9 @@ public:
     // Phase 3: A-Life grass interaction (thread-safe wrapper for calls from A-Life thread)
     virtual void RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type = 0) = 0;
 
+    // Rain splash / wet: sample baked detail heightmap (XZ → Y). Default: unavailable.
+    virtual bool SampleTerrainHeight(float /*x*/, float /*z*/, float& /*outY*/) { return false; }
+
     virtual void RenderStatsOverlay() {}
     virtual void RenderPBRConversionUI() {}
     virtual void SetEnabled(bool) {}

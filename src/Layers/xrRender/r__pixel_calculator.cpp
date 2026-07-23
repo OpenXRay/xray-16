@@ -28,8 +28,7 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
 
 void r_pixel_calculator::run()
 {
-    // TODO: Implement via NVRHI
-    Log("----- ssa build not yet implemented for FrameGraph -----");
+    // SSA pixel calculator not ported to FrameGraph yet; no-op (avoid log spam).
 }
 
 } // namespace xray::render::fg

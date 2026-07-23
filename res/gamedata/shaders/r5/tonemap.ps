@@ -1,46 +1,45 @@
-// xrRender/Shaders/tonemap.ps.hlsl
-// Tonemap pass - currently passthrough until HDR lighting is implemented
-//
-// When HDR is ready, this will apply:
-// - Auto-exposure from ExposurePass
-// - ACES filmic tonemapping
-// - Gamma correction (if needed)
-//
-// Inputs:
-//   t0: Scene color (RGBA16_FLOAT or RGBA8_UNORM)
-//   t1: Exposure texture (1x1 R32_FLOAT from ExposurePass) - unused for now
-//   s0: Linear sampler
+// tonemap.ps — classic CoP combine tonemap: scale + modified Reinhard (white=1.7)
+// Matches r3/common_functions.h tonemap() — NOT ACES (ACES crushed night sky gradients).
+#define SM_6_0
 
 Texture2D t_hdr : register(t0);
-Texture2D<float> t_exposure : register(t1);  // Reserved for future HDR
-
-#include "common_samplers.h"
+Texture2D<float> t_exposure : register(t1);
+SamplerState smp_rtlinear : register(s0);
 
 struct PS_INPUT {
     float4 position : SV_POSITION;
     float2 texcoord : TEXCOORD0;
 };
 
-// ACES Filmic tonemap (Narkowicz 2015) - for future HDR use
-// float3 ACESFilm(float3 x) {
-//     float a = 2.51;
-//     float b = 0.03;
-//     float c = 2.43;
-//     float d = 0.59;
-//     float e = 0.14;
-//     return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
-// }
+float3 ClassicTonemap(float3 rgb, float scale)
+{
+    rgb *= scale;
 
-float4 main(PS_INPUT input) : SV_TARGET {
-    float4 color = t_hdr.Sample(smp_linear, input.texcoord);
+    // Modified Reinhard, white intensity 1.7 (Clear Sky / CoP)
+    const float fWhiteIntensity = 1.7;
+    const float fWhiteIntensitySQR = fWhiteIntensity * fWhiteIntensity;
+    return (rgb * (1.0 + rgb / fWhiteIntensitySQR)) / (rgb + 1.0);
+}
 
-    // Apply exposure uniformly to entire scene
-    // float exposure = t_exposure.Load(int3(0, 0, 0));
-    // exposure = clamp(exposure, 0.1, 16.0);
-    // color.rgb *= exposure;
+// Breaks smooth-gradient banding on night sky after LDR quantize
+float InterleavedGradientNoise(float2 p)
+{
+    return frac(52.9829189 * frac(dot(p, float2(0.06711056, 0.00583715))));
+}
 
-    // TODO: Enable ACES tonemapping when HDR lighting is fully implemented
-    // color.rgb = ACESFilm(color.rgb);
+float4 main(PS_INPUT input) : SV_TARGET
+{
+    float2 uv = saturate(input.texcoord);
+    float3 color = t_hdr.SampleLevel(smp_rtlinear, uv, 0).rgb;
 
-    return color;
+    float scale = t_exposure.Load(int3(0, 0, 0));
+    // Classic clamp mirrored here as safety; adapt already clamps [1/128, 20]
+    scale = clamp(scale, 1.0 / 128.0, 20.0);
+
+    color = ClassicTonemap(color, scale);
+
+    float dither = InterleavedGradientNoise(input.position.xy) - 0.5;
+    color += dither / 255.0;
+
+    return float4(saturate(color), 1.0);
 }

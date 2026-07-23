@@ -82,6 +82,12 @@ private:
     void CreateBindlessResources();
     void QueryCapabilities();
 
+    // Feature bits after CreateLogicalDevice clamp (Apple/MoltenVK may disable some)
+    bool m_featureDrawIndirectCount = false;
+    bool m_featureMultiDrawIndirect = false;
+    bool m_featureDescriptorIndexing = false;
+    bool m_featureShaderDrawParameters = false;
+
     VkInstance m_instance = VK_NULL_HANDLE;
     VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
     VkDevice m_device = VK_NULL_HANDLE;

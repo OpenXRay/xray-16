@@ -20,8 +20,8 @@ ENGINE_API u32 ps_r3_grass_wind_octaves = 5;             // FBM octave count
 ENGINE_API Fvector3 ps_r3_grass_color_tip = {0.35f, 0.45f, 0.18f};    // Blade tip color (vibrant green)
 ENGINE_API Fvector3 ps_r3_grass_color_base = {0.28f, 0.38f, 0.15f};   // Blade base color (duller brown-green)
 ENGINE_API float ps_r3_grass_color_variation = 0.15f;                  // Per-blade color variation (±%)
-ENGINE_API Fvector3 ps_r3_grass_sss_color = {0.5f, 0.7f, 0.3f};       // Subsurface scattering tint
-ENGINE_API float ps_r3_grass_sss_intensity = 0.25f;                    // SSS strength
+ENGINE_API Fvector3 ps_r3_grass_sss_color = {0.55f, 0.85f, 0.25f};     // Subsurface scattering tint
+ENGINE_API float ps_r3_grass_sss_intensity = 0.9f;                     // SSS strength (CoP billboards)
 
 // Per-object-ID color tints (64 grass types max)
 // Default all to white (1,1,1) = no tint

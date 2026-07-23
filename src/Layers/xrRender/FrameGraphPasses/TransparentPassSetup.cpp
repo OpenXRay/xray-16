@@ -15,6 +15,10 @@
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
 #include "Layers/xrRender/ClusteredLightManager.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
+#include "xrEngine/Environment.h"
+#include "xrEngine/IGame_Persistent.h"
 
 namespace xray::render::fg::passes {
 
@@ -40,9 +44,11 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
     state.ps = psResult.handle;
 
     auto& cache = framegraph::GetPassResourceCache();
-    state.layout = cache.GetOrCreateBindingLayoutFromReflection("TransparentPass", *vsResult.reflection, *psResult.reflection, nvDevice);
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection("TransparentPass_CSMLadder", *vsResult.reflection, *psResult.reflection, nvDevice);
     if (!state.layout)
         return;
+
+    state.sampler = cache.GetLinearWrapSampler(nvDevice);
 
     u32 attrCount = 0;
     auto* attrs = GetUnifiedVertexAttributes(attrCount);
@@ -80,14 +86,53 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
     rt0.destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
     rt0.blendOpAlpha = nvrhi::BlendOp::Add;
 
-    state.pipeline = cache.GetOrCreatePipeline("TransparentPass", pipeDesc, fbInfo, nvDevice);
+    state.pipeline = cache.GetOrCreatePipeline("TransparentPass_CSMLadder", pipeDesc, fbInfo, nvDevice);
     if (!state.pipeline)
         return;
 
     QueryBindingLayoutFromPipeline(state.pipeline, state.layout);
 
+    // Dedicated water PSO (soft + foam + SSR)
+    {
+        auto waterVs = shaderLoader->LoadVertexShader("water", "main");
+        auto waterPs = shaderLoader->LoadPixelShader("water", "main");
+        if (waterVs.handle && waterPs.handle && waterVs.reflection && waterPs.reflection)
+        {
+            state.waterVs = waterVs.handle;
+            state.waterPs = waterPs.handle;
+            state.waterLayout = cache.GetOrCreateBindingLayoutFromReflection(
+                "TransparentWater_v3", *waterVs.reflection, *waterPs.reflection, nvDevice);
+            if (state.waterLayout)
+            {
+                nvrhi::GraphicsPipelineDesc waterDesc = pipeDesc;
+                waterDesc.VS = state.waterVs;
+                waterDesc.PS = state.waterPs;
+                waterDesc.inputLayout = nvDevice->createInputLayout(attrs, attrCount, state.waterVs);
+                if (bindlessLayout)
+                    waterDesc.bindingLayouts = {state.waterLayout, bindlessLayout};
+                else
+                    waterDesc.bindingLayouts = {state.waterLayout};
+                waterDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+                state.waterPipeline = cache.GetOrCreatePipeline("TransparentWater_v3", waterDesc, fbInfo, nvDevice);
+            }
+            waterVs.reflection = nullptr;
+            waterPs.reflection = nullptr;
+        }
+        if (!state.waterPipeline)
+            Msg("! [TransparentPass] Water PSO unavailable — water clipped from forward");
+    }
+
+    if (auto* resMgr = device->GetFGResourceManager())
+    {
+        if (auto* texMgr = resMgr->GetTextureManager())
+        {
+            auto foam = texMgr->LoadTexture("water" DELIMITER "water_foam");
+            state.foamTexture = texMgr->GetNVRHITexture(foam);
+        }
+    }
+
     state.initialized = true;
-    Msg("* [TransparentPass] Pipeline initialized");
+    Msg("* [TransparentPass] Pipeline initialized (water=%d)", state.waterPipeline ? 1 : 0);
 }
 
 framegraph::DefaultOutputLayout setupTransparentPass(
@@ -180,10 +225,22 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             const auto& cfg = data.config;
 
             auto& variantTexBuffer = bindless::VariantTextureBuffer::Instance();
+            auto& clm = ClusteredLightManager::Instance();
+            auto& passCache = framegraph::GetPassResourceCache();
+
+            nvrhi::ITexture* dummy2D = passCache.GetDummyShadowMap2D(nvDevice);
+            nvrhi::ITexture* sky0 = cfg.envSky0
+                ? cfg.envSky0
+                : passCache.GetDummyCubeMap(nvDevice);
+            nvrhi::ITexture* sky1 = cfg.envSky1
+                ? cfg.envSky1
+                : passCache.GetDummyCubeMap(nvDevice);
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* vsReflection = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
             auto* psReflection = shaderLoader->GetCachedReflection("bindless_forward", ".ps");
+            if (!vsReflection || !psReflection)
+                return;
 
             framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Transparent");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB);
@@ -191,37 +248,70 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
             bsb.BufferSRV("g_CompactBatchIndices", cfg.compactBatchIndicesBuffer);
             bsb.BufferSRV("g_CompactMaterialIDs", cfg.compactMaterialIDBuffer);
-            bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
-            bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
-            bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+            bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
+            bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
+            bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+            {
+                static const char* kNames[3] = {"g_ShadowMap0", "g_ShadowMap1", "g_ShadowMap2"};
+                for (u32 i = 0; i < 3; ++i)
+                {
+                    nvrhi::ITexture* t = cfg.shadowCascades[i] ? cfg.shadowCascades[i]
+                        : (i == 0 && cfg.shadowMapArray ? cfg.shadowMapArray : dummy2D);
+                    if (t)
+                        bsb.Texture(kNames[i], t);
+                }
+            }
+            {
+                nvrhi::ITexture* contactHist = cfg.contactHistory
+                    ? cfg.contactHistory
+                    : passCache.GetDummyContactHistory(nvDevice);
+                if (contactHist)
+                    bsb.Texture("g_ContactHistory", contactHist);
+            }
+            {
+                nvrhi::ITexture* localAtlas = cfg.localShadowAtlas
+                    ? cfg.localShadowAtlas
+                    : passCache.GetDummyShadowMap(nvDevice);
+                if (localAtlas)
+                    bsb.Texture("g_LocalShadowAtlas", localAtlas);
+            }
+            if (sky0)
+                bsb.Texture("s_env0", sky0);
+            if (sky1)
+                bsb.Texture("s_env1", sky1);
 
-            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
-            R_ASSERT2(bindingSet, "Transparent binding set creation failed");
-
-            nvrhi::GraphicsState state;
-            state.pipeline = data.passState->pipeline;
-            state.framebuffer = framebuffer;
-            state.bindings = { bindingSet };
-
-            auto* backend = data.device->GetBackend();
-            if (backend) {
-                auto* bindlessTable = backend->GetBindlessDescriptorTable();
-                if (bindlessTable)
-                    state.addBindingSet(bindlessTable);
+            auto bindingSet = passCache.GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
+            if (!bindingSet)
+            {
+                Msg("! [TransparentPass] Binding set create failed — skip draw");
+                return;
             }
 
-            state.vertexBuffers = {
+            nvrhi::GraphicsState gfxState;
+            gfxState.pipeline = data.passState->pipeline;
+            gfxState.framebuffer = framebuffer;
+            gfxState.bindings = { bindingSet };
+
+            auto* backend = data.device->GetBackend();
+            nvrhi::IBindingSet* bindlessTable = nullptr;
+            if (backend) {
+                bindlessTable = backend->GetBindlessDescriptorTable();
+                if (bindlessTable)
+                    gfxState.addBindingSet(bindlessTable);
+            }
+
+            gfxState.vertexBuffers = {
                 {cfg.megaVertexBuffer, 0, 0},
                 {drawIndexBuffer, 1, 0}
             };
-            state.indexBuffer = { cfg.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
-            state.indirectParams = cfg.compactDrawArgsBuffer;
-            state.indirectCountBuffer = cfg.compactCountBuffer;
+            gfxState.indexBuffer = { cfg.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
+            gfxState.indirectParams = cfg.compactDrawArgsBuffer;
+            gfxState.indirectCountBuffer = cfg.compactCountBuffer;
 
             const auto& rtDesc = colorRT->getDesc();
             nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
-            state.viewport.addViewport(viewport);
-            state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
+            gfxState.viewport.addViewport(viewport);
+            gfxState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
             if (cfg.variantPartition.Enabled()) {
                 auto* backendDev = data.device->GetBackend();
@@ -231,21 +321,142 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 vpCfg.inputLayout = data.passState->inputLayout;
                 vpCfg.passLayout = data.passState->layout;
                 vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
-                vpCfg.bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
-                vpCfg.sampler = data.passState->sampler;
+                vpCfg.bindlessTable = bindlessTable;
+                vpCfg.sampler = data.passState->sampler
+                    ? data.passState->sampler.Get()
+                    : passCache.GetLinearWrapSampler(nvDevice);
                 vpCfg.staticGlobalsCB = staticGlobalsCB;
                 vpCfg.lightingCB = lightingCB;
                 vpCfg.materialBuffer = matBuffer.GetBuffer();
                 vpCfg.variantTexBuffer = variantTexBuffer.GetBuffer();
                 vpCfg.instanceBuffer = cfg.instanceBuffer;
                 vpCfg.megaVertexBuffer = cfg.megaVertexBuffer;
+                vpCfg.shadowMapArray = cfg.shadowCascades[0] ? cfg.shadowCascades[0] : cfg.shadowMapArray;
+                for (u32 i = 0; i < 3; ++i)
+                    vpCfg.shadowCascades[i] = cfg.shadowCascades[i];
+                vpCfg.localShadowAtlas = cfg.localShadowAtlas;
+                vpCfg.envSky0 = sky0;
+                vpCfg.envSky1 = sky1;
+                vpCfg.lightDataBuffer = clm.GetLightDataBuffer();
+                vpCfg.clusterGridBuffer = clm.GetClusterGridBuffer();
+                vpCfg.lightIndexListBuffer = clm.GetLightIndexListBuffer();
                 vpCfg.partition = cfg.variantPartition;
                 vpCfg.selectTransparent = true;
 
-                DrawVariantPartition(cmdList, nvDevice, framebuffer, state, vpCfg);
+                DrawVariantPartition(cmdList, nvDevice, framebuffer, gfxState, vpCfg);
             } else {
-                cmdList->setGraphicsState(state);
+                cmdList->setGraphicsState(gfxState);
                 DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, cfg.objectCount);
+            }
+
+            // Second draw: dedicated water PSO (soft depth + foam + SSR)
+            if (data.passState->waterPipeline && data.passState->waterLayout)
+            {
+                auto* waterVsRefl = shaderLoader->GetCachedReflection("water", ".vs");
+                auto* waterPsRefl = shaderLoader->GetCachedReflection("water", ".ps");
+                if (waterVsRefl && waterPsRefl)
+                {
+                    // Snapshot HDR + depth for SSR/soft water (cannot sample RTs we write / DSV)
+                    const auto& cdesc = colorRT->getDesc();
+                    if (!data.passState->waterSsrColor ||
+                        data.passState->waterSsrColor->getDesc().width != cdesc.width ||
+                        data.passState->waterSsrColor->getDesc().height != cdesc.height)
+                    {
+                        nvrhi::TextureDesc td = cdesc;
+                        td.debugName = "WaterSSR_Color";
+                        td.isRenderTarget = true;
+                        td.isShaderResource = true;
+                        td.initialState = nvrhi::ResourceStates::ShaderResource;
+                        td.keepInitialState = true;
+                        data.passState->waterSsrColor = nvDevice->createTexture(td);
+                    }
+                    nvrhi::ITexture* ssrColor = data.passState->waterSsrColor;
+                    // Unbind RT/DSV → Copy → SRV so water SSR can sample scene (Metal/MoltenVK).
+                    if (ssrColor)
+                    {
+                        cmdList->setTextureState(colorRT, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+                        cmdList->setTextureState(ssrColor, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+                        cmdList->copyTexture(ssrColor, nvrhi::TextureSlice(), colorRT, nvrhi::TextureSlice());
+                        cmdList->setTextureState(ssrColor, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                    }
+
+                    const auto& ddesc = depthRT->getDesc();
+                    if (!data.passState->waterSceneDepth ||
+                        data.passState->waterSceneDepth->getDesc().width != ddesc.width ||
+                        data.passState->waterSceneDepth->getDesc().height != ddesc.height)
+                    {
+                        nvrhi::TextureDesc td{};
+                        td.width = ddesc.width;
+                        td.height = ddesc.height;
+                        td.format = nvrhi::Format::D32;
+                        td.debugName = "WaterSSR_Depth";
+                        td.isShaderResource = true;
+                        td.isTypeless = true;
+                        td.initialState = nvrhi::ResourceStates::ShaderResource;
+                        td.keepInitialState = true;
+                        data.passState->waterSceneDepth = nvDevice->createTexture(td);
+                    }
+                    nvrhi::ITexture* sceneDepthSrv = data.passState->waterSceneDepth;
+                    if (sceneDepthSrv)
+                    {
+                        cmdList->setTextureState(depthRT, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+                        cmdList->setTextureState(sceneDepthSrv, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+                        cmdList->copyTexture(sceneDepthSrv, nvrhi::TextureSlice(), depthRT, nvrhi::TextureSlice());
+                        cmdList->setTextureState(sceneDepthSrv, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                    }
+                    // Restore attachments for the water draw that follows
+                    cmdList->setTextureState(colorRT, nvrhi::AllSubresources, nvrhi::ResourceStates::RenderTarget);
+                    if (normalRT)
+                        cmdList->setTextureState(normalRT, nvrhi::AllSubresources, nvrhi::ResourceStates::RenderTarget);
+                    if (baseColorRT)
+                        cmdList->setTextureState(baseColorRT, nvrhi::AllSubresources, nvrhi::ResourceStates::RenderTarget);
+                    if (worldPosRT)
+                        cmdList->setTextureState(worldPosRT, nvrhi::AllSubresources, nvrhi::ResourceStates::RenderTarget);
+                    // Transparent pass declares depth as read-only (test, no write)
+                    cmdList->setTextureState(depthRT, nvrhi::AllSubresources, nvrhi::ResourceStates::DepthRead);
+
+                    auto waterCB = cache.GetOrCreateVolatileCB(
+                        "TransparentWater", "WaterParams", sizeof(Fvector4), data.device);
+                    Fvector4 wi{};
+                    wi.set(1.f, 1.f, 1.f, 1.f);
+                    if (g_pGamePersistent)
+                    {
+                        const auto& env = g_pGamePersistent->Environment().CurrentEnv;
+                        float intens = std::max(env.fog_color.x, std::max(env.fog_color.y, env.fog_color.z));
+                        wi.set(std::max(intens, 0.35f), intens, intens, 1.f);
+                    }
+                    cmdList->writeBuffer(waterCB, &wi, sizeof(wi));
+
+                    nvrhi::ITexture* foam = data.passState->foamTexture;
+                    if (!foam)
+                        foam = passCache.GetDummyShadowMap2D(nvDevice);
+
+                    framegraph::BindingSetBuilder wbsb(*waterVsRefl, *waterPsRefl, nvDevice, "Transparent.Water");
+                    wbsb.ConstantBuffer("static_globals", staticGlobalsCB)
+                        .ConstantBuffer("WaterParams", waterCB)
+                        .BufferSRV("g_Materials", matBuffer.GetBuffer())
+                        .BufferSRV("g_InstanceData", cfg.instanceBuffer)
+                        .BufferSRV("g_CompactBatchIndices", cfg.compactBatchIndicesBuffer)
+                        .BufferSRV("g_CompactMaterialIDs", cfg.compactMaterialIDBuffer);
+                    if (sky0) wbsb.Texture("s_env0", sky0);
+                    if (sky1) wbsb.Texture("s_env1", sky1);
+                    if (foam) wbsb.Texture("s_leaves", foam);
+                    if (ssrColor) wbsb.Texture("g_SceneColor", ssrColor);
+                    if (sceneDepthSrv) wbsb.Texture("g_SceneDepth", sceneDepthSrv);
+
+                    auto waterSet = passCache.GetOrCreateBindingSet(
+                        wbsb.Build(), data.passState->waterLayout, nvDevice);
+                    if (waterSet)
+                    {
+                        nvrhi::GraphicsState waterGfx = gfxState;
+                        waterGfx.pipeline = data.passState->waterPipeline;
+                        waterGfx.bindings = {waterSet};
+                        if (bindlessTable)
+                            waterGfx.addBindingSet(bindlessTable);
+                        cmdList->setGraphicsState(waterGfx);
+                        DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, cfg.objectCount);
+                    }
+                }
             }
         }
     );

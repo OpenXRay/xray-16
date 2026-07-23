@@ -19,9 +19,14 @@ struct ThunderboltPassData
 {
     framegraph::VirtualResourceHandle output;
     framegraph::VirtualResourceHandle depth;
+    framegraph::VirtualResourceHandle worldPos;
     FGThunderboltRender* renderer = nullptr;
 };
 
-framegraph::VirtualResourceHandle setupThunderboltPass(framegraph::FrameGraph& fg, framegraph::VirtualResourceHandle inputTarget,
-    framegraph::VirtualResourceHandle depthTarget, FGThunderboltRender* renderer);
+framegraph::VirtualResourceHandle setupThunderboltPass(
+    framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle inputTarget,
+    framegraph::VirtualResourceHandle depthTarget,
+    framegraph::VirtualResourceHandle worldPosTarget,
+    FGThunderboltRender* renderer);
 } // namespace xray::render::fg::passes

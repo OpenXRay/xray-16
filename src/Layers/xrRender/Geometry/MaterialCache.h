@@ -343,7 +343,7 @@ public:
 
     u32 PreRegisterBindlessMaterial(dxRender_Visual* visual);
 
-    u32 PreRegisterParticleMaterial(const shared_str& textureName);
+    u32 PreRegisterParticleMaterial(const shared_str& textureName, u8 blendMode = 1);
 
 
     bool IsTerrainMaterial(dxRender_Visual* visual);

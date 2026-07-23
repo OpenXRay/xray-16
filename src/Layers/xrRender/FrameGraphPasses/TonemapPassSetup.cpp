@@ -44,7 +44,7 @@ void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state) {
             auto& cache = framegraph::GetPassResourceCache();
 
             state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-                "TonemapPass", *vsResult.reflection, *psResult.reflection, device);
+                "TonemapPass_ACES", *vsResult.reflection, *psResult.reflection, device);
 
             if (state.bindingLayout) {
                 nvrhi::GraphicsPipelineDesc pipeDesc;
@@ -63,7 +63,7 @@ void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state) {
                     fbFmt = GEnv.Backend->GetBackBuffer()->getDesc().format;
                 fbInfo.addColorFormat(fbFmt);
 
-                state.pipeline = cache.GetOrCreatePipeline("TonemapPass", pipeDesc, fbInfo, device);
+                state.pipeline = cache.GetOrCreatePipeline("TonemapPass_ACES", pipeDesc, fbInfo, device);
             }
         }
     }
@@ -118,11 +118,16 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             if (hasOutputTarget) {
                 data.ldrOutput = passBuilder.write(outputTarget, ResourceState::RenderTarget);
             } else {
+                // Must match tonemap PSO format (backbuffer), otherwise NVRHI rejects setGraphicsState
+                nvrhi::Format ldrFmt = nvrhi::Format::RGBA8_UNORM;
+                if (GEnv.Backend && GEnv.Backend->GetBackBuffer())
+                    ldrFmt = GEnv.Backend->GetBackBuffer()->getDesc().format;
+
                 framegraph::ResourceDesc ldrDesc;
                 ldrDesc.type = framegraph::ResourceDesc::Type::Texture2D;
                 ldrDesc.width = width;
                 ldrDesc.height = height;
-                ldrDesc.format = nvrhi::Format::RGBA8_UNORM;
+                ldrDesc.format = ldrFmt;
                 ldrDesc.isRenderTarget = true;
                 ldrDesc.isTransient = false;
                 ldrDesc.debugName = "rt_Final";
@@ -147,6 +152,19 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             if (!hdrTexture || !ldrTexture)
                 return;
 
+            nvrhi::ITexture* exposureTex = ps->fallbackExposureTexture;
+            if (data.hasExposure && data.exposureInput.is_valid())
+            {
+                if (auto* e = fg.GetPhysicalTexture(data.exposureInput))
+                    exposureTex = e;
+            }
+            if (!exposureTex && data.exposurePassState)
+                exposureTex = GetExposureTexture(*data.exposurePassState);
+            if (!exposureTex)
+                exposureTex = ps->fallbackExposureTexture;
+            if (!exposureTex)
+                return;
+
             auto& cache = framegraph::GetPassResourceCache();
 
             auto* vsRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("tonemap", ".vs");
@@ -156,13 +174,14 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, device, "Tonemap");
             bsb.Texture("t_hdr", hdrTexture);
+            bsb.Texture("t_exposure", exposureTex);
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->bindingLayout, device);
             if (!bindingSet)
                 return;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(ldrTexture);
-            auto framebuffer = cache.GetOrCreateFramebuffer("TonemapPass", fbDesc, device);
+            auto framebuffer = cache.GetOrCreateFramebuffer("TonemapPass_ACES", fbDesc, device);
 
             nvrhi::Viewport viewport;
             viewport.minX = 0;

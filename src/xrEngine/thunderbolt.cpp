@@ -171,7 +171,33 @@ bool CEffect_Thunderbolt::RayPick(const Fvector& s, const Fvector& d, float& ran
     bRes = g_pGameLevel->ObjectSpace.RayPick(s, d, range, collide::rqtBoth, RQ, E);
     if (bRes)
         range = RQ.range;
-    else
+
+    // Prefer nearer terrain heightmap hit (ObjectSpace often misses terrain).
+    if (GEnv.Render && d.y < -0.01f)
+    {
+        const float maxR = range;
+        float best = maxR;
+        bool hit = false;
+        Fvector p;
+        p.mad(s, d, _min(maxR, (s.y + 80.f) / _max(-d.y, 0.01f)));
+        float hy = 0.f;
+        if (GEnv.Render->SampleTerrainHeight(p.x, p.z, hy) && s.y > hy)
+        {
+            const float th = (s.y - hy) / (-d.y);
+            if (th > 0.f && th < best)
+            {
+                best = th;
+                hit = true;
+            }
+        }
+        if (hit)
+        {
+            range = best;
+            bRes = true;
+        }
+    }
+
+    if (!bRes)
     {
         Fvector N = {0.f, -1.f, 0.f};
         Fvector P = {0.f, 0.f, 0.f};
@@ -183,8 +209,7 @@ bool CEffect_Thunderbolt::RayPick(const Fvector& s, const Fvector& d, float& ran
             range = dst;
             return true;
         }
-        else
-            return false;
+        return false;
     }
 #endif
     return bRes;

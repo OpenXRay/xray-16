@@ -31,12 +31,12 @@ void FGThunderboltRender::InitResources()
     auto* shaderLoader = RImplementation.GetShaderLoader();
     R_ASSERT(shaderLoader);
 
-    auto vsResult = shaderLoader->LoadVertexShader("effects_world_textured", "main");
-    R_ASSERT2(vsResult.handle, "FGThunderboltRender: failed to load effects_world_textured.vs");
+    auto vsResult = shaderLoader->LoadVertexShader("effects_world_soft", "main");
+    R_ASSERT2(vsResult.handle, "FGThunderboltRender: failed to load effects_world_soft.vs");
     m_vs = vsResult.handle;
 
-    auto psResult = shaderLoader->LoadPixelShader("effects_world_textured", "main");
-    R_ASSERT2(psResult.handle, "FGThunderboltRender: failed to load effects_world_textured.ps");
+    auto psResult = shaderLoader->LoadPixelShader("effects_world_soft", "main");
+    R_ASSERT2(psResult.handle, "FGThunderboltRender: failed to load effects_world_soft.ps");
     m_ps = psResult.handle;
 
     nvrhi::VertexAttributeDesc vertexAttrs[] = {
@@ -48,11 +48,11 @@ void FGThunderboltRender::InitResources()
     R_ASSERT2(m_inputLayout, "FGThunderboltRender: createInputLayout failed");
 
     nvrhi::BufferDesc cbDesc;
-    cbDesc.byteSize = sizeof(passes::DynamicTransforms);
+    cbDesc.byteSize = sizeof(passes::SoftFXConstants);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
     cbDesc.maxVersions = 16;
-    cbDesc.debugName = "FGThunderboltRender_CB";
+    cbDesc.debugName = "FGThunderboltRender_SoftCB";
     m_constantBuffer = m_device->createBuffer(cbDesc);
     R_ASSERT2(m_constantBuffer, "FGThunderboltRender: createBuffer(CB) failed");
 
@@ -67,6 +67,7 @@ void FGThunderboltRender::InitResources()
     bindingLayoutDesc.bindings = {
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
         nvrhi::BindingLayoutItem::Texture_SRV(0),
+        nvrhi::BindingLayoutItem::Texture_SRV(1),
         nvrhi::BindingLayoutItem::Sampler(0),
     };
     m_bindingLayout = m_device->createBindingLayout(bindingLayoutDesc);
@@ -96,6 +97,7 @@ void FGThunderboltRender::InitResources()
 
     m_pipeline = m_device->createGraphicsPipeline(pipelineDesc, fbInfo);
     R_ASSERT2(m_pipeline, "FGThunderboltRender: createGraphicsPipeline failed");
+    Msg("* [FGThunderboltRender] Soft-depth thunderbolt pipeline ready");
 }
 
 void FGThunderboltRender::Copy(IThunderboltRender& _in)
@@ -282,9 +284,10 @@ void FGThunderboltRender::EnsureGeometryCapacity(size_t vertexCount, size_t inde
     }
 }
 
-void FGThunderboltRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer)
+void FGThunderboltRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer,
+                               nvrhi::ITexture* sceneWorldPos)
 {
-    if (m_batches.empty())
+    if (m_batches.empty() || !sceneWorldPos || !m_pipeline || !m_bindingLayout)
         return;
 
     EnsureGeometryCapacity(m_vertices.size(), m_indices.size());
@@ -294,8 +297,8 @@ void FGThunderboltRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer
     if (!m_indices.empty())
         cmdList->writeBuffer(m_indexBuffer, m_indices.data(), m_indices.size() * sizeof(u16));
 
-    passes::DynamicTransforms cb{};
-    passes::FillDynamicTransforms(cb);
+    passes::SoftFXConstants cb{};
+    passes::FillSoftFXConstants(cb);
     cmdList->writeBuffer(m_constantBuffer, &cb, sizeof(cb));
 
     cmdList->setBufferState(m_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
@@ -303,9 +306,6 @@ void FGThunderboltRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer
     cmdList->setBufferState(m_constantBuffer, nvrhi::ResourceStates::ConstantBuffer);
 
     const auto& fbInfo = framebuffer->getFramebufferInfo();
-
-    nvrhi::ITexture* currentTexture = nullptr;
-    nvrhi::BindingSetHandle currentBindingSet;
 
     nvrhi::VertexBufferBinding vertexBinding;
     vertexBinding.buffer = m_vertexBuffer;
@@ -317,34 +317,27 @@ void FGThunderboltRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer
         if (b.indexCount == 0 || !b.texture)
             continue;
 
-        if (b.texture != currentTexture)
-        {
-            auto it = m_bindingSetCache.find(b.texture);
-            if (it == m_bindingSetCache.end())
-            {
-                nvrhi::BindingSetDesc bindingSetDesc;
-                bindingSetDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
-                    nvrhi::BindingSetItem::Texture_SRV(0, b.texture),
-                    nvrhi::BindingSetItem::Sampler(0, m_sampler),
-                };
-                nvrhi::BindingSetHandle bs = m_device->createBindingSet(bindingSetDesc, m_bindingLayout);
-                R_ASSERT2(bs, "FGThunderboltRender: createBindingSet failed");
-                it = m_bindingSetCache.emplace(b.texture, std::move(bs)).first;
-            }
-            currentBindingSet = it->second;
-            currentTexture = b.texture;
-        }
+        nvrhi::BindingSetDesc bindingSetDesc;
+        bindingSetDesc.bindings = {
+            nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
+            nvrhi::BindingSetItem::Texture_SRV(0, b.texture),
+            nvrhi::BindingSetItem::Texture_SRV(1, sceneWorldPos),
+            nvrhi::BindingSetItem::Sampler(0, m_sampler),
+        };
+        nvrhi::BindingSetHandle bindingSet = m_device->createBindingSet(bindingSetDesc, m_bindingLayout);
+        if (!bindingSet)
+            continue;
 
         nvrhi::GraphicsState state;
         state.pipeline = m_pipeline;
         state.framebuffer = framebuffer;
-        state.bindings = { currentBindingSet };
+        state.bindings = { bindingSet };
         state.vertexBuffers = { vertexBinding };
         state.indexBuffer.buffer = m_indexBuffer;
         state.indexBuffer.format = nvrhi::Format::R16_UINT;
         state.indexBuffer.offset = 0;
-        state.viewport = nvrhi::ViewportState().addViewportAndScissorRect(nvrhi::Viewport(static_cast<float>(fbInfo.width), static_cast<float>(fbInfo.height)));
+        state.viewport = nvrhi::ViewportState().addViewportAndScissorRect(
+            nvrhi::Viewport(static_cast<float>(fbInfo.width), static_cast<float>(fbInfo.height)));
         cmdList->setGraphicsState(state);
 
         nvrhi::DrawArguments args;

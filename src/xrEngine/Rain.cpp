@@ -93,6 +93,60 @@ bool CEffect_Rain::RayPick(const Fvector& s, const Fvector& d, float& range, col
     bRes = g_pGameLevel->ObjectSpace.RayPick(s, d, range, tgt, RQ, E);
     if (bRes)
         range = RQ.range;
+
+    // ObjectSpace often misses terrain (heightmap-only). Prefer nearer heightmap hit.
+    if (GEnv.Render && d.y < -0.01f)
+    {
+        const float maxR = range;
+        float best = maxR;
+        bool hit = false;
+        for (int i = 1; i <= 8; ++i)
+        {
+            const float t = maxR * (float(i) / 8.f);
+            Fvector p;
+            p.mad(s, d, t);
+            float hy = 0.f;
+            if (!GEnv.Render->SampleTerrainHeight(p.x, p.z, hy))
+                continue;
+            if (s.y >= hy && p.y <= hy)
+            {
+                const float t0 = maxR * (float(i - 1) / 8.f);
+                Fvector p0;
+                p0.mad(s, d, t0);
+                const float denom = (p0.y - p.y);
+                float frac = (denom > 1e-4f) ? (p0.y - hy) / denom : 1.f;
+                clamp(frac, 0.f, 1.f);
+                const float th = t0 + (t - t0) * frac;
+                if (th > 0.f && th < best)
+                {
+                    best = th;
+                    hit = true;
+                }
+            }
+        }
+        if (!hit)
+        {
+            float hy = 0.f;
+            // Walk XZ along the ray to the estimated ground distance
+            const float guess = _min(maxR, (s.y + 50.f) / _max(-d.y, 0.01f));
+            Fvector p;
+            p.mad(s, d, guess);
+            if (GEnv.Render->SampleTerrainHeight(p.x, p.z, hy) && s.y > hy)
+            {
+                const float th = (s.y - hy) / (-d.y);
+                if (th > 0.f && th < best)
+                {
+                    best = th;
+                    hit = true;
+                }
+            }
+        }
+        if (hit)
+        {
+            range = best;
+            bRes = true;
+        }
+    }
 #endif
     return bRes;
 }
@@ -168,13 +222,13 @@ void CEffect_Rain::OnFrame()
         break;
     }
 
-    // ambient sound
+    // ambient sound — follow camera; keep audible even before hemi probe warms up
     if (snd_Ambient._feedback())
     {
-        // Fvector sndP;
-        // sndP.mad (Device.vCameraPosition,Fvector().set(0,1,0),source_offset);
-        // snd_Ambient.set_position(sndP);
-        snd_Ambient.set_volume(_max(0.1f, factor) * hemi_factor);
+        snd_Ambient.set_position(Device.vCameraPosition);
+        float vol = _max(0.1f, factor);
+        vol *= _max(0.35f, hemi_factor);
+        snd_Ambient.set_volume(vol);
     }
 }
 

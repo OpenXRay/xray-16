@@ -1,0 +1,113 @@
+// bindless_skinned_tess.ds — Domain for skinned PatchList (PN + optional HM)
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct HS_CONTROL_POINT
+{
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+};
+
+struct HS_CONSTANT_DATA
+{
+    float Edges[3] : SV_TessFactor;
+    float Inside : SV_InsideTessFactor;
+};
+
+struct DS_OUTPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+};
+
+[domain("tri")]
+[partitioning("integer")]
+DS_OUTPUT main(HS_CONSTANT_DATA input, float3 bary : SV_DomainLocation,
+               const OutputPatch<HS_CONTROL_POINT, 3> patch)
+{
+    DS_OUTPUT o;
+
+    float u = bary.x;
+    float v = bary.y;
+    float w = bary.z;
+
+    MaterialData mat = g_Materials[patch[0].materialID];
+    bool usePN = (mat.tessMethod == TESS_METHOD_PN || mat.tessMethod == TESS_METHOD_PN_HM);
+
+    float3 pos;
+    float3 N;
+    if (usePN)
+    {
+        float3 b300 = patch[0].worldPos;
+        float3 b030 = patch[1].worldPos;
+        float3 b003 = patch[2].worldPos;
+        float3 n200 = normalize(patch[0].normal);
+        float3 n020 = normalize(patch[1].normal);
+        float3 n002 = normalize(patch[2].normal);
+
+        float3 b210 = (2.0 * b300 + b030 - dot(b030 - b300, n200) * n200) / 3.0;
+        float3 b120 = (2.0 * b030 + b300 - dot(b300 - b030, n020) * n020) / 3.0;
+        float3 b021 = (2.0 * b030 + b003 - dot(b003 - b030, n020) * n020) / 3.0;
+        float3 b012 = (2.0 * b003 + b030 - dot(b030 - b003, n002) * n002) / 3.0;
+        float3 b102 = (2.0 * b003 + b300 - dot(b300 - b003, n002) * n002) / 3.0;
+        float3 b201 = (2.0 * b300 + b003 - dot(b003 - b300, n200) * n200) / 3.0;
+
+        float3 E = (b210 + b120 + b021 + b012 + b102 + b201) / 6.0;
+        float3 V = (b300 + b030 + b003) / 3.0;
+        float3 b111 = E + (E - V) * 0.5;
+
+        float v12 = 2.0 * dot(b030 - b300, n200 + n020) / max(dot(b030 - b300, b030 - b300), 1e-8);
+        float v23 = 2.0 * dot(b003 - b030, n020 + n002) / max(dot(b003 - b030, b003 - b030), 1e-8);
+        float v31 = 2.0 * dot(b300 - b003, n002 + n200) / max(dot(b300 - b003, b300 - b003), 1e-8);
+        float3 n110 = normalize(n200 + n020 - v12 * (b030 - b300));
+        float3 n011 = normalize(n020 + n002 - v23 * (b003 - b030));
+        float3 n101 = normalize(n002 + n200 - v31 * (b300 - b003));
+
+        float uu = u * u, vv = v * v, ww = w * w;
+        pos = b300 * (uu * u) + b030 * (vv * v) + b003 * (ww * w)
+            + b210 * (3.0 * uu * v) + b120 * (3.0 * u * vv)
+            + b201 * (3.0 * uu * w) + b102 * (3.0 * u * ww)
+            + b021 * (3.0 * vv * w) + b012 * (3.0 * v * ww)
+            + b111 * (6.0 * u * v * w);
+
+        N = n200 * uu + n020 * vv + n002 * ww
+          + n110 * (u * v) + n011 * (v * w) + n101 * (w * u);
+        N = normalize(N);
+    }
+    else
+    {
+        pos = patch[0].worldPos * u + patch[1].worldPos * v + patch[2].worldPos * w;
+        N = normalize(patch[0].normal * u + patch[1].normal * v + patch[2].normal * w);
+    }
+
+    float2 tc = patch[0].texcoord * u + patch[1].texcoord * v + patch[2].texcoord * w;
+    float3 T = normalize(patch[0].tangent * u + patch[1].tangent * v + patch[2].tangent * w);
+    float3 B = normalize(patch[0].bitangent * u + patch[1].bitangent * v + patch[2].bitangent * w);
+
+    bool useHM = (mat.tessMethod == TESS_METHOD_HM || mat.tessMethod == TESS_METHOD_PN_HM);
+    if (useHM && ((mat.flags & MAT_FLAG_HAS_NORMAL_X) != 0) && mat.normalXIndex != INVALID_TEXTURE_INDEX)
+    {
+        float height = GetBindlessTexture(mat.normalXIndex).SampleLevel(smp_linear, tc, 0).a;
+        float hmScale = (parallax.x > 0.0) ? (parallax.x * 2.0) : 0.04;
+        pos += N * ((height - 0.5) * hmScale);
+    }
+
+    o.worldPos = pos;
+    o.position = mul(m_VP, float4(pos, 1.0));
+    o.texcoord = tc;
+    o.normal = N;
+    o.tangent = T;
+    o.bitangent = B;
+    o.materialID = patch[0].materialID;
+    return o;
+}

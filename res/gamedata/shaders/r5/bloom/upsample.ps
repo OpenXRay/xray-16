@@ -1,0 +1,32 @@
+// bloom/upsample.ps — Dual Kawase upsample + accumulate with higher mip
+#define SM_6_0
+Texture2D g_Low  : register(t0); // lower-res bloom
+Texture2D g_High : register(t1); // matching higher mip from downsample chain
+SamplerState smp_rtlinear : register(s0);
+
+cbuffer BloomParams : register(b0)
+{
+    float2 texelSize; // 1/srcSize (low-res)
+    float2 _pad;
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float2 uv = saturate(I.uv);
+    float2 o = texelSize;
+    float3 c = 0;
+    c += g_Low.SampleLevel(smp_rtlinear, uv + float2(-o.x, -o.y), 0).rgb;
+    c += g_Low.SampleLevel(smp_rtlinear, uv + float2(+o.x, -o.y), 0).rgb;
+    c += g_Low.SampleLevel(smp_rtlinear, uv + float2(-o.x, +o.y), 0).rgb;
+    c += g_Low.SampleLevel(smp_rtlinear, uv + float2(+o.x, +o.y), 0).rgb;
+    c += g_Low.SampleLevel(smp_rtlinear, uv + float2(-o.x * 2, 0), 0).rgb * 2.0;
+    c += g_Low.SampleLevel(smp_rtlinear, uv + float2(+o.x * 2, 0), 0).rgb * 2.0;
+    c += g_Low.SampleLevel(smp_rtlinear, uv + float2(0, -o.y * 2), 0).rgb * 2.0;
+    c += g_Low.SampleLevel(smp_rtlinear, uv + float2(0, +o.y * 2), 0).rgb * 2.0;
+    c += g_Low.SampleLevel(smp_rtlinear, uv, 0).rgb * 4.0;
+    c *= (1.0 / 16.0);
+    c += g_High.SampleLevel(smp_rtlinear, uv, 0).rgb;
+    return float4(c, 1.0);
+}

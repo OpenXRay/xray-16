@@ -1,0 +1,40 @@
+// ssgi_temporal.ps — MV reproject + disocclusion blend (SSFX IL pattern)
+#define SM_6_0
+#include "common.h"
+
+Texture2D g_Current : register(t0);
+Texture2D g_History : register(t1);
+Texture2D g_Depth   : register(t2);
+Texture2D g_Motion  : register(t22);
+
+cbuffer SSGITemporalParams : register(b5)
+{
+    float2 screenSize;
+    float  hasHistory; // 0 or 1
+    float  _pad;
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float2 uv = saturate(I.uv);
+    float4 curr = g_Current.SampleLevel(smp_nofilter, uv, 0);
+    float depth = g_Depth.SampleLevel(smp_nofilter, uv, 0).x;
+    if (depth >= 0.9995 || hasHistory < 0.5)
+        return curr;
+
+    float2 motion = g_Motion.SampleLevel(smp_nofilter, uv, 0).xy;
+    float2 histUV = uv + motion;
+    float motionPx = length(motion * screenSize);
+    if (any(histUV < 0.0) || any(histUV > 1.0) || motionPx > 40.0)
+        return curr;
+
+    float4 prev = g_History.SampleLevel(smp_linear, histUV, 0);
+    float prevDepth = g_Depth.SampleLevel(smp_nofilter, histUV, 0).x;
+    // Approximate disocclusion via depth ratio at reprojected UV
+    float docc = abs(1.0 - depth / max(prevDepth, 1e-5));
+    float vel = saturate(motionPx * 0.04);
+    float weight = saturate(0.92 - vel - docc * 2.0);
+    return float4(lerp(curr.rgb, prev.rgb, weight), curr.a);
+}

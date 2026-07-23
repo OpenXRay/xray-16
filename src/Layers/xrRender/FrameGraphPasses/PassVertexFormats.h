@@ -64,18 +64,10 @@ struct HistogramCB {
 };
 
 struct AdaptCB {
-    float minLogLum;
-    float logLumRange;
-    float lowPercentile;
-    float highPercentile;
-    float adaptSpeedUp;
-    float adaptSpeedDown;
-    float deltaTime;
-    float exposureCompensation;
-    float minExposure;
-    float maxExposure;
-    float calibrationConstant;
-    float padding;
+    float middleGrayX;
+    float middleGrayY;
+    float middleGrayZ;
+    float middleGrayW; // adaptation blend
 };
 
 } // namespace xray::render::fg::passes

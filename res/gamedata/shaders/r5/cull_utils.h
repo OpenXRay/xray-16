@@ -20,13 +20,18 @@
 
 // Test sphere against frustum planes (skip near plane)
 // Returns: true = visible, false = culled
+// Extra radius margin: objects near the silhouette stay drawn so SSR can still
+// sample them after a small yaw (without margin, 1° can cull a whole batch and
+// wipe half-screen reflections in one frame).
 bool FrustumTestSphere(float3 center, float radius, float4 planes[6])
 {
+    const float margin = max(radius * 0.45, 8.0);
+    float r = radius + margin;
     // Test against 5 planes, skip near plane (index 5)
     for (uint i = 0; i < 5; ++i)
     {
         float dist = dot(planes[i].xyz, center) + planes[i].w;
-        if (dist > radius)
+        if (dist > r)
             return false;
     }
     return true;
@@ -112,6 +117,14 @@ bool HiZTestSphereTemporal(
     uint hiZHeight,
     uint hiZMipLevels)
 {
+    // Camera near/inside the bounding volume: large indoor wall batches have huge
+    // spheres; temporal Hi-Z cannot represent thin walls wrapping the eye.
+    // 2.5*radius (squared 6.25) — was 1.5 and still popped Skadovsk-class interiors.
+    float3 toCenter = center - cameraPos;
+    float r2 = radius * radius;
+    if (dot(toCenter, toCenter) <= r2 * 6.25)
+        return true;
+
     // Project sphere center to PREVIOUS frame's clip space (matches Hi-Z data)
     float4 prevClipPos = mul(prevViewProj, float4(center, 1.0));
 
@@ -148,8 +161,16 @@ bool HiZTestSphereTemporal(
     float boxWidth = (boxUV.z - boxUV.x) * float(hiZWidth);
     float boxHeight = (boxUV.w - boxUV.y) * float(hiZHeight);
 
-    // Select mip where box is roughly 2x2 pixels
-    float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5)));
+    // Large screen footprint (doors/walls filling the view) → never occlusion-cull.
+    // Sphere Hi-Z is unreliable for near-field interior geometry.
+    float screenArea = boxWidth * boxHeight;
+    float fullArea = float(hiZWidth) * float(hiZHeight);
+    if (screenArea > fullArea * 0.18)
+        return true;
+
+    // Select mip where box is roughly 2x2 pixels, then bias one level coarser
+    // so MAX Hi-Z is more conservative (fewer false occlusions).
+    float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5))) - 1.0;
     mipLevel = clamp(mipLevel, 0.0, float(hiZMipLevels - 1));
 
     // Sample Hi-Z at 4 corners (previous frame's depth)
@@ -173,8 +194,11 @@ bool HiZTestSphereTemporal(
 
     float frontDepth = frontClip.z / frontClip.w;
 
-    // Visible if front of sphere is in front of Hi-Z depth
-    return frontDepth <= hiZDepth;
+    // Larger slop for temporal mismatch + thin interior walls
+    const float depthSlop = 0.0025;
+
+    // Visible if front of sphere is in front of Hi-Z depth (plus slop)
+    return frontDepth <= hiZDepth + depthSlop;
 }
 
 // Legacy single-viewProj version (for non-temporal Hi-Z)

@@ -107,6 +107,10 @@ public:
         bool meshShaders = false;
         bool rayTracing = false;
         bool variableRateShading = false;
+        bool drawIndirectCount = false;   // vkCmdDrawIndexedIndirectCount / ExecuteIndirect count
+        bool multiDrawIndirect = false;
+        bool descriptorIndexing = false;
+        bool shaderDrawParameters = false;
         u32 maxBindlessResources = 0;
         u32 shaderModel = 50;  // 50 = SM5.0, 60 = SM6.0, etc.
 

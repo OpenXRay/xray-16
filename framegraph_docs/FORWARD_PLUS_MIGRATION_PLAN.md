@@ -1,7 +1,7 @@
 # Forward+ Renderer Implementation Plan
 ## X-Ray Engine FrameGraph Migration
 
-**Status:** Ready to implement
+**Status:** Largely implemented in-tree (see `STATUS.md`). This document remains a design/history reference; do not treat the 24-week checklist as unfinished work.
 **Timeline:** 24 weeks to full production-ready forward+ renderer with volumetrics and particles
 **Target Performance:** 100-165fps @ 1920×1080 (from current ~90-110fps)
 **Key Features:** PBR lighting, CSM shadows, clustered lights, froxel volumetrics, four-tier particles

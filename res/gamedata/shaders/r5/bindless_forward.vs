@@ -42,6 +42,8 @@ struct VS_OUTPUT
     float3 tangent  : TEXCOORD3;
     float3 bitangent: TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    float hemi      : TEXCOORD6;  // Vertex hemisphere (normal.a)
+    float2 lmUV     : TEXCOORD7;  // Lightmap UV (texcoord1)
 };
 
 // ═══════════════════════════════════════════════════════
@@ -100,9 +102,13 @@ VS_OUTPUT main(VS_INPUT input)
 
     // UVs are pre-unpacked in UnifiedVertex format - pass through directly
     output.texcoord = input.texcoord;
+    output.lmUV = input.texcoord1;
 
     // Pass material ID to pixel shader
     output.materialID = materialID;
+
+    // Packed normal.a stores hemisphere occlusion (BGRA8_UNORM)
+    output.hemi = input.normal.a;
 
     return output;
 }

@@ -6,6 +6,7 @@ namespace xray::render::fg
 {
 // Common
 extern ECORE_API u32 ps_r_sun_shafts; //=	0;
+extern ECORE_API float ps_r_sun_shafts_scale; //= 1.0f (brightness multiplier)
 extern ECORE_API const xr_token qsun_shafts_token[];
 
 extern ECORE_API u32 ps_r2_smapsize;
@@ -23,9 +24,25 @@ enum
     ssao_mode_default,
     ssao_mode_hdao,
     ssao_mode_hbao,
+    ssao_mode_gtao,
 };
 
 extern ECORE_API u32 ps_r_sun_quality; //	=	0;
+extern ECORE_API int ps_r_shadow_debug; // 0=off,1=cascade idx,2=CSM term,3=cascade UV,4=N.L
+extern ECORE_API float ps_r2_sun_normal_bias; // world-space normal offset (meters) for CSM
+extern ECORE_API int ps_r_shadow_cast_all; // 1=legacy cast-all near+mid
+extern ECORE_API int ps_r_skinned_shadows; // 1=NPCs/mutants cast into the sun CSM
+extern ECORE_API int ps_r_depth_prepass; // 1=opaque depth prepass for early-Z in Forward+
+extern ECORE_API int ps_r_hiz_occlusion; // 1=Hi-Z occlusion in GPU cull, 0=frustum only
+extern ECORE_API int ps_r_shadow_light_cull; // 1=light-frustum CSM caster cull
+extern ECORE_API int ps_r_local_shadows; // 1=spot/omni local shadow atlas
+extern ECORE_API int ps_r_local_shadow_tiles; // max atlas slices (1..16)
+extern ECORE_API int ps_r_shadow_indoor_near_only; // 1=indoor portal sets use cascade 0 only
+extern ECORE_API int ps_r_portal_cull; // 1=portal/sector visibility filter
+extern ECORE_API int ps_r_hom; // 1=CPU HOM occlusion on top of portal traversal
+extern ECORE_API float ps_r2_sun_soft;    // PCSS max penumbra (texels)
+extern ECORE_API float ps_r2_sun_blocker; // PCSS blocker-search spacing (texels)
+extern ECORE_API float ps_r2_sun_contact; // PCSS min penumbra (texels) — contact sharpness
 extern ECORE_API u32 ps_r_water_reflection; //	=	0;
 extern ECORE_API const xr_token qsun_quality_token[];
 extern ECORE_API const xr_token qwater_reflection_quality_token[];
@@ -235,6 +252,7 @@ enum
 
 // Smoke Trail (weapon muzzle smoke)
 extern ECORE_API int   ps_r_smoke_trail_enabled;
+extern ECORE_API int   ps_r_test_trails;
 extern ECORE_API float ps_r_smoke_max_emit_rate;
 extern ECORE_API float ps_r_smoke_point_lifetime;
 extern ECORE_API float ps_r_smoke_max_width;

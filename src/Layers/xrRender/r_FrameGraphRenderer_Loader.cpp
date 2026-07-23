@@ -164,14 +164,15 @@ void FrameGraphRenderer::level_Load(IReader* fs)
     g_pGamePersistent->LoadTitle("st_loading_sectors_portals");
     LoadSectors(fs);
 
-    // HOM - Skip if using FrameGraph renderer (GPU Hi-Z culling replaces CPU HOM)
-    if (!true)
+    // HOM - classic occlusion map (GPU Hi-Z complements, does not replace)
+    if (!strstr(Core.Params, "-no_hom"))
     {
         m_HOM.Load();
+        m_HOM.Enable();
     }
     else
     {
-        Msg("* [FrameGraph] Skipping HOM load - using GPU Hi-Z culling instead");
+        Msg("* [FrameGraph] Skipping HOM load (-no_hom)");
     }
 
     // Lights

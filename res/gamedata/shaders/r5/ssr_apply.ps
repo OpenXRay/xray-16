@@ -1,0 +1,24 @@
+// ssr_apply.ps — SSFX combine: lerp(color, ssr, glossWeight) — no washout
+#define SM_6_0
+
+SamplerState smp_nofilter : register(s0);
+SamplerState smp_linear   : register(s1);
+
+Texture2D g_Color : register(t0);
+Texture2D g_SSR   : register(t1);
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float3 color = g_Color.SampleLevel(smp_linear, I.uv, 0).rgb;
+    float4 ssr = g_SSR.SampleLevel(smp_linear, I.uv, 0);
+    float w = saturate(ssr.a);
+    if (w < 0.005)
+        return float4(color, 1.0);
+
+    // Soft combine — keep reflections dark-ish so sky never bleaches the plate
+    w = min(w, 0.14);
+    float3 refl = ssr.rgb / (1.0 + ssr.rgb * 1.4);
+    return float4(lerp(color, refl, w), 1.0);
+}

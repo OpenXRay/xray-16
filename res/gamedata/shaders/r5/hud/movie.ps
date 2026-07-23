@@ -1,0 +1,25 @@
+#include "common.h"
+#include "bindless_common.h"
+
+// YUV→RGB for Theora UI movies (CTheoraSurface packs A=255,R=Y,G=U,B=V as
+// little-endian V,U,Y,A — sampled as RGBA: .r=V .g=U .b=Y).
+float4 main(p_TL I) : SV_Target
+{
+	if (I.TexIdx == INVALID_TEXTURE_INDEX)
+		return I.Color;
+
+	float4 tex = GetBindlessTexture(I.TexIdx).Sample(smp_base, I.Tex0);
+	float3 YUV = tex.rgb;
+	float Y = YUV.z;
+	float U = YUV.y;
+	float V = YUV.x;
+
+	float c = 1.16406f;
+	float3 _Y = float3(c, c, c) * Y;
+	float3 _U = float3(0, -0.390625f, +2.01562f) * U;
+	float3 _V = float3(+1.59765f, -0.8125f, 0) * V;
+	float3 _S = float3(-0.86961f, +0.53076f, -1.0786f);
+
+	// Preserve alpha from texture (Theora alpha plane) for UI transparency
+	return float4(_Y + _U + _V + _S, tex.a) * I.Color;
+}

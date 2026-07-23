@@ -1,0 +1,147 @@
+// contact_shadows.ps — fullscreen SS contact (sun) + temporal + light spatial filter
+#define SM_6_0
+#include "common.h"
+
+Texture2D g_Depth   : register(t0);
+Texture2D g_History : register(t1);
+Texture2D g_Motion  : register(t22);
+
+cbuffer ContactParams : register(b5)
+{
+    float2 screenSize;
+    float  rayLength;
+    float  hasHistory;
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float Hash12(float2 p)
+{
+    float3 p3 = frac(float3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return frac((p3.x + p3.y) * p3.z);
+}
+
+float MarchContact(float3 worldPos, float2 uv, bool isHud)
+{
+    float len = rayLength;
+    if (len <= 1e-4)
+        return 1.0;
+
+    float pLen = length(worldPos - eye_position);
+    float DFactor = saturate((pLen - 80.0) * 0.01);
+    float rayDetail = lerp(0.02, 0.05, saturate(pLen * 0.02));
+    float rayThick = lerp(0.25, 8.0, DFactor);
+    float rayLen = lerp(1.0, 12.0, DFactor) * len;
+    rayLen *= saturate(pLen * 0.5); // avoid near-camera blowup
+
+    if (isHud)
+    {
+        rayDetail = 0.0;
+        rayLen = len * 0.35; // weapon-scale
+        rayThick = 1.0;
+    }
+
+    const int steps = 12;
+    float3 L = normalize(-L_sun_dir_w); // toward sun
+    float3 stepVec = L * (rayLen / float(steps));
+    float noise = Hash12(uv * 100.0 + timers.xx * 100.0);
+    float3 p = worldPos + stepVec * (0.35 + noise * 0.4);
+
+    float hitSoft = 1.0;
+    [unroll]
+    for (int i = 0; i < steps; ++i)
+    {
+        p += stepVec * (1.0 + Hash12(uv * 100.0 + timers.xx * 100.0 + float(i)));
+        float4 clip = mul(m_VP, float4(p, 1.0));
+        if (clip.w <= 1e-4)
+            break;
+        float2 suv = float2(clip.x / clip.w * 0.5 + 0.5, 0.5 - clip.y / clip.w * 0.5);
+        if (any(suv < 0.0) || any(suv > 1.0))
+            break;
+
+        float rawD = g_Depth.SampleLevel(smp_nofilter, suv, 0).x;
+        if (rawD >= 0.9995)
+            return hitSoft;
+
+        float2 ndc = float2(suv.x * 2.0 - 1.0, 1.0 - suv.y * 2.0);
+        float4 wh = mul(m_InvVP, float4(ndc, rawD, 1.0));
+        float3 hit = wh.xyz / max(wh.w, 1e-5);
+        float marchDist = length(p - eye_position);
+        float hitDist = length(hit - eye_position);
+        float diff = marchDist - hitDist;
+        if (!isHud)
+            diff *= (rawD < 0.9995) ? 1.0 : 0.0;
+        if (diff > rayDetail && diff < rayThick)
+        {
+            // Soft contact: closer hits darker, edge of thickness softer
+            float t = saturate((diff - rayDetail) / max(rayThick - rayDetail, 1e-3));
+            float occ = lerp(0.35, 0.72, t); // was hard 0.18
+            hitSoft = min(hitSoft, occ);
+            break;
+        }
+    }
+    return hitSoft;
+}
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float2 uv = saturate(I.uv);
+    float rawD = g_Depth.SampleLevel(smp_nofilter, uv, 0).x;
+    if (rawD >= 0.9995)
+        return float4(1, 0, 0, 0);
+
+    float2 ndc = float2(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0);
+    float4 worldH = mul(m_InvVP, float4(ndc, rawD, 1.0));
+    float3 worldPos = worldH.xyz / max(worldH.w, 1e-5);
+
+    // HUD: very near depth in view space
+    float viewZ = abs(mul(m_V, float4(worldPos, 1.0)).z);
+    bool isHud = viewZ < 1.25;
+
+    float shadow = MarchContact(worldPos, uv, isHud);
+
+    float3 motion = float3(0, 0, 0);
+    if (hasHistory > 0.5)
+        motion.xy = g_Motion.SampleLevel(smp_nofilter, uv, 0).xy;
+
+    float2 histUV = uv - motion.xy;
+    float docc = 0.0;
+    float outOff = 0.0;
+    float4 prev = float4(shadow, 0, 0, 0);
+    float spatial = shadow;
+    if (hasHistory > 0.5)
+    {
+        outOff = any(histUV < 0.0) || any(histUV > 1.0) ? 1.0 : 0.0;
+        float2 texel = 1.0 / max(screenSize, float2(1, 1));
+        // Depth-aware 5-tap on history (bilateral denoise of accumulated contact)
+        float sum = 0.0;
+        float wSum = 0.0;
+        const float2 offs[5] = {
+            float2(0, 0), float2(texel.x, 0), float2(-texel.x, 0),
+            float2(0, texel.y), float2(0, -texel.y)
+        };
+        [unroll]
+        for (int k = 0; k < 5; ++k)
+        {
+            float2 huv = saturate(histUV + offs[k]);
+            float4 h = g_History.SampleLevel(smp_linear, huv, 0);
+            float hd = g_Depth.SampleLevel(smp_nofilter, huv, 0).x;
+            float dw = exp(-abs(hd - rawD) * 80.0);
+            sum += h.r * dw;
+            wSum += dw;
+        }
+        prev = g_History.SampleLevel(smp_linear, saturate(histUV), 0);
+        spatial = sum / max(wSum, 1e-3);
+        float prevD = g_Depth.SampleLevel(smp_nofilter, saturate(histUV), 0).x;
+        docc = saturate(abs(1.0 - rawD / max(prevD, 1e-5)));
+        docc *= 1.0 + 10.0 * (isHud ? 1.0 : 0.0);
+        docc += saturate(abs(spatial - shadow) * 1.5) * 0.35;
+        prev.r = spatial;
+    }
+
+    float vel = length(motion.xy) * (isHud ? 30.0 : 1.0);
+    float w = saturate(0.88 - (outOff + docc + vel));
+    float accum = lerp(shadow, prev.r, w * hasHistory);
+    return float4(accum, docc, 0, outOff);
+}

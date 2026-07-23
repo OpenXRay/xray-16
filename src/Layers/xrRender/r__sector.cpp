@@ -89,6 +89,8 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
     poly.assign(V, vcnt);
     pFace = face;
     pBack = back;
+    marker = 0xffffffff;
+    bDualRender = FALSE;
 
     Fvector N, T;
     N.set(0, 0, 0);
@@ -114,8 +116,19 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
     */
 }
 
-void CSector::setup(const level_sector_data_t& data)
+void CSector::setup(const level_sector_data_t& data, const xr_vector<CPortal*>& portals)
 {
+    const auto num_portals = data.portals_id.size();
+    m_portals.clear();
+    m_portals.reserve(num_portals);
+    for (u32 idx = 0; idx < num_portals; ++idx)
+    {
+        const auto ID = data.portals_id[idx];
+        if (ID >= portals.size() || !portals[ID])
+            continue;
+        m_portals.push_back(portals[ID]);
+    }
+
     if (GEnv.isDedicatedServer)
         m_root = nullptr;
     else

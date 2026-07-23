@@ -5,8 +5,11 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
+#include "Layers/xrRender/xrRender_console.h"
 #include "xrEngine/IRenderBackend.h"
 #include "xrCore/Threading/ParallelFor.hpp"
+#include <algorithm>
+#include <cstring>
 
 namespace xray::render::fg
 {
@@ -112,6 +115,9 @@ void ClusteredLightManager::Shutdown()
     m_statsScheduled = 0;
     m_visibleLightCountCPU = 0;
     m_lightsCPU.clear();
+    m_lightSources.clear();
+    m_localShadowTiles.clear();
+    m_stickyShadowSlots = {};
     m_spotTextureCache.clear();
     m_device = nullptr;
 }
@@ -119,10 +125,65 @@ void ClusteredLightManager::Shutdown()
 void ClusteredLightManager::BeginFrame()
 {
     m_lightsCPU.clear();
+    m_lightSources.clear();
+    m_localShadowTiles.clear();
     m_numLights = 0;
     m_numPoint = 0;
     m_numSpot = 0;
     m_numOmni = 0;
+}
+
+Fmatrix ClusteredLightManager::BuildSpotClipVP(const light* L)
+{
+    Fmatrix spotVP;
+    spotVP.identity();
+    if (!L)
+        return spotVP;
+
+    Fvector L_dir, L_up, L_right;
+    L_dir.set(L->direction);
+    float l_dir_m = L_dir.magnitude();
+    if (_valid(l_dir_m) && l_dir_m > EPS_S)
+        L_dir.div(l_dir_m);
+    else
+        L_dir.set(0, 0, 1);
+
+    if (L->right.square_magnitude() > EPS)
+    {
+        L_right.set(L->right);
+        L_right.normalize();
+        L_up.crossproduct(L_dir, L_right);
+        L_up.normalize();
+        L_right.crossproduct(L_up, L_dir);
+        L_right.normalize();
+    }
+    else
+    {
+        L_up.set(0, 1, 0);
+        if (_abs(L_up.dotproduct(L_dir)) > .99f)
+            L_up.set(0, 0, 1);
+        L_right.crossproduct(L_up, L_dir);
+        L_right.normalize();
+        L_up.crossproduct(L_dir, L_right);
+        L_up.normalize();
+    }
+
+    Fmatrix spotView;
+    spotView.build_camera_dir(L->position, L_dir, L_up);
+
+    Fmatrix spotProj;
+    // Classic Light_Render_Direct_ComputeXFS: near=virtual_size, far=range,
+    // FOV pad +3.5° (spot) / +11.5° (point faces → OMNIPART).
+    const float nearPlane = std::max(L->virtual_size, 0.05f);
+    const float tan_shift = (L->flags.type == IRender_Light::OMNIPART)
+        ? deg2rad(11.5f)
+        : deg2rad(3.5f);
+    const float fov = std::min(L->cone + tan_shift, PI * 0.98f);
+    const float farPlane = std::max(L->range + EPS_S, nearPlane + 0.5f);
+    spotProj.build_projection(fov, 1.f, nearPlane, farPlane);
+
+    spotVP.mul(spotProj, spotView);
+    return spotVP;
 }
 
 GPULightData ClusteredLightManager::BuildGPULightData(const light* L)
@@ -155,47 +216,9 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L)
 
         float texIdxBits;
         std::memcpy(&texIdxBits, &texIdx, sizeof(float));
+        // .w = local shadow tile (asuint): 0 = none; set later by AssignLocalShadowTiles
         gpu.spotParamsAndType.set(offset, 1.0f, texIdxBits, 0.0f);
-
-        if (texIdx != 0)
-        {
-            Fvector L_dir, L_up, L_right;
-            L_dir.set(L->direction);
-            float l_dir_m = L_dir.magnitude();
-            if (_valid(l_dir_m) && l_dir_m > EPS_S)
-                L_dir.div(l_dir_m);
-            else
-                L_dir.set(0, 0, 1);
-
-            if (L->right.square_magnitude() > EPS)
-            {
-                L_right.set(L->right);
-                L_right.normalize();
-                L_up.crossproduct(L_dir, L_right);
-                L_up.normalize();
-                L_right.crossproduct(L_up, L_dir);
-                L_right.normalize();
-            }
-            else
-            {
-                L_up.set(0, 1, 0);
-                if (_abs(L_up.dotproduct(L_dir)) > .99f)
-                    L_up.set(0, 0, 1);
-                L_right.crossproduct(L_up, L_dir);
-                L_right.normalize();
-                L_up.crossproduct(L_dir, L_right);
-                L_up.normalize();
-            }
-
-            Fmatrix spotView;
-            spotView.build_camera_dir(L->position, L_dir, L_up);
-
-            Fmatrix spotProj;
-            float nearPlane = std::max(L->virtual_size, 0.01f);
-            spotProj.build_projection(L->cone + deg2rad(3.5f), 1.f, nearPlane, range + EPS_S);
-
-            gpu.spotVP.mul(spotProj, spotView);
-        }
+        gpu.spotVP = BuildSpotClipVP(L);
     }
     else
     {
@@ -212,18 +235,45 @@ void ClusteredLightManager::CollectLight(const light* L)
         return;
 
     m_lightsCPU.push_back(BuildGPULightData(L));
+    m_lightSources.push_back(L);
     m_numLights++;
 }
 
 void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>& lights)
 {
-    const u32 count = std::min(static_cast<u32>(lights.size()), MAX_LIGHTS);
+    if (lights.empty())
+        return;
+
+    // Expand shadowed POINT → 6 OMNIPART faces (classic Export path).
+    xr_vector<const light*> expanded;
+    expanded.reserve(lights.size() + 32);
+    for (const light* L : lights)
+    {
+        if (!L)
+            continue;
+        if (L->flags.type == IRender_Light::POINT && L->flags.bShadow)
+        {
+            light* mutableL = const_cast<light*>(L);
+            mutableL->EnsureOmniparts();
+            for (int f = 0; f < 6; ++f)
+            {
+                if (L->omnipart[f])
+                    expanded.push_back(L->omnipart[f]);
+            }
+        }
+        else
+        {
+            expanded.push_back(L);
+        }
+    }
+
+    const u32 count = std::min(static_cast<u32>(expanded.size()), MAX_LIGHTS);
     if (count == 0)
         return;
 
     for (u32 i = 0; i < count; i++)
     {
-        const light* L = lights[i];
+        const light* L = expanded[i];
         const u32 lt = L->flags.type;
         const bool isSpot = (lt == IRender_Light::SPOT || lt == IRender_Light::OMNIPART);
         if (isSpot && !L->spot_texture_name.empty())
@@ -231,18 +281,22 @@ void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>&
     }
 
     m_lightsCPU.resize(count);
+    m_lightSources.resize(count);
     m_numLights = count;
+
+    for (u32 i = 0; i < count; ++i)
+        m_lightSources[i] = expanded[i];
 
     xr_parallel_for(TaskRange<u32>(0, count), [&](const TaskRange<u32>& range) {
         for (u32 i = range.begin(); i != range.end(); ++i)
-            m_lightsCPU[i] = BuildGPULightData(lights[i]);
+            m_lightsCPU[i] = BuildGPULightData(expanded[i]);
     });
 
     if (psDeviceFlags.test(rsStatistic))
     {
         for (u32 i = 0; i < count; i++)
         {
-            const u32 lt = lights[i]->flags.type;
+            const u32 lt = expanded[i]->flags.type;
             if (lt == IRender_Light::POINT)
                 m_numPoint++;
             else if (lt == IRender_Light::SPOT)
@@ -253,18 +307,168 @@ void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>&
     }
 }
 
+void ClusteredLightManager::AssignLocalShadowTiles(const Fvector& cameraPos)
+{
+    m_localShadowTiles.clear();
+    if (ps_r_local_shadows == 0 || m_numLights == 0 || m_lightSources.size() != m_numLights)
+    {
+        m_stickyShadowSlots = {};
+        return;
+    }
+
+    struct Candidate
+    {
+        u32 idx = 0;
+        float score = 0.f;
+        Fmatrix clipVP;
+        const light* L = nullptr;
+    };
+
+    // light* → candidate (first occurrence wins; OMNIPART faces are distinct lights)
+    xr_map<const light*, Candidate> byLight;
+
+    for (u32 i = 0; i < m_numLights; ++i)
+    {
+        const light* L = m_lightSources[i];
+        if (!L || !L->flags.bShadow)
+            continue;
+        const u32 lt = L->flags.type;
+        if (lt != IRender_Light::SPOT && lt != IRender_Light::OMNIPART)
+            continue;
+
+        const float distSq = cameraPos.distance_to_sqr(L->position);
+        const float intensity = std::max({L->color.r, L->color.g, L->color.b, 0.01f});
+        float score = intensity * L->range / (1.f + distSq);
+        // Static level lights (Light_DB) — room fixtures; keep them over the torch.
+        if (L->flags.bStatic)
+            score *= 2.5f;
+        // OMNIPART = POINT faces (Skadovsk cabin lamps). Slightly below spots but not starved.
+        if (lt == IRender_Light::OMNIPART)
+            score *= 0.85f;
+        // Downward faces → long floor shadows from beds/tables.
+        if (L->direction.y < -0.35f)
+            score *= 1.5f;
+        // Player torch: close dynamic SPOT — don't let it eat every atlas slot indoors.
+        if (lt == IRender_Light::SPOT && !L->flags.bStatic && distSq < 16.f)
+            score *= 0.35f;
+
+        Candidate c;
+        c.idx = i;
+        c.score = score;
+        c.clipVP = m_lightsCPU[i].spotVP;
+        c.L = L;
+        byLight.emplace(L, c);
+    }
+
+    if (byLight.empty())
+    {
+        m_stickyShadowSlots = {};
+        return;
+    }
+
+    // Find admission floor from a fresh top-N ranking (for hysteresis).
+    xr_vector<Candidate> ranked;
+    ranked.reserve(byLight.size());
+    for (auto& kv : byLight)
+        ranked.push_back(kv.second);
+    std::sort(ranked.begin(), ranked.end(), [](const Candidate& a, const Candidate& b) {
+        if (a.score != b.score)
+            return a.score > b.score;
+        return a.L < b.L; // stable tie-break
+    });
+
+    const u32 tileCap = std::clamp(static_cast<u32>(std::max(ps_r_local_shadow_tiles, 1)), 1u, MAX_LOCAL_SHADOW_TILES);
+    const u32 nWant = std::min(static_cast<u32>(ranked.size()), tileCap);
+    const float admitScore = (nWant > 0) ? ranked[nWant - 1].score : 0.f;
+    // Wide hysteresis: score flickers every frame as you walk — 0.7 was still thrashing
+    // (whole room shadows popping on/off right in front of the camera).
+    const float keepScore = admitScore * 0.35f;
+    constexpr u32 kStickyGraceFrames = 45;
+
+    std::array<StickyShadowSlot, MAX_LOCAL_SHADOW_TILES> nextSticky{};
+    xr_vector<bool> sliceTaken(MAX_LOCAL_SHADOW_TILES, false);
+    xr_map<const light*, u32> assigned; // light* → slice
+
+    auto packTile = [&](u32 lightIdx, u32 slice, const light* L, const Fmatrix& clipVP, float score, u32 grace) {
+        u32 tilePlusOne = slice + 1;
+        float tileBits;
+        std::memcpy(&tileBits, &tilePlusOne, sizeof(float));
+        m_lightsCPU[lightIdx].spotParamsAndType.w = tileBits;
+
+        LocalShadowTile tile;
+        tile.L = L;
+        tile.clipVP = clipVP;
+        tile.lightIndex = lightIdx;
+        tile.slice = slice;
+        m_localShadowTiles.push_back(tile);
+
+        nextSticky[slice] = {L, score, grace};
+        sliceTaken[slice] = true;
+        assigned[L] = slice;
+    };
+
+    // 1) Retain previous sticky occupants (score hysteresis + grace frames).
+    for (u32 s = 0; s < tileCap; ++s)
+    {
+        const StickyShadowSlot& prev = m_stickyShadowSlots[s];
+        if (!prev.L)
+            continue;
+        auto it = byLight.find(prev.L);
+        if (it == byLight.end())
+        {
+            // Light briefly left the clustered list — reserve the slice so it isn't
+            // stolen; resume packing when the light returns (kills on/off flicker).
+            if (prev.graceFrames == 0)
+                continue;
+            nextSticky[s] = {prev.L, prev.score, prev.graceFrames - 1};
+            sliceTaken[s] = true;
+            continue;
+        }
+        const bool eligible = it->second.score >= keepScore;
+        if (!eligible && prev.graceFrames == 0)
+            continue;
+        const u32 grace = eligible ? kStickyGraceFrames
+                                   : (prev.graceFrames > 0 ? prev.graceFrames - 1 : 0);
+        packTile(it->second.idx, s, prev.L, it->second.clipVP, it->second.score, grace);
+    }
+
+    // 2) Fill free slices from ranked list (skip already assigned).
+    for (const Candidate& c : ranked)
+    {
+        if (assigned.find(c.L) != assigned.end())
+            continue;
+        u32 freeSlice = tileCap;
+        for (u32 s = 0; s < tileCap; ++s)
+        {
+            if (!sliceTaken[s])
+            {
+                freeSlice = s;
+                break;
+            }
+        }
+        if (freeSlice >= tileCap)
+            break;
+        packTile(c.idx, freeSlice, c.L, c.clipVP, c.score, kStickyGraceFrames);
+    }
+
+    m_stickyShadowSlots = nextSticky;
+}
+
 void ClusteredLightManager::AddLight(const light* L, u32 type)
 {
     if (m_numLights >= MAX_LIGHTS)
         return;
 
     m_lightsCPU.push_back(BuildGPULightData(L));
+    m_lightSources.push_back(L);
     m_numLights++;
 }
 
 void ClusteredLightManager::BuildLightBuffer(const light_Package& package)
 {
     m_lightsCPU.clear();
+    m_lightSources.clear();
+    m_localShadowTiles.clear();
     m_numLights = 0;
 
     for (const light* L : package.v_point)

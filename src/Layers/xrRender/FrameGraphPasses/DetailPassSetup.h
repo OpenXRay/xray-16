@@ -41,6 +41,12 @@ struct DetailPassData {
     framegraph::VirtualResourceHandle outputNormal;
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle worldPos;
+    framegraph::VirtualResourceHandle shadowMap;
+    nvrhi::ITexture* shadowMapArray = nullptr;
+    nvrhi::ITexture* shadowCascades[3] = {};
+    nvrhi::ITexture* localShadowAtlas = nullptr;
+    nvrhi::ITexture* contactDepth = nullptr;
+    nvrhi::ITexture* contactHistory = nullptr;
     fg::RenderDevice* device;
     fg::FGDetailManager* detailManager;
     framegraph::DefaultOutputLayout outputs;
@@ -62,7 +68,14 @@ framegraph::DefaultOutputLayout setupDetailPass(
     const framegraph::DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
-    xray::profiler::GPUProfiler* gpuProfiler = nullptr
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr,
+    nvrhi::ITexture* shadowMapArray = nullptr,
+    framegraph::VirtualResourceHandle shadowMapHandle = {},
+    nvrhi::ITexture* contactDepth = nullptr,
+    nvrhi::ITexture* contactHistory = nullptr,
+    framegraph::VirtualResourceHandle perlinReady = {},
+    nvrhi::ITexture* const* shadowCascades = nullptr,
+    nvrhi::ITexture* localShadowAtlas = nullptr
 );
 
 } // namespace xray::render::fg::passes

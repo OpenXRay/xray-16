@@ -1,0 +1,110 @@
+// wet/rain_apply.ps — SSFX-style darken (no brighten) + drips
+#define SM_6_0
+
+#include "wet/ssfx_waterfall.h"
+#include "wet/ssfx_ssr.h"
+
+SamplerState smp_rtlinear : register(s0);
+SamplerState smp_linear   : register(s1);
+SamplerState smp_nofilter : register(s2);
+
+Texture2D g_Color : register(t0);
+Texture2D g_Patched : register(t1);
+Texture2D g_WorldPos : register(t2);
+Texture2D g_WaterFall : register(t3);
+Texture2D g_SceneReflection : register(t4);
+
+cbuffer WetConstants : register(b0)
+{
+    float4 RainDensity;
+    float4 EyePos;
+    float4 SunColor;
+    float4 Timers;
+    float4x4 m_VP;
+    float4x4 m_RainSampleVP;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+};
+
+float4 main(PS_INPUT input) : SV_Target
+{
+    float4 color = g_Color.SampleLevel(smp_rtlinear, input.texcoord, 0);
+    float rain = max(RainDensity.x, RainDensity.y);
+    float rainGate = saturate(rain * 40.0);
+
+    float4 patched = g_Patched.SampleLevel(smp_rtlinear, input.texcoord, 0);
+    float3 worldPos = g_WorldPos.SampleLevel(smp_rtlinear, input.texcoord, 0).xyz;
+    float3 N = normalize(patched.xyz + float3(0.0, 0.0, 0.00001));
+
+    float3 RainP = ssfx_RainPos(worldPos, EyePos.xyz);
+    // patched.a is SSFX gloss — use for darken amount
+    float Gloss = saturate(patched.a) * rainGate;
+    float p_len = length(RainP);
+    Gloss *= smoothstep(250.0, 200.0, p_len);
+
+    // Darken wet albedo — visible on NPC/grass/HUD, never brighten
+    float ColorIntensity = 1.0 - sqrt(saturate(Gloss * 5.5)) * 0.72;
+    ColorIntensity = max(ColorIntensity, 0.52);
+    float3 diffuse = color.rgb * ColorIntensity;
+
+    float3 Vdir = normalize(EyePos.xyz - worldPos);
+    float NdV = saturate(dot(N, Vdir));
+    // Local wet specular (face + rim) — NPCs gleam without sky plate washout
+    float faceSpec = pow(NdV, 4.5) * Gloss;
+    float rimSpec = pow(saturate(1.0 - NdV), 2.2) * Gloss;
+    float3 sun = max(SunColor.rgb, float3(0.06, 0.06, 0.06));
+    float3 sheen = sun * (faceSpec * 0.65 + rimSpec * 0.35 + Gloss * 0.03);
+
+    float2 wSoft = ssfx_WallWeightsSoft(N);
+    float wall = smoothstep(0.12, 0.5, saturate(1.0 - abs(N.y))) * Gloss;
+
+    float3 tc1 = RainP * 0.5;
+    float fAngleFactor = (1.0 - saturate(N.y));
+    fAngleFactor = 0.1 * ceil(fAngleFactor * 10.0) * 0.5;
+
+    float2 uvX = float2(tc1.z, tc1.y + Timers.x * fAngleFactor);
+    float2 uvZ = float2(tc1.x, tc1.y + Timers.x * fAngleFactor);
+    float2 IsDir = float2(N.z, N.x);
+    float isLen = max(length(IsDir), 0.001);
+    IsDir /= isLen;
+    float2 uvD = float2(dot(tc1.xz, IsDir), tc1.y + Timers.x);
+
+    float noiseX = ssfx_FallFlowRaw(g_WaterFall, smp_linear, uvX);
+    float noiseZ = ssfx_FallFlowRaw(g_WaterFall, smp_linear, uvZ);
+    float noiseD = ssfx_FallFlowRaw(g_WaterFall, smp_linear, uvD);
+    float noise = max(noiseX * wSoft.x + noiseZ * wSoft.y, noiseD * 0.55) * wall;
+
+    float dX = ssfx_DropletStreak(uvX, rain, Timers.x);
+    float dZ = ssfx_DropletStreak(uvZ, rain, Timers.x);
+    float drips = (dX * wSoft.x + dZ * wSoft.y) * wall;
+
+    float3 nX = ssfx_GetWaterNMap(g_WaterFall, smp_linear, uvX);
+    float3 nZ = ssfx_GetWaterNMap(g_WaterFall, smp_linear, uvZ);
+    float3 fall = nX.yxz * wSoft.x + nZ.zxy * wSoft.y;
+    float peaks = ssfx_FallPeak(fall) * wall;
+
+    float2 wxz = ssfx_WallWeightsXZ(N);
+    float3 sX = ssfx_GetWaterFall(g_WaterFall, smp_linear, RainP.zy, rain, Timers.x);
+    float3 sZ = ssfx_GetWaterFall(g_WaterFall, smp_linear, RainP.xy, rain, Timers.x);
+    float3 sFall = sX.yxz * wxz.x + sZ.zxy * wxz.y;
+    float cols = ssfx_FallPeak(sFall) * wall * 0.65;
+
+    diffuse *= 1.0 - noise * 0.42;
+    diffuse *= 1.0 - drips * 0.28;
+    diffuse *= 1.0 - peaks * 0.16;
+    diffuse *= 1.0 - cols * 0.14;
+
+    float upW = smoothstep(0.7, 0.85, saturate(N.y));
+    float ripple = saturate(length(N.xz) * 2.2) * Gloss * upW;
+    diffuse *= 1.0 - ripple * 0.14;
+
+    // Keep SceneReflection bound (Slang); do NOT add sky/lit plate — caused washout
+    sheen += g_SceneReflection.SampleLevel(smp_rtlinear, input.texcoord, 0).rgb * 0.0;
+
+    color.rgb = diffuse + sheen;
+    return color;
+}

@@ -45,7 +45,7 @@ const xr_token qpreset_token[] =
     { nullptr, 0 }
 };
 
-u32 ps_r2_smapsize = 2048;
+u32 ps_r2_smapsize = 1024;
 const xr_token qsmapsize_token[] =
 {
 #if !defined(MASTER_GOLD) || RENDER == R_R1
@@ -75,17 +75,19 @@ const xr_token qsmapsize_token[] =
     { nullptr, 0 }
 };
 
-u32 ps_r_ssao_mode = ssao_mode_default;
+u32 ps_r_ssao_mode = ssao_mode_gtao;
 const xr_token qssao_mode_token[] =
 {
     { "disabled", ssao_mode_off },
     { "default",  ssao_mode_default },
     { "hdao",     ssao_mode_hdao },
     { "hbao",     ssao_mode_hbao },
+    { "gtao",     ssao_mode_gtao },
     { nullptr,    0 }
 };
 
 u32 ps_r_sun_shafts = 2;
+float ps_r_sun_shafts_scale = 1.0f; // brightness multiplier for volumetric sun (1 = faithful to original)
 const xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3}, {nullptr, 0}};
 
 u32 ps_r_ssao = 3;
@@ -94,6 +96,21 @@ const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_m
 {nullptr, 0}};
 
 u32 ps_r_sun_quality = 1; // = 0;
+int ps_r_shadow_debug = 0; // 0=off,1=cascade idx,2=CSM term,3=cascade UV,4=N.L
+float ps_r2_sun_normal_bias = 0.04f; // world-space normal offset (meters) for CSM
+int ps_r_shadow_cast_all = 0; // 1=legacy cast-all near; 0=camera compact / light-frustum
+int ps_r_skinned_shadows = 1; // 1=NPCs/mutants cast into the sun CSM (self-shadowing), 0=off
+int ps_r_depth_prepass = 1; // early-Z; enables same-frame Hi-Z path when r_hiz_occlusion
+int ps_r_hiz_occlusion = 1; // 1=static occlusion compact after same-frame Hi-Z (depth prepass)
+int ps_r_shadow_light_cull = 1; // 1=CPU light-frustum CSM casters (DRAWINDEX compact)
+int ps_r_local_shadows = 1; // 1=spot/OMNIPART local shadow atlas (expensive: N× BuildLightFrustumCasters)
+int ps_r_local_shadow_tiles = 12; // max atlas slices (hard cap MAX_LOCAL_SHADOW_TILES=16)
+int ps_r_shadow_indoor_near_only = 1; // 1=few portal sectors → only cascade 0
+int ps_r_portal_cull = 1; // 1=portal/sector PVS traversal (frustum) for static submit
+int ps_r_hom = 0; // 1=add CPU HOM occlusion on top of portal traversal (opt-in refinement)
+float ps_r2_sun_soft = 6.0f;    // PCSS max penumbra (texels): larger = softer shadows far from occluder
+float ps_r2_sun_blocker = 2.5f; // PCSS blocker-search spacing (texels): larger = detects distant occluders
+float ps_r2_sun_contact = 1.0f; // PCSS min penumbra (texels): smaller = sharper contact shadow
 const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
 #if defined(USE_DX11) // TODO: OGL: fix ultra and extreme settings
     {"st_opt_ultra", 3}, {"st_opt_extreme", 4},
@@ -187,15 +204,19 @@ float ps_r2_ssaLOD_B = 48.f;
 Flags32 ps_r2_ls_flags = {R2FLAG_SUN
     //| R2FLAG_SUN_IGNORE_PORTALS
     | R2FLAG_EXP_DONT_TEST_UNSHADOWED | R2FLAG_USE_NVSTENCIL | R2FLAG_EXP_SPLIT_SCENE | R2FLAG_EXP_MT_CALC |
-    R3FLAG_DYN_WET_SURF | R3FLAG_VOLUMETRIC_SMOKE
+    R3FLAG_DYN_WET_SURF
+    // R3FLAG_VOLUMETRIC_SMOKE — froxel sun shafts; off by default (classic CoP has no volumetric rays)
     //| R3FLAG_MSAA
     //| R3FLAG_MSAA_OPT
     | R3FLAG_GBUFFER_OPT | R2FLAG_DETAIL_BUMP | R2FLAG_DOF | R2FLAG_SOFT_PARTICLES | R2FLAG_SOFT_WATER |
-    R2FLAG_STEEP_PARALLAX | R2FLAG_SUN_FOCUS | R2FLAG_SUN_TSM | R2FLAG_TONEMAP | R2FLAG_VOLUMETRIC_LIGHTS}; // r2-only
+    R2FLAG_STEEP_PARALLAX | R2FLAG_SUN_FOCUS | R2FLAG_SUN_TSM | R2FLAG_TONEMAP}; // r2-only
+    // R2FLAG_VOLUMETRIC_LIGHTS also off by default (same reason)
 
 Flags32 ps_r2_ls_flags_ext = {
-    /*R2FLAGEXT_SSAO_OPT_DATA |*/ R2FLAGEXT_SSAO_HALF_DATA | R2FLAGEXT_ENABLE_TESSELLATION | R3FLAGEXT_SSR_HALF_DEPTH |
-    R3FLAGEXT_SSR_JITTER};
+    /*R2FLAGEXT_SSAO_OPT_DATA |*/ R2FLAGEXT_SSAO_HALF_DATA |
+    /* R2FLAGEXT_ENABLE_TESSELLATION — off by default: Apple Metal/MoltenVK tess
+       temp buffers can kernel-panic (IOGPUGroupMemory::remove_memory_object). */
+    R3FLAGEXT_SSR_HALF_DEPTH | R3FLAGEXT_SSR_JITTER};
 
 float ps_r2_df_parallax_h = 0.02f;
 float ps_r2_df_parallax_range = 75.f;
@@ -252,8 +273,8 @@ Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
 float ps_r2_dof_sky = 30; //    distance to sky
 float ps_r2_dof_kernel_size = 5.0f; //  7.0f
 
-float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
-float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
+float ps_r3_dyn_wet_surf_near = 10.f; // view-space start falloff
+float ps_r3_dyn_wet_surf_far = 50.f;  // view-space end falloff (was 20 — too short)
 int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
 // R4 Debug
@@ -274,6 +295,8 @@ const xr_token fg_render_mode_token[] = {
 
 // Smoke Trail (weapon muzzle smoke)
 int   ps_r_smoke_trail_enabled  = 1;
+// Ribbon/Trail test passes (debug quads) — off by default, they emit no geometry
+int   ps_r_test_trails          = 0;
 float ps_r_smoke_max_emit_rate  = 45.f;
 float ps_r_smoke_point_lifetime = 2.5f;
 float ps_r_smoke_max_width      = 0.04f;
@@ -283,7 +306,7 @@ float ps_r_smoke_turbulence     = 0.8f;
 
 u32 ps_steep_parallax = 0;
 int ps_r__detail_radius = 49;
-int ps_r__detail_gpu = 1; // 0=Vanilla CPU path, 1=GPU compute path (default GPU)
+int ps_r__detail_gpu = 0; // 0=CoP textured billboards (GPU cull), 1=procedural green blades
 
 u32 dm_size = 24;
 u32 dm_cache1_line = 12; //dm_size*2/dm_cache1_count
@@ -451,6 +474,18 @@ public:
             ps_r2_ls_flags_ext.set(R2FLAGEXT_SSAO_HBAO, 1);
             ps_r2_ls_flags_ext.set(R2FLAGEXT_SSAO_HDAO, 0);
             ps_r2_ls_flags_ext.set(R2FLAGEXT_SSAO_OPT_DATA, 1);
+            break;
+        }
+        case ssao_mode_gtao:
+        {
+            if (ps_r_ssao == 0)
+            {
+                ps_r_ssao = 1;
+            }
+            ps_r2_ls_flags_ext.set(R2FLAGEXT_SSAO_HBAO, 0);
+            ps_r2_ls_flags_ext.set(R2FLAGEXT_SSAO_HDAO, 0);
+            ps_r2_ls_flags_ext.set(R2FLAGEXT_SSAO_OPT_DATA, 0);
+            ps_r2_ls_flags_ext.set(R2FLAGEXT_SSAO_HALF_DATA, 0);
             break;
         }
         }
@@ -729,7 +764,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.04f, 0.99f);
     CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 600);
     CMD4(CCC_Float, "r__detail_height", &ps_r__Detail_height, 1, 2);
-    CMD4(CCC_Integer, "r__detail_gpu", &ps_r__detail_gpu, 0, 1); // Toggle GPU compute path
+    CMD4(CCC_Integer, "r__detail_gpu", &ps_r__detail_gpu, 0, 1); // 0=CoP billboards+GPU cull, 1=procedural blades
 
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);
@@ -817,7 +852,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_sun_tsm_bias", &ps_r2_sun_tsm_bias, -0.5, +0.5);
     CMD4(CCC_Float, "r2_sun_near", &ps_r2_sun_near, 1.f, 150.f); //AVO: extended from 50.f to 150.f
 #if RENDER != R_R1
-    CMD4(CCC_Float, "r2_sun_far", &ps_r2_sun_far, 51.f, 180.f);
+    CMD4(CCC_Float, "r2_sun_far", &ps_r2_sun_far, 51.f, 400.f);
 #endif
     CMD4(CCC_Float, "r2_sun_near_border", &ps_r2_sun_near_border, .5f, 1.0f);
     CMD4(CCC_Float, "r2_sun_depth_far_scale", &ps_r2_sun_depth_far_scale, 0.5, 1.5);
@@ -893,6 +928,7 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r2_volumetric_lights", &ps_r2_ls_flags, R2FLAG_VOLUMETRIC_LIGHTS);
     //CMD3(CCC_Mask, "r2_sun_shafts", &ps_r2_ls_flags, R2FLAG_SUN_SHAFTS);
     CMD3(CCC_Token, "r2_sun_shafts", &ps_r_sun_shafts, qsun_shafts_token);
+    CMD4(CCC_Float, "r2_sun_shafts_scale", &ps_r_sun_shafts_scale, 0.0f, 4.0f);
     CMD3(CCC_SSAO_Mode, "r2_ssao_mode", &ps_r_ssao_mode, qssao_mode_token);
     CMD3(CCC_Token, "r2_ssao", &ps_r_ssao, qssao_token);
     CMD3(CCC_Mask, "r2_ssao_blur", &ps_r2_ls_flags_ext, R2FLAGEXT_SSAO_BLUR); // Need restart
@@ -900,7 +936,7 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r2_ssao_half_data", &ps_r2_ls_flags_ext, R2FLAGEXT_SSAO_HALF_DATA); // Need restart
     CMD3(CCC_Mask, "r2_ssao_hbao", &ps_r2_ls_flags_ext, R2FLAGEXT_SSAO_HBAO); // Need restart
     CMD3(CCC_Mask, "r2_ssao_hdao", &ps_r2_ls_flags_ext, R2FLAGEXT_SSAO_HDAO); // Need restart
-    CMD3(CCC_Mask, "r4_enable_tessellation", &ps_r2_ls_flags_ext, R2FLAGEXT_ENABLE_TESSELLATION); // Need restart
+    CMD3(CCC_Mask, "r4_enable_tessellation", &ps_r2_ls_flags_ext, R2FLAGEXT_ENABLE_TESSELLATION); // Need restart; UNSAFE on Apple/MoltenVK (IOGPU kernel panic)
     CMD3(CCC_Mask, "r4_wireframe", &ps_r2_ls_flags_ext, R2FLAGEXT_WIREFRAME); // Need restart
     CMD3(CCC_Mask, "r2_steep_parallax", &ps_r2_ls_flags, R2FLAG_STEEP_PARALLAX);
     CMD3(CCC_Mask, "r2_detail_bump", &ps_r2_ls_flags, R2FLAG_DETAIL_BUMP);
@@ -959,8 +995,42 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
 
+    CMD4(CCC_Integer, "r_taa", &ps_r_taa, 0, 1);
+    CMD4(CCC_Float, "r_taa_sharpness", &ps_r_taa_sharpness, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_bloom", &ps_r_bloom, 0, 1);
+    CMD4(CCC_Integer, "r_cas", &ps_r_cas, 0, 1);
+    CMD4(CCC_Float, "r_cas_sharpness", &ps_r_cas_sharpness, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_shadow_debug", &ps_r_shadow_debug, 0, 4);
+    CMD4(CCC_Float, "r2_sun_normal_bias", &ps_r2_sun_normal_bias, 0.0f, 0.5f);
+    CMD4(CCC_Integer, "r_shadow_cast_all", &ps_r_shadow_cast_all, 0, 1);
+    CMD4(CCC_Integer, "r_skinned_shadows", &ps_r_skinned_shadows, 0, 1);
+    CMD4(CCC_Integer, "r_depth_prepass", &ps_r_depth_prepass, 0, 1);
+    CMD4(CCC_Integer, "r_hiz_occlusion", &ps_r_hiz_occlusion, 0, 1);
+    CMD4(CCC_Integer, "r_shadow_light_cull", &ps_r_shadow_light_cull, 0, 1);
+    CMD4(CCC_Integer, "r_local_shadows", &ps_r_local_shadows, 0, 1);
+    CMD4(CCC_Integer, "r_local_shadow_tiles", &ps_r_local_shadow_tiles, 1, 16);
+    CMD4(CCC_Integer, "r_shadow_indoor_near_only", &ps_r_shadow_indoor_near_only, 0, 1);
+    CMD4(CCC_Integer, "r_portal_cull", &ps_r_portal_cull, 0, 1);
+    CMD4(CCC_Integer, "r_hom", &ps_r_hom, 0, 1);
+    CMD4(CCC_Float, "r2_sun_soft", &ps_r2_sun_soft, 0.5f, 24.0f);
+    CMD4(CCC_Float, "r2_sun_blocker", &ps_r2_sun_blocker, 0.5f, 8.0f);
+    CMD4(CCC_Float, "r2_sun_contact", &ps_r2_sun_contact, 0.1f, 4.0f);
+    CMD4(CCC_Integer, "r_contact_shadows", &ps_r_contact_shadows, 0, 1);
+    CMD4(CCC_Float, "r_contact_shadows_length", &ps_r_contact_shadows_length, 0.05f, 2.0f);
+    CMD4(CCC_Integer, "r_ssr", &ps_r_ssr, 0, 1);
+    CMD4(CCC_Integer, "r_ssr_quality", &ps_r_ssr_quality, 1, 4);
+
+    CMD4(CCC_Integer, "r_sky_ibl", &ps_r_sky_ibl, 0, 1);
+    CMD4(CCC_Float, "r_sky_ibl_intensity", &ps_r_sky_ibl_intensity, 0.0f, 4.0f);
+    CMD4(CCC_Integer, "r_foliage_sss", &ps_r_foliage_sss, 0, 1);
+    CMD4(CCC_Float, "r_foliage_sss_intensity", &ps_r_foliage_sss_intensity, 0.0f, 4.0f);
+    CMD4(CCC_Integer, "r_ssgi", &ps_r_ssgi, 0, 1);
+    CMD4(CCC_Integer, "r_ssgi_quality", &ps_r_ssgi_quality, 1, 3);
+    CMD4(CCC_Float, "r_ssgi_intensity", &ps_r_ssgi_intensity, 0.0f, 4.0f);
+
     // Smoke Trail (weapon muzzle smoke)
     CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);
+    CMD4(CCC_Integer, "r_test_trails",     &ps_r_test_trails,         0, 1);
     CMD4(CCC_Float,   "r_smoke_emit_rate", &ps_r_smoke_max_emit_rate,  1.0f, 120.0f);
     CMD4(CCC_Float,   "r_smoke_lifetime",  &ps_r_smoke_point_lifetime, 0.5f, 10.0f);
     CMD4(CCC_Float,   "r_smoke_width",     &ps_r_smoke_max_width,      0.005f, 0.2f);

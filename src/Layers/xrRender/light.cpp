@@ -271,6 +271,38 @@ void light::xform_calc()
 Fvector cmNorm[6] = { { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f }, { 0.f, 0.f, -1.f }, { 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f } };
 Fvector cmDir [6] = { { 1.f, 0.f, 0.f }, {-1.f, 0.f, 0.f }, { 0.f, 1.f,  0.f }, { 0.f,-1.f, 0.f }, { 0.f, 0.f, 1.f }, { 0.f, 0.f,-1.f } };
 
+void light::EnsureOmniparts()
+{
+    if (flags.type != IRender_Light::POINT)
+        return;
+
+    if (nullptr == omnipart[0])
+        for (auto& p_light : omnipart)
+            p_light = xr_new<light>();
+
+    for (int f = 0; f < 6; f++)
+    {
+        light* L = omnipart[f];
+        Fvector R;
+        R.crossproduct(cmNorm[f], cmDir[f]);
+        L->set_type(IRender_Light::OMNIPART);
+        L->set_shadow(flags.bShadow);
+        L->set_position(position);
+        L->set_rotation(cmDir[f], R);
+        L->set_cone(PI_DIV_2);
+        L->set_range(range);
+        L->set_virtual_size(virtual_size);
+        L->set_color(color);
+        L->spatial.sector_id = spatial.sector_id;
+        L->s_spot = s_spot;
+        L->s_point = s_point;
+        L->set_volumetric(flags.bVolumetric);
+        L->set_volumetric_quality(m_volumetric_quality);
+        L->set_volumetric_intensity(m_volumetric_intensity);
+        L->set_volumetric_distance(m_volumetric_distance);
+    }
+}
+
 void light::Export(light_Package& package)
 {
     if (flags.bShadow)
@@ -279,52 +311,9 @@ void light::Export(light_Package& package)
         {
         case IRender_Light::POINT:
         {
-            // tough: create/update 6 shadowed lights
-            if (nullptr == omnipart[0])
-                for (auto& p_light : omnipart)
-                    p_light = xr_new<light>();
+            EnsureOmniparts();
             for (int f = 0; f < 6; f++)
-            {
-                light* L = omnipart[f];
-                Fvector R;
-                R.crossproduct(cmNorm[f], cmDir[f]);
-                L->set_type(IRender_Light::OMNIPART);
-                L->set_shadow(true);
-                L->set_position(position);
-                L->set_rotation(cmDir[f], R);
-                L->set_cone(PI_DIV_2);
-                L->set_range(range);
-                L->set_virtual_size(virtual_size);
-                L->set_color(color);
-                L->spatial.sector_id = spatial.sector_id; //. dangerous?
-                L->s_spot = s_spot;
-                L->s_point = s_point;
-
-#if 0
-                if (RImplementation.o.msaa)
-                {
-                    int bound = 1;
-
-                    if (!RImplementation.o.msaa_opt)
-                        bound = RImplementation.o.msaa_samples;
-
-                    for (int i = 0; i < bound; ++i)
-                    {
-                        L->s_point_msaa[i] = s_point_msaa[i];
-                        L->s_spot_msaa[i] = s_spot_msaa[i];
-                        // L->s_volumetric_msaa[i] = s_volumetric_msaa[i];
-                    }
-                }
-#endif // (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
-
-                //  Igor: add volumetric support
-                L->set_volumetric(flags.bVolumetric);
-                L->set_volumetric_quality(m_volumetric_quality);
-                L->set_volumetric_intensity(m_volumetric_intensity);
-                L->set_volumetric_distance(m_volumetric_distance);
-
-                package.v_shadowed.push_back(L);
-            }
+                package.v_shadowed.push_back(omnipart[f]);
         }
         break;
         case IRender_Light::SPOT: package.v_shadowed.push_back(this); break;

@@ -14,7 +14,10 @@ public:
 
     u32 RegisterMaterial(const MaterialData& material);
     void UpdateMaterial(u32 materialID, const MaterialData& material);
-    const MaterialData* GetMaterial(u32 materialID) const { return Get(materialID); }
+    const MaterialData* GetMaterial(u32 materialID) const
+    {
+        return materialID < m_materialCount ? Get(materialID) : nullptr;
+    }
 
     u32 GetMaterialCount() const { return m_materialCount; }
 

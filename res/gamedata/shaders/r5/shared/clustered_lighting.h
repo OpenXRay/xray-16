@@ -125,9 +125,16 @@ float3 EvaluateClusteredLights(
 
         if (atten > 0.001f)
         {
+            float shadow = 1.0;
+            // spotParamsAndType.w = asfloat(tile+1) when this light owns an atlas slice
+            uint localTile = asuint(light.spotParamsAndType.w);
+            if (localTile != 0)
+                shadow = SampleLocalShadow(worldPos, light.spotVP, localTile);
+
+            // Contact history is sun-marched — do not apply to clustered local lights.
             float3 litColor = PBRDirectLighting(
                 albedo, N, V, L,
-                lightColor * atten,
+                lightColor * atten * shadow,
                 metallic, roughness, diffuseMode);
             totalLight += litColor;
         }

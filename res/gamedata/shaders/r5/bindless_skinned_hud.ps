@@ -1,5 +1,9 @@
 #define SM_6_0
 #define CLUSTERED_LIGHTING_FORWARD
+#define CSM_SHADOW_FORWARD
+#define HUD_SHADOW_FORWARD
+#define LOCAL_SHADOW_FORWARD
+#define SKY_IBL
 #include "common.h"
 #include "bindless_common.h"
 #include "skinned_common.h"
@@ -83,7 +87,11 @@ PS_OUTPUT main(PS_INPUT input)
 
     albedo = apply_splat_color(albedo, input.worldPos, input.texcoord);
 
-    f_forward fwd = output_forward_pbr(albedo, N, correctedWorldPos, metallic, roughness, ao, input.position);
+    float hemi = calc_model_hemi(N);
+    f_forward fwd = output_forward_pbr(albedo, N, correctedWorldPos, metallic, roughness, ao, input.position, hemi);
+    // Self-shadow from dedicated HUD map (FOV-adjusted space matches cast)
+    float hudSh = SampleHUDShadow(input.worldPos);
+    fwd.color.rgb *= lerp(0.55, 1.0, hudSh);
     output.color = float4(fwd.color.rgb, diffuseSample.a);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;

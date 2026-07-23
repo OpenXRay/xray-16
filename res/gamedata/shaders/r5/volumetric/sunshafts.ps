@@ -1,0 +1,74 @@
+// Classic CoP sunshafts (accum_volumetric_sun.ps) — ray march + CSM
+#define SM_6_0
+#define CSM_SHADOW_FORWARD
+#include "common.h"
+#include "shared/shadow_sampling.h"
+
+cbuffer SunShaftsCB : register(b3)
+{
+    float4 shaft_params; // x=intensity, y=quality(1..3), z=sampleCount, w=scale
+};
+
+Texture2D g_Depth : register(t1);
+Texture2D g_WorldPos : register(t2);
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+};
+
+// Half-res march: outputs the scattered-light term ONLY (like the original
+// accum_volumetric_sun, which renders into a separate buffer). A later combine
+// pass upsamples/blurs this and adds it to the scene.
+float4 main(PS_INPUT input) : SV_Target0
+{
+    float depth = g_Depth.SampleLevel(smp_nofilter, input.texcoord, 0).x;
+    float4 worldPos4 = g_WorldPos.SampleLevel(smp_nofilter, input.texcoord, 0);
+
+    float intensity = shaft_params.x;
+    if (intensity < 1e-4)
+        return float4(0.0, 0.0, 0.0, 0.0);
+
+    int raySamples = (int)max(shaft_params.z, 20.0);
+    float maxDensity = intensity;
+    float density = maxDensity / float(raySamples);
+
+    float res = 0.0;
+
+    if (depth >= 0.9999 || worldPos4.w < 0.5)
+    {
+        res = maxDensity;
+    }
+    else
+    {
+        float3 Pw = worldPos4.xyz;
+        float3 toEye = eye_position - Pw;
+        float j = frac(52.9829189 * frac(dot(input.position.xy, float2(0.06711056, 0.00583715))));
+        float coeff = (float(raySamples) - j) / float(raySamples * raySamples);
+        float3 stepW = toEye * coeff;
+
+        float3 cur = Pw;
+        float viewZ = length(mul(m_V, float4(Pw, 1.0)).xyz);
+
+        [loop]
+        for (int i = 0; i < raySamples; ++i)
+        {
+            if (viewZ > 0.3)
+                res += density * SampleCSM_Volumetric(cur);
+
+            cur += stepW;
+            viewZ = length(mul(m_V, float4(cur, 1.0)).xyz);
+        }
+    }
+
+    // Classic: elevation from light travel dir (−Ldynamic_dir.z)
+    float3 sunTravel = normalize(-L_sun_dir_w);
+    float fSaturation = -sunTravel.y;
+    fSaturation = 0.5 * fSaturation + 0.5;
+    fSaturation = 0.80 * fSaturation + 0.20;
+    res *= fSaturation;
+
+    float scale = shaft_params.w > 0.0 ? shaft_params.w : 1.0;
+    return float4(res * L_sun_color * scale, 1.0);
+}

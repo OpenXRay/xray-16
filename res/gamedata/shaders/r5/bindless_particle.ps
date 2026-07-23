@@ -32,19 +32,26 @@ PS_OUTPUT main(PS_INPUT input)
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
     float4 result = diffuseSample * input.color;
 
-    clip(result.a - (0.01 / 255.0));
+    // Classic SET uses aref 200; BLEND uses near-zero so soft-particle fade can run.
+    clip(result.a - mat.alphaRef);
 
-    float4 sceneWP = g_SceneWorldPos.Load(int3((int2)input.hpos.xy, 0));
-    if (sceneWP.w > 0.5) {
-        float3 viewDir = camera_direction.xyz;
-        float sceneViewZ = dot(sceneWP.xyz - eye_position, viewDir);
-        float particleViewZ = dot(input.worldPos - eye_position, viewDir);
-        float spaceDepth = sceneViewZ - particleViewZ - DEPTH_EPSILON;
-        if (spaceDepth < -2 * DEPTH_EPSILON)
-            spaceDepth = 100000.0;
-        float soft = Contrast(saturate(spaceDepth * 1.3), 2);
-        result.a *= soft;
-        result.rgb *= soft;
+    // camera_direction.w = r2_soft_particles (FillGlobalConstants)
+    if (camera_direction.w > 0.5)
+    {
+        float4 sceneWP = g_SceneWorldPos.Load(int3((int2)input.hpos.xy, 0));
+        if (sceneWP.w > 0.5)
+        {
+            float3 viewDir = camera_direction.xyz;
+            float sceneViewZ = dot(sceneWP.xyz - eye_position, viewDir);
+            float particleViewZ = dot(input.worldPos - eye_position, viewDir);
+            // Classic r3/particle.ps soft depth fade
+            float spaceDepth = sceneViewZ - particleViewZ - DEPTH_EPSILON;
+            if (spaceDepth < -2 * DEPTH_EPSILON)
+                spaceDepth = 100000.0;
+            float soft = Contrast(saturate(spaceDepth * 1.3), 2);
+            result.a *= soft;
+            result.rgb *= soft;
+        }
     }
 
     output.color = result;

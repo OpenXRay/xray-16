@@ -183,6 +183,9 @@ void FGDetailManager::Unload()
 
     slot_aabbs.clear();
     slotDataCPU.clear();
+    heightmapCPU.clear();
+    heightmapTexture = nullptr;
+    heightmapWidth = heightmapHeight = 0;
 
     if (dtFS)
     {
@@ -542,6 +545,62 @@ bool FGDetailManager::LoadHeightmapTexture(nvrhi::IDevice* device)
     Msg("  ✓ Heightmap texture loaded: %ux%u R32_FLOAT, %u mips",
         texDesc.width, texDesc.height, texDesc.mipLevels);
 
+    // Keep mip0 on CPU for rain splash RayPick / terrain collide
+    {
+        const auto& mip0 = ddsData.mipLevels[0];
+        const u32 count = heightmapWidth * heightmapHeight;
+        heightmapCPU.assign(count, HEIGHTMAP_NO_TERRAIN);
+        if (mip0.data && mip0.size >= count * sizeof(float))
+        {
+            const float* src = reinterpret_cast<const float*>(mip0.data);
+            // rowPitch may include padding
+            const u32 srcStride = mip0.rowPitch / sizeof(float);
+            for (u32 y = 0; y < heightmapHeight; ++y)
+            {
+                const float* row = src + y * srcStride;
+                float* dst = heightmapCPU.data() + y * heightmapWidth;
+                memcpy(dst, row, heightmapWidth * sizeof(float));
+            }
+        }
+        Msg("* [FGDetailManager] Heightmap CPU copy: %u samples", (u32)heightmapCPU.size());
+    }
+
+    return true;
+}
+
+bool FGDetailManager::SampleHeight(float worldX, float worldZ, float& outY) const
+{
+    if (heightmapCPU.empty() || heightmapWidth == 0 || heightmapHeight == 0 ||
+        heightmapTexelSize <= 0.f)
+        return false;
+
+    const float fx = (worldX - heightmapWorldMinX) / heightmapTexelSize - 0.5f;
+    const float fz = (worldZ - heightmapWorldMinZ) / heightmapTexelSize - 0.5f;
+    if (fx < 0.f || fz < 0.f || fx >= float(heightmapWidth - 1) || fz >= float(heightmapHeight - 1))
+        return false;
+
+    const u32 x0 = u32(fx);
+    const u32 z0 = u32(fz);
+    const u32 x1 = x0 + 1;
+    const u32 z1 = z0 + 1;
+    const float tx = fx - float(x0);
+    const float tz = fz - float(z0);
+
+    const auto at = [&](u32 x, u32 z) -> float {
+        return heightmapCPU[z * heightmapWidth + x];
+    };
+
+    const float h00 = at(x0, z0);
+    const float h10 = at(x1, z0);
+    const float h01 = at(x0, z1);
+    const float h11 = at(x1, z1);
+    if (h00 <= HEIGHTMAP_NO_TERRAIN * 0.5f || h10 <= HEIGHTMAP_NO_TERRAIN * 0.5f ||
+        h01 <= HEIGHTMAP_NO_TERRAIN * 0.5f || h11 <= HEIGHTMAP_NO_TERRAIN * 0.5f)
+        return false;
+
+    const float h0 = h00 + (h10 - h00) * tx;
+    const float h1 = h01 + (h11 - h01) * tx;
+    outY = h0 + (h1 - h0) * tz;
     return true;
 }
 
@@ -632,6 +691,48 @@ bool FGDetailManager::LoadBuildDetailsTexture(nvrhi::IDevice* device)
                     pbrDesc.width, pbrDesc.height, pbrDesc.mipLevels, (int)pbrDesc.format, buildDetailsPbrBindlessIndex);
             }
         }
+    }
+    else
+    {
+        Msg("! [FGDetailManager] build_details_pbr.dds missing — CoP grass uses default roughness/AO (SSS still on)");
+    }
+
+    // Procedural blades (r__detail_gpu 1): vein detail map
+    resources::DDSData veinData;
+    if (resources::DDSLoader::LoadFromFile("shaders\\grass_vein", veinData) &&
+        veinData.isValid && !veinData.mipLevels.empty())
+    {
+        nvrhi::TextureDesc veinDesc;
+        veinDesc.width = veinData.desc.width;
+        veinDesc.height = veinData.desc.height;
+        veinDesc.depth = 1;
+        veinDesc.arraySize = 1;
+        veinDesc.mipLevels = veinData.desc.mipLevels;
+        veinDesc.format = veinData.desc.format;
+        veinDesc.dimension = nvrhi::TextureDimension::Texture2D;
+        veinDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        veinDesc.keepInitialState = true;
+        veinDesc.debugName = "GrassVein";
+
+        grassVeinTexture = device->createTexture(veinDesc);
+        if (grassVeinTexture)
+        {
+            for (u32 mip = 0; mip < veinData.mipLevels.size(); mip++)
+            {
+                const auto& ml = veinData.mipLevels[mip];
+                renderDevice->UploadTextureDataToNVRHI(grassVeinTexture, 0, mip, ml.data, ml.size, ml.rowPitch, 0);
+            }
+            if (GEnv.Backend)
+            {
+                grassVeinBindlessIndex = GEnv.Backend->RegisterBindlessTexture(grassVeinTexture);
+                Msg("* [FGDetailManager] shaders/grass_vein.dds loaded: %ux%u, bindless=%u",
+                    veinDesc.width, veinDesc.height, grassVeinBindlessIndex);
+            }
+        }
+    }
+    else
+    {
+        Msg("! [FGDetailManager] shaders/grass_vein.dds not found — procedural blades lose vein detail");
     }
 
     return true;
@@ -1370,6 +1471,11 @@ void FGDetailManager::DestroyGPUBuffers()
     pulledVertexBuffer = nullptr;
     pulledIndexBuffer = nullptr;
     buildDetailsTexture = nullptr;
+    buildDetailsPbrTexture = nullptr;
+    grassVeinTexture = nullptr;
+    buildDetailsBindlessIndex = 0;
+    buildDetailsPbrBindlessIndex = 0;
+    grassVeinBindlessIndex = 0;
 
     perlin4dTexture = nullptr;
     perlin4dComputeShader = nullptr;
@@ -2035,7 +2141,7 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
         return false;
     }
 
-    graphicsBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailGPU", *vsRefl, *psRefl, device);
+    graphicsBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailGPU_CSMLadder", *vsRefl, *psRefl, device);
     if (!graphicsBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create graphics binding layout");
@@ -2050,7 +2156,7 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
         return false;
     }
 
-    decalBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailDecal", *decalVsRefl, *decalPsRefl, device);
+    decalBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailDecal_CSMLadder", *decalVsRefl, *decalPsRefl, device);
     if (!decalBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create decal binding layout");
@@ -2140,7 +2246,7 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
         auto* bbVsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".vs");
         auto* bbPsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".ps");
         if (bbVsRefl && bbPsRefl)
-            billboardBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailBillboard", *bbVsRefl, *bbPsRefl, device);
+            billboardBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailBillboard_CSMLadder", *bbVsRefl, *bbPsRefl, device);
         if (!billboardBindingLayout)
             billboardBindingLayout = decalBindingLayout;
 

@@ -335,6 +335,13 @@ void FGEnvironmentRender::DrawSky(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
     auto dynamicCBBuffer = cache.GetOrCreateVolatileCB("FGEnv_Sky", "DynamicCB", sizeof(passes::DynamicTransforms), renderDevice);
     cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
+    // Horizon fog matched to distance-fog color so terrain→sky has no hard seam.
+    struct SkyFogCB { Fvector4 color; Fvector4 params; } skyFog;
+    skyFog.color.set(env.fog_color.x, env.fog_color.y, env.fog_color.z, 0.0f);
+    skyFog.params.set(0.22f, 1.0f, 0.0f, 0.0f); // band height, strength
+    auto skyFogCB = cache.GetOrCreateVolatileCB("FGEnv_Sky", "SkyFogCB", sizeof(SkyFogCB), renderDevice);
+    cmdList->writeBuffer(skyFogCB, &skyFog, sizeof(skyFog));
+
     nvrhi::ITexture* sky0Tex = nullptr;
     nvrhi::ITexture* sky1Tex = nullptr;
     auto* texManager = renderDevice->GetFGResourceManager()
@@ -358,6 +365,7 @@ void FGEnvironmentRender::DrawSky(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
 
     framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, m_device, "FGEnv_Sky");
     bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer);
+    bsb.ConstantBuffer("SkyFog", skyFogCB);
     bsb.Texture("s_sky0", sky0Tex);
     bsb.Texture("s_sky1", sky1Tex);
 
@@ -468,8 +476,10 @@ void FGEnvironmentRender::InitSunResources()
     renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::One);
     renderState.blendState.targets[0].setDestBlend(nvrhi::BlendFactor::One);
     renderState.blendState.targets[0].setBlendOp(nvrhi::BlendOp::Add);
-    renderState.depthStencilState.setDepthTestEnable(false);
+    // Depth-test so mountains/objects occlude the disc (classic). No depth write.
+    renderState.depthStencilState.setDepthTestEnable(true);
     renderState.depthStencilState.setDepthWriteEnable(false);
+    renderState.depthStencilState.setDepthFunc(nvrhi::ComparisonFunc::LessOrEqual);
     renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
 
     nvrhi::GraphicsPipelineDesc pipelineDesc;
@@ -482,6 +492,7 @@ void FGEnvironmentRender::InitSunResources()
 
     nvrhi::FramebufferInfoEx fbInfo;
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    fbInfo.depthFormat = nvrhi::Format::D32;
 
     m_sunPipeline = cache.GetOrCreatePipeline("FGEnv_Sun", pipelineDesc, fbInfo, m_device);
     R_ASSERT(m_sunPipeline);

@@ -32,7 +32,8 @@ struct ExtractedReflection
 /// Disk cache for compiled shader bytecode + reflection metadata
 /// Cache format: shaders_cache_fg/<shader_name>.<ext>/<content_hash>
 ///
-/// Binary format (CACHE_VERSION = 2):
+/// Binary format (CACHE_VERSION = 15):
+///   terrain hemi+lmap, water SSR/soft, wet v2, grass CSM cast
 ///   [4 bytes] Cache version
 ///   [4 bytes] Source hash (CRC32 of shader source + macros)
 ///   [4 bytes] Bytecode size
@@ -131,7 +132,7 @@ private:
         ExtractedReflection& outReflection
     );
 
-    static constexpr u32 CACHE_VERSION = 6;
+    static constexpr u32 CACHE_VERSION = 168; // grass SSS + vein CB + CoP billboard glow
     Stats m_stats;
     bool m_cacheEnabled;
     xr_string m_backendSubdir;

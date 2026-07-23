@@ -32,8 +32,8 @@ groupshared uint gs_histogram[64];
 
 float ComputeLuminance(float3 color)
 {
-    // ITU BT.709 luminance coefficients
-    return dot(color, float3(0.2126, 0.7152, 0.0722));
+    // Classic CoP LUMINANCE_VECTOR (common_defines.h) — not BT.709
+    return dot(color, float3(0.3, 0.38, 0.22));
 }
 
 uint ComputeBinIndex(float luminance)
@@ -77,13 +77,11 @@ void main(uint3 dispatch_id : SV_DispatchThreadID, uint group_index : SV_GroupIn
         // Compute luminance
         float luminance = ComputeLuminance(color.rgb);
 
-        // Skip very dark pixels (effectively transparent/sky)
-        if (luminance > 0.0001)
+        // Include dark pixels too (classic averages the whole bloom buffer;
+        // skipping them made night meter sky-only and blew exposure).
+        if (luminance >= 0.0)
         {
-            // Get bin index
-            uint binIndex = ComputeBinIndex(luminance);
-
-            // Atomically increment local histogram
+            uint binIndex = ComputeBinIndex(max(luminance, 0.00001));
             InterlockedAdd(gs_histogram[binIndex], 1);
         }
     }

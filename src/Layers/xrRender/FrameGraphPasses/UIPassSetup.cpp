@@ -109,12 +109,20 @@ framegraph::VirtualResourceHandle setupUIPass(
                 return;
             }
 
-            g_pGamePersistent->OnRenderPPUI_main();
+            // Record order = draw order (last on top):
+            //   in-game HUD → sequencers → loading → main menu → menu PP
+            uiRender->Clear();
+            IUIRender* oldRenderer = GEnv.UIRender;
+            GEnv.UIRender = uiRender;
+
             g_pGamePersistent->OnRenderInGameUI();
-            if (g_pGamePersistent->IsLoadingScreenShown()) {
-                g_pGamePersistent->load_draw_internal();
-            }
             g_pGamePersistent->OnRenderSequencers();
+            if (g_pGamePersistent->IsLoadingScreenShown())
+                g_pGamePersistent->load_draw_internal();
+            g_pGamePersistent->OnRenderPPUI_main();
+            g_pGamePersistent->OnRenderPPUI_PP();
+
+            GEnv.UIRender = oldRenderer;
 
             if (!uiRender->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};

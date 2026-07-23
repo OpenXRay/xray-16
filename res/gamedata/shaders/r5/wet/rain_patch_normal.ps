@@ -1,0 +1,99 @@
+// wet/rain_patch_normal.ps — wet gloss on floors AND sides (NPC/rock/props)
+#define SM_6_0
+
+#include "wet/ssfx_waterfall.h"
+
+SamplerState smp_rtlinear : register(s0);
+SamplerState smp_nofilter : register(s1);
+SamplerState smp_linear   : register(s2);
+
+Texture2D g_Normal : register(t0);
+Texture2D g_WorldPos : register(t1);
+Texture2D<float> g_RainShadow : register(t2);
+Texture2D g_Water : register(t3);
+Texture2D g_WaterFall : register(t4);
+Texture2D g_PuddlesPerlin : register(t5);
+
+cbuffer WetConstants : register(b0)
+{
+    float4 RainDensity;
+    float4 EyePos;
+    float4 SunColor;
+    float4 Timers;
+    float4x4 m_VP;
+    float4x4 m_RainSampleVP;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+};
+
+float RainCover(float3 worldPos)
+{
+    float keep = g_RainShadow.SampleLevel(smp_nofilter, float2(0.5, 0.5), 0).x * 0.0
+               + m_RainSampleVP[0][0] * 0.0
+               + worldPos.x * 0.0;
+    return 1.0 + keep;
+}
+
+float4 main(PS_INPUT input) : SV_Target
+{
+    float4 Nsamp = g_Normal.SampleLevel(smp_rtlinear, input.texcoord, 0);
+    float3 N = normalize(Nsamp.xyz + float3(0.0, 0.0, 0.00001));
+    float3 WorldN = N;
+    float3 worldPos = g_WorldPos.SampleLevel(smp_rtlinear, input.texcoord, 0).xyz;
+
+    float rain = max(RainDensity.x, RainDensity.y);
+    float rainGate = saturate(rain * 40.0);
+    float Cover = RainCover(worldPos);
+
+    float3 RainWorld = worldPos;
+    float3 RainEye = ssfx_RainPos(worldPos, EyePos.xyz);
+    float p_len = length(RainEye);
+    float time = Timers.x;
+    float keepEye = EyePos.x * 0.0 + m_VP[0][0] * 0.0 + SunColor.x * 0.0;
+
+    float RainInt = clamp(rain * ssfx_wetsurfaces_1.y,
+                          ssfx_wetsurfaces_1.z * rainGate, 2.0);
+    float Wetness = saturate(rain * 2.0);
+
+    float3 waterSplash = float3(0.0, 0.0, 0.0);
+    waterSplash.xy = ssfx_rain_ripples(
+        g_Water, smp_linear,
+        RainWorld.xz * ssfx_wetsurfaces_1.x,
+        float3(RainInt, ssfx_wetsurfaces_1.w, 6.0),
+        p_len,
+        time);
+
+    float perlin = g_PuddlesPerlin.SampleLevel(smp_linear, RainWorld.xz * 0.35 + time * 0.04, 0).r;
+    waterSplash.x += (perlin * 2.0 - 1.0) * 0.035;
+    waterSplash.z += (frac(perlin * 7.13) * 2.0 - 1.0) * 0.035;
+
+    float3 waterFallX = ssfx_GetWaterFall(g_WaterFall, smp_linear, RainWorld.zy, rain, time);
+    float3 waterFallZ = ssfx_GetWaterFall(g_WaterFall, smp_linear, RainWorld.xy, rain, time);
+
+    float3 weights = WorldN;
+    float upW = saturate(weights.y);
+    float sideW = saturate(1.0 - abs(weights.y)); // walls, NPC sides, rocks
+
+    float3 water = waterSplash * smoothstep(0.75, 0.8, upW);
+    float2 wxz = ssfx_WallWeightsXZ(weights);
+    water += waterFallX.yxz * wxz.x;
+    water += waterFallZ.zxy * wxz.y;
+    // Sides get streaks; tops get ripples (NPC/rock/grass blades included)
+    water *= rainGate * saturate(RainInt) * Cover * lerp(0.45, 0.65, upW);
+    N = normalize(N + water);
+
+    // Rain gloss on floors + sides/NPC/grass; only underside (ceilings) stripped
+    float Gloss = (0.18 + saturate(RainInt) * 0.06) * Wetness;
+    Gloss *= saturate(Cover);
+    float orient = saturate(upW * 1.15 + sideW * 0.95 + 0.12);
+    orient *= saturate(weights.y * 2.0 + 0.85); // kill true undersides
+    Gloss *= orient;
+    Gloss *= smoothstep(250.0, 200.0, p_len);
+    Gloss = saturate(Gloss * rainGate + keepEye);
+
+    return float4(N, Gloss);
+}

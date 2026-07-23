@@ -63,6 +63,8 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/ShaderConstants.cpp
     FrameGraphPasses/ForwardColorPassSetup.h
     FrameGraphPasses/ForwardColorPassSetup.cpp
+    FrameGraphPasses/DepthPrepassSetup.h
+    FrameGraphPasses/DepthPrepassSetup.cpp
     FrameGraphPasses/HiZBuildPassSetup.h
     FrameGraphPasses/HiZBuildPassSetup.cpp
     FrameGraphPasses/SkinningPassSetup.h
@@ -73,8 +75,20 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/StatGraphPassSetup.cpp
     FrameGraphPasses/DebugDrawPassSetup.h
     FrameGraphPasses/DebugDrawPassSetup.cpp
+    FrameGraphPasses/RainGPUSimManager.h
+    FrameGraphPasses/RainGPUSimManager.cpp
     FrameGraphPasses/RainPassSetup.h
     FrameGraphPasses/RainPassSetup.cpp
+    FrameGraphPasses/WetSurfacesPassSetup.h
+    FrameGraphPasses/WetSurfacesPassSetup.cpp
+    FrameGraphPasses/SceneReflectionPassSetup.h
+    FrameGraphPasses/SceneReflectionPassSetup.cpp
+    FrameGraphPasses/RainShadowPassSetup.h
+    FrameGraphPasses/RainShadowPassSetup.cpp
+    FrameGraphPasses/AmbientOcclusionPassSetup.h
+    FrameGraphPasses/AmbientOcclusionPassSetup.cpp
+    FrameGraphPasses/SunShaftsPassSetup.h
+    FrameGraphPasses/SunShaftsPassSetup.cpp
     FrameGraphPasses/ThunderboltPassSetup.h
     FrameGraphPasses/ThunderboltPassSetup.cpp
     FrameGraphPasses/LensFlarePassSetup.h
@@ -115,6 +129,19 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/ExposurePassSetup.cpp
     FrameGraphPasses/TonemapPassSetup.h
     FrameGraphPasses/TonemapPassSetup.cpp
+    FrameGraphPasses/VolumetricPassSetup.h
+    FrameGraphPasses/VolumetricPassSetup.cpp
+    FrameGraphPasses/ShadowPassSetup.h
+    FrameGraphPasses/ShadowPassSetup.cpp
+    FrameGraphPasses/LocalShadowPassSetup.h
+    FrameGraphPasses/LocalShadowPassSetup.cpp
+    FrameGraphPasses/ShadowCascadeFit.h
+    FrameGraphPasses/ShadowCascadeFit.cpp
+    Volumetrics/IVolumetricSource.h
+    Volumetrics/WorldFogSource.h
+    Volumetrics/WorldFogSource.cpp
+    Volumetrics/VolumetricRenderer.h
+    Volumetrics/VolumetricRenderer.cpp
     FrameGraphPasses/UIPassSetup.h
     FrameGraphPasses/UIPassSetup.cpp
     FrameGraphPasses/SkyPassSetup.h
@@ -136,6 +163,20 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/ReSTIRGIPassSetup.h
     FrameGraphPasses/ReSTIRGIPassSetup.cpp
     FrameGraphPasses/ClusterLightPassSetup.cpp
+    FrameGraphPasses/TAAPassSetup.h
+    FrameGraphPasses/TAAPassSetup.cpp
+    FrameGraphPasses/BloomPassSetup.h
+    FrameGraphPasses/BloomPassSetup.cpp
+    FrameGraphPasses/CASPassSetup.h
+    FrameGraphPasses/CASPassSetup.cpp
+    FrameGraphPasses/SSRPassSetup.h
+    FrameGraphPasses/SSRPassSetup.cpp
+    FrameGraphPasses/SSGIPassSetup.h
+    FrameGraphPasses/SSGIPassSetup.cpp
+    FrameGraphPasses/ContactShadowsPassSetup.h
+    FrameGraphPasses/ContactShadowsPassSetup.cpp
+    FrameGraphPasses/DofPassSetup.h
+    FrameGraphPasses/DofPassSetup.cpp
 
     RayTracing/RTAccelStructManager.h
     RayTracing/RTAccelStructManager.cpp
@@ -263,6 +304,7 @@ target_sources(xrRender PRIVATE
     r__scene.cpp
     r__scene.h
     r__sector.cpp
+    r__sector_traversal.cpp
     xrStripify.cpp
     BufferUtils.cpp
 

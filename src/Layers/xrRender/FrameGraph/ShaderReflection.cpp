@@ -1065,6 +1065,7 @@ static void FilterReflectionByUsage(ExtractedReflection& result, slang::ICompone
         return used;
     };
 
+    // Slang entry-point metadata can mark resources sampled only from helpers as unused.
     Msg("  [FilterReflection] Before: %u SRVs, %u UAVs, %u samplers, %u CBs",
         result.rtBindings.inputTextures.size(), result.rtBindings.uavBindings.size(),
         result.rtBindings.samplers.size(), result.constantLayout.constantBuffers.buffers.size());

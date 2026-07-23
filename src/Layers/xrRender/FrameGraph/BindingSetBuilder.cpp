@@ -149,9 +149,19 @@ int BindingSetBuilder::FindCBSlot(const char* name) const
 BindingSetBuilder& BindingSetBuilder::Texture(const char* name, nvrhi::ITexture* texture,
     nvrhi::Format format, nvrhi::TextureSubresourceSet subresources)
 {
-    int slot = FindSRVSlot(name);
-    if (slot >= 0)
-        m_desc.bindings.push_back(nvrhi::BindingSetItem::Texture_SRV(slot, texture, format, subresources));
+    // Bind every matching slot — VS+PS can declare the same name at different
+    // auto-assigned registers; binding only the first leaves layout holes (t27/t34).
+    bool found = false;
+    for (const auto& r : m_lists->srvs)
+    {
+        if (!NameMatches(r.name, name))
+            continue;
+        m_desc.bindings.push_back(nvrhi::BindingSetItem::Texture_SRV(
+            r.slot, texture, format, subresources));
+        found = true;
+    }
+    if (!found)
+        FindSRVSlot(name); // logs missing
     return *this;
 }
 

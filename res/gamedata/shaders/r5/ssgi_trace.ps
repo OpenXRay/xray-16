@@ -1,0 +1,131 @@
+// ssgi_trace.ps — screen-space GI gather (cosine hemisphere march)
+#define SM_6_0
+#include "common.h"
+#include "shared/ssr.h"
+
+Texture2D g_Color  : register(t0);
+Texture2D g_Normal : register(t1);
+Texture2D g_Base   : register(t2);
+// g_SceneColor / g_SceneDepth from ssr.h (t20/t21)
+
+cbuffer SSGIParams : register(b5)
+{
+    float intensity;
+    float maxDistance;
+    float thickness;
+    float rayCount; // as float for CB packing
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float Hash12(float2 p)
+{
+    float3 p3 = frac(float3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return frac((p3.x + p3.y) * p3.z);
+}
+
+float3 Hash3(float2 p)
+{
+    return float3(Hash12(p), Hash12(p + 17.1), Hash12(p + 91.7));
+}
+
+// Cosine-weighted hemisphere sample around N
+float3 SampleHemisphere(float3 N, float2 xi)
+{
+    float phi = 6.2831853 * xi.x;
+    float cosTheta = sqrt(xi.y);
+    float sinTheta = sqrt(1.0 - xi.y);
+    float3 up = abs(N.y) < 0.999 ? float3(0, 1, 0) : float3(1, 0, 0);
+    float3 T = normalize(cross(up, N));
+    float3 B = cross(N, T);
+    return normalize(T * (cos(phi) * sinTheta) + B * (sin(phi) * sinTheta) + N * cosTheta);
+}
+
+float4 TraceSSGI(float3 worldPos, float3 N, float2 uv)
+{
+    const int rays = clamp((int)rayCount, 2, 8);
+    const int steps = 12;
+    const float stepSize = maxDistance / float(steps);
+
+    float3 accum = 0.0;
+    float weightSum = 0.0;
+
+    [loop]
+    for (int r = 0; r < rays; ++r)
+    {
+        float2 xi = Hash3(uv * screen_res.xy + float2(float(r) * 37.1, timers.x * 17.3 + timers.w * 3.1)).xy;
+        xi.x = frac(xi.x + float(r) * 0.6180339 + timers.y * 0.01);
+        float3 dir = SampleHemisphere(N, xi);
+
+        float3 marchPos = worldPos + N * 0.05 + dir * (stepSize * (0.25 + xi.y * 0.5));
+        bool hit = false;
+        float2 hitUV = 0.0;
+        float hitDist = 0.0;
+
+        [loop]
+        for (int s = 0; s < steps; ++s)
+        {
+            float2 suv;
+            float w;
+            if (!WorldToUv(marchPos, suv, w))
+                break;
+            if (any(suv < 0.0) || any(suv > 1.0))
+                break;
+
+            float3 scenePos;
+            float rawD;
+            float sceneDist = SampleSceneDistance(suv, scenePos, rawD);
+            if (rawD >= 0.9995)
+            {
+                marchPos += dir * stepSize;
+                continue;
+            }
+
+            float marchDist = length(marchPos - eye_position);
+            float delta = marchDist - sceneDist;
+            if (delta > 0.0 && delta < thickness)
+            {
+                hit = true;
+                hitUV = suv;
+                hitDist = sceneDist;
+                break;
+            }
+            marchPos += dir * stepSize;
+        }
+
+        if (hit)
+        {
+            float3 hitColor = g_SceneColor.SampleLevel(smp_linear, hitUV, 0).rgb;
+            float3 hitBase = g_Base.SampleLevel(smp_linear, hitUV, 0).rgb;
+            // Mild albedo tint without full demodulation (avoids feedback blowup)
+            float3 bounce = hitColor * lerp(float3(1, 1, 1), saturate(hitBase * 1.5), 0.35);
+            float atten = rcp(1.0 + hitDist * 0.04);
+            float border = RayAttenBorder(hitUV, SSR_EDGE_ATTENUATION);
+            float w = atten * border;
+            accum += bounce * w;
+            weightSum += w;
+        }
+    }
+
+    if (weightSum < 1e-4)
+        return float4(0, 0, 0, 0);
+    return float4(accum / weightSum, 1.0);
+}
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float rawDepth = g_SceneDepth.SampleLevel(smp_nofilter, I.uv, 0).x;
+    if (rawDepth >= 0.9995)
+        return float4(0, 0, 0, 0);
+
+    float4 nSample = g_Normal.SampleLevel(smp_nofilter, I.uv, 0);
+    float3 N = normalize(nSample.xyz);
+    float2 ndc = float2(I.uv.x * 2.0 - 1.0, 1.0 - I.uv.y * 2.0);
+    float4 worldH = mul(m_InvVP, float4(ndc, rawDepth, 1.0));
+    float3 worldPos = worldH.xyz / max(worldH.w, 1e-5);
+
+    float4 gi = TraceSSGI(worldPos, N, I.uv);
+    gi.rgb *= intensity;
+    return gi;
+}

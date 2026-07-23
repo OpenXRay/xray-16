@@ -1,5 +1,9 @@
 #define SM_6_0
 #define CLUSTERED_LIGHTING_FORWARD
+#define CSM_SHADOW_FORWARD
+#define LOCAL_SHADOW_FORWARD
+#define CSM_CHEAP_FORWARD
+#define SKY_IBL
 #include "common.h"
 #include "bindless_common.h"
 
@@ -23,15 +27,9 @@ cbuffer DetailGlobals : register(b3)
 	float grass_blade_height;
 	uint build_details_index;
 	uint build_details_pbr_index;
+	uint grass_vein_index;
+	uint _pad0, _pad1, _pad2;
 };
-
-float3 ComputeBillboardSSS(float3 worldNormal, float3 lightDir, float heightParam)
-{
-	float backlit = saturate(dot(worldNormal, lightDir) * 0.5 + 0.5);
-	float thinness = heightParam;
-	float sssAmount = backlit * thinness * grass_sss_color.w;
-	return grass_sss_color.rgb * sssAmount;
-}
 
 f_forward main(p_billboard I)
 {
@@ -48,6 +46,7 @@ f_forward main(p_billboard I)
 	float metallic = 0.0;
 	float roughness = 0.85;
 	float ao = lerp(0.5, 1.0, saturate(t));
+	float hemi = I.position.w;
 
 	if (build_details_pbr_index != 0)
 	{
@@ -58,8 +57,12 @@ f_forward main(p_billboard I)
 		ao = pbr.b;
 	}
 
-	float3 sss = ComputeBillboardSSS(N, -L_sun_dir_w, t);
-	albedo += sss * L_sun_color;
+	// Alpha as thickness; tips thinner for stronger SSS
+	float thickness = saturate(lerp(0.45, 1.0, t) * saturate(texel.a + 0.35));
+	float sssAmt = max(grass_sss_color.w, 0.75);
 
-	return output_forward_pbr(albedo, N, I.position.xyz, metallic, roughness, ao, I.hpos);
+	return output_forward_pbr(
+		albedo, N, I.position.xyz, metallic, roughness, ao, I.hpos,
+		hemi, 1.0,
+		sssAmt, grass_sss_color.rgb, thickness);
 }

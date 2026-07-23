@@ -391,12 +391,12 @@ struct ParticleBlendDesc {
 };
 
 static const ParticleBlendDesc s_blendDescs[PARTICLE_BLEND_COUNT] = {
-    { nvrhi::BlendFactor::One,       nvrhi::BlendFactor::Zero,        nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero,        false, true,  "ParticlePass_set" },
-    { nvrhi::BlendFactor::SrcAlpha,  nvrhi::BlendFactor::InvSrcAlpha, nvrhi::BlendFactor::One, nvrhi::BlendFactor::InvSrcAlpha, true,  false, "ParticlePass_blend" },
-    { nvrhi::BlendFactor::One,       nvrhi::BlendFactor::One,         nvrhi::BlendFactor::One, nvrhi::BlendFactor::One,         true,  false, "ParticlePass_add" },
-    { nvrhi::BlendFactor::DstColor,  nvrhi::BlendFactor::Zero,        nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero,        true,  false, "ParticlePass_mul" },
-    { nvrhi::BlendFactor::DstColor,  nvrhi::BlendFactor::SrcColor,    nvrhi::BlendFactor::One, nvrhi::BlendFactor::SrcAlpha,    true,  false, "ParticlePass_mul2x" },
-    { nvrhi::BlendFactor::SrcAlpha,  nvrhi::BlendFactor::One,         nvrhi::BlendFactor::One, nvrhi::BlendFactor::One,         true,  false, "ParticlePass_alphaAdd" },
+    { nvrhi::BlendFactor::One,       nvrhi::BlendFactor::Zero,        nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero,        false, true,  "ParticlePass_set_v2" },
+    { nvrhi::BlendFactor::SrcAlpha,  nvrhi::BlendFactor::InvSrcAlpha, nvrhi::BlendFactor::One, nvrhi::BlendFactor::InvSrcAlpha, true,  false, "ParticlePass_blend_v2" },
+    { nvrhi::BlendFactor::One,       nvrhi::BlendFactor::One,         nvrhi::BlendFactor::One, nvrhi::BlendFactor::One,         true,  false, "ParticlePass_add_v2" },
+    { nvrhi::BlendFactor::DstColor,  nvrhi::BlendFactor::Zero,        nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero,        true,  false, "ParticlePass_mul_v2" },
+    { nvrhi::BlendFactor::DstColor,  nvrhi::BlendFactor::SrcColor,    nvrhi::BlendFactor::One, nvrhi::BlendFactor::SrcAlpha,    true,  false, "ParticlePass_mul2x_v2" },
+    { nvrhi::BlendFactor::SrcAlpha,  nvrhi::BlendFactor::One,         nvrhi::BlendFactor::One, nvrhi::BlendFactor::One,         true,  false, "ParticlePass_alphaAdd_v2" },
 };
 
 void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state)
@@ -465,6 +465,12 @@ void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::Framebuf
             pipeDesc.renderState.blendState.targets[0].destBlend = bd.destBlend;
             pipeDesc.renderState.blendState.targets[0].srcBlendAlpha = bd.srcBlendAlpha;
             pipeDesc.renderState.blendState.targets[0].destBlendAlpha = bd.destBlendAlpha;
+            // Transparent particles must NOT overwrite G-buffer RTs (normal /
+            // baseColor / worldPos). Classic particle.ps writes color only;
+            // leaking billboard worldPos/normal breaks soft particles + lighting
+            // (water splash / fountain / anomaly glow look "wrong").
+            for (u32 rt = 1; rt < 4; ++rt)
+                pipeDesc.renderState.blendState.targets[rt].setColorWriteMask(nvrhi::ColorMask(0));
         }
 
         state.pipelines[i] = cache.GetOrCreatePipeline(bd.name, pipeDesc, fbInfo, nvDevice);

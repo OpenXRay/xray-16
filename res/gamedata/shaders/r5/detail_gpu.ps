@@ -1,5 +1,9 @@
 #define SM_6_0
 #define CLUSTERED_LIGHTING_FORWARD
+#define CSM_SHADOW_FORWARD
+#define LOCAL_SHADOW_FORWARD
+#define CSM_CHEAP_FORWARD
+#define SKY_IBL
 #include "common.h"
 #include "bindless_common.h"
 
@@ -29,10 +33,15 @@ cbuffer DetailGlobals : register(b3)
     float4 grass_color_base;        // RGB + padding (blade base color)
     float4 grass_sss_color;         // RGB + intensity (subsurface scattering)
     float grass_color_variation;    // Per-blade color variation amount
-    uint current_lod_level;         // 0=close, 1=mid, 2=far (set per draw call)
-    uint debug_lod_colors;          // 1=show LOD debug colors, 0=normal rendering
-    float _pad0, _pad1;             // Padding to 16-byte alignment
+    float grass_blade_height;       // Blade height multiplier
+    uint build_details_index;
+    uint build_details_pbr_index;
+    uint grass_vein_index;
+    uint _pad0, _pad1, _pad2;
 };
+
+// Bindless texture indices for detail rendering — vein is in DetailGlobals now
+uniform int dm_debug_trails;
 
 // Per-object tint buffer (64 grass types)
 struct GrassObjectTint
@@ -41,25 +50,12 @@ struct GrassObjectTint
 };
 StructuredBuffer<GrassObjectTint> grass_object_tints : register(t34);
 
-// ══════════════════════════════════════════════════════════
-//  PROCEDURAL GRASS PBR MATERIAL PARAMETERS
-// ══════════════════════════════════════════════════════════
-
-// PBR Material properties for grass
-static const float GRASS_ROUGHNESS_BASE = 0.85;   // Base of blade is rough/matte
-static const float GRASS_ROUGHNESS_TIP = 0.55;    // Tips have waxy coating, slightly shinier
-static const float GRASS_METALLIC = 0.0;          // Organic material, never metallic
-
-// AO parameters
-static const float GRASS_AO_BASE = 0.35;          // Dark occlusion at blade base
-static const float GRASS_AO_TIP = 1.0;            // Full exposure at tip
-static const float GRASS_AO_POWER = 0.6;          // Curve falloff (lower = darker longer)
-
-// Bindless texture indices for detail rendering
-uniform uint grass_vein_index;         // Bindless index for grass vein texture
-
-// Phase 5: Grass interaction debug visualization
-uniform int dm_debug_trails;
+static const float GRASS_ROUGHNESS_BASE = 0.85;
+static const float GRASS_ROUGHNESS_TIP = 0.55;
+static const float GRASS_METALLIC = 0.0;
+static const float GRASS_AO_BASE = 0.35;
+static const float GRASS_AO_TIP = 1.0;
+static const float GRASS_AO_POWER = 0.6;
 
 float SampleGrassInteraction(float2 atlas_uv)
 {
@@ -101,18 +97,8 @@ float ComputeGrassAO(float heightParam, float veinDetail, float widthPercent)
     return heightAO * edgeAO * microAO;
 }
 
-// Simple subsurface scattering approximation for grass
-float3 ComputeGrassSSS(float3 worldNormal, float3 lightDir, float heightParam)
-{
-    // SSS is stronger at thin blade tips and when backlit
-    float backlit = saturate(dot(worldNormal, lightDir) * 0.5 + 0.5);
-    float thinness = heightParam;  // Tips are thinner
-
-    // Use SSS color and intensity from constant buffer
-    float sssIntensity = grass_sss_color.w;
-    float sssAmount = backlit * thinness * sssIntensity;
-    return grass_sss_color.rgb * sssAmount;
-}
+// Simple subsurface scattering approximation for grass — removed (uses output_forward_pbr SSS)
+// Height-based thickness: tips thinner
 
 f_forward main(p_flat I)
 {
@@ -133,9 +119,13 @@ f_forward main(p_flat I)
     float t = I.heightParam;
 
     // ===== VEIN DETAIL TEXTURE (BINDLESS) =====
-    Texture2D vein_tex = GetBindlessTexture(grass_vein_index);
-    float4 vein_detail = vein_tex.Sample(smp_linear, I.tcdh.xy);
-    float veinValue = vein_detail.a;  // Use alpha for detail intensity
+    float4 vein_detail = float4(1.0, 1.0, 1.0, 0.0);
+    if (grass_vein_index != 0)
+    {
+        Texture2D vein_tex = GetBindlessTexture(grass_vein_index);
+        vein_detail = vein_tex.Sample(smp_linear, I.tcdh.xy);
+    }
+    float veinValue = vein_detail.a;
 
     // ===== PROCEDURAL GRASS ALBEDO =====
     // Get colors from constant buffer
@@ -174,8 +164,14 @@ f_forward main(p_flat I)
     float3 midColor = (grass_color_base.rgb + grass_color_tip.rgb) * 0.5;
     grassAlbedo = lerp(midColor, grassAlbedo, distFade);
 
-    float3 sss = ComputeGrassSSS(N, -L_sun_dir_w, t);
-    float3 finalAlbedo = grassAlbedo + sss * L_sun_color;
+    // Tips + blade edges are thinner → stronger SSS; vein.a as future thickness map hook
+    float thickness = saturate(lerp(0.55, 1.0, t) * lerp(0.85, 1.0, abs(widthPercent - 0.5) * 2.0));
+    thickness *= lerp(1.0, veinValue + 0.5, 0.25);
 
-    return output_forward_pbr(finalAlbedo, N, I.position.xyz, metallic, roughness, ao, I.hpos);
+    // VS packs slot hemi in position.w (same as detail_billboard)
+    float hemi = I.position.w;
+    return output_forward_pbr(
+        grassAlbedo, N, I.position.xyz, metallic, roughness, ao, I.hpos,
+        hemi, 1.0,
+        grass_sss_color.w, grass_sss_color.rgb, thickness);
 }

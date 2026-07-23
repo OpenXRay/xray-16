@@ -50,7 +50,8 @@ void setupDetailCullPass(
         [&, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, capturedPrevViewProj, hasPrevViewProj, gpuProfiler, detailState](
             FrameGraph& builder, PassHandle passHandle, DetailCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
+            // Run on graphics queue so CascadedShadows (grass cast) sees fresh instances.
+            // Async compute has no FG dependency into the shadow pass.
             passBuilder.sideEffects();
 
             data.device = device;
