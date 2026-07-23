@@ -16,6 +16,11 @@ Externals/rafx/
 Externals/rafx-proj/
 .tmp_classic_sun/
 
+# Local WIP / machine-specific (not for the framegraph branch)
+framegraph_docs/STATUS.md
+.DS_Store
+**/.DS_Store
+
 # User-specific files
 *.user
 *.user.props
