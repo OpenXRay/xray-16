@@ -189,7 +189,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
             bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
 
-            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
+            auto transparentBindDesc = bsb.Build();
+            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(transparentBindDesc, data.passState->layout, nvDevice);
             R_ASSERT2(bindingSet, "Transparent binding set creation failed");
 
             nvrhi::GraphicsState state;
@@ -226,13 +227,9 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 vpCfg.passLayout = data.passState->layout;
                 vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
                 vpCfg.bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
-                vpCfg.sampler = data.passState->sampler;
-                vpCfg.staticGlobalsCB = staticGlobalsCB;
-                vpCfg.lightingCB = lightingCB;
-                vpCfg.materialBuffer = matBuffer.GetBuffer();
-                vpCfg.variantTexBuffer = variantTexBuffer.GetBuffer();
-                vpCfg.instanceBuffer = cfg.instanceBuffer;
                 vpCfg.megaVertexBuffer = cfg.megaVertexBuffer;
+                vpCfg.baseBindings = transparentBindDesc;
+                vpCfg.objectCount = cfg.objectCount;
                 vpCfg.partition = cfg.variantPartition;
                 vpCfg.selectTransparent = true;
 
