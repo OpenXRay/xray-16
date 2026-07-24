@@ -1,0 +1,7 @@
+{
+    "sorting": { "priority": 1, "backToFront": false },
+    "fog": false,
+    "wmark": true,
+    "blend": { "src": "DstColor", "dst": "SrcColor" },
+    "depth": { "test": true, "write": false }
+}
