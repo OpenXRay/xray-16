@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/FrameGraphPasses/PassCommon.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 
 namespace xray::render
 {
@@ -142,6 +143,29 @@ void DrawVariantPartition(
 
     const auto& p = cfg.partition;
 
+    nvrhi::BindingSetDesc bindDesc = cfg.baseBindings;
+    bool foundBatch = false, foundMat = false;
+    for (auto& item : bindDesc.bindings) {
+        if (item.type == nvrhi::ResourceType::StructuredBuffer_SRV && item.slot == 15) {
+            item.resourceHandle = p.batchIndicesBuffer;
+            foundBatch = true;
+        } else if (item.type == nvrhi::ResourceType::StructuredBuffer_SRV && item.slot == 16) {
+            item.resourceHandle = p.materialIDsBuffer;
+            foundMat = true;
+        }
+    }
+    if (!foundBatch || !foundMat) {
+        Msg("! [VariantPSO] partition draw: compact index/material slots missing in base bindings");
+        return;
+    }
+    auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, cfg.passLayout, nvDevice);
+    if (!bindingSet) {
+        Msg("! [VariantPSO] partition binding set creation failed");
+        return;
+    }
+
+    const u32 maxDraws = (cfg.objectCount && cfg.objectCount < p.binCapacity) ? cfg.objectCount : p.binCapacity;
+
     for (u32 v = 0; v < p.variantCount; v++) {
         nvrhi::IGraphicsPipeline* pso;
         if (v == 0) {
@@ -154,20 +178,6 @@ void DrawVariantPartition(
                 cfg.inputLayout, cfg.passLayout, cfg.bindlessLayout);
             if (!pso) continue;
         }
-
-        nvrhi::BindingSetDesc bindDesc;
-        bindDesc.bindings = {
-            nvrhi::BindingSetItem::ConstantBuffer(2, cfg.staticGlobalsCB),
-            nvrhi::BindingSetItem::ConstantBuffer(4, cfg.lightingCB),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(8, cfg.materialBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(10, cfg.variantTexBuffer),
-            nvrhi::BindingSetItem::Sampler(0, cfg.sampler),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(14, cfg.instanceBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(15, p.batchIndicesBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(16, p.materialIDsBuffer),
-        };
-        auto bindingSet = nvDevice->createBindingSet(bindDesc, cfg.passLayout);
-        if (!bindingSet) continue;
 
         state.pipeline = pso;
         state.bindings = { bindingSet };
@@ -185,7 +195,7 @@ void DrawVariantPartition(
             cmdList,
             v * p.binCapacity * sizeof(fg::IndirectDrawArgs),
             v * sizeof(u32),
-            p.binCapacity);
+            maxDraws);
     }
 
     cmdList->setBufferState(p.drawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);

@@ -190,7 +190,7 @@ static void renderBindlessForward(
 
     auto& clm = ClusteredLightManager::Instance();
 
-    auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
+    auto buildBindingDescForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetDesc {
         framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "ForwardColor");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
         bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
@@ -200,8 +200,11 @@ static void renderBindlessForward(
         bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
         bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
         bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+        return bsb.Build();
+    };
 
-        return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), ps.bindlessLayout, nvDevice);
+    auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
+        return framegraph::GetPassResourceCache().GetOrCreateBindingSet(buildBindingDescForSet(set), ps.bindlessLayout, nvDevice);
     };
 
     // ═══════════════════════════════════════════════════════
@@ -279,13 +282,9 @@ static void renderBindlessForward(
         vpCfg.passLayout = ps.bindlessLayout;
         vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
         vpCfg.bindlessTable = bindlessTable;
-        vpCfg.sampler = ps.linearSampler;
-        vpCfg.staticGlobalsCB = staticGlobalsCB;
-        vpCfg.lightingCB = lightingCB;
-        vpCfg.materialBuffer = matBuffer.GetBuffer();
-        vpCfg.variantTexBuffer = variantTexBuffer.GetBuffer();
-        vpCfg.instanceBuffer = config.staticSet.instanceBuffer;
         vpCfg.megaVertexBuffer = config.megaVertexBuffer;
+        vpCfg.baseBindings = buildBindingDescForSet(config.staticSet);
+        vpCfg.objectCount = config.staticSet.totalObjectCount;
         vpCfg.partition = config.variantPartition;
         vpCfg.selectTransparent = false;
 
