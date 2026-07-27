@@ -1311,6 +1311,12 @@ void CScriptGameObject::SuppressAutoStackOnce()
     item->SetSuppressAutoStackOnce();
 }
 
+bool CScriptGameObject::IsSuppressingAutoStackScript()
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    return item && item->IsSuppressingAutoStack();
+}
+
 u16 CScriptGameObject::AmmoBoxSize()
 {
     CWeaponAmmo* ammo = smart_cast<CWeaponAmmo*>(&object());

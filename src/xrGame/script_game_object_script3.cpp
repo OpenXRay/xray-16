@@ -475,6 +475,7 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
 
         // For InventoryItem
         .def("suppress_auto_stack_once", &CScriptGameObject::SuppressAutoStackOnce)
+        .def("is_suppressing_auto_stack", &CScriptGameObject::IsSuppressingAutoStackScript)
 
         // For Weapons
         .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
