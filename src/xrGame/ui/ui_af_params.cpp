@@ -3,6 +3,7 @@
 #include "xrUICore/Static/UIStatic.h"
 #include "Actor.h"
 #include "ActorCondition.h"
+#include "Artefact.h"
 #include "inventory_item.h"
 #include "Common/object_broker.h"
 #include "UIXmlInit.h"
@@ -87,7 +88,8 @@ bool CUIArtefactParams::InitFromXml(CUIXml& xml)
     };
 
     //Alundaio: Show AF Condition
-    m_disp_condition = create_item("condition", "ui_inv_af_condition");
+    const auto condition_caption = StringTable().translate("ui_inv_af_condition").c_str();
+    m_disp_condition = create_item("condition", condition_caption);
     //-Alundaio
 
     for (auto [id, section, actor_condition, caption_id, magnitude, sign_inverse, unit] : af_restore)
@@ -128,6 +130,11 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
     const auto& condition_sect = pSettings->read_if_exists<pcstr>(actor_sect, "condition_sect", actor_sect);
     const auto& hit_absorbation_sect = pSettings->r_string(af_section, "hit_absorbation_sect");
 
+    // Dead Air can tune an artefact instance's effect magnitudes at runtime (e.g. IAM mutations),
+    // overriding the static config via CArtefact::Set*Power/SetAdditionalWeight/SetArtefactImmunity.
+    // Prefer those live values so the tooltip matches what the item actually does, not just its base template.
+    const CArtefact* af = smart_cast<CArtefact*>(const_cast<CInventoryItem*>(&pInvItem));
+
     float h = 0.0f;
     if (m_Prop_line)
         h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
@@ -156,7 +163,22 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
         if (!m_restore_item[id])
             continue;
 
-        float val = pSettings->r_float(af_section, restore_section);
+        float val;
+        if (af)
+        {
+            switch (id)
+            {
+            case ALife::eHealthRestoreSpeed:    val = af->GetHealthPower();    break;
+            case ALife::eSatietyRestoreSpeed:   val = af->GetSatietyPower();   break;
+            case ALife::ePowerRestoreSpeed:     val = af->GetPowerPower();     break;
+            case ALife::eBleedingRestoreSpeed:  val = af->GetBleedingPower();  break;
+            case ALife::eRadiationRestoreSpeed: val = af->GetRadiationPower(); break;
+            default:                            val = pSettings->r_float(af_section, restore_section); break;
+            }
+        }
+        else
+            val = pSettings->r_float(af_section, restore_section);
+
         if (fis_zero(val))
             continue;
 
@@ -169,8 +191,10 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
         setValue(m_restore_item[id], val);
     }
 
-    CHitImmunity immunities;
-    immunities.LoadImmunities(hit_absorbation_sect, pSettings, is_soc);
+    CHitImmunity static_immunities;
+    if (!af)
+        static_immunities.LoadImmunities(hit_absorbation_sect, pSettings, is_soc);
+    const CHitImmunity& immunities = af ? af->m_ArtefactHitImmunities : static_immunities;
 
     for (auto [id, immunity_section, immunity_caption, magnitude, sign_inverse, unit] : af_immunity)
     {
@@ -192,7 +216,7 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
 
     if (m_additional_weight)
     {
-        float val = pSettings->r_float(af_section, "additional_inventory_weight");
+        float val = af ? af->AdditionalInventoryWeight() : pSettings->r_float(af_section, "additional_inventory_weight");
         if (!fis_zero(val))
         {
             val *= pInvItem.GetCondition();
