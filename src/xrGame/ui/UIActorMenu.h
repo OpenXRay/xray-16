@@ -189,6 +189,7 @@ protected:
     CUI3tButton* m_trade_button{};
     CUI3tButton* m_trade_buy_button{};
     CUI3tButton* m_trade_sell_button{};
+    CUI3tButton* m_trade_barter_button{}; // Dead Air: goods-for-goods exchange, no money
     CUI3tButton* m_takeall_button{};
     CUI3tButton* m_exit_button{};
 
@@ -199,6 +200,8 @@ protected:
 protected:
     u32 m_last_time;
     bool m_repair_mode;
+    // Dead Air: current trade partner only barters (set on entering mmTrade)
+    bool m_trade_barter_mode{};
     bool m_item_info_view;
     bool m_highlight_clear;
     u32 m_trade_partner_inventory_state;
@@ -358,7 +361,8 @@ protected:
     u32 CalcItemsPrice(CUIDragDropListEx* pList, CTrade* pTrade, bool bBuying);
     void UpdatePrices();
     bool CanMoveToPartner(PIItem pItem);
-    void TransferItems(CUIDragDropListEx* pSellList, CUIDragDropListEx* pBuyList, CTrade* pTrade, bool bBuying);
+    void TransferItems(
+        CUIDragDropListEx* pSellList, CUIDragDropListEx* pBuyList, CTrade* pTrade, bool bBuying, bool bFree = false);
 
 public:
     CUIActorMenu();
@@ -396,6 +400,7 @@ public:
     void OnBtnPerformTrade(CUIWindow* w, void* d);
     void OnBtnPerformTradeBuy(CUIWindow* w, void* d);
     void OnBtnPerformTradeSell(CUIWindow* w, void* d);
+    void OnBtnPerformBarter(CUIWindow* w, void* d);
     void OnBtnExitClicked(CUIWindow* w, void* d);
     void TakeAllFromPartner(CUIWindow* w, void* d);
     void StoreAllToPartner(CUIWindow* w, void* d);

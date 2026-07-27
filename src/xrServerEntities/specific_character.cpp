@@ -76,6 +76,7 @@ void CSpecificCharacter::load_shared(LPCSTR)
     data()->m_fHitProbabilityFactor = pXML->ReadFlt("hit_probability_factor", 0, 1.f);
     data()->m_crouch_type = pXML->ReadInt("crouch_type", 0, 0);
     data()->m_upgrade_mechanic = (pXML->ReadInt("mechanic_mode", 0, 0) == 1);
+    data()->m_barter_mode = (pXML->ReadInt("barter_mode", 0, 0) == 1);
 
     data()->m_critical_wound_weights = pXML->Read("critical_wound_weights", 0, "1");
 
@@ -160,6 +161,7 @@ float CSpecificCharacter::panic_threshold() const { return data()->m_fPanic_thre
 float CSpecificCharacter::hit_probability_factor() const { return data()->m_fHitProbabilityFactor; }
 int CSpecificCharacter::crouch_type() const { return data()->m_crouch_type; }
 bool CSpecificCharacter::upgrade_mechanic() const { return data()->m_upgrade_mechanic; }
+bool CSpecificCharacter::barter_mode() const { return data()->m_barter_mode; }
 LPCSTR CSpecificCharacter::critical_wound_weights() const { return data()->m_critical_wound_weights.c_str(); }
 
 shared_str CSpecificCharacter::terrain_sect() const { return data()->m_terrain_sect; }

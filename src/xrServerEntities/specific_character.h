@@ -32,6 +32,8 @@ struct SSpecificCharacterData : CSharedResource
     float m_fHitProbabilityFactor{ 1.f };
     int m_crouch_type{};
     bool m_upgrade_mechanic{};
+    // Dead Air: this character trades goods-for-goods only, never for money
+    bool m_barter_mode{};
 
     xr_string m_critical_wound_weights;
 
@@ -127,6 +129,7 @@ public:
     float hit_probability_factor() const;
     int crouch_type() const;
     bool upgrade_mechanic() const;
+    bool barter_mode() const;
     LPCSTR critical_wound_weights() const;
 
     const shared_str& IconName() const { return data()->m_icon_name; };
