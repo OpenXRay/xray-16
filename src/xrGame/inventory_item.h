@@ -140,19 +140,6 @@ public:
     BOOL GetDropManual() const { return m_flags.test(FdropManual); }
     void SetDropManual(BOOL val);
 
-    // Suppresses this item from being matched as an inventory-list auto-stack target/source for a short,
-    // fixed window (see .cpp) rather than a stateful flag - a single scripted split's resulting pickup can
-    // trigger several internal merge-attempt calls (and this item's own UI cell is never re-inserted after
-    // a split, only mutated in place, so there's no reliable "placement" event to clear a flag on). Time-
-    // based expiry means it protects the whole split-then-repick-up sequence without ever getting stuck on.
-    void SetSuppressAutoStackOnce();
-    bool IsSuppressingAutoStack() const;
-
-protected:
-    u32 m_dwSuppressAutoStackUntil{};
-
-public:
-
     BOOL IsInvalid() const;
 
     BOOL IsQuestItem() const { return m_flags.test(FIsQuestItem); }

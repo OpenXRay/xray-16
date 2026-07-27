@@ -1467,14 +1467,4 @@ void CInventoryItem::SetDropManual(BOOL val)
     }
 }
 
-void CInventoryItem::SetSuppressAutoStackOnce()
-{
-    // 2s is generous enough for the split's freshly-spawned other half to be auto-picked-up and re-inserted
-    // into the same list on a nearby frame, but short enough that it never meaningfully blocks a later,
-    // genuinely-intentional merge of this same item.
-    m_dwSuppressAutoStackUntil = Device.dwTimeGlobal + 2000;
-}
-
-bool CInventoryItem::IsSuppressingAutoStack() const { return Device.dwTimeGlobal < m_dwSuppressAutoStackUntil; }
-
 bool CInventoryItem::has_network_synchronization() const { return false; }

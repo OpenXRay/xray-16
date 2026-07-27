@@ -879,11 +879,6 @@ public:
     void AmmoSetCount(u16 count);
     u16 AmmoBoxSize();
 
-    // CInventoryItem: suppress the next inventory-list auto-stack check for this item once
-    // (used after a scripted split so the two halves don't immediately re-merge).
-    void SuppressAutoStackOnce();
-    bool IsSuppressingAutoStackScript();
-
     // Weapon & Outfit
     bool AddUpgrade(pcstr upgrade);
     bool InstallUpgrade(pcstr upgrade);
