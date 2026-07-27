@@ -1043,7 +1043,9 @@ float CActor::currentFOV()
     if (eacFirstEye == cam_active && pWeapon && pWeapon->IsZoomed() &&
         (!pWeapon->ZoomTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture())))
     {
-        return pWeapon->GetZoomFactor() * (0.75f);
+        // Dead Air's weapon configs express ironsight/scope zoom as a divisor against the base FOV
+        // (e.g. ironsight_zoom_factor ~1.8, scopes ~6-20), not as an absolute target FOV in degrees.
+        return (g_fov / pWeapon->GetZoomFactor()) * 0.75f;
     }
     else
     {
