@@ -334,31 +334,32 @@ float UICore::get_current_kx()
 
 shared_str UICore::get_xml_name(pcstr path, pcstr fn)
 {
-    string_path str;
-    if (!is_widescreen())
-    {
-        xr_sprintf(str, "%s", fn);
-        if (NULL == strext(fn))
-            xr_strcat(str, ".xml");
-    }
-    else
-    {
-        if (strext(fn))
-        {
-            xr_strcpy(str, fn);
-            *strext(str) = 0;
-            xr_strcat(str, "_16.xml");
-        }
-        else
-            xr_sprintf(str, "%s_16", fn);
+    // Normalized plain (non-widescreen) name.
+    string_path plain;
+    xr_strcpy(plain, fn);
+    if (nullptr == strext(plain))
+        xr_strcat(plain, ".xml");
 
-        string_path str_;
-        if (!FS.exist(str_, "$game_config$", path, str))
-        {
-            xr_sprintf(str, "%s", fn);
-            if (nullptr == strext(fn))
-                xr_strcat(str, ".xml");
-        }
-    }
-    return str;
+    // Widescreen ("_16") name. NOTE: the stock code built this WITHOUT the extension when the
+    // caller passed an extension-less name, so the FS.exist() probe below could never succeed
+    // for those callers. Always build "<name>_16.xml".
+    string_path wide;
+    xr_strcpy(wide, plain);
+    *strext(wide) = 0;
+    xr_strcat(wide, "_16.xml");
+
+    // Dead Air / DeadZone maintains ONLY the "_16" UI layouts: the non-widescreen files still in
+    // the archives are stale leftovers from the mod's base (different skin, missing nodes, and in
+    // several cases whole features the mod replaced - e.g. ui_mm_faction_select.xml is still the
+    // old CoC faction picker, actor_menu.xml has no backpack/sidearm/binocular slots, and
+    // ui_mm_main.xml has no <background_words> so it hard-errors in CUIXmlInitBase::InitWindow).
+    // Selecting them by aspect ratio therefore swapped the whole UI for a broken one as soon as a
+    // 4:3 / 5:4 resolution was picked. Prefer the maintained layout at every aspect ratio and fall
+    // back to the plain file only when no "_16" variant exists (that is the common case, and it
+    // keeps behavior identical to stock for every file that has no widescreen variant).
+    string_path tmp;
+    if (FS.exist(tmp, "$game_config$", path, wide))
+        return wide;
+
+    return plain;
 }
