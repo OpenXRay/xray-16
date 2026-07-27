@@ -92,11 +92,11 @@ void ui_actor_state_wnd::UpdateActorInfo(CInventoryOwner* owner)
 
     const auto& conditions = actor->conditions();
 
-    // show stamina icon
-    value = conditions.GetPower();
+    // Dead Air repurposed this bar/tooltip (stt_stamina, "stamina_state" in actor_menu_16.xml) to show
+    // satiety ("st_ui_stamina_sensor_inv" is localized as satiety/hunger text), but the binding here was
+    // left showing stamina (Power), so the inventory bar displayed the wrong stat entirely.
+    value = conditions.GetSatiety();
     m_state[stt_stamina]->set_progress(value);
-
-    value = actor->GetRestoreSpeed(ALife::ePowerRestoreSpeed);
     m_state[stt_stamina]->set_text(value); // 0..0.99
 
     // show health icon
