@@ -205,7 +205,7 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
         // Dead Air: sidearm slot (base 5) and grenade/binocular slot (base 4). Optional so
         // layouts without these controls (4:3 actor_menu.xml) still load.
-        { eInventorySidearmList,   "dragdrop_sidearm",         nullptr,               "sidearm_highlight",       nullptr,            false },
+        { eInventorySidearmList,   "dragdrop_sidearm",         "progess_bar_sidearm", "sidearm_highlight",       nullptr,            false },
         { eInventoryGrenadeList,   "dragdrop_binocular",       nullptr,               "binocular_slot_highlight",nullptr,            false },
 
         { eInventoryOutfitList,    "dragdrop_outfit",          "progess_bar_outfit",  "outfit_slot_highlight",   nullptr,            true },
@@ -227,7 +227,7 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
         { eTrashList,              "dragdrop_trash",           nullptr,               nullptr,                   nullptr,            false },
 
-        { eInventoryBackpackList,  "dragdrop_backpack",        nullptr,               "backpack_slot_highlight", nullptr,            false },
+        { eInventoryBackpackList,  "dragdrop_backpack",        "progess_bar_backpack","backpack_slot_highlight", nullptr,            false },
     };
     static_assert(std::size(inventory_lists) == eListCount,
         "All lists should be listed in the tuple above.");
