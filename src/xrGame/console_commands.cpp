@@ -1486,6 +1486,8 @@ public:
     CCC_MainMenu(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
     virtual void Execute(LPCSTR args)
     {
+        Msg("[ESCDBG] CCC_MainMenu::Execute args='%s' IsActive=%d frame=%d", args, MainMenu()->IsActive(),
+            Device.dwFrame);
         bool bWhatToDo = TRUE;
         if (0 == xr_strlen(args))
         {

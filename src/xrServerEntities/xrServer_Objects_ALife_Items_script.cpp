@@ -81,6 +81,7 @@ void CSE_ALifeItemWeapon::script_register(lua_State* luaState)
             .def("set_ammo_elapsed", &CSE_ALifeItemWeapon::set_ammo_elapsed)
             .def("get_ammo_elapsed", &CSE_ALifeItemWeapon::get_ammo_elapsed)
             .def("get_ammo_magsize", &CSE_ALifeItemWeapon::get_ammo_magsize)
+            .def("get_addon_flags", &CSE_ALifeItemWeapon::get_addon_flags)
     ];
 }
 

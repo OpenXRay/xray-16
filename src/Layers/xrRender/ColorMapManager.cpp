@@ -20,6 +20,10 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
     if (strTexName == m_strCMap[iTex])
         return;
 
+    Msg("[PPDBG] ColorMap slot=%d '%s' -> '%s' (cached=%d)", iTex,
+        m_strCMap[iTex].c_str() ? m_strCMap[iTex].c_str() : "", strTexName.c_str() ? strTexName.c_str() : "",
+        strTexName.size() ? (int)(m_TexCache.find(strTexName) != m_TexCache.end()) : -1);
+
     m_strCMap[iTex] = strTexName;
 
     if (strTexName.size())

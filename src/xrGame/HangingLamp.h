@@ -42,6 +42,7 @@ public:
     virtual ~CHangingLamp();
     void TurnOn();
     void TurnOff();
+    bool is_on() const { return !!m_bState; } // Dead Air scripts query lamp on-state
     virtual void Load(LPCSTR section);
     virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();

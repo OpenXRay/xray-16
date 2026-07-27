@@ -1445,8 +1445,53 @@ u32 CScriptGameObject::PlayHudMotion(pcstr M, bool mixIn, u32 state)
     return itm->PlayHUDMotion(M, mixIn, itm, state);
 }
 
+// HUD-item states are exchanged with Lua as raw integers, and OpenXRay does NOT number them the way the
+// engine these scripts were written for does. Retail X-Ray (CoP/CoC 1.4.22, what Dead Air targets) has
+//     eIdle=0, eShowing=1, eHiding=2, eHidden=3, eBore=4
+// while this engine's CHUDState::EHudStates is
+//     eHidden=0, eIdle=1, eShowing=2, eHiding=3, eBore=4
+// -- the four base states are permuted. (Everything from eBore on, including the weapon states eFire=5 /
+// eReload=7 etc., lines up in both, which is why weapon-state scripts were never affected and this went
+// unnoticed.) The mod's own `xrs_debug_tools.script` documents the numbering it expects, so there is no
+// ambiguity about which side is "right" for this content.
+//
+// Symptom this caused: `itms_manager.script` lights the hand flashlight and the lighter only while
+// `obj:get_state() == 0`, meaning eIdle -- device drawn and idle in hand. Here 0 is eHidden and a drawn
+// device reports 1, so the test never passed and neither item ever emitted light, in any headlamp state.
+// Glowsticks were unaffected because their branch has no state test.
+//
+// Translate at the script boundary rather than renumbering the engine enum: the enum is used symbolically
+// in hundreds of places in C++ (and eHidden==0 is load-bearing for zero-initialized state), whereas the
+// Lua-visible integer is only produced/consumed here and in SwitchState. The permutation is its own
+// inverse direction-wise, so one table each way.
+static u32 hud_state_to_script(u32 s)
+{
+    switch (s)
+    {
+    case CHUDState::eHidden: return 3;
+    case CHUDState::eIdle: return 0;
+    case CHUDState::eShowing: return 1;
+    case CHUDState::eHiding: return 2;
+    default: return s; // eBore and everything above it (weapon states) already agree
+    }
+}
+
+static u32 hud_state_from_script(u32 s)
+{
+    switch (s)
+    {
+    case 0: return CHUDState::eIdle;
+    case 1: return CHUDState::eShowing;
+    case 2: return CHUDState::eHiding;
+    case 3: return CHUDState::eHidden;
+    default: return s;
+    }
+}
+
 void CScriptGameObject::SwitchState(u32 state)
 {
+    state = hud_state_from_script(state);
+
     CWeapon* Weapon = object().cast_weapon();
     if (Weapon)
     {
@@ -1464,12 +1509,12 @@ void CScriptGameObject::SwitchState(u32 state)
 u32 CScriptGameObject::GetState()
 {
     if (const auto weapon = object().cast_weapon())
-        return weapon->GetState();
+        return hud_state_to_script(weapon->GetState());
 
     if (CInventoryItem* IItem = object().cast_inventory_item())
     {
         if (const auto itm = IItem->cast_hud_item())
-            return itm->GetState();
+            return hud_state_to_script(itm->GetState());
     }
 
     return 65535;

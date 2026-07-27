@@ -145,7 +145,18 @@ void CUIComboBox::SetCurrentOptValue()
     m_list_box.Clear();
     const xr_token* tok = GetOptToken();
 
-	R_ASSERT3(tok, "Option token doesnt exist:", m_entry.c_str());
+    // Dead Air / OpenXRay port tolerance: some combos in ui_mm_opt_*.xml bind to console
+    // commands that are either missing here or not token-typed (e.g. the renamed/absent
+    // r2_shadow_map_size, or CCC_Mask on/off commands like r2_sun_shafts / r3_msaa).
+    // Rather than a hard fatal that blocks the whole Options menu, leave this one combo
+    // empty and keep going (mirrors CUITabControl::SetCurrentOptValue's tolerant handling).
+    if (!tok)
+    {
+        Msg("! [UIComboBox] option token doesnt exist, leaving combo empty: %s", m_entry.c_str());
+        m_text.SetText("");
+        m_itoken_id = 0;
+        return;
+    }
 
 	while (tok->name)
     {

@@ -166,6 +166,25 @@ void CRenderTarget::accum_spot(CBackend& cmd_list, light* L)
     float L_spec;
     L_clr.set(L->color.r, L->color.g, L->color.b);
     L_clr.mul(L->get_LOD());
+    // [PPDBG] live diagnostic knob: multiply EVERY spot light's color so we can test, in-game and at
+    // runtime (console `dbg_slight_boost N`), whether the deferred spot-accumulation path responds to
+    // light color at all -- for NPC torches as well as the player's. If cranking this does nothing
+    // visible, the dimness is NOT a "color too low" problem and lives downstream (combine/exposure) or
+    // the spot isn't being accumulated. Applies to all spot lights (bypasses all Torch.cpp logic).
+    extern float ps_dbg_slight_boost;
+    if (ps_dbg_slight_boost != 1.f)
+        L_clr.mul(ps_dbg_slight_boost);
+    {
+        static u32 s_ppdbg_lf = 0;
+        if (Device.dwFrame - s_ppdbg_lf > 30)
+        {
+            s_ppdbg_lf = Device.dwFrame;
+            const float camdist = Device.vCameraPosition.distance_to(L->position);
+            Msg("[PPDBG-ACCUMSPOT] spot color(%.2f,%.2f,%.2f) range=%.2f camdist=%.1f applied_clr(%.2f,%.2f,%.2f) boost=%.1f",
+                L->color.r, L->color.g, L->color.b, L->range, camdist,
+                L_clr.x, L_clr.y, L_clr.z, ps_dbg_slight_boost);
+        }
+    }
     L_spec = u_diffuse2s(L_clr);
     Device.mView.transform_tiny(L_pos, L->position);
     Device.mView.transform_dir(L_dir, L->direction);

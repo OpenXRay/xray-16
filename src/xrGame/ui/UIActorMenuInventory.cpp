@@ -49,6 +49,8 @@ void CUIActorMenu::InitInventoryMode()
     ShowIfExist(m_pLists[eInventoryDetectorList], true);
     ShowIfExist(m_pLists[eInventoryBackpackList], true);
     ShowIfExist(m_pLists[eInventoryKnifeList], true);
+    ShowIfExist(m_pLists[eInventorySidearmList], true);
+    ShowIfExist(m_pLists[eInventoryGrenadeList], true);
     m_pLists[eInventoryPistolList]->Show(true);
     m_pLists[eInventoryAutomaticList]->Show(true);
     ShowIfExist(m_pQuickSlot, true);
@@ -247,6 +249,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
     CUIDragDropListEx* all_lists[] =
     {
         m_pLists[eInventoryBeltList], m_pLists[eInventoryKnifeList], m_pLists[eInventoryPistolList], m_pLists[eInventoryAutomaticList],
+        m_pLists[eInventorySidearmList], m_pLists[eInventoryGrenadeList],
         m_pLists[eInventoryBackpackList], m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList],
         m_pLists[eInventoryBagList], m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
     };
@@ -506,6 +509,16 @@ bool CUIActorMenu::TryActiveSlot(CUICellItem* itm)
 
     if (slot == GRENADE_SLOT)
     {
+        // Dead Air port: GRENADE_SLOT now has a real, visible UI list (grenade/binocular slot).
+        // Defer to the standard ToSlot path in OnItemDbClick so the slot cell refreshes live
+        // (equip / swap / unequip-toggle all handled there). The legacy "activate in place via
+        // network event" branch below only ran a deferred SendEvent with no cell move, which left
+        // the slot looking empty until the menu was reopened. Keep that legacy behavior only when
+        // there is no dedicated slot list (e.g. the 4:3 actor_menu.xml), where the grenade has no
+        // cell to move and simply stays shown in the ruck.
+        if (m_pLists[eInventoryGrenadeList])
+            return false;
+
         PIItem prev_iitem = m_pActorInvOwner->inventory().ItemFromSlot(slot);
         if (prev_iitem && (prev_iitem->object().cNameSect() != iitem->object().cNameSect()))
         {
@@ -634,6 +647,13 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         CUIDragDropListEx* invlist = GetListByType(iActorBag);
         if (invlist != slot_list)
         {
+            // The grenade slot can hold an item logically (default_to_ruck=false auto-equip,
+            // or the CGrenade auto-refill in Actor::OnItem*) without a cell in the visible slot
+            // list — the list only syncs on menu open via InitCellForSlot. Re-add the missing
+            // cell so the swap-out below can proceed instead of bailing at ItemsCount()!=1.
+            if (slot_list->ItemsCount() == 0 && _iitem)
+                slot_list->SetItem(create_cell_item(_iitem));
+
             if (slot_list->ItemsCount() != 1)
                 return false;
 
@@ -816,6 +836,12 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
 
     case INV_SLOT_3: return m_pLists[eInventoryAutomaticList]; break;
 
+    // Dead Air: sidearm (base 5) and grenade/binocular (base 4) get real UI slots.
+    // Falls back to the ruck if the layout XML lacks the control (e.g. 4:3 actor_menu.xml).
+    case BINOCULAR_SLOT: return m_pLists[eInventorySidearmList] ? m_pLists[eInventorySidearmList] : m_pLists[eInventoryBagList]; break;
+
+    case GRENADE_SLOT: return m_pLists[eInventoryGrenadeList] ? m_pLists[eInventoryGrenadeList] : m_pLists[eInventoryBagList]; break;
+
     case BACKPACK_SLOT: return m_pLists[eInventoryBackpackList]; break;
 
     case OUTFIT_SLOT: return m_pLists[eInventoryOutfitList]; break;
@@ -827,7 +853,6 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
     case PDA_SLOT:
     case TORCH_SLOT:
     case ARTEFACT_SLOT:
-    case BINOCULAR_SLOT:
 
     default:
         if (m_currMenuMode == mmTrade)

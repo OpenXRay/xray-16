@@ -1120,7 +1120,7 @@ void CActor::UpdateCL()
 
             CEffectorZoomInertion* S = smart_cast<CEffectorZoomInertion*>(Cameras().GetCamEffector(eCEZoom));
             if (S)
-                S->SetParams(full_fire_disp);
+                S->SetParams(full_fire_disp + m_fZoomInertionFactor);
 
             SetZoomAimingMode(true);
         }

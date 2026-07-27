@@ -338,6 +338,10 @@ void ISpatial_DB::_remove(ISpatial_NODE* N, ISpatial_NODE* N_sub)
     else if (N_sub == N->children[7])
         octant = 7;
     VERIFY(octant < 8);
+    // Release builds compile out the VERIFY above; guard against a tree inconsistency where N_sub
+    // is not actually a child of N (would index children[u32(-1)] and corrupt memory / crash).
+    if (octant >= 8)
+        return;
     VERIFY(N_sub->_empty());
     _node_destroy(N->children[octant]);
 

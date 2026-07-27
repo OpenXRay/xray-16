@@ -91,6 +91,7 @@ void CScriptGameObject::script_register(lua_State* luaState)
                 value("on_item_drop", int(GameObject::eOnItemDrop)),
                 value("script_animation", int(GameObject::eScriptAnimation)),
                 value("take_item_from_box", int(GameObject::eInvBoxItemTake)),
+                value("take_item_from_ground", int(GameObject::eTakeItemFromGround)),
                 value("weapon_no_ammo", int(GameObject::eWeaponNoAmmoAvailable)),
 
                 //Alundaio:

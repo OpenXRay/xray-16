@@ -22,6 +22,22 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
     float L_R = L->range * .95f;
     Fvector L_clr;
     L_clr.set(L->color.r, L->color.g, L->color.b);
+    // [PPDBG] same live knob as accum_spot, applied to point/omni lights too, so we can see whether the
+    // torch's OMNI (the ~1.3m near pool) is what dominates the visible "few steps" light.
+    extern float ps_dbg_slight_boost;
+    if (ps_dbg_slight_boost != 1.f)
+        L_clr.mul(ps_dbg_slight_boost);
+    {
+        static u32 s_ppdbg_lf = 0;
+        if (Device.dwFrame - s_ppdbg_lf > 30)
+        {
+            s_ppdbg_lf = Device.dwFrame;
+            const float camdist = Device.vCameraPosition.distance_to(L->position);
+            Msg("[PPDBG-ACCUMPOINT] point color(%.2f,%.2f,%.2f) range=%.2f camdist=%.1f applied_clr(%.2f,%.2f,%.2f) boost=%.1f",
+                L->color.r, L->color.g, L->color.b, L->range, camdist,
+                L_clr.x, L_clr.y, L_clr.z, ps_dbg_slight_boost);
+        }
+    }
     L_spec = u_diffuse2s(L_clr);
     Device.mView.transform_tiny(L_pos, L->position);
 

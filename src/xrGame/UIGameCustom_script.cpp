@@ -23,6 +23,11 @@ void CUIGameCustom::script_register(lua_State* luaState)
                 return self->AddCustomStatic(id, singleInstance);
             })
             .def("AddCustomStatic", &CUIGameCustom::AddCustomStatic)
+            // Dead Air / CoC scripts call AddCustomStatic(id) with a single argument.
+            .def("AddCustomStatic", +[](CUIGameCustom* self, pcstr id)
+            {
+                return self->AddCustomStatic(id, false);
+            })
             .def("RemoveCustomStatic", &CUIGameCustom::RemoveCustomStatic)
             .def("HideActorMenu", &CUIGameCustom::HideActorMenu)
              //Alundaio

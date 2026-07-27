@@ -243,7 +243,10 @@ void CEnvAmbient::load(
             m_effects[k] = create_effect(effects_config, _GetItem(effs, k, tmp));
     }
 
-    R_ASSERT(!m_sound_channels.empty() || !m_effects.empty());
+    // Dead Air / CoC-based mods ship env ambients with neither sound channels nor effects.
+    // The retail engine tolerated these; downgrade the hard assert to a warning so startup proceeds.
+    if (m_sound_channels.empty() && m_effects.empty())
+        Msg("! CEnvAmbient [%s]: ambient has no sound channels and no effects (ignored)", sect);
 }
 
 //-----------------------------------------------------------------------------

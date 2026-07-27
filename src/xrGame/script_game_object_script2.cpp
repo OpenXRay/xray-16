@@ -8,6 +8,7 @@
 
 #include "pch_script.h"
 #include "script_game_object.h"
+#include "torch.h"
 #include "alife_space.h"
 #include "script_entity_space.h"
 #include "movement_manager_space.h"
@@ -31,6 +32,15 @@
 #include "xrScriptEngine/Functor.hpp"
 
 extern CScriptActionPlanner* script_action_planner(CScriptGameObject* obj);
+
+// Dead Air torch API is called on the game_object wrapper (db.actor:object(...)), so forward
+// these to the underlying CTorch. Defined as macros to avoid ~20 near-identical wrappers.
+#define DA_TORCH_F(luaName, cppName) \
+    .def(luaName, +[](CScriptGameObject* o, float v) { if (CTorch* t = smart_cast<CTorch*>(&o->object())) t->cppName(v); })
+#define DA_TORCH_B(luaName, cppName) \
+    .def(luaName, +[](CScriptGameObject* o, bool v) { if (CTorch* t = smart_cast<CTorch*>(&o->object())) t->cppName(v); })
+#define DA_TORCH_S(luaName, cppName) \
+    .def(luaName, +[](CScriptGameObject* o, pcstr v) { if (CTorch* t = smart_cast<CTorch*>(&o->object())) t->cppName(v); })
 
 luabind::class_<CScriptGameObject>& script_register_game_object1(luabind::class_<CScriptGameObject>& instance)
 {
@@ -96,6 +106,8 @@ luabind::class_<CScriptGameObject>& script_register_game_object1(luabind::class_
         .def("cost", &CScriptGameObject::Cost)
         .def("condition", &CScriptGameObject::GetCondition)
         .def("set_condition", &CScriptGameObject::SetCondition)
+        .def("get_weapon_condition_type", &CScriptGameObject::GetWeaponConditionType)
+        .def("set_weapon_condition_type", &CScriptGameObject::SetWeaponConditionType)
         .def("death_time", &CScriptGameObject::DeathTime)
         //		.def("armor",						&CScriptGameObject::Armor)
         .def("max_health", &CScriptGameObject::MaxHealth)
@@ -164,6 +176,8 @@ luabind::class_<CScriptGameObject>& script_register_game_object1(luabind::class_
         .def("start_upgrade", &CScriptGameObject::StartUpgrade)
         .def("get_ammo_type", &CScriptGameObject::GetAmmoType)
         .def("set_ammo_type", &CScriptGameObject::SetAmmoType)
+        .def("get_ammo_name", &CScriptGameObject::GetAmmoName)
+        .def("is_ammo_suitable", &CScriptGameObject::IsAmmoSuitable)
         .def("get_ammo_count_for_type", &CScriptGameObject::GetAmmoCount)
         .def("get_main_weapon_type", &CScriptGameObject::GetMainWeaponType)
         .def("get_weapon_type", &CScriptGameObject::GetWeaponType)
@@ -318,6 +332,32 @@ luabind::class_<CScriptGameObject>& script_register_game_object1(luabind::class_
         .def("head_orientation", &CScriptGameObject::head_orientation)
 
         .def("set_actor_position", &CScriptGameObject::SetActorPosition)
+        .def("set_actor_zoom_inertion", &CScriptGameObject::SetActorZoomInertion)
+        .def("set_radiation_detector", &CScriptGameObject::SetRadiationDetector)
+        .def("set_actor_recoil_coeff", &CScriptGameObject::SetActorRecoilCoeff)
+        .def("set_actor_community", &CScriptGameObject::SetActorCommunity)
+        DA_TORCH_F("torch_set_color_r", torch_set_color_r)
+        DA_TORCH_F("torch_set_color_g", torch_set_color_g)
+        DA_TORCH_F("torch_set_color_b", torch_set_color_b)
+        DA_TORCH_F("torch_set_color_a", torch_set_color_a)
+        DA_TORCH_F("torch2_set_color_r", torch2_set_color_r)
+        DA_TORCH_F("torch2_set_color_g", torch2_set_color_g)
+        DA_TORCH_F("torch2_set_color_b", torch2_set_color_b)
+        DA_TORCH_F("torch_set_offset_y", torch_set_offset_y)
+        DA_TORCH_F("torch_set_offset_z", torch_set_offset_z)
+        DA_TORCH_F("torch2_set_offset_x", torch2_set_offset_x)
+        DA_TORCH_F("torch2_set_offset_y", torch2_set_offset_y)
+        DA_TORCH_F("torch_set_radius", torch_set_radius)
+        DA_TORCH_F("torch_set_range", torch_set_range)
+        DA_TORCH_F("torch2_set_radius", torch2_set_radius)
+        DA_TORCH_F("torch2_set_range", torch2_set_range)
+        DA_TORCH_F("torch_set_inertion", torch_set_inertion)
+        DA_TORCH_S("torch_set_animation", torch_set_animation)
+        DA_TORCH_S("torch_set_texture", torch_set_texture)
+        DA_TORCH_B("torch_switch_spot", torch_switch_spot)
+        DA_TORCH_B("enable_torch", enable_torch)
+        DA_TORCH_B("enable_torch2", enable_torch2)
+        .def("torch_enabled", +[](CScriptGameObject* o) { CTorch* t = smart_cast<CTorch*>(&o->object()); return t ? t->torch_enabled() : false; })
         .def("set_actor_direction", &CScriptGameObject::SetActorDirection)
         .def("disable_hit_marks", (void (CScriptGameObject::*)(bool)) & CScriptGameObject::DisableHitMarks)
         .def("disable_hit_marks", (bool (CScriptGameObject::*)() const) & CScriptGameObject::DisableHitMarks)

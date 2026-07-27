@@ -171,6 +171,11 @@ public:
     virtual float GetConditionToShow() const { return GetCondition(); }
     IC void SetCondition(float val) { m_fCondition = val; }
     void ChangeCondition(float fDeltaCondition);
+    // Dead Air weapon "condition type" bitmask (which parts are broken: firemode/scope/silencer/GL etc.).
+    // Transient (not serialized) — default 0 means "no break assigned yet", which is what NPC-dropped
+    // weapons expect in death_manager/items_condition. See HANDOFF §7-style export additions.
+    IC u32 GetWeaponConditionType() const { return m_weapon_condition_type; }
+    IC void SetWeaponConditionType(u32 val) { m_weapon_condition_type = val; }
 
     u16 BaseSlot() const { return m_ItemCurrPlace.base_slot_id; }
     u16 CurrSlot() const { return m_ItemCurrPlace.slot_id; }
@@ -190,6 +195,7 @@ protected:
     u32 m_cost;
     float m_weight;
     float m_fCondition{ 1.0f };
+    u32 m_weapon_condition_type{ 0 };
     shared_str m_Description;
 
 protected:

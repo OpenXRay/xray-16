@@ -14,10 +14,10 @@ R"(<w>
     </loading_logo>
     <loading_progress x="260" y="599" width="506" height="4" horz="1" min="0" max="100" pos="0" inertion="5.0">
         <progress>
-            <texture>ui_mm_loading_progress_bar</texture>
+            <texture>ui\oxr_loading_bar</texture>
         </progress>
         <background stretch="1">
-            <texture width="506" height="4" r="0" g="0" b="0" a="255">ui_mm_loading_progress_bar</texture>
+            <texture width="506" height="4" r="0" g="0" b="0" a="255">ui\oxr_loading_bar</texture>
         </background>
     </loading_progress>
     <loading_stage x="260" y="530" width="506" height="20">
@@ -50,10 +50,10 @@ R"(<w>
     <loading_logo x="102" y="173" width="819" height="512" stretch="1"/>
     <loading_progress x="310" y="599" width="405" height="5" horz="1" min="0" max="100" pos="0" inertion="5.0">
         <progress>
-            <texture>ui_mm_loading_progress_bar</texture>
+            <texture>ui\oxr_loading_bar</texture>
         </progress>
         <background stretch="1">
-            <texture width="405" height="5" r="0" g="0" b="0" a="255">ui_mm_loading_progress_bar</texture>
+            <texture width="405" height="5" r="0" g="0" b="0" a="255">ui\oxr_loading_bar</texture>
         </background>
     </loading_progress>
     <loading_stage x="310" y="530" width="405" height="20" stretch="1">

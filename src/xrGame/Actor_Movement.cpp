@@ -674,6 +674,16 @@ float CActor::get_additional_weight() const
     CBackpack* pBackpack = GetBackpack();
     if (pBackpack)
         res += pBackpack->m_additional_weight;
+    else
+    {
+        // Dead Air's backpack items (items_attachments.ltx [kit_hunt] and its variants) are
+        // spawned as class=SCRPTART script artefacts, not CBackpack, so GetBackpack()'s
+        // smart_cast never matches them. Count their weight bonus the same way belt artefacts
+        // are counted below, so equipping one actually raises carry capacity.
+        CArtefact* backpack_artefact = smart_cast<CArtefact*>(inventory().ItemFromSlot(BACKPACK_SLOT));
+        if (backpack_artefact)
+            res += backpack_artefact->AdditionalInventoryWeight() * backpack_artefact->GetCondition();
+    }
 
     for (TIItemContainer::const_iterator it = inventory().m_belt.begin(); inventory().m_belt.end() != it; ++it)
     {

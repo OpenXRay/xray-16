@@ -35,15 +35,46 @@ CUIGameSP::~CUIGameSP()
     CloseTimeDilator();
 }
 
-void CUIGameSP::HideShownDialogs()
+bool CUIGameSP::HideShownDialogs()
 {
-    HideActorMenu();
-    HidePdaMenu();
+    // Decide what to close from the on-screen (render) state via IsShown(), NOT from the input-
+    // receiver stack. Dead Air's broken PDA/inventory can stay visibly shown while dropping off
+    // the input-receiver list (or vice versa), so TopInputReceiver() alone is unreliable here.
+    bool closed = false;
+
+    if (ActorMenu && ActorMenu->IsShown())
+    {
+        HideActorMenu();
+        closed = true;
+    }
+    if (PdaMenu && PdaMenu->IsShown())
+    {
+        HidePdaMenu();
+        closed = true;
+    }
+
     CUIDialogWnd* mir = TopInputReceiver();
     if (mir && mir == TalkMenu)
     {
         mir->HideDialog();
+        closed = true;
     }
+    else if (TalkMenu && TalkMenu->IsShown())
+    {
+        TalkMenu->HideDialog();
+        closed = true;
+    }
+
+    return closed;
+}
+
+bool CUIGameSP::AnyFullscreenShown()
+{
+    if (CUIGameCustom::AnyFullscreenShown())
+        return true;
+    if (TalkMenu && TalkMenu->IsShown())
+        return true;
+    return false;
 }
 
 void CUIGameSP::ReinitDialogs()
@@ -196,6 +227,12 @@ void CUIGameSP::StartTrade(CInventoryOwner* pActorInv, CInventoryOwner* pOtherOw
 {
     //.	if( MainInputReceiver() )	return;
 
+    // PDA and the actor menu are meant to be mutually exclusive top-level screens (see ShowActorMenu()/
+    // ShowPdaMenu()). This entry point bypasses that helper, so if the PDA happened to be left open it
+    // ends up stacked underneath the trade screen: closing trade with Escape reveals the still-shown PDA,
+    // requiring a second Escape to actually return to gameplay.
+    HidePdaMenu();
+
     ActorMenu->SetActor(pActorInv);
     ActorMenu->SetPartner(pOtherOwner);
 
@@ -206,6 +243,8 @@ void CUIGameSP::StartTrade(CInventoryOwner* pActorInv, CInventoryOwner* pOtherOw
 void CUIGameSP::StartUpgrade(CInventoryOwner* pActorInv, CInventoryOwner* pMech)
 {
     //.	if( MainInputReceiver() )	return;
+
+    HidePdaMenu();
 
     ActorMenu->SetActor(pActorInv);
     ActorMenu->SetPartner(pMech);

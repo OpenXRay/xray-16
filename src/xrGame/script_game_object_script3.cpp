@@ -319,6 +319,18 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("set_artefact_satiety", &CScriptGameObject::SetArtefactSatietyRestoreSpeed)
         .def("set_artefact_power", &CScriptGameObject::SetArtefactPowerRestoreSpeed)
         .def("set_artefact_bleeding", &CScriptGameObject::SetArtefactBleedingRestoreSpeed)
+        // Dead Air runtime artefact tuning (weight + per-hit-type immunities)
+        .def("set_artefact_weight", +[](CScriptGameObject* o, float v) { if (CArtefact* a = smart_cast<CArtefact*>(&o->object())) a->SetWeight(v); })
+        .def("set_artefact_additional_weight", +[](CScriptGameObject* o, float v) { if (CArtefact* a = smart_cast<CArtefact*>(&o->object())) a->SetAdditionalWeight(v); })
+        .def("set_artefact_burn_immunity", +[](CScriptGameObject* o, float v) { if (CArtefact* a = smart_cast<CArtefact*>(&o->object())) a->SetArtefactImmunity(ALife::eHitTypeBurn, v); })
+        .def("set_artefact_shock_immunity", +[](CScriptGameObject* o, float v) { if (CArtefact* a = smart_cast<CArtefact*>(&o->object())) a->SetArtefactImmunity(ALife::eHitTypeShock, v); })
+        .def("set_artefact_chemical_burn_immunity", +[](CScriptGameObject* o, float v) { if (CArtefact* a = smart_cast<CArtefact*>(&o->object())) a->SetArtefactImmunity(ALife::eHitTypeChemicalBurn, v); })
+        .def("set_artefact_radiation_immunity", +[](CScriptGameObject* o, float v) { if (CArtefact* a = smart_cast<CArtefact*>(&o->object())) a->SetArtefactImmunity(ALife::eHitTypeRadiation, v); })
+        .def("set_artefact_telepatic_immunity", +[](CScriptGameObject* o, float v) { if (CArtefact* a = smart_cast<CArtefact*>(&o->object())) a->SetArtefactImmunity(ALife::eHitTypeTelepatic, v); })
+        .def("set_artefact_wound_immunity", +[](CScriptGameObject* o, float v) { if (CArtefact* a = smart_cast<CArtefact*>(&o->object())) a->SetArtefactImmunity(ALife::eHitTypeWound, v); })
+        .def("set_artefact_fire_wound_immunity", +[](CScriptGameObject* o, float v) { if (CArtefact* a = smart_cast<CArtefact*>(&o->object())) a->SetArtefactImmunity(ALife::eHitTypeFireWound, v); })
+        .def("set_artefact_strike_immunity", +[](CScriptGameObject* o, float v) { if (CArtefact* a = smart_cast<CArtefact*>(&o->object())) a->SetArtefactImmunity(ALife::eHitTypeStrike, v); })
+        .def("set_artefact_explosion_immunity", +[](CScriptGameObject* o, float v) { if (CArtefact* a = smart_cast<CArtefact*>(&o->object())) a->SetArtefactImmunity(ALife::eHitTypeExplosion, v); })
 
         // HELICOPTER
         .def("get_helicopter", &CScriptGameObject::get_helicopter)

@@ -191,6 +191,8 @@ float ps_r2_df_parallax_h = 0.02f;
 float ps_r2_df_parallax_range = 75.f;
 float ps_r2_tonemap_middlegray = 1.f; // r2-only
 float ps_r2_tonemap_adaptation = 1.f; // r2-only
+float ps_dbg_exposure = -1.f; // [PPDBG] <0 normal; >=0 forces fixed rt_LUM luminance (diagnose dark-after-load)
+float ps_dbg_slight_boost = 1.f; // [PPDBG] runtime multiplier on EVERY spot light's color in accum_spot (1=normal). Diagnose dynamic-light dimness live.
 float ps_r2_tonemap_low_lum = 0.0001f; // r2-only
 float ps_r2_tonemap_amount = 0.7f; // r2-only
 float ps_r2_ls_bloom_kernel_g = 3.f; // r2-only
@@ -241,6 +243,29 @@ float ps_r2_slight_fade = 0.5f; // 1.f
 Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
 float ps_r2_dof_sky = 30; //    distance to sky
 float ps_r2_dof_kernel_size = 5.0f; //  7.0f
+
+// Dead Air custom render cvars (its engine build added these; stock OpenXRay lacks
+// them, so level_weathers.script's per-update calls flooded the console with
+// "Unknown command"). Registered so scripts can set/read them without error; storage
+// only, not yet wired into the render path.
+int ps_r2_dof_pickable = 0; // 0/1 flag: focus DOF on the item being picked up
+float ps_r2_dof_time = 0.1f; // DOF transition time (seconds)
+float ps_r2_dof_diff_far = 0.f; // weather-driven differential DOF far distance
+float ps_r2_vibrance_val = 0.f; // post-process vibrance amount
+float ps_r2_aberration_val = 0.f; // post-process chromatic-aberration amount
+int ps_r2_vibrance = 0; // 0/1 vibrance enable flag
+float ps_r2_lensdirt_val = 0.f; // lens-dirt overlay amount
+float ps_r2_lenswater_val = 0.f; // lens-water (rain drops) overlay amount
+float ps_r2_sss_radius = 0.5f; // subsurface-scattering radius
+float ps_r2_sss_phase1 = 0.f; // subsurface-scattering phase 1
+float ps_r2_sss_phase2 = 0.f; // subsurface-scattering phase 2
+float ps_r2_sss_blend = 0.f; // subsurface-scattering blend
+float ps_r_color_base_r = 0.5f; // color-grading base R
+float ps_r_color_base_g = 0.5f; // color-grading base G
+float ps_r_color_base_b = 0.5f; // color-grading base B
+float ps_r_color_add_r = 0.f; // color-grading add R
+float ps_r_color_add_g = 0.f; // color-grading add G
+float ps_r_color_add_b = 0.f; // color-grading add B
 
 float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
 float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
@@ -806,6 +831,8 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r2_tonemap", &ps_r2_ls_flags, R2FLAG_TONEMAP);
     CMD4(CCC_Float, "r2_tonemap_middlegray", &ps_r2_tonemap_middlegray, 0.0f, 2.0f);
     CMD4(CCC_Float, "r2_tonemap_adaptation", &ps_r2_tonemap_adaptation, 0.01f, 10.0f);
+    CMD4(CCC_Float, "dbg_exposure", &ps_dbg_exposure, -1.0f, 100.0f);
+    CMD4(CCC_Float, "dbg_slight_boost", &ps_dbg_slight_boost, 0.0f, 1000.0f);
     CMD4(CCC_Float, "r2_tonemap_lowlum", &ps_r2_tonemap_low_lum, 0.0001f, 1.0f);
     CMD4(CCC_Float, "r2_tonemap_amount", &ps_r2_tonemap_amount, 0.0000f, 1.0f);
     CMD4(CCC_Float, "r2_ls_bloom_kernel_scale", &ps_r2_ls_bloom_kernel_scale, 0.5f, 2.f);
@@ -910,6 +937,26 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_dof_kernel", &ps_r2_dof_kernel_size, .0f, 10.f);
     CMD4(CCC_Float, "r2_dof_sky", &ps_r2_dof_sky, -10000.f, 10000.f);
     CMD3(CCC_Mask, "r2_dof_enable", &ps_r2_ls_flags, R2FLAG_DOF);
+
+    // Dead Air custom render cvars (see decls above) — silence level_weathers.script spam.
+    CMD4(CCC_Integer, "r2_dof_pickable", &ps_r2_dof_pickable, 0, 1);
+    CMD4(CCC_Float, "r2_dof_time", &ps_r2_dof_time, 0.f, 10.f);
+    CMD4(CCC_Float, "r2_dof_diff_far", &ps_r2_dof_diff_far, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r2_vibrance_val", &ps_r2_vibrance_val, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r2_aberration_val", &ps_r2_aberration_val, -10000.f, 10000.f);
+    CMD4(CCC_Integer, "r2_vibrance", &ps_r2_vibrance, 0, 1);
+    CMD4(CCC_Float, "r2_lensdirt_val", &ps_r2_lensdirt_val, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r2_lenswater_val", &ps_r2_lenswater_val, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r2_sss_radius", &ps_r2_sss_radius, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r2_sss_phase1", &ps_r2_sss_phase1, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r2_sss_phase2", &ps_r2_sss_phase2, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r2_sss_blend", &ps_r2_sss_blend, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r__color_base_r", &ps_r_color_base_r, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r__color_base_g", &ps_r_color_base_g, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r__color_base_b", &ps_r_color_base_b, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r__color_add_r", &ps_r_color_add_r, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r__color_add_g", &ps_r_color_add_g, -10000.f, 10000.f);
+    CMD4(CCC_Float, "r__color_add_b", &ps_r_color_add_b, -10000.f, 10000.f);
 
     //float ps_r2_dof_near = 0.f; // 0.f
     //float ps_r2_dof_focus = 1.4f; // 1.4f

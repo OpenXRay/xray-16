@@ -80,6 +80,9 @@ enum ECallbackType : u32
     eControllerHold,
     eControllerAttitudeChange,
 
+    // Dead Air / CoC: item picked up from the ground (script-referenced callback constant)
+    eTakeItemFromGround,
+
     // X-Ray Extensions:
     eKeyPress   = 123,
     eKeyRelease = 124,
