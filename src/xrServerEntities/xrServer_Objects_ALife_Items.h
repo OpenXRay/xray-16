@@ -220,6 +220,11 @@ public:
     }; // struct grenade_count_t
     grenade_count_t a_elapsed_grenades;
 
+    // Dead Air per-part malfunction bitmask (which parts are broken: firemode/scope/silencer/GL etc.),
+    // rolled at loot-spawn time by coc_treasure_manager.script and consumed by items_condition.script.
+    // Trailing field, read defensively (see STATE_Read) so old spawn/save data without it still loads.
+    u32 m_weapon_condition_type{0};
+
     float m_fHitPower;
     ALife::EHitType m_tHitType;
     LPCSTR m_caAmmoSections;

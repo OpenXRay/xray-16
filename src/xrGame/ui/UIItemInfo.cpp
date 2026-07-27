@@ -28,6 +28,34 @@ extern const LPCSTR g_inventory_upgrade_xml;
 #define INV_GRID_WIDTH2 40.0f
 #define INV_GRID_HEIGHT2 40.0f
 
+// Appends Dead Air's per-part weapon malfunction list ("st_condition_type" header + one
+// "st_condition_type_<bit+1>" line per set bit of GetWeaponConditionType()) to the item's
+// flavor text, matching the original engine's item-info tooltip.
+static xr_string BuildItemDescriptionText(CInventoryItem& pInvItem)
+{
+    xr_string text = pInvItem.ItemDescription().c_str();
+
+    CWeapon* weapon = smart_cast<CWeapon*>(&pInvItem);
+    if (!weapon)
+        return text;
+
+    const u32 cond_type = weapon->GetWeaponConditionType();
+    if (!cond_type)
+        return text;
+
+    text += StringTable().translate("st_condition_type").c_str();
+    for (u32 bit = 0; bit < 32; ++bit)
+    {
+        if (!(cond_type & (1u << bit)))
+            continue;
+
+        string64 key;
+        xr_sprintf(key, "st_condition_type_%u", bit + 1);
+        text += StringTable().translate(key).c_str();
+    }
+    return text;
+}
+
 CUIItemInfo::CUIItemInfo() : CUIWindow(CUIItemInfo::GetDebugType())
 {
     UIItemImageSize.set(0.0f, 0.0f);
@@ -285,7 +313,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
             descr->SetFont(m_desc_info.pDescFont);
             descr->SetWidth(UIDesc->GetDesiredChildWidth());
             descr->SetTextComplexMode(true);
-            descr->SetText(pInvItem->ItemDescription().c_str());
+            descr->SetText(BuildItemDescriptionText(*pInvItem).c_str());
             descr->AdjustHeightToText();
             UIDesc->AddWindow(descr, !soc_style);
         }

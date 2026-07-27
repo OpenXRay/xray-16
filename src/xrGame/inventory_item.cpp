@@ -33,6 +33,13 @@ constexpr pcstr INV_NAME_SHORT_KEY = "inv_name_short";
 constexpr pcstr DESCRIPTION_KEY = "description";
 extern int g_normalize_mouse_sens;
 
+// m_weapon_condition_type was added to the save format after it originally shipped, mid-stream
+// (weapon subclasses append more of their own fields right after CInventoryItem::save/load returns,
+// so a bare "bytes remaining" check can't tell an old save from a new one at this point). Written as
+// a marker + value pair instead: on load, peek 4 bytes and only consume them (plus the value) if they
+// match; otherwise seek back so the original old-format bytes are read normally by what follows.
+constexpr u32 WEAPON_CONDITION_TYPE_SAVE_MARKER = 0x57434E44; // "WCND"
+
 net_updateInvData* CInventoryItem::NetSync()
 {
     if (!m_net_updateData)
@@ -360,6 +367,8 @@ void CInventoryItem::save(NET_Packet& packet)
 {
     packet.w_u16(m_ItemCurrPlace.value);
     packet.w_float(m_fCondition);
+    packet.w_u32(WEAPON_CONDITION_TYPE_SAVE_MARKER);
+    packet.w_u32(m_weapon_condition_type);
     //--	save_data				(m_upgrades, packet);
 
     if (object().H_Parent())
@@ -753,6 +762,16 @@ void CInventoryItem::load(IReader& packet)
 {
     m_ItemCurrPlace.value = packet.r_u16();
     m_fCondition = packet.r_float();
+
+    m_weapon_condition_type = 0;
+    if (packet.elapsed() >= (intptr_t)(2 * sizeof(u32)))
+    {
+        const size_t mark = packet.tell();
+        if (packet.r_u32() == WEAPON_CONDITION_TYPE_SAVE_MARKER)
+            m_weapon_condition_type = packet.r_u32();
+        else
+            packet.seek(mark);
+    }
 
     //--	load_data( m_upgrades, packet );
     //--	install_loaded_upgrades();
