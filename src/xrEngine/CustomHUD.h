@@ -17,6 +17,8 @@ ENGINE_API extern Flags32 psHUD_Flags;
 #define HUD_WEAPON_RT2 (1 << 11)
 #define HUD_DRAW_RT2 (1 << 12)
 #define HUD_LEFT_HANDED (1 << 13)
+#define HUD_DRAW_INFO (1 << 14) // Dead Air "hud_draw_info" option
+#define HUD_DRAW_MAP (1 << 15) // Dead Air "hud_draw_map" option
 
 class IGameObject;
 

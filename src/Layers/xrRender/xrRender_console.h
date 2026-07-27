@@ -67,6 +67,7 @@ extern ECORE_API int ps_r__clear_models_on_unload;
 enum
 {
     RFLAG_ACTOR_SHADOW = 1 << 0,
+    RFLAG_ACTOR_BODY = 1 << 1, // Dead Air "Тело игрока" option: draw actor's own visual in the main color pass, not just shadow map
 };
 
 extern ECORE_API Flags32 ps_r__common_flags;

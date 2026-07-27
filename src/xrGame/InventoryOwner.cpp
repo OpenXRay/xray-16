@@ -284,7 +284,18 @@ bool CInventoryOwner::IsTrading() { return m_bTrading; }
 //==============
 void CInventoryOwner::renderable_Render(u32 context_id, IRenderable* root)
 {
-    if (inventory().ActiveItem())
+    // The locally-controlled actor's active/held item is already drawn by the HUD
+    // system (CCustomHUD::Render_First/Render_Last) — rendering it again here would
+    // double the weapon draw (only reachable now that r__actor_body, see
+    // r__dsgraph_build.cpp, can force this whole call to run for the current view
+    // entity; previously it never ran for the local player at all). Other attachments
+    // below (outfit, helmet, gloves, backpack, ...) are NOT drawn by the HUD system and
+    // must still render regardless — skipping the whole function here was the bug that
+    // left the actor's own body headless/handless even with r__actor_body enabled.
+    CGameObject* self = smart_cast<CGameObject*>(this);
+    bool is_local_view_entity = self && Level().CurrentViewEntity() == self;
+
+    if (inventory().ActiveItem() && !is_local_view_entity)
         inventory().ActiveItem()->renderable_Render(context_id, root);
 
     CAttachmentOwner::renderable_Render(context_id, root);

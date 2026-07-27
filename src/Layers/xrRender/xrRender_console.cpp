@@ -267,6 +267,20 @@ float ps_r_color_add_r = 0.f; // color-grading add R
 float ps_r_color_add_g = 0.f; // color-grading add G
 float ps_r_color_add_b = 0.f; // color-grading add B
 
+// Dead Air options-menu master toggles/sliders referenced by ui_mm_opt_16.xml but
+// never registered in stock OpenXRay, so Apply silently failed and the checkbox/slider
+// always reverted. Storage only, not yet wired into the render path (r__actor_body is
+// the exception — see RFLAG_ACTOR_BODY above).
+float ps_r2_sunshafts_intensity = 0.f; // "r2_sss_intensity" — unrelated to ps_r2_sss_radius/phase1/phase2/blend above (subsurface scattering); Dead Air reused the "sss" prefix for sun shafts here
+int ps_r2_sunshafts_enable = 0; // "r2_sss_enable"
+float ps_r2_lumasharpen_val = 0.f; // "r2_lumasharpen"
+int ps_r2_fxaa = 0; // "r2_fxaa"
+int ps_r2_technicolor = 0; // "r2_technicolor"
+int ps_r2_vignette = 0; // "r2_vignette"
+int ps_r2_lenswater_enable = 0; // "r2_lenswater" (distinct from ps_r2_lenswater_val strength above)
+int ps_r2_lensdirt_enable = 0; // "r2_lensdirt" (distinct from ps_r2_lensdirt_val strength above)
+int ps_r2_reflections = 0; // "r2_reflections"
+
 float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
 float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
 int ps_r3_dyn_wet_surf_sm_res = 256; // 256
@@ -790,6 +804,7 @@ void xrRender_initconsole()
 #endif // DEBUG
 
     CMD3(CCC_Mask, "r__actor_shadow", &ps_r__common_flags, RFLAG_ACTOR_SHADOW);
+    CMD3(CCC_Mask, "r__actor_body", &ps_r__common_flags, RFLAG_ACTOR_BODY);
 
     CMD2(CCC_tf_Aniso, "r__tf_aniso", &ps_r__tf_Anisotropic); // {1..16}
     CMD2(CCC_tf_MipBias, "r1_tf_mipbias", &ps_r__tf_Mipbias); // {-3 +3}
@@ -957,6 +972,16 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__color_add_r", &ps_r_color_add_r, -10000.f, 10000.f);
     CMD4(CCC_Float, "r__color_add_g", &ps_r_color_add_g, -10000.f, 10000.f);
     CMD4(CCC_Float, "r__color_add_b", &ps_r_color_add_b, -10000.f, 10000.f);
+
+    CMD4(CCC_Float, "r2_sss_intensity", &ps_r2_sunshafts_intensity, -10000.f, 10000.f);
+    CMD4(CCC_Integer, "r2_sss_enable", &ps_r2_sunshafts_enable, 0, 1);
+    CMD4(CCC_Float, "r2_lumasharpen", &ps_r2_lumasharpen_val, -10000.f, 10000.f);
+    CMD4(CCC_Integer, "r2_fxaa", &ps_r2_fxaa, 0, 1);
+    CMD4(CCC_Integer, "r2_technicolor", &ps_r2_technicolor, 0, 1);
+    CMD4(CCC_Integer, "r2_vignette", &ps_r2_vignette, 0, 1);
+    CMD4(CCC_Integer, "r2_lenswater", &ps_r2_lenswater_enable, 0, 1);
+    CMD4(CCC_Integer, "r2_lensdirt", &ps_r2_lensdirt_enable, 0, 1);
+    CMD4(CCC_Integer, "r2_reflections", &ps_r2_reflections, 0, 1);
 
     //float ps_r2_dof_near = 0.f; // 0.f
     //float ps_r2_dof_focus = 1.4f; // 1.4f

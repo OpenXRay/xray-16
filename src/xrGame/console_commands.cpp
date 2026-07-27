@@ -2191,12 +2191,18 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "hud_weapon", &psHUD_Flags, HUD_WEAPON);
     CMD3(CCC_Mask, "hud_info", &psHUD_Flags, HUD_INFO);
     CMD3(CCC_Mask, "hud_draw", &psHUD_Flags, HUD_DRAW);
+    // Dead Air options: ui_mm_opt_16.xml references these but stock OpenXRay never
+    // registered them, so Apply silently failed and the checkboxes always reverted off.
+    CMD3(CCC_Mask, "hud_draw_info", &psHUD_Flags, HUD_DRAW_INFO);
+    CMD3(CCC_Mask, "hud_draw_map", &psHUD_Flags, HUD_DRAW_MAP);
 
     // hud
     psHUD_Flags.set(HUD_CROSSHAIR, true);
     psHUD_Flags.set(HUD_WEAPON, true);
     psHUD_Flags.set(HUD_DRAW, true);
     psHUD_Flags.set(HUD_INFO, true);
+    psHUD_Flags.set(HUD_DRAW_INFO, true);
+    psHUD_Flags.set(HUD_DRAW_MAP, true);
 
     CMD3(CCC_Mask, "hud_crosshair", &psHUD_Flags, HUD_CROSSHAIR);
     CMD3(CCC_Mask, "hud_crosshair_dist", &psHUD_Flags, HUD_CROSSHAIR_DIST);
