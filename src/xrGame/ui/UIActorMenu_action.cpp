@@ -81,7 +81,13 @@ bool CUIActorMenu::DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, C
         if (!_citem)
         {
             CUICellContainer* c = old_owner->GetContainer();
-            Ivector2 c_pos = c->PickCell(old_owner->GetDragItemPosition());
+            // Use the raw cursor position, not GetDragItemPosition() (the dragged icon's tracked
+            // top-left corner, offset from the cursor by wherever it was originally grabbed) - the
+            // player is dropping onto whatever cell is under their actual cursor, not under the
+            // icon's corner, which only coincides with the target cell when the item happens to be
+            // grabbed near its own top-left corner. Using the offset corner made this drop-on-item
+            // detection miss intermittently, so ammo/consumable combining only worked "sometimes."
+            Ivector2 c_pos = c->PickCell(GetUICursor().GetCursorPosition());
             if (c->ValidCell(c_pos))
             {
                 CUICell& ui_cell = c->GetCellAt(c_pos);
