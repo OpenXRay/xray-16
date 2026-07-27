@@ -361,6 +361,36 @@ void CScriptGameObject::SetActorPosition(Fvector pos)
             LuaMessageType::Error, "ScriptGameObject : attempt to call SetActorPosition method for non-actor object");
 }
 
+void CScriptGameObject::SetActorZoomInertion(float factor)
+{
+    CActor* actor = smart_cast<CActor*>(&object());
+    if (actor)
+        actor->set_actor_zoom_inertion(factor);
+    else
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
+            "ScriptGameObject : attempt to call set_actor_zoom_inertion method for non-actor object");
+}
+
+void CScriptGameObject::SetRadiationDetector(bool active)
+{
+    CActor* actor = smart_cast<CActor*>(&object());
+    if (actor)
+        actor->set_radiation_detector(active);
+    else
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
+            "ScriptGameObject : attempt to call set_radiation_detector method for non-actor object");
+}
+
+void CScriptGameObject::SetActorRecoilCoeff(float coeff)
+{
+    CActor* actor = smart_cast<CActor*>(&object());
+    if (actor)
+        actor->set_actor_recoil_coeff(coeff);
+    else
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
+            "ScriptGameObject : attempt to call set_actor_recoil_coeff method for non-actor object");
+}
+
 void CScriptGameObject::SetNpcPosition(Fvector pos)
 {
     CCustomMonster* obj = smart_cast<CCustomMonster*>(&object());

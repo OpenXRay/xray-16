@@ -325,6 +325,19 @@ public:
     EActorCameras active_cam() const { return cam_active; } // KD: we need to know which cam is active outside actor methods
     virtual void cam_Set(EActorCameras style); //Alundaio: made public
 
+public:
+    // Dead Air / CoC: extra zoom-aim sway driven by actor condition, set from script.
+    float m_fZoomInertionFactor = 0.0f;
+    void set_actor_zoom_inertion(float f) { m_fZoomInertionFactor = f; }
+
+    // Dead Air: whether the actor currently has a working radiation detector (script-gated).
+    bool m_bRadiationDetectorActive = true;
+    void set_radiation_detector(bool active) { m_bRadiationDetectorActive = active; }
+
+    // Dead Air: script-driven recoil multiplier (stored; applied where recoil is computed if wired).
+    float m_fRecoilCoeff = 1.0f;
+    void set_actor_recoil_coeff(float v) { m_fRecoilCoeff = v; }
+
 protected:
     //virtual void cam_Set(EActorCameras style);
     void cam_Update(float dt, float fFOV);

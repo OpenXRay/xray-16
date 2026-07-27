@@ -66,6 +66,8 @@ ICF void init_dbghelp()
 {
     s_dbghelp = GetModuleHandleA("dbghelp.dll");
     if (!s_dbghelp)
+        s_dbghelp = LoadLibraryA("dbghelp.dll"); // not preloaded -> load it (from exe dir / system)
+    if (!s_dbghelp)
     {
         Log("! [StackTraceBuilder] Failed to load dbghelp.dll");
         return;

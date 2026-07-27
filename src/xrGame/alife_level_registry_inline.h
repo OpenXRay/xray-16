@@ -12,7 +12,7 @@
 
 IC CALifeLevelRegistry::CALifeLevelRegistry(const GameGraph::_LEVEL_ID& level_id) { m_level_id = level_id; }
 IC GameGraph::_LEVEL_ID CALifeLevelRegistry::level_id() const { return (m_level_id); }
-IC void CALifeLevelRegistry::add(CSE_ALifeDynamicObject* object)
+IC void CALifeLevelRegistry::add(CSE_ALifeDynamicObject* object, bool no_assert)
 {
     if (ai().game_graph().vertex(object->m_tGraphID)->level_id() != level_id())
         return;
@@ -23,7 +23,7 @@ IC void CALifeLevelRegistry::add(CSE_ALifeDynamicObject* object)
         Msg("[LSS] adding object [%s][%d] to current level", object->name_replace(), object->ID);
     }
 #endif
-    inherited::add(object->ID, object);
+    inherited::add(object->ID, object, no_assert);
 }
 
 IC void CALifeLevelRegistry::remove(CSE_ALifeDynamicObject* object, bool no_assert)

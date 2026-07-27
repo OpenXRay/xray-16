@@ -32,6 +32,10 @@ void CRenderDevice::Reset(bool precache /*= true*/)
 {
     ZoneScoped;
 
+    // [PPDBG] find what's triggering a full device reset (and the resulting
+    // m_bFirstFrameAfterReset skip-frame) around in-session loads.
+    Msg("[PPDBG] CRenderDevice::Reset() called f=%u precache=%d", dwFrame, precache);
+
     const auto dwWidth_before = dwWidth;
     const auto dwHeight_before = dwHeight;
     pInput->GrabInput(false);

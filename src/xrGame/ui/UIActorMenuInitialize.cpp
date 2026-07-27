@@ -203,6 +203,11 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
         { eInventoryPistolList,    "dragdrop_pistol",          "progess_bar_weapon1", "inv_slot2_highlight",     nullptr,            true },
         { eInventoryAutomaticList, "dragdrop_automatic",       "progess_bar_weapon2", "inv_slot3_highlight",     nullptr,            true },
 
+        // Dead Air: sidearm slot (base 5) and grenade/binocular slot (base 4). Optional so
+        // layouts without these controls (4:3 actor_menu.xml) still load.
+        { eInventorySidearmList,   "dragdrop_sidearm",         nullptr,               "sidearm_highlight",       nullptr,            false },
+        { eInventoryGrenadeList,   "dragdrop_binocular",       nullptr,               "binocular_slot_highlight",nullptr,            false },
+
         { eInventoryOutfitList,    "dragdrop_outfit",          "progess_bar_outfit",  "outfit_slot_highlight",   nullptr,            true },
         { eInventoryHelmetList,    "dragdrop_helmet",          "progess_bar_helmet",  "helmet_slot_highlight",   "helmet_over",      false },
 
@@ -531,6 +536,8 @@ void CUIActorMenu::InitCallbacks()
     BindDragDropListEvents(m_pLists[eInventoryKnifeList]);
     BindDragDropListEvents(m_pLists[eInventoryPistolList]);
     BindDragDropListEvents(m_pLists[eInventoryAutomaticList]);
+    BindDragDropListEvents(m_pLists[eInventorySidearmList]);
+    BindDragDropListEvents(m_pLists[eInventoryGrenadeList]);
 
     BindDragDropListEvents(m_pLists[eInventoryBackpackList]);
     BindDragDropListEvents(m_pLists[eInventoryOutfitList]);

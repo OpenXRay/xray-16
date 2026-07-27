@@ -182,6 +182,8 @@ public:
     u32 Cost() const;
     float GetCondition() const;
     void SetCondition(float val);
+    u32 GetWeaponConditionType() const;
+    void SetWeaponConditionType(u32 val);
 
     // CEntity
     _DECLARE_FUNCTION10(DeathTime, u32);
@@ -231,6 +233,10 @@ public:
     void ResetActionQueue();
     // Actor only
     void SetActorPosition(Fvector pos);
+    void SetActorZoomInertion(float factor);
+    void SetRadiationDetector(bool active);
+    void SetActorRecoilCoeff(float coeff);
+    void SetActorCommunity(pcstr community);
     void SetActorDirection(float dir);
     void SetNpcPosition(Fvector pos);
     void DisableHitMarks(bool disable);
@@ -865,6 +871,8 @@ public:
     u32 GetWeaponType();
     u8 GetWeaponSubstate();
     u8 GetAmmoType();
+    LPCSTR GetAmmoName();
+    bool IsAmmoSuitable(LPCSTR ammo_section);
 
     // CWeaponAmmo
     u16 AmmoGetCount();

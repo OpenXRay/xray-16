@@ -765,6 +765,10 @@ CInifile::Sect& CInifile::r_section(pcstr S) const
         // F->w_string ("shared strings:");
         // g_pStringContainer->dump(F);
         // FS.w_close (F);
+        Msg("~ [r_section DIAG] requested [%s]; inifile has %u sections; neighbor [%s]", section, (u32)DATA.size(), (*I)->Name.c_str());
+        for (const auto& s : DATA)
+            if (strncmp(s->Name.c_str(), "ammo_7.", 7) == 0)
+                Msg("~ [r_section DIAG]   have: %s", s->Name.c_str());
         xrDebug::Fatal(DEBUG_INFO, "Can't open section '%s' (only '%s' avail). Please attach [*.ini_log] file to your bug report", section, (*I)->Name.c_str());
     }
     return **I;

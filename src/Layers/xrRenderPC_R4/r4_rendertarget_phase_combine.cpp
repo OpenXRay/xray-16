@@ -143,6 +143,21 @@ void CRenderTarget::phase_combine()
 
             sunclr.set(L_clr.x, L_clr.y, L_clr.z, L_spec);
             sundir.set(L_dir.x, L_dir.y, L_dir.z, 0);
+
+            // [PPDBG] log environment lighting to catch "level goes dark / no skybox light" after in-session load.
+            {
+                static u32 s_ppdbg_env_last = 0;
+                if (Device.dwFrame - s_ppdbg_env_last >= 120)
+                {
+                    s_ppdbg_env_last = Device.dwFrame;
+                    Msg("[PPDBG] env f=%u amb=(%.3f,%.3f,%.3f) envclr=(%.3f,%.3f,%.3f) fog=(%.3f,%.3f,%.3f) "
+                        "sun=(%.3f,%.3f,%.3f) sunLum=%.3f lumAmb=%.3f lumHemi=%.3f",
+                        Device.dwFrame, envdesc.ambient.x, envdesc.ambient.y, envdesc.ambient.z,
+                        envdesc.env_color.x, envdesc.env_color.y, envdesc.env_color.z, envdesc.fog_color.x,
+                        envdesc.fog_color.y, envdesc.fog_color.z, L_clr.x, L_clr.y, L_clr.z, ps_r2_sun_lumscale,
+                        ps_r2_sun_lumscale_amb, ps_r2_sun_lumscale_hemi);
+                }
+            }
         }
 
         /*
@@ -268,11 +283,19 @@ void CRenderTarget::phase_combine()
     {
         if ((0 == dsgraph.mapDistort.size()) && !_menu_pp)
             bDistort = FALSE;
+
+        // Always rebind+clear to the neutral "no distortion" value, even when nothing
+        // is drawn this frame: rt_Generic_1_r is reused earlier in this same frame as a
+        // generic G-buffer/lighting scratch target (cleared to {} at the top of this
+        // function), so leaving this block gated behind bDistort left stale, unrelated
+        // G-buffer data in the buffer for combine_2's s_distort sample whenever no
+        // distortion emitter was active (e.g. the first frames after an in-session
+        // save load, before anomalies re-register into dsgraph.mapDistort).
+        PIX_EVENT(render_distort_objects);
+        u_setrt(RCache, rt_Generic_1_r, nullptr, nullptr, rt_MSAADepth); // Now RT is a distortion mask
+        RCache.ClearRT(rt_Generic_1_r, color_rgba(127, 127, 0, 127));
         if (bDistort)
         {
-            PIX_EVENT(render_distort_objects);
-            u_setrt(RCache, rt_Generic_1_r, nullptr, nullptr, rt_MSAADepth); // Now RT is a distortion mask
-            RCache.ClearRT(rt_Generic_1_r, color_rgba(127, 127, 0, 127));
             RCache.set_CullMode(CULL_CCW);
             RCache.set_Stencil(FALSE);
             RCache.set_ColorWriteEnable();
@@ -404,6 +427,20 @@ void CRenderTarget::phase_combine()
         RCache.set_c("dof_params", dof.x, dof.y, dof.z, ps_r2_dof_sky);
         //.		RCache.set_c				("dof_params",	ps_r2_dof.x, ps_r2_dof.y, ps_r2_dof.z, ps_r2_dof_sky);
         RCache.set_c("dof_kernel", vDofKernel.x, vDofKernel.y, ps_r2_dof_kernel_size, 0.f);
+
+        // Dead Air's combine_2 shader gates optional chromatic-aberration / sharpen effects behind
+        // "if (aberration != 0)" / "if (lumasharpen != 0)", but this engine never binds these
+        // Dead-Air-specific constants (they're not part of stock OpenXRay's postprocess pipeline).
+        // Left unset, they read whatever stale/uninitialized value happens to occupy that constant
+        // buffer memory; when that's NaN, "NaN != 0" is true (IEEE unordered compare), spuriously
+        // enabling both branches. The aberration branch then poisons the accumulating output color
+        // with NaN (no saturate), and the sharpen branch's final add_sat clamps that NaN to exactly
+        // 0 -- zeroing the whole frame's base color right before the DOF blur accumulation runs on
+        // top of it, producing a uniform under-exposed image. Binding these to a defined neutral
+        // value every frame keeps both effects off, matching this port's lack of support for them.
+        RCache.set_c("aberration", 0.f, 0.f, 0.f, 0.f);
+        RCache.set_c("lumasharpen", 0.f, 0.f, 0.f, 0.f);
+        RCache.set_c("vibrance", 0.f, 0.f, 0.f, 0.f);
 
         RCache.set_Geometry(g_aa_AA);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);

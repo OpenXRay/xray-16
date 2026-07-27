@@ -113,7 +113,14 @@ public:
     bool GameIndicatorsShown() { return showGameIndicators; }
     void ShowCrosshair(bool show) { psHUD_Flags.set(HUD_CROSSHAIR_RT, show); }
     bool CrosshairShown() { return !!psHUD_Flags.test(HUD_CROSSHAIR_RT); }
-    virtual void HideShownDialogs() {}
+    // Returns true if it actually closed a visibly-shown full-screen screen (PDA/inventory/talk).
+    // The caller (Escape handling) uses that to decide whether Escape closed a screen or should
+    // fall through to opening the pause menu.
+    virtual bool HideShownDialogs() { return false; }
+    // Non-destructive query: is any full-screen screen (dialog / PDA / inventory / talk) currently
+    // up? Used to snapshot the on-screen state the instant Escape arrives, before script callbacks
+    // can mutate it.
+    virtual bool AnyFullscreenShown();
     virtual void ReinitDialogs() {}
     StaticDrawableWrapper* AddCustomStatic(const char* id, bool singleInstance, float ttlDefault = -1.0f);
     StaticDrawableWrapper* GetCustomStatic(const char* id);

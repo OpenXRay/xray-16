@@ -241,6 +241,9 @@ public:
     void set_ammo_elapsed(u16 count);
     u16 get_ammo_magsize();
     void clone_addons(CSE_ALifeItemWeapon* parent);
+    // Dead Air / CoC scripts expect a script-exposed accessor for the addon flags (returned by
+    // reference so :set() persists on the server object). The retail/mod engine exported this.
+    Flags8& get_addon_flags() { return m_addon_flags; }
 
     virtual BOOL Net_Relevant();
 

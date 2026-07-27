@@ -879,6 +879,19 @@ void CActor::SwitchNightVision()
             if (wpn2 && wpn2->IsZoomed())
                 return;
 
+            // Dead Air handles kNIGHT_VISION itself (itms_manager.on_key_press ->
+            // torch:enable_night_vision(not torch:night_vision_enabled())). The script eKeyPress
+            // callback runs first (CLevel::IR_OnKeyboardPress), so by the time we get here the
+            // script has already toggled night vision -- toggling again immediately undid it, which
+            // is why pressing N appeared to do nothing at all. Same class of bug as the kTORCH one
+            // fixed in CActor::SwitchTorch: once a script owns the state, the engine must not
+            // duplicate the key.
+            if (torch->night_vision_script_driven() || torch->script_driven())
+            {
+                Msg("[PPDBG-NV] caller: engine kNIGHT_VISION binding -- skipped (script-driven)");
+                return;
+            }
+            Msg("[PPDBG-NV] caller: engine kNIGHT_VISION binding (CActor::SwitchNightVision)");
             torch->SwitchNightVision();
             return;
         }
@@ -895,6 +908,13 @@ void CActor::SwitchTorch()
         CTorch* torch = smart_cast<CTorch*>(*it);
         if (torch)
         {
+            // Dead Air handles this same key in Lua (itms_manager.on_key_press -> enable_torch2) and
+            // deliberately keeps the shared light object itself always on, because the glowstick, lighter
+            // and hand flashlight all ride on it too. Hard-toggling the object from here switched those
+            // off as well -- the reported symptom was a glowstick that only lit anything while the
+            // headlamp was on. Once a script has taken the torch over, let it own the state.
+            if (torch->script_driven())
+                return;
             torch->Switch();
             return;
         }

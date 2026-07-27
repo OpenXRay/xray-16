@@ -6,6 +6,7 @@
 #include "script_game_object.h"
 #include "script_game_object_impl.h"
 #include "InventoryOwner.h"
+#include "character_community.h"
 #include "PDA.h"
 #include "xrMessages.h"
 #include "character_info.h"
@@ -718,6 +719,19 @@ void CScriptGameObject::SetCharacterRank(int char_rank)
     return pInventoryOwner->SetRank(char_rank);
 }
 
+void CScriptGameObject::SetActorCommunity(pcstr community)
+{
+    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+    if (!pInventoryOwner)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "set_actor_community available only for InventoryOwner");
+        return;
+    }
+    CHARACTER_COMMUNITY c;
+    c.set(community);
+    pInventoryOwner->SetCommunity(c.index());
+}
+
 void CScriptGameObject::ChangeCharacterRank(int char_rank)
 {
     CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
@@ -1090,6 +1104,10 @@ void CScriptGameObject::enable_night_vision(bool value)
             LuaMessageType::Error, "CTorch : cannot access class member enable_night_vision!");
         return;
     }
+    Msg("[PPDBG-NV] caller: script enable_night_vision(%d)", value ? 1 : 0);
+    // The script owns night vision from now on; the engine's kNIGHT_VISION binding must stand down,
+    // otherwise both toggle on the same key press and cancel each other out.
+    torch->set_night_vision_script_driven();
     torch->SwitchNightVision(value);
 }
 

@@ -520,6 +520,23 @@ void CGamePersistent::OnFrame()
     if (!g_pGameLevel->bReady)
         return;
 
+    // [PPDBG] track client object-respawn progress after a (re)load to test whether
+    // light-bearing objects are still streaming in when rendering resumes.
+    {
+        static u32 s_lastPrecacheFrame = 0;
+        static s32 s_ppdbgCountdown = -1;
+        if (s_lastPrecacheFrame != 0 && Device.dwPrecacheFrame == 0)
+            s_ppdbgCountdown = 400; // start a fresh watch window on precache-end edge
+        s_lastPrecacheFrame = Device.dwPrecacheFrame;
+
+        if (s_ppdbgCountdown >= 0)
+        {
+            if (s_ppdbgCountdown % 20 == 0)
+                Msg("[PPDBG] post-load t+%d frames: objects=%d", 400 - s_ppdbgCountdown, Level().Objects.o_count());
+            --s_ppdbgCountdown;
+        }
+    }
+
     g_pGameLevel->WorldRendered(false);
 
     if (Device.Paused())

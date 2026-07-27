@@ -88,6 +88,12 @@ protected:
         eInventoryPistolList,
         eInventoryAutomaticList,
 
+        // Dead Air: dedicated visible slots for the sidearm (BINOCULAR_SLOT / base 5)
+        // and the grenade+binocular slot (GRENADE_SLOT / base 4). Stock OpenXRay routed
+        // both through the ruck, so these items could not be equipped.
+        eInventorySidearmList,
+        eInventoryGrenadeList,
+
         eInventoryBackpackList,
         eInventoryOutfitList,
         eInventoryHelmetList,

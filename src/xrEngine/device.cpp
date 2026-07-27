@@ -79,6 +79,7 @@ void CRenderDevice::RenderEnd(void)
                 precache_light->set_active(false);
                 precache_light.destroy();
             }
+            b_precacheLight = false;
             GEnv.Sound->set_master_volume(1.f);
             GEnv.Render->ResourcesDestroyNecessaryTextures();
             Memory.mem_compact();
@@ -123,6 +124,7 @@ void CRenderDevice::PreCache(u32 amount, bool wait_user_input)
         precache_light->set_color(255, 255, 255);
         precache_light->set_range(5.0f);
         precache_light->set_active(true);
+        b_precacheLight = true;
     }
     if (amount && !load_screen_renderer.IsActive())
     {

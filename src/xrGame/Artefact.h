@@ -84,6 +84,9 @@ public:
     virtual void PhTune(float step){};
 
     float AdditionalInventoryWeight() const { return m_additional_weight; }
+    // Dead Air runtime artefact tuning
+    void SetAdditionalWeight(float v) { m_additional_weight = v; }
+    void SetArtefactImmunity(ALife::EHitType t, float v) { m_ArtefactHitImmunities.SetHitImmunity(t, v); }
     bool m_bCanSpawnZone;
     float m_fHealthRestoreSpeed;
     float m_fRadiationRestoreSpeed;

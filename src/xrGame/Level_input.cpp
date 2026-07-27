@@ -128,6 +128,15 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     EGameActions _curr = GetBindedAction(key);
 
+    // Snapshot whether a full-screen screen (PDA / inventory / talk / any dialog) is visibly up at
+    // the instant Escape ARRIVES - BEFORE the script eKeyPress callback below, which in Dead Air can
+    // close the PDA. Without this, kQUIT (further down) sees an already-emptied screen and wrongly
+    // opens the pause menu ("closing the PDA opens the menu"). See §11/§12 of the handoff.
+    const bool esc_screen_was_up = b_ui_exist ? CurrentGameUI()->AnyFullscreenShown() : false;
+    if (_curr == kQUIT || key == SDL_SCANCODE_ESCAPE)
+        Msg("[ESCDBG] IR_OnKeyboardPress ESC entry: key=%d action=%d(kQUIT=%d) screenWasUp=%d b_ui=%d Paused=%d frame=%d",
+            key, _curr, kQUIT, esc_screen_was_up, b_ui_exist, Device.Paused(), Device.dwFrame);
+
     /* avo: script callback */
     if (!g_bDisableAllInput && g_actor)
     {
@@ -172,14 +181,50 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     case kQUIT:
     {
-        if (b_ui_exist && CurrentGameUI()->TopInputReceiver() && !Device.Paused())
+        CUIGameCustom* ui = b_ui_exist ? CurrentGameUI() : nullptr;
+        CUIDialogWnd* tir = ui ? ui->TopInputReceiver() : nullptr;
+
+        // Escape's action is decided from the screen state captured the instant the key ARRIVED
+        // (esc_screen_was_up), NOT the state now: the Lua eKeyPress callback that just ran can flip
+        // it either way in Dead Air. Two observed cases both broke Escape before this:
+        //   * screen WAS up, but a script closed the PDA during the callback -> stock code then saw
+        //     an empty screen and opened the pause menu ("closing the PDA opens the menu").
+        //   * screen was NOT up, but a script OPENED the PDA during the callback (direct ShowDialog,
+        //     bypassing ShowPdaMenu) -> stock code then closed that PDA and never opened the menu
+        //     ("Esc in gameplay does nothing").
+        // Anchoring on the arrival-time snapshot fixes both. See §11/§12 of the handoff.
+        if (esc_screen_was_up)
         {
-            if (CurrentGameUI()->IR_UIOnKeyboardPress(key))
-                return; // special case for mp and main_menu
-            CurrentGameUI()->TopInputReceiver()->HideDialog();
+            // A screen was up when Escape arrived -> dismiss it, never open the pause menu. Prefer
+            // letting the genuine top dialog process Escape (internal navigation), then force-close
+            // it if it stubbornly stayed; otherwise close whatever is still shown.
+            if (tir && tir->IsShown() && !Device.Paused())
+            {
+                const bool handled = ui->IR_UIOnKeyboardPress(key);
+                CUIDialogWnd* now = ui->TopInputReceiver();
+                Msg("[ESCDBG] kQUIT screenWasUp: tir=%s handled=%d now=%s nowShown=%d frame=%d", tir->GetDebugType(),
+                    handled, now ? now->GetDebugType() : "null", now ? now->IsShown() : -1, Device.dwFrame);
+                if (!handled || (now == tir && tir->IsShown()))
+                {
+                    Msg("[ESCDBG] kQUIT force HideDialog on %s", tir->GetDebugType());
+                    tir->HideDialog();
+                }
+            }
+            else if (ui && !Device.Paused())
+            {
+                const bool closedShown = ui->HideShownDialogs();
+                Msg("[ESCDBG] kQUIT screenWasUp: no live TIR, HideShownDialogs closedShown=%d frame=%d",
+                    closedShown, Device.dwFrame);
+            }
         }
         else
         {
+            // Nothing was up when Escape arrived -> the player wants the pause menu. A script
+            // eKeyPress callback may have spuriously opened the PDA in the meantime; close it so it
+            // does not linger under/over the menu, then open the pause menu.
+            const bool closedSpurious = (ui && !Device.Paused()) ? ui->HideShownDialogs() : false;
+            Msg("[ESCDBG] kQUIT screenWasDown: closedSpurious=%d Paused=%d -> main_menu", closedSpurious,
+                Device.Paused());
             Console->Execute("main_menu");
         }
         return;

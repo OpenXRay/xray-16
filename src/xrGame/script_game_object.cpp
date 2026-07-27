@@ -372,6 +372,34 @@ u8 CScriptGameObject::GetAmmoType()
     return weapon->GetAmmoType();
 }
 
+LPCSTR CScriptGameObject::GetAmmoName()
+{
+    CWeapon* weapon = smart_cast<CWeapon*>(&object());
+    if (!weapon)
+        return nullptr;
+
+    if (weapon->m_ammoType >= weapon->m_ammoTypes.size())
+        return nullptr;
+
+    return weapon->m_ammoTypes[weapon->m_ammoType].c_str();
+}
+
+bool CScriptGameObject::IsAmmoSuitable(LPCSTR ammo_section)
+{
+    CWeapon* weapon = smart_cast<CWeapon*>(&object());
+    if (!weapon || !ammo_section)
+        return false;
+
+    const shared_str section = ammo_section;
+    for (const shared_str& ammo_type : weapon->m_ammoTypes)
+    {
+        if (ammo_type == section)
+            return true;
+    }
+
+    return false;
+}
+
 void CScriptGameObject::SetMainWeaponType(u32 type)
 {
     CWeapon* weapon = smart_cast<CWeapon*>(&object());
@@ -490,6 +518,30 @@ void CScriptGameObject::SetCondition(float val)
     }
     val -= inventory_item->GetCondition();
     inventory_item->ChangeCondition(val);
+}
+
+u32 CScriptGameObject::GetWeaponConditionType() const
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        GEnv.ScriptEngine->script_log(
+            LuaMessageType::Error, "CSciptEntity : cannot access class member GetWeaponConditionType!");
+        return (0);
+    }
+    return (inventory_item->GetWeaponConditionType());
+}
+
+void CScriptGameObject::SetWeaponConditionType(u32 val)
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        GEnv.ScriptEngine->script_log(
+            LuaMessageType::Error, "CSciptEntity : cannot access class member SetWeaponConditionType!");
+        return;
+    }
+    inventory_item->SetWeaponConditionType(val);
 }
 
 void CScriptGameObject::eat(CScriptGameObject* item)

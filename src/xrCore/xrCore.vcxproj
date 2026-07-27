@@ -36,13 +36,15 @@
       <AdditionalDependencies Condition="$(Configuration.Contains('Debug'))">mimalloc-static-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <PreBuildEvent>
-      <Command>where /q git
+      <Command>cd /d "$(ProjectDir)"
+where /q git
 if errorlevel 1 (
   echo git not found
-  goto :EOF
+  exit /b 0
 )
 echo git found
-call .GitInfo.cmd</Command>
+call "$(ProjectDir).GitInfo.cmd"
+exit /b 0</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

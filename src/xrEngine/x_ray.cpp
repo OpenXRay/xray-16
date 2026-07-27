@@ -28,6 +28,7 @@
 
 #ifdef XR_PLATFORM_WINDOWS
 #include <locale>
+#include <filesystem>
 
 #include "DiscordGameSDK/discord.h"
 #define USE_DISCORD_INTEGRATION
@@ -203,6 +204,37 @@ constexpr pcstr FRAME_MARK_APPLICATION_STARTUP = "Application startup";
 constexpr pcstr FRAME_MARK_APPLICATION_SHUTDOWN = "Application shutdown";
 constexpr pcstr FRAME_MARK_APPLICATION_RUN = "Application run";
 
+// Debug/porting helper: dump every file under a path alias (e.g. "$game_config$") from the
+// mounted VFS (archives) to loose files on disk, which then override the archives.
+static void UnpackAliasToLoose(pcstr alias)
+{
+    FS_FileSet fset;
+    FS.file_list(fset, alias, FS_ListFiles, nullptr);
+    Msg("UNPACK [%s]: %u files", alias, (u32)fset.size());
+    u32 done = 0, failed = 0;
+    for (const FS_File& f : fset)
+    {
+        string_path full;
+        FS.update_path(full, alias, f.name.c_str());
+        IReader* R = FS.r_open(full);
+        if (!R) { ++failed; continue; }
+        std::error_code ec;
+        std::filesystem::create_directories(std::filesystem::path(full).parent_path(), ec);
+        FILE* fp = fopen(full, "wb");
+        if (fp)
+        {
+            if (R->length())
+                fwrite(R->pointer(), 1, (size_t)R->length(), fp);
+            fclose(fp);
+            ++done;
+        }
+        else
+            ++failed;
+        FS.r_close(R);
+    }
+    Msg("UNPACK [%s]: wrote %u, failed %u", alias, done, failed);
+}
+
 CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 2>& modules)
 {
     TracySetProgramName("OpenXRay");
@@ -254,6 +286,15 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
     }
 
     Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
+
+    if (strstr(commandLine, "-unpack_configs"))
+    {
+        UnpackAliasToLoose("$game_config$");
+        UnpackAliasToLoose("$game_scripts$");
+        Msg("UNPACK: complete, exiting.");
+        FlushLog();
+        TerminateProcess(GetCurrentProcess(), 0);
+    }
 
     InitSettings();
     // Adjust player & computer name for Asian

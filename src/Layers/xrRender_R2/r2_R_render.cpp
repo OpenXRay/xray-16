@@ -94,14 +94,43 @@ void CRender::Render()
     // if (!(g_pGameLevel && g_hud) || bMenu)
     if (!g_pGameLevel || bMenu)
     {
+        // [PPDBG] this branch rebinds base_rt but skips the whole scene/combine pipeline;
+        // if it fires for many consecutive frames after a load, the backbuffer never gets
+        // recomposited and whatever G-buffer RT was last bound elsewhere could show through.
+        {
+            static u32 s_ppdbg_skip_last = 0;
+            if (Device.dwFrame != s_ppdbg_skip_last)
+            {
+                s_ppdbg_skip_last = Device.dwFrame;
+                Msg("[PPDBG] Render() skip f=%u noLevel=%d bMenu=%d", Device.dwFrame, !g_pGameLevel, bMenu);
+            }
+        }
         Target->u_setrt(RCache, Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
         return;
     }
 
     if (m_bFirstFrameAfterReset)
     {
+        // [PPDBG] this branch used to return WITHOUT rebinding base_rt, unlike the sibling
+        // branch above - whatever RT was left bound from the end of the previous frame (e.g.
+        // a G-buffer target written by the last loading-screen/precache frame) would stay on
+        // the backbuffer for however long nothing else rebinds it. Rebind explicitly, same as
+        // the sibling branch, so the presented backbuffer is always the correct target.
+        Msg("[PPDBG] Render() firstFrameAfterReset skip f=%u", Device.dwFrame);
+        Target->u_setrt(RCache, Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
         m_bFirstFrameAfterReset = false;
         return;
+    }
+
+    // [PPDBG] heartbeat: confirms the normal scene pipeline (and therefore phase_combine/tonemap)
+    // actually reached this point and will run to completion this frame.
+    {
+        static u32 s_ppdbg_beat_last = 0;
+        if (Device.dwFrame - s_ppdbg_beat_last >= 120)
+        {
+            s_ppdbg_beat_last = Device.dwFrame;
+            Msg("[PPDBG] Render() normal path f=%u", Device.dwFrame);
+        }
     }
 
     //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);

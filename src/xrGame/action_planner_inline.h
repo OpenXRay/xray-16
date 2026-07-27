@@ -87,8 +87,11 @@ void CPlanner::update()
 		Msg("! ERROR: there is no action sequence, which can transfer current world state to the target one: action[%s]", current_action().m_action_name);
 #endif
 
-    THROW(!this->solution().empty());
-	//Alundaio:
+	//Alundaio: tolerate an empty solution (GOAP found no action sequence to the goal this frame)
+	//by skipping the update, instead of aborting. This matches the graceful behavior the retail
+	//Dead Air engine relied on; the THROW below only fires because this Release build defines
+	//XRAY_EXCEPTIONS. A transiently unsolvable combat/logic graph must not crash the game.
+	//THROW(!this->solution().empty());
 	if (this->solution().empty())
 		return;
 	//-Alundaio

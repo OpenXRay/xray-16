@@ -310,6 +310,27 @@ void CCameraManager::UpdatePPEffectors()
         pp_affected.noise.grain = pp_identity.noise.grain;
 
     pp_affected.validate("after applying pp");
+
+    // [PPDBG] log active PP effectors when the aggregate is non-neutral (thermal/false-color bug).
+    {
+        const bool dirty = _abs(pp_affected.color_base.r - 0.5f) > 0.02f ||
+            _abs(pp_affected.color_base.g - 0.5f) > 0.02f || _abs(pp_affected.color_base.b - 0.5f) > 0.02f ||
+            _abs(pp_affected.color_add.r) > 0.02f || _abs(pp_affected.color_add.g) > 0.02f ||
+            _abs(pp_affected.color_add.b) > 0.02f || pp_affected.cm_influence > 0.01f;
+        static u32 s_ppdbg_eff_last = 0;
+        if (dirty && (Device.dwFrame - s_ppdbg_eff_last >= 60))
+        {
+            s_ppdbg_eff_last = Device.dwFrame;
+            string512 types{};
+            for (int i = 0; i < (int)m_EffectorsPP.size(); ++i)
+            {
+                string32 t;
+                xr_sprintf(t, "%d(v=%d) ", (int)m_EffectorsPP[i]->Type(), m_EffectorsPP[i]->Valid() ? 1 : 0);
+                xr_strcat(types, t);
+            }
+            Msg("[PPDBG] effectors count=%d types=[%s]", (int)m_EffectorsPP.size(), types);
+        }
+    }
 }
 
 void CCameraManager::ApplyDevice()

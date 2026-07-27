@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+#if defined(USE_DX11)
+#include <DirectXPackedVector.h>
+#endif
+
 namespace xray::render::RENDER_NAMESPACE
 {
 namespace phase_luminance
@@ -25,6 +29,15 @@ struct v_filter
 void CRenderTarget::phase_luminance()
 {
     using namespace phase_luminance;
+
+    // Freeze HDR auto-exposure while the in-session-load precache light is on.
+    // restart_simulator() (F9/console/menu load of a same-level save) keeps the level
+    // loaded and turns on an artificial white light at the camera during PreCache; metering
+    // that would latch the exposure dark for seconds after the load. Skipping adaptation here
+    // preserves the correct pre-load exposure across the reload. (A full level load shows a
+    // loading screen instead and does NOT set this flag, so its exposure ramp is unaffected.)
+    if (Device.dwPrecacheFrame && Device.b_precacheLight)
+        return;
 
     u32 Offset = 0;
 #ifdef USE_DX9 // XXX: check why eps is 0 for other renderers
@@ -247,6 +260,125 @@ void CRenderTarget::phase_luminance()
         RCache.set_c("MiddleGray", _result.x, _result.y, _result.z, f_luminance_adapt);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     }
+
+    // Exposure sanitizer. dbg_exposure >= 0 pins rt_LUM to that value (manual debug override).
+    // Otherwise, guard auto-exposure against a blown/NaN metered luminance: after an in-session
+    // load a bad HDR value can drive the adapted exposure to ~0 (or NaN), crushing the whole
+    // scene to black. We read the 1x1 exposure back periodically and, if it is non-finite or
+    // below a visible floor, pin it to the last healthy exposure so the image can't go black.
+    if (ps_dbg_exposure >= 0.f)
+    {
+        Fcolor c;
+        c.set(ps_dbg_exposure, ps_dbg_exposure, ps_dbg_exposure, ps_dbg_exposure);
+        RCache.ClearRT(rt_LUM_pool[gpu_id * 2 + 0], c);
+        RCache.ClearRT(rt_LUM_pool[gpu_id * 2 + 1], c);
+    }
+#if defined(USE_DX11)
+    else
+    {
+        static u32 s_rb_last = 0;
+        static float s_clamp_to = -1.f; // <0 = healthy, no clamp applied
+        static float s_last_good = 2.5f; // fallback exposure if we never saw a healthy value
+        constexpr float FLOOR = 0.15f, CAP = 25.f;
+        if (Device.dwFrame - s_rb_last >= 8)
+        {
+            s_rb_last = Device.dwFrame;
+            D3D_TEXTURE2D_DESC d = {};
+            d.Width = 1;
+            d.Height = 1;
+            d.MipLevels = 1;
+            d.ArraySize = 1;
+            d.SampleDesc.Count = 1;
+            d.Format = DXGI_FORMAT_R32_FLOAT;
+            d.Usage = D3D_USAGE_STAGING;
+            d.CPUAccessFlags = D3D_CPU_ACCESS_READ;
+            ID3DTexture2D* stage = nullptr;
+            if (SUCCEEDED(HW.pDevice->CreateTexture2D(&d, nullptr, &stage)) && stage)
+            {
+                HW.get_context(CHW::IMM_CTX_ID)->CopyResource(stage, rt_LUM_pool[gpu_id * 2 + 1]->pSurface);
+                D3D_MAPPED_TEXTURE2D md = {};
+                if (SUCCEEDED(HW.get_context(CHW::IMM_CTX_ID)->Map(stage, 0, D3D_MAP_READ, 0, &md)))
+                {
+                    const float lum = *(const float*)md.pData;
+                    HW.get_context(CHW::IMM_CTX_ID)->Unmap(stage, 0);
+                    Msg("[PPDBG] rt_LUM=%g valid=%d adapt=%g paused=%d", lum, _valid(lum) ? 1 : 0,
+                        f_luminance_adapt, Device.Paused() ? 1 : 0);
+                    if (_valid(lum) && lum >= FLOOR && lum <= CAP)
+                    {
+                        s_last_good = lum;
+                        s_clamp_to = -1.f;
+                    }
+                    else
+                    {
+                        s_clamp_to = _valid(lum) ? clampr(lum, FLOOR, CAP) : s_last_good;
+                    }
+                }
+                _RELEASE(stage);
+            }
+        }
+        if (s_clamp_to >= 0.f)
+        {
+            Fcolor c;
+            c.set(s_clamp_to, s_clamp_to, s_clamp_to, s_clamp_to);
+            RCache.ClearRT(rt_LUM_pool[gpu_id * 2 + 0], c);
+            RCache.ClearRT(rt_LUM_pool[gpu_id * 2 + 1], c);
+        }
+    }
+
+    // [PPDBG] Localize the HDR blowup: read back the 8x8 luminance grid and log the hottest cell.
+    // cell(0,0) = top-left of screen; x grows right, y grows down. A single hot cell = a localized
+    // bright source dragging auto-exposure down; a hot row/region points at sky/ground/etc.
+    {
+        static u32 s_grid_last = 0;
+        if (Device.dwFrame - s_grid_last >= 60)
+        {
+            s_grid_last = Device.dwFrame;
+            D3D_TEXTURE2D_DESC d = {};
+            d.Width = 8;
+            d.Height = 8;
+            d.MipLevels = 1;
+            d.ArraySize = 1;
+            d.SampleDesc.Count = 1;
+            d.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+            d.Usage = D3D_USAGE_STAGING;
+            d.CPUAccessFlags = D3D_CPU_ACCESS_READ;
+            ID3DTexture2D* stage = nullptr;
+            if (SUCCEEDED(HW.pDevice->CreateTexture2D(&d, nullptr, &stage)) && stage)
+            {
+                HW.get_context(CHW::IMM_CTX_ID)->CopyResource(stage, rt_LUM_8->pSurface);
+                D3D_MAPPED_TEXTURE2D md = {};
+                if (SUCCEEDED(HW.get_context(CHW::IMM_CTX_ID)->Map(stage, 0, D3D_MAP_READ, 0, &md)))
+                {
+                    float mx = -1e30f, sum = 0.f;
+                    int mxx = 0, mxy = 0;
+                    for (int y = 0; y < 8; ++y)
+                    {
+                        const u16* row = (const u16*)((const u8*)md.pData + y * md.RowPitch);
+                        for (int x = 0; x < 8; ++x)
+                        {
+                            const float r = DirectX::PackedVector::XMConvertHalfToFloat(row[x * 4 + 0]);
+                            const float g = DirectX::PackedVector::XMConvertHalfToFloat(row[x * 4 + 1]);
+                            const float b = DirectX::PackedVector::XMConvertHalfToFloat(row[x * 4 + 2]);
+                            const float a = DirectX::PackedVector::XMConvertHalfToFloat(row[x * 4 + 3]);
+                            const float lum = (r + g + b + a) * 0.25f;
+                            sum += lum;
+                            if (lum > mx)
+                            {
+                                mx = lum;
+                                mxx = x;
+                                mxy = y;
+                            }
+                        }
+                    }
+                    HW.get_context(CHW::IMM_CTX_ID)->Unmap(stage, 0);
+                    Msg("[PPDBG] LUM8 max=%g @cell(%d,%d) mean=%g ratio=%.1f", mx, mxx, mxy, sum / 64.f,
+                        mx / (sum / 64.f + 1e-6f));
+                }
+                _RELEASE(stage);
+            }
+        }
+    }
+#endif
 
     // Cleanup states
     RCache.set_Z(true);

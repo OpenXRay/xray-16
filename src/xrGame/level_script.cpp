@@ -191,6 +191,8 @@ float low_cover_in_direction(u32 level_vertex_id, const Fvector& direction)
 }
 
 float rain_factor() { return (g_pGamePersistent->Environment().CurrentEnv.rain_density); }
+// Dead Air / CoC scripts call level.get_rain_volume(); equivalent to the current rain density.
+float get_rain_volume() { return (g_pGamePersistent->Environment().CurrentEnv.rain_density); }
 u32 vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distance)
 {
     direction.normalize_safe();
@@ -815,6 +817,7 @@ void CLevel::script_register(lua_State* luaState)
         def("low_cover_in_direction", low_cover_in_direction),
         def("vertex_in_direction", vertex_in_direction),
         def("rain_factor", rain_factor),
+        def("get_rain_volume", get_rain_volume),
         def("patrol_path_exists", patrol_path_exists),
         def("vertex_position", vertex_position),
         def("name", +[]() { return Level().name().c_str(); }),

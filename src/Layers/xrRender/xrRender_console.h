@@ -111,6 +111,8 @@ extern ECORE_API float ps_r2_tonemap_middlegray; // r2-only
 extern ECORE_API float ps_r2_tonemap_adaptation; // r2-only
 extern ECORE_API float ps_r2_tonemap_low_lum; // r2-only
 extern ECORE_API float ps_r2_tonemap_amount; // r2-only
+extern ECORE_API float ps_dbg_exposure; // [PPDBG] <0 = normal auto-exposure; >=0 forces this fixed luminance
+extern ECORE_API float ps_dbg_slight_boost; // [PPDBG] spot-light color multiplier in accum_spot (1=normal)
 extern ECORE_API float ps_r2_ls_bloom_kernel_scale; // r2-only	// gauss
 extern ECORE_API float ps_r2_ls_bloom_kernel_g; // r2-only	// gauss
 extern ECORE_API float ps_r2_ls_bloom_kernel_b; // r2-only	// bilinear

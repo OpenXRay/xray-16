@@ -823,6 +823,30 @@ void CRender::rmNormal(CBackend& cmd_list)
 
 void CRender::SetPostProcessParams(const SPPInfo& ppi)
 {
+    // [PPDBG] diagnose thermal/false-color post-process corruption after in-session save load.
+    {
+        const bool dirty =
+            _abs(ppi.blur) > 0.01f || _abs(ppi.gray) > 0.01f || ppi.noise.intensity > 0.01f ||
+            _abs(ppi.duality.h) > 0.01f || _abs(ppi.duality.v) > 0.01f ||
+            _abs(ppi.color_base.r - 0.5f) > 0.02f || _abs(ppi.color_base.g - 0.5f) > 0.02f ||
+            _abs(ppi.color_base.b - 0.5f) > 0.02f || _abs(ppi.color_gray.r - 0.333f) > 0.02f ||
+            _abs(ppi.color_gray.g - 0.333f) > 0.02f || _abs(ppi.color_gray.b - 0.333f) > 0.02f ||
+            _abs(ppi.color_add.r) > 0.02f || _abs(ppi.color_add.g) > 0.02f || _abs(ppi.color_add.b) > 0.02f ||
+            ppi.cm_influence > 0.01f;
+        static u32 s_ppdbg_last = 0;
+        if (dirty && (Device.dwFrame - s_ppdbg_last >= 60))
+        {
+            s_ppdbg_last = Device.dwFrame;
+            Msg("[PPDBG] f=%u blur=%.3f gray=%.3f noise=%.3f dual=(%.3f,%.3f) base=(%.3f,%.3f,%.3f) "
+                "grayW=(%.3f,%.3f,%.3f) add=(%.3f,%.3f,%.3f) cmInf=%.3f cmInt=%.3f cm1='%s' cm2='%s'",
+                Device.dwFrame, ppi.blur, ppi.gray, ppi.noise.intensity, ppi.duality.h, ppi.duality.v,
+                ppi.color_base.r, ppi.color_base.g, ppi.color_base.b, ppi.color_gray.r, ppi.color_gray.g,
+                ppi.color_gray.b, ppi.color_add.r, ppi.color_add.g, ppi.color_add.b, ppi.cm_influence,
+                ppi.cm_interpolate, ppi.cm_tex1.c_str() ? ppi.cm_tex1.c_str() : "",
+                ppi.cm_tex2.c_str() ? ppi.cm_tex2.c_str() : "");
+        }
+    }
+
     Target->set_blur(ppi.blur);
     Target->set_gray(ppi.gray);
 

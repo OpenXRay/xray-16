@@ -176,7 +176,12 @@ void CALifeGraphRegistry::add(CSE_ALifeDynamicObject* object, GameGraph::_GRAPH_
     if (!object->m_bOnline && object->used_ai_locations() /**&& object->interactive()**/)
     {
         VERIFY(ai().game_graph().valid_vertex_id(game_vertex_id));
-        m_objects[game_vertex_id].objects().add(object->ID, object);
+        // no_assert=true: during ALife unload (CALifeSimulatorBase::unload -> on_unregister ->
+        // CSE_ALifeOnlineOfflineGroup::unregister_member -> graph().update -> add) a group member can be re-added to
+        // a graph point where it is already registered. Retail (ReleaseMasterGold, XRAY_EXCEPTIONS=0) tolerated this
+        // because THROW2 compiled out to a NDEBUG no-op; this Release build has XRAY_EXCEPTIONS=1 so it fataled. A
+        // duplicate add is a no-op (the existing entry stays). Same class as HANDOFF §14 / the teleport remove fix.
+        m_objects[game_vertex_id].objects().add(object->ID, object, true);
         object->m_tGraphID = game_vertex_id;
     }
     else if (!m_level && update)
@@ -186,7 +191,7 @@ void CALifeGraphRegistry::add(CSE_ALifeDynamicObject* object, GameGraph::_GRAPH_
     }
 
     if (update && m_level && ai().game_graph().valid_vertex_id(game_vertex_id))
-        level().add(object);
+        level().add(object, true);
 }
 
 void CALifeGraphRegistry::remove(CSE_ALifeDynamicObject* object, GameGraph::_GRAPH_ID game_vertex_id, bool update)
@@ -200,8 +205,13 @@ void CALifeGraphRegistry::remove(CSE_ALifeDynamicObject* object, GameGraph::_GRA
                 game_vertex_id);
         }
 #endif
-        m_objects[game_vertex_id].objects().remove(object->ID);
+        // no_assert=true: an A-Life teleport (e.g. an NPC walking a cross-graph game path) can ask to remove a
+        // server object that isn't registered at this graph point / level. Retail (ReleaseMasterGold,
+        // XRAY_EXCEPTIONS=0) tolerated this because THROW2 compiled out to a NDEBUG no-op; this Release build has
+        // XRAY_EXCEPTIONS=1 so it fataled. Removing a not-present id is inherently a no-op, so tolerate it. See
+        // HANDOFF §14 (same class of bug: GOAP planner THROW).
+        m_objects[game_vertex_id].objects().remove(object->ID, true);
     }
     if (update && m_level)
-        level().remove(object, ai().game_graph().vertex(game_vertex_id)->level_id() != level().level_id());
+        level().remove(object, true);
 }

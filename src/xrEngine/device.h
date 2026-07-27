@@ -57,6 +57,9 @@ public:
     u32 dwFrame{};
     u32 dwPrecacheFrame{};
     u32 dwPrecacheTotal{};
+    // True while the in-session-load precache light is active (restart_simulator path).
+    // Used to freeze HDR auto-exposure so that artificial light doesn't latch it dark.
+    bool b_precacheLight{};
 
     // Rendering resolution
     u32 dwWidth{};

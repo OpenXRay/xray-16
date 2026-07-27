@@ -161,6 +161,8 @@ extern CUISequencer* g_tutorial2;
 
 bool CUIGameCustom::ShowActorMenu()
 {
+    Msg("[ESCDBG] ShowActorMenu called: ActorMenu.IsShown=%d PdaMenu.IsShown=%d", ActorMenu->IsShown(),
+        PdaMenu->IsShown());
     if (ActorMenu->IsShown())
     {
         ActorMenu->HideDialog();
@@ -180,7 +182,10 @@ bool CUIGameCustom::ShowActorMenu()
 void CUIGameCustom::HideActorMenu()
 {
     if (ActorMenu->IsShown())
+    {
+        Msg("[ESCDBG] HideActorMenu() closing ActorMenu frame=%d", Device.dwFrame);
         ActorMenu->HideDialog();
+    }
 }
 
 //Alundaio:
@@ -226,6 +231,8 @@ void CUIGameCustom::ShowMessagesWindow()
 
 bool CUIGameCustom::ShowPdaMenu()
 {
+    Msg("[ESCDBG] ShowPdaMenu called: ActorMenu.IsShown=%d PdaMenu.IsShown=%d", ActorMenu->IsShown(),
+        PdaMenu->IsShown());
     if (PdaMenu->IsShown())
     {
         PdaMenu->HideDialog();
@@ -239,7 +246,21 @@ bool CUIGameCustom::ShowPdaMenu()
 void CUIGameCustom::HidePdaMenu()
 {
     if (PdaMenu->IsShown())
+    {
+        Msg("[ESCDBG] HidePdaMenu() closing PdaMenu frame=%d", Device.dwFrame);
         PdaMenu->HideDialog();
+    }
+}
+
+bool CUIGameCustom::AnyFullscreenShown()
+{
+    if (TopInputReceiver())
+        return true;
+    if (PdaMenu && PdaMenu->IsShown())
+        return true;
+    if (ActorMenu && ActorMenu->IsShown())
+        return true;
+    return false;
 }
 
 void CUIGameCustom::SetClGame(game_cl_GameState* gameState) { gameState->SetGameUI(this); }

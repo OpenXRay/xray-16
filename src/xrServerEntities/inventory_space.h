@@ -20,7 +20,14 @@ enum
     TORCH_SLOT, // torch
     ARTEFACT_SLOT, // artefact
     HELMET_SLOT,
-    BACKPACK_SLOT, // backpack
+    // base 13 is Dead Air's "script animation" (hand-item overlay) slot, referenced by
+    // literal 13 in gamedata\scripts\dar2_animations_hands.script / dinamic_hud.script.
+    // base 14 is unused (freed when grenades/binoculars were realigned onto GRENADE_SLOT/
+    // BINOCULAR_SLOT). Dead Air's system.ltx [inventory] itself places "backpack" at base 15
+    // (slot_persistent_15), and every backpack-item .ltx (items_attachments.ltx [kit_hunt])
+    // and 20+ gamedata\scripts callers hardcode item_in_slot(15) for it — so BACKPACK_SLOT
+    // must equal 15, not the next sequential value, to match the data Dead Air actually ships.
+    BACKPACK_SLOT = 15, // backpack
     SLOTS_COUNT
 };
 

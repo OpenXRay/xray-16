@@ -641,7 +641,10 @@ void CUIMainIngameWnd::UpdateMainIndicators()
         return;
 
     UpdateQuickSlots();
-    if (IsGameTypeSingle())
+    // Only update the PDA ranking window while the PDA is actually shown. Updating it every frame
+    // in the background (with Dead Air's partly-broken PDA UI) walks a corrupted child tree and
+    // crashes in CUIWindow::Update — and its data is only visible when the PDA is open anyway.
+    if (IsGameTypeSingle() && CurrentGameUI()->GetPdaMenu().IsShown())
         CurrentGameUI()->GetPdaMenu().UpdateRankingWnd();
 
     u8 flags = 0;
