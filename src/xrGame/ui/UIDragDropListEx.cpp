@@ -699,6 +699,11 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
         if (i == itm)
             continue;
 
+        // Alundaio: a candidate that was just split (see itms_manager.script inv_item_split_ammo) skips
+        // being considered ONCE, so the freshly-spawned other half doesn't immediately re-merge with it.
+        if (iitem && iitem->ConsumeSuppressAutoStackOnce())
+            continue;
+
         if (i->EqualTo(itm))
             return i;
     }

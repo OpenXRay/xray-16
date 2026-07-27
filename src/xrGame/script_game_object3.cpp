@@ -1298,6 +1298,19 @@ void CScriptGameObject::AmmoSetCount(u16 count)
     ammo->m_boxCurr = count;
 }
 
+void CScriptGameObject::SuppressAutoStackOnce()
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        GEnv.ScriptEngine->script_log(
+            LuaMessageType::Error, "CGameObject : cannot access class member SuppressAutoStackOnce!");
+        return;
+    }
+
+    item->SetSuppressAutoStackOnce();
+}
+
 u16 CScriptGameObject::AmmoBoxSize()
 {
     CWeaponAmmo* ammo = smart_cast<CWeaponAmmo*>(&object());
