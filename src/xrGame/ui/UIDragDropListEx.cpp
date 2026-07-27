@@ -664,9 +664,21 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
     }
     //-Alundaio
 
+    // Alundaio: covers the case where the item just being (re-)placed is itself the one that was just
+    // split (e.g. a full list rebuild re-inserts it after the freshly-spawned other half is already
+    // present as a candidate) - FindSimilar()'s own check only catches the reverse insertion order.
+    if (iitem && iitem->IsSuppressingAutoStack())
+    {
+        Msg("[stack_dbg] AddSimilar: self-suppressed %s (just-split item being re-placed)",
+            iitem->m_section_id.c_str());
+        return false;
+    }
+
     CUICellItem* i = FindSimilar(itm);
     if (i == nullptr || i == itm || itm->ChildsCount() > 0)
         return false;
+
+    Msg("[stack_dbg] AddSimilar: merged %s into existing cell 0x%p", iitem ? iitem->m_section_id.c_str() : "?", i);
 
     i->PushChild(itm);
     itm->SetOwnerList(m_pParentDragDropList);
@@ -700,9 +712,13 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
             continue;
 
         // Alundaio: a candidate that was just split (see itms_manager.script inv_item_split_ammo) skips
-        // being considered ONCE, so the freshly-spawned other half doesn't immediately re-merge with it.
-        if (iitem && iitem->ConsumeSuppressAutoStackOnce())
+        // being considered while suppressed, so the freshly-spawned other half doesn't immediately
+        // re-merge with it.
+        if (iitem && iitem->IsSuppressingAutoStack())
+        {
+            Msg("[stack_dbg] FindSimilar: candidate-suppressed %s (just-split item)", iitem->m_section_id.c_str());
             continue;
+        }
 
         if (i->EqualTo(itm))
             return i;

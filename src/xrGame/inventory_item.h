@@ -84,10 +84,6 @@ protected:
         FInInterpolate = (1 << 10),
         FIsQuestItem = (1 << 11),
         FIsHelperItem = (1 << 12),
-        // Set right after a scripted split (e.g. splitting an ammo stack) on the item that stays behind,
-        // so the freshly-spawned other half doesn't immediately re-merge with it when it's picked back up
-        // into the same list. Consumed (cleared) the first time it's checked as a merge candidate.
-        FSuppressAutoStackOnce = (1 << 13),
     };
 
     Flags16 m_flags;
@@ -144,15 +140,18 @@ public:
     BOOL GetDropManual() const { return m_flags.test(FdropManual); }
     void SetDropManual(BOOL val);
 
-    IC void SetSuppressAutoStackOnce() { m_flags.set(FSuppressAutoStackOnce, TRUE); }
-    // One-shot check: returns true (and clears the flag) only the first time it's asked after being set.
-    IC bool ConsumeSuppressAutoStackOnce()
-    {
-        if (!m_flags.test(FSuppressAutoStackOnce))
-            return false;
-        m_flags.set(FSuppressAutoStackOnce, FALSE);
-        return true;
-    }
+    // Suppresses this item from being matched as an inventory-list auto-stack target/source for a short,
+    // fixed window (see .cpp) rather than a stateful flag - a single scripted split's resulting pickup can
+    // trigger several internal merge-attempt calls (and this item's own UI cell is never re-inserted after
+    // a split, only mutated in place, so there's no reliable "placement" event to clear a flag on). Time-
+    // based expiry means it protects the whole split-then-repick-up sequence without ever getting stuck on.
+    void SetSuppressAutoStackOnce();
+    bool IsSuppressingAutoStack() const;
+
+protected:
+    u32 m_dwSuppressAutoStackUntil{};
+
+public:
 
     BOOL IsInvalid() const;
 
