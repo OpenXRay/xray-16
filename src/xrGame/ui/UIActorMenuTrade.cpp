@@ -11,6 +11,7 @@
 #include "UIInventoryUtilities.h"
 #include "UICellItemFactory.h"
 #include "InventoryOwner.h"
+#include "xrServerEntities/character_info.h" // CSpecificCharacter::barter_mode()
 #include "Inventory.h"
 #include "trade.h"
 #include "Entity.h"
@@ -26,6 +27,11 @@
 
 void CUIActorMenu::InitTradeMode()
 {
+    // Dead Air: ordinary (non-trader) stalkers are flagged <barter_mode>1</barter_mode> in their
+    // character profile. They exchange goods for goods only — no money changes hands — so they get a
+    // single "exchange" button instead of the separate buy/sell pair.
+    m_trade_barter_mode = m_pPartnerInvOwner && m_pPartnerInvOwner->SpecificCharacter().barter_mode();
+
     ShowIfExist(m_pTradeWnd, true);
     m_pLists[eInventoryBagList]->Show(false);
     GetModeSpecificPartnerInfo(mmTrade)->Show(true);
@@ -42,9 +48,10 @@ void CUIActorMenu::InitTradeMode()
     ShowIfExist(m_LeftBackground, true);
 
     m_PartnerWeightBar->Show(true);
-    ShowIfExist(m_trade_button, true);
-    ShowIfExist(m_trade_buy_button, true);
-    ShowIfExist(m_trade_sell_button, true);
+    ShowIfExist(m_trade_button, !m_trade_barter_mode);
+    ShowIfExist(m_trade_buy_button, !m_trade_barter_mode);
+    ShowIfExist(m_trade_sell_button, !m_trade_barter_mode);
+    ShowIfExist(m_trade_barter_button, m_trade_barter_mode);
 
     VERIFY(m_pPartnerInvOwner);
     m_pPartnerInvOwner->StartTrading();
@@ -145,6 +152,8 @@ void CUIActorMenu::DeInitTradeMode()
     ShowIfExist(m_trade_button, false);
     ShowIfExist(m_trade_buy_button, false);
     ShowIfExist(m_trade_sell_button, false);
+    ShowIfExist(m_trade_barter_button, false);
+    m_trade_barter_mode = false;
 
     if (!CurrentGameUI())
         return;
@@ -518,14 +527,42 @@ void CUIActorMenu::OnBtnPerformTradeSell(CUIWindow* w, void* d)
     UpdateItemsPlace();
 }
 
+// Dead Air barter: no money, only goods. The deal goes through as soon as what the actor puts up is
+// worth at least as much as what he is taking, using the very same prices the two trade bars show.
+void CUIActorMenu::OnBtnPerformBarter(CUIWindow* w, void* d)
+{
+    if (m_pLists[eTradeActorList]->ItemsCount() == 0 && m_pLists[eTradePartnerList]->ItemsCount() == 0)
+    {
+        return;
+    }
+
+    const u32 actor_price = CalcItemsPrice(m_pLists[eTradeActorList], m_partner_trade, true);
+    const u32 partner_price = CalcItemsPrice(m_pLists[eTradePartnerList], m_partner_trade, false);
+
+    if (actor_price >= partner_price)
+    {
+        m_partner_trade->OnPerformTrade(0, 0);
+
+        TransferItems(m_pLists[eTradeActorList], m_pLists[eTradePartnerBagList], m_partner_trade, true, true);
+        TransferItems(m_pLists[eTradePartnerList], m_pLists[eTradeActorBagList], m_partner_trade, false, true);
+    }
+    else
+    {
+        ShowMessage("trade_dont_make", "trade_dont_make", 2.0f);
+    }
+    SetCurrentItem(nullptr);
+
+    UpdateItemsPlace();
+}
+
 void CUIActorMenu::TransferItems(
-    CUIDragDropListEx* pSellList, CUIDragDropListEx* pBuyList, CTrade* pTrade, bool bBuying)
+    CUIDragDropListEx* pSellList, CUIDragDropListEx* pBuyList, CTrade* pTrade, bool bBuying, bool bFree)
 {
     while (pSellList->ItemsCount())
     {
         CUICellItem* cell_item = pSellList->RemoveItem(pSellList->GetItemIdx(0), false);
         PIItem item = (PIItem)cell_item->m_pData;
-        pTrade->TransferItem(item, bBuying);
+        pTrade->TransferItem(item, bBuying, bFree);
 
         if (bBuying)
         {

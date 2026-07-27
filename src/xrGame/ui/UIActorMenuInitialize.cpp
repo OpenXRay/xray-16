@@ -279,6 +279,8 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     m_trade_button = UIHelper::Create3tButton(uiXml, "trade_button", this, false);
     m_trade_buy_button = UIHelper::Create3tButton(uiXml, "trade_buy_button", this, false);
     m_trade_sell_button = UIHelper::Create3tButton(uiXml, "trade_sell_button", this, false);
+    // Dead Air: barter partners get a single exchange button instead of buy/sell
+    m_trade_barter_button = UIHelper::Create3tButton(uiXml, "trade_barter_button", this, false);
     m_takeall_button = UIHelper::Create3tButton(uiXml, "takeall_button", this);
     m_exit_button = UIHelper::Create3tButton(uiXml, "exit_button", this);
 
@@ -520,6 +522,9 @@ void CUIActorMenu::InitCallbacks()
 
     RegisterCallback(m_trade_sell_button, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnPerformTradeSell));
+
+    RegisterCallback(m_trade_barter_button, BUTTON_CLICKED,
+        CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnPerformBarter));
 
     RegisterCallback(m_takeall_button, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIActorMenu::TakeAllFromPartner));
