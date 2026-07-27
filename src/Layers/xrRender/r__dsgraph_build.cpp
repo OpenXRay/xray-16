@@ -1110,6 +1110,13 @@ void R_dsgraph_structure::build_subspace()
                     IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
                     if (viewEntity == nullptr)
                         break;
+                    // Ladder climb: the camera swings close to/inside the torso in this
+                    // pose (a world-distance heuristic was tried and proved unworkable —
+                    // camera-to-neck distance barely changes between climbing and normal
+                    // standing/walking). Query the actual game state instead via the
+                    // cross-DLL climbing() accessor and skip the body draw outright.
+                    if (viewEntity->climbing())
+                        break;
                     const auto& entity_pos = viewEntity->spatial_sector_point();
                     viewEntity->spatial_updatesector(detect_sector(entity_pos));
                     const auto sector_id = viewEntity->GetSpatialData().sector_id;
@@ -1135,17 +1142,6 @@ void R_dsgraph_structure::build_subspace()
                         // the worn outfit's body model has no head geometry to mount it on
                         // (confirmed unwanted in-game 2026-07-27). add_Visual bypasses
                         // CActor::renderable_Render's attachment call entirely.
-                        // A camera-to-bone distance heuristic was tried here to suppress
-                        // the body draw during ladder-climbing (which clips into the
-                        // camera) but logged data proved it can't work: camera-to-
-                        // neck/shoulder distance sits in the same ~0.15-0.5m range during
-                        // completely normal standing/walking as it does while climbing,
-                        // because the camera is a fixed rig offset from the head/neck —
-                        // that distance barely changes with animation state at all.
-                        // Reverted (2026-07-27); the ladder clip remains unfixed and needs
-                        // a different approach (e.g. a real camera-space/near-clip test,
-                        // or detecting the climb state directly via a new cross-DLL query
-                        // — neither attempted yet).
                         if (viewEntity->Visual() != nullptr)
                             RImplementation.add_Visual(context_id, renderable, viewEntity->Visual(), viewEntity->XFORM());
                     }
