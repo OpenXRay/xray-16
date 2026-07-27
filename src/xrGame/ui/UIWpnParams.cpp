@@ -16,6 +16,7 @@ struct SLuaWpnParams
     luabind::functor<float> m_functorDamage;
     luabind::functor<float> m_functorDamageMP;
     luabind::functor<float> m_functorHandling;
+    luabind::functor<float> m_functorReliability;
 
     SLuaWpnParams();
     ~SLuaWpnParams();
@@ -36,6 +37,8 @@ SLuaWpnParams::SLuaWpnParams()
     VERIFY(functor_exists);
     functor_exists = GEnv.ScriptEngine->functor("ui_wpn_params.GetAccuracy", m_functorAccuracy);
     VERIFY(functor_exists);
+    functor_exists = GEnv.ScriptEngine->functor("ui_wpn_params.GetReliability", m_functorReliability);
+    VERIFY(functor_exists);
 }
 
 SLuaWpnParams::~SLuaWpnParams() {}
@@ -53,6 +56,7 @@ CUIWpnParams::CUIWpnParams() : CUIWindow("Weapon Params")
     AttachChild(&m_progressDamage);
     AttachChild(&m_progressHandling);
     AttachChild(&m_progressRPM);
+    AttachChild(&m_progressReliability);
 }
 
 bool CUIWpnParams::InitFromXml(CUIXml& xml_doc)
@@ -68,16 +72,31 @@ bool CUIWpnParams::InitFromXml(CUIXml& xml_doc)
     m_icon_dam = UIHelper::CreateStatic(xml_doc, "wpn_params:static_damage", this, false);
     m_icon_han = UIHelper::CreateStatic(xml_doc, "wpn_params:static_handling", this, false);
     m_icon_rpm = UIHelper::CreateStatic(xml_doc, "wpn_params:static_rpm", this, false);
+    m_icon_cond = UIHelper::CreateStatic(xml_doc, "wpn_params:static_condition", this, false);
+    m_icon_rel = UIHelper::CreateStatic(xml_doc, "wpn_params:static_reliability", this, false);
 
     CUIXmlInit::InitStatic(xml_doc, "wpn_params:cap_accuracy", 0, &m_textAccuracy);
     CUIXmlInit::InitStatic(xml_doc, "wpn_params:cap_damage", 0, &m_textDamage);
     CUIXmlInit::InitStatic(xml_doc, "wpn_params:cap_handling", 0, &m_textHandling);
     CUIXmlInit::InitStatic(xml_doc, "wpn_params:cap_rpm", 0, &m_textRPM);
+    m_textCondition = UIHelper::CreateStatic(xml_doc, "wpn_params:cap_condition", this, false);
+    m_textCondition2 = UIHelper::CreateStatic(xml_doc, "wpn_params:cap_condition2", this, false);
+    m_textReliability = UIHelper::CreateStatic(xml_doc, "wpn_params:cap_reliability", this, false);
 
     m_progressAccuracy.InitFromXml(xml_doc, "wpn_params:progress_accuracy");
     m_progressDamage.InitFromXml(xml_doc, "wpn_params:progress_damage");
     m_progressHandling.InitFromXml(xml_doc, "wpn_params:progress_handling");
     m_progressRPM.InitFromXml(xml_doc, "wpn_params:progress_rpm");
+
+    if (xml_doc.NavigateToNode("wpn_params:progress_reliability", 0))
+    {
+        m_progressReliability.InitFromXml(xml_doc, "wpn_params:progress_reliability");
+        m_progressReliability.Show(true);
+    }
+    else
+    {
+        m_progressReliability.Show(false);
+    }
 
     if (IsGameTypeSingle())
     {
@@ -122,11 +141,13 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
     float cur_damage = (GameID() == eGameIDSingle) ?
         iFloor(g_lua_wpn_params->m_functorDamage(cur_section, str_upgrades) * 53.0f) / 53.0f :
         iFloor(g_lua_wpn_params->m_functorDamageMP(cur_section, str_upgrades) * 53.0f) / 53.0f;
+    float cur_rel = iFloor(g_lua_wpn_params->m_functorReliability(cur_section, str_upgrades) * 53.0f) / 53.0f;
 
     float slot_rpm = cur_rpm;
     float slot_accur = cur_accur;
     float slot_hand = cur_hand;
     float slot_damage = cur_damage;
+    float slot_rel = cur_rel;
 
     if (slot_wpn && (slot_wpn != &cur_wpn))
     {
@@ -140,12 +161,33 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
         slot_damage = (GameID() == eGameIDSingle) ?
             iFloor(g_lua_wpn_params->m_functorDamage(slot_section, str_upgrades) * 53.0f) / 53.0f :
             iFloor(g_lua_wpn_params->m_functorDamageMP(slot_section, str_upgrades) * 53.0f) / 53.0f;
+        slot_rel = iFloor(g_lua_wpn_params->m_functorReliability(slot_section, str_upgrades) * 53.0f) / 53.0f;
     }
 
     m_progressAccuracy.SetTwoPos(cur_accur, slot_accur);
     m_progressDamage.SetTwoPos(cur_damage, slot_damage);
     m_progressHandling.SetTwoPos(cur_hand, slot_hand);
     m_progressRPM.SetTwoPos(cur_rpm, slot_rpm);
+    m_progressReliability.SetTwoPos(cur_rel, slot_rel);
+
+    if (m_textCondition2)
+    {
+        float cur_cond = cur_wpn.GetConditionToShow() * 100.0f;
+        float slot_cond = cur_cond;
+        if (slot_wpn && (slot_wpn != &cur_wpn))
+            slot_cond = slot_wpn->GetConditionToShow() * 100.0f;
+
+        if (fsimilar(cur_cond, slot_cond))
+            m_textCondition2->SetTextColor(color_rgba(170, 170, 170, 255));
+        else if (cur_cond < slot_cond)
+            m_textCondition2->SetTextColor(color_rgba(255, 0, 0, 255));
+        else
+            m_textCondition2->SetTextColor(color_rgba(0, 255, 0, 255));
+
+        string128 str;
+        xr_sprintf(str, sizeof(str), "%.0f%%", cur_cond);
+        m_textCondition2->SetText(str);
+    }
 
     if (IsGameTypeSingle())
     {

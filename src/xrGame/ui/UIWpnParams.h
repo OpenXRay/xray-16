@@ -23,17 +23,23 @@ protected:
     CUIDoubleProgressBar m_progressHandling;
     CUIDoubleProgressBar m_progressDamage;
     CUIDoubleProgressBar m_progressRPM;
+    CUIDoubleProgressBar m_progressReliability;
 
     CUIStatic* m_icon_acc;
     CUIStatic* m_icon_dam;
     CUIStatic* m_icon_han;
     CUIStatic* m_icon_rpm;
+    CUIStatic* m_icon_cond;
+    CUIStatic* m_icon_rel;
 
     CUIStatic* m_stAmmo;
     CUIStatic m_textAccuracy{ "Accuracy" };
     CUIStatic m_textHandling{ "Handling" };
     CUIStatic m_textDamage{ "Damage" };
     CUIStatic m_textRPM{ "RPM" };
+    CUIStatic* m_textCondition;
+    CUIStatic* m_textCondition2;
+    CUIStatic* m_textReliability;
     CUIStatic* m_textAmmoTypes;
     CUIStatic* m_textAmmoUsedType;
     CUIStatic* m_textAmmoCount;

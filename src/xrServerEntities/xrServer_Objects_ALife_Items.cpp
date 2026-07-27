@@ -564,6 +564,13 @@ void CSE_ALifeItemWeapon::STATE_Read(NET_Packet& tNetPacket, u16 size)
 
     if (m_wVersion > 122)
         a_elapsed_grenades.unpack_from_byte(tNetPacket.r_u8());
+
+    // Trailing field, not covered by m_wVersion (Dead Air script addition, not a stock format bump) —
+    // guard on remaining bytes so spawn/save data written before this field existed still reads cleanly.
+    if (tNetPacket.r_elapsed() >= sizeof(u32))
+        tNetPacket.r_u32(m_weapon_condition_type);
+    else
+        m_weapon_condition_type = 0;
 }
 
 void CSE_ALifeItemWeapon::STATE_Write(NET_Packet& tNetPacket)
@@ -575,6 +582,7 @@ void CSE_ALifeItemWeapon::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(m_addon_flags.get());
     tNetPacket.w_u8(ammo_type);
     tNetPacket.w_u8(a_elapsed_grenades.pack_to_byte());
+    tNetPacket.w_u32(m_weapon_condition_type);
 }
 
 void CSE_ALifeItemWeapon::OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, ClientID sender)

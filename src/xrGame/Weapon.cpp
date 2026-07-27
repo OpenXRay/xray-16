@@ -578,6 +578,12 @@ bool CWeapon::net_Spawn(CSE_Abstract* DC)
     m_ammoType = E->ammo_type;
     SetState(E->wpn_state);
     SetNextState(E->wpn_state);
+    // Only seed from the ALife object's own condition-type field (set once, at loot-spawn time, by
+    // coc_treasure_manager.script) on a genuinely fresh spawn. If client_data is present, net_Load
+    // (called inside inherited::net_Spawn above) already restored the authoritative, up-to-date
+    // session value from CInventoryItem::save/load — don't stomp it back to the stale ALife seed.
+    if (E->client_data.empty())
+        SetWeaponConditionType(E->m_weapon_condition_type);
 
     m_DefaultCartridge.Load(m_ammoTypes[m_ammoType].c_str(), m_ammoType);
     if (iAmmoElapsed)

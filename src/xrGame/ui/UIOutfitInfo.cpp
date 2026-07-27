@@ -115,6 +115,23 @@ void CUIOutfitImmunity::SetProgressValue(float cur, float comp, float add /*= 0.
 }
 
 // ===========================================================================================
+void CUIOutfitInfo::SetConditionValue(float cur, float comp)
+{
+    if (!m_textCondition2)
+        return;
+
+    if (fsimilar(cur, comp))
+        m_textCondition2->SetTextColor(color_rgba(170, 170, 170, 255));
+    else if (cur < comp)
+        m_textCondition2->SetTextColor(color_rgba(255, 0, 0, 255));
+    else
+        m_textCondition2->SetTextColor(color_rgba(0, 255, 0, 255));
+
+    string128 str;
+    xr_sprintf(str, sizeof(str), "%.0f%%", cur);
+    m_textCondition2->SetText(str);
+}
+
 void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 {
     constexpr pcstr base_str = "outfit_info";
@@ -143,6 +160,10 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
             m_start_pos = { x, y };
         }
     }
+
+    m_icon_condition = UIHelper::CreateStatic(xml_doc, "outfit_info:static_condition", this, false);
+    m_textCondition = UIHelper::CreateStatic(xml_doc, "outfit_info:cap_condition", this, false);
+    m_textCondition2 = UIHelper::CreateStatic(xml_doc, "outfit_info:cap_condition2", this, false);
 
     for (const auto [hit_type, immunity, immunity_text] : immunity_names)
     {
@@ -195,6 +216,10 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
         }
         return;
     }
+
+    const float cur_cond = cur_outfit->GetConditionToShow() * 100.0f;
+    const float slot_cond = slot_outfit ? slot_outfit->GetConditionToShow() * 100.0f : cur_cond;
+    SetConditionValue(cur_cond, slot_cond);
 
     const bool is_cs_cop = cur_outfit->GetHitFracType() != SBoneProtections::HitFraction;
 
@@ -261,6 +286,10 @@ void CUIOutfitInfo::UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet)
     {
         return;
     }
+
+    const float cur_cond = cur_helmet->GetConditionToShow() * 100.0f;
+    const float slot_cond = slot_helmet ? slot_helmet->GetConditionToShow() * 100.0f : cur_cond;
+    SetConditionValue(cur_cond, slot_cond);
 
     for (auto& [hit_type, item] : m_items)
     {
