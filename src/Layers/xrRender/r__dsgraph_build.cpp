@@ -712,6 +712,51 @@ void R_dsgraph_structure::unload()
 }
 
 
+// Pose a bone hierarchy in one skeleton (full-detail shadow stand-in) to match another,
+// differently-proportioned skeleton (the actor's own live, currently-worn-outfit visual)
+// by bone name. Copying accumulated world transforms directly (first attempt) warped
+// badly during animation, because it silently carries the SOURCE model's bone lengths
+// into the TARGET model's geometry — the two body meshes share the same rig topology but
+// not necessarily identical bone proportions, and this error compounds down each bone
+// chain, so it's small near bind pose (idle) and large at the chain's far end (head,
+// hands) once the pose actually moves (walking) — matching what was observed in-game
+// 2026-07-27. Fix: decompose the source bone's LOCAL (parent-relative) transform, keep
+// only its ROTATION, and recombine with the TARGET's OWN bind-pose translation (bone
+// length) before accumulating through the TARGET's own hierarchy — proper retargeting,
+// not a flat world-transform copy.
+static void retarget_bone_recursive(IKinematics* full_kin, IKinematics* live_kin, CBoneData& full_bd,
+    const Fmatrix& full_parent_world, const Fmatrix& live_parent_world, bool live_parent_valid)
+{
+    const u16 full_id = full_bd.GetSelfID();
+    const u16 live_id = live_kin->LL_BoneID(full_bd.name);
+
+    Fmatrix full_local = full_bd.bind_transform; // target's own bone length/offset
+    Fmatrix live_world_for_children = live_parent_world;
+    bool live_valid_here = false;
+
+    if (live_id != BI_NONE && live_parent_valid)
+    {
+        const Fmatrix& live_world = live_kin->LL_GetBoneInstance(live_id).mTransform;
+        Fmatrix live_parent_inv;
+        live_parent_inv.invert(live_parent_world);
+        Fmatrix live_local;
+        live_local.mul_43(live_parent_inv, live_world);
+        // take the source's rotation/scale basis only — keep target's own translation
+        full_local.i = live_local.i;
+        full_local.j = live_local.j;
+        full_local.k = live_local.k;
+        live_world_for_children = live_world;
+        live_valid_here = true;
+    }
+
+    CBoneInstance& full_bi = full_kin->LL_GetBoneInstance(full_id);
+    full_bi.mTransform.mul_43(full_parent_world, full_local);
+    full_bi.mRenderTransform.mul_43(full_bi.mTransform, full_kin->LL_GetData(full_id).m2b_transform);
+
+    for (CBoneData* child : full_bd.children)
+        retarget_bone_recursive(full_kin, live_kin, *child, full_bi.mTransform, live_world_for_children, live_valid_here);
+}
+
 // sub-space rendering - main procedure
 void R_dsgraph_structure::build_subspace()
 {
@@ -939,6 +984,170 @@ void R_dsgraph_structure::build_subspace()
 
                         // renderable
                         g_pGameLevel->pHUD->Render_First(context_id);
+                    }
+                } while (0);
+            }
+
+            // Actor Body shadow: the weapon-shadow injection above only draws the HUD
+            // (weapon) model into the shadow map, not the actor's own body.
+            //
+            // Root-caused 2026-07-27: the actor's *own* visual while worn with an outfit
+            // is NOT a full body — CCustomOutfit::ApplySkinModel swaps it to the outfit's
+            // "actor_visual" (e.g. actors\legs\novice_outfit.ogf), a legs-only model with
+            // no head/hand geometry at all (by design, so the first-person HUD hands are
+            // used instead — confirmed wanted behavior for the color-pass draw below).
+            // Bone-visibility toggling (two earlier attempts) could never fix this: the
+            // geometry for those parts simply isn't in that model. Two earlier attempts
+            // confirmed via runtime log that the head/hand bones were already visible.
+            //
+            // Fix: render a SEPARATE, independent instance of the full-detail creature
+            // visual (actors\stalker_hero\stalker_hero_1.ogf — the same complete model
+            // regular NPCs use) for the shadow only, with its bone transforms copied
+            // bone-by-bone (by name) from the actor's own live/posed skeleton so the
+            // shadow's stance matches the actor's real animation instead of a static pose.
+            if (o.phase == CRender::PHASE_SMAP && ps_r__common_flags.test(RFLAG_ACTOR_BODY))
+            {
+                do
+                {
+                    IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
+                    if (viewEntity == nullptr)
+                        break;
+                    const auto& entity_pos = viewEntity->spatial_sector_point();
+                    viewEntity->spatial_updatesector(detect_sector(entity_pos));
+                    const auto sector_id = viewEntity->GetSpatialData().sector_id;
+                    if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
+                        break; // disassociated from S/P structure
+                    CSector* sector = Sectors[sector_id];
+                    if (PortalTraverser.i_marker != sector->r_marker)
+                        break; // inactive (untouched) sector
+                    IRenderable* renderable = viewEntity->dcast_Renderable();
+                    if (renderable == nullptr)
+                        break;
+
+                    for (const CFrustum& view : sector->r_frustums)
+                    {
+                        if (!view.testSphere_dirty(
+                            viewEntity->GetSpatialData().sphere.P, viewEntity->GetSpatialData().sphere.R))
+                            continue;
+
+                        // Base body mesh only, NOT renderable->renderable_Render() (which
+                        // also shadow-casts attachments like the torch/headlamp). The
+                        // headlamp attaches at the LIVE (legs-only) skeleton's real bone
+                        // position, while the full-detail silhouette below is a separately
+                        // retargeted approximation of the head — the two don't line up
+                        // exactly, so the headlamp cast a visibly detached second shadow
+                        // next to the head's (confirmed unwanted in-game 2026-07-27).
+                        // Simplest fix: the headlamp doesn't need its own shadow at all.
+                        if (viewEntity->Visual() != nullptr)
+                            RImplementation.add_Visual(context_id, renderable, viewEntity->Visual(), viewEntity->XFORM());
+                    }
+                } while (0);
+
+                // Full-detail body, posed to match, for a complete silhouette. Deliberately
+                // a SEPARATE do-while from the block above, not gated by its portal-marker /
+                // sector-frustum checks: the reported "reverts to legs-only while moving,
+                // comes back when moving back" (2026-07-27) pointed at that gate flipping
+                // near sector/frustum boundaries — not at the retargeted pose data itself,
+                // which logged as valid throughout, including while broken. add_Visual is
+                // documented as doing no culling of its own, so this doesn't need that gate;
+                // it only inherited it from copy-pasting the pre-existing weapon-shadow
+                // block above (which has its own reasons to need it — portal-clipped
+                // rendering for the HUD weapon specifically).
+                do
+                {
+                    IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
+                    if (viewEntity == nullptr)
+                        break;
+                    IRenderable* renderable = viewEntity->dcast_Renderable();
+                    if (renderable == nullptr)
+                        break;
+
+                    // Load once (Instance_Duplicate under the hood — safe to call every
+                    // frame, but no need to; a single independent instance we keep posing
+                    // ourselves is enough since it's only ever rendered from here).
+                    static IRenderVisual* s_full_body_visual = nullptr;
+                    static bool s_full_body_load_attempted = false;
+                    if (!s_full_body_load_attempted)
+                    {
+                        s_full_body_load_attempted = true;
+                        s_full_body_visual = RImplementation.model_Create("actors\\stalker_hero\\stalker_hero_1");
+                    }
+                    if (s_full_body_visual == nullptr)
+                        break;
+
+                    IKinematics* full_kin = s_full_body_visual->dcast_PKinematics();
+                    IKinematics* live_kin = viewEntity->Visual() ? viewEntity->Visual()->dcast_PKinematics() : nullptr;
+                    if (full_kin != nullptr && live_kin != nullptr)
+                    {
+                        // Proper retargeting (see retarget_bone_recursive above) — two
+                        // earlier attempts that copied world/render transforms directly
+                        // worked at idle but warped/collapsed during animation because
+                        // they silently carried the live model's bone lengths into the
+                        // full model's differently-proportioned mesh (confirmed in-game
+                        // 2026-07-27).
+                        const u16 full_root = full_kin->LL_GetBoneRoot();
+                        const u16 live_root = live_kin->LL_GetBoneRoot();
+                        if (full_root != BI_NONE)
+                        {
+                            retarget_bone_recursive(full_kin, live_kin, full_kin->LL_GetData(full_root),
+                                Fidentity, Fidentity, live_root != BI_NONE);
+                        }
+                    }
+                    RImplementation.add_Visual(context_id, renderable, s_full_body_visual, viewEntity->XFORM());
+                } while (0);
+            }
+
+            // Actor Body (Dead Air "Тело игрока" option): the actor is normally excluded
+            // from the main color pass render list (see spatial DB traversal above — this
+            // is the classic X-Ray behavior where the local player never sees their own
+            // body), the same way it's excluded from PHASE_SMAP unless force-injected
+            // above. Mirror that force-injection here for PHASE_NORMAL so the actor's own
+            // visual (not just the HUD weapon model) actually gets drawn when enabled.
+            if (o.phase == CRender::PHASE_NORMAL && o.is_main_pass && ps_r__common_flags.test(RFLAG_ACTOR_BODY))
+            {
+                do
+                {
+                    IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
+                    if (viewEntity == nullptr)
+                        break;
+                    const auto& entity_pos = viewEntity->spatial_sector_point();
+                    viewEntity->spatial_updatesector(detect_sector(entity_pos));
+                    const auto sector_id = viewEntity->GetSpatialData().sector_id;
+                    if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
+                        break; // disassociated from S/P structure
+                    CSector* sector = Sectors[sector_id];
+                    if (PortalTraverser.i_marker != sector->r_marker)
+                        break; // inactive (untouched) sector
+                    IRenderable* renderable = viewEntity->dcast_Renderable();
+                    if (renderable == nullptr)
+                        break;
+                    for (const CFrustum& view : sector->r_frustums)
+                    {
+                        if (!view.testSphere_dirty(
+                            viewEntity->GetSpatialData().sphere.P, viewEntity->GetSpatialData().sphere.R))
+                            continue;
+
+                        // Base body mesh only — NOT renderable->renderable_Render(), which
+                        // also draws attached items (torch/headlamp, radio) via
+                        // CAttachmentOwner. Those attachments still need to render for the
+                        // shadow (see the PHASE_SMAP block above), but in the color pass
+                        // they show up as a headlamp mesh floating at head height, since
+                        // the worn outfit's body model has no head geometry to mount it on
+                        // (confirmed unwanted in-game 2026-07-27). add_Visual bypasses
+                        // CActor::renderable_Render's attachment call entirely.
+                        // A camera-to-bone distance heuristic was tried here to suppress
+                        // the body draw during ladder-climbing (which clips into the
+                        // camera) but logged data proved it can't work: camera-to-
+                        // neck/shoulder distance sits in the same ~0.15-0.5m range during
+                        // completely normal standing/walking as it does while climbing,
+                        // because the camera is a fixed rig offset from the head/neck —
+                        // that distance barely changes with animation state at all.
+                        // Reverted (2026-07-27); the ladder clip remains unfixed and needs
+                        // a different approach (e.g. a real camera-space/near-clip test,
+                        // or detecting the climb state directly via a new cross-DLL query
+                        // — neither attempted yet).
+                        if (viewEntity->Visual() != nullptr)
+                            RImplementation.add_Visual(context_id, renderable, viewEntity->Visual(), viewEntity->XFORM());
                     }
                 } while (0);
             }
