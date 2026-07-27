@@ -427,6 +427,7 @@ public:
     bool AnyMove() { return (mstate_real & mcAnyMove) != 0; };
     bool is_jump();
     u32 MovingState() const { return mstate_real; }
+    virtual bool climbing() const override { return (mstate_real & mcClimb) != 0; }
 
     [[nodiscard]]
     u32 GetBodyState() const { return mstate_real; }

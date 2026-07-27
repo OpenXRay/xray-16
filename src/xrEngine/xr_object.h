@@ -264,6 +264,10 @@ public:
     virtual CBaseMonster* cast_base_monster() = 0;
     virtual CShellLauncher* cast_shell_launcher() = 0; //--#SM+#--
     virtual bool feel_touch_on_contact(IGameObject* obj) = 0;
+    // True only for the actor while climbing a ladder (false for every other object).
+    // Lets the render DLL query actor climb state across the DLL boundary without
+    // needing CActor's definition (only CGameObject/CActor implement this).
+    virtual bool climbing() const = 0;
     // Utilities
     // XXX: move out
     // static void u_EventGen(NET_Packet& P, u32 type, u32 dest);

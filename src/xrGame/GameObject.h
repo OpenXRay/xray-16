@@ -217,6 +217,7 @@ public:
     virtual CBaseMonster* cast_base_monster() override { return NULL; }
     CShellLauncher* cast_shell_launcher() override { return nullptr; }
     virtual bool feel_touch_on_contact(IGameObject*) override { return TRUE; }
+    virtual bool climbing() const override { return false; }
     // Utilities
     // XXX: move out
     static void u_EventGen(NET_Packet& P, u32 type, u32 dest);
