@@ -88,7 +88,7 @@ public:
     IC float MaxWalkWeight() const { return m_MaxWalkWeight; }
     float GetAlcohol() { return m_fAlcohol; }
     float GetPsy() { return 1.0f - GetPsyHealth(); }
-    float GetSatiety() { return m_fSatiety; }
+    float GetSatiety() const { return m_fSatiety; }
     IC float GetSatietyPower() const { return m_fV_SatietyPower * m_fSatiety; };
     void AffectDamage_InjuriousMaterialAndMonstersInfluence();
     float GetInjuriousMaterialDamage();
