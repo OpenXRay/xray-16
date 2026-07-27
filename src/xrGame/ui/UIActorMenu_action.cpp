@@ -395,6 +395,20 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     InfoCurItem(NULL);
 
+    // kUSE ("F") is also the engine's secondary keyboard bind for kUI_ACCEPT, which
+    // CUICellItem::OnKeyboardAction treats as an equip/unequip double-click when the
+    // mouse hovers an item. Intercept it here, before inherited::OnKeyboardAction can
+    // hand it to the focused cell item, so F closes the inventory/container window
+    // instead of activating whatever item is under the cursor.
+    if (IsBinded(kUSE, dik))
+    {
+        if (WINDOW_KEY_PRESSED == keyboard_action)
+        {
+            OnBtnExitClicked(this, nullptr);
+        }
+        return true;
+    }
+
     const bool escdbg = (dik == SDL_SCANCODE_ESCAPE || dik == SDL_SCANCODE_I);
     if (escdbg) Msg("[ESCDBG] CUIActorMenu::OnKeyboardAction dik=%d action=%d", dik, (int)keyboard_action);
 
