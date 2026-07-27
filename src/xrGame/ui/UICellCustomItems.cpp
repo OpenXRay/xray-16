@@ -34,7 +34,7 @@ CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
     inherited::SetStretchTexture(true);
 
     //Alundaio; Layered icon
-    for (u8 i = 0; i < 255; ++i)
+    for (u8 i = 1; i < 255; ++i)
     {
         string32 layer_str;
         xr_sprintf(layer_str, "%u%s", i, detail::ICON_LAYER_FIELD);
