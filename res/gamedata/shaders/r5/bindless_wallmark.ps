@@ -1,0 +1,39 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+};
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 baseColor : SV_Target2;
+};
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    PS_OUTPUT output;
+
+    MaterialData mat = g_Materials[input.materialID];
+    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+
+    if (mat.flags & MAT_FLAG_ALPHA_TEST)
+    {
+        clip(diffuseSample.a - mat.alphaRef);
+    }
+
+    output.color = diffuseSample;
+    output.normal = float4(normalize(input.normal), 1.0);
+    output.baseColor = float4(diffuseSample.rgb, 0.0);
+    return output;
+}
