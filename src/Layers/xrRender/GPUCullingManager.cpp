@@ -1450,7 +1450,6 @@ void GPUCullingManager::DispatchVariantPartition(
     cmdList->setBufferState(set.compactBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(set.compactMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(set.compactDispatchArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
     cmdList->setBufferState(materialBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(partition.variantCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(partition.reorderedDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
@@ -1488,9 +1487,8 @@ void GPUCullingManager::DispatchVariantPartition(
     nvrhi::ComputeState state;
     state.pipeline = m_variantPartitionPipeline;
     state.bindings = { bindingSet };
-    state.indirectParams = set.compactDispatchArgsBuffer;
     cmdList->setComputeState(state);
-    cmdList->dispatchIndirect(0);
+    cmdList->dispatch(1, 1, 1);
 
     cmdList->setBufferState(partition.variantCountBuffer, nvrhi::ResourceStates::IndirectArgument);
     cmdList->setBufferState(partition.reorderedDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
