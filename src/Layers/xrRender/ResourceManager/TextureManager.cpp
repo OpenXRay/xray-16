@@ -700,6 +700,66 @@ void TextureManager::Update(float deltaTime) {
 //  INTERNAL METHODS (Stubs for Day 2 / Week 2)
 // ═══════════════════════════════════════════════════
 
+static bool PreserveAlphaCoverage(DDSData& ddsData) {
+    const auto fmt = ddsData.desc.format;
+    const bool rgba8 = fmt == nvrhi::Format::RGBA8_UNORM || fmt == nvrhi::Format::SRGBA8_UNORM ||
+        fmt == nvrhi::Format::BGRA8_UNORM || fmt == nvrhi::Format::SBGRA8_UNORM;
+    if (!rgba8 || ddsData.desc.type != TextureDesc::Texture2D || ddsData.desc.arraySize != 1 ||
+        ddsData.mipLevels.size() < 2)
+        return false;
+
+    constexpr u32 ALPHA_REF = 200;
+    const DDSMipLevel& mip0 = ddsData.mipLevels[0];
+    const u64 texels0 = mip0.size / 4;
+    if (!texels0)
+        return false;
+
+    u64 cov0 = 0;
+    for (u64 i = 0; i < texels0; i++)
+        if (mip0.data[i * 4 + 3] >= ALPHA_REF)
+            cov0++;
+    if (cov0 == 0 || cov0 == texels0)
+        return false;
+    const double target = double(cov0) / double(texels0);
+
+    bool rescaled = false;
+    for (size_t m = 1; m < ddsData.mipLevels.size(); m++) {
+        u8* px = const_cast<u8*>(ddsData.mipLevels[m].data);
+        const u64 texels = ddsData.mipLevels[m].size / 4;
+        if (!texels)
+            continue;
+
+        u64 hist[256] = {};
+        for (u64 i = 0; i < texels; i++)
+            hist[px[i * 4 + 3]]++;
+        u64 atLeast[257];
+        atLeast[256] = 0;
+        for (int t = 255; t >= 0; t--)
+            atLeast[t] = atLeast[t + 1] + hist[t];
+
+        float lo = 1.0f, hi = 8.0f;
+        for (int it = 0; it < 24; it++) {
+            const float mid = 0.5f * (lo + hi);
+            const u32 thresh = std::min<u32>(256, u32(ceilf(float(ALPHA_REF) / mid)));
+            const double cov = double(atLeast[thresh]) / double(texels);
+            if (cov < target)
+                lo = mid;
+            else
+                hi = mid;
+        }
+        const float scale = 0.5f * (lo + hi);
+        if (scale <= 1.001f)
+            continue;
+
+        for (u64 i = 0; i < texels; i++) {
+            const u32 a = u32(float(px[i * 4 + 3]) * scale + 0.5f);
+            px[i * 4 + 3] = u8(std::min<u32>(a, 255u));
+        }
+        rescaled = true;
+    }
+    return rescaled;
+}
+
 void TextureManager::LoadTextureSync(TextureHandle handle) {
     if (!ValidateHandle(handle)) {
         Msg("! [TextureManager] LoadTextureSync: Invalid handle");
@@ -742,6 +802,13 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     //         meta.filePath.c_str(),
     //         (u32)ddsData.sequenceState->frameData.size());
     // }
+
+    if (!isVideoTexture && !isSequenceTexture &&
+        strncmp(meta.filePath.c_str(), "trees" DELIMITER, 6) == 0)
+    {
+        if (PreserveAlphaCoverage(ddsData))
+            Msg("* [TextureManager] Alpha coverage preserved: %s", meta.filePath.c_str());
+    }
 
     // ═══════════════════════════════════════════════════
     //  CHECK MEMORY BUDGET BEFORE ALLOCATING TEXTURE
