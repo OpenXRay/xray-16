@@ -2,6 +2,7 @@
     "sorting": { "priority": 2, "backToFront": true },
     "fog": false,
     "wmark": true,
+    "ps": "bindless_wallmark",
     "blend": { "src": "SrcAlpha", "dst": "InvSrcAlpha" },
     "depth": { "test": true, "write": false }
 }
