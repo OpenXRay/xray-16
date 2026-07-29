@@ -1193,6 +1193,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             hizOutput.width,
             hizOutput.height,
             hizOutput.mipLevels,
+            m_prevViewProj,
             &m_worldParticleBatches
         );
     }

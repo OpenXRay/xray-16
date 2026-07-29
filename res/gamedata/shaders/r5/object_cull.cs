@@ -62,7 +62,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     if (!FrustumTestSphere(obj.position, obj.radius, g_FrustumPlanes))
         return;
 
-    if (!HiZTestSphereTemporal(obj.position, obj.radius, g_CameraPos, g_ViewProj, g_PrevViewProj,
+    if (!HiZTestSphere(obj.position, obj.radius, g_CameraPos, g_PrevViewProj,
                        g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
         return;
 

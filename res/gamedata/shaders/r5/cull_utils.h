@@ -52,37 +52,46 @@ bool DistanceTestAABB(float3 aabb_min, float3 aabb_max, float3 camera_pos, float
     return dist_sq < max_dist_sq;
 }
 
+struct HiZTestResult
+{
+    bool visible;
+    float frontDepth;
+    float hiZDepth;
+};
 
-bool HiZTestSphereTemporal(
+HiZTestResult HiZTestSphereEx(
     float3 center,
     float radius,
     float3 cameraPos,
-    float4x4 currentViewProj,
-    float4x4 prevViewProj,
+    float4x4 pyramidViewProj,
     Texture2D<float> hiZPyramid,
     SamplerState pointSampler,
     uint hiZWidth,
     uint hiZHeight,
     uint hiZMipLevels)
 {
-    float4 prevClipPos = mul(prevViewProj, float4(center, 1.0));
+    HiZTestResult result;
+    result.visible = true;
+    result.frontDepth = 0.0;
+    result.hiZDepth = 0.0;
 
-    if (prevClipPos.w <= 0.001)
-        return true;
+    float4 clipPos = mul(pyramidViewProj, float4(center, 1.0));
+    if (clipPos.w <= 0.001)
+        return result;
 
-    float3 prevNdc = prevClipPos.xyz / prevClipPos.w;
+    float3 ndc = clipPos.xyz / clipPos.w;
 
-    float projScale = max(abs(prevViewProj[0][0]), abs(prevViewProj[1][1]));
-    float2 ndcSize = float2(radius, radius) * projScale / prevClipPos.w;
+    float projScale = max(abs(pyramidViewProj[0][0]), abs(pyramidViewProj[1][1]));
+    float2 ndcSize = float2(radius, radius) * projScale / clipPos.w;
 
-    float2 minNDC = prevNdc.xy - ndcSize;
-    float2 maxNDC = prevNdc.xy + ndcSize;
+    float2 minNDC = ndc.xy - ndcSize;
+    float2 maxNDC = ndc.xy + ndcSize;
 
     if (any(minNDC < -1.0) || any(maxNDC > 1.0))
-        return true;
+        return result;
 
-    float2 minUV = saturate(minNDC * 0.5 + 0.5);
-    float2 maxUV = saturate(maxNDC * 0.5 + 0.5);
+    float2 minUV = minNDC * 0.5 + 0.5;
+    float2 maxUV = maxNDC * 0.5 + 0.5;
 
     minUV.y = 1.0 - minUV.y;
     maxUV.y = 1.0 - maxUV.y;
@@ -100,33 +109,32 @@ bool HiZTestSphereTemporal(
     float d3 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.w), mipLevel);
     float d4 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.w), mipLevel);
 
-    float hiZDepth = min(min(d1, d2), min(d3, d4));
+    result.hiZDepth = min(min(d1, d2), min(d3, d4));
 
     float3 viewDir = normalize(center - cameraPos);
     float3 frontPoint = center - viewDir * radius;
-    float4 frontClip = mul(prevViewProj, float4(frontPoint, 1.0));
-
+    float4 frontClip = mul(pyramidViewProj, float4(frontPoint, 1.0));
     if (frontClip.w <= 0.001)
-        return true;
+        return result;
 
-    float frontDepth = frontClip.z / frontClip.w;
-
-    return frontDepth >= hiZDepth;
+    result.frontDepth = frontClip.z / frontClip.w;
+    result.visible = result.frontDepth >= result.hiZDepth;
+    return result;
 }
 
 bool HiZTestSphere(
     float3 center,
     float radius,
     float3 cameraPos,
-    float4x4 viewProj,
+    float4x4 pyramidViewProj,
     Texture2D<float> hiZPyramid,
     SamplerState pointSampler,
     uint hiZWidth,
     uint hiZHeight,
     uint hiZMipLevels)
 {
-    return HiZTestSphereTemporal(center, radius, cameraPos, viewProj, viewProj,
-                                  hiZPyramid, pointSampler, hiZWidth, hiZHeight, hiZMipLevels);
+    return HiZTestSphereEx(center, radius, cameraPos, pyramidViewProj,
+                           hiZPyramid, pointSampler, hiZWidth, hiZHeight, hiZMipLevels).visible;
 }
 
 #endif

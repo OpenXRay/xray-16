@@ -15,6 +15,7 @@ namespace xray::render::fg::passes {
 
 struct ParticleCullParams {
     Fmatrix viewProj;
+    Fmatrix prevViewProj;
     Fvector4 frustumPlanes[6];
     Fvector4 cameraPos;
     Fvector4 cameraTop;
@@ -24,7 +25,7 @@ struct ParticleCullParams {
     u32 hiZHeight;
     u32 hiZMipLevels;
 };
-static_assert(sizeof(ParticleCullParams) == 224, "ParticleCullParams must be 224 bytes");
+static_assert(sizeof(ParticleCullParams) == 288, "ParticleCullParams must be 288 bytes");
 
 struct ParticleBillboardParams {
     Fvector4 cameraTop;
@@ -57,7 +58,8 @@ public:
         u32 particleCount,
         u32 hiZWidth,
         u32 hiZHeight,
-        u32 hiZMipLevels);
+        u32 hiZMipLevels,
+        const Fmatrix& prevViewProj);
 
     void DispatchBillboardGeneration(
         nvrhi::ICommandList* cmdList,

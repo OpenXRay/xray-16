@@ -40,9 +40,9 @@ void main(uint3 dtid : SV_DispatchThreadID)
         return;
     }
 
-    bool visible = HiZTestSphereTemporal(
+    bool visible = HiZTestSphere(
         lightPos, range, cb_cameraPos.xyz,
-        cb_curViewProj, cb_prevViewProj,
+        cb_prevViewProj,
         g_HiZPyramid, smp_nofilter,
         cb_hizWidth, cb_hizHeight, cb_hizMipLevels);
 
