@@ -18,6 +18,7 @@ struct VS_OUTPUT {
     float4 color    : COLOR0;      // RGB = sky color, A = blend factor
     float3 tc0      : TEXCOORD0;   // Cubemap UV for sky0
     float3 tc1      : TEXCOORD1;   // Cubemap UV for sky1
+    float  elev     : TEXCOORD2;   // ray elevation (1=zenith, 0=horizon, <0=below)
 };
 
 VS_OUTPUT main(VS_INPUT v) {
@@ -37,6 +38,9 @@ VS_OUTPUT main(VS_INPUT v) {
     // Pass through texture coordinates (cubemap directions)
     o.tc0 = v.tc0;
     o.tc1 = v.tc1;
+
+    // Ray elevation for horizon fog (rotateY preserves Y → hbox local Y is enough)
+    o.elev = normalize(v.position.xyz).y;
 
     // Pass through color with HDR scaling
     // Note: Vanilla uses tonemap texture here, we'll apply exposure in PS

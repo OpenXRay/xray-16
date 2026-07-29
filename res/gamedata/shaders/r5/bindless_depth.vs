@@ -1,42 +1,50 @@
-// bindless_depth.vs
-// SM6 Depth-only vertex shader for bindless geometry
-// MUST produce identical SV_Position as bindless_forward.vs for Z consistency
-
+// bindless_depth.vs — depth-only prepass (bindless mega-buffer)
 #define SM_6_0
 #include "common.h"
+#include "bindless_common.h"
 
-// UnifiedVertex format (48 bytes) - same as bindless_forward.vs
 struct VS_INPUT
 {
-    float4 position  : POSITION;     // float3 position
-    float4 normal    : NORMAL;       // D3DCOLOR: packed normal + hemi (unused for depth)
-    float4 tangent   : TANGENT;      // D3DCOLOR: packed tangent (unused for depth)
-    float4 binormal  : BINORMAL;     // D3DCOLOR: packed binormal (unused for depth)
-    float2 texcoord  : TEXCOORD0;    // float2: base UV (unused for depth)
-    float2 texcoord1 : TEXCOORD1;    // float2: lightmap UV (unused for depth)
-    float4 color     : COLOR0;       // D3DCOLOR: vertex color (unused for depth)
+    float4 position  : POSITION;
+    float4 normal    : NORMAL;
+    float4 tangent   : TANGENT;
+    float4 binormal  : BINORMAL;
+    float2 texcoord  : TEXCOORD0;
+    float2 texcoord1 : TEXCOORD1;
+    float4 color     : COLOR0;
+    uint drawIndex   : DRAWINDEX;
 };
 
 struct VS_OUTPUT
 {
     float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+    nointerpolation uint materialID : TEXCOORD1;
 };
 
-// Per-draw constants - MUST match bindless_forward.vs exactly
-cbuffer PerDrawConstants : register(b5)
+struct InstanceData
 {
-    float4x4 g_World;
-    uint g_MaterialID;
-    float3 g_Padding;
+    float4x4 world;
+    uint materialID;
+    uint flags;
+    float pad0, pad1;
 };
+
+StructuredBuffer<InstanceData> g_InstanceData : register(t14);
+StructuredBuffer<uint> g_CompactBatchIndices : register(t15);
+StructuredBuffer<uint> g_CompactMaterialIDs : register(t16);
 
 VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
+    uint drawID = input.drawIndex;
+    uint batchIndex = g_CompactBatchIndices[drawID];
+    InstanceData instanceData = g_InstanceData[batchIndex];
+    uint materialID = g_CompactMaterialIDs[drawID];
 
-    // Transform position - IDENTICAL to bindless_forward.vs
-    float4 worldPos = mul(g_World, float4(input.position.xyz, 1.0));
+    float4 worldPos = mul(instanceData.world, float4(input.position.xyz, 1.0));
     output.position = mul(m_VP, worldPos);
-
+    output.texcoord = input.texcoord;
+    output.materialID = materialID;
     return output;
 }

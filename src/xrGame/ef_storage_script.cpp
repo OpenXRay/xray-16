@@ -35,7 +35,7 @@ float evaluate(CEF_Storage* ef_storage, LPCSTR function, CScriptGameObject* _0, 
     if (_0 && !ef_storage->non_alife().member())
     {
         GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "object %s is not herited from CSE_ALifeSchedulable!", *_0->cName());
+            LuaMessageType::Error, "object %s is not herited from CSE_ALifeSchedulable!", _0->cName().c_str());
         return (0.f);
     }
 
@@ -43,7 +43,7 @@ float evaluate(CEF_Storage* ef_storage, LPCSTR function, CScriptGameObject* _0, 
     if (_1 && !ef_storage->non_alife().enemy())
     {
         GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "object %s is not herited from CSE_ALifeSchedulable!", *_1->cName());
+            LuaMessageType::Error, "object %s is not herited from CSE_ALifeSchedulable!", _1->cName().c_str());
         return (0.f);
     }
 

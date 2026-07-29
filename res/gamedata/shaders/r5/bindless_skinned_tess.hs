@@ -1,0 +1,104 @@
+// bindless_skinned_tess.hs — Hull for skinned PatchList (NPC / mutant tessellation)
+// Matches bindless_skinned*.vs IO (no hemi). Same MoltenVK rules as bindless_tess.hs:
+// do not put user varyings in the patch-constant struct.
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct VS_CONTROL_POINT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+};
+
+struct HS_CONTROL_POINT
+{
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+};
+
+struct HS_CONSTANT_DATA
+{
+    float Edges[3] : SV_TessFactor;
+    float Inside : SV_InsideTessFactor;
+};
+
+float ComputeEdgeFactor(float3 p0, float3 p1)
+{
+    float3 mid = 0.5 * (p0 + p1);
+    float dist = max(length(mid - eye_position), 0.5);
+    float edgeLen = length(p0 - p1);
+    float pixels = (edgeLen / dist) * 720.0;
+    float f = saturate((pixels - 4.0) / 20.0);
+    float distFade = saturate(1.0 - (dist - 8.0) / 25.0);
+    return max(1.0, round(lerp(1.0, 4.0, f * f * distFade)));
+}
+
+HS_CONSTANT_DATA PatchConstant(InputPatch<VS_CONTROL_POINT, 3> patch)
+{
+    HS_CONSTANT_DATA o;
+    MaterialData mat = g_Materials[patch[0].materialID];
+    bool doTess = (mat.tessMethod != TESS_METHOD_OFF) &&
+                  ((mat.flags & MAT_FLAG_WATER) == 0);
+
+    float f0 = 1.0, f1 = 1.0, f2 = 1.0;
+    if (doTess)
+    {
+        f0 = ComputeEdgeFactor(patch[1].worldPos, patch[2].worldPos);
+        f1 = ComputeEdgeFactor(patch[2].worldPos, patch[0].worldPos);
+        f2 = ComputeEdgeFactor(patch[0].worldPos, patch[1].worldPos);
+
+        if (mat.tessMethod == TESS_METHOD_PN)
+        {
+            float3 N0 = normalize(patch[0].normal);
+            float3 N1 = normalize(patch[1].normal);
+            float3 N2 = normalize(patch[2].normal);
+            float3 Nv0 = mul((float3x3)m_V, N0);
+            float3 Nv1 = mul((float3x3)m_V, N1);
+            float3 Nv2 = mul((float3x3)m_V, N2);
+            float3 Pv0 = mul(m_V, float4(patch[0].worldPos, 1.0)).xyz;
+            float3 Pv1 = mul(m_V, float4(patch[1].worldPos, 1.0)).xyz;
+            float3 Pv2 = mul(m_V, float4(patch[2].worldPos, 1.0)).xyz;
+            bool doDiscard = (Nv0.z > 0.1) && (Nv1.z > 0.1) && (Nv2.z > 0.1) &&
+                (Pv0.z > 5.0) && (Pv1.z > 5.0) && (Pv2.z > 5.0);
+            if (doDiscard)
+            {
+                f0 = -1.0;
+                f1 = -1.0;
+                f2 = -1.0;
+            }
+        }
+    }
+    o.Edges[0] = f0;
+    o.Edges[1] = f1;
+    o.Edges[2] = f2;
+    o.Inside = (f0 < 0.0) ? -1.0 : max(1.0, round((f0 + f1 + f2) / 3.0));
+    return o;
+}
+
+[domain("tri")]
+[partitioning("integer")]
+[outputtopology("triangle_ccw")]
+[outputcontrolpoints(3)]
+[patchconstantfunc("PatchConstant")]
+[maxtessfactor(4.0)]
+HS_CONTROL_POINT main(InputPatch<VS_CONTROL_POINT, 3> patch, uint id : SV_OutputControlPointID)
+{
+    HS_CONTROL_POINT o;
+    o.worldPos = patch[id].worldPos;
+    o.texcoord = patch[id].texcoord;
+    o.normal = patch[id].normal;
+    o.tangent = patch[id].tangent;
+    o.bitangent = patch[id].bitangent;
+    o.materialID = patch[id].materialID;
+    return o;
+}

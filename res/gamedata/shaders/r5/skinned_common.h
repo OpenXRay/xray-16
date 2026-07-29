@@ -3,6 +3,21 @@
 
 StructuredBuffer<float4x4> g_BoneMatrices : register(t3);
 
+#ifdef LOCAL_SKIN_INSTANCE_SSBO
+struct LocalSkinInstanceGPU
+{
+    float4x4 world;
+    uint materialID;
+    uint boneOffset;
+    uint2 pad;
+};
+StructuredBuffer<LocalSkinInstanceGPU> g_LocalSkinInstances : register(t12);
+
+float4x4 get_bone_ofs(uint boneOffset, int legacy_index)
+{
+    return g_BoneMatrices[boneOffset + (legacy_index / 3)];
+}
+#else
 cbuffer SkinnedMaterialCB : register(b4)
 {
     uint g_SkinnedMaterialID;
@@ -10,25 +25,7 @@ cbuffer SkinnedMaterialCB : register(b4)
     uint g_SplatOffset;
     uint g_SplatCount;
 };
-
-struct PaintSplat
-{
-    float4 posRadius;       // xyz = rest-pose position, w = world-space radius
-    float4 color;           // rgb + alpha
-    uint4  boneIdx;         // up to 4 bone indices (local to skeleton)
-    float4 boneWeights;     // corresponding weights (sum = 1)
-    float2 hitUV;           // hit UV in target diffuse UV space
-    float uvRadius;         // radius in UV space for stamp sampling
-    uint wallmarkMaterialID; // bindless material ID for wallmark texture
-    float4 evolution;       // x=spawnTime, y=invLifetime, z=seed, w=mode
-};
-
-StructuredBuffer<PaintSplat> g_PaintSplats : register(t11);
-
-float4x4 get_bone(int legacy_index)
-{
-    return g_BoneMatrices[g_SkeletonBoneOffset + (legacy_index / 3)];
-}
+#endif
 
 float4 skinning_pos(float4 pos, float4x4 bone)
 {
@@ -44,6 +41,28 @@ float3 unpack_d3dcolor_normal(float3 packed)
 {
     return packed * 2.0 - 1.0;
 }
+
+#ifndef LOCAL_SKIN_INSTANCE_SSBO
+float4x4 get_bone(int legacy_index)
+{
+    return g_BoneMatrices[g_SkeletonBoneOffset + (legacy_index / 3)];
+}
+#endif
+
+#if !defined(LOCAL_SKIN_INSTANCE_SSBO) && !defined(SKINNED_SKIP_PAINT_SPLATS)
+struct PaintSplat
+{
+    float4 posRadius;       // xyz = rest-pose position, w = world-space radius
+    float4 color;           // rgb + alpha
+    uint4  boneIdx;         // up to 4 bone indices (local to skeleton)
+    float4 boneWeights;     // corresponding weights (sum = 1)
+    float2 hitUV;           // hit UV in target diffuse UV space
+    float uvRadius;         // radius in UV space for stamp sampling
+    uint wallmarkMaterialID; // bindless material ID for wallmark texture
+    float4 evolution;       // x=spawnTime, y=invLifetime, z=seed, w=mode
+};
+
+StructuredBuffer<PaintSplat> g_PaintSplats : register(t11);
 
 float3 skin_splat_pos(PaintSplat splat)
 {
@@ -228,5 +247,6 @@ float3 apply_splat_color(float3 albedo, float3 worldPos, float2 meshUV)
     }
     return albedo;
 }
+#endif // !LOCAL_SKIN_INSTANCE_SSBO && !SKINNED_SKIP_PAINT_SPLATS
 
 #endif // SKINNED_COMMON_H

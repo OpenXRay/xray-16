@@ -5,6 +5,8 @@
 #include "Layers/xrRender/Blender_CLSID.h"
 #include "Layers/xrRender/blenders/Blender_BmmD.h"
 #include "Layers/xrRender/blenders/Blender_Particle.h"
+#include "Layers/xrRender/blenders/blender_deffer_flat.h"
+#include "Layers/xrRender/blenders/blender_deffer_model.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r__scene.h"
@@ -67,6 +69,31 @@ bool GetShaderBlendInfo(const char* shaderName, ShaderBlendInfo& out)
     out.writesDepth = props.writesDepth;
     out.strictB2F = props.strictB2F;
     return true;
+}
+
+bool GetShaderTessellationMethod(const char* shaderName, u32& outMethod)
+{
+    outMethod = 0;
+    if (!shaderName || !shaderName[0])
+        return false;
+    auto* res = GetResources();
+    if (!res)
+        return false;
+    fg::IBlender* B = res->_FindBlender(shaderName);
+    if (!B)
+        return false;
+    const CLASS_ID cls = B->getDescription().CLS;
+    if (cls == fg::B_DEFAULT || cls == fg::B_VERT)
+    {
+        outMethod = static_cast<fg::CBlender_deffer_flat*>(B)->GetTessellation();
+        return true;
+    }
+    if (cls == fg::B_MODEL)
+    {
+        outMethod = static_cast<fg::CBlender_deffer_model*>(B)->GetTessellation();
+        return true;
+    }
+    return false;
 }
 
 bool GetParticleBlendIndex(const char* shaderName, u32& outIndex)

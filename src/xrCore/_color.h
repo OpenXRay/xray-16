@@ -45,14 +45,14 @@ ICF u32 color_rgba_f(f32 r, f32 g, f32 b, f32 a) noexcept
     return color_argb_f(a, r, g, b);
 }
 
-constexpr u32 color_xrgb(u32 r, u32 g, u32 b) { return color_argb(0xff, r, g, b); }
+constexpr u32 color_xrgb(u32 r, u32 g, u32 b) noexcept { return color_argb(0xff, r, g, b); }
 constexpr u32 color_get_R(u32 rgba) noexcept { return ((rgba >> 16) & 0xff); }
 constexpr u32 color_get_G(u32 rgba) noexcept { return ((rgba >> 8) & 0xff); }
 constexpr u32 color_get_B(u32 rgba) noexcept { return (rgba & 0xff); }
 constexpr u32 color_get_A(u32 rgba) noexcept { return (rgba >> 24); }
 constexpr u32 subst_alpha(u32 rgba, u32 a) { return (rgba & ~color_rgba(0, 0, 0, 0xff)) | color_rgba(0, 0, 0, a); }
-constexpr u32 bgr2rgb(u32 bgr) { return color_rgba(color_get_B(bgr), color_get_G(bgr), color_get_R(bgr), 0); }
-constexpr u32 rgb2bgr(u32 rgb) { return bgr2rgb(rgb); }
+constexpr u32 bgr2rgb(u32 bgr) noexcept { return color_rgba(color_get_B(bgr), color_get_G(bgr), color_get_R(bgr), 0); }
+constexpr u32 rgb2bgr(u32 rgb) noexcept { return bgr2rgb(rgb); }
 
 struct Fcolor
 {

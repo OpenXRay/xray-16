@@ -56,7 +56,9 @@ IBlender* CResourceManager::_FindBlender(LPCSTR Name)
 }
 
 // Helper: Convert oBlend token ID to BlendMode
-// Token IDs from Blender_Screen_SET/Blender_Particle: 0=SET, 1=BLEND, 2=ADD, 3=MUL, 4=MUL_2X, 5=ALPHA-ADD
+// Screen_SET: 0=SET, 1=BLEND, 2=ADD, 3=MUL, 4=MUL_2X, 5=ALPHA-ADD,
+//             6=MUL_2X (B^D) wallmarks, 7=SET(2r), 8=BLEND(2r), 9=BLEND(4r)
+// Particle:   0..5 only (same as Screen_SET 0..5)
 static CResourceManager::BlendMode TokenToBlendMode(u32 tokenID)
 {
     using BlendMode = CResourceManager::BlendMode;
@@ -68,7 +70,11 @@ static CResourceManager::BlendMode TokenToBlendMode(u32 tokenID)
     case 3: return BlendMode::Multiply;     // MUL
     case 4: return BlendMode::Multiply2X;   // MUL_2X
     case 5: return BlendMode::Additive;     // ALPHA-ADD
-    default: return BlendMode::AlphaBlend;  // Unknown - assume blend
+    case 6: return BlendMode::Multiply2X;   // MUL_2X (B^D) — effects\wallmarkmult
+    case 7: return BlendMode::Opaque;       // SET (2r)
+    case 8: return BlendMode::AlphaBlend;   // BLEND (2r)
+    case 9: return BlendMode::AlphaBlend;   // BLEND (4r)
+    default: return BlendMode::AlphaBlend;
     }
 }
 
@@ -116,18 +122,19 @@ bool CResourceManager::GetBlenderProperties(LPCSTR shaderName, BlenderProperties
         outProps.writesDepth = !b->oBlend.value;
         return true;
     }
-    // B_MODEL - model blender (oAREF, oBlend)
     if (cls == B_MODEL)
     {
-        auto* b = static_cast<CBlender_Model*>(B);
+        auto* b = static_cast<CBlender_deffer_model*>(B);
         outProps.alphaRef = b->oAREF.value;
-        if (b->oBlend.value)
+        if (b->oBlend.value && b->oAREF.value < 16)
             outProps.blendMode = BlendMode::AlphaBlend;
-        else if (b->oAREF.value > 0)
+        else if (b->oBlend.value)
             outProps.blendMode = BlendMode::AlphaTest;
         else
             outProps.blendMode = BlendMode::Opaque;
         outProps.writesDepth = (outProps.blendMode != BlendMode::AlphaBlend);
+        if (outProps.blendMode == BlendMode::Opaque)
+            outProps.strictB2F = false;
         return true;
     }
     // B_MODEL_EbB - model with env (oBlend)

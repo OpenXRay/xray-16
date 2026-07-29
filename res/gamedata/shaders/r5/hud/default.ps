@@ -1,0 +1,13 @@
+#include "common.h"
+#include "bindless_common.h"
+
+float4 main(p_TL I) : SV_Target
+{
+	if (I.TexIdx == INVALID_TEXTURE_INDEX)
+		return I.Color;
+
+	float4 tex = GetBindlessTexture(I.TexIdx).Sample(smp_base, I.Tex0);
+	float4 color = tex * I.Color;
+	clip(color.a - 1.0 / 255.0);
+	return color;
+}

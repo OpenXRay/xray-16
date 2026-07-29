@@ -1,0 +1,107 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+#include "shared/tess_pn.h"
+
+struct HS_CONTROL_POINT
+{
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+    float hemi : TEXCOORD6;
+};
+
+struct HS_CONSTANT_DATA
+{
+    float Edges[3] : SV_TessFactor;
+    float Inside : SV_InsideTessFactor;
+};
+
+struct DS_OUTPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+    float hemi : TEXCOORD6;
+};
+
+[domain("tri")]
+[partitioning("integer")]
+DS_OUTPUT main(HS_CONSTANT_DATA input, float3 uvw : SV_DomainLocation,
+               const OutputPatch<HS_CONTROL_POINT, 3> bp)
+{
+    DS_OUTPUT o;
+
+    float minc = min(uvw.x, min(uvw.y, uvw.z));
+    [flatten] if (minc != 0.0)
+    {
+        [flatten] if (((1.0 / 3.0) - minc) > 0.01)
+        {
+            float fK = (1.0 / 3.0) / ((1.0 / 3.0) - minc);
+            fK = minc < 0.1 ? fK : 1.0;
+            uvw = lerp(float3(1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0), uvw, fK);
+        }
+    }
+
+    float u = uvw.x;
+    float v = uvw.y;
+    float w = uvw.z;
+
+    float3 triPos = bp[0].worldPos * w + bp[1].worldPos * v + bp[2].worldPos * u;
+    float2 tc = bp[0].texcoord * w + bp[1].texcoord * v + bp[2].texcoord * u;
+    float3 T = bp[0].tangent * w + bp[1].tangent * v + bp[2].tangent * u;
+    float3 B = bp[0].bitangent * w + bp[1].bitangent * v + bp[2].bitangent * u;
+    float3 Nlin = bp[0].normal * w + bp[1].normal * v + bp[2].normal * u;
+    float hemi = bp[0].hemi * w + bp[1].hemi * v + bp[2].hemi * u;
+
+    uint matId = bp[0].materialID;
+    MaterialData mat = g_Materials[matId];
+    bool usePN = (mat.tessMethod == TESS_METHOD_PN || mat.tessMethod == TESS_METHOD_PN_HM);
+
+    float3 pos = triPos;
+    float3 N = normalize(Nlin);
+    if (usePN)
+    {
+        TessPNEvaluate(
+            bp[0].worldPos, bp[1].worldPos, bp[2].worldPos,
+            bp[0].normal, bp[1].normal, bp[2].normal,
+            uvw, pos, N);
+    }
+
+    bool useHM = (mat.tessMethod == TESS_METHOD_HM || mat.tessMethod == TESS_METHOD_PN_HM);
+    if (useHM &&
+        ((mat.flags & MAT_FLAG_HAS_DETAIL) != 0) &&
+        ((mat.flags & MAT_FLAG_HAS_NORMAL_X) != 0) &&
+        mat.normalXIndex != INVALID_TEXTURE_INDEX)
+    {
+        float height = GetBindlessTexture(mat.normalXIndex).SampleLevel(smp_linear, tc, 0).a;
+        if ((mat.flags & MAT_FLAG_HAS_DETAIL_BUMP) != 0 &&
+            mat.detailBumpXIndex != INVALID_TEXTURE_INDEX)
+        {
+            float2 tcd = tc * mat.detailScale;
+            float hDetail = GetBindlessTexture(mat.detailBumpXIndex).SampleLevel(smp_linear, tcd, 0).a;
+            height += (hDetail - 0.5) * 0.2;
+        }
+        pos += N * TessHMDisplace(height);
+    }
+
+    [flatten] if (minc == 0.0)
+        pos = triPos;
+
+    o.worldPos = pos;
+    o.position = mul(m_VP, float4(pos, 1.0));
+    o.texcoord = tc;
+    o.normal = N;
+    o.tangent = normalize(T);
+    o.bitangent = normalize(B);
+    o.materialID = matId;
+    o.hemi = hemi;
+    return o;
+}

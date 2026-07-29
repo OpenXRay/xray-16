@@ -30,8 +30,8 @@ CSpaceRestrictionManager::~CSpaceRestrictionManager()
 void show_restriction(const shared_str& restrictions)
 {
     string256 temp;
-    for (int i = 0, n = _GetItemCount(*restrictions); i < n; ++i)
-        Msg("     %s", _GetItem(*restrictions, i, temp));
+    for (int i = 0, n = _GetItemCount(restrictions.c_str()); i < n; ++i)
+        Msg("     %s", _GetItem(restrictions.c_str(), i, temp));
 }
 
 typedef intrusive_ptr<CSpaceRestriction, RestrictionSpace::CTimeIntrusiveBase> CRestrictionPtr;
@@ -171,7 +171,7 @@ CSpaceRestrictionManager::CRestrictionPtr CSpaceRestrictionManager::restriction(
     out_restrictors = normalize_string(out_restrictors);
     in_restrictors = normalize_string(in_restrictors);
 
-    strconcat(sizeof(m_temp), m_temp, *out_restrictors, "\x01", *in_restrictors);
+    strconcat(sizeof(m_temp), m_temp, out_restrictors.c_str(), "\x01", in_restrictors.c_str());
     shared_str space_restrictions = m_temp;
 
     SPACE_RESTRICTIONS::const_iterator I = m_space_restrictions.find(space_restrictions);
@@ -193,8 +193,8 @@ u32 CSpaceRestrictionManager::accessible_nearest(ALife::_OBJECT_ID id, const Fve
 bool CSpaceRestrictionManager::restriction_presented(shared_str restrictions, shared_str restriction) const
 {
     string4096 m_temp;
-    for (u32 i = 0, n = _GetItemCount(*restrictions); i < n; ++i)
-        if (!xr_strcmp(restriction, _GetItem(*restrictions, i, m_temp)))
+    for (u32 i = 0, n = _GetItemCount(restrictions.c_str()); i < n; ++i)
+        if (!xr_strcmp(restriction, _GetItem(restrictions.c_str(), i, m_temp)))
             return (true);
     return (false);
 }
@@ -203,9 +203,9 @@ void CSpaceRestrictionManager::join_restrictions(shared_str& restrictions, share
 {
     string4096 m_temp1;
     string4096 m_temp2;
-    xr_strcpy(m_temp2, *restrictions);
-    for (u32 i = 0, n = _GetItemCount(*update), count = xr_strlen(m_temp2); i < n; ++i)
-        if (!restriction_presented(m_temp2, _GetItem(*update, i, m_temp1)))
+    xr_strcpy(m_temp2, restrictions.c_str());
+    for (u32 i = 0, n = _GetItemCount(update.c_str()), count = xr_strlen(m_temp2); i < n; ++i)
+        if (!restriction_presented(m_temp2, _GetItem(update.c_str(), i, m_temp1)))
         {
             if (count)
                 xr_strcat(m_temp2, ",");
@@ -220,8 +220,8 @@ void CSpaceRestrictionManager::difference_restrictions(shared_str& restrictions,
     string4096 m_temp1;
     string4096 m_temp2;
     xr_strcpy(m_temp2, "");
-    for (u32 i = 0, n = _GetItemCount(*restrictions), count = 0; i < n; ++i)
-        if (!restriction_presented(update, _GetItem(*restrictions, i, m_temp1)))
+    for (u32 i = 0, n = _GetItemCount(restrictions.c_str()), count = 0; i < n; ++i)
+        if (!restriction_presented(update, _GetItem(restrictions.c_str(), i, m_temp1)))
         {
             if (count)
                 xr_strcat(m_temp2, ",");

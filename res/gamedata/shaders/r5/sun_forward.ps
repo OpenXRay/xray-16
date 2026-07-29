@@ -18,13 +18,6 @@ struct PS_INPUT {
 };
 
 float4 main(PS_INPUT I) : SV_Target {
-    // Sample sun texture (usually has falloff baked in)
     float4 sunTex = s_sun.Sample(smp_linear, I.tc);
-
-    // Apply vertex color tint (HDR sun color)
-    float4 color;
-    color.rgb = sunTex.rgb * I.color.rgb;
-    color.a = sunTex.a * I.color.a;
-
-    return color;
+    return sunTex * I.color;
 }

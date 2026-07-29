@@ -21,8 +21,8 @@ public:
     CHitImmunity();
     virtual ~CHitImmunity() = default;
 
-    void LoadImmunities(const char* section, const CInifile* ini);
-    void AddImmunities(const char* section, const CInifile* ini);
+    void LoadImmunities(const char* section, const CInifile* ini, bool invert = false);
+    void AddImmunities(const char* section, const CInifile* ini, bool invert = false);
     float GetHitImmunity(ALife::EHitType hit_type) const { return m_HitImmunityKoefs[hit_type]; }
     float AffectHit(float power, ALife::EHitType hit_type) const { return power * GetHitImmunity(hit_type); }
 };

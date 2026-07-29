@@ -1,0 +1,36 @@
+// shadow_cascade_foliage.ps — casts alpha-tested cutout shadows for the transparent
+// (alpha-blended) draw set. Trees/bushes/leaves are classified as alpha-blend and live
+// in the transparent set, so they never reach the opaque shadow_cascade.ps. We cast every
+// non-water member of that set as an alpha cutout (clip by diffuse alpha). This covers
+// trees even when MAT_FLAG_FOLIAGE was not detected on the visual, while water is skipped
+// so it does not throw a solid box shadow.
+#include "bindless_common.h"
+#include "common_samplers.h"
+
+struct PS_INPUT
+{
+	float4 position : SV_Position;
+	float2 texcoord : TEXCOORD0;
+	nointerpolation uint materialID : TEXCOORD1;
+};
+
+void main(PS_INPUT input)
+{
+	MaterialData mat = g_Materials[input.materialID];
+
+	// Cast every non-water transparent member as an alpha cutout. Relying only on
+	// MAT_FLAG_FOLIAGE missed trees whose material never got that flag, so instead we
+	// skip water and cast anything else in this set by its diffuse alpha.
+	if ((mat.flags & MAT_FLAG_WATER) != 0)
+		clip(-1.0);
+
+	if (mat.diffuseIndex == INVALID_TEXTURE_INDEX)
+		return;
+
+	float alpha = GetBindlessTexture(mat.diffuseIndex).Sample(smp_linear, input.texcoord).a;
+	// Foliage cutouts use a lower reference so thin leaf silhouettes survive; other
+	// transparents (glass) use a higher default so faint surfaces cast little.
+	float ref = mat.alphaRef > 0.0 ? mat.alphaRef
+		: ((mat.flags & MAT_FLAG_FOLIAGE) != 0 ? 0.35 : 0.5);
+	clip(alpha - ref);
+}

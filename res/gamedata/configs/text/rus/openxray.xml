@@ -1,135 +1,174 @@
 <?xml version="1.0" encoding="windows-1251" ?>
 <string_table>
 	<string id="st_unload_magazine_after_pickup">
-		<text>Разряжать ор. при поднятии</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ. пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="st_unload_magazine_all">
-		<text>разрядить всё оружие</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="st_unequip">
-		<text>убрать в рюкзак</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="st_donate">
-		<text>Подарить</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="st_loading_lights">
-		<text>Загрузка освещения</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="st_client_connecting_to">
-		<text>Клиент: Соединение с</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ</text>
 	</string>
 	<string id="st_client_spawning">
-		<text>Клиент: Создание</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="st_client_synchronising">
-		<text>Клиент: Синхронизация</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="st_creating_new_game">
-		<text>Создание новой игры</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_always_active">
-		<text>Не ставить на паузу при Alt+Tab</text>
+		<text>пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ Alt+Tab</text>
 	</string>
 	<string id="ui_mm_detail_radius">
-		<text>Дальность прор. травы</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_ui_style">
-		<text>Стиль интерфейса</text>
+		<text>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_style_default">
-		<text>Зов Припяти</text>
+		<text>пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_simplified_item_pickup">
-		<text>Упр. подбор предметов</text>
+		<text>пїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_multi_item_pickup">
-		<text>Множ. подбор предметов</text>
+		<text>пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_loadingstages">
-		<text>Стадии загрузки</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="renderer_rgl">
-		<text>Ул. полное освещение (OpenGL)</text>
+		<text>пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (OpenGL)</text>
 	</string>
 	<string id="ui_mm_window_mode">
-		<text>Режим окна</text>
+		<text>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="st_opt_windowed">
-		<text>Оконный</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="st_opt_windowed_borderless">
-		<text>Оконный без рамок</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="st_opt_fullscreen">
-		<text>Полноэкранный</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="st_opt_fullscreen_borderless">
-		<text>Полноэкранный (быстрый Alt+Tab)</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ Alt+Tab)</text>
 	</string>
 	<string id="ui_mm_r2_fxaa">
 		<text>FXAA</text>
 	</string>
 	<string id="ui_mm_r2_smap_size">
-		<text>Качество теневых карт</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
-		<text>Оптимизация намокания</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
-		<text>Намокание вблизи</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
-		<text>Намокание вдали</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
-		<text>Качество намокания</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_fov">
-		<text>Угол обзора</text>
+		<text>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_hud_fov">
-		<text>Угол обзора HUD</text>
+		<text>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ HUD</text>
 	</string>
 	<string id="ui_mm_localization">
-		<text>Язык</text>
+		<text>пїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_gamepad_setup">
-		<text>Настройка геймпада</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_fps_limit">
-		<text>Ограничение FPS в игре</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FPS пїЅ пїЅпїЅпїЅпїЅ</text>
 	</string>
 	<string id="ui_mm_fps_limit_in_menu">
-		<text>Ограничение FPS в меню</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FPS пїЅ пїЅпїЅпїЅпїЅ</text>
 	</string>
   <string id="cze">
-    <text>Чешский (Czech)</text>
+    <text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (Czech)</text>
   </string>
   <string id="eng">
-		<text>Английский (English)</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (English)</text>
 	</string>
 	<string id="fra">
-		<text>Французский (French)</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (French)</text>
 	</string>
 	<string id="ger">
-		<text>Немецкий (German)</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (German)</text>
 	</string>
 	<string id="ita">
-		<text>Итальянский (Italian)</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (Italian)</text>
 	</string>
 	<string id="jpn">
-    	<text>Японский (Japanese)</text>
+    	<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (Japanese)</text>
 	</string>
 	<string id="pol">
-		<text>Польский (Polish)</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (Polish)</text>
 	</string>
 	<string id="rus">
-		<text>Русский (Russian)</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (Russian)</text>
 	</string>
 	<string id="spa">
-		<text>Испанский (Spanish)</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (Spanish)</text>
 	</string>
 	<string id="ukr">
-		<text>Украинский (Ukrainian)</text>
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (Ukrainian)</text>
+	</string>
+	<string id="ui_mm_r2_sun_details">
+		<text>пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</text>
+	</string>
+	<string id="ui_mm_rt_gi">
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ GI (ReSTIR)</text>
+	</string>
+	<string id="ui_mm_rt_gi_intensity">
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ RT GI</text>
+	</string>
+	<string id="ui_mm_denoise">
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅ RT</text>
+	</string>
+	<string id="ui_mm_upscale">
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (0=пїЅпїЅпїЅпїЅ 1=FSR 2=DLSS)</text>
+	</string>
+	<string id="ui_mm_upscale_quality">
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
+	</string>
+	<string id="ui_mm_render_scale">
+		<text>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
+	</string>
+	<string id="ui_mm_fsr_fg">
+		<text>FSR пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</text>
+	</string>
+	<string id="ui_mm_dlss_fg">
+		<text>DLSS пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</text>
+	</string>
+	<string id="ui_mm_dlss_rr">
+		<text>DLSS ray reconstruction</text>
+	</string>
+	<string id="ui_mm_amd_rr">
+		<text>AMD ray regeneration</text>
+	</string>
+	<string id="ui_mm_taa">
+		<text>TAA</text>
+	</string>
+	<string id="ui_mm_cas">
+		<text>CAS пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</text>
 	</string>
 </string_table>

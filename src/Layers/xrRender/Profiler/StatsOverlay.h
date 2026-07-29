@@ -59,6 +59,14 @@ struct RenderStats
     u32 lightsPoint = 0;
     u32 lightsSpot = 0;
     u32 lightsOmni = 0;
+    u32 localShadowTiles = 0;
+    u32 localShadowCandidates = 0;
+    u32 localShadowDropped = 0;
+    u32 localShadowRedraw = 0;
+
+    // MDI / draw instrumentation (from DrawIndexedIndirectCountOrFallback)
+    u32 mdiDrawCalls = 0;
+    u32 mdiMaxDrawCountSum = 0;
 
     u32 detailInstances = 0;
     u32 detailSlots = 0;         // Detail slots
@@ -80,6 +88,8 @@ struct RenderStats
     u32 fgArenaPeak = 0;
     u32 fgArenaCapacity = 0;
     u32 fgArenaFallbacks = 0;
+    float fgSetupPassesMs = 0.f;
+    float fgCompileMs = 0.f;
 
     void Reset()
     {
@@ -91,12 +101,15 @@ struct RenderStats
         skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
+        localShadowTiles = localShadowCandidates = localShadowDropped = localShadowRedraw = 0;
+        mdiDrawCalls = mdiMaxDrawCountSum = 0;
         detailInstances = detailSlots = 0;
         detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;
         detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;
         detailVisibleDecals = 0;
         detailGeneratedInstances = detailVisibleCapacity = detailDecalCapacity = 0;
         fgArenaUsed = fgArenaPeak = fgArenaCapacity = fgArenaFallbacks = 0;
+        fgSetupPassesMs = fgCompileMs = 0.f;
     }
 };
 

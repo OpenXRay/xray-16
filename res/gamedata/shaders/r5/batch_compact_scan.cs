@@ -1,7 +1,6 @@
 // batch_compact_scan.cs
 // Prefix scan over per-group counts to produce group offsets and total visible count.
 #define SM_5_0
-#include "common.h"
 
 #define COMPACT_GROUP_SIZE 256
 

@@ -1,0 +1,112 @@
+// Classic CoP HDAO (r3/ssao_hdao.ps) — pixel rings + view-Z valley
+#include "ao/ao_common.h"
+
+static const float kRejectRadius = 0.43;
+static const float kAcceptRadius = 0.0001;
+static const float kIntensity = 0.85;
+static const float kZDispScale = 0.1;
+static const float kAcceptAngle = 0.98;
+
+static const float2 kRing[12] =
+{
+    float2(1, -1), float2(0, 1),
+    float2(0, 3), float2(2, 1), float2(3, -1), float2(1, -3),
+    float2(1, -5), float2(3, -3), float2(5, -1), float2(4, 1), float2(2, 3), float2(0, 5)
+};
+
+// Sum of float4 ring weights per gather (classic g_f4SSAORingWeight average * 4)
+static const float kRingWeight[12] =
+{
+    2.65432, 2.65432,
+    1.37051, 1.67321, 1.37051, 1.67321,
+    1.10134, 1.21766, 0.94534, 1.10134, 1.21766, 0.94534
+};
+
+static const float kRingWeightsTotal[3] = { 5.30864, 11.39610, 17.92677 };
+
+float SampleViewZ(float2 uv)
+{
+    float4 wp = SampleWorldPos(uv);
+    if (wp.w < 0.5)
+        return 1e6;
+    return WorldToView(wp.xyz).z;
+}
+
+float ValleyGate(float2 texcoord, float3 N)
+{
+    // Simplified classic HDAOValleyAngle — 4 mirrored normal taps
+    static const float2 kNormOff[4] =
+    {
+        float2(0, -9), float2(6, -6), float2(10, 0), float2(8, 9)
+    };
+    float summed = 0.0;
+    [unroll]
+    for (int i = 0; i < 4; ++i)
+    {
+        float2 o = kNormOff[i] * ao_screen.zw;
+        float3 n1 = SampleWorldNormal(saturate(texcoord + o));
+        float3 n2 = SampleWorldNormal(saturate(texcoord - o));
+        float d1 = dot(n1, N);
+        float d2 = dot(n2, N);
+        summed += (d1 > kAcceptAngle) ? 0.0 : (1.0 - abs(d1) * 0.25);
+        summed += (d2 > kAcceptAngle) ? 0.0 : (1.0 - abs(d2) * 0.25);
+    }
+    summed /= 8.0;
+    summed += 0.5;
+    if (summed <= 0.5)
+        summed /= 10.0;
+    return summed;
+}
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    float depth = SampleDepth(input.texcoord);
+    float4 worldPos4 = SampleWorldPos(input.texcoord);
+    if (IsSky(depth, worldPos4))
+        return float4(1, 1, 1, 1);
+
+    float3 Nw = SampleWorldNormal(input.texcoord);
+    float3 Pv = WorldToView(worldPos4.xyz);
+    float3 Nv = normalize(mul((float3x3)m_V, Nw));
+
+    float viewZ = ViewDepth(Pv);
+    if (viewZ < 0.5)
+        return float4(1, 1, 1, 1);
+
+    float q = AoQuality();
+    int numGathers = (q >= 3.0) ? 12 : ((q >= 2.0) ? 6 : 2);
+    int ringIdx = (q >= 3.0) ? 2 : ((q >= 2.0) ? 1 : 0);
+
+    float zDisp = Pv.z + kZDispScale * Nv.z;
+    float valley = ValleyGate(input.texcoord, Nw);
+
+    float occlusion = 0.0;
+    float2 texel = ao_screen.zw;
+
+    [loop]
+    for (int i = 0; i < numGathers; ++i)
+    {
+        float2 pattern = kRing[i];
+        float2 mirror = (pattern + 1.0) * float2(-1.0, -1.0);
+
+        float2 uv0 = input.texcoord + pattern * texel;
+        float2 uv1 = input.texcoord + mirror * texel;
+        if (any(uv0 < 0.0) || any(uv0 > 1.0) || any(uv1 < 0.0) || any(uv1 > 1.0))
+            continue;
+
+        float z0 = SampleViewZ(uv0);
+        float z1 = SampleViewZ(uv1);
+        float d0 = zDisp - z0;
+        float d1 = zDisp - z1;
+
+        float c0 = (d0 < kRejectRadius && d0 > kAcceptRadius) ? 1.0 : 0.0;
+        float c1 = (d1 < kRejectRadius && d1 > kAcceptRadius) ? 1.0 : 0.0;
+        occlusion += kRingWeight[i] * (c0 * c1);
+    }
+
+    float occ = occlusion * kIntensity / (2.0 * kRingWeightsTotal[ringIdx]);
+    occ *= valley;
+    occ *= saturate(viewZ - 0.5);
+    float ao = 1.0 - saturate(occ);
+    return float4(ao, ao, ao, 1);
+}

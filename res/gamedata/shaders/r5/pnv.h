@@ -20,10 +20,9 @@
 #define SCANLINES_INTENSITY 0.015     // ���������  �������������
 #define VIGNETTE_RADIUS 1.0           //
 
-// Pixel
-// Note: screen_res is now in static_globals cbuffer (shared/common.h)
-// Note: m_zoom_deviation remains as loose uniform (engine binds it individually)
+#ifndef PNV_ZOOM_DEVIATION_DEFINED
 uniform	float4 		m_zoom_deviation;
+#endif
 
 float4 calc_night_vision_effect(float2 tc0, float4 color, float3 NV_COLOR)
 {

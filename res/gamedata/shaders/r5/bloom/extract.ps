@@ -1,0 +1,25 @@
+// bloom/extract.ps — bright-pass extract for Dual Kawase bloom (HDR-safe)
+#define SM_6_0
+Texture2D g_Color : register(t0);
+SamplerState smp_rtlinear : register(s0);
+
+cbuffer BloomParams : register(b0)
+{
+    float4 threshold; // x = threshold, y = soft knee, zw unused
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float2 uv = saturate(I.uv);
+    float3 c = g_Color.SampleLevel(smp_rtlinear, uv, 0).rgb;
+    float br = max(c.r, max(c.g, c.b));
+    float thr = max(threshold.x, 1e-3);
+    float soft = max(threshold.y, 1e-3);
+    float knee = soft * thr;
+    float softZone = clamp(br - thr + knee, 0.0, 2.0 * knee);
+    softZone = (softZone * softZone) / max(4.0 * knee, 1e-4);
+    float contrib = max(softZone, br - thr) / max(br, 1e-4);
+    return float4(c * contrib, 1.0);
+}

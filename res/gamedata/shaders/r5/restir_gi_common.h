@@ -6,7 +6,7 @@
 #endif
 
 static const uint RESTIR_INVALID_ID = 0xFFFFFFFF;
-static const float RESTIR_MAX_RADIANCE = 100.0;
+static const float RESTIR_MAX_RADIANCE = 48.0;
 static const uint RESTIR_M_MAX = 20;
 
 struct GIReservoir
@@ -119,6 +119,31 @@ GIReservoir UnpackReservoir(float4 A, float4 B)
     UnpackNormalMAge(asuint(B.w), r.sampleNormal, r.M, r.age);
     r.w_sum = 0;
     return r;
+}
+
+GIReservoir UnpackReservoir(float4 A, float4 B, float2 C)
+{
+    GIReservoir r = UnpackReservoir(A, B);
+    r.w_sum = C.x;
+    return r;
+}
+
+float2 PackReservoirC(GIReservoir r)
+{
+    return float2(r.w_sum, asfloat(r.M));
+}
+
+float AgeConfidence(uint age, uint softMax)
+{
+    float a = (float)age;
+    float s = (float)max(softMax, 1u);
+    return saturate(1.0 - (a / (s * 2.0)));
+}
+
+uint TemporalMClamp(uint M, uint age, uint mMax)
+{
+    uint ageCut = age > 24u ? (mMax / 2u) : mMax;
+    return min(M, max(ageCut, 1u));
 }
 
 // Jacobian of reconnection shift: reusing sample from pixel q at pixel r

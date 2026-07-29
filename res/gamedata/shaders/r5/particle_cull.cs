@@ -48,10 +48,6 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
 
     bool visible = FrustumTestSphere(p.position, p.radius, g_FrustumPlanes);
 
-    if (visible && g_HiZMipLevels > 0)
-        visible = HiZTestSphere(p.position, p.radius, g_CameraPos.xyz, g_PrevViewProj,
-                                g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels);
-
     if (visible)
     {
         uint unused;

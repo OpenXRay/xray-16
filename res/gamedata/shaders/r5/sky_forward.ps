@@ -1,8 +1,6 @@
 // xrRender/Shaders/forward/sky_forward.ps
-// Sky dome pixel shader for Forward+ rendering
-//
-// Samples two cubemap textures and blends between them
-// Outputs HDR color to single render target
+// Sky dome — classic CoP path (sky2.ps): tint * cubemap * 0.33,
+// then unified tonemap applies scale (classic used scale*2 → net 0.66).
 
 #include "shared/common.h"
 #include "common_samplers.h"
@@ -10,27 +8,36 @@
 struct PS_INPUT {
     float4 hpos     : SV_POSITION;
     float4 color    : COLOR0;      // RGB = sky color tint, A = blend factor
-    float3 tc0      : TEXCOORD0;   // Cubemap UV for sky0
-    float3 tc1      : TEXCOORD1;   // Cubemap UV for sky1
+    float3 tc0      : TEXCOORD0;
+    float3 tc1      : TEXCOORD1;
+    float  elev     : TEXCOORD2;
 };
 
-// Sky cubemap textures
 TextureCube s_sky0 : register(t0);
 TextureCube s_sky1 : register(t1);
 
+// Horizon fog — matches distance-fogged geometry so the horizon has no hard cut.
+// b0/b1/b2 are taken by common.h (dynamic_transforms/shader_params/static_globals).
+cbuffer SkyFog : register(b3)
+{
+    float4 sky_fog_color;
+    float4 sky_fog_params; // x=band height, y=strength
+};
 
-float4 main(PS_INPUT I) : SV_TARGET {
-    // Sample both sky cubemaps
-    float3 sky0 = s_sky0.Sample(smp_rtlinear, I.tc0).rgb;
-    float3 sky1 = s_sky1.Sample(smp_rtlinear, I.tc1).rgb;
+float4 main(PS_INPUT I) : SV_TARGET
+{
+    float3 s0 = s_sky0.Sample(smp_rtlinear, I.tc0).rgb;
+    float3 s1 = s_sky1.Sample(smp_rtlinear, I.tc1).rgb;
 
-    // Blend between sky states (alpha = blend weight from environment)
-    float blendFactor = I.color.a;
-    float3 sky = lerp(sky0, sky1, blendFactor);
+    // Classic: factor.xyz * lerp(s0, s1, factor.w); sky *= 0.33
+    // Classic then tonemapped with scale*2 → effective pre-scale 0.66 here.
+    float3 sky = I.color.rgb * lerp(s0, s1, I.color.a);
+    sky *= 0.66;
 
-    // Apply sky color tint from environment
-    // sky *= I.color.rgb;
+    float bandH   = max(sky_fog_params.x, 1e-3);
+    float strength = saturate(sky_fog_params.y);
+    float fogT = saturate((bandH - I.elev) / bandH) * strength;
+    sky = lerp(sky, sky_fog_color.rgb, fogT);
 
-    // Output HDR sky color (exposure applied uniformly in tonemap pass)
-    return float4(sky, 1.0f);
+    return float4(sky, 1.0);
 }

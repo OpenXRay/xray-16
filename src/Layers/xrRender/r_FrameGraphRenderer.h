@@ -21,12 +21,14 @@
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "Layers/xrRender/Profiler/StatsOverlay.h"
+#include "Layers/xrRender/FrameGraphPasses/LodPassSetup.h"
 
 struct ImDrawData;
 
 namespace xray::render::fg
 {
 class IRender_DetailModel;
+class CSector;
 
 struct ShaderMacro
 {
@@ -43,6 +45,7 @@ namespace xray::render::fg {
     class RTAccelStructManager;
     class CRenderTarget;
     class light;
+    class VolumetricRenderer;
     namespace PS {
         class CParticleEffect;
     }
@@ -225,6 +228,7 @@ public:
     void Screenshot(IRender::ScreenshotMode mode, pcstr name) override;
     void SetPostProcessParams(const SPPInfo&) override;
     void RequestGrassInteraction(const Fvector&, float, float, uint8_t) override;
+    bool SampleTerrainHeight(float x, float z, float& outY) override;
 
     // Initialize
     bool Initialize(fg::RenderDevice* device);
@@ -248,6 +252,8 @@ public:
         float gbufferMs = 0.0f;
         float lightingMs = 0.0f;
         float tonemapMs = 0.0f;
+        float fgSetupPassesMs = 0.0f;
+        float fgCompileMs = 0.0f;
         u32 numDrawCalls = 0;
         u32 numTriangles = 0;
     };
@@ -282,6 +288,9 @@ public:
     // Decal Manager accessor (for wallmark routing)
     fg::decals::DecalManager* GetDecalManager() const { return m_decalManager.get(); }
     fg::decals::OverlayManager* GetOverlayManager() const { return m_overlayManager.get(); }
+
+    fg::RTAccelStructManager* GetRTAccelMgr() const { return m_rtAccelMgr.get(); }
+    bool IsRTGIActive() const;
 
 public:
     struct _options
@@ -481,6 +490,7 @@ private:
     // Eliminates double vertex processing cost (~1.5-2ms savings)
     nvrhi::TextureHandle m_prevFrameDepth;
     nvrhi::TextureHandle m_normals[2];
+    nvrhi::TextureHandle m_worldPos[2];
     u32 m_pingPongIndex = 0;
 
     Fmatrix m_prevViewProj;                       // Previous frame's view-projection
@@ -528,6 +538,9 @@ private:
     // Smoke Trail Manager (GPU weapon muzzle smoke)
     xr_unique_ptr<fg::passes::SmokeTrailManager> m_smokeTrailManager;
 
+    // Froxel volumetric fog (MVP: world fog + sun)
+    xr_unique_ptr<fg::VolumetricRenderer> m_volumetricRenderer;
+
     // Ray Tracing acceleration structures (for path tracer)
     xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
     u32 m_ptSampleIndex = 0;
@@ -543,6 +556,7 @@ private:
 
     // HUD geometry (separate from world geometry)
     xr_vector<GeometryBatch> m_hudBatches;
+    xr_vector<fg::passes::LodImpostorInstance> m_lodImpostors;
 
     // Particle systems (collected during same spatial query as geometry)
     xr_vector<fg::passes::ParticleBatch> m_worldParticleBatches;  // World-space particles
@@ -551,10 +565,19 @@ private:
     // ═══════════════════════════════════════════════════════
     //  STATIC GEOMETRY CACHE (collected once, reused every frame)
     // ═══════════════════════════════════════════════════════
-    // Static geometry from sector hierarchies doesn't change - cache it!
-    // Only dynamic objects (from spatial DB) need per-frame collection
+    // Static geometry: unique batches + per-sector index lists (built once after load)
     xr_vector<GeometryBatch> m_cachedStaticBatches;
-    bool m_staticBatchesCached = false;
+    xr_vector<xr_vector<u32>> m_sectorStaticBatchIds;
+    xr_vector<u8> m_sectorCacheReady;
+    xr_vector<u8> m_staticSubmitMark;
+    u8 m_staticSubmitEpoch = 0;
+    xr_map<dxRender_Visual*, xr_vector<u32>> m_visualCacheBatchIds;
+    bool m_staticCacheInitialized = false;
+    bool m_portalTraverseActive = false;
+
+    // Ensure sector static batches exist. Returns true if built this call
+    // (batches already pushed into the live collector via ProcessVisualGeometry).
+    bool EnsureSectorStaticCache(size_t sectorIndex, const xr_vector<fg::CSector*>& sectors);
 
     // RenderContext for execution
     xr_unique_ptr<fg::RenderContext> m_renderContext;

@@ -385,9 +385,9 @@ TrailPassOutput setupTrailPass(
                 auto* psReflection = shaderLoader->GetCachedReflection("trail", ".ps");
                 BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Trail");
                 bsb.ConstantBuffer("static_globals", staticGlobalsCB)
-                   .ConstantBuffer("TrailParams", trailParamsCB)
-                   .BufferSRV("g_Materials", matBuffer.GetBuffer())
-                   .BufferSRV("g_ControlPoints", st.controlPointBuffer)
+                   .ConstantBuffer("TrailParams", trailParamsCB);
+                BindBindlessMaterialTables(bsb);
+                bsb.BufferSRV("g_ControlPoints", st.controlPointBuffer)
                    .BufferSRV("g_TrailState", st.dummyStateBuffer);
                 auto bindDesc = bsb.Build();
                 auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st.layout, nvDevice);

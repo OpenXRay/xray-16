@@ -140,7 +140,7 @@ float angle_inertion_var(float src, float tgt, float min_speed, float max_speed,
 	return src;
 }
 
-double rsqrt(double v) { return 1.0 / _sqrt(v); }
+double rsqrt(double v) noexcept { return 1.0 / _sqrt(v); }
 
 //////////////////////////////////////////////////////////////////
 

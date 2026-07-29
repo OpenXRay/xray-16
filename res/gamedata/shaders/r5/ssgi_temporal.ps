@@ -1,0 +1,55 @@
+#define SM_6_0
+#include "common.h"
+
+Texture2D g_Current : register(t0);
+Texture2D g_History : register(t1);
+Texture2D g_Depth   : register(t2);
+Texture2D g_Motion  : register(t22);
+
+cbuffer SSGITemporalParams : register(b5)
+{
+    float2 traceSize;
+    float  hasHistory;
+    float  _pad0;
+    float2 fullSize;
+    float2 _pad1;
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float2 uv = saturate(I.uv);
+    float2 texel = rcp(max(traceSize, 1.0.xx));
+    float4 curr = g_Current.SampleLevel(smp_nofilter, uv, 0);
+    float depth = g_Depth.SampleLevel(smp_nofilter, uv, 0).x;
+    if (IsSkyDepth(depth) || hasHistory < 0.5)
+        return curr;
+
+    float2 motion = g_Motion.SampleLevel(smp_nofilter, uv, 0).xy;
+    float2 histUV = uv + motion;
+    float motionPx = length(motion * max(fullSize, 1.0.xx));
+    if (any(histUV < texel) || any(histUV > (1.0 - texel)) || motionPx > 40.0)
+        return curr;
+
+    float4 prev = g_History.SampleLevel(smp_linear, saturate(histUV), 0);
+
+    float3 nMin = curr.rgb;
+    float3 nMax = curr.rgb;
+    [unroll]
+    for (int y = -1; y <= 1; ++y)
+    {
+        [unroll]
+        for (int x = -1; x <= 1; ++x)
+        {
+            float3 s = g_Current.SampleLevel(smp_nofilter, uv + float2(x, y) * texel, 0).rgb;
+            nMin = min(nMin, s);
+            nMax = max(nMax, s);
+        }
+    }
+    float3 pClamp = clamp(prev.rgb, nMin, nMax);
+
+    float vel = saturate(motionPx * 0.04);
+    float weight = saturate(0.90 - vel * 0.65);
+    return float4(lerp(curr.rgb, pClamp, weight), curr.a);
+}

@@ -1,0 +1,16 @@
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal   : TEXCOORD2;
+    float3 tangent  : TEXCOORD3;
+    float3 bitangent: TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+    float hemi      : TEXCOORD6;
+    float2 lmUV     : TEXCOORD7;
+};
+
+void main(PS_INPUT input)
+{
+}

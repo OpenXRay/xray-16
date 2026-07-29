@@ -109,16 +109,27 @@ framegraph::VirtualResourceHandle setupUIPass(
                 return;
             }
 
-            g_pGamePersistent->OnRenderPPUI_main();
+            // Record order = draw order (last on top):
+            //   in-game HUD → sequencers → loading → main menu → menu PP
+            uiRender->Clear();
+            IUIRender* oldRenderer = GEnv.UIRender;
+            GEnv.UIRender = uiRender;
+
             g_pGamePersistent->OnRenderInGameUI();
-            if (g_pGamePersistent->IsLoadingScreenShown()) {
-                g_pGamePersistent->load_draw_internal();
-            }
             g_pGamePersistent->OnRenderSequencers();
+            if (g_pGamePersistent->IsLoadingScreenShown())
+                g_pGamePersistent->load_draw_internal();
+            g_pGamePersistent->OnRenderPPUI_main();
+            g_pGamePersistent->OnRenderPPUI_PP();
+
+            GEnv.UIRender = oldRenderer;
 
             if (!uiRender->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
+                const float uiW = float(std::max(1u, data.width));
+                const float uiH = float(std::max(1u, data.height));
+                staticGlobalsCB.screen_res.set(uiW, uiH, 1.0f / uiW, 1.0f / uiH);
 
                 for (const auto& batch : uiRender->GetBatches()) {
                     if (batch.uiShader && uiMatCache) {
@@ -207,6 +218,9 @@ framegraph::VirtualResourceHandle setupCursorPass(
             if (!uiRender->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
+                const float uiW = float(std::max(1u, data.width));
+                const float uiH = float(std::max(1u, data.height));
+                staticGlobalsCB.screen_res.set(uiW, uiH, 1.0f / uiW, 1.0f / uiH);
 
                 for (const auto& batch : uiRender->GetBatches()) {
                     if (batch.uiShader && uiMatCache) {

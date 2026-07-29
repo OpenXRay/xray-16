@@ -62,7 +62,7 @@ void FGFontRender::InitResources()
     cbDesc.byteSize = sizeof(FontCB);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = 16;
+    cbDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     cbDesc.debugName = "FGFontRender_CB";
     m_constantBuffer = m_device->createBuffer(cbDesc);
     R_ASSERT2(m_constantBuffer, "FGFontRender: createBuffer(CB) failed");

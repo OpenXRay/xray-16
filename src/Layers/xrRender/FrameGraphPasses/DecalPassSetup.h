@@ -22,7 +22,8 @@ namespace xray::render::fg::decals {
 namespace xray::render::fg::passes {
 
 struct DecalPassState {
-    nvrhi::GraphicsPipelineHandle pipeline;
+    nvrhi::GraphicsPipelineHandle alphaPipeline;
+    nvrhi::GraphicsPipelineHandle multiplyPipeline;
     nvrhi::BindingLayoutHandle bindingLayout;
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::ShaderHandle vs;

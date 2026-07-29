@@ -43,7 +43,8 @@ const xr_token tbmode_token[] = {{"None", STextureParams::tbmNone}, {"Use", STex
 
 void STextureParams::Load(IReader& F)
 {
-    R_ASSERT(F.find_chunk(THM_CHUNK_TEXTUREPARAM));
+    if (!F.find_chunk(THM_CHUNK_TEXTUREPARAM))
+        return;
     F.r(&fmt, sizeof(ETFormat));
     flags.assign(F.r_u32());
     border_color = F.r_u32();
@@ -200,8 +201,14 @@ void STextureParams::FillProp(LPCSTR base_name, PropItemVec& items, PropValue::T
     OnTypeChangeEvent = on_type_change;
     PropValue* P = PHelper().CreateToken32(items, "Type", (u32*)&type, ttype_token);
     P->OnChangeEvent.bind(this, &STextureParams::OnTypeChange);
-    PHelper().CreateCaption(items, "Source" DELIMITER "Width", shared_str().printf("%d", width));
-    PHelper().CreateCaption(items, "Source" DELIMITER "Height", shared_str().printf("%d", height));
+
+    shared_str temp_str;
+    xr_sprintf(temp_str, "%d", width);
+    PHelper().CreateCaption(items, "Source" DELIMITER "Width", temp_str);
+
+    xr_sprintf(temp_str, "%d", height);
+    PHelper().CreateCaption(items, "Source" DELIMITER "Height", v);
+
     PHelper().CreateCaption(items, "Source" DELIMITER "Alpha", HasAlpha() ? "present" : "absent");
     switch (type)
     {

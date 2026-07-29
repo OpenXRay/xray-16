@@ -993,15 +993,16 @@ void FrameGraph::AllocateResources() {
                 resources::TextureHandle rmHandle = m_resourcePool->AllocateTexture(rmTexDesc);
 
                 if (rmHandle.IsValid()) {
-                    // Store ResourceManager handle for lifecycle management
                     resource.resourceTexture = rmHandle;
 
-                    // Get the NVRHI texture for immediate use
                     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
                     resource.nvrhiTexture = texManager->GetNVRHITexture(rmHandle);
-                    resource.isAllocated = (resource.nvrhiTexture != nullptr);
-                    totalMemoryAllocated += resource.memorySize;
-                    continue;
+                    if (resource.nvrhiTexture) {
+                        resource.isAllocated = true;
+                        totalMemoryAllocated += resource.memorySize;
+                        continue;
+                    }
+                    resource.resourceTexture = {};
                 }
             }
 
@@ -1175,6 +1176,24 @@ void FrameGraph::OptimizeMemoryAliasing() {
                 if (current->desc.type != ResourceDesc::Type::Buffer &&
                     current->desc.format != candidate->desc.format) {
                     compatible = false;
+                }
+
+                if (current->desc.type != ResourceDesc::Type::Buffer) {
+                    if (current->desc.width != candidate->desc.width ||
+                        current->desc.height != candidate->desc.height ||
+                        current->desc.depth != candidate->desc.depth ||
+                        current->desc.arraySize != candidate->desc.arraySize ||
+                        current->desc.mipLevels != candidate->desc.mipLevels ||
+                        current->desc.sampleCount != candidate->desc.sampleCount) {
+                        compatible = false;
+                    }
+                    const bool curUAV = current->desc.isUAV || current->desc.allowUAV;
+                    const bool candUAV = candidate->desc.isUAV || candidate->desc.allowUAV;
+                    if (curUAV != candUAV ||
+                        current->desc.isRenderTarget != candidate->desc.isRenderTarget ||
+                        current->desc.isDepthStencil != candidate->desc.isDepthStencil) {
+                        compatible = false;
+                    }
                 }
 
                 // Candidate must be large enough

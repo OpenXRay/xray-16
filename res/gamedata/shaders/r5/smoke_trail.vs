@@ -18,8 +18,8 @@ struct TrailControlPoint
     float cumDist;             // cumulative distance from head
 };
 
-StructuredBuffer<TrailControlPoint> g_ControlPoints : register(t10);
-ByteAddressBuffer g_TrailState : register(t11);
+StructuredBuffer<TrailControlPoint> g_ControlPoints : register(t13);
+ByteAddressBuffer g_TrailState : register(t14);
 
 // ═══════════════════════════════════════════════════════
 //  Per-group constant buffer (matches TrailParamsCB)
@@ -211,7 +211,7 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
     // --- Output ---
     output.hpos = mul(m_VP, float4(finalPos, 1.0));
     output.texcoord = uv;
-    output.color = float4(1.0, 1.0, 1.0, smoothAge);
+    output.color = float4(1.0, 1.0, 1.0, smoothAge * tailFade);
 
     return output;
 }

@@ -56,7 +56,8 @@ struct PathTracerCB {
     u32 skinnedBatchStart;
     u32 grassBatchStart;
     u32 detailAtlasIndex;
-    u32 pad[2];
+    u32 particleBatchStart;
+    u32 pad;
 };
 static_assert(sizeof(PathTracerCB) == 160, "PathTracerCB must be 160 bytes");
 
@@ -266,18 +267,24 @@ PathTracerOutput setupPathTracerPass(
         cbData.skinnedBatchStart = batchCounts.identityStatic + batchCounts.terrain +
                                    batchCounts.transparent + batchCounts.instancedTotal;
     else
-        cbData.skinnedBatchStart = 0;
+        cbData.skinnedBatchStart = 0xFFFFFFFFu;
 
     if (batchCounts.grass > 0)
         cbData.grassBatchStart = batchCounts.identityStatic + batchCounts.terrain +
                                  batchCounts.transparent + batchCounts.instancedTotal +
                                  batchCounts.skinned;
     else
-        cbData.grassBatchStart = 0;
+        cbData.grassBatchStart = 0xFFFFFFFFu;
+
+    if (batchCounts.particles > 0)
+        cbData.particleBatchStart = batchCounts.identityStatic + batchCounts.terrain +
+                                      batchCounts.transparent + batchCounts.instancedTotal +
+                                      batchCounts.skinned + batchCounts.grass;
+    else
+        cbData.particleBatchStart = 0xFFFFFFFFu;
 
     cbData.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
-    cbData.pad[0] = 0;
-    cbData.pad[1] = 0;
+    cbData.pad = 0;
 
     auto& passData = fg.addCallbackPass<PathTracerData>(
         "Path Tracer",

@@ -1,0 +1,89 @@
+// dof.ps — classic CoP-style DOF (poisson) for FrameGraph HDR
+#define SM_6_0
+
+Texture2D g_Color : register(t0);
+Texture2D g_Depth : register(t1);
+SamplerState smp_rtlinear : register(s0);
+SamplerState smp_point : register(s1);
+
+cbuffer DofParams : register(b0)
+{
+    float4 dof_params; // x=near, y=focus, z=far, w=sky_dist
+    float4 dof_kernel; // xy = 0.5/res, z = kernel size, w unused
+    float4x4 m_InvVP;
+    float4x4 m_V;
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+#define EPSDEPTHDOF 0.0001
+
+// View-space distance along camera forward (X-Ray +Z). Always positive.
+float ViewZFromDepth(float2 uv, float rawDepth)
+{
+    float2 ndc = float2(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0);
+    float4 worldH = mul(m_InvVP, float4(ndc, rawDepth, 1.0));
+    float3 worldPos = worldH.xyz / max(worldH.w, 1e-5);
+    float viewZ = mul(m_V, float4(worldPos, 1.0)).z;
+    return abs(viewZ);
+}
+
+float DOFFactor(float depth)
+{
+    float dist_to_focus = depth - dof_params.y;
+    float blur_far = saturate(dist_to_focus / max(dof_params.z - dof_params.y, 1e-3));
+    float blur_near = saturate(dist_to_focus / (dof_params.x - dof_params.y));
+    float blur = blur_near + blur_far;
+    return blur * blur;
+}
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    // Fullscreen triangle UV is already [0,1] on-screen (extends to 2 off-screen)
+    float2 uv = I.uv;
+    float3 img = g_Color.SampleLevel(smp_rtlinear, uv, 0).rgb;
+    float rawDepth = g_Depth.SampleLevel(smp_point, uv, 0).x;
+
+    float depth = ViewZFromDepth(uv, rawDepth);
+    if (depth <= EPSDEPTHDOF || rawDepth <= 1e-7)
+        depth = dof_params.w;
+
+    float blur = DOFFactor(depth);
+    if (blur < 1e-4)
+        return float4(img, 1.0);
+
+    // Classic: scale = (0.5/res) * kernel * blur
+    float2 scale = dof_kernel.xy * (dof_kernel.z * blur);
+
+    float2 o[12];
+    o[0]  = float2(-0.326212, -0.405810) * scale;
+    o[1]  = float2(-0.840144, -0.073580) * scale;
+    o[2]  = float2(-0.695914,  0.457137) * scale;
+    o[3]  = float2(-0.203345,  0.620716) * scale;
+    o[4]  = float2( 0.962340, -0.194983) * scale;
+    o[5]  = float2( 0.473434, -0.480026) * scale;
+    o[6]  = float2( 0.519456,  0.767022) * scale;
+    o[7]  = float2( 0.185461, -0.893124) * scale;
+    o[8]  = float2( 0.507431,  0.064425) * scale;
+    o[9]  = float2( 0.896420,  0.412458) * scale;
+    o[10] = float2(-0.321940, -0.932615) * scale;
+    o[11] = float2(-0.791559, -0.597710) * scale;
+
+    // Classic: weight taps by their own CoC (dof.h)
+    float3 sum = img;
+    float contrib = 1.0;
+    [unroll]
+    for (int i = 0; i < 12; ++i)
+    {
+        float2 tap = uv + o[i];
+        float3 tapColor = g_Color.SampleLevel(smp_rtlinear, tap, 0).rgb;
+        float tapRaw = g_Depth.SampleLevel(smp_point, tap, 0).x;
+        float tapDepth = ViewZFromDepth(tap, tapRaw);
+        if (tapDepth <= EPSDEPTHDOF || tapRaw <= 1e-7)
+            tapDepth = dof_params.w;
+        float tapContrib = DOFFactor(tapDepth);
+        sum += tapColor * tapContrib;
+        contrib += tapContrib;
+    }
+    return float4(sum / max(contrib, 1e-3), 1.0);
+}

@@ -25,6 +25,8 @@ public:
 
     bool IsInitialized() const override { return m_initialized; }
     void WaitForIdle() override;
+    void LockDevice() override;
+    void UnlockDevice() override;
     DeviceState GetDeviceState() const override;
 
     nvrhi::IDevice* GetDevice() const override { return m_nvrhiDevice.Get(); }
@@ -47,7 +49,14 @@ public:
     u32 GetBackBufferCount() const override { return BACK_BUFFER_COUNT; }
     std::pair<u32, u32> GetBackBufferSize() const override { return {m_backBufferWidth, m_backBufferHeight}; }
     void Present(bool vsync) override;
+    bool PresentFrameGeneration(nvrhi::ITexture* interpolated, nvrhi::ITexture* real) override;
+    u64 GetPresentCount() const override { return m_nextPresentId - 1; }
     void ResizeSwapChain(u32 width, u32 height) override;
+
+    bool IsLowLatencyAvailable() const override { return m_latencyAvailable; }
+    void ApplyLowLatencyMode(int mode, u32 minIntervalUs) override;
+    void LatencySleep() override;
+    void SetLatencyMarker(LatencyMarker marker) override;
 
     void BeginFrame() override;
     void EndFrame() override;
@@ -56,6 +65,11 @@ public:
 
     const Capabilities& GetCapabilities() const override { return m_capabilities; }
     Capabilities& GetMutableCapabilities() override { return m_capabilities; }
+
+    VkInstance GetVkInstance() const { return m_instance; }
+    VkPhysicalDevice GetVkPhysicalDevice() const { return m_physicalDevice; }
+    VkDevice GetVkDevice() const { return m_device; }
+    u32 GetGraphicsQueueFamily() const { return m_graphicsQueueFamily; }
 
     u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override;
     void UnregisterBindlessTexture(u32 index) override;
@@ -67,7 +81,7 @@ public:
     void SetMarker(pcstr name) override;
 
 private:
-    static constexpr u32 BACK_BUFFER_COUNT = 3;
+    static constexpr u32 BACK_BUFFER_COUNT = 4;
     static constexpr u32 MAX_BINDLESS_TEXTURES = 65536;
 
     bool CreateInstance(SDL_Window* window, bool enableValidation);
@@ -81,12 +95,45 @@ private:
     void DestroySyncObjects();
     void CreateBindlessResources();
     void QueryCapabilities();
+    void InitLatencyExtension();
+    void DestroyLatencyObjects();
+    VkPresentModeKHR SelectPresentMode(bool wantVSync, bool wantFg) const;
+    void PresentInternal(bool outOfBand);
+    void AssociateLatencyPresentId(u64 presentId);
+    void SetLatencyMarkerNV(VkLatencyMarkerNV marker, u64 presentId);
+
+    /// Recreate from current surface caps. Returns false if surface is 0x0 (minimized).
+    bool RecreateSwapchainFromSurface();
+    void RequestSwapchainRecreate(bool fromOutOfDate);
+
+    // Feature bits after CreateLogicalDevice clamp (Apple/MoltenVK may disable some)
+    bool m_featureDrawIndirectCount = false;
+    bool m_featureMultiDrawIndirect = false;
+    bool m_featureDescriptorIndexing = false;
+    bool m_featureShaderDrawParameters = false;
+    bool m_featureRayTracing = false;
+    bool m_featureBufferDeviceAddress = false;
 
     VkInstance m_instance = VK_NULL_HANDLE;
     VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
     VkDevice m_device = VK_NULL_HANDLE;
     VkSurfaceKHR m_surface = VK_NULL_HANDLE;
     VkSwapchainKHR m_swapchain = VK_NULL_HANDLE;
+    VkPresentModeKHR m_presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    bool m_createdWithVSync = true;
+    bool m_createdWithFg = false;
+    bool m_presentIdAvailable = false;
+    bool m_latencyAvailable = false;
+    int m_appliedReflexMode = -1;
+    u32 m_appliedReflexIntervalUs = UINT32_MAX;
+    u64 m_nextPresentId = 1;
+    u64 m_latencySleepValue = 0;
+    VkSemaphore m_latencySleepSemaphore = VK_NULL_HANDLE;
+    bool m_oobPresentQueueNotified = false;
+    PFN_vkSetLatencySleepModeNV m_vkSetLatencySleepModeNV = nullptr;
+    PFN_vkLatencySleepNV m_vkLatencySleepNV = nullptr;
+    PFN_vkSetLatencyMarkerNV m_vkSetLatencyMarkerNV = nullptr;
+    PFN_vkQueueNotifyOutOfBandNV m_vkQueueNotifyOutOfBandNV = nullptr;
     VkQueue m_graphicsQueue = VK_NULL_HANDLE;
     u32 m_graphicsQueueFamily = UINT32_MAX;
     VkQueue m_computeQueue = VK_NULL_HANDLE;
@@ -121,6 +168,11 @@ private:
     u32 m_currentImageIndex = 0;
     u32 m_currentFrameIndex = 0;
     VkFormat m_swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
+
+    // Present may run on the submit thread — flag BeginFrame to recreate.
+    std::atomic<bool> m_swapchainDirty{false};
+    // After one recreate for SUBOPTIMAL, ignore further SUBOPTIMAL until OUT_OF_DATE.
+    std::atomic<bool> m_suboptimalAccepted{false};
 
     Task* m_gcTask = nullptr;
     std::atomic<u64> m_lastGraphicsInstanceID{ 0 };

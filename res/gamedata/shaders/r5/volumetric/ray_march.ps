@@ -1,0 +1,76 @@
+// ray_march.ps — integrate froxel volume and composite over HDR scene
+#include "volumetric/shared_froxel.h"
+
+Texture2D    t_SceneColor : register(t0);
+Texture2D    t_Depth      : register(t1);
+Texture3D    t_Froxel     : register(t2);
+SamplerState smp_linear   : register(s0);
+
+struct PS_INPUT
+{
+	float4 position : SV_POSITION;
+	float2 texcoord : TEXCOORD0;
+};
+
+// Hardware depth → view-space Z (positive distance along view axis)
+float SampleDepthViewZ(float2 uv, out float3 worldPos)
+{
+	float d = t_Depth.SampleLevel(smp_linear, uv, 0).r;
+	float2 ndc = float2(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0);
+	float4 clip = float4(ndc, d, 1.0);
+	float4 worldH = mul(cb_InvVP, clip);
+	worldPos = worldH.xyz / max(worldH.w, 1e-5);
+	float3 viewOffset = worldPos - cb_CameraPos;
+	return length(viewOffset);
+}
+
+float4 main(PS_INPUT input) : SV_Target
+{
+	float4 scene = t_SceneColor.SampleLevel(smp_linear, input.texcoord, 0);
+	float rawDepth = t_Depth.SampleLevel(smp_linear, input.texcoord, 0).r;
+
+	float3 worldPos;
+	float sceneDist = SampleDepthViewZ(input.texcoord, worldPos);
+
+	const bool isSky = (rawDepth <= 1e-7);
+	// Cap sky march; keep terrain march to actual depth
+	sceneDist = min(sceneDist, isSky ? min(cb_Far * 0.25, 120.0) : cb_Far);
+
+	const uint steps = 24;
+	float3 accum = 0;
+	float transmittance = 1.0;
+	float stepSize = sceneDist / (float)steps;
+	float2 uv = input.texcoord;
+
+	[loop]
+	for (uint i = 0; i < steps; ++i)
+	{
+		float t = (float(i) + 0.5) * stepSize;
+		if (t >= sceneDist)
+			break;
+
+		float froxelZ = ViewZToFroxelZ(t, cb_Dims.z);
+		float3 uvw = float3(uv, (froxelZ + 0.5) / float(cb_Dims.z));
+		float4 froxel = t_Froxel.SampleLevel(smp_linear, uvw, 0);
+
+		float density = froxel.a;
+		// Mix sun inscattering with fog albedo so unlit fog still reads as fog colour
+		float3 inscattered = froxel.rgb + cb_FogAlbedo * density * 0.15;
+
+		float extinction = density * stepSize;
+		float stepTrans = exp(-extinction);
+		accum += transmittance * inscattered * stepSize;
+		transmittance *= stepTrans;
+
+		if (transmittance < 0.05)
+			break;
+	}
+
+    // Soft floor — avoid crushing sky/terrain to black
+	transmittance = max(transmittance, isSky ? 0.35 : 0.08);
+	float3 result = scene.rgb * transmittance + accum;
+
+	// Geometry already has classic distance fog in forward; only soft-blend sky haze here
+	// (avoid double fog_color lerp that crushed skies).
+	return float4(result, scene.a);
+}

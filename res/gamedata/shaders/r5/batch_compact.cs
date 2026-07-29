@@ -4,7 +4,6 @@
 // Input: Static draw args + visibility + prefix buffers
 // Output: Visible batches in compact arrays + their original indices + material IDs
 #define SM_5_0
-#include "common.h"
 
 #define COMPACT_GROUP_SIZE 256
 

@@ -100,6 +100,22 @@ public:
     );
 
     /// <summary>
+    /// Load and compile hull (tessellation control) shader
+    /// </summary>
+    ShaderResult LoadHullShader(
+        const char* name,
+        const char* entryPoint = "main"
+    );
+
+    /// <summary>
+    /// Load and compile domain (tessellation evaluation) shader
+    /// </summary>
+    ShaderResult LoadDomainShader(
+        const char* name,
+        const char* entryPoint = "main"
+    );
+
+    /// <summary>
     /// Load and compile compute shader from res/gamedata/shaders/r5/
     /// Always returns shader with reflection data
     /// </summary>

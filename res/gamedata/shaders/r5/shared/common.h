@@ -34,7 +34,7 @@ cbuffer	static_globals : register(b2)
 
 	float4		fog_plane;
 	float4		fog_params;		// x=near*(1/(far-near)), ?,?, w = -1/(far-near)
-	float4		fog_color;
+	float4		fog_color;		// .w = rain_density (terrain puddles / wet)
 
 	float4		L_ambient;		// L_ambient.w = skynbox-lerp-factor
 	float3		L_sun_color;
@@ -43,8 +43,8 @@ cbuffer	static_globals : register(b2)
 	float		hud_fov;
 	float4		L_hemi_color;
 
-	float3 		eye_position;
-	float		_pad_eye;
+    float3 		eye_position;
+	float		contact_shadow_length; // 0 = off; meters of SS contact ray
 
 	float4 		pos_decompression_params;
 	float4 		pos_decompression_params2;

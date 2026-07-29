@@ -21,6 +21,8 @@
 #include "IGame_Level.h"
 #endif
 
+#include "editor_helper.h"
+
 #define FAR_DIST g_pGamePersistent->Environment().CurrentEnv.far_plane
 
 //#define MAX_Flares 24
@@ -51,13 +53,50 @@ void CLensFlareDescriptor::SetGradient(float fMaxRadius, float fOpacity, pcstr t
 
 void CLensFlareDescriptor::AddFlare(float fRadius, float fOpacity, float fPosition, pcstr tex_name, pcstr sh_name)
 {
-    SFlare F;
-    F.fRadius = fRadius;
-    F.fOpacity = fOpacity;
-    F.fPosition = fPosition;
-    F.shader = sh_name;
-    F.texture = tex_name;
-    m_Flares.push_back(F);
+    m_Flares.emplace_back(SFlare
+    {
+        .fOpacity = fOpacity,
+        .fRadius = fRadius,
+        .fPosition = fPosition,
+        .texture = tex_name,
+        .shader = sh_name,
+    });
+}
+
+bool CLensFlareDescriptor::SFlare::ed_show_params()
+{
+#ifndef MASTER_GOLD
+    using namespace xray::imgui;
+    ScopeID scope{ this };
+    bool result{};
+    result |= ImGui::DragFloat("Opacity", &fOpacity);
+    result |= ImGui::DragFloat("Radius", &fRadius);
+    result |= ImGui::DragFloat("Position", &fPosition);
+    if (InputText("Shader", shader))
+    {
+        m_pRender->DestroyShader();
+        m_pRender->CreateShader(shader.c_str(), texture.c_str());
+        result = true;
+    }
+    if (InputText("Texture", texture))
+    {
+        m_pRender->DestroyShader();
+        m_pRender->CreateShader(shader.c_str(), texture.c_str());
+        result = true;
+    }
+    return result;
+#endif
+}
+
+bool CLensFlareDescriptor::SSource::ed_show_params()
+{
+#ifndef MASTER_GOLD
+    using namespace xray::imgui;
+    bool result = SFlare::ed_show_params();
+    ScopeID scope{ this };
+    result |= ImGui::Checkbox("Ignore color", &ignore_color);
+    return result;
+#endif
 }
 
 struct FlareDescriptorFields
@@ -79,7 +118,7 @@ FlareDescriptorFields SunFields =
     "sun", "sun_shader", "sun_texture", "sun_radius", "sun_ignore_color"
 };
 
-CLensFlareDescriptor::CLensFlareDescriptor(shared_str sect, CInifile const* pIni)
+CLensFlareDescriptor::CLensFlareDescriptor(const shared_str& sect, CInifile const* pIni)
 {
     section = sect;
 
@@ -163,6 +202,62 @@ void CLensFlareDescriptor::OnDeviceDestroy()
         flare.m_pRender->DestroyShader();
 }
 
+void CLensFlareDescriptor::ed_show_params()
+{
+#ifndef MASTER_GOLD
+    using namespace xray::imgui;
+
+    float blend_rise_time = 1.f / m_StateBlendUpSpeed;
+    if (ImGui::DragFloat("Blend rise time", &blend_rise_time))
+        m_StateBlendUpSpeed = 1.f / (_max(blend_rise_time, 0.f) + EPS_S);
+
+    float blend_down_time = 1.f / m_StateBlendDnSpeed;
+    if (ImGui::DragFloat("Blend down time", &blend_down_time))
+        m_StateBlendUpSpeed = 1.f / (_max(blend_down_time, 0.f) + EPS_S);
+
+    bool v = m_Flags.is(flSource);
+    if (ImGui::Checkbox("Source", &v))
+        m_Flags.set(flSource, v);
+    ItemHelp("Name in configs: \n"
+        "CS/COP: sun\n"
+        "   SOC: source");
+
+    ImGui::SameLine();
+    v = m_Flags.is(flFlare);
+    if (ImGui::Checkbox("Flares", &v))
+        m_Flags.set(flFlare, v);
+
+    ImGui::SameLine();
+    v = m_Flags.is(flGradient);
+    if (ImGui::Checkbox("Gradient", &v))
+        m_Flags.set(flGradient, v);
+
+    ImGui::SeparatorText("Source");
+    m_Source.ed_show_params();
+
+    ImGui::SeparatorText("Flares");
+    if (ImGui::BeginTabBar("Flares"))
+    {
+        size_t id = 1;
+        for (auto& flare : m_Flares)
+        {
+            if (ImGui::BeginTabItem(std::to_string(id).c_str()))
+            {
+                flare.ed_show_params();
+                ImGui::EndTabItem();
+            }
+            ++id;
+        }
+        if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
+            AddFlare(0.f, 0.f, 0.f, nullptr, "effects\\flare");
+        ImGui::EndTabBar();
+    }
+
+    ImGui::SeparatorText("Gradient");
+    m_Gradient.ed_show_params();
+#endif
+}
+
 //------------------------------------------------------------------------------
 CLensFlare::CLensFlare()
 {
@@ -182,6 +277,18 @@ CLensFlare::CLensFlare()
     string_path filePath;
     if (FS.exist(filePath, "$game_config$", "environment\\suns.ltx"))
         m_suns_config = xr_new<CInifile>(filePath, true, true, false);
+
+#ifndef MASTER_GOLD
+    // Load all sections so weather editor can see all of them
+    if (m_suns_config)
+    {
+        for (const auto& section : m_suns_config->sections())
+        {
+            const auto descriptor = xr_new<CLensFlareDescriptor>(section->Name, m_suns_config);
+            m_Palette.emplace_back(descriptor);
+        }
+    }
+#endif
 
     OnDeviceCreate();
 }
@@ -393,7 +500,7 @@ void CLensFlare::Render(bool bSun, bool bFlares, bool bGradient)
     m_pRender->Render(*this, bSun, bFlares, bGradient);
 }
 
-CLensFlareDescriptor* CLensFlare::AppendDef(shared_str sect)
+CLensFlareDescriptor* CLensFlare::AppendDef(const shared_str& sect)
 {
     if (!sect || (0 == sect[0]))
         return nullptr;
@@ -402,9 +509,15 @@ CLensFlareDescriptor* CLensFlare::AppendDef(shared_str sect)
         if (flare->section == sect)
             return flare;
 
-    const auto descriptor = xr_new<CLensFlareDescriptor>(sect,
-        m_suns_config ? m_suns_config : pSettings
-    );
+    const CInifile* suns_config;
+    if (m_suns_config && m_suns_config->section_exist(sect))
+        suns_config = m_suns_config;
+    else if (pSettings->section_exist(sect))
+        suns_config = pSettings;
+    else
+        suns_config = m_suns_config ? m_suns_config : pSettings;
+
+    const auto descriptor = xr_new<CLensFlareDescriptor>(sect, suns_config);
     return m_Palette.emplace_back(descriptor);
 }
 
@@ -426,4 +539,24 @@ void CLensFlare::OnDeviceDestroy()
 
     // VS
     m_pRender->OnDeviceDestroy();
+}
+
+void CLensFlareDescriptor::save(CInifile* config) const
+{
+}
+
+void CLensFlare::save(bool soc_style) const
+{
+    string_path path;
+
+    if (soc_style)
+    {
+        FS.update_path(path, "$game_config$", "weathers\\flares.ltx");
+    }
+    else if (!FS.update_path(path, "$game_weathers$", "suns.ltx", false))
+    {
+        FS.update_path(path, "$game_config$", "environment\\suns.ltx");
+    }
+
+    // XXX: save
 }

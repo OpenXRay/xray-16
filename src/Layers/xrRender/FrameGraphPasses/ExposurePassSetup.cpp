@@ -10,6 +10,8 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/xrRender_console.h"
+#include "xrEngine/Environment.h"
 
 namespace fg
 {
@@ -20,23 +22,39 @@ namespace xray::render::fg::passes {
 
 using namespace framegraph;
 
-// ═══════════════════════════════════════════════════════
-//  EXPOSURE CONFIG
-// ═══════════════════════════════════════════════════════
+static float CopLuma(float r, float g, float b)
+{
+    return r * 0.3f + g * 0.38f + b * 0.22f;
+}
 
+static float ComputeEnvironmentExposureEV()
+{
+    if (!g_pGamePersistent)
+        return 0.f;
+
+    const auto& env = g_pGamePersistent->Environment().CurrentEnv;
+
+    const float sunL = CopLuma(env.sun_color.x, env.sun_color.y, env.sun_color.z) * ps_r2_sun_lumscale;
+    const float hemiL = CopLuma(env.hemi_color.x, env.hemi_color.y, env.hemi_color.z) * ps_r2_sun_lumscale_hemi;
+    const float ambL = CopLuma(env.ambient.x, env.ambient.y, env.ambient.z) * ps_r2_sun_lumscale_amb;
+    const float L_env = std::max(sunL + hemiL + ambL, 1e-4f);
+    const float L_ref = std::max(ps_r_exposure_env_ref, 1e-4f);
+    const float envEV = std::log2(L_env / L_ref);
+    return std::clamp(envEV, -4.f, 2.f);
+}
+
+// Classic binder (phase_luminance):
+//   amount = R2FLAG_TONEMAP ? ps_r2_tonemap_amount : 0
+//   _none=(1,0,1), _full=(middlegray,1,lowlum)
+//   MiddleGray = lerp(_none,_full,amount) + adaptBlend in .w
 ExposureConfig GetDefaultExposureConfig()
 {
     ExposureConfig config;
-    config.minLogLuminance = -10.0f;
-    config.maxLogLuminance = 4.0f;
-    config.lowPercentile = 0.5f;
-    config.highPercentile = 0.98f;
-    config.adaptSpeedUp = 3.0f;
-    config.adaptSpeedDown = 1.0f;
-    config.minExposure = 0.001f;
-    config.maxExposure = 64.0f;
-    config.exposureCompensation = 0.0f;
-    config.calibrationConstant = 12.5f;
+    const bool tonemapOn = ps_r2_ls_flags.test(R2FLAG_TONEMAP);
+    config.middleGray = ps_r2_tonemap_middlegray;
+    config.amount = tonemapOn ? ps_r2_tonemap_amount : 0.0f;
+    config.lowLum = ps_r2_tonemap_low_lum;
+    config.adaptation = ps_r2_tonemap_adaptation;
     return config;
 }
 
@@ -106,6 +124,20 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
         state.exposureTexture = nvDevice->createTexture(texDesc);
         if (!state.exposureTexture)
             Msg("! [ExposurePass] Failed to create exposure texture");
+        else
+        {
+            // Seed so tonemap never samples uninitialized 0 (→ crushed black).
+            nvrhi::CommandListHandle cmd = nvDevice->createCommandList();
+            if (cmd)
+            {
+                cmd->open();
+                float seed = 1.0f;
+                cmd->writeTexture(state.exposureTexture, 0, 0, &seed, sizeof(float));
+                cmd->close();
+                nvDevice->executeCommandList(cmd);
+            }
+            state.currentExposure = 1.0f;
+        }
     }
 
     if (state.computeEnabled) {
@@ -123,13 +155,13 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
         }
 
         {
-            state.adaptLayout = cache.GetOrCreateBindingLayoutFromReflection("ExposurePass_Adapt", *adaptResult.reflection, nvDevice);
+            state.adaptLayout = cache.GetOrCreateBindingLayoutFromReflection("ExposurePass_Adapt_v2", *adaptResult.reflection, nvDevice);
 
             if (state.adaptLayout) {
                 nvrhi::ComputePipelineDesc pipeDesc;
                 pipeDesc.CS = adaptResult.handle;
                 pipeDesc.bindingLayouts = { state.adaptLayout };
-                state.adaptPipeline = cache.GetOrCreateComputePipeline("ExposurePass_Adapt", pipeDesc, nvDevice);
+                state.adaptPipeline = cache.GetOrCreateComputePipeline("ExposurePass_Adapt_v2", pipeDesc, nvDevice);
             }
         }
 
@@ -145,25 +177,40 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
     Msg("* [ExposurePass] Initialized (compute=%s)", state.computeEnabled ? "enabled" : "fallback");
 }
 
-// ═══════════════════════════════════════════════════════
-//  FALLBACK: Fixed exposure calculation
-// ═══════════════════════════════════════════════════════
+static void FillAdaptCB(const ExposureConfig& config, float deltaTime, AdaptCB& out)
+{
+    Fvector4 none(1.f, 0.f, 1.f, 0.f);
+    Fvector4 full(config.middleGray, 1.f, config.lowLum, 0.f);
+    Fvector4 result;
+    result.lerp(none, full, config.amount);
+
+    out.middleGrayX = result.x;
+    out.middleGrayY = result.y;
+    out.middleGrayZ = result.z;
+    out.pad0 = 0.f;
+    out.lowPercentile = 0.50f;
+    out.highPercentile = 0.90f;
+    out.adaptUp = std::max(ps_r_exposure_adapt_up, 0.01f);
+    out.adaptDown = std::max(ps_r_exposure_adapt_down, 0.01f);
+    const float envStrength = std::clamp(ps_r_exposure_env_strength, 0.f, 1.f);
+    out.evBias = ps_r_exposure_ev_bias + ComputeEnvironmentExposureEV() * envStrength;
+    out.deltaTime = std::max(deltaTime, 1e-4f);
+    out.pad1 = 0.f;
+    out.pad2 = 0.f;
+    (void)config.adaptation;
+}
 
 static float ComputeFallbackExposure(const ExposureConfig& config, float deltaTime, ExposurePassState& state)
 {
-    float targetExposure = 1.0f;
-
-    targetExposure *= std::exp2(config.exposureCompensation);
-
-    targetExposure = std::clamp(targetExposure, config.minExposure, config.maxExposure);
-
-    float adaptSpeed = (targetExposure > state.currentExposure)
-        ? config.adaptSpeedUp
-        : config.adaptSpeedDown;
-
-    float adaptFactor = 1.0f - std::exp(-deltaTime * adaptSpeed);
-    state.currentExposure = std::lerp(state.currentExposure, targetExposure, adaptFactor);
-
+    AdaptCB cb{};
+    FillAdaptCB(config, deltaTime, cb);
+    const float Lw = 1.0f;
+    float scale = cb.middleGrayX / std::max(Lw * cb.middleGrayY + cb.middleGrayZ, 1e-6f);
+    scale *= std::exp2(cb.evBias);
+    scale = std::clamp(scale, 1.f / 128.f, 20.f);
+    const float rate = (scale > state.currentExposure) ? cb.adaptUp : cb.adaptDown;
+    const float alpha = 1.f - std::exp(-rate * cb.deltaTime);
+    state.currentExposure = std::lerp(state.currentExposure, scale, std::clamp(alpha, 0.f, 1.f));
     return state.currentExposure;
 }
 
@@ -183,17 +230,26 @@ ExposureOutput setupExposurePass(
 {
     InitializeExposureResources(device, state);
 
-    // Create exposure texture resource in framegraph
+    if (!state.exposureTexture)
+    {
+        ExposureOutput empty{};
+        return empty;
+    }
+
+    // Import the persistent 1×1 exposure texture — adapt CS writes here and
+    // tonemap must read the SAME resource (CreateTexture was a separate empty RT).
     ResourceDesc exposureDesc;
     exposureDesc.type = ResourceDesc::Type::Texture2D;
     exposureDesc.debugName = "Exposure";
     exposureDesc.width = 1;
     exposureDesc.height = 1;
     exposureDesc.format = nvrhi::Format::R32_FLOAT;
-    exposureDesc.isRenderTarget = false;
     exposureDesc.isUAV = true;
+    exposureDesc.allowUAV = true;
+    exposureDesc.isImported = true;
 
-    VirtualResourceHandle exposureHandle = fg.CreateTexture("exposure_rt", exposureDesc);
+    VirtualResourceHandle exposureHandle = fg.ImportTexture(
+        "Exposure", state.exposureTexture.Get(), exposureDesc);
 
     // Create histogram buffer resource
     ResourceDesc histogramDesc;
@@ -248,9 +304,10 @@ ExposureOutput setupExposurePass(
                     ctx->ClearBufferUint(ps->histogramBuffer.Get(), 0);
 
                     {
+                        // Fixed log range matching luminance_histogram.cs / exposure_adapt.cs
                         HistogramCB histCB;
-                        histCB.minLogLum = data.config.minLogLuminance;
-                        histCB.logLumRange = data.config.maxLogLuminance - data.config.minLogLuminance;
+                        histCB.minLogLum = -10.0f;
+                        histCB.logLumRange = 14.0f;
                         histCB.width = data.width;
                         histCB.height = data.height;
 
@@ -274,19 +331,8 @@ ExposureOutput setupExposurePass(
                     }
 
                     {
-                        AdaptCB adaptCB;
-                        adaptCB.minLogLum = data.config.minLogLuminance;
-                        adaptCB.logLumRange = data.config.maxLogLuminance - data.config.minLogLuminance;
-                        adaptCB.lowPercentile = data.config.lowPercentile;
-                        adaptCB.highPercentile = data.config.highPercentile;
-                        adaptCB.adaptSpeedUp = data.config.adaptSpeedUp;
-                        adaptCB.adaptSpeedDown = data.config.adaptSpeedDown;
-                        adaptCB.deltaTime = data.deltaTime;
-                        adaptCB.exposureCompensation = data.config.exposureCompensation;
-                        adaptCB.minExposure = data.config.minExposure;
-                        adaptCB.maxExposure = data.config.maxExposure;
-                        adaptCB.calibrationConstant = data.config.calibrationConstant;
-                        adaptCB.padding = 0.0f;
+                        AdaptCB adaptCB{};
+                        FillAdaptCB(data.config, data.deltaTime, adaptCB);
 
                         cmdList->writeBuffer(adaptCBHandle, &adaptCB, sizeof(adaptCB));
 

@@ -344,24 +344,36 @@ shared_str CTextureDescrMngr::GetParallaxName(const shared_str& tex_name) const
 
 shared_str CTextureDescrMngr::GetPBRName(const shared_str& tex_name) const
 {
-    // First check .thm metadata for explicit pbr_name
     map_TD::const_iterator I = m_texture_details.find(tex_name);
     if (I != m_texture_details.end())
     {
         if (I->second.m_spec && I->second.m_spec->m_pbr_name.size())
         {
-            return I->second.m_spec->m_pbr_name;
+            if (TextureFileExists(I->second.m_spec->m_pbr_name.c_str()))
+                return I->second.m_spec->m_pbr_name;
         }
     }
 
-    // Fallback: Check if _pbr file exists with naming convention
-    // tex_name might be "wood" or "wood_d", try to derive base name
     xr_string base = tex_name.c_str();
     if (base.size() > 2 && base.substr(base.size() - 2) == "_d")
         base = base.substr(0, base.size() - 2);
 
     string256 nm;
     strconcat(sizeof(nm), nm, base.c_str(), "_pbr");
+    if (TextureFileExists(nm))
+        return nm;
+
+    return "";
+}
+
+shared_str CTextureDescrMngr::GetSSSName(const shared_str& tex_name) const
+{
+    xr_string base = tex_name.c_str();
+    if (base.size() > 2 && base.substr(base.size() - 2) == "_d")
+        base = base.substr(0, base.size() - 2);
+
+    string256 nm;
+    strconcat(sizeof(nm), nm, base.c_str(), "_sss");
     if (TextureFileExists(nm))
         return nm;
 

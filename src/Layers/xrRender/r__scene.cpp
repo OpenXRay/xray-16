@@ -30,9 +30,7 @@ void R_scene_geometry::load(const xr_vector<CSector::level_sector_data_t>& secto
     for (u32 idx = 0; idx < sectors_count; ++idx)
     {
         auto* sector = xr_new<CSector>();
-
         sector->unique_id = static_cast<IRender_Sector::sector_id_t>(idx);
-        sector->setup(sectors_data[idx]);
         Sectors[idx] = sector;
     }
 
@@ -41,6 +39,10 @@ void R_scene_geometry::load(const xr_vector<CSector::level_sector_data_t>& secto
         auto* portal = static_cast<CPortal*>(Portals[idx]);
         portal->setup(portals_data[idx], Sectors);
     }
+
+    // Link portal pointers into sectors after portals exist
+    for (u32 idx = 0; idx < sectors_count; ++idx)
+        Sectors[idx]->setup(sectors_data[idx], Portals);
 }
 
 void R_scene_geometry::unload()

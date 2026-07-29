@@ -1,0 +1,83 @@
+// Classic ring/dir SSAO (r3/ssao.ps) for FrameGraph
+#include "ao/ao_common.h"
+#include "shared/surface_marks.h"
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    float depth = SampleDepth(input.texcoord);
+    float4 worldPos4 = SampleWorldPos(input.texcoord);
+    if (IsSky(depth, worldPos4))
+        return float4(1, 1, 1, 1);
+    if (IsHudSurfMark(worldPos4.w))
+        return float4(1, 1, 1, 1);
+
+    float3 Nw = SampleWorldNormal(input.texcoord);
+    float3 Pw = worldPos4.xyz;
+    float3 P = WorldToView(Pw);
+    float3 N = normalize(mul((float3x3)m_V, Nw));
+    float pointDepth = ViewDepth(P);
+    if (pointDepth < 0.01)
+        return float4(1, 1, 1, 1);
+
+    float q = AoQuality();
+    int rings = (q >= 2.0) ? 3 : 2;
+    int dirs = (q >= 3.0) ? 8 : 4;
+
+    // Classic: (.5/1024,.5/768)*kernel/max(z,1.3) — scale to current resolution
+    float kernelSize = 150.0;
+    float2 scale = float2(0.5, 0.5) * ao_screen.zw * (ao_screen.x / 1024.0) * kernelSize / max(pointDepth, 1.3);
+
+    float2 jitter = Ign2(input.position.xy);
+    float occ = 0.0;
+    float numDir = 0.0;
+
+    static const float radsHi[4] = { 0.20, 0.57735, 0.81650, 1.0 };
+    static const float radsLo[3] = { 0.20, 0.7071, 1.0 };
+
+    [loop]
+    for (int rad = 0; rad < rings; ++rad)
+    {
+        [loop]
+        for (int d = 0; d < dirs; ++d)
+        {
+            float2 tapJ = frac(jitter * float2(31337.0, 73313.0) + float2(rad, d) * 0.17);
+            float r0 = (rings >= 3) ? radsHi[rad] : radsLo[rad];
+            float r1 = (rings >= 3) ? radsHi[rad + 1] : radsLo[min(rad + 1, 2)];
+            float r = lerp(r0 * 1.3, r1 * 1.3, tapJ.x);
+            float a0 = (float(d) / float(dirs)) * 6.2831853;
+            float a1 = (float(d + 1) / float(dirs)) * 6.2831853;
+            float a = lerp(a0, a1, tapJ.y);
+            float2 dir = float2(cos(a), sin(a));
+            float2 uv = input.texcoord + dir * r * scale;
+            if (any(uv < 0.0) || any(uv > 1.0))
+                continue;
+
+            float4 sampleWP = SampleWorldPos(uv);
+            if (sampleWP.w < 0.5)
+                continue;
+
+            float3 tapPos = WorldToView(sampleWP.xyz);
+            float3 v = tapPos - P;
+            float dist = length(v);
+            float3 dirN = v / max(dist, 1e-4);
+            float infl = saturate(dot(dirN, N));
+            float occFactor = saturate(dist);
+            float rangeAtt = saturate(1.0 - dist * 0.5);
+            occ += (infl + 0.01) * lerp(1.0, occFactor, infl) * rangeAtt;
+            numDir += (infl + 0.01) * rangeAtt;
+        }
+    }
+
+    float ao = 1.0;
+    if (numDir > 1e-4)
+        ao = saturate(occ / numDir);
+    // Classic soft remap
+    if (q <= 1.5)
+        ao = (ao + 0.3) / 1.3;
+    else
+        ao = (ao + 0.2) / 1.2;
+
+    float weaponAtten = smoothstep(0.8, 0.9, length(P));
+    ao = lerp(1.0, ao, weaponAtten);
+    return float4(ao, ao, ao, 1);
+}

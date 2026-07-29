@@ -6,8 +6,22 @@
 
 #define SM_6_0
 #define CLUSTERED_LIGHTING_FORWARD
+#define CSM_SHADOW_FORWARD
+#define LOCAL_SHADOW_FORWARD
+#define SHADOW_MASK_FORWARD
+#define SKY_IBL
+#define SKY_IBL_SPEC_V4 1
+// CSM: PCSS + cascade depth select (bust shader cache when sampling.h changes)
 #include "common.h"
 #include "bindless_common.h"
+#include "shared/object_parallax.h"
+#include "shared/skin_sss.h"
+
+cbuffer TransparentDrawCB : register(b6)
+{
+    uint g_TransparentBlendPass;
+    uint3 _transparentDrawPad;
+};
 
 struct PS_INPUT
 {
@@ -17,7 +31,9 @@ struct PS_INPUT
     float3 normal : TEXCOORD2;
     float3 tangent : TEXCOORD3;
     float3 bitangent : TEXCOORD4;
-    nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    nointerpolation uint materialID : TEXCOORD5;
+    float hemi : TEXCOORD6;
+    float2 lmUV : TEXCOORD7;
 };
 
 struct PS_OUTPUT
@@ -25,44 +41,36 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
     float4 baseColor : SV_Target2;
+    float4 worldPos : SV_Target3;
 };
-
-// Lighting uses static_globals from common.h (b2):
-// - L_sun_color, L_sun_dir_w (sun)
-// - L_ambient (ambient)
-// - eye_position (camera)
-// - fog_params, fog_color (fog)
 
 PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
 
-    // DEBUG: Visualize UVs as color to find where black areas are in UV space
-    // Uncomment ONE of these to debug:
-
-    // Option 1: Show UV coordinates as RG color (frac to see tiling)
-    //output.color = float4(frac(input.texcoord.x), frac(input.texcoord.y), 0, 1);
-    //return output;
-
-    // Option 2: Show material ID as grayscale
-    //output.color = float4(input.materialID / 255.0, input.materialID / 255.0, input.materialID / 255.0, 1);
-    //return output;
-
-    // Get material data directly using material ID
     MaterialData mat = g_Materials[input.materialID];
 
+    // ── Water drawn by dedicated water PSO (TransparentPass second draw) ──
+    if (mat.flags & MAT_FLAG_WATER)
+        clip(-1);
 
-    // Sample textures using SM6 bindless (ResourceDescriptorHeap)
-    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+    // TransparentPass batches: 1 = SrcAlpha, 2 = Multiply (0 = forward / all)
+    if (g_TransparentBlendPass > 0)
+    {
+        bool isMul = (mat.flags & MAT_FLAG_MULTIPLY) != 0;
+        if (g_TransparentBlendPass == 1 && isMul)
+            clip(-1);
+        if (g_TransparentBlendPass == 2 && !isMul)
+            clip(-1);
+    }
 
-    // DEBUG: Visualize material ID (drawIndex) - use brighter colors
-    //float r = (input.materialID % 7) / 6.0;
-    //float g = (input.materialID % 5) / 4.0 + 0.3;
-    //float b = (input.materialID % 3) / 2.0 + 0.5;
-    //output.color = float4(r, g, b, 1);
-    //return output;
+    float3 Tn = normalize(input.tangent);
+    float3 Bn = normalize(input.bitangent);
+    float3 Ngeom = normalize(input.normal);
+    float2 uv = ObjectParallaxUV(mat, input.texcoord, input.worldPos, Tn, Bn, Ngeom);
 
-    // Alpha test
+    float4 diffuseSample = SampleDiffuse(mat, uv);
+
     if (mat.flags & MAT_FLAG_ALPHA_TEST)
     {
         clip(diffuseSample.a - mat.alphaRef);
@@ -70,44 +78,111 @@ PS_OUTPUT main(PS_INPUT input)
 
     float3 albedo = diffuseSample.rgb;
 
-    float3 N = normalize(input.normal);
+    float3 N = Ngeom;
     float gloss = 0.0;
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
-        BumpSample bump = SampleNormal(mat, input.texcoord);
-        float3x3 TBN = float3x3(
-            normalize(input.tangent),
-            normalize(input.bitangent),
-            N
-        );
+        BumpSample bump = SampleNormal(mat, uv);
+        float3x3 TBN = float3x3(Tn, Bn, N);
         N = normalize(mul(bump.normal, TBN));
         gloss = bump.gloss;
     }
 
-    // Detail texture
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
-        // Detail sampling (uses mat.detailScale internally)
-        float4 detailSample = SampleDetail(mat, input.texcoord);
-        // Blend detail (multiply-2x style)
+        float4 detailSample = SampleDetail(mat, uv);
         albedo = albedo * (detailSample.rgb * 2.0);
+        // Non-bump detail path modulates gloss from detail alpha (sload.h)
+        if (!(mat.flags & MAT_FLAG_HAS_DETAIL_BUMP))
+            gloss = gloss * detailSample.a * 2.0;
     }
 
-    float metallic = 0.0;
-    float roughness = 1.0 - gloss;
-    float ao = 1.0;
+    float metallic, roughness, ao, height;
+    ResolveMaterialPBR(mat, uv, gloss, metallic, roughness, ao, height);
 
-    if (mat.flags & MAT_FLAG_HAS_PBR)
+    float sssStrength = 0.0;
+    float3 sssTint = float3(1.0, 1.0, 1.0);
+    float sssThickness = 1.0;
+    float sssMask = 0.0;
+    float sssProfile = -1.0;
+    if (mat.flags & MAT_FLAG_FOLIAGE)
     {
-        float3 pbrSample = SamplePBR(mat, input.texcoord);
-        metallic = pbrSample.r;
-        roughness = pbrSample.g;
-        ao = pbrSample.b;
+        sssStrength = max(parallax.z, 0.0);
+        if (mat.flags & MAT_FLAG_ALPHA_TEST)
+            sssThickness = saturate(diffuseSample.a + 0.2);
+        sssProfile = 1.0;
+        sssTint = float3(0.45, 0.85, 0.35);
+        sssMask = saturate(sssStrength * 1.6);
+    }
+    if (mat.flags & MAT_FLAG_GLASS)
+    {
+        sssStrength = max(sssStrength, 0.55);
+        sssThickness = saturate(diffuseSample.a + 0.25);
+        sssProfile = 4.0;
+        sssTint = float3(0.85, 0.92, 1.0);
+        sssMask = 0.0;
+    }
+    if (mat.flags & MAT_FLAG_HAS_SSS_MAP)
+    {
+        float4 sssS = GetBindlessTexture(mat.sssMapIndex).Sample(smp_linear, uv);
+        ApplySSSMapSample(sssS, sssStrength, sssTint, sssThickness, sssMask, sssProfile);
     }
 
-    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position);
-    output.color = float4(fwd.color.rgb, diffuseSample.a);
+    float hemi = input.hemi;
+    if (hemi < 0.0)
+        hemi = (parallax.w < -0.5) ? 0.0 : calc_model_hemi(N) * 0.35;
+    float sunOcc = 1.0;
+    if ((mat.flags & MAT_FLAG_HAS_LMAP) != 0 && mat.lmapIndex != INVALID_TEXTURE_INDEX
+        && dot(input.lmUV, input.lmUV) > 1e-8)
+    {
+        float4 lmh = GetBindlessTexture(mat.lmapIndex).Sample(smp_linear, input.lmUV);
+        float bakedHemi = saturate(lmh.a);
+        hemi = max(saturate(hemi), bakedHemi);
+#if !defined(CSM_SHADOW_FORWARD)
+        sunOcc = saturate(lmh.g);
+#endif
+    }
+    f_forward fwd = output_forward_pbr(
+        albedo, N, input.worldPos, metallic, roughness, ao, input.position, hemi, sunOcc,
+        sssStrength, sssTint, sssThickness, sssMask, sssProfile);
+    if (mat.flags & MAT_FLAG_MULTIPLY)
+    {
+        float a = saturate(diffuseSample.a);
+        float3 mulRgb = lerp(float3(0.5, 0.5, 0.5), albedo, a);
+        output.color = float4(mulRgb, 1.0);
+    }
+    else
+    {
+        float3 lit = fwd.color.rgb;
+        if ((mat.flags & MAT_FLAG_EMISSIVE) && mat.emissiveIntensity > 0.0)
+            lit = max(lit, albedo * mat.emissiveIntensity);
+        float outA = (mat.flags & MAT_FLAG_ALPHA_BLEND) ? diffuseSample.a : 1.0;
+        output.color = float4(lit, outA);
+    }
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
+    output.worldPos = fwd.worldPos;
     return output;
 }
+
+#define PCSS_VOGEL_V1 1
+
+#define LOCAL_SHADOW_FADE_V1 1
+
+#define LOCAL_SHADOW_FADE_V2 1
+
+#define LOCAL_SHADOW_FADE_V3 1
+
+#define LOCAL_SHADOW_FADE_V4 1
+
+#define LOCAL_SHADOW_CLASSIC_V1 1
+
+#define LOCAL_SHADOW_CLASSIC_V2 1
+
+#define LOCAL_SHADOW_STABLE_V1 1
+
+#define LOCAL_SHADOW_SMAP2D_V1 1
+
+#define LOCAL_SHADOW_SMAP_PAGES_V1 1
+
+#define LOCAL_SHADOW_RECT_F4_V1 1

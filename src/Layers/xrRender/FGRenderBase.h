@@ -46,7 +46,8 @@ public:
     void ResourcesStoreNecessaryTextures() override;
     void ResourcesDumpMemoryUsage() override;
 
-    bool HWSupportsShaderYUV2RGB() override { return false; }
+    // Theora packs V/U/Y into RGBA8; hud\movie.ps converts to RGB on GPU
+    bool HWSupportsShaderYUV2RGB() override { return true; }
 
     DeviceState GetDeviceState() override;
     bool GetForceGPU_REF() override;

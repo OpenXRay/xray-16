@@ -22,6 +22,14 @@ typedef BOOL (*CollisionCallback)(
     CParticleEffect* E, PAPI::Particle& P, const Fvector& pt, const Fvector& norm); // TRUE-continue collision exec
 typedef void (*DestroyCallback)(CParticleEffect* E, PAPI::Particle& P);
 
+enum class ParticleLightingMode : u8
+{
+    Emissive = 0,
+    Lit = 1,
+    Volumetric = 2,
+    SixWay = 3,
+};
+
 class PFunction;
 struct SFrame
 {
@@ -75,8 +83,11 @@ public:
     // texture
     shared_str m_ShaderName;
     shared_str m_TextureName;
+    shared_str m_SixWayPosXYZ;
+    shared_str m_SixWayNegXYZ;
     ref_shader m_CachedShader;
     SFrame m_Frame;
+    ParticleLightingMode m_LightingMode = ParticleLightingMode::Emissive;
     // compiled actions
     CMemoryWriter m_Actions;
     // def
@@ -157,5 +168,6 @@ public:
 #define PED_CHUNK_VEL_SCALE 0x0022
 #define PED_CHUNK_EDATA 0x0024
 #define PED_CHUNK_ALIGN_TO_PATH 0x0025
+#define PED_CHUNK_LIGHTING 0x0026
 //---------------------------------------------------------------------------
 } // namespace xray::render::fg

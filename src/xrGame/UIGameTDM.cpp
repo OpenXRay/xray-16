@@ -46,18 +46,22 @@ void CUIGameTDM::Init(int stage)
     { // unique
         m_pTeamPanels->Init(TEAM_PANELS_TDM_XML_NAME, "team_panels_wnd");
 
-        CUIXml uiXml, xml2;
+        CUIXml uiXml, uiXml2;
         uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_tdm.xml");
+        uiXml2.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_dm.xml"); // CS
 
-        CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
+        CUIXmlInit::InitWindow(uiXml, "global", 0, Window, false);
         CUIXmlInit::InitStatic(uiXml, "team1_icon", 0, m_team1_icon);
         CUIXmlInit::InitStatic(uiXml, "team2_icon", 0, m_team2_icon);
         CUIXmlInit::InitStatic(uiXml, "team1_score", 0, m_team1_score);
         CUIXmlInit::InitStatic(uiXml, "team2_score", 0, m_team2_score);
-        CUIXmlInit::InitStatic(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
+        if (!CUIXmlInit::InitStatic(uiXml, "fraglimit", 0, m_pFragLimitIndicator, false))
+            CUIXmlInit::InitStatic(uiXml2, "fraglimit", 0, m_pFragLimitIndicator, false); // CS
 
-        m_pMoneyIndicator->InitFromXML(uiXml);
-        m_pRankIndicator->InitFromXml(uiXml);
+        if (!m_pMoneyIndicator->InitFromXML(uiXml))
+            m_pMoneyIndicator->InitFromXML(uiXml2); // CS
+        if (!m_pRankIndicator->InitFromXml(uiXml))
+            m_pRankIndicator->InitFromXml(uiXml2); // CS
     }
     if (stage == 2)
     { // after

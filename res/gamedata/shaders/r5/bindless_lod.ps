@@ -1,0 +1,72 @@
+#include "shared/common.h"
+#include "common_samplers.h"
+
+Texture2D s_hemi : register(t1);
+
+struct PS_INPUT
+{
+    float4 hpos     : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 tc0      : TEXCOORD1;
+    float2 tc1      : TEXCOORD2;
+    float4 af       : COLOR0;
+    float3 normal   : TEXCOORD3;
+};
+
+struct PS_OUTPUT
+{
+    float4 color     : SV_Target0;
+    float4 normal    : SV_Target1;
+    float4 baseColor : SV_Target2;
+    float4 worldPos  : SV_Target3;
+};
+
+PS_OUTPUT main(PS_INPUT I)
+{
+    float4 D0 = s_base.Sample(smp_base, I.tc0);
+    float4 D1 = s_base.Sample(smp_base, I.tc1);
+    float4 H0 = s_hemi.Sample(smp_linear, I.tc0);
+    float4 H1 = s_hemi.Sample(smp_linear, I.tc1);
+    H0.xyz = H0.rgb * 2.0 - 1.0;
+    H1.xyz = H1.rgb * 2.0 - 1.0;
+
+    float4 D = lerp(D0, D1, I.af.w);
+    D.w *= I.af.z;
+    float4 H = lerp(H0, H1, I.af.w);
+    H.w *= I.af.x;
+
+    clip(D.w - (96.0 / 255.0));
+
+    float3 N = normalize(H.xyz);
+    float hemi = saturate(H.w);
+
+    float4 P0 = s_pbr.Sample(smp_linear, I.tc0);
+    float4 P1 = s_pbr.Sample(smp_linear, I.tc1);
+    float4 P = lerp(P0, P1, I.af.w);
+    float metallic = P.r;
+    float roughness = max(P.g, 0.04);
+    float ao = P.b;
+
+    float3 albedo = D.rgb * ao;
+    float3 sunL = normalize(-L_sun_dir_w);
+    float3 V = normalize(eye_position - I.worldPos);
+    float ndl = saturate(dot(N, sunL));
+    float3 diffuse = albedo * (1.0 - metallic);
+    float3 lit = diffuse * (L_hemi_color.rgb * hemi + L_ambient.rgb);
+    lit += diffuse * L_sun_color.rgb * ndl * I.af.y;
+
+    float3 Hvec = normalize(V + sunL);
+    float ndh = saturate(dot(N, Hvec));
+    float glossPow = exp2(10.0 * (1.0 - roughness) + 1.0);
+    float3 metalAlbedo = max(D.rgb, float3(0.08, 0.08, 0.085));
+    float3 F0 = lerp(float3(0.04, 0.04, 0.04), metalAlbedo, metallic);
+    float3 spec = F0 * pow(ndh, glossPow) * ndl * I.af.y * L_sun_color.rgb;
+    lit += spec;
+
+    PS_OUTPUT o;
+    o.color = float4(lit, 1.0);
+    o.normal = float4(N, roughness);
+    o.baseColor = float4(D.rgb, metallic);
+    o.worldPos = float4(I.worldPos, 1.0);
+    return o;
+}

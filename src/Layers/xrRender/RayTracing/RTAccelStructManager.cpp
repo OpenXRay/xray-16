@@ -11,6 +11,7 @@
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FGDetailManager.h"
+#include "Layers/xrRender/FrameGraphPasses/ParticlePassSetup.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
@@ -19,6 +20,7 @@
 extern ENGINE_API float ps_r3_grass_blade_width;
 extern ENGINE_API float ps_r3_grass_blade_height;
 extern ENGINE_API float ps_r3_grass_wind_displacement;
+extern ENGINE_API float ps_r_rt_detail_dist;
 
 namespace xray::render::fg {
     extern xray::render::FrameGraphRenderer RImplementation;
@@ -75,9 +77,12 @@ static_assert(sizeof(GrassRTCB) == 96, "GrassRTCB must be 96 bytes");
 
 struct BillboardRTCB {
     u32 maxVertsPerBillboard;
+    float maxDist;
+    float camX, camY;
+    float camZ;
     u32 pad[3];
 };
-static_assert(sizeof(BillboardRTCB) == 16, "BillboardRTCB must be 16 bytes");
+static_assert(sizeof(BillboardRTCB) == 32, "BillboardRTCB must be 32 bytes");
 
 static void FmatrixToRTTransform(const Fmatrix& m, nvrhi::rt::AffineTransform& out)
 {
@@ -100,16 +105,38 @@ void RTAccelStructManager::Initialize(fg::RenderDevice* device)
         Msg("* [RT] Ray tracing NOT supported on this device");
 }
 
+void RTAccelStructManager::RetireAccelStruct(nvrhi::rt::AccelStructHandle as)
+{
+    if (!as)
+        return;
+    m_retiredAccelStructs.push_back(as);
+}
+
+void RTAccelStructManager::PumpRetiredAccelStructs()
+{
+    constexpr size_t kKeepAlive = 4;
+    if (m_retiredAccelStructs.size() > kKeepAlive)
+        m_retiredAccelStructs.erase(
+            m_retiredAccelStructs.begin(),
+            m_retiredAccelStructs.end() - static_cast<std::ptrdiff_t>(kKeepAlive));
+}
+
 void RTAccelStructManager::Shutdown()
 {
     m_staticBlas = nullptr;
     m_uniqueGeometries.clear();
     m_tlas = nullptr;
+    m_tlasMaxInstances = 0;
+    m_tlasBuiltInstances = 0;
     m_batchInfoBuffer = nullptr;
+    m_retiredAccelStructs.clear();
     m_skinnedOutputVB = nullptr;
     m_skinnedIB = nullptr;
     m_skinnedBlas = nullptr;
     m_skinnedBatchData.clear();
+    m_skinnedTotalVerts = 0;
+    m_skinnedTotalIndices = 0;
+    m_skinnedTopoHash = 0;
     m_skinnedReady = false;
     m_grassOutputVB = nullptr;
     m_grassIB = nullptr;
@@ -117,6 +144,15 @@ void RTAccelStructManager::Shutdown()
     m_grassTotalVerts = 0;
     m_grassTotalIndices = 0;
     m_grassReady = false;
+    m_particleOutputVB = nullptr;
+    m_particleIB = nullptr;
+    m_particleBlas = nullptr;
+    m_particleTotalVerts = 0;
+    m_particleTotalIndices = 0;
+    m_particleTopoHash = 0;
+    m_particleReady = false;
+    m_particleAllocFailed = false;
+    m_particleBatchData.clear();
     m_isReady = false;
     m_batchCount = 0;
     m_batchCounts = {};
@@ -159,9 +195,27 @@ void RTAccelStructManager::InvalidateShaderPipelines()
     Msg("* [RTAccel] Shader pipelines invalidated for hot-reload");
 }
 
+void RTAccelStructManager::ReleaseAccelerationStructures()
+{
+    m_staticBlas = nullptr;
+    m_uniqueGeometries.clear();
+    m_tlas = nullptr;
+    m_tlasMaxInstances = 0;
+    m_tlasBuiltInstances = 0;
+    m_batchInfoBuffer = nullptr;
+    InvalidateSkinned();
+    InvalidateGrass();
+    InvalidateParticles();
+    m_grassAllocFailed = false;
+    m_particleAllocFailed = false;
+    m_isReady = false;
+    m_batchCount = 0;
+    m_batchCounts = {};
+}
+
 void RTAccelStructManager::BuildIfNeeded(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling)
 {
-    if (m_isReady || !m_rtSupported || !gpuCulling)
+    if (!m_rtSupported || !gpuCulling)
         return;
 
     if (!gpuCulling->IsMegaDataUploaded())
@@ -169,6 +223,35 @@ void RTAccelStructManager::BuildIfNeeded(nvrhi::ICommandList* cmdList, GPUCullin
 
     const auto& drawArgs = gpuCulling->GetStaticDrawArgsData();
     if (drawArgs.empty())
+        return;
+
+    u32 terrainAvail = 0;
+    for (const auto& a : gpuCulling->GetTerrainDrawArgsData())
+    {
+        if (a.indexCountPerInstance > 0)
+            terrainAvail++;
+    }
+
+    if (m_isReady)
+    {
+        if (m_batchCounts.terrain == 0 && terrainAvail > 0)
+        {
+            Msg("* [RT] Terrain batches appeared (%u) — rebuilding static AS", terrainAvail);
+            m_staticBlas = nullptr;
+            m_uniqueGeometries.clear();
+            m_tlas = nullptr;
+            m_batchInfoBuffer = nullptr;
+            m_isReady = false;
+            m_batchCount = 0;
+            m_batchCounts = {};
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    if (gpuCulling->GetTerrainObjectCount() > 0 && terrainAvail == 0)
         return;
 
     m_megaVB = gpuCulling->GetMegaVertexBuffer();
@@ -360,22 +443,35 @@ void RTAccelStructManager::BuildTLAS(nvrhi::ICommandList* cmdList)
 
     u32 skinnedCount = m_skinnedReady ? (u32)m_skinnedBatchData.size() : 0;
     u32 grassCount = m_grassReady ? 1 : 0;
-    u32 instanceCount = (m_staticBlas ? 1 : 0) + totalInstances + (m_skinnedBlas ? 1 : 0) + (m_grassBlas ? 1 : 0);
+    u32 particleCount = m_particleReady ? 1 : 0;
+    u32 instanceCount = (m_staticBlas ? 1 : 0) + totalInstances + (m_skinnedBlas ? 1 : 0) +
+                         (m_grassBlas ? 1 : 0) + (m_particleBlas ? 1 : 0);
     if (instanceCount == 0) {
         Msg("! [RT] No BLAS to build TLAS from");
         return;
     }
 
-    nvrhi::rt::AccelStructDesc tlasDesc;
-    tlasDesc.debugName = "SceneTLAS";
-    tlasDesc.isTopLevel = true;
-    tlasDesc.topLevelMaxInstances = instanceCount;
-    tlasDesc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
+    const bool needCreate = !m_tlas || instanceCount > m_tlasMaxInstances;
+    if (needCreate) {
+        m_tlasMaxInstances = std::max(instanceCount + 64u, m_tlasMaxInstances * 2u);
+        m_tlasMaxInstances = std::max(m_tlasMaxInstances, 64u);
 
-    m_tlas = nvDevice->createAccelStruct(tlasDesc);
-    if (!m_tlas) {
-        Msg("! [RT] Failed to create TLAS");
-        return;
+        nvrhi::rt::AccelStructDesc tlasDesc;
+        tlasDesc.debugName = "SceneTLAS";
+        tlasDesc.isTopLevel = true;
+        tlasDesc.topLevelMaxInstances = m_tlasMaxInstances;
+        tlasDesc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace |
+                              nvrhi::rt::AccelStructBuildFlags::AllowUpdate;
+
+        RetireAccelStruct(m_tlas);
+        m_tlas = nvDevice->createAccelStruct(tlasDesc);
+        if (!m_tlas) {
+            Msg("! [RT] Failed to create TLAS (instances=%u capacity=%u)", instanceCount, m_tlasMaxInstances);
+            m_tlasMaxInstances = 0;
+            return;
+        }
+        Msg("* [RT] TLAS created (capacity=%u)", m_tlasMaxInstances);
+        PumpRetiredAccelStructs();
     }
 
     xr_vector<nvrhi::rt::InstanceDesc> instances;
@@ -426,20 +522,38 @@ void RTAccelStructManager::BuildTLAS(nvrhi::ICommandList* cmdList)
 
     u32 grassBatchOffset = skinnedBatchOffset + skinnedCount;
     if (m_grassBlas && grassCount > 0) {
-        auto grassInstFlags = m_grassBillboardMode
-            ? nvrhi::rt::InstanceFlags::TriangleCullDisable
-            : nvrhi::rt::InstanceFlags::ForceOpaque;
+        auto grassFlags = nvrhi::rt::InstanceFlags::TriangleCullDisable;
+        if (!m_grassBillboardMode)
+            grassFlags = grassFlags | nvrhi::rt::InstanceFlags::ForceOpaque;
         nvrhi::rt::InstanceDesc inst;
         inst.setTransform(nvrhi::rt::c_IdentityTransform)
             .setInstanceID(grassBatchOffset)
-            .setInstanceMask(0x01)
-            .setFlags(grassInstFlags)
+            .setInstanceMask(0x02)
+            .setFlags(grassFlags)
             .setBLAS(m_grassBlas);
         instances.push_back(inst);
     }
 
-    m_batchCount = grassBatchOffset + grassCount;
-    cmdList->buildTopLevelAccelStruct(m_tlas, instances.data(), (u32)instances.size());
+    u32 particleBatchOffset = grassBatchOffset + grassCount;
+    if (m_particleBlas && particleCount > 0) {
+        nvrhi::rt::InstanceDesc inst;
+        inst.setTransform(nvrhi::rt::c_IdentityTransform)
+            .setInstanceID(particleBatchOffset)
+            .setInstanceMask(0x04)
+            .setFlags(nvrhi::rt::InstanceFlags::TriangleCullDisable |
+                      nvrhi::rt::InstanceFlags::ForceOpaque)
+            .setBLAS(m_particleBlas);
+        instances.push_back(inst);
+    }
+
+    m_batchCount = particleBatchOffset + particleCount;
+    const u32 builtCount = (u32)instances.size();
+    auto buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace |
+                      nvrhi::rt::AccelStructBuildFlags::AllowUpdate;
+    if (!needCreate && m_tlasBuiltInstances == builtCount)
+        buildFlags = buildFlags | nvrhi::rt::AccelStructBuildFlags::PerformUpdate;
+    cmdList->buildTopLevelAccelStruct(m_tlas, instances.data(), builtCount, buildFlags);
+    m_tlasBuiltInstances = builtCount;
 }
 
 static void AppendBatchInfos(
@@ -511,17 +625,32 @@ void RTAccelStructManager::CreateBatchInfoBuffer(nvrhi::ICommandList* cmdList, G
         batchInfos.push_back(info);
     }
 
+    if (m_particleReady && m_particleTotalIndices > 0 && !m_particleBatchData.empty()) {
+        RTBatchInfo info;
+        info.materialID = m_particleBatchData[0].materialID;
+        info.startIndex = 0;
+        info.baseVertex = 0;
+        info.indexCount = m_particleTotalIndices;
+        batchInfos.push_back(info);
+    }
+
     if (batchInfos.empty()) return;
 
-    nvrhi::BufferDesc desc;
-    desc.debugName = "RTBatchInfoBuffer";
-    desc.byteSize = batchInfos.size() * sizeof(RTBatchInfo);
-    desc.structStride = sizeof(RTBatchInfo);
-    desc.initialState = nvrhi::ResourceStates::ShaderResource;
-    desc.keepInitialState = true;
-
-    m_batchInfoBuffer = nvDevice->createBuffer(desc);
-    cmdList->writeBuffer(m_batchInfoBuffer, batchInfos.data(), batchInfos.size() * sizeof(RTBatchInfo));
+    const u64 neededBytes = batchInfos.size() * sizeof(RTBatchInfo);
+    if (!m_batchInfoBuffer || m_batchInfoBuffer->getDesc().byteSize < neededBytes) {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "RTBatchInfoBuffer";
+        desc.byteSize = neededBytes;
+        desc.structStride = sizeof(RTBatchInfo);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        m_batchInfoBuffer = nvDevice->createBuffer(desc);
+        if (!m_batchInfoBuffer) {
+            Msg("! [RT] Failed to create batch info buffer (%u entries)", (u32)batchInfos.size());
+            return;
+        }
+    }
+    cmdList->writeBuffer(m_batchInfoBuffer, batchInfos.data(), neededBytes);
 }
 
 u32 RTAccelStructManager::GetSkinningFormatID(u16 renderMode, u32 stride)
@@ -556,7 +685,7 @@ void RTAccelStructManager::InitSkinningPipeline()
     cbDesc.byteSize = sizeof(RTSkinningCB);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    cbDesc.maxVersions = 8192;
     s_skinCB = m_device->CreateBuffer(cbDesc);
 
     s_skinLayout = cache.GetOrCreateBindingLayoutFromReflection("RTSkinning", *skinResult.reflection, nvDevice);
@@ -647,6 +776,13 @@ void RTAccelStructManager::BuildSkinnedBLAS(
     for (const auto& b : worldBatches) processBatch(b);
     for (const auto& b : hudBatches) processBatch(b);
 
+    constexpr u32 kMaxSkinnedVerts = 500000u;
+    if (totalVerts > kMaxSkinnedVerts) {
+        Msg("! [RT] Skinned verts capped %u -> %u", totalVerts, kMaxSkinnedVerts);
+        InvalidateSkinned();
+        return;
+    }
+
     u64 vbSize = static_cast<u64>(totalVerts) * SKINNED_VERTEX_STRIDE;
     u64 ibSize = static_cast<u64>(totalIndices) * sizeof(u32);
 
@@ -660,6 +796,11 @@ void RTAccelStructManager::BuildSkinnedBLAS(
         desc.keepInitialState = true;
         desc.canHaveUAVs = true;
         m_skinnedOutputVB = nvDevice->createBuffer(desc);
+        if (!m_skinnedOutputVB) {
+            Msg("! [RT] SkinnedOutputVB create failed");
+            InvalidateSkinned();
+            return;
+        }
     }
 
     if (!m_skinnedIB || m_skinnedIB->getDesc().byteSize < ibSize) {
@@ -671,6 +812,11 @@ void RTAccelStructManager::BuildSkinnedBLAS(
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
         m_skinnedIB = nvDevice->createBuffer(desc);
+        if (!m_skinnedIB) {
+            Msg("! [RT] SkinnedIB create failed");
+            InvalidateSkinned();
+            return;
+        }
     }
 
     cmdList->writeBuffer(m_skinnedIB, consolidatedIndices.data(), consolidatedIndices.size() * sizeof(u32));
@@ -681,16 +827,37 @@ void RTAccelStructManager::BuildSkinnedBLAS(
     nvrhi::ComputeState state;
     state.pipeline = s_skinPipeline;
 
+    if (!boneBuffer) {
+        Msg("! [RT] Skinned skinning skipped — bone buffer missing");
+        InvalidateSkinned();
+        return;
+    }
+
+    cmdList->setBufferState(m_skinnedOutputVB, nvrhi::ResourceStates::UnorderedAccess);
+
     for (const auto& sb : m_skinnedBatchData) {
+        if (!sb.srcVB)
+            continue;
         auto it = bindingSetCache.find(sb.srcVB);
         if (it == bindingSetCache.end()) {
             auto* skinRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_skin_vertices", ".cs");
+            if (!skinRefl) {
+                Msg("! [RT] rt_skin_vertices reflection missing");
+                InvalidateSkinned();
+                return;
+            }
             framegraph::BindingSetBuilder bsb(*skinRefl, nvDevice, "RT.SkinVertices");
             bsb.BufferSRV("g_SrcVB", sb.srcVB)
                .BufferSRV("g_BoneMatrices", boneBuffer)
                .BufferUAV("g_Output", m_skinnedOutputVB)
                .ConstantBuffer("RTSkinningCB", m_device->GetNativeBuffer(s_skinCB));
-            it = bindingSetCache.emplace(sb.srcVB, nvDevice->createBindingSet(bsb.Build(), s_skinLayout)).first;
+            auto set = nvDevice->createBindingSet(bsb.Build(), s_skinLayout);
+            if (!set) {
+                Msg("! [RT] Skinned binding set failed (srcVB)");
+                InvalidateSkinned();
+                return;
+            }
+            it = bindingSetCache.emplace(sb.srcVB, set).first;
         }
 
         RTSkinningCB cb;
@@ -710,9 +877,20 @@ void RTAccelStructManager::BuildSkinnedBLAS(
         cmdList->dispatch((sb.vertexCount + 255) / 256, 1, 1);
     }
 
+    cmdList->setBufferState(m_skinnedOutputVB, nvrhi::ResourceStates::AccelStructBuildInput);
+
+    u64 topoHash = m_skinnedBatchData.size();
+    for (const auto& sb : m_skinnedBatchData) {
+        topoHash = topoHash * 131ull + sb.vertexCount;
+        topoHash = topoHash * 131ull + sb.indexCount;
+        topoHash = topoHash * 131ull + sb.indexOffset;
+        topoHash = topoHash * 131ull + sb.vertexOffset;
+    }
+
     nvrhi::rt::AccelStructDesc blasDesc;
     blasDesc.debugName = "SkinnedBLAS";
-    blasDesc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
+    blasDesc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild |
+                          nvrhi::rt::AccelStructBuildFlags::AllowUpdate;
 
     for (const auto& sb : m_skinnedBatchData) {
         nvrhi::rt::GeometryTriangles tri;
@@ -731,27 +909,54 @@ void RTAccelStructManager::BuildSkinnedBLAS(
         blasDesc.addBottomLevelGeometry(geom);
     }
 
-    m_skinnedBlas = nvDevice->createAccelStruct(blasDesc);
-    if (m_skinnedBlas)
+    const bool needCreate = !m_skinnedBlas || m_skinnedTopoHash != topoHash ||
+        m_skinnedTotalVerts != totalVerts || m_skinnedTotalIndices != totalIndices;
+    if (needCreate) {
+        RetireAccelStruct(m_skinnedBlas);
+        m_skinnedBlas = nvDevice->createAccelStruct(blasDesc);
+        if (!m_skinnedBlas) {
+            Msg("! [RT] Skinned BLAS create failed");
+            InvalidateSkinned();
+            return;
+        }
         nvrhi::utils::BuildBottomLevelAccelStruct(cmdList, m_skinnedBlas, blasDesc);
+        static u32 s_lastLogFrame = 0;
+        if (Device.dwFrame - s_lastLogFrame > 60u) {
+            s_lastLogFrame = Device.dwFrame;
+            Msg("* [RT] Built %u skinned BLAS (%u verts, %u indices)",
+                (u32)m_skinnedBatchData.size(), totalVerts, totalIndices);
+        }
+    } else if (m_skinnedBlas) {
+        blasDesc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild |
+                              nvrhi::rt::AccelStructBuildFlags::AllowUpdate |
+                              nvrhi::rt::AccelStructBuildFlags::PerformUpdate;
+        nvrhi::utils::BuildBottomLevelAccelStruct(cmdList, m_skinnedBlas, blasDesc);
+    }
 
+    m_skinnedTotalVerts = totalVerts;
+    m_skinnedTotalIndices = totalIndices;
+    m_skinnedTopoHash = topoHash;
     m_batchCounts.skinned = (u32)m_skinnedBatchData.size();
     m_skinnedReady = true;
-
-    Msg("* [RT] Built %u skinned BLAS (%u verts, %u indices)",
-        (u32)m_skinnedBatchData.size(), totalVerts, totalIndices);
+    PumpRetiredAccelStructs();
 }
 
 void RTAccelStructManager::InvalidateSkinned()
 {
+    RetireAccelStruct(m_skinnedBlas);
     m_skinnedBlas = nullptr;
     m_skinnedBatchData.clear();
+    m_skinnedTotalVerts = 0;
+    m_skinnedTotalIndices = 0;
+    m_skinnedTopoHash = 0;
     m_batchCounts.skinned = 0;
     m_skinnedReady = false;
+    PumpRetiredAccelStructs();
 }
 
 void RTAccelStructManager::InvalidateGrass()
 {
+    RetireAccelStruct(m_grassBlas);
     m_grassBlas = nullptr;
     m_grassTotalVerts = 0;
     m_grassTotalIndices = 0;
@@ -759,6 +964,20 @@ void RTAccelStructManager::InvalidateGrass()
     m_grassReady = false;
     m_grassBillboardMode = false;
     m_detailAtlasIndex = 0;
+    PumpRetiredAccelStructs();
+}
+
+void RTAccelStructManager::InvalidateParticles()
+{
+    RetireAccelStruct(m_particleBlas);
+    m_particleBlas = nullptr;
+    m_particleTotalVerts = 0;
+    m_particleTotalIndices = 0;
+    m_particleTopoHash = 0;
+    m_batchCounts.particles = 0;
+    m_particleReady = false;
+    m_particleBatchData.clear();
+    PumpRetiredAccelStructs();
 }
 
 void RTAccelStructManager::RebuildDynamic(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling)
@@ -842,7 +1061,10 @@ void RTAccelStructManager::InitBillboardPipeline()
 
 void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetailManager* detailMgr)
 {
-    if (!m_rtSupported || !m_isReady || !detailMgr)
+    if (!m_rtSupported || !m_isReady || !detailMgr || m_grassAllocFailed)
+        return;
+
+    if (m_grassReady && (Device.dwFrame & 3u) != 0u)
         return;
 
     const bool billboardMode = !ps_r__detail_gpu;
@@ -854,14 +1076,38 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
 
     if (billboardMode) {
         InitBillboardPipeline();
-        if (!s_billboardInitialized) return;
+        if (!s_billboardInitialized) {
+            Msg("! [RT] Billboard grass pipeline missing");
+            return;
+        }
 
         u32 maxVPB = detailMgr->maxPulledIndexCount;
         maxVPB = (maxVPB / 3) * 3;
-        if (maxVPB == 0 || !detailMgr->billboardDrawArgsBuffer) { InvalidateGrass(); return; }
+        constexpr u32 kMaxVertsPerBillboardRT = 48u;
+        if (maxVPB > kMaxVertsPerBillboardRT)
+            maxVPB = kMaxVertsPerBillboardRT;
+        if (maxVPB == 0 || !detailMgr->billboardDrawArgsBuffer) {
+            InvalidateGrass();
+            return;
+        }
 
+        constexpr u32 kMaxRtBillboardVerts = 500000u;
         u32 capacity = detailMgr->visibleBufferCapacity;
-        totalVerts = capacity * maxVPB;
+        const u32 maxCapacity = kMaxRtBillboardVerts / maxVPB;
+        if (capacity > maxCapacity)
+            capacity = maxCapacity;
+        if (capacity == 0) {
+            InvalidateGrass();
+            return;
+        }
+
+        const u32 actualCount = std::min(stats.visibleBillboardCount, capacity);
+        if (actualCount == 0) {
+            InvalidateGrass();
+            return;
+        }
+
+        totalVerts = actualCount * maxVPB;
         totalIndices = totalVerts;
         u64 vbSize = static_cast<u64>(totalVerts) * GRASS_VERTEX_STRIDE;
         u64 ibSize = static_cast<u64>(totalIndices) * sizeof(u32);
@@ -876,6 +1122,12 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
             desc.keepInitialState = true;
             desc.canHaveUAVs = true;
             m_grassOutputVB = nvDevice->createBuffer(desc);
+            if (!m_grassOutputVB) {
+                Msg("! [RT] Grass VB alloc failed (%.1f MB) — grass excluded from RT", float(vbSize) / (1024.f * 1024.f));
+                m_grassAllocFailed = true;
+                InvalidateGrass();
+                return;
+            }
         }
 
         if (!m_grassIB || m_grassIB->getDesc().byteSize < ibSize) {
@@ -888,13 +1140,24 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
             desc.initialState = nvrhi::ResourceStates::ShaderResource;
             desc.keepInitialState = true;
             m_grassIB = nvDevice->createBuffer(desc);
+            if (!m_grassIB) {
+                Msg("! [RT] Grass IB alloc failed (%.1f MB) — grass excluded from RT", float(ibSize) / (1024.f * 1024.f));
+                m_grassAllocFailed = true;
+                InvalidateGrass();
+                return;
+            }
         }
 
         BillboardRTCB cb;
         cb.maxVertsPerBillboard = maxVPB;
+        cb.maxDist = ps_r_rt_detail_dist;
+        cb.camX = Device.vCameraPosition.x;
+        cb.camY = Device.vCameraPosition.y;
+        cb.camZ = Device.vCameraPosition.z;
         cb.pad[0] = cb.pad[1] = cb.pad[2] = 0;
 
         auto* billboardRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_grass_billboard", ".cs");
+        if (!billboardRefl) { InvalidateGrass(); return; }
         framegraph::BindingSetBuilder bsb(*billboardRefl, nvDevice, "RT.Billboard");
         bsb.BufferSRV("g_AllInstances", detailMgr->generatedInstancesBuffer)
            .BufferSRV("g_VisibleIndices", detailMgr->visibleBillboardInstancesBuffer)
@@ -905,13 +1168,14 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
            .BufferUAV("g_OutputIB", m_grassIB)
            .ConstantBuffer("BillboardRTCB", m_device->GetNativeBuffer(s_billboardCB));
         auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_billboardLayout);
+        if (!bindingSet) { InvalidateGrass(); return; }
 
         cmdList->writeBuffer(m_device->GetNativeBuffer(s_billboardCB), &cb, sizeof(BillboardRTCB));
         nvrhi::ComputeState state;
         state.pipeline = s_billboardPipeline;
         state.bindings = { bindingSet };
         cmdList->setComputeState(state);
-        cmdList->dispatch((capacity + 255) / 256, 1, 1);
+        cmdList->dispatch((actualCount + 255) / 256, 1, 1);
     } else {
         InitGrassPipeline();
         if (!s_grassInitialized) return;
@@ -919,8 +1183,29 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
         u32 lodCounts[FGDetailManager::LOD_COUNT] = {
             stats.visibleLOD0Count, stats.visibleLOD1Count, stats.visibleLOD2Count
         };
+        const float distFactor = std::min(1.f, ps_r_rt_detail_dist / 40.f);
+        for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
+            lodCounts[lod] = (u32)((float)lodCounts[lod] * distFactor);
+
         u32 totalBlades = lodCounts[0] + lodCounts[1] + lodCounts[2];
         if (totalBlades == 0) { InvalidateGrass(); return; }
+
+        constexpr u32 kMaxRtGrassBlades = 500000u;
+        const u32 maxBlades = std::max(1u, (u32)((float)kMaxRtGrassBlades * distFactor));
+        if (totalBlades > maxBlades) {
+            u32 excess = totalBlades - maxBlades;
+            const u32 drop0 = std::min(lodCounts[0], excess);
+            lodCounts[0] -= drop0;
+            excess -= drop0;
+            if (excess > 0) {
+                const u32 drop1 = std::min(lodCounts[1], excess);
+                lodCounts[1] -= drop1;
+                excess -= drop1;
+            }
+            if (excess > 0)
+                lodCounts[2] = (lodCounts[2] > excess) ? (lodCounts[2] - excess) : 0;
+            totalBlades = lodCounts[0] + lodCounts[1] + lodCounts[2];
+        }
 
         u32 lodVertsPerBlade[FGDetailManager::LOD_COUNT];
         u32 lodIndicesPerBlade[FGDetailManager::LOD_COUNT];
@@ -945,6 +1230,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
             desc.keepInitialState = true;
             desc.canHaveUAVs = true;
             m_grassOutputVB = nvDevice->createBuffer(desc);
+            if (!m_grassOutputVB) { m_grassAllocFailed = true; InvalidateGrass(); return; }
         }
 
         if (!m_grassIB || m_grassIB->getDesc().byteSize < ibSize) {
@@ -957,6 +1243,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
             desc.initialState = nvrhi::ResourceStates::ShaderResource;
             desc.keepInitialState = true;
             m_grassIB = nvDevice->createBuffer(desc);
+            if (!m_grassIB) { m_grassAllocFailed = true; InvalidateGrass(); return; }
         }
 
         float windAngleDeg = 0.0f;
@@ -984,6 +1271,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
             if (lodCounts[lod] == 0) continue;
 
             auto* grassRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_grass_vertices", ".cs");
+            if (!grassRefl) { InvalidateGrass(); return; }
             framegraph::BindingSetBuilder bsb(*grassRefl, nvDevice, "RT.Grass");
             bsb.BufferSRV("g_AllInstances", detailMgr->generatedInstancesBuffer)
                .BufferSRV("g_SlotData", detailMgr->slotDataBuffer)
@@ -993,6 +1281,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
                .BufferUAV("g_OutputIB", m_grassIB)
                .ConstantBuffer("GrassRTCB", m_device->GetNativeBuffer(s_grassCB));
             auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_grassLayout);
+            if (!bindingSet) { InvalidateGrass(); return; }
 
             GrassRTCB cb = cbTemplate;
             cb.segments = FGDetailManager::LOD_SEGMENTS[lod];
@@ -1012,10 +1301,9 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
             vertexOffset += totalVertsThisLod;
             indexOffset += lodCounts[lod] * lodIndicesPerBlade[lod];
         }
-
-        Msg("* [RT] Built blade grass BLAS (%u blades, %u verts, %u indices, LODs: %u/%u/%u)",
-            totalBlades, totalVerts, totalIndices, lodCounts[0], lodCounts[1], lodCounts[2]);
     }
+
+    if (totalVerts == 0 || totalIndices == 0) { InvalidateGrass(); return; }
 
     nvrhi::rt::AccelStructDesc blasDesc;
     blasDesc.debugName = "GrassBLAS";
@@ -1037,11 +1325,18 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
     geom.setTriangles(tri).setFlags(geomFlags);
     blasDesc.addBottomLevelGeometry(geom);
 
-    if (!m_grassBlas || m_grassTotalVerts != totalVerts || m_grassTotalIndices != totalIndices)
+    if (!m_grassBlas || m_grassTotalVerts != totalVerts || m_grassTotalIndices != totalIndices) {
+        RetireAccelStruct(m_grassBlas);
         m_grassBlas = nvDevice->createAccelStruct(blasDesc);
+        PumpRetiredAccelStructs();
+    }
 
-    if (m_grassBlas)
-        nvrhi::utils::BuildBottomLevelAccelStruct(cmdList, m_grassBlas, blasDesc);
+    if (!m_grassBlas) {
+        Msg("! [RT] Grass BLAS create failed (verts=%u)", totalVerts);
+        InvalidateGrass();
+        return;
+    }
+    nvrhi::utils::BuildBottomLevelAccelStruct(cmdList, m_grassBlas, blasDesc);
 
     m_grassTotalVerts = totalVerts;
     m_grassTotalIndices = totalIndices;
@@ -1049,6 +1344,28 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
     m_grassReady = true;
     m_grassBillboardMode = billboardMode;
     m_detailAtlasIndex = billboardMode ? detailMgr->buildDetailsBindlessIndex : 0;
+
+    {
+        static u32 s_lastVerts = 0;
+        static bool s_lastBillboard = false;
+        if (s_lastVerts != totalVerts || s_lastBillboard != billboardMode)
+        {
+            s_lastVerts = totalVerts;
+            s_lastBillboard = billboardMode;
+            Msg("* [RT] Grass BLAS ready (%s, verts=%u, atlas=%u)",
+                billboardMode ? "billboard" : "blades", totalVerts, m_detailAtlasIndex);
+        }
+    }
+}
+
+void RTAccelStructManager::BuildParticleBLAS(
+    nvrhi::ICommandList* cmdList,
+    const xr_vector<passes::ParticleBatch>& worldBatches)
+{
+    (void)cmdList;
+    (void)worldBatches;
+    if (m_particleReady || m_particleBlas)
+        InvalidateParticles();
 }
 
 }

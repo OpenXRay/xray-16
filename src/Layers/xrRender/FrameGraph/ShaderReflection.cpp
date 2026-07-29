@@ -1065,6 +1065,7 @@ static void FilterReflectionByUsage(ExtractedReflection& result, slang::ICompone
         return used;
     };
 
+    // Slang entry-point metadata can mark resources sampled only from helpers as unused.
     Msg("  [FilterReflection] Before: %u SRVs, %u UAVs, %u samplers, %u CBs",
         result.rtBindings.inputTextures.size(), result.rtBindings.uavBindings.size(),
         result.rtBindings.samplers.size(), result.constantLayout.constantBuffers.buffers.size());
@@ -1082,14 +1083,29 @@ static void FilterReflectionByUsage(ExtractedReflection& result, slang::ICompone
             srUsed, srUnused, dtsUsed, dtsUnused);
     }
 
+    auto keepPassResource = [](const char* n) -> bool {
+        if (!n || !n[0] || n[1] != '_')
+            return false;
+        const char p = n[0];
+        return p == 'g' || p == 't' || p == 'u';
+    };
+
     auto& textures = result.rtBindings.inputTextures;
     textures.erase(std::remove_if(textures.begin(), textures.end(),
-        [&](const auto& t) { return !isUsed(SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE, t.slot); }),
+        [&](const auto& t) {
+            if (keepPassResource(t.name.c_str()))
+                return false;
+            return !isUsed(SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE, t.slot);
+        }),
         textures.end());
 
     auto& uavs = result.rtBindings.uavBindings;
     uavs.erase(std::remove_if(uavs.begin(), uavs.end(),
-        [&](const auto& u) { return !isUsed(SLANG_PARAMETER_CATEGORY_UNORDERED_ACCESS, u.slot); }),
+        [&](const auto& u) {
+            if (keepPassResource(u.name.c_str()))
+                return false;
+            return !isUsed(SLANG_PARAMETER_CATEGORY_UNORDERED_ACCESS, u.slot);
+        }),
         uavs.end());
 
     auto& samplers = result.rtBindings.samplers;
@@ -1119,22 +1135,35 @@ static void FilterReflectionByUsage(ExtractedReflection& result, slang::ICompone
         [&](const auto& cb) { return !isUsed(SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER, cb.slot); }),
         cbs.end());
 
+    auto preferTex = [](const auto& a, const auto& b) -> bool {
+        const char* an = a.name.c_str();
+        const char* bn = b.name.c_str();
+        auto isPass = [](const char* n) {
+            return n && n[1] == '_' && (n[0] == 'g' || n[0] == 't' || n[0] == 'u');
+        };
+        const bool aPass = isPass(an);
+        const bool bPass = isPass(bn);
+        if (aPass != bPass)
+            return aPass;
+        if (a.shape == ResourceShape::Texture && b.shape != ResourceShape::Texture)
+            return true;
+        if (b.shape == ResourceShape::Texture && a.shape != ResourceShape::Texture)
+            return false;
+        return false;
+    };
     for (size_t i = 0; i < textures.size(); ++i)
     {
         for (size_t j = i + 1; j < textures.size(); )
         {
             if (textures[i].slot == textures[j].slot)
             {
-                if (textures[j].shape != ResourceShape::Texture && textures[i].shape == ResourceShape::Texture)
+                if (preferTex(textures[j], textures[i]))
                 {
                     textures.erase(textures.begin() + i);
                     --i;
                     break;
                 }
-                else
-                {
-                    textures.erase(textures.begin() + j);
-                }
+                textures.erase(textures.begin() + j);
             }
             else
                 ++j;

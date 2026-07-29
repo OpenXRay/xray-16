@@ -29,7 +29,7 @@ BOOL is_combat_cover(shared_str const& table_id)
 
     string256 temp;
     xr_strcpy(temp, "smart_covers.descriptions.");
-    xr_strcat(temp, *table_id);
+    xr_strcat(temp, table_id.c_str());
 
     luabind::object table, value;
     bool result = GEnv.ScriptEngine->function_object(temp, table, LUA_TTABLE);
@@ -129,20 +129,20 @@ void CSE_SmartCover::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_W
 #ifndef MASTER_GOLD
 void CSE_SmartCover::FillProps(LPCSTR pref, PropItemVec& items)
 {
-    PHelper().CreateFloat(items, PrepareKey(pref, *s_name, "hold position time"), &m_hold_position_time, 0.f, 60.f);
-    RListValue* value = PHelper().CreateRList(items, PrepareKey(pref, *s_name, "description"), &m_description,
+    PHelper().CreateFloat(items, PrepareKey(pref, s_name.c_str(), "hold position time"), &m_hold_position_time, 0.f, 60.f);
+    RListValue* value = PHelper().CreateRList(items, PrepareKey(pref, s_name.c_str(), "description"), &m_description,
         &*fp_data.smart_covers.begin(), fp_data.smart_covers.size());
     value->OnChangeEvent.bind(this, &CSE_SmartCover::OnChangeDescription);
 
     PHelper().CreateFloat(
-        items, PrepareKey(pref, *s_name, "enter min enemy distance"), &m_enter_min_enemy_distance, 0.f, 100.f);
+        items, PrepareKey(pref, s_name.c_str(), "enter min enemy distance"), &m_enter_min_enemy_distance, 0.f, 100.f);
     PHelper().CreateFloat(
-        items, PrepareKey(pref, *s_name, "exit min enemy distance"), &m_exit_min_enemy_distance, 0.f, 100.f);
+        items, PrepareKey(pref, s_name.c_str(), "exit min enemy distance"), &m_exit_min_enemy_distance, 0.f, 100.f);
 
     if (is_combat_cover(m_description))
     {
-        PHelper().CreateBOOL(items, PrepareKey(pref, *s_name, "is combat cover"), &m_is_combat_cover);
-        PHelper().CreateBOOL(items, PrepareKey(pref, *s_name, "can fire"), &m_can_fire);
+        PHelper().CreateBOOL(items, PrepareKey(pref, s_name.c_str(), "is combat cover"), &m_is_combat_cover);
+        PHelper().CreateBOOL(items, PrepareKey(pref, s_name.c_str(), "can fire"), &m_can_fire);
     }
 }
 #endif // #ifndef MASTER_GOLD

@@ -1,0 +1,104 @@
+#define SM_6_0
+#define ACTOR_WET_MARK 1
+#define CLUSTERED_LIGHTING_FORWARD
+#define CSM_SHADOW_FORWARD
+#define LOCAL_SHADOW_FORWARD
+#define SHADOW_MASK_FORWARD
+#define SKY_IBL
+#include "common.h"
+#include "bindless_common.h"
+#include "skinned_common.h"
+
+Texture2D s_vp2 : register(t56);
+SamplerState smp_scope : register(s5);
+
+cbuffer ScopeParams : register(b5)
+{
+    float4 m_hud_params;
+    float4 m_zoom_deviation;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+};
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 baseColor : SV_Target2;
+    float4 worldPos : SV_Target3;
+};
+
+float resize(float input, float factor, float offset)
+{
+    return (input - 0.5 + offset) / factor + 0.5 - offset;
+}
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    PS_OUTPUT output;
+
+    uint materialID = g_SkinnedMaterialID;
+    MaterialData mat = g_Materials[materialID];
+    float4 t_base = SampleDiffuse(mat, input.texcoord);
+
+    if (m_hud_params.y * m_hud_params.a < 0.0001)
+    {
+        if (mat.flags & MAT_FLAG_ALPHA_TEST)
+            clip(t_base.a - mat.alphaRef);
+
+        float3 Tn = normalize(input.tangent);
+        float3 Bn = normalize(input.bitangent);
+        float3 Ngeom = normalize(input.normal);
+        float3 N = Ngeom;
+        float gloss = 0.0;
+        if (mat.flags & MAT_FLAG_HAS_NORMAL)
+        {
+            BumpSample bump = SampleNormal(mat, input.texcoord);
+            float3x3 TBN = float3x3(Tn, Bn, N);
+            N = normalize(mul(bump.normal, TBN));
+            gloss = bump.gloss;
+        }
+
+        float metallic, roughness, ao, parallax;
+        ResolveMaterialPBR(mat, input.texcoord, gloss, metallic, roughness, ao, parallax);
+
+        f_forward fwd = output_forward_pbr(
+            t_base.rgb, N, input.worldPos, metallic, roughness, ao, input.position, 1.0, 1.0);
+        float outA = (mat.flags & MAT_FLAG_ALPHA_BLEND) ? t_base.a : 1.0;
+        output.color = float4(fwd.color.rgb, outA);
+        output.normal = fwd.normal;
+        output.baseColor = fwd.baseColor;
+        output.worldPos = float4(input.worldPos, 2.0);
+        return output;
+    }
+
+    float2 tc = input.texcoord;
+    tc.x += m_zoom_deviation.x;
+    tc.y += m_zoom_deviation.y;
+    tc.x = resize(tc.x, screen_res.x / max(screen_res.y, 1.0), 0.0);
+
+    float2 offset = distance(tc, float2(0.5, 0.5)) * float2(m_hud_params.z, m_hud_params.z);
+    float4 t_vp2;
+    t_vp2.r = s_vp2.Sample(smp_scope, tc + offset).r;
+    t_vp2.g = s_vp2.Sample(smp_scope, tc).g;
+    t_vp2.b = s_vp2.Sample(smp_scope, tc - offset).b;
+    t_vp2.a = 1.0;
+
+    float3 base = lerp(t_vp2.rgb, t_base.rgb, t_base.a);
+    float alpha = min(m_hud_params.y, m_hud_params.a);
+
+    output.color = float4(base, alpha);
+    output.normal = float4(normalize(input.normal) * 0.5 + 0.5, 0.0);
+    output.baseColor = float4(base, alpha);
+    output.worldPos = float4(input.worldPos, 1.0);
+    return output;
+}

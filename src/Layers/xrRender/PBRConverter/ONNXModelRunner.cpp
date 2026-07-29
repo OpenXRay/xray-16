@@ -260,43 +260,16 @@ bool ONNXModelRunner::LoadModel(const char* model_path, bool use_gpu, const char
             Msg("! [ONNXModelRunner] CoreML provider unavailable, falling back to CPU: %s", e.what());
         }
 #else
-        // Use TensorRT V2 API for NVIDIA GPUs (has advanced options like build logging)
-        Ort::TensorRTProviderOptions trt_options{};
-
-        // Build options map
-        std::unordered_map<std::string, std::string> trt_opts;
-
-        // Basic settings
-        trt_opts["device_id"] = "0";
-        trt_opts["trt_max_workspace_size"] = "2147483648"; // 2GB
-        trt_opts["trt_fp16_enable"] = "1"; // Enable FP16 tensor cores
-
-        if (trt_profile_min && trt_profile_min[0]) trt_opts["trt_profile_min_shapes"] = trt_profile_min;
-        if (trt_profile_max && trt_profile_max[0]) trt_opts["trt_profile_max_shapes"] = trt_profile_max;
-        if (trt_profile_opt && trt_profile_opt[0]) trt_opts["trt_profile_opt_shapes"] = trt_profile_opt;
-
-        // Engine caching
-        trt_opts["trt_engine_cache_enable"] = "1";
-        if (trt_cache_path && trt_cache_path[0] != '\0') {
-            trt_opts["trt_engine_cache_path"] = trt_cache_path;
+        try {
+            OrtCUDAProviderOptions cuda_options{};
+            cuda_options.device_id = 0;
+            session_options.AppendExecutionProvider_CUDA(cuda_options);
+            Msg("[ONNXModelRunner] CUDA GPU acceleration enabled");
+            use_gpu_ = true;
         }
-
-        trt_opts["trt_builder_optimization_level"] = "0";
-
-        trt_opts["trt_build_heuristics_enable"] = "1";
-
-        trt_opts["trt_timing_cache_enable"] = "1";
-        if (trt_cache_path && trt_cache_path[0] != '\0') {
-            std::string cache_str(trt_cache_path);
-            auto last_sep = cache_str.find_last_of("\\/");
-            std::string timing_path = (last_sep != std::string::npos) ? cache_str.substr(0, last_sep) : cache_str;
-            trt_opts["trt_timing_cache_path"] = timing_path;
+        catch (const Ort::Exception& e) {
+            Msg("! [ONNXModelRunner] CUDA provider unavailable, falling back to CPU: %s", e.what());
         }
-
-        trt_options.Update(trt_opts);
-        session_options.AppendExecutionProvider_TensorRT_V2(*trt_options);
-        Msg("[ONNXModelRunner] TensorRT V2 GPU acceleration enabled (FP16, profile shapes constrained)");
-        use_gpu_ = true;
 #endif
     }
 

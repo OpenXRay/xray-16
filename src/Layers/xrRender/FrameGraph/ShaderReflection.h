@@ -162,7 +162,8 @@ struct ShaderRTBindings {
                 state.mipFilter = FilterMode::Point;
                 state.maxAnisotropy = 1;
             }
-            else if (strstr(name.c_str(), "smp_shadowcmp") != nullptr) {
+            else if (strstr(name.c_str(), "smp_shadowcmp") != nullptr ||
+                     strstr(name.c_str(), "smp_raincmp") != nullptr) {
                 state.addressMode = AddressMode::Clamp;
                 state.minFilter = FilterMode::Linear;
                 state.magFilter = FilterMode::Linear;

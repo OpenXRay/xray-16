@@ -279,7 +279,7 @@ void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, BOO
         return;
 
     u8 SlotID, ItemID;
-    pCurBuyMenu->GetWeaponIndexByName(*pItem->object().cNameSect(), SlotID, ItemID);
+    pCurBuyMenu->GetWeaponIndexByName(pItem->object().cNameSect().c_str(), SlotID, ItemID);
     if (SlotID == 0xff || ItemID == 0xff)
         return;
     s16 BigID = GetBuyMenuItemIndex(SlotID, ItemID);
@@ -318,7 +318,7 @@ void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, BOO
     {
         if (pWeapon->ScopeAttachable())
         {
-            pCurBuyMenu->GetWeaponIndexByName(*pWeapon->GetScopeName(), SlotID, ItemID);
+            pCurBuyMenu->GetWeaponIndexByName(pWeapon->GetScopeName().c_str(), SlotID, ItemID);
             if (SlotID != 0xff && ItemID != 0xff)
             {
                 if (pWeapon->IsScopeAttached())
@@ -336,7 +336,7 @@ void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, BOO
 
         if (pWeapon->GrenadeLauncherAttachable())
         {
-            pCurBuyMenu->GetWeaponIndexByName(*pWeapon->GetGrenadeLauncherName(), SlotID, ItemID);
+            pCurBuyMenu->GetWeaponIndexByName(pWeapon->GetGrenadeLauncherName().c_str(), SlotID, ItemID);
             if (SlotID != 0xff && ItemID != 0xff)
             {
                 if (pWeapon->IsGrenadeLauncherAttached())
@@ -356,7 +356,7 @@ void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, BOO
 
         if (pWeapon->SilencerAttachable())
         {
-            pCurBuyMenu->GetWeaponIndexByName(*pWeapon->GetSilencerName(), SlotID, ItemID);
+            pCurBuyMenu->GetWeaponIndexByName(pWeapon->GetSilencerName().c_str(), SlotID, ItemID);
             if (SlotID != 0xff && ItemID != 0xff)
             {
                 if (pWeapon->IsSilencerAttached())
@@ -458,7 +458,7 @@ void game_cl_Deathmatch::LoadDefItemsForRank(IBuyWnd* pBuyMenu)
         const shared_str& ItemName = pBuyMenu->GetWeaponNameByIndex(pDefItem->SlotID, pDefItem->ItemID);
         if (!ItemName.size())
             continue;
-        if (!xr_strcmp(*ItemName, "mp_wpn_knife"))
+        if (!xr_strcmp(ItemName.c_str(), "mp_wpn_knife"))
             continue;
         if (!pSettings->line_exist(ItemName, "ammo_class"))
             continue;

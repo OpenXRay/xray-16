@@ -43,10 +43,12 @@ public:
     const particles_systems::library_interface& particles_systems_library() override;
 
     void DrawSky(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height);
+    void DrawClouds(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height);
     void DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height);
 
 private:
     void InitSkyResources();
+    void InitCloudResources();
     void InitSunResources();
 
     using RuntimeTextureList = xr_vector<std::pair<u32, ref_texture>>;
@@ -76,6 +78,18 @@ private:
     nvrhi::BindingLayoutHandle m_skyBindingLayout;
     nvrhi::GraphicsPipelineHandle m_skyPipeline;
     bool m_skyInitialized = false;
+
+    nvrhi::BufferHandle m_cloudsVertexBuffer;
+    nvrhi::BufferHandle m_cloudsIndexBuffer;
+    nvrhi::TextureHandle m_cloudsPlaceholderTex;
+    nvrhi::ShaderHandle m_cloudsVS;
+    nvrhi::ShaderHandle m_cloudsPS;
+    nvrhi::InputLayoutHandle m_cloudsInputLayout;
+    nvrhi::BindingLayoutHandle m_cloudsBindingLayout;
+    nvrhi::GraphicsPipelineHandle m_cloudsPipeline;
+    u32 m_cloudsIndexCount = 0;
+    u32 m_cloudsVertexCapacity = 0;
+    bool m_cloudsInitialized = false;
 
     nvrhi::BufferHandle m_sunVertexBuffer;
     nvrhi::BufferHandle m_sunIndexBuffer;

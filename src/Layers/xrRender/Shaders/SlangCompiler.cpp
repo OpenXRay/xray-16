@@ -253,9 +253,20 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
 
     Slang::ComPtr<slang::IBlob> codeBlob;
     slangResult = linkedProgram->getEntryPointCode(0, 0, codeBlob.writeRef(), diagnosticBlob.writeRef());
+    if (diagnosticBlob)
+    {
+        auto* msg = static_cast<const char*>(diagnosticBlob->getBufferPointer());
+        if (msg && msg[0])
+        {
+            result.errorMessage = msg;
+            Msg("! [SlangCompiler] Codegen errors for %s: %s", sourcePath, msg);
+        }
+        diagnosticBlob = nullptr;
+    }
     if (SLANG_FAILED(slangResult) || !codeBlob)
     {
-        result.errorMessage = "Failed to retrieve compiled bytecode";
+        if (result.errorMessage.empty())
+            result.errorMessage = "Failed to retrieve compiled bytecode";
         Msg("! [SlangCompiler] %s", result.errorMessage.c_str());
         return result;
     }

@@ -503,7 +503,7 @@ target_compile_definitions(xrCore
     GITHUB_RUN_ID=\"$ENV{GITHUB_RUN_ID}\"
     GITHUB_RUN_NUMBER=\"$ENV{GITHUB_RUN_NUMBER}\"
     GITHUB_REPOSITORY=\"$ENV{GITHUB_REPOSITORY}\"
-    GIT_INFO_CURRENT_COMMIT=\"${XRAY_GIT_SHA1}\"
+    GIT_INFO_CURRENT_COMMIT=\"${XRAY_GIT_SHA}\"
     GIT_INFO_CURRENT_BRANCH=\"${XRAY_GIT_BRANCH}\"
     OPENSSL_NO_DEPRECATED
 )
@@ -517,6 +517,19 @@ endif()
 set_target_properties(xrCore PROPERTIES
     PREFIX ""
 )
+
+if (XRAY_ENABLE_TRACY)
+    target_sources(xrCore PRIVATE
+        "${CMAKE_SOURCE_DIR}/Externals/tracy/public/TracyClient.cpp"
+    )
+    # TracyClient must not use xrCore PCH / Unity (DEBUG_INFO macro clash)
+    set_source_files_properties(
+        "${CMAKE_SOURCE_DIR}/Externals/tracy/public/TracyClient.cpp"
+        PROPERTIES
+            SKIP_PRECOMPILE_HEADERS ON
+            SKIP_UNITY_BUILD_INCLUSION ON
+    )
+endif()
 
 target_precompile_headers(xrCore
     PRIVATE

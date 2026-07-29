@@ -276,6 +276,13 @@ BOOL CPEDef::Load(IReader& F)
     }
 #endif
 
+    if (F.find_chunk(PED_CHUNK_LIGHTING))
+    {
+        m_LightingMode = (ParticleLightingMode)F.r_u32();
+        F.r_stringZ(m_SixWayPosXYZ);
+        F.r_stringZ(m_SixWayNegXYZ);
+    }
+
     return TRUE;
 }
 
@@ -321,6 +328,14 @@ BOOL CPEDef::Load2(CInifile& ini)
     {
         m_APDefaultRotation = ini.r_fvector3("align_to_path", "default_rotation");
     }
+
+    if (ini.line_exist("_effect", "lighting_mode"))
+        m_LightingMode = (ParticleLightingMode)ini.r_u32("_effect", "lighting_mode");
+    if (ini.line_exist("_effect", "sixway_pos_xyz"))
+        m_SixWayPosXYZ = ini.r_string("_effect", "sixway_pos_xyz");
+    if (ini.line_exist("_effect", "sixway_neg_xyz"))
+        m_SixWayNegXYZ = ini.r_string("_effect", "sixway_neg_xyz");
+
 #ifdef _EDITOR
     if (pCreateEAction)
     {
@@ -349,6 +364,11 @@ void CPEDef::Save2(CInifile& ini)
     ini.w_u32("_effect", "max_particles", m_MaxParticles);
     //.!!	F.w				(m_Actions.pointer(),m_Actions.size());
     ini.w_u32("_effect", "flags", m_Flags.get());
+    ini.w_u32("_effect", "lighting_mode", (u32)m_LightingMode);
+    if (m_SixWayPosXYZ.c_str())
+        ini.w_string("_effect", "sixway_pos_xyz", m_SixWayPosXYZ.c_str());
+    if (m_SixWayNegXYZ.c_str())
+        ini.w_string("_effect", "sixway_neg_xyz", m_SixWayNegXYZ.c_str());
 
     if (m_Flags.is(dfSprite))
     {
@@ -473,6 +493,12 @@ void CPEDef::Save(IWriter& F)
     }
     F.close_chunk();
 #endif
+
+    F.open_chunk(PED_CHUNK_LIGHTING);
+    F.w_u32((u32)m_LightingMode);
+    F.w_stringZ(m_SixWayPosXYZ);
+    F.w_stringZ(m_SixWayNegXYZ);
+    F.close_chunk();
 }
 
 #ifdef _EDITOR

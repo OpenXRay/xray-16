@@ -1,0 +1,29 @@
+// Apply AO to HDR — classic combine only dims hemi/ambient, not sun.
+// Forward has no split RT: use ambient-weight k≈0.4 to approximate that look.
+#define SM_6_0
+#include "common.h"
+
+Texture2D g_Color : register(t0);
+Texture2D g_AO : register(t1);
+Texture2D g_Depth : register(t2);
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+};
+
+// Approximate ambient share of forward lighting (classic: hdiffuse *= occ only)
+static const float kAmbientWeight = 0.4;
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    float4 color = g_Color.SampleLevel(smp_nofilter, input.texcoord, 0);
+    float depth = g_Depth.SampleLevel(smp_nofilter, input.texcoord, 0).x;
+    if (IsSkyDepth(depth))
+        return color;
+
+    float ao = g_AO.SampleLevel(smp_rtlinear, input.texcoord, 0).x;
+    color.rgb *= lerp(1.0, ao, kAmbientWeight);
+    return color;
+}

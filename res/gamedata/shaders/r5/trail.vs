@@ -19,8 +19,8 @@ struct TrailControlPoint
     float cumDist;             // cumulative distance from head
 };
 
-StructuredBuffer<TrailControlPoint> g_ControlPoints : register(t10);
-ByteAddressBuffer g_TrailState : register(t11);  // GPU-driven: {head, totalSpawned, liveCount, totalDist_bits}
+StructuredBuffer<TrailControlPoint> g_ControlPoints : register(t13);
+ByteAddressBuffer g_TrailState : register(t14);  // GPU-driven: {head, totalSpawned, liveCount, totalDist_bits}
 
 // ═══════════════════════════════════════════════════════
 //  Per-group constant buffer
@@ -68,6 +68,7 @@ struct VS_OUTPUT
     float4 hpos     : SV_Position;
     float2 texcoord : TEXCOORD0;
     float4 color    : TEXCOORD1;
+    nointerpolation uint materialID : TEXCOORD2;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -299,7 +300,9 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
     // --- Output ---
     output.hpos = mul(m_VP, float4(finalPos, 1.0));
     output.texcoord = uv;
-    output.color = float4(1.0, 1.0, 1.0, smoothAge);
+    // smoothAge fades birth→death; tailFade fades along trail length (classic ribbon)
+    output.color = float4(1.0, 1.0, 1.0, smoothAge * tailFade);
+    output.materialID = g_MaterialID;
 
     return output;
 }

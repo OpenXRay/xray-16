@@ -42,14 +42,16 @@ inline const char* GetTextureTypeName(TextureType type) {
 // GPU-side material representation - must match HLSL exactly!
 // Uses SM6 bindless texture indices from ResourceDescriptorHeap
 //
-// Layout (32 bytes total):
+// Layout (64 bytes total):
 //   Bytes 0-15:  Texture descriptor indices (4× u32)
 //   Bytes 16-31: Material properties
+//   Bytes 32-47: Extended bump / tessellation
+//   Bytes 48-63: SSS map + pad
 
 struct alignas(16) MaterialData {
     // Descriptor heap indices (UINT32_MAX = invalid/not present)
     u32 diffuseIndex;    // Base color / albedo texture
-    u32 normalIndex;     // Normal map texture
+    u32 normalIndex;     // Normal map texture (s_bump)
     u32 detailIndex;     // Detail texture
     u32 pbrIndex;        // Packed Metallic/Roughness/AO texture
 
@@ -58,8 +60,19 @@ struct alignas(16) MaterialData {
     float alphaRef;      // Alpha test threshold (0.5 typical)
     u32 flags;           // Material flags (see MaterialFlags)
     u32 shaderVariant;   // Index into ShaderVariantRegistry (0=default)
+
+    // Extended (must stay in sync with HLSL MaterialData)
+    u32 normalXIndex;      // bump# (s_bumpX) — error + height
+    u32 detailBumpIndex;   // s_detailBump
+    u32 detailBumpXIndex;  // s_detailBumpX
+    u32 tessMethod;        // 0=off, 1=PN, 2=HM, 3=PN+HM (CBlender_Compile)
+
+    u32 sssMapIndex;       // SSS thickness/strength map (R/G/B = thick/str/profile)
+    float emissiveIntensity;
+    u32 lmapIndex;         // Baked hemi lightmap (lmap#N_2: a=hemi, g=sun)
+    u32 _pad2;
 };
-static_assert(sizeof(MaterialData) == 32, "MaterialData must be 32 bytes for GPU alignment");
+static_assert(sizeof(MaterialData) == 64, "MaterialData must be 64 bytes for GPU alignment");
 
 // Material flags (must match HLSL)
 enum MaterialFlags : u32 {
@@ -73,6 +86,14 @@ enum MaterialFlags : u32 {
     MAT_FLAG_HAS_PBR_LAYER = (1 << 7),  // Terrain has PBR detail textures
     MAT_FLAG_ALPHA_BLEND   = (1 << 8),  // Transparent alpha blending
     MAT_FLAG_WATER         = (1 << 9),  // Water surface (Fresnel reflect/refract)
+    MAT_FLAG_HAS_NORMAL_X  = (1 << 10), // Has bump# (normalXIndex valid)
+    MAT_FLAG_HAS_DETAIL_BUMP = (1 << 11), // Has detail bump pair
+    MAT_FLAG_HAS_LMAP      = (1 << 12), // Terrain/object has lightmap (lmapIndex valid)
+    MAT_FLAG_FOLIAGE       = (1 << 13), // Trees / bushes / leaves — subsurface scattering
+    MAT_FLAG_PARTICLE_HARD = (1 << 16), // Disable soft-particle depth fade
+    MAT_FLAG_HAS_SSS_MAP   = (1 << 14), // sssMapIndex valid (R=thickness G=strength B=profile)
+    MAT_FLAG_MULTIPLY      = (1 << 15), // DestColor*SrcColor wall stains / burns
+    MAT_FLAG_GLASS         = (1 << 17), // Thin-glass transmission SSS profile
 };
 
 // ═══════════════════════════════════════════════════════
@@ -81,12 +102,14 @@ enum MaterialFlags : u32 {
 // Terrain uses 4-layer detail blending with RGBA mask
 // Each layer has: color, normal, and optional PBR textures
 //
-// Layout (64 bytes total):
+// Layout (96 bytes total):
 //   Bytes 0-7:   Base and mask indices
 //   Bytes 8-23:  Detail color indices (R/G/B/A)
 //   Bytes 24-39: Detail normal indices (R/G/B/A)
 //   Bytes 40-55: Detail PBR indices (R/G/B/A)
-//   Bytes 56-63: Properties
+//   Bytes 56-71: Detail bump# indices (R/G/B/A)
+//   Bytes 72-79: Properties (detailScale + flags)
+//   Bytes 80-95: Lightmap index + pad
 
 constexpr u32 MAX_TERRAIN_MATERIALS = 512 * 4;
 
@@ -101,22 +124,34 @@ struct alignas(16) TerrainMaterialData {
     u32 detailB_Index;       // Detail texture for mask.b channel
     u32 detailA_Index;       // Detail texture for mask.a channel
 
-    // Detail normal textures (s_dn_r/g/b/a)
-    u32 normalR_Index;       // Detail normal for mask.r channel
-    u32 normalG_Index;       // Detail normal for mask.g channel
-    u32 normalB_Index;       // Detail normal for mask.b channel
-    u32 normalA_Index;       // Detail normal for mask.a channel
+    // Detail normal textures (s_dn_r/g/b/a) — s_bump
+    u32 normalR_Index;
+    u32 normalG_Index;
+    u32 normalB_Index;
+    u32 normalA_Index;
 
     // Detail PBR textures (s_pbr_r/g/b/a) - optional
-    u32 pbrR_Index;          // PBR for mask.r channel (R=metal, G=rough, B=AO, A=parallax)
-    u32 pbrG_Index;          // PBR for mask.g channel
-    u32 pbrB_Index;          // PBR for mask.b channel
-    u32 pbrA_Index;          // PBR for mask.a channel
+    u32 pbrR_Index;
+    u32 pbrG_Index;
+    u32 pbrB_Index;
+    u32 pbrA_Index;
+
+    // Detail bump# (s_bumpX) for dual-bump — same naming as object materials
+    u32 normalXR_Index;
+    u32 normalXG_Index;
+    u32 normalXB_Index;
+    u32 normalXA_Index;
 
     // Properties
-    float detailScale;       // Uniform tiling scale for all 4 detail layers
-    u32 flags;               // MAT_FLAG_TERRAIN, MAT_FLAG_HAS_PBR_LAYER
+    float detailScale;
+    u32 flags;               // MAT_FLAG_TERRAIN, MAT_FLAG_HAS_PBR_LAYER, MAT_FLAG_HAS_NORMAL_X, MAT_FLAG_HAS_LMAP
+
+    // Lightmap (s_lmap / L_textures[1]) — classic Blender_BmmD
+    u32 lmapIndex;
+    u32 pad0;
+    u32 pad1;
+    u32 pad2;
 };
-static_assert(sizeof(TerrainMaterialData) == 64, "TerrainMaterialData must be 64 bytes for GPU alignment");
+static_assert(sizeof(TerrainMaterialData) == 96, "TerrainMaterialData must be 96 bytes for GPU alignment");
 
 } // namespace xray::render::fg::bindless

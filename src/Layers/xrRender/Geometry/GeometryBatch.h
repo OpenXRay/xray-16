@@ -23,9 +23,8 @@ struct MaterialPSO;  // Forward declaration
 // ══════════════════════════════════════════════════════════
 
 struct GeometryBatch {
-    // Vertex/index buffers (NVRHI handles for wrapped legacy buffers)
-    nvrhi::BufferHandle vertexBuffer;
-    nvrhi::BufferHandle indexBuffer;
+    nvrhi::IBuffer* vertexBuffer = nullptr;
+    nvrhi::IBuffer* indexBuffer = nullptr;
 
     // Draw parameters
     u32 indexCount = 0;
@@ -97,6 +96,10 @@ struct GeometryBatch {
     bool isTerrain = false;
     u32 terrainMaterialID = UINT32_MAX;  // Index into g_TerrainMaterials for terrain rendering
 
+    bool cachedAlphaTest = false;
+    bool cachedTransparent = false;
+    bool sortFlagsValid = false;
+
     // SSA (Screen Space Area) for sorting - matches vanilla CalcSSA()
     // SSA = R / distSQ where R = bounding sphere radius, distSQ = distance squared to camera
     // Larger SSA = closer/bigger = should render first (front-to-back for opaque)
@@ -117,24 +120,38 @@ struct GeometryBatch {
     // ═══════════════════════════════════════════════════
     // Uses MaterialSystem for material flags
 
-    // Check if batch is alpha-tested (uses clip/discard in shader)
     bool IsAlphaTested() const {
+        if (sortFlagsValid)
+            return cachedAlphaTest;
         if (!visual || !visual->shaderName.size())
             return false;
-
         return MaterialSystem::Instance()
             .GetMaterialInfo(visual->shaderName)
             .alphaTest;
     }
 
-    // Check if batch requires back-to-front sorting (transparent/alpha-blended)
     bool IsStrictB2F() const {
+        if (sortFlagsValid)
+            return cachedTransparent;
         if (!visual || !visual->shaderName.size())
             return false;
-
         return MaterialSystem::Instance()
             .GetMaterialInfo(visual->shaderName)
             .transparent;
+    }
+
+    void CacheSortFlags() {
+        if (!visual || !visual->shaderName.size())
+        {
+            cachedAlphaTest = false;
+            cachedTransparent = false;
+            sortFlagsValid = true;
+            return;
+        }
+        const auto& info = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName);
+        cachedAlphaTest = info.alphaTest;
+        cachedTransparent = info.transparent;
+        sortFlagsValid = true;
     }
 
     // Check if batch is opaque (no alpha-test and no strict B2F)
@@ -156,10 +173,9 @@ public:
     void BeginFrame();
     void EndFrame();
 
-    // Submit geometry for rendering
     void Submit(const GeometryBatch& batch);
+    void SubmitStatic(const GeometryBatch& batch);
 
-    // Get batches for rendering (const)
     const xr_vector<GeometryBatch>& GetBatches() const { return m_batches; }
 
     // Get batches for routing (non-const, for Week 16 dynamic routing)

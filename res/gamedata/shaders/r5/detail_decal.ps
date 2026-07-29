@@ -1,11 +1,14 @@
 #define SM_6_0
 #define CLUSTERED_LIGHTING_FORWARD
+#define CSM_SHADOW_FORWARD
+#define LOCAL_SHADOW_FORWARD
+#define SKY_IBL
 #include "common.h"
 #include "bindless_common.h"
 
 cbuffer DetailGlobals : register(b3)
 {
-	float4 consts;
+    float4 consts;
 	float4 wave;
 	float4 dir2D;
 	float4 dir2D_2;
@@ -23,6 +26,8 @@ cbuffer DetailGlobals : register(b3)
 	float grass_blade_height;
 	uint build_details_index;
 	uint build_details_pbr_index;
+	uint grass_vein_index;
+	uint _pad0, _pad1, _pad2;
 };
 
 f_forward main(p_decal I)
@@ -30,12 +35,15 @@ f_forward main(p_decal I)
 	Texture2D atlas_tex = GetBindlessTexture(build_details_index);
 	float4 texel = atlas_tex.Sample(smp_linear, I.tcdh.xy);
 
-	clip(texel.a - 0.5);
+	// details\blend (R1): aref 200 + SrcAlpha. Kill BC1 filtered fringe, keep soft edge above gate.
+	clip(texel.a - def_aref);
+	float alpha = saturate((texel.a - def_aref) / max(1e-3, 1.0 - def_aref));
 
 	float3 N = normalize(I.N);
 	float metallic = 0.0;
 	float roughness = 0.85;
 	float ao = 1.0;
+	float hemi = I.position.w;
 
 	if (build_details_pbr_index != 0)
 	{
@@ -46,5 +54,12 @@ f_forward main(p_decal I)
 		ao = pbr.b;
 	}
 
-	return output_forward_pbr(texel.rgb, N, I.position.xyz, metallic, roughness, ao, I.hpos);
+	float thickness = saturate(texel.a + 0.2);
+	f_forward res = output_forward_pbr(
+		texel.rgb, N, I.position.xyz, metallic, roughness, ao, I.hpos,
+		hemi, saturate(I.sunOcclusion),
+		grass_sss_color.w, grass_sss_color.rgb, thickness);
+	res.color.a = alpha;
+	res.baseColor = float4(0, 0, 0, 0);
+	return res;
 }

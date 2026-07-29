@@ -13,12 +13,18 @@ struct VariantPSOKey
     u32 variantIndex;
     u32 passIndex;
     u32 vertexFormat;
+    u32 colorTargetCount = 0;
+    u32 depthFormat = 0;
+    u32 sampleCount = 1;
 
     bool operator<(const VariantPSOKey& o) const
     {
         if (variantIndex != o.variantIndex) return variantIndex < o.variantIndex;
         if (passIndex != o.passIndex) return passIndex < o.passIndex;
-        return vertexFormat < o.vertexFormat;
+        if (vertexFormat != o.vertexFormat) return vertexFormat < o.vertexFormat;
+        if (colorTargetCount != o.colorTargetCount) return colorTargetCount < o.colorTargetCount;
+        if (depthFormat != o.depthFormat) return depthFormat < o.depthFormat;
+        return sampleCount < o.sampleCount;
     }
 };
 
@@ -67,9 +73,26 @@ struct VariantPartitionDrawConfig
     nvrhi::IBindingLayout* passLayout = nullptr;
     nvrhi::IBindingLayout* bindlessLayout = nullptr;
     nvrhi::IBindingSet* bindlessTable = nullptr;
+    nvrhi::ISampler* sampler = nullptr;
+    nvrhi::IBuffer* staticGlobalsCB = nullptr;
+    nvrhi::IBuffer* lightingCB = nullptr;
+    nvrhi::IBuffer* materialBuffer = nullptr;
+    nvrhi::IBuffer* variantTexBuffer = nullptr;
+    nvrhi::IBuffer* instanceBuffer = nullptr;
     nvrhi::IBuffer* megaVertexBuffer = nullptr;
-    nvrhi::BindingSetDesc baseBindings;
-    u32 objectCount = 0;
+    nvrhi::ITexture* shadowMapArray = nullptr;
+    nvrhi::ITexture* shadowCascades[3] = {};
+    nvrhi::ITexture* shadowHZB[3] = {};
+    nvrhi::ITexture* localShadowAtlas = nullptr;
+    nvrhi::ITexture* localShadowESM = nullptr;
+    nvrhi::ITexture* contactHistory = nullptr;
+    nvrhi::ITexture* shadowMask = nullptr;
+    nvrhi::ITexture* envSky0 = nullptr;
+    nvrhi::ITexture* envSky1 = nullptr;
+    nvrhi::IBuffer* lightDataBuffer = nullptr;
+    nvrhi::IBuffer* shadowDataBuffer = nullptr;
+    nvrhi::IBuffer* clusterGridBuffer = nullptr;
+    nvrhi::IBuffer* lightIndexListBuffer = nullptr;
     VariantPartitionConfig partition;
     bool selectTransparent = false;
 };

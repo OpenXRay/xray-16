@@ -1,0 +1,70 @@
+// Classic HBAO (gl/ssao_hbao.ps) — fixed R=0.4, contrast 0.8, +Z view
+#include "ao/ao_common.h"
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    float depth = SampleDepth(input.texcoord);
+    float4 worldPos4 = SampleWorldPos(input.texcoord);
+    if (IsSky(depth, worldPos4))
+        return float4(1, 1, 1, 1);
+
+    float3 Nw = SampleWorldNormal(input.texcoord);
+    float3 P = WorldToView(worldPos4.xyz);
+    float3 N = normalize(mul((float3x3)m_V, Nw));
+
+    float q = AoQuality();
+    int numDir = (q >= 3.0) ? 6 : ((q >= 2.0) ? 5 : 4);
+    int numSteps = 3;
+    // Classic g_R / g_Contrast / g_AngleBias
+    const float R = 0.400009334;
+    const float invR = 2.49994159;
+    const float contrast = 0.8;
+    const float angleBias = 0.0;
+    float viewZ = ViewDepth(P);
+
+    float2 jitter = Ign2(input.position.xy);
+    float ao = 0.0;
+
+    [loop]
+    for (int i = 0; i < numDir; ++i)
+    {
+        float ang = (float(i) + jitter.x) * (6.2831853 / float(numDir));
+        float2 dir = float2(cos(ang), sin(ang));
+
+        float maxTan = angleBias - 0.01;
+        float weight = 0.0;
+        float occ = 0.0;
+
+        [loop]
+        for (int s = 0; s < numSteps; ++s)
+        {
+            float step = (float(s) + 0.5 + jitter.y) / float(numSteps);
+            step *= step;
+            float2 uv = input.texcoord + dir * WorldRadiusToUV(R * step, viewZ);
+            if (any(uv < 0.0) || any(uv > 1.0))
+                break;
+
+            float4 sw = SampleWorldPos(uv);
+            if (sw.w < 0.5)
+                continue;
+            float3 S = WorldToView(sw.xyz);
+            float3 D = S - P;
+            float len2 = dot(D, D);
+            // +Z forward: closer → smaller z → positive (P.z - S.z)
+            float tanH = (P.z - S.z) * rsqrt(max(len2, 1e-8));
+            float falloff = saturate(1.0 - len2 * invR * invR);
+            float diff = max(tanH - maxTan, 0.0);
+            occ += diff * falloff;
+            weight += falloff;
+            maxTan = max(maxTan, tanH);
+        }
+
+        ao += (weight > 0.0) ? (occ / weight) : 0.0;
+    }
+
+    ao = saturate(1.0 - (ao / float(numDir)) * contrast);
+    // Weapon / near attenuation like classic
+    float atten = smoothstep(0.8, 0.9, length(P));
+    ao = lerp(1.0, ao, atten);
+    return float4(ao, ao, ao, 1);
+}

@@ -218,14 +218,14 @@ void CServerList::AddServerDetail(const GameInfo& info)
 
 void CServerList::AddBoolED(const char* keyName, bool value)
 {
-    AddServerDetail(GameInfo(*StringTable().translate(keyName),
-        value ? *StringTable().translate("mp_si_enabled") : *StringTable().translate("mp_si_disabled")));
+    AddServerDetail(GameInfo(StringTable().translate(keyName).c_str(),
+        value ? StringTable().translate("mp_si_enabled").c_str() : StringTable().translate("mp_si_disabled").c_str()));
 }
 
 void CServerList::AddBoolYN(const char* keyName, bool value)
 {
-    AddServerDetail(GameInfo(*StringTable().translate(keyName),
-        value ? *StringTable().translate("mp_si_yes") : *StringTable().translate("mp_si_no")));
+    AddServerDetail(GameInfo(StringTable().translate(keyName).c_str(),
+        value ? StringTable().translate("mp_si_yes").c_str() : StringTable().translate("mp_si_no").c_str()));
 }
 
 void CServerList::AddBoolKeyED(void* s, const char* keyName, int k) { AddBoolED(keyName, browser().GetBool(s, k)); }
@@ -234,7 +234,7 @@ void CServerList::AddIntKey(void* s, const char* keyName, int k)
 {
     string256 tmp;
     xr_sprintf(tmp, "%d", browser().GetInt(s, k));
-    AddServerDetail(GameInfo(*StringTable().translate(keyName), tmp));
+    AddServerDetail(GameInfo(StringTable().translate(keyName).c_str(), tmp));
 }
 
 void CServerList::AddIntKeyN(void* s, float m, const char* keyName, const char* suffix, int k)
@@ -243,10 +243,10 @@ void CServerList::AddIntKeyN(void* s, float m, const char* keyName, const char* 
     {
         string256 tmp;
         xr_sprintf(tmp, "%d%s", int(browser().GetInt(s, k) * m), suffix);
-        AddServerDetail(GameInfo(*StringTable().translate(keyName), tmp));
+        AddServerDetail(GameInfo(StringTable().translate(keyName).c_str(), tmp));
     }
     else
-        AddServerDetail(GameInfo(*StringTable().translate(keyName), *StringTable().translate("mp_si_no")));
+        AddServerDetail(GameInfo(StringTable().translate(keyName).c_str(), StringTable().translate("mp_si_no").c_str()));
 }
 
 void CServerList::AddTimeKey(void* s, const char* keyName, const char* format, const char* suffix, int k)
@@ -254,21 +254,21 @@ void CServerList::AddTimeKey(void* s, const char* keyName, const char* format, c
     if (browser().GetInt(s, k))
     {
         string256 tmp;
-        xr_sprintf(tmp, format, browser().GetFloat(s, k), *StringTable().translate(suffix));
-        AddServerDetail(GameInfo(*StringTable().translate(keyName), tmp));
+        xr_sprintf(tmp, format, browser().GetFloat(s, k), StringTable().translate(suffix).c_str());
+        AddServerDetail(GameInfo(StringTable().translate(keyName).c_str(), tmp));
     }
     else
-        AddServerDetail(GameInfo(*StringTable().translate(keyName), *StringTable().translate("mp_si_no")));
+        AddServerDetail(GameInfo(StringTable().translate(keyName).c_str(), StringTable().translate("mp_si_no").c_str()));
 }
 
 void CServerList::AddString(const char* key, const char* value)
 {
-    AddServerDetail(GameInfo(*StringTable().translate(key), value));
+    AddServerDetail(GameInfo(StringTable().translate(key).c_str(), value));
 }
 
 void CServerList::AddStringSt(const char* key, const char* value)
 {
-    AddServerDetail(GameInfo(*StringTable().translate(key), *StringTable().translate(value)));
+    AddServerDetail(GameInfo(StringTable().translate(key).c_str(), StringTable().translate(value).c_str()));
 }
 
 void CServerList::FillUpDetailedServerInfo()
@@ -868,8 +868,8 @@ void CServerList::SrvInfo2LstSrvInfo(const ServerInfo* pServerInfo)
     m_itemInfo.info.address = address.c_str();
     m_itemInfo.info.map = pServerInfo->m_SessionName;
     m_itemInfo.info.game = GameTypeToStringEx(pServerInfo->m_GameType, true);
-    m_itemInfo.info.players.printf("%d/%d", pServerInfo->m_ServerNumPlayers, pServerInfo->m_ServerMaxPlayers);
-    m_itemInfo.info.ping.printf("%d", pServerInfo->m_Ping);
+    xr_sprintf(m_itemInfo.info.players, "%d/%d", pServerInfo->m_ServerNumPlayers, pServerInfo->m_ServerMaxPlayers);
+    xr_sprintf(m_itemInfo.info.ping, "%d", pServerInfo->m_Ping);
     m_itemInfo.info.version = pServerInfo->m_ServerVersion;
     m_itemInfo.info.icons.pass = pServerInfo->m_bPassword;
     m_itemInfo.info.icons.dedicated = pServerInfo->m_bDedicated;

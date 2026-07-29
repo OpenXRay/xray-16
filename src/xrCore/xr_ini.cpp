@@ -455,24 +455,45 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
             R_ASSERT(path && path[0]);
             if (_GetItem(str, 1, inc_name, '"'))
             {
-                string_path fn;
-                strconcat(sizeof fn, fn, path, inc_name);
-                if (!allow_include_func || allow_include_func(fn))
+                string_path fn, inc_path, folder;
+                strconcat(sizeof(fn), fn, path, inc_name);
+                _splitpath(fn, inc_path, folder, 0, 0);
+                xr_strcat(inc_path, sizeof(inc_path), folder);
+
+                const auto loadFile = [&](const string_path _fn, const string_path name)
                 {
-                    IReader* I = FS.r_open(fn);
-#ifndef XR_PLATFORM_WINDOWS // XXX: replace with runtime check for case-sensitivity
-                    if (I == nullptr)
+                    if (!allow_include_func || allow_include_func(_fn))
                     {
-                        xr_fs_nostrlwr(inc_name);
-                        strconcat(fn, path, inc_name);
-                        I = FS.r_open(fn);
-                    }
+                        IReader* I = FS.r_open(_fn);
+#ifndef XR_PLATFORM_WINDOWS // XXX: replace with runtime check for case-sensitivity
+                        if (I == nullptr)
+                        {
+                            xr_fs_nostrlwr(inc_name);
+                            strconcat(fn, path, inc_name);
+                            I = FS.r_open(fn);
+                        }
 #endif
-                    R_ASSERT3(I, "Can't find include file:", inc_name);
-                    const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);
-                    Load(I, inc_path.c_str(), allow_include_func);
-                    FS.r_close(I);
+                        R_ASSERT3(I, "Can't find include file:", name);
+                        Load(I, inc_path, allow_include_func);
+                        FS.r_close(I);
+                    }
+                };
+
+                if (strstr(inc_name, "*.ltx"))
+                {
+                    FS_FileSet fset;
+                    FS.file_list(fset, inc_path, FS_ListFiles, inc_name);
+
+                    for (FS_FileSet::iterator it = fset.begin(); it != fset.end(); it++)
+                    {
+                        LPCSTR _name = it->name.c_str();
+                        string_path _fn;
+                        strconcat(sizeof(_fn), _fn, inc_path, _name);
+                        loadFile(_fn, _name);
+                    }
                 }
+                else
+                    loadFile(fn, inc_name);
             }
         }
         else if (str[0] && str[0] == '[') // new section ?
@@ -622,6 +643,15 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
 void CInifile::save_as(IWriter& writer, bool bcheck) const
 {
     string4096 temp, val;
+    for (const auto& include : m_includes)
+    {
+        strconcat(temp, "#include \"", include.c_str(), "\"");
+        writer.w_string(temp);
+    }
+
+    if (!m_includes.empty())
+        writer.w_string(" ");
+
     for (auto r_it = DATA.begin(); r_it != DATA.end(); ++r_it)
     {
         xr_sprintf(temp, sizeof temp, "[%s]", (*r_it)->Name.c_str());
@@ -938,6 +968,11 @@ bool CInifile::r_line(const shared_str& S, int L, pcstr* N, pcstr* V) const { re
 //--------------------------------------------------------------------------------------------------------
 // Write functions
 //--------------------------------------------------------------------------------------
+void CInifile::w_include(cpcstr include)
+{
+    m_includes.emplace_back(include);
+}
+
 void CInifile::w_string(pcstr S, pcstr L, pcstr V, pcstr comment)
 {
     R_ASSERT(!m_flags.test(eReadOnly));
@@ -1109,6 +1144,7 @@ void CInifile::w_fvector4(pcstr S, pcstr L, const Fvector4& V, pcstr comment)
 }
 
 void CInifile::w_bool(pcstr S, pcstr L, bool V, pcstr comment) { w_string(S, L, V ? "on" : "off", comment); }
+
 void CInifile::remove_line(pcstr S, pcstr L)
 {
     R_ASSERT(!m_flags.test(eReadOnly));
@@ -1120,6 +1156,16 @@ void CInifile::remove_line(pcstr S, pcstr L)
         R_ASSERT(A != data.Data.end() && xr_strcmp(A->first.c_str(), L) == 0);
         data.Data.erase(A);
     }
+}
+
+void CInifile::remove_include(cpcstr include)
+{
+    const auto it = std::find_if(m_includes.begin(), m_includes.end(), [&](const xr_string& incl)
+    {
+        return xr_strcmp(incl.c_str(), include) == 0;
+    });
+    if (it != m_includes.end())
+        m_includes.erase(it);
 }
 
 template<>

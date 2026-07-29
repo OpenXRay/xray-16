@@ -436,6 +436,10 @@ void D3D12Backend::QueryCapabilities() {
     m_capabilities.bindlessTextures = true;
     m_capabilities.maxBindlessResources = MAX_BINDLESS_TEXTURES;
     m_capabilities.shaderModel = 60;  // SM6.0 for D3D12
+    m_capabilities.drawIndirectCount = true;
+    m_capabilities.multiDrawIndirect = true;
+    m_capabilities.descriptorIndexing = true;
+    m_capabilities.shaderDrawParameters = true;
 
     // Check for mesh shaders
     D3D12_FEATURE_DATA_D3D12_OPTIONS7 options7 = {};

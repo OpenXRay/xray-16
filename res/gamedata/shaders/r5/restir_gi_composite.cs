@@ -1,14 +1,23 @@
-#include "common.h"
 #include "rt_common.h"
 #include "shared/pbr_brdf.h"
+#include "shared/basecolor_pack.h"
+#include "shared/nrd_helpers.h"
+#include "shared/surface_marks.h"
 #include "restir_gi_common.h"
+#include "rt_irradiance_cache.h"
 
 cbuffer CompositeParams : register(b5) {
     float4x4 g_InvViewProj;
     float4 g_CameraPos;
     float2 g_ScreenSize;
     float g_GIIntensity;
-    uint g_Pad;
+    uint g_CacheSize;
+    float4 g_FogParams;
+    float4 g_FogColor;
+    float g_CacheCellSize;
+    uint g_CacheMaxAge;
+    uint g_FrameIndex;
+    float g_Pad;
 };
 
 Texture2D<float4> t_DirectLighting : register(t0);
@@ -17,9 +26,19 @@ Texture2D<float4> t_ReservoirB : register(t2);
 Texture2D<float> t_Depth : register(t3);
 Texture2D<float4> t_BaseColor : register(t5);
 Texture2D<float4> t_SceneColorIn : register(t6);
+Texture2D<float4> t_WorldPos : register(t7);
 Texture2D<float4> t_Normal : register(t8);
+Texture2D<float4> t_NoisySpecular : register(t9);
+Texture2D<float4> t_ClassifyWorldPos : register(t10);
+Texture2D<float4> t_SpecReservoirA : register(t11);
+Texture2D<float4> t_SpecReservoirB : register(t12);
+Texture2D<float> t_ParticleOpacity : register(t13);
+SamplerState s_LinearClamp : register(s0);
 
 RWTexture2D<float4> u_SceneColor : register(u0);
+RWTexture2D<float4> u_NoisyDiffuse : register(u1);
+RWTexture2D<float> u_HitDist : register(u2);
+RWStructuredBuffer<IrradianceCacheEntry> u_IrradianceCache : register(u3);
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchID : SV_DispatchThreadID)
@@ -29,43 +48,111 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth <= 0.0 || depth >= 0.9) {
+    if (depth <= 0.0) {
         u_SceneColor[pixel] = t_SceneColorIn.Load(int3(pixel, 0));
+        u_NoisyDiffuse[pixel] = 0;
+        u_HitDist[pixel] = 0;
+        return;
+    }
+
+    float guideMark = t_WorldPos.Load(int3(pixel, 0)).w;
+    float classifyMark = t_ClassifyWorldPos.Load(int3(pixel, 0)).w;
+    if (SkipRtSurfLighting(classifyMark, guideMark)) {
+        u_SceneColor[pixel] = t_SceneColorIn.Load(int3(pixel, 0));
+        u_NoisyDiffuse[pixel] = 0;
+        u_HitDist[pixel] = 0;
         return;
     }
 
     float3 direct = t_DirectLighting.Load(int3(pixel, 0)).rgb;
+    float4 specSample = t_NoisySpecular.Load(int3(pixel, 0));
 
     GIReservoir r = UnpackReservoir(
         t_ReservoirA.Load(int3(pixel, 0)),
         t_ReservoirB.Load(int3(pixel, 0))
     );
+    GIReservoir specR = UnpackReservoir(
+        t_SpecReservoirA.Load(int3(pixel, 0)),
+        t_SpecReservoirB.Load(int3(pixel, 0))
+    );
 
-    float3 indirect = 0;
-    if (IsReservoirValid(r) && r.W > 0) {
-        float2 giUV = (float2(pixel) + 0.5) / g_ScreenSize;
-        float4 giClip = float4(giUV.x * 2.0 - 1.0, 1.0 - giUV.y * 2.0, depth, 1.0);
-        float4 giWorld = mul(g_InvViewProj, giClip);
-        float3 worldPos = giWorld.xyz / giWorld.w;
-        float4 normalData = t_Normal.Load(int3(pixel, 0));
-        float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
+    float3 worldPos = t_WorldPos.Load(int3(pixel, 0)).xyz;
+    float4 normalData = t_Normal.Load(int3(pixel, 0));
+    float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
+    float3 N = normalize(normalData.xyz);
+    float roughness = max(normalData.w, MIN_ROUGHNESS);
+    float3 albedo = max(baseColorData.rgb, 0.0);
+    float metallic = UnpackMetallicFromBaseA(baseColorData.a);
+    float3 F0 = CalculateF0(albedo, metallic);
+    float3 V = normalize(g_CameraPos.xyz - worldPos);
+    float3 Fenv = NRD_EnvironmentTerm_Rtg(F0, abs(dot(N, V)), roughness);
 
-        float3 N = normalize(normalData.xyz);
-        float roughness = abs(normalData.w);
-        float3 albedo = baseColorData.rgb;
-        float metallic = baseColorData.a;
-
+    float3 diffIrradiance = 0;
+    float hitDist = 0;
+    bool weakRes = !(IsReservoirValid(r) && r.W > 1e-5 && metallic < 0.999);
+    if (!weakRes) {
         float3 wi = normalize(r.samplePos - worldPos);
         float cosTheta = max(dot(N, wi), 0);
-        float3 F0 = CalculateF0(albedo, metallic);
         float3 kD = (1.0 - F_Schlick(cosTheta, F0)) * (1.0 - metallic);
         float3 brdfCos = kD * albedo / PI * cosTheta;
 
-        indirect = r.Lo * brdfCos * r.W;
-        indirect = min(indirect, RESTIR_MAX_RADIANCE);
-        indirect *= g_GIIntensity;
+        diffIrradiance = r.Lo * brdfCos * r.W;
+        diffIrradiance = min(diffIrradiance, RESTIR_MAX_RADIANCE);
+        hitDist = length(r.samplePos - worldPos);
+        if (Luminance(diffIrradiance) < 1e-4)
+            weakRes = true;
+    }
+    if (weakRes && metallic < 0.999)
+    {
+        float3 cached = QueryIrradianceCacheRW(
+            u_IrradianceCache, worldPos, g_CacheCellSize, g_CacheSize, g_FrameIndex, g_CacheMaxAge);
+        float3 kD = (1.0 - metallic);
+        float3 floorGi = cached * kD * albedo / PI;
+        float mixW = IsReservoirValid(r) && r.W > 0 ? 0.55 : 1.0;
+        diffIrradiance = max(diffIrradiance, floorGi * mixW);
+    }
+    if (hitDist < 1e-3)
+        hitDist = 0;
+    diffIrradiance *= g_GIIntensity;
+
+    float3 specIrradiance = max(specSample.rgb, 0.0) * g_GIIntensity;
+    if (IsReservoirValid(specR) && specR.W > 0) {
+        float3 fromRes = min(specR.Lo * Fenv * specR.W, RESTIR_MAX_RADIANCE) * g_GIIntensity;
+        specIrradiance = lerp(specIrradiance, fromRes, 0.85);
+        if (hitDist < 1e-3)
+            hitDist = length(specR.samplePos - worldPos);
+    }
+    if (specSample.a > 1e-3 && hitDist < 1e-3)
+        hitDist = specSample.a;
+
+    diffIrradiance = min(diffIrradiance, RESTIR_MAX_RADIANCE);
+    specIrradiance = min(specIrradiance, RESTIR_MAX_RADIANCE);
+    {
+        float dLum = max(Luminance(direct), 0.04);
+        float maxDiff = dLum * 10.0 + 0.35;
+        float diffLum = Luminance(diffIrradiance);
+        if (diffLum > maxDiff)
+            diffIrradiance *= maxDiff / diffLum;
     }
 
-    float3 finalColor = direct + indirect;
-    u_SceneColor[pixel] = float4(finalColor, 1.0);
+    float giAo = 1.0;
+    if (hitDist > 0.35 && hitDist < 3.0)
+        giAo = saturate(0.72 + hitDist * 0.09);
+
+    float2 opacityUV = (float2(pixel) + 0.5) / g_ScreenSize;
+    float particleOcc = saturate(t_ParticleOpacity.SampleLevel(s_LinearClamp, opacityUV, 0));
+    float particleAtten = 1.0 - 0.7 * particleOcc;
+    giAo *= particleAtten;
+    direct *= lerp(1.0, particleAtten, 0.45);
+
+    u_NoisyDiffuse[pixel] = float4(diffIrradiance * giAo, 1.0);
+    u_HitDist[pixel] = hitDist;
+
+    float3 ambientBase = t_SceneColorIn.Load(int3(pixel, 0)).rgb;
+    float3 lit = direct + (diffIrradiance + specIrradiance) * giAo;
+    float dist = length(worldPos - g_CameraPos.xyz);
+    float fog = saturate(dist * g_FogParams.w + g_FogParams.x);
+    fog = saturate(fog * lerp(1.0, 1.12, saturate(g_GIIntensity)));
+    lit *= (1.0 - fog);
+    u_SceneColor[pixel] = float4(ambientBase + lit, 1.0);
 }

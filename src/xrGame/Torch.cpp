@@ -18,6 +18,8 @@
 #include "ActorEffector.h"
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
+#include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/ShadersExternalData.h"
 
 constexpr pcstr TORCH_DEFINITION = "torch_definition";
 static const float TORCH_INERTION_CLAMP = PI_DIV_6;
@@ -39,8 +41,10 @@ CTorch::CTorch()
 
     light_render->set_type(IRender_Light::SPOT);
     light_render->set_shadow(true);
+    light_render->set_hud_mode(true);
     light_omni->set_type(IRender_Light::POINT);
     light_omni->set_shadow(false);
+    light_omni->set_hud_mode(true);
 
     // Disabling shift by x and z axes for 1st render,
     // because we don't have dynamic lighting in it.
@@ -514,6 +518,8 @@ void CNightVisionEffector::Start(const shared_str& sect, CActor* pA, bool play_s
 {
     m_pActor = pA;
     AddEffector(m_pActor, effNightvision, sect);
+    if (g_pGamePersistent && g_pGamePersistent->m_pGShaderConstants)
+        g_pGamePersistent->m_pGShaderConstants->m_blender_mode.x = 1.f;
     if (play_sound)
     {
         PlaySounds(eStartSound);
@@ -535,6 +541,8 @@ void CNightVisionEffector::Stop(const float factor, bool play_sound)
         m_sounds.StopSound("NightVisionOnSnd");
         m_sounds.StopSound("NightVisionIdleSnd");
     }
+    if (g_pGamePersistent && g_pGamePersistent->m_pGShaderConstants)
+        g_pGamePersistent->m_pGShaderConstants->m_blender_mode.x = 0.f;
 }
 
 bool CNightVisionEffector::IsActive()

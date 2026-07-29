@@ -69,7 +69,22 @@ Ivector vpack(const Fvector& src)
 
 CRenderTarget::CRenderTarget()
 {
-    return;
+    im_noise_time = 1.f;
+    im_noise_shift_w = 0;
+    im_noise_shift_h = 0;
+    param_blur = 0.f;
+    param_gray = 0.f;
+    param_duality_h = 0.f;
+    param_duality_v = 0.f;
+    param_noise = 0.f;
+    param_noise_scale = 1.f;
+    param_noise_fps = 25.f;
+    param_color_base = color_rgba(127, 127, 127, 0);
+    param_color_gray = color_rgba(85, 85, 85, 0);
+    param_color_add.set(0.f, 0.f, 0.f);
+    param_color_map_influence = 0.f;
+    param_color_map_interpolate = 0.f;
+    m_bHasActiveVolumetric = false;
 }
 
 CRenderTarget::~CRenderTarget() {}

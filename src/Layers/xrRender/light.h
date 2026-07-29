@@ -159,7 +159,9 @@ public:
     void gi_generate();
     void xform_calc();
     void Export(light_Package& dest);
+    void EnsureOmniparts();
     void set_attenuation_params(float a0, float a1, float a2, float fo);
+    [[nodiscard]] float get_LOD() const;
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
     light();

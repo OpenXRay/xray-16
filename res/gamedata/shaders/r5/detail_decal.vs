@@ -18,6 +18,10 @@ struct GPUSlotData
 	uint packed_palette_01;
 	uint packed_palette_23;
 	float hemi;
+	float sun;
+	float _pad0;
+	float _pad1;
+	float _pad2;
 };
 
 static const float PACK_MAX_SCALE = 4.0;
@@ -65,11 +69,13 @@ cbuffer DetailGlobals : register(b3)
 	float grass_blade_height;
 	uint build_details_index;
 	uint build_details_pbr_index;
+	uint grass_vein_index;
+	uint _pad0, _pad1, _pad2;
 };
 
-StructuredBuffer<uint> visible_indices : register(t33);
-StructuredBuffer<DetailModelGPU> detail_models : register(t35);
-StructuredBuffer<DecalPulledVertex> decal_vertices : register(t36);
+StructuredBuffer<uint> visible_indices : register(t39);
+StructuredBuffer<DetailModelGPU> detail_models : register(t60);
+StructuredBuffer<DecalPulledVertex> decal_vertices : register(t61);
 StructuredBuffer<InstanceData> all_instances : register(t37);
 StructuredBuffer<GPUSlotData> slot_data : register(t38);
 
@@ -104,7 +110,9 @@ v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 	rotated.y = local_pos.y;
 	rotated.z = local_pos.x * s + local_pos.z * c;
 
-	float4 world_pos = float4(rotated + raw.pos, 1.0);
+	float3 world_pos = rotated + raw.pos;
+	world_pos.y += 0.02;
+	float3 N = float3(0, 1, 0);
 
 	float2 uv = float2(v.u, v.v);
 
@@ -120,7 +128,7 @@ v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 
 	float slot_hemi = slot_data[slot_idx].hemi;
 	float hemi = abs(slot_hemi);
-	float sun = sign(slot_hemi) * 0.25 + 0.25;
+	float sun = saturate(slot_data[slot_idx].sun);
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh = float4(uv, hemi, sun);
@@ -128,9 +136,10 @@ v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 	O.tcdh = uv;
 #endif
 
-	O.position = float4(world_pos.xyz, hemi);
-	O.N = float3(0, 1, 0);
-	O.hpos = mul(g_detail_VP, world_pos);
+	O.position = float4(world_pos, hemi);
+	O.N = N;
+	O.sunOcclusion = sun;
+	O.hpos = mul(g_detail_VP, float4(world_pos, 1.f));
 
 	return O;
 }

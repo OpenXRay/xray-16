@@ -1,0 +1,156 @@
+#define SM_6_0
+
+SamplerState smp_nofilter : register(s0);
+SamplerState smp_linear   : register(s1);
+
+Texture2D g_SSR    : register(t0);
+Texture2D g_Depth  : register(t1);
+Texture2D g_Normal : register(t2);
+
+cbuffer SSRBlurParams : register(b0)
+{
+    float2 texelSize;
+    float  blurIntensity;
+    float  blurKernel;
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float Lum(float3 c)
+{
+    return dot(max(c, 0.0), float3(0.2126, 0.7152, 0.0722));
+}
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float4 center = g_SSR.SampleLevel(smp_nofilter, I.uv, 0);
+    float centerZ = g_Depth.SampleLevel(smp_nofilter, I.uv, 0).x;
+    if (center.a < 0.0015)
+        return float4(0, 0, 0, 0);
+    if (centerZ <= 1e-7)
+        return float4(0, 0, 0, 0);
+
+    float4 nC = g_Normal.SampleLevel(smp_nofilter, I.uv, 0);
+    float3 Nc = normalize(nC.xyz + 1e-5);
+    float roughness = saturate(nC.w);
+    float gloss = saturate(1.0 - roughness);
+    float conf = saturate(center.a);
+    float cLum = Lum(center.rgb);
+
+    float m1 = 0.0;
+    float m2 = 0.0;
+    float mW = 0.0;
+    float nMin = 1e10;
+    float nMax = -1e10;
+    [unroll]
+    for (int y0 = -1; y0 <= 1; ++y0)
+    {
+        [unroll]
+        for (int x0 = -1; x0 <= 1; ++x0)
+        {
+            float4 s0 = g_SSR.SampleLevel(smp_nofilter, I.uv + float2(x0, y0) * texelSize, 0);
+            if (s0.a < 0.0015)
+                continue;
+            float l0 = Lum(s0.rgb);
+            float ww0 = saturate(s0.a * 3.0);
+            m1 += l0 * ww0;
+            m2 += l0 * l0 * ww0;
+            mW += ww0;
+            nMin = min(nMin, l0);
+            nMax = max(nMax, l0);
+        }
+    }
+    float meanL = mW > 1e-4 ? m1 / mW : cLum;
+    float varL = mW > 1e-4 ? max(m2 / mW - meanL * meanL, 0.0) : 0.0;
+    float sigmaL = sqrt(varL);
+    float noisy = saturate(sigmaL / max(meanL + 0.04, 1e-3) * 2.2);
+    float wetHint = saturate((0.45 - roughness) * 3.5);
+
+    float needBlur = saturate(blurIntensity * 1.2) * lerp(1.25, 0.5, gloss * gloss);
+    needBlur = max(needBlur, noisy * 0.95);
+    needBlur = max(needBlur, saturate(1.1 - conf * 1.35));
+    needBlur = max(needBlur, wetHint * 0.35 * saturate(1.0 - conf));
+    float radius = lerp(1.0, 3.8, needBlur);
+    float depthSigma = lerp(140.0, 380.0, gloss);
+    float normalSigma = lerp(5.0, 18.0, gloss);
+    float lumSigma = lerp(0.08, 0.22, needBlur);
+
+    float3 sum = 0.0.xxx;
+    float wsum = 0.0;
+    float aSum = 0.0;
+    float neighborLumSum = 0.0;
+    float neighborW = 0.0;
+    int validN = 0;
+
+    int k = clamp((int)blurKernel, 2, 6);
+    float maxDist2 = float(k * k) + 0.1;
+    [loop]
+    for (int i = -k; i <= k; ++i)
+    {
+        [loop]
+        for (int j = -k; j <= k; ++j)
+        {
+            float dist2 = float(i * i + j * j);
+            if (dist2 > maxDist2)
+                continue;
+            float2 uv = I.uv + float2(i, j) * texelSize * radius;
+            float4 s = g_SSR.SampleLevel(smp_nofilter, uv, 0);
+            if (s.a < 0.0015)
+                continue;
+            float z = g_Depth.SampleLevel(smp_nofilter, uv, 0).x;
+            float dz = abs(z - centerZ);
+            if (dz > 0.007)
+                continue;
+            float3 Ns = normalize(g_Normal.SampleLevel(smp_nofilter, uv, 0).xyz + 1e-5);
+            float nd = saturate(dot(Nc, Ns));
+            if (nd < 0.62)
+                continue;
+            float sLum = Lum(s.rgb);
+            float dl = abs(sLum - cLum);
+            float wz = exp(-dz * depthSigma);
+            float wn = pow(nd, normalSigma);
+            float ws = exp(-0.12 * dist2);
+            float wl = exp(-dl / max(lumSigma + sigmaL * 0.75, 1e-3));
+            float w = wz * wn * ws * wl * saturate(s.a * 2.8);
+            if (i == 0 && j == 0)
+                w *= lerp(0.18, 0.4, gloss * gloss);
+            sum += s.rgb * w;
+            aSum += s.a * w;
+            wsum += w;
+            if (!(i == 0 && j == 0))
+            {
+                neighborLumSum += sLum * w;
+                neighborW += w;
+                validN++;
+            }
+        }
+    }
+
+    if (wsum < 1e-4)
+        return float4(center.rgb * 0.3, center.a * 0.2);
+
+    float3 blurred = sum / wsum;
+    float blurA = saturate(aSum / wsum);
+    float nLum = neighborW > 1e-4 ? (neighborLumSum / neighborW) : meanL;
+
+    float spike = saturate((cLum - nLum * 1.15) / max(nLum + 0.035, 1e-3));
+    spike = max(spike, saturate((cLum - Lum(blurred) * 1.25) * 2.0));
+    spike = max(spike, saturate((cLum - nMax) * 3.0));
+    float iso = saturate(1.0 - float(validN) / 22.0);
+    float kill = saturate(spike * 1.7 + iso * (1.0 - conf) * 1.15 + noisy * 0.35);
+
+    float3 cleaned = lerp(center.rgb, blurred, max(kill, 0.68));
+    cleaned = lerp(cleaned, blurred, saturate(needBlur * 0.95));
+
+    float maxKeep = lerp(nLum, meanL, 0.5) * lerp(1.7, 1.1, kill) + 0.025;
+    float cl = Lum(cleaned);
+    cleaned *= rcp(1.0 + max(cl - maxKeep, 0.0) * 5.0);
+    cleaned = clamp(cleaned, 0.0.xxx, (nMax * 1.15 + 0.03).xxx);
+
+    float sharpMix = saturate(gloss * gloss * 0.4 + conf * 0.1 - kill - needBlur * 0.55 - wetHint * 0.15);
+    float3 outRgb = lerp(cleaned, blurred, 1.0 - sharpMix * 0.25);
+    float outA = lerp(blurA, conf, 0.15) * (1.0 - kill * 0.7);
+    outA = max(outA, blurA * 0.6);
+    outA *= lerp(1.0, 0.92, noisy * (1.0 - conf));
+    return float4(outRgb, saturate(outA));
+}

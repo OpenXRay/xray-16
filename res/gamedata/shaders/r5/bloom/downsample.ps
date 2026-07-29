@@ -1,0 +1,29 @@
+// bloom/downsample.ps — Dual Kawase downsample
+#define SM_6_0
+Texture2D g_Color : register(t0);
+SamplerState smp_rtlinear : register(s0);
+
+cbuffer BloomParams : register(b0)
+{
+    float2 texelSize; // 1/srcSize
+    float2 _pad;
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float2 uv = saturate(I.uv);
+    float2 o = texelSize;
+    float3 c = 0;
+    c += g_Color.SampleLevel(smp_rtlinear, uv, 0).rgb * 0.25;
+    c += g_Color.SampleLevel(smp_rtlinear, uv + float2(-o.x, -o.y), 0).rgb * 0.125;
+    c += g_Color.SampleLevel(smp_rtlinear, uv + float2(+o.x, -o.y), 0).rgb * 0.125;
+    c += g_Color.SampleLevel(smp_rtlinear, uv + float2(-o.x, +o.y), 0).rgb * 0.125;
+    c += g_Color.SampleLevel(smp_rtlinear, uv + float2(+o.x, +o.y), 0).rgb * 0.125;
+    c += g_Color.SampleLevel(smp_rtlinear, uv + float2(-o.x * 2, 0), 0).rgb * 0.0625;
+    c += g_Color.SampleLevel(smp_rtlinear, uv + float2(+o.x * 2, 0), 0).rgb * 0.0625;
+    c += g_Color.SampleLevel(smp_rtlinear, uv + float2(0, -o.y * 2), 0).rgb * 0.0625;
+    c += g_Color.SampleLevel(smp_rtlinear, uv + float2(0, +o.y * 2), 0).rgb * 0.0625;
+    return float4(c, 1.0);
+}

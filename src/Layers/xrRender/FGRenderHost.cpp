@@ -66,7 +66,7 @@ void FGRenderHost::ResizeBackend(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight)
         return;
 
     int w, h;
-    SDL_GetWindowSize(hWnd, &w, &h);
+    SDL_GetWindowSizeInPixels(hWnd, &w, &h);
     GEnv.Backend->ResizeSwapChain(static_cast<u32>(w), static_cast<u32>(h));
     std::tie(dwWidth, dwHeight) = GEnv.Backend->GetBackBufferSize();
 }

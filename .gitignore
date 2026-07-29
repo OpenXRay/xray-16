@@ -8,7 +8,18 @@
 # exclude binaries and temporary files
 [Bb]in/
 [Bb]uild*/
+bin-rafx/
 cmake_builds/
+
+# Local RAFX checkouts / scratch (not vendored for this branch)
+Externals/rafx/
+Externals/rafx-proj/
+.tmp_classic_sun/
+
+# Local WIP / machine-specific (not for the framegraph branch)
+framegraph_docs/STATUS.md
+.DS_Store
+**/.DS_Store
 
 # User-specific files
 *.user
@@ -23,3 +34,7 @@ cmake_builds/
 
 # exclude doxygen output
 doc/doxygen/html/*
+
+# Screen Space Shaders reference
+refs/ssfx/
+ScreenSpaceShaders_Update23_5.zip

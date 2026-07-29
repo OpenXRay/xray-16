@@ -11,6 +11,7 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
+#include "shared/wmark.h"
 
 // UnifiedVertex format (48 bytes):
 //   Position:  float3    at offset  0 (12 bytes)
@@ -42,6 +43,8 @@ struct VS_OUTPUT
     float3 tangent  : TEXCOORD3;
     float3 bitangent: TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    float hemi      : TEXCOORD6;  // Vertex hemisphere (normal.a)
+    float2 lmUV     : TEXCOORD7;  // Lightmap UV (texcoord1)
 };
 
 // ═══════════════════════════════════════════════════════
@@ -87,25 +90,33 @@ VS_OUTPUT main(VS_INPUT input)
     float3 tangentUnpacked = UnpackNormal(input.tangent);
     float3 binormalUnpacked = UnpackNormal(input.binormal);
 
-    // Transform position
     float4 worldPos = mul(worldMatrix, float4(input.position.xyz, 1.0));
     output.worldPos = worldPos.xyz;
+    float3x3 worldMatrix3x3 = (float3x3)worldMatrix;
+    float3 Nworld = normalize(mul(worldMatrix3x3, normalUnpacked));
     float3 clipPos = worldPos.xyz;
-    if (g_Materials[materialID].flags & MAT_FLAG_ALPHA_BLEND)
+    const uint matFlags = g_Materials[materialID].flags;
+    if (matFlags & MAT_FLAG_MULTIPLY)
+        clipPos = wmark_shift(worldPos.xyz, Nworld).xyz;
+    else if (matFlags & MAT_FLAG_ALPHA_BLEND)
         clipPos += (eye_position - clipPos) * 0.002;
     output.position = mul(m_VP, float4(clipPos, 1.0));
 
-    // Transform normal/tangent to world space
-    float3x3 worldMatrix3x3 = (float3x3)worldMatrix;
-    output.normal = normalize(mul(worldMatrix3x3, normalUnpacked));
+    output.normal = Nworld;
     output.tangent = normalize(mul(worldMatrix3x3, tangentUnpacked));
     output.bitangent = normalize(mul(worldMatrix3x3, binormalUnpacked));
 
     // UVs are pre-unpacked in UnifiedVertex format - pass through directly
     output.texcoord = input.texcoord;
+    output.lmUV = input.texcoord1;
 
     // Pass material ID to pixel shader
     output.materialID = materialID;
+
+    if (instanceData.flags & 0x8u)
+        output.hemi = -1.0;
+    else
+        output.hemi = input.normal.a;
 
     return output;
 }

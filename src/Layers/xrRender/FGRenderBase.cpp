@@ -13,6 +13,7 @@
 #include "xrEngine/IRenderBackend.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
+#include "Upscaling/StreamlineDLSS.h"
 
 #include <SDL3/SDL.h>
 
@@ -185,7 +186,15 @@ void FGRenderBase::End()
     if (GEnv.Backend)
     {
         GEnv.Backend->EndFrame();
-        GEnv.Backend->Present(psDeviceFlags.test(rsVSync));
+        const bool vsync = psDeviceFlags.test(rsVSync);
+        nvrhi::ITexture* fgInterp = nullptr;
+        nvrhi::ITexture* fgReal = nullptr;
+        if (Streamline_TakeFgPresent(fgInterp, fgReal) &&
+            GEnv.Backend->PresentFrameGeneration(fgInterp, fgReal))
+        {
+            return;
+        }
+        GEnv.Backend->Present(vsync);
     }
 }
 
@@ -251,84 +260,13 @@ void FGRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 using namespace xray::render::pbr;
 void FGRenderBase::ConvertLegacyAssetsToPBR()
 {
-    if (ps_r4_use_pbr == 0)
-        return;
-
-    if (m_pbrConversionThread.joinable())
-        return;
-
-    Msg("~ [PBR] PBR rendering enabled, checking texture conversion...");
-
-    m_pbrConversionThread = std::thread([this]
-    {
-        ConvertLegacyAssetsToPBRImpl();
-        ConversionProgress::Get().EndJob();
-    });
 }
 
 void FGRenderBase::RenderPBRConversionUI()
 {
-    RenderConversionProgressUI();
 }
 
 void FGRenderBase::ConvertLegacyAssetsToPBRImpl()
 {
-    TextureScanConfig scanConfig;
-    scanConfig.texture_roots = {"$game_textures$"};
-    scanConfig.recursive = true;
-    scanConfig.include_levels = true;
-
-    TextureInventory inventory = BuildTextureInventory(scanConfig);
-    Msg("~ [PBR] Found %d legacy texture sets", static_cast<int>(inventory.assets.size()));
-
-    PBRConversionParams params;
-    params.generate_mipmaps = true;
-    params.default_metallic = 0.0f;
-    params.default_roughness = 0.5f;
-    params.default_ao = 1.0f;
-
-    bool needsConversion = !VerifyPBROutputs(inventory, params);
-
-    if (needsConversion)
-    {
-        Msg("~ [PBR] Starting texture conversion (outputs missing)...");
-        ConversionProgress::Get().BeginJob();
-
-        PBRConversionStats stats;
-        bool success = ConvertTexturesToPBR(inventory, params, stats, nullptr);
-
-        if (success)
-        {
-            Msg("~ [PBR] Conversion complete: %d converted, %d skipped, %d failed",
-                stats.textures_converted, stats.textures_skipped, stats.textures_failed);
-        }
-        else
-        {
-            Msg("! [PBR] Conversion failed!");
-        }
-    }
-    else
-    {
-        Msg("~ [PBR] Textures already converted, skipping conversion.");
-    }
-
-    Msg("~ [PBR] Checking for PBR texture consolidation...");
-    ConsolidationStats consolidationStats;
-    if (ConsolidatePBRTextures("$game_textures$", consolidationStats, nullptr))
-    {
-        if (consolidationStats.textures_consolidated > 0)
-        {
-            Msg("~ [PBR] Consolidation complete: %d packed, %d files deleted",
-                consolidationStats.textures_consolidated, consolidationStats.files_deleted);
-        }
-        else
-        {
-            Msg("~ [PBR] No textures needed consolidation.");
-        }
-    }
-    else
-    {
-        Msg("! [PBR] Consolidation had failures: %d failed", consolidationStats.textures_failed);
-    }
 }
 }

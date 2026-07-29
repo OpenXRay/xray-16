@@ -92,13 +92,13 @@ void generate_story_ids(STORY_PAIRS& result, _id_type INVALID_ID, LPCSTR section
     {
         const shared_str& temp = Ini->r_string_wb(section_name, N);
 
-        R_ASSERT3(!strchr(*temp, ' '), invalid_id_description, *temp);
-        R_ASSERT2(xr_strcmp(*temp, INVALID_ID_STRING), invalid_id_redefinition);
+        R_ASSERT3(!strchr(temp.c_str(), ' '), invalid_id_description, temp.c_str());
+        R_ASSERT2(xr_strcmp(temp.c_str(), INVALID_ID_STRING), invalid_id_redefinition);
 
         for (const auto& story : result)
-            R_ASSERT3(story.first != temp, duplicated_id_description, *temp);
+            R_ASSERT3(story.first != temp, duplicated_id_description, temp.c_str());
 
-        result.emplace_back(*temp, atoi(N));
+        result.emplace_back(temp.c_str(), atoi(N));
         ++k;
     }
 
@@ -302,7 +302,7 @@ void CALifeSimulator__release(CALifeSimulator* self, CSE_Abstract* object, bool)
 
 LPCSTR get_level_name(const CALifeSimulator* self, int level_id)
 {
-    LPCSTR result = *ai().game_graph().header().level((GameGraph::_LEVEL_ID)level_id).name();
+    LPCSTR result = ai().game_graph().header().level((GameGraph::_LEVEL_ID)level_id).name().c_str();
     return (result);
 }
 
@@ -523,7 +523,7 @@ void CALifeSimulator::script_register(lua_State* luaState)
         STORY_PAIRS::const_iterator I = story_ids.begin();
         STORY_PAIRS::const_iterator E = story_ids.end();
         for (; I != E; ++I)
-            instance.enum_("_story_ids")[luabind::value(*(*I).first, (*I).second)];
+            instance.enum_("_story_ids")[luabind::value((*I).first.c_str(), (*I).second)];
 
         luabind::module(luaState)[instance];
     }
@@ -543,7 +543,7 @@ void CALifeSimulator::script_register(lua_State* luaState)
         SPAWN_STORY_PAIRS::const_iterator I = spawn_story_ids.begin();
         SPAWN_STORY_PAIRS::const_iterator E = spawn_story_ids.end();
         for (; I != E; ++I)
-            instance.enum_("_spawn_story_ids")[luabind::value(*(*I).first, (*I).second)];
+            instance.enum_("_spawn_story_ids")[luabind::value((*I).first.c_str(), (*I).second)];
 
         luabind::module(luaState)[instance];
     }

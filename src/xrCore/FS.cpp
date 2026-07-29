@@ -75,7 +75,10 @@ void VerifyPath(pcstr path)
     string1024 tmp;
     for (int i = 0; path[i]; i++)
     {
-        if (path[i] != _DELIMITER || i == 0)
+        // Engine paths use '\'; callers may also pass '/'. Split on both so nested
+        // cache dirs like shaders_cache_fg/vk/ao/ssao.ps create intermediates on POSIX.
+        const char c = path[i];
+        if ((c != _DELIMITER && c != '/') || i == 0)
             continue;
         CopyMemory(tmp, path, i);
         tmp[i] = 0;
@@ -115,7 +118,6 @@ bool file_handle_internal(pcstr file_name, size_t& size, int& file_handle)
 
 void* FileDownload(pcstr file_name, const int& file_handle, size_t& file_size)
 {
-    VERIFY(file_size != 0);
     void* buffer = xr_malloc(file_size);
 
     const auto r_bytes = _read(file_handle, buffer, file_size);

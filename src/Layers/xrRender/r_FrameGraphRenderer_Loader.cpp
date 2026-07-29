@@ -19,7 +19,6 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "Layers/xrRender/FGDetailManager.h"
-#include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
 #include "Layers/xrRender/Light_DB.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/r__sector.h"
@@ -97,16 +96,10 @@ void FrameGraphRenderer::level_Load(IReader* fs)
             *delim = 0;
             xr_strcpy(n_tlist, delim + 1);
 
-            // Extract first texture name
-            string256 firstTexture;
-            xr_strcpy(firstTexture, n_tlist);
-            if (pstr comma = strchr(firstTexture, ','))
-                *comma = 0;  // Truncate at first comma
-
-            // D3D12: Compile NVRHI shaders directly (NO legacy ref_shader!)
-            if (true) {
-                CompileLevelShader(i, n_sh, firstTexture);
-            }
+            // Keep the full classic list "base[,lmap#N_1[,lmap#N_2]]" — consumers
+            // that need a single texture strip commas themselves (MaterialCache),
+            // and the lmap slots are required for baked static lightmaps.
+            CompileLevelShader(i, n_sh, n_tlist);
         }
         chunk->close();
     }
@@ -144,9 +137,6 @@ void FrameGraphRenderer::level_Load(IReader* fs)
             if (detailMgr && detailMgr->Load()) {
                 detailMgr->BakeHeightmap();
                 detailMgr->LoadHeightmapTexture(GetRenderDevice()->GetNVRHIDevice());
-                pbr::PBRConversionParams pbrParams;
-                pbrParams.generate_mipmaps = true;
-                pbr::ConvertSingleTextureToPBR("$level$", "build_details.dds", pbrParams);
                 detailMgr->LoadBuildDetailsTexture(GetRenderDevice()->GetNVRHIDevice());
                 detailMgr->ComputeSlotAABBs();
                 detailMgr->CreateGPUBuffers(GetRenderDevice()->GetNVRHIDevice());
@@ -164,14 +154,15 @@ void FrameGraphRenderer::level_Load(IReader* fs)
     g_pGamePersistent->LoadTitle("st_loading_sectors_portals");
     LoadSectors(fs);
 
-    // HOM - Skip if using FrameGraph renderer (GPU Hi-Z culling replaces CPU HOM)
-    if (!true)
+    // HOM - classic occlusion map (GPU Hi-Z complements, does not replace)
+    if (!strstr(Core.Params, "-no_hom"))
     {
         m_HOM.Load();
+        m_HOM.Enable();
     }
     else
     {
-        Msg("* [FrameGraph] Skipping HOM load - using GPU Hi-Z culling instead");
+        Msg("* [FrameGraph] Skipping HOM load (-no_hom)");
     }
 
     // Lights
@@ -196,53 +187,11 @@ void FrameGraphRenderer::CompileLevelShader(u32 shaderID, const char* shaderName
     compiled.shaderName = shaderName;
     compiled.textureName = textureName;
 
-    // Use the CRender's ShaderLoader instance
-    if (!GEnv.Render->GetShaderLoader()) {
-        Msg("! [ERROR] ShaderLoader not available for shader: %s", shaderName);
-        return;
-    }
-
-    // ═══════════════════════════════════════════════════
-    //  COMPILE VERTEX SHADER
-    // ═══════════════════════════════════════════════════
-    auto vsResult = GEnv.Render->GetShaderLoader()->LoadVertexShader(shaderName, "main");
-
-    if (vsResult.handle) {
-        compiled.vsHandle = vsResult.handle;
-        // Move ownership of reflection data
-        compiled.vsReflection.reset(vsResult.reflection);
-        vsResult.reflection = nullptr;  // Prevent double deletion
-    } else {
-        Msg("! [ERROR] Failed to compile VS for shader: %s", shaderName);
-        return;
-    }
-
-    // ═══════════════════════════════════════════════════
-    //  COMPILE PIXEL SHADER
-    // ═══════════════════════════════════════════════════
-    auto psResult = GEnv.Render->GetShaderLoader()->LoadPixelShader(shaderName, "main");
-
-    if (psResult.handle) {
-        compiled.psHandle = psResult.handle;
-        // Move ownership of reflection data
-        compiled.psReflection.reset(psResult.reflection);
-        psResult.reflection = nullptr;  // Prevent double deletion
-    } else {
-        Msg("! [ERROR] Failed to compile PS for shader: %s", shaderName);
-        return;
-    }
-
-    // ═══════════════════════════════════════════════════
-    //  GET MATERIAL INFO (from MaterialSystem)
-    // ═══════════════════════════════════════════════════
+    // FrameGraph draws level geometry via bindless_forward / VariantPSOCache.
+    // Level chunk names (default, def_shaders\def_vertex, flora\leaf_wave, …) are
+    // blender keys — they are not files under shaders/r5/. Keep names + material
+    // flags for GetCompiledShaderNames / MaterialSystem; do not try to compile them.
     compiled.materialInfo = MaterialSystem::Instance().GetMaterialInfo(shaderName);
-
-    Msg("* Compiled shader %u: %s (VS=%p, PS=%p, alphaTest=%d, transparent=%d)",
-        shaderID, shaderName,
-        compiled.vsHandle.Get(),
-        compiled.psHandle.Get(),
-        compiled.materialInfo.alphaTest,
-        compiled.materialInfo.transparent);
 }
 
 // ═══════════════════════════════════════════════════
@@ -252,80 +201,10 @@ void FrameGraphRenderer::PrecompileLevelPSOs()
 {
     ZoneScopedN("Precompile Level PSOs");
 
-    auto* materialCache = GetMaterialCache();
-    if (!materialCache) {
-        Msg("! [ERROR] MaterialCache not available - skipping PSO precompilation");
-        return;
-    }
-
-    // ═══════════════════════════════════════════════════
-    //  HARDCODE FRAMEBUFFER FORMATS (matches ForwardColorPassSetup)
-    // ═══════════════════════════════════════════════════
-    nvrhi::Format colorFormat = nvrhi::Format::RGBA16_FLOAT;  // HDR
-    nvrhi::Format depthFormat = nvrhi::Format::D32;
-
-    u32 totalPSOs = 0;
-
-    for (u32 shaderID = 0; shaderID < m_CompiledLevelShaders.size(); ++shaderID) {
-        auto& compiled = m_CompiledLevelShaders[shaderID];
-
-        if (!compiled.vsHandle || !compiled.psHandle)
-            continue;  // Skip failed compilations
-
-        // Update progress
-        float progress = float(shaderID) / float(m_CompiledLevelShaders.size());
-        g_pGamePersistent->LoadTitle("st_precompiling_pso", progress);
-
-        // ═══════════════════════════════════════════════════
-        //  FIND COMPATIBLE VERTEX FORMATS
-        // ═══════════════════════════════════════════════════
-        xr_vector<u32> compatibleFormats;
-        for (u32 dcl_id = 0; dcl_id < BufferPool.nDC.size(); ++dcl_id) {
-            if (IsVertexFormatCompatible(BufferPool.nDC[dcl_id], compiled.vsReflection.get())) {
-                compatibleFormats.push_back(dcl_id);
-            }
-        }
-
-        if (compatibleFormats.empty()) {
-            Msg("! Shader %u (%s) has no compatible vertex formats!",
-                shaderID, compiled.shaderName.c_str());
-            continue;
-        }
-
-        // ═══════════════════════════════════════════════════
-        //  PRECOMPILE PSOs FOR EACH FORMAT + PASS TYPE
-        // ═══════════════════════════════════════════════════
-        for (u32 dcl_id : compatibleFormats) {
-            // 1. Forward Color PSO (always needed)
-            if (CreatePrecompiledPSO(
-                shaderID,
-                dcl_id,
-                RenderPassType::ForwardColor,
-                colorFormat,
-                depthFormat,
-                materialCache
-            )) {
-                totalPSOs++;
-            }
-
-            // 2. Depth Prepass PSO (for opaque + alpha-tested)
-            if (!compiled.materialInfo.transparent) {
-                if (CreatePrecompiledPSO(
-                    shaderID,
-                    dcl_id,
-                    RenderPassType::DepthPrepass,
-                    nvrhi::Format::UNKNOWN,  // No color output
-                    depthFormat,
-                    materialCache
-                )) {
-                    totalPSOs++;
-                }
-            }
-        }
-    }
-
-    Msg("* Precompiled %u PSOs for %u shaders across %u vertex formats",
-        totalPSOs, m_CompiledLevelShaders.size(), BufferPool.nDC.size());
+    // Bindless materials create PSOs through VariantPSOCache at first use.
+    // Per-blender VS/PS handles are intentionally not compiled (see CompileLevelShader).
+    Msg("* Precompiled 0 PSOs for %u shaders (bindless path — VariantPSOCache)",
+        m_CompiledLevelShaders.size());
 }
 
 void FrameGraphRenderer::level_Unload()

@@ -342,29 +342,21 @@ TextureHandle TextureManager::CreateTexture(
         nvrhiDesc.clearValue = nvrhi::Color(0.0f);
     }
 
-    // Create texture
     meta.nvrhiTexture = m_device->GetNVRHIDevice()->createTexture(nvrhiDesc);
 
-    if (meta.nvrhiTexture) {
-        meta.state = TextureState::Resident;
-        meta.residentMips = desc.mipLevels;
-        meta.requestedMips = desc.mipLevels;
-
-        // Calculate memory
-        meta.memoryUsed = desc.CalculateMemorySize();
-        m_stats.texturesResident++;
-        m_stats.totalMemoryUsed += meta.memoryUsed;
-
-        // Msg("~ [TextureManager] Created runtime texture '%s': %ux%ux%u, %.2f MB",
-        //     desc.debugName.c_str(),
-        //     desc.width, desc.height, desc.depth,
-        //     meta.memoryUsed / (1024.0f * 1024.0f));
-    } else {
+    if (!meta.nvrhiTexture) {
         Msg("! [TextureManager] Failed to create NVRHI texture '%s'", desc.debugName.c_str());
+        FreeHandle(handle);
+        return TextureHandle{};
     }
 
+    meta.state = TextureState::Resident;
+    meta.residentMips = desc.mipLevels;
+    meta.requestedMips = desc.mipLevels;
+    meta.memoryUsed = desc.CalculateMemorySize();
+    m_stats.texturesResident++;
+    m_stats.totalMemoryUsed += meta.memoryUsed;
     m_stats.texturesTotal++;
-
     return handle;
 }
 
@@ -406,27 +398,21 @@ nvrhi::ITexture* TextureManager::GetNVRHITexture(TextureHandle handle) {
 
     TextureMetadata& meta = m_textures[handle.index];
 
-    // ═══════════════════════════════════════════════════
-    //  AUTO-TOUCH FOR LRU
-    // ═══════════════════════════════════════════════════
-
-    meta.lastAccessTime = 0.0f;  // Reset LRU timer
-    meta.accessCount++;
-
-    // Mark video as active for this frame (enables decoding)
     if (meta.videoTextureData) {
         meta.videoActiveThisFrame = true;
     }
 
-    // ═══════════════════════════════════════════════════
-    //  AUTO-RELOAD IF EVICTED
-    // ═══════════════════════════════════════════════════
+    if (meta.state == TextureState::Failed)
+        return nullptr;
 
     if (meta.state == TextureState::Unloaded || meta.state == TextureState::Evicted) {
-        // Msg("! [TextureManager] ⚠️ Accessing evicted texture: %s - reloading...",
-        //     meta.filePath.c_str());
+        if (meta.state == TextureState::Evicted && meta.lastAccessTime < 1.5f)
+            return nullptr;
         LoadTextureSync(handle);
     }
+
+    meta.lastAccessTime = 0.0f;
+    meta.accessCount++;
 
     return meta.nvrhiTexture.Get();
 }
@@ -564,81 +550,62 @@ bool TextureManager::EnforceMemoryBudget(u64 requiredBytes) {
 bool TextureManager::EvictTextures(u64 bytesNeeded) {
     u64 bytesFreed = 0;
 
-    // ═══════════════════════════════════════════════════
-    //  BUILD EVICTION CANDIDATES (LRU + Priority)
-    // ═══════════════════════════════════════════════════
-
     struct EvictionCandidate {
         TextureHandle handle;
-        float score;  // Higher = evict first
+        float score;
         u64 memoryUsed;
 
         bool operator<(const EvictionCandidate& other) const {
-            return score > other.score;  // Descending order
+            return score > other.score;
         }
     };
 
-    xr_vector<EvictionCandidate> candidates;
-
-    for (u32 i = 0; i < m_textures.size(); i++) {
-        const TextureMetadata& meta = m_textures[i];
-
-        if (!meta.isAlive) continue;
-        if (!meta.CanEvict()) continue;  // Check priority, refCount
-
-        // Calculate eviction score
-        // Higher score = more likely to evict
+    auto scoreMeta = [](const TextureMetadata& meta) -> float {
         float score = 0.0f;
-
-        // Factor 1: Time since last access (LRU)
         score += meta.lastAccessTime * 10.0f;
-
-        // Factor 2: Priority (low priority = evict first)
         score += (float)meta.priority * 100.0f;
-
-        // Factor 3: Access count (less used = evict first)
         score -= (float)meta.accessCount * 0.1f;
-
-        // Factor 4: Memory used (larger = prefer to evict for space)
         score += (float)meta.memoryUsed / (1024.0f * 1024.0f);
+        return score;
+    };
 
-        EvictionCandidate candidate;
-        candidate.handle = TextureHandle(i, meta.generation);
-        candidate.score = score;
-        candidate.memoryUsed = meta.memoryUsed;
+    auto collectAndEvict = [&](bool force) {
+        xr_vector<EvictionCandidate> candidates;
+        for (u32 i = 0; i < m_textures.size(); i++) {
+            const TextureMetadata& meta = m_textures[i];
+            if (!meta.isAlive) continue;
+            if (force) {
+                if (!meta.CanForceEvict()) continue;
+            } else {
+                if (!meta.CanEvict()) continue;
+            }
 
-        candidates.push_back(candidate);
-    }
-
-    // Sort by score
-    std::sort(candidates.begin(), candidates.end());
-
-    // Msg("! [TextureManager] Found %u eviction candidates", candidates.size());
-
-    // ═══════════════════════════════════════════════════
-    //  EVICT UNTIL WE HAVE ENOUGH SPACE
-    // ═══════════════════════════════════════════════════
-
-    for (const auto& candidate : candidates) {
-        if (bytesFreed >= bytesNeeded) {
-            break;  // Freed enough
+            EvictionCandidate candidate;
+            candidate.handle = TextureHandle(i, meta.generation);
+            candidate.score = scoreMeta(meta);
+            candidate.memoryUsed = meta.memoryUsed;
+            candidates.push_back(candidate);
         }
 
-        const TextureMetadata* meta = GetMetadata(candidate.handle);
+        std::sort(candidates.begin(), candidates.end());
 
-        // Msg("!   Evicting: %s (score=%.2f, %llu KB)",
-        //     meta->filePath.c_str(),
-        //     candidate.score,
-        //     candidate.memoryUsed / 1024);
+        for (const auto& candidate : candidates) {
+            if (bytesFreed >= bytesNeeded)
+                break;
 
-        EvictTextureInternal(candidate.handle);
+            const TextureMetadata* meta = GetMetadata(candidate.handle);
+            if (!meta || meta->state != TextureState::Resident)
+                continue;
 
-        bytesFreed += candidate.memoryUsed;
-    }
+            const u64 before = meta->memoryUsed;
+            EvictTextureInternal(candidate.handle);
+            bytesFreed += before;
+        }
+    };
 
-    // Msg("! [TextureManager] Freed %llu MB (needed %llu MB)",
-    //     bytesFreed / (1024 * 1024),
-    //     bytesNeeded / (1024 * 1024));
+    collectAndEvict(false);
+    if (bytesFreed < bytesNeeded)
+        collectAndEvict(true);
 
     return bytesFreed >= bytesNeeded;
 }
@@ -649,24 +616,19 @@ void TextureManager::EvictTextureInternal(TextureHandle handle) {
     TextureMetadata& meta = m_textures[handle.index];
 
     if (meta.state != TextureState::Resident) {
-        return;  // Already evicted
+        return;
     }
 
-    // Release NVRHI texture
     if (meta.nvrhiTexture) {
-        // NVRHI will destroy when ref count reaches zero
         meta.nvrhiTexture = nullptr;
     }
 
-    // Update state
     meta.state = TextureState::Evicted;
     meta.residentMips = 0;
+    meta.lastAccessTime = 0.0f;
 
-    // Update memory tracking
     m_memoryUsed -= meta.memoryUsed;
     meta.memoryUsed = 0;
-
-    // Msg("! [TextureManager] Evicted: %s", meta.filePath.c_str());
 }
 
 // ═══════════════════════════════════════════════════
@@ -768,12 +730,9 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
 
     TextureMetadata& meta = m_textures[handle.index];
 
-    // Already loaded?
-    if (meta.state == TextureState::Resident) {
+    if (meta.state == TextureState::Resident || meta.state == TextureState::Failed)
         return;
-    }
 
-    // Mark as loading
     meta.state = TextureState::Loading;
 
     // ═══════════════════════════════════════════════════
@@ -786,7 +745,7 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     DDSData ddsData;
     if (!DDSLoader::LoadFromFile(meta.filePath.c_str(), ddsData)) {
         Msg("! [TextureManager] Failed to load texture: %s", meta.filePath.c_str());
-        meta.state = TextureState::Unloaded;
+        meta.state = TextureState::Failed;
         return;
     }
 
@@ -817,12 +776,13 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     u64 requiredMemory = ddsData.totalDataSize;
 
     if (!EnforceMemoryBudget(requiredMemory)) {
-        Msg("! [TextureManager] ❌ Cannot load %s - out of memory! (need %llu MB, have %llu / %llu MB used)",
+        Msg("! [TextureManager] Cannot load %s - out of memory! (need %llu MB, have %llu / %llu MB used)",
             meta.filePath.c_str(),
             requiredMemory / (1024 * 1024),
             m_memoryUsed / (1024 * 1024),
             m_memoryBudget / (1024 * 1024));
-        meta.state = TextureState::Unloaded;
+        meta.state = TextureState::Evicted;
+        meta.lastAccessTime = 0.0f;
         return;
     }
 
@@ -852,11 +812,23 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
             break;
     }
 
-    // Create texture (no initial data - we'll upload separately)
     fg::TextureHandle deviceHandle = m_device->CreateTexture(deviceDesc, nullptr);
     if (!deviceHandle.IsValid()) {
-        Msg("! [TextureManager] Failed to create NVRHI texture: %s", meta.filePath.c_str());
-        meta.state = TextureState::Unloaded;
+        const u64 evictTarget = std::max<u64>(requiredMemory, 64ull * 1024ull * 1024ull);
+        if (EvictTextures(evictTarget)) {
+            if (nvrhi::IDevice* nvDev = m_device->GetNVRHIDevice()) {
+                nvDev->runGarbageCollection();
+            }
+            deviceHandle = m_device->CreateTexture(deviceDesc, nullptr);
+        }
+    }
+    if (!deviceHandle.IsValid()) {
+        Msg("! [TextureManager] Failed to create NVRHI texture: %s (used %llu / %llu MB)",
+            meta.filePath.c_str(),
+            m_memoryUsed / (1024 * 1024),
+            m_memoryBudget / (1024 * 1024));
+        meta.state = TextureState::Evicted;
+        meta.lastAccessTime = 0.0f;
         return;
     }
 
@@ -1054,6 +1026,7 @@ const char* TextureStateToString(TextureState state) {
         case TextureState::Resident: return "Resident";
         case TextureState::Evicting: return "Evicting";
         case TextureState::Evicted: return "Evicted";
+        case TextureState::Failed: return "Failed";
         default: return "Unknown";
     }
 }

@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "Profiler.h"
 
+#include <thread>
+#include <chrono>
+
 namespace xray::profiler
 {
 
@@ -14,6 +17,13 @@ void Initialize()
 
 void Shutdown()
 {
+#if XRAY_TRACY_ENABLED
+    // Stop Tracy worker before static teardown — otherwise libc++ throws
+    // "mutex lock failed: Invalid argument" when joining a destroyed mutex.
+    tracy::GetProfiler().RequestShutdown();
+    for (int i = 0; i < 200 && !tracy::GetProfiler().HasShutdownFinished(); ++i)
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+#endif
     // Note: CPUProfiler singleton cleanup happens at program exit
     Msg("* [Profiler] Shutdown");
 }
@@ -32,6 +42,9 @@ void FrameEnd()
         return;
 
     CPUProfiler::Instance().FrameEnd();
+#if XRAY_TRACY_ENABLED
+    FrameMark;
+#endif
 }
 
 CPUProfiler& GetCPUProfiler()

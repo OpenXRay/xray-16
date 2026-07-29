@@ -2,6 +2,32 @@
 
 namespace xray::imgui
 {
+struct ScopeID final : Noncopyable
+{
+    template <typename... Args>
+    explicit ScopeID(Args... args)
+    {
+        ImGui::PushID(std::forward<Args>(args)...);
+    }
+
+    ~ScopeID()
+    {
+        ImGui::PopID();
+    }
+};
+
+struct combo_raii
+{
+    ~combo_raii()
+    {
+        ImGui::EndCombo();
+    }
+};
+
+// Uses previous ItemID in the ID stack for the storage ID to allow
+// same ID for multiple items without causing ID conflicts
+bool CascadingCollapsingHeader(cpcstr label, ImGuiTreeNodeFlags flags = 0);
+
 inline void ItemHelp(const char* desc, bool use_separate_marker = true, bool on_same_line = true)
 {
     if (use_separate_marker)
@@ -24,6 +50,22 @@ inline bool MenuItemWithShortcut(pcstr label, EGameActions shortcut, const char*
 {
     cpcstr key_name = GetActionBinding(shortcut);
     const bool result = ImGui::MenuItem(label, key_name, selected);
+    if (desc)
+        ItemHelp(desc);
+    return result;
+}
+
+template <typename T>
+inline bool Selector(cpcstr label, T& current_item, cpcstr items[], const int items_count, cpcstr desc = nullptr)
+{
+    VERIFY2(items, "There's no point in using Selector without text items.");
+    int selected = static_cast<int>(current_item);
+    clamp(selected, 0, items_count - 1);
+    const bool result = ImGui::SliderInt(label, &selected, 0, items_count - 1, items ? items[selected] : "%d", ImGuiSliderFlags_NoInput);
+    if (result)
+        current_item = static_cast<T>(selected);
+    if (items_count == 2 && ImGui::IsItemDeactivated() && !ImGui::IsItemDeactivatedAfterEdit())
+        current_item = static_cast<T>(!selected);
     if (desc)
         ItemHelp(desc);
     return result;

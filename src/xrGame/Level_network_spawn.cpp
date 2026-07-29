@@ -18,8 +18,8 @@ void CLevel::cl_Process_Spawn(NET_Packet& P)
     P.r_stringZ(s_name);
 
     // Create DC (xrSE)
-    CSE_Abstract* E = F_entity_Create(*s_name);
-    R_ASSERT2(E, *s_name);
+    CSE_Abstract* E = F_entity_Create(s_name.c_str());
+    R_ASSERT2(E, s_name.c_str());
 
     E->Spawn_Read(P);
     if (E->s_flags.is(M_SPAWN_UPDATE))
@@ -102,7 +102,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
 
     // Client spawn
     //	T.Start		();
-    IGameObject* O = Objects.Create(*E->s_name);
+    IGameObject* O = Objects.Create(E->s_name.c_str());
 // Msg				("--spawn--CREATE: %f ms",1000.f*T.GetAsync());
 
 //	T.Start		();
@@ -112,7 +112,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
         if (!GEnv.isDedicatedServer)
             client_spawn_manager().clear(O->ID());
         Objects.Destroy(O);
-        Msg("! Failed to spawn entity '%s'", *E->s_name);
+        Msg("! Failed to spawn entity '%s'", E->s_name.c_str());
     }
     else
     {

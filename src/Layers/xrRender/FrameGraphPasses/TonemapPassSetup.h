@@ -33,11 +33,11 @@ struct TonemapPassData {
     u32 height;
     TonemapPassState* passState;
     const ExposurePassState* exposurePassState;
+    fg::RenderDevice* device = nullptr;
 };
 
 // Lambda-based tonemap pass setup
-// Converts HDR scene color (RGBA16_FLOAT) to LDR output (RGBA8_UNORM) using ACES filmic tonemap
-// Now accepts exposure texture from ExposurePass for auto-exposure
+// Converts HDR → LDR via classic CoP modified Reinhard (white=1.7) + MiddleGray exposure
 // If outputTarget is valid, writes directly to it (e.g., imported backbuffer)
 // If outputTarget is invalid, creates internal rt_Final texture
 framegraph::VirtualResourceHandle setupTonemapPass(

@@ -34,6 +34,8 @@ public:
     }
     virtual void destroy();
 
+    bool operator==(const IUIShader& other) const override;
+
     CTexture* GetBaseTexture() const;
     bool GetBaseTextureResolution(Fvector2& res) override;
     xrImTextureData GetImGuiTextureId() override;

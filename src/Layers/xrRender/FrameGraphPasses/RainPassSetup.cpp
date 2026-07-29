@@ -2,6 +2,7 @@
 #include "RainPassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/fgRainRender.h"
 
@@ -11,31 +12,53 @@ framegraph::VirtualResourceHandle setupRainPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle inputTarget,
     framegraph::VirtualResourceHandle depthTarget,
-    FGRainRender* renderer)
+    framegraph::VirtualResourceHandle worldPosTarget,
+    framegraph::VirtualResourceHandle rainSMTarget,
+    FGRainRender* renderer,
+    const Fmatrix& rainSampleVP,
+    bool rainSMValid,
+    const RainHeightmapInfo& heightmap)
 {
     using namespace framegraph;
 
+    if (!depthTarget.is_valid() || !worldPosTarget.is_valid())
+    {
+        Msg("! [RainPass] Missing depth/worldPos — skipping rain (would be unoccluded)");
+        return inputTarget;
+    }
+
     auto& passData = fg.addCallbackPass<RainPassData>(
         "Rain",
-        [inputTarget, depthTarget, renderer](FrameGraph& builder, PassHandle passHandle, RainPassData& data) {
+        [&](FrameGraph& builder, PassHandle passHandle, RainPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.renderer = renderer;
-            data.depth = passBuilder.read(depthTarget, ResourceState::DepthStencilRead);
+            data.heightmap = heightmap;
+            data.rainSampleVP = rainSampleVP;
+            data.rainSMValid = rainSMValid;
+            data.depth = passBuilder.readWrite(depthTarget, ResourceState::DepthStencilWrite);
+            data.worldPos = passBuilder.read(worldPosTarget, ResourceState::ShaderResource);
             data.output = passBuilder.readWrite(inputTarget, ResourceState::RenderTarget);
+            if (rainSMTarget.is_valid())
+                data.rainSM = passBuilder.read(rainSMTarget, ResourceState::ShaderResource);
         },
         [](const RainPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
-            if (!data.renderer || !data.renderer->HasWork()) return;
+            if (!data.renderer) return;
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            nvrhi::IDevice* nv = cmdList ? cmdList->getDevice() : nullptr;
             auto* outputRT = fg.GetPhysicalTexture(data.output);
             auto* depth    = fg.GetPhysicalTexture(data.depth);
-            if (!cmdList || !outputRT) return;
+            auto* worldPos = fg.GetPhysicalTexture(data.worldPos);
+            auto* rainSM   = data.rainSM.is_valid() ? fg.GetPhysicalTexture(data.rainSM) : nullptr;
+            if (!cmdList || !nv || !outputRT || !depth || !worldPos) return;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outputRT);
-            if (depth) fbDesc.setDepthAttachment(depth);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            fbDesc.setDepthAttachment(depth);
+            auto framebuffer = GetPassResourceCache().GetOrCreateFramebuffer("RainPass_Soft", fbDesc, nv);
+            if (!framebuffer) return;
 
-            data.renderer->Draw(cmdList, framebuffer);
+            data.renderer->SetRainShadowInputs(rainSM, data.rainSampleVP, data.rainSMValid && rainSM);
+            data.renderer->Draw(cmdList, framebuffer, worldPos, data.heightmap);
         });
 
     return passData.output;

@@ -4,6 +4,8 @@
 #include "PassResourceCache.h"
 #include "BindingLayoutBuilder.h"
 #include "ShaderCache.h"
+#include "Layers/xrRender/r2_types.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render::framegraph {
 
@@ -127,17 +129,34 @@ nvrhi::ISampler* PassResourceCache::GetShadowCmpSampler(nvrhi::IDevice* device) 
 }
 
 nvrhi::ITexture* PassResourceCache::GetDummyShadowMap(nvrhi::IDevice* device) {
-    if (!m_dummyShadowMap) {
+    if (!m_dummyShadowMap && device) {
         nvrhi::TextureDesc desc;
         desc.width = 1;
         desc.height = 1;
-        desc.arraySize = 3;
+        desc.arraySize = 16;
         desc.format = nvrhi::Format::D32;
         desc.debugName = "DummyShadowMap";
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
         desc.dimension = nvrhi::TextureDimension::Texture2DArray;
+        desc.isShaderResource = true;
+        desc.isRenderTarget = true;
+        desc.useClearValue = true;
+        desc.clearValue = nvrhi::Color(1.0f);
         m_dummyShadowMap = device->createTexture(desc);
+        if (m_dummyShadowMap) {
+            nvrhi::CommandListHandle cmd = device->createCommandList();
+            if (cmd) {
+                cmd->open();
+                for (u32 layer = 0; layer < desc.arraySize; ++layer)
+                    cmd->clearDepthStencilTexture(
+                        m_dummyShadowMap,
+                        nvrhi::TextureSubresourceSet(0, 1, layer, 1),
+                        true, 1.0f, false, 0);
+                cmd->close();
+                device->executeCommandList(cmd);
+            }
+        }
     }
     return m_dummyShadowMap;
 }
@@ -152,9 +171,143 @@ nvrhi::ITexture* PassResourceCache::GetDummyShadowMap2D(nvrhi::IDevice* device) 
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
         desc.dimension = nvrhi::TextureDimension::Texture2D;
+        desc.isShaderResource = true;
         m_dummyShadowMap2D = device->createTexture(desc);
     }
     return m_dummyShadowMap2D;
+}
+
+nvrhi::ITexture* PassResourceCache::GetDummyLocalShadowESM(nvrhi::IDevice* device) {
+    if (!m_dummyLocalShadowESM && device) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.arraySize = 4;
+        desc.format = nvrhi::Format::R16_FLOAT;
+        desc.debugName = "DummyLocalShadowESM";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.dimension = nvrhi::TextureDimension::Texture2DArray;
+        desc.isShaderResource = true;
+        m_dummyLocalShadowESM = device->createTexture(desc);
+        if (m_dummyLocalShadowESM) {
+            nvrhi::CommandListHandle cmd = device->createCommandList();
+            cmd->open();
+            uint16_t one = 0x3C00;
+            for (u32 layer = 0; layer < 4; ++layer)
+                cmd->writeTexture(m_dummyLocalShadowESM, layer, 0, &one, sizeof(one));
+            cmd->close();
+            device->executeCommandList(cmd);
+        }
+    }
+    return m_dummyLocalShadowESM;
+}
+
+nvrhi::ITexture* PassResourceCache::GetDummyContactDepth(nvrhi::IDevice* device) {
+    if (!m_dummyContactDepth && device) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.format = nvrhi::Format::R32_FLOAT;
+        desc.debugName = "DummyContactDepth";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.dimension = nvrhi::TextureDimension::Texture2D;
+        desc.isShaderResource = true;
+        m_dummyContactDepth = device->createTexture(desc);
+        if (m_dummyContactDepth) {
+            // Far depth — ContactShadow thickness test never hits
+            nvrhi::CommandListHandle cmd = device->createCommandList();
+            cmd->open();
+            float farD = 1.0f;
+            cmd->writeTexture(m_dummyContactDepth, 0, 0, &farD, sizeof(farD));
+            cmd->close();
+            device->executeCommandList(cmd);
+        }
+    }
+    return m_dummyContactDepth;
+}
+
+nvrhi::ITexture* PassResourceCache::GetDummyContactHistory(nvrhi::IDevice* device) {
+    if (!m_dummyContactHistory && device) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.format = nvrhi::Format::RGBA16_FLOAT;
+        desc.debugName = "DummyContactHistory";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.dimension = nvrhi::TextureDimension::Texture2D;
+        desc.isShaderResource = true;
+        m_dummyContactHistory = device->createTexture(desc);
+        if (m_dummyContactHistory) {
+            nvrhi::CommandListHandle cmd = device->createCommandList();
+            cmd->open();
+            // 1 = fully lit
+            float white[4] = {1.f, 0.f, 0.f, 0.f};
+            cmd->writeTexture(m_dummyContactHistory, 0, 0, white, sizeof(white));
+            cmd->close();
+            device->executeCommandList(cmd);
+        }
+    }
+    return m_dummyContactHistory;
+}
+
+void PassResourceCache::EnsureShadowBindDummies(nvrhi::IDevice* device) {
+    if (!device)
+        return;
+    GetDummyShadowMap(device);
+    GetDummyShadowMap2D(device);
+    GetDummyLocalShadowESM(device);
+    GetDummyContactDepth(device);
+    GetDummyContactHistory(device);
+}
+
+nvrhi::ITexture* PassResourceCache::GetDummyCubeMap(nvrhi::IDevice* device) {
+    if (!m_dummyCubeMap) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.format = nvrhi::Format::RGBA8_UNORM;
+        desc.dimension = nvrhi::TextureDimension::TextureCube;
+        desc.arraySize = 6;
+        desc.debugName = "DummyCubeMap";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.isShaderResource = true;
+        m_dummyCubeMap = device->createTexture(desc);
+    }
+    return m_dummyCubeMap;
+}
+
+nvrhi::ITexture* PassResourceCache::GetDummyCubeArray(nvrhi::IDevice* device) {
+    if (!m_dummyCubeArray && device) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.format = nvrhi::Format::RGBA8_UNORM;
+        desc.dimension = nvrhi::TextureDimension::TextureCubeArray;
+        desc.arraySize = 6;
+        desc.debugName = "DummyCubeArray";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.isShaderResource = true;
+        m_dummyCubeArray = device->createTexture(desc);
+    }
+    return m_dummyCubeArray;
+}
+
+nvrhi::IBuffer* PassResourceCache::GetDummyStructuredBuffer(nvrhi::IDevice* device) {
+    if (!m_dummyStructuredBuffer && device) {
+        nvrhi::BufferDesc bd;
+        bd.byteSize = sizeof(float) * 4 * 64;
+        bd.structStride = sizeof(float) * 4;
+        bd.initialState = nvrhi::ResourceStates::ShaderResource;
+        bd.keepInitialState = true;
+        bd.debugName = "DummyStructuredBuffer";
+        m_dummyStructuredBuffer = device->createBuffer(bd);
+    }
+    return m_dummyStructuredBuffer;
 }
 
 nvrhi::ISampler* PassResourceCache::GetSamplerByName(const char* smpName, nvrhi::IDevice* device)
@@ -165,8 +318,10 @@ nvrhi::ISampler* PassResourceCache::GetSamplerByName(const char* smpName, nvrhi:
         return GetLinearClampSampler(device);
     if (strstr(smpName, "smp_base") || strstr(smpName, "smp_material") || strstr(smpName, "smp_bump"))
         return GetAnisoWrapSampler(device);
-    if (strstr(smpName, "smp_shadowcmp"))
+    if (strstr(smpName, "smp_shadowcmp") || strstr(smpName, "smp_raincmp"))
         return GetShadowCmpSampler(device);
+    if (strstr(smpName, "smp_shadow_point") || strstr(smpName, "smp_shadowpoint"))
+        return GetPointClampSampler(device);
     return GetLinearWrapSampler(device);
 }
 
@@ -180,6 +335,14 @@ nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayout(
     nvrhi::IDevice* device)
 {
     u64 key = HashString(passName);
+    key = HashCombine(key, u64(desc.visibility));
+    key = HashCombine(key, u64(desc.bindings.size()));
+    for (const auto& b : desc.bindings)
+    {
+        key = HashCombine(key, u64(b.type));
+        key = HashCombine(key, u64(b.slot));
+        key = HashCombine(key, u64(b.size));
+    }
 
     auto it = m_bindingLayouts.find(key);
     if (it != m_bindingLayouts.end()) {
@@ -187,7 +350,6 @@ nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayout(
         return it->second;
     }
 
-    // Create new layout
     m_stats.layoutMisses++;
     nvrhi::BindingLayoutHandle layout = device->createBindingLayout(desc);
     if (layout) {
@@ -405,8 +567,14 @@ nvrhi::IBuffer* PassResourceCache::GetOrCreateVolatileCB(
     u64 key = HashCombine(HashString(passName), HashString(bufferName));
     auto it = m_volatileCBs.find(key);
     if (it != m_volatileCBs.end()) {
-        m_stats.bufferHits++;
-        return device->GetNativeBuffer(it->second);
+        nvrhi::IBuffer* existing = device->GetNativeBuffer(it->second);
+        if (existing && existing->getDesc().maxVersions >= maxVersions &&
+            existing->getDesc().byteSize >= byteSize)
+        {
+            m_stats.bufferHits++;
+            return existing;
+        }
+        m_volatileCBs.erase(it);
     }
     m_stats.bufferMisses++;
 
@@ -488,6 +656,11 @@ void PassResourceCache::Clear() {
     m_commonShadowCmp = nullptr;
     m_dummyShadowMap = nullptr;
     m_dummyShadowMap2D = nullptr;
+    m_dummyContactDepth = nullptr;
+    m_dummyContactHistory = nullptr;
+    m_dummyCubeMap = nullptr;
+    m_dummyCubeArray = nullptr;
+    m_dummyStructuredBuffer = nullptr;
 
     Msg("* [PassResourceCache] Cleared all caches");
 }

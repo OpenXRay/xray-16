@@ -23,6 +23,17 @@ constexpr u32 CUBE_VERTEX_COUNT = 8;
 constexpr float DEFAULT_NORMAL_THRESHOLD = 0.5f;
 constexpr u32 DECAL_FLAG_STATIC = 0;
 constexpr u32 DECAL_FLAG_SKELETON = 1;
+constexpr u32 DECAL_FLAG_MULTIPLY = 2;
+
+inline u32 ClassifyWallmarkBlend(const char* textureName)
+{
+    if (!textureName || !textureName[0])
+        return DECAL_FLAG_MULTIPLY;
+    if (strstr(textureName, "blood") || strstr(textureName, "gore") ||
+        strstr(textureName, "bleed"))
+        return 0;
+    return DECAL_FLAG_MULTIPLY;
+}
 
 struct alignas(16) GPUDecalData {
     Fmatrix worldToDecal;
@@ -43,6 +54,7 @@ struct DecalInstance {
     float creationTime;
     float ttl;
     Fvector normal;
+    u32 blendFlags = DECAL_FLAG_MULTIPLY;
 };
 
 struct SkeletonDecalInstance {
@@ -62,7 +74,8 @@ public:
     void Shutdown();
     void Clear();
 
-    void AddStaticDecal(const Fvector& pos, const Fvector& normal, float size, u32 materialID);
+    void AddStaticDecal(const Fvector& pos, const Fvector& normal, float size, u32 materialID,
+                        const char* textureName = nullptr);
     void AddSkeletonDecal(CKinematics* parent, const Fmatrix* parentXForm,
                           u16 boneID, const Fvector& localPos,
                           const Fvector& localNormal, float size, u32 materialID);

@@ -108,15 +108,40 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared
             break;
         case BlendMode::AlphaBlend:
         case BlendMode::Additive:
+            info.transparent = true;
+            if (blendInfo.alphaRef > 0)
+            {
+                info.alphaTest = true;
+                info.alphaRef = blendInfo.alphaRef;
+            }
+            else
+            {
+                info.alphaTest = false;
+                info.alphaRef = 0;
+            }
+            break;
         case BlendMode::Multiply:
         case BlendMode::Multiply2X:
-            info.alphaTest = false;
-            info.alphaRef = 0;
             info.transparent = true;
+            info.multiply = true;
+            if (blendInfo.alphaRef > 0)
+            {
+                info.alphaTest = true;
+                info.alphaRef = blendInfo.alphaRef;
+            }
+            else
+            {
+                info.alphaTest = false;
+                info.alphaRef = 0;
+            }
             break;
         }
-        if (blendInfo.strictB2F)
+        if (blendInfo.strictB2F &&
+            blendInfo.mode != BlendMode::Opaque &&
+            blendInfo.mode != BlendMode::AlphaTest)
+        {
             info.transparent = true;
+        }
         m_stats.materialsFromBlender++;
     }
 
@@ -134,6 +159,12 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared
             info.alphaRef = variant->passes[0].alphaTestRef;
         }
     }
+
+    // Water shaders are always transparent (r3 blender: SRCALPHA/INVSRCALPHA).
+    // Do not register a water.s.json until variant-partition cost is acceptable —
+    // water shading lives in bindless_forward.ps (MAT_FLAG_WATER).
+    if (strstr(shaderName, "water"))
+        info.transparent = true;
 
     m_materialCache[key] = info;
     return m_materialCache[key];
@@ -258,7 +289,7 @@ xr_string MaterialSystem::GetNormalPath(const char* textureName) const
 
 xr_string MaterialSystem::GetPBRPath(const char* textureName) const
 {
-    // Convention: texture_pbr (packed R=AO, G=Roughness, B=Metallic)
+    // Convention: texture_pbr (packed R=Metallic, G=Roughness, B=AO, A=Parallax)
     xr_string path = textureName;
     path += "_pbr";
     return path;

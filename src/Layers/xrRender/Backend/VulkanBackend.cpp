@@ -3,6 +3,8 @@
 
 #include "xrCore/Threading/TaskManager.hpp"
 
+#include <algorithm>
+
 #if defined(__APPLE__)
 #include <pthread/qos.h>
 #endif
@@ -13,6 +15,15 @@
 #include <nvrhi/validation.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
+#if defined(XRAY_USE_DLSS)
+#include "Layers/xrRender/Upscaling/StreamlineDLSS.h"
+#endif
+
+extern ENGINE_API int ps_r_dlss_fg;
+extern ENGINE_API int ps_r_upscale;
+extern ENGINE_API int ps_r_reflex;
+extern int ps_fps_limit;
+extern int ps_fps_limit_in_menu;
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -114,14 +125,20 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
     deviceDesc.instanceExtensions = instanceExts.data();
     deviceDesc.numInstanceExtensions = instanceExts.size();
 
-    const char* deviceExts[] = {
+    xr_vector<const char*> nvrhiDeviceExts = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
         VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
         VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
         VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
     };
-    deviceDesc.deviceExtensions = deviceExts;
-    deviceDesc.numDeviceExtensions = std::size(deviceExts);
+    if (m_featureRayTracing) {
+        nvrhiDeviceExts.push_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+        nvrhiDeviceExts.push_back(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+        nvrhiDeviceExts.push_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+    }
+    deviceDesc.deviceExtensions = nvrhiDeviceExts.data();
+    deviceDesc.numDeviceExtensions = nvrhiDeviceExts.size();
+    deviceDesc.bufferDeviceAddressSupported = m_featureBufferDeviceAddress;
 
     m_nvrhiVulkanDevice = nvrhi::vulkan::createDevice(deviceDesc);
     if (!m_nvrhiVulkanDevice) {
@@ -155,6 +172,11 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
     }
 
     m_asyncSubmit = strstr(Core.Params, "-async_submit") != nullptr;
+    if (m_asyncSubmit && ps_r_upscale == 2 && ps_r_dlss_fg != 0)
+    {
+        m_asyncSubmit = false;
+        Msg("! [VulkanBackend] -async_submit disabled — incompatible with DLSS-FG dual present");
+    }
     if (m_asyncSubmit) {
         m_submitRun = true;
         m_submitThread = std::thread([this] { SubmitThreadMain(); });
@@ -187,7 +209,12 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
 
     m_initialized = true;
     Msg("* [VulkanBackend] Initialized successfully");
-    Msg("*   Bindless textures: Yes (max %u)", m_capabilities.maxBindlessResources);
+    Msg("*   Bindless textures: %s (max %u)",
+        m_capabilities.bindlessTextures ? "Yes" : "No",
+        m_capabilities.maxBindlessResources);
+    Msg("*   drawIndirectCount: %s, multiDrawIndirect: %s",
+        m_capabilities.drawIndirectCount ? "Yes" : "No",
+        m_capabilities.multiDrawIndirect ? "Yes" : "No");
     return true;
 }
 
@@ -223,6 +250,7 @@ void VulkanBackend::Shutdown() {
     }
     m_nvrhiVulkanDevice = nullptr;
 
+    DestroyLatencyObjects();
     DestroySyncObjects();
     DestroySwapChain();
 
@@ -267,6 +295,10 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
     }
     xr_vector<const char*> extensions(sdlExts, sdlExts + sdlExtCount);
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#if defined(XRAY_USE_DLSS)
+    xray::render::fg::Streamline_PreInstanceInit();
+    xray::render::fg::Streamline_GetRequiredInstanceExtensions(extensions);
+#endif
 
     xr_vector<const char*> layers;
     if (enableValidation) {
@@ -330,6 +362,14 @@ bool VulkanBackend::SelectPhysicalDevice() {
             m_capabilities.id_vendor = props.vendorID;
             m_capabilities.id_device = props.deviceID;
             Msg("* [VulkanBackend] Using GPU: %s", props.deviceName);
+            VkPhysicalDeviceMemoryProperties memProps{};
+            vkGetPhysicalDeviceMemoryProperties(dev, &memProps);
+            for (u32 hi = 0; hi < memProps.memoryHeapCount; ++hi)
+            {
+                if (memProps.memoryHeaps[hi].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
+                    Msg("* [VulkanBackend] Device-local heap[%u]: %llu MB",
+                        hi, (unsigned long long)(memProps.memoryHeaps[hi].size / (1024ull * 1024ull)));
+            }
             return true;
         }
     }
@@ -340,6 +380,14 @@ bool VulkanBackend::SelectPhysicalDevice() {
     m_capabilities.id_vendor = props.vendorID;
     m_capabilities.id_device = props.deviceID;
     Msg("* [VulkanBackend] Using GPU (fallback): %s", props.deviceName);
+    VkPhysicalDeviceMemoryProperties memProps{};
+    vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memProps);
+    for (u32 hi = 0; hi < memProps.memoryHeapCount; ++hi)
+    {
+        if (memProps.memoryHeaps[hi].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
+            Msg("* [VulkanBackend] Device-local heap[%u]: %llu MB",
+                hi, (unsigned long long)(memProps.memoryHeaps[hi].size / (1024ull * 1024ull)));
+    }
     return true;
 }
 
@@ -406,6 +454,18 @@ bool VulkanBackend::CreateLogicalDevice() {
         queueCreateInfos.push_back(computeQueueInfo);
     }
 
+    u32 availExtCount = 0;
+    vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &availExtCount, nullptr);
+    xr_vector<VkExtensionProperties> availExts(availExtCount);
+    if (availExtCount)
+        vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &availExtCount, availExts.data());
+    auto hasExt = [&](const char* name) -> bool {
+        for (const auto& e : availExts)
+            if (!strcmp(e.extensionName, name))
+                return true;
+        return false;
+    };
+
     xr_vector<const char*> deviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
         VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
@@ -415,6 +475,33 @@ bool VulkanBackend::CreateLogicalDevice() {
 #if defined(XR_PLATFORM_APPLE)
     deviceExtensions.push_back("VK_KHR_portability_subset");
 #endif
+
+    bool wantRT =
+        hasExt(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) &&
+        hasExt(VK_KHR_RAY_QUERY_EXTENSION_NAME) &&
+        hasExt(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+    if (wantRT) {
+        deviceExtensions.push_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+        deviceExtensions.push_back(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+        deviceExtensions.push_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+    }
+#if defined(XRAY_USE_DLSS)
+    {
+        xr_vector<const char*> ngxDevExts;
+        xray::render::fg::Streamline_GetRequiredDeviceExtensions(m_physicalDevice, ngxDevExts);
+        for (const char* e : ngxDevExts) {
+            if (e && hasExt(e))
+                deviceExtensions.push_back(e);
+        }
+    }
+#endif
+
+    const bool wantPresentId = hasExt(VK_KHR_PRESENT_ID_EXTENSION_NAME);
+    const bool wantLowLatency2 = wantPresentId && hasExt(VK_NV_LOW_LATENCY_2_EXTENSION_NAME);
+    if (wantPresentId)
+        deviceExtensions.push_back(VK_KHR_PRESENT_ID_EXTENSION_NAME);
+    if (wantLowLatency2)
+        deviceExtensions.push_back(VK_NV_LOW_LATENCY_2_EXTENSION_NAME);
 
     VkPhysicalDeviceVulkan12Features vulkan12Features = {};
     vulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
@@ -427,6 +514,19 @@ bool VulkanBackend::CreateLogicalDevice() {
     vulkan12Features.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
     vulkan12Features.descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
     vulkan12Features.timelineSemaphore = VK_TRUE;
+    vulkan12Features.bufferDeviceAddress = VK_TRUE;
+
+    VkPhysicalDeviceAccelerationStructureFeaturesKHR asFeatures = {};
+    asFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+    asFeatures.accelerationStructure = VK_TRUE;
+
+    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = {};
+    rayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+    rayQueryFeatures.rayQuery = VK_TRUE;
+
+    VkPhysicalDevicePresentIdFeaturesKHR presentIdFeatures = {};
+    presentIdFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_ID_FEATURES_KHR;
+    presentIdFeatures.presentId = VK_TRUE;
 
     VkPhysicalDeviceSynchronization2Features sync2Features = {};
     sync2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
@@ -443,6 +543,15 @@ bool VulkanBackend::CreateLogicalDevice() {
     vulkan11Features.shaderDrawParameters = VK_TRUE;
     dynamicRenderingFeatures.pNext = &vulkan11Features;
 
+    void** featureTail = &vulkan11Features.pNext;
+    if (wantRT) {
+        vulkan11Features.pNext = &asFeatures;
+        asFeatures.pNext = &rayQueryFeatures;
+        featureTail = &rayQueryFeatures.pNext;
+    }
+    if (wantPresentId)
+        *featureTail = &presentIdFeatures;
+
     VkPhysicalDeviceFeatures2 features2 = {};
     features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features2.pNext = &vulkan12Features;
@@ -454,6 +563,8 @@ bool VulkanBackend::CreateLogicalDevice() {
     features2.features.shaderStorageImageReadWithoutFormat = VK_TRUE;
     features2.features.shaderStorageImageWriteWithoutFormat = VK_TRUE;
     features2.features.multiViewport = VK_TRUE;
+    features2.features.textureCompressionBC = VK_TRUE;
+    features2.features.imageCubeArray = VK_TRUE;
 
     VkDeviceCreateInfo deviceCreateInfo = {};
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -466,9 +577,20 @@ bool VulkanBackend::CreateLogicalDevice() {
     {
         VkPhysicalDeviceVulkan12Features sup12 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
         VkPhysicalDeviceVulkan11Features sup11 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES };
+        VkPhysicalDeviceAccelerationStructureFeaturesKHR supAS = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR };
+        VkPhysicalDeviceRayQueryFeaturesKHR supRQ = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR };
+        VkPhysicalDevicePresentIdFeaturesKHR supPresentId = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_ID_FEATURES_KHR };
         VkPhysicalDeviceFeatures2 sup2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
         sup2.pNext = &sup12;
         sup12.pNext = &sup11;
+        void** supTail = &sup11.pNext;
+        if (wantRT) {
+            sup11.pNext = &supAS;
+            supAS.pNext = &supRQ;
+            supTail = &supRQ.pNext;
+        }
+        if (wantPresentId)
+            *supTail = &supPresentId;
         vkGetPhysicalDeviceFeatures2(m_physicalDevice, &sup2);
 
 #define CLAMP12(F) do { if (vulkan12Features.F && !sup12.F) { Msg("! [VulkanBackend] vk12 feature unsupported: " #F); vulkan12Features.F = VK_FALSE; } } while(0)
@@ -481,6 +603,7 @@ bool VulkanBackend::CreateLogicalDevice() {
         CLAMP12(descriptorBindingSampledImageUpdateAfterBind);
         CLAMP12(descriptorBindingStorageBufferUpdateAfterBind);
         CLAMP12(timelineSemaphore);
+        CLAMP12(bufferDeviceAddress);
 #undef CLAMP12
 #define CLAMPF(F) do { if (features2.features.F && !sup2.features.F) { Msg("! [VulkanBackend] feature unsupported: " #F); features2.features.F = VK_FALSE; } } while(0)
         CLAMPF(samplerAnisotropy);
@@ -490,20 +613,112 @@ bool VulkanBackend::CreateLogicalDevice() {
         CLAMPF(shaderStorageImageReadWithoutFormat);
         CLAMPF(shaderStorageImageWriteWithoutFormat);
         CLAMPF(multiViewport);
+        CLAMPF(textureCompressionBC);
+        CLAMPF(imageCubeArray);
 #undef CLAMPF
+        if (!features2.features.textureCompressionBC)
+            Msg("! [VulkanBackend] textureCompressionBC unavailable — BC1-BC7 textures will fail");
         if (vulkan11Features.shaderDrawParameters && !sup11.shaderDrawParameters) {
             Msg("! [VulkanBackend] vk11 feature unsupported: shaderDrawParameters");
             vulkan11Features.shaderDrawParameters = VK_FALSE;
         }
+        if (wantRT) {
+            if (!supAS.accelerationStructure) {
+                Msg("! [VulkanBackend] accelerationStructure unsupported");
+                asFeatures.accelerationStructure = VK_FALSE;
+            }
+            if (!supRQ.rayQuery) {
+                Msg("! [VulkanBackend] rayQuery unsupported");
+                rayQueryFeatures.rayQuery = VK_FALSE;
+            }
+        }
 
-        Msg("* [VulkanBackend] vk12.drawIndirectCount = %s (device reports: %s)",
-            vulkan12Features.drawIndirectCount ? "ENABLED" : "DISABLED",
+        m_featureDrawIndirectCount = vulkan12Features.drawIndirectCount == VK_TRUE;
+        m_featureMultiDrawIndirect = features2.features.multiDrawIndirect == VK_TRUE;
+        m_featureDescriptorIndexing = vulkan12Features.descriptorIndexing == VK_TRUE;
+        m_featureShaderDrawParameters = vulkan11Features.shaderDrawParameters == VK_TRUE;
+        m_featureBufferDeviceAddress = vulkan12Features.bufferDeviceAddress == VK_TRUE;
+        m_featureRayTracing = wantRT &&
+            asFeatures.accelerationStructure == VK_TRUE &&
+            rayQueryFeatures.rayQuery == VK_TRUE &&
+            m_featureBufferDeviceAddress;
+
+        if (wantPresentId && !supPresentId.presentId)
+        {
+            Msg("! [VulkanBackend] presentId feature unsupported");
+            presentIdFeatures.presentId = VK_FALSE;
+            m_presentIdAvailable = false;
+        }
+        else
+            m_presentIdAvailable = wantPresentId && presentIdFeatures.presentId == VK_TRUE;
+        m_latencyAvailable = wantLowLatency2 && m_presentIdAvailable;
+
+        Msg("* [VulkanBackend] feature clamp summary:");
+        Msg("*   drawIndirectCount      = %s (device: %s)",
+            m_featureDrawIndirectCount ? "ENABLED" : "DISABLED",
             sup12.drawIndirectCount ? "supported" : "unsupported");
+        Msg("*   multiDrawIndirect      = %s (device: %s)",
+            m_featureMultiDrawIndirect ? "ENABLED" : "DISABLED",
+            sup2.features.multiDrawIndirect ? "supported" : "unsupported");
+        Msg("*   descriptorIndexing     = %s (device: %s)",
+            m_featureDescriptorIndexing ? "ENABLED" : "DISABLED",
+            sup12.descriptorIndexing ? "supported" : "unsupported");
+        Msg("*   shaderDrawParameters   = %s (device: %s)",
+            m_featureShaderDrawParameters ? "ENABLED" : "DISABLED",
+            sup11.shaderDrawParameters ? "supported" : "unsupported");
+        Msg("*   bufferDeviceAddress    = %s",
+            m_featureBufferDeviceAddress ? "ENABLED" : "DISABLED");
+        Msg("*   rayTracing (AS+RQ)     = %s",
+            m_featureRayTracing ? "ENABLED" : "DISABLED");
+        Msg("*   presentId              = %s",
+            m_presentIdAvailable ? "ENABLED" : "DISABLED");
+        Msg("*   lowLatency2 (Reflex)   = %s",
+            m_latencyAvailable ? "ENABLED" : "DISABLED");
+        Msg("*   runtimeDescriptorArray = %s",
+            vulkan12Features.runtimeDescriptorArray ? "ENABLED" : "DISABLED");
+        Msg("*   partiallyBound         = %s",
+            vulkan12Features.descriptorBindingPartiallyBound ? "ENABLED" : "DISABLED");
     }
 
     VkResult result = vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);
+    if (result != VK_SUCCESS && wantRT) {
+        Msg("! [VulkanBackend] vkCreateDevice failed with RT (%d), retrying without RT", result);
+        wantRT = false;
+        m_featureRayTracing = false;
+        asFeatures.accelerationStructure = VK_FALSE;
+        rayQueryFeatures.rayQuery = VK_FALSE;
+        vulkan11Features.pNext = wantPresentId ? &presentIdFeatures : nullptr;
+        deviceExtensions.clear();
+        deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+        deviceExtensions.push_back(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME);
+        deviceExtensions.push_back(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME);
+        deviceExtensions.push_back(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
+#if defined(XR_PLATFORM_APPLE)
+        deviceExtensions.push_back("VK_KHR_portability_subset");
+#endif
+#if defined(XRAY_USE_DLSS)
+        {
+            xr_vector<const char*> ngxDevExts;
+            xray::render::fg::Streamline_GetRequiredDeviceExtensions(m_physicalDevice, ngxDevExts);
+            for (const char* e : ngxDevExts) {
+                if (e && hasExt(e))
+                    deviceExtensions.push_back(e);
+            }
+        }
+#endif
+        if (wantPresentId)
+            deviceExtensions.push_back(VK_KHR_PRESENT_ID_EXTENSION_NAME);
+        if (wantLowLatency2)
+            deviceExtensions.push_back(VK_NV_LOW_LATENCY_2_EXTENSION_NAME);
+        deviceCreateInfo.enabledExtensionCount = static_cast<u32>(deviceExtensions.size());
+        deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+        result = vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);
+    }
     if (result != VK_SUCCESS) {
         Msg("! [VulkanBackend] vkCreateDevice failed: %d", result);
+        if (result == VK_ERROR_OUT_OF_DEVICE_MEMORY || result == VK_ERROR_INITIALIZATION_FAILED) {
+            Msg("! [VulkanBackend] GPU busy/OOM — kill leftover xr_3da (often Ctrl+Z stopped): pkill -9 xr_3da");
+        }
         return false;
     }
 
@@ -518,6 +733,8 @@ bool VulkanBackend::CreateLogicalDevice() {
     } else {
         Msg("* [VulkanBackend] No compute queue available (async compute disabled)");
     }
+
+    InitLatencyExtension();
 
     Msg("* [VulkanBackend] Logical device created (graphics family %u)", m_graphicsQueueFamily);
     return true;
@@ -553,48 +770,48 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
         }
     }
 
-    u32 presentModeCount = 0;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, nullptr);
-    xr_vector<VkPresentModeKHR> presentModes(presentModeCount);
-    vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, presentModes.data());
-
     const bool wantVSync = psDeviceFlags.test(rsVSync);
-    VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
-    if (!wantVSync)
-    {
-        bool hasImmediate = false, hasMailbox = false;
-        for (auto mode : presentModes)
-        {
-            if (mode == VK_PRESENT_MODE_IMMEDIATE_KHR) hasImmediate = true;
-            else if (mode == VK_PRESENT_MODE_MAILBOX_KHR) hasMailbox = true;
-        }
-        if (hasImmediate)      presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
-        else if (hasMailbox)   presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
-    }
-    Msg("* [VulkanBackend] Present mode: %s (vsync=%s)",
+    const bool wantFg = ps_r_upscale == 2 && ps_r_dlss_fg != 0;
+    m_createdWithVSync = wantVSync;
+    m_createdWithFg = wantFg;
+    const VkPresentModeKHR presentMode = SelectPresentMode(wantVSync, wantFg);
+    m_presentMode = presentMode;
+    Msg("* [VulkanBackend] Present mode: %s (vsync=%s fg=%s)",
         presentMode == VK_PRESENT_MODE_IMMEDIATE_KHR ? "IMMEDIATE" :
         presentMode == VK_PRESENT_MODE_MAILBOX_KHR   ? "MAILBOX"   : "FIFO",
-        wantVSync ? "on" : "off");
+        wantVSync ? "on" : "off",
+        wantFg ? "on" : "off");
 
     VkExtent2D extent = { width, height };
     if (surfaceCaps.currentExtent.width != UINT32_MAX)
         extent = surfaceCaps.currentExtent;
 
-    u32 imageCount = BACK_BUFFER_COUNT;
+    u32 imageCount = wantFg ? BACK_BUFFER_COUNT : 3;
     if (imageCount < surfaceCaps.minImageCount)
         imageCount = surfaceCaps.minImageCount;
+    if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR && imageCount < surfaceCaps.minImageCount + 1)
+        imageCount = surfaceCaps.minImageCount + 1;
     if (surfaceCaps.maxImageCount > 0 && imageCount > surfaceCaps.maxImageCount)
         imageCount = surfaceCaps.maxImageCount;
+    if (imageCount > BACK_BUFFER_COUNT)
+        imageCount = BACK_BUFFER_COUNT;
+
+    VkSwapchainLatencyCreateInfoNV latencyCreateInfo = {};
+    latencyCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_LATENCY_CREATE_INFO_NV;
+    latencyCreateInfo.latencyModeEnable = m_latencyAvailable ? VK_TRUE : VK_FALSE;
 
     VkSwapchainCreateInfoKHR swapchainInfo = {};
     swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    if (m_latencyAvailable)
+        swapchainInfo.pNext = &latencyCreateInfo;
     swapchainInfo.surface = m_surface;
     swapchainInfo.minImageCount = imageCount;
     swapchainInfo.imageFormat = m_swapchainFormat;
     swapchainInfo.imageColorSpace = colorSpace;
     swapchainInfo.imageExtent = extent;
     swapchainInfo.imageArrayLayers = 1;
-    swapchainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    swapchainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+        (surfaceCaps.supportedUsageFlags & (VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT));
     swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     swapchainInfo.preTransform = surfaceCaps.currentTransform;
     swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
@@ -615,6 +832,17 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     m_backBufferWidth = extent.width;
     m_backBufferHeight = extent.height;
     m_currentImageIndex = 0;
+    m_oobPresentQueueNotified = false;
+    m_appliedReflexMode = -1;
+
+    if (m_latencyAvailable)
+    {
+        const int mode = ps_r_reflex;
+        u32 intervalUs = 0;
+        if (ps_fps_limit > 0)
+            intervalUs = 1000000u / static_cast<u32>(ps_fps_limit);
+        ApplyLowLatencyMode(mode, intervalUs);
+    }
 
     Msg("* [VulkanBackend] Swapchain created: %ux%u, %u images, format %d",
         extent.width, extent.height, imageCount, m_swapchainFormat);
@@ -643,6 +871,7 @@ void VulkanBackend::CreateBackBufferTextures() {
         desc.height = m_backBufferHeight;
         desc.format = nvFormat;
         desc.isRenderTarget = true;
+        desc.isShaderResource = true;
         desc.debugName = "BackBuffer";
         desc.keepInitialState = true;
         desc.initialState = nvrhi::ResourceStates::Present;
@@ -689,6 +918,176 @@ void VulkanBackend::DestroySyncObjects() {
     }
 }
 
+VkPresentModeKHR VulkanBackend::SelectPresentMode(bool wantVSync, bool wantFg) const
+{
+    if (wantVSync)
+        return VK_PRESENT_MODE_FIFO_KHR;
+
+    u32 presentModeCount = 0;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, nullptr);
+    xr_vector<VkPresentModeKHR> presentModes(presentModeCount);
+    if (presentModeCount)
+        vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, presentModes.data());
+
+    bool hasImmediate = false, hasMailbox = false;
+    for (auto mode : presentModes)
+    {
+        if (mode == VK_PRESENT_MODE_IMMEDIATE_KHR) hasImmediate = true;
+        else if (mode == VK_PRESENT_MODE_MAILBOX_KHR) hasMailbox = true;
+    }
+
+    if (wantFg)
+        return hasMailbox ? VK_PRESENT_MODE_MAILBOX_KHR : VK_PRESENT_MODE_FIFO_KHR;
+    if (hasImmediate) return VK_PRESENT_MODE_IMMEDIATE_KHR;
+    if (hasMailbox) return VK_PRESENT_MODE_MAILBOX_KHR;
+    return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+void VulkanBackend::InitLatencyExtension()
+{
+    m_vkSetLatencySleepModeNV = nullptr;
+    m_vkLatencySleepNV = nullptr;
+    m_vkSetLatencyMarkerNV = nullptr;
+    m_vkQueueNotifyOutOfBandNV = nullptr;
+    if (!m_latencyAvailable || !m_device)
+        return;
+
+    m_vkSetLatencySleepModeNV = reinterpret_cast<PFN_vkSetLatencySleepModeNV>(
+        vkGetDeviceProcAddr(m_device, "vkSetLatencySleepModeNV"));
+    m_vkLatencySleepNV = reinterpret_cast<PFN_vkLatencySleepNV>(
+        vkGetDeviceProcAddr(m_device, "vkLatencySleepNV"));
+    m_vkSetLatencyMarkerNV = reinterpret_cast<PFN_vkSetLatencyMarkerNV>(
+        vkGetDeviceProcAddr(m_device, "vkSetLatencyMarkerNV"));
+    m_vkQueueNotifyOutOfBandNV = reinterpret_cast<PFN_vkQueueNotifyOutOfBandNV>(
+        vkGetDeviceProcAddr(m_device, "vkQueueNotifyOutOfBandNV"));
+
+    if (!m_vkSetLatencySleepModeNV || !m_vkLatencySleepNV || !m_vkSetLatencyMarkerNV)
+    {
+        Msg("! [VulkanBackend] VK_NV_low_latency2 entry points missing");
+        m_latencyAvailable = false;
+        return;
+    }
+
+    VkSemaphoreTypeCreateInfo timelineInfo = {};
+    timelineInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
+    timelineInfo.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE;
+    timelineInfo.initialValue = 0;
+    VkSemaphoreCreateInfo semInfo = {};
+    semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    semInfo.pNext = &timelineInfo;
+    if (vkCreateSemaphore(m_device, &semInfo, nullptr, &m_latencySleepSemaphore) != VK_SUCCESS)
+    {
+        Msg("! [VulkanBackend] Failed to create Reflex sleep timeline semaphore");
+        m_latencyAvailable = false;
+        m_latencySleepSemaphore = VK_NULL_HANDLE;
+        return;
+    }
+    m_latencySleepValue = 0;
+    Msg("* [VulkanBackend] NVIDIA Reflex (VK_NV_low_latency2) ready");
+}
+
+void VulkanBackend::DestroyLatencyObjects()
+{
+    if (m_device && m_latencySleepSemaphore)
+    {
+        vkDestroySemaphore(m_device, m_latencySleepSemaphore, nullptr);
+        m_latencySleepSemaphore = VK_NULL_HANDLE;
+    }
+    m_vkSetLatencySleepModeNV = nullptr;
+    m_vkLatencySleepNV = nullptr;
+    m_vkSetLatencyMarkerNV = nullptr;
+    m_vkQueueNotifyOutOfBandNV = nullptr;
+}
+
+void VulkanBackend::ApplyLowLatencyMode(int mode, u32 minIntervalUs)
+{
+    if (!m_latencyAvailable || !m_vkSetLatencySleepModeNV || !m_swapchain)
+        return;
+    if (mode < 0) mode = 0;
+    if (mode > 2) mode = 2;
+    if (mode == m_appliedReflexMode && minIntervalUs == m_appliedReflexIntervalUs)
+        return;
+
+    VkLatencySleepModeInfoNV info = {};
+    info.sType = VK_STRUCTURE_TYPE_LATENCY_SLEEP_MODE_INFO_NV;
+    info.lowLatencyMode = (mode >= 1) ? VK_TRUE : VK_FALSE;
+    info.lowLatencyBoost = (mode >= 2) ? VK_TRUE : VK_FALSE;
+    info.minimumIntervalUs = minIntervalUs;
+    const VkResult res = m_vkSetLatencySleepModeNV(m_device, m_swapchain, &info);
+    if (res != VK_SUCCESS)
+    {
+        Msg("! [VulkanBackend] vkSetLatencySleepModeNV failed: %d", static_cast<int>(res));
+        return;
+    }
+    m_appliedReflexMode = mode;
+    m_appliedReflexIntervalUs = minIntervalUs;
+}
+
+void VulkanBackend::LatencySleep()
+{
+    if (!m_latencyAvailable || !m_vkLatencySleepNV || !m_swapchain || !m_latencySleepSemaphore)
+        return;
+
+    const u64 waitValue = ++m_latencySleepValue;
+    VkLatencySleepInfoNV sleepInfo = {};
+    sleepInfo.sType = VK_STRUCTURE_TYPE_LATENCY_SLEEP_INFO_NV;
+    sleepInfo.signalSemaphore = m_latencySleepSemaphore;
+    sleepInfo.value = waitValue;
+    if (m_vkLatencySleepNV(m_device, m_swapchain, &sleepInfo) != VK_SUCCESS)
+        return;
+
+    VkSemaphoreWaitInfo waitInfo = {};
+    waitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO;
+    waitInfo.semaphoreCount = 1;
+    waitInfo.pSemaphores = &m_latencySleepSemaphore;
+    waitInfo.pValues = &waitValue;
+    vkWaitSemaphores(m_device, &waitInfo, UINT64_MAX);
+}
+
+void VulkanBackend::SetLatencyMarkerNV(VkLatencyMarkerNV marker, u64 presentId)
+{
+    if (!m_latencyAvailable || !m_vkSetLatencyMarkerNV || !m_swapchain)
+        return;
+    VkSetLatencyMarkerInfoNV info = {};
+    info.sType = VK_STRUCTURE_TYPE_SET_LATENCY_MARKER_INFO_NV;
+    info.presentID = presentId;
+    info.marker = marker;
+    m_vkSetLatencyMarkerNV(m_device, m_swapchain, &info);
+}
+
+void VulkanBackend::SetLatencyMarker(LatencyMarker marker)
+{
+    if (!m_latencyAvailable)
+        return;
+    VkLatencyMarkerNV vkMarker = VK_LATENCY_MARKER_SIMULATION_START_NV;
+    switch (marker)
+    {
+    case LatencyMarker::SimulationStart: vkMarker = VK_LATENCY_MARKER_SIMULATION_START_NV; break;
+    case LatencyMarker::SimulationEnd: vkMarker = VK_LATENCY_MARKER_SIMULATION_END_NV; break;
+    case LatencyMarker::RenderSubmitStart: vkMarker = VK_LATENCY_MARKER_RENDERSUBMIT_START_NV; break;
+    case LatencyMarker::RenderSubmitEnd: vkMarker = VK_LATENCY_MARKER_RENDERSUBMIT_END_NV; break;
+    case LatencyMarker::PresentStart: vkMarker = VK_LATENCY_MARKER_PRESENT_START_NV; break;
+    case LatencyMarker::PresentEnd: vkMarker = VK_LATENCY_MARKER_PRESENT_END_NV; break;
+    case LatencyMarker::OutOfBandPresentStart: vkMarker = VK_LATENCY_MARKER_OUT_OF_BAND_PRESENT_START_NV; break;
+    case LatencyMarker::OutOfBandPresentEnd: vkMarker = VK_LATENCY_MARKER_OUT_OF_BAND_PRESENT_END_NV; break;
+    default: return;
+    }
+    SetLatencyMarkerNV(vkMarker, m_nextPresentId);
+}
+
+void VulkanBackend::AssociateLatencyPresentId(u64 presentId)
+{
+    if (!m_latencyAvailable || !m_device)
+        return;
+    VkLatencySubmissionPresentIdNV idInfo = {};
+    idInfo.sType = VK_STRUCTURE_TYPE_LATENCY_SUBMISSION_PRESENT_ID_NV;
+    idInfo.presentID = presentId;
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.pNext = &idInfo;
+    vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+}
+
 void VulkanBackend::CreateBindlessResources() {
     Msg("* [VulkanBackend] Creating bindless resources...");
 
@@ -715,9 +1114,14 @@ void VulkanBackend::CreateBindlessResources() {
 }
 
 void VulkanBackend::QueryCapabilities() {
-    m_capabilities.bindlessTextures = true;
+    m_capabilities.bindlessTextures = m_featureDescriptorIndexing;
     m_capabilities.maxBindlessResources = MAX_BINDLESS_TEXTURES;
     m_capabilities.shaderModel = 60;
+    m_capabilities.drawIndirectCount = m_featureDrawIndirectCount;
+    m_capabilities.multiDrawIndirect = m_featureMultiDrawIndirect;
+    m_capabilities.descriptorIndexing = m_featureDescriptorIndexing;
+    m_capabilities.shaderDrawParameters = m_featureShaderDrawParameters;
+    m_capabilities.rayTracing = m_featureRayTracing;
 
     VkPhysicalDeviceProperties props;
     vkGetPhysicalDeviceProperties(m_physicalDevice, &props);
@@ -796,19 +1200,93 @@ void VulkanBackend::UnregisterBindlessTexture(u32 index) {
 }
 
 nvrhi::ITexture* VulkanBackend::GetBackBuffer() {
-    return m_backBuffers[m_currentImageIndex].Get();
+    const u32 idx = (m_currentImageIndex < BACK_BUFFER_COUNT) ? m_currentImageIndex : 0;
+    return m_backBuffers[idx].Get();
 }
 
-void VulkanBackend::Present(bool vsync) {
+void VulkanBackend::RequestSwapchainRecreate(bool fromOutOfDate)
+{
+    if (fromOutOfDate)
+    {
+        m_suboptimalAccepted.store(false, std::memory_order_relaxed);
+        m_swapchainDirty.store(true, std::memory_order_relaxed);
+        return;
+    }
+
+    // SUBOPTIMAL is still presentable. Recreate once, then ignore until OUT_OF_DATE.
+    if (m_suboptimalAccepted.load(std::memory_order_relaxed))
+        return;
+    m_swapchainDirty.store(true, std::memory_order_relaxed);
+}
+
+bool VulkanBackend::RecreateSwapchainFromSurface()
+{
+    VkSurfaceCapabilitiesKHR caps = {};
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &caps);
+
+    u32 w = m_backBufferWidth;
+    u32 h = m_backBufferHeight;
+    if (caps.currentExtent.width != UINT32_MAX)
+    {
+        w = caps.currentExtent.width;
+        h = caps.currentExtent.height;
+    }
+    else
+    {
+        w = std::clamp(w, caps.minImageExtent.width, caps.maxImageExtent.width);
+        h = std::clamp(h, caps.minImageExtent.height, caps.maxImageExtent.height);
+    }
+
+    if (w == 0 || h == 0)
+        return false;
+
+    Msg("* [VulkanBackend] Recreating swapchain: %ux%u → %ux%u",
+        m_backBufferWidth, m_backBufferHeight, w, h);
+    ResizeSwapChain(w, h);
+    m_swapchainDirty.store(false, std::memory_order_relaxed);
+    m_suboptimalAccepted.store(true, std::memory_order_relaxed);
+    return true;
+}
+
+void VulkanBackend::Present(bool /*vsync*/) {
     if (m_asyncSubmit)
         return;
+    PresentInternal(false);
+}
 
+void VulkanBackend::PresentInternal(bool outOfBand)
+{
     ZoneScopedN("VulkanBackend::Present");
 
     std::scoped_lock sc(m_swapchainMutex, m_queueMutex);
 
+    const u64 presentId = m_nextPresentId++;
+    AssociateLatencyPresentId(presentId);
+
+    if (outOfBand)
+    {
+        if (m_vkQueueNotifyOutOfBandNV && !m_oobPresentQueueNotified)
+        {
+            VkOutOfBandQueueTypeInfoNV qinfo{};
+            qinfo.sType = VK_STRUCTURE_TYPE_OUT_OF_BAND_QUEUE_TYPE_INFO_NV;
+            qinfo.queueType = VK_OUT_OF_BAND_QUEUE_TYPE_PRESENT_NV;
+            m_vkQueueNotifyOutOfBandNV(m_graphicsQueue, &qinfo);
+            m_oobPresentQueueNotified = true;
+        }
+        SetLatencyMarkerNV(VK_LATENCY_MARKER_OUT_OF_BAND_PRESENT_START_NV, presentId);
+    }
+    else
+        SetLatencyMarkerNV(VK_LATENCY_MARKER_PRESENT_START_NV, presentId);
+
+    VkPresentIdKHR presentIdInfo = {};
+    presentIdInfo.sType = VK_STRUCTURE_TYPE_PRESENT_ID_KHR;
+    presentIdInfo.swapchainCount = 1;
+    presentIdInfo.pPresentIds = &presentId;
+
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    if (m_presentIdAvailable)
+        presentInfo.pNext = &presentIdInfo;
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = &m_renderFinished[m_currentFrameIndex];
     presentInfo.swapchainCount = 1;
@@ -816,15 +1294,111 @@ void VulkanBackend::Present(bool vsync) {
     presentInfo.pImageIndices = &m_currentImageIndex;
 
     VkResult result = vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
-        Msg("* [VulkanBackend] Swapchain out of date, resize needed");
-    }
+    if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        RequestSwapchainRecreate(true);
+    else if (result == VK_SUBOPTIMAL_KHR)
+        RequestSwapchainRecreate(false);
+
+    if (outOfBand)
+        SetLatencyMarkerNV(VK_LATENCY_MARKER_OUT_OF_BAND_PRESENT_END_NV, presentId);
+    else
+        SetLatencyMarkerNV(VK_LATENCY_MARKER_PRESENT_END_NV, presentId);
 
     VkSubmitInfo fenceSubmit = {};
     fenceSubmit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     vkQueueSubmit(m_graphicsQueue, 1, &fenceSubmit, m_inFlightFence[m_currentFrameIndex]);
 
     m_currentFrameIndex = (m_currentFrameIndex + 1) % BACK_BUFFER_COUNT;
+}
+
+bool VulkanBackend::PresentFrameGeneration(nvrhi::ITexture* interpolated, nvrhi::ITexture* real)
+{
+    if (!interpolated || m_asyncSubmit)
+        return false;
+
+    ZoneScopedN("VulkanBackend::PresentFrameGeneration");
+
+    nvrhi::ITexture* proto = m_backBuffers[0].Get();
+    if (!proto || proto->getDesc().format != interpolated->getDesc().format ||
+        proto->getDesc().width != interpolated->getDesc().width ||
+        proto->getDesc().height != interpolated->getDesc().height)
+        return false;
+
+    auto* cl = m_commandLists[1].Get();
+    if (!cl)
+        return false;
+
+    const u32 realSlot = m_currentFrameIndex;
+    const u32 realImage = m_currentImageIndex;
+    const u32 interpSlot = (realSlot + 1) % BACK_BUFFER_COUNT;
+    nvrhi::ITexture* realBb =
+        (realImage < BACK_BUFFER_COUNT) ? m_backBuffers[realImage].Get() : nullptr;
+
+    {
+        ZoneScopedN("VK::FG_WaitInterpSlotFence");
+        vkWaitForFences(m_device, 1, &m_inFlightFence[interpSlot], VK_TRUE, UINT64_MAX);
+        vkResetFences(m_device, 1, &m_inFlightFence[interpSlot]);
+    }
+
+    auto reSignalInterpFence = [&]() {
+        VkSubmitInfo fenceSubmit = {};
+        fenceSubmit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        vkQueueSubmit(m_graphicsQueue, 1, &fenceSubmit, m_inFlightFence[interpSlot]);
+    };
+
+    {
+        std::lock_guard<std::mutex> sc(m_swapchainMutex);
+        VkResult result = vkAcquireNextImageKHR(
+            m_device, m_swapchain, UINT64_MAX,
+            m_imageAvailable[interpSlot], VK_NULL_HANDLE,
+            &m_currentImageIndex);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            RequestSwapchainRecreate(true);
+            m_currentImageIndex = realImage;
+            reSignalInterpFence();
+            return false;
+        }
+        if (result == VK_SUBOPTIMAL_KHR)
+            RequestSwapchainRecreate(false);
+    }
+
+    nvrhi::ITexture* interpDst = GetBackBuffer();
+    if (!interpDst)
+    {
+        m_currentImageIndex = realImage;
+        reSignalInterpFence();
+        return false;
+    }
+
+    {
+        auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        vkDevice->queueWaitForSemaphore(
+            nvrhi::CommandQueue::Graphics,
+            m_imageAvailable[interpSlot], 0);
+        vkDevice->queueSignalSemaphore(
+            nvrhi::CommandQueue::Graphics,
+            m_renderFinished[interpSlot], 0);
+
+        cl->open();
+        nvrhi::TextureSlice slice;
+        cl->copyTexture(interpDst, slice, interpolated, slice);
+        if (real && realBb && real != realBb)
+            cl->copyTexture(realBb, slice, real, slice);
+        cl->close();
+        m_nvrhiDevice->executeCommandList(cl);
+    }
+
+    m_currentFrameIndex = interpSlot;
+    PresentInternal(true);
+
+    m_currentFrameIndex = realSlot;
+    m_currentImageIndex = realImage;
+    PresentInternal(false);
+
+    return true;
 }
 
 void VulkanBackend::ResizeSwapChain(u32 width, u32 height) {
@@ -836,10 +1410,38 @@ void VulkanBackend::ResizeSwapChain(u32 width, u32 height) {
     DestroySwapChain();
     CreateSwapChain(width, height);
     CreateBackBufferTextures();
+    m_swapchainDirty.store(false, std::memory_order_relaxed);
+
+    if (m_nvrhiDevice)
+    {
+        for (int i = 0; i < 3; ++i)
+            m_nvrhiDevice->runGarbageCollection();
+    }
 }
 
 void VulkanBackend::BeginFrame() {
     ZoneScopedN("VK::BeginFrame");
+
+    const bool wantVSync = psDeviceFlags.test(rsVSync);
+    const bool wantFg = ps_r_upscale == 2 && ps_r_dlss_fg != 0;
+    if (m_asyncSubmit && wantFg)
+    {
+        FlushSubmits();
+        m_asyncSubmit = false;
+        Msg("! [VulkanBackend] async submit disabled — DLSS-FG enabled");
+    }
+    const VkPresentModeKHR desiredMode = SelectPresentMode(wantVSync, wantFg);
+    if (wantVSync != m_createdWithVSync || wantFg != m_createdWithFg || desiredMode != m_presentMode)
+        RequestSwapchainRecreate(true);
+
+    if (m_latencyAvailable)
+    {
+        u32 intervalUs = 0;
+        const int fpsCap = (Device.Paused() || g_pGameLevel == nullptr) ? ps_fps_limit_in_menu : ps_fps_limit;
+        if (fpsCap > 0)
+            intervalUs = 1000000u / static_cast<u32>(fpsCap);
+        ApplyLowLatencyMode(ps_r_reflex, intervalUs);
+    }
 
     if (m_gcTask) {
         ZoneScopedN("VK::WaitForGC");
@@ -853,20 +1455,70 @@ void VulkanBackend::BeginFrame() {
         m_submitDoneCv.wait(lk, [&] { return !m_slotInFlight[m_recordSlot]; });
     }
 
-    vkWaitForFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex], VK_TRUE, UINT64_MAX);
-    vkResetFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex]);
-
-    VkResult result;
     {
+        ZoneScopedN("VK::WaitInFlightFence");
+        vkWaitForFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex], VK_TRUE, UINT64_MAX);
+        vkResetFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex]);
+    }
+
+    auto reSignalInFlightFence = [&]() {
+        VkSubmitInfo fenceSubmit = {};
+        fenceSubmit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        vkQueueSubmit(m_graphicsQueue, 1, &fenceSubmit, m_inFlightFence[m_currentFrameIndex]);
+    };
+
+    auto acquire = [&]() -> VkResult {
+        ZoneScopedN("VK::AcquireNextImage");
         std::lock_guard<std::mutex> sc(m_swapchainMutex);
-        result = vkAcquireNextImageKHR(
+        return vkAcquireNextImageKHR(
             m_device, m_swapchain, UINT64_MAX,
             m_imageAvailable[m_currentFrameIndex], VK_NULL_HANDLE,
             &m_currentImageIndex);
+    };
+
+    // Present (possibly async) may have flagged a stale swapchain — recreate before acquire.
+    if (m_swapchainDirty.load(std::memory_order_relaxed))
+    {
+        if (!RecreateSwapchainFromSurface())
+        {
+            reSignalInFlightFence();
+            return;
+        }
     }
 
-    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-        Msg("* [VulkanBackend] Swapchain out of date during acquire");
+    VkResult result = acquire();
+
+    // OUT_OF_DATE must recreate. SUBOPTIMAL is presentable — recreate at most once
+    // (same policy as Present), otherwise Linux drivers that always return SUBOPTIMAL
+    // would recreate every frame.
+    const bool acquireNeedsRecreate =
+        result == VK_ERROR_OUT_OF_DATE_KHR ||
+        (result == VK_SUBOPTIMAL_KHR && !m_suboptimalAccepted.load(std::memory_order_relaxed));
+
+    if (acquireNeedsRecreate)
+    {
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+            m_suboptimalAccepted.store(false, std::memory_order_relaxed);
+
+        if (!RecreateSwapchainFromSurface())
+        {
+            reSignalInFlightFence();
+            return;
+        }
+
+        result = acquire();
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            Msg("~ [VulkanBackend] Acquire still out of date after recreate — skipping frame");
+            reSignalInFlightFence();
+            return;
+        }
+    }
+
+    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+        Msg("! [VulkanBackend] vkAcquireNextImageKHR failed: %d", static_cast<int>(result));
+        reSignalInFlightFence();
         return;
     }
 
@@ -886,6 +1538,9 @@ void VulkanBackend::BeginFrame() {
 
 void VulkanBackend::EndFrame() {
     ZoneScopedN("VK::EndFrame");
+
+    if (!m_inFrame)
+        return;
 
     m_inFrame = false;
 
@@ -937,7 +1592,8 @@ void VulkanBackend::EndFrame() {
 
     nvrhi::IDevice* device = m_nvrhiDevice;
     m_gcTask = &TaskScheduler->AddTask([device] {
-        device->runGarbageCollection();
+        if (device)
+            device->runGarbageCollection();
     });
 }
 
@@ -1005,9 +1661,10 @@ void VulkanBackend::SubmitThreadMain() {
             presentInfo.pImageIndices = &job.imageIndex;
 
             VkResult result = vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
-            if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
-                Msg("* [VulkanBackend] Swapchain out of date, resize needed");
-            }
+            if (result == VK_ERROR_OUT_OF_DATE_KHR)
+                RequestSwapchainRecreate(true);
+            else if (result == VK_SUBOPTIMAL_KHR)
+                RequestSwapchainRecreate(false);
             const auto tPresented = Clock::now();
             m_stPresentUs.store(usBetween(tPresentLocked, tPresented), std::memory_order_relaxed);
 
@@ -1057,6 +1714,14 @@ void VulkanBackend::WaitForIdle() {
         m_nvrhiDevice->waitForIdle();
     if (m_device)
         vkDeviceWaitIdle(m_device);
+}
+
+void VulkanBackend::LockDevice() {
+    m_queueMutex.lock();
+}
+
+void VulkanBackend::UnlockDevice() {
+    m_queueMutex.unlock();
 }
 
 void VulkanBackend::ExecuteCommandList(nvrhi::ICommandList* commandList) {

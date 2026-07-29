@@ -6,6 +6,7 @@ namespace xray::render::fg
 {
 // Common
 extern ECORE_API u32 ps_r_sun_shafts; //=	0;
+extern ECORE_API float ps_r_sun_shafts_scale; //= 1.0f (brightness multiplier)
 extern ECORE_API const xr_token qsun_shafts_token[];
 
 extern ECORE_API u32 ps_r2_smapsize;
@@ -23,9 +24,37 @@ enum
     ssao_mode_default,
     ssao_mode_hdao,
     ssao_mode_hbao,
+    ssao_mode_gtao,
 };
 
 extern ECORE_API u32 ps_r_sun_quality; //	=	0;
+extern ECORE_API int ps_r_shadow_debug; // 0=off,1=cascade idx,2=CSM term,3=cascade UV,4=N.L
+extern ECORE_API float ps_r2_sun_normal_bias; // world-space normal offset (meters) for CSM
+extern ECORE_API int ps_r_shadow_cast_all; // 1=legacy cast-all near+mid
+extern ECORE_API int ps_r_skinned_shadows; // 1=NPCs/mutants cast into the sun CSM
+extern ECORE_API int ps_r_depth_prepass; // 1=opaque depth prepass for early-Z in Forward+
+extern ECORE_API int ps_r_hiz_occlusion; // 1=Hi-Z occlusion in GPU cull, 0=frustum only
+extern ECORE_API int ps_r_shadow_light_cull; // 1=light-frustum CSM caster cull
+extern ECORE_API int ps_r_local_shadows; // 1=spot/omni local shadow atlas
+extern ECORE_API int ps_r_local_shadow_tiles;
+extern ECORE_API int ps_r_local_shadow_update_div; // period multiplier for soft refresh tiers
+extern ECORE_API int ps_r_local_shadow_redraw_budget; // max soft tiles redrawn per frame
+extern ECORE_API int ps_r_local_shadow_skinned_max;
+extern ECORE_API float ps_r_local_shadow_near; // full-rate distance (m)
+extern ECORE_API float ps_r_local_shadow_mid; // mid-rate distance (m)
+extern ECORE_API int ps_r_local_shadow_far_period; // soft refresh period beyond mid
+extern ECORE_API int ps_r_local_shadow_atlas; // atlas edge: 1024/2048/4096/8192
+extern ECORE_API int ps_r_local_shadow_filter; // 0=PCF depth, 1=ESM
+extern ECORE_API int ps_r_shadow_hzb; // 1=per-cascade Shadow-HZB for hierarchical CSM
+extern ECORE_API int ps_r_shadow_mask; // 1=half-res screen shadow mask (sun/contact/local)
+extern ECORE_API int ps_r_cluster_debug; // 0=off,1=tileXY,2=slice heatmap
+extern ECORE_API int ps_r_cluster_tile_size; // 32 or 64 (applied next grid rebuild)
+extern ECORE_API int ps_r_shadow_indoor_near_only; // 1=indoor portal sets use cascade 0 only
+extern ECORE_API int ps_r_portal_cull; // 1=portal/sector visibility filter
+extern ECORE_API int ps_r_hom; // 1=CPU HOM occlusion on top of portal traversal
+extern ECORE_API float ps_r2_sun_soft;    // PCSS max penumbra (texels)
+extern ECORE_API float ps_r2_sun_blocker; // PCSS blocker-search spacing (texels)
+extern ECORE_API float ps_r2_sun_contact; // PCSS min penumbra (texels) — contact sharpness
 extern ECORE_API u32 ps_r_water_reflection; //	=	0;
 extern ECORE_API const xr_token qsun_quality_token[];
 extern ECORE_API const xr_token qwater_reflection_quality_token[];
@@ -111,6 +140,23 @@ extern ECORE_API float ps_r2_tonemap_middlegray; // r2-only
 extern ECORE_API float ps_r2_tonemap_adaptation; // r2-only
 extern ECORE_API float ps_r2_tonemap_low_lum; // r2-only
 extern ECORE_API float ps_r2_tonemap_amount; // r2-only
+extern ECORE_API float ps_r_exposure_ev_bias;
+extern ECORE_API float ps_r_exposure_env_strength;
+extern ECORE_API float ps_r_exposure_env_ref;
+extern ECORE_API float ps_r_exposure_adapt_up;
+extern ECORE_API float ps_r_exposure_adapt_down;
+extern ECORE_API float ps_r_tonemap_white;
+extern ECORE_API float ps_r_tonemap_contrast;
+extern ECORE_API int ps_r_camera;
+extern ECORE_API int ps_r_camera_distort_enable;
+extern ECORE_API int ps_r_camera_ca_enable;
+extern ECORE_API int ps_r_camera_vignette_enable;
+extern ECORE_API int ps_r_camera_grain_enable;
+extern ECORE_API int ps_r_camera_mblur_enable;
+extern ECORE_API float ps_r_camera_distort;
+extern ECORE_API float ps_r_camera_ca;
+extern ECORE_API float ps_r_camera_vignette;
+extern ECORE_API float ps_r_camera_grain;
 extern ECORE_API float ps_r2_ls_bloom_kernel_scale; // r2-only	// gauss
 extern ECORE_API float ps_r2_ls_bloom_kernel_g; // r2-only	// gauss
 extern ECORE_API float ps_r2_ls_bloom_kernel_b; // r2-only	// bilinear
@@ -235,12 +281,14 @@ enum
 
 // Smoke Trail (weapon muzzle smoke)
 extern ECORE_API int   ps_r_smoke_trail_enabled;
+extern ECORE_API int   ps_r_test_trails;
 extern ECORE_API float ps_r_smoke_max_emit_rate;
 extern ECORE_API float ps_r_smoke_point_lifetime;
 extern ECORE_API float ps_r_smoke_max_width;
 extern ECORE_API float ps_r_smoke_gravity;
 extern ECORE_API float ps_r_smoke_buoyancy;
 extern ECORE_API float ps_r_smoke_turbulence;
+extern ECORE_API float SunshaftsIntensity;
 
 extern void xrRender_initconsole();
 } // namespace xray::render::fg

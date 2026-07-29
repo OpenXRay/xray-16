@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/ParticleEffectDef.h"
 #include "PassVertexFormats.h"
 
 namespace xray::render::fg {
@@ -57,6 +58,7 @@ struct ParticleBatch {
     u32 bindlessMaterialID = 0;
     u8 blendMode = PARTICLE_BLEND_BLEND;
     ParticleShaderVariant shaderVariant = ParticleShaderVariant::Standard;
+    PS::ParticleLightingMode lightingMode = PS::ParticleLightingMode::Emissive;
 };
 
 struct ParticleCullStats {
@@ -69,12 +71,18 @@ struct ParticleCullStats {
 
 struct ParticlePassState {
     nvrhi::GraphicsPipelineHandle pipelines[PARTICLE_BLEND_COUNT];
+    nvrhi::GraphicsPipelineHandle litPipelines[PARTICLE_BLEND_COUNT];
+    nvrhi::GraphicsPipelineHandle sixWayPipelines[PARTICLE_BLEND_COUNT];
     nvrhi::GraphicsPipelineHandle distortPipeline;
     nvrhi::BindingLayoutHandle layout;
+    nvrhi::BindingLayoutHandle litLayout;
+    nvrhi::BindingLayoutHandle sixWayLayout;
     nvrhi::BindingLayoutHandle distortLayout;
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
+    nvrhi::ShaderHandle litPS;
+    nvrhi::ShaderHandle sixWayPS;
     nvrhi::ShaderHandle distortPS;
     nvrhi::SamplerHandle sampler;
     bool initialized = false;
@@ -102,8 +110,10 @@ struct ParticlePassData {
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle outputNormal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle hiZPyramid;
     framegraph::VirtualResourceHandle distortionRT;
+    framegraph::VirtualResourceHandle seedDistortion;
     framegraph::VirtualResourceHandle prevDepth;
     fg::RenderDevice* device;
     const xr_vector<ParticleBatch>* worldParticleBatches;
@@ -119,6 +129,7 @@ struct ParticlePassData {
     bool hasPrevViewProj;
     ParticlePassState* passState;
     bool hasDistortion;
+    bool importedDistortion;
 };
 
 struct ParticlePassOutput {
@@ -136,6 +147,36 @@ void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::Framebuf
 // Renders AFTER forward color and skinning passes (particles on top of world+HUD)
 // Supports both world and HUD particles with proper FOV handling
 // When hiZPyramid is valid, uses GPU frustum + occlusion culling
+void FilterRTParticleBatches(const xr_vector<ParticleBatch>& src, xr_vector<ParticleBatch>& out);
+u32 GenerateParticleVertices(
+    const xr_vector<ParticleBatch>& batches,
+    xr_vector<ParticleVertex>& vertices,
+    xr_vector<u32>* outCounts = nullptr,
+    float maxDistance = 0.f);
+
+struct ParticleOcclusionPassState {
+    nvrhi::GraphicsPipelineHandle pipeline;
+    nvrhi::BindingLayoutHandle layout;
+    nvrhi::InputLayoutHandle inputLayout;
+    nvrhi::ShaderHandle vs;
+    nvrhi::ShaderHandle ps;
+    nvrhi::SamplerHandle sampler;
+    nvrhi::BufferHandle particleVB;
+    u32 particleVBSize = 0;
+    nvrhi::BufferHandle quadIB;
+    u32 maxQuads = 0;
+    bool initialized = false;
+};
+
+framegraph::VirtualResourceHandle setupParticleOcclusionPass(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    framegraph::VirtualResourceHandle worldPos,
+    const xr_vector<ParticleBatch>* worldParticleBatches,
+    u32 width,
+    u32 height,
+    ParticleOcclusionPassState& state);
+
 ParticlePassOutput setupParticlePass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
@@ -145,13 +186,14 @@ ParticlePassOutput setupParticlePass(
     MaterialCache* materialCache,
     u32 width,
     u32 height,
-    framegraph::VirtualResourceHandle hiZPyramid = {},  // Hi-Z pyramid for GPU culling
+    framegraph::VirtualResourceHandle hiZPyramid = {},
     u32 hiZWidth = 0,
     u32 hiZHeight = 0,
     u32 hiZMipLevels = 0,
     const Fmatrix* prevViewProj = nullptr,
     framegraph::VirtualResourceHandle prevDepth = {},
-    ParticlePassState* state = nullptr
+    ParticlePassState* state = nullptr,
+    framegraph::VirtualResourceHandle seedDistortion = {}
 );
 
 } // namespace xray::render::fg::passes

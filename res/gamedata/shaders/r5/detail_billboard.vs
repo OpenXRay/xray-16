@@ -17,6 +17,10 @@ struct GPUSlotData
 	uint packed_palette_01;
 	uint packed_palette_23;
 	float hemi;
+	float sun;
+	float _pad0;
+	float _pad1;
+	float _pad2;
 };
 
 static const float PACK_MAX_SCALE = 4.0;
@@ -65,14 +69,16 @@ cbuffer DetailGlobals : register(b3)
 	float grass_blade_height;
 	uint build_details_index;
 	uint build_details_pbr_index;
+	uint grass_vein_index;
+	uint _pad0, _pad1, _pad2;
 };
 
 // Perlin4D 3D volume — bound directly at t12 (not bindless, since bindless is Texture2D only)
 Texture3D g_Perlin4D : register(t12);
 
-StructuredBuffer<uint> visible_indices : register(t33);
-StructuredBuffer<DetailModelGPU> detail_models : register(t35);
-StructuredBuffer<PulledVertex> pulled_vertices : register(t36);
+StructuredBuffer<uint> visible_indices : register(t39);
+StructuredBuffer<DetailModelGPU> detail_models : register(t60);
+StructuredBuffer<PulledVertex> pulled_vertices : register(t61);
 StructuredBuffer<InstanceData> all_instances : register(t37);
 StructuredBuffer<GPUSlotData> slot_data : register(t38);
 
@@ -84,6 +90,7 @@ v2p_billboard main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceI
 	InstanceData raw = all_instances[src_idx];
 
 	uint object_id = raw.packed & 0x3F;
+	uint vis_id = (raw.packed >> 6) & 0x3;
 	float rotation = float((raw.packed >> 8) & 0x3FF) / 1023.0 * TWO_PI;
 	float scale = float((raw.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
 
@@ -111,10 +118,17 @@ v2p_billboard main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceI
 	float4 world_pos = float4(rotated + raw.pos, 1.0);
 
 	float wind_speed = max(g_wind_direction.y, 0.1);
-	float time = wave.w;
+	float wind_phase = (vis_id == 2) ? 1.73 : 0.0;
+	float wind_mul = (vis_id == 2) ? 1.15 : 1.0;
+	float time = wave.w + wind_phase;
 
 	float wind_angle_rad = g_wind_direction.x * (M_PI / 180.0);
 	float2 global_wind_dir = float2(sin(wind_angle_rad), cos(wind_angle_rad));
+	if (vis_id == 2)
+	{
+		float2 alt = normalize(dir2D_2.xy + float2(1e-4, 0));
+		global_wind_dir = normalize(lerp(global_wind_dir, alt, 0.35));
+	}
 
 	float2 dir_uv = world_pos.zx * (0.005 / wind_speed) + time * (0.005 * wind_speed);
 	float wind_dir_noise = g_Perlin4D.SampleLevel(smp_linear, float3(dir_uv, 0), 0).r;
@@ -124,7 +138,7 @@ v2p_billboard main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceI
 
 	float fbm_wind_strength = lerp(0.25, 1.0, wind_str_noise);
 	fbm_wind_strength *= fbm_wind_strength;
-	fbm_wind_strength *= wind_speed;
+	fbm_wind_strength *= wind_speed * wind_mul;
 
 	float fbm_turbulence = (wind_dir_noise * 2.0 - 1.0) * 0.3;
 	float2 perpendicular_dir = float2(-global_wind_dir.y, global_wind_dir.x);
@@ -148,7 +162,8 @@ v2p_billboard main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceI
 
 	float slot_hemi = slot_data[slot_idx].hemi;
 	float hemi = abs(slot_hemi);
-	float sun = sign(slot_hemi) * 0.25 + 0.25;
+	// Classic gl/deffer_detail: c0.x = sun (c_dir), c0.w = hemi
+	float sun = saturate(slot_data[slot_idx].sun);
 
 	uint triBase = (vertex_id / 3) * 3;
 	PulledVertex v0 = pulled_vertices[mdl.pulledVertexBase + triBase];
@@ -177,6 +192,7 @@ v2p_billboard main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceI
 	uint bh = asuint(bc.x * 73856093 + bc.y * 19349663);
 	bh ^= bh >> 16;
 	O.bladeHash = float(bh & 0xFFFFu) / 65535.0;
+	O.sunOcclusion = sun;
 	O.hpos = mul(g_detail_VP, world_pos);
 	return O;
 }

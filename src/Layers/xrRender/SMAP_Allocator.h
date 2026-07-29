@@ -66,7 +66,6 @@ public:
     {
         VERIFY(_size <= psize && _size > 4);
 
-        // setup first in the soup, if empty state
         if (stack.empty())
         {
             Ivector2 p;
@@ -76,7 +75,6 @@ public:
             return true;
         }
 
-        // perform search	(first-fit)
         for (u32 it = 0; it < cpoint.size(); it++)
         {
             R.setup(cpoint[it], _size);
@@ -94,14 +92,29 @@ public:
             if (bIntersect)
                 continue;
 
-            // OK, place
             cpoint.erase(cpoint.begin() + it);
             _add(R);
             return true;
         }
 
-        // fail
         return false;
+    }
+
+    BOOL reserve(u32 posX, u32 posY, u32 size)
+    {
+        if (size < 4 || size > psize)
+            return FALSE;
+        if (posX + size > psize || posY + size > psize)
+            return FALSE;
+        Ivector2 p;
+        p.set(int(posX), int(posY));
+        SMAP_Rect R{};
+        R.setup(p, size);
+        for (u32 t = 0; t < stack.size(); t++)
+            if (stack[t].intersect(R))
+                return FALSE;
+        _add(R);
+        return TRUE;
     }
 };
 } // namespace xray::render::fg

@@ -7,6 +7,7 @@
 #include "IGame_Level.h"
 
 #include "editor_helper.h"
+#include "xr_ioc_cmd.h"
 
 // Phase 5: Grass wind tuning parameters (defined here in xrEngine, externed in render DLL)
 ENGINE_API float ps_r3_grass_wind_multiplier = 1.0f;     // Multiplier for environment wind strength
@@ -20,8 +21,9 @@ ENGINE_API u32 ps_r3_grass_wind_octaves = 5;             // FBM octave count
 ENGINE_API Fvector3 ps_r3_grass_color_tip = {0.35f, 0.45f, 0.18f};    // Blade tip color (vibrant green)
 ENGINE_API Fvector3 ps_r3_grass_color_base = {0.28f, 0.38f, 0.15f};   // Blade base color (duller brown-green)
 ENGINE_API float ps_r3_grass_color_variation = 0.15f;                  // Per-blade color variation (±%)
-ENGINE_API Fvector3 ps_r3_grass_sss_color = {0.5f, 0.7f, 0.3f};       // Subsurface scattering tint
-ENGINE_API float ps_r3_grass_sss_intensity = 0.25f;                    // SSS strength
+// Tint multiplies albedo in EvaluateFoliageSSS — keep near-white so blade color comes from texture.
+ENGINE_API Fvector3 ps_r3_grass_sss_color = {1.0f, 1.0f, 1.0f};
+// Intensity: use r_foliage_sss / r_foliage_sss_intensity (shared with trees/leaves)
 
 // Per-object-ID color tints (64 grass types max)
 // Default all to white (1,1,1) = no tint
@@ -56,24 +58,14 @@ ENGINE_API float ps_r3_grass_blade_height = 1.0f;   // Height multiplier (1.0 de
 namespace
 {
 bool window_weather_cycle = false;
-bool window_suns = false;
 bool window_ambients = false;
-bool window_thunderbolts = false;
 bool window_level_weathers = false;
-
-struct combo_raii
-{
-    ~combo_raii()
-    {
-        ImGui::EndCombo();
-    }
-};
 
 bool TimeFrameCombo(pcstr label, CEnvDescriptor*& descriptor, const CEnvironment::EnvVec* currentWeather)
 {
     if (ImGui::BeginCombo(label, descriptor ? descriptor->m_identifier.c_str() : "##"))
     {
-        combo_raii raii;
+        xray::imgui::combo_raii raii;
 
         if (ImGui::Selectable("##", !descriptor))
         {
@@ -97,49 +89,27 @@ bool TimeFrameCombo(pcstr label, CEnvDescriptor*& descriptor, const CEnvironment
 
 bool ConfigStyleSelector(pcstr label, bool& soc_style)
 {
-    using namespace xray::imgui;
-
-    bool result = false;
-    enum ConfigStyle
+    constexpr pcstr styles[] =
     {
-        ConfigStyle_SOC,
-        ConfigStyle_CSCOP,
-        ConfigStyle_COUNT
-    };
-    constexpr pcstr styles[ConfigStyle_COUNT] =
-    {
+        "CS/COP",
         "SOC",
-        "CS/COP"
     };
-    int selected = soc_style ? ConfigStyle_SOC : ConfigStyle_CSCOP;
-    if (ImGui::SliderInt(label, &selected, 0, ConfigStyle_COUNT - 1, styles[selected]))
-    {
-        switch (static_cast<ConfigStyle>(selected))
-        {
-        case ConfigStyle_SOC:   soc_style = true; break;
-        case ConfigStyle_CSCOP: soc_style = false; break;
-        }
-        result = true;
-    }
-    ItemHelp("This affects how environment color will be calculated in the mixer. "
+    return xray::imgui::Selector(label, soc_style, styles, std::size(styles),
+        "This affects how environment color will be calculated in the mixer. "
         "(look at the environment color in the mixer category)");
-    return result;
 }
-}
+} // namespace
 
 void CEnvDescriptor::ed_show_params(const CEnvironment& env)
 {
     using namespace xray::imgui;
 
-    ImGui::PushID(m_identifier.c_str());
-    if (ImGui::CollapsingHeader("sun##category", ImGuiTreeNodeFlags_DefaultOpen))
+    ScopeID scope(this);
+
+    if (CascadingCollapsingHeader("sun##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (ImGui::BeginCombo("sun##lensflareid", lens_flare ? lens_flare->section.c_str() : ""))
         {
-            if (ImGui::Selectable("<edit>", false))
-            {
-                window_suns = true;
-            }
             if (ImGui::Selectable("##", !lens_flare))
                 lens_flare = nullptr;
             for (CLensFlareDescriptor* desc : env.eff_LensFlare->GetDescriptors())
@@ -152,6 +122,15 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
         ItemHelp("Name in configs: \n"
                  "CS/COP: sun\n"
                  "   SOC: flares");
+
+        ImGui::SameLine();
+        ImGui::Button("Edit##flares");
+        if (ImGui::BeginPopupContextItem(nullptr, ImGuiPopupFlags_MouseButtonLeft))
+        {
+            if (lens_flare)
+                lens_flare->ed_show_params();
+            ImGui::EndPopup();
+        }
 
         ImGui::ColorEdit3("sun color", reinterpret_cast<float*>(&sun_color));
 
@@ -193,7 +172,7 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
 
         ImGui::DragFloat("shafts intensity", &m_fSunShaftsIntensity, 0.001f, 0.0f, 1.0f);
     }
-    if (ImGui::CollapsingHeader("hemisphere##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("hemisphere##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (InputText("sky texture", sky_texture_name))
         {
@@ -213,7 +192,7 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
         if (ImGui::DragFloat("sky rotation", &rotation, 0.5f, -360.0f, 360.f))
             sky_rotation = deg2rad(rotation);
     }
-    if (ImGui::CollapsingHeader("clouds##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("clouds##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (InputText("clouds texture", clouds_texture_name))
             on_device_create();
@@ -224,7 +203,7 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
         if (ImGui::DragFloat("clouds rotation", &rotation, 0.5f, -360.0f, 360.f))
             clouds_rotation = deg2rad(rotation);
     }
-    if (ImGui::CollapsingHeader("ambient##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("ambient##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (ImGui::BeginCombo("ambient##env_ambient", env_ambient ? env_ambient->name().c_str() : ""))
         {
@@ -251,7 +230,7 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
                  "CS/COP: ambient_color\n"
                  "   SOC: ambient");
     }
-    if (ImGui::CollapsingHeader("fog##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("fog##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::DragFloat("far plane", &far_plane);
         ImGui::ColorEdit3("fog color", reinterpret_cast<float*>(&fog_color));
@@ -260,19 +239,15 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
         ImGui::DragFloat("fog density", &fog_density, 0.001f, 0.0f, 1.0f);
         ImGui::DragFloat("water intensity", &m_fWaterIntensity, 0.001f, 0.0f, 1.0f);
     }
-    if (ImGui::CollapsingHeader("rain##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("rain##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::ColorEdit3("rain color", reinterpret_cast<float*>(&rain_color));
         ImGui::DragFloat("rain density", &rain_density, 0.001f, 0.0f, 1.0f);
     }
-    if (ImGui::CollapsingHeader("thunderbolts##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("thunderbolts##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (ImGui::BeginCombo("thunderbolts", thunderbolt ? thunderbolt->section.c_str() : ""))
+        if (ImGui::BeginCombo("bolts", thunderbolt ? thunderbolt->section.c_str() : ""))
         {
-            if (ImGui::Selectable("<edit>", false))
-            {
-                window_thunderbolts = true;
-            }
             if (ImGui::Selectable("##", !thunderbolt))
                 thunderbolt = nullptr;
             for (const auto& bolts : env.eff_Thunderbolt->GetCollections())
@@ -286,10 +261,20 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
                  "CS/COP: thunderbolts_collection\n"
                  "   SOC: thunderbolt");
 
+        ImGui::SameLine();
+        ImGui::Button("Edit##thunderbolts");
+        if (ImGui::BeginPopupContextItem(nullptr, ImGuiPopupFlags_MouseButtonLeft))
+        {
+            env.eff_Thunderbolt->ED_ShowParams();
+            if (thunderbolt)
+                thunderbolt->ed_show_params();
+            ImGui::EndPopup();
+        }
+
         ImGui::DragFloat("duration", &bolt_duration);
         ImGui::DragFloat("period", &bolt_period);
     }
-    if (ImGui::CollapsingHeader("wind##category", ImGuiTreeNodeFlags_DefaultOpen))
+    if (CascadingCollapsingHeader("wind##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         float direction = rad2deg(wind_direction);
         if (ImGui::DragFloat("wind direction", &direction, 0.5f, -360.0f, 360.f))
@@ -297,7 +282,6 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
 
         ImGui::DragFloat("wind velocity", &wind_velocity, 1.0f, 0.0f, 1000.0f);
     }
-    ImGui::PopID();
 }
 
 void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
@@ -306,8 +290,8 @@ void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
 
     CEnvDescriptor::ed_show_params(env);
 
-    ImGui::PushID(m_identifier.c_str());
-    if (ImGui::CollapsingHeader("mixer##category", ImGuiTreeNodeFlags_DefaultOpen))
+    ScopeID scope(this);
+    if (CascadingCollapsingHeader("mixer##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::ColorEdit4("environment color", reinterpret_cast<float*>(&env_color));
         ItemHelp("CS/COP: takes hemisphere color as the base value.\n"
@@ -318,32 +302,6 @@ void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
         ImGui::DragFloat("fog near", &fog_near);
         ImGui::DragFloat("fog far", &fog_far);
     }
-    ImGui::PopID();
-}
-
-void CEffect_Thunderbolt::ED_ShowParams()
-{
-    using namespace xray::imgui;
-
-    float altitude[2] = { rad2deg(p_var_alt.x) , rad2deg(p_var_alt.y) };
-    if (ImGui::DragFloat2("altitude", altitude, 0.5f, -360.0f, 360.f))
-        p_var_alt = { rad2deg(altitude[0]) , rad2deg(altitude[1]) };
-
-    float deltalongitude = rad2deg(p_var_long);
-    if (ImGui::DragFloat("wind direction", &deltalongitude, 0.5f, -360.0f, 360.f))
-        p_var_long = deg2rad(deltalongitude);
-
-    ImGui::DragFloat("minimum distance factor", &p_min_dist, 0.001f, 0.0f, MAX_DIST_FACTOR);
-    ItemHelp("Distance from far plane");
-
-    float tilt = rad2deg(p_tilt);
-    if (ImGui::DragFloat("tilt", &tilt, 0.01f, 15.0f, 30.f))
-        p_tilt = deg2rad(tilt);
-
-    ImGui::DragFloat("second probability", &p_second_prop, 0.001f, 0.0f, 1.0f);
-    ImGui::DragFloat("sky color", &p_sky_color, 0.001f, 0.0f, 1.0f);
-    ImGui::DragFloat("sun color", &p_sun_color, 0.001f, 0.0f, 1.0f);
-    ImGui::DragFloat("fog color", &p_fog_color, 0.001f, 0.0f, 1.0f);
 }
 
 void CEnvironment::on_tool_frame()
@@ -379,9 +337,7 @@ void CEnvironment::on_tool_frame()
             if (ImGui::BeginMenu("Windows"))
             {
                 if (ImGui::MenuItem("Weather cycles", nullptr, &window_weather_cycle)) {}
-                if (ImGui::MenuItem("Suns", nullptr, &window_suns)) {}
                 if (ImGui::MenuItem("Ambients", nullptr, &window_ambients)) {}
-                if (ImGui::MenuItem("Thunderbolts", nullptr, &window_thunderbolts)) {}
                 if (ImGui::MenuItem("Level weathers", nullptr, &window_level_weathers)) {}
 
                 ImGui::EndMenu();
@@ -597,11 +553,18 @@ void CEnvironment::on_tool_frame()
 
             ImGui::SeparatorText("Subsurface Scattering");
 
-            ImGui::ColorEdit3("SSS color", reinterpret_cast<float*>(&ps_r3_grass_sss_color));
-            ItemHelp("Color of light transmitted through grass blades (backlit effect)");
+            {
+                bool foliageSssOn = (ps_r_foliage_sss != 0);
+                if (ImGui::Checkbox("Foliage SSS (r_foliage_sss)", &foliageSssOn))
+                    ps_r_foliage_sss = foliageSssOn ? 1 : 0;
+                ItemHelp("Shared enable for grass, leaves, bushes (console: r_foliage_sss)");
+            }
 
-            ImGui::DragFloat("SSS intensity", &ps_r3_grass_sss_intensity, 0.01f, 0.0f, 1.0f);
-            ItemHelp("Strength of subsurface scattering effect");
+            ImGui::ColorEdit3("SSS color", reinterpret_cast<float*>(&ps_r3_grass_sss_color));
+            ItemHelp("Optional grass tint (trees use albedo). White = texture color only");
+
+            ImGui::DragFloat("SSS intensity (r_foliage_sss_intensity)", &ps_r_foliage_sss_intensity, 0.01f, 0.0f, 4.0f);
+            ItemHelp("Shared strength for grass + foliage (console: r_foliage_sss_intensity)");
 
             ImGui::SeparatorText("Per-Object Tint");
 

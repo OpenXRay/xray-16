@@ -1,0 +1,25 @@
+// detail_billboard_shadow.ps — alpha-tested CoP detail into CSM
+#define SM_6_0
+#include "bindless_common.h"
+
+cbuffer GrassShadowCB : register(b6)
+{
+    float grass_blade_height;
+    uint build_details_index;
+    float pad0, pad1;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 tc : TEXCOORD0;
+};
+
+void main(PS_INPUT I)
+{
+    if (build_details_index == 0)
+        return;
+    Texture2D atlas = GetBindlessTexture(build_details_index);
+    float a = atlas.Sample(smp_linear, I.tc).a;
+    clip(a - 0.5);
+}

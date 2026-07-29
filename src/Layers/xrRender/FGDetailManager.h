@@ -30,6 +30,8 @@ public:
     };
     static_assert(sizeof(InstanceData) == 16, "InstanceData must be 16 bytes");
 
+    // Matches classic DetailSlot lighting: c_hemi + c_dir (sun occlusion).
+    // CoP/R2/R3 do NOT apply sector RGB (c_r/g/b) to details — that is R1-only.
     struct GPUSlotData
     {
         float world_min_x;
@@ -39,9 +41,13 @@ public:
         u32 packed_ids;
         u32 packed_palette_01;
         u32 packed_palette_23;
-        float hemi;
+        float hemi; // DetailSlot.c_hemi → ambient scale
+        float sun;  // DetailSlot.c_dir  → sun occlusion (gl/deffer_detail c0.x)
+        float _pad0;
+        float _pad1;
+        float _pad2;
     };
-    static_assert(sizeof(GPUSlotData) == 32, "GPUSlotData must be 32 bytes");
+    static_assert(sizeof(GPUSlotData) == 48, "GPUSlotData must be 48 bytes");
 
     struct SlotAABB
     {
@@ -86,6 +92,8 @@ public:
         float grass_blade_height;
         u32 buildDetailsIndex;
         u32 buildDetailsPbrIndex;
+        u32 grassVeinIndex;
+        u32 pad0, pad1, pad2;
     };
 
     struct DetailCullParams
@@ -193,6 +201,8 @@ public:
     u32 buildDetailsBindlessIndex = 0;
     nvrhi::TextureHandle buildDetailsPbrTexture;
     u32 buildDetailsPbrBindlessIndex = 0;
+    nvrhi::TextureHandle grassVeinTexture;
+    u32 grassVeinBindlessIndex = 0;
 
     nvrhi::BufferHandle visibleSlotIDsBuffer;
     nvrhi::BufferHandle visibleSlotCounterBuffer;
@@ -280,6 +290,9 @@ public:
 
     nvrhi::TextureHandle heightmapTexture;
 
+    // CPU mip0 copy for rain RayPick / gameplay queries
+    xr_vector<float> heightmapCPU;
+
     float m_lastDensity = -1.0f;
     bool m_instancesNeedRegeneration = true;
 
@@ -307,6 +320,13 @@ public:
     void Unload();
     bool BakeHeightmap();
     bool LoadHeightmapTexture(nvrhi::IDevice* device);
+    bool SampleHeight(float worldX, float worldZ, float& outY) const;
+
+    nvrhi::ITexture* GetHeightmapTexture() const { return heightmapTexture; }
+    float GetHeightmapWorldMinX() const { return heightmapWorldMinX; }
+    float GetHeightmapWorldMinZ() const { return heightmapWorldMinZ; }
+    float GetHeightmapTexelSize() const { return heightmapTexelSize; }
+    bool HasHeightmapGPU() const { return heightmapTexture != nullptr && heightmapTexelSize > 0.f; }
     bool LoadBuildDetailsTexture(nvrhi::IDevice* device);
     void PackSlotData();
     bool CreateGPUBuffers(nvrhi::IDevice* device);
