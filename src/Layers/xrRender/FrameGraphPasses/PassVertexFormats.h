@@ -54,6 +54,10 @@ struct HiZCB {
     u32 outputHeight;
     u32 inputMipLevel;
     u32 isFirstMip;
+    u32 inputWidth;
+    u32 inputHeight;
+    u32 pad0;
+    u32 pad1;
 };
 
 struct HistogramCB {

@@ -78,7 +78,7 @@ bool HiZTestSphereTemporal(
     float2 minNDC = prevNdc.xy - ndcSize;
     float2 maxNDC = prevNdc.xy + ndcSize;
 
-    if (any(minNDC > 1.0) || any(maxNDC < -1.0))
+    if (any(minNDC < -1.0) || any(maxNDC > 1.0))
         return true;
 
     float2 minUV = saturate(minNDC * 0.5 + 0.5);
@@ -92,7 +92,7 @@ bool HiZTestSphereTemporal(
     float boxWidth = (boxUV.z - boxUV.x) * float(hiZWidth);
     float boxHeight = (boxUV.w - boxUV.y) * float(hiZHeight);
 
-    float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5)));
+    float mipLevel = ceil(log2(max(1.0, max(boxWidth, boxHeight))));
     mipLevel = clamp(mipLevel, 0.0, float(hiZMipLevels - 1));
 
     float d1 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.y), mipLevel);
