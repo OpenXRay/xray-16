@@ -54,10 +54,11 @@ bool SkinnedGeometryPools::Register(VertexStagingBuffer* vsb, IndexStagingBuffer
     if (vStride != SkinnedFormatStride(formatID))
         return false;
 
-    if (vsb->skinned_pool_format == formatID)
-        return true;
-    if (vsb->skinned_pool_format != UINT32_MAX)
+    if (vsb->skinned_pool_generation == m_generation) {
+        if (vsb->skinned_pool_format == formatID)
+            return true;
         return false;
+    }
 
     const void* vdata = vsb->Map(0, 0, true);
     if (!vdata)
@@ -85,6 +86,7 @@ bool SkinnedGeometryPools::Register(VertexStagingBuffer* vsb, IndexStagingBuffer
     isb->Unmap();
 
     vsb->skinned_pool_format = formatID;
+    vsb->skinned_pool_generation = m_generation;
     vsb->skinned_pool_base_vertex = baseVertex;
     vsb->skinned_pool_first_index = firstIndex;
     return true;
@@ -163,6 +165,9 @@ void SkinnedGeometryPools::Reset()
 {
     for (auto& pool : m_pools)
         pool = Pool{};
+    ++m_generation;
+    if (m_generation == 0)
+        m_generation = 1;
 }
 
 } // namespace xray::render::fg

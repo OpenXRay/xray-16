@@ -29,10 +29,9 @@ void main(uint3 dtid : SV_DispatchThreadID)
     GPULightData ld = g_Lights[lightIdx];
     float3 lightPos = ld.positionAndInvRangeSq.xyz;
     float range = ld.colorAndRange.w;
-    float cullRange = range * 1.75;
 
     float3 toLight = lightPos - cb_cameraPos.xyz;
-    if (dot(toLight, toLight) <= cullRange * cullRange)
+    if (dot(toLight, toLight) <= range * range)
     {
         uint idx;
         g_VisibleLightCount.InterlockedAdd(0, 1, idx);
@@ -41,9 +40,9 @@ void main(uint3 dtid : SV_DispatchThreadID)
         return;
     }
 
-    bool visible = HiZTestSphereTemporal(
-        lightPos, cullRange, cb_cameraPos.xyz,
-        cb_curViewProj, cb_prevViewProj,
+    bool visible = HiZTestSphere(
+        lightPos, range, cb_cameraPos.xyz,
+        cb_prevViewProj,
         g_HiZPyramid, smp_nofilter,
         cb_hizWidth, cb_hizHeight, cb_hizMipLevels);
 
@@ -55,5 +54,3 @@ void main(uint3 dtid : SV_DispatchThreadID)
             g_VisibleLightIndices[idx] = lightIdx;
     }
 }
-
-#define LOCAL_SHADOW_RECT_F4_V1 1

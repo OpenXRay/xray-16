@@ -192,7 +192,7 @@ void LevelGraphDebugRender::DrawStalkers(int vid)
     Device.mFullTransform.transform(temp, pos);
     font.OutSetI(temp.x, -temp.y);
     font.SetHeightI(0.05f / _sqrt(temp.w));
-    if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
+    if (temp.z > 1 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
         showText = false;
     using ObjectRegistry = CALifeGraphRegistry::OBJECT_REGISTRY;
     using DetailPath = CALifeMonsterDetailPathManager::PATH;
@@ -261,7 +261,7 @@ void LevelGraphDebugRender::DrawStalkers(int vid)
         render.draw_aabb(direction, radius, radius, radius, color);
         Fvector4 temp;
         Device.mFullTransform.transform(temp, direction);
-        if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
+        if (temp.z > 1 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
             continue;
         font.SetHeightI(0.05f / _sqrt(temp.w));
     }
@@ -288,7 +288,7 @@ void LevelGraphDebugRender::DrawObjects(int vid)
     font.OutSetI(temp.x, -temp.y);
     font.SetHeightI(0.05f / _sqrt(temp.w));
     bool showText = true;
-    if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
+    if (temp.z > 1 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
         showText = false;
     using ObjectRegistry = CALifeGraphRegistry::OBJECT_REGISTRY;
     using DetailPath = CALifeMonsterDetailPathManager::PATH;
@@ -357,7 +357,7 @@ void LevelGraphDebugRender::DrawObjects(int vid)
         render.draw_aabb(direction, radius, radius, radius, color);
         Fvector4 temp;
         Device.mFullTransform.transform(temp, direction);
-        if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
+        if (temp.z > 1 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
             continue;
         font.SetHeightI(0.05f / _sqrt(temp.w));
     }
@@ -429,7 +429,7 @@ void LevelGraphDebugRender::DrawGameGraph()
         T.y += 1.5f / 10.f;
         Device.mFullTransform.transform(S, T);
         //out of screen
-        if (S.z < 0 || S.w < 0)
+        if (S.z > 1 || S.w < 0)
             continue;
         if (S.x < -1.f || S.x > 1.f || S.y<-1.f || S.x>1.f)
             continue;
@@ -477,7 +477,7 @@ void LevelGraphDebugRender::DrawGameGraph()
                 T.y += 1.5f;
                 Device.mFullTransform.transform(S, T);
                 //out of screen
-                if (S.z < 0 || S.w < 0)
+                if (S.z > 1 || S.w < 0)
                     continue;
                 if (S.x < -1.f || S.x > 1.f || S.y<-1.f || S.x>1.f)
                     continue;
@@ -684,7 +684,7 @@ void LevelGraphDebugRender::DrawNodes()
                 offsetPos.y += 0.3f;
                 Fvector4 tsmPos;
                 Device.mFullTransform.transform(tsmPos, offsetPos);
-                if (tsmPos.z < 0 || tsmPos.w < 0 || _abs(tsmPos.x) > 1 || _abs(tsmPos.y) > 1)
+                if (tsmPos.z > 1 || tsmPos.w < 0 || _abs(tsmPos.x) > 1 || _abs(tsmPos.y) > 1)
                     continue;
                 font->SetHeightI(0.05f / _sqrt(_abs(tsmPos.w)));
                 font->SetColor(0xffffffff);

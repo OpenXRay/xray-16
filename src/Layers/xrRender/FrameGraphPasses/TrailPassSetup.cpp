@@ -231,7 +231,7 @@ void InitializeTrailResources(fg::RenderDevice* device, const nvrhi::Framebuffer
     pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
     pipeDesc.renderState.depthStencilState.depthTestEnable = true;
     pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
-    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
     pipeDesc.renderState.blendState.targets[0].enableBlend();
     pipeDesc.renderState.blendState.targets[0].srcBlend = nvrhi::BlendFactor::SrcAlpha;
@@ -290,7 +290,6 @@ TrailPassOutput setupTrailPass(
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = forwardInputs.normal;
             data.outputs.baseColor = forwardInputs.baseColor;
-            data.outputs.worldPos = forwardInputs.worldPos;
             data.outputs.depth = data.depth;
         },
         [](const TrailPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -419,7 +418,6 @@ TrailPassOutput setupTrailPass(
     output.layout.albedo = passData.outputColor;
     output.layout.normal = passData.outputs.normal;
     output.layout.baseColor = passData.outputs.baseColor;
-    output.layout.worldPos = passData.outputs.worldPos;
     output.layout.depth = passData.depth;
     return output;
 }

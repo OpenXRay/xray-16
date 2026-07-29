@@ -62,7 +62,7 @@ inline fg::ComparisonFunc ConvertComparisonFunc(D3D11_COMPARISON_FUNC d3dFunc) {
         case D3D11_COMPARISON_NOT_EQUAL: return fg::ComparisonFunc::NotEqual;
         case D3D11_COMPARISON_GREATER_EQUAL: return fg::ComparisonFunc::GreaterEqual;
         case D3D11_COMPARISON_ALWAYS: return fg::ComparisonFunc::Always;
-        default: return fg::ComparisonFunc::Less;
+        default: return fg::ComparisonFunc::Greater;
     }
 }
 

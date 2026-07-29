@@ -146,7 +146,7 @@ void i_scan(int curY, float leftX, float lhx, float rightX, float rhx, float sta
 
     // Move to far my dz/5 to place the pixel at the center of face that it covers.
     // This will make sure that objects will not be clipped for just standing next to the home from outside.
-    Z += 0.5f * _abs(dZ);
+    Z -= 0.5f * _abs(dZ);
 
     // gain access to buffers
     occTri** pFrame = Raster.get_frame();
@@ -161,10 +161,10 @@ void i_scan(int curY, float leftX, float lhx, float rightX, float rhx, float sta
         if (shared(currentTri, pFrame[i - 1]))
         {
             // float ZR = (Z+2*pDepth[i-1])*one_div_3;
-            if (Z < pDepth[i])
+            if (Z > pDepth[i])
             {
                 pFrame[i] = currentTri;
-                pDepth[i] = __max(Z, pDepth[i - 1]);
+                pDepth[i] = __min(Z, pDepth[i - 1]);
                 dwPixels++;
             }
         }
@@ -174,7 +174,7 @@ void i_scan(int curY, float leftX, float lhx, float rightX, float rhx, float sta
     limit = i_base + maxX;
     for (; i < limit; i++, Z += dZ)
     {
-        if (Z < pDepth[i])
+        if (Z > pDepth[i])
         {
             pFrame[i] = currentTri;
             pDepth[i] = Z;
@@ -191,10 +191,10 @@ void i_scan(int curY, float leftX, float lhx, float rightX, float rhx, float sta
         if (shared(currentTri, pFrame[i + 1]))
         {
             // float ZR = (Z+2*pDepth[i+1])*one_div_3;
-            if (Z < pDepth[i])
+            if (Z > pDepth[i])
             {
                 pFrame[i] = currentTri;
-                pDepth[i] = __max(Z, pDepth[i + 1]);
+                pDepth[i] = __min(Z, pDepth[i + 1]);
                 dwPixels++;
             }
         }
@@ -222,7 +222,7 @@ IC void i_test_micro(int x, int y)
     {
         float* pDepth = Raster.get_depth();
         float ZR = (pDepth[pos_up] + pDepth[pos_down]) / 2;
-        if (ZR < pDepth[pos])
+        if (ZR > pDepth[pos])
         {
             pFrame[pos] = T1;
             pDepth[pos] = ZR;

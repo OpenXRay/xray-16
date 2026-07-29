@@ -27,8 +27,7 @@ framegraph::VirtualResourceHandle setupDistortionApplyPass(
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle sceneColor,
     framegraph::VirtualResourceHandle distortionRT,
-    framegraph::VirtualResourceHandle worldPos,
-    framegraph::VirtualResourceHandle baseColor,
+    framegraph::VirtualResourceHandle depth,
     u32 width,
     u32 height,
     DistortionApplyPassState& state

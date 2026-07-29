@@ -48,6 +48,12 @@ struct RenderStats
     u32 skinnedVisible = 0;      // Skinned meshes that passed culling
     u32 skinnedCulled = 0;       // Skinned meshes culled by Hi-Z
 
+    // Particle culling stats (from GPU Hi-Z culling)
+    u32 particleCullSubmitted = 0;  // World particle batches submitted for culling
+    u32 particleCullVisible = 0;    // World particle batches that passed culling
+    u32 particleQuadsSubmitted = 0; // Total particle quads submitted
+    u32 particleQuadsVisible = 0;   // Particle quads in visible batches
+
     u32 lightsClustered = 0;
     u32 lightsHiZVisible = 0;
     u32 lightsPoint = 0;
@@ -93,6 +99,7 @@ struct RenderStats
         megaBufferVertices = megaBufferIndices = 0;
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
         skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
+        particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
         localShadowTiles = localShadowCandidates = localShadowDropped = localShadowRedraw = 0;
         mdiDrawCalls = mdiMaxDrawCountSum = 0;

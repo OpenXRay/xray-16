@@ -3,8 +3,6 @@
 #include "DDSLoader.h"
 #include "TextureStreaming.h"
 #include "../RenderContext/RenderDevice.h"
-#include "xrEngine/IRenderBackend.h"
-#include <algorithm>
 
 // Modern Texture Manager Implementation
 // Week 1 - Day 1-2: Tasks 1.4, 2.2
@@ -243,16 +241,11 @@ TextureHandle TextureManager::LoadTexture(
 {
     shared_str pathStr = path;
 
+    // Check if already loaded (deduplication)
     auto it = m_pathToHandle.find(pathStr);
     if (it != m_pathToHandle.end()) {
         TextureHandle existing = it->second;
         if (ValidateHandle(existing)) {
-            TextureMetadata& existingMeta = m_textures[existing.index];
-            if (existingMeta.state == TextureState::Failed) {
-                existingMeta.state = TextureState::Unloaded;
-                existingMeta.nvrhiTexture = nullptr;
-                LoadTextureSync(existing);
-            }
             AddRef(existing);
             return existing;
         }
@@ -346,9 +339,10 @@ TextureHandle TextureManager::CreateTexture(
         nvrhiDesc.isRenderTarget = true;
         nvrhiDesc.isTypeless = true;
         nvrhiDesc.useClearValue = true;
-        nvrhiDesc.clearValue = nvrhi::Color(1.0f);
+        nvrhiDesc.clearValue = nvrhi::Color(0.0f);
     }
 
+    // Create texture
     meta.nvrhiTexture = m_device->GetNVRHIDevice()->createTexture(nvrhiDesc);
 
     if (meta.nvrhiTexture) {
@@ -356,14 +350,17 @@ TextureHandle TextureManager::CreateTexture(
         meta.residentMips = desc.mipLevels;
         meta.requestedMips = desc.mipLevels;
 
+        // Calculate memory
         meta.memoryUsed = desc.CalculateMemorySize();
         m_stats.texturesResident++;
         m_stats.totalMemoryUsed += meta.memoryUsed;
+
+        // Msg("~ [TextureManager] Created runtime texture '%s': %ux%ux%u, %.2f MB",
+        //     desc.debugName.c_str(),
+        //     desc.width, desc.height, desc.depth,
+        //     meta.memoryUsed / (1024.0f * 1024.0f));
     } else {
-        Msg("! [TextureManager] Failed to create NVRHI texture '%s' (%ux%u fmt=%d rt=%d uav=%d)",
-            desc.debugName.c_str(), desc.width, desc.height, (int)desc.format,
-            (int)desc.isRenderTarget, (int)desc.isUAV);
-        meta.state = TextureState::Failed;
+        Msg("! [TextureManager] Failed to create NVRHI texture '%s'", desc.debugName.c_str());
     }
 
     m_stats.texturesTotal++;
@@ -425,10 +422,9 @@ nvrhi::ITexture* TextureManager::GetNVRHITexture(TextureHandle handle) {
     //  AUTO-RELOAD IF EVICTED
     // ═══════════════════════════════════════════════════
 
-    if (meta.state == TextureState::Failed)
-        return nullptr;
-
     if (meta.state == TextureState::Unloaded || meta.state == TextureState::Evicted) {
+        // Msg("! [TextureManager] ⚠️ Accessing evicted texture: %s - reloading...",
+        //     meta.filePath.c_str());
         LoadTextureSync(handle);
     }
 
@@ -704,6 +700,66 @@ void TextureManager::Update(float deltaTime) {
 //  INTERNAL METHODS (Stubs for Day 2 / Week 2)
 // ═══════════════════════════════════════════════════
 
+static bool PreserveAlphaCoverage(DDSData& ddsData) {
+    const auto fmt = ddsData.desc.format;
+    const bool rgba8 = fmt == nvrhi::Format::RGBA8_UNORM || fmt == nvrhi::Format::SRGBA8_UNORM ||
+        fmt == nvrhi::Format::BGRA8_UNORM || fmt == nvrhi::Format::SBGRA8_UNORM;
+    if (!rgba8 || ddsData.desc.type != TextureDesc::Texture2D || ddsData.desc.arraySize != 1 ||
+        ddsData.mipLevels.size() < 2)
+        return false;
+
+    constexpr u32 ALPHA_REF = 200;
+    const DDSMipLevel& mip0 = ddsData.mipLevels[0];
+    const u64 texels0 = mip0.size / 4;
+    if (!texels0)
+        return false;
+
+    u64 cov0 = 0;
+    for (u64 i = 0; i < texels0; i++)
+        if (mip0.data[i * 4 + 3] >= ALPHA_REF)
+            cov0++;
+    if (cov0 == 0 || cov0 == texels0)
+        return false;
+    const double target = double(cov0) / double(texels0);
+
+    bool rescaled = false;
+    for (size_t m = 1; m < ddsData.mipLevels.size(); m++) {
+        u8* px = const_cast<u8*>(ddsData.mipLevels[m].data);
+        const u64 texels = ddsData.mipLevels[m].size / 4;
+        if (!texels)
+            continue;
+
+        u64 hist[256] = {};
+        for (u64 i = 0; i < texels; i++)
+            hist[px[i * 4 + 3]]++;
+        u64 atLeast[257];
+        atLeast[256] = 0;
+        for (int t = 255; t >= 0; t--)
+            atLeast[t] = atLeast[t + 1] + hist[t];
+
+        float lo = 1.0f, hi = 8.0f;
+        for (int it = 0; it < 24; it++) {
+            const float mid = 0.5f * (lo + hi);
+            const u32 thresh = std::min<u32>(256, u32(ceilf(float(ALPHA_REF) / mid)));
+            const double cov = double(atLeast[thresh]) / double(texels);
+            if (cov < target)
+                lo = mid;
+            else
+                hi = mid;
+        }
+        const float scale = 0.5f * (lo + hi);
+        if (scale <= 1.001f)
+            continue;
+
+        for (u64 i = 0; i < texels; i++) {
+            const u32 a = u32(float(px[i * 4 + 3]) * scale + 0.5f);
+            px[i * 4 + 3] = u8(std::min<u32>(a, 255u));
+        }
+        rescaled = true;
+    }
+    return rescaled;
+}
+
 void TextureManager::LoadTextureSync(TextureHandle handle) {
     if (!ValidateHandle(handle)) {
         Msg("! [TextureManager] LoadTextureSync: Invalid handle");
@@ -712,25 +768,56 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
 
     TextureMetadata& meta = m_textures[handle.index];
 
-    if (meta.state == TextureState::Resident || meta.state == TextureState::Failed)
+    // Already loaded?
+    if (meta.state == TextureState::Resident) {
         return;
+    }
 
+    // Mark as loading
     meta.state = TextureState::Loading;
+
+    // ═══════════════════════════════════════════════════
+    //  LOAD TEXTURE FILE (AUTO-DETECTS .DDS OR .OGM)
+    // ═══════════════════════════════════════════════════
+    // DDSLoader now automatically detects file type:
+    // - .dds → Static DDS texture
+    // - .ogm → Theora video texture (dynamic, per-frame decode)
 
     DDSData ddsData;
     if (!DDSLoader::LoadFromFile(meta.filePath.c_str(), ddsData)) {
         Msg("! [TextureManager] Failed to load texture: %s", meta.filePath.c_str());
-        meta.state = TextureState::Failed;
+        meta.state = TextureState::Unloaded;
         return;
     }
 
+    // Check texture type
     bool isVideoTexture = (ddsData.type == DDSData::TextureType::Video);
     bool isSequenceTexture = (ddsData.type == DDSData::TextureType::Sequence);
+
+    // if (isVideoTexture) {
+    //     Msg("* [TextureManager] Video texture detected: %s", meta.filePath.c_str());
+    // }
+    // if (isSequenceTexture) {
+    //     Msg("* [TextureManager] Sequence texture detected: %s (%u frames)",
+    //         meta.filePath.c_str(),
+    //         (u32)ddsData.sequenceState->frameData.size());
+    // }
+
+    if (!isVideoTexture && !isSequenceTexture &&
+        strncmp(meta.filePath.c_str(), "trees" DELIMITER, 6) == 0)
+    {
+        if (PreserveAlphaCoverage(ddsData))
+            Msg("* [TextureManager] Alpha coverage preserved: %s", meta.filePath.c_str());
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  CHECK MEMORY BUDGET BEFORE ALLOCATING TEXTURE
+    // ═══════════════════════════════════════════════════
 
     u64 requiredMemory = ddsData.totalDataSize;
 
     if (!EnforceMemoryBudget(requiredMemory)) {
-        Msg("! [TextureManager] Cannot load %s - out of memory! (need %llu MB, have %llu / %llu MB used)",
+        Msg("! [TextureManager] ❌ Cannot load %s - out of memory! (need %llu MB, have %llu / %llu MB used)",
             meta.filePath.c_str(),
             requiredMemory / (1024 * 1024),
             m_memoryUsed / (1024 * 1024),
@@ -739,144 +826,99 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         return;
     }
 
-    nvrhi::TextureDesc nvrhiDesc;
-    nvrhiDesc.width = std::max(1u, ddsData.desc.width);
-    nvrhiDesc.height = std::max(1u, ddsData.desc.height);
-    nvrhiDesc.depth = std::max(1u, ddsData.desc.depth);
-    nvrhiDesc.arraySize = std::max(1u, ddsData.desc.arraySize);
-    nvrhiDesc.mipLevels = std::max(1u, ddsData.desc.mipLevels);
-    nvrhiDesc.format = ddsData.desc.format;
-    nvrhiDesc.debugName = ddsData.filePath.c_str() ? ddsData.filePath.c_str() : meta.filePath.c_str();
-    nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-    nvrhiDesc.keepInitialState = true;
-    nvrhiDesc.isShaderResource = true;
-    nvrhiDesc.sampleCount = 1;
+    // Create NVRHI texture (without initial data)
+    fg::RenderDevice::TextureDesc deviceDesc;
+    deviceDesc.width = ddsData.desc.width;
+    deviceDesc.height = ddsData.desc.height;
+    deviceDesc.depth = ddsData.desc.depth;
+    deviceDesc.arraySize = ddsData.desc.arraySize;
+    deviceDesc.mipLevels = ddsData.desc.mipLevels;
+    deviceDesc.format = ddsData.desc.format;
+    deviceDesc.debugName = ddsData.filePath.c_str();
 
+    // Determine dimension
     switch (ddsData.desc.type) {
         case TextureDesc::Texture1D:
-            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture1D;
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture1D;
             break;
-        case TextureDesc::Texture2DArray:
-            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
+        case TextureDesc::Texture2D:
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture2D;
             break;
         case TextureDesc::Texture3D:
-            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture3D;
             break;
         case TextureDesc::TextureCube:
-            nvrhiDesc.dimension = nvrhi::TextureDimension::TextureCube;
-            break;
-        default:
-            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
+            deviceDesc.dimension = fg::RenderDevice::TextureDesc::TextureCube;
             break;
     }
 
-    auto* nvDevice = m_device->GetNVRHIDevice();
-    meta.nvrhiTexture = nvDevice->createTexture(nvrhiDesc);
-    if (!meta.nvrhiTexture && nvrhiDesc.format == nvrhi::Format::BGRA8_UNORM)
-    {
-        nvrhiDesc.format = nvrhi::Format::RGBA8_UNORM;
-        meta.nvrhiTexture = nvDevice->createTexture(nvrhiDesc);
-        if (meta.nvrhiTexture)
-            Msg("~ [TextureManager] Created %s as RGBA8 (BGRA8 create failed)", meta.filePath.c_str());
-    }
-
-    if (!meta.nvrhiTexture) {
-        EvictTextures(requiredMemory * 2);
-        meta.nvrhiTexture = nvDevice->createTexture(nvrhiDesc);
-    }
-
-    DDSData faceData[6];
-    bool usedFaceFallback = false;
-    if (!meta.nvrhiTexture && ddsData.desc.type == TextureDesc::TextureCube) {
-        bool facesOk = true;
-        for (int face = 0; face < 6 && facesOk; ++face) {
-            string_path facePath;
-            xr_sprintf(facePath, "%s-%d", meta.filePath.c_str(), face);
-            if (!DDSLoader::LoadFromFile(facePath, faceData[face]) ||
-                faceData[face].desc.type != TextureDesc::Texture2D ||
-                faceData[face].desc.width != faceData[0].desc.width ||
-                faceData[face].desc.height != faceData[0].desc.height ||
-                faceData[face].desc.format != faceData[0].desc.format ||
-                faceData[face].desc.mipLevels != faceData[0].desc.mipLevels) {
-                facesOk = false;
-            }
-        }
-        if (facesOk) {
-            nvrhiDesc.width = faceData[0].desc.width;
-            nvrhiDesc.height = faceData[0].desc.height;
-            nvrhiDesc.depth = 1;
-            nvrhiDesc.arraySize = 6;
-            nvrhiDesc.mipLevels = std::max(1u, faceData[0].desc.mipLevels);
-            nvrhiDesc.format = faceData[0].desc.format;
-            nvrhiDesc.dimension = nvrhi::TextureDimension::TextureCube;
-            EvictTextures(faceData[0].totalDataSize * 6ull);
-            meta.nvrhiTexture = nvDevice->createTexture(nvrhiDesc);
-            if (meta.nvrhiTexture) {
-                usedFaceFallback = true;
-                requiredMemory = faceData[0].totalDataSize * 6ull;
-                Msg("~ [TextureManager] %s: BC cube create failed, using face DDS (%ux%u fmt=%d)",
-                    meta.filePath.c_str(), nvrhiDesc.width, nvrhiDesc.height, (int)nvrhiDesc.format);
-            }
-        }
-    }
-
-    if (!meta.nvrhiTexture) {
-        Msg("! [TextureManager] Failed to create NVRHI texture: %s (%ux%u depth=%u arr=%u mips=%u fmt=%d)",
-            meta.filePath.c_str(),
-            nvrhiDesc.width, nvrhiDesc.height, nvrhiDesc.depth, nvrhiDesc.arraySize,
-            nvrhiDesc.mipLevels, (int)ddsData.desc.format);
-        meta.state = TextureState::Failed;
+    // Create texture (no initial data - we'll upload separately)
+    fg::TextureHandle deviceHandle = m_device->CreateTexture(deviceDesc, nullptr);
+    if (!deviceHandle.IsValid()) {
+        Msg("! [TextureManager] Failed to create NVRHI texture: %s", meta.filePath.c_str());
+        meta.state = TextureState::Unloaded;
         return;
     }
 
-    if (usedFaceFallback) {
-        for (int face = 0; face < 6; ++face) {
-            const u32 totalMips = std::max(1u, faceData[face].desc.mipLevels);
-            for (u32 mipLevel = 0; mipLevel < totalMips && mipLevel < faceData[face].mipLevels.size(); ++mipLevel) {
-                const DDSMipLevel& mip = faceData[face].mipLevels[mipLevel];
-                m_device->UploadTextureDataToNVRHI(
-                    meta.nvrhiTexture.Get(),
-                    (u32)face,
-                    mipLevel,
-                    mip.data,
-                    mip.size,
-                    mip.rowPitch,
-                    mip.slicePitch);
-            }
-        }
-    } else {
-        for (const DDSMipLevel& mip : ddsData.mipLevels) {
-            u32 totalMips = std::max(1u, ddsData.desc.mipLevels);
-            u32 mipIndex = (u32)(&mip - &ddsData.mipLevels[0]);
-            u32 arraySlice = mipIndex / totalMips;
-            u32 mipLevel = mipIndex % totalMips;
-            m_device->UploadTextureDataToNVRHI(
-                meta.nvrhiTexture.Get(),
-                arraySlice,
-                mipLevel,
-                mip.data,
-                mip.size,
-                mip.rowPitch,
-                mip.slicePitch);
-        }
+    // Upload all mip levels using RenderDevice's upload API
+    xr_vector<fg::RenderDevice::TextureSliceData> slices;
+    slices.reserve(ddsData.mipLevels.size());
+
+    for (const DDSMipLevel& mip : ddsData.mipLevels) {
+        fg::RenderDevice::TextureSliceData slice;
+
+        // Calculate which array slice and mip this belongs to
+        // DDS stores: [slice0_mip0, slice0_mip1, ..., slice1_mip0, slice1_mip1, ...]
+        u32 totalMips = ddsData.desc.mipLevels;
+        u32 mipIndex = (u32)(&mip - &ddsData.mipLevels[0]);
+
+        slice.arraySlice = mipIndex / totalMips;
+        slice.mipLevel = mipIndex % totalMips;
+        slice.data = mip.data;
+        slice.dataSize = mip.size;
+        slice.rowPitch = mip.rowPitch;      // Use pitch calculated by DDSLoader
+        slice.slicePitch = mip.slicePitch;  // Use pitch calculated by DDSLoader
+
+        slices.push_back(slice);
     }
 
+    // Upload all slices in one command list
+    m_device->UploadTextureData(deviceHandle, slices.data(), (u32)slices.size());
+
+    // Store NVRHI handle
+    meta.nvrhiTexture = m_device->GetNativeTexture(deviceHandle);
+
+    // ═══════════════════════════════════════════════════
+    //  STORE VIDEO TEXTURE STATE (IF APPLICABLE)
+    // ═══════════════════════════════════════════════════
+
     if (isVideoTexture) {
+        // Move DDSData into metadata so we can update it each frame
         meta.videoTextureData = xr_make_unique<DDSData>();
-        *meta.videoTextureData = std::move(ddsData);
+        *meta.videoTextureData = std::move(ddsData);  // Transfer ownership
+
+        // Msg("* [TextureManager] Video texture state stored for: %s", meta.filePath.c_str());
     }
 
     if (isSequenceTexture) {
+        // Move DDSData into metadata so we can animate frames
         meta.sequenceTextureData = xr_make_unique<DDSData>();
-        *meta.sequenceTextureData = std::move(ddsData);
+        *meta.sequenceTextureData = std::move(ddsData);  // Transfer ownership
+
+        // Initialize animation state
         meta.sequenceTextureData->sequenceState->currentFrame = 0;
+
+        // Msg("* [TextureManager] Sequence texture state stored for: %s", meta.filePath.c_str());
     }
 
+    // Update metadata
     meta.state = TextureState::Resident;
-    meta.residentMips = (isVideoTexture || isSequenceTexture) ? 1 : nvrhiDesc.mipLevels;
-    meta.totalMips = (isVideoTexture || isSequenceTexture) ? 1 : nvrhiDesc.mipLevels;
-    meta.requestedMips = meta.totalMips;
-    meta.memoryUsed = requiredMemory;
+    meta.residentMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;  // Video/sequence textures have 1 mip
+    meta.totalMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;
+    meta.requestedMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;
+    meta.memoryUsed = ddsData.totalDataSize;
+
+    // Update memory tracking
     m_memoryUsed += meta.memoryUsed;
 }
 
@@ -1012,7 +1054,6 @@ const char* TextureStateToString(TextureState state) {
         case TextureState::Resident: return "Resident";
         case TextureState::Evicting: return "Evicting";
         case TextureState::Evicted: return "Evicted";
-        case TextureState::Failed: return "Failed";
         default: return "Unknown";
     }
 }

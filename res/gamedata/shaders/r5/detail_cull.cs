@@ -147,13 +147,12 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         if (!FrustumTestSphere(bounds_center, bounds_radius, g_frustum_planes))
             continue;
 
-        uint flags = asuint(mdl.flags);
-        bool is_static = (flags & DO_NO_WAVING) != 0;
-        if (!is_static &&
-            !HiZTestSphereTemporal(bounds_center, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
+        if (!HiZTestSphere(bounds_center, bounds_radius, g_camera_pos, g_prev_view_proj,
                             g_hiz_pyramid, smp_nofilter, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
             continue;
 
+        uint flags = asuint(mdl.flags);
+        bool is_static = (flags & DO_NO_WAVING) != 0;
         if (is_static)
             AppendDecal(inst_idx);
         else if (g_grass_mode == 0)

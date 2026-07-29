@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "DecalPassSetup.h"
-#include "PassCommon.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
@@ -26,7 +25,6 @@ struct DecalPassData {
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
     VirtualResourceHandle sceneColor;
-    VirtualResourceHandle worldPos;
     fg::RenderDevice* device;
     decals::DecalManager* decalMgr;
     DecalPassState* passState;
@@ -58,49 +56,33 @@ static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::Fram
     state.inputLayout = nvDevice->createInputLayout(&posAttr, 1, state.vs);
 
     state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "Decal_v2", *vsResult.reflection, *psResult.reflection, nvDevice);
+        "Decal", *vsResult.reflection, *psResult.reflection, nvDevice);
 
-    auto makePipe = [&](const char* name, bool multiply) -> nvrhi::GraphicsPipelineHandle {
-        nvrhi::GraphicsPipelineDesc pipeDesc;
-        pipeDesc.setVertexShader(state.vs);
-        pipeDesc.setPixelShader(state.ps);
-        pipeDesc.setInputLayout(state.inputLayout);
-        pipeDesc.addBindingLayout(state.bindingLayout);
+    nvrhi::GraphicsPipelineDesc pipeDesc;
+    pipeDesc.setVertexShader(state.vs);
+    pipeDesc.setPixelShader(state.ps);
+    pipeDesc.setInputLayout(state.inputLayout);
+    pipeDesc.addBindingLayout(state.bindingLayout);
 
-        if (GEnv.Backend && GEnv.Backend->GetBindlessLayout())
-            pipeDesc.addBindingLayout(GEnv.Backend->GetBindlessLayout());
+    if (GEnv.Backend && GEnv.Backend->GetBindlessLayout())
+        pipeDesc.addBindingLayout(GEnv.Backend->GetBindlessLayout());
 
-        pipeDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
-        pipeDesc.renderState.depthStencilState.setDepthTestEnable(false);
-        pipeDesc.renderState.depthStencilState.setDepthWriteEnable(false);
-        pipeDesc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::Front);
+    pipeDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
+    pipeDesc.renderState.depthStencilState.setDepthTestEnable(false);
+    pipeDesc.renderState.depthStencilState.setDepthWriteEnable(false);
+    pipeDesc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::Front);
 
-        auto& blend = pipeDesc.renderState.blendState.targets[0];
-        blend.setBlendEnable(true);
-        if (multiply)
-        {
-            blend.setSrcBlend(nvrhi::BlendFactor::DstColor);
-            blend.setDestBlend(nvrhi::BlendFactor::SrcColor);
-            blend.setBlendOp(nvrhi::BlendOp::Add);
-            blend.setSrcBlendAlpha(nvrhi::BlendFactor::Zero);
-            blend.setDestBlendAlpha(nvrhi::BlendFactor::One);
-            blend.setBlendOpAlpha(nvrhi::BlendOp::Add);
-        }
-        else
-        {
-            blend.setSrcBlend(nvrhi::BlendFactor::SrcAlpha);
-            blend.setDestBlend(nvrhi::BlendFactor::InvSrcAlpha);
-            blend.setBlendOp(nvrhi::BlendOp::Add);
-            blend.setSrcBlendAlpha(nvrhi::BlendFactor::One);
-            blend.setDestBlendAlpha(nvrhi::BlendFactor::InvSrcAlpha);
-            blend.setBlendOpAlpha(nvrhi::BlendOp::Add);
-        }
-        return cache.GetOrCreatePipeline(name, pipeDesc, fbInfo, nvDevice);
-    };
+    auto& blend = pipeDesc.renderState.blendState.targets[0];
+    blend.setBlendEnable(true);
+    blend.setSrcBlend(nvrhi::BlendFactor::SrcAlpha);
+    blend.setDestBlend(nvrhi::BlendFactor::InvSrcAlpha);
+    blend.setBlendOp(nvrhi::BlendOp::Add);
+    blend.setSrcBlendAlpha(nvrhi::BlendFactor::One);
+    blend.setDestBlendAlpha(nvrhi::BlendFactor::InvSrcAlpha);
+    blend.setBlendOpAlpha(nvrhi::BlendOp::Add);
 
-    state.multiplyPipeline = makePipe("DecalMult_v2", true);
-    state.alphaPipeline = makePipe("DecalAlpha_v2", false);
-    state.initialized = state.multiplyPipeline != nullptr && state.alphaPipeline != nullptr;
+    state.pipeline = cache.GetOrCreatePipeline("Decal", pipeDesc, fbInfo, nvDevice);
+    state.initialized = state.pipeline != nullptr;
 }
 
 DefaultOutputLayout setupDecalPass(
@@ -128,7 +110,6 @@ DefaultOutputLayout setupDecalPass(
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
             data.normal = passBuilder.read(inputs.normal, ResourceState::ShaderResource);
             data.sceneColor = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
-            data.worldPos = passBuilder.read(inputs.worldPos, ResourceState::ShaderResource);
         },
 
         [](const DecalPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -138,8 +119,7 @@ DefaultOutputLayout setupDecalPass(
             auto* depthTex = fg.GetPhysicalTexture(data.depth);
             auto* normalTex = fg.GetPhysicalTexture(data.normal);
             auto* colorTex = fg.GetPhysicalTexture(data.sceneColor);
-            auto* worldPosTex = fg.GetPhysicalTexture(data.worldPos);
-            if (!depthTex || !normalTex || !colorTex || !worldPosTex)
+            if (!depthTex || !normalTex || !colorTex)
                 return;
 
             data.decalMgr->Upload(ctx);
@@ -157,15 +137,21 @@ DefaultOutputLayout setupDecalPass(
                 return;
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
-            {
-                StaticGlobals sg = BuildStaticGlobals();
-                cmdList->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
-            }
 
             auto* vsReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("decal_box", ".vs");
             auto* psReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("decal_box", ".ps");
 
-            auto drawCB = cache.GetOrCreateVolatileCB("Frame", "DecalDrawCB", 16, data.device);
+            auto* materialBuffer = MaterialBuffer::Instance().GetBuffer();
+
+            framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Decal");
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+            bsb.BufferSRV("g_Decals", data.decalMgr->GetDecalBuffer());
+            bsb.Texture("g_Depth", depthTex);
+            bsb.Texture("g_Normal", normalTex);
+            bsb.BufferSRV("g_Materials", materialBuffer);
+
+            auto bindingSet = cache.GetOrCreateBindingSet(
+                bsb.Build(), data.passState->bindingLayout, nvDevice);
 
             nvrhi::Viewport viewport;
             viewport.minX = 0;
@@ -175,45 +161,26 @@ DefaultOutputLayout setupDecalPass(
             viewport.minZ = 0.0f;
             viewport.maxZ = 1.0f;
 
+            nvrhi::GraphicsState gfxState;
+            gfxState.pipeline = data.passState->pipeline;
+            gfxState.framebuffer = framebuffer;
+            gfxState.viewport.addViewportAndScissorRect(viewport);
+            gfxState.addBindingSet(bindingSet);
+
             auto* backend = data.device->GetBackend();
             nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
+            if (bindlessTable)
+                gfxState.addBindingSet(bindlessTable);
+
+            gfxState.vertexBuffers = { { data.decalMgr->GetCubeVB(), 0, 0 } };
+            gfxState.indexBuffer = { data.decalMgr->GetCubeIB(), nvrhi::Format::R16_UINT, 0 };
+
+            cmdList->setGraphicsState(gfxState);
 
             nvrhi::DrawArguments args;
             args.vertexCount = decals::CUBE_INDEX_COUNT;
             args.instanceCount = data.decalMgr->GetActiveCount();
-
-            auto drawWith = [&](nvrhi::IGraphicsPipeline* pipeline, u32 wantMultiply) {
-                if (!pipeline)
-                    return;
-                u32 cbData[4] = { wantMultiply, 0, 0, 0 };
-                cmdList->writeBuffer(drawCB, cbData, sizeof(cbData));
-
-                framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Decal");
-                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-                bsb.ConstantBuffer("DecalDrawCB", drawCB);
-                bsb.BufferSRV("g_Decals", data.decalMgr->GetDecalBuffer());
-                bsb.Texture("g_Depth", depthTex);
-                bsb.Texture("g_WorldPos", worldPosTex);
-                BindBindlessMaterialTables(bsb);
-
-                auto bindingSet = cache.GetOrCreateBindingSet(
-                    bsb.Build(), data.passState->bindingLayout, nvDevice);
-
-                nvrhi::GraphicsState gfxState;
-                gfxState.pipeline = pipeline;
-                gfxState.framebuffer = framebuffer;
-                gfxState.viewport.addViewportAndScissorRect(viewport);
-                gfxState.addBindingSet(bindingSet);
-                if (bindlessTable)
-                    gfxState.addBindingSet(bindlessTable);
-                gfxState.vertexBuffers = { { data.decalMgr->GetCubeVB(), 0, 0 } };
-                gfxState.indexBuffer = { data.decalMgr->GetCubeIB(), nvrhi::Format::R16_UINT, 0 };
-                cmdList->setGraphicsState(gfxState);
-                cmdList->drawIndexed(args);
-            };
-
-            drawWith(data.passState->multiplyPipeline, 1);
-            drawWith(data.passState->alphaPipeline, 0);
+            cmdList->drawIndexed(args);
         }
     );
 

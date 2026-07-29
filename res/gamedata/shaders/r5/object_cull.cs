@@ -53,8 +53,7 @@ cbuffer CullParams : register(b5)  // b5 to avoid conflicts with common.h
     uint g_HiZHeight;              // Hi-Z pyramid base height
     uint g_HiZMipLevels;           // Number of Hi-Z mip levels
     uint g_FrameId;                // Frame stamp for visibility
-    uint g_HiZEnable;              // 0=skip Hi-Z occlusion (frustum+distance only)
-    uint2 g_Padding;
+    uint3 g_Padding;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -113,13 +112,9 @@ void main(uint3 dtID : SV_DispatchThreadID)
     // 3. Hi-Z occlusion culling (expensive - texture sample + math)
     // Note: This test is conservative - may mark occluded objects as visible
     // but will never mark visible objects as occluded
-    // TEMPORAL HI-Z: Use prevViewProj for Hi-Z lookup since pyramid was built from previous frame's depth
-    if (g_HiZEnable != 0)
-    {
-        if (!HiZTestSphereTemporal(obj.position, obj.radius, g_CameraPos, g_ViewProj, g_PrevViewProj,
-                           g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
-            return;
-    }
+    if (!HiZTestSphere(obj.position, obj.radius, g_CameraPos, g_PrevViewProj,
+                       g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
+        return;
 
     // ─────────────────────────────────────────────────────
     //  OBJECT IS VISIBLE - Add to output

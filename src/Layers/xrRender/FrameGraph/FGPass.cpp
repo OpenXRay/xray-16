@@ -46,12 +46,12 @@ public:
     }
 
     PassBuilder& DepthStencil(VirtualResourceHandle resource) {
-        m_node->WriteDepthStencil(resource, false, 1.0f, 0);
+        m_node->WriteDepthStencil(resource, false, 0.0f, 0);
         return *this;
     }
 
     PassBuilder& DepthStencilClear(VirtualResourceHandle resource,
-                                   float clearDepth = 1.0f, u8 clearStencil = 0) {
+                                   float clearDepth = 0.0f, u8 clearStencil = 0) {
         m_node->WriteDepthStencil(resource, true, clearDepth, clearStencil);
         return *this;
     }

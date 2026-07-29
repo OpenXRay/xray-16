@@ -114,12 +114,6 @@ float3	v_hemi(float3 n)
 	return L_hemi_color.rgb*(.5f + .5f*n.y);
 }
 
-float calc_model_hemi(float3 norm_w)
-{
-	float ny = normalize(norm_w).y;
-	return saturate(0.52f + 0.48f * ny);
-}
-
 float3	v_sun(float3 n)                        	
 {
 	return L_sun_color*dot(n,-L_sun_dir_w);                
@@ -224,18 +218,20 @@ float gbuf_unpack_mtl( float mtl_hemi )
 }
 
 #include "shared/pbr_brdf.h"
-#if defined(SKY_IBL)
-#include "shared/sky_ibl.h"
-#endif
-#include "shared/foliage_sss.h"
-#include "shared/glass_sss.h"
-#include "shared/basecolor_pack.h"
-#include "shared/shadow_sampling.h"
 #include "shared/clustered_lighting.h"
 
 float3 worldNormalToView(float3 N)
 {
 	return normalize(mul(float3x3(m_V[0].xyz, m_V[1].xyz, m_V[2].xyz), N));
+}
+
+float3 reconstruct_world_pos(float2 svPosXY, float depth)
+{
+	float2 uv = svPosXY * screen_res.zw;
+	float4 clip = float4(uv * 2.0 - 1.0, depth, 1.0);
+	clip.y = -clip.y;
+	float4 world = mul(m_InvVP, clip);
+	return world.xyz / world.w;
 }
 
 f_forward output_forward_color(float3 albedo, float3 normal, float3 worldPos, float metallic, float roughness)
@@ -244,7 +240,6 @@ f_forward output_forward_color(float3 albedo, float3 normal, float3 worldPos, fl
 	res.color = float4(albedo, 1.0);
 	res.normal = float4(normalize(normal), roughness);
 	res.baseColor = float4(albedo, metallic);
-	res.worldPos = float4(worldPos, 1.0);
 	return res;
 }
 
@@ -255,173 +250,43 @@ f_forward output_forward_pbr(
 	float metallic,
 	float roughness,
 	float ao,
-	float4 svPosition = float4(0, 0, 0, 0),
-	float hemi = 1.0,
-	float sunOcclusion = 1.0,
-	float sssStrength = 0.0,
-	float3 sssTint = float3(1, 1, 1),
-	float sssThickness = 1.0,
-	float sssMask = 0.0,
-	float sssProfile = -1.0)
+	float4 svPosition = float4(0, 0, 0, 0))
 {
 	f_forward res;
-
-	if (parallax.w < -0.5)
-	{
-		float3 N = normalize(worldNormal);
-		float3 V = normalize(eye_position - worldPos);
-		float3 L = normalize(-L_sun_dir_w);
-		float hemiTerm = saturate(hemi);
-		float indoor = saturate(1.0 - hemiTerm * 1.35);
-		float hemiFill = max(hemiTerm, lerp(0.08, 0.28, indoor));
-		float hemiDir = 0.4 + 0.6 * saturate(N.y * 0.5 + 0.5);
-		float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * max(L_hemi_color.w, 0.35) * hemiDir;
-		ambientColor = max(ambientColor, L_ambient.rgb + L_hemi_color.rgb * lerp(0.12, 0.4, indoor));
-		float3 ambient = PBRAmbient(albedo, N, V, metallic, roughness, ao, ambientColor * hemiFill);
-		float3 finalColor = ambient;
-		float sssAmt = max(sssStrength, sssMask * max(parallax.z, 0.0));
-		if (sssAmt > 1e-4)
-		{
-			finalColor += EvaluateFoliageSSS(
-				albedo, N, V, L, L_sun_color, 1.0,
-				sssTint, max(sssThickness, 0.65), sssAmt);
-		}
-		{
-			float dist = length(worldPos - eye_position);
-			float fog = saturate(dist * fog_params.w + fog_params.x);
-			finalColor = lerp(finalColor, fog_color.rgb, fog);
-		}
-		res.color = float4(finalColor, 1.0);
-		res.normal = float4(N, roughness);
-		res.baseColor = float4(albedo, PackBaseColorA(metallic, max(sssMask, saturate(sssAmt))));
-		res.worldPos = float4(worldPos, 1.0);
-		return res;
-	}
 
 	float3 N = normalize(worldNormal);
 	float3 V = normalize(eye_position - worldPos);
 	float3 L = normalize(-L_sun_dir_w);
-	float albedoLum = dot(albedo, float3(0.2126, 0.7152, 0.0722));
-	metallic *= saturate(albedoLum * 3.2 + 0.35);
-	albedo = SanitizeMetalAlbedo(albedo, metallic);
-	float hemiTerm = saturate(hemi);
-	float sunTerm = saturate(sunOcclusion);
-	float ndl = dot(N, L);
-	bool needSunShadow = (ndl > 0.0) || (sssStrength > 1e-4);
-
-	float csm = 1.0;
-	float contact = 1.0;
-	float2 maskUV = float2(0, 0);
-	if (svPosition.w != 0)
-		maskUV = float2(svPosition.x * screen_res.z, svPosition.y * screen_res.w);
-#if defined(SHADOW_MASK_FORWARD)
-	bool useMask = ShadowMaskEnabled() && (svPosition.w != 0);
-	if (useMask)
-	{
-		float3 mask = SampleShadowMask(maskUV);
-		if (needSunShadow)
-		{
-			csm = lerp(0.20, 1.0, saturate(mask.r));
-			contact = saturate(mask.g);
-		}
-	}
-	else
-#endif
-	if (needSunShadow)
-	{
-#if defined(CSM_CHEAP_FORWARD)
-		csm = SampleCSM_Fast(worldPos, N);
-#else
-		csm = SampleCSM(worldPos, N);
-#endif
-		csm = lerp(0.20, 1.0, saturate(csm));
-		contact = ContactShadow(worldPos, L);
-	}
-	float sunShadow = csm * contact * sunTerm;
 
 	float3 sunLight = PBRDirectLighting(
 		albedo, N, V, L,
 		L_sun_color,
 		metallic, roughness, (uint)pbr_diffuse_mode
-	) * sunShadow;
+	);
 
-	float3 ambient;
-#if defined(SKY_IBL)
-	float iblIntensity = parallax.w; // packed: r_sky_ibl ? intensity : 0
-	if (iblIntensity > 1e-4)
-	{
-		ambient = PBRAmbientIBL(
-			albedo, N, V, worldPos,
-			metallic, roughness, ao,
-			hemiTerm, iblIntensity);
-	}
-	else
-#endif
-	{
-		float3 ambientColor = (L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w) * hemiTerm;
-		ambient = PBRAmbient(
-			albedo, N, V,
-			metallic, roughness, ao,
-			ambientColor
-		);
-	}
+	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
+	float3 ambient = PBRAmbient(
+		albedo, N, V,
+		metallic, roughness, ao,
+		ambientColor
+	);
 
 	float3 finalColor = sunLight + ambient;
-
-	if (sssStrength > 1e-4)
-	{
-		if (sssProfile > 3.5)
-		{
-			finalColor += EvaluateGlassTransmission(
-				albedo, N, V, L, L_sun_color, sunShadow,
-				sssThickness, sssStrength);
-		}
-		else
-		{
-			finalColor += EvaluateFoliageSSS(
-				albedo, N, V, L, L_sun_color, sunShadow,
-				sssTint, sssThickness, sssStrength);
-#if defined(SKY_IBL)
-			if (parallax.w > 1e-4)
-			{
-				finalColor += EvaluateFoliageSkySSS(
-					albedo, N, sssTint, sssThickness, sssStrength * parallax.w);
-			}
-#endif
-		}
-	}
 
 #ifdef CLUSTERED_LIGHTING_FORWARD
 	if (svPosition.w != 0)
 	{
-		float linearDepth = abs(mul(m_V, float4(worldPos, 1.0)).z);
+		float linearDepth = mul(m_V, float4(worldPos, 1.0)).z;
 		float3 clusterLights = EvaluateClusteredLights(
 			worldPos, N, V, albedo, metallic, roughness,
-			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode, 1.0);
+			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode);
 		finalColor += clusterLights;
-
-		// r_cluster_debug (dev_param_2.w): 1=tileXY, 2=slice
-		int clusterDebug = (int)(dev_param_2.w + 0.5);
-		if (clusterDebug > 0)
-			finalColor = ClusterDebugColor(svPosition.xy, linearDepth, clusterDebug);
 	}
 #endif
 
-	{
-		float dist = length(worldPos - eye_position);
-		float fog = saturate(dist * fog_params.w + fog_params.x);
-		finalColor = lerp(finalColor, fog_color.rgb, fog);
-	}
-
-	// Shadow diagnostics: r_shadow_debug (dev_param_3.z) overrides scene color.
-	int shadowDebug = (int)(dev_param_3.z + 0.5);
-	if (shadowDebug > 0)
-		finalColor = ShadowDebugColor(worldPos, N, L, shadowDebug);
-
 	res.color = float4(finalColor, 1.0);
 	res.normal = float4(N, roughness);
-	res.baseColor = float4(albedo, PackBaseColorA(metallic, sssMask));
-	res.worldPos = float4(worldPos, 1.0);
+	res.baseColor = float4(albedo, metallic);
 	return res;
 }
 

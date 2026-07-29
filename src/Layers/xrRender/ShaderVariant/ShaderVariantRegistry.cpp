@@ -43,7 +43,7 @@ static nvrhi::BlendOp ParseBlendOp(const char* str)
 
 static nvrhi::ComparisonFunc ParseComparisonFunc(const char* str)
 {
-    if (!str || !str[0]) return nvrhi::ComparisonFunc::LessOrEqual;
+    if (!str || !str[0]) return nvrhi::ComparisonFunc::GreaterOrEqual;
     if (!xr_strcmp(str, "Never")) return nvrhi::ComparisonFunc::Never;
     if (!xr_strcmp(str, "Less")) return nvrhi::ComparisonFunc::Less;
     if (!xr_strcmp(str, "Equal")) return nvrhi::ComparisonFunc::Equal;
@@ -53,7 +53,7 @@ static nvrhi::ComparisonFunc ParseComparisonFunc(const char* str)
     if (!xr_strcmp(str, "GreaterOrEqual")) return nvrhi::ComparisonFunc::GreaterOrEqual;
     if (!xr_strcmp(str, "Always")) return nvrhi::ComparisonFunc::Always;
     Msg("! [ShaderVariant] Unknown comparison func: '%s'", str);
-    return nvrhi::ComparisonFunc::LessOrEqual;
+    return nvrhi::ComparisonFunc::GreaterOrEqual;
 }
 
 static nvrhi::RasterCullMode ParseCullMode(const char* str)
@@ -119,7 +119,7 @@ static void ParseDepthState(const JsonValue& depth, ShaderPassDesc& pass)
     if (!depth.is_object()) return;
     pass.depthStencil.depthTestEnable = depth["test"].as_bool(true);
     pass.depthStencil.depthWriteEnable = depth["write"].as_bool(true);
-    pass.depthStencil.depthFunc = ParseComparisonFunc(depth["func"].as_string("LessOrEqual"));
+    pass.depthStencil.depthFunc = ParseComparisonFunc(depth["func"].as_string("GreaterOrEqual"));
 }
 
 static void ParseStencilState(const JsonValue& stencil, ShaderPassDesc& pass)

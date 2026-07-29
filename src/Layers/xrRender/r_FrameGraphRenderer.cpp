@@ -795,6 +795,18 @@ void FrameGraphRenderer::RenderStatsOverlay()
         // Collect particle stats
         stats.particleBatches = static_cast<u32>(m_worldParticleBatches.size() + m_hudParticleBatches.size());
 
+        if (m_blackboard)
+        {
+            const auto& particleCull = m_blackboard->get_or_add<passes::ParticlePassState>().cullStats;
+            if (particleCull.active)
+            {
+                stats.particleCullSubmitted = particleCull.submittedBatches;
+                stats.particleCullVisible = particleCull.visibleBatches;
+                stats.particleQuadsSubmitted = particleCull.submittedQuads;
+                stats.particleQuadsVisible = particleCull.visibleQuads;
+            }
+        }
+
         // Collect GPU culling stats
         if (m_gpuCullingManager)
         {
@@ -2349,6 +2361,21 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             fxLayout.normal = rtgiGuideNormal;
         if (rtgiActive && rtgiGuideBaseColor.is_valid())
             fxLayout.baseColor = rtgiGuideBaseColor;
+        framegraph::VirtualResourceHandle particlePrevDepth;
+        if (hasPrevDepth && m_prevFrameDepth)
+        {
+            framegraph::ResourceDesc particlePrevDepthDesc;
+            particlePrevDepthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+            particlePrevDepthDesc.debugName = "rt_ParticlePrevDepth";
+            particlePrevDepthDesc.width = width;
+            particlePrevDepthDesc.height = height;
+            particlePrevDepthDesc.format = nvrhi::Format::D32;
+            particlePrevDepthDesc.isDepthStencil = true;
+            particlePrevDepthDesc.isImported = true;
+            particlePrevDepthDesc.isTransient = false;
+            particlePrevDepth = m_framegraph->ImportTexture(
+                "rt_ParticlePrevDepth", m_prevFrameDepth, particlePrevDepthDesc);
+        }
         auto particleOutputs = passes::setupParticlePass(
             *m_framegraph,
             m_device,
@@ -2362,6 +2389,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             hizOutput.width,
             hizOutput.height,
             hizOutput.mipLevels,
+            m_hasPrevFrameData ? &m_prevViewProj : nullptr,
+            particlePrevDepth,
             &m_blackboard->get_or_add<passes::ParticlePassState>()
         );
 

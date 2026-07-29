@@ -1,11 +1,9 @@
 #define SM_6_0
 #include "common.h"
-#include "shared/surface_marks.h"
 
 Texture2D g_Snapshot : register(t0);
 Texture2D g_Distortion : register(t1);
-Texture2D<float4> g_WorldPos : register(t2);
-Texture2D<float4> g_BaseColor : register(t3);
+Texture2D<float> g_Depth : register(t2);
 
 struct PS_INPUT
 {
@@ -13,47 +11,41 @@ struct PS_INPUT
     float2 texcoord : TEXCOORD0;
 };
 
-bool IsHudNear(float2 uv, float2 texel)
-{
-    [unroll]
-    for (int y = -2; y <= 2; ++y)
-    {
-        [unroll]
-        for (int x = -2; x <= 2; ++x)
-        {
-            float2 p = uv + float2(x, y) * texel;
-            float m = g_WorldPos.SampleLevel(smp_nofilter, saturate(p), 0).w;
-            if (IsHudSurfMark(m))
-                return true;
-        }
-    }
-    return false;
-}
-
 float4 main(PS_INPUT input) : SV_Target0
 {
-    float4 snapshot = g_Snapshot.Sample(smp_linear, input.texcoord);
-    float4 distortSample = g_Distortion.Sample(smp_nofilter, input.texcoord);
+    float4 distortSample = g_Distortion.Sample(smp_linear, input.texcoord);
     float2 offset = distortSample.xy;
     float totalWeight = distortSample.w;
 
-    if (totalWeight < 0.0001 || dot(offset, offset) < 1e-10)
-        return snapshot;
+    if (totalWeight < 0.0001)
+        return g_Snapshot.Sample(smp_linear, input.texcoord);
 
-    float mark = g_WorldPos.SampleLevel(smp_nofilter, input.texcoord, 0).w;
-    if (IsHudSurfMark(mark) || !IsWaterSurfMark(mark))
-        return snapshot;
+    float sourceViewZ = distortSample.z / totalWeight;
 
-    float2 texel = screen_res.zw;
-    if (IsHudNear(input.texcoord, texel))
-        return snapshot;
+    int2 pixelCoord = (int2)input.position.xy;
+    float currentDepth = g_Depth.Load(int3(pixelCoord, 0));
+    float3 viewDir = camera_direction.xyz;
+    float currentViewZ = 0.0;
+    if (currentDepth > 0.0) {
+        float3 currentWP = reconstruct_world_pos(input.position.xy, currentDepth);
+        currentViewZ = dot(currentWP - eye_position, viewDir);
+
+        if (currentViewZ < sourceViewZ * 0.9)
+            return g_Snapshot.Sample(smp_linear, input.texcoord);
+    }
 
     float2 displaced = saturate(input.texcoord + offset);
-    float destMark = g_WorldPos.SampleLevel(smp_nofilter, displaced, 0).w;
-    if (IsHudSurfMark(destMark) || !IsWaterSurfMark(destMark))
-        return snapshot;
-    if (IsHudNear(displaced, texel))
-        return snapshot;
+
+    if (currentDepth > 0.0) {
+        float2 displacedPx = displaced * screen_res.xy;
+        float displacedDepth = g_Depth.Load(int3((int2)displacedPx, 0));
+        if (displacedDepth > 0.0) {
+            float3 displacedWP = reconstruct_world_pos(displacedPx, displacedDepth);
+            float displacedViewZ = dot(displacedWP - eye_position, viewDir);
+            if (displacedViewZ < currentViewZ * 0.85)
+                displaced = input.texcoord;
+        }
+    }
 
     return g_Snapshot.Sample(smp_linear, displaced);
 }

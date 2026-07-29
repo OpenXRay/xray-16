@@ -27,7 +27,6 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
     float4 baseColor : SV_Target2;
-    float4 worldPos : SV_Target3;
 };
 
 float3 UndoHUDFOVAdjustment(float3 adjustedWorldPos)
@@ -118,7 +117,7 @@ PS_OUTPUT main(PS_INPUT input)
     output.color = float4(fwd.color.rgb, 1.0);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
-    output.worldPos = float4(correctedWorldPos, 2.0);
+    output.normal.a = -max(fwd.normal.a, 0.004);
     return output;
 }
 

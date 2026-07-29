@@ -20,8 +20,7 @@ using namespace framegraph;
 struct DistortionApplyData {
     VirtualResourceHandle sceneInput;
     VirtualResourceHandle distortionInput;
-    VirtualResourceHandle worldPosInput;
-    VirtualResourceHandle baseColorInput;
+    VirtualResourceHandle depthInput;
     VirtualResourceHandle output;
     u32 width;
     u32 height;
@@ -44,7 +43,7 @@ void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassSt
     auto& cache = GetPassResourceCache();
 
     state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "DistortionApply_v8_HudDilate", *vsResult.reflection, *psResult.reflection, device);
+        "DistortionApply", *vsResult.reflection, *psResult.reflection, device);
 
     if (state.bindingLayout) {
         nvrhi::GraphicsPipelineDesc pipeDesc;
@@ -60,7 +59,7 @@ void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassSt
         nvrhi::FramebufferInfoEx fbInfo;
         fbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
 
-        state.pipeline = cache.GetOrCreatePipeline("DistortionApply_v8_HudDilate", pipeDesc, fbInfo, device);
+        state.pipeline = cache.GetOrCreatePipeline("DistortionApply", pipeDesc, fbInfo, device);
     }
     state.initialized = true;
 }
@@ -70,17 +69,13 @@ VirtualResourceHandle setupDistortionApplyPass(
     fg::RenderDevice* device,
     VirtualResourceHandle sceneColor,
     VirtualResourceHandle distortionRT,
-    VirtualResourceHandle worldPos,
-    VirtualResourceHandle baseColor,
+    VirtualResourceHandle depth,
     u32 width,
     u32 height,
     DistortionApplyPassState& passState)
 {
     if (device && device->GetNVRHIDevice())
         InitializeDistortionApplyPass(device->GetNVRHIDevice(), passState);
-
-    if (!distortionRT.is_valid() || !sceneColor.is_valid())
-        return sceneColor;
 
     ResourceDesc outputDesc;
     outputDesc.type = ResourceDesc::Type::Texture2D;
@@ -96,19 +91,14 @@ VirtualResourceHandle setupDistortionApplyPass(
     auto& passData = fg.addCallbackPass<DistortionApplyData>(
         "DistortionApply",
 
-        [sceneColor, distortionRT, worldPos, baseColor, outputHandle, width, height, &passState](FrameGraph& builder, PassHandle passHandle, DistortionApplyData& data) {
+        [sceneColor, distortionRT, depth, outputHandle, width, height, &passState](FrameGraph& builder, PassHandle passHandle, DistortionApplyData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.width = width;
             data.height = height;
             data.passState = &passState;
             data.sceneInput = passBuilder.read(sceneColor, ResourceState::ShaderResource);
             data.distortionInput = passBuilder.read(distortionRT, ResourceState::ShaderResource);
-            data.worldPosInput = worldPos.is_valid()
-                ? passBuilder.read(worldPos, ResourceState::ShaderResource)
-                : VirtualResourceHandle{};
-            data.baseColorInput = baseColor.is_valid()
-                ? passBuilder.read(baseColor, ResourceState::ShaderResource)
-                : VirtualResourceHandle{};
+            data.depthInput = passBuilder.read(depth, ResourceState::ShaderResource);
             data.output = passBuilder.write(outputHandle, ResourceState::RenderTarget);
         },
 
@@ -116,10 +106,9 @@ VirtualResourceHandle setupDistortionApplyPass(
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             auto* sceneTex = fg.GetPhysicalTexture(data.sceneInput);
             auto* distortTex = fg.GetPhysicalTexture(data.distortionInput);
-            auto* worldPosTex = data.worldPosInput.is_valid() ? fg.GetPhysicalTexture(data.worldPosInput) : nullptr;
-            auto* baseColorTex = data.baseColorInput.is_valid() ? fg.GetPhysicalTexture(data.baseColorInput) : nullptr;
+            auto* depthTex = fg.GetPhysicalTexture(data.depthInput);
             auto* outputTex = fg.GetPhysicalTexture(data.output);
-            if (!sceneTex || !distortTex || !outputTex)
+            if (!sceneTex || !distortTex || !depthTex || !outputTex)
                 return;
 
             auto* ps = data.passState;
@@ -140,8 +129,7 @@ VirtualResourceHandle setupDistortionApplyPass(
             bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                .Texture("g_Snapshot", sceneTex)
                .Texture("g_Distortion", distortTex)
-               .Texture("g_WorldPos", worldPosTex ? worldPosTex : cache.GetDummyContactHistory(device))
-               .Texture("g_BaseColor", baseColorTex ? baseColorTex : cache.GetDummyContactHistory(device));
+               .Texture("g_Depth", depthTex);
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->bindingLayout, device);
 
             nvrhi::FramebufferDesc fbDesc;

@@ -1,11 +1,6 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
-#include "shared/wmark.h"
-
-#define DECAL_FLAG_STATIC   0u
-#define DECAL_FLAG_SKELETON 1u
-#define DECAL_FLAG_MULTIPLY 2u
 
 struct GPUDecalData
 {
@@ -17,15 +12,9 @@ struct GPUDecalData
     uint flags;
 };
 
-cbuffer DecalDrawCB : register(b4)
-{
-    uint g_WantMultiply;
-    uint3 _decalDrawPad;
-};
-
 StructuredBuffer<GPUDecalData> g_Decals : register(t3);
 Texture2D<float> g_Depth : register(t24);
-Texture2D<float4> g_WorldPos : register(t25);
+Texture2D<float4> g_Normal : register(t25);
 
 struct VS_OUTPUT
 {
@@ -37,31 +26,22 @@ struct VS_OUTPUT
 float4 main(VS_OUTPUT input) : SV_Target0
 {
     GPUDecalData decal = g_Decals[input.instanceID];
-    bool multiply = (decal.flags & DECAL_FLAG_MULTIPLY) != 0u;
-    if (multiply != (g_WantMultiply != 0u))
-        discard;
-
     int2 pixelCoord = int2(input.position.xy);
 
     float depth = g_Depth.Load(int3(pixelCoord, 0));
-    if (depth >= 1.0)
+    if (depth <= 0.0)
         discard;
 
-    float4 worldPosData = g_WorldPos.Load(int3(pixelCoord, 0));
-    float geoType = worldPosData.w;
-    bool isStatic = geoType < 1.5;
-    if ((decal.flags & 1u) == 0u && !isStatic)
+    bool isStatic = g_Normal.Load(int3(pixelCoord, 0)).a >= 0.0;
+    if (decal.flags == 0 && !isStatic)
         discard;
-    if ((decal.flags & 1u) != 0u && isStatic)
+    if (decal.flags == 1 && isStatic)
         discard;
-    if ((decal.flags & 1u) != 0u && depth < 0.1)
+    if (decal.flags == 1 && depth > 0.9)
         discard;
-
-    float3 worldPos = worldPosData.xyz;
-    float3 decalN = normalize(mul((float3x3)decal.decalToWorld, float3(0, 1, 0)));
-    worldPos += decalN * NORMAL_SHIFT;
-
+    float3 worldPos = reconstruct_world_pos(input.position.xy, depth);
     float4 decalLocal = mul(decal.worldToDecal, float4(worldPos, 1.0));
+
     float3 absLocal = abs(decalLocal.xyz);
     if (absLocal.x > 0.5 || absLocal.y > 0.5 || absLocal.z > 0.5)
         discard;
@@ -70,22 +50,10 @@ float4 main(VS_OUTPUT input) : SV_Target0
 
     MaterialData mat = g_Materials[decal.materialID];
     float4 decalColor = SampleDiffuse(mat, uv);
-    float metallic, roughness, ao, parallax;
-    ResolveMaterialPBR(mat, uv, 0.0, metallic, roughness, ao, parallax);
-    decalColor.rgb *= ao;
 
     float3 edgeDist = 0.5 - absLocal;
     float minEdge = min(edgeDist.x, min(edgeDist.y, edgeDist.z));
-    float edgeFade = saturate(minEdge * 8.0);
-    float a = saturate(decalColor.a * decal.opacity * edgeFade);
-    if (a < 0.01)
-        discard;
+    float edgeFade = saturate(minEdge * 4.0);
 
-    if (multiply)
-    {
-        float3 rgb = lerp(float3(0.5, 0.5, 0.5), decalColor.rgb, a);
-        return float4(rgb, 1.0);
-    }
-
-    return float4(decalColor.rgb, a);
+    return float4(decalColor.rgb, decalColor.a * decal.opacity * edgeFade);
 }

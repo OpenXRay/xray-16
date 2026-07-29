@@ -16,6 +16,16 @@ namespace xray::render::fg
 namespace
 {
 constexpr u32 kMaxFlares = 24;
+
+struct FlareVisParams
+{
+    float sunPosX;
+    float sunPosY;
+    float radiusPx;
+    float emaAlpha;
+    u32 valid;
+    u32 pad[3];
+};
 } // namespace
 
 FGLensFlareRender::FGLensFlareRender()
@@ -43,6 +53,14 @@ void FGLensFlareRender::InitResources()
     R_ASSERT2(psResult.handle, "FGLensFlareRender: failed to load effects_world_textured.ps");
     m_ps = psResult.handle;
 
+    auto vsOverlayResult = shaderLoader->LoadVertexShader("effects_flare", "main");
+    R_ASSERT2(vsOverlayResult.handle, "FGLensFlareRender: failed to load effects_flare.vs");
+    m_vsOverlay = vsOverlayResult.handle;
+
+    auto csResult = shaderLoader->LoadComputeShader("flare_visibility", "main");
+    R_ASSERT2(csResult.handle, "FGLensFlareRender: failed to load flare_visibility.cs");
+    m_visCS = csResult.handle;
+
     nvrhi::VertexAttributeDesc vertexAttrs[] = {
         nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGB32_FLOAT).setOffset(0).setElementStride(sizeof(Vertex)),
         nvrhi::VertexAttributeDesc().setName("COLOR").setFormat(nvrhi::Format::RGBA8_UNORM).setOffset(12).setElementStride(sizeof(Vertex)),
@@ -50,6 +68,8 @@ void FGLensFlareRender::InitResources()
     };
     m_inputLayout = m_device->createInputLayout(vertexAttrs, 3, m_vs);
     R_ASSERT2(m_inputLayout, "FGLensFlareRender: createInputLayout failed");
+    m_inputLayoutOverlay = m_device->createInputLayout(vertexAttrs, 3, m_vsOverlay);
+    R_ASSERT2(m_inputLayoutOverlay, "FGLensFlareRender: createInputLayout (overlay) failed");
 
     nvrhi::BufferDesc cbDesc;
     cbDesc.byteSize = sizeof(passes::DynamicTransforms);
@@ -59,6 +79,25 @@ void FGLensFlareRender::InitResources()
     cbDesc.debugName = "FGLensFlareRender_CB";
     m_constantBuffer = m_device->createBuffer(cbDesc);
     R_ASSERT2(m_constantBuffer, "FGLensFlareRender: createBuffer(CB) failed");
+
+    nvrhi::BufferDesc visCbDesc;
+    visCbDesc.byteSize = sizeof(FlareVisParams);
+    visCbDesc.isConstantBuffer = true;
+    visCbDesc.isVolatile = true;
+    visCbDesc.maxVersions = 16;
+    visCbDesc.debugName = "FGLensFlareRender_VisCB";
+    m_visConstantBuffer = m_device->createBuffer(visCbDesc);
+    R_ASSERT2(m_visConstantBuffer, "FGLensFlareRender: createBuffer(VisCB) failed");
+
+    nvrhi::BufferDesc visDesc;
+    visDesc.byteSize = sizeof(float);
+    visDesc.structStride = sizeof(float);
+    visDesc.canHaveUAVs = true;
+    visDesc.debugName = "FGLensFlareRender_Vis";
+    visDesc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+    visDesc.keepInitialState = true;
+    m_visBuffer = m_device->createBuffer(visDesc);
+    R_ASSERT2(m_visBuffer, "FGLensFlareRender: createBuffer(Vis) failed");
 
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
@@ -76,29 +115,67 @@ void FGLensFlareRender::InitResources()
     m_bindingLayout = m_device->createBindingLayout(bindingLayoutDesc);
     R_ASSERT2(m_bindingLayout, "FGLensFlareRender: createBindingLayout failed");
 
+    nvrhi::BindingLayoutDesc overlayLayoutDesc;
+    overlayLayoutDesc.visibility = nvrhi::ShaderType::All;
+    overlayLayoutDesc.bindings = {
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
+        nvrhi::BindingLayoutItem::Texture_SRV(0),
+        nvrhi::BindingLayoutItem::Sampler(0),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
+    };
+    m_overlayBindingLayout = m_device->createBindingLayout(overlayLayoutDesc);
+    R_ASSERT2(m_overlayBindingLayout, "FGLensFlareRender: createBindingLayout (overlay) failed");
+
+    nvrhi::BindingLayoutDesc visLayoutDesc;
+    visLayoutDesc.visibility = nvrhi::ShaderType::Compute;
+    visLayoutDesc.bindings = {
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
+        nvrhi::BindingLayoutItem::Texture_SRV(0),
+        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
+    };
+    m_visBindingLayout = m_device->createBindingLayout(visLayoutDesc);
+    R_ASSERT2(m_visBindingLayout, "FGLensFlareRender: createBindingLayout (vis) failed");
+
     nvrhi::FramebufferInfo fbInfo;
     fbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
     fbInfo.setDepthFormat(nvrhi::Format::D32);
     fbInfo.setSampleCount(1);
 
-    nvrhi::GraphicsPipelineDesc pipelineDesc;
-    pipelineDesc.VS = m_vs;
-    pipelineDesc.PS = m_ps;
-    pipelineDesc.inputLayout = m_inputLayout;
-    pipelineDesc.bindingLayouts = { m_bindingLayout };
-    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
-    pipelineDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-    pipelineDesc.renderState.depthStencilState.depthTestEnable = false;
-    pipelineDesc.renderState.depthStencilState.depthWriteEnable = false;
-    pipelineDesc.renderState.blendState.targets[0]
+    nvrhi::GraphicsPipelineDesc sourceDesc;
+    sourceDesc.VS = m_vs;
+    sourceDesc.PS = m_ps;
+    sourceDesc.inputLayout = m_inputLayout;
+    sourceDesc.bindingLayouts = { m_bindingLayout };
+    sourceDesc.primType = nvrhi::PrimitiveType::TriangleList;
+    sourceDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+    sourceDesc.renderState.depthStencilState.depthTestEnable = true;
+    sourceDesc.renderState.depthStencilState.depthWriteEnable = false;
+    sourceDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+    sourceDesc.renderState.blendState.targets[0]
         .setBlendEnable(true)
         .setSrcBlend(nvrhi::BlendFactor::SrcAlpha)
         .setDestBlend(nvrhi::BlendFactor::One)
         .setSrcBlendAlpha(nvrhi::BlendFactor::One)
         .setDestBlendAlpha(nvrhi::BlendFactor::One);
 
-    m_pipeline = m_device->createGraphicsPipeline(pipelineDesc, fbInfo);
-    R_ASSERT2(m_pipeline, "FGLensFlareRender: createGraphicsPipeline failed");
+    m_pipelineSource = m_device->createGraphicsPipeline(sourceDesc, fbInfo);
+    R_ASSERT2(m_pipelineSource, "FGLensFlareRender: createGraphicsPipeline (source) failed");
+
+    nvrhi::GraphicsPipelineDesc overlayDesc = sourceDesc;
+    overlayDesc.VS = m_vsOverlay;
+    overlayDesc.inputLayout = m_inputLayoutOverlay;
+    overlayDesc.bindingLayouts = { m_overlayBindingLayout };
+    overlayDesc.renderState.depthStencilState.depthTestEnable = false;
+    overlayDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Always;
+
+    m_pipelineOverlay = m_device->createGraphicsPipeline(overlayDesc, fbInfo);
+    R_ASSERT2(m_pipelineOverlay, "FGLensFlareRender: createGraphicsPipeline (overlay) failed");
+
+    nvrhi::ComputePipelineDesc visPipelineDesc;
+    visPipelineDesc.CS = m_visCS;
+    visPipelineDesc.bindingLayouts = { m_visBindingLayout };
+    m_visPipeline = m_device->createComputePipeline(visPipelineDesc);
+    R_ASSERT2(m_visPipeline, "FGLensFlareRender: createComputePipeline (vis) failed");
 }
 
 void FGLensFlareRender::Copy(ILensFlareRender& _in)
@@ -129,7 +206,8 @@ nvrhi::ITexture* FGLensFlareRender::ResolveTexture(const shared_str& name)
     return handle;
 }
 
-void FGLensFlareRender::PushQuad(const Fvector& center, const Fvector& vecX, const Fvector& vecY, u32 color, nvrhi::ITexture* tex)
+void FGLensFlareRender::PushQuad(const Fvector& center, const Fvector& vecX, const Fvector& vecY, u32 color,
+    nvrhi::ITexture* tex, bool depthTested)
 {
     if (!tex)
         return;
@@ -182,6 +260,7 @@ void FGLensFlareRender::PushQuad(const Fvector& center, const Fvector& vecX, con
     b.indexOffset = iStart;
     b.indexCount = 6;
     b.texture = tex;
+    b.depthTested = depthTested;
     m_batches.push_back(b);
 }
 
@@ -190,6 +269,20 @@ void FGLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
     Clear();
     if (!owner.m_Current)
         return;
+
+    m_sunValid = false;
+    Fvector4 clip;
+    Device.mFullTransform.transform(clip, owner.vecLight);
+    if (clip.w > 0.f)
+    {
+        m_sunValid = true;
+        m_sunPosPx.set((clip.x * 0.5f + 0.5f) * float(Device.dwWidth),
+            (1.f - (clip.y * 0.5f + 0.5f)) * float(Device.dwHeight));
+        const float radius =
+            owner.m_Current->m_Flags.is(CLensFlareDescriptor::flSource) ? owner.m_Current->m_Source.fRadius : 0.15f;
+        m_sunRadiusPx = radius * 0.25f * float(Device.dwHeight) / tanf(deg2rad(Device.fFOV) * 0.5f);
+        clamp(m_sunRadiusPx, 4.f, 96.f);
+    }
 
     Fcolor dwLight;
     dwLight.set(owner.LightColor);
@@ -212,7 +305,7 @@ void FGLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
 
         auto* flare = static_cast<FGFlareRender*>(&*owner.m_Current->m_Source.m_pRender);
         nvrhi::ITexture* tex = ResolveTexture(flare ? flare->m_textureName : shared_str{});
-        PushQuad(owner.vecLight, vecSx, vecSy, color.get(), tex);
+        PushQuad(owner.vecLight, vecSx, vecSy, color.get(), tex, true);
     }
 
     if (owner.fBlend >= EPS_L)
@@ -256,6 +349,46 @@ void FGLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
             PushQuad(owner.vecLight, vecSx, vecSy, color.get(), tex);
         }
     }
+}
+
+void FGLensFlareRender::DispatchVisibility(nvrhi::ICommandList* cmdList, nvrhi::ITexture* depth)
+{
+    if (!depth || !m_visPipeline)
+        return;
+
+    if (!m_visInitialized)
+    {
+        cmdList->clearBufferUInt(m_visBuffer, 0);
+        m_visInitialized = true;
+    }
+
+    FlareVisParams cb{};
+    cb.sunPosX = m_sunPosPx.x;
+    cb.sunPosY = m_sunPosPx.y;
+    cb.radiusPx = m_sunRadiusPx;
+    cb.emaAlpha = 1.f - expf(-8.f * Device.fTimeDelta);
+    cb.valid = m_sunValid ? 1u : 0u;
+    cmdList->writeBuffer(m_visConstantBuffer, &cb, sizeof(cb));
+
+    auto it = m_visBindingSetCache.find(depth);
+    if (it == m_visBindingSetCache.end())
+    {
+        nvrhi::BindingSetDesc d;
+        d.bindings = {
+            nvrhi::BindingSetItem::ConstantBuffer(0, m_visConstantBuffer),
+            nvrhi::BindingSetItem::Texture_SRV(0, depth),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(0, m_visBuffer),
+        };
+        nvrhi::BindingSetHandle bs = m_device->createBindingSet(d, m_visBindingLayout);
+        R_ASSERT2(bs, "FGLensFlareRender: createBindingSet (vis) failed");
+        it = m_visBindingSetCache.emplace(depth, std::move(bs)).first;
+    }
+
+    nvrhi::ComputeState state;
+    state.pipeline = m_visPipeline;
+    state.bindings = { it->second };
+    cmdList->setComputeState(state);
+    cmdList->dispatch(1, 1, 1);
 }
 
 void FGLensFlareRender::EnsureGeometryCapacity(size_t vertexCount, size_t indexCount)
@@ -305,11 +438,9 @@ void FGLensFlareRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* 
     cmdList->setBufferState(m_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
     cmdList->setBufferState(m_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
     cmdList->setBufferState(m_constantBuffer, nvrhi::ResourceStates::ConstantBuffer);
+    cmdList->setBufferState(m_visBuffer, nvrhi::ResourceStates::ShaderResource);
 
     const auto& fbInfo = framebuffer->getFramebufferInfo();
-
-    nvrhi::ITexture* currentTexture = nullptr;
-    nvrhi::BindingSetHandle currentBindingSet;
 
     nvrhi::VertexBufferBinding vertexBinding;
     vertexBinding.buffer = m_vertexBuffer;
@@ -321,29 +452,28 @@ void FGLensFlareRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* 
         if (b.indexCount == 0 || !b.texture)
             continue;
 
-        if (b.texture != currentTexture)
+        auto& cache = b.depthTested ? m_sourceBindingSetCache : m_overlayBindingSetCache;
+        auto it = cache.find(b.texture);
+        if (it == cache.end())
         {
-            auto it = m_bindingSetCache.find(b.texture);
-            if (it == m_bindingSetCache.end())
-            {
-                nvrhi::BindingSetDesc bindingSetDesc;
-                bindingSetDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
-                    nvrhi::BindingSetItem::Texture_SRV(0, b.texture),
-                    nvrhi::BindingSetItem::Sampler(0, m_sampler),
-                };
-                nvrhi::BindingSetHandle bs = m_device->createBindingSet(bindingSetDesc, m_bindingLayout);
-                R_ASSERT2(bs, "FGLensFlareRender: createBindingSet failed");
-                it = m_bindingSetCache.emplace(b.texture, std::move(bs)).first;
-            }
-            currentBindingSet = it->second;
-            currentTexture = b.texture;
+            nvrhi::BindingSetDesc bindingSetDesc;
+            bindingSetDesc.bindings = {
+                nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
+                nvrhi::BindingSetItem::Texture_SRV(0, b.texture),
+                nvrhi::BindingSetItem::Sampler(0, m_sampler),
+            };
+            if (!b.depthTested)
+                bindingSetDesc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_SRV(1, m_visBuffer));
+            nvrhi::BindingSetHandle bs =
+                m_device->createBindingSet(bindingSetDesc, b.depthTested ? m_bindingLayout : m_overlayBindingLayout);
+            R_ASSERT2(bs, "FGLensFlareRender: createBindingSet failed");
+            it = cache.emplace(b.texture, std::move(bs)).first;
         }
 
         nvrhi::GraphicsState state;
-        state.pipeline = m_pipeline;
+        state.pipeline = b.depthTested ? m_pipelineSource : m_pipelineOverlay;
         state.framebuffer = framebuffer;
-        state.bindings = { currentBindingSet };
+        state.bindings = { it->second };
         state.vertexBuffers = { vertexBinding };
         state.indexBuffer.buffer = m_indexBuffer;
         state.indexBuffer.format = nvrhi::Format::R16_UINT;

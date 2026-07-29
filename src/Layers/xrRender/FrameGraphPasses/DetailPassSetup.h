@@ -40,14 +40,6 @@ struct DetailPassData {
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle outputNormal;
     framegraph::VirtualResourceHandle baseColor;
-    framegraph::VirtualResourceHandle worldPos;
-    framegraph::VirtualResourceHandle shadowMap;
-    nvrhi::ITexture* shadowMapArray = nullptr;
-    nvrhi::ITexture* shadowCascades[3] = {};
-    nvrhi::ITexture* localShadowAtlas = nullptr;
-    nvrhi::ITexture* localShadowESM = nullptr;
-    nvrhi::ITexture* contactDepth = nullptr;
-    nvrhi::ITexture* contactHistory = nullptr;
     fg::RenderDevice* device;
     fg::FGDetailManager* detailManager;
     framegraph::DefaultOutputLayout outputs;
@@ -55,7 +47,13 @@ struct DetailPassData {
     u32 height;
     xray::profiler::GPUProfiler* gpuProfiler;
 };
-
+// Lambda-based detail pass setup with GPU culling support
+// Renders detail objects (grass, vegetation) using:
+// - GPU compute culling (frustum + Hi-Z occlusion)
+// - Single unified draw call via DrawIndexedInstancedIndirect
+// - Interactive grass system (wind + entity interactions)
+// - Virtual texturing for interaction atlas
+// Renders AFTER forward color pass (details on top of world geometry)
 framegraph::DefaultOutputLayout setupDetailPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
@@ -63,15 +61,7 @@ framegraph::DefaultOutputLayout setupDetailPass(
     const framegraph::DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
-    xray::profiler::GPUProfiler* gpuProfiler = nullptr,
-    nvrhi::ITexture* shadowMapArray = nullptr,
-    framegraph::VirtualResourceHandle shadowMapHandle = {},
-    nvrhi::ITexture* contactDepth = nullptr,
-    nvrhi::ITexture* contactHistory = nullptr,
-    framegraph::VirtualResourceHandle perlinReady = {},
-    nvrhi::ITexture* const* shadowCascades = nullptr,
-    nvrhi::ITexture* localShadowAtlas = nullptr,
-    nvrhi::ITexture* localShadowESM = nullptr
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr
 );
 
 } // namespace xray::render::fg::passes
