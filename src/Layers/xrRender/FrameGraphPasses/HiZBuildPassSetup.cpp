@@ -203,6 +203,11 @@ HiZPyramidOutput setupHiZBuildPass(
                 // So inputMipLevel should always be 0 for the bound texture view
                 cb.inputMipLevel = 0;  // Always 0 - we bind specific mip as subresource
                 cb.isFirstMip = (mip == 0) ? 1 : 0;
+                const auto& depthDesc = depthTexture->getDesc();
+                cb.inputWidth = (mip == 0) ? (u32)depthDesc.width : std::max(1u, data.width >> (mip - 1));
+                cb.inputHeight = (mip == 0) ? (u32)depthDesc.height : std::max(1u, data.height >> (mip - 1));
+                cb.pad0 = 0;
+                cb.pad1 = 0;
 
                 cmdList->writeBuffer(hizCB, &cb, sizeof(cb));
 

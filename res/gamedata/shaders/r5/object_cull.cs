@@ -112,8 +112,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     // 3. Hi-Z occlusion culling (expensive - texture sample + math)
     // Note: This test is conservative - may mark occluded objects as visible
     // but will never mark visible objects as occluded
-    // TEMPORAL HI-Z: Use prevViewProj for Hi-Z lookup since pyramid was built from previous frame's depth
-    if (!HiZTestSphereTemporal(obj.position, obj.radius, g_CameraPos, g_ViewProj, g_PrevViewProj,
+    if (!HiZTestSphere(obj.position, obj.radius, g_CameraPos, g_PrevViewProj,
                        g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
         return;
 

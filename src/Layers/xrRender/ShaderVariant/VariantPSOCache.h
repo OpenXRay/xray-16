@@ -67,13 +67,9 @@ struct VariantPartitionDrawConfig
     nvrhi::IBindingLayout* passLayout = nullptr;
     nvrhi::IBindingLayout* bindlessLayout = nullptr;
     nvrhi::IBindingSet* bindlessTable = nullptr;
-    nvrhi::ISampler* sampler = nullptr;
-    nvrhi::IBuffer* staticGlobalsCB = nullptr;
-    nvrhi::IBuffer* lightingCB = nullptr;
-    nvrhi::IBuffer* materialBuffer = nullptr;
-    nvrhi::IBuffer* variantTexBuffer = nullptr;
-    nvrhi::IBuffer* instanceBuffer = nullptr;
     nvrhi::IBuffer* megaVertexBuffer = nullptr;
+    nvrhi::BindingSetDesc baseBindings;
+    u32 objectCount = 0;
     VariantPartitionConfig partition;
     bool selectTransparent = false;
 };

@@ -541,6 +541,23 @@ void StatsOverlay::RenderGeometrySection()
         }
 
         // ═══════════════════════════════════════════════════
+        //  PARTICLE CULLING STATS
+        // ═══════════════════════════════════════════════════
+        if (s.particleCullSubmitted > 0)
+        {
+            ImGui::Text("Particle Culling:");
+            ImGui::Indent();
+
+            u32 culledBatches = s.particleCullSubmitted - s.particleCullVisible;
+            float cullRate = 100.0f * culledBatches / s.particleCullSubmitted;
+            ImGui::Text("Hi-Z:   %u/%u batches visible (%.0f%% culled)",
+                s.particleCullVisible, s.particleCullSubmitted, cullRate);
+            ImGui::Text("Quads:  %u/%u visible", s.particleQuadsVisible, s.particleQuadsSubmitted);
+
+            ImGui::Unindent();
+        }
+
+        // ═══════════════════════════════════════════════════
         //  MEGA-BUFFER STATS
         // ═══════════════════════════════════════════════════
         if (s.megaBufferVertices > 0)

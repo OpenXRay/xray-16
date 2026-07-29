@@ -29,6 +29,7 @@
 class Task;
 
 constexpr float VIEWPORT_NEAR = 0.2f;
+constexpr float RENDER_VIEWPORT_NEAR = 0.001f;
 constexpr float HUD_VIEWPORT_NEAR = 0.05f;
 
 class ENGINE_API CRenderDevice : public IWindowHandler
@@ -71,12 +72,12 @@ public:
         if (enabled && !m_bNearer)
         {
             m_bNearer = true;
-            mProject._43 -= EPS_L;
+            mProject._43 += EPS_L;
         }
         else if (!enabled && m_bNearer)
         {
             m_bNearer = false;
-            mProject._43 += EPS_L;
+            mProject._43 -= EPS_L;
         }
         GEnv.Render->SetCacheXform(mView, mProject);
         // R_ASSERT(0);

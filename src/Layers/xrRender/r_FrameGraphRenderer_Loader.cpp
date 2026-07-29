@@ -779,10 +779,10 @@ void FrameGraphRenderer::SetupDepthState(RenderPassType passType, const Material
 
     switch (passType) {
     case RenderPassType::DepthPrepass:
-        // Depth prepass: write depth, test with Less
+        // Depth prepass: write depth, test with Greater
         psoDesc.renderState.depthStencilState.depthTestEnable = true;
         psoDesc.renderState.depthStencilState.depthWriteEnable = true;
-        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Less;
+        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Greater;
         psoDesc.renderState.depthStencilState.stencilEnable = false;
         break;
 
@@ -795,10 +795,10 @@ void FrameGraphRenderer::SetupDepthState(RenderPassType passType, const Material
         break;
 
     case RenderPassType::HUD:
-        // HUD: test and write with LessEqual (renders in front)
+        // HUD: test and write with GreaterEqual (renders in front)
         psoDesc.renderState.depthStencilState.depthTestEnable = true;
         psoDesc.renderState.depthStencilState.depthWriteEnable = true;
-        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
         psoDesc.renderState.depthStencilState.stencilEnable = false;
         break;
 
@@ -813,7 +813,7 @@ void FrameGraphRenderer::SetupDepthState(RenderPassType passType, const Material
         // Default: standard depth test
         psoDesc.renderState.depthStencilState.depthTestEnable = true;
         psoDesc.renderState.depthStencilState.depthWriteEnable = true;
-        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Less;
+        psoDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Greater;
         psoDesc.renderState.depthStencilState.stencilEnable = false;
         break;
     }

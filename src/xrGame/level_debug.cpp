@@ -195,7 +195,7 @@ void CLevelDebug::draw_object_info()
             res.transform(v_res, class_it->second->get_shift_pos());
 
             // check if the object in sight
-            if (v_res.z < 0 || v_res.w < 0)
+            if (v_res.z > 1 || v_res.w < 0)
                 continue;
             if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f)
                 continue;

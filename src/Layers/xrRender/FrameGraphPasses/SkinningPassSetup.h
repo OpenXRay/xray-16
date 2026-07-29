@@ -13,6 +13,7 @@ namespace xray::render {
     namespace fg {
         class dxRender_Visual;
         class RenderDevice;
+        class GPUCullingManager;
     }
 }
 
@@ -31,7 +32,7 @@ namespace xray::render::fg::passes {
 // ═══════════════════════════════════════════════════════════════════════════
 // Renders all skinned meshes in two phases:
 //   1. World Phase - NPCs, monsters, etc. with normal depth [0.0, 1.0]
-//   2. HUD Phase - First-person weapons/hands with compressed depth [0.0, 0.1]
+//   2. HUD Phase - First-person weapons/hands with compressed depth [0.9, 1.0]
 //
 // This pass consolidates all skinned mesh rendering that was previously split
 // between ForwardColorPass (world skinned) and HUDPass (HUD skinned).
@@ -52,6 +53,13 @@ struct SkinningPassState {
     nvrhi::BindingLayoutHandle hudLayout;
     nvrhi::ShaderHandle ps;
     nvrhi::ShaderHandle hudPS;
+    SkinningPipelineVariant mdiNonHQ;
+    SkinningPipelineVariant mdiHQ1w;
+    SkinningPipelineVariant mdiHQ2w;
+    SkinningPipelineVariant mdiHQ3w;
+    SkinningPipelineVariant mdiHQ4w;
+    nvrhi::BindingLayoutHandle mdiLayout;
+    nvrhi::ShaderHandle mdiPS;
     SkinningPipelineVariant hudNonHQ;
     SkinningPipelineVariant hudHQ1w;
     SkinningPipelineVariant hudHQ2w;
@@ -63,38 +71,19 @@ struct SkinningPassState {
 
 void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state);
 
-// Callback to update skinned culling stats
-using SkinnedStatsCallback = void(*)(u32 rendered, u32 culled, void* userData);
-
-// Callback type for visual-based visibility lookup (handles batch reordering)
-using VisibilityByVisualCallback = u32(*)(const dxRender_Visual* visual, void* userData);
-
-// Skinned mesh visibility data (from GPU culling)
-struct SkinnedVisibilityData {
-    bool enabled = false;  // Whether GPU culling is active
-
-    // Visual-based visibility lookup (handles batch reordering correctly)
-    VisibilityByVisualCallback visibilityByVisualCallback = nullptr;
-    void* visibilityByVisualUserData = nullptr;
-
-    // Stats callback (called at end of skinning pass)
-    SkinnedStatsCallback statsCallback = nullptr;
-    void* statsUserData = nullptr;
-};
-
 struct SkinningPassData {
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
-    framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle depth;
+    framegraph::VirtualResourceHandle skinnedDrawArgs;
     fg::RenderDevice* device;
     const GeometryCollector* geometry;
     const xr_vector<GeometryBatch>* hudBatches;
     MaterialCache* materialCache;
+    fg::GPUCullingManager* gpuCulling;
     u32 width, height;
     framegraph::DefaultOutputLayout outputs;
-    SkinnedVisibilityData visibilityData;
     SkinningPassState* passState;
     decals::OverlayManager* overlayMgr;
 };
@@ -110,7 +99,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     MaterialCache* materialCache,
     u32 width,
     u32 height,
-    const SkinnedVisibilityData& visibilityData = {},
+    fg::GPUCullingManager* gpuCulling = nullptr,
+    framegraph::VirtualResourceHandle skinnedDrawArgs = {},
     SkinningPassState* state = nullptr,
     decals::OverlayManager* overlayMgr = nullptr
 );

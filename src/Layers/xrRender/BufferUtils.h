@@ -87,6 +87,11 @@ public:
     size_t GetSystemMemoryUsage() const;
     size_t GetVideoMemoryUsage() const;
 
+    u32 skinned_pool_format{UINT32_MAX};
+    u32 skinned_pool_generation{};
+    u32 skinned_pool_base_vertex{};
+    u32 skinned_pool_first_index{};
+
 private:
     void Destroy();
 

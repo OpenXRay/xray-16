@@ -53,7 +53,7 @@ uint GetClusterIndex(float2 screenPos, float linearDepth,
 // Linearize depth from projection matrix depth value
 float LinearizeDepth(float ndcDepth, float zNear, float zFar)
 {
-    return zNear * zFar / (zFar - ndcDepth * (zFar - zNear));
+    return zNear * zFar / (zNear + ndcDepth * (zFar - zNear));
 }
 
 #ifdef CLUSTERED_LIGHTING_FORWARD

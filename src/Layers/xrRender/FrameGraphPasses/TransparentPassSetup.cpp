@@ -67,7 +67,7 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
     pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
     pipeDesc.renderState.depthStencilState.depthTestEnable = true;
     pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
-    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
@@ -108,7 +108,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
-    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
     fbInfo.depthFormat = nvrhi::Format::D32;
     InitializeTransparentResources(device, fbInfo, state);
 
@@ -128,8 +127,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
             if (inputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
-            if (inputs.worldPos.is_valid())
-                data.worldPos = passBuilder.readWrite(inputs.worldPos, ResourceState::RenderTarget);
         },
 
         [](const TransparentPassData& data,
@@ -148,7 +145,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 return;
 
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
-            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
@@ -156,8 +152,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 fbDesc.addColorAttachment(normalRT);
             if (baseColorRT)
                 fbDesc.addColorAttachment(baseColorRT);
-            if (worldPosRT)
-                fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = framegraph::GetPassResourceCache();
             auto framebuffer = cache.GetOrCreateFramebuffer("TransparentPass", fbDesc, nvDevice);
@@ -195,7 +189,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
             bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
 
-            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
+            auto transparentBindDesc = bsb.Build();
+            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(transparentBindDesc, data.passState->layout, nvDevice);
             R_ASSERT2(bindingSet, "Transparent binding set creation failed");
 
             nvrhi::GraphicsState state;
@@ -232,13 +227,9 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 vpCfg.passLayout = data.passState->layout;
                 vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
                 vpCfg.bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
-                vpCfg.sampler = data.passState->sampler;
-                vpCfg.staticGlobalsCB = staticGlobalsCB;
-                vpCfg.lightingCB = lightingCB;
-                vpCfg.materialBuffer = matBuffer.GetBuffer();
-                vpCfg.variantTexBuffer = variantTexBuffer.GetBuffer();
-                vpCfg.instanceBuffer = cfg.instanceBuffer;
                 vpCfg.megaVertexBuffer = cfg.megaVertexBuffer;
+                vpCfg.baseBindings = transparentBindDesc;
+                vpCfg.objectCount = cfg.objectCount;
                 vpCfg.partition = cfg.variantPartition;
                 vpCfg.selectTransparent = true;
 
@@ -254,7 +245,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     outputs.albedo = passData.color;
     outputs.normal = passData.normal;
     outputs.baseColor = passData.baseColor;
-    outputs.worldPos = passData.worldPos;
     outputs.depth = passData.depth;
     return outputs;
 }

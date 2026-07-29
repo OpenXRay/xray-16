@@ -171,7 +171,7 @@ nvrhi::ComparisonFunc PipelineStateCache::ConvertComparisonFunc(ComparisonFunc f
         case ComparisonFunc::NotEqual:     return nvrhi::ComparisonFunc::NotEqual;
         case ComparisonFunc::GreaterEqual: return nvrhi::ComparisonFunc::GreaterOrEqual;
         case ComparisonFunc::Always:       return nvrhi::ComparisonFunc::Always;
-        default: return nvrhi::ComparisonFunc::Less;
+        default: return nvrhi::ComparisonFunc::Greater;
     }
 }
 

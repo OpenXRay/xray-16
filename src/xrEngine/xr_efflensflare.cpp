@@ -179,14 +179,6 @@ CLensFlare::CLensFlare()
     m_State = lfsNone;
     m_StateBlend = 0.f;
 
-#ifndef _EDITOR
-    for (auto& ray : m_ray_cache)
-    {
-        for (auto& vert : ray.verts)
-            vert.set(0, 0, 0);
-    }
-#endif
-
     string_path filePath;
     if (FS.exist(filePath, "$game_config$", "environment\\suns.ltx"))
         m_suns_config = xr_new<CInifile>(filePath, true, true, false);
@@ -201,53 +193,6 @@ CLensFlare::~CLensFlare()
     CInifile::Destroy(m_suns_config);
     m_suns_config = nullptr;
 }
-
-#ifndef _EDITOR
-struct STranspParam
-{
-    Fvector P;
-    Fvector D;
-    float f;
-    // CLensFlare* parent;
-    collide::ray_cache* pray_cache;
-    float vis;
-    float vis_threshold;
-    STranspParam(collide::ray_cache* cache, const Fvector& p, const Fvector& d, float fval, float _vis_threshold)
-        : P(p), D(d), f(fval), pray_cache(cache), vis(1.f), vis_threshold(_vis_threshold)
-    {
-    }
-};
-IC bool material_callback(collide::rq_result& result, LPVOID params)
-{
-    STranspParam* fp = (STranspParam*)params;
-    float vis = 1.f;
-    if (result.O)
-    {
-        vis = 0.f;
-        IKinematics* K = PKinematics(result.O->GetRenderData().visual);
-        if (K && (result.element > 0))
-        {
-            const auto& bone_data = K->LL_GetData(u16(result.element));
-            vis = GMLib.GetMaterialByIdx(bone_data.game_mtl_idx)->fVisTransparencyFactor;
-        }
-    }
-    else
-    {
-        CDB::TRI* T = g_pGameLevel->ObjectSpace.GetStaticTris() + result.element;
-        vis = GMLib.GetMaterialByIdx(T->material)->fVisTransparencyFactor;
-        if (fis_zero(vis))
-        {
-            Fvector* V = g_pGameLevel->ObjectSpace.GetStaticVerts();
-            fp->pray_cache->set(fp->P, fp->D, fp->f, true);
-            fp->pray_cache->verts[0].set(V[T->verts[0]]);
-            fp->pray_cache->verts[1].set(V[T->verts[1]]);
-            fp->pray_cache->verts[2].set(V[T->verts[2]]);
-        }
-    }
-    fp->vis *= vis;
-    return (fp->vis > fp->vis_threshold);
-}
-#endif
 
 IC void blend_lerp(float& cur, float tgt, float speed, float dt)
 {
@@ -283,9 +228,6 @@ static pcstr state_to_string(const CLensFlare::LFState& state)
 }
 #endif
 
-static Fvector2 RayDeltas[CLensFlare::MAX_RAYS] = {
-    {0, 0}, {1, 0}, {-1, 0}, {0, -1}, {0, 1},
-};
 void CLensFlare::OnFrame(const CEnvDescriptorMixer& currentEnv, float time_factor)
 {
     if (dwFrame == Device.dwFrame)
@@ -407,108 +349,7 @@ void CLensFlare::OnFrame(const CEnvDescriptorMixer& currentEnv, float time_facto
         fBlend = fBlend + BLEND_INC_SPEED * Device.fTimeDelta;
 #else
 
-    // Side vectors to bend normal.
-    Fvector vecSx;
-    Fvector vecSy;
-
-    // float fScale = m_Current->m_Source.fRadius * vSunDir.magnitude();
-    // float fScale = m_Current->m_Source.fRadius;
-    // HACK: it must be read from the weather!
-    float fScale = 0.02f;
-
-    vecSx.mul(vecX, fScale);
-    vecSy.mul(vecY, fScale);
-
-    IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
-    R_ASSERT(_valid(vSunDir));
-    STranspParam TP(&m_ray_cache[0], Device.vCameraPosition, vSunDir, 1000.f, EPS_L);
-
-    R_ASSERT(_valid(TP.P));
-    R_ASSERT(_valid(TP.D));
-    collide::ray_defs RD(TP.P, TP.D, TP.f, CDB::OPT_CULL, collide::rqtBoth);
-    float fVisResult = 0.0f;
-
-    for (int i = 0; i < MAX_RAYS; ++i)
-    {
-        TP.D = vSunDir;
-        TP.D.add(Fvector().mul(vecSx, RayDeltas[i].x));
-        TP.D.add(Fvector().mul(vecSy, RayDeltas[i].y));
-        R_ASSERT(_valid(TP.D));
-        TP.pray_cache = &(m_ray_cache[i]);
-        TP.vis = 1.0f;
-        RD.dir = TP.D;
-
-        if (m_ray_cache[i].result && m_ray_cache[i].similar(TP.P, TP.D, TP.f))
-        {
-            // similar with previous query == 0
-            TP.vis = 0.f;
-        }
-        else
-        {
-            float _u, _v, _range;
-            if (CDB::TestRayTri(TP.P, TP.D, m_ray_cache[i].verts, _u, _v, _range, false) &&
-                (_range > 0 && _range < TP.f))
-            {
-                TP.vis = 0.f;
-            }
-            else
-            {
-                // cache outdated. real query.
-                r_dest.r_clear();
-                if (g_pGameLevel->ObjectSpace.RayQuery(r_dest, RD, material_callback, &TP, NULL, o_main))
-                    m_ray_cache[i].result = false;
-            }
-        }
-
-        fVisResult += TP.vis;
-    }
-
-    fVisResult *= 1.0f / float(MAX_RAYS);
-
-    // blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
-    blend_lerp(fBlend, fVisResult, BLEND_DEC_SPEED, Device.fTimeDelta);
-
-/*
-IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
-STranspParam TP (&m_ray_cache,Device.vCameraPosition,vSunDir,1000.f,EPS_L);
-collide::ray_defs RD (TP.P,TP.D,TP.f,CDB::OPT_CULL,collide::rqtBoth);
-if (m_ray_cache.result&&m_ray_cache.similar(TP.P,TP.D,TP.f)){
-// similar with previous query == 0
-TP.vis = 0.f;
-}else{
-float _u,_v,_range;
-if (CDB::TestRayTri(TP.P,TP.D,m_ray_cache.verts,_u,_v,_range,false)&&(_range>0 && _range<TP.f)){
-TP.vis = 0.f;
-}else{
-// cache outdated. real query.
-r_dest.r_clear ();
-if (g_pGameLevel->ObjectSpace.RayQuery (r_dest,RD,material_callback,&TP,NULL,o_main))
-m_ray_cache.result = false ;
-}
-}
-
-blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
-*/
-/*
- IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
- STranspParam TP (this,Device.vCameraPosition,vSunDir,1000.f,EPS_L);
- collide::ray_defs RD (TP.P,TP.D,TP.f,CDB::OPT_CULL,collide::rqtBoth);
- if (m_ray_cache.result&&m_ray_cache.similar(TP.P,TP.D,TP.f)){
- // similar with previous query == 0
- TP.vis = 0.f;
- }else{
- float _u,_v,_range;
- if (CDB::TestRayTri(TP.P,TP.D,m_ray_cache.verts,_u,_v,_range,false)&&(_range>0 && _range<TP.f)){
- TP.vis = 0.f;
- }else{
- // cache outdated. real query.
- r_dest.r_clear ();
- if (g_pGameLevel->ObjectSpace.RayQuery (r_dest,RD,material_callback,&TP,NULL,o_main))
- m_ray_cache.result = false ;
- }
- }
- blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
- */
+    blend_lerp(fBlend, 1.0f, BLEND_DEC_SPEED, Device.fTimeDelta);
 #endif
     clamp(fBlend, 0.0f, 1.0f);
 

@@ -87,7 +87,7 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
     pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
     pipeDesc.renderState.depthStencilState.depthTestEnable = true;
     pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
@@ -117,7 +117,7 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
             terrainPipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
             terrainPipeDesc.renderState.depthStencilState.depthTestEnable = true;
             terrainPipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-            terrainPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+            terrainPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
             terrainPipeDesc.renderState.rasterState.frontCounterClockwise = false;
             terrainPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
             state.terrainPipeline = cache.GetOrCreatePipeline("ForwardColor_Terrain", terrainPipeDesc, fbInfo, nvDevice);
@@ -137,7 +137,6 @@ static void renderBindlessForward(
     nvrhi::ITexture* colorRT,
     nvrhi::ITexture* normalRT,
     nvrhi::ITexture* baseColorRT,
-    nvrhi::ITexture* worldPosRT,
     nvrhi::ITexture* depthRT,
     const BindlessForwardConfig& config,
     MaterialCache* materialCache,
@@ -172,8 +171,6 @@ static void renderBindlessForward(
         fbDesc.addColorAttachment(normalRT);
     if (baseColorRT)
         fbDesc.addColorAttachment(baseColorRT);
-    if (worldPosRT)
-        fbDesc.addColorAttachment(worldPosRT);
     fbDesc.setDepthAttachment(depthRT);
     auto& cache = framegraph::GetPassResourceCache();
     auto framebuffer = cache.GetOrCreateFramebuffer("ForwardColor", fbDesc, nvDevice);
@@ -193,7 +190,7 @@ static void renderBindlessForward(
 
     auto& clm = ClusteredLightManager::Instance();
 
-    auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
+    auto buildBindingDescForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetDesc {
         framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "ForwardColor");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
         bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
@@ -203,8 +200,11 @@ static void renderBindlessForward(
         bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
         bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
         bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+        return bsb.Build();
+    };
 
-        return framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), ps.bindlessLayout, nvDevice);
+    auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
+        return framegraph::GetPassResourceCache().GetOrCreateBindingSet(buildBindingDescForSet(set), ps.bindlessLayout, nvDevice);
     };
 
     // ═══════════════════════════════════════════════════════
@@ -282,13 +282,9 @@ static void renderBindlessForward(
         vpCfg.passLayout = ps.bindlessLayout;
         vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
         vpCfg.bindlessTable = bindlessTable;
-        vpCfg.sampler = ps.linearSampler;
-        vpCfg.staticGlobalsCB = staticGlobalsCB;
-        vpCfg.lightingCB = lightingCB;
-        vpCfg.materialBuffer = matBuffer.GetBuffer();
-        vpCfg.variantTexBuffer = variantTexBuffer.GetBuffer();
-        vpCfg.instanceBuffer = config.staticSet.instanceBuffer;
         vpCfg.megaVertexBuffer = config.megaVertexBuffer;
+        vpCfg.baseBindings = buildBindingDescForSet(config.staticSet);
+        vpCfg.objectCount = config.staticSet.totalObjectCount;
         vpCfg.partition = config.variantPartition;
         vpCfg.selectTransparent = false;
 
@@ -379,7 +375,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::VirtualResourceHandle colorInput,
     framegraph::VirtualResourceHandle normalInput,
     framegraph::VirtualResourceHandle baseColorInput,
-    framegraph::VirtualResourceHandle worldPosInput,
     const GeometryCollector* geometry,
     MaterialCache* materialCache,
     u32 width,
@@ -406,7 +401,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA (Declares resource usage)
         // ═══════════════════════════════════════════════════════
-        [&, width, height, colorInput, normalInput, baseColorInput, worldPosInput, drawArgsInput, bindlessConfig, state](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
+        [&, width, height, colorInput, normalInput, baseColorInput, drawArgsInput, bindlessConfig, state](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -422,8 +417,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             data.normal = passBuilder.write(normalInput, ResourceState::RenderTarget);
             if (baseColorInput.is_valid())
                 data.baseColor = passBuilder.write(baseColorInput, ResourceState::RenderTarget);
-            if (worldPosInput.is_valid())
-                data.worldPos = passBuilder.write(worldPosInput, ResourceState::RenderTarget);
 
             if (drawArgsInput.is_valid()) {
                 data.drawArgsBuffer = passBuilder.read(drawArgsInput, ResourceState::IndirectArgument);
@@ -432,7 +425,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             data.outputs.albedo = data.color;
             data.outputs.normal = data.normal;
             data.outputs.baseColor = data.baseColor;
-            data.outputs.worldPos = data.worldPos;
             data.outputs.depth = data.depth;
         },
 
@@ -447,20 +439,17 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
-            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
 
             if (!depthRT || !colorRT)
                 return;
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             if (cmdList) {
-                cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 1.0f, false, 0);
+                cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
                 if (normalRT)
                     cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
                 if (baseColorRT)
                     cmdList->clearTextureFloat(baseColorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
-                if (worldPosRT)
-                    cmdList->clearTextureFloat(worldPosRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
             }
 
             // Check if we have geometry to render
@@ -486,7 +475,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 colorRT,
                 normalRT,
                 baseColorRT,
-                worldPosRT,
                 depthRT,
                 data.bindlessConfig,
                 data.materialCache,
@@ -499,7 +487,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     outputs.albedo = passData.color;
     outputs.normal = passData.normal;
     outputs.baseColor = passData.baseColor;
-    outputs.worldPos = passData.worldPos;
     outputs.depth = passData.depth;
     return outputs;
 }

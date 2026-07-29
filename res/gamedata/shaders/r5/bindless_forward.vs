@@ -90,7 +90,10 @@ VS_OUTPUT main(VS_INPUT input)
     // Transform position
     float4 worldPos = mul(worldMatrix, float4(input.position.xyz, 1.0));
     output.worldPos = worldPos.xyz;
-    output.position = mul(m_VP, worldPos);
+    float3 clipPos = worldPos.xyz;
+    if (g_Materials[materialID].flags & MAT_FLAG_ALPHA_BLEND)
+        clipPos += (eye_position - clipPos) * 0.002;
+    output.position = mul(m_VP, float4(clipPos, 1.0));
 
     // Transform normal/tangent to world space
     float3x3 worldMatrix3x3 = (float3x3)worldMatrix;

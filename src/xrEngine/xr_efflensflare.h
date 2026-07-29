@@ -70,18 +70,6 @@ class ENGINE_API CLensFlare
 {
     friend class xray::render::fg::FGLensFlareRender;
 
-public:
-    enum
-    {
-        MAX_RAYS = 5
-    };
-
-private:
-    collide::rq_results r_dest;
-#ifndef _EDITOR
-    collide::ray_cache m_ray_cache[MAX_RAYS];
-#endif
-
 protected:
     float fBlend;
     u32 dwFrame;

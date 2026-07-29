@@ -6,7 +6,6 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "PassVertexFormats.h"
-#include "ParticleGPUCullingManager.h"
 
 namespace xray::render::fg {
     class dxRender_Visual;
@@ -60,6 +59,14 @@ struct ParticleBatch {
     ParticleShaderVariant shaderVariant = ParticleShaderVariant::Standard;
 };
 
+struct ParticleCullStats {
+    u32 submittedBatches = 0;
+    u32 visibleBatches = 0;
+    u32 submittedQuads = 0;
+    u32 visibleQuads = 0;
+    bool active = false;
+};
+
 struct ParticlePassState {
     nvrhi::GraphicsPipelineHandle pipelines[PARTICLE_BLEND_COUNT];
     nvrhi::GraphicsPipelineHandle distortPipeline;
@@ -76,7 +83,17 @@ struct ParticlePassState {
     u32 particleVBSize = 0;
     nvrhi::BufferHandle quadIB;
     u32 maxQuads = 0;
-    xr_unique_ptr<ParticleGPUCullingManager> gpuCullingManager;
+    nvrhi::ComputePipelineHandle cullPipeline;
+    nvrhi::BindingLayoutHandle cullLayout;
+    nvrhi::BufferHandle cullObjectBuffer;
+    nvrhi::BufferHandle cullArgsBuffer;
+    static constexpr u32 CULL_STATS_SLOTS = 6;
+    nvrhi::BufferHandle cullStatsBuffer;
+    nvrhi::BufferHandle cullStatsReadback[CULL_STATS_SLOTS];
+    u32 cullStatsSubmitted[CULL_STATS_SLOTS][2] = {};
+    u32 cullStatsWriteSlot = 0;
+    u32 cullStatsScheduled = 0;
+    ParticleCullStats cullStats;
 };
 
 struct ParticlePassData {
@@ -85,10 +102,9 @@ struct ParticlePassData {
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle outputNormal;
     framegraph::VirtualResourceHandle baseColor;
-    framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle hiZPyramid;
     framegraph::VirtualResourceHandle distortionRT;
-    framegraph::VirtualResourceHandle worldPosCopy;
+    framegraph::VirtualResourceHandle prevDepth;
     fg::RenderDevice* device;
     const xr_vector<ParticleBatch>* worldParticleBatches;
     const xr_vector<ParticleBatch>* hudParticleBatches;
@@ -99,6 +115,8 @@ struct ParticlePassData {
     u32 hiZWidth;
     u32 hiZHeight;
     u32 hiZMipLevels;
+    Fmatrix prevViewProj;
+    bool hasPrevViewProj;
     ParticlePassState* passState;
     bool hasDistortion;
 };
@@ -131,6 +149,8 @@ ParticlePassOutput setupParticlePass(
     u32 hiZWidth = 0,
     u32 hiZHeight = 0,
     u32 hiZMipLevels = 0,
+    const Fmatrix* prevViewProj = nullptr,
+    framegraph::VirtualResourceHandle prevDepth = {},
     ParticlePassState* state = nullptr
 );
 

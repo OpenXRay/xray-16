@@ -51,6 +51,7 @@ static_assert(sizeof(ReSTIRGICB) == 224, "ReSTIRGICB must be 224 bytes");
 
 struct TemporalCB {
     Fmatrix invViewProj;
+    Fmatrix prevInvViewProj;
     Fvector4 cameraPos;
     float screenWidth;
     float screenHeight;
@@ -59,7 +60,7 @@ struct TemporalCB {
     u32 frameIndex;
     u32 pad[3];
 };
-static_assert(sizeof(TemporalCB) == 112, "TemporalCB must be 112 bytes");
+static_assert(sizeof(TemporalCB) == 176, "TemporalCB must be 176 bytes");
 
 struct CompositeCB {
     Fmatrix invViewProj;
@@ -223,7 +224,6 @@ struct InitialPassData {
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
     VirtualResourceHandle baseColor;
-    VirtualResourceHandle worldPos;
     ReSTIRGICB cbData;
     u32 width, height;
     nvrhi::ITexture* sky0;
@@ -238,8 +238,7 @@ struct TemporalPassData {
     VirtualResourceHandle normal;
     VirtualResourceHandle prevNormals;
     VirtualResourceHandle baseColor;
-    VirtualResourceHandle worldPos;
-    VirtualResourceHandle prevWorldPos;
+    VirtualResourceHandle prevDepth;
     VirtualResourceHandle motionVectors;
     TemporalCB cbData;
     u32 width, height;
@@ -253,7 +252,6 @@ struct CompositePassData {
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
     VirtualResourceHandle baseColor;
-    VirtualResourceHandle worldPos;
     VirtualResourceHandle sceneColorIn;
     VirtualResourceHandle sceneColor;
     CompositeCB cbData;
@@ -268,9 +266,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
     VirtualResourceHandle depth,
     VirtualResourceHandle normal,
     VirtualResourceHandle baseColor,
-    VirtualResourceHandle worldPos,
     VirtualResourceHandle prevNormals,
-    VirtualResourceHandle prevWorldPos,
+    VirtualResourceHandle prevDepth,
     VirtualResourceHandle motionVectors,
     VirtualResourceHandle sceneColorIn,
     const Fmatrix& invViewProj,
@@ -396,7 +393,6 @@ ReSTIRGIOutput setupReSTIRGIPass(
             data.depth = pb.read(depth, ResourceState::ShaderResource);
             data.normal = pb.read(normal, ResourceState::ShaderResource);
             data.baseColor = pb.read(baseColor, ResourceState::ShaderResource);
-            data.worldPos = pb.read(worldPos, ResourceState::ShaderResource);
             pb.write(fgDirectLighting, ResourceState::UnorderedAccess);
             pb.write(fgResA, ResourceState::UnorderedAccess);
             pb.write(fgResB, ResourceState::UnorderedAccess);
@@ -415,8 +411,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
             auto* depthTex = fg.GetPhysicalTexture(data.depth);
             auto* normalTex = fg.GetPhysicalTexture(data.normal);
             auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
-            auto* worldPosTex = fg.GetPhysicalTexture(data.worldPos);
-            if (!depthTex || !normalTex || !baseColorTex || !worldPosTex) {
+            if (!depthTex || !normalTex || !baseColorTex) {
                 Msg("! [RTGI Initial] Null FG texture: depth=%d normal=%d baseColor=%d", !!depthTex, !!normalTex, !!baseColorTex);
                 return;
             }
@@ -486,7 +481,6 @@ ReSTIRGIOutput setupReSTIRGIPass(
             bsb.Texture("t_Depth", depthTex);
             bsb.Texture("t_Normal", normalTex);
             bsb.Texture("t_BaseColor", baseColorTex);
-            bsb.Texture("t_WorldPos", worldPosTex);
             bsb.TextureUAV("u_DirectLighting", directLit);
             bsb.TextureUAV("u_ReservoirA", resA);
             bsb.TextureUAV("u_ReservoirB", resB);
@@ -518,6 +512,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
     if (hasPrevFrameData && motionVectors.is_valid()) {
         TemporalCB temporalCB;
         temporalCB.invViewProj = invViewProj;
+        temporalCB.prevInvViewProj.invert_44(prevViewProj);
         temporalCB.cameraPos = { cameraPos.x, cameraPos.y, cameraPos.z, 0 };
         temporalCB.screenWidth = (float)width;
         temporalCB.screenHeight = (float)height;
@@ -535,9 +530,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 if (prevNormals.is_valid())
                     data.prevNormals = pb.read(prevNormals, ResourceState::ShaderResource);
                 data.baseColor = pb.read(baseColor, ResourceState::ShaderResource);
-                data.worldPos = pb.read(worldPos, ResourceState::ShaderResource);
-                if (prevWorldPos.is_valid())
-                    data.prevWorldPos = pb.read(prevWorldPos, ResourceState::ShaderResource);
+                if (prevDepth.is_valid())
+                    data.prevDepth = pb.read(prevDepth, ResourceState::ShaderResource);
                 data.motionVectors = pb.read(motionVectors, ResourceState::ShaderResource);
                 pb.readWrite(fgResA, ResourceState::UnorderedAccess);
                 pb.readWrite(fgResB, ResourceState::UnorderedAccess);
@@ -555,10 +549,9 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 auto* normalTex = fg.GetPhysicalTexture(data.normal);
                 auto* prevNormalsTex = data.prevNormals.is_valid() ? fg.GetPhysicalTexture(data.prevNormals) : normalTex;
                 auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
-                auto* worldPosTex = fg.GetPhysicalTexture(data.worldPos);
-                auto* prevWorldPosTex = data.prevWorldPos.is_valid() ? fg.GetPhysicalTexture(data.prevWorldPos) : worldPosTex;
+                auto* prevDepthTex = data.prevDepth.is_valid() ? fg.GetPhysicalTexture(data.prevDepth) : depthTex;
                 auto* mvTex = fg.GetPhysicalTexture(data.motionVectors);
-                if (!depthTex || !normalTex || !baseColorTex || !worldPosTex || !mvTex) return;
+                if (!depthTex || !normalTex || !baseColorTex || !mvTex) return;
 
                 nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
                 nvrhi::ICommandList* cmdList = ctx->GetCommandList();
@@ -578,8 +571,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 bsb.Texture("t_Normal", normalTex);
                 bsb.Texture("t_PrevNormal", prevNormalsTex);
                 bsb.Texture("t_BaseColor", baseColorTex);
-                bsb.Texture("t_WorldPos", worldPosTex);
-                bsb.Texture("t_PrevWorldPos", prevWorldPosTex);
+                bsb.Texture("t_PrevDepth", prevDepthTex);
                 bsb.TextureUAV("u_ReservoirA", data.state->reservoirA[data.writeIdx]);
                 bsb.TextureUAV("u_ReservoirB", data.state->reservoirB[data.writeIdx]);
                 auto& cache = GetPassResourceCache();
@@ -614,7 +606,6 @@ ReSTIRGIOutput setupReSTIRGIPass(
             data.depth = pb.read(depth, ResourceState::ShaderResource);
             data.normal = pb.read(normal, ResourceState::ShaderResource);
             data.baseColor = pb.read(baseColor, ResourceState::ShaderResource);
-            data.worldPos = pb.read(worldPos, ResourceState::ShaderResource);
             data.sceneColorIn = pb.read(sceneColorIn, ResourceState::ShaderResource);
             pb.read(fgDirectLighting, ResourceState::ShaderResource);
             pb.read(fgResA, ResourceState::ShaderResource);
@@ -631,10 +622,9 @@ ReSTIRGIOutput setupReSTIRGIPass(
             auto* depthTex = fg.GetPhysicalTexture(data.depth);
             auto* normalTex = fg.GetPhysicalTexture(data.normal);
             auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
-            auto* worldPosTex = fg.GetPhysicalTexture(data.worldPos);
             auto* sceneColorInTex = fg.GetPhysicalTexture(data.sceneColorIn);
             auto* outTex = fg.GetPhysicalTexture(data.sceneColor);
-            if (!depthTex || !normalTex || !baseColorTex || !worldPosTex || !sceneColorInTex || !outTex) return;
+            if (!depthTex || !normalTex || !baseColorTex || !sceneColorInTex || !outTex) return;
 
             nvrhi::ITexture* directLit = data.state->directLighting.Get();
             nvrhi::ITexture* resA = data.state->reservoirA[data.reservoirIdx].Get();
@@ -663,7 +653,6 @@ ReSTIRGIOutput setupReSTIRGIPass(
             bsb.Texture("t_Normal", normalTex);
             bsb.Texture("t_BaseColor", baseColorTex);
             bsb.Texture("t_SceneColorIn", sceneColorInTex);
-            bsb.Texture("t_WorldPos", worldPosTex);
             bsb.TextureUAV("u_SceneColor", outTex);
             auto& cache = GetPassResourceCache();
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->compositeLayout, nvDevice);
