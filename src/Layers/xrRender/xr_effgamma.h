@@ -25,7 +25,7 @@ public:
     void Gamma(float G) { fGamma = G; }
     void Brightness(float B) { fBrightness = B; }
     void Contrast(float C) { fContrast = C; }
-    void GetIP(float& G, float& B, float& C, Fcolor& Balance)
+    void GetIP(float& G, float& B, float& C, Fcolor& Balance) const
     {
         G = fGamma;
         B = fBrightness;

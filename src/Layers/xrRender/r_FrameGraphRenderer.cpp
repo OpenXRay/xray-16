@@ -493,6 +493,12 @@ void FrameGraphRenderer::Render() {
     auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device);
     auto staticGlobalsData = passes::BuildStaticGlobals();
 
+    {
+        float G, B, C; Fcolor Balance;
+        m_Gamma.GetIP(G, B, C, Balance);
+        staticGlobalsData.gamma_params.set(1.0f / (G + 0.001f), B, C, 0.0f);
+    }
+
     auto& clm = fg::ClusteredLightManager::Instance();
     if (clm.IsReady() && clm.GetLightCount() > 0) {
         float zNear = VIEWPORT_NEAR;

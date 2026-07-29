@@ -72,11 +72,11 @@ public:
 
 protected:
     bool b_loaded{ false };
+    CGammaControl m_Gamma;
 
 private:
     void ConvertLegacyAssetsToPBRImpl();
 
-    CGammaControl m_Gamma;
     std::thread m_pbrConversionThread;
 };
 }
