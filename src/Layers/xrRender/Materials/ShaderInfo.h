@@ -33,6 +33,8 @@ struct ShaderBlendInfo
 };
 bool GetShaderBlendInfo(const char* shaderName, ShaderBlendInfo& out);
 
+bool GetShaderTessellationMethod(const char* shaderName, u32& outMethod);
+
 bool GetParticleBlendIndex(const char* shaderName, u32& outIndex);
 
 }

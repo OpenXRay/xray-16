@@ -35,7 +35,9 @@ f_forward main(p_decal I)
 	Texture2D atlas_tex = GetBindlessTexture(build_details_index);
 	float4 texel = atlas_tex.Sample(smp_linear, I.tcdh.xy);
 
-	clip(texel.a - 0.5);
+	// details\blend (R1): aref 200 + SrcAlpha. Kill BC1 filtered fringe, keep soft edge above gate.
+	clip(texel.a - def_aref);
+	float alpha = saturate((texel.a - def_aref) / max(1e-3, 1.0 - def_aref));
 
 	float3 N = normalize(I.N);
 	float metallic = 0.0;
@@ -53,8 +55,11 @@ f_forward main(p_decal I)
 	}
 
 	float thickness = saturate(texel.a + 0.2);
-	return output_forward_pbr(
+	f_forward res = output_forward_pbr(
 		texel.rgb, N, I.position.xyz, metallic, roughness, ao, I.hpos,
-		hemi, 1.0,
+		hemi, saturate(I.sunOcclusion),
 		grass_sss_color.w, grass_sss_color.rgb, thickness);
+	res.color.a = alpha;
+	res.baseColor = float4(0, 0, 0, 0);
+	return res;
 }

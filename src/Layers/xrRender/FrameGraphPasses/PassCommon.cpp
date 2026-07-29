@@ -9,8 +9,36 @@
 #include "xrEngine/device.h"
 #include "xrEngine/IRenderBackend.h"
 #include "xrCDB/Frustum.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
+#include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
+#include "Layers/xrRender/Bindless/BindlessTypes.h"
+#include <atomic>
 
 namespace xray::render::fg::passes {
+
+namespace
+{
+std::atomic<u32> g_mdiDrawCalls{0};
+std::atomic<u32> g_mdiMaxDrawCountSum{0};
+}
+
+void ResetMdiDrawCounters()
+{
+    g_mdiDrawCalls.store(0, std::memory_order_relaxed);
+    g_mdiMaxDrawCountSum.store(0, std::memory_order_relaxed);
+}
+
+u32 GetMdiDrawCallCount()
+{
+    return g_mdiDrawCalls.load(std::memory_order_relaxed);
+}
+
+u32 GetMdiMaxDrawCountSum()
+{
+    return g_mdiMaxDrawCountSum.load(std::memory_order_relaxed);
+}
 
 void DrawIndexedIndirectCountOrFallback(
     nvrhi::ICommandList* cmdList,
@@ -18,6 +46,9 @@ void DrawIndexedIndirectCountOrFallback(
     uint32_t countOffsetBytes,
     uint32_t maxDrawCount)
 {
+    g_mdiDrawCalls.fetch_add(1, std::memory_order_relaxed);
+    g_mdiMaxDrawCountSum.fetch_add(maxDrawCount, std::memory_order_relaxed);
+
     // MoltenVK / older GPUs may lack drawIndirectCount. Callers that take the
     // fallback path must clear unused compact draw-arg slots (instanceCount=0).
     const bool useCount = GEnv.Backend && GEnv.Backend->GetCapabilities().drawIndirectCount;
@@ -139,6 +170,76 @@ void ResolveEnvSkyCubes(fg::RenderDevice* device, nvrhi::ITexture*& outSky0, nvr
         outSky0 = cache.GetDummyCubeMap(nvDevice);
     if (!outSky1 && nvDevice)
         outSky1 = cache.GetDummyCubeMap(nvDevice);
+}
+
+void BindBindlessMaterialTables(framegraph::BindingSetBuilder& bsb)
+{
+    // bindless_common.h declares t8/t9/t10 even when a pass only samples g_Materials.
+    // Skipping any of them → NVRHI null binding set → invisible geometry.
+    // Always bind something: early frames / shadow-only paths may lack real tables.
+    static nvrhi::BufferHandle s_dummyMat;
+    static nvrhi::BufferHandle s_dummyTerrain;
+    static nvrhi::BufferHandle s_dummyVariant;
+
+    auto ensureDummy = [](nvrhi::BufferHandle& slot, const char* name, u32 stride) -> nvrhi::IBuffer* {
+        if (!slot)
+        {
+            auto* backend = GEnv.Render ? GEnv.Render->GetRenderDevice() : nullptr;
+            nvrhi::IDevice* dev = backend ? backend->GetNVRHIDevice() : nullptr;
+            if (!dev)
+                return nullptr;
+            nvrhi::BufferDesc desc;
+            desc.byteSize = stride * 4;
+            desc.structStride = stride;
+            desc.debugName = name;
+            desc.initialState = nvrhi::ResourceStates::ShaderResource;
+            desc.keepInitialState = true;
+            slot = dev->createBuffer(desc);
+        }
+        return slot.Get();
+    };
+
+    nvrhi::IBuffer* mats = bindless::MaterialBuffer::Instance().GetBuffer();
+    if (!mats)
+        mats = ensureDummy(s_dummyMat, "DummyMaterials", sizeof(bindless::MaterialData));
+    if (mats)
+        bsb.BufferSRV("g_Materials", mats);
+
+    nvrhi::IBuffer* terrain = bindless::TerrainMaterialBuffer::Instance().GetBuffer();
+    if (!terrain)
+        terrain = ensureDummy(s_dummyTerrain, "DummyTerrainMaterials", sizeof(bindless::TerrainMaterialData));
+    if (terrain)
+        bsb.BufferSRV("g_TerrainMaterials", terrain);
+
+    nvrhi::IBuffer* variants = bindless::VariantTextureBuffer::Instance().GetBuffer();
+    if (!variants)
+        variants = ensureDummy(s_dummyVariant, "DummyVariantTextures", sizeof(bindless::VariantTextureData));
+    if (variants)
+        bsb.BufferSRV("g_VariantTextures", variants);
+}
+
+void BindPaintSplatBuffer(framegraph::BindingSetBuilder& bsb, nvrhi::IDevice* device,
+    nvrhi::IBuffer* splatBuffer)
+{
+    nvrhi::IBuffer* buf = splatBuffer;
+    if (!buf)
+    {
+        // skinned_common.h always declares t11 — shadow / HUD may not have overlays.
+        static nvrhi::BufferHandle s_dummyPaint;
+        if (!s_dummyPaint && device)
+        {
+            nvrhi::BufferDesc desc;
+            desc.byteSize = 256;
+            desc.structStride = 64;
+            desc.debugName = "DummyPaintSplats";
+            desc.initialState = nvrhi::ResourceStates::ShaderResource;
+            desc.keepInitialState = true;
+            s_dummyPaint = device->createBuffer(desc);
+        }
+        buf = s_dummyPaint.Get();
+    }
+    if (buf)
+        bsb.BufferSRV("g_PaintSplats", buf);
 }
 
 } // namespace xray::render::fg::passes

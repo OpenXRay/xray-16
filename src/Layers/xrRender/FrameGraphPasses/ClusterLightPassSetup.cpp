@@ -51,7 +51,7 @@ static void InitAssignPipeline(nvrhi::IDevice* nvDevice, ClusterLightPassState& 
     }
 
     state.assignLayout = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(
-        "ClusterLightAssign", *csRefl, nvDevice);
+        "ClusterLightAssign_v4_Group64", *csRefl, nvDevice);
     if (!state.assignLayout)
         return;
 
@@ -166,6 +166,7 @@ void setupClusterLightPass(
             if (!data.passState->assignInitialized)
                 return;
 
+            data.lightManager->RefreshHudSpotXForms();
             data.lightManager->Upload(cmdList);
 
             auto& cache = framegraph::GetPassResourceCache();
@@ -267,7 +268,8 @@ void setupClusterLightPass(
 
             u32 tilesX = data.lightManager->GetTilesX();
             u32 tilesY = data.lightManager->GetTilesY();
-            cmdList->dispatch(tilesX, tilesY, CLUSTER_NUM_SLICES);
+            const u32 clusterCount = tilesX * tilesY * ::xray::render::fg::CLUSTER_NUM_SLICES;
+            cmdList->dispatch(clusterCount, 1, 1);
         }
     );
 }

@@ -1,4 +1,6 @@
 // effects_world_soft.ps — soft depth occlusion against GBuffer worldPos (MoltenVK-safe)
+#include "shared/surface_marks.h"
+
 Texture2D s_base : register(t0);
 Texture2D g_SceneWorldPos : register(t1);
 SamplerState smp_base : register(s0);
@@ -22,17 +24,17 @@ float4 main(PSInput input) : SV_Target
     float4 tex = s_base.Sample(smp_base, input.texcoord);
     float4 result = tex * input.color;
 
-    // Soft occlusion: hide fragments behind opaque scene geometry.
     float4 sceneWP = g_SceneWorldPos.Load(int3((int2)input.position.xy, 0));
+    if (IsHudSurfMark(sceneWP.w))
+        discard;
+
     if (sceneWP.w > 0.5)
     {
         float3 eye = EyePos.xyz;
         float sceneDist = length(sceneWP.xyz - eye);
         float fxDist = length(input.worldPos - eye);
-        // Behind opaque surface → kill (with small epsilon for coplanar)
         if (fxDist > sceneDist + 0.15)
             discard;
-        // Soft edge near contact
         float soft = saturate((sceneDist - fxDist + 0.15) * 4.0);
         result.a *= soft;
         result.rgb *= soft;

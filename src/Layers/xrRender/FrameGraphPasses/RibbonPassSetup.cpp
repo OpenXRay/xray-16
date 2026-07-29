@@ -339,9 +339,9 @@ RibbonPassOutput setupRibbonPass(
                 auto* psReflection = shaderLoader->GetCachedReflection("ribbon", ".ps");
                 BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Ribbon");
                 bsb.ConstantBuffer("static_globals", staticGlobalsCB)
-                   .ConstantBuffer("RibbonParams", ribbonParamsCB)
-                   .BufferSRV("g_Materials", matBuffer.GetBuffer())
-                   .BufferSRV("g_ControlPoints", st.controlPointBuffer);
+                   .ConstantBuffer("RibbonParams", ribbonParamsCB);
+                BindBindlessMaterialTables(bsb);
+                bsb.BufferSRV("g_ControlPoints", st.controlPointBuffer);
                 auto bindDesc = bsb.Build();
                 auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st.layout, nvDevice);
 

@@ -266,14 +266,14 @@ PathTracerOutput setupPathTracerPass(
         cbData.skinnedBatchStart = batchCounts.identityStatic + batchCounts.terrain +
                                    batchCounts.transparent + batchCounts.instancedTotal;
     else
-        cbData.skinnedBatchStart = 0;
+        cbData.skinnedBatchStart = 0xFFFFFFFFu;
 
     if (batchCounts.grass > 0)
         cbData.grassBatchStart = batchCounts.identityStatic + batchCounts.terrain +
                                  batchCounts.transparent + batchCounts.instancedTotal +
                                  batchCounts.skinned;
     else
-        cbData.grassBatchStart = 0;
+        cbData.grassBatchStart = 0xFFFFFFFFu;
 
     cbData.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
     cbData.pad[0] = 0;

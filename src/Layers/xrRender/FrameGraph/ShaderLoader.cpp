@@ -91,6 +91,74 @@ void ResolveShaderSourceRelativePath(
     strconcat(outRelativePathSize, outRelativePath, "r5" DELIMITER, shName, extension);
 }
 
+u32 MixHash(u32 a, u32 b)
+{
+    return a ^ ((b << 16) | (b >> 16)) ^ (b * 0x9E3779B9u);
+}
+
+u32 HashShaderSourceWithIncludes(const char* source, size_t sourceLen, int depth)
+{
+    u32 hash = ShaderCache::ComputeHash(source, sourceLen);
+    if (!source || sourceLen == 0 || depth > 8)
+        return hash;
+
+    const char* p = source;
+    const char* end = source + sourceLen;
+    while (p < end)
+    {
+        const char* line = p;
+        while (p < end && *p != '\n')
+            ++p;
+        const char* lineEnd = p;
+        if (p < end)
+            ++p;
+
+        while (line < lineEnd && (*line == ' ' || *line == '\t'))
+            ++line;
+        if (line + 8 >= lineEnd || strncmp(line, "#include", 8) != 0)
+            continue;
+        line += 8;
+        while (line < lineEnd && (*line == ' ' || *line == '\t'))
+            ++line;
+        if (line >= lineEnd || (*line != '"' && *line != '<'))
+            continue;
+        const char quote = (*line == '"') ? '"' : '>';
+        ++line;
+        const char* pathStart = line;
+        while (line < lineEnd && *line != quote)
+            ++line;
+        if (line <= pathStart || line >= lineEnd)
+            continue;
+
+        string_path includeName;
+        const size_t pathLen = static_cast<size_t>(line - pathStart);
+        if (pathLen >= sizeof(includeName))
+            continue;
+        memcpy(includeName, pathStart, pathLen);
+        includeName[pathLen] = 0;
+        for (char* c = includeName; *c; ++c)
+        {
+            if (*c == '/')
+                *c = '\\';
+        }
+
+        string_path filename;
+        strconcat(sizeof(filename), filename, "r5" DELIMITER, includeName);
+        IReader* inc = FS.r_open("$game_shaders$", filename);
+        if (!inc)
+            continue;
+        hash = MixHash(hash, HashShaderSourceWithIncludes(
+            (const char*)inc->pointer(), inc->length(), depth + 1));
+        FS.r_close(inc);
+    }
+    return hash;
+}
+
+u32 HashShaderSourceWithIncludes(const char* source, size_t sourceLen)
+{
+    return HashShaderSourceWithIncludes(source, sourceLen, 0);
+}
+
 } // namespace
 
 ShaderLoader::ShaderLoader(xray::render::SlangCompiler* slangCompiler)
@@ -169,7 +237,7 @@ bool ShaderLoader::CompileShader(
         return false;
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSourceWithIncludes(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -242,7 +310,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     WatchShaderFile(cacheKey, name, ".vs", entryPoint, xray::render::SlangCompiler::Stage::Vertex);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSourceWithIncludes(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -377,7 +445,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     WatchShaderFile(cacheKey, name, ".ps", entryPoint, xray::render::SlangCompiler::Stage::Pixel);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSourceWithIncludes(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -502,7 +570,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadHullShader(const char* name, const 
         return result;
     WatchShaderFile(cacheKey, name, ".hs", entryPoint, xray::render::SlangCompiler::Stage::Hull);
 
-    u32 sourceHash = ShaderCache::ComputeHash((const char*)fs->pointer(), fs->length());
+    u32 sourceHash = HashShaderSourceWithIncludes((const char*)fs->pointer(), fs->length());
     ExtractedReflection deserializedReflection;
     bool cacheHit = m_cache.TryLoad(name, ".hs", sourceHash, result.bytecode, &deserializedReflection);
     if (cacheHit)
@@ -572,7 +640,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadDomainShader(const char* name, cons
         return result;
     WatchShaderFile(cacheKey, name, ".ds", entryPoint, xray::render::SlangCompiler::Stage::Domain);
 
-    u32 sourceHash = ShaderCache::ComputeHash((const char*)fs->pointer(), fs->length());
+    u32 sourceHash = HashShaderSourceWithIncludes((const char*)fs->pointer(), fs->length());
     ExtractedReflection deserializedReflection;
     bool cacheHit = m_cache.TryLoad(name, ".ds", sourceHash, result.bytecode, &deserializedReflection);
     if (cacheHit)
@@ -659,7 +727,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     WatchShaderFile(cacheKey, name, ".cs", entryPoint, xray::render::SlangCompiler::Stage::Compute);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSourceWithIncludes(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -802,7 +870,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
     WatchShaderFile(cacheKey, name, ".as", entryPoint, xray::render::SlangCompiler::Stage::Amplification);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSourceWithIncludes(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -912,7 +980,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
     WatchShaderFile(cacheKey, name, ".ms", entryPoint, xray::render::SlangCompiler::Stage::Mesh);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSourceWithIncludes(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -1032,10 +1100,9 @@ bool ShaderLoader::CompileShaderWithDefines(
         definesStr.append(";");
     }
 
-    u32 cacheKey = ShaderCache::ComputeHash(
-        sourceCode.c_str(),
-        sourceCode.length(),
-        definesStr.c_str()
+    u32 cacheKey = MixHash(
+        HashShaderSourceWithIncludes(sourceCode.c_str(), sourceCode.length()),
+        ShaderCache::ComputeHash("", 0, definesStr.c_str())
     );
 
     // Try to load from cache

@@ -8,6 +8,7 @@
 
 #include "XR_IOConsole.h"
 #include "xr_input.h"
+#include "xr_ioc_cmd.h"
 
 #include "IGame_Level.h"
 #include "IGame_Persistent.h"
@@ -63,6 +64,11 @@ bool CRenderDevice::RenderBegin()
         ZoneScopedN("RenderBegin::BackendBegin");
         GEnv.Render->Begin();
     }
+
+    // Vulkan may fail swapchain acquire (OUT_OF_DATE) without opening a command list.
+    // Abort this frame; GetDeviceState() will request NeedReset on the next attempt.
+    if (GEnv.Backend && !GEnv.Backend->IsInFrame())
+        return false;
 
     g_bRendering = true;
     return true;
@@ -305,7 +311,15 @@ void CRenderDevice::ProcessFrame()
 
         const u64 frameStartNs = SDL_GetTicksNS();
 
+        const bool reflexPacing = GEnv.Backend && GEnv.Backend->IsLowLatencyAvailable();
+        if (reflexPacing)
+            GEnv.Backend->LatencySleep();
+
+        if (GEnv.Backend)
+            GEnv.Backend->SetLatencyMarker(IRenderBackend::LatencyMarker::SimulationStart);
         FrameMove();
+        if (GEnv.Backend)
+            GEnv.Backend->SetLatencyMarker(IRenderBackend::LatencyMarker::SimulationEnd);
 
         OnCameraUpdated();
 
@@ -318,7 +332,11 @@ void CRenderDevice::ProcessFrame()
             seqFrameMT.Process();
         });
 
+        if (GEnv.Backend)
+            GEnv.Backend->SetLatencyMarker(IRenderBackend::LatencyMarker::RenderSubmitStart);
         DoRender();
+        if (GEnv.Backend)
+            GEnv.Backend->SetLatencyMarker(IRenderBackend::LatencyMarker::RenderSubmitEnd);
 
         TaskScheduler->Wait(processSeqParallel);
 
@@ -328,7 +346,9 @@ void CRenderDevice::ProcessFrame()
         else if (Paused() || g_pGameLevel == nullptr)
             fpsCap = ps_fps_limit_in_menu;
 
-        if (fpsCap > 0)
+        const bool skipAppFpsCap = reflexPacing && !GEnv.isDedicatedServer &&
+            (ps_r_reflex != 0 || fpsCap > 0);
+        if (fpsCap > 0 && !skipAppFpsCap)
         {
             const u64 targetFrameNs = 1'000'000'000ull / static_cast<u64>(fpsCap);
             const u64 deadlineNs = frameStartNs + targetFrameNs;

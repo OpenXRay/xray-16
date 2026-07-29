@@ -161,6 +161,31 @@ nvrhi::ITexture* PassResourceCache::GetDummyShadowMap2D(nvrhi::IDevice* device) 
     return m_dummyShadowMap2D;
 }
 
+nvrhi::ITexture* PassResourceCache::GetDummyLocalShadowESM(nvrhi::IDevice* device) {
+    if (!m_dummyLocalShadowESM && device) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.arraySize = 4;
+        desc.format = nvrhi::Format::R16_FLOAT;
+        desc.debugName = "DummyLocalShadowESM";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.dimension = nvrhi::TextureDimension::Texture2DArray;
+        desc.isShaderResource = true;
+        m_dummyLocalShadowESM = device->createTexture(desc);
+        if (m_dummyLocalShadowESM) {
+            nvrhi::CommandListHandle cmd = device->createCommandList();
+            cmd->open();
+            cmd->clearTextureFloat(
+                m_dummyLocalShadowESM, nvrhi::AllSubresources, nvrhi::Color(1.f));
+            cmd->close();
+            device->executeCommandList(cmd);
+        }
+    }
+    return m_dummyLocalShadowESM;
+}
+
 nvrhi::ITexture* PassResourceCache::GetDummyContactDepth(nvrhi::IDevice* device) {
     if (!m_dummyContactDepth && device) {
         nvrhi::TextureDesc desc;
@@ -228,6 +253,36 @@ nvrhi::ITexture* PassResourceCache::GetDummyCubeMap(nvrhi::IDevice* device) {
     return m_dummyCubeMap;
 }
 
+nvrhi::ITexture* PassResourceCache::GetDummyCubeArray(nvrhi::IDevice* device) {
+    if (!m_dummyCubeArray && device) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.format = nvrhi::Format::RGBA8_UNORM;
+        desc.dimension = nvrhi::TextureDimension::TextureCubeArray;
+        desc.arraySize = 6;
+        desc.debugName = "DummyCubeArray";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.isShaderResource = true;
+        m_dummyCubeArray = device->createTexture(desc);
+    }
+    return m_dummyCubeArray;
+}
+
+nvrhi::IBuffer* PassResourceCache::GetDummyStructuredBuffer(nvrhi::IDevice* device) {
+    if (!m_dummyStructuredBuffer && device) {
+        nvrhi::BufferDesc bd;
+        bd.byteSize = sizeof(float) * 4 * 64;
+        bd.structStride = sizeof(float) * 4;
+        bd.initialState = nvrhi::ResourceStates::ShaderResource;
+        bd.keepInitialState = true;
+        bd.debugName = "DummyStructuredBuffer";
+        m_dummyStructuredBuffer = device->createBuffer(bd);
+    }
+    return m_dummyStructuredBuffer;
+}
+
 nvrhi::ISampler* PassResourceCache::GetSamplerByName(const char* smpName, nvrhi::IDevice* device)
 {
     if (strstr(smpName, "smp_nofilter") || strstr(smpName, "smp_smap") || strstr(smpName, "smp_jitter"))
@@ -253,6 +308,14 @@ nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayout(
     nvrhi::IDevice* device)
 {
     u64 key = HashString(passName);
+    key = HashCombine(key, u64(desc.visibility));
+    key = HashCombine(key, u64(desc.bindings.size()));
+    for (const auto& b : desc.bindings)
+    {
+        key = HashCombine(key, u64(b.type));
+        key = HashCombine(key, u64(b.slot));
+        key = HashCombine(key, u64(b.size));
+    }
 
     auto it = m_bindingLayouts.find(key);
     if (it != m_bindingLayouts.end()) {
@@ -260,7 +323,6 @@ nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayout(
         return it->second;
     }
 
-    // Create new layout
     m_stats.layoutMisses++;
     nvrhi::BindingLayoutHandle layout = device->createBindingLayout(desc);
     if (layout) {
@@ -564,6 +626,8 @@ void PassResourceCache::Clear() {
     m_dummyContactDepth = nullptr;
     m_dummyContactHistory = nullptr;
     m_dummyCubeMap = nullptr;
+    m_dummyCubeArray = nullptr;
+    m_dummyStructuredBuffer = nullptr;
 
     Msg("* [PassResourceCache] Cleared all caches");
 }

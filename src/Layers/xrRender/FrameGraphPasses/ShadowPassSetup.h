@@ -74,6 +74,9 @@ struct ShadowPassState
     nvrhi::BindingLayoutHandle skinned2wLayout;
     nvrhi::GraphicsPipelineHandle skinned3wPipeline; // 3-bone HQ (44B)
     nvrhi::BindingLayoutHandle skinned3wLayout;
+    nvrhi::GraphicsPipelineHandle skinnedMdiPipeline[6];
+    nvrhi::BindingLayoutHandle skinnedMdiLayout;
+    nvrhi::InputLayoutHandle skinnedMdiInputLayout[6];
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::InputLayoutHandle grassInputLayout;
     nvrhi::InputLayoutHandle skinnedInputLayout;
@@ -134,7 +137,8 @@ ShadowCascadeOutputs setupCascadedShadowPass(
     const xr_vector<xray::render::GeometryBatch>* hudBatches,
     const xr_vector<xray::render::GeometryBatch>* worldSkinnedBatches,
     fg::GPUCullingManager* gpuCulling,
-    ShadowPassState& state);
+    ShadowPassState& state,
+    framegraph::VirtualResourceHandle skinnedDrawArgs = {});
 
 void InitializeShadowPass(fg::RenderDevice* device, ShadowPassState& state);
 void ShutdownShadowPass(fg::RenderDevice* device, ShadowPassState& state);

@@ -34,6 +34,8 @@
 #include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
+#include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "xrEngine/xr_object.h"
 
 
@@ -1063,6 +1065,10 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
     matData.detailBumpIndex = INVALID_TEXTURE_INDEX;
     matData.detailBumpXIndex = INVALID_TEXTURE_INDEX;
     matData.tessMethod = 0;
+    matData.sssMapIndex = INVALID_TEXTURE_INDEX;
+    matData.emissiveIntensity = 0.f;
+    matData._pad1 = 0;
+    matData._pad2 = 0;
 
     if (matPSO->pass) {
         fg::STextureList* texList = matPSO->pass->T._get();
@@ -1153,7 +1159,8 @@ u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
     if (baseForScale.size() > 0) {
         matData.detailScale = GetDetailScale(baseForScale);
     } else {
-        matData.detailScale = 4.0f;
+        // Classic TextureDescr default / dt_params when unset
+        matData.detailScale = 1.0f;
     }
 
     u32 terrainMaterialID = terrainBuffer.RegisterMaterial(matData);
@@ -1448,10 +1455,10 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     matData.detailBumpIndex = INVALID_TEXTURE_INDEX;
     matData.detailBumpXIndex = INVALID_TEXTURE_INDEX;
     matData.tessMethod = 0;
-    matData.normalXIndex = INVALID_TEXTURE_INDEX;
-    matData.detailBumpIndex = INVALID_TEXTURE_INDEX;
-    matData.detailBumpXIndex = INVALID_TEXTURE_INDEX;
-    matData.tessMethod = 0;
+    matData.sssMapIndex = INVALID_TEXTURE_INDEX;
+    matData.emissiveIntensity = 0.f;
+    matData._pad1 = 0;
+    matData._pad2 = 0;
 
     if (visual->textureName.size() > 0) {
         matData.detailScale = GetDetailScale(visual->textureName);
@@ -1466,26 +1473,70 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
         if (matInfo.transparent) {
             matData.flags |= MAT_FLAG_ALPHA_BLEND;
         }
+        if (matInfo.multiply) {
+            matData.flags |= MAT_FLAG_MULTIPLY;
+        }
         if (strstr(visual->shaderName.c_str(), "water") != nullptr)
         {
             matData.flags |= MAT_FLAG_WATER;
-            // Ensure water goes through transparent partition even if blender props are stale
             matData.flags |= MAT_FLAG_ALPHA_BLEND;
         }
-        // Trees / bushes / leaves — enable foliage SSS path
+        {
+            const char* sh = visual->shaderName.c_str();
+            const char* tex = visual->textureName.size() ? visual->textureName.c_str() : "";
+            const bool emissiveName =
+                strstr(sh, "selflight") || strstr(sh, "emissive") || strstr(sh, "glow") ||
+                strstr(sh, "lightplane") || strstr(sh, "light_plane") ||
+                strstr(tex, "glow") || strstr(tex, "selflight") || strstr(tex, "emissive") ||
+                strstr(tex, "neon");
+            if (emissiveName)
+            {
+                matData.flags |= MAT_FLAG_EMISSIVE;
+                float intens = 2.5f;
+                if (strstr(sh, "selflight"))
+                    intens = 3.5f;
+                if (strstr(sh, "glow") || strstr(tex, "glow"))
+                    intens = 4.5f;
+                matData.emissiveIntensity = intens;
+            }
+        }
+        // Foliage SSS: leaves/bushes only — not bark, LODs, cars, opaque trunks.
+        // Old matcher tagged every MT_TREE + lod\* + trees\* textures → green SSS on wood/vehicles.
         {
             const char* sh = visual->shaderName.c_str();
             const char* tex = visual->textureName.size() ? visual->textureName.c_str() : "";
             const u16 vtype = visual->getType();
             const bool treeType = (vtype == MT_TREE_ST || vtype == MT_TREE_PM);
-            if (treeType ||
-                strstr(sh, "trees") || strstr(sh, "tree\\") || strstr(sh, "tree/") ||
+            const bool cutout =
+                (matData.flags & (MAT_FLAG_ALPHA_TEST | MAT_FLAG_ALPHA_BLEND)) != 0;
+
+            const bool barkLike =
+                strstr(tex, "bark") || strstr(tex, "stvol") || strstr(tex, "trunk") ||
+                strstr(tex, "kora") || strstr(tex, "brevno") || strstr(tex, "wood_") ||
+                strstr(tex, "stem") || strstr(tex, "pen_") || strstr(sh, "trunk");
+
+            const bool leafTex =
+                strstr(tex, "leaves") || strstr(tex, "leaf") || strstr(tex, "vetka") ||
+                strstr(tex, "foliage") || strstr(tex, "flora") || strstr(tex, "xvoy") ||
+                strstr(tex, "needles");
+
+            const bool plantShader =
                 strstr(sh, "bush") || strstr(sh, "flora") || strstr(sh, "leaf") ||
-                strstr(sh, "vegetation") || strstr(sh, "lod\\") || strstr(sh, "lod/") ||
-                strstr(tex, "trees\\") || strstr(tex, "trees/") ||
-                strstr(tex, "bush") || strstr(tex, "flora") || strstr(tex, "leaves"))
+                strstr(sh, "vegetation") ||
+                strstr(sh, "trees\\") || strstr(sh, "trees/") ||
+                strstr(sh, "tree\\") || strstr(sh, "tree/");
+
+            // Leaves are alpha-cutout on tree/bush shaders; never match lod\ alone.
+            if (!barkLike &&
+                ((cutout && (treeType || plantShader || leafTex)) || leafTex))
             {
                 matData.flags |= MAT_FLAG_FOLIAGE;
+            }
+
+            if (strstr(tex, "glass") || strstr(tex, "steklo") || strstr(tex, "window") ||
+                strstr(sh, "glass") || strstr(sh, "steklo"))
+            {
+                matData.flags |= MAT_FLAG_GLASS;
             }
         }
         matData.shaderVariant = matInfo.shaderVariant;
@@ -1516,16 +1567,37 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     return materialID;
 }
 
-u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName, u8 blendMode)
+u32 MaterialCache::PreRegisterParticleMaterial(
+    const shared_str& textureName,
+    u8 blendMode,
+    const char* shaderName,
+    const char* sixWayPosXYZ,
+    const char* sixWayNegXYZ)
 {
     using namespace fg::bindless;
 
     if (!textureName.size() || !textureName[0])
         return UINT32_MAX;
 
-    // Key by texture + blend: SET needs aref 200, BLEND/ADD keep near-zero for soft fade.
+    u32 colorMode = 0;
+    bool hard = false;
+    if (shaderName && shaderName[0])
+    {
+        if (strstr(shaderName, "particle_s-aadd") || strstr(shaderName, "s-aadd"))
+            colorMode = 3;
+        else if (strstr(shaderName, "particle_s-add") || strstr(shaderName, "s-add"))
+            colorMode = 2;
+        else if (strstr(shaderName, "particle_s-blend") || strstr(shaderName, "s-blend"))
+            colorMode = 1;
+        if (strstr(shaderName, "particle_hard") || strstr(shaderName, "_hard"))
+            hard = true;
+    }
+
     string256 cacheKey;
-    xr_sprintf(cacheKey, "%s#%u", textureName.c_str(), (u32)blendMode);
+    xr_sprintf(cacheKey, "%s#%u#%u#%u#%s#%s",
+        textureName.c_str(), (u32)blendMode, colorMode, hard ? 1u : 0u,
+        sixWayPosXYZ ? sixWayPosXYZ : "",
+        sixWayNegXYZ ? sixWayNegXYZ : "");
     shared_str key(cacheKey);
 
     auto it = m_particleTextureToMaterialID.find(key);
@@ -1536,7 +1608,6 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName, u8
     if (!materialBuffer.IsInitialized())
         return UINT32_MAX;
 
-    // PARTICLE_BLEND_SET = 0 (classic deferred blender aref 200 + depth write)
     constexpr u8 kParticleBlendSet = 0;
     MaterialData matData = {};
     matData.diffuseIndex = INVALID_TEXTURE_INDEX;
@@ -1544,6 +1615,7 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName, u8
     matData.detailIndex = INVALID_TEXTURE_INDEX;
     matData.pbrIndex = INVALID_TEXTURE_INDEX;
     matData.detailScale = 1.0f;
+    matData.sssMapIndex = INVALID_TEXTURE_INDEX;
     if (blendMode == kParticleBlendSet)
     {
         matData.alphaRef = 200.0f / 255.0f;
@@ -1554,6 +1626,19 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName, u8
         matData.alphaRef = 0.01f / 255.0f;
         matData.flags = 0;
     }
+    if (hard)
+        matData.flags |= MAT_FLAG_PARTICLE_HARD;
+    if (colorMode >= 2)
+    {
+        matData.flags |= MAT_FLAG_EMISSIVE;
+        matData.emissiveIntensity = (colorMode >= 3) ? 6.0f : 3.5f;
+    }
+    else if (shaderName && (strstr(shaderName, "glow") || strstr(shaderName, "emissive")))
+    {
+        matData.flags |= MAT_FLAG_EMISSIVE;
+        matData.emissiveIntensity = 4.0f;
+    }
+    matData.tessMethod = colorMode;
     matData.shaderVariant = 0;
 
     u32 materialID = materialBuffer.RegisterMaterial(matData);
@@ -1564,6 +1649,10 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName, u8
     pending.materialID = materialID;
     pending.visual = nullptr;
     pending.textureName = textureName;
+    if (sixWayPosXYZ && sixWayPosXYZ[0])
+        pending.sixWayPosXYZ = sixWayPosXYZ;
+    if (sixWayNegXYZ && sixWayNegXYZ[0])
+        pending.sixWayNegXYZ = sixWayNegXYZ;
     m_pendingMaterials.push_back(pending);
 
     Msg("* [MaterialCache] PreRegisterParticle: matID=%u tex='%s' blend=%u aref=%.3f pending=%u",
@@ -1578,14 +1667,15 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
 {
     using namespace fg::bindless;
 
-    if (m_pendingMaterials.empty()) {
-        return;
-    }
-
     auto& materialBuffer = MaterialBuffer::Instance();
     if (!materialBuffer.IsInitialized())
         return;
 
+    u32 processedCount = 0;
+    bool tessRoutingDirty = false;
+
+    if (!m_pendingMaterials.empty())
+    {
     resources::TextureManager* texManager = m_resourceManager ? m_resourceManager->GetTextureManager() : nullptr;
     if (!texManager)
         return;
@@ -1595,8 +1685,6 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
         Msg("! [MaterialCache] Backend not available - cannot register bindless textures");
         return;
     }
-
-    u32 processedCount = 0;
 
     for (const auto& pending : m_pendingMaterials) {
         dxRender_Visual* visual = pending.visual;
@@ -1661,10 +1749,8 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
             }
         }
 
-        auto& texDescMgr = TextureDescr;
-        shared_str bumpName = isWater ? shared_str("water\\water_normal") : texDescMgr.GetBumpName(diffuseName);
-        if (bumpName.size() && bumpName[0]) {
-            resources::TextureHandle handle = texManager->LoadTexture(bumpName.c_str());
+        if (pending.sixWayPosXYZ.size() && pending.sixWayPosXYZ[0]) {
+            resources::TextureHandle handle = texManager->LoadTexture(pending.sixWayPosXYZ.c_str());
             if (handle.IsValid()) {
                 nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
                 if (nvrhiTex) {
@@ -1673,6 +1759,58 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
                         matData.normalIndex = descriptorIndex;
                         matData.flags |= MAT_FLAG_HAS_NORMAL;
                         updated = true;
+                    }
+                }
+            }
+        }
+        if (pending.sixWayNegXYZ.size() && pending.sixWayNegXYZ[0]) {
+            resources::TextureHandle handle = texManager->LoadTexture(pending.sixWayNegXYZ.c_str());
+            if (handle.IsValid()) {
+                nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+                if (nvrhiTex) {
+                    u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                    if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                        matData.detailIndex = descriptorIndex;
+                        matData.flags |= MAT_FLAG_HAS_DETAIL;
+                        updated = true;
+                    }
+                }
+            }
+        }
+
+        auto& texDescMgr = TextureDescr;
+        const bool hasSixWay = pending.sixWayPosXYZ.size() && pending.sixWayPosXYZ[0];
+        shared_str bumpName = isWater ? shared_str("water\\water_normal")
+            : (hasSixWay ? shared_str() : texDescMgr.GetBumpName(diffuseName));
+        if (bumpName.size() && bumpName[0]) {
+            resources::TextureHandle handle = texManager->LoadTexture(bumpName.c_str());
+            if (isWater && !handle.IsValid())
+                handle = texManager->LoadTexture("fx\\water_normal");
+            if (isWater && !handle.IsValid())
+                handle = texManager->LoadTexture("water\\water_water_bump");
+            if (handle.IsValid()) {
+                nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+                if (nvrhiTex) {
+                    u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                    if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                        matData.normalIndex = descriptorIndex;
+                        matData.flags |= MAT_FLAG_HAS_NORMAL;
+                        updated = true;
+                    }
+                }
+            }
+
+            if (isWater) {
+                resources::TextureHandle dudv = texManager->LoadTexture("water\\water_dudv");
+                if (dudv.IsValid()) {
+                    nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(dudv);
+                    if (nvrhiTex) {
+                        u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                        if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                            matData.detailIndex = descriptorIndex;
+                            matData.flags |= MAT_FLAG_HAS_DETAIL;
+                            updated = true;
+                        }
                     }
                 }
             }
@@ -1698,7 +1836,7 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
 
         LPCSTR detailTexName = nullptr;
         bool detailHasBump = false;
-        if (texDescMgr.GetDetailTexture(diffuseName, detailTexName)) {
+        if (!isWater && texDescMgr.GetDetailTexture(diffuseName, detailTexName)) {
             if (detailTexName && detailTexName[0]) {
                 resources::TextureHandle handle = texManager->LoadTexture(detailTexName);
                 if (handle.IsValid()) {
@@ -1753,34 +1891,38 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
             }
         }
 
-        // Tessellation method assignment (used only when r4_enable_tessellation is
-        // on — and that flag is forcibly cleared on Apple/MoltenVK).
-        // Classic: deffer_model / deffer_flat blender token. We approximate with
-        // models\ + bump# only (PN+HM). Level/trees use steep parallax instead.
         bool denyTess = isWater ||
-            (matData.flags & (MAT_FLAG_FOLIAGE | MAT_FLAG_WATER | MAT_FLAG_TERRAIN |
-                              MAT_FLAG_ALPHA_TEST | MAT_FLAG_ALPHA_BLEND)) != 0;
-        bool isModelShader = false;
+            (matData.flags & (MAT_FLAG_FOLIAGE | MAT_FLAG_WATER | MAT_FLAG_TERRAIN)) != 0;
         if (visual && visual->shaderName.size())
         {
             const char* sh = visual->shaderName.c_str();
-            if (strstr(sh, "models\\") || strstr(sh, "models/") ||
-                strstr(sh, "model\\") || strstr(sh, "model/"))
-                isModelShader = true;
             if (strstr(sh, "flora") || strstr(sh, "tree") || strstr(sh, "grass") ||
-                strstr(sh, "particle") || strstr(sh, "effects\\"))
+                strstr(sh, "particle") || strstr(sh, "effects\\") || strstr(sh, "effects/"))
                 denyTess = true;
         }
         u32 wantMethod = 0;
-        if (!denyTess && isModelShader && (matData.flags & MAT_FLAG_HAS_NORMAL_X))
-            wantMethod = 3; // TESS_PN_HM
+        if (!denyTess)
+        {
+            u32 blenderTess = 0;
+            if (visual && visual->shaderName.size() &&
+                shader_info::GetShaderTessellationMethod(visual->shaderName.c_str(), blenderTess))
+                wantMethod = blenderTess;
+            if (wantMethod >= 2 && (matData.flags & MAT_FLAG_HAS_NORMAL_X) == 0)
+                wantMethod = (wantMethod == 2) ? 0 : 1;
+            if (wantMethod == 3 && (matData.flags & MAT_FLAG_HAS_DETAIL) == 0)
+                wantMethod = 1;
+            if (wantMethod > 3)
+                wantMethod = 0;
+        }
         if (matData.tessMethod != wantMethod)
         {
+            if (wantMethod != 0 || matData.tessMethod != 0)
+                tessRoutingDirty = true;
             matData.tessMethod = wantMethod;
             updated = true;
         }
 
-        if (diffuseName.c_str() && diffuseName[0]) {
+        if (diffuseName.c_str() && diffuseName[0] && !isWater) {
             shared_str pbrName = texDescMgr.GetPBRName(diffuseName);
             if (!pbrName.empty()) {
                 resources::TextureHandle handle = texManager->LoadTexture(pbrName.c_str());
@@ -1796,21 +1938,44 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
                     }
                 }
             }
+
+            shared_str sssName = texDescMgr.GetSSSName(diffuseName);
+            if (!sssName.empty()) {
+                resources::TextureHandle handle = texManager->LoadTexture(sssName.c_str());
+                if (handle.IsValid()) {
+                    nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+                    if (nvrhiTex) {
+                        u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                        if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                            matData.sssMapIndex = descriptorIndex;
+                            matData.flags |= MAT_FLAG_HAS_SSS_MAP;
+                            updated = true;
+                            static u32 s_sssBoundLog = 0;
+                            if (s_sssBoundLog < 24)
+                            {
+                                Msg("* [SSS] bound map '%s' for '%s' idx=%u",
+                                    sssName.c_str(), diffuseName.c_str(), descriptorIndex);
+                                ++s_sssBoundLog;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        // One-shot bump + tess diagnostic
         {
             static u32 s_bumpDbgCount = 0;
             static u32 s_tessMatCount = 0;
             if (matData.tessMethod != 0)
                 s_tessMatCount++;
             if (s_bumpDbgCount < 40) {
-                Msg("* [BumpDbg] mat=%u diff='%s' bump='%s' nIdx=%u nXIdx=%u flags=0x%X tess=%u",
-                    materialID,
-                    diffuseName.size() ? diffuseName.c_str() : "",
+                u32 blenderTess = 0;
+                const char* sh = (visual && visual->shaderName.size()) ? visual->shaderName.c_str() : "";
+                shader_info::GetShaderTessellationMethod(sh, blenderTess);
+                Msg("* [BumpDbg] mat=%u sh='%s' bump='%s' flags=0x%X tess=%u blenderTess=%u",
+                    materialID, sh,
                     bumpName.size() ? bumpName.c_str() : "(none)",
-                    matData.normalIndex, matData.normalXIndex, matData.flags,
-                    matData.tessMethod);
+                    matData.flags, matData.tessMethod, blenderTess);
                 s_bumpDbgCount++;
                 if (s_bumpDbgCount == 40)
                     Msg("* [TessDbg] materials with tessMethod!=0 so far: %u", s_tessMatCount);
@@ -1853,9 +2018,80 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
     }
 
     m_pendingMaterials.clear();
+    } // !m_pendingMaterials.empty()
+
+#if !defined(XR_PLATFORM_APPLE)
+    {
+        static int s_prevTessFlag = -1;
+        const int tessOn = ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION) ? 1 : 0;
+        if (tessOn != s_prevTessFlag)
+        {
+            s_prevTessFlag = tessOn;
+            u32 fixed = 0;
+            for (const auto& kv : m_materialIDByNames)
+            {
+                const u32 id = kv.second;
+                const MaterialData* existing = materialBuffer.GetMaterial(id);
+                if (!existing)
+                    continue;
+                MaterialData matData = *existing;
+                u32 wantMethod = 0;
+                if (tessOn)
+                {
+                    const char* sh = kv.first.first.c_str();
+                    const bool denyTess =
+                        (matData.flags & (MAT_FLAG_FOLIAGE | MAT_FLAG_WATER | MAT_FLAG_TERRAIN |
+                                          MAT_FLAG_PARTICLE_HARD)) != 0 ||
+                        (sh && (strstr(sh, "flora") || strstr(sh, "tree") || strstr(sh, "grass") ||
+                                strstr(sh, "particle") || strstr(sh, "effects\\") ||
+                                strstr(sh, "effects/")));
+                    u32 blenderTess = 0;
+                    if (!denyTess && sh && sh[0] &&
+                        shader_info::GetShaderTessellationMethod(sh, blenderTess))
+                        wantMethod = blenderTess;
+                    if (wantMethod >= 2 && (matData.flags & MAT_FLAG_HAS_NORMAL_X) == 0)
+                        wantMethod = (wantMethod == 2) ? 0 : 1;
+                    if (wantMethod == 3 && (matData.flags & MAT_FLAG_HAS_DETAIL) == 0)
+                        wantMethod = 1;
+                    if (wantMethod > 3)
+                        wantMethod = 0;
+                }
+                if (matData.tessMethod != wantMethod)
+                {
+                    matData.tessMethod = wantMethod;
+                    materialBuffer.UpdateMaterial(id, matData);
+                    ++fixed;
+                    tessRoutingDirty = true;
+                }
+            }
+            u32 withTess = 0;
+            for (const auto& kv : m_materialIDByNames)
+            {
+                const MaterialData* m = materialBuffer.GetMaterial(kv.second);
+                if (m && m->tessMethod != 0)
+                    ++withTess;
+            }
+            Msg("* [Tess] flag=%d updated=%u materials with tessMethod!=0: %u (blender only)",
+                tessOn, fixed, withTess);
+            tessRoutingDirty = true;
+        }
+    }
+#endif
 
     if (processedCount > 0) {
         materialBuffer.Upload(ctx);
+    }
+
+    if (tessRoutingDirty)
+    {
+        if (auto* fgr = dynamic_cast<FrameGraphRenderer*>(GEnv.Render))
+        {
+            if (auto* cull = fgr->GetGPUCullingManager())
+            {
+                cull->InvalidateStaticCullingData();
+                Msg("* [Tess] static cull invalidated after tessMethod update");
+            }
+        }
     }
 
     auto& vtb = bindless::VariantTextureBuffer::Instance();

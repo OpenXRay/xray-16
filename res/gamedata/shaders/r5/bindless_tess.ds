@@ -1,11 +1,7 @@
-// bindless_tess.ds — Domain shader (PN interpolate + heightmap displace)
-//
-// PN Bezier / normal coefficients are derived here from the 3 control points
-// (same formulas as the classic hull patch-constant path). Avoids Slang's
-// missing Patch decoration on user patch-constant varyings.
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
+#include "shared/tess_pn.h"
 
 struct HS_CONTROL_POINT
 {
@@ -38,87 +34,73 @@ struct DS_OUTPUT
 
 [domain("tri")]
 [partitioning("integer")]
-DS_OUTPUT main(HS_CONSTANT_DATA input, float3 bary : SV_DomainLocation,
-               const OutputPatch<HS_CONTROL_POINT, 3> patch)
+DS_OUTPUT main(HS_CONSTANT_DATA input, float3 uvw : SV_DomainLocation,
+               const OutputPatch<HS_CONTROL_POINT, 3> bp)
 {
     DS_OUTPUT o;
 
-    float u = bary.x;
-    float v = bary.y;
-    float w = bary.z;
+    float minc = min(uvw.x, min(uvw.y, uvw.z));
+    [flatten] if (minc != 0.0)
+    {
+        [flatten] if (((1.0 / 3.0) - minc) > 0.01)
+        {
+            float fK = (1.0 / 3.0) / ((1.0 / 3.0) - minc);
+            fK = minc < 0.1 ? fK : 1.0;
+            uvw = lerp(float3(1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0), uvw, fK);
+        }
+    }
 
-    uint matId = patch[0].materialID;
+    float u = uvw.x;
+    float v = uvw.y;
+    float w = uvw.z;
+
+    float3 triPos = bp[0].worldPos * w + bp[1].worldPos * v + bp[2].worldPos * u;
+    float2 tc = bp[0].texcoord * w + bp[1].texcoord * v + bp[2].texcoord * u;
+    float3 T = bp[0].tangent * w + bp[1].tangent * v + bp[2].tangent * u;
+    float3 B = bp[0].bitangent * w + bp[1].bitangent * v + bp[2].bitangent * u;
+    float3 Nlin = bp[0].normal * w + bp[1].normal * v + bp[2].normal * u;
+    float hemi = bp[0].hemi * w + bp[1].hemi * v + bp[2].hemi * u;
+
+    uint matId = bp[0].materialID;
     MaterialData mat = g_Materials[matId];
     bool usePN = (mat.tessMethod == TESS_METHOD_PN || mat.tessMethod == TESS_METHOD_PN_HM);
 
-    float3 pos;
-    float3 N;
+    float3 pos = triPos;
+    float3 N = normalize(Nlin);
     if (usePN)
     {
-        float3 b300 = patch[0].worldPos;
-        float3 b030 = patch[1].worldPos;
-        float3 b003 = patch[2].worldPos;
-        float3 n200 = normalize(patch[0].normal);
-        float3 n020 = normalize(patch[1].normal);
-        float3 n002 = normalize(patch[2].normal);
-
-        float3 b210 = (2.0 * b300 + b030 - dot(b030 - b300, n200) * n200) / 3.0;
-        float3 b120 = (2.0 * b030 + b300 - dot(b300 - b030, n020) * n020) / 3.0;
-        float3 b021 = (2.0 * b030 + b003 - dot(b003 - b030, n020) * n020) / 3.0;
-        float3 b012 = (2.0 * b003 + b030 - dot(b030 - b003, n002) * n002) / 3.0;
-        float3 b102 = (2.0 * b003 + b300 - dot(b300 - b003, n002) * n002) / 3.0;
-        float3 b201 = (2.0 * b300 + b003 - dot(b003 - b300, n200) * n200) / 3.0;
-
-        float3 E = (b210 + b120 + b021 + b012 + b102 + b201) / 6.0;
-        float3 V = (b300 + b030 + b003) / 3.0;
-        float3 b111 = E + (E - V) * 0.5;
-
-        float v12 = 2.0 * dot(b030 - b300, n200 + n020) / max(dot(b030 - b300, b030 - b300), 1e-8);
-        float v23 = 2.0 * dot(b003 - b030, n020 + n002) / max(dot(b003 - b030, b003 - b030), 1e-8);
-        float v31 = 2.0 * dot(b300 - b003, n002 + n200) / max(dot(b300 - b003, b300 - b003), 1e-8);
-        float3 n110 = normalize(n200 + n020 - v12 * (b030 - b300));
-        float3 n011 = normalize(n020 + n002 - v23 * (b003 - b030));
-        float3 n101 = normalize(n002 + n200 - v31 * (b300 - b003));
-
-        float uu = u * u, vv = v * v, ww = w * w;
-        pos = b300 * (uu * u) + b030 * (vv * v) + b003 * (ww * w)
-            + b210 * (3.0 * uu * v) + b120 * (3.0 * u * vv)
-            + b201 * (3.0 * uu * w) + b102 * (3.0 * u * ww)
-            + b021 * (3.0 * vv * w) + b012 * (3.0 * v * ww)
-            + b111 * (6.0 * u * v * w);
-
-        N = n200 * uu + n020 * vv + n002 * ww
-          + n110 * (u * v) + n011 * (v * w) + n101 * (w * u);
-        N = normalize(N);
+        TessPNEvaluate(
+            bp[0].worldPos, bp[1].worldPos, bp[2].worldPos,
+            bp[0].normal, bp[1].normal, bp[2].normal,
+            uvw, pos, N);
     }
-    else
-    {
-        pos = patch[0].worldPos * u + patch[1].worldPos * v + patch[2].worldPos * w;
-        N = normalize(patch[0].normal * u + patch[1].normal * v + patch[2].normal * w);
-    }
-
-    float2 tc = patch[0].texcoord * u + patch[1].texcoord * v + patch[2].texcoord * w;
-    float3 T = normalize(patch[0].tangent * u + patch[1].tangent * v + patch[2].tangent * w);
-    float3 B = normalize(patch[0].bitangent * u + patch[1].bitangent * v + patch[2].bitangent * w);
-    float hemi = patch[0].hemi * u + patch[1].hemi * v + patch[2].hemi * w;
 
     bool useHM = (mat.tessMethod == TESS_METHOD_HM || mat.tessMethod == TESS_METHOD_PN_HM);
-    if (useHM && ((mat.flags & MAT_FLAG_HAS_NORMAL_X) != 0) && mat.normalXIndex != INVALID_TEXTURE_INDEX)
+    if (useHM &&
+        ((mat.flags & MAT_FLAG_HAS_DETAIL) != 0) &&
+        ((mat.flags & MAT_FLAG_HAS_NORMAL_X) != 0) &&
+        mat.normalXIndex != INVALID_TEXTURE_INDEX)
     {
         float height = GetBindlessTexture(mat.normalXIndex).SampleLevel(smp_linear, tc, 0).a;
-        // Scale from r2_parallax_h (parallax.x); fallback 0.04m so HM is visible
-        // even when steep-parallax is off. Classic DX11 used a similar ~cm range.
-        float hmScale = (parallax.x > 0.0) ? (parallax.x * 2.0) : 0.04;
-        float displace = (height - 0.5) * hmScale;
-        pos += N * displace;
+        if ((mat.flags & MAT_FLAG_HAS_DETAIL_BUMP) != 0 &&
+            mat.detailBumpXIndex != INVALID_TEXTURE_INDEX)
+        {
+            float2 tcd = tc * mat.detailScale;
+            float hDetail = GetBindlessTexture(mat.detailBumpXIndex).SampleLevel(smp_linear, tcd, 0).a;
+            height += (hDetail - 0.5) * 0.2;
+        }
+        pos += N * TessHMDisplace(height);
     }
+
+    [flatten] if (minc == 0.0)
+        pos = triPos;
 
     o.worldPos = pos;
     o.position = mul(m_VP, float4(pos, 1.0));
     o.texcoord = tc;
     o.normal = N;
-    o.tangent = T;
-    o.bitangent = B;
+    o.tangent = normalize(T);
+    o.bitangent = normalize(B);
     o.materialID = matId;
     o.hemi = hemi;
     return o;

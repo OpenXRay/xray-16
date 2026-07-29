@@ -1,0 +1,76 @@
+#define SM_6_0
+#include "shared/basecolor_pack.h"
+
+SamplerState smp_nofilter : register(s0);
+SamplerState smp_linear   : register(s1);
+
+Texture2D g_Color : register(t0);
+Texture2D g_Depth : register(t1);
+Texture2D g_Normal : register(t2);
+Texture2D g_Base : register(t3);
+
+cbuffer SSSSSParams : register(b0)
+{
+    float2 texelSize;
+    float2 direction;
+    float widthScale;
+    float strength;
+    float debugMode;
+    float _pad0;
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float baseA = g_Base.SampleLevel(smp_nofilter, I.uv, 0).a;
+    float mask = UnpackSSSMaskFromBaseA(baseA);
+    float3 color = g_Color.SampleLevel(smp_linear, I.uv, 0).rgb;
+
+    if (debugMode > 0.5)
+        return float4(mask, mask * 0.2, mask * 0.05, 1.0);
+
+    if (mask < 0.02)
+        return float4(color, 1.0);
+
+    float centerZ = g_Depth.SampleLevel(smp_nofilter, I.uv, 0).x;
+    if (centerZ >= 0.9995)
+        return float4(color, 1.0);
+
+    float3 Nc = normalize(g_Normal.SampleLevel(smp_nofilter, I.uv, 0).xyz + 1e-5);
+    float2 stepDir = direction * texelSize;
+
+    float sigmaR = max(0.75, 1.10 * widthScale);
+    float sigmaG = max(0.55, 0.70 * widthScale);
+    float sigmaB = max(0.40, 0.45 * widthScale);
+    float maxSigma = max(sigmaR, max(sigmaG, sigmaB));
+    int radius = clamp(int(ceil(maxSigma * 3.0)), 2, 12);
+
+    float3 sum = 0.0.xxx;
+    float3 wsum = 0.0.xxx;
+
+    for (int i = -radius; i <= radius; ++i)
+    {
+        float fi = float(i);
+        float2 uv = I.uv + stepDir * fi;
+        float3 s = g_Color.SampleLevel(smp_linear, uv, 0).rgb;
+        float m = UnpackSSSMaskFromBaseA(g_Base.SampleLevel(smp_nofilter, uv, 0).a);
+        float z = g_Depth.SampleLevel(smp_nofilter, uv, 0).x;
+        float3 Ns = normalize(g_Normal.SampleLevel(smp_nofilter, uv, 0).xyz + 1e-5);
+        float dz = abs(z - centerZ);
+        float depthW = exp(-dz * 60.0);
+        float normalW = pow(saturate(dot(Nc, Ns)), 4.0);
+        float maskW = lerp(0.25, 1.0, m);
+        float3 g = float3(
+            exp(-(fi * fi) / (2.0 * sigmaR * sigmaR)),
+            exp(-(fi * fi) / (2.0 * sigmaG * sigmaG)),
+            exp(-(fi * fi) / (2.0 * sigmaB * sigmaB)));
+        float3 w = g * depthW * normalW * maskW;
+        sum += s * w;
+        wsum += w;
+    }
+
+    float3 blurred = sum / max(wsum, 1e-4);
+    float3 outc = lerp(color, blurred, saturate(mask * strength));
+    return float4(outc, 1.0);
+}

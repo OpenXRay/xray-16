@@ -10,6 +10,8 @@
 
 extern ENGINE_API float ps_r_taa_sharpness;
 extern ENGINE_API int ps_r_taa;
+extern ENGINE_API int ps_r_taa_jitter;
+extern ENGINE_API int ps_r_upscale;
 
 namespace xray::render::fg::passes
 {
@@ -22,23 +24,49 @@ float g_taa_jitter_prev_py = 0.f;
 Fmatrix g_taa_unjittered_full_transform;
 Fmatrix g_taa_unjittered_inv_full_transform;
 
+static float Halton(u32 index, u32 base)
+{
+    float f = 1.f;
+    float r = 0.f;
+    while (index > 0)
+    {
+        f /= float(base);
+        r += f * float(index % base);
+        index /= base;
+    }
+    return r;
+}
+
 void ApplyTAAJitter()
 {
-    // Keep temporal reprojection in the unjittered camera space.
-    g_taa_unjittered_full_transform.mul(Device.mProject, Device.mView);
-    g_taa_unjittered_inv_full_transform.invert_44(g_taa_unjittered_full_transform);
+    g_taa_unjittered_full_transform = Device.mFullTransform;
+    g_taa_unjittered_inv_full_transform = Device.mInvFullTransform;
 
     g_taa_jitter_prev_px = g_taa_jitter_px;
     g_taa_jitter_prev_py = g_taa_jitter_py;
-    g_taa_jitter_px = 0.f;
-    g_taa_jitter_py = 0.f;
-    // Full projection jitter currently shifts the whole frame in this pipeline.
-    // Keep TAA temporal accumulation enabled, but leave the camera projection stable.
 
-    Device.mFullTransform = g_taa_unjittered_full_transform;
-    Device.mInvFullTransform = g_taa_unjittered_inv_full_transform;
-    if (GEnv.Render)
-        GEnv.Render->SetCacheXform(Device.mView, Device.mProject);
+    const bool wantJitter = (ps_r_taa_jitter != 0) && (ps_r_taa != 0 || ps_r_upscale != 0);
+    if (!wantJitter)
+    {
+        g_taa_jitter_px = 0.f;
+        g_taa_jitter_py = 0.f;
+        return;
+    }
+
+    const u32 phase = Device.dwFrame % 16u;
+    const float jx = Halton(phase + 1, 2) - 0.5f;
+    const float jy = Halton(phase + 1, 3) - 0.5f;
+    g_taa_jitter_px = jx;
+    g_taa_jitter_py = jy;
+
+    const float w = float(std::max(1u, Device.dwWidth));
+    const float h = float(std::max(1u, Device.dwHeight));
+    Fmatrix jitterMat;
+    jitterMat.identity();
+    jitterMat._31 = (jx * 2.f) / w;
+    jitterMat._32 = (jy * 2.f) / h;
+    Device.mFullTransform.mul(jitterMat, g_taa_unjittered_full_transform);
+    Device.mInvFullTransform.invert(Device.mFullTransform);
 }
 
 namespace
@@ -101,7 +129,7 @@ void InitializeTAA(nvrhi::IDevice* device, TAAPassState& state)
     }
     auto& cache = GetPassResourceCache();
     state.layout = cache.GetOrCreateBindingLayoutFromReflection(
-        "TAA_v4", *vs.reflection, *ps.reflection, device);
+        "TAA_v5", *vs.reflection, *ps.reflection, device);
     if (state.layout)
     {
         nvrhi::GraphicsPipelineDesc desc;
@@ -115,7 +143,7 @@ void InitializeTAA(nvrhi::IDevice* device, TAAPassState& state)
         desc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
         nvrhi::FramebufferInfoEx fb;
         fb.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
-        state.pipeline = cache.GetOrCreatePipeline("TAA_v4", desc, fb, device);
+        state.pipeline = cache.GetOrCreatePipeline("TAA_v5", desc, fb, device);
     }
     state.initialized = true;
 }
@@ -152,6 +180,21 @@ framegraph::VirtualResourceHandle setupTAAPass(
     EnsureHistory(device->GetNVRHIDevice(), state, width, height);
     if (!state.history[0] || !state.history[1])
         return sceneColor;
+
+    {
+        const Fvector camPos = Device.vCameraPosition;
+        const Fvector camDir = Device.vCameraDirection;
+        if (state.hasCameraHistory)
+        {
+            const float posDelta = camPos.distance_to(state.prevCameraPos);
+            const float dirDot = std::clamp(camDir.dotproduct(state.prevCameraDir), -1.f, 1.f);
+            if (posDelta > 8.f || dirDot < 0.7f)
+                state.hasHistory = false;
+        }
+        state.prevCameraPos = camPos;
+        state.prevCameraDir = camDir;
+        state.hasCameraHistory = true;
+    }
 
     const u32 readIdx = state.historyIndex;
     const u32 writeIdx = 1u - readIdx;

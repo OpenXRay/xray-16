@@ -13,14 +13,14 @@ namespace xray::render::fg
 {
 class RenderDevice;
 class VolumetricRenderer;
+class ClusteredLightManager;
 }
 
 namespace xray::render::fg::passes
 {
 
-struct ParticleBatch; // ParticlePassSetup.h
+struct ParticleBatch;
 
-// Must match volumetric/shared_froxel.h FroxelParams (b5)
 struct alignas(16) FroxelParamsCB
 {
     u32 dims[3];
@@ -51,7 +51,8 @@ struct alignas(16) TemporalParamsCB
 {
     Fmatrix prevVP;
     float temporalAlpha;
-    float pad[3];
+    u32 frameIndex;
+    float pad[2];
 };
 static_assert(sizeof(TemporalParamsCB) % 16 == 0);
 
@@ -70,18 +71,29 @@ struct alignas(16) ParticleInjectParamsCB
     u32 pad[3];
 };
 
+struct alignas(16) LightShaftParamsCB
+{
+    Fvector sunDir;
+    float intensity;
+    Fvector albedo;
+    float densityBoost;
+};
+static_assert(sizeof(LightShaftParamsCB) % 16 == 0);
+
 struct VolumetricPassState
 {
     nvrhi::ComputePipelineHandle clearPipeline;
     nvrhi::ComputePipelineHandle fogPipeline;
     nvrhi::ComputePipelineHandle lightPipeline;
     nvrhi::ComputePipelineHandle particlePipeline;
+    nvrhi::ComputePipelineHandle lightShaftPipeline;
     nvrhi::ComputePipelineHandle temporalPipeline;
     nvrhi::GraphicsPipelineHandle marchPipeline;
     nvrhi::BindingLayoutHandle clearLayout;
     nvrhi::BindingLayoutHandle fogLayout;
     nvrhi::BindingLayoutHandle lightLayout;
     nvrhi::BindingLayoutHandle particleLayout;
+    nvrhi::BindingLayoutHandle lightShaftLayout;
     nvrhi::BindingLayoutHandle temporalLayout;
     nvrhi::BindingLayoutHandle marchLayout;
     nvrhi::SamplerHandle linearSampler;
@@ -89,10 +101,19 @@ struct VolumetricPassState
     nvrhi::BufferHandle temporalCB;
     nvrhi::BufferHandle particleParamsCB;
     nvrhi::BufferHandle particlePointsCB;
+    nvrhi::BufferHandle lightShaftCB;
     Fmatrix prevVP;
     bool hasPrevVP = false;
     bool initialized = false;
     bool computeEnabled = false;
+};
+
+struct VolumetricLightingInputs
+{
+    nvrhi::ITexture* shadowMapArray = nullptr;
+    nvrhi::ITexture* shadowCascades[3] = {};
+    nvrhi::ITexture* shadowHZB[3] = {};
+    ClusteredLightManager* lightManager = nullptr;
 };
 
 struct VolumetricPassData
@@ -104,6 +125,7 @@ struct VolumetricPassData
     VolumetricRenderer* volumetric = nullptr;
     VolumetricPassState* passState = nullptr;
     const xr_vector<ParticleBatch>* particleBatches = nullptr;
+    VolumetricLightingInputs lighting{};
     u32 width = 0;
     u32 height = 0;
 };
@@ -117,7 +139,8 @@ framegraph::VirtualResourceHandle setupVolumetricPass(
     u32 width,
     u32 height,
     VolumetricPassState& state,
-    const xr_vector<ParticleBatch>* particleBatches = nullptr);
+    const xr_vector<ParticleBatch>* particleBatches = nullptr,
+    const VolumetricLightingInputs* lighting = nullptr);
 
 void InitializeVolumetricPass(nvrhi::IDevice* device, VolumetricPassState& state);
 void ShutdownVolumetricPass(VolumetricPassState& state);

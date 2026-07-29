@@ -2,7 +2,6 @@
 // Per-group prefix scan for visible batches.
 // Outputs local prefix per batch and group-visible counts.
 #define SM_5_0
-#include "common.h"
 
 #define COMPACT_GROUP_SIZE 256
 

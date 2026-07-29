@@ -28,6 +28,7 @@
 #include "xrNetServer/NET_Messages.h"
 #include "xrCore/xr_token.h"
 #include "GamePersistent.h"
+#include "xrEngine/ShadersExternalData.h"
 
 #define WEAPON_REMOVE_TIME 60000
 #define ROTATION_TIME 0.25f
@@ -1775,6 +1776,16 @@ void CWeapon::UpdateHudAdditonal(Fmatrix& trans)
             m_zoom_params.m_fZoomRotationFactor -= Device.fTimeDelta / m_zoom_params.m_fZoomRotateTime;
 
         clamp(m_zoom_params.m_fZoomRotationFactor, 0.f, 1.f);
+    }
+
+    if (g_pGamePersistent && g_pGamePersistent->m_pGShaderConstants)
+    {
+        const float zoom = m_zoom_params.m_fZoomRotationFactor;
+        g_pGamePersistent->m_pGShaderConstants->hud_params.set(
+            zoom,
+            IsZoomed() ? zoom : 0.f,
+            0.015f,
+            1.f);
     }
 }
 

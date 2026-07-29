@@ -2,6 +2,8 @@
 
 #include "IVolumetricSource.h"
 #include "WorldFogSource.h"
+#include "LightShaftSource.h"
+#include "ParticleEmitterSource.h"
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include <nvrhi/nvrhi.h>
 
@@ -17,8 +19,8 @@ class RenderDevice;
 class VolumetricRenderer
 {
 public:
-    static constexpr u32 kFroxelX = 160;
-    static constexpr u32 kFroxelY = 90;
+    static constexpr u32 kFroxelX = 128;
+    static constexpr u32 kFroxelY = 72;
     static constexpr u32 kFroxelZ = 16;
 
     void Initialize(RenderDevice* device);
@@ -26,11 +28,14 @@ public:
 
     void RegisterSource(IVolumetricSource* source);
     void ClearSources();
-    void BeginFrame(); // refresh WorldFog from Environment
-    void SwapFroxelHistory(); // after frame: current → prev
+    void BeginFrame();
+    void SwapFroxelHistory();
 
     WorldFogSource& GetWorldFog() { return m_worldFog; }
     const WorldFogSource& GetWorldFog() const { return m_worldFog; }
+    LightShaftSource& GetLightShaft() { return m_lightShaft; }
+    ParticleEmitterSource& GetParticleEmitter() { return m_particleEmitter; }
+    const xr_vector<IVolumetricSource*>& GetSources() const { return m_sources; }
     nvrhi::ITexture* GetFroxelVolume() const { return m_froxelVolume.Get(); }
     nvrhi::ITexture* GetPrevFroxelVolume() const { return m_prevFroxelVolume.Get(); }
     bool HasFroxelHistory() const { return m_hasHistory && m_prevFroxelVolume; }
@@ -45,6 +50,8 @@ private:
     nvrhi::TextureHandle m_froxelVolume;
     nvrhi::TextureHandle m_prevFroxelVolume;
     WorldFogSource m_worldFog;
+    LightShaftSource m_lightShaft;
+    ParticleEmitterSource m_particleEmitter;
     xr_vector<IVolumetricSource*> m_sources;
 };
 

@@ -4,6 +4,7 @@
 #define LOCAL_SHADOW_FORWARD
 #define CSM_CHEAP_FORWARD
 #define SKY_IBL
+#define SKY_IBL_SPEC_V4 1
 #include "common.h"
 #include "bindless_common.h"
 
@@ -57,12 +58,12 @@ f_forward main(p_billboard I)
 		ao = pbr.b;
 	}
 
-	// Alpha as thickness; tips thinner for stronger SSS
 	float thickness = saturate(lerp(0.45, 1.0, t) * saturate(texel.a + 0.35));
-	float sssAmt = max(grass_sss_color.w, 0.75);
+	float sssAmt = max(grass_sss_color.w, 0.0);
+	float sssMask = saturate(sssAmt * 1.6);
 
 	return output_forward_pbr(
 		albedo, N, I.position.xyz, metallic, roughness, ao, I.hpos,
-		hemi, 1.0,
-		sssAmt, grass_sss_color.rgb, thickness);
+		hemi, saturate(I.sunOcclusion),
+		sssAmt, grass_sss_color.rgb, thickness, sssMask, 1.0);
 }

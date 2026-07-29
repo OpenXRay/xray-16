@@ -299,6 +299,8 @@ private:
         u32 materialID;
         dxRender_Visual* visual;
         shared_str textureName;
+        shared_str sixWayPosXYZ;
+        shared_str sixWayNegXYZ;
     };
     xr_vector<PendingMaterial> m_pendingMaterials;
 
@@ -343,7 +345,12 @@ public:
 
     u32 PreRegisterBindlessMaterial(dxRender_Visual* visual);
 
-    u32 PreRegisterParticleMaterial(const shared_str& textureName, u8 blendMode = 1);
+    u32 PreRegisterParticleMaterial(
+        const shared_str& textureName,
+        u8 blendMode = 1,
+        const char* shaderName = nullptr,
+        const char* sixWayPosXYZ = nullptr,
+        const char* sixWayNegXYZ = nullptr);
 
 
     bool IsTerrainMaterial(dxRender_Visual* visual);

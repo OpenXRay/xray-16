@@ -10,8 +10,12 @@
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/xrRender_console.h"
+#include "Layers/xrRender/FrameGraphPasses/TAAPassSetup.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
+
+extern ENGINE_API int ps_r_rt_gi;
+extern ENGINE_API int ps_r_path_tracer;
 
 namespace xray::render::fg::passes {
 
@@ -34,6 +38,7 @@ struct WetPassData
     VirtualResourceHandle colorIn;
     VirtualResourceHandle normal;
     VirtualResourceHandle worldPos;
+    VirtualResourceHandle baseColor;
     VirtualResourceHandle patched;
     VirtualResourceHandle colorOut;
     VirtualResourceHandle normalOut;
@@ -45,6 +50,7 @@ struct WetPassData
     WetSurfacesExtras extras;
     bool hasRainSM = false;
     bool hasSceneReflection = false;
+    bool hasBaseColor = false;
 };
 
 static void BlitColor(nvrhi::ICommandList* cmdList, nvrhi::ITexture* dst, nvrhi::ITexture* src)
@@ -64,7 +70,10 @@ static WetConstantsGPU MakeWetConstants(const Fmatrix& rainSampleVP)
         ? g_pGamePersistent->Environment().CurrentEnv.rain_density
         : 0.f;
     wet.RainDensity.set(rainDensity, rainDensity, 0.f, 0.f);
-    wet.EyePos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 0.f);
+    const bool rtNoDistFade = (ps_r_rt_gi != 0) || (ps_r_path_tracer != 0);
+    wet.EyePos.set(
+        Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z,
+        rtNoDistFade ? 1.f : 0.f);
     if (g_pGamePersistent)
     {
         const auto& env = g_pGamePersistent->Environment().CurrentEnv;
@@ -72,12 +81,12 @@ static WetConstantsGPU MakeWetConstants(const Fmatrix& rainSampleVP)
     }
     const float t = Device.fTimeGlobal;
     wet.Timers.set(t, t * 10.f, t / 10.f, _sin(t));
-    wet.m_VP = Device.mFullTransform;
+    wet.m_VP = g_taa_unjittered_full_transform;
     wet.m_RainSampleVP = rainSampleVP;
     return wet;
 }
 
-constexpr u32 kWetPipeVersion = 7;
+constexpr u32 kWetPipeVersion = 25;
 
 void InitializeWetSurfacesPass(nvrhi::IDevice* device, WetSurfacesPassState& state)
 {
@@ -109,12 +118,12 @@ void InitializeWetSurfacesPass(nvrhi::IDevice* device, WetSurfacesPassState& sta
 
     auto& cache = GetPassResourceCache();
     state.layout = cache.GetOrCreateBindingLayoutFromReflection(
-        "WetApply_v7", *vs.reflection, *applyPs.reflection, device);
+        "WetApply_v25_SpecUnion", *vs.reflection, *applyPs.reflection, device);
 
     if (patchPs.handle && patchPs.reflection)
     {
         state.patchLayout = cache.GetOrCreateBindingLayoutFromReflection(
-            "WetPatch_v7", *vs.reflection, *patchPs.reflection, device);
+            "WetPatch_v24", *vs.reflection, *patchPs.reflection, device);
     }
     else
     {
@@ -124,7 +133,7 @@ void InitializeWetSurfacesPass(nvrhi::IDevice* device, WetSurfacesPassState& sta
     if (writePs.handle && writePs.reflection)
     {
         state.writeNormalLayout = cache.GetOrCreateBindingLayoutFromReflection(
-            "WetWriteNormal_v7", *vs.reflection, *writePs.reflection, device);
+            "WetWriteNormal_v24", *vs.reflection, *writePs.reflection, device);
     }
 
     nvrhi::FramebufferInfoEx fbInfo;
@@ -145,20 +154,58 @@ void InitializeWetSurfacesPass(nvrhi::IDevice* device, WetSurfacesPassState& sta
         pipe = cache.GetOrCreatePipeline(name, desc, fbInfo, device);
     };
 
-    makePipe(applyPs, state.layout, state.pipeline, "WetApply_v7");
-    makePipe(patchPs, state.patchLayout, state.patchPipeline, "WetPatch_v7");
-    makePipe(writePs, state.writeNormalLayout, state.writeNormalPipeline, "WetWriteNormal_v7");
+    makePipe(applyPs, state.layout, state.pipeline, "WetApply_v25_SpecUnion");
+    makePipe(patchPs, state.patchLayout, state.patchPipeline, "WetPatch_v24");
+    makePipe(writePs, state.writeNormalLayout, state.writeNormalPipeline, "WetWriteNormal_v24");
 
     state.initialized = true;
     state.pipeVersion = kWetPipeVersion;
     if (state.pipeline && state.layout)
     {
-        Msg("* [WetSurfaces] Rebuild v9: apply=%d patch=%d write=%d (SSR-stable normals, non-transient RT)",
+        Msg("* [WetSurfaces] Rebuild v25: apply=%d patch=%d write=%d",
             !!state.pipeline, !!state.patchPipeline, !!state.writeNormalPipeline);
     }
     else
         Msg("! [WetSurfaces] Pipeline create failed — wet disabled");
 }
+
+namespace
+{
+bool EnsureWetTarget(
+    nvrhi::IDevice* nvDevice,
+    nvrhi::TextureHandle& slot,
+    u32 width,
+    u32 height,
+    const char* name)
+{
+    if (!nvDevice || width == 0 || height == 0)
+        return false;
+
+    if (slot)
+    {
+        const auto& d = slot->getDesc();
+        if (d.width == width && d.height == height)
+            return true;
+    }
+
+    nvrhi::TextureDesc desc;
+    desc.width = width;
+    desc.height = height;
+    desc.format = nvrhi::Format::RGBA16_FLOAT;
+    desc.isRenderTarget = true;
+    desc.isShaderResource = true;
+    desc.debugName = name;
+    desc.initialState = nvrhi::ResourceStates::ShaderResource;
+    desc.keepInitialState = true;
+    slot = nvDevice->createTexture(desc);
+    if (!slot)
+    {
+        Msg("! [WetSurfaces] Failed to create %s %ux%u RGBA16F", name, width, height);
+        return false;
+    }
+    return true;
+}
+} // namespace
 
 DefaultOutputLayout setupWetSurfacesPass(
     FrameGraph& fg,
@@ -173,6 +220,7 @@ DefaultOutputLayout setupWetSurfacesPass(
     static bool s_loggedNoFlag = false;
     static bool s_loggedMissingInputs = false;
     static bool s_loggedNoPipelines = false;
+    static bool s_loggedNoTargets = false;
 
     if (!ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF))
     {
@@ -187,7 +235,6 @@ DefaultOutputLayout setupWetSurfacesPass(
     const float rainDensity = g_pGamePersistent
         ? g_pGamePersistent->Environment().CurrentEnv.rain_density
         : 0.f;
-    // Rain-only (SSFX/CoP behavior) — no wet rewrite in dry weather
     if (rainDensity < 0.001f)
         return outputs;
 
@@ -204,8 +251,11 @@ DefaultOutputLayout setupWetSurfacesPass(
         return outputs;
     }
 
-    if (device && device->GetNVRHIDevice())
-        InitializeWetSurfacesPass(device->GetNVRHIDevice(), passState);
+    if (!device || !device->GetNVRHIDevice())
+        return outputs;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    InitializeWetSurfacesPass(nvDevice, passState);
 
     if (!passState.pipeline || !passState.layout)
     {
@@ -218,28 +268,57 @@ DefaultOutputLayout setupWetSurfacesPass(
         return outputs;
     }
 
+    const bool doWriteNormal = passState.writeNormalPipeline && passState.writeNormalLayout
+        && passState.patchPipeline && passState.patchLayout;
+
+    const bool needResize = passState.texWidth != width || passState.texHeight != height;
+    if (needResize)
+    {
+        passState.patched = nullptr;
+        passState.color = nullptr;
+        passState.normal = nullptr;
+        passState.texWidth = 0;
+        passState.texHeight = 0;
+    }
+
+    if (!EnsureWetTarget(nvDevice, passState.patched, width, height, "rt_WetPatched") ||
+        !EnsureWetTarget(nvDevice, passState.color, width, height, "rt_WetColor") ||
+        (doWriteNormal && !EnsureWetTarget(nvDevice, passState.normal, width, height, "rt_WetNormal")))
+    {
+        passState.patched = nullptr;
+        passState.color = nullptr;
+        passState.normal = nullptr;
+        passState.texWidth = 0;
+        passState.texHeight = 0;
+        if (!s_loggedNoTargets)
+        {
+            Msg("! [WetSurfaces] RT alloc failed — wet disabled this frame");
+            s_loggedNoTargets = true;
+        }
+        return outputs;
+    }
+    passState.texWidth = width;
+    passState.texHeight = height;
+    s_loggedNoTargets = false;
+
     ResourceDesc texDesc;
     texDesc.type = ResourceDesc::Type::Texture2D;
     texDesc.width = width;
     texDesc.height = height;
     texDesc.format = nvrhi::Format::RGBA16_FLOAT;
     texDesc.isRenderTarget = true;
-    // Non-transient: aliased wet normal/color made fullscreen SSR hard-switch by
-    // camera/map position (same class of bug as rt_SceneReflection).
     texDesc.isTransient = false;
 
     texDesc.debugName = "rt_WetPatched";
-    auto patched = fg.CreateTexture("rt_WetPatched", texDesc);
+    auto patched = fg.ImportTexture("rt_WetPatched", passState.patched.Get(), texDesc);
     texDesc.debugName = "rt_WetColor";
-    auto outColor = fg.CreateTexture("rt_WetColor", texDesc);
+    auto outColor = fg.ImportTexture("rt_WetColor", passState.color.Get(), texDesc);
 
-    const bool doWriteNormal = passState.writeNormalPipeline && passState.writeNormalLayout
-        && passState.patchPipeline && passState.patchLayout;
     VirtualResourceHandle outNormal{};
     if (doWriteNormal)
     {
         texDesc.debugName = "rt_WetNormal";
-        outNormal = fg.CreateTexture("rt_WetNormal", texDesc);
+        outNormal = fg.ImportTexture("rt_WetNormal", passState.normal.Get(), texDesc);
     }
 
     const bool hasRainSM = extras.rainSMValid && extras.rainSM.is_valid();
@@ -261,6 +340,9 @@ DefaultOutputLayout setupWetSurfacesPass(
             data.colorIn = passBuilder.read(inputs.albedo, ResourceState::ShaderResource);
             data.normal = passBuilder.read(inputs.normal, ResourceState::ShaderResource);
             data.worldPos = passBuilder.read(inputs.worldPos, ResourceState::ShaderResource);
+            data.hasBaseColor = inputs.baseColor.is_valid();
+            if (data.hasBaseColor)
+                data.baseColor = passBuilder.read(inputs.baseColor, ResourceState::ShaderResource);
             if (hasRainSM)
                 data.rainSM = passBuilder.read(extras.rainSM, ResourceState::ShaderResource);
             if (hasSceneReflection)
@@ -287,6 +369,7 @@ DefaultOutputLayout setupWetSurfacesPass(
             auto* normalTex = fgGraph.GetPhysicalTexture(data.normal);
             auto* worldPosTex = fgGraph.GetPhysicalTexture(data.worldPos);
             auto* patchedTex = fgGraph.GetPhysicalTexture(data.patched);
+            auto* baseTex = data.hasBaseColor ? fgGraph.GetPhysicalTexture(data.baseColor) : nullptr;
             if (!colorIn || !normalTex || !worldPosTex || !patchedTex || !colorOut)
                 return;
 
@@ -355,6 +438,8 @@ DefaultOutputLayout setupWetSurfacesPass(
                 waterFall = waterRipple;
             if (!puddlesPerlin)
                 puddlesPerlin = waterRipple;
+            if (!baseTex)
+                baseTex = cache.GetDummyContactHistory(nvDevice);
 
             nvrhi::Viewport viewport;
             viewport.minX = 0;
@@ -375,7 +460,8 @@ DefaultOutputLayout setupWetSurfacesPass(
                     .Texture("g_RainShadow", rainSM)
                     .Texture("g_Water", waterRipple)
                     .Texture("g_WaterFall", waterFall)
-                    .Texture("g_PuddlesPerlin", puddlesPerlin);
+                    .Texture("g_PuddlesPerlin", puddlesPerlin)
+                    .Texture("g_Base", baseTex);
                 auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->patchLayout, nvDevice);
                 if (bindingSet)
                 {
@@ -415,7 +501,7 @@ DefaultOutputLayout setupWetSurfacesPass(
                 {
                     nvrhi::FramebufferDesc fbDesc;
                     fbDesc.addColorAttachment(normalOut);
-                    auto framebuffer = cache.GetOrCreateFramebuffer("WetWriteNormal_v1d", fbDesc, nvDevice);
+                    auto framebuffer = cache.GetOrCreateFramebuffer("WetWriteNormal_v1f", fbDesc, nvDevice);
                     if (framebuffer)
                     {
                         nvrhi::GraphicsState state;
@@ -457,7 +543,8 @@ DefaultOutputLayout setupWetSurfacesPass(
                     .Texture("g_Patched", patchedForApply)
                     .Texture("g_WorldPos", worldPosTex)
                     .Texture("g_WaterFall", waterFall)
-                    .Texture("g_SceneReflection", sceneRefl);
+                    .Texture("g_SceneReflection", sceneRefl)
+                    .Texture("g_Base", baseTex);
                 auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->layout, nvDevice);
                 if (!bindingSet)
                 {

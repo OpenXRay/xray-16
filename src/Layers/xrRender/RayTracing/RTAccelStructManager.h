@@ -130,6 +130,8 @@ private:
     nvrhi::rt::AccelStructHandle m_staticBlas;
     xr_vector<UniqueGeometry> m_uniqueGeometries;
     nvrhi::rt::AccelStructHandle m_tlas;
+    u32 m_tlasMaxInstances = 0;
+    u32 m_tlasBuiltInstances = 0;
     nvrhi::BufferHandle m_batchInfoBuffer;
 
     nvrhi::IBuffer* m_megaVB = nullptr;
@@ -141,6 +143,9 @@ private:
     nvrhi::BufferHandle m_skinnedIB;
     nvrhi::rt::AccelStructHandle m_skinnedBlas;
     xr_vector<SkinnedBatchRT> m_skinnedBatchData;
+    u32 m_skinnedTotalVerts = 0;
+    u32 m_skinnedTotalIndices = 0;
+    u64 m_skinnedTopoHash = 0;
     bool m_skinnedReady = false;
 
     nvrhi::BufferHandle m_grassOutputVB;

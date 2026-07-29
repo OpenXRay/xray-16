@@ -1,27 +1,37 @@
-// tonemap.ps — classic CoP combine tonemap: scale + modified Reinhard (white=1.7)
-// Matches r3/common_functions.h tonemap() — NOT ACES (ACES crushed night sky gradients).
 #define SM_6_0
 
 Texture2D t_hdr : register(t0);
 Texture2D<float> t_exposure : register(t1);
 SamplerState smp_rtlinear : register(s0);
 
+cbuffer TonemapParams : register(b0)
+{
+    float g_white;
+    float g_contrast;
+    float2 g_pad;
+};
+
 struct PS_INPUT {
     float4 position : SV_POSITION;
     float2 texcoord : TEXCOORD0;
 };
 
-float3 ClassicTonemap(float3 rgb, float scale)
+float Luminance(float3 c)
 {
-    rgb *= scale;
-
-    // Modified Reinhard, white intensity 1.7 (Clear Sky / CoP)
-    const float fWhiteIntensity = 1.7;
-    const float fWhiteIntensitySQR = fWhiteIntensity * fWhiteIntensity;
-    return (rgb * (1.0 + rgb / fWhiteIntensitySQR)) / (rgb + 1.0);
+    return dot(c, float3(0.3, 0.38, 0.22));
 }
 
-// Breaks smooth-gradient banding on night sky after LDR quantize
+float3 FilmicTonemap(float3 rgb, float scale, float white, float contrast)
+{
+    rgb = max(rgb * scale, 0.0);
+    float L = max(Luminance(rgb), 1e-6);
+    float w2 = max(white * white, 1e-3);
+    float Lt = (L * (1.0 + L / w2)) / (1.0 + L);
+    float3 mapped = rgb * (Lt / L);
+    mapped = pow(max(mapped, 0.0), max(contrast, 1e-3));
+    return saturate(mapped);
+}
+
 float InterleavedGradientNoise(float2 p)
 {
     return frac(52.9829189 * frac(dot(p, float2(0.06711056, 0.00583715))));
@@ -33,10 +43,11 @@ float4 main(PS_INPUT input) : SV_TARGET
     float3 color = t_hdr.SampleLevel(smp_rtlinear, uv, 0).rgb;
 
     float scale = t_exposure.Load(int3(0, 0, 0));
-    // Classic clamp mirrored here as safety; adapt already clamps [1/128, 20]
     scale = clamp(scale, 1.0 / 128.0, 20.0);
 
-    color = ClassicTonemap(color, scale);
+    float white = (g_white > 0.01) ? g_white : 4.0;
+    float contrast = (g_contrast > 0.01) ? g_contrast : 1.0;
+    color = FilmicTonemap(color, scale, white, contrast);
 
     float dither = InterleavedGradientNoise(input.position.xy) - 0.5;
     color += dither / 255.0;

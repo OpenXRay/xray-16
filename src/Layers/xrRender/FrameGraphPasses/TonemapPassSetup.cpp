@@ -10,6 +10,7 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/xrRender_console.h"
 
 namespace xray::render::fg {
     extern xray::render::FrameGraphRenderer RImplementation;
@@ -44,7 +45,7 @@ void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state) {
             auto& cache = framegraph::GetPassResourceCache();
 
             state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-                "TonemapPass_ACES", *vsResult.reflection, *psResult.reflection, device);
+                "TonemapPass_Filmic", *vsResult.reflection, *psResult.reflection, device);
 
             if (state.bindingLayout) {
                 nvrhi::GraphicsPipelineDesc pipeDesc;
@@ -63,7 +64,7 @@ void InitializeTonemapPass(nvrhi::IDevice* device, TonemapPassState& state) {
                     fbFmt = GEnv.Backend->GetBackBuffer()->getDesc().format;
                 fbInfo.addColorFormat(fbFmt);
 
-                state.pipeline = cache.GetOrCreatePipeline("TonemapPass_ACES", pipeDesc, fbInfo, device);
+                state.pipeline = cache.GetOrCreatePipeline("TonemapPass_Filmic", pipeDesc, fbInfo, device);
             }
         }
     }
@@ -100,7 +101,7 @@ framegraph::VirtualResourceHandle setupTonemapPass(
     auto& passData = fg.addCallbackPass<TonemapPassData>(
         "Tonemap",
 
-        [hdrInput, exposureTexture, outputTarget, hasExposure, hasOutputTarget, width, height, &tonemapState, exposureState](FrameGraph& builder, PassHandle passHandle, TonemapPassData& data) {
+        [hdrInput, exposureTexture, outputTarget, hasExposure, hasOutputTarget, width, height, &tonemapState, exposureState, device](FrameGraph& builder, PassHandle passHandle, TonemapPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -108,6 +109,7 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             data.hasExposure = hasExposure;
             data.passState = &tonemapState;
             data.exposurePassState = exposureState;
+            data.device = device;
 
             data.hdrInput = passBuilder.read(hdrInput, ResourceState::ShaderResource);
 
@@ -172,7 +174,27 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             if (!vsRefl || !psRefl)
                 return;
 
+            struct TonemapCB {
+                float white;
+                float contrast;
+                float pad0;
+                float pad1;
+            } tmCB{};
+            tmCB.white = ps_r_tonemap_white;
+            tmCB.contrast = ps_r_tonemap_contrast;
+
+            nvrhi::BufferHandle tonemapCB = nullptr;
+            if (data.device)
+            {
+                tonemapCB = cache.GetOrCreateVolatileCB(
+                    "TonemapPass", "TonemapParams", sizeof(TonemapCB), data.device);
+                if (tonemapCB)
+                    cmdList->writeBuffer(tonemapCB, &tmCB, sizeof(tmCB));
+            }
+
             framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, device, "Tonemap");
+            if (tonemapCB)
+                bsb.ConstantBuffer("TonemapParams", tonemapCB);
             bsb.Texture("t_hdr", hdrTexture);
             bsb.Texture("t_exposure", exposureTex);
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->bindingLayout, device);
@@ -181,7 +203,7 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(ldrTexture);
-            auto framebuffer = cache.GetOrCreateFramebuffer("TonemapPass_ACES", fbDesc, device);
+            auto framebuffer = cache.GetOrCreateFramebuffer("TonemapPass_Filmic", fbDesc, device);
 
             nvrhi::Viewport viewport;
             viewport.minX = 0;

@@ -248,6 +248,66 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	xml:InitStatic("video_adv:cap_r4_tessellation", _st)
 	ctl = xml:InitCheck("video_adv:check_r4_tessellation", _st)
 	table.insert(handler.m_preconditions, {func=mode_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_rt_gi", _st)
+	ctl = xml:InitCheck("video_adv:check_rt_gi", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_rt_gi_intensity", _st)
+	ctl = xml:InitTrackBar("video_adv:track_rt_gi_intensity", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_denoise", _st)
+	ctl = xml:InitCheck("video_adv:check_denoise", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_upscale", _st)
+	ctl = xml:InitTrackBar("video_adv:track_upscale", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_upscale_quality", _st)
+	ctl = xml:InitTrackBar("video_adv:track_upscale_quality", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_render_scale", _st)
+	ctl = xml:InitTrackBar("video_adv:track_render_scale", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_fsr_fg", _st)
+	ctl = xml:InitCheck("video_adv:check_fsr_fg", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_dlss_fg", _st)
+	ctl = xml:InitCheck("video_adv:check_dlss_fg", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_dlss_rr", _st)
+	ctl = xml:InitCheck("video_adv:check_dlss_rr", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_amd_rr", _st)
+	ctl = xml:InitCheck("video_adv:check_amd_rr", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_taa", _st)
+	ctl = xml:InitCheck("video_adv:check_taa", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_cas", _st)
+	ctl = xml:InitCheck("video_adv:check_cas", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_4, control=_st})
 ---------
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_vsync", _st)

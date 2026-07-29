@@ -19,8 +19,8 @@ struct TrailControlPoint
     float cumDist;             // cumulative distance from head
 };
 
-StructuredBuffer<TrailControlPoint> g_ControlPoints : register(t10);
-ByteAddressBuffer g_TrailState : register(t11);  // GPU-driven: {head, totalSpawned, liveCount, totalDist_bits}
+StructuredBuffer<TrailControlPoint> g_ControlPoints : register(t13);
+ByteAddressBuffer g_TrailState : register(t14);  // GPU-driven: {head, totalSpawned, liveCount, totalDist_bits}
 
 // ═══════════════════════════════════════════════════════
 //  Per-group constant buffer

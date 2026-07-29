@@ -21,10 +21,17 @@ struct SSGIPassState
     nvrhi::BindingLayoutHandle temporalLayout;
     nvrhi::BindingLayoutHandle applyLayout;
     nvrhi::TextureHandle colorCopy;
+    nvrhi::TextureHandle outputTex;
+    nvrhi::TextureHandle giTraceTex;
+    nvrhi::TextureHandle giBlurTex;
+    nvrhi::TextureHandle giTemporalTex;
     nvrhi::TextureHandle history[2];
     u32 historyW = 0;
     u32 historyH = 0;
+    u32 outputW = 0;
+    u32 outputH = 0;
     u32 historyIndex = 0;
+    u32 pipeVersion = 0;
     bool hasHistory = false;
     bool initialized = false;
 };

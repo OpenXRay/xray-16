@@ -10,6 +10,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/IGame_Level.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/device.h"
 
@@ -20,13 +21,13 @@ using namespace framegraph;
 
 struct alignas(16) SunShaftsCBGPU
 {
-    Fvector4 shaft_params; // intensity, quality, samples, scale
+    Fvector4 shaft_params;
 };
 static_assert(sizeof(SunShaftsCBGPU) == 16);
 
 struct alignas(16) SunShaftsCombineCBGPU
 {
-    Fvector4 combine_params; // xy = half-res texel size, zw = unused
+    Fvector4 combine_params;
 };
 static_assert(sizeof(SunShaftsCombineCBGPU) == 16);
 
@@ -35,10 +36,10 @@ struct SunShaftsPassData
     VirtualResourceHandle depth;
     VirtualResourceHandle worldPos;
     VirtualResourceHandle shadowMap;
-    VirtualResourceHandle output; // half-res shafts
+    VirtualResourceHandle output;
     nvrhi::ITexture* shadowMapArray = nullptr;
     nvrhi::ITexture* shadowCascades[3] = {};
-    u32 width = 0;  // march (half) resolution
+    u32 width = 0;
     u32 height = 0;
     float intensity = 0.f;
     u32 quality = 0;
@@ -48,9 +49,9 @@ struct SunShaftsPassData
 struct SunShaftsCombineData
 {
     VirtualResourceHandle sceneColor;
-    VirtualResourceHandle shafts; // half-res
-    VirtualResourceHandle output; // full-res scene + shafts
-    u32 width = 0;  // full resolution
+    VirtualResourceHandle shafts;
+    VirtualResourceHandle output;
+    u32 width = 0;
     u32 height = 0;
     u32 halfWidth = 0;
     u32 halfHeight = 0;
@@ -59,8 +60,18 @@ struct SunShaftsCombineData
 
 void InitializeSunShaftsPass(nvrhi::IDevice* device, SunShaftsPassState& state)
 {
-    if (state.initialized || !device)
+    constexpr u32 kPipeVersion = 6;
+    if (!device)
         return;
+    if (state.initialized && state.pipeline && state.combinePipeline && state.pipeVersion == kPipeVersion)
+        return;
+
+    state.initialized = false;
+    state.pipeVersion = 0;
+    state.pipeline = nullptr;
+    state.combinePipeline = nullptr;
+    state.layout = nullptr;
+    state.combineLayout = nullptr;
 
     auto* loader = GEnv.Render->GetShaderLoader();
     if (!loader)
@@ -69,6 +80,7 @@ void InitializeSunShaftsPass(nvrhi::IDevice* device, SunShaftsPassState& state)
         return;
     }
 
+    BindingSetBuilder::InvalidateReflectionCache();
     auto vs = loader->LoadVertexShader("fullscreen");
     auto ps = loader->LoadPixelShader("volumetric/sunshafts");
     if (!vs.handle || !ps.handle || !ps.reflection)
@@ -78,9 +90,19 @@ void InitializeSunShaftsPass(nvrhi::IDevice* device, SunShaftsPassState& state)
         return;
     }
 
+    state.marchVsReflection = loader->GetCachedReflection("fullscreen", ".vs");
+    state.marchPsReflection = loader->GetCachedReflection("volumetric/sunshafts", ".ps");
+    if (!state.marchVsReflection || !state.marchPsReflection)
+    {
+        Msg("! [SunShafts] Missing cached reflection (vs=%p ps=%p)",
+            state.marchVsReflection, state.marchPsReflection);
+        state.initialized = true;
+        return;
+    }
+
     auto& cache = GetPassResourceCache();
     state.layout = cache.GetOrCreateBindingLayoutFromReflection(
-        "SunShafts_CSMLadder", *vs.reflection, *ps.reflection, device);
+        "SunShafts_CSMLadder_v4", *state.marchVsReflection, *state.marchPsReflection, device);
 
     nvrhi::GraphicsPipelineDesc desc;
     desc.setVertexShader(vs.handle);
@@ -94,28 +116,35 @@ void InitializeSunShaftsPass(nvrhi::IDevice* device, SunShaftsPassState& state)
 
     nvrhi::FramebufferInfoEx fbInfo;
     fbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
-    state.pipeline = cache.GetOrCreatePipeline("SunShafts", desc, fbInfo, device);
+    state.pipeline = cache.GetOrCreatePipeline("SunShafts_v4", desc, fbInfo, device);
 
-    // Full-res combine pipeline: upsample + blur half-res shafts, add to scene.
     auto combinePs = loader->LoadPixelShader("volumetric/sunshafts_combine");
     if (combinePs.handle && combinePs.reflection)
     {
+        state.combinePsReflection = loader->GetCachedReflection("volumetric/sunshafts_combine", ".ps");
         state.combineLayout = cache.GetOrCreateBindingLayoutFromReflection(
-            "SunShaftsCombine", *vs.reflection, *combinePs.reflection, device);
+            "SunShaftsCombine_v4", *state.marchVsReflection, *state.combinePsReflection, device);
 
         nvrhi::GraphicsPipelineDesc cdesc;
         cdesc.setVertexShader(vs.handle);
         cdesc.setPixelShader(combinePs.handle);
         cdesc.addBindingLayout(state.combineLayout);
         cdesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
-        cdesc.renderState.blendState.targets[0].setBlendEnable(false);
+        auto& bt = cdesc.renderState.blendState.targets[0];
+        bt.setBlendEnable(true);
+        bt.setSrcBlend(nvrhi::BlendFactor::One);
+        bt.setDestBlend(nvrhi::BlendFactor::One);
+        bt.setBlendOp(nvrhi::BlendOp::Add);
+        bt.setSrcBlendAlpha(nvrhi::BlendFactor::One);
+        bt.setDestBlendAlpha(nvrhi::BlendFactor::Zero);
+        bt.setBlendOpAlpha(nvrhi::BlendOp::Add);
         cdesc.renderState.depthStencilState.setDepthTestEnable(false);
         cdesc.renderState.depthStencilState.setDepthWriteEnable(false);
         cdesc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
 
         nvrhi::FramebufferInfoEx cfbInfo;
         cfbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
-        state.combinePipeline = cache.GetOrCreatePipeline("SunShaftsCombine", cdesc, cfbInfo, device);
+        state.combinePipeline = cache.GetOrCreatePipeline("SunShaftsCombine_v4", cdesc, cfbInfo, device);
     }
     else
     {
@@ -123,23 +152,34 @@ void InitializeSunShaftsPass(nvrhi::IDevice* device, SunShaftsPassState& state)
     }
 
     state.initialized = true;
-    Msg("* [SunShafts] Pass initialized (march=%d combine=%d)",
-        state.pipeline ? 1 : 0, state.combinePipeline ? 1 : 0);
+    state.pipeVersion = kPipeVersion;
+    Msg("* [SunShafts] Pass initialized v4 (march=%d combine=%d cbs=%u srvs=%u)",
+        state.pipeline ? 1 : 0, state.combinePipeline ? 1 : 0,
+        (u32)state.marchPsReflection->constantLayout.constantBuffers.buffers.size(),
+        (u32)state.marchPsReflection->rtBindings.inputTextures.size());
+}
+
+float ResolveSunShaftsIntensity()
+{
+    if (!ps_r_sun_shafts)
+        return 0.f;
+    if (Device.dwPrecacheFrame)
+        return 0.f;
+    if (!g_pGamePersistent || !g_pGameLevel || g_pGamePersistent->IsLoadingScreenShown())
+        return 0.f;
+
+    float intensity = g_pGamePersistent->Environment().CurrentEnv.m_fSunShaftsIntensity;
+    if (SunshaftsIntensity > 0.f)
+        intensity = SunshaftsIntensity;
+    intensity *= std::max(ps_r_sun_shafts_scale, 0.f);
+    return intensity;
 }
 
 static bool NeedSunShafts(float& outIntensity, u32& outQuality)
 {
-    outIntensity = 0.f;
     outQuality = ps_r_sun_shafts;
-    if (!ps_r_sun_shafts)
-        return false;
-    if (!g_pGamePersistent)
-        return false;
-    const auto& env = g_pGamePersistent->Environment().CurrentEnv;
-    outIntensity = env.m_fSunShaftsIntensity;
-    if (outIntensity < 0.0001f)
-        return false;
-    return true;
+    outIntensity = ResolveSunShaftsIntensity();
+    return outIntensity >= 1e-4f;
 }
 
 VirtualResourceHandle setupSunShaftsPass(
@@ -155,16 +195,26 @@ VirtualResourceHandle setupSunShaftsPass(
     SunShaftsPassState& passState,
     nvrhi::ITexture* const* shadowCascades)
 {
+    float intensity = 0.f;
+    u32 quality = 0;
+    if (!NeedSunShafts(intensity, quality) || !shadowMapArray)
+        return sceneColor;
+
     if (device && device->GetNVRHIDevice())
         InitializeSunShaftsPass(device->GetNVRHIDevice(), passState);
 
-    float intensity = 0.f;
-    u32 quality = 0;
-    if (!NeedSunShafts(intensity, quality) || !passState.pipeline ||
-        !passState.combinePipeline || !shadowMapArray)
+    if (!passState.pipeline || !passState.combinePipeline)
         return sceneColor;
 
-    // Original renders the volumetric sun into a reduced-res buffer, then combines.
+    {
+        static float s_lastLogged = -1.f;
+        if (fabsf(intensity - s_lastLogged) > 0.01f)
+        {
+            s_lastLogged = intensity;
+            Msg("* [SunShafts] active intensity=%.3f quality=%u", intensity, quality);
+        }
+    }
+
     const u32 halfW = (width > 1) ? (width / 2) : 1;
     const u32 halfH = (height > 1) ? (height / 2) : 1;
 
@@ -184,11 +234,10 @@ VirtualResourceHandle setupSunShaftsPass(
     outDesc.height = height;
     outDesc.format = nvrhi::Format::RGBA16_FLOAT;
     outDesc.isRenderTarget = true;
-    outDesc.isTransient = true;
+    outDesc.isTransient = false;
     outDesc.debugName = "rt_SunShafts";
     auto output = fg.CreateTexture("rt_SunShafts", outDesc);
 
-    // ── Pass 1: half-res ray march (shafts term only) ─────────────────────────
     fg.addCallbackPass<SunShaftsPassData>(
         "SunShaftsMarch",
         [=, &passState](FrameGraph& builder, PassHandle passHandle, SunShaftsPassData& data) {
@@ -217,14 +266,14 @@ VirtualResourceHandle setupSunShaftsPass(
             auto* depthTex = fg.GetPhysicalTexture(data.depth);
             auto* worldPosTex = fg.GetPhysicalTexture(data.worldPos);
             auto* outTex = fg.GetPhysicalTexture(data.output);
-            if (!depthTex || !worldPosTex || !outTex || !data.shadowMapArray)
+            if (!depthTex || !worldPosTex || !outTex)
                 return;
 
             auto& cache = GetPassResourceCache();
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB(
                 "Frame", "StaticGlobals", sizeof(StaticGlobals), ctx->GetDevice());
             auto shaftCB = cache.GetOrCreateVolatileCB(
-                "SunShafts", "SunShaftsCB", sizeof(SunShaftsCBGPU), ctx->GetDevice());
+                "SunShafts", "SunShaftsCB_v4", sizeof(SunShaftsCBGPU), ctx->GetDevice());
 
             StaticGlobals sg = BuildStaticGlobals();
             cmd->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
@@ -235,13 +284,10 @@ VirtualResourceHandle setupSunShaftsPass(
             cb.shaft_params.set(data.intensity, float(data.quality), samples, scale);
             cmd->writeBuffer(shaftCB, &cb, sizeof(cb));
 
-            auto* loader = GEnv.Render->GetShaderLoader();
-            auto* vsRefl = loader->GetCachedReflection("fullscreen", ".vs");
-            auto* psRefl = loader->GetCachedReflection("volumetric/sunshafts", ".ps");
-            if (!vsRefl || !psRefl)
+            if (!ps->marchVsReflection || !ps->marchPsReflection)
                 return;
 
-            BindingSetBuilder bsb(*vsRefl, *psRefl, nv, "SunShaftsMarch");
+            BindingSetBuilder bsb(*ps->marchVsReflection, *ps->marchPsReflection, nv, "SunShaftsMarch");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                 .ConstantBuffer("SunShaftsCB", shaftCB)
                 .Texture("g_Depth", depthTex)
@@ -257,6 +303,16 @@ VirtualResourceHandle setupSunShaftsPass(
                     if (t)
                         bsb.Texture(kNames[i], t);
                 }
+                static const char* kHzb[3] = {"g_ShadowHZB0", "g_ShadowHZB1", "g_ShadowHZB2"};
+                nvrhi::ITexture* dummyHzb = smpCache.GetDummyContactDepth(nv);
+                for (u32 i = 0; i < 3; ++i)
+                {
+                    if (dummyHzb)
+                        bsb.Texture(kHzb[i], dummyHzb);
+                }
+                nvrhi::ITexture* contactHist = smpCache.GetDummyContactHistory(nv);
+                if (contactHist)
+                    bsb.Texture("g_ContactHistory", contactHist);
             }
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->layout, nv);
             if (!bindingSet)
@@ -264,7 +320,7 @@ VirtualResourceHandle setupSunShaftsPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outTex);
-            auto fb = cache.GetOrCreateFramebuffer("SunShaftsMarch", fbDesc, nv);
+            auto fb = cache.GetOrCreateFramebuffer("SunShaftsMarch_v4", fbDesc, nv);
 
             nvrhi::Viewport vp(0.f, float(data.width), 0.f, float(data.height), 0.f, 1.f);
             nvrhi::GraphicsState state;
@@ -276,7 +332,6 @@ VirtualResourceHandle setupSunShaftsPass(
             cmd->draw(nvrhi::DrawArguments().setVertexCount(3));
         });
 
-    // ── Pass 2: full-res combine (upsample + blur + add to scene) ─────────────
     auto& combineData = fg.addCallbackPass<SunShaftsCombineData>(
         "SunShaftsCombine",
         [=, &passState](FrameGraph& builder, PassHandle passHandle, SunShaftsCombineData& data) {
@@ -286,9 +341,9 @@ VirtualResourceHandle setupSunShaftsPass(
             data.halfWidth = halfW;
             data.halfHeight = halfH;
             data.passState = &passState;
-            data.sceneColor = pb.read(sceneColor, ResourceState::ShaderResource);
+            data.sceneColor = pb.read(sceneColor, ResourceState::CopySource);
             data.shafts = pb.read(shaftsHalf, ResourceState::ShaderResource);
-            data.output = pb.write(output, ResourceState::RenderTarget);
+            data.output = pb.write(output, ResourceState::CopyDest);
         },
         [](const SunShaftsCombineData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             auto* ps = data.passState;
@@ -303,24 +358,26 @@ VirtualResourceHandle setupSunShaftsPass(
             if (!colorTex || !shaftsTex || !outTex)
                 return;
 
+            cmd->setTextureState(colorTex, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+            cmd->setTextureState(outTex, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+            cmd->copyTexture(outTex, nvrhi::TextureSlice(), colorTex, nvrhi::TextureSlice());
+            cmd->setTextureState(outTex, nvrhi::AllSubresources, nvrhi::ResourceStates::RenderTarget);
+            cmd->setTextureState(shaftsTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+
             auto& cache = GetPassResourceCache();
             auto combineCB = cache.GetOrCreateVolatileCB(
-                "SunShafts", "SunShaftsCombineCB", sizeof(SunShaftsCombineCBGPU), ctx->GetDevice());
+                "SunShafts", "SunShaftsCombineCB_v4", sizeof(SunShaftsCombineCBGPU), ctx->GetDevice());
 
             SunShaftsCombineCBGPU cb{};
             cb.combine_params.set(
                 1.f / float(data.halfWidth), 1.f / float(data.halfHeight), 0.f, 0.f);
             cmd->writeBuffer(combineCB, &cb, sizeof(cb));
 
-            auto* loader = GEnv.Render->GetShaderLoader();
-            auto* vsRefl = loader->GetCachedReflection("fullscreen", ".vs");
-            auto* psRefl = loader->GetCachedReflection("volumetric/sunshafts_combine", ".ps");
-            if (!vsRefl || !psRefl)
+            if (!ps->marchVsReflection || !ps->combinePsReflection)
                 return;
 
-            BindingSetBuilder bsb(*vsRefl, *psRefl, nv, "SunShaftsCombine");
+            BindingSetBuilder bsb(*ps->marchVsReflection, *ps->combinePsReflection, nv, "SunShaftsCombine");
             bsb.ConstantBuffer("SunShaftsCombineCB", combineCB)
-                .Texture("g_Color", colorTex)
                 .Texture("g_Shafts", shaftsTex);
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->combineLayout, nv);
             if (!bindingSet)
@@ -328,7 +385,7 @@ VirtualResourceHandle setupSunShaftsPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outTex);
-            auto fb = cache.GetOrCreateFramebuffer("SunShaftsCombine", fbDesc, nv);
+            auto fb = cache.GetOrCreateFramebuffer("SunShaftsCombine_v4", fbDesc, nv);
 
             nvrhi::Viewport vp(0.f, float(data.width), 0.f, float(data.height), 0.f, 1.f);
             nvrhi::GraphicsState state;
@@ -338,6 +395,7 @@ VirtualResourceHandle setupSunShaftsPass(
             state.addBindingSet(bindingSet);
             cmd->setGraphicsState(state);
             cmd->draw(nvrhi::DrawArguments().setVertexCount(3));
+            cmd->setTextureState(outTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
         });
 
     return combineData.output;

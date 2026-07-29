@@ -1,0 +1,61 @@
+#define SM_6_0
+
+Texture2D g_Color : register(t0);
+Texture2D g_Motion : register(t22);
+SamplerState smp_rtlinear : register(s0);
+SamplerState smp_point : register(s1);
+
+cbuffer MotionBlurParams : register(b0)
+{
+    float2 g_screenSize;
+    float g_intensity;
+    float g_pad;
+};
+
+struct PS_INPUT
+{
+    float4 pos : SV_Position;
+    float2 uv : TEXCOORD0;
+};
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float2 uv = saturate(I.uv);
+    float2 texel = 1.0 / max(g_screenSize, 1.0);
+    float2 vel = g_Motion.SampleLevel(smp_point, uv, 0).xy;
+
+    float2 bestVel = vel;
+    float bestLen = length(vel);
+    [unroll]
+    for (int y = -1; y <= 1; ++y)
+    {
+        [unroll]
+        for (int x = -1; x <= 1; ++x)
+        {
+            float2 nVel = g_Motion.SampleLevel(smp_point, saturate(uv + float2(x, y) * texel), 0).xy;
+            float nLen = length(nVel);
+            if (nLen > bestLen)
+            {
+                bestLen = nLen;
+                bestVel = nVel;
+            }
+        }
+    }
+
+    float2 blurVec = bestVel * g_intensity;
+    const int samples = 8;
+    float3 acc = g_Color.SampleLevel(smp_rtlinear, uv, 0).rgb;
+    float wsum = 1.0;
+    [unroll]
+    for (int i = 1; i < samples; ++i)
+    {
+        float t = (float(i) / float(samples - 1)) * 2.0 - 1.0;
+        float2 suv = uv + blurVec * t;
+        if (any(suv < 0.0) || any(suv > 1.0))
+            continue;
+        float w = 1.0 - abs(t) * 0.5;
+        acc += g_Color.SampleLevel(smp_rtlinear, suv, 0).rgb * w;
+        wsum += w;
+    }
+    return float4(acc / max(wsum, 1e-3), 1.0);
+}

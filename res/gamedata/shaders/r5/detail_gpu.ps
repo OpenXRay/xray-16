@@ -4,6 +4,7 @@
 #define LOCAL_SHADOW_FORWARD
 #define CSM_CHEAP_FORWARD
 #define SKY_IBL
+#define SKY_IBL_SPEC_V4 1
 #include "common.h"
 #include "bindless_common.h"
 
@@ -168,10 +169,11 @@ f_forward main(p_flat I)
     float thickness = saturate(lerp(0.55, 1.0, t) * lerp(0.85, 1.0, abs(widthPercent - 0.5) * 2.0));
     thickness *= lerp(1.0, veinValue + 0.5, 0.25);
 
-    // VS packs slot hemi in position.w (same as detail_billboard)
     float hemi = I.position.w;
+    float sssAmt = max(grass_sss_color.w, 0.0);
+    float sssMask = saturate(sssAmt * 1.6);
     return output_forward_pbr(
         grassAlbedo, N, I.position.xyz, metallic, roughness, ao, I.hpos,
-        hemi, 1.0,
-        grass_sss_color.w, grass_sss_color.rgb, thickness);
+        hemi, saturate(I.sunOcclusion),
+        sssAmt, grass_sss_color.rgb, thickness, sssMask, 1.0);
 }

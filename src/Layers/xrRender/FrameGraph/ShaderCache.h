@@ -132,7 +132,7 @@ private:
         ExtractedReflection& outReflection
     );
 
-    static constexpr u32 CACHE_VERSION = 168; // grass SSS + vein CB + CoP billboard glow
+    static constexpr u32 CACHE_VERSION = 196;
     Stats m_stats;
     bool m_cacheEnabled;
     xr_string m_backendSubdir;

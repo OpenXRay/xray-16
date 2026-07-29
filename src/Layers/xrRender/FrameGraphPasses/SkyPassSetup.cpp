@@ -42,6 +42,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
             if (!environment) return;
 
             data.renderer->DrawSky(cmdList, framebuffer, environment, data.width, data.height);
+            data.renderer->DrawClouds(cmdList, framebuffer, environment, data.width, data.height);
         });
 
     return passData.colorOutput;

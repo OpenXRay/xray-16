@@ -797,7 +797,11 @@ void FGDetailManager::PackSlotData()
                 (u32(src.palette[3].a0) << 16) | (u32(src.palette[3].a1) << 20) |
                 (u32(src.palette[3].a2) << 24) | (u32(src.palette[3].a3) << 28);
 
+            // Classic CoP (DetailManager_Decompress): Item.c_hemi + Item.c_sun from
+            // c_hemi / c_dir. Sector RGB (c_r/g/b) is R1-only — not used on R2+.
             dst.hemi = src.r_qclr(src.c_hemi, 15);
+            dst.sun = src.r_qclr(src.c_dir, 15);
+            dst._pad0 = dst._pad1 = dst._pad2 = 0.f;
         }
     }
 
@@ -847,10 +851,10 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
     }
 
     {
-        constexpr float MIN_DENSITY = 0.04f;
-        constexpr u32 MAX_CAPACITY_BYTES = 512u * 1024u * 1024u;
+        constexpr u32 MAX_CAPACITY_BYTES = 128u * 1024u * 1024u;
         constexpr u32 MAX_CAPACITY = MAX_CAPACITY_BYTES / sizeof(InstanceData);
-        u32 d_size = u32(std::ceil(2.0f / MIN_DENSITY));
+        const float density = std::max(ps_current_detail_density, 0.15f);
+        u32 d_size = u32(std::ceil(2.0f / density));
         u32 grid_per_slot = (d_size + 1) * (d_size + 1);
         generatedInstancesCapacity = std::min(u32(float(slot_count) * float(grid_per_slot) * 0.08f), MAX_CAPACITY);
         generatedInstancesCapacity = std::max(generatedInstancesCapacity, 1000000u);
@@ -880,7 +884,8 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             float(desc.byteSize) / (1024.f * 1024.f));
     }
 
-    visibleBufferCapacity = std::max(generatedInstancesCapacity / 4, 100000u);
+    constexpr u32 MAX_VISIBLE = 4u * 1024u * 1024u;
+    visibleBufferCapacity = std::min(std::max(generatedInstancesCapacity / 4, 100000u), MAX_VISIBLE);
     Msg("* [FGDetailManager] Initial visible buffer capacity: %u (%.1f MB per LOD)",
         visibleBufferCapacity, (visibleBufferCapacity * sizeof(u32)) / (1024.f * 1024.f));
 
@@ -2141,7 +2146,7 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
         return false;
     }
 
-    graphicsBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailGPU_CSMLadder", *vsRefl, *psRefl, device);
+    graphicsBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailGPU_CSMLadder_v4", *vsRefl, *psRefl, device);
     if (!graphicsBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create graphics binding layout");
@@ -2156,7 +2161,7 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
         return false;
     }
 
-    decalBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailDecal_CSMLadder", *decalVsRefl, *decalPsRefl, device);
+    decalBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailDecal_CSMLadder_v4", *decalVsRefl, *decalPsRefl, device);
     if (!decalBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create decal binding layout");
@@ -2232,6 +2237,24 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
             if (bindlessLayout)
                 decalPipeDesc.bindingLayouts.push_back(bindlessLayout);
         }
+        decalPipeDesc.renderState.depthStencilState.depthTestEnable = true;
+        decalPipeDesc.renderState.depthStencilState.depthWriteEnable = true;
+        decalPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+        decalPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+        decalPipeDesc.renderState.rasterState.depthBias = -8;
+        decalPipeDesc.renderState.rasterState.slopeScaledDepthBias = -1.f;
+        decalPipeDesc.renderState.rasterState.depthBiasClamp = 0.f;
+
+        auto& decalBlend = decalPipeDesc.renderState.blendState.targets[0];
+        decalBlend.setBlendEnable(true);
+        decalBlend.setSrcBlend(nvrhi::BlendFactor::SrcAlpha);
+        decalBlend.setDestBlend(nvrhi::BlendFactor::InvSrcAlpha);
+        decalBlend.setBlendOp(nvrhi::BlendOp::Add);
+        decalBlend.setSrcBlendAlpha(nvrhi::BlendFactor::One);
+        decalBlend.setDestBlendAlpha(nvrhi::BlendFactor::InvSrcAlpha);
+        decalBlend.setBlendOpAlpha(nvrhi::BlendOp::Add);
+        for (u32 rt = 1; rt < 4; ++rt)
+            decalPipeDesc.renderState.blendState.targets[rt].setColorWriteMask(nvrhi::ColorMask(0));
 
         decalGraphicsPipeline = device->createGraphicsPipeline(decalPipeDesc, fbInfo);
         if (!decalGraphicsPipeline)
@@ -2246,7 +2269,7 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
         auto* bbVsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".vs");
         auto* bbPsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".ps");
         if (bbVsRefl && bbPsRefl)
-            billboardBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailBillboard_CSMLadder", *bbVsRefl, *bbPsRefl, device);
+            billboardBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailBillboard_CSMLadder_v4", *bbVsRefl, *bbPsRefl, device);
         if (!billboardBindingLayout)
             billboardBindingLayout = decalBindingLayout;
 
@@ -2302,8 +2325,11 @@ void FGDetailManager::DispatchCulling(
 
     if (m_instancesNeedRegeneration)
     {
-        constexpr u32 MAX_INSTANCES = 128u * 1024u * 1024u;
-        u32 d_size = u32(std::ceil(2.0f / ps_current_detail_density));
+        constexpr u32 MAX_CAPACITY_BYTES = 128u * 1024u * 1024u;
+        constexpr u32 MAX_INSTANCES = MAX_CAPACITY_BYTES / sizeof(InstanceData);
+        constexpr u32 MAX_VISIBLE = 4u * 1024u * 1024u;
+        const float density = std::max(ps_current_detail_density, 0.15f);
+        u32 d_size = u32(std::ceil(2.0f / density));
         u32 grid_per_slot = (d_size + 1) * (d_size + 1);
         u32 neededGenCapacity = std::min(u32(float(slot_count) * float(grid_per_slot) * 0.08f), MAX_INSTANCES);
         neededGenCapacity = std::max(neededGenCapacity, 1000000u);
@@ -2324,10 +2350,11 @@ void FGDetailManager::DispatchCulling(
             generatedInstancesBuffer = device->createBuffer(desc);
         }
 
-        if (visibleBufferCapacity < generatedInstancesCapacity)
+        const u32 neededVisible = std::min(std::max(generatedInstancesCapacity / 4, 100000u), MAX_VISIBLE);
+        if (visibleBufferCapacity < neededVisible)
         {
-            Msg("[DetailManager] Pre-grow visible buffers: %u -> %u", visibleBufferCapacity, generatedInstancesCapacity);
-            visibleBufferCapacity = generatedInstancesCapacity;
+            Msg("[DetailManager] Pre-grow visible buffers: %u -> %u", visibleBufferCapacity, neededVisible);
+            visibleBufferCapacity = neededVisible;
             for (u32 lod = 0; lod < LOD_COUNT; lod++)
             {
                 nvrhi::BufferDesc desc;
@@ -2790,7 +2817,8 @@ void FGDetailManager::ResizeVisibleBuffersIfNeeded(nvrhi::IDevice* device)
             totalGeneratedInstances, generatedInstancesCapacity,
             100.f * float(totalGeneratedInstances) / float(generatedInstancesCapacity));
 
-    u32 newCapacity = std::max(totalGeneratedInstances, 100000u);
+    constexpr u32 MAX_VISIBLE = 4u * 1024u * 1024u;
+    u32 newCapacity = std::min(std::max(totalGeneratedInstances, 100000u), MAX_VISIBLE);
     bool needsGrow = newCapacity > visibleBufferCapacity;
     bool needsShrink = newCapacity < visibleBufferCapacity / 2;
     if (!needsGrow && !needsShrink)

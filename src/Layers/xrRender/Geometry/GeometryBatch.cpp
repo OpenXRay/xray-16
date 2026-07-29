@@ -4,11 +4,10 @@
 
 namespace xray::render {
 
-// Global geometry collector instance (to be initialized by renderer)
 GeometryCollector* g_geometryCollector = nullptr;
 
 GeometryCollector::GeometryCollector() {
-    m_batches.reserve(4096);  // Pre-allocate for typical scene
+    m_batches.reserve(16384);
     Msg("* [GeometryCollector] Created");
 }
 
@@ -17,87 +16,120 @@ GeometryCollector::~GeometryCollector() {
 }
 
 void GeometryCollector::BeginFrame() {
-    // Clear previous frame's batches
     m_batches.clear();
-
-    // Reset statistics
+    if (m_batches.capacity() < 16384)
+        m_batches.reserve(16384);
     m_stats = Stats{};
 }
 
 void GeometryCollector::EndFrame() {
-    // Update statistics
     m_stats.numBatches = static_cast<u32>(m_batches.size());
 }
 
 void GeometryCollector::Submit(const GeometryBatch& batch) {
-    VERIFY(batch.vertexBuffer != nullptr);  // nvrhi::BufferHandle is a smart pointer
+    VERIFY(batch.vertexBuffer != nullptr);
     VERIFY(batch.indexBuffer != nullptr);
     VERIFY(batch.indexCount > 0);
-    // NOTE: pipeline can be nullptr during collection, will be set later from visual->shader
 
     m_batches.push_back(batch);
 }
 
+void GeometryCollector::SubmitStatic(const GeometryBatch& s) {
+    VERIFY(s.vertexBuffer != nullptr);
+    VERIFY(s.indexBuffer != nullptr);
+    VERIFY(s.indexCount > 0);
+
+    GeometryBatch& d = m_batches.emplace_back();
+    d.vertexBuffer = s.vertexBuffer;
+    d.indexBuffer = s.indexBuffer;
+    d.indexCount = s.indexCount;
+    d.startIndex = s.startIndex;
+    d.baseVertex = s.baseVertex;
+    d.vertexStride = s.vertexStride;
+    d.materialID = s.materialID;
+    d.bindlessMaterialID = s.bindlessMaterialID;
+    d.albedoTexture = s.albedoTexture;
+    d.normalTexture = s.normalTexture;
+    d.materialTexture = s.materialTexture;
+    d.worldMatrix = s.worldMatrix;
+    d.worldBoundsCenter = s.worldBoundsCenter;
+    d.worldBoundsRadius = s.worldBoundsRadius;
+    d.pipeline = s.pipeline;
+    d.bindingSet = s.bindingSet;
+    d.materialPSO = s.materialPSO;
+    d.renderPhase = s.renderPhase;
+    d.visual = s.visual;
+    d.renderable = s.renderable;
+    d.isVisible = s.isVisible;
+    d.isStatic = s.isStatic;
+    d.isSkinned = s.isSkinned;
+    d.skinningRenderMode = s.skinningRenderMode;
+    d.skinnedPoolFormat = s.skinnedPoolFormat;
+    d.skinnedPoolBaseVertex = s.skinnedPoolBaseVertex;
+    d.skinnedPoolFirstIndex = s.skinnedPoolFirstIndex;
+    d.isTerrain = s.isTerrain;
+    d.terrainMaterialID = s.terrainMaterialID;
+    d.cachedAlphaTest = s.cachedAlphaTest;
+    d.cachedTransparent = s.cachedTransparent;
+    d.sortFlagsValid = s.sortFlagsValid;
+    d.ssa = s.ssa;
+    d.megaBufferAlloc = s.megaBufferAlloc;
+}
+
 void GeometryCollector::Sort() {
-    // ═══════════════════════════════════════════════════════
-    //  RENDER ORDER SORTING (using SSA + shader flags)
-    // ═══════════════════════════════════════════════════════
-    // Proper render order for forward rendering:
-    //   1. Opaque (iPriority == 0) - SSA descending (front-to-back for early-Z)
-    //   2. Alpha-tested (iPriority == 1) - SSA descending (after opaque fills depth)
-    //   3. Transparent (bStrictB2F) - SSA ascending (back-to-front for blending)
-    //
-    // SSA = R / distSQ (larger = closer/bigger = more visually important)
-    // SSA descending = front-to-back, SSA ascending = back-to-front
+    if (m_batches.empty())
+        return;
 
-    std::sort(m_batches.begin(), m_batches.end(),
-        [](const GeometryBatch& a, const GeometryBatch& b) {
-            // Get sorting properties using member functions
-            bool aB2F = a.IsStrictB2F();
-            bool bB2F = b.IsStrictB2F();
-            bool aAref = a.IsAlphaTested();
-            bool bAref = b.IsAlphaTested();
+    for (auto& batch : m_batches)
+    {
+        if (!batch.sortFlagsValid)
+            batch.CacheSortFlags();
+    }
 
-            // 1. Transparent (bStrictB2F) batches render LAST
-            if (aB2F != bB2F) {
-                return !aB2F;  // Non-B2F comes before B2F
-            }
+    const u32 n = static_cast<u32>(m_batches.size());
+    static thread_local xr_vector<u32> order;
+    order.resize(n);
+    for (u32 i = 0; i < n; ++i)
+        order[i] = i;
 
-            // 2. For transparent batches: sort by SSA ascending (back-to-front)
-            if (aB2F && bB2F) {
-                return a.ssa < b.ssa;  // Ascending SSA = back-to-front
-            }
+    auto opaqueEnd = std::partition(order.begin(), order.end(),
+        [&](u32 i) { return !m_batches[i].cachedTransparent && !m_batches[i].cachedAlphaTest; });
+    auto arefEnd = std::partition(opaqueEnd, order.end(),
+        [&](u32 i) { return !m_batches[i].cachedTransparent; });
 
-            // 3. Alpha-tested renders AFTER opaque
-            //    This ensures opaque geometry fills depth buffer first,
-            //    so clip() in alpha-tested shaders shows correct background.
-            if (aAref != bAref) {
-                return !aAref;  // Non-aref (opaque) comes before aref
-            }
+    auto bySsaAsc = [&](u32 a, u32 b) { return m_batches[a].ssa < m_batches[b].ssa; };
+    std::sort(arefEnd, order.end(), bySsaAsc);
 
-            // 4. Within same category: sort by SSA descending (front-to-back)
-            //    This matches vanilla's cmp_ssa: return lhs.ssa > rhs.ssa
-            return a.ssa > b.ssa;  // Descending SSA = front-to-back
-        });
+    bool identity = true;
+    for (u32 i = 0; i < n; ++i)
+    {
+        if (order[i] != i)
+        {
+            identity = false;
+            break;
+        }
+    }
+    if (identity)
+        return;
+
+    static thread_local xr_vector<GeometryBatch> sorted;
+    sorted.clear();
+    sorted.reserve(n);
+    for (u32 i : order)
+        sorted.push_back(std::move(m_batches[i]));
+    m_batches.swap(sorted);
 }
 
 u64 GeometryCollector::ComputeSortKey(const GeometryBatch& batch) {
-    // Compute sort key (higher bits = more important)
     u64 key = 0;
 
-    // Bits 48-63: Pipeline (most important - avoid PSO changes)
     if (batch.pipeline) {
         u64 pipelineHash = reinterpret_cast<u64>(batch.pipeline) >> 4;
         key |= (pipelineHash & 0xFFFF) << 48;
     }
 
-    // Bits 32-47: Material ID
     key |= (static_cast<u64>(batch.materialID) & 0xFFFF) << 32;
-
-    // Bits 16-31: Albedo texture
     key |= (batch.albedoTexture.index & 0xFFFF) << 16;
-
-    // Bits 0-15: Normal texture
     key |= (batch.normalTexture.index & 0xFFFF);
 
     return key;

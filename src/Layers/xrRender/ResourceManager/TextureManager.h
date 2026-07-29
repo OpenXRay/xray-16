@@ -22,11 +22,12 @@ struct DDSData;           // Forward declaration for video texture support
 // ═══════════════════════════════════════════════════
 
 enum class TextureState : u8 {
-    Unloaded,       // Not in memory (on disk only)
-    Loading,        // Async load in progress
-    Resident,       // Fully loaded in VRAM
-    Evicting,       // Marked for eviction
-    Evicted,        // Was resident, now evicted (keep metadata)
+    Unloaded,
+    Loading,
+    Resident,
+    Evicting,
+    Evicted,
+    Failed,
 };
 
 const char* TextureStateToString(TextureState state);
@@ -283,7 +284,7 @@ private:
     //  MEMORY MANAGEMENT
     // ═══════════════════════════════════════════════════
 
-    u64 m_memoryBudget = 2ULL * 1024 * 1024 * 1024;  // 2GB default
+    u64 m_memoryBudget = 16ULL * 1024 * 1024 * 1024;
     u64 m_memoryUsed = 0;
 
     // ═══════════════════════════════════════════════════

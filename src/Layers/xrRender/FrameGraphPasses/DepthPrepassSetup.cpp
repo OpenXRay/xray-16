@@ -12,7 +12,9 @@
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/xrRender_console.h"
+#include "xrCDB/Frustum.h"
 #include "xrEngine/IRenderBackend.h"
 
 namespace xray::render::fg::passes
@@ -41,12 +43,12 @@ static void InitializeDepthPrepass(fg::RenderDevice* device, DepthPrepassState& 
     if (!nvDevice || !shaderLoader)
         return;
 
-    auto vsResult = shaderLoader->LoadVertexShader("bindless_depth", "main");
+    auto vsResult = shaderLoader->LoadVertexShader("bindless_forward", "main");
     auto psResult = shaderLoader->LoadPixelShader("bindless_depth", "main");
     auto opaquePsResult = shaderLoader->LoadPixelShader("bindless_depth_opaque", "main");
     if (!vsResult.handle || !psResult.handle)
     {
-        Msg("! [DepthPrepass] Failed to load bindless_depth shaders");
+        Msg("! [DepthPrepass] Failed to load bindless_forward/bindless_depth shaders");
         return;
     }
     state.vs = vsResult.handle;
@@ -56,7 +58,7 @@ static void InitializeDepthPrepass(fg::RenderDevice* device, DepthPrepassState& 
 
     auto& cache = GetPassResourceCache();
     state.layout = cache.GetOrCreateBindingLayoutFromReflection(
-        "DepthPrepass_v1", *vsResult.reflection, *psResult.reflection, nvDevice);
+        "DepthPrepass_v2_FwdVS", *vsResult.reflection, *psResult.reflection, nvDevice);
     if (!state.layout)
         return;
 
@@ -85,7 +87,7 @@ static void InitializeDepthPrepass(fg::RenderDevice* device, DepthPrepassState& 
     else
         pipeDesc.bindingLayouts = {state.layout};
 
-    state.pipeline = cache.GetOrCreatePipeline("DepthPrepass_v1", pipeDesc, fbInfo, nvDevice);
+    state.pipeline = cache.GetOrCreatePipeline("DepthPrepass_v2_FwdVS", pipeDesc, fbInfo, nvDevice);
     if (!state.pipeline)
     {
         Msg("! [DepthPrepass] Pipeline create failed");
@@ -96,7 +98,7 @@ static void InitializeDepthPrepass(fg::RenderDevice* device, DepthPrepassState& 
     if (state.terrainPs && opaquePsResult.reflection)
     {
         state.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection(
-            "DepthPrepass_Terrain_v1", *vsResult.reflection, *opaquePsResult.reflection, nvDevice);
+            "DepthPrepass_Terrain_v2_FwdVS", *vsResult.reflection, *opaquePsResult.reflection, nvDevice);
         if (state.terrainLayout)
         {
             nvrhi::GraphicsPipelineDesc terrainDesc = pipeDesc;
@@ -106,12 +108,59 @@ static void InitializeDepthPrepass(fg::RenderDevice* device, DepthPrepassState& 
             else
                 terrainDesc.bindingLayouts = {state.terrainLayout};
             state.terrainPipeline = cache.GetOrCreatePipeline(
-                "DepthPrepass_Terrain_v1", terrainDesc, fbInfo, nvDevice);
+                "DepthPrepass_Terrain_v2_FwdVS", terrainDesc, fbInfo, nvDevice);
         }
     }
 
+#if !defined(XR_PLATFORM_APPLE)
+    {
+        auto tessVs = shaderLoader->LoadVertexShader("bindless_forward", "main");
+        auto tessHs = shaderLoader->LoadHullShader("bindless_tess", "main");
+        auto tessDs = shaderLoader->LoadDomainShader("bindless_tess", "main");
+        auto tessPs = shaderLoader->LoadPixelShader("bindless_depth_tess", "main");
+        if (tessVs.handle && tessHs.handle && tessDs.handle && tessPs.handle &&
+            tessVs.reflection && tessPs.reflection)
+        {
+            state.tessVs = tessVs.handle;
+            state.tessHs = tessHs.handle;
+            state.tessDs = tessDs.handle;
+            state.tessPs = tessPs.handle;
+            state.tessLayout = cache.GetOrCreateBindingLayoutFromReflection(
+                "DepthPrepass_Tess_v1", *tessVs.reflection, *tessPs.reflection, nvDevice);
+            if (state.tessLayout)
+            {
+                state.tessInputLayout = nvDevice->createInputLayout(attrs, attrCount, state.tessVs);
+                nvrhi::GraphicsPipelineDesc tessDesc = pipeDesc;
+                tessDesc.VS = state.tessVs;
+                tessDesc.HS = state.tessHs;
+                tessDesc.DS = state.tessDs;
+                tessDesc.PS = state.tessPs;
+                tessDesc.inputLayout = state.tessInputLayout;
+                tessDesc.primType = nvrhi::PrimitiveType::PatchList;
+                tessDesc.patchControlPoints = 3;
+                tessDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+                if (bindlessLayout)
+                    tessDesc.bindingLayouts = {state.tessLayout, bindlessLayout};
+                else
+                    tessDesc.bindingLayouts = {state.tessLayout};
+                state.tessPipeline = cache.GetOrCreatePipeline(
+                    "DepthPrepass_Tess_v1", tessDesc, fbInfo, nvDevice);
+            }
+            tessVs.reflection = nullptr;
+            tessPs.reflection = nullptr;
+        }
+        if (state.tessPipeline)
+            Msg("* [DepthPrepass] Tessellation pipeline ready");
+        else
+            Msg("! [DepthPrepass] Tessellation pipeline unavailable");
+    }
+#else
+    Msg("* [DepthPrepass] Tessellation disabled on Apple/MoltenVK (IOGPU safety)");
+#endif
+
     state.initialized = true;
-    Msg("* [DepthPrepass] Pipeline ready (terrain=%d)", state.terrainPipeline ? 1 : 0);
+    Msg("* [DepthPrepass] Pipeline ready (terrain=%d tess=%d)",
+        state.terrainPipeline ? 1 : 0, state.tessPipeline ? 1 : 0);
 }
 
 VirtualResourceHandle setupDepthPrepass(
@@ -123,17 +172,20 @@ VirtualResourceHandle setupDepthPrepass(
     u32 width,
     u32 height,
     const BindlessForwardConfig& bindlessConfig,
-    DepthPrepassState* state)
+    DepthPrepassState* state,
+    VirtualResourceHandle cullDrawArgs)
 {
     if (!ps_r_depth_prepass || !state || !depthInput.is_valid())
         return depthInput;
 
     auto& passData = fg.addCallbackPass<DepthPrepassData>(
         "DepthPrepass",
-        [&, width, height, depthInput, bindlessConfig, state](
+        [&, width, height, depthInput, bindlessConfig, state, cullDrawArgs](
             FrameGraph& builder, PassHandle passHandle, DepthPrepassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.depth = passBuilder.write(depthInput, ResourceState::DepthStencilWrite);
+            if (cullDrawArgs.is_valid())
+                passBuilder.read(cullDrawArgs, ResourceState::IndirectArgument);
             data.device = device;
             data.geometry = geometry;
             data.materialCache = materialCache;
@@ -192,7 +244,7 @@ VirtualResourceHandle setupDepthPrepass(
                 return;
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
-            auto* vsRefl = shaderLoader->GetCachedReflection("bindless_depth", ".vs");
+            auto* vsRefl = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
             auto* psRefl = shaderLoader->GetCachedReflection("bindless_depth", ".ps");
             if (!vsRefl || !psRefl)
                 return;
@@ -212,7 +264,7 @@ VirtualResourceHandle setupDepthPrepass(
 
                 BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "DepthPrepass");
                 bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-                bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+                BindBindlessMaterialTables(bsb);
                 bsb.BufferSRV("g_InstanceData", set.instanceBuffer);
                 bsb.BufferSRV("g_CompactBatchIndices", set.compactBatchIndicesBuffer);
                 bsb.BufferSRV("g_CompactMaterialIDs", set.compactMaterialIDBuffer);
@@ -242,6 +294,71 @@ VirtualResourceHandle setupDepthPrepass(
             drawSet(data.bindlessConfig.staticSet);
             drawSet(data.bindlessConfig.dynamicSet);
 
+#if !defined(XR_PLATFORM_APPLE)
+            const bool tessEnabled = ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
+#else
+            const bool tessEnabled = false;
+#endif
+            if (tessEnabled && data.passState->tessPipeline && data.passState->tessLayout &&
+                data.bindlessConfig.tessObjectCount > 0 && data.bindlessConfig.tessDrawArgs &&
+                data.bindlessConfig.tessObjects && data.bindlessConfig.tessMaterialIDBuffer &&
+                data.bindlessConfig.tessBatchIndicesBuffer && data.bindlessConfig.tessInstanceBuffer)
+            {
+                auto* tessVsRefl = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
+                auto* tessPsRefl = shaderLoader->GetCachedReflection("bindless_depth_tess", ".ps");
+                if (tessVsRefl && tessPsRefl)
+                {
+                    BindingSetBuilder tessBsb(*tessVsRefl, *tessPsRefl, nvDevice, "DepthPrepass.Tess");
+                    tessBsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                    BindBindlessMaterialTables(tessBsb);
+                    tessBsb.BufferSRV("g_InstanceData", data.bindlessConfig.tessInstanceBuffer);
+                    tessBsb.BufferSRV("g_CompactBatchIndices", data.bindlessConfig.tessBatchIndicesBuffer);
+                    tessBsb.BufferSRV("g_CompactMaterialIDs", data.bindlessConfig.tessMaterialIDBuffer);
+                    auto tessBindingSet = cache.GetOrCreateBindingSet(
+                        tessBsb.Build(), data.passState->tessLayout, nvDevice);
+                    if (tessBindingSet)
+                    {
+                        nvrhi::GraphicsState gs;
+                        gs.pipeline = data.passState->tessPipeline;
+                        gs.framebuffer = framebuffer;
+                        gs.bindings = {tessBindingSet};
+                        if (bindlessTable)
+                            gs.addBindingSet(bindlessTable);
+                        gs.vertexBuffers = {
+                            {data.bindlessConfig.megaVertexBuffer, 0, 0},
+                            {drawIndexBuffer, 1, 0}};
+                        gs.indexBuffer = {
+                            data.bindlessConfig.megaIndexBuffer, nvrhi::Format::R32_UINT, 0};
+                        gs.viewport.addViewport(viewport);
+                        gs.viewport.addScissorRect(nvrhi::Rect(data.width, data.height));
+                        cmdList->setGraphicsState(gs);
+
+                        CFrustum tessFrustum;
+                        tessFrustum.CreateFromMatrix(
+                            Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+
+                        for (u32 i = 0; i < data.bindlessConfig.tessObjectCount; ++i)
+                        {
+                            const auto& args = data.bindlessConfig.tessDrawArgs[i];
+                            if (args.indexCountPerInstance == 0)
+                                continue;
+
+                            const auto& obj = data.bindlessConfig.tessObjects[i];
+                            if (!tessFrustum.testSphere_dirty(obj.position, obj.radius * 1.15f))
+                                continue;
+
+                            nvrhi::DrawArguments da;
+                            da.vertexCount = args.indexCountPerInstance;
+                            da.instanceCount = 1;
+                            da.startIndexLocation = args.startIndexLocation;
+                            da.startVertexLocation = args.baseVertexLocation;
+                            da.startInstanceLocation = i;
+                            cmdList->drawIndexed(da);
+                        }
+                    }
+                }
+            }
+
             // Terrain fills most outdoor pixels — critical for early-Z
             if (data.passState->terrainPipeline && data.passState->terrainLayout &&
                 data.bindlessConfig.HasTerrain() && data.bindlessConfig.UseTerrainCompaction())
@@ -259,6 +376,7 @@ VirtualResourceHandle setupDepthPrepass(
                 {
                     BindingSetBuilder tbsb(*vsRefl, *opaquePsRefl, nvDevice, "DepthPrepass.Terrain");
                     tbsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                    BindBindlessMaterialTables(tbsb);
                     tbsb.BufferSRV("g_InstanceData", data.bindlessConfig.terrainInstanceBuffer);
                     tbsb.BufferSRV("g_CompactBatchIndices", data.bindlessConfig.terrainCompactBatchIndicesBuffer);
                     tbsb.BufferSRV("g_CompactMaterialIDs", data.bindlessConfig.terrainCompactMaterialIDBuffer);

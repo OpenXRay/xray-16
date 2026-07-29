@@ -16,12 +16,17 @@ namespace xray::render::fg {
 namespace xray::render::fg::passes {
 
 struct WetSurfacesPassState {
-    nvrhi::GraphicsPipelineHandle pipeline;      // apply
+    nvrhi::GraphicsPipelineHandle pipeline;
     nvrhi::BindingLayoutHandle layout;
     nvrhi::GraphicsPipelineHandle patchPipeline;
     nvrhi::BindingLayoutHandle patchLayout;
     nvrhi::GraphicsPipelineHandle writeNormalPipeline;
     nvrhi::BindingLayoutHandle writeNormalLayout;
+    nvrhi::TextureHandle patched;
+    nvrhi::TextureHandle color;
+    nvrhi::TextureHandle normal;
+    u32 texWidth = 0;
+    u32 texHeight = 0;
     bool initialized = false;
     u32 pipeVersion = 0;
 };

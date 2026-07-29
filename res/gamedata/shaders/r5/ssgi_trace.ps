@@ -1,19 +1,18 @@
-// ssgi_trace.ps — screen-space GI gather (cosine hemisphere march)
 #define SM_6_0
 #include "common.h"
 #include "shared/ssr.h"
 
-Texture2D g_Color  : register(t0);
-Texture2D g_Normal : register(t1);
-Texture2D g_Base   : register(t2);
-// g_SceneColor / g_SceneDepth from ssr.h (t20/t21)
+Texture2D g_Normal : register(t0);
+Texture2D g_Base   : register(t1);
 
 cbuffer SSGIParams : register(b5)
 {
     float intensity;
     float maxDistance;
     float thickness;
-    float rayCount; // as float for CB packing
+    float rayCount;
+    float frameIndex;
+    float3 _pad;
 };
 
 struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
@@ -30,7 +29,6 @@ float3 Hash3(float2 p)
     return float3(Hash12(p), Hash12(p + 17.1), Hash12(p + 91.7));
 }
 
-// Cosine-weighted hemisphere sample around N
 float3 SampleHemisphere(float3 N, float2 xi)
 {
     float phi = 6.2831853 * xi.x;
@@ -42,11 +40,29 @@ float3 SampleHemisphere(float3 N, float2 xi)
     return normalize(T * (cos(phi) * sinTheta) + B * (sin(phi) * sinTheta) + N * cosTheta);
 }
 
+float3 HitDiffuseRadiance(float2 hitUV)
+{
+    float4 hitBase = g_Base.SampleLevel(smp_linear, hitUV, 0);
+    float3 hitAlbedo = saturate(hitBase.rgb);
+    float hitMetallic = UnpackMetallicFromBaseA(hitBase.a);
+    float hitRough = saturate(g_Normal.SampleLevel(smp_nofilter, hitUV, 0).w);
+    float3 hitLit = max(g_SceneColor.SampleLevel(smp_linear, hitUV, 0).rgb, 0.0);
+
+    float hitDiffuse = saturate(1.0 - hitMetallic);
+    hitDiffuse *= lerp(0.55, 1.0, saturate(hitRough));
+
+    float hitLum = max(dot(hitLit, float3(0.2126, 0.7152, 0.0722)), 1e-4);
+    float3 bounce = hitLit * hitAlbedo * hitDiffuse;
+    bounce *= rcp(1.0 + hitLum * 0.45);
+    return bounce;
+}
+
 float4 TraceSSGI(float3 worldPos, float3 N, float2 uv)
 {
     const int rays = clamp((int)rayCount, 2, 8);
     const int steps = 12;
     const float stepSize = maxDistance / float(steps);
+    const float frame = floor(frameIndex);
 
     float3 accum = 0.0;
     float weightSum = 0.0;
@@ -54,8 +70,8 @@ float4 TraceSSGI(float3 worldPos, float3 N, float2 uv)
     [loop]
     for (int r = 0; r < rays; ++r)
     {
-        float2 xi = Hash3(uv * screen_res.xy + float2(float(r) * 37.1, timers.x * 17.3 + timers.w * 3.1)).xy;
-        xi.x = frac(xi.x + float(r) * 0.6180339 + timers.y * 0.01);
+        float2 xi = Hash3(uv * screen_res.xy + float2(float(r) * 37.1 + frame * 1.6180339, float(r) * 12.9898 + frame * 0.7548777)).xy;
+        xi.x = frac(xi.x + float(r) * 0.6180339);
         float3 dir = SampleHemisphere(N, xi);
 
         float3 marchPos = worldPos + N * 0.05 + dir * (stepSize * (0.25 + xi.y * 0.5));
@@ -96,13 +112,11 @@ float4 TraceSSGI(float3 worldPos, float3 N, float2 uv)
 
         if (hit)
         {
-            float3 hitColor = g_SceneColor.SampleLevel(smp_linear, hitUV, 0).rgb;
-            float3 hitBase = g_Base.SampleLevel(smp_linear, hitUV, 0).rgb;
-            // Mild albedo tint without full demodulation (avoids feedback blowup)
-            float3 bounce = hitColor * lerp(float3(1, 1, 1), saturate(hitBase * 1.5), 0.35);
+            float3 bounce = HitDiffuseRadiance(hitUV);
+            float NdotL = saturate(dot(N, dir));
             float atten = rcp(1.0 + hitDist * 0.04);
             float border = RayAttenBorder(hitUV, SSR_EDGE_ATTENUATION);
-            float w = atten * border;
+            float w = atten * border * max(NdotL, 0.15);
             accum += bounce * w;
             weightSum += w;
         }
@@ -121,6 +135,13 @@ float4 main(PS_INPUT I) : SV_Target
 
     float4 nSample = g_Normal.SampleLevel(smp_nofilter, I.uv, 0);
     float3 N = normalize(nSample.xyz);
+    float roughness = saturate(nSample.w);
+    float4 base = g_Base.SampleLevel(smp_linear, I.uv, 0);
+    float metallic = UnpackMetallicFromBaseA(base.a);
+
+    if (metallic > 0.92 && roughness < 0.18)
+        return float4(0, 0, 0, 0);
+
     float2 ndc = float2(I.uv.x * 2.0 - 1.0, 1.0 - I.uv.y * 2.0);
     float4 worldH = mul(m_InvVP, float4(ndc, rawDepth, 1.0));
     float3 worldPos = worldH.xyz / max(worldH.w, 1e-5);

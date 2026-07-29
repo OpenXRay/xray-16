@@ -24,6 +24,11 @@ struct RainShadowPassState
 {
     xray::render::fg::TextureHandle rainSMHandle;
     nvrhi::ITexture* rainSM = nullptr;
+    nvrhi::GraphicsPipelineHandle rainPipeline;
+    nvrhi::BindingLayoutHandle rainLayout;
+    nvrhi::GraphicsPipelineHandle terrainPipeline;
+    nvrhi::BindingLayoutHandle terrainLayout;
+    nvrhi::BufferHandle rainCB;
     u32 resolution = 0;
     Fmatrix clipVP;
     Fmatrix sampleVP;
@@ -46,7 +51,6 @@ RainShadowOutputs setupRainShadowPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     const BindlessForwardConfig& bindlessConfig,
-    ShadowPassState& shadowState,
     RainShadowPassState& state);
 
 } // namespace xray::render::fg::passes

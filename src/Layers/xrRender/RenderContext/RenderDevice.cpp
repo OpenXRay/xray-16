@@ -203,13 +203,13 @@ TextureHandle RenderDevice::CreateTexture(
     VERIFY(m_initialized);
     VERIFY(desc.width > 0 && desc.height > 0);
 
-    // Convert to NVRHI descriptor
     nvrhi::TextureDesc nvrhiDesc = ConvertTextureDesc(desc);
 
-    // Create NVRHI texture
     nvrhi::TextureHandle nvrhiTexture = GetNativeDevice()->createTexture(nvrhiDesc);
     if (!nvrhiTexture) {
-        Msg("! [RenderDevice] Failed to create texture: %s", desc.debugName.c_str());
+        Msg("! [RenderDevice] Failed to create texture: %s (%ux%u depth=%u arr=%u mips=%u fmt=%d)",
+            desc.debugName.c_str(), desc.width, desc.height, desc.depth, desc.arraySize,
+            desc.mipLevels, (int)desc.format);
         return TextureHandle{};
     }
 
@@ -943,17 +943,20 @@ bool RenderDevice::ValidateShaderHandle(ShaderHandle handle) const {
 nvrhi::TextureDesc RenderDevice::ConvertTextureDesc(const TextureDesc& desc) {
     nvrhi::TextureDesc nvrhiDesc;
 
-    nvrhiDesc.width = desc.width;
-    nvrhiDesc.height = desc.height;
-    nvrhiDesc.depth = desc.depth;
-    nvrhiDesc.arraySize = desc.arraySize;
-    nvrhiDesc.mipLevels = desc.mipLevels;
+    nvrhiDesc.width = desc.width ? desc.width : 1;
+    nvrhiDesc.height = desc.height ? desc.height : 1;
+    nvrhiDesc.depth = desc.depth ? desc.depth : 1;
+    nvrhiDesc.arraySize = desc.arraySize ? desc.arraySize : 1;
+    nvrhiDesc.mipLevels = desc.mipLevels ? desc.mipLevels : 1;
     nvrhiDesc.sampleCount = 1;
     nvrhiDesc.sampleQuality = 0;
     nvrhiDesc.format = desc.format;
     nvrhiDesc.debugName = desc.debugName.c_str();
-    nvrhiDesc.initialState = desc.initialState;
+    nvrhiDesc.initialState = desc.initialState == nvrhi::ResourceStates::Unknown
+        ? nvrhi::ResourceStates::ShaderResource
+        : desc.initialState;
     nvrhiDesc.keepInitialState = true;
+    nvrhiDesc.isShaderResource = true;
 
     // Dimension
     switch (desc.dimension) {

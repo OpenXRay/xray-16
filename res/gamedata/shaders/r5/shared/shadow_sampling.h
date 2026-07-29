@@ -8,6 +8,9 @@
 Texture2D<float> g_ShadowMap0 : register(t23);
 Texture2D<float> g_ShadowMap1 : register(t29);
 Texture2D<float> g_ShadowMap2 : register(t30);
+Texture2D<float> g_ShadowHZB0 : register(t31);
+Texture2D<float> g_ShadowHZB1 : register(t32);
+Texture2D<float> g_ShadowHZB2 : register(t33);
 SamplerComparisonState smp_shadowcmp : register(s4);
 SamplerState smp_shadow_point : register(s5);
 #endif
@@ -17,11 +20,28 @@ Texture2DArray<float> g_HUDShadowMap : register(t24);
 #endif
 
 #ifdef LOCAL_SHADOW_FORWARD
-// Spot / OMNIPART local shadow atlas (t27 — free after g_ContactDepth removal)
 Texture2DArray<float> g_LocalShadowAtlas : register(t27);
+Texture2DArray<float> g_LocalShadowESM : register(t51);
 #ifndef CSM_SHADOW_FORWARD
 SamplerComparisonState smp_shadowcmp : register(s4);
 #endif
+#ifndef CSM_SHADOW_FORWARD
+SamplerState smp_shadow_point : register(s5);
+#endif
+#endif
+
+#ifdef SHADOW_MASK_FORWARD
+Texture2D g_ShadowMask : register(t34);
+
+bool ShadowMaskEnabled()
+{
+	return dev_param_2.z > 0.5;
+}
+
+float3 SampleShadowMask(float2 screenUV)
+{
+	return g_ShadowMask.SampleLevel(smp_rtlinear, screenUV, 0).rgb;
+}
 #endif
 
 #include "shared/contact_shadows.h"
@@ -87,70 +107,103 @@ float CascadeUVRim(float2 uv)
 	return min(d.x, d.y);
 }
 
-float Gaussian11(int i)
+float ShadowHZBMax(uint cascade, float2 uv, float mip)
 {
-	static const float k[11] = {
-		0.0093, 0.0280, 0.0650, 0.1210, 0.1760, 0.2000,
-		0.1760, 0.1210, 0.0650, 0.0280, 0.0093
-	};
-	return k[i + 5];
+	if (cascade == 0)
+		return g_ShadowHZB0.SampleLevel(smp_shadow_point, uv, mip).x;
+	if (cascade == 1)
+		return g_ShadowHZB1.SampleLevel(smp_shadow_point, uv, mip).x;
+	return g_ShadowHZB2.SampleLevel(smp_shadow_point, uv, mip).x;
 }
 
-int BlockerKernelRadius(float sunQuality)
+bool ShadowHZBEnabled()
 {
-	return (sunQuality >= 2.5) ? 5 : (sunQuality >= 1.5) ? 3 : 2;
+	return dev_param_2.y > 0.5;
 }
 
-int FilterKernelRadius(float sunQuality)
+float TryShadowHZBEarlyOut(uint cascade, float2 shadowUV, float refDepth)
 {
-	// Default tier (quality 1) uses radius 3: radius 2 (5 taps) left penumbrae too
-	// crisp — with more taps the variable-width PCSS filter reads as genuinely soft.
-	return (sunQuality >= 2.5) ? 5 : (sunQuality >= 1.5) ? 4 : 3;
+#if defined(SHADOW_MASK_CS)
+	return -1.0;
+#else
+	if (!ShadowHZBEnabled())
+		return -1.0;
+	float smapSize = CascadeSmapSize(cascade);
+	float2 hzbSize = float2(smapSize, smapSize) * 0.5;
+	float2 dx = abs(ddx(shadowUV)) * hzbSize;
+	float2 dy = abs(ddy(shadowUV)) * hzbSize;
+	float footprint = max(max(dx.x, dx.y), max(dy.x, dy.y));
+	float mip = clamp(log2(max(footprint, 1.0)), 0.0, 6.0);
+	float maxD = ShadowHZBMax(cascade, shadowUV, mip);
+	float rd = saturate(refDepth - ReceiverBias(cascade));
+	if (rd > maxD + 1e-4)
+		return 0.0;
+	return -1.0;
+#endif
 }
 
 float SampleCascadePCF(uint cascade, float2 shadowUV, float refDepth, float softScale)
 {
+	float hzb = TryShadowHZBEarlyOut(cascade, shadowUV, refDepth);
+	if (hzb >= 0.0)
+		return hzb;
 	float smapSize = CascadeSmapSize(cascade);
-	float ts = (0.6 * max(softScale, 1.0)) / smapSize;
+	float dsm = max(dev_param_1.x, 0.1);
+	float ts = (0.75 * max(softScale, 1.0) * (dsm / 0.7)) / smapSize;
 	float rd = saturate(refDepth - ReceiverBias(cascade));
 	float lit = 0.0;
-	lit += ShadowCmpLit(float3(shadowUV + float2(-ts, -ts), (float)cascade), rd);
-	lit += ShadowCmpLit(float3(shadowUV + float2(+ts, -ts), (float)cascade), rd);
-	lit += ShadowCmpLit(float3(shadowUV + float2(-ts, +ts), (float)cascade), rd);
-	lit += ShadowCmpLit(float3(shadowUV + float2(+ts, +ts), (float)cascade), rd);
-	return lit * 0.25;
+	[unroll]
+	for (int y = -1; y <= 1; ++y)
+	{
+		[unroll]
+		for (int x = -1; x <= 1; ++x)
+		{
+			float2 o = float2((float)x, (float)y) * ts;
+			lit += ShadowCmpLit(float3(shadowUV + o, (float)cascade), rd);
+		}
+	}
+	return lit * (1.0 / 9.0);
 }
 
-float FindAverageBlockerDepth(
+float2 VogelDisk(uint i, uint n)
+{
+	float r = sqrt((float(i) + 0.5) / float(n));
+	float theta = float(i) * 2.399963229728653;
+	return float2(r * cos(theta), r * sin(theta));
+}
+
+float2x2 ShadowDiskRotation(float2 shadowUV, float smapSize)
+{
+	float n = frac(sin(dot(shadowUV * smapSize, float2(12.9898, 78.233))) * 43758.5453);
+	float a = n * 6.28318530718;
+	float ca = cos(a);
+	float sa = sin(a);
+	return float2x2(ca, -sa, sa, ca);
+}
+
+float FindAverageBlockerDepth5(
 	uint cascade,
 	float2 shadowUV,
 	float refDepth,
 	float searchRadiusUV,
-	int kernelRadius,
 	out float blockerCount)
 {
 	float avgBlocker = 0.0;
 	blockerCount = 0.0;
-	int R = clamp(kernelRadius, 1, 5);
+	float thresh = refDepth - ReceiverBias(cascade) - 1e-5;
 
 	[unroll]
-	for (int y = -5; y <= 5; ++y)
+	for (int y = -2; y <= 2; ++y)
 	{
-		if (abs(y) > R)
-			continue;
 		[unroll]
-		for (int x = -5; x <= 5; ++x)
+		for (int x = -2; x <= 2; ++x)
 		{
-			if (abs(x) > R)
-				continue;
-
 			float2 uv = shadowUV + float2((float)x, (float)y) * searchRadiusUV;
 			float d = ShadowDepth(cascade, uv);
-			if (d < refDepth - ReceiverBias(cascade) - 1e-5)
+			if (d < thresh)
 			{
-				float w = Gaussian11(x) * Gaussian11(y);
-				avgBlocker += d * w;
-				blockerCount += w;
+				avgBlocker += d;
+				blockerCount += 1.0;
 			}
 		}
 	}
@@ -160,84 +213,104 @@ float FindAverageBlockerDepth(
 	return 0.0;
 }
 
-float FilterPCSS(
+float FindAverageBlockerDepth7(
+	uint cascade,
+	float2 shadowUV,
+	float refDepth,
+	float searchRadiusUV,
+	out float blockerCount)
+{
+	float avgBlocker = 0.0;
+	blockerCount = 0.0;
+	float thresh = refDepth - ReceiverBias(cascade) - 1e-5;
+
+	[unroll]
+	for (int y = -3; y <= 3; ++y)
+	{
+		[unroll]
+		for (int x = -3; x <= 3; ++x)
+		{
+			float2 uv = shadowUV + float2((float)x, (float)y) * searchRadiusUV;
+			float d = ShadowDepth(cascade, uv);
+			if (d < thresh)
+			{
+				avgBlocker += d;
+				blockerCount += 1.0;
+			}
+		}
+	}
+
+	if (blockerCount > 1e-5)
+		return avgBlocker / blockerCount;
+	return 0.0;
+}
+
+float FilterPCSSPoisson(
 	uint cascade,
 	float2 shadowUV,
 	float refDepth,
 	float filterRadiusUV,
-	int kernelRadius)
+	float smapSize,
+	uint tapCount)
 {
-	float sum = 0.0;
-	float wsum = 0.0;
 	float rd = saturate(refDepth - ReceiverBias(cascade));
-	int R = clamp(kernelRadius, 1, 5);
+	float2x2 rot = ShadowDiskRotation(shadowUV, smapSize);
+	float sum = 0.0;
 
-	[unroll]
-	for (int y = -5; y <= 5; ++y)
+	[loop]
+	for (uint i = 0; i < tapCount; ++i)
 	{
-		if (abs(y) > R)
-			continue;
-		[unroll]
-		for (int x = -5; x <= 5; ++x)
-		{
-			if (abs(x) > R)
-				continue;
-
-			float w = Gaussian11(x) * Gaussian11(y);
-			float2 uv = shadowUV + float2((float)x, (float)y) * filterRadiusUV;
-			sum += w * ShadowCmpLit(float3(uv, (float)cascade), rd);
-			wsum += w;
-		}
+		float2 o = mul(rot, VogelDisk(i, tapCount)) * filterRadiusUV;
+		sum += ShadowCmpLit(float3(shadowUV + o, (float)cascade), rd);
 	}
 
-	return (wsum > 1e-5) ? (sum / wsum) : 1.0;
+	return sum / float(tapCount);
 }
 
-// Full PCSS: blocker search + penumbra estimate + variable-size weighted filter.
-// sunQuality in dev_param_3.y (r2_sun_quality 0..3). Tunables in dev_param_4:
-//   .x = r2_sun_soft    (max penumbra, texels)  — how soft shadows get far from the occluder
-//   .y = r2_sun_blocker (blocker-search spacing, texels)
-//   .z = r2_sun_contact (min penumbra, texels)  — contact sharpness
 float SampleCascadePCSS(uint cascade, float2 shadowUV, float refDepth, float viewZ, float midSplit)
 {
+	float hzb = TryShadowHZBEarlyOut(cascade, shadowUV, refDepth);
+	if (hzb >= 0.0)
+		return hzb;
 	float smapSize = CascadeSmapSize(cascade);
 	float sunQuality = dev_param_3.y;
+	float dsm = max(dev_param_1.x, 0.1) / 0.7;
 
-	float softTexels    = dev_param_4.x > 0.0 ? dev_param_4.x : 6.0;
-	float blockerTexels = dev_param_4.y > 0.0 ? dev_param_4.y : 2.5;
-	float contactTexels = dev_param_4.z > 0.0 ? dev_param_4.z : 1.0;
+	float softTexels    = (dev_param_4.x > 0.0 ? dev_param_4.x : 6.0) * dsm;
+	float blockerTexels = (dev_param_4.y > 0.0 ? dev_param_4.y : 2.5) * dsm;
+	float contactTexels = (dev_param_4.z > 0.0 ? dev_param_4.z : 1.0) * dsm;
 
-	// Lowest tier: a single crisp contact-sized tap.
 	if (sunQuality < 0.5)
 		return SampleCascadePCF(cascade, shadowUV, refDepth, contactTexels / 0.6);
 
-	int blockerRadius = BlockerKernelRadius(sunQuality);
-	int filterRadius = FilterKernelRadius(sunQuality);
-
 	float blockerSearchUV = max(blockerTexels, 0.5) / smapSize;
 	float blockerCount = 0.0;
-	float avgBlocker = FindAverageBlockerDepth(
-		cascade, shadowUV, refDepth, blockerSearchUV, blockerRadius, blockerCount);
+	float avgBlocker;
+	if (sunQuality >= 2.5)
+		avgBlocker = FindAverageBlockerDepth7(
+			cascade, shadowUV, refDepth, blockerSearchUV, blockerCount);
+	else
+		avgBlocker = FindAverageBlockerDepth5(
+			cascade, shadowUV, refDepth, blockerSearchUV, blockerCount);
 
-	// No occluder standing above this receiver → sharp contact tap, no false blur.
 	if (blockerCount <= 0.12)
 		return SampleCascadePCF(cascade, shadowUV, refDepth, contactTexels / 0.6);
 
-	// PCSS penumbra grows with the receiver→blocker gap. The gap is in normalized
-	// cascade depth (~0.1-0.4 for real occluders), so keep the gain low: a high gain
-	// saturates penumbra to max for almost everything, widening the filter so much that
-	// thin shadows (tree trunks/branches) only cover the center tap and wash out to lit.
 	float gap = max(refDepth - avgBlocker, 0.0);
 	float penumbra = saturate(gap / max(avgBlocker, 1e-3) * 3.0);
 
 	float cascadeScale = 1.0 + float(cascade) * 0.3;
 	float maxTexels = softTexels * cascadeScale;
 	float widthTexels = clamp(lerp(contactTexels, maxTexels, penumbra), contactTexels, maxTexels);
+	float filterRadiusUV = widthTexels / smapSize;
 
-	// widthTexels is the half-extent of the kernel; convert to per-tap spacing so the
-	// filter always spans ±widthTexels regardless of tap count (smooth, no aliasing).
-	float filterRadiusUV = (widthTexels / float(max(filterRadius, 1))) / smapSize;
-	return FilterPCSS(cascade, shadowUV, refDepth, filterRadiusUV, filterRadius);
+	uint taps = 16;
+	if (sunQuality >= 2.5)
+		taps = 32;
+	else if (sunQuality >= 1.5)
+		taps = 24;
+
+	return FilterPCSSPoisson(cascade, shadowUV, refDepth, filterRadiusUV, smapSize, taps);
 }
 
 // Try cascade c with full PCSS; returns lit in [0,1] or -1 if UV/depth invalid.
@@ -272,8 +345,11 @@ float SampleCSM(float3 worldPos, float3 N)
 
 	float viewZ = abs(mul(m_V, float4(worldPos, 1.0)).z);
 
-	// Soft end of shadow distance — keep most of r2_sun_far usable (was 0.72→too early).
-	float rangeFade = 1.0 - smoothstep(farSplit * 0.88, farSplit, viewZ);
+	// Soft end of shadow distance. r2_slight_fade (dev_param_1.w) extends how far
+	// CSM stays opaque — classic used the same cvar for light shadow LOD.
+	float slightFade = saturate(max(dev_param_1.w, 0.2));
+	float fadeStart = farSplit * lerp(0.78, 0.92, slightFade);
+	float rangeFade = 1.0 - smoothstep(fadeStart, farSplit, viewZ);
 	if (rangeFade <= 1e-3)
 		return 1.0;
 
@@ -302,10 +378,8 @@ float SampleCSM(float3 worldPos, float3 N)
 	float litPrimary = -1.0;
 	uint used = primary;
 	[unroll]
-	for (uint c = 0; c < cascadeCount; ++c)
+	for (uint c = primary; c < cascadeCount; ++c)
 	{
-		if (c < primary)
-			continue;
 		float lit = TrySampleCascadePCSS(c, worldPos, N, viewZ, midSplit);
 		if (lit >= 0.0)
 		{
@@ -365,7 +439,9 @@ float SampleCSM_Fast(float3 worldPos, float3 N)
 	float farSplit = max(splits.z, splits.y + 1.0);
 	float viewZ = abs(mul(m_V, float4(worldPos, 1.0)).z);
 
-	float rangeFade = 1.0 - smoothstep(farSplit * 0.88, farSplit, viewZ);
+	float slightFade = saturate(max(dev_param_1.w, 0.2));
+	float fadeStart = farSplit * lerp(0.78, 0.92, slightFade);
+	float rangeFade = 1.0 - smoothstep(fadeStart, farSplit, viewZ);
 	if (rangeFade <= 1e-3)
 		return 1.0;
 
@@ -377,10 +453,8 @@ float SampleCSM_Fast(float3 worldPos, float3 N)
 
 	float lit = -1.0;
 	[unroll]
-	for (uint c = 0; c < cascadeCount; ++c)
+	for (uint c = primary; c < cascadeCount; ++c)
 	{
-		if (c < primary)
-			continue;
 		lit = TrySampleCascadePCF(c, worldPos, N);
 		if (lit >= 0.0)
 			break;
@@ -391,19 +465,28 @@ float SampleCSM_Fast(float3 worldPos, float3 N)
 	return lerp(1.0, lit, rangeFade);
 }
 
-// Cheap single-tap CSM for volumetrics. Sunshafts ray-march this 20-40× per pixel at
-// full res; the PCSS path (blocker search + PCF kernel) there is the dominant cost and
-// its soft penumbra is invisible in scattered light. One hardware comparison per probe.
+float TrySampleCascadeVolumetric(uint c, float3 worldPos)
+{
+	float4 sc = mul(shadow_matrices[c], float4(worldPos, 1.0));
+	if (!CascadeCoordValid(sc))
+		return -1.0;
+	float rd = saturate(sc.z - ReceiverBias(c));
+	return ShadowCmpLit(float3(sc.xy, (float)c), rd);
+}
+
 float SampleCSM_Volumetric(float3 worldPos)
 {
 	const uint cascadeCount = 3;
 	float3 splits = cascade_splits.xyz;
+	float rimWidth = cascade_splits.w > 1e-4 ? cascade_splits.w : 0.12;
 	float farSplit = max(splits.z, splits.y + 1.0);
 	float viewZ = abs(mul(m_V, float4(worldPos, 1.0)).z);
 
-	float rangeFade = 1.0 - smoothstep(farSplit * 0.88, farSplit, viewZ);
+	float slightFade = saturate(max(dev_param_1.w, 0.2));
+	float fadeStart = farSplit * lerp(0.78, 0.92, slightFade);
+	float rangeFade = 1.0 - smoothstep(fadeStart, farSplit, viewZ);
 	if (rangeFade <= 1e-3)
-		return 1.0;
+		return 0.0;
 
 	uint primary = 2;
 	if (viewZ < splits.x)
@@ -411,19 +494,72 @@ float SampleCSM_Volumetric(float3 worldPos)
 	else if (viewZ < splits.y)
 		primary = 1;
 
-	[unroll]
-	for (uint c = 0; c < cascadeCount; ++c)
+	float blendStart = 0.0;
+	float blendEnd = 0.0;
+	uint nextC = primary;
+	if (primary == 0)
 	{
-		if (c < primary)
-			continue;
-		float4 sc = mul(shadow_matrices[c], float4(worldPos, 1.0));
-		if (!CascadeCoordValid(sc))
-			continue;
-		float rd = saturate(sc.z - ReceiverBias(c));
-		float lit = ShadowCmpLit(float3(sc.xy, (float)c), rd);
-		return lerp(1.0, lit, rangeFade);
+		blendEnd = splits.x;
+		blendStart = splits.x * 0.65;
+		nextC = 1;
 	}
-	return 1.0;
+	else if (primary == 1)
+	{
+		blendEnd = splits.y;
+		blendStart = lerp(splits.x, splits.y, 0.65);
+		nextC = 2;
+	}
+
+	float litPrimary = -1.0;
+	uint used = primary;
+	[unroll]
+	for (uint c = primary; c < cascadeCount; ++c)
+	{
+		float lit = TrySampleCascadeVolumetric(c, worldPos);
+		if (lit >= 0.0)
+		{
+			litPrimary = lit;
+			used = c;
+			break;
+		}
+	}
+
+	if (litPrimary < 0.0)
+		return 0.0;
+
+	float result = litPrimary;
+
+	if (primary < 2 && used == primary)
+	{
+		float splitBlend = saturate((viewZ - blendStart) / max(blendEnd - blendStart, 1e-3));
+		splitBlend = smoothstep(0.0, 1.0, splitBlend);
+		if (splitBlend > 1e-3)
+		{
+			float litNext = TrySampleCascadeVolumetric(nextC, worldPos);
+			if (litNext >= 0.0)
+				result = lerp(result, litNext, splitBlend);
+		}
+	}
+
+	float4 scUsed = mul(shadow_matrices[used], float4(worldPos, 1.0));
+	float rim = saturate(CascadeUVRim(scUsed.xy) / max(rimWidth, 1e-3));
+	if (rim < 0.999)
+	{
+		if (used + 1 < cascadeCount)
+		{
+			float litNext = TrySampleCascadeVolumetric(used + 1, worldPos);
+			if (litNext >= 0.0)
+				result = lerp(litNext, result, rim);
+			else
+				result = lerp(0.0, result, rim);
+		}
+		else
+		{
+			result *= smoothstep(0.0, 1.0, rim);
+		}
+	}
+
+	return result * rangeFade;
 }
 
 // Overload without a normal (volumetric march, debug): no normal-offset bias.
@@ -524,46 +660,92 @@ float SampleHUDShadow(float3 worldPos)
 #endif
 }
 
-// Spot / OMNIPART local shadows. tilePlusOne = asuint(spotParamsAndType.w):
-// 0 = no atlas tile, else slice = tilePlusOne - 1. spotVP is clip-space (same as
-// projector sampling); UV uses Y-flip to match D3D→Vulkan viewport.
-float SampleLocalShadow(float3 worldPos, float4x4 spotVP, uint tilePlusOne)
+// Spot / OMNIPART local shadows.
+// localShadowRect.w = (page + 1) + opacity * 0.999  (opacity = temporal fade).
+// spotVP is clip-space; UV uses Y-flip to match D3D→Vulkan (NVRHI) viewport.
+// softKernel = r2_ls_psm_kernel / r2_ls_ssm_kernel (classic KERNEL texels, ~0.6–0.7).
+// Atlas res in dev_param_4.w (r2_smap_size × r2_ls_squality).
+float SampleLocalShadow(float3 worldPos, float3 N, float4x4 spotVP, float4 shadowRect, float softKernel)
 {
 #ifndef LOCAL_SHADOW_FORWARD
 	return 1.0;
 #else
-	if (tilePlusOne == 0)
+	float pagePlus = shadowRect.w;
+	if (pagePlus < 0.5)
 		return 1.0;
 
-	float4 sc = mul(spotVP, float4(worldPos, 1.0));
+	float opacity = frac(pagePlus);
+	if (opacity < 1e-3)
+		return 1.0;
+
+	float scale = shadowRect.z;
+	if (scale < 1e-4)
+		return 1.0;
+
+	float3 wp = worldPos + normalize(N) * 0.001;
+
+	float4 sc = mul(spotVP, float4(wp, 1.0));
 	if (sc.w <= 1e-4)
 		return 1.0;
 
 	float3 ndc = sc.xyz / sc.w;
-	float2 uv = ndc.xy * 0.5 + 0.5;
-	uv.y = 1.0 - uv.y;
+	float2 lightUV = ndc.xy * 0.5 + 0.5;
+	lightUV.y = 1.0 - lightUV.y;
 	float depth = ndc.z;
 
-	if (any(uv < 0.0) || any(uv > 1.0) || depth < 0.0 || depth > 1.0)
+	if (any(lightUV < 0.0) || any(lightUV > 1.0) || depth < 0.0 || depth > 1.0)
 		return 1.0;
 
-	// Classic KERNEL 0.6 4-tap PCF. Soft UV rim only (like accum_sun_far edge fade) —
-	// hard [0,1] reject made shadows pop on/off right in front of the camera as the
-	// light frustum swept the floor. Keep rim narrow so long mid-frustum shadows stay.
-	uint slice = tilePlusOne - 1;
-	float ts = 0.6 / 1024.0;
-	float rd = saturate(depth - 0.0003);
-	float lit = 0.0;
-	lit += g_LocalShadowAtlas.SampleCmp(smp_shadowcmp, float3(uv + float2(-ts, -ts), slice), rd);
-	lit += g_LocalShadowAtlas.SampleCmp(smp_shadowcmp, float3(uv + float2(+ts, -ts), slice), rd);
-	lit += g_LocalShadowAtlas.SampleCmp(smp_shadowcmp, float3(uv + float2(-ts, +ts), slice), rd);
-	lit += g_LocalShadowAtlas.SampleCmp(smp_shadowcmp, float3(uv + float2(+ts, +ts), slice), rd);
-	lit *= 0.25;
+	float2 uv = lightUV * scale + shadowRect.xy;
+	uint page = uint(pagePlus) - 1;
 
-	float2 edge = min(uv, 1.0 - uv);
-	float rim = smoothstep(0.0, 0.05, min(edge.x, edge.y));
-	return lerp(1.0, lit, rim);
+	float atlas = max(floor(dev_param_4.w), 512.0);
+	bool useEsm = frac(dev_param_4.w) > 0.25;
+	float kernel = max(softKernel, 0.1);
+	float ts = kernel / atlas;
+	float2 uvMin = shadowRect.xy + (0.5 / atlas);
+	float2 uvMax = shadowRect.xy + scale - (0.5 / atlas);
+	float lit = 0.0;
+
+	if (useEsm)
+	{
+		const float k = 80.0;
+		float2 o[4] = { float2(-ts, -ts), float2(+ts, -ts), float2(-ts, +ts), float2(+ts, +ts) };
+		[unroll] for (int i = 0; i < 4; ++i)
+		{
+			float2 suv = clamp(uv + o[i], uvMin, uvMax);
+			float occluder = g_LocalShadowESM.SampleLevel(smp_shadow_point, float3(suv, page), 0).x;
+			float receiver = exp(k * saturate(depth));
+			lit += saturate(receiver / max(occluder, 1e-4));
+		}
+		lit *= 0.25;
+	}
+	else
+	{
+		float depthBias = max(abs(dev_param_2.x), 0.00005);
+		float rd = saturate(depth - depthBias);
+		lit += g_LocalShadowAtlas.SampleCmp(smp_shadowcmp, float3(clamp(uv + float2(-ts, -ts), uvMin, uvMax), page), rd);
+		lit += g_LocalShadowAtlas.SampleCmp(smp_shadowcmp, float3(clamp(uv + float2(+ts, -ts), uvMin, uvMax), page), rd);
+		lit += g_LocalShadowAtlas.SampleCmp(smp_shadowcmp, float3(clamp(uv + float2(-ts, +ts), uvMin, uvMax), page), rd);
+		lit += g_LocalShadowAtlas.SampleCmp(smp_shadowcmp, float3(clamp(uv + float2(+ts, +ts), uvMin, uvMax), page), rd);
+		lit *= 0.25;
+	}
+
+	float2 edge = min(lightUV, 1.0 - lightUV);
+	float rim = smoothstep(0.0, 0.012, min(edge.x, edge.y));
+	return lerp(1.0, lit, rim * opacity);
 #endif
+}
+
+float SampleLocalShadow(float3 worldPos, float3 N, float4x4 spotVP, float4 shadowRect)
+{
+	float soft = max(max(dev_param_1.y, dev_param_1.z), 0.6);
+	return SampleLocalShadow(worldPos, N, spotVP, shadowRect, soft);
+}
+
+float SampleLocalShadow(float3 worldPos, float4x4 spotVP, float4 shadowRect)
+{
+	return SampleLocalShadow(worldPos, float3(0, 1, 0), spotVP, shadowRect);
 }
 
 #endif

@@ -53,6 +53,8 @@ public:
     virtual bool IsInitialized() const = 0;
     virtual void Shutdown() = 0;
     virtual void WaitForIdle() = 0;
+    virtual void LockDevice() {}
+    virtual void UnlockDevice() {}
     virtual DeviceState GetDeviceState() const { return DeviceState::Normal; }
 
     // ═══════ NVRHI Access ═══════
@@ -80,8 +82,25 @@ public:
     virtual u32 GetCurrentBackBufferIndex() const { return 0; }
     virtual u32 GetBackBufferCount() const { return 1; }
     virtual void Present(bool vsync) = 0;
+    virtual bool PresentFrameGeneration(nvrhi::ITexture* interpolated, nvrhi::ITexture* real) { (void)interpolated; (void)real; return false; }
     virtual std::pair<u32, u32> GetBackBufferSize() const = 0;
     virtual void ResizeSwapChain(u32 width, u32 height) {}
+
+    enum class LatencyMarker : u32
+    {
+        SimulationStart = 0,
+        SimulationEnd,
+        RenderSubmitStart,
+        RenderSubmitEnd,
+        PresentStart,
+        PresentEnd,
+        OutOfBandPresentStart,
+        OutOfBandPresentEnd,
+    };
+    virtual bool IsLowLatencyAvailable() const { return false; }
+    virtual void ApplyLowLatencyMode(int mode, u32 minIntervalUs) { (void)mode; (void)minIntervalUs; }
+    virtual void LatencySleep() {}
+    virtual void SetLatencyMarker(LatencyMarker marker) { (void)marker; }
 
     // ═══════ Frame Sync ═══════
     virtual void BeginFrame() = 0;

@@ -23,8 +23,14 @@ extern ENGINE_API Fvector4 ps_dev_param_4;
 extern ENGINE_API float psHUD_FOV;
 extern ENGINE_API int ps_r_contact_shadows;
 extern ENGINE_API float ps_r_contact_shadows_length;
+extern ENGINE_API int ps_r_rt_gi;
+extern ENGINE_API float ps_r_rt_gi_ambient_scale;
+extern ENGINE_API int ps_r_path_tracer;
 extern ENGINE_API int ps_r_sky_ibl;
 extern ENGINE_API float ps_r_sky_ibl_intensity;
+extern ENGINE_API int ps_r_ibl_prefilter;
+extern ENGINE_API int ps_r_ibl_probe_auto;
+extern ENGINE_API float ps_r_ibl_probe_radius;
 extern ENGINE_API int ps_r_foliage_sss;
 extern ENGINE_API float ps_r_foliage_sss_intensity;
 extern ECORE_API u32 ps_r_sun_quality;
@@ -178,14 +184,15 @@ inline void FillClusterParams(StaticGlobals& cb)
     }
     else
     {
-        const u32 tilesX = (w + ::xray::render::fg::CLUSTER_TILE_SIZE - 1) / ::xray::render::fg::CLUSTER_TILE_SIZE;
-        const u32 tilesY = (h + ::xray::render::fg::CLUSTER_TILE_SIZE - 1) / ::xray::render::fg::CLUSTER_TILE_SIZE;
+        const u32 tileSize = ::xray::render::fg::ClusterTileSize();
+        const u32 tilesX = (w + tileSize - 1) / tileSize;
+        const u32 tilesY = (h + tileSize - 1) / tileSize;
         cb.cluster_params.set(
             static_cast<float>(tilesX),
             static_cast<float>(tilesY),
             static_cast<float>(::xray::render::fg::CLUSTER_NUM_SLICES),
             0.0f);
-        cb.cluster_scales.set(zNear, zFar, 1.0f, static_cast<float>(::xray::render::fg::CLUSTER_TILE_SIZE));
+        cb.cluster_scales.set(zNear, zFar, 1.0f, static_cast<float>(tileSize));
     }
 }
 
@@ -249,12 +256,23 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.pos_decompression_params2.set((float)Device.dwWidth, (float)Device.dwHeight, 1.0f / (float)Device.dwWidth, 1.0f / (float)Device.dwHeight);
 
     // Parallax mapping: .x = height scale (r2_parallax_h; 0 disables object parallax),
-    // .y = bias, .z = foliage SSS intensity, .w = sky IBL intensity. Object steep
-    // parallax in bindless_forward.ps keys off .x>0 and requires r2_steep_parallax.
+    // .y = bias, .z = foliage SSS intensity, .w = sky IBL intensity.
+    // When RT GI is active, .w = -1 signals unlit GBuffer-only forward (see common_functions.h).
     const float parallaxH = ps_r2_ls_flags.test(R2FLAG_STEEP_PARALLAX) ? ps_r2_df_parallax_h : 0.0f;
-    cb.parallax.set(parallaxH, -0.01f,
-        (ps_r_foliage_sss != 0) ? ps_r_foliage_sss_intensity : 0.0f,
-        (ps_r_sky_ibl != 0) ? ps_r_sky_ibl_intensity : 0.0f);
+    const bool rtgiUnlit = (ps_r_rt_gi != 0) || (ps_r_path_tracer != 0);
+    if (rtgiUnlit)
+    {
+        cb.parallax.set(parallaxH, -0.01f,
+            (ps_r_foliage_sss != 0) ? ps_r_foliage_sss_intensity : 0.0f,
+            -1.0f);
+        cb.padding3 = 0.0f;
+    }
+    else
+    {
+        cb.parallax.set(parallaxH, -0.01f,
+            (ps_r_foliage_sss != 0) ? ps_r_foliage_sss_intensity : 0.0f,
+            (ps_r_sky_ibl != 0) ? ps_r_sky_ibl_intensity : 0.0f);
+    }
 
     // Screen resolution (for UI shaders and other effects)
     cb.screen_res.set(
@@ -266,7 +284,8 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
 
     cb.hud_fov = psHUD_FOV;
     // Screen-space contact shadow length (0 = disabled); packed as StaticGlobals.padding3
-    cb.padding3 = (ps_r_contact_shadows != 0) ? ps_r_contact_shadows_length : 0.0f;
+    if (!rtgiUnlit)
+        cb.padding3 = (ps_r_contact_shadows != 0) ? ps_r_contact_shadows_length : 0.0f;
 
     // ═══════════════════════════════════════════════════════
     //  FORWARD+ EXTENSIONS (Phase 1.3)
@@ -318,16 +337,34 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.dev_param_3 = ps_dev_param_3;
     cb.dev_param_4 = ps_dev_param_4;
 
+    // Classic soft-filter kernels (were registered but unused). Drive FG PCF/PCSS.
+    //   .x = r2_ls_dsm_kernel — directional / sun soft scale (default 0.7)
+    //   .y = r2_ls_psm_kernel — point / OMNIPART local soft (texels)
+    //   .z = r2_ls_ssm_kernel — spot local soft (texels)
+    //   .w = r2_slight_fade  — shadow distance / LOD fade
+    cb.dev_param_1.x = ps_r2_ls_dsm_kernel;
+    cb.dev_param_1.y = ps_r2_ls_psm_kernel;
+    cb.dev_param_1.z = ps_r2_ls_ssm_kernel;
+    cb.dev_param_1.w = ps_r2_slight_fade;
+
+    // .x = |r2_ls_depth_bias| for local SampleCmp receiver bias
+    cb.dev_param_2.x = std::abs(ps_r2_ls_depth_bias);
+    // r_cluster_debug -> common_functions.h ClusterDebugColor (dev_param_2.w)
+    cb.dev_param_2.w = float(ps_r_cluster_debug);
+    cb.dev_param_2.y = (ps_r_shadow_hzb != 0) ? 1.0f : 0.0f;
+    cb.dev_param_2.z = (ps_r_shadow_mask != 0) ? 1.0f : 0.0f;
+
     // r_shadow_debug overlay mode -> shadow_sampling.h ShadowDebugColor
     cb.dev_param_3.z = float(ps_r_shadow_debug);
     // r2_sun_normal_bias (meters) -> shadow_sampling.h NormalOffsetWorld
     cb.dev_param_3.w = ps_r2_sun_normal_bias;
 
     // PCSS filtering controls -> shadow_sampling.h SampleCascadePCSS.
-    // (dev_param_4 was previously view_shadow_proj, which no shader reads.)
     cb.dev_param_4.x = ps_r2_sun_soft;     // max penumbra (texels) — softness
     cb.dev_param_4.y = ps_r2_sun_blocker;  // blocker-search spacing (texels)
     cb.dev_param_4.z = ps_r2_sun_contact;  // min penumbra (texels) — contact sharpness
+    cb.dev_param_4.w = float(xray::render::fg::LocalShadowAtlasSize()) +
+        ((ps_r_local_shadow_filter != 0) ? 0.5f : 0.0f);
 
     if (g_ShadowCascadeGPUData.valid)
     {
@@ -387,26 +424,37 @@ inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
     dir.normalize_safe();
     cb.L_sun_dir_w.set(dir.x, dir.y, dir.z);
 
+    float ambScale = 1.0f;
+    if ((ps_r_rt_gi != 0) || (ps_r_path_tracer != 0))
+        ambScale = std::clamp(ps_r_rt_gi_ambient_scale, 0.0f, 1.0f);
+
     cb.L_ambient.set(
-        desc.ambient.x * ps_r2_sun_lumscale_amb,
-        desc.ambient.y * ps_r2_sun_lumscale_amb,
-        desc.ambient.z * ps_r2_sun_lumscale_amb,
+        desc.ambient.x * ps_r2_sun_lumscale_amb * ambScale,
+        desc.ambient.y * ps_r2_sun_lumscale_amb * ambScale,
+        desc.ambient.z * ps_r2_sun_lumscale_amb * ambScale,
         desc.weight
     );
 
-    // 3-arg set keeps L_hemi_color.w (ps_r2_sun_lumscale_hemi from FillGlobalConstants)
     cb.L_hemi_color.set(
-        desc.hemi_color.x,
-        desc.hemi_color.y,
-        desc.hemi_color.z
+        desc.hemi_color.x * ambScale,
+        desc.hemi_color.y * ambScale,
+        desc.hemi_color.z * ambScale
     );
 }
 
 void GetSunLightData(SunLightData& outSun, float hdrIntensity = 2.0f);
 
-inline StaticGlobals BuildStaticGlobals(float hdrIntensity = 2.0f) {
+inline StaticGlobals BuildStaticGlobals(float hdrIntensity = 2.0f, bool allowRtgiUnlit = true) {
     StaticGlobals sg = {};
     FillGlobalConstants(sg);
+    if (!allowRtgiUnlit && sg.parallax.w < -0.5f)
+    {
+        const float parallaxH = ps_r2_ls_flags.test(R2FLAG_STEEP_PARALLAX) ? ps_r2_df_parallax_h : 0.0f;
+        sg.parallax.set(parallaxH, -0.01f,
+            (ps_r_foliage_sss != 0) ? ps_r_foliage_sss_intensity : 0.0f,
+            (ps_r_sky_ibl != 0) ? ps_r_sky_ibl_intensity : 0.0f);
+        sg.padding3 = (ps_r_contact_shadows != 0) ? ps_r_contact_shadows_length : 0.0f;
+    }
     SunLightData sunData;
     GetSunLightData(sunData, hdrIntensity);
     FillSunConstants(sg, sunData);

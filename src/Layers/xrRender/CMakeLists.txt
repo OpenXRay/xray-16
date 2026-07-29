@@ -111,6 +111,8 @@ target_sources(xrRender PRIVATE
     fgEnvironmentRender.cpp
     FrameGraphPasses/ParticlePassSetup.h
     FrameGraphPasses/ParticlePassSetup.cpp
+    FrameGraphPasses/GlowPassSetup.h
+    FrameGraphPasses/GlowPassSetup.cpp
     FrameGraphPasses/RibbonPassSetup.h
     FrameGraphPasses/RibbonPassSetup.cpp
     FrameGraphPasses/TrailPassSetup.h
@@ -140,6 +142,10 @@ target_sources(xrRender PRIVATE
     Volumetrics/IVolumetricSource.h
     Volumetrics/WorldFogSource.h
     Volumetrics/WorldFogSource.cpp
+    Volumetrics/LightShaftSource.h
+    Volumetrics/LightShaftSource.cpp
+    Volumetrics/ParticleEmitterSource.h
+    Volumetrics/ParticleEmitterSource.cpp
     Volumetrics/VolumetricRenderer.h
     Volumetrics/VolumetricRenderer.cpp
     FrameGraphPasses/UIPassSetup.h
@@ -162,6 +168,19 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/MotionVectorPassSetup.cpp
     FrameGraphPasses/ReSTIRGIPassSetup.h
     FrameGraphPasses/ReSTIRGIPassSetup.cpp
+    Upscaling/UpscaleState.h
+    Upscaling/UpscaleState.cpp
+    Upscaling/IUpscaleBackend.h
+    Upscaling/UpscaleBackends.cpp
+    Upscaling/StreamlineDLSS.h
+    Upscaling/NgxDLSS.cpp
+    Upscaling/DlssFgPassSetup.h
+    Upscaling/DlssFgPassSetup.cpp
+    Upscaling/UpscalePassSetup.h
+    Upscaling/UpscalePassSetup.cpp
+    Denoising/IDenoiseBackend.h
+    Denoising/DenoiseBackends.cpp
+    Denoising/NRDDenoiseBackend.cpp
     FrameGraphPasses/ClusterLightPassSetup.cpp
     FrameGraphPasses/TAAPassSetup.h
     FrameGraphPasses/TAAPassSetup.cpp
@@ -169,12 +188,27 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/BloomPassSetup.cpp
     FrameGraphPasses/CASPassSetup.h
     FrameGraphPasses/CASPassSetup.cpp
+    FrameGraphPasses/CameraModelPassSetup.h
+    FrameGraphPasses/CameraModelPassSetup.cpp
+    FrameGraphPasses/PostProcessPassSetup.h
+    FrameGraphPasses/PostProcessPassSetup.cpp
+    FrameGraphPasses/LodPassSetup.h
+    FrameGraphPasses/LodPassSetup.cpp
+    fg_rendertarget_pp.cpp
     FrameGraphPasses/SSRPassSetup.h
     FrameGraphPasses/SSRPassSetup.cpp
     FrameGraphPasses/SSGIPassSetup.h
     FrameGraphPasses/SSGIPassSetup.cpp
+    FrameGraphPasses/SSSSSPassSetup.h
+    FrameGraphPasses/SSSSSPassSetup.cpp
+    FrameGraphPasses/IBLPrefilterPassSetup.h
+    FrameGraphPasses/IBLPrefilterPassSetup.cpp
     FrameGraphPasses/ContactShadowsPassSetup.h
     FrameGraphPasses/ContactShadowsPassSetup.cpp
+    FrameGraphPasses/ShadowHZBPassSetup.h
+    FrameGraphPasses/ShadowHZBPassSetup.cpp
+    FrameGraphPasses/ShadowMaskPassSetup.h
+    FrameGraphPasses/ShadowMaskPassSetup.cpp
     FrameGraphPasses/DofPassSetup.h
     FrameGraphPasses/DofPassSetup.cpp
 
@@ -456,6 +490,41 @@ if(XRAY_USE_AI_PBR)
     target_compile_definitions(xrRender PRIVATE USE_AI_PBR)
     target_include_directories(xrRender PRIVATE "${XRAY_ONNXRUNTIME_INCLUDE_DIR}")
     target_link_libraries(xrRender PRIVATE "${XRAY_ONNXRUNTIME_LIBRARY}")
+endif()
+
+if(XRAY_USE_FSR)
+    target_compile_definitions(xrRender PRIVATE XRAY_USE_FSR=1)
+endif()
+if(XRAY_USE_DLSS)
+    set(XRAY_DLSS_ROOT "${CMAKE_SOURCE_DIR}/Externals/DLSS")
+    if(NOT EXISTS "${XRAY_DLSS_ROOT}/include/nvsdk_ngx.h")
+        message(FATAL_ERROR "XRAY_USE_DLSS=ON but Externals/DLSS SDK headers are missing")
+    endif()
+    if(WIN32)
+        set(XRAY_DLSS_LIB_DIR "${XRAY_DLSS_ROOT}/lib/Windows_x86_64/x64")
+        find_library(XRAY_NVSDK_NGX_LIBRARY NAMES nvsdk_ngx_s nvsdk_ngx
+            PATHS "${XRAY_DLSS_LIB_DIR}" NO_DEFAULT_PATH)
+        set(XRAY_DLSS_RUNTIME_DIR "${XRAY_DLSS_ROOT}/lib/Windows_x86_64/rel")
+    else()
+        set(XRAY_DLSS_LIB_DIR "${XRAY_DLSS_ROOT}/lib/Linux_x86_64")
+        set(XRAY_NVSDK_NGX_LIBRARY "${XRAY_DLSS_LIB_DIR}/libnvsdk_ngx.a")
+        set(XRAY_DLSS_RUNTIME_DIR "${XRAY_DLSS_LIB_DIR}/rel")
+    endif()
+    if(NOT EXISTS "${XRAY_NVSDK_NGX_LIBRARY}")
+        message(FATAL_ERROR "XRAY_USE_DLSS=ON but NGX library not found at ${XRAY_NVSDK_NGX_LIBRARY}")
+    endif()
+    target_compile_definitions(xrRender PRIVATE XRAY_USE_DLSS=1)
+    target_include_directories(xrRender PRIVATE "${XRAY_DLSS_ROOT}/include")
+    target_link_libraries(xrRender PRIVATE "${XRAY_NVSDK_NGX_LIBRARY}")
+    if(UNIX AND NOT APPLE)
+        target_link_libraries(xrRender PRIVATE dl)
+    endif()
+    message(STATUS "DLSS/NGX: ON (${XRAY_NVSDK_NGX_LIBRARY})")
+    set(XRAY_DLSS_RUNTIME_DIR "${XRAY_DLSS_RUNTIME_DIR}" CACHE INTERNAL "DLSS runtime library directory")
+endif()
+if(XRAY_USE_NRD)
+    target_compile_definitions(xrRender PRIVATE XRAY_USE_NRD=1)
+    target_link_libraries(xrRender PRIVATE NRD NRDIntegration NRI)
 endif()
 
 set_target_properties(xrRender PROPERTIES

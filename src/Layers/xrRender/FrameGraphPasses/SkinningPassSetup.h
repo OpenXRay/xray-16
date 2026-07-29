@@ -30,13 +30,6 @@ namespace xray::render::fg::passes {
 // ═══════════════════════════════════════════════════════════════════════════
 //  SKINNING PASS - Consolidated skinned mesh rendering
 // ═══════════════════════════════════════════════════════════════════════════
-// Renders all skinned meshes in two phases:
-//   1. World Phase - NPCs, monsters, etc. with normal depth [0.0, 1.0]
-//   2. HUD Phase - First-person weapons/hands with compressed depth [0.0, 0.1]
-//
-// This pass consolidates all skinned mesh rendering that was previously split
-// between ForwardColorPass (world skinned) and HUDPass (HUD skinned).
-
 struct SkinningPipelineVariant {
     nvrhi::GraphicsPipelineHandle pipeline;
     nvrhi::InputLayoutHandle inputLayout;
@@ -57,8 +50,10 @@ struct SkinningPassState {
     SkinningPipelineVariant tessHQ4w;
     nvrhi::BindingLayoutHandle layout;
     nvrhi::BindingLayoutHandle hudLayout;
+    nvrhi::BindingLayoutHandle hudScopeLayout;
     nvrhi::ShaderHandle ps;
     nvrhi::ShaderHandle hudPS;
+    nvrhi::ShaderHandle hudScopePS;
     nvrhi::ShaderHandle tessHS;
     nvrhi::ShaderHandle tessDS;
     SkinningPipelineVariant mdiNonHQ;
@@ -73,6 +68,19 @@ struct SkinningPassState {
     SkinningPipelineVariant hudHQ2w;
     SkinningPipelineVariant hudHQ3w;
     SkinningPipelineVariant hudHQ4w;
+    SkinningPipelineVariant hudScopeNonHQ;
+    SkinningPipelineVariant hudScopeHQ1w;
+    SkinningPipelineVariant hudScopeHQ2w;
+    SkinningPipelineVariant hudScopeHQ3w;
+    SkinningPipelineVariant hudScopeHQ4w;
+    SkinningPipelineVariant depthNonHQ;
+    SkinningPipelineVariant depthHQ1w;
+    SkinningPipelineVariant depthHQ2w;
+    SkinningPipelineVariant depthHQ3w;
+    SkinningPipelineVariant depthHQ4w;
+    nvrhi::BindingLayoutHandle depthLayout;
+    nvrhi::ShaderHandle depthPS;
+    nvrhi::TextureHandle secondVP;
     nvrhi::SamplerHandle linearSampler;
     bool initialized = false;
 };
@@ -100,20 +108,34 @@ struct SkinningPassData {
     nvrhi::ITexture* shadowCascades[3] = {};
     nvrhi::ITexture* hudShadowMap = nullptr;
     nvrhi::ITexture* localShadowAtlas = nullptr;
+    nvrhi::ITexture* localShadowESM = nullptr;
+    nvrhi::ITexture* shadowHZB[3] = {};
+    nvrhi::ITexture* shadowMask = nullptr;
     nvrhi::ITexture* contactDepth = nullptr;
     nvrhi::ITexture* contactHistory = nullptr;
     nvrhi::ITexture* envSky0 = nullptr;
     nvrhi::ITexture* envSky1 = nullptr;
 };
 
-// Main skinning pass setup function
-// Renders world skinned meshes followed by HUD skinned meshes
+framegraph::VirtualResourceHandle setupSkinnedDepthPass(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    framegraph::VirtualResourceHandle depthInput,
+    const GeometryCollector* geometry,
+    MaterialCache* materialCache,
+    u32 width,
+    u32 height,
+    fg::GPUCullingManager* gpuCulling,
+    SkinningPassState* state,
+    decals::OverlayManager* overlayMgr = nullptr
+);
+
 framegraph::DefaultOutputLayout setupSkinningPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     const GeometryCollector* geometry,       // Contains world skinned batches
-    const xr_vector<GeometryBatch>* hudBatches,  // HUD skinned batches (weapons, hands)
+    const xr_vector<GeometryBatch>* hudBatches,  // unused when HUD is deferred; pass nullptr
     MaterialCache* materialCache,
     u32 width,
     u32 height,
@@ -129,7 +151,38 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     nvrhi::ITexture* envSky1 = nullptr,
     nvrhi::ITexture* hudShadowMap = nullptr,
     nvrhi::ITexture* const* shadowCascades = nullptr,
-    nvrhi::ITexture* localShadowAtlas = nullptr
+    nvrhi::ITexture* localShadowAtlas = nullptr,
+    nvrhi::ITexture* const* shadowHZB = nullptr,
+    nvrhi::ITexture* shadowMask = nullptr,
+    nvrhi::ITexture* localShadowESM = nullptr
+);
+
+framegraph::VirtualResourceHandle setupHudOverlayPass(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    framegraph::VirtualResourceHandle sceneColor,
+    framegraph::VirtualResourceHandle depth,
+    framegraph::VirtualResourceHandle normal,
+    framegraph::VirtualResourceHandle baseColor,
+    framegraph::VirtualResourceHandle worldPos,
+    const xr_vector<GeometryBatch>* hudBatches,
+    MaterialCache* materialCache,
+    u32 width,
+    u32 height,
+    fg::GPUCullingManager* gpuCulling,
+    SkinningPassState* state,
+    nvrhi::ITexture* shadowMapArray = nullptr,
+    nvrhi::ITexture* contactDepth = nullptr,
+    nvrhi::ITexture* contactHistory = nullptr,
+    nvrhi::ITexture* envSky0 = nullptr,
+    nvrhi::ITexture* envSky1 = nullptr,
+    nvrhi::ITexture* hudShadowMap = nullptr,
+    nvrhi::ITexture* const* shadowCascades = nullptr,
+    nvrhi::ITexture* localShadowAtlas = nullptr,
+    nvrhi::ITexture* const* shadowHZB = nullptr,
+    nvrhi::ITexture* shadowMask = nullptr,
+    nvrhi::ITexture* localShadowESM = nullptr,
+    bool rtgiGuidePass = false
 );
 
 } // namespace xray::render::fg::passes

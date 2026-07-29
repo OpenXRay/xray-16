@@ -17,7 +17,7 @@ struct RibbonControlPoint
     float cumDist;   // cumulative distance from head
 };
 
-StructuredBuffer<RibbonControlPoint> g_ControlPoints : register(t10);
+StructuredBuffer<RibbonControlPoint> g_ControlPoints : register(t13);
 
 // ═══════════════════════════════════════════════════════
 //  Per-group constant buffer

@@ -12,6 +12,10 @@ struct GPUSlotData {
     uint packed_palette_01;
     uint packed_palette_23;
     float hemi;
+    float sun;
+    float _pad0;
+    float _pad1;
+    float _pad2;
 };
 
 StructuredBuffer<InstanceData> g_AllInstances : register(t0);

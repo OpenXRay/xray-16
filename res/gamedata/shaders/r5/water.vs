@@ -103,5 +103,7 @@ VS_OUTPUT main(VS_INPUT input)
     o.fog = saturate(calc_fogging(P));
     o.materialID = materialID;
     o.tctexgen = o.hpos;
+    float3 Pe = mul(m_V, P).xyz;
+    o.tctexgen.z = Pe.z;
     return o;
 }

@@ -107,6 +107,9 @@ struct BindlessForwardConfig {
     // Enable bindless rendering mode
     bool enabled = false;
 
+    // After depth prepass: Equal + depth write off (desktop Vulkan only)
+    bool useEqualDepth = false;
+
     // ═══════════════════════════════════════════════════════
     //  MEGA-BUFFER SYSTEM (GPU-Driven Rendering)
     // ═══════════════════════════════════════════════════════
@@ -160,6 +163,7 @@ struct BindlessForwardConfig {
 
     // Local spot/OMNIPART shadow atlas (t27); null = dummy array
     nvrhi::ITexture* localShadowAtlas = nullptr;
+    nvrhi::ITexture* localShadowESM = nullptr;
     framegraph::VirtualResourceHandle localShadowHandle;
 
     // Previous-frame depth for screen-space contact shadows; null = disabled
@@ -167,9 +171,21 @@ struct BindlessForwardConfig {
     // Previous-frame temporal contact factor (t28); null = dummy white
     nvrhi::ITexture* contactHistory = nullptr;
 
-    // Sky cubemaps for water reflections (t25/t26)
+    // Per-cascade Shadow-HZB (t31/t32/t33); null = dummy
+    nvrhi::ITexture* shadowHZB[3] = {};
+    framegraph::VirtualResourceHandle shadowHZBHandles[3];
+    // Half-res screen shadow mask (t34); null = dummy white
+    nvrhi::ITexture* shadowMask = nullptr;
+    framegraph::VirtualResourceHandle shadowMaskHandle;
+
+    // Sky cubemaps for water reflections / IBL (t25/t26)
     nvrhi::ITexture* envSky0 = nullptr;
     nvrhi::ITexture* envSky1 = nullptr;
+
+    nvrhi::ITexture* envBrdfLut = nullptr;
+    nvrhi::IBuffer* envSkySH = nullptr;
+    nvrhi::IBuffer* envProbes = nullptr;
+    nvrhi::ITexture* envProbeCubes = nullptr;
 
     VariantPartitionConfig variantPartition;
 };

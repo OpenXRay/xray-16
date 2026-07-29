@@ -57,7 +57,7 @@ static const float HEIGHT_NOISE_SCALE = 0.05;    // World-space frequency of hei
 
 // Phase 6: Virtual texturing indirection table
 // NOTE: common_samplers.h uses t0-t31, so we use t32+ to avoid conflicts
-Buffer<uint> slot_indirection : register(t32);  // Packed: physical_page (16) | mip (8) | flags (8)
+Buffer<uint> slot_indirection : register(t40);
 
 // Phase 6: New vertex structure for SDF blade geometry
 // NOTE: Semantic names must match C++ VertexAttributeDesc in FGDetailManager.cpp
@@ -86,6 +86,10 @@ struct GPUSlotData
 	uint packed_palette_01;
 	uint packed_palette_23;
 	float hemi;
+	float sun;
+	float _pad0;
+	float _pad1;
+	float _pad2;
 };
 
 static const float PACK_MAX_SCALE = 4.0;
@@ -95,7 +99,7 @@ static const float TWO_PI = 6.28318530718;
 // Perlin4D 3D volume — bound directly at t12 (not bindless, since bindless is Texture2D only)
 Texture3D g_Perlin4D : register(t12);
 
-StructuredBuffer<uint> visible_indices : register(t33);
+StructuredBuffer<uint> visible_indices : register(t39);
 StructuredBuffer<InstanceData> all_instances : register(t37);
 StructuredBuffer<GPUSlotData> slot_data : register(t38);
 
@@ -216,7 +220,9 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// Sample Perlin noise for direction, strength, and turbulence separately
 	// Key: Scale inversely with wind_speed, time scroll proportionally
 	float wind_speed = max(g_wind_direction.y, 0.1);  // Avoid division by zero
-	float time = wave.w;  // Global time
+	float wind_phase = (det.vis_id == 2) ? 1.73 : 0.0;
+	float wind_mul = (det.vis_id == 2) ? 1.15 : 1.0;
+	float time = wave.w + wind_phase;
 
 	// Wind DIRECTION sample - larger scale, slower movement
 	// Reference: pos.zx * 0.005/wind_speed + TIME * 0.005 * wind_speed
@@ -238,7 +244,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// Process strength: remap to [0.25, 1.0], square for contrast, scale by wind_speed
 	float fbm_wind_strength = lerp(0.25, 1.0, wind_str_noise);
 	fbm_wind_strength *= fbm_wind_strength;  // Square for more contrast
-	fbm_wind_strength *= wind_speed;
+	fbm_wind_strength *= wind_speed * wind_mul;
 
 	// Process turbulence: same processing as strength
 	float wind_turbulence = lerp(0.25, 1.0, wind_turb_noise);
@@ -251,6 +257,11 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// Calculate global wind direction from g_wind_direction
 	float wind_angle_rad = g_wind_direction.x * (M_PI / 180.0);
 	float2 global_wind_dir = float2(sin(wind_angle_rad), cos(wind_angle_rad));
+	if (det.vis_id == 2)
+	{
+		float2 alt = normalize(dir2D_2.xy + float2(1e-4, 0));
+		global_wind_dir = normalize(lerp(global_wind_dir, alt, 0.35));
+	}
 
 	// Add turbulence perpendicular to wind direction
 	float2 perpendicular_dir = float2(-global_wind_dir.y, global_wind_dir.x);
@@ -421,7 +432,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// ===== Calculate blade normal =====
 	float slot_hemi = slot_data[slot_idx].hemi;
 	float hemi = abs(slot_hemi);
-	float sun = sign(slot_hemi) * 0.25f + 0.25f;
+	float sun = saturate(slot_data[slot_idx].sun);
 
 	// NORMAL = perpendicular to blade surface = cross(tangent, right)
 	// Since right is derived from rotation matrix, this is stable
@@ -459,6 +470,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	uint bh = asuint(bc.x * 73856093 + bc.y * 19349663);
 	bh ^= bh >> 16;
 	O.bladeHash = float(bh & 0xFFFFu) / 65535.0;
+	O.sunOcclusion = sun;
 	O.hpos = mul(g_detail_VP, pos);
 	return O;
 }

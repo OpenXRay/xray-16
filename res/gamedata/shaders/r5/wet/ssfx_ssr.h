@@ -95,7 +95,6 @@ float4 WetSSR(
         return float4(0, 0, 0, 0);
 
     float3 refl = sceneColor.SampleLevel(smpColor, hitUV, 0).rgb;
-    // Reject near-black "hits" (former fullscreen SSR failure mode)
     float lum = dot(refl, float3(0.299, 0.587, 0.114));
     conf *= saturate(lum * 8.0);
     return float4(refl, conf);

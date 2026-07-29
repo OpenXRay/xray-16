@@ -114,11 +114,10 @@ float3	v_hemi(float3 n)
 	return L_hemi_color.rgb*(.5f + .5f*n.y);
 }
 
-// Scalar hemi occlusion for skinned/dynamic meshes without baked vertex hemi.
-// Same wrap as classic v_hemi; fed into output_forward_pbr ambient term.
 float calc_model_hemi(float3 norm_w)
 {
-	return saturate(0.5f + 0.5f * normalize(norm_w).y);
+	float ny = normalize(norm_w).y;
+	return saturate(0.52f + 0.48f * ny);
 }
 
 float3	v_sun(float3 n)                        	
@@ -229,6 +228,8 @@ float gbuf_unpack_mtl( float mtl_hemi )
 #include "shared/sky_ibl.h"
 #endif
 #include "shared/foliage_sss.h"
+#include "shared/glass_sss.h"
+#include "shared/basecolor_pack.h"
 #include "shared/shadow_sampling.h"
 #include "shared/clustered_lighting.h"
 
@@ -259,24 +260,83 @@ f_forward output_forward_pbr(
 	float sunOcclusion = 1.0,
 	float sssStrength = 0.0,
 	float3 sssTint = float3(1, 1, 1),
-	float sssThickness = 1.0)
+	float sssThickness = 1.0,
+	float sssMask = 0.0,
+	float sssProfile = -1.0)
 {
 	f_forward res;
+
+	if (parallax.w < -0.5)
+	{
+		float3 N = normalize(worldNormal);
+		float3 V = normalize(eye_position - worldPos);
+		float3 L = normalize(-L_sun_dir_w);
+		float hemiTerm = saturate(hemi);
+		float indoor = saturate(1.0 - hemiTerm * 1.35);
+		float hemiFill = max(hemiTerm, lerp(0.08, 0.28, indoor));
+		float hemiDir = 0.4 + 0.6 * saturate(N.y * 0.5 + 0.5);
+		float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * max(L_hemi_color.w, 0.35) * hemiDir;
+		ambientColor = max(ambientColor, L_ambient.rgb + L_hemi_color.rgb * lerp(0.12, 0.4, indoor));
+		float3 ambient = PBRAmbient(albedo, N, V, metallic, roughness, ao, ambientColor * hemiFill);
+		float3 finalColor = ambient;
+		float sssAmt = max(sssStrength, sssMask * max(parallax.z, 0.0));
+		if (sssAmt > 1e-4)
+		{
+			finalColor += EvaluateFoliageSSS(
+				albedo, N, V, L, L_sun_color, 1.0,
+				sssTint, max(sssThickness, 0.65), sssAmt);
+		}
+		{
+			float dist = length(worldPos - eye_position);
+			float fog = saturate(dist * fog_params.w + fog_params.x);
+			finalColor = lerp(finalColor, fog_color.rgb, fog);
+		}
+		res.color = float4(finalColor, 1.0);
+		res.normal = float4(N, roughness);
+		res.baseColor = float4(albedo, PackBaseColorA(metallic, max(sssMask, saturate(sssAmt))));
+		res.worldPos = float4(worldPos, 1.0);
+		return res;
+	}
 
 	float3 N = normalize(worldNormal);
 	float3 V = normalize(eye_position - worldPos);
 	float3 L = normalize(-L_sun_dir_w);
+	float albedoLum = dot(albedo, float3(0.2126, 0.7152, 0.0722));
+	metallic *= saturate(albedoLum * 3.2 + 0.35);
+	albedo = SanitizeMetalAlbedo(albedo, metallic);
 	float hemiTerm = saturate(hemi);
 	float sunTerm = saturate(sunOcclusion);
+	float ndl = dot(N, L);
+	bool needSunShadow = (ndl > 0.0) || (sssStrength > 1e-4);
 
-#if defined(CSM_CHEAP_FORWARD)
-	float csm = SampleCSM_Fast(worldPos, N);
-#else
-	float csm = SampleCSM(worldPos, N);
+	float csm = 1.0;
+	float contact = 1.0;
+	float2 maskUV = float2(0, 0);
+	if (svPosition.w != 0)
+		maskUV = float2(svPosition.x * screen_res.z, svPosition.y * screen_res.w);
+#if defined(SHADOW_MASK_FORWARD)
+	bool useMask = ShadowMaskEnabled() && (svPosition.w != 0);
+	if (useMask)
+	{
+		float3 mask = SampleShadowMask(maskUV);
+		if (needSunShadow)
+		{
+			csm = lerp(0.20, 1.0, saturate(mask.r));
+			contact = saturate(mask.g);
+		}
+	}
+	else
 #endif
-	// Soft ambient fill in umbra — full-black CSM reads too heavy indoors / under trees.
-	csm = lerp(0.20, 1.0, saturate(csm));
-	float contact = ContactShadow(worldPos, L);
+	if (needSunShadow)
+	{
+#if defined(CSM_CHEAP_FORWARD)
+		csm = SampleCSM_Fast(worldPos, N);
+#else
+		csm = SampleCSM(worldPos, N);
+#endif
+		csm = lerp(0.20, 1.0, saturate(csm));
+		contact = ContactShadow(worldPos, L);
+	}
 	float sunShadow = csm * contact * sunTerm;
 
 	float3 sunLight = PBRDirectLighting(
@@ -291,7 +351,7 @@ f_forward output_forward_pbr(
 	if (iblIntensity > 1e-4)
 	{
 		ambient = PBRAmbientIBL(
-			albedo, N, V,
+			albedo, N, V, worldPos,
 			metallic, roughness, ao,
 			hemiTerm, iblIntensity);
 	}
@@ -310,26 +370,40 @@ f_forward output_forward_pbr(
 
 	if (sssStrength > 1e-4)
 	{
-		finalColor += EvaluateFoliageSSS(
-			albedo, N, V, L, L_sun_color, sunShadow,
-			sssTint, sssThickness, sssStrength);
-#if defined(SKY_IBL)
-		if (parallax.w > 1e-4)
+		if (sssProfile > 3.5)
 		{
-			finalColor += EvaluateFoliageSkySSS(
-				albedo, N, sssTint, sssThickness, sssStrength * parallax.w);
+			finalColor += EvaluateGlassTransmission(
+				albedo, N, V, L, L_sun_color, sunShadow,
+				sssThickness, sssStrength);
 		}
+		else
+		{
+			finalColor += EvaluateFoliageSSS(
+				albedo, N, V, L, L_sun_color, sunShadow,
+				sssTint, sssThickness, sssStrength);
+#if defined(SKY_IBL)
+			if (parallax.w > 1e-4)
+			{
+				finalColor += EvaluateFoliageSkySSS(
+					albedo, N, sssTint, sssThickness, sssStrength * parallax.w);
+			}
 #endif
+		}
 	}
 
 #ifdef CLUSTERED_LIGHTING_FORWARD
 	if (svPosition.w != 0)
 	{
-		float linearDepth = mul(m_V, float4(worldPos, 1.0)).z;
+		float linearDepth = abs(mul(m_V, float4(worldPos, 1.0)).z);
 		float3 clusterLights = EvaluateClusteredLights(
 			worldPos, N, V, albedo, metallic, roughness,
-			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode);
+			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode, 1.0);
 		finalColor += clusterLights;
+
+		// r_cluster_debug (dev_param_2.w): 1=tileXY, 2=slice
+		int clusterDebug = (int)(dev_param_2.w + 0.5);
+		if (clusterDebug > 0)
+			finalColor = ClusterDebugColor(svPosition.xy, linearDepth, clusterDebug);
 	}
 #endif
 
@@ -346,7 +420,7 @@ f_forward output_forward_pbr(
 
 	res.color = float4(finalColor, 1.0);
 	res.normal = float4(N, roughness);
-	res.baseColor = float4(albedo, metallic);
+	res.baseColor = float4(albedo, PackBaseColorA(metallic, sssMask));
 	res.worldPos = float4(worldPos, 1.0);
 	return res;
 }

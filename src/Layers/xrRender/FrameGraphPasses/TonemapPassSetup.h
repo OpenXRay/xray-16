@@ -33,6 +33,7 @@ struct TonemapPassData {
     u32 height;
     TonemapPassState* passState;
     const ExposurePassState* exposurePassState;
+    fg::RenderDevice* device = nullptr;
 };
 
 // Lambda-based tonemap pass setup

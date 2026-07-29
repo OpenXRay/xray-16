@@ -93,7 +93,7 @@ void InitBloom(nvrhi::IDevice* nv, BloomPassState& st)
     st.extractLayout = cache.GetOrCreateBindingLayoutFromReflection("BloomExtract_v3", *vs.reflection, *ex.reflection, nv);
     st.downLayout = cache.GetOrCreateBindingLayoutFromReflection("BloomDown_v3", *vs.reflection, *dn.reflection, nv);
     st.upLayout = cache.GetOrCreateBindingLayoutFromReflection("BloomUp_v3", *vs.reflection, *up.reflection, nv);
-    st.compLayout = cache.GetOrCreateBindingLayoutFromReflection("BloomComp_v3", *vs.reflection, *cp.reflection, nv);
+    st.compLayout = cache.GetOrCreateBindingLayoutFromReflection("BloomComp_v4", *vs.reflection, *cp.reflection, nv);
     if (st.extractLayout)
         st.extractPipe = MakeFSPipe("BloomExtract_v3", nv, vs.handle, ex.handle, st.extractLayout, nvrhi::Format::RGBA16_FLOAT, false);
     if (st.downLayout)
@@ -101,7 +101,7 @@ void InitBloom(nvrhi::IDevice* nv, BloomPassState& st)
     if (st.upLayout)
         st.upPipe = MakeFSPipe("BloomUp_v3", nv, vs.handle, up.handle, st.upLayout, nvrhi::Format::RGBA16_FLOAT, false);
     if (st.compLayout)
-        st.compPipe = MakeFSPipe("BloomCompAdd_v3", nv, vs.handle, cp.handle, st.compLayout, nvrhi::Format::RGBA16_FLOAT, true);
+        st.compPipe = MakeFSPipe("BloomCompAdd_v4", nv, vs.handle, cp.handle, st.compLayout, nvrhi::Format::RGBA16_FLOAT, true);
     st.initialized = true;
 }
 
@@ -140,6 +140,7 @@ VirtualResourceHandle setupBloomPass(
     FrameGraph& fg,
     fg::RenderDevice* device,
     VirtualResourceHandle sceneColor,
+    VirtualResourceHandle depth,
     u32 width,
     u32 height,
     BloomPassState& state)
@@ -148,6 +149,8 @@ VirtualResourceHandle setupBloomPass(
         return sceneColor;
     InitBloom(device->GetNVRHIDevice(), state);
     if (!state.extractPipe || !state.downPipe || !state.upPipe || !state.compPipe)
+        return sceneColor;
+    if (!depth.is_valid())
         return sceneColor;
 
     // Non-transient: never alias bloom pyramids onto unrelated full-res RTs.
@@ -190,6 +193,7 @@ VirtualResourceHandle setupBloomPass(
     struct PassData
     {
         VirtualResourceHandle scene;
+        VirtualResourceHandle depth;
         VirtualResourceHandle mips[kBloomMips];
         VirtualResourceHandle upMips[kBloomMips - 1];
         VirtualResourceHandle output;
@@ -208,6 +212,7 @@ VirtualResourceHandle setupBloomPass(
             data.width = width;
             data.height = height;
             data.scene = pb.read(sceneColor, ResourceState::ShaderResource);
+            data.depth = pb.read(depth, ResourceState::ShaderResource);
             for (u32 i = 0; i < kBloomMips; ++i)
             {
                 data.mips[i] = pb.write(mips[i], ResourceState::RenderTarget);
@@ -236,10 +241,11 @@ VirtualResourceHandle setupBloomPass(
                 return;
 
             auto* scene = graph.GetPhysicalTexture(data.scene);
+            auto* depthTex = graph.GetPhysicalTexture(data.depth);
             nvrhi::ITexture* mipTex[kBloomMips];
             for (u32 i = 0; i < kBloomMips; ++i)
                 mipTex[i] = graph.GetPhysicalTexture(data.mips[i]);
-            if (!scene || !mipTex[0])
+            if (!scene || !depthTex || !mipTex[0])
                 return;
 
             struct alignas(16) P4 { float x, y, z, w; };
@@ -313,11 +319,12 @@ VirtualResourceHandle setupBloomPass(
             cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::RenderTarget);
             cmd->setTextureState(bloomFull, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
 
-            P4 p{intensity, 0, 0, 0};
+            P4 p{intensity, 0.9995f, 0, 0};
             cmd->writeBuffer(cb, &p, sizeof(p));
             BindingSetBuilder bsb(*vsR, *cpR, nv, "Bloom.Comp");
             bsb.ConstantBuffer("BloomParams", cb);
             bsb.Texture("g_Bloom", bloomFull);
+            bsb.Texture("g_Depth", depthTex);
             auto set = cache.GetOrCreateBindingSet(bsb.Build(), st->compLayout, nv);
             DrawFS(cmd, nv, st->compPipe, set, out, data.width, data.height, "BloomCompFB");
             cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);

@@ -8,12 +8,20 @@
 #define CLUSTERED_LIGHTING_FORWARD
 #define CSM_SHADOW_FORWARD
 #define LOCAL_SHADOW_FORWARD
+#define SHADOW_MASK_FORWARD
 #define SKY_IBL
+#define SKY_IBL_SPEC_V4 1
 // CSM: PCSS + cascade depth select (bust shader cache when sampling.h changes)
 #include "common.h"
 #include "bindless_common.h"
-// Water materials are drawn by dedicated water.vs/ps in TransparentPass.
-// s_env0/s_env1 declared via shared/sky_ibl.h (SKY_IBL)
+#include "shared/object_parallax.h"
+#include "shared/skin_sss.h"
+
+cbuffer TransparentDrawCB : register(b6)
+{
+    uint g_TransparentBlendPass;
+    uint3 _transparentDrawPad;
+};
 
 struct PS_INPUT
 {
@@ -23,7 +31,7 @@ struct PS_INPUT
     float3 normal : TEXCOORD2;
     float3 tangent : TEXCOORD3;
     float3 bitangent : TEXCOORD4;
-    nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    nointerpolation uint materialID : TEXCOORD5;
     float hemi : TEXCOORD6;
 };
 
@@ -35,66 +43,6 @@ struct PS_OUTPUT
     float4 worldPos : SV_Target3;
 };
 
-// Object steep parallax (classic sload.h ALLOW_STEEPPARALLAX) on bump# height
-// (normalX.a). Offsets UV before texturing so relief shows on walls/props.
-// Disabled (returns uv) when: parallax off (parallax.x<=0), no bump#, grazing
-// angle, distance fade, or on alpha-test / foliage (billboards have no real depth).
-float2 ObjectParallaxUV(MaterialData mat, float2 uv, float3 worldPos,
-                        float3 T, float3 B, float3 N)
-{
-    if (parallax.x <= 0.0)
-        return uv;
-    if ((mat.flags & MAT_FLAG_HAS_NORMAL_X) == 0 || mat.normalXIndex == INVALID_TEXTURE_INDEX)
-        return uv;
-    if (mat.flags & (MAT_FLAG_ALPHA_TEST | MAT_FLAG_FOLIAGE))
-        return uv;
-
-    float3 V = normalize(eye_position - worldPos);
-    float3 Vts = normalize(float3(dot(V, T), dot(V, B), dot(V, N)));
-    if (Vts.z < 0.02)
-        return uv;
-
-    float viewZ = abs(mul(m_V, float4(worldPos, 1.0)).z);
-    const float startFade = 8.0;
-    const float stopFade = 20.0;
-    if (viewZ >= stopFade)
-        return uv;
-
-    const float maxSamples = 16.0;
-    const float minSamples = 6.0;
-    float nSteps = lerp(maxSamples, minSamples, saturate(Vts.z));
-    float stepSize = 1.0 / nSteps;
-    float2 vDelta = Vts.xy * (-parallax.x) * 1.2;
-    float2 offPerStep = stepSize * vDelta;
-
-    Texture2D hx = GetBindlessTexture(mat.normalXIndex);
-    float2 curOff = uv;
-    float curH = 0.0;
-    float curBound = 1.0;
-
-    [loop]
-    for (int i = 0; i < (int)nSteps; ++i)
-    {
-        if (curH < curBound)
-        {
-            curOff += offPerStep;
-            curH = hx.Sample(smp_linear, curOff).a;
-            curBound -= stepSize;
-        }
-    }
-
-    float2 prevOff = curOff - offPerStep;
-    float prevH = hx.Sample(smp_linear, prevOff).a;
-    float d2 = (curBound + stepSize) - prevH;
-    float d1 = curBound - curH;
-    float denom = d2 - d1;
-    float amt = (abs(denom) > 1e-5)
-        ? (curBound * d2 - (curBound + stepSize) * d1) / denom
-        : curBound;
-    float fade = smoothstep(stopFade, startFade, viewZ);
-    return uv + vDelta * ((1.0 - amt) * fade);
-}
-
 PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
@@ -104,6 +52,16 @@ PS_OUTPUT main(PS_INPUT input)
     // ── Water drawn by dedicated water PSO (TransparentPass second draw) ──
     if (mat.flags & MAT_FLAG_WATER)
         clip(-1);
+
+    // TransparentPass batches: 1 = SrcAlpha, 2 = Multiply (0 = forward / all)
+    if (g_TransparentBlendPass > 0)
+    {
+        bool isMul = (mat.flags & MAT_FLAG_MULTIPLY) != 0;
+        if (g_TransparentBlendPass == 1 && isMul)
+            clip(-1);
+        if (g_TransparentBlendPass == 2 && !isMul)
+            clip(-1);
+    }
 
     float3 Tn = normalize(input.tangent);
     float3 Bn = normalize(input.bitangent);
@@ -138,43 +96,78 @@ PS_OUTPUT main(PS_INPUT input)
             gloss = gloss * detailSample.a * 2.0;
     }
 
-    float metallic = 0.0;
-    float roughness = 1.0 - gloss;
-    float ao = 1.0;
+    float metallic, roughness, ao, height;
+    ResolveMaterialPBR(mat, uv, gloss, metallic, roughness, ao, height);
 
-    if (mat.flags & MAT_FLAG_HAS_PBR)
-    {
-        float3 pbrSample = SamplePBR(mat, uv);
-        metallic = pbrSample.r;
-        roughness = pbrSample.g;
-        ao = pbrSample.b;
-    }
-
-    // Foliage SSS: default thickness=1; optional thickness map in detailBumpX (R)
     float sssStrength = 0.0;
-    float3 sssTint = float3(0.45, 0.65, 0.22);
+    float3 sssTint = float3(1.0, 1.0, 1.0);
     float sssThickness = 1.0;
+    float sssMask = 0.0;
+    float sssProfile = -1.0;
     if (mat.flags & MAT_FLAG_FOLIAGE)
     {
-        // parallax.z = global foliage SSS intensity (see FillGlobalConstants)
         sssStrength = max(parallax.z, 0.0);
-        // Leaf alpha: thinner at transparent edges
         if (mat.flags & MAT_FLAG_ALPHA_TEST)
             sssThickness = saturate(diffuseSample.a + 0.2);
-        if (mat.flags & MAT_FLAG_HAS_SSS_MAP)
-        {
-            // Future: dedicated SSS thickness texture (R = thick→less scatter)
-            float thickMap = GetBindlessTexture(mat.detailBumpXIndex).Sample(smp_linear, input.texcoord).r;
-            sssThickness *= saturate(1.0 - thickMap);
-        }
+        sssProfile = 1.0;
+        sssTint = float3(0.45, 0.85, 0.35);
+        sssMask = saturate(sssStrength * 1.6);
+    }
+    if (mat.flags & MAT_FLAG_GLASS)
+    {
+        sssStrength = max(sssStrength, 0.55);
+        sssThickness = saturate(diffuseSample.a + 0.25);
+        sssProfile = 4.0;
+        sssTint = float3(0.85, 0.92, 1.0);
+        sssMask = 0.0;
+    }
+    if (mat.flags & MAT_FLAG_HAS_SSS_MAP)
+    {
+        float4 sssS = GetBindlessTexture(mat.sssMapIndex).Sample(smp_linear, uv);
+        ApplySSSMapSample(sssS, sssStrength, sssTint, sssThickness, sssMask, sssProfile);
     }
 
     f_forward fwd = output_forward_pbr(
         albedo, N, input.worldPos, metallic, roughness, ao, input.position, input.hemi, 1.0,
-        sssStrength, sssTint, sssThickness);
-    output.color = float4(fwd.color.rgb, diffuseSample.a);
+        sssStrength, sssTint, sssThickness, sssMask, sssProfile);
+    if (mat.flags & MAT_FLAG_MULTIPLY)
+    {
+        float a = saturate(diffuseSample.a);
+        float3 mulRgb = lerp(float3(0.5, 0.5, 0.5), albedo, a);
+        output.color = float4(mulRgb, 1.0);
+    }
+    else
+    {
+        float3 lit = fwd.color.rgb;
+        if ((mat.flags & MAT_FLAG_EMISSIVE) && mat.emissiveIntensity > 0.0)
+            lit = max(lit, albedo * mat.emissiveIntensity);
+        float outA = (mat.flags & MAT_FLAG_ALPHA_BLEND) ? diffuseSample.a : 1.0;
+        output.color = float4(lit, outA);
+    }
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
     output.worldPos = fwd.worldPos;
     return output;
 }
+
+#define PCSS_VOGEL_V1 1
+
+#define LOCAL_SHADOW_FADE_V1 1
+
+#define LOCAL_SHADOW_FADE_V2 1
+
+#define LOCAL_SHADOW_FADE_V3 1
+
+#define LOCAL_SHADOW_FADE_V4 1
+
+#define LOCAL_SHADOW_CLASSIC_V1 1
+
+#define LOCAL_SHADOW_CLASSIC_V2 1
+
+#define LOCAL_SHADOW_STABLE_V1 1
+
+#define LOCAL_SHADOW_SMAP2D_V1 1
+
+#define LOCAL_SHADOW_SMAP_PAGES_V1 1
+
+#define LOCAL_SHADOW_RECT_F4_V1 1

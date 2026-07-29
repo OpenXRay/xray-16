@@ -108,12 +108,22 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared
             break;
         case BlendMode::AlphaBlend:
         case BlendMode::Additive:
+            info.transparent = true;
+            if (blendInfo.alphaRef > 0)
+            {
+                info.alphaTest = true;
+                info.alphaRef = blendInfo.alphaRef;
+            }
+            else
+            {
+                info.alphaTest = false;
+                info.alphaRef = 0;
+            }
+            break;
         case BlendMode::Multiply:
         case BlendMode::Multiply2X:
-            // Classic blenders often keep AREF together with blend (model/detail/
-            // screen_set with oAREF). Dropping aref made bindless_forward skip
-            // clip() → fringe / no cutoff on alpha effects.
             info.transparent = true;
+            info.multiply = true;
             if (blendInfo.alphaRef > 0)
             {
                 info.alphaTest = true;
@@ -275,7 +285,7 @@ xr_string MaterialSystem::GetNormalPath(const char* textureName) const
 
 xr_string MaterialSystem::GetPBRPath(const char* textureName) const
 {
-    // Convention: texture_pbr (packed R=AO, G=Roughness, B=Metallic)
+    // Convention: texture_pbr (packed R=Metallic, G=Roughness, B=AO, A=Parallax)
     xr_string path = textureName;
     path += "_pbr";
     return path;

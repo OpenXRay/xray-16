@@ -13,6 +13,7 @@
 #include "xrEngine/IRenderBackend.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
+#include "Upscaling/StreamlineDLSS.h"
 
 #include <SDL3/SDL.h>
 
@@ -185,7 +186,16 @@ void FGRenderBase::End()
     if (GEnv.Backend)
     {
         GEnv.Backend->EndFrame();
-        GEnv.Backend->Present(psDeviceFlags.test(rsVSync));
+        const bool vsync = psDeviceFlags.test(rsVSync);
+        nvrhi::ITexture* fgInterp = nullptr;
+        nvrhi::ITexture* fgReal = nullptr;
+        if (Streamline_TakeFgPresent(fgInterp, fgReal))
+        {
+            GEnv.Backend->Present(vsync);
+            GEnv.Backend->PresentFrameGeneration(fgInterp, fgReal);
+            return;
+        }
+        GEnv.Backend->Present(vsync);
     }
 }
 
@@ -251,19 +261,6 @@ void FGRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 using namespace xray::render::pbr;
 void FGRenderBase::ConvertLegacyAssetsToPBR()
 {
-    if (ps_r4_use_pbr == 0)
-        return;
-
-    if (m_pbrConversionThread.joinable())
-        return;
-
-    Msg("~ [PBR] PBR rendering enabled, checking texture conversion...");
-
-    m_pbrConversionThread = std::thread([this]
-    {
-        ConvertLegacyAssetsToPBRImpl();
-        ConversionProgress::Get().EndJob();
-    });
 }
 
 void FGRenderBase::RenderPBRConversionUI()

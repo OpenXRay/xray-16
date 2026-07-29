@@ -24,10 +24,15 @@
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/Shaders/SlangCompilerTest.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"  // Phase 2.5.3
+#include "Layers/xrRender/FrameGraphPasses/IBLPrefilterPassSetup.h"
 #ifdef DEBUG
 #include "Layers/xrRender/ResourceManager/TestTextureManager.h"
 #endif
 #endif
+
+extern ENGINE_API int ps_r_ibl_prefilter;
+extern ENGINE_API int ps_r_ibl_probe_auto;
+extern ENGINE_API float ps_r_ibl_probe_radius;
 
 // Detail manager debug
 extern ENGINE_API int dm_debug_trails;
@@ -103,8 +108,20 @@ int ps_r_skinned_shadows = 1; // 1=NPCs/mutants cast into the sun CSM (self-shad
 int ps_r_depth_prepass = 1; // early-Z; enables same-frame Hi-Z path when r_hiz_occlusion
 int ps_r_hiz_occlusion = 1; // 1=static occlusion compact after same-frame Hi-Z (depth prepass)
 int ps_r_shadow_light_cull = 1; // 1=CPU light-frustum CSM casters (DRAWINDEX compact)
-int ps_r_local_shadows = 1; // 1=spot/OMNIPART local shadow atlas (expensive: N× BuildLightFrustumCasters)
-int ps_r_local_shadow_tiles = 12; // max atlas slices (hard cap MAX_LOCAL_SHADOW_TILES=16)
+int ps_r_local_shadows = 1;
+int ps_r_local_shadow_tiles = 96;
+int ps_r_local_shadow_update_div = 1;
+int ps_r_local_shadow_redraw_budget = 16;
+int ps_r_local_shadow_skinned_max = 24;
+float ps_r_local_shadow_near = 10.f;
+float ps_r_local_shadow_mid = 30.f;
+int ps_r_local_shadow_far_period = 5;
+int ps_r_local_shadow_atlas = 2048;
+int ps_r_local_shadow_filter = 0;
+int ps_r_shadow_hzb = 1;
+int ps_r_shadow_mask = 1;
+int ps_r_cluster_debug = 0; // 0=off,1=tileXY checker,2=depth slice
+int ps_r_cluster_tile_size = 64; // 32 or 64 — cluster XY tile pixels
 int ps_r_shadow_indoor_near_only = 1; // 1=few portal sectors → only cascade 0
 int ps_r_portal_cull = 1; // 1=portal/sector PVS traversal (frustum) for static submit
 int ps_r_hom = 0; // 1=add CPU HOM occlusion on top of portal traversal (opt-in refinement)
@@ -224,6 +241,23 @@ float ps_r2_tonemap_middlegray = 1.f; // r2-only
 float ps_r2_tonemap_adaptation = 1.f; // r2-only
 float ps_r2_tonemap_low_lum = 0.0001f; // r2-only
 float ps_r2_tonemap_amount = 0.7f; // r2-only
+float ps_r_exposure_ev_bias = 0.f;
+float ps_r_exposure_env_strength = 0.75f;
+float ps_r_exposure_env_ref = 1.35f;
+float ps_r_exposure_adapt_up = 1.5f;
+float ps_r_exposure_adapt_down = 3.0f;
+float ps_r_tonemap_white = 4.0f;
+float ps_r_tonemap_contrast = 1.0f;
+int ps_r_camera = 1;
+int ps_r_camera_distort_enable = 1;
+int ps_r_camera_ca_enable = 1;
+int ps_r_camera_vignette_enable = 1;
+int ps_r_camera_grain_enable = 1;
+int ps_r_camera_mblur_enable = 1;
+float ps_r_camera_distort = 0.04f;
+float ps_r_camera_ca = 0.0015f;
+float ps_r_camera_vignette = 0.25f;
+float ps_r_camera_grain = 0.015f;
 float ps_r2_ls_bloom_kernel_g = 3.f; // r2-only
 float ps_r2_ls_bloom_kernel_b = .7f; // r2-only
 float ps_r2_ls_bloom_speed = 100.f; // r2-only
@@ -273,9 +307,9 @@ Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
 float ps_r2_dof_sky = 30; //    distance to sky
 float ps_r2_dof_kernel_size = 5.0f; //  7.0f
 
-float ps_r3_dyn_wet_surf_near = 10.f; // view-space start falloff
-float ps_r3_dyn_wet_surf_far = 50.f;  // view-space end falloff (was 20 — too short)
-int ps_r3_dyn_wet_surf_sm_res = 256; // 256
+float ps_r3_dyn_wet_surf_near = 10.f;
+float ps_r3_dyn_wet_surf_far = 50.f;
+int ps_r3_dyn_wet_surf_sm_res = 1024;
 
 // R4 Debug
 int ps_r4_debug_gpu_culling = 0; // 0=off, 1=show bounding spheres with cull state colors
@@ -712,14 +746,68 @@ public:
     }
 };
 
-#ifdef DEBUG
+#if RENDER == R_R4
+class CCC_IBLProbeAdd : public IConsole_Command
+{
+public:
+    CCC_IBLProbeAdd(LPCSTR N) : IConsole_Command(N) {}
+    void Execute(LPCSTR args) override
+    {
+        float radius = 8.f;
+        if (args && args[0])
+            radius = std::max(1.f, (float)atof(args));
+        auto* st = xray::render::fg::passes::GetActiveIBLState();
+        if (!st)
+        {
+            Msg("! [IBL] state not ready");
+            return;
+        }
+        const int idx = xray::render::fg::passes::IBLAddProbeAtCamera(*st, radius);
+        Msg("* [IBL] probe %d added r=%.1f (captures next frame)", idx, radius);
+    }
+};
+
+class CCC_IBLProbeClear : public IConsole_Command
+{
+public:
+    CCC_IBLProbeClear(LPCSTR N) : IConsole_Command(N) {}
+    void Execute(LPCSTR) override
+    {
+        auto* st = xray::render::fg::passes::GetActiveIBLState();
+        if (!st)
+            return;
+        xray::render::fg::passes::IBLClearProbes(*st);
+        Msg("* [IBL] probes cleared");
+    }
+};
+
+class CCC_IBLProbeCapture : public IConsole_Command
+{
+public:
+    CCC_IBLProbeCapture(LPCSTR N) : IConsole_Command(N) {}
+    void Execute(LPCSTR args) override
+    {
+        auto* st = xray::render::fg::passes::GetActiveIBLState();
+        if (!st || st->probeCount == 0)
+        {
+            Msg("! [IBL] no probes");
+            return;
+        }
+        int idx = int(st->probeCount) - 1;
+        if (args && args[0])
+            idx = std::clamp((int)atoi(args), 0, int(st->probeCount) - 1);
+        xray::render::fg::passes::IBLRequestCapture(*st, idx);
+        Msg("* [IBL] capture requested for probe %d", idx);
+    }
+};
+#endif
+
 class CCC_SunshaftsIntensity : public CCC_Float
 {
 public:
     CCC_SunshaftsIntensity(LPCSTR N, float* V, float _min, float _max) : CCC_Float(N, V, _min, _max) {}
     virtual void Save(IWriter*) { ; }
 };
-#endif
 
 //  Allow real-time fog config reload
 
@@ -815,6 +903,23 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_tonemap_adaptation", &ps_r2_tonemap_adaptation, 0.01f, 10.0f);
     CMD4(CCC_Float, "r2_tonemap_lowlum", &ps_r2_tonemap_low_lum, 0.0001f, 1.0f);
     CMD4(CCC_Float, "r2_tonemap_amount", &ps_r2_tonemap_amount, 0.0000f, 1.0f);
+    CMD4(CCC_Float, "r_exposure_ev_bias", &ps_r_exposure_ev_bias, -4.0f, 4.0f);
+    CMD4(CCC_Float, "r_exposure_env_strength", &ps_r_exposure_env_strength, 0.0f, 1.0f);
+    CMD4(CCC_Float, "r_exposure_env_ref", &ps_r_exposure_env_ref, 0.01f, 16.0f);
+    CMD4(CCC_Float, "r_exposure_adapt_up", &ps_r_exposure_adapt_up, 0.01f, 20.0f);
+    CMD4(CCC_Float, "r_exposure_adapt_down", &ps_r_exposure_adapt_down, 0.01f, 20.0f);
+    CMD4(CCC_Float, "r_tonemap_white", &ps_r_tonemap_white, 0.5f, 16.0f);
+    CMD4(CCC_Float, "r_tonemap_contrast", &ps_r_tonemap_contrast, 0.8f, 1.25f);
+    CMD4(CCC_Integer, "r_camera", &ps_r_camera, 0, 1);
+    CMD4(CCC_Integer, "r_camera_distort_enable", &ps_r_camera_distort_enable, 0, 1);
+    CMD4(CCC_Integer, "r_camera_ca_enable", &ps_r_camera_ca_enable, 0, 1);
+    CMD4(CCC_Integer, "r_camera_vignette_enable", &ps_r_camera_vignette_enable, 0, 1);
+    CMD4(CCC_Integer, "r_camera_grain_enable", &ps_r_camera_grain_enable, 0, 1);
+    CMD4(CCC_Integer, "r_camera_mblur_enable", &ps_r_camera_mblur_enable, 0, 1);
+    CMD4(CCC_Float, "r_camera_distort", &ps_r_camera_distort, 0.0f, 0.5f);
+    CMD4(CCC_Float, "r_camera_ca", &ps_r_camera_ca, 0.0f, 0.05f);
+    CMD4(CCC_Float, "r_camera_vignette", &ps_r_camera_vignette, 0.0f, 2.0f);
+    CMD4(CCC_Float, "r_camera_grain", &ps_r_camera_grain, 0.0f, 0.2f);
     CMD4(CCC_Float, "r2_ls_bloom_kernel_scale", &ps_r2_ls_bloom_kernel_scale, 0.5f, 2.f);
     CMD4(CCC_Float, "r2_ls_bloom_kernel_g", &ps_r2_ls_bloom_kernel_g, 1.f, 7.f);
     CMD4(CCC_Float, "r2_ls_bloom_kernel_b", &ps_r2_ls_bloom_kernel_b, 0.01f, 1.f);
@@ -994,9 +1099,43 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_path_tracer_bounces", &ps_r_path_tracer_bounces, 1, 16);
     CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
+    CMD4(CCC_Integer, "r_rt_gi_spatial_samples", &ps_r_rt_gi_spatial_samples, 0, 16);
+    CMD4(CCC_Float, "r_rt_gi_spatial_radius", &ps_r_rt_gi_spatial_radius, 1.0f, 128.0f);
+    CMD4(CCC_Integer, "r_rt_gi_m_max", &ps_r_rt_gi_m_max, 1, 100);
+    CMD4(CCC_Integer, "r_rt_gi_local_samples", &ps_r_rt_gi_local_samples, 0, 16);
+    CMD4(CCC_Integer, "r_rt_di_candidates", &ps_r_rt_di_candidates, 1, 64);
+    CMD4(CCC_Integer, "r_rt_di_spatial_samples", &ps_r_rt_di_spatial_samples, 0, 16);
+    CMD4(CCC_Float, "r_rt_di_spatial_radius", &ps_r_rt_di_spatial_radius, 1.0f, 128.0f);
+    CMD4(CCC_Integer, "r_rt_di_m_max", &ps_r_rt_di_m_max, 1, 100);
+    CMD4(CCC_Integer, "r_rt_gi_atrous_steps", &ps_r_rt_gi_atrous_steps, 1, 6);
+    CMD4(CCC_Float, "r_rt_gi_temporal_alpha", &ps_r_rt_gi_temporal_alpha, 0.0f, 0.98f);
+    CMD4(CCC_Float, "r_rt_gi_ambient_scale", &ps_r_rt_gi_ambient_scale, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_rt_gi_bounces", &ps_r_rt_gi_bounces, 1, 2);
+    CMD4(CCC_Integer, "r_rt_gi_cache_size", &ps_r_rt_gi_cache_size, 0, 1048576);
+    CMD4(CCC_Float, "r_rt_gi_cache_cell", &ps_r_rt_gi_cache_cell, 0.05f, 8.0f);
+    CMD4(CCC_Integer, "r_rt_vol_steps", &ps_r_rt_vol_steps, 0, 64);
+    CMD4(CCC_Integer, "r_rt_vol_light_samples", &ps_r_rt_vol_light_samples, 0, 8);
 
     CMD4(CCC_Integer, "r_taa", &ps_r_taa, 0, 1);
     CMD4(CCC_Float, "r_taa_sharpness", &ps_r_taa_sharpness, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_taa_jitter", &ps_r_taa_jitter, 0, 1);
+    CMD4(CCC_Float, "r_render_scale", &ps_r_render_scale, 0.25f, 1.0f);
+    CMD4(CCC_Integer, "r_upscale", &ps_r_upscale, 0, 2);
+    CMD4(CCC_Integer, "r_upscale_quality", &ps_r_upscale_quality, 0, 5);
+    CMD4(CCC_Integer, "r_fsr_fg", &ps_r_fsr_fg, 0, 1);
+    CMD4(CCC_Float, "r_fsr_sharpness", &ps_r_fsr_sharpness, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_dlss", &ps_r_dlss, 0, 1);
+    CMD4(CCC_Integer, "r_dlss_quality", &ps_r_dlss_quality, 0, 5);
+    CMD4(CCC_Integer, "r_dlss_fg", &ps_r_dlss_fg, 0, 1);
+    CMD4(CCC_Integer, "r_dlss_rr", &ps_r_dlss_rr, 0, 1);
+    CMD4(CCC_Float, "r_dlss_sharpness", &ps_r_dlss_sharpness, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_dlss_auto_exposure", &ps_r_dlss_auto_exposure, 0, 1);
+    CMD4(CCC_Integer, "r_reflex", &ps_r_reflex, 0, 2);
+    CMD4(CCC_Integer, "r_denoise", &ps_r_denoise, 0, 1);
+    CMD4(CCC_Integer, "r_nrd_method", &ps_r_nrd_method, 0, 1);
+    CMD4(CCC_Integer, "r_nrd_apply", &ps_r_nrd_apply, 0, 1);
+    CMD4(CCC_Integer, "r_amd_rr", &ps_r_amd_rr, 0, 1);
+    CMD4(CCC_Integer, "r_ffx_denoiser", &ps_r_ffx_denoiser, 0, 1);
     CMD4(CCC_Integer, "r_bloom", &ps_r_bloom, 0, 1);
     CMD4(CCC_Integer, "r_cas", &ps_r_cas, 0, 1);
     CMD4(CCC_Float, "r_cas_sharpness", &ps_r_cas_sharpness, 0.0f, 1.0f);
@@ -1008,7 +1147,19 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_hiz_occlusion", &ps_r_hiz_occlusion, 0, 1);
     CMD4(CCC_Integer, "r_shadow_light_cull", &ps_r_shadow_light_cull, 0, 1);
     CMD4(CCC_Integer, "r_local_shadows", &ps_r_local_shadows, 0, 1);
-    CMD4(CCC_Integer, "r_local_shadow_tiles", &ps_r_local_shadow_tiles, 1, 16);
+    CMD4(CCC_Integer, "r_shadow_hzb", &ps_r_shadow_hzb, 0, 1);
+    CMD4(CCC_Integer, "r_shadow_mask", &ps_r_shadow_mask, 0, 1);
+    CMD4(CCC_Integer, "r_local_shadow_tiles", &ps_r_local_shadow_tiles, 1, 512);
+    CMD4(CCC_Integer, "r_local_shadow_update_div", &ps_r_local_shadow_update_div, 1, 8);
+    CMD4(CCC_Integer, "r_local_shadow_redraw_budget", &ps_r_local_shadow_redraw_budget, 1, 128);
+    CMD4(CCC_Integer, "r_local_shadow_skinned_max", &ps_r_local_shadow_skinned_max, 0, 256);
+    CMD4(CCC_Float, "r_local_shadow_near", &ps_r_local_shadow_near, 1.f, 100.f);
+    CMD4(CCC_Float, "r_local_shadow_mid", &ps_r_local_shadow_mid, 5.f, 200.f);
+    CMD4(CCC_Integer, "r_local_shadow_far_period", &ps_r_local_shadow_far_period, 1, 30);
+    CMD4(CCC_Integer, "r_local_shadow_atlas", &ps_r_local_shadow_atlas, 1024, 8192);
+    CMD4(CCC_Integer, "r_local_shadow_filter", &ps_r_local_shadow_filter, 0, 1);
+    CMD4(CCC_Integer, "r_cluster_debug", &ps_r_cluster_debug, 0, 2);
+    CMD4(CCC_Integer, "r_cluster_tile_size", &ps_r_cluster_tile_size, 32, 64);
     CMD4(CCC_Integer, "r_shadow_indoor_near_only", &ps_r_shadow_indoor_near_only, 0, 1);
     CMD4(CCC_Integer, "r_portal_cull", &ps_r_portal_cull, 0, 1);
     CMD4(CCC_Integer, "r_hom", &ps_r_hom, 0, 1);
@@ -1022,11 +1173,23 @@ void xrRender_initconsole()
 
     CMD4(CCC_Integer, "r_sky_ibl", &ps_r_sky_ibl, 0, 1);
     CMD4(CCC_Float, "r_sky_ibl_intensity", &ps_r_sky_ibl_intensity, 0.0f, 4.0f);
+    CMD4(CCC_Integer, "r_ibl_prefilter", &ps_r_ibl_prefilter, 0, 1);
+    CMD4(CCC_Integer, "r_ibl_probe_auto", &ps_r_ibl_probe_auto, 0, 1);
+    CMD4(CCC_Float, "r_ibl_probe_radius", &ps_r_ibl_probe_radius, 2.0f, 64.0f);
+#if RENDER == R_R4
+    CMD1(CCC_IBLProbeAdd, "r_ibl_probe_add");
+    CMD1(CCC_IBLProbeClear, "r_ibl_probe_clear");
+    CMD1(CCC_IBLProbeCapture, "r_ibl_probe_capture");
+#endif
     CMD4(CCC_Integer, "r_foliage_sss", &ps_r_foliage_sss, 0, 1);
     CMD4(CCC_Float, "r_foliage_sss_intensity", &ps_r_foliage_sss_intensity, 0.0f, 4.0f);
     CMD4(CCC_Integer, "r_ssgi", &ps_r_ssgi, 0, 1);
     CMD4(CCC_Integer, "r_ssgi_quality", &ps_r_ssgi_quality, 1, 3);
     CMD4(CCC_Float, "r_ssgi_intensity", &ps_r_ssgi_intensity, 0.0f, 4.0f);
+    CMD4(CCC_Integer, "r_sssss", &ps_r_sssss, 0, 1);
+    CMD4(CCC_Float, "r_sssss_width", &ps_r_sssss_width, 0.1f, 4.0f);
+    CMD4(CCC_Float, "r_sssss_strength", &ps_r_sssss_strength, 0.0f, 2.0f);
+    CMD4(CCC_Integer, "r_sssss_debug", &ps_r_sssss_debug, 0, 1);
 
     // Smoke Trail (weapon muzzle smoke)
     CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);

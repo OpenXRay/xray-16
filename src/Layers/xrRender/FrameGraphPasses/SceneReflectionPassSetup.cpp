@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render::fg::passes
 {
@@ -15,15 +16,57 @@ struct SceneReflectionCaptureData
     VirtualResourceHandle src;
     VirtualResourceHandle dst;
 };
+
+nvrhi::TextureHandle EnsureSceneReflectionTexture(
+    nvrhi::IDevice* nvDevice,
+    SceneReflectionPassState& state,
+    u32 width,
+    u32 height)
+{
+    if (!nvDevice || width == 0 || height == 0)
+        return nullptr;
+
+    if (state.texture && state.width == width && state.height == height)
+        return state.texture;
+
+    nvrhi::TextureDesc desc;
+    desc.width = width;
+    desc.height = height;
+    desc.format = nvrhi::Format::RGBA16_FLOAT;
+    desc.isRenderTarget = true;
+    desc.isShaderResource = true;
+    desc.debugName = "rt_SceneReflection";
+    desc.initialState = nvrhi::ResourceStates::ShaderResource;
+    desc.keepInitialState = true;
+
+    state.texture = nvDevice->createTexture(desc);
+    state.width = width;
+    state.height = height;
+    if (!state.texture)
+    {
+        Msg("! [SceneReflection] Failed to create rt_SceneReflection %ux%u RGBA16F",
+            width, height);
+        state.width = 0;
+        state.height = 0;
+    }
+    return state.texture;
+}
 } // namespace
 
 VirtualResourceHandle setupSceneReflectionCapture(
     FrameGraph& fg,
+    fg::RenderDevice* device,
     VirtualResourceHandle litSceneColor,
     u32 width,
-    u32 height)
+    u32 height,
+    SceneReflectionPassState& state)
 {
-    if (!litSceneColor.is_valid() || width == 0 || height == 0)
+    if (!litSceneColor.is_valid() || width == 0 || height == 0 || !device)
+        return litSceneColor;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    nvrhi::ITexture* phys = EnsureSceneReflectionTexture(nvDevice, state, width, height).Get();
+    if (!phys)
         return litSceneColor;
 
     ResourceDesc desc;
@@ -32,10 +75,9 @@ VirtualResourceHandle setupSceneReflectionCapture(
     desc.height = height;
     desc.format = nvrhi::Format::RGBA16_FLOAT;
     desc.isRenderTarget = true;
-    // Must NOT be transient — aliasing reused normal/worldPos memory → green/purple SSR
     desc.isTransient = false;
     desc.debugName = "rt_SceneReflection";
-    auto dst = fg.CreateTexture("rt_SceneReflection", desc);
+    auto dst = fg.ImportTexture("rt_SceneReflection", phys, desc);
 
     (void)fg.addCallbackPass<SceneReflectionCaptureData>(
         "SceneReflectionCapture",

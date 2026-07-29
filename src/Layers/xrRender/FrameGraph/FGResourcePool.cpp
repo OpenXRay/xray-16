@@ -70,13 +70,18 @@ void FGResourcePool::FreeTexture(resources::TextureHandle handle) {
         return;
     }
 
-    // Add to pool for potential reuse
+    if (meta->state == resources::TextureState::Failed || !meta->nvrhiTexture)
+    {
+        m_resourceManager->GetTextureManager()->Release(handle);
+        if (m_stats.texturesActive > 0)
+            m_stats.texturesActive--;
+        return;
+    }
+
     if (m_aliasingEnabled) {
-        // Check if this texture is already in the pool
         bool foundInPool = false;
         for (auto& pooled : m_texturePool) {
             if (pooled.handle.index == handle.index && pooled.handle.generation == handle.generation) {
-                // Already in pool - just mark as available
                 pooled.inUse = false;
                 pooled.lastUsedFrame = m_currentFrame;
                 foundInPool = true;
@@ -84,7 +89,6 @@ void FGResourcePool::FreeTexture(resources::TextureHandle handle) {
             }
         }
 
-        // If not in pool, add it
         if (!foundInPool) {
             PooledTexture pooled;
             pooled.handle = handle;
@@ -96,7 +100,6 @@ void FGResourcePool::FreeTexture(resources::TextureHandle handle) {
         }
 
     } else {
-        // Aliasing disabled - actually destroy
         m_resourceManager->GetTextureManager()->Release(handle);
         m_stats.texturesActive--;
     }
@@ -152,7 +155,10 @@ bool FGResourcePool::AreTexturesCompatible(
            a.height == b.height &&
            a.format == b.format &&
            a.mipLevels == b.mipLevels &&
-           a.arraySize == b.arraySize;
+           a.arraySize == b.arraySize &&
+           a.isUAV == b.isUAV &&
+           a.isRenderTarget == b.isRenderTarget &&
+           a.isDepthStencil == b.isDepthStencil;
 }
 
 // ═══════════════════════════════════════════════════

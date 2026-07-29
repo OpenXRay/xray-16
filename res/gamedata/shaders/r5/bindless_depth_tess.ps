@@ -1,0 +1,26 @@
+#include "bindless_common.h"
+#include "common_samplers.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+    float hemi : TEXCOORD6;
+};
+
+void main(PS_INPUT input)
+{
+    MaterialData mat = g_Materials[input.materialID];
+    if ((mat.flags & MAT_FLAG_ALPHA_TEST) != 0)
+    {
+        if (mat.diffuseIndex == INVALID_TEXTURE_INDEX)
+            return;
+        float alpha = GetBindlessTexture(mat.diffuseIndex).Sample(smp_linear, input.texcoord).a;
+        clip(alpha - mat.alphaRef);
+    }
+}

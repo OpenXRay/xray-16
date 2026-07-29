@@ -2,6 +2,7 @@
 #include "SSRPassSetup.h"
 #include "ShaderConstants.h"
 #include "PassCommon.h"
+#include "IBLPrefilterPassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
@@ -18,7 +19,7 @@ using namespace framegraph;
 
 namespace
 {
-constexpr u32 kSSRPipeVersion = 43;
+constexpr u32 kSSRPipeVersion = 72;
 
 struct SSRQualityParams
 {
@@ -27,45 +28,63 @@ struct SSRQualityParams
     float thickness;
     float refine;
     float blurIntensity;
+    float blurKernel;
+    float enableNearMarch;
+    float enableBlurRefine;
 };
 
 SSRQualityParams QualityFromConsole()
 {
     switch (std::clamp(ps_r_ssr_quality, 1, 4))
     {
-    case 1: return {16.f, 80.f, 1.50f, 2.f, 0.70f};
-    case 2: return {24.f, 120.f, 1.25f, 4.f, 0.85f};
-    case 3: return {32.f, 160.f, 1.00f, 6.f, 1.00f};
-    default: return {48.f, 220.f, 0.85f, 8.f, 1.00f};
+    case 1: return {16.f, 80.f, 1.50f, 2.f, 1.25f, 3.f, 0.f, 0.f};
+    case 2: return {24.f, 120.f, 1.25f, 4.f, 1.35f, 4.f, 0.f, 0.f};
+    case 3: return {32.f, 160.f, 1.00f, 6.f, 1.45f, 5.f, 1.f, 1.f};
+    default: return {48.f, 220.f, 0.85f, 8.f, 1.55f, 6.f, 1.f, 1.f};
     }
 }
 
-void EnsureSSRBuffer(nvrhi::IDevice* nv, SSRPassState& st, u32 w, u32 h)
+void EnsureSSRBuffer(nvrhi::IDevice* nv, SSRPassState& st, u32 fullW, u32 fullH, u32 traceW, u32 traceH)
 {
-    if (st.history[0] && st.history[1] && st.outputTex && st.blurTex &&
-        st.historyW == w && st.historyH == h)
+    const bool needTrace = !st.history[0] || !st.history[1] || !st.blurTex ||
+        st.historyW != traceW || st.historyH != traceH;
+    const bool needOut = !st.outputTex || st.outputW != fullW || st.outputH != fullH;
+    if (!needTrace && !needOut)
         return;
+
     nvrhi::TextureDesc td;
-    td.width = w;
-    td.height = h;
     td.format = nvrhi::Format::RGBA16_FLOAT;
     td.isRenderTarget = true;
     td.isShaderResource = true;
     td.initialState = nvrhi::ResourceStates::ShaderResource;
     td.keepInitialState = true;
-    td.debugName = "rt_SSR_History0";
-    st.history[0] = nv->createTexture(td);
-    td.debugName = "rt_SSR_History1";
-    st.history[1] = nv->createTexture(td);
-    td.debugName = "rt_SSR_Output";
-    st.outputTex = nv->createTexture(td);
-    td.debugName = "rt_SSR_BlurPersist";
-    st.blurTex = nv->createTexture(td);
-    st.historyW = w;
-    st.historyH = h;
-    st.historyIndex = 0;
-    st.historyNeedsClear = true;
-    st.hasHistory = false;
+
+    if (needOut)
+    {
+        td.width = fullW;
+        td.height = fullH;
+        td.debugName = "rt_SSR_Output";
+        st.outputTex = nv->createTexture(td);
+        st.outputW = fullW;
+        st.outputH = fullH;
+    }
+
+    if (needTrace)
+    {
+        td.width = traceW;
+        td.height = traceH;
+        td.debugName = "rt_SSR_History0";
+        st.history[0] = nv->createTexture(td);
+        td.debugName = "rt_SSR_History1";
+        st.history[1] = nv->createTexture(td);
+        td.debugName = "rt_SSR_BlurPersist";
+        st.blurTex = nv->createTexture(td);
+        st.historyW = traceW;
+        st.historyH = traceH;
+        st.historyIndex = 0;
+        st.historyNeedsClear = true;
+        st.hasHistory = false;
+    }
 }
 
 void DrawSSRFullscreen(
@@ -114,23 +133,26 @@ void InitSSR(nvrhi::IDevice* nv, SSRPassState& st)
     auto vs = loader->LoadVertexShader("fullscreen");
     auto ps = loader->LoadPixelShader("ssr_resolve");
     auto psBlur = loader->LoadPixelShader("ssr_blur");
+    auto psTemp = loader->LoadPixelShader("ssr_temporal");
     auto psApply = loader->LoadPixelShader("ssr_apply");
-    if (!vs.handle || !ps.handle || !psBlur.handle || !psApply.handle ||
-        !vs.reflection || !ps.reflection || !psBlur.reflection || !psApply.reflection)
+    if (!vs.handle || !ps.handle || !psBlur.handle || !psTemp.handle || !psApply.handle ||
+        !vs.reflection || !ps.reflection || !psBlur.reflection || !psTemp.reflection || !psApply.reflection)
     {
-        Msg("! [SSR] Shader load failed (resolve=%d blur=%d apply=%d) — will retry",
-            !!ps.handle, !!psBlur.handle, !!psApply.handle);
+        Msg("! [SSR] Shader load failed (resolve=%d blur=%d temp=%d apply=%d) — will retry",
+            !!ps.handle, !!psBlur.handle, !!psTemp.handle, !!psApply.handle);
         st.initialized = false;
         return;
     }
 
     auto& cache = GetPassResourceCache();
     st.layout = cache.GetOrCreateBindingLayoutFromReflection(
-        "SSRResolve_v45", *vs.reflection, *ps.reflection, nv);
+        "SSRResolve_v71", *vs.reflection, *ps.reflection, nv);
     st.blurLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "SSRBlur_v45", *vs.reflection, *psBlur.reflection, nv);
+        "SSRBlur_v71", *vs.reflection, *psBlur.reflection, nv);
+    st.temporalLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "SSRTemporal_v71", *vs.reflection, *psTemp.reflection, nv);
     st.applyLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "SSRApply_v45", *vs.reflection, *psApply.reflection, nv);
+        "SSRApply_v72_MetalWet", *vs.reflection, *psApply.reflection, nv);
 
     auto makeSingle = [&](auto& psSh, nvrhi::BindingLayoutHandle layout,
                           nvrhi::GraphicsPipelineHandle& pipe, const char* name) {
@@ -153,17 +175,18 @@ void InitSSR(nvrhi::IDevice* nv, SSRPassState& st)
         pipe = cache.GetOrCreatePipeline(name, desc, fb, nv);
     };
 
-    makeSingle(ps, st.layout, st.pipeline, "SSRResolve_v45");
-    makeSingle(psBlur, st.blurLayout, st.blurPipeline, "SSRBlur_v45");
-    makeSingle(psApply, st.applyLayout, st.applyPipeline, "SSRApply_v45");
+    makeSingle(ps, st.layout, st.pipeline, "SSRResolve_v71");
+    makeSingle(psBlur, st.blurLayout, st.blurPipeline, "SSRBlur_v71");
+    makeSingle(psTemp, st.temporalLayout, st.temporalPipeline, "SSRTemporal_v71");
+    makeSingle(psApply, st.applyLayout, st.applyPipeline, "SSRApply_v72_MetalWet");
 
     st.initialized = true;
     st.pipeVersion = kSSRPipeVersion;
-    if (st.pipeline && st.blurPipeline && st.applyPipeline)
-        Msg("* [SSR] initialized v45 (SSR dim sky + NPC face sheen)");
+    if (st.pipeline && st.blurPipeline && st.temporalPipeline && st.applyPipeline)
+        Msg("* [SSR] initialized v72 (SSR∪RT metal/wet)");
     else
-        Msg("! [SSR] Pipeline create failed (resolve=%d blur=%d apply=%d)",
-            !!st.pipeline, !!st.blurPipeline, !!st.applyPipeline);
+        Msg("! [SSR] Pipeline create failed (resolve=%d blur=%d temp=%d apply=%d)",
+            !!st.pipeline, !!st.blurPipeline, !!st.temporalPipeline, !!st.applyPipeline);
 }
 } // namespace
 
@@ -187,6 +210,7 @@ VirtualResourceHandle setupSSRPass(
 
     InitSSR(device->GetNVRHIDevice(), state);
     if (!state.pipeline || !state.layout || !state.blurPipeline || !state.blurLayout ||
+        !state.temporalPipeline || !state.temporalLayout ||
         !state.applyPipeline || !state.applyLayout)
     {
         static bool s_loggedPipe = false;
@@ -203,14 +227,20 @@ VirtualResourceHandle setupSSRPass(
     if (!depth.is_valid())
         return sceneColor;
 
-    EnsureSSRBuffer(device->GetNVRHIDevice(), state, width, height);
+    const int quality = std::clamp(ps_r_ssr_quality, 1, 4);
+#if !defined(XR_PLATFORM_APPLE)
+    const bool halfRes = quality < 4;
+#else
+    const bool halfRes = false;
+#endif
+    const u32 tw = halfRes ? std::max(1u, width / 2) : width;
+    const u32 th = halfRes ? std::max(1u, height / 2) : height;
+
+    EnsureSSRBuffer(device->GetNVRHIDevice(), state, width, height, tw, th);
     if (!state.outputTex || !state.blurTex || !state.history[0] || !state.history[1])
         return sceneColor;
     (void)hasPrevFrame;
-    (void)motionVectors;
-    (void)worldPos;
 
-    // Persistent imported RTs — never FG-aliased (CreateTexture non-transient was not enough).
     ResourceDesc outDesc;
     outDesc.type = ResourceDesc::Type::Texture2D;
     outDesc.width = width;
@@ -223,6 +253,8 @@ VirtualResourceHandle setupSSRPass(
     auto output = fg.ImportTexture("rt_SSR", state.outputTex.Get(), outDesc);
 
     ResourceDesc blurDesc = outDesc;
+    blurDesc.width = tw;
+    blurDesc.height = th;
     blurDesc.debugName = "rt_SSR_Blur";
     auto blurRT = fg.ImportTexture("rt_SSR_Blur", state.blurTex.Get(), blurDesc);
 
@@ -231,7 +263,7 @@ VirtualResourceHandle setupSSRPass(
     {
         const u32 writeIdx = state.historyIndex & 1u;
         const u32 readIdx = (writeIdx ^ 1u);
-        ResourceDesc ssrDesc = outDesc;
+        ResourceDesc ssrDesc = blurDesc;
         ssrDesc.debugName = "rt_SSR_Buffer";
         ssrBuf = fg.ImportTexture("rt_SSR_Buffer", state.history[writeIdx].Get(), ssrDesc);
         ssrDesc.debugName = "rt_SSR_History";
@@ -240,11 +272,14 @@ VirtualResourceHandle setupSSRPass(
 
     struct PassData
     {
-        VirtualResourceHandle color, reflection, depth, normal, base, ssr, hist, blur, output;
-        u32 width, height;
+        VirtualResourceHandle color, reflection, depth, normal, base, worldPos, motion, ssr, hist, blur, output;
+        u32 width, height, tw, th;
+        int quality = 2;
         SSRPassState* st = nullptr;
         fg::RenderDevice* device = nullptr;
         bool hasHistory = false;
+        bool hasWorldPos = false;
+        bool hasMotion = false;
     };
 
     auto& pd = fg.addCallbackPass<PassData>(
@@ -255,12 +290,21 @@ VirtualResourceHandle setupSSRPass(
             data.device = device;
             data.width = width;
             data.height = height;
+            data.tw = tw;
+            data.th = th;
+            data.quality = quality;
             data.hasHistory = state.hasHistory && !state.historyNeedsClear;
             data.color = pb.read(sceneColor, ResourceState::ShaderResource);
             data.reflection = pb.read(reflectionColor, ResourceState::ShaderResource);
             data.depth = pb.read(depth, ResourceState::ShaderResource);
             data.normal = pb.read(normal, ResourceState::ShaderResource);
             data.base = pb.read(baseColor, ResourceState::ShaderResource);
+            data.hasWorldPos = worldPos.is_valid();
+            if (data.hasWorldPos)
+                data.worldPos = pb.read(worldPos, ResourceState::ShaderResource);
+            data.hasMotion = motionVectors.is_valid();
+            if (data.hasMotion)
+                data.motion = pb.read(motionVectors, ResourceState::ShaderResource);
             data.hist = pb.read(ssrHist, ResourceState::ShaderResource);
             data.ssr = pb.write(ssrBuf, ResourceState::RenderTarget);
             data.blur = pb.write(blurRT, ResourceState::RenderTarget);
@@ -275,6 +319,8 @@ VirtualResourceHandle setupSSRPass(
             auto* depthTex = graph.GetPhysicalTexture(data.depth);
             auto* normalTex = graph.GetPhysicalTexture(data.normal);
             auto* baseTex = graph.GetPhysicalTexture(data.base);
+            auto* worldPosTex = data.hasWorldPos ? graph.GetPhysicalTexture(data.worldPos) : nullptr;
+            auto* motionTex = data.hasMotion ? graph.GetPhysicalTexture(data.motion) : nullptr;
             auto* histTex = graph.GetPhysicalTexture(data.hist);
             auto* out = graph.GetPhysicalTexture(data.output);
             auto* ssrTex = graph.GetPhysicalTexture(data.ssr);
@@ -288,6 +334,21 @@ VirtualResourceHandle setupSSRPass(
             if (!loader)
                 return;
 
+            auto* vsR = loader->GetCachedReflection("fullscreen", ".vs");
+            auto* psR = loader->GetCachedReflection("ssr_resolve", ".ps");
+            auto* psBlurR = loader->GetCachedReflection("ssr_blur", ".ps");
+            auto* psApplyR = loader->GetCachedReflection("ssr_apply", ".ps");
+            auto* psTempR = loader->GetCachedReflection("ssr_temporal", ".ps");
+            if (!vsR || !psR || !psBlurR || !psTempR || !psApplyR)
+            {
+                cmd->setTextureState(color, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+                cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+                cmd->copyTexture(out, nvrhi::TextureSlice(), color, nvrhi::TextureSlice());
+                cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                return;
+            }
+
+#if defined(XR_PLATFORM_APPLE)
             const auto& rdesc = reflection->getDesc();
             if (!data.st->colorCopy ||
                 data.st->colorCopy->getDesc().width != rdesc.width ||
@@ -310,12 +371,6 @@ VirtualResourceHandle setupSSRPass(
                 cmd->setTextureState(reflection, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
             }
 
-            auto* vsR = loader->GetCachedReflection("fullscreen", ".vs");
-            auto* psR = loader->GetCachedReflection("ssr_resolve", ".ps");
-            auto* psBlurR = loader->GetCachedReflection("ssr_blur", ".ps");
-            auto* psApplyR = loader->GetCachedReflection("ssr_apply", ".ps");
-
-            // Lit scene copy for apply SRV (must NOT be the same texture as `out`)
             const auto& cdesc = color->getDesc();
             if (!data.st->litCopy ||
                 data.st->litCopy->getDesc().width != cdesc.width ||
@@ -337,7 +392,6 @@ VirtualResourceHandle setupSSRPass(
                 cmd->setTextureState(data.st->litCopy, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
             }
 
-            // Depth → typeless SRV copy (same as water SSR on Metal/MoltenVK)
             {
                 const auto& ddesc = depthTex->getDesc();
                 if (!data.st->depthCopy ||
@@ -363,21 +417,42 @@ VirtualResourceHandle setupSSRPass(
                     cmd->setTextureState(data.st->depthCopy, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
                 }
             }
+#else
+            nvrhi::ITexture* sceneColorSrv = reflection;
+            nvrhi::ITexture* litSrv = (color != out) ? color : nullptr;
+            if (!litSrv)
+            {
+                const auto& cdesc = color->getDesc();
+                if (!data.st->litCopy ||
+                    data.st->litCopy->getDesc().width != cdesc.width ||
+                    data.st->litCopy->getDesc().height != cdesc.height)
+                {
+                    nvrhi::TextureDesc td = cdesc;
+                    td.debugName = "SSR_LitCopy";
+                    td.isRenderTarget = true;
+                    td.isShaderResource = true;
+                    td.initialState = nvrhi::ResourceStates::ShaderResource;
+                    td.keepInitialState = true;
+                    data.st->litCopy = nv->createTexture(td);
+                }
+                if (data.st->litCopy)
+                {
+                    cmd->setTextureState(color, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+                    cmd->setTextureState(data.st->litCopy, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+                    cmd->copyTexture(data.st->litCopy, nvrhi::TextureSlice(), color, nvrhi::TextureSlice());
+                    cmd->setTextureState(data.st->litCopy, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                    litSrv = data.st->litCopy;
+                }
+                else
+                    litSrv = color;
+            }
+#endif
 
-            // Fallback: scene already in out if resolve/apply fail
-            cmd->setTextureState(color, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
-            cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
-            cmd->copyTexture(out, nvrhi::TextureSlice(), color, nvrhi::TextureSlice());
             cmd->setTextureState(color, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+            cmd->setTextureState(reflection, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
             cmd->setTextureState(depthTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
             cmd->setTextureState(normalTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
             cmd->setTextureState(baseTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
-
-            if (!vsR || !psR || !psBlurR || !psApplyR)
-            {
-                cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
-                return;
-            }
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB(
                 "Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
@@ -392,15 +467,15 @@ VirtualResourceHandle setupSSRPass(
             {
                 float cutoff, intensity, hasHistory, frameIndex;
                 float marchSteps, marchDistance, marchThickness, refineSteps;
-                float pad0, pad1, pad2, pad3;
+                float enableNearMarch, pad1, pad2, pad3;
             };
             PCB p{
-                0.65f, 0.95f,
+                0.65f, 1.25f,
                 data.hasHistory ? 1.f : 0.f,
                 float(Device.dwFrame & 1023),
                 q.steps, q.distance, q.thickness, q.refine,
-                0.f, 0.f, 0.f, 0.f};
-            auto* ssrCB = cache.GetOrCreateVolatileCB("SSR", "SSRParams_v45", sizeof(PCB), data.device);
+                q.enableNearMarch, 0.f, 0.f, 0.f};
+            auto* ssrCB = cache.GetOrCreateVolatileCB("SSR", "SSRParams_v71", sizeof(PCB), data.device);
             if (ssrCB)
                 cmd->writeBuffer(ssrCB, &p, sizeof(p));
 
@@ -414,12 +489,11 @@ VirtualResourceHandle setupSSRPass(
                 td.keepInitialState = true;
                 s_zeroMotion = nv->createTexture(td);
             }
+            nvrhi::ITexture* motionSrv = motionTex ? motionTex : s_zeroMotion.Get();
 
-            nvrhi::ITexture* sky0 = nullptr;
-            nvrhi::ITexture* sky1 = nullptr;
-            ResolveEnvSkyCubes(data.device, sky0, sky1);
-            if (!sky0) sky0 = cache.GetDummyCubeMap(nv);
-            if (!sky1) sky1 = sky0;
+            const auto& ibl = GetCurrentIBLBindResources();
+            nvrhi::ITexture* sky0 = ibl.spec0 ? ibl.spec0 : cache.GetDummyCubeMap(nv);
+            nvrhi::ITexture* sky1 = ibl.spec1 ? ibl.spec1 : sky0;
 
             nvrhi::ITexture* histSrv = histTex ? histTex : cache.GetDummyContactHistory(nv);
             if (data.st->historyNeedsClear && histSrv)
@@ -428,25 +502,41 @@ VirtualResourceHandle setupSSRPass(
                 data.st->historyNeedsClear = false;
             }
 
-            static int s_ssrLog = 0;
-            if ((s_ssrLog++ % 300) == 0)
-                Msg("* [SSR] exec v45 resolve→blur→apply");
+#if defined(XR_PLATFORM_APPLE)
+            nvrhi::ITexture* sceneColorSrv = data.st->colorCopy ? data.st->colorCopy.Get() : reflection;
+            nvrhi::ITexture* litSrv = data.st->litCopy ? data.st->litCopy.Get() : color;
+            nvrhi::ITexture* depthSrv = data.st->depthCopy ? data.st->depthCopy.Get() : depthTex;
+#else
+            nvrhi::ITexture* depthSrv = depthTex;
+#endif
 
-            // 1) Resolve
             cmd->clearTextureFloat(ssrTex, nvrhi::AllSubresources, nvrhi::Color(0.f));
             {
-                nvrhi::ITexture* depthSrv = data.st->depthCopy ? data.st->depthCopy.Get() : depthTex;
                 BindingSetBuilder bsb(*vsR, *psR, nv, "SSR.Resolve");
                 if (staticGlobalsCB)
                     bsb.ConstantBuffer("static_globals", staticGlobalsCB);
                 if (ssrCB)
                     bsb.ConstantBuffer("SSRParams", ssrCB);
-                bsb.Texture("g_Color", data.st->litCopy ? data.st->litCopy.Get() : color)
+                static nvrhi::TextureHandle s_zeroWorldPos;
+                if (!s_zeroWorldPos)
+                {
+                    nvrhi::TextureDesc td;
+                    td.width = 1;
+                    td.height = 1;
+                    td.format = nvrhi::Format::RGBA16_FLOAT;
+                    td.initialState = nvrhi::ResourceStates::ShaderResource;
+                    td.keepInitialState = true;
+                    td.debugName = "SSR_DummyWorldPos";
+                    s_zeroWorldPos = nv->createTexture(td);
+                }
+                nvrhi::ITexture* wpSrv = worldPosTex ? worldPosTex : s_zeroWorldPos.Get();
+                bsb.Texture("g_Color", litSrv)
                     .Texture("g_Normal", normalTex)
                     .Texture("g_Base", baseTex)
                     .Texture("g_History", histSrv)
-                    .Texture("g_Motion", s_zeroMotion)
-                    .Texture("g_SceneColor", data.st->colorCopy)
+                    .Texture("g_WorldPos", wpSrv)
+                    .Texture("g_Motion", motionSrv)
+                    .Texture("g_SceneColor", sceneColorSrv)
                     .Texture("g_SceneDepth", depthSrv)
                     .Texture("s_env0", sky0)
                     .Texture("s_env1", sky1);
@@ -459,29 +549,25 @@ VirtualResourceHandle setupSSRPass(
                         Msg("! [SSR] Resolve binding failed — scene passthrough");
                         s_loggedBind = true;
                     }
-                    // Never leave rt_SSR unwritten (transient-era footgun).
-                    nvrhi::ITexture* litSrc = data.st->litCopy ? data.st->litCopy.Get() : color;
-                    if (litSrc && out)
+                    if (litSrv && out)
                     {
-                        cmd->setTextureState(litSrc, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+                        cmd->setTextureState(litSrv, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
                         cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
-                        cmd->copyTexture(out, nvrhi::TextureSlice(), litSrc, nvrhi::TextureSlice());
+                        cmd->copyTexture(out, nvrhi::TextureSlice(), litSrv, nvrhi::TextureSlice());
                     }
                     cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
                     return;
                 }
-                DrawSSRFullscreen(cmd, nv, data.st->pipeline, set, ssrTex, data.width, data.height, "SSR_Resolve_v45");
+                DrawSSRFullscreen(cmd, nv, data.st->pipeline, set, ssrTex, data.tw, data.th, "SSR_Resolve_v71");
                 cmd->setTextureState(ssrTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
             }
 
-            // 2) Bilateral denoise
-            struct alignas(16) BlurCB { float texelX, texelY, blurIntensity, pad; };
-            BlurCB bcb{1.f / float(data.width), 1.f / float(data.height), q.blurIntensity, 0.f};
-            auto* blurCB = cache.GetOrCreateVolatileCB("SSR", "BlurParams_v45", sizeof(BlurCB), data.device);
+            struct alignas(16) BlurCB { float texelX, texelY, blurIntensity, blurKernel; };
+            BlurCB bcb{1.f / float(data.tw), 1.f / float(data.th), q.blurIntensity, q.blurKernel};
+            auto* blurCB = cache.GetOrCreateVolatileCB("SSR", "BlurParams_v71", sizeof(BlurCB), data.device);
             if (blurCB)
                 cmd->writeBuffer(blurCB, &bcb, sizeof(bcb));
             {
-                nvrhi::ITexture* depthSrv = data.st->depthCopy ? data.st->depthCopy.Get() : depthTex;
                 BindingSetBuilder bsb(*vsR, *psBlurR, nv, "SSR.Blur");
                 if (blurCB)
                     bsb.ConstantBuffer("SSRBlurParams", blurCB);
@@ -490,7 +576,7 @@ VirtualResourceHandle setupSSRPass(
                     .Texture("g_Normal", normalTex);
                 auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.st->blurLayout, nv);
                 if (set)
-                    DrawSSRFullscreen(cmd, nv, data.st->blurPipeline, set, blurTex, data.width, data.height, "SSR_Blur_v45");
+                    DrawSSRFullscreen(cmd, nv, data.st->blurPipeline, set, blurTex, data.tw, data.th, "SSR_Blur_v71");
                 else
                 {
                     cmd->setTextureState(ssrTex, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
@@ -500,30 +586,77 @@ VirtualResourceHandle setupSSRPass(
                 cmd->setTextureState(blurTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
             }
 
-            // Store blurred SSR into history write slot for next frame temporal hold
+            nvrhi::ITexture* ssrForApply = blurTex;
             {
-                cmd->setTextureState(blurTex, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
-                cmd->setTextureState(ssrTex, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
-                cmd->copyTexture(ssrTex, nvrhi::TextureSlice(), blurTex, nvrhi::TextureSlice());
-                cmd->setTextureState(ssrTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
-                cmd->setTextureState(blurTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                struct alignas(16) TempCB { float sx, sy, hasHistory, pad; };
+                TempCB tcb{
+                    float(data.tw), float(data.th),
+                    data.hasHistory ? 1.f : 0.f, 0.f};
+                auto* tempCB = cache.GetOrCreateVolatileCB("SSR", "TemporalParams_v71", sizeof(TempCB), data.device);
+                if (tempCB)
+                    cmd->writeBuffer(tempCB, &tcb, sizeof(tcb));
+                BindingSetBuilder bsb(*vsR, *psTempR, nv, "SSR.Temporal");
+                if (tempCB)
+                    bsb.ConstantBuffer("SSRTemporalParams", tempCB);
+                bsb.Texture("g_Current", blurTex)
+                    .Texture("g_History", histSrv)
+                    .Texture("g_Depth", depthSrv)
+                    .Texture("g_Motion", motionSrv);
+                auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.st->temporalLayout, nv);
+                if (set)
+                {
+                    DrawSSRFullscreen(cmd, nv, data.st->temporalPipeline, set, ssrTex, data.tw, data.th, "SSR_Temporal_v71");
+                    cmd->setTextureState(ssrTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                    ssrForApply = ssrTex;
+                }
+                else
+                {
+                    cmd->setTextureState(blurTex, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+                    cmd->setTextureState(ssrTex, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+                    cmd->copyTexture(ssrTex, nvrhi::TextureSlice(), blurTex, nvrhi::TextureSlice());
+                    cmd->setTextureState(ssrTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                    ssrForApply = ssrTex;
+                }
                 data.st->historyIndex ^= 1u;
                 data.st->hasHistory = true;
             }
 
-            // 3) Apply: read litCopy, write out — never the same texture
+            if (q.enableBlurRefine > 0.5f && ssrForApply == ssrTex)
             {
-                nvrhi::ITexture* litSrc = data.st->litCopy ? data.st->litCopy.Get() : color;
+                BlurCB bcb2{1.f / float(data.tw), 1.f / float(data.th), q.blurIntensity * 0.85f, q.blurKernel};
+                auto* blurCB2 = cache.GetOrCreateVolatileCB("SSR", "BlurParams2_v71", sizeof(BlurCB), data.device);
+                if (blurCB2)
+                    cmd->writeBuffer(blurCB2, &bcb2, sizeof(bcb2));
+                BindingSetBuilder bsb(*vsR, *psBlurR, nv, "SSR.BlurRefine");
+                if (blurCB2)
+                    bsb.ConstantBuffer("SSRBlurParams", blurCB2);
+                bsb.Texture("g_SSR", ssrTex)
+                    .Texture("g_Depth", depthSrv)
+                    .Texture("g_Normal", normalTex);
+                auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.st->blurLayout, nv);
+                if (set)
+                {
+                    DrawSSRFullscreen(cmd, nv, data.st->blurPipeline, set, blurTex, data.tw, data.th, "SSR_BlurRefine_v71");
+                    cmd->setTextureState(blurTex, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                    ssrForApply = blurTex;
+                }
+            }
+
+            {
                 BindingSetBuilder bsb(*vsR, *psApplyR, nv, "SSR.Apply");
-                bsb.Texture("g_Color", litSrc).Texture("g_SSR", blurTex);
+                bsb.Texture("g_Color", litSrv)
+                    .Texture("g_SSR", ssrForApply)
+                    .Texture("g_Base", baseTex)
+                    .Texture("g_Normal", normalTex)
+                    .Texture("g_WorldPos", worldPosTex ? worldPosTex : cache.GetDummyContactHistory(nv));
                 auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.st->applyLayout, nv);
                 if (set)
-                    DrawSSRFullscreen(cmd, nv, data.st->applyPipeline, set, out, data.width, data.height, "SSR_Apply_v45");
-                else if (litSrc && out)
+                    DrawSSRFullscreen(cmd, nv, data.st->applyPipeline, set, out, data.width, data.height, "SSR_Apply_v72");
+                else if (litSrv && out)
                 {
-                    cmd->setTextureState(litSrc, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+                    cmd->setTextureState(litSrv, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
                     cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
-                    cmd->copyTexture(out, nvrhi::TextureSlice(), litSrc, nvrhi::TextureSlice());
+                    cmd->copyTexture(out, nvrhi::TextureSlice(), litSrv, nvrhi::TextureSlice());
                 }
                 cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
             }

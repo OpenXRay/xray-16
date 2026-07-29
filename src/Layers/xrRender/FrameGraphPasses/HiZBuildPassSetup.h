@@ -89,7 +89,9 @@ HiZPyramidOutput setupHiZBuildPass(
     framegraph::VirtualResourceHandle depthInput,
     u32 width,
     u32 height,
-    HiZBuildPassState& state
+    HiZBuildPassState& state,
+    const char* resourceName = "rt_HiZPyramid",
+    const char* passName = "Hi-Z Build"
 );
 
 // Get number of mip levels for given dimensions

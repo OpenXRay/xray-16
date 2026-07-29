@@ -35,7 +35,7 @@ void TerrainMaterialBuffer::Initialize(fg::RenderDevice* device)
     defaultMat.normalXG_Index = INVALID_TEXTURE_INDEX;
     defaultMat.normalXB_Index = INVALID_TEXTURE_INDEX;
     defaultMat.normalXA_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.detailScale = 4.0f;
+    defaultMat.detailScale = 1.0f; // Classic TextureDescr / dt_params default
 
     m_data.resize(MAX_TERRAIN_MATERIALS);
     for (auto& mat : m_data)

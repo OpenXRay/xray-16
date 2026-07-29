@@ -20,6 +20,9 @@ struct TAAPassState
     u32 historyIndex = 0;
     bool hasHistory = false;
     bool initialized = false;
+    Fvector prevCameraPos = {0, 0, 0};
+    Fvector prevCameraDir = {0, 0, 1};
+    bool hasCameraHistory = false;
 };
 
 struct alignas(16) TAAParamsCB

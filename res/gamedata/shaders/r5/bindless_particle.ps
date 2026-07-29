@@ -1,6 +1,7 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
+#include "shared/surface_marks.h"
 
 Texture2D<float4> g_SceneWorldPos : register(t1);
 
@@ -32,19 +33,18 @@ PS_OUTPUT main(PS_INPUT input)
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
     float4 result = diffuseSample * input.color;
 
-    // Classic SET uses aref 200; BLEND uses near-zero so soft-particle fade can run.
     clip(result.a - mat.alphaRef);
 
-    // camera_direction.w = r2_soft_particles (FillGlobalConstants)
-    if (camera_direction.w > 0.5)
+    if (camera_direction.w > 0.5 && !(mat.flags & MAT_FLAG_PARTICLE_HARD))
     {
         float4 sceneWP = g_SceneWorldPos.Load(int3((int2)input.hpos.xy, 0));
+        if (IsHudSurfMark(sceneWP.w))
+            discard;
         if (sceneWP.w > 0.5)
         {
             float3 viewDir = camera_direction.xyz;
             float sceneViewZ = dot(sceneWP.xyz - eye_position, viewDir);
             float particleViewZ = dot(input.worldPos - eye_position, viewDir);
-            // Classic r3/particle.ps soft depth fade
             float spaceDepth = sceneViewZ - particleViewZ - DEPTH_EPSILON;
             if (spaceDepth < -2 * DEPTH_EPSILON)
                 spaceDepth = 100000.0;
@@ -52,6 +52,24 @@ PS_OUTPUT main(PS_INPUT input)
             result.a *= soft;
             result.rgb *= soft;
         }
+    }
+
+    // tessMethod: 0=standard, 1=s-blend, 2=s-add, 3=s-aadd (GL particle_s-* color math)
+    if (mat.tessMethod == 1)
+    {
+        float3 r = lerp(float3(1, 1, 1), result.rgb, result.a);
+        result = float4(r, 1.0);
+    }
+    else if (mat.tessMethod == 2)
+    {
+        float3 r = float3(1, 1, 1) - result.rgb - result.rgb * result.rgb;
+        result = float4(r, 1.0);
+    }
+    else if (mat.tessMethod == 3)
+    {
+        float3 c = result.rgb * result.a;
+        float3 r = float3(1, 1, 1) - c + c * c;
+        result = float4(r, 1.0);
     }
 
     output.color = result;

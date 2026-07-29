@@ -76,10 +76,15 @@ struct VariantPartitionDrawConfig
     nvrhi::IBuffer* megaVertexBuffer = nullptr;
     nvrhi::ITexture* shadowMapArray = nullptr;
     nvrhi::ITexture* shadowCascades[3] = {};
+    nvrhi::ITexture* shadowHZB[3] = {};
     nvrhi::ITexture* localShadowAtlas = nullptr;
+    nvrhi::ITexture* localShadowESM = nullptr;
+    nvrhi::ITexture* contactHistory = nullptr;
+    nvrhi::ITexture* shadowMask = nullptr;
     nvrhi::ITexture* envSky0 = nullptr;
     nvrhi::ITexture* envSky1 = nullptr;
     nvrhi::IBuffer* lightDataBuffer = nullptr;
+    nvrhi::IBuffer* shadowDataBuffer = nullptr;
     nvrhi::IBuffer* clusterGridBuffer = nullptr;
     nvrhi::IBuffer* lightIndexListBuffer = nullptr;
     VariantPartitionConfig partition;

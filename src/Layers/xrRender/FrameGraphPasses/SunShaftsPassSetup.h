@@ -7,6 +7,7 @@
 namespace xray::render::framegraph
 {
 class FrameGraph;
+struct ExtractedReflection;
 }
 
 namespace xray::render::fg
@@ -19,11 +20,15 @@ namespace xray::render::fg::passes
 
 struct SunShaftsPassState
 {
-    nvrhi::GraphicsPipelineHandle pipeline;       // half-res march (shafts-only)
+    nvrhi::GraphicsPipelineHandle pipeline;
     nvrhi::BindingLayoutHandle layout;
-    nvrhi::GraphicsPipelineHandle combinePipeline; // full-res upsample + add to scene
+    nvrhi::GraphicsPipelineHandle combinePipeline;
     nvrhi::BindingLayoutHandle combineLayout;
+    framegraph::ExtractedReflection* marchVsReflection = nullptr;
+    framegraph::ExtractedReflection* marchPsReflection = nullptr;
+    framegraph::ExtractedReflection* combinePsReflection = nullptr;
     bool initialized = false;
+    u32 pipeVersion = 0;
 };
 
 framegraph::VirtualResourceHandle setupSunShaftsPass(
@@ -40,5 +45,7 @@ framegraph::VirtualResourceHandle setupSunShaftsPass(
     nvrhi::ITexture* const* shadowCascades = nullptr);
 
 void InitializeSunShaftsPass(nvrhi::IDevice* device, SunShaftsPassState& state);
+
+float ResolveSunShaftsIntensity();
 
 } // namespace xray::render::fg::passes

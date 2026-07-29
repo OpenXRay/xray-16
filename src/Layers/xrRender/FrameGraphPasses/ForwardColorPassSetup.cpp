@@ -1,6 +1,7 @@
 // xrRender/FrameGraphPasses/ForwardColorPassSetup.cpp
 #include "stdafx.h"
 #include "ForwardColorPassSetup.h"
+#include "IBLPrefilterPassSetup.h"
 #include "ShaderConstants.h"  // CB layout definitions and FillGlobalConstants/FillDynamicTransforms
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
@@ -62,7 +63,7 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
 
     auto& cache = framegraph::GetPassResourceCache();
 
-    state.bindlessLayout = cache.GetOrCreateBindingLayoutFromReflection("ForwardColor_PBR_v3_CSMLadder", *vsResult.reflection, *psResult.reflection, nvDevice);
+    state.bindlessLayout = cache.GetOrCreateBindingLayoutFromReflection("ForwardColor_PBR_v4_TranspCB", *vsResult.reflection, *psResult.reflection, nvDevice);
 
     u32 attrCount = 0;
     auto* attrs = GetUnifiedVertexAttributes(attrCount);
@@ -95,7 +96,7 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-    state.bindlessPipeline = cache.GetOrCreatePipeline("ForwardColor_PBR_v3_CSMLadder", pipeDesc, fbInfo, nvDevice);
+    state.bindlessPipeline = cache.GetOrCreatePipeline("ForwardColor_PBR_v4_TranspCB", pipeDesc, fbInfo, nvDevice);
     if (!state.bindlessPipeline) {
         Msg("! [BindlessForward] Failed to create pipeline");
         return;
@@ -237,6 +238,12 @@ static void renderBindlessForward(
         cmdList->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
     }
 
+    auto transparentDrawCB = cache.GetOrCreateVolatileCB("Frame", "TransparentDrawCB", 16, device);
+    {
+        u32 passMode[4] = { 0, 0, 0, 0 };
+        cmdList->writeBuffer(transparentDrawCB, passMode, sizeof(passMode));
+    }
+
     auto lightingData = FillLightingConstants();
     cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
 
@@ -282,6 +289,27 @@ static void renderBindlessForward(
             : passCache.GetDummyShadowMap(nvDevice);
         if (localAtlas)
             bsb.Texture("g_LocalShadowAtlas", localAtlas);
+        nvrhi::ITexture* localEsm = config.localShadowESM
+            ? config.localShadowESM
+            : passCache.GetDummyLocalShadowESM(nvDevice);
+        if (localEsm)
+            bsb.Texture("g_LocalShadowESM", localEsm);
+        static const char* kHzb[3] = {"g_ShadowHZB0", "g_ShadowHZB1", "g_ShadowHZB2"};
+        nvrhi::ITexture* dummyHzb = passCache.GetDummyContactDepth(nvDevice);
+        for (u32 i = 0; i < 3; ++i)
+        {
+            nvrhi::ITexture* hz = config.shadowHZB[i] ? config.shadowHZB[i] : dummyHzb;
+            if (hz)
+                bsb.Texture(kHzb[i], hz);
+        }
+    };
+
+    auto bindShadowMask = [&](framegraph::BindingSetBuilder& bsb) {
+        nvrhi::ITexture* shadowMask = config.shadowMask
+            ? config.shadowMask
+            : passCache.GetDummyContactHistory(nvDevice);
+        if (shadowMask)
+            bsb.Texture("g_ShadowMask", shadowMask);
     };
 
     auto bindSkyCubes = [&](framegraph::BindingSetBuilder& bsb) {
@@ -289,19 +317,29 @@ static void renderBindlessForward(
             bsb.Texture("s_env0", sky0);
         if (sky1)
             bsb.Texture("s_env1", sky1);
+        IBLBindResources ibl{};
+        ibl.brdfLut = config.envBrdfLut;
+        ibl.shBuffer = config.envSkySH;
+        ibl.probeBuffer = config.envProbes;
+        ibl.probeCubeArray = config.envProbeCubes;
+        BindIBLResources(bsb, ibl, nvDevice);
     };
 
     auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
         framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "ForwardColor");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-        bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+        bsb.ConstantBuffer("TransparentDrawCB", transparentDrawCB);
+        BindBindlessMaterialTables(bsb);
         bsb.BufferSRV("g_InstanceData", set.instanceBuffer);
         bsb.BufferSRV("g_CompactBatchIndices", set.compactBatchIndicesBuffer);
         bsb.BufferSRV("g_CompactMaterialIDs", set.compactMaterialIDBuffer);
         bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
+        if (clm.GetShadowDataBuffer())
+            bsb.BufferSRV("g_ShadowData", clm.GetShadowDataBuffer());
         bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
         bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
         bindShadowMap(bsb);
+        bindShadowMask(bsb);
         bindSkyCubes(bsb);
 
         auto bs = passCache.GetOrCreateBindingSet(bsb.Build(), ps.bindlessLayout, nvDevice);
@@ -333,10 +371,9 @@ static void renderBindlessForward(
         return;
     }
 
-    // Equal-depth after prepass was rejected: VS path mismatch (depth vs forward)
-    // fails ComparisonFunc::Equal on MoltenVK → black indoor geometry / no torch.
-    // Keep LessOrEqual; DepthPrepass still fills Hi-Z for overdraw rejection.
     nvrhi::IGraphicsPipeline* opaquePipe = ps.bindlessPipeline.Get();
+    if (config.useEqualDepth && ps.bindlessEqualPipeline)
+        opaquePipe = ps.bindlessEqualPipeline.Get();
 
     nvrhi::GraphicsState state;
     state.pipeline = opaquePipe;
@@ -403,13 +440,20 @@ static void renderBindlessForward(
         vpCfg.megaVertexBuffer = config.megaVertexBuffer;
         vpCfg.shadowMapArray = shadowTex;
         for (u32 i = 0; i < 3; ++i)
+        {
             vpCfg.shadowCascades[i] = config.shadowCascades[i];
+            vpCfg.shadowHZB[i] = config.shadowHZB[i];
+        }
         vpCfg.localShadowAtlas = config.localShadowAtlas;
+        vpCfg.localShadowESM = config.localShadowESM;
+        vpCfg.contactHistory = config.contactHistory;
+        vpCfg.shadowMask = config.shadowMask;
         vpCfg.envSky0 = sky0;
         vpCfg.envSky1 = sky1;
         {
             auto& clmVp = ClusteredLightManager::Instance();
             vpCfg.lightDataBuffer = clmVp.GetLightDataBuffer();
+            vpCfg.shadowDataBuffer = clmVp.GetShadowDataBuffer();
             vpCfg.clusterGridBuffer = clmVp.GetClusterGridBuffer();
             vpCfg.lightIndexListBuffer = clmVp.GetLightIndexListBuffer();
         }
@@ -418,7 +462,7 @@ static void renderBindlessForward(
 
         DrawVariantPartition(cmdList, nvDevice, framebuffer, state, vpCfg);
 
-        state.pipeline = ps.bindlessPipeline;
+        state.pipeline = opaquePipe;
         state.vertexBuffers = {
             {config.megaVertexBuffer, 0, 0},
             {drawIndexBuffer, 1, 0}
@@ -428,66 +472,77 @@ static void renderBindlessForward(
     }
     drawSet(config.dynamicSet);
 
-    // Tessellation: PatchList PSO + direct drawIndexed (CPU frustum).
-    // Avoid DrawIndexedIndirect+tess — MoltenVK freezes on some camera angles.
-    // Apple/MoltenVK: hard-disabled — Metal tess temp buffers can kernel-panic
-    // (IOGPUGroupMemory::remove_memory_object) regardless of the console flag.
+            // Tessellation: PatchList PSO + direct drawIndexed (CPU frustum).
+            // Avoid DrawIndexedIndirect+tess — MoltenVK/Vulkan freezes on some camera angles.
+            // Apple/MoltenVK: hard-disabled — Metal tess temp buffers can kernel-panic
+            // (IOGPUGroupMemory::remove_memory_object) regardless of the console flag.
 #if defined(XR_PLATFORM_APPLE)
-    const bool tessEnabled = false;
+            const bool tessEnabled = false;
 #else
-    const bool tessEnabled = ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
+            const bool tessEnabled = ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
 #endif
-    if (tessEnabled && ps.bindlessTessPipeline &&
-        config.tessObjectCount > 0 && config.tessDrawArgs && config.tessObjects &&
-        config.tessMaterialIDBuffer && config.tessBatchIndicesBuffer && config.tessInstanceBuffer)
-    {
-        framegraph::BindingSetBuilder tessBsb(*vsReflection, *psReflection, nvDevice, "ForwardColor.Tess");
-        tessBsb.ConstantBuffer("static_globals", staticGlobalsCB);
-        tessBsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-        tessBsb.BufferSRV("g_InstanceData", config.tessInstanceBuffer);
-        tessBsb.BufferSRV("g_CompactBatchIndices", config.tessBatchIndicesBuffer);
-        tessBsb.BufferSRV("g_CompactMaterialIDs", config.tessMaterialIDBuffer);
-        tessBsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
-        tessBsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
-        tessBsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
-        bindShadowMap(tessBsb);
-        bindSkyCubes(tessBsb);
-
-        auto tessBindingSet = passCache.GetOrCreateBindingSet(tessBsb.Build(), ps.bindlessLayout, nvDevice);
-        if (tessBindingSet)
-        {
-            state.pipeline = ps.bindlessTessPipeline;
-            state.bindings = { tessBindingSet };
-            if (bindlessTable)
-                state.addBindingSet(bindlessTable);
-            state.indirectParams = nullptr;
-            state.indirectCountBuffer = nullptr;
-            cmdList->setGraphicsState(state);
-
-            // No CPU frustum here: bounds for some model batches are unreliable,
-            // and exclusive tess routing would hide the whole mesh if culled.
-            for (u32 i = 0; i < config.tessObjectCount; ++i)
+            if (tessEnabled && ps.bindlessTessPipeline &&
+                config.tessObjectCount > 0 && config.tessDrawArgs && config.tessObjects &&
+                config.tessMaterialIDBuffer && config.tessBatchIndicesBuffer && config.tessInstanceBuffer)
             {
-                const auto& args = config.tessDrawArgs[i];
-                if (args.indexCountPerInstance == 0)
-                    continue;
+                framegraph::BindingSetBuilder tessBsb(*vsReflection, *psReflection, nvDevice, "ForwardColor.Tess");
+                tessBsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                tessBsb.ConstantBuffer("TransparentDrawCB", transparentDrawCB);
+                BindBindlessMaterialTables(tessBsb);
+                tessBsb.BufferSRV("g_InstanceData", config.tessInstanceBuffer);
+                tessBsb.BufferSRV("g_CompactBatchIndices", config.tessBatchIndicesBuffer);
+                tessBsb.BufferSRV("g_CompactMaterialIDs", config.tessMaterialIDBuffer);
+                tessBsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
+                if (clm.GetShadowDataBuffer())
+                    tessBsb.BufferSRV("g_ShadowData", clm.GetShadowDataBuffer());
+                tessBsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
+                tessBsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+                bindShadowMap(tessBsb);
+                bindShadowMask(tessBsb);
+                bindSkyCubes(tessBsb);
 
-                nvrhi::DrawArguments da;
-                da.vertexCount = args.indexCountPerInstance;
-                da.instanceCount = 1;
-                da.startIndexLocation = args.startIndexLocation;
-                da.startVertexLocation = args.baseVertexLocation;
-                da.startInstanceLocation = i;
-                cmdList->drawIndexed(da);
+                auto tessBindingSet = passCache.GetOrCreateBindingSet(tessBsb.Build(), ps.bindlessLayout, nvDevice);
+                if (tessBindingSet)
+                {
+                    state.pipeline = ps.bindlessTessPipeline;
+                    state.bindings = { tessBindingSet };
+                    if (bindlessTable)
+                        state.addBindingSet(bindlessTable);
+                    state.indirectParams = nullptr;
+                    state.indirectCountBuffer = nullptr;
+                    cmdList->setGraphicsState(state);
+
+                    // Soft frustum cull: PatchList amplification is expensive and has
+                    // caused view-angle freezes; skip batches clearly outside the view.
+                    CFrustum tessFrustum;
+                    tessFrustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+
+                    for (u32 i = 0; i < config.tessObjectCount; ++i)
+                    {
+                        const auto& args = config.tessDrawArgs[i];
+                        if (args.indexCountPerInstance == 0)
+                            continue;
+
+                        const auto& obj = config.tessObjects[i];
+                        if (!tessFrustum.testSphere_dirty(obj.position, obj.radius * 1.15f))
+                            continue;
+
+                        nvrhi::DrawArguments da;
+                        da.vertexCount = args.indexCountPerInstance;
+                        da.instanceCount = 1;
+                        da.startIndexLocation = args.startIndexLocation;
+                        da.startVertexLocation = args.baseVertexLocation;
+                        da.startInstanceLocation = i;
+                        cmdList->drawIndexed(da);
+                    }
+
+                    state.pipeline = opaquePipe;
+                }
+                else
+                {
+                    Msg("! [ForwardColor] Tess binding set create failed — skip tess draws");
+                }
             }
-
-            state.pipeline = opaquePipe;
-        }
-        else
-        {
-            Msg("! [ForwardColor] Tess binding set create failed — skip tess draws");
-        }
-    }
 
     // ═══════════════════════════════════════════════════════
     //  TERRAIN RENDERING (4-layer detail blending)
@@ -507,17 +562,19 @@ static void renderBindlessForward(
                           config.terrainCompactDrawArgsBuffer && config.terrainCompactCountBuffer,
                 "Terrain buffers not ready for compaction rendering");
 
-            // Create terrain binding set (includes TerrainMaterialBuffer at t9)
-            // NOTE: Terrain uses its own instance/batch buffers, not the regular ones
+            // Terrain PS includes bindless_common.h → layout needs t8/t9/t10 even if
+            // only g_TerrainMaterials is sampled (same issue as DetailPass).
             auto* terrainVsRefl = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
             auto* terrainPsRefl = shaderLoader->GetCachedReflection("bindless_terrain", ".ps");
             framegraph::BindingSetBuilder terrainBsb(*terrainVsRefl, *terrainPsRefl, nvDevice, "ForwardColor.Terrain");
             terrainBsb.ConstantBuffer("static_globals", staticGlobalsCB);
-            terrainBsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
+            BindBindlessMaterialTables(terrainBsb);
             terrainBsb.BufferSRV("g_InstanceData", config.terrainInstanceBuffer);
             terrainBsb.BufferSRV("g_CompactBatchIndices", config.terrainCompactBatchIndicesBuffer);
             terrainBsb.BufferSRV("g_CompactMaterialIDs", config.terrainCompactMaterialIDBuffer);
             terrainBsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
+            if (clm.GetShadowDataBuffer())
+                terrainBsb.BufferSRV("g_ShadowData", clm.GetShadowDataBuffer());
             terrainBsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
             terrainBsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
             bindShadowMap(terrainBsb);
@@ -530,8 +587,12 @@ static void renderBindlessForward(
             }
             else
             {
+                nvrhi::IGraphicsPipeline* terrainPipe = ps.terrainPipeline.Get();
+                if (config.useEqualDepth && ps.terrainEqualPipeline)
+                    terrainPipe = ps.terrainEqualPipeline.Get();
+
                 nvrhi::GraphicsState terrainState;
-                terrainState.pipeline = ps.terrainPipeline.Get();
+                terrainState.pipeline = terrainPipe;
                 terrainState.framebuffer = framebuffer;
                 terrainState.bindings = { terrainBindingSet };
 
@@ -623,6 +684,13 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             }
             if (bindlessConfig.localShadowHandle.is_valid()) {
                 passBuilder.read(bindlessConfig.localShadowHandle, ResourceState::ShaderResource);
+            }
+            for (u32 i = 0; i < 3; ++i) {
+                if (bindlessConfig.shadowHZBHandles[i].is_valid())
+                    passBuilder.read(bindlessConfig.shadowHZBHandles[i], ResourceState::ShaderResource);
+            }
+            if (bindlessConfig.shadowMaskHandle.is_valid()) {
+                passBuilder.read(bindlessConfig.shadowMaskHandle, ResourceState::ShaderResource);
             }
 
             data.outputs.albedo = data.color;

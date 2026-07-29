@@ -146,8 +146,7 @@ float4 main(PS_INPUT I) : SV_Target
     float2 uv = saturate(I.uv);
     float2 texel = 1.0 / max(screenSize, float2(1, 1));
 
-    // Stable temporal resolve (projection jitter disabled in ApplyTAAJitter).
-    float2 uvUnjitter = uv;
+    float2 uvUnjitter = uv - jitter / max(screenSize, float2(1, 1));
 
     float3 current = g_Current.SampleLevel(smp_rtlinear, saturate(uvUnjitter), 0).rgb;
     float depth = g_Depth.SampleLevel(smp_point, uv, 0).x;
@@ -155,15 +154,29 @@ float4 main(PS_INPUT I) : SV_Target
         return float4(current, 1.0);
 
     float2 motion = DilatedMotion(uv, texel);
+    float motionPx = length(motion * screenSize);
+    if (motionPx < 0.35)
+    {
+        motion = 0.0;
+        motionPx = 0.0;
+    }
     float2 histUV = uv + motion;
 
-    float motionPx = length(motion * screenSize);
     bool badMotion = motionPx > 48.0;
     bool outOfBounds = any(histUV < texel) || any(histUV > (1.0 - texel));
     if (badMotion || outOfBounds)
         return float4(current, 1.0);
 
-    float3 history = HistoryCatmullRom(saturate(histUV), texel);
+    float3 history = (motionPx < 1e-4)
+        ? g_History.SampleLevel(smp_rtlinear, uv, 0).rgb
+        : HistoryCatmullRom(saturate(histUV), texel);
+
+    {
+        float lumCur = max(dot(current, float3(0.3, 0.38, 0.22)), 1e-4);
+        float lumHist = max(dot(history, float3(0.3, 0.38, 0.22)), 1e-4);
+        float exposureScale = clamp(lumCur / lumHist, 0.5, 2.0);
+        history *= exposureScale;
+    }
 
     // Neighborhood in YCoCg (unjittered)
     float3 Neighborhood[9];

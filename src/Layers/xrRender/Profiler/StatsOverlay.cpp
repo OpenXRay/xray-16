@@ -517,6 +517,33 @@ void StatsOverlay::RenderGeometrySection()
         }
 
         // ═══════════════════════════════════════════════════
+        //  MDI / CLUSTER
+        // ═══════════════════════════════════════════════════
+        ImGui::Text("MDI draws: %u (maxCountSum %u)", s.mdiDrawCalls, s.mdiMaxDrawCountSum);
+        if (s.lightsClustered > 0)
+        {
+            ImGui::Text("Lights: %u clustered (HiZ vis %u)", s.lightsClustered, s.lightsHiZVisible);
+            ImGui::Indent();
+            if (s.lightsPoint > 0)
+                ImGui::BulletText("Point: %u", s.lightsPoint);
+            if (s.lightsSpot > 0)
+                ImGui::BulletText("Spot:  %u", s.lightsSpot);
+            if (s.lightsOmni > 0)
+                ImGui::BulletText("Omni:  %u", s.lightsOmni);
+            ImGui::Unindent();
+        }
+        if (s.localShadowTiles > 0 || s.localShadowCandidates > 0)
+        {
+            ImGui::Text("Local shadows: %u tiles (cand %u, drop %u, redraw %u)",
+                s.localShadowTiles, s.localShadowCandidates, s.localShadowDropped, s.localShadowRedraw);
+        }
+        if (s.fgSetupPassesMs > 0.f || s.fgCompileMs > 0.f)
+        {
+            ImGui::Text("FG SetupPasses: %s  Compile: %s",
+                FormatTime(s.fgSetupPassesMs, 0), FormatTime(s.fgCompileMs, 1));
+        }
+
+        // ═══════════════════════════════════════════════════
         //  SKINNING STATS
         // ═══════════════════════════════════════════════════
         if (s.skinnedMeshes > 0 || s.skinnedSubmitted > 0)

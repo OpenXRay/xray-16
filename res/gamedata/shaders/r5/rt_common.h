@@ -33,6 +33,38 @@ float2 GetHitUV(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
     return uv0 * w0 + uv1 * barycentrics.x + uv2 * barycentrics.y;
 }
 
+float2 GetHitLightmapUV(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
+                        RTBatchInfo info, uint primitiveIndex, float2 barycentrics)
+{
+    uint triBase = (info.startIndex + primitiveIndex * 3);
+    uint i0 = megaIB.Load(triBase * 4 + 0) + info.baseVertex;
+    uint i1 = megaIB.Load(triBase * 4 + 4) + info.baseVertex;
+    uint i2 = megaIB.Load(triBase * 4 + 8) + info.baseVertex;
+
+    float2 uv0 = asfloat(megaVB.Load2(i0 * 48 + 32));
+    float2 uv1 = asfloat(megaVB.Load2(i1 * 48 + 32));
+    float2 uv2 = asfloat(megaVB.Load2(i2 * 48 + 32));
+
+    float w0 = 1.0 - barycentrics.x - barycentrics.y;
+    return uv0 * w0 + uv1 * barycentrics.x + uv2 * barycentrics.y;
+}
+
+float GetHitHemi(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
+                 RTBatchInfo info, uint primitiveIndex, float2 barycentrics)
+{
+    uint triBase = (info.startIndex + primitiveIndex * 3);
+    uint i0 = megaIB.Load(triBase * 4 + 0) + info.baseVertex;
+    uint i1 = megaIB.Load(triBase * 4 + 4) + info.baseVertex;
+    uint i2 = megaIB.Load(triBase * 4 + 8) + info.baseVertex;
+
+    float h0 = float((megaVB.Load(i0 * 48 + 12) >> 24) & 0xFF) / 255.0;
+    float h1 = float((megaVB.Load(i1 * 48 + 12) >> 24) & 0xFF) / 255.0;
+    float h2 = float((megaVB.Load(i2 * 48 + 12) >> 24) & 0xFF) / 255.0;
+
+    float w0 = 1.0 - barycentrics.x - barycentrics.y;
+    return saturate(h0 * w0 + h1 * barycentrics.x + h2 * barycentrics.y);
+}
+
 float3 DecodePackedNormal(uint packed)
 {
     return float3(

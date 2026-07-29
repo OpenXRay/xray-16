@@ -42,10 +42,11 @@ inline const char* GetTextureTypeName(TextureType type) {
 // GPU-side material representation - must match HLSL exactly!
 // Uses SM6 bindless texture indices from ResourceDescriptorHeap
 //
-// Layout (48 bytes total):
+// Layout (64 bytes total):
 //   Bytes 0-15:  Texture descriptor indices (4× u32)
 //   Bytes 16-31: Material properties
 //   Bytes 32-47: Extended bump / tessellation
+//   Bytes 48-63: SSS map + pad
 
 struct alignas(16) MaterialData {
     // Descriptor heap indices (UINT32_MAX = invalid/not present)
@@ -65,8 +66,13 @@ struct alignas(16) MaterialData {
     u32 detailBumpIndex;   // s_detailBump
     u32 detailBumpXIndex;  // s_detailBumpX
     u32 tessMethod;        // 0=off, 1=PN, 2=HM, 3=PN+HM (CBlender_Compile)
+
+    u32 sssMapIndex;       // SSS thickness/strength map (R/G/B = thick/str/profile)
+    float emissiveIntensity;
+    u32 _pad1;
+    u32 _pad2;
 };
-static_assert(sizeof(MaterialData) == 48, "MaterialData must be 48 bytes for GPU alignment");
+static_assert(sizeof(MaterialData) == 64, "MaterialData must be 64 bytes for GPU alignment");
 
 // Material flags (must match HLSL)
 enum MaterialFlags : u32 {
@@ -84,7 +90,10 @@ enum MaterialFlags : u32 {
     MAT_FLAG_HAS_DETAIL_BUMP = (1 << 11), // Has detail bump pair
     MAT_FLAG_HAS_LMAP      = (1 << 12), // Terrain/object has lightmap (lmapIndex valid)
     MAT_FLAG_FOLIAGE       = (1 << 13), // Trees / bushes / leaves — subsurface scattering
-    MAT_FLAG_HAS_SSS_MAP   = (1 << 14), // detailBumpXIndex = SSS thickness (R), future hook
+    MAT_FLAG_PARTICLE_HARD = (1 << 16), // Disable soft-particle depth fade
+    MAT_FLAG_HAS_SSS_MAP   = (1 << 14), // sssMapIndex valid (R=thickness G=strength B=profile)
+    MAT_FLAG_MULTIPLY      = (1 << 15), // DestColor*SrcColor wall stains / burns
+    MAT_FLAG_GLASS         = (1 << 17), // Thin-glass transmission SSS profile
 };
 
 // ═══════════════════════════════════════════════════════

@@ -17,6 +17,12 @@ struct SunVertex {
     u32 color;
     float u, v;
 };
+
+struct CloudVertex {
+    Fvector3 position;
+    u32 dir;
+    u32 color;
+};
 #pragma pack(pop)
 
 struct TextVertex {
@@ -67,7 +73,15 @@ struct AdaptCB {
     float middleGrayX;
     float middleGrayY;
     float middleGrayZ;
-    float middleGrayW; // adaptation blend
+    float pad0;
+    float lowPercentile;
+    float highPercentile;
+    float adaptUp;
+    float adaptDown;
+    float evBias;
+    float deltaTime;
+    float pad1;
+    float pad2;
 };
 
 } // namespace xray::render::fg::passes

@@ -29,6 +29,7 @@ framegraph::VirtualResourceHandle setupBloomPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle sceneColor,
+    framegraph::VirtualResourceHandle depth,
     u32 width,
     u32 height,
     BloomPassState& state);

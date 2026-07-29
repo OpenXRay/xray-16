@@ -18,42 +18,80 @@ using namespace framegraph;
 
 namespace
 {
-void EnsureHistory(nvrhi::IDevice* nv, SSGIPassState& st, u32 w, u32 h)
+constexpr u32 kSSGIPipeVersion = 9;
+
+nvrhi::TextureHandle CreateRT(nvrhi::IDevice* nv, u32 w, u32 h, const char* name)
 {
-    if (st.history[0] && st.historyW == w && st.historyH == h)
-        return;
-    for (int i = 0; i < 2; ++i)
+    nvrhi::TextureDesc td;
+    td.width = w;
+    td.height = h;
+    td.format = nvrhi::Format::RGBA16_FLOAT;
+    td.isRenderTarget = true;
+    td.isShaderResource = true;
+    td.initialState = nvrhi::ResourceStates::ShaderResource;
+    td.keepInitialState = true;
+    td.debugName = name;
+    return nv->createTexture(td);
+}
+
+void EnsureTargets(nvrhi::IDevice* nv, SSGIPassState& st, u32 w, u32 h, u32 tw, u32 th)
+{
+    if (!st.outputTex || st.outputW != w || st.outputH != h)
     {
-        nvrhi::TextureDesc td;
-        td.width = w;
-        td.height = h;
-        td.format = nvrhi::Format::RGBA16_FLOAT;
-        td.isRenderTarget = true;
-        td.isShaderResource = true;
-        td.initialState = nvrhi::ResourceStates::ShaderResource;
-        td.keepInitialState = true;
-        td.debugName = (i == 0) ? "rt_SSGI_Hist0" : "rt_SSGI_Hist1";
-        st.history[i] = nv->createTexture(td);
+        st.outputTex = CreateRT(nv, w, h, "rt_SSGI_Out");
+        st.colorCopy = CreateRT(nv, w, h, "SSGI_ColorCopy");
+        st.outputW = w;
+        st.outputH = h;
     }
-    st.historyW = w;
-    st.historyH = h;
-    st.hasHistory = false;
-    st.historyIndex = 0;
+    if (!st.giTraceTex || st.historyW != tw || st.historyH != th)
+    {
+        st.giTraceTex = CreateRT(nv, tw, th, "rt_SSGI");
+        st.giBlurTex = CreateRT(nv, tw, th, "rt_SSGI_Blur");
+        st.giTemporalTex = CreateRT(nv, tw, th, "rt_SSGI_Temporal");
+        for (int i = 0; i < 2; ++i)
+            st.history[i] = CreateRT(nv, tw, th, (i == 0) ? "rt_SSGI_Hist0" : "rt_SSGI_Hist1");
+        st.historyW = tw;
+        st.historyH = th;
+        st.hasHistory = false;
+        st.historyIndex = 0;
+    }
 }
 
 void InitSSGI(nvrhi::IDevice* nv, SSGIPassState& st)
 {
-    if (st.initialized || !nv)
+    if (!nv)
         return;
-    auto* loader = GEnv.Render->GetShaderLoader();
-    if (!loader) { st.initialized = true; return; }
+    if (st.initialized && st.pipeVersion == kSSGIPipeVersion &&
+        st.tracePipeline && st.blurPipeline && st.applyPipeline)
+        return;
 
+    st.initialized = false;
+    st.pipeVersion = 0;
+    st.tracePipeline = nullptr;
+    st.blurPipeline = nullptr;
+    st.temporalPipeline = nullptr;
+    st.applyPipeline = nullptr;
+    st.traceLayout = nullptr;
+    st.blurLayout = nullptr;
+    st.temporalLayout = nullptr;
+    st.applyLayout = nullptr;
+
+    auto* loader = GEnv.Render->GetShaderLoader();
+    if (!loader)
+    {
+        st.initialized = true;
+        return;
+    }
+
+    BindingSetBuilder::InvalidateReflectionCache();
     auto vs = loader->LoadVertexShader("fullscreen");
     auto psTrace = loader->LoadPixelShader("ssgi_trace");
     auto psBlur = loader->LoadPixelShader("ssgi_blur");
     auto psTemporal = loader->LoadPixelShader("ssgi_temporal");
     auto psApply = loader->LoadPixelShader("ssgi_apply");
-    if (!vs.handle || !psTrace.handle || !psBlur.handle || !psTemporal.handle || !psApply.handle)
+    if (!vs.handle || !psTrace.handle || !psBlur.handle || !psTemporal.handle || !psApply.handle ||
+        !vs.reflection || !psTrace.reflection || !psBlur.reflection || !psTemporal.reflection ||
+        !psApply.reflection)
     {
         st.initialized = true;
         return;
@@ -64,7 +102,7 @@ void InitSSGI(nvrhi::IDevice* nv, SSGIPassState& st)
     fb.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
 
     auto makePipe = [&](const char* name, auto& ps, nvrhi::BindingLayoutHandle& layout,
-                        nvrhi::GraphicsPipelineHandle& pipe) {
+                        nvrhi::GraphicsPipelineHandle& pipe, bool additive) {
         layout = cache.GetOrCreateBindingLayoutFromReflection(
             name, *vs.reflection, *ps.reflection, nv);
         if (!layout)
@@ -73,25 +111,39 @@ void InitSSGI(nvrhi::IDevice* nv, SSGIPassState& st)
         desc.setVertexShader(vs.handle);
         desc.setPixelShader(ps.handle);
         desc.addBindingLayout(layout);
-        auto* backend = GEnv.Backend;
-        if (backend && backend->GetBindlessLayout())
-            desc.addBindingLayout(backend->GetBindlessLayout());
         desc.setPrimType(nvrhi::PrimitiveType::TriangleList);
-        desc.renderState.blendState.targets[0].setBlendEnable(false);
+        auto& bt = desc.renderState.blendState.targets[0];
+        if (additive)
+        {
+            bt.setBlendEnable(true);
+            bt.setSrcBlend(nvrhi::BlendFactor::One);
+            bt.setDestBlend(nvrhi::BlendFactor::One);
+            bt.setBlendOp(nvrhi::BlendOp::Add);
+            bt.setSrcBlendAlpha(nvrhi::BlendFactor::One);
+            bt.setDestBlendAlpha(nvrhi::BlendFactor::One);
+            bt.setBlendOpAlpha(nvrhi::BlendOp::Add);
+        }
+        else
+            bt.setBlendEnable(false);
         desc.renderState.depthStencilState.setDepthTestEnable(false);
         desc.renderState.depthStencilState.setDepthWriteEnable(false);
         desc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
         pipe = cache.GetOrCreatePipeline(name, desc, fb, nv);
     };
 
-    makePipe("SSGI_Trace_v2", psTrace, st.traceLayout, st.tracePipeline);
-    makePipe("SSGI_Blur_v2", psBlur, st.blurLayout, st.blurPipeline);
-    makePipe("SSGI_Temporal_v2", psTemporal, st.temporalLayout, st.temporalPipeline);
-    makePipe("SSGI_Apply_v2", psApply, st.applyLayout, st.applyPipeline);
+    makePipe("SSGI_Trace_v9", psTrace, st.traceLayout, st.tracePipeline, false);
+    makePipe("SSGI_Blur_v9", psBlur, st.blurLayout, st.blurPipeline, false);
+    makePipe("SSGI_Temporal_v9", psTemporal, st.temporalLayout, st.temporalPipeline, false);
+    makePipe("SSGI_Apply_v9", psApply, st.applyLayout, st.applyPipeline, false);
     st.initialized = true;
+    st.pipeVersion = kSSGIPipeVersion;
+    if (st.tracePipeline && st.blurPipeline && st.applyPipeline)
+        Msg("* [SSGI] initialized v9 (stable frame RNG, composite apply)");
+    else
+        Msg("! [SSGI] Pipeline create failed");
 }
 
-void DrawFullscreen(
+void DrawSSGIFullscreen(
     nvrhi::ICommandList* cmd,
     nvrhi::IDevice* nv,
     nvrhi::GraphicsPipelineHandle pipe,
@@ -110,8 +162,6 @@ void DrawFullscreen(
     gs.pipeline = pipe;
     gs.framebuffer = fb;
     gs.bindings = { set };
-    if (GEnv.Backend && GEnv.Backend->GetBindlessDescriptorTable())
-        gs.addBindingSet(GEnv.Backend->GetBindlessDescriptorTable());
     gs.viewport.addViewportAndScissorRect(nvrhi::Viewport(float(w), float(h)));
     cmd->setGraphicsState(gs);
     cmd->draw(nvrhi::DrawArguments().setVertexCount(3));
@@ -142,29 +192,14 @@ VirtualResourceHandle setupSSGIPass(
     const u32 tw = halfRes ? std::max(1u, width / 2) : width;
     const u32 th = halfRes ? std::max(1u, height / 2) : height;
 
-    EnsureHistory(device->GetNVRHIDevice(), state, tw, th);
+    EnsureTargets(device->GetNVRHIDevice(), state, width, height, tw, th);
+    if (!state.outputTex || !state.colorCopy || !state.giTraceTex || !state.giBlurTex)
+        return sceneColor;
+
     const u32 readIdx = state.historyIndex;
     const u32 writeIdx = 1u - readIdx;
     const bool useTemporal = state.temporalPipeline && motionVectors.is_valid() &&
         hasPrevFrame && state.hasHistory && state.history[0];
-
-    ResourceDesc giDesc;
-    giDesc.type = ResourceDesc::Type::Texture2D;
-    giDesc.width = tw;
-    giDesc.height = th;
-    giDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    giDesc.isRenderTarget = true;
-    giDesc.isTransient = true;
-    giDesc.debugName = "rt_SSGI";
-    auto giTrace = fg.CreateTexture("rt_SSGI", giDesc);
-
-    ResourceDesc blurDesc = giDesc;
-    blurDesc.debugName = "rt_SSGI_Blur";
-    auto giBlur = fg.CreateTexture("rt_SSGI_Blur", blurDesc);
-
-    ResourceDesc tempDesc = giDesc;
-    tempDesc.debugName = "rt_SSGI_Temporal";
-    auto giTemporal = fg.CreateTexture("rt_SSGI_Temporal", tempDesc);
 
     ResourceDesc outDesc;
     outDesc.type = ResourceDesc::Type::Texture2D;
@@ -172,18 +207,26 @@ VirtualResourceHandle setupSSGIPass(
     outDesc.height = height;
     outDesc.format = nvrhi::Format::RGBA16_FLOAT;
     outDesc.isRenderTarget = true;
-    outDesc.isTransient = true;
+    outDesc.isTransient = false;
+    outDesc.isImported = true;
     outDesc.debugName = "rt_SSGI_Out";
-    auto output = fg.CreateTexture("rt_SSGI_Out", outDesc);
+    auto output = fg.ImportTexture("rt_SSGI_Out", state.outputTex.Get(), outDesc);
+
+    ResourceDesc giDesc = outDesc;
+    giDesc.width = tw;
+    giDesc.height = th;
+    giDesc.debugName = "rt_SSGI";
+    auto giTrace = fg.ImportTexture("rt_SSGI", state.giTraceTex.Get(), giDesc);
+    giDesc.debugName = "rt_SSGI_Blur";
+    auto giBlur = fg.ImportTexture("rt_SSGI_Blur", state.giBlurTex.Get(), giDesc);
+    giDesc.debugName = "rt_SSGI_Temporal";
+    auto giTemporal = fg.ImportTexture("rt_SSGI_Temporal", state.giTemporalTex.Get(), giDesc);
 
     VirtualResourceHandle histRead{};
     if (useTemporal)
     {
-        ResourceDesc histDesc = giDesc;
-        histDesc.isTransient = false;
-        histDesc.isImported = true;
-        histDesc.debugName = "rt_SSGI_HistRead";
-        histRead = fg.ImportTexture("rt_SSGI_HistRead", state.history[readIdx].Get(), histDesc);
+        giDesc.debugName = "rt_SSGI_HistRead";
+        histRead = fg.ImportTexture("rt_SSGI_HistRead", state.history[readIdx].Get(), giDesc);
     }
 
     struct PassData
@@ -229,7 +272,7 @@ VirtualResourceHandle setupSSGIPass(
         },
         [](const PassData& data, const FrameGraph& graph, fg::RenderContext* ctx) {
             auto* cmd = ctx->GetCommandList();
-            auto* nv = cmd->getDevice();
+            auto* nv = cmd ? cmd->getDevice() : nullptr;
             auto* color = graph.GetPhysicalTexture(data.color);
             auto* depthTex = graph.GetPhysicalTexture(data.depth);
             auto* normalTex = graph.GetPhysicalTexture(data.normal);
@@ -238,27 +281,24 @@ VirtualResourceHandle setupSSGIPass(
             auto* giB = graph.GetPhysicalTexture(data.giBlur);
             auto* giTemp = graph.GetPhysicalTexture(data.giTemporal);
             auto* out = graph.GetPhysicalTexture(data.output);
-            if (!cmd || !nv || !color || !depthTex || !normalTex || !baseTex ||
-                !giT || !giB || !giTemp || !out || !data.st)
+            if (!cmd || !nv || !color || !out || !data.st || !data.st->colorCopy)
                 return;
 
-            const auto& cdesc = color->getDesc();
-            if (!data.st->colorCopy ||
-                data.st->colorCopy->getDesc().width != cdesc.width ||
-                data.st->colorCopy->getDesc().height != cdesc.height)
+            nvrhi::ITexture* sceneSrv = color;
+            if (color == out)
             {
-                nvrhi::TextureDesc td = cdesc;
-                td.debugName = "SSGI_ColorCopy";
-                td.isRenderTarget = true;
-                td.initialState = nvrhi::ResourceStates::ShaderResource;
-                td.keepInitialState = true;
-                data.st->colorCopy = nv->createTexture(td);
-            }
-            if (data.st->colorCopy)
                 cmd->copyTexture(data.st->colorCopy, nvrhi::TextureSlice(), color, nvrhi::TextureSlice());
+                cmd->setTextureState(data.st->colorCopy, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                sceneSrv = data.st->colorCopy;
+            }
+
+            if (!depthTex || !normalTex || !baseTex || !giT || !giB || !giTemp)
+                return;
 
             auto& cache = GetPassResourceCache();
             auto* loader = GEnv.Render->GetShaderLoader();
+            if (!loader)
+                return;
             auto* vsR = loader->GetCachedReflection("fullscreen", ".vs");
             auto* psTraceR = loader->GetCachedReflection("ssgi_trace", ".ps");
             auto* psBlurR = loader->GetCachedReflection("ssgi_blur", ".ps");
@@ -269,15 +309,21 @@ VirtualResourceHandle setupSSGIPass(
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB(
                 "Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            if (staticGlobalsCB)
+            {
+                StaticGlobals sg = BuildStaticGlobals();
+                cmd->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
+            }
 
             struct alignas(16) TraceCB
             {
                 float intensity, maxDistance, thickness, rayCount;
+                float frameIndex, p1, p2, p3;
             };
             float rays = (data.quality <= 1) ? 4.f : (data.quality == 2) ? 6.f : 8.f;
             float maxDist = (data.quality <= 1) ? 8.f : (data.quality == 2) ? 12.f : 18.f;
-            TraceCB tcb{ data.intensity, maxDist, 0.85f, rays };
-            auto* traceCB = cache.GetOrCreateVolatileCB("SSGI", "TraceParams", sizeof(TraceCB), data.device);
+            TraceCB tcb{ data.intensity, maxDist, 0.85f, rays, float(Device.dwFrame & 1023), 0, 0, 0 };
+            auto* traceCB = cache.GetOrCreateVolatileCB("SSGI", "TraceParams_v9", sizeof(TraceCB), data.device);
             if (traceCB)
                 cmd->writeBuffer(traceCB, &tcb, sizeof(tcb));
 
@@ -289,16 +335,17 @@ VirtualResourceHandle setupSSGIPass(
                     bsb.ConstantBuffer("SSGIParams", traceCB);
                 bsb.Texture("g_Normal", normalTex)
                     .Texture("g_Base", baseTex)
-                    .Texture("g_SceneColor", data.st->colorCopy)
+                    .Texture("g_SceneColor", sceneSrv)
                     .Texture("g_SceneDepth", depthTex);
                 auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.st->traceLayout, nv);
-                DrawFullscreen(cmd, nv, data.st->tracePipeline, set, giT, data.tw, data.th, "SSGI_Trace");
+                if (set)
+                    DrawSSGIFullscreen(cmd, nv, data.st->tracePipeline, set, giT, data.tw, data.th, "SSGI_Trace_v9");
                 cmd->setTextureState(giT, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
             }
 
             struct alignas(16) BlurCB { float texelX, texelY, p2, p3; };
             BlurCB bcb{ 1.f / float(data.tw), 1.f / float(data.th), 0, 0 };
-            auto* blurCB = cache.GetOrCreateVolatileCB("SSGI", "BlurParams", sizeof(BlurCB), data.device);
+            auto* blurCB = cache.GetOrCreateVolatileCB("SSGI", "BlurParams_v9", sizeof(BlurCB), data.device);
             if (blurCB)
                 cmd->writeBuffer(blurCB, &bcb, sizeof(bcb));
 
@@ -308,7 +355,8 @@ VirtualResourceHandle setupSSGIPass(
                     bsb.ConstantBuffer("SSGIBlurParams", blurCB);
                 bsb.Texture("g_SSGI", giT).Texture("g_Depth", depthTex);
                 auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.st->blurLayout, nv);
-                DrawFullscreen(cmd, nv, data.st->blurPipeline, set, giB, data.tw, data.th, "SSGI_Blur");
+                if (set)
+                    DrawSSGIFullscreen(cmd, nv, data.st->blurPipeline, set, giB, data.tw, data.th, "SSGI_Blur_v9");
                 cmd->setTextureState(giB, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
             }
 
@@ -335,9 +383,15 @@ VirtualResourceHandle setupSSGIPass(
                 }
                 if (hist && motionTex)
                 {
-                    struct alignas(16) TempCB { float sx, sy, hasHistory, pad; };
-                    TempCB tcb2{ float(data.tw), float(data.th), 1.f, 0.f };
-                    auto* tempCB = cache.GetOrCreateVolatileCB("SSGI", "TemporalParams", sizeof(TempCB), data.device);
+                    struct alignas(16) TempCB
+                    {
+                        float traceX, traceY, hasHistory, pad0;
+                        float fullX, fullY, pad1, pad2;
+                    };
+                    TempCB tcb2{
+                        float(data.tw), float(data.th), 1.f, 0.f,
+                        float(data.width), float(data.height), 0.f, 0.f};
+                    auto* tempCB = cache.GetOrCreateVolatileCB("SSGI", "TemporalParams_v9", sizeof(TempCB), data.device);
                     if (tempCB)
                         cmd->writeBuffer(tempCB, &tcb2, sizeof(tcb2));
                     BindingSetBuilder bsb(*vsR, *psTempR, nv, "SSGI.Temporal");
@@ -348,9 +402,12 @@ VirtualResourceHandle setupSSGIPass(
                         .Texture("g_Motion", motionTex)
                         .Texture("g_Depth", depthTex);
                     auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.st->temporalLayout, nv);
-                    DrawFullscreen(cmd, nv, data.st->temporalPipeline, set, giTemp, data.tw, data.th, "SSGI_Temporal");
-                    cmd->setTextureState(giTemp, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
-                    giForApply = giTemp;
+                    if (set)
+                    {
+                        DrawSSGIFullscreen(cmd, nv, data.st->temporalPipeline, set, giTemp, data.tw, data.th, "SSGI_Temporal_v9");
+                        cmd->setTextureState(giTemp, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                        giForApply = giTemp;
+                    }
                 }
             }
 
@@ -365,7 +422,7 @@ VirtualResourceHandle setupSSGIPass(
 
             struct alignas(16) ApplyCB { float intensity, p1, p2, p3; };
             ApplyCB acb{ 1.0f, 0, 0, 0 };
-            auto* applyCB = cache.GetOrCreateVolatileCB("SSGI", "ApplyParams", sizeof(ApplyCB), data.device);
+            auto* applyCB = cache.GetOrCreateVolatileCB("SSGI", "ApplyParams_v9", sizeof(ApplyCB), data.device);
             if (applyCB)
                 cmd->writeBuffer(applyCB, &acb, sizeof(acb));
 
@@ -375,14 +432,20 @@ VirtualResourceHandle setupSSGIPass(
                     bsb.ConstantBuffer("static_globals", staticGlobalsCB);
                 if (applyCB)
                     bsb.ConstantBuffer("SSGIApplyParams", applyCB);
-                bsb.Texture("g_Color", data.st->colorCopy)
+                bsb.Texture("g_Color", sceneSrv)
                     .Texture("g_SSGI", giForApply)
                     .Texture("g_Normal", normalTex)
                     .Texture("g_Base", baseTex)
                     .Texture("g_Depth", depthTex);
                 auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.st->applyLayout, nv);
-                DrawFullscreen(cmd, nv, data.st->applyPipeline, set, out, data.width, data.height, "SSGI_Apply");
+                if (set)
+                {
+                    cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::RenderTarget);
+                    DrawSSGIFullscreen(cmd, nv, data.st->applyPipeline, set, out, data.width, data.height, "SSGI_Apply_v9");
+                }
             }
+
+            cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
         });
 
     return pd.output;

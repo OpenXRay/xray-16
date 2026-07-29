@@ -146,7 +146,8 @@ void DecalManager::BuildOBB(DecalInstance& decal, const Fvector& pos, const Fvec
     decal.normal = N;
 }
 
-void DecalManager::AddStaticDecal(const Fvector& pos, const Fvector& normal, float size, u32 materialID)
+void DecalManager::AddStaticDecal(const Fvector& pos, const Fvector& normal, float size, u32 materialID,
+                                  const char* textureName)
 {
     m_lock.Enter();
 
@@ -155,12 +156,15 @@ void DecalManager::AddStaticDecal(const Fvector& pos, const Fvector& normal, flo
         return;
     }
 
+    const u32 blendFlags = ClassifyWallmarkBlend(textureName);
+
     for (auto& existing : m_staticDecals) {
         if (existing.materialID == materialID && existing.position.similar(pos, 0.02f)) {
             float angle = ::Random.randF(deg2rad(-20.f), deg2rad(20.f));
             BuildOBB(existing, pos, normal, size, angle);
             existing.creationTime = Device.fTimeGlobal;
             existing.ttl = ps_r__WallmarkTTL;
+            existing.blendFlags = blendFlags;
             m_lock.Leave();
             return;
         }
@@ -172,6 +176,7 @@ void DecalManager::AddStaticDecal(const Fvector& pos, const Fvector& normal, flo
     decal.materialID = materialID;
     decal.creationTime = Device.fTimeGlobal;
     decal.ttl = ps_r__WallmarkTTL;
+    decal.blendFlags = blendFlags;
 
     m_staticDecals.push_back(decal);
     m_lock.Leave();
@@ -337,7 +342,7 @@ void DecalManager::Update(float dt, float currentTime)
         data.materialID = decal.materialID;
         data.opacity = opacity;
         data.normalThreshold = DEFAULT_NORMAL_THRESHOLD;
-        data.flags = DECAL_FLAG_STATIC;
+        data.flags = DECAL_FLAG_STATIC | decal.blendFlags;
         m_gpuData.push_back(data);
     }
 

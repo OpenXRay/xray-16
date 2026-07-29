@@ -1,16 +1,15 @@
-// bindless_skinned.ps
-// SM6 Bindless forward pixel shader for SKINNED meshes
-// Uses per-draw constant for material ID (not GPU-driven)
-// Uses ResourceDescriptorHeap[NonUniformResourceIndex(index)] for texture access
-
 #define SM_6_0
+#define ACTOR_WET_MARK 1
 #define CLUSTERED_LIGHTING_FORWARD
 #define CSM_SHADOW_FORWARD
 #define LOCAL_SHADOW_FORWARD
 #define SKY_IBL
+#define SKY_IBL_SPEC_V4 1
 #include "common.h"
 #include "bindless_common.h"
 #include "skinned_common.h"
+#include "shared/object_parallax.h"
+#include "shared/skin_sss.h"
 
 struct PS_INPUT
 {
@@ -35,16 +34,16 @@ PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
 
-    // Use per-draw material ID from constant buffer
     uint materialID = g_SkinnedMaterialID;
-
-    // Get material data
     MaterialData mat = g_Materials[materialID];
 
-    // Sample diffuse texture
-    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+    float3 Tn = normalize(input.tangent);
+    float3 Bn = normalize(input.bitangent);
+    float3 Ngeom = normalize(input.normal);
+    float2 uv = ObjectParallaxUV(mat, input.texcoord, input.worldPos, Tn, Bn, Ngeom);
 
-    // Alpha test
+    float4 diffuseSample = SampleDiffuse(mat, uv);
+
     if (mat.flags & MAT_FLAG_ALPHA_TEST)
     {
         clip(diffuseSample.a - mat.alphaRef);
@@ -52,47 +51,72 @@ PS_OUTPUT main(PS_INPUT input)
 
     float3 albedo = diffuseSample.rgb;
 
-    float3 N = normalize(input.normal);
+    float3 N = Ngeom;
     float gloss = 0.0;
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
-        BumpSample bump = SampleNormal(mat, input.texcoord);
-        float3x3 TBN = float3x3(
-            normalize(input.tangent),
-            normalize(input.bitangent),
-            N
-        );
+        BumpSample bump = SampleNormal(mat, uv);
+        float3x3 TBN = float3x3(Tn, Bn, N);
         N = normalize(mul(bump.normal, TBN));
         gloss = bump.gloss;
     }
 
-    // Detail texture
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
-        float4 detailSample = SampleDetail(mat, input.texcoord);
+        float4 detailSample = SampleDetail(mat, uv);
         albedo = albedo * (detailSample.rgb * 2.0);
+        if (!(mat.flags & MAT_FLAG_HAS_DETAIL_BUMP))
+            gloss = gloss * detailSample.a * 2.0;
     }
 
-    float metallic = 0.0;
-    float roughness = 1.0 - gloss;
-    float ao = 1.0;
-
-    if (mat.flags & MAT_FLAG_HAS_PBR)
-    {
-        float3 pbrSample = SamplePBR(mat, input.texcoord);
-        metallic = pbrSample.r;
-        roughness = pbrSample.g;
-        ao = pbrSample.b;
-    }
+    float metallic, roughness, ao, parallax;
+    ResolveMaterialPBR(mat, uv, gloss, metallic, roughness, ao, parallax);
 
     albedo = apply_splat_color(albedo, input.worldPos, input.texcoord);
 
-    float hemi = calc_model_hemi(N);
-    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position, hemi);
-    output.color = float4(fwd.color.rgb, diffuseSample.a);
+    float sssStrength = 0.0;
+    float3 sssTint = float3(1, 1, 1);
+    float sssThickness = 1.0;
+    float sssMask = 0.0;
+    float sssProfile = -1.0;
+    if (mat.flags & MAT_FLAG_HAS_SSS_MAP)
+    {
+        float3 V = normalize(eye_position - input.worldPos);
+        EvalSkinSSSParams(albedo, metallic, N, V, gloss, sssStrength, sssTint, sssThickness);
+        float4 sssS = GetBindlessTexture(mat.sssMapIndex).Sample(smp_linear, uv);
+        ApplySSSMapSample(sssS, sssStrength, sssTint, sssThickness, sssMask, sssProfile);
+    }
+
+    float hemi = calc_model_hemi(Ngeom);
+    f_forward fwd = output_forward_pbr(
+        albedo, N, input.worldPos, metallic, roughness, ao, input.position, hemi, 1.0,
+        sssStrength, sssTint, sssThickness, sssMask, sssProfile);
+    float outA = (mat.flags & MAT_FLAG_ALPHA_BLEND) ? diffuseSample.a : 1.0;
+    output.color = float4(fwd.color.rgb, outA);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
-    output.worldPos = fwd.worldPos;
-    output.worldPos.w = 2.0;
+    output.worldPos = float4(fwd.worldPos.xyz, 3.0);
     return output;
 }
+
+#define PCSS_VOGEL_V1 1
+
+#define LOCAL_SHADOW_FADE_V1 1
+
+#define LOCAL_SHADOW_FADE_V2 1
+
+#define LOCAL_SHADOW_FADE_V3 1
+
+#define LOCAL_SHADOW_FADE_V4 1
+
+#define LOCAL_SHADOW_CLASSIC_V1 1
+
+#define LOCAL_SHADOW_CLASSIC_V2 1
+
+#define LOCAL_SHADOW_STABLE_V1 1
+
+#define LOCAL_SHADOW_SMAP2D_V1 1
+
+#define LOCAL_SHADOW_SMAP_PAGES_V1 1
+
+#define LOCAL_SHADOW_RECT_F4_V1 1

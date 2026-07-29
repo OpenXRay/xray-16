@@ -43,7 +43,8 @@ const xr_token tbmode_token[] = {{"None", STextureParams::tbmNone}, {"Use", STex
 
 void STextureParams::Load(IReader& F)
 {
-    R_ASSERT(F.find_chunk(THM_CHUNK_TEXTUREPARAM));
+    if (!F.find_chunk(THM_CHUNK_TEXTUREPARAM))
+        return;
     F.r(&fmt, sizeof(ETFormat));
     flags.assign(F.r_u32());
     border_color = F.r_u32();

@@ -472,9 +472,9 @@ DefaultOutputLayout setupSmokeTrailPass(
             auto* psReflection = shaderLoader->GetCachedReflection("smoke_trail", ".ps");
             BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "SmokeTrail.Draw");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB)
-               .ConstantBuffer("TrailParams", trailParamsCB)
-               .BufferSRV("g_Materials", bindless::MaterialBuffer::Instance().GetBuffer())
-               .BufferSRV("g_ControlPoints", mgr->GetCompactBuffer())
+               .ConstantBuffer("TrailParams", trailParamsCB);
+            BindBindlessMaterialTables(bsb);
+            bsb.BufferSRV("g_ControlPoints", mgr->GetCompactBuffer())
                .BufferSRV("g_TrailState", mgr->GetStateBuffer())
                .Texture("g_Perlin4D", data.perlin4dVolume);
             auto bindDesc = bsb.Build();

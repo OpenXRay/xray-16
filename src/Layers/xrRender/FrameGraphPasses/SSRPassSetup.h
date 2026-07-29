@@ -16,16 +16,20 @@ struct SSRPassState
     nvrhi::BindingLayoutHandle layout;
     nvrhi::GraphicsPipelineHandle blurPipeline;
     nvrhi::BindingLayoutHandle blurLayout;
+    nvrhi::GraphicsPipelineHandle temporalPipeline;
+    nvrhi::BindingLayoutHandle temporalLayout;
     nvrhi::GraphicsPipelineHandle applyPipeline;
     nvrhi::BindingLayoutHandle applyLayout;
     nvrhi::TextureHandle colorCopy;  // pre-wet reflection source
     nvrhi::TextureHandle litCopy;    // post-wet lit scene for apply (never R/W same as out)
     nvrhi::TextureHandle depthCopy;  // typeless D32 SRV copy (Metal-safe, like water SSR)
     nvrhi::TextureHandle outputTex;  // persistent composite out (never FG-aliased)
-    nvrhi::TextureHandle blurTex;    // persistent blur RT
-    nvrhi::TextureHandle history[2];
+    nvrhi::TextureHandle blurTex;    // persistent blur RT (trace res)
+    nvrhi::TextureHandle history[2]; // trace-res temporal history
     u32 historyW = 0;
     u32 historyH = 0;
+    u32 outputW = 0;
+    u32 outputH = 0;
     u32 historyIndex = 0;
     u32 pipeVersion = 0;
     bool hasHistory = false;

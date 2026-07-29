@@ -7,8 +7,6 @@
 #define	MAX_SHIFT		0.011f
 #define RANGE			100.f
 
-uniform float3		eye_direction;
-
 float4 	wmark_shift 	(float3 pos, float3 norm)
 {
 	float3	P 	= 	pos;
@@ -16,9 +14,9 @@ float4 	wmark_shift 	(float3 pos, float3 norm)
 	float3	sd 	= 	eye_position-P;
 	float 	d 	= 	length(sd);
 	float 	w 	= 	min(d/RANGE,1.f);
-	float 	s 	= 	lerp(MIN_SHIFT,MAX_SHIFT,d);
+	float 	s 	= 	lerp(MIN_SHIFT,MAX_SHIFT,w);
 		P	+=	N.xyz*NORMAL_SHIFT;
-		P	-=	normalize(eye_direction + normalize(P-eye_position)) * s;
+		P	-=	normalize(camera_direction.xyz + normalize(P-eye_position)) * s;
 	return	float4	(P,1.f);
 }
 #endif

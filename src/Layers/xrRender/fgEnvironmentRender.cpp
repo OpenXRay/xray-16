@@ -164,6 +164,18 @@ void FGEnvironmentRender::OnDeviceDestroy()
     m_skyPipeline = nullptr;
     m_skyInitialized = false;
 
+    m_cloudsVertexBuffer = nullptr;
+    m_cloudsIndexBuffer = nullptr;
+    m_cloudsPlaceholderTex = nullptr;
+    m_cloudsVS = nullptr;
+    m_cloudsPS = nullptr;
+    m_cloudsInputLayout = nullptr;
+    m_cloudsBindingLayout = nullptr;
+    m_cloudsPipeline = nullptr;
+    m_cloudsIndexCount = 0;
+    m_cloudsVertexCapacity = 0;
+    m_cloudsInitialized = false;
+
     m_sunVertexBuffer = nullptr;
     m_sunIndexBuffer = nullptr;
     m_sunPlaceholderTex = nullptr;
@@ -238,12 +250,7 @@ void FGEnvironmentRender::InitSkyResources()
 
     auto vsResult = shaderLoader->LoadVertexShader("sky_forward");
     auto psResult = shaderLoader->LoadPixelShader("sky_forward");
-    if (!vsResult.handle || !psResult.handle)
-    {
-        vsResult = shaderLoader->LoadVertexShader("sky2");
-        psResult = shaderLoader->LoadPixelShader("sky2");
-    }
-    R_ASSERT2(vsResult.handle && psResult.handle, "FGEnv: failed to load sky shaders");
+    R_ASSERT2(vsResult.handle && psResult.handle, "FGEnv: failed to load sky_forward shaders");
     m_skyVS = vsResult.handle;
     m_skyPS = psResult.handle;
 
@@ -391,6 +398,229 @@ void FGEnvironmentRender::DrawSky(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
 
     cmdList->setGraphicsState(state);
     cmdList->drawIndexed(nvrhi::DrawArguments{60, 1, 0, 0, 0});
+}
+
+void FGEnvironmentRender::InitCloudResources()
+{
+    if (m_cloudsInitialized)
+        return;
+
+    auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
+    auto* renderDevice = fgRenderer->GetRenderDevice();
+    m_device = renderDevice->GetNVRHIDevice();
+    R_ASSERT(m_device);
+
+    nvrhi::TextureDesc texDesc;
+    texDesc.width = 1;
+    texDesc.height = 1;
+    texDesc.format = nvrhi::Format::RGBA8_UNORM;
+    texDesc.debugName = "FGEnv_CloudsPlaceholder";
+    texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    texDesc.keepInitialState = true;
+    m_cloudsPlaceholderTex = m_device->createTexture(texDesc);
+
+    {
+        nvrhi::CommandListHandle uploadCmd = m_device->createCommandList();
+        uploadCmd->open();
+        u32 white = 0xFFFFFFFF;
+        uploadCmd->writeTexture(m_cloudsPlaceholderTex, 0, 0, &white, sizeof(white));
+        uploadCmd->close();
+        m_device->executeCommandList(uploadCmd);
+    }
+
+    auto* shaderLoader = RImplementation.GetShaderLoader();
+    R_ASSERT(shaderLoader);
+    auto vsResult = shaderLoader->LoadVertexShader("clouds_forward");
+    auto psResult = shaderLoader->LoadPixelShader("clouds_forward");
+    if (!vsResult.handle || !psResult.handle)
+    {
+        Msg("! [FGEnv] clouds_forward shaders missing — clouds disabled");
+        return;
+    }
+    m_cloudsVS = vsResult.handle;
+    m_cloudsPS = psResult.handle;
+
+    auto& cache = framegraph::GetPassResourceCache();
+    m_cloudsBindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "FGEnv_Clouds", *vsResult.reflection, *psResult.reflection, m_device);
+    R_ASSERT(m_cloudsBindingLayout);
+
+    nvrhi::VertexAttributeDesc attribs[] = {
+        nvrhi::VertexAttributeDesc()
+            .setName("POSITION")
+            .setFormat(nvrhi::Format::RGB32_FLOAT)
+            .setOffset(offsetof(passes::CloudVertex, position))
+            .setElementStride(sizeof(passes::CloudVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("COLOR")
+            .setFormat(nvrhi::Format::RGBA8_UNORM)
+            .setArraySize(2)
+            .setOffset(offsetof(passes::CloudVertex, dir))
+            .setElementStride(sizeof(passes::CloudVertex)),
+    };
+    m_cloudsInputLayout = cache.GetOrCreateInputLayout(
+        "FGEnv_Clouds", attribs, std::size(attribs), m_cloudsVS, m_device);
+
+    nvrhi::RenderState renderState;
+    renderState.blendState.targets[0].setBlendEnable(true);
+    renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::SrcAlpha);
+    renderState.blendState.targets[0].setDestBlend(nvrhi::BlendFactor::OneMinusSrcAlpha);
+    renderState.blendState.targets[0].setBlendOp(nvrhi::BlendOp::Add);
+    renderState.depthStencilState.setDepthTestEnable(false);
+    renderState.depthStencilState.setDepthWriteEnable(false);
+    renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
+
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+    pipelineDesc.setVertexShader(m_cloudsVS);
+    pipelineDesc.setPixelShader(m_cloudsPS);
+    pipelineDesc.addBindingLayout(m_cloudsBindingLayout);
+    pipelineDesc.setInputLayout(m_cloudsInputLayout);
+    pipelineDesc.setRenderState(renderState);
+    pipelineDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+
+    m_cloudsPipeline = cache.GetOrCreatePipeline("FGEnv_Clouds", pipelineDesc, fbInfo, m_device);
+    R_ASSERT(m_cloudsPipeline);
+
+    m_cloudsInitialized = true;
+}
+
+void FGEnvironmentRender::DrawClouds(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height)
+{
+    if (!environment || !cmdList || !framebuffer)
+        return;
+    if (environment->CloudsVerts.empty() || environment->CloudsIndices.empty())
+        return;
+
+    InitCloudResources();
+    if (!m_cloudsInitialized)
+        return;
+
+    CEnvDescriptor& env = environment->CurrentEnv;
+    if (env.clouds_color.w <= 0.001f)
+        return;
+
+    const u32 vertCount = static_cast<u32>(environment->CloudsVerts.size());
+    const u32 indexCount = static_cast<u32>(environment->CloudsIndices.size());
+
+    if (!m_cloudsVertexBuffer || m_cloudsVertexCapacity < vertCount)
+    {
+        nvrhi::BufferDesc vbDesc;
+        vbDesc.byteSize = vertCount * sizeof(passes::CloudVertex);
+        vbDesc.debugName = "FGEnv_CloudsVB";
+        vbDesc.isVertexBuffer = true;
+        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+        vbDesc.keepInitialState = true;
+        m_cloudsVertexBuffer = m_device->createBuffer(vbDesc);
+        m_cloudsVertexCapacity = vertCount;
+    }
+
+    if (!m_cloudsIndexBuffer || m_cloudsIndexCount != indexCount)
+    {
+        nvrhi::BufferDesc ibDesc;
+        ibDesc.byteSize = indexCount * sizeof(u16);
+        ibDesc.debugName = "FGEnv_CloudsIB";
+        ibDesc.isIndexBuffer = true;
+        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+        ibDesc.keepInitialState = true;
+        m_cloudsIndexBuffer = m_device->createBuffer(ibDesc);
+        cmdList->writeBuffer(m_cloudsIndexBuffer, environment->CloudsIndices.data(),
+            indexCount * sizeof(u16));
+        m_cloudsIndexCount = indexCount;
+    }
+
+    Fmatrix mScale, mXFORM;
+    mScale.scale(10.f, 0.4f, 10.f);
+    mXFORM.rotateY(env.clouds_rotation);
+    mXFORM.mulB_43(mScale);
+    mXFORM.translate_over(Device.vCameraPosition);
+
+    Fvector wd0, wd1;
+    Fvector4 wind_dir;
+    wd0.setHP(PI_DIV_4, 0);
+    wd1.setHP(PI_DIV_4 + PI_DIV_8, 0);
+    wind_dir.set(wd0.x, wd0.z, wd1.x, wd1.z).mul(0.5f).add(0.5f).mul(255.f);
+    const u32 C0 = color_rgba(
+        iFloor(wind_dir.x), iFloor(wind_dir.y), iFloor(wind_dir.w), iFloor(wind_dir.z));
+    const u32 C1 = color_rgba(
+        iFloor(env.clouds_color.x * 255.f),
+        iFloor(env.clouds_color.y * 255.f),
+        iFloor(env.clouds_color.z * 255.f),
+        iFloor(env.clouds_color.w * 255.f));
+
+    xr_vector<passes::CloudVertex> vertices(vertCount);
+    for (u32 i = 0; i < vertCount; ++i)
+    {
+        vertices[i].position = environment->CloudsVerts[i];
+        vertices[i].dir = C0;
+        vertices[i].color = C1;
+    }
+    cmdList->writeBuffer(m_cloudsVertexBuffer, vertices.data(), vertCount * sizeof(passes::CloudVertex));
+
+    auto& cache = framegraph::GetPassResourceCache();
+    auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
+    auto* renderDevice = fgRenderer->GetRenderDevice();
+
+    passes::DynamicTransforms dynamicCB = {};
+    passes::FillDynamicTransforms(dynamicCB, mXFORM);
+    auto dynamicCBBuffer = cache.GetOrCreateVolatileCB(
+        "FGEnv_Clouds", "DynamicCB", sizeof(passes::DynamicTransforms), renderDevice);
+    cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
+
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB(
+        "Frame", "StaticGlobals", sizeof(passes::StaticGlobals), renderDevice);
+    {
+        passes::StaticGlobals sg = passes::BuildStaticGlobals();
+        cmdList->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
+    }
+
+    nvrhi::ITexture* clouds0Tex = nullptr;
+    nvrhi::ITexture* clouds1Tex = nullptr;
+    auto* texManager = renderDevice->GetFGResourceManager()
+        ? renderDevice->GetFGResourceManager()->GetTextureManager() : nullptr;
+    if (texManager && environment->Current[0] && environment->Current[1])
+    {
+        const shared_str& name0 = environment->Current[0]->clouds_texture_name;
+        const shared_str& name1 = environment->Current[1]->clouds_texture_name;
+        if (name0.size())
+            clouds0Tex = texManager->GetNVRHITexture(texManager->LoadTexture(name0.c_str()));
+        if (name1.size())
+            clouds1Tex = texManager->GetNVRHITexture(texManager->LoadTexture(name1.c_str()));
+    }
+    if (!clouds0Tex) clouds0Tex = m_cloudsPlaceholderTex.Get();
+    if (!clouds1Tex) clouds1Tex = m_cloudsPlaceholderTex.Get();
+
+    auto* vsRefl = RImplementation.GetShaderLoader()->GetCachedReflection("clouds_forward", ".vs");
+    auto* psRefl = RImplementation.GetShaderLoader()->GetCachedReflection("clouds_forward", ".ps");
+    if (!vsRefl || !psRefl)
+        return;
+
+    framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, m_device, "FGEnv_Clouds");
+    bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer);
+    bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+    bsb.Texture("s_clouds0", clouds0Tex);
+    bsb.Texture("s_clouds1", clouds1Tex);
+
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), m_cloudsBindingLayout, m_device);
+
+    nvrhi::Viewport viewport;
+    viewport.minX = 0; viewport.minY = 0;
+    viewport.maxX = static_cast<float>(width);
+    viewport.maxY = static_cast<float>(height);
+    viewport.minZ = 0.0f; viewport.maxZ = 1.0f;
+
+    nvrhi::GraphicsState state;
+    state.pipeline = m_cloudsPipeline;
+    state.framebuffer = framebuffer;
+    state.viewport.addViewportAndScissorRect(viewport);
+    state.addBindingSet(bindingSet);
+    state.vertexBuffers = {{m_cloudsVertexBuffer, 0, 0}};
+    state.indexBuffer = {m_cloudsIndexBuffer, nvrhi::Format::R16_UINT, 0};
+
+    cmdList->setGraphicsState(state);
+    cmdList->drawIndexed(nvrhi::DrawArguments{indexCount, 1, 0, 0, 0});
 }
 
 void FGEnvironmentRender::InitSunResources()

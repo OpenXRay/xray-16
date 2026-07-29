@@ -56,17 +56,38 @@ HS_CONSTANT_DATA PatchConstant(InputPatch<VS_CONTROL_POINT, 3> patch)
         f0 = ComputeEdgeFactor(patch[1].worldPos, patch[2].worldPos);
         f1 = ComputeEdgeFactor(patch[2].worldPos, patch[0].worldPos);
         f2 = ComputeEdgeFactor(patch[0].worldPos, patch[1].worldPos);
+
+        if (mat.tessMethod == TESS_METHOD_PN)
+        {
+            float3 N0 = normalize(patch[0].normal);
+            float3 N1 = normalize(patch[1].normal);
+            float3 N2 = normalize(patch[2].normal);
+            float3 Nv0 = mul((float3x3)m_V, N0);
+            float3 Nv1 = mul((float3x3)m_V, N1);
+            float3 Nv2 = mul((float3x3)m_V, N2);
+            float3 Pv0 = mul(m_V, float4(patch[0].worldPos, 1.0)).xyz;
+            float3 Pv1 = mul(m_V, float4(patch[1].worldPos, 1.0)).xyz;
+            float3 Pv2 = mul(m_V, float4(patch[2].worldPos, 1.0)).xyz;
+            bool doDiscard = (Nv0.z > 0.1) && (Nv1.z > 0.1) && (Nv2.z > 0.1) &&
+                (Pv0.z > 5.0) && (Pv1.z > 5.0) && (Pv2.z > 5.0);
+            if (doDiscard)
+            {
+                f0 = -1.0;
+                f1 = -1.0;
+                f2 = -1.0;
+            }
+        }
     }
     o.Edges[0] = f0;
     o.Edges[1] = f1;
     o.Edges[2] = f2;
-    o.Inside = max(1.0, round((f0 + f1 + f2) / 3.0));
+    o.Inside = (f0 < 0.0) ? -1.0 : max(1.0, round((f0 + f1 + f2) / 3.0));
     return o;
 }
 
 [domain("tri")]
 [partitioning("integer")]
-[outputtopology("triangle_cw")]
+[outputtopology("triangle_ccw")]
 [outputcontrolpoints(3)]
 [patchconstantfunc("PatchConstant")]
 [maxtessfactor(4.0)]

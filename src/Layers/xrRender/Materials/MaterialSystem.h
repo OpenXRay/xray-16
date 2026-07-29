@@ -37,6 +37,7 @@ public:
         bool alphaTest = false;      // Uses clip()/discard - needs alpha test in depth prepass
         u32 alphaRef = 0;            // Alpha reference threshold (0-255), normalized to 0.0-1.0 for GPU
         bool transparent = false;    // Requires back-to-front sorting (bStrictB2F)
+        bool multiply = false;       // DestColor*SrcColor (wall stains / burns)
         u8 priority = 1;             // Render priority (0-3) for batching
 
         // Future PBR properties (stored here for unified material system)
@@ -58,7 +59,7 @@ public:
     {
         fg::TextureHandle albedo;    // Base color / diffuse
         fg::TextureHandle normal;    // Normal map
-        fg::TextureHandle pbr;       // Packed PBR (R=AO, G=Roughness, B=Metallic)
+        fg::TextureHandle pbr;       // Packed PBR (R=Metallic, G=Roughness, B=AO, A=Parallax)
         fg::TextureHandle detail;    // Detail texture (optional)
 
         bool IsValid() const;

@@ -26,6 +26,8 @@
 #include "xrEngine/IRenderBackend.h"
 #include "Layers/xrRender/r__sector.h"
 #include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
+#include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 
 extern ENGINE_API float ps_r3_grass_blade_height;
 extern ENGINE_API float psHUD_FOV;
@@ -511,6 +513,98 @@ void InitializeShadowPass(fg::RenderDevice* device, ShadowPassState& state)
             44, nvrhi::Format::RGBA32_FLOAT, state.skinned3wVs, state.skinned3wLayout,
             state.skinned3wInputLayout, state.skinned3wPipeline);
 
+        auto initSkinnedMdi = [&](u32 fmt, const char* vsName, const char* dbgName,
+                                  const nvrhi::VertexAttributeDesc* baseAttribs, u32 baseAttrCount) {
+            auto v = loader->LoadVertexShader(vsName, "main");
+            if (!v.handle || !v.reflection || !ps.handle || !ps.reflection)
+                return;
+            if (!state.skinnedMdiLayout)
+            {
+                state.skinnedMdiLayout = cache.GetOrCreateBindingLayoutFromReflection(
+                    "ShadowCascadeSkinnedMDI_v1", *v.reflection, *ps.reflection, nv);
+            }
+            if (!state.skinnedMdiLayout)
+            {
+                v.reflection = nullptr;
+                return;
+            }
+            nvrhi::VertexAttributeDesc attribs[8];
+            for (u32 i = 0; i < baseAttrCount; ++i)
+                attribs[i] = baseAttribs[i];
+            attribs[baseAttrCount] = nvrhi::VertexAttributeDesc()
+                .setName("DRAWINDEX").setFormat(nvrhi::Format::R32_UINT)
+                .setBufferIndex(1).setOffset(0).setElementStride(4).setIsInstanced(true);
+            state.skinnedMdiInputLayout[fmt] = nv->createInputLayout(attribs, baseAttrCount + 1, v.handle);
+            nvrhi::GraphicsPipelineDesc d;
+            d.VS = v.handle;
+            d.PS = state.ps;
+            d.inputLayout = state.skinnedMdiInputLayout[fmt];
+            d.primType = nvrhi::PrimitiveType::TriangleList;
+            d.bindingLayouts = {state.skinnedMdiLayout};
+            if (bindlessLayout)
+                d.bindingLayouts.push_back(bindlessLayout);
+            d.renderState.depthStencilState.setDepthTestEnable(true);
+            d.renderState.depthStencilState.setDepthWriteEnable(true);
+            d.renderState.depthStencilState.setDepthFunc(nvrhi::ComparisonFunc::LessOrEqual);
+            d.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
+            d.renderState.rasterState.depthBias = 4;
+            d.renderState.rasterState.slopeScaledDepthBias = 3.0f;
+            state.skinnedMdiPipeline[fmt] = cache.GetOrCreatePipeline(dbgName, d, fbInfo, nv);
+            v.reflection = nullptr;
+        };
+
+        {
+            constexpr u32 stride = 24;
+            nvrhi::VertexAttributeDesc attribs[] = {
+                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA16_SNORM).setOffset(0).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(8).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(12).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG16_SNORM).setOffset(20).setElementStride(stride),
+            };
+            initSkinnedMdi(VF_SKINNED_NONHQ, "shadow\\shadow_cascade_skinned_mdi",
+                "ShadowCascadeSkinnedMDI_nonHQ_v1", attribs, 5);
+        }
+        {
+            constexpr u32 stride = 36;
+            nvrhi::VertexAttributeDesc attribs[] = {
+                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
+            };
+            initSkinnedMdi(VF_SKINNED_HQ1W, "shadow\\shadow_cascade_skinned_hq_mdi",
+                "ShadowCascadeSkinnedMDI_hq1w_v1", attribs, 5);
+        }
+        {
+            constexpr u32 stride = 40;
+            nvrhi::VertexAttributeDesc attribs[] = {
+                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("BLENDINDICES").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(36).setElementStride(stride),
+            };
+            initSkinnedMdi(VF_SKINNED_HQ4W, "shadow\\shadow_cascade_skinned_4w_mdi",
+                "ShadowCascadeSkinnedMDI_hq4w_v1", attribs, 6);
+        }
+        {
+            constexpr u32 stride = 44;
+            nvrhi::VertexAttributeDesc attribs[] = {
+                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
+            };
+            initSkinnedMdi(VF_SKINNED_HQ2W, "shadow\\shadow_cascade_skinned_2w_mdi",
+                "ShadowCascadeSkinnedMDI_hq2w_v1", attribs, 5);
+            initSkinnedMdi(VF_SKINNED_HQ3W, "shadow\\shadow_cascade_skinned_3w_mdi",
+                "ShadowCascadeSkinnedMDI_hq3w_v1", attribs, 5);
+        }
+
         if (!state.skinnedPipeline)
             Msg("! [ShadowPass] Actor skinned CSM pipeline unavailable");
     }
@@ -620,6 +714,12 @@ void ShutdownShadowPass(fg::RenderDevice* device, ShadowPassState& state)
     state.skinnedLayout = nullptr;
     state.skinned4wPipeline = nullptr;
     state.skinned4wLayout = nullptr;
+    state.skinnedMdiLayout = nullptr;
+    for (u32 i = 0; i < 6; ++i)
+    {
+        state.skinnedMdiPipeline[i] = nullptr;
+        state.skinnedMdiInputLayout[i] = nullptr;
+    }
     state.inputLayout = nullptr;
     state.grassInputLayout = nullptr;
     state.skinnedInputLayout = nullptr;
@@ -653,7 +753,8 @@ ShadowCascadeOutputs setupCascadedShadowPass(
     const xr_vector<xray::render::GeometryBatch>* hudBatches,
     const xr_vector<xray::render::GeometryBatch>* worldSkinnedBatches,
     fg::GPUCullingManager* gpuCulling,
-    ShadowPassState& state)
+    ShadowPassState& state,
+    framegraph::VirtualResourceHandle skinnedDrawArgs)
 {
     using namespace framegraph;
 
@@ -774,12 +875,13 @@ ShadowCascadeOutputs setupCascadedShadowPass(
     struct PassData
     {
         VirtualResourceHandle shadowCascades[kCSMCascadeCount];
+        VirtualResourceHandle skinnedDrawArgs;
         ShadowPassState* passState = nullptr;
         BindlessForwardConfig bindlessConfig;
         MaterialCache* materialCache = nullptr;
         FGDetailManager* detailManager = nullptr;
-    const xr_vector<xray::render::GeometryBatch>* hudBatches = nullptr;
-    const xr_vector<xray::render::GeometryBatch>* worldSkinnedBatches = nullptr;
+        const xr_vector<xray::render::GeometryBatch>* hudBatches = nullptr;
+        const xr_vector<xray::render::GeometryBatch>* worldSkinnedBatches = nullptr;
         GPUCullingManager* gpuCulling = nullptr;
         fg::RenderDevice* device = nullptr;
         bool sunOn = false;
@@ -789,16 +891,17 @@ ShadowCascadeOutputs setupCascadedShadowPass(
     };
 
     const bool sunDetails = sunOn && ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS);
-    // World actor→CSM0 stays off (camera-attached disc). HUD casts into dedicated map.
-    const bool actorShadow = false;
+    const bool actorShadow = ps_r__common_flags.test(RFLAG_ACTOR_SHADOW);
     const bool hudShadow = sunOn && state.hudShadowMap != nullptr;
 
     auto& passData = fg.addCallbackPass<PassData>(
         "CascadedShadows",
-        [&, sunOn, sunDetails, actorShadow, hudShadow, detailManager, hudBatches, worldSkinnedBatches, gpuCulling](FrameGraph& builder, PassHandle passHandle, PassData& data) {
+        [&, sunOn, sunDetails, actorShadow, hudShadow, detailManager, hudBatches, worldSkinnedBatches, gpuCulling, skinnedDrawArgs](FrameGraph& builder, PassHandle passHandle, PassData& data) {
             RenderPassBuilder pb(builder, passHandle);
             for (u32 i = 0; i < kCSMCascadeCount; ++i)
                 data.shadowCascades[i] = pb.write(shadowHandles[i], ResourceState::DepthStencilWrite);
+            if (skinnedDrawArgs.is_valid())
+                data.skinnedDrawArgs = pb.read(skinnedDrawArgs, ResourceState::IndirectArgument);
             data.passState = &state;
             data.bindlessConfig = bindlessConfig;
             data.materialCache = materialCache;
@@ -830,16 +933,32 @@ ShadowCascadeOutputs setupCascadedShadowPass(
 
             ShadowPassState& st = *data.passState;
 
+            // Far cascade (c=2): skip clear+redraw every other frame when camera is calm.
+            static Fvector s_prevCamPos = {0, 0, 0};
+            static Fvector s_prevCamDir = {0, 0, 1};
+            static bool s_farCascadeValid = false;
+            const float camMove = Device.vCameraPosition.distance_to(s_prevCamPos);
+            const float camTurn = 1.f - _abs(Device.vCameraDirection.dotproduct(s_prevCamDir));
+            const bool cameraCalm = camMove < 0.35f && camTurn < 0.02f;
+            const bool skipFarCascade = s_farCascadeValid && cameraCalm && ((Device.dwFrame % 3u) != 0);
+            s_prevCamPos = Device.vCameraPosition;
+            s_prevCamDir = Device.vCameraDirection;
+
             for (u32 c = 0; c < kCSMCascadeCount; ++c)
             {
                 if (!shadowTex[c])
+                    continue;
+                if (c == 2 && skipFarCascade)
                     continue;
                 cmd->clearDepthStencilTexture(
                     shadowTex[c], nvrhi::TextureSubresourceSet(0, 1, 0, 1), true, 1.0f, false, 0);
             }
 
             if (!data.sunOn)
+            {
+                s_farCascadeValid = false;
                 return;
+            }
 
             if (data.materialCache)
                 data.materialCache->FinalizePendingMaterials(ctx);
@@ -948,7 +1067,8 @@ ShadowCascadeOutputs setupCascadedShadowPass(
                             bsb.ConstantBuffer("ShadowCascadeCB", st.cascadeCB);
                             bsb.ConstantBuffer("SkinnedMaterialCB", matCB);
                             bsb.BufferSRV("g_BoneMatrices", boneBuf);
-                            bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+                            BindBindlessMaterialTables(bsb);
+                            BindPaintSplatBuffer(bsb, nv);
                             auto set = cache.GetOrCreateBindingSet(bsb.Build(), layout, nv);
                             if (!set)
                                 continue;
@@ -973,8 +1093,6 @@ ShadowCascadeOutputs setupCascadedShadowPass(
                     }
                 }
             }
-
-            // World actor→CSM0 remains disabled (camera-attached disc).
 
             if (!data.bindlessConfig.UseGPUCulling() || !data.bindlessConfig.UseMegaBuffers())
                 return;
@@ -1034,6 +1152,10 @@ ShadowCascadeOutputs setupCascadedShadowPass(
                     continue;
 
                 if (!shadowTex[c])
+                    continue;
+
+                // Far cascade cadence: reuse previous contents when camera is calm
+                if (c == 2 && skipFarCascade)
                     continue;
 
                 const u32 cres = st.cascadeResolution[c] ? st.cascadeResolution[c] : GetCSMCascadeResolution(c);
@@ -1108,7 +1230,7 @@ ShadowCascadeOutputs setupCascadedShadowPass(
 
                     framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, nv, "ShadowCascade_v2");
                     bsb.ConstantBuffer("ShadowCascadeCB", st.cascadeCB);
-                    bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+                    BindBindlessMaterialTables(bsb);
                     bsb.BufferSRV("g_InstanceData", set.instanceBuffer);
                     bsb.BufferSRV("g_CompactBatchIndices", batchIndices);
                     bsb.BufferSRV("g_CompactMaterialIDs", materialIDs);
@@ -1152,10 +1274,49 @@ ShadowCascadeOutputs setupCascadedShadowPass(
                 }
 
                 drawSet(data.bindlessConfig.staticSet, st.pipeline);
-                drawSet(data.bindlessConfig.dynamicSet, st.pipeline);
-                // Trees/bushes (alpha-blended → transparent set) cast as alpha-tested foliage — near+mid only
-                if (c < 2)
+                const bool shaftsNeedFarCasters = ps_r_sun_shafts > 0;
+                if (c < 2 || shaftsNeedFarCasters)
+                    drawSet(data.bindlessConfig.dynamicSet, st.pipeline);
+                if (c < 2 || shaftsNeedFarCasters)
                     drawSet(data.bindlessConfig.transparentCasterSet, st.foliagePipeline);
+
+                if (data.gpuCulling && data.gpuCulling->GetTessObjectCount() > 0)
+                {
+                    nvrhi::IBuffer* tessInst = data.gpuCulling->GetTessInstanceBuffer();
+                    nvrhi::IBuffer* tessMat = data.gpuCulling->GetTessMaterialIDBuffer();
+                    nvrhi::IBuffer* tessIdx = data.gpuCulling->GetTessBatchIndicesBuffer();
+                    nvrhi::IBuffer* tessArgs = data.gpuCulling->GetTessDrawArgsBuffer();
+                    const u32 tessCount = data.gpuCulling->GetTessObjectCount();
+                    if (tessInst && tessMat && tessIdx && tessArgs && tessCount > 0)
+                    {
+                        framegraph::BindingSetBuilder tsb(*vsRefl, *psRefl, nv, "ShadowCascade.Tess");
+                        tsb.ConstantBuffer("ShadowCascadeCB", st.cascadeCB);
+                        BindBindlessMaterialTables(tsb);
+                        tsb.BufferSRV("g_InstanceData", tessInst);
+                        tsb.BufferSRV("g_CompactBatchIndices", tessIdx);
+                        tsb.BufferSRV("g_CompactMaterialIDs", tessMat);
+                        auto tessSet = cache.GetOrCreateBindingSet(tsb.Build(), st.layout, nv);
+                        if (tessSet)
+                        {
+                            nvrhi::GraphicsState gs;
+                            gs.pipeline = st.pipeline;
+                            gs.framebuffer = fb;
+                            gs.bindings = {tessSet};
+                            if (bindlessTable)
+                                gs.addBindingSet(bindlessTable);
+                            gs.vertexBuffers = {
+                                {data.bindlessConfig.megaVertexBuffer, 0, 0},
+                                {drawIndexBuffer, 1, 0}};
+                            gs.indexBuffer = {
+                                data.bindlessConfig.megaIndexBuffer, nvrhi::Format::R32_UINT, 0};
+                            gs.viewport.addViewport(cascadeVp);
+                            gs.viewport.addScissorRect(nvrhi::Rect(cres, cres));
+                            gs.indirectParams = tessArgs;
+                            cmd->setGraphicsState(gs);
+                            cmd->drawIndexedIndirect(0, tessCount);
+                        }
+                    }
+                }
 
                 // Terrain cast into near+mid (far cascade too coarse / expensive)
                 if (st.terrainPipeline && st.terrainLayout &&
@@ -1174,6 +1335,7 @@ ShadowCascadeOutputs setupCascadedShadowPass(
                     {
                         framegraph::BindingSetBuilder tbsb(*vsRefl, *terrainPsRefl, nv, "ShadowCascade.Terrain");
                         tbsb.ConstantBuffer("ShadowCascadeCB", st.cascadeCB);
+                        BindBindlessMaterialTables(tbsb);
                         tbsb.BufferSRV("g_InstanceData", data.bindlessConfig.terrainInstanceBuffer);
                         tbsb.BufferSRV("g_CompactBatchIndices", data.bindlessConfig.terrainCompactBatchIndicesBuffer);
                         tbsb.BufferSRV("g_CompactMaterialIDs", data.bindlessConfig.terrainCompactMaterialIDBuffer);
@@ -1223,6 +1385,8 @@ ShadowCascadeOutputs setupCascadedShadowPass(
                                 *bbVsRefl, *bbPsRefl, nv, "ShadowCascade.BillboardGrass");
                             gsb.ConstantBuffer("ShadowCascadeCB", st.cascadeCB);
                             gsb.ConstantBuffer("GrassShadowCB", st.grassCB);
+                            // detail_billboard_shadow.ps includes bindless_common.h → t8/t9/t10
+                            BindBindlessMaterialTables(gsb);
                             gsb.BufferSRV("visible_indices", dm->visibleBillboardInstancesBuffer);
                             gsb.BufferSRV("detail_models", dm->detailModelsBuffer);
                             gsb.BufferSRV("pulled_vertices", dm->pulledVertexBuffer);
@@ -1285,90 +1449,155 @@ ShadowCascadeOutputs setupCascadedShadowPass(
                     }
                 }
 
-                // World skinned: near + mid only (far cascade barely resolves NPC scale)
-                if (worldSkinnedReady && skDynCB && skMatCB && c < 1)
+                if (worldSkinnedReady && c < 2)
                 {
-                    for (const auto& batch : *data.worldSkinnedBatches)
+                    const bool mdiActive = data.gpuCulling->IsSkinnedMDIEnabled() &&
+                        st.skinnedMdiLayout && skBoneBuf;
+                    auto* mdiVsRefl = mdiActive
+                        ? shaderLoader->GetCachedReflection("shadow\\shadow_cascade_skinned_mdi", ".vs")
+                        : nullptr;
+                    auto drawIndexBuffer = mdiActive
+                        ? GetOrCreateDrawIndexBuffer("ShadowCascade_SkinnedMDI", nv)
+                        : nullptr;
+
+                    if (mdiActive && mdiVsRefl && drawIndexBuffer)
                     {
-                        if (!batch.isSkinned || !batch.vertexBuffer || !batch.indexBuffer)
-                            continue;
+                        auto& pools = data.gpuCulling->GetSkinnedPools();
+                        for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f)
+                        {
+                            const auto& bucket = data.gpuCulling->GetSkinnedBucket(f);
+                            if (bucket.count == 0 || !st.skinnedMdiPipeline[f])
+                                continue;
+                            nvrhi::IBuffer* poolVB = pools.GetVertexBuffer(f);
+                            nvrhi::IBuffer* poolIB = pools.GetIndexBuffer(f);
+                            if (!poolVB || !poolIB || !bucket.compactDrawArgsBuffer ||
+                                !bucket.compactCountBuffer || !bucket.recordsBuffer ||
+                                !bucket.compactBatchIndicesBuffer || !bucket.compactMaterialIDBuffer)
+                                continue;
 
-                        CKinematics* parent = nullptr;
-                        const u32 visualType = batch.visual ? batch.visual->getType() : 0;
-                        if (visualType == MT_SKELETON_GEOMDEF_ST)
-                            parent = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
-                        else if (visualType == MT_SKELETON_GEOMDEF_PM)
-                            parent = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
-                        if (!parent)
-                            continue;
+                            framegraph::BindingSetBuilder bsb(*mdiVsRefl, *skPsRefl, nv, "ShadowCascade.WorldSkinMDI");
+                            bsb.ConstantBuffer("ShadowCascadeCB", st.cascadeCB);
+                            bsb.BufferSRV("g_BoneMatrices", skBoneBuf);
+                            BindBindlessMaterialTables(bsb);
+                            BindPaintSplatBuffer(bsb, nv);
+                            bsb.BufferSRV("g_SkinnedRecords", bucket.recordsBuffer);
+                            bsb.BufferSRV("g_SkinnedCompactIndices", bucket.compactBatchIndicesBuffer);
+                            bsb.BufferSRV("g_SkinnedCompactMaterialIDs", bucket.compactMaterialIDBuffer);
+                            auto set = cache.GetOrCreateBindingSet(bsb.Build(), st.skinnedMdiLayout, nv);
+                            if (!set)
+                                continue;
 
-                        // Match the shadow pipeline to the vertex format, mirroring
-                        // SkinningPass::SelectSkinnedPipelineFromVariants. RM_* from
-                        // CSkeletonX: 1 SINGLE,2 SINGLE_HQ,3 1B,4 1B_HQ,5 2B,6 2B_HQ,
-                        // 7 3B,8 3B_HQ,9 4B,10 4B_HQ.
-                        const u16 rm = batch.skinningRenderMode;
-                        const u32 stride = batch.vertexStride;
-                        nvrhi::IGraphicsPipeline* pipe = nullptr;
-                        nvrhi::IBindingLayout* layout = nullptr;
-                        nvrhi::IInputLayout* il = nullptr;
-                        auto* vsRefl = skVsReflNonHQ;
-                        auto pick3w = [&] { pipe = st.skinned3wPipeline.Get(); layout = st.skinned3wLayout.Get(); il = st.skinned3wInputLayout.Get(); vsRefl = skVsRefl3W; };
-                        auto pick2w = [&] { pipe = st.skinned2wPipeline.Get(); layout = st.skinned2wLayout.Get(); il = st.skinned2wInputLayout.Get(); vsRefl = skVsRefl2W; };
-                        auto pick4w = [&] { pipe = st.skinned4wPipeline.Get(); layout = st.skinned4wLayout.Get(); il = st.skinned4wInputLayout.Get(); vsRefl = skVsRefl4W; };
-                        auto pickHq = [&] { pipe = st.skinnedHqPipeline.Get(); layout = st.skinnedHqLayout.Get(); il = st.skinnedHqInputLayout.Get(); vsRefl = skVsReflHQ; };
-                        auto pickNonHq = [&] { pipe = st.skinnedPipeline.Get(); layout = st.skinnedLayout.Get(); il = st.skinnedInputLayout.Get(); vsRefl = skVsReflNonHQ; };
-                        if (rm == 7 || rm == 8) pick3w();
-                        else if (rm == 5 || rm == 6) pick2w();
-                        else if (rm == 9 || rm == 10) pick4w();
-                        else if (rm == 4 || rm == 2) pickHq();
-                        else if (rm == 3 || rm == 1) pickNonHq();
-                        else if (stride == 36) pickHq();
-                        else if (stride == 40) pick4w();
-                        else if (stride == 44) pick2w();
-                        else pickNonHq();
+                            nvrhi::GraphicsState gs;
+                            gs.pipeline = st.skinnedMdiPipeline[f];
+                            gs.framebuffer = fb;
+                            gs.bindings = {set};
+                            if (bindlessTable)
+                                gs.addBindingSet(bindlessTable);
+                            gs.vertexBuffers = {{poolVB, 0, 0}, {drawIndexBuffer, 1, 0}};
+                            gs.indexBuffer = {poolIB, nvrhi::Format::R16_UINT, 0};
+                            gs.viewport.addViewport(cascadeVp);
+                            gs.viewport.addScissorRect(nvrhi::Rect(cres, cres));
+                            gs.indirectParams = bucket.compactDrawArgsBuffer;
+                            gs.indirectCountBuffer = bucket.compactCountBuffer;
+                            cmd->setGraphicsState(gs);
+                            DrawIndexedIndirectCountOrFallback(cmd, 0, 0, bucket.count);
+                        }
+                    }
 
-                        if (!pipe || !layout || !il || !vsRefl)
-                            continue;
+                    if (skDynCB && skMatCB)
+                    {
+                        for (const auto& batch : *data.worldSkinnedBatches)
+                        {
+                            if (!batch.isSkinned || !batch.vertexBuffer || !batch.indexBuffer)
+                                continue;
 
-                        const u32 boneOffset = data.gpuCulling->GetOrUploadSkeleton(cmd, parent);
+                            if (mdiActive)
+                            {
+                                const u32 variantIdx = bindless::MaterialBuffer::Instance().GetShaderVariant(batch.bindlessMaterialID);
+                                const bool pooled = variantIdx == 0
+                                    && batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
+                                    && batch.skinnedPoolFormat < SkinnedGeometryPools::FORMAT_COUNT;
+                                if (pooled)
+                                    continue;
+                            }
 
-                        DynamicTransforms dyn{};
-                        FillDynamicTransforms(dyn, batch.worldMatrix);
-                        cmd->writeBuffer(skDynCB, &dyn, sizeof(dyn));
+                            CKinematics* parent = nullptr;
+                            const u32 visualType = batch.visual ? batch.visual->getType() : 0;
+                            if (visualType == MT_SKELETON_GEOMDEF_ST)
+                                parent = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
+                            else if (visualType == MT_SKELETON_GEOMDEF_PM)
+                                parent = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+                            if (!parent)
+                                continue;
 
-                        SkinnedMaterialCB matId{};
-                        matId.materialID = batch.bindlessMaterialID;
-                        matId.skeletonBoneOffset = boneOffset;
-                        cmd->writeBuffer(skMatCB, &matId, sizeof(matId));
+                            const u16 rm = batch.skinningRenderMode;
+                            const u32 stride = batch.vertexStride;
+                            nvrhi::IGraphicsPipeline* pipe = nullptr;
+                            nvrhi::IBindingLayout* layout = nullptr;
+                            nvrhi::IInputLayout* il = nullptr;
+                            auto* vsRefl = skVsReflNonHQ;
+                            auto pick3w = [&] { pipe = st.skinned3wPipeline.Get(); layout = st.skinned3wLayout.Get(); il = st.skinned3wInputLayout.Get(); vsRefl = skVsRefl3W; };
+                            auto pick2w = [&] { pipe = st.skinned2wPipeline.Get(); layout = st.skinned2wLayout.Get(); il = st.skinned2wInputLayout.Get(); vsRefl = skVsRefl2W; };
+                            auto pick4w = [&] { pipe = st.skinned4wPipeline.Get(); layout = st.skinned4wLayout.Get(); il = st.skinned4wInputLayout.Get(); vsRefl = skVsRefl4W; };
+                            auto pickHq = [&] { pipe = st.skinnedHqPipeline.Get(); layout = st.skinnedHqLayout.Get(); il = st.skinnedHqInputLayout.Get(); vsRefl = skVsReflHQ; };
+                            auto pickNonHq = [&] { pipe = st.skinnedPipeline.Get(); layout = st.skinnedLayout.Get(); il = st.skinnedInputLayout.Get(); vsRefl = skVsReflNonHQ; };
+                            if (rm == 7 || rm == 8) pick3w();
+                            else if (rm == 5 || rm == 6) pick2w();
+                            else if (rm == 9 || rm == 10) pick4w();
+                            else if (rm == 4 || rm == 2) pickHq();
+                            else if (rm == 3 || rm == 1) pickNonHq();
+                            else if (stride == 36) pickHq();
+                            else if (stride == 40) pick4w();
+                            else if (stride == 44) pick2w();
+                            else pickNonHq();
 
-                        framegraph::BindingSetBuilder bsb(*vsRefl, *skPsRefl, nv, "ShadowCascade.WorldSkin");
-                        bsb.ConstantBuffer("dynamic_transforms", skDynCB);
-                        bsb.ConstantBuffer("ShadowCascadeCB", st.cascadeCB);
-                        bsb.ConstantBuffer("SkinnedMaterialCB", skMatCB);
-                        bsb.BufferSRV("g_BoneMatrices", skBoneBuf);
-                        bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-                        auto set = cache.GetOrCreateBindingSet(bsb.Build(), layout, nv);
-                        if (!set)
-                            continue;
+                            if (!pipe || !layout || !il || !vsRefl)
+                                continue;
 
-                        nvrhi::GraphicsState gs;
-                        gs.pipeline = pipe;
-                        gs.framebuffer = fb;
-                        gs.bindings = {set};
-                        if (bindlessTable)
-                            gs.addBindingSet(bindlessTable);
-                        gs.vertexBuffers = {{batch.vertexBuffer, 0, 0}};
-                        gs.indexBuffer = {batch.indexBuffer, nvrhi::Format::R16_UINT, 0};
-                        gs.viewport.addViewport(cascadeVp);
-                        gs.viewport.addScissorRect(nvrhi::Rect(cres, cres));
-                        cmd->setGraphicsState(gs);
-                        cmd->drawIndexed(
-                            nvrhi::DrawArguments()
-                                .setVertexCount(batch.indexCount)
-                                .setStartIndexLocation(batch.startIndex)
-                                .setStartVertexLocation(batch.baseVertex));
+                            const u32 boneOffset = data.gpuCulling->GetOrUploadSkeleton(cmd, parent);
+
+                            DynamicTransforms dyn{};
+                            FillDynamicTransforms(dyn, batch.worldMatrix);
+                            cmd->writeBuffer(skDynCB, &dyn, sizeof(dyn));
+
+                            SkinnedMaterialCB matId{};
+                            matId.materialID = batch.bindlessMaterialID;
+                            matId.skeletonBoneOffset = boneOffset;
+                            cmd->writeBuffer(skMatCB, &matId, sizeof(matId));
+
+                            framegraph::BindingSetBuilder bsb(*vsRefl, *skPsRefl, nv, "ShadowCascade.WorldSkin");
+                            bsb.ConstantBuffer("dynamic_transforms", skDynCB);
+                            bsb.ConstantBuffer("ShadowCascadeCB", st.cascadeCB);
+                            bsb.ConstantBuffer("SkinnedMaterialCB", skMatCB);
+                            bsb.BufferSRV("g_BoneMatrices", skBoneBuf);
+                            BindBindlessMaterialTables(bsb);
+                            BindPaintSplatBuffer(bsb, nv);
+                            auto set = cache.GetOrCreateBindingSet(bsb.Build(), layout, nv);
+                            if (!set)
+                                continue;
+
+                            nvrhi::GraphicsState gs;
+                            gs.pipeline = pipe;
+                            gs.framebuffer = fb;
+                            gs.bindings = {set};
+                            if (bindlessTable)
+                                gs.addBindingSet(bindlessTable);
+                            gs.vertexBuffers = {{batch.vertexBuffer, 0, 0}};
+                            gs.indexBuffer = {batch.indexBuffer, nvrhi::Format::R16_UINT, 0};
+                            gs.viewport.addViewport(cascadeVp);
+                            gs.viewport.addScissorRect(nvrhi::Rect(cres, cres));
+                            cmd->setGraphicsState(gs);
+                            cmd->drawIndexed(
+                                nvrhi::DrawArguments()
+                                    .setVertexCount(batch.indexCount)
+                                    .setStartIndexLocation(batch.startIndex)
+                                    .setStartVertexLocation(batch.baseVertex));
+                        }
                     }
                 }
+
+                if (c == 2)
+                    s_farCascadeValid = true;
             }
         });
 

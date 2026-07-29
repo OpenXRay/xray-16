@@ -7,6 +7,8 @@
 #define CSM_SHADOW_FORWARD
 #define LOCAL_SHADOW_FORWARD
 #define SKY_IBL
+#define SKY_IBL_SPEC_V4 1
+#define TERRAIN_WET_MARK 1
 #include "common.h"
 #include "bindless_common.h"
 
@@ -55,22 +57,36 @@ float4 SampleTerrainTexture(uint index, float2 uv)
     return GetBindlessTexture(index).Sample(smp_linear, uv);
 }
 
-float SampleTerrainHeight(uint index, float2 uv)
+float SampleTerrainHeightClassic(uint bumpXIdx, float2 uv)
 {
-    if (index == INVALID_TEXTURE_INDEX)
+    if (bumpXIdx == INVALID_TEXTURE_INDEX)
         return 0.5;
-    // bump# stores height in .a (classic) — also try .r for SSFX height maps
-    float4 h = GetBindlessTexture(index).SampleLevel(smp_linear, uv, 0);
+    float4 h = GetBindlessTexture(bumpXIdx).SampleLevel(smp_linear, uv, 0);
     return saturate(max(h.a, h.r));
 }
 
-float4 SampleTerrainHeights(TerrainMaterialData mat, float2 uv)
+float SampleTerrainHeightIxray(uint bumpIdx, float2 uv)
 {
+    if (bumpIdx == INVALID_TEXTURE_INDEX)
+        return 0.5;
+    return saturate(GetBindlessTexture(bumpIdx).SampleLevel(smp_linear, uv, 0).r);
+}
+
+float4 SampleTerrainHeights(TerrainMaterialData mat, float2 uv, bool ixrayPbs)
+{
+    if (ixrayPbs)
+    {
+        return float4(
+            SampleTerrainHeightIxray(mat.normalR_Index, uv),
+            SampleTerrainHeightIxray(mat.normalG_Index, uv),
+            SampleTerrainHeightIxray(mat.normalB_Index, uv),
+            SampleTerrainHeightIxray(mat.normalA_Index, uv));
+    }
     return float4(
-        SampleTerrainHeight(mat.normalXR_Index, uv),
-        SampleTerrainHeight(mat.normalXG_Index, uv),
-        SampleTerrainHeight(mat.normalXB_Index, uv),
-        SampleTerrainHeight(mat.normalXA_Index, uv));
+        SampleTerrainHeightClassic(mat.normalXR_Index, uv),
+        SampleTerrainHeightClassic(mat.normalXG_Index, uv),
+        SampleTerrainHeightClassic(mat.normalXB_Index, uv),
+        SampleTerrainHeightClassic(mat.normalXA_Index, uv));
 }
 
 // SSFX HeightBlending — weight mask by layer height
@@ -85,18 +101,20 @@ float4 HeightBlendMask(float4 heights, float4 weights)
     return cut / sum;
 }
 
-float BlendTerrainHeight(TerrainMaterialData mat, float4 mask, float2 uv)
+float BlendTerrainHeight(TerrainMaterialData mat, float4 mask, float2 uv, bool ixrayPbs)
 {
-    float4 h = SampleTerrainHeights(mat, uv);
+    float4 h = SampleTerrainHeights(mat, uv, ixrayPbs);
     return saturate(dot(h, mask));
 }
 
-// SSFX-style POM on detail UVs (uses bump# / height layers)
 float2 TerrainPOM(TerrainMaterialData mat, float4 mask, float2 detailUV,
-                  float3 T, float3 B, float3 N, float3 worldPos, out float heightAO)
+                  float3 T, float3 B, float3 N, float3 worldPos, bool ixrayPbs, out float heightAO)
 {
     heightAO = 1.0;
-    if ((mat.flags & MAT_FLAG_HAS_NORMAL_X) == 0)
+    bool hasHeight = ixrayPbs
+        ? ((mat.normalR_Index != INVALID_TEXTURE_INDEX) || (mat.normalG_Index != INVALID_TEXTURE_INDEX))
+        : ((mat.flags & MAT_FLAG_HAS_NORMAL_X) != 0);
+    if (!hasHeight)
         return detailUV;
 
     float3 V = normalize(eye_position - worldPos);
@@ -119,7 +137,7 @@ float2 TerrainPOM(TerrainMaterialData mat, float4 mask, float2 detailUV,
     float fCurrHeight = 0.0;
     float fCurrentBound = 1.0;
     float prevSam = 0.0;
-    float currSam = BlendTerrainHeight(mat, mask, detailUV);
+    float currSam = BlendTerrainHeight(mat, mask, detailUV, ixrayPbs);
 
     [loop]
     for (int i = 0; i < (int)nNumSteps; ++i)
@@ -130,7 +148,7 @@ float2 TerrainPOM(TerrainMaterialData mat, float4 mask, float2 detailUV,
         prevSam = currSam;
         vTexCurrentOffset += vTexOffsetPerStep;
         fCurrentBound -= fStepSize;
-        currSam = BlendTerrainHeight(mat, mask, vTexCurrentOffset);
+        currSam = BlendTerrainHeight(mat, mask, vTexCurrentOffset, ixrayPbs);
         fCurrHeight = layerH;
     }
 
@@ -149,14 +167,32 @@ float2 TerrainPOM(TerrainMaterialData mat, float4 mask, float2 detailUV,
     return lerp(detailUV, resultUV, fade);
 }
 
-void SampleTerrainBump(uint normalIdx, float2 uv, float weight, inout float3 Nts, inout float gloss)
+void SampleTerrainBump(uint normalIdx, uint normalXIdx, float2 uv, float weight,
+    inout float3 Nts, inout float gloss, bool ixrayPbs)
 {
     if (normalIdx == INVALID_TEXTURE_INDEX || weight < 1e-5)
         return;
 
-    float4 nPacked = GetBindlessTexture(normalIdx).Sample(smp_linear, uv).wzyx;
-    Nts += (nPacked.xyz - 0.5) * weight;
-    gloss += nPacked.w * weight;
+    float4 Nu = GetBindlessTexture(normalIdx).Sample(smp_linear, uv);
+    if (ixrayPbs)
+    {
+        float2 nxy = Nu.wy * 2.0 - 1.0;
+        float nz = sqrt(max(0.0, 1.0 - saturate(dot(nxy, nxy))));
+        Nts += float3(nxy, nz) * weight;
+        if (normalXIdx != INVALID_TEXTURE_INDEX)
+        {
+            float rough = GetBindlessTexture(normalXIdx).Sample(smp_linear, uv).y;
+            gloss += saturate(1.0 - rough) * weight;
+        }
+        else
+            gloss += 0.15 * weight;
+    }
+    else
+    {
+        float4 nPacked = Nu.wzyx;
+        Nts += (nPacked.xyz - 0.5) * weight;
+        gloss += nPacked.w * weight;
+    }
 }
 
 // Modest terrain puddles (SSFX-inspired). Rain in fog_color.w.
@@ -195,10 +231,11 @@ PS_OUTPUT main(PS_INPUT input)
     else
         mask = float4(0.25, 0.25, 0.25, 0.25);
 
-    // Height-aware splat (SSFX Terrain Upgrade)
-    if ((mat.flags & MAT_FLAG_HAS_NORMAL_X) != 0)
+    const bool ixrayPbs = (mat.flags & MAT_FLAG_HAS_PBR_LAYER) != 0;
+
+    if (ixrayPbs || (mat.flags & MAT_FLAG_HAS_NORMAL_X) != 0)
     {
-        float4 heights = SampleTerrainHeights(mat, detailUV);
+        float4 heights = SampleTerrainHeights(mat, detailUV, ixrayPbs);
         mask = HeightBlendMask(heights, mask);
     }
 
@@ -207,7 +244,7 @@ PS_OUTPUT main(PS_INPUT input)
     float3 Ngeom = normalize(input.normal);
 
     float heightAO = 1.0;
-    detailUV = TerrainPOM(mat, mask, detailUV, T, B, Ngeom, input.worldPos, heightAO);
+    detailUV = TerrainPOM(mat, mask, detailUV, T, B, Ngeom, input.worldPos, ixrayPbs, heightAO);
 
     float3 detailR = SampleTerrainTexture(mat.detailR_Index, detailUV).rgb;
     float3 detailG = SampleTerrainTexture(mat.detailG_Index, detailUV).rgb;
@@ -225,18 +262,20 @@ PS_OUTPUT main(PS_INPUT input)
     float3 blendedTS = 0;
     float gloss = 0;
 
-    SampleTerrainBump(mat.normalR_Index, detailUV, mask.r, blendedTS, gloss);
-    SampleTerrainBump(mat.normalG_Index, detailUV, mask.g, blendedTS, gloss);
-    SampleTerrainBump(mat.normalB_Index, detailUV, mask.b, blendedTS, gloss);
-    SampleTerrainBump(mat.normalA_Index, detailUV, mask.a, blendedTS, gloss);
+    SampleTerrainBump(mat.normalR_Index, mat.normalXR_Index, detailUV, mask.r, blendedTS, gloss, ixrayPbs);
+    SampleTerrainBump(mat.normalG_Index, mat.normalXG_Index, detailUV, mask.g, blendedTS, gloss, ixrayPbs);
+    SampleTerrainBump(mat.normalB_Index, mat.normalXB_Index, detailUV, mask.b, blendedTS, gloss, ixrayPbs);
+    SampleTerrainBump(mat.normalA_Index, mat.normalXA_Index, detailUV, mask.a, blendedTS, gloss, ixrayPbs);
 
-    blendedTS.z *= 0.5;
+    if (!ixrayPbs)
+        blendedTS.z *= 0.5;
 
     float3 N = Ngeom;
     if (length(blendedTS) > 1e-4)
     {
         float3x3 TBN = float3x3(T, B, Ngeom);
-        N = normalize(mul(blendedTS, TBN));
+        float3 ts = ixrayPbs ? normalize(blendedTS) : blendedTS;
+        N = normalize(mul(ts, TBN));
     }
 
     float metallic = 0.0;
@@ -280,8 +319,9 @@ PS_OUTPUT main(PS_INPUT input)
     float puddle = TerrainPuddle(input.worldPos, N, rain);
     if (puddle > 0.001)
     {
-        albedo = lerp(albedo, albedo * float3(0.66, 0.63, 0.60), puddle * 0.35);
-        roughness = lerp(roughness, 0.08, puddle * 0.7);
+        albedo = lerp(albedo, albedo * float3(0.66, 0.63, 0.60), puddle * 0.25);
+        float wetR = ixrayPbs ? max(roughness * 0.65, 0.22) : 0.08;
+        roughness = lerp(roughness, wetR, puddle * (ixrayPbs ? 0.4 : 0.7));
     }
 
     f_forward fwd = output_forward_pbr(
@@ -290,6 +330,6 @@ PS_OUTPUT main(PS_INPUT input)
     output.color = float4(fwd.color.rgb, 1.0);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
-    output.worldPos = fwd.worldPos;
+    output.worldPos = float4(fwd.worldPos.xyz, 4.0);
     return output;
 }

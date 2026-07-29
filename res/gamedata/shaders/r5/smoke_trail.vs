@@ -18,8 +18,8 @@ struct TrailControlPoint
     float cumDist;             // cumulative distance from head
 };
 
-StructuredBuffer<TrailControlPoint> g_ControlPoints : register(t10);
-ByteAddressBuffer g_TrailState : register(t11);
+StructuredBuffer<TrailControlPoint> g_ControlPoints : register(t13);
+ByteAddressBuffer g_TrailState : register(t14);
 
 // ═══════════════════════════════════════════════════════
 //  Per-group constant buffer (matches TrailParamsCB)

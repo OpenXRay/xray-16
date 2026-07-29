@@ -87,7 +87,9 @@ HiZPyramidOutput setupHiZBuildPass(
     VirtualResourceHandle depthInput,
     u32 width,
     u32 height,
-    HiZBuildPassState& hizState)
+    HiZBuildPassState& hizState,
+    const char* resourceName,
+    const char* passName)
 {
     InitializeHiZResources(device, width, height, hizState);
 
@@ -110,18 +112,18 @@ HiZPyramidOutput setupHiZBuildPass(
 
     ResourceDesc hizDesc;
     hizDesc.type = ResourceDesc::Type::Texture2D;
-    hizDesc.debugName = "HiZPyramid";
+    hizDesc.debugName = resourceName;
     hizDesc.width = hizWidth;
     hizDesc.height = hizHeight;
     hizDesc.format = nvrhi::Format::R32_FLOAT;
     hizDesc.mipLevels = hizMipLevels;
     hizDesc.isUAV = true;
-    hizDesc.isTransient = true;  // Transient - will be aliased/reused
+    hizDesc.isTransient = false;
 
-    VirtualResourceHandle hizHandle = fg.CreateTexture("rt_HiZPyramid", hizDesc);
+    VirtualResourceHandle hizHandle = fg.CreateTexture(resourceName, hizDesc);
 
     auto& passData = fg.addCallbackPass<HiZBuildData>(
-        "Hi-Z Build",
+        passName,
 
         [&, width, height, hizWidth, hizHeight, hizMipLevels](FrameGraph& builder, PassHandle passHandle, HiZBuildData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
@@ -181,27 +183,23 @@ HiZPyramidOutput setupHiZBuildPass(
             // For mip 0, we read from full-res depth and downsample 2x2 → 1
             // For mip N (N>0), we read from Hi-Z mip N-1 and downsample 2x2 → 1
 
-            auto hizCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("HiZBuild", "HiZCB", sizeof(HiZCB), data.device, 64);
+            auto hizCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB(
+                "HiZBuild", "HiZParams", sizeof(HiZCB), data.device, 1024);
             if (!hizCB) {
                 Msg("! [HiZBuild] Constant buffer is NULL at execute time!");
                 return;
             }
 
             for (u32 mip = 0; mip < data.mipLevels; mip++) {
-                // Output dimensions for this mip level
                 u32 outWidth = std::max(1u, data.width >> mip);
                 u32 outHeight = std::max(1u, data.height >> mip);
 
-                // Skip if output is 0 (shouldn't happen)
                 if (outWidth == 0 || outHeight == 0) break;
 
-                // Update constant buffer
                 HiZCB cb;
                 cb.outputWidth = outWidth;
                 cb.outputHeight = outHeight;
-                // NOTE: When binding a specific mip subresource, the shader sees it as mip 0
-                // So inputMipLevel should always be 0 for the bound texture view
-                cb.inputMipLevel = 0;  // Always 0 - we bind specific mip as subresource
+                cb.inputMipLevel = 0;
                 cb.isFirstMip = (mip == 0) ? 1 : 0;
 
                 cmdList->writeBuffer(hizCB, &cb, sizeof(cb));
@@ -227,7 +225,8 @@ HiZPyramidOutput setupHiZBuildPass(
                 bsb.TextureUAV("g_output_hiz", hizTexture, nvrhi::Format::R32_FLOAT, outputSubres);
                 bsb.ConstantBuffer("HiZParams", hizCB);
 
-                nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
+                nvrhi::BindingSetHandle bindingSet = GetPassResourceCache().GetOrCreateBindingSet(
+                    bsb.Build(), data.passState->layout, nvDevice);
 
                 if (!bindingSet) {
                     Msg("! [HiZBuild] Failed to create binding set for mip %d", mip);

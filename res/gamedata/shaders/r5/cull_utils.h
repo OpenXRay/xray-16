@@ -137,7 +137,7 @@ bool HiZTestSphereTemporal(
 
     // Calculate screen-space bounding box (in previous frame's space)
     float projScale = max(abs(prevViewProj[0][0]), abs(prevViewProj[1][1]));
-    float2 ndcSize = float2(radius, radius) * projScale / prevClipPos.w;
+    float2 ndcSize = float2(radius, radius) * projScale / prevClipPos.w * 1.5;
 
     float2 minNDC = prevNdc.xy - ndcSize;
     float2 maxNDC = prevNdc.xy + ndcSize;
@@ -168,9 +168,8 @@ bool HiZTestSphereTemporal(
     if (screenArea > fullArea * 0.18)
         return true;
 
-    // Select mip where box is roughly 2x2 pixels, then bias one level coarser
-    // so MAX Hi-Z is more conservative (fewer false occlusions).
-    float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5))) - 1.0;
+    // Coarser mip = larger MAX footprint → fewer false occlusions.
+    float mipLevel = ceil(log2(max(1.0, max(boxWidth, boxHeight))));
     mipLevel = clamp(mipLevel, 0.0, float(hiZMipLevels - 1));
 
     // Sample Hi-Z at 4 corners (previous frame's depth)

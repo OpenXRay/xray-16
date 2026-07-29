@@ -16,6 +16,8 @@ public:
     CBlender_deffer_flat();
     virtual ~CBlender_deffer_flat();
 
+    u32 GetTessellation() const { return oTessellation.IDselected; }
+
 private:
     xrP_TOKEN oTessellation;
 };

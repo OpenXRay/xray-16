@@ -29,6 +29,7 @@ namespace xray::render::fg {
     class dxRender_Visual;  // Forward declaration for visual pointer map
     class CKinematics;
     class RTAccelStructManager;
+    struct LocalShadowTile;
     namespace decals {
         class OverlayManager;
     }
@@ -190,9 +191,11 @@ public:
     // Shutdown and release resources
     void Shutdown();
 
-    // Upload scene objects to GPU (call once per frame before culling)
-    // Extracts bounding sphere data from geometry batches
     void UploadSceneObjects(fg::RenderContext* ctx, const GeometryCollector* geometry);
+
+    void SetStaticBatchSource(const xr_vector<GeometryBatch>* batches) { m_staticBatchSource = batches; }
+    bool IsStaticDataCached() const { return m_staticDataCached; }
+    bool IsTerrainDataCached() const { return m_terrainDataCached; }
 
     void InvalidateStaticCullingData();
     void InvalidateShadersAndPipelines();
@@ -207,9 +210,10 @@ public:
         u32 hizHeight,
         u32 hizMipLevels,
         const GeometryCollector* geometry,
-        const Fmatrix& prevViewProj, // Previous frame's viewProj for temporal Hi-Z
+        const Fmatrix& prevViewProj,
         bool forceDisableHiz = false,
-        bool skipUpload = false
+        bool skipUpload = false,
+        framegraph::VirtualResourceHandle waitFor = {}
     );
 
     nvrhi::ITexture* GetDummyHiZTexture() const { return m_dummyHizTexture.Get(); }
@@ -346,10 +350,29 @@ public:
 
     // Light-frustum CSM caster compact (CPU filter + upload). Call once per cascade before draw.
     void BuildLightFrustumCasters(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        const Fmatrix& lightVP, float radiusInflate = 1.25f, float skipNearCameraClearance = 0.f);
+
+    bool DispatchLightFrustumCasters(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
         const Fmatrix& lightVP, float radiusInflate = 1.25f);
 
-    /// Ensure identity shadow-caster index/count buffers exist (for cast-all fallback).
-    /// Does not frustum-filter — safe to call before local-shadow cast-all draws.
+    bool EnsureLightShadowCullPipeline(nvrhi::IDevice* nvDevice);
+    bool EnsureLocalShadowCullSlots(nvrhi::IDevice* nvDevice, u32 slotCount);
+    bool DispatchLightFrustumCastersToSlot(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        const Fmatrix& lightVP, float radiusInflate, u32 slot);
+    bool DispatchAllLocalShadowTileCulls(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        const xr_vector<LocalShadowTile>& tiles, float radiusInflate);
+
+    static constexpr u32 kLocalShadowCullMaxSlots = 256;
+    static constexpr u32 kLocalShadowCullSlotCap = 4096;
+
+    nvrhi::IBuffer* GetLocalShadowSlotIndices(u32 slot, u32 setIdx) const;
+    nvrhi::IBuffer* GetLocalShadowSlotDrawArgs(u32 slot, u32 setIdx) const;
+    nvrhi::IBuffer* GetLocalShadowSlotMats(u32 slot, u32 setIdx) const;
+    nvrhi::IBuffer* GetLocalShadowSlotCount(u32 slot, u32 setIdx) const;
+    nvrhi::BindingSetHandle* MutLocalShadowSlotDrawBinding(u32 slot, u32 setIdx);
+    nvrhi::IBuffer** MutLocalShadowSlotDrawSrcInstance(u32 slot, u32 setIdx);
+    u32 GetLocalShadowCullSlotCount() const { return m_localShadowCullSlotCount; }
+
     void EnsureShadowCasterIdentityBuffers(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice);
 
     nvrhi::IBuffer* GetStaticShadowCompactDrawArgsBuffer() const { return m_staticSet.shadowCompactDrawArgsBuffer.Get(); }
@@ -381,6 +404,7 @@ public:
     nvrhi::IBuffer* GetTessInstanceBuffer() const { return m_tessSet.instanceBuffer.Get(); }
     nvrhi::IBuffer* GetTessMaterialIDBuffer() const { return m_tessSet.materialIDBuffer.Get(); }
     nvrhi::IBuffer* GetTessBatchIndicesBuffer() const { return m_tessBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetTessDrawArgsBuffer() const { return m_tessSet.drawArgsBuffer.Get(); }
     const xr_vector<IndirectDrawArgs>& GetTessDrawArgsData() const { return m_tessDrawArgsData; }
     const xr_vector<GPUObjectData>& GetTessObjectData() const { return m_tessObjectData; }
 
@@ -580,8 +604,31 @@ private:
     nvrhi::ComputePipelineHandle m_compactCountPipeline;
     nvrhi::ComputePipelineHandle m_compactScanPipeline;
     nvrhi::ComputePipelineHandle m_compactScatterPipeline;
+    nvrhi::ComputePipelineHandle m_lightShadowCullPipeline;
     nvrhi::BindingLayoutHandle m_cullLayout;
     nvrhi::BindingLayoutHandle m_clearArgsLayout;
+    nvrhi::BindingLayoutHandle m_lightShadowCullLayout;
+    nvrhi::BufferHandle m_lightShadowCullParamsCB;
+    bool m_lightShadowCullReady = false;
+
+    struct LocalShadowCullSlotSet
+    {
+        nvrhi::BufferHandle indices;
+        nvrhi::BufferHandle drawArgs;
+        nvrhi::BufferHandle mats;
+        nvrhi::BufferHandle count;
+        nvrhi::BindingSetHandle cullBinding;
+        nvrhi::BindingSetHandle drawBinding;
+        nvrhi::IBuffer* cullSrcObject = nullptr;
+        nvrhi::IBuffer* drawSrcInstance = nullptr;
+    };
+    struct LocalShadowCullSlot
+    {
+        LocalShadowCullSlotSet sets[3];
+    };
+    xr_vector<LocalShadowCullSlot> m_localShadowCullSlots;
+    u32 m_localShadowCullSlotCount = 0;
+
     nvrhi::BindingLayoutHandle m_compactCountLayout;
     nvrhi::BindingLayoutHandle m_compactScanLayout;
     nvrhi::BindingLayoutHandle m_compactScatterLayout;
@@ -606,11 +653,17 @@ private:
         const CullSetBuffers& set,
         VariantPartitionBuffers& partition);
 
-    bool m_staticTerrainDrawArgsUploaded = false;  // True after first upload (terrain)
+    bool m_staticTerrainDrawArgsUploaded = false;
+    bool m_terrainDataCached = false;
+    u32 m_lastMaterialCountForStatic = 0;
+    u64 m_transientUploadFingerprint = 0;
+    bool m_transientDataCached = false;
+    bool m_lastTessFlagOn = false;
 
     bool m_compactEnabled = false;
 
     bool m_staticDataCached = false;
+    const xr_vector<GeometryBatch>* m_staticBatchSource = nullptr;
 
     // ───────────────────────────────────────────────────────
     //  TERRAIN-SPECIFIC BUFFERS

@@ -74,6 +74,8 @@ public:
     shared_str GetParallaxName(const shared_str& tex_name) const;
     // Consolidated packed PBR texture (R=metallic, G=roughness, B=ao, A=parallax):
     shared_str GetPBRName(const shared_str& tex_name) const;
+    // SSS map (R=thickness, G=strength, B=profile): <base>_sss
+    shared_str GetSSSName(const shared_str& tex_name) const;
 };
 
 extern ECORE_API CTextureDescrMngr TextureDescr;

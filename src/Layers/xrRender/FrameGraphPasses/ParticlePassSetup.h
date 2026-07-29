@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/ParticleEffectDef.h"
 #include "PassVertexFormats.h"
 #include "ParticleGPUCullingManager.h"
 
@@ -58,16 +59,23 @@ struct ParticleBatch {
     u32 bindlessMaterialID = 0;
     u8 blendMode = PARTICLE_BLEND_BLEND;
     ParticleShaderVariant shaderVariant = ParticleShaderVariant::Standard;
+    PS::ParticleLightingMode lightingMode = PS::ParticleLightingMode::Emissive;
 };
 
 struct ParticlePassState {
     nvrhi::GraphicsPipelineHandle pipelines[PARTICLE_BLEND_COUNT];
+    nvrhi::GraphicsPipelineHandle litPipelines[PARTICLE_BLEND_COUNT];
+    nvrhi::GraphicsPipelineHandle sixWayPipelines[PARTICLE_BLEND_COUNT];
     nvrhi::GraphicsPipelineHandle distortPipeline;
     nvrhi::BindingLayoutHandle layout;
+    nvrhi::BindingLayoutHandle litLayout;
+    nvrhi::BindingLayoutHandle sixWayLayout;
     nvrhi::BindingLayoutHandle distortLayout;
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
+    nvrhi::ShaderHandle litPS;
+    nvrhi::ShaderHandle sixWayPS;
     nvrhi::ShaderHandle distortPS;
     nvrhi::SamplerHandle sampler;
     bool initialized = false;
@@ -101,6 +109,7 @@ struct ParticlePassData {
     u32 hiZMipLevels;
     ParticlePassState* passState;
     bool hasDistortion;
+    bool importedDistortion;
 };
 
 struct ParticlePassOutput {

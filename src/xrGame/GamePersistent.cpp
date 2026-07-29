@@ -126,9 +126,6 @@ void CGamePersistent::OnAppStart()
 
     inherited::OnAppStart();
 
-    if (GEnv.Render)
-        GEnv.Render->ConvertLegacyAssetsToPBR();
-
 #ifdef XR_PLATFORM_WINDOWS
     ansel = xr_new<AnselManager>();
     ansel->Load();

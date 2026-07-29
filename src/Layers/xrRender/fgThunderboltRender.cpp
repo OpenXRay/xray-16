@@ -51,7 +51,7 @@ void FGThunderboltRender::InitResources()
     cbDesc.byteSize = sizeof(passes::SoftFXConstants);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
-    cbDesc.maxVersions = 16;
+    cbDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     cbDesc.debugName = "FGThunderboltRender_SoftCB";
     m_constantBuffer = m_device->createBuffer(cbDesc);
     R_ASSERT2(m_constantBuffer, "FGThunderboltRender: createBuffer(CB) failed");

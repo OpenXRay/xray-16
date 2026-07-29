@@ -30,6 +30,8 @@ public:
     };
     static_assert(sizeof(InstanceData) == 16, "InstanceData must be 16 bytes");
 
+    // Matches classic DetailSlot lighting: c_hemi + c_dir (sun occlusion).
+    // CoP/R2/R3 do NOT apply sector RGB (c_r/g/b) to details — that is R1-only.
     struct GPUSlotData
     {
         float world_min_x;
@@ -39,9 +41,13 @@ public:
         u32 packed_ids;
         u32 packed_palette_01;
         u32 packed_palette_23;
-        float hemi;
+        float hemi; // DetailSlot.c_hemi → ambient scale
+        float sun;  // DetailSlot.c_dir  → sun occlusion (gl/deffer_detail c0.x)
+        float _pad0;
+        float _pad1;
+        float _pad2;
     };
-    static_assert(sizeof(GPUSlotData) == 32, "GPUSlotData must be 32 bytes");
+    static_assert(sizeof(GPUSlotData) == 48, "GPUSlotData must be 48 bytes");
 
     struct SlotAABB
     {

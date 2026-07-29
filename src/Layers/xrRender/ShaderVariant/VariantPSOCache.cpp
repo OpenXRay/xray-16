@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/FrameGraphPasses/PassCommon.h"
+#include "Layers/xrRender/FrameGraphPasses/IBLPrefilterPassSetup.h"
 
 namespace xray::render
 {
@@ -163,7 +164,7 @@ nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
     pipeDesc.renderState.rasterState = pass.rasterState;
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
 
-    if (pass.blendEnabled)
+    if (pass.blendEnabled && !(remappedToSkinned && !variant.transparent))
     {
         pipeDesc.renderState.blendState.targets[0] = pass.blendRT;
         pipeDesc.renderState.blendState.alphaToCoverageEnable = pass.alphaToCoverage;
@@ -249,20 +250,20 @@ void DrawVariantPartition(
 
         framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "VariantPartition");
         bsb.ConstantBuffer("static_globals", cfg.staticGlobalsCB);
-        bsb.BufferSRV("g_Materials", cfg.materialBuffer);
-        bsb.BufferSRV("g_VariantTextures", cfg.variantTexBuffer);
+        fg::passes::BindBindlessMaterialTables(bsb);
         bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
         bsb.BufferSRV("g_CompactBatchIndices", p.batchIndicesBuffer);
         bsb.BufferSRV("g_CompactMaterialIDs", p.materialIDsBuffer);
 
         if (cfg.lightDataBuffer)
             bsb.BufferSRV("g_LightData", cfg.lightDataBuffer);
+        if (cfg.shadowDataBuffer)
+            bsb.BufferSRV("g_ShadowData", cfg.shadowDataBuffer);
         if (cfg.clusterGridBuffer)
             bsb.BufferSRV("g_ClusterGrid", cfg.clusterGridBuffer);
         if (cfg.lightIndexListBuffer)
             bsb.BufferSRV("g_LightIndexList", cfg.lightIndexListBuffer);
 
-        // CSM is fixed-register in bindless_forward; water has no shadow map.
         if (xr_strcmp(psName, "water") != 0)
         {
             static const char* kNames[3] = {"g_ShadowMap0", "g_ShadowMap1", "g_ShadowMap2"};
@@ -273,16 +274,40 @@ void DrawVariantPartition(
                 if (t)
                     bsb.Texture(kNames[i], t);
             }
+            nvrhi::ITexture* contactHist = cfg.contactHistory
+                ? cfg.contactHistory
+                : smpCache.GetDummyContactHistory(nvDevice);
+            if (contactHist)
+                bsb.Texture("g_ContactHistory", contactHist);
             nvrhi::ITexture* localAtlas = cfg.localShadowAtlas
                 ? cfg.localShadowAtlas
-                : framegraph::GetPassResourceCache().GetDummyShadowMap(nvDevice);
+                : smpCache.GetDummyShadowMap(nvDevice);
             if (localAtlas)
                 bsb.Texture("g_LocalShadowAtlas", localAtlas);
+            nvrhi::ITexture* localEsm = cfg.localShadowESM
+                ? cfg.localShadowESM
+                : smpCache.GetDummyLocalShadowESM(nvDevice);
+            if (localEsm)
+                bsb.Texture("g_LocalShadowESM", localEsm);
+            static const char* kHzb[3] = {"g_ShadowHZB0", "g_ShadowHZB1", "g_ShadowHZB2"};
+            nvrhi::ITexture* dummyHzb = smpCache.GetDummyContactDepth(nvDevice);
+            for (u32 i = 0; i < 3; ++i)
+            {
+                nvrhi::ITexture* hz = cfg.shadowHZB[i] ? cfg.shadowHZB[i] : dummyHzb;
+                if (hz)
+                    bsb.Texture(kHzb[i], hz);
+            }
+            nvrhi::ITexture* shadowMask = cfg.shadowMask
+                ? cfg.shadowMask
+                : smpCache.GetDummyContactHistory(nvDevice);
+            if (shadowMask)
+                bsb.Texture("g_ShadowMask", shadowMask);
         }
         if (sky0)
             bsb.Texture("s_env0", sky0);
         if (sky1)
             bsb.Texture("s_env1", sky1);
+        xray::render::fg::passes::BindIBLResources(bsb, xray::render::fg::passes::GetCurrentIBLBindResources(), nvDevice);
 
         auto bindingSet = smpCache.GetOrCreateBindingSet(bsb.Build(), layout, nvDevice);
         if (!bindingSet)

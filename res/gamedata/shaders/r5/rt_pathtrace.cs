@@ -22,13 +22,13 @@ cbuffer PathTracerParams : register(b5) {
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
 StructuredBuffer<RTBatchInfo> g_BatchInfo : register(t2);
 ByteAddressBuffer g_MegaVB : register(t3);
-ByteAddressBuffer g_MegaIB : register(t4);
 TextureCube<float4> g_Sky0 : register(t5);
 TextureCube<float4> g_Sky1 : register(t6);
 ByteAddressBuffer g_SkinnedVB : register(t7);
 ByteAddressBuffer g_SkinnedIB : register(t11);
 ByteAddressBuffer g_GrassVB : register(t12);
 ByteAddressBuffer g_GrassIB : register(t13);
+ByteAddressBuffer g_MegaIB : register(t18);
 
 RWTexture2D<float4> g_Accumulation : register(u0);
 RWTexture2D<float4> g_Output : register(u1);
@@ -37,13 +37,13 @@ static const uint MAX_ALPHA_SKIPS = 8;
 
 bool IsSkinnedBatch(uint batchIdx)
 {
-    return g_SkinnedBatchStart > 0 && batchIdx >= g_SkinnedBatchStart &&
-           !(g_GrassBatchStart > 0 && batchIdx >= g_GrassBatchStart);
+    return g_SkinnedBatchStart != 0xFFFFFFFFu && batchIdx >= g_SkinnedBatchStart &&
+           (g_GrassBatchStart == 0xFFFFFFFFu || batchIdx < g_GrassBatchStart);
 }
 
 bool IsGrassBatch(uint batchIdx)
 {
-    return g_GrassBatchStart > 0 && batchIdx >= g_GrassBatchStart;
+    return g_GrassBatchStart != 0xFFFFFFFFu && batchIdx >= g_GrassBatchStart;
 }
 
 float4 SampleTerrainTexture(uint index, float2 uv)
@@ -327,8 +327,10 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
                         shadowAtten = 0.0;
                         break;
                     }
-                    shadowAtten *= 0.5;
-                    shadowOrigin = shadowOrigin + sunDir * (shadowQ.CommittedRayT() + 0.002);
+                    float tHit = shadowQ.CommittedRayT();
+                    if (tHit >= 0.04)
+                        shadowAtten *= 0.88;
+                    shadowOrigin = shadowOrigin + sunDir * (tHit + 0.002);
                     continue;
                 }
 

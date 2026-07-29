@@ -34,8 +34,11 @@ void AddOne(pcstr split)
 {
     ScopeLock scope{ &logCS };
 
-    OutputDebugString(split);
-    OutputDebugString("\n");
+    if (!(LogExecCB && LogCB))
+    {
+        OutputDebugString(split);
+        OutputDebugString("\n");
+    }
 
     LogFile.push_back(split);
 

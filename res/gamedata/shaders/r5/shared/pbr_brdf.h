@@ -70,10 +70,15 @@ float3 CookTorranceSpecular(
     return numerator / denominator;
 }
 
-// Calculate F0 (base reflectivity) from metallic and albedo
+float3 SanitizeMetalAlbedo(float3 albedo, float metallic)
+{
+    float3 metalFloor = float3(0.08, 0.08, 0.085);
+    return lerp(albedo, max(albedo, metalFloor), saturate(metallic));
+}
+
 float3 CalculateF0(float3 albedo, float metallic)
 {
-    return lerp(DIELECTRIC_F0, albedo, metallic);
+    return lerp(DIELECTRIC_F0, SanitizeMetalAlbedo(albedo, metallic), metallic);
 }
 
 // Lambertian diffuse (simplest, uniform)
@@ -152,7 +157,20 @@ float3 PBRDirectLighting(
     return (diffuse + specular) * lightColor * NdotL;
 }
 
-// Simplified ambient term (placeholder for future IBL)
+float2 EnvBRDFApprox(float NdotV, float roughness)
+{
+    const float4 c0 = float4(-1.0, -0.0275, -0.572, 0.022);
+    const float4 c1 = float4(1.0, 0.0425, 1.04, -0.04);
+    float4 r = roughness * c0 + c1;
+    float a004 = min(r.x * r.x, exp2(-9.28 * NdotV)) * r.x + r.y;
+    return float2(-1.04, 1.04) * a004 + r.zw;
+}
+
+float3 EnvBRDF(float3 F0, float NdotV, float roughness, float2 lut)
+{
+    return F0 * lut.x + lut.y;
+}
+
 float3 PBRAmbient(
     float3 albedo,
     float3 N,
@@ -169,8 +187,8 @@ float3 PBRAmbient(
     float3 kD = (1.0f - F) * (1.0f - metallic);
     float3 diffuseAmbient = kD * albedo * ambientColor;
 
-    // Approximate specular ambient (will be replaced by IBL)
-    float3 specularAmbient = F * ambientColor * 0.3f;
+    float2 brdf = EnvBRDFApprox(NdotV, roughness);
+    float3 specularAmbient = EnvBRDF(F0, NdotV, roughness, brdf) * ambientColor;
 
     return (diffuseAmbient + specularAmbient) * ao;
 }

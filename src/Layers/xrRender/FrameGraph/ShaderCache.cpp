@@ -23,13 +23,24 @@ void ShaderCache::GetCachePath(
     u32 sourceHash,
     string_path& outPath)
 {
+    // Shader names use '/' (ao/ssao) or '\' (effects\flare). VerifyPath only
+    // splits on '\', so forward slashes must be normalized or mkdir("vk/ao/ssao.ps")
+    // fails on Linux when intermediate dirs are missing.
+    string_path normalizedName;
+    xr_strcpy(normalizedName, shaderName);
+    for (char* p = normalizedName; *p; ++p)
+    {
+        if (*p == '/')
+            *p = _DELIMITER;
+    }
+
     string_path shaderDir;
     if (m_backendSubdir.empty())
         xr_sprintf(shaderDir, "shaders_cache_fg%s%s%s",
-            DELIMITER, shaderName, extension);
+            DELIMITER, normalizedName, extension);
     else
         xr_sprintf(shaderDir, "shaders_cache_fg%s%s%s%s%s",
-            DELIMITER, m_backendSubdir.c_str(), DELIMITER, shaderName, extension);
+            DELIMITER, m_backendSubdir.c_str(), DELIMITER, normalizedName, extension);
 
     xr_sprintf(outPath, "%s%s%08X",
         shaderDir, DELIMITER, sourceHash);
@@ -52,15 +63,15 @@ bool ShaderCache::TryLoad(
     string_path cachePath;
     GetCachePath(shaderName, extension, sourceHash, cachePath);
 
-    // Check if cache file exists
-    if (!FS.exist("$app_data_root$", cachePath))
+    string_path fullPath;
+    FS.update_path(fullPath, "$app_data_root$", cachePath);
+    if (!FS.exist(fullPath, FSType::External))
     {
         m_stats.misses++;
         return false;
     }
 
-    // Open cache file
-    IReader* reader = FS.r_open("$app_data_root$", cachePath);
+    IReader* reader = FS.r_open(fullPath);
     if (!reader)
     {
         m_stats.misses++;
@@ -129,9 +140,11 @@ void ShaderCache::Save(
 
     // Write cache file (directory will be created automatically by w_open)
     IWriter* writer = FS.w_open("$app_data_root$", cachePath);
-    if (!writer)
+    if (!writer || !writer->valid())
     {
         Msg("! [ShaderCache] Failed to create cache file: %s", cachePath);
+        if (writer)
+            FS.w_close(writer);
         return;
     }
 

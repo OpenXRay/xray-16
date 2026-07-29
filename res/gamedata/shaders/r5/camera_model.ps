@@ -1,0 +1,72 @@
+#define SM_6_0
+
+Texture2D g_Color : register(t0);
+SamplerState smp_rtlinear : register(s0);
+
+cbuffer CameraModelParams : register(b0)
+{
+    float2 g_screenSize;
+    float g_distort;
+    float g_ca;
+    float g_vignette;
+    float g_grain;
+    float g_time;
+    float g_pad;
+};
+
+struct PS_INPUT
+{
+    float4 pos : SV_Position;
+    float2 uv : TEXCOORD0;
+};
+
+float2 DistortUV(float2 uv, float amount)
+{
+    float2 c = uv * 2.0 - 1.0;
+    float r2 = dot(c, c);
+    c *= max(1.0 - amount * r2, 0.15);
+    return c * 0.5 + 0.5;
+}
+
+float3 SampleSafe(float2 uv)
+{
+    float2 inside = step(0.0, uv) * step(uv, 1.0);
+    float mask = inside.x * inside.y;
+    float3 col = g_Color.SampleLevel(smp_rtlinear, saturate(uv), 0).rgb;
+    return col * mask;
+}
+
+float Hash21(float2 p)
+{
+    float3 p3 = frac(float3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return frac((p3.x + p3.y) * p3.z);
+}
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float2 uv = saturate(I.uv);
+    float2 duv = DistortUV(uv, g_distort);
+
+    float2 c = uv * 2.0 - 1.0;
+    float r = length(c);
+    float2 dir = (r > 1e-4) ? (c / r) : float2(0, 0);
+    float2 caOff = dir * g_ca * r * r;
+
+    float3 col;
+    col.r = SampleSafe(duv + caOff).r;
+    col.g = SampleSafe(duv).g;
+    col.b = SampleSafe(duv - caOff).b;
+
+    float vig = saturate(1.0 - r * r * g_vignette);
+    col *= vig;
+
+    if (g_grain > 1e-4)
+    {
+        float n = Hash21(I.pos.xy + g_time * 37.0) * 2.0 - 1.0;
+        float luma = dot(col, float3(0.3, 0.38, 0.22));
+        col += n * g_grain * (0.35 + 0.65 * saturate(1.0 - luma));
+    }
+
+    return float4(saturate(col), 1.0);
+}

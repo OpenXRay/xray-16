@@ -1,0 +1,154 @@
+#define SM_6_0
+
+SamplerState smp_nofilter : register(s0);
+SamplerState smp_linear   : register(s1);
+
+Texture2D g_Current : register(t0);
+Texture2D g_History : register(t1);
+Texture2D g_Depth   : register(t2);
+Texture2D g_Motion  : register(t22);
+
+cbuffer SSRTemporalParams : register(b0)
+{
+    float2 screenSize;
+    float  hasHistory;
+    float  _pad;
+};
+
+struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+
+float Lum(float3 c)
+{
+    return dot(max(c, 0.0), float3(0.2126, 0.7152, 0.0722));
+}
+
+float2 DilatedMotion(float2 uv, float2 texel)
+{
+    float bestZ = g_Depth.SampleLevel(smp_nofilter, uv, 0).x;
+    float2 bestM = g_Motion.SampleLevel(smp_nofilter, uv, 0).xy;
+    [unroll]
+    for (int y = -1; y <= 1; ++y)
+    {
+        [unroll]
+        for (int x = -1; x <= 1; ++x)
+        {
+            if (x == 0 && y == 0)
+                continue;
+            float2 suv = uv + float2(x, y) * texel;
+            float z = g_Depth.SampleLevel(smp_nofilter, suv, 0).x;
+            if (z < bestZ)
+            {
+                bestZ = z;
+                bestM = g_Motion.SampleLevel(smp_nofilter, suv, 0).xy;
+            }
+        }
+    }
+    return bestM;
+}
+
+float4 SampleHistory(float2 uv, float2 texel)
+{
+    float2 f = frac(uv * screenSize + 0.5);
+    float2 base = (floor(uv * screenSize - 0.5) + 0.5) * texel;
+    float4 s00 = g_History.SampleLevel(smp_linear, base + float2(0, 0) * texel, 0);
+    float4 s10 = g_History.SampleLevel(smp_linear, base + float2(1, 0) * texel, 0);
+    float4 s01 = g_History.SampleLevel(smp_linear, base + float2(0, 1) * texel, 0);
+    float4 s11 = g_History.SampleLevel(smp_linear, base + float2(1, 1) * texel, 0);
+    float4 sx0 = lerp(s00, s10, f.x);
+    float4 sx1 = lerp(s01, s11, f.x);
+    return lerp(sx0, sx1, f.y);
+}
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float2 uv = saturate(I.uv);
+    float2 texel = rcp(max(screenSize, 1.0.xx));
+    float4 curr = g_Current.SampleLevel(smp_nofilter, uv, 0);
+    float depth = g_Depth.SampleLevel(smp_nofilter, uv, 0).x;
+
+    if (depth >= 0.9995)
+        return float4(0, 0, 0, 0);
+
+    if (hasHistory < 0.5)
+        return curr;
+
+    float2 motion = DilatedMotion(uv, texel);
+    float2 histUV = uv + motion;
+    float motionPx = length(motion * max(screenSize, 1.0.xx));
+    if (any(histUV < texel) || any(histUV > (1.0 - texel)) || motionPx > 42.0)
+        return curr;
+
+    float4 prev = SampleHistory(saturate(histUV), texel);
+    if (prev.a < 0.002 && curr.a < 0.002)
+        return curr;
+
+    float3 nMin = curr.rgb;
+    float3 nMax = curr.rgb;
+    float3 m1 = 0.0.xxx;
+    float3 m2 = 0.0.xxx;
+    float aMean = 0.0;
+    float nw = 0.0;
+    [unroll]
+    for (int y = -1; y <= 1; ++y)
+    {
+        [unroll]
+        for (int x = -1; x <= 1; ++x)
+        {
+            float4 s = g_Current.SampleLevel(smp_nofilter, uv + float2(x, y) * texel, 0);
+            float ww = (x == 0 && y == 0) ? 1.2 : 1.0;
+            ww *= saturate(s.a * 3.0 + 0.15);
+            nMin = min(nMin, s.rgb);
+            nMax = max(nMax, s.rgb);
+            m1 += s.rgb * ww;
+            m2 += s.rgb * s.rgb * ww;
+            aMean += s.a * ww;
+            nw += ww;
+        }
+    }
+    m1 /= max(nw, 1e-4);
+    m2 /= max(nw, 1e-4);
+    aMean /= max(nw, 1e-4);
+    float3 varC = max(m2 - m1 * m1, 0.0.xxx);
+    float3 sigma = sqrt(varC);
+    float gamma = lerp(1.35, 0.75, saturate(motionPx / 18.0));
+    float3 boxMin = nMin - sigma * gamma * 0.35;
+    float3 boxMax = nMax + sigma * gamma * 0.35;
+    boxMin = min(boxMin, m1 - sigma * gamma);
+    boxMax = max(boxMax, m1 + sigma * gamma);
+    float3 pClamp = clamp(prev.rgb, boxMin, boxMax);
+
+    float prevDepth = g_Depth.SampleLevel(smp_nofilter, saturate(histUV), 0).x;
+    float docc = abs(1.0 - depth / max(prevDepth, 1e-5));
+    float vel = saturate(motionPx * 0.03);
+
+    float curL = Lum(curr.rgb);
+    float prevL = Lum(pClamp);
+    float firefly = saturate((curL - prevL * 1.25) / max(prevL + 0.035, 1e-3));
+    float weak = saturate(1.0 - curr.a * 3.2);
+    float miss = curr.a < 0.018 && prev.a > 0.035 ? 1.0 : 0.0;
+    float confGap = saturate(prev.a - curr.a);
+    float noisy = saturate(length(sigma) / max(Lum(m1) + 0.04, 1e-3) * 1.8);
+
+    float weight = saturate(0.94 - vel * 0.55 - docc * 1.5);
+    weight = max(weight, weak * 0.92);
+    weight = max(weight, firefly * 0.88);
+    weight = max(weight, miss * 0.96);
+    weight = max(weight, confGap * 0.55);
+    weight = max(weight, noisy * 0.45);
+    weight *= saturate(1.0 - docc * 2.8);
+    if (curr.a < 0.05)
+        pClamp = prev.rgb;
+
+    float3 outRgb = lerp(curr.rgb, pClamp, weight);
+    float outA = lerp(curr.a, max(curr.a, prev.a), weight * 0.9);
+    outA = max(outA, prev.a * weight * 0.88);
+    outA = max(outA, lerp(curr.a, aMean, 0.35));
+    if (firefly > 0.4)
+        outRgb = lerp(outRgb, pClamp, 0.8);
+
+    float maxKeep = max(prevL, Lum(m1)) * 2.0 + 0.04;
+    float ol = Lum(outRgb);
+    outRgb *= rcp(1.0 + max(ol - maxKeep, 0.0) * 2.4);
+
+    return float4(outRgb, saturate(outA));
+}

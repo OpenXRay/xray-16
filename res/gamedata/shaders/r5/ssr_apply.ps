@@ -1,24 +1,97 @@
-// ssr_apply.ps — SSFX combine: lerp(color, ssr, glossWeight) — no washout
 #define SM_6_0
+#include "shared/basecolor_pack.h"
+#include "shared/surface_marks.h"
 
 SamplerState smp_nofilter : register(s0);
 SamplerState smp_linear   : register(s1);
 
 Texture2D g_Color : register(t0);
 Texture2D g_SSR   : register(t1);
+Texture2D g_Base  : register(t2);
+Texture2D g_Normal : register(t3);
+Texture2D<float4> g_WorldPos : register(t4);
 
 struct PS_INPUT { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
 
+float Lum(float3 c)
+{
+	return dot(max(c, 0.0), float3(0.2126, 0.7152, 0.0722));
+}
+
 float4 main(PS_INPUT I) : SV_Target
 {
-    float3 color = g_Color.SampleLevel(smp_linear, I.uv, 0).rgb;
-    float4 ssr = g_SSR.SampleLevel(smp_linear, I.uv, 0);
-    float w = saturate(ssr.a);
-    if (w < 0.005)
-        return float4(color, 1.0);
+	float3 color = g_Color.SampleLevel(smp_linear, I.uv, 0).rgb;
+	float mark = g_WorldPos.SampleLevel(smp_nofilter, I.uv, 0).w;
+	if (IsHudSurfMark(mark) || IsWaterSurfMark(mark))
+		return float4(color, 1.0);
 
-    // Soft combine — keep reflections dark-ish so sky never bleaches the plate
-    w = min(w, 0.14);
-    float3 refl = ssr.rgb / (1.0 + ssr.rgb * 1.4);
-    return float4(lerp(color, refl, w), 1.0);
+	float2 texel;
+	g_SSR.GetDimensions(texel.x, texel.y);
+	texel = rcp(max(texel, 1.0));
+
+	float4 cCenter = g_SSR.SampleLevel(smp_nofilter, I.uv, 0);
+	if (cCenter.a < 0.002)
+	{
+		float neighA = 0.0;
+		[unroll] for (int y0 = -1; y0 <= 1; ++y0)
+			[unroll] for (int x0 = -1; x0 <= 1; ++x0)
+				neighA += g_SSR.SampleLevel(smp_nofilter, I.uv + float2(x0, y0) * texel, 0).a;
+		if (neighA < 0.01)
+			return float4(color, 1.0);
+	}
+
+	float4 acc = 0.0.xxxx;
+	float wSum = 0.0;
+	float cLum0 = Lum(cCenter.rgb);
+	[unroll]
+	for (int y = -2; y <= 2; ++y)
+	{
+		[unroll]
+		for (int x = -2; x <= 2; ++x)
+		{
+			float dist2 = float(x * x + y * y);
+			if (dist2 > 8.1)
+				continue;
+			float4 s = g_SSR.SampleLevel(smp_nofilter, I.uv + float2(x, y) * texel, 0);
+			if (s.a < 0.0015)
+				continue;
+			float sLum = Lum(s.rgb);
+			float wl = exp(-abs(sLum - cLum0) * 6.0);
+			float ws = exp(-0.35 * dist2);
+			float ww = wl * ws * saturate(s.a * 3.5);
+			if (x == 0 && y == 0)
+				ww *= 1.35;
+			acc += s * ww;
+			wSum += ww;
+		}
+	}
+	if (wSum < 1e-4)
+		return float4(color, 1.0);
+
+	float4 c0 = acc / wSum;
+	float w = saturate(c0.a);
+	if (w < 0.003)
+		return float4(color, 1.0);
+
+	float metallic = UnpackMetallicFromBaseA(g_Base.SampleLevel(smp_nofilter, I.uv, 0).a);
+	float roughness = max(g_Normal.SampleLevel(smp_nofilter, I.uv, 0).w, 0.04);
+	float gloss = saturate(1.0 - roughness);
+	float metalWet = saturate(metallic * 1.2 + gloss * gloss * 0.9);
+
+	float3 hit = c0.rgb;
+	float hitLum = Lum(hit);
+	float colLum = max(Lum(color), 1e-4);
+	float hitChroma = length(hit - hitLum.xxx);
+	float skyWash = saturate(hitLum * 2.0) * saturate(1.15 - hitChroma * 9.0);
+	skyWash = max(skyWash, saturate(hitLum / colLum - 1.0) * 0.7);
+	hit *= rcp(1.0 + hit * 1.5);
+	hit *= lerp(1.0, 0.28, skyWash);
+
+	float mixW = min(w * lerp(1.05, 0.4, skyWash), lerp(0.12, 0.45, metalWet));
+	mixW *= lerp(0.2, 1.0, metalWet);
+	float3 unioned = max(color, hit);
+	float3 outc = lerp(color, lerp(unioned, hit, saturate(metallic + gloss * 0.5)), mixW);
+	float outLum = max(Lum(outc), 1e-4);
+	outc *= lerp(1.0, max(colLum / outLum, 1.0), saturate(mixW * 1.1));
+	return float4(max(outc, 0.0), 1.0);
 }

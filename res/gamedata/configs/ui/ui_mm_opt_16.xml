@@ -511,6 +511,98 @@
             <options_item entry="r4_enable_tessellation" group="mm_opt_video_adv" depend="vid"/>
         </check_r4_tessellation>
 
+        <cap_rt_gi x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_rt_gi</text>
+        </cap_rt_gi>
+        <check_rt_gi x="133" y="0" width="35" stretch="1" height="29">
+            <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r_rt_gi" group="mm_opt_video_adv" depend="runtime"/>
+        </check_rt_gi>
+
+        <cap_rt_gi_intensity x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_rt_gi_intensity</text>
+        </cap_rt_gi_intensity>
+        <track_rt_gi_intensity x="140" y="6" width="188" height="16">
+            <options_item entry="r_rt_gi_intensity" group="mm_opt_video_adv" depend="runtime"/>
+        </track_rt_gi_intensity>
+
+        <cap_denoise x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_denoise</text>
+        </cap_denoise>
+        <check_denoise x="133" y="0" width="35" stretch="1" height="29">
+            <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r_denoise" group="mm_opt_video_adv" depend="runtime"/>
+        </check_denoise>
+
+        <cap_upscale x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_upscale</text>
+        </cap_upscale>
+        <track_upscale x="140" y="6" width="188" height="16" step="1" is_integer="1">
+            <options_item entry="r_upscale" group="mm_opt_video_adv" depend="runtime"/>
+        </track_upscale>
+
+        <cap_upscale_quality x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_upscale_quality</text>
+        </cap_upscale_quality>
+        <track_upscale_quality x="140" y="6" width="188" height="16" step="1" is_integer="1">
+            <options_item entry="r_upscale_quality" group="mm_opt_video_adv" depend="runtime"/>
+        </track_upscale_quality>
+
+        <cap_render_scale x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_render_scale</text>
+        </cap_render_scale>
+        <track_render_scale x="140" y="6" width="188" height="16">
+            <options_item entry="r_render_scale" group="mm_opt_video_adv" depend="runtime"/>
+        </track_render_scale>
+
+        <cap_fsr_fg x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_fsr_fg</text>
+        </cap_fsr_fg>
+        <check_fsr_fg x="133" y="0" width="35" stretch="1" height="29">
+            <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r_fsr_fg" group="mm_opt_video_adv" depend="runtime"/>
+        </check_fsr_fg>
+
+        <cap_dlss_fg x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_dlss_fg</text>
+        </cap_dlss_fg>
+        <check_dlss_fg x="133" y="0" width="35" stretch="1" height="29">
+            <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r_dlss_fg" group="mm_opt_video_adv" depend="runtime"/>
+        </check_dlss_fg>
+
+        <cap_dlss_rr x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_dlss_rr</text>
+        </cap_dlss_rr>
+        <check_dlss_rr x="133" y="0" width="35" stretch="1" height="29">
+            <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r_dlss_rr" group="mm_opt_video_adv" depend="runtime"/>
+        </check_dlss_rr>
+
+        <cap_amd_rr x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_amd_rr</text>
+        </cap_amd_rr>
+        <check_amd_rr x="133" y="0" width="35" stretch="1" height="29">
+            <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r_amd_rr" group="mm_opt_video_adv" depend="runtime"/>
+        </check_amd_rr>
+
+        <cap_taa x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_taa</text>
+        </cap_taa>
+        <check_taa x="133" y="0" width="35" stretch="1" height="29">
+            <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r_taa" group="mm_opt_video_adv" depend="runtime"/>
+        </check_taa>
+
+        <cap_cas x="12" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_cas</text>
+        </cap_cas>
+        <check_cas x="133" y="0" width="35" stretch="1" height="29">
+            <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r_cas" group="mm_opt_video_adv" depend="runtime"/>
+        </check_cas>
+
         <btn_to_simply x="270" y="322" width="86" height="24" stretch="1" accel="ui_action_1">
             <text align="c" font="letterica16">ui_mm_simply</text>
             <texture>ui_inGame2_button</texture>

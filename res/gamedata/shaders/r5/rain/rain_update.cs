@@ -112,9 +112,21 @@ bool UnderRoof(float3 headPos)
         return false;
 
     float depth = saturate(uvz.z);
-    float shadowDepth = g_RainShadow.SampleLevel(smp_nofilter, uvz.xy, 0).x;
     const float bias = 0.0015;
-    float cover = saturate((shadowDepth - (depth - bias)) * 800.0);
+    float2 smSize;
+    g_RainShadow.GetDimensions(smSize.x, smSize.y);
+    float2 texel = 1.0 / max(smSize, float2(1.0, 1.0));
+    float cover = 0.0;
+    [unroll] for (int y = -2; y <= 2; ++y)
+    {
+        [unroll] for (int x = -2; x <= 2; ++x)
+        {
+            float2 o = float2((float)x, (float)y) * texel * 1.25;
+            float shadowDepth = g_RainShadow.SampleLevel(smp_nofilter, uvz.xy + o, 0).x;
+            cover += saturate((shadowDepth - (depth - bias)) * 120.0);
+        }
+    }
+    cover *= (1.0 / 25.0);
     float edge = saturate(min(uvz.x, 1.0 - uvz.x) * 8.0) * saturate(min(uvz.y, 1.0 - uvz.y) * 8.0);
     cover = lerp(1.0, cover, edge);
     return cover < 0.5;

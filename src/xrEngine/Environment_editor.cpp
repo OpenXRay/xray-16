@@ -7,6 +7,7 @@
 #include "IGame_Level.h"
 
 #include "editor_helper.h"
+#include "xr_ioc_cmd.h"
 
 // Phase 5: Grass wind tuning parameters (defined here in xrEngine, externed in render DLL)
 ENGINE_API float ps_r3_grass_wind_multiplier = 1.0f;     // Multiplier for environment wind strength
@@ -20,8 +21,9 @@ ENGINE_API u32 ps_r3_grass_wind_octaves = 5;             // FBM octave count
 ENGINE_API Fvector3 ps_r3_grass_color_tip = {0.35f, 0.45f, 0.18f};    // Blade tip color (vibrant green)
 ENGINE_API Fvector3 ps_r3_grass_color_base = {0.28f, 0.38f, 0.15f};   // Blade base color (duller brown-green)
 ENGINE_API float ps_r3_grass_color_variation = 0.15f;                  // Per-blade color variation (±%)
-ENGINE_API Fvector3 ps_r3_grass_sss_color = {0.55f, 0.85f, 0.25f};     // Subsurface scattering tint
-ENGINE_API float ps_r3_grass_sss_intensity = 0.9f;                     // SSS strength (CoP billboards)
+// Tint multiplies albedo in EvaluateFoliageSSS — keep near-white so blade color comes from texture.
+ENGINE_API Fvector3 ps_r3_grass_sss_color = {1.0f, 1.0f, 1.0f};
+// Intensity: use r_foliage_sss / r_foliage_sss_intensity (shared with trees/leaves)
 
 // Per-object-ID color tints (64 grass types max)
 // Default all to white (1,1,1) = no tint
@@ -597,11 +599,18 @@ void CEnvironment::on_tool_frame()
 
             ImGui::SeparatorText("Subsurface Scattering");
 
-            ImGui::ColorEdit3("SSS color", reinterpret_cast<float*>(&ps_r3_grass_sss_color));
-            ItemHelp("Color of light transmitted through grass blades (backlit effect)");
+            {
+                bool foliageSssOn = (ps_r_foliage_sss != 0);
+                if (ImGui::Checkbox("Foliage SSS (r_foliage_sss)", &foliageSssOn))
+                    ps_r_foliage_sss = foliageSssOn ? 1 : 0;
+                ItemHelp("Shared enable for grass, leaves, bushes (console: r_foliage_sss)");
+            }
 
-            ImGui::DragFloat("SSS intensity", &ps_r3_grass_sss_intensity, 0.01f, 0.0f, 1.0f);
-            ItemHelp("Strength of subsurface scattering effect");
+            ImGui::ColorEdit3("SSS color", reinterpret_cast<float*>(&ps_r3_grass_sss_color));
+            ItemHelp("Optional grass tint (trees use albedo). White = texture color only");
+
+            ImGui::DragFloat("SSS intensity (r_foliage_sss_intensity)", &ps_r_foliage_sss_intensity, 0.01f, 0.0f, 4.0f);
+            ItemHelp("Shared strength for grass + foliage (console: r_foliage_sss_intensity)");
 
             ImGui::SeparatorText("Per-Object Tint");
 

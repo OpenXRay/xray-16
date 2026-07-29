@@ -45,9 +45,6 @@ void VolumetricRenderer::Initialize(RenderDevice* device)
         return;
     }
 
-    ClearSources();
-    RegisterSource(&m_worldFog);
-
     m_initialized = true;
     m_hasHistory = false;
     Msg("* [VolumetricRenderer] Initialized froxel volume %ux%ux%u (+temporal)",
@@ -83,6 +80,13 @@ void VolumetricRenderer::ClearSources()
 
 void VolumetricRenderer::BeginFrame()
 {
+    ClearSources();
+    RegisterSource(&m_worldFog);
+    m_lightShaft.PrepareGPUData();
+    if (m_lightShaft.GetIntensity() > 1e-4f)
+        RegisterSource(&m_lightShaft);
+    RegisterSource(&m_particleEmitter);
+
     for (auto* s : m_sources)
     {
         if (s)
@@ -92,8 +96,6 @@ void VolumetricRenderer::BeginFrame()
 
 void VolumetricRenderer::SwapFroxelHistory()
 {
-    // Mark that a complete lit volume exists for next-frame temporal.
-    // Actual copy is done in VolumetricPass execute (GPU copyTexture).
     m_hasHistory = (m_froxelVolume != nullptr && m_prevFroxelVolume != nullptr);
 }
 

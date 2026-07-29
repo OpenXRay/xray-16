@@ -75,7 +75,10 @@ void VerifyPath(pcstr path)
     string1024 tmp;
     for (int i = 0; path[i]; i++)
     {
-        if (path[i] != _DELIMITER || i == 0)
+        // Engine paths use '\'; callers may also pass '/'. Split on both so nested
+        // cache dirs like shaders_cache_fg/vk/ao/ssao.ps create intermediates on POSIX.
+        const char c = path[i];
+        if ((c != _DELIMITER && c != '/') || i == 0)
             continue;
         CopyMemory(tmp, path, i);
         tmp[i] = 0;

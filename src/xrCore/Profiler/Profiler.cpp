@@ -42,6 +42,9 @@ void FrameEnd()
         return;
 
     CPUProfiler::Instance().FrameEnd();
+#if XRAY_TRACY_ENABLED
+    FrameMark;
+#endif
 }
 
 CPUProfiler& GetCPUProfiler()

@@ -10,6 +10,10 @@ struct GPUSlotData
     uint packed_palette_01;
     uint packed_palette_23;
     float hemi;
+    float sun;
+    float _pad0;
+    float _pad1;
+    float _pad2;
 };
 
 struct InstanceData
@@ -287,8 +291,9 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         else
         {
             DetailModelGPU mdl = g_detail_models[object_id];
-            float scale = mdl.maxScale * g_detail_height_multiplier;
-            float rotation = 0.0f;
+            float scale = lerp(mdl.minScale, mdl.maxScale, pcg_randF(r_scale, 0.0, 1.0))
+                        * g_detail_height_multiplier;
+            float rotation = pcg_randF(r_yaw, 0.0, TWO_PI);
 
             uint flags = asuint(mdl.flags);
             const uint DO_NO_WAVING = 0x0001;

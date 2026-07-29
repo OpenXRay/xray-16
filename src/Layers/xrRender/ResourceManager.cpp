@@ -56,7 +56,9 @@ IBlender* CResourceManager::_FindBlender(LPCSTR Name)
 }
 
 // Helper: Convert oBlend token ID to BlendMode
-// Token IDs from Blender_Screen_SET/Blender_Particle: 0=SET, 1=BLEND, 2=ADD, 3=MUL, 4=MUL_2X, 5=ALPHA-ADD
+// Screen_SET: 0=SET, 1=BLEND, 2=ADD, 3=MUL, 4=MUL_2X, 5=ALPHA-ADD,
+//             6=MUL_2X (B^D) wallmarks, 7=SET(2r), 8=BLEND(2r), 9=BLEND(4r)
+// Particle:   0..5 only (same as Screen_SET 0..5)
 static CResourceManager::BlendMode TokenToBlendMode(u32 tokenID)
 {
     using BlendMode = CResourceManager::BlendMode;
@@ -68,7 +70,11 @@ static CResourceManager::BlendMode TokenToBlendMode(u32 tokenID)
     case 3: return BlendMode::Multiply;     // MUL
     case 4: return BlendMode::Multiply2X;   // MUL_2X
     case 5: return BlendMode::Additive;     // ALPHA-ADD
-    default: return BlendMode::AlphaBlend;  // Unknown - assume blend
+    case 6: return BlendMode::Multiply2X;   // MUL_2X (B^D) — effects\wallmarkmult
+    case 7: return BlendMode::Opaque;       // SET (2r)
+    case 8: return BlendMode::AlphaBlend;   // BLEND (2r)
+    case 9: return BlendMode::AlphaBlend;   // BLEND (4r)
+    default: return BlendMode::AlphaBlend;
     }
 }
 

@@ -21,6 +21,7 @@
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "Layers/xrRender/Profiler/StatsOverlay.h"
+#include "Layers/xrRender/FrameGraphPasses/LodPassSetup.h"
 
 struct ImDrawData;
 
@@ -251,6 +252,8 @@ public:
         float gbufferMs = 0.0f;
         float lightingMs = 0.0f;
         float tonemapMs = 0.0f;
+        float fgSetupPassesMs = 0.0f;
+        float fgCompileMs = 0.0f;
         u32 numDrawCalls = 0;
         u32 numTriangles = 0;
     };
@@ -285,6 +288,9 @@ public:
     // Decal Manager accessor (for wallmark routing)
     fg::decals::DecalManager* GetDecalManager() const { return m_decalManager.get(); }
     fg::decals::OverlayManager* GetOverlayManager() const { return m_overlayManager.get(); }
+
+    fg::RTAccelStructManager* GetRTAccelMgr() const { return m_rtAccelMgr.get(); }
+    bool IsRTGIActive() const;
 
 public:
     struct _options
@@ -550,6 +556,7 @@ private:
 
     // HUD geometry (separate from world geometry)
     xr_vector<GeometryBatch> m_hudBatches;
+    xr_vector<fg::passes::LodImpostorInstance> m_lodImpostors;
 
     // Particle systems (collected during same spatial query as geometry)
     xr_vector<fg::passes::ParticleBatch> m_worldParticleBatches;  // World-space particles
@@ -562,6 +569,8 @@ private:
     xr_vector<GeometryBatch> m_cachedStaticBatches;
     xr_vector<xr_vector<u32>> m_sectorStaticBatchIds;
     xr_vector<u8> m_sectorCacheReady;
+    xr_vector<u8> m_staticSubmitMark;
+    u8 m_staticSubmitEpoch = 0;
     xr_map<dxRender_Visual*, xr_vector<u32>> m_visualCacheBatchIds;
     bool m_staticCacheInitialized = false;
     bool m_portalTraverseActive = false;

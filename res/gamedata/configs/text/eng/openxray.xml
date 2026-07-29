@@ -126,4 +126,40 @@
 	<string id="ui_mm_r2_sun_details">
 		<text>Grass shadows</text>
 	</string>
+	<string id="ui_mm_rt_gi">
+		<text>Ray-traced GI (ReSTIR)</text>
+	</string>
+	<string id="ui_mm_rt_gi_intensity">
+		<text>RT GI intensity</text>
+	</string>
+	<string id="ui_mm_denoise">
+		<text>RT denoise</text>
+	</string>
+	<string id="ui_mm_upscale">
+		<text>Upscaling (0=Off 1=FSR 2=DLSS)</text>
+	</string>
+	<string id="ui_mm_upscale_quality">
+		<text>Upscale quality</text>
+	</string>
+	<string id="ui_mm_render_scale">
+		<text>Render scale</text>
+	</string>
+	<string id="ui_mm_fsr_fg">
+		<text>FSR frame generation</text>
+	</string>
+	<string id="ui_mm_dlss_fg">
+		<text>DLSS frame generation</text>
+	</string>
+	<string id="ui_mm_dlss_rr">
+		<text>DLSS ray reconstruction</text>
+	</string>
+	<string id="ui_mm_amd_rr">
+		<text>AMD ray regeneration</text>
+	</string>
+	<string id="ui_mm_taa">
+		<text>TAA</text>
+	</string>
+	<string id="ui_mm_cas">
+		<text>CAS sharpen</text>
+	</string>
 </string_table>

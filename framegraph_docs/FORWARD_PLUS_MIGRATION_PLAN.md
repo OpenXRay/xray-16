@@ -806,6 +806,18 @@ MaterialPSO* MaterialCache::GetOrCreateDepthPSO(dxRender_Visual* visual) {
 
 **Goal:** Convert legacy diffuse/specular/gloss materials to PBR workflow
 
+### Implementation status (shipped)
+
+- CLI: `src/Tools/MaterialConverter/` → target `MaterialConverter`
+  - `scan|convert|fix|report --root <textures_dir>`
+  - `--mode heuristic` (default), `--mode ai` when `-DXRAY_USE_AI_PBR=ON`
+- Output: packed `<base>_pbr.dds` (R=M, G=R, B=AO, A=Parallax) + `.thm` `pbr_name`
+- Runtime fallback: `PBRTextureConverter::ConvertTexturesToPBR` uses heuristic when AI unavailable
+- Shader PBR: `ResolveMaterialPBR` / `SamplePBRFull` in `bindless_common.h`; LOD/scope/particle_lit/decal consume PBR
+- Smoke:
+  1. `MaterialConverter convert --root res/gamedata/textures --kind OpaqueDielectric`
+  2. Load level with `r4_use_pbr 1`, confirm `MAT_FLAG_HAS_PBR` on forward/skinned/terrain/LOD
+
 This is the **perfect time** to modernize to PBR because:
 - Shaders are being rewritten anyway (no legacy baggage)
 - Texture conversion can happen offline (one-time cost)

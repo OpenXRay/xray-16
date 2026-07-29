@@ -34,6 +34,13 @@ void fgUIShader::create(LPCSTR sh, LPCSTR tex)
     auto vsResult = shaderLoader->LoadVertexShader(sh, "main");
     auto psResult = shaderLoader->LoadPixelShader(sh, "main");
 
+    // Blender names like hud\fog_of_war have no r5 sources; prefer hud\default before stubs.
+    if ((!vsResult.handle || !psResult.handle) && sh && strstr(sh, "hud"))
+    {
+        vsResult = shaderLoader->LoadVertexShader("hud\\default", "main");
+        psResult = shaderLoader->LoadPixelShader("hud\\default", "main");
+    }
+
     if (!vsResult.handle || !psResult.handle)
     {
         Msg("* [fgUIShader] Shader '%s' not found, falling back to stub_notransform_t", sh);

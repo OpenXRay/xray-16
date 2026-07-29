@@ -27,7 +27,7 @@ static float2 UV1[4] = { float2(1,0), float2(1,1), float2(0,0), float2(0,1) };
 void WriteRainVertex(uint vIdx, float3 pos, uint col, float2 uv)
 {
     uint b = vIdx * 24u;
-    g_Vertices.Store3(b, asuint(float4(pos, 0.0)));
+    g_Vertices.Store3(b, asuint(pos));
     g_Vertices.Store(b + 12u, col);
     g_Vertices.Store2(b + 16u, asuint(uv));
 }

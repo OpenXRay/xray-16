@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "light.h"
+#include "Layers/xrRender/xrRender_console.h"
 
 namespace xray::render::fg
 {
@@ -300,6 +301,7 @@ void light::EnsureOmniparts()
         L->set_volumetric_quality(m_volumetric_quality);
         L->set_volumetric_intensity(m_volumetric_intensity);
         L->set_volumetric_distance(m_volumetric_distance);
+        L->spatial_move();
     }
 }
 
@@ -335,6 +337,21 @@ void light::set_attenuation_params(float a0, float a1, float a2, float fo)
     attenuation1 = a1;
     attenuation2 = a2;
     falloff = fo;
+}
+
+float light::get_LOD() const
+{
+    if (!flags.bShadow)
+        return 1.f;
+
+    const float fovFactor = _sqr(90.f / std::max(Device.fFOV, 1.f));
+    const float gScreen = float(Device.dwWidth * Device.dwHeight) * fovFactor * (EPS_S + ps_r__LOD);
+    const float ssaStart = _sqr(ps_r__GLOD_ssa_start / 3.f) / std::max(gScreen, 1.f);
+    const float ssaEnd = _sqr(ps_r__GLOD_ssa_end / 3.f) / std::max(gScreen, 1.f);
+    const float distSQ = Device.vCameraPosition.distance_to_sqr(spatial.sphere.P) + EPS;
+    const float ssa = ps_r2_slight_fade * spatial.sphere.R / distSQ;
+    const float denom = std::max(ssaStart - ssaEnd, 1e-8f);
+    return _sqrt(clampr((ssa - ssaEnd) / denom, 0.f, 1.f));
 }
 
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)

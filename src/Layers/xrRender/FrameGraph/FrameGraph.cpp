@@ -1177,10 +1177,6 @@ void FrameGraph::OptimizeMemoryAliasing() {
                     compatible = false;
                 }
 
-                // Exact dimensions required — aliasing a half-res bloom mip onto a
-                // full-res RT makes DrawFS write into the top-left corner only
-                // (viewport = logical size) while UV sampling covers the whole
-                // oversized texture → black frame + nested thumbnails.
                 if (current->desc.type != ResourceDesc::Type::Buffer) {
                     if (current->desc.width != candidate->desc.width ||
                         current->desc.height != candidate->desc.height ||
@@ -1188,6 +1184,13 @@ void FrameGraph::OptimizeMemoryAliasing() {
                         current->desc.arraySize != candidate->desc.arraySize ||
                         current->desc.mipLevels != candidate->desc.mipLevels ||
                         current->desc.sampleCount != candidate->desc.sampleCount) {
+                        compatible = false;
+                    }
+                    const bool curUAV = current->desc.isUAV || current->desc.allowUAV;
+                    const bool candUAV = candidate->desc.isUAV || candidate->desc.allowUAV;
+                    if (curUAV != candUAV ||
+                        current->desc.isRenderTarget != candidate->desc.isRenderTarget ||
+                        current->desc.isDepthStencil != candidate->desc.isDepthStencil) {
                         compatible = false;
                     }
                 }

@@ -36,7 +36,19 @@ extern ECORE_API int ps_r_depth_prepass; // 1=opaque depth prepass for early-Z i
 extern ECORE_API int ps_r_hiz_occlusion; // 1=Hi-Z occlusion in GPU cull, 0=frustum only
 extern ECORE_API int ps_r_shadow_light_cull; // 1=light-frustum CSM caster cull
 extern ECORE_API int ps_r_local_shadows; // 1=spot/omni local shadow atlas
-extern ECORE_API int ps_r_local_shadow_tiles; // max atlas slices (1..16)
+extern ECORE_API int ps_r_local_shadow_tiles;
+extern ECORE_API int ps_r_local_shadow_update_div; // period multiplier for soft refresh tiers
+extern ECORE_API int ps_r_local_shadow_redraw_budget; // max soft tiles redrawn per frame
+extern ECORE_API int ps_r_local_shadow_skinned_max;
+extern ECORE_API float ps_r_local_shadow_near; // full-rate distance (m)
+extern ECORE_API float ps_r_local_shadow_mid; // mid-rate distance (m)
+extern ECORE_API int ps_r_local_shadow_far_period; // soft refresh period beyond mid
+extern ECORE_API int ps_r_local_shadow_atlas; // atlas edge: 1024/2048/4096/8192
+extern ECORE_API int ps_r_local_shadow_filter; // 0=PCF depth, 1=ESM
+extern ECORE_API int ps_r_shadow_hzb; // 1=per-cascade Shadow-HZB for hierarchical CSM
+extern ECORE_API int ps_r_shadow_mask; // 1=half-res screen shadow mask (sun/contact/local)
+extern ECORE_API int ps_r_cluster_debug; // 0=off,1=tileXY,2=slice heatmap
+extern ECORE_API int ps_r_cluster_tile_size; // 32 or 64 (applied next grid rebuild)
 extern ECORE_API int ps_r_shadow_indoor_near_only; // 1=indoor portal sets use cascade 0 only
 extern ECORE_API int ps_r_portal_cull; // 1=portal/sector visibility filter
 extern ECORE_API int ps_r_hom; // 1=CPU HOM occlusion on top of portal traversal
@@ -128,6 +140,23 @@ extern ECORE_API float ps_r2_tonemap_middlegray; // r2-only
 extern ECORE_API float ps_r2_tonemap_adaptation; // r2-only
 extern ECORE_API float ps_r2_tonemap_low_lum; // r2-only
 extern ECORE_API float ps_r2_tonemap_amount; // r2-only
+extern ECORE_API float ps_r_exposure_ev_bias;
+extern ECORE_API float ps_r_exposure_env_strength;
+extern ECORE_API float ps_r_exposure_env_ref;
+extern ECORE_API float ps_r_exposure_adapt_up;
+extern ECORE_API float ps_r_exposure_adapt_down;
+extern ECORE_API float ps_r_tonemap_white;
+extern ECORE_API float ps_r_tonemap_contrast;
+extern ECORE_API int ps_r_camera;
+extern ECORE_API int ps_r_camera_distort_enable;
+extern ECORE_API int ps_r_camera_ca_enable;
+extern ECORE_API int ps_r_camera_vignette_enable;
+extern ECORE_API int ps_r_camera_grain_enable;
+extern ECORE_API int ps_r_camera_mblur_enable;
+extern ECORE_API float ps_r_camera_distort;
+extern ECORE_API float ps_r_camera_ca;
+extern ECORE_API float ps_r_camera_vignette;
+extern ECORE_API float ps_r_camera_grain;
 extern ECORE_API float ps_r2_ls_bloom_kernel_scale; // r2-only	// gauss
 extern ECORE_API float ps_r2_ls_bloom_kernel_g; // r2-only	// gauss
 extern ECORE_API float ps_r2_ls_bloom_kernel_b; // r2-only	// bilinear

@@ -1,4 +1,3 @@
-// temporal_reproject.cs — temporal accumulate froxel density/lighting
 #include "volumetric/shared_froxel.h"
 
 Texture3D<float4> t_PrevFroxel : register(t0);
@@ -7,9 +6,10 @@ SamplerState smp_linear : register(s0);
 
 cbuffer TemporalParams : register(b6)
 {
-	float4x4 cb_PrevVP;       // previous frame view-projection
+	float4x4 cb_PrevVP;
 	float    cb_TemporalAlpha;
-	float3   cb_PadT;
+	uint     cb_FrameIndex;
+	float2   cb_PadT;
 };
 
 [numthreads(8, 8, 1)]
@@ -34,6 +34,14 @@ void main(uint3 dtID : SV_DispatchThreadID)
 	if (all(uv >= 0.0) && all(uv <= 1.0) && zNorm >= 0.0 && zNorm <= 1.0)
 		hist = t_PrevFroxel.SampleLevel(smp_linear, prevUVW, 0);
 
-	float a = saturate(cb_TemporalAlpha);
-	u_FroxelVolume[dtID] = lerp(cur, hist, a);
+	bool shouldUpdate = ((dtID.x + dtID.y + dtID.z + cb_FrameIndex) % 4u) == 0u;
+	if (shouldUpdate)
+	{
+		float a = saturate(cb_TemporalAlpha);
+		u_FroxelVolume[dtID] = lerp(cur, hist, a);
+	}
+	else
+	{
+		u_FroxelVolume[dtID] = hist;
+	}
 }

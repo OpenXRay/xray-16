@@ -1,6 +1,7 @@
 // xrRender/GPUCullingManager.cpp
 #include "stdafx.h"
 #include "GPUCullingManager.h"
+#include "ClusteredLightManager.h"
 #include "xrCore/Profiler/Profiler.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
@@ -484,7 +485,7 @@ void GPUCullingManager::CreateBuffers(fg::RenderDevice* device)
     //  TESSELLATION CULLING SET (opaque bump# / PN+HM)
     // ───────────────────────────────────────────────────────
     {
-        const u32 maxTess = 4096;
+        const u32 maxTess = m_maxObjects;
         m_tessSet.maxObjects = maxTess;
 
         nvrhi::BufferDesc desc;
@@ -1744,6 +1745,12 @@ void GPUCullingManager::Shutdown()
     m_cullParamsCB = fg::BufferHandle();
     m_cullPipeline = nullptr;
     m_cullLayout = nullptr;
+    m_lightShadowCullPipeline = nullptr;
+    m_lightShadowCullLayout = nullptr;
+    m_lightShadowCullParamsCB = nullptr;
+    m_lightShadowCullReady = false;
+    m_localShadowCullSlots.clear();
+    m_localShadowCullSlotCount = 0;
     m_pointSampler = nullptr;
 
     m_compactParamsCB = fg::BufferHandle();
@@ -1826,6 +1833,8 @@ void GPUCullingManager::Shutdown()
 
     // Visibility buffer
     m_staticTerrainDrawArgsUploaded = false;
+    m_terrainDataCached = false;
+    m_lastMaterialCountForStatic = 0;
     m_staticDataCached = false;
 
     m_initialized = false;
@@ -1968,34 +1977,108 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
 
     const auto& batches = geometry->GetBatches();
     u32 totalBatches = static_cast<u32>(batches.size());
+    const bool haveStaticSource = m_staticBatchSource && !m_staticBatchSource->empty();
 
-    if (totalBatches == 0) {
-        m_staticSet.objectCount = 0;
+    if (totalBatches == 0 && !(haveStaticSource && !m_staticDataCached)) {
         m_dynamicSet.objectCount = 0;
         m_tessSet.objectCount = 0;
-        m_objectCount = 0;
+        m_transparentSet.objectCount = 0;
+        m_transientDataCached = false;
+        m_transientUploadFingerprint = 0;
+        if (!m_staticDataCached)
+        {
+            m_staticSet.objectCount = 0;
+            m_objectCount = 0;
+        }
+        else
+        {
+            m_objectCount = m_staticSet.objectCount;
+        }
         return;
     }
 
-    // Tess routing depends on MaterialBuffer.tessMethod, which fills in as textures load.
-    // Rebuild static lists every frame while tessellation is enabled.
-    // Apple/MoltenVK: never route into PatchList (IOGPU kernel panic risk).
 #if defined(XR_PLATFORM_APPLE)
     const bool tessFlagOn = false;
 #else
     const bool tessFlagOn = ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
 #endif
-    if (tessFlagOn)
+    {
+        const u32 matCount = bindless::MaterialBuffer::Instance().GetMaterialCount();
+        if (matCount != m_lastMaterialCountForStatic)
+        {
+            m_staticDataCached = false;
+            m_staticSet.objectsUploaded = false;
+            m_terrainDataCached = false;
+            m_staticTerrainDrawArgsUploaded = false;
+            m_transientDataCached = false;
+            m_lastMaterialCountForStatic = matCount;
+        }
+    }
+    if (tessFlagOn != m_lastTessFlagOn)
+    {
         m_staticDataCached = false;
+        m_staticSet.objectsUploaded = false;
+        m_transientDataCached = false;
+        m_lastTessFlagOn = tessFlagOn;
+    }
+
+    auto hashMix = [](u64 h, u64 v) -> u64 {
+        return h ^ (v + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2));
+    };
+    auto hashFloat = [&](u64 h, float f) -> u64 {
+        u32 bits = 0;
+        memcpy(&bits, &f, sizeof(bits));
+        return hashMix(h, bits);
+    };
+
+    u64 transientFp = 0;
+    transientFp = hashMix(transientFp, tessFlagOn ? 1u : 0u);
+    transientFp = hashMix(transientFp, bindless::MaterialBuffer::Instance().GetMaterialCount());
+    {
+        constexpr u32 kMaxTessIndexCount = 8192;
+        u32 transientCount = 0;
+        for (u32 i = 0; i < totalBatches; ++i)
+        {
+            const auto& batch = batches[i];
+            if (batch.isSkinned || batch.isTerrain)
+                continue;
+
+            bool routeTess = false;
+            if (tessFlagOn && !batch.IsStrictB2F())
+            {
+                const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(batch.bindlessMaterialID);
+                routeTess = mat && mat->tessMethod != 0 && batch.indexCount > 0 &&
+                    batch.indexCount <= kMaxTessIndexCount;
+            }
+            const bool isTransient = batch.IsStrictB2F() || routeTess || !batch.isStatic;
+            if (!isTransient)
+                continue;
+
+            ++transientCount;
+            transientFp = hashMix(transientFp, reinterpret_cast<uintptr_t>(batch.visual));
+            transientFp = hashMix(transientFp, batch.bindlessMaterialID);
+            transientFp = hashMix(transientFp, batch.indexCount);
+            transientFp = hashMix(transientFp, batch.isStatic ? 1u : 0u);
+            transientFp = hashMix(transientFp, batch.IsStrictB2F() ? 1u : 0u);
+            transientFp = hashMix(transientFp, routeTess ? 1u : 0u);
+            transientFp = hashFloat(transientFp, batch.worldMatrix._11);
+            transientFp = hashFloat(transientFp, batch.worldMatrix._22);
+            transientFp = hashFloat(transientFp, batch.worldMatrix._33);
+            transientFp = hashFloat(transientFp, batch.worldMatrix._41);
+            transientFp = hashFloat(transientFp, batch.worldMatrix._42);
+            transientFp = hashFloat(transientFp, batch.worldMatrix._43);
+            transientFp = hashFloat(transientFp, batch.worldBoundsRadius);
+        }
+        transientFp = hashMix(transientFp, transientCount);
+    }
+    const bool skipTransientRebuild =
+        m_transientDataCached && transientFp == m_transientUploadFingerprint;
 
     R_ASSERT2(m_staticSet.objectBuffer && m_staticSet.drawArgsBuffer && m_staticSet.visibilityBuffer,
         "Static GPU culling buffers not initialized");
     R_ASSERT2(m_dynamicSet.objectBuffer && m_dynamicSet.drawArgsBuffer && m_dynamicSet.visibilityBuffer,
         "Dynamic GPU culling buffers not initialized");
 
-    // Build object data, draw args, and material ID arrays
-    // NOTE: Skip skinned batches - they use separate per-draw rendering with bone matrices
-    // NOTE: Terrain batches are tracked separately for terrain shader rendering
     if (!m_staticDataCached) {
         m_staticObjectData.clear();
         m_staticObjectData.reserve(totalBatches);
@@ -2009,36 +2092,37 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         m_staticBatchVertexCounts.reserve(totalBatches);
     }
 
-    m_dynamicObjectData.clear();
-    m_dynamicObjectData.reserve(totalBatches);
-    m_dynamicDrawArgsData.clear();
-    m_dynamicDrawArgsData.reserve(totalBatches);
-    m_dynamicMaterialIDData.clear();
-    m_dynamicMaterialIDData.reserve(totalBatches);
-    m_dynamicInstanceData.clear();
-    m_dynamicInstanceData.reserve(totalBatches);
+    if (!skipTransientRebuild) {
+        m_dynamicObjectData.clear();
+        m_dynamicObjectData.reserve(totalBatches);
+        m_dynamicDrawArgsData.clear();
+        m_dynamicDrawArgsData.reserve(totalBatches);
+        m_dynamicMaterialIDData.clear();
+        m_dynamicMaterialIDData.reserve(totalBatches);
+        m_dynamicInstanceData.clear();
+        m_dynamicInstanceData.reserve(totalBatches);
 
-    // Terrain-specific arrays
-    m_terrainObjectData.clear();
-    m_terrainObjectData.reserve(totalBatches / 4);
-    m_terrainDrawArgsData.clear();
-    m_terrainDrawArgsData.reserve(totalBatches / 4);
-    m_terrainMaterialIDData.clear();
-    m_terrainMaterialIDData.reserve(totalBatches / 4);
-    m_terrainInstanceData.clear();
-    m_terrainInstanceData.reserve(totalBatches / 4);
+        m_transparentObjectData.clear();
+        m_transparentDrawArgsData.clear();
+        m_transparentMaterialIDData.clear();
+        m_transparentInstanceData.clear();
 
-    // Transparent-specific arrays
-    m_transparentObjectData.clear();
-    m_transparentDrawArgsData.clear();
-    m_transparentMaterialIDData.clear();
-    m_transparentInstanceData.clear();
+        m_tessObjectData.clear();
+        m_tessDrawArgsData.clear();
+        m_tessMaterialIDData.clear();
+        m_tessInstanceData.clear();
+    }
 
-    // Tessellation-specific arrays (rebuilt every frame like transparent)
-    m_tessObjectData.clear();
-    m_tessDrawArgsData.clear();
-    m_tessMaterialIDData.clear();
-    m_tessInstanceData.clear();
+    if (!m_terrainDataCached) {
+        m_terrainObjectData.clear();
+        m_terrainObjectData.reserve(totalBatches / 4);
+        m_terrainDrawArgsData.clear();
+        m_terrainDrawArgsData.reserve(totalBatches / 4);
+        m_terrainMaterialIDData.clear();
+        m_terrainMaterialIDData.reserve(totalBatches / 4);
+        m_terrainInstanceData.clear();
+        m_terrainInstanceData.reserve(totalBatches / 4);
+    }
 
     auto appendBatch = [&](const GeometryBatch& batch,
                            xr_vector<GPUObjectData>& objectData,
@@ -2181,95 +2265,117 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     ZoneScopedN("Upload::Rebuild");
     u32 badMatSkipped = 0;
     const u32 terrainMatCount = bindless::TerrainMaterialBuffer::Instance().GetMaterialCount();
+    constexpr u32 kMaxTessIndexCount = 8192;
+
+    auto appendTerrain = [&](const GeometryBatch& batch) {
+        if (batch.terrainMaterialID == UINT32_MAX)
+        {
+            badMatSkipped++;
+            return;
+        }
+        GPUObjectData obj;
+        obj.position = batch.worldBoundsCenter;
+        obj.radius = batch.worldBoundsRadius;
+        obj.batchIndex = static_cast<u32>(m_terrainObjectData.size());
+        obj.flags = GPU_OBJECT_OPAQUE;
+        obj.pad0 = 0.0f;
+        obj.pad1 = 0.0f;
+        m_terrainObjectData.push_back(obj);
+
+        IndirectDrawArgs args;
+        args.indexCountPerInstance = batch.indexCount;
+        args.instanceCount = 0;
+        if (batch.megaBufferAlloc.valid) {
+            args.startIndexLocation = batch.megaBufferAlloc.indexOffset;
+            args.baseVertexLocation = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
+        } else {
+            args.startIndexLocation = batch.startIndex;
+            args.baseVertexLocation = batch.baseVertex;
+        }
+        args.startInstanceLocation = static_cast<u32>(m_terrainDrawArgsData.size());
+        m_terrainDrawArgsData.push_back(args);
+
+        m_terrainMaterialIDData.push_back(batch.terrainMaterialID);
+
+        GPUInstanceData inst;
+        inst.world = batch.worldMatrix;
+        inst.materialID = batch.terrainMaterialID;
+        inst.flags = GPU_OBJECT_OPAQUE;
+        inst.pad0 = 0.0f;
+        inst.pad1 = 0.0f;
+        m_terrainInstanceData.push_back(inst);
+    };
+
+    auto isTessBatch = [&](const GeometryBatch& batch) -> bool {
+        if (!tessFlagOn || batch.IsStrictB2F())
+            return false;
+        const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(batch.bindlessMaterialID);
+        return mat && mat->tessMethod != 0 && batch.indexCount > 0 &&
+            batch.indexCount <= kMaxTessIndexCount;
+    };
+
+    if (haveStaticSource && (!m_staticDataCached || !m_terrainDataCached))
+    {
+        ZoneScopedN("Upload::StaticFromCache");
+        for (const auto& batch : *m_staticBatchSource)
+        {
+            if (batch.isSkinned)
+                continue;
+            if (batch.isTerrain)
+            {
+                if (!m_terrainDataCached)
+                    appendTerrain(batch);
+                continue;
+            }
+            if (m_staticDataCached || batch.IsStrictB2F() || isTessBatch(batch))
+                continue;
+            if (appendBatch(batch, m_staticObjectData, m_staticDrawArgsData, m_staticMaterialIDData, m_staticInstanceData))
+                m_staticBatchVertexCounts.push_back(batch.megaBufferAlloc.valid ? batch.megaBufferAlloc.vertexCount : 0);
+            else
+                badMatSkipped++;
+        }
+    }
+
     for (u32 i = 0; i < totalBatches; i++) {
         const auto& batch = batches[i];
 
-        // Skip skinned batches - they use a separate per-draw rendering path
-        // with bone matrices and cannot use the GPU-driven multi-draw system
         if (batch.isSkinned)
             continue;
 
-        // Route terrain batches to separate arrays for terrain shader rendering
         if (batch.isTerrain) {
-            // Only reject completely unregistered IDs. Do not compare against
-            // GetMaterialCount() — pending terrain slots are valid after Register.
-            if (batch.terrainMaterialID == UINT32_MAX)
-            {
-                badMatSkipped++;
+            if (m_terrainDataCached || haveStaticSource)
                 continue;
-            }
-            // ─────────────────────────────────────────────────────
-            //  TERRAIN BATCH - Goes to terrain arrays
-            // ─────────────────────────────────────────────────────
-            GPUObjectData obj;
-            obj.position = batch.worldBoundsCenter;
-            obj.radius = batch.worldBoundsRadius;
-            obj.batchIndex = static_cast<u32>(m_terrainObjectData.size());
-            obj.flags = GPU_OBJECT_OPAQUE;  // Terrain is always opaque
-            obj.pad0 = 0.0f;
-            obj.pad1 = 0.0f;
-            m_terrainObjectData.push_back(obj);
-
-            // Terrain draw args
-            IndirectDrawArgs args;
-            args.indexCountPerInstance = batch.indexCount;
-            args.instanceCount = 0;  // Set by culling shader if visible
-            if (batch.megaBufferAlloc.valid) {
-                args.startIndexLocation = batch.megaBufferAlloc.indexOffset;
-                args.baseVertexLocation = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
-            } else {
-                args.startIndexLocation = batch.startIndex;
-                args.baseVertexLocation = batch.baseVertex;
-            }
-            // CRITICAL: StartInstanceLocation provides draw index to shader
-            // This indexes into terrain material/instance buffers
-            args.startInstanceLocation = static_cast<u32>(m_terrainDrawArgsData.size());
-            m_terrainDrawArgsData.push_back(args);
-
-            // Terrain material ID (index into TerrainMaterialBuffer, not regular MaterialBuffer)
-            m_terrainMaterialIDData.push_back(batch.terrainMaterialID);
-
-            // Terrain instance data (world transform)
-            GPUInstanceData inst;
-            inst.world = batch.worldMatrix;
-            inst.materialID = batch.terrainMaterialID;  // Terrain material ID
-            inst.flags = GPU_OBJECT_OPAQUE;  // Terrain is always opaque
-            inst.pad0 = 0.0f;
-            inst.pad1 = 0.0f;
-            m_terrainInstanceData.push_back(inst);
+            appendTerrain(batch);
             continue;
         }
 
         if (batch.IsStrictB2F()) {
-            if (!appendBatch(batch, m_transparentObjectData, m_transparentDrawArgsData, m_transparentMaterialIDData, m_transparentInstanceData))
+            if (!skipTransientRebuild &&
+                !appendBatch(batch, m_transparentObjectData, m_transparentDrawArgsData, m_transparentMaterialIDData, m_transparentInstanceData))
                 badMatSkipped++;
             continue;
         }
 
-        // Route model tess materials to a dedicated PatchList draw set.
-        // Skip huge meshes: MoltenVK tess expands patches and can exceed its
-        // ~131k temporary-vertex cap (view-dependent freeze until camera moves).
-        constexpr u32 kMaxTessIndexCount = 8192;
-        if (tessFlagOn)
+        if (isTessBatch(batch))
         {
-            const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(batch.bindlessMaterialID);
-            if (mat && mat->tessMethod != 0 && batch.indexCount > 0 &&
-                batch.indexCount <= kMaxTessIndexCount)
+            if (!skipTransientRebuild &&
+                m_tessObjectData.size() < m_tessSet.maxObjects &&
+                appendBatch(batch, m_tessObjectData, m_tessDrawArgsData, m_tessMaterialIDData, m_tessInstanceData))
             {
-                if (!appendBatch(batch, m_tessObjectData, m_tessDrawArgsData, m_tessMaterialIDData, m_tessInstanceData))
-                    badMatSkipped++;
                 continue;
             }
+            if (skipTransientRebuild)
+                continue;
         }
 
         if (batch.isStatic) {
-            if (!m_staticDataCached) {
+            if (!m_staticDataCached && !haveStaticSource) {
                 if (appendBatch(batch, m_staticObjectData, m_staticDrawArgsData, m_staticMaterialIDData, m_staticInstanceData))
                     m_staticBatchVertexCounts.push_back(batch.megaBufferAlloc.valid ? batch.megaBufferAlloc.vertexCount : 0);
                 else
                     badMatSkipped++;
             }
-        } else {
+        } else if (!skipTransientRebuild) {
             if (!appendBatch(batch, m_dynamicObjectData, m_dynamicDrawArgsData, m_dynamicMaterialIDData, m_dynamicInstanceData))
                 badMatSkipped++;
         }
@@ -2369,7 +2475,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         Msg("* [GPUCulling] Static object data uploaded: %u objects", m_staticSet.objectCount);
     }
 
-    if (m_dynamicSet.objectCount > 0) {
+    if (!skipTransientRebuild && m_dynamicSet.objectCount > 0) {
         ZoneScopedN("Upload::DynamicWrite");
         R_ASSERT2(m_dynamicObjectData.size() >= m_dynamicSet.objectCount, "Dynamic object data smaller than count");
         R_ASSERT2(m_dynamicDrawArgsData.size() >= m_dynamicSet.objectCount, "Dynamic draw args data smaller than count");
@@ -2417,15 +2523,11 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         R_ASSERT2(m_terrainMaterialIDData.size() >= m_terrainObjectCount, "Terrain material ID data smaller than object count");
         R_ASSERT2(m_terrainInstanceData.size() >= m_terrainObjectCount, "Terrain instance data smaller than object count");
 
-        // Terrain object data (bounding spheres) - still uploaded every frame
-        // TODO: Terrain is static, could cache this too with dirty flag
-        cmdList->writeBuffer(m_terrainObjectBuffer,
-            m_terrainObjectData.data(),
-            m_terrainObjectCount * sizeof(GPUObjectData));
-        cmdList->setBufferState(m_terrainObjectBuffer, nvrhi::ResourceStates::ShaderResource);
-
-        // Terrain draw args, material IDs, instance data - uploaded ONCE (visibility buffer handles culling)
         if (!m_staticTerrainDrawArgsUploaded) {
+            cmdList->writeBuffer(m_terrainObjectBuffer,
+                m_terrainObjectData.data(),
+                m_terrainObjectCount * sizeof(GPUObjectData));
+            cmdList->setBufferState(m_terrainObjectBuffer, nvrhi::ResourceStates::ShaderResource);
             // Set instanceCount=1 for all terrain (apply visibility pass will set actual visibility)
             for (auto& args : m_terrainDrawArgsData) {
                 args.instanceCount = 1;
@@ -2477,6 +2579,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
             }
 
             m_staticTerrainDrawArgsUploaded = true;
+            m_terrainDataCached = true;
             Msg("* [GPUCulling] Static terrain draw args uploaded: %u objects (visibility buffer mode)", m_terrainObjectCount);
         }
     }
@@ -2488,7 +2591,8 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     // ─────────────────────────────────────────────────────
     m_transparentSet.objectCount = std::min(static_cast<u32>(m_transparentObjectData.size()), m_transparentSet.maxObjects);
 
-    if (m_transparentSet.objectCount > 0 && m_transparentSet.objectBuffer && m_transparentSet.drawArgsBuffer) {
+    if (!skipTransientRebuild && m_transparentSet.objectCount > 0 &&
+        m_transparentSet.objectBuffer && m_transparentSet.drawArgsBuffer) {
         ZoneScopedN("Upload::TransparentWrite");
         for (auto& args : m_transparentDrawArgsData)
             args.instanceCount = 1;
@@ -2513,17 +2617,13 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
             m_transparentSet.objectCount * sizeof(GPUInstanceData));
         cmdList->setBufferState(m_transparentSet.instanceBuffer, nvrhi::ResourceStates::ShaderResource);
 
-        // View-independent foliage shadow casting: trees/bushes are alpha-blended and
-        // live here, so the shadow pass draws this set (foliage-only) into the CSM.
         EnsureShadowCasterBuffers(cmdList, m_device->GetNVRHIDevice(), m_transparentSet, "Transparent");
     }
 
-    // ─────────────────────────────────────────────────────
-    //  TESSELLATION GPU UPLOAD (per-frame)
-    // ─────────────────────────────────────────────────────
     m_tessSet.objectCount = std::min(static_cast<u32>(m_tessObjectData.size()), m_tessSet.maxObjects);
 
-    if (m_tessSet.objectCount > 0 && m_tessSet.objectBuffer && m_tessSet.drawArgsBuffer) {
+    if (!skipTransientRebuild && m_tessSet.objectCount > 0 &&
+        m_tessSet.objectBuffer && m_tessSet.drawArgsBuffer) {
         ZoneScopedN("Upload::TessWrite");
         for (u32 i = 0; i < m_tessSet.objectCount; ++i)
         {
@@ -2561,20 +2661,36 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
             cmdList->setBufferState(m_tessBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
         }
     }
+
+    if (!skipTransientRebuild)
+    {
+        m_transientUploadFingerprint = transientFp;
+        m_transientDataCached = true;
+    }
 }
 
 void GPUCullingManager::InvalidateStaticCullingData()
 {
     m_staticDataCached = false;
+    m_terrainDataCached = false;
+    m_staticTerrainDrawArgsUploaded = false;
+    m_lastMaterialCountForStatic = 0;
     m_staticSet.objectsUploaded = false;
     m_staticSet.drawArgsUploaded = false;
     m_staticSet.objectCount = 0;
+    m_transientDataCached = false;
+    m_transientUploadFingerprint = 0;
 
     m_staticObjectData.clear();
     m_staticDrawArgsData.clear();
     m_staticMaterialIDData.clear();
     m_staticInstanceData.clear();
     m_staticBatchVertexCounts.clear();
+    m_terrainObjectData.clear();
+    m_terrainDrawArgsData.clear();
+    m_terrainMaterialIDData.clear();
+    m_terrainInstanceData.clear();
+    m_terrainObjectCount = 0;
 
     Msg("* [GPUCulling] Static culling data invalidated");
 }
@@ -2619,6 +2735,8 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
 
     m_staticDataCached = false;
     m_staticTerrainDrawArgsUploaded = false;
+    m_terrainDataCached = false;
+    m_lastMaterialCountForStatic = 0;
     m_staticSet.objectsUploaded = false;
     m_staticSet.drawArgsUploaded = false;
     m_dynamicSet.objectsUploaded = false;
@@ -2905,6 +3023,7 @@ void GPUCullingManager::EnsureShadowCasterBuffers(nvrhi::ICommandList* cmdList,
     if (!set.shadowIndicesBuffer || set.shadowBuffersCapacity < set.objectCount)
     {
         const u32 capacity = set.objectCount;
+        set.shadowCountBuffer = nullptr;
 
         char nameBuf[128];
         nvrhi::BufferDesc idxDesc;
@@ -2912,7 +3031,8 @@ void GPUCullingManager::EnsureShadowCasterBuffers(nvrhi::ICommandList* cmdList,
         idxDesc.debugName = nameBuf;
         idxDesc.byteSize = u64(capacity) * sizeof(u32);
         idxDesc.structStride = sizeof(u32);
-        idxDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        idxDesc.canHaveUAVs = true;
+        idxDesc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         idxDesc.keepInitialState = true;
         set.shadowIndicesBuffer = nvDevice->createBuffer(idxDesc);
 
@@ -2931,8 +3051,9 @@ void GPUCullingManager::EnsureShadowCasterBuffers(nvrhi::ICommandList* cmdList,
             cntDesc.debugName = nameBuf;
             cntDesc.byteSize = sizeof(u32);
             cntDesc.canHaveRawViews = true;
+            cntDesc.canHaveUAVs = true;
             cntDesc.isDrawIndirectArgs = true;
-            cntDesc.initialState = nvrhi::ResourceStates::IndirectArgument;
+            cntDesc.initialState = nvrhi::ResourceStates::UnorderedAccess;
             cntDesc.keepInitialState = true;
             set.shadowCountBuffer = nvDevice->createBuffer(cntDesc);
         }
@@ -2943,8 +3064,10 @@ void GPUCullingManager::EnsureShadowCasterBuffers(nvrhi::ICommandList* cmdList,
             argsDesc.debugName = nameBuf;
             argsDesc.byteSize = u64(capacity) * sizeof(IndirectDrawArgs);
             argsDesc.canHaveRawViews = true;
+            argsDesc.canHaveUAVs = true;
             argsDesc.isDrawIndirectArgs = true;
-            argsDesc.initialState = nvrhi::ResourceStates::IndirectArgument;
+            argsDesc.structStride = sizeof(IndirectDrawArgs);
+            argsDesc.initialState = nvrhi::ResourceStates::UnorderedAccess;
             argsDesc.keepInitialState = true;
             set.shadowCompactDrawArgsBuffer = nvDevice->createBuffer(argsDesc);
         }
@@ -2954,7 +3077,8 @@ void GPUCullingManager::EnsureShadowCasterBuffers(nvrhi::ICommandList* cmdList,
             matDesc.debugName = nameBuf;
             matDesc.byteSize = u64(capacity) * sizeof(u32);
             matDesc.structStride = sizeof(u32);
-            matDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+            matDesc.canHaveUAVs = true;
+            matDesc.initialState = nvrhi::ResourceStates::UnorderedAccess;
             matDesc.keepInitialState = true;
             set.shadowCompactMaterialIDBuffer = nvDevice->createBuffer(matDesc);
         }
@@ -2968,7 +3092,7 @@ void GPUCullingManager::EnsureShadowCasterBuffers(nvrhi::ICommandList* cmdList,
 }
 
 void GPUCullingManager::BuildLightFrustumCasters(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
-    const Fmatrix& lightVP, float radiusInflate)
+    const Fmatrix& lightVP, float radiusInflate, float skipNearCameraClearance)
 {
     if (!cmdList || !nvDevice)
         return;
@@ -2978,6 +3102,7 @@ void GPUCullingManager::BuildLightFrustumCasters(nvrhi::ICommandList* cmdList, n
     CFrustum frustum;
     Fmatrix vp = lightVP;
     frustum.CreateFromMatrix(vp, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+    const Fvector camPos = Device.vCameraPosition;
 
     auto filterSet = [&](CullSetBuffers& set,
                          const xr_vector<GPUObjectData>& objects,
@@ -3009,14 +3134,20 @@ void GPUCullingManager::BuildLightFrustumCasters(nvrhi::ICommandList* cmdList, n
             const float r = o.radius * radiusInflate;
             if (!frustum.testSphere_dirty(o.position, r))
                 continue;
+            // Local atlas: drop large casters that reach into the camera bubble.
+            // Those walls fill sideways OMNIPART faces → hard "shadows in your face".
+            // CSM/rain keep skipNearCameraClearance=0.
+            if (skipNearCameraClearance > 0.f && r > 0.45f)
+            {
+                const float camDist = camPos.distance_to(o.position);
+                if (camDist - r < skipNearCameraClearance)
+                    continue;
+            }
             ids.push_back(i);
             if (i < drawArgs.size())
             {
                 IndirectDrawArgs a = drawArgs[i];
                 a.instanceCount = 1;
-                // DRAWINDEX must index the compact buffers (0..count-1), not the
-                // source object slot. Keeping the original startInstanceLocation
-                // made foliage sample wrong materials → solid triangle shadows.
                 a.startInstanceLocation = static_cast<u32>(args.size());
                 args.push_back(a);
             }
@@ -3036,6 +3167,535 @@ void GPUCullingManager::BuildLightFrustumCasters(nvrhi::ICommandList* cmdList, n
     filterSet(m_staticSet, m_staticObjectData, m_staticDrawArgsData, m_staticMaterialIDData, "Static");
     filterSet(m_dynamicSet, m_dynamicObjectData, m_dynamicDrawArgsData, m_dynamicMaterialIDData, "Dynamic");
     filterSet(m_transparentSet, m_transparentObjectData, m_transparentDrawArgsData, m_transparentMaterialIDData, "Transparent");
+}
+
+bool GPUCullingManager::EnsureLightShadowCullPipeline(nvrhi::IDevice* nvDevice)
+{
+    if (m_lightShadowCullReady)
+        return m_lightShadowCullPipeline != nullptr && m_lightShadowCullParamsCB != nullptr;
+    if (!nvDevice || !GEnv.Render || !GEnv.Render->GetShaderLoader())
+        return false;
+
+    auto csShader = GEnv.Render->GetShaderLoader()->LoadComputeShader("light_shadow_cull");
+    auto* csRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("light_shadow_cull", ".cs");
+    if (!csRefl || !csShader.handle)
+    {
+        static bool s_once = false;
+        if (!s_once)
+        {
+            Msg("! [GPUCulling] light_shadow_cull.cs missing — falling back to CPU light frustum cull");
+            s_once = true;
+        }
+        m_lightShadowCullReady = true;
+        return false;
+    }
+
+    auto& cache = framegraph::GetPassResourceCache();
+    m_lightShadowCullLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "GPUCull_LightShadowCull", *csRefl, nvDevice);
+    if (!m_lightShadowCullLayout)
+    {
+        m_lightShadowCullReady = true;
+        return false;
+    }
+
+    nvrhi::ComputePipelineDesc pipeDesc;
+    pipeDesc.CS = csShader.handle;
+    pipeDesc.bindingLayouts = {m_lightShadowCullLayout};
+    m_lightShadowCullPipeline = nvDevice->createComputePipeline(pipeDesc);
+    if (!m_lightShadowCullPipeline)
+    {
+        m_lightShadowCullReady = true;
+        return false;
+    }
+
+    if (!m_lightShadowCullParamsCB)
+    {
+        nvrhi::BufferDesc cbDesc;
+        cbDesc.byteSize = sizeof(Fvector4) * 6 + sizeof(u32) * 4;
+        cbDesc.isConstantBuffer = true;
+        cbDesc.isVolatile = true;
+        cbDesc.maxVersions = 8192;
+        cbDesc.debugName = "GPUCull_LightShadowCullParams";
+        m_lightShadowCullParamsCB = nvDevice->createBuffer(cbDesc);
+    }
+    m_lightShadowCullReady = true;
+    if (m_lightShadowCullPipeline && m_lightShadowCullParamsCB)
+        Msg("* [GPUCulling] light_shadow_cull pipeline ready");
+    return m_lightShadowCullPipeline != nullptr && m_lightShadowCullParamsCB != nullptr;
+}
+
+bool GPUCullingManager::EnsureLocalShadowCullSlots(nvrhi::IDevice* nvDevice, u32 /*slotCount*/)
+{
+    if (!nvDevice)
+        return false;
+    if (m_localShadowCullSlotCount >= kLocalShadowCullMaxSlots && !m_localShadowCullSlots.empty())
+        return true;
+
+    m_localShadowCullSlots.clear();
+    m_localShadowCullSlots.resize(kLocalShadowCullMaxSlots);
+    m_localShadowCullSlotCount = 0;
+
+    const u32 slotCount = kLocalShadowCullMaxSlots;
+    const u32 cap = kLocalShadowCullSlotCap;
+    static const char* kSetNames[3] = {"Static", "Dynamic", "Transparent"};
+    for (u32 s = 0; s < slotCount; ++s)
+    {
+        for (u32 si = 0; si < 3; ++si)
+        {
+            auto& set = m_localShadowCullSlots[s].sets[si];
+            char nameBuf[128];
+            {
+                nvrhi::BufferDesc d;
+                snprintf(nameBuf, sizeof(nameBuf), "LocalShadowCull_s%u_%s_Idx", s, kSetNames[si]);
+                d.debugName = nameBuf;
+                d.byteSize = u64(cap) * sizeof(u32);
+                d.structStride = sizeof(u32);
+                d.canHaveUAVs = true;
+                d.initialState = nvrhi::ResourceStates::UnorderedAccess;
+                d.keepInitialState = true;
+                set.indices = nvDevice->createBuffer(d);
+            }
+            {
+                nvrhi::BufferDesc d;
+                snprintf(nameBuf, sizeof(nameBuf), "LocalShadowCull_s%u_%s_Args", s, kSetNames[si]);
+                d.debugName = nameBuf;
+                d.byteSize = u64(cap) * sizeof(IndirectDrawArgs);
+                d.structStride = sizeof(IndirectDrawArgs);
+                d.canHaveUAVs = true;
+                d.canHaveRawViews = true;
+                d.isDrawIndirectArgs = true;
+                d.initialState = nvrhi::ResourceStates::UnorderedAccess;
+                d.keepInitialState = true;
+                set.drawArgs = nvDevice->createBuffer(d);
+            }
+            {
+                nvrhi::BufferDesc d;
+                snprintf(nameBuf, sizeof(nameBuf), "LocalShadowCull_s%u_%s_Mats", s, kSetNames[si]);
+                d.debugName = nameBuf;
+                d.byteSize = u64(cap) * sizeof(u32);
+                d.structStride = sizeof(u32);
+                d.canHaveUAVs = true;
+                d.initialState = nvrhi::ResourceStates::UnorderedAccess;
+                d.keepInitialState = true;
+                set.mats = nvDevice->createBuffer(d);
+            }
+            {
+                nvrhi::BufferDesc d;
+                snprintf(nameBuf, sizeof(nameBuf), "LocalShadowCull_s%u_%s_Cnt", s, kSetNames[si]);
+                d.debugName = nameBuf;
+                d.byteSize = sizeof(u32);
+                d.canHaveUAVs = true;
+                d.canHaveRawViews = true;
+                d.isDrawIndirectArgs = true;
+                d.initialState = nvrhi::ResourceStates::UnorderedAccess;
+                d.keepInitialState = true;
+                set.count = nvDevice->createBuffer(d);
+            }
+            if (!set.indices || !set.drawArgs || !set.mats || !set.count)
+            {
+                m_localShadowCullSlots.clear();
+                m_localShadowCullSlotCount = 0;
+                Msg("! [GPUCulling] LocalShadowCull slot alloc failed at %u", s);
+                return false;
+            }
+        }
+    }
+    m_localShadowCullSlotCount = slotCount;
+    Msg("* [GPUCulling] LocalShadowCull slots ready (%u x %u casters)", slotCount, cap);
+    return true;
+}
+
+nvrhi::BindingSetHandle* GPUCullingManager::MutLocalShadowSlotDrawBinding(u32 slot, u32 setIdx)
+{
+    if (slot >= m_localShadowCullSlotCount || setIdx >= 3)
+        return nullptr;
+    return std::addressof(m_localShadowCullSlots[slot].sets[setIdx].drawBinding);
+}
+
+nvrhi::IBuffer** GPUCullingManager::MutLocalShadowSlotDrawSrcInstance(u32 slot, u32 setIdx)
+{
+    if (slot >= m_localShadowCullSlotCount || setIdx >= 3)
+        return nullptr;
+    return std::addressof(m_localShadowCullSlots[slot].sets[setIdx].drawSrcInstance);
+}
+
+nvrhi::IBuffer* GPUCullingManager::GetLocalShadowSlotIndices(u32 slot, u32 setIdx) const
+{
+    if (slot >= m_localShadowCullSlotCount || setIdx >= 3)
+        return nullptr;
+    return m_localShadowCullSlots[slot].sets[setIdx].indices.Get();
+}
+nvrhi::IBuffer* GPUCullingManager::GetLocalShadowSlotDrawArgs(u32 slot, u32 setIdx) const
+{
+    if (slot >= m_localShadowCullSlotCount || setIdx >= 3)
+        return nullptr;
+    return m_localShadowCullSlots[slot].sets[setIdx].drawArgs.Get();
+}
+nvrhi::IBuffer* GPUCullingManager::GetLocalShadowSlotMats(u32 slot, u32 setIdx) const
+{
+    if (slot >= m_localShadowCullSlotCount || setIdx >= 3)
+        return nullptr;
+    return m_localShadowCullSlots[slot].sets[setIdx].mats.Get();
+}
+nvrhi::IBuffer* GPUCullingManager::GetLocalShadowSlotCount(u32 slot, u32 setIdx) const
+{
+    if (slot >= m_localShadowCullSlotCount || setIdx >= 3)
+        return nullptr;
+    return m_localShadowCullSlots[slot].sets[setIdx].count.Get();
+}
+
+bool GPUCullingManager::DispatchLightFrustumCasters(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+    const Fmatrix& lightVP, float radiusInflate)
+{
+    if (!cmdList || !nvDevice)
+        return false;
+
+    ZoneScopedN("DispatchLightFrustumCasters");
+    if (!EnsureLightShadowCullPipeline(nvDevice))
+        return false;
+
+    struct LightShadowCullParamsCB
+    {
+        Fvector4 frustumPlanes[6];
+        u32 objectCount;
+        float radiusInflate;
+        u32 maxOut;
+        u32 pad;
+    };
+
+    Fmatrix vp = lightVP;
+    Fvector4 planes[6];
+    ExtractFrustumPlanes(vp, planes);
+
+    auto dispatchSet = [&](CullSetBuffers& set, const char* name) -> bool {
+        if (set.objectCount == 0)
+            return true;
+        if (!set.objectBuffer || !set.drawArgsBuffer || !set.materialIDBuffer)
+            return false;
+
+        EnsureShadowCasterBuffers(cmdList, nvDevice, set, name);
+        if (!set.shadowIndicesBuffer || !set.shadowCompactDrawArgsBuffer ||
+            !set.shadowCompactMaterialIDBuffer || !set.shadowCountBuffer)
+            return false;
+
+        LightShadowCullParamsCB cb{};
+        for (u32 i = 0; i < 6; ++i)
+            cb.frustumPlanes[i] = planes[i];
+        cb.objectCount = set.objectCount;
+        cb.radiusInflate = radiusInflate;
+        cb.maxOut = set.objectCount;
+        cmdList->writeBuffer(m_lightShadowCullParamsCB, &cb, sizeof(cb));
+
+        const u32 zero = 0;
+        cmdList->writeBuffer(set.shadowCountBuffer, &zero, sizeof(u32));
+
+        cmdList->setBufferState(set.objectBuffer, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(set.drawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(set.materialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(set.shadowIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(set.shadowCompactDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(set.shadowCompactMaterialIDBuffer, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(set.shadowCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+        auto* csRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("light_shadow_cull", ".cs");
+        framegraph::BindingSetBuilder bsb(*csRefl, nvDevice, "LightShadowCull");
+        bsb.ConstantBuffer("LightShadowCullParams", m_lightShadowCullParamsCB);
+        bsb.BufferSRV("g_Objects", set.objectBuffer);
+        bsb.BufferSRV("g_InputDrawArgs", set.drawArgsBuffer);
+        bsb.BufferSRV("g_InputMaterialIDs", set.materialIDBuffer);
+        bsb.BufferUAV("g_OutIndices", set.shadowIndicesBuffer);
+        bsb.BufferUAV("g_OutDrawArgs", set.shadowCompactDrawArgsBuffer);
+        bsb.BufferUAV("g_OutMaterialIDs", set.shadowCompactMaterialIDBuffer);
+        bsb.BufferUAV("g_OutCount", set.shadowCountBuffer);
+
+        auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(
+            bsb.Build(), m_lightShadowCullLayout, nvDevice);
+        if (!bindingSet)
+            return false;
+
+        nvrhi::ComputeState state;
+        state.pipeline = m_lightShadowCullPipeline;
+        state.bindings = {bindingSet};
+        cmdList->setComputeState(state);
+        cmdList->dispatch((set.objectCount + 63) / 64, 1, 1);
+
+        cmdList->setBufferState(set.shadowIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(set.shadowCompactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+        cmdList->setBufferState(set.shadowCompactMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(set.shadowCountBuffer, nvrhi::ResourceStates::IndirectArgument);
+        return true;
+    };
+
+    if (!dispatchSet(m_staticSet, "Static"))
+        return false;
+    if (!dispatchSet(m_dynamicSet, "Dynamic"))
+        return false;
+    if (!dispatchSet(m_transparentSet, "Transparent"))
+        return false;
+    return true;
+}
+
+bool GPUCullingManager::DispatchLightFrustumCastersToSlot(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+    const Fmatrix& lightVP, float radiusInflate, u32 slot)
+{
+    if (!cmdList || !nvDevice || slot >= m_localShadowCullSlotCount)
+        return false;
+    if (!EnsureLightShadowCullPipeline(nvDevice))
+        return false;
+
+    auto* csRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("light_shadow_cull", ".cs");
+    if (!csRefl)
+        return false;
+
+    struct LightShadowCullParamsCB
+    {
+        Fvector4 frustumPlanes[6];
+        u32 objectCount;
+        float radiusInflate;
+        u32 maxOut;
+        u32 pad;
+    };
+
+    Fmatrix vp = lightVP;
+    Fvector4 planes[6];
+    ExtractFrustumPlanes(vp, planes);
+
+    CullSetBuffers* srcSets[3] = {&m_staticSet, &m_dynamicSet, &m_transparentSet};
+    auto& slotSets = m_localShadowCullSlots[slot].sets;
+    auto& cache = framegraph::GetPassResourceCache();
+
+    for (u32 si = 0; si < 3; ++si)
+    {
+        CullSetBuffers& set = *srcSets[si];
+        auto& out = slotSets[si];
+        if (set.objectCount == 0)
+        {
+            const u32 zero = 0;
+            if (out.count)
+                cmdList->writeBuffer(out.count, &zero, sizeof(u32));
+            continue;
+        }
+        if (!set.objectBuffer || !set.drawArgsBuffer || !set.materialIDBuffer)
+            return false;
+        if (!out.indices || !out.drawArgs || !out.mats || !out.count)
+            return false;
+
+        LightShadowCullParamsCB cb{};
+        for (u32 i = 0; i < 6; ++i)
+            cb.frustumPlanes[i] = planes[i];
+        cb.objectCount = set.objectCount;
+        cb.radiusInflate = radiusInflate;
+        cb.maxOut = kLocalShadowCullSlotCap;
+        cmdList->writeBuffer(m_lightShadowCullParamsCB, &cb, sizeof(cb));
+
+        const u32 zero = 0;
+        cmdList->writeBuffer(out.count, &zero, sizeof(u32));
+
+        cmdList->setBufferState(out.indices, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(out.drawArgs, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(out.mats, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(out.count, nvrhi::ResourceStates::UnorderedAccess);
+
+        nvrhi::IBuffer* srcObj = set.objectBuffer.Get();
+        if (!out.cullBinding || out.cullSrcObject != srcObj)
+        {
+            framegraph::BindingSetBuilder bsb(*csRefl, nvDevice, "LightShadowCullSlot");
+            bsb.ConstantBuffer("LightShadowCullParams", m_lightShadowCullParamsCB);
+            bsb.BufferSRV("g_Objects", set.objectBuffer);
+            bsb.BufferSRV("g_InputDrawArgs", set.drawArgsBuffer);
+            bsb.BufferSRV("g_InputMaterialIDs", set.materialIDBuffer);
+            bsb.BufferUAV("g_OutIndices", out.indices);
+            bsb.BufferUAV("g_OutDrawArgs", out.drawArgs);
+            bsb.BufferUAV("g_OutMaterialIDs", out.mats);
+            bsb.BufferUAV("g_OutCount", out.count);
+            out.cullBinding = cache.GetOrCreateBindingSet(bsb.Build(), m_lightShadowCullLayout, nvDevice);
+            out.cullSrcObject = out.cullBinding ? srcObj : nullptr;
+            if (!out.cullBinding)
+                return false;
+        }
+
+        nvrhi::ComputeState state;
+        state.pipeline = m_lightShadowCullPipeline;
+        state.bindings = {out.cullBinding};
+        cmdList->setComputeState(state);
+        cmdList->dispatch((set.objectCount + 63) / 64, 1, 1);
+
+        cmdList->setBufferState(out.indices, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(out.drawArgs, nvrhi::ResourceStates::IndirectArgument);
+        cmdList->setBufferState(out.mats, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(out.count, nvrhi::ResourceStates::IndirectArgument);
+    }
+    return true;
+}
+
+bool GPUCullingManager::DispatchAllLocalShadowTileCulls(
+    nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+    const xr_vector<LocalShadowTile>& tiles, float radiusInflate)
+{
+    ZoneScopedN("DispatchAllLocalShadowTileCulls");
+    if (!cmdList || !nvDevice || tiles.empty())
+        return false;
+    if (!EnsureLightShadowCullPipeline(nvDevice))
+        return false;
+
+    auto* csRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("light_shadow_cull", ".cs");
+    if (!csRefl)
+        return false;
+
+    CullSetBuffers* srcSets[3] = {&m_staticSet, &m_dynamicSet, &m_transparentSet};
+    bool anySrc = false;
+    for (u32 si = 0; si < 3; ++si)
+    {
+        CullSetBuffers& set = *srcSets[si];
+        if (set.objectCount == 0 || !set.objectBuffer || !set.drawArgsBuffer || !set.materialIDBuffer)
+            continue;
+        cmdList->setBufferState(set.objectBuffer, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(set.drawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(set.materialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+        anySrc = true;
+    }
+    if (!anySrc)
+        return false;
+
+    struct LightShadowCullParamsCB
+    {
+        Fvector4 frustumPlanes[6];
+        u32 objectCount;
+        float radiusInflate;
+        u32 maxOut;
+        u32 pad;
+    };
+
+    struct CullJob
+    {
+        u32 slot = 0;
+        u32 setIdx = 0;
+        u32 objectCount = 0;
+        Fvector4 planes[6]{};
+    };
+    static thread_local xr_vector<CullJob> s_jobs;
+    static thread_local xr_vector<LocalShadowCullSlotSet*> s_outs;
+    static thread_local xr_vector<nvrhi::IBuffer*> s_zeroCounts;
+    auto& jobs = s_jobs;
+    auto& outs = s_outs;
+    auto& zeroCounts = s_zeroCounts;
+    jobs.clear();
+    outs.clear();
+    zeroCounts.clear();
+
+    const u32 maxSlots = GetLocalShadowCullSlotCount();
+    const u32 zero = 0;
+    bool anyTile = false;
+    for (u32 i = 0; i < tiles.size() && i < maxSlots; ++i)
+    {
+        const LocalShadowTile& tile = tiles[i];
+        if (tile.size < 8 || !tile.needsRedraw)
+            continue;
+        anyTile = true;
+
+        Fmatrix vp = tile.clipVP;
+        Fvector4 planes[6];
+        ExtractFrustumPlanes(vp, planes);
+
+        auto& slotSets = m_localShadowCullSlots[i].sets;
+        for (u32 si = 0; si < 3; ++si)
+        {
+            CullSetBuffers& set = *srcSets[si];
+            auto& out = slotSets[si];
+            if (!out.indices || !out.drawArgs || !out.mats || !out.count)
+                return false;
+            cmdList->writeBuffer(out.count, &zero, sizeof(u32));
+            if (set.objectCount == 0)
+            {
+                zeroCounts.push_back(out.count.Get());
+                continue;
+            }
+            CullJob job{};
+            job.slot = i;
+            job.setIdx = si;
+            job.objectCount = set.objectCount;
+            for (u32 p = 0; p < 6; ++p)
+                job.planes[p] = planes[p];
+            jobs.push_back(job);
+            outs.push_back(&out);
+        }
+    }
+    if (!anyTile)
+        return false;
+    if (jobs.empty())
+    {
+        for (nvrhi::IBuffer* countBuf : zeroCounts)
+        {
+            if (countBuf)
+                cmdList->setBufferState(countBuf, nvrhi::ResourceStates::IndirectArgument);
+        }
+        return true;
+    }
+
+    auto& cache = framegraph::GetPassResourceCache();
+    for (u32 ji = 0; ji < jobs.size(); ++ji)
+    {
+        LocalShadowCullSlotSet& out = *outs[ji];
+        cmdList->setBufferState(out.indices, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(out.drawArgs, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(out.mats, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(out.count, nvrhi::ResourceStates::UnorderedAccess);
+    }
+
+    for (u32 ji = 0; ji < jobs.size(); ++ji)
+    {
+        const CullJob& job = jobs[ji];
+        CullSetBuffers& set = *srcSets[job.setIdx];
+        LocalShadowCullSlotSet& out = *outs[ji];
+
+        LightShadowCullParamsCB cb{};
+        for (u32 p = 0; p < 6; ++p)
+            cb.frustumPlanes[p] = job.planes[p];
+        cb.objectCount = job.objectCount;
+        cb.radiusInflate = radiusInflate;
+        cb.maxOut = kLocalShadowCullSlotCap;
+        cmdList->writeBuffer(m_lightShadowCullParamsCB, &cb, sizeof(cb));
+
+        nvrhi::IBuffer* srcObj = set.objectBuffer.Get();
+        if (!out.cullBinding || out.cullSrcObject != srcObj)
+        {
+            framegraph::BindingSetBuilder bsb(*csRefl, nvDevice, "LightShadowCullSlot");
+            bsb.ConstantBuffer("LightShadowCullParams", m_lightShadowCullParamsCB);
+            bsb.BufferSRV("g_Objects", set.objectBuffer);
+            bsb.BufferSRV("g_InputDrawArgs", set.drawArgsBuffer);
+            bsb.BufferSRV("g_InputMaterialIDs", set.materialIDBuffer);
+            bsb.BufferUAV("g_OutIndices", out.indices);
+            bsb.BufferUAV("g_OutDrawArgs", out.drawArgs);
+            bsb.BufferUAV("g_OutMaterialIDs", out.mats);
+            bsb.BufferUAV("g_OutCount", out.count);
+            out.cullBinding = cache.GetOrCreateBindingSet(bsb.Build(), m_lightShadowCullLayout, nvDevice);
+            out.cullSrcObject = out.cullBinding ? srcObj : nullptr;
+            if (!out.cullBinding)
+                return false;
+        }
+
+        nvrhi::ComputeState state;
+        state.pipeline = m_lightShadowCullPipeline;
+        state.bindings = {out.cullBinding};
+        cmdList->setComputeState(state);
+        cmdList->dispatch((job.objectCount + 63) / 64, 1, 1);
+    }
+
+    for (u32 ji = 0; ji < jobs.size(); ++ji)
+    {
+        LocalShadowCullSlotSet& out = *outs[ji];
+        cmdList->setBufferState(out.indices, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(out.drawArgs, nvrhi::ResourceStates::IndirectArgument);
+        cmdList->setBufferState(out.mats, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(out.count, nvrhi::ResourceStates::IndirectArgument);
+    }
+    for (nvrhi::IBuffer* countBuf : zeroCounts)
+    {
+        if (countBuf)
+            cmdList->setBufferState(countBuf, nvrhi::ResourceStates::IndirectArgument);
+    }
+    return true;
 }
 
 void GPUCullingManager::EnsureShadowCasterIdentityBuffers(
@@ -3077,7 +3737,8 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     const GeometryCollector* geometry,
     const Fmatrix& prevViewProj,
     bool forceDisableHiz,
-    bool skipUpload)
+    bool skipUpload,
+    framegraph::VirtualResourceHandle waitFor)
 {
     using namespace framegraph;
 
@@ -3120,6 +3781,8 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
         VirtualResourceHandle hizPyramid;
         VirtualResourceHandle staticDrawArgsBuffer;
         VirtualResourceHandle dynamicDrawArgsBuffer;
+        VirtualResourceHandle staticCompactDrawArgsBuffer;
+        VirtualResourceHandle dynamicCompactDrawArgsBuffer;
 
         GPUCullingManager* manager;
         const GeometryCollector* geometry;
@@ -3148,6 +3811,25 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
         skipUpload ? "gpu_cull_dynamic_drawargs_hiz" : "gpu_cull_dynamic_drawargs",
         m_dynamicSet.drawArgsBuffer, drawArgsDesc);
 
+    VirtualResourceHandle staticCompactDrawArgsHandle;
+    VirtualResourceHandle dynamicCompactDrawArgsHandle;
+    if (m_compactEnabled && m_staticSet.compactDrawArgsBuffer && m_dynamicSet.compactDrawArgsBuffer)
+    {
+        ResourceDesc compactArgsDesc;
+        compactArgsDesc.type = ResourceDesc::Type::Buffer;
+        compactArgsDesc.debugName = "GPUCull_CompactDrawArgs";
+        compactArgsDesc.bufferSize = m_maxObjects * sizeof(IndirectDrawArgs);
+        compactArgsDesc.isUAV = true;
+        compactArgsDesc.isTransient = false;
+
+        staticCompactDrawArgsHandle = fg.ImportBuffer(
+            skipUpload ? "gpu_cull_static_compact_drawargs_hiz" : "gpu_cull_static_compact_drawargs",
+            m_staticSet.compactDrawArgsBuffer, compactArgsDesc);
+        dynamicCompactDrawArgsHandle = fg.ImportBuffer(
+            skipUpload ? "gpu_cull_dynamic_compact_drawargs_hiz" : "gpu_cull_dynamic_compact_drawargs",
+            m_dynamicSet.compactDrawArgsBuffer, compactArgsDesc);
+    }
+
     // Ensure Hi-Z handle is valid for binding (dummy 1x1 when pyramid missing)
     VirtualResourceHandle hizHandle = hizPyramid;
     u32 effHizW = hizWidth;
@@ -3174,10 +3856,10 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
         skipUpload ? "GPU Culling HiZ" : "GPU Culling",
 
         // Setup lambda
-        [&, effHizW, effHizH, effHizMips, staticDrawArgsHandle, dynamicDrawArgsHandle, geometry, prevViewProj, forceDisableHiz, skipUpload, hizHandle](FrameGraph& builder, PassHandle passHandle, GPUCullPassData& data) {
+        [&, effHizW, effHizH, effHizMips, staticDrawArgsHandle, dynamicDrawArgsHandle,
+         staticCompactDrawArgsHandle, dynamicCompactDrawArgsHandle,
+         geometry, prevViewProj, forceDisableHiz, skipUpload, hizHandle, waitFor](FrameGraph& builder, PassHandle passHandle, GPUCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
-            // Graphics queue: asyncCompute left Forward/Skinning sampling compact
-            // buffers without FG barriers → terrain flicker / empty draws (MoltenVK).
             passBuilder.sideEffects();
 
             data.manager = this;
@@ -3189,9 +3871,15 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             data.forceDisableHiz = forceDisableHiz;
             data.skipUpload = skipUpload;
 
+            if (waitFor.is_valid())
+                passBuilder.read(waitFor, ResourceState::IndirectArgument);
             data.hizPyramid = passBuilder.read(hizHandle, ResourceState::ShaderResource);
             data.staticDrawArgsBuffer = passBuilder.write(staticDrawArgsHandle, ResourceState::UnorderedAccess);
             data.dynamicDrawArgsBuffer = passBuilder.write(dynamicDrawArgsHandle, ResourceState::UnorderedAccess);
+            if (staticCompactDrawArgsHandle.is_valid())
+                data.staticCompactDrawArgsBuffer = passBuilder.write(staticCompactDrawArgsHandle, ResourceState::UnorderedAccess);
+            if (dynamicCompactDrawArgsHandle.is_valid())
+                data.dynamicCompactDrawArgsBuffer = passBuilder.write(dynamicCompactDrawArgsHandle, ResourceState::UnorderedAccess);
         },
 
         // Execute lambda
@@ -3244,9 +3932,9 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 R_ASSERT2(set.objectBuffer && set.visibleIndexBuffer && set.visibleCountBuffer && set.visibilityBuffer,
                     "Cull set buffers not initialized");
 
-                // Clear visible count to 0
                 u32 zero = 0;
                 cmdList->writeBuffer(set.visibleCountBuffer, &zero, sizeof(u32));
+                cmdList->clearBufferUInt(set.visibilityBuffer, 0);
 
                 // Fill constant buffer
                 CullParamsCB cb;
@@ -3278,7 +3966,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                    .BufferUAV("g_VisibleCount", set.visibleCountBuffer)
                    .BufferUAV("g_Visibility", set.visibilityBuffer);
 
-                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_cullLayout);
+                nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), mgr->m_cullLayout, nvDevice);
                 R_ASSERT2(bindingSet, "Failed to create culling binding set");
 
                 // Set compute state and dispatch culling
@@ -3441,9 +4129,10 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 terrainCB.hizHeight = data.hizHeight;
                 terrainCB.hizMipLevels = data.hizMipLevels;
                 terrainCB.frameId = frameId;
-                // Terrain: frustum/distance only. Temporal Hi-Z on the ground plane
-                // false-culls patches at mip boundaries → visible flicker.
-                terrainCB.hizEnable = 0u;
+                // Terrain: same-frame Hi-Z with conservative AABB (Cull2 after prepass).
+                // Keep off for temporal/dummy (width<=1) — mip flicker on ground plane.
+                terrainCB.hizEnable = (data.forceDisableHiz || ps_r_hiz_occlusion == 0 ||
+                    data.hizWidth <= 1) ? 0u : 1u;
                 terrainCB.padding[0] = terrainCB.padding[1] = 0;
                 mgr->ExtractFrustumPlanes(Device.mFullTransform, terrainCB.frustumPlanes);
                 cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB), &terrainCB, sizeof(terrainCB));
@@ -3457,7 +4146,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                           .BufferUAV("g_VisibleCount", mgr->m_terrainVisibleCountBuffer)
                           .BufferUAV("g_Visibility", mgr->m_terrainVisibilityBuffer);
 
-                nvrhi::BindingSetHandle terrainBindingSet = nvDevice->createBindingSet(terrainBsb.Build(), mgr->m_cullLayout);
+                nvrhi::BindingSetHandle terrainBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainBsb.Build(), mgr->m_cullLayout, nvDevice);
                 R_ASSERT2(terrainBindingSet, "Terrain culling binding set creation failed");
 
                 nvrhi::ComputeState terrainState;
@@ -3606,7 +4295,10 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
     output.visibleIndices = VirtualResourceHandle();  // Not using framegraph for these
     output.visibleCount = VirtualResourceHandle();
-    output.drawArgsBuffer = passData.staticDrawArgsBuffer;
+    // Forward/Depth sample compact draw-args; expose that producer edge (not the pre-compact buffer).
+    output.drawArgsBuffer = passData.staticCompactDrawArgsBuffer.is_valid()
+        ? passData.staticCompactDrawArgsBuffer
+        : passData.staticDrawArgsBuffer;
     output.staticDrawArgsBuffer = passData.staticDrawArgsBuffer;
     output.dynamicDrawArgsBuffer = passData.dynamicDrawArgsBuffer;
     output.staticObjectCount = m_staticSet.objectCount;
@@ -3614,13 +4306,8 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
     // Set compact output handles if compaction is enabled
     if (m_compactEnabled) {
-        // Import compact buffers into framegraph
-        ResourceDesc compactArgsDesc;
-        compactArgsDesc.type = ResourceDesc::Type::Buffer;
-        compactArgsDesc.debugName = "GPUCull_CompactDrawArgs";
-        compactArgsDesc.bufferSize = m_maxObjects * sizeof(IndirectDrawArgs);
-        compactArgsDesc.isUAV = true;
-        compactArgsDesc.isTransient = false;
+        output.staticCompactDrawArgs = passData.staticCompactDrawArgsBuffer;
+        output.dynamicCompactDrawArgs = passData.dynamicCompactDrawArgsBuffer;
 
         ResourceDesc compactIndicesDesc;
         compactIndicesDesc.type = ResourceDesc::Type::Buffer;
@@ -3630,11 +4317,12 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
         compactIndicesDesc.isUAV = true;
         compactIndicesDesc.isTransient = false;
 
-        output.staticCompactDrawArgs = fg.ImportBuffer("gpu_cull_static_compact_drawargs", m_staticSet.compactDrawArgsBuffer, compactArgsDesc);
-        output.staticCompactBatchIndices = fg.ImportBuffer("gpu_cull_static_compact_batchindices", m_staticSet.compactBatchIndicesBuffer, compactIndicesDesc);
-
-        output.dynamicCompactDrawArgs = fg.ImportBuffer("gpu_cull_dynamic_compact_drawargs", m_dynamicSet.compactDrawArgsBuffer, compactArgsDesc);
-        output.dynamicCompactBatchIndices = fg.ImportBuffer("gpu_cull_dynamic_compact_batchindices", m_dynamicSet.compactBatchIndicesBuffer, compactIndicesDesc);
+        output.staticCompactBatchIndices = fg.ImportBuffer(
+            skipUpload ? "gpu_cull_static_compact_batchindices_hiz" : "gpu_cull_static_compact_batchindices",
+            m_staticSet.compactBatchIndicesBuffer, compactIndicesDesc);
+        output.dynamicCompactBatchIndices = fg.ImportBuffer(
+            skipUpload ? "gpu_cull_dynamic_compact_batchindices_hiz" : "gpu_cull_dynamic_compact_batchindices",
+            m_dynamicSet.compactBatchIndicesBuffer, compactIndicesDesc);
     } else {
         output.staticCompactDrawArgs = VirtualResourceHandle();
         output.staticCompactBatchIndices = VirtualResourceHandle();
@@ -3950,7 +4638,7 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedCullingPass(
                    .BufferUAV("g_VisibleCount", mgr->m_skinnedVisibleCountBuffer)
                    .BufferUAV("g_Visibility", visibility);
 
-                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_cullLayout);
+                nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), mgr->m_cullLayout, nvDevice);
                 R_ASSERT2(bindingSet, "Failed to create skinned culling binding set");
 
                 nvrhi::ComputeState state;
@@ -3982,7 +4670,7 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedCullingPass(
                        .BufferSRV("g_Visibility", mgr->m_skinnedVisibilityBuffer)
                        .BufferUAV("g_DrawArgs", mgr->m_skinnedDrawArgsBuffer);
 
-                nvrhi::BindingSetHandle gateBindingSet = nvDevice->createBindingSet(gateBsb.Build(), mgr->m_skinnedArgsGateLayout);
+                nvrhi::BindingSetHandle gateBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(gateBsb.Build(), mgr->m_skinnedArgsGateLayout, nvDevice);
                 R_ASSERT2(gateBindingSet, "Failed to create skinned args gate binding set");
 
                 nvrhi::ComputeState gateState;
@@ -4268,7 +4956,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                    .Texture("g_HiZPyramid", hizTexture)
                    .BufferUAV("g_DebugOutput", mgr->m_debugBuffer);
 
-                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_debugComputeLayout);
+                nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), mgr->m_debugComputeLayout, nvDevice);
                 R_ASSERT2(bindingSet, "Debug binding set creation failed");
 
                 nvrhi::ComputeState state;
@@ -4326,7 +5014,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                        .Texture("g_HiZPyramid", hizTexture)
                        .BufferUAV("g_DebugOutput", mgr->m_debugBuffer);
 
-                    nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_debugComputeLayout);
+                    nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), mgr->m_debugComputeLayout, nvDevice);
 
                     nvrhi::ComputeState state;
                     state.pipeline = mgr->m_particleDebugComputePipeline;
@@ -4356,7 +5044,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 bsb.ConstantBuffer("CullDebugVSParams", mgr->m_device->GetNativeBuffer(mgr->m_debugGraphicsParamsCB))
                    .BufferSRV("g_DebugData", mgr->m_debugBuffer);
 
-                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_debugGraphicsLayout);
+                nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), mgr->m_debugGraphicsLayout, nvDevice);
 
                 nvrhi::FramebufferDesc fbDesc;
                 fbDesc.addColorAttachment(colorTexture);
@@ -4689,7 +5377,7 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
                .BufferUAV("g_VisibleIndices", mgr->m_particleVisibleCountBuffer)
                .BufferUAV("g_VisibleCount", mgr->m_particleDrawArgsBuffer);
 
-            nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_particleCullLayout);
+            nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), mgr->m_particleCullLayout, nvDevice);
             if (!bindingSet) {
                 Msg("! [GPUCulling] Failed to create particle binding set");
                 return;

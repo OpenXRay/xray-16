@@ -1,7 +1,12 @@
 #include "stdafx.h"
 #include "VolumetricPassSetup.h"
 #include "ParticlePassSetup.h"
+#include "ShaderConstants.h"
+#include "TAAPassSetup.h"
+#include "SunShaftsPassSetup.h"
 #include "Layers/xrRender/Volumetrics/VolumetricRenderer.h"
+#include "Layers/xrRender/Volumetrics/IVolumetricSource.h"
+#include "Layers/xrRender/ClusteredLightManager.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
@@ -11,8 +16,11 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/IGame_Level.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/device.h"
+
+extern ENGINE_API int ps_r_upscale;
 
 namespace fg
 {
@@ -53,7 +61,7 @@ void FillFroxelParams(FroxelParamsCB& cb, const VolumetricRenderer& vol)
         cb.sunDir.set(-env.sun_dir.x, -env.sun_dir.y, -env.sun_dir.z);
         cb.sunDir.normalize_safe();
         cb.sunColor.set(env.sun_color.x, env.sun_color.y, env.sun_color.z);
-        cb.sunIntensity = std::max(env.m_fSunShaftsIntensity, 0.15f);
+        cb.sunIntensity = ResolveSunShaftsIntensity();
 
         const float n = env.fog_near;
         const float f = std::max(env.fog_far, n + 1.0f);
@@ -97,6 +105,49 @@ nvrhi::ComputePipelineHandle LoadComputePipe(
     return cache.GetOrCreateComputePipeline(passName, desc, device);
 }
 
+void BindVolumetricLighting(
+    BindingSetBuilder& bsb,
+    nvrhi::IDevice* nv,
+    nvrhi::IBuffer* staticGlobalsCB,
+    nvrhi::IBuffer* paramsCB,
+    nvrhi::ITexture* froxel,
+    const VolumetricLightingInputs& lighting)
+{
+    bsb.ConstantBuffer("static_globals", staticGlobalsCB)
+        .ConstantBuffer("FroxelParams", paramsCB)
+        .TextureUAV("u_FroxelVolume", froxel);
+
+    auto& cache = GetPassResourceCache();
+    nvrhi::ITexture* dummy2D = cache.GetDummyShadowMap2D(nv);
+    nvrhi::ITexture* dummyHzb = cache.GetDummyContactDepth(nv);
+    static const char* kNames[3] = {"g_ShadowMap0", "g_ShadowMap1", "g_ShadowMap2"};
+    static const char* kHzb[3] = {"g_ShadowHZB0", "g_ShadowHZB1", "g_ShadowHZB2"};
+    for (u32 i = 0; i < 3; ++i)
+    {
+        nvrhi::ITexture* t = lighting.shadowCascades[i]
+            ? lighting.shadowCascades[i]
+            : (i == 0 && lighting.shadowMapArray ? lighting.shadowMapArray : dummy2D);
+        if (t)
+            bsb.Texture(kNames[i], t);
+        nvrhi::ITexture* hz = lighting.shadowHZB[i] ? lighting.shadowHZB[i] : dummyHzb;
+        if (hz)
+            bsb.Texture(kHzb[i], hz);
+    }
+    nvrhi::ITexture* contactHist = cache.GetDummyContactHistory(nv);
+    if (contactHist)
+        bsb.Texture("g_ContactHistory", contactHist);
+
+    if (lighting.lightManager)
+    {
+        if (auto* lights = lighting.lightManager->GetLightDataBuffer())
+            bsb.BufferSRV("g_LightData", lights);
+        if (auto* grid = lighting.lightManager->GetClusterGridBuffer())
+            bsb.BufferSRV("g_ClusterGrid", grid);
+        if (auto* idx = lighting.lightManager->GetLightIndexListBuffer())
+            bsb.BufferSRV("g_LightIndexList", idx);
+    }
+}
+
 } // namespace
 
 void InitializeVolumetricPass(nvrhi::IDevice* device, VolumetricPassState& state)
@@ -108,6 +159,7 @@ void InitializeVolumetricPass(nvrhi::IDevice* device, VolumetricPassState& state
     state.fogPipeline = LoadComputePipe("VolFog", "volumetric\\world_fog", device, state.fogLayout);
     state.lightPipeline = LoadComputePipe("VolLight", "volumetric\\apply_lighting", device, state.lightLayout);
     state.particlePipeline = LoadComputePipe("VolParticle", "volumetric\\particle_inject", device, state.particleLayout);
+    state.lightShaftPipeline = LoadComputePipe("VolLightShaft", "volumetric\\light_shafts", device, state.lightShaftLayout);
     state.temporalPipeline = LoadComputePipe("VolTemporal", "volumetric\\temporal_reproject", device, state.temporalLayout);
 
     auto* loader = GEnv.Render->GetShaderLoader();
@@ -178,6 +230,15 @@ void InitializeVolumetricPass(nvrhi::IDevice* device, VolumetricPassState& state
         bd.debugName = "VolParticlePoints";
         state.particlePointsCB = device->createBuffer(bd);
     }
+    {
+        nvrhi::BufferDesc cb;
+        cb.byteSize = sizeof(LightShaftParamsCB);
+        cb.isConstantBuffer = true;
+        cb.isVolatile = true;
+        cb.maxVersions = 16;
+        cb.debugName = "VolLightShaftCB";
+        state.lightShaftCB = device->createBuffer(cb);
+    }
 
     {
         nvrhi::SamplerDesc s;
@@ -190,10 +251,11 @@ void InitializeVolumetricPass(nvrhi::IDevice* device, VolumetricPassState& state
         state.marchPipeline && state.paramsCB;
     state.initialized = true;
 
-    Msg("* [VolumetricPass] Init: compute=%s temporal=%s particles=%s",
+    Msg("* [VolumetricPass] Init: compute=%s temporal=%s particles=%s shafts=%s",
         state.computeEnabled ? "OK" : "FAIL",
         state.temporalPipeline ? "OK" : "off",
-        state.particlePipeline ? "OK" : "off");
+        state.particlePipeline ? "OK" : "off",
+        state.lightShaftPipeline ? "OK" : "off");
 }
 
 void ShutdownVolumetricPass(VolumetricPassState& state)
@@ -202,12 +264,14 @@ void ShutdownVolumetricPass(VolumetricPassState& state)
     state.fogPipeline = nullptr;
     state.lightPipeline = nullptr;
     state.particlePipeline = nullptr;
+    state.lightShaftPipeline = nullptr;
     state.temporalPipeline = nullptr;
     state.marchPipeline = nullptr;
     state.clearLayout = nullptr;
     state.fogLayout = nullptr;
     state.lightLayout = nullptr;
     state.particleLayout = nullptr;
+    state.lightShaftLayout = nullptr;
     state.temporalLayout = nullptr;
     state.marchLayout = nullptr;
     state.linearSampler = nullptr;
@@ -215,6 +279,7 @@ void ShutdownVolumetricPass(VolumetricPassState& state)
     state.temporalCB = nullptr;
     state.particleParamsCB = nullptr;
     state.particlePointsCB = nullptr;
+    state.lightShaftCB = nullptr;
     state.hasPrevVP = false;
     state.initialized = false;
     state.computeEnabled = false;
@@ -229,7 +294,8 @@ VirtualResourceHandle setupVolumetricPass(
     u32 width,
     u32 height,
     VolumetricPassState& state,
-    const xr_vector<ParticleBatch>* particleBatches)
+    const xr_vector<ParticleBatch>* particleBatches,
+    const VolumetricLightingInputs* lighting)
 {
     if (!volumetric || !volumetric->IsReady() || !device)
         return sceneColor;
@@ -241,6 +307,10 @@ VirtualResourceHandle setupVolumetricPass(
         return sceneColor;
 
     volumetric->BeginFrame();
+
+    VolumetricLightingInputs lightingCopy{};
+    if (lighting)
+        lightingCopy = *lighting;
 
     nvrhi::ITexture* froxelTex = volumetric->GetFroxelVolume();
     ResourceDesc froxelDesc;
@@ -265,7 +335,7 @@ VirtualResourceHandle setupVolumetricPass(
 
     auto& passData = fg.addCallbackPass<VolumetricPassData>(
         "VolumetricFog",
-        [&, sceneColor, depth, froxelHandle, width, height, volumetric, particleBatches](
+        [&, sceneColor, depth, froxelHandle, width, height, volumetric, particleBatches, lightingCopy](
             FrameGraph& builder, PassHandle passHandle, VolumetricPassData& data) {
             RenderPassBuilder pb(builder, passHandle);
             data.sceneInput = pb.read(sceneColor, ResourceState::ShaderResource);
@@ -275,6 +345,7 @@ VirtualResourceHandle setupVolumetricPass(
             data.volumetric = volumetric;
             data.passState = &state;
             data.particleBatches = particleBatches;
+            data.lighting = lightingCopy;
             data.width = width;
             data.height = height;
         },
@@ -302,6 +373,7 @@ VirtualResourceHandle setupVolumetricPass(
             const u32 gy = (VolumetricRenderer::kFroxelY + 7) / 8;
             const u32 gz = VolumetricRenderer::kFroxelZ;
 
+            auto& cache = GetPassResourceCache();
             auto dispatchUAV = [&](nvrhi::IComputePipeline* pipe, nvrhi::IBindingLayout* layout) {
                 if (!pipe || !layout)
                     return;
@@ -310,7 +382,7 @@ VirtualResourceHandle setupVolumetricPass(
                     nvrhi::BindingSetItem::ConstantBuffer(5, st.paramsCB),
                     nvrhi::BindingSetItem::Texture_UAV(0, froxel),
                 };
-                auto bs = nv->createBindingSet(bsDesc, layout);
+                auto bs = cache.GetOrCreateBindingSet(bsDesc, layout, nv);
                 if (!bs)
                     return;
                 nvrhi::ComputeState cs;
@@ -322,26 +394,71 @@ VirtualResourceHandle setupVolumetricPass(
 
             cmd->setTextureState(froxel, nvrhi::TextureSubresourceSet{}, nvrhi::ResourceStates::UnorderedAccess);
             dispatchUAV(st.clearPipeline, st.clearLayout);
-            dispatchUAV(st.fogPipeline, st.fogLayout);
 
-            // Particle density inject (batch centers as smoke blobs)
-            if (st.particlePipeline && st.particleLayout && st.particlePointsCB &&
-                st.particleParamsCB && data.particleBatches && !data.particleBatches->empty())
+            auto* loader = GEnv.Render->GetShaderLoader();
+            const auto& sources = vol.GetSources();
+            for (auto* source : sources)
             {
-                ParticleInjectPointGPU points[256];
-                u32 count = 0;
-                for (const auto& batch : *data.particleBatches)
+                if (!source)
+                    continue;
+                const char* shaderName = source->GetShaderName();
+                if (!shaderName)
+                    continue;
+
+                if (strstr(shaderName, "world_fog"))
                 {
-                    if (count >= 256 || batch.particleCount == 0 || batch.isHUDMode)
-                        continue;
-                    auto& p = points[count++];
-                    p.position = batch.worldMatrix.c;
-                    p.radius = 1.5f + 0.02f * float(std::min(batch.particleCount, 64u));
-                    p.albedo.set(0.7f, 0.7f, 0.75f);
-                    p.density = 0.08f * float(std::min(batch.particleCount, 32u));
+                    dispatchUAV(st.fogPipeline, st.fogLayout);
                 }
-                if (count > 0)
+                else if (strstr(shaderName, "light_shafts") && st.lightShaftPipeline && st.lightShaftLayout && st.lightShaftCB)
                 {
+                    LightShaftParamsCB shaft{};
+                    shaft.sunDir = params.sunDir;
+                    shaft.intensity = params.sunIntensity;
+                    shaft.albedo = params.fogAlbedo;
+                    shaft.densityBoost = params.fogDensity * 0.5f;
+                    shaft.intensity = ResolveSunShaftsIntensity();
+                    if (shaft.intensity < 1e-4f)
+                        continue;
+                    cmd->writeBuffer(st.lightShaftCB, &shaft, sizeof(shaft));
+
+                    nvrhi::BindingSetDesc bsDesc;
+                    bsDesc.bindings = {
+                        nvrhi::BindingSetItem::ConstantBuffer(5, st.paramsCB),
+                        nvrhi::BindingSetItem::ConstantBuffer(6, st.lightShaftCB),
+                        nvrhi::BindingSetItem::Texture_UAV(0, froxel),
+                    };
+                    auto bs = cache.GetOrCreateBindingSet(bsDesc, st.lightShaftLayout, nv);
+                    if (bs)
+                    {
+                        nvrhi::ComputeState cs;
+                        cs.pipeline = st.lightShaftPipeline;
+                        cs.bindings = {bs};
+                        cmd->setComputeState(cs);
+                        cmd->dispatch(gx, gy, gz);
+                    }
+                }
+                else if (strstr(shaderName, "particle") && st.particlePipeline && st.particleLayout &&
+                    st.particlePointsCB && st.particleParamsCB)
+                {
+                    ParticleInjectPointGPU points[256];
+                    u32 count = 0;
+                    if (data.particleBatches)
+                    {
+                        for (const auto& batch : *data.particleBatches)
+                        {
+                            if (count >= 256 || batch.particleCount == 0 || batch.isHUDMode)
+                                continue;
+                            if (batch.lightingMode != PS::ParticleLightingMode::Volumetric)
+                                continue;
+                            auto& p = points[count++];
+                            p.position = batch.worldMatrix.c;
+                            p.radius = 1.5f + 0.02f * float(std::min(batch.particleCount, 64u));
+                            p.albedo.set(0.7f, 0.7f, 0.75f);
+                            p.density = 0.08f * float(std::min(batch.particleCount, 32u));
+                        }
+                    }
+                    if (count == 0)
+                        continue;
                     cmd->writeBuffer(st.particlePointsCB, points, sizeof(ParticleInjectPointGPU) * count);
                     ParticleInjectParamsCB pp{};
                     pp.particleCount = count;
@@ -354,7 +471,7 @@ VirtualResourceHandle setupVolumetricPass(
                         nvrhi::BindingSetItem::StructuredBuffer_SRV(0, st.particlePointsCB),
                         nvrhi::BindingSetItem::Texture_UAV(0, froxel),
                     };
-                    auto bs = nv->createBindingSet(bsDesc, st.particleLayout);
+                    auto bs = cache.GetOrCreateBindingSet(bsDesc, st.particleLayout, nv);
                     if (bs)
                     {
                         nvrhi::ComputeState cs;
@@ -366,16 +483,39 @@ VirtualResourceHandle setupVolumetricPass(
                 }
             }
 
-            dispatchUAV(st.lightPipeline, st.lightLayout);
+            if (st.lightPipeline && st.lightLayout && loader)
+            {
+                auto* csRefl = loader->GetCachedReflection("volumetric\\apply_lighting", ".cs");
+                if (csRefl)
+                {
+                    auto staticGlobalsCB = cache.GetOrCreateVolatileCB(
+                        "Frame", "StaticGlobals", sizeof(StaticGlobals), ctx->GetDevice());
+                    StaticGlobals sg = BuildStaticGlobals();
+                    cmd->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
 
-            // Temporal accumulate from previous frame
+                    BindingSetBuilder bsb(*csRefl, nv, "VolLight");
+                    BindVolumetricLighting(bsb, nv, staticGlobalsCB, st.paramsCB, froxel, data.lighting);
+                    auto bs = cache.GetOrCreateBindingSet(bsb.Build(), st.lightLayout, nv);
+                    if (bs)
+                    {
+                        nvrhi::ComputeState cs;
+                        cs.pipeline = st.lightPipeline;
+                        cs.bindings = {bs};
+                        cmd->setComputeState(cs);
+                        cmd->dispatch(gx, gy, gz);
+                    }
+                }
+            }
+
             nvrhi::ITexture* prevFroxel = vol.GetPrevFroxelVolume();
-            if (st.temporalPipeline && st.temporalLayout && st.temporalCB && prevFroxel &&
+            const bool allowVolTemporal = ps_r_upscale == 0;
+            if (allowVolTemporal && st.temporalPipeline && st.temporalLayout && st.temporalCB && prevFroxel &&
                 vol.HasFroxelHistory() && st.hasPrevVP)
             {
                 TemporalParamsCB tcb{};
                 tcb.prevVP = st.prevVP;
                 tcb.temporalAlpha = 0.88f;
+                tcb.frameIndex = Device.dwFrame;
                 cmd->writeBuffer(st.temporalCB, &tcb, sizeof(tcb));
 
                 cmd->setTextureState(prevFroxel, nvrhi::TextureSubresourceSet{},
@@ -389,7 +529,7 @@ VirtualResourceHandle setupVolumetricPass(
                     nvrhi::BindingSetItem::Texture_UAV(0, froxel),
                     nvrhi::BindingSetItem::Sampler(0, st.linearSampler),
                 };
-                auto bs = nv->createBindingSet(bsDesc, st.temporalLayout);
+                auto bs = cache.GetOrCreateBindingSet(bsDesc, st.temporalLayout, nv);
                 if (bs)
                 {
                     nvrhi::ComputeState cs;
@@ -400,7 +540,6 @@ VirtualResourceHandle setupVolumetricPass(
                 }
             }
 
-            // Copy current → prev for next frame
             if (prevFroxel)
             {
                 cmd->setTextureState(froxel, nvrhi::TextureSubresourceSet{},
@@ -411,7 +550,7 @@ VirtualResourceHandle setupVolumetricPass(
                 vol.SwapFroxelHistory();
             }
 
-            st.prevVP = Device.mFullTransform;
+            st.prevVP = g_taa_unjittered_full_transform;
             st.hasPrevVP = true;
 
             cmd->setTextureState(froxel, nvrhi::TextureSubresourceSet{}, nvrhi::ResourceStates::ShaderResource);
@@ -432,7 +571,7 @@ VirtualResourceHandle setupVolumetricPass(
                 nvrhi::BindingSetItem::Texture_SRV(2, froxel),
                 nvrhi::BindingSetItem::Sampler(0, st.linearSampler),
             };
-            auto marchSet = nv->createBindingSet(marchBs, st.marchLayout);
+            auto marchSet = cache.GetOrCreateBindingSet(marchBs, st.marchLayout, nv);
             if (!marchSet)
                 return;
 

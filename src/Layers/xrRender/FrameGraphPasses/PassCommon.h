@@ -15,6 +15,10 @@ void DrawIndexedIndirectCountOrFallback(
     uint32_t countOffsetBytes,
     uint32_t maxDrawCount);
 
+void ResetMdiDrawCounters();
+u32 GetMdiDrawCallCount();
+u32 GetMdiMaxDrawCountSum();
+
 struct LightingConstants {
     Fvector4 sunDirection;
     Fvector4 sunColor;
@@ -71,5 +75,13 @@ u32 ExtractFrustumPlanes(Fvector4 outPlanes[6]);
 
 // Resolve $user$sky0/$user$sky1 cubemaps for water reflections (falls back to dummy cubes).
 void ResolveEnvSkyCubes(fg::RenderDevice* device, nvrhi::ITexture*& outSky0, nvrhi::ITexture*& outSky1);
+
+/// Bind g_Materials / g_TerrainMaterials / g_VariantTextures required by bindless_common.h
+/// (t8/t9/t10). Always call when the PS includes bindless_common.h.
+void BindBindlessMaterialTables(framegraph::BindingSetBuilder& bsb);
+
+/// Bind g_PaintSplats (t11) required by skinned_common.h. Uses overlay buffer or a dummy.
+void BindPaintSplatBuffer(framegraph::BindingSetBuilder& bsb, nvrhi::IDevice* device,
+    nvrhi::IBuffer* splatBuffer = nullptr);
 
 } // namespace xray::render::fg::passes

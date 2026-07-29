@@ -11,6 +11,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/xrRender_console.h"
+#include "xrEngine/Environment.h"
 
 namespace fg
 {
@@ -20,6 +21,27 @@ namespace fg
 namespace xray::render::fg::passes {
 
 using namespace framegraph;
+
+static float CopLuma(float r, float g, float b)
+{
+    return r * 0.3f + g * 0.38f + b * 0.22f;
+}
+
+static float ComputeEnvironmentExposureEV()
+{
+    if (!g_pGamePersistent)
+        return 0.f;
+
+    const auto& env = g_pGamePersistent->Environment().CurrentEnv;
+
+    const float sunL = CopLuma(env.sun_color.x, env.sun_color.y, env.sun_color.z) * ps_r2_sun_lumscale;
+    const float hemiL = CopLuma(env.hemi_color.x, env.hemi_color.y, env.hemi_color.z) * ps_r2_sun_lumscale_hemi;
+    const float ambL = CopLuma(env.ambient.x, env.ambient.y, env.ambient.z) * ps_r2_sun_lumscale_amb;
+    const float L_env = std::max(sunL + hemiL + ambL, 1e-4f);
+    const float L_ref = std::max(ps_r_exposure_env_ref, 1e-4f);
+    const float envEV = std::log2(L_env / L_ref);
+    return std::clamp(envEV, -4.f, 2.f);
+}
 
 // Classic binder (phase_luminance):
 //   amount = R2FLAG_TONEMAP ? ps_r2_tonemap_amount : 0
@@ -133,13 +155,13 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
         }
 
         {
-            state.adaptLayout = cache.GetOrCreateBindingLayoutFromReflection("ExposurePass_Adapt", *adaptResult.reflection, nvDevice);
+            state.adaptLayout = cache.GetOrCreateBindingLayoutFromReflection("ExposurePass_Adapt_v2", *adaptResult.reflection, nvDevice);
 
             if (state.adaptLayout) {
                 nvrhi::ComputePipelineDesc pipeDesc;
                 pipeDesc.CS = adaptResult.handle;
                 pipeDesc.bindingLayouts = { state.adaptLayout };
-                state.adaptPipeline = cache.GetOrCreateComputePipeline("ExposurePass_Adapt", pipeDesc, nvDevice);
+                state.adaptPipeline = cache.GetOrCreateComputePipeline("ExposurePass_Adapt_v2", pipeDesc, nvDevice);
             }
         }
 
@@ -155,13 +177,8 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
     Msg("* [ExposurePass] Initialized (compute=%s)", state.computeEnabled ? "enabled" : "fallback");
 }
 
-// Classic CPU-side MiddleGray packing + adaptation blend update
-static void FillClassicMiddleGray(const ExposureConfig& config, float deltaTime, ExposurePassState& state, AdaptCB& out)
+static void FillAdaptCB(const ExposureConfig& config, float deltaTime, AdaptCB& out)
 {
-    // f_luminance_adapt = .9 * prev + .1 * dt * adaptation
-    state.adaptBlend = 0.9f * state.adaptBlend + 0.1f * deltaTime * config.adaptation;
-    state.adaptBlend = std::clamp(state.adaptBlend, 0.0f, 1.0f);
-
     Fvector4 none(1.f, 0.f, 1.f, 0.f);
     Fvector4 full(config.middleGray, 1.f, config.lowLum, 0.f);
     Fvector4 result;
@@ -170,18 +187,30 @@ static void FillClassicMiddleGray(const ExposureConfig& config, float deltaTime,
     out.middleGrayX = result.x;
     out.middleGrayY = result.y;
     out.middleGrayZ = result.z;
-    out.middleGrayW = state.adaptBlend;
+    out.pad0 = 0.f;
+    out.lowPercentile = 0.50f;
+    out.highPercentile = 0.90f;
+    out.adaptUp = std::max(ps_r_exposure_adapt_up, 0.01f);
+    out.adaptDown = std::max(ps_r_exposure_adapt_down, 0.01f);
+    const float envStrength = std::clamp(ps_r_exposure_env_strength, 0.f, 1.f);
+    out.evBias = ps_r_exposure_ev_bias + ComputeEnvironmentExposureEV() * envStrength;
+    out.deltaTime = std::max(deltaTime, 1e-4f);
+    out.pad1 = 0.f;
+    out.pad2 = 0.f;
+    (void)config.adaptation;
 }
 
 static float ComputeFallbackExposure(const ExposureConfig& config, float deltaTime, ExposurePassState& state)
 {
-    // No scene: hold at 1 (classic scale with amount=0)
     AdaptCB cb{};
-    FillClassicMiddleGray(config, deltaTime, state, cb);
+    FillAdaptCB(config, deltaTime, cb);
     const float Lw = 1.0f;
     float scale = cb.middleGrayX / std::max(Lw * cb.middleGrayY + cb.middleGrayZ, 1e-6f);
+    scale *= std::exp2(cb.evBias);
     scale = std::clamp(scale, 1.f / 128.f, 20.f);
-    state.currentExposure = std::lerp(state.currentExposure, scale, cb.middleGrayW);
+    const float rate = (scale > state.currentExposure) ? cb.adaptUp : cb.adaptDown;
+    const float alpha = 1.f - std::exp(-rate * cb.deltaTime);
+    state.currentExposure = std::lerp(state.currentExposure, scale, std::clamp(alpha, 0.f, 1.f));
     return state.currentExposure;
 }
 
@@ -303,7 +332,7 @@ ExposureOutput setupExposurePass(
 
                     {
                         AdaptCB adaptCB{};
-                        FillClassicMiddleGray(data.config, data.deltaTime, *ps, adaptCB);
+                        FillAdaptCB(data.config, data.deltaTime, adaptCB);
 
                         cmdList->writeBuffer(adaptCBHandle, &adaptCB, sizeof(adaptCB));
 

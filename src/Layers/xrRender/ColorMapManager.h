@@ -11,6 +11,7 @@ public:
     ColorMapManager();
 
     void SetTextures(const shared_str& tex0, const shared_str& tex1);
+    ref_texture& get_cmap(int i) { return m_CMap[i]; }
 
 private:
     void UpdateTexture(const shared_str& strTexName, int iTex);

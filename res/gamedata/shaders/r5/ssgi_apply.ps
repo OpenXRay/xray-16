@@ -1,15 +1,12 @@
-// ssgi_apply.ps — composite SSGI into HDR scene color
 #define SM_6_0
 #include "common.h"
 #include "shared/pbr_brdf.h"
 
-Texture2D g_Color : register(t0);
-Texture2D g_SSGI  : register(t1);
+Texture2D g_Color  : register(t0);
+Texture2D g_SSGI   : register(t1);
 Texture2D g_Normal : register(t2);
-Texture2D g_Base  : register(t3);
-// t4 is taken by s_pbr from common_samplers.h (via common.h). Use a free slot,
-// otherwise reflection reports t4 as s_pbr and the binding set is left incomplete.
-Texture2D g_Depth : register(t5);
+Texture2D g_Base   : register(t3);
+Texture2D g_Depth  : register(t5);
 
 cbuffer SSGIApplyParams : register(b5)
 {
@@ -26,17 +23,20 @@ float4 main(PS_INPUT I) : SV_Target
     if (rawDepth >= 0.9995)
         return float4(color, 1.0);
 
-    float3 gi = g_SSGI.SampleLevel(smp_linear, I.uv, 0).rgb;
+    float amt = saturate(intensity);
+    if (amt < 1e-4)
+        return float4(color, 1.0);
+
     float4 base = g_Base.SampleLevel(smp_linear, I.uv, 0);
-    float3 albedo = base.rgb;
-    float metallic = base.a;
+    float3 albedo = saturate(base.rgb);
+    float metallic = UnpackMetallicFromBaseA(base.a);
     float4 nSample = g_Normal.SampleLevel(smp_nofilter, I.uv, 0);
-    float roughness = nSample.w;
+    float3 N = normalize(nSample.xyz + 1e-5);
+    float roughness = saturate(nSample.w);
 
     float2 ndc = float2(I.uv.x * 2.0 - 1.0, 1.0 - I.uv.y * 2.0);
     float4 worldH = mul(m_InvVP, float4(ndc, rawDepth, 1.0));
     float3 worldPos = worldH.xyz / max(worldH.w, 1e-5);
-    float3 N = normalize(nSample.xyz);
     float3 V = normalize(eye_position - worldPos);
 
     float3 F0 = CalculateF0(albedo, metallic);
@@ -44,6 +44,7 @@ float4 main(PS_INPUT I) : SV_Target
     float3 F = F_SchlickRoughness(NdotV, F0, roughness);
     float3 kD = (1.0 - F) * (1.0 - metallic);
 
-    color += gi * kD * albedo * intensity;
-    return float4(color, 1.0);
+    float3 gi = max(g_SSGI.SampleLevel(smp_linear, I.uv, 0).rgb, 0.0);
+    color += kD * albedo * gi * amt;
+    return float4(max(color, 0.0), 1.0);
 }
