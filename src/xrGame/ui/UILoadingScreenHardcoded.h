@@ -12,25 +12,25 @@ R"(<w>
 	</background>
     <loading_logo x="0" y="173" width="1024" height="399">
     </loading_logo>
-    <loading_progress x="260" y="599" width="506" height="4" horz="1" min="0" max="100" pos="0" inertion="5.0">
-        <progress>
-            <texture>ui\oxr_loading_bar</texture>
+    <loading_progress x="127" y="698" width="749" height="8" horz="1" min="0" max="100" pos="0" inertion="5.0" under_background="0">
+        <progress stretch="1">
+            <texture width="749" height="8" r="255" g="255" b="255" a="255">ui\oxr_loading_bar</texture>
         </progress>
         <background stretch="1">
-            <texture width="506" height="4" r="0" g="0" b="0" a="255">ui\oxr_loading_bar</texture>
+            <texture width="749" height="8" r="0" g="0" b="0" a="255">ui\oxr_loading_bar</texture>
         </background>
     </loading_progress>
     <loading_stage x="260" y="530" width="506" height="20">
         <text align="c" r="170" g="170" b="170" font="letterica18"/>
     </loading_stage>
-    <loading_header x="260" y="622" width="506" height="20">
-        <text align="c" r="103" g="103" b="103" font="letterica18"/>
+    <loading_header x="260" y="560" width="506" height="20">
+        <text align="c" r="200" g="200" b="200" font="letterica18"/>
     </loading_header>
-    <loading_tip_number x="260" y="658" width="506" height="20">
-        <text align="c" r="103" g="103" b="103" font="letterica18"/>
+    <loading_tip_number x="260" y="596" width="506" height="20">
+        <text align="c" r="200" g="200" b="200" font="letterica18"/>
     </loading_tip_number>
-    <loading_tip x="163" y="676" width="700" height="80" complex_mode="1">
-        <text alignment="c" align="c" r="103" g="103" b="103" font="letterica18"/>
+    <loading_tip x="163" y="614" width="700" height="60" complex_mode="1">
+        <text alignment="c" align="c" r="200" g="200" b="200" font="letterica18"/>
     </loading_tip>
 </w>)";
 
@@ -48,25 +48,25 @@ R"(<w>
         </auto_static>
     </background>
     <loading_logo x="102" y="173" width="819" height="512" stretch="1"/>
-    <loading_progress x="310" y="599" width="405" height="5" horz="1" min="0" max="100" pos="0" inertion="5.0">
-        <progress>
-            <texture>ui\oxr_loading_bar</texture>
+    <loading_progress x="204" y="698" width="600" height="8" horz="1" min="0" max="100" pos="0" inertion="5.0" under_background="0">
+        <progress stretch="1">
+            <texture width="600" height="8" r="255" g="255" b="255" a="255">ui\oxr_loading_bar</texture>
         </progress>
         <background stretch="1">
-            <texture width="405" height="5" r="0" g="0" b="0" a="255">ui\oxr_loading_bar</texture>
+            <texture width="600" height="8" r="0" g="0" b="0" a="255">ui\oxr_loading_bar</texture>
         </background>
     </loading_progress>
     <loading_stage x="310" y="530" width="405" height="20" stretch="1">
         <text align="c" r="170" g="170" b="170" font="letterica18"/>
     </loading_stage>
-    <loading_header x="310" y="622" width="405" height="20" stretch="1">
-        <text align="c" r="103" g="103" b="103" font="letterica18"/>
+    <loading_header x="310" y="560" width="405" height="20" stretch="1">
+        <text align="c" r="200" g="200" b="200" font="letterica18"/>
     </loading_header>
-    <loading_tip_number x="310" y="658" width="405" height="20" stretch="1">
-        <text align="c" r="103" g="103" b="103" font="letterica18"/>
+    <loading_tip_number x="310" y="596" width="405" height="20" stretch="1">
+        <text align="c" r="200" g="200" b="200" font="letterica18"/>
     </loading_tip_number>
-    <loading_tip x="273" y="676" width="480" height="80" complex_mode="1" stretch="1">
-        <text alignment="c" align="c" r="103" g="103" b="103" font="letterica18"/>
+    <loading_tip x="273" y="614" width="480" height="60" complex_mode="1" stretch="1">
+        <text alignment="c" align="c" r="200" g="200" b="200" font="letterica18"/>
     </loading_tip>
 </w>)";
 
