@@ -285,14 +285,8 @@ public:
     void LL_SetBonesVisible(u64 mask) override;
 
     // Main functionality
-    void CalcBones(BOOL bForceExact = FALSE);
-
     void CalculateBones(BOOL bForceExact = FALSE) override; // Recalculate skeleton
     void CalculateBones_Invalidate() override;
-
-    void CalculateBonesFG(BOOL bForceExact = FALSE) override; // Recalculate skeleton
-    void CalculateBones_InvalidateFG() override;
-
     void Callback(UpdateCallback C, void* Param) override
     {
         Update_Callback = C;

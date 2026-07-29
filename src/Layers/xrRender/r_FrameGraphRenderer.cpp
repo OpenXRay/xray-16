@@ -2305,8 +2305,7 @@ static void ForEachLeafVisual(dxRender_Visual* pVisual, F&& fn) {
         case MT_SKELETON_ANIM:
         case MT_SKELETON_RIGID: {
             CKinematics* pV = static_cast<CKinematics*>(pVisual);
-            pV->CalculateBones_InvalidateFG();
-            pV->CalculateBonesFG(TRUE);
+            pV->CalculateBones(TRUE);
 
             for (auto& child : pV->children) {
                 ForEachLeafVisual(child, fn);

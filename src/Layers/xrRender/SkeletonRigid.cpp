@@ -11,20 +11,7 @@ extern int psSkeletonUpdate;
 #ifdef DEBUG
 void check_kinematics(CKinematics* _k, LPCSTR s);
 #endif
-void CKinematics::CalculateBonesFG(BOOL bForceExact)
-{
-    CalcBones(bForceExact);
-}
-
 void CKinematics::CalculateBones(BOOL bForceExact)
-{
-    if (GEnv.Render->IsEnabled())
-        return;
-
-    CalcBones(bForceExact);
-}
-
-void CKinematics::CalcBones(BOOL bForceExact)
 {
     ZoneScoped;
 

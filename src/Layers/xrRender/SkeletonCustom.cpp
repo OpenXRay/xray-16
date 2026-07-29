@@ -444,17 +444,8 @@ void CKinematics::Copy(dxRender_Visual* P)
     m_lod = (pFrom->m_lod) ? g_pModelPool->Instance_Duplicate(pFrom->m_lod) : nullptr;
 }
 
-void CKinematics::CalculateBones_InvalidateFG()
-{
-    UCalc_Time = 0x0;
-    UCalc_Visibox = psSkeletonUpdate;
-}
-
 void CKinematics::CalculateBones_Invalidate()
 {
-    if (GEnv.Render->IsEnabled())
-        return;
-
     UCalc_Time = 0x0;
     UCalc_Visibox = psSkeletonUpdate;
 }
