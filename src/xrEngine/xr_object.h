@@ -268,6 +268,13 @@ public:
     // Lets the render DLL query actor climb state across the DLL boundary without
     // needing CActor's definition (only CGameObject/CActor implement this).
     virtual bool climbing() const = 0;
+    // True only for the actor while its model orientation is still lerping to catch up
+    // with the camera after a fast turn-in-place (CActor::g_cl_Orientate's mcTurn state,
+    // Actor_Movement.cpp) — false for every other object. During this window the actor's
+    // own XFORM()/skeleton root orientation visibly lags the camera by design (an
+    // intentional animation-catchup mechanic that predates and is unrelated to actor-body
+    // rendering), which is jarring once the body itself is force-rendered/shadowed.
+    virtual bool turning_in_place() const = 0;
     // Utilities
     // XXX: move out
     // static void u_EventGen(NET_Packet& P, u32 type, u32 dest);

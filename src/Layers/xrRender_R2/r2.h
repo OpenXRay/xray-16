@@ -393,6 +393,7 @@ public:
     // feature level
     GenerationLevel GetGeneration() const override { return IRender::GENERATION_R2; }
     bool is_sun_static() override { return o.sunstatic; }
+    bool actor_body_shadow_active() const override;
 
 #if defined(USE_DX11)
     BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D11; }

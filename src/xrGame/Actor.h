@@ -428,6 +428,7 @@ public:
     bool is_jump();
     u32 MovingState() const { return mstate_real; }
     virtual bool climbing() const override { return (mstate_real & mcClimb) != 0; }
+    virtual bool turning_in_place() const override { return (mstate_real & mcTurn) != 0; }
 
     [[nodiscard]]
     u32 GetBodyState() const { return mstate_real; }
