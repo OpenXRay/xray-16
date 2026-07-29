@@ -484,9 +484,18 @@ void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::Framebuf
             ad.initialState = nvrhi::ResourceStates::IndirectArgument;
             ad.keepInitialState = true;
             state.cullArgsBuffer = nvDevice->createBuffer(ad);
+
+            nvrhi::BufferDesc sd;
+            sd.debugName = "ParticleCullStats";
+            sd.byteSize = 2 * sizeof(u32);
+            sd.canHaveUAVs = true;
+            sd.canHaveRawViews = true;
+            sd.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            sd.keepInitialState = true;
+            state.cullStatsBuffer = nvDevice->createBuffer(sd);
         }
 
-        if (state.cullPipeline && state.cullObjectBuffer && state.cullArgsBuffer)
+        if (state.cullPipeline && state.cullObjectBuffer && state.cullArgsBuffer && state.cullStatsBuffer)
             Msg("* [ParticlePass] Hi-Z particle culling ready (%u slots)", PARTICLE_CULL_MAX_SLOTS);
         else
             Msg("! [ParticlePass] Hi-Z particle culling unavailable, drawing unculled");
@@ -639,6 +648,9 @@ ParticlePassOutput setupParticlePass(
             u32 totalWorld = data.worldParticleBatches ? (u32)data.worldParticleBatches->size() : 0;
             u32 totalHUD = data.hudParticleBatches ? (u32)data.hudParticleBatches->size() : 0;
 
+            if (data.passState)
+                data.passState->cullStats.active = false;
+
             if ((totalWorld == 0 && totalHUD == 0) || !data.passState)
                 return;
 
@@ -771,9 +783,11 @@ ParticlePassOutput setupParticlePass(
             xr_vector<WorldGroupDraw> worldGroups;
             xr_vector<ParticleCullSlot> cullSlots;
             xr_vector<ParticleDrawArgs> cullArgs;
+            u32 submittedQuads = 0;
 
             bool cullReady = data.passState->cullPipeline && data.passState->cullObjectBuffer &&
-                             data.passState->cullArgsBuffer && data.hasPrevViewProj &&
+                             data.passState->cullArgsBuffer && data.passState->cullStatsBuffer &&
+                             data.hasPrevViewProj &&
                              data.hiZPyramid.is_valid() && data.hiZMipLevels > 0;
             nvrhi::ITexture* hizTexture = cullReady ? fg.GetPhysicalTexture(data.hiZPyramid) : nullptr;
             if (!hizTexture)
@@ -825,6 +839,7 @@ ParticlePassOutput setupParticlePass(
                     group.slotCount = (u32)cullSlots.size() - group.firstSlot;
                     if (group.slotCount == 0)
                         continue;
+                    submittedQuads += group.totalParticles;
                     worldGroups.push_back(std::move(group));
                 }
 
@@ -837,6 +852,9 @@ ParticlePassOutput setupParticlePass(
                                      cullSlots.size() * sizeof(ParticleCullSlot));
                 cmdList->writeBuffer(data.passState->cullArgsBuffer, cullArgs.data(),
                                      cullArgs.size() * sizeof(ParticleDrawArgs));
+
+                const u32 statsZero[2] = { 0, 0 };
+                cmdList->writeBuffer(data.passState->cullStatsBuffer, statsZero, sizeof(statsZero));
 
                 ParticleCullParamsCB cullCBData;
                 cullCBData.prevViewProj = data.prevViewProj;
@@ -866,7 +884,8 @@ ParticlePassOutput setupParticlePass(
                 cullBsb.ConstantBuffer("ParticleCullParams", cullCB)
                        .BufferSRV("g_ParticleData", data.passState->cullObjectBuffer)
                        .Texture("g_HiZPyramid", hizTexture)
-                       .BufferUAV("g_DrawArgs", data.passState->cullArgsBuffer);
+                       .BufferUAV("g_DrawArgs", data.passState->cullArgsBuffer)
+                       .BufferUAV("g_CullStats", data.passState->cullStatsBuffer);
                 auto cullBindingSet = cache.GetOrCreateBindingSet(cullBsb.Build(), data.passState->cullLayout, nvDevice);
 
                 if (cullBindingSet) {
@@ -875,6 +894,42 @@ ParticlePassOutput setupParticlePass(
                     cullState.bindings = { cullBindingSet };
                     cmdList->setComputeState(cullState);
                     cmdList->dispatch(((u32)cullSlots.size() + 63) / 64, 1, 1);
+
+                    auto& ps = *data.passState;
+                    if (ps.cullStatsScheduled >= ParticlePassState::CULL_STATS_SLOTS) {
+                        nvrhi::IBuffer* oldest = ps.cullStatsReadback[ps.cullStatsWriteSlot];
+                        void* mapped = oldest ? nvDevice->mapBuffer(oldest, nvrhi::CpuAccessMode::Read) : nullptr;
+                        if (mapped) {
+                            const u32* counts = static_cast<const u32*>(mapped);
+                            const u32 subBatches = ps.cullStatsSubmitted[ps.cullStatsWriteSlot][0];
+                            const u32 subQuads = ps.cullStatsSubmitted[ps.cullStatsWriteSlot][1];
+                            ps.cullStats.submittedBatches = subBatches;
+                            ps.cullStats.submittedQuads = subQuads;
+                            ps.cullStats.visibleBatches = std::min(counts[0], subBatches);
+                            ps.cullStats.visibleQuads = std::min(counts[1], subQuads);
+                            ps.cullStats.active = true;
+                            nvDevice->unmapBuffer(oldest);
+                        }
+                    }
+
+                    nvrhi::BufferHandle& statsSlot = ps.cullStatsReadback[ps.cullStatsWriteSlot];
+                    if (!statsSlot) {
+                        nvrhi::BufferDesc rd;
+                        rd.debugName = "ParticleCullStatsReadback";
+                        rd.byteSize = 2 * sizeof(u32);
+                        rd.cpuAccess = nvrhi::CpuAccessMode::Read;
+                        rd.initialState = nvrhi::ResourceStates::CopyDest;
+                        rd.keepInitialState = true;
+                        statsSlot = nvDevice->createBuffer(rd);
+                    }
+                    if (statsSlot) {
+                        cmdList->copyBuffer(statsSlot, 0, ps.cullStatsBuffer, 0, 2 * sizeof(u32));
+                        ps.cullStatsSubmitted[ps.cullStatsWriteSlot][0] = (u32)cullSlots.size();
+                        ps.cullStatsSubmitted[ps.cullStatsWriteSlot][1] = submittedQuads;
+                        ps.cullStatsWriteSlot = (ps.cullStatsWriteSlot + 1) % ParticlePassState::CULL_STATS_SLOTS;
+                        if (ps.cullStatsScheduled < ParticlePassState::CULL_STATS_SLOTS)
+                            ++ps.cullStatsScheduled;
+                    }
                 } else {
                     cullReady = false;
                 }

@@ -34,6 +34,7 @@ StructuredBuffer<ParticleData> g_ParticleData : register(t0);
 Texture2D<float> g_HiZPyramid : register(t1);
 
 RWStructuredBuffer<IndirectDrawArgs> g_DrawArgs : register(u0);
+RWByteAddressBuffer g_CullStats : register(u1);
 
 [numthreads(THREAD_GROUP_SIZE, 1, 1)]
 void main(uint3 dispatchThreadID : SV_DispatchThreadID)
@@ -50,6 +51,13 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
     if (visible && g_HiZMipLevels > 0)
         visible = HiZTestSphere(p.position, p.radius, g_CameraPos.xyz, g_PrevViewProj,
                                 g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels);
+
+    if (visible)
+    {
+        uint unused;
+        g_CullStats.InterlockedAdd(0, 1u, unused);
+        g_CullStats.InterlockedAdd(4, g_DrawArgs[slot].indexCountPerInstance / 6u, unused);
+    }
 
     g_DrawArgs[slot].instanceCount = visible ? 1u : 0u;
 }

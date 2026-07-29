@@ -59,6 +59,14 @@ struct ParticleBatch {
     ParticleShaderVariant shaderVariant = ParticleShaderVariant::Standard;
 };
 
+struct ParticleCullStats {
+    u32 submittedBatches = 0;
+    u32 visibleBatches = 0;
+    u32 submittedQuads = 0;
+    u32 visibleQuads = 0;
+    bool active = false;
+};
+
 struct ParticlePassState {
     nvrhi::GraphicsPipelineHandle pipelines[PARTICLE_BLEND_COUNT];
     nvrhi::GraphicsPipelineHandle distortPipeline;
@@ -79,6 +87,13 @@ struct ParticlePassState {
     nvrhi::BindingLayoutHandle cullLayout;
     nvrhi::BufferHandle cullObjectBuffer;
     nvrhi::BufferHandle cullArgsBuffer;
+    static constexpr u32 CULL_STATS_SLOTS = 6;
+    nvrhi::BufferHandle cullStatsBuffer;
+    nvrhi::BufferHandle cullStatsReadback[CULL_STATS_SLOTS];
+    u32 cullStatsSubmitted[CULL_STATS_SLOTS][2] = {};
+    u32 cullStatsWriteSlot = 0;
+    u32 cullStatsScheduled = 0;
+    ParticleCullStats cullStats;
 };
 
 struct ParticlePassData {
