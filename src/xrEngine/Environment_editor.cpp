@@ -304,31 +304,6 @@ void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
     }
 }
 
-void CEffect_Thunderbolt::ED_ShowParams()
-{
-    using namespace xray::imgui;
-
-    float altitude[2] = { rad2deg(p_var_alt.x) , rad2deg(p_var_alt.y) };
-    if (ImGui::DragFloat2("altitude", altitude, 0.5f, -360.0f, 360.f))
-        p_var_alt = { rad2deg(altitude[0]) , rad2deg(altitude[1]) };
-
-    float deltalongitude = rad2deg(p_var_long);
-    if (ImGui::DragFloat("wind direction", &deltalongitude, 0.5f, -360.0f, 360.f))
-        p_var_long = deg2rad(deltalongitude);
-
-    ImGui::DragFloat("minimum distance factor", &p_min_dist, 0.001f, 0.0f, MAX_DIST_FACTOR);
-    ItemHelp("Distance from far plane");
-
-    float tilt = rad2deg(p_tilt);
-    if (ImGui::DragFloat("tilt", &tilt, 0.01f, 15.0f, 30.f))
-        p_tilt = deg2rad(tilt);
-
-    ImGui::DragFloat("second probability", &p_second_prop, 0.001f, 0.0f, 1.0f);
-    ImGui::DragFloat("sky color", &p_sky_color, 0.001f, 0.0f, 1.0f);
-    ImGui::DragFloat("sun color", &p_sun_color, 0.001f, 0.0f, 1.0f);
-    ImGui::DragFloat("fog color", &p_fog_color, 0.001f, 0.0f, 1.0f);
-}
-
 void CEnvironment::on_tool_frame()
 {
 #ifdef MASTER_GOLD
