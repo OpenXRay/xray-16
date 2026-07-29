@@ -957,7 +957,11 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r2_dof_pickable", &ps_r2_dof_pickable, 0, 1);
     CMD4(CCC_Float, "r2_dof_time", &ps_r2_dof_time, 0.f, 10.f);
     CMD4(CCC_Float, "r2_dof_diff_far", &ps_r2_dof_diff_far, -10000.f, 10000.f);
-    CMD4(CCC_Float, "r2_vibrance_val", &ps_r2_vibrance_val, -10000.f, 10000.f);
+    // Wide -10000..10000 range dropped in favor of the actual usable range now that this drives the
+    // combine_2 shader's Vibrance() pass for real (see r4_rendertarget_phase_combine.cpp) -- the
+    // options-menu slider maps its full width to whatever [min,max] this cvar registers, so the old
+    // near-infinite range made every drag land imperceptibly close to neutral.
+    CMD4(CCC_Float, "r2_vibrance_val", &ps_r2_vibrance_val, -1.f, 1.f);
     CMD4(CCC_Float, "r2_aberration_val", &ps_r2_aberration_val, -10000.f, 10000.f);
     CMD4(CCC_Integer, "r2_vibrance", &ps_r2_vibrance, 0, 1);
     CMD4(CCC_Float, "r2_lensdirt_val", &ps_r2_lensdirt_val, -10000.f, 10000.f);
@@ -966,9 +970,13 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_sss_phase1", &ps_r2_sss_phase1, -10000.f, 10000.f);
     CMD4(CCC_Float, "r2_sss_phase2", &ps_r2_sss_phase2, -10000.f, 10000.f);
     CMD4(CCC_Float, "r2_sss_blend", &ps_r2_sss_blend, -10000.f, 10000.f);
-    CMD4(CCC_Float, "r__color_base_r", &ps_r_color_base_r, -10000.f, 10000.f);
-    CMD4(CCC_Float, "r__color_base_g", &ps_r_color_base_g, -10000.f, 10000.f);
-    CMD4(CCC_Float, "r__color_base_b", &ps_r_color_base_b, -10000.f, 10000.f);
+    // 0..1 matches SPPInfo::SColor's packing (r/g/b * 255, clamped) -- same range Dead Air's own scripts
+    // use for these (xr_actor.script, ui_dar2_game_options.script presets: 0.4-0.9). Narrowed from the
+    // storage-only -10000..10000 placeholder now that the options-menu slider's full width actually maps
+    // onto this range (see r2.cpp CRender::SetPostProcessParams).
+    CMD4(CCC_Float, "r__color_base_r", &ps_r_color_base_r, 0.f, 1.f);
+    CMD4(CCC_Float, "r__color_base_g", &ps_r_color_base_g, 0.f, 1.f);
+    CMD4(CCC_Float, "r__color_base_b", &ps_r_color_base_b, 0.f, 1.f);
     CMD4(CCC_Float, "r__color_add_r", &ps_r_color_add_r, -10000.f, 10000.f);
     CMD4(CCC_Float, "r__color_add_g", &ps_r_color_add_g, -10000.f, 10000.f);
     CMD4(CCC_Float, "r__color_add_b", &ps_r_color_add_b, -10000.f, 10000.f);

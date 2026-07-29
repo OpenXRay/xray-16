@@ -859,9 +859,23 @@ void CRender::SetPostProcessParams(const SPPInfo& ppi)
     Target->set_noise_scale(ppi.noise.grain);
     Target->set_noise_fps(ppi.noise.fps);
 
-    Target->set_color_base(ppi.color_base);
+    // Fold in the Dead Air options-menu color correction (r__color_base_r/g/b, r__color_add_r/g/b) as a
+    // persistent offset from SPPInfo's neutral baseline (color_base 0.5/0.5/0.5, color_add 0/0/0 -- see
+    // CCameraManager::pp_identity). This layers under whatever a .ppe postprocess effector is currently
+    // blending in, the same way CCameraManager blends multiple effectors against that same baseline.
+    SPPInfo::SColor color_base = ppi.color_base;
+    color_base.r += ps_r_color_base_r - 0.5f;
+    color_base.g += ps_r_color_base_g - 0.5f;
+    color_base.b += ps_r_color_base_b - 0.5f;
+
+    SPPInfo::SColor color_add = ppi.color_add;
+    color_add.r += ps_r_color_add_r;
+    color_add.g += ps_r_color_add_g;
+    color_add.b += ps_r_color_add_b;
+
+    Target->set_color_base(color_base);
     Target->set_color_gray(ppi.color_gray);
-    Target->set_color_add(ppi.color_add);
+    Target->set_color_add(color_add);
 
     Target->set_cm_imfluence(ppi.cm_influence);
     Target->set_cm_interpolate(ppi.cm_interpolate);

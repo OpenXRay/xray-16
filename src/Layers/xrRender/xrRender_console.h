@@ -160,6 +160,16 @@ extern ECORE_API Fvector3 ps_r2_dof;
 extern ECORE_API float ps_r2_dof_sky; //	distance to sky
 extern ECORE_API float ps_r2_dof_kernel_size; //	7.0f
 
+// Dead Air options-menu color correction ("Цветокоррекция") + saturation ("Насыщенность").
+// base default 0.5/0.5/0.5 matches SPPInfo's neutral color_base; add default 0/0/0 matches its neutral color_add.
+extern ECORE_API float ps_r_color_base_r;
+extern ECORE_API float ps_r_color_base_g;
+extern ECORE_API float ps_r_color_base_b;
+extern ECORE_API float ps_r_color_add_r;
+extern ECORE_API float ps_r_color_add_g;
+extern ECORE_API float ps_r_color_add_b;
+extern ECORE_API float ps_r2_vibrance_val;
+
 extern ECORE_API float ps_r3_dyn_wet_surf_near; // 10.0f
 extern ECORE_API float ps_r3_dyn_wet_surf_far; // 30.0f
 extern ECORE_API int ps_r3_dyn_wet_surf_sm_res; // 256
