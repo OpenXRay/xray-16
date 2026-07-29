@@ -22,6 +22,7 @@
 #include "Layers/xrRender/ClusteredLightManager.h"
 #include "xrParticles/psystem.h"
 #include "xrCDB/Frustum.h"  // For CFrustum (frustum plane extraction)
+#include <nvrhi/utils.h>
 
 extern ENGINE_API float psHUD_FOV;
 
@@ -205,12 +206,52 @@ static Fmatrix BuildHUDFOVMatrix()
     return result;
 }
 
-static u32 GenerateParticleVertices(
+void FilterRTParticleBatches(const xr_vector<ParticleBatch>& src, xr_vector<ParticleBatch>& out)
+{
+    constexpr float kRTParticleMaxDist = 20.f;
+    constexpr u32 kRTParticleMaxBatches = 8;
+
+    struct Cand {
+        const ParticleBatch* batch;
+        float dist;
+    };
+    xr_vector<Cand> cands;
+    cands.reserve(src.size());
+
+    const Fvector& cam = Device.vCameraPosition;
+    for (const auto& b : src) {
+        if (b.isHUDMode)
+            continue;
+        if (b.shaderVariant == ParticleShaderVariant::Distort)
+            continue;
+        if (!b.visual)
+            continue;
+        const float dist = cam.distance_to(b.visual->vis.sphere.P) - b.visual->vis.sphere.R;
+        if (dist > kRTParticleMaxDist)
+            continue;
+        cands.push_back({&b, dist > 0.f ? dist : 0.f});
+    }
+
+    std::sort(cands.begin(), cands.end(), [](const Cand& a, const Cand& b) {
+        return a.dist < b.dist;
+    });
+
+    out.clear();
+    const u32 n = std::min((u32)cands.size(), kRTParticleMaxBatches);
+    out.reserve(n);
+    for (u32 i = 0; i < n; i++)
+        out.push_back(*cands[i].batch);
+}
+
+u32 GenerateParticleVertices(
     const xr_vector<ParticleBatch>& batches,
     xr_vector<ParticleVertex>& vertices,
-    xr_vector<u32>* outCounts = nullptr)
+    xr_vector<u32>* outCounts,
+    float maxDistance)
 {
     u32 totalParticles = 0;
+    const float maxDistSq = maxDistance > 0.f ? maxDistance * maxDistance : 0.f;
+    const Fvector& cam = Device.vCameraPosition;
 
     for (const auto& batch : batches) {
         if (outCounts)
@@ -248,9 +289,18 @@ static u32 GenerateParticleVertices(
 
         float sina = 0.0f, cosa = 0.0f;
         float angle = float(0xFFFFFFFF);
+        u32 written = 0;
 
         for (u32 i = 0; i < particleCount; i++) {
             auto& m = particles[i];
+
+            if (maxDistSq > 0.f) {
+                Fvector wp = m.pos;
+                if (hasXForm)
+                    xform.transform_tiny(wp, m.pos);
+                if (cam.distance_to_sqr(wp) > maxDistSq)
+                    continue;
+            }
 
             if (angle != m.rot.x) {
                 angle = m.rot.x;
@@ -346,11 +396,13 @@ static u32 GenerateParticleVertices(
                     v->p = tmp;
                 }
             }
+            written++;
         }
 
+        vertices.resize(baseVertex + written * 4);
         if (outCounts)
-            outCounts->back() = particleCount;
-        totalParticles += particleCount;
+            outCounts->back() = written;
+        totalParticles += written;
     }
 
     return totalParticles;
@@ -587,7 +639,7 @@ static void InitializeDistortionPipeline(fg::RenderDevice* device, const nvrhi::
     pipeDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
     pipeDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::One;
 
-    state.distortPipeline = cache.GetOrCreatePipeline("ParticlePass_distort", pipeDesc, fbInfo, nvDevice);
+    state.distortPipeline = cache.GetOrCreatePipeline("ParticlePass_distort_v2", pipeDesc, fbInfo, nvDevice);
 
     if (state.distortPipeline) {
         const auto& actualDesc = state.distortPipeline->getDesc();
@@ -613,7 +665,8 @@ ParticlePassOutput setupParticlePass(
     u32 hiZMipLevels,
     const Fmatrix* prevViewProj,
     VirtualResourceHandle prevDepth,
-    ParticlePassState* state)
+    ParticlePassState* state,
+    VirtualResourceHandle seedDistortion)
 {
     if (state) {
         nvrhi::FramebufferInfoEx fbInfo;
@@ -631,7 +684,7 @@ ParticlePassOutput setupParticlePass(
 
     auto& passData = fg.addCallbackPass<ParticlePassData>(
         "Particles",
-        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, state](FrameGraph& builder, PassHandle passHandle, ParticlePassData& data) {
+        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, state, seedDistortion](FrameGraph& builder, PassHandle passHandle, ParticlePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -657,19 +710,29 @@ ParticlePassOutput setupParticlePass(
                     if (b.shaderVariant == ParticleShaderVariant::Distort) return true;
                 return false;
             };
-            data.hasDistortion = hasDistortBatch(worldParticleBatches) || hasDistortBatch(hudParticleBatches);
+            const bool particleDistort =
+                hasDistortBatch(worldParticleBatches) || hasDistortBatch(hudParticleBatches);
+            data.importedDistortion = seedDistortion.is_valid();
+            data.hasDistortion = particleDistort || data.importedDistortion;
+            data.seedDistortion = {};
 
             if (data.hasDistortion) {
-                framegraph::ResourceDesc distDesc;
-                distDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-                distDesc.width = width;
-                distDesc.height = height;
-                distDesc.format = nvrhi::Format::RGBA16_FLOAT;
-                distDesc.isRenderTarget = true;
-                distDesc.isTransient = true;
-                distDesc.isUAV = true;
-                distDesc.debugName = "rt_Distortion";
-                data.distortionRT = passBuilder.createTexture("rt_Distortion", distDesc);
+                if (data.importedDistortion && !particleDistort) {
+                    data.distortionRT = passBuilder.readWrite(seedDistortion, ResourceState::RenderTarget);
+                } else {
+                    framegraph::ResourceDesc distDesc;
+                    distDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+                    distDesc.width = width;
+                    distDesc.height = height;
+                    distDesc.format = nvrhi::Format::RGBA16_FLOAT;
+                    distDesc.isRenderTarget = true;
+                    distDesc.isTransient = true;
+                    distDesc.isUAV = true;
+                    distDesc.debugName = "rt_Distortion";
+                    data.distortionRT = passBuilder.createTexture("rt_Distortion", distDesc);
+                    if (data.importedDistortion)
+                        data.seedDistortion = passBuilder.read(seedDistortion, ResourceState::CopySource);
+                }
             }
 
             if (hiZPyramid.is_valid())
@@ -681,12 +744,15 @@ ParticlePassOutput setupParticlePass(
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
             if (forwardInputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
+            if (forwardInputs.worldPos.is_valid())
+                data.worldPos = passBuilder.read(forwardInputs.worldPos, ResourceState::ShaderResource);
             if (prevDepth.is_valid())
                 data.prevDepth = passBuilder.read(prevDepth, ResourceState::ShaderResource);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = data.outputNormal;
             data.outputs.baseColor = data.baseColor;
+            data.outputs.worldPos = forwardInputs.worldPos;
             data.outputs.depth = data.depth;
         },
         [](const ParticlePassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -716,14 +782,14 @@ ParticlePassOutput setupParticlePass(
             matBuffer.Upload(ctx);
 
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
-            auto* prevDepthTex = data.prevDepth.is_valid() ? fg.GetPhysicalTexture(data.prevDepth) : depthRT;
+            auto* worldPosTex = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
+            if (!normalRT || !baseColorRT)
+                return;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
-            if (normalRT)
-                fbDesc.addColorAttachment(normalRT);
-            if (baseColorRT)
-                fbDesc.addColorAttachment(baseColorRT);
+            fbDesc.addColorAttachment(normalRT);
+            fbDesc.addColorAttachment(baseColorRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = framegraph::GetPassResourceCache();
             auto framebuffer = cache.GetOrCreateFramebuffer("ParticlePass", fbDesc, nvDevice);
@@ -736,14 +802,16 @@ ParticlePassOutput setupParticlePass(
             const auto& rtDesc = colorRT->getDesc();
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            if (!worldPosTex)
+                worldPosTex = cache.GetDummyContactHistory(nvDevice);
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* vsReflection = shaderLoader->GetCachedReflection("bindless_particle", ".vs");
             auto* psReflection = shaderLoader->GetCachedReflection("bindless_particle", ".ps");
             BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Particle");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB)
-               .BufferSRV("g_Materials", matBuffer.GetBuffer())
-               .Texture("g_SceneDepth", prevDepthTex);
+               .Texture("g_SceneWorldPos", worldPosTex);
+            BindBindlessMaterialTables(bsb);
             auto bindDesc = bsb.Build();
             auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindDesc, data.passState->layout, nvDevice);
 
@@ -755,8 +823,8 @@ ParticlePassOutput setupParticlePass(
                     return nullptr;
                 BindingSetBuilder lbsb(*vsReflection, *litPsReflection, nvDevice, psName);
                 lbsb.ConstantBuffer("static_globals", staticGlobalsCB)
-                    .BufferSRV("g_Materials", matBuffer.GetBuffer())
-                    .Texture("g_SceneDepth", prevDepthTex);
+                    .Texture("g_SceneWorldPos", worldPosTex);
+                BindBindlessMaterialTables(lbsb);
                 auto& clm = ClusteredLightManager::Instance();
                 if (clm.GetLightDataBuffer())
                     lbsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
@@ -789,9 +857,11 @@ ParticlePassOutput setupParticlePass(
             {
                 xr_vector<ParticleBatch> filtered;
                 for (const auto& b : allBatches) {
-                    if (b.blendMode == blendMode && b.shaderVariant == ParticleShaderVariant::Standard &&
-                        b.lightingMode == PS::ParticleLightingMode::Emissive)
-                        filtered.push_back(b);
+                    if (b.blendMode != blendMode || b.shaderVariant == ParticleShaderVariant::Distort)
+                        continue;
+                    if (b.lightingMode != PS::ParticleLightingMode::Emissive)
+                        continue;
+                    filtered.push_back(b);
                 }
                 if (filtered.empty())
                     return;
@@ -931,9 +1001,11 @@ ParticlePassOutput setupParticlePass(
                 for (u8 mode : s_renderOrder) {
                     xr_vector<ParticleBatch> filtered;
                     for (const auto& b : *data.worldParticleBatches) {
-                        if (b.blendMode == mode && b.shaderVariant == ParticleShaderVariant::Standard &&
-                        b.lightingMode == PS::ParticleLightingMode::Emissive)
-                            filtered.push_back(b);
+                        if (b.blendMode != mode || b.shaderVariant == ParticleShaderVariant::Distort)
+                            continue;
+                        if (b.lightingMode != PS::ParticleLightingMode::Emissive)
+                            continue;
+                        filtered.push_back(b);
                     }
                     if (filtered.empty())
                         continue;
@@ -1137,6 +1209,26 @@ ParticlePassOutput setupParticlePass(
             if (!distortRT)
                 return;
 
+            auto* seedTex = data.seedDistortion.is_valid()
+                ? fg.GetPhysicalTexture(data.seedDistortion)
+                : nullptr;
+            if (seedTex && seedTex != distortRT)
+                cmdList->copyTexture(distortRT, nvrhi::TextureSlice(), seedTex, nvrhi::TextureSlice());
+            else if (!data.importedDistortion)
+                cmdList->clearTextureFloat(distortRT, nvrhi::AllSubresources, nvrhi::Color(0.f, 0.f, 0.f, 0.f));
+
+            bool hasParticleDistort = false;
+            auto checkDistort = [&](const xr_vector<ParticleBatch>* batches) {
+                if (!batches) return;
+                for (const auto& b : *batches)
+                    if (b.shaderVariant == ParticleShaderVariant::Distort)
+                        hasParticleDistort = true;
+            };
+            checkDistort(data.worldParticleBatches);
+            checkDistort(data.hudParticleBatches);
+            if (!hasParticleDistort)
+                return;
+
             nvrhi::FramebufferDesc distortFbDesc;
             distortFbDesc.addColorAttachment(distortRT);
             distortFbDesc.setDepthAttachment(depthRT);
@@ -1147,13 +1239,11 @@ ParticlePassOutput setupParticlePass(
             if (!data.passState->distortPipeline)
                 return;
 
-            cmdList->clearTextureFloat(distortRT, nvrhi::AllSubresources, nvrhi::Color(0.f, 0.f, 0.f, 0.f));
-
             auto* distortVsReflection = shaderLoader->GetCachedReflection("bindless_particle", ".vs");
             auto* distortPsReflection = shaderLoader->GetCachedReflection("bindless_particle_distort", ".ps");
             BindingSetBuilder distortBsb(*distortVsReflection, *distortPsReflection, nvDevice, "Particle.Distort");
-            distortBsb.ConstantBuffer("static_globals", staticGlobalsCB)
-                      .BufferSRV("g_Materials", matBuffer.GetBuffer());
+            distortBsb.ConstantBuffer("static_globals", staticGlobalsCB);
+            BindBindlessMaterialTables(distortBsb);
             auto distortBindDesc = distortBsb.Build();
             auto distortBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(
                 distortBindDesc, data.passState->distortLayout, nvDevice);
@@ -1220,6 +1310,258 @@ ParticlePassOutput setupParticlePass(
     output.layout.depth = passData.depth;
     output.distortionRT = passData.distortionRT;
     return output;
+}
+
+static void InitParticleOcclusionPipeline(
+    fg::RenderDevice* device,
+    ParticleOcclusionPassState& state,
+    u32 width,
+    u32 height)
+{
+    if (state.initialized)
+        return;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    if (!nvDevice)
+        return;
+
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    if (!shaderLoader)
+        return;
+
+    auto* backend = device->GetBackend();
+    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+    auto& cache = framegraph::GetPassResourceCache();
+
+    auto vsResult = shaderLoader->LoadVertexShader("bindless_particle", "main");
+    auto psResult = shaderLoader->LoadPixelShader("particle_occlusion", "main");
+    if (!vsResult.handle || !psResult.handle || !vsResult.reflection || !psResult.reflection)
+        return;
+
+    state.vs = vsResult.handle;
+    state.ps = psResult.handle;
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection(
+        "ParticleOcclusion", *vsResult.reflection, *psResult.reflection, nvDevice);
+
+    nvrhi::SamplerDesc samplerDesc;
+    samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
+    samplerDesc.setAllFilters(true);
+    state.sampler = nvDevice->createSampler(samplerDesc);
+
+    constexpr u32 stride = sizeof(ParticleVertex);
+    nvrhi::VertexAttributeDesc attribs[] = {
+        nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGB32_FLOAT).setBufferIndex(0).setOffset(0).setElementStride(stride),
+        nvrhi::VertexAttributeDesc().setName("COLOR").setFormat(nvrhi::Format::BGRA8_UNORM).setBufferIndex(0).setOffset(12).setElementStride(stride),
+        nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setBufferIndex(0).setOffset(16).setElementStride(stride),
+        nvrhi::VertexAttributeDesc().setName("MATERIALID").setFormat(nvrhi::Format::R32_UINT).setBufferIndex(0).setOffset(24).setElementStride(stride),
+    };
+    state.inputLayout = nvDevice->createInputLayout(attribs, 4, state.vs);
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.width = width;
+    fbInfo.height = height;
+    fbInfo.colorFormats = { nvrhi::Format::R16_FLOAT };
+
+    nvrhi::GraphicsPipelineDesc pipeDesc;
+    pipeDesc.VS = state.vs;
+    pipeDesc.PS = state.ps;
+    pipeDesc.inputLayout = state.inputLayout;
+    pipeDesc.bindingLayouts.push_back(state.layout);
+    if (bindlessLayout)
+        pipeDesc.bindingLayouts.push_back(bindlessLayout);
+    pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
+    pipeDesc.renderState.depthStencilState.depthTestEnable = false;
+    pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
+    pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+    pipeDesc.renderState.blendState.targets[0].enableBlend();
+    pipeDesc.renderState.blendState.targets[0].srcBlend = nvrhi::BlendFactor::One;
+    pipeDesc.renderState.blendState.targets[0].destBlend = nvrhi::BlendFactor::One;
+    pipeDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
+    pipeDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::One;
+
+    state.pipeline = cache.GetOrCreatePipeline("ParticleOcclusion", pipeDesc, fbInfo, nvDevice);
+    if (state.pipeline && !state.pipeline->getDesc().bindingLayouts.empty())
+        state.layout = state.pipeline->getDesc().bindingLayouts[0];
+
+    state.initialized = state.pipeline != nullptr;
+    if (state.initialized)
+        Msg("* [ParticleOcclusion] Half-res opacity pass ready");
+}
+
+framegraph::VirtualResourceHandle setupParticleOcclusionPass(
+    FrameGraph& fg,
+    fg::RenderDevice* device,
+    VirtualResourceHandle worldPos,
+    const xr_vector<ParticleBatch>* worldParticleBatches,
+    u32 width,
+    u32 height,
+    ParticleOcclusionPassState& state)
+{
+    const u32 genW = std::max(1u, (width + 1) / 2);
+    const u32 genH = std::max(1u, (height + 1) / 2);
+    InitParticleOcclusionPipeline(device, state, genW, genH);
+
+    ResourceDesc opacityDesc;
+    opacityDesc.type = ResourceDesc::Type::Texture2D;
+    opacityDesc.width = genW;
+    opacityDesc.height = genH;
+    opacityDesc.format = nvrhi::Format::R16_FLOAT;
+    opacityDesc.isRenderTarget = true;
+    opacityDesc.isTransient = true;
+    opacityDesc.debugName = "rt_ParticleOpacity";
+    auto opacityRT = fg.CreateTexture("rt_ParticleOpacity", opacityDesc);
+
+    struct OccPassData {
+        fg::RenderDevice* device = nullptr;
+        ParticleOcclusionPassState* passState = nullptr;
+        const xr_vector<ParticleBatch>* worldBatches = nullptr;
+        VirtualResourceHandle worldPos;
+        VirtualResourceHandle opacity;
+        u32 genW = 0;
+        u32 genH = 0;
+    };
+
+    fg.addCallbackPass<OccPassData>(
+        "Particle Occlusion SS",
+        [&, worldPos, opacityRT, worldParticleBatches, genW, genH](FrameGraph& builder, PassHandle passHandle, OccPassData& data) {
+            RenderPassBuilder pb(builder, passHandle);
+            data.device = device;
+            data.passState = &state;
+            data.worldBatches = worldParticleBatches;
+            data.worldPos = pb.read(worldPos, ResourceState::ShaderResource);
+            data.opacity = pb.write(opacityRT, ResourceState::RenderTarget);
+            data.genW = genW;
+            data.genH = genH;
+        },
+        [](const OccPassData& data, const FrameGraph& fgGraph, fg::RenderContext* ctx) {
+            auto* ps = data.passState;
+            if (!ps || !ps->initialized || !ps->pipeline)
+                return;
+
+            auto* opacityTex = fgGraph.GetPhysicalTexture(data.opacity);
+            auto* worldPosTex = data.worldPos.is_valid() ? fgGraph.GetPhysicalTexture(data.worldPos) : nullptr;
+            if (!opacityTex)
+                return;
+
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+            auto& cache = framegraph::GetPassResourceCache();
+            if (!worldPosTex)
+                worldPosTex = cache.GetDummyContactHistory(nvDevice);
+
+            nvrhi::FramebufferDesc fbDesc;
+            fbDesc.addColorAttachment(opacityTex);
+            auto framebuffer = cache.GetOrCreateFramebuffer("ParticleOcclusion", fbDesc, nvDevice);
+            if (!framebuffer)
+                return;
+
+            nvrhi::utils::ClearColorAttachment(cmdList, framebuffer, 0, nvrhi::Color(0.f));
+
+            if (!data.worldBatches || data.worldBatches->empty())
+                return;
+
+            xr_vector<ParticleBatch> filtered;
+            FilterRTParticleBatches(*data.worldBatches, filtered);
+            if (filtered.empty())
+                return;
+
+            constexpr float kMaxDist = 20.f;
+            constexpr u32 kMaxQuads = 256u;
+            xr_vector<ParticleVertex> vertices;
+            GenerateParticleVertices(filtered, vertices, nullptr, kMaxDist);
+            if (vertices.empty())
+                return;
+
+            u32 totalParticles = (u32)vertices.size() / 4;
+            if (totalParticles > kMaxQuads) {
+                totalParticles = kMaxQuads;
+                vertices.resize(totalParticles * 4);
+            }
+
+            const u32 vbBytes = (u32)(vertices.size() * sizeof(ParticleVertex));
+            if (!ps->particleVB || ps->particleVBSize < vbBytes) {
+                nvrhi::BufferDesc vbDesc;
+                vbDesc.byteSize = std::max(vbBytes, 64u * 1024u);
+                vbDesc.isVertexBuffer = true;
+                vbDesc.debugName = "ParticleOcclusionVB";
+                vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+                vbDesc.keepInitialState = true;
+                ps->particleVB = nvDevice->createBuffer(vbDesc);
+                ps->particleVBSize = ps->particleVB ? (u32)vbDesc.byteSize : 0;
+            }
+            if (!ps->quadIB || ps->maxQuads < totalParticles) {
+                u32 numIndices = totalParticles * 6;
+                xr_vector<u16> indices(numIndices);
+                for (u32 i = 0; i < totalParticles; i++) {
+                    u16 b = (u16)(i * 4);
+                    indices[i * 6 + 0] = b;
+                    indices[i * 6 + 1] = b + 1;
+                    indices[i * 6 + 2] = b + 2;
+                    indices[i * 6 + 3] = b;
+                    indices[i * 6 + 4] = b + 2;
+                    indices[i * 6 + 5] = b + 3;
+                }
+                nvrhi::BufferDesc ibDesc;
+                ibDesc.byteSize = numIndices * sizeof(u16);
+                ibDesc.isIndexBuffer = true;
+                ibDesc.debugName = "ParticleOcclusionIB";
+                ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+                ibDesc.keepInitialState = true;
+                ps->quadIB = nvDevice->createBuffer(ibDesc);
+                if (ps->quadIB) {
+                    cmdList->writeBuffer(ps->quadIB, indices.data(), indices.size() * sizeof(u16));
+                    ps->maxQuads = totalParticles;
+                }
+            }
+            if (!ps->particleVB || !ps->quadIB)
+                return;
+
+            cmdList->writeBuffer(ps->particleVB, vertices.data(), vbBytes);
+
+            auto& matBuffer = MaterialBuffer::Instance();
+            matBuffer.Upload(ctx);
+
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB(
+                "Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
+
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* vsReflection = shaderLoader->GetCachedReflection("bindless_particle", ".vs");
+            auto* psReflection = shaderLoader->GetCachedReflection("particle_occlusion", ".ps");
+            if (!vsReflection || !psReflection)
+                return;
+
+            BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "ParticleOcclusion");
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB)
+               .Texture("g_SceneWorldPos", worldPosTex);
+            BindBindlessMaterialTables(bsb);
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->layout, nvDevice);
+            if (!bindingSet)
+                return;
+
+            auto* backend = data.device->GetBackend();
+            nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
+
+            nvrhi::GraphicsState gfxState;
+            gfxState.pipeline = ps->pipeline;
+            gfxState.framebuffer = framebuffer;
+            gfxState.viewport.addViewport(nvrhi::Viewport((float)data.genW, (float)data.genH));
+            gfxState.viewport.addScissorRect(nvrhi::Rect(data.genW, data.genH));
+            gfxState.bindings = { bindingSet };
+            if (bindlessTable)
+                gfxState.addBindingSet(bindlessTable);
+            gfxState.vertexBuffers = { { ps->particleVB, 0, 0 } };
+            gfxState.indexBuffer = { ps->quadIB, nvrhi::Format::R16_UINT, 0 };
+
+            cmdList->setGraphicsState(gfxState);
+            cmdList->drawIndexed(
+                nvrhi::DrawArguments()
+                    .setVertexCount(totalParticles * 6)
+                    .setStartIndexLocation(0)
+                    .setStartVertexLocation(0));
+        }
+    );
+
+    return opacityRT;
 }
 
 } // namespace xray::render::fg::passes

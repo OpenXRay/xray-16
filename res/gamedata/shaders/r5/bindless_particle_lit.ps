@@ -73,8 +73,10 @@ PS_OUTPUT main(PS_INPUT input)
     float3 albedo = diffuseSample.rgb * input.color.rgb;
     float alpha = diffuseSample.a * input.color.a;
 
-    clip(alpha - mat.alphaRef);
+    float clipA = max(alpha, max(albedo.r, max(albedo.g, albedo.b)));
+    clip(clipA - mat.alphaRef);
 
+    float soft = 1.0;
     if (camera_direction.w > 0.5 && !(mat.flags & MAT_FLAG_PARTICLE_HARD))
     {
         float4 sceneWP = g_SceneWorldPos.Load(int3((int2)input.hpos.xy, 0));
@@ -88,9 +90,7 @@ PS_OUTPUT main(PS_INPUT input)
             float spaceDepth = sceneViewZ - particleViewZ - DEPTH_EPSILON;
             if (spaceDepth < -2 * DEPTH_EPSILON)
                 spaceDepth = 100000.0;
-            float soft = Contrast(saturate(spaceDepth * 1.3), 2);
-            alpha *= soft;
-            albedo *= soft;
+            soft = smoothstep(0.0, 1.25, spaceDepth);
         }
     }
 
@@ -115,15 +115,8 @@ PS_OUTPUT main(PS_INPUT input)
     lit += albedo * L_sun_color.rgb * pow(ndh, glossPow) * 0.15 * (1.0 - metallic);
 
     float4 result = float4(lit, alpha);
-    if (mat.tessMethod == 1)
-        result = float4(lerp(float3(1, 1, 1), result.rgb, result.a), 1.0);
-    else if (mat.tessMethod == 2)
-        result = float4(float3(1, 1, 1) - result.rgb - result.rgb * result.rgb, 1.0);
-    else if (mat.tessMethod == 3)
-    {
-        float3 c = result.rgb * result.a;
-        result = float4(float3(1, 1, 1) - c + c * c, 1.0);
-    }
+    result.a *= soft;
+    result.rgb *= soft;
 
     output.color = result;
     output.normal = float4(N, 1);

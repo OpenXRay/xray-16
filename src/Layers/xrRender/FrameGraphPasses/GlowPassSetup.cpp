@@ -26,8 +26,8 @@ void EnsureGlowResources(nvrhi::IDevice* nv, GlowPassState& state)
     auto* shaderLoader = RImplementation.GetShaderLoader();
     if (!shaderLoader)
         return;
-    auto vsResult = shaderLoader->LoadVertexShader("sun_forward");
-    auto psResult = shaderLoader->LoadPixelShader("sun_forward");
+    auto vsResult = shaderLoader->LoadVertexShader("glow_forward");
+    auto psResult = shaderLoader->LoadPixelShader("glow_forward");
     if (!vsResult.handle || !psResult.handle)
         return;
     state.vs = vsResult.handle;
@@ -35,7 +35,7 @@ void EnsureGlowResources(nvrhi::IDevice* nv, GlowPassState& state)
 
     auto& cache = GetPassResourceCache();
     state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "GlowBillboard", *vsResult.reflection, *psResult.reflection, nv);
+        "GlowBillboard_v3", *vsResult.reflection, *psResult.reflection, nv);
     if (!state.bindingLayout)
         return;
 
@@ -65,7 +65,7 @@ void EnsureGlowResources(nvrhi::IDevice* nv, GlowPassState& state)
     rs.blendState.targets[0].setBlendOp(nvrhi::BlendOp::Add);
     rs.depthStencilState.setDepthTestEnable(true);
     rs.depthStencilState.setDepthWriteEnable(false);
-    rs.depthStencilState.setDepthFunc(nvrhi::ComparisonFunc::LessOrEqual);
+    rs.depthStencilState.setDepthFunc(nvrhi::ComparisonFunc::GreaterOrEqual);
     rs.rasterState.setCullMode(nvrhi::RasterCullMode::None);
 
     nvrhi::GraphicsPipelineDesc pso;
@@ -79,7 +79,7 @@ void EnsureGlowResources(nvrhi::IDevice* nv, GlowPassState& state)
     nvrhi::FramebufferInfoEx fbInfo;
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
     fbInfo.depthFormat = nvrhi::Format::D32;
-    state.pipeline = cache.GetOrCreatePipeline("GlowBillboard", pso, fbInfo, nv);
+    state.pipeline = cache.GetOrCreatePipeline("GlowBillboard_v3", pso, fbInfo, nv);
 
     u16 indices[6] = { 0, 1, 2, 2, 1, 3 };
     nvrhi::BufferDesc ibDesc;
@@ -229,13 +229,16 @@ framegraph::VirtualResourceHandle setupGlowBillboardPass(
                 return;
 
             auto& cache = GetPassResourceCache();
-            auto* vsRefl = RImplementation.GetShaderLoader()->GetCachedReflection("sun_forward", ".vs");
-            auto* psRefl = RImplementation.GetShaderLoader()->GetCachedReflection("sun_forward", ".ps");
+            auto* vsRefl = RImplementation.GetShaderLoader()->GetCachedReflection("glow_forward", ".vs");
+            auto* psRefl = RImplementation.GetShaderLoader()->GetCachedReflection("glow_forward", ".ps");
             if (!vsRefl || !psRefl)
                 return;
 
             auto dynamicCBBuffer = cache.GetOrCreateVolatileCB(
-                "Frame", "DynamicTransforms", sizeof(DynamicTransforms), renderDevice);
+                "GlowBillboard", "DynamicTransforms", sizeof(DynamicTransforms), renderDevice);
+            DynamicTransforms dynCB{};
+            FillDynamicTransforms(dynCB, Fidentity);
+            cmd->writeBuffer(dynamicCBBuffer, &dynCB, sizeof(dynCB));
 
             Fvector right = Device.vCameraRight;
             Fvector up = Device.vCameraTop;

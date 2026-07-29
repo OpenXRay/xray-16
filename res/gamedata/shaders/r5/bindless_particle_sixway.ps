@@ -82,8 +82,10 @@ PS_OUTPUT main(PS_INPUT input)
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
     float3 albedo = diffuseSample.rgb * input.color.rgb;
     float alpha = diffuseSample.a * input.color.a;
-    clip(alpha - mat.alphaRef);
+    float clipA = max(alpha, max(albedo.r, max(albedo.g, albedo.b)));
+    clip(clipA - mat.alphaRef);
 
+    float soft = 1.0;
     if (camera_direction.w > 0.5 && !(mat.flags & MAT_FLAG_PARTICLE_HARD))
     {
         float4 sceneWP = g_SceneWorldPos.Load(int3((int2)input.hpos.xy, 0));
@@ -97,7 +99,7 @@ PS_OUTPUT main(PS_INPUT input)
             float spaceDepth = sceneViewZ - particleViewZ - DEPTH_EPSILON;
             if (spaceDepth < -2 * DEPTH_EPSILON)
                 spaceDepth = 100000.0;
-            float soft = Contrast(saturate(spaceDepth * 1.3), 2);
+            soft = smoothstep(0.0, 1.25, spaceDepth);
             alpha *= soft;
             albedo *= soft;
         }
