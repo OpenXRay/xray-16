@@ -54,6 +54,8 @@ void Streamline_Shutdown();
 bool Streamline_IsDLSSAvailable();
 bool Streamline_IsFGAvailable();
 bool Streamline_IsRRAvailable();
+bool Streamline_ConsumeFeatureReset();
+void Streamline_ReleaseFeatures();
 
 bool Streamline_EvaluateDLSS(nvrhi::ICommandList* cmd, const UpscaleInputs& inputs);
 bool Streamline_EvaluateDLSSRR(nvrhi::ICommandList* cmd, const UpscaleInputs& inputs);

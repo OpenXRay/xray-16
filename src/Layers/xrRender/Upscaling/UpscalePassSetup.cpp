@@ -343,6 +343,11 @@ framegraph::VirtualResourceHandle setupUpscaleOrResolvePass(
                     nvrhi::TextureSlice slice;
                     cmd->copyTexture(dst, slice, src, slice);
                 }
+                else
+                {
+                    cmd->clearTextureFloat(dst, nvrhi::TextureSubresourceSet(0, 1, 0, 1),
+                        nvrhi::Color(0.f));
+                }
             }
         });
 

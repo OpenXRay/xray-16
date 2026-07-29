@@ -47,6 +47,9 @@ u32 g_featW = 0, g_featH = 0, g_outW = 0, g_outH = 0;
 int g_featQuality = -1;
 int g_featCreateFlags = -1;
 bool g_featRR = false;
+bool g_featNeedsSubmit = false;
+bool g_featRecreated = false;
+bool g_featForceSR = false;
 u32 g_fgW = 0, g_fgH = 0, g_fgRenderW = 0, g_fgRenderH = 0;
 u32 g_fgFormat = 0;
 nvrhi::TextureHandle g_fgInterp;
@@ -198,10 +201,18 @@ bool MakeResourceVK(nvrhi::ITexture* tex, bool readWrite, NVSDK_NGX_Resource_VK&
     return true;
 }
 
+void WaitGpuForNgx()
+{
+    if (GEnv.Backend)
+        GEnv.Backend->WaitForIdle();
+}
+
 void DestroyFgFeature()
 {
-    if (g_fgHandle && g_params)
+    const bool hadFg = g_fgHandle != nullptr;
+    if (hadFg && g_params)
     {
+        WaitGpuForNgx();
         NVSDK_NGX_VULKAN_ReleaseFeature(g_fgHandle);
         g_fgHandle = nullptr;
     }
@@ -214,20 +225,26 @@ void DestroyFgFeature()
 
 void DestroyFeatures()
 {
-    if (g_dlssHandle && g_params)
+    const bool hadFeat = g_dlssHandle || g_rrHandle;
+    if (hadFeat && g_params)
     {
-        NVSDK_NGX_VULKAN_ReleaseFeature(g_dlssHandle);
-        g_dlssHandle = nullptr;
-    }
-    if (g_rrHandle && g_params)
-    {
-        NVSDK_NGX_VULKAN_ReleaseFeature(g_rrHandle);
-        g_rrHandle = nullptr;
+        WaitGpuForNgx();
+        if (g_dlssHandle)
+        {
+            NVSDK_NGX_VULKAN_ReleaseFeature(g_dlssHandle);
+            g_dlssHandle = nullptr;
+        }
+        if (g_rrHandle)
+        {
+            NVSDK_NGX_VULKAN_ReleaseFeature(g_rrHandle);
+            g_rrHandle = nullptr;
+        }
     }
     g_featW = g_featH = g_outW = g_outH = 0;
     g_featQuality = -1;
     g_featCreateFlags = -1;
     g_featRR = false;
+    g_featNeedsSubmit = false;
 }
 
 void CopyTo44(float dst[4][4], const float src[16])
@@ -243,7 +260,9 @@ bool EnsureFeature(nvrhi::ICommandList* cmd, const UpscaleInputs& inputs, bool w
         return false;
     int createFlags =
         NVSDK_NGX_DLSS_Feature_Flags_IsHDR |
-        NVSDK_NGX_DLSS_Feature_Flags_MVLowRes;
+        NVSDK_NGX_DLSS_Feature_Flags_DepthInverted;
+    if (inputs.renderWidth < inputs.displayWidth || inputs.renderHeight < inputs.displayHeight)
+        createFlags |= NVSDK_NGX_DLSS_Feature_Flags_MVLowRes;
     if (ps_r_dlss_auto_exposure)
         createFlags |= NVSDK_NGX_DLSS_Feature_Flags_AutoExposure;
 
@@ -309,6 +328,8 @@ bool EnsureFeature(nvrhi::ICommandList* cmd, const UpscaleInputs& inputs, bool w
     g_featQuality = ps_r_dlss_quality;
     g_featCreateFlags = createFlags;
     g_featRR = wantRR && g_rrHandle != nullptr;
+    g_featNeedsSubmit = true;
+    g_featRecreated = true;
     return true;
 }
 
@@ -452,6 +473,8 @@ void Streamline_Shutdown()
 {
     DestroyFgFeature();
     DestroyFeatures();
+    if (g_params || g_ngxReady)
+        WaitGpuForNgx();
     if (g_params)
     {
         NVSDK_NGX_VULKAN_DestroyParameters(g_params);
@@ -465,11 +488,27 @@ void Streamline_Shutdown()
     }
     g_ngxReady = false;
     g_dlssAvailable = g_rrAvailable = g_fgAvailable = false;
+    g_featRecreated = false;
+    g_featForceSR = false;
 }
 
 bool Streamline_IsDLSSAvailable() { return g_dlssAvailable; }
 bool Streamline_IsFGAvailable() { return g_fgAvailable; }
 bool Streamline_IsRRAvailable() { return g_rrAvailable; }
+
+bool Streamline_ConsumeFeatureReset()
+{
+    const bool r = g_featRecreated;
+    g_featRecreated = false;
+    return r;
+}
+
+void Streamline_ReleaseFeatures()
+{
+    DestroyFgFeature();
+    DestroyFeatures();
+    g_featForceSR = false;
+}
 
 bool EvaluateDLSSSR(VkCommandBuffer vkCmd, const UpscaleInputs& inputs,
     NVSDK_NGX_Resource_VK& color, NVSDK_NGX_Resource_VK& depth, NVSDK_NGX_Resource_VK& mv,
@@ -505,18 +544,25 @@ bool Streamline_EvaluateDLSS(nvrhi::ICommandList* cmd, const UpscaleInputs& inpu
     if (!g_ngxReady || !cmd || !inputs.color || !inputs.output || !inputs.depth || !inputs.motionVectors)
         return false;
 
-    const bool wantRR = inputs.enableRR && g_rrAvailable &&
+    bool wantRR = !g_featForceSR && inputs.enableRR && g_rrAvailable &&
         inputs.normals && inputs.diffuseAlbedo && inputs.specularAlbedo;
     if (!EnsureFeature(cmd, inputs, wantRR))
         return false;
+    UpscaleInputs evalIn = inputs;
+    if (g_featNeedsSubmit)
+    {
+        g_featNeedsSubmit = false;
+        evalIn.reset = true;
+    }
+    wantRR = g_featRR && wantRR;
 
     NVSDK_NGX_Resource_VK color{}, depth{}, mv{}, out{}, exposure{};
-    if (!MakeResourceVK(inputs.color, false, color) ||
-        !MakeResourceVK(inputs.depth, false, depth) ||
-        !MakeResourceVK(inputs.motionVectors, false, mv) ||
-        !MakeResourceVK(inputs.output, true, out))
+    if (!MakeResourceVK(evalIn.color, false, color) ||
+        !MakeResourceVK(evalIn.depth, false, depth) ||
+        !MakeResourceVK(evalIn.motionVectors, false, mv) ||
+        !MakeResourceVK(evalIn.output, true, out))
         return false;
-    const bool hasExposure = inputs.exposure && MakeResourceVK(inputs.exposure, false, exposure);
+    const bool hasExposure = evalIn.exposure && MakeResourceVK(evalIn.exposure, false, exposure);
 
     auto* vkCmd = (VkCommandBuffer)cmd->getNativeObject(nvrhi::ObjectTypes::VK_CommandBuffer).integer;
     if (!vkCmd)
@@ -526,16 +572,16 @@ bool Streamline_EvaluateDLSS(nvrhi::ICommandList* cmd, const UpscaleInputs& inpu
     if (g_featRR && g_rrHandle && wantRR)
     {
         NVSDK_NGX_Resource_VK normals{}, diffAlb{}, specAlb{}, diffHit{}, specHit{};
-        if (!MakeResourceVK(inputs.normals, false, normals) ||
-            !MakeResourceVK(inputs.diffuseAlbedo, false, diffAlb) ||
-            !MakeResourceVK(inputs.specularAlbedo, false, specAlb))
+        if (!MakeResourceVK(evalIn.normals, false, normals) ||
+            !MakeResourceVK(evalIn.diffuseAlbedo, false, diffAlb) ||
+            !MakeResourceVK(evalIn.specularAlbedo, false, specAlb))
         {
             Msg("! [Upscale] DLSS-RR missing G-buffer — falling back to SR");
         }
         else
         {
-            const bool hasDiffHit = inputs.diffuseHitDistance && MakeResourceVK(inputs.diffuseHitDistance, false, diffHit);
-            const bool hasSpecHit = inputs.specularHitDistance && MakeResourceVK(inputs.specularHitDistance, false, specHit);
+            const bool hasDiffHit = evalIn.diffuseHitDistance && MakeResourceVK(evalIn.diffuseHitDistance, false, diffHit);
+            const bool hasSpecHit = evalIn.specularHitDistance && MakeResourceVK(evalIn.specularHitDistance, false, specHit);
 
             NVSDK_NGX_VK_DLSSD_Eval_Params eval{};
             eval.pInColor = &color;
@@ -550,15 +596,15 @@ bool Streamline_EvaluateDLSS(nvrhi::ICommandList* cmd, const UpscaleInputs& inpu
                 eval.pInDiffuseHitDistance = &diffHit;
             if (hasSpecHit)
                 eval.pInSpecularHitDistance = &specHit;
-            eval.pInWorldToViewMatrix = const_cast<float*>(inputs.worldToView);
-            eval.pInViewToClipMatrix = const_cast<float*>(inputs.viewToClip);
-            eval.InJitterOffsetX = inputs.jitterX;
-            eval.InJitterOffsetY = inputs.jitterY;
-            eval.InRenderSubrectDimensions = { inputs.renderWidth, inputs.renderHeight };
-            eval.InReset = inputs.reset ? 1 : 0;
-            eval.InMVScaleX = (float)inputs.renderWidth;
-            eval.InMVScaleY = (float)inputs.renderHeight;
-            eval.InFrameTimeDeltaInMsec = inputs.frameTimeMs;
+            eval.pInWorldToViewMatrix = const_cast<float*>(evalIn.worldToView);
+            eval.pInViewToClipMatrix = const_cast<float*>(evalIn.viewToClip);
+            eval.InJitterOffsetX = evalIn.jitterX;
+            eval.InJitterOffsetY = evalIn.jitterY;
+            eval.InRenderSubrectDimensions = { evalIn.renderWidth, evalIn.renderHeight };
+            eval.InReset = evalIn.reset ? 1 : 0;
+            eval.InMVScaleX = (float)evalIn.renderWidth;
+            eval.InMVScaleY = (float)evalIn.renderHeight;
+            eval.InFrameTimeDeltaInMsec = evalIn.frameTimeMs;
             eval.InPreExposure = 1.f;
             eval.InExposureScale = 1.f;
             if (hasExposure)
@@ -577,16 +623,14 @@ bool Streamline_EvaluateDLSS(nvrhi::ICommandList* cmd, const UpscaleInputs& inpu
             }
             else
             {
-                Msg("! [Upscale] DLSS-RR Evaluate failed 0x%08x — falling back to SR", (u32)res);
-                DestroyFeatures();
-                if (!EnsureFeature(cmd, inputs, false))
-                    return false;
+                Msg("! [Upscale] DLSS-RR Evaluate failed 0x%08x — falling back to SR next frame", (u32)res);
+                g_featForceSR = true;
             }
         }
     }
 
-    if (!ok)
-        ok = EvaluateDLSSSR(vkCmd, inputs, color, depth, mv, out, hasExposure ? &exposure : nullptr);
+    if (!ok && g_dlssHandle)
+        ok = EvaluateDLSSSR(vkCmd, evalIn, color, depth, mv, out, hasExposure ? &exposure : nullptr);
 
     return ok;
 }
@@ -684,9 +728,22 @@ bool Streamline_EvaluateDLSSG(nvrhi::ICommandList* cmd, const DlssFgInputs& inpu
 
     const bool hasHudless = inputs.hudless && MakeResourceVK(inputs.hudless, false, hudless);
 
+    cmd->setTextureState(inputs.backbuffer, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+    cmd->setTextureState(inputs.depth, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+    cmd->setTextureState(inputs.motionVectors, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+    if (hasHudless)
+        cmd->setTextureState(inputs.hudless, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+    cmd->setTextureState(g_fgInterp, nvrhi::AllSubresources, nvrhi::ResourceStates::UnorderedAccess);
+    cmd->setTextureState(g_fgReal, nvrhi::AllSubresources, nvrhi::ResourceStates::UnorderedAccess);
+    cmd->commitBarriers();
+
     auto* vkCmd = (VkCommandBuffer)cmd->getNativeObject(nvrhi::ObjectTypes::VK_CommandBuffer).integer;
     if (!vkCmd || !g_fgHandle)
         return false;
+
+    NVSDK_NGX_Parameter_SetUI(g_params, "DLSSG.EnableInterp", 1);
+    NVSDK_NGX_Parameter_SetI(g_params, "DLSSG.NumFrames", 1);
+    NVSDK_NGX_Parameter_SetUI(g_params, "DLSSG.IsRecording", 1);
 
     NVSDK_NGX_VK_DLSSG_Eval_Params eval{};
     eval.pBackbuffer = &color;
@@ -727,8 +784,13 @@ bool Streamline_EvaluateDLSSG(nvrhi::ICommandList* cmd, const DlssFgInputs& inpu
     opt.cameraFar = inputs.cameraFar;
     opt.cameraFOV = inputs.cameraFOV;
     opt.cameraAspectRatio = inputs.cameraAspect;
-    opt.colorBuffersHDR = false;
-    opt.depthInverted = false;
+    {
+        const auto fmt = inputs.backbuffer->getDesc().format;
+        opt.colorBuffersHDR =
+            fmt == nvrhi::Format::RGBA16_FLOAT || fmt == nvrhi::Format::RGBA32_FLOAT ||
+            fmt == nvrhi::Format::RGB32_FLOAT || fmt == nvrhi::Format::RG16_FLOAT;
+    }
+    opt.depthInverted = true;
     opt.cameraMotionIncluded = true;
     opt.reset = inputs.reset;
     opt.motionVectorsDilated = false;
@@ -739,31 +801,11 @@ bool Streamline_EvaluateDLSSG(nvrhi::ICommandList* cmd, const DlssFgInputs& inpu
         opt.hudLessSubrectSize = { inputs.displayWidth, inputs.displayHeight };
 
     const NVSDK_NGX_Result res = NGX_VK_EVALUATE_DLSSG(vkCmd, g_fgHandle, g_params, &eval, &opt);
+    cmd->clearState();
     if (NVSDK_NGX_FAILED(res))
     {
         Msg("! [Upscale] DLSS-FG Evaluate failed 0x%08x", (u32)res);
         return false;
-    }
-
-    if (auto* bb = GEnv.Backend ? GEnv.Backend->GetBackBuffer() : nullptr)
-    {
-        if (bb->getDesc().width == g_fgW && bb->getDesc().height == g_fgH &&
-            bb->getDesc().format == g_fgReal->getDesc().format)
-        {
-            nvrhi::TextureSlice slice;
-            cmd->copyTexture(bb, slice, g_fgReal, slice);
-        }
-        else
-        {
-            static bool s_fmtLogged = false;
-            if (!s_fmtLogged)
-            {
-                s_fmtLogged = true;
-                Msg("! [Upscale] DLSS-FG blit skipped — BB %ux%u fmt=%u vs FG %ux%u fmt=%u",
-                    bb->getDesc().width, bb->getDesc().height, (u32)bb->getDesc().format,
-                    g_fgW, g_fgH, (u32)g_fgReal->getDesc().format);
-            }
-        }
     }
 
     g_fgPresentPending = true;
@@ -800,6 +842,8 @@ void Streamline_Shutdown() {}
 bool Streamline_IsDLSSAvailable() { return false; }
 bool Streamline_IsFGAvailable() { return false; }
 bool Streamline_IsRRAvailable() { return false; }
+bool Streamline_ConsumeFeatureReset() { return false; }
+void Streamline_ReleaseFeatures() {}
 bool Streamline_EvaluateDLSS(nvrhi::ICommandList*, const UpscaleInputs&) { return false; }
 bool Streamline_EvaluateDLSSRR(nvrhi::ICommandList*, const UpscaleInputs&) { return false; }
 bool Streamline_EvaluateDLSSG(nvrhi::ICommandList*, const DlssFgInputs&) { return false; }

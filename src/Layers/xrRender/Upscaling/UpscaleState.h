@@ -19,7 +19,7 @@ struct UpscaleState
     bool resetHistory = false;
 };
 
-void UpdateUpscaleState(UpscaleState& state, u32 displayW, u32 displayH);
+void UpdateUpscaleState(UpscaleState& state, u32 displayW, u32 displayH, bool backendAvailable = true);
 
 inline bool NeedsResolveToDisplay(const UpscaleState& state)
 {

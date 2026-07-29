@@ -131,7 +131,7 @@ void setupDlssFgPass(
             in.cameraRight[0] = right.x;
             in.cameraRight[1] = right.y;
             in.cameraRight[2] = right.z;
-            in.cameraNear = VIEWPORT_NEAR;
+            in.cameraNear = RENDER_VIEWPORT_NEAR;
             in.cameraFar = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 600.f;
             in.cameraFOV = deg2rad(Device.fFOV);
             in.cameraAspect = (data.displayH > 0) ? ((float)data.displayW / (float)data.displayH) : 1.f;
