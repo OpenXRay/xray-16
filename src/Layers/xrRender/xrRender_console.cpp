@@ -113,6 +113,7 @@ int ps_r_local_shadow_tiles = 96;
 int ps_r_local_shadow_update_div = 1;
 int ps_r_local_shadow_redraw_budget = 16;
 int ps_r_local_shadow_skinned_max = 24;
+float SunshaftsIntensity = 0.f;
 float ps_r_local_shadow_near = 10.f;
 float ps_r_local_shadow_mid = 30.f;
 int ps_r_local_shadow_far_period = 5;

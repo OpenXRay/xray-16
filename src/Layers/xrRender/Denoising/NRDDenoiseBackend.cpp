@@ -57,7 +57,7 @@ struct NrdCompositeCB
     float fogColor[4];
 };
 
-void CopyMatrix(float dst[16], const Fmatrix& m)
+void NrdCopyMatrix(float dst[16], const Fmatrix& m)
 {
     dst[0] = m._11; dst[1] = m._12; dst[2] = m._13; dst[3] = m._14;
     dst[4] = m._21; dst[5] = m._22; dst[6] = m._23; dst[7] = m._24;
@@ -424,10 +424,10 @@ public:
         worldToClipPrev.mul(Device.mProjectSaved, Device.mViewSaved);
 
         NrdPackCB packCB{};
-        CopyMatrix(packCB.worldToView, Device.mView);
-        CopyMatrix(packCB.worldToViewPrev, Device.mViewSaved);
-        CopyMatrix(packCB.worldToClip, worldToClip);
-        CopyMatrix(packCB.worldToClipPrev, worldToClipPrev);
+        NrdCopyMatrix(packCB.worldToView, Device.mView);
+        NrdCopyMatrix(packCB.worldToViewPrev, Device.mViewSaved);
+        NrdCopyMatrix(packCB.worldToClip, worldToClip);
+        NrdCopyMatrix(packCB.worldToClipPrev, worldToClipPrev);
         if (inputs.worldToView[0] != 0.f || inputs.worldToView[5] != 0.f || inputs.worldToView[10] != 0.f)
             memcpy(packCB.worldToView, inputs.worldToView, sizeof(packCB.worldToView));
         if (inputs.worldToViewPrev[0] != 0.f || inputs.worldToViewPrev[5] != 0.f || inputs.worldToViewPrev[10] != 0.f)
@@ -534,10 +534,10 @@ public:
             m_nrdFrameIndex = 0;
 
         nrd::CommonSettings common{};
-        CopyMatrix(common.viewToClipMatrix, Device.mProject);
-        CopyMatrix(common.viewToClipMatrixPrev, Device.mProjectSaved);
-        CopyMatrix(common.worldToViewMatrix, Device.mView);
-        CopyMatrix(common.worldToViewMatrixPrev, Device.mViewSaved);
+        NrdCopyMatrix(common.viewToClipMatrix, Device.mProject);
+        NrdCopyMatrix(common.viewToClipMatrixPrev, Device.mProjectSaved);
+        NrdCopyMatrix(common.worldToViewMatrix, Device.mView);
+        NrdCopyMatrix(common.worldToViewMatrixPrev, Device.mViewSaved);
 
         common.motionVectorScale[0] = 1.f / (float)w;
         common.motionVectorScale[1] = 1.f / (float)h;

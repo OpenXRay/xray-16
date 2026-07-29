@@ -29,6 +29,7 @@ namespace xray::render::fg {
     class dxRender_Visual;  // Forward declaration for visual pointer map
     class CKinematics;
     class RTAccelStructManager;
+    struct LocalShadowTile;
     namespace decals {
         class OverlayManager;
     }
@@ -157,6 +158,11 @@ struct GPUCullOutput {
 
 };
 
+struct GPUParticleCullOutput {
+    framegraph::VirtualResourceHandle drawArgsBuffer;
+    u32 maxParticles;
+};
+
 // ═══════════════════════════════════════════════════════
 //  GPU CULLING MANAGER
 // ═══════════════════════════════════════════════════════
@@ -185,9 +191,11 @@ public:
     // Shutdown and release resources
     void Shutdown();
 
-    // Upload scene objects to GPU (call once per frame before culling)
-    // Extracts bounding sphere data from geometry batches
     void UploadSceneObjects(fg::RenderContext* ctx, const GeometryCollector* geometry);
+
+    void SetStaticBatchSource(const xr_vector<GeometryBatch>* batches) { m_staticBatchSource = batches; }
+    bool IsStaticDataCached() const { return m_staticDataCached; }
+    bool IsTerrainDataCached() const { return m_terrainDataCached; }
 
     void InvalidateStaticCullingData();
     void InvalidateShadersAndPipelines();
@@ -202,8 +210,13 @@ public:
         u32 hizHeight,
         u32 hizMipLevels,
         const GeometryCollector* geometry,
-        const Fmatrix& prevViewProj  // Previous frame's viewProj for temporal Hi-Z
+        const Fmatrix& prevViewProj,
+        bool forceDisableHiz = false,
+        bool skipUpload = false,
+        framegraph::VirtualResourceHandle waitFor = {}
     );
+
+    nvrhi::ITexture* GetDummyHiZTexture() const { return m_dummyHizTexture.Get(); }
 
     // Get number of objects uploaded this frame (static + dynamic)
     u32 GetObjectCount() const { return m_objectCount; }
@@ -280,11 +293,25 @@ public:
         u32 hizWidth,
         u32 hizHeight,
         u32 hizMipLevels,
-        const Fmatrix& prevViewProj,
         const xr_vector<passes::ParticleBatch>* particleBatches = nullptr
     );
 
     bool IsDebugEnabled() const;
+
+    void UploadParticleBatches(fg::RenderContext* ctx, const xr_vector<passes::ParticleBatch>* batches);
+
+    GPUParticleCullOutput SetupParticleCullingPass(
+        framegraph::FrameGraph& fg,
+        framegraph::VirtualResourceHandle hizPyramid,
+        u32 hizWidth,
+        u32 hizHeight,
+        u32 hizMipLevels,
+        const xr_vector<passes::ParticleBatch>* batches
+    );
+
+    u32 GetParticleCount() const { return m_particleCount; }
+    bool IsParticleCullingEnabled() const { return m_initialized && m_particleCullEnabled; }
+    nvrhi::IBuffer* GetParticleDrawArgsBuffer() const { return m_particleDrawArgsBuffer.Get(); }
 
     nvrhi::IBuffer* GetStaticCompactDrawArgsBuffer() const { return m_staticSet.compactDrawArgsBuffer.Get(); }
     nvrhi::IBuffer* GetStaticCompactBatchIndicesBuffer() const { return m_staticSet.compactBatchIndicesBuffer.Get(); }
@@ -302,6 +329,60 @@ public:
     nvrhi::IBuffer* GetDynamicDrawArgsBuffer() const { return m_dynamicSet.drawArgsBuffer.Get(); }
 
     // ───────────────────────────────────────────────────────
+    //  SHADOW CASTER (view-independent, unculled) BUFFERS
+    // ───────────────────────────────────────────────────────
+    // drawArgsBuffer holds the full template (instanceCount=1 for every batch) and is
+    // never touched by the camera cull in compaction mode; materialIDBuffer/instanceBuffer
+    // are full per-batch. Combined with an identity drawID->batch map these let the shadow
+    // pass draw all casters regardless of camera direction.
+    nvrhi::IBuffer* GetStaticFullMaterialIDBuffer() const { return m_staticSet.materialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticShadowIndicesBuffer() const { return m_staticSet.shadowIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticShadowCountBuffer() const { return m_staticSet.shadowCountBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicFullMaterialIDBuffer() const { return m_dynamicSet.materialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicShadowIndicesBuffer() const { return m_dynamicSet.shadowIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicShadowCountBuffer() const { return m_dynamicSet.shadowCountBuffer.Get(); }
+
+    // Transparent set doubles as the foliage shadow caster (trees/bushes are alpha-blended).
+    nvrhi::IBuffer* GetTransparentDrawArgsBuffer() const { return m_transparentSet.drawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentFullMaterialIDBuffer() const { return m_transparentSet.materialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentShadowIndicesBuffer() const { return m_transparentSet.shadowIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentShadowCountBuffer() const { return m_transparentSet.shadowCountBuffer.Get(); }
+
+    // Light-frustum CSM caster compact (CPU filter + upload). Call once per cascade before draw.
+    void BuildLightFrustumCasters(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        const Fmatrix& lightVP, float radiusInflate = 1.25f, float skipNearCameraClearance = 0.f);
+
+    bool DispatchLightFrustumCasters(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        const Fmatrix& lightVP, float radiusInflate = 1.25f);
+
+    bool EnsureLightShadowCullPipeline(nvrhi::IDevice* nvDevice);
+    bool EnsureLocalShadowCullSlots(nvrhi::IDevice* nvDevice, u32 slotCount);
+    bool DispatchLightFrustumCastersToSlot(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        const Fmatrix& lightVP, float radiusInflate, u32 slot);
+    bool DispatchAllLocalShadowTileCulls(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        const xr_vector<LocalShadowTile>& tiles, float radiusInflate);
+
+    static constexpr u32 kLocalShadowCullMaxSlots = 256;
+    static constexpr u32 kLocalShadowCullSlotCap = 4096;
+
+    nvrhi::IBuffer* GetLocalShadowSlotIndices(u32 slot, u32 setIdx) const;
+    nvrhi::IBuffer* GetLocalShadowSlotDrawArgs(u32 slot, u32 setIdx) const;
+    nvrhi::IBuffer* GetLocalShadowSlotMats(u32 slot, u32 setIdx) const;
+    nvrhi::IBuffer* GetLocalShadowSlotCount(u32 slot, u32 setIdx) const;
+    nvrhi::BindingSetHandle* MutLocalShadowSlotDrawBinding(u32 slot, u32 setIdx);
+    nvrhi::IBuffer** MutLocalShadowSlotDrawSrcInstance(u32 slot, u32 setIdx);
+    u32 GetLocalShadowCullSlotCount() const { return m_localShadowCullSlotCount; }
+
+    void EnsureShadowCasterIdentityBuffers(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice);
+
+    nvrhi::IBuffer* GetStaticShadowCompactDrawArgsBuffer() const { return m_staticSet.shadowCompactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticShadowCompactMaterialIDBuffer() const { return m_staticSet.shadowCompactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicShadowCompactDrawArgsBuffer() const { return m_dynamicSet.shadowCompactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicShadowCompactMaterialIDBuffer() const { return m_dynamicSet.shadowCompactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentShadowCompactDrawArgsBuffer() const { return m_transparentSet.shadowCompactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentShadowCompactMaterialIDBuffer() const { return m_transparentSet.shadowCompactMaterialIDBuffer.Get(); }
+
+    // ───────────────────────────────────────────────────────
     //  TERRAIN-SPECIFIC BUFFERS
     // ───────────────────────────────────────────────────────
     u32 GetTerrainObjectCount() const { return m_terrainObjectCount; }
@@ -317,6 +398,15 @@ public:
     nvrhi::IBuffer* GetTransparentCompactBatchIndicesBuffer() const { return m_transparentSet.compactBatchIndicesBuffer.Get(); }
     nvrhi::IBuffer* GetTransparentCompactMaterialIDBuffer() const { return m_transparentSet.compactMaterialIDBuffer.Get(); }
     nvrhi::IBuffer* GetTransparentCompactCountBuffer() const { return m_transparentSet.compactCountBuffer.Get(); }
+
+    // Tessellation set (opaque bump# materials — direct drawIndexed, not MDI)
+    u32 GetTessObjectCount() const { return m_tessSet.objectCount; }
+    nvrhi::IBuffer* GetTessInstanceBuffer() const { return m_tessSet.instanceBuffer.Get(); }
+    nvrhi::IBuffer* GetTessMaterialIDBuffer() const { return m_tessSet.materialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetTessBatchIndicesBuffer() const { return m_tessBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetTessDrawArgsBuffer() const { return m_tessSet.drawArgsBuffer.Get(); }
+    const xr_vector<IndirectDrawArgs>& GetTessDrawArgsData() const { return m_tessDrawArgsData; }
+    const xr_vector<GPUObjectData>& GetTessObjectData() const { return m_tessObjectData; }
 
     // ───────────────────────────────────────────────────────
     //  VARIANT PARTITIONING (multi-PSO rendering)
@@ -482,6 +572,14 @@ private:
         nvrhi::BufferHandle compactGroupCountsBuffer;   // Visible count per group (scratch)
         nvrhi::BufferHandle compactGroupOffsetsBuffer;  // Prefix offsets per group (scratch)
         nvrhi::BufferHandle instanceBuffer;             // Instance data buffer (GPUInstanceData)
+        // Shadow caster (view-independent) buffers: identity drawID->batch map + count.
+        // Used to draw ALL batches into the shadow map regardless of camera frustum,
+        // so casters that leave the camera view still cast shadows.
+        nvrhi::BufferHandle shadowIndicesBuffer;        // Identity or light-culled batch indices
+        nvrhi::BufferHandle shadowCountBuffer;          // Single u32 = caster count (indirect count)
+        nvrhi::BufferHandle shadowCompactDrawArgsBuffer; // Compacted draw args for light-frustum CSM
+        nvrhi::BufferHandle shadowCompactMaterialIDBuffer;
+        u32 shadowBuffersCapacity = 0;                  // Capacity the identity buffer was built for
         u32 objectCount = 0;
         u32 maxObjects = 0;
         bool drawArgsUploaded = false;
@@ -492,6 +590,11 @@ private:
     CullSetBuffers m_staticSet;
     CullSetBuffers m_dynamicSet;
 
+    // Ensure the view-independent shadow-caster identity/count buffers for a set
+    // exist and are sized/filled for the current objectCount.
+    void EnsureShadowCasterBuffers(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        CullSetBuffers& set, const char* name);
+
     // Shared constant buffer
     fg::BufferHandle m_cullParamsCB;         // Constant buffer
 
@@ -501,8 +604,31 @@ private:
     nvrhi::ComputePipelineHandle m_compactCountPipeline;
     nvrhi::ComputePipelineHandle m_compactScanPipeline;
     nvrhi::ComputePipelineHandle m_compactScatterPipeline;
+    nvrhi::ComputePipelineHandle m_lightShadowCullPipeline;
     nvrhi::BindingLayoutHandle m_cullLayout;
     nvrhi::BindingLayoutHandle m_clearArgsLayout;
+    nvrhi::BindingLayoutHandle m_lightShadowCullLayout;
+    nvrhi::BufferHandle m_lightShadowCullParamsCB;
+    bool m_lightShadowCullReady = false;
+
+    struct LocalShadowCullSlotSet
+    {
+        nvrhi::BufferHandle indices;
+        nvrhi::BufferHandle drawArgs;
+        nvrhi::BufferHandle mats;
+        nvrhi::BufferHandle count;
+        nvrhi::BindingSetHandle cullBinding;
+        nvrhi::BindingSetHandle drawBinding;
+        nvrhi::IBuffer* cullSrcObject = nullptr;
+        nvrhi::IBuffer* drawSrcInstance = nullptr;
+    };
+    struct LocalShadowCullSlot
+    {
+        LocalShadowCullSlotSet sets[3];
+    };
+    xr_vector<LocalShadowCullSlot> m_localShadowCullSlots;
+    u32 m_localShadowCullSlotCount = 0;
+
     nvrhi::BindingLayoutHandle m_compactCountLayout;
     nvrhi::BindingLayoutHandle m_compactScanLayout;
     nvrhi::BindingLayoutHandle m_compactScatterLayout;
@@ -527,11 +653,17 @@ private:
         const CullSetBuffers& set,
         VariantPartitionBuffers& partition);
 
-    bool m_staticTerrainDrawArgsUploaded = false;  // True after first upload (terrain)
+    bool m_staticTerrainDrawArgsUploaded = false;
+    bool m_terrainDataCached = false;
+    u32 m_lastMaterialCountForStatic = 0;
+    u64 m_transientUploadFingerprint = 0;
+    bool m_transientDataCached = false;
+    bool m_lastTessFlagOn = false;
 
     bool m_compactEnabled = false;
 
     bool m_staticDataCached = false;
+    const xr_vector<GeometryBatch>* m_staticBatchSource = nullptr;
 
     // ───────────────────────────────────────────────────────
     //  TERRAIN-SPECIFIC BUFFERS
@@ -564,6 +696,10 @@ private:
     // ───────────────────────────────────────────────────────
     CullSetBuffers m_transparentSet;
 
+    // Opaque tessellation materials (direct drawIndexed; identity batch map)
+    CullSetBuffers m_tessSet;
+    nvrhi::BufferHandle m_tessBatchIndicesBuffer;
+
     // ───────────────────────────────────────────────────────
     //  DEBUG VISUALIZATION RESOURCES
     // ───────────────────────────────────────────────────────
@@ -581,15 +717,24 @@ private:
     nvrhi::InputLayoutHandle m_debugInputLayout;
 
     nvrhi::BufferHandle m_particleBuffer;
+    nvrhi::BufferHandle m_particleDrawArgsBuffer;
+    nvrhi::BufferHandle m_particleVisibleCountBuffer;
+    fg::BufferHandle m_particleCullParamsCB;
+    nvrhi::ComputePipelineHandle m_particleCullPipeline;
+    nvrhi::BindingLayoutHandle m_particleCullLayout;
 
+    u32 m_particleCount = 0;
     u32 m_maxParticles = 0;
+    bool m_particleCullEnabled = false;
     xr_vector<GPUParticleData> m_particleData;
+    xr_vector<IndirectDrawArgs> m_particleDrawArgsData;
     fg::RenderDevice* m_device = nullptr;
     RTAccelStructManager* m_rtAccelMgr = nullptr;
     u32 m_objectCount = 0;
     u32 m_maxObjects = 0;
     bool m_initialized = false;
     bool m_computeEnabled = false;
+    nvrhi::TextureHandle m_dummyHizTexture; // 1x1 R32F when no real Hi-Z yet
 
     xr_vector<GPUObjectData> m_staticObjectData;
     xr_vector<IndirectDrawArgs> m_staticDrawArgsData;
@@ -615,6 +760,12 @@ private:
     xr_vector<IndirectDrawArgs> m_transparentDrawArgsData;
     xr_vector<u32> m_transparentMaterialIDData;
     xr_vector<GPUInstanceData> m_transparentInstanceData;
+
+    // Tessellation-specific CPU data (bump# / PN+HM materials)
+    xr_vector<GPUObjectData> m_tessObjectData;
+    xr_vector<IndirectDrawArgs> m_tessDrawArgsData;
+    xr_vector<u32> m_tessMaterialIDData;
+    xr_vector<GPUInstanceData> m_tessInstanceData;
 
     // ───────────────────────────────────────────────────────
     //  SKINNED MESH CULLING (GPU-Driven)
@@ -650,7 +801,7 @@ private:
 
     // Global bone buffer for GPU-driven skinned rendering
     // All skeleton bones are uploaded here each frame, indexed by per-instance offset
-    static constexpr u32 MAX_TOTAL_BONES = 16384;  // ~200 skeletons * 78 bones
+    static constexpr u32 MAX_TOTAL_BONES = 8192;  // ~100 skeletons * 78 bones
     static constexpr u32 BONE_STRIDE = sizeof(Fmatrix);  // 64 bytes
     nvrhi::BufferHandle m_globalBoneBuffer;
     u32 m_boneUploadFrameId = 0;

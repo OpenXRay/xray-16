@@ -14,7 +14,7 @@ using namespace framegraph;
 
 namespace {
 
-void CopyMatrix(float dst[16], const Fmatrix& m)
+void DlssFgCopyMatrix(float dst[16], const Fmatrix& m)
 {
     dst[0] = m._11; dst[1] = m._12; dst[2] = m._13; dst[3] = m._14;
     dst[4] = m._21; dst[5] = m._22; dst[6] = m._23; dst[7] = m._24;
@@ -112,10 +112,10 @@ void setupDlssFgPass(
             in.jitterX = data.jitterX;
             in.jitterY = data.jitterY;
             in.reset = data.reset;
-            CopyMatrix(in.viewToClip, data.viewToClip);
-            CopyMatrix(in.clipToView, data.clipToView);
-            CopyMatrix(in.clipToPrevClip, data.clipToPrev);
-            CopyMatrix(in.prevClipToClip, data.prevToClip);
+            DlssFgCopyMatrix(in.viewToClip, data.viewToClip);
+            DlssFgCopyMatrix(in.clipToView, data.clipToView);
+            DlssFgCopyMatrix(in.clipToPrevClip, data.clipToPrev);
+            DlssFgCopyMatrix(in.prevClipToClip, data.prevToClip);
             in.cameraPos[0] = Device.vCameraPosition.x;
             in.cameraPos[1] = Device.vCameraPosition.y;
             in.cameraPos[2] = Device.vCameraPosition.z;

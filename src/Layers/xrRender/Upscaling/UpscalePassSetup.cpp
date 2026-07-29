@@ -88,7 +88,7 @@ void EnsureRRGuideResources(fg::RenderDevice* device, UpscalePassState& state, u
     state.rrGuideH = h;
 }
 
-void CopyMatrix(float dst[16], const Fmatrix& m)
+static void UpscaleCopyMatrix(float dst[16], const Fmatrix& m)
 {
     dst[0] = m._11; dst[1] = m._12; dst[2] = m._13; dst[3] = m._14;
     dst[4] = m._21; dst[5] = m._22; dst[6] = m._23; dst[7] = m._24;
@@ -322,8 +322,8 @@ framegraph::VirtualResourceHandle setupUpscaleOrResolvePass(
             in.enableRR = data.wantRR && (ps_r_upscale == 2 && ps_r_dlss_rr);
             if (ps_r_upscale == 2 && ps_r_dlss_auto_exposure)
                 in.exposure = nullptr;
-            CopyMatrix(in.worldToView, Device.mView);
-            CopyMatrix(in.viewToClip, Device.mProject);
+            UpscaleCopyMatrix(in.worldToView, Device.mView);
+            UpscaleCopyMatrix(in.viewToClip, Device.mProject);
 
             bool ok = false;
             if (data.backend && data.backend->IsAvailable())

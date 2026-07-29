@@ -756,8 +756,7 @@ ParticlePassOutput setupParticlePass(
                 BindingSetBuilder lbsb(*vsReflection, *litPsReflection, nvDevice, psName);
                 lbsb.ConstantBuffer("static_globals", staticGlobalsCB)
                     .BufferSRV("g_Materials", matBuffer.GetBuffer())
-                    .Texture("g_SceneDepth", prevDepthTex)
-                    .Sampler("s_linear", data.passState->sampler);
+                    .Texture("g_SceneDepth", prevDepthTex);
                 auto& clm = ClusteredLightManager::Instance();
                 if (clm.GetLightDataBuffer())
                     lbsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());

@@ -30,6 +30,20 @@ struct TransparentPassConfig {
 
     VariantPartitionConfig variantPartition;
 
+    // Cascaded shadow maps + sky cubes for water reflections
+    nvrhi::ITexture* shadowMapArray = nullptr;
+    nvrhi::ITexture* shadowCascades[3] = {};
+    nvrhi::ITexture* localShadowAtlas = nullptr;
+    nvrhi::ITexture* localShadowESM = nullptr;
+    nvrhi::ITexture* envSky0 = nullptr;
+    nvrhi::ITexture* envSky1 = nullptr;
+    nvrhi::ITexture* contactDepth = nullptr; // unused (history-only contact)
+    nvrhi::ITexture* contactHistory = nullptr; // g_ContactHistory @ t28
+    nvrhi::ITexture* shadowHZB[3] = {};
+    framegraph::VirtualResourceHandle shadowHZBHandles[3];
+    nvrhi::ITexture* shadowMask = nullptr;
+    framegraph::VirtualResourceHandle shadowMaskHandle;
+
     bool IsValid() const {
         return objectCount > 0 && compactDrawArgsBuffer && megaVertexBuffer && megaIndexBuffer;
     }
@@ -37,11 +51,25 @@ struct TransparentPassConfig {
 
 struct TransparentPassState {
     nvrhi::GraphicsPipelineHandle pipeline;
+    nvrhi::GraphicsPipelineHandle multiplyPipeline;
     nvrhi::BindingLayoutHandle layout;
+    nvrhi::GraphicsPipelineHandle waterPipeline;
+    nvrhi::BindingLayoutHandle waterLayout;
+    nvrhi::GraphicsPipelineHandle waterDistortPipeline;
+    nvrhi::BindingLayoutHandle waterDistortLayout;
     nvrhi::InputLayoutHandle inputLayout;
+    nvrhi::InputLayoutHandle waterDistortInputLayout;
     nvrhi::SamplerHandle sampler;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
+    nvrhi::ShaderHandle waterVs;
+    nvrhi::ShaderHandle waterPs;
+    nvrhi::ShaderHandle waterDistortVs;
+    nvrhi::ShaderHandle waterDistortPs;
+    nvrhi::ITexture* foamTexture = nullptr;
+    nvrhi::TextureHandle waterSsrColor;
+    nvrhi::TextureHandle waterSceneDepth;
+    nvrhi::TextureHandle waterSceneWorldPos;
     bool initialized = false;
 };
 
@@ -50,6 +78,8 @@ struct TransparentPassData {
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle worldPos;
+    framegraph::VirtualResourceHandle distortion;
     fg::RenderDevice* device;
     TransparentPassConfig config;
     TransparentPassState* passState;
