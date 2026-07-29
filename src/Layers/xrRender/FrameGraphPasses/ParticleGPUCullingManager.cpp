@@ -304,7 +304,8 @@ void ParticleGPUCullingManager::DispatchCulling(
     u32 particleCount,
     u32 hiZWidth,
     u32 hiZHeight,
-    u32 hiZMipLevels)
+    u32 hiZMipLevels,
+    const Fmatrix& prevViewProj)
 {
     if (!m_initialized || particleCount == 0)
         return;
@@ -317,6 +318,7 @@ void ParticleGPUCullingManager::DispatchCulling(
 
     ParticleCullParams params;
     params.viewProj = Device.mFullTransform;
+    params.prevViewProj = prevViewProj;
     for (u32 i = 0; i < 6; i++)
     {
         if (i < planeCount)

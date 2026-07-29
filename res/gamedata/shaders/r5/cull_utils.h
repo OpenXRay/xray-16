@@ -89,109 +89,93 @@ bool DistanceTestAABB(float3 aabb_min, float3 aabb_max, float3 camera_pos, float
 // ═══════════════════════════════════════════════════════
 //  HI-Z OCCLUSION CULLING
 // ═══════════════════════════════════════════════════════
-// Requires caller to define:
-//   Texture2D<float> g_HiZPyramid : register(t1);
+// Single source of truth for the Hi-Z occlusion test.
+// pyramidViewProj must be the view-projection the pyramid's depth was
+// rendered with (the previous frame's for temporal Hi-Z).
 
+struct HiZTestResult
+{
+    bool visible;
+    float frontDepth;
+    float hiZDepth;
+};
 
-// Hi-Z occlusion test for sphere (4-tap conservative)
-// Returns: true = visible, false = occluded (cull)
-//
-// TEMPORAL HI-Z: When using previous frame's depth for Hi-Z:
-// - Use prevViewProj for Hi-Z UV calculation (matches depth buffer camera)
-// - Use currentViewProj for depth comparison (current camera position)
-// - This handles camera movement without false culling
-bool HiZTestSphereTemporal(
+HiZTestResult HiZTestSphereEx(
     float3 center,
     float radius,
     float3 cameraPos,
-    float4x4 currentViewProj,  // Current frame - for frustum/depth compare
-    float4x4 prevViewProj,     // Previous frame - for Hi-Z UV lookup
+    float4x4 pyramidViewProj,
     Texture2D<float> hiZPyramid,
     SamplerState pointSampler,
     uint hiZWidth,
     uint hiZHeight,
     uint hiZMipLevels)
 {
-    // Project sphere center to PREVIOUS frame's clip space (matches Hi-Z data)
-    float4 prevClipPos = mul(prevViewProj, float4(center, 1.0));
+    HiZTestResult result;
+    result.visible = true;
+    result.frontDepth = 0.0;
+    result.hiZDepth = 0.0;
 
-    // Behind previous camera - conservatively visible
-    if (prevClipPos.w <= 0.001)
-        return true;
+    float4 clipPos = mul(pyramidViewProj, float4(center, 1.0));
+    if (clipPos.w <= 0.001)
+        return result;
 
-    // Perspective divide -> NDC (previous frame)
-    float3 prevNdc = prevClipPos.xyz / prevClipPos.w;
+    float3 ndc = clipPos.xyz / clipPos.w;
 
-    // Calculate screen-space bounding box (in previous frame's space)
-    float projScale = max(abs(prevViewProj[0][0]), abs(prevViewProj[1][1]));
-    float2 ndcSize = float2(radius, radius) * projScale / prevClipPos.w;
+    float projScale = max(abs(pyramidViewProj[0][0]), abs(pyramidViewProj[1][1]));
+    float2 ndcSize = float2(radius, radius) * projScale / clipPos.w;
 
-    float2 minNDC = prevNdc.xy - ndcSize;
-    float2 maxNDC = prevNdc.xy + ndcSize;
+    float2 minNDC = ndc.xy - ndcSize;
+    float2 maxNDC = ndc.xy + ndcSize;
 
-    // Conservatively visible if off-screen in previous frame
     if (any(minNDC < -1.0) || any(maxNDC > 1.0))
-        return true;
+        return result;
 
-    // Convert NDC to UV space [0, 1]
-    float2 minUV = saturate(minNDC * 0.5 + 0.5);
-    float2 maxUV = saturate(maxNDC * 0.5 + 0.5);
+    float2 minUV = minNDC * 0.5 + 0.5;
+    float2 maxUV = maxNDC * 0.5 + 0.5;
 
-    // Flip Y (NDC Y+ is up, UV Y+ is down)
     minUV.y = 1.0 - minUV.y;
     maxUV.y = 1.0 - maxUV.y;
 
-    // Re-sort after Y flip
     float4 boxUV = float4(min(minUV, maxUV), max(minUV, maxUV));
 
-    // Calculate box size in pixels
     float boxWidth = (boxUV.z - boxUV.x) * float(hiZWidth);
     float boxHeight = (boxUV.w - boxUV.y) * float(hiZHeight);
 
-    // Select mip where box is roughly 2x2 pixels
     float mipLevel = ceil(log2(max(1.0, max(boxWidth, boxHeight))));
     mipLevel = clamp(mipLevel, 0.0, float(hiZMipLevels - 1));
 
-    // Sample Hi-Z at 4 corners (previous frame's depth)
     float d1 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.y), mipLevel);
     float d2 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.y), mipLevel);
     float d3 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.w), mipLevel);
     float d4 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.w), mipLevel);
 
-    // MIN = farthest depth in region (1=near, 0=far)
-    float hiZDepth = min(min(d1, d2), min(d3, d4));
+    result.hiZDepth = min(min(d1, d2), min(d3, d4));
 
-    // Calculate front depth of sphere in PREVIOUS frame's space
-    // (must match the Hi-Z data we're comparing against)
     float3 viewDir = normalize(center - cameraPos);
     float3 frontPoint = center - viewDir * radius;
-    float4 frontClip = mul(prevViewProj, float4(frontPoint, 1.0));
-
-    // Front point behind previous camera - straddles near plane, visible
+    float4 frontClip = mul(pyramidViewProj, float4(frontPoint, 1.0));
     if (frontClip.w <= 0.001)
-        return true;
+        return result;
 
-    float frontDepth = frontClip.z / frontClip.w;
-
-    // Visible if front of sphere is in front of Hi-Z depth
-    return frontDepth >= hiZDepth;
+    result.frontDepth = frontClip.z / frontClip.w;
+    result.visible = result.frontDepth >= result.hiZDepth;
+    return result;
 }
 
-// Legacy single-viewProj version (for non-temporal Hi-Z)
 bool HiZTestSphere(
     float3 center,
     float radius,
     float3 cameraPos,
-    float4x4 viewProj,
+    float4x4 pyramidViewProj,
     Texture2D<float> hiZPyramid,
     SamplerState pointSampler,
     uint hiZWidth,
     uint hiZHeight,
     uint hiZMipLevels)
 {
-    // Use same viewProj for both sampling and depth comparison
-    return HiZTestSphereTemporal(center, radius, cameraPos, viewProj, viewProj,
-                                  hiZPyramid, pointSampler, hiZWidth, hiZHeight, hiZMipLevels);
+    return HiZTestSphereEx(center, radius, cameraPos, pyramidViewProj,
+                           hiZPyramid, pointSampler, hiZWidth, hiZHeight, hiZMipLevels).visible;
 }
 
 #endif // CULL_UTILS_H

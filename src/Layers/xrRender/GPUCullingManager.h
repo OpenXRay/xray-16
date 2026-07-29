@@ -285,6 +285,7 @@ public:
         u32 hizWidth,
         u32 hizHeight,
         u32 hizMipLevels,
+        const Fmatrix& prevViewProj,
         const xr_vector<passes::ParticleBatch>* particleBatches = nullptr
     );
 

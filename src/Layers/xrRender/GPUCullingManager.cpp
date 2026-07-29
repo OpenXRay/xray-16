@@ -62,6 +62,7 @@ struct CullParamsCB {
 
 struct CullDebugParamsCB {
     Fmatrix viewProj;
+    Fmatrix prevViewProj;
     Fvector cameraPos;
     float maxDistanceSq;
     Fvector4 frustumPlanes[6];
@@ -3518,6 +3519,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
     u32 hizWidth,
     u32 hizHeight,
     u32 hizMipLevels,
+    const Fmatrix& prevViewProj,
     const xr_vector<passes::ParticleBatch>* particleBatches)
 {
     using namespace framegraph;
@@ -3542,12 +3544,13 @@ void GPUCullingManager::SetupDebugVisualizationPass(
         u32 hizWidth;
         u32 hizHeight;
         u32 hizMipLevels;
+        Fmatrix prevViewProj;
     };
 
     fg.addCallbackPass<DebugPassData>(
         "GPU Culling Debug",
 
-        [&, hizWidth, hizHeight, hizMipLevels, particleCount, particleBatches](FrameGraph& builder, PassHandle passHandle, DebugPassData& data) {
+        [&, hizWidth, hizHeight, hizMipLevels, particleCount, particleBatches, prevViewProj](FrameGraph& builder, PassHandle passHandle, DebugPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.manager = this;
@@ -3559,6 +3562,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
             data.hizWidth = hizWidth;
             data.hizHeight = hizHeight;
             data.hizMipLevels = hizMipLevels;
+            data.prevViewProj = prevViewProj;
 
             data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
             data.colorTarget = passBuilder.write(colorTarget, ResourceState::RenderTarget);
@@ -3592,6 +3596,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
                 CullDebugParamsCB cb;
                 cb.viewProj = Device.mFullTransform;
+                cb.prevViewProj = data.prevViewProj;
                 cb.cameraPos = Device.vCameraPosition;
                 cb.maxDistanceSq = farPlane * farPlane;
                 cb.objectCount = objectCount;
@@ -3650,6 +3655,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
                     CullDebugParamsCB cb;
                     cb.viewProj = Device.mFullTransform;
+                    cb.prevViewProj = data.prevViewProj;
                     cb.cameraPos = Device.vCameraPosition;
                     cb.maxDistanceSq = farPlane * farPlane;
                     cb.objectCount = static_cast<u32>(mgr->m_particleData.size());

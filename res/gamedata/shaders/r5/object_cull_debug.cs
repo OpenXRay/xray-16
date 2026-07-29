@@ -28,6 +28,7 @@ struct GPUObjectData
 cbuffer CullDebugParams : register(b5)
 {
     float4x4 g_ViewProj;           // View-projection matrix
+    float4x4 g_PrevViewProj;       // Previous frame (for Hi-Z sampling)
     float3 g_CameraPos;            // Camera world position
     float g_MaxDistance;           // Maximum render distance (squared)
     float4 g_FrustumPlanes[6];     // View frustum planes (world space)
@@ -62,62 +63,9 @@ RWStructuredBuffer<CullDebugData> g_DebugOutput : register(u0);
 // Returns: x = object depth, y = hi-z depth, z = 1 if visible, 0 if occluded
 float3 OcclusionTestSphereDebug(float3 center, float radius)
 {
-    float3 result = float3(0.0, 0.0, 1.0); // Default: visible
-
-    // Project sphere center to clip space (use our cbuffer, not common.h's m_VP)
-    float4 clipPos = mul(g_ViewProj, float4(center, 1.0));
-
-    // Behind camera - conservatively visible
-    if (clipPos.w <= 0.001)
-        return float3(0.0, 1.0, 1.0);
-
-    float3 ndc = clipPos.xyz / clipPos.w;
-
-    // Calculate screen-space bounding box
-    float projScale = max(abs(g_ViewProj[0][0]), abs(g_ViewProj[1][1]));
-    float2 ndcSize = float2(radius, radius) * projScale / clipPos.w;
-    float2 minNDC = ndc.xy - ndcSize;
-    float2 maxNDC = ndc.xy + ndcSize;
-
-    // Completely outside screen
-    if (any(minNDC > 1.0) || any(maxNDC < -1.0))
-        return float3(1.0, 0.0, 0.0); // Occluded (off-screen)
-
-    // Convert to UV space
-    float2 minUV = minNDC * 0.5 + 0.5;
-    float2 maxUV = maxNDC * 0.5 + 0.5;
-    minUV.y = 1.0 - minUV.y;
-    maxUV.y = 1.0 - maxUV.y;
-    float4 boxUV = float4(min(minUV, maxUV), max(minUV, maxUV));
-
-    // Calculate mip level
-    float boxWidth = (boxUV.z - boxUV.x) * float(g_HiZWidth);
-    float boxHeight = (boxUV.w - boxUV.y) * float(g_HiZHeight);
-    float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5)));
-    mipLevel = clamp(mipLevel, 0.0, float(g_HiZMipLevels - 1));
-
-    // Sample Hi-Z at 4 corners
-    float d1 = g_HiZPyramid.SampleLevel(smp_nofilter, float2(boxUV.x, boxUV.y), mipLevel);
-    float d2 = g_HiZPyramid.SampleLevel(smp_nofilter, float2(boxUV.z, boxUV.y), mipLevel);
-    float d3 = g_HiZPyramid.SampleLevel(smp_nofilter, float2(boxUV.x, boxUV.w), mipLevel);
-    float d4 = g_HiZPyramid.SampleLevel(smp_nofilter, float2(boxUV.z, boxUV.w), mipLevel);
-    float hiZDepth = min(min(d1, d2), min(d3, d4));
-
-    // Calculate object's front depth
-    float3 viewDir = normalize(center - g_CameraPos);
-    float3 frontPoint = center - viewDir * radius;
-    float4 frontClip = mul(g_ViewProj, float4(frontPoint, 1.0));
-
-    if (frontClip.w <= 0.001)
-        return float3(0.0, hiZDepth, 1.0); // Near plane intersection - visible
-
-    float objectDepth = saturate(frontClip.z / frontClip.w);
-
-    // Depth comparison
-    float depthBias = 0.0001;
-    bool visible = objectDepth >= (hiZDepth - depthBias);
-
-    return float3(objectDepth, hiZDepth, visible ? 1.0 : 0.0);
+    HiZTestResult r = HiZTestSphereEx(center, radius, g_CameraPos, g_PrevViewProj,
+                                      g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels);
+    return float3(r.frontDepth, r.hiZDepth, r.visible ? 1.0 : 0.0);
 }
 
 // ═══════════════════════════════════════════════════════

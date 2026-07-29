@@ -18,6 +18,7 @@ namespace xray::render::fg::passes {
 // Constant buffer for culling parameters
 struct ParticleCullParams {
     Fmatrix viewProj;           // 64 bytes
+    Fmatrix prevViewProj;       // 64 bytes
     Fvector4 frustumPlanes[6];  // 96 bytes
     Fvector4 cameraPos;         // 16 bytes (xyz + pad)
     Fvector4 cameraTop;         // 16 bytes (xyz + pad)
@@ -26,9 +27,9 @@ struct ParticleCullParams {
     u32 hiZWidth;               //  4 bytes
     u32 hiZHeight;              //  4 bytes
     u32 hiZMipLevels;           //  4 bytes
-    // Total: 224 bytes
+    // Total: 288 bytes
 };
-static_assert(sizeof(ParticleCullParams) == 224, "ParticleCullParams must be 224 bytes");
+static_assert(sizeof(ParticleCullParams) == 288, "ParticleCullParams must be 288 bytes");
 
 // Constant buffer for billboard generation
 struct ParticleBillboardParams {
@@ -68,7 +69,8 @@ public:
         u32 particleCount,
         u32 hiZWidth,
         u32 hiZHeight,
-        u32 hiZMipLevels);
+        u32 hiZMipLevels,
+        const Fmatrix& prevViewProj);
 
     void DispatchBillboardGeneration(
         nvrhi::ICommandList* cmdList,
