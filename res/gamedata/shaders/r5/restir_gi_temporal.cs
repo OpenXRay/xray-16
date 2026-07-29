@@ -17,7 +17,8 @@ cbuffer ReSTIRTemporalParams : register(b5) {
     uint g_SkinnedBatchStart;
     uint g_GrassBatchStart;
     uint g_DetailAtlasIndex;
-    uint2 g_Pad;
+    uint g_ParticleBatchStart;
+    float g_CameraMotion;
 };
 
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
@@ -26,9 +27,11 @@ ByteAddressBuffer g_MegaVB : register(t3);
 ByteAddressBuffer g_MegaIB : register(t18);
 ByteAddressBuffer g_GrassVB : register(t12);
 ByteAddressBuffer g_GrassIB : register(t13);
+ByteAddressBuffer g_ParticleVB : register(t4);
+ByteAddressBuffer g_ParticleIB : register(t8);
 
 Texture2D<float4> t_PrevReservoirA : register(t0);
-Texture2D<float4> t_PrevReservoirB : register(t4);
+Texture2D<float4> t_PrevReservoirB : register(t22);
 Texture2D<float2> t_MotionVectors : register(t5);
 Texture2D<float> t_Depth : register(t6);
 Texture2D<float4> t_PrevNormal : register(t7);
@@ -50,10 +53,10 @@ bool VisibilityOK(float3 worldPos, float3 N, float3 samplePos)
 {
     float3 biasedPos = worldPos + N * 0.01;
     return TraceVisibilityClear(
-        g_SceneTLAS, g_BatchInfo, g_MegaVB, g_MegaIB, g_GrassVB, g_GrassIB,
+        g_SceneTLAS, g_BatchInfo, g_MegaVB, g_MegaIB, g_GrassVB, g_GrassIB, g_ParticleVB, g_ParticleIB,
         biasedPos, samplePos,
         g_IdentityStaticCount, g_TerrainBatchCount, g_SkinnedBatchStart, g_GrassBatchStart,
-        g_DetailAtlasIndex);
+        g_ParticleBatchStart, g_DetailAtlasIndex);
 }
 
 void TemporalMerge(
@@ -130,7 +133,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth >= 1.0) {
+    if (depth <= 0.0) {
         u_ReservoirA[pixel] = 0;
         u_ReservoirB[pixel] = 0;
         u_ReservoirC[pixel] = 0;
@@ -171,8 +174,10 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         float3 prevN = normalize(t_PrevNormal.Load(int3(prevPixel, 0)).xyz);
         float viewDist = length(worldPos - g_CameraPos.xyz);
         float posDist = length(worldPos - prevWorldPos);
+        float posTol = lerp(0.08, 0.05, saturate(g_CameraMotion)) * viewDist;
+        float nTol = lerp(0.88, 0.94, saturate(g_CameraMotion));
         bool valid = SameHudSurfClass(centerMark, prevWorldPosData.w) &&
-            posDist < 0.1 * viewDist && dot(N, prevN) > 0.906;
+            posDist < posTol && dot(N, prevN) > nTol;
         if (valid) {
             prevRes = UnpackReservoir(
                 t_PrevReservoirA.Load(int3(prevPixel, 0)),
@@ -181,13 +186,24 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
             prevSpec = UnpackReservoir(
                 t_PrevSpecA.Load(int3(prevPixel, 0)),
                 t_PrevSpecB.Load(int3(prevPixel, 0)));
+            if (g_CameraMotion > 0.5)
+            {
+                prevRes.M = max(1u, (prevRes.M * 3u) / 4u);
+                prevSpec.M = max(1u, (prevSpec.M * 3u) / 4u);
+            }
         }
     }
 
-    TemporalMerge(output, currRes, prevRes, worldPos, prevWorldPos, N, albedo, metallic, true, rng);
+    bool requireVis = true;
+    if (g_CameraMotion < 0.2)
+    {
+        uint h = pcg_hash(pixel.x + pixel.y * 1973u + g_FrameIndex);
+        requireVis = ((h & 3u) != 0u);
+    }
+    TemporalMerge(output, currRes, prevRes, worldPos, prevWorldPos, N, albedo, metallic, requireVis, rng);
     float3 specAlbedo = lerp(float3(1, 1, 1), albedo, metallic);
-    TemporalMerge(outputSpec, currSpec, prevSpec, worldPos, prevWorldPos, N, specAlbedo, metallic, true, rng);
-    if (roughness > 0.55)
+    TemporalMerge(outputSpec, currSpec, prevSpec, worldPos, prevWorldPos, N, specAlbedo, metallic, requireVis, rng);
+    if (roughness > 0.55 || g_CameraMotion > 0.65)
         outputSpec = currSpec;
 
     float4 outA, outB;

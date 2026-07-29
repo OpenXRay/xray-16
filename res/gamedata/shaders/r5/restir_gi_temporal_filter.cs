@@ -52,14 +52,14 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float3 currS = currS4.rgb;
     float specHitDist = currS4.a;
 
-    if (depth >= 1.0 || g_Enabled == 0) {
+    if (depth <= 0.0 || g_Enabled == 0) {
         u_OutDiffuse[pixel] = float4(currD, 1.0);
         u_OutSpecular[pixel] = float4(currS, specHitDist);
         return;
     }
 
     float2 mv = t_MotionVectors.Load(int3(pixel, 0));
-    float2 histUV = (float2(pixel) + 0.5) * g_InvScreenSize - mv;
+    float2 histUV = (float2(pixel) + 0.5) * g_InvScreenSize + mv;
     if (any(histUV < 0.0) || any(histUV > 1.0)) {
         u_OutDiffuse[pixel] = float4(currD, 1.0);
         u_OutSpecular[pixel] = float4(currS, specHitDist);
@@ -115,8 +115,8 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         }
     }
 
-    histD = ClipAABB(histD, minD * 0.15, maxD * 4.5);
-    histS = ClipAABB(histS, minS * 0.1, maxS * 5.0);
+    histD = ClipAABB(histD, minD * 0.55, maxD * 2.0);
+    histS = ClipAABB(histS, minS * 0.4, maxS * 2.4);
 
     float alpha = saturate(g_Alpha) * trust;
     float3 outD = lerp(currD, histD, alpha);

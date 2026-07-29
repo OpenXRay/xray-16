@@ -20,7 +20,9 @@ cbuffer ReSTIRSpatialParams : register(b5) {
     uint g_SkinnedBatchStart;
     uint g_GrassBatchStart;
     uint g_DetailAtlasIndex;
-    uint3 g_Pad;
+    uint g_ParticleBatchStart;
+    float g_LodDist;
+    float g_CameraMotion;
 };
 
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
@@ -29,8 +31,10 @@ ByteAddressBuffer g_MegaVB : register(t3);
 ByteAddressBuffer g_MegaIB : register(t18);
 ByteAddressBuffer g_GrassVB : register(t12);
 ByteAddressBuffer g_GrassIB : register(t13);
+ByteAddressBuffer g_ParticleVB : register(t4);
+ByteAddressBuffer g_ParticleIB : register(t8);
 
-Texture2D<float> t_Depth : register(t4);
+Texture2D<float> t_Depth : register(t0);
 Texture2D<float4> t_Normal : register(t5);
 Texture2D<float4> t_BaseColor : register(t6);
 Texture2D<float4> t_WorldPos : register(t7);
@@ -50,10 +54,10 @@ bool VisibilityOK(float3 worldPos, float3 N, float3 samplePos)
 {
     float3 biasedPos = worldPos + N * 0.01;
     return TraceVisibilityClear(
-        g_SceneTLAS, g_BatchInfo, g_MegaVB, g_MegaIB, g_GrassVB, g_GrassIB,
+        g_SceneTLAS, g_BatchInfo, g_MegaVB, g_MegaIB, g_GrassVB, g_GrassIB, g_ParticleVB, g_ParticleIB,
         biasedPos, samplePos,
         g_IdentityStaticCount, g_TerrainBatchCount, g_SkinnedBatchStart, g_GrassBatchStart,
-        g_DetailAtlasIndex);
+        g_ParticleBatchStart, g_DetailAtlasIndex);
 }
 
 float TargetLuminance(GIReservoir r, float3 worldPos, float3 N, float3 albedo, float metallic)
@@ -96,7 +100,10 @@ GIReservoir SpatialReuse(
         output.age = center.age;
     }
 
+    float farLod = saturate(linearDepth / max(g_LodDist, 1.0));
     uint samples = min(g_SpatialSamples, 16u);
+    if (farLod > 0.7)
+        samples = min(samples, 2u);
     for (uint i = 0; i < samples; ++i) {
         float ang = rand_float(rng) * 6.2831853;
         float rad = sqrt(rand_float(rng)) * g_SpatialRadius * radiusScale;
@@ -107,7 +114,7 @@ GIReservoir SpatialReuse(
             continue;
 
         float nDepth = t_Depth.Load(int3(nPixel, 0));
-        if (nDepth >= 1.0)
+        if (nDepth <= 0.0)
             continue;
 
         float4 nWorldPosData = t_WorldPos.Load(int3(nPixel, 0));
@@ -133,6 +140,8 @@ GIReservoir SpatialReuse(
 
         float neighLum = TargetLuminance(neighbor, worldPos, N, albedo, metallic);
         if (neighLum <= 0)
+            continue;
+        if (centerLum > 1e-5 && neighLum > centerLum * 8.0)
             continue;
 
         float conf = AgeConfidence(neighbor.age, 32u);
@@ -163,7 +172,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth >= 1.0) {
+    if (depth <= 0.0) {
         u_ReservoirA[pixel] = 0;
         u_ReservoirB[pixel] = 0;
         u_ReservoirC[pixel] = 0;
@@ -183,6 +192,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float metallic = UnpackMetallicFromBaseA(baseColorData.a);
     float linearDepth = length(worldPos - g_CameraPos.xyz);
     uint rng = pcg_hash(pixel.x + pixel.y * 6287u + g_FrameIndex * 33461u);
+    float radiusScale = lerp(1.0, 0.7, saturate(g_CameraMotion));
 
     GIReservoir center = UnpackReservoir(
         t_ReservoirA.Load(int3(pixel, 0)),
@@ -193,13 +203,13 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         t_SpecB.Load(int3(pixel, 0)));
 
     GIReservoir output = SpatialReuse(center, t_ReservoirA, t_ReservoirB, t_ReservoirC, true,
-        pixel, worldPos, centerMark, N, albedo, metallic, linearDepth, 1.0, rng);
+        pixel, worldPos, centerMark, N, albedo, metallic, linearDepth, radiusScale, rng);
     float3 specAlbedo = lerp(float3(1, 1, 1), albedo, metallic);
     float specRadius = roughness < 0.2 ? 0.35 : (roughness < 0.45 ? 0.6 : 0.15);
     GIReservoir outputSpec = centerSpec;
     if (roughness < 0.55) {
         outputSpec = SpatialReuse(centerSpec, t_SpecA, t_SpecB, t_ReservoirC, false,
-            pixel, worldPos, centerMark, N, specAlbedo, metallic, linearDepth, specRadius, rng);
+            pixel, worldPos, centerMark, N, specAlbedo, metallic, linearDepth, specRadius * radiusScale, rng);
     }
 
     float4 outA, outB;

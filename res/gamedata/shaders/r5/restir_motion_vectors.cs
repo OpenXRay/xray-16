@@ -27,7 +27,7 @@ float2 ProjectToUv(float4x4 viewProj, float3 worldPos)
 float3 ReconstructFarWorld(float2 uv)
 {
     float2 ndc = float2(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0);
-    float4 farH = mul(g_InvViewProj, float4(ndc, 1.0, 1.0));
+    float4 farH = mul(g_InvViewProj, float4(ndc, 0.0, 1.0));
     return farH.xyz / max(farH.w, 1e-6);
 }
 
@@ -40,7 +40,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
 
     float2 uv = (float2(pixel) + 0.5) * g_InvScreenSize;
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth >= 0.9995)
+    if (IsSkyDepth(depth))
     {
         if (g_HasPrevCamera == 0)
         {
