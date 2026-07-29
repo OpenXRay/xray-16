@@ -36,7 +36,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float depth = t_Depth.Load(int3(pixel, 0));
     float guideMark = t_WorldPos.Load(int3(pixel, 0)).w;
     float classifyMark = t_ClassifyWorldPos.Load(int3(pixel, 0)).w;
-    if (depth >= 1.0 || SkipRtSurfLighting(classifyMark, guideMark)) {
+    if (depth <= 0.0 || SkipRtSurfLighting(classifyMark, guideMark)) {
         u_SceneColor[pixel] = t_SceneColorIn.Load(int3(pixel, 0));
         u_OutDiffuse[pixel] = 0;
         u_OutSpecular[pixel] = 0;

@@ -81,7 +81,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float2 ndc = float2(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0);
     float3 cam = g_CameraPos.xyz;
 
-    float4 farClip = mul(g_InvViewProj, float4(ndc, 1.0, 1.0));
+    float4 farClip = mul(g_InvViewProj, float4(ndc, 0.0, 1.0));
     float3 farPos = farClip.xyz / max(farClip.w, 1e-6);
     float3 viewDir = normalize(farPos - cam);
 
@@ -92,18 +92,21 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         clamp(uint(uv.y * float(max(depthH, 1u))), 0u, max(depthH, 1u) - 1u));
 
     float depth = t_Depth.Load(int3(depthPixel, 0));
-    const bool isSky = depth >= 0.9995;
+    const bool isSky = IsSkyDepth(depth);
 
     float3 surfacePos;
     if (isSky) {
         float marchFar = min(max(g_FogFar, 900.0), 1600.0);
         surfacePos = cam + viewDir * marchFar;
     } else {
-        float3 worldPos = t_WorldPos.Load(int3(depthPixel, 0)).xyz;
-        if (any(abs(worldPos - cam) > 1e-3))
-            surfacePos = worldPos;
-        else
-            surfacePos = cam + viewDir * min(max(g_FogFar, 900.0), 1600.0);
+        float4 wp = t_WorldPos.Load(int3(depthPixel, 0));
+        if (wp.w >= 0.5)
+            surfacePos = wp.xyz;
+        else {
+            float4 clip = float4(ndc, depth, 1.0);
+            float4 worldH = mul(g_InvViewProj, clip);
+            surfacePos = worldH.xyz / max(worldH.w, 1e-6);
+        }
     }
 
     float3 toEye = cam - surfacePos;

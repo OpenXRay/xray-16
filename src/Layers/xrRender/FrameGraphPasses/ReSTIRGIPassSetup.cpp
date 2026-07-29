@@ -38,6 +38,10 @@ extern ENGINE_API int ps_r_rt_gi_bounces;
 extern ENGINE_API int ps_r_rt_gi_cache_size;
 extern ENGINE_API float ps_r_rt_gi_cache_cell;
 extern ENGINE_API int ps_r_rt_vol_steps;
+extern ENGINE_API float ps_r_rt_detail_dist;
+extern ENGINE_API float ps_r_rt_gi_lod_dist;
+extern ENGINE_API int ps_r_rt_sun_soft_samples;
+extern ENGINE_API float ps_r_rt_sun_angular;
 
 namespace fg
 {
@@ -77,9 +81,42 @@ struct ReSTIRGICB {
     u32 cacheSize;
     float cacheCellSize;
     u32 cacheMaxAge;
-    u32 pad1;
+    u32 particleBatchStart;
+    float lodDist;
+    float sunAngular;
+    u32 sunSoftSamples;
+    float cameraMotion;
 };
-static_assert(sizeof(ReSTIRGICB) == 368, "ReSTIRGICB must be 368 bytes");
+static_assert(sizeof(ReSTIRGICB) == 384, "ReSTIRGICB must be 384 bytes");
+
+struct RTBatchStartIndices {
+    u32 skinned = 0xFFFFFFFFu;
+    u32 grass = 0xFFFFFFFFu;
+    u32 particle = 0xFFFFFFFFu;
+};
+
+static RTBatchStartIndices ComputeRTBatchStarts(const RTBatchCounts& bc)
+{
+    RTBatchStartIndices r;
+    u32 base = bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal;
+    if (bc.skinned > 0)
+        r.skinned = base;
+    base += bc.skinned;
+    if (bc.grass > 0)
+        r.grass = base;
+    base += bc.grass;
+    if (bc.particles > 0)
+        r.particle = base;
+    return r;
+}
+
+static void FillRTBatchCBFields(u32& skinnedStart, u32& grassStart, u32& particleStart, const RTBatchCounts& bc)
+{
+    const auto idx = ComputeRTBatchStarts(bc);
+    skinnedStart = idx.skinned;
+    grassStart = idx.grass;
+    particleStart = idx.particle;
+}
 
 struct TemporalCB {
     Fmatrix invViewProj;
@@ -94,7 +131,8 @@ struct TemporalCB {
     u32 skinnedBatchStart;
     u32 grassBatchStart;
     u32 detailAtlasIndex;
-    u32 pad[2];
+    u32 particleBatchStart;
+    float cameraMotion;
 };
 static_assert(sizeof(TemporalCB) == 128, "TemporalCB must be 128 bytes");
 
@@ -114,7 +152,9 @@ struct SpatialCB {
     u32 skinnedBatchStart;
     u32 grassBatchStart;
     u32 detailAtlasIndex;
-    u32 pad[3];
+    u32 particleBatchStart;
+    float lodDist;
+    float cameraMotion;
 };
 static_assert(sizeof(SpatialCB) == 144, "SpatialCB must be 144 bytes");
 
@@ -151,7 +191,7 @@ struct DISpatialCB {
     u32 identityStaticCount;
     u32 terrainBatchCount;
     u32 skinnedBatchStart;
-    u32 pad0;
+    u32 particleBatchStart;
     u32 pad1;
     u32 pad2;
 };
@@ -167,7 +207,7 @@ struct DIShadeCB {
     u32 identityStaticCount;
     u32 terrainBatchCount;
     u32 skinnedBatchStart;
-    u32 pad;
+    u32 particleBatchStart;
 };
 static_assert(sizeof(DIShadeCB) == 64, "DIShadeCB must be 64 bytes");
 
@@ -194,11 +234,15 @@ struct CompositeCB {
     float screenWidth;
     float screenHeight;
     float giIntensity;
-    u32 pad;
+    u32 cacheSize;
     Fvector4 fogParams;
     Fvector4 fogColor;
+    float cacheCellSize;
+    u32 cacheMaxAge;
+    u32 frameIndex;
+    float pad;
 };
-static_assert(sizeof(CompositeCB) == 128, "CompositeCB must be 128 bytes");
+static_assert(sizeof(CompositeCB) == 144, "CompositeCB must be 144 bytes");
 
 struct BlurCB {
     float screenWidth;
@@ -244,9 +288,16 @@ struct RTVolCB {
 };
 static_assert(sizeof(RTVolCB) == 160, "RTVolCB must be 160 bytes");
 
+static bool s_rtgiAllocFailed = false;
+
 bool IsRTGIActive(const RTAccelStructManager* accelMgr)
 {
-    return ::ps_r_rt_gi && accelMgr && accelMgr->IsSupported() && accelMgr->IsReady();
+    return ::ps_r_rt_gi && !s_rtgiAllocFailed && accelMgr && accelMgr->IsSupported() && accelMgr->IsReady();
+}
+
+bool IsRTGIAllocFailed()
+{
+    return s_rtgiAllocFailed;
 }
 
 static void CreatePlaceholders(nvrhi::IDevice* nvDevice)
@@ -276,7 +327,7 @@ static void CreatePlaceholders(nvrhi::IDevice* nvDevice)
 
 static void EnsureVolumetricPipeline(fg::RenderDevice* device, ReSTIRGIPassState& state)
 {
-    constexpr u32 kVolPipeVersion = 4;
+    constexpr u32 kVolPipeVersion = 5;
     static u32 s_volPipeVersion = 0;
     if (state.volPipeline && state.volLayout && s_volPipeVersion == kVolPipeVersion)
         return;
@@ -313,7 +364,7 @@ static void EnsureVolumetricPipeline(fg::RenderDevice* device, ReSTIRGIPassState
 
 static void EnsureWaterPipeline(fg::RenderDevice* device, ReSTIRGIPassState& state)
 {
-    constexpr u32 kWaterPipeVersion = 10;
+    constexpr u32 kWaterPipeVersion = 11;
     static u32 s_waterPipeVersion = 0;
     if (state.waterPipeline && state.waterLayout && s_waterPipeVersion == kWaterPipeVersion)
         return;
@@ -335,7 +386,7 @@ static void EnsureWaterPipeline(fg::RenderDevice* device, ReSTIRGIPassState& sta
     if (auto* backend = device->GetBackend())
         bindlessLayout = backend->GetBindlessLayout();
 
-    state.waterLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Water_RT_v10", *csResult.reflection, nvDevice);
+    state.waterLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Water_RT_v11", *csResult.reflection, nvDevice);
     nvrhi::ComputePipelineDesc pipeDesc;
     pipeDesc.CS = csResult.handle;
     if (bindlessLayout)
@@ -349,9 +400,11 @@ static void EnsureWaterPipeline(fg::RenderDevice* device, ReSTIRGIPassState& sta
 
 static void InitializeResources(fg::RenderDevice* device, ReSTIRGIPassState& state)
 {
-    if (state.initialized && state.enabled) {
-        EnsureVolumetricPipeline(device, state);
-        EnsureWaterPipeline(device, state);
+    if (state.initialized) {
+        if (state.enabled) {
+            EnsureVolumetricPipeline(device, state);
+            EnsureWaterPipeline(device, state);
+        }
         return;
     }
 
@@ -366,11 +419,14 @@ static void InitializeResources(fg::RenderDevice* device, ReSTIRGIPassState& sta
         state.sampler = cache.GetOrCreateSampler("RTGI", samplerDesc, nvDevice);
     }
 
-    if (!state.cb) {
-        state.cb = cache.GetOrCreateVolatileCB("RTGI", "RTGI_CB",
-            (u32)std::max({ sizeof(ReSTIRGICB), sizeof(TemporalCB), sizeof(SpatialCB), sizeof(DITemporalCB),
-                sizeof(DISpatialCB), sizeof(DIShadeCB), sizeof(WaterCB), sizeof(CompositeCB), sizeof(BlurCB),
-                sizeof(TemporalFilterCB), sizeof(RTVolCB) }), device);
+    {
+        constexpr u32 kRTGICBVersions = 512u;
+        const u32 cbBytes = (u32)std::max({ sizeof(ReSTIRGICB), sizeof(TemporalCB), sizeof(SpatialCB),
+            sizeof(DITemporalCB), sizeof(DISpatialCB), sizeof(DIShadeCB), sizeof(WaterCB),
+            sizeof(CompositeCB), sizeof(BlurCB), sizeof(TemporalFilterCB), sizeof(RTVolCB) });
+        nvrhi::IBuffer* cb = cache.GetOrCreateVolatileCB("RTGI", "RTGI_CB", cbBytes, device, kRTGICBVersions);
+        if (cb != state.cb)
+            state.cb = cb;
     }
 
     nvrhi::IBindingLayout* bindlessLayout = nullptr;
@@ -481,9 +537,10 @@ static void InitializeResources(fg::RenderDevice* device, ReSTIRGIPassState& sta
     EnsureWaterPipeline(device, state);
 
     if (!state.compositePipeline) {
+        BindingSetBuilder::InvalidateReflectionCache();
         auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("restir_gi_composite");
         if (csResult.handle && csResult.reflection) {
-            state.compositeLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Composite_v6", *csResult.reflection, nvDevice);
+            state.compositeLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Composite_v9", *csResult.reflection, nvDevice);
             nvrhi::ComputePipelineDesc pipeDesc;
             pipeDesc.CS = csResult.handle;
             pipeDesc.bindingLayouts = { state.compositeLayout };
@@ -558,6 +615,7 @@ static bool EnsureIrradianceCache(nvrhi::IDevice* nvDevice, ReSTIRGIPassState& s
     bufDesc.byteSize = (size_t)entries * 16u;
     bufDesc.structStride = 16;
     bufDesc.canHaveUAVs = true;
+    bufDesc.canHaveRawViews = true;
     bufDesc.initialState = nvrhi::ResourceStates::UnorderedAccess;
     bufDesc.keepInitialState = true;
     state.irradianceCache = nvDevice->createBuffer(bufDesc);
@@ -568,8 +626,38 @@ static bool EnsureIrradianceCache(nvrhi::IDevice* nvDevice, ReSTIRGIPassState& s
     return true;
 }
 
+static void ReleasePersistentTextures(ReSTIRGIPassState& state)
+{
+    for (int i = 0; i < 2; i++) {
+        state.reservoirA[i] = nullptr;
+        state.reservoirB[i] = nullptr;
+        state.reservoirC[i] = nullptr;
+        state.specReservoirA[i] = nullptr;
+        state.specReservoirB[i] = nullptr;
+        state.diReservoir[i] = nullptr;
+    }
+    state.directLighting = nullptr;
+    state.noisyDiffuse = nullptr;
+    state.noisySpecular = nullptr;
+    state.blurTemp = nullptr;
+    state.blurTempSpec = nullptr;
+    state.histDiffuse = nullptr;
+    state.histSpecular = nullptr;
+    state.hitDistance = nullptr;
+    state.volSceneColor = nullptr;
+    state.irradianceCache = nullptr;
+    state.irradianceCacheSize = 0;
+    state.texWidth = 0;
+    state.texHeight = 0;
+    state.volTexWidth = 0;
+    state.volTexHeight = 0;
+}
+
 static bool EnsurePersistentTextures(nvrhi::IDevice* nvDevice, ReSTIRGIPassState& state, u32 width, u32 height)
 {
+    if (state.allocFailed || s_rtgiAllocFailed)
+        return false;
+
     const bool sizeOk = state.reservoirA[0] && state.diReservoir[0] && state.reservoirC[0] &&
         state.specReservoirA[0] && state.texWidth == width && state.texHeight == height;
     if (sizeOk) {
@@ -579,6 +667,8 @@ static bool EnsurePersistentTextures(nvrhi::IDevice* nvDevice, ReSTIRGIPassState
             state.blurTemp && state.blurTempSpec && state.histDiffuse && state.histSpecular && state.hitDistance &&
             state.irradianceCache;
     }
+
+    ReleasePersistentTextures(state);
 
     auto makeTex = [&](const char* name, nvrhi::Format fmt) -> nvrhi::TextureHandle {
         nvrhi::TextureDesc desc;
@@ -592,6 +682,15 @@ static bool EnsurePersistentTextures(nvrhi::IDevice* nvDevice, ReSTIRGIPassState
         return nvDevice->createTexture(desc);
     };
 
+    auto failAlloc = [&](const char* msg) {
+        Msg("%s", msg);
+        ReleasePersistentTextures(state);
+        state.enabled = false;
+        state.allocFailed = true;
+        s_rtgiAllocFailed = true;
+        return false;
+    };
+
     for (int i = 0; i < 2; i++) {
         state.reservoirA[i] = makeTex(i == 0 ? "RTGI_ReservoirA_0" : "RTGI_ReservoirA_1", nvrhi::Format::RGBA32_FLOAT);
         state.reservoirB[i] = makeTex(i == 0 ? "RTGI_ReservoirB_0" : "RTGI_ReservoirB_1", nvrhi::Format::RGBA32_FLOAT);
@@ -601,9 +700,7 @@ static bool EnsurePersistentTextures(nvrhi::IDevice* nvDevice, ReSTIRGIPassState
         state.diReservoir[i] = makeTex(i == 0 ? "RTGI_DIReservoir_0" : "RTGI_DIReservoir_1", nvrhi::Format::RGBA32_FLOAT);
         if (!state.reservoirA[i] || !state.reservoirB[i] || !state.reservoirC[i] ||
             !state.specReservoirA[i] || !state.specReservoirB[i] || !state.diReservoir[i]) {
-            Msg("! [ReSTIR GI] Reservoir texture create failed");
-            state.enabled = false;
-            return false;
+            return failAlloc("! [ReSTIR GI] Reservoir texture create failed (VRAM) — falling back to raster lighting");
         }
     }
 
@@ -616,21 +713,27 @@ static bool EnsurePersistentTextures(nvrhi::IDevice* nvDevice, ReSTIRGIPassState
     state.histSpecular = makeTex("RTGI_HistSpecular", nvrhi::Format::RGBA16_FLOAT);
     state.hitDistance = makeTex("RTGI_HitDistance", nvrhi::Format::R16_FLOAT);
 
-    if (!EnsureIrradianceCache(nvDevice, state)) {
-        state.enabled = false;
-        return false;
-    }
+    if (!EnsureIrradianceCache(nvDevice, state))
+        return failAlloc("! [ReSTIR GI] Irradiance cache create failed — falling back to raster lighting");
 
     if (!state.directLighting || !state.noisyDiffuse || !state.noisySpecular || !state.blurTemp ||
         !state.blurTempSpec || !state.histDiffuse || !state.histSpecular || !state.hitDistance) {
-        Msg("! [ReSTIR GI] Persistent texture create failed — GI disabled");
-        state.enabled = false;
-        return false;
+        return failAlloc("! [ReSTIR GI] Persistent texture create failed — GI disabled, falling back to raster lighting");
     }
 
     state.texWidth = width;
     state.texHeight = height;
     return true;
+}
+
+bool EnsureReSTIRGITextures(fg::RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height)
+{
+    if (!device || !device->GetNVRHIDevice() || state.allocFailed || s_rtgiAllocFailed)
+        return false;
+    InitializeResources(device, state);
+    if (!state.enabled)
+        return false;
+    return EnsurePersistentTextures(device->GetNVRHIDevice(), state, width, height);
 }
 
 struct InitialPassData {
@@ -675,6 +778,7 @@ struct CompositePassData {
     VirtualResourceHandle classifyWorldPos;
     VirtualResourceHandle sceneColorIn;
     VirtualResourceHandle sceneColor;
+    VirtualResourceHandle particleOpacity;
     CompositeCB cbData;
     u32 width, height;
     u32 reservoirIdx;
@@ -701,7 +805,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
     bool hasPrevFrameData,
     bool skipInTreeDenoise,
     VirtualResourceHandle classifyWorldPos,
-    bool skipLightingTemporal)
+    bool skipLightingTemporal,
+    VirtualResourceHandle particleOpacity)
 {
     InitializeResources(device, state);
 
@@ -738,16 +843,23 @@ ReSTIRGIOutput setupReSTIRGIPass(
     float skyWeight = env.CurrentEnv.weight;
 
     if (texManager && env.Current[0] && env.Current[1]) {
-        if (env.Current[0]->sky_texture_name.size()) {
-            auto h0 = texManager->LoadTexture(env.Current[0]->sky_texture_name.c_str());
-            nvrhi::ITexture* t = texManager->GetNVRHITexture(h0);
-            if (t) sky0Tex = t;
+        static shared_str s_skyName0;
+        static shared_str s_skyName1;
+        static nvrhi::ITexture* s_skyTex0 = nullptr;
+        static nvrhi::ITexture* s_skyTex1 = nullptr;
+
+        const shared_str& name0 = env.Current[0]->sky_texture_name;
+        const shared_str& name1 = env.Current[1]->sky_texture_name;
+        if (name0.size() && name0 != s_skyName0) {
+            s_skyName0 = name0;
+            s_skyTex0 = texManager->GetNVRHITexture(texManager->LoadTexture(name0.c_str()));
         }
-        if (env.Current[1]->sky_texture_name.size()) {
-            auto h1 = texManager->LoadTexture(env.Current[1]->sky_texture_name.c_str());
-            nvrhi::ITexture* t = texManager->GetNVRHITexture(h1);
-            if (t) sky1Tex = t;
+        if (name1.size() && name1 != s_skyName1) {
+            s_skyName1 = name1;
+            s_skyTex1 = texManager->GetNVRHITexture(texManager->LoadTexture(name1.c_str()));
         }
+        if (s_skyTex0) sky0Tex = s_skyTex0;
+        if (s_skyTex1) sky1Tex = s_skyTex1;
     }
 
     Fvector sunDir = env.CurrentEnv.sun_dir;
@@ -780,6 +892,10 @@ ReSTIRGIOutput setupReSTIRGIPass(
     initialCB.grassBatchStart = batchCounts.grass > 0
         ? batchCounts.identityStatic + batchCounts.terrain + batchCounts.transparent + batchCounts.instancedTotal + batchCounts.skinned
         : 0xFFFFFFFFu;
+    initialCB.particleBatchStart = batchCounts.particles > 0
+        ? batchCounts.identityStatic + batchCounts.terrain + batchCounts.transparent + batchCounts.instancedTotal +
+          batchCounts.skinned + batchCounts.grass
+        : 0xFFFFFFFFu;
     initialCB.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
     initialCB.localLightSamples = (u32)std::max(0, ::ps_r_rt_gi_local_samples);
     initialCB.bounces = (u32)std::clamp(::ps_r_rt_gi_bounces, 1, 2);
@@ -809,7 +925,17 @@ ReSTIRGIOutput setupReSTIRGIPass(
     initialCB.cacheSize = state.irradianceCacheSize;
     initialCB.cacheCellSize = std::max(0.05f, ::ps_r_rt_gi_cache_cell);
     initialCB.cacheMaxAge = 64u;
-    initialCB.pad1 = 0;
+    initialCB.lodDist = std::max(10.f, ::ps_r_rt_gi_lod_dist);
+    initialCB.sunAngular = std::max(0.001f, ::ps_r_rt_sun_angular);
+    initialCB.sunSoftSamples = (u32)std::clamp(::ps_r_rt_sun_soft_samples, 1, 8);
+    {
+        static Fvector s_prevCamDir = {0, 0, 1};
+        Fvector camDir = Device.vCameraDirection;
+        float motion = 1.f - camDir.dotproduct(s_prevCamDir);
+        motion = std::clamp(motion * 4.f, 0.f, 1.f);
+        s_prevCamDir = camDir;
+        initialCB.cameraMotion = motion;
+    }
 
     ResourceDesc persistDesc;
     persistDesc.type = ResourceDesc::Type::Texture2D;
@@ -916,12 +1042,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
             const auto& bc = data.accelMgr->GetBatchCounts();
             cb.identityStaticCount = bc.identityStatic;
             cb.terrainBatchCount = bc.terrain;
-            cb.skinnedBatchStart = bc.skinned > 0
-                ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal
-                : 0xFFFFFFFFu;
-            cb.grassBatchStart = bc.grass > 0
-                ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal + bc.skinned
-                : 0xFFFFFFFFu;
+            FillRTBatchCBFields(cb.skinnedBatchStart, cb.grassBatchStart, cb.particleBatchStart, bc);
             cb.detailAtlasIndex = data.accelMgr->GetDetailAtlasIndex();
             cb.cacheSize = data.state->irradianceCacheSize;
             {
@@ -941,6 +1062,10 @@ ReSTIRGIOutput setupReSTIRGIPass(
             if (!skinnedIB) skinnedIB = s_rtgiPlaceholderBuffer.Get();
             if (!grassVB) grassVB = s_rtgiPlaceholderBuffer.Get();
             if (!grassIB) grassIB = s_rtgiPlaceholderBuffer.Get();
+            nvrhi::IBuffer* particleVB = data.accelMgr->GetParticleOutputVB();
+            nvrhi::IBuffer* particleIB = data.accelMgr->GetParticleIB();
+            if (!particleVB) particleVB = s_rtgiPlaceholderBuffer.Get();
+            if (!particleIB) particleIB = s_rtgiPlaceholderBuffer.Get();
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_initial", ".cs");
@@ -959,6 +1084,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
             bsb.BufferSRV("g_SkinnedIB", skinnedIB);
             bsb.BufferSRV("g_GrassVB", grassVB);
             bsb.BufferSRV("g_GrassIB", grassIB);
+            bsb.BufferSRV("g_ParticleVB", particleVB);
+            bsb.BufferSRV("g_ParticleIB", particleIB);
             bsb.Texture("t_Depth", depthTex);
             bsb.Texture("t_Normal", normalTex);
             bsb.Texture("t_BaseColor", baseColorTex);
@@ -1016,7 +1143,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
         temporalCB.skinnedBatchStart = initialCB.skinnedBatchStart;
         temporalCB.grassBatchStart = initialCB.grassBatchStart;
         temporalCB.detailAtlasIndex = initialCB.detailAtlasIndex;
-        temporalCB.pad[0] = temporalCB.pad[1] = 0;
+        temporalCB.particleBatchStart = initialCB.particleBatchStart;
+        temporalCB.cameraMotion = initialCB.cameraMotion;
 
         fg.addCallbackPass<TemporalPassData>(
             "ReSTIR GI Temporal",
@@ -1064,12 +1192,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
                     const auto& bc = data.accelMgr->GetBatchCounts();
                     cb.identityStaticCount = bc.identityStatic;
                     cb.terrainBatchCount = bc.terrain;
-                    cb.skinnedBatchStart = bc.skinned > 0
-                        ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal
-                        : 0xFFFFFFFFu;
-                    cb.grassBatchStart = bc.grass > 0
-                        ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal + bc.skinned
-                        : 0xFFFFFFFFu;
+                    FillRTBatchCBFields(cb.skinnedBatchStart, cb.grassBatchStart, cb.particleBatchStart, bc);
                     cb.detailAtlasIndex = data.accelMgr->GetDetailAtlasIndex();
                 }
                 cmdList->writeBuffer(data.state->cb, &cb, sizeof(TemporalCB));
@@ -1090,6 +1213,10 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 if (!megaIB) megaIB = s_rtgiPlaceholderBuffer.Get();
                 if (!grassVB) grassVB = s_rtgiPlaceholderBuffer.Get();
                 if (!grassIB) grassIB = s_rtgiPlaceholderBuffer.Get();
+                nvrhi::IBuffer* particleVB = data.accelMgr->GetParticleOutputVB();
+                nvrhi::IBuffer* particleIB = data.accelMgr->GetParticleIB();
+                if (!particleVB) particleVB = s_rtgiPlaceholderBuffer.Get();
+                if (!particleIB) particleIB = s_rtgiPlaceholderBuffer.Get();
 
                 framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "ReSTIRGI.Temporal");
                 bsb.ConstantBuffer("ReSTIRTemporalParams", data.state->cb);
@@ -1100,6 +1227,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 bsb.BufferSRV("g_MegaIB", megaIB);
                 bsb.BufferSRV("g_GrassVB", grassVB);
                 bsb.BufferSRV("g_GrassIB", grassIB);
+                bsb.BufferSRV("g_ParticleVB", particleVB);
+                bsb.BufferSRV("g_ParticleIB", particleIB);
                 bsb.Texture("t_PrevReservoirA", data.state->reservoirA[data.readIdx]);
                 bsb.Texture("t_PrevReservoirB", data.state->reservoirB[data.readIdx]);
                 bsb.Texture("t_PrevReservoirC", data.state->reservoirC[data.readIdx]);
@@ -1260,7 +1389,9 @@ ReSTIRGIOutput setupReSTIRGIPass(
         spatialCB.skinnedBatchStart = initialCB.skinnedBatchStart;
         spatialCB.grassBatchStart = initialCB.grassBatchStart;
         spatialCB.detailAtlasIndex = initialCB.detailAtlasIndex;
-        spatialCB.pad[0] = spatialCB.pad[1] = spatialCB.pad[2] = 0;
+        spatialCB.particleBatchStart = initialCB.particleBatchStart;
+        spatialCB.lodDist = initialCB.lodDist;
+        spatialCB.cameraMotion = initialCB.cameraMotion;
 
         VirtualResourceHandle fgResAOut = fg.ImportTexture("rtgi_ResA_S", state.reservoirA[readIdx].Get(), resDesc);
         VirtualResourceHandle fgResBOut = fg.ImportTexture("rtgi_ResB_S", state.reservoirB[readIdx].Get(), resDesc);
@@ -1338,12 +1469,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
                     const auto& bc = data.accelMgr->GetBatchCounts();
                     cb.identityStaticCount = bc.identityStatic;
                     cb.terrainBatchCount = bc.terrain;
-                    cb.skinnedBatchStart = bc.skinned > 0
-                        ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal
-                        : 0xFFFFFFFFu;
-                    cb.grassBatchStart = bc.grass > 0
-                        ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal + bc.skinned
-                        : 0xFFFFFFFFu;
+                    FillRTBatchCBFields(cb.skinnedBatchStart, cb.grassBatchStart, cb.particleBatchStart, bc);
                     cb.detailAtlasIndex = data.accelMgr->GetDetailAtlasIndex();
                 }
                 cmdList->writeBuffer(data.state->cb, &cb, sizeof(SpatialCB));
@@ -1362,6 +1488,10 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 if (!megaIB) megaIB = s_rtgiPlaceholderBuffer.Get();
                 if (!grassVB) grassVB = s_rtgiPlaceholderBuffer.Get();
                 if (!grassIB) grassIB = s_rtgiPlaceholderBuffer.Get();
+                nvrhi::IBuffer* particleVB = data.accelMgr->GetParticleOutputVB();
+                nvrhi::IBuffer* particleIB = data.accelMgr->GetParticleIB();
+                if (!particleVB) particleVB = s_rtgiPlaceholderBuffer.Get();
+                if (!particleIB) particleIB = s_rtgiPlaceholderBuffer.Get();
 
                 framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "ReSTIRGI.Spatial");
                 bsb.ConstantBuffer("ReSTIRSpatialParams", data.state->cb);
@@ -1372,6 +1502,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 bsb.BufferSRV("g_MegaIB", megaIB);
                 bsb.BufferSRV("g_GrassVB", grassVB);
                 bsb.BufferSRV("g_GrassIB", grassIB);
+                bsb.BufferSRV("g_ParticleVB", particleVB);
+                bsb.BufferSRV("g_ParticleIB", particleIB);
                 bsb.Texture("t_Depth", depthTex);
                 bsb.Texture("t_Normal", normalTex);
                 bsb.Texture("t_BaseColor", baseColorTex);
@@ -1429,7 +1561,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
         diSpatCB.identityStaticCount = initialCB.identityStaticCount;
         diSpatCB.terrainBatchCount = initialCB.terrainBatchCount;
         diSpatCB.skinnedBatchStart = initialCB.skinnedBatchStart;
-        diSpatCB.pad0 = 0;
+        diSpatCB.particleBatchStart = initialCB.particleBatchStart;
 
         VirtualResourceHandle fgDIOut = fg.ImportTexture("rtgi_DI_S", state.diReservoir[readIdx].Get(), resDesc);
 
@@ -1497,18 +1629,17 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 if (!megaIB) megaIB = s_rtgiPlaceholderBuffer.Get();
                 if (!grassVB) grassVB = s_rtgiPlaceholderBuffer.Get();
                 if (!grassIB) grassIB = s_rtgiPlaceholderBuffer.Get();
+                nvrhi::IBuffer* particleVB = data.accelMgr->GetParticleOutputVB();
+                nvrhi::IBuffer* particleIB = data.accelMgr->GetParticleIB();
+                if (!particleVB) particleVB = s_rtgiPlaceholderBuffer.Get();
+                if (!particleIB) particleIB = s_rtgiPlaceholderBuffer.Get();
 
                 {
                     const auto& bc = data.accelMgr->GetBatchCounts();
                     DISpatialCB cb = data.cbData;
                     cb.identityStaticCount = bc.identityStatic;
                     cb.terrainBatchCount = bc.terrain;
-                    cb.skinnedBatchStart = bc.skinned > 0
-                        ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal
-                        : 0xFFFFFFFFu;
-                    cb.grassBatchStart = bc.grass > 0
-                        ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal + bc.skinned
-                        : 0xFFFFFFFFu;
+                    FillRTBatchCBFields(cb.skinnedBatchStart, cb.grassBatchStart, cb.particleBatchStart, bc);
                     cb.detailAtlasIndex = data.accelMgr->GetDetailAtlasIndex();
                     cmdList->writeBuffer(data.state->cb, &cb, sizeof(DISpatialCB));
                 }
@@ -1522,6 +1653,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 bsb.BufferSRV("g_MegaIB", megaIB);
                 bsb.BufferSRV("g_GrassVB", grassVB);
                 bsb.BufferSRV("g_GrassIB", grassIB);
+                bsb.BufferSRV("g_ParticleVB", particleVB);
+                bsb.BufferSRV("g_ParticleIB", particleIB);
                 bsb.BufferSRV("g_LightData", lightData);
                 bsb.Texture("t_SrcDI", srcDI);
                 bsb.Texture("t_Depth", depthTex);
@@ -1560,7 +1693,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
         diShadeCB.identityStaticCount = initialCB.identityStaticCount;
         diShadeCB.terrainBatchCount = initialCB.terrainBatchCount;
         diShadeCB.skinnedBatchStart = initialCB.skinnedBatchStart;
-        diShadeCB.pad = 0;
+        diShadeCB.particleBatchStart = initialCB.particleBatchStart;
 
         struct DIShadePassData {
             fg::RenderDevice* device;
@@ -1624,18 +1757,17 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 if (!megaIB) megaIB = s_rtgiPlaceholderBuffer.Get();
                 if (!grassVB) grassVB = s_rtgiPlaceholderBuffer.Get();
                 if (!grassIB) grassIB = s_rtgiPlaceholderBuffer.Get();
+                nvrhi::IBuffer* particleVB = data.accelMgr->GetParticleOutputVB();
+                nvrhi::IBuffer* particleIB = data.accelMgr->GetParticleIB();
+                if (!particleVB) particleVB = s_rtgiPlaceholderBuffer.Get();
+                if (!particleIB) particleIB = s_rtgiPlaceholderBuffer.Get();
 
                 {
                     const auto& bc = data.accelMgr->GetBatchCounts();
                     DIShadeCB cb = data.cbData;
                     cb.identityStaticCount = bc.identityStatic;
                     cb.terrainBatchCount = bc.terrain;
-                    cb.skinnedBatchStart = bc.skinned > 0
-                        ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal
-                        : 0xFFFFFFFFu;
-                    cb.grassBatchStart = bc.grass > 0
-                        ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal + bc.skinned
-                        : 0xFFFFFFFFu;
+                    FillRTBatchCBFields(cb.skinnedBatchStart, cb.grassBatchStart, cb.particleBatchStart, bc);
                     cb.detailAtlasIndex = data.accelMgr->GetDetailAtlasIndex();
                     cmdList->writeBuffer(data.state->cb, &cb, sizeof(DIShadeCB));
                 }
@@ -1649,6 +1781,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
                 bsb.BufferSRV("g_MegaIB", megaIB);
                 bsb.BufferSRV("g_GrassVB", grassVB);
                 bsb.BufferSRV("g_GrassIB", grassIB);
+                bsb.BufferSRV("g_ParticleVB", particleVB);
+                bsb.BufferSRV("g_ParticleIB", particleIB);
                 bsb.BufferSRV("g_LightData", lightData);
                 bsb.Texture("t_DIReservoir", diRes);
                 bsb.Texture("t_Depth", depthTex);
@@ -1694,19 +1828,23 @@ ReSTIRGIOutput setupReSTIRGIPass(
     compositeCB.screenWidth = (float)width;
     compositeCB.screenHeight = (float)height;
     compositeCB.giIntensity = giIntensity;
-    compositeCB.pad = 0;
+    compositeCB.cacheSize = state.irradianceCacheSize;
     {
         StaticGlobals fogFill{};
         FillGlobalConstants(fogFill);
         compositeCB.fogParams = fogFill.fog_params;
         compositeCB.fogColor = fogFill.fog_color;
     }
+    compositeCB.cacheCellSize = std::max(0.05f, ::ps_r_rt_gi_cache_cell);
+    compositeCB.cacheMaxAge = 64u;
+    compositeCB.frameIndex = Device.dwFrame;
+    compositeCB.pad = 0.f;
 
     VirtualResourceHandle classifyWP = classifyWorldPos.is_valid() ? classifyWorldPos : worldPos;
 
     auto& compositeData = fg.addCallbackPass<CompositePassData>(
         "ReSTIR GI Composite",
-        [&, compositeCB, compositeReservoirIdx, outHandle, fgDirectLighting, fgResA, fgResB, fgSpecA, fgSpecB, fgNoisyDiff, fgNoisySpec, fgHitDist, classifyWP](FrameGraph& builder, PassHandle passHandle, CompositePassData& data) {
+        [&, compositeCB, compositeReservoirIdx, outHandle, fgDirectLighting, fgResA, fgResB, fgSpecA, fgSpecB, fgNoisyDiff, fgNoisySpec, fgHitDist, classifyWP, particleOpacity](FrameGraph& builder, PassHandle passHandle, CompositePassData& data) {
             RenderPassBuilder pb(builder, passHandle);
             data.depth = pb.read(depth, ResourceState::ShaderResource);
             data.normal = pb.read(normal, ResourceState::ShaderResource);
@@ -1714,6 +1852,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
             data.worldPos = pb.read(worldPos, ResourceState::ShaderResource);
             data.classifyWorldPos = pb.read(classifyWP, ResourceState::ShaderResource);
             data.sceneColorIn = pb.read(sceneColorIn, ResourceState::ShaderResource);
+            if (particleOpacity.is_valid())
+                data.particleOpacity = pb.read(particleOpacity, ResourceState::ShaderResource);
             pb.read(fgDirectLighting, ResourceState::ShaderResource);
             pb.read(fgResA, ResourceState::ShaderResource);
             pb.read(fgResB, ResourceState::ShaderResource);
@@ -1755,12 +1895,19 @@ ReSTIRGIOutput setupReSTIRGIPass(
 
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            if (!EnsureIrradianceCache(nvDevice, *data.state))
+                return;
 
             cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(CompositeCB));
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_composite", ".cs");
             if (!csReflection) return;
+
+            nvrhi::ITexture* particleOpacityTex = data.particleOpacity.is_valid()
+                ? fg.GetPhysicalTexture(data.particleOpacity) : nullptr;
+            if (!particleOpacityTex)
+                particleOpacityTex = GetPassResourceCache().GetDummyContactHistory(nvDevice);
 
             framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "ReSTIRGI.Composite");
             bsb.ConstantBuffer("CompositeParams", data.state->cb);
@@ -1776,9 +1923,14 @@ ReSTIRGIOutput setupReSTIRGIPass(
             bsb.Texture("t_ClassifyWorldPos", classifyTex);
             bsb.Texture("t_SpecReservoirA", specA);
             bsb.Texture("t_SpecReservoirB", specB);
+            bsb.Texture("t_ParticleOpacity", particleOpacityTex);
+            nvrhi::IBuffer* irrCache = data.state->irradianceCache.Get();
+            if (!irrCache)
+                return;
             bsb.TextureUAV("u_SceneColor", outTex);
             bsb.TextureUAV("u_NoisyDiffuse", noisyDiff);
             bsb.TextureUAV("u_HitDist", hitDist);
+            bsb.BufferUAV("u_IrradianceCache", irrCache);
             auto& cache = GetPassResourceCache();
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->compositeLayout, nvDevice);
             if (!bindingSet) return;
@@ -2030,7 +2182,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
     if (state.waterPipeline && state.waterLayout && accelMgr) {
         WaterCB waterCB{};
         waterCB.invViewProj = invViewProj;
-        waterCB.cameraPos = { cameraPos.x, cameraPos.y, cameraPos.z, 0 };
+        waterCB.cameraPos = { cameraPos.x, cameraPos.y, cameraPos.z, initialCB.lodDist };
         waterCB.sunDir_intensity = initialCB.sunDir_intensity;
         waterCB.sunColor_skyWeight = initialCB.sunColor_skyWeight;
         waterCB.screenWidth = (float)width;
@@ -2369,7 +2521,7 @@ VirtualResourceHandle setupRTVolumetricPass(
             framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "ReSTIRGI.Vol");
             bsb.ConstantBuffer("RTVolParams", data.state->cb);
             bsb.AccelStruct("g_SceneTLAS", tlas);
-            bsb.Texture("t_Depth", depthTex);
+            bsb.Texture("t_Depth", depthTex, nvrhi::Format::R32_FLOAT);
             bsb.Texture("t_SceneColorIn", sceneIn);
             bsb.Texture("t_WorldPos", worldPosTex);
             bsb.BufferSRV("g_BatchInfo", batchInfo);
@@ -2451,6 +2603,8 @@ void ShutdownReSTIRGI(ReSTIRGIPassState& state)
     s_rtgiPlaceholderCube = nullptr;
     state.initialized = false;
     state.enabled = false;
+    state.allocFailed = false;
+    s_rtgiAllocFailed = false;
 }
 
 }

@@ -4,15 +4,20 @@
 #include "shared/nrd_helpers.h"
 #include "shared/surface_marks.h"
 #include "restir_gi_common.h"
+#include "rt_irradiance_cache.h"
 
 cbuffer CompositeParams : register(b5) {
     float4x4 g_InvViewProj;
     float4 g_CameraPos;
     float2 g_ScreenSize;
     float g_GIIntensity;
-    uint g_Pad;
+    uint g_CacheSize;
     float4 g_FogParams;
     float4 g_FogColor;
+    float g_CacheCellSize;
+    uint g_CacheMaxAge;
+    uint g_FrameIndex;
+    float g_Pad;
 };
 
 Texture2D<float4> t_DirectLighting : register(t0);
@@ -27,10 +32,13 @@ Texture2D<float4> t_NoisySpecular : register(t9);
 Texture2D<float4> t_ClassifyWorldPos : register(t10);
 Texture2D<float4> t_SpecReservoirA : register(t11);
 Texture2D<float4> t_SpecReservoirB : register(t12);
+Texture2D<float> t_ParticleOpacity : register(t13);
+SamplerState s_LinearClamp : register(s0);
 
 RWTexture2D<float4> u_SceneColor : register(u0);
 RWTexture2D<float4> u_NoisyDiffuse : register(u1);
 RWTexture2D<float> u_HitDist : register(u2);
+RWStructuredBuffer<IrradianceCacheEntry> u_IrradianceCache : register(u3);
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchID : SV_DispatchThreadID)
@@ -40,7 +48,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth >= 1.0) {
+    if (depth <= 0.0) {
         u_SceneColor[pixel] = t_SceneColorIn.Load(int3(pixel, 0));
         u_NoisyDiffuse[pixel] = 0;
         u_HitDist[pixel] = 0;
@@ -49,7 +57,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     float guideMark = t_WorldPos.Load(int3(pixel, 0)).w;
     float classifyMark = t_ClassifyWorldPos.Load(int3(pixel, 0)).w;
-    if (IsWaterSurfMark(classifyMark) && !IsHudSurfMark(guideMark)) {
+    if (SkipRtSurfLighting(classifyMark, guideMark)) {
         u_SceneColor[pixel] = t_SceneColorIn.Load(int3(pixel, 0));
         u_NoisyDiffuse[pixel] = 0;
         u_HitDist[pixel] = 0;
@@ -81,7 +89,8 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     float3 diffIrradiance = 0;
     float hitDist = 0;
-    if (IsReservoirValid(r) && r.W > 0 && metallic < 0.999) {
+    bool weakRes = !(IsReservoirValid(r) && r.W > 1e-5 && metallic < 0.999);
+    if (!weakRes) {
         float3 wi = normalize(r.samplePos - worldPos);
         float cosTheta = max(dot(N, wi), 0);
         float3 kD = (1.0 - F_Schlick(cosTheta, F0)) * (1.0 - metallic);
@@ -90,6 +99,17 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         diffIrradiance = r.Lo * brdfCos * r.W;
         diffIrradiance = min(diffIrradiance, RESTIR_MAX_RADIANCE);
         hitDist = length(r.samplePos - worldPos);
+        if (Luminance(diffIrradiance) < 1e-4)
+            weakRes = true;
+    }
+    if (weakRes && metallic < 0.999)
+    {
+        float3 cached = QueryIrradianceCacheRW(
+            u_IrradianceCache, worldPos, g_CacheCellSize, g_CacheSize, g_FrameIndex, g_CacheMaxAge);
+        float3 kD = (1.0 - metallic);
+        float3 floorGi = cached * kD * albedo / PI;
+        float mixW = IsReservoirValid(r) && r.W > 0 ? 0.55 : 1.0;
+        diffIrradiance = max(diffIrradiance, floorGi * mixW);
     }
     if (hitDist < 1e-3)
         hitDist = 0;
@@ -107,10 +127,23 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     diffIrradiance = min(diffIrradiance, RESTIR_MAX_RADIANCE);
     specIrradiance = min(specIrradiance, RESTIR_MAX_RADIANCE);
+    {
+        float dLum = max(Luminance(direct), 0.04);
+        float maxDiff = dLum * 10.0 + 0.35;
+        float diffLum = Luminance(diffIrradiance);
+        if (diffLum > maxDiff)
+            diffIrradiance *= maxDiff / diffLum;
+    }
 
     float giAo = 1.0;
     if (hitDist > 0.35 && hitDist < 3.0)
         giAo = saturate(0.72 + hitDist * 0.09);
+
+    float2 opacityUV = (float2(pixel) + 0.5) / g_ScreenSize;
+    float particleOcc = saturate(t_ParticleOpacity.SampleLevel(s_LinearClamp, opacityUV, 0));
+    float particleAtten = 1.0 - 0.7 * particleOcc;
+    giAo *= particleAtten;
+    direct *= lerp(1.0, particleAtten, 0.45);
 
     u_NoisyDiffuse[pixel] = float4(diffIrradiance * giAo, 1.0);
     u_HitDist[pixel] = hitDist;

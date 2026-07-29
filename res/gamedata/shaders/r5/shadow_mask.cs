@@ -80,7 +80,7 @@ void main(uint3 id : SV_DispatchThreadID)
 
     float2 uv = (float2(id.xy) + 0.5) / float2(g_maskSize);
     float rawD = g_SceneDepth.SampleLevel(smp_nofilter, uv, 0).x;
-    if (rawD >= 0.9995)
+    if (IsSkyDepth(rawD))
     {
         g_OutMask[id.xy] = float4(1, 1, 1, 1);
         return;

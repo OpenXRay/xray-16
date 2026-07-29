@@ -113,7 +113,7 @@ int ps_r_local_shadow_tiles = 96;
 int ps_r_local_shadow_update_div = 1;
 int ps_r_local_shadow_redraw_budget = 16;
 int ps_r_local_shadow_skinned_max = 24;
-float SunshaftsIntensity = 0.f;
+ECORE_API float SunshaftsIntensity = 0.f;
 float ps_r_local_shadow_near = 10.f;
 float ps_r_local_shadow_mid = 30.f;
 int ps_r_local_shadow_far_period = 5;
@@ -552,6 +552,83 @@ public:
         Console->Execute(cmd);
     }
 };
+
+#if RENDER == R_R4
+const xr_token qrt_quality_token[] =
+{
+    { "off", 0 },
+    { "low", 1 },
+    { "medium", 2 },
+    { "high", 3 },
+    { "ultra", 4 },
+    { nullptr, 0 }
+};
+
+class CCC_RTQuality : public CCC_Token
+{
+public:
+    CCC_RTQuality(LPCSTR N, u32* V, const xr_token* T) : CCC_Token(N, V, T) {}
+
+    virtual void Execute(LPCSTR args)
+    {
+        CCC_Token::Execute(args);
+
+        struct RTQualityPreset
+        {
+            int gi;
+            float intensity;
+            int bounces;
+            int spatial_samples;
+            float spatial_radius;
+            int m_max;
+            int local_samples;
+            int di_candidates;
+            int di_spatial_samples;
+            float di_spatial_radius;
+            int di_m_max;
+            int atrous_steps;
+            float ambient_scale;
+            int cache_size;
+            float cache_cell;
+            int vol_steps;
+            float detail_dist;
+            float lod_dist;
+            int sun_soft_samples;
+        };
+
+        static const RTQualityPreset kPresets[] =
+        {
+            { 0, 1.0f, 1, 2, 24.0f, 4, 2, 6, 2, 16.0f, 10, 3, 0.40f, 131072, 1.00f, 8, 12.f, 30.f, 2 },
+            { 1, 1.0f, 1, 2, 24.0f, 4, 2, 6, 2, 16.0f, 10, 3, 0.40f, 131072, 1.00f, 8, 12.f, 30.f, 2 },
+            { 1, 1.0f, 1, 4, 40.0f, 8, 4, 8, 4, 32.0f, 20, 4, 0.35f, 262144, 0.75f, 16, 20.f, 40.f, 4 },
+            { 1, 1.0f, 2, 6, 48.0f, 12, 6, 12, 6, 40.0f, 24, 5, 0.30f, 393216, 0.60f, 24, 30.f, 50.f, 6 },
+            { 1, 1.0f, 2, 8, 56.0f, 16, 8, 16, 8, 48.0f, 30, 6, 0.25f, 524288, 0.50f, 32, 40.f, 60.f, 8 },
+        };
+
+        const u32 idx = (*value <= 4u) ? *value : 2u;
+        const RTQualityPreset& p = kPresets[idx];
+        ps_r_rt_gi = p.gi;
+        ps_r_rt_gi_intensity = p.intensity;
+        ps_r_rt_gi_bounces = p.bounces;
+        ps_r_rt_gi_spatial_samples = p.spatial_samples;
+        ps_r_rt_gi_spatial_radius = p.spatial_radius;
+        ps_r_rt_gi_m_max = p.m_max;
+        ps_r_rt_gi_local_samples = p.local_samples;
+        ps_r_rt_di_candidates = p.di_candidates;
+        ps_r_rt_di_spatial_samples = p.di_spatial_samples;
+        ps_r_rt_di_spatial_radius = p.di_spatial_radius;
+        ps_r_rt_di_m_max = p.di_m_max;
+        ps_r_rt_gi_atrous_steps = p.atrous_steps;
+        ps_r_rt_gi_ambient_scale = p.ambient_scale;
+        ps_r_rt_gi_cache_size = p.cache_size;
+        ps_r_rt_gi_cache_cell = p.cache_cell;
+        ps_r_rt_vol_steps = p.vol_steps;
+        ps_r_rt_detail_dist = p.detail_dist;
+        ps_r_rt_gi_lod_dist = p.lod_dist;
+        ps_r_rt_sun_soft_samples = p.sun_soft_samples;
+    }
+};
+#endif
 
 class CCC_memory_stats : public IConsole_Command
 {
@@ -1031,6 +1108,7 @@ void xrRender_initconsole()
     //CMD3(CCC_Mask, "r2_sun_shafts", &ps_r2_ls_flags, R2FLAG_SUN_SHAFTS);
     CMD3(CCC_Token, "r2_sun_shafts", &ps_r_sun_shafts, qsun_shafts_token);
     CMD4(CCC_Float, "r2_sun_shafts_scale", &ps_r_sun_shafts_scale, 0.0f, 4.0f);
+    CMD4(CCC_SunshaftsIntensity, "r__sunshafts_intensity", &SunshaftsIntensity, 0.f, 1.f);
     CMD3(CCC_SSAO_Mode, "r2_ssao_mode", &ps_r_ssao_mode, qssao_mode_token);
     CMD3(CCC_Token, "r2_ssao", &ps_r_ssao, qssao_token);
     CMD3(CCC_Mask, "r2_ssao_blur", &ps_r2_ls_flags_ext, R2FLAGEXT_SSAO_BLUR); // Need restart
@@ -1094,6 +1172,7 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r4_debug_gpu_culling", &ps_r4_debug_gpu_culling, 0, 1);
     CMD4(CCC_Integer, "r_path_tracer", &ps_r_path_tracer, 0, 1);
     CMD4(CCC_Integer, "r_path_tracer_bounces", &ps_r_path_tracer_bounces, 1, 16);
+    CMD3(CCC_RTQuality, "r_rt_quality", &ps_r_rt_quality, qrt_quality_token);
     CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
     CMD4(CCC_Integer, "r_rt_gi_spatial_samples", &ps_r_rt_gi_spatial_samples, 0, 16);
@@ -1112,6 +1191,10 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_rt_gi_cache_cell", &ps_r_rt_gi_cache_cell, 0.05f, 8.0f);
     CMD4(CCC_Integer, "r_rt_vol_steps", &ps_r_rt_vol_steps, 0, 64);
     CMD4(CCC_Integer, "r_rt_vol_light_samples", &ps_r_rt_vol_light_samples, 0, 8);
+    CMD4(CCC_Float, "r_rt_detail_dist", &ps_r_rt_detail_dist, 2.f, 64.f);
+    CMD4(CCC_Float, "r_rt_gi_lod_dist", &ps_r_rt_gi_lod_dist, 10.f, 120.f);
+    CMD4(CCC_Integer, "r_rt_sun_soft_samples", &ps_r_rt_sun_soft_samples, 1, 8);
+    CMD4(CCC_Float, "r_rt_sun_angular", &ps_r_rt_sun_angular, 0.001f, 0.05f);
 
     CMD4(CCC_Integer, "r_taa", &ps_r_taa, 0, 1);
     CMD4(CCC_Float, "r_taa_sharpness", &ps_r_taa_sharpness, 0.0f, 1.0f);

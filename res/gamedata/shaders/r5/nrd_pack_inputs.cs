@@ -55,7 +55,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float3 cameraPos = g_CameraPos_Range.xyz;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth >= 1.0) {
+    if (depth <= 0.0) {
         u_DiffRadianceHitDist[pixel] = 0;
         u_SpecRadianceHitDist[pixel] = 0;
         u_NormalRoughness[pixel] = float4(0.5, 0.5, 1.0, 1.0);

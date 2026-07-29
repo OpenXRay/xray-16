@@ -288,7 +288,7 @@ extern ECORE_API float ps_r_smoke_max_width;
 extern ECORE_API float ps_r_smoke_gravity;
 extern ECORE_API float ps_r_smoke_buoyancy;
 extern ECORE_API float ps_r_smoke_turbulence;
-extern float SunshaftsIntensity;
+extern ECORE_API float SunshaftsIntensity;
 
 extern void xrRender_initconsole();
 } // namespace xray::render::fg

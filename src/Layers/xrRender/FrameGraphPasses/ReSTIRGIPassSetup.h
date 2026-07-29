@@ -65,6 +65,7 @@ struct ReSTIRGIPassState {
     bool initialized = false;
     bool enabled = false;
     bool initialLoadFailed = false;
+    bool allocFailed = false;
 };
 
 struct ReSTIRGIOutput {
@@ -75,6 +76,8 @@ struct ReSTIRGIOutput {
 };
 
 bool IsRTGIActive(const RTAccelStructManager* accelMgr);
+bool IsRTGIAllocFailed();
+bool EnsureReSTIRGITextures(fg::RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height);
 
 ReSTIRGIOutput setupReSTIRGIPass(
     framegraph::FrameGraph& fg,
@@ -97,7 +100,8 @@ ReSTIRGIOutput setupReSTIRGIPass(
     bool hasPrevFrameData,
     bool skipInTreeDenoise = false,
     framegraph::VirtualResourceHandle classifyWorldPos = {},
-    bool skipLightingTemporal = false
+    bool skipLightingTemporal = false,
+    framegraph::VirtualResourceHandle particleOpacity = {}
 );
 
 void ShutdownReSTIRGI(ReSTIRGIPassState& state);

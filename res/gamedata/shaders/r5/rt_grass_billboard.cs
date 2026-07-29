@@ -33,7 +33,13 @@ RWByteAddressBuffer g_OutputIB : register(u1);
 
 cbuffer BillboardRTCB : register(b5) {
     uint maxVertsPerBillboard;
-    uint3 pad;
+    float maxDist;
+    float camX;
+    float camY;
+    float camZ;
+    uint pad0;
+    uint pad1;
+    uint pad2;
 };
 
 static const float TWO_PI = 6.28318530718;
@@ -45,6 +51,16 @@ uint pack_normal(float3 n)
     return (u.x << 16) | (u.y << 8) | u.z;
 }
 
+void zero_billboard(uint vertBase)
+{
+    for (uint v = 0; v < maxVertsPerBillboard; v++) {
+        uint vi = vertBase + v;
+        g_Output.Store4(vi * 24, uint4(0, 0, 0, 0));
+        g_Output.Store2(vi * 24 + 16, uint2(0, 0));
+        g_OutputIB.Store(vi * 4, vi);
+    }
+}
+
 [numthreads(256, 1, 1)]
 void main(uint3 dtid : SV_DispatchThreadID)
 {
@@ -54,17 +70,18 @@ void main(uint3 dtid : SV_DispatchThreadID)
     uint vertBase = bb_idx * maxVertsPerBillboard;
 
     if (bb_idx >= actualCount) {
-        for (uint v = 0; v < maxVertsPerBillboard; v++) {
-            uint vi = vertBase + v;
-            g_Output.Store4(vi * 24, uint4(0, 0, 0, 0));
-            g_Output.Store2(vi * 24 + 16, uint2(0, 0));
-            g_OutputIB.Store(vi * 4, vi);
-        }
+        zero_billboard(vertBase);
         return;
     }
 
     uint src_idx = g_VisibleIndices[bb_idx];
     InstanceData inst = g_AllInstances[src_idx];
+
+    float3 camera = float3(camX, camY, camZ);
+    if (length(inst.pos - camera) > maxDist) {
+        zero_billboard(vertBase);
+        return;
+    }
 
     uint object_id = inst.packed & 0x3F;
     float rotation = float((inst.packed >> 8) & 0x3FF) / 1023.0 * TWO_PI;

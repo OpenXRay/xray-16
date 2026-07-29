@@ -54,18 +54,23 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     float guideMark = t_WorldPos.Load(int3(pixel, 0)).w;
     float classifyMark = t_ClassifyWorldPos.Load(int3(pixel, 0)).w;
-    if (depth >= 1.0 || SkipRtSurfLighting(classifyMark, guideMark)) {
+    if (depth <= 0.0 || SkipRtSurfLighting(classifyMark, guideMark)) {
         u_SceneColor[pixel] = t_SceneColorIn.Load(int3(pixel, 0));
         u_FilteredDiffuse[pixel] = 0;
         u_FilteredSpecular[pixel] = 0;
         return;
     }
 
-    float3 N = normalize(t_Normal.Load(int3(pixel, 0)).xyz);
+    float4 nPack = t_Normal.Load(int3(pixel, 0));
+    float3 N = normalize(nPack.xyz);
+    float roughness = saturate(nPack.w);
     float centerLumaD = Luma(noisyD);
     float centerLumaS = Luma(noisyS);
     float directLuma = max(Luma(direct), 0.02);
     int step = (int)max(g_Step, 1u);
+    float hitBlur = saturate(specHitDist * 0.04);
+    float roughBlur = saturate(roughness * roughness * 2.5 + hitBlur);
+    int stepS = max(step, (int)ceil((float)step * (1.0 + roughBlur * 2.5)));
 
     float3 sumD = 0;
     float3 sumS = 0;
@@ -78,37 +83,46 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     [unroll] for (int iy = -2; iy <= 2; ++iy) {
         [unroll] for (int ix = -2; ix <= 2; ++ix) {
-            int2 np = int2(pixel) + int2(ix, iy) * step;
-            if (np.x < 0 || np.y < 0 || np.x >= (int)g_ScreenSize.x || np.y >= (int)g_ScreenSize.y)
+            int2 npD = int2(pixel) + int2(ix, iy) * step;
+            int2 npS = int2(pixel) + int2(ix, iy) * stepS;
+            if (npD.x >= 0 && npD.y >= 0 && npD.x < (int)g_ScreenSize.x && npD.y < (int)g_ScreenSize.y)
+            {
+                float nd = t_Depth.Load(int3(npD, 0));
+                if (nd > 0.0 && SameHudSurfClass(guideMark, t_WorldPos.Load(int3(npD, 0)).w))
+                {
+                    float3 nN = normalize(t_Normal.Load(int3(npD, 0)).xyz);
+                    float3 nD = SoftClampFirefly(t_NoisyDiffuse.Load(int3(npD, 0)).rgb, directLuma, 5.0);
+                    nbMinD = min(nbMinD, nD);
+                    nbMaxD = max(nbMaxD, nD);
+                    float w = kKernel[ix + 2] * kKernel[iy + 2];
+                    float wGeo = exp(-abs(depth - nd) * g_PhiDepth);
+                    wGeo *= pow(saturate(dot(N, nN)), g_PhiNormal);
+                    w *= max(wGeo, 0.05);
+                    float wD = w * exp(-abs(Luma(nD) - centerLumaD) * 1.25);
+                    sumD += nD * wD;
+                    wSumD += wD;
+                }
+            }
+
+            if (npS.x < 0 || npS.y < 0 || npS.x >= (int)g_ScreenSize.x || npS.y >= (int)g_ScreenSize.y)
+                continue;
+            float ndS = t_Depth.Load(int3(npS, 0));
+            if (ndS <= 0.0)
+                continue;
+            if (!SameHudSurfClass(guideMark, t_WorldPos.Load(int3(npS, 0)).w))
                 continue;
 
-            float nd = t_Depth.Load(int3(np, 0));
-            if (nd >= 1.0)
-                continue;
-            if (!SameHudSurfClass(guideMark, t_WorldPos.Load(int3(np, 0)).w))
-                continue;
-
-            float3 nN = normalize(t_Normal.Load(int3(np, 0)).xyz);
-            float3 nD = t_NoisyDiffuse.Load(int3(np, 0)).rgb;
-            float3 nS = t_NoisySpecular.Load(int3(np, 0)).rgb;
-            nD = SoftClampFirefly(nD, directLuma, 5.0);
-            nS = SoftClampFirefly(nS, directLuma, 6.5);
-
-            nbMinD = min(nbMinD, nD);
-            nbMaxD = max(nbMaxD, nD);
+            float3 nNs = normalize(t_Normal.Load(int3(npS, 0)).xyz);
+            float3 nS = SoftClampFirefly(t_NoisySpecular.Load(int3(npS, 0)).rgb, directLuma, 6.5);
             nbMinS = min(nbMinS, nS);
             nbMaxS = max(nbMaxS, nS);
 
-            float w = kKernel[ix + 2] * kKernel[iy + 2];
-            float wGeo = exp(-abs(depth - nd) * g_PhiDepth);
-            wGeo *= pow(saturate(dot(N, nN)), g_PhiNormal);
-            w *= max(wGeo, 0.05);
-
-            float wD = w * exp(-abs(Luma(nD) - centerLumaD) * 1.25);
-            float wS = w * exp(-abs(Luma(nS) - centerLumaS) * 0.75);
-            sumD += nD * wD;
+            float wS0 = kKernel[ix + 2] * kKernel[iy + 2];
+            float wGeoS = exp(-abs(depth - ndS) * (g_PhiDepth * lerp(1.0, 0.45, roughBlur)));
+            wGeoS *= pow(saturate(dot(N, nNs)), g_PhiNormal * lerp(1.0, 0.35, roughBlur));
+            wS0 *= max(wGeoS, 0.08);
+            float wS = wS0 * exp(-abs(Luma(nS) - centerLumaS) * lerp(0.75, 0.2, roughBlur));
             sumS += nS * wS;
-            wSumD += wD;
             wSumS += wS;
         }
     }

@@ -42,6 +42,24 @@ namespace xray::render {
 
 namespace xray::render::fg::passes {
 
+inline u32& RenderResW() { static u32 w = 0; return w; }
+inline u32& RenderResH() { static u32 h = 0; return h; }
+inline void SetRenderResolution(u32 w, u32 h)
+{
+    RenderResW() = std::max(1u, w);
+    RenderResH() = std::max(1u, h);
+}
+inline u32 GetRenderWidth()
+{
+    const u32 w = RenderResW();
+    return w ? w : std::max(1u, (u32)Device.dwWidth);
+}
+inline u32 GetRenderHeight()
+{
+    const u32 h = RenderResH();
+    return h ? h : std::max(1u, (u32)Device.dwHeight);
+}
+
 // Filled by CascadedShadows pass; consumed by FillGlobalConstants
 struct ShadowCascadeGPUData
 {
@@ -169,8 +187,8 @@ using GlobalConstants = StaticGlobals;
 inline void FillClusterParams(StaticGlobals& cb)
 {
     auto& clm = ::xray::render::fg::ClusteredLightManager::Instance();
-    const u32 w = std::max(1u, (u32)Device.dwWidth);
-    const u32 h = std::max(1u, (u32)Device.dwHeight);
+    const u32 w = GetRenderWidth();
+    const u32 h = GetRenderHeight();
     const float zNear = VIEWPORT_NEAR;
     const float zFar = g_pGamePersistent
         ? g_pGamePersistent->Environment().CurrentEnv.far_plane
@@ -251,9 +269,12 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     const float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
     const float HorzTan = -VertTan / Device.fASPECT;
 
+    const float rw = float(GetRenderWidth());
+    const float rh = float(GetRenderHeight());
+
     // Vertex decompression (used for quantized positions)
-    cb.pos_decompression_params.set(HorzTan, VertTan, (2.0f * HorzTan) / (float)Device.dwWidth, (2.0f * VertTan) / (float)Device.dwHeight);
-    cb.pos_decompression_params2.set((float)Device.dwWidth, (float)Device.dwHeight, 1.0f / (float)Device.dwWidth, 1.0f / (float)Device.dwHeight);
+    cb.pos_decompression_params.set(HorzTan, VertTan, (2.0f * HorzTan) / rw, (2.0f * VertTan) / rh);
+    cb.pos_decompression_params2.set(rw, rh, 1.0f / rw, 1.0f / rh);
 
     // Parallax mapping: .x = height scale (r2_parallax_h; 0 disables object parallax),
     // .y = bias, .z = foliage SSS intensity, .w = sky IBL intensity.
@@ -274,13 +295,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
             (ps_r_sky_ibl != 0) ? ps_r_sky_ibl_intensity : 0.0f);
     }
 
-    // Screen resolution (for UI shaders and other effects)
-    cb.screen_res.set(
-        (float)Device.dwWidth,              // x = width
-        (float)Device.dwHeight,             // y = height
-        1.0f / (float)Device.dwWidth,       // z = 1/width
-        1.0f / (float)Device.dwHeight       // w = 1/height
-    );
+    cb.screen_res.set(rw, rh, 1.0f / rw, 1.0f / rh);
 
     cb.hud_fov = psHUD_FOV;
     // Screen-space contact shadow length (0 = disabled); packed as StaticGlobals.padding3
@@ -377,7 +392,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
 inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity) {
     cb.m_W = m_W;
     cb.m_WV.mul_43(Device.mView, m_W);
-    cb.m_WVP.mul(Device.mProject, cb.m_WV);
+    cb.m_WVP.mul(Device.mFullTransform, m_W);
 
     cb.L_material.set(0.01903f, 0.74998f, 0.0f, 0.25f);
     cb.hemi_cube_pos_faces.set(0.08034f, 0.42066f, 0.13277f, 0.0f);
@@ -438,7 +453,8 @@ inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
     cb.L_hemi_color.set(
         desc.hemi_color.x * ambScale,
         desc.hemi_color.y * ambScale,
-        desc.hemi_color.z * ambScale
+        desc.hemi_color.z * ambScale,
+        ps_r2_sun_lumscale_hemi
     );
 }
 
@@ -458,6 +474,17 @@ inline StaticGlobals BuildStaticGlobals(float hdrIntensity = 2.0f, bool allowRtg
     SunLightData sunData;
     GetSunLightData(sunData, hdrIntensity);
     FillSunConstants(sg, sunData);
+    if (!allowRtgiUnlit && ((ps_r_rt_gi != 0) || (ps_r_path_tracer != 0)))
+    {
+        const float invAmb = (ps_r_rt_gi_ambient_scale > 1e-4f)
+            ? (1.0f / std::clamp(ps_r_rt_gi_ambient_scale, 0.0f, 1.0f)) : 1.0f;
+        sg.L_ambient.x *= invAmb;
+        sg.L_ambient.y *= invAmb;
+        sg.L_ambient.z *= invAmb;
+        sg.L_hemi_color.x *= invAmb;
+        sg.L_hemi_color.y *= invAmb;
+        sg.L_hemi_color.z *= invAmb;
+    }
     FillClusterParams(sg);
     return sg;
 }
