@@ -440,7 +440,12 @@ void CRenderTarget::phase_combine()
         // value every frame keeps both effects off, matching this port's lack of support for them.
         RCache.set_c("aberration", 0.f, 0.f, 0.f, 0.f);
         RCache.set_c("lumasharpen", 0.f, 0.f, 0.f, 0.f);
-        RCache.set_c("vibrance", 0.f, 0.f, 0.f, 0.f);
+        // Options-menu "Насыщенность" (saturation) slider -- r2_vibrance_val. Previously hard-pinned to
+        // zero along with aberration/lumasharpen to dodge the NaN issue described above; unlike those two
+        // (which have no data or UI driving them), this one is live-bound in ui_mm_opt_16.xml, so it needs
+        // the real, defined value instead of a neutral stand-in. Still NaN-safe: the global is a plain
+        // float initialized to 0.f, never left uninitialized.
+        RCache.set_c("vibrance", ps_r2_vibrance_val, ps_r2_vibrance_val, ps_r2_vibrance_val, 0.f);
 
         RCache.set_Geometry(g_aa_AA);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
