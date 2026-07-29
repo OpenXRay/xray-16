@@ -10,8 +10,6 @@
 #include "Common/object_broker.h"
 #include "Common/LevelGameDef.h"
 
-ENGINE_API float SunshaftsIntensity = 0.f;
-
 void CEnvModifier::load(IReader* fs, u32 version)
 {
     use_flags.one();
@@ -557,19 +555,12 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     rain_color.lerp(A.rain_color, B.rain_color, f);
     bolt_period = fi * A.bolt_period + f * B.bolt_period;
     bolt_duration = fi * A.bolt_duration + f * B.bolt_duration;
+
     // wind
     wind_velocity = fi * A.wind_velocity + f * B.wind_velocity;
     //wind_direction = fi * A.wind_direction + f * B.wind_direction;
 
-#ifdef DEBUG
-    if (SunshaftsIntensity > 0.f)
-        m_fSunShaftsIntensity = SunshaftsIntensity;
-    else
-#endif
-    {
-        m_fSunShaftsIntensity = fi * A.m_fSunShaftsIntensity + f * B.m_fSunShaftsIntensity;
-    }
-
+    m_fSunShaftsIntensity = fi * A.m_fSunShaftsIntensity + f * B.m_fSunShaftsIntensity;
     m_fWaterIntensity = fi * A.m_fWaterIntensity + f * B.m_fWaterIntensity;
 
     // trees
@@ -1055,10 +1046,18 @@ void CEnvironment::save() const
     FS.update_path(environment_config_path, "$game_config$", "weathers\\environment.ltx");
 
     CInifile* environment_config = xr_new<CInifile>(environment_config_path, false, false, false);
+    environment_config->w_include("env_ambient.ltx");
+    environment_config->w_include("flares.ltx");
+    environment_config->w_include("thunderbolt.ltx");
 
     save_weathers(environment_config);
     save_weather_effects(environment_config);
 
+    const bool soc_style = !environment_config->sections().empty();
+    eff_LensFlare->save(soc_style);
+    // XXX: save thunderbolts, sound channels, effects, etc.
+
+    environment_config->save_at_end(soc_style);
     CInifile::Destroy(environment_config);
 }
 
@@ -1073,14 +1072,14 @@ void CEnvironment::save_weathers(CInifile* environment_config /*= nullptr*/) con
     string_path weathers_path_soc;
     FS.update_path(weathers_path_soc, "$game_config$", "weathers\\weather_");
 
-    bool should_save_environment_config = false;
     for (const auto& [name, descriptors] : WeatherCycles)
     {
         const bool soc_style = descriptors.soc_style;
         string_path weather_sect;
         if (soc_style && environment_config)
         {
-            should_save_environment_config = true;
+            strconcat(weather_sect, "weather_", name.c_str(), ".ltx");
+            environment_config->w_include(weather_sect);
             strconcat(weather_sect, "sect_weather_", name.c_str());
             environment_config->w_string("weathers", name.c_str(), weather_sect);
         }
@@ -1108,9 +1107,6 @@ void CEnvironment::save_weathers(CInifile* environment_config /*= nullptr*/) con
 
         CInifile::Destroy(config);
     }
-
-    if (should_save_environment_config && environment_config)
-        environment_config->save_at_end(true);
 }
 
 void CEnvironment::save_weather_effects(CInifile* environment_config /*= nullptr*/) const
@@ -1124,14 +1120,14 @@ void CEnvironment::save_weather_effects(CInifile* environment_config /*= nullptr
     string_path effects_path_soc;
     FS.update_path(effects_path_soc, "$game_config$", "weathers\\weather_");
 
-    bool should_save_environment_config = false;
     for (const auto& [name, descriptors] : WeatherFXs)
     {
         const bool soc_style = descriptors.soc_style;
         string_path weather_sect;
         if (soc_style && environment_config)
         {
-            should_save_environment_config = true;
+            strconcat(weather_sect, "weather_", name.c_str(), ".ltx");
+            environment_config->w_include(weather_sect);
             strconcat(weather_sect, "sect_weather_", name.c_str());
             environment_config->w_string("weather_effects", name.c_str(), weather_sect);
         }
@@ -1159,7 +1155,4 @@ void CEnvironment::save_weather_effects(CInifile* environment_config /*= nullptr
 
         CInifile::Destroy(config);
     }
-
-    if (should_save_environment_config && environment_config)
-        environment_config->save_at_end(true);
 }

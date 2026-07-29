@@ -58,6 +58,10 @@ void CUIActorMenu::InitDeadBodySearchMode()
     m_takeall_button->Show(true);
     GetModeSpecificPartnerInfo(mmDeadBodySearch)->Show(nullptr != m_pPartnerInvOwner);
 
+    auto partnerIcon = m_SearchLootPartnerCharacterInfo->GetParent();
+    if (partnerIcon != this)
+        partnerIcon->Show(false);
+
     InitInventoryContents(m_pLists[eSearchLootActorBagList],
         m_pLists[eSearchLootActorBagList] != m_pLists[eInventoryBagList]);
 

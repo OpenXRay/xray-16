@@ -192,7 +192,7 @@ void stalker_movement_manager_base::initialize()
 
 void stalker_movement_manager_base::set_desired_position(const Fvector* position)
 {
-    VERIFY2(!position || accessible(*position) || show_restrictions(&restrictions()), *object().cName());
+    VERIFY2(!position || accessible(*position) || show_restrictions(&restrictions()), object().cName().c_str());
     m_target.desired_position(position);
 }
 
@@ -276,7 +276,7 @@ void stalker_movement_manager_base::setup_movement_params(stalker_movement_param
                 Fvector vertex_position = ai().level_graph().vertex_position(level_path().dest_vertex_id());
                 VERIFY2(restrictions().accessible(vertex_position) || show_restrictions(&restrictions()),
                     make_string("vertex_id[%d],position[%f][%f][%f],object[%s]", vertex_id, VPUSH(vertex_position),
-                        *object().cName()));
+                        object().cName().c_str()));
                 detail().set_dest_position(vertex_position);
             }
         }
@@ -476,7 +476,7 @@ void stalker_movement_manager_base::parse_velocity_mask(stalker_movement_params&
         {
             CStalkerCombatPlanner& planner = smart_cast<CStalkerCombatPlanner&>(m_object->brain().current_action());
             if (planner.current_action_id() != StalkerDecisionSpace::eWorldOperatorKillWoundedEnemy)
-                Msg("~ stalker %s is doing bad thing (action %s)", *m_object->cName(),
+                Msg("~ stalker %s is doing bad thing (action %s)", m_object->cName().c_str(),
                     planner.current_action().m_action_name);
         }
 #endif // DEBUG
@@ -497,7 +497,7 @@ void stalker_movement_manager_base::parse_velocity_mask(stalker_movement_params&
     }
 
     VERIFY2((movement_params.m_mental_state != eMentalStateFree) || movement_params.m_body_state != eBodyStateCrouch,
-        *object().cName());
+        object().cName().c_str());
 
     switch (point.velocity & eVelocityMovementType)
     {
@@ -553,10 +553,10 @@ void stalker_movement_manager_base::set_nearest_accessible_position(Fvector desi
 
     VERIFY(ai().level_graph().inside(level_vertex_id, desired_position));
 
-    VERIFY2(restrictions().accessible(level_vertex_id) || show_restrictions(&restrictions()), *object().cName());
+    VERIFY2(restrictions().accessible(level_vertex_id) || show_restrictions(&restrictions()), object().cName().c_str());
     set_level_dest_vertex(level_vertex_id);
 
-    VERIFY2(restrictions().accessible(desired_position) || show_restrictions(&restrictions()), *object().cName());
+    VERIFY2(restrictions().accessible(desired_position) || show_restrictions(&restrictions()), object().cName().c_str());
     set_desired_position(&desired_position);
 }
 

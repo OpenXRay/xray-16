@@ -34,6 +34,13 @@ void CCar::script_register(lua_State* luaState)
             .def("SetExplodeTime", &CCar::SetExplodeTime)
             .def("ExplodeTime", &CCar::ExplodeTime)
             .def("CarExplode", &CCar::CarExplode)
+            // X-Ray Extensions:
+            .def("get_fuel", &CCar::GetfFuel)
+            .def("set_fuel", &CCar::SetfFuel)
+            .def("get_fuel_tank", &CCar::GetfFuelTank)
+            .def("set_fuel_tank", &CCar::SetfFuelTank)
+            .def("get_fuel_consumption", &CCar::GetfFuelConsumption)
+            .def("set_fuel_consumption", &CCar::SetfFuelConsumption)
             /***** added by Ray Twitty (aka Shadows) START *****/
             .def("GetfFuel", &CCar::GetfFuel)
             .def("SetfFuel", &CCar::SetfFuel)

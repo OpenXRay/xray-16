@@ -1026,10 +1026,6 @@ void xrRender_initconsole()
     //float ps_r2_dof_near = 0.f; // 0.f
     //float ps_r2_dof_focus = 1.4f; // 1.4f
 
-#ifdef DEBUG
-    CMD4(CCC_SunshaftsIntensity, "r__sunshafts_intensity", &SunshaftsIntensity, 0.f, 1.f);
-#endif
-
     CMD3(CCC_Mask, "r2_volumetric_lights", &ps_r2_ls_flags, R2FLAG_VOLUMETRIC_LIGHTS);
     //CMD3(CCC_Mask, "r2_sun_shafts", &ps_r2_ls_flags, R2FLAG_SUN_SHAFTS);
     CMD3(CCC_Token, "r2_sun_shafts", &ps_r_sun_shafts, qsun_shafts_token);

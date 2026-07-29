@@ -72,7 +72,9 @@ void CArtefact::Load(LPCSTR section)
 
     if (pSettings->section_exist(pSettings->r_string(section, "hit_absorbation_sect")))
     {
-        m_ArtefactHitImmunities.LoadImmunities(pSettings->r_string(section, "hit_absorbation_sect"), pSettings);
+        // SOC vs CS/COP are inverted, convert to CS/COP format.
+        const bool is_soc = GMLib.GetLibraryVersion() <= GAMEMTL_VERSION_SOC;
+        m_ArtefactHitImmunities.LoadImmunities(pSettings->r_string(section, "hit_absorbation_sect"), pSettings, is_soc);
     }
     m_bCanSpawnZone = !!pSettings->line_exist("artefact_spawn_zones", section);
     m_af_rank = pSettings->read_if_exists<u8>(section, "af_rank", 0);

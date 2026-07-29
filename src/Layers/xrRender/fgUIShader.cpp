@@ -113,6 +113,14 @@ void fgUIShader::destroy()
     }
 }
 
+bool fgUIShader::operator==(const IUIShader& other) const
+{
+    const auto* o = dynamic_cast<const fgUIShader*>(&other);
+    if (!o)
+        return false;
+    return SamePipelineAs(*o) && baseTexture == o->baseTexture;
+}
+
 CTexture* fgUIShader::GetBaseTexture() const
 {
     return m_baseTexture;

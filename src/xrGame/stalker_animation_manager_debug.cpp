@@ -101,8 +101,8 @@ void show_animations()
 
     Msg("frames starts animation                        animation_set");
     for (i = animations; i != e; ++i)
-        Msg("%6d %6d %-32s %s", (*i)->second.m_frame_count, (*i)->second.m_start_count, *(*i)->first.first,
-            *(*i)->first.second);
+        Msg("%6d %6d %-32s %s", (*i)->second.m_frame_count, (*i)->second.m_start_count, (*i)->first.first.c_str(),
+            (*i)->first.second.c_str());
 }
 
 void show_blends()
@@ -130,8 +130,8 @@ void show_blends()
         "    "
         "         animation_set2");
     for (i = blends; i != e; ++i)
-        Msg("%-32s %32s ->[%6d]-> %-32s %32s", *(*i)->first.second.second, *(*i)->first.second.first, (*i)->second,
-            *(*i)->first.first.first, *(*i)->first.first.second);
+        Msg("%-32s %32s ->[%6d]-> %-32s %32s", (*i)->first.second.second.c_str(), (*i)->first.second.first.c_str(), (*i)->second,
+            (*i)->first.first.first.c_str(), (*i)->first.first.second.c_str());
 }
 
 void show_animation_stats()
@@ -193,7 +193,7 @@ void CStalkerAnimationManager::add_animation_stats(
     const ANIMATION_ID& animation_id, const BLEND_ID* blend_id, bool just_started)
 {
     ::add_animation_stats(
-        animation_id.first, animation_id.second, *object().Visual()->getDebugName(), blend_id, just_started);
+        animation_id.first, animation_id.second, object().Visual()->getDebugName().c_str(), blend_id, just_started);
 }
 
 void CStalkerAnimationManager::add_animation_stats()

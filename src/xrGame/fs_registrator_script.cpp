@@ -15,7 +15,7 @@ LPCSTR update_path_script(CLocatorAPI* fs, LPCSTR initial, LPCSTR src)
     convert_path_separators(temp);
 #endif
     temp_2 = temp;
-    return *temp_2;
+    return temp_2.c_str();
 }
 
 //Alundaio: Set flag to rescan all files in path

@@ -561,7 +561,7 @@ BOOL game_sv_ArtefactHunt::OnTouch(u16 eid_who, u16 eid_what, BOOL bForced)
         if (W)
         {
             //---------------------------------------------------------------
-            if (IsBuyableItem(*e_what->s_name))
+            if (IsBuyableItem(e_what->s_name.c_str()))
                 return TRUE;
             //---------------------------------------------------------------
         }
@@ -1437,12 +1437,12 @@ void game_sv_ArtefactHunt::ReadOptions(shared_str& options)
 {
     inherited::ReadOptions(options);
     //-------------------------------
-    g_sv_ah_dwArtefactRespawnDelta = get_option_i(*options, "ardelta", g_sv_ah_dwArtefactRespawnDelta); // sec
-    g_sv_ah_dwArtefactsNum = get_option_i(*options, "anum", g_sv_ah_dwArtefactsNum);
-    g_sv_ah_dwArtefactStayTime = get_option_i(*options, "astime", g_sv_ah_dwArtefactStayTime);
+    g_sv_ah_dwArtefactRespawnDelta = get_option_i(options.c_str(), "ardelta", g_sv_ah_dwArtefactRespawnDelta); // sec
+    g_sv_ah_dwArtefactsNum = get_option_i(options.c_str(), "anum", g_sv_ah_dwArtefactsNum);
+    g_sv_ah_dwArtefactStayTime = get_option_i(options.c_str(), "astime", g_sv_ah_dwArtefactStayTime);
     g_sv_dm_dwFragLimit = 0;
     //----------------------------------------------------------------------------
-    g_sv_ah_iReinforcementTime = get_option_i(*options, "reinf", g_sv_ah_iReinforcementTime);
+    g_sv_ah_iReinforcementTime = get_option_i(options.c_str(), "reinf", g_sv_ah_iReinforcementTime);
     if (g_sv_ah_iReinforcementTime < 0)
         g_sv_ah_iReinforcementTime = -1;
     //----------------------------------------------------------------------------

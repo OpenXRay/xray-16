@@ -72,6 +72,8 @@ void CScriptGameObject::script_register(lua_State* luaState)
                 value("inventory_pda", int(GameObject::eInventoryPda)),
                 value("inventory_info", int(GameObject::eInventoryInfo)),
                 value("article_info", int(GameObject::eArticleInfo)),
+                value("task_state", int(GameObject::eTaskStateChange)),
+                value("map_location_added", int(GameObject::eMapLocationAdded)),
                 value("use_object", int(GameObject::eUseObject)),
                 value("hit", int(GameObject::eHit)),
                 value("sound", int(GameObject::eSound)),
@@ -88,7 +90,6 @@ void CScriptGameObject::script_register(lua_State* luaState)
                 value("on_item_take", int(GameObject::eOnItemTake)),
                 value("on_item_drop", int(GameObject::eOnItemDrop)),
                 value("script_animation", int(GameObject::eScriptAnimation)),
-                value("task_state", int(GameObject::eTaskStateChange)),
                 value("take_item_from_box", int(GameObject::eInvBoxItemTake)),
                 value("weapon_no_ammo", int(GameObject::eWeaponNoAmmoAvailable)),
 
@@ -121,7 +122,12 @@ void CScriptGameObject::script_register(lua_State* luaState)
                 value("item_to_ruck", int(GameObject::eItemToRuck)),
                 //-AVO
 
-                value("map_location_added", int(GameObject::eMapLocationAdded))
+                // X-Ray Extensions:
+                value("on_key_press", int(GameObject::eKeyPress)),
+                value("on_key_release", int(GameObject::eKeyRelease)),
+                value("on_key_hold", int(GameObject::eKeyHold)),
+                value("on_mouse_wheel", int(GameObject::eMouseWheel)),
+                value("on_mouse_move", int(GameObject::eMouseMove))
             ],
 
         def("buy_condition", (void (*)(CScriptIniFile*, pcstr))(&::buy_condition)),

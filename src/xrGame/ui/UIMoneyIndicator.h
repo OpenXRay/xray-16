@@ -10,7 +10,7 @@ class CUIMoneyIndicator final : public CUIWindow
 {
 public:
     CUIMoneyIndicator();
-    void InitFromXML(CUIXml& xml_doc);
+    bool InitFromXML(CUIXml& xml_doc);
     void SetMoneyAmount(pcstr money);
     void SetMoneyChange(pcstr money);
     void AddBonusMoney(KillMessageStruct& msg);

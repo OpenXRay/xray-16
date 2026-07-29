@@ -2,7 +2,7 @@
 #include "UIActorInfo.h"
 #include "UIXmlInit.h"
 
-#include "xrUICore/Windows/UITextFrameLineWnd.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrUICore/Static/UIAnimatedStatic.h"
 
 #include "Actor.h"
@@ -34,9 +34,9 @@ bool CUIActorInfoWnd::Init()
     CUIXmlInit::InitFrameWindow(uiXml, "chicon_frame_window", 0, UICharIconFrame);
     AttachChild(UICharIconFrame);
 
-    UICharIconHeader = xr_new<CUITextFrameLineWnd>();
+    UICharIconHeader = xr_new<CUIFrameLineWnd>("Character icon header");
     UICharIconHeader->SetAutoDelete(true);
-    CUIXmlInit::InitTextFrameLine(uiXml, "chicon_frame_line", 0, UICharIconHeader);
+    CUIXmlInit::InitFrameLine(uiXml, "chicon_frame_line", 0, UICharIconHeader);
     UICharIconFrame->AttachChild(UICharIconHeader);
 
     UIAnimatedIcon = xr_new<CUIAnimatedStatic>();
@@ -49,9 +49,9 @@ bool CUIActorInfoWnd::Init()
     CUIXmlInit::InitFrameWindow(uiXml, "info_frame_window", 0, UIInfoFrame);
     AttachChild(UIInfoFrame);
 
-    UIInfoHeader = xr_new<CUITextFrameLineWnd>();
+    UIInfoHeader = xr_new<CUIFrameLineWnd>("Info header");
     UIInfoHeader->SetAutoDelete(true);
-    CUIXmlInit::InitTextFrameLine(uiXml, "info_frame_line", 0, UIInfoHeader);
+    CUIXmlInit::InitFrameLine(uiXml, "info_frame_line", 0, UIInfoHeader);
     UIInfoFrame->AttachChild(UIInfoHeader);
 
     UIDetailList = xr_new<CUIScrollView>();
@@ -87,7 +87,8 @@ void CUIActorInfoWnd::Show(bool status)
     if (!status) return;
 
     UICharacterInfo->InitCharacter(Actor()->ID());
-    UICharIconHeader->SetText(Actor()->Name());
+    if (UICharIconHeader->GetTitleText())
+        UICharIconHeader->GetTitleText()->SetText(Actor()->Name());
     FillPointsInfo();
 }
 
@@ -197,13 +198,15 @@ void CUIActorInfoWnd::FillPointsDetail(const shared_str& id)
 
     if (id == "reputation") //reputation
     {
-        UIInfoHeader->GetTitleStatic()->SetTextST("st_detail_list_for_community_relations");
+        if (UICharIconHeader->GetTitleText())
+            UICharIconHeader->GetTitleText()->SetTextST("st_detail_list_for_community_relations");
         FillReputationDetails(&uiXml, path);
         return;
     }
     string256 str;
     xr_sprintf(str, "st_detail_list_for_%s", id.c_str());
-    UIInfoHeader->GetTitleStatic()->SetTextST(str);
+    if (UICharIconHeader->GetTitleText())
+        UICharIconHeader->GetTitleText()->SetTextST(str);
 
     SStatSectionData& section = Actor()->StatisticMgr().GetSection(id);
     vStatDetailData::const_iterator it = section.data.begin();
@@ -219,7 +222,7 @@ void CUIActorInfoWnd::FillPointsDetail(const shared_str& id)
         xr_sprintf(buff, "%d.", _cntr);
         itm->m_text0->SetText(buff);
 
-        itm->m_text1->SetTextST(*CStringTable().translate((*it).key));
+        itm->m_text1->SetTextST(CStringTable().translate((*it).key).c_str());
         itm->m_text1->AdjustHeightToText();
 
         if (0 == (*it).str_value.size())
@@ -268,7 +271,7 @@ void CUIActorInfoWnd::FillReputationDetails(CUIXml* xml, LPCSTR path)
         CUIActorStaticticDetail* itm = xr_new<CUIActorStaticticDetail>();
         itm->Init(xml, path, 0);
         comm.set(xml->Read(_list_node, "r", i, "unknown_community"));
-        itm->m_text1->SetTextST(*(comm.id()));
+        itm->m_text1->SetTextST(comm.id().c_str());
 
         CHARACTER_GOODWILL gw = RELATION_REGISTRY().GetCommunityGoodwill(comm.index(), Actor()->ID());
         gw += CHARACTER_COMMUNITY::relation(Actor()->Community(), comm.index());
