@@ -41,7 +41,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         return;
 
     float depth = g_Depth.Load(int3(pixel, 0));
-    if (depth >= 1.0)
+    if (depth <= 0.0)
     {
         u_DiffuseAlbedo[pixel] = float4(1.0, 1.0, 1.0, 1.0);
         u_SpecularAlbedo[pixel] = 0;
@@ -64,6 +64,10 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float3 diffAlb = albedo * (1.0 - metallic);
     float3 specAlb = EnvBRDFApprox2(F0, alpha, NoV);
     float specHit = max(g_NoisySpecular.Load(int3(pixel, 0)).a, 0.0);
+    float r2 = roughness * roughness;
+    float minFootprint = (0.15 + 4.5 * r2) / max(NoV, 0.12);
+    specHit = max(specHit, minFootprint);
+    specHit *= (1.0 + 5.0 * r2);
 
     u_DiffuseAlbedo[pixel] = float4(diffAlb, 1.0);
     u_SpecularAlbedo[pixel] = float4(specAlb, 1.0);

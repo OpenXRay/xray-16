@@ -275,12 +275,14 @@ void FGLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
     Device.mFullTransform.transform(clip, owner.vecLight);
     if (clip.w > 0.f)
     {
+        const float rw = float(passes::GetRenderWidth());
+        const float rh = float(passes::GetRenderHeight());
         m_sunValid = true;
-        m_sunPosPx.set((clip.x * 0.5f + 0.5f) * float(Device.dwWidth),
-            (1.f - (clip.y * 0.5f + 0.5f)) * float(Device.dwHeight));
+        m_sunPosPx.set((clip.x * 0.5f + 0.5f) * rw,
+            (1.f - (clip.y * 0.5f + 0.5f)) * rh);
         const float radius =
             owner.m_Current->m_Flags.is(CLensFlareDescriptor::flSource) ? owner.m_Current->m_Source.fRadius : 0.15f;
-        m_sunRadiusPx = radius * 0.25f * float(Device.dwHeight) / tanf(deg2rad(Device.fFOV) * 0.5f);
+        m_sunRadiusPx = radius * 0.25f * rh / tanf(deg2rad(Device.fFOV) * 0.5f);
         clamp(m_sunRadiusPx, 4.f, 96.f);
     }
 

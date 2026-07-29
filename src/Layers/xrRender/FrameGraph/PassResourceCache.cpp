@@ -129,18 +129,34 @@ nvrhi::ISampler* PassResourceCache::GetShadowCmpSampler(nvrhi::IDevice* device) 
 }
 
 nvrhi::ITexture* PassResourceCache::GetDummyShadowMap(nvrhi::IDevice* device) {
-    if (!m_dummyShadowMap) {
+    if (!m_dummyShadowMap && device) {
         nvrhi::TextureDesc desc;
         desc.width = 1;
         desc.height = 1;
-        desc.arraySize = 4;
+        desc.arraySize = 16;
         desc.format = nvrhi::Format::D32;
         desc.debugName = "DummyShadowMap";
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
         desc.dimension = nvrhi::TextureDimension::Texture2DArray;
         desc.isShaderResource = true;
+        desc.isRenderTarget = true;
+        desc.useClearValue = true;
+        desc.clearValue = nvrhi::Color(1.0f);
         m_dummyShadowMap = device->createTexture(desc);
+        if (m_dummyShadowMap) {
+            nvrhi::CommandListHandle cmd = device->createCommandList();
+            if (cmd) {
+                cmd->open();
+                for (u32 layer = 0; layer < desc.arraySize; ++layer)
+                    cmd->clearDepthStencilTexture(
+                        m_dummyShadowMap,
+                        nvrhi::TextureSubresourceSet(0, 1, layer, 1),
+                        true, 1.0f, false, 0);
+                cmd->close();
+                device->executeCommandList(cmd);
+            }
+        }
     }
     return m_dummyShadowMap;
 }
@@ -177,8 +193,9 @@ nvrhi::ITexture* PassResourceCache::GetDummyLocalShadowESM(nvrhi::IDevice* devic
         if (m_dummyLocalShadowESM) {
             nvrhi::CommandListHandle cmd = device->createCommandList();
             cmd->open();
-            cmd->clearTextureFloat(
-                m_dummyLocalShadowESM, nvrhi::AllSubresources, nvrhi::Color(1.f));
+            uint16_t one = 0x3C00;
+            for (u32 layer = 0; layer < 4; ++layer)
+                cmd->writeTexture(m_dummyLocalShadowESM, layer, 0, &one, sizeof(one));
             cmd->close();
             device->executeCommandList(cmd);
         }
@@ -234,6 +251,16 @@ nvrhi::ITexture* PassResourceCache::GetDummyContactHistory(nvrhi::IDevice* devic
         }
     }
     return m_dummyContactHistory;
+}
+
+void PassResourceCache::EnsureShadowBindDummies(nvrhi::IDevice* device) {
+    if (!device)
+        return;
+    GetDummyShadowMap(device);
+    GetDummyShadowMap2D(device);
+    GetDummyLocalShadowESM(device);
+    GetDummyContactDepth(device);
+    GetDummyContactHistory(device);
 }
 
 nvrhi::ITexture* PassResourceCache::GetDummyCubeMap(nvrhi::IDevice* device) {
@@ -540,8 +567,14 @@ nvrhi::IBuffer* PassResourceCache::GetOrCreateVolatileCB(
     u64 key = HashCombine(HashString(passName), HashString(bufferName));
     auto it = m_volatileCBs.find(key);
     if (it != m_volatileCBs.end()) {
-        m_stats.bufferHits++;
-        return device->GetNativeBuffer(it->second);
+        nvrhi::IBuffer* existing = device->GetNativeBuffer(it->second);
+        if (existing && existing->getDesc().maxVersions >= maxVersions &&
+            existing->getDesc().byteSize >= byteSize)
+        {
+            m_stats.bufferHits++;
+            return existing;
+        }
+        m_volatileCBs.erase(it);
     }
     m_stats.bufferMisses++;
 

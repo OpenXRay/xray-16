@@ -324,6 +324,57 @@ struct Fmatrix
         return *this;
     }
 
+    IC SelfRef build_projection_stdz(float fFOV, float fAspect, float fNearPlane, float fFarPlane)
+    {
+        float HAT = tanf(fFOV / 2.f);
+        VERIFY(_abs(fFarPlane - fNearPlane) > EPS_S);
+        VERIFY(_abs(HAT) > EPS_S);
+
+        float cot = 1.0f / HAT;
+        float w = fAspect * cot;
+        float h = 1.0f * cot;
+        float Q = fFarPlane / (fFarPlane - fNearPlane);
+
+        _11 = w;
+        _12 = 0;
+        _13 = 0;
+        _14 = 0;
+        _21 = 0;
+        _22 = h;
+        _23 = 0;
+        _24 = 0;
+        _31 = 0;
+        _32 = 0;
+        _33 = Q;
+        _34 = 1.0f;
+        _41 = 0;
+        _42 = 0;
+        _43 = -Q * fNearPlane;
+        _44 = 0;
+        return *this;
+    }
+
+    IC SelfRef build_projection_ortho_stdz(float w, float h, float zn, float zf)
+    {
+        _11 = 2.0f / w;
+        _12 = 0;
+        _13 = 0;
+        _14 = 0;
+        _21 = 0;
+        _22 = 2.0f / h;
+        _23 = 0;
+        _24 = 0;
+        _31 = 0;
+        _32 = 0;
+        _33 = 1.0f / (zf - zn);
+        _34 = 0;
+        _41 = 0;
+        _42 = 0;
+        _43 = zn / (zn - zf);
+        _44 = 1.0f;
+        return *this;
+    }
+
     IC SelfRef build_projection_ortho(float w, float h, float zn, float zf)
     {
         _11 = 2.0f / w;

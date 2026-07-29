@@ -84,6 +84,7 @@ public:
     void BuildLightBuffer(const light_Package& package);
     /// Pick top-N shadowed faces and pack tile index into GPULightData.w (call after collect, before Upload).
     void AssignLocalShadowTiles(const Fvector& cameraPos);
+    void ClearLocalShadowAssignments();
     void RefreshHudSpotXForms();
     void BuildDISampleTable();
     void Upload(nvrhi::ICommandList* cmdList);

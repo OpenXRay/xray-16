@@ -760,13 +760,12 @@ static void ZeroMetallicIfBlacklisted(ConvertedPBRTextures& converted, const xr_
 
 static bool InitializeAIPipeline() {
     if (g_ai_pipeline) {
-        return true;  // Already initialized
+        return true;
     }
 
-    // Initialize pipeline
     PBRPipelineConfig config;
     config.use_gpu = true;
-    config.verbose = true;  // Set to true for debugging
+    config.verbose = true;
 
     g_ai_pipeline.reset(xr_new<PBRPipeline>());
     if (!g_ai_pipeline->Initialize(config)) {
@@ -779,6 +778,15 @@ static bool InitializeAIPipeline() {
     g_ai_available = true;
     Msg("[PBRTextureConverter] AI pipeline initialized successfully");
     return true;
+}
+
+static void ShutdownAIPipeline() {
+    ScopeLock lock{ &g_ai_pipeline_mutex };
+    if (!g_ai_pipeline)
+        return;
+    g_ai_pipeline.reset();
+    g_ai_available = false;
+    Msg("[PBRTextureConverter] AI pipeline shut down (VRAM released)");
 }
 
 static xr_vector<u8> NearestNeighborUpscaleRGBA(
@@ -1369,6 +1377,13 @@ bool ConvertTexturesToPBR(
     PBRConversionStats& out_stats,
     ProgressCallback progress_callback)
 {
+    (void)params;
+    (void)progress_callback;
+    out_stats.textures_scanned = static_cast<u32>(inventory.assets.size());
+    out_stats.textures_skipped = out_stats.textures_scanned;
+    return true;
+
+#if 0
     if (inventory.assets.empty()) {
         return true;
     }
@@ -1725,7 +1740,12 @@ bool ConvertTexturesToPBR(
         out_stats.textures_failed,
         out_stats.conversion_time_seconds);
 
+#ifdef USE_AI_PBR
+    ShutdownAIPipeline();
+#endif
+
     return out_stats.textures_failed == 0;
+#endif
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1968,47 +1988,13 @@ bool ConvertSingleTextureToPBR(
     const char* relative_path,
     const PBRConversionParams& params)
 {
-    if (!FileExists(root_alias, relative_path))
-    {
-        Msg("! [PBRTextureConverter] Texture not found: %s/%s", root_alias, relative_path);
-        return false;
-    }
-
-    xr_string rel(relative_path);
-    xr_string base_name = rel;
-    if (const auto dot = base_name.find_last_of('.'); dot != xr_string::npos)
-        base_name = base_name.substr(0, dot);
-
-    xr_string pbr_path = base_name + "_pbr.dds";
-    if (FileExists(root_alias, pbr_path.c_str()))
-    {
-        Msg("~ [PBRTextureConverter] %s already exists, skipping", pbr_path.c_str());
-        return true;
-    }
-
-    LegacyTextureAsset asset;
-    asset.base_name = base_name;
-    asset.diffuse.root_alias = root_alias;
-    asset.diffuse.relative_path = relative_path;
-
-    TextureInventory inventory;
-    inventory.assets.push_back(std::move(asset));
-    inventory.total_textures = 1;
-
-    PBRConversionParams localParams = params;
-    localParams.output_root = root_alias;
-
-    PBRConversionStats stats;
-    if (!ConvertTexturesToPBR(inventory, localParams, stats, nullptr))
-    {
-        Msg("! [PBRTextureConverter] Conversion failed: %s", relative_path);
-        return false;
-    }
-
-    ConsolidationStats consolidationStats;
-    ConsolidatePBRTextures(root_alias, consolidationStats, nullptr);
-
-    return stats.textures_failed == 0;
+    (void)params;
+    xr_string pbr_path(relative_path);
+    if (const auto dot = pbr_path.find_last_of('.'); dot != xr_string::npos)
+        pbr_path = pbr_path.substr(0, dot) + "_pbr.dds";
+    else
+        pbr_path += "_pbr.dds";
+    return FileExists(root_alias, pbr_path.c_str());
 }
 
 } // namespace xray::render::pbr

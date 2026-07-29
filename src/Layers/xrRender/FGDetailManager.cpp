@@ -2239,7 +2239,7 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
         }
         decalPipeDesc.renderState.depthStencilState.depthTestEnable = true;
         decalPipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-        decalPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+        decalPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
         decalPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
         decalPipeDesc.renderState.rasterState.depthBias = -8;
         decalPipeDesc.renderState.rasterState.slopeScaledDepthBias = -1.f;

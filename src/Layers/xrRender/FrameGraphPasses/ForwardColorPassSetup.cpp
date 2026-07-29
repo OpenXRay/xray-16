@@ -63,7 +63,7 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
 
     auto& cache = framegraph::GetPassResourceCache();
 
-    state.bindlessLayout = cache.GetOrCreateBindingLayoutFromReflection("ForwardColor_PBR_v4_TranspCB", *vsResult.reflection, *psResult.reflection, nvDevice);
+    state.bindlessLayout = cache.GetOrCreateBindingLayoutFromReflection("ForwardColor_PBR_v5_DynHemi", *vsResult.reflection, *psResult.reflection, nvDevice);
 
     u32 attrCount = 0;
     auto* attrs = GetUnifiedVertexAttributes(attrCount);
@@ -92,23 +92,22 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
     pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
     pipeDesc.renderState.depthStencilState.depthTestEnable = true;
     pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-    state.bindlessPipeline = cache.GetOrCreatePipeline("ForwardColor_PBR_v4_TranspCB", pipeDesc, fbInfo, nvDevice);
+    state.bindlessPipeline = cache.GetOrCreatePipeline("ForwardColor_PBR_v5_DynHemi", pipeDesc, fbInfo, nvDevice);
     if (!state.bindlessPipeline) {
         Msg("! [BindlessForward] Failed to create pipeline");
         return;
     }
 
-    // After DepthPrepass: Equal + no write → Hi-Z rejects overdraw, skips redundant depth stores
     {
         nvrhi::GraphicsPipelineDesc equalDesc = pipeDesc;
         equalDesc.renderState.depthStencilState.depthWriteEnable = false;
-        equalDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
+        equalDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
         state.bindlessEqualPipeline = cache.GetOrCreatePipeline(
-            "ForwardColor_PBR_Equal_v1", equalDesc, fbInfo, nvDevice);
+            "ForwardColor_PBR_AfterDepth_v1", equalDesc, fbInfo, nvDevice);
     }
 
     QueryBindingLayoutFromPipeline(state.bindlessPipeline, state.bindlessLayout);
@@ -147,7 +146,7 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
     if (terrainPsResult.handle) {
         state.terrainPS = terrainPsResult.handle;
         state.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection(
-            "ForwardColor_Terrain_PBR_v3_CSMLadder", *vsResult.reflection, *terrainPsResult.reflection, nvDevice);
+            "ForwardColor_Terrain_PBR_v4_NoLmapRaster", *vsResult.reflection, *terrainPsResult.reflection, nvDevice);
 
         if (state.terrainLayout) {
             nvrhi::GraphicsPipelineDesc terrainPipeDesc;
@@ -161,17 +160,17 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
             terrainPipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
             terrainPipeDesc.renderState.depthStencilState.depthTestEnable = true;
             terrainPipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-            terrainPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+            terrainPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
             terrainPipeDesc.renderState.rasterState.frontCounterClockwise = false;
             terrainPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-            state.terrainPipeline = cache.GetOrCreatePipeline("ForwardColor_Terrain_PBR_v3_CSMLadder", terrainPipeDesc, fbInfo, nvDevice);
+            state.terrainPipeline = cache.GetOrCreatePipeline("ForwardColor_Terrain_PBR_v4_NoLmapRaster", terrainPipeDesc, fbInfo, nvDevice);
             if (state.terrainPipeline)
             {
                 nvrhi::GraphicsPipelineDesc terrainEqual = terrainPipeDesc;
                 terrainEqual.renderState.depthStencilState.depthWriteEnable = false;
-                terrainEqual.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
+                terrainEqual.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
                 state.terrainEqualPipeline = cache.GetOrCreatePipeline(
-                    "ForwardColor_Terrain_Equal_v2_CSMLadder", terrainEqual, fbInfo, nvDevice);
+                    "ForwardColor_Terrain_AfterDepth_v1", terrainEqual, fbInfo, nvDevice);
                 state.terrainInitialized = true;
             }
         }
@@ -217,14 +216,14 @@ static void renderBindlessForward(
     // ═══════════════════════════════════════════════════════
     //  SETUP FRAMEBUFFER AND RENDER STATE
     // ═══════════════════════════════════════════════════════
+    if (!normalRT || !baseColorRT || !worldPosRT)
+        return;
+
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.addColorAttachment(colorRT);
-    if (normalRT)
-        fbDesc.addColorAttachment(normalRT);
-    if (baseColorRT)
-        fbDesc.addColorAttachment(baseColorRT);
-    if (worldPosRT)
-        fbDesc.addColorAttachment(worldPosRT);
+    fbDesc.addColorAttachment(normalRT);
+    fbDesc.addColorAttachment(baseColorRT);
+    fbDesc.addColorAttachment(worldPosRT);
     fbDesc.setDepthAttachment(depthRT);
     auto& cache = framegraph::GetPassResourceCache();
     auto framebuffer = cache.GetOrCreateFramebuffer("ForwardColor", fbDesc, nvDevice);
@@ -670,10 +669,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
             data.color = passBuilder.readWrite(colorInput, ResourceState::RenderTarget);
             data.normal = passBuilder.write(normalInput, ResourceState::RenderTarget);
-            if (baseColorInput.is_valid())
-                data.baseColor = passBuilder.write(baseColorInput, ResourceState::RenderTarget);
-            if (worldPosInput.is_valid())
-                data.worldPos = passBuilder.write(worldPosInput, ResourceState::RenderTarget);
+            data.baseColor = passBuilder.write(baseColorInput, ResourceState::RenderTarget);
+            data.worldPos = passBuilder.write(worldPosInput, ResourceState::RenderTarget);
 
             if (drawArgsInput.is_valid()) {
                 data.drawArgsBuffer = passBuilder.read(drawArgsInput, ResourceState::IndirectArgument);
@@ -713,14 +710,14 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
             auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
 
-            if (!depthRT || !colorRT)
+            if (!depthRT || !colorRT || !normalRT || !baseColorRT || !worldPosRT)
                 return;
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             if (cmdList) {
                 // DepthPrepass already cleared+filled depth — clearing here would kill early-Z.
                 if (!ps_r_depth_prepass)
-                    cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 1.0f, false, 0);
+                    cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
                 if (normalRT)
                     cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
                 if (baseColorRT)

@@ -45,7 +45,7 @@ float4 main(PS_INPUT I) : SV_Target
     float rawDepth = g_Depth.SampleLevel(smp_point, uv, 0).x;
 
     float depth = ViewZFromDepth(uv, rawDepth);
-    if (depth <= EPSDEPTHDOF || rawDepth >= 0.9995)
+    if (depth <= EPSDEPTHDOF || rawDepth <= 1e-7)
         depth = dof_params.w;
 
     float blur = DOFFactor(depth);
@@ -79,7 +79,7 @@ float4 main(PS_INPUT I) : SV_Target
         float3 tapColor = g_Color.SampleLevel(smp_rtlinear, tap, 0).rgb;
         float tapRaw = g_Depth.SampleLevel(smp_point, tap, 0).x;
         float tapDepth = ViewZFromDepth(tap, tapRaw);
-        if (tapDepth <= EPSDEPTHDOF || tapRaw >= 0.9995)
+        if (tapDepth <= EPSDEPTHDOF || tapRaw <= 1e-7)
             tapDepth = dof_params.w;
         float tapContrib = DOFFactor(tapDepth);
         sum += tapColor * tapContrib;

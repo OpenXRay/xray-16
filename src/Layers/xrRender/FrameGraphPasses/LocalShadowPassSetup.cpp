@@ -31,7 +31,7 @@ namespace xray::render::fg::passes
 
 void InitializeLocalShadowPass(fg::RenderDevice* device, LocalShadowPassState& state)
 {
-    if (!device)
+    if (!device || state.allocFailed)
         return;
 
     const u32 res = xray::render::fg::LocalShadowAtlasSize();
@@ -41,8 +41,7 @@ void InitializeLocalShadowPass(fg::RenderDevice* device, LocalShadowPassState& s
     if (state.initialized && state.enabled && state.resolution == res &&
         state.sliceCount == pages && state.atlas && state.staticCacheTex &&
         state.cascadeCB && state.cascadeCBMaxVersions >= kLocalCascadeCBVersions &&
-        state.clearDepthPipeline && state.localSkinIndirectArgs && state.esmCB &&
-        state.esmConvertPipeline && state.esmBlurPipeline)
+        state.clearDepthPipeline && state.localSkinIndirectArgs && state.esmCB)
         return;
 
     if (state.initialized)
@@ -75,20 +74,38 @@ void InitializeLocalShadowPass(fg::RenderDevice* device, LocalShadowPassState& s
     for (u32 i = 0; i < MAX_LOCAL_SHADOW_PAGES; ++i)
         state.pageFramebuffers[i] = nullptr;
 
-    auto* resMgr = device->GetFGResourceManager();
     nvrhi::IDevice* nv = device->GetNVRHIDevice();
-    if (!resMgr || !resMgr->GetRTFactory() || !resMgr->GetTextureManager() || !nv)
+    if (!nv)
     {
         state.initialized = true;
         state.enabled = false;
+        state.allocFailed = true;
         return;
     }
 
     state.resolution = res;
     state.sliceCount = pages;
-    state.atlasHandle = resMgr->GetRTFactory()->CreateCascadedShadowMap(
-        res, pages, true, "rt_LocalShadowAtlas");
-    state.atlas = resMgr->GetTextureManager()->GetNVRHITexture(state.atlasHandle);
+    {
+        nvrhi::TextureDesc td;
+        td.width = res;
+        td.height = res;
+        td.depth = 1;
+        td.arraySize = pages;
+        td.mipLevels = 1;
+        td.format = nvrhi::Format::D32;
+        td.dimension = nvrhi::TextureDimension::Texture2DArray;
+        td.isRenderTarget = true;
+        td.isTypeless = true;
+        td.isShaderResource = true;
+        td.useClearValue = true;
+        td.clearValue = nvrhi::Color(1.0f);
+        td.initialState = nvrhi::ResourceStates::ShaderResource;
+        td.keepInitialState = true;
+        td.debugName = "rt_LocalShadowAtlas";
+        state.atlasOwned = nv->createTexture(td);
+        state.atlas = state.atlasOwned;
+        state.atlasHandle = {};
+    }
 
     {
         nvrhi::TextureDesc td;
@@ -266,14 +283,24 @@ void InitializeLocalShadowPass(fg::RenderDevice* device, LocalShadowPassState& s
     }
 
     state.initialized = true;
-    state.enabled = (state.atlas != nullptr && state.cascadeCB != nullptr && state.cullDoneMarker != nullptr);
+    state.enabled = (state.atlas != nullptr && state.cascadeCB != nullptr && state.cullDoneMarker != nullptr &&
+        state.clearDepthPipeline != nullptr && state.staticCacheTex != nullptr);
     if (state.enabled)
+    {
+        if (nvrhi::IDevice* nvDev = device ? device->GetNVRHIDevice() : nullptr)
+            framegraph::GetPassResourceCache().EnsureShadowBindDummies(nvDev);
         Msg("* [LocalShadow] Init: OK (%ux%u × %u pages, CB versions %u, clear=%d, static=%d, esmTex=%d, esmPipe=%d/%d)",
             res, res, pages, state.cascadeCBMaxVersions, state.clearDepthPipeline ? 1 : 0,
             state.staticCacheTex ? 1 : 0, state.esmAtlasTex ? 1 : 0,
             state.esmConvertPipeline ? 1 : 0, state.esmBlurPipeline ? 1 : 0);
+    }
     else
-        Msg("! [LocalShadow] Failed to create local shadow atlas/CB");
+    {
+        Msg("! [LocalShadow] Failed to create local shadow atlas/CB — lights stay unshadowed");
+        state.allocFailed = true;
+        state.atlasOwned = nullptr;
+        state.atlas = nullptr;
+    }
 }
 
 void ShutdownLocalShadowPass(fg::RenderDevice* device, LocalShadowPassState& state)
@@ -284,7 +311,9 @@ void ShutdownLocalShadowPass(fg::RenderDevice* device, LocalShadowPassState& sta
             device->GetFGResourceManager()->GetRTFactory()->ReleaseRenderTarget(state.atlasHandle);
     }
     state.atlasHandle = {};
+    state.atlasOwned = nullptr;
     state.atlas = nullptr;
+    state.allocFailed = false;
     state.staticCache = nullptr;
     state.staticCacheTex = nullptr;
     state.esmAtlas = nullptr;
@@ -344,6 +373,8 @@ LocalShadowOutputs setupLocalShadowPass(
     InitializeLocalShadowPass(device, state);
     if (!state.enabled || !state.atlas || !state.cascadeCB || !state.cullDoneMarker ||
         !shadowState.enabled || !shadowState.pipeline)
+        return outputs;
+    if (!bindlessConfig.UseGPUCulling() || !bindlessConfig.UseMegaBuffers())
         return outputs;
 
     nvrhi::IDevice* nvInit = device->GetNVRHIDevice();
@@ -461,6 +492,12 @@ LocalShadowOutputs setupLocalShadowPass(
             if (!vsRefl || !psRefl || !drawIndexBuffer || !st.pipeline || !st.layout || !ls.cascadeCB)
                 return;
 
+            {
+                ShadowCascadeCB priming{};
+                priming.lightVP.identity();
+                cmd->writeBuffer(ls.cascadeCB, &priming, sizeof(priming));
+            }
+
             auto& cache = GetPassResourceCache();
             auto& matBuffer = bindless::MaterialBuffer::Instance();
             matBuffer.Upload(ctx);
@@ -520,6 +557,22 @@ LocalShadowOutputs setupLocalShadowPass(
             const u32 maxSlots = data.gpuCulling->GetLocalShadowCullSlotCount();
             const u32 maxTilesThisFrame = static_cast<u32>(tilesRef.size());
             u32 tilesDrawn = 0;
+
+            for (u32 slot = 0; slot < maxSlots; ++slot)
+            {
+                for (u32 si = 0; si < 3; ++si)
+                {
+                    if (auto* b = data.gpuCulling->MutLocalShadowSlotDrawBinding(slot, si))
+                        *b = nullptr;
+                    if (auto* s = data.gpuCulling->MutLocalShadowSlotDrawSrcInstance(slot, si))
+                        *s = nullptr;
+                }
+            }
+            ls.skin1w.bindingSet = nullptr;
+            ls.skinHq.bindingSet = nullptr;
+            ls.skin2w.bindingSet = nullptr;
+            ls.skin3w.bindingSet = nullptr;
+            ls.skin4w.bindingSet = nullptr;
 
             struct LocalSkinDraw
             {

@@ -57,8 +57,8 @@ static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::Fram
     posAttr.elementStride = sizeof(Fvector);
     state.inputLayout = nvDevice->createInputLayout(&posAttr, 1, state.vs);
 
-    state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "Decal_v2", *vsResult.reflection, *psResult.reflection, nvDevice);
+        state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "Decal_v3", *vsResult.reflection, *psResult.reflection, nvDevice);
 
     auto makePipe = [&](const char* name, bool multiply) -> nvrhi::GraphicsPipelineHandle {
         nvrhi::GraphicsPipelineDesc pipeDesc;
@@ -98,8 +98,8 @@ static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::Fram
         return cache.GetOrCreatePipeline(name, pipeDesc, fbInfo, nvDevice);
     };
 
-    state.multiplyPipeline = makePipe("DecalMult_v2", true);
-    state.alphaPipeline = makePipe("DecalAlpha_v2", false);
+    state.multiplyPipeline = makePipe("DecalMult_v3", true);
+    state.alphaPipeline = makePipe("DecalAlpha_v3", false);
     state.initialized = state.multiplyPipeline != nullptr && state.alphaPipeline != nullptr;
 }
 
@@ -192,7 +192,7 @@ DefaultOutputLayout setupDecalPass(
                 bsb.ConstantBuffer("static_globals", staticGlobalsCB);
                 bsb.ConstantBuffer("DecalDrawCB", drawCB);
                 bsb.BufferSRV("g_Decals", data.decalMgr->GetDecalBuffer());
-                bsb.Texture("g_Depth", depthTex);
+                bsb.Texture("g_Depth", depthTex, nvrhi::Format::R32_FLOAT);
                 bsb.Texture("g_WorldPos", worldPosTex);
                 BindBindlessMaterialTables(bsb);
 

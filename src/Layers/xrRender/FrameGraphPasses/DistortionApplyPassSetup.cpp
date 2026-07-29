@@ -44,7 +44,7 @@ void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassSt
     auto& cache = GetPassResourceCache();
 
     state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "DistortionApply_v8_HudDilate", *vsResult.reflection, *psResult.reflection, device);
+        "DistortionApply_v10", *vsResult.reflection, *psResult.reflection, device);
 
     if (state.bindingLayout) {
         nvrhi::GraphicsPipelineDesc pipeDesc;
@@ -60,7 +60,7 @@ void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassSt
         nvrhi::FramebufferInfoEx fbInfo;
         fbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
 
-        state.pipeline = cache.GetOrCreatePipeline("DistortionApply_v8_HudDilate", pipeDesc, fbInfo, device);
+        state.pipeline = cache.GetOrCreatePipeline("DistortionApply_v10", pipeDesc, fbInfo, device);
     }
     state.initialized = true;
 }

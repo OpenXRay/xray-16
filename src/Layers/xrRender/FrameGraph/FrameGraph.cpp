@@ -993,15 +993,16 @@ void FrameGraph::AllocateResources() {
                 resources::TextureHandle rmHandle = m_resourcePool->AllocateTexture(rmTexDesc);
 
                 if (rmHandle.IsValid()) {
-                    // Store ResourceManager handle for lifecycle management
                     resource.resourceTexture = rmHandle;
 
-                    // Get the NVRHI texture for immediate use
                     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
                     resource.nvrhiTexture = texManager->GetNVRHITexture(rmHandle);
-                    resource.isAllocated = (resource.nvrhiTexture != nullptr);
-                    totalMemoryAllocated += resource.memorySize;
-                    continue;
+                    if (resource.nvrhiTexture) {
+                        resource.isAllocated = true;
+                        totalMemoryAllocated += resource.memorySize;
+                        continue;
+                    }
+                    resource.resourceTexture = {};
                 }
             }
 

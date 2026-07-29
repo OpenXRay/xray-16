@@ -562,6 +562,11 @@ float SampleCSM_Volumetric(float3 worldPos)
 	return result * rangeFade;
 }
 
+float SampleCSM_SunShafts(float3 worldPos)
+{
+	return SampleCSM_Volumetric(worldPos);
+}
+
 // Overload without a normal (volumetric march, debug): no normal-offset bias.
 float SampleCSM(float3 worldPos)
 {
@@ -625,6 +630,11 @@ float SampleCSM_Fast(float3 worldPos, float3 N)
 }
 
 float SampleCSM_Volumetric(float3 worldPos)
+{
+	return 1.0;
+}
+
+float SampleCSM_SunShafts(float3 worldPos)
 {
 	return 1.0;
 }

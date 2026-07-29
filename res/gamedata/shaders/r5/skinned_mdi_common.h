@@ -10,6 +10,11 @@ struct SkinnedDrawRecord
     uint splatOffset;
     uint splatCount;
     uint pad;
+    float4x4 prevWorld;
+    uint prevBoneOffset;
+    uint prevValid;
+    uint pad1;
+    uint pad2;
 };
 
 StructuredBuffer<SkinnedDrawRecord> g_SkinnedRecords : register(t14);

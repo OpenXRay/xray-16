@@ -40,7 +40,7 @@ float3 YCoCgToRGB(float3 c)
 // Closest-depth motion dilation (foreground MV wins at edges)
 float2 DilatedMotion(float2 uv, float2 texel)
 {
-    float bestDepth = 1.0;
+    float bestDepth = -1.0;
     float2 bestMotion = g_Motion.SampleLevel(smp_point, uv, 0).xy;
     [unroll]
     for (int y = -1; y <= 1; ++y)
@@ -50,7 +50,7 @@ float2 DilatedMotion(float2 uv, float2 texel)
         {
             float2 suv = saturate(uv + float2(x, y) * texel);
             float d = g_Depth.SampleLevel(smp_point, suv, 0).x;
-            if (d < bestDepth)
+            if (d > bestDepth)
             {
                 bestDepth = d;
                 bestMotion = g_Motion.SampleLevel(smp_point, suv, 0).xy;
@@ -150,7 +150,7 @@ float4 main(PS_INPUT I) : SV_Target
 
     float3 current = g_Current.SampleLevel(smp_rtlinear, saturate(uvUnjitter), 0).rgb;
     float depth = g_Depth.SampleLevel(smp_point, uv, 0).x;
-    if (depth >= 0.9995 || blendAlpha >= 0.999)
+    if (depth <= 1e-7 || blendAlpha >= 0.999)
         return float4(current, 1.0);
 
     float2 motion = DilatedMotion(uv, texel);

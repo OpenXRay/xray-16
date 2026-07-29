@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TAAPassSetup.h"
+#include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
@@ -40,7 +41,7 @@ static float Halton(u32 index, u32 base)
 void ApplyTAAJitter()
 {
     g_taa_unjittered_full_transform = Device.mFullTransform;
-    g_taa_unjittered_inv_full_transform = Device.mInvFullTransform;
+    g_taa_unjittered_inv_full_transform.invert_44(g_taa_unjittered_full_transform);
 
     g_taa_jitter_prev_px = g_taa_jitter_px;
     g_taa_jitter_prev_py = g_taa_jitter_py;
@@ -59,14 +60,14 @@ void ApplyTAAJitter()
     g_taa_jitter_px = jx;
     g_taa_jitter_py = jy;
 
-    const float w = float(std::max(1u, Device.dwWidth));
-    const float h = float(std::max(1u, Device.dwHeight));
+    const float w = float(std::max(1u, GetRenderWidth()));
+    const float h = float(std::max(1u, GetRenderHeight()));
     Fmatrix jitterMat;
     jitterMat.identity();
     jitterMat._31 = (jx * 2.f) / w;
     jitterMat._32 = (jy * 2.f) / h;
     Device.mFullTransform.mul(jitterMat, g_taa_unjittered_full_transform);
-    Device.mInvFullTransform.invert(Device.mFullTransform);
+    Device.mInvFullTransform.invert_44(Device.mFullTransform);
 }
 
 namespace

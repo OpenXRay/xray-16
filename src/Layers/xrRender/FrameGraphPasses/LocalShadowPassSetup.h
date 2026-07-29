@@ -77,6 +77,8 @@ struct LocalShadowPassState
     u32 sliceCount = 0;
     bool initialized = false;
     bool enabled = false;
+    bool allocFailed = false;
+    nvrhi::TextureHandle atlasOwned;
 };
 
 struct LocalShadowOutputs

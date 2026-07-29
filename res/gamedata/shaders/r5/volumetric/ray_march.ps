@@ -32,7 +32,7 @@ float4 main(PS_INPUT input) : SV_Target
 	float3 worldPos;
 	float sceneDist = SampleDepthViewZ(input.texcoord, worldPos);
 
-	const bool isSky = (rawDepth >= 0.9995);
+	const bool isSky = (rawDepth <= 1e-7);
 	// Cap sky march; keep terrain march to actual depth
 	sceneDist = min(sceneDist, isSky ? min(cb_Far * 0.25, 120.0) : cb_Far);
 

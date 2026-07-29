@@ -49,7 +49,7 @@ void ComputeTopDownRainMatrices(float extent, float height, u32 smapRes, Fmatrix
     view.build_camera_dir(eye, dir, up);
 
     Fmatrix proj;
-    proj.build_projection_ortho(e * 2.f, e * 2.f, 1.f, height + 120.f);
+    proj.build_projection_ortho_stdz(e * 2.f, e * 2.f, 1.f, height + 120.f);
 
     outClipVP.mul(proj, view);
 
@@ -212,6 +212,8 @@ RainShadowOutputs setupRainShadowPass(
 
     InitializeRainShadowPass(device, state);
     if (!state.enabled || !state.rainSM || !state.rainPipeline || !state.rainLayout || !state.rainCB)
+        return outputs;
+    if (!bindlessConfig.UseGPUCulling() || !bindlessConfig.UseMegaBuffers())
         return outputs;
 
     const bool rtWet = (ps_r_rt_gi != 0) || (ps_r_path_tracer != 0);

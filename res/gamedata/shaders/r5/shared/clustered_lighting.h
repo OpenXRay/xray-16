@@ -162,17 +162,28 @@ float3 EvaluateClusteredLights(
             if (texIdx != 0xFFFFFFFFu)
             {
                 float4 projPos = mul(light.spotVP, float4(worldPos, 1.0));
-                if (projPos.w > 0)
+                float3 spotDir = light.directionAndSpotScale.xyz;
+                float spotScale = light.directionAndSpotScale.w;
+                float spotOffset = light.spotParamsAndType.x;
+                float cone = SpotLightAttenuation(toLight, spotDir, spotScale, spotOffset);
+                if (projPos.w > 1e-4)
                 {
                     float2 projUV = projPos.xy / projPos.w * 0.5 + 0.5;
                     projUV.y = 1.0 - projUV.y;
-                    Texture2D spotTex = GetBindlessTexture(texIdx);
-                    float4 texSample = spotTex.SampleLevel(smp_rtlinear, projUV, 0);
-                    atten *= texSample.r;
+                    if (all(projUV >= 0.0) && all(projUV <= 1.0))
+                    {
+                        Texture2D spotTex = GetBindlessTexture(texIdx);
+                        float4 texSample = spotTex.SampleLevel(smp_rtlinear, projUV, 0);
+                        atten *= texSample.r * cone;
+                    }
+                    else
+                    {
+                        atten = 0.0;
+                    }
                 }
                 else
                 {
-                    atten = 0;
+                    atten = 0.0;
                 }
             }
             else
@@ -187,7 +198,7 @@ float3 EvaluateClusteredLights(
         if (atten > 0.001f)
         {
             float shadow = 1.0;
-            if (light.localShadowRect.w > 0.5)
+            if (light.localShadowRect.w > 0.5 && invRangeSq >= 0.0)
             {
                 float soft = (lightType > 0.5f)
                     ? max(dev_param_1.z, 0.1)

@@ -26,9 +26,12 @@ void main(uint3 tid : SV_GroupThreadID)
     float a = float(tid.x) * 2.39996323;
     float2 p = sun_pos_px + r * float2(cos(a), sin(a));
 
-    uint vis = 1;
+    uint vis = 0;
     if (p.x >= 0.0 && p.y >= 0.0 && p.x < dim_x && p.y < dim_y)
-        vis = (g_Depth.Load(int3(int2(p), 0)) <= 0.0) ? 1 : 0;
+    {
+        float d = g_Depth.Load(int3(int2(p), 0));
+        vis = (d <= 1e-7) ? 1 : 0;
+    }
 
     InterlockedAdd(gs_visible, vis);
     GroupMemoryBarrierWithGroupSync();

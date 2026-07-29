@@ -30,6 +30,7 @@ framegraph::VirtualResourceHandle setupContactShadowsPass(
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle sceneColor,
     framegraph::VirtualResourceHandle depth,
+    framegraph::VirtualResourceHandle worldPos,
     framegraph::VirtualResourceHandle motionVectors,
     u32 width,
     u32 height,

@@ -36,7 +36,7 @@ float2 DilatedMotion(float2 uv, float2 texel)
                 continue;
             float2 suv = uv + float2(x, y) * texel;
             float z = g_Depth.SampleLevel(smp_nofilter, suv, 0).x;
-            if (z < bestZ)
+            if (z > bestZ)
             {
                 bestZ = z;
                 bestM = g_Motion.SampleLevel(smp_nofilter, suv, 0).xy;
@@ -66,7 +66,7 @@ float4 main(PS_INPUT I) : SV_Target
     float4 curr = g_Current.SampleLevel(smp_nofilter, uv, 0);
     float depth = g_Depth.SampleLevel(smp_nofilter, uv, 0).x;
 
-    if (depth >= 0.9995)
+    if (depth <= 1e-7)
         return float4(0, 0, 0, 0);
 
     if (hasHistory < 0.5)

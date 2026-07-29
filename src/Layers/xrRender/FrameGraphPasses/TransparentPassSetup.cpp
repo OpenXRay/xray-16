@@ -76,11 +76,11 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
     pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
     pipeDesc.renderState.depthStencilState.depthTestEnable = true;
     pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
-    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-    pipeDesc.renderState.rasterState.depthBias = -16;
-    pipeDesc.renderState.rasterState.slopeScaledDepthBias = -2.f;
+    pipeDesc.renderState.rasterState.depthBias = 16;
+    pipeDesc.renderState.rasterState.slopeScaledDepthBias = 2.f;
 
     auto& rt0 = pipeDesc.renderState.blendState.targets[0];
     rt0.blendEnable = true;
@@ -93,7 +93,7 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
     for (u32 rt = 1; rt < 4; ++rt)
         pipeDesc.renderState.blendState.targets[rt].setColorWriteMask(nvrhi::ColorMask(0));
 
-    state.pipeline = cache.GetOrCreatePipeline("TransparentPass_v3_AlphaBias", pipeDesc, fbInfo, nvDevice);
+    state.pipeline = cache.GetOrCreatePipeline("TransparentPass_v4_RevZBias", pipeDesc, fbInfo, nvDevice);
     if (!state.pipeline)
         return;
 
@@ -107,7 +107,7 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
         mulRt.srcBlendAlpha = nvrhi::BlendFactor::Zero;
         mulRt.destBlendAlpha = nvrhi::BlendFactor::One;
         mulRt.blendOpAlpha = nvrhi::BlendOp::Add;
-        state.multiplyPipeline = cache.GetOrCreatePipeline("TransparentPass_v3_MultiplyBias", mulDesc, fbInfo, nvDevice);
+        state.multiplyPipeline = cache.GetOrCreatePipeline("TransparentPass_v4_MultiplyRevZBias", mulDesc, fbInfo, nvDevice);
     }
 
     QueryBindingLayoutFromPipeline(state.pipeline, state.layout);
@@ -121,7 +121,7 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
             state.waterVs = waterVs.handle;
             state.waterPs = waterPs.handle;
             state.waterLayout = cache.GetOrCreateBindingLayoutFromReflection(
-                "TransparentWater_v18_Murk", *waterVs.reflection, *waterPs.reflection, nvDevice);
+                "TransparentWater_v19_SSR", *waterVs.reflection, *waterPs.reflection, nvDevice);
             if (state.waterLayout)
             {
                 nvrhi::GraphicsPipelineDesc waterDesc = pipeDesc;
@@ -140,7 +140,7 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
                         nvrhi::ColorMask::Red | nvrhi::ColorMask::Green |
                         nvrhi::ColorMask::Blue | nvrhi::ColorMask::Alpha);
                 }
-                state.waterPipeline = cache.GetOrCreatePipeline("TransparentWater_v18_Murk", waterDesc, fbInfo, nvDevice);
+                state.waterPipeline = cache.GetOrCreatePipeline("TransparentWater_v19_SSR", waterDesc, fbInfo, nvDevice);
             }
             waterVs.reflection = nullptr;
             waterPs.reflection = nullptr;
@@ -173,7 +173,7 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
                 distortDesc.primType = nvrhi::PrimitiveType::TriangleList;
                 distortDesc.renderState.depthStencilState.depthTestEnable = true;
                 distortDesc.renderState.depthStencilState.depthWriteEnable = false;
-                distortDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+                distortDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
                 distortDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
                 auto& drt = distortDesc.renderState.blendState.targets[0];
                 drt.blendEnable = true;
@@ -247,10 +247,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
-            if (inputs.baseColor.is_valid())
-                data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
-            if (inputs.worldPos.is_valid())
-                data.worldPos = passBuilder.readWrite(inputs.worldPos, ResourceState::RenderTarget);
+            data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
+            data.worldPos = passBuilder.readWrite(inputs.worldPos, ResourceState::RenderTarget);
             for (u32 i = 0; i < 3; ++i) {
                 if (config.shadowHZBHandles[i].is_valid())
                     passBuilder.read(config.shadowHZBHandles[i], ResourceState::ShaderResource);
@@ -289,15 +287,14 @@ framegraph::DefaultOutputLayout setupTransparentPass(
 
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
             auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
+            if (!normalRT || !baseColorRT || !worldPosRT)
+                return;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
-            if (normalRT)
-                fbDesc.addColorAttachment(normalRT);
-            if (baseColorRT)
-                fbDesc.addColorAttachment(baseColorRT);
-            if (worldPosRT)
-                fbDesc.addColorAttachment(worldPosRT);
+            fbDesc.addColorAttachment(normalRT);
+            fbDesc.addColorAttachment(baseColorRT);
+            fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = framegraph::GetPassResourceCache();
             auto framebuffer = cache.GetOrCreateFramebuffer("TransparentPass", fbDesc, nvDevice);

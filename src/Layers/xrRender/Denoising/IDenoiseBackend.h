@@ -38,7 +38,7 @@ struct DenoiseInputs
     float jitterPrevX = 0.f;
     float jitterPrevY = 0.f;
     float exposure = 1.f;
-    float nearZ = 0.2f;
+    float nearZ = 0.001f;
     float farZ = 500.f;
     float viewToClip[16] = {};
     float viewToClipPrev[16] = {};

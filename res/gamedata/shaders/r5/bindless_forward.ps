@@ -33,6 +33,7 @@ struct PS_INPUT
     float3 bitangent : TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;
     float hemi : TEXCOORD6;
+    float2 lmUV : TEXCOORD7;
 };
 
 struct PS_OUTPUT
@@ -40,6 +41,7 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
     float4 baseColor : SV_Target2;
+    float4 worldPos : SV_Target3;
 };
 
 PS_OUTPUT main(PS_INPUT input)
@@ -126,8 +128,22 @@ PS_OUTPUT main(PS_INPUT input)
         ApplySSSMapSample(sssS, sssStrength, sssTint, sssThickness, sssMask, sssProfile);
     }
 
+    float hemi = input.hemi;
+    if (hemi < 0.0)
+        hemi = (parallax.w < -0.5) ? 0.0 : calc_model_hemi(N) * 0.35;
+    float sunOcc = 1.0;
+    if ((mat.flags & MAT_FLAG_HAS_LMAP) != 0 && mat.lmapIndex != INVALID_TEXTURE_INDEX
+        && dot(input.lmUV, input.lmUV) > 1e-8)
+    {
+        float4 lmh = GetBindlessTexture(mat.lmapIndex).Sample(smp_linear, input.lmUV);
+        float bakedHemi = saturate(lmh.a);
+        hemi = max(saturate(hemi), bakedHemi);
+#if !defined(CSM_SHADOW_FORWARD)
+        sunOcc = saturate(lmh.g);
+#endif
+    }
     f_forward fwd = output_forward_pbr(
-        albedo, N, input.worldPos, metallic, roughness, ao, input.position, input.hemi, 1.0,
+        albedo, N, input.worldPos, metallic, roughness, ao, input.position, hemi, sunOcc,
         sssStrength, sssTint, sssThickness, sssMask, sssProfile);
     if (mat.flags & MAT_FLAG_MULTIPLY)
     {
@@ -145,6 +161,7 @@ PS_OUTPUT main(PS_INPUT input)
     }
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
+    output.worldPos = fwd.worldPos;
     return output;
 }
 

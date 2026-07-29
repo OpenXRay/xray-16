@@ -140,7 +140,13 @@ struct TextureMetadata {
     }
 
     bool CanEvict() const {
-        return priority >= TexturePriority::Low &&
+        return priority >= TexturePriority::Medium &&
+               refCount == 0 &&
+               state == TextureState::Resident;
+    }
+
+    bool CanForceEvict() const {
+        return priority >= TexturePriority::High &&
                refCount == 0 &&
                state == TextureState::Resident;
     }

@@ -72,7 +72,7 @@ void EnsureLodPipeline(nvrhi::IDevice* nv, LodPassState& st)
     desc.setPrimType(nvrhi::PrimitiveType::TriangleList);
     desc.renderState.depthStencilState.setDepthTestEnable(true);
     desc.renderState.depthStencilState.setDepthWriteEnable(true);
-    desc.renderState.depthStencilState.setDepthFunc(nvrhi::ComparisonFunc::LessOrEqual);
+    desc.renderState.depthStencilState.setDepthFunc(nvrhi::ComparisonFunc::GreaterOrEqual);
     desc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
     desc.renderState.blendState.targets[0].setBlendEnable(false);
 
@@ -141,10 +141,8 @@ DefaultOutputLayout setupLodPass(
             data.height = height;
             data.color = pb.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.normal = pb.readWrite(inputs.normal, ResourceState::RenderTarget);
-            if (inputs.baseColor.is_valid())
-                data.baseColor = pb.readWrite(inputs.baseColor, ResourceState::RenderTarget);
-            if (inputs.worldPos.is_valid())
-                data.worldPos = pb.readWrite(inputs.worldPos, ResourceState::RenderTarget);
+            data.baseColor = pb.readWrite(inputs.baseColor, ResourceState::RenderTarget);
+            data.worldPos = pb.readWrite(inputs.worldPos, ResourceState::RenderTarget);
             data.depth = pb.readWrite(inputs.depth, ResourceState::DepthStencilWrite);
             data.outputs.albedo = data.color;
             data.outputs.normal = data.normal;
@@ -163,7 +161,7 @@ DefaultOutputLayout setupLodPass(
             auto* baseRT = data.baseColor.is_valid() ? graph.GetPhysicalTexture(data.baseColor) : nullptr;
             auto* worldRT = data.worldPos.is_valid() ? graph.GetPhysicalTexture(data.worldPos) : nullptr;
             auto* depthRT = graph.GetPhysicalTexture(data.depth);
-            if (!colorRT || !depthRT)
+            if (!colorRT || !depthRT || !normalRT || !baseRT || !worldRT)
                 return;
 
             const u32 maxVerts = u32(data.impostors->size()) * 4;
@@ -222,9 +220,9 @@ DefaultOutputLayout setupLodPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
-            if (normalRT) fbDesc.addColorAttachment(normalRT);
-            if (baseRT) fbDesc.addColorAttachment(baseRT);
-            if (worldRT) fbDesc.addColorAttachment(worldRT);
+            fbDesc.addColorAttachment(normalRT);
+            fbDesc.addColorAttachment(baseRT);
+            fbDesc.addColorAttachment(worldRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = GetPassResourceCache();
             auto fb = cache.GetOrCreateFramebuffer("LodPass", fbDesc, nv);
@@ -259,10 +257,13 @@ DefaultOutputLayout setupLodPass(
 
                 if (texMgr && inst.lod->textureName.size())
                 {
-                    auto h = texMgr->LoadTexture(inst.lod->textureName.c_str());
+                    xr_string lodTexName = inst.lod->textureName.c_str();
+                    if (size_t comma = lodTexName.find(','); comma != xr_string::npos)
+                        lodTexName.resize(comma);
+                    auto h = texMgr->LoadTexture(lodTexName.c_str());
                     if (auto* t = texMgr->GetNVRHITexture(h))
                         baseTex = t;
-                    xr_string hemiName = inst.lod->textureName.c_str();
+                    xr_string hemiName = lodTexName;
                     hemiName += "_nm";
                     auto hh = texMgr->LoadTexture(hemiName.c_str());
                     if (auto* t = texMgr->GetNVRHITexture(hh))
@@ -271,7 +272,7 @@ DefaultOutputLayout setupLodPass(
                         hemiTex = baseTex;
 
                     pbrTex = baseTex;
-                    shared_str pbrName = TextureDescr.GetPBRName(inst.lod->textureName);
+                    shared_str pbrName = TextureDescr.GetPBRName(shared_str(lodTexName.c_str()));
                     if (pbrName.size())
                     {
                         auto hp = texMgr->LoadTexture(pbrName.c_str());
@@ -280,7 +281,7 @@ DefaultOutputLayout setupLodPass(
                     }
                     else
                     {
-                        xr_string fallback = inst.lod->textureName.c_str();
+                        xr_string fallback = lodTexName;
                         fallback += "_pbr";
                         auto hp = texMgr->LoadTexture(fallback.c_str());
                         if (auto* t = texMgr->GetNVRHITexture(hp))

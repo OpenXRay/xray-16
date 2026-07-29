@@ -122,18 +122,19 @@ bool CResourceManager::GetBlenderProperties(LPCSTR shaderName, BlenderProperties
         outProps.writesDepth = !b->oBlend.value;
         return true;
     }
-    // B_MODEL - model blender (oAREF, oBlend)
     if (cls == B_MODEL)
     {
-        auto* b = static_cast<CBlender_Model*>(B);
+        auto* b = static_cast<CBlender_deffer_model*>(B);
         outProps.alphaRef = b->oAREF.value;
-        if (b->oBlend.value)
+        if (b->oBlend.value && b->oAREF.value < 16)
             outProps.blendMode = BlendMode::AlphaBlend;
-        else if (b->oAREF.value > 0)
+        else if (b->oBlend.value)
             outProps.blendMode = BlendMode::AlphaTest;
         else
             outProps.blendMode = BlendMode::Opaque;
         outProps.writesDepth = (outProps.blendMode != BlendMode::AlphaBlend);
+        if (outProps.blendMode == BlendMode::Opaque)
+            outProps.strictB2F = false;
         return true;
     }
     // B_MODEL_EbB - model with env (oBlend)

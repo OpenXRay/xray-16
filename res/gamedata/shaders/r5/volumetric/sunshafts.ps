@@ -2,6 +2,7 @@
 #define CSM_SHADOW_FORWARD
 #include "common.h"
 #include "shared/shadow_sampling.h"
+#include "shared/surface_marks.h"
 
 cbuffer SunShaftsCB : register(b3)
 {
@@ -38,24 +39,16 @@ float4 main(PS_INPUT input) : SV_Target0
     float density = maxDensity / float(raySamples);
 
     float res = 0.0;
-    const bool isSky = (depth >= 0.9995);
 
-    float3 sunDirW = normalize(L_sun_dir_w);
-    float3 viewDirW = float3(0, 0, 1);
-
-    if (isSky)
+    if (IsSkyDepth(depth))
     {
-        float3 Pw = ReconstructWorldFromDepth(input.texcoord, 0.9995);
-        viewDirW = normalize(Pw - eye_position);
-        float towardSun = saturate(dot(viewDirW, -sunDirW));
-        res = maxDensity * pow(towardSun, 12.0);
+        res = maxDensity;
     }
     else
     {
-        float3 Pw = (worldPos4.w >= 0.5)
+        float3 Pw = (worldPos4.w >= 0.5 && !IsHudSurfMark(worldPos4.w))
             ? worldPos4.xyz
             : ReconstructWorldFromDepth(input.texcoord, depth);
-        viewDirW = normalize(Pw - eye_position);
 
         float3 toEye = eye_position - Pw;
         float j = frac(52.9829189 * frac(dot(input.position.xy, float2(0.06711056, 0.00583715))));
@@ -69,22 +62,18 @@ float4 main(PS_INPUT input) : SV_Target0
         for (int i = 0; i < raySamples; ++i)
         {
             if (viewZ > 0.3)
-                res += density * SampleCSM_Volumetric(cur);
+                res += density * SampleCSM_SunShafts(cur);
 
             cur += stepW;
             viewZ = abs(mul(m_V, float4(cur, 1.0)).z);
         }
-
-        float towardSun = saturate(dot(viewDirW, -sunDirW));
-        res *= lerp(0.35, 1.0, pow(towardSun, 4.0));
     }
 
-    float3 sunView = normalize(mul((float3x3)m_V, sunDirW));
-    float fSaturation = -sunView.z;
+    float3 lightTravelV = normalize(mul((float3x3)m_V, normalize(L_sun_dir_w)));
+    float fSaturation = -lightTravelV.z;
     fSaturation = 0.5 * fSaturation + 0.5;
     fSaturation = 0.80 * fSaturation + 0.20;
     res *= fSaturation;
 
-    float scale = shaft_params.w > 0.0 ? shaft_params.w : 1.0;
-    return float4(res * L_sun_color * scale, 0.0);
+    return float4(res * L_sun_color, 0.0);
 }

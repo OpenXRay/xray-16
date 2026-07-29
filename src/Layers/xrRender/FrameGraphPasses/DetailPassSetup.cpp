@@ -129,10 +129,8 @@ DefaultOutputLayout setupDetailPass(
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
             data.outputColor = passBuilder.write(forwardInputs.albedo);
             data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
-            if (forwardInputs.baseColor.is_valid())
-                data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
-            if (forwardInputs.worldPos.is_valid())
-                data.worldPos = passBuilder.readWrite(forwardInputs.worldPos, ResourceState::RenderTarget);
+            data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
+            data.worldPos = passBuilder.readWrite(forwardInputs.worldPos, ResourceState::RenderTarget);
             if (shadowMapHandle.is_valid())
                 data.shadowMap = passBuilder.read(shadowMapHandle, ResourceState::ShaderResource);
             if (perlinReady.is_valid())
@@ -184,15 +182,14 @@ DefaultOutputLayout setupDetailPass(
             nvrhi::ITexture* normalTexture = fg.GetPhysicalTexture(data.outputNormal);
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
             auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
+            if (!normalTexture || !baseColorRT || !worldPosRT)
+                return;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorTexture);
-            if (normalTexture)
-                fbDesc.addColorAttachment(normalTexture);
-            if (baseColorRT)
-                fbDesc.addColorAttachment(baseColorRT);
-            if (worldPosRT)
-                fbDesc.addColorAttachment(worldPosRT);
+            fbDesc.addColorAttachment(normalTexture);
+            fbDesc.addColorAttachment(baseColorRT);
+            fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthTexture);
 
             auto framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer(

@@ -24,6 +24,9 @@
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
+extern ENGINE_API int ps_r_rt_gi;
+extern ENGINE_API int ps_r_path_tracer;
+
 namespace fg
 {
     extern xray::render::FrameGraphRenderer RImplementation;
@@ -57,6 +60,17 @@ struct CullParamsCB {
     u32 hizEnable;              // 0=skip Hi-Z occlusion test
     u32 padding[2];
 };
+
+struct ParticleCullParamsCB {
+    Fmatrix prevViewProj;
+    Fvector4 frustumPlanes[6];
+    Fvector4 cameraPos;
+    u32 slotCount;
+    u32 hiZWidth;
+    u32 hiZHeight;
+    u32 hiZMipLevels;
+};
+static_assert(sizeof(ParticleCullParamsCB) == 192, "ParticleCullParamsCB must match particle_cull.cs");
 
 // ═══════════════════════════════════════════════════════
 //  DEBUG CONSTANT BUFFER (must match HLSL)
@@ -167,13 +181,11 @@ void GPUCullingManager::Initialize(fg::RenderDevice* device)
         td.keepInitialState = true;
         td.debugName = "GPUCull_DummyHiZ";
         m_dummyHizTexture = nvDevice->createTexture(td);
-        // Far depth (1.0) so HiZTestSphere always passes — all-visible path for
-        // DetailCull / frame-0 / forceDisableHiz when no real pyramid is bound.
         if (m_dummyHizTexture)
         {
             nvrhi::CommandListHandle cmd = nvDevice->createCommandList();
             cmd->open();
-            const float farD = 1.0f;
+            const float farD = 0.0f;
             cmd->writeTexture(m_dummyHizTexture, 0, 0, &farD, sizeof(farD));
             cmd->close();
             nvDevice->executeCommandList(cmd);
@@ -660,21 +672,21 @@ void GPUCullingManager::CreateSkinnedCullingBuffers(fg::RenderDevice* device)
     m_skinnedObjectData.reserve(m_maxSkinnedObjects);
     m_skinnedDrawArgsData.reserve(m_maxSkinnedObjects);
 
-    // Global bone buffer for GPU-driven skinned rendering
-    {
+    for (u32 i = 0; i < 2; ++i) {
         nvrhi::BufferDesc desc;
-        desc.debugName = "GlobalBoneBuffer";
-        desc.byteSize = MAX_TOTAL_BONES * BONE_STRIDE;  // 8192 * 64 = 512KB
+        desc.debugName = (i == 0) ? "GlobalBoneBuffer0" : "GlobalBoneBuffer1";
+        desc.byteSize = MAX_TOTAL_BONES * BONE_STRIDE;
         desc.structStride = BONE_STRIDE;
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
 
-        m_globalBoneBuffer = nvDevice->createBuffer(desc);
-        if (!m_globalBoneBuffer) {
-            Msg("! [GPUCulling] Failed to create global bone buffer");
+        m_globalBoneBuffers[i] = nvDevice->createBuffer(desc);
+        if (!m_globalBoneBuffers[i]) {
+            Msg("! [GPUCulling] Failed to create global bone buffer %u", i);
             return;
         }
     }
+    m_currentBoneBuffer = 0;
 
     // Pre-allocate staging buffer for max skeleton size
     m_boneStagingBuffer.resize(256);  // Max bones per skeleton (typically 78)
@@ -754,7 +766,10 @@ void GPUCullingManager::EnsureSkinnedBufferCapacity(u32 count)
 void GPUCullingManager::EnsureSkinnedBucketCapacity(SkinnedBucket& bucket, const char* name, u32 capacity)
 {
     if (bucket.objectBuffer
-        && bucket.objectBuffer->getDesc().byteSize >= capacity * sizeof(GPUObjectData))
+        && bucket.objectBuffer->getDesc().byteSize >= capacity * sizeof(GPUObjectData)
+        && bucket.recordsBuffer
+        && bucket.recordsBuffer->getDesc().byteSize >= capacity * sizeof(SkinnedDrawRecord)
+        && bucket.recordsBuffer->getDesc().structStride == sizeof(SkinnedDrawRecord))
         return;
 
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
@@ -2132,10 +2147,9 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         const u32 matCount = bindless::MaterialBuffer::Instance().GetMaterialCount();
         if (batch.bindlessMaterialID == UINT32_MAX || batch.bindlessMaterialID >= matCount)
             return false;
+        if (!batch.megaBufferAlloc.valid)
+            return false;
 
-        // ─────────────────────────────────────────────────────
-        //  BUILD OBJECT DATA (for culling)
-        // ─────────────────────────────────────────────────────
         GPUObjectData obj;
         obj.position = batch.worldBoundsCenter;
         obj.radius = batch.worldBoundsRadius;
@@ -2148,25 +2162,19 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
             obj.flags |= GPU_OBJECT_ALPHA_TEST;
         if (batch.IsStrictB2F())
             obj.flags |= GPU_OBJECT_TRANSPARENT;
+        if (!batch.isStatic)
+            obj.flags |= GPU_OBJECT_DYNAMIC;
 
         obj.pad0 = 0.0f;
         obj.pad1 = 0.0f;
 
         objectData.push_back(obj);
 
-        // ─────────────────────────────────────────────────────
-        //  BUILD DRAW ARGS (for indirect draw)
-        // ─────────────────────────────────────────────────────
         IndirectDrawArgs args;
         args.indexCountPerInstance = batch.indexCount;
-        args.instanceCount = 1;  // Compaction uses visibility buffer
-        if (batch.megaBufferAlloc.valid) {
-            args.startIndexLocation = batch.megaBufferAlloc.indexOffset;
-            args.baseVertexLocation = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
-        } else {
-            args.startIndexLocation = batch.startIndex;
-            args.baseVertexLocation = batch.baseVertex;
-        }
+        args.instanceCount = 1;
+        args.startIndexLocation = batch.megaBufferAlloc.indexOffset;
+        args.baseVertexLocation = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
         // startInstanceLocation carries the per-draw DRAWINDEX for the view-independent
         // "cast all" shadow path, which draws these raw args directly (no compaction).
         // The forward path ignores this: batch_compact.cs overwrites it with the compacted
@@ -2826,6 +2834,22 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
                 rec.splatCount = sr.count;
             }
             rec.pad = 0;
+            if (skeleton && skeleton->fg_prev_bone_valid &&
+                skeleton->fg_prev_world_frame + 1 == m_boneUploadFrameId) {
+                rec.prevWorld = skeleton->fg_prev_world;
+                rec.prevBoneOffset = skeleton->fg_prev_bone_upload_offset;
+                rec.prevValid = 1;
+            } else {
+                rec.prevWorld = batch.worldMatrix;
+                rec.prevBoneOffset = rec.boneOffset;
+                rec.prevValid = 0;
+            }
+            rec.pad1 = 0;
+            rec.pad2 = 0;
+            if (skeleton) {
+                skeleton->fg_curr_world = batch.worldMatrix;
+                skeleton->fg_curr_world_frame = m_boneUploadFrameId;
+            }
             bucket.records.push_back(rec);
             bucket.materialIDs.push_back(batch.bindlessMaterialID);
         } else {
@@ -2927,9 +2951,29 @@ bool GPUCullingManager::EnsureSkinnedArgsGatePipeline(nvrhi::IDevice* nvDevice)
 
 void GPUCullingManager::BeginSkinnedFrame()
 {
-    // Reset bone buffer allocations for new frame
     ++m_boneUploadFrameId;
+    m_currentBoneBuffer ^= 1;
     m_currentBoneOffset = 0;
+}
+
+u32 GPUCullingManager::GetPrevBoneOffset(CKinematics* skeleton) const
+{
+    if (!skeleton || !skeleton->fg_prev_bone_valid)
+        return 0;
+    return skeleton->fg_prev_bone_upload_offset;
+}
+
+bool GPUCullingManager::HasPrevBones(CKinematics* skeleton) const
+{
+    return skeleton && skeleton->fg_prev_bone_valid != 0;
+}
+
+void GPUCullingManager::SetSkeletonCurrWorld(CKinematics* skeleton, const Fmatrix& world)
+{
+    if (!skeleton)
+        return;
+    skeleton->fg_curr_world = world;
+    skeleton->fg_curr_world_frame = m_boneUploadFrameId;
 }
 
 u32 GPUCullingManager::GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinematics* skeleton)
@@ -2937,32 +2981,38 @@ u32 GPUCullingManager::GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinema
     if (!m_boneBufferInitialized || !skeleton || !cmdList)
         return 0;
 
-    // Check if already uploaded this frame
     if (skeleton->fg_bone_upload_frame == m_boneUploadFrameId) {
         return skeleton->fg_bone_upload_offset;
     }
 
-    // Allocate space for this skeleton
     u32 boneCount = skeleton->LL_BoneCount();
     if (boneCount == 0)
         return 0;
 
-    // Check capacity
     if (m_currentBoneOffset + boneCount > MAX_TOTAL_BONES) {
         Msg("! [GPUCulling] Bone buffer full: need %u bones, have %u remaining",
             boneCount, MAX_TOTAL_BONES - m_currentBoneOffset);
-        return 0;  // Return 0 offset, will render with identity bones
+        return 0;
     }
 
-    // Record the offset for this skeleton
+    if (skeleton->fg_bone_upload_frame + 1 == m_boneUploadFrameId) {
+        skeleton->fg_prev_bone_upload_offset = skeleton->fg_bone_upload_offset;
+        skeleton->fg_prev_bone_valid = 1;
+    } else {
+        skeleton->fg_prev_bone_valid = 0;
+    }
+
+    if (skeleton->fg_curr_world_frame + 1 == m_boneUploadFrameId) {
+        skeleton->fg_prev_world = skeleton->fg_curr_world;
+        skeleton->fg_prev_world_frame = skeleton->fg_curr_world_frame;
+    }
+
     u32 boneOffset = m_currentBoneOffset;
     skeleton->fg_bone_upload_frame = m_boneUploadFrameId;
     skeleton->fg_bone_upload_offset = boneOffset;
 
-    // Upload bones
     UploadSkeletonBones(cmdList, skeleton, boneOffset);
 
-    // Advance allocation pointer
     m_currentBoneOffset += boneCount;
 
     return boneOffset;
@@ -2972,22 +3022,18 @@ void GPUCullingManager::UploadSkeletonBones(nvrhi::ICommandList* cmdList, CKinem
 {
     u32 boneCount = skeleton->LL_BoneCount();
 
-    // Ensure staging buffer is large enough
     if (m_boneStagingBuffer.size() < boneCount) {
         m_boneStagingBuffer.resize(boneCount);
     }
 
-    // Slang uses column_major — raw row-major Fmatrix bytes are naturally transposed.
-    // No explicit transpose needed.
     for (u32 i = 0; i < boneCount; i++) {
         m_boneStagingBuffer[i] = skeleton->LL_GetTransform_R(u16(i));
     }
 
-    // Upload to GPU at the correct offset
     u64 byteOffset = static_cast<u64>(boneOffset) * BONE_STRIDE;
     u64 byteSize = static_cast<u64>(boneCount) * BONE_STRIDE;
 
-    cmdList->writeBuffer(m_globalBoneBuffer, m_boneStagingBuffer.data(), byteSize, byteOffset);
+    cmdList->writeBuffer(m_globalBoneBuffers[m_currentBoneBuffer], m_boneStagingBuffer.data(), byteSize, byteOffset);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3907,14 +3953,12 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                 bindless::MaterialBuffer::Instance().Upload(ctx);
 
-                if (mgr->m_rtAccelMgr) {
+                if (mgr->m_rtAccelMgr && (ps_r_rt_gi || ps_r_path_tracer)) {
+                    if (!mgr->m_rtAccelMgr->GetMaterialBuffer())
+                        mgr->m_rtAccelMgr->SetMaterialBuffer(bindless::MaterialBuffer::Instance().GetBuffer());
+                    if (!mgr->m_rtAccelMgr->GetTerrainMaterialBuffer())
+                        mgr->m_rtAccelMgr->SetTerrainMaterialBuffer(bindless::TerrainMaterialBuffer::Instance().GetBuffer());
                     mgr->m_rtAccelMgr->BuildIfNeeded(cmdList, mgr);
-                    if (mgr->m_rtAccelMgr->IsReady()) {
-                        if (!mgr->m_rtAccelMgr->GetMaterialBuffer())
-                            mgr->m_rtAccelMgr->SetMaterialBuffer(bindless::MaterialBuffer::Instance().GetBuffer());
-                        if (!mgr->m_rtAccelMgr->GetTerrainMaterialBuffer())
-                            mgr->m_rtAccelMgr->SetTerrainMaterialBuffer(bindless::TerrainMaterialBuffer::Instance().GetBuffer());
-                    }
                 }
             }
 
@@ -5112,11 +5156,12 @@ void GPUCullingManager::CreateParticleResources(fg::RenderDevice* device)
         nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_ParticleDrawArgs";
         desc.byteSize = m_maxParticles * sizeof(IndirectDrawArgs);
+        desc.structStride = sizeof(IndirectDrawArgs);
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
         desc.isDrawIndirectArgs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;  // Let NVRHI handle state transitions
+        desc.keepInitialState = true;
 
         m_particleDrawArgsBuffer = nvDevice->createBuffer(desc);
         if (!m_particleDrawArgsBuffer) {
@@ -5127,9 +5172,8 @@ void GPUCullingManager::CreateParticleResources(fg::RenderDevice* device)
 
     {
         nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_ParticleVisibleCount";
-        desc.byteSize = sizeof(u32);
-        desc.structStride = sizeof(u32);
+        desc.debugName = "GPUCull_ParticleCullStats";
+        desc.byteSize = sizeof(u32) * 2;
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
@@ -5137,7 +5181,7 @@ void GPUCullingManager::CreateParticleResources(fg::RenderDevice* device)
 
         m_particleVisibleCountBuffer = nvDevice->createBuffer(desc);
         if (!m_particleVisibleCountBuffer) {
-            Msg("! [GPUCulling] Failed to create particle visible count buffer");
+            Msg("! [GPUCulling] Failed to create particle cull stats buffer");
             return;
         }
     }
@@ -5145,7 +5189,7 @@ void GPUCullingManager::CreateParticleResources(fg::RenderDevice* device)
     {
         fg::RenderDevice::BufferDesc desc;
         desc.debugName = "GPUCull_ParticleParams";
-        desc.byteSize = sizeof(CullParamsCB);
+        desc.byteSize = sizeof(ParticleCullParamsCB);
         desc.isConstantBuffer = true;
         desc.isVolatile = true;
         desc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
@@ -5160,7 +5204,7 @@ void GPUCullingManager::CreateParticleResources(fg::RenderDevice* device)
     {
         auto& cache = framegraph::GetPassResourceCache();
         auto* particleCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("particle_cull", ".cs");
-        m_particleCullLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ParticleCull", *particleCullRefl, nvDevice);
+        m_particleCullLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ParticleCull_v2", *particleCullRefl, nvDevice);
         if (!m_particleCullLayout) {
             Msg("! [GPUCulling] Failed to create particle binding layout");
             return;
@@ -5345,27 +5389,18 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
                 return;
             }
 
-            u32 zero = 0;
-            cmdList->writeBuffer(mgr->m_particleVisibleCountBuffer, &zero, sizeof(u32));
+            const u32 statsZero[2] = { 0, 0 };
+            cmdList->writeBuffer(mgr->m_particleVisibleCountBuffer, statsZero, sizeof(statsZero));
 
-            u32 frameId = Device.dwFrame + 1u;
-            if (frameId == 0)
-                frameId = 1;
-
-            CullParamsCB cb;
-            cb.viewProj = Device.mFullTransform;
-            cb.cameraPos = Device.vCameraPosition;
-            float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
-            cb.maxDistanceSq = farPlane * farPlane;
-            cb.objectCount = data.particleCount;
-            cb.hizWidth = data.hizWidth;
-            cb.hizHeight = data.hizHeight;
-            cb.hizMipLevels = data.hizMipLevels;
-            cb.frameId = frameId;
-            cb.hizEnable = (data.forceDisableHiz || ps_r_hiz_occlusion == 0) ? 0u : 1u;
-            cb.padding[0] = cb.padding[1] = 0;
-
+            ParticleCullParamsCB cb{};
+            cb.prevViewProj = Device.mFullTransform;
             mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
+            cb.cameraPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y,
+                             Device.vCameraPosition.z, 0.0f);
+            cb.slotCount = data.particleCount;
+            cb.hiZWidth = data.hizWidth;
+            cb.hiZHeight = data.hizHeight;
+            cb.hiZMipLevels = (data.forceDisableHiz || ps_r_hiz_occlusion == 0) ? 0u : data.hizMipLevels;
 
             cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_particleCullParamsCB), &cb, sizeof(cb));
 
@@ -5374,8 +5409,8 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
             bsb.ConstantBuffer("ParticleCullParams", mgr->m_device->GetNativeBuffer(mgr->m_particleCullParamsCB))
                .BufferSRV("g_ParticleData", mgr->m_particleBuffer)
                .Texture("g_HiZPyramid", hizTexture)
-               .BufferUAV("g_VisibleIndices", mgr->m_particleVisibleCountBuffer)
-               .BufferUAV("g_VisibleCount", mgr->m_particleDrawArgsBuffer);
+               .BufferUAV("g_DrawArgs", mgr->m_particleDrawArgsBuffer)
+               .BufferUAV("g_CullStats", mgr->m_particleVisibleCountBuffer);
 
             nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), mgr->m_particleCullLayout, nvDevice);
             if (!bindingSet) {

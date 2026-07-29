@@ -76,7 +76,7 @@ static void InitializeDepthPrepass(fg::RenderDevice* device, DepthPrepassState& 
     pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
     pipeDesc.renderState.depthStencilState.depthTestEnable = true;
     pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
@@ -217,7 +217,7 @@ VirtualResourceHandle setupDepthPrepass(
             if (!cmdList || !nvDevice)
                 return;
 
-            cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 1.0f, false, 0);
+            cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
 
             if (data.materialCache)
                 data.materialCache->FinalizePendingMaterials(ctx);

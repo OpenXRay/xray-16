@@ -42,7 +42,7 @@ struct MaterialData
     uint tessMethod;        // 0=off, 1=PN, 2=HM, 3=PN+HM
     uint sssMapIndex;       // SSS map (R thick, G strength, B profile)
     float emissiveIntensity;
-    uint _pad1;
+    uint lmapIndex;         // Baked hemi lightmap (lmap#N_2: a=hemi, g=sun)
     uint _pad2;
 };
 

@@ -362,6 +362,14 @@ bool VulkanBackend::SelectPhysicalDevice() {
             m_capabilities.id_vendor = props.vendorID;
             m_capabilities.id_device = props.deviceID;
             Msg("* [VulkanBackend] Using GPU: %s", props.deviceName);
+            VkPhysicalDeviceMemoryProperties memProps{};
+            vkGetPhysicalDeviceMemoryProperties(dev, &memProps);
+            for (u32 hi = 0; hi < memProps.memoryHeapCount; ++hi)
+            {
+                if (memProps.memoryHeaps[hi].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
+                    Msg("* [VulkanBackend] Device-local heap[%u]: %llu MB",
+                        hi, (unsigned long long)(memProps.memoryHeaps[hi].size / (1024ull * 1024ull)));
+            }
             return true;
         }
     }
@@ -372,6 +380,14 @@ bool VulkanBackend::SelectPhysicalDevice() {
     m_capabilities.id_vendor = props.vendorID;
     m_capabilities.id_device = props.deviceID;
     Msg("* [VulkanBackend] Using GPU (fallback): %s", props.deviceName);
+    VkPhysicalDeviceMemoryProperties memProps{};
+    vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memProps);
+    for (u32 hi = 0; hi < memProps.memoryHeapCount; ++hi)
+    {
+        if (memProps.memoryHeaps[hi].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
+            Msg("* [VulkanBackend] Device-local heap[%u]: %llu MB",
+                hi, (unsigned long long)(memProps.memoryHeaps[hi].size / (1024ull * 1024ull)));
+    }
     return true;
 }
 
@@ -794,7 +810,8 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     swapchainInfo.imageColorSpace = colorSpace;
     swapchainInfo.imageExtent = extent;
     swapchainInfo.imageArrayLayers = 1;
-    swapchainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    swapchainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+        (surfaceCaps.supportedUsageFlags & (VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT));
     swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     swapchainInfo.preTransform = surfaceCaps.currentTransform;
     swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
@@ -854,6 +871,7 @@ void VulkanBackend::CreateBackBufferTextures() {
         desc.height = m_backBufferHeight;
         desc.format = nvFormat;
         desc.isRenderTarget = true;
+        desc.isShaderResource = true;
         desc.debugName = "BackBuffer";
         desc.keepInitialState = true;
         desc.initialState = nvrhi::ResourceStates::Present;
@@ -1295,67 +1313,91 @@ void VulkanBackend::PresentInternal(bool outOfBand)
 
 bool VulkanBackend::PresentFrameGeneration(nvrhi::ITexture* interpolated, nvrhi::ITexture* real)
 {
-    (void)real;
     if (!interpolated || m_asyncSubmit)
         return false;
 
     ZoneScopedN("VulkanBackend::PresentFrameGeneration");
 
-    const u32 prevFrame = (m_currentFrameIndex + BACK_BUFFER_COUNT - 1) % BACK_BUFFER_COUNT;
-    {
-        ZoneScopedN("VK::FG_WaitPrevPresentFence");
-        vkWaitForFences(m_device, 1, &m_inFlightFence[prevFrame], VK_TRUE, UINT64_MAX);
-    }
-
-    {
-        ZoneScopedN("VK::FG_WaitInFlightFence");
-        vkWaitForFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex], VK_TRUE, UINT64_MAX);
-        vkResetFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex]);
-    }
-
-    {
-        std::lock_guard<std::mutex> sc(m_swapchainMutex);
-        VkResult result = vkAcquireNextImageKHR(
-            m_device, m_swapchain, UINT64_MAX,
-            m_imageAvailable[m_currentFrameIndex], VK_NULL_HANDLE,
-            &m_currentImageIndex);
-        if (result == VK_ERROR_OUT_OF_DATE_KHR)
-        {
-            RequestSwapchainRecreate(true);
-            return false;
-        }
-        if (result == VK_SUBOPTIMAL_KHR)
-            RequestSwapchainRecreate(false);
-    }
-
-    nvrhi::ITexture* dst = GetBackBuffer();
-    if (!dst || dst->getDesc().format != interpolated->getDesc().format ||
-        dst->getDesc().width != interpolated->getDesc().width ||
-        dst->getDesc().height != interpolated->getDesc().height)
+    nvrhi::ITexture* proto = m_backBuffers[0].Get();
+    if (!proto || proto->getDesc().format != interpolated->getDesc().format ||
+        proto->getDesc().width != interpolated->getDesc().width ||
+        proto->getDesc().height != interpolated->getDesc().height)
         return false;
 
     auto* cl = m_commandLists[1].Get();
     if (!cl)
         return false;
 
+    const u32 realSlot = m_currentFrameIndex;
+    const u32 realImage = m_currentImageIndex;
+    const u32 interpSlot = (realSlot + 1) % BACK_BUFFER_COUNT;
+    nvrhi::ITexture* realBb =
+        (realImage < BACK_BUFFER_COUNT) ? m_backBuffers[realImage].Get() : nullptr;
+
+    {
+        ZoneScopedN("VK::FG_WaitInterpSlotFence");
+        vkWaitForFences(m_device, 1, &m_inFlightFence[interpSlot], VK_TRUE, UINT64_MAX);
+        vkResetFences(m_device, 1, &m_inFlightFence[interpSlot]);
+    }
+
+    auto reSignalInterpFence = [&]() {
+        VkSubmitInfo fenceSubmit = {};
+        fenceSubmit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        vkQueueSubmit(m_graphicsQueue, 1, &fenceSubmit, m_inFlightFence[interpSlot]);
+    };
+
+    {
+        std::lock_guard<std::mutex> sc(m_swapchainMutex);
+        VkResult result = vkAcquireNextImageKHR(
+            m_device, m_swapchain, UINT64_MAX,
+            m_imageAvailable[interpSlot], VK_NULL_HANDLE,
+            &m_currentImageIndex);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            RequestSwapchainRecreate(true);
+            m_currentImageIndex = realImage;
+            reSignalInterpFence();
+            return false;
+        }
+        if (result == VK_SUBOPTIMAL_KHR)
+            RequestSwapchainRecreate(false);
+    }
+
+    nvrhi::ITexture* interpDst = GetBackBuffer();
+    if (!interpDst)
+    {
+        m_currentImageIndex = realImage;
+        reSignalInterpFence();
+        return false;
+    }
+
     {
         auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
         std::lock_guard<std::mutex> qk(m_queueMutex);
         vkDevice->queueWaitForSemaphore(
             nvrhi::CommandQueue::Graphics,
-            m_imageAvailable[m_currentFrameIndex], 0);
+            m_imageAvailable[interpSlot], 0);
         vkDevice->queueSignalSemaphore(
             nvrhi::CommandQueue::Graphics,
-            m_renderFinished[m_currentFrameIndex], 0);
+            m_renderFinished[interpSlot], 0);
 
         cl->open();
         nvrhi::TextureSlice slice;
-        cl->copyTexture(dst, slice, interpolated, slice);
+        cl->copyTexture(interpDst, slice, interpolated, slice);
+        if (real && realBb && real != realBb)
+            cl->copyTexture(realBb, slice, real, slice);
         cl->close();
         m_nvrhiDevice->executeCommandList(cl);
     }
 
+    m_currentFrameIndex = interpSlot;
     PresentInternal(true);
+
+    m_currentFrameIndex = realSlot;
+    m_currentImageIndex = realImage;
+    PresentInternal(false);
+
     return true;
 }
 

@@ -1,7 +1,5 @@
 #define SM_6_0
-
-SamplerState smp_nofilter : register(s0);
-SamplerState smp_linear   : register(s1);
+#include "common.h"
 
 cbuffer SunShaftsCombineCB : register(b3)
 {
@@ -20,11 +18,11 @@ float4 main(PS_INPUT input) : SV_Target0
 {
     float2 ts = combine_params.xy;
     float3 shafts =
-        g_Shafts.SampleLevel(smp_linear, input.texcoord, 0).rgb * 0.5 +
-        g_Shafts.SampleLevel(smp_linear, input.texcoord + float2( ts.x,  ts.y), 0).rgb * 0.125 +
-        g_Shafts.SampleLevel(smp_linear, input.texcoord + float2(-ts.x,  ts.y), 0).rgb * 0.125 +
-        g_Shafts.SampleLevel(smp_linear, input.texcoord + float2( ts.x, -ts.y), 0).rgb * 0.125 +
-        g_Shafts.SampleLevel(smp_linear, input.texcoord + float2(-ts.x, -ts.y), 0).rgb * 0.125;
+        g_Shafts.SampleLevel(smp_rtlinear, input.texcoord, 0).rgb * 0.5 +
+        g_Shafts.SampleLevel(smp_rtlinear, input.texcoord + float2( ts.x,  ts.y), 0).rgb * 0.125 +
+        g_Shafts.SampleLevel(smp_rtlinear, input.texcoord + float2(-ts.x,  ts.y), 0).rgb * 0.125 +
+        g_Shafts.SampleLevel(smp_rtlinear, input.texcoord + float2( ts.x, -ts.y), 0).rgb * 0.125 +
+        g_Shafts.SampleLevel(smp_rtlinear, input.texcoord + float2(-ts.x, -ts.y), 0).rgb * 0.125;
 
     return float4(max(shafts, 0.0), 0.0);
 }

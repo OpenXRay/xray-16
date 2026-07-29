@@ -438,6 +438,20 @@ void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>&
     }
 }
 
+void ClusteredLightManager::ClearLocalShadowAssignments()
+{
+    m_localShadowTiles.clear();
+    m_localShadowCandidates = 0;
+    m_localShadowDropped = 0;
+    m_localShadowRedraw = 0;
+    m_shadowDataCPU.clear();
+    for (u32 i = 0; i < m_numLights; ++i)
+    {
+        m_lightsCPU[i].localShadowRect.set(0.f, 0.f, 0.f, 0.f);
+        m_lightsCPU[i].spotParamsAndType.w = 0.f;
+    }
+}
+
 void ClusteredLightManager::AssignLocalShadowTiles(const Fvector& cameraPos)
 {
     ZoneScopedN("LocalShadow::AssignTiles");
@@ -450,6 +464,7 @@ void ClusteredLightManager::AssignLocalShadowTiles(const Fvector& cameraPos)
     if (ps_r_local_shadows == 0 || m_numLights == 0 || m_lightSources.size() != m_numLights)
     {
         m_localShadowSticky.clear();
+        ClearLocalShadowAssignments();
         return;
     }
 
@@ -487,6 +502,8 @@ void ClusteredLightManager::AssignLocalShadowTiles(const Fvector& cameraPos)
         const u32 lt = L->flags.type;
         if (lt != IRender_Light::SPOT && lt != IRender_Light::OMNIPART)
             continue;
+        if (L->flags.bHudMode)
+            continue;
 
         L->spatial_move();
 
@@ -497,23 +514,18 @@ void ClusteredLightManager::AssignLocalShadowTiles(const Fvector& cameraPos)
         const Fvector& sp = L->spatial.sphere.P;
         const float sr = std::max(L->spatial.sphere.R, 0.01f);
         const float distCenter = cameraPos.distance_to(sp);
-        const bool hudLight = L->flags.bHudMode;
         const bool cameraInside = distCenter <= (sr * 1.01f + VIEWPORT_NEAR);
         const bool wasSticky = m_localShadowSticky.find(L) != m_localShadowSticky.end();
         const float dist = std::max(0.f, distCenter - sr);
 
-        if (!hudLight && !cameraInside && lod <= EPS_L)
+        if (!cameraInside && lod <= EPS_L)
             continue;
 
-        if (!hudLight && !cameraInside)
+        if (!cameraInside)
         {
             const float dropDist = wasSticky ? 120.f : 100.f;
             if (dist > dropDist)
                 continue;
-        }
-
-        if (!hudLight && !cameraInside)
-        {
             const float frustumInflate = wasSticky ? 1.35f : 1.1f;
             if (!camFrustum.testSphere_dirty(sp, sr * frustumInflate))
                 continue;

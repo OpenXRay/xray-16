@@ -182,9 +182,8 @@ static AOConstantsGPU MakeAOConstants(u32 width, u32 height, u32 quality)
     const float strength = 1.0f; // apply uses fixed ambient weight; modes bake their own contrast
     c.ao_params.set(radius, bias, strength, q);
 
-    // IX-Ray gtao_parameters = focal * 0.5; SSAO/HBAO use full focal via WorldRadiusToUV when needed
     const float focal = h / (2.0f * std::tan(Device.fFOV * 0.5f * (3.14159265f / 180.0f)));
-    c.ao_proj.set(focal * 0.5f, static_cast<float>(Device.dwFrame), 0.f, 0.f);
+    c.ao_proj.set(focal * 0.5f, 0.f, 0.f, 0.f);
     return c;
 }
 

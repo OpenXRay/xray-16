@@ -16,6 +16,7 @@ struct PostProcessPassState
     nvrhi::BindingLayoutHandle layout;
     nvrhi::Format pipelineFormat = nvrhi::Format::UNKNOWN;
     nvrhi::TextureHandle noisePlaceholder;
+    nvrhi::ITexture* noiseTexture = nullptr;
     bool initialized = false;
 };
 

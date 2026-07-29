@@ -156,8 +156,9 @@ float3 PBRAmbientIBL(
 	float3 F0 = CalculateF0(albedo, metallic);
 	float NdotV = max(dot(N, V), 0.0);
 	float3 F = F_SchlickRoughness(NdotV, F0, roughness);
+	float hemiOcc = saturate(hemiOcclusion);
 	float hemiDir = 0.55 + 0.45 * saturate(N.y);
-	float3 weatherScale = max(L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w * hemiDir, 0.0);
+	float3 weatherScale = max(L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w * hemiDir * hemiOcc, 0.0);
 
 	float4 iblMeta = g_IBLSkySH[IBL_SH_COUNT * 2];
 	float mipCount = max(iblMeta.x, 1.0);
@@ -188,7 +189,7 @@ float3 PBRAmbientIBL(
 	float match = weatherLum / irrLum;
 	match = clamp(match, 0.75, 1.6);
 	irradiance *= match * max(intensity, 0.35) * max(ssgiScale, 0.65);
-	irradiance = max(irradiance, weatherScale * lerp(0.85, 0.7, overcast));
+	irradiance = max(irradiance * hemiOcc, weatherScale * lerp(0.85, 0.7, overcast));
 
 	float roughSpec = saturate(1.05 - roughness * 1.15);
 	specEnv *= weatherScale * max(intensity, 0.35) * roughSpec;
@@ -203,7 +204,7 @@ float3 PBRAmbientIBL(
 	float3 specularAmbient = EnvBRDF(F0, NdotV, roughness, lut) * specEnv;
 	specularAmbient *= roughSpec;
 
-	return (diffuseAmbient + specularAmbient) * ao * saturate(hemiOcclusion);
+	return (diffuseAmbient + specularAmbient) * ao;
 }
 
 #endif

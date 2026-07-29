@@ -71,7 +71,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
 		if (!ProjectWorld(p, suv, vz))
 			continue;
 		float rawDepth = g_SceneDepth.SampleLevel(smp_nofilter, suv, 0).x;
-		if (rawDepth >= 0.9995)
+		if (rawDepth <= 1e-7)
 			continue;
 		float4 worldH = mul(cb_InvVP, float4(suv.x * 2.0 - 1.0, 1.0 - suv.y * 2.0, rawDepth, 1.0));
 		float3 hitPos = worldH.xyz / max(worldH.w, 1e-5);

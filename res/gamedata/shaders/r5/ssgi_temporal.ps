@@ -23,7 +23,7 @@ float4 main(PS_INPUT I) : SV_Target
     float2 texel = rcp(max(traceSize, 1.0.xx));
     float4 curr = g_Current.SampleLevel(smp_nofilter, uv, 0);
     float depth = g_Depth.SampleLevel(smp_nofilter, uv, 0).x;
-    if (depth >= 0.9995 || hasHistory < 0.5)
+    if (IsSkyDepth(depth) || hasHistory < 0.5)
         return curr;
 
     float2 motion = g_Motion.SampleLevel(smp_nofilter, uv, 0).xy;

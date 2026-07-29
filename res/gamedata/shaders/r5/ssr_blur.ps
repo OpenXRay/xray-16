@@ -27,7 +27,7 @@ float4 main(PS_INPUT I) : SV_Target
     float centerZ = g_Depth.SampleLevel(smp_nofilter, I.uv, 0).x;
     if (center.a < 0.0015)
         return float4(0, 0, 0, 0);
-    if (centerZ >= 0.9995)
+    if (centerZ <= 1e-7)
         return float4(0, 0, 0, 0);
 
     float4 nC = g_Normal.SampleLevel(smp_nofilter, I.uv, 0);

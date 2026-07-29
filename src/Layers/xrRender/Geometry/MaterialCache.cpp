@@ -1067,7 +1067,7 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
     matData.tessMethod = 0;
     matData.sssMapIndex = INVALID_TEXTURE_INDEX;
     matData.emissiveIntensity = 0.f;
-    matData._pad1 = 0;
+    matData.lmapIndex = INVALID_TEXTURE_INDEX;
     matData._pad2 = 0;
 
     if (matPSO->pass) {
@@ -1457,11 +1457,16 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     matData.tessMethod = 0;
     matData.sssMapIndex = INVALID_TEXTURE_INDEX;
     matData.emissiveIntensity = 0.f;
-    matData._pad1 = 0;
+    matData.lmapIndex = INVALID_TEXTURE_INDEX;
     matData._pad2 = 0;
 
     if (visual->textureName.size() > 0) {
-        matData.detailScale = GetDetailScale(visual->textureName);
+        shared_str baseForScale = visual->textureName;
+        const char* p = baseForScale.c_str();
+        if (const char* comma = strchr(p, ','))
+            baseForScale = shared_str(xr_string(p, comma - p).c_str());
+        if (baseForScale.size())
+            matData.detailScale = GetDetailScale(baseForScale);
     }
 
     if (visual->shaderName.size() > 0) {
@@ -1579,23 +1584,16 @@ u32 MaterialCache::PreRegisterParticleMaterial(
     if (!textureName.size() || !textureName[0])
         return UINT32_MAX;
 
-    u32 colorMode = 0;
     bool hard = false;
     if (shaderName && shaderName[0])
     {
-        if (strstr(shaderName, "particle_s-aadd") || strstr(shaderName, "s-aadd"))
-            colorMode = 3;
-        else if (strstr(shaderName, "particle_s-add") || strstr(shaderName, "s-add"))
-            colorMode = 2;
-        else if (strstr(shaderName, "particle_s-blend") || strstr(shaderName, "s-blend"))
-            colorMode = 1;
         if (strstr(shaderName, "particle_hard") || strstr(shaderName, "_hard"))
             hard = true;
     }
 
     string256 cacheKey;
-    xr_sprintf(cacheKey, "%s#%u#%u#%u#%s#%s",
-        textureName.c_str(), (u32)blendMode, colorMode, hard ? 1u : 0u,
+    xr_sprintf(cacheKey, "%s#%u#%u#%s#%s",
+        textureName.c_str(), (u32)blendMode, hard ? 1u : 0u,
         sixWayPosXYZ ? sixWayPosXYZ : "",
         sixWayNegXYZ ? sixWayNegXYZ : "");
     shared_str key(cacheKey);
@@ -1616,6 +1614,7 @@ u32 MaterialCache::PreRegisterParticleMaterial(
     matData.pbrIndex = INVALID_TEXTURE_INDEX;
     matData.detailScale = 1.0f;
     matData.sssMapIndex = INVALID_TEXTURE_INDEX;
+    matData.lmapIndex = INVALID_TEXTURE_INDEX;
     if (blendMode == kParticleBlendSet)
     {
         matData.alphaRef = 200.0f / 255.0f;
@@ -1628,17 +1627,12 @@ u32 MaterialCache::PreRegisterParticleMaterial(
     }
     if (hard)
         matData.flags |= MAT_FLAG_PARTICLE_HARD;
-    if (colorMode >= 2)
-    {
-        matData.flags |= MAT_FLAG_EMISSIVE;
-        matData.emissiveIntensity = (colorMode >= 3) ? 6.0f : 3.5f;
-    }
-    else if (shaderName && (strstr(shaderName, "glow") || strstr(shaderName, "emissive")))
+    if (shaderName && (strstr(shaderName, "glow") || strstr(shaderName, "emissive")))
     {
         matData.flags |= MAT_FLAG_EMISSIVE;
         matData.emissiveIntensity = 4.0f;
     }
-    matData.tessMethod = colorMode;
+    matData.tessMethod = 0;
     matData.shaderVariant = 0;
 
     u32 materialID = materialBuffer.RegisterMaterial(matData);
@@ -1723,9 +1717,42 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
         if (!diffuseName.size() || !diffuseName[0])
             continue;
 
-        // Classic texture lists are "s_base[,s_distort|lmap|...]". Particle
-        // registration already picks the correct slot; still strip commas here
-        // so any leftover "a,b" names cannot hit the loader as one path.
+        // Classic texture lists are "s_base[,lmap#N_1[,lmap#N_2]]". Slot [2]
+        // starting with "lmap" is the baked hemi map (uber_deffer USE_LM_HEMI).
+        if (!isWater)
+        {
+            xr_vector<xr_string> texSlots;
+            const char* p = diffuseName.c_str();
+            while (p && *p)
+            {
+                while (*p == ' ')
+                    ++p;
+                const char* start = p;
+                while (*p && *p != ',')
+                    ++p;
+                if (p > start)
+                    texSlots.emplace_back(start, p - start);
+                if (*p == ',')
+                    ++p;
+            }
+            if (texSlots.size() > 2 && 0 == strncmp(texSlots[2].c_str(), "lmap", 4))
+            {
+                resources::TextureHandle handle = texManager->LoadTexture(texSlots[2].c_str());
+                if (handle.IsValid()) {
+                    if (nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle)) {
+                        u32 idx = backend->RegisterBindlessTexture(nvrhiTex);
+                        if (idx != INVALID_TEXTURE_INDEX) {
+                            matData.lmapIndex = idx;
+                            matData.flags |= MAT_FLAG_HAS_LMAP;
+                            updated = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Strip commas so the remaining single-texture loads below cannot hit
+        // the loader with "a,b" as one path.
         {
             const char* p = diffuseName.c_str();
             const char* comma = strchr(p, ',');

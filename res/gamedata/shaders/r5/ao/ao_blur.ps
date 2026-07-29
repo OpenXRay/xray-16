@@ -22,7 +22,7 @@ float4 main(PS_INPUT input) : SV_Target0
 {
     float centerAO = g_AO.SampleLevel(smp_nofilter, input.texcoord, 0).x;
     float centerZ = g_Depth.SampleLevel(smp_nofilter, input.texcoord, 0).x;
-    if (centerZ >= 0.9999)
+    if (IsSkyDepth(centerZ))
         return float4(1, 1, 1, 1);
 
     float2 texel = ao_screen.zw;

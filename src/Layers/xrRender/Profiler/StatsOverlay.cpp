@@ -8,6 +8,9 @@
 #include <algorithm>
 #include <cstring>
 
+extern ENGINE_API int ps_r_upscale;
+extern ENGINE_API int ps_r_dlss_fg;
+
 static bool FormatSubmitThreadLine(char* buf, size_t size)
 {
     IRenderBackend::SubmitThreadTimings t;
@@ -124,6 +127,27 @@ void StatsOverlay::Render()
     float fps = cpuFrameTime > 0.0f ? 1000.0f / cpuFrameTime : 0.0f;
 
     ImGui::Text("Frame: %s (%.1f FPS)", FormatTime(cpuFrameTime), fps);
+    if (ps_r_upscale == 2 && ps_r_dlss_fg && GEnv.Backend)
+    {
+        static u64 s_lastPresents = 0;
+        static float s_accumTime = 0.f;
+        static float s_fgFps = 0.f;
+        const u64 presents = GEnv.Backend->GetPresentCount();
+        if (s_lastPresents == 0 || presents < s_lastPresents)
+        {
+            s_lastPresents = presents;
+            s_accumTime = 0.f;
+        }
+        s_accumTime += Device.fTimeDeltaReal;
+        if (s_accumTime >= 0.5f)
+        {
+            s_fgFps = float(presents - s_lastPresents) / s_accumTime;
+            s_lastPresents = presents;
+            s_accumTime = 0.f;
+        }
+        if (s_fgFps > 0.f)
+            ImGui::Text("After FG: %.1f FPS presented", s_fgFps);
+    }
     if (!ideActive)
     {
         ImGui::TextDisabled("(Press editor key to interact)");

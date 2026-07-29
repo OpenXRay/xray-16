@@ -56,6 +56,7 @@ public:
     nvrhi::ITexture* GetDummyContactDepth(nvrhi::IDevice* device);
     /// 1x1 white (1.0 = lit) for g_ContactHistory @ t28
     nvrhi::ITexture* GetDummyContactHistory(nvrhi::IDevice* device);
+    void EnsureShadowBindDummies(nvrhi::IDevice* device);
     nvrhi::ITexture* GetDummyCubeMap(nvrhi::IDevice* device);
     nvrhi::ITexture* GetDummyCubeArray(nvrhi::IDevice* device);
     nvrhi::IBuffer* GetDummyStructuredBuffer(nvrhi::IDevice* device);

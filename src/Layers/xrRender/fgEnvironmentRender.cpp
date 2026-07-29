@@ -355,12 +355,25 @@ void FGEnvironmentRender::DrawSky(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
         ? renderDevice->GetFGResourceManager()->GetTextureManager() : nullptr;
     if (texManager && environment->Current[0] && environment->Current[1])
     {
+        static shared_str s_skyName0;
+        static shared_str s_skyName1;
+        static nvrhi::ITexture* s_skyTex0 = nullptr;
+        static nvrhi::ITexture* s_skyTex1 = nullptr;
+
         const shared_str& skyName0 = environment->Current[0]->sky_texture_name;
         const shared_str& skyName1 = environment->Current[1]->sky_texture_name;
-        if (skyName0.size())
-            sky0Tex = texManager->GetNVRHITexture(texManager->LoadTexture(skyName0.c_str()));
-        if (skyName1.size())
-            sky1Tex = texManager->GetNVRHITexture(texManager->LoadTexture(skyName1.c_str()));
+        if (skyName0.size() && skyName0 != s_skyName0)
+        {
+            s_skyName0 = skyName0;
+            s_skyTex0 = texManager->GetNVRHITexture(texManager->LoadTexture(skyName0.c_str()));
+        }
+        if (skyName1.size() && skyName1 != s_skyName1)
+        {
+            s_skyName1 = skyName1;
+            s_skyTex1 = texManager->GetNVRHITexture(texManager->LoadTexture(skyName1.c_str()));
+        }
+        sky0Tex = s_skyTex0;
+        sky1Tex = s_skyTex1;
     }
     if (!sky0Tex) sky0Tex = m_skyPlaceholderCube.Get();
     if (!sky1Tex) sky1Tex = m_skyPlaceholderCube.Get();
@@ -582,12 +595,25 @@ void FGEnvironmentRender::DrawClouds(nvrhi::ICommandList* cmdList, nvrhi::IFrame
         ? renderDevice->GetFGResourceManager()->GetTextureManager() : nullptr;
     if (texManager && environment->Current[0] && environment->Current[1])
     {
+        static shared_str s_cloudsName0;
+        static shared_str s_cloudsName1;
+        static nvrhi::ITexture* s_cloudsTex0 = nullptr;
+        static nvrhi::ITexture* s_cloudsTex1 = nullptr;
+
         const shared_str& name0 = environment->Current[0]->clouds_texture_name;
         const shared_str& name1 = environment->Current[1]->clouds_texture_name;
-        if (name0.size())
-            clouds0Tex = texManager->GetNVRHITexture(texManager->LoadTexture(name0.c_str()));
-        if (name1.size())
-            clouds1Tex = texManager->GetNVRHITexture(texManager->LoadTexture(name1.c_str()));
+        if (name0.size() && name0 != s_cloudsName0)
+        {
+            s_cloudsName0 = name0;
+            s_cloudsTex0 = texManager->GetNVRHITexture(texManager->LoadTexture(name0.c_str()));
+        }
+        if (name1.size() && name1 != s_cloudsName1)
+        {
+            s_cloudsName1 = name1;
+            s_cloudsTex1 = texManager->GetNVRHITexture(texManager->LoadTexture(name1.c_str()));
+        }
+        clouds0Tex = s_cloudsTex0;
+        clouds1Tex = s_cloudsTex1;
     }
     if (!clouds0Tex) clouds0Tex = m_cloudsPlaceholderTex.Get();
     if (!clouds1Tex) clouds1Tex = m_cloudsPlaceholderTex.Get();
@@ -679,7 +705,7 @@ void FGEnvironmentRender::InitSunResources()
 
     auto& cache = framegraph::GetPassResourceCache();
     m_sunBindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "FGEnv_Sun", *vsResult.reflection, *psResult.reflection, m_device);
+        "FGEnv_Sun_v2", *vsResult.reflection, *psResult.reflection, m_device);
     R_ASSERT(m_sunBindingLayout);
 
     nvrhi::VertexAttributeDesc attribs[] = {
@@ -703,13 +729,15 @@ void FGEnvironmentRender::InitSunResources()
 
     nvrhi::RenderState renderState;
     renderState.blendState.targets[0].setBlendEnable(true);
-    renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::One);
+    renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::SrcAlpha);
     renderState.blendState.targets[0].setDestBlend(nvrhi::BlendFactor::One);
     renderState.blendState.targets[0].setBlendOp(nvrhi::BlendOp::Add);
-    // Depth-test so mountains/objects occlude the disc (classic). No depth write.
+    renderState.blendState.targets[0].setSrcBlendAlpha(nvrhi::BlendFactor::One);
+    renderState.blendState.targets[0].setDestBlendAlpha(nvrhi::BlendFactor::One);
+    renderState.blendState.targets[0].setBlendOpAlpha(nvrhi::BlendOp::Add);
     renderState.depthStencilState.setDepthTestEnable(true);
     renderState.depthStencilState.setDepthWriteEnable(false);
-    renderState.depthStencilState.setDepthFunc(nvrhi::ComparisonFunc::LessOrEqual);
+    renderState.depthStencilState.setDepthFunc(nvrhi::ComparisonFunc::GreaterOrEqual);
     renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
 
     nvrhi::GraphicsPipelineDesc pipelineDesc;
@@ -724,7 +752,7 @@ void FGEnvironmentRender::InitSunResources()
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
     fbInfo.depthFormat = nvrhi::Format::D32;
 
-    m_sunPipeline = cache.GetOrCreatePipeline("FGEnv_Sun", pipelineDesc, fbInfo, m_device);
+    m_sunPipeline = cache.GetOrCreatePipeline("FGEnv_Sun_v3", pipelineDesc, fbInfo, m_device);
     R_ASSERT(m_sunPipeline);
 
     m_sunInitialized = true;
@@ -758,10 +786,11 @@ void FGEnvironmentRender::DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
         return;
 
     float fDistance = env.far_plane * 0.75f;
+    const float fDotClamped = std::max(fDot, 0.25f);
 
     Fvector vecLight;
     vecLight.set(vSunDir);
-    vecLight.mul(fDistance / fDot);
+    vecLight.mul(fDistance / fDotClamped);
     vecLight.add(Device.vCameraPosition);
 
     Fvector vecX, vecY;
@@ -816,7 +845,10 @@ void FGEnvironmentRender::DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
     auto* renderDevice = fgRenderer->GetRenderDevice();
 
     auto dynamicCBBuffer = cache.GetOrCreateVolatileCB(
-        "Frame", "DynamicTransforms", sizeof(passes::DynamicTransforms), renderDevice);
+        "FGEnv_Sun", "DynamicTransforms", sizeof(passes::DynamicTransforms), renderDevice);
+    passes::DynamicTransforms dynamicCB{};
+    passes::FillDynamicTransforms(dynamicCB, Fidentity);
+    cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
     nvrhi::ITexture* sunTex = nullptr;
     const shared_str& sunTexName = flareDesc->m_Source.texture;

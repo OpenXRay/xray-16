@@ -89,7 +89,7 @@ float4 compute_ssr_ex(
 	float3 V = normalize(position - eye_position);
 	float3 R = reflect(V, N);
 #ifdef SSR_WATER_DOWNWARD_BIAS
-	if (R.y < -0.2)
+	if (R.y < -0.55)
 		return float4(skybox, 0.0);
 #endif
 
@@ -152,7 +152,6 @@ float4 compute_ssr_ex(
 		float w;
 		if (!WorldToUv(marchPos, uv, w))
 		{
-			// Behind camera: keep last on-screen sample with soft conf (no hard cut)
 			if (tPrev > tMin && all(prevUV >= 0.0) && all(prevUV <= 1.0))
 			{
 				hitUV = prevUV;
@@ -164,8 +163,6 @@ float4 compute_ssr_ex(
 		}
 		if (any(uv < 0.0) || any(uv > 1.0))
 		{
-			// Left frustum: clamp to edge — all wet pixels share ~same R, so a hard
-			// miss here snaps the WHOLE screen (sky or geo). Keep edge sample.
 			if (tPrev > tMin)
 				hitUV = saturate(prevUV);
 			else
@@ -180,7 +177,7 @@ float4 compute_ssr_ex(
 		float sceneVZ = SampleSceneViewZ(uv, rawDepth);
 		float marchVZ = abs(mul(m_V, float4(marchPos, 1.0)).z);
 
-		if (rawDepth >= 0.9995)
+		if (IsSkyDepth(rawDepth))
 		{
 #ifdef SSR_ACCEPT_SKY
 			if (t > tMin * 1.25)
@@ -197,7 +194,7 @@ float4 compute_ssr_ex(
 		}
 
 		float delta = sceneVZ - marchVZ;
-		if (delta <= thickness && delta >= -thickness * 5.0)
+		if (delta <= thickness && delta >= -thickness)
 		{
 #ifdef SSR_OPAQUE_REFLECTOR
 			float minUvSep = lerp(0.028, 0.0035, nearAmt);
@@ -245,12 +242,14 @@ float4 compute_ssr_ex(
 			float mHit = abs(mul(m_V, float4(origin + R * (0.5 * (distA + distB)), 1.0)).z);
 			float err = abs(sHit - mHit);
 			hitConf = saturate(1.0 - err / max(thickness * 2.5, 1e-3));
+			float3 hitPos = ReconstructWorld(hitUV, dHit);
+			float toward = dot(normalize(hitPos - origin), R);
+			hitConf *= saturate(toward * 2.0);
 			hit = hitConf > 0.04;
 			break;
 		}
-		else if (delta < -thickness * 5.0)
+		else if (delta < -thickness)
 		{
-			// Occluded: soft keep last UV instead of hard kill (reduces yaw snap)
 			if (tPrev > tMin * 1.5 && all(prevUV >= 0.0) && all(prevUV <= 1.0))
 			{
 				hitUV = prevUV;
@@ -312,6 +311,177 @@ float4 compute_ssr(float3 position, float3 normal, float3 skybox)
 	return compute_ssr_ex(
 		position, normal, skybox,
 		SSR_SAMPLES, SSR_DISTANCE, SSR_THICKNESS, SSR_REFINE, 0.0);
+}
+
+float4 compute_ssr_water(float3 position, float3 normal, float3 skybox)
+{
+	float3 N = normalize(lerp(normalize(normal), float3(0.0, 1.0, 0.0), 0.7));
+	float3 V = normalize(position - eye_position);
+	float3 R = reflect(V, N);
+	if (R.y < 0.02)
+		R = normalize(float3(R.x, 0.02, R.z));
+	R = normalize(R);
+
+	const int steps = 36;
+	const float maxDist = 160.0;
+	const float thickness = 1.15;
+	const int refineCount = 6;
+	const float minUvSep = 0.008;
+	const float tMin = 0.85;
+
+	float3 origin = position + N * 0.1;
+	float2 startUV = 0.0;
+	float startW = 1.0;
+	if (!WorldToUv(origin, startUV, startW))
+		return float4(skybox, 0.0);
+
+	float2 dirUV = 0.0;
+	{
+		float2 uv1 = 0.0;
+		float w1 = 1.0;
+		if (!WorldToUv(origin + R * 3.0, uv1, w1))
+			return float4(skybox, 0.0);
+		dirUV = uv1 - startUV;
+		float dirLen = length(dirUV);
+		if (dirLen < 1e-4)
+			return float4(skybox, 0.0);
+		dirUV /= dirLen;
+	}
+
+	float2 hitUV = 0.0;
+	bool hit = false;
+	float hitConf = 0.0;
+	float hitT = 0.0;
+
+	float tPrev = tMin;
+	float2 prevUV = startUV;
+	{
+		float pw = 1.0;
+		WorldToUv(origin + R * tMin, prevUV, pw);
+	}
+
+	[loop]
+	for (int i = 1; i <= steps; ++i)
+	{
+		float u = float(i) / float(steps);
+		float t = max(tMin, maxDist * u * u);
+		float3 marchPos = origin + R * t;
+
+		float2 uv = 0.0;
+		float w = 1.0;
+		if (!WorldToUv(marchPos, uv, w))
+			break;
+		if (any(uv < 0.0) || any(uv > 1.0))
+			break;
+
+		float rawDepth = 0.0;
+		float sceneVZ = SampleSceneViewZ(uv, rawDepth);
+		if (IsSkyDepth(rawDepth))
+		{
+			prevUV = uv;
+			tPrev = t;
+			continue;
+		}
+
+		float3 scenePos = ReconstructWorld(uv, rawDepth);
+		if (scenePos.y < position.y - 0.2)
+		{
+			prevUV = uv;
+			tPrev = t;
+			continue;
+		}
+
+		float3 toScene = scenePos - origin;
+		float along = dot(toScene, R);
+		if (along < tMin)
+		{
+			prevUV = uv;
+			tPrev = t;
+			continue;
+		}
+
+		float perp = length(scenePos - (origin + R * along));
+		float marchVZ = abs(mul(m_V, float4(marchPos, 1.0)).z);
+		float delta = sceneVZ - marchVZ;
+		float thick = thickness * (1.0 + along * 0.012);
+		if (delta > thick || delta < -thick * 2.0 || perp > thick)
+		{
+			if (delta < -thick * 2.0)
+				break;
+			prevUV = uv;
+			tPrev = t;
+			continue;
+		}
+
+		if (length(uv - startUV) < minUvSep)
+		{
+			prevUV = uv;
+			tPrev = t;
+			continue;
+		}
+
+		float2 travel = uv - startUV;
+		float travelLen = length(travel);
+		if (travelLen < minUvSep || dot(travel / travelLen, dirUV) < 0.2)
+		{
+			prevUV = uv;
+			tPrev = t;
+			continue;
+		}
+
+		float distA = tPrev;
+		float distB = t;
+		[loop]
+		for (int r = 0; r < refineCount; ++r)
+		{
+			float midT = 0.5 * (distA + distB);
+			float2 uvM = 0.0;
+			float wM = 1.0;
+			WorldToUv(origin + R * midT, uvM, wM);
+			float dM = 0.0;
+			float sVZ = SampleSceneViewZ(uvM, dM);
+			float mVZ = abs(mul(m_V, float4(origin + R * midT, 1.0)).z);
+			if ((sVZ - mVZ) <= thickness)
+				distB = midT;
+			else
+				distA = midT;
+		}
+
+		hitT = 0.5 * (distA + distB);
+		float wH = 1.0;
+		WorldToUv(origin + R * hitT, hitUV, wH);
+		if (any(hitUV < 0.0) || any(hitUV > 1.0) || length(hitUV - startUV) < minUvSep)
+			break;
+
+		float dHit = 0.0;
+		float sHit = SampleSceneViewZ(hitUV, dHit);
+		if (IsSkyDepth(dHit))
+			break;
+		float3 hitPos = ReconstructWorld(hitUV, dHit);
+		if (hitPos.y < position.y - 0.2)
+			break;
+
+		float alongH = dot(hitPos - origin, R);
+		float perpH = length(hitPos - (origin + R * alongH));
+		float mHit = abs(mul(m_V, float4(origin + R * hitT, 1.0)).z);
+		float err = abs(sHit - mHit);
+		hitConf = saturate(1.0 - err / max(thickness * 2.0, 1e-3));
+		hitConf *= saturate(1.0 - perpH / max(thickness * 2.5, 1e-3));
+		hitConf *= RayAttenBorder(hitUV, SSR_EDGE_ATTENUATION);
+		hitConf *= saturate((alongH - tMin) * 0.5);
+		hit = hitConf > 0.08;
+		break;
+	}
+
+	if (!hit)
+		return float4(skybox, 0.0);
+
+	float3 img = g_SceneColor.SampleLevel(smp_nofilter, hitUV, 0).xyz;
+	float hitLum = dot(max(img, 0.0), float3(0.2126, 0.7152, 0.0722));
+	if (hitLum < 1e-5)
+		return float4(skybox, 0.0);
+	hitConf *= saturate(hitLum * 2.5 + 0.45);
+	return float4(img, saturate(hitConf * 1.25));
 }
 
 float4 compute_ssr_near(
@@ -384,7 +554,7 @@ float4 compute_ssr_near(
 		float sceneVZ = SampleSceneViewZ(uv, rawDepth);
 		float marchVZ = abs(mul(m_V, float4(marchPos, 1.0)).z);
 
-		if (rawDepth >= 0.9995)
+		if (IsSkyDepth(rawDepth))
 		{
 			if (t > tMin * 1.5)
 			{
@@ -399,7 +569,7 @@ float4 compute_ssr_near(
 		}
 
 		float delta = sceneVZ - marchVZ;
-		if (delta <= thickness && delta >= -thickness * 4.0)
+		if (delta <= thickness && delta >= -thickness)
 		{
 			if (length(uv - startUV) < 0.0025)
 			{
@@ -436,10 +606,13 @@ float4 compute_ssr_near(
 			float mHit = abs(mul(m_V, float4(origin + R * (0.5 * (distA + distB)), 1.0)).z);
 			float err = abs(sHit - mHit);
 			hitConf = saturate(1.0 - err / max(thickness * 2.0, 1e-3));
+			float3 hitPos = ReconstructWorld(hitUV, dHit);
+			float toward = dot(normalize(hitPos - origin), R);
+			hitConf *= saturate(toward * 2.0);
 			hit = hitConf > 0.03;
 			break;
 		}
-		else if (delta < -thickness * 4.0)
+		else if (delta < -thickness)
 		{
 			if (tPrev > tMin * 1.2 && all(prevUV >= 0.0) && all(prevUV <= 1.0))
 			{

@@ -1,5 +1,6 @@
 #define SM_6_0
 #include "common.h"
+#include "shared/basecolor_pack.h"
 #include "shared/ssr.h"
 
 Texture2D g_Normal : register(t0);
@@ -92,7 +93,7 @@ float4 TraceSSGI(float3 worldPos, float3 N, float2 uv)
             float3 scenePos;
             float rawD;
             float sceneDist = SampleSceneDistance(suv, scenePos, rawD);
-            if (rawD >= 0.9995)
+            if (IsSkyDepth(rawD))
             {
                 marchPos += dir * stepSize;
                 continue;
@@ -130,7 +131,7 @@ float4 TraceSSGI(float3 worldPos, float3 N, float2 uv)
 float4 main(PS_INPUT I) : SV_Target
 {
     float rawDepth = g_SceneDepth.SampleLevel(smp_nofilter, I.uv, 0).x;
-    if (rawDepth >= 0.9995)
+    if (IsSkyDepth(rawDepth))
         return float4(0, 0, 0, 0);
 
     float4 nSample = g_Normal.SampleLevel(smp_nofilter, I.uv, 0);

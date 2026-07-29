@@ -83,6 +83,7 @@ public:
     virtual u32 GetBackBufferCount() const { return 1; }
     virtual void Present(bool vsync) = 0;
     virtual bool PresentFrameGeneration(nvrhi::ITexture* interpolated, nvrhi::ITexture* real) { (void)interpolated; (void)real; return false; }
+    virtual u64 GetPresentCount() const { return 0; }
     virtual std::pair<u32, u32> GetBackBufferSize() const = 0;
     virtual void ResizeSwapChain(u32 width, u32 height) {}
 

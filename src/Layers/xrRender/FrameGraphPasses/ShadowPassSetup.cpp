@@ -668,6 +668,8 @@ void InitializeShadowPass(fg::RenderDevice* device, ShadowPassState& state)
 
     state.initialized = true;
     state.enabled = true;
+    if (nvrhi::IDevice* nv = device ? device->GetNVRHIDevice() : nullptr)
+        framegraph::GetPassResourceCache().EnsureShadowBindDummies(nv);
     Msg("* [ShadowPass] Init: OK (CSM ladder %u/%u/%u, HUD %ux%u)",
         state.cascadeResolution[0], state.cascadeResolution[1], state.cascadeResolution[2],
         ShadowPassState::kHUDShadowResolution, ShadowPassState::kHUDShadowResolution);

@@ -67,7 +67,7 @@ void Init(nvrhi::IDevice* nv, ContactShadowsPassState& st)
 
     auto& cache = GetPassResourceCache();
     st.marchLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "ContactMarch_v2", *vs.reflection, *psMarch.reflection, nv);
+        "ContactMarch_v6", *vs.reflection, *psMarch.reflection, nv);
     if (st.marchLayout)
     {
         nvrhi::GraphicsPipelineDesc desc;
@@ -84,7 +84,7 @@ void Init(nvrhi::IDevice* nv, ContactShadowsPassState& st)
         desc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
         nvrhi::FramebufferInfoEx fb;
         fb.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
-        st.marchPipeline = cache.GetOrCreatePipeline("ContactMarch_v2", desc, fb, nv);
+        st.marchPipeline = cache.GetOrCreatePipeline("ContactMarch_v6", desc, fb, nv);
     }
     st.initialized = true;
 }
@@ -102,13 +102,14 @@ VirtualResourceHandle setupContactShadowsPass(
     fg::RenderDevice* device,
     VirtualResourceHandle sceneColor,
     VirtualResourceHandle depth,
+    VirtualResourceHandle worldPos,
     VirtualResourceHandle motionVectors,
     u32 width,
     u32 height,
     bool hasPrevFrame,
     ContactShadowsPassState& state)
 {
-    if (!ps_r_contact_shadows || !device || !device->GetNVRHIDevice())
+    if (!ps_r_contact_shadows || !device || !device->GetNVRHIDevice() || !worldPos.is_valid())
         return sceneColor;
 
     Init(device->GetNVRHIDevice(), state);
@@ -145,7 +146,7 @@ VirtualResourceHandle setupContactShadowsPass(
 
     struct PassData
     {
-        VirtualResourceHandle depth, motion, hist, march;
+        VirtualResourceHandle depth, worldPos, motion, hist, march;
         ContactShadowsPassState* st = nullptr;
         fg::RenderDevice* device = nullptr;
         u32 width = 0, height = 0, writeIdx = 0;
@@ -163,6 +164,7 @@ VirtualResourceHandle setupContactShadowsPass(
             data.writeIdx = writeIdx;
             data.useTemporal = useTemporal;
             data.depth = pb.read(depth, ResourceState::ShaderResource);
+            data.worldPos = pb.read(worldPos, ResourceState::ShaderResource);
             data.hist = pb.read(histRead, ResourceState::ShaderResource);
             if (useTemporal)
                 data.motion = pb.read(motionVectors, ResourceState::ShaderResource);
@@ -173,9 +175,10 @@ VirtualResourceHandle setupContactShadowsPass(
             auto* cmd = ctx->GetCommandList();
             auto* nv = cmd ? cmd->getDevice() : nullptr;
             auto* depthTex = graph.GetPhysicalTexture(data.depth);
+            auto* worldPosTex = graph.GetPhysicalTexture(data.worldPos);
             auto* hist = graph.GetPhysicalTexture(data.hist);
             auto* march = graph.GetPhysicalTexture(data.march);
-            if (!cmd || !nv || !depthTex || !hist || !march || !data.st)
+            if (!cmd || !nv || !depthTex || !worldPosTex || !hist || !march || !data.st)
                 return;
 
             nvrhi::ITexture* motionTex = nullptr;
@@ -228,6 +231,7 @@ VirtualResourceHandle setupContactShadowsPass(
             if (marchCB)
                 bsb.ConstantBuffer("ContactParams", marchCB);
             bsb.Texture("g_Depth", depthTex)
+                .Texture("g_WorldPos", worldPosTex)
                 .Texture("g_Motion", motionTex)
                 .Texture("g_History", hist);
             auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.st->marchLayout, nv);

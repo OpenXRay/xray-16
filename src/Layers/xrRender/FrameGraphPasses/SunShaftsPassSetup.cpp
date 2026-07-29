@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SunShaftsPassSetup.h"
 #include "ShaderConstants.h"
+#include "TAAPassSetup.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
@@ -60,7 +61,7 @@ struct SunShaftsCombineData
 
 void InitializeSunShaftsPass(nvrhi::IDevice* device, SunShaftsPassState& state)
 {
-    constexpr u32 kPipeVersion = 6;
+    constexpr u32 kPipeVersion = 16;
     if (!device)
         return;
     if (state.initialized && state.pipeline && state.combinePipeline && state.pipeVersion == kPipeVersion)
@@ -101,8 +102,9 @@ void InitializeSunShaftsPass(nvrhi::IDevice* device, SunShaftsPassState& state)
     }
 
     auto& cache = GetPassResourceCache();
+    cache.EnsureShadowBindDummies(device);
     state.layout = cache.GetOrCreateBindingLayoutFromReflection(
-        "SunShafts_CSMLadder_v4", *state.marchVsReflection, *state.marchPsReflection, device);
+        "SunShafts_CSMLadder_v16", *state.marchVsReflection, *state.marchPsReflection, device);
 
     nvrhi::GraphicsPipelineDesc desc;
     desc.setVertexShader(vs.handle);
@@ -116,14 +118,14 @@ void InitializeSunShaftsPass(nvrhi::IDevice* device, SunShaftsPassState& state)
 
     nvrhi::FramebufferInfoEx fbInfo;
     fbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
-    state.pipeline = cache.GetOrCreatePipeline("SunShafts_v4", desc, fbInfo, device);
+    state.pipeline = cache.GetOrCreatePipeline("SunShafts_v16", desc, fbInfo, device);
 
     auto combinePs = loader->LoadPixelShader("volumetric/sunshafts_combine");
     if (combinePs.handle && combinePs.reflection)
     {
         state.combinePsReflection = loader->GetCachedReflection("volumetric/sunshafts_combine", ".ps");
         state.combineLayout = cache.GetOrCreateBindingLayoutFromReflection(
-            "SunShaftsCombine_v4", *state.marchVsReflection, *state.combinePsReflection, device);
+            "SunShaftsCombine_v16", *state.marchVsReflection, *state.combinePsReflection, device);
 
         nvrhi::GraphicsPipelineDesc cdesc;
         cdesc.setVertexShader(vs.handle);
@@ -144,7 +146,7 @@ void InitializeSunShaftsPass(nvrhi::IDevice* device, SunShaftsPassState& state)
 
         nvrhi::FramebufferInfoEx cfbInfo;
         cfbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
-        state.combinePipeline = cache.GetOrCreatePipeline("SunShaftsCombine_v4", cdesc, cfbInfo, device);
+        state.combinePipeline = cache.GetOrCreatePipeline("SunShaftsCombine_v16", cdesc, cfbInfo, device);
     }
     else
     {
@@ -153,10 +155,8 @@ void InitializeSunShaftsPass(nvrhi::IDevice* device, SunShaftsPassState& state)
 
     state.initialized = true;
     state.pipeVersion = kPipeVersion;
-    Msg("* [SunShafts] Pass initialized v4 (march=%d combine=%d cbs=%u srvs=%u)",
-        state.pipeline ? 1 : 0, state.combinePipeline ? 1 : 0,
-        (u32)state.marchPsReflection->constantLayout.constantBuffers.buffers.size(),
-        (u32)state.marchPsReflection->rtBindings.inputTextures.size());
+    Msg("* [SunShafts] Pass initialized v16 (R32 depth/CSM) march=%d combine=%d",
+        state.pipeline ? 1 : 0, state.combinePipeline ? 1 : 0);
 }
 
 float ResolveSunShaftsIntensity()
@@ -172,7 +172,7 @@ float ResolveSunShaftsIntensity()
     if (SunshaftsIntensity > 0.f)
         intensity = SunshaftsIntensity;
     intensity *= std::max(ps_r_sun_shafts_scale, 0.f);
-    return intensity;
+    return std::max(intensity, 0.f);
 }
 
 static bool NeedSunShafts(float& outIntensity, u32& outQuality)
@@ -269,19 +269,46 @@ VirtualResourceHandle setupSunShaftsPass(
             if (!depthTex || !worldPosTex || !outTex)
                 return;
 
+            const auto& ddesc = depthTex->getDesc();
+            if (!ps->depthCopy ||
+                ps->depthCopy->getDesc().width != ddesc.width ||
+                ps->depthCopy->getDesc().height != ddesc.height)
+            {
+                nvrhi::TextureDesc td{};
+                td.width = ddesc.width;
+                td.height = ddesc.height;
+                td.format = nvrhi::Format::D32;
+                td.debugName = "SunShafts_DepthCopy";
+                td.isShaderResource = true;
+                td.isTypeless = true;
+                td.initialState = nvrhi::ResourceStates::ShaderResource;
+                td.keepInitialState = true;
+                ps->depthCopy = nv->createTexture(td);
+            }
+            nvrhi::ITexture* depthSrv = depthTex;
+            if (ps->depthCopy)
+            {
+                cmd->setTextureState(depthTex, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+                cmd->setTextureState(ps->depthCopy, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+                cmd->copyTexture(ps->depthCopy, nvrhi::TextureSlice(), depthTex, nvrhi::TextureSlice());
+                cmd->setTextureState(ps->depthCopy, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                depthSrv = ps->depthCopy;
+            }
+
             auto& cache = GetPassResourceCache();
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB(
                 "Frame", "StaticGlobals", sizeof(StaticGlobals), ctx->GetDevice());
             auto shaftCB = cache.GetOrCreateVolatileCB(
-                "SunShafts", "SunShaftsCB_v4", sizeof(SunShaftsCBGPU), ctx->GetDevice());
+                "SunShafts", "SunShaftsCB_v15", sizeof(SunShaftsCBGPU), ctx->GetDevice());
 
-            StaticGlobals sg = BuildStaticGlobals();
+            StaticGlobals sg = BuildStaticGlobals(1.0f);
+            sg.m_VP = g_taa_unjittered_full_transform;
+            sg.m_InvVP = g_taa_unjittered_inv_full_transform;
             cmd->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
 
             SunShaftsCBGPU cb{};
             const float samples = (data.quality >= 3) ? 40.f : 20.f;
-            const float scale = ps_r_sun_shafts_scale > 0.f ? ps_r_sun_shafts_scale : 1.f;
-            cb.shaft_params.set(data.intensity, float(data.quality), samples, scale);
+            cb.shaft_params.set(data.intensity, float(data.quality), samples, 1.f);
             cmd->writeBuffer(shaftCB, &cb, sizeof(cb));
 
             if (!ps->marchVsReflection || !ps->marchPsReflection)
@@ -290,12 +317,11 @@ VirtualResourceHandle setupSunShaftsPass(
             BindingSetBuilder bsb(*ps->marchVsReflection, *ps->marchPsReflection, nv, "SunShaftsMarch");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                 .ConstantBuffer("SunShaftsCB", shaftCB)
-                .Texture("g_Depth", depthTex)
+                .Texture("g_Depth", depthSrv, nvrhi::Format::R32_FLOAT)
                 .Texture("g_WorldPos", worldPosTex);
             {
                 static const char* kNames[3] = {"g_ShadowMap0", "g_ShadowMap1", "g_ShadowMap2"};
-                auto& smpCache = GetPassResourceCache();
-                nvrhi::ITexture* dummy2D = smpCache.GetDummyShadowMap2D(nv);
+                nvrhi::ITexture* dummy2D = cache.GetDummyShadowMap2D(nv);
                 for (u32 i = 0; i < 3; ++i)
                 {
                     nvrhi::ITexture* t = data.shadowCascades[i] ? data.shadowCascades[i]
@@ -304,13 +330,13 @@ VirtualResourceHandle setupSunShaftsPass(
                         bsb.Texture(kNames[i], t);
                 }
                 static const char* kHzb[3] = {"g_ShadowHZB0", "g_ShadowHZB1", "g_ShadowHZB2"};
-                nvrhi::ITexture* dummyHzb = smpCache.GetDummyContactDepth(nv);
+                nvrhi::ITexture* dummyHzb = cache.GetDummyContactDepth(nv);
                 for (u32 i = 0; i < 3; ++i)
                 {
                     if (dummyHzb)
                         bsb.Texture(kHzb[i], dummyHzb);
                 }
-                nvrhi::ITexture* contactHist = smpCache.GetDummyContactHistory(nv);
+                nvrhi::ITexture* contactHist = cache.GetDummyContactHistory(nv);
                 if (contactHist)
                     bsb.Texture("g_ContactHistory", contactHist);
             }
@@ -320,7 +346,7 @@ VirtualResourceHandle setupSunShaftsPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outTex);
-            auto fb = cache.GetOrCreateFramebuffer("SunShaftsMarch_v4", fbDesc, nv);
+            auto fb = cache.GetOrCreateFramebuffer("SunShaftsMarch_v15", fbDesc, nv);
 
             nvrhi::Viewport vp(0.f, float(data.width), 0.f, float(data.height), 0.f, 1.f);
             nvrhi::GraphicsState state;
@@ -366,7 +392,7 @@ VirtualResourceHandle setupSunShaftsPass(
 
             auto& cache = GetPassResourceCache();
             auto combineCB = cache.GetOrCreateVolatileCB(
-                "SunShafts", "SunShaftsCombineCB_v4", sizeof(SunShaftsCombineCBGPU), ctx->GetDevice());
+                "SunShafts", "SunShaftsCombineCB_v15", sizeof(SunShaftsCombineCBGPU), ctx->GetDevice());
 
             SunShaftsCombineCBGPU cb{};
             cb.combine_params.set(
@@ -385,7 +411,7 @@ VirtualResourceHandle setupSunShaftsPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outTex);
-            auto fb = cache.GetOrCreateFramebuffer("SunShaftsCombine_v4", fbDesc, nv);
+            auto fb = cache.GetOrCreateFramebuffer("SunShaftsCombine_v15", fbDesc, nv);
 
             nvrhi::Viewport vp(0.f, float(data.width), 0.f, float(data.height), 0.f, 1.f);
             nvrhi::GraphicsState state;

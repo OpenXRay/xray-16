@@ -142,7 +142,7 @@ void ComputeFrustumFitCascadeMatrices(
     viewOff.mul(zOff, lightView);
 
     Fmatrix lightProj;
-    lightProj.build_projection_ortho(orthoSize, orthoSize, zn, zn + zf);
+    lightProj.build_projection_ortho_stdz(orthoSize, orthoSize, zn, zn + zf);
     outClipVP.mul(lightProj, viewOff);
 
     const float fRange = (cascadeIndex == 0) ? ps_r2_sun_depth_near_scale : ps_r2_sun_depth_far_scale;

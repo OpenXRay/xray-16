@@ -61,7 +61,7 @@ float4 main(PS_INPUT I) : SV_Target
                + hasHistory * 0.0 + frameIndex * 0.0;
 
     float rawDepth = g_SceneDepth.SampleLevel(smp_nofilter, I.uv, 0).x;
-    if (rawDepth >= 0.9995)
+    if (IsSkyDepth(rawDepth))
         return float4(0, 0, 0, 0);
 
     float2 ndc = float2(I.uv.x * 2.0 - 1.0, 1.0 - I.uv.y * 2.0);
@@ -112,8 +112,9 @@ float4 main(PS_INPUT I) : SV_Target
     surf *= floraScale * metalBoost;
     surf *= lerp(1.0, 0.08, matteKill * (1.0 - metallic) * (1.0 - charWet * wetWritten));
     surf = max(surf, metallic * saturate(0.35 + gloss * 0.55));
+    surf = max(surf, gloss * gloss * 0.4);
 
-    if (surf < 0.03)
+    if (surf < 0.01)
         return float4(0, 0, 0, 0);
 
     float3 V = normalize(worldPos - eye_position);

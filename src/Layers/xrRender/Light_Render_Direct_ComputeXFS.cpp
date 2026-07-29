@@ -99,7 +99,7 @@ void CLight_Compute_XFORM_and_VIS::compute_xf_spot(light* L)
     else
         tan_shift = deg2rad(3.5f);
 
-    L->X.S.project.build_projection(L->cone + tan_shift, 1.f, L->virtual_size, L->range + EPS_S);
+    L->X.S.project.build_projection_stdz(L->cone + tan_shift, 1.f, L->virtual_size, L->range + EPS_S);
     L->X.S.combine.mul(L->X.S.project, L->X.S.view);
 }
 } // namespace xray::render::fg

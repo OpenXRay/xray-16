@@ -22,7 +22,7 @@ float4 main(PS_INPUT input) : SV_Target0
     const float angleBias = 0.0;
     float viewZ = ViewDepth(P);
 
-    float2 jitter = Ign2(input.position.xy + ao_proj.y);
+    float2 jitter = Ign2(input.position.xy);
     float ao = 0.0;
 
     [loop]

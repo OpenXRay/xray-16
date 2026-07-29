@@ -3,6 +3,10 @@
 #include "RenderContext.h"
 #include "../ResourceManager/FGResourceManager.h"
 #include "../Shaders/SlangCompiler.h"
+#include "Layers/xrRender/Backend/VulkanBackend.h"
+#include "xrEngine/IRenderBackend.h"
+#include <vulkan/vulkan.h>
+#include <algorithm>
 
 namespace xray::render::fg {
 
@@ -141,6 +145,31 @@ bool RenderDevice::InitializeFromBackend(IRenderBackend* backend) {
     m_modernResourceManager = xr_make_unique<xray::render::resources::FGResourceManager>(this);
     Msg("* [RenderDevice] FGResourceManager initialized");
 
+    if (auto* texMgr = m_modernResourceManager->GetTextureManager())
+    {
+        u64 deviceLocal = 0;
+        if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
+        {
+            if (auto* vk = dynamic_cast<VulkanBackend*>(GEnv.Backend))
+            {
+                VkPhysicalDeviceMemoryProperties memProps{};
+                vkGetPhysicalDeviceMemoryProperties(vk->GetVkPhysicalDevice(), &memProps);
+                for (u32 hi = 0; hi < memProps.memoryHeapCount; ++hi)
+                {
+                    if (memProps.memoryHeaps[hi].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
+                        deviceLocal = std::max(deviceLocal, (u64)memProps.memoryHeaps[hi].size);
+                }
+            }
+        }
+        if (deviceLocal > 0)
+        {
+            const u64 budget = std::max(512ull * 1024ull * 1024ull, (deviceLocal * 45ull) / 100ull);
+            texMgr->SetMemoryBudget(budget);
+            Msg("* [RenderDevice] Texture budget %llu MB (device-local heap %llu MB)",
+                budget / (1024ull * 1024ull), deviceLocal / (1024ull * 1024ull));
+        }
+    }
+
     // Reserve initial capacity
     m_textures.reserve(256);
     m_buffers.reserve(512);
@@ -207,9 +236,24 @@ TextureHandle RenderDevice::CreateTexture(
 
     nvrhi::TextureHandle nvrhiTexture = GetNativeDevice()->createTexture(nvrhiDesc);
     if (!nvrhiTexture) {
-        Msg("! [RenderDevice] Failed to create texture: %s (%ux%u depth=%u arr=%u mips=%u fmt=%d)",
+        const nvrhi::FormatInfo& fmtInfo = nvrhi::getFormatInfo(nvrhiDesc.format);
+        const u32 blockW = fmtInfo.blockSize > 1 ? fmtInfo.blockSize : 1;
+        const u32 blockH = fmtInfo.blockSize > 1 ? fmtInfo.blockSize : 1;
+        nvrhi::TextureDesc probeDesc = nvrhiDesc;
+        probeDesc.width = blockW;
+        probeDesc.height = blockH;
+        probeDesc.depth = 1;
+        probeDesc.arraySize = 1;
+        probeDesc.mipLevels = 1;
+        probeDesc.debugName = "CreateTexture_OomProbe";
+        nvrhi::TextureHandle sameFmtProbe = GetNativeDevice()->createTexture(probeDesc);
+        const bool likelyOom = (bool)sameFmtProbe;
+        if (sameFmtProbe)
+            sameFmtProbe = nullptr;
+        Msg("! [RenderDevice] Failed to create texture: %s (%ux%u depth=%u arr=%u mips=%u fmt=%d) [%s]",
             desc.debugName.c_str(), desc.width, desc.height, desc.depth, desc.arraySize,
-            desc.mipLevels, (int)desc.format);
+            desc.mipLevels, (int)desc.format,
+            likelyOom ? "likely VRAM/device-memory exhaustion" : "desc/format rejected");
         return TextureHandle{};
     }
 

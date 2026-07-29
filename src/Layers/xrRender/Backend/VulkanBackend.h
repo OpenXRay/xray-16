@@ -50,6 +50,7 @@ public:
     std::pair<u32, u32> GetBackBufferSize() const override { return {m_backBufferWidth, m_backBufferHeight}; }
     void Present(bool vsync) override;
     bool PresentFrameGeneration(nvrhi::ITexture* interpolated, nvrhi::ITexture* real) override;
+    u64 GetPresentCount() const override { return m_nextPresentId - 1; }
     void ResizeSwapChain(u32 width, u32 height) override;
 
     bool IsLowLatencyAvailable() const override { return m_latencyAvailable; }

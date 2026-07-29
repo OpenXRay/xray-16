@@ -97,7 +97,7 @@ float2 Ign2(float2 pixel)
 
 bool IsSky(float depth, float4 worldPos)
 {
-    if (depth >= 0.9999)
+    if (depth <= 1e-7)
         return true;
     if (worldPos.w < 0.5)
         return true;

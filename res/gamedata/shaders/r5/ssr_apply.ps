@@ -83,15 +83,12 @@ float4 main(PS_INPUT I) : SV_Target
 	float colLum = max(Lum(color), 1e-4);
 	float hitChroma = length(hit - hitLum.xxx);
 	float skyWash = saturate(hitLum * 2.0) * saturate(1.15 - hitChroma * 9.0);
-	skyWash = max(skyWash, saturate(hitLum / colLum - 1.0) * 0.7);
-	hit *= rcp(1.0 + hit * 1.5);
-	hit *= lerp(1.0, 0.28, skyWash);
+	skyWash = max(skyWash, saturate(hitLum / colLum - 1.0) * 0.55);
+	hit *= rcp(1.0 + hit * 0.85);
+	hit *= lerp(1.0, 0.55, skyWash);
 
-	float mixW = min(w * lerp(1.05, 0.4, skyWash), lerp(0.12, 0.45, metalWet));
-	mixW *= lerp(0.2, 1.0, metalWet);
-	float3 unioned = max(color, hit);
-	float3 outc = lerp(color, lerp(unioned, hit, saturate(metallic + gloss * 0.5)), mixW);
-	float outLum = max(Lum(outc), 1e-4);
-	outc *= lerp(1.0, max(colLum / outLum, 1.0), saturate(mixW * 1.1));
+	float mixW = min(w * lerp(1.15, 0.7, skyWash), lerp(0.42, 0.72, metalWet));
+	float mirrorAmt = saturate(metallic * 0.85 + gloss * gloss * 0.65);
+	float3 outc = lerp(color, hit, mixW * lerp(0.55, 1.0, mirrorAmt));
 	return float4(max(outc, 0.0), 1.0);
 }

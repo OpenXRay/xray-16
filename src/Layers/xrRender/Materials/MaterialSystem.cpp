@@ -136,8 +136,12 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared
             }
             break;
         }
-        if (blendInfo.strictB2F)
+        if (blendInfo.strictB2F &&
+            blendInfo.mode != BlendMode::Opaque &&
+            blendInfo.mode != BlendMode::AlphaTest)
+        {
             info.transparent = true;
+        }
         m_stats.materialsFromBlender++;
     }
 

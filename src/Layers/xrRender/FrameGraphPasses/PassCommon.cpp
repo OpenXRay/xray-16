@@ -148,12 +148,12 @@ void ResolveEnvSkyCubes(fg::RenderDevice* device, nvrhi::ITexture*& outSky0, nvr
             ? env.Current[1]->sky_texture_name
             : shared_str();
 
-        if (name0.size() && (name0 != s_cachedName0 || !s_cachedTex0))
+        if (name0.size() && name0 != s_cachedName0)
         {
             s_cachedName0 = name0;
             s_cachedTex0 = texManager->GetNVRHITexture(texManager->LoadTexture(name0.c_str()));
         }
-        if (name1.size() && (name1 != s_cachedName1 || !s_cachedTex1))
+        if (name1.size() && name1 != s_cachedName1)
         {
             s_cachedName1 = name1;
             s_cachedTex1 = texManager->GetNVRHITexture(texManager->LoadTexture(name1.c_str()));

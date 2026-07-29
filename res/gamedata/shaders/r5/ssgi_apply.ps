@@ -1,5 +1,6 @@
 #define SM_6_0
 #include "common.h"
+#include "shared/basecolor_pack.h"
 #include "shared/pbr_brdf.h"
 
 Texture2D g_Color  : register(t0);
@@ -20,7 +21,7 @@ float4 main(PS_INPUT I) : SV_Target
 {
     float3 color = g_Color.SampleLevel(smp_linear, I.uv, 0).rgb;
     float rawDepth = g_Depth.SampleLevel(smp_nofilter, I.uv, 0).x;
-    if (rawDepth >= 0.9995)
+    if (IsSkyDepth(rawDepth))
         return float4(color, 1.0);
 
     float amt = saturate(intensity);

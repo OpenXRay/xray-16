@@ -19,7 +19,6 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "Layers/xrRender/FGDetailManager.h"
-#include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
 #include "Layers/xrRender/Light_DB.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/r__sector.h"
@@ -97,16 +96,10 @@ void FrameGraphRenderer::level_Load(IReader* fs)
             *delim = 0;
             xr_strcpy(n_tlist, delim + 1);
 
-            // Extract first texture name
-            string256 firstTexture;
-            xr_strcpy(firstTexture, n_tlist);
-            if (pstr comma = strchr(firstTexture, ','))
-                *comma = 0;  // Truncate at first comma
-
-            // D3D12: Compile NVRHI shaders directly (NO legacy ref_shader!)
-            if (true) {
-                CompileLevelShader(i, n_sh, firstTexture);
-            }
+            // Keep the full classic list "base[,lmap#N_1[,lmap#N_2]]" — consumers
+            // that need a single texture strip commas themselves (MaterialCache),
+            // and the lmap slots are required for baked static lightmaps.
+            CompileLevelShader(i, n_sh, n_tlist);
         }
         chunk->close();
     }
@@ -144,9 +137,6 @@ void FrameGraphRenderer::level_Load(IReader* fs)
             if (detailMgr && detailMgr->Load()) {
                 detailMgr->BakeHeightmap();
                 detailMgr->LoadHeightmapTexture(GetRenderDevice()->GetNVRHIDevice());
-                pbr::PBRConversionParams pbrParams;
-                pbrParams.generate_mipmaps = true;
-                pbr::ConvertSingleTextureToPBR("$level$", "build_details.dds", pbrParams);
                 detailMgr->LoadBuildDetailsTexture(GetRenderDevice()->GetNVRHIDevice());
                 detailMgr->ComputeSlotAABBs();
                 detailMgr->CreateGPUBuffers(GetRenderDevice()->GetNVRHIDevice());

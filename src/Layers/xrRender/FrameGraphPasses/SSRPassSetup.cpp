@@ -19,7 +19,7 @@ using namespace framegraph;
 
 namespace
 {
-constexpr u32 kSSRPipeVersion = 72;
+constexpr u32 kSSRPipeVersion = 74;
 
 struct SSRQualityParams
 {
@@ -146,13 +146,13 @@ void InitSSR(nvrhi::IDevice* nv, SSRPassState& st)
 
     auto& cache = GetPassResourceCache();
     st.layout = cache.GetOrCreateBindingLayoutFromReflection(
-        "SSRResolve_v71", *vs.reflection, *ps.reflection, nv);
+        "SSRResolve_v74", *vs.reflection, *ps.reflection, nv);
     st.blurLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "SSRBlur_v71", *vs.reflection, *psBlur.reflection, nv);
+        "SSRBlur_v74", *vs.reflection, *psBlur.reflection, nv);
     st.temporalLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "SSRTemporal_v71", *vs.reflection, *psTemp.reflection, nv);
+        "SSRTemporal_v74", *vs.reflection, *psTemp.reflection, nv);
     st.applyLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "SSRApply_v72_MetalWet", *vs.reflection, *psApply.reflection, nv);
+        "SSRApply_v74", *vs.reflection, *psApply.reflection, nv);
 
     auto makeSingle = [&](auto& psSh, nvrhi::BindingLayoutHandle layout,
                           nvrhi::GraphicsPipelineHandle& pipe, const char* name) {
@@ -175,15 +175,15 @@ void InitSSR(nvrhi::IDevice* nv, SSRPassState& st)
         pipe = cache.GetOrCreatePipeline(name, desc, fb, nv);
     };
 
-    makeSingle(ps, st.layout, st.pipeline, "SSRResolve_v71");
-    makeSingle(psBlur, st.blurLayout, st.blurPipeline, "SSRBlur_v71");
-    makeSingle(psTemp, st.temporalLayout, st.temporalPipeline, "SSRTemporal_v71");
-    makeSingle(psApply, st.applyLayout, st.applyPipeline, "SSRApply_v72_MetalWet");
+    makeSingle(ps, st.layout, st.pipeline, "SSRResolve_v73");
+    makeSingle(psBlur, st.blurLayout, st.blurPipeline, "SSRBlur_v73");
+    makeSingle(psTemp, st.temporalLayout, st.temporalPipeline, "SSRTemporal_v73");
+    makeSingle(psApply, st.applyLayout, st.applyPipeline, "SSRApply_v73");
 
     st.initialized = true;
     st.pipeVersion = kSSRPipeVersion;
     if (st.pipeline && st.blurPipeline && st.temporalPipeline && st.applyPipeline)
-        Msg("* [SSR] initialized v72 (SSR∪RT metal/wet)");
+        Msg("* [SSR] initialized v74 (mirror hit + apply)");
     else
         Msg("! [SSR] Pipeline create failed (resolve=%d blur=%d temp=%d apply=%d)",
             !!st.pipeline, !!st.blurPipeline, !!st.temporalPipeline, !!st.applyPipeline);
@@ -446,6 +446,32 @@ VirtualResourceHandle setupSSRPass(
                 else
                     litSrv = color;
             }
+
+            {
+                const auto& ddesc = depthTex->getDesc();
+                if (!data.st->depthCopy ||
+                    data.st->depthCopy->getDesc().width != ddesc.width ||
+                    data.st->depthCopy->getDesc().height != ddesc.height)
+                {
+                    nvrhi::TextureDesc td{};
+                    td.width = ddesc.width;
+                    td.height = ddesc.height;
+                    td.format = nvrhi::Format::D32;
+                    td.debugName = "SSR_DepthCopy";
+                    td.isShaderResource = true;
+                    td.isTypeless = true;
+                    td.initialState = nvrhi::ResourceStates::ShaderResource;
+                    td.keepInitialState = true;
+                    data.st->depthCopy = nv->createTexture(td);
+                }
+                if (data.st->depthCopy)
+                {
+                    cmd->setTextureState(depthTex, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+                    cmd->setTextureState(data.st->depthCopy, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+                    cmd->copyTexture(data.st->depthCopy, nvrhi::TextureSlice(), depthTex, nvrhi::TextureSlice());
+                    cmd->setTextureState(data.st->depthCopy, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                }
+            }
 #endif
 
             cmd->setTextureState(color, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
@@ -475,7 +501,7 @@ VirtualResourceHandle setupSSRPass(
                 float(Device.dwFrame & 1023),
                 q.steps, q.distance, q.thickness, q.refine,
                 q.enableNearMarch, 0.f, 0.f, 0.f};
-            auto* ssrCB = cache.GetOrCreateVolatileCB("SSR", "SSRParams_v71", sizeof(PCB), data.device);
+            auto* ssrCB = cache.GetOrCreateVolatileCB("SSR", "SSRParams_v74", sizeof(PCB), data.device);
             if (ssrCB)
                 cmd->writeBuffer(ssrCB, &p, sizeof(p));
 
@@ -505,10 +531,8 @@ VirtualResourceHandle setupSSRPass(
 #if defined(XR_PLATFORM_APPLE)
             nvrhi::ITexture* sceneColorSrv = data.st->colorCopy ? data.st->colorCopy.Get() : reflection;
             nvrhi::ITexture* litSrv = data.st->litCopy ? data.st->litCopy.Get() : color;
-            nvrhi::ITexture* depthSrv = data.st->depthCopy ? data.st->depthCopy.Get() : depthTex;
-#else
-            nvrhi::ITexture* depthSrv = depthTex;
 #endif
+            nvrhi::ITexture* depthSrv = data.st->depthCopy ? data.st->depthCopy.Get() : depthTex;
 
             cmd->clearTextureFloat(ssrTex, nvrhi::AllSubresources, nvrhi::Color(0.f));
             {

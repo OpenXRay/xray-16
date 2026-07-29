@@ -166,7 +166,7 @@ VirtualResourceHandle setupPostProcessPass(
                 td.height = height;
                 td.format = outFmt;
                 td.isRenderTarget = true;
-                td.isTransient = false;
+                td.isTransient = true;
                 td.debugName = "rt_PostProcess";
                 data.output = pb.createTexture("rt_PostProcess", td);
             }
@@ -245,14 +245,18 @@ VirtualResourceHandle setupPostProcessPass(
             }
 
             nvrhi::ITexture* noiseTex = data.st->noisePlaceholder.Get();
-            auto* resMgr = data.device->GetFGResourceManager();
-            auto* texMgr = resMgr ? resMgr->GetTextureManager() : nullptr;
-            if (texMgr)
+            if (!data.st->noiseTexture)
             {
-                auto handle = texMgr->LoadTexture("fx\\fx_noise2");
-                if (auto* t = texMgr->GetNVRHITexture(handle))
-                    noiseTex = t;
+                auto* resMgr = data.device->GetFGResourceManager();
+                auto* texMgr = resMgr ? resMgr->GetTextureManager() : nullptr;
+                if (texMgr)
+                {
+                    auto handle = texMgr->LoadTexture("fx\\fx_noise2");
+                    data.st->noiseTexture = texMgr->GetNVRHITexture(handle);
+                }
             }
+            if (data.st->noiseTexture)
+                noiseTex = data.st->noiseTexture;
 
             nvrhi::ITexture* grad0 = data.st->noisePlaceholder.Get();
             nvrhi::ITexture* grad1 = data.st->noisePlaceholder.Get();

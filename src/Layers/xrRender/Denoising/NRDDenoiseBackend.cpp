@@ -174,7 +174,7 @@ class NRDDenoiseBackend final : public IDenoiseBackend
             bd.byteSize = 512;
             bd.isConstantBuffer = true;
             bd.isVolatile = true;
-            bd.maxVersions = 16;
+            bd.maxVersions = xray::render::fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
             bd.debugName = "NRD_CB_v9";
             bd.initialState = nvrhi::ResourceStates::ConstantBuffer;
             bd.keepInitialState = true;

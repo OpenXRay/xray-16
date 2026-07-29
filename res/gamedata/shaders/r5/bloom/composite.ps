@@ -25,7 +25,7 @@ float4 main(PS_INPUT I) : SV_Target
     if (dw == cw && dh == ch && dw > 0)
     {
         float depth = g_Depth.Load(int3(int2(uv * float2(dw, dh)), 0));
-        skyMask = depth >= skyDepth ? 0.0 : 1.0;
+        skyMask = depth <= skyDepth ? 0.0 : 1.0;
     }
 
     return float4(bloom * intensity * skyMask, 1.0);

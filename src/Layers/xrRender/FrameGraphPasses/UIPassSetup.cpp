@@ -127,6 +127,9 @@ framegraph::VirtualResourceHandle setupUIPass(
             if (!uiRender->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
+                const float uiW = float(std::max(1u, data.width));
+                const float uiH = float(std::max(1u, data.height));
+                staticGlobalsCB.screen_res.set(uiW, uiH, 1.0f / uiW, 1.0f / uiH);
 
                 for (const auto& batch : uiRender->GetBatches()) {
                     if (batch.uiShader && uiMatCache) {
@@ -215,6 +218,9 @@ framegraph::VirtualResourceHandle setupCursorPass(
             if (!uiRender->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
+                const float uiW = float(std::max(1u, data.width));
+                const float uiH = float(std::max(1u, data.height));
+                staticGlobalsCB.screen_res.set(uiW, uiH, 1.0f / uiW, 1.0f / uiH);
 
                 for (const auto& batch : uiRender->GetBatches()) {
                     if (batch.uiShader && uiMatCache) {

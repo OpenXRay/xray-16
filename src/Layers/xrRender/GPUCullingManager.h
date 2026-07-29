@@ -65,6 +65,7 @@ enum GPUObjectFlags : u32 {
     GPU_OBJECT_OPAQUE      = 0x1,
     GPU_OBJECT_ALPHA_TEST  = 0x2,
     GPU_OBJECT_TRANSPARENT = 0x4,
+    GPU_OBJECT_DYNAMIC     = 0x8,
 };
 
 // ═══════════════════════════════════════════════════════
@@ -488,8 +489,13 @@ public:
         u32 splatOffset;
         u32 splatCount;
         u32 pad;
+        Fmatrix prevWorld;
+        u32 prevBoneOffset;
+        u32 prevValid;
+        u32 pad1;
+        u32 pad2;
     };
-    static_assert(sizeof(SkinnedDrawRecord) == 80, "SkinnedDrawRecord must be 80 bytes");
+    static_assert(sizeof(SkinnedDrawRecord) == 160, "SkinnedDrawRecord must be 160 bytes");
 
     struct SkinnedBucket {
         nvrhi::BufferHandle objectBuffer;
@@ -526,15 +532,16 @@ public:
     // Global bone buffer pool - all skeleton bones are uploaded here each frame.
     // Each skeleton gets a contiguous range: g_BoneMatrices[offset + boneIndex]
 
-    // Call at frame start to reset bone buffer allocations
     void BeginSkinnedFrame();
 
-    // Get bone offset for a skeleton, uploading if not already done this frame
-    // Returns offset (in bone count) into global buffer
     u32 GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinematics* skeleton);
 
-    // Get the global bone buffer for shader binding
-    nvrhi::IBuffer* GetGlobalBoneBuffer() const { return m_globalBoneBuffer.Get(); }
+    nvrhi::IBuffer* GetGlobalBoneBuffer() const { return m_globalBoneBuffers[m_currentBoneBuffer].Get(); }
+    nvrhi::IBuffer* GetPrevBoneBuffer() const { return m_globalBoneBuffers[m_currentBoneBuffer ^ 1].Get(); }
+    u32 GetPrevBoneOffset(CKinematics* skeleton) const;
+    bool HasPrevBones(CKinematics* skeleton) const;
+    u32 GetBoneUploadFrameId() const { return m_boneUploadFrameId; }
+    void SetSkeletonCurrWorld(CKinematics* skeleton, const Fmatrix& world);
 
     // Process readback results from previous frame (call at frame start)
     void ProcessStatsReadback();
@@ -799,11 +806,10 @@ private:
     void DispatchSkinnedBucketCompaction(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
         SkinnedBucket& bucket, u32 frameId);
 
-    // Global bone buffer for GPU-driven skinned rendering
-    // All skeleton bones are uploaded here each frame, indexed by per-instance offset
-    static constexpr u32 MAX_TOTAL_BONES = 8192;  // ~100 skeletons * 78 bones
-    static constexpr u32 BONE_STRIDE = sizeof(Fmatrix);  // 64 bytes
-    nvrhi::BufferHandle m_globalBoneBuffer;
+    static constexpr u32 MAX_TOTAL_BONES = 8192;
+    static constexpr u32 BONE_STRIDE = sizeof(Fmatrix);
+    nvrhi::BufferHandle m_globalBoneBuffers[2];
+    u32 m_currentBoneBuffer = 0;
     u32 m_boneUploadFrameId = 0;
     xr_vector<Fmatrix> m_boneStagingBuffer;
     u32 m_currentBoneOffset = 0;

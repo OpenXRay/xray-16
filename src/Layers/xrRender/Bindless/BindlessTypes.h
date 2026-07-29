@@ -69,7 +69,7 @@ struct alignas(16) MaterialData {
 
     u32 sssMapIndex;       // SSS thickness/strength map (R/G/B = thick/str/profile)
     float emissiveIntensity;
-    u32 _pad1;
+    u32 lmapIndex;         // Baked hemi lightmap (lmap#N_2: a=hemi, g=sun)
     u32 _pad2;
 };
 static_assert(sizeof(MaterialData) == 64, "MaterialData must be 64 bytes for GPU alignment");

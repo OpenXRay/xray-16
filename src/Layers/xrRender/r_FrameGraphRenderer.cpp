@@ -597,7 +597,7 @@ void FrameGraphRenderer::Render() {
     if (clm.IsReady() && clm.GetLightCount() > 0) {
         float zNear = VIEWPORT_NEAR;
         float zFar = g_pGamePersistent->Environment().CurrentEnv.far_plane;
-        auto ccb = clm.BuildClusterCB(Device.dwWidth, Device.dwHeight, zNear, zFar);
+        auto ccb = clm.BuildClusterCB(passes::GetRenderWidth(), passes::GetRenderHeight(), zNear, zFar);
         staticGlobalsData.cluster_params.set(ccb.gridDims.x, ccb.gridDims.y, ccb.gridDims.z, ccb.gridDims.w);
         staticGlobalsData.cluster_scales.set(ccb.depthParams.x, ccb.depthParams.y, ccb.depthParams.z, ccb.depthParams.w);
     }
@@ -669,6 +669,7 @@ void FrameGraphRenderer::RenderMenu() {
 
     const u32 width = Device.dwWidth;
     const u32 height = Device.dwHeight;
+    passes::SetRenderResolution(width, height);
 
     nvrhi::ITexture* backbufferTexture = GEnv.Backend->GetBackBuffer();
     framegraph::VirtualResourceHandle backbufferHandle;
@@ -742,7 +743,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
             const auto& batches = m_geometryCollector->GetBatches();
             stats.totalBatches = static_cast<u32>(batches.size());
 
-            xr_set<IRenderVisual*> uniqueSkeletons;
+            xr_set<IRenderable*> uniqueSkeletons;
 
             for (const auto& batch : batches)
             {
@@ -754,25 +755,8 @@ void FrameGraphRenderer::RenderStatsOverlay()
                     stats.skinnedBatches++;
                     stats.skinnedTriangles += triangles;
 
-                    if (batch.renderable)
-                    {
-                        IRenderVisual* rootVisual = batch.renderable->GetRenderData().visual;
-                        if (rootVisual && uniqueSkeletons.find(rootVisual) == uniqueSkeletons.end())
-                        {
-                            uniqueSkeletons.insert(rootVisual);
-                            stats.skinnedMeshes++;
-
-                            // Get bone count from kinematics
-                            IKinematics* K = rootVisual->dcast_PKinematics();
-                            if (K)
-                            {
-                                u32 boneCount = K->LL_BoneCount();
-                                stats.totalBones += boneCount;
-                                if (boneCount > stats.maxBonesPerMesh)
-                                    stats.maxBonesPerMesh = boneCount;
-                            }
-                        }
-                    }
+                    if (batch.renderable && uniqueSkeletons.insert(batch.renderable).second)
+                        stats.skinnedMeshes++;
                 }
                 else if (batch.isTerrain)
                 {
@@ -1033,8 +1017,38 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     passes::ApplyTAAJitter();
     passes::ResetMdiDrawCounters();
 
-    if ((ps_r_upscale != 0 || ps_r_dlss != 0) && !g_upscaleBackend)
-        g_upscaleBackend.reset(fg::CreateUpscaleBackendAuto());
+    {
+        if (ps_r_dlss != 0 && ps_r_upscale == 0)
+            ps_r_upscale = 2;
+        const int reqUpscale = ps_r_upscale;
+        const fg::UpscaleBackendType wantType =
+            (reqUpscale == 2) ? fg::UpscaleBackendType::DLSS :
+            (reqUpscale == 1) ? fg::UpscaleBackendType::FSR :
+            fg::UpscaleBackendType::None;
+        const fg::UpscaleBackendType haveType =
+            g_upscaleBackend ? g_upscaleBackend->GetType() : fg::UpscaleBackendType::None;
+        const bool haveOk = g_upscaleBackend && g_upscaleBackend->IsAvailable();
+        const bool needSwitch =
+            (wantType == fg::UpscaleBackendType::None && haveType != fg::UpscaleBackendType::None) ||
+            (wantType != fg::UpscaleBackendType::None && (!haveOk || haveType != wantType));
+        if (needSwitch)
+        {
+            if (GEnv.Backend)
+                GEnv.Backend->WaitForIdle();
+            if (g_upscaleBackend)
+            {
+                if (haveType == fg::UpscaleBackendType::DLSS &&
+                    wantType != fg::UpscaleBackendType::DLSS)
+                    fg::Streamline_ReleaseFeatures();
+                g_upscaleBackend->Shutdown();
+                g_upscaleBackend.reset();
+            }
+            if (wantType != fg::UpscaleBackendType::None)
+                g_upscaleBackend.reset(fg::CreateUpscaleBackendAuto());
+            m_hasPrevFrameData = false;
+        }
+    }
+    const bool upscaleBackendOk = g_upscaleBackend && g_upscaleBackend->IsAvailable();
 
     {
         static int s_denoiseCvar = -1;
@@ -1044,7 +1058,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         static int s_rrAvail = -1;
         static u32 s_denoiseW = 0;
         static u32 s_denoiseH = 0;
-        UpdateUpscaleState(g_upscaleState, Device.dwWidth, Device.dwHeight);
+        UpdateUpscaleState(g_upscaleState, Device.dwWidth, Device.dwHeight, upscaleBackendOk);
         const u32 denoiseW = g_upscaleState.renderWidth ? g_upscaleState.renderWidth : Device.dwWidth;
         const u32 denoiseH = g_upscaleState.renderHeight ? g_upscaleState.renderHeight : Device.dwHeight;
         const int rrAvail = fg::Streamline_IsRRAvailable() ? 1 : 0;
@@ -1056,6 +1070,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             s_rrAvail != rrAvail ||
             (g_denoiseBackend && (s_denoiseW != denoiseW || s_denoiseH != denoiseH));
         if (denoiseDirty && g_denoiseBackend) {
+            if (GEnv.Backend)
+                GEnv.Backend->WaitForIdle();
             g_denoiseBackend->Shutdown();
             g_denoiseBackend.reset();
         }
@@ -1072,28 +1088,44 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         s_denoiseH = denoiseH;
     }
 
-    // Recompute after backend auto-fallback may clear r_upscale
-    UpdateUpscaleState(g_upscaleState, Device.dwWidth, Device.dwHeight);
+    UpdateUpscaleState(g_upscaleState, Device.dwWidth, Device.dwHeight, upscaleBackendOk);
     g_upscaleState.jitterX = passes::g_taa_jitter_px;
     g_upscaleState.jitterY = passes::g_taa_jitter_py;
     g_upscaleState.prevJitterX = passes::g_taa_jitter_prev_px;
     g_upscaleState.prevJitterY = passes::g_taa_jitter_prev_py;
-    g_upscaleState.resetHistory = !m_hasPrevFrameData;
+    g_upscaleState.resetHistory = !m_hasPrevFrameData || fg::Streamline_ConsumeFeatureReset();
 
     const u32 displayWidth = g_upscaleState.displayWidth;
     const u32 displayHeight = g_upscaleState.displayHeight;
     const u32 width = g_upscaleState.renderWidth;
     const u32 height = g_upscaleState.renderHeight;
+    passes::SetRenderResolution(width, height);
+    static bool s_rtGiWasOn = false;
+    if (s_rtGiWasOn && !ps_r_rt_gi)
+        passes::ShutdownReSTIRGI(m_blackboard->get_or_add<passes::ReSTIRGIPassState>());
+    s_rtGiWasOn = ps_r_rt_gi;
+
+    bool rtgiActive = IsRTGIActive();
+    if (rtgiActive)
+    {
+        auto& rtgiState = m_blackboard->get_or_add<passes::ReSTIRGIPassState>();
+        if (!passes::EnsureReSTIRGITextures(m_device, rtgiState, width, height))
+            rtgiActive = false;
+    }
+    const bool rtGiWanted =
+        ps_r_rt_gi && !passes::IsRTGIAllocFailed() &&
+        m_rtAccelMgr && m_rtAccelMgr->IsSupported();
     const bool rtLightingWanted =
-        (ps_r_rt_gi || ps_r_path_tracer) && m_rtAccelMgr && m_rtAccelMgr->IsSupported();
-    const bool rtgiActive = IsRTGIActive();
+        (ps_r_path_tracer || rtGiWanted) &&
+        m_rtAccelMgr && m_rtAccelMgr->IsSupported();
     const bool wantSunShaftCsm = ps_r_sun_shafts != 0;
+    const bool wantSkinnedCsm = ps_r_skinned_shadows != 0;
     if (rtLightingWanted)
     {
         auto& localShadow = m_blackboard->get_or_add<passes::LocalShadowPassState>();
         if (localShadow.initialized)
             passes::ShutdownLocalShadowPass(m_device, localShadow);
-        if (!wantSunShaftCsm)
+        if (!wantSunShaftCsm && !wantSkinnedCsm)
         {
             auto& shadowState = m_blackboard->get_or_add<passes::ShadowPassState>();
             if (shadowState.initialized)
@@ -1166,7 +1198,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         for (int i = 0; i < 2; i++) {
             desc.debugName = (i == 0) ? "WorldPos_A" : "WorldPos_B";
             m_worldPos[i] = nvDevice->createTexture(desc);
+            if (!m_worldPos[i])
+                Msg("! [FG] Failed to create %s (%ux%u RGBA32_FLOAT)", desc.debugName.c_str(), width, height);
         }
+    }
+
+    if (!m_worldPos[writeIdx]) {
+        static bool s_worldPosFailLogged = false;
+        if (!s_worldPosFailLogged) {
+            Msg("! [FG] rt_WorldPos unavailable — aborting frame graph build (further spam suppressed)");
+            s_worldPosFailLogged = true;
+        }
+        return;
     }
 
     framegraph::ResourceDesc normalImportDesc;
@@ -1625,8 +1668,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     // ═══════════════════════════════════════════════════════
     //  CASCADED SHADOW MAPS (sun CSM, before Forward)
+    //  Keep CSM under RTGI when skinned casters or sunshafts need it.
     // ═══════════════════════════════════════════════════════
-    if (!rtLightingWanted)
+    if (!rtLightingWanted || wantSunShaftCsm || wantSkinnedCsm)
     {
         Fvector sunDir(0.3f, 0.8f, 0.2f);
         if (g_pGamePersistent)
@@ -1680,6 +1724,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 bindlessConfig.localShadowHandle = localOut.atlas;
                 m_framegraph->GetRTRegistry().RegisterRT("rt_LocalShadowAtlas", localOut.atlas);
             }
+            else
+            {
+                clmLocal.ClearLocalShadowAssignments();
+            }
+        }
+        else
+        {
+            clmLocal.ClearLocalShadowAssignments();
         }
     }
 
@@ -2112,6 +2164,20 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             width, height,
             m_blackboard->get_or_add<passes::MotionVectorPassState>()
         );
+        if (motionOutput.motionVectors.is_valid()) {
+            motionOutput.motionVectors = passes::setupSkinnedVelocityPass(
+                *m_framegraph, m_device,
+                motionOutput.motionVectors,
+                rtgiGuideDepth,
+                m_geometryCollector.get(),
+                m_hudBatches.empty() ? nullptr : &m_hudBatches,
+                m_gpuCullingManager.get(),
+                &m_blackboard->get_or_add<passes::SkinningPassState>(),
+                passes::g_taa_unjittered_full_transform,
+                m_prevViewProj,
+                width, height
+            );
+        }
     }
 
     // Wet G-buffer snapshot before RTGI (particles deferred until after denoise).
@@ -2124,7 +2190,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  DYNAMIC BLAS BUILD (before ReSTIR / path tracer)
     // ═══════════════════════════════════════════════════════
-    bool needsRT = (ps_r_path_tracer || ps_r_rt_gi) && m_rtAccelMgr && m_rtAccelMgr->IsSupported();
+    bool needsRT = rtLightingWanted;
+    static bool s_rtWasWanted = false;
+    if (s_rtWasWanted && !needsRT && m_rtAccelMgr)
+        m_rtAccelMgr->ReleaseAccelerationStructures();
+    s_rtWasWanted = needsRT;
 
     if (needsRT && m_rtAccelMgr->IsReady()) {
         bool ptNeedsBLAS = ps_r_path_tracer && m_ptSampleIndex == 0;
@@ -2137,6 +2207,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 FGDetailManager* detailMgr;
                 const GeometryCollector* geometry;
                 const xr_vector<GeometryBatch>* hudBatches;
+                const xr_vector<passes::ParticleBatch>* worldParticleBatches;
             };
 
             m_framegraph->addCallbackPass<DynamicBLASData>(
@@ -2149,6 +2220,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                     data.detailMgr = m_detailManager.get();
                     data.geometry = m_geometryCollector.get();
                     data.hudBatches = &m_hudBatches;
+                    data.worldParticleBatches = &m_worldParticleBatches;
                 },
                 [](const DynamicBLASData& data, const framegraph::FrameGraph&, fg::RenderContext* ctx) {
                     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
@@ -2182,6 +2254,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
                     data.accelMgr->BuildSkinnedBLAS(cmdList, data.gpuCulling, worldSkinned, hudSkinned);
                     data.accelMgr->BuildGrassBLAS(cmdList, data.detailMgr);
+                    if (data.worldParticleBatches)
+                        data.accelMgr->BuildParticleBLAS(cmdList, *data.worldParticleBatches);
                     data.accelMgr->RebuildDynamic(cmdList, data.gpuCulling);
                 }
             );
@@ -2193,15 +2267,21 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
 
     if (rtgiActive) {
-        const bool useDlssRR = ps_r_dlss_rr != 0 && ps_r_upscale == 2 && fg::Streamline_IsRRAvailable();
         const bool vendorDenoise = fg::IsVendorDenoiseActive(g_denoiseBackend.get());
-        const bool useVendorDenoise = vendorDenoise && ps_r_nrd_apply != 0 && !useDlssRR;
-        const bool skipInTreeDenoise = useVendorDenoise || useDlssRR;
+        const bool useVendorDenoise = vendorDenoise && ps_r_nrd_apply != 0;
+        const bool skipInTreeDenoise = useVendorDenoise;
         auto sceneColorBeforeRtgi = sceneColor;
         auto& rtgiState = m_blackboard->get_or_add<passes::ReSTIRGIPassState>();
         {
             auto& tpState = m_blackboard->get_or_add<passes::TransparentPassState>();
             rtgiState.waterUnderWorldPos = tpState.waterSceneWorldPos.Get();
+        }
+        framegraph::VirtualResourceHandle particleOpacityRT;
+        if (rtgiGuideWorldPos.is_valid() && !m_worldParticleBatches.empty()) {
+            auto& occState = m_blackboard->get_or_add<passes::ParticleOcclusionPassState>();
+            particleOpacityRT = passes::setupParticleOcclusionPass(
+                *m_framegraph, m_device, rtgiGuideWorldPos,
+                &m_worldParticleBatches, width, height, occState);
         }
         auto rtgiOutput = passes::setupReSTIRGIPass(
             *m_framegraph, m_device, m_rtAccelMgr.get(),
@@ -2216,7 +2296,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             rtgiState, m_hasPrevFrameData,
             skipInTreeDenoise,
             transparentOutputs.worldPos,
-            useDlssRR
+            false,
+            particleOpacityRT
         );
         sceneColor = rtgiOutput.sceneColor;
 
@@ -2292,7 +2373,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                     in.jitterY = passes::g_taa_jitter_py;
                     in.jitterPrevX = passes::g_taa_jitter_prev_px;
                     in.jitterPrevY = passes::g_taa_jitter_prev_py;
-                    in.nearZ = 0.2f;
+                    in.nearZ = RENDER_VIEWPORT_NEAR;
                     in.farZ = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 500.f;
                     copyMat(in.viewToClip, Device.mProject);
                     copyMat(in.viewToClipPrev, Device.mProjectSaved);
@@ -2391,7 +2472,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             hizOutput.mipLevels,
             m_hasPrevFrameData ? &m_prevViewProj : nullptr,
             particlePrevDepth,
-            &m_blackboard->get_or_add<passes::ParticlePassState>()
+            &m_blackboard->get_or_add<passes::ParticlePassState>(),
+            transparentOutputs.distortion
         );
 
         auto trailChainLayout = particleOutputs.layout;
@@ -2619,22 +2701,33 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         ? rtgiGuideDepth
         : (transparentOutputs.depth.is_valid() ? transparentOutputs.depth : depthBuffer);
 
-    if (!rtgiActive)
     {
-        auto shaftDepth = occludeDepth;
-        auto shaftWorldPos = gbufferForWet.worldPos.is_valid() ? gbufferForWet.worldPos : worldPosBuffer;
-        sceneColor = passes::setupSunShaftsPass(
-            *m_framegraph,
-            m_device,
-            sceneColor,
-            shaftDepth,
-            shaftWorldPos,
-            bindlessConfig.shadowMapArray,
-            bindlessConfig.shadowMapHandle,
-            width,
-            height,
-            m_blackboard->get_or_add<passes::SunShaftsPassState>(),
-            bindlessConfig.shadowCascades);
+        bool useRasterShafts = !rtgiActive;
+        if (rtgiActive)
+        {
+            auto& rtgiState = m_blackboard->get_or_add<passes::ReSTIRGIPassState>();
+            if (rtgiState.volAllocFailed)
+                useRasterShafts = true;
+        }
+        if (useRasterShafts)
+        {
+            auto shaftDepth = occludeDepth;
+            auto shaftWorldPos = (rtgiActive && rtgiGuideWorldPos.is_valid())
+                ? rtgiGuideWorldPos
+                : (gbufferForWet.worldPos.is_valid() ? gbufferForWet.worldPos : worldPosBuffer);
+            sceneColor = passes::setupSunShaftsPass(
+                *m_framegraph,
+                m_device,
+                sceneColor,
+                shaftDepth,
+                shaftWorldPos,
+                bindlessConfig.shadowMapArray,
+                bindlessConfig.shadowMapHandle,
+                width,
+                height,
+                m_blackboard->get_or_add<passes::SunShaftsPassState>(),
+                bindlessConfig.shadowCascades);
+        }
     }
 
     sceneColor = passes::setupSunPass(
@@ -2690,36 +2783,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             &volLighting);
     }
 
-    if (!rtgiActive && !m_hudBatches.empty())
-    {
-        sceneColor = passes::setupHudOverlayPass(
-            *m_framegraph,
-            m_device,
-            sceneColor,
-            transparentOutputs.depth,
-            transparentOutputs.normal,
-            transparentOutputs.baseColor,
-            transparentOutputs.worldPos,
-            &m_hudBatches,
-            m_materialCache.get(),
-            width,
-            height,
-            m_gpuCullingManager.get(),
-            &m_blackboard->get_or_add<passes::SkinningPassState>(),
-            bindlessConfig.shadowMapArray,
-            bindlessConfig.contactDepth,
-            bindlessConfig.contactHistory,
-            bindlessConfig.envSky0,
-            bindlessConfig.envSky1,
-            bindlessConfig.hudShadowMap,
-            bindlessConfig.shadowCascades,
-            bindlessConfig.localShadowAtlas,
-            bindlessConfig.shadowHZB,
-            bindlessConfig.shadowMask,
-            bindlessConfig.localShadowESM
-        );
-    }
-
     auto postDepth = occludeDepth;
     auto postNormal = wetNormal.is_valid() ? wetNormal
         : (transparentOutputs.normal.is_valid() ? transparentOutputs.normal : gbufferForWet.normal);
@@ -2732,6 +2795,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_device,
             sceneColor,
             postDepth,
+            transparentOutputs.worldPos.is_valid() ? transparentOutputs.worldPos : worldPosBuffer,
             motionOutput.motionVectors,
             width,
             height,
@@ -2826,6 +2890,44 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_framegraph->GetRTRegistry().RegisterRT("rt_TAA", sceneColor);
     }
 
+    if (!m_hudBatches.empty())
+    {
+        const auto hudDepth = (rtgiActive && rtgiGuideDepth.is_valid())
+            ? rtgiGuideDepth : transparentOutputs.depth;
+        const auto hudNormal = (rtgiActive && rtgiGuideNormal.is_valid())
+            ? rtgiGuideNormal : transparentOutputs.normal;
+        const auto hudBase = (rtgiActive && rtgiGuideBaseColor.is_valid())
+            ? rtgiGuideBaseColor : transparentOutputs.baseColor;
+        const auto hudWorldPos = (rtgiActive && rtgiGuideWorldPos.is_valid())
+            ? rtgiGuideWorldPos : transparentOutputs.worldPos;
+        sceneColor = passes::setupHudOverlayPass(
+            *m_framegraph,
+            m_device,
+            sceneColor,
+            hudDepth,
+            hudNormal,
+            hudBase,
+            hudWorldPos,
+            &m_hudBatches,
+            m_materialCache.get(),
+            width,
+            height,
+            m_gpuCullingManager.get(),
+            &m_blackboard->get_or_add<passes::SkinningPassState>(),
+            bindlessConfig.shadowMapArray,
+            bindlessConfig.contactDepth,
+            bindlessConfig.contactHistory,
+            bindlessConfig.envSky0,
+            bindlessConfig.envSky1,
+            bindlessConfig.hudShadowMap,
+            bindlessConfig.shadowCascades,
+            bindlessConfig.localShadowAtlas,
+            bindlessConfig.shadowHZB,
+            bindlessConfig.shadowMask,
+            bindlessConfig.localShadowESM
+        );
+    }
+
     // Classic CoP MiddleGray exposure (r2_tonemap*); NOT photographic histogram EV
     passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();
     auto exposureOutput = passes::setupExposurePass(
@@ -2840,11 +2942,25 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
     m_exposureTexture = exposureOutput.exposureTexture;
 
+    if (pendingDistortRT.is_valid() && o.distortion)
+    {
+        sceneColor = passes::setupDistortionApplyPass(
+            *m_framegraph,
+            m_device,
+            sceneColor,
+            pendingDistortRT,
+            pendingDistortWorldPos,
+            pendingDistortBaseColor,
+            width,
+            height,
+            m_blackboard->get_or_add<passes::DistortionApplyPassState>());
+    }
+
     // FSR/DLSS or 1:1 resolve to display resolution before bloom/tonemap/UI
     {
         passes::UpscaleRRGuides rrGuides{};
         passes::UpscaleRRGuides* rrGuidesPtr = nullptr;
-        if (ps_r_upscale == 2 && ps_r_dlss_rr)
+        if (ps_r_upscale == 2 && ps_r_dlss_rr && !ps_r_rt_gi)
         {
             auto& rtgiState = m_blackboard->get_or_add<passes::ReSTIRGIPassState>();
             rrGuides.normals = rtgiGuideNormal;
@@ -2856,7 +2972,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             rrGuides.hitDistance = rtgiState.hitDistance.Get();
             rrGuidesPtr = &rrGuides;
         }
-        const auto upscaleDepth = (ps_r_upscale == 2 && ps_r_dlss_rr && rtgiGuideDepth.is_valid())
+        const auto upscaleDepth = (ps_r_upscale == 2 && ps_r_dlss_rr && !ps_r_rt_gi && rtgiGuideDepth.is_valid())
             ? rtgiGuideDepth
             : postDepth;
         sceneColor = passes::setupUpscaleOrResolvePass(
@@ -2876,20 +2992,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     const u32 postW = upscaleResolved ? displayWidth : width;
     const u32 postH = upscaleResolved ? displayHeight : height;
     const bool upscaleOwnsTemporal = ps_r_upscale != 0;
-
-    if (pendingDistortRT.is_valid() && o.distortion)
-    {
-        sceneColor = passes::setupDistortionApplyPass(
-            *m_framegraph,
-            m_device,
-            sceneColor,
-            pendingDistortRT,
-            pendingDistortWorldPos,
-            pendingDistortBaseColor,
-            postW,
-            postH,
-            m_blackboard->get_or_add<passes::DistortionApplyPassState>());
-    }
 
     if (rtgiActive && m_rtAccelMgr)
     {
@@ -4263,10 +4365,18 @@ public:
         }
     }
 
+    static bool TooCloseToCamera(const Fvector& pos, float radius)
+    {
+        const float minDist = _max(0.45f, radius * 2.f);
+        return Device.vCameraPosition.distance_to_sqr(pos) < minDist * minDist;
+    }
+
     static bool CollectBillboard(void* glow, fg::passes::GlowBillboard& out)
     {
         auto* g = static_cast<CGlow*>(glow);
         if (!g || !g->bActive)
+            return false;
+        if (TooCloseToCamera(g->m_pos, g->m_radius))
             return false;
         out.pos = g->m_pos;
         out.radius = g->m_radius;
@@ -4283,7 +4393,8 @@ public:
         m_light->set_rotation(m_dir, m_dir);
         m_light->set_range(_max(m_radius * 2.5f, 0.5f));
         m_light->set_color(m_color);
-        m_light->set_active(bActive);
+        const bool useLight = bActive && !TooCloseToCamera(m_pos, m_radius);
+        m_light->set_active(useLight);
     }
 
     void set_active(bool b) override

@@ -90,7 +90,7 @@ uint main(PS_INPUT input) : SV_Target0
     float3 Point = WorldToView(worldPos4.xyz);
     float3 Normal = normalize(mul((float3x3)m_V, Nw));
 
-    float2 jitter = Ign2(input.position.xy + ao_proj.y);
+    float2 jitter = Ign2(input.position.xy);
     float viewZ = ViewDepth(Point);
     float occlusion = viewZ > 60.0
         ? 1.0

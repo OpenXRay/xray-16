@@ -198,7 +198,7 @@ void InitializeVolumetricPass(nvrhi::IDevice* device, VolumetricPassState& state
         cb.byteSize = sizeof(FroxelParamsCB);
         cb.isConstantBuffer = true;
         cb.isVolatile = true;
-        cb.maxVersions = 16;
+        cb.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
         cb.debugName = "FroxelParamsCB";
         state.paramsCB = device->createBuffer(cb);
     }
@@ -207,7 +207,7 @@ void InitializeVolumetricPass(nvrhi::IDevice* device, VolumetricPassState& state
         cb.byteSize = sizeof(TemporalParamsCB);
         cb.isConstantBuffer = true;
         cb.isVolatile = true;
-        cb.maxVersions = 16;
+        cb.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
         cb.debugName = "VolTemporalCB";
         state.temporalCB = device->createBuffer(cb);
     }
@@ -216,7 +216,7 @@ void InitializeVolumetricPass(nvrhi::IDevice* device, VolumetricPassState& state
         cb.byteSize = sizeof(ParticleInjectParamsCB);
         cb.isConstantBuffer = true;
         cb.isVolatile = true;
-        cb.maxVersions = 16;
+        cb.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
         cb.debugName = "VolParticleParamsCB";
         state.particleParamsCB = device->createBuffer(cb);
     }
@@ -235,7 +235,7 @@ void InitializeVolumetricPass(nvrhi::IDevice* device, VolumetricPassState& state
         cb.byteSize = sizeof(LightShaftParamsCB);
         cb.isConstantBuffer = true;
         cb.isVolatile = true;
-        cb.maxVersions = 16;
+        cb.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
         cb.debugName = "VolLightShaftCB";
         state.lightShaftCB = device->createBuffer(cb);
     }

@@ -319,7 +319,7 @@ VirtualResourceHandle setupBloomPass(
             cmd->setTextureState(out, nvrhi::AllSubresources, nvrhi::ResourceStates::RenderTarget);
             cmd->setTextureState(bloomFull, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
 
-            P4 p{intensity, 0.9995f, 0, 0};
+            P4 p{intensity, 1e-7f, 0, 0};
             cmd->writeBuffer(cb, &p, sizeof(p));
             BindingSetBuilder bsb(*vsR, *cpR, nv, "Bloom.Comp");
             bsb.ConstantBuffer("BloomParams", cb);

@@ -24,6 +24,7 @@ struct SunShaftsPassState
     nvrhi::BindingLayoutHandle layout;
     nvrhi::GraphicsPipelineHandle combinePipeline;
     nvrhi::BindingLayoutHandle combineLayout;
+    nvrhi::TextureHandle depthCopy;
     framegraph::ExtractedReflection* marchVsReflection = nullptr;
     framegraph::ExtractedReflection* marchPsReflection = nullptr;
     framegraph::ExtractedReflection* combinePsReflection = nullptr;
