@@ -266,6 +266,15 @@ public:
     virtual bool is_sun_static() = 0;
     virtual u32 get_dx_level() = 0;
 
+    // True when the Dead Air "Тело игрока" (actor body) render option is on, i.e. the
+    // render DLL is already casting a full-detail shadow stand-in for the local actor
+    // (see r__dsgraph_build.cpp's PHASE_SMAP RFLAG_ACTOR_BODY block). Lets xrGame skip
+    // drawing the actor's own (legs-only) base visual from CActor::renderable_Render —
+    // which is otherwise reached via CHUDManager::Render_First's shadow injection call
+    // and produces a redundant, superseded headless/armless shadow alongside the
+    // full-detail one when both are active.
+    virtual bool actor_body_shadow_active() const = 0;
+
     // Loading / Unloading
     virtual void create() = 0;
     virtual void destroy() = 0;

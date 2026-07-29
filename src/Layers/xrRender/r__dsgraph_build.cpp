@@ -2,7 +2,9 @@
 
 #include "FHierrarhyVisual.h"
 #include "SkeletonCustom.h"
+#include "xrCore/Threading/Lock.hpp"
 #include "xrCore/Threading/ParallelFor.hpp"
+#include "xrCore/Threading/ScopeLock.hpp"
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/IRenderable.h"
 #include "xrEngine/xr_object.h"
@@ -1005,77 +1007,148 @@ void R_dsgraph_structure::build_subspace()
             // regular NPCs use) for the shadow only, with its bone transforms copied
             // bone-by-bone (by name) from the actor's own live/posed skeleton so the
             // shadow's stance matches the actor's real animation instead of a static pose.
-            if (o.phase == CRender::PHASE_SMAP && ps_r__common_flags.test(RFLAG_ACTOR_BODY))
+            //
+            // Root-caused 2026-07-29 ("shadow sometimes grows four legs"): this used to
+            // ALSO force-inject the live legs-only viewEntity->Visual() into the shadow map
+            // right here, alongside the full-detail stand-in below — i.e. TWO independently
+            // posed body meshes casting overlapping shadows every frame RFLAG_ACTOR_BODY was
+            // on. The full-detail stand-in's pose is only a retargeted APPROXIMATION of the
+            // live skeleton (rotation-only copy per bone, see retarget_bone_recursive below),
+            // so the two never lined up pixel-perfect; the mismatch is the same error curve
+            // as the warping bug described in the retargeting notes below — small near bind
+            // pose, growing with how far the pose deviates from it — so it was easy to miss
+            // standing still and obvious as two separate, slightly offset pairs of legs
+            // during fast turning/movement. The full-detail stand-in was always meant to
+            // REPLACE the legs-only shadow ("for a complete silhouette"), not supplement it.
+            // Removed the redundant legs-only injection entirely; the full-detail stand-in
+            // below is now the sole shadow-caster for the body.
+            //
+            // Root-caused 2026-07-29, pass 3 ("shadow still doubled/body still pops in after
+            // passes 1 and 2"): `o.phase == PHASE_SMAP` is NOT unique to genuine shadow-map
+            // light passes. `r2_R_render.cpp`'s Z-fill main-camera depth pre-pass
+            // (`R2FLAG_ZFILL`) ALSO sets `o.phase = PHASE_SMAP` — it reuses the depth-only
+            // rendering path for an Early-Z optimization of the MAIN CAMERA's own view, not
+            // for a light. It's the only PHASE_SMAP call site that also sets
+            // `o.is_main_pass = true` (every real shadow-casting light/cascade/rain-occlusion
+            // pass leaves that `false`, its `reset()` default — verified across every
+            // `build_subspace()` call site in `Layers/xrRender_R2`). Without excluding it,
+            // the full-detail stand-in was being depth-injected into the CAMERA's own
+            // z-prepass from the CAMERA's own viewpoint every frame — a second, camera-space
+            // copy of the body, independent of and in addition to its legitimate per-light
+            // shadow-map copies (one of which is correct and expected: the same shadow-
+            // casting body needs to be submitted once per shadow-casting light, e.g. once for
+            // the sun and again for the player's own headlamp if it casts shadows — that
+            // repetition across `build_subspace()` calls is by design, not the bug).
+            if (o.phase == CRender::PHASE_SMAP && !o.is_main_pass && ps_r__common_flags.test(RFLAG_ACTOR_BODY))
             {
+                // Full-detail body, posed to match, for a complete silhouette. Not gated by
+                // portal-marker / sector-frustum checks: the reported "reverts to legs-only
+                // while moving, comes back when moving back" (2026-07-27) pointed at that
+                // gate flipping near sector/frustum boundaries — not at the retargeted pose
+                // data itself, which logged as valid throughout, including while broken.
+                // add_Visual is documented as doing no culling of its own, so this doesn't
+                // need that gate; it only inherited it from copy-pasting the pre-existing
+                // weapon-shadow block above (which has its own reasons to need it — portal-
+                // clipped rendering for the HUD weapon specifically).
                 do
                 {
                     IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
                     if (viewEntity == nullptr)
                         break;
-                    const auto& entity_pos = viewEntity->spatial_sector_point();
-                    viewEntity->spatial_updatesector(detect_sector(entity_pos));
-                    const auto sector_id = viewEntity->GetSpatialData().sector_id;
-                    if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
-                        break; // disassociated from S/P structure
-                    CSector* sector = Sectors[sector_id];
-                    if (PortalTraverser.i_marker != sector->r_marker)
-                        break; // inactive (untouched) sector
-                    IRenderable* renderable = viewEntity->dcast_Renderable();
-                    if (renderable == nullptr)
+                    // Root-caused 2026-07-29, pass 4 (real cause, confirmed via user-reported
+                    // "if I stopped moving the camera, it moved behind player's body and
+                    // rendered body appeared normal" + diagnostic logging showing the actor
+                    // is NEVER submitted through the normal render path, ruling out passes
+                    // 1-3's theories): `CActor::g_cl_Orientate` (`Actor_Movement.cpp:494-546`)
+                    // does not snap the actor's own model/skeleton-root orientation
+                    // (`r_model_yaw`, what `XFORM()` ultimately reflects) to the camera
+                    // instantly when standing still and turning fast — it sets `mcTurn` and
+                    // *lerps* toward the camera's new yaw over up to ~1s
+                    // (`angle_lerp(..., PI_MUL_2, dt)`). This is a pre-existing, intentional
+                    // animation-catchup mechanic, unrelated to and predating actor-body
+                    // rendering — it was simply invisible before nothing ever rendered the
+                    // actor's own body/shadow. Now that it does, the lag is visible as the
+                    // body/shadow briefly facing the wrong way (up to ~180° off for a fast
+                    // 180° camera snap) until the lerp catches up, exactly matching "pops in
+                    // front of view, turning in opposite direction... normal again once
+                    // camera stops." Skip the shadow draw outright while it's happening,
+                    // same pattern as the climbing() check.
+                    if (viewEntity->turning_in_place())
                         break;
-
-                    for (const CFrustum& view : sector->r_frustums)
-                    {
-                        if (!view.testSphere_dirty(
-                            viewEntity->GetSpatialData().sphere.P, viewEntity->GetSpatialData().sphere.R))
-                            continue;
-
-                        // Base body mesh only, NOT renderable->renderable_Render() (which
-                        // also shadow-casts attachments like the torch/headlamp). The
-                        // headlamp attaches at the LIVE (legs-only) skeleton's real bone
-                        // position, while the full-detail silhouette below is a separately
-                        // retargeted approximation of the head — the two don't line up
-                        // exactly, so the headlamp cast a visibly detached second shadow
-                        // next to the head's (confirmed unwanted in-game 2026-07-27).
-                        // Simplest fix: the headlamp doesn't need its own shadow at all.
-                        if (viewEntity->Visual() != nullptr)
-                            RImplementation.add_Visual(context_id, renderable, viewEntity->Visual(), viewEntity->XFORM());
-                    }
-                } while (0);
-
-                // Full-detail body, posed to match, for a complete silhouette. Deliberately
-                // a SEPARATE do-while from the block above, not gated by its portal-marker /
-                // sector-frustum checks: the reported "reverts to legs-only while moving,
-                // comes back when moving back" (2026-07-27) pointed at that gate flipping
-                // near sector/frustum boundaries — not at the retargeted pose data itself,
-                // which logged as valid throughout, including while broken. add_Visual is
-                // documented as doing no culling of its own, so this doesn't need that gate;
-                // it only inherited it from copy-pasting the pre-existing weapon-shadow
-                // block above (which has its own reasons to need it — portal-clipped
-                // rendering for the HUD weapon specifically).
-                do
-                {
-                    IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
-                    if (viewEntity == nullptr)
+                    // The actor is force-injected here ONLY as a substitute for the normal
+                    // spatial-DB traversal it's excluded from in first-person (see
+                    // CActor::shedule_Update's setVisible(!HUDview()) — the STYPE_RENDERABLE
+                    // bit this toggles is the actor's ONLY normal-path exclusion mechanism,
+                    // for BOTH the color pass and this shadow pass). If STYPE_RENDERABLE is
+                    // currently set (HUDview() false — e.g. not focused, non-first-person
+                    // camera, or a holder that disallows it), the normal traversal above
+                    // ALREADY rendered/shadowed the actor once this frame; force-injecting
+                    // the stand-in on top of that is what produced the intermittent
+                    // "doubled shadow" (2026-07-29) — the §47 fix (removing the redundant
+                    // legs-only injection) only removed an always-on duplicate and missed
+                    // this transient one against the normal path itself.
+                    if (viewEntity->GetSpatialData().type & STYPE_RENDERABLE)
                         break;
                     IRenderable* renderable = viewEntity->dcast_Renderable();
                     if (renderable == nullptr)
                         break;
 
-                    // Load once (Instance_Duplicate under the hood — safe to call every
-                    // frame, but no need to; a single independent instance we keep posing
-                    // ourselves is enough since it's only ever rendered from here).
-                    static IRenderVisual* s_full_body_visual = nullptr;
-                    static bool s_full_body_load_attempted = false;
-                    if (!s_full_body_load_attempted)
+                    // Root-caused 2026-07-29, pass 5 (user screenshot showed the shadow as
+                    // two overlapping copies of the same silhouette, one trailing behind the
+                    // other — "sibling is always a bit behind main model"): sun shadows
+                    // render via R__NUM_SUN_CASCADES (3) cascades processed IN PARALLEL
+                    // across worker threads (`xr_parallel_for` in `render_phase_sun.cpp`),
+                    // each with its own `context_id` but all calling into this same function.
+                    // A single `static IRenderVisual*` shared across every call was being
+                    // re-posed in place by `retarget_bone_recursive` (which mutates its bone-
+                    // instance array) by whichever cascade thread happened to reach it —
+                    // multiple threads writing the same mutable bone data concurrently, no
+                    // synchronization, a genuine data race. Confirmed by the diagnostic
+                    // showing exactly `R__NUM_SUN_CASCADES` (3) injections per sampled frame.
+                    // Fixed by giving every `context_id` its own independent model instance —
+                    // each concurrent cascade thread poses and reads back only its own copy,
+                    // never touching another thread's.
+                    //
+                    // Root-caused 2026-07-29, pass 6 ("shadow's back to headless/armless" —
+                    // the pass 5 fix above REGRESSED the shadow): giving every context_id its
+                    // own instance means `RImplementation.model_Create(...)` (→
+                    // `CModelPool::Create`, `ModelPool.cpp`) can now get called from MULTIPLE
+                    // PARALLEL CASCADE THREADS SIMULTANEOUSLY — one per context_id, on their
+                    // first use, same `xr_parallel_for` as pass 5's diagnosis. `CModelPool::
+                    // Create` mutates several plain (non-atomic, unlocked) containers —
+                    // `Pool` (a map), `Models` (a vector, linearly scanned by `Instance_Find`),
+                    // `Registry` — with no synchronization of its own; it was only ever safe
+                    // before because the single shared instance meant exactly one thread ever
+                    // called it, once, ever. Concurrent calls corrupt that shared pool state,
+                    // and the model handed back to a losing thread can come back with
+                    // sub-visuals missing — which is indistinguishable, in silhouette, from
+                    // the pre-existing legs-only shadow this whole feature was built to
+                    // replace. Fix: serialize just the CREATION call (not the per-frame
+                    // posing, which is already safely per-instance) behind a lock, so
+                    // `model_Create` itself is never entered by more than one thread at once,
+                    // while every context still ends up with its own independent instance to
+                    // pose concurrently afterward.
+                    static IRenderVisual* s_full_body_visual[R__NUM_CONTEXTS] = {};
+                    static bool s_full_body_load_attempted[R__NUM_CONTEXTS] = {};
+#ifdef CONFIG_PROFILE_LOCKS
+                    static Lock s_full_body_load_lock(MUTEX_PROFILE_ID(ActorBodyShadowStandInLoad));
+#else
+                    static Lock s_full_body_load_lock;
+#endif
+                    VERIFY(context_id < R__NUM_CONTEXTS);
+                    if (!s_full_body_load_attempted[context_id])
                     {
-                        s_full_body_load_attempted = true;
-                        s_full_body_visual = RImplementation.model_Create("actors\\stalker_hero\\stalker_hero_1");
+                        ScopeLock guard(&s_full_body_load_lock);
+                        if (!s_full_body_load_attempted[context_id]) // re-check inside the lock
+                        {
+                            s_full_body_load_attempted[context_id] = true;
+                            s_full_body_visual[context_id] = RImplementation.model_Create("actors\\stalker_hero\\stalker_hero_1");
+                        }
                     }
-                    if (s_full_body_visual == nullptr)
+                    if (s_full_body_visual[context_id] == nullptr)
                         break;
 
-                    IKinematics* full_kin = s_full_body_visual->dcast_PKinematics();
+                    IKinematics* full_kin = s_full_body_visual[context_id]->dcast_PKinematics();
                     IKinematics* live_kin = viewEntity->Visual() ? viewEntity->Visual()->dcast_PKinematics() : nullptr;
                     if (full_kin != nullptr && live_kin != nullptr)
                     {
@@ -1085,6 +1158,34 @@ void R_dsgraph_structure::build_subspace()
                         // they silently carried the live model's bone lengths into the
                         // full model's differently-proportioned mesh (confirmed in-game
                         // 2026-07-27).
+                        //
+                        // Root-caused 2026-07-29, pass 10 (the real cause of the "dark blob"
+                        // — passes 5-9 all confirmed the DATA we compute here is correct,
+                        // right up until it silently gets discarded one call later):
+                        // `RImplementation.add_Visual(...)` below routes through
+                        // `add_leafs_dynamic`, which — for a top-level MT_SKELETON_* visual
+                        // like this one — unconditionally calls `pV->CalculateBones(TRUE)`
+                        // before actually queuing the geometry. `CKinematics::CalculateBones`
+                        // has a per-OBJECT "already ran this exact frame" early-out
+                        // (`Device.dwTimeGlobal == UCalc_Time`); when it does NOT early out,
+                        // it fully recomputes every bone's `mTransform`/`mRenderTransform`
+                        // from the model's own internal (bind-pose) state via
+                        // `Bone_Calculate`, silently OVERWRITING everything
+                        // `retarget_bone_recursive` just wrote. Before pass 5, all 3 sun
+                        // cascades shared ONE instance — the first cascade's `add_Visual`
+                        // call triggered the real overwrite, but the 2nd/3rd cascades'
+                        // `CalculateBones` calls hit the SAME already-current `UCalc_Time`
+                        // and early-outed, accidentally preserving THEIR retargeted pose
+                        // (which is why the shadow "mostly worked" before, if imperfectly).
+                        // Pass 5 gave every context_id its own separate instance so each one
+                        // now has its OWN previously-stale `UCalc_Time` — meaning every
+                        // single context's one-and-only `add_Visual` call always misses the
+                        // early-out and always gets overwritten, every frame. Fix: force the
+                        // real recompute (bind pose, harmless) OURSELVES first, so
+                        // `UCalc_Time` is already current by the time `retarget_bone_recursive`
+                        // runs — making OUR pose the last write, and `add_Visual`'s internal
+                        // `CalculateBones` call a guaranteed no-op right after.
+                        full_kin->CalculateBones(TRUE);
                         const u16 full_root = full_kin->LL_GetBoneRoot();
                         const u16 live_root = live_kin->LL_GetBoneRoot();
                         if (full_root != BI_NONE)
@@ -1093,7 +1194,7 @@ void R_dsgraph_structure::build_subspace()
                                 Fidentity, Fidentity, live_root != BI_NONE);
                         }
                     }
-                    RImplementation.add_Visual(context_id, renderable, s_full_body_visual, viewEntity->XFORM());
+                    RImplementation.add_Visual(context_id, renderable, s_full_body_visual[context_id], viewEntity->XFORM());
                 } while (0);
             }
 
@@ -1103,6 +1204,18 @@ void R_dsgraph_structure::build_subspace()
             // body), the same way it's excluded from PHASE_SMAP unless force-injected
             // above. Mirror that force-injection here for PHASE_NORMAL so the actor's own
             // visual (not just the HUD weapon model) actually gets drawn when enabled.
+            //
+            // Root-caused 2026-07-29 ("body sometimes visible turning camera fast, looks
+            // like a second one"): this block still carried the same
+            // PortalTraverser.i_marker != sector->r_marker gate that was already proven
+            // flaky and removed from the PHASE_SMAP full-detail-body injection above (see
+            // that block's comment) — small/fast camera and sector-boundary movement flips
+            // it, so the body force-injection was intermittently skipped for a frame or two
+            // rather than showing/hiding consistently with intent (looking down). It's not
+            // actually a second body, just the same single legs-only visual popping in and
+            // out. add_Visual does no culling of its own, so this gate was never
+            // load-bearing here either — dropped it and the sector/frustum ceremony around
+            // it, matching the PHASE_SMAP block's already-validated fix.
             if (o.phase == CRender::PHASE_NORMAL && o.is_main_pass && ps_r__common_flags.test(RFLAG_ACTOR_BODY))
             {
                 do
@@ -1117,34 +1230,39 @@ void R_dsgraph_structure::build_subspace()
                     // cross-DLL climbing() accessor and skip the body draw outright.
                     if (viewEntity->climbing())
                         break;
-                    const auto& entity_pos = viewEntity->spatial_sector_point();
-                    viewEntity->spatial_updatesector(detect_sector(entity_pos));
-                    const auto sector_id = viewEntity->GetSpatialData().sector_id;
-                    if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
-                        break; // disassociated from S/P structure
-                    CSector* sector = Sectors[sector_id];
-                    if (PortalTraverser.i_marker != sector->r_marker)
-                        break; // inactive (untouched) sector
+                    // Root-caused 2026-07-29, pass 4 (the actual cause of "body pops into
+                    // view turning fast, looks like a second one, headless/armless, turning
+                    // opposite the camera" — see the matching comment on the PHASE_SMAP
+                    // full-detail-body block above for the full root-cause writeup). The
+                    // actor's own model-yaw visibly lags the camera while `mcTurn` is set
+                    // (`CActor::g_cl_Orientate`, `Actor_Movement.cpp`) — an intentional,
+                    // pre-existing animation-catchup mechanic that was invisible before the
+                    // actor's own body was ever rendered. Skip the draw during that window,
+                    // same pattern as the climbing() check just above.
+                    if (viewEntity->turning_in_place())
+                        break;
+                    // Same reasoning as the PHASE_SMAP block above: STYPE_RENDERABLE being
+                    // set means the normal spatial-DB traversal already rendered the actor
+                    // once this frame (HUDview() false), so force-injecting a second draw
+                    // on top of it is what produced the intermittent "second body popping
+                    // into view while turning" (2026-07-29) — mutually exclusive with the
+                    // normal path, not just with itself.
+                    if (viewEntity->GetSpatialData().type & STYPE_RENDERABLE)
+                        break;
                     IRenderable* renderable = viewEntity->dcast_Renderable();
                     if (renderable == nullptr)
                         break;
-                    for (const CFrustum& view : sector->r_frustums)
-                    {
-                        if (!view.testSphere_dirty(
-                            viewEntity->GetSpatialData().sphere.P, viewEntity->GetSpatialData().sphere.R))
-                            continue;
 
-                        // Base body mesh only — NOT renderable->renderable_Render(), which
-                        // also draws attached items (torch/headlamp, radio) via
-                        // CAttachmentOwner. Those attachments still need to render for the
-                        // shadow (see the PHASE_SMAP block above), but in the color pass
-                        // they show up as a headlamp mesh floating at head height, since
-                        // the worn outfit's body model has no head geometry to mount it on
-                        // (confirmed unwanted in-game 2026-07-27). add_Visual bypasses
-                        // CActor::renderable_Render's attachment call entirely.
-                        if (viewEntity->Visual() != nullptr)
-                            RImplementation.add_Visual(context_id, renderable, viewEntity->Visual(), viewEntity->XFORM());
-                    }
+                    // Base body mesh only — NOT renderable->renderable_Render(), which
+                    // also draws attached items (torch/headlamp, radio) via
+                    // CAttachmentOwner. Those attachments still need to render for the
+                    // shadow (see the PHASE_SMAP block above), but in the color pass
+                    // they show up as a headlamp mesh floating at head height, since
+                    // the worn outfit's body model has no head geometry to mount it on
+                    // (confirmed unwanted in-game 2026-07-27). add_Visual bypasses
+                    // CActor::renderable_Render's attachment call entirely.
+                    if (viewEntity->Visual() != nullptr)
+                        RImplementation.add_Visual(context_id, renderable, viewEntity->Visual(), viewEntity->XFORM());
                 } while (0);
             }
 #endif

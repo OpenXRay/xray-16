@@ -10,6 +10,7 @@
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/xrRender_console.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
@@ -653,6 +654,7 @@ void CRender::MakeContextCurrent(RenderContext context)
 #endif
 
 // Implementation
+bool CRender::actor_body_shadow_active() const { return ps_r__common_flags.test(RFLAG_ACTOR_BODY); }
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return xr_new<CROS_impl>(); }
 void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
 IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }

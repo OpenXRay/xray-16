@@ -1537,7 +1537,27 @@ void CActor::shedule_Update(u32 DT)
 void CActor::renderable_Render(u32 context_id, IRenderable* root)
 {
     VERIFY(_valid(XFORM()));
-    inherited::renderable_Render(context_id, root);
+    // Root-caused 2026-07-29, §47 pass 8 (shadow still headless/armless with "a dark
+    // blob on the legs" after passes 5-7 confirmed the RFLAG_ACTOR_BODY full-detail
+    // stand-in was posed correctly — the bug was elsewhere entirely): this function is
+    // ONLY ever reached, for the local actor, via CHUDManager::Render_First's shadow
+    // injection (Level().CurrentViewEntity() is excluded from every other rendering
+    // path — see r__dsgraph_build.cpp's own diagnostic confirming STYPE_RENDERABLE is
+    // never set). Render_First calls IGameObject::renderable_Render on the WHOLE actor
+    // (not just the held item, despite its "weapon shadow" framing) specifically to get
+    // the HUD weapon's shadow into the world's shadow map — but `inherited::
+    // renderable_Render` below draws the actor's own BASE VISUAL too (the legs-only
+    // outfit model, see CCustomOutfit::ApplySkinModel), an always-on legs/torso-only
+    // shadow completely independent of the "Тело игрока" option. When that option is
+    // also on, its own dedicated full-detail shadow stand-in (r__dsgraph_build.cpp,
+    // RFLAG_ACTOR_BODY) is a strict superset meant to REPLACE this one — but nothing
+    // ever suppressed this path, so both rendered simultaneously: the correct
+    // full-detail shadow plus this always-on legs-only one underneath/behind it,
+    // exactly matching "real body + an armless/headless sibling." Skip only the base
+    // visual (not CInventoryOwner::renderable_Render, i.e. the weapon/attachments still
+    // need to render here) when the render DLL confirms its own replacement is active.
+    if (!GEnv.Render->actor_body_shadow_active())
+        inherited::renderable_Render(context_id, root);
     CInventoryOwner::renderable_Render(context_id, root);
 }
 
