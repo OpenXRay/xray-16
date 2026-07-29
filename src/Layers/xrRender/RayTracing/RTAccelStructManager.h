@@ -11,6 +11,10 @@ namespace xray::render::fg {
     class FGDetailManager;
 }
 
+namespace xray::render::fg::passes {
+    struct ParticleBatch;
+}
+
 namespace xray::render::fg {
 class RenderDevice;
 class RenderContext;
@@ -34,6 +38,7 @@ struct RTBatchCounts {
     u32 instancedTotal = 0;
     u32 skinned = 0;
     u32 grass = 0;
+    u32 particles = 0;
 };
 
 class RTAccelStructManager {
@@ -42,14 +47,17 @@ public:
     void Shutdown();
 
     void BuildIfNeeded(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
+    void ReleaseAccelerationStructures();
 
     void BuildSkinnedBLAS(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling,
                           const xr_vector<GeometryBatch>& worldBatches,
                           const xr_vector<GeometryBatch>& hudBatches);
     void BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetailManager* detailMgr);
+    void BuildParticleBLAS(nvrhi::ICommandList* cmdList, const xr_vector<passes::ParticleBatch>& worldBatches);
     void RebuildDynamic(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
     void InvalidateSkinned();
     void InvalidateGrass();
+    void InvalidateParticles();
     static void InvalidateShaderPipelines();
 
     bool IsReady() const { return m_isReady; }
@@ -65,6 +73,8 @@ public:
     nvrhi::IBuffer* GetSkinnedIB() const { return m_skinnedIB.Get(); }
     nvrhi::IBuffer* GetGrassOutputVB() const { return m_grassOutputVB.Get(); }
     nvrhi::IBuffer* GetGrassIB() const { return m_grassIB.Get(); }
+    nvrhi::IBuffer* GetParticleOutputVB() const { return m_particleOutputVB.Get(); }
+    nvrhi::IBuffer* GetParticleIB() const { return m_particleIB.Get(); }
     u32 GetBatchCount() const { return m_batchCount; }
     const RTBatchCounts& GetBatchCounts() const { return m_batchCounts; }
     u32 GetDetailAtlasIndex() const { return m_detailAtlasIndex; }
@@ -120,6 +130,8 @@ private:
     void InitGrassPipeline();
     void InitBillboardPipeline();
     u32 GetSkinningFormatID(u16 renderMode, u32 stride);
+    void RetireAccelStruct(nvrhi::rt::AccelStructHandle as);
+    void PumpRetiredAccelStructs();
 
     fg::RenderDevice* m_device = nullptr;
     bool m_rtSupported = false;
@@ -133,6 +145,7 @@ private:
     u32 m_tlasMaxInstances = 0;
     u32 m_tlasBuiltInstances = 0;
     nvrhi::BufferHandle m_batchInfoBuffer;
+    xr_vector<nvrhi::rt::AccelStructHandle> m_retiredAccelStructs;
 
     nvrhi::IBuffer* m_megaVB = nullptr;
     nvrhi::IBuffer* m_megaIB = nullptr;
@@ -155,7 +168,26 @@ private:
     u32 m_grassTotalIndices = 0;
     bool m_grassReady = false;
     bool m_grassBillboardMode = false;
+    bool m_grassAllocFailed = false;
     u32 m_detailAtlasIndex = 0;
+
+    nvrhi::BufferHandle m_particleOutputVB;
+    nvrhi::BufferHandle m_particleIB;
+    nvrhi::rt::AccelStructHandle m_particleBlas;
+    u32 m_particleTotalVerts = 0;
+    u32 m_particleTotalIndices = 0;
+    u64 m_particleTopoHash = 0;
+    bool m_particleReady = false;
+    bool m_particleAllocFailed = false;
+
+    struct ParticleBatchRT {
+        u32 vertexOffset;
+        u32 vertexCount;
+        u32 indexOffset;
+        u32 indexCount;
+        u32 materialID;
+    };
+    xr_vector<ParticleBatchRT> m_particleBatchData;
 
     static nvrhi::ComputePipelineHandle s_skinPipeline;
     static nvrhi::BindingLayoutHandle s_skinLayout;

@@ -80,6 +80,19 @@ struct SkinningPassState {
     SkinningPipelineVariant depthHQ4w;
     nvrhi::BindingLayoutHandle depthLayout;
     nvrhi::ShaderHandle depthPS;
+    SkinningPipelineVariant velNonHQ;
+    SkinningPipelineVariant velHQ1w;
+    SkinningPipelineVariant velHQ2w;
+    SkinningPipelineVariant velHQ3w;
+    SkinningPipelineVariant velHQ4w;
+    SkinningPipelineVariant velMdiNonHQ;
+    SkinningPipelineVariant velMdiHQ1w;
+    SkinningPipelineVariant velMdiHQ2w;
+    SkinningPipelineVariant velMdiHQ3w;
+    SkinningPipelineVariant velMdiHQ4w;
+    nvrhi::BindingLayoutHandle velocityLayout;
+    nvrhi::BindingLayoutHandle velocityMdiLayout;
+    nvrhi::ShaderHandle velocityPS;
     nvrhi::TextureHandle secondVP;
     nvrhi::SamplerHandle linearSampler;
     bool initialized = false;
@@ -183,6 +196,21 @@ framegraph::VirtualResourceHandle setupHudOverlayPass(
     nvrhi::ITexture* shadowMask = nullptr,
     nvrhi::ITexture* localShadowESM = nullptr,
     bool rtgiGuidePass = false
+);
+
+framegraph::VirtualResourceHandle setupSkinnedVelocityPass(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    framegraph::VirtualResourceHandle motionVectors,
+    framegraph::VirtualResourceHandle depth,
+    const GeometryCollector* geometry,
+    const xr_vector<GeometryBatch>* hudBatches,
+    fg::GPUCullingManager* gpuCulling,
+    SkinningPassState* state,
+    const Fmatrix& viewProj,
+    const Fmatrix& prevViewProj,
+    u32 width,
+    u32 height
 );
 
 } // namespace xray::render::fg::passes

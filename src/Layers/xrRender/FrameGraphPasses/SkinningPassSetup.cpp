@@ -124,7 +124,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
         pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
         pipeDesc.renderState.depthStencilState.depthTestEnable = true;
         pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-        pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+        pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
         pipeDesc.renderState.rasterState.frontCounterClockwise = false;
         pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
         return pipeDesc;
@@ -178,7 +178,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
     auto mdiVsForReflection = shaderLoader->LoadVertexShader("bindless_skinned_mdi", "main");
     if (mdiPsResult.handle && mdiVsForReflection.handle) {
         state.mdiPS = mdiPsResult.handle;
-        state.mdiLayout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass_MDI_IBL_CSMLadder_NoMask",
+        state.mdiLayout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass_MDI_FullLit_v3",
             *mdiVsForReflection.reflection, *mdiPsResult.reflection, nvDevice);
     }
 
@@ -214,7 +214,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG16_SNORM).setOffset(20).setElementStride(stride),
         };
         initVariant(state.nonHQ, "bindless_skinned", "SkinningPass_nonHQ_IBL_CSMLadder_v2", attribs, 5);
-        initMDIVariant(state.mdiNonHQ, "bindless_skinned_mdi", "SkinningPass_mdi_nonHQ_IBL_CSMLadder_v2", attribs, 5);
+        initMDIVariant(state.mdiNonHQ, "bindless_skinned_mdi", "SkinningPass_mdi_nonHQ_FullLit_v3", attribs, 5);
     }
 
     {
@@ -227,7 +227,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
         };
         initVariant(state.hq1w, "bindless_skinned_hq", "SkinningPass_hq1w_IBL_CSMLadder_v2", attribs, 5);
-        initMDIVariant(state.mdiHQ1w, "bindless_skinned_hq_mdi", "SkinningPass_mdi_hq1w_IBL_CSMLadder_v2", attribs, 5);
+        initMDIVariant(state.mdiHQ1w, "bindless_skinned_hq_mdi", "SkinningPass_mdi_hq1w_FullLit_v3", attribs, 5);
     }
 
     {
@@ -241,7 +241,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("BLENDINDICES").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(36).setElementStride(stride),
         };
         initVariant(state.hq4w, "bindless_skinned_4w", "SkinningPass_hq4w_IBL_CSMLadder_v2", attribs, 6);
-        initMDIVariant(state.mdiHQ4w, "bindless_skinned_4w_mdi", "SkinningPass_mdi_hq4w_IBL_CSMLadder_v2", attribs, 6);
+        initMDIVariant(state.mdiHQ4w, "bindless_skinned_4w_mdi", "SkinningPass_mdi_hq4w_FullLit_v3", attribs, 6);
     }
 
     {
@@ -254,7 +254,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
         };
         initVariant(state.hq2w, "bindless_skinned_2w", "SkinningPass_hq2w_IBL_CSMLadder_v2", attribs, 5);
-        initMDIVariant(state.mdiHQ2w, "bindless_skinned_2w_mdi", "SkinningPass_mdi_hq2w_IBL_CSMLadder_v2", attribs, 5);
+        initMDIVariant(state.mdiHQ2w, "bindless_skinned_2w_mdi", "SkinningPass_mdi_hq2w_FullLit_v3", attribs, 5);
     }
 
     {
@@ -267,7 +267,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
         };
         initVariant(state.hq3w, "bindless_skinned_3w", "SkinningPass_hq3w_IBL_CSMLadder_v2", attribs, 5);
-        initMDIVariant(state.mdiHQ3w, "bindless_skinned_3w_mdi", "SkinningPass_mdi_hq3w_IBL_CSMLadder_v2", attribs, 5);
+        initMDIVariant(state.mdiHQ3w, "bindless_skinned_3w_mdi", "SkinningPass_mdi_hq3w_FullLit_v3", attribs, 5);
     }
 
     initHudVariant(state.hudNonHQ, state.nonHQ, "SkinningPass_hud_nonHQ_Opaque_v3");
@@ -360,7 +360,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
                 pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
                 pipeDesc.renderState.depthStencilState.depthTestEnable = true;
                 pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-                pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+                pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
                 pipeDesc.renderState.rasterState.frontCounterClockwise = false;
                 pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
                 depthVar.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, depthFb, nvDevice);
@@ -379,6 +379,124 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
         else
         {
             Msg("! [SkinningPass] bindless_skinned_depth missing — skinned depth disabled");
+        }
+    }
+
+    {
+        auto velPs = shaderLoader->LoadPixelShader("bindless_skinned_velocity", "main");
+        if (velPs.handle)
+        {
+            state.velocityPS = velPs.handle;
+            nvrhi::FramebufferInfoEx velFb;
+            velFb.colorFormats = { nvrhi::Format::RG16_FLOAT };
+            velFb.depthFormat = nvrhi::Format::D32;
+
+            auto initVelVariant = [&](SkinningPipelineVariant& var, const char* vsName,
+                                      const nvrhi::VertexAttributeDesc* attribs, u32 attrCount,
+                                      const char* cacheName, bool mdi) {
+                auto vsResult = shaderLoader->LoadVertexShader(vsName, "main");
+                if (!vsResult.handle || !vsResult.reflection || !velPs.reflection)
+                    return;
+                if (!state.velocityLayout && !mdi)
+                    state.velocityLayout = cache.GetOrCreateBindingLayoutFromReflection(
+                        "SkinningVelocity_v1", *vsResult.reflection, *velPs.reflection, nvDevice);
+                if (!state.velocityMdiLayout && mdi)
+                    state.velocityMdiLayout = cache.GetOrCreateBindingLayoutFromReflection(
+                        "SkinningVelocityMDI_v1", *vsResult.reflection, *velPs.reflection, nvDevice);
+                nvrhi::IBindingLayout* layout = mdi ? state.velocityMdiLayout.Get() : state.velocityLayout.Get();
+                if (!layout)
+                    return;
+
+                nvrhi::VertexAttributeDesc localAttribs[8];
+                u32 totalAttrs = attrCount;
+                for (u32 i = 0; i < attrCount; ++i)
+                    localAttribs[i] = attribs[i];
+                if (mdi) {
+                    localAttribs[attrCount] = nvrhi::VertexAttributeDesc()
+                        .setName("DRAWINDEX").setFormat(nvrhi::Format::R32_UINT)
+                        .setBufferIndex(1).setOffset(0).setElementStride(4).setIsInstanced(true);
+                    totalAttrs = attrCount + 1;
+                }
+
+                var.vs = vsResult.handle;
+                var.inputLayout = nvDevice->createInputLayout(localAttribs, totalAttrs, var.vs);
+                nvrhi::GraphicsPipelineDesc pipeDesc;
+                pipeDesc.VS = var.vs;
+                pipeDesc.PS = state.velocityPS;
+                pipeDesc.inputLayout = var.inputLayout;
+                pipeDesc.bindingLayouts = { layout };
+                pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
+                pipeDesc.renderState.depthStencilState.depthTestEnable = true;
+                pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
+                pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+                pipeDesc.renderState.rasterState.frontCounterClockwise = false;
+                pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+                pipeDesc.renderState.blendState.targets[0]
+                    .setBlendEnable(false)
+                    .setColorWriteMask(nvrhi::ColorMask::Red | nvrhi::ColorMask::Green);
+                var.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, velFb, nvDevice);
+            };
+
+            {
+                constexpr u32 stride = 24;
+                nvrhi::VertexAttributeDesc attribs[] = {
+                    nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA16_SNORM).setOffset(0).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(8).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(12).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG16_SNORM).setOffset(20).setElementStride(stride),
+                };
+                initVelVariant(state.velNonHQ, "bindless_skinned_velocity", attribs, 5, "SkinningVelocity_nonHQ_v1", false);
+                initVelVariant(state.velMdiNonHQ, "bindless_skinned_mdi_velocity", attribs, 5, "SkinningVelocity_mdi_nonHQ_v1", true);
+            }
+            {
+                constexpr u32 stride = 36;
+                nvrhi::VertexAttributeDesc attribs[] = {
+                    nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
+                };
+                initVelVariant(state.velHQ1w, "bindless_skinned_hq_velocity", attribs, 5, "SkinningVelocity_hq1w_v1", false);
+                initVelVariant(state.velMdiHQ1w, "bindless_skinned_hq_mdi_velocity", attribs, 5, "SkinningVelocity_mdi_hq1w_v1", true);
+            }
+            {
+                constexpr u32 stride = 40;
+                nvrhi::VertexAttributeDesc attribs[] = {
+                    nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("BLENDINDICES").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(36).setElementStride(stride),
+                };
+                initVelVariant(state.velHQ4w, "bindless_skinned_4w_velocity", attribs, 6, "SkinningVelocity_hq4w_v1", false);
+                initVelVariant(state.velMdiHQ4w, "bindless_skinned_4w_mdi_velocity", attribs, 6, "SkinningVelocity_mdi_hq4w_v1", true);
+            }
+            {
+                constexpr u32 stride = 44;
+                nvrhi::VertexAttributeDesc attribs[] = {
+                    nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
+                    nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
+                };
+                initVelVariant(state.velHQ2w, "bindless_skinned_2w_velocity", attribs, 5, "SkinningVelocity_hq2w_v1", false);
+                initVelVariant(state.velMdiHQ2w, "bindless_skinned_2w_mdi_velocity", attribs, 5, "SkinningVelocity_mdi_hq2w_v1", true);
+                initVelVariant(state.velHQ3w, "bindless_skinned_3w_velocity", attribs, 5, "SkinningVelocity_hq3w_v1", false);
+                initVelVariant(state.velMdiHQ3w, "bindless_skinned_3w_mdi_velocity", attribs, 5, "SkinningVelocity_mdi_hq3w_v1", true);
+            }
+
+            if (state.velNonHQ.pipeline || state.velHQ1w.pipeline || state.velHQ4w.pipeline)
+                Msg("* [SkinningPass] Skinned velocity pipelines ready");
+            else
+                Msg("! [SkinningPass] Skinned velocity PSO create failed");
+        }
+        else
+        {
+            Msg("! [SkinningPass] bindless_skinned_velocity missing — skinned velocity disabled");
         }
     }
 
@@ -1063,10 +1181,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
-            if (inputs.baseColor.is_valid())
-                data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
-            if (inputs.worldPos.is_valid())
-                data.worldPos = passBuilder.readWrite(inputs.worldPos, ResourceState::RenderTarget);
+            data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
+            data.worldPos = passBuilder.readWrite(inputs.worldPos, ResourceState::RenderTarget);
             data.depth = passBuilder.readWrite(inputs.depth, ResourceState::DepthStencilWrite);
 
             data.outputs.albedo = data.color;
@@ -1107,7 +1223,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
             auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
-            if (!colorRT || !depthRT)
+            if (!colorRT || !depthRT || !normalRT || !baseColorRT || !worldPosRT)
                 return;
 
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
@@ -1117,12 +1233,9 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
-            if (normalRT)
-                fbDesc.addColorAttachment(normalRT);
-            if (baseColorRT)
-                fbDesc.addColorAttachment(baseColorRT);
-            if (worldPosRT)
-                fbDesc.addColorAttachment(worldPosRT);
+            fbDesc.addColorAttachment(normalRT);
+            fbDesc.addColorAttachment(baseColorRT);
+            fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthRT);
             auto framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer("SkinningPass", fbDesc, nvDevice);
             if (!framebuffer)
@@ -1145,9 +1258,14 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
             auto& cache = framegraph::GetPassResourceCache();
             auto dynTransformsCB = cache.GetOrCreateVolatileCB("SkinningPass", "DynTransforms", sizeof(DynamicTransforms), data.device, 1024 * 8);
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("SkinningPass", "StaticGlobals", sizeof(StaticGlobals), data.device);
             auto shaderParamsCB = cache.GetOrCreateVolatileCB("SkinningPass", "ShaderParams", sizeof(ShaderParams), data.device, 512);
             auto materialIdCB = cache.GetOrCreateVolatileCB("SkinningPass", "MaterialId", sizeof(SkinnedMaterialCB), data.device, 1024 * 8);
+
+            {
+                StaticGlobals sg = BuildStaticGlobals();
+                cmdList->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
+            }
 
             ShaderParams shaderParams = {};
             shaderParams.m_AlphaRef = 0.5f;
@@ -1280,6 +1398,15 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
                     u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
                     auto sr = GetSplatRange(batch, data.overlayMgr);
+                    {
+                        CKinematics* parent = nullptr;
+                        u32 visualType = batch.visual ? batch.visual->getType() : 0;
+                        if (visualType == MT_SKELETON_GEOMDEF_ST)
+                            parent = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
+                        else if (visualType == MT_SKELETON_GEOMDEF_PM)
+                            parent = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+                        gpuCullMgr->SetSkeletonCurrWorld(parent, batch.worldMatrix);
+                    }
 
                     DrawSkinnedBatch(*data.passState, cmdList, nvDevice, worldCtx,
                         batch, batch.worldMatrix, boneOffset, sr,
@@ -1428,12 +1555,9 @@ framegraph::VirtualResourceHandle setupHudOverlayPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
-            if (normalRT)
-                fbDesc.addColorAttachment(normalRT);
-            if (baseColorRT)
-                fbDesc.addColorAttachment(baseColorRT);
-            if (worldPosRT)
-                fbDesc.addColorAttachment(worldPosRT);
+            fbDesc.addColorAttachment(normalRT);
+            fbDesc.addColorAttachment(baseColorRT);
+            fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthRT);
             auto framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer(
                 data.rtgiGuidePass ? "HudRtgiGuidePass" : "HudOverlayPass", fbDesc, nvDevice);
@@ -1448,7 +1572,7 @@ framegraph::VirtualResourceHandle setupHudOverlayPass(
             auto materialIdCB = cache.GetOrCreateVolatileCB("HudOverlay", "MaterialId", sizeof(SkinnedMaterialCB), data.device, 1024 * 8);
 
             {
-                StaticGlobals sg = BuildStaticGlobals(2.0f, data.rtgiGuidePass);
+                StaticGlobals sg = BuildStaticGlobals(2.0f, false);
                 cmdList->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
             }
 
@@ -1464,7 +1588,7 @@ framegraph::VirtualResourceHandle setupHudOverlayPass(
             nvrhi::Viewport hudViewport(
                 0.0f, static_cast<float>(rtDesc.width),
                 0.0f, static_cast<float>(rtDesc.height),
-                0.0f, 0.1f);
+                0.9f, 1.0f);
             nvrhi::Rect scissor(rtDesc.width, rtDesc.height);
 
             bool hasScopeBatch = false;
@@ -1544,6 +1668,15 @@ framegraph::VirtualResourceHandle setupHudOverlayPass(
             for (const auto& batch : *data.hudBatches) {
                 Fmatrix adjustedWorldMatrix = ApplyHUDFOVAdjustment(batch.worldMatrix);
                 u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
+                {
+                    CKinematics* parent = nullptr;
+                    u32 visualType = batch.visual ? batch.visual->getType() : 0;
+                    if (visualType == MT_SKELETON_GEOMDEF_ST)
+                        parent = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
+                    else if (visualType == MT_SKELETON_GEOMDEF_PM)
+                        parent = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+                    gpuCullMgr->SetSkeletonCurrWorld(parent, adjustedWorldMatrix);
+                }
                 const SkinnedPhaseContext& drawCtx =
                     (IsScopeBatch(batch) && scopeCtx.bindingSet) ? scopeCtx : hudCtx;
 
@@ -1554,6 +1687,301 @@ framegraph::VirtualResourceHandle setupHudOverlayPass(
     );
 
     return passData.color;
+}
+
+framegraph::VirtualResourceHandle setupSkinnedVelocityPass(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    framegraph::VirtualResourceHandle motionVectors,
+    framegraph::VirtualResourceHandle depth,
+    const GeometryCollector* geometry,
+    const xr_vector<GeometryBatch>* hudBatches,
+    fg::GPUCullingManager* gpuCulling,
+    SkinningPassState* state,
+    const Fmatrix& viewProj,
+    const Fmatrix& prevViewProj,
+    u32 width,
+    u32 height)
+{
+    using namespace framegraph;
+
+    if (!device || !state || !gpuCulling || !motionVectors.is_valid() || !depth.is_valid())
+        return motionVectors;
+
+    if (!state->initialized || !state->velocityPS || !state->velocityLayout)
+    {
+        nvrhi::FramebufferInfoEx fbInfo;
+        fbInfo.colorFormats = {
+            nvrhi::Format::RGBA16_FLOAT, nvrhi::Format::RGBA16_FLOAT,
+            nvrhi::Format::RGBA8_UNORM, nvrhi::Format::RGBA32_FLOAT
+        };
+        fbInfo.depthFormat = nvrhi::Format::D32;
+        InitializeSkinningResources(device, fbInfo, *state);
+    }
+    if (!state->velocityPS || !state->velocityLayout)
+        return motionVectors;
+
+    struct alignas(16) VelocityTransformsCB {
+        Fmatrix m_W;
+        Fmatrix m_W_prev;
+        Fmatrix m_VP;
+        Fmatrix m_VP_prev;
+    };
+    struct alignas(16) VelocitySkinCB {
+        u32 boneOffset;
+        u32 prevBoneOffset;
+        u32 hasPrev;
+        u32 pad;
+    };
+
+    struct PassData {
+        VirtualResourceHandle motionVectors;
+        VirtualResourceHandle depth;
+        fg::RenderDevice* device = nullptr;
+        const GeometryCollector* geometry = nullptr;
+        const xr_vector<GeometryBatch>* hudBatches = nullptr;
+        fg::GPUCullingManager* gpuCulling = nullptr;
+        SkinningPassState* passState = nullptr;
+        Fmatrix viewProj;
+        Fmatrix prevViewProj;
+        u32 width = 0;
+        u32 height = 0;
+    };
+
+    auto& passData = fg.addCallbackPass<PassData>(
+        "Skinned Velocity",
+        [&](FrameGraph& builder, PassHandle pass, PassData& data) {
+            RenderPassBuilder pb(builder, pass);
+            data.motionVectors = pb.readWrite(motionVectors, ResourceState::RenderTarget);
+            data.depth = pb.read(depth, ResourceState::DepthStencilRead);
+            data.device = device;
+            data.geometry = geometry;
+            data.hudBatches = hudBatches;
+            data.gpuCulling = gpuCulling;
+            data.passState = state;
+            data.viewProj = viewProj;
+            data.prevViewProj = prevViewProj;
+            data.width = width;
+            data.height = height;
+        },
+        [](const PassData& data, const FrameGraph& fgGraph, fg::RenderContext* ctx) {
+            auto* mvRT = fgGraph.GetPhysicalTexture(data.motionVectors);
+            auto* depthRT = fgGraph.GetPhysicalTexture(data.depth);
+            if (!mvRT || !depthRT || !data.gpuCulling || !data.passState)
+                return;
+
+            nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            if (!nvDevice || !cmdList)
+                return;
+
+            GPUCullingManager* gpuCullMgr = data.gpuCulling;
+            nvrhi::IBuffer* currBones = gpuCullMgr->GetGlobalBoneBuffer();
+            nvrhi::IBuffer* prevBones = gpuCullMgr->GetPrevBoneBuffer();
+            if (!currBones || !prevBones)
+                return;
+
+            nvrhi::FramebufferDesc fbDesc;
+            fbDesc.addColorAttachment(mvRT);
+            fbDesc.setDepthAttachment(depthRT);
+            auto framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer(
+                "SkinnedVelocityPass", fbDesc, nvDevice);
+            if (!framebuffer)
+                return;
+
+            auto& cache = framegraph::GetPassResourceCache();
+            auto velCB = cache.GetOrCreateVolatileCB("SkinnedVelocity", "VelocityTransforms", sizeof(VelocityTransformsCB), data.device, 1024 * 8);
+            auto skinCB = cache.GetOrCreateVolatileCB("SkinnedVelocity", "VelocitySkin", sizeof(VelocitySkinCB), data.device, 1024 * 8);
+            if (!velCB || !skinCB)
+                return;
+
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* velPsRefl = shaderLoader->GetCachedReflection("bindless_skinned_velocity", ".ps");
+            if (!velPsRefl)
+                return;
+
+            nvrhi::Viewport viewport(0.f, float(data.width), 0.f, float(data.height), 0.f, 1.f);
+            nvrhi::Rect scissor(data.width, data.height);
+
+            auto selectVel = [&](u32 stride, u16 mode) -> const SkinningPipelineVariant* {
+                if (mode == RM_SKINNING_3B || mode == RM_SKINNING_3B_HQ) return &data.passState->velHQ3w;
+                if (mode == RM_SKINNING_2B || mode == RM_SKINNING_2B_HQ) return &data.passState->velHQ2w;
+                if (mode == RM_SKINNING_4B || mode == RM_SKINNING_4B_HQ) return &data.passState->velHQ4w;
+                if (mode == RM_SKINNING_1B_HQ || mode == RM_SINGLE_HQ) return &data.passState->velHQ1w;
+                if (mode == RM_SKINNING_1B || mode == RM_SINGLE) return &data.passState->velNonHQ;
+                if (stride == 36) return &data.passState->velHQ1w;
+                if (stride == 40) return &data.passState->velHQ4w;
+                if (stride == 44) return &data.passState->velHQ2w;
+                return &data.passState->velNonHQ;
+            };
+            auto selectVelMdi = [&](u32 fmt) -> const SkinningPipelineVariant* {
+                switch (fmt) {
+                case VF_SKINNED_NONHQ: return &data.passState->velMdiNonHQ;
+                case VF_SKINNED_HQ1W: return &data.passState->velMdiHQ1w;
+                case VF_SKINNED_HQ2W: return &data.passState->velMdiHQ2w;
+                case VF_SKINNED_HQ3W: return &data.passState->velMdiHQ3w;
+                case VF_SKINNED_HQ4W: return &data.passState->velMdiHQ4w;
+                default: return nullptr;
+                }
+            };
+
+            auto drawResidual = [&](const GeometryBatch& batch, const Fmatrix& world, bool hudDepth) {
+                CKinematics* parent = nullptr;
+                u32 visualType = batch.visual ? batch.visual->getType() : 0;
+                if (visualType == MT_SKELETON_GEOMDEF_ST)
+                    parent = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
+                else if (visualType == MT_SKELETON_GEOMDEF_PM)
+                    parent = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+
+                u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
+                const bool hasPrev = gpuCullMgr->HasPrevBones(parent) &&
+                    parent && parent->fg_prev_world_frame + 1 == gpuCullMgr->GetBoneUploadFrameId();
+
+                const SkinningPipelineVariant* variant = selectVel(batch.vertexStride, batch.skinningRenderMode);
+                if (!variant || !variant->pipeline || !batch.vertexBuffer || !batch.indexBuffer)
+                    return;
+
+                auto* vsRefl = shaderLoader->GetCachedReflection(
+                    batch.vertexStride == 40 ? "bindless_skinned_4w_velocity" :
+                    batch.vertexStride == 44 ? (batch.skinningRenderMode == RM_SKINNING_3B || batch.skinningRenderMode == RM_SKINNING_3B_HQ
+                        ? "bindless_skinned_3w_velocity" : "bindless_skinned_2w_velocity") :
+                    batch.vertexStride == 36 ? "bindless_skinned_hq_velocity" :
+                    "bindless_skinned_velocity", ".vs");
+                if (!vsRefl)
+                    vsRefl = shaderLoader->GetCachedReflection("bindless_skinned_velocity", ".vs");
+                if (!vsRefl)
+                    return;
+
+                VelocityTransformsCB vcb{};
+                vcb.m_W = world;
+                vcb.m_W_prev = hasPrev ? parent->fg_prev_world : world;
+                vcb.m_VP = data.viewProj;
+                vcb.m_VP_prev = data.prevViewProj;
+                cmdList->writeBuffer(velCB, &vcb, sizeof(vcb));
+
+                VelocitySkinCB scb{};
+                scb.boneOffset = boneOffset;
+                scb.prevBoneOffset = hasPrev ? gpuCullMgr->GetPrevBoneOffset(parent) : boneOffset;
+                scb.hasPrev = hasPrev ? 1u : 0u;
+                scb.pad = 0;
+                cmdList->writeBuffer(skinCB, &scb, sizeof(scb));
+
+                framegraph::BindingSetBuilder bsb(*vsRefl, *velPsRefl, nvDevice, "SkinnedVelocity");
+                bsb.ConstantBuffer("VelocityTransforms", velCB);
+                bsb.BufferSRV("g_BoneMatrices", currBones);
+                bsb.BufferSRV("g_PrevBoneMatrices", prevBones);
+                bsb.ConstantBuffer("VelocitySkinCB", skinCB);
+                auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->velocityLayout, nvDevice);
+                if (!bindingSet)
+                    return;
+
+                nvrhi::GraphicsState gfxState;
+                gfxState.pipeline = variant->pipeline;
+                gfxState.framebuffer = framebuffer;
+                gfxState.bindings = { bindingSet };
+                gfxState.vertexBuffers = { {batch.vertexBuffer, 0, 0} };
+                gfxState.indexBuffer = { batch.indexBuffer, nvrhi::Format::R16_UINT, 0 };
+                if (hudDepth) {
+                    nvrhi::Viewport hudVp(0.f, float(data.width), 0.f, float(data.height), 0.9f, 1.f);
+                    gfxState.viewport.addViewport(hudVp);
+                } else {
+                    gfxState.viewport.addViewport(viewport);
+                }
+                gfxState.viewport.addScissorRect(scissor);
+                cmdList->setGraphicsState(gfxState);
+                cmdList->drawIndexed(
+                    nvrhi::DrawArguments()
+                        .setVertexCount(batch.indexCount)
+                        .setStartIndexLocation(batch.startIndex)
+                        .setStartVertexLocation(batch.baseVertex));
+            };
+
+            if (data.geometry) {
+                const bool mdiActive = gpuCullMgr->IsSkinnedMDIEnabled() && gpuCullMgr->GetSkinnedObjectCount() > 0;
+                if (mdiActive && data.passState->velocityMdiLayout) {
+                    nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("SkinnedVelocity", nvDevice);
+                    auto& pools = gpuCullMgr->GetSkinnedPools();
+                    VelocityTransformsCB vcb{};
+                    vcb.m_W = Fidentity;
+                    vcb.m_W_prev = Fidentity;
+                    vcb.m_VP = data.viewProj;
+                    vcb.m_VP_prev = data.prevViewProj;
+                    cmdList->writeBuffer(velCB, &vcb, sizeof(vcb));
+                    VelocitySkinCB scb{};
+                    cmdList->writeBuffer(skinCB, &scb, sizeof(scb));
+
+                    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
+                        const auto& bucket = gpuCullMgr->GetSkinnedBucket(f);
+                        if (bucket.count == 0)
+                            continue;
+                        const SkinningPipelineVariant* variant = selectVelMdi(f);
+                        nvrhi::IBuffer* poolVB = pools.GetVertexBuffer(f);
+                        nvrhi::IBuffer* poolIB = pools.GetIndexBuffer(f);
+                        if (!variant || !variant->pipeline || !poolVB || !poolIB || !drawIndexBuffer)
+                            continue;
+
+                        const char* vsName =
+                            f == VF_SKINNED_HQ4W ? "bindless_skinned_4w_mdi_velocity" :
+                            f == VF_SKINNED_HQ3W ? "bindless_skinned_3w_mdi_velocity" :
+                            f == VF_SKINNED_HQ2W ? "bindless_skinned_2w_mdi_velocity" :
+                            f == VF_SKINNED_HQ1W ? "bindless_skinned_hq_mdi_velocity" :
+                            "bindless_skinned_mdi_velocity";
+                        auto* vsRefl = shaderLoader->GetCachedReflection(vsName, ".vs");
+                        if (!vsRefl)
+                            continue;
+
+                        framegraph::BindingSetBuilder bsb(*vsRefl, *velPsRefl, nvDevice, "SkinnedVelocity.MDI");
+                        bsb.ConstantBuffer("VelocityTransforms", velCB);
+                        bsb.BufferSRV("g_BoneMatrices", currBones);
+                        bsb.BufferSRV("g_PrevBoneMatrices", prevBones);
+                        bsb.ConstantBuffer("VelocitySkinCB", skinCB);
+                        bsb.BufferSRV("g_SkinnedRecords", bucket.recordsBuffer);
+                        bsb.BufferSRV("g_SkinnedCompactIndices", bucket.compactBatchIndicesBuffer);
+                        auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->velocityMdiLayout, nvDevice);
+                        if (!bindingSet)
+                            continue;
+
+                        nvrhi::GraphicsState gfxState;
+                        gfxState.pipeline = variant->pipeline;
+                        gfxState.framebuffer = framebuffer;
+                        gfxState.bindings = { bindingSet };
+                        gfxState.vertexBuffers = { {poolVB, 0, 0}, {drawIndexBuffer, 1, 0} };
+                        gfxState.indexBuffer = { poolIB, nvrhi::Format::R16_UINT, 0 };
+                        gfxState.viewport.addViewport(viewport);
+                        gfxState.viewport.addScissorRect(scissor);
+                        gfxState.indirectParams = bucket.compactDrawArgsBuffer;
+                        gfxState.indirectCountBuffer = bucket.compactCountBuffer;
+                        cmdList->setGraphicsState(gfxState);
+                        DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, bucket.count);
+                    }
+                }
+
+                for (const auto& batch : data.geometry->GetBatches()) {
+                    if (!batch.isSkinned)
+                        continue;
+                    if (mdiActive) {
+                        const u32 variantIdx = MaterialBuffer::Instance().GetShaderVariant(batch.bindlessMaterialID);
+                        const bool pooled = variantIdx == 0
+                            && batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
+                            && batch.skinnedPoolFormat < SkinnedGeometryPools::FORMAT_COUNT;
+                        if (pooled)
+                            continue;
+                    }
+                    drawResidual(batch, batch.worldMatrix, false);
+                }
+            }
+
+            if (data.hudBatches) {
+                for (const auto& batch : *data.hudBatches) {
+                    if (IsScopeBatch(batch))
+                        continue;
+                    drawResidual(batch, ApplyHUDFOVAdjustment(batch.worldMatrix), true);
+                }
+            }
+        }
+    );
+
+    return passData.motionVectors;
 }
 
 } // namespace xray::render::fg::passes

@@ -136,6 +136,12 @@ public:
 
     u32 fg_bone_upload_frame{0};
     u32 fg_bone_upload_offset{0};
+    u32 fg_prev_bone_upload_offset{0};
+    u32 fg_prev_bone_valid{0};
+    Fmatrix fg_curr_world{};
+    u32 fg_curr_world_frame{0};
+    Fmatrix fg_prev_world{};
+    u32 fg_prev_world_frame{0};
 
 protected:
     SkeletonWMVec wallmarks;

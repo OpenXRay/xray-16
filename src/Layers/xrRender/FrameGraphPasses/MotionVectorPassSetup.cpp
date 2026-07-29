@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "MotionVectorPassSetup.h"
+#include "TAAPassSetup.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
@@ -13,7 +14,7 @@ using namespace framegraph;
 
 namespace
 {
-constexpr u32 kMotionVectorPipeVersion = 6;
+constexpr u32 kMotionVectorPipeVersion = 10;
 }
 
 static void InitializeResources(fg::RenderDevice* device, MotionVectorPassState& state)
@@ -36,14 +37,14 @@ static void InitializeResources(fg::RenderDevice* device, MotionVectorPassState&
         return;
 
     state.layout = cache.GetOrCreateBindingLayoutFromReflection(
-        "MotionVector_v6", *csResult.reflection, nvDevice);
+        "MotionVector_v10", *csResult.reflection, nvDevice);
 
     nvrhi::ComputePipelineDesc pipeDesc;
     pipeDesc.CS = csResult.handle;
     pipeDesc.bindingLayouts = { state.layout };
-    state.pipeline = cache.GetOrCreateComputePipeline("MotionVector_v6", pipeDesc, nvDevice);
+    state.pipeline = cache.GetOrCreateComputePipeline("MotionVector_v10", pipeDesc, nvDevice);
 
-    state.cb = cache.GetOrCreateVolatileCB("MotionVector", "MotionVectorCB_v6", 256, device);
+    state.cb = cache.GetOrCreateVolatileCB("MotionVector", "MotionVectorCB_v10", 256, device);
 
     state.initialized = true;
     state.pipeVersion = kMotionVectorPipeVersion;
@@ -71,6 +72,7 @@ MotionVectorOutput setupMotionVectorPass(
     mvDesc.height = height;
     mvDesc.format = nvrhi::Format::RG16_FLOAT;
     mvDesc.isUAV = true;
+    mvDesc.isRenderTarget = true;
     mvDesc.isTransient = true;
     auto mvHandle = fg.CreateTexture("rt_MotionVectors", mvDesc);
 
@@ -88,6 +90,7 @@ MotionVectorOutput setupMotionVectorPass(
         MotionVectorPassState* state;
         Fmatrix viewProj;
         Fmatrix prevViewProj;
+        Fmatrix invViewProj;
         Fvector cameraPos;
         Fvector prevCameraPos;
         u32 width, height;
@@ -105,6 +108,7 @@ MotionVectorOutput setupMotionVectorPass(
             data.state = &state;
             data.viewProj = viewProj;
             data.prevViewProj = prevViewProj;
+            data.invViewProj = g_taa_unjittered_inv_full_transform;
             data.cameraPos = cameraPos;
             data.prevCameraPos = prevCameraPos;
             data.width = width;
@@ -130,7 +134,7 @@ MotionVectorOutput setupMotionVectorPass(
             } cb;
             cb.viewProj = data.viewProj;
             cb.prevViewProj = data.prevViewProj;
-            cb.invViewProj.invert(data.viewProj);
+            cb.invViewProj = data.invViewProj;
             cb.screenW = (float)data.width;
             cb.screenH = (float)data.height;
             cb.invScreenW = 1.0f / data.width;

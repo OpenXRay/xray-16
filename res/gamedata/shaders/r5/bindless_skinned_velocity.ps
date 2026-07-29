@@ -1,0 +1,6 @@
+#include "skinned_velocity_common.h"
+
+float2 main(VelocityVSOut input) : SV_Target0
+{
+    return VelocityUvFromClip(input.prevClip) - VelocityUvFromClip(input.currClip);
+}

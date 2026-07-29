@@ -66,10 +66,10 @@ void main(uint3 dtid : SV_DispatchThreadID)
 
     switch (g_FormatID)
     {
-    case 0: // nonHQ/1W — 24B
+    case 0: // nonHQ/1W — 24B (SNORM16 pos → ±12 like bindless_skinned.vs)
     {
         uint4 posData = g_SrcVB.Load4(srcAddr);
-        localPos = float4(unpack_snorm16_xyz(posData.xy), 1.0);
+        localPos = float4(unpack_snorm16_xyz(posData.xy) * 12.0, 1.0);
         float4 normalPacked = unpack_d3dcolor(posData.z);
         localNormal = normalPacked.rgb * 2.0 - 1.0;
         uint boneIdx = int(normalPacked.a * 255.0 + 0.3);
