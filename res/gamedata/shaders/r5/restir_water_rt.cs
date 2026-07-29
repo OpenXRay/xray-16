@@ -51,6 +51,12 @@ bool IsGrassBatch(uint batchIdx)
     return g_GrassBatchStart != 0xFFFFFFFFu && batchIdx >= g_GrassBatchStart;
 }
 
+bool IsTerrainBatch(uint batchIdx)
+{
+    return batchIdx >= g_IdentityStaticCount &&
+           batchIdx < g_IdentityStaticCount + g_TerrainBatchCount;
+}
+
 float3 SampleSkyW(float3 dir)
 {
     float3 d = normalize(dir);
@@ -77,13 +83,74 @@ float3 DecodeNormal(float3 nEnc)
     return n * rsqrt(lenSq);
 }
 
-float3 TraceWaterReflect(float3 origin, float3 dir, float3 skyRefl)
+float4 SampleTerrainTexture(uint index, float2 uv, float mip)
+{
+    if (index == INVALID_TEXTURE_INDEX)
+        return float4(0.5, 0.5, 0.5, 1.0);
+    return GetBindlessTexture(index).SampleLevel(smp_linear, uv, mip);
+}
+
+float3 SampleTerrainAlbedoWater(TerrainMaterialData mat, float2 uv, float hitDist)
+{
+    float lodDist = max(g_CameraPos.w, 10.0);
+    float mip = saturate(hitDist / lodDist) * 0.45;
+    float2 baseUV = uv;
+    float4 baseSample = SampleTerrainTexture(mat.baseAlbedoIndex, baseUV, mip * 0.35);
+    float4 mask = SampleTerrainTexture(mat.blendMaskIndex, baseUV, mip * 0.35);
+    float maskSum = dot(mask, float4(1, 1, 1, 1));
+    mask = maskSum > 0.001 ? mask / maskSum : float4(0.25, 0.25, 0.25, 0.25);
+    float2 detailUV = uv * mat.detailScale;
+    float detailMip = mip + 0.1;
+    if (hitDist > lodDist * 0.65)
+    {
+        float m = max(max(mask.r, mask.g), max(mask.b, mask.a));
+        float3 d = baseSample.rgb;
+        if (mask.r >= m) d = SampleTerrainTexture(mat.detailR_Index, detailUV, detailMip).rgb;
+        else if (mask.g >= m) d = SampleTerrainTexture(mat.detailG_Index, detailUV, detailMip).rgb;
+        else if (mask.b >= m) d = SampleTerrainTexture(mat.detailB_Index, detailUV, detailMip).rgb;
+        else d = SampleTerrainTexture(mat.detailA_Index, detailUV, detailMip).rgb;
+        return baseSample.rgb * d * 2.0;
+    }
+    float3 detailR = SampleTerrainTexture(mat.detailR_Index, detailUV, detailMip).rgb;
+    float3 detailG = SampleTerrainTexture(mat.detailG_Index, detailUV, detailMip).rgb;
+    float3 detailB = SampleTerrainTexture(mat.detailB_Index, detailUV, detailMip).rgb;
+    float3 detailA = SampleTerrainTexture(mat.detailA_Index, detailUV, detailMip).rgb;
+    float3 blendedDetail = detailR * mask.r + detailG * mask.g + detailB * mask.b + detailA * mask.a;
+    return baseSample.rgb * blendedDetail * 2.0;
+}
+
+float3 ShadeBakedFromMaterialLmap(MaterialData mat, float2 lmUV, float3 albedo, float hemi)
+{
+    if ((mat.flags & MAT_FLAG_HAS_LMAP) != 0 && mat.lmapIndex != INVALID_TEXTURE_INDEX)
+    {
+        float2 luv = (dot(lmUV, lmUV) > 1e-8) ? lmUV : float2(0.5, 0.5);
+        float3 L = GetBindlessTexture(mat.lmapIndex).SampleLevel(smp_linear, luv, 0).rgb;
+        return L * albedo;
+    }
+    return ShadeBakedFromHemi(hemi, albedo, g_HemiColor.rgb);
+}
+
+float3 ImportanceSampleGGX(float2 Xi, float3 N, float roughness)
+{
+    float a = max(roughness * roughness, 0.001);
+    float phi = 6.2831853 * Xi.x;
+    float cosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a * a - 1.0) * Xi.y));
+    float sinTheta = sqrt(max(1.0 - cosTheta * cosTheta, 0.0));
+    float3 H = float3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
+    float3 up = abs(N.z) < 0.999 ? float3(0, 0, 1) : float3(1, 0, 0);
+    float3 tangent = normalize(cross(up, N));
+    float3 bitangent = cross(N, tangent);
+    return normalize(tangent * H.x + bitangent * H.y + N * H.z);
+}
+
+float3 TraceWaterReflect(float3 origin, float3 dir, float3 skyRefl, uint maxSteps)
 {
     float3 rayOrigin = origin;
     float remain = 8000.0;
+    maxSteps = clamp(maxSteps, 1u, 8u);
 
     [loop]
-    for (uint step = 0; step < 8; ++step)
+    for (uint step = 0; step < maxSteps; ++step)
     {
         if (remain <= 0.05)
             break;
@@ -139,7 +206,10 @@ float3 TraceWaterReflect(float3 origin, float3 dir, float3 skyRefl)
         float3 albedo = float3(0.5, 0.5, 0.5);
         float3 hitN = float3(0.0, 1.0, 0.0);
         float hemi = 0.5;
+        float2 lmUV = 0;
         bool skipHit = false;
+        bool hasLmap = false;
+        float3 baked = 0;
 
         if (IsGrassBatch(batchIdx))
         {
@@ -158,6 +228,7 @@ float3 TraceWaterReflect(float3 origin, float3 dir, float3 skyRefl)
             {
                 albedo = lerp(float3(0.08, 0.18, 0.03), float3(0.15, 0.35, 0.06), 1.0 - hitUV.y);
             }
+            baked = g_HemiColor.rgb * albedo * 0.45;
         }
         else if (IsSkinnedBatch(batchIdx))
         {
@@ -175,10 +246,26 @@ float3 TraceWaterReflect(float3 origin, float3 dir, float3 skyRefl)
             else
                 albedo = diffuse.rgb;
             hemi = 0.55;
+            baked = ShadeBakedFromHemi(hemi, albedo, g_HemiColor.rgb);
+            if ((mat.flags & MAT_FLAG_EMISSIVE) && mat.emissiveIntensity > 0.0)
+                baked += albedo * mat.emissiveIntensity;
+        }
+        else if (IsTerrainBatch(batchIdx))
+        {
+            float2 hitUV = GetHitUV(g_MegaVB, g_MegaIB, info, primIdx, bary);
+            lmUV = GetHitLightmapUV(g_MegaVB, g_MegaIB, info, primIdx, bary);
+            hemi = GetHitHemi(g_MegaVB, g_MegaIB, info, primIdx, bary);
+            hitN = normalize(TransformNormalToWorld(
+                GetHitNormal(g_MegaVB, g_MegaIB, info, primIdx, bary), objectToWorld));
+            TerrainMaterialData tmat = g_TerrainMaterials[info.materialID];
+            albedo = SampleTerrainAlbedoWater(tmat, hitUV, tHit);
+            baked = ShadeBakedFromTerrainLmap(tmat, lmUV, albedo, g_HemiColor.rgb, hemi);
+            hasLmap = (tmat.flags & MAT_FLAG_HAS_LMAP) != 0 && tmat.lmapIndex != INVALID_TEXTURE_INDEX;
         }
         else
         {
             float2 hitUV = GetHitUV(g_MegaVB, g_MegaIB, info, primIdx, bary);
+            lmUV = GetHitLightmapUV(g_MegaVB, g_MegaIB, info, primIdx, bary);
             hemi = GetHitHemi(g_MegaVB, g_MegaIB, info, primIdx, bary);
             hitN = normalize(TransformNormalToWorld(
                 GetHitNormal(g_MegaVB, g_MegaIB, info, primIdx, bary), objectToWorld));
@@ -192,6 +279,10 @@ float3 TraceWaterReflect(float3 origin, float3 dir, float3 skyRefl)
                 skipHit = true;
             else
                 albedo = diffuse.rgb;
+            baked = ShadeBakedFromMaterialLmap(mat, lmUV, albedo, hemi);
+            hasLmap = (mat.flags & MAT_FLAG_HAS_LMAP) != 0 && mat.lmapIndex != INVALID_TEXTURE_INDEX;
+            if ((mat.flags & MAT_FLAG_EMISSIVE) && mat.emissiveIntensity > 0.0)
+                baked += albedo * mat.emissiveIntensity;
         }
 
         if (skipHit)
@@ -209,13 +300,42 @@ float3 TraceWaterReflect(float3 origin, float3 dir, float3 skyRefl)
         float sunI = saturate(g_SunDir_Intensity.w);
         float3 sunCol = max(g_SunColor_SkyWeight.rgb, float3(0.25, 0.25, 0.25)) * sunI;
         float ndl = saturate(dot(hitN, sunDir));
-        float3 baked = ShadeBakedFromHemi(hemi, albedo, g_HemiColor.rgb);
-        float3 hitCol = baked + albedo * sunCol * (0.35 + 0.65 * ndl);
-        hitCol = max(hitCol, albedo * 0.2);
-        return lerp(hitCol, skyRefl, 0.08);
+        float3 hitCol = baked;
+        if (!hasLmap)
+            hitCol += albedo * sunCol * ndl * 0.85;
+        else
+            hitCol += albedo * sunCol * ndl * 0.12;
+        hitCol += SampleSkyW(hitN) * albedo * 0.08;
+        return lerp(hitCol, skyRefl, 0.05);
     }
 
     return skyRefl;
+}
+
+float3 TraceWaterReflectGlossy(float3 origin, float3 N, float3 V, uint maxSteps, uint spp, inout uint rng)
+{
+    float3 R = reflect(-V, N);
+    float rough = 0.045;
+    spp = clamp(spp, 1u, 2u);
+    float3 acc = 0;
+    float wSum = 0;
+    [loop]
+    for (uint i = 0; i < spp; ++i)
+    {
+        float2 xi = float2(rand_float(rng), rand_float(rng));
+        float3 H = ImportanceSampleGGX(xi, N, rough);
+        float3 L = normalize(reflect(-V, H));
+        if (dot(L, N) <= 0.0)
+            L = R;
+        float3 skyRefl = SampleSkyW(L);
+        float3 c = TraceWaterReflect(origin, L, skyRefl, maxSteps);
+        float w = max(dot(L, N), 0.05);
+        acc += c * w;
+        wSum += w;
+    }
+    float3 glossy = acc / max(wSum, 1e-3);
+    float3 mirrorSky = SampleSkyW(R);
+    return lerp(glossy, mirrorSky, 0.02);
 }
 
 [numthreads(8, 8, 1)]
@@ -236,7 +356,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     }
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth >= 1.0)
+    if (depth <= 0.0)
     {
         u_SceneColor[pixel] = under4;
         return;
@@ -244,6 +364,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     float3 waterPos = classifyData.xyz;
     float waterDist = length(waterPos - g_CameraPos.xyz);
+    float lodDist = max(g_CameraPos.w, 10.0);
 
     float4 underWP = t_UnderWorldPos.Load(int3(pixel, 0));
     float waterDepth = 8.0;
@@ -262,20 +383,30 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     }
 
     float3 N = DecodeNormal(t_Normal.Load(int3(pixel, 0)).xyz);
-    N = normalize(lerp(float3(0.0, 1.0, 0.0), float3(N.x, abs(N.y) + 0.05, N.z), 0.35));
+    N = normalize(lerp(float3(0.0, 1.0, 0.0), float3(N.x, abs(N.y) + 0.05, N.z), 0.2));
 
     float3 V = normalize(g_CameraPos.xyz - waterPos);
     float3 R = normalize(reflect(-V, N));
     float F = FresnelSchlickWater(abs(dot(N, V)));
 
     float3 skyRefl = SampleSkyW(R);
-    float3 reflected = TraceWaterReflect(waterPos + N * 0.08, R, skyRefl);
+    float3 reflected = skyRefl;
+    float lod = saturate(waterDist / lodDist);
+    if (lod < 0.95)
+    {
+        uint steps = (lod < 0.4) ? 3u : ((lod < 0.7) ? 2u : 1u);
+        uint spp = (lod < 0.5) ? 2u : 1u;
+        uint rng = pcg_hash(pixel.x + pixel.y * 7919u + asuint(waterPos.x) * 97u);
+        reflected = TraceWaterReflectGlossy(waterPos + N * 0.08, N, V, steps, spp, rng);
+    }
 
     float3 sunDir = normalize(-g_SunDir_Intensity.xyz);
     float3 sunColor = g_SunColor_SkyWeight.rgb * saturate(g_SunDir_Intensity.w);
     reflected += sunColor * pow(saturate(dot(R, sunDir)), 384.0) * 0.7;
 
-    float reflA = saturate(0.45 + 0.45 * F) * edgeFade;
-    float3 color = lerp(under4.rgb, reflected, reflA);
+    float reflA = saturate(0.5 + 0.45 * F) * edgeFade;
+    float3 body = t_BaseColor.Load(int3(pixel, 0)).rgb;
+    float3 under = lerp(body * float3(0.45, 0.55, 0.5), under4.rgb, 0.2);
+    float3 color = lerp(under, reflected, reflA);
     u_SceneColor[pixel] = float4(color, under4.a);
 }

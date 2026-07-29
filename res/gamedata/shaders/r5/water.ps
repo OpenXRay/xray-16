@@ -78,15 +78,20 @@ PS_OUTPUT main(PS_INPUT I)
     float3 env0 = s_env0.SampleLevel(smp_base, vreflect, 0).rgb;
     float3 env1 = s_env1.SampleLevel(smp_base, vreflect, 0).rgb;
     float3 env = lerp(env0, env1, L_ambient.w);
-    env = max(env, float3(0.12, 0.14, 0.16));
-    env *= 2.2;
-    env *= max(L_hemi_color.rgb + L_ambient.rgb, float3(0.35, 0.38, 0.42));
+    env *= max(L_hemi_color.rgb + L_ambient.rgb, float3(0.2, 0.22, 0.24));
+    env = max(env, float3(0.04, 0.05, 0.055));
 
     float3 worldPos = I.v2point + eye_position.xyz;
+    const bool rtgiUnlit = parallax.w < -0.5;
+    if (!rtgiUnlit)
     {
-        float3 Nssr = normalize(lerp(Nw, float3(0.0, 1.0, 0.0), 0.45));
-        float4 ssr = compute_ssr_ex(worldPos, Nssr, env, 28, 120.0, 1.75, 4, 0.0);
-        env = lerp(env, ssr.xyz, saturate(ssr.w));
+        float4 ssr = compute_ssr_water(worldPos, Nw, env);
+        float w = saturate(ssr.w);
+        float3 hit = max(ssr.xyz, 0.0);
+        float hitLum = max(dot(hit, float3(0.2126, 0.7152, 0.0722)), 1e-4);
+        float3 hitChroma = hit / hitLum;
+        hit = hitChroma * hitLum;
+        env = lerp(env, hit, saturate(w * 1.45));
     }
 
     float NdotV = saturate(abs(dot(Nw, -v2point)));
