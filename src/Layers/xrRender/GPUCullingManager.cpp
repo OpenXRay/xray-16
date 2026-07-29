@@ -99,9 +99,7 @@ GPUCullingManager::GPUCullingManager()
     , m_maxObjects(MAX_CULLING_OBJECTS)
     , m_initialized(false)
     , m_computeEnabled(false)
-    , m_particleCount(0)
     , m_maxParticles(MAX_CULLING_PARTICLES)
-    , m_particleCullEnabled(false)
 {
     m_staticObjectData.reserve(MAX_CULLING_OBJECTS);
     m_staticDrawArgsData.reserve(MAX_CULLING_OBJECTS);
@@ -1576,11 +1574,6 @@ void GPUCullingManager::Shutdown()
     m_debugInputLayout = nullptr;
 
     m_particleBuffer = nullptr;
-    m_particleDrawArgsBuffer = nullptr;
-    m_particleVisibleCountBuffer = nullptr;
-    m_particleCullParamsCB = fg::BufferHandle();
-    m_particleCullPipeline = nullptr;
-    m_particleCullLayout = nullptr;
 
     // Mega-buffer resources
     m_megaVertexBuffer = nullptr;
@@ -1635,9 +1628,7 @@ void GPUCullingManager::Shutdown()
     m_initialized = false;
     m_computeEnabled = false;
     m_compactEnabled = false;
-    m_particleCullEnabled = false;
     m_objectCount = 0;
-    m_particleCount = 0;
 
     // Stats readback
     for (u32 i = 0; i < STATS_READBACK_SLOTS; ++i)
@@ -2219,16 +2210,12 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
     m_debugGraphicsLayout = nullptr;
     m_debugInputLayout = nullptr;
 
-    m_particleCullPipeline = nullptr;
-    m_particleCullLayout = nullptr;
-
     m_pointSampler = nullptr;
 
     m_initialized = false;
     m_computeEnabled = false;
     m_compactEnabled = false;
     m_variantPartitionEnabled = false;
-    m_particleCullEnabled = false;
     m_skinnedCullEnabled = false;
 
     m_staticDataCached = false;
@@ -3748,289 +3735,16 @@ void GPUCullingManager::CreateParticleResources(fg::RenderDevice* device)
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    auto particleCullResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("particle_cull");
-    if (!particleCullResult.handle) {
-        Msg("! [GPUCulling] particle_cull.cs not found - particle culling disabled");
-        return;
-    }
+    nvrhi::BufferDesc desc;
+    desc.debugName = "GPUCull_Particles";
+    desc.byteSize = m_maxParticles * sizeof(GPUParticleData);
+    desc.structStride = sizeof(GPUParticleData);
+    desc.initialState = nvrhi::ResourceStates::ShaderResource;
+    desc.keepInitialState = true;
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_Particles";
-        desc.byteSize = m_maxParticles * sizeof(GPUParticleData);
-        desc.structStride = sizeof(GPUParticleData);
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
-        desc.keepInitialState = true;
-
-        m_particleBuffer = nvDevice->createBuffer(desc);
-        if (!m_particleBuffer) {
-            Msg("! [GPUCulling] Failed to create particle buffer");
-            return;
-        }
-    }
-
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_ParticleDrawArgs";
-        desc.byteSize = m_maxParticles * sizeof(IndirectDrawArgs);
-        desc.canHaveUAVs = true;
-        desc.canHaveRawViews = true;
-        desc.isDrawIndirectArgs = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;  // Let NVRHI handle state transitions
-
-        m_particleDrawArgsBuffer = nvDevice->createBuffer(desc);
-        if (!m_particleDrawArgsBuffer) {
-            Msg("! [GPUCulling] Failed to create particle draw args buffer");
-            return;
-        }
-    }
-
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_ParticleVisibleCount";
-        desc.byteSize = sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.canHaveUAVs = true;
-        desc.canHaveRawViews = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
-
-        m_particleVisibleCountBuffer = nvDevice->createBuffer(desc);
-        if (!m_particleVisibleCountBuffer) {
-            Msg("! [GPUCulling] Failed to create particle visible count buffer");
-            return;
-        }
-    }
-
-    {
-        fg::RenderDevice::BufferDesc desc;
-        desc.debugName = "GPUCull_ParticleParams";
-        desc.byteSize = sizeof(CullParamsCB);
-        desc.isConstantBuffer = true;
-        desc.isVolatile = true;
-        desc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
-
-        m_particleCullParamsCB = m_device->CreateBuffer(desc);
-        if (!m_particleCullParamsCB.IsValid()) {
-            Msg("! [GPUCulling] Failed to create particle constant buffer");
-            return;
-        }
-    }
-
-    {
-        auto& cache = framegraph::GetPassResourceCache();
-        auto* particleCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("particle_cull", ".cs");
-        m_particleCullLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ParticleCull", *particleCullRefl, nvDevice);
-        if (!m_particleCullLayout) {
-            Msg("! [GPUCulling] Failed to create particle binding layout");
-            return;
-        }
-    }
-
-    {
-        nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = GEnv.Render->GetShaderLoader()->LoadComputeShader("particle_cull").handle;
-        pipeDesc.bindingLayouts = { m_particleCullLayout };
-
-        Msg("* [GPUCulling] Creating particle compute pipeline:");
-        Msg("    CS shader: %p", pipeDesc.CS.Get());
-        Msg("    Binding layouts: %u", pipeDesc.bindingLayouts.size());
-        Msg("    Layout[0]: %p", pipeDesc.bindingLayouts[0].Get());
-
-        m_particleCullPipeline = nvDevice->createComputePipeline(pipeDesc);
-        if (!m_particleCullPipeline) {
-            Msg("! [GPUCulling] Failed to create particle compute pipeline");
-            Msg("! [GPUCulling]   Check NVRHI validation layer output above for details");
-            return;
-        }
-    }
-
-    m_particleCullEnabled = true;
-    Msg("* [GPUCulling] Particle culling resources created");
-}
-
-void GPUCullingManager::UploadParticleBatches(fg::RenderContext* ctx, const xr_vector<passes::ParticleBatch>* batches)
-{
-    ZoneScopedN("GPUCull::UploadParticles");
-
-    if (!m_particleCullEnabled || !batches)
-        return;
-
-    m_particleCount = std::min(static_cast<u32>(batches->size()), m_maxParticles);
-
-    if (m_particleCount == 0)
-        return;
-
-    m_particleData.clear();
-    m_particleData.reserve(m_particleCount);
-    m_particleDrawArgsData.clear();
-    m_particleDrawArgsData.reserve(m_particleCount);
-
-    for (u32 i = 0; i < m_particleCount; i++) {
-        const auto& batch = (*batches)[i];
-
-        if (!batch.visual)
-            continue;
-
-        GPUParticleData particle;
-        particle.position = batch.visual->vis.sphere.P;
-        particle.radius = batch.visual->vis.sphere.R;
-        particle.batchIndex = i;
-        particle.flags = 0;
-        particle.pad0 = 0.0f;
-        particle.pad1 = 0.0f;
-
-        m_particleData.push_back(particle);
-
-        IndirectDrawArgs args;
-        args.indexCountPerInstance = batch.particleCount * 6;
-        args.instanceCount = 0;
-        args.startIndexLocation = 0;
-        args.baseVertexLocation = 0;
-        args.startInstanceLocation = 0;
-
-        m_particleDrawArgsData.push_back(args);
-    }
-
-    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-    cmdList->writeBuffer(m_particleBuffer, m_particleData.data(), m_particleCount * sizeof(GPUParticleData));
-    cmdList->writeBuffer(m_particleDrawArgsBuffer, m_particleDrawArgsData.data(), m_particleCount * sizeof(IndirectDrawArgs));
-}
-
-GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
-    framegraph::FrameGraph& fg,
-    framegraph::VirtualResourceHandle hizPyramid,
-    u32 hizWidth,
-    u32 hizHeight,
-    u32 hizMipLevels,
-    const xr_vector<passes::ParticleBatch>* batches)
-{
-    using namespace framegraph;
-
-    GPUParticleCullOutput output;
-    output.maxParticles = m_maxParticles;
-
-    if (!m_particleCullEnabled) {
-        output.drawArgsBuffer = VirtualResourceHandle();
-        return output;
-    }
-
-    m_particleCount = batches ? std::min(static_cast<u32>(batches->size()), m_maxParticles) : 0;
-
-    if (m_particleCount == 0) {
-        output.drawArgsBuffer = VirtualResourceHandle();
-        return output;
-    }
-
-    struct ParticleCullPassData {
-        VirtualResourceHandle hizPyramid;
-        VirtualResourceHandle drawArgsBuffer;
-
-        GPUCullingManager* manager;
-        const xr_vector<passes::ParticleBatch>* batches;
-        u32 particleCount;
-        u32 hizWidth;
-        u32 hizHeight;
-        u32 hizMipLevels;
-    };
-
-    ResourceDesc drawArgsDesc;
-    drawArgsDesc.type = ResourceDesc::Type::Buffer;
-    drawArgsDesc.debugName = "GPUCull_ParticleDrawArgs";
-    drawArgsDesc.bufferSize = m_maxParticles * sizeof(IndirectDrawArgs);
-    drawArgsDesc.structStride = sizeof(IndirectDrawArgs);
-    drawArgsDesc.isUAV = true;
-    drawArgsDesc.isTransient = false;
-
-    VirtualResourceHandle drawArgsHandle = fg.ImportBuffer("gpu_cull_particle_drawargs", m_particleDrawArgsBuffer, drawArgsDesc);
-
-    auto& passData = fg.addCallbackPass<ParticleCullPassData>(
-        "GPU Particle Culling",
-
-        [&, hizWidth, hizHeight, hizMipLevels, drawArgsHandle, batches](FrameGraph& builder, PassHandle passHandle, ParticleCullPassData& data) {
-            RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
-
-            data.manager = this;
-            data.batches = batches;
-            data.particleCount = m_particleCount;
-            data.hizWidth = hizWidth;
-            data.hizHeight = hizHeight;
-            data.hizMipLevels = hizMipLevels;
-
-            data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
-            data.drawArgsBuffer = passBuilder.write(drawArgsHandle, ResourceState::UnorderedAccess);
-        },
-
-        [](const ParticleCullPassData& data,
-           const FrameGraph& fg,
-           fg::RenderContext* ctx) {
-
-            GPUCullingManager* mgr = data.manager;
-            if (!mgr->m_particleCullEnabled || data.particleCount == 0)
-                return;
-
-            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            nvrhi::IDevice* nvDevice = mgr->m_device->GetNVRHIDevice();
-
-            mgr->UploadParticleBatches(ctx, data.batches);
-
-            nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
-            if (!hizTexture) {
-                Msg("! [GPUCulling] Hi-Z texture not available for particle culling");
-                return;
-            }
-
-            u32 zero = 0;
-            cmdList->writeBuffer(mgr->m_particleVisibleCountBuffer, &zero, sizeof(u32));
-
-            u32 frameId = Device.dwFrame + 1u;
-            if (frameId == 0)
-                frameId = 1;
-
-            CullParamsCB cb;
-            cb.viewProj = Device.mFullTransform;
-            cb.cameraPos = Device.vCameraPosition;
-            float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
-            cb.maxDistanceSq = farPlane * farPlane;
-            cb.objectCount = data.particleCount;
-            cb.hizWidth = data.hizWidth;
-            cb.hizHeight = data.hizHeight;
-            cb.hizMipLevels = data.hizMipLevels;
-            cb.frameId = frameId;
-            cb.padding[0] = cb.padding[1] = cb.padding[2] = 0;
-
-            mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
-
-            cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_particleCullParamsCB), &cb, sizeof(cb));
-
-            auto* particleCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("particle_cull", ".cs");
-            framegraph::BindingSetBuilder bsb(*particleCullRefl, nvDevice, "GPUCull.ParticleCull");
-            bsb.ConstantBuffer("ParticleCullParams", mgr->m_device->GetNativeBuffer(mgr->m_particleCullParamsCB))
-               .BufferSRV("g_ParticleData", mgr->m_particleBuffer)
-               .Texture("g_HiZPyramid", hizTexture)
-               .BufferUAV("g_VisibleIndices", mgr->m_particleVisibleCountBuffer)
-               .BufferUAV("g_VisibleCount", mgr->m_particleDrawArgsBuffer);
-
-            nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_particleCullLayout);
-            if (!bindingSet) {
-                Msg("! [GPUCulling] Failed to create particle binding set");
-                return;
-            }
-
-            nvrhi::ComputeState state;
-            state.pipeline = mgr->m_particleCullPipeline;
-            state.bindings = { bindingSet };
-            cmdList->setComputeState(state);
-
-            u32 groupCount = (data.particleCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
-            cmdList->dispatch(groupCount, 1, 1);
-        }
-    );
-
-    output.drawArgsBuffer = passData.drawArgsBuffer;
-    return output;
+    m_particleBuffer = nvDevice->createBuffer(desc);
+    if (!m_particleBuffer)
+        Msg("! [GPUCulling] Failed to create particle buffer");
 }
 
 // ═══════════════════════════════════════════════════════

@@ -157,11 +157,6 @@ struct GPUCullOutput {
 
 };
 
-struct GPUParticleCullOutput {
-    framegraph::VirtualResourceHandle drawArgsBuffer;
-    u32 maxParticles;
-};
-
 // ═══════════════════════════════════════════════════════
 //  GPU CULLING MANAGER
 // ═══════════════════════════════════════════════════════
@@ -290,21 +285,6 @@ public:
     );
 
     bool IsDebugEnabled() const;
-
-    void UploadParticleBatches(fg::RenderContext* ctx, const xr_vector<passes::ParticleBatch>* batches);
-
-    GPUParticleCullOutput SetupParticleCullingPass(
-        framegraph::FrameGraph& fg,
-        framegraph::VirtualResourceHandle hizPyramid,
-        u32 hizWidth,
-        u32 hizHeight,
-        u32 hizMipLevels,
-        const xr_vector<passes::ParticleBatch>* batches
-    );
-
-    u32 GetParticleCount() const { return m_particleCount; }
-    bool IsParticleCullingEnabled() const { return m_initialized && m_particleCullEnabled; }
-    nvrhi::IBuffer* GetParticleDrawArgsBuffer() const { return m_particleDrawArgsBuffer.Get(); }
 
     nvrhi::IBuffer* GetStaticCompactDrawArgsBuffer() const { return m_staticSet.compactDrawArgsBuffer.Get(); }
     nvrhi::IBuffer* GetStaticCompactBatchIndicesBuffer() const { return m_staticSet.compactBatchIndicesBuffer.Get(); }
@@ -601,17 +581,9 @@ private:
     nvrhi::InputLayoutHandle m_debugInputLayout;
 
     nvrhi::BufferHandle m_particleBuffer;
-    nvrhi::BufferHandle m_particleDrawArgsBuffer;
-    nvrhi::BufferHandle m_particleVisibleCountBuffer;
-    fg::BufferHandle m_particleCullParamsCB;
-    nvrhi::ComputePipelineHandle m_particleCullPipeline;
-    nvrhi::BindingLayoutHandle m_particleCullLayout;
 
-    u32 m_particleCount = 0;
     u32 m_maxParticles = 0;
-    bool m_particleCullEnabled = false;
     xr_vector<GPUParticleData> m_particleData;
-    xr_vector<IndirectDrawArgs> m_particleDrawArgsData;
     fg::RenderDevice* m_device = nullptr;
     RTAccelStructManager* m_rtAccelMgr = nullptr;
     u32 m_objectCount = 0;

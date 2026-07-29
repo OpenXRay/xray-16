@@ -1,75 +1,55 @@
-// particle_cull.cs
-// GPU particle culling: frustum + Hi-Z occlusion
-// Outputs visible particle indices and count
-
 #define THREAD_GROUP_SIZE 64
 
 #include "common_samplers.h"
 #include "cull_utils.h"
 
-// Must match GPUParticleData in GPUCullingManager.h (32 bytes)
 struct ParticleData {
-    float3 position;    // 12 bytes
-    float radius;       //  4 bytes
-    uint batchIndex;    //  4 bytes
-    uint flags;         //  4 bytes
-    float pad0;         //  4 bytes
-    float pad1;         //  4 bytes
+    float3 position;
+    float radius;
+    uint batchIndex;
+    uint flags;
+    float pad0;
+    float pad1;
 };
 
-// Use b5 to avoid collision with common.h buffers (b0, b1, b2, b3, b4)
+struct IndirectDrawArgs {
+    uint indexCountPerInstance;
+    uint instanceCount;
+    uint startIndexLocation;
+    int baseVertexLocation;
+    uint startInstanceLocation;
+};
+
 cbuffer ParticleCullParams : register(b5) {
-    float4x4 g_ViewProj;        // Current frame (for frustum culling) - 64 bytes
-    float4x4 g_PrevViewProj;    // Previous frame (for Hi-Z sampling) - 64 bytes
-    float4 g_FrustumPlanes[6];  // 96 bytes
-    float4 g_CameraPos;         // 16 bytes
-    float4 g_CameraTop;         // 16 bytes
-    float4 g_CameraRight;       // 16 bytes
-    uint g_ParticleCount;       //  4 bytes
-    uint g_HiZWidth;            //  4 bytes
-    uint g_HiZHeight;           //  4 bytes
-    uint g_HiZMipLevels;        //  4 bytes
+    float4x4 g_PrevViewProj;
+    float4 g_FrustumPlanes[6];
+    float4 g_CameraPos;
+    uint g_SlotCount;
+    uint g_HiZWidth;
+    uint g_HiZHeight;
+    uint g_HiZMipLevels;
 };
 
 StructuredBuffer<ParticleData> g_ParticleData : register(t0);
 Texture2D<float> g_HiZPyramid : register(t1);
 
-
-RWStructuredBuffer<uint> g_VisibleIndices : register(u0);
-RWByteAddressBuffer g_VisibleCount : register(u1);
+RWStructuredBuffer<IndirectDrawArgs> g_DrawArgs : register(u0);
 
 [numthreads(THREAD_GROUP_SIZE, 1, 1)]
 void main(uint3 dispatchThreadID : SV_DispatchThreadID)
 {
-    uint particleIdx = dispatchThreadID.x;
+    uint slot = dispatchThreadID.x;
 
-    if (particleIdx >= g_ParticleCount)
+    if (slot >= g_SlotCount)
         return;
 
-    ParticleData p = g_ParticleData[particleIdx];
+    ParticleData p = g_ParticleData[slot];
 
-    float radius = p.radius;
+    bool visible = FrustumTestSphere(p.position, p.radius, g_FrustumPlanes);
 
-    if (!FrustumTestSphere(p.position, radius, g_FrustumPlanes))
-        return;
+    if (visible && g_HiZMipLevels > 0)
+        visible = HiZTestSphere(p.position, p.radius, g_CameraPos.xyz, g_PrevViewProj,
+                                g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels);
 
-    // Hi-Z occlusion culling (returns true = visible)
-    if (g_HiZMipLevels > 0) {
-        if (!HiZTestSphere(
-                p.position,
-                radius,
-                g_CameraPos.xyz,
-                g_PrevViewProj,
-                g_HiZPyramid,
-                smp_nofilter,
-                g_HiZWidth,
-                g_HiZHeight,
-                g_HiZMipLevels))
-            return;
-    }
-
-    // Particle is visible - append to output
-    uint visibleIdx;
-    g_VisibleCount.InterlockedAdd(0, 1, visibleIdx);
-    g_VisibleIndices[visibleIdx] = particleIdx;
+    g_DrawArgs[slot].instanceCount = visible ? 1u : 0u;
 }

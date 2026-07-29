@@ -109,8 +109,6 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/DecalPassSetup.cpp
     FrameGraphPasses/DistortionApplyPassSetup.h
     FrameGraphPasses/DistortionApplyPassSetup.cpp
-    FrameGraphPasses/ParticleGPUCullingManager.h
-    FrameGraphPasses/ParticleGPUCullingManager.cpp
     FrameGraphPasses/ExposurePassSetup.h
     FrameGraphPasses/ExposurePassSetup.cpp
     FrameGraphPasses/TonemapPassSetup.h

@@ -2,7 +2,6 @@
 // Batched particle rendering with GPU culling
 #include "stdafx.h"
 #include "ParticlePassSetup.h"
-#include "ParticleGPUCullingManager.h"
 #include "PassCommon.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
@@ -33,7 +32,37 @@ using fg::PS::CParticleEffect;
 using fg::PS::CParticleGroup;
 using fg::PS::CPEDef;
 
-static constexpr u32 MAX_GPU_PARTICLES = 65536;
+static constexpr u32 PARTICLE_CULL_MAX_SLOTS = 1024;
+
+struct ParticleCullSlot {
+    Fvector position;
+    float radius;
+    u32 batchIndex;
+    u32 flags;
+    float pad0;
+    float pad1;
+};
+static_assert(sizeof(ParticleCullSlot) == 32, "ParticleCullSlot must be 32 bytes");
+
+struct ParticleDrawArgs {
+    u32 indexCount;
+    u32 instanceCount;
+    u32 startIndex;
+    s32 baseVertex;
+    u32 startInstance;
+};
+static_assert(sizeof(ParticleDrawArgs) == 20, "ParticleDrawArgs must be 20 bytes");
+
+struct ParticleCullParamsCB {
+    Fmatrix prevViewProj;
+    Fvector4 frustumPlanes[6];
+    Fvector4 cameraPos;
+    u32 slotCount;
+    u32 hiZWidth;
+    u32 hiZHeight;
+    u32 hiZMipLevels;
+};
+static_assert(sizeof(ParticleCullParamsCB) == 192, "ParticleCullParamsCB must be 192 bytes");
 
 static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads, ParticlePassState& state)
 {
@@ -177,11 +206,15 @@ static Fmatrix BuildHUDFOVMatrix()
 
 static u32 GenerateParticleVertices(
     const xr_vector<ParticleBatch>& batches,
-    xr_vector<ParticleVertex>& vertices)
+    xr_vector<ParticleVertex>& vertices,
+    xr_vector<u32>* outCounts = nullptr)
 {
     u32 totalParticles = 0;
 
     for (const auto& batch : batches) {
+        if (outCounts)
+            outCounts->push_back(0);
+
         if (!batch.visual || batch.visual->getType() != MT_PARTICLE_EFFECT)
             continue;
 
@@ -314,66 +347,8 @@ static u32 GenerateParticleVertices(
             }
         }
 
-        totalParticles += particleCount;
-    }
-
-    return totalParticles;
-}
-
-// Collect GPUParticleData for GPU culling path
-static u32 CollectGPUParticleData(
-    const xr_vector<ParticleBatch>& batches,
-    xr_vector<GPUParticleData>& gpuParticles)
-{
-    u32 totalParticles = 0;
-
-    for (const auto& batch : batches) {
-        if (!batch.visual || batch.visual->getType() != MT_PARTICLE_EFFECT)
-            continue;
-
-        CParticleEffect* pEffect = static_cast<CParticleEffect*>(batch.visual);
-        auto* pDef = pEffect->GetDefinition();
-        if (!pDef || !pDef->m_Flags.is(CPEDef::dfSprite))
-            continue;
-
-        PAPI::Particle* particles = nullptr;
-        u32 particleCount = 0;
-        PAPI::ParticleManager()->GetParticles(pEffect->GetHandleEffect(), particles, particleCount);
-
-        if (particleCount == 0 || !particles)
-            continue;
-
-        u32 baseIdx = (u32)gpuParticles.size();
-        gpuParticles.resize(baseIdx + particleCount);
-
-        for (u32 i = 0; i < particleCount; i++) {
-            auto& m = particles[i];
-            auto& gp = gpuParticles[baseIdx + i];
-
-            gp.position = m.pos;
-            gp.rotation = m.rot.x;
-
-            float r_x = m.size.x * 0.5f;
-            float r_y = m.size.y * 0.5f;
-
-            if (pDef->m_Flags.is(CPEDef::dfVelocityScale)) {
-                float speed = m.vel.magnitude();
-                r_x += speed * pDef->m_VelocityScale.x;
-                r_y += speed * pDef->m_VelocityScale.y;
-            }
-
-            gp.size.set(r_x, r_y);
-            gp.color = m.color;
-            gp.materialID = batch.bindlessMaterialID;
-
-            if (pDef->m_Flags.is(CPEDef::dfFramed)) {
-                pDef->m_Frame.CalculateTC(iFloor(float(m.frame) / 255.f), gp.uvMin, gp.uvMax);
-            } else {
-                gp.uvMin.set(0.f, 0.f);
-                gp.uvMax.set(1.f, 1.f);
-            }
-        }
-
+        if (outCounts)
+            outCounts->back() = particleCount;
         totalParticles += particleCount;
     }
 
@@ -479,12 +454,42 @@ void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::Framebuf
     state.initialized = true;
     Msg("* [ParticlePass] Pipeline initialization complete (6 blend modes + distortion)");
 
-    if (!state.gpuCullingManager) {
-        state.gpuCullingManager = xr_make_unique<ParticleGPUCullingManager>();
-        if (!state.gpuCullingManager->Initialize(device, MAX_GPU_PARTICLES)) {
-            Msg("! [ParticlePass] GPU culling initialization failed, using CPU fallback");
-            state.gpuCullingManager.reset();
+    if (!state.cullPipeline) {
+        auto csResult = shaderLoader->LoadComputeShader("particle_cull");
+        if (csResult.handle) {
+            state.cullLayout = cache.GetOrCreateBindingLayoutFromReflection("ParticleCull", *csResult.reflection, nvDevice);
+            if (state.cullLayout) {
+                nvrhi::ComputePipelineDesc cullDesc;
+                cullDesc.CS = csResult.handle;
+                cullDesc.bindingLayouts = { state.cullLayout };
+                state.cullPipeline = cache.GetOrCreateComputePipeline("ParticleCull", cullDesc, nvDevice);
+            }
         }
+
+        if (state.cullPipeline) {
+            nvrhi::BufferDesc od;
+            od.debugName = "ParticleCullSlots";
+            od.byteSize = PARTICLE_CULL_MAX_SLOTS * sizeof(ParticleCullSlot);
+            od.structStride = sizeof(ParticleCullSlot);
+            od.initialState = nvrhi::ResourceStates::ShaderResource;
+            od.keepInitialState = true;
+            state.cullObjectBuffer = nvDevice->createBuffer(od);
+
+            nvrhi::BufferDesc ad;
+            ad.debugName = "ParticleCullArgs";
+            ad.byteSize = PARTICLE_CULL_MAX_SLOTS * sizeof(ParticleDrawArgs);
+            ad.structStride = sizeof(ParticleDrawArgs);
+            ad.canHaveUAVs = true;
+            ad.isDrawIndirectArgs = true;
+            ad.initialState = nvrhi::ResourceStates::IndirectArgument;
+            ad.keepInitialState = true;
+            state.cullArgsBuffer = nvDevice->createBuffer(ad);
+        }
+
+        if (state.cullPipeline && state.cullObjectBuffer && state.cullArgsBuffer)
+            Msg("* [ParticlePass] Hi-Z particle culling ready (%u slots)", PARTICLE_CULL_MAX_SLOTS);
+        else
+            Msg("! [ParticlePass] Hi-Z particle culling unavailable, drawing unculled");
     }
 }
 
@@ -552,6 +557,7 @@ ParticlePassOutput setupParticlePass(
     u32 hiZWidth,
     u32 hiZHeight,
     u32 hiZMipLevels,
+    const Fmatrix* prevViewProj,
     VirtualResourceHandle prevDepth,
     ParticlePassState* state)
 {
@@ -584,6 +590,11 @@ ParticlePassOutput setupParticlePass(
             data.hiZWidth = hiZWidth;
             data.hiZHeight = hiZHeight;
             data.hiZMipLevels = hiZMipLevels;
+            data.hasPrevViewProj = prevViewProj != nullptr;
+            if (prevViewProj)
+                data.prevViewProj = *prevViewProj;
+            else
+                data.prevViewProj.identity();
             data.passState = state;
 
             auto hasDistortBatch = [](const xr_vector<ParticleBatch>* batches) {
@@ -749,7 +760,164 @@ ParticlePassOutput setupParticlePass(
                 );
             };
 
-            if (totalWorld > 0) {
+            struct WorldGroupDraw {
+                u8 mode;
+                xr_vector<ParticleVertex> vertices;
+                u32 totalParticles;
+                u32 firstSlot;
+                u32 slotCount;
+            };
+
+            xr_vector<WorldGroupDraw> worldGroups;
+            xr_vector<ParticleCullSlot> cullSlots;
+            xr_vector<ParticleDrawArgs> cullArgs;
+
+            bool cullReady = data.passState->cullPipeline && data.passState->cullObjectBuffer &&
+                             data.passState->cullArgsBuffer && data.hasPrevViewProj &&
+                             data.hiZPyramid.is_valid() && data.hiZMipLevels > 0;
+            nvrhi::ITexture* hizTexture = cullReady ? fg.GetPhysicalTexture(data.hiZPyramid) : nullptr;
+            if (!hizTexture)
+                cullReady = false;
+
+            if (totalWorld > 0 && cullReady) {
+                for (u8 mode : s_renderOrder) {
+                    xr_vector<ParticleBatch> filtered;
+                    for (const auto& b : *data.worldParticleBatches) {
+                        if (b.blendMode == mode && b.shaderVariant == ParticleShaderVariant::Standard)
+                            filtered.push_back(b);
+                    }
+                    if (filtered.empty())
+                        continue;
+
+                    WorldGroupDraw group;
+                    group.mode = mode;
+                    xr_vector<u32> counts;
+                    group.totalParticles = GenerateParticleVertices(filtered, group.vertices, &counts);
+                    if (group.totalParticles == 0)
+                        continue;
+
+                    group.firstSlot = (u32)cullSlots.size();
+                    u32 firstParticle = 0;
+                    for (size_t i = 0; i < filtered.size(); ++i) {
+                        u32 count = counts[i];
+                        if (count == 0)
+                            continue;
+
+                        ParticleCullSlot slot;
+                        slot.position = filtered[i].visual->vis.sphere.P;
+                        slot.radius = filtered[i].visual->vis.sphere.R;
+                        slot.batchIndex = (u32)cullSlots.size();
+                        slot.flags = 0;
+                        slot.pad0 = 0.0f;
+                        slot.pad1 = 0.0f;
+                        cullSlots.push_back(slot);
+
+                        ParticleDrawArgs args;
+                        args.indexCount = count * 6;
+                        args.instanceCount = 1;
+                        args.startIndex = firstParticle * 6;
+                        args.baseVertex = 0;
+                        args.startInstance = 0;
+                        cullArgs.push_back(args);
+
+                        firstParticle += count;
+                    }
+                    group.slotCount = (u32)cullSlots.size() - group.firstSlot;
+                    if (group.slotCount == 0)
+                        continue;
+                    worldGroups.push_back(std::move(group));
+                }
+
+                if (cullSlots.empty() || cullSlots.size() > PARTICLE_CULL_MAX_SLOTS)
+                    cullReady = false;
+            }
+
+            if (totalWorld > 0 && cullReady) {
+                cmdList->writeBuffer(data.passState->cullObjectBuffer, cullSlots.data(),
+                                     cullSlots.size() * sizeof(ParticleCullSlot));
+                cmdList->writeBuffer(data.passState->cullArgsBuffer, cullArgs.data(),
+                                     cullArgs.size() * sizeof(ParticleDrawArgs));
+
+                ParticleCullParamsCB cullCBData;
+                cullCBData.prevViewProj = data.prevViewProj;
+                CFrustum frustum;
+                frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+                u32 planeCount = std::min<u32>((u32)frustum.p_count, 6);
+                for (u32 i = 0; i < 6; i++) {
+                    if (i < planeCount)
+                        cullCBData.frustumPlanes[i].set(frustum.planes[i].n.x, frustum.planes[i].n.y,
+                                                        frustum.planes[i].n.z, frustum.planes[i].d);
+                    else
+                        cullCBData.frustumPlanes[i].set(0.0f, 0.0f, 0.0f, -1000000.0f);
+                }
+                cullCBData.cameraPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y,
+                                         Device.vCameraPosition.z, 0.0f);
+                cullCBData.slotCount = (u32)cullSlots.size();
+                cullCBData.hiZWidth = data.hiZWidth;
+                cullCBData.hiZHeight = data.hiZHeight;
+                cullCBData.hiZMipLevels = data.hiZMipLevels;
+
+                auto cullCB = cache.GetOrCreateVolatileCB("ParticleCull", "ParticleCullParams",
+                                                          sizeof(ParticleCullParamsCB), data.device);
+                cmdList->writeBuffer(cullCB, &cullCBData, sizeof(cullCBData));
+
+                auto* cullRefl = shaderLoader->GetCachedReflection("particle_cull", ".cs");
+                BindingSetBuilder cullBsb(*cullRefl, nvDevice, "ParticleCull");
+                cullBsb.ConstantBuffer("ParticleCullParams", cullCB)
+                       .BufferSRV("g_ParticleData", data.passState->cullObjectBuffer)
+                       .Texture("g_HiZPyramid", hizTexture)
+                       .BufferUAV("g_DrawArgs", data.passState->cullArgsBuffer);
+                auto cullBindingSet = cache.GetOrCreateBindingSet(cullBsb.Build(), data.passState->cullLayout, nvDevice);
+
+                if (cullBindingSet) {
+                    nvrhi::ComputeState cullState;
+                    cullState.pipeline = data.passState->cullPipeline;
+                    cullState.bindings = { cullBindingSet };
+                    cmdList->setComputeState(cullState);
+                    cmdList->dispatch(((u32)cullSlots.size() + 63) / 64, 1, 1);
+                } else {
+                    cullReady = false;
+                }
+            }
+
+            if (totalWorld > 0 && cullReady) {
+                for (auto& group : worldGroups) {
+                    EnsureParticleVertexBuffer(nvDevice, (u32)(group.vertices.size() * sizeof(ParticleVertex)), *data.passState);
+                    EnsureQuadIndexBuffer(nvDevice, group.totalParticles, *data.passState);
+                    if (!data.passState->particleVB || !data.passState->quadIB)
+                        continue;
+
+                    cmdList->writeBuffer(data.passState->particleVB, group.vertices.data(),
+                                         group.vertices.size() * sizeof(ParticleVertex));
+
+                    auto pipeline = data.passState->pipelines[group.mode];
+                    if (!pipeline)
+                        pipeline = data.passState->pipelines[PARTICLE_BLEND_BLEND];
+                    if (!pipeline)
+                        continue;
+
+                    nvrhi::Viewport viewport(
+                        0.0f, static_cast<float>(rtDesc.width),
+                        0.0f, static_cast<float>(rtDesc.height),
+                        0.0f, 1.0f
+                    );
+
+                    nvrhi::GraphicsState gfxState;
+                    gfxState.pipeline = pipeline;
+                    gfxState.framebuffer = framebuffer;
+                    gfxState.bindings = { bindingSet };
+                    if (bindlessTable)
+                        gfxState.addBindingSet(bindlessTable);
+                    gfxState.vertexBuffers = { {data.passState->particleVB, 0, 0} };
+                    gfxState.indexBuffer = { data.passState->quadIB, nvrhi::Format::R16_UINT, 0 };
+                    gfxState.indirectParams = data.passState->cullArgsBuffer;
+                    gfxState.viewport.addViewport(viewport);
+                    gfxState.viewport.addScissorRect(scissor);
+
+                    cmdList->setGraphicsState(gfxState);
+                    cmdList->drawIndexedIndirect(group.firstSlot * sizeof(ParticleDrawArgs), group.slotCount);
+                }
+            } else if (totalWorld > 0) {
                 for (u8 mode : s_renderOrder)
                     renderBatchGroup(*data.worldParticleBatches, mode, 0.0f, 1.0f);
             }

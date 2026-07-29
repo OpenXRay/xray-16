@@ -1100,17 +1100,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             drawArgsBuffer = cullOutput.drawArgsBuffer;
         }
 
-        if (m_gpuCullingManager->IsParticleCullingEnabled() && !m_worldParticleBatches.empty()) {
-            m_gpuCullingManager->SetupParticleCullingPass(
-                *m_framegraph,
-                m_hizPyramid,
-                hizOutput.width,
-                hizOutput.height,
-                hizOutput.mipLevels,
-                &m_worldParticleBatches
-            );
-        }
-
         if (m_gpuCullingManager->IsSkinnedCullingEnabled()) {
             skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedCullingPass(
                 *m_framegraph,
@@ -1405,6 +1394,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.width,
         hizOutput.height,
         hizOutput.mipLevels,
+        m_hasPrevFrameData ? &m_prevViewProj : nullptr,
         prevDepthHandle,
         &m_blackboard->get_or_add<passes::ParticlePassState>()
     );

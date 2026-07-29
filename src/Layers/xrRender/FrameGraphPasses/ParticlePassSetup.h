@@ -6,7 +6,6 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "PassVertexFormats.h"
-#include "ParticleGPUCullingManager.h"
 
 namespace xray::render::fg {
     class dxRender_Visual;
@@ -76,7 +75,10 @@ struct ParticlePassState {
     u32 particleVBSize = 0;
     nvrhi::BufferHandle quadIB;
     u32 maxQuads = 0;
-    xr_unique_ptr<ParticleGPUCullingManager> gpuCullingManager;
+    nvrhi::ComputePipelineHandle cullPipeline;
+    nvrhi::BindingLayoutHandle cullLayout;
+    nvrhi::BufferHandle cullObjectBuffer;
+    nvrhi::BufferHandle cullArgsBuffer;
 };
 
 struct ParticlePassData {
@@ -98,6 +100,8 @@ struct ParticlePassData {
     u32 hiZWidth;
     u32 hiZHeight;
     u32 hiZMipLevels;
+    Fmatrix prevViewProj;
+    bool hasPrevViewProj;
     ParticlePassState* passState;
     bool hasDistortion;
 };
@@ -130,6 +134,7 @@ ParticlePassOutput setupParticlePass(
     u32 hiZWidth = 0,
     u32 hiZHeight = 0,
     u32 hiZMipLevels = 0,
+    const Fmatrix* prevViewProj = nullptr,
     framegraph::VirtualResourceHandle prevDepth = {},
     ParticlePassState* state = nullptr
 );
