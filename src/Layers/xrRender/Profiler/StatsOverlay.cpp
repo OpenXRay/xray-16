@@ -504,6 +504,20 @@ void StatsOverlay::RenderGeometrySection()
             ImGui::Unindent();
         }
 
+        if (s.particleCullSubmitted > 0)
+        {
+            ImGui::Text("Particle Culling:");
+            ImGui::Indent();
+
+            u32 culledBatches = s.particleCullSubmitted - s.particleCullVisible;
+            float cullRate = 100.0f * culledBatches / s.particleCullSubmitted;
+            ImGui::Text("Hi-Z:   %u/%u batches visible (%.0f%% culled)",
+                s.particleCullVisible, s.particleCullSubmitted, cullRate);
+            ImGui::Text("Quads:  %u/%u visible", s.particleQuadsVisible, s.particleQuadsSubmitted);
+
+            ImGui::Unindent();
+        }
+
         if (s.megaBufferVertices > 0)
         {
             ImGui::Text("Mega-Buffer:");

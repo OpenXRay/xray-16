@@ -703,6 +703,18 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.skinnedCulled = skinnedCullStats.culled;
         }
 
+        if (m_blackboard)
+        {
+            const auto& particleCull = m_blackboard->get_or_add<passes::ParticlePassState>().cullStats;
+            if (particleCull.active)
+            {
+                stats.particleCullSubmitted = particleCull.submittedBatches;
+                stats.particleCullVisible = particleCull.visibleBatches;
+                stats.particleQuadsSubmitted = particleCull.submittedQuads;
+                stats.particleQuadsVisible = particleCull.visibleQuads;
+            }
+        }
+
         {
             auto& clmStats = fg::ClusteredLightManager::Instance();
             stats.lightsClustered = clmStats.GetLightCount();

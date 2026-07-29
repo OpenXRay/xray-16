@@ -37,6 +37,11 @@ struct RenderStats
     u32 skinnedVisible = 0;
     u32 skinnedCulled = 0;
 
+    u32 particleCullSubmitted = 0;
+    u32 particleCullVisible = 0;
+    u32 particleQuadsSubmitted = 0;
+    u32 particleQuadsVisible = 0;
+
     u32 lightsClustered = 0;
     u32 lightsHiZVisible = 0;
     u32 lightsPoint = 0;
@@ -70,6 +75,7 @@ struct RenderStats
         megaBufferVertices = megaBufferIndices = 0;
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
         skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
+        particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
         detailInstances = detailSlots = 0;
         detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;
