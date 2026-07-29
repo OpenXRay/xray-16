@@ -131,6 +131,7 @@ void CActor::PickupModeUpdate()
     {
         m_pUsableObject->use(this);
         Game().SendPickUpEvent(ID(), m_pObjectWeLookingAt->ID());
+        callback(GameObject::eTakeItemFromGround)(m_pObjectWeLookingAt->lua_game_object());
     }
 
     feel_touch_update(Position(), m_fPickupInfoRadius);
@@ -235,6 +236,7 @@ void CActor::PickupModeUpdate_COD()
 
         //подбирание объекта
         Game().SendPickUpEvent(ID(), pNearestItem->object().ID());
+        callback(GameObject::eTakeItemFromGround)(pNearestItem->object().lua_game_object());
 
         if (!psActorFlags.test(AF_MULTI_ITEM_PICKUP))
             m_bPickupMode = false;
