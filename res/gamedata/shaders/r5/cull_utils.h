@@ -130,7 +130,7 @@ bool HiZTestSphereTemporal(
     float2 maxNDC = prevNdc.xy + ndcSize;
 
     // Conservatively visible if off-screen in previous frame
-    if (any(minNDC > 1.0) || any(maxNDC < -1.0))
+    if (any(minNDC < -1.0) || any(maxNDC > 1.0))
         return true;
 
     // Convert NDC to UV space [0, 1]
@@ -149,7 +149,7 @@ bool HiZTestSphereTemporal(
     float boxHeight = (boxUV.w - boxUV.y) * float(hiZHeight);
 
     // Select mip where box is roughly 2x2 pixels
-    float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5)));
+    float mipLevel = ceil(log2(max(1.0, max(boxWidth, boxHeight))));
     mipLevel = clamp(mipLevel, 0.0, float(hiZMipLevels - 1));
 
     // Sample Hi-Z at 4 corners (previous frame's depth)
