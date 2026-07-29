@@ -13,12 +13,18 @@ struct VariantPSOKey
     u32 variantIndex;
     u32 passIndex;
     u32 vertexFormat;
+    u32 colorTargetCount = 0;
+    u32 depthFormat = 0;
+    u32 sampleCount = 1;
 
     bool operator<(const VariantPSOKey& o) const
     {
         if (variantIndex != o.variantIndex) return variantIndex < o.variantIndex;
         if (passIndex != o.passIndex) return passIndex < o.passIndex;
-        return vertexFormat < o.vertexFormat;
+        if (vertexFormat != o.vertexFormat) return vertexFormat < o.vertexFormat;
+        if (colorTargetCount != o.colorTargetCount) return colorTargetCount < o.colorTargetCount;
+        if (depthFormat != o.depthFormat) return depthFormat < o.depthFormat;
+        return sampleCount < o.sampleCount;
     }
 };
 

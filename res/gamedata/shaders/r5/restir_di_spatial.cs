@@ -24,7 +24,7 @@ cbuffer ReSTIRDISpatialParams : register(b5) {
     uint g_IdentityStaticCount;
     uint g_TerrainBatchCount;
     uint g_SkinnedBatchStart;
-    uint g_Pad0;
+    uint g_ParticleBatchStart;
     uint g_Pad1;
     uint g_Pad2;
 };
@@ -36,8 +36,10 @@ ByteAddressBuffer g_MegaVB : register(t3);
 ByteAddressBuffer g_MegaIB : register(t18);
 ByteAddressBuffer g_GrassVB : register(t12);
 ByteAddressBuffer g_GrassIB : register(t13);
+ByteAddressBuffer g_ParticleVB : register(t19);
+ByteAddressBuffer g_ParticleIB : register(t4);
 Texture2D<float4> t_SrcDI : register(t0);
-Texture2D<float> t_Depth : register(t4);
+Texture2D<float> t_Depth : register(t14);
 Texture2D<float4> t_BaseColor : register(t6);
 Texture2D<float4> t_WorldPos : register(t7);
 Texture2D<float4> t_Normal : register(t11);
@@ -47,10 +49,10 @@ RWTexture2D<float4> u_DIReservoir : register(u0);
 float TraceShadowDI(float3 origin, float3 dir, float tMax)
 {
     return TraceVisibilityAtten(
-        g_SceneTLAS, g_BatchInfo, g_MegaVB, g_MegaIB, g_GrassVB, g_GrassIB,
+        g_SceneTLAS, g_BatchInfo, g_MegaVB, g_MegaIB, g_GrassVB, g_GrassIB, g_ParticleVB, g_ParticleIB,
         origin, dir, tMax,
         g_IdentityStaticCount, g_TerrainBatchCount, g_SkinnedBatchStart, g_GrassBatchStart,
-        g_DetailAtlasIndex, false);
+        g_ParticleBatchStart, g_DetailAtlasIndex, true, 0.0);
 }
 
 [numthreads(8, 8, 1)]
@@ -61,7 +63,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth >= 1.0 || g_SpatialSamples == 0) {
+    if (depth <= 0.0 || g_SpatialSamples == 0) {
         u_DIReservoir[pixel] = t_SrcDI.Load(int3(pixel, 0));
         return;
     }

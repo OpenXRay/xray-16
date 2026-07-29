@@ -43,6 +43,11 @@ nvrhi::ShaderHandle VariantPSOCache::LoadShader(nvrhi::ShaderType type, const ch
     return result.handle;
 }
 
+static bool IsSkinnedVertexFormat(u32 vertexFormat)
+{
+    return vertexFormat >= VF_SKINNED_NONHQ && vertexFormat <= VF_SKINNED_HQ3W;
+}
+
 static const char* GetDefaultSkinnedVS(u32 vertexFormat)
 {
     switch (vertexFormat)
@@ -58,10 +63,7 @@ static const char* GetDefaultSkinnedVS(u32 vertexFormat)
 
 static const char* GetDefaultSkinnedPS(u32 vertexFormat)
 {
-    // All skinned VS share the same lit PS (IBL + CSM + clustered)
-    if (vertexFormat >= VF_SKINNED_NONHQ && vertexFormat <= VF_SKINNED_HQ3W)
-        return "bindless_skinned";
-    return nullptr;
+    return IsSkinnedVertexFormat(vertexFormat) ? "bindless_skinned" : nullptr;
 }
 
 nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
@@ -75,7 +77,17 @@ nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
     nvrhi::IBindingLayout* passBindingLayout,
     nvrhi::IBindingLayout* bindlessLayout)
 {
-    VariantPSOKey key{variantIndex, passIndex, vertexFormat};
+    if (!framebuffer)
+        return nullptr;
+
+    const auto& fbInfo = framebuffer->getFramebufferInfo();
+    VariantPSOKey key{
+        variantIndex,
+        passIndex,
+        vertexFormat,
+        static_cast<u32>(fbInfo.colorFormats.size()),
+        static_cast<u32>(fbInfo.depthFormat),
+        fbInfo.sampleCount};
 
     auto it = m_cache.find(key);
     if (it != m_cache.end())
@@ -90,25 +102,17 @@ nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
     const char* psName = pass.psName.c_str();
     bool remappedToSkinned = false;
 
-    // Model materials are authored as bindless_forward; skinned draws must use
-    // bindless_skinned* so NPCs/bots get the same IBL/CSM/clustered path as world.
-    if (vertexFormat >= VF_SKINNED_NONHQ && vertexFormat <= VF_SKINNED_HQ3W)
+    if (IsSkinnedVertexFormat(vertexFormat))
     {
-        if (!xr_strcmp(vsName, "bindless_forward"))
+        if (const char* skinnedVS = GetDefaultSkinnedVS(vertexFormat))
         {
-            if (const char* skinnedVS = GetDefaultSkinnedVS(vertexFormat))
-            {
-                vsName = skinnedVS;
-                remappedToSkinned = true;
-            }
+            vsName = skinnedVS;
+            remappedToSkinned = true;
         }
-        if (!xr_strcmp(psName, "bindless_forward"))
+        if (const char* skinnedPS = GetDefaultSkinnedPS(vertexFormat))
         {
-            if (const char* skinnedPS = GetDefaultSkinnedPS(vertexFormat))
-            {
-                psName = skinnedPS;
-                remappedToSkinned = true;
-            }
+            psName = skinnedPS;
+            remappedToSkinned = true;
         }
     }
 
@@ -121,7 +125,6 @@ nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
     if (!vsResult.handle || !psResult.handle)
         return nullptr;
 
-    // Cache handles for reuse
     {
         string256 vsKey, psKey;
         xr_sprintf(vsKey, "%d:%s", static_cast<int>(nvrhi::ShaderType::Vertex), vsName);
@@ -130,8 +133,6 @@ nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
         m_shaderCache[shared_str(psKey)] = psResult.handle;
     }
 
-    // Remapped skinned default shaders share SkinningPass layout (IBL/CSM binds).
-    // Other custom variants (e.g. water) keep a reflection-matched layout.
     nvrhi::BindingLayoutHandle layoutHandle = passBindingLayout;
     const bool customShaders =
         !remappedToSkinned &&
@@ -163,11 +164,19 @@ nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
     pipeDesc.renderState.depthStencilState = pass.depthStencil;
     pipeDesc.renderState.rasterState = pass.rasterState;
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
+    if (variant.wmark)
+    {
+        pipeDesc.renderState.rasterState.depthBias = 16;
+        pipeDesc.renderState.rasterState.slopeScaledDepthBias = 2.f;
+    }
 
     if (pass.blendEnabled && !(remappedToSkinned && !variant.transparent))
     {
         pipeDesc.renderState.blendState.targets[0] = pass.blendRT;
         pipeDesc.renderState.blendState.alphaToCoverageEnable = pass.alphaToCoverage;
+        if (variant.wmark)
+            pipeDesc.renderState.blendState.targets[0].setColorWriteMask(
+                nvrhi::ColorMask::Red | nvrhi::ColorMask::Green | nvrhi::ColorMask::Blue);
     }
 
     auto pipeline = device->createGraphicsPipeline(pipeDesc, framebuffer);

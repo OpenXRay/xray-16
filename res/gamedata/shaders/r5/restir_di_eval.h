@@ -39,11 +39,19 @@ float EvalLocalLightAttenuationDI(GPULightDataDI light, float3 worldPos, out flo
         uint texIdx = asuint(light.spotParamsAndType.z);
         if (texIdx != 0xFFFFFFFFu) {
             float4 projPos = mul(light.spotVP, float4(worldPos, 1.0));
-            if (projPos.w > 0) {
+            float3 spotDir = light.directionAndSpotScale.xyz;
+            float spotScale = light.directionAndSpotScale.w;
+            float spotOffset = light.spotParamsAndType.x;
+            float cone = SpotAttenDI(toLight, spotDir, spotScale, spotOffset);
+            if (projPos.w > 1e-4) {
                 float2 projUV = projPos.xy / projPos.w * 0.5 + 0.5;
                 projUV.y = 1.0 - projUV.y;
-                Texture2D spotTex = GetBindlessTexture(texIdx);
-                atten *= spotTex.SampleLevel(smp_linear, projUV, 0).r;
+                if (all(projUV >= 0.0) && all(projUV <= 1.0)) {
+                    Texture2D spotTex = GetBindlessTexture(texIdx);
+                    atten *= spotTex.SampleLevel(smp_linear, projUV, 0).r * cone;
+                } else {
+                    atten = 0;
+                }
             } else {
                 atten = 0;
             }
@@ -83,7 +91,13 @@ float LightEmitterRadiusDI(GPULightDataDI light)
 
 float SoftShadowAmountDI(float dist)
 {
-    return saturate((dist - 1.25) / 10.0);
+    return saturate((dist - 0.35) / 6.0);
+}
+
+float LightEmitterRadiusDISoft(GPULightDataDI light)
+{
+    float range = max(abs(light.colorAndRange.w), 0.5);
+    return clamp(range * 0.035, 0.05, 0.65);
 }
 
 #endif

@@ -29,7 +29,7 @@ bool IsWaterSurfMark(float w)
 bool SkipRtSurfLighting(float classifyW, float guideW)
 {
     if (IsHudSurfMark(guideW))
-        return false;
+        return true;
     return IsWaterSurfMark(classifyW);
 }
 

@@ -38,7 +38,11 @@ cbuffer ReSTIRGIParams : register(b5) {
     uint g_CacheSize;
     float g_CacheCellSize;
     uint g_CacheMaxAge;
-    uint g_Pad1;
+    uint g_ParticleBatchStart;
+    float g_LodDist;
+    float g_SunAngular;
+    uint g_SunSoftSamples;
+    float g_CameraMotion;
 };
 
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
@@ -50,6 +54,8 @@ ByteAddressBuffer g_SkinnedVB : register(t7);
 ByteAddressBuffer g_SkinnedIB : register(t11);
 ByteAddressBuffer g_GrassVB : register(t12);
 ByteAddressBuffer g_GrassIB : register(t13);
+ByteAddressBuffer g_ParticleVB : register(t19);
+ByteAddressBuffer g_ParticleIB : register(t4);
 Texture2D<float> t_Depth : register(t14);
 Texture2D<float4> t_Normal : register(t15);
 Texture2D<float4> t_BaseColor : register(t16);
@@ -73,12 +79,14 @@ RWStructuredBuffer<IrradianceCacheEntry> u_IrradianceCache : register(u8);
 bool IsSkinnedBatch(uint batchIdx)
 {
     return g_SkinnedBatchStart != 0xFFFFFFFFu && batchIdx >= g_SkinnedBatchStart &&
-           (g_GrassBatchStart == 0xFFFFFFFFu || batchIdx < g_GrassBatchStart);
+           (g_GrassBatchStart == 0xFFFFFFFFu || batchIdx < g_GrassBatchStart) &&
+           (g_ParticleBatchStart == 0xFFFFFFFFu || batchIdx < g_ParticleBatchStart);
 }
 
 bool IsGrassBatch(uint batchIdx)
 {
-    return g_GrassBatchStart != 0xFFFFFFFFu && batchIdx >= g_GrassBatchStart;
+    return g_GrassBatchStart != 0xFFFFFFFFu && batchIdx >= g_GrassBatchStart &&
+           (g_ParticleBatchStart == 0xFFFFFFFFu || batchIdx < g_ParticleBatchStart);
 }
 
 bool IsTerrainBatch(uint batchIdx)
@@ -95,13 +103,60 @@ float3 SampleSky(float3 dir)
     return lerp(s0, s1, w);
 }
 
-float TraceShadow(float3 origin, float3 dir, float tMax, bool nearSkinnedOccludes)
+float3 SampleSkyDiffuse(float3 dir)
+{
+    float w = g_SunColor_SkyWeight.w;
+    float3 s0 = g_Sky0.SampleLevel(smp_linear, dir, 4.0).rgb;
+    float3 s1 = g_Sky1.SampleLevel(smp_linear, dir, 4.0).rgb;
+    return lerp(s0, s1, w);
+}
+
+float3 SampleSkySpec(float3 dir, float roughness)
+{
+    float mip = saturate(roughness) * 5.0;
+    float w = g_SunColor_SkyWeight.w;
+    float3 s0 = g_Sky0.SampleLevel(smp_linear, dir, mip).rgb;
+    float3 s1 = g_Sky1.SampleLevel(smp_linear, dir, mip).rgb;
+    return lerp(s0, s1, w);
+}
+
+float TraceShadow(float3 origin, float3 dir, float tMax, bool nearSkinnedOccludes, float skinnedSelfMax)
 {
     return TraceVisibilityAtten(
-        g_SceneTLAS, g_BatchInfo, g_MegaVB, g_MegaIB, g_GrassVB, g_GrassIB,
+        g_SceneTLAS, g_BatchInfo, g_MegaVB, g_MegaIB, g_GrassVB, g_GrassIB, g_ParticleVB, g_ParticleIB,
         origin, dir, tMax,
         g_IdentityStaticCount, g_TerrainBatchCount, g_SkinnedBatchStart, g_GrassBatchStart,
-        g_DetailAtlasIndex, nearSkinnedOccludes);
+        g_ParticleBatchStart, g_DetailAtlasIndex, nearSkinnedOccludes, skinnedSelfMax);
+}
+
+float TraceSoftShadowSun(float3 origin, float3 sunDir, float viewDist, bool nearSkinnedOccludes, float skinnedSelfMax, inout uint rng)
+{
+    float lod = saturate(viewDist / max(g_LodDist, 1.0));
+    uint maxS = max(g_SunSoftSamples, 1u);
+    uint samples = 1u;
+    if (lod < 0.55)
+        samples = maxS;
+    else if (lod < 0.85)
+        samples = max(1u, maxS / 2u);
+
+    if (samples <= 1u)
+        return TraceShadow(origin, sunDir, 10000.0, nearSkinnedOccludes, skinnedSelfMax);
+
+    float3 L = normalize(sunDir);
+    float3 up = abs(L.y) < 0.99 ? float3(0, 1, 0) : float3(1, 0, 0);
+    float3 T = normalize(cross(up, L));
+    float3 B = cross(L, T);
+    float radius = max(g_SunAngular, 0.001);
+    float vis = 0.0;
+    for (uint i = 0; i < samples; ++i)
+    {
+        float2 u = float2(rand_float(rng), rand_float(rng));
+        float r = sqrt(u.x) * radius;
+        float a = u.y * 6.2831853;
+        float3 dir = normalize(L + T * (cos(a) * r) + B * (sin(a) * r));
+        vis += TraceShadow(origin, dir, 10000.0, nearSkinnedOccludes, skinnedSelfMax);
+    }
+    return vis / (float)samples;
 }
 
 float PointLightAttenuationRT(float distSq, float invRangeSq)
@@ -181,7 +236,7 @@ float3 EvaluateLocalLightsRT(
             float endSkip = max(0.55, LightEmitterRadiusDI(light) * 3.0 + 0.25);
             float shadowDist = max(dist - endSkip, dist * 0.88);
             if (shadowDist > 0.02)
-                shadow = TraceShadow(biasedPos, L, shadowDist, false);
+                shadow = TraceShadow(biasedPos, L, shadowDist, true, 0.0);
         }
         if (shadow <= 0.001)
             continue;
@@ -230,7 +285,7 @@ DIReservoir SampleDIReservoir(
     return r;
 }
 
-float3 SampleTerrainAlbedo(TerrainMaterialData mat, float2 uv);
+float3 SampleTerrainAlbedo(TerrainMaterialData mat, float2 uv, float hitDist);
 
 struct BounceHit {
     float3 position;
@@ -296,7 +351,7 @@ BounceHit TraceBounce(float3 origin, float3 direction, inout uint rng, bool skip
             hitN = GetSkinnedHitNormal(g_GrassVB, g_GrassIB, info, primIdx, bary);
             geoN = GetSkinnedHitGeoNormal(g_GrassVB, g_GrassIB, info, primIdx);
         } else if (IsSkinnedBatch(batchIdx)) {
-            if (skipNearSkinned && q.CommittedRayT() < 0.45) {
+            if (skipNearSkinned && q.CommittedRayT() < 0.2) {
                 rayOrigin = rayOrigin + direction * (q.CommittedRayT() + 0.002);
                 continue;
             }
@@ -334,7 +389,7 @@ BounceHit TraceBounce(float3 origin, float3 direction, inout uint rng, bool skip
             baked = g_HemiColor.rgb * albedo * 0.35;
         } else if (IsTerrainBatch(batchIdx)) {
             TerrainMaterialData tmat = g_TerrainMaterials[info.materialID];
-            albedo = SampleTerrainAlbedo(tmat, hitUV);
+            albedo = SampleTerrainAlbedo(tmat, hitUV, q.CommittedRayT());
             baked = ShadeBakedFromTerrainLmap(tmat, lmUV, albedo, g_HemiColor.rgb, hemi);
         } else {
             MaterialData mat = g_Materials[info.materialID];
@@ -383,14 +438,24 @@ float4 SampleTerrainTexture(uint index, float2 uv)
     return GetBindlessTexture(index).SampleLevel(smp_linear, uv, 0);
 }
 
-float3 SampleTerrainAlbedo(TerrainMaterialData mat, float2 uv)
+float3 SampleTerrainAlbedo(TerrainMaterialData mat, float2 uv, float hitDist)
 {
     float2 baseUV = uv;
-    float2 detailUV = uv * mat.detailScale;
     float4 baseSample = SampleTerrainTexture(mat.baseAlbedoIndex, baseUV);
     float4 mask = SampleTerrainTexture(mat.blendMaskIndex, baseUV);
     float maskSum = dot(mask, float4(1, 1, 1, 1));
     mask = maskSum > 0.001 ? mask / maskSum : float4(0.25, 0.25, 0.25, 0.25);
+    if (hitDist > g_LodDist * 0.5)
+    {
+        float m = max(max(mask.r, mask.g), max(mask.b, mask.a));
+        float3 d = baseSample.rgb;
+        if (mask.r >= m) d = SampleTerrainTexture(mat.detailR_Index, uv * mat.detailScale).rgb;
+        else if (mask.g >= m) d = SampleTerrainTexture(mat.detailG_Index, uv * mat.detailScale).rgb;
+        else if (mask.b >= m) d = SampleTerrainTexture(mat.detailB_Index, uv * mat.detailScale).rgb;
+        else d = SampleTerrainTexture(mat.detailA_Index, uv * mat.detailScale).rgb;
+        return baseSample.rgb * d * 2.0;
+    }
+    float2 detailUV = uv * mat.detailScale;
     float3 detailR = SampleTerrainTexture(mat.detailR_Index, detailUV).rgb;
     float3 detailG = SampleTerrainTexture(mat.detailG_Index, detailUV).rgb;
     float3 detailB = SampleTerrainTexture(mat.detailB_Index, detailUV).rgb;
@@ -423,37 +488,45 @@ float3 EvaluateSecondaryLo(
     float3 sunDir,
     float3 sunColor,
     float2 pixelPos,
+    float primaryViewDist,
     inout uint rngState)
 {
     float3 hitBiased = h.position + h.geoNormal * 0.005;
     float3 hitV = normalize(primaryPos - h.position);
-    float hitShadow = TraceShadow(hitBiased, sunDir, 10000.0, false);
+    float hitShadow = TraceShadow(hitBiased, sunDir, 10000.0, true, 0.0);
     float3 Lo = ShadeHitDirect(h.albedo, h.normal, hitV, h.metallic, h.roughness, sunDir, sunColor, hitShadow, h.baked);
     Lo += h.emissive;
     float hitLinDepth = abs(mul(g_WorldToView, float4(h.position, 1.0)).z);
-    Lo += EvaluateLocalLightsRT(h.position, h.normal, hitV, h.albedo, h.metallic, h.roughness,
-        pixelPos, hitLinDepth, min(g_LocalLightSamples, 4u), rngState);
-    if (g_Bounces >= 2u && rand_float(rngState) < 0.75) {
+    float farLod = saturate(primaryViewDist / max(g_LodDist, 1.0));
+    uint localS = (farLod > 0.7) ? 0u : ((rand_float(rngState) < 0.5) ? 1u : 0u);
+    if (localS > 0)
+        Lo += EvaluateLocalLightsRT(h.position, h.normal, hitV, h.albedo, h.metallic, h.roughness,
+            pixelPos, hitLinDepth, localS, rngState);
+    if (g_Bounces >= 2u && farLod < 0.65 && rand_float(rngState) < 0.75) {
         float2 u2 = float2(rand_float(rngState), rand_float(rngState));
         float3 dir2 = cosine_weighted_hemisphere(u2, h.normal);
         BounceHit h2 = TraceBounce(hitBiased, dir2, rngState, false);
         if (h2.valid) {
             float3 hit2Biased = h2.position + h2.geoNormal * 0.005;
             float3 hit2V = normalize(h.position - h2.position);
-            float sh2 = TraceShadow(hit2Biased, sunDir, 10000.0, false);
+            float sh2 = TraceShadow(hit2Biased, sunDir, 10000.0, true, 0.0);
             float3 Lo2 = ShadeHitDirect(h2.albedo, h2.normal, hit2V, h2.metallic, h2.roughness, sunDir, sunColor, sh2, h2.baked);
             Lo2 += h2.emissive;
-            Lo2 += EvaluateLocalLightsRT(h2.position, h2.normal, hit2V, h2.albedo, h2.metallic, h2.roughness,
-                pixelPos, abs(mul(g_WorldToView, float4(h2.position, 1.0)).z), min(g_LocalLightSamples, 2u), rngState);
+            float3 cached2 = QueryIrradianceCacheRW(u_IrradianceCache, h2.position, g_CacheCellSize, g_CacheSize, g_FrameIndex, g_CacheMaxAge);
+            if (any(cached2 > 0))
+                Lo2 = max(Lo2, cached2 * h2.albedo * 0.65);
             Lo += Lo2 * h2.albedo * (1.0 / 0.75) * 0.55;
             UpdateIrradianceCache(u_IrradianceCache, h2.position, Lo2, g_CacheCellSize, g_CacheSize, g_FrameIndex);
         } else {
-            Lo += SampleSky(dir2) * (1.0 / 0.75) * 0.45;
+            Lo += SampleSkyDiffuse(dir2) * (1.0 / 0.75) * 0.45;
         }
     }
     float3 cached = QueryIrradianceCacheRW(u_IrradianceCache, h.position, g_CacheCellSize, g_CacheSize, g_FrameIndex, g_CacheMaxAge);
-    if (Luminance(Lo) < 0.02 && any(cached > 0))
-        Lo = max(Lo, cached * h.albedo);
+    if (any(cached > 0))
+    {
+        float cacheW = saturate(0.55 + 0.35 * (1.0 - saturate(Luminance(Lo) * 4.0)));
+        Lo = lerp(Lo, max(Lo, cached * h.albedo), cacheW);
+    }
     UpdateIrradianceCache(u_IrradianceCache, h.position, Lo, g_CacheCellSize, g_CacheSize, g_FrameIndex);
     return min(Lo, RESTIR_MAX_RADIANCE);
 }
@@ -467,7 +540,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     float depth = t_Depth.Load(int3(pixel, 0));
     float4 worldPosData = t_WorldPos.Load(int3(pixel, 0));
-    if (depth >= 1.0) {
+    if (depth <= 0.0) {
         u_DirectLighting[pixel] = 0;
         u_ReservoirA[pixel] = 0;
         u_ReservoirB[pixel] = 0;
@@ -479,8 +552,18 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
     }
 
-    const bool isHud = IsHudSurfMark(worldPosData.w);
     float3 worldPos = worldPosData.xyz;
+    if (all(worldPos == 0.0)) {
+        float2 uv = (float2(pixel) + 0.5) / g_ScreenSize;
+        float2 ndc = float2(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0);
+        float4 worldH = mul(g_InvViewProj, float4(ndc, depth, 1.0));
+        worldPos = worldH.xyz / max(worldH.w, 1e-5);
+        worldPosData.xyz = worldPos;
+    }
+
+    const bool isHud = IsHudSurfMark(worldPosData.w);
+    const bool isChar = IsCharSurfMark(worldPosData.w);
+    const float skinnedSelfMax = isChar ? 0.65 : 0.0;
     float4 normalData = t_Normal.Load(int3(pixel, 0));
     float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
 
@@ -493,11 +576,13 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float sunIntensity = g_SunDir_Intensity.w;
     float3 sunColor = g_SunColor_SkyWeight.xyz * sunIntensity;
 
-    float3 biasedPos = worldPos + N * (isHud ? 0.03 : 0.01);
+    float3 biasedPos = worldPos + N * (isHud ? 0.03 : (isChar ? 0.035 : 0.01));
     float linearDepth = abs(mul(g_WorldToView, float4(worldPos, 1.0)).z);
+    float viewDist = length(worldPos - g_CameraPos.xyz);
     float2 pixelPos = float2(pixel) + 0.5;
 
-    float shadow = TraceShadow(biasedPos, sunDir, 10000.0, isHud);
+    uint rng = pcg_hash(pixel.x + pixel.y * 1973u + g_FrameIndex * 26699u);
+    float shadow = TraceSoftShadowSun(biasedPos, sunDir, viewDist, isHud, skinnedSelfMax, rng);
     float3 direct = 0;
     if (shadow > 0.001)
         direct = PBRDirectLighting(albedo, N, V, sunDir, sunColor * shadow, metallic, roughness, 1);
@@ -510,8 +595,6 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
             albedo, N, V, sunDir, sunColor, max(shadow, 0.35),
             sssTint, sssThickness, sssMask);
     }
-
-    uint rng = pcg_hash(pixel.x + pixel.y * 1973u + g_FrameIndex * 26699u);
     DIReservoir diRes = SampleDIReservoir(
         worldPos, N, V, albedo, metallic, roughness,
         pixelPos, linearDepth, max(g_DICandidates, 1u), isHud, rng);
@@ -529,21 +612,27 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         float2 u = float2(rand_float(rng), rand_float(rng));
         float3 bounceDir = cosine_weighted_hemisphere(u, N);
         float cosPDF = max(dot(bounceDir, N), 0) / PI;
-        BounceHit hit = TraceBounce(biasedPos, bounceDir, rng, isHud);
+        BounceHit hit = TraceBounce(biasedPos, bounceDir, rng, isHud || isChar);
 
         float3 LoSurf = 0;
-        float3 LoSky = min(SampleSky(bounceDir), RESTIR_MAX_RADIANCE);
+        float3 LoSky = min(SampleSkyDiffuse(bounceDir), RESTIR_MAX_RADIANCE);
         float3 samplePos = worldPos + bounceDir * g_ClusterScales.y;
         float3 sampleN = -bounceDir;
         bool usedSurf = false;
 
         if (hit.valid && cosPDF > 1e-6) {
-            LoSurf = EvaluateSecondaryLo(hit, worldPos, sunDir, sunColor, pixelPos, rng);
+            LoSurf = EvaluateSecondaryLo(hit, worldPos, sunDir, sunColor, pixelPos, viewDist, rng);
             if (isHud)
                 LoSurf = min(LoSurf, sunColor * 0.35 + 0.08);
             samplePos = hit.position;
             sampleN = hit.normal;
             usedSurf = true;
+            if (Luminance(LoSurf) < 0.015)
+            {
+                float3 pCache = QueryIrradianceCacheRW(u_IrradianceCache, worldPos, g_CacheCellSize, g_CacheSize, g_FrameIndex, g_CacheMaxAge);
+                if (any(pCache > 0))
+                    LoSurf = max(LoSurf, pCache * albedo * 0.5);
+            }
         } else if (isHud) {
             LoSky = min(LoSky, sunColor * 0.25 + 0.06);
         }
@@ -569,46 +658,61 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         }
     }
 
-    float3 R;
-    if (roughness < 0.08) {
-        R = reflect(-V, N);
-    } else {
-        float2 uSpec = float2(rand_float(rng), rand_float(rng));
-        float3 H = ImportanceSampleGGX(uSpec, N, roughness);
-        R = normalize(2.0 * max(dot(V, H), 0.0) * H - V);
-        if (dot(R, N) <= 0.0)
-            R = reflect(-V, N);
-    }
+    float3 Fenv = NRD_EnvironmentTerm_Rtg(F0primary, abs(dot(N, V)), roughness);
+    float sampleRough = max(roughness, 0.06);
+    uint specSamples = 1u;
 
     float3 specular = 0;
     float specHitDist = 0;
-    float3 Fenv = NRD_EnvironmentTerm_Rtg(F0primary, abs(dot(N, V)), roughness);
+    float3 bestSamplePos = worldPos;
+    float3 bestSampleN = N;
+    float3 bestLo = 0;
+    float accW = 0;
 
-    if (dot(R, N) > 0.0) {
-        BounceHit specHit = TraceBounce(biasedPos, R, rng, isHud);
+    [loop] for (uint si = 0; si < specSamples; si++) {
+        float2 uSpec = float2(rand_float(rng), rand_float(rng));
+        float3 H = ImportanceSampleGGX(uSpec, N, sampleRough);
+        float3 R = normalize(2.0 * max(dot(V, H), 0.0) * H - V);
+        if (dot(R, N) <= 0.0)
+            R = reflect(-V, N);
+        if (dot(R, N) <= 0.0)
+            continue;
+
+        BounceHit specHit = TraceBounce(biasedPos, R, rng, isHud || isChar);
         float3 Lo = 0;
         float3 samplePos = worldPos + R * g_ClusterScales.y;
         float3 sampleN = -R;
+        float hitDist = g_ClusterScales.y;
         if (specHit.valid) {
-            Lo = EvaluateSecondaryLo(specHit, worldPos, sunDir, sunColor, pixelPos, rng);
+            Lo = EvaluateSecondaryLo(specHit, worldPos, sunDir, sunColor, pixelPos, viewDist, rng);
             if (isHud)
                 Lo = min(Lo, sunColor * 0.3 + 0.05);
             samplePos = specHit.position;
             sampleN = specHit.normal;
-            specHitDist = length(specHit.position - worldPos);
-            if (specHitDist < 1e-3)
-                specHitDist = 0;
+            hitDist = length(specHit.position - worldPos);
+            if (hitDist < 1e-3)
+                hitDist = 0;
         } else {
-            Lo = min(SampleSky(R), RESTIR_MAX_RADIANCE);
+            Lo = min(SampleSkySpec(R, sampleRough), RESTIR_MAX_RADIANCE);
             if (isHud)
                 Lo = min(Lo, sunColor * 0.2 + 0.04);
-            specHitDist = g_ClusterScales.y;
         }
-        specular = min(Lo, RESTIR_MAX_RADIANCE) * Fenv;
+        Lo = min(Lo, RESTIR_MAX_RADIANCE);
+        float w = 1.0 / (float)specSamples;
+        specular += Lo * Fenv * w;
+        specHitDist += hitDist * w;
+        accW += w;
+        if (Luminance(Lo) >= Luminance(bestLo)) {
+            bestLo = Lo;
+            bestSamplePos = samplePos;
+            bestSampleN = sampleN;
+        }
+    }
+
+    if (accW > 1e-4) {
         float targetLum = Luminance(specular);
         if (targetLum > 0) {
-            float w = targetLum;
-            ReservoirUpdate(specReservoir, w, samplePos, sampleN, Lo, rng);
+            ReservoirUpdate(specReservoir, targetLum, bestSamplePos, bestSampleN, bestLo, rng);
             specReservoir.W = (specReservoir.M > 0) ? specReservoir.w_sum / (targetLum * (float)specReservoir.M) : 0;
             specReservoir.age = 0;
         }

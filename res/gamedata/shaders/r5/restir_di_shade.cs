@@ -19,7 +19,7 @@ cbuffer ReSTIRDIShadeParams : register(b5) {
     uint g_IdentityStaticCount;
     uint g_TerrainBatchCount;
     uint g_SkinnedBatchStart;
-    uint g_Pad0;
+    uint g_ParticleBatchStart;
 };
 
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
@@ -29,6 +29,8 @@ ByteAddressBuffer g_MegaVB : register(t3);
 ByteAddressBuffer g_MegaIB : register(t18);
 ByteAddressBuffer g_GrassVB : register(t12);
 ByteAddressBuffer g_GrassIB : register(t13);
+ByteAddressBuffer g_ParticleVB : register(t19);
+ByteAddressBuffer g_ParticleIB : register(t4);
 Texture2D<float4> t_DIReservoir : register(t0);
 Texture2D<float> t_Depth : register(t4);
 Texture2D<float4> t_BaseColor : register(t6);
@@ -37,16 +39,16 @@ Texture2D<float4> t_Normal : register(t11);
 
 RWTexture2D<float4> u_DirectLighting : register(u0);
 
-float TraceShadowRayDI(float3 origin, float3 dir, float tMax)
+float TraceShadowRayDI(float3 origin, float3 dir, float tMax, float skinnedSelfMax)
 {
     return TraceVisibilityAtten(
-        g_SceneTLAS, g_BatchInfo, g_MegaVB, g_MegaIB, g_GrassVB, g_GrassIB,
+        g_SceneTLAS, g_BatchInfo, g_MegaVB, g_MegaIB, g_GrassVB, g_GrassIB, g_ParticleVB, g_ParticleIB,
         origin, dir, tMax,
         g_IdentityStaticCount, g_TerrainBatchCount, g_SkinnedBatchStart, g_GrassBatchStart,
-        g_DetailAtlasIndex, false);
+        g_ParticleBatchStart, g_DetailAtlasIndex, true, skinnedSelfMax);
 }
 
-float TraceSoftShadowDI(float3 origin, float3 lightPos, float emitterRadius, bool hudLight, inout uint rng)
+float TraceSoftShadowDI(float3 origin, float3 lightPos, float emitterRadius, bool hudLight, float skinnedSelfMax, inout uint rng)
 {
     float3 toLight = lightPos - origin;
     float dist = length(toLight);
@@ -57,9 +59,9 @@ float TraceSoftShadowDI(float3 origin, float3 lightPos, float emitterRadius, boo
     float soft = hudLight ? 0.0 : SoftShadowAmountDI(dist);
     float radius = emitterRadius * lerp(0.12, 1.0, soft);
     uint samples = 1;
-    if (soft > 0.08)
+    if (soft > 0.05)
         samples = 2;
-    if (soft > 0.4)
+    if (soft > 0.25)
         samples = 4;
 
     float3 up = (abs(L.y) < 0.99) ? float3(0, 1, 0) : float3(1, 0, 0);
@@ -81,7 +83,7 @@ float TraceSoftShadowDI(float3 origin, float3 lightPos, float emitterRadius, boo
             vis += 1.0;
             continue;
         }
-        vis += TraceShadowRayDI(origin, dir / max(d, 1e-4), tMax);
+        vis += TraceShadowRayDI(origin, dir / max(d, 1e-4), tMax, skinnedSelfMax);
     }
     return vis / (float)samples;
 }
@@ -94,7 +96,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth >= 1.0)
+    if (depth <= 0.0)
         return;
 
     DIReservoir r = UnpackDIReservoir(t_DIReservoir.Load(int3(pixel, 0)));
@@ -104,6 +106,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float4 worldPosData = t_WorldPos.Load(int3(pixel, 0));
     float3 worldPos = worldPosData.xyz;
     const bool hudSurf = IsHudSurfMark(worldPosData.w);
+    const float skinnedSelfMax = IsCharSurfMark(worldPosData.w) ? 0.65 : 0.0;
     float4 normalData = t_Normal.Load(int3(pixel, 0));
     float3 N = normalize(normalData.xyz);
     float roughness = max(normalData.w, MIN_ROUGHNESS);
@@ -126,9 +129,9 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     float shadow = 1.0;
     if (!hudLight && asuint(light.spotParamsAndType.w) != 0xFFFFFFFFu) {
-        float3 biased = worldPos + N * 0.05;
+        float3 biased = worldPos + N * (skinnedSelfMax > 0.0 ? 0.06 : 0.05);
         uint rng = pcg_hash(pixel.x + pixel.y * 1973u + r.lightIndex * 26699u + asuint(dist * 100.0));
-        shadow = TraceSoftShadowDI(biased, light.positionAndInvRangeSq.xyz, LightEmitterRadiusDI(light), false, rng);
+        shadow = TraceSoftShadowDI(biased, light.positionAndInvRangeSq.xyz, LightEmitterRadiusDISoft(light), false, skinnedSelfMax, rng);
         if (!hudSurf && shadow <= 0.001 && light.spotParamsAndType.y < 0.5)
             shadow = 0.35;
     }

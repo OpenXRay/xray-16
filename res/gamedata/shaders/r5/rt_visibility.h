@@ -4,6 +4,7 @@
 #include "bindless_common.h"
 #include "rt_common.h"
 #include "rt_grass_alpha.h"
+#include "rt_particle_alpha.h"
 
 static const uint RT_VIS_MAX_SKIPS = 8;
 
@@ -14,6 +15,8 @@ float TraceVisibilityAtten(
     ByteAddressBuffer megaIB,
     ByteAddressBuffer grassVB,
     ByteAddressBuffer grassIB,
+    ByteAddressBuffer particleVB,
+    ByteAddressBuffer particleIB,
     float3 origin,
     float3 dir,
     float tMax,
@@ -21,14 +24,17 @@ float TraceVisibilityAtten(
     uint terrainBatchCount,
     uint skinnedBatchStart,
     uint grassBatchStart,
+    uint particleBatchStart,
     uint detailAtlasIndex,
-    bool nearSkinnedOccludes)
+    bool nearSkinnedOccludes,
+    float skinnedSelfMax)
 {
     float atten = 1.0;
     float3 shadowOrigin = origin;
     float3 shadowDir = normalize(dir);
     float remain = tMax;
     const float selfSkip = nearSkinnedOccludes ? 0.004 : 0.02;
+    const float skinSelf = max(skinnedSelfMax, 0.0);
 
     for (uint si = 0; si < RT_VIS_MAX_SKIPS; si++) {
         RayDesc ray;
@@ -43,6 +49,7 @@ float TraceVisibilityAtten(
             if (q.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE) {
                 uint candBatch = q.CandidateInstanceID() + q.CandidateGeometryIndex();
                 if (grassBatchStart != 0xFFFFFFFFu && candBatch >= grassBatchStart &&
+                    (particleBatchStart == 0xFFFFFFFFu || candBatch < particleBatchStart) &&
                     GrassTexelOpaque(grassVB, grassIB, batchInfo, candBatch,
                         q.CandidatePrimitiveIndex(), q.CandidateTriangleBarycentrics(), detailAtlasIndex))
                     q.CommitNonOpaqueTriangleHit();
@@ -63,7 +70,8 @@ float TraceVisibilityAtten(
         uint sBatchIdx = q.CommittedInstanceID() + q.CommittedGeometryIndex();
         RTBatchInfo sInfo = batchInfo[sBatchIdx];
 
-        bool isGrass = grassBatchStart != 0xFFFFFFFFu && sBatchIdx >= grassBatchStart;
+        bool isGrass = grassBatchStart != 0xFFFFFFFFu && sBatchIdx >= grassBatchStart &&
+            (particleBatchStart == 0xFFFFFFFFu || sBatchIdx < particleBatchStart);
         if (isGrass) {
             float tHit = q.CommittedRayT();
             if (tHit < 0.1) {
@@ -81,6 +89,28 @@ float TraceVisibilityAtten(
         }
 
         MaterialData sMat = g_Materials[sInfo.materialID];
+
+        bool isParticle = particleBatchStart != 0xFFFFFFFFu && sBatchIdx >= particleBatchStart;
+        if (isParticle) {
+            float tHit = q.CommittedRayT() + 0.002;
+            if (sMat.flags & MAT_FLAG_EMISSIVE) {
+                shadowOrigin = shadowOrigin + shadowDir * tHit;
+                remain -= tHit;
+                if (remain <= 0.001) break;
+                continue;
+            }
+            float2 sUV = GetParticleHitUV(particleVB, particleIB, sInfo,
+                q.CommittedPrimitiveIndex(), q.CommittedTriangleBarycentrics());
+            float2 d = sUV * 2.0 - 1.0;
+            float soft = saturate(1.0 - dot(d, d));
+            soft *= soft;
+            atten *= (1.0 - 0.65 * soft);
+            if (atten < 0.2) { atten = 0.2; break; }
+            shadowOrigin = shadowOrigin + shadowDir * tHit;
+            remain -= tHit;
+            if (remain <= 0.001) break;
+            continue;
+        }
 
         if (sMat.flags & MAT_FLAG_EMISSIVE) {
             float tHit = q.CommittedRayT() + 0.002;
@@ -108,18 +138,14 @@ float TraceVisibilityAtten(
         if (isTerrain) { atten = 0; break; }
 
         bool isSkinned = skinnedBatchStart != 0xFFFFFFFFu && sBatchIdx >= skinnedBatchStart &&
-            (grassBatchStart == 0xFFFFFFFFu || sBatchIdx < grassBatchStart);
+            (grassBatchStart == 0xFFFFFFFFu || sBatchIdx < grassBatchStart) &&
+            (particleBatchStart == 0xFFFFFFFFu || sBatchIdx < particleBatchStart);
         if (isSkinned) {
-            float tHit = q.CommittedRayT();
-            if (!nearSkinnedOccludes && tHit < 0.85) {
-                shadowOrigin = shadowOrigin + shadowDir * (tHit + 0.002);
-                remain -= (tHit + 0.002);
+            if (tHit0 < skinSelf) {
+                shadowOrigin = shadowOrigin + shadowDir * (tHit0 + 0.002);
+                remain -= (tHit0 + 0.002);
                 if (remain <= 0.001) break;
                 continue;
-            }
-            if (!nearSkinnedOccludes) {
-                atten *= 0.35;
-                break;
             }
             atten = 0;
             break;
@@ -157,12 +183,15 @@ bool TraceVisibilityClear(
     ByteAddressBuffer megaIB,
     ByteAddressBuffer grassVB,
     ByteAddressBuffer grassIB,
+    ByteAddressBuffer particleVB,
+    ByteAddressBuffer particleIB,
     float3 origin,
     float3 target,
     uint identityStaticCount,
     uint terrainBatchCount,
     uint skinnedBatchStart,
     uint grassBatchStart,
+    uint particleBatchStart,
     uint detailAtlasIndex)
 {
     float3 dir = target - origin;
@@ -170,10 +199,10 @@ bool TraceVisibilityClear(
     if (dist < 1e-4)
         return false;
     float atten = TraceVisibilityAtten(
-        tlas, batchInfo, megaVB, megaIB, grassVB, grassIB,
+        tlas, batchInfo, megaVB, megaIB, grassVB, grassIB, particleVB, particleIB,
         origin, dir / dist, max(dist - 0.02, 0.001),
         identityStaticCount, terrainBatchCount, skinnedBatchStart, grassBatchStart,
-        detailAtlasIndex, false);
+        particleBatchStart, detailAtlasIndex, true, 0.0);
     return atten > 0.15;
 }
 
