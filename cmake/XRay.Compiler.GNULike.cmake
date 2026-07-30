@@ -53,6 +53,8 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     )
 endif()
 
+add_compile_options(-fno-strict-aliasing)
+
 if (WIN32)
     add_compile_definitions(WIN32 _WINDOWS)
 endif()
