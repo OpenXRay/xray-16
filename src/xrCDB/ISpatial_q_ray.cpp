@@ -4,6 +4,8 @@
 #include "xrCore/Threading/Lock.hpp"
 #include "xrCore/Threading/ScopeLock.hpp"
 
+#include <bit>
+
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
@@ -36,7 +38,7 @@ struct alignas(16) ray_t
     vec_t fwd_dir;
 };
 
-ICF u32& uf(float& x) { return (u32&)x; }
+ICF u32 uf(const float& x) { return std::bit_cast<u32>(x); }
 ICF bool isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fvector& coord)
 {
     Fvector MaxT;
