@@ -57,6 +57,9 @@ add_compile_options(-fno-strict-aliasing)
 
 if (WIN32)
     add_compile_definitions(WIN32 _WINDOWS)
+    if (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+        add_compile_options(/bigobj)
+    endif()
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB AND NOT WIN32)

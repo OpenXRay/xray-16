@@ -35,6 +35,10 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio")
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT xr_3da)
 endif()
 
+add_compile_definitions(
+    $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:XRAY_STATIC_BUILD>
+)
+
 block()
     set(CMAKE_UNITY_BUILD OFF)
     add_subdirectory(Externals)
