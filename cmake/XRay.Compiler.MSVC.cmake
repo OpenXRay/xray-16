@@ -22,6 +22,7 @@ else()
 endif()
 
 add_compile_options(/Zc:inline)
+add_compile_options(/bigobj)
 
 add_compile_options($<$<EQUAL:${CMAKE_SIZEOF_VOID_P},4>:/arch:SSE2>)
 add_compile_options($<$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>:/arch:AVX2>)
