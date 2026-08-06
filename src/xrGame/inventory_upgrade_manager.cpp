@@ -83,10 +83,12 @@ Property* Manager::get_property(shared_str const& property_id)
 
 Root* Manager::add_root(shared_str const& root_id)
 {
+#ifndef MASTER_GOLD
     if (get_root(root_id))
     {
-        VERIFY2(0, make_string("Try add the existent upgrade_root for inventory item <%s>!", root_id.c_str()));
+        Msg("! Try add the existent upgrade_root for inventory item <%s>!", root_id.c_str());
     }
+#endif
     Root* new_root = xr_new<Root>();
     m_roots.emplace(root_id, new_root);
     new_root->construct(root_id, *this);
@@ -95,12 +97,13 @@ Root* Manager::add_root(shared_str const& root_id)
 
 Upgrade* Manager::add_upgrade(shared_str const& upgrade_id, Group& parent_group)
 {
+#ifndef MASTER_GOLD
     if (get_upgrade(upgrade_id))
     {
-        VERIFY2(
-            0, make_string("Try add the existent upgrade (%s), in group <%s>. Such upgrade is in group <%s> already!",
-                   upgrade_id.c_str(), parent_group.id_str(), get_upgrade(upgrade_id)->parent_group_id().c_str()));
+        Msg("! Try add the existent upgrade (%s), in group <%s>. Such upgrade is in group <%s> already!",
+            upgrade_id.c_str(), parent_group.id_str(), get_upgrade(upgrade_id)->parent_group_id().c_str());
     }
+#endif
     Upgrade* new_upgrade = xr_new<Upgrade>();
     m_upgrades.emplace(upgrade_id, new_upgrade);
     new_upgrade->construct(upgrade_id, parent_group, *this);
@@ -123,10 +126,12 @@ Group* Manager::add_group(shared_str const& group_id, UpgradeBase& parent_upgrad
 
 Property* Manager::add_property(shared_str const& property_id)
 {
+#ifndef MASTER_GOLD
     if (get_property(property_id))
     {
-        VERIFY2(0, make_string("Try add the existent upgrade property <%s>!", property_id.c_str()));
+        Msg("! Try add the existent upgrade property <%s>!", property_id.c_str());
     }
+#endif
     Property* new_property = xr_new<Property>();
     m_properties.emplace(property_id, new_property);
     new_property->construct(property_id, *this);
@@ -137,11 +142,16 @@ Property* Manager::add_property(shared_str const& property_id)
 
 bool Manager::item_upgrades_exist(shared_str const& item_id)
 {
-    VERIFY2(pSettings->section_exist(item_id), make_string("Inventory item [%s] does not exist!", item_id.c_str()));
+    R_ASSERT2_CURE(pSettings->section_exist(item_id), make_string("Inventory item [%s] does not exist!", item_id.c_str()),
+    {
+        return false;
+    });
+
     if (!pSettings->line_exist(item_id, "upgrades") || !pSettings->r_string(item_id, "upgrades"))
     {
         return false;
     }
+
     if (!pSettings->line_exist(item_id, "upgrade_scheme") || !pSettings->r_string(item_id, "upgrade_scheme"))
     {
         return false;
@@ -175,13 +185,17 @@ void Manager::load_all_properties()
 {
     LPCSTR properties_section = "upgrades_properties";
 
-    if (!pSettings->section_exist(properties_section) && ShadowOfChernobylMode)
+    if (!pSettings->section_exist(properties_section))
+    {
+        Msg("! Can't load upgrades properties: section [%s] does not exist!", properties_section);
         return;
+    }
 
-
-    VERIFY2(
-        pSettings->section_exist(properties_section), make_string("Section [%s] does not exist !", properties_section));
-    VERIFY2(pSettings->line_count(properties_section), make_string("Section [%s] is empty !", properties_section));
+    if (pSettings->line_count(properties_section) == 0)
+    {
+        Msg("! Can't load upgrades properties: section [%s] is empty!", properties_section);
+        return;
+    }
 
     const CInifile::Sect& inv_section = pSettings->r_section(properties_section);
 
@@ -193,7 +207,7 @@ void Manager::load_all_properties()
 
     if (g_upgrades_log == 1)
     {
-        Msg("# Upgrades properties of inventory itmes loaded.");
+        Msg("# Upgrades properties of inventory items loaded.");
     }
 }
 
@@ -245,8 +259,8 @@ void Manager::log_hierarchy() const
 void Manager::test_all_upgrades(CInventoryItem& item)
 {
     Root* root_p = get_root(item.m_section_id);
-    VERIFY2(root_p,
-        make_string("Upgrades for item <%s> (id = %d) does not exist!", item.m_section_id.c_str(), item.object_id()));
+    R_ASSERT2_CURE(root_p,
+        make_string("Upgrades for item <%s> (id = %d) does not exist!", item.m_section_id.c_str(), item.object_id()), { return; });
     root_p->test_all_upgrades(item);
 
     if (g_upgrades_log == 1)
@@ -259,16 +273,18 @@ void Manager::test_all_upgrades(CInventoryItem& item)
 
 Upgrade* Manager::upgrade_verify(shared_str const& item_section, shared_str const& upgrade_id)
 {
-    [[maybe_unused]] auto root_p = get_root(item_section);
-    VERIFY2(root_p, make_string("Upgrades of item <%s> don`t exist!", item_section.c_str()));
-
     Upgrade* upgrade_p = get_upgrade(upgrade_id);
-    VERIFY2(
-        upgrade_p, make_string("Upgrade <%s> in item <%s> does not exist!", upgrade_id.c_str(), item_section.c_str()));
+#ifndef MASTER_GOLD
+    auto root_p = get_root(item_section);
+    if (!root_p)
+        Msg("! Upgrades of item <%s> don`t exist!", item_section.c_str());
 
-    VERIFY2(root_p->contain_upgrade(upgrade_id),
-        make_string("Inventory item <%s> not contain upgrade <%s> !", item_section.c_str(), upgrade_id.c_str()));
+    if (!upgrade_p)
+        Msg("! Upgrade <%s> in item <%s> does not exist!", upgrade_id.c_str(), item_section.c_str());
 
+    if (root_p && !root_p->contain_upgrade(upgrade_id))
+        Msg("Inventory item <%s> not contain upgrade <%s> !", item_section.c_str(), upgrade_id.c_str());
+#endif
     return upgrade_p;
 }
 
@@ -280,7 +296,7 @@ bool Manager::make_known_upgrade(CInventoryItem& item, shared_str const& upgrade
 bool Manager::make_known_upgrade(const shared_str& upgrade_id)
 {
     Upgrade* upgrade_p = get_upgrade(upgrade_id);
-    VERIFY2(upgrade_p, make_string("Upgrade <%s> does not exist!", upgrade_id.c_str()));
+    R_ASSERT2_CURE(upgrade_p, make_string("Upgrade <%s> does not exist!", upgrade_id.c_str()), { return false; });
     return (upgrade_p->make_known());
 }
 
@@ -292,7 +308,7 @@ bool Manager::is_known_upgrade(CInventoryItem& item, shared_str const& upgrade_i
 bool Manager::is_known_upgrade(shared_str const& upgrade_id)
 {
     Upgrade* upgrade_p = get_upgrade(upgrade_id);
-    VERIFY2(upgrade_p, make_string("Upgrade <%s> does not exist!", upgrade_id.c_str()));
+    R_ASSERT2_CURE(upgrade_p, make_string("Upgrade <%s> does not exist!", upgrade_id.c_str()), { return false; });
     return (upgrade_p->is_known());
 }
 
@@ -414,20 +430,16 @@ LPCSTR Manager::get_item_scheme(CInventoryItem& item)
 
 LPCSTR Manager::get_upgrade_by_index(CInventoryItem& item, Ivector2 const& index)
 {
-    Upgrade* upgrade = NULL;
-
     if (Root* root_p = get_root(item.m_section_id))
     {
-        upgrade = root_p->get_upgrade_by_index(index);
-        if (upgrade)
+        if (Upgrade* upgrade = root_p->get_upgrade_by_index(index))
         {
             return upgrade->id_str();
         }
     }
 
-    VERIFY2(upgrade, make_string("! Upgrade with index <%d,%d> in inventory item [%s] does not exist!", index.x,
-                         index.y, item.m_section_id.c_str()));
-    return NULL;
+    Msg("! Upgrade with index <%d,%d> in inventory item [%s] does not exist!", index.x, index.y, item.m_section_id.c_str());
+    return nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

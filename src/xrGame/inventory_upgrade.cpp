@@ -87,7 +87,10 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_known = !!READ_IF_EXISTS(pSettings, r_bool, id(), "known", false);
 
     shared_str properties = pSettings->r_string(id(), "property");
-    VERIFY2(properties.size(), make_string("Upgrade <%s> : property is empty !", id_str()));
+#ifndef MASTER_GOLD
+    if (properties.empty())
+        Msg("Upgrade <%s> : property is empty !", id_str());
+#endif
 
     string256 buffer;
     for (u8 i = 0; i < max_properties_count; i++)
@@ -96,9 +99,10 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
         if (prop.size())
         {
             m_properties[i] = prop;
-            VERIFY2(manager_r.get_property(prop),
-                make_string("Upgrade <%s> : property [%s] is unknown (not found in upgrade manager) !", id_str(),
-                    prop.c_str()));
+#ifndef MASTER_GOLD
+            if (!manager_r.get_property(prop))
+                Msg("Upgrade <%s> : property [%s] is unknown (not found in upgrade manager) !", id_str(), prop.c_str());
+#endif
         }
     }
 

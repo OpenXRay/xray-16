@@ -25,7 +25,10 @@ void UpgradeBase::construct(const shared_str& upgrade_id, Manager& manager_r)
     m_id._set(upgrade_id);
     m_known = false;
 
-    VERIFY2(pSettings->section_exist(m_id), make_string("Section of upgrade [%s] not exist!", m_id.c_str()));
+#ifndef MASTER_GOLD
+    if (pSettings->section_exist(m_id))
+        Msg("! Section of upgrade [%s] not exist!", m_id.c_str());
+#endif
 }
 
 void UpgradeBase::add_dependent_groups(LPCSTR groups_str, Manager& manager_r)

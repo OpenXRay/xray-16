@@ -24,7 +24,7 @@ void Group::construct(const shared_str& group_id, UpgradeBase& parent_upgrade, M
         make_string("Upgrade <%s> : group section [%s] does not exist!", parent_upgrade.id_str(), m_id.c_str()));
 
     LPCSTR upgrades_str = pSettings->r_string(m_id, "elements");
-    VERIFY2(upgrades_str, make_string("in upgrade group <%s> elements are empty!", m_id.c_str()));
+    R_ASSERT2_CURE(upgrades_str, make_string("in upgrade group <%s> elements are empty!", m_id.c_str()), { return; });
 
     u32 const buffer_size = (xr_strlen(upgrades_str) + 1) * sizeof(char);
     PSTR temp = (PSTR)xr_alloca(buffer_size);

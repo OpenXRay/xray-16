@@ -35,7 +35,10 @@ void Root::construct(const shared_str& root_id, Manager& manager_r)
     add_dependent_groups(upgrade_groups_str, manager_r);
 
     LPCSTR upgrade_scheme_str = pSettings->r_string(root_id, "upgrade_scheme");
-    VERIFY2(upgrade_scheme_str, make_string("In inventory item <%s> `upgrade_scheme` is empty!", root_id.c_str()));
+#ifndef MASTER_GOLD
+    if (!upgrade_scheme_str)
+        Msg("! In inventory item <%s> `upgrade_scheme` is empty!", root_id.c_str());
+#endif
     m_upgrade_scheme._set(upgrade_scheme_str);
 
     inherited::fill_root_container(this);
@@ -51,10 +54,11 @@ void Root::add_upgrade(Upgrade* upgr)
         }
     }
 
-    [[maybe_unused]] auto scheme_index = upgr->get_scheme_index();
-    VERIFY2(verify_scheme_index(scheme_index),
-        make_string("in upgrade <%s> for item <%s> scheme index [%d, %d] is duplicated !", upgr->id_str(), id_str(),
-            scheme_index.x, scheme_index.y));
+#ifndef MASTER_GOLD
+    auto scheme_index = upgr->get_scheme_index();
+    if (!verify_scheme_index(scheme_index))
+        Msg("~ in upgrade <%s> for item <%s> scheme index [%d, %d] is duplicated !", upgr->id_str(), id_str(), scheme_index.x, scheme_index.y);
+#endif
     m_contained_upgrades.push_back(upgr);
 }
 
