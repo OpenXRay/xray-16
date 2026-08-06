@@ -15,11 +15,13 @@
 ALife::_TIME_ID __game_time() { return (ai().get_alife() ? ai().alife().time().game_time() : Level().GetGameTime()); }
 u32 get_time() { return u32(__game_time() & u32(-1)); }
 xrTime get_time_struct() { return xrTime(__game_time()); }
-LPCSTR xrTime::dateToString(int mode)
+
+pcstr xrTime::dateToString(int mode) const
 {
     return InventoryUtilities::GetDateAsString(m_time, (InventoryUtilities::EDatePrecision)mode).c_str();
 }
-LPCSTR xrTime::timeToString(int mode)
+
+pcstr xrTime::timeToString(int mode) const
 {
     return InventoryUtilities::GetTimeAsString(m_time, (InventoryUtilities::ETimePrecision)mode).c_str();
 }
@@ -51,12 +53,12 @@ void xrTime::set(int y, int mo, int d, int h, int mi, int s, int ms)
     m_time += generate_time(y, mo, d, h, mi, s, ms);
 }
 
-void xrTime::get(u32& y, u32& mo, u32& d, u32& h, u32& mi, u32& s, u32& ms)
+void xrTime::get(u32& y, u32& mo, u32& d, u32& h, u32& mi, u32& s, u32& ms) const
 {
     split_time(m_time, y, mo, d, h, mi, s, ms);
 }
 
-float xrTime::diffSec(const xrTime& other)
+float xrTime::diffSec(const xrTime& other) const
 {
     if (*this > other)
         return (m_time - other.m_time) / (float)sec2ms;
