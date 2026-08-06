@@ -144,13 +144,25 @@ CSE_ALifeTraderAbstract::CSE_ALifeTraderAbstract(LPCSTR caSection)
 
 CSE_Abstract* CSE_ALifeTraderAbstract::init()
 {
-    string4096 S;
-    // xr_sprintf                        (S,"%s\r\n[game_info]\r\nname_id = default\r\n",!*base()->m_ini_string ? "" :
-    // *base()->m_ini_string);
-    xr_sprintf(S, "%s\r\n[game_info]\r\n", !base()->m_ini_string.c_str() ? "" : base()->m_ini_string.c_str());
-    base()->m_ini_string = S;
+    constexpr char APPEND_STRING[] = "\r\n[game_info]\r\n"; // "%s\r\n[game_info]\r\nname_id = default\r\n"
 
-    return (base());
+    const auto se_abstract = base();
+    const auto ini_string = se_abstract->m_ini_string;
+
+    if (ini_string.size() + std::size(APPEND_STRING) > 4096)
+    {
+        xr_string temp = ini_string.c_str();
+        temp.append(APPEND_STRING);
+        se_abstract->m_ini_string = temp.data();
+    }
+    else // stack is better
+    {
+        string4096 temp;
+        xr_sprintf(temp, "%s%s", ini_string.c_str() ? ini_string.c_str() : "", APPEND_STRING);
+        se_abstract->m_ini_string = temp;
+    }
+
+    return se_abstract;
 }
 
 CSE_ALifeTraderAbstract::~CSE_ALifeTraderAbstract() {}
