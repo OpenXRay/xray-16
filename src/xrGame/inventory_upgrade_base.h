@@ -42,8 +42,8 @@ enum UpgradeStateResult
 class UpgradeBase : private Noncopyable
 {
 public:
-    UpgradeBase();
-    virtual ~UpgradeBase();
+    virtual ~UpgradeBase() = default;
+
     void construct(const shared_str& upgrade_id, Manager& manager_r);
 
     IC const shared_str& id() const;
@@ -51,13 +51,13 @@ public:
     IC bool is_known() const;
 
 #ifdef DEBUG
-    virtual void log_hierarchy(LPCSTR nest);
+    virtual void log_hierarchy(pcstr nest) const;
 //	virtual		void		test_all_upgrades( CInventoryItem& item );
 #endif // DEBUG
 
     virtual bool is_root();
     bool make_known();
-    virtual bool contain_upgrade(const shared_str& upgrade_id);
+    virtual bool contain_upgrade(const shared_str& upgrade_id) const;
     virtual void fill_root_container(Root* root);
 
     virtual UpgradeStateResult can_install(CInventoryItem& item, bool loading);

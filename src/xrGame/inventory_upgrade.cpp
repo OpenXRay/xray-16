@@ -189,7 +189,7 @@ UpgradeStateResult Upgrade::can_add(CInventoryItem& item)
    return inherited::can_install(item, false);
 }
 
-bool Upgrade::check_scheme_index(Ivector2 const& scheme_index)
+bool Upgrade::check_scheme_index(Ivector2 const& scheme_index) const
 {
     return (m_scheme_index.x == scheme_index.x && m_scheme_index.y == scheme_index.y);
 }

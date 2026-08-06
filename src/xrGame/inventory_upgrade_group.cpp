@@ -14,8 +14,7 @@ namespace inventory
 {
 namespace upgrade
 {
-Group::Group() {}
-Group::~Group() {}
+
 void Group::construct(const shared_str& group_id, UpgradeBase& parent_upgrade, Manager& manager_r)
 {
     m_id._set(group_id);
@@ -47,7 +46,7 @@ void Group::add_parent_upgrade(UpgradeBase& parent_upgrade)
 
 #ifdef DEBUG
 
-void Group::log_hierarchy(LPCSTR nest)
+void Group::log_hierarchy(pcstr nest) const
 {
     u32 sz = (xr_strlen(nest) + 4) * sizeof(char);
     PSTR nest2 = (PSTR)xr_alloca(sz);
@@ -55,11 +54,9 @@ void Group::log_hierarchy(LPCSTR nest)
     xr_strcat(nest2, sz, "   ");
     Msg("%s(g) %s", nest2, m_id.c_str());
 
-    Upgrades_type::iterator ib = m_included_upgrades.begin();
-    Upgrades_type::iterator ie = m_included_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (auto& included_upgrade : m_included_upgrades)
     {
-        (*ib)->log_hierarchy(nest2);
+        included_upgrade->log_hierarchy(nest2);
     }
 }
 
@@ -67,31 +64,27 @@ void Group::log_hierarchy(LPCSTR nest)
 
 void Group::fill_root(Root* root)
 {
-    Upgrades_type::iterator ib = m_included_upgrades.begin();
-    Upgrades_type::iterator ie = m_included_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (auto& included_upgrade : m_included_upgrades)
     {
-        (*ib)->fill_root_container(root);
+        included_upgrade->fill_root_container(root);
     }
 }
 
 UpgradeStateResult Group::can_install(CInventoryItem& item, UpgradeBase& test_upgrade, bool loading)
 {
-    Upgrades_type::iterator ib = m_parent_upgrades.begin();
-    Upgrades_type::iterator ie = m_parent_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (auto& parent_upgrade : m_parent_upgrades)
     {
-        if ((*ib)->is_root())
+        if (parent_upgrade->is_root())
         {
             continue;
         }
         bool cant_install; // XXX Clear Sky upgrades: find a dynamic, universal solution
         if (ClearSkyMode)
-            cant_install = !item.has_upgrade((*ib)->id());
+            cant_install = !item.has_upgrade(parent_upgrade->id());
         else
         {
-            Upgrade* U = smart_cast<Upgrade*>(*ib);
-            cant_install = !item.has_upgrade_group(U->parent_group_id());;
+            Upgrade* U   = smart_cast<Upgrade*>(parent_upgrade);
+            cant_install = !item.has_upgrade_group(U->parent_group_id());
         }
 
         if (cant_install)
@@ -108,15 +101,13 @@ UpgradeStateResult Group::can_install(CInventoryItem& item, UpgradeBase& test_up
         }
     }
 
-    ib = m_included_upgrades.begin();
-    ie = m_included_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (auto& included_upgrade : m_included_upgrades)
     {
-        if ((*ib) == &test_upgrade)
+        if (included_upgrade == &test_upgrade)
         {
             continue;
         }
-        if (item.has_upgrade((*ib)->id()))
+        if (item.has_upgrade(included_upgrade->id()))
         {
             if (loading)
             {
@@ -135,21 +126,17 @@ UpgradeStateResult Group::can_install(CInventoryItem& item, UpgradeBase& test_up
 
 void Group::highlight_up()
 {
-    Upgrades_type::iterator ib = m_included_upgrades.begin();
-    Upgrades_type::iterator ie = m_included_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (auto& included_upgrade : m_included_upgrades)
     {
-        (*ib)->highlight_up();
+        included_upgrade->highlight_up();
     }
 }
 
 void Group::highlight_down()
 {
-    Upgrades_type::iterator ib = m_parent_upgrades.begin();
-    Upgrades_type::iterator ie = m_parent_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (auto& parent_upgrade : m_parent_upgrades)
     {
-        (*ib)->highlight_down();
+        parent_upgrade->highlight_down();
     }
 }
 

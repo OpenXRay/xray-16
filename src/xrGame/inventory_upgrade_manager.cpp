@@ -20,11 +20,6 @@ namespace inventory
 {
 namespace upgrade
 {
-// using inventory::upgrade::Manager;
-// using inventory::upgrade::UpgradeBase;
-// using inventory::upgrade::Upgrade;
-// using inventory::upgrade::Root;
-// using inventory::upgrade::Group;
 
 Manager::Manager()
 {
@@ -46,42 +41,42 @@ Manager::~Manager()
 
 Root* Manager::get_root(shared_str const& root_id)
 {
-    Roots_type::const_iterator i = m_roots.find(root_id);
+    const auto i = m_roots.find(root_id);
     if (i != m_roots.end())
     {
-        return ((*i).second);
+        return i->second;
     }
-    return (NULL);
+    return nullptr;
 }
 
 Upgrade* Manager::get_upgrade(shared_str const& upgrade_id)
 {
-    Upgrades_type::const_iterator i = m_upgrades.find(upgrade_id);
+    const auto i = m_upgrades.find(upgrade_id);
     if (i != m_upgrades.end())
     {
-        return ((*i).second);
+        return i->second;
     }
-    return (NULL);
+    return nullptr;
 }
 
 Group* Manager::get_group(shared_str const& group_id)
 {
-    Groups_type::const_iterator i = m_groups.find(group_id);
+    const auto i = m_groups.find(group_id);
     if (i != m_groups.end())
     {
-        return ((*i).second);
+        return i->second;
     }
-    return (NULL);
+    return nullptr;
 }
 
 Property* Manager::get_property(shared_str const& property_id)
 {
-    Properties_type::const_iterator i = m_properties.find(property_id);
+    const auto i = m_properties.find(property_id);
     if (i != m_properties.end())
     {
-        return ((*i).second);
+        return i->second;
     }
-    return (NULL);
+    return nullptr;
 }
 
 // -----------------------------------------------------------------------
@@ -188,12 +183,11 @@ void Manager::load_all_properties()
         pSettings->section_exist(properties_section), make_string("Section [%s] does not exist !", properties_section));
     VERIFY2(pSettings->line_count(properties_section), make_string("Section [%s] is empty !", properties_section));
 
-    CInifile::Sect& inv_section = pSettings->r_section(properties_section);
-    auto ib = inv_section.Data.begin();
-    auto ie = inv_section.Data.end();
-    for (; ib != ie; ++ib)
+    const CInifile::Sect& inv_section = pSettings->r_section(properties_section);
+
+    for (const auto& section : inv_section.Data)
     {
-        shared_str property_id((*ib).first);
+        shared_str property_id(section.first);
         add_property(property_id);
     }
 
@@ -207,55 +201,42 @@ void Manager::load_all_properties()
 
 #ifdef DEBUG
 
-void Manager::log_hierarchy()
+void Manager::log_hierarchy() const
 {
-    { // roots
-        Msg("# inventory upgrades roots: [%d] ", m_roots.size());
-        Roots_type::iterator ib = m_roots.begin();
-        Roots_type::iterator ie = m_roots.end();
-        for (; ib != ie; ++ib)
-        {
-            Msg("   %s", (*ib).first.c_str());
-        }
+    // roots
+    Msg("# inventory upgrades roots: [%d] ", m_roots.size());
+    for (auto& root : m_roots)
+    {
+        Msg("   %s", root.first.c_str());
     }
 
-    { // groups
-        Msg("# inventory upgrades groups: [%d] ", m_groups.size());
-        Groups_type::iterator ib = m_groups.begin();
-        Groups_type::iterator ie = m_groups.end();
-        for (; ib != ie; ++ib)
-        {
-            Msg("   %s", (*ib).first.c_str());
-        }
+    // groups
+    Msg("# inventory upgrades groups: [%d] ", m_groups.size());
+    for (auto& group : m_groups)
+    {
+        Msg("   %s", group.first.c_str());
     }
 
-    { // upgrades
-        Msg("# inventory upgrades: [%d] ", m_upgrades.size());
-        Upgrades_type::iterator ib = m_upgrades.begin();
-        Upgrades_type::iterator ie = m_upgrades.end();
-        for (; ib != ie; ++ib)
-        {
-            Msg("   %s", (*ib).first.c_str());
-        }
+    // upgrades
+    Msg("# inventory upgrades: [%d] ", m_upgrades.size());
+    for (auto& upgrade : m_upgrades)
+    {
+        Msg("   %s", upgrade.first.c_str());
     }
 
-    { // properties
-        Msg("# inventory upgrade properties: [%d] ", m_properties.size());
-        Properties_type::iterator ib = m_properties.begin();
-        Properties_type::iterator ie = m_properties.end();
-        for (; ib != ie; ++ib)
-        {
-            Msg("   %s", (*ib).first.c_str());
-        }
+    // properties
+    Msg("# inventory upgrade properties: [%d] ", m_properties.size());
+    for (auto& property : m_properties)
+    {
+        Msg("   %s", property.first.c_str());
     }
 
+    // hierarchy
     Msg("- ----- ----- ----- inventory upgrades hierarchy: begin ----- ----- -----");
 
-    Roots_type::iterator ib = m_roots.begin();
-    Roots_type::iterator ie = m_roots.end();
-    for (; ib != ie; ++ib)
+    for (auto& root : m_roots)
     {
-        ((*ib).second)->log_hierarchy("");
+        (root.second)->log_hierarchy("");
     }
 
     Msg("- ----- ----- ----- inventory upgrades hierarchy: end   ----- ----- -----");
@@ -427,7 +408,7 @@ LPCSTR Manager::get_item_scheme(CInventoryItem& item)
 {
     Root* root_p = get_root(item.m_section_id);
     if (!root_p)
-        return NULL;
+        return nullptr;
     return root_p->scheme();
 }
 
@@ -435,8 +416,7 @@ LPCSTR Manager::get_upgrade_by_index(CInventoryItem& item, Ivector2 const& index
 {
     Upgrade* upgrade = NULL;
 
-    Root* root_p = get_root(item.m_section_id);
-    if (root_p)
+    if (Root* root_p = get_root(item.m_section_id))
     {
         upgrade = root_p->get_upgrade_by_index(index);
         if (upgrade)
@@ -457,18 +437,14 @@ bool Manager::compute_range(LPCSTR parameter, float& low, float& high)
     low = flt_max;
     high = flt_min;
 
-    Roots_type::iterator ib = m_roots.begin();
-    Roots_type::iterator ie = m_roots.end();
-    for (; ib != ie; ++ib)
+    for (auto& root : m_roots)
     {
-        compute_range_section(((*ib).second)->id_str(), parameter, low, high);
+        compute_range_section(root.second->id_str(), parameter, low, high);
     }
 
-    Upgrades_type::iterator uib = m_upgrades.begin();
-    Upgrades_type::iterator uie = m_upgrades.end();
-    for (; uib != uie; ++uib)
+    for (auto& upgrade : m_upgrades)
     {
-        compute_range_section(((*uib).second)->section(), parameter, low, high);
+        compute_range_section(upgrade.second->section(), parameter, low, high);
     }
 
     return (low != flt_max) && (high != flt_min);
@@ -496,8 +472,7 @@ void Manager::compute_range_section(LPCSTR section, LPCSTR parameter, float& low
 
 void Manager::highlight_hierarchy(CInventoryItem& item, shared_str const& upgrade_id)
 {
-    Root* root_p = get_root(item.m_section_id);
-    if (root_p)
+    if (Root* root_p = get_root(item.m_section_id))
     {
         root_p->highlight_hierarchy(upgrade_id);
     }
@@ -505,8 +480,7 @@ void Manager::highlight_hierarchy(CInventoryItem& item, shared_str const& upgrad
 
 void Manager::reset_highlight(CInventoryItem& item)
 {
-    Root* root_p = get_root(item.m_section_id);
-    if (root_p)
+    if (Root* root_p = get_root(item.m_section_id))
     {
         root_p->reset_highlight();
         return;

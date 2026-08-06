@@ -19,8 +19,7 @@ namespace inventory
 {
 namespace upgrade
 {
-UpgradeBase::UpgradeBase() {}
-UpgradeBase::~UpgradeBase() {}
+
 void UpgradeBase::construct(const shared_str& upgrade_id, Manager& manager_r)
 {
     m_id._set(upgrade_id);
@@ -47,13 +46,11 @@ void UpgradeBase::add_dependent_groups(LPCSTR groups_str, Manager& manager_r)
 
 #ifdef DEBUG
 
-void UpgradeBase::log_hierarchy(LPCSTR nest)
+void UpgradeBase::log_hierarchy(pcstr nest) const
 {
-    Groups_type::iterator ib = m_depended_groups.begin();
-    Groups_type::iterator ie = m_depended_groups.end();
-    for (; ib != ie; ++ib)
+    for (auto depended_group : m_depended_groups)
     {
-        (*ib)->log_hierarchy(nest);
+        depended_group->log_hierarchy(nest);
     }
 }
 /*
@@ -76,16 +73,19 @@ bool UpgradeBase::make_known()
     return true;
 }
 
-bool UpgradeBase::contain_upgrade(const shared_str& upgrade_id) { return (m_id._get() == upgrade_id._get()); }
+bool UpgradeBase::contain_upgrade(const shared_str& upgrade_id) const
+{
+    return m_id._get() == upgrade_id._get();
+}
+
 void UpgradeBase::fill_root_container(Root* root)
 {
     //!=R_ASSERT2( 0, make_string( "! Can`t fill <%s> in <UpgradeBase::fill_root_container> for root = %s", id_str(),
     //! root->id_str() ) );
-    Groups_type::iterator ib = m_depended_groups.begin();
-    Groups_type::iterator ie = m_depended_groups.end();
-    for (; ib != ie; ++ib)
+
+    for (Group* depended_group : m_depended_groups)
     {
-        (*ib)->fill_root(root);
+        depended_group->fill_root(root);
     }
 }
 

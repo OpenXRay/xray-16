@@ -17,8 +17,7 @@ namespace inventory
 {
 namespace upgrade
 {
-Root::Root() {}
-Root::~Root() {}
+
 void Root::construct(const shared_str& root_id, Manager& manager_r)
 {
     inherited::construct(root_id, manager_r);
@@ -44,11 +43,9 @@ void Root::construct(const shared_str& root_id, Manager& manager_r)
 
 void Root::add_upgrade(Upgrade* upgr)
 {
-    Upgrades_vec::iterator ib = m_contained_upgrades.begin();
-    Upgrades_vec::iterator ie = m_contained_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (const auto& contained_upgrade : m_contained_upgrades)
     {
-        if (upgr == (*ib))
+        if (upgr == contained_upgrade)
         {
             return;
         }
@@ -62,9 +59,9 @@ void Root::add_upgrade(Upgrade* upgr)
 }
 
 bool Root::is_root() { return true; }
-#ifdef DEBUG
 
-void Root::log_hierarchy(LPCSTR nest)
+#ifdef DEBUG
+void Root::log_hierarchy(pcstr nest) const
 {
     u32 sz = (xr_strlen(nest) + 4) * sizeof(char);
     PSTR nest2 = (PSTR)xr_alloca(sz);
@@ -74,36 +71,31 @@ void Root::log_hierarchy(LPCSTR nest)
     inherited::log_hierarchy(nest2);
 }
 
-void Root::test_all_upgrades(CInventoryItem& item)
+void Root::test_all_upgrades(CInventoryItem& item) const
 {
-    Upgrades_vec::iterator ib = m_contained_upgrades.begin();
-    Upgrades_vec::iterator ie = m_contained_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (const auto& contained_upgrade : m_contained_upgrades)
     {
-        bool res = item.verify_upgrade((*ib)->section());
+        const bool res = item.verify_upgrade(contained_upgrade->section());
 
         if (g_upgrades_log == 1)
         {
-            Msg("# Checking upgrade <%s> (id = %d) is successful: %s ", (*ib)->section(), item.object_id(),
+            Msg("# Checking upgrade <%s> (id = %d) is successful: %s ", contained_upgrade->section(), item.object_id(),
                 res ? "OK" : "FAILED");
         }
     }
 }
-
 #endif // DEBUG
 
-bool Root::contain_upgrade(const shared_str& upgrade_id)
+bool Root::contain_upgrade(const shared_str& upgrade_id) const
 {
     if (inherited::contain_upgrade(upgrade_id))
     {
         return true;
     }
 
-    Upgrades_vec::iterator ib = m_contained_upgrades.begin();
-    Upgrades_vec::iterator ie = m_contained_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (auto& contained_upgrade : m_contained_upgrades)
     {
-        if ((*ib)->contain_upgrade(upgrade_id))
+        if (contained_upgrade->contain_upgrade(upgrade_id))
         {
             return true;
         }
@@ -111,13 +103,11 @@ bool Root::contain_upgrade(const shared_str& upgrade_id)
     return false;
 }
 
-bool Root::verify_scheme_index(const Ivector2& scheme_index)
+bool Root::verify_scheme_index(const Ivector2& scheme_index) const
 {
-    Upgrades_vec::iterator ib = m_contained_upgrades.begin();
-    Upgrades_vec::iterator ie = m_contained_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (auto& contained_upgrade : m_contained_upgrades)
     {
-        if ((*ib)->check_scheme_index(scheme_index))
+        if (contained_upgrade->check_scheme_index(scheme_index))
         {
             return false;
         }
@@ -125,31 +115,27 @@ bool Root::verify_scheme_index(const Ivector2& scheme_index)
     return true;
 }
 
-Upgrade* Root::get_upgrade_by_index(Ivector2 const& index)
+Upgrade* Root::get_upgrade_by_index(Ivector2 const& index) const
 {
-    Upgrades_vec::iterator ib = m_contained_upgrades.begin();
-    Upgrades_vec::iterator ie = m_contained_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (auto& contained_upgrade : m_contained_upgrades)
     {
-        if ((*ib)->check_scheme_index(index))
+        if (contained_upgrade->check_scheme_index(index))
         {
-            return (*ib);
+            return contained_upgrade;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void Root::highlight_hierarchy(shared_str const& upgrade_id)
 {
-    Upgrades_vec::iterator ib = m_contained_upgrades.begin();
-    Upgrades_vec::iterator ie = m_contained_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (auto& contained_upgrade : m_contained_upgrades)
     {
-        if ((*ib)->id()._get() == upgrade_id._get())
+        if (contained_upgrade->id()._get() == upgrade_id._get())
         {
             if (ClearSkyMode) // XXX Clear Sky upgrades: find a dynamic, universal solution
-                (*ib)->highlight_up();
-            (*ib)->highlight_down();
+                contained_upgrade->highlight_up();
+            contained_upgrade->highlight_down();
             return;
         }
     }
@@ -157,11 +143,9 @@ void Root::highlight_hierarchy(shared_str const& upgrade_id)
 
 void Root::reset_highlight()
 {
-    Upgrades_vec::iterator ib = m_contained_upgrades.begin();
-    Upgrades_vec::iterator ie = m_contained_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (auto& contained_upgrade : m_contained_upgrades)
     {
-        (*ib)->set_highlight(false);
+        contained_upgrade->set_highlight(false);
     }
 }
 
