@@ -239,6 +239,34 @@ void CGameTaskManager::UpdateActiveTask()
 {
     std::stable_sort(GetGameTasks().begin(), GetGameTasks().end(), task_prio_pred);
 
+    if (ShadowOfChernobylMode)
+    {
+        for (const SGameTaskKey& taskKey : GetGameTasks())
+        {
+            CGameTask* task = taskKey.game_task;
+            if (task->GetTaskState() != eTaskStateInProgress)
+                continue;
+
+            const TASK_OBJECTIVE_ID count = task->GetObjectivesCount();
+            for (TASK_OBJECTIVE_ID objectiveId = 2; objectiveId < count; ++objectiveId)
+            {
+                SGameTaskObjective& objective = task->Objective(objectiveId);
+                if (objective.m_def_location_enabled || objective.LinkedMapLocation() ||
+                    objective.GetTaskState() != eTaskStateInProgress ||
+                    task->Objective(objectiveId - 1).GetTaskState() != eTaskStateCompleted)
+                {
+                    continue;
+                }
+
+                // Use the load path so saves made by the earlier broken
+                // implementation can reuse their disabled hidden location.
+                objective.CreateMapLocation(true);
+                if (objective.LinkedMapLocation())
+                    objective.LinkedMapLocation()->EnableSpot();
+            }
+        }
+    }
+
     for (u32 i = eTaskTypeStoryline; i < eTaskTypeCount; ++i)
     {
         CGameTask* activeTask = ActiveTask(static_cast<ETaskType>(i));
@@ -309,9 +337,20 @@ void CGameTaskManager::MapLocationRelcase(CMapLocation* ml)
     if (mwnd)
         mwnd->MapLocationRelcase(ml);
 
-    CGameTask* gt = HasGameTask(ml, false);
-    if (gt)
-        gt->RemoveMapLocations(true);
+    for (const SGameTaskKey& taskKey : GetGameTasks())
+    {
+        CGameTask* task = taskKey.game_task;
+        const TASK_OBJECTIVE_ID count = task->GetObjectivesCount();
+        for (TASK_OBJECTIVE_ID i = 0; i < count; ++i)
+        {
+            SGameTaskObjective& objective = task->Objective(i);
+            if (objective.LinkedMapLocation() == ml)
+            {
+                objective.RemoveMapLocations(true);
+                return;
+            }
+        }
+    }
 }
 
 CGameTask* CGameTaskManager::HasGameTask(const CMapLocation* ml, bool only_inprocess)
@@ -322,11 +361,14 @@ CGameTask* CGameTaskManager::HasGameTask(const CMapLocation* ml, bool only_inpro
     for (; it != it_e; ++it)
     {
         CGameTask* gt = (*it).game_task;
-        if (gt->LinkedMapLocation() == ml)
+        const TASK_OBJECTIVE_ID count = gt->GetObjectivesCount();
+        for (TASK_OBJECTIVE_ID i = 0; i < count; ++i)
         {
-            if (only_inprocess && gt->GetTaskState() != eTaskStateInProgress)
+            if (gt->Objective(i).LinkedMapLocation() != ml)
                 continue;
 
+            if (only_inprocess && gt->GetTaskState() != eTaskStateInProgress)
+                break;
             return gt;
         }
     }
