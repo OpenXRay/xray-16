@@ -11,6 +11,8 @@ CUICheckButton::CUICheckButton()
 {
     TextItemControl()->SetTextAlignment(CGameFont::alLeft);
     SetButtonAsSwitch(true);
+    if (ShadowOfChernobylMode)
+        SetBackgroundStretchTexture(false);
     m_pDependControl = NULL;
 }
 
