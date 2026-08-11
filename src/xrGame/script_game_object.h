@@ -320,6 +320,8 @@ public:
     bool DisableInfoPortion(LPCSTR info_id);
 
     void GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time);
+    void GiveGameNews(
+        LPCSTR caption, LPCSTR news, LPCSTR texture_name, const Frect& texture_rect, int delay, int show_time);
     void GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time, int type);
     void ClearGameNews() const;
 
