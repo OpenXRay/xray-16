@@ -69,7 +69,18 @@ void CScriptNetPacket::script_register(lua_State* luaState)
             .def("r_float", (float (NET_Packet::*)())(&NET_Packet::r_float))
             .def("r_u64", (u64(NET_Packet::*)())(&NET_Packet::r_u64))
             .def("r_s64", (s64(NET_Packet::*)())(&NET_Packet::r_s64))
-            .def("r_u32", (u32(NET_Packet::*)())(&NET_Packet::r_u32))
+            .def("r_u32", +[](NET_Packet* self) -> lua_Number
+            {
+                const u32 value = self->r_u32();
+
+                // SoC scripts use -1 as a u32 sentinel. In the original 32-bit
+                // engine, Lua received 0xffffffff as -1. Keep that behavior in
+                // SoC mode so original saves do not contain invalid object IDs.
+                if (ShadowOfChernobylMode)
+                    return static_cast<s32>(value);
+
+                return value;
+            })
             .def("r_s32", (s32(NET_Packet::*)())(&NET_Packet::r_s32))
             .def("r_u16", (u16(NET_Packet::*)())(&NET_Packet::r_u16))
             .def("r_s16", (s16(NET_Packet::*)())(&NET_Packet::r_s16))

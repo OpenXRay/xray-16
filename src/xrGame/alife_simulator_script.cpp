@@ -53,6 +53,17 @@ CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, pcstr name)
 {
     VERIFY(self);
 
+    if (!name)
+    {
+        // SoC random-task saves can use -1 for an absent defend target. The
+        // original script then calls object(nil) and reads optional actor spawn
+        // data. Use the actor as the harmless compatibility object.
+        if (ShadowOfChernobylMode)
+            return self->graph().actor();
+
+        return nullptr;
+    }
+
     for (CALifeObjectRegistry::OBJECT_REGISTRY::const_iterator it = self->objects().objects().begin();
          it != self->objects().objects().end(); ++it)
     {
