@@ -4,6 +4,7 @@
 
 #include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrUICore/Static/UIAnimatedStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 
 #include "Actor.h"
 
@@ -17,6 +18,37 @@
 
 constexpr cpcstr ACTOR_STATISTIC_XML = "actor_statistic.xml";
 constexpr cpcstr ACTOR_CHARACTER_XML = "pda_dialog_character.xml";
+
+namespace
+{
+void MoveSocActorTextPastPortrait(CUICharacterInfo& characterInfo)
+{
+    const CUIStatic& portrait = characterInfo.UIIcon();
+    const float portraitRight = portrait.GetWndPos().x +
+        _max(portrait.GetWidth(), portrait.GetTextureRect().width());
+
+    constexpr CUICharacterInfo::UIItemType TextItems[] = {
+        CUICharacterInfo::eRankCaption,
+        CUICharacterInfo::eRank,
+        CUICharacterInfo::eCommunityCaption,
+        CUICharacterInfo::eCommunity,
+        CUICharacterInfo::eReputationCaption,
+        CUICharacterInfo::eReputation,
+    };
+
+    for (const CUICharacterInfo::UIItemType type : TextItems)
+    {
+        CUIStatic* text = characterInfo.GetIcon(type);
+        if (!text)
+            continue;
+
+        Fvector2 position = text->GetWndPos();
+        const float rightLimit = characterInfo.GetWidth() - text->GetWidth();
+        position.x = _min(_max(position.x, portraitRight), rightLimit);
+        text->SetWndPos(position);
+    }
+}
+} // namespace
 
 CUIActorInfoWnd::CUIActorInfoWnd() : CUIWindow(CUIActorInfoWnd::GetDebugType()) {}
 
@@ -72,7 +104,7 @@ bool CUIActorInfoWnd::Init()
     UICharacterInfo = xr_new<CUICharacterInfo>();
     UICharacterInfo->SetAutoDelete(true);
     UICharacterWindow->AttachChild(UICharacterInfo);
-    UICharacterInfo->InitCharacterInfo(UICharacterWindow->GetWndPos(), UICharacterWindow->GetWndSize(), ACTOR_CHARACTER_XML);
+    UICharacterInfo->InitCharacterInfo(Fvector2().set(0.0f, 0.0f), UICharacterWindow->GetWndSize(), ACTOR_CHARACTER_XML);
 
     // Элементы автоматического добавления
     CUIXmlInit::InitAutoStaticGroup(uiXml, "right_auto_static", 0, UICharIconFrame);
@@ -87,6 +119,8 @@ void CUIActorInfoWnd::Show(bool status)
     if (!status) return;
 
     UICharacterInfo->InitCharacter(Actor()->ID());
+    if (ShadowOfChernobylMode)
+        MoveSocActorTextPastPortrait(*UICharacterInfo);
     if (UICharIconHeader->GetTitleText())
         UICharIconHeader->GetTitleText()->SetText(Actor()->Name());
     FillPointsInfo();
