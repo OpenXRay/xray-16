@@ -9,6 +9,7 @@
 #include "ai/monsters/states/monster_state_help_sound.h"
 #include "ai/monsters/states/monster_state_hear_int_sound.h"
 #include "ai/monsters/states/monster_state_hitted.h"
+#include "ai/monsters/states/monster_state_rest.h"
 #include "ai/monsters/group_states/group_state_attack.h"
 #include "ai/monsters/group_states/group_state_rest.h"
 #include "ai/monsters/group_states/group_state_eat.h"
@@ -22,7 +23,10 @@ const float atack_decision_maxdist = 6.f;
 
 CStateManagerDog::CStateManagerDog(CAI_Dog* monster) : inherited(monster)
 {
-    add_state(eStateRest, xr_new<CStateGroupRest<CAI_Dog>>(monster));
+    if (ShadowOfChernobylMode)
+        add_state(eStateRest, xr_new<CStateMonsterRest<CAI_Dog>>(monster));
+    else
+        add_state(eStateRest, xr_new<CStateGroupRest<CAI_Dog>>(monster));
     add_state(eStatePanic, xr_new<CStateGroupPanic<CAI_Dog>>(monster));
     add_state(eStateAttack, xr_new<CStateGroupAttack<CAI_Dog>>(monster));
     add_state(eStateEat, xr_new<CStateGroupEat<CAI_Dog>>(monster));
