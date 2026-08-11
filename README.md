@@ -17,6 +17,9 @@ However, they know about many community projects, including this, and support S.
 
 Installation instructions are on the [How to install and play](https://github.com/OpenXRay/xray-16/wiki/[EN]-How-to-install-and-play) page.
 
+The experimental Shadow of Chernobyl procedure for Apple silicon Macs is in
+[the macOS guide](misc/macos/README.md).
+
 ## Supported game platforms
 - Call of Chernobyl 1.4.22.
 - Call of Pripyat 1.6.02.
