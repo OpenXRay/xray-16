@@ -5,6 +5,7 @@
 #include "GameDataResolver.h"
 
 #include <SDL.h>
+#include <dirent.h>
 #include <cstdio>
 #include <cstdlib>
 #include <limits.h>
@@ -26,6 +27,8 @@ struct GameInfo
     std::string displayName;
     std::vector<std::string> steamNames;
     std::vector<std::string> gogNames;
+    bool supportsFlatArchives;
+    std::string requiredDataDescription;
 };
 
 bool HasCommandLineOption(pcstr commandLine, pcstr option)
@@ -114,7 +117,7 @@ bool PathExistsNoFollow(const std::string& path)
     return lstat(path.c_str(), &st) == 0;
 }
 
-bool HasRequiredGameData(const std::string& root)
+bool HasDirectoryGameData(const std::string& root)
 {
     if (root.empty())
         return false;
@@ -124,9 +127,33 @@ bool HasRequiredGameData(const std::string& root)
         IsDirectory(JoinPath(root, "localization"));
 }
 
-bool HasRuntimeLayout(const std::string& root)
+bool HasSoCFlatArchives(const std::string& root)
 {
-    return HasRequiredGameData(root) &&
+    static constexpr pcstr RequiredArchives[] = {
+        "gamedata.db0", "gamedata.db1", "gamedata.db2", "gamedata.db3", "gamedata.db4",
+        "gamedata.db5", "gamedata.db6", "gamedata.db7", "gamedata.db8", "gamedata.db9",
+        "gamedata.dba", "gamedata.dbb", "gamedata.dbc"
+    };
+
+    if (root.empty())
+        return false;
+
+    for (pcstr archiveName : RequiredArchives)
+    {
+        if (!IsFile(JoinPath(root, archiveName)))
+            return false;
+    }
+    return true;
+}
+
+bool HasRequiredGameData(const std::string& root, const GameInfo& gameInfo)
+{
+    return HasDirectoryGameData(root) || (gameInfo.supportsFlatArchives && HasSoCFlatArchives(root));
+}
+
+bool HasRuntimeLayout(const std::string& root, const GameInfo& gameInfo)
+{
+    return HasRequiredGameData(root, gameInfo) &&
         IsFile(JoinPath(root, "fsgame.ltx")) &&
         IsDirectory(JoinPath(root, "gamedata"));
 }
@@ -139,7 +166,9 @@ GameInfo GetGameInfo(pcstr commandLine)
             "S.T.A.L.K.E.R. - Shadow of Chernobyl",
             "S.T.A.L.K.E.R.: Shadow of Chernobyl",
             { "STALKER Shadow of Chernobyl", "Stalker Shadow of Chernobyl", "S.T.A.L.K.E.R. Shadow of Chernobyl" },
-            { "S.T.A.L.K.E.R. - Shadow of Chernobyl" }
+            { "S.T.A.L.K.E.R. - Shadow of Chernobyl" },
+            true,
+            "the gamedata.db* archives"
         };
     }
 
@@ -149,7 +178,9 @@ GameInfo GetGameInfo(pcstr commandLine)
             "S.T.A.L.K.E.R. - Clear Sky",
             "S.T.A.L.K.E.R.: Clear Sky",
             { "STALKER Clear Sky", "Stalker Clear Sky", "S.T.A.L.K.E.R. Clear Sky" },
-            { "S.T.A.L.K.E.R. - Clear Sky" }
+            { "S.T.A.L.K.E.R. - Clear Sky" },
+            false,
+            "levels, resources, and localization"
         };
     }
 
@@ -157,7 +188,9 @@ GameInfo GetGameInfo(pcstr commandLine)
         "S.T.A.L.K.E.R. - Call of Pripyat",
         "S.T.A.L.K.E.R.: Call of Pripyat",
         { "STALKER Call of Pripyat", "Stalker Call of Pripyat", "S.T.A.L.K.E.R. Call of Pripyat" },
-        { "S.T.A.L.K.E.R. - Call of Pripyat" }
+        { "S.T.A.L.K.E.R. - Call of Pripyat" },
+        false,
+        "levels, resources, and localization"
     };
 }
 
@@ -228,9 +261,9 @@ void SaveRoot(const std::string& prefPath, const std::string& root)
     fclose(file);
 }
 
-void AddCandidate(std::vector<std::string>& candidates, const std::string& path)
+void AddCandidate(std::vector<std::string>& candidates, const std::string& path, const GameInfo& gameInfo)
 {
-    if (!HasRequiredGameData(path))
+    if (!HasRequiredGameData(path, gameInfo))
         return;
 
     const std::string normalized = NormalizeExistingPath(path);
@@ -246,24 +279,28 @@ std::vector<std::string> DiscoverCandidates(const GameInfo& gameInfo, const std:
 {
     std::vector<std::string> candidates;
 
-    AddCandidate(candidates, prefPath);
-    AddCandidate(candidates, ExpandHomePath(JoinPath(".local/share/GSC Game World", gameInfo.appSupportName.c_str()).c_str()));
+    AddCandidate(candidates, prefPath, gameInfo);
+    AddCandidate(candidates,
+        ExpandHomePath(JoinPath(".local/share/GSC Game World", gameInfo.appSupportName.c_str()).c_str()), gameInfo);
 
     for (const auto& steamName : gameInfo.steamNames)
     {
-        AddCandidate(candidates, ExpandHomePath(JoinPath("Library/Application Support/Steam/steamapps/common", steamName.c_str()).c_str()));
-        AddCandidate(candidates, ExpandHomePath(JoinPath(".local/share/Steam/steamapps/common", steamName.c_str()).c_str()));
-        AddCandidate(candidates, ExpandHomePath(JoinPath(".steam/steam/steamapps/common", steamName.c_str()).c_str()));
+        AddCandidate(candidates,
+            ExpandHomePath(JoinPath("Library/Application Support/Steam/steamapps/common", steamName.c_str()).c_str()), gameInfo);
+        AddCandidate(candidates,
+            ExpandHomePath(JoinPath(".local/share/Steam/steamapps/common", steamName.c_str()).c_str()), gameInfo);
+        AddCandidate(candidates,
+            ExpandHomePath(JoinPath(".steam/steam/steamapps/common", steamName.c_str()).c_str()), gameInfo);
     }
 
     for (const auto& gogName : gameInfo.gogNames)
     {
-        AddCandidate(candidates, ExpandHomePath(JoinPath("GOG Games", gogName.c_str()).c_str()));
-        AddCandidate(candidates, ExpandHomePath(JoinPath("Applications", gogName.c_str()).c_str()));
-        AddCandidate(candidates, JoinPath("/Applications", gogName.c_str()));
+        AddCandidate(candidates, ExpandHomePath(JoinPath("GOG Games", gogName.c_str()).c_str()), gameInfo);
+        AddCandidate(candidates, ExpandHomePath(JoinPath("Applications", gogName.c_str()).c_str()), gameInfo);
+        AddCandidate(candidates, JoinPath("/Applications", gogName.c_str()), gameInfo);
     }
 
-    AddCandidate(candidates, GetBundleNeighborRoot());
+    AddCandidate(candidates, GetBundleNeighborRoot(), gameInfo);
     return candidates;
 }
 
@@ -333,7 +370,7 @@ void ShowAppleScriptAlert(const std::string& message)
 bool ChooseFolder(const GameInfo& gameInfo, std::string& selectedRoot)
 {
     const std::string prompt = "Select the " + gameInfo.displayName +
-        " directory that contains levels, resources, and localization.";
+        " directory that contains " + gameInfo.requiredDataDescription + ".";
     std::string output;
     if (!RunAppleScript("POSIX path of (choose folder with prompt " + EscapeAppleScriptString(prompt) + ")\n", output))
         return false;
@@ -432,9 +469,28 @@ void LinkDirectoryIfPresent(const std::string& prefPath, const std::string& game
     EnsureManagedSymlink(source, linkPath);
 }
 
-bool ApplyRuntimeLayout(const std::string& prefPath, const std::string& bundleResourcesRoot, const std::string& gameRoot)
+void LinkFlatArchivesIfPresent(const std::string& prefPath, const std::string& gameRoot)
 {
-    if (!HasRequiredGameData(gameRoot))
+    DIR* directory = opendir(gameRoot.c_str());
+    if (!directory)
+        return;
+
+    while (const dirent* entry = readdir(directory))
+    {
+        if (strncmp(entry->d_name, "gamedata.db", 11) != 0)
+            continue;
+
+        const std::string source = JoinPath(gameRoot, entry->d_name);
+        if (IsFile(source))
+            EnsureManagedSymlink(source, JoinPath(prefPath, entry->d_name));
+    }
+    closedir(directory);
+}
+
+bool ApplyRuntimeLayout(const std::string& prefPath, const std::string& bundleResourcesRoot,
+    const std::string& gameRoot, const GameInfo& gameInfo)
+{
+    if (!HasRequiredGameData(gameRoot, gameInfo))
         return false;
 
     EnsureManagedSymlink(JoinPath(bundleResourcesRoot, "fsgame.ltx"), JoinPath(prefPath, "fsgame.ltx"));
@@ -445,8 +501,10 @@ bool ApplyRuntimeLayout(const std::string& prefPath, const std::string& bundleRe
     LinkDirectoryIfPresent(prefPath, gameRoot, "localization");
     LinkDirectoryIfPresent(prefPath, gameRoot, "mp");
     LinkDirectoryIfPresent(prefPath, gameRoot, "patches");
+    if (gameInfo.supportsFlatArchives)
+        LinkFlatArchivesIfPresent(prefPath, gameRoot);
 
-    return HasRuntimeLayout(prefPath);
+    return HasRuntimeLayout(prefPath, gameInfo);
 }
 } // namespace
 
@@ -468,7 +526,8 @@ void ResolveMacOSGameDataPath(pcstr commandLine)
         HasCommandLineOption(commandLine, "-reset_gamedata_path");
 
     const std::string savedRoot = GetSavedRoot(prefPath);
-    if (!forceSelection && HasRequiredGameData(savedRoot) && ApplyRuntimeLayout(prefPath, bundleResourcesRoot, savedRoot))
+    if (!forceSelection && HasRequiredGameData(savedRoot, gameInfo) &&
+        ApplyRuntimeLayout(prefPath, bundleResourcesRoot, savedRoot, gameInfo))
         return;
 
     const std::vector<std::string> candidates = DiscoverCandidates(gameInfo, prefPath);
@@ -476,15 +535,15 @@ void ResolveMacOSGameDataPath(pcstr commandLine)
 
     while (ChooseRootFromDialog(gameInfo, candidates, selectedRoot))
     {
-        if (!HasRequiredGameData(selectedRoot))
+        if (!HasRequiredGameData(selectedRoot, gameInfo))
         {
             ShowAppleScriptAlert(
-                "The selected directory does not contain levels, resources, and localization. "
+                "The selected directory does not contain " + gameInfo.requiredDataDescription + ". "
                 "Please choose the root directory of a licensed game installation.");
             continue;
         }
 
-        if (ApplyRuntimeLayout(prefPath, bundleResourcesRoot, selectedRoot))
+        if (ApplyRuntimeLayout(prefPath, bundleResourcesRoot, selectedRoot, gameInfo))
         {
             SaveRoot(prefPath, NormalizeExistingPath(selectedRoot));
             return;
@@ -495,16 +554,17 @@ void ResolveMacOSGameDataPath(pcstr commandLine)
             "Check file permissions and try again.");
     }
 
-    if (HasRuntimeLayout(prefPath))
+    if (HasRuntimeLayout(prefPath, gameInfo))
         return;
 
-    if (!HasRequiredGameData(prefPath))
+    if (!HasRequiredGameData(prefPath, gameInfo))
     {
+        const std::string message = "OpenXRay could not find required game files.\nChoose a directory that contains " +
+            gameInfo.requiredDataDescription + ".";
         SDL_ShowSimpleMessageBox(
             SDL_MESSAGEBOX_WARNING,
             "OpenXRay: game files are required",
-            "OpenXRay could not find required game files.\n"
-            "Choose a directory that contains levels, resources, and localization.",
+            message.c_str(),
             nullptr);
     }
     else
