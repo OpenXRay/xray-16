@@ -30,7 +30,7 @@ void CUIOutfitDragDropList::SetOutfit(CUICellItem* itm)
     m_background->SetStretchTexture(true);
 
 
-    if (IsGameTypeSingle() && !itm)
+    if (!IsGameTypeSingle() && !itm)
     {
         IGameObject* pActor = smart_cast<CActor*>(Level().CurrentEntity());
 
