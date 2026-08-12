@@ -2546,6 +2546,22 @@ set_target_properties(xrGame PROPERTIES
     UNITY_BUILD_BATCH_SIZE 50
 )
 
+set_source_files_properties(
+    ui/UIDiaryWnd2.cpp
+    ui/UIEncyclopediaArticleWnd.cpp
+    ui/UIEncyclopediaWnd.cpp
+    ui/UIEventsWnd.cpp
+    ui/UINewsWnd.cpp
+    ui/UIPdaAux.cpp
+    ui/UIPdaContactsWnd.cpp
+    ui/UIPdaListItem.cpp
+    ui/UIStalkersRankingWnd.cpp
+    ui/UITaskDescrWnd.cpp
+    ui/UITaskItem.cpp
+    ui/UITreeViewItem.cpp
+    PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
+)
+
 target_precompile_headers(xrGame
     PRIVATE
     $<$<COMPILE_LANGUAGE:CXX>:StdAfx.h>
