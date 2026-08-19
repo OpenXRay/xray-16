@@ -1,4 +1,3 @@
-// xrRender/FrameGraphPasses/ExposurePassSetup.cpp
 #include "stdafx.h"
 #include "ExposurePassSetup.h"
 #include "PassVertexFormats.h"
@@ -10,6 +9,8 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/xrRender_console.h"
+#include <cstring>
 
 namespace fg
 {
@@ -20,23 +21,18 @@ namespace xray::render::fg::passes {
 
 using namespace framegraph;
 
-// ═══════════════════════════════════════════════════════
-//  EXPOSURE CONFIG
-// ═══════════════════════════════════════════════════════
+namespace {
+constexpr u32 kExposurePipeVersion = 5;
+}
 
 ExposureConfig GetDefaultExposureConfig()
 {
     ExposureConfig config;
-    config.minLogLuminance = -10.0f;
-    config.maxLogLuminance = 4.0f;
-    config.lowPercentile = 0.5f;
-    config.highPercentile = 0.98f;
-    config.adaptSpeedUp = 3.0f;
-    config.adaptSpeedDown = 1.0f;
-    config.minExposure = 0.001f;
-    config.maxExposure = 64.0f;
-    config.exposureCompensation = 0.0f;
-    config.calibrationConstant = 12.5f;
+    const bool tonemapOn = ps_r2_ls_flags.test(R2FLAG_TONEMAP);
+    config.middleGray = ps_r2_tonemap_middlegray;
+    config.amount = tonemapOn ? ps_r2_tonemap_amount : 0.0f;
+    config.lowLum = ps_r2_tonemap_low_lum;
+    config.adaptation = ps_r2_tonemap_adaptation;
     return config;
 }
 
@@ -45,14 +41,59 @@ nvrhi::ITexture* GetExposureTexture(const ExposurePassState& state)
     return state.exposureTexture.Get();
 }
 
-// ═══════════════════════════════════════════════════════
-//  INITIALIZATION
-// ═══════════════════════════════════════════════════════
+void PollExposureHistogram(ExposurePassState& state, nvrhi::IDevice* device)
+{
+    if (!device)
+        return;
+    const u32 readSlot = (state.histWriteSlot + 1u) % 3u;
+    if (!state.histReadback[readSlot])
+        return;
+    void* mapped = device->mapBuffer(state.histReadback[readSlot], nvrhi::CpuAccessMode::Read);
+    if (!mapped)
+        return;
+    memcpy(state.histBins, mapped, sizeof(state.histBins));
+    device->unmapBuffer(state.histReadback[readSlot]);
+}
+
+static void UpdateMiddleGray(const ExposureConfig& config, float deltaTime, ExposurePassState& state, AdaptCB& out)
+{
+    state.f_luminance_adapt =
+        0.9f * state.f_luminance_adapt + 0.1f * deltaTime * config.adaptation;
+
+    Fvector3 none, full, result;
+    none.set(1.f, 0.f, 1.f);
+    full.set(config.middleGray, 1.f, config.lowLum);
+    result.lerp(none, full, config.amount);
+
+    out.middleGrayX = result.x;
+    out.middleGrayY = result.y;
+    out.middleGrayZ = result.z;
+    out.middleGrayW = state.f_luminance_adapt;
+}
+
+static float ComputeFallbackExposure(const ExposureConfig& config, float deltaTime, ExposurePassState& state)
+{
+    AdaptCB cb{};
+    UpdateMiddleGray(config, deltaTime, state, cb);
+    const float Lw = 1.0f;
+    float scale = cb.middleGrayX / std::max(Lw * cb.middleGrayY + cb.middleGrayZ, 1e-6f);
+    state.currentExposure = std::lerp(state.currentExposure, scale, std::clamp(cb.middleGrayW, 0.f, 1.f));
+    state.currentExposure = std::clamp(state.currentExposure, 1.f / 128.f, 20.f);
+    return state.currentExposure;
+}
 
 void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& state)
 {
-    if (state.initialized)
+    if (state.initialized && state.pipeVersion == kExposurePipeVersion && state.adaptPipeline)
         return;
+
+    state.initialized = false;
+    state.pipeVersion = 0;
+    state.histogramPipeline = nullptr;
+    state.adaptPipeline = nullptr;
+    state.histogramLayout = nullptr;
+    state.adaptLayout = nullptr;
+    state.computeEnabled = false;
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice) {
@@ -61,6 +102,7 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
         return;
     }
 
+    framegraph::BindingSetBuilder::InvalidateReflectionCache();
     auto histogramResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("luminance_histogram");
     auto adaptResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("exposure_adapt");
 
@@ -79,6 +121,7 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
 
     state.computeEnabled = histogramOK && adaptOK;
 
+    if (!state.histogramBuffer)
     {
         nvrhi::BufferDesc bufDesc;
         bufDesc.debugName = "ExposureHistogram";
@@ -93,6 +136,17 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
             Msg("! [ExposurePass] Failed to create histogram buffer");
     }
 
+    for (u32 i = 0; i < 3; i++) {
+        if (state.histReadback[i])
+            continue;
+        nvrhi::BufferDesc rd;
+        rd.debugName = "ExposureHistogramReadback";
+        rd.byteSize = 64 * sizeof(u32);
+        rd.cpuAccess = nvrhi::CpuAccessMode::Read;
+        state.histReadback[i] = nvDevice->createBuffer(rd);
+    }
+
+    if (!state.exposureTexture)
     {
         nvrhi::TextureDesc texDesc;
         texDesc.debugName = "ExposureValue";
@@ -106,6 +160,19 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
         state.exposureTexture = nvDevice->createTexture(texDesc);
         if (!state.exposureTexture)
             Msg("! [ExposurePass] Failed to create exposure texture");
+        else
+        {
+            nvrhi::CommandListHandle cmd = nvDevice->createCommandList();
+            if (cmd)
+            {
+                cmd->open();
+                float seed = 1.0f;
+                cmd->writeTexture(state.exposureTexture, 0, 0, &seed, sizeof(float));
+                cmd->close();
+                nvDevice->executeCommandList(cmd);
+            }
+            state.currentExposure = 1.0f;
+        }
     }
 
     if (state.computeEnabled) {
@@ -123,13 +190,13 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
         }
 
         {
-            state.adaptLayout = cache.GetOrCreateBindingLayoutFromReflection("ExposurePass_Adapt", *adaptResult.reflection, nvDevice);
+            state.adaptLayout = cache.GetOrCreateBindingLayoutFromReflection("ExposurePass_Adapt_v3", *adaptResult.reflection, nvDevice);
 
             if (state.adaptLayout) {
                 nvrhi::ComputePipelineDesc pipeDesc;
                 pipeDesc.CS = adaptResult.handle;
                 pipeDesc.bindingLayouts = { state.adaptLayout };
-                state.adaptPipeline = cache.GetOrCreateComputePipeline("ExposurePass_Adapt", pipeDesc, nvDevice);
+                state.adaptPipeline = cache.GetOrCreateComputePipeline("ExposurePass_Adapt_v3", pipeDesc, nvDevice);
             }
         }
 
@@ -142,34 +209,9 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
     }
 
     state.initialized = true;
+    state.pipeVersion = kExposurePipeVersion;
     Msg("* [ExposurePass] Initialized (compute=%s)", state.computeEnabled ? "enabled" : "fallback");
 }
-
-// ═══════════════════════════════════════════════════════
-//  FALLBACK: Fixed exposure calculation
-// ═══════════════════════════════════════════════════════
-
-static float ComputeFallbackExposure(const ExposureConfig& config, float deltaTime, ExposurePassState& state)
-{
-    float targetExposure = 1.0f;
-
-    targetExposure *= std::exp2(config.exposureCompensation);
-
-    targetExposure = std::clamp(targetExposure, config.minExposure, config.maxExposure);
-
-    float adaptSpeed = (targetExposure > state.currentExposure)
-        ? config.adaptSpeedUp
-        : config.adaptSpeedDown;
-
-    float adaptFactor = 1.0f - std::exp(-deltaTime * adaptSpeed);
-    state.currentExposure = std::lerp(state.currentExposure, targetExposure, adaptFactor);
-
-    return state.currentExposure;
-}
-
-// ═══════════════════════════════════════════════════════
-//  SETUP EXPOSURE PASS
-// ═══════════════════════════════════════════════════════
 
 ExposureOutput setupExposurePass(
     FrameGraph& fg,
@@ -183,19 +225,25 @@ ExposureOutput setupExposurePass(
 {
     InitializeExposureResources(device, state);
 
-    // Create exposure texture resource in framegraph
+    if (!state.exposureTexture)
+    {
+        ExposureOutput empty{};
+        return empty;
+    }
+
     ResourceDesc exposureDesc;
     exposureDesc.type = ResourceDesc::Type::Texture2D;
     exposureDesc.debugName = "Exposure";
     exposureDesc.width = 1;
     exposureDesc.height = 1;
     exposureDesc.format = nvrhi::Format::R32_FLOAT;
-    exposureDesc.isRenderTarget = false;
     exposureDesc.isUAV = true;
+    exposureDesc.allowUAV = true;
+    exposureDesc.isImported = true;
 
-    VirtualResourceHandle exposureHandle = fg.CreateTexture("exposure_rt", exposureDesc);
+    VirtualResourceHandle exposureHandle = fg.ImportTexture(
+        "Exposure", state.exposureTexture.Get(), exposureDesc);
 
-    // Create histogram buffer resource
     ResourceDesc histogramDesc;
     histogramDesc.type = ResourceDesc::Type::Buffer;
     histogramDesc.debugName = "LuminanceHistogram";
@@ -218,13 +266,8 @@ ExposureOutput setupExposurePass(
             data.height = height;
             data.passState = &state;
 
-            // Read HDR scene for histogram
             data.sceneColor = passBuilder.read(hdrSceneColor);
-
-            // Write exposure output
             data.exposureTexture = passBuilder.write(exposureHandle, ResourceState::UnorderedAccess);
-
-            // Write histogram (intermediate)
             data.histogramBuffer = passBuilder.write(histogramHandle, ResourceState::UnorderedAccess);
         },
 
@@ -249,8 +292,8 @@ ExposureOutput setupExposurePass(
 
                     {
                         HistogramCB histCB;
-                        histCB.minLogLum = data.config.minLogLuminance;
-                        histCB.logLumRange = data.config.maxLogLuminance - data.config.minLogLuminance;
+                        histCB.minLogLum = -10.0f;
+                        histCB.logLumRange = 14.0f;
                         histCB.width = data.width;
                         histCB.height = data.height;
 
@@ -270,23 +313,16 @@ ExposureOutput setupExposurePass(
                             u32 groupsX = (data.width + 15) / 16;
                             u32 groupsY = (data.height + 15) / 16;
                             ctx->Dispatch(groupsX, groupsY, 1);
+                            if (ps->histReadback[ps->histWriteSlot]) {
+                                cmdList->copyBuffer(ps->histReadback[ps->histWriteSlot], 0, ps->histogramBuffer, 0, 64 * sizeof(u32));
+                                ps->histWriteSlot = (ps->histWriteSlot + 1u) % 3u;
+                            }
                         }
                     }
 
                     {
-                        AdaptCB adaptCB;
-                        adaptCB.minLogLum = data.config.minLogLuminance;
-                        adaptCB.logLumRange = data.config.maxLogLuminance - data.config.minLogLuminance;
-                        adaptCB.lowPercentile = data.config.lowPercentile;
-                        adaptCB.highPercentile = data.config.highPercentile;
-                        adaptCB.adaptSpeedUp = data.config.adaptSpeedUp;
-                        adaptCB.adaptSpeedDown = data.config.adaptSpeedDown;
-                        adaptCB.deltaTime = data.deltaTime;
-                        adaptCB.exposureCompensation = data.config.exposureCompensation;
-                        adaptCB.minExposure = data.config.minExposure;
-                        adaptCB.maxExposure = data.config.maxExposure;
-                        adaptCB.calibrationConstant = data.config.calibrationConstant;
-                        adaptCB.padding = 0.0f;
+                        AdaptCB adaptCB{};
+                        UpdateMiddleGray(data.config, data.deltaTime, *ps, adaptCB);
 
                         cmdList->writeBuffer(adaptCBHandle, &adaptCB, sizeof(adaptCB));
 

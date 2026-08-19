@@ -1,0 +1,64 @@
+#define SM_6_0
+
+Texture2D t_src : register(t0);
+SamplerState smp_rtlinear : register(s0);
+
+cbuffer TonemapHDR : register(b5)
+{
+    float g_Hdr10;
+    float g_PaperWhite;
+    float g_PeakNits;
+    float g_HudNits;
+};
+
+struct PS_INPUT {
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+float3 Rec709ToRec2020(float3 c)
+{
+    const float3x3 m = float3x3(
+        0.6274040, 0.3292820, 0.0433136,
+        0.0690970, 0.9195400, 0.0113612,
+        0.0163916, 0.0880132, 0.8955952);
+    return mul(m, c);
+}
+
+float3 LinearToPQ(float3 L)
+{
+    const float m1 = 0.1593017578125;
+    const float m2 = 78.84375;
+    const float c1 = 0.8359375;
+    const float c2 = 18.8515625;
+    const float c3 = 18.6875;
+    float3 Lm = pow(max(L, 0.0), m1);
+    float3 N = (c1 + c2 * Lm) / (1.0 + c3 * Lm);
+    return pow(N, m2);
+}
+
+float3 SoftClipPeak(float3 nits, float peak)
+{
+    float start = peak * 0.75;
+    float3 over = max(nits - start, 0.0);
+    return min(nits, start) + over * (peak - start) / (over + (peak - start));
+}
+
+float IGN(float2 p)
+{
+    return frac(52.9829189 * frac(dot(p, float2(0.06711056, 0.00583715))));
+}
+
+float4 main(PS_INPUT input) : SV_TARGET
+{
+    float3 rgb = t_src.SampleLevel(smp_rtlinear, saturate(input.texcoord), 0).rgb;
+    float paper = max(g_PaperWhite, 1.0);
+    float peak = max(g_PeakNits, paper);
+    float3 rec2020 = max(Rec709ToRec2020(rgb), 0.0);
+    float3 nits = SoftClipPeak(rec2020 * paper, peak);
+    float3 pq = LinearToPQ(nits / 10000.0);
+    float n0 = IGN(input.position.xy);
+    float n1 = IGN(input.position.xy + float2(19.0, 47.0));
+    pq += (n0 - n1) / 1023.0;
+    return float4(saturate(pq), 1.0);
+}
