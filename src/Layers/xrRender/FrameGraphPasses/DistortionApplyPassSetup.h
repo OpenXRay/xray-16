@@ -17,7 +17,9 @@ namespace xray::render::fg::passes {
 struct DistortionApplyPassState {
     nvrhi::GraphicsPipelineHandle pipeline;
     nvrhi::BindingLayoutHandle bindingLayout;
+    nvrhi::ITexture* waterUnderColor = nullptr;
     bool initialized = false;
+    u32 version = 0;
 };
 
 void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassState& state);
@@ -27,6 +29,8 @@ framegraph::VirtualResourceHandle setupDistortionApplyPass(
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle sceneColor,
     framegraph::VirtualResourceHandle distortionRT,
+    framegraph::VirtualResourceHandle worldPos,
+    framegraph::VirtualResourceHandle baseColor,
     framegraph::VirtualResourceHandle depth,
     u32 width,
     u32 height,

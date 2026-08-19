@@ -33,6 +33,10 @@ framegraph::VirtualResourceHandle setupThunderboltPass(framegraph::FrameGraph& f
             if (!cmdList || !outputRT)
                 return;
 
+            if (depth &&
+                (depth->getDesc().width != outputRT->getDesc().width ||
+                 depth->getDesc().height != outputRT->getDesc().height))
+                return;
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outputRT);
             if (depth)

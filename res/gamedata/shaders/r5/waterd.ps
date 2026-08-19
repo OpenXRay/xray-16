@@ -1,0 +1,75 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+#include "shared/waterconfig.h"
+#include "shared/ssr.h"
+#include "shared/surface_marks.h"
+
+static const float POWER = 0.5;
+
+struct PS_INPUT
+{
+    float4 hpos     : SV_Position;
+    float2 tbase    : TEXCOORD0;
+    float2 tdist0   : TEXCOORD1;
+    float2 tdist1   : TEXCOORD2;
+    float3 worldPos : TEXCOORD3;
+    nointerpolation uint materialID : TEXCOORD4;
+    float4 tctexgen : TEXCOORD5;
+};
+
+cbuffer WaterParams : register(b5)
+{
+    float4 water_intensity;
+};
+
+Texture2D g_UnderWorldPos : register(t23);
+
+float SoftWaterSpaceDepth(float2 pixelXY, float waterHwZ, float3 waterPos)
+{
+    float sceneDepth = g_SceneDepth.Load(int3((int2)pixelXY, 0)).x;
+    if (sceneDepth <= 1e-6)
+        return 0.0;
+
+    float3 sceneWP = reconstruct_world_pos(pixelXY, sceneDepth);
+    float3 viewDir = normalize(camera_direction.xyz);
+    float sceneViewZ = abs(dot(sceneWP - eye_position.xyz, viewDir));
+    float waterViewZ = abs(dot(waterPos - eye_position.xyz, viewDir));
+    float optical = max(0.0, sceneViewZ - waterViewZ);
+
+    float hwGap = saturate((waterHwZ - sceneDepth) * 150.0);
+    return min(optical, hwGap * 2.5);
+}
+
+float4 main(PS_INPUT I) : SV_Target0
+{
+    MaterialData mat = g_Materials[I.materialID];
+    if ((mat.flags & MAT_FLAG_WATER) == 0)
+        clip(-1);
+
+    float2 t_d0 = float2(0.5, 0.5);
+    float2 t_d1 = float2(0.5, 0.5);
+    if (mat.detailIndex != INVALID_TEXTURE_INDEX)
+    {
+        Texture2D dudv = GetBindlessTexture(mat.detailIndex);
+        t_d0 = dudv.Sample(smp_base, I.tdist0).xy;
+        t_d1 = dudv.Sample(smp_base, I.tdist1).xy;
+    }
+
+    float4 t_base = SampleDiffuse(mat, I.tbase);
+    float2 distort = (t_d0 + t_d1) * 0.5;
+    float2 zero = float2(0.5, 0.5);
+    float2 faded = lerp(distort, zero, t_base.a);
+
+    bool softOn = water_intensity.w > 0.5;
+    if (softOn)
+    {
+        float waterDepth = SoftWaterSpaceDepth(I.hpos.xy, I.hpos.z, I.worldPos);
+        float softFade = smoothstep(0.05, 0.55, waterDepth);
+        softFade = max(softFade, 0.35);
+        faded = lerp(zero, faded, softFade);
+    }
+
+    faded = faded * POWER - 0.5 * POWER + 0.5;
+    return float4(faded, 0.0, 0.5);
+}

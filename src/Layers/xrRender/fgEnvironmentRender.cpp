@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <algorithm>
 
 #include "fgEnvironmentRender.h"
 
@@ -11,9 +12,12 @@
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraphPasses/PassVertexFormats.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
+#include "Layers/xrRender/xrRender_console.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/xr_efflensflare.h"
+#include "Layers/xrRender/r__scene.h"
+#include "Layers/xrRender/FLOD.h"
 
 namespace xray::render::fg
 {
@@ -156,6 +160,9 @@ void FGEnvironmentRender::OnDeviceDestroy()
     m_skyIndexBuffer = nullptr;
     m_skyConstantBuffer = nullptr;
     m_skyPlaceholderCube = nullptr;
+    m_skyExposureFallback = nullptr;
+    m_skyDepthFallback = nullptr;
+    m_skyPassCB = nullptr;
     m_skySampler = nullptr;
     m_skyVS = nullptr;
     m_skyPS = nullptr;
@@ -173,6 +180,40 @@ void FGEnvironmentRender::OnDeviceDestroy()
     m_sunBindingLayout = nullptr;
     m_sunPipeline = nullptr;
     m_sunInitialized = false;
+
+    m_cloudVertexBuffer = nullptr;
+    m_cloudIndexBuffer = nullptr;
+    m_cloudPlaceholder = nullptr;
+    m_cloudSampler = nullptr;
+    m_cloudVS = nullptr;
+    m_cloudPS = nullptr;
+    m_cloudInputLayout = nullptr;
+    m_cloudBindingLayout = nullptr;
+    m_cloudPipeline = nullptr;
+    m_cloudVBCapacity = 0;
+    m_cloudIBCapacity = 0;
+    m_cloudInitialized = false;
+
+    m_portalVertexBuffer = nullptr;
+    m_portalVS = nullptr;
+    m_portalPS = nullptr;
+    m_portalInputLayout = nullptr;
+    m_portalBindingLayout = nullptr;
+    m_portalPipeline = nullptr;
+    m_portalVBCapacity = 0;
+    m_portalInitialized = false;
+
+    m_lodVertexBuffer = nullptr;
+    m_lodIndexBuffer = nullptr;
+    m_lodPlaceholder = nullptr;
+    m_lodSampler = nullptr;
+    m_lodVS = nullptr;
+    m_lodPS = nullptr;
+    m_lodInputLayout = nullptr;
+    m_lodBindingLayout = nullptr;
+    m_lodPipeline = nullptr;
+    m_lodVBCapacity = 0;
+    m_lodInitialized = false;
 
     m_device = nullptr;
 }
@@ -217,6 +258,32 @@ void FGEnvironmentRender::InitSkyResources()
     m_skyPlaceholderCube = m_device->createTexture(cubeDesc);
     R_ASSERT2(m_skyPlaceholderCube, "FGEnv: placeholder cubemap createTexture failed");
 
+    nvrhi::TextureDesc expDesc;
+    expDesc.width = 1;
+    expDesc.height = 1;
+    expDesc.format = nvrhi::Format::R32_FLOAT;
+    expDesc.debugName = "FGEnv_SkyExposureFallback";
+    expDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    expDesc.keepInitialState = true;
+    m_skyExposureFallback = m_device->createTexture(expDesc);
+
+    nvrhi::TextureDesc depthFb;
+    depthFb.width = 1;
+    depthFb.height = 1;
+    depthFb.format = nvrhi::Format::R32_FLOAT;
+    depthFb.debugName = "FGEnv_SkyDepthFallback";
+    depthFb.initialState = nvrhi::ResourceStates::ShaderResource;
+    depthFb.keepInitialState = true;
+    m_skyDepthFallback = m_device->createTexture(depthFb);
+
+    nvrhi::BufferDesc skyCbDesc;
+    skyCbDesc.byteSize = 16;
+    skyCbDesc.isConstantBuffer = true;
+    skyCbDesc.isVolatile = true;
+    skyCbDesc.maxVersions = 16;
+    skyCbDesc.debugName = "FGEnv_SkyPassCB";
+    m_skyPassCB = m_device->createBuffer(skyCbDesc);
+
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
     samplerDesc.setAllFilters(true);
@@ -229,6 +296,12 @@ void FGEnvironmentRender::InitSkyResources()
         u32 skyBlue = 0xFF8080FF;
         for (u32 face = 0; face < 6; ++face)
             uploadCmd->writeTexture(m_skyPlaceholderCube, face, 0, &skyBlue, sizeof(skyBlue));
+        float expOne = 1.0f;
+        if (m_skyExposureFallback)
+            uploadCmd->writeTexture(m_skyExposureFallback, 0, 0, &expOne, sizeof(expOne));
+        float depthZero = 0.0f;
+        if (m_skyDepthFallback)
+            uploadCmd->writeTexture(m_skyDepthFallback, 0, 0, &depthZero, sizeof(depthZero));
         uploadCmd->close();
         m_device->executeCommandList(uploadCmd);
     }
@@ -236,6 +309,7 @@ void FGEnvironmentRender::InitSkyResources()
     auto* shaderLoader = RImplementation.GetShaderLoader();
     R_ASSERT(shaderLoader);
 
+    framegraph::BindingSetBuilder::InvalidateReflectionCache();
     auto vsResult = shaderLoader->LoadVertexShader("sky_forward");
     auto psResult = shaderLoader->LoadPixelShader("sky_forward");
     if (!vsResult.handle || !psResult.handle)
@@ -249,7 +323,7 @@ void FGEnvironmentRender::InitSkyResources()
 
     auto& cache = framegraph::GetPassResourceCache();
     m_skyBindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "FGEnv_Sky", *vsResult.reflection, *psResult.reflection, m_device);
+        "FGEnv_Sky_v14", *vsResult.reflection, *psResult.reflection, m_device);
     R_ASSERT2(m_skyBindingLayout, "FGEnv: createBindingLayout failed");
 
     nvrhi::VertexAttributeDesc vertexAttribs[] = {
@@ -289,13 +363,13 @@ void FGEnvironmentRender::InitSkyResources()
     nvrhi::FramebufferInfoEx fbInfo;
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
 
-    m_skyPipeline = cache.GetOrCreatePipeline("FGEnv_Sky", pipelineDesc, fbInfo, m_device);
+    m_skyPipeline = cache.GetOrCreatePipeline("FGEnv_Sky_v15", pipelineDesc, fbInfo, m_device);
     R_ASSERT2(m_skyPipeline, "FGEnv: createGraphicsPipeline failed");
 
     m_skyInitialized = true;
 }
 
-void FGEnvironmentRender::DrawSky(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height)
+void FGEnvironmentRender::DrawSky(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height, nvrhi::ITexture* depthTex, bool composite)
 {
     if (!environment || !cmdList || !framebuffer)
         return;
@@ -358,13 +432,21 @@ void FGEnvironmentRender::DrawSky(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
 
     framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, m_device, "FGEnv_Sky");
     bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer);
+    {
+        passes::StaticGlobals sg = passes::BuildStaticGlobals();
+        auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), renderDevice);
+        cmdList->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
+        bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+    }
     bsb.Texture("s_sky0", sky0Tex);
     bsb.Texture("s_sky1", sky1Tex);
 
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), m_skyBindingLayout, m_device);
+    if (!bindingSet)
+        return;
 
     auto* colorRT = framebuffer->getDesc().colorAttachments[0].texture;
-    if (colorRT)
+    if (colorRT && !composite)
         cmdList->clearTextureFloat(colorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
 
     nvrhi::Viewport viewport;
@@ -441,7 +523,7 @@ void FGEnvironmentRender::InitSunResources()
 
     auto& cache = framegraph::GetPassResourceCache();
     m_sunBindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "FGEnv_Sun", *vsResult.reflection, *psResult.reflection, m_device);
+        "FGEnv_Sun_v3", *vsResult.reflection, *psResult.reflection, m_device);
     R_ASSERT(m_sunBindingLayout);
 
     nvrhi::VertexAttributeDesc attribs[] = {
@@ -465,7 +547,7 @@ void FGEnvironmentRender::InitSunResources()
 
     nvrhi::RenderState renderState;
     renderState.blendState.targets[0].setBlendEnable(true);
-    renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::One);
+    renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::SrcAlpha);
     renderState.blendState.targets[0].setDestBlend(nvrhi::BlendFactor::One);
     renderState.blendState.targets[0].setBlendOp(nvrhi::BlendOp::Add);
     renderState.depthStencilState.setDepthTestEnable(false);
@@ -483,7 +565,7 @@ void FGEnvironmentRender::InitSunResources()
     nvrhi::FramebufferInfoEx fbInfo;
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
 
-    m_sunPipeline = cache.GetOrCreatePipeline("FGEnv_Sun", pipelineDesc, fbInfo, m_device);
+    m_sunPipeline = cache.GetOrCreatePipeline("FGEnv_Sun_v3", pipelineDesc, fbInfo, m_device);
     R_ASSERT(m_sunPipeline);
 
     m_sunInitialized = true;
@@ -491,6 +573,13 @@ void FGEnvironmentRender::InitSunResources()
 
 void FGEnvironmentRender::DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height)
 {
+    (void)cmdList;
+    (void)framebuffer;
+    (void)environment;
+    (void)width;
+    (void)height;
+    return;
+
     if (!environment || !cmdList || !framebuffer)
         return;
 
@@ -536,11 +625,6 @@ void FGEnvironmentRender::DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
     else
         sunColor.set(env.sun_color.x, env.sun_color.y, env.sun_color.z, 1.0f);
 
-    const float intensity = 2.0f;
-    sunColor.r *= intensity;
-    sunColor.g *= intensity;
-    sunColor.b *= intensity;
-
     Fvector vecSx, vecSy;
     vecSx.mul(vecX, sunRadius * fDistance);
     vecSy.mul(vecY, sunRadius * fDistance);
@@ -574,8 +658,11 @@ void FGEnvironmentRender::DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
     auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
     auto* renderDevice = fgRenderer->GetRenderDevice();
 
+    passes::DynamicTransforms dynamicCB = {};
+    passes::FillDynamicTransforms(dynamicCB);
     auto dynamicCBBuffer = cache.GetOrCreateVolatileCB(
-        "Frame", "DynamicTransforms", sizeof(passes::DynamicTransforms), renderDevice);
+        "FGEnv_Sun", "DynamicCB", sizeof(passes::DynamicTransforms), renderDevice);
+    cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
     nvrhi::ITexture* sunTex = nullptr;
     const shared_str& sunTexName = flareDesc->m_Source.texture;
@@ -610,5 +697,410 @@ void FGEnvironmentRender::DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
 
     cmdList->setGraphicsState(state);
     cmdList->drawIndexed(nvrhi::DrawArguments{6, 1, 0, 0, 0});
+}
+
+void FGEnvironmentRender::InitCloudResources()
+{
+    if (m_cloudInitialized)
+        return;
+
+    auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
+    auto* renderDevice = fgRenderer->GetRenderDevice();
+    m_device = renderDevice->GetNVRHIDevice();
+    if (!m_device)
+        return;
+
+    nvrhi::TextureDesc texDesc;
+    texDesc.width = 1;
+    texDesc.height = 1;
+    texDesc.format = nvrhi::Format::RGBA8_UNORM;
+    texDesc.debugName = "FGEnv_CloudPlaceholder";
+    texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    texDesc.keepInitialState = true;
+    m_cloudPlaceholder = m_device->createTexture(texDesc);
+
+    nvrhi::SamplerDesc samplerDesc;
+    samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
+    samplerDesc.setAllFilters(true);
+    m_cloudSampler = m_device->createSampler(samplerDesc);
+
+    {
+        nvrhi::CommandListHandle uploadCmd = m_device->createCommandList();
+        uploadCmd->open();
+        u32 white = 0xFFFFFFFF;
+        uploadCmd->writeTexture(m_cloudPlaceholder, 0, 0, &white, sizeof(white));
+        uploadCmd->close();
+        m_device->executeCommandList(uploadCmd);
+    }
+
+    auto* shaderLoader = RImplementation.GetShaderLoader();
+    auto vsResult = shaderLoader->LoadVertexShader("clouds");
+    auto psResult = shaderLoader->LoadPixelShader("clouds");
+    if (!vsResult.handle || !psResult.handle)
+        return;
+    m_cloudVS = vsResult.handle;
+    m_cloudPS = psResult.handle;
+
+    auto& cache = framegraph::GetPassResourceCache();
+    m_cloudBindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "FGEnv_Clouds_v1", *vsResult.reflection, *psResult.reflection, m_device);
+    if (!m_cloudBindingLayout)
+        return;
+
+    nvrhi::VertexAttributeDesc attribs[] = {
+        nvrhi::VertexAttributeDesc()
+            .setName("POSITION")
+            .setFormat(nvrhi::Format::RGB32_FLOAT)
+            .setOffset(offsetof(passes::CloudVertex, p))
+            .setElementStride(sizeof(passes::CloudVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("COLOR")
+            .setFormat(nvrhi::Format::RGBA8_UNORM)
+            .setOffset(offsetof(passes::CloudVertex, dir))
+            .setElementStride(sizeof(passes::CloudVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("COLOR")
+            .setFormat(nvrhi::Format::RGBA8_UNORM)
+            .setArraySize(1)
+            .setOffset(offsetof(passes::CloudVertex, color))
+            .setElementStride(sizeof(passes::CloudVertex)),
+    };
+    attribs[1].setName("COLOR0");
+    attribs[2].setName("COLOR1");
+    m_cloudInputLayout = cache.GetOrCreateInputLayout("FGEnv_Clouds", attribs, 3, m_cloudVS, m_device);
+
+    nvrhi::RenderState renderState;
+    renderState.blendState.targets[0].setBlendEnable(true);
+    renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::SrcAlpha);
+    renderState.blendState.targets[0].setDestBlend(nvrhi::BlendFactor::InvSrcAlpha);
+    renderState.depthStencilState.setDepthTestEnable(false);
+    renderState.depthStencilState.setDepthWriteEnable(false);
+    renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
+
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+    pipelineDesc.setVertexShader(m_cloudVS);
+    pipelineDesc.setPixelShader(m_cloudPS);
+    pipelineDesc.addBindingLayout(m_cloudBindingLayout);
+    pipelineDesc.setInputLayout(m_cloudInputLayout);
+    pipelineDesc.setRenderState(renderState);
+    pipelineDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    m_cloudPipeline = cache.GetOrCreatePipeline("FGEnv_Clouds_v1", pipelineDesc, fbInfo, m_device);
+    m_cloudInitialized = m_cloudPipeline != nullptr;
+}
+
+void FGEnvironmentRender::DrawClouds(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height)
+{
+    if (!environment || !cmdList || !framebuffer)
+        return;
+    if (environment->CloudsVerts.empty() || environment->CloudsIndices.empty())
+        return;
+
+    InitCloudResources();
+    if (!m_cloudInitialized)
+        return;
+
+    const CEnvDescriptorMixer& env = environment->CurrentEnv;
+    const u32 vCount = static_cast<u32>(environment->CloudsVerts.size());
+    const u32 iCount = static_cast<u32>(environment->CloudsIndices.size());
+    const u32 vbBytes = vCount * sizeof(passes::CloudVertex);
+    const u32 ibBytes = iCount * sizeof(u16);
+
+    if (!m_cloudVertexBuffer || m_cloudVBCapacity < vbBytes)
+    {
+        nvrhi::BufferDesc vbDesc;
+        vbDesc.byteSize = std::max(vbBytes, 64u);
+        vbDesc.debugName = "FGEnv_CloudVB";
+        vbDesc.isVertexBuffer = true;
+        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+        vbDesc.keepInitialState = true;
+        m_cloudVertexBuffer = m_device->createBuffer(vbDesc);
+        m_cloudVBCapacity = vbDesc.byteSize;
+    }
+    if (!m_cloudIndexBuffer || m_cloudIBCapacity < ibBytes)
+    {
+        nvrhi::BufferDesc ibDesc;
+        ibDesc.byteSize = std::max(ibBytes, 64u);
+        ibDesc.debugName = "FGEnv_CloudIB";
+        ibDesc.isIndexBuffer = true;
+        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+        ibDesc.keepInitialState = true;
+        m_cloudIndexBuffer = m_device->createBuffer(ibDesc);
+        m_cloudIBCapacity = ibDesc.byteSize;
+    }
+    if (!m_cloudVertexBuffer || !m_cloudIndexBuffer)
+        return;
+
+    Fvector wd0, wd1;
+    Fvector4 wind_dir;
+    wd0.setHP(PI_DIV_4, 0);
+    wd1.setHP(PI_DIV_4 + PI_DIV_8, 0);
+    wind_dir.set(wd0.x, wd0.z, wd1.x, wd1.z).mul(0.5f).add(0.5f).mul(255.f);
+    u32 C0 = color_rgba(iFloor(wind_dir.x), iFloor(wind_dir.y), iFloor(wind_dir.w), iFloor(wind_dir.z));
+    u32 C1 = color_rgba(
+        iFloor(env.clouds_color.x * 255.f),
+        iFloor(env.clouds_color.y * 255.f),
+        iFloor(env.clouds_color.z * 255.f),
+        iFloor(env.clouds_color.w * 255.f));
+
+    xr_vector<passes::CloudVertex> verts(vCount);
+    for (u32 i = 0; i < vCount; ++i)
+    {
+        verts[i].p = environment->CloudsVerts[i];
+        verts[i].dir = C0;
+        verts[i].color = C1;
+    }
+    cmdList->writeBuffer(m_cloudVertexBuffer, verts.data(), vbBytes);
+    cmdList->writeBuffer(m_cloudIndexBuffer, environment->CloudsIndices.data(), ibBytes);
+
+    Fmatrix mScale, mXFORM;
+    mScale.scale(10.f, 0.4f, 10.f);
+    mXFORM.rotateY(env.clouds_rotation);
+    mXFORM.mulB_43(mScale);
+    mXFORM.translate_over(Device.vCameraPosition);
+
+    auto& cache = framegraph::GetPassResourceCache();
+    auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
+    auto* renderDevice = fgRenderer->GetRenderDevice();
+
+    passes::DynamicTransforms dynamicCB = {};
+    passes::FillDynamicTransforms(dynamicCB, mXFORM);
+    auto dynamicCBBuffer = cache.GetOrCreateVolatileCB("FGEnv_Clouds", "DynamicCB", sizeof(passes::DynamicTransforms), renderDevice);
+    cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
+
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), renderDevice);
+    {
+        passes::StaticGlobals sg = passes::BuildStaticGlobals();
+        cmdList->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
+    }
+
+    nvrhi::ITexture* c0 = m_cloudPlaceholder.Get();
+    nvrhi::ITexture* c1 = m_cloudPlaceholder.Get();
+    auto* texManager = renderDevice->GetFGResourceManager()
+        ? renderDevice->GetFGResourceManager()->GetTextureManager() : nullptr;
+    if (texManager && environment->Current[0] && environment->Current[1])
+    {
+        const shared_str& n0 = environment->Current[0]->clouds_texture_name;
+        const shared_str& n1 = environment->Current[1]->clouds_texture_name;
+        if (n0.size())
+            c0 = texManager->GetNVRHITexture(texManager->LoadTexture(n0.c_str()));
+        if (n1.size())
+            c1 = texManager->GetNVRHITexture(texManager->LoadTexture(n1.c_str()));
+        if (!c0) c0 = m_cloudPlaceholder.Get();
+        if (!c1) c1 = m_cloudPlaceholder.Get();
+    }
+
+    auto* vsRefl = RImplementation.GetShaderLoader()->GetCachedReflection("clouds", ".vs");
+    auto* psRefl = RImplementation.GetShaderLoader()->GetCachedReflection("clouds", ".ps");
+    if (!vsRefl || !psRefl)
+        return;
+
+    framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, m_device, "FGEnv_Clouds");
+    bsb.ConstantBuffer("dynamic_transforms", dynamicCBBuffer);
+    bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+    bsb.Texture("s_clouds0", c0);
+    bsb.Texture("s_clouds1", c1);
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), m_cloudBindingLayout, m_device);
+    if (!bindingSet)
+        return;
+
+    nvrhi::GraphicsState state;
+    state.pipeline = m_cloudPipeline;
+    state.framebuffer = framebuffer;
+    state.viewport.addViewportAndScissorRect(
+        nvrhi::Viewport(static_cast<float>(width), static_cast<float>(height)));
+    state.addBindingSet(bindingSet);
+    state.vertexBuffers = {{m_cloudVertexBuffer, 0, 0}};
+    state.indexBuffer = {m_cloudIndexBuffer, nvrhi::Format::R16_UINT, 0};
+    cmdList->setGraphicsState(state);
+    cmdList->drawIndexed(nvrhi::DrawArguments{iCount, 1, 0, 0, 0});
+}
+
+void FGEnvironmentRender::InitPortalResources()
+{
+    if (m_portalInitialized)
+        return;
+
+    auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
+    auto* renderDevice = fgRenderer->GetRenderDevice();
+    m_device = renderDevice->GetNVRHIDevice();
+    if (!m_device)
+        return;
+
+    auto* shaderLoader = RImplementation.GetShaderLoader();
+    auto vsResult = shaderLoader->LoadVertexShader("portal");
+    auto psResult = shaderLoader->LoadPixelShader("portal");
+    if (!vsResult.handle || !psResult.handle)
+        return;
+    m_portalVS = vsResult.handle;
+    m_portalPS = psResult.handle;
+
+    auto& cache = framegraph::GetPassResourceCache();
+    m_portalBindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "FGEnv_Portal_v1", *vsResult.reflection, *psResult.reflection, m_device);
+    if (!m_portalBindingLayout)
+        return;
+
+    nvrhi::VertexAttributeDesc attribs[] = {
+        nvrhi::VertexAttributeDesc()
+            .setName("POSITION")
+            .setFormat(nvrhi::Format::RGB32_FLOAT)
+            .setOffset(offsetof(passes::PortalVertex, p))
+            .setElementStride(sizeof(passes::PortalVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("COLOR")
+            .setFormat(nvrhi::Format::RGBA8_UNORM)
+            .setOffset(offsetof(passes::PortalVertex, color))
+            .setElementStride(sizeof(passes::PortalVertex)),
+    };
+    m_portalInputLayout = cache.GetOrCreateInputLayout("FGEnv_Portal", attribs, 2, m_portalVS, m_device);
+
+    nvrhi::RenderState renderState;
+    renderState.blendState.targets[0].setBlendEnable(true);
+    renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::SrcAlpha);
+    renderState.blendState.targets[0].setDestBlend(nvrhi::BlendFactor::InvSrcAlpha);
+    renderState.depthStencilState.setDepthTestEnable(true);
+    renderState.depthStencilState.setDepthWriteEnable(false);
+    renderState.depthStencilState.setDepthFunc(nvrhi::ComparisonFunc::GreaterOrEqual);
+    renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
+
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+    pipelineDesc.setVertexShader(m_portalVS);
+    pipelineDesc.setPixelShader(m_portalPS);
+    pipelineDesc.addBindingLayout(m_portalBindingLayout);
+    pipelineDesc.setInputLayout(m_portalInputLayout);
+    pipelineDesc.setRenderState(renderState);
+    pipelineDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    fbInfo.depthFormat = nvrhi::Format::D32;
+    m_portalPipeline = cache.GetOrCreatePipeline("FGEnv_Portal_v1", pipelineDesc, fbInfo, m_device);
+    m_portalInitialized = m_portalPipeline != nullptr;
+}
+
+void FGEnvironmentRender::DrawPortals(nvrhi::ICommandList*, nvrhi::IFramebuffer*, u32, u32)
+{
+}
+
+void FGEnvironmentRender::InitLodResources()
+{
+    if (m_lodInitialized)
+        return;
+
+    auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
+    auto* renderDevice = fgRenderer->GetRenderDevice();
+    m_device = renderDevice->GetNVRHIDevice();
+    if (!m_device)
+        return;
+
+    nvrhi::TextureDesc texDesc;
+    texDesc.width = 1;
+    texDesc.height = 1;
+    texDesc.format = nvrhi::Format::RGBA8_UNORM;
+    texDesc.debugName = "FGEnv_LodPlaceholder";
+    texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    texDesc.keepInitialState = true;
+    m_lodPlaceholder = m_device->createTexture(texDesc);
+
+    nvrhi::SamplerDesc samplerDesc;
+    samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
+    samplerDesc.setAllFilters(true);
+    m_lodSampler = m_device->createSampler(samplerDesc);
+
+    {
+        nvrhi::CommandListHandle uploadCmd = m_device->createCommandList();
+        uploadCmd->open();
+        u32 white = 0xFFFFFFFF;
+        uploadCmd->writeTexture(m_lodPlaceholder, 0, 0, &white, sizeof(white));
+        u16 idx[6] = {0, 1, 2, 0, 2, 3};
+        nvrhi::BufferDesc ibDesc;
+        ibDesc.byteSize = sizeof(idx);
+        ibDesc.debugName = "FGEnv_LodIB";
+        ibDesc.isIndexBuffer = true;
+        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+        ibDesc.keepInitialState = true;
+        m_lodIndexBuffer = m_device->createBuffer(ibDesc);
+        uploadCmd->writeBuffer(m_lodIndexBuffer, idx, sizeof(idx));
+        uploadCmd->close();
+        m_device->executeCommandList(uploadCmd);
+    }
+
+    auto* shaderLoader = RImplementation.GetShaderLoader();
+    auto vsResult = shaderLoader->LoadVertexShader("lod_forward");
+    auto psResult = shaderLoader->LoadPixelShader("lod_forward");
+    if (!vsResult.handle || !psResult.handle)
+        return;
+    m_lodVS = vsResult.handle;
+    m_lodPS = psResult.handle;
+
+    auto& cache = framegraph::GetPassResourceCache();
+    m_lodBindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "FGEnv_Lod_v1", *vsResult.reflection, *psResult.reflection, m_device);
+    if (!m_lodBindingLayout)
+        return;
+
+    nvrhi::VertexAttributeDesc attribs[] = {
+        nvrhi::VertexAttributeDesc()
+            .setName("POSITION")
+            .setFormat(nvrhi::Format::RGB32_FLOAT)
+            .setOffset(offsetof(passes::LodVertex, p))
+            .setElementStride(sizeof(passes::LodVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("COLOR")
+            .setFormat(nvrhi::Format::RGBA8_UNORM)
+            .setOffset(offsetof(passes::LodVertex, color))
+            .setElementStride(sizeof(passes::LodVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("TEXCOORD")
+            .setFormat(nvrhi::Format::RG32_FLOAT)
+            .setOffset(offsetof(passes::LodVertex, tc0))
+            .setElementStride(sizeof(passes::LodVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("TEXCOORD")
+            .setArraySize(1)
+            .setFormat(nvrhi::Format::RG32_FLOAT)
+            .setOffset(offsetof(passes::LodVertex, tc1))
+            .setElementStride(sizeof(passes::LodVertex)),
+        nvrhi::VertexAttributeDesc()
+            .setName("TEXCOORD")
+            .setArraySize(1)
+            .setFormat(nvrhi::Format::RGBA32_FLOAT)
+            .setOffset(offsetof(passes::LodVertex, af))
+            .setElementStride(sizeof(passes::LodVertex)),
+    };
+    attribs[2].setName("TEXCOORD0");
+    attribs[3].setName("TEXCOORD1");
+    attribs[4].setName("TEXCOORD2");
+    m_lodInputLayout = cache.GetOrCreateInputLayout("FGEnv_Lod", attribs, 5, m_lodVS, m_device);
+
+    nvrhi::RenderState renderState;
+    renderState.blendState.targets[0].setBlendEnable(false);
+    renderState.depthStencilState.setDepthTestEnable(true);
+    renderState.depthStencilState.setDepthWriteEnable(true);
+    renderState.depthStencilState.setDepthFunc(nvrhi::ComparisonFunc::GreaterOrEqual);
+    renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
+
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+    pipelineDesc.setVertexShader(m_lodVS);
+    pipelineDesc.setPixelShader(m_lodPS);
+    pipelineDesc.addBindingLayout(m_lodBindingLayout);
+    pipelineDesc.setInputLayout(m_lodInputLayout);
+    pipelineDesc.setRenderState(renderState);
+    pipelineDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    fbInfo.depthFormat = nvrhi::Format::D32;
+    m_lodPipeline = cache.GetOrCreatePipeline("FGEnv_Lod_v1", pipelineDesc, fbInfo, m_device);
+    m_lodInitialized = m_lodPipeline != nullptr;
+}
+
+void FGEnvironmentRender::DrawLodImpostors(
+    nvrhi::ICommandList*, nvrhi::IFramebuffer*, u32, u32,
+    const xr_vector<dxRender_Visual*>&)
+{
 }
 } // namespace xray::render::fg

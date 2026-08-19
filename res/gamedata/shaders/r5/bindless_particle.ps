@@ -16,39 +16,36 @@ struct PS_INPUT
     nointerpolation uint materialID : TEXCOORD4;
 };
 
-struct PS_OUTPUT
+float4 main(PS_INPUT input) : SV_Target
 {
-    float4 color : SV_Target0;
-    float4 normal : SV_Target1;
-    float4 baseColor : SV_Target2;
-};
-
-PS_OUTPUT main(PS_INPUT input)
-{
-    PS_OUTPUT output;
-
     MaterialData mat = g_Materials[input.materialID];
-    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+    float4 diffuseSample = float4(1, 0, 1, 1);
+    if (mat.diffuseIndex != INVALID_TEXTURE_INDEX)
+        diffuseSample = GetBindlessTexture(mat.diffuseIndex).Sample(smp_rtlinear, input.texcoord);
     float4 result = diffuseSample * input.color;
-
     clip(result.a - (0.01 / 255.0));
 
-    float sceneDepth = g_SceneDepth.Load(int3((int2)input.hpos.xy, 0));
-    if (sceneDepth > 0.0) {
-        float3 sceneWP = reconstruct_world_pos(input.hpos.xy, sceneDepth);
-        float3 viewDir = camera_direction.xyz;
-        float sceneViewZ = dot(sceneWP - eye_position, viewDir);
-        float particleViewZ = dot(input.worldPos - eye_position, viewDir);
-        float spaceDepth = sceneViewZ - particleViewZ - DEPTH_EPSILON;
-        if (spaceDepth < -2 * DEPTH_EPSILON)
-            spaceDepth = 100000.0;
-        float soft = Contrast(saturate(spaceDepth * 1.3), 2);
-        result.a *= soft;
-        result.rgb *= soft;
+    float soft = 1.0;
+    const bool softEnabled = camera_direction.w > 0.5;
+    const bool isHudBand = input.hpos.z >= 0.85;
+    if (softEnabled && !isHudBand)
+    {
+        float sceneDepth = g_SceneDepth.Load(int3((int2)input.hpos.xy, 0));
+        if (sceneDepth > 1e-6)
+        {
+            float3 sceneWP = reconstruct_world_pos(input.hpos.xy, sceneDepth);
+            float3 viewDir = normalize(camera_direction.xyz);
+            float sceneViewZ = abs(dot(sceneWP - eye_position, viewDir));
+            float particleViewZ = abs(dot(input.worldPos - eye_position, viewDir));
+            float spaceDepth = sceneViewZ - particleViewZ - DEPTH_EPSILON;
+            if (spaceDepth < -2.0 * DEPTH_EPSILON)
+                soft = 1.0;
+            else
+                soft = smoothstep(0.0, 1.25, max(spaceDepth, 0.0));
+        }
     }
 
-    output.color = result;
-    output.normal = float4(normalize(input.normal), 1);
-    output.baseColor = float4(diffuseSample.rgb, 0);
-    return output;
+    result.a *= soft;
+    result.rgb *= soft;
+    return result;
 }

@@ -1,13 +1,9 @@
-// bindless_forward.ps
-// SM6 Bindless forward pixel shader
-// Uses ResourceDescriptorHeap[NonUniformResourceIndex(index)] for texture access
-// MaterialData contains descriptor heap indices (diffuseIndex, normalIndex, etc.)
-// Uses static_globals (b2) for lighting - same values as legacy renderer
-
 #define SM_6_0
 #define CLUSTERED_LIGHTING_FORWARD
 #include "common.h"
 #include "bindless_common.h"
+#include "shared/parallax.h"
+#include "shared/surface_marks.h"
 
 struct PS_INPUT
 {
@@ -17,7 +13,9 @@ struct PS_INPUT
     float3 normal : TEXCOORD2;
     float3 tangent : TEXCOORD3;
     float3 bitangent : TEXCOORD4;
-    nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    nointerpolation uint materialID : TEXCOORD5;
+    float hemi : TEXCOORD6;
+    float2 lmUV : TEXCOORD7;
 };
 
 struct PS_OUTPUT
@@ -25,71 +23,58 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
     float4 baseColor : SV_Target2;
+    float4 worldPos : SV_Target3;
 };
-
-// Lighting uses static_globals from common.h (b2):
-// - L_sun_color, L_sun_dir_w (sun)
-// - L_ambient (ambient)
-// - eye_position (camera)
-// - fog_params, fog_color (fog)
 
 PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
 
-    // DEBUG: Visualize UVs as color to find where black areas are in UV space
-    // Uncomment ONE of these to debug:
-
-    // Option 1: Show UV coordinates as RG color (frac to see tiling)
-    //output.color = float4(frac(input.texcoord.x), frac(input.texcoord.y), 0, 1);
-    //return output;
-
-    // Option 2: Show material ID as grayscale
-    //output.color = float4(input.materialID / 255.0, input.materialID / 255.0, input.materialID / 255.0, 1);
-    //return output;
-
-    // Get material data directly using material ID
     MaterialData mat = g_Materials[input.materialID];
 
+    if (mat.flags & MAT_FLAG_WATER)
+        clip(-1);
 
-    // Sample textures using SM6 bindless (ResourceDescriptorHeap)
-    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+    float3 Ngeom = normalize(input.normal);
+    float2 uv = ApplyMaterialParallaxUV(mat, input.texcoord, input.tangent, input.bitangent, Ngeom, input.worldPos);
+    float4 diffuseSample = SampleDiffuse(mat, uv);
+    const bool isGlass = (mat.flags & MAT_FLAG_GLASS) != 0;
 
-    // DEBUG: Visualize material ID (drawIndex) - use brighter colors
-    //float r = (input.materialID % 7) / 6.0;
-    //float g = (input.materialID % 5) / 4.0 + 0.3;
-    //float b = (input.materialID % 3) / 2.0 + 0.5;
-    //output.color = float4(r, g, b, 1);
-    //return output;
-
-    // Alpha test
     if (mat.flags & MAT_FLAG_ALPHA_TEST)
     {
         clip(diffuseSample.a - mat.alphaRef);
     }
 
     float3 albedo = diffuseSample.rgb;
+    if (isGlass)
+    {
+        float3 Vdir = normalize(eye_position - input.worldPos);
+        float3 R = reflect(-Vdir, Ngeom);
+        float3 e0 = env_s0.SampleLevel(smp_rtlinear, R, 0).rgb;
+        float3 e1 = env_s1.SampleLevel(smp_rtlinear, R, 0).rgb;
+        float3 env = lerp(e0, e1, saturate(L_ambient.w));
+        albedo = lerp(env, diffuseSample.rgb, diffuseSample.a);
+    }
 
-    float3 N = normalize(input.normal);
+    float3 N = Ngeom;
     float gloss = 0.0;
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
-        BumpSample bump = SampleNormal(mat, input.texcoord);
+        BumpSample bump = SampleNormal(mat, uv);
         float3x3 TBN = float3x3(
             normalize(input.tangent),
             normalize(input.bitangent),
             N
         );
-        N = normalize(mul(bump.normal, TBN));
+        float3 Nt = normalize(mul(bump.normal, TBN));
+        if (all(isfinite(Nt)) && dot(Nt, N) > 0.2)
+            N = Nt;
         gloss = bump.gloss;
     }
 
-    // Detail texture
-    if (mat.flags & MAT_FLAG_HAS_DETAIL)
+    if (!isGlass && (mat.flags & MAT_FLAG_HAS_DETAIL))
     {
-        // Detail sampling (uses mat.detailScale internally)
-        float4 detailSample = SampleDetail(mat, input.texcoord);
-        // Blend detail (multiply-2x style)
+        float4 detailSample = SampleDetail(mat, uv);
         albedo = albedo * (detailSample.rgb * 2.0);
     }
 
@@ -99,15 +84,53 @@ PS_OUTPUT main(PS_INPUT input)
 
     if (mat.flags & MAT_FLAG_HAS_PBR)
     {
-        float3 pbrSample = SamplePBR(mat, input.texcoord);
+        float3 pbrSample = SamplePBR(mat, uv);
         metallic = pbrSample.r;
         roughness = pbrSample.g;
         ao = pbrSample.b;
     }
+    float hemi = input.hemi;
+    if (hemi < 0.0)
+        hemi = (parallax.w < -0.5) ? 0.0 : calc_model_hemi(N);
+    float sunOcc = 1.0;
+    bool hasLmap = false;
+    if ((mat.flags & MAT_FLAG_HAS_LMAP) != 0 && mat.lmapIndex != INVALID_TEXTURE_INDEX
+        && dot(input.lmUV, input.lmUV) > 1e-8)
+    {
+        float4 lmh = GetBindlessTexture(mat.lmapIndex).Sample(smp_rtlinear, input.lmUV);
+        float bakedHemi = saturate(get_hemi(lmh));
+        hemi = bakedHemi;
+        sunOcc = saturate(get_sun(lmh));
+        hasLmap = true;
+    }
 
-    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position);
-    output.color = float4(fwd.color.rgb, diffuseSample.a);
+    f_forward fwd = output_forward_pbr(
+        albedo, N, input.worldPos, metallic, roughness, ao, input.position, hemi, sunOcc, hasLmap);
+    float3 lit = fwd.color.rgb;
+    float outA = fwd.color.a;
+    if ((mat.flags & MAT_FLAG_ALPHA_BLEND) != 0 && (mat.flags & MAT_FLAG_HAS_LMAP) == 0)
+        outA = diffuseSample.a;
+    if (isGlass)
+    {
+        float fog = saturate(dot(float4(input.worldPos, 1.0), fog_plane));
+        outA = diffuseSample.a * fog * fog;
+    }
+    output.color = float4(lit, outA);
     output.normal = fwd.normal;
-    output.baseColor = fwd.baseColor;
+    float luma = dot(albedo, float3(0.299, 0.587, 0.114));
+    float chroma = length(albedo - luma);
+    float gDom = albedo.g - max(albedo.r, albedo.b);
+    bool leafTint = metallic < 0.18 && chroma > 0.07 && albedo.g > 0.08 && gDom > -0.03;
+    bool foliage = ((mat.flags & MAT_FLAG_FOLIAGE) != 0) && leafTint;
+    if (!foliage && (mat.flags & MAT_FLAG_ALPHA_TEST) != 0 && (mat.flags & MAT_FLAG_ALPHA_BLEND) == 0)
+        foliage = leafTint && (mat.flags & MAT_FLAG_TWO_SIDED) != 0;
+    float mark = 0.0;
+    if (hasLmap && sunOcc < 0.2)
+        mark = SURF_MARK_INTERIOR;
+    else if (foliage)
+        mark = SURF_MARK_FOLIAGE;
+    float sssMask = foliage ? 0.7 : 0.0;
+    output.baseColor = float4(fwd.baseColor.rgb, PackBaseColorA(metallic, sssMask));
+    output.worldPos = float4(input.worldPos, mark);
     return output;
 }

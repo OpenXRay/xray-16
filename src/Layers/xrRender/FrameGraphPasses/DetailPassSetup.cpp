@@ -53,11 +53,16 @@ DefaultOutputLayout setupDetailPass(
     const DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
-    xray::profiler::GPUProfiler* gpuProfiler
+    xray::profiler::GPUProfiler* gpuProfiler,
+    VirtualResourceHandle cullArgs
 )
 {
     if (detailManager && !detailManager->graphicsPipeline)
     {
+        auto* shaderLoader = GEnv.Render ? GEnv.Render->GetShaderLoader() : nullptr;
+        if (shaderLoader && (!detailManager->vertexShader || !detailManager->pixelShader))
+            detailManager->LoadGraphicsShaders(shaderLoader);
+
         nvrhi::FramebufferInfo fbInfo;
         fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
         fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
@@ -85,10 +90,15 @@ DefaultOutputLayout setupDetailPass(
             data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
             if (forwardInputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
+            if (forwardInputs.worldPos.is_valid())
+                data.worldPos = passBuilder.readWrite(forwardInputs.worldPos, ResourceState::RenderTarget);
+            if (cullArgs.is_valid())
+                passBuilder.read(cullArgs, ResourceState::IndirectArgument);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = data.outputNormal;
             data.outputs.baseColor = data.baseColor;
+            data.outputs.worldPos = data.worldPos.is_valid() ? data.worldPos : forwardInputs.worldPos;
             data.outputs.depth = data.depth;
         },
         [](const DetailPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
@@ -130,6 +140,7 @@ DefaultOutputLayout setupDetailPass(
 
             nvrhi::ITexture* normalTexture = fg.GetPhysicalTexture(data.outputNormal);
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
+            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorTexture);
@@ -137,9 +148,12 @@ DefaultOutputLayout setupDetailPass(
                 fbDesc.addColorAttachment(normalTexture);
             if (baseColorRT)
                 fbDesc.addColorAttachment(baseColorRT);
+            if (worldPosRT)
+                fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthTexture);
 
-            nvrhi::FramebufferHandle framebuffer = data.device->GetNVRHIDevice()->createFramebuffer(fbDesc);
+            nvrhi::FramebufferHandle framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer(
+                worldPosRT ? "DetailPassWPos" : "DetailPass", fbDesc, data.device->GetNVRHIDevice());
             if (!framebuffer)
                 return;
 
@@ -153,6 +167,11 @@ DefaultOutputLayout setupDetailPass(
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), renderDevice);
             auto detailGlobalsCB = cache.GetOrCreateVolatileCB("Detail", "DetailGlobals", sizeof(FGDetailManager::DetailFrameConstants), renderDevice);
             auto dynLightCB = cache.GetOrCreateVolatileCB("Detail", "DynLight", 48, renderDevice);
+
+            {
+                StaticGlobals sg = BuildStaticGlobals();
+                cmdList->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
+            }
 
             // b3: DetailGlobals
             float windAngleDeg = 0.0f;
@@ -227,6 +246,7 @@ DefaultOutputLayout setupDetailPass(
                 bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                 bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
                 bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+                BindEnvIblCubes(bsb, data.device);
                 auto bindDesc = bsb.Build();
                 bindDesc.bindings.push_back(nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection));
                 return cache.GetOrCreateBindingSet(bindDesc, dm->graphicsBindingLayout, nvDev);
@@ -248,6 +268,7 @@ DefaultOutputLayout setupDetailPass(
                 bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                 bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
                 bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+                BindEnvIblCubes(bsb, data.device);
                 return cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDev);
             };
 
@@ -308,6 +329,7 @@ DefaultOutputLayout setupDetailPass(
                 decalBsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                 decalBsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
                 decalBsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+                BindEnvIblCubes(decalBsb, data.device);
                 nvrhi::BindingSetHandle decalBindingSet = cache.GetOrCreateBindingSet(decalBsb.Build(), dm->decalBindingLayout, nvDev);
 
                 nvrhi::GraphicsState state;
@@ -333,6 +355,7 @@ DefaultOutputLayout setupDetailPass(
     outputs.albedo = passData.outputColor;
     outputs.normal = passData.outputNormal;
     outputs.baseColor = passData.baseColor;
+    outputs.worldPos = forwardInputs.worldPos;
     outputs.depth = passData.depth;
     return outputs;
 }

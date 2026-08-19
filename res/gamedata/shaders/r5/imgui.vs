@@ -4,6 +4,8 @@
 cbuffer vertexBuffer : register(b0)
 {
     float4x4 ProjectionMatrix;
+    float uiScale;
+    float3 uiPad;
 };
 
 struct VS_INPUT

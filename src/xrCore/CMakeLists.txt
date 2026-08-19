@@ -518,6 +518,18 @@ set_target_properties(xrCore PROPERTIES
     PREFIX ""
 )
 
+if (XRAY_ENABLE_TRACY)
+    target_sources(xrCore PRIVATE
+        "${CMAKE_SOURCE_DIR}/Externals/tracy/public/TracyClient.cpp"
+    )
+    set_source_files_properties(
+        "${CMAKE_SOURCE_DIR}/Externals/tracy/public/TracyClient.cpp"
+        PROPERTIES
+            SKIP_PRECOMPILE_HEADERS ON
+            SKIP_UNITY_BUILD_INCLUSION ON
+    )
+endif()
+
 target_precompile_headers(xrCore
     PRIVATE
     stdafx.h

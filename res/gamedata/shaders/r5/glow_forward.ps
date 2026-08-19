@@ -1,0 +1,22 @@
+#define SM_6_0
+
+SamplerState smp_linear : register(s0);
+Texture2D s_sun : register(t0);
+
+struct PS_INPUT {
+    float4 hpos     : SV_POSITION;
+    float4 color    : COLOR0;
+    float2 tc       : TEXCOORD0;
+};
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float4 tex = s_sun.Sample(smp_linear, I.tc);
+
+    float alpha = saturate(tex.a);
+
+    clip(alpha * I.color.a - (0.01 / 255.0));
+
+    float3 rgb = tex.rgb * I.color.rgb;
+    return float4(rgb, alpha * I.color.a);
+}

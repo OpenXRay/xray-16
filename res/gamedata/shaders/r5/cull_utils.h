@@ -116,6 +116,13 @@ HiZTestResult HiZTestSphereEx(
     result.frontDepth = 0.0;
     result.hiZDepth = 0.0;
 
+    float3 toCenter = center - cameraPos;
+    float distSq = dot(toCenter, toCenter);
+    float r = max(radius, 0.05);
+    float r2 = r * r;
+    if (distSq <= r2 * 6.25 || distSq <= (r + 2.0) * (r + 2.0) || distSq <= 9.0)
+        return result;
+
     float4 clipPos = mul(pyramidViewProj, float4(center, 1.0));
     if (clipPos.w <= 0.001)
         return result;
@@ -123,16 +130,16 @@ HiZTestResult HiZTestSphereEx(
     float3 ndc = clipPos.xyz / clipPos.w;
 
     float projScale = max(abs(pyramidViewProj[0][0]), abs(pyramidViewProj[1][1]));
-    float2 ndcSize = float2(radius, radius) * projScale / clipPos.w;
+    float2 ndcSize = float2(r, r) * projScale / clipPos.w * 1.75;
 
     float2 minNDC = ndc.xy - ndcSize;
     float2 maxNDC = ndc.xy + ndcSize;
 
-    if (any(minNDC < -1.0) || any(maxNDC > 1.0))
+    if (any(minNDC > 1.0) || any(maxNDC < -1.0))
         return result;
 
-    float2 minUV = minNDC * 0.5 + 0.5;
-    float2 maxUV = maxNDC * 0.5 + 0.5;
+    float2 minUV = saturate(minNDC * 0.5 + 0.5);
+    float2 maxUV = saturate(maxNDC * 0.5 + 0.5);
 
     minUV.y = 1.0 - minUV.y;
     maxUV.y = 1.0 - maxUV.y;
@@ -141,6 +148,11 @@ HiZTestResult HiZTestSphereEx(
 
     float boxWidth = (boxUV.z - boxUV.x) * float(hiZWidth);
     float boxHeight = (boxUV.w - boxUV.y) * float(hiZHeight);
+
+    float screenArea = boxWidth * boxHeight;
+    float fullArea = float(hiZWidth) * float(hiZHeight);
+    if (screenArea > fullArea * 0.08)
+        return result;
 
     float mipLevel = ceil(log2(max(1.0, max(boxWidth, boxHeight))));
     mipLevel = clamp(mipLevel, 0.0, float(hiZMipLevels - 1));
@@ -153,13 +165,14 @@ HiZTestResult HiZTestSphereEx(
     result.hiZDepth = min(min(d1, d2), min(d3, d4));
 
     float3 viewDir = normalize(center - cameraPos);
-    float3 frontPoint = center - viewDir * radius;
+    float3 frontPoint = center - viewDir * r;
     float4 frontClip = mul(pyramidViewProj, float4(frontPoint, 1.0));
     if (frontClip.w <= 0.001)
         return result;
 
     result.frontDepth = frontClip.z / frontClip.w;
-    result.visible = result.frontDepth >= result.hiZDepth;
+    const float depthSlop = 0.005;
+    result.visible = result.frontDepth + depthSlop >= result.hiZDepth;
     return result;
 }
 

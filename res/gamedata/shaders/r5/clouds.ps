@@ -1,0 +1,25 @@
+#include "shared/common.h"
+
+struct PS_INPUT
+{
+    float4 hpos  : SV_Position;
+    float4 color : COLOR0;
+    float2 tc0   : TEXCOORD0;
+    float2 tc1   : TEXCOORD1;
+};
+
+SamplerState smp_rtlinear : register(s0);
+Texture2D s_clouds0 : register(t0);
+Texture2D s_clouds1 : register(t1);
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float4 s0_0 = s_clouds0.Sample(smp_rtlinear, I.tc0);
+    float4 s0_1 = s_clouds1.Sample(smp_rtlinear, I.tc0);
+    float4 s1_0 = s_clouds0.Sample(smp_rtlinear, I.tc1);
+    float4 s1_1 = s_clouds1.Sample(smp_rtlinear, I.tc1);
+    float4 s_0 = s0_0 + s1_0;
+    float4 s_1 = s0_1 + s1_1;
+    float4 mixc = I.color * lerp(s_0, s_1, L_ambient.w);
+    return mixc;
+}

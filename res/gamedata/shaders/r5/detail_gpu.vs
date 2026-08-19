@@ -42,7 +42,8 @@ cbuffer DetailGlobals : register(b3)
     float4 grass_sss_color;         // RGB + intensity (subsurface scattering)
     float grass_color_variation;    // Per-blade color variation amount
     float grass_blade_height;       // Blade height multiplier (default 1.0)
-    float _pad0, _pad1;             // Padding to 16-byte alignment
+    uint build_details_index;
+    uint build_details_pbr_index;
 };
 
 static const float M_PI = 3.1415926;
@@ -456,6 +457,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	uint bh = asuint(bc.x * 73856093 + bc.y * 19349663);
 	bh ^= bh >> 16;
 	O.bladeHash = float(bh & 0xFFFFu) / 65535.0;
+	O.sunOcclusion = sun;
 	O.hpos = mul(g_detail_VP, pos);
 	return O;
 }

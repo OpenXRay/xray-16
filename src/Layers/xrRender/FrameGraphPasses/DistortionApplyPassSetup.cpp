@@ -20,6 +20,8 @@ using namespace framegraph;
 struct DistortionApplyData {
     VirtualResourceHandle sceneInput;
     VirtualResourceHandle distortionInput;
+    VirtualResourceHandle worldPosInput;
+    VirtualResourceHandle baseColorInput;
     VirtualResourceHandle depthInput;
     VirtualResourceHandle output;
     u32 width;
@@ -28,11 +30,21 @@ struct DistortionApplyData {
 };
 
 void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassState& state) {
-    if (state.initialized || !device) return;
+    constexpr u32 kVersion = 16;
+    if (state.initialized && state.version == kVersion)
+        return;
+    state.initialized = false;
+    state.version = kVersion;
+    state.pipeline = nullptr;
+    state.bindingLayout = nullptr;
+
+    if (!device)
+        return;
 
     if (!GEnv.Render->GetShaderLoader())
         return;
 
+    framegraph::BindingSetBuilder::InvalidateReflectionCache();
     auto vsResult = GEnv.Render->GetShaderLoader()->LoadVertexShader("fullscreen");
     auto psResult = GEnv.Render->GetShaderLoader()->LoadPixelShader("distortion_apply");
     if (!vsResult.handle || !psResult.handle) {
@@ -43,7 +55,7 @@ void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassSt
     auto& cache = GetPassResourceCache();
 
     state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "DistortionApply", *vsResult.reflection, *psResult.reflection, device);
+        "DistortionApply_v21_KeepReflect", *vsResult.reflection, *psResult.reflection, device);
 
     if (state.bindingLayout) {
         nvrhi::GraphicsPipelineDesc pipeDesc;
@@ -59,7 +71,7 @@ void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassSt
         nvrhi::FramebufferInfoEx fbInfo;
         fbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
 
-        state.pipeline = cache.GetOrCreatePipeline("DistortionApply", pipeDesc, fbInfo, device);
+        state.pipeline = cache.GetOrCreatePipeline("DistortionApply_v21_KeepReflect", pipeDesc, fbInfo, device);
     }
     state.initialized = true;
 }
@@ -69,6 +81,8 @@ VirtualResourceHandle setupDistortionApplyPass(
     fg::RenderDevice* device,
     VirtualResourceHandle sceneColor,
     VirtualResourceHandle distortionRT,
+    VirtualResourceHandle worldPos,
+    VirtualResourceHandle baseColor,
     VirtualResourceHandle depth,
     u32 width,
     u32 height,
@@ -76,6 +90,9 @@ VirtualResourceHandle setupDistortionApplyPass(
 {
     if (device && device->GetNVRHIDevice())
         InitializeDistortionApplyPass(device->GetNVRHIDevice(), passState);
+
+    if (!distortionRT.is_valid() || !sceneColor.is_valid())
+        return sceneColor;
 
     ResourceDesc outputDesc;
     outputDesc.type = ResourceDesc::Type::Texture2D;
@@ -91,14 +108,22 @@ VirtualResourceHandle setupDistortionApplyPass(
     auto& passData = fg.addCallbackPass<DistortionApplyData>(
         "DistortionApply",
 
-        [sceneColor, distortionRT, depth, outputHandle, width, height, &passState](FrameGraph& builder, PassHandle passHandle, DistortionApplyData& data) {
+        [sceneColor, distortionRT, worldPos, baseColor, depth, outputHandle, width, height, &passState](FrameGraph& builder, PassHandle passHandle, DistortionApplyData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.width = width;
             data.height = height;
             data.passState = &passState;
             data.sceneInput = passBuilder.read(sceneColor, ResourceState::ShaderResource);
             data.distortionInput = passBuilder.read(distortionRT, ResourceState::ShaderResource);
-            data.depthInput = passBuilder.read(depth, ResourceState::ShaderResource);
+            data.worldPosInput = worldPos.is_valid()
+                ? passBuilder.read(worldPos, ResourceState::ShaderResource)
+                : VirtualResourceHandle{};
+            data.baseColorInput = baseColor.is_valid()
+                ? passBuilder.read(baseColor, ResourceState::ShaderResource)
+                : VirtualResourceHandle{};
+            data.depthInput = depth.is_valid()
+                ? passBuilder.read(depth, ResourceState::ShaderResource)
+                : VirtualResourceHandle{};
             data.output = passBuilder.write(outputHandle, ResourceState::RenderTarget);
         },
 
@@ -106,9 +131,10 @@ VirtualResourceHandle setupDistortionApplyPass(
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             auto* sceneTex = fg.GetPhysicalTexture(data.sceneInput);
             auto* distortTex = fg.GetPhysicalTexture(data.distortionInput);
-            auto* depthTex = fg.GetPhysicalTexture(data.depthInput);
+            auto* worldPosTex = data.worldPosInput.is_valid() ? fg.GetPhysicalTexture(data.worldPosInput) : nullptr;
+            auto* depthTex = data.depthInput.is_valid() ? fg.GetPhysicalTexture(data.depthInput) : nullptr;
             auto* outputTex = fg.GetPhysicalTexture(data.output);
-            if (!sceneTex || !distortTex || !depthTex || !outputTex)
+            if (!sceneTex || !distortTex || !outputTex)
                 return;
 
             auto* ps = data.passState;
@@ -126,10 +152,16 @@ VirtualResourceHandle setupDistortionApplyPass(
                 return;
 
             BindingSetBuilder bsb(*vsRefl, *psRefl, device, "DistortionApply");
+            nvrhi::ITexture* underColor = ps->waterUnderColor
+                ? ps->waterUnderColor
+                : sceneTex;
             bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                .Texture("g_Snapshot", sceneTex)
                .Texture("g_Distortion", distortTex)
-               .Texture("g_Depth", depthTex);
+               .Texture("g_WorldPos", worldPosTex ? worldPosTex : cache.GetDummyContactHistory(device))
+               .Texture("g_UnderColor", underColor)
+               .Texture("g_Depth", depthTex ? depthTex : cache.GetDummyContactDepth(device),
+                        nvrhi::Format::R32_FLOAT);
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps->bindingLayout, device);
 
             nvrhi::FramebufferDesc fbDesc;

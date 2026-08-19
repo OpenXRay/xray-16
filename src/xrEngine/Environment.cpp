@@ -399,7 +399,6 @@ void CEnvironment::lerp()
     // final lerp
     const float current_weight = TimeWeight(fGameTime, Current[0]->exec_time, Current[1]->exec_time);
     CurrentEnv.lerp(*this, *Current[0], *Current[1], current_weight, EM, mpower);
-    // FrameGraph handles sky/environment rendering
 }
 
 void CEnvironment::OnFrame()

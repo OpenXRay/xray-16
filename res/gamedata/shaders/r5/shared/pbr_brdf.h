@@ -70,7 +70,6 @@ float3 CookTorranceSpecular(
     return numerator / denominator;
 }
 
-// Calculate F0 (base reflectivity) from metallic and albedo
 float3 CalculateF0(float3 albedo, float metallic)
 {
     return lerp(DIELECTRIC_F0, albedo, metallic);
@@ -137,22 +136,21 @@ float3 PBRDirectLighting(
 
     float3 F0 = CalculateF0(albedo, metallic);
 
+    float3 F = F_Schlick(HdotV, F0);
     float3 specular = CookTorranceSpecular(NdotH, NdotV, NdotL, HdotV, roughness, F0);
-    specular += MultiscatterCompensation(F0, NdotV, NdotL, roughness);
+    specular += MultiscatterCompensation(F0, NdotV, NdotL, roughness) * (1.0f - metallic);
 
     float fd = (diffuseMode == 1)
         ? LambertianDiffuse()
         : DisneyDiffuse(NdotV, NdotL, LdotH, roughness);
 
-    float3 F_in = F_Schlick(NdotL, F0);
-    float3 F_out = F_Schlick(NdotV, F0);
-    float3 kD = (1.0f - F_in) * (1.0f - F_out) * (1.0f - metallic);
+    float3 kD = (1.0f - F) * (1.0f - metallic);
     float3 diffuse = kD * albedo * fd;
 
     return (diffuse + specular) * lightColor * NdotL;
 }
 
-// Simplified ambient term (placeholder for future IBL)
+// Ambient fill: albedo * (L_ambient + env IBL), plus rough specular lobe
 float3 PBRAmbient(
     float3 albedo,
     float3 N,
@@ -168,8 +166,6 @@ float3 PBRAmbient(
 
     float3 kD = (1.0f - F) * (1.0f - metallic);
     float3 diffuseAmbient = kD * albedo * ambientColor;
-
-    // Approximate specular ambient (will be replaced by IBL)
     float3 specularAmbient = F * ambientColor * 0.3f;
 
     return (diffuseAmbient + specularAmbient) * ao;

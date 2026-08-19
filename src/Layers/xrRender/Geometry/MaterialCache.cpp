@@ -41,6 +41,25 @@ namespace xray::render {
 
 using namespace xray::render::fg;
 
+static bool ParticleTexLooksEmissive(const char* tex)
+{
+    if (!tex)
+        return false;
+    return strstr(tex, "explosion") || strstr(tex, "grenade") || strstr(tex, "blast")
+        || strstr(tex, "ani-explosion") || strstr(tex, "glow") || strstr(tex, "fire")
+        || strstr(tex, "flame") || strstr(tex, "ani-fire") || strstr(tex, "flash")
+        || strstr(tex, "flare") || strstr(tex, "spark") || strstr(tex, "anomaly")
+        || strstr(tex, "heat") || strstr(tex, "zhar");
+}
+
+static float ParticleEmissiveIntensity(const char* tex)
+{
+    if (tex && (strstr(tex, "explosion") || strstr(tex, "grenade")
+        || strstr(tex, "blast") || strstr(tex, "ani-explosion")))
+        return 6.0f;
+    return 4.5f;
+}
+
 
 
 
@@ -633,11 +652,8 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     return matPSO->vsBindingSet;
 }
 
-u32 MaterialCache::GetVertexFormatID(dxRender_Visual* visual)
+u32 MaterialCache::GetVertexFormatID(dxRender_Visual* /*visual*/)
 {
-    if (!visual)
-        return 0;
-
     return 0;
 }
 
@@ -712,12 +728,15 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
                      (reinterpret_cast<uintptr_t>(dxShader->m_psHandle.Get()) << 1);
     }
 
+    const auto& fbInfo = framebuffer->getFramebufferInfo();
     MaterialKey key;
     key.psoType = PSOType::UI;
     key.shader = nullptr;
     key.textureHash = shaderHash ^ (static_cast<u64>(topology) << 56);
     key.element = elementIndex;
     key.framebuffer = framebuffer;
+    key.colorFormat = fbInfo.colorFormats.empty() ? nvrhi::Format::UNKNOWN : fbInfo.colorFormats[0];
+    key.depthFormat = fbInfo.depthFormat;
 
     auto it = m_cache.find(key);
     if (it != m_cache.end()) {
@@ -836,16 +855,22 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         }
     }
 
+    xr_map<shared_str, u32> maxCbSizes;
+    for (const auto& cbInfo : pso->constantBuffers)
+        maxCbSizes[cbInfo.name] = std::max(maxCbSizes[cbInfo.name], cbInfo.size);
+
     xr_map<shared_str, nvrhi::BufferHandle> createdBuffers;
     for (auto& cbInfo : pso->constantBuffers) {
         auto it = createdBuffers.find(cbInfo.name);
         if (it != createdBuffers.end()) {
             cbInfo.nvrhiBuffer = it->second;
+            cbInfo.size = maxCbSizes[cbInfo.name];
             continue;
         }
 
+        const u32 bufSize = maxCbSizes[cbInfo.name];
         nvrhi::BufferDesc bufferDesc;
-        bufferDesc.byteSize = cbInfo.size;
+        bufferDesc.byteSize = bufSize;
         bufferDesc.isConstantBuffer = true;
         bufferDesc.debugName = make_string("UI_CB_%s", cbInfo.name.c_str()).c_str();
         bufferDesc.keepInitialState = true;
@@ -858,6 +883,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         }
 
         cbInfo.nvrhiBuffer = buffer;
+        cbInfo.size = bufSize;
         createdBuffers[cbInfo.name] = buffer;
     }
 
@@ -1059,6 +1085,7 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
     matData.alphaRef = 0.5f;
     matData.flags = 0;
     matData.shaderVariant = 0;
+    matData.lmapIndex = INVALID_TEXTURE_INDEX;
 
     if (matPSO->pass) {
         fg::STextureList* texList = matPSO->pass->T._get();
@@ -1128,7 +1155,6 @@ u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
     matData.pbrG_Index = INVALID_TEXTURE_INDEX;
     matData.pbrB_Index = INVALID_TEXTURE_INDEX;
     matData.pbrA_Index = INVALID_TEXTURE_INDEX;
-
     matData.flags = MAT_FLAG_TERRAIN;
 
     if (visual->textureName.size() > 0) {
@@ -1297,6 +1323,8 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
                 if (idx != INVALID_TEXTURE_INDEX) {
                     matData.pbrR_Index = idx;
                     matData.flags |= MAT_FLAG_HAS_PBR_LAYER;
+                    if (texDescMgr.UseSteepParallax(detailR))
+                        matData.flags |= MAT_FLAG_STEEP_PARALLAX;
                     updated = true;
                 }
             }
@@ -1393,9 +1421,15 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     matData.alphaRef = 0.5f;
     matData.flags = 0;
     matData.shaderVariant = 0;
+    matData.lmapIndex = INVALID_TEXTURE_INDEX;
 
     if (visual->textureName.size() > 0) {
-        matData.detailScale = GetDetailScale(visual->textureName);
+        shared_str baseForScale = visual->textureName;
+        const char* p = baseForScale.c_str();
+        if (const char* comma = strchr(p, ','))
+            baseForScale = shared_str(xr_string(p, comma - p).c_str());
+        if (baseForScale.size())
+            matData.detailScale = GetDetailScale(baseForScale);
     }
 
     if (visual->shaderName.size() > 0) {
@@ -1408,7 +1442,69 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
             matData.flags |= MAT_FLAG_ALPHA_BLEND;
         }
         if (strstr(visual->shaderName.c_str(), "water") != nullptr)
+        {
             matData.flags |= MAT_FLAG_WATER;
+            matData.flags |= MAT_FLAG_ALPHA_BLEND;
+        }
+        const char* sh = visual->shaderName.c_str();
+        const char* tex = visual->textureName.c_str();
+        auto hasName = [](const char* s, const char* k) { return s && strstr(s, k) != nullptr; };
+        const bool metalAlpha = hasName(sh, "metall") || hasName(sh, "metal") || hasName(tex, "metall")
+            || hasName(tex, "metal") || hasName(tex, "grate") || hasName(tex, "fence")
+            || hasName(tex, "grid") || hasName(tex, "setka") || hasName(tex, "zabor")
+            || hasName(tex, "rebar") || hasName(tex, "lattice") || hasName(tex, "netting")
+            || hasName(tex, "rast_");
+        const bool foliageName = hasName(sh, "tree") || hasName(sh, "bush") || hasName(sh, "leaf")
+            || hasName(sh, "flora") || hasName(tex, "tree") || hasName(tex, "trees")
+            || hasName(tex, "leaf") || hasName(tex, "leaves") || hasName(tex, "bush")
+            || hasName(tex, "kust") || hasName(tex, "vetka") || hasName(tex, "flora")
+            || hasName(tex, "elka") || hasName(tex, "sosna");
+        if (foliageName && !metalAlpha)
+            matData.flags |= MAT_FLAG_FOLIAGE;
+        const bool glassName = hasName(tex, "glas\\") || hasName(tex, "glas/")
+            || hasName(tex, "glass\\") || hasName(tex, "glass/")
+            || hasName(tex, "glasses") || hasName(tex, "head_glass")
+            || hasName(tex, "wind_transp") || hasName(sh, "xwindows")
+            || hasName(sh, "xmonolith") || hasName(sh, "xanomaly")
+            || hasName(sh, "pautina") || hasName(sh, "xdistort");
+        if (glassName)
+        {
+            matData.flags |= MAT_FLAG_GLASS;
+            matData.flags |= MAT_FLAG_ALPHA_BLEND;
+            matData.flags |= MAT_FLAG_TWO_SIDED;
+        }
+        if (hasName(sh, "scope") || hasName(sh, "lense"))
+            matData.flags |= MAT_FLAG_SCOPE;
+        if (hasName(sh, "hud3d") || hasName(sh, "hud_p3d"))
+        {
+            matData.flags |= MAT_FLAG_HUD3D;
+            matData.flags |= MAT_FLAG_ALPHA_BLEND;
+        }
+        if (hasName(sh, "wallmark"))
+        {
+            matData.flags |= MAT_FLAG_WMARK;
+            matData.flags |= MAT_FLAG_ALPHA_BLEND;
+        }
+        if (strstr(sh, "lightplane") != nullptr)
+        {
+            matData.flags |= MAT_FLAG_ALPHA_BLEND;
+            matData.flags |= MAT_FLAG_ALPHA_TEST;
+            if (matData.alphaRef <= 0.0f)
+                matData.alphaRef = 0.5f / 255.0f;
+        }
+        const bool emissiveName = strstr(sh, "selflight") != nullptr
+            || strstr(sh, "glow") != nullptr
+            || (tex && (strstr(tex, "glow") != nullptr || strstr(tex, "selflight") != nullptr));
+        if (emissiveName)
+        {
+            matData.flags |= MAT_FLAG_EMISSIVE;
+            float intens = 2.5f;
+            if (strstr(sh, "selflight") || (tex && strstr(tex, "selflight")))
+                intens = 3.5f;
+            if (strstr(sh, "glow") || (tex && strstr(tex, "glow")))
+                intens = 4.5f;
+            matData.emissiveIntensity = intens;
+        }
         matData.shaderVariant = matInfo.shaderVariant;
         matData.flags |= MAT_FLAG_HAS_NORMAL;
     }
@@ -1457,8 +1553,15 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
     matData.pbrIndex = INVALID_TEXTURE_INDEX;
     matData.detailScale = 1.0f;
     matData.alphaRef = 0.01f / 255.0f;
+    matData.lmapIndex = INVALID_TEXTURE_INDEX;
     matData.flags = 0;
     matData.shaderVariant = 0;
+    const char* tex = textureName.c_str();
+    if (ParticleTexLooksEmissive(tex))
+    {
+        matData.flags |= MAT_FLAG_EMISSIVE;
+        matData.emissiveIntensity = ParticleEmissiveIntensity(tex);
+    }
 
     u32 materialID = materialBuffer.RegisterMaterial(matData);
 
@@ -1515,6 +1618,16 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
         MaterialData matData = *existingMat;
         bool updated = false;
 
+        if (!visual && pending.textureName.size()) {
+            const char* tex = pending.textureName.c_str();
+            if (ParticleTexLooksEmissive(tex))
+            {
+                matData.flags |= MAT_FLAG_EMISSIVE;
+                matData.emissiveIntensity = ParticleEmissiveIntensity(tex);
+                updated = true;
+            }
+        }
+
         shared_str diffuseName;
         if (visual) {
             diffuseName = visual->textureName;
@@ -1522,27 +1635,113 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
             diffuseName = pending.textureName;
         }
 
+        const bool isWater = (matData.flags & MAT_FLAG_WATER) != 0;
+        if (isWater)
+        {
+            const char* shader = visual && visual->shaderName.size() ? visual->shaderName.c_str() : "";
+            if (strstr(shader, "studen"))
+                diffuseName = "water\\water_studen";
+            else if (strstr(shader, "ryaska"))
+                diffuseName = "water\\water_ryaska1";
+            else
+                diffuseName = "water\\water_water";
+        }
+
         if (!diffuseName.size() || !diffuseName[0])
             continue;
 
+        xr_vector<xr_string> texSlots;
         {
-            resources::TextureHandle handle = texManager->LoadTexture(diffuseName.c_str());
-            if (handle.IsValid()) {
-                nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
-                if (nvrhiTex) {
-                    u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
-                    if (descriptorIndex != INVALID_TEXTURE_INDEX) {
-                        matData.diffuseIndex = descriptorIndex;
-                        updated = true;
-                    }
+            const char* p = diffuseName.c_str();
+            while (p && *p)
+            {
+                const char* comma = strchr(p, ',');
+                if (comma)
+                {
+                    texSlots.emplace_back(p, comma - p);
+                    p = comma + 1;
+                }
+                else
+                {
+                    texSlots.emplace_back(p);
+                    break;
                 }
             }
         }
 
+        shared_str baseName = !texSlots.empty() ? shared_str(texSlots[0].c_str()) : diffuseName;
+        if (!baseName.size() || !baseName[0] || 0 == xr_strcmp(baseName.c_str(), "$null"))
+        {
+            if (texSlots.size() > 1 && texSlots[1].size() && 0 != xr_strcmp(texSlots[1].c_str(), "$null"))
+                baseName = shared_str(texSlots[1].c_str());
+        }
+
+        auto RegisterTex = [&](const char* name) -> u32 {
+            if (!name || !name[0] || 0 == xr_strcmp(name, "$null"))
+                return INVALID_TEXTURE_INDEX;
+            resources::TextureHandle handle = texManager->LoadTexture(name);
+            if (!handle.IsValid())
+                return INVALID_TEXTURE_INDEX;
+            nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+            if (!nvrhiTex)
+                return INVALID_TEXTURE_INDEX;
+            return backend->RegisterBindlessTexture(nvrhiTex);
+        };
+
+        {
+            u32 descriptorIndex = RegisterTex(baseName.c_str());
+            if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                matData.diffuseIndex = descriptorIndex;
+                updated = true;
+                if (isWater)
+                    Msg("* [MaterialCache] Water diffuse '%s' idx=%u", baseName.c_str(), descriptorIndex);
+            } else if (isWater) {
+                Msg("! [MaterialCache] Water diffuse FAILED '%s'", baseName.c_str());
+            }
+        }
+
+        if (!isWater)
+        {
+            const char* lmapName = nullptr;
+            for (const auto& slot : texSlots)
+            {
+                if (slot.size() >= 4 && 0 == strncmp(slot.c_str(), "lmap", 4))
+                {
+                    lmapName = slot.c_str();
+                    break;
+                }
+            }
+            if (lmapName)
+            {
+                u32 descriptorIndex = RegisterTex(lmapName);
+                if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                    matData.lmapIndex = descriptorIndex;
+                    matData.flags |= MAT_FLAG_HAS_LMAP;
+                    updated = true;
+                }
+            }
+        }
+
+        if ((matData.flags & MAT_FLAG_GLASS) != 0)
+        {
+            u32 descriptorIndex = RegisterTex("pfx" DELIMITER "pfx_dist_glass");
+            if (descriptorIndex != INVALID_TEXTURE_INDEX)
+            {
+                matData.detailIndex = descriptorIndex;
+                matData.flags |= MAT_FLAG_HAS_DETAIL;
+                updated = true;
+            }
+        }
+
         auto& texDescMgr = TextureDescr;
-        shared_str bumpName = texDescMgr.GetBumpName(diffuseName);
+        shared_str bumpName = isWater ? shared_str("water\\water_water_bump")
+            : texDescMgr.GetBumpName(baseName);
         if (bumpName.size() && bumpName[0]) {
             resources::TextureHandle handle = texManager->LoadTexture(bumpName.c_str());
+            if (isWater && !handle.IsValid())
+                handle = texManager->LoadTexture("water\\water_normal");
+            if (isWater && !handle.IsValid())
+                handle = texManager->LoadTexture("fx\\water_normal");
             if (handle.IsValid()) {
                 nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
                 if (nvrhiTex) {
@@ -1556,39 +1755,38 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
             }
         }
 
-        LPCSTR detailTexName = nullptr;
-        if (texDescMgr.GetDetailTexture(diffuseName, detailTexName)) {
-            if (detailTexName && detailTexName[0]) {
-                resources::TextureHandle handle = texManager->LoadTexture(detailTexName);
-                if (handle.IsValid()) {
-                    nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
-                    if (nvrhiTex) {
-                        u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
-                        if (descriptorIndex != INVALID_TEXTURE_INDEX) {
-                            matData.detailIndex = descriptorIndex;
-                            matData.detailScale = texDescMgr.GetDetailScale(diffuseName);
-                            matData.flags |= MAT_FLAG_HAS_DETAIL;
-                            updated = true;
-                        }
+        if (isWater) {
+            u32 descriptorIndex = RegisterTex("water\\water_dudv");
+            if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                matData.detailIndex = descriptorIndex;
+                matData.flags |= MAT_FLAG_HAS_DETAIL;
+                updated = true;
+            }
+        } else {
+            LPCSTR detailTexName = nullptr;
+            if (texDescMgr.GetDetailTexture(baseName, detailTexName)) {
+                if (detailTexName && detailTexName[0]) {
+                    u32 descriptorIndex = RegisterTex(detailTexName);
+                    if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                        matData.detailIndex = descriptorIndex;
+                        matData.detailScale = texDescMgr.GetDetailScale(baseName);
+                        matData.flags |= MAT_FLAG_HAS_DETAIL;
+                        updated = true;
                     }
                 }
             }
         }
 
-        if (diffuseName.c_str() && diffuseName[0]) {
-            shared_str pbrName = texDescMgr.GetPBRName(diffuseName);
+        if (!isWater && baseName.c_str() && baseName[0]) {
+            shared_str pbrName = texDescMgr.GetPBRName(baseName);
             if (!pbrName.empty()) {
-                resources::TextureHandle handle = texManager->LoadTexture(pbrName.c_str());
-                if (handle.IsValid()) {
-                    nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
-                    if (nvrhiTex) {
-                        u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
-                        if (descriptorIndex != INVALID_TEXTURE_INDEX) {
-                            matData.pbrIndex = descriptorIndex;
-                            matData.flags |= MAT_FLAG_HAS_PBR;
-                            updated = true;
-                        }
-                    }
+                u32 descriptorIndex = RegisterTex(pbrName.c_str());
+                if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                    matData.pbrIndex = descriptorIndex;
+                    matData.flags |= MAT_FLAG_HAS_PBR;
+                    if (texDescMgr.UseSteepParallax(baseName))
+                        matData.flags |= MAT_FLAG_STEEP_PARALLAX;
+                    updated = true;
                 }
             }
         }

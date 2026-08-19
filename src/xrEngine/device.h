@@ -102,13 +102,14 @@ private:
     {
         CStatTimer RenderTotal; // pureRender
         CStatTimer EngineTotal; // pureFrame
-        float fFPS, fRFPS, fTPS; // FPS, RenderFPS, TPS
+        float fFPS, fRFPS, fTPS, fFPS_FG;
 
         RenderDeviceStatistics()
         {
             fFPS = 30.f;
             fRFPS = 30.f;
             fTPS = 0;
+            fFPS_FG = 0.f;
         }
     };
 
@@ -208,6 +209,7 @@ public:
     void CleanupVideoModes();
 
     const RenderDeviceStatistics& GetStats() const { return stats; }
+    void SetPresentedFps(float fpsFg) { stats.fFPS_FG = fpsFg; }
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
 
     void* GetApplicationWindowHandle() const override;

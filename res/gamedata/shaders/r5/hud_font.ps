@@ -11,5 +11,8 @@ struct 	v2p
 float4 main ( p_TL I ) : SV_Target
 {
 	float glyph_alpha = s_base.Sample( smp_base, I.Tex0 ).r;
-	return float4(I.Color.rgb, glyph_alpha * I.Color.a);
+	float3 rgb = I.Color.rgb;
+	if (_pad_eye < 0.999)
+		rgb = SRGBToLinear(rgb);
+	return float4(rgb * max(_pad_eye, 1e-4), glyph_alpha * I.Color.a);
 }

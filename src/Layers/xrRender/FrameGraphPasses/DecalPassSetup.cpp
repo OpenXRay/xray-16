@@ -33,8 +33,12 @@ struct DecalPassData {
 
 static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, DecalPassState& state)
 {
-    if (state.initialized)
+    constexpr u32 kDecalPipeVersion = 8;
+    const u32 colorFmt = (u32)fbInfo.colorFormats[0];
+    if (state.initialized && state.pipeVersion == kDecalPipeVersion && state.colorFormat == colorFmt)
         return;
+    state.initialized = false;
+    state.pipeline = nullptr;
 
     auto& cache = GetPassResourceCache();
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -56,7 +60,7 @@ static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::Fram
     state.inputLayout = nvDevice->createInputLayout(&posAttr, 1, state.vs);
 
     state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "Decal", *vsResult.reflection, *psResult.reflection, nvDevice);
+        "Decal_v2", *vsResult.reflection, *psResult.reflection, nvDevice);
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
     pipeDesc.setVertexShader(state.vs);
@@ -81,8 +85,12 @@ static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::Fram
     blend.setDestBlendAlpha(nvrhi::BlendFactor::InvSrcAlpha);
     blend.setBlendOpAlpha(nvrhi::BlendOp::Add);
 
-    state.pipeline = cache.GetOrCreatePipeline("Decal", pipeDesc, fbInfo, nvDevice);
+    char pipeName[64];
+    xr_sprintf(pipeName, "Decal_v8_SrcA_%u", colorFmt);
+    state.pipeline = cache.GetOrCreatePipeline(pipeName, pipeDesc, fbInfo, nvDevice);
     state.initialized = state.pipeline != nullptr;
+    state.pipeVersion = kDecalPipeVersion;
+    state.colorFormat = colorFmt;
 }
 
 DefaultOutputLayout setupDecalPass(
@@ -121,6 +129,10 @@ DefaultOutputLayout setupDecalPass(
             auto* colorTex = fg.GetPhysicalTexture(data.sceneColor);
             if (!depthTex || !normalTex || !colorTex)
                 return;
+
+            nvrhi::FramebufferInfoEx fmtInfo;
+            fmtInfo.colorFormats.push_back(colorTex->getDesc().format);
+            InitializeDecalResources(data.device, fmtInfo, *data.passState);
 
             data.decalMgr->Upload(ctx);
 

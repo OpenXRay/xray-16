@@ -31,6 +31,9 @@ public:
 
     static void InvalidateReflectionCache();
 
+    bool HasSRV(const char* name) const;
+    bool HasUAV(const char* name) const;
+
     BindingSetBuilder& Texture(const char* name, nvrhi::ITexture* texture,
                                nvrhi::Format format = nvrhi::Format::UNKNOWN,
                                nvrhi::TextureSubresourceSet subresources = nvrhi::AllSubresources);
@@ -58,6 +61,7 @@ public:
 
 private:
     const ReflectedLists* m_lists;
+    nvrhi::IDevice* m_device = nullptr;
 
     nvrhi::BindingSetDesc m_desc;
 

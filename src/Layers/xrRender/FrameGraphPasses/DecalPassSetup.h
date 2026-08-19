@@ -28,6 +28,8 @@ struct DecalPassState {
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
     bool initialized = false;
+    u32 pipeVersion = 0;
+    u32 colorFormat = 0;
 };
 
 framegraph::DefaultOutputLayout setupDecalPass(

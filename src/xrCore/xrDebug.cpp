@@ -83,7 +83,7 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
     {
         SDL_MESSAGEBOX_ERROR,
         windowHandler ? windowHandler->GetApplicationWindow() : nullptr,
-        title, message, SDL_arraysize(buttons), buttons, nullptr
+        title, message, (int)(sizeof(buttons) / sizeof(buttons[0])), buttons, nullptr
     };
 
     int button = -1;
@@ -289,7 +289,7 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
             // we must hide the window
             if (windowHandler && !DebuggerIsPresent())
                 windowHandler->OnFatalError();
-                DEBUG_BREAK;
+            DEBUG_BREAK;
         } // switch (result)
     }
 

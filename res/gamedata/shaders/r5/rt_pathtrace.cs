@@ -1,22 +1,26 @@
 #include "bindless_common.h"
+#include "shared/terrain_blend.h"
+#include "shared/pbr_brdf.h"
 #include "rt_common.h"
+#include "rt_grass_alpha.h"
+#include "rt_visibility.h"
 
 cbuffer PathTracerParams : register(b5) {
     float4x4 g_InvViewProj;
     float4 g_CameraPos;
     float4 g_SunDir_Intensity;
     float4 g_SunColor_SkyWeight;
+    float4 g_SkyColor;
     float g_ScreenWidth;
     float g_ScreenHeight;
     uint g_SampleIndex;
     uint g_MaxBounces;
     uint g_IdentityStaticCount;
     uint g_TerrainBatchCount;
-    uint g_TransparentBatchCount;
     uint g_SkinnedBatchStart;
     uint g_GrassBatchStart;
     uint g_DetailAtlasIndex;
-    uint2 g_Pad;
+    uint3 g_Pad;
 };
 
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
@@ -29,6 +33,7 @@ ByteAddressBuffer g_SkinnedVB : register(t7);
 ByteAddressBuffer g_SkinnedIB : register(t11);
 ByteAddressBuffer g_GrassVB : register(t12);
 ByteAddressBuffer g_GrassIB : register(t13);
+Texture3D<float> t_BlueNoise : register(t14);
 
 RWTexture2D<float4> g_Accumulation : register(u0);
 RWTexture2D<float4> g_Output : register(u1);
@@ -37,13 +42,13 @@ static const uint MAX_ALPHA_SKIPS = 8;
 
 bool IsSkinnedBatch(uint batchIdx)
 {
-    return g_SkinnedBatchStart > 0 && batchIdx >= g_SkinnedBatchStart &&
-           !(g_GrassBatchStart > 0 && batchIdx >= g_GrassBatchStart);
+    return g_SkinnedBatchStart != 0xFFFFFFFFu && batchIdx >= g_SkinnedBatchStart &&
+           (g_GrassBatchStart == 0xFFFFFFFFu || batchIdx < g_GrassBatchStart);
 }
 
 bool IsGrassBatch(uint batchIdx)
 {
-    return g_GrassBatchStart > 0 && batchIdx >= g_GrassBatchStart;
+    return g_GrassBatchStart != 0xFFFFFFFFu && batchIdx == g_GrassBatchStart;
 }
 
 float4 SampleTerrainTexture(uint index, float2 uv)
@@ -60,19 +65,12 @@ float3 SampleTerrainAlbedo(TerrainMaterialData mat, float2 uv)
 
     float4 baseSample = SampleTerrainTexture(mat.baseAlbedoIndex, baseUV);
 
-    float4 mask = SampleTerrainTexture(mat.blendMaskIndex, baseUV);
-    float maskSum = dot(mask, float4(1, 1, 1, 1));
-    if (maskSum > 0.001)
-        mask /= maskSum;
-    else
-        mask = float4(0.25, 0.25, 0.25, 0.25);
-
-    float3 detailR = SampleTerrainTexture(mat.detailR_Index, detailUV).rgb;
-    float3 detailG = SampleTerrainTexture(mat.detailG_Index, detailUV).rgb;
-    float3 detailB = SampleTerrainTexture(mat.detailB_Index, detailUV).rgb;
-    float3 detailA = SampleTerrainTexture(mat.detailA_Index, detailUV).rgb;
-
-    float3 blendedDetail = detailR * mask.r + detailG * mask.g + detailB * mask.b + detailA * mask.a;
+    float4 mask = TerrainNormalizeMask(SampleTerrainTexture(mat.blendMaskIndex, baseUV));
+    float4 detailR = SampleTerrainTexture(mat.detailR_Index, detailUV);
+    float4 detailG = SampleTerrainTexture(mat.detailG_Index, detailUV);
+    float4 detailB = SampleTerrainTexture(mat.detailB_Index, detailUV);
+    float4 detailA = SampleTerrainTexture(mat.detailA_Index, detailUV);
+    float3 blendedDetail = TerrainBlendRGB(detailR.rgb, detailG.rgb, detailB.rgb, detailA.rgb, mask);
     return baseSample.rgb * blendedDetail * 2.0;
 }
 
@@ -140,7 +138,7 @@ float3 SampleSky(float3 dir)
     float w = g_SunColor_SkyWeight.w;
     float3 s0 = g_Sky0.SampleLevel(smp_linear, dir, 0).rgb;
     float3 s1 = g_Sky1.SampleLevel(smp_linear, dir, 0).rgb;
-    return lerp(s0, s1, w);
+    return lerp(s0, s1, w) * g_SkyColor.rgb * 0.33;
 }
 
 float3 GenerateCameraRay(uint2 pixel, inout uint rng, out float3 origin)
@@ -221,13 +219,12 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         while (q.Proceed()) {
             if (q.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE) {
                 uint candBatch = q.CandidateInstanceID() + q.CandidateGeometryIndex();
-                if (IsGrassBatch(candBatch) && g_DetailAtlasIndex > 0) {
-                    RTBatchInfo candInfo = g_BatchInfo[candBatch];
-                    float2 candUV = GetSkinnedHitUV(g_GrassVB, g_GrassIB, candInfo,
-                        q.CandidatePrimitiveIndex(), q.CandidateTriangleBarycentrics());
-                    float4 texel = GetBindlessTexture(g_DetailAtlasIndex).SampleLevel(smp_linear, candUV, 0);
-                    if (texel.a >= 0.3)
+                if (IsGrassBatch(candBatch)) {
+                    if (GrassTexelOpaque(g_GrassVB, g_GrassIB, g_BatchInfo, candBatch,
+                            q.CandidatePrimitiveIndex(), q.CandidateTriangleBarycentrics(),
+                            g_DetailAtlasIndex))
                         q.CommitNonOpaqueTriangleHit();
+                    continue;
                 }
             }
         }
@@ -274,10 +271,12 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
             continue;
         }
 
-        if ((hitMat.flags & MAT_FLAG_ALPHA_TEST) && hitMat.alpha < hitMat.alphaRef) {
-            origin = origin + direction * hitT + direction * 0.002;
-            bounce--;
-            continue;
+        if ((hitMat.flags & MAT_FLAG_ALPHA_TEST) && (hitMat.flags & MAT_FLAG_ALPHA_BLEND) == 0) {
+            if (hitMat.alpha < 0.5) {
+                origin = origin + direction * hitT + direction * 0.002;
+                bounce--;
+                continue;
+            }
         }
 
         if ((hitMat.flags & MAT_FLAG_ALPHA_BLEND) && hitMat.alpha < 0.5) {
@@ -301,17 +300,16 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
                 shadowRay.TMax = 10000.0;
 
                 RayQuery<RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES> shadowQ;
-                shadowQ.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, 0xFF, shadowRay);
+                shadowQ.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, RT_MASK_SHADOW, shadowRay);
                 while (shadowQ.Proceed()) {
                     if (shadowQ.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE) {
                         uint candBatch = shadowQ.CandidateInstanceID() + shadowQ.CandidateGeometryIndex();
-                        if (IsGrassBatch(candBatch) && g_DetailAtlasIndex > 0) {
-                            RTBatchInfo candInfo = g_BatchInfo[candBatch];
-                            float2 candUV = GetSkinnedHitUV(g_GrassVB, g_GrassIB, candInfo,
-                                shadowQ.CandidatePrimitiveIndex(), shadowQ.CandidateTriangleBarycentrics());
-                            float4 texel = GetBindlessTexture(g_DetailAtlasIndex).SampleLevel(smp_linear, candUV, 0);
-                            if (texel.a >= 0.3)
+                        if (IsGrassBatch(candBatch)) {
+                            if (GrassTexelOpaque(g_GrassVB, g_GrassIB, g_BatchInfo, candBatch,
+                                    shadowQ.CandidatePrimitiveIndex(), shadowQ.CandidateTriangleBarycentrics(),
+                                    g_DetailAtlasIndex))
                                 shadowQ.CommitNonOpaqueTriangleHit();
+                            continue;
                         }
                     }
                 }
@@ -323,13 +321,8 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
                 RTBatchInfo sInfo = g_BatchInfo[sBatchIdx];
 
                 if (IsGrassBatch(sBatchIdx)) {
-                    if (g_DetailAtlasIndex > 0) {
-                        shadowAtten = 0.0;
-                        break;
-                    }
-                    shadowAtten *= 0.5;
-                    shadowOrigin = shadowOrigin + sunDir * (shadowQ.CommittedRayT() + 0.002);
-                    continue;
+                    shadowAtten = 0.0;
+                    break;
                 }
 
                 MaterialData sMat = g_Materials[sInfo.materialID];
@@ -358,9 +351,10 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
                 float4 sDiffuse = SampleDiffuseLevel(sMat, sUV);
 
-                if ((sMat.flags & MAT_FLAG_ALPHA_TEST) && sDiffuse.a < sMat.alphaRef) {
-                    shadowOrigin = shadowOrigin + sunDir * (shadowQ.CommittedRayT() + 0.002);
-                    continue;
+                if ((sMat.flags & MAT_FLAG_FOLIAGE) ||
+                    ((sMat.flags & MAT_FLAG_ALPHA_TEST) && (sMat.flags & MAT_FLAG_ALPHA_BLEND) == 0)) {
+                    shadowAtten = 0.0;
+                    break;
                 }
 
                 if ((sMat.flags & MAT_FLAG_ALPHA_BLEND) && sDiffuse.a < 0.5) {

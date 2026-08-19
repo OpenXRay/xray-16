@@ -24,6 +24,9 @@ option(XRAY_USE_ASAN     "Use AddressSanitizer"       OFF)
 option(XRAY_ENABLE_TRACY "Enable tracy profiler"      OFF)
 option(XRAY_USE_AI_PBR   "Enable AI PBR texture converter (requires ONNX Runtime)" OFF)
 
+option(XRAY_USE_DLSS     "Enable NVIDIA DLSS / NGX (requires SDK)" OFF)
+option(XRAY_USE_NRD      "Enable NVIDIA NRD denoise via NRDIntegration+NRI (Linux Vulkan: -DXRAY_USE_NRD=ON)" OFF)
+
 include(XRay.Build)
 include(XRay.Windows.Externals)
 include(XRay.Packaging)

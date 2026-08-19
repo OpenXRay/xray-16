@@ -222,7 +222,9 @@ void CRenderDevice::UpdateWindowState()
     if (!m_sdlWnd)
         return;
 
+    int winW = 0, winH = 0;
     int pxW = 0, pxH = 0;
+    SDL_GetWindowSize(m_sdlWnd, &winW, &winH);
     SDL_GetWindowSizeInPixels(m_sdlWnd, &pxW, &pxH);
     m_windowVisible = (pxW > 0 && pxH > 0);
     if (!m_windowVisible)
@@ -232,16 +234,18 @@ void CRenderDevice::UpdateWindowState()
     {
         if (psDeviceMode.WindowStyle == rsWindowed)
         {
-            psDeviceMode.Width = static_cast<u32>(pxW);
-            psDeviceMode.Height = static_cast<u32>(pxH);
+            psDeviceMode.Width = static_cast<u32>(winW);
+            psDeviceMode.Height = static_cast<u32>(winH);
         }
         Reset();
         return;
     }
 
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = { static_cast<float>(dwWidth), static_cast<float>(dwHeight) };
-    io.DisplayFramebufferScale = ImVec2{ 1.0f, 1.0f };
+    io.DisplaySize = { static_cast<float>(winW), static_cast<float>(winH) };
+    io.DisplayFramebufferScale = ImVec2{
+        (winW > 0) ? static_cast<float>(pxW) / static_cast<float>(winW) : 1.0f,
+        (winH > 0) ? static_cast<float>(pxH) / static_cast<float>(winH) : 1.0f };
 }
 
 SDL_Window* CRenderDevice::GetApplicationWindow()

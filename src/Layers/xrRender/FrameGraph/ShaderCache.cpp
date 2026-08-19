@@ -23,13 +23,21 @@ void ShaderCache::GetCachePath(
     u32 sourceHash,
     string_path& outPath)
 {
+    string_path safeName;
+    xr_strcpy(safeName, shaderName);
+    for (char* p = safeName; *p; ++p)
+    {
+        if (*p == '/' || *p == '\\')
+            *p = '_';
+    }
+
     string_path shaderDir;
     if (m_backendSubdir.empty())
         xr_sprintf(shaderDir, "shaders_cache_fg%s%s%s",
-            DELIMITER, shaderName, extension);
+            DELIMITER, safeName, extension);
     else
         xr_sprintf(shaderDir, "shaders_cache_fg%s%s%s%s%s",
-            DELIMITER, m_backendSubdir.c_str(), DELIMITER, shaderName, extension);
+            DELIMITER, m_backendSubdir.c_str(), DELIMITER, safeName, extension);
 
     xr_sprintf(outPath, "%s%s%08X",
         shaderDir, DELIMITER, sourceHash);

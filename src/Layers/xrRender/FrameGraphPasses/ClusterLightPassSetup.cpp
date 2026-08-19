@@ -10,6 +10,9 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 
+extern ENGINE_API int ps_r_rt_gi;
+extern ENGINE_API int ps_r_path_tracer;
+
 namespace xray::render::fg::passes
 {
 using namespace framegraph;
@@ -120,7 +123,8 @@ void setupClusterLightPass(
     const Fmatrix& prevViewProj,
     bool hasPrevViewProj)
 {
-    bool useHiZ = hasPrevViewProj && hizPyramid.is_valid() && hizWidth > 0 && hizHeight > 0;
+    bool useHiZ = hasPrevViewProj && hizPyramid.is_valid() && hizWidth > 0 && hizHeight > 0
+        && ps_r_rt_gi == 0 && ps_r_path_tracer == 0;
 
     fg.addCallbackPass<ClusterLightPassData>(
         "ClusterLightAssign",
@@ -176,6 +180,15 @@ void setupClusterLightPass(
                     {
                         const u32 zero = 0;
                         cmdList->writeBuffer(data.lightManager->GetVisibleLightCountBuffer(), &zero, sizeof(u32));
+                        {
+                            static std::array<u32, MAX_LIGHTS> s_zeroMask{};
+                            const u32 clearCount = data.lightManager->GetLightCount();
+                            if (clearCount > 0)
+                                cmdList->writeBuffer(
+                                    data.lightManager->GetVisibleLightIndicesBuffer(),
+                                    s_zeroMask.data(),
+                                    clearCount * sizeof(u32));
+                        }
 
                         LightHiZCullCB cullCB;
                         cullCB.prevViewProj = data.prevViewProj;
@@ -203,18 +216,21 @@ void setupClusterLightPass(
                             auto cullBindingSet = cache.GetOrCreateBindingSet(
                                 bsb.Build(), data.passState->cullLayout, nvDevice);
 
-                            nvrhi::ComputeState cullState;
-                            cullState.pipeline = data.passState->cullPipeline;
-                            cullState.bindings = { cullBindingSet };
-                            cmdList->setComputeState(cullState);
+                            if (cullBindingSet)
+                            {
+                                nvrhi::ComputeState cullState;
+                                cullState.pipeline = data.passState->cullPipeline;
+                                cullState.bindings = { cullBindingSet };
+                                cmdList->setComputeState(cullState);
 
-                            u32 groups = (data.lightManager->GetLightCount() + 63) / 64;
-                            cmdList->dispatch(groups, 1, 1);
+                                u32 groups = (data.lightManager->GetLightCount() + 63) / 64;
+                                cmdList->dispatch(groups, 1, 1);
 
-                            cmdList->commitBarriers();
-                            if (psDeviceFlags.test(rsStatistic))
-                                data.lightManager->ScheduleStatsReadback(cmdList);
-                            didHiZCull = true;
+                                cmdList->commitBarriers();
+                                if (psDeviceFlags.test(rsStatistic))
+                                    data.lightManager->ScheduleStatsReadback(cmdList);
+                                didHiZCull = true;
+                            }
                         }
                     }
                 }

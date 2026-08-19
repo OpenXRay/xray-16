@@ -4,6 +4,7 @@
 #include "ShaderConstants.h"  // CB layout definitions and FillGlobalConstants/FillDynamicTransforms
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"  // For loading bindless shaders
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
@@ -34,8 +35,12 @@ namespace xray::render::fg::passes {
 
 void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ForwardColorPassState& state)
 {
-    if (state.bindlessInitialized)
+    constexpr u32 kForwardPipeVersion = 6;
+    if (state.bindlessInitialized && state.pipeVersion == kForwardPipeVersion)
         return;
+    state.bindlessInitialized = false;
+    state.terrainInitialized = false;
+    state.pipeVersion = 0;
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice)
@@ -58,7 +63,7 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
 
     auto& cache = framegraph::GetPassResourceCache();
 
-    state.bindlessLayout = cache.GetOrCreateBindingLayoutFromReflection("ForwardColor", *vsResult.reflection, *psResult.reflection, nvDevice);
+    state.bindlessLayout = cache.GetOrCreateBindingLayoutFromReflection("ForwardColor_v4", *vsResult.reflection, *psResult.reflection, nvDevice);
 
     u32 attrCount = 0;
     auto* attrs = GetUnifiedVertexAttributes(attrCount);
@@ -90,8 +95,9 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
     pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+    pipeDesc.renderState.blendState.alphaToCoverageEnable = true;
 
-    state.bindlessPipeline = cache.GetOrCreatePipeline("ForwardColor", pipeDesc, fbInfo, nvDevice);
+    state.bindlessPipeline = cache.GetOrCreatePipeline("ForwardColor_v4_WPos", pipeDesc, fbInfo, nvDevice);
     if (!state.bindlessPipeline) {
         Msg("! [BindlessForward] Failed to create pipeline");
         return;
@@ -100,10 +106,12 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
     QueryBindingLayoutFromPipeline(state.bindlessPipeline, state.bindlessLayout);
 
     auto terrainPsResult = shaderLoader->LoadPixelShader("bindless_terrain", "main");
-    if (terrainPsResult.handle) {
+    if (!terrainPsResult.handle) {
+        Msg("! [BindlessForward] Failed to load bindless_terrain.ps — terrain will not render");
+    } else {
         state.terrainPS = terrainPsResult.handle;
         state.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection(
-            "ForwardColor_Terrain", *vsResult.reflection, *terrainPsResult.reflection, nvDevice);
+            "ForwardColor_Terrain_v6", *vsResult.reflection, *terrainPsResult.reflection, nvDevice);
 
         if (state.terrainLayout) {
             nvrhi::GraphicsPipelineDesc terrainPipeDesc;
@@ -120,13 +128,18 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
             terrainPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
             terrainPipeDesc.renderState.rasterState.frontCounterClockwise = false;
             terrainPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-            state.terrainPipeline = cache.GetOrCreatePipeline("ForwardColor_Terrain", terrainPipeDesc, fbInfo, nvDevice);
+            state.terrainPipeline = cache.GetOrCreatePipeline("ForwardColor_Terrain_v6_WPos", terrainPipeDesc, fbInfo, nvDevice);
             if (state.terrainPipeline)
                 state.terrainInitialized = true;
+            else
+                Msg("! [BindlessForward] Failed to create terrain pipeline");
+        } else {
+            Msg("! [BindlessForward] Failed to create terrain binding layout");
         }
     }
 
     state.bindlessInitialized = true;
+    state.pipeVersion = kForwardPipeVersion;
     Msg("* [BindlessForward] Pipeline initialized");
 }
 
@@ -137,6 +150,7 @@ static void renderBindlessForward(
     nvrhi::ITexture* colorRT,
     nvrhi::ITexture* normalRT,
     nvrhi::ITexture* baseColorRT,
+    nvrhi::ITexture* worldPosRT,
     nvrhi::ITexture* depthRT,
     const BindlessForwardConfig& config,
     MaterialCache* materialCache,
@@ -171,16 +185,22 @@ static void renderBindlessForward(
         fbDesc.addColorAttachment(normalRT);
     if (baseColorRT)
         fbDesc.addColorAttachment(baseColorRT);
+    if (worldPosRT)
+        fbDesc.addColorAttachment(worldPosRT);
     fbDesc.setDepthAttachment(depthRT);
     auto& cache = framegraph::GetPassResourceCache();
-    auto framebuffer = cache.GetOrCreateFramebuffer("ForwardColor", fbDesc, nvDevice);
+    auto framebuffer = cache.GetOrCreateFramebuffer(worldPosRT ? "ForwardColorWPos" : "ForwardColor", fbDesc, nvDevice);
 
     auto lightingCB = cache.GetOrCreateVolatileCB("ForwardColor", "LightingCB", sizeof(LightingConstants), device);
-    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), device);
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), device, 512);
     auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("ForwardColor", nvDevice);
 
     auto lightingData = FillLightingConstants();
     cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
+    {
+        StaticGlobals sg = BuildStaticGlobals();
+        cmdList->writeBuffer(staticGlobalsCB, &sg, sizeof(sg));
+    }
 
     auto& variantTexBuffer = bindless::VariantTextureBuffer::Instance();
 
@@ -193,7 +213,8 @@ static void renderBindlessForward(
     auto buildBindingDescForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetDesc {
         framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "ForwardColor");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-        bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+        BindBindlessMaterialTables(bsb);
+        BindEnvIblCubes(bsb, device);
         bsb.BufferSRV("g_InstanceData", set.instanceBuffer);
         bsb.BufferSRV("g_CompactBatchIndices", set.compactBatchIndicesBuffer);
         bsb.BufferSRV("g_CompactMaterialIDs", set.compactMaterialIDBuffer);
@@ -324,7 +345,8 @@ static void renderBindlessForward(
             auto* terrainPsRefl = shaderLoader->GetCachedReflection("bindless_terrain", ".ps");
             framegraph::BindingSetBuilder terrainBsb(*terrainVsRefl, *terrainPsRefl, nvDevice, "ForwardColor.Terrain");
             terrainBsb.ConstantBuffer("static_globals", staticGlobalsCB);
-            terrainBsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
+            BindBindlessMaterialTables(terrainBsb);
+            BindEnvIblCubes(terrainBsb, device);
             terrainBsb.BufferSRV("g_InstanceData", config.terrainInstanceBuffer);
             terrainBsb.BufferSRV("g_CompactBatchIndices", config.terrainCompactBatchIndicesBuffer);
             terrainBsb.BufferSRV("g_CompactMaterialIDs", config.terrainCompactMaterialIDBuffer);
@@ -333,8 +355,9 @@ static void renderBindlessForward(
             terrainBsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
 
             auto terrainBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainBsb.Build(), ps.terrainLayout, nvDevice);
-            R_ASSERT2(terrainBindingSet, "Terrain binding set creation failed");
-
+            if (!terrainBindingSet) {
+                Msg("! [ForwardColor] Terrain binding set creation failed");
+            } else {
             // Set up terrain graphics state
             nvrhi::GraphicsState terrainState;
             terrainState.pipeline = ps.terrainPipeline;
@@ -360,6 +383,7 @@ static void renderBindlessForward(
 
             cmdList->setGraphicsState(terrainState);
             DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, config.terrainObjectCount);
+            }
 
         }
     }
@@ -387,11 +411,11 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
 
     if (state) {
         nvrhi::FramebufferInfoEx fbInfo;
-        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
-        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
-        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
-        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
-        fbInfo.depthFormat = nvrhi::Format::D32;
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
+    fbInfo.depthFormat = nvrhi::Format::D32;
         InitializeForwardResources(device, fbInfo, *state);
     }
 
@@ -417,6 +441,17 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             data.normal = passBuilder.write(normalInput, ResourceState::RenderTarget);
             if (baseColorInput.is_valid())
                 data.baseColor = passBuilder.write(baseColorInput, ResourceState::RenderTarget);
+            {
+                ResourceDesc wpDesc;
+                wpDesc.type = ResourceDesc::Type::Texture2D;
+                wpDesc.width = width;
+                wpDesc.height = height;
+                wpDesc.format = nvrhi::Format::RGBA32_FLOAT;
+                wpDesc.isRenderTarget = true;
+                wpDesc.isTransient = true;
+                wpDesc.debugName = "rt_ForwardWorldPos";
+                data.worldPos = passBuilder.createTexture("rt_ForwardWorldPos", wpDesc);
+            }
 
             if (drawArgsInput.is_valid()) {
                 data.drawArgsBuffer = passBuilder.read(drawArgsInput, ResourceState::IndirectArgument);
@@ -425,6 +460,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             data.outputs.albedo = data.color;
             data.outputs.normal = data.normal;
             data.outputs.baseColor = data.baseColor;
+            data.outputs.worldPos = data.worldPos;
             data.outputs.depth = data.depth;
         },
 
@@ -439,6 +475,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
+            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
 
             if (!depthRT || !colorRT)
                 return;
@@ -450,6 +487,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                     cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
                 if (baseColorRT)
                     cmdList->clearTextureFloat(baseColorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
+                if (worldPosRT)
+                    cmdList->clearTextureFloat(worldPosRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
             }
 
             // Check if we have geometry to render
@@ -475,6 +514,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 colorRT,
                 normalRT,
                 baseColorRT,
+                worldPosRT,
                 depthRT,
                 data.bindlessConfig,
                 data.materialCache,
@@ -487,6 +527,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     outputs.albedo = passData.color;
     outputs.normal = passData.normal;
     outputs.baseColor = passData.baseColor;
+    outputs.worldPos = passData.worldPos;
     outputs.depth = passData.depth;
     return outputs;
 }

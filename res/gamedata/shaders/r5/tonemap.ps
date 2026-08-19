@@ -1,46 +1,186 @@
-// xrRender/Shaders/tonemap.ps.hlsl
-// Tonemap pass - currently passthrough until HDR lighting is implemented
-//
-// When HDR is ready, this will apply:
-// - Auto-exposure from ExposurePass
-// - ACES filmic tonemapping
-// - Gamma correction (if needed)
-//
-// Inputs:
-//   t0: Scene color (RGBA16_FLOAT or RGBA8_UNORM)
-//   t1: Exposure texture (1x1 R32_FLOAT from ExposurePass) - unused for now
-//   s0: Linear sampler
+#define SM_6_0
 
 Texture2D t_hdr : register(t0);
-Texture2D<float> t_exposure : register(t1);  // Reserved for future HDR
+Texture2D<float> t_exposure : register(t1);
+Texture2D t_bloom : register(t2);
+Texture2D<float> t_depth : register(t3);
+SamplerState smp_rtlinear : register(s0);
 
-#include "common_samplers.h"
+cbuffer TonemapHDR : register(b5)
+{
+    float g_Hdr10;
+    float g_PaperWhite;
+    float g_PeakNits;
+    float g_HudNits;
+    float4 g_DofParams;
+    float4 g_DofMblur;
+    float4 g_EyePos;
+    float4x4 g_InvVP;
+    float4x4 g_PrevVP;
+    float g_ExposureBias;
+    float g_Contrast;
+    float g_Saturation;
+    float g_WhitePoint;
+    float g_Lift;
+    float g_Gamma;
+    float g_Gain;
+    float g_BloomScale;
+    float g_Temp;
+    float g_Tint;
+    float g_Pad0;
+    float g_Pad1;
+    float4 g_PadGrade;
+};
 
 struct PS_INPUT {
     float4 position : SV_POSITION;
     float2 texcoord : TEXCOORD0;
 };
 
-// ACES Filmic tonemap (Narkowicz 2015) - for future HDR use
-// float3 ACESFilm(float3 x) {
-//     float a = 2.51;
-//     float b = 0.03;
-//     float c = 2.43;
-//     float d = 0.59;
-//     float e = 0.14;
-//     return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
-// }
+float3 SRGBToLinear(float3 c)
+{
+    float3 lo = c / 12.92;
+    float3 hi = pow(max((c + 0.055) / 1.055, 0.0), 2.4);
+    return lerp(lo, hi, step(0.04045, c));
+}
 
-float4 main(PS_INPUT input) : SV_TARGET {
-    float4 color = t_hdr.Sample(smp_linear, input.texcoord);
+float3 ReconstructWorld(float2 uv, float depth)
+{
+    float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0, depth, 1.0);
+    float4 world = mul(g_InvVP, clip);
+    return world.xyz / max(world.w, 1e-8);
+}
 
-    // Apply exposure uniformly to entire scene
-    // float exposure = t_exposure.Load(int3(0, 0, 0));
-    // exposure = clamp(exposure, 0.1, 16.0);
-    // color.rgb *= exposure;
+float ViewZ(float2 uv, float depth)
+{
+    if (depth <= 1e-7)
+        return g_DofParams.w;
+    return length(ReconstructWorld(uv, depth) - g_EyePos.xyz);
+}
 
-    // TODO: Enable ACES tonemapping when HDR lighting is fully implemented
-    // color.rgb = ACESFilm(color.rgb);
+float DOFFactor(float depthZ)
+{
+    float dist_to_focus = depthZ - g_DofParams.y;
+    float blur_far = saturate(dist_to_focus / max(g_DofParams.z - g_DofParams.y, 1e-3));
+    float blur_near = saturate(dist_to_focus / min(g_DofParams.x - g_DofParams.y, -1e-3));
+    float blur = blur_near + blur_far;
+    return blur * blur;
+}
 
-    return color;
+float3 TonemapTap(float2 uv, float scale)
+{
+    float3 rgb = t_hdr.SampleLevel(smp_rtlinear, uv, 0).rgb * scale;
+    float depth = t_depth.SampleLevel(smp_rtlinear, uv, 0);
+    if (depth <= 1e-7)
+        return rgb * 2.5;
+    float w = max(g_WhitePoint, 0.2);
+    w *= w;
+    return (rgb * (1.0 + rgb / w)) / (rgb + 1.0);
+}
+
+float3 ApplyDof(float3 img, float2 center, float scale)
+{
+    if (g_DofMblur.z < 0.5)
+        return img;
+    float depthZ = ViewZ(center, t_depth.SampleLevel(smp_rtlinear, center, 0));
+    float blur = DOFFactor(depthZ);
+    float2 scaleUv = float2(0.5 / 1024.0, 0.5 / 768.0) * (g_DofMblur.x * blur);
+    float2 o[12] = {
+        float2(-0.326212, -0.405810), float2(-0.840144, -0.073580),
+        float2(-0.695914,  0.457137), float2(-0.203345,  0.620716),
+        float2( 0.962340, -0.194983), float2( 0.473434, -0.480026),
+        float2( 0.519456,  0.767022), float2( 0.185461, -0.893124),
+        float2( 0.507431,  0.064425), float2( 0.896420,  0.412458),
+        float2(-0.321940, -0.932615), float2(-0.791559, -0.597710)
+    };
+    float3 sum = img;
+    float contrib = 1.0;
+    [unroll]
+    for (int i = 0; i < 12; i++)
+    {
+        float2 tap = saturate(center + o[i] * scaleUv);
+        float tapZ = ViewZ(tap, t_depth.SampleLevel(smp_rtlinear, tap, 0));
+        float tapC = DOFFactor(tapZ);
+        sum += TonemapTap(tap, scale) * tapC;
+        contrib += tapC;
+    }
+    return sum / max(contrib, 1e-3);
+}
+
+float3 ApplyMblur(float3 img, float2 uv, float scale)
+{
+    if (g_DofMblur.w < 0.5)
+        return img;
+    float depth = t_depth.SampleLevel(smp_rtlinear, uv, 0);
+    if (depth <= 1e-7)
+        return img;
+    float3 wp = ReconstructWorld(uv, depth);
+    float4 prev = mul(g_PrevVP, float4(wp, 1.0));
+    float2 prevUv = prev.xy / max(prev.w, 1e-8);
+    prevUv = float2(prevUv.x * 0.5 + 0.5, 1.0 - (prevUv.y * 0.5 + 0.5));
+    float2 vel = (uv - prevUv) * (g_DofMblur.y / 12.0);
+    vel = clamp(vel, float2(-0.001, -0.001), float2(0.001, 0.001));
+    float3 blurred = img;
+    [unroll]
+    for (int i = 1; i <= 11; i++)
+        blurred += TonemapTap(saturate(uv + vel * (float)i), scale);
+    return blurred / 12.0;
+}
+
+float4 main(PS_INPUT input) : SV_TARGET
+{
+    float2 uv = saturate(input.texcoord);
+    float3 rgb = t_hdr.SampleLevel(smp_rtlinear, uv, 0).rgb;
+    float depth = t_depth.SampleLevel(smp_rtlinear, uv, 0);
+
+    float scale = t_exposure.Load(int3(0, 0, 0));
+    scale = clamp(scale, 1.0 / 128.0, 20.0);
+    rgb *= scale;
+
+    rgb *= exp2(g_ExposureBias);
+
+    float3 low;
+    if (depth <= 1e-7)
+    {
+        low = rgb * 2.5;
+    }
+    else
+    {
+        float fWhiteIntensitySQR = max(g_WhitePoint, 0.2);
+        fWhiteIntensitySQR *= fWhiteIntensitySQR;
+        low = (rgb * (1.0 + rgb / fWhiteIntensitySQR)) / (rgb + 1.0);
+    }
+
+    float4 bloom = t_bloom.SampleLevel(smp_rtlinear, uv, 0);
+    float bloomA = max(bloom.a, 0.0) * g_BloomScale;
+    float3 combined = low + bloom.rgb * bloomA;
+    if (depth <= 1e-7)
+    {
+        float bloomLum = dot(bloom.rgb, float3(0.3333, 0.3333, 0.3333));
+        combined = low + bloom.rgb * max(bloomA, 0.35 * bloomLum);
+    }
+    combined = ApplyDof(combined, uv, scale);
+    combined = ApplyMblur(combined, uv, scale);
+    combined = (combined - 0.5) * g_Contrast + 0.5 + g_Lift;
+    combined = pow(max(combined, 0.0), max(g_Gamma, 0.05)) * g_Gain;
+    float luma = dot(combined, float3(0.2126, 0.7152, 0.0722));
+    combined = lerp(luma.xxx, combined, g_Saturation);
+    combined.r *= 1.0 + g_Temp;
+    combined.b *= 1.0 - g_Temp;
+    combined.g *= 1.0 + g_Tint * 0.5;
+    combined = max(combined, 0.0);
+    if (g_Hdr10 < 0.5)
+        combined = saturate(combined);
+    else
+    {
+        float3 sdr = saturate(combined);
+        float3 lin = SRGBToLinear(sdr);
+        float luma = max(dot(lin, float3(0.2126, 0.7152, 0.0722)), 1e-6);
+        float mid = smoothstep(0.004, 0.03, luma) * (1.0 - smoothstep(0.35, 0.85, luma));
+        lin = max(luma + (lin - luma) * (1.0 + 0.14 * mid), 0.0);
+        float headroom = max(g_PeakNits / max(g_PaperWhite, 1.0) - 1.0, 0.0);
+        float3 over = max(combined - 1.0, 0.0);
+        combined = lin + over * headroom / (1.0 + over);
+    }
+    return float4(combined, 1.0);
 }

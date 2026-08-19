@@ -157,9 +157,120 @@ nvrhi::ITexture* PassResourceCache::GetDummyShadowMap2D(nvrhi::IDevice* device) 
     return m_dummyShadowMap2D;
 }
 
+nvrhi::ITexture* PassResourceCache::GetDummyContactDepth(nvrhi::IDevice* device) {
+    if (!m_dummyContactDepth && device) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.format = nvrhi::Format::R32_FLOAT;
+        desc.debugName = "DummyContactDepth";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.dimension = nvrhi::TextureDimension::Texture2D;
+        desc.isShaderResource = true;
+        m_dummyContactDepth = device->createTexture(desc);
+        if (m_dummyContactDepth) {
+            nvrhi::CommandListHandle cmd = device->createCommandList();
+            cmd->open();
+            float farD = 1.0f;
+            cmd->writeTexture(m_dummyContactDepth, 0, 0, &farD, sizeof(farD));
+            cmd->close();
+            device->executeCommandList(cmd);
+        }
+    }
+    return m_dummyContactDepth;
+}
+
+nvrhi::ITexture* PassResourceCache::GetDummyContactHistory(nvrhi::IDevice* device) {
+    if (!m_dummyContactHistory && device) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.format = nvrhi::Format::RGBA16_FLOAT;
+        desc.debugName = "DummyContactHistory";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.dimension = nvrhi::TextureDimension::Texture2D;
+        desc.isShaderResource = true;
+        m_dummyContactHistory = device->createTexture(desc);
+        if (m_dummyContactHistory) {
+            nvrhi::CommandListHandle cmd = device->createCommandList();
+            cmd->open();
+            float white[4] = {1.f, 0.f, 0.f, 0.f};
+            cmd->writeTexture(m_dummyContactHistory, 0, 0, white, sizeof(white));
+            cmd->close();
+            device->executeCommandList(cmd);
+        }
+    }
+    return m_dummyContactHistory;
+}
+
+nvrhi::ITexture* PassResourceCache::GetDummyCubeMap(nvrhi::IDevice* device) {
+    if (!m_dummyCubeMap) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.format = nvrhi::Format::RGBA8_UNORM;
+        desc.dimension = nvrhi::TextureDimension::TextureCube;
+        desc.arraySize = 6;
+        desc.debugName = "DummyCubeMap";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.isShaderResource = true;
+        m_dummyCubeMap = device->createTexture(desc);
+    }
+    return m_dummyCubeMap;
+}
+
+nvrhi::IBuffer* PassResourceCache::GetDummySRVBuffer(nvrhi::IDevice* device) {
+    if (!m_dummySRVBuffer && device) {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = 256;
+        desc.structStride = 16;
+        desc.canHaveRawViews = true;
+        desc.debugName = "DummySRVBuffer";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        m_dummySRVBuffer = device->createBuffer(desc);
+    }
+    return m_dummySRVBuffer;
+}
+
+nvrhi::ITexture* PassResourceCache::GetDummyUAVTexture(nvrhi::IDevice* device) {
+    if (!m_dummyUAVTexture && device) {
+        nvrhi::TextureDesc desc;
+        desc.width = 1;
+        desc.height = 1;
+        desc.format = nvrhi::Format::RGBA16_FLOAT;
+        desc.debugName = "DummyUAVTexture";
+        desc.isUAV = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        desc.dimension = nvrhi::TextureDimension::Texture2D;
+        m_dummyUAVTexture = device->createTexture(desc);
+    }
+    return m_dummyUAVTexture;
+}
+
+nvrhi::IBuffer* PassResourceCache::GetDummyUAVBuffer(nvrhi::IDevice* device) {
+    if (!m_dummyUAVBuffer && device) {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = 256;
+        desc.structStride = 16;
+        desc.canHaveRawViews = true;
+        desc.canHaveUAVs = true;
+        desc.debugName = "DummyUAVBuffer";
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_dummyUAVBuffer = device->createBuffer(desc);
+    }
+    return m_dummyUAVBuffer;
+}
+
 nvrhi::ISampler* PassResourceCache::GetSamplerByName(const char* smpName, nvrhi::IDevice* device)
 {
-    if (strstr(smpName, "smp_nofilter") || strstr(smpName, "smp_smap") || strstr(smpName, "smp_jitter"))
+    if (strstr(smpName, "smp_nofilter") || strstr(smpName, "smp_smap") ||
+        strstr(smpName, "smp_jitter") || strstr(smpName, "smp_point"))
         return GetPointClampSampler(device);
     if (strstr(smpName, "smp_rtlinear"))
         return GetLinearClampSampler(device);
@@ -180,6 +291,12 @@ nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayout(
     nvrhi::IDevice* device)
 {
     u64 key = HashString(passName);
+    key = HashCombine(key, u64(desc.visibility));
+    for (const auto& b : desc.bindings) {
+        key = HashCombine(key, u64(b.slot));
+        key = HashCombine(key, u64(b.type));
+        key = HashCombine(key, u64(b.size));
+    }
 
     auto it = m_bindingLayouts.find(key);
     if (it != m_bindingLayouts.end()) {
@@ -187,7 +304,6 @@ nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayout(
         return it->second;
     }
 
-    // Create new layout
     m_stats.layoutMisses++;
     nvrhi::BindingLayoutHandle layout = device->createBindingLayout(desc);
     if (layout) {
@@ -308,8 +424,33 @@ nvrhi::FramebufferHandle PassResourceCache::GetOrCreateFramebuffer(
     const nvrhi::FramebufferDesc& desc,
     nvrhi::IDevice* device)
 {
-    // Key combines pass name with all render target pointers
-    // This ensures we reuse framebuffers when the same RTs are bound
+    u32 attW = 0, attH = 0;
+    auto checkDim = [&](nvrhi::ITexture* tex) -> bool {
+        if (!tex)
+            return true;
+        const auto& d = tex->getDesc();
+        if (!attW) {
+            attW = d.width;
+            attH = d.height;
+            return true;
+        }
+        return d.width == attW && d.height == attH;
+    };
+    if (desc.depthAttachment.texture && !checkDim(desc.depthAttachment.texture)) {
+        const auto& d = desc.depthAttachment.texture->getDesc();
+        Msg("! [FG] %s framebuffer skipped: depth %ux%u vs color %ux%u",
+            passName, d.width, d.height, attW, attH);
+        return nullptr;
+    }
+    for (const auto& attachment : desc.colorAttachments) {
+        if (attachment.texture && !checkDim(attachment.texture)) {
+            const auto& d = attachment.texture->getDesc();
+            Msg("! [FG] %s framebuffer skipped: color %ux%u vs %ux%u",
+                passName, d.width, d.height, attW, attH);
+            return nullptr;
+        }
+    }
+
     u64 key = HashString(passName);
 
     for (const auto& attachment : desc.colorAttachments) {
@@ -448,12 +589,70 @@ static u64 HashBindingSetDesc(const nvrhi::BindingSetDesc& desc, nvrhi::IBinding
     return hash;
 }
 
+static int LayoutRegisterClass(nvrhi::ResourceType type)
+{
+    switch (type) {
+    case nvrhi::ResourceType::Texture_SRV:
+    case nvrhi::ResourceType::TypedBuffer_SRV:
+    case nvrhi::ResourceType::StructuredBuffer_SRV:
+    case nvrhi::ResourceType::RawBuffer_SRV:
+    case nvrhi::ResourceType::RayTracingAccelStruct:
+        return 0;
+    case nvrhi::ResourceType::Texture_UAV:
+    case nvrhi::ResourceType::TypedBuffer_UAV:
+    case nvrhi::ResourceType::StructuredBuffer_UAV:
+    case nvrhi::ResourceType::RawBuffer_UAV:
+        return 1;
+    default:
+        return -1;
+    }
+}
+
 nvrhi::BindingSetHandle PassResourceCache::GetOrCreateBindingSet(
     const nvrhi::BindingSetDesc& desc,
     nvrhi::IBindingLayout* layout,
     nvrhi::IDevice* device)
 {
-    u64 key = HashBindingSetDesc(desc, layout);
+    nvrhi::BindingSetDesc padded = desc;
+    if (layout && layout->getDesc()) {
+        for (const auto& item : layout->getDesc()->bindings) {
+            const int cls = LayoutRegisterClass(item.type);
+            bool found = false;
+            for (const auto& b : padded.bindings) {
+                if (b.slot == item.slot && LayoutRegisterClass(b.type) == cls) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found)
+                continue;
+            if (cls == 0) {
+                if (item.type == nvrhi::ResourceType::Texture_SRV) {
+                    if (auto* tex = GetDummyContactHistory(device))
+                        padded.bindings.push_back(nvrhi::BindingSetItem::Texture_SRV(item.slot, tex));
+                } else if (item.type == nvrhi::ResourceType::RawBuffer_SRV) {
+                    if (auto* buf = GetDummySRVBuffer(device))
+                        padded.bindings.push_back(nvrhi::BindingSetItem::RawBuffer_SRV(item.slot, buf));
+                } else if (item.type != nvrhi::ResourceType::RayTracingAccelStruct) {
+                    if (auto* buf = GetDummySRVBuffer(device))
+                        padded.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_SRV(item.slot, buf));
+                }
+            } else if (cls == 1) {
+                if (item.type == nvrhi::ResourceType::Texture_UAV) {
+                    if (auto* tex = GetDummyUAVTexture(device))
+                        padded.bindings.push_back(nvrhi::BindingSetItem::Texture_UAV(item.slot, tex));
+                } else if (item.type == nvrhi::ResourceType::RawBuffer_UAV) {
+                    if (auto* buf = GetDummyUAVBuffer(device))
+                        padded.bindings.push_back(nvrhi::BindingSetItem::RawBuffer_UAV(item.slot, buf));
+                } else {
+                    if (auto* buf = GetDummyUAVBuffer(device))
+                        padded.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_UAV(item.slot, buf));
+                }
+            }
+        }
+    }
+
+    u64 key = HashBindingSetDesc(padded, layout);
     auto it = m_bindingSets.find(key);
     if (it != m_bindingSets.end()) {
         m_stats.bindingSetHits++;
@@ -461,7 +660,7 @@ nvrhi::BindingSetHandle PassResourceCache::GetOrCreateBindingSet(
     }
 
     m_stats.bindingSetMisses++;
-    nvrhi::BindingSetHandle bindingSet = device->createBindingSet(desc, layout);
+    nvrhi::BindingSetHandle bindingSet = device->createBindingSet(padded, layout);
     if (bindingSet)
         m_bindingSets[key] = bindingSet;
     return bindingSet;
@@ -488,6 +687,12 @@ void PassResourceCache::Clear() {
     m_commonShadowCmp = nullptr;
     m_dummyShadowMap = nullptr;
     m_dummyShadowMap2D = nullptr;
+    m_dummyContactDepth = nullptr;
+    m_dummyContactHistory = nullptr;
+    m_dummyCubeMap = nullptr;
+    m_dummySRVBuffer = nullptr;
+    m_dummyUAVTexture = nullptr;
+    m_dummyUAVBuffer = nullptr;
 
     Msg("* [PassResourceCache] Cleared all caches");
 }

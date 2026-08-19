@@ -27,7 +27,9 @@
 #include "Layers/xrRender/Decals/OverlayManager.h"
 #include "PassCommon.h"
 #include "Layers/xrRender/ClusteredLightManager.h"
+#include "Layers/xrRender/RayTracing/ReSTIRMemoryManager.h"
 #include "xrCore/FMesh.hpp"
+#include "xrEngine/IGame_Persistent.h"
 
 extern ENGINE_API float psHUD_FOV;
 
@@ -64,8 +66,11 @@ static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
 
 void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state)
 {
-    if (state.initialized)
+    constexpr u32 kSkinningPipeVersion = 7;
+    if (state.initialized && state.pipeVersion == kSkinningPipeVersion)
         return;
+    state.initialized = false;
+    state.pipeVersion = 0;
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice)
@@ -78,6 +83,11 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
     auto& cache = framegraph::GetPassResourceCache();
+
+    nvrhi::FramebufferInfoEx worldFbInfo = fbInfo;
+    if (worldFbInfo.colorFormats.size() < 4)
+        worldFbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
+    nvrhi::FramebufferInfoEx hudFbInfo = worldFbInfo;
 
     auto skinnedPsResult = shaderLoader->LoadPixelShader("bindless_skinned", "main");
     if (!skinnedPsResult.handle) {
@@ -92,7 +102,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
     auto hudPsResult = shaderLoader->LoadPixelShader("bindless_skinned_hud", "main");
     if (hudPsResult.handle) {
         state.hudPS = hudPsResult.handle;
-        state.hudLayout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass_HUD", *skinnedVsForReflection.reflection, *hudPsResult.reflection, nvDevice);
+        state.hudLayout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass_HUD6", *skinnedVsForReflection.reflection, *hudPsResult.reflection, nvDevice);
     }
     if (!state.hudLayout)
         state.hudLayout = state.layout;
@@ -123,7 +133,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
         variant.vs = vsResult.handle;
         variant.inputLayout = nvDevice->createInputLayout(attribs, attrCount, variant.vs);
         auto pipeDesc = buildPipelineDesc(variant.vs, variant.inputLayout);
-        variant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
+        variant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, worldFbInfo, nvDevice);
         if (variant.pipeline)
             QueryBindingLayoutFromPipeline(variant.pipeline, state.layout);
     };
@@ -135,7 +145,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
         hudVariant.inputLayout = worldVariant.inputLayout;
         auto pipeDesc = buildPipelineDesc(worldVariant.vs, worldVariant.inputLayout, state.hudPS);
         pipeDesc.bindingLayouts[0] = state.hudLayout;
-        hudVariant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
+        hudVariant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, hudFbInfo, nvDevice);
     };
 
     auto mdiPsResult = shaderLoader->LoadPixelShader("bindless_skinned_mdi", "main");
@@ -165,7 +175,7 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
         variant.inputLayout = nvDevice->createInputLayout(attribs, baseAttrCount + 1, variant.vs);
         auto pipeDesc = buildPipelineDesc(variant.vs, variant.inputLayout, state.mdiPS);
         pipeDesc.bindingLayouts[0] = state.mdiLayout;
-        variant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
+        variant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, worldFbInfo, nvDevice);
     };
 
     {
@@ -177,8 +187,8 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG16_SNORM).setOffset(20).setElementStride(stride),
         };
-        initVariant(state.nonHQ, "bindless_skinned", "SkinningPass_nonHQ", attribs, 5);
-        initMDIVariant(state.mdiNonHQ, "bindless_skinned_mdi", "SkinningPass_mdi_nonHQ", attribs, 5);
+        initVariant(state.nonHQ, "bindless_skinned", "SkinningPass_nonHQ_v6", attribs, 5);
+        initMDIVariant(state.mdiNonHQ, "bindless_skinned_mdi", "SkinningPass_mdi_nonHQ_v6", attribs, 5);
     }
 
     {
@@ -190,8 +200,8 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
         };
-        initVariant(state.hq1w, "bindless_skinned_hq", "SkinningPass_hq1w", attribs, 5);
-        initMDIVariant(state.mdiHQ1w, "bindless_skinned_hq_mdi", "SkinningPass_mdi_hq1w", attribs, 5);
+        initVariant(state.hq1w, "bindless_skinned_hq", "SkinningPass_hq1w_v6", attribs, 5);
+        initMDIVariant(state.mdiHQ1w, "bindless_skinned_hq_mdi", "SkinningPass_mdi_hq1w_v6", attribs, 5);
     }
 
     {
@@ -204,8 +214,8 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
             nvrhi::VertexAttributeDesc().setName("BLENDINDICES").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(36).setElementStride(stride),
         };
-        initVariant(state.hq4w, "bindless_skinned_4w", "SkinningPass_hq4w", attribs, 6);
-        initMDIVariant(state.mdiHQ4w, "bindless_skinned_4w_mdi", "SkinningPass_mdi_hq4w", attribs, 6);
+        initVariant(state.hq4w, "bindless_skinned_4w", "SkinningPass_hq4w_v6", attribs, 6);
+        initMDIVariant(state.mdiHQ4w, "bindless_skinned_4w_mdi", "SkinningPass_mdi_hq4w_v6", attribs, 6);
     }
 
     {
@@ -217,8 +227,8 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
         };
-        initVariant(state.hq2w, "bindless_skinned_2w", "SkinningPass_hq2w", attribs, 5);
-        initMDIVariant(state.mdiHQ2w, "bindless_skinned_2w_mdi", "SkinningPass_mdi_hq2w", attribs, 5);
+        initVariant(state.hq2w, "bindless_skinned_2w", "SkinningPass_hq2w_v6", attribs, 5);
+        initMDIVariant(state.mdiHQ2w, "bindless_skinned_2w_mdi", "SkinningPass_mdi_hq2w_v6", attribs, 5);
     }
 
     {
@@ -230,18 +240,37 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
         };
-        initVariant(state.hq3w, "bindless_skinned_3w", "SkinningPass_hq3w", attribs, 5);
-        initMDIVariant(state.mdiHQ3w, "bindless_skinned_3w_mdi", "SkinningPass_mdi_hq3w", attribs, 5);
+        initVariant(state.hq3w, "bindless_skinned_3w", "SkinningPass_hq3w_v6", attribs, 5);
+        initMDIVariant(state.mdiHQ3w, "bindless_skinned_3w_mdi", "SkinningPass_mdi_hq3w_v6", attribs, 5);
     }
 
-    initHudVariant(state.hudNonHQ, state.nonHQ, "SkinningPass_hud_nonHQ");
-    initHudVariant(state.hudHQ1w, state.hq1w, "SkinningPass_hud_hq1w");
-    initHudVariant(state.hudHQ2w, state.hq2w, "SkinningPass_hud_hq2w");
-    initHudVariant(state.hudHQ3w, state.hq3w, "SkinningPass_hud_hq3w");
-    initHudVariant(state.hudHQ4w, state.hq4w, "SkinningPass_hud_hq4w");
+    initHudVariant(state.hudNonHQ, state.nonHQ, "SkinningPass_hud6_nonHQ_v7");
+    initHudVariant(state.hudHQ1w, state.hq1w, "SkinningPass_hud6_hq1w_v7");
+    initHudVariant(state.hudHQ2w, state.hq2w, "SkinningPass_hud6_hq2w_v7");
+    initHudVariant(state.hudHQ3w, state.hq3w, "SkinningPass_hud6_hq3w_v7");
+    initHudVariant(state.hudHQ4w, state.hq4w, "SkinningPass_hud6_hq4w_v7");
+
+    if (!state.scopeDummy)
+    {
+        nvrhi::TextureDesc td;
+        td.width = 1;
+        td.height = 1;
+        td.format = nvrhi::Format::RGBA8_UNORM;
+        td.debugName = "Skinning_ScopeDummy";
+        td.initialState = nvrhi::ResourceStates::ShaderResource;
+        td.keepInitialState = true;
+        state.scopeDummy = nvDevice->createTexture(td);
+        nvrhi::CommandListHandle uploadCmd = nvDevice->createCommandList();
+        uploadCmd->open();
+        u32 black = 0;
+        uploadCmd->writeTexture(state.scopeDummy, 0, 0, &black, sizeof(black));
+        uploadCmd->close();
+        nvDevice->executeCommandList(uploadCmd);
+    }
 
     state.initialized = true;
-    Msg("* [SkinningPass] Pipeline initialization complete");
+    state.pipeVersion = kSkinningPipeVersion;
+    Msg("* [SkinningPass] Pipeline initialization complete v7");
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -410,7 +439,11 @@ static SkinnedPhaseContext BuildSkinnedPhaseContext(
     nvrhi::IBuffer* splatBuffer,
     const nvrhi::Viewport& viewport,
     const nvrhi::Rect& scissor,
-    bool isHUD)
+    bool isHUD,
+    fg::RenderDevice* device = nullptr,
+    nvrhi::ITexture* sceneDepth = nullptr,
+    nvrhi::IBuffer* hudScopeCB = nullptr,
+    nvrhi::ITexture* scopeColor = nullptr)
 {
     using namespace fg;
     using namespace fg::bindless;
@@ -447,6 +480,15 @@ static SkinnedPhaseContext BuildSkinnedPhaseContext(
     bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
     bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
     bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+    BindEnvIblCubes(bsb, device);
+    if (isHUD)
+    {
+        if (hudScopeCB)
+            bsb.ConstantBuffer("HudScopeCB", hudScopeCB);
+        nvrhi::ITexture* vp2 = scopeColor ? scopeColor : state.scopeDummy.Get();
+        if (vp2)
+            bsb.Texture("s_vp2", vp2);
+    }
 
     ctx.bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), activeLayout, nvDevice);
     return ctx;
@@ -479,6 +521,7 @@ static void DrawSkinnedBatch(
     matIdData.skeletonBoneOffset = skeletonBoneOffset;
     matIdData.splatOffset = splatRange.offset;
     matIdData.splatCount = splatRange.count;
+    matIdData.hudLit = ctx.isHUD ? 1u : 0u;
     cmdList->writeBuffer(ctx.materialIdCB, &matIdData, sizeof(matIdData));
 
     u32 variantIdx = MaterialBuffer::Instance().GetShaderVariant(batch.bindlessMaterialID);
@@ -492,15 +535,17 @@ static void DrawSkinnedBatch(
 
     for (u32 p = 0; p < passCount; p++) {
         nvrhi::IGraphicsPipeline* pipeline;
-        if (variant) {
+        if (ctx.isHUD) {
+            pipeline = SelectHUDSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode);
+        } else if (variant) {
             u32 fmt = GetSkinnedVertexFormatID(batch.skinningRenderMode, batch.vertexStride);
             pipeline = VariantPSOCache::Instance().GetOrCreatePSO(
                 nvDevice, ctx.framebuffer, variantIdx, *variant, p, fmt,
-                GetSkinnedInputLayout(state, fmt), state.layout, ctx.bindlessLayout);
+                GetSkinnedInputLayout(state, fmt),
+                state.layout,
+                ctx.bindlessLayout);
         } else {
-            pipeline = ctx.isHUD
-                ? SelectHUDSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode)
-                : SelectSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode);
+            pipeline = SelectSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode);
         }
         if (!pipeline)
             continue;
@@ -555,12 +600,15 @@ framegraph::DefaultOutputLayout setupSkinningPass(
         fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
         fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
         fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
+        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA32_FLOAT);
         fbInfo.depthFormat = nvrhi::Format::D32;
         InitializeSkinningResources(device, fbInfo, *state);
     }
 
+    const char* passName = (!geometry && hudBatches) ? "Skinning HUD Pass" : "Skinning Pass";
+
     auto& passData = fg.addCallbackPass<SkinningPassData>(
-        "Skinning Pass",
+        passName,
 
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA
@@ -585,11 +633,30 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
             if (inputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
+            if (inputs.worldPos.is_valid())
+            {
+                data.worldPos = passBuilder.readWrite(inputs.worldPos, ResourceState::RenderTarget);
+                data.clearWorldPos = false;
+            }
+            else
+            {
+                ResourceDesc wpDesc;
+                wpDesc.type = ResourceDesc::Type::Texture2D;
+                wpDesc.width = width;
+                wpDesc.height = height;
+                wpDesc.format = nvrhi::Format::RGBA32_FLOAT;
+                wpDesc.isRenderTarget = true;
+                wpDesc.isTransient = true;
+                wpDesc.debugName = "rt_SkinnedWorldPos";
+                data.worldPos = passBuilder.createTexture("rt_SkinnedWorldPos", wpDesc);
+                data.clearWorldPos = true;
+            }
             data.depth = passBuilder.readWrite(inputs.depth, ResourceState::DepthStencilWrite);
 
             data.outputs.albedo = data.color;
             data.outputs.normal = data.normal;
             data.outputs.baseColor = data.baseColor;
+            data.outputs.worldPos = data.worldPos;
             data.outputs.depth = data.depth;
         },
 
@@ -622,6 +689,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
+            auto* worldPosRT = data.worldPos.is_valid() ? fg.GetPhysicalTexture(data.worldPos) : nullptr;
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             if (!colorRT || !depthRT)
                 return;
@@ -631,14 +699,20 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             if (!nvDevice || !cmdList)
                 return;
 
+            if (worldPosRT && data.clearWorldPos)
+                cmdList->clearTextureFloat(worldPosRT, nvrhi::AllSubresources, nvrhi::Color(0.f, 0.f, 0.f, 0.f));
+
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
             if (normalRT)
                 fbDesc.addColorAttachment(normalRT);
             if (baseColorRT)
                 fbDesc.addColorAttachment(baseColorRT);
+            if (worldPosRT)
+                fbDesc.addColorAttachment(worldPosRT);
             fbDesc.setDepthAttachment(depthRT);
-            auto framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer("SkinningPass", fbDesc, nvDevice);
+            const char* fbKey = worldPosRT ? "SkinningPassWP_v6" : "SkinningPass";
+            auto framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer(fbKey, fbDesc, nvDevice);
             if (!framebuffer)
                 return;
 
@@ -661,7 +735,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             auto dynTransformsCB = cache.GetOrCreateVolatileCB("SkinningPass", "DynTransforms", sizeof(DynamicTransforms), data.device, 1024 * 8);
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             auto shaderParamsCB = cache.GetOrCreateVolatileCB("SkinningPass", "ShaderParams", sizeof(ShaderParams), data.device, 512);
-            auto materialIdCB = cache.GetOrCreateVolatileCB("SkinningPass", "MaterialId", sizeof(SkinnedMaterialCB), data.device, 1024 * 8);
+            auto materialIdCB = cache.GetOrCreateVolatileCB("SkinningPass", "MaterialId_v2", sizeof(SkinnedMaterialCB), data.device, 1024 * 8);
 
             ShaderParams shaderParams = {};
             shaderParams.m_AlphaRef = 0.5f;
@@ -749,6 +823,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                         bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
                         bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+                        BindEnvIblCubes(bsb, data.device);
 
                         auto& cache = framegraph::GetPassResourceCache();
                         nvrhi::BindingSetHandle mdiBindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->mdiLayout, nvDevice);
@@ -801,17 +876,109 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             //  PHASE 2: HUD SKINNED MESHES (depth [0.9, 1.0])
             // ═══════════════════════════════════════════════════════
             if (hasHUDSkinned) {
+                static u32 s_hudLitLogFrames = 0;
+                if (s_hudLitLogFrames < 3) {
+                    ++s_hudLitLogFrames;
+                    Msg("* [HUD] skinned batches=%u lights=%u",
+                        (u32)data.hudBatches->size(),
+                        ClusteredLightManager::Instance().GetLightCount());
+                }
                 nvrhi::Viewport hudViewport(
                     0.0f, static_cast<float>(rtDesc.width),
                     0.0f, static_cast<float>(rtDesc.height),
-                    0.9f, 1.0f
+                    0.0f, 1.0f
                 );
 
+                nvrhi::IFramebuffer* hudFramebuffer = framebuffer;
+                if (worldPosRT) {
+                    nvrhi::FramebufferDesc hudFbDesc;
+                    hudFbDesc.addColorAttachment(colorRT);
+                    if (normalRT)
+                        hudFbDesc.addColorAttachment(normalRT);
+                    if (baseColorRT)
+                        hudFbDesc.addColorAttachment(baseColorRT);
+                    hudFbDesc.addColorAttachment(worldPosRT);
+                    hudFbDesc.setDepthAttachment(depthRT);
+                    hudFramebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer(
+                        "SkinningPassHUD", hudFbDesc, nvDevice);
+                    if (!hudFramebuffer)
+                        hudFramebuffer = framebuffer;
+                }
+
+                auto hudGlobalsCB = cache.GetOrCreateVolatileCB(
+                    "SkinningPass", "StaticGlobals_HUD", sizeof(StaticGlobals), data.device);
+                {
+                    StaticGlobals hudSg = BuildStaticGlobals();
+                    auto& clm = ClusteredLightManager::Instance();
+                    if (clm.IsReady())
+                    {
+                        if (clm.GetLightCount() > 0)
+                            clm.Upload(cmdList);
+                        float zNear = VIEWPORT_NEAR;
+                        float zFar = g_pGamePersistent
+                            ? g_pGamePersistent->Environment().CurrentEnv.far_plane
+                            : 500.f;
+                        auto ccb = clm.BuildClusterCB(rtDesc.width, rtDesc.height, zNear, zFar);
+                        hudSg.cluster_params.set(
+                            ccb.gridDims.x, ccb.gridDims.y, ccb.gridDims.z,
+                            (float)clm.GetLightCount());
+                        hudSg.cluster_scales.set(
+                            ccb.depthParams.x, ccb.depthParams.y, ccb.depthParams.z, ccb.depthParams.w);
+                    }
+                    if (((ps_r_rt_gi != 0) && g_restirReplaceForward) || (ps_r_path_tracer != 0))
+                        hudSg.parallax.w = -1.0f;
+                    else
+                        hudSg.parallax.w = 0.0f;
+                    hudSg.pos_decompression_params2.set(
+                        (float)rtDesc.width, (float)rtDesc.height,
+                        1.0f / (float)rtDesc.width, 1.0f / (float)rtDesc.height);
+                    cmdList->writeBuffer(hudGlobalsCB, &hudSg, sizeof(hudSg));
+                }
+
+                nvrhi::ITexture* scopeSrc = colorRT;
+                if (scopeSrc)
+                {
+                    const auto& cd = scopeSrc->getDesc();
+                    if (!data.passState->scopeCopy ||
+                        data.passState->scopeCopy->getDesc().width != cd.width ||
+                        data.passState->scopeCopy->getDesc().height != cd.height)
+                    {
+                        nvrhi::TextureDesc td = cd;
+                        td.debugName = "Skinning_ScopeCopy";
+                        td.isRenderTarget = false;
+                        td.isShaderResource = true;
+                        td.initialState = nvrhi::ResourceStates::ShaderResource;
+                        td.keepInitialState = true;
+                        data.passState->scopeCopy = nvDevice->createTexture(td);
+                    }
+                    if (data.passState->scopeCopy)
+                    {
+                        cmdList->setTextureState(scopeSrc, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+                        cmdList->setTextureState(data.passState->scopeCopy, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+                        cmdList->copyTexture(data.passState->scopeCopy, nvrhi::TextureSlice(), scopeSrc, nvrhi::TextureSlice());
+                        cmdList->setTextureState(data.passState->scopeCopy, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+                        cmdList->setTextureState(scopeSrc, nvrhi::AllSubresources, nvrhi::ResourceStates::RenderTarget);
+                    }
+                }
+
+                auto hudScopeCB = cache.GetOrCreateVolatileCB(
+                    "SkinningPass", "HudScopeCB", 32, data.device);
+                {
+                    Fvector4 params, zoom;
+                    params.set(0, 0, 0, 0);
+                    zoom.set(0, 0, 0, 0);
+                    if (g_pGamePersistent && g_pGamePersistent->m_pGShaderConstants)
+                        params = g_pGamePersistent->m_pGShaderConstants->hud_params;
+                    struct HudScopeCB { Fvector4 hud; Fvector4 zoom; } cb{params, zoom};
+                    cmdList->writeBuffer(hudScopeCB, &cb, sizeof(cb));
+                }
+
                 SkinnedPhaseContext hudCtx = BuildSkinnedPhaseContext(
-                    *data.passState, nvDevice, framebuffer,
-                    dynTransformsCB, staticGlobalsCB, materialIdCB,
+                    *data.passState, nvDevice, hudFramebuffer,
+                    dynTransformsCB, hudGlobalsCB, materialIdCB,
                     globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer,
-                    hudViewport, scissor, true);
+                    hudViewport, scissor, true, data.device, depthRT,
+                    hudScopeCB, data.passState->scopeCopy.Get());
 
                 for (const auto& batch : *data.hudBatches) {
                     Fmatrix adjustedWorldMatrix = ApplyHUDFOVAdjustment(batch.worldMatrix);
@@ -829,6 +996,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     outputs.albedo = passData.color;
     outputs.normal = passData.normal;
     outputs.baseColor = passData.baseColor;
+    outputs.worldPos = passData.worldPos;
     outputs.depth = passData.depth;
     return outputs;
 }

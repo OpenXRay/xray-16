@@ -109,6 +109,12 @@ float   get_sun( float4 lmh)
 	return lmh.g;
 }
 
+float calc_model_hemi(float3 norm_w)
+{
+	float ny = normalize(norm_w).y;
+	return saturate(0.52f + 0.48f * ny);
+}
+
 float3	v_hemi(float3 n)
 {
 	return L_hemi_color.rgb*(.5f + .5f*n.y);
@@ -219,6 +225,7 @@ float gbuf_unpack_mtl( float mtl_hemi )
 
 #include "shared/pbr_brdf.h"
 #include "shared/clustered_lighting.h"
+#include "shared/basecolor_pack.h"
 
 float3 worldNormalToView(float3 N)
 {
@@ -227,11 +234,16 @@ float3 worldNormalToView(float3 N)
 
 float3 reconstruct_world_pos(float2 svPosXY, float depth)
 {
-	float2 uv = svPosXY * screen_res.zw;
+	float2 uv = svPosXY * pos_decompression_params2.zw;
 	float4 clip = float4(uv * 2.0 - 1.0, depth, 1.0);
 	clip.y = -clip.y;
 	float4 world = mul(m_InvVP, clip);
 	return world.xyz / world.w;
+}
+
+bool IsSkyDepth(float d)
+{
+	return d <= 1e-7;
 }
 
 f_forward output_forward_color(float3 albedo, float3 normal, float3 worldPos, float metallic, float roughness)
@@ -239,9 +251,25 @@ f_forward output_forward_color(float3 albedo, float3 normal, float3 worldPos, fl
 	f_forward res;
 	res.color = float4(albedo, 1.0);
 	res.normal = float4(normalize(normal), roughness);
-	res.baseColor = float4(albedo, metallic);
+	res.baseColor = float4(albedo, PackBaseColorA(metallic, 0.0));
 	return res;
 }
+
+#ifdef CLUSTERED_LIGHTING_FORWARD
+TextureCube env_s0 : register(t25);
+TextureCube env_s1 : register(t26);
+
+float3 SampleEnvHemiIBL(float3 N)
+{
+	float3 e0 = env_s0.SampleLevel(smp_rtlinear, N, 0).rgb;
+	float3 e1 = env_s1.SampleLevel(smp_rtlinear, N, 0).rgb;
+	float3 envSamp = lerp(e0, e1, saturate(L_ambient.w));
+	float envLum = dot(envSamp, float3(0.3333, 0.3333, 0.3333));
+	float3 env_d = L_hemi_color.rgb * envSamp;
+	env_d *= envSamp;
+	return lerp(L_hemi_color.rgb, env_d, saturate(envLum * 8.0));
+}
+#endif
 
 f_forward output_forward_pbr(
 	float3 albedo,
@@ -250,7 +278,12 @@ f_forward output_forward_pbr(
 	float metallic,
 	float roughness,
 	float ao,
-	float4 svPosition = float4(0, 0, 0, 0))
+	float4 svPosition = float4(0, 0, 0, 0),
+	float hemi = 1.0,
+	float sunOcclusion = 1.0,
+	bool hasLmap = false,
+	bool forceHudLit = false,
+	float ambientScale = 1.0)
 {
 	f_forward res;
 
@@ -258,35 +291,58 @@ f_forward output_forward_pbr(
 	float3 V = normalize(eye_position - worldPos);
 	float3 L = normalize(-L_sun_dir_w);
 
-	float3 sunLight = PBRDirectLighting(
-		albedo, N, V, L,
-		L_sun_color,
-		metallic, roughness, (uint)pbr_diffuse_mode
-	);
+	float hemiTerm = saturate(hemi);
+	const bool rtgiUnlit = parallax.w < -0.5;
+#if defined(OX_HUD_FORWARD)
+	const bool hudLit = !rtgiUnlit;
+#else
+	const bool hudLit = forceHudLit;
+#endif
 
-	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
+	if (!hasLmap && hemiTerm < 0.01)
+		hemiTerm = saturate(0.5 + 0.5 * N.y);
+
+#if defined(OX_FLAT_HEMI)
+	float3 ambientColor = L_ambient.rgb * ambientScale + L_hemi_color.rgb * L_hemi_color.w * hemiTerm;
+#elif defined(CLUSTERED_LIGHTING_FORWARD)
+	float3 ambientColor = L_ambient.rgb * ambientScale + SampleEnvHemiIBL(N) * hemiTerm;
+#else
+	float3 ambientColor = L_ambient.rgb * ambientScale + L_hemi_color.rgb * L_hemi_color.w * hemiTerm;
+#endif
 	float3 ambient = PBRAmbient(
 		albedo, N, V,
 		metallic, roughness, ao,
 		ambientColor
 	);
 
-	float3 finalColor = sunLight + ambient;
+	float3 finalColor = ambient;
+	if (!rtgiUnlit || hudLit)
+	{
+		float3 sunLight = PBRDirectLighting(
+			albedo, N, V, L,
+			L_sun_color * saturate(sunOcclusion),
+			metallic, roughness, (uint)pbr_diffuse_mode
+		);
+		finalColor = sunLight + ambient;
+	}
 
 #ifdef CLUSTERED_LIGHTING_FORWARD
-	if (svPosition.w != 0)
+	if (!hudLit && svPosition.w != 0 && !rtgiUnlit)
 	{
-		float linearDepth = mul(m_V, float4(worldPos, 1.0)).z;
-		float3 clusterLights = EvaluateClusteredLights(
+		float linearDepth = abs(mul(m_V, float4(worldPos, 1.0)).z);
+		finalColor += EvaluateClusteredLights(
 			worldPos, N, V, albedo, metallic, roughness,
 			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode);
-		finalColor += clusterLights;
 	}
 #endif
 
-	res.color = float4(finalColor, 1.0);
+	float dist = length(worldPos - eye_position.xyz);
+	float fog = saturate(dist * fog_params.w + fog_params.x);
+	finalColor = lerp(finalColor, fog_color.rgb, fog);
+
+	res.color = float4(finalColor, saturate(sunOcclusion));
 	res.normal = float4(N, roughness);
-	res.baseColor = float4(albedo, metallic);
+	res.baseColor = float4(albedo, PackBaseColorA(metallic, 0.0));
 	return res;
 }
 

@@ -19,6 +19,7 @@ struct SkyPassData {
     FGEnvironmentRender* renderer;
     u32 width;
     u32 height;
+    bool composite = false;
 };
 
 framegraph::VirtualResourceHandle setupSkyPass(
@@ -27,7 +28,8 @@ framegraph::VirtualResourceHandle setupSkyPass(
     framegraph::VirtualResourceHandle depthInput,
     FGEnvironmentRender* renderer,
     u32 width,
-    u32 height
+    u32 height,
+    bool composite = false
 );
 
 } // namespace xray::render::fg::passes

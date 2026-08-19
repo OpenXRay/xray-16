@@ -51,6 +51,12 @@ public:
     nvrhi::ISampler* GetShadowCmpSampler(nvrhi::IDevice* device);
     nvrhi::ITexture* GetDummyShadowMap(nvrhi::IDevice* device);
     nvrhi::ITexture* GetDummyShadowMap2D(nvrhi::IDevice* device);
+    nvrhi::ITexture* GetDummyContactDepth(nvrhi::IDevice* device);
+    nvrhi::ITexture* GetDummyContactHistory(nvrhi::IDevice* device);
+    nvrhi::ITexture* GetDummyCubeMap(nvrhi::IDevice* device);
+    nvrhi::IBuffer* GetDummySRVBuffer(nvrhi::IDevice* device);
+    nvrhi::ITexture* GetDummyUAVTexture(nvrhi::IDevice* device);
+    nvrhi::IBuffer* GetDummyUAVBuffer(nvrhi::IDevice* device);
 
     nvrhi::ISampler* GetSamplerByName(const char* smpName, nvrhi::IDevice* device);
 
@@ -197,6 +203,12 @@ private:
     nvrhi::SamplerHandle m_commonShadowCmp;
     nvrhi::TextureHandle m_dummyShadowMap;
     nvrhi::TextureHandle m_dummyShadowMap2D;
+    nvrhi::TextureHandle m_dummyContactDepth;
+    nvrhi::TextureHandle m_dummyContactHistory;
+    nvrhi::TextureHandle m_dummyCubeMap;
+    nvrhi::BufferHandle m_dummySRVBuffer;
+    nvrhi::TextureHandle m_dummyUAVTexture;
+    nvrhi::BufferHandle m_dummyUAVBuffer;
 
     Stats m_stats;
 

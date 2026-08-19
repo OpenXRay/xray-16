@@ -28,7 +28,7 @@ void main(uint3 tid : SV_GroupThreadID)
 
     uint vis = 1;
     if (p.x >= 0.0 && p.y >= 0.0 && p.x < dim_x && p.y < dim_y)
-        vis = (g_Depth.Load(int3(int2(p), 0)) <= 0.0) ? 1 : 0;
+        vis = (g_Depth.Load(int3(int2(p), 0)) <= 1e-5) ? 1 : 0;
 
     InterlockedAdd(gs_visible, vis);
     GroupMemoryBarrierWithGroupSync();

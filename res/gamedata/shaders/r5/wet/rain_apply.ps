@@ -1,0 +1,149 @@
+#define SM_6_0
+
+#include "wet/ssfx_waterfall.h"
+#include "shared/basecolor_pack.h"
+#include "shared/surface_marks.h"
+
+SamplerState smp_rtlinear : register(s0);
+SamplerState smp_linear   : register(s1);
+SamplerState smp_nofilter : register(s2);
+
+Texture2D g_Color : register(t0);
+Texture2D g_Patched : register(t1);
+Texture2D g_WorldPos : register(t2);
+Texture2D g_WaterFall : register(t3);
+Texture2D g_SceneReflection : register(t4);
+Texture2D g_Base : register(t5);
+
+cbuffer WetConstants : register(b0)
+{
+    float4 RainDensity;
+    float4 EyePos;
+    float4 SunColor;
+    float4 Timers;
+    float4x4 m_VP;
+    float4x4 m_RainSampleVP;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+};
+
+float4 main(PS_INPUT input) : SV_Target
+{
+    float4 color = g_Color.SampleLevel(smp_rtlinear, input.texcoord, 0);
+    float4 wpSamp = g_WorldPos.SampleLevel(smp_rtlinear, input.texcoord, 0);
+
+    float rain = max(RainDensity.x, RainDensity.y);
+    float rainGate = saturate(rain * 28.0 + 0.15);
+    const bool noDistFade = EyePos.w > 0.5;
+
+    float4 patched = g_Patched.SampleLevel(smp_rtlinear, input.texcoord, 0);
+    float3 worldPos = wpSamp.xyz;
+    float hudWet = IsHudSurfMark(wpSamp.w) ? 1.0 : 0.0;
+    float charWet = IsCharSurfMark(wpSamp.w) ? 1.0 : 0.0;
+    float actorWet = saturate(hudWet + charWet);
+    if (EyePos.w > 0.5 && actorWet > 0.0)
+        return color;
+    float wetBoost = (wpSamp.w > 1.5) ? 1.0 : 0.0;
+    float terrainWet = IsTerrainSurfMark(wpSamp.w) ? 1.0 : 0.0;
+    float grassWet = IsVegSurfMark(wpSamp.w) ? 1.0 : 0.0;
+    float3 N = normalize(patched.xyz + float3(0.0, 0.0, 0.00001));
+    float metallic = UnpackMetallicFromBaseA(g_Base.SampleLevel(smp_rtlinear, input.texcoord, 0).a);
+
+    float3 RainP = ssfx_RainPos(worldPos, EyePos.xyz);
+    float outdoor = saturate(patched.a * 5.0);
+    outdoor = max(outdoor, actorWet * rainGate * 0.85);
+    float Gloss = saturate(patched.a * lerp(1.45, lerp(1.9, lerp(2.1, 2.0, grassWet), terrainWet), wetBoost)) * rainGate;
+    float p_len = length(RainP);
+    float distFade = noDistFade ? 1.0 : saturate((280.0 - p_len) / 100.0);
+    Gloss *= lerp(distFade, 1.0, max(wetBoost, actorWet));
+    float charFloor = 0.34 * rainGate * outdoor;
+    float charAdd = 0.14 * rainGate * outdoor;
+    float charGloss = saturate(max(Gloss, charFloor) + charAdd);
+    charGloss = lerp(charGloss, 0.45 * outdoor, 0.5);
+    Gloss = lerp(Gloss, saturate(charGloss), actorWet * rainGate * outdoor);
+
+    float wetAmt = saturate(max(Gloss, outdoor * rainGate * lerp(0.45, 0.7, grassWet)) * lerp(1.0, 1.35, wetBoost));
+    float3 diffuse = color.rgb * lerp(1.0, lerp(0.62, lerp(0.48, 0.52, grassWet), terrainWet), wetAmt);
+
+    float3 Vdir = normalize(EyePos.xyz - worldPos);
+    float NdV = saturate(dot(N, Vdir));
+    float faceSpec = pow(NdV, lerp(3.2, 2.4, wetBoost)) * Gloss;
+    float rimSpec = pow(saturate(1.0 - NdV), lerp(1.8, 1.35, wetBoost)) * Gloss;
+    float3 sun = max(SunColor.rgb, 0.0);
+    float sunLum = max(dot(sun, float3(0.2126, 0.7152, 0.0722)), 1e-4);
+    float sunChroma = length(sun - sunLum.xxx);
+    float overcastSun = saturate(1.0 - sunChroma * 8.0) * saturate(1.15 - sunLum * 2.5);
+    float3 sheen = sun * (faceSpec * lerp(1.1, lerp(1.5, 1.65, terrainWet), wetBoost)
+        + rimSpec * lerp(0.7, 1.15, wetBoost));
+    sheen *= lerp(1.12, 1.35, metallic);
+    sheen *= lerp(1.0, lerp(0.6, 0.85, wetBoost), overcastSun);
+
+    float3 ambLit = max(sun * 0.35 + float3(0.05, 0.055, 0.06), float3(0.03, 0.035, 0.04));
+    sheen += ambLit * (faceSpec * 0.55 + rimSpec * 0.85) * lerp(1.0, 1.25, wetBoost);
+    sheen *= outdoor;
+
+    float2 wSoft = ssfx_WallWeightsSoft(N);
+    float wall = smoothstep(0.12, 0.5, saturate(1.0 - abs(N.y))) * Gloss;
+
+    float3 tc1 = RainP * 0.5;
+    float fAngleFactor = (1.0 - saturate(N.y));
+    fAngleFactor = 0.1 * ceil(fAngleFactor * 10.0) * 0.5;
+
+    float2 uvX = float2(tc1.z, tc1.y + Timers.x * fAngleFactor);
+    float2 uvZ = float2(tc1.x, tc1.y + Timers.x * fAngleFactor);
+    float2 IsDir = float2(N.z, N.x);
+    float isLen = max(length(IsDir), 0.001);
+    IsDir /= isLen;
+    float2 uvD = float2(dot(tc1.xz, IsDir), tc1.y + Timers.x);
+
+    float noiseX = ssfx_FallFlowRaw(g_WaterFall, smp_linear, uvX);
+    float noiseZ = ssfx_FallFlowRaw(g_WaterFall, smp_linear, uvZ);
+    float noiseD = ssfx_FallFlowRaw(g_WaterFall, smp_linear, uvD);
+    float noise = max(noiseX * wSoft.x + noiseZ * wSoft.y, noiseD * 0.55) * wall;
+
+    float dX = ssfx_DropletStreak(uvX, rain, Timers.x);
+    float dZ = ssfx_DropletStreak(uvZ, rain, Timers.x);
+    float drips = (dX * wSoft.x + dZ * wSoft.y) * wall;
+
+    float3 nX = ssfx_GetWaterNMap(g_WaterFall, smp_linear, uvX);
+    float3 nZ = ssfx_GetWaterNMap(g_WaterFall, smp_linear, uvZ);
+    float3 fall = nX.yxz * wSoft.x + nZ.zxy * wSoft.y;
+    float peaks = ssfx_FallPeak(fall) * wall;
+
+    float2 wxz = ssfx_WallWeightsXZ(N);
+    float3 sX = ssfx_GetWaterFall(g_WaterFall, smp_linear, RainP.zy, rain, Timers.x);
+    float3 sZ = ssfx_GetWaterFall(g_WaterFall, smp_linear, RainP.xy, rain, Timers.x);
+    float3 sFall = sX.yxz * wxz.x + sZ.zxy * wxz.y;
+    float cols = ssfx_FallPeak(sFall) * wall * 0.65;
+
+    float streak = saturate(noise * 0.35 + drips * 0.45 + peaks * 0.25 + cols * 0.2);
+    float3 streakLit = max(sun, ambLit);
+    sheen += streakLit * streak * Gloss * lerp(0.12, 0.08, overcastSun);
+
+    float upW = smoothstep(0.7, 0.85, saturate(N.y));
+    float ripple = saturate(length(N.xz) * 2.2) * Gloss * upW;
+    sheen += streakLit * ripple * 0.08 * lerp(1.0, 0.55, overcastSun);
+
+    float3 R = reflect(-Vdir, N);
+    R.y = max(R.y, lerp(-0.05, 0.02, wetBoost));
+    R = normalize(R);
+    float4 rClip = mul(m_VP, float4(worldPos + R * lerp(2.0, 5.5, Gloss), 1.0));
+    float2 rUv = float2(rClip.x, -rClip.y) / max(rClip.w, 1e-4) * 0.5 + 0.5;
+    float rBorder = saturate(min(min(rUv.x, rUv.y), min(1.0 - rUv.x, 1.0 - rUv.y)) / 0.08);
+    float3 envHit = g_SceneReflection.SampleLevel(smp_rtlinear, saturate(rUv), 0).rgb;
+    envHit /= (1.0 + envHit * 1.4);
+    float reflW = Gloss * lerp(0.55, 0.9, metallic) * rBorder * rainGate * outdoor;
+    reflW *= lerp(0.75, lerp(1.05, 1.2, terrainWet), wetBoost);
+    reflW = lerp(reflW, saturate(max(reflW, 0.22) + 0.12), actorWet * rainGate * outdoor);
+    reflW = max(reflW, wetAmt * rainGate * outdoor * lerp(0.22, 0.32, actorWet));
+    float rtSpecKeep = saturate(metallic * 0.65 + Gloss * 0.25);
+    float3 envUnion = max(envHit, color.rgb * rtSpecKeep);
+    sheen += lerp(envHit, envUnion, rtSpecKeep) * reflW * lerp(1.0, 0.55, metallic);
+
+    color.rgb = diffuse + sheen;
+    return color;
+}

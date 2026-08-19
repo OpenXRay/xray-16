@@ -1,0 +1,25 @@
+#include "shared/common.h"
+
+struct PS_INPUT
+{
+    float4 hpos  : SV_Position;
+    float4 color : COLOR0;
+    float2 tc0   : TEXCOORD0;
+    float2 tc1   : TEXCOORD1;
+    float4 af    : TEXCOORD2;
+};
+
+SamplerState smp_base : register(s0);
+Texture2D s_base : register(t0);
+Texture2D s_hemi : register(t1);
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    float4 D0 = s_base.Sample(smp_base, I.tc0);
+    float4 D1 = s_base.Sample(smp_base, I.tc1);
+    float4 D = lerp(D0, D1, I.af.w);
+    D.a *= I.af.z;
+    clip(D.a - (96.0 / 255.0));
+    float3 rgb = D.rgb * I.color.rgb * 2.0;
+    return float4(rgb, D.a);
+}

@@ -9,11 +9,14 @@ struct GPULightData {
     float4x4 spotVP;
 };
 
-// Point light distance attenuation (smooth window function)
-float PointLightAttenuation(float distSq, float invRangeSq)
+// Point light distance attenuation (smooth window + virtual-size near soft)
+float PointLightAttenuation(float distSq, float invRangeSq, float virtSizeSq)
 {
     float factor = saturate(1.0f - distSq * invRangeSq);
-    return factor * factor;
+    float softSq = max(virtSizeSq, 0.1225);
+    float nearT = saturate(distSq / softSq);
+    float nearSoft = nearT * nearT * (3.0 - 2.0 * nearT);
+    return factor * lerp(0.85, 1.0, nearSoft);
 }
 
 // Spot light angular attenuation
@@ -86,40 +89,53 @@ float3 EvaluateClusteredLights(
         uint lightIdx = g_LightIndexList[lightOffset + i];
         GPULightData light = g_LightData[lightIdx];
         float3 lightPos = light.positionAndInvRangeSq.xyz;
-        float invRangeSq = light.positionAndInvRangeSq.w;
+        float invRangeSq = abs(light.positionAndInvRangeSq.w);
         float3 lightColor = light.colorAndRange.xyz;
         float lightType = light.spotParamsAndType.y;
 
         float3 toLight = lightPos - worldPos;
         float distSq = dot(toLight, toLight);
         float3 L = normalize(toLight);
-        float atten = PointLightAttenuation(distSq, invRangeSq);
+        float virtSizeSq = light.spotParamsAndType.w;
+        float atten = PointLightAttenuation(distSq, invRangeSq, virtSizeSq);
 
         if (lightType > 0.5f)
         {
+            float3 spotDir = light.directionAndSpotScale.xyz;
+            float spotScale = light.directionAndSpotScale.w;
+            float spotOffset = light.spotParamsAndType.x;
+            float cone = SpotLightAttenuation(toLight, spotDir, spotScale, spotOffset);
+
             uint texIdx = asuint(light.spotParamsAndType.z);
-            if (texIdx != 0)
+            if (texIdx != 0xFFFFFFFFu)
             {
                 float4 projPos = mul(light.spotVP, float4(worldPos, 1.0));
-                if (projPos.w > 0)
+                if (projPos.w > 1e-3)
                 {
                     float2 projUV = projPos.xy / projPos.w * 0.5 + 0.5;
                     projUV.y = 1.0 - projUV.y;
-                    Texture2D spotTex = GetBindlessTexture(texIdx);
-                    float4 texSample = spotTex.SampleLevel(smp_rtlinear, projUV, 0);
-                    atten *= texSample.r;
+                    float2 edge = saturate(min(projUV, 1.0 - projUV) * 4.0);
+                    float uvMask = edge.x * edge.y;
+                    if (uvMask > 1e-4)
+                    {
+                        Texture2D spotTex = GetBindlessTexture(texIdx);
+                        float cookie = spotTex.SampleLevel(smp_rtlinear, projUV, 0).r;
+                        cookie = smoothstep(0.02, 0.45, cookie);
+                        atten *= cookie * cone * uvMask;
+                    }
+                    else
+                    {
+                        atten = 0.0;
+                    }
                 }
                 else
                 {
-                    atten = 0;
+                    atten *= cone * 0.2;
                 }
             }
             else
             {
-                float3 spotDir = light.directionAndSpotScale.xyz;
-                float spotScale = light.directionAndSpotScale.w;
-                float spotOffset = light.spotParamsAndType.x;
-                atten *= SpotLightAttenuation(toLight, spotDir, spotScale, spotOffset);
+                atten *= cone;
             }
         }
 
@@ -130,6 +146,60 @@ float3 EvaluateClusteredLights(
                 lightColor * atten,
                 metallic, roughness, diffuseMode);
             totalLight += litColor;
+        }
+    }
+    return totalLight;
+}
+
+float3 EvaluateAllLocalLights(
+    float3 worldPos,
+    float3 N,
+    float3 V,
+    float3 albedo,
+    float metallic,
+    float roughness,
+    uint diffuseMode)
+{
+    uint numLights = min((uint)cluster_params.w, 256u);
+    if (numLights == 0)
+        return 0;
+
+    float3 totalLight = 0;
+    for (uint i = 0; i < numLights; i++)
+    {
+        GPULightData light = g_LightData[i];
+        if (light.colorAndRange.w < 0.01)
+            continue;
+        float3 lightPos = light.positionAndInvRangeSq.xyz;
+        float invRangeSq = abs(light.positionAndInvRangeSq.w);
+        if (invRangeSq < 1e-8)
+            continue;
+        float3 lightColor = light.colorAndRange.xyz;
+        float lightType = light.spotParamsAndType.y;
+
+        float3 toLight = lightPos - worldPos;
+        float distSq = dot(toLight, toLight);
+        if (distSq * invRangeSq >= 1.0)
+            continue;
+
+        float3 L = normalize(toLight);
+        float virtSizeSq = light.spotParamsAndType.w;
+        float atten = PointLightAttenuation(distSq, invRangeSq, virtSizeSq);
+
+        if (lightType > 0.5f)
+        {
+            float3 spotDir = light.directionAndSpotScale.xyz;
+            float spotScale = light.directionAndSpotScale.w;
+            float spotOffset = light.spotParamsAndType.x;
+            atten *= SpotLightAttenuation(toLight, spotDir, spotScale, spotOffset);
+        }
+
+        if (atten > 0.001f)
+        {
+            totalLight += PBRDirectLighting(
+                albedo, N, V, L,
+                lightColor * atten,
+                metallic, roughness, diffuseMode);
         }
     }
     return totalLight;

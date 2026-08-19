@@ -1,11 +1,9 @@
-// xrRender/FrameGraphPasses/ExposurePassSetup.h
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include <nvrhi/nvrhi.h>
 
-// Forward declarations
 namespace xray::render {
     namespace fg {
         class RenderDevice;
@@ -18,30 +16,6 @@ namespace xray::render::framegraph {
 
 namespace xray::render::fg::passes {
 
-// ═══════════════════════════════════════════════════════
-//  EXPOSURE PASS (Auto-Exposure / Eye Adaptation)
-// ═══════════════════════════════════════════════════════
-//
-// Computes scene exposure for HDR rendering using histogram-based
-// auto-exposure with temporal eye adaptation.
-//
-// PIPELINE:
-// 1. Luminance Histogram - Compute shader generates 64-bin histogram
-//    from HDR scene in log2 luminance space
-// 2. Exposure Adaptation - Compute shader analyzes histogram,
-//    skips extreme values, computes target exposure, applies
-//    temporal smoothing for eye adaptation effect
-//
-// OUTPUT:
-// - 1x1 R32_FLOAT texture containing exposure value
-// - Sky pass reads this via s_tonemap.Load(int3(0,0,0)).x
-// - Tonemap pass uses same exposure for HDR->LDR conversion
-//
-// REFERENCES:
-// - Krzysztof Narkowicz: "Automatic Exposure" (2016)
-// - Epic Games: "Auto Exposure in UE 4.25" (2020)
-// - Hillaire: "A Scalable and Production Ready Sky and Atmosphere" (2020)
-
 struct ExposurePassState {
     nvrhi::BufferHandle histogramBuffer;
     nvrhi::TextureHandle exposureTexture;
@@ -52,28 +26,18 @@ struct ExposurePassState {
     bool initialized = false;
     bool computeEnabled = false;
     float currentExposure = 1.0f;
+    float f_luminance_adapt = 0.5f;
+    u32 pipeVersion = 0;
+    nvrhi::BufferHandle histReadback[3];
+    u32 histWriteSlot = 0;
+    u32 histBins[64] = {};
 };
 
 struct ExposureConfig {
-    // Histogram parameters
-    float minLogLuminance = -10.0f;  // Minimum log2 luminance (EV)
-    float maxLogLuminance = 4.0f;    // Maximum log2 luminance (EV)
-
-    // Percentile clamping (skip extreme values)
-    float lowPercentile = 0.5f;      // Skip darkest 50% of pixels
-    float highPercentile = 0.98f;    // Skip brightest 2% of pixels
-
-    // Eye adaptation speed (f-stops per second)
-    float adaptSpeedUp = 3.0f;       // Speed when brightening
-    float adaptSpeedDown = 1.0f;     // Speed when darkening (slower)
-
-    // Exposure limits
-    float minExposure = 0.001f;      // Minimum exposure value
-    float maxExposure = 64.0f;       // Maximum exposure value
-
-    // Calibration
-    float exposureCompensation = 0.0f;  // Manual EV adjustment
-    float calibrationConstant = 12.5f;  // Reflected-light meter constant K
+    float middleGray = 1.0f;
+    float amount = 0.7f;
+    float lowLum = 0.0001f;
+    float adaptation = 1.0f;
 };
 
 struct ExposurePassData {
@@ -88,16 +52,13 @@ struct ExposurePassData {
     ExposurePassState* passState;
 };
 
-// Output handles from exposure pass
 struct ExposureOutput {
-    framegraph::VirtualResourceHandle exposureTexture;  // 1x1 R32_FLOAT
-    framegraph::VirtualResourceHandle histogramBuffer;  // 64 u32 bins (for debug)
+    framegraph::VirtualResourceHandle exposureTexture;
+    framegraph::VirtualResourceHandle histogramBuffer;
 };
 
 void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& state);
 
-// Setup the exposure pass
-// Returns handle to 1x1 exposure texture
 ExposureOutput setupExposurePass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
@@ -112,5 +73,6 @@ ExposureOutput setupExposurePass(
 ExposureConfig GetDefaultExposureConfig();
 
 nvrhi::ITexture* GetExposureTexture(const ExposurePassState& state);
+void PollExposureHistogram(ExposurePassState& state, nvrhi::IDevice* device);
 
 } // namespace xray::render::fg::passes

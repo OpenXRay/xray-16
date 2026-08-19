@@ -217,8 +217,13 @@ void FGDebugDraw::DrawEllipse(const Fmatrix& T, u32 color)
 
 bool FGDebugDraw::EnsurePipelines(nvrhi::IDevice* device, nvrhi::IFramebuffer* framebuffer)
 {
-    if (m_pipelineLine && m_pipelineTri)
+    const auto& fbInfo = framebuffer->getFramebufferInfo();
+    const nvrhi::Format fmt = fbInfo.colorFormats.empty() ? nvrhi::Format::UNKNOWN : fbInfo.colorFormats[0];
+    if (m_pipelineLine && m_pipelineTri && m_pipelineFormat == fmt)
         return true;
+    m_pipelineLine = nullptr;
+    m_pipelineTri = nullptr;
+    m_pipelineFormat = fmt;
 
     auto* shaderLoader = RImplementation.GetShaderLoader();
     if (!shaderLoader)

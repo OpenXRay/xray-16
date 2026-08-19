@@ -1,0 +1,24 @@
+// shadow_cascade.ps — alpha-clip for foliage / masked casters
+#include "bindless_common.h"
+#include "common_samplers.h"
+
+// g_Materials is declared in bindless_common.h (t8)
+
+struct PS_INPUT
+{
+	float4 position : SV_Position;
+	float2 texcoord : TEXCOORD0;
+	nointerpolation uint materialID : TEXCOORD1;
+};
+
+void main(PS_INPUT input)
+{
+	MaterialData mat = g_Materials[input.materialID];
+	if ((mat.flags & MAT_FLAG_ALPHA_TEST) != 0)
+	{
+		if (mat.diffuseIndex == INVALID_TEXTURE_INDEX)
+			return;
+		float alpha = GetBindlessTexture(mat.diffuseIndex).Sample(smp_linear, input.texcoord).a;
+		clip(alpha - mat.alphaRef);
+	}
+}

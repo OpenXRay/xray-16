@@ -1,9 +1,12 @@
 #define SM_6_0
 #include "common.h"
+#include "shared/surface_marks.h"
 
 Texture2D g_Snapshot : register(t0);
 Texture2D g_Distortion : register(t1);
-Texture2D<float> g_Depth : register(t2);
+Texture2D<float4> g_WorldPos : register(t2);
+Texture2D g_UnderColor : register(t3);
+Texture2D<float> g_Depth : register(t24);
 
 struct PS_INPUT
 {
@@ -11,41 +14,88 @@ struct PS_INPUT
     float2 texcoord : TEXCOORD0;
 };
 
-float4 main(PS_INPUT input) : SV_Target0
+float DistBorderAtten(float2 pos, float value)
 {
-    float4 distortSample = g_Distortion.Sample(smp_linear, input.texcoord);
-    float2 offset = distortSample.xy;
-    float totalWeight = distortSample.w;
+    float borderDist = min(1.0 - max(pos.x, pos.y), min(pos.x, pos.y));
+    return saturate(borderDist > value ? 1.0 : borderDist / value);
+}
 
-    if (totalWeight < 0.0001)
-        return g_Snapshot.Sample(smp_linear, input.texcoord);
-
-    float sourceViewZ = distortSample.z / totalWeight;
-
-    int2 pixelCoord = (int2)input.position.xy;
-    float currentDepth = g_Depth.Load(int3(pixelCoord, 0));
-    float3 viewDir = camera_direction.xyz;
-    float currentViewZ = 0.0;
-    if (currentDepth > 0.0) {
-        float3 currentWP = reconstruct_world_pos(input.position.xy, currentDepth);
-        currentViewZ = dot(currentWP - eye_position, viewDir);
-
-        if (currentViewZ < sourceViewZ * 0.9)
-            return g_Snapshot.Sample(smp_linear, input.texcoord);
-    }
-
-    float2 displaced = saturate(input.texcoord + offset);
-
-    if (currentDepth > 0.0) {
-        float2 displacedPx = displaced * screen_res.xy;
-        float displacedDepth = g_Depth.Load(int3((int2)displacedPx, 0));
-        if (displacedDepth > 0.0) {
-            float3 displacedWP = reconstruct_world_pos(displacedPx, displacedDepth);
-            float displacedViewZ = dot(displacedWP - eye_position, viewDir);
-            if (displacedViewZ < currentViewZ * 0.85)
-                displaced = input.texcoord;
+bool IsHudNearMark(float2 uv, float2 texel)
+{
+    [unroll]
+    for (int y = -2; y <= 2; ++y)
+    {
+        [unroll]
+        for (int x = -2; x <= 2; ++x)
+        {
+            float2 p = saturate(uv + float2(x, y) * texel);
+            int2 ip = int2(p * screen_res.xy);
+            if (IsHudSurfMark(g_WorldPos.Load(int3(ip, 0)).w))
+                return true;
         }
     }
+    return false;
+}
 
-    return g_Snapshot.Sample(smp_linear, displaced);
+float SampleViewZ(float2 uv)
+{
+    float4 wp = g_WorldPos.SampleLevel(smp_nofilter, uv, 0);
+    if (IsWaterSurfMark(wp.w) || IsHudSurfMark(wp.w) || IsCharSurfMark(wp.w))
+        return abs(mul(m_V, float4(wp.xyz, 1.0)).z);
+
+    float rawDepth = g_Depth.Load(int3((int2)(uv * screen_res.xy), 0));
+    if (rawDepth <= 1e-7)
+        return 0.0;
+    float3 sceneWP = reconstruct_world_pos(uv * screen_res.xy, rawDepth);
+    return abs(mul(m_V, float4(sceneWP, 1.0)).z);
+}
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    float4 snapshot = g_Snapshot.Sample(smp_linear, input.texcoord);
+    float2 texel = screen_res.zw;
+
+    float4 wp = g_WorldPos.SampleLevel(smp_nofilter, input.texcoord, 0);
+    if (IsHudSurfMark(wp.w) || IsHudNearMark(input.texcoord, texel))
+        return snapshot;
+
+    float4 d = g_Distortion.Sample(smp_nofilter, input.texcoord);
+    if (d.w < 1e-4)
+        return snapshot;
+
+    float2 centered = d.xy - 0.5;
+    float dist2 = dot(centered, centered);
+    if (dist2 < 1e-6)
+        return snapshot;
+
+    float2 offset = centered * def_distort;
+    offset.y = -offset.y;
+    offset *= DistBorderAtten(input.texcoord, 0.045);
+    offset *= saturate(d.w * 2.0);
+
+    float2 displaced = saturate(input.texcoord + offset);
+    if (IsHudNearMark(displaced, texel))
+        return snapshot;
+    if (IsHudSurfMark(g_WorldPos.SampleLevel(smp_nofilter, displaced, 0).w))
+        return snapshot;
+
+    if (IsWaterSurfMark(wp.w))
+    {
+        float3 refractedUnder = g_UnderColor.SampleLevel(smp_nofilter, displaced, 0).rgb;
+        float3 surface = snapshot.rgb;
+        float3 body = lerp(refractedUnder, surface, 0.72);
+        return float4(body, snapshot.a);
+    }
+
+    float destViewZ = SampleViewZ(input.texcoord);
+    float srcViewZ = d.z;
+    if (srcViewZ > 1.0 && destViewZ > 1e-4 && srcViewZ > destViewZ + 0.15)
+        return snapshot;
+
+    float displacedViewZ = SampleViewZ(displaced);
+    if (srcViewZ > 1.0 && displacedViewZ > 1e-4 && displacedViewZ + 0.15 < srcViewZ)
+        return snapshot;
+
+    float4 warped = g_Snapshot.Sample(smp_nofilter, displaced);
+    return float4(warped.rgb, snapshot.a);
 }

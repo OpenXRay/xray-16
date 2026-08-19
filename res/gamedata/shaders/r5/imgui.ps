@@ -10,10 +10,27 @@ struct PS_INPUT
 
 #include "common_samplers.h"
 
+cbuffer vertexBuffer : register(b0)
+{
+    float4x4 ProjectionMatrix;
+    float uiScale;
+    float3 uiPad;
+};
+
 Texture2D texture0 : register(t0);
+
+float3 SRGBToLinear(float3 c)
+{
+    float3 lo = c / 12.92;
+    float3 hi = pow(max((c + 0.055) / 1.055, 0.0), 2.4);
+    return lerp(lo, hi, step(0.04045, c));
+}
 
 float4 main(PS_INPUT input) : SV_Target
 {
-    float4 out_col = input.col * texture0.Sample(smp_linear, input.uv);
-    return out_col;
+    float4 t = texture0.Sample(smp_linear, input.uv);
+    float3 rgb = input.col.rgb * t.rgb;
+    if (uiScale < 0.999)
+        rgb = SRGBToLinear(rgb);
+    return float4(rgb * max(uiScale, 1e-4), input.col.a * t.a);
 }

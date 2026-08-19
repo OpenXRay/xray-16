@@ -1,0 +1,168 @@
+// wet/rain_patch_normal.ps — wet gloss on floors AND sides (NPC/rock/props)
+#define SM_6_0
+
+#include "wet/ssfx_waterfall.h"
+#include "shared/basecolor_pack.h"
+#include "shared/surface_marks.h"
+
+SamplerState smp_rtlinear : register(s0);
+SamplerState smp_nofilter : register(s1);
+SamplerState smp_linear   : register(s2);
+
+Texture2D g_Normal : register(t0);
+Texture2D g_WorldPos : register(t1);
+Texture2D<float> g_RainShadow : register(t2);
+Texture2D g_Water : register(t3);
+Texture2D g_WaterFall : register(t4);
+Texture2D g_PuddlesPerlin : register(t5);
+Texture2D g_Base : register(t6);
+Texture2D<float> g_SkyOpen : register(t7);
+
+cbuffer WetConstants : register(b0)
+{
+    float4 RainDensity;
+    float4 EyePos;
+    float4 SunColor;
+    float4 Timers;
+    float4x4 m_VP;
+    float4x4 m_RainSampleVP;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+};
+
+float RainCover(float3 worldPos)
+{
+    float4 tc = mul(m_RainSampleVP, float4(worldPos, 1.0));
+    float3 uvz = tc.xyz / max(tc.w, 1e-5);
+    if (any(uvz.xy < 0.0) || any(uvz.xy > 1.0) || uvz.z < 0.0 || uvz.z > 1.0)
+        return EyePos.w > 0.5 ? 0.0 : 1.0;
+
+    float depth = saturate(uvz.z);
+    const float bias = 0.0015;
+    float2 smSize;
+    g_RainShadow.GetDimensions(smSize.x, smSize.y);
+    float2 texel = 1.0 / max(smSize, float2(1.0, 1.0));
+
+    float cover = 0.0;
+    [unroll] for (int y = -2; y <= 2; ++y)
+    {
+        [unroll] for (int x = -2; x <= 2; ++x)
+        {
+            float2 o = float2((float)x, (float)y) * texel * 1.25;
+            float shadowDepth = g_RainShadow.SampleLevel(smp_nofilter, uvz.xy + o, 0).x;
+            cover += saturate((shadowDepth - (depth - bias)) * 120.0);
+        }
+    }
+    cover *= (1.0 / 25.0);
+
+    float edge = saturate(min(uvz.x, 1.0 - uvz.x) * 8.0)
+               * saturate(min(uvz.y, 1.0 - uvz.y) * 8.0);
+    float edgeFallback = EyePos.w > 0.5 ? 0.0 : 1.0;
+    cover = lerp(edgeFallback, cover, edge);
+    return cover;
+}
+
+float4 main(PS_INPUT input) : SV_Target
+{
+    float4 Nsamp = g_Normal.SampleLevel(smp_rtlinear, input.texcoord, 0);
+    float4 wpSamp = g_WorldPos.SampleLevel(smp_rtlinear, input.texcoord, 0);
+    float3 N = normalize(Nsamp.xyz + float3(0.0, 0.0, 0.00001));
+    float3 WorldN = N;
+    float3 worldPos = wpSamp.xyz;
+    float hudWet = IsHudSurfMark(wpSamp.w) ? 1.0 : 0.0;
+    float charWet = IsCharSurfMark(wpSamp.w) ? 1.0 : 0.0;
+    float actorWet = saturate(hudWet + charWet);
+    if (EyePos.w > 0.5 && actorWet > 0.0)
+        return float4(N, 0.0);
+    float wetBoost = (wpSamp.w > 1.5) ? 1.0 : 0.0;
+    float terrainWet = IsTerrainSurfMark(wpSamp.w) ? 1.0 : 0.0;
+    float grassWet = IsVegSurfMark(wpSamp.w) ? 1.0 : 0.0;
+    const bool noDistFade = EyePos.w > 0.5;
+    float matRough = saturate(abs(Nsamp.w));
+    float metallic = UnpackMetallicFromBaseA(g_Base.SampleLevel(smp_rtlinear, input.texcoord, 0).a);
+    float dielectric = 1.0 - metallic;
+    float soak = saturate(0.55 + matRough * 0.85) * lerp(0.7, 1.25, dielectric);
+    soak *= lerp(1.0, 0.75, metallic);
+    soak *= lerp(1.0, 1.45, wetBoost);
+    soak *= lerp(1.0, 1.25, terrainWet);
+    soak *= lerp(1.0, 1.4, grassWet);
+    soak *= lerp(1.0, 1.35, actorWet);
+
+    float rain = max(RainDensity.x, RainDensity.y);
+    float rainGate = saturate(rain * 28.0 + 0.15);
+    float Cover = RainCover(worldPos);
+    if (EyePos.w > 0.5)
+    {
+        float sky = g_SkyOpen.Load(int3(input.position.xy, 0));
+        Cover = min(Cover, saturate(sky));
+    }
+    if (hudWet > 0.0)
+    {
+        float sky = (EyePos.w > 0.5) ? g_SkyOpen.Load(int3(input.position.xy, 0)) : 1.0;
+        Cover = max(Cover, saturate(sky) * 0.9);
+    }
+    Cover = lerp(Cover, saturate(Cover * 1.15 + 0.05), wetBoost * (1.0 - terrainWet));
+    Cover = lerp(Cover, saturate(max(Cover, 0.55)), actorWet * rainGate);
+
+    float3 RainWorld = worldPos;
+    float3 RainEye = ssfx_RainPos(worldPos, EyePos.xyz);
+    float p_len = length(RainEye);
+    float time = Timers.x;
+    float keepEye = EyePos.x * 0.0 + m_VP[0][0] * 0.0 + SunColor.x * 0.0;
+
+    float RainInt = clamp(rain * ssfx_wetsurfaces_1.y * 1.35,
+                          ssfx_wetsurfaces_1.z * rainGate, 2.4);
+    float Wetness = saturate(rain * 2.8 + 0.2) * soak * Cover;
+
+    float3 waterSplash = float3(0.0, 0.0, 0.0);
+    waterSplash.xy = ssfx_rain_ripples(
+        g_Water, smp_linear,
+        RainWorld.xz * ssfx_wetsurfaces_1.x,
+        float3(RainInt, ssfx_wetsurfaces_1.w, 6.0),
+        p_len,
+        time);
+
+    float perlin = g_PuddlesPerlin.SampleLevel(smp_linear, RainWorld.xz * 0.35 + time * 0.04, 0).r;
+    waterSplash.x += (perlin * 2.0 - 1.0) * 0.035;
+    waterSplash.z += (frac(perlin * 7.13) * 2.0 - 1.0) * 0.035;
+
+    float3 waterFallX = ssfx_GetWaterFall(g_WaterFall, smp_linear, RainWorld.zy, rain, time);
+    float3 waterFallZ = ssfx_GetWaterFall(g_WaterFall, smp_linear, RainWorld.xy, rain, time);
+
+    float3 weights = WorldN;
+    float upW = saturate(weights.y);
+    float sideW = saturate(1.0 - abs(weights.y)); // walls, NPC sides, rocks
+
+    float3 water = waterSplash * smoothstep(0.75, 0.8, upW);
+    float2 wxz = ssfx_WallWeightsXZ(weights);
+    water += waterFallX.yxz * wxz.x;
+    water += waterFallZ.zxy * wxz.y;
+    // Sides get streaks; tops get ripples (NPC/rock/grass blades included)
+    water *= rainGate * saturate(RainInt) * Cover * lerp(0.45, 0.65, upW) * soak;
+    N = normalize(N + water);
+
+    float Gloss = (0.28 + saturate(RainInt) * 0.14) * Wetness;
+    Gloss *= Cover;
+    Gloss *= lerp(1.0, 1.55, metallic * saturate(1.0 - matRough * 0.85));
+    float orient = saturate(upW * 1.25 + sideW * 1.05 + 0.2);
+    orient *= saturate(weights.y * 1.6 + 0.9);
+    orient = lerp(orient, saturate(0.55 + sideW * 1.2 + upW * 0.85), wetBoost);
+    orient = lerp(orient, saturate(0.75 + upW * 1.4), terrainWet);
+    orient = lerp(orient, saturate(0.82 + upW * 0.9 + sideW * 0.65), grassWet);
+    Gloss *= orient;
+    float distFade = noDistFade ? 1.0 : saturate((280.0 - p_len) / 100.0);
+    Gloss *= lerp(distFade, 1.0, wetBoost);
+    Gloss = saturate(Gloss * rainGate * lerp(1.35, lerp(2.1, 2.35, terrainWet), wetBoost) + keepEye);
+    float outdoor = saturate(Cover * 1.35);
+    float charFloor = 0.40 * rainGate * outdoor;
+    float charAdd = 0.20 * rainGate * outdoor;
+    float charGloss = saturate(max(Gloss, charFloor) + charAdd);
+    charGloss = lerp(charGloss, 0.52 * outdoor, 0.55);
+    Gloss = lerp(Gloss, saturate(charGloss), actorWet * rainGate * outdoor);
+
+    return float4(N, Gloss);
+}

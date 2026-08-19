@@ -1,0 +1,12 @@
+#include "shared/common.h"
+
+struct PS_INPUT
+{
+    float4 hpos  : SV_Position;
+    float4 color : COLOR0;
+};
+
+float4 main(PS_INPUT I) : SV_Target
+{
+    return I.color;
+}

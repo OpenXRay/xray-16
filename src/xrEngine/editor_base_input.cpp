@@ -141,21 +141,18 @@ void ide::UpdateMouseData()
     auto& bd = m_imgui_backend;
     const bool anyMouseButtonPressed = pInput->iAnyMouseButtonDown();
 
-    if (bd.mouse_last_leave_frame && bd.mouse_last_leave_frame >= ImGui::GetFrameCount() && anyMouseButtonPressed)
+    if (bd.mouse_last_leave_frame && bd.mouse_last_leave_frame >= ImGui::GetFrameCount() && !anyMouseButtonPressed)
     {
         bd.mouse_window_id = 0;
         bd.mouse_last_leave_frame = 0;
         io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
     }
 
-    // Our io.AddMouseViewportEvent() calls will only be valid when not capturing.
-    // Technically speaking testing for 'anyMouseButtonPressed' would be more rygorous, but testing for payload reduces noise and potential side-effects.
     if (bd.mouse_can_report_hovered_viewport && ImGui::GetDragDropPayload() == nullptr)
         io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport;
     else
         io.BackendFlags &= ~ImGuiBackendFlags_HasMouseHoveredViewport;
 
-    // We forward mouse input when hovered or captured (via SDL_EVENT_MOUSE_MOTION) or when focused (below)
 #if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE && defined(IMGUI_ENABLE_VIEWPORTS)
     SDL_CaptureMouse(anyMouseButtonPressed ? true : false);
     SDL_Window* focused_window = SDL_GetKeyboardFocus();
@@ -169,6 +166,15 @@ void ide::UpdateMouseData()
         if (io.WantSetMousePos)
         {
             pInput->iSetMousePos({ (int)io.MousePos.x, (int)io.MousePos.y }, io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable);
+        }
+        else if (bd.mouse_last_leave_frame == 0)
+        {
+            float mx = 0.0f, my = 0.0f;
+            if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+                SDL_GetGlobalMouseState(&mx, &my);
+            else
+                SDL_GetMouseState(&mx, &my);
+            io.AddMousePosEvent(mx, my);
         }
     }
 
@@ -285,6 +291,12 @@ void ide::IR_OnDeactivate()
 void ide::IR_OnMousePress(int key)
 {
     ImGuiIO& io = ImGui::GetIO();
+    float mx = 0.0f, my = 0.0f;
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        SDL_GetGlobalMouseState(&mx, &my);
+    else
+        SDL_GetMouseState(&mx, &my);
+    io.AddMousePosEvent(mx, my);
     const int imkey = key - (MOUSE_INVALID + 1);
     io.AddMouseButtonEvent(imkey, true);
 }
@@ -298,7 +310,6 @@ void ide::IR_OnMouseRelease(int key)
 
 void ide::IR_OnMouseHold(int /*key*/)
 {
-    // ImGui handles hold state on its own
 }
 
 void ide::IR_OnMouseWheel(float x, float y)
@@ -309,13 +320,13 @@ void ide::IR_OnMouseWheel(float x, float y)
 
 void ide::IR_OnMouseMove(int /*x*/, int /*y*/)
 {
-    // x and y are relative to previous mouse position
-    // ImGui accepts absolute coordinates (that are relative to window or monitor)
-    Ivector2 p;
-    pInput->iGetAsyncMousePos(p, ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable);
-
     ImGuiIO& io = ImGui::GetIO();
-    io.AddMousePosEvent(static_cast<float>(p.x), static_cast<float>(p.y));
+    float mx = 0.0f, my = 0.0f;
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        SDL_GetGlobalMouseState(&mx, &my);
+    else
+        SDL_GetMouseState(&mx, &my);
+    io.AddMousePosEvent(mx, my);
 }
 
 void ide::IR_OnKeyboardPress(int key)

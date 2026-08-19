@@ -4,6 +4,9 @@
 #include "xrCore/FileCRC32.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/xrRender_console.h"
+#include <algorithm>
+#include <cctype>
+#include <cstring>
 
 namespace xray::render::framegraph {
 using namespace fg;
@@ -46,8 +49,9 @@ void ResolveShaderSourceRelativePath(
     {
         pcstr pchr = strchr(name, '(');
         ptrdiff_t size = pchr ? pchr - name : xr_strlen(name);
-        strncpy(shName, name, size);
-        shName[size] = 0;
+        const size_t n = std::min(static_cast<size_t>(size), sizeof(shName) - 1);
+        std::memcpy(shName, name, n);
+        shName[n] = 0;
     }
 
     // Only remove skinning suffix (_0, _1, _2, _3, _4) for vertex shaders
@@ -59,23 +63,117 @@ void ResolveShaderSourceRelativePath(
         size_t len = xr_strlen(shName);
         if (len > 2 && shName[len - 2] == '_' && shName[len - 1] >= '0' && shName[len - 1] <= '4')
         {
-            // Check if this looks like a skinning suffix by checking if the base name exists
             string_path testName;
             xr_strcpy(testName, shName);
-            testName[len - 2] = 0; // Remove the "_X" suffix
+            testName[len - 2] = 0;
 
             string_path testFilename;
             strconcat(sizeof(testFilename), testFilename, "r5" DELIMITER, testName, extension);
 
-            // Only strip if the base file exists
             if (FS.exist("$game_shaders$", testFilename))
             {
-                xr_strcpy(shName, testName); // Use the base name
+                xr_strcpy(shName, testName);
             }
         }
     }
 
+    {
+        char norm[256];
+        size_t n = 0;
+        for (const char* p = shName; *p && n + 1 < sizeof(norm); ++p)
+        {
+            char c = *p;
+            if (c == '\\')
+                c = '/';
+            norm[n++] = (char)tolower((unsigned char)c);
+        }
+        norm[n] = 0;
+        if (0 == xr_strcmp(norm, "effects/water"))
+            xr_strcpy(shName, "water");
+        else if (0 == xr_strcmp(norm, "effects/waterd"))
+            xr_strcpy(shName, "waterd");
+    }
+
+    for (char* p = shName; *p; ++p)
+    {
+        if (*p == '/' || *p == '\\')
+            *p = '\\';
+    }
+
     strconcat(outRelativePathSize, outRelativePath, "r5" DELIMITER, shName, extension);
+}
+
+u32 MixSourceHash(u32 a, u32 b)
+{
+    return a ^ ((b << 16) | (b >> 16));
+}
+
+void HashIncludesRecursive(const char* source, size_t len, u32& hash, xr_vector<xr_string>& visited)
+{
+    const char* p = source;
+    const char* end = source + len;
+    while (p < end)
+    {
+        const char* hashMark = static_cast<const char*>(memchr(p, '#', size_t(end - p)));
+        if (!hashMark)
+            break;
+        p = hashMark + 1;
+        while (p < end && (*p == ' ' || *p == '\t'))
+            ++p;
+        if (p + 7 > end || strncmp(p, "include", 7) != 0)
+            continue;
+        p += 7;
+        while (p < end && (*p == ' ' || *p == '\t'))
+            ++p;
+        if (p >= end || (*p != '"' && *p != '<'))
+            continue;
+        const char delim = (*p == '"') ? '"' : '>';
+        ++p;
+        const char* start = p;
+        while (p < end && *p != delim && *p != '\n' && *p != '\r')
+            ++p;
+        if (p >= end || *p != delim)
+            continue;
+        xr_string incName(start, p - start);
+        if (incName.empty())
+            continue;
+        for (char& c : incName)
+        {
+            if (c == '/')
+                c = '\\';
+        }
+        bool seen = false;
+        for (const auto& v : visited)
+        {
+            if (v == incName)
+            {
+                seen = true;
+                break;
+            }
+        }
+        if (seen)
+            continue;
+        visited.push_back(incName);
+
+        string_path rel;
+        strconcat(sizeof(rel), rel, "r5" DELIMITER, incName.c_str());
+        IReader* inc = FS.r_open("$game_shaders$", rel);
+        if (!inc)
+            continue;
+        const char* incSrc = static_cast<const char*>(inc->pointer());
+        const size_t incLen = inc->length();
+        hash = MixSourceHash(hash, crc32(incSrc, incLen));
+        HashIncludesRecursive(incSrc, incLen, hash, visited);
+        inc->close();
+    }
+}
+
+u32 HashShaderSource(const char* source, size_t len)
+{
+    u32 hash = ShaderCache::ComputeHash(source, len);
+    xr_vector<xr_string> visited;
+    HashIncludesRecursive(source, len, hash, visited);
+    return hash;
 }
 
 } // namespace
@@ -156,7 +254,7 @@ bool ShaderLoader::CompileShader(
         return false;
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSource(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -225,11 +323,14 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     // Open shader source file
     IReader* fs = OpenShaderFile(name, ".vs");
     if (!fs)
-        return result;  // Empty result
+    {
+        Msg("! [ShaderLoader] Failed to open %s.vs", name);
+        return result;
+    }
     WatchShaderFile(cacheKey, name, ".vs", entryPoint, xray::render::SlangCompiler::Stage::Vertex);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSource(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -360,11 +461,14 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     // Open shader source file
     IReader* fs = OpenShaderFile(name, ".ps");
     if (!fs)
-        return result;  // Empty result
+    {
+        Msg("! [ShaderLoader] Failed to open %s.ps", name);
+        return result;
+    }
     WatchShaderFile(cacheKey, name, ".ps", entryPoint, xray::render::SlangCompiler::Stage::Pixel);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSource(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -506,7 +610,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     WatchShaderFile(cacheKey, name, ".cs", entryPoint, xray::render::SlangCompiler::Stage::Compute);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSource(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -649,7 +753,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
     WatchShaderFile(cacheKey, name, ".as", entryPoint, xray::render::SlangCompiler::Stage::Amplification);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSource(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -759,7 +863,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
     WatchShaderFile(cacheKey, name, ".ms", entryPoint, xray::render::SlangCompiler::Stage::Mesh);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = HashShaderSource(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -879,11 +983,9 @@ bool ShaderLoader::CompileShaderWithDefines(
         definesStr.append(";");
     }
 
-    u32 cacheKey = ShaderCache::ComputeHash(
-        sourceCode.c_str(),
-        sourceCode.length(),
-        definesStr.c_str()
-    );
+    u32 cacheKey = HashShaderSource(sourceCode.c_str(), sourceCode.length());
+    if (!definesStr.empty())
+        cacheKey = MixSourceHash(cacheKey, crc32(definesStr.c_str(), definesStr.length()));
 
     // Try to load from cache
     ExtractedReflection cachedReflection;

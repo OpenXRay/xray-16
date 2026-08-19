@@ -32,6 +32,7 @@ namespace xray::render::fg::passes {
 struct DetailPassState {
     bool detailDataUploaded = false;
     float lastBladeWidth = 0.0f;
+    framegraph::VirtualResourceHandle cullArgs;
 };
 
 struct DetailPassData {
@@ -40,6 +41,7 @@ struct DetailPassData {
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle outputNormal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle worldPos;
     fg::RenderDevice* device;
     fg::FGDetailManager* detailManager;
     framegraph::DefaultOutputLayout outputs;
@@ -61,7 +63,8 @@ framegraph::DefaultOutputLayout setupDetailPass(
     const framegraph::DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
-    xray::profiler::GPUProfiler* gpuProfiler = nullptr
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr,
+    framegraph::VirtualResourceHandle cullArgs = {}
 );
 
 } // namespace xray::render::fg::passes

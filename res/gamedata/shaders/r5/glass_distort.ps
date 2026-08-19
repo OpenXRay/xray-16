@@ -1,0 +1,33 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+    float hemi : TEXCOORD6;
+    float2 lmUV : TEXCOORD7;
+};
+
+float4 main(PS_INPUT input) : SV_Target
+{
+    MaterialData mat = g_Materials[input.materialID];
+    if ((mat.flags & MAT_FLAG_GLASS) == 0)
+        clip(-1);
+
+    float3 N = normalize(input.normal);
+    float3 V = normalize(eye_position - input.worldPos);
+    float fade = 0.9 * abs(dot(V, N));
+    float4 distort = SampleDiffuse(mat, input.texcoord);
+    if ((mat.flags & MAT_FLAG_HAS_DETAIL) != 0 && mat.detailIndex != INVALID_TEXTURE_INDEX)
+        distort = GetBindlessTexture(mat.detailIndex).Sample(smp_base, input.texcoord);
+    float factor = saturate(fade * max(distort.a, max(max(distort.r, distort.g), distort.b)));
+    clip(factor - 0.01);
+    return float4(distort.rgb, factor);
+}

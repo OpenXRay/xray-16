@@ -35,8 +35,6 @@ framegraph::VirtualResourceHandle setupLensFlarePass(framegraph::FrameGraph& fg,
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outputRT);
-            if (depth)
-                fbDesc.setDepthAttachment(depth);
             auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
 
             data.renderer->DispatchVisibility(cmdList, depth);

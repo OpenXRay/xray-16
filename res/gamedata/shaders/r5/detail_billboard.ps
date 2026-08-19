@@ -2,6 +2,16 @@
 #define CLUSTERED_LIGHTING_FORWARD
 #include "common.h"
 #include "bindless_common.h"
+#include "shared/surface_marks.h"
+#include "shared/basecolor_pack.h"
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 baseColor : SV_Target2;
+    float4 worldPos : SV_Target3;
+};
 
 cbuffer DetailGlobals : register(b3)
 {
@@ -25,15 +35,7 @@ cbuffer DetailGlobals : register(b3)
 	uint build_details_pbr_index;
 };
 
-float3 ComputeBillboardSSS(float3 worldNormal, float3 lightDir, float heightParam)
-{
-	float backlit = saturate(dot(worldNormal, lightDir) * 0.5 + 0.5);
-	float thinness = heightParam;
-	float sssAmount = backlit * thinness * grass_sss_color.w;
-	return grass_sss_color.rgb * sssAmount;
-}
-
-f_forward main(p_billboard I)
+PS_OUTPUT main(p_billboard I)
 {
 	Texture2D atlas_tex = GetBindlessTexture(build_details_index);
 	float4 texel = atlas_tex.Sample(smp_linear, I.tcdh.xy);
@@ -46,6 +48,7 @@ f_forward main(p_billboard I)
 	float metallic = 0.0;
 	float roughness = 0.85;
 	float ao = lerp(0.5, 1.0, saturate(t));
+	float hemi = saturate(I.position.w);
 
 	if (build_details_pbr_index != 0)
 	{
@@ -56,8 +59,27 @@ f_forward main(p_billboard I)
 		ao = pbr.b;
 	}
 
-	float3 sss = ComputeBillboardSSS(N, -L_sun_dir_w, t);
-	albedo += sss * L_sun_color;
+	float3 tipColor = grass_color_tip.rgb;
+	float3 baseColor = grass_color_base.rgb;
+	float color_blend = smoothstep(0.2, 0.8, t);
+	float3 heightTint = lerp(baseColor, tipColor, color_blend);
+	float3 defaultMid = float3(0.315, 0.415, 0.165);
+	albedo *= heightTint / defaultMid;
 
-	return output_forward_pbr(albedo, N, I.position.xyz, metallic, roughness, ao, I.hpos);
+	float variationAmount = grass_color_variation;
+	albedo *= lerp(1.0 - variationAmount, 1.0 + variationAmount, I.bladeHash);
+
+	float sunOcc = (I.sunOcclusion > 0.01) ? 1.0 : 0.05;
+	const bool restir = parallax.w < -0.5;
+	float fwdSun = restir ? sunOcc : ((I.sunOcclusion > 0.01) ? consts.z : 0.0);
+
+	f_forward fwd = output_forward_pbr(
+		albedo, N, I.position.xyz, metallic, roughness, ao, I.hpos,
+		hemi, fwdSun, false, false);
+	PS_OUTPUT o;
+	o.color = float4(fwd.color.rgb, sunOcc);
+	o.normal = fwd.normal;
+	o.baseColor = float4(fwd.baseColor.rgb, PackBaseColorA(metallic, lerp(0.4, 0.85, saturate(t))));
+	o.worldPos = float4(I.position.xyz, SURF_MARK_GRASS);
+	return o;
 }

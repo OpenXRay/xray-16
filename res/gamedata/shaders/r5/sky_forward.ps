@@ -1,36 +1,28 @@
-// xrRender/Shaders/forward/sky_forward.ps
-// Sky dome pixel shader for Forward+ rendering
-//
-// Samples two cubemap textures and blends between them
-// Outputs HDR color to single render target
-
 #include "shared/common.h"
-#include "common_samplers.h"
+#include "atmosphere.h"
 
 struct PS_INPUT {
     float4 hpos     : SV_POSITION;
-    float4 color    : COLOR0;      // RGB = sky color tint, A = blend factor
-    float3 tc0      : TEXCOORD0;   // Cubemap UV for sky0
-    float3 tc1      : TEXCOORD1;   // Cubemap UV for sky1
+    float4 color    : COLOR0;
+    float3 tc0      : TEXCOORD0;
+    float3 tc1      : TEXCOORD1;
+    float  elev     : TEXCOORD2;
 };
 
-// Sky cubemap textures
+SamplerState smp_rtlinear : register(s0);
 TextureCube s_sky0 : register(t0);
 TextureCube s_sky1 : register(t1);
 
-
-float4 main(PS_INPUT I) : SV_TARGET {
-    // Sample both sky cubemaps
-    float3 sky0 = s_sky0.Sample(smp_rtlinear, I.tc0).rgb;
-    float3 sky1 = s_sky1.Sample(smp_rtlinear, I.tc1).rgb;
-
-    // Blend between sky states (alpha = blend weight from environment)
-    float blendFactor = I.color.a;
-    float3 sky = lerp(sky0, sky1, blendFactor);
-
-    // Apply sky color tint from environment
-    // sky *= I.color.rgb;
-
-    // Output HDR sky color (exposure applied uniformly in tonemap pass)
-    return float4(sky, 1.0f);
+float4 main(PS_INPUT I) : SV_TARGET
+{
+    float3 s0 = s_sky0.Sample(smp_rtlinear, I.tc0).rgb;
+    float3 s1 = s_sky1.Sample(smp_rtlinear, I.tc1).rgb;
+    float3 sky = I.color.rgb * lerp(s0, s1, I.color.a);
+    sky *= 0.33;
+    float3 viewDir = normalize(lerp(I.tc0, I.tc1, I.color.a));
+    float3 sunDir = normalize(-L_sun_dir_w.xyz);
+    float strength = saturate(fog_color.w);
+    if (strength > 0.001)
+        sky += AtmosphereSkyInscatter(viewDir, sunDir, L_sun_color.xyz, L_hemi_color.xyz, I.color.rgb, strength);
+    return float4(max(sky, 0.0), 1.0);
 }

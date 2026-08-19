@@ -159,8 +159,12 @@ void FGFontRender::EnsureVertexCapacity(size_t vertexCount)
 
 void FGFontRender::EnsurePipeline(nvrhi::IFramebuffer* framebuffer)
 {
-    if (m_pipeline)
+    const auto& fbInfo = framebuffer->getFramebufferInfo();
+    const nvrhi::Format fmt = fbInfo.colorFormats.empty() ? nvrhi::Format::UNKNOWN : fbInfo.colorFormats[0];
+    if (m_pipeline && m_pipelineFormat == fmt)
         return;
+    m_pipeline = nullptr;
+    m_pipelineFormat = fmt;
 
     nvrhi::GraphicsPipelineDesc pipelineDesc;
     pipelineDesc.VS = m_vs;

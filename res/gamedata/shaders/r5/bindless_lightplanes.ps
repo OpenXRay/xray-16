@@ -1,0 +1,40 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+};
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 baseColor : SV_Target2;
+};
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    PS_OUTPUT output;
+
+    MaterialData mat = g_Materials[input.materialID];
+    float4 tex = SampleDiffuse(mat, input.texcoord);
+
+    float3 N = normalize(input.normal);
+    float3 V = normalize(eye_position.xyz - input.worldPos);
+    float fade = abs(dot(V, N));
+    float alpha = saturate(tex.a) * fade;
+    clip(alpha - (1.0 / 255.0));
+
+    output.color = float4(tex.rgb, alpha);
+    output.normal = float4(0, 0, 0, 0);
+    output.baseColor = float4(0, 0, 0, 0);
+    return output;
+}

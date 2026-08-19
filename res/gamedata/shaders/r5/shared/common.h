@@ -6,6 +6,13 @@
 #ifndef SHARED_COMMON_H
 #define SHARED_COMMON_H
 
+float3 SRGBToLinear(float3 c)
+{
+	float3 lo = c / 12.92;
+	float3 hi = pow(max((c + 0.055) / 1.055, 0.0), 2.4);
+	return lerp(lo, hi, step(0.04045, c));
+}
+
 //	Used by VS
 cbuffer	dynamic_transforms : register(b0)
 {

@@ -32,6 +32,83 @@
 // Detail manager debug
 extern ENGINE_API int dm_debug_trails;
 
+namespace
+{
+const xr_token qrt_quality_token[] =
+{
+    { "off", 0 },
+    { "low", 1 },
+    { "medium", 2 },
+    { "high", 3 },
+    { "ultra", 4 },
+    { nullptr, 0 }
+};
+
+class CCC_RTQuality : public CCC_Token
+{
+public:
+    CCC_RTQuality(LPCSTR N, u32* V, const xr_token* T) : CCC_Token(N, V, T) {}
+
+    virtual void Execute(LPCSTR args) override
+    {
+        CCC_Token::Execute(args);
+        struct RTQualityPreset
+        {
+            int gi;
+            float intensity;
+            int bounces;
+            int spatial_samples;
+            float spatial_radius;
+            int m_max;
+            int local_samples;
+            int di_candidates;
+            int di_spatial_samples;
+            float di_spatial_radius;
+            int di_m_max;
+            int atrous_steps;
+            float ambient_scale;
+            int cache_size;
+            float cache_cell;
+            int vol_steps;
+            float detail_dist;
+            float lod_dist;
+            int sun_soft_samples;
+            int half;
+        };
+        static const RTQualityPreset kPresets[] =
+        {
+            { 0, 1.0f, 1, 2, 24.0f, 4, 2, 6, 0, 16.0f, 10, 3, 0.00f, 131072, 1.00f, 8, 12.f, 30.f, 2, 1 },
+            { 1, 1.0f, 1, 2, 24.0f, 4, 2, 6, 0, 16.0f, 10, 3, 0.00f, 131072, 1.00f, 8, 12.f, 30.f, 2, 1 },
+            { 1, 1.0f, 1, 3, 40.0f, 8, 4, 8, 0, 32.0f, 20, 3, 0.00f, 262144, 0.75f, 16, 20.f, 40.f, 2, 0 },
+            { 1, 1.0f, 2, 6, 48.0f, 12, 6, 12, 0, 40.0f, 24, 4, 0.00f, 393216, 0.60f, 24, 30.f, 50.f, 6, 0 },
+            { 1, 1.0f, 2, 8, 56.0f, 16, 8, 16, 0, 48.0f, 30, 4, 0.00f, 524288, 0.50f, 32, 40.f, 60.f, 8, 0 },
+        };
+        const u32 idx = (*value <= 4u) ? *value : 2u;
+        const RTQualityPreset& p = kPresets[idx];
+        ps_r_rt_gi = p.gi;
+        ps_r_rt_gi_half = p.half;
+        ps_r_rt_gi_intensity = p.intensity;
+        ps_r_rt_gi_bounces = p.bounces;
+        ps_r_rt_gi_spatial_samples = p.spatial_samples;
+        ps_r_rt_gi_spatial_radius = p.spatial_radius;
+        ps_r_rt_gi_m_max = p.m_max;
+        ps_r_rt_gi_local_samples = p.local_samples;
+        ps_r_rt_di_candidates = p.di_candidates;
+        ps_r_rt_di_spatial_samples = p.di_spatial_samples;
+        ps_r_rt_di_spatial_radius = p.di_spatial_radius;
+        ps_r_rt_di_m_max = p.di_m_max;
+        ps_r_rt_gi_atrous_steps = p.atrous_steps;
+        ps_r_rt_gi_ambient_scale = p.ambient_scale;
+        ps_r_rt_gi_cache_size = p.cache_size;
+        ps_r_rt_gi_cache_cell = p.cache_cell;
+        ps_r_rt_vol_steps = p.vol_steps;
+        ps_r_rt_detail_dist = p.detail_dist;
+        ps_r_rt_gi_lod_dist = p.lod_dist;
+        ps_r_rt_sun_soft_samples = p.sun_soft_samples;
+    }
+};
+}
+
 namespace xray::render::fg
 {
 u32 ps_Preset = 2;
@@ -191,7 +268,7 @@ Flags32 ps_r2_ls_flags = {R2FLAG_SUN
     //| R3FLAG_MSAA
     //| R3FLAG_MSAA_OPT
     | R3FLAG_GBUFFER_OPT | R2FLAG_DETAIL_BUMP | R2FLAG_DOF | R2FLAG_SOFT_PARTICLES | R2FLAG_SOFT_WATER |
-    R2FLAG_STEEP_PARALLAX | R2FLAG_SUN_FOCUS | R2FLAG_SUN_TSM | R2FLAG_TONEMAP | R2FLAG_VOLUMETRIC_LIGHTS}; // r2-only
+    R2FLAG_STEEP_PARALLAX | R2FLAG_SUN_FOCUS | R2FLAG_SUN_TSM | R2FLAG_SUN_DETAILS | R2FLAG_TONEMAP | R2FLAG_VOLUMETRIC_LIGHTS};
 
 Flags32 ps_r2_ls_flags_ext = {
     /*R2FLAGEXT_SSAO_OPT_DATA |*/ R2FLAGEXT_SSAO_HALF_DATA | R2FLAGEXT_ENABLE_TESSELLATION | R3FLAGEXT_SSR_HALF_DEPTH |
@@ -956,8 +1033,79 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r4_debug_gpu_culling", &ps_r4_debug_gpu_culling, 0, 1);
     CMD4(CCC_Integer, "r_path_tracer", &ps_r_path_tracer, 0, 1);
     CMD4(CCC_Integer, "r_path_tracer_bounces", &ps_r_path_tracer_bounces, 1, 16);
-    CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
+    CMD3(CCC_RTQuality, "r_rt_quality", &ps_r_rt_quality, qrt_quality_token);
+    CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 2);
+    CMD4(CCC_Integer, "r_rt_gi_half", &ps_r_rt_gi_half, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
+    CMD4(CCC_Integer, "r_rt_gi_spatial_samples", &ps_r_rt_gi_spatial_samples, 0, 16);
+    CMD4(CCC_Float, "r_rt_gi_spatial_radius", &ps_r_rt_gi_spatial_radius, 1.0f, 128.0f);
+    CMD4(CCC_Integer, "r_rt_gi_m_max", &ps_r_rt_gi_m_max, 1, 100);
+    CMD4(CCC_Integer, "r_rt_gi_local_samples", &ps_r_rt_gi_local_samples, 0, 16);
+    CMD4(CCC_Integer, "r_rt_di_candidates", &ps_r_rt_di_candidates, 1, 64);
+    CMD4(CCC_Integer, "r_rt_di_spatial_samples", &ps_r_rt_di_spatial_samples, 0, 16);
+    CMD4(CCC_Float, "r_rt_di_spatial_radius", &ps_r_rt_di_spatial_radius, 1.0f, 128.0f);
+    CMD4(CCC_Integer, "r_rt_di_m_max", &ps_r_rt_di_m_max, 1, 100);
+    CMD4(CCC_Integer, "r_rt_gi_atrous_steps", &ps_r_rt_gi_atrous_steps, 1, 6);
+    CMD4(CCC_Float, "r_rt_gi_temporal_alpha", &ps_r_rt_gi_temporal_alpha, 0.0f, 0.98f);
+    CMD4(CCC_Float, "r_rt_gi_ambient_scale", &ps_r_rt_gi_ambient_scale, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_rt_gi_bounces", &ps_r_rt_gi_bounces, 1, 2);
+    CMD4(CCC_Integer, "r_rt_gi_cache_size", &ps_r_rt_gi_cache_size, 0, 1048576);
+    CMD4(CCC_Float, "r_rt_gi_cache_cell", &ps_r_rt_gi_cache_cell, 0.05f, 8.0f);
+    CMD4(CCC_Integer, "r_rt_vol_steps", &ps_r_rt_vol_steps, 0, 64);
+    CMD4(CCC_Integer, "r_rt_vol_light_samples", &ps_r_rt_vol_light_samples, 0, 8);
+    CMD4(CCC_Float, "r_rt_detail_dist", &ps_r_rt_detail_dist, 2.f, 64.f);
+    CMD4(CCC_Float, "r_rt_gi_lod_dist", &ps_r_rt_gi_lod_dist, 10.f, 120.f);
+    CMD4(CCC_Integer, "r_rt_sun_soft_samples", &ps_r_rt_sun_soft_samples, 1, 8);
+    CMD4(CCC_Float, "r_rt_sun_angular", &ps_r_rt_sun_angular, 0.001f, 0.05f);
+    CMD4(CCC_Integer, "r_vol_fog", &ps_r_vol_fog, 0, 1);
+    CMD4(CCC_Float, "r_vol_fog_density", &ps_r_vol_fog_density, 0.0f, 2.0f);
+    CMD4(CCC_Float, "r_vol_fog_height", &ps_r_vol_fog_height, -200.0f, 200.0f);
+    CMD4(CCC_Float, "r_vol_fog_falloff", &ps_r_vol_fog_falloff, 0.0f, 1.0f);
+    CMD4(CCC_Float, "r_vol_fog_g", &ps_r_vol_fog_g, -0.99f, 0.99f);
+    CMD4(CCC_Float, "r_vol_fog_noise", &ps_r_vol_fog_noise, 0.0f, 2.0f);
+    CMD4(CCC_Integer, "r_vol_fog_gi", &ps_r_vol_fog_gi, 0, 1);
+    CMD4(CCC_Integer, "r_vol_fog_sun", &ps_r_vol_fog_sun, 0, 1);
+    CMD4(CCC_Integer, "r_rt_refl", &ps_r_rt_refl, 0, 2);
+    CMD4(CCC_Integer, "r_vol_fog_rt", &ps_r_vol_fog_rt, 0, 1);
+    CMD4(CCC_Integer, "r_vol_fog_lights", &ps_r_vol_fog_lights, 0, 8);
+    CMD4(CCC_Integer, "r_vol_fog_temporal", &ps_r_vol_fog_temporal, 0, 1);
+    CMD4(CCC_Integer, "r_vol_fog_spot", &ps_r_vol_fog_spot, 0, 2);
+    CMD4(CCC_Integer, "r_atmosphere", &ps_r_atmosphere, 0, 1);
+    CMD4(CCC_Float, "r_atmosphere_strength", &ps_r_atmosphere_strength, 0.0f, 4.0f);
+    CMD4(CCC_Integer, "r_rt_pt_bounces", &ps_r_rt_pt_bounces, 1, 8);
+    CMD4(CCC_Integer, "r_rt_pt_ccap", &ps_r_rt_pt_ccap, 1, 32);
+    CMD4(CCC_Integer, "r_rt_pt_decorrelate", &ps_r_rt_pt_decorrelate, 0, 1);
+
+    CMD4(CCC_Integer, "r_taa", &ps_r_taa, 0, 1);
+    CMD4(CCC_Float, "r_taa_sharpness", &ps_r_taa_sharpness, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_taa_jitter", &ps_r_taa_jitter, 0, 1);
+    CMD4(CCC_Float, "r_render_scale", &ps_r_render_scale, 0.25f, 1.0f);
+    CMD4(CCC_Integer, "r_upscale", &ps_r_upscale, 0, 3);
+    CMD4(CCC_Integer, "r_upscale_quality", &ps_r_upscale_quality, 0, 5);
+    CMD4(CCC_Integer, "r_dlss", &ps_r_dlss, 0, 1);
+    CMD4(CCC_Integer, "r_dlss_quality", &ps_r_dlss_quality, 0, 5);
+    CMD4(CCC_Integer, "r_dlss_fg", &ps_r_dlss_fg, 0, 1);
+    CMD4(CCC_Integer, "r_dlss_rr", &ps_r_dlss_rr, 0, 1);
+    CMD4(CCC_Float, "r_dlss_sharpness", &ps_r_dlss_sharpness, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_dlss_auto_exposure", &ps_r_dlss_auto_exposure, 0, 1);
+    CMD4(CCC_Integer, "r_denoise", &ps_r_denoise, 0, 1);
+    CMD4(CCC_Integer, "r_nrd_method", &ps_r_nrd_method, 0, 1);
+    CMD4(CCC_Integer, "r_nrd_apply", &ps_r_nrd_apply, 0, 1);
+    CMD4(CCC_Integer, "r_hdr10", &ps_r_hdr10, 0, 1);
+    CMD4(CCC_Float, "r_hdr10_hud", &ps_r_hdr10_hud, 80.f, 1000.f);
+    CMD4(CCC_Float, "r_hdr10_paper_white", &ps_r_hdr10_paper_white, 80.f, 1000.f);
+    CMD4(CCC_Float, "r_hdr10_peak", &ps_r_hdr10_peak, 200.f, 10000.f);
+    CMD4(CCC_Integer, "r_hdr_debug", &ps_r_hdr_debug, 0, 1);
+    CMD4(CCC_Float, "r_hdr_exposure_bias", &ps_r_hdr_exposure_bias, -4.f, 4.f);
+    CMD4(CCC_Float, "r_hdr_contrast", &ps_r_hdr_contrast, 0.2f, 3.f);
+    CMD4(CCC_Float, "r_hdr_saturation", &ps_r_hdr_saturation, 0.f, 3.f);
+    CMD4(CCC_Float, "r_hdr_white", &ps_r_hdr_white, 0.4f, 8.f);
+    CMD4(CCC_Float, "r_hdr_lift", &ps_r_hdr_lift, -0.5f, 0.5f);
+    CMD4(CCC_Float, "r_hdr_gamma", &ps_r_hdr_gamma, 0.3f, 2.6f);
+    CMD4(CCC_Float, "r_hdr_gain", &ps_r_hdr_gain, 0.2f, 3.f);
+    CMD4(CCC_Float, "r_hdr_temp", &ps_r_hdr_temp, -1.f, 1.f);
+    CMD4(CCC_Float, "r_hdr_tint", &ps_r_hdr_tint, -1.f, 1.f);
+    CMD4(CCC_Float, "r_hdr_bloom", &ps_r_hdr_bloom, 0.f, 4.f);
 
     // Smoke Trail (weapon muzzle smoke)
     CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);

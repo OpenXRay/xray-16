@@ -39,6 +39,8 @@ public:
 
     void setup(const level_portal_data_t& data, const xr_vector<CSector*>& sectors);
 
+    const Poly& getPoly() const { return poly; }
+
     CSector* getSectorFacing(const Fvector& V)
     {
         if (P.classify(V) > 0)

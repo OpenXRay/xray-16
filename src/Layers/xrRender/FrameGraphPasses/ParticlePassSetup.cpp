@@ -355,6 +355,62 @@ static u32 GenerateParticleVertices(
     return totalParticles;
 }
 
+bool ParticleBatchLooksEmissive(const ParticleBatch& batch)
+{
+    if (batch.isHUDMode || batch.shaderVariant == ParticleShaderVariant::Distort)
+        return false;
+    if (batch.shaderVariant == ParticleShaderVariant::Emissive)
+        return true;
+    if (!batch.visual || batch.visual->getType() != MT_PARTICLE_EFFECT)
+        return false;
+    auto* pEffect = static_cast<CParticleEffect*>(batch.visual);
+    auto* pDef = pEffect ? pEffect->GetDefinition() : nullptr;
+    if (!pDef)
+        return false;
+    const char* sh = pDef->m_ShaderName.c_str();
+    const char* tex = pDef->m_TextureName.c_str();
+    auto has = [](const char* s, const char* k) { return s && strstr(s, k) != nullptr; };
+    return has(sh, "glow") || has(sh, "flare") || has(tex, "glow") || has(tex, "fire")
+        || has(tex, "flame") || has(tex, "explosion") || has(tex, "ani-fire")
+        || has(tex, "ani-explosion") || has(tex, "grenade") || has(tex, "blast")
+        || has(tex, "flash") || has(tex, "flare") || has(tex, "spark")
+        || has(tex, "anomaly") || has(tex, "heat") || has(tex, "zhar")
+        || has(sh, "anomaly") || has(sh, "heat");
+}
+
+u32 BuildEmissiveParticleRTGeometry(
+    const xr_vector<ParticleBatch>& worldBatches,
+    xr_vector<ParticleVertex>& vertices,
+    xr_vector<u32>& indices,
+    u32 maxQuads)
+{
+    xr_vector<ParticleBatch> filtered;
+    filtered.reserve(worldBatches.size());
+    for (const auto& b : worldBatches) {
+        if (ParticleBatchLooksEmissive(b))
+            filtered.push_back(b);
+    }
+    if (filtered.empty())
+        return 0;
+    u32 quads = GenerateParticleVertices(filtered, vertices);
+    if (quads > maxQuads) {
+        vertices.resize(maxQuads * 4);
+        quads = maxQuads;
+    }
+    indices.resize(quads * 6);
+    for (u32 i = 0; i < quads; i++) {
+        const u32 v = i * 4;
+        const u32 o = i * 6;
+        indices[o + 0] = v + 0;
+        indices[o + 1] = v + 1;
+        indices[o + 2] = v + 2;
+        indices[o + 3] = v + 1;
+        indices[o + 4] = v + 3;
+        indices[o + 5] = v + 2;
+    }
+    return quads;
+}
+
 struct ParticleBlendDesc {
     nvrhi::BlendFactor srcBlend;
     nvrhi::BlendFactor destBlend;
@@ -366,18 +422,21 @@ struct ParticleBlendDesc {
 };
 
 static const ParticleBlendDesc s_blendDescs[PARTICLE_BLEND_COUNT] = {
-    { nvrhi::BlendFactor::One,       nvrhi::BlendFactor::Zero,        nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero,        false, true,  "ParticlePass_set" },
-    { nvrhi::BlendFactor::SrcAlpha,  nvrhi::BlendFactor::InvSrcAlpha, nvrhi::BlendFactor::One, nvrhi::BlendFactor::InvSrcAlpha, true,  false, "ParticlePass_blend" },
-    { nvrhi::BlendFactor::One,       nvrhi::BlendFactor::One,         nvrhi::BlendFactor::One, nvrhi::BlendFactor::One,         true,  false, "ParticlePass_add" },
-    { nvrhi::BlendFactor::DstColor,  nvrhi::BlendFactor::Zero,        nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero,        true,  false, "ParticlePass_mul" },
-    { nvrhi::BlendFactor::DstColor,  nvrhi::BlendFactor::SrcColor,    nvrhi::BlendFactor::One, nvrhi::BlendFactor::SrcAlpha,    true,  false, "ParticlePass_mul2x" },
-    { nvrhi::BlendFactor::SrcAlpha,  nvrhi::BlendFactor::One,         nvrhi::BlendFactor::One, nvrhi::BlendFactor::One,         true,  false, "ParticlePass_alphaAdd" },
+    { nvrhi::BlendFactor::One,       nvrhi::BlendFactor::Zero,        nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero,        false, true,  "ParticlePass_set_v2" },
+    { nvrhi::BlendFactor::SrcAlpha,  nvrhi::BlendFactor::InvSrcAlpha, nvrhi::BlendFactor::One, nvrhi::BlendFactor::InvSrcAlpha, true,  false, "ParticlePass_blend_v2" },
+    { nvrhi::BlendFactor::One,       nvrhi::BlendFactor::One,         nvrhi::BlendFactor::One, nvrhi::BlendFactor::One,         true,  false, "ParticlePass_add_v2" },
+    { nvrhi::BlendFactor::DstColor,  nvrhi::BlendFactor::Zero,        nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero,        true,  false, "ParticlePass_mul_v2" },
+    { nvrhi::BlendFactor::DstColor,  nvrhi::BlendFactor::SrcColor,    nvrhi::BlendFactor::One, nvrhi::BlendFactor::SrcAlpha,    true,  false, "ParticlePass_mul2x_v2" },
+    { nvrhi::BlendFactor::SrcAlpha,  nvrhi::BlendFactor::One,         nvrhi::BlendFactor::One, nvrhi::BlendFactor::One,         true,  false, "ParticlePass_alphaAdd_v2" },
 };
 
 void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state)
 {
-    if (state.initialized)
+    constexpr u32 kParticlePipeVersion = 2;
+    if (state.initialized && state.pipeVersion == kParticlePipeVersion)
         return;
+    state.initialized = false;
+    state.pipeVersion = 0;
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice)
@@ -452,6 +511,7 @@ void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::Framebuf
     }
 
     state.initialized = true;
+    state.pipeVersion = kParticlePipeVersion;
     Msg("* [ParticlePass] Pipeline initialization complete (6 blend modes + distortion)");
 
     if (!state.cullPipeline) {
@@ -504,8 +564,12 @@ void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::Framebuf
 
 static void InitializeDistortionPipeline(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state)
 {
-    if (state.distortInitialized)
+    constexpr u32 kDistortVersion = 2;
+    if (state.distortInitialized && state.distortVersion == kDistortVersion)
         return;
+    state.distortInitialized = false;
+    state.distortVersion = kDistortVersion;
+    state.distortPipeline = nullptr;
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -536,13 +600,16 @@ static void InitializeDistortionPipeline(fg::RenderDevice* device, const nvrhi::
     pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
     pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-    pipeDesc.renderState.blendState.targets[0].enableBlend();
-    pipeDesc.renderState.blendState.targets[0].srcBlend = nvrhi::BlendFactor::One;
-    pipeDesc.renderState.blendState.targets[0].destBlend = nvrhi::BlendFactor::One;
-    pipeDesc.renderState.blendState.targets[0].srcBlendAlpha = nvrhi::BlendFactor::One;
-    pipeDesc.renderState.blendState.targets[0].destBlendAlpha = nvrhi::BlendFactor::One;
+    auto& brt = pipeDesc.renderState.blendState.targets[0];
+    brt.blendEnable = true;
+    brt.srcBlend = nvrhi::BlendFactor::SrcAlpha;
+    brt.destBlend = nvrhi::BlendFactor::InvSrcAlpha;
+    brt.blendOp = nvrhi::BlendOp::Add;
+    brt.srcBlendAlpha = nvrhi::BlendFactor::One;
+    brt.destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
+    brt.blendOpAlpha = nvrhi::BlendOp::Add;
 
-    state.distortPipeline = cache.GetOrCreatePipeline("ParticlePass_distort", pipeDesc, fbInfo, nvDevice);
+    state.distortPipeline = cache.GetOrCreatePipeline("ParticlePass_distort_v2_Alpha", pipeDesc, fbInfo, nvDevice);
 
     if (state.distortPipeline) {
         const auto& actualDesc = state.distortPipeline->getDesc();
@@ -568,13 +635,12 @@ ParticlePassOutput setupParticlePass(
     u32 hiZMipLevels,
     const Fmatrix* prevViewProj,
     VirtualResourceHandle prevDepth,
-    ParticlePassState* state)
+    ParticlePassState* state,
+    VirtualResourceHandle seedDistortion)
 {
     if (state) {
         nvrhi::FramebufferInfoEx fbInfo;
         fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
-        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
-        fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
         fbInfo.depthFormat = nvrhi::Format::D32;
         InitializeParticleResources(device, fbInfo, *state);
 
@@ -586,7 +652,7 @@ ParticlePassOutput setupParticlePass(
 
     auto& passData = fg.addCallbackPass<ParticlePassData>(
         "Particles",
-        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, state](FrameGraph& builder, PassHandle passHandle, ParticlePassData& data) {
+        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, state, seedDistortion](FrameGraph& builder, PassHandle passHandle, ParticlePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -612,19 +678,28 @@ ParticlePassOutput setupParticlePass(
                     if (b.shaderVariant == ParticleShaderVariant::Distort) return true;
                 return false;
             };
-            data.hasDistortion = hasDistortBatch(worldParticleBatches) || hasDistortBatch(hudParticleBatches);
+            const bool hasParticleDistort =
+                hasDistortBatch(worldParticleBatches) || hasDistortBatch(hudParticleBatches);
+            data.hasDistortion = hasParticleDistort || seedDistortion.is_valid();
+            data.importedDistortion = false;
+            data.seedDistortion = {};
 
             if (data.hasDistortion) {
-                framegraph::ResourceDesc distDesc;
-                distDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-                distDesc.width = width;
-                distDesc.height = height;
-                distDesc.format = nvrhi::Format::RGBA16_FLOAT;
-                distDesc.isRenderTarget = true;
-                distDesc.isTransient = true;
-                distDesc.isUAV = true;
-                distDesc.debugName = "rt_Distortion";
-                data.distortionRT = passBuilder.createTexture("rt_Distortion", distDesc);
+                if (seedDistortion.is_valid()) {
+                    data.distortionRT = passBuilder.readWrite(seedDistortion, ResourceState::RenderTarget);
+                    data.importedDistortion = true;
+                } else {
+                    framegraph::ResourceDesc distDesc;
+                    distDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+                    distDesc.width = width;
+                    distDesc.height = height;
+                    distDesc.format = nvrhi::Format::RGBA16_FLOAT;
+                    distDesc.isRenderTarget = true;
+                    distDesc.isTransient = true;
+                    distDesc.isUAV = true;
+                    distDesc.debugName = "rt_Distortion";
+                    data.distortionRT = passBuilder.createTexture("rt_Distortion", distDesc);
+                }
             }
 
             if (hiZPyramid.is_valid())
@@ -632,10 +707,9 @@ ParticlePassOutput setupParticlePass(
 
             data.inputColor = passBuilder.read(forwardInputs.albedo);
             data.outputColor = passBuilder.write(forwardInputs.albedo, ResourceState::RenderTarget);
-            data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
+            data.outputNormal = forwardInputs.normal;
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
-            if (forwardInputs.baseColor.is_valid())
-                data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
+            data.baseColor = forwardInputs.baseColor;
             if (prevDepth.is_valid())
                 data.prevDepth = passBuilder.read(prevDepth, ResourceState::ShaderResource);
 
@@ -655,7 +729,6 @@ ParticlePassOutput setupParticlePass(
                 return;
 
             auto* colorRT = fg.GetPhysicalTexture(data.outputColor);
-            auto* normalRT = fg.GetPhysicalTexture(data.outputNormal);
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             if (!colorRT || !depthRT)
                 return;
@@ -670,18 +743,13 @@ ParticlePassOutput setupParticlePass(
             auto& matBuffer = MaterialBuffer::Instance();
             matBuffer.Upload(ctx);
 
-            auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
             auto* prevDepthTex = data.prevDepth.is_valid() ? fg.GetPhysicalTexture(data.prevDepth) : depthRT;
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
-            if (normalRT)
-                fbDesc.addColorAttachment(normalRT);
-            if (baseColorRT)
-                fbDesc.addColorAttachment(baseColorRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = framegraph::GetPassResourceCache();
-            auto framebuffer = cache.GetOrCreateFramebuffer("ParticlePass", fbDesc, nvDevice);
+            auto framebuffer = cache.GetOrCreateFramebuffer("ParticlePass_v2", fbDesc, nvDevice);
             if (!framebuffer)
                 return;
 
@@ -989,6 +1057,22 @@ ParticlePassOutput setupParticlePass(
             if (!distortRT)
                 return;
 
+            bool hasParticleDistort = false;
+            auto checkDistort = [&](const xr_vector<ParticleBatch>* batches) {
+                if (!batches) return;
+                for (const auto& b : *batches)
+                    if (b.shaderVariant == ParticleShaderVariant::Distort)
+                        hasParticleDistort = true;
+            };
+            checkDistort(data.worldParticleBatches);
+            checkDistort(data.hudParticleBatches);
+
+            if (!data.importedDistortion)
+                cmdList->clearTextureFloat(distortRT, nvrhi::AllSubresources, nvrhi::Color(0.5f, 0.5f, 0.f, 0.f));
+
+            if (!hasParticleDistort)
+                return;
+
             nvrhi::FramebufferDesc distortFbDesc;
             distortFbDesc.addColorAttachment(distortRT);
             distortFbDesc.setDepthAttachment(depthRT);
@@ -998,8 +1082,6 @@ ParticlePassOutput setupParticlePass(
 
             if (!data.passState->distortPipeline)
                 return;
-
-            cmdList->clearTextureFloat(distortRT, nvrhi::AllSubresources, nvrhi::Color(0.f, 0.f, 0.f, 0.f));
 
             auto* distortVsReflection = shaderLoader->GetCachedReflection("bindless_particle", ".vs");
             auto* distortPsReflection = shaderLoader->GetCachedReflection("bindless_particle_distort", ".ps");

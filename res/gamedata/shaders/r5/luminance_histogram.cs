@@ -32,8 +32,7 @@ groupshared uint gs_histogram[64];
 
 float ComputeLuminance(float3 color)
 {
-    // ITU BT.709 luminance coefficients
-    return dot(color, float3(0.2126, 0.7152, 0.0722));
+    return dot(color, LUMINANCE_VECTOR * def_hdr);
 }
 
 uint ComputeBinIndex(float luminance)
@@ -78,7 +77,7 @@ void main(uint3 dispatch_id : SV_DispatchThreadID, uint group_index : SV_GroupIn
         float luminance = ComputeLuminance(color.rgb);
 
         // Skip very dark pixels (effectively transparent/sky)
-        if (luminance > 0.0001)
+        if (luminance > 0.0001 && luminance < 16.0)
         {
             // Get bin index
             uint binIndex = ComputeBinIndex(luminance);

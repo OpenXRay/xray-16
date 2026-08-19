@@ -803,11 +803,21 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     //         (u32)ddsData.sequenceState->frameData.size());
     // }
 
-    if (!isVideoTexture && !isSequenceTexture &&
-        strncmp(meta.filePath.c_str(), "trees" DELIMITER, 6) == 0)
+    if (!isVideoTexture && !isSequenceTexture)
     {
-        if (PreserveAlphaCoverage(ddsData))
-            Msg("* [TextureManager] Alpha coverage preserved: %s", meta.filePath.c_str());
+        const char* path = meta.filePath.c_str();
+        const bool arefLikely =
+            strncmp(path, "trees" DELIMITER, 6) == 0 ||
+            strncmp(path, "mtl" DELIMITER, 4) == 0 ||
+            strncmp(path, "prop" DELIMITER, 5) == 0 ||
+            strncmp(path, "details" DELIMITER, 8) == 0 ||
+            strncmp(path, "flora" DELIMITER, 6) == 0 ||
+            strncmp(path, "fx" DELIMITER, 3) == 0 ||
+            strstr(path, "fence") != nullptr ||
+            strstr(path, "grate") != nullptr ||
+            strstr(path, "wire") != nullptr;
+        if (arefLikely && PreserveAlphaCoverage(ddsData))
+            Msg("* [TextureManager] Alpha coverage preserved: %s", path);
     }
 
     // ═══════════════════════════════════════════════════

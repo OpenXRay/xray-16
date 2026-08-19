@@ -57,6 +57,12 @@ void FGLensFlareRender::InitResources()
     R_ASSERT2(vsOverlayResult.handle, "FGLensFlareRender: failed to load effects_flare.vs");
     m_vsOverlay = vsOverlayResult.handle;
 
+    auto vsSun = shaderLoader->LoadVertexShader("effects_sun_disc", "main");
+    auto psSun = shaderLoader->LoadPixelShader("effects_sun_disc", "main");
+    R_ASSERT2(vsSun.handle && psSun.handle, "FGLensFlareRender: failed to load effects_sun_disc");
+    m_vsSunDisc = vsSun.handle;
+    m_psSunDisc = psSun.handle;
+
     auto csResult = shaderLoader->LoadComputeShader("flare_visibility", "main");
     R_ASSERT2(csResult.handle, "FGLensFlareRender: failed to load flare_visibility.cs");
     m_visCS = csResult.handle;
@@ -70,6 +76,8 @@ void FGLensFlareRender::InitResources()
     R_ASSERT2(m_inputLayout, "FGLensFlareRender: createInputLayout failed");
     m_inputLayoutOverlay = m_device->createInputLayout(vertexAttrs, 3, m_vsOverlay);
     R_ASSERT2(m_inputLayoutOverlay, "FGLensFlareRender: createInputLayout (overlay) failed");
+    m_inputLayoutSunDisc = m_device->createInputLayout(vertexAttrs, 3, m_vsSunDisc);
+    R_ASSERT2(m_inputLayoutSunDisc, "FGLensFlareRender: createInputLayout (sun disc) failed");
 
     nvrhi::BufferDesc cbDesc;
     cbDesc.byteSize = sizeof(passes::DynamicTransforms);
@@ -105,6 +113,37 @@ void FGLensFlareRender::InitResources()
     m_sampler = m_device->createSampler(samplerDesc);
     R_ASSERT2(m_sampler, "FGLensFlareRender: createSampler failed");
 
+    {
+        constexpr u32 kDisc = 64;
+        nvrhi::TextureDesc discDesc;
+        discDesc.width = kDisc;
+        discDesc.height = kDisc;
+        discDesc.format = nvrhi::Format::RGBA8_UNORM;
+        discDesc.debugName = "FGLensFlare_SoftDisc";
+        discDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        discDesc.keepInitialState = true;
+        m_softDisc = m_device->createTexture(discDesc);
+        xr_vector<u32> pixels(kDisc * kDisc);
+        for (u32 y = 0; y < kDisc; ++y)
+        {
+            for (u32 x = 0; x < kDisc; ++x)
+            {
+                const float u = (float(x) + 0.5f) / float(kDisc) * 2.f - 1.f;
+                const float v = (float(y) + 0.5f) / float(kDisc) * 2.f - 1.f;
+                const float r = _sqrt(u * u + v * v);
+                const float a = _max(0.f, 1.f - r);
+                const float s = a * a;
+                pixels[y * kDisc + x] = color_rgba(
+                    u32(s * 255.f), u32(s * 255.f), u32(s * 255.f), u32(a * 255.f));
+            }
+        }
+        nvrhi::CommandListHandle upload = m_device->createCommandList();
+        upload->open();
+        upload->writeTexture(m_softDisc, 0, 0, pixels.data(), kDisc * sizeof(u32));
+        upload->close();
+        m_device->executeCommandList(upload);
+    }
+
     nvrhi::BindingLayoutDesc bindingLayoutDesc;
     bindingLayoutDesc.visibility = nvrhi::ShaderType::All;
     bindingLayoutDesc.bindings = {
@@ -138,19 +177,18 @@ void FGLensFlareRender::InitResources()
 
     nvrhi::FramebufferInfo fbInfo;
     fbInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
-    fbInfo.setDepthFormat(nvrhi::Format::D32);
     fbInfo.setSampleCount(1);
 
     nvrhi::GraphicsPipelineDesc sourceDesc;
-    sourceDesc.VS = m_vs;
+    sourceDesc.VS = m_vsSunDisc;
     sourceDesc.PS = m_ps;
-    sourceDesc.inputLayout = m_inputLayout;
+    sourceDesc.inputLayout = m_inputLayoutSunDisc;
     sourceDesc.bindingLayouts = { m_bindingLayout };
     sourceDesc.primType = nvrhi::PrimitiveType::TriangleList;
     sourceDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-    sourceDesc.renderState.depthStencilState.depthTestEnable = true;
+    sourceDesc.renderState.depthStencilState.depthTestEnable = false;
     sourceDesc.renderState.depthStencilState.depthWriteEnable = false;
-    sourceDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+    sourceDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Always;
     sourceDesc.renderState.blendState.targets[0]
         .setBlendEnable(true)
         .setSrcBlend(nvrhi::BlendFactor::SrcAlpha)
@@ -165,11 +203,32 @@ void FGLensFlareRender::InitResources()
     overlayDesc.VS = m_vsOverlay;
     overlayDesc.inputLayout = m_inputLayoutOverlay;
     overlayDesc.bindingLayouts = { m_overlayBindingLayout };
-    overlayDesc.renderState.depthStencilState.depthTestEnable = false;
-    overlayDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Always;
 
     m_pipelineOverlay = m_device->createGraphicsPipeline(overlayDesc, fbInfo);
     R_ASSERT2(m_pipelineOverlay, "FGLensFlareRender: createGraphicsPipeline (overlay) failed");
+
+    nvrhi::BindingLayoutDesc sunDiscLayoutDesc;
+    sunDiscLayoutDesc.visibility = nvrhi::ShaderType::All;
+    sunDiscLayoutDesc.bindings = {
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
+    };
+    m_sunDiscBindingLayout = m_device->createBindingLayout(sunDiscLayoutDesc);
+    R_ASSERT2(m_sunDiscBindingLayout, "FGLensFlareRender: createBindingLayout (sun disc) failed");
+
+    nvrhi::GraphicsPipelineDesc sunDiscDesc = sourceDesc;
+    sunDiscDesc.VS = m_vsSunDisc;
+    sunDiscDesc.PS = m_psSunDisc;
+    sunDiscDesc.inputLayout = m_inputLayoutSunDisc;
+    sunDiscDesc.bindingLayouts = { m_sunDiscBindingLayout };
+    m_pipelineSunDisc = m_device->createGraphicsPipeline(sunDiscDesc, fbInfo);
+    R_ASSERT2(m_pipelineSunDisc, "FGLensFlareRender: createGraphicsPipeline (sun disc) failed");
+
+    nvrhi::BindingSetDesc sunDiscSetDesc;
+    sunDiscSetDesc.bindings = {
+        nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
+    };
+    m_sunDiscBindingSet = m_device->createBindingSet(sunDiscSetDesc, m_sunDiscBindingLayout);
+    R_ASSERT2(m_sunDiscBindingSet, "FGLensFlareRender: createBindingSet (sun disc) failed");
 
     nvrhi::ComputePipelineDesc visPipelineDesc;
     visPipelineDesc.CS = m_visCS;
@@ -207,9 +266,9 @@ nvrhi::ITexture* FGLensFlareRender::ResolveTexture(const shared_str& name)
 }
 
 void FGLensFlareRender::PushQuad(const Fvector& center, const Fvector& vecX, const Fvector& vecY, u32 color,
-    nvrhi::ITexture* tex, bool depthTested)
+    nvrhi::ITexture* tex, bool depthTested, bool procedural)
 {
-    if (!tex)
+    if (!tex && !procedural)
         return;
 
     const u32 base = static_cast<u32>(m_vertices.size());
@@ -261,6 +320,7 @@ void FGLensFlareRender::PushQuad(const Fvector& center, const Fvector& vecX, con
     b.indexCount = 6;
     b.texture = tex;
     b.depthTested = depthTested;
+    b.procedural = procedural;
     m_batches.push_back(b);
 }
 
@@ -276,12 +336,10 @@ void FGLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
     if (clip.w > 0.f)
     {
         m_sunValid = true;
-        m_sunPosPx.set((clip.x * 0.5f + 0.5f) * float(Device.dwWidth),
-            (1.f - (clip.y * 0.5f + 0.5f)) * float(Device.dwHeight));
+        m_sunPosPx.set(clip.x * 0.5f + 0.5f, 1.f - (clip.y * 0.5f + 0.5f));
         const float radius =
             owner.m_Current->m_Flags.is(CLensFlareDescriptor::flSource) ? owner.m_Current->m_Source.fRadius : 0.15f;
-        m_sunRadiusPx = radius * 0.25f * float(Device.dwHeight) / tanf(deg2rad(Device.fFOV) * 0.5f);
-        clamp(m_sunRadiusPx, 4.f, 96.f);
+        m_sunRadiusPx = radius * 0.25f / tanf(deg2rad(Device.fFOV) * 0.5f);
     }
 
     Fcolor dwLight;
@@ -305,7 +363,10 @@ void FGLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
 
         auto* flare = static_cast<FGFlareRender*>(&*owner.m_Current->m_Source.m_pRender);
         nvrhi::ITexture* tex = ResolveTexture(flare ? flare->m_textureName : shared_str{});
-        PushQuad(owner.vecLight, vecSx, vecSy, color.get(), tex, true);
+        if (tex)
+            PushQuad(owner.vecLight, vecSx, vecSy, color.get(), tex, true, false);
+        else
+            PushQuad(owner.vecLight, vecSx, vecSy, color.get(), nullptr, false, true);
     }
 
     if (owner.fBlend >= EPS_L)
@@ -337,15 +398,18 @@ void FGLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
 
         if (bGradient && owner.fGradientValue >= EPS_L && owner.m_Current->m_Flags.is(CLensFlareDescriptor::flGradient))
         {
-            vecSx.mul(owner.vecX, owner.m_Current->m_Gradient.fRadius * owner.fGradientValue * fDistance);
-            vecSy.mul(owner.vecY, owner.m_Current->m_Gradient.fRadius * owner.fGradientValue * fDistance);
+            const float gradScale = 0.42f * owner.fGradientValue;
+            vecSx.mul(owner.vecX, owner.m_Current->m_Gradient.fRadius * gradScale * fDistance);
+            vecSy.mul(owner.vecY, owner.m_Current->m_Gradient.fRadius * gradScale * fDistance);
 
             Fcolor color;
             color.set(dwLight);
-            color.mul_rgba(owner.fGradientValue * owner.m_StateBlend);
+            color.mul_rgba(owner.fGradientValue * owner.m_StateBlend * 0.45f);
 
             auto* flare = static_cast<FGFlareRender*>(&*owner.m_Current->m_Gradient.m_pRender);
             nvrhi::ITexture* tex = ResolveTexture(flare ? flare->m_textureName : shared_str{});
+            if (!tex)
+                tex = m_softDisc.Get();
             PushQuad(owner.vecLight, vecSx, vecSy, color.get(), tex);
         }
     }
@@ -362,10 +426,12 @@ void FGLensFlareRender::DispatchVisibility(nvrhi::ICommandList* cmdList, nvrhi::
         m_visInitialized = true;
     }
 
+    const auto& depthDesc = depth->getDesc();
     FlareVisParams cb{};
-    cb.sunPosX = m_sunPosPx.x;
-    cb.sunPosY = m_sunPosPx.y;
-    cb.radiusPx = m_sunRadiusPx;
+    cb.sunPosX = m_sunPosPx.x * float(depthDesc.width);
+    cb.sunPosY = m_sunPosPx.y * float(depthDesc.height);
+    cb.radiusPx = m_sunRadiusPx * float(depthDesc.height);
+    clamp(cb.radiusPx, 4.f, 96.f);
     cb.emaAlpha = 1.f - expf(-8.f * Device.fTimeDelta);
     cb.valid = m_sunValid ? 1u : 0u;
     cmdList->writeBuffer(m_visConstantBuffer, &cb, sizeof(cb));
@@ -449,8 +515,31 @@ void FGLensFlareRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* 
 
     for (const Batch& b : m_batches)
     {
-        if (b.indexCount == 0 || !b.texture)
+        if (b.indexCount == 0 || (!b.texture && !b.procedural))
             continue;
+
+        if (b.procedural)
+        {
+            if (!m_pipelineSunDisc || !m_sunDiscBindingSet)
+                continue;
+            nvrhi::GraphicsState state;
+            state.pipeline = m_pipelineSunDisc;
+            state.framebuffer = framebuffer;
+            state.bindings = { m_sunDiscBindingSet };
+            state.vertexBuffers = { vertexBinding };
+            state.indexBuffer.buffer = m_indexBuffer;
+            state.indexBuffer.format = nvrhi::Format::R16_UINT;
+            state.indexBuffer.offset = 0;
+            state.viewport = nvrhi::ViewportState().addViewportAndScissorRect(
+                nvrhi::Viewport(static_cast<float>(fbInfo.width), static_cast<float>(fbInfo.height)));
+            cmdList->setGraphicsState(state);
+            nvrhi::DrawArguments args;
+            args.vertexCount = b.indexCount;
+            args.instanceCount = 1;
+            args.startIndexLocation = b.indexOffset;
+            cmdList->drawIndexed(args);
+            continue;
+        }
 
         auto& cache = b.depthTested ? m_sourceBindingSetCache : m_overlayBindingSetCache;
         auto it = cache.find(b.texture);

@@ -16,7 +16,11 @@ static void DeduplicateBySlotAndClass(xr_vector<BindingSetBuilder::ReflectedReso
 {
     for (size_t i = 0; i < vec.size(); ++i) {
         for (size_t j = i + 1; j < vec.size(); ) {
-            if (vec[i].slot == vec[j].slot)
+            if (vec[i].slot != vec[j].slot) {
+                ++j;
+                continue;
+            }
+            if (NameMatches(vec[i].name, vec[j].name))
                 vec.erase(vec.begin() + j);
             else
                 ++j;
@@ -100,6 +104,7 @@ void BindingSetBuilder::InvalidateReflectionCache()
 BindingSetBuilder::BindingSetBuilder(const ExtractedReflection& reflection, nvrhi::IDevice* device,
     const char*)
     : m_lists(&GetOrBuildReflectedLists(&reflection, nullptr, device))
+    , m_device(device)
 {
     m_desc.bindings.reserve(m_lists->srvs.size() + m_lists->uavs.size()
         + m_lists->cbs.size() + m_lists->samplerItems.size());
@@ -111,18 +116,51 @@ BindingSetBuilder::BindingSetBuilder(
     nvrhi::IDevice* device,
     const char*)
     : m_lists(&GetOrBuildReflectedLists(&vsReflection, &psReflection, device))
+    , m_device(device)
 {
     m_desc.bindings.reserve(m_lists->srvs.size() + m_lists->uavs.size()
         + m_lists->cbs.size() + m_lists->samplerItems.size());
+}
+
+static void WarnMissingOnce(const char* kind, const char* name)
+{
+    if (!name || !name[0])
+        return;
+    static xr_set<xr_string> s_warned;
+    xr_string key;
+    key = kind;
+    key += ":";
+    key += name;
+    if (!s_warned.insert(key).second)
+        return;
+    Msg("! [BindingSetBuilder] %s '%s' not in reflection (optional bind skipped)", kind, name);
+}
+
+bool BindingSetBuilder::HasSRV(const char* name) const
+{
+    if (!m_lists || !name)
+        return false;
+    for (const auto& r : m_lists->srvs)
+        if (NameMatches(r.name, name))
+            return true;
+    return false;
+}
+
+bool BindingSetBuilder::HasUAV(const char* name) const
+{
+    if (!m_lists || !name)
+        return false;
+    for (const auto& r : m_lists->uavs)
+        if (NameMatches(r.name, name))
+            return true;
+    return false;
 }
 
 int BindingSetBuilder::FindSRVSlot(const char* name) const
 {
     for (const auto& r : m_lists->srvs)
         if (NameMatches(r.name, name)) return static_cast<int>(r.slot);
-    Msg("! [BindingSetBuilder] SRV '%s' not found in reflection (have %u SRVs)", name, m_lists->srvs.size());
-    for (const auto& r : m_lists->srvs)
-        Msg("    SRV: '%s' @ t%u", r.name ? r.name : "(null)", r.slot);
+    WarnMissingOnce("SRV", name);
     return -1;
 }
 
@@ -130,9 +168,7 @@ int BindingSetBuilder::FindUAVSlot(const char* name) const
 {
     for (const auto& r : m_lists->uavs)
         if (NameMatches(r.name, name)) return static_cast<int>(r.slot);
-    Msg("! [BindingSetBuilder] UAV '%s' not found in reflection (have %u UAVs)", name, m_lists->uavs.size());
-    for (const auto& r : m_lists->uavs)
-        Msg("    UAV: '%s' @ u%u", r.name ? r.name : "(null)", r.slot);
+    WarnMissingOnce("UAV", name);
     return -1;
 }
 
@@ -140,15 +176,15 @@ int BindingSetBuilder::FindCBSlot(const char* name) const
 {
     for (const auto& r : m_lists->cbs)
         if (NameMatches(r.name, name)) return static_cast<int>(r.slot);
-    Msg("! [BindingSetBuilder] CB '%s' not found in reflection (have %u CBs)", name, m_lists->cbs.size());
-    for (const auto& r : m_lists->cbs)
-        Msg("    CB: '%s' @ b%u", r.name ? r.name : "(null)", r.slot);
+    WarnMissingOnce("CB", name);
     return -1;
 }
 
 BindingSetBuilder& BindingSetBuilder::Texture(const char* name, nvrhi::ITexture* texture,
     nvrhi::Format format, nvrhi::TextureSubresourceSet subresources)
 {
+    if (!texture)
+        return *this;
     int slot = FindSRVSlot(name);
     if (slot >= 0)
         m_desc.bindings.push_back(nvrhi::BindingSetItem::Texture_SRV(slot, texture, format, subresources));
@@ -158,6 +194,8 @@ BindingSetBuilder& BindingSetBuilder::Texture(const char* name, nvrhi::ITexture*
 BindingSetBuilder& BindingSetBuilder::TextureUAV(const char* name, nvrhi::ITexture* texture,
     nvrhi::Format format, nvrhi::TextureSubresourceSet subresources)
 {
+    if (!texture)
+        return *this;
     int slot = FindUAVSlot(name);
     if (slot >= 0)
         m_desc.bindings.push_back(nvrhi::BindingSetItem::Texture_UAV(slot, texture, format, subresources));
@@ -166,6 +204,8 @@ BindingSetBuilder& BindingSetBuilder::TextureUAV(const char* name, nvrhi::ITextu
 
 BindingSetBuilder& BindingSetBuilder::BufferSRV(const char* name, nvrhi::IBuffer* buffer)
 {
+    if (!buffer)
+        return *this;
     int slot = FindSRVSlot(name);
     if (slot >= 0) {
         for (const auto& r : m_lists->srvs) {
@@ -183,6 +223,8 @@ BindingSetBuilder& BindingSetBuilder::BufferSRV(const char* name, nvrhi::IBuffer
 
 BindingSetBuilder& BindingSetBuilder::BufferUAV(const char* name, nvrhi::IBuffer* buffer)
 {
+    if (!buffer)
+        return *this;
     int slot = FindUAVSlot(name);
     if (slot >= 0) {
         for (const auto& r : m_lists->uavs) {
@@ -279,6 +321,32 @@ static int GetBindingSetRegisterClass(nvrhi::ResourceType type)
 nvrhi::BindingSetDesc BindingSetBuilder::Build()
 {
     AddSamplers();
+
+    auto& cache = GetPassResourceCache();
+    for (const auto& r : m_lists->srvs) {
+        bool found = false;
+        for (const auto& b : m_desc.bindings) {
+            if (GetBindingSetRegisterClass(b.type) == 0 && b.slot == r.slot) {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+            continue;
+        WarnMissingOnce("unbound SRV", r.name);
+        if (!m_device)
+            continue;
+        if (r.layoutType == nvrhi::ResourceType::Texture_SRV) {
+            if (auto* tex = cache.GetDummyContactHistory(m_device))
+                m_desc.bindings.push_back(nvrhi::BindingSetItem::Texture_SRV(r.slot, tex));
+        } else if (r.layoutType == nvrhi::ResourceType::RawBuffer_SRV) {
+            if (auto* buf = cache.GetDummySRVBuffer(m_device))
+                m_desc.bindings.push_back(nvrhi::BindingSetItem::RawBuffer_SRV(r.slot, buf));
+        } else if (r.layoutType != nvrhi::ResourceType::RayTracingAccelStruct) {
+            if (auto* buf = cache.GetDummySRVBuffer(m_device))
+                m_desc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_SRV(r.slot, buf));
+        }
+    }
 
     std::sort(m_desc.bindings.begin(), m_desc.bindings.end(),
         [](const nvrhi::BindingSetItem& a, const nvrhi::BindingSetItem& b) {

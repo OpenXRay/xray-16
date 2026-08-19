@@ -44,6 +44,7 @@ private:
     nvrhi::BufferHandle           m_indexBuffer;
     size_t                        m_vertexCapacity = 0;
     nvrhi::GraphicsPipelineHandle m_pipeline;
+    nvrhi::Format                 m_pipelineFormat = nvrhi::Format::UNKNOWN;
 
     xr_vector<Vertex>             m_vertices;
     Fvector2                      m_textureSize{ 0.f, 0.f };

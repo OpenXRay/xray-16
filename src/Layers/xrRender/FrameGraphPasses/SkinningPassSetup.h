@@ -66,7 +66,10 @@ struct SkinningPassState {
     SkinningPipelineVariant hudHQ3w;
     SkinningPipelineVariant hudHQ4w;
     nvrhi::SamplerHandle linearSampler;
+    nvrhi::TextureHandle scopeDummy;
+    nvrhi::TextureHandle scopeCopy;
     bool initialized = false;
+    u32 pipeVersion = 0;
 };
 
 void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state);
@@ -75,6 +78,7 @@ struct SkinningPassData {
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle skinnedDrawArgs;
     fg::RenderDevice* device;
@@ -86,6 +90,7 @@ struct SkinningPassData {
     framegraph::DefaultOutputLayout outputs;
     SkinningPassState* passState;
     decals::OverlayManager* overlayMgr;
+    bool clearWorldPos = false;
 };
 
 // Main skinning pass setup function
