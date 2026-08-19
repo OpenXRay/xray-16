@@ -130,6 +130,7 @@ v2p_decal main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
 
 	O.position = float4(world_pos.xyz, hemi);
 	O.N = float3(0, 1, 0);
+	O.sunOcclusion = sun;
 	O.hpos = mul(g_detail_VP, world_pos);
 
 	return O;

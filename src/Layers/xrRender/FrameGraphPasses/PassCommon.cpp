@@ -1,6 +1,14 @@
 #include "stdafx.h"
 #include "PassCommon.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
+#include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
+#include "Layers/xrRender/Bindless/BindlessTypes.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/device.h"
@@ -69,6 +77,130 @@ u32 ExtractFrustumPlanes(Fvector4 outPlanes[6])
         outPlanes[i].set(frustum.planes[i].n.x, frustum.planes[i].n.y, frustum.planes[i].n.z, frustum.planes[i].d);
     }
     return count;
+}
+
+void ResolveEnvSkyCubes(fg::RenderDevice* device, nvrhi::ITexture*& outSky0, nvrhi::ITexture*& outSky1)
+{
+    outSky0 = nullptr;
+    outSky1 = nullptr;
+
+    nvrhi::IDevice* nvDevice = device ? device->GetNVRHIDevice() : nullptr;
+    auto* texManager = (device && device->GetFGResourceManager())
+        ? device->GetFGResourceManager()->GetTextureManager()
+        : nullptr;
+
+    static shared_str s_cachedName0;
+    static shared_str s_cachedName1;
+    static nvrhi::ITexture* s_cachedTex0 = nullptr;
+    static nvrhi::ITexture* s_cachedTex1 = nullptr;
+
+    if (texManager && g_pGamePersistent)
+    {
+        auto& env = g_pGamePersistent->Environment();
+        shared_str name0;
+        shared_str name1;
+        if (env.Current[0])
+        {
+            name0 = env.Current[0]->sky_texture_env_name.size()
+                ? env.Current[0]->sky_texture_env_name
+                : env.Current[0]->sky_texture_name;
+        }
+        if (env.Current[1])
+        {
+            name1 = env.Current[1]->sky_texture_env_name.size()
+                ? env.Current[1]->sky_texture_env_name
+                : env.Current[1]->sky_texture_name;
+        }
+
+        if (name0.size() && name0 != s_cachedName0)
+        {
+            s_cachedName0 = name0;
+            s_cachedTex0 = texManager->GetNVRHITexture(texManager->LoadTexture(name0.c_str()));
+        }
+        if (name1.size() && name1 != s_cachedName1)
+        {
+            s_cachedName1 = name1;
+            s_cachedTex1 = texManager->GetNVRHITexture(texManager->LoadTexture(name1.c_str()));
+        }
+
+        if (name0.size())
+            outSky0 = s_cachedTex0;
+        if (name1.size())
+            outSky1 = s_cachedTex1;
+
+        static shared_str s_reportedName0;
+        static shared_str s_reportedName1;
+        if (name0 != s_reportedName0 || name1 != s_reportedName1)
+        {
+            Msg("* [EnvIBL] env_s0='%s' resolved=%d env_s1='%s' resolved=%d",
+                name0.c_str(), outSky0 ? 1 : 0, name1.c_str(), outSky1 ? 1 : 0);
+            s_reportedName0 = name0;
+            s_reportedName1 = name1;
+        }
+    }
+
+    auto& cache = framegraph::GetPassResourceCache();
+    if (!outSky0 && nvDevice)
+        outSky0 = cache.GetDummyCubeMap(nvDevice);
+    if (!outSky1 && nvDevice)
+        outSky1 = cache.GetDummyCubeMap(nvDevice);
+}
+
+void BindBindlessMaterialTables(framegraph::BindingSetBuilder& bsb)
+{
+    static nvrhi::BufferHandle s_dummyMat;
+    static nvrhi::BufferHandle s_dummyTerrain;
+    static nvrhi::BufferHandle s_dummyVariant;
+
+    auto ensureDummy = [](nvrhi::BufferHandle& slot, const char* name, u32 stride) -> nvrhi::IBuffer* {
+        if (!slot)
+        {
+            auto* backend = GEnv.Render ? GEnv.Render->GetRenderDevice() : nullptr;
+            nvrhi::IDevice* dev = backend ? backend->GetNVRHIDevice() : nullptr;
+            if (!dev)
+                return nullptr;
+            nvrhi::BufferDesc desc;
+            desc.byteSize = stride * 4;
+            desc.structStride = stride;
+            desc.debugName = name;
+            desc.initialState = nvrhi::ResourceStates::ShaderResource;
+            desc.keepInitialState = true;
+            slot = dev->createBuffer(desc);
+        }
+        return slot.Get();
+    };
+
+    nvrhi::IBuffer* mats = bindless::MaterialBuffer::Instance().GetBuffer();
+    if (!mats)
+        mats = ensureDummy(s_dummyMat, "DummyMaterials", sizeof(bindless::MaterialData));
+    if (mats && bsb.HasSRV("g_Materials"))
+        bsb.BufferSRV("g_Materials", mats);
+
+    nvrhi::IBuffer* terrain = bindless::TerrainMaterialBuffer::Instance().GetBuffer();
+    if (!terrain)
+        terrain = ensureDummy(s_dummyTerrain, "DummyTerrainMaterials", sizeof(bindless::TerrainMaterialData));
+    if (terrain && bsb.HasSRV("g_TerrainMaterials"))
+        bsb.BufferSRV("g_TerrainMaterials", terrain);
+
+    nvrhi::IBuffer* variants = bindless::VariantTextureBuffer::Instance().GetBuffer();
+    if (!variants)
+        variants = ensureDummy(s_dummyVariant, "DummyVariantTextures", sizeof(bindless::VariantTextureData));
+    if (variants && bsb.HasSRV("g_VariantTextures"))
+        bsb.BufferSRV("g_VariantTextures", variants);
+}
+
+void BindEnvIblCubes(framegraph::BindingSetBuilder& bsb, fg::RenderDevice* device)
+{
+    if (!bsb.HasSRV("env_s0") && !bsb.HasSRV("env_s1"))
+        return;
+
+    nvrhi::ITexture* sky0 = nullptr;
+    nvrhi::ITexture* sky1 = nullptr;
+    ResolveEnvSkyCubes(device, sky0, sky1);
+    if (bsb.HasSRV("env_s0") && sky0)
+        bsb.Texture("env_s0", sky0);
+    if (bsb.HasSRV("env_s1") && sky1)
+        bsb.Texture("env_s1", sky1);
 }
 
 } // namespace xray::render::fg::passes

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ImGuiRendererNVRHI.h"
+#include <algorithm>
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 #include "FrameGraph/BindingSetBuilder.h"
 #include "FrameGraph/ShaderCache.h"
@@ -123,7 +124,10 @@ void ImGuiRendererNVRHI::SetupRenderState(ImDrawData* drawData, nvrhi::ICommandL
     float T = drawData->DisplayPos.y;
     float B = drawData->DisplayPos.y + drawData->DisplaySize.y;
 
-    ImGuiConstants constants;
+    ImGuiConstants constants{};
+    constants.uiScale = 1.f;
+    if (GEnv.Backend && GEnv.Backend->IsHdr10())
+        constants.uiScale = ps_r_hdr10_hud / std::max(ps_r_hdr10_paper_white, 1.f);
     constants.mvpMatrix[0][0] = 2.0f / (R - L);
     constants.mvpMatrix[0][1] = 0.0f;
     constants.mvpMatrix[0][2] = 0.0f;

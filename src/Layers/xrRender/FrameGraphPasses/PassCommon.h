@@ -3,6 +3,8 @@
 #include <nvrhi/nvrhi.h>
 #include "xrCore/xrCore.h"
 
+namespace xray::render::framegraph { class BindingSetBuilder; }
+
 namespace xray::render::fg::passes {
 
 inline void DrawIndexedIndirectCountOrFallback(
@@ -67,5 +69,11 @@ nvrhi::BufferHandle GetOrCreateDrawIndexBuffer(const char* passName, nvrhi::IDev
 LightingConstants FillLightingConstants();
 
 u32 ExtractFrustumPlanes(Fvector4 outPlanes[6]);
+
+void ResolveEnvSkyCubes(fg::RenderDevice* device, nvrhi::ITexture*& outSky0, nvrhi::ITexture*& outSky1);
+
+void BindBindlessMaterialTables(framegraph::BindingSetBuilder& bsb);
+
+void BindEnvIblCubes(framegraph::BindingSetBuilder& bsb, fg::RenderDevice* device);
 
 } // namespace xray::render::fg::passes

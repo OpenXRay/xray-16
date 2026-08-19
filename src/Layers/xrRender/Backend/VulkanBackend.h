@@ -47,7 +47,9 @@ public:
     u32 GetBackBufferCount() const override { return BACK_BUFFER_COUNT; }
     std::pair<u32, u32> GetBackBufferSize() const override { return {m_backBufferWidth, m_backBufferHeight}; }
     void Present(bool vsync) override;
+    bool PresentFrameGeneration(nvrhi::ITexture* interpolated, nvrhi::ITexture* real) override;
     void ResizeSwapChain(u32 width, u32 height) override;
+    bool IsHdr10() const override { return m_hdr10Active; }
 
     void BeginFrame() override;
     void EndFrame() override;
@@ -56,6 +58,11 @@ public:
 
     const Capabilities& GetCapabilities() const override { return m_capabilities; }
     Capabilities& GetMutableCapabilities() override { return m_capabilities; }
+
+    VkInstance GetVkInstance() const { return m_instance; }
+    VkPhysicalDevice GetVkPhysicalDevice() const { return m_physicalDevice; }
+    VkDevice GetVkDevice() const { return m_device; }
+    u32 GetGraphicsQueueFamily() const { return m_graphicsQueueFamily; }
 
     u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override;
     void UnregisterBindlessTexture(u32 index) override;
@@ -81,6 +88,9 @@ private:
     void DestroySyncObjects();
     void CreateBindlessResources();
     void QueryCapabilities();
+    void UpdateHdrMetadata();
+
+    void PresentInternal();
 
     VkInstance m_instance = VK_NULL_HANDLE;
     VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
@@ -111,6 +121,8 @@ private:
     xr_vector<u32> m_freeBindlessIndices;
     xr_map<nvrhi::ITexture*, u32> m_bindlessTextureMap;
     u32 m_nextBindlessIndex = 0;
+    xr_vector<const char*> m_enabledDeviceExtensions;
+    bool m_bufferDeviceAddressSupported = false;
 
     bool m_initialized = false;
     bool m_inFrame = false;
@@ -121,6 +133,10 @@ private:
     u32 m_currentImageIndex = 0;
     u32 m_currentFrameIndex = 0;
     VkFormat m_swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
+    bool m_hdr10Active = false;
+    PFN_vkSetHdrMetadataEXT m_setHdrMetadata = nullptr;
+    float m_hdrMetaPeak = 0.f;
+    float m_hdrMetaPaper = 0.f;
 
     Task* m_gcTask = nullptr;
     std::atomic<u64> m_lastGraphicsInstanceID{ 0 };
@@ -142,6 +158,7 @@ private:
     std::condition_variable m_submitDoneCv;
     SubmitJob m_pendingJob;
     bool m_jobQueued = false;
+    bool m_submitBusy = false;
     bool m_submitRun = false;
     bool m_slotInFlight[2] = {};
     std::mutex m_queueMutex;

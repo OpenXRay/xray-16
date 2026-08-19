@@ -17,29 +17,24 @@
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/SH_Atomic.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
-#include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"
 
 namespace xray::render::fg::passes {
 
-using namespace xray::render::fgconstants;
-
-static void UploadStaticGlobals(FGConstantSystem& constants, const StaticGlobals& cb) {
-    constants.SetStatic("m_V", cb.m_V);
-    constants.SetStatic("m_P", cb.m_P);
-    constants.SetStatic("m_VP", cb.m_VP);
-    constants.SetStatic("timers", cb.timers);
-    constants.SetStatic("fog_plane", cb.fog_plane);
-    constants.SetStatic("fog_params", cb.fog_params);
-    constants.SetStatic("fog_color", cb.fog_color);
-    constants.SetStatic("L_ambient", cb.L_ambient);
-    constants.SetStatic("L_sun_color", Fvector4(cb.L_sun_color.x, cb.L_sun_color.y, cb.L_sun_color.z, 0.0f));
-    constants.SetStatic("L_sun_dir_w", Fvector4(cb.L_sun_dir_w.x, cb.L_sun_dir_w.y, cb.L_sun_dir_w.z, 0.0f));
-    constants.SetStatic("L_hemi_color", cb.L_hemi_color);
-    constants.SetStatic("eye_position", Fvector4(cb.eye_position.x, cb.eye_position.y, cb.eye_position.z, 0.0f));
-    constants.SetStatic("pos_decompression_params", cb.pos_decompression_params);
-    constants.SetStatic("pos_decompression_params2", cb.pos_decompression_params2);
-    constants.SetStatic("parallax", cb.parallax);
-    constants.SetStatic("screen_res", cb.screen_res);
+static void UploadStaticGlobals(nvrhi::ICommandList* cmdList, MaterialPSO* matPSO, const StaticGlobals& cb)
+{
+    if (!cmdList || !matPSO)
+        return;
+    for (auto& cbInfo : matPSO->constantBuffers)
+    {
+        if (!cbInfo.nvrhiBuffer)
+            continue;
+        if (cbInfo.name != "static_globals")
+            continue;
+        const u32 bytes = std::min(cbInfo.size, (u32)sizeof(StaticGlobals));
+        if (bytes == 0)
+            continue;
+        cmdList->writeBuffer(cbInfo.nvrhiBuffer, &cb, bytes);
+    }
 }
 
 static fg::PrimitiveTopology GetBatchTopology(const ui::UIGeometryBatch& batch)
@@ -110,6 +105,7 @@ framegraph::VirtualResourceHandle setupUIPass(
             }
 
             g_pGamePersistent->OnRenderPPUI_main();
+            g_pGamePersistent->OnRenderPPUI_PP();
             g_pGamePersistent->OnRenderInGameUI();
             if (g_pGamePersistent->IsLoadingScreenShown()) {
                 g_pGamePersistent->load_draw_internal();
@@ -119,6 +115,9 @@ framegraph::VirtualResourceHandle setupUIPass(
             if (!uiRender->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
+                const float uiW = float(std::max(1u, data.width));
+                const float uiH = float(std::max(1u, data.height));
+                staticGlobalsCB.screen_res.set(uiW, uiH, 1.0f / uiW, 1.0f / uiH);
 
                 for (const auto& batch : uiRender->GetBatches()) {
                     if (batch.uiShader && uiMatCache) {
@@ -128,12 +127,8 @@ framegraph::VirtualResourceHandle setupUIPass(
                             framebuffer,
                             GetBatchTopology(batch)
                         );
-
-                        if (matPSO) {
-                            FGConstantSystem constants(matPSO);
-                            UploadStaticGlobals(constants, staticGlobalsCB);
-                            constants.CommitStatic(ctx);
-                        }
+                        if (matPSO)
+                            UploadStaticGlobals(cmdList, matPSO, staticGlobalsCB);
                     }
                 }
 
@@ -207,6 +202,9 @@ framegraph::VirtualResourceHandle setupCursorPass(
             if (!uiRender->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
+                const float uiW = float(std::max(1u, data.width));
+                const float uiH = float(std::max(1u, data.height));
+                staticGlobalsCB.screen_res.set(uiW, uiH, 1.0f / uiW, 1.0f / uiH);
 
                 for (const auto& batch : uiRender->GetBatches()) {
                     if (batch.uiShader && uiMatCache) {
@@ -216,12 +214,8 @@ framegraph::VirtualResourceHandle setupCursorPass(
                             framebuffer,
                             GetBatchTopology(batch)
                         );
-
-                        if (matPSO) {
-                            FGConstantSystem constants(matPSO);
-                            UploadStaticGlobals(constants, staticGlobalsCB);
-                            constants.CommitStatic(ctx);
-                        }
+                        if (matPSO)
+                            UploadStaticGlobals(cmdList, matPSO, staticGlobalsCB);
                     }
                 }
 

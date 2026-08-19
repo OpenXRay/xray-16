@@ -65,7 +65,13 @@ nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
     nvrhi::IBindingLayout* passBindingLayout,
     nvrhi::IBindingLayout* bindlessLayout)
 {
-    VariantPSOKey key{variantIndex, passIndex, vertexFormat};
+    u32 fbSig = 0;
+    if (framebuffer)
+    {
+        const auto& info = framebuffer->getFramebufferInfo();
+        fbSig = (u32)info.colorFormats.size() ^ ((u32)info.depthFormat << 8);
+    }
+    VariantPSOKey key{variantIndex, passIndex, vertexFormat, fbSig};
 
     auto it = m_cache.find(key);
     if (it != m_cache.end())
@@ -107,7 +113,21 @@ nvrhi::IGraphicsPipeline* VariantPSOCache::GetOrCreatePSO(
     if (pass.blendEnabled)
     {
         pipeDesc.renderState.blendState.targets[0] = pass.blendRT;
+        pipeDesc.renderState.blendState.targets[0].setColorWriteMask(pass.colorWriteMask);
         pipeDesc.renderState.blendState.alphaToCoverageEnable = pass.alphaToCoverage;
+        const bool additive =
+            pass.blendRT.destBlend == nvrhi::BlendFactor::One &&
+            (pass.blendRT.srcBlend == nvrhi::BlendFactor::SrcAlpha ||
+             pass.blendRT.srcBlend == nvrhi::BlendFactor::One);
+        const bool modulate =
+            pass.blendRT.srcBlend == nvrhi::BlendFactor::DstColor ||
+            pass.blendRT.destBlend == nvrhi::BlendFactor::SrcColor ||
+            pass.blendRT.destBlend == nvrhi::BlendFactor::DstColor;
+        if (additive || modulate)
+        {
+            for (u32 rt = 1; rt < 4; ++rt)
+                pipeDesc.renderState.blendState.targets[rt].setColorWriteMask(nvrhi::ColorMask(0));
+        }
     }
 
     auto pipeline = device->createGraphicsPipeline(pipeDesc, framebuffer);
@@ -169,11 +189,17 @@ void DrawVariantPartition(
     for (u32 v = 0; v < p.variantCount; v++) {
         nvrhi::IGraphicsPipeline* pso;
         if (v == 0) {
+            if (cfg.onlyWmark)
+                continue;
             pso = cfg.defaultPipeline;
         } else {
             const auto* variant = registry.GetVariantByIndex(v);
             if (!variant) continue;
             if (cfg.selectTransparent ? !variant->transparent : variant->transparent) continue;
+            if (cfg.skipWmark && (variant->wmark || variant->emissive))
+                continue;
+            if (cfg.onlyWmark && !variant->wmark && !variant->emissive)
+                continue;
             pso = psoCache.GetOrCreatePSO(nvDevice, framebuffer, v, *variant, 0, VF_MDI,
                 cfg.inputLayout, cfg.passLayout, cfg.bindlessLayout);
             if (!pso) continue;

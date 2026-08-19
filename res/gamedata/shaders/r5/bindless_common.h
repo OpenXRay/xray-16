@@ -28,17 +28,20 @@ Texture2D GetBindlessTexture(uint index)
 
 struct MaterialData
 {
-    uint diffuseIndex;   // Descriptor heap index
-    uint normalIndex;    // Descriptor heap index
-    uint detailIndex;    // Descriptor heap index
-    uint pbrIndex;       // Descriptor heap index
+    uint diffuseIndex;
+    uint normalIndex;
+    uint detailIndex;
+    uint pbrIndex;
     float detailScale;
     float alphaRef;
     uint flags;
     uint shaderVariant;
+    uint lmapIndex;
+    float emissiveIntensity;
+    uint _pad1;
+    uint _pad2;
 };
 
-// Material flags
 #define MAT_FLAG_ALPHA_TEST    (1 << 0)
 #define MAT_FLAG_TWO_SIDED     (1 << 1)
 #define MAT_FLAG_EMISSIVE      (1 << 2)
@@ -49,6 +52,33 @@ struct MaterialData
 #define MAT_FLAG_HAS_PBR_LAYER (1 << 7)
 #define MAT_FLAG_ALPHA_BLEND   (1 << 8)
 #define MAT_FLAG_WATER         (1 << 9)
+#define MAT_FLAG_FOLIAGE       (1 << 10)
+#define MAT_FLAG_STEEP_PARALLAX (1 << 11)
+#define MAT_FLAG_HAS_LMAP      (1 << 12)
+#define MAT_FLAG_GLASS         (1 << 13)
+#define MAT_FLAG_SCOPE         (1 << 14)
+#define MAT_FLAG_HUD3D         (1 << 15)
+#define MAT_FLAG_WMARK         (1 << 16)
+
+float GlowTexelAlpha(float4 tex)
+{
+    return saturate(tex.a);
+}
+
+float GlowTexelMask(float4 tex)
+{
+    return GlowTexelAlpha(tex);
+}
+
+float ParticleTexelAlpha(float4 tex)
+{
+    return saturate(tex.a);
+}
+
+float3 GlowEmissiveRgb(float4 tex, float intensity)
+{
+    return tex.rgb * intensity * GlowTexelAlpha(tex);
+}
 
 // ═══════════════════════════════════════════════════════
 //  TERRAIN MATERIAL DATA (matches C++ TerrainMaterialData)
@@ -79,9 +109,8 @@ struct TerrainMaterialData
     uint pbrB_Index;        // PBR for mask.b channel
     uint pbrA_Index;        // PBR for mask.a channel
 
-    // Properties
-    float detailScale;      // Uniform scale for all 4 detail layers
-    uint flags;             // MAT_FLAG_TERRAIN, MAT_FLAG_HAS_PBR_LAYER
+    float detailScale;
+    uint flags;
 };
 
 // ═══════════════════════════════════════════════════════

@@ -31,26 +31,20 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float range = ld.colorAndRange.w;
 
     float3 toLight = lightPos - cb_cameraPos.xyz;
-    if (dot(toLight, toLight) <= range * range)
+    bool visible = dot(toLight, toLight) <= range * range;
+    if (!visible)
     {
-        uint idx;
-        g_VisibleLightCount.InterlockedAdd(0, 1, idx);
-        if (idx < 1024)
-            g_VisibleLightIndices[idx] = lightIdx;
-        return;
+        visible = HiZTestSphere(
+            lightPos, range, cb_cameraPos.xyz,
+            cb_prevViewProj,
+            g_HiZPyramid, smp_nofilter,
+            cb_hizWidth, cb_hizHeight, cb_hizMipLevels);
     }
-
-    bool visible = HiZTestSphere(
-        lightPos, range, cb_cameraPos.xyz,
-        cb_prevViewProj,
-        g_HiZPyramid, smp_nofilter,
-        cb_hizWidth, cb_hizHeight, cb_hizMipLevels);
 
     if (visible)
     {
+        g_VisibleLightIndices[lightIdx] = 1u;
         uint idx;
         g_VisibleLightCount.InterlockedAdd(0, 1, idx);
-        if (idx < 1024)
-            g_VisibleLightIndices[idx] = lightIdx;
     }
 }

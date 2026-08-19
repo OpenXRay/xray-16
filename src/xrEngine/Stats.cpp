@@ -153,8 +153,12 @@ void CStats::Show()
 
     if (psDeviceFlags.test(rsShowFPS))
     {
-        const auto fps = u32(Device.GetStats().fFPS);
-        fpsFont->Out(static_cast<float>(Device.dwWidth - 40), 5, "%3d", fps);
+        const auto fps = Device.GetStats().fFPS;
+        const auto fpsFg = Device.GetStats().fFPS_FG;
+        if (fpsFg > fps + 0.5f)
+            fpsFont->Out(static_cast<float>(Device.dwWidth - 120), 5, "%3.0f/%3.0f", fps, fpsFg);
+        else
+            fpsFont->Out(static_cast<float>(Device.dwWidth - 40), 5, "%3.0f", fps);
         fpsFont->OnRender();
     }
     if (psDeviceFlags.test(rsShowFPSGraph))

@@ -135,6 +135,18 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared
         }
     }
 
+    if (strstr(shaderName, "water"))
+        info.transparent = true;
+    if (strstr(shaderName, "lightplane"))
+        info.transparent = true;
+    if (strstr(shaderName, "xwindows") || strstr(shaderName, "xmonolith")
+        || strstr(shaderName, "xanomaly") || strstr(shaderName, "pautina")
+        || strstr(shaderName, "xdistort") || strstr(shaderName, "hud3d")
+        || strstr(shaderName, "hud_p3d"))
+        info.transparent = true;
+    if (strstr(shaderName, "wallmark"))
+        info.transparent = true;
+
     m_materialCache[key] = info;
     return m_materialCache[key];
 }

@@ -1,0 +1,10 @@
+{
+    "sorting": { "priority": 1, "backToFront": false },
+    "fog": false,
+    "wmark": true,
+    "transparent": true,
+    "ps": "bindless_wallmark_set",
+    "blend": { "src": "One", "dst": "Zero" },
+    "depth": { "test": true, "write": false },
+    "colorWriteMask": "RGB"
+}

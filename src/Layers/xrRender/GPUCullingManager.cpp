@@ -1827,7 +1827,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         // ─────────────────────────────────────────────────────
         GPUObjectData obj;
         obj.position = batch.worldBoundsCenter;
-        obj.radius = batch.worldBoundsRadius;
+        obj.radius = batch.isStatic ? batch.worldBoundsRadius : (batch.worldBoundsRadius * 1.75f);
         obj.batchIndex = static_cast<u32>(objectData.size());
 
         obj.flags = 0;
@@ -1837,6 +1837,10 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
             obj.flags |= GPU_OBJECT_ALPHA_TEST;
         if (batch.IsStrictB2F())
             obj.flags |= GPU_OBJECT_TRANSPARENT;
+        if (batch.visual && batch.visual->shaderName.size()
+            && (strstr(batch.visual->shaderName.c_str(), "wallmark")
+                || strstr(batch.visual->shaderName.c_str(), "lightplane")))
+            obj.flags |= GPU_OBJECT_WMARK;
 
         obj.pad0 = 0.0f;
         obj.pad1 = 0.0f;
@@ -1932,6 +1936,20 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
 
         if (batch.IsStrictB2F()) {
             appendBatch(batch, m_transparentObjectData, m_transparentDrawArgsData, m_transparentMaterialIDData, m_transparentInstanceData);
+            if (batch.visual && batch.visual->shaderName.size() &&
+                strstr(batch.visual->shaderName.c_str(), "water"))
+            {
+                static u32 s_waterBatchLog = 0;
+                if (s_waterBatchLog < 8)
+                {
+                    Msg("* [GPUCull] Water transparent batch mat=%u shader='%s' idx=%u verts=%u",
+                        batch.bindlessMaterialID,
+                        batch.visual->shaderName.c_str(),
+                        static_cast<u32>(m_transparentObjectData.size() - 1),
+                        batch.indexCount);
+                    ++s_waterBatchLog;
+                }
+            }
             continue;
         }
 
@@ -2266,8 +2284,8 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
 
         GPUObjectData obj;
         obj.position = batch.worldBoundsCenter;
-        obj.radius = batch.worldBoundsRadius;
-        obj.flags = 0;  // Skinned meshes use their own alpha handling
+        obj.radius = batch.worldBoundsRadius * 1.75f;
+        obj.flags = 0;
         obj.pad0 = 0.0f;
         obj.pad1 = 0.0f;
 
@@ -2617,14 +2635,11 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
             bindless::MaterialBuffer::Instance().Upload(ctx);
 
-            if (mgr->m_rtAccelMgr) {
-                mgr->m_rtAccelMgr->BuildIfNeeded(cmdList, mgr);
-                if (mgr->m_rtAccelMgr->IsReady()) {
-                    if (!mgr->m_rtAccelMgr->GetMaterialBuffer())
-                        mgr->m_rtAccelMgr->SetMaterialBuffer(bindless::MaterialBuffer::Instance().GetBuffer());
-                    if (!mgr->m_rtAccelMgr->GetTerrainMaterialBuffer())
-                        mgr->m_rtAccelMgr->SetTerrainMaterialBuffer(bindless::TerrainMaterialBuffer::Instance().GetBuffer());
-                }
+            if (mgr->m_rtAccelMgr && mgr->m_rtAccelMgr->IsReady()) {
+                if (!mgr->m_rtAccelMgr->GetMaterialBuffer())
+                    mgr->m_rtAccelMgr->SetMaterialBuffer(bindless::MaterialBuffer::Instance().GetBuffer());
+                if (!mgr->m_rtAccelMgr->GetTerrainMaterialBuffer())
+                    mgr->m_rtAccelMgr->SetTerrainMaterialBuffer(bindless::TerrainMaterialBuffer::Instance().GetBuffer());
             }
 
             // Get Hi-Z texture
@@ -3694,6 +3709,9 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
                 nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_debugGraphicsLayout);
 
+                if (depthTexture->getDesc().width != colorTexture->getDesc().width ||
+                    depthTexture->getDesc().height != colorTexture->getDesc().height)
+                    return;
                 nvrhi::FramebufferDesc fbDesc;
                 fbDesc.addColorAttachment(colorTexture);
                 fbDesc.setDepthAttachment(depthTexture);
@@ -3763,6 +3781,9 @@ void GPUCullingManager::BeginLevelLoad(u32 estimatedVertices, u32 estimatedIndic
     m_megaDataUploaded = false;
 
     InvalidateStaticCullingData();
+
+    if (m_rtAccelMgr)
+        m_rtAccelMgr->Invalidate();
 
     // Clear and pre-allocate mega-buffers
     m_megaVertices.clear();

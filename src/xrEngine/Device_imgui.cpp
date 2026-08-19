@@ -29,7 +29,7 @@ void CRenderDevice::InitializeImGui()
                       ImGuiConfigFlags_NavEnableGamepad |
                       ImGuiConfigFlags_DockingEnable;
 
-    io.ConfigNavMoveSetMousePos = true;
+    io.ConfigNavMoveSetMousePos = false;
 
     string_path fName;
     FS.update_path(fName, "$app_data_root$", io.IniFilename);

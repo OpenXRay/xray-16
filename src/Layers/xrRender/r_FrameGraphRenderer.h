@@ -260,6 +260,7 @@ public:
     xray::profiler::StatsOverlay* GetStatsOverlay() const { return m_statsOverlay.get(); }
     void ToggleStatsOverlay() { if (m_statsOverlay) m_statsOverlay->ToggleVisible(); }
 
+    nvrhi::ITexture* GetPersistentExposureTexture() const;
     fg::RenderDevice* GetRenderDevice() const override { return m_device; }
     framegraph::ShaderLoader* GetShaderLoader() const override { return m_shaderLoader; }
     fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const override { return m_imguiRendererNVRHI; }
@@ -483,9 +484,10 @@ private:
     nvrhi::TextureHandle m_normals[2];
     u32 m_pingPongIndex = 0;
 
-    Fmatrix m_prevViewProj;                       // Previous frame's view-projection
-    Fvector m_prevCameraPos;                      // Previous frame's camera position
-    bool m_hasPrevFrameData = false;              // Valid previous frame exists
+    Fmatrix m_prevViewProj;
+    Fmatrix m_prevInvFullTransform;
+    Fvector m_prevCameraPos;
+    bool m_hasPrevFrameData = false;
     u32 m_prevFrameWidth = 0;                     // Previous frame resolution
     u32 m_prevFrameHeight = 0;
 
@@ -555,6 +557,7 @@ private:
     // Only dynamic objects (from spatial DB) need per-frame collection
     xr_vector<GeometryBatch> m_cachedStaticBatches;
     bool m_staticBatchesCached = false;
+    xr_vector<dxRender_Visual*> m_lodImpostors;
 
     // RenderContext for execution
     xr_unique_ptr<fg::RenderContext> m_renderContext;

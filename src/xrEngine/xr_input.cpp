@@ -187,6 +187,7 @@ void CInput::MouseUpdate()
     static_assert(std::size(IdxToKey) == COUNT_MOUSE_BUTTONS);
 
     bool mouseMoved = false;
+    bool mouseMotion = false;
     int offs[2]{};
     float scroll[2]{};
     const auto mousePrev = mouseState;
@@ -206,6 +207,7 @@ void CInput::MouseUpdate()
         {
         case SDL_EVENT_MOUSE_MOTION:
             mouseMoved = true;
+            mouseMotion = true;
             offs[0] += static_cast<int>(event.motion.xrel);
             offs[1] += static_cast<int>(event.motion.yrel);
             mouseAxisState[0] = static_cast<int>(event.motion.x);
@@ -244,7 +246,7 @@ void CInput::MouseUpdate()
 
     if (mouseMoved)
     {
-        if (offs[0] || offs[1])
+        if (mouseMotion || offs[0] || offs[1])
             cbStack.back()->IR_OnMouseMove(offs[0], offs[1]);
 
         if (!fis_zero(scroll[0]) || !fis_zero(scroll[1]))
@@ -541,14 +543,8 @@ bool KbdKeyToButtonName(const int dik, xr_string& result)
     return false;
 }
 
-bool OtherDevicesKeyToButtonName(const int btn, xr_string& /*result*/)
+bool OtherDevicesKeyToButtonName(const int /*btn*/, xr_string& /*result*/)
 {
-    if (btn > CInput::COUNT_KB_BUTTONS)
-    {
-        // XXX: Not implemented
-        return false;
-    }
-
     return false;
 }
 

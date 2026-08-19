@@ -1,0 +1,16 @@
+struct PSInput
+{
+    float4 position : SV_Position;
+    float4 color    : COLOR;
+    float2 texcoord : TEXCOORD0;
+};
+
+float4 main(PSInput input) : SV_Target
+{
+    float2 d = input.texcoord * 2.0 - 1.0;
+    float r2 = dot(d, d);
+    float a = saturate(1.0 - r2);
+    a = a * a;
+    float3 rgb = input.color.rgb * a;
+    return float4(rgb, input.color.a * a);
+}

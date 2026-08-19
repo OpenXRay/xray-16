@@ -42,37 +42,42 @@ inline const char* GetTextureTypeName(TextureType type) {
 // GPU-side material representation - must match HLSL exactly!
 // Uses SM6 bindless texture indices from ResourceDescriptorHeap
 //
-// Layout (32 bytes total):
-//   Bytes 0-15:  Texture descriptor indices (4× u32)
-//   Bytes 16-31: Material properties
-
 struct alignas(16) MaterialData {
-    // Descriptor heap indices (UINT32_MAX = invalid/not present)
-    u32 diffuseIndex;    // Base color / albedo texture
-    u32 normalIndex;     // Normal map texture
-    u32 detailIndex;     // Detail texture
-    u32 pbrIndex;        // Packed Metallic/Roughness/AO texture
+    u32 diffuseIndex;
+    u32 normalIndex;
+    u32 detailIndex;
+    u32 pbrIndex;
 
-    // Material properties
-    float detailScale;   // Detail texture tiling multiplier
-    float alphaRef;      // Alpha test threshold (0.5 typical)
-    u32 flags;           // Material flags (see MaterialFlags)
-    u32 shaderVariant;   // Index into ShaderVariantRegistry (0=default)
+    float detailScale;
+    float alphaRef;
+    u32 flags;
+    u32 shaderVariant;
+
+    u32 lmapIndex;
+    float emissiveIntensity;
+    u32 _pad1;
+    u32 _pad2;
 };
-static_assert(sizeof(MaterialData) == 32, "MaterialData must be 32 bytes for GPU alignment");
+static_assert(sizeof(MaterialData) == 48, "MaterialData must be 48 bytes for GPU alignment");
 
-// Material flags (must match HLSL)
 enum MaterialFlags : u32 {
-    MAT_FLAG_ALPHA_TEST    = (1 << 0),  // Enable alpha testing
-    MAT_FLAG_TWO_SIDED     = (1 << 1),  // Disable backface culling
-    MAT_FLAG_EMISSIVE      = (1 << 2),  // Has emissive component
-    MAT_FLAG_HAS_DETAIL    = (1 << 3),  // Has detail texture (detailIndex valid)
-    MAT_FLAG_HAS_NORMAL    = (1 << 4),  // Has normal map (normalIndex valid)
-    MAT_FLAG_HAS_PBR       = (1 << 5),  // Has PBR textures (pbrIndex valid)
-    MAT_FLAG_TERRAIN       = (1 << 6),  // Terrain 4-layer blending material
-    MAT_FLAG_HAS_PBR_LAYER = (1 << 7),  // Terrain has PBR detail textures
-    MAT_FLAG_ALPHA_BLEND   = (1 << 8),  // Transparent alpha blending
-    MAT_FLAG_WATER         = (1 << 9),  // Water surface (Fresnel reflect/refract)
+    MAT_FLAG_ALPHA_TEST    = (1 << 0),
+    MAT_FLAG_TWO_SIDED     = (1 << 1),
+    MAT_FLAG_EMISSIVE      = (1 << 2),
+    MAT_FLAG_HAS_DETAIL    = (1 << 3),
+    MAT_FLAG_HAS_NORMAL    = (1 << 4),
+    MAT_FLAG_HAS_PBR       = (1 << 5),
+    MAT_FLAG_TERRAIN       = (1 << 6),
+    MAT_FLAG_HAS_PBR_LAYER = (1 << 7),
+    MAT_FLAG_ALPHA_BLEND   = (1 << 8),
+    MAT_FLAG_WATER         = (1 << 9),
+    MAT_FLAG_FOLIAGE       = (1 << 10),
+    MAT_FLAG_STEEP_PARALLAX = (1 << 11),
+    MAT_FLAG_HAS_LMAP      = (1 << 12),
+    MAT_FLAG_GLASS         = (1 << 13),
+    MAT_FLAG_SCOPE         = (1 << 14),
+    MAT_FLAG_HUD3D         = (1 << 15),
+    MAT_FLAG_WMARK         = (1 << 16),
 };
 
 // ═══════════════════════════════════════════════════════
@@ -113,9 +118,8 @@ struct alignas(16) TerrainMaterialData {
     u32 pbrB_Index;          // PBR for mask.b channel
     u32 pbrA_Index;          // PBR for mask.a channel
 
-    // Properties
-    float detailScale;       // Uniform tiling scale for all 4 detail layers
-    u32 flags;               // MAT_FLAG_TERRAIN, MAT_FLAG_HAS_PBR_LAYER
+    float detailScale;
+    u32 flags;
 };
 static_assert(sizeof(TerrainMaterialData) == 64, "TerrainMaterialData must be 64 bytes for GPU alignment");
 

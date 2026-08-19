@@ -22,18 +22,32 @@ void FGFlareRender::CreateShader(LPCSTR sh_name, LPCSTR tex_name)
     if (!shaderLoader)
         return;
 
-    auto vsResult = shaderLoader->LoadVertexShader(sh_name, "main");
-    auto psResult = shaderLoader->LoadPixelShader(sh_name, "main");
+    const char* vsName = sh_name;
+    const char* psName = "sun_forward";
+    if (sh_name)
+    {
+        if (strstr(sh_name, "flare"))
+            vsName = "effects_flare";
+        else if (strstr(sh_name, "sun"))
+            vsName = "effects_sun";
+    }
+
+    auto vsResult = shaderLoader->LoadVertexShader(vsName, "main");
+    auto psResult = shaderLoader->LoadPixelShader(psName, "main");
 
     if (vsResult.handle && psResult.handle)
     {
         m_vsHandle = vsResult.handle;
         m_psHandle = psResult.handle;
-        Msg("* [FGFlareRender] Compiled flare shader: %s (tex: %s)", sh_name, tex_name);
     }
-    else
+    else if (psResult.handle)
     {
-        Msg("! [FGFlareRender] Failed to compile flare shader: %s", sh_name);
+        auto fallbackVs = shaderLoader->LoadVertexShader("sun_forward", "main");
+        if (fallbackVs.handle)
+        {
+            m_vsHandle = fallbackVs.handle;
+            m_psHandle = psResult.handle;
+        }
     }
 }
 

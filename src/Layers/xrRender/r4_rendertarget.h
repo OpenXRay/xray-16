@@ -260,6 +260,20 @@ public:
         color_map_manager.SetTextures(tex0, tex1);
     }
 
+    float get_blur() const { return param_blur; }
+    float get_gray() const { return param_gray; }
+    float get_duality_h() const { return param_duality_h; }
+    float get_duality_v() const { return param_duality_v; }
+    float get_noise() const { return param_noise; }
+    float get_noise_scale() const { return param_noise_scale; }
+    float get_noise_fps() const { return param_noise_fps; }
+    u32 get_color_base() const { return param_color_base; }
+    u32 get_color_gray() const { return param_color_gray; }
+    const Fvector& get_color_add() const { return param_color_add; }
+    float get_cm_influence() const { return param_color_map_influence; }
+    float get_cm_interpolate() const { return param_color_map_interpolate; }
+    nvrhi::ITexture* get_cm_texture(int i) const { return color_map_manager.GetTexture(i); }
+
 #ifdef DEBUG
     void dbg_addline(const Fvector& P0, const Fvector& P1, u32 c)
     {

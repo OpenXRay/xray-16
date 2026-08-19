@@ -1,0 +1,29 @@
+#include "common.h"
+#include "bindless_common.h"
+
+float3 YuvToRgb(float3 src)
+{
+    float3 YUV = src.bgr;
+    float Y = YUV.z;
+    float U = YUV.y;
+    float V = YUV.x;
+    float c = 1.16406;
+    float3 _Y = float3(c, c, c) * Y;
+    float3 _U = float3(0.0, -0.390625, 2.01562) * U;
+    float3 _V = float3(1.59765, -0.8125, 0.0) * V;
+    float3 _S = float3(-0.86961, 0.53076, -1.0786);
+    return _Y + _U + _V + _S;
+}
+
+float4 main(p_TL I) : SV_Target
+{
+    float3 rgb = I.Color.rgb;
+    float a = I.Color.a;
+    if (I.TexIdx != INVALID_TEXTURE_INDEX)
+    {
+        float4 c = GetBindlessTexture(I.TexIdx).Sample(smp_base, I.Tex0) * I.Color;
+        rgb = YuvToRgb(c.rgb);
+        a = c.a;
+    }
+    return float4(rgb, a);
+}

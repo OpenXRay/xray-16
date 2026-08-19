@@ -1165,18 +1165,14 @@ void CCharacterPhysicsSupport::EndActivateFreeShell(
     // actualize
     m_pPhysicsShell->GetGlobalTransformDynamic(&mXFORM);
     m_pPhysicsShell->mXFORM.set(mXFORM);
+    if (!_valid(mXFORM))
+    {
+        mXFORM.identity();
+        mXFORM.c.set(m_EntityAlife.Position());
+        m_pPhysicsShell->mXFORM.set(mXFORM);
+        m_pPhysicsShell->SetGlTransformDynamic(mXFORM);
+    }
 
-    // if( false &&  anim_mov_ctrl && anim_mov_blend && anim_mov_blend->blend != CBlend::eFREE_SLOT &&
-    // anim_mov_blend->timeCurrent + Device.fTimeDelta*anim_mov_blend->speed <
-    // anim_mov_blend->timeTotal-SAMPLE_SPF-EPS)//.
-    //{
-    //	const Fmatrix sv_xform = mXFORM;
-    //	mXFORM.set( start_xform );
-    //	//anim_mov_blend->blendPower = 1;
-    //	anim_mov_blend->timeCurrent  += Device.fTimeDelta * anim_mov_blend->speed;
-    //	m_pPhysicsShell->AnimToVelocityState( Device.fTimeDelta, 2 * default_l_limit, 10.f * default_w_limit );
-    //	mXFORM.set( sv_xform );
-    //}
     IKinematics* K = smart_cast<IKinematics*>(m_EntityAlife.Visual());
     // u16 root =K->LL_GetBoneRoot();
     // if( root!=0 )

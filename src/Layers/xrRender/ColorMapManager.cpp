@@ -15,6 +15,13 @@ void ColorMapManager::SetTextures(const shared_str& tex0, const shared_str& tex1
     UpdateTexture(tex1, 1);
 }
 
+nvrhi::ITexture* ColorMapManager::GetTexture(int i) const
+{
+    if (i < 0 || i > 1 || !m_CMap[i])
+        return nullptr;
+    return m_CMap[i]->surface_get_native();
+}
+
 void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
 {
     if (strTexName == m_strCMap[iTex])

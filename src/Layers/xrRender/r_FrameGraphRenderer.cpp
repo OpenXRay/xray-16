@@ -36,6 +36,7 @@
 #include "FrameGraphPasses/DetailCullPassSetup.h"    // Detail culling (async compute)
 #include "FrameGraphPasses/DetailPassSetup.h"        // Detail rendering pass
 #include "FrameGraphPasses/TransparentPassSetup.h"   // Transparent alpha-blended geometry (after detail)
+#include "FrameGraphPasses/PassCommon.h"
 // SM6 bindless: Textures registered directly with D3D12Backend via RegisterBindlessTexture()
 #include "Bindless/MaterialBuffer.h"                 // Bindless material buffer
 #include "Bindless/TerrainMaterialBuffer.h"          // Terrain material buffer
@@ -44,6 +45,7 @@
 #include "FrameGraphPasses/SunPassSetup.h"           // Sun disc rendering
 #include "FrameGraphPasses/SkinningPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"      // Particle rendering (billboards/sprites)
+#include "FrameGraphPasses/GlowPassSetup.h"
 #include "FrameGraphPasses/DistortionApplyPassSetup.h" // Distortion post-process
 #include "FrameGraphPasses/DecalPassSetup.h"          // Screen-space box decals
 #include "Decals/DecalManager.h"                      // Decal manager
@@ -51,13 +53,26 @@
 #include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/FontPassSetup.h"
-#include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
+#include "FrameGraphPasses/TonemapPassSetup.h"
+#include "FrameGraphPasses/PostProcessPassSetup.h"
 #include "FrameGraphPasses/SmokeTrailPassSetup.h"
 #include "FrameGraphPasses/ClusterLightPassSetup.h"
 #include "ClusteredLightManager.h"
 #include "light.h"
 #include "FrameGraphPasses/MotionVectorPassSetup.h"
+#include "FrameGraphPasses/TAAPassSetup.h"
 #include "FrameGraphPasses/ReSTIRGIPassSetup.h"
+#include "FrameGraphPasses/WetSurfacesPassSetup.h"
+#include "FrameGraphPasses/RainShadowPassSetup.h"
+#include "FrameGraphPasses/ShadowPassSetup.h"
+#include "FrameGraphPasses/VolumetricFogPassSetup.h"
+#include "Upscaling/UpscaleState.h"
+#include "Upscaling/IUpscaleBackend.h"
+#include "Upscaling/UpscalePassSetup.h"
+#include "Upscaling/StreamlineDLSS.h"
+#include "Upscaling/DlssFgPassSetup.h"
+#include "Denoising/IDenoiseBackend.h"
+#include "RayTracing/ReSTIRMemoryManager.h"
 #include "FrameGraphPasses/RibbonPassSetup.h"
 #include "FrameGraphPasses/TrailPassSetup.h"
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
@@ -175,10 +190,49 @@ extern ENGINE_API int ps_r_rt_gi;
 extern ENGINE_API float ps_r_rt_gi_intensity;
 extern ENGINE_API int ps_r_path_tracer;
 extern ENGINE_API int ps_r_path_tracer_bounces;
+extern ENGINE_API int ps_r_taa;
+extern ENGINE_API int ps_r_upscale;
+extern ENGINE_API int ps_r_denoise;
+extern ENGINE_API int ps_r_nrd_method;
+extern ENGINE_API int ps_r_dlss;
+extern ENGINE_API int ps_r_dlss_rr;
+extern ENGINE_API int ps_r_dlss_fg;
+extern ENGINE_API int ps_r_hdr_debug;
 
 namespace xray::render {
 
 using namespace fg;
+
+static framegraph::VirtualResourceHandle CreateHdrCompose(framegraph::FrameGraph& fg, u32 w, u32 h)
+{
+    framegraph::ResourceDesc d;
+    d.type = framegraph::ResourceDesc::Type::Texture2D;
+    d.width = w;
+    d.height = h;
+    d.format = nvrhi::Format::RGBA16_FLOAT;
+    d.isRenderTarget = true;
+    d.debugName = "rt_HdrCompose";
+    return fg.CreateTexture("rt_HdrCompose", d);
+}
+
+static framegraph::VirtualResourceHandle CreateDisplayColor(framegraph::FrameGraph& fg, u32 w, u32 h)
+{
+    nvrhi::Format fmt = nvrhi::Format::RGBA8_UNORM;
+    if (GEnv.Backend && GEnv.Backend->GetBackBuffer())
+        fmt = GEnv.Backend->GetBackBuffer()->getDesc().format;
+    framegraph::ResourceDesc d;
+    d.type = framegraph::ResourceDesc::Type::Texture2D;
+    d.width = w;
+    d.height = h;
+    d.format = fmt;
+    d.isRenderTarget = true;
+    d.debugName = "rt_FgDisplay";
+    return fg.CreateTexture("rt_FgDisplay", d);
+}
+
+static fg::UpscaleState g_upscaleState;
+static xr_unique_ptr<fg::IUpscaleBackend> g_upscaleBackend;
+static xr_unique_ptr<fg::IDenoiseBackend> g_denoiseBackend;
 
 // Forward declaration and extern for accessing RImplementation
 namespace fg {
@@ -360,14 +414,38 @@ void FrameGraphRenderer::Shutdown() {
 
     fg::ClusteredLightManager::Instance().Shutdown();
 
+    if (m_blackboard) {
+        if (auto* restir = m_blackboard->try_get<passes::ReSTIRGIPassState>())
+            passes::ShutdownReSTIRGI(*restir);
+        if (auto* wet = m_blackboard->try_get<passes::WetSurfacesPassState>())
+            wet->initialized = false;
+        if (auto* rainSM = m_blackboard->try_get<passes::RainShadowPassState>())
+            passes::ShutdownRainShadowPass(m_device, *rainSM);
+        if (auto* grassSM = m_blackboard->try_get<passes::GrassShadowPassState>())
+            passes::ShutdownGrassShadowPass(m_device, *grassSM);
+        if (auto* volFog = m_blackboard->try_get<passes::VolumetricFogPassState>())
+            passes::ShutdownVolumetricFog(*volFog);
+    }
+
     passes::ShutdownPathTracer();
 
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
 
+    if (g_upscaleBackend) {
+        g_upscaleBackend->Shutdown();
+        g_upscaleBackend.reset();
+    }
+    if (g_denoiseBackend) {
+        g_denoiseBackend->Shutdown();
+        g_denoiseBackend.reset();
+    }
+
     if (m_blackboard) {
         if (auto* tonemap = m_blackboard->try_get<passes::TonemapPassState>())
             passes::ShutdownTonemapPass(*tonemap);
+        if (auto* taa = m_blackboard->try_get<passes::TAAPassState>())
+            passes::ShutdownTAAPass(*taa);
         m_blackboard.reset();
     }
 
@@ -490,14 +568,15 @@ void FrameGraphRenderer::Render() {
 
     auto& cache = framegraph::GetPassResourceCache();
     auto* cmdList = m_renderContext->GetCommandList();
-    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device);
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device, 512);
     auto staticGlobalsData = passes::BuildStaticGlobals();
 
     auto& clm = fg::ClusteredLightManager::Instance();
     if (clm.IsReady() && clm.GetLightCount() > 0) {
         float zNear = VIEWPORT_NEAR;
         float zFar = g_pGamePersistent->Environment().CurrentEnv.far_plane;
-        auto ccb = clm.BuildClusterCB(Device.dwWidth, Device.dwHeight, zNear, zFar);
+        auto ccb = clm.BuildClusterCB(
+            passes::GetRenderWidth(), passes::GetRenderHeight(), zNear, zFar);
         staticGlobalsData.cluster_params.set(ccb.gridDims.x, ccb.gridDims.y, ccb.gridDims.z, ccb.gridDims.w);
         staticGlobalsData.cluster_scales.set(ccb.depthParams.x, ccb.depthParams.y, ccb.depthParams.z, ccb.depthParams.w);
     }
@@ -505,7 +584,7 @@ void FrameGraphRenderer::Render() {
     cmdList->writeBuffer(staticGlobalsCB, &staticGlobalsData, sizeof(staticGlobalsData));
 
     auto dynamicTransformsCB = cache.GetOrCreateVolatileCB("Frame", "DynamicTransforms",
-        sizeof(passes::DynamicTransforms), m_device);
+        sizeof(passes::DynamicTransforms), m_device, 256);
     passes::DynamicTransforms dynamicTransformsData = {};
     passes::FillDynamicTransforms(dynamicTransformsData);
     cmdList->writeBuffer(dynamicTransformsCB, &dynamicTransformsData, sizeof(dynamicTransformsData));
@@ -521,7 +600,8 @@ void FrameGraphRenderer::Render() {
     }
 
     m_hasPrevFrameData = true;
-    m_prevViewProj = Device.mFullTransform;
+    m_prevViewProj = passes::g_taa_unjittered_full_transform;
+    m_prevInvFullTransform = Device.mInvFullTransform;
     m_prevCameraPos = Device.vCameraPosition;
     m_pingPongIndex = 1 - m_pingPongIndex;
 
@@ -587,15 +667,18 @@ void FrameGraphRenderer::RenderMenu() {
         backbufferHandle = m_framegraph->ImportTexture("Backbuffer", backbufferTexture, backbufferDesc);
     }
 
+    const bool hdr10 = GEnv.Backend && GEnv.Backend->IsHdr10();
+
     framegraph::ResourceDesc bgDesc;
     bgDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     bgDesc.width = width;
     bgDesc.height = height;
-    bgDesc.format = nvrhi::Format::RGBA8_UNORM;
+    bgDesc.format = hdr10 ? nvrhi::Format::RGBA16_FLOAT : nvrhi::Format::RGBA8_UNORM;
     bgDesc.isRenderTarget = true;
-    bgDesc.debugName = "rt_MenuBackground";
+    const char* bgName = hdr10 ? "rt_HdrCompose" : "rt_MenuBackground";
+    bgDesc.debugName = bgName;
 
-    auto backgroundTarget = m_framegraph->CreateTexture("rt_MenuBackground", bgDesc);
+    auto backgroundTarget = m_framegraph->CreateTexture(bgName, bgDesc);
     
     framegraph::PassHandle clearPass = m_framegraph->AddPass("ClearBackground");
     m_framegraph->PassWrite(clearPass, backgroundTarget, framegraph::ResourceState::RenderTarget);
@@ -614,25 +697,33 @@ void FrameGraphRenderer::RenderMenu() {
     sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
     sceneWithUI = passes::setupDebugDrawPass(*m_framegraph, sceneWithUI, width, height);
 
-    auto ldrOutput = passes::setupTonemapPass(
-        *m_framegraph,
-        m_device,
-        sceneWithUI,  // HDR input (RGBA16_FLOAT)
-        framegraph::VirtualResourceHandle(),  // No exposure for menu
-        backbufferHandle,  // Output directly to imported backbuffer
-        width,
-        height,
-        m_blackboard->get_or_add<passes::TonemapPassState>()
-    );
+    framegraph::VirtualResourceHandle ldrOutput = sceneWithUI;
+    if (!hdr10)
+    {
+        ldrOutput = passes::setupTonemapPass(
+            *m_framegraph,
+            m_device,
+            sceneWithUI,
+            framegraph::VirtualResourceHandle(),
+            backbufferHandle,
+            width,
+            height,
+            m_blackboard->get_or_add<passes::TonemapPassState>()
+        );
+    }
 
     fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.Render->GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
-        ldrOutput,  // LDR input (RGBA8_UNORM)
+        ldrOutput,
         imguiRenderer,
         width,
         height
     );
+    if (hdr10)
+        finalOutput = passes::setupHdr10EncodePass(
+            *m_framegraph, m_device, finalOutput, backbufferHandle, width, height,
+            m_blackboard->get_or_add<passes::TonemapPassState>());
 
     m_finalOutput = finalOutput;
 
@@ -649,6 +740,21 @@ void FrameGraphRenderer::RenderMenu() {
 
 void FrameGraphRenderer::RenderStatsOverlay()
 {
+    if (ps_r_hdr_debug)
+    {
+        const fg::passes::ExposurePassState* exp = nullptr;
+        if (m_blackboard)
+        {
+            if (auto* e = m_blackboard->try_get<fg::passes::ExposurePassState>())
+            {
+                if (m_device && m_device->GetNVRHIDevice())
+                    fg::passes::PollExposureHistogram(*e, m_device->GetNVRHIDevice());
+                exp = e;
+            }
+        }
+        fg::passes::RenderHdrDebugUI(exp);
+    }
+
     if (m_statsOverlay && psDeviceFlags.test(rsStatistic))
     {
         xray::profiler::RenderStats stats;
@@ -659,8 +765,6 @@ void FrameGraphRenderer::RenderStatsOverlay()
             const auto& batches = m_geometryCollector->GetBatches();
             stats.totalBatches = static_cast<u32>(batches.size());
 
-            xr_set<IRenderVisual*> uniqueSkeletons;
-
             for (const auto& batch : batches)
             {
                 u32 triangles = batch.indexCount / 3;
@@ -670,26 +774,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
                 {
                     stats.skinnedBatches++;
                     stats.skinnedTriangles += triangles;
-
-                    if (batch.renderable)
-                    {
-                        IRenderVisual* rootVisual = batch.renderable->GetRenderData().visual;
-                        if (rootVisual && uniqueSkeletons.find(rootVisual) == uniqueSkeletons.end())
-                        {
-                            uniqueSkeletons.insert(rootVisual);
-                            stats.skinnedMeshes++;
-
-                            // Get bone count from kinematics
-                            IKinematics* K = rootVisual->dcast_PKinematics();
-                            if (K)
-                            {
-                                u32 boneCount = K->LL_BoneCount();
-                                stats.totalBones += boneCount;
-                                if (boneCount > stats.maxBonesPerMesh)
-                                    stats.maxBonesPerMesh = boneCount;
-                            }
-                        }
-                    }
+                    stats.skinnedMeshes++;
                 }
                 else if (batch.isTerrain)
                 {
@@ -935,8 +1020,102 @@ framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
 }
 
 void FrameGraphRenderer::SetupFrameGraphPasses() {
-    const u32 width = Device.dwWidth;
-    const u32 height = Device.dwHeight;
+    passes::ApplyTAAJitter();
+
+    {
+        if (ps_r_dlss != 0 && ps_r_upscale == 0)
+            ps_r_upscale = 2;
+        const int reqUpscale = ps_r_upscale;
+        fg::UpscaleBackendType wantType = fg::UpscaleBackendType::None;
+        if (reqUpscale == 3)
+            wantType = fg::UpscaleBackendType::DLSS;
+        else if (reqUpscale == 2)
+            wantType = fg::UpscaleBackendType::DLSS;
+        else if (reqUpscale == 1)
+            wantType = fg::UpscaleBackendType::None;
+        const fg::UpscaleBackendType haveType =
+            g_upscaleBackend ? g_upscaleBackend->GetType() : fg::UpscaleBackendType::None;
+        const bool haveOk = g_upscaleBackend && g_upscaleBackend->IsAvailable();
+        const bool needSwitch =
+            (wantType == fg::UpscaleBackendType::None && haveType != fg::UpscaleBackendType::None) ||
+            (wantType != fg::UpscaleBackendType::None && (!haveOk || haveType != wantType));
+        if (needSwitch)
+        {
+            if (GEnv.Backend)
+                GEnv.Backend->WaitForIdle();
+            if (g_upscaleBackend)
+            {
+                if (haveType == fg::UpscaleBackendType::DLSS &&
+                    wantType != fg::UpscaleBackendType::DLSS)
+                    fg::Streamline_ReleaseFeatures();
+                g_upscaleBackend->Shutdown();
+                g_upscaleBackend.reset();
+            }
+            if (wantType != fg::UpscaleBackendType::None)
+                g_upscaleBackend.reset(fg::CreateUpscaleBackendAuto());
+            m_hasPrevFrameData = false;
+        }
+    }
+    const bool upscaleBackendOk = g_upscaleBackend && g_upscaleBackend->IsAvailable();
+
+    {
+        static int s_denoiseCvar = -1;
+        static int s_nrdMethodCvar = -1;
+        static int s_dlssRrCvar = -1;
+        static int s_upscaleCvar = -1;
+        static int s_rrAvail = -1;
+        static u32 s_denoiseW = 0;
+        static u32 s_denoiseH = 0;
+        UpdateUpscaleState(g_upscaleState, Device.dwWidth, Device.dwHeight, upscaleBackendOk);
+        const u32 denoiseW = g_upscaleState.renderWidth ? g_upscaleState.renderWidth : Device.dwWidth;
+        const u32 denoiseH = g_upscaleState.renderHeight ? g_upscaleState.renderHeight : Device.dwHeight;
+        const int rrAvail = fg::Streamline_IsRRAvailable() ? 1 : 0;
+        const bool denoiseDirty =
+            s_denoiseCvar != ps_r_denoise ||
+            s_nrdMethodCvar != ps_r_nrd_method ||
+            s_dlssRrCvar != ps_r_dlss_rr ||
+            s_upscaleCvar != ps_r_upscale ||
+            s_rrAvail != rrAvail ||
+            (g_denoiseBackend && (s_denoiseW != denoiseW || s_denoiseH != denoiseH));
+        if (denoiseDirty && g_denoiseBackend) {
+            if (GEnv.Backend)
+                GEnv.Backend->WaitForIdle();
+            g_denoiseBackend->Shutdown();
+            g_denoiseBackend.reset();
+        }
+        if (ps_r_denoise != 0 && !g_denoiseBackend)
+            g_denoiseBackend.reset(fg::CreateDenoiseBackendAuto(ps_r_dlss_rr != 0 && ps_r_upscale == 2));
+        if (g_denoiseBackend && g_denoiseBackend->IsAvailable())
+            g_denoiseBackend->Resize(denoiseW, denoiseH);
+        s_denoiseCvar = ps_r_denoise;
+        s_nrdMethodCvar = ps_r_nrd_method;
+        s_dlssRrCvar = ps_r_dlss_rr;
+        s_upscaleCvar = ps_r_upscale;
+        s_rrAvail = rrAvail;
+        s_denoiseW = denoiseW;
+        s_denoiseH = denoiseH;
+    }
+
+    UpdateUpscaleState(g_upscaleState, Device.dwWidth, Device.dwHeight, upscaleBackendOk);
+    g_upscaleState.jitterX = passes::g_taa_jitter_px;
+    g_upscaleState.jitterY = passes::g_taa_jitter_py;
+    g_upscaleState.prevJitterX = passes::g_taa_jitter_prev_px;
+    g_upscaleState.prevJitterY = passes::g_taa_jitter_prev_py;
+    if (m_bFirstFrameAfterReset)
+    {
+        m_hasPrevFrameData = false;
+        m_bFirstFrameAfterReset = false;
+        fg::ReSTIRMemoryManager::Instance().RequestHistoryReset();
+    }
+    g_upscaleState.resetHistory = !m_hasPrevFrameData || fg::Streamline_ConsumeFeatureReset();
+
+    const u32 displayWidth = g_upscaleState.displayWidth;
+    const u32 displayHeight = g_upscaleState.displayHeight;
+    const u32 width = g_upscaleState.renderWidth;
+    const u32 height = g_upscaleState.renderHeight;
+    passes::SetRenderResolution(width, height);
+    const bool upscaleResolved = g_upscaleState.upscaleActive &&
+        g_upscaleBackend && g_upscaleBackend->IsAvailable();
 
     nvrhi::ITexture* backbufferTexture = GEnv.Backend->GetBackBuffer();
     framegraph::VirtualResourceHandle backbufferHandle;
@@ -944,8 +1123,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (backbufferTexture) {
         framegraph::ResourceDesc backbufferDesc;
         backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-        backbufferDesc.width = width;
-        backbufferDesc.height = height;
+        backbufferDesc.width = displayWidth;
+        backbufferDesc.height = displayHeight;
         backbufferDesc.format = backbufferTexture->getDesc().format;
         backbufferDesc.isRenderTarget = true;
         backbufferDesc.isImported = true;
@@ -1136,6 +1315,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     colorDesc.format = nvrhi::Format::RGBA16_FLOAT;
     colorDesc.isRenderTarget = true;
     colorDesc.debugName = "rt_SceneColor";
+    colorDesc.allowUAV = true;
 
     auto skyColorHandle = m_framegraph->CreateTexture("rt_SceneColor", colorDesc);
 
@@ -1264,15 +1444,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    // 2. Skinning Pass - Renders all skinned meshes (world + HUD)
-    // World skinned: NPCs, monsters with normal depth [0.0, 1.0]
-    // HUD skinned: First-person weapons/hands with depth [0.9, 1.0]
-    auto hudOutputs = passes::setupSkinningPass(
+    // 2. Skinning Pass - world skinned only
+    auto skinnedOutputs = passes::setupSkinningPass(
         *m_framegraph,
         m_device,
         forwardOutputs,
         m_geometryCollector.get(),
-        &m_hudBatches,
+        nullptr,
         m_materialCache.get(),
         width,
         height,
@@ -1285,6 +1463,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  DETAIL CULL PASS (Async Compute)
     // ═══════════════════════════════════════════════════════
+    auto& detailPassState = m_blackboard->get_or_add<passes::DetailPassState>();
     passes::setupDetailCullPass(
         *m_framegraph,
         m_device,
@@ -1295,7 +1474,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.mipLevels,
         m_hasPrevFrameData ? &m_prevViewProj : nullptr,
         m_gpuProfiler.get(),
-        &m_blackboard->get_or_add<passes::DetailPassState>()
+        &detailPassState
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1328,11 +1507,25 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         *m_framegraph,
         m_device,
         m_detailManager.get(),
-        hudOutputs,
+        skinnedOutputs,
         width,
         height,
-        m_gpuProfiler.get()
+        m_gpuProfiler.get(),
+        detailPassState.cullArgs
     );
+
+    passes::GrassShadowOutputs grassShadowOut{};
+    if (m_detailManager && g_pGamePersistent)
+    {
+        grassShadowOut = passes::setupGrassShadowPass(
+            *m_framegraph,
+            m_device,
+            m_detailManager.get(),
+            g_pGamePersistent->Environment().CurrentEnv.sun_dir,
+            m_blackboard->get_or_add<passes::GrassShadowPassState>(),
+            detailOutputs.albedo,
+            detailPassState.cullArgs);
+    }
 
     // ═══════════════════════════════════════════════════════
     //  TRANSPARENT PASS (alpha-blended geometry)
@@ -1347,9 +1540,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         transparentConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetTransparentCompactMaterialIDBuffer();
         transparentConfig.compactCountBuffer = m_gpuCullingManager->GetTransparentCompactCountBuffer();
         transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
+        passes::ResolveEnvSkyCubes(m_device, transparentConfig.envSky0, transparentConfig.envSky1);
 
         if (m_gpuCullingManager->IsVariantPartitionEnabled())
             transparentConfig.variantPartition = m_gpuCullingManager->GetTransparentPartition().ToConfig();
+        if ((ps_r_rt_gi != 0) && m_rtAccelMgr && m_rtAccelMgr->IsSupported() && m_rtAccelMgr->IsReady())
+            transparentConfig.skipWmark = true;
     }
 
     auto transparentOutputs = passes::setupTransparentPass(
@@ -1361,193 +1557,411 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_blackboard->get_or_add<passes::TransparentPassState>()
     );
 
-    // ═══════════════════════════════════════════════════════
-    //  DECAL PASS (screen-space box decals on surfaces)
-    // ═══════════════════════════════════════════════════════
-    if (m_decalManager) {
+    if (!m_hudBatches.empty()) {
+        framegraph::DefaultOutputLayout hudIn = transparentOutputs;
+        auto hudOut = passes::setupSkinningPass(
+            *m_framegraph,
+            m_device,
+            hudIn,
+            nullptr,
+            &m_hudBatches,
+            m_materialCache.get(),
+            width,
+            height,
+            m_gpuCullingManager.get(),
+            {},
+            &m_blackboard->get_or_add<passes::SkinningPassState>(),
+            m_overlayManager.get());
+        transparentOutputs.albedo = hudOut.albedo;
+        transparentOutputs.normal = hudOut.normal;
+        transparentOutputs.baseColor = hudOut.baseColor;
+        if (hudOut.worldPos.is_valid())
+            transparentOutputs.worldPos = hudOut.worldPos;
+        transparentOutputs.depth = hudOut.depth;
+    }
+
+    if (m_decalManager)
         m_decalManager->Update(Device.fTimeDelta, Device.fTimeGlobal);
-        if (m_decalManager->GetActiveCount() > 0) {
-            transparentOutputs = passes::setupDecalPass(
-                *m_framegraph, m_device,
-                transparentOutputs, m_decalManager.get(),
-                width, height,
-                m_blackboard->get_or_add<passes::DecalPassState>()
-            );
-        }
+
+    const bool restirWallmarks = transparentConfig.skipWmark;
+    if (restirWallmarks && transparentConfig.IsValid() && transparentOutputs.baseColor.is_valid()) {
+        framegraph::DefaultOutputLayout wmIn = transparentOutputs;
+        wmIn.albedo = transparentOutputs.baseColor;
+        auto wmOut = passes::setupWallmarkPass(
+            *m_framegraph, m_device, wmIn, transparentConfig,
+            width, height,
+            m_blackboard->get_or_add<passes::TransparentPassState>());
+        transparentOutputs.baseColor = wmOut.albedo;
+    }
+    if (m_decalManager && m_decalManager->GetActiveCount() > 0) {
+        framegraph::DefaultOutputLayout decalIn = transparentOutputs;
+        if (restirWallmarks && transparentOutputs.baseColor.is_valid())
+            decalIn.albedo = transparentOutputs.baseColor;
+        auto decalOut = passes::setupDecalPass(
+            *m_framegraph, m_device,
+            decalIn, m_decalManager.get(),
+            width, height,
+            m_blackboard->get_or_add<passes::DecalPassState>());
+        if (restirWallmarks && transparentOutputs.baseColor.is_valid())
+            transparentOutputs.baseColor = decalOut.albedo;
+        else
+            transparentOutputs.albedo = decalOut.albedo;
     }
 
     // ═══════════════════════════════════════════════════════
     //  MOTION VECTOR PASS (Depth-based reprojection)
     // ═══════════════════════════════════════════════════════
-    passes::MotionVectorOutput motionOutput;
-    if (m_hasPrevFrameData) {
-        motionOutput = passes::setupMotionVectorPass(
-            *m_framegraph, m_device,
-            transparentOutputs.depth,
-            Device.mInvFullTransform, m_prevViewProj,
-            width, height,
-            m_blackboard->get_or_add<passes::MotionVectorPassState>()
-        );
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  PARTICLE PASS (after all opaque + transparent geometry)
-    // ═══════════════════════════════════════════════════════
-    auto particleOutputs = passes::setupParticlePass(
-        *m_framegraph,
-        m_device,
-        transparentOutputs,
-        &m_worldParticleBatches,
-        &m_hudParticleBatches,
-        m_materialCache.get(),
-        width,
-        height,
-        hizOutput.pyramid,
-        hizOutput.width,
-        hizOutput.height,
-        hizOutput.mipLevels,
-        m_hasPrevFrameData ? &m_prevViewProj : nullptr,
-        prevDepthHandle,
-        &m_blackboard->get_or_add<passes::ParticlePassState>()
+    passes::MotionVectorOutput motionOutput = passes::setupMotionVectorPass(
+        *m_framegraph, m_device,
+        transparentOutputs.depth,
+        passes::g_taa_unjittered_full_transform,
+        m_prevViewProj,
+        Device.mInvFullTransform,
+        width, height,
+        m_blackboard->get_or_add<passes::MotionVectorPassState>()
     );
 
-    // ═══════════════════════════════════════════════════════
-    //  RIBBON PASS (test quad, after particles)
-    // ═══════════════════════════════════════════════════════
-    auto ribbonOutputs = passes::setupRibbonPass(
-        *m_framegraph,
-        m_device,
-        particleOutputs.layout,
-        width,
-        height,
-        &m_blackboard->get_or_add<passes::RibbonPassState>()
-    );
+    auto sceneColor = transparentOutputs.albedo;
+    framegraph::VirtualResourceHandle pendingDistortRT = transparentOutputs.distortion;
 
     // ═══════════════════════════════════════════════════════
-    //  TRAIL PASS (after ribbon, stored-direction width)
+    //  RT ACCEL + DYNAMIC BLAS (before ReSTIR / Path Tracer)
     // ═══════════════════════════════════════════════════════
-    auto trailOutputs = passes::setupTrailPass(
-        *m_framegraph,
-        m_device,
-        ribbonOutputs.layout,
-        width,
-        height,
-        &m_blackboard->get_or_add<passes::TrailPassState>()
-    );
-
-    // ═══════════════════════════════════════════════════════
-    //  SMOKE TRAIL PASS (GPU-simulated weapon muzzle smoke)
-    // ═══════════════════════════════════════════════════════
-    auto smokeOutputs = trailOutputs.layout;
-    if (m_smokeTrailManager && m_smokeTrailManager->IsReady())
     {
-        smokeOutputs = passes::setupSmokeTrailPass(
-            *m_framegraph,
-            m_device,
-            trailOutputs.layout,
-            m_smokeTrailManager.get(),
-            width,
-            height,
-            m_blackboard->get_or_add<passes::SmokeTrailPassState>(),
-            m_detailManager ? m_detailManager->perlin4dTexture.Get() : nullptr
-        );
+        static int s_lastGi = -1;
+        if (s_lastGi != ps_r_rt_gi) {
+            s_lastGi = ps_r_rt_gi;
+            const bool supported = m_rtAccelMgr && m_rtAccelMgr->IsSupported();
+            const bool ready = m_rtAccelMgr && m_rtAccelMgr->IsReady();
+            Msg("* [ReSTIR] r_rt_gi=%d supported=%d ready=%d", ps_r_rt_gi, supported ? 1 : 0, ready ? 1 : 0);
+        }
     }
 
-    auto sceneColor = smokeOutputs.albedo;
+    bool needsRT = (ps_r_path_tracer || ps_r_rt_gi) && m_rtAccelMgr && m_rtAccelMgr->IsSupported();
+    const bool levelLoading = g_pGamePersistent && g_pGamePersistent->IsLoadingScreenShown();
 
-    if (particleOutputs.distortionRT.is_valid()) {
-        sceneColor = passes::setupDistortionApplyPass(
-            *m_framegraph, m_device, sceneColor, particleOutputs.distortionRT,
-            particleOutputs.layout.depth, width, height,
-            m_blackboard->get_or_add<passes::DistortionApplyPassState>());
+    if (needsRT && m_gpuCullingManager && !levelLoading) {
+        m_gpuCullingManager->Initialize(m_device);
+        m_gpuCullingManager->SetRTAccelStructManager(m_rtAccelMgr.get());
+
+        if (!m_rtAccelMgr->IsReady()) {
+            static bool s_rtWaitLogged = false;
+            if (!s_rtWaitLogged) {
+                s_rtWaitLogged = true;
+                Msg("* [RT] Waiting for mega geometry upload to build TLAS");
+            }
+        }
+
+        struct RTBuildData {
+            RTAccelStructManager* accelMgr;
+            GPUCullingManager* gpuCulling;
+            FGDetailManager* detailMgr;
+            const GeometryCollector* geometry;
+            const xr_vector<GeometryBatch>* hudBatches;
+            const xr_vector<passes::ParticleBatch>* worldParticles;
+            bool buildDynamic;
+        };
+
+        const bool buildDynamic = m_rtAccelMgr->IsReady() &&
+            ((ps_r_path_tracer && m_ptSampleIndex == 0) || (ps_r_rt_gi && !ps_r_path_tracer));
+
+        m_framegraph->addCallbackPass<RTBuildData>(
+            "RT Accel Build",
+            [&](framegraph::FrameGraph& builder, framegraph::PassHandle passHandle, RTBuildData& data) {
+                framegraph::RenderPassBuilder pb(builder, passHandle);
+                pb.sideEffects();
+                if (detailPassState.cullArgs.is_valid())
+                    pb.read(detailPassState.cullArgs, framegraph::ResourceState::ShaderResource);
+                data.accelMgr = m_rtAccelMgr.get();
+                data.gpuCulling = m_gpuCullingManager.get();
+                data.detailMgr = m_detailManager.get();
+                data.geometry = m_geometryCollector.get();
+                data.hudBatches = &m_hudBatches;
+                data.worldParticles = &m_worldParticleBatches;
+                data.buildDynamic = buildDynamic;
+            },
+            [](const RTBuildData& data, const framegraph::FrameGraph&, fg::RenderContext* ctx) {
+                nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+                data.accelMgr->BuildIfNeeded(cmdList, data.gpuCulling);
+
+                if (data.accelMgr->IsReady()) {
+                    if (!data.accelMgr->GetMaterialBuffer())
+                        data.accelMgr->SetMaterialBuffer(bindless::MaterialBuffer::Instance().GetBuffer());
+                    if (!data.accelMgr->GetTerrainMaterialBuffer())
+                        data.accelMgr->SetTerrainMaterialBuffer(bindless::TerrainMaterialBuffer::Instance().GetBuffer());
+                }
+
+                if (!data.buildDynamic || !data.accelMgr->IsReady())
+                    return;
+
+                xr_vector<GeometryBatch> worldSkinned;
+                for (const auto& b : data.geometry->GetBatches()) {
+                    if (b.isSkinned && b.visual && b.indexCount > 0)
+                        worldSkinned.push_back(b);
+                }
+
+                xr_vector<GeometryBatch> hudSkinned;
+                data.accelMgr->BuildSkinnedBLAS(cmdList, data.gpuCulling, worldSkinned, hudSkinned);
+                data.accelMgr->BuildGrassBLAS(cmdList, data.detailMgr);
+                if (data.worldParticles)
+                    data.accelMgr->BuildParticleBLAS(cmdList, *data.worldParticles);
+                else
+                    data.accelMgr->InvalidateParticles();
+                data.accelMgr->RebuildDynamic(cmdList, data.gpuCulling);
+            }
+        );
     }
 
     // ═══════════════════════════════════════════════════════
     //  ReSTIR GI (RT Shadows + Indirect Lighting)
     // ═══════════════════════════════════════════════════════
 
-    if (ps_r_rt_gi && m_rtAccelMgr && m_rtAccelMgr->IsSupported() && m_rtAccelMgr->IsReady()) {
+    nvrhi::ITexture* restirNoisyDiffuse = nullptr;
+    nvrhi::ITexture* restirNoisySpecular = nullptr;
+    nvrhi::ITexture* restirHitDistance = nullptr;
+
+    if (ps_r_rt_gi && m_rtAccelMgr && m_rtAccelMgr->IsSupported()) {
+        if (!m_rtAccelMgr->IsReady()) {
+            g_restirReplaceForward = false;
+            static u32 s_lastWaitFrame = 0;
+            if (Device.dwFrame - s_lastWaitFrame > 60) {
+                s_lastWaitFrame = Device.dwFrame;
+                Msg("! [ReSTIR] r_rt_gi=1 but TLAS not ready yet");
+            }
+        } else {
+        auto& restirState = m_blackboard->get_or_add<passes::ReSTIRGIPassState>();
+        {
+            auto& tpState = m_blackboard->get_or_add<passes::TransparentPassState>();
+            restirState.waterUnderWorldPos = tpState.waterSceneWorldPos;
+            restirState.waterUnderColor = tpState.waterSsrColor;
+        }
         auto rtgiOutput = passes::setupReSTIRGIPass(
             *m_framegraph, m_device, m_rtAccelMgr.get(),
             transparentOutputs.depth, transparentOutputs.normal,
             transparentOutputs.baseColor,
+            transparentOutputs.worldPos,
             prevNormalsHandle, prevDepthHandle,
             motionOutput.motionVectors,
             sceneColor,
-            Device.mInvFullTransform, m_prevViewProj,
+            Device.mInvFullTransform, m_prevViewProj, m_prevInvFullTransform,
             Device.vCameraPosition, ps_r_rt_gi_intensity,
             width, height,
-            m_blackboard->get_or_add<passes::ReSTIRGIPassState>(), m_hasPrevFrameData
+            restirState, m_hasPrevFrameData, grassShadowOut
         );
         sceneColor = rtgiOutput.sceneColor;
-    }
+        restirNoisyDiffuse = rtgiOutput.noisyDiffuse;
+        restirNoisySpecular = rtgiOutput.noisySpecular;
+        restirHitDistance = rtgiOutput.hitDistance;
 
-    // ═══════════════════════════════════════════════════════
-    //  DYNAMIC BLAS BUILD (shared by Path Tracer + ReSTIR GI)
-    // ═══════════════════════════════════════════════════════
-    bool needsRT = (ps_r_path_tracer || ps_r_rt_gi) && m_rtAccelMgr && m_rtAccelMgr->IsSupported();
-
-    if (needsRT && m_rtAccelMgr->IsReady()) {
-        bool ptNeedsBLAS = ps_r_path_tracer && m_ptSampleIndex == 0;
-        bool giNeedsBLAS = ps_r_rt_gi && !ps_r_path_tracer;
-
-        if (ptNeedsBLAS || giNeedsBLAS) {
-            struct DynamicBLASData {
-                RTAccelStructManager* accelMgr;
-                GPUCullingManager* gpuCulling;
-                FGDetailManager* detailMgr;
-                const GeometryCollector* geometry;
-                const xr_vector<GeometryBatch>* hudBatches;
+        if (false && g_denoiseBackend && g_denoiseBackend->IsAvailable() &&
+            ps_r_denoise != 0 && !(ps_r_dlss_rr != 0 && ps_r_upscale == 2))
+        {
+            struct NrdPassData {
+                framegraph::VirtualResourceHandle depth;
+                framegraph::VirtualResourceHandle normal;
+                framegraph::VirtualResourceHandle baseColor;
+                framegraph::VirtualResourceHandle worldPos;
+                framegraph::VirtualResourceHandle motion;
+                framegraph::VirtualResourceHandle sceneColor;
+                nvrhi::ITexture* noisyDiffuse = nullptr;
+                nvrhi::ITexture* noisySpecular = nullptr;
+                nvrhi::ITexture* hitDistance = nullptr;
+                nvrhi::ITexture* directLighting = nullptr;
+                u32 width = 0;
+                u32 height = 0;
             };
 
-            m_framegraph->addCallbackPass<DynamicBLASData>(
-                "Dynamic BLAS Build",
-                [&](framegraph::FrameGraph& builder, framegraph::PassHandle passHandle, DynamicBLASData& data) {
+            m_framegraph->addCallbackPass<NrdPassData>(
+                "ReSTIR NRD",
+                [&](framegraph::FrameGraph& builder, framegraph::PassHandle passHandle, NrdPassData& data) {
                     framegraph::RenderPassBuilder pb(builder, passHandle);
+                    data.depth = pb.read(transparentOutputs.depth, framegraph::ResourceState::ShaderResource);
+                    data.normal = pb.read(transparentOutputs.normal, framegraph::ResourceState::ShaderResource);
+                    data.baseColor = pb.read(transparentOutputs.baseColor, framegraph::ResourceState::ShaderResource);
+                    if (transparentOutputs.worldPos.is_valid())
+                        data.worldPos = pb.read(transparentOutputs.worldPos, framegraph::ResourceState::ShaderResource);
+                    if (motionOutput.motionVectors.is_valid())
+                        data.motion = pb.read(motionOutput.motionVectors, framegraph::ResourceState::ShaderResource);
+                    data.sceneColor = pb.readWrite(sceneColor, framegraph::ResourceState::UnorderedAccess);
                     pb.sideEffects();
-                    data.accelMgr = m_rtAccelMgr.get();
-                    data.gpuCulling = m_gpuCullingManager.get();
-                    data.detailMgr = m_detailManager.get();
-                    data.geometry = m_geometryCollector.get();
-                    data.hudBatches = &m_hudBatches;
+                    data.noisyDiffuse = restirNoisyDiffuse;
+                    data.noisySpecular = restirNoisySpecular;
+                    data.hitDistance = restirHitDistance;
+                    data.directLighting = fg::ReSTIRMemoryManager::Instance().GetDirectLighting();
+                    data.width = width;
+                    data.height = height;
                 },
-                [](const DynamicBLASData& data, const framegraph::FrameGraph&, fg::RenderContext* ctx) {
-                    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+                [](const NrdPassData& data, const framegraph::FrameGraph& fgGraph, fg::RenderContext* ctx) {
+                    if (!g_denoiseBackend || !g_denoiseBackend->IsAvailable() || !ctx)
+                        return;
+                    auto* depthTex = fgGraph.GetPhysicalTexture(data.depth);
+                    auto* normalTex = fgGraph.GetPhysicalTexture(data.normal);
+                    auto* baseTex = fgGraph.GetPhysicalTexture(data.baseColor);
+                    auto* sceneTex = fgGraph.GetPhysicalTexture(data.sceneColor);
+                    auto* worldPosTex = data.worldPos.is_valid() ? fgGraph.GetPhysicalTexture(data.worldPos) : nullptr;
+                    auto* motionTex = data.motion.is_valid() ? fgGraph.GetPhysicalTexture(data.motion) : nullptr;
+                    if (!depthTex || !normalTex || !baseTex || !sceneTex || !data.noisyDiffuse || !worldPosTex)
+                        return;
 
-                    xr_vector<GeometryBatch> worldSkinned;
-                    for (const auto& b : data.geometry->GetBatches()) {
-                        if (b.isSkinned && b.visual && b.indexCount > 0)
-                            worldSkinned.push_back(b);
-                    }
-
-                    float fovScale = 1.0f / psHUD_FOV;
-                    Fmatrix viewMatrix = Device.mView;
-                    Fmatrix invView;
-                    invView.invert(viewMatrix);
-                    Fmatrix fovScaleMat;
-                    fovScaleMat.identity();
-                    fovScaleMat._11 = fovScale;
-                    fovScaleMat._22 = fovScale;
-
-                    xr_vector<GeometryBatch> hudSkinned;
-                    for (const auto& b : *data.hudBatches) {
-                        if (b.isSkinned && b.visual && b.indexCount > 0) {
-                            auto adjusted = b;
-                            Fmatrix t1, t2;
-                            t1.mul(viewMatrix, b.worldMatrix);
-                            t2.mul(fovScaleMat, t1);
-                            adjusted.worldMatrix.mul(invView, t2);
-                            hudSkinned.push_back(adjusted);
-                        }
-                    }
-
-                    data.accelMgr->BuildSkinnedBLAS(cmdList, data.gpuCulling, worldSkinned, hudSkinned);
-                    data.accelMgr->BuildGrassBLAS(cmdList, data.detailMgr);
-                    data.accelMgr->RebuildDynamic(cmdList, data.gpuCulling);
+                    fg::DenoiseInputs in;
+                    in.noisyDiffuse = data.noisyDiffuse;
+                    in.noisySpecular = data.noisySpecular;
+                    in.hitDistance = data.hitDistance;
+                    in.normals = normalTex;
+                    in.roughness = normalTex;
+                    in.depth = depthTex;
+                    in.baseColor = baseTex;
+                    in.worldPos = worldPosTex;
+                    in.motionVectors = motionTex;
+                    in.directLighting = data.directLighting;
+                    in.sceneColorIn = sceneTex;
+                    in.outSceneColor = sceneTex;
+                    in.outDiffuse = data.noisyDiffuse;
+                    in.outSpecular = data.noisySpecular;
+                    in.width = data.width;
+                    in.height = data.height;
+                    in.frameIndex = Device.dwFrame;
+                    in.nearZ = 0.001f;
+                    in.farZ = 500.f;
+                    g_denoiseBackend->Evaluate(ctx->GetCommandList(), in);
                 }
             );
         }
+        }
+    } else {
+        g_restirReplaceForward = false;
     }
+
+    passes::RainShadowOutputs rainShadowOut{};
+    {
+        const float rainDensity = g_pGamePersistent
+            ? g_pGamePersistent->Environment().CurrentEnv.rain_density
+            : 0.f;
+        const bool needRainSM = (rainDensity > 0.001f) || ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF);
+        if (needRainSM)
+        {
+            rainShadowOut = passes::setupRainShadowPass(
+                *m_framegraph,
+                m_device,
+                bindlessConfig,
+                m_blackboard->get_or_add<passes::RainShadowPassState>());
+        }
+    }
+
+    {
+        passes::WetSurfacesExtras wetExtras{};
+        if (rainShadowOut.rainSMTex)
+        {
+            wetExtras.rainSM = rainShadowOut.rainSM;
+            wetExtras.rainSMTex = rainShadowOut.rainSMTex;
+            wetExtras.rainSampleVP = rainShadowOut.sampleVP;
+            wetExtras.rainSMValid = rainShadowOut.valid;
+        }
+        auto wetIn = transparentOutputs;
+        wetIn.albedo = sceneColor;
+        if (ps_r_rt_gi && fg::ReSTIRMemoryManager::Instance().GetSkyOpen())
+            wetExtras.skyOpenTex = fg::ReSTIRMemoryManager::Instance().GetSkyOpen();
+        auto wetOut = passes::setupWetSurfacesPass(
+            *m_framegraph,
+            m_device,
+            wetIn,
+            width,
+            height,
+            m_blackboard->get_or_add<passes::WetSurfacesPassState>(),
+            wetExtras);
+        sceneColor = wetOut.albedo;
+    }
+
+    {
+        framegraph::DefaultOutputLayout fxIn = transparentOutputs;
+        fxIn.albedo = sceneColor;
+        auto particleOutputs = passes::setupParticlePass(
+            *m_framegraph,
+            m_device,
+            fxIn,
+            &m_worldParticleBatches,
+            &m_hudParticleBatches,
+            m_materialCache.get(),
+            width,
+            height,
+            hizOutput.pyramid,
+            hizOutput.width,
+            hizOutput.height,
+            hizOutput.mipLevels,
+            m_hasPrevFrameData ? &m_prevViewProj : nullptr,
+            prevDepthHandle,
+            &m_blackboard->get_or_add<passes::ParticlePassState>(),
+            pendingDistortRT
+        );
+        auto ribbonOutputs = passes::setupRibbonPass(
+            *m_framegraph,
+            m_device,
+            particleOutputs.layout,
+            width,
+            height,
+            &m_blackboard->get_or_add<passes::RibbonPassState>()
+        );
+        auto trailOutputs = passes::setupTrailPass(
+            *m_framegraph,
+            m_device,
+            ribbonOutputs.layout,
+            width,
+            height,
+            &m_blackboard->get_or_add<passes::TrailPassState>()
+        );
+        auto smokeOutputs = trailOutputs.layout;
+        if (m_smokeTrailManager && m_smokeTrailManager->IsReady())
+        {
+            smokeOutputs = passes::setupSmokeTrailPass(
+                *m_framegraph,
+                m_device,
+                trailOutputs.layout,
+                m_smokeTrailManager.get(),
+                width,
+                height,
+                m_blackboard->get_or_add<passes::SmokeTrailPassState>(),
+                m_detailManager ? m_detailManager->perlin4dTexture.Get() : nullptr
+            );
+        }
+        sceneColor = smokeOutputs.albedo;
+        sceneColor = passes::setupGlowBillboardPass(
+            *m_framegraph,
+            m_device,
+            sceneColor,
+            transparentOutputs.depth.is_valid() ? transparentOutputs.depth : depthBuffer,
+            width,
+            height,
+            m_blackboard->get_or_add<passes::GlowPassState>());
+        if (particleOutputs.distortionRT.is_valid())
+            pendingDistortRT = particleOutputs.distortionRT;
+        if (pendingDistortRT.is_valid()) {
+            auto& distortState = m_blackboard->get_or_add<passes::DistortionApplyPassState>();
+            {
+                auto& tpState = m_blackboard->get_or_add<passes::TransparentPassState>();
+                distortState.waterUnderColor = tpState.waterSsrColor;
+            }
+            sceneColor = passes::setupDistortionApplyPass(
+                *m_framegraph, m_device, sceneColor, pendingDistortRT,
+                transparentOutputs.worldPos, transparentOutputs.baseColor,
+                transparentOutputs.depth,
+                width, height,
+                distortState);
+        }
+    }
+
+    sceneColor = passes::setupVolumetricFogPass(
+        *m_framegraph,
+        m_device,
+        sceneColor,
+        transparentOutputs.depth,
+        transparentOutputs.worldPos,
+        Device.mInvFullTransform,
+        m_prevViewProj,
+        Device.vCameraPosition,
+        width,
+        height,
+        m_blackboard->get_or_add<passes::VolumetricFogPassState>(),
+        m_rtAccelMgr.get());
 
     // ═══════════════════════════════════════════════════════
     //  PATH TRACER (Reference / Ground-Truth Mode)
@@ -1645,6 +2059,22 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
+    if (ps_r_taa && ps_r_upscale == 0)
+    {
+        sceneColor = passes::setupTAAPass(
+            *m_framegraph,
+            m_device,
+            sceneColor,
+            transparentOutputs.depth,
+            motionOutput.motionVectors,
+            width,
+            height,
+            m_hasPrevFrameData,
+            m_blackboard->get_or_add<passes::TAAPassState>(),
+            transparentOutputs.worldPos);
+        m_framegraph->GetRTRegistry().RegisterRT("rt_TAA", sceneColor);
+    }
+
     // ═══════════════════════════════════════════════════════
     //  EXPOSURE PASS (Auto-Exposure / Eye Adaptation)
     // ═══════════════════════════════════════════════════════
@@ -1662,37 +2092,111 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     m_exposureTexture = exposureOutput.exposureTexture;
 
+    passes::UpscaleRRGuides rrGuides{};
+    const passes::UpscaleRRGuides* rrGuidesPtr = nullptr;
+    if (restirNoisyDiffuse && restirNoisySpecular && transparentOutputs.normal.is_valid() &&
+        transparentOutputs.baseColor.is_valid() && transparentOutputs.worldPos.is_valid())
+    {
+        rrGuides.normals = transparentOutputs.normal;
+        rrGuides.baseColor = transparentOutputs.baseColor;
+        rrGuides.worldPos = transparentOutputs.worldPos;
+        rrGuides.depth = transparentOutputs.depth;
+        rrGuides.noisyDiffuse = restirNoisyDiffuse;
+        rrGuides.noisySpecular = restirNoisySpecular;
+        rrGuides.hitDistance = restirHitDistance;
+        rrGuidesPtr = &rrGuides;
+    }
+
+    sceneColor = passes::setupUpscaleOrResolvePass(
+        *m_framegraph,
+        m_device,
+        sceneColor,
+        transparentOutputs.depth,
+        motionOutput.motionVectors,
+        exposureOutput.exposureTexture,
+        g_upscaleState,
+        g_upscaleBackend.get(),
+        width,
+        height,
+        m_blackboard->get_or_add<passes::UpscalePassState>(),
+        rrGuidesPtr);
+
+    const u32 postW = upscaleResolved ? displayWidth : width;
+    const u32 postH = upscaleResolved ? displayHeight : height;
+
+    const bool hdr10 = GEnv.Backend && GEnv.Backend->IsHdr10();
+    const bool useDlssFg =
+        g_upscaleBackend &&
+        g_upscaleBackend->SupportsFG() &&
+        g_upscaleBackend->GetType() == fg::UpscaleBackendType::DLSS &&
+        ps_r_dlss_fg != 0;
+
+    framegraph::VirtualResourceHandle tonemapTarget;
+    if (hdr10)
+        tonemapTarget = CreateHdrCompose(*m_framegraph, postW, postH);
+    else if (useDlssFg)
+        tonemapTarget = CreateDisplayColor(*m_framegraph, postW, postH);
+    else
+        tonemapTarget = backbufferHandle;
+
+    bool needPP = false;
+    if (m_pTarget && m_pTarget->u_need_PP())
+        needPP = true;
+    if (g_pGamePersistent && g_pGamePersistent->m_pGShaderConstants
+        && g_pGamePersistent->m_pGShaderConstants->m_blender_mode.x > 0.5f)
+        needPP = true;
+
+    auto tonemapDest = tonemapTarget;
+    if (needPP)
+        tonemapDest = hdr10 ? CreateHdrCompose(*m_framegraph, postW, postH)
+                            : CreateDisplayColor(*m_framegraph, postW, postH);
+
+    auto ldrOutput = passes::setupTonemapPass(
+        *m_framegraph,
+        m_device,
+        sceneColor,
+        exposureOutput.exposureTexture,
+        tonemapDest,
+        postW,
+        postH,
+        m_blackboard->get_or_add<passes::TonemapPassState>(),
+        &m_blackboard->get_or_add<passes::ExposurePassState>(),
+        transparentOutputs.depth,
+        transparentOutputs.worldPos
+    );
+
+    if (needPP)
+    {
+        ldrOutput = passes::setupPostProcessPass(
+            *m_framegraph,
+            m_device,
+            ldrOutput,
+            tonemapTarget,
+            postW,
+            postH,
+            m_pTarget,
+            m_blackboard->get_or_add<passes::PostProcessPassState>());
+    }
+
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
-        sceneColor,
-        width,
-        height
+        ldrOutput,
+        postW,
+        postH
     );
 
     sceneWithUI = passes::setupFontPass(*m_framegraph, sceneWithUI);
 
-    // 5. Cursor Pass - Renders cursor on top of UI+Text
     sceneWithUI = passes::setupCursorPass(
         *m_framegraph,
         sceneWithUI,
-        width,
-        height
+        postW,
+        postH
     );
 
-    sceneWithUI = passes::setupDebugDrawPass(*m_framegraph, sceneWithUI, width, height);
+    sceneWithUI = passes::setupDebugDrawPass(*m_framegraph, sceneWithUI, postW, postH);
 
-    // 6. Tonemap Pass - Convert HDR to LDR using ACES filmic tonemap
-    auto ldrOutput = passes::setupTonemapPass(
-        *m_framegraph,
-        m_device,
-        sceneWithUI,
-        exposureOutput.exposureTexture,
-        backbufferHandle,
-        width,
-        height,
-        m_blackboard->get_or_add<passes::TonemapPassState>(),
-        &m_blackboard->get_or_add<passes::ExposurePassState>()
-    );
+    ldrOutput = sceneWithUI;
 
     // ═══════════════════════════════════════════════════════
     //  DEBUG PREVIEW PASS (Render Inspector RT visualization)
@@ -1832,11 +2336,38 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         *m_framegraph,
         ldrOutput,
         imguiRenderer,
-        width,
-        height
+        postW,
+        postH
     );
+    if (hdr10)
+    {
+        auto encodeDst = useDlssFg
+            ? CreateDisplayColor(*m_framegraph, postW, postH)
+            : backbufferHandle;
+        finalOutput = passes::setupHdr10EncodePass(
+            *m_framegraph, m_device, finalOutput, encodeDst, postW, postH,
+            m_blackboard->get_or_add<passes::TonemapPassState>());
+    }
 
-    // Store final output for presentation (now points to backbuffer)
+    if (useDlssFg)
+    {
+        const bool resetFg = !m_hasPrevFrameData || g_upscaleState.resetHistory;
+        passes::setupDlssFgPass(
+            *m_framegraph,
+            finalOutput,
+            framegraph::VirtualResourceHandle{},
+            depthBuffer,
+            motionOutput.motionVectors,
+            Device.mProject,
+            m_prevViewProj,
+            Device.mFullTransform,
+            width,
+            height,
+            postW,
+            postH,
+            resetFg);
+    }
+
     m_finalOutput = finalOutput;
 
     // ═══════════════════════════════════════════════════════
@@ -1892,6 +2423,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     m_prevFrameWidth = width;
     m_prevFrameHeight = height;
+}
+
+nvrhi::ITexture* FrameGraphRenderer::GetPersistentExposureTexture() const
+{
+    if (!m_blackboard)
+        return nullptr;
+    if (auto* exp = m_blackboard->try_get<passes::ExposurePassState>())
+    {
+        if (exp->exposureTexture)
+            return exp->exposureTexture.Get();
+    }
+    if (auto* tm = m_blackboard->try_get<passes::TonemapPassState>())
+    {
+        if (tm->fallbackExposureTexture)
+            return tm->fallbackExposureTexture.Get();
+    }
+    return nullptr;
 }
 
 void FrameGraphRenderer::PrintStats() const {
@@ -2190,12 +2738,37 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     return true;
 }
 
-static u8 QueryParticleBlendMode(LPCSTR shaderName)
+static bool ParticleNameLooksAdditive(LPCSTR shaderName, LPCSTR texName)
+{
+    auto has = [](LPCSTR s, const char* k) { return s && strstr(s, k); };
+    if (has(shaderName, "smoke") || has(texName, "smoke")
+        || has(texName, "dust") || has(texName, "steam"))
+        return false;
+    return has(shaderName, "add") || has(shaderName, "glow") || has(shaderName, "flare")
+        || has(shaderName, "anomaly") || has(shaderName, "heat")
+        || has(texName, "anomaly") || has(texName, "heat") || has(texName, "zhar")
+        || has(texName, "fire") || has(texName, "flame") || has(texName, "glow")
+        || has(texName, "flash") || has(texName, "spark") || has(texName, "flare")
+        || has(texName, "explosion") || has(texName, "grenade") || has(texName, "blast")
+        || has(texName, "tracer");
+}
+
+static u8 QueryParticleBlendMode(LPCSTR shaderName, LPCSTR texName)
 {
     u32 id = 0;
-    if (!shader_info::GetParticleBlendIndex(shaderName, id))
-        return passes::PARTICLE_BLEND_BLEND;
-    return (id < passes::PARTICLE_BLEND_COUNT) ? (u8)id : passes::PARTICLE_BLEND_BLEND;
+    if (shader_info::GetParticleBlendIndex(shaderName, id)
+        && id > 0 && id < passes::PARTICLE_BLEND_COUNT)
+        return (u8)id;
+    if (shaderName && (strstr(shaderName, "s-aadd") || strstr(shaderName, "alpha-add")
+        || strstr(shaderName, "alphaadd")))
+        return passes::PARTICLE_BLEND_ALPHA_ADD;
+    if (ParticleNameLooksAdditive(shaderName, texName))
+        return passes::PARTICLE_BLEND_ADD;
+    if (shaderName && (strstr(shaderName, "mul2x") || strstr(shaderName, "mul_2x")))
+        return passes::PARTICLE_BLEND_MUL_2X;
+    if (shaderName && strstr(shaderName, "mul"))
+        return passes::PARTICLE_BLEND_MUL;
+    return passes::PARTICLE_BLEND_BLEND;
 }
 
 void FrameGraphRenderer::ProcessSingleParticleEffect(
@@ -2225,7 +2798,9 @@ void FrameGraphRenderer::ProcessSingleParticleEffect(
     batch.renderable = renderable;
     batch.isHUDMode = isHUDParticle;
     batch.particleCount = particleCount;
-    batch.blendMode = QueryParticleBlendMode(pDef->m_ShaderName.c_str());
+    batch.blendMode = QueryParticleBlendMode(
+        pDef->m_ShaderName.c_str(),
+        pDef->m_TextureName.size() ? pDef->m_TextureName.c_str() : "");
 
     if (strstr(pDef->m_ShaderName.c_str(), "distort"))
         batch.shaderVariant = passes::ParticleShaderVariant::Distort;
@@ -2297,6 +2872,7 @@ static void ForEachLeafVisual(dxRender_Visual* pVisual, F&& fn) {
         }
         case MT_LOD: {
             FLOD* pV = static_cast<FLOD*>(pVisual);
+            fn(pVisual);
             for (auto& child : pV->children) {
                 ForEachLeafVisual(child, fn);
             }
@@ -2363,6 +2939,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     u32 submittedStatic = 0;
 
     if (!m_staticBatchesCached && !sectors.empty()) {
+        m_lodImpostors.clear();
         Msg("* [GeomCache] Building static geometry cache from %zu sectors...", sectors.size());
 
         xr_vector<dxRender_Visual*> staticVisuals;
@@ -2444,8 +3021,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         submittedDynamic++;
     }
 
-    if (!collectedLights.empty())
-        fg::ClusteredLightManager::Instance().CollectLightsParallel(collectedLights);
+    fg::ClusteredLightManager::Instance().CollectLightsParallel(collectedLights);
 
     // ═══════════════════════════════════════════════════════
     //  HUD RENDERING (after dynamic objects)
@@ -2499,23 +3075,7 @@ xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
     return phases;
 }
 
-void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
-    PassEntry entry;
-    entry.phase = phase;
-
-    switch (phase) {
-        case framegraph::RenderPhase::Geometry: {
-            return;
-        }
-
-        case framegraph::RenderPhase::Lighting:
-        case framegraph::RenderPhase::PostProcess:
-        case framegraph::RenderPhase::Combine:
-        case framegraph::RenderPhase::Shadow:
-        case framegraph::RenderPhase::Custom:
-        default:
-            return;
-    }
+void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase /*phase*/) {
 }
 
 void FrameGraphRenderer::CreateAllRequiredPasses() {
@@ -2618,15 +3178,71 @@ namespace
 class CGlow : public IRender_Glow
 {
 public:
+    light* m_light = nullptr;
+    Fvector m_pos{};
+    Fvector m_dir{ 0.f, -1.f, 0.f };
+    float m_radius = 1.f;
+    Fcolor m_color{ 1.f, 1.f, 1.f, 1.f };
+    shared_str m_texture;
     bool bActive{ false };
+
+    explicit CGlow(light* L) : m_light(L)
+    {
+        fg::passes::GlowRegistry_Register(this);
+        if (m_light)
+        {
+            m_light->set_active(false);
+            xr_delete(m_light);
+            m_light = nullptr;
+        }
+    }
+
+    ~CGlow() override
+    {
+        fg::passes::GlowRegistry_Unregister(this);
+        if (m_light)
+        {
+            m_light->set_active(false);
+            xr_delete(m_light);
+            m_light = nullptr;
+        }
+    }
+
+    static bool TooCloseToCamera(const Fvector& pos, float radius)
+    {
+        const float minDist = _max(0.45f, radius * 2.f);
+        return Device.vCameraPosition.distance_to_sqr(pos) < minDist * minDist;
+    }
+
+    static bool CollectBillboard(void* glow, fg::passes::GlowBillboard& out)
+    {
+        auto* g = static_cast<CGlow*>(glow);
+        if (!g || !g->bActive)
+            return false;
+        if (TooCloseToCamera(g->m_pos, g->m_radius))
+            return false;
+        out.pos = g->m_pos;
+        out.radius = g->m_radius;
+        out.color = g->m_color;
+        out.texture = g->m_texture;
+        return true;
+    }
+
     void set_active(bool b) override { bActive = b; }
     bool get_active() override { return bActive; }
-    void set_position(const Fvector&) override {}
-    void set_direction(const Fvector&) override {}
-    void set_radius(float) override {}
-    void set_texture(LPCSTR) override {}
-    void set_color(const Fcolor&) override {}
-    void set_color(float, float, float) override {}
+    void set_position(const Fvector& P) override { m_pos = P; }
+    void set_direction(const Fvector& D) override
+    {
+        m_dir = D;
+        if (m_dir.magnitude() < 1e-4f)
+            m_dir.set(0.f, -1.f, 0.f);
+        else
+            m_dir.normalize();
+    }
+    void set_radius(float R) override { m_radius = _max(R, 0.05f); }
+    void set_texture(LPCSTR name) override { m_texture = name; }
+    void set_color(const Fcolor& C) override { m_color = C; }
+    void set_color(float r, float g, float b) override { m_color.set(r, g, b, 1.f); }
 };
 
 float EstimateSplatUVRadius(const fg::decals::MeshPickResult& pickResult, float worldRadius)
@@ -2673,7 +3289,16 @@ IRender_ObjectSpecific* FrameGraphRenderer::ros_create(IRenderable*) { return xr
 void FrameGraphRenderer::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
 
 IRender_Light* FrameGraphRenderer::light_create() { return Lights.Create(); }
-IRender_Glow*  FrameGraphRenderer::glow_create()  { return xr_new<CGlow>(); }
+IRender_Glow*  FrameGraphRenderer::glow_create()
+{
+    static bool s_glowCollectHooked = false;
+    if (!s_glowCollectHooked)
+    {
+        fg::passes::GlowRegistry_SetCollect(&CGlow::CollectBillboard);
+        s_glowCollectHooked = true;
+    }
+    return xr_new<CGlow>(nullptr);
+}
 
 IRenderVisual* FrameGraphRenderer::model_Create(pcstr name, IReader* data)        { return g_pModelPool->Create(name, data); }
 IRenderVisual* FrameGraphRenderer::model_CreateChild(pcstr name, IReader* data)   { return g_pModelPool->CreateChild(name, data); }

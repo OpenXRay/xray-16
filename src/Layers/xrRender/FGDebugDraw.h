@@ -56,6 +56,7 @@ private:
     size_t                        m_triCapacity = 0;
     nvrhi::GraphicsPipelineHandle m_pipelineLine;
     nvrhi::GraphicsPipelineHandle m_pipelineTri;
+    nvrhi::Format                 m_pipelineFormat = nvrhi::Format::UNKNOWN;
 };
 
 extern FGDebugDraw g_debug_draw;

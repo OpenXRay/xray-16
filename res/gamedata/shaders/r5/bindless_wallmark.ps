@@ -28,12 +28,10 @@ PS_OUTPUT main(PS_INPUT input)
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
 
     if (mat.flags & MAT_FLAG_ALPHA_TEST)
-    {
         clip(diffuseSample.a - mat.alphaRef);
-    }
 
     output.color = diffuseSample;
-    output.normal = float4(normalize(input.normal), 1.0);
-    output.baseColor = float4(diffuseSample.rgb, 0.0);
+    output.normal = float4(0, 0, 0, 0);
+    output.baseColor = float4(0, 0, 0, 0);
     return output;
 }

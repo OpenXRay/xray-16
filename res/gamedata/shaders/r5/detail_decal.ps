@@ -30,12 +30,16 @@ f_forward main(p_decal I)
 	Texture2D atlas_tex = GetBindlessTexture(build_details_index);
 	float4 texel = atlas_tex.Sample(smp_linear, I.tcdh.xy);
 
-	clip(texel.a - 0.5);
+	clip(texel.a - 96.0 / 255.0);
 
 	float3 N = normalize(I.N);
 	float metallic = 0.0;
 	float roughness = 0.85;
 	float ao = 1.0;
+	float hemi = saturate(I.position.w);
+	float sunOcc = (I.sunOcclusion > 0.01) ? 1.0 : 0.05;
+	const bool restir = parallax.w < -0.5;
+	float fwdSun = restir ? sunOcc : ((I.sunOcclusion > 0.01) ? consts.z : 0.0);
 
 	if (build_details_pbr_index != 0)
 	{
@@ -46,5 +50,9 @@ f_forward main(p_decal I)
 		ao = pbr.b;
 	}
 
-	return output_forward_pbr(texel.rgb, N, I.position.xyz, metallic, roughness, ao, I.hpos);
+	f_forward o = output_forward_pbr(
+		texel.rgb, N, I.position.xyz, metallic, roughness, ao, I.hpos,
+		hemi, fwdSun, false, false);
+	o.color.a = sunOcc;
+	return o;
 }

@@ -391,6 +391,7 @@ void CShootingObject::UpdateLight()
 {
     if (light_render && light_time > 0)
     {
+        Light_Render(get_CurrentFirePoint());
         light_time -= Device.fTimeDelta;
         if (light_time <= 0)
             StopLight();

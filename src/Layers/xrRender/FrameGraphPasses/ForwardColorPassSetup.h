@@ -119,6 +119,7 @@ struct ForwardColorPassState {
     nvrhi::ShaderHandle bindlessVS;
     nvrhi::ShaderHandle bindlessPS;
     bool bindlessInitialized = false;
+    u32 pipeVersion = 0;
     nvrhi::GraphicsPipelineHandle terrainPipeline;
     nvrhi::BindingLayoutHandle terrainLayout;
     nvrhi::ShaderHandle terrainPS;
@@ -130,6 +131,7 @@ struct ForwardColorPassData {
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle worldPos;
     framegraph::VirtualResourceHandle drawArgsBuffer;
     fg::RenderDevice* device;
     const GeometryCollector* geometry;

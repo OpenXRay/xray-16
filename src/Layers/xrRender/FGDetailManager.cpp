@@ -39,7 +39,7 @@ extern int ps_r__detail_gpu;
 extern float ps_current_detail_height;
 extern float ps_current_detail_density;
 
-static int magic4x4[4][4] = {{0, 14, 3, 13}, {11, 5, 8, 6}, {12, 2, 15, 1}, {7, 9, 4, 10}};
+static constexpr int magic4x4[4][4] = {{0, 14, 3, 13}, {11, 5, 8, 6}, {12, 2, 15, 1}, {7, 9, 4, 10}};
 
 static void bwdithermap(int levels, int magic[16][16])
 {
@@ -244,7 +244,7 @@ bool FGDetailManager::BakeHeightmap()
     const u32 total_slots = dtH.x_size() * dtH.z_size();
     std::atomic<u32> slots_completed{0};
 
-    auto worker = [&](u32 slot_start, u32 slot_end)
+    auto worker = [this, dtSlots, &pixels, &slots_completed, total_slots](u32 slot_start, u32 slot_end)
     {
         thread_local xrXRC thread_xrc;
 
@@ -2019,10 +2019,7 @@ bool FGDetailManager::CreateInstanceGenPipeline(fg::RenderDevice* renderDevice)
 bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, const nvrhi::FramebufferInfo& fbInfo)
 {
     if (!renderDevice || !vertexShader || !pixelShader)
-    {
-        Msg("! [FGDetailManager] CreateGraphicsPipeline: invalid parameters");
         return false;
-    }
 
     nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
 
@@ -2113,6 +2110,7 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
         Msg("! [FGDetailManager] Failed to create graphics pipeline");
         return false;
     }
+    Msg("* [FGDetailManager] Created graphics pipeline");
 
     if (decalVertexShader && decalPixelShader)
     {
@@ -2174,7 +2172,7 @@ void FGDetailManager::DispatchCulling(
     u32 hiZMipLevels,
     xray::profiler::GPUProfiler* gpuProfiler)
 {
-    if (!cullComputeShader || !slotCullComputeShader || slot_count == 0)
+    if (!hiZPyramid || !cullComputeShader || !slotCullComputeShader || slot_count == 0)
     {
         return;
     }
@@ -2320,6 +2318,8 @@ void FGDetailManager::DispatchCulling(
            .BufferUAV("g_visible_slot_counter", visibleSlotCounterBuffer);
 
         nvrhi::BindingSetHandle slotCullBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), slotCullBindingLayout, device);
+        if (!slotCullBindingSet)
+            return;
 
         nvrhi::ComputeState state;
         state.pipeline = slotCullPipeline;
@@ -2360,6 +2360,8 @@ void FGDetailManager::DispatchCulling(
            .BufferUAV("g_indirect_args_billboard", billboardDrawArgsBuffer);
 
         nvrhi::BindingSetHandle instanceCullBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), computeBindingLayout, device);
+        if (!instanceCullBindingSet)
+            return;
 
         nvrhi::ComputeState state;
         state.pipeline = computePipeline;
@@ -2463,7 +2465,7 @@ void FGDetailManager::BuildDetailModelGPUData()
         auto& d = cachedModelGPUData[i];
         d.minScale = m->m_fMinScale;
         d.maxScale = m->m_fMaxScale;
-        d.flags = *reinterpret_cast<const float*>(&m->m_Flags.flags);
+        std::memcpy(&d.flags, &m->m_Flags.flags, sizeof(d.flags));
 
         if (m->number_vertices > 0)
         {
@@ -2587,7 +2589,8 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
     cmdList->clearBufferUInt(instanceCounterBuffer, 0);
     cmdList->clearBufferUInt(perSlotLocalCountersBuffer, 0);
 
-    auto dispatchInstanceGen = [&](u32 mode, const char* passName) {
+    auto dispatchInstanceGen = [this, cmdList, device, gpuProfiler, renderDevice, numBlocks, numGroupsX, numGroupsY](
+                                   u32 mode, const char* passName) {
         if (gpuProfiler) gpuProfiler->BeginPass(cmdList, passName);
 
         InstanceGenParams genParams;
@@ -2613,7 +2616,8 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
         if (gpuProfiler) gpuProfiler->EndPass(cmdList, passName);
     };
 
-    auto dispatchPrefixSum = [&](nvrhi::ComputePipelineHandle pipeline, u32 groups, const char* passName) {
+    auto dispatchPrefixSum = [this, cmdList, device, gpuProfiler, renderDevice](
+                                 nvrhi::ComputePipelineHandle pipeline, u32 groups, const char* passName) {
         if (gpuProfiler) gpuProfiler->BeginPass(cmdList, passName);
 
         auto* prefixRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_prefix_sum", ".cs:main_scan_blocks");

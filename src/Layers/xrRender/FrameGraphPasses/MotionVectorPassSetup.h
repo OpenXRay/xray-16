@@ -13,6 +13,9 @@ struct MotionVectorPassState {
     nvrhi::BindingLayoutHandle layout;
     nvrhi::IBuffer* cb = nullptr;
     bool initialized = false;
+    u32 pipeVersion = 0;
+    Fvector prevCameraPos{};
+    bool hasPrevCamera = false;
 };
 
 struct MotionVectorOutput {
@@ -23,8 +26,9 @@ MotionVectorOutput setupMotionVectorPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depthInput,
-    const Fmatrix& invViewProj,
+    const Fmatrix& viewProj,
     const Fmatrix& prevViewProj,
+    const Fmatrix& invViewProjJittered,
     u32 width, u32 height,
     MotionVectorPassState& state);
 

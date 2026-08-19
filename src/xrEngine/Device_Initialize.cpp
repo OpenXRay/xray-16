@@ -102,6 +102,8 @@ void CRenderDevice::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     font.OutNext("*** ENGINE:   %2.2fms", stats.EngineTotal.result);
     font.OutNext("FPS/RFPS:     %3.1f/%3.1f", stats.fFPS, stats.fRFPS);
+    if (stats.fFPS_FG > 1.f)
+        font.OutNext("FPS after FG: %3.1f", stats.fFPS_FG);
     font.OutNext("TPS:          %2.2f M", stats.fTPS);
     if (alert && stats.fFPS < 30)
         alert->Print(font, "FPS       < 30:   %3.1f", stats.fFPS);

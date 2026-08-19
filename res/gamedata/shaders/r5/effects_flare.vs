@@ -28,6 +28,7 @@ VSOutput main(VSInput input)
 {
     VSOutput output;
     output.position = mul(m_WVP, float4(input.position, 1.0));
+    output.position.z = output.position.w * 0.0001;
     output.color = input.color.bgra;
     output.color.a *= g_FlareVis[0];
     output.texcoord = input.texcoord;

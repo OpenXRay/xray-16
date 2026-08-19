@@ -64,6 +64,7 @@ enum GPUObjectFlags : u32 {
     GPU_OBJECT_OPAQUE      = 0x1,
     GPU_OBJECT_ALPHA_TEST  = 0x2,
     GPU_OBJECT_TRANSPARENT = 0x4,
+    GPU_OBJECT_WMARK       = 0x8,
 };
 
 // ═══════════════════════════════════════════════════════
@@ -260,6 +261,7 @@ public:
     const xr_vector<u32>& GetTerrainMaterialIDData() const { return m_terrainMaterialIDData; }
     const xr_vector<IndirectDrawArgs>& GetTransparentDrawArgsData() const { return m_transparentDrawArgsData; }
     const xr_vector<u32>& GetTransparentMaterialIDData() const { return m_transparentMaterialIDData; }
+    const xr_vector<GPUInstanceData>& GetTransparentInstanceData() const { return m_transparentInstanceData; }
     const xr_vector<GPUInstanceData>& GetStaticInstanceData() const { return m_staticInstanceData; }
 
     void SetRTAccelStructManager(RTAccelStructManager* mgr) { m_rtAccelMgr = mgr; }

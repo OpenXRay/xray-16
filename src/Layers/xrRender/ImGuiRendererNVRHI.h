@@ -71,6 +71,8 @@ private:
     // Constants structure for projection matrix
     struct ImGuiConstants {
         float mvpMatrix[4][4];
+        float uiScale;
+        float uiPad[3];
     };
 
 protected:

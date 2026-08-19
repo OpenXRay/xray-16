@@ -4,9 +4,13 @@
 #include "xrCore/MemoryStats.h"
 #include "xrEngine/device.h"
 #include "xrEngine/IRenderBackend.h"
+#include "Layers/xrRender/Upscaling/StreamlineDLSS.h"
 #include <imgui.h>
 #include <algorithm>
 #include <cstring>
+
+extern ENGINE_API int ps_r_upscale;
+extern ENGINE_API int ps_r_dlss_fg;
 
 static bool FormatSubmitThreadLine(char* buf, size_t size)
 {
@@ -124,6 +128,22 @@ void StatsOverlay::Render()
     float fps = cpuFrameTime > 0.0f ? 1000.0f / cpuFrameTime : 0.0f;
 
     ImGui::Text("Frame: %s (%.1f FPS)", FormatTime(cpuFrameTime), fps);
+    {
+        const bool fgWant = ps_r_upscale == 2 && ps_r_dlss_fg != 0;
+        const bool fgAvail = xray::render::fg::Streamline_IsFGAvailable();
+        const bool fgEval = xray::render::fg::Streamline_FgEvaluatedLastFrame();
+        const bool fgPres = xray::render::fg::Streamline_FgPresentedLastFrame();
+        const float fpsFg = Device.GetStats().fFPS_FG;
+        if (fgWant || fgAvail || fgEval || fgPres || fpsFg > 1.f)
+        {
+            ImGui::Text("DLSS-FG: %s | after FG: %.1f FPS",
+                !fgAvail ? "unavailable" :
+                !fgWant ? "off" :
+                fgPres ? "presenting x2" :
+                fgEval ? "eval (present failed)" : "enabled",
+                fpsFg > 1.f ? fpsFg : (fgPres ? fps * 2.f : fps));
+        }
+    }
     if (!ideActive)
     {
         ImGui::TextDisabled("(Press editor key to interact)");

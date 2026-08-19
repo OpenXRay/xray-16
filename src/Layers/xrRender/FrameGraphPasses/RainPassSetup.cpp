@@ -30,6 +30,10 @@ framegraph::VirtualResourceHandle setupRainPass(
             auto* depth    = fg.GetPhysicalTexture(data.depth);
             if (!cmdList || !outputRT) return;
 
+            if (depth &&
+                (depth->getDesc().width != outputRT->getDesc().width ||
+                 depth->getDesc().height != outputRT->getDesc().height))
+                return;
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outputRT);
             if (depth) fbDesc.setDepthAttachment(depth);

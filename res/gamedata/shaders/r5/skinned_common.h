@@ -9,6 +9,10 @@ cbuffer SkinnedMaterialCB : register(b4)
     uint g_SkeletonBoneOffset;
     uint g_SplatOffset;
     uint g_SplatCount;
+    uint g_HudLit;
+    uint g_HudPad0;
+    uint g_HudPad1;
+    uint g_HudPad2;
 };
 
 struct PaintSplat

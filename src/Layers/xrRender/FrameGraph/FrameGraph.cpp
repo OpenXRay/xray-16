@@ -1171,13 +1171,22 @@ void FrameGraph::OptimizeMemoryAliasing() {
                     compatible = false;
                 }
 
-                // Must have same format for textures
-                if (current->desc.type != ResourceDesc::Type::Buffer &&
-                    current->desc.format != candidate->desc.format) {
-                    compatible = false;
+                if (current->desc.type != ResourceDesc::Type::Buffer) {
+                    if (current->desc.format != candidate->desc.format ||
+                        current->desc.width != candidate->desc.width ||
+                        current->desc.height != candidate->desc.height ||
+                        current->desc.depth != candidate->desc.depth ||
+                        current->desc.arraySize != candidate->desc.arraySize ||
+                        current->desc.mipLevels != candidate->desc.mipLevels ||
+                        current->desc.sampleCount != candidate->desc.sampleCount ||
+                        current->desc.isRenderTarget != candidate->desc.isRenderTarget ||
+                        current->desc.isDepthStencil != candidate->desc.isDepthStencil ||
+                        current->desc.isUAV != candidate->desc.isUAV ||
+                        current->desc.allowUAV != candidate->desc.allowUAV) {
+                        compatible = false;
+                    }
                 }
 
-                // Candidate must be large enough
                 if (candidate->memorySize < current->memorySize) {
                     compatible = false;
                 }

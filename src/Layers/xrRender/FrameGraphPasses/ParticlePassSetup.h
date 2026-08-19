@@ -78,7 +78,9 @@ struct ParticlePassState {
     nvrhi::ShaderHandle distortPS;
     nvrhi::SamplerHandle sampler;
     bool initialized = false;
+    u32 pipeVersion = 0;
     bool distortInitialized = false;
+    u32 distortVersion = 0;
     nvrhi::BufferHandle particleVB;
     u32 particleVBSize = 0;
     nvrhi::BufferHandle quadIB;
@@ -104,6 +106,7 @@ struct ParticlePassData {
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle hiZPyramid;
     framegraph::VirtualResourceHandle distortionRT;
+    framegraph::VirtualResourceHandle seedDistortion;
     framegraph::VirtualResourceHandle prevDepth;
     fg::RenderDevice* device;
     const xr_vector<ParticleBatch>* worldParticleBatches;
@@ -119,6 +122,7 @@ struct ParticlePassData {
     bool hasPrevViewProj;
     ParticlePassState* passState;
     bool hasDistortion;
+    bool importedDistortion;
 };
 
 struct ParticlePassOutput {
@@ -136,6 +140,14 @@ void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::Framebuf
 // Renders AFTER forward color and skinning passes (particles on top of world+HUD)
 // Supports both world and HUD particles with proper FOV handling
 // When hiZPyramid is valid, uses GPU frustum + occlusion culling
+bool ParticleBatchLooksEmissive(const ParticleBatch& batch);
+
+u32 BuildEmissiveParticleRTGeometry(
+    const xr_vector<ParticleBatch>& worldBatches,
+    xr_vector<ParticleVertex>& vertices,
+    xr_vector<u32>& indices,
+    u32 maxQuads);
+
 ParticlePassOutput setupParticlePass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
@@ -151,7 +163,8 @@ ParticlePassOutput setupParticlePass(
     u32 hiZMipLevels = 0,
     const Fmatrix* prevViewProj = nullptr,
     framegraph::VirtualResourceHandle prevDepth = {},
-    ParticlePassState* state = nullptr
+    ParticlePassState* state = nullptr,
+    framegraph::VirtualResourceHandle seedDistortion = {}
 );
 
 } // namespace xray::render::fg::passes

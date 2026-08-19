@@ -13,6 +13,7 @@
 #include "xrEngine/IRenderBackend.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
+#include "Upscaling/StreamlineDLSS.h"
 
 #include <SDL3/SDL.h>
 
@@ -184,8 +185,23 @@ void FGRenderBase::End()
     ZoneScopedN("FGRenderBase::BackendEnd");
     if (GEnv.Backend)
     {
+        if (!GEnv.Backend->IsInFrame())
+            return;
         GEnv.Backend->EndFrame();
-        GEnv.Backend->Present(psDeviceFlags.test(rsVSync));
+        const bool vsync = psDeviceFlags.test(rsVSync);
+        nvrhi::ITexture* fgInterp = nullptr;
+        nvrhi::ITexture* fgReal = nullptr;
+        if (Streamline_TakeFgPresent(fgInterp, fgReal) &&
+            GEnv.Backend->PresentFrameGeneration(fgInterp, fgReal))
+        {
+            Streamline_NotifyFgPresented(true);
+            const float renderFps = Device.GetStats().fFPS;
+            Device.SetPresentedFps(renderFps > 1.f ? renderFps * 2.f : 0.f);
+            return;
+        }
+        Streamline_NotifyFgPresented(false);
+        Device.SetPresentedFps(0.f);
+        GEnv.Backend->Present(vsync);
     }
 }
 

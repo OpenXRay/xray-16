@@ -132,6 +132,11 @@ struct GeometryBatch {
         if (!visual || !visual->shaderName.size())
             return false;
 
+        if (strstr(visual->shaderName.c_str(), "water") != nullptr)
+            return true;
+        if (strstr(visual->shaderName.c_str(), "wallmark") != nullptr)
+            return true;
+
         return MaterialSystem::Instance()
             .GetMaterialInfo(visual->shaderName)
             .transparent;

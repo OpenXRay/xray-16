@@ -17,6 +17,25 @@ struct SunVertex {
     u32 color;
     float u, v;
 };
+
+struct CloudVertex {
+    Fvector3 p;
+    u32 dir;
+    u32 color;
+};
+
+struct PortalVertex {
+    Fvector3 p;
+    u32 color;
+};
+
+struct LodVertex {
+    Fvector3 p;
+    u32 color;
+    Fvector2 tc0;
+    Fvector2 tc1;
+    Fvector4 af;
+};
 #pragma pack(pop)
 
 struct TextVertex {
@@ -68,18 +87,10 @@ struct HistogramCB {
 };
 
 struct AdaptCB {
-    float minLogLum;
-    float logLumRange;
-    float lowPercentile;
-    float highPercentile;
-    float adaptSpeedUp;
-    float adaptSpeedDown;
-    float deltaTime;
-    float exposureCompensation;
-    float minExposure;
-    float maxExposure;
-    float calibrationConstant;
-    float padding;
+    float middleGrayX;
+    float middleGrayY;
+    float middleGrayZ;
+    float middleGrayW;
 };
 
 } // namespace xray::render::fg::passes

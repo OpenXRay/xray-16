@@ -22,6 +22,7 @@ public:
         u32 indexCount;
         nvrhi::ITexture* texture;
         bool depthTested;
+        bool procedural;
     };
 
     FGLensFlareRender();
@@ -49,7 +50,7 @@ private:
     void EnsureGeometryCapacity(size_t vertexCount, size_t indexCount);
     nvrhi::ITexture* ResolveTexture(const shared_str& name);
     void PushQuad(const Fvector& center, const Fvector& vecX, const Fvector& vecY, u32 color, nvrhi::ITexture* tex,
-        bool depthTested = false);
+        bool depthTested = false, bool procedural = false);
 
     xr_vector<Vertex> m_vertices;
     xr_vector<u16> m_indices;
@@ -79,7 +80,14 @@ private:
     size_t m_indexCapacity = 0;
     nvrhi::GraphicsPipelineHandle m_pipelineSource;
     nvrhi::GraphicsPipelineHandle m_pipelineOverlay;
+    nvrhi::GraphicsPipelineHandle m_pipelineSunDisc;
+    nvrhi::BindingLayoutHandle m_sunDiscBindingLayout;
+    nvrhi::BindingSetHandle m_sunDiscBindingSet;
+    nvrhi::ShaderHandle m_vsSunDisc;
+    nvrhi::ShaderHandle m_psSunDisc;
+    nvrhi::InputLayoutHandle m_inputLayoutSunDisc;
     nvrhi::ComputePipelineHandle m_visPipeline;
+    nvrhi::TextureHandle m_softDisc;
     bool m_visInitialized = false;
     bool m_sunValid = false;
     Fvector2 m_sunPosPx{};

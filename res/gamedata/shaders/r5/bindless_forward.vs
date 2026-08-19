@@ -41,7 +41,9 @@ struct VS_OUTPUT
     float3 normal   : TEXCOORD2;
     float3 tangent  : TEXCOORD3;
     float3 bitangent: TEXCOORD4;
-    nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    nointerpolation uint materialID : TEXCOORD5;
+    float hemi      : TEXCOORD6;
+    float2 lmUV     : TEXCOORD7;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -91,7 +93,7 @@ VS_OUTPUT main(VS_INPUT input)
     float4 worldPos = mul(worldMatrix, float4(input.position.xyz, 1.0));
     output.worldPos = worldPos.xyz;
     float3 clipPos = worldPos.xyz;
-    if (g_Materials[materialID].flags & MAT_FLAG_ALPHA_BLEND)
+    if ((instanceData.flags & 0x1) == 0 && (g_Materials[materialID].flags & MAT_FLAG_ALPHA_BLEND))
         clipPos += (eye_position - clipPos) * 0.002;
     output.position = mul(m_VP, float4(clipPos, 1.0));
 
@@ -101,11 +103,10 @@ VS_OUTPUT main(VS_INPUT input)
     output.tangent = normalize(mul(worldMatrix3x3, tangentUnpacked));
     output.bitangent = normalize(mul(worldMatrix3x3, binormalUnpacked));
 
-    // UVs are pre-unpacked in UnifiedVertex format - pass through directly
     output.texcoord = input.texcoord;
-
-    // Pass material ID to pixel shader
+    output.lmUV = input.texcoord1;
     output.materialID = materialID;
+    output.hemi = input.normal.a;
 
     return output;
 }

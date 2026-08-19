@@ -13,19 +13,21 @@ framegraph::VirtualResourceHandle setupSkyPass(
     framegraph::VirtualResourceHandle depthInput,
     FGEnvironmentRender* renderer,
     u32 width,
-    u32 height)
+    u32 height,
+    bool composite)
 {
     using namespace framegraph;
 
     auto& passData = fg.addCallbackPass<SkyPassData>(
-        "Sky",
-        [colorInput, depthInput, renderer, width, height](FrameGraph& builder, PassHandle passHandle, SkyPassData& data) {
+        composite ? "SkyComposite" : "Sky",
+        [colorInput, depthInput, renderer, width, height, composite](FrameGraph& builder, PassHandle passHandle, SkyPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.renderer = renderer;
             data.width = width;
             data.height = height;
+            data.composite = composite;
             data.colorOutput = passBuilder.write(colorInput, ResourceState::RenderTarget);
-            data.depthOutput = passBuilder.read(depthInput, ResourceState::DepthStencilRead);
+            data.depthOutput = passBuilder.read(depthInput, ResourceState::ShaderResource);
         },
         [](const SkyPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             if (!data.renderer) return;
@@ -41,7 +43,12 @@ framegraph::VirtualResourceHandle setupSkyPass(
             CEnvironment* environment = g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr;
             if (!environment) return;
 
-            data.renderer->DrawSky(cmdList, framebuffer, environment, data.width, data.height);
+            nvrhi::ITexture* depthRT = nullptr;
+            if (data.depthOutput.is_valid())
+                depthRT = fg.GetPhysicalTexture(data.depthOutput);
+
+            data.renderer->DrawSky(cmdList, framebuffer, environment, data.width, data.height, depthRT, data.composite);
+            data.renderer->DrawClouds(cmdList, framebuffer, environment, data.width, data.height);
         });
 
     return passData.colorOutput;

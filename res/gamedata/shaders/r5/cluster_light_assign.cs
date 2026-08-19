@@ -46,17 +46,24 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float2 tileMax = float2(min((tileX + 1) * tileSize, cb_screenSize.x),
                              min((tileY + 1) * tileSize, cb_screenSize.y));
 
-    uint numVisible = min(g_VisibleLightCount.Load(0), 1024u);
+    uint numLights = min((uint)cb_gridDims.w, 2048u);
 
     uint lightCount = 0;
-    uint lightIndices[256];
+    uint lightIndices[128];
 
-    for (uint iter = 0; iter < numVisible; iter++)
+    for (uint i = 0; i < numLights; i++)
     {
-        uint i = g_VisibleLightIndices[iter];
+        if (lightCount >= 128)
+            break;
+
+        if (g_VisibleLightIndices[i] == 0u)
+            continue;
+
         GPULightData ld = g_Lights[i];
         float3 lightPos = ld.positionAndInvRangeSq.xyz;
         float range = ld.colorAndRange.w;
+        if (range <= 1e-4 || abs(ld.positionAndInvRangeSq.w) <= 1e-8)
+            continue;
 
         float4 clipPos = mul(m_VP, float4(lightPos, 1.0));
         float lightDepth = clipPos.w;
@@ -78,7 +85,9 @@ void main(uint3 dtid : SV_DispatchThreadID)
             screenPos.y = (0.5 - ndc.y * 0.5) * cb_screenSize.y;
 
             float zNearOverlap = max(sliceNear, max(depthNear, zNear));
-            float screenRadius = (range / zNearOverlap) * cb_screenSize.y * 0.5;
+            float cotFovY = max(cb_pad.x, 0.5);
+            float screenRadius = (range / zNearOverlap) * cotFovY * cb_screenSize.y * 0.5;
+            screenRadius += tileSize;
 
             float2 closest = clamp(screenPos, tileMin, tileMax);
             float2 diff = screenPos - closest;
@@ -86,12 +95,9 @@ void main(uint3 dtid : SV_DispatchThreadID)
                 continue;
         }
 
-        if (lightCount < 256)
-            lightIndices[lightCount] = i;
+        lightIndices[lightCount] = i;
         lightCount++;
     }
-
-    lightCount = min(lightCount, 256);
 
     if (lightCount > 0)
     {

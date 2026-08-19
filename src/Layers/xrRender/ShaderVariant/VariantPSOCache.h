@@ -13,12 +13,14 @@ struct VariantPSOKey
     u32 variantIndex;
     u32 passIndex;
     u32 vertexFormat;
+    u32 fbSig;
 
     bool operator<(const VariantPSOKey& o) const
     {
         if (variantIndex != o.variantIndex) return variantIndex < o.variantIndex;
         if (passIndex != o.passIndex) return passIndex < o.passIndex;
-        return vertexFormat < o.vertexFormat;
+        if (vertexFormat != o.vertexFormat) return vertexFormat < o.vertexFormat;
+        return fbSig < o.fbSig;
     }
 };
 
@@ -72,6 +74,8 @@ struct VariantPartitionDrawConfig
     u32 objectCount = 0;
     VariantPartitionConfig partition;
     bool selectTransparent = false;
+    bool skipWmark = false;
+    bool onlyWmark = false;
 };
 
 void DrawVariantPartition(

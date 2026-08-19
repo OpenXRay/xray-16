@@ -152,7 +152,10 @@ bool FGResourcePool::AreTexturesCompatible(
            a.height == b.height &&
            a.format == b.format &&
            a.mipLevels == b.mipLevels &&
-           a.arraySize == b.arraySize;
+           a.arraySize == b.arraySize &&
+           a.isRenderTarget == b.isRenderTarget &&
+           a.isDepthStencil == b.isDepthStencil &&
+           a.isUAV == b.isUAV;
 }
 
 // ═══════════════════════════════════════════════════

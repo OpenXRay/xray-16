@@ -110,6 +110,10 @@ bool RenderDevice::InitializeFromBackend(IRenderBackend* backend) {
         nvrhi::ICommandList* GetCommandList() const override { return m_ref->GetCommandList(); }
         nvrhi::ITexture* GetBackBuffer() override { return m_ref->GetBackBuffer(); }
         void Present(bool vsync) override { m_ref->Present(vsync); }
+        bool PresentFrameGeneration(nvrhi::ITexture* interpolated, nvrhi::ITexture* real) override
+        {
+            return m_ref->PresentFrameGeneration(interpolated, real);
+        }
         std::pair<u32, u32> GetBackBufferSize() const override { return m_ref->GetBackBufferSize(); }
         bool IsInFrame() const override { return m_ref->IsInFrame(); }
         void BeginFrame() override { m_ref->BeginFrame(); }
@@ -594,6 +598,24 @@ nvrhi::BindingSetHandle RenderDevice::CreateBindingSet(const nvrhi::BindingSetDe
 
 nvrhi::FramebufferHandle RenderDevice::CreateFramebuffer(const nvrhi::FramebufferDesc& desc) {
     VERIFY(m_initialized);
+    u32 attW = 0, attH = 0;
+    auto checkDim = [&](nvrhi::ITexture* tex) -> bool {
+        if (!tex)
+            return true;
+        const auto& d = tex->getDesc();
+        if (!attW) {
+            attW = d.width;
+            attH = d.height;
+            return true;
+        }
+        return d.width == attW && d.height == attH;
+    };
+    if (desc.depthAttachment.texture && !checkDim(desc.depthAttachment.texture))
+        return nullptr;
+    for (const auto& attachment : desc.colorAttachments) {
+        if (attachment.texture && !checkDim(attachment.texture))
+            return nullptr;
+    }
     return GetNativeDevice()->createFramebuffer(desc);
 }
 

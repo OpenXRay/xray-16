@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nvrhi/nvrhi.h>
+
 namespace xray::render::fg
 {
 //	Reduces amount of work if the texture was not changed.
@@ -11,6 +13,7 @@ public:
     ColorMapManager();
 
     void SetTextures(const shared_str& tex0, const shared_str& tex1);
+    nvrhi::ITexture* GetTexture(int i) const;
 
 private:
     void UpdateTexture(const shared_str& strTexName, int iTex);

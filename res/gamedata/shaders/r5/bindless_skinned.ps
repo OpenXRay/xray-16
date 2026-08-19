@@ -1,13 +1,11 @@
-// bindless_skinned.ps
-// SM6 Bindless forward pixel shader for SKINNED meshes
-// Uses per-draw constant for material ID (not GPU-driven)
-// Uses ResourceDescriptorHeap[NonUniformResourceIndex(index)] for texture access
-
 #define SM_6_0
 #define CLUSTERED_LIGHTING_FORWARD
 #include "common.h"
 #include "bindless_common.h"
+#include "shared/parallax.h"
 #include "skinned_common.h"
+#include "shared/surface_marks.h"
+#include "shared/basecolor_pack.h"
 
 struct PS_INPUT
 {
@@ -25,22 +23,20 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
     float4 baseColor : SV_Target2;
+    float4 worldPos : SV_Target3;
 };
 
 PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
 
-    // Use per-draw material ID from constant buffer
     uint materialID = g_SkinnedMaterialID;
-
-    // Get material data
     MaterialData mat = g_Materials[materialID];
 
-    // Sample diffuse texture
-    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+    float3 Ngeom = normalize(input.normal);
+    float2 uv = ApplyMaterialParallaxUV(mat, input.texcoord, input.tangent, input.bitangent, Ngeom, input.worldPos);
+    float4 diffuseSample = SampleDiffuse(mat, uv);
 
-    // Alpha test
     if (mat.flags & MAT_FLAG_ALPHA_TEST)
     {
         clip(diffuseSample.a - mat.alphaRef);
@@ -48,24 +44,25 @@ PS_OUTPUT main(PS_INPUT input)
 
     float3 albedo = diffuseSample.rgb;
 
-    float3 N = normalize(input.normal);
+    float3 N = Ngeom;
     float gloss = 0.0;
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
-        BumpSample bump = SampleNormal(mat, input.texcoord);
+        BumpSample bump = SampleNormal(mat, uv);
         float3x3 TBN = float3x3(
             normalize(input.tangent),
             normalize(input.bitangent),
             N
         );
-        N = normalize(mul(bump.normal, TBN));
+        float3 Nt = normalize(mul(bump.normal, TBN));
+        if (all(isfinite(Nt)) && dot(Nt, N) > 0.2)
+            N = Nt;
         gloss = bump.gloss;
     }
 
-    // Detail texture
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
-        float4 detailSample = SampleDetail(mat, input.texcoord);
+        float4 detailSample = SampleDetail(mat, uv);
         albedo = albedo * (detailSample.rgb * 2.0);
     }
 
@@ -75,7 +72,7 @@ PS_OUTPUT main(PS_INPUT input)
 
     if (mat.flags & MAT_FLAG_HAS_PBR)
     {
-        float3 pbrSample = SamplePBR(mat, input.texcoord);
+        float3 pbrSample = SamplePBR(mat, uv);
         metallic = pbrSample.r;
         roughness = pbrSample.g;
         ao = pbrSample.b;
@@ -83,10 +80,16 @@ PS_OUTPUT main(PS_INPUT input)
 
     albedo = apply_splat_color(albedo, input.worldPos, input.texcoord);
 
-    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position);
+    float3 lightPos = input.worldPos;
+    const bool hudLit = g_HudLit != 0;
+    if (hudLit)
+        lightPos = eye_position + normalize(camera_direction.xyz) * 0.35;
+    float hemi = saturate(0.5 + 0.5 * N.y);
+    f_forward fwd = output_forward_pbr(albedo, N, lightPos, metallic, roughness, ao, input.position, hemi, 1.0, false, hudLit);
     output.color = float4(fwd.color.rgb, diffuseSample.a);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
     output.normal.a = -max(fwd.normal.a, 0.004);
+    output.worldPos = float4(input.worldPos, SURF_MARK_CHAR);
     return output;
 }

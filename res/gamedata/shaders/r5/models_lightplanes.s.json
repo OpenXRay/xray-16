@@ -1,0 +1,12 @@
+{
+    "sorting": { "priority": 2, "backToFront": true },
+    "fog": false,
+    "emissive": true,
+    "transparent": true,
+    "ps": "bindless_lightplanes",
+    "blend": { "src": "SrcAlpha", "dst": "One" },
+    "depth": { "test": true, "write": false, "func": "GreaterOrEqual" },
+    "raster": { "cull": "None" },
+    "alphaTest": { "ref": 0 },
+    "colorWriteMask": "RGB"
+}

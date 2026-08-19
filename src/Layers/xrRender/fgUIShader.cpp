@@ -31,8 +31,14 @@ void fgUIShader::create(LPCSTR sh, LPCSTR tex)
         RImplementation.Resources->bDeferredLoad = prevDeferredLoad;
     }
 
-    auto vsResult = shaderLoader->LoadVertexShader(sh, "main");
-    auto psResult = shaderLoader->LoadPixelShader(sh, "main");
+    const bool movie = sh && (0 == xr_strcmp(sh, "hud_movie") || 0 == xr_strcmp(sh, "yuv2rgb"));
+    auto vsResult = shaderLoader->LoadVertexShader(movie ? "hud_movie" : sh, "main");
+    auto psResult = shaderLoader->LoadPixelShader(movie ? "hud_movie" : sh, "main");
+    if (movie && (!vsResult.handle || !psResult.handle))
+    {
+        vsResult = shaderLoader->LoadVertexShader("stub_notransform_t", "main");
+        psResult = shaderLoader->LoadPixelShader("yuv2rgb", "main");
+    }
 
     if (!vsResult.handle || !psResult.handle)
     {

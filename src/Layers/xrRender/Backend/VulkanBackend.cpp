@@ -2,6 +2,19 @@
 #include "VulkanBackend.h"
 
 #include "xrCore/Threading/TaskManager.hpp"
+#include <algorithm>
+#include <array>
+#include <cstring>
+#include <ranges>
+
+extern ENGINE_API int ps_r_hdr10;
+extern ENGINE_API float ps_r_hdr10_paper_white;
+extern ENGINE_API float ps_r_hdr10_peak;
+extern ENGINE_API int ps_r_upscale;
+extern ENGINE_API int ps_r_dlss_fg;
+#if defined(XRAY_USE_DLSS)
+#include "Layers/xrRender/Upscaling/StreamlineDLSS.h"
+#endif
 
 #if defined(__APPLE__)
 #include <pthread/qos.h>
@@ -41,9 +54,9 @@ static NVRHIVulkanMessageCallback s_nvrhiVkMessageCallback;
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-    VkDebugUtilsMessageTypeFlagsEXT type,
+    VkDebugUtilsMessageTypeFlagsEXT,
     const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
-    void* userData)
+    void*)
 {
     if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
         Msg("! [Vulkan] ERROR: %s", callbackData->pMessage);
@@ -55,7 +68,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(
 VulkanBackend::VulkanBackend() = default;
 
 VulkanBackend::~VulkanBackend() {
-    Shutdown();
+    VulkanBackend::Shutdown();
 }
 
 bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool enableValidation) {
@@ -120,8 +133,13 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
         VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
         VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
     };
-    deviceDesc.deviceExtensions = deviceExts;
-    deviceDesc.numDeviceExtensions = std::size(deviceExts);
+    deviceDesc.deviceExtensions = m_enabledDeviceExtensions.empty() ? deviceExts : m_enabledDeviceExtensions.data();
+    deviceDesc.numDeviceExtensions = m_enabledDeviceExtensions.empty()
+        ? std::size(deviceExts)
+        : m_enabledDeviceExtensions.size();
+    deviceDesc.bufferDeviceAddressSupported = m_bufferDeviceAddressSupported;
+    if (m_bufferDeviceAddressSupported)
+        Msg("* [VulkanBackend] NVRHI bufferDeviceAddressSupported=1");
 
     m_nvrhiVulkanDevice = nvrhi::vulkan::createDevice(deviceDesc);
     if (!m_nvrhiVulkanDevice) {
@@ -145,9 +163,9 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
 
     nvrhi::CommandListParameters cmdParams;
     cmdParams.enableImmediateExecution = false;
-    for (u32 i = 0; i < 2; ++i) {
-        m_commandLists[i] = m_nvrhiDevice->createCommandList(cmdParams);
-        if (!m_commandLists[i]) {
+    for (auto& cl : m_commandLists) {
+        cl = m_nvrhiDevice->createCommandList(cmdParams);
+        if (!cl) {
             Msg("! [VulkanBackend] Failed to create command list");
             Shutdown();
             return false;
@@ -200,11 +218,15 @@ void VulkanBackend::Shutdown() {
 
     if (m_submitThread.joinable()) {
         {
-            std::lock_guard<std::mutex> lk(m_submitMutex);
+            std::scoped_lock lk(m_submitMutex);
             m_submitRun = false;
         }
         m_submitCv.notify_one();
         m_submitThread.join();
+        m_jobQueued = false;
+        m_submitBusy = false;
+        m_slotInFlight[0] = false;
+        m_slotInFlight[1] = false;
     }
 
     m_bindlessDescriptorTable = nullptr;
@@ -235,10 +257,9 @@ void VulkanBackend::Shutdown() {
         m_surface = VK_NULL_HANDLE;
     }
     if (m_debugMessenger) {
-        auto destroyFunc = (PFN_vkDestroyDebugUtilsMessengerEXT)
-            vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
-        if (destroyFunc)
-            destroyFunc(m_instance, m_debugMessenger, nullptr);
+    if (auto destroyFunc = (PFN_vkDestroyDebugUtilsMessengerEXT)
+            vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT"); destroyFunc)
+        destroyFunc(m_instance, m_debugMessenger, nullptr);
         m_debugMessenger = VK_NULL_HANDLE;
     }
     if (m_instance) {
@@ -246,11 +267,13 @@ void VulkanBackend::Shutdown() {
         m_instance = VK_NULL_HANDLE;
     }
 
+    m_enabledDeviceExtensions.clear();
+    m_bufferDeviceAddressSupported = false;
     m_initialized = false;
     Msg("* [VulkanBackend] Shutdown complete");
 }
 
-bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
+bool VulkanBackend::CreateInstance(SDL_Window* /*window*/, bool enableValidation) {
     VkApplicationInfo appInfo = {};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "OpenXRay";
@@ -267,6 +290,23 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
     }
     xr_vector<const char*> extensions(sdlExts, sdlExts + sdlExtCount);
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    {
+        u32 instExtCount = 0;
+        vkEnumerateInstanceExtensionProperties(nullptr, &instExtCount, nullptr);
+        xr_vector<VkExtensionProperties> instExts(instExtCount);
+        if (instExtCount)
+            vkEnumerateInstanceExtensionProperties(nullptr, &instExtCount, instExts.data());
+        for (const auto& e : instExts) {
+            if (!strcmp(e.extensionName, VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME)) {
+                extensions.push_back(VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME);
+                break;
+            }
+        }
+    }
+#if defined(XRAY_USE_DLSS)
+    xray::render::fg::Streamline_PreInstanceInit();
+    xray::render::fg::Streamline_GetRequiredInstanceExtensions(extensions);
+#endif
 
     xr_vector<const char*> layers;
     if (enableValidation) {
@@ -380,21 +420,19 @@ bool VulkanBackend::CreateLogicalDevice() {
 
     // If no dedicated compute family, try using a second queue from graphics family
     bool useGraphicsFamilyForCompute = false;
-    if (m_computeQueueFamily == UINT32_MAX) {
-        if (queueFamilies[m_graphicsQueueFamily].queueCount >= 2) {
-            m_computeQueueFamily = m_graphicsQueueFamily;
-            useGraphicsFamilyForCompute = true;
-        }
+    if (m_computeQueueFamily == UINT32_MAX && queueFamilies[m_graphicsQueueFamily].queueCount >= 2) {
+        m_computeQueueFamily = m_graphicsQueueFamily;
+        useGraphicsFamilyForCompute = true;
     }
 
-    float queuePriorities[2] = { 1.0f, 1.0f };
+    std::array<float, 2> queuePriorities{ 1.0f, 1.0f };
 
     xr_vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     VkDeviceQueueCreateInfo graphicsQueueInfo = {};
     graphicsQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     graphicsQueueInfo.queueFamilyIndex = m_graphicsQueueFamily;
     graphicsQueueInfo.queueCount = useGraphicsFamilyForCompute ? 2 : 1;
-    graphicsQueueInfo.pQueuePriorities = queuePriorities;
+    graphicsQueueInfo.pQueuePriorities = queuePriorities.data();
     queueCreateInfos.push_back(graphicsQueueInfo);
 
     if (m_computeQueueFamily != UINT32_MAX && !useGraphicsFamilyForCompute) {
@@ -402,9 +440,20 @@ bool VulkanBackend::CreateLogicalDevice() {
         computeQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         computeQueueInfo.queueFamilyIndex = m_computeQueueFamily;
         computeQueueInfo.queueCount = 1;
-        computeQueueInfo.pQueuePriorities = queuePriorities;
+        computeQueueInfo.pQueuePriorities = queuePriorities.data();
         queueCreateInfos.push_back(computeQueueInfo);
     }
+
+    u32 availExtCount = 0;
+    vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &availExtCount, nullptr);
+    xr_vector<VkExtensionProperties> availExts(availExtCount);
+    if (availExtCount)
+        vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &availExtCount, availExts.data());
+    auto hasExt = [&](const char* name) {
+        return std::ranges::any_of(availExts, [name](const auto& e) {
+            return strcmp(e.extensionName, name) == 0;
+        });
+    };
 
     xr_vector<const char*> deviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
@@ -415,6 +464,30 @@ bool VulkanBackend::CreateLogicalDevice() {
 #if defined(XR_PLATFORM_APPLE)
     deviceExtensions.push_back("VK_KHR_portability_subset");
 #endif
+#if defined(XRAY_USE_DLSS)
+    {
+        xr_vector<const char*> ngxDevExts;
+        xray::render::fg::Streamline_GetRequiredDeviceExtensions(m_physicalDevice, ngxDevExts);
+        for (const char* e : ngxDevExts) {
+            if (e && hasExt(e))
+                deviceExtensions.push_back(e);
+        }
+    }
+#endif
+
+    const bool wantRT =
+        hasExt(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) &&
+        hasExt(VK_KHR_RAY_QUERY_EXTENSION_NAME) &&
+        hasExt(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+    if (wantRT) {
+        deviceExtensions.push_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+        deviceExtensions.push_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+        deviceExtensions.push_back(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+        if (hasExt(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME))
+            deviceExtensions.push_back(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME);
+    }
+    if (hasExt(VK_EXT_HDR_METADATA_EXTENSION_NAME))
+        deviceExtensions.push_back(VK_EXT_HDR_METADATA_EXTENSION_NAME);
 
     VkPhysicalDeviceVulkan12Features vulkan12Features = {};
     vulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
@@ -427,6 +500,7 @@ bool VulkanBackend::CreateLogicalDevice() {
     vulkan12Features.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
     vulkan12Features.descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
     vulkan12Features.timelineSemaphore = VK_TRUE;
+    vulkan12Features.bufferDeviceAddress = wantRT ? VK_TRUE : VK_FALSE;
 
     VkPhysicalDeviceSynchronization2Features sync2Features = {};
     sync2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
@@ -442,6 +516,17 @@ bool VulkanBackend::CreateLogicalDevice() {
     vulkan11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
     vulkan11Features.shaderDrawParameters = VK_TRUE;
     dynamicRenderingFeatures.pNext = &vulkan11Features;
+
+    VkPhysicalDeviceAccelerationStructureFeaturesKHR asFeatures = {};
+    asFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+    asFeatures.accelerationStructure = VK_TRUE;
+    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = {};
+    rayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+    rayQueryFeatures.rayQuery = VK_TRUE;
+    if (wantRT) {
+        vulkan11Features.pNext = &asFeatures;
+        asFeatures.pNext = &rayQueryFeatures;
+    }
 
     VkPhysicalDeviceFeatures2 features2 = {};
     features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
@@ -466,9 +551,17 @@ bool VulkanBackend::CreateLogicalDevice() {
     {
         VkPhysicalDeviceVulkan12Features sup12 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
         VkPhysicalDeviceVulkan11Features sup11 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES };
+        VkPhysicalDeviceAccelerationStructureFeaturesKHR supAS = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR };
+        VkPhysicalDeviceRayQueryFeaturesKHR supRQ = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR };
         VkPhysicalDeviceFeatures2 sup2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
         sup2.pNext = &sup12;
-        sup12.pNext = &sup11;
+        if (wantRT) {
+            sup12.pNext = &supAS;
+            supAS.pNext = &supRQ;
+            supRQ.pNext = &sup11;
+        } else {
+            sup12.pNext = &sup11;
+        }
         vkGetPhysicalDeviceFeatures2(m_physicalDevice, &sup2);
 
 #define CLAMP12(F) do { if (vulkan12Features.F && !sup12.F) { Msg("! [VulkanBackend] vk12 feature unsupported: " #F); vulkan12Features.F = VK_FALSE; } } while(0)
@@ -481,6 +574,7 @@ bool VulkanBackend::CreateLogicalDevice() {
         CLAMP12(descriptorBindingSampledImageUpdateAfterBind);
         CLAMP12(descriptorBindingStorageBufferUpdateAfterBind);
         CLAMP12(timelineSemaphore);
+        CLAMP12(bufferDeviceAddress);
 #undef CLAMP12
 #define CLAMPF(F) do { if (features2.features.F && !sup2.features.F) { Msg("! [VulkanBackend] feature unsupported: " #F); features2.features.F = VK_FALSE; } } while(0)
         CLAMPF(samplerAnisotropy);
@@ -495,11 +589,41 @@ bool VulkanBackend::CreateLogicalDevice() {
             Msg("! [VulkanBackend] vk11 feature unsupported: shaderDrawParameters");
             vulkan11Features.shaderDrawParameters = VK_FALSE;
         }
+        if (wantRT) {
+            if (!supAS.accelerationStructure || !supRQ.rayQuery || !sup12.bufferDeviceAddress) {
+                Msg("! [VulkanBackend] RayQuery/AS features incomplete (AS=%d RQ=%d BDA=%d) — RT disabled",
+                    (int)supAS.accelerationStructure, (int)supRQ.rayQuery, (int)sup12.bufferDeviceAddress);
+                asFeatures.accelerationStructure = VK_FALSE;
+                rayQueryFeatures.rayQuery = VK_FALSE;
+                vulkan12Features.bufferDeviceAddress = VK_FALSE;
+                vulkan11Features.pNext = nullptr;
+                m_bufferDeviceAddressSupported = false;
+                for (size_t i = 0; i < deviceExtensions.size();) {
+                    const char* n = deviceExtensions[i];
+                    if (!strcmp(n, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) ||
+                        !strcmp(n, VK_KHR_RAY_QUERY_EXTENSION_NAME) ||
+                        !strcmp(n, VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) ||
+                        !strcmp(n, VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME))
+                        deviceExtensions.erase(deviceExtensions.begin() + i);
+                    else
+                        ++i;
+                }
+                deviceCreateInfo.enabledExtensionCount = static_cast<u32>(deviceExtensions.size());
+            } else {
+                m_bufferDeviceAddressSupported = true;
+                Msg("* [VulkanBackend] RayQuery + AccelerationStructure ENABLED (BDA=1)");
+            }
+        } else {
+            m_bufferDeviceAddressSupported = false;
+            Msg("* [VulkanBackend] RayQuery extensions not available on this GPU");
+        }
 
         Msg("* [VulkanBackend] vk12.drawIndirectCount = %s (device reports: %s)",
             vulkan12Features.drawIndirectCount ? "ENABLED" : "DISABLED",
             sup12.drawIndirectCount ? "supported" : "unsupported");
     }
+
+    m_enabledDeviceExtensions = deviceExtensions;
 
     VkResult result = vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);
     if (result != VK_SUCCESS) {
@@ -519,6 +643,8 @@ bool VulkanBackend::CreateLogicalDevice() {
         Msg("* [VulkanBackend] No compute queue available (async compute disabled)");
     }
 
+    m_setHdrMetadata = (PFN_vkSetHdrMetadataEXT)vkGetDeviceProcAddr(m_device, "vkSetHdrMetadataEXT");
+
     Msg("* [VulkanBackend] Logical device created (graphics family %u)", m_graphicsQueueFamily);
     return true;
 }
@@ -534,21 +660,59 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
 
     m_swapchainFormat = VK_FORMAT_R8G8B8A8_UNORM;
     VkColorSpaceKHR colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-    bool foundFormat = false;
-    for (const auto& fmt : formats) {
-        if (fmt.format == VK_FORMAT_R8G8B8A8_UNORM) {
-            m_swapchainFormat = fmt.format;
-            colorSpace = fmt.colorSpace;
-            foundFormat = true;
-            break;
-        }
-    }
-    if (!foundFormat) {
+    m_hdr10Active = false;
+    if (ps_r_hdr10) {
         for (const auto& fmt : formats) {
-            if (fmt.format == VK_FORMAT_B8G8R8A8_UNORM) {
+            if (fmt.colorSpace == VK_COLOR_SPACE_HDR10_ST2084_EXT &&
+                fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32) {
                 m_swapchainFormat = fmt.format;
                 colorSpace = fmt.colorSpace;
+                m_hdr10Active = true;
                 break;
+            }
+        }
+        if (!m_hdr10Active) {
+            for (const auto& fmt : formats) {
+                if (fmt.colorSpace == VK_COLOR_SPACE_HDR10_ST2084_EXT &&
+                    fmt.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32) {
+                    m_swapchainFormat = fmt.format;
+                    colorSpace = fmt.colorSpace;
+                    m_hdr10Active = true;
+                    break;
+                }
+            }
+        }
+        if (!m_hdr10Active)
+            Msg("! [VulkanBackend] HDR10 requested, no ST.2084 10-bit surface format");
+    }
+    if (!m_hdr10Active) {
+        bool foundFormat = false;
+        for (const auto& fmt : formats) {
+            if (fmt.format == VK_FORMAT_R8G8B8A8_UNORM &&
+                fmt.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+                m_swapchainFormat = fmt.format;
+                colorSpace = fmt.colorSpace;
+                foundFormat = true;
+                break;
+            }
+        }
+        if (!foundFormat) {
+            for (const auto& fmt : formats) {
+                if (fmt.format == VK_FORMAT_R8G8B8A8_UNORM) {
+                    m_swapchainFormat = fmt.format;
+                    colorSpace = fmt.colorSpace;
+                    foundFormat = true;
+                    break;
+                }
+            }
+        }
+        if (!foundFormat) {
+            for (const auto& fmt : formats) {
+                if (fmt.format == VK_FORMAT_B8G8R8A8_UNORM) {
+                    m_swapchainFormat = fmt.format;
+                    colorSpace = fmt.colorSpace;
+                    break;
+                }
             }
         }
     }
@@ -559,22 +723,33 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, presentModes.data());
 
     const bool wantVSync = psDeviceFlags.test(rsVSync);
+    const bool wantFg = ps_r_upscale == 2 && ps_r_dlss_fg != 0;
     VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
-    if (!wantVSync)
+    if (!wantVSync || wantFg)
     {
-        bool hasImmediate = false, hasMailbox = false;
+        bool hasImmediate = false;
+        bool hasMailbox = false;
         for (auto mode : presentModes)
         {
             if (mode == VK_PRESENT_MODE_IMMEDIATE_KHR) hasImmediate = true;
             else if (mode == VK_PRESENT_MODE_MAILBOX_KHR) hasMailbox = true;
         }
-        if (hasImmediate)      presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
-        else if (hasMailbox)   presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+        if (wantFg && hasMailbox)
+            presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+        else if (!wantVSync && hasImmediate)
+            presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+        else if (hasMailbox)
+            presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
     }
-    Msg("* [VulkanBackend] Present mode: %s (vsync=%s)",
-        presentMode == VK_PRESENT_MODE_IMMEDIATE_KHR ? "IMMEDIATE" :
-        presentMode == VK_PRESENT_MODE_MAILBOX_KHR   ? "MAILBOX"   : "FIFO",
-        wantVSync ? "on" : "off");
+    const char* presentModeName = "FIFO";
+    if (presentMode == VK_PRESENT_MODE_IMMEDIATE_KHR)
+        presentModeName = "IMMEDIATE";
+    else if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+        presentModeName = "MAILBOX";
+    Msg("* [VulkanBackend] Present mode: %s (vsync=%s fg=%s)",
+        presentModeName,
+        wantVSync ? "on" : "off",
+        wantFg ? "on" : "off");
 
     VkExtent2D extent = { width, height };
     if (surfaceCaps.currentExtent.width != UINT32_MAX)
@@ -616,9 +791,35 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     m_backBufferHeight = extent.height;
     m_currentImageIndex = 0;
 
-    Msg("* [VulkanBackend] Swapchain created: %ux%u, %u images, format %d",
-        extent.width, extent.height, imageCount, m_swapchainFormat);
+    Msg("* [VulkanBackend] Swapchain created: %ux%u, %u images, format %d hdr10=%s",
+        extent.width, extent.height, imageCount, m_swapchainFormat, m_hdr10Active ? "on" : "off");
+    m_hdrMetaPeak = 0.f;
+    m_hdrMetaPaper = 0.f;
+    UpdateHdrMetadata();
     return true;
+}
+
+void VulkanBackend::UpdateHdrMetadata()
+{
+    if (!m_hdr10Active || !m_setHdrMetadata || !m_swapchain)
+        return;
+    const float peak = ps_r_hdr10_peak;
+    const float paper = ps_r_hdr10_paper_white;
+    if (peak == m_hdrMetaPeak && paper == m_hdrMetaPaper)
+        return;
+    m_hdrMetaPeak = peak;
+    m_hdrMetaPaper = paper;
+    VkHdrMetadataEXT md{};
+    md.sType = VK_STRUCTURE_TYPE_HDR_METADATA_EXT;
+    md.displayPrimaryRed = {0.708f, 0.292f};
+    md.displayPrimaryGreen = {0.170f, 0.797f};
+    md.displayPrimaryBlue = {0.131f, 0.046f};
+    md.whitePoint = {0.3127f, 0.3290f};
+    md.maxLuminance = peak;
+    md.minLuminance = 0.005f;
+    md.maxContentLightLevel = peak;
+    md.maxFrameAverageLightLevel = paper;
+    m_setHdrMetadata(m_device, 1, &m_swapchain, &md);
 }
 
 void VulkanBackend::DestroySwapChain() {
@@ -633,9 +834,12 @@ void VulkanBackend::DestroySwapChain() {
 }
 
 void VulkanBackend::CreateBackBufferTextures() {
-    nvrhi::Format nvFormat = (m_swapchainFormat == VK_FORMAT_R8G8B8A8_UNORM)
-        ? nvrhi::Format::RGBA8_UNORM
-        : nvrhi::Format::BGRA8_UNORM;
+    nvrhi::Format nvFormat = nvrhi::Format::BGRA8_UNORM;
+    if (m_swapchainFormat == VK_FORMAT_A2B10G10R10_UNORM_PACK32 ||
+        m_swapchainFormat == VK_FORMAT_A2R10G10B10_UNORM_PACK32)
+        nvFormat = nvrhi::Format::R10G10B10A2_UNORM;
+    else if (m_swapchainFormat == VK_FORMAT_R8G8B8A8_UNORM)
+        nvFormat = nvrhi::Format::RGBA8_UNORM;
 
     for (u32 i = 0; i < m_swapchainImages.size() && i < BACK_BUFFER_COUNT; i++) {
         nvrhi::TextureDesc desc;
@@ -799,11 +1003,9 @@ nvrhi::ITexture* VulkanBackend::GetBackBuffer() {
     return m_backBuffers[m_currentImageIndex].Get();
 }
 
-void VulkanBackend::Present(bool vsync) {
-    if (m_asyncSubmit)
-        return;
-
-    ZoneScopedN("VulkanBackend::Present");
+void VulkanBackend::PresentInternal()
+{
+    ZoneScopedN("VulkanBackend::PresentInternal");
 
     std::scoped_lock sc(m_swapchainMutex, m_queueMutex);
 
@@ -827,6 +1029,114 @@ void VulkanBackend::Present(bool vsync) {
     m_currentFrameIndex = (m_currentFrameIndex + 1) % BACK_BUFFER_COUNT;
 }
 
+void VulkanBackend::Present(bool vsync) {
+    (void)vsync;
+    if (m_asyncSubmit)
+        return;
+
+    ZoneScopedN("VulkanBackend::Present");
+    PresentInternal();
+}
+
+bool VulkanBackend::PresentFrameGeneration(nvrhi::ITexture* interpolated, nvrhi::ITexture* real)
+{
+    if (!interpolated || m_asyncSubmit)
+        return false;
+
+    ZoneScopedN("VulkanBackend::PresentFrameGeneration");
+
+    const nvrhi::ITexture* proto = m_backBuffers[0].Get();
+    if (!proto || proto->getDesc().format != interpolated->getDesc().format ||
+        proto->getDesc().width != interpolated->getDesc().width ||
+        proto->getDesc().height != interpolated->getDesc().height)
+    {
+        static bool s_logged = false;
+        if (!s_logged)
+        {
+            s_logged = true;
+            const auto& id = interpolated->getDesc();
+            const auto& bd = proto ? proto->getDesc() : nvrhi::TextureDesc{};
+            Msg("! [VulkanBackend] DLSS-FG present skipped: FG %ux%u fmt=%u vs BB %ux%u fmt=%u",
+                id.width, id.height, (u32)id.format,
+                bd.width, bd.height, (u32)bd.format);
+        }
+        return false;
+    }
+
+    auto* cl = m_commandLists[m_recordSlot ^ 1u].Get();
+    if (!cl)
+        return false;
+
+    const u32 realSlot = m_currentFrameIndex;
+    const u32 realImage = m_currentImageIndex;
+    const u32 interpSlot = (realSlot + 1) % BACK_BUFFER_COUNT;
+    nvrhi::ITexture* realBb =
+        (realImage < BACK_BUFFER_COUNT) ? m_backBuffers[realImage].Get() : nullptr;
+
+    {
+        ZoneScopedN("VK::FG_WaitInterpSlotFence");
+        vkWaitForFences(m_device, 1, &m_inFlightFence[interpSlot], VK_TRUE, UINT64_MAX);
+        vkResetFences(m_device, 1, &m_inFlightFence[interpSlot]);
+    }
+
+    auto reSignalInterpFence = [this, interpSlot]() {
+        VkSubmitInfo fenceSubmit = {};
+        fenceSubmit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        std::scoped_lock qk(m_queueMutex);
+        vkQueueSubmit(m_graphicsQueue, 1, &fenceSubmit, m_inFlightFence[interpSlot]);
+    };
+
+    {
+        std::scoped_lock sc(m_swapchainMutex);
+        VkResult result = vkAcquireNextImageKHR(
+            m_device, m_swapchain, UINT64_MAX,
+            m_imageAvailable[interpSlot], VK_NULL_HANDLE,
+            &m_currentImageIndex);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            m_currentImageIndex = realImage;
+            reSignalInterpFence();
+            return false;
+        }
+    }
+
+    nvrhi::ITexture* interpDst = GetBackBuffer();
+    if (!interpDst)
+    {
+        m_currentImageIndex = realImage;
+        reSignalInterpFence();
+        return false;
+    }
+
+    {
+        auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+        std::scoped_lock qk(m_queueMutex);
+        vkDevice->queueWaitForSemaphore(
+            nvrhi::CommandQueue::Graphics,
+            m_imageAvailable[interpSlot], 0);
+        vkDevice->queueSignalSemaphore(
+            nvrhi::CommandQueue::Graphics,
+            m_renderFinished[interpSlot], 0);
+
+        cl->open();
+        nvrhi::TextureSlice slice;
+        cl->copyTexture(interpDst, slice, interpolated, slice);
+        if (real && realBb && real != realBb)
+            cl->copyTexture(realBb, slice, real, slice);
+        cl->close();
+        m_nvrhiDevice->executeCommandList(cl);
+    }
+
+    m_currentFrameIndex = interpSlot;
+    PresentInternal();
+
+    m_currentFrameIndex = realSlot;
+    m_currentImageIndex = realImage;
+    PresentInternal();
+
+    return true;
+}
+
 void VulkanBackend::ResizeSwapChain(u32 width, u32 height) {
     WaitForIdle();
 
@@ -841,6 +1151,20 @@ void VulkanBackend::ResizeSwapChain(u32 width, u32 height) {
 void VulkanBackend::BeginFrame() {
     ZoneScopedN("VK::BeginFrame");
 
+    if (m_asyncSubmit)
+    {
+        if (const bool wantFg = ps_r_upscale == 2 && ps_r_dlss_fg != 0; wantFg)
+        {
+            FlushSubmits();
+            m_asyncSubmit = false;
+            Msg("! [VulkanBackend] async submit disabled — DLSS-FG enabled");
+        }
+    }
+
+    if (m_initialized && ((ps_r_hdr10 != 0) != m_hdr10Active) && m_backBufferWidth && m_backBufferHeight)
+        ResizeSwapChain(m_backBufferWidth, m_backBufferHeight);
+    UpdateHdrMetadata();
+
     if (m_gcTask) {
         ZoneScopedN("VK::WaitForGC");
         TaskScheduler->Wait(*m_gcTask);
@@ -849,24 +1173,55 @@ void VulkanBackend::BeginFrame() {
 
     if (m_asyncSubmit) {
         ZoneScopedN("VK::WaitSubmitSlot");
-        std::unique_lock<std::mutex> lk(m_submitMutex);
-        m_submitDoneCv.wait(lk, [&] { return !m_slotInFlight[m_recordSlot]; });
+        std::unique_lock lk(m_submitMutex);
+        m_submitDoneCv.wait(lk, [this, slot = m_recordSlot] { return !m_slotInFlight[slot]; });
     }
 
     vkWaitForFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex], VK_TRUE, UINT64_MAX);
     vkResetFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex]);
 
-    VkResult result;
-    {
-        std::lock_guard<std::mutex> sc(m_swapchainMutex);
-        result = vkAcquireNextImageKHR(
+    auto acquire = [this] {
+        std::scoped_lock sc(m_swapchainMutex);
+        return vkAcquireNextImageKHR(
             m_device, m_swapchain, UINT64_MAX,
             m_imageAvailable[m_currentFrameIndex], VK_NULL_HANDLE,
             &m_currentImageIndex);
-    }
+    };
 
+    auto reSignalInFlightFence = [this]() {
+        VkSubmitInfo fenceSubmit = {};
+        fenceSubmit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        std::scoped_lock qk(m_queueMutex);
+        vkQueueSubmit(m_graphicsQueue, 1, &fenceSubmit, m_inFlightFence[m_currentFrameIndex]);
+    };
+
+    VkResult result = acquire();
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         Msg("* [VulkanBackend] Swapchain out of date during acquire");
+        VkSurfaceCapabilitiesKHR caps{};
+        if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &caps) == VK_SUCCESS) {
+            u32 w = caps.currentExtent.width;
+            u32 h = caps.currentExtent.height;
+            if (w == 0xFFFFFFFFu)
+                w = m_backBufferWidth;
+            if (h == 0xFFFFFFFFu)
+                h = m_backBufferHeight;
+            if (w > 0 && h > 0)
+                ResizeSwapChain(w, h);
+        }
+        result = acquire();
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            Msg("~ [VulkanBackend] Acquire still out of date after recreate — skipping frame");
+            reSignalInFlightFence();
+            m_inFrame = false;
+            return;
+        }
+    }
+
+    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+        Msg("! [VulkanBackend] vkAcquireNextImageKHR failed: %d", static_cast<int>(result));
+        reSignalInFlightFence();
+        m_inFrame = false;
         return;
     }
 
@@ -887,6 +1242,9 @@ void VulkanBackend::BeginFrame() {
 void VulkanBackend::EndFrame() {
     ZoneScopedN("VK::EndFrame");
 
+    if (!m_inFrame)
+        return;
+
     m_inFrame = false;
 
     if (m_asyncSubmit) {
@@ -905,7 +1263,10 @@ void VulkanBackend::EndFrame() {
         job.enqueueTime = std::chrono::steady_clock::now();
 
         {
-            std::lock_guard<std::mutex> lk(m_submitMutex);
+            std::unique_lock lk(m_submitMutex);
+            m_submitDoneCv.wait(lk, [this] { return !m_jobQueued || !m_submitRun; });
+            if (!m_submitRun)
+                return;
             m_pendingJob = job;
             m_jobQueued = true;
             m_slotInFlight[m_recordSlot] = true;
@@ -919,7 +1280,7 @@ void VulkanBackend::EndFrame() {
 
     auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
     {
-        std::lock_guard<std::mutex> qk(m_queueMutex);
+        std::scoped_lock qk(m_queueMutex);
         vkDevice->queueSignalSemaphore(
             nvrhi::CommandQueue::Graphics,
             m_renderFinished[m_currentFrameIndex], 0);
@@ -936,7 +1297,7 @@ void VulkanBackend::EndFrame() {
     }
 
     nvrhi::IDevice* device = m_nvrhiDevice;
-    m_gcTask = &TaskScheduler->AddTask([device] {
+    m_gcTask = &TaskManager::AddTask([device] {
         device->runGarbageCollection();
     });
 }
@@ -947,27 +1308,29 @@ void VulkanBackend::SubmitThreadMain() {
 #endif
 
     using Clock = std::chrono::steady_clock;
-    auto usBetween = [](Clock::time_point a, Clock::time_point b) -> u64 {
+    auto usBetween = [](Clock::time_point a, Clock::time_point b) {
         return static_cast<u64>(std::chrono::duration_cast<std::chrono::microseconds>(b - a).count());
     };
 
     for (;;) {
         SubmitJob job;
         {
-            std::unique_lock<std::mutex> lk(m_submitMutex);
-            m_submitCv.wait(lk, [&] { return m_jobQueued || !m_submitRun; });
+            std::unique_lock lk(m_submitMutex);
+            m_submitCv.wait(lk, [this] { return m_jobQueued || !m_submitRun; });
             if (!m_submitRun && !m_jobQueued)
                 return;
             job = m_pendingJob;
             m_jobQueued = false;
+            m_submitBusy = true;
         }
+        m_submitDoneCv.notify_all();
 
         const auto tDequeue = Clock::now();
         m_stJobLatencyUs.store(usBetween(job.enqueueTime, tDequeue), std::memory_order_relaxed);
 
         auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
         {
-            std::lock_guard<std::mutex> qk(m_queueMutex);
+            std::scoped_lock qk(m_queueMutex);
             const auto tLocked = Clock::now();
             m_stQueueLockUs.store(usBetween(tDequeue, tLocked), std::memory_order_relaxed);
 
@@ -984,7 +1347,7 @@ void VulkanBackend::SubmitThreadMain() {
         }
 
         {
-            std::lock_guard<std::mutex> lk(m_submitMutex);
+            std::scoped_lock lk(m_submitMutex);
             m_slotInFlight[job.slot] = false;
         }
         m_submitDoneCv.notify_all();
@@ -1023,6 +1386,12 @@ void VulkanBackend::SubmitThreadMain() {
             m_nvrhiDevice->runGarbageCollection();
             m_stGcUs.store(usBetween(tGc, Clock::now()), std::memory_order_relaxed);
         }
+
+        {
+            std::scoped_lock lk(m_submitMutex);
+            m_submitBusy = false;
+        }
+        m_submitDoneCv.notify_all();
     }
 }
 
@@ -1043,8 +1412,10 @@ bool VulkanBackend::GetSubmitThreadTimings(SubmitThreadTimings& out) const {
 void VulkanBackend::FlushSubmits() {
     if (!m_asyncSubmit)
         return;
-    std::unique_lock<std::mutex> lk(m_submitMutex);
-    m_submitDoneCv.wait(lk, [&] { return !m_jobQueued && !m_slotInFlight[0] && !m_slotInFlight[1]; });
+    std::unique_lock lk(m_submitMutex);
+    m_submitDoneCv.wait(lk, [this] {
+        return !m_jobQueued && !m_submitBusy && !m_slotInFlight[0] && !m_slotInFlight[1];
+    });
 }
 
 void VulkanBackend::WaitForIdle() {
@@ -1061,7 +1432,7 @@ void VulkanBackend::WaitForIdle() {
 
 void VulkanBackend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
     if (m_nvrhiDevice && commandList) {
-        std::lock_guard<std::mutex> qk(m_queueMutex);
+        std::scoped_lock qk(m_queueMutex);
         m_nvrhiDevice->executeCommandList(commandList);
     }
 }
@@ -1069,23 +1440,27 @@ void VulkanBackend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
 u64 VulkanBackend::ExecuteComputeCommandList(nvrhi::ICommandList* commandList) {
     if (!m_nvrhiDevice || !commandList || !m_computeQueue)
         return 0;
+    std::scoped_lock qk(m_queueMutex);
     return m_nvrhiDevice->executeCommandList(commandList, nvrhi::CommandQueue::Compute);
 }
 
 void VulkanBackend::QueueWaitForCompute(u64 instanceID) {
     if (!m_nvrhiDevice || !m_computeQueue || instanceID == 0)
         return;
+    std::scoped_lock qk(m_queueMutex);
     m_nvrhiDevice->queueWaitForCommandList(nvrhi::CommandQueue::Graphics, nvrhi::CommandQueue::Compute, instanceID);
 }
 
 void VulkanBackend::ComputeWaitForPreviousGraphics() {
     if (!m_nvrhiDevice || !m_computeQueue || m_lastGraphicsInstanceID == 0)
         return;
+    std::scoped_lock qk(m_queueMutex);
     m_nvrhiDevice->queueWaitForCommandList(nvrhi::CommandQueue::Compute, nvrhi::CommandQueue::Graphics, m_lastGraphicsInstanceID);
 }
 
 void VulkanBackend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {
     if (!m_nvrhiDevice) return;
+    std::scoped_lock qk(m_queueMutex);
     for (u32 i = 0; i < count; i++) {
         if (commandLists[i])
             m_nvrhiDevice->executeCommandList(commandLists[i]);
@@ -1098,7 +1473,9 @@ void VulkanBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, s
     if (m_inFrame) {
         m_commandLists[m_recordSlot]->writeBuffer(buffer, data, size);
     } else {
-        m_nvrhiDevice->runGarbageCollection();
+        std::scoped_lock qk(m_queueMutex);
+        if (!m_asyncSubmit)
+            m_nvrhiDevice->runGarbageCollection();
         m_uploadCommandList->open();
         m_uploadCommandList->writeBuffer(buffer, data, size);
         m_uploadCommandList->close();
@@ -1116,9 +1493,9 @@ DeviceState VulkanBackend::GetDeviceState() const {
     return DeviceState::Normal;
 }
 
-void VulkanBackend::BeginDebugEvent(pcstr name) {}
+void VulkanBackend::BeginDebugEvent(pcstr name) { (void)name; }
 void VulkanBackend::EndDebugEvent() {}
-void VulkanBackend::SetMarker(pcstr name) {}
+void VulkanBackend::SetMarker(pcstr name) { (void)name; }
 
 IRenderBackend* CreateVulkanBackend(SDL_Window* window, u32 width, u32 height, bool enableValidation) {
     auto* backend = xr_new<VulkanBackend>();

@@ -41,7 +41,7 @@ static_assert(sizeof(LightHiZCullCB) == 160, "LightHiZCullCB must be 160 bytes")
 
 static constexpr u32 CLUSTER_TILE_SIZE = 64;
 static constexpr u32 CLUSTER_NUM_SLICES = 24;
-static constexpr u32 MAX_LIGHTS = 1024;
+static constexpr u32 MAX_LIGHTS = 2048;
 static constexpr u32 MAX_LIGHT_INDICES = 1024 * 1024;
 
 class ClusteredLightManager {
@@ -53,6 +53,8 @@ public:
     void BeginFrame();
     void CollectLight(const light* L);
     void CollectLightsParallel(const xr_vector<const light*>& lights);
+    void AddTransientPointLight(const Fvector& pos, const Fvector& color, float range);
+    bool HasNearbyPointLight(const Fvector& pos, float radius) const;
     void BuildLightBuffer(const light_Package& package);
     void Upload(nvrhi::ICommandList* cmdList);
     void UploadAllVisible(nvrhi::ICommandList* cmdList);
@@ -63,15 +65,19 @@ public:
     nvrhi::IBuffer* GetLightIndexCounterBuffer() const { return m_lightIndexCounterBuffer; }
     nvrhi::IBuffer* GetVisibleLightIndicesBuffer() const { return m_visibleLightIndicesBuffer; }
     nvrhi::IBuffer* GetVisibleLightCountBuffer() const { return m_visibleLightCountBuffer; }
+    nvrhi::IBuffer* GetDILightIndicesBuffer() const { return m_diLightIndicesBuffer; }
+    nvrhi::IBuffer* GetDILightCDFBuffer() const { return m_diLightCDFBuffer; }
 
     u32 GetLightCount() const { return m_numLights; }
+    u32 GetDILightCount() const { return m_diLightCount; }
+    float GetDIPowerSum() const { return m_diPowerSum; }
     u32 GetPointCount() const { return m_numPoint; }
     u32 GetSpotCount() const { return m_numSpot; }
     u32 GetOmniCount() const { return m_numOmni; }
     u32 GetTilesX() const { return m_tilesX; }
     u32 GetTilesY() const { return m_tilesY; }
 
-    ClusterCB BuildClusterCB(u32 screenWidth, u32 screenHeight, float zNear, float zFar) const;
+    ClusterCB BuildClusterCB(u32 screenWidth, u32 screenHeight, float zNear, float zFar);
 
     void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
     void ProcessStatsReadback();
@@ -80,19 +86,29 @@ public:
     bool IsReady() const { return m_lightDataBuffer != nullptr; }
 
 private:
+    void PurgeTransientLights();
     void AddLight(const light* L, u32 type);
+    void BuildDISampleTable();
     GPULightData BuildGPULightData(const light* L);
     u32 GetOrLoadSpotTexture(const shared_str& name);
 
     nvrhi::DeviceHandle m_device;
 
     xr_vector<GPULightData> m_lightsCPU;
+    xr_vector<const light*> m_slotOwners;
+    xr_vector<u32> m_freeSlots;
+    xr_map<const light*, u32> m_lightToSlot;
+    xr_vector<u32> m_diIndicesCPU;
+    xr_vector<float> m_diCDFCPU;
     std::array<u32, MAX_LIGHTS> m_identityIndices;
+    std::array<u32, MAX_LIGHTS> m_visibleMaskOnes{};
     xr_map<shared_str, u32> m_spotTextureCache;
     u32 m_numLights = 0;
     u32 m_numPoint = 0;
     u32 m_numSpot = 0;
     u32 m_numOmni = 0;
+    u32 m_diLightCount = 0;
+    float m_diPowerSum = 0.f;
 
     nvrhi::BufferHandle m_lightDataBuffer;
     nvrhi::BufferHandle m_clusterGridBuffer;
@@ -100,6 +116,8 @@ private:
     nvrhi::BufferHandle m_lightIndexCounterBuffer;
     nvrhi::BufferHandle m_visibleLightIndicesBuffer;
     nvrhi::BufferHandle m_visibleLightCountBuffer;
+    nvrhi::BufferHandle m_diLightIndicesBuffer;
+    nvrhi::BufferHandle m_diLightCDFBuffer;
     static constexpr u32 STATS_READBACK_SLOTS = 6;
     nvrhi::BufferHandle m_statsReadbackBuffers[STATS_READBACK_SLOTS];
     u32 m_statsWriteSlot = 0;
@@ -109,6 +127,7 @@ private:
 
     u32 m_tilesX = 0;
     u32 m_tilesY = 0;
+    u64 m_lightSetFingerprint = 0;
 };
 
 }

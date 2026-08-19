@@ -69,6 +69,8 @@ struct MaterialKey {
 
     u32 element;
     nvrhi::IFramebuffer* framebuffer;
+    nvrhi::Format colorFormat;
+    nvrhi::Format depthFormat;
 
     MaterialKey()
         : psoType(PSOType::Material)
@@ -77,6 +79,8 @@ struct MaterialKey {
         , stateHash(0)
         , element(0)
         , framebuffer(nullptr)
+        , colorFormat(nvrhi::Format::UNKNOWN)
+        , depthFormat(nvrhi::Format::UNKNOWN)
     {
     }
 
@@ -87,6 +91,8 @@ struct MaterialKey {
         , stateHash(stHash)
         , element(0)
         , framebuffer(nullptr)
+        , colorFormat(nvrhi::Format::UNKNOWN)
+        , depthFormat(nvrhi::Format::UNKNOWN)
     {
     }
 
@@ -95,7 +101,9 @@ struct MaterialKey {
 
         if (psoType == PSOType::UI) {
             if (textureHash != other.textureHash) return textureHash < other.textureHash;
-            return element < other.element;
+            if (element != other.element) return element < other.element;
+            if (colorFormat != other.colorFormat) return colorFormat < other.colorFormat;
+            return depthFormat < other.depthFormat;
         }
 
         if (psoType == PSOType::Depth) {
@@ -114,7 +122,9 @@ struct MaterialKey {
 
         if (psoType == PSOType::UI) {
             return textureHash == other.textureHash &&
-                   element == other.element;
+                   element == other.element &&
+                   colorFormat == other.colorFormat &&
+                   depthFormat == other.depthFormat;
         }
 
         if (psoType == PSOType::Depth) {

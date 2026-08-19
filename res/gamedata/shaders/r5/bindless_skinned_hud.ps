@@ -1,8 +1,20 @@
 #define SM_6_0
 #define CLUSTERED_LIGHTING_FORWARD
+#define OX_HUD_FORWARD
 #include "common.h"
 #include "bindless_common.h"
 #include "skinned_common.h"
+#include "shared/surface_marks.h"
+#include "shared/basecolor_pack.h"
+#include "shared/pbr_brdf.h"
+
+cbuffer HudScopeCB : register(b6)
+{
+    float4 m_hud_params;
+    float4 m_zoom_deviation;
+};
+
+Texture2D s_vp2 : register(t20);
 
 struct PS_INPUT
 {
@@ -20,30 +32,41 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
     float4 baseColor : SV_Target2;
+    float4 worldPos : SV_Target3;
 };
-
-float3 UndoHUDFOVAdjustment(float3 adjustedWorldPos)
-{
-    float3 viewPos = mul(m_V, float4(adjustedWorldPos, 1.0)).xyz;
-    viewPos.xy *= hud_fov;
-    float3x3 invRot = transpose(float3x3(m_V[0].xyz, m_V[1].xyz, m_V[2].xyz));
-    return mul(invRot, viewPos) + eye_position;
-}
 
 PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
 
-    float3 correctedWorldPos = UndoHUDFOVAdjustment(input.worldPos);
+    float3 camDir = normalize(camera_direction.xyz);
+    if (dot(camDir, camDir) < 1e-4)
+        camDir = float3(0, 0, 1);
 
     uint materialID = g_SkinnedMaterialID;
     MaterialData mat = g_Materials[materialID];
 
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
-
     if (mat.flags & MAT_FLAG_ALPHA_TEST)
-    {
         clip(diffuseSample.a - mat.alphaRef);
+
+    const bool isScope = (mat.flags & MAT_FLAG_SCOPE) != 0;
+    float vis = m_hud_params.y * max(m_hud_params.a, 1.0);
+    if (isScope && vis > 0.0001)
+    {
+        float2 tc = input.texcoord + m_zoom_deviation.xy;
+        float aspect = screen_res.x / max(screen_res.y, 1.0);
+        tc.x = (tc.x - 0.5 + 0.0) / aspect + 0.5;
+        float2 offset = distance(tc, float2(0.5, 0.5)) * float2(m_hud_params.z, m_hud_params.z);
+        float4 t_vp2 = s_vp2.Sample(smp_base, tc);
+        t_vp2.r = s_vp2.Sample(smp_base, tc + offset).r;
+        t_vp2.b = s_vp2.Sample(smp_base, tc - offset).b;
+        float3 base = lerp(t_vp2.rgb, diffuseSample.rgb, diffuseSample.a);
+        output.color = float4(base, min(m_hud_params.y, max(m_hud_params.a, 1.0)));
+        output.normal = float4(normalize(input.normal), -0.004);
+        output.baseColor = float4(base, 0.0);
+        output.worldPos = float4(input.worldPos, SURF_MARK_HUD);
+        return output;
     }
 
     float3 albedo = diffuseSample.rgb;
@@ -63,15 +86,11 @@ PS_OUTPUT main(PS_INPUT input)
     }
 
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
-    {
-        float4 detailSample = SampleDetail(mat, input.texcoord);
-        albedo = albedo * (detailSample.rgb * 2.0);
-    }
+        albedo *= SampleDetail(mat, input.texcoord).rgb * 2.0;
 
     float metallic = 0.0;
     float roughness = 1.0 - gloss;
     float ao = 1.0;
-
     if (mat.flags & MAT_FLAG_HAS_PBR)
     {
         float3 pbrSample = SamplePBR(mat, input.texcoord);
@@ -82,10 +101,20 @@ PS_OUTPUT main(PS_INPUT input)
 
     albedo = apply_splat_color(albedo, input.worldPos, input.texcoord);
 
-    f_forward fwd = output_forward_pbr(albedo, N, correctedWorldPos, metallic, roughness, ao, input.position);
+    float3 lightPos = input.worldPos;
+    float3 toEye = eye_position - input.worldPos;
+    if (length(toEye) < 0.05)
+        lightPos = eye_position + camDir * 0.35;
+
+    float hemi = saturate(0.5 + 0.5 * N.y);
+    f_forward fwd = output_forward_pbr(
+        albedo, N, lightPos, metallic, roughness, ao,
+        input.position, hemi, 1.0, false, false);
+
     output.color = float4(fwd.color.rgb, diffuseSample.a);
     output.normal = fwd.normal;
-    output.baseColor = fwd.baseColor;
     output.normal.a = -max(fwd.normal.a, 0.004);
+    output.baseColor = fwd.baseColor;
+    output.worldPos = float4(input.worldPos, SURF_MARK_HUD);
     return output;
 }

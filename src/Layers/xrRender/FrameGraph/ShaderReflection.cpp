@@ -1082,14 +1082,28 @@ static void FilterReflectionByUsage(ExtractedReflection& result, slang::ICompone
             srUsed, srUnused, dtsUsed, dtsUnused);
     }
 
+    auto isLegacyCommonSrv = [](const shared_str& name) -> bool {
+        const char* n = name.c_str();
+        return n && n[0] == 's' && n[1] == '_';
+    };
+
     auto& textures = result.rtBindings.inputTextures;
     textures.erase(std::remove_if(textures.begin(), textures.end(),
-        [&](const auto& t) { return !isUsed(SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE, t.slot); }),
+        [&](const auto& t) {
+            if (!isLegacyCommonSrv(t.name))
+                return false;
+            return !isUsed(SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE, t.slot);
+        }),
         textures.end());
 
     auto& uavs = result.rtBindings.uavBindings;
     uavs.erase(std::remove_if(uavs.begin(), uavs.end(),
-        [&](const auto& u) { return !isUsed(SLANG_PARAMETER_CATEGORY_UNORDERED_ACCESS, u.slot); }),
+        [&](const auto& u) {
+            const char* n = u.name.c_str();
+            if (n && ((n[0] == 'u' && n[1] == '_') || (n[0] == 'g' && n[1] == '_')))
+                return false;
+            return !isUsed(SLANG_PARAMETER_CATEGORY_UNORDERED_ACCESS, u.slot);
+        }),
         uavs.end());
 
     auto& samplers = result.rtBindings.samplers;
@@ -1119,21 +1133,31 @@ static void FilterReflectionByUsage(ExtractedReflection& result, slang::ICompone
         [&](const auto& cb) { return !isUsed(SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER, cb.slot); }),
         cbs.end());
 
+    auto preferSrv = [&](const auto& keep, const auto& drop) -> bool {
+        if (keep.shape != ResourceShape::Texture && drop.shape == ResourceShape::Texture)
+            return true;
+        if (drop.shape != ResourceShape::Texture && keep.shape == ResourceShape::Texture)
+            return false;
+        const bool keepLegacy = isLegacyCommonSrv(keep.name);
+        const bool dropLegacy = isLegacyCommonSrv(drop.name);
+        if (keepLegacy != dropLegacy)
+            return !keepLegacy;
+        return true;
+    };
+
     for (size_t i = 0; i < textures.size(); ++i)
     {
         for (size_t j = i + 1; j < textures.size(); )
         {
             if (textures[i].slot == textures[j].slot)
             {
-                if (textures[j].shape != ResourceShape::Texture && textures[i].shape == ResourceShape::Texture)
+                if (preferSrv(textures[i], textures[j]))
+                    textures.erase(textures.begin() + j);
+                else
                 {
                     textures.erase(textures.begin() + i);
                     --i;
                     break;
-                }
-                else
-                {
-                    textures.erase(textures.begin() + j);
                 }
             }
             else

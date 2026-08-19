@@ -177,6 +177,7 @@ v2p_billboard main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceI
 	uint bh = asuint(bc.x * 73856093 + bc.y * 19349663);
 	bh ^= bh >> 16;
 	O.bladeHash = float(bh & 0xFFFFu) / 65535.0;
+	O.sunOcclusion = sun;
 	O.hpos = mul(g_detail_VP, world_pos);
 	return O;
 }

@@ -9,6 +9,7 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
+#include "Layers/xrRender/RayTracing/ReSTIRMemoryManager.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #endif
@@ -46,19 +47,19 @@ struct PathTracerCB {
     Fvector4 cameraPos_pad;
     Fvector4 sunDir_intensity;
     Fvector4 sunColor_skyWeight;
+    Fvector4 skyColor;
     float screenWidth;
     float screenHeight;
     u32 sampleIndex;
     u32 maxBounces;
     u32 identityStaticCount;
     u32 terrainBatchCount;
-    u32 transparentBatchCount;
     u32 skinnedBatchStart;
     u32 grassBatchStart;
     u32 detailAtlasIndex;
-    u32 pad[2];
+    u32 pad[3];
 };
-static_assert(sizeof(PathTracerCB) == 160, "PathTracerCB must be 160 bytes");
+static_assert(sizeof(PathTracerCB) == 176, "PathTracerCB must be 176 bytes");
 
 static void CreatePlaceholderCubemap(nvrhi::IDevice* nvDevice)
 {
@@ -107,7 +108,7 @@ static void InitializeResources(fg::RenderDevice* device)
     }
     s_pathtrace_shader = csResult.handle;
 
-    s_cb = cache.GetOrCreateVolatileCB("PathTracer", "PathTracerCB", sizeof(PathTracerCB), device);
+    s_cb = cache.GetOrCreateVolatileCB("PathTracer", "PathTracerCB_v2", sizeof(PathTracerCB), device);
 
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllFilters(true);
@@ -117,7 +118,7 @@ static void InitializeResources(fg::RenderDevice* device)
     CreatePlaceholderCubemap(nvDevice);
     CreatePlaceholderBuffer(nvDevice);
 
-    s_layout = cache.GetOrCreateBindingLayoutFromReflection("PathTracer", *csResult.reflection, nvDevice);
+    s_layout = cache.GetOrCreateBindingLayoutFromReflection("PathTracer_v3", *csResult.reflection, nvDevice);
 
 #if defined(XR_PLATFORM_WINDOWS)
     auto* backend = dynamic_cast<D3D12Backend*>(GEnv.Backend);
@@ -252,6 +253,10 @@ PathTracerOutput setupPathTracerPass(
     cbData.cameraPos_pad = { cameraPos.x, cameraPos.y, cameraPos.z, 0.0f };
     cbData.sunDir_intensity = { sunDir.x, sunDir.y, sunDir.z, sunIntensity };
     cbData.sunColor_skyWeight = { sunColor.x, sunColor.y, sunColor.z, skyWeight };
+    {
+        const Fvector3& skc = env.CurrentEnv.sky_color;
+        cbData.skyColor = { skc.x, skc.y, skc.z, 0.f };
+    }
     cbData.screenWidth = static_cast<float>(width);
     cbData.screenHeight = static_cast<float>(height);
     cbData.sampleIndex = config.sampleIndex;
@@ -260,24 +265,24 @@ PathTracerOutput setupPathTracerPass(
     const auto& batchCounts = accelMgr->GetBatchCounts();
     cbData.identityStaticCount = batchCounts.identityStatic;
     cbData.terrainBatchCount = batchCounts.terrain;
-    cbData.transparentBatchCount = batchCounts.transparent;
 
     if (batchCounts.skinned > 0)
         cbData.skinnedBatchStart = batchCounts.identityStatic + batchCounts.terrain +
                                    batchCounts.transparent + batchCounts.instancedTotal;
     else
-        cbData.skinnedBatchStart = 0;
+        cbData.skinnedBatchStart = 0xFFFFFFFFu;
 
     if (batchCounts.grass > 0)
         cbData.grassBatchStart = batchCounts.identityStatic + batchCounts.terrain +
                                  batchCounts.transparent + batchCounts.instancedTotal +
                                  batchCounts.skinned;
     else
-        cbData.grassBatchStart = 0;
+        cbData.grassBatchStart = 0xFFFFFFFFu;
 
     cbData.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
     cbData.pad[0] = 0;
     cbData.pad[1] = 0;
+    cbData.pad[2] = 0;
 
     auto& passData = fg.addCallbackPass<PathTracerData>(
         "Path Tracer",
@@ -334,6 +339,13 @@ PathTracerOutput setupPathTracerPass(
             bsb.BufferSRV("g_SkinnedIB", skinnedIB);
             bsb.BufferSRV("g_GrassVB", grassVB);
             bsb.BufferSRV("g_GrassIB", grassIB);
+            {
+                auto& memMgr = ReSTIRMemoryManager::Instance();
+                memMgr.Init(nvDevice);
+                nvrhi::ITexture* blueNoise = memMgr.GetBlueNoise() ? memMgr.GetBlueNoise() : memMgr.GetPlaceholderTex3D();
+                if (bsb.HasSRV("t_BlueNoise"))
+                    bsb.Texture("t_BlueNoise", blueNoise);
+            }
             bsb.TextureUAV("g_Accumulation", s_accumBuffer);
             bsb.TextureUAV("g_Output", outTex);
             auto& cache = GetPassResourceCache();

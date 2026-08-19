@@ -109,10 +109,14 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/DecalPassSetup.cpp
     FrameGraphPasses/DistortionApplyPassSetup.h
     FrameGraphPasses/DistortionApplyPassSetup.cpp
+    FrameGraphPasses/GlowPassSetup.h
+    FrameGraphPasses/GlowPassSetup.cpp
     FrameGraphPasses/ExposurePassSetup.h
     FrameGraphPasses/ExposurePassSetup.cpp
     FrameGraphPasses/TonemapPassSetup.h
     FrameGraphPasses/TonemapPassSetup.cpp
+    FrameGraphPasses/PostProcessPassSetup.h
+    FrameGraphPasses/PostProcessPassSetup.cpp
     FrameGraphPasses/UIPassSetup.h
     FrameGraphPasses/UIPassSetup.cpp
     FrameGraphPasses/SkyPassSetup.h
@@ -131,12 +135,40 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/PathTracerPassSetup.cpp
     FrameGraphPasses/MotionVectorPassSetup.h
     FrameGraphPasses/MotionVectorPassSetup.cpp
+    Upscaling/UpscaleState.h
+    Upscaling/UpscaleState.cpp
+    Upscaling/IUpscaleBackend.h
+    Upscaling/UpscaleBackends.cpp
+    Upscaling/StreamlineDLSS.h
+    Upscaling/NgxDLSS.cpp
+    Upscaling/DlssFgPassSetup.h
+    Upscaling/DlssFgPassSetup.cpp
+    Upscaling/UpscalePassSetup.h
+    Upscaling/UpscalePassSetup.cpp
+    Denoising/IDenoiseBackend.h
+    Denoising/DenoiseBackends.cpp
+    Denoising/NRDDenoiseBackend.cpp
+    FrameGraphPasses/TAAPassSetup.h
+    FrameGraphPasses/TAAPassSetup.cpp
     FrameGraphPasses/ReSTIRGIPassSetup.h
     FrameGraphPasses/ReSTIRGIPassSetup.cpp
     FrameGraphPasses/ClusterLightPassSetup.cpp
+    FrameGraphPasses/WetSurfacesPassSetup.h
+    FrameGraphPasses/WetSurfacesPassSetup.cpp
+    FrameGraphPasses/RainShadowPassSetup.h
+    FrameGraphPasses/RainShadowPassSetup.cpp
+    FrameGraphPasses/ShadowPassSetup.h
+    FrameGraphPasses/GrassShadowPassSetup.cpp
+    FrameGraphPasses/VolumetricFogPassSetup.h
+    FrameGraphPasses/VolumetricFogPassSetup.cpp
+
+    Volumetrics/VolumetricFogManager.h
+    Volumetrics/VolumetricFogManager.cpp
 
     RayTracing/RTAccelStructManager.h
     RayTracing/RTAccelStructManager.cpp
+    RayTracing/ReSTIRMemoryManager.h
+    RayTracing/ReSTIRMemoryManager.cpp
 
     FGDetailManager.h
     FGDetailManager.cpp
@@ -412,6 +444,38 @@ if(XRAY_USE_AI_PBR)
     target_compile_definitions(xrRender PRIVATE USE_AI_PBR)
     target_include_directories(xrRender PRIVATE "${XRAY_ONNXRUNTIME_INCLUDE_DIR}")
     target_link_libraries(xrRender PRIVATE "${XRAY_ONNXRUNTIME_LIBRARY}")
+endif()
+
+if(XRAY_USE_DLSS)
+    set(XRAY_DLSS_ROOT "${CMAKE_SOURCE_DIR}/Externals/DLSS")
+    if(NOT EXISTS "${XRAY_DLSS_ROOT}/include/nvsdk_ngx.h")
+        message(FATAL_ERROR "XRAY_USE_DLSS=ON but Externals/DLSS SDK headers are missing")
+    endif()
+    if(WIN32)
+        set(XRAY_DLSS_LIB_DIR "${XRAY_DLSS_ROOT}/lib/Windows_x86_64/x64")
+        find_library(XRAY_NVSDK_NGX_LIBRARY NAMES nvsdk_ngx_s nvsdk_ngx
+            PATHS "${XRAY_DLSS_LIB_DIR}" NO_DEFAULT_PATH)
+        set(XRAY_DLSS_RUNTIME_DIR "${XRAY_DLSS_ROOT}/lib/Windows_x86_64/rel")
+    else()
+        set(XRAY_DLSS_LIB_DIR "${XRAY_DLSS_ROOT}/lib/Linux_x86_64")
+        set(XRAY_NVSDK_NGX_LIBRARY "${XRAY_DLSS_LIB_DIR}/libnvsdk_ngx.a")
+        set(XRAY_DLSS_RUNTIME_DIR "${XRAY_DLSS_LIB_DIR}/rel")
+    endif()
+    if(NOT EXISTS "${XRAY_NVSDK_NGX_LIBRARY}")
+        message(FATAL_ERROR "XRAY_USE_DLSS=ON but NGX library not found at ${XRAY_NVSDK_NGX_LIBRARY}")
+    endif()
+    target_compile_definitions(xrRender PRIVATE XRAY_USE_DLSS=1)
+    target_include_directories(xrRender PRIVATE "${XRAY_DLSS_ROOT}/include")
+    target_link_libraries(xrRender PRIVATE "${XRAY_NVSDK_NGX_LIBRARY}")
+    if(UNIX AND NOT APPLE)
+        target_link_libraries(xrRender PRIVATE dl)
+    endif()
+    message(STATUS "DLSS/NGX: ON (${XRAY_NVSDK_NGX_LIBRARY})")
+    set(XRAY_DLSS_RUNTIME_DIR "${XRAY_DLSS_RUNTIME_DIR}" CACHE INTERNAL "DLSS runtime library directory")
+endif()
+if(XRAY_USE_NRD)
+    target_compile_definitions(xrRender PRIVATE XRAY_USE_NRD=1)
+    target_link_libraries(xrRender PRIVATE NRD NRDIntegration NRI)
 endif()
 
 set_target_properties(xrRender PROPERTIES
