@@ -273,6 +273,15 @@ const xr_token fg_render_mode_token[] = {
 };
 
 // Smoke Trail (weapon muzzle smoke)
+int   ps_r_cluster       = 1;
+int   ps_r_cluster_tris  = 256;
+int   ps_r_cluster_merge = 1;
+int   ps_r_cluster_cache = 1;
+int   ps_r_cluster_debug = 0;
+float ps_r_cluster_lod   = 4.0f;
+float ps_r_cluster_fade  = 0.25f;
+float ps_r_ssa_px        = 2.0f;
+
 int   ps_r_smoke_trail_enabled  = 1;
 float ps_r_smoke_max_emit_rate  = 45.f;
 float ps_r_smoke_point_lifetime = 2.5f;
@@ -958,6 +967,15 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_path_tracer_bounces", &ps_r_path_tracer_bounces, 1, 16);
     CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
+
+    CMD4(CCC_Integer, "r_cluster", &ps_r_cluster, 0, 1);
+    CMD4(CCC_Integer, "r_cluster_tris", &ps_r_cluster_tris, 128, 4096);
+    CMD4(CCC_Integer, "r_cluster_merge", &ps_r_cluster_merge, 0, 1);
+    CMD4(CCC_Integer, "r_cluster_cache", &ps_r_cluster_cache, 0, 1);
+    CMD4(CCC_Integer, "r_cluster_debug", &ps_r_cluster_debug, 0, 4);
+    CMD4(CCC_Float, "r_cluster_lod", &ps_r_cluster_lod, 0.05f, 64.0f);
+    CMD4(CCC_Float, "r_cluster_fade", &ps_r_cluster_fade, 0.0f, 1.0f);
+    CMD4(CCC_Float, "r_ssa_px", &ps_r_ssa_px, 0.25f, 16.0f);
 
     // Smoke Trail (weapon muzzle smoke)
     CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);

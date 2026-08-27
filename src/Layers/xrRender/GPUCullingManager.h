@@ -8,6 +8,7 @@
 #include "Layers/xrRender/Bindless/UnifiedVertex.h"
 #include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 #include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
+#include "Layers/xrRender/ClusterDAG.h"
 
 namespace xray::render::fg::passes {
     struct ParticleBatch;
@@ -701,6 +702,8 @@ private:
     bool m_megaDataUploaded = false;
     bool m_levelLoadInProgress = false;
 
+    ClusterDAG m_clusterDAG;
+
     // ───────────────────────────────────────────────────────
     //  VB POOL REGISTRATION (for level geometry)
     // ───────────────────────────────────────────────────────
@@ -763,6 +766,12 @@ public:
         u32 ibID, u32 iBase, u32 iCount,
         bool alternative = false
     ) const;
+
+    // Bake the cluster LOD DAG over CPU-resident mega arrays and append
+    // cluster index data to the mega-IB. Must run between the last
+    // RegisterVBPool/RegisterIBPool call and EndLevelLoad.
+    void BakeClusterDAG(const xr_vector<ClusterMeshKey>& ranges);
+    ClusterDAG& GetClusterDAG() { return m_clusterDAG; }
 
     // Detect vertex format from vertex declaration
     static bindless::SourceVertexFormat DetectFormatFromDecl(

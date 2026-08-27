@@ -19,6 +19,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/FrameGraph/ShaderPhaseCache.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
+#include "Layers/xrRender/ClusterDAG.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "Layers/xrRender/Profiler/StatsOverlay.h"
 
@@ -169,6 +170,7 @@ private:
     using VertexDeclarator = ::xray::render::fg::VertexDeclarator;
     void LoadBuffers(CStreamReader* fs, bool alternative);
     void LoadVisuals(IReader* fs);
+    void CollectClusterBakeRanges(xr_vector<fg::ClusterMeshKey>& ranges);
     void LoadLights(IReader* fs);
     void LoadSectors(IReader* fs);
     void LoadSWIs(CStreamReader* fs);

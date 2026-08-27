@@ -191,6 +191,7 @@ target_sources(xrRender PRIVATE
     FHierrarhyVisual.cpp
     FLOD.cpp
     FProgressive.cpp
+    ClusterDAG.cpp
     FSkinned.cpp
     FTreeVisual.cpp
     FVisual.cpp

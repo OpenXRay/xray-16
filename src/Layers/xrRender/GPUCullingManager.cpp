@@ -3990,6 +3990,33 @@ void GPUCullingManager::EndLevelLoad()
     Msg("* [GPUCulling] Mega-buffers ready for GPU upload");
 }
 
+void GPUCullingManager::BakeClusterDAG(const xr_vector<ClusterMeshKey>& ranges)
+{
+    if (!m_levelLoadInProgress) {
+        Msg("! [GPUCulling] BakeClusterDAG called outside of level load");
+        return;
+    }
+
+    m_clusterDAG.Clear();
+    if (ranges.empty() || m_megaVertices.empty() || m_megaIndices.empty())
+        return;
+
+    m_clusterDAG.Bake(ranges, m_megaVertices.data(), m_megaIndices.data());
+
+    const xr_vector<u32>& baked = m_clusterDAG.BakedIndices();
+    if (baked.empty())
+        return;
+
+    m_clusterDAG.SetMegaIndexBase(m_totalIndexCount);
+    m_megaIndices.insert(m_megaIndices.end(), baked.begin(), baked.end());
+    m_totalIndexCount += u32(baked.size());
+    m_clusterDAG.ReleaseIndexData();
+
+    Msg("* [GPUCulling] cluster indices appended at %u, mega-IB now %u indices (%.1f MB)",
+        m_clusterDAG.MegaIndexBase(), m_totalIndexCount,
+        (m_totalIndexCount * sizeof(u32)) / (1024.0f * 1024.0f));
+}
+
 void GPUCullingManager::UploadInstanceData(fg::RenderContext* ctx, const GeometryCollector* geometry)
 {
     (void)ctx;
