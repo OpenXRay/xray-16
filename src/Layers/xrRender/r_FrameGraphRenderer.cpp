@@ -1333,31 +1333,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_blackboard->get_or_add<passes::ParticlePassState>()
     );
 
-    auto ribbonOutputs = passes::setupRibbonPass(
-        *m_framegraph,
-        m_device,
-        particleOutputs.layout,
-        width,
-        height,
-        &m_blackboard->get_or_add<passes::RibbonPassState>()
-    );
-
-    auto trailOutputs = passes::setupTrailPass(
-        *m_framegraph,
-        m_device,
-        ribbonOutputs.layout,
-        width,
-        height,
-        &m_blackboard->get_or_add<passes::TrailPassState>()
-    );
-
-    auto smokeOutputs = trailOutputs.layout;
+    auto smokeOutputs = particleOutputs.layout;
     if (m_smokeTrailManager && m_smokeTrailManager->IsReady())
     {
         smokeOutputs = passes::setupSmokeTrailPass(
             *m_framegraph,
             m_device,
-            trailOutputs.layout,
+            particleOutputs.layout,
             m_smokeTrailManager.get(),
             width,
             height,
