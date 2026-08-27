@@ -274,6 +274,21 @@ static void renderBindlessForward(
         DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, set.totalObjectCount);
     };
 
+    auto drawClusterSet = [&]() {
+        if (!config.clusterSet.IsValid() || !config.clusterDrawIndexBuffer)
+            return;
+
+        state.vertexBuffers = {
+            {config.megaVertexBuffer, 0, 0},
+            {config.clusterDrawIndexBuffer, 1, 0}
+        };
+        drawSet(config.clusterSet);
+        state.vertexBuffers = {
+            {config.megaVertexBuffer, 0, 0},
+            {drawIndexBuffer, 1, 0}
+        };
+    };
+
     if (config.variantPartition.Enabled()) {
         auto* backendDev = device->GetBackend();
         VariantPartitionDrawConfig vpCfg;
@@ -298,6 +313,7 @@ static void renderBindlessForward(
     } else {
         drawSet(config.staticSet);
     }
+    drawClusterSet();
     drawSet(config.dynamicSet);
 
     // ═══════════════════════════════════════════════════════

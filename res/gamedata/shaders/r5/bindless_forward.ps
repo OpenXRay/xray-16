@@ -18,6 +18,7 @@ struct PS_INPUT
     float3 tangent : TEXCOORD3;
     float3 bitangent : TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    nointerpolation uint drawID : TEXCOORD6;
 };
 
 struct PS_OUTPUT
@@ -109,5 +110,15 @@ PS_OUTPUT main(PS_INPUT input)
     output.color = float4(fwd.color.rgb, diffuseSample.a);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
+
+    if (dev_param_4.x > 0.5)
+    {
+        uint h = input.drawID * 747796405u + 2891336453u;
+        h = ((h >> ((h >> 28u) + 4u)) ^ h) * 277803737u;
+        h = (h >> 22u) ^ h;
+        float3 tint = float3(float(h & 255u), float((h >> 8) & 255u), float((h >> 16) & 255u)) / 255.0;
+        output.color.rgb = tint;
+    }
+
     return output;
 }

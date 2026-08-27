@@ -42,6 +42,7 @@ struct VS_OUTPUT
     float3 tangent  : TEXCOORD3;
     float3 bitangent: TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    nointerpolation uint drawID : TEXCOORD6;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -106,6 +107,7 @@ VS_OUTPUT main(VS_INPUT input)
 
     // Pass material ID to pixel shader
     output.materialID = materialID;
+    output.drawID = drawID;
 
     return output;
 }

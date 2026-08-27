@@ -1804,6 +1804,8 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         m_staticInstanceData.reserve(totalBatches);
         m_staticBatchVertexCounts.clear();
         m_staticBatchVertexCounts.reserve(totalBatches);
+        m_staticBatchKeys.clear();
+        m_staticBatchKeys.reserve(totalBatches);
     }
 
     m_dynamicObjectData.clear();
@@ -1958,6 +1960,15 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
             if (!m_staticDataCached) {
                 appendBatch(batch, m_staticObjectData, m_staticDrawArgsData, m_staticMaterialIDData, m_staticInstanceData);
                 m_staticBatchVertexCounts.push_back(batch.megaBufferAlloc.valid ? batch.megaBufferAlloc.vertexCount : 0);
+
+                ClusterMeshKey key = {};
+                if (batch.megaBufferAlloc.valid) {
+                    key.vertexOffset = batch.megaBufferAlloc.vertexOffset;
+                    key.indexOffset = batch.megaBufferAlloc.indexOffset;
+                    key.vertexCount = batch.megaBufferAlloc.vertexCount;
+                    key.indexCount = batch.megaBufferAlloc.indexCount;
+                }
+                m_staticBatchKeys.push_back(key);
             }
         } else {
             appendBatch(batch, m_dynamicObjectData, m_dynamicDrawArgsData, m_dynamicMaterialIDData, m_dynamicInstanceData);
@@ -2019,6 +2030,9 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     }
 
     if (m_staticSet.objectCount > 0 && !m_staticSet.objectsUploaded) {
+        BuildClusterEntries();
+        UploadClusterEntries(cmdList, m_device->GetNVRHIDevice());
+
         R_ASSERT2(m_staticObjectData.size() >= m_staticSet.objectCount, "Static object data smaller than count");
         R_ASSERT2(m_staticDrawArgsData.size() >= m_staticSet.objectCount, "Static draw args data smaller than count");
         R_ASSERT2(m_staticMaterialIDData.size() >= m_staticSet.objectCount, "Static material ID data smaller than count");
@@ -2199,6 +2213,10 @@ void GPUCullingManager::InvalidateStaticCullingData()
     m_staticMaterialIDData.clear();
     m_staticInstanceData.clear();
     m_staticBatchVertexCounts.clear();
+    m_staticBatchKeys.clear();
+
+    m_clusterSet = {};
+    m_clusterEntryData.clear();
 
     Msg("* [GPUCulling] Static culling data invalidated");
 }
@@ -2207,6 +2225,8 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
 {
     m_cullPipeline = nullptr;
     m_clearArgsPipeline = nullptr;
+    m_clusterCullPipeline = nullptr;
+    m_clusterCullLayout = nullptr;
     m_compactCountPipeline = nullptr;
     m_compactScanPipeline = nullptr;
     m_compactScatterPipeline = nullptr;
@@ -2537,7 +2557,8 @@ void GPUCullingManager::ExecuteCullPhase(fg::RenderContext* ctx, nvrhi::ITexture
         cb.hizMipLevels = phase.hizMipLevels;
         cb.frameId = phase.stamp;
         cb.useHiZ = phase.useHiZ ? 1u : 0u;
-        cb.padding[0] = cb.padding[1] = 0;
+        cb.padding[0] = (ps_r_cluster && m_clusterSet.entryCount > 0 && m_clusterSet.uploaded) ? 1u : 0u;
+        cb.padding[1] = 0;
         ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
     };
 
@@ -2693,6 +2714,8 @@ void GPUCullingManager::ExecuteCullPhase(fg::RenderContext* ctx, nvrhi::ITexture
     dispatchCullSet(m_staticSet,
         (phase.runPartition && m_variantPartitionEnabled) ? &m_staticPartition : nullptr);
     dispatchCullSet(m_dynamicSet, nullptr);
+
+    DispatchClusterCull(cmdList, nvDevice, hizTexture, phase);
 
     if (m_terrainObjectCount > 0 && m_terrainObjectBuffer && m_terrainDrawArgsBuffer) {
         u32 zeroTerrain = 0;
@@ -4022,6 +4045,339 @@ void GPUCullingManager::BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges
     Msg("* [GPUCulling] cluster indices appended at %u, mega-IB now %u indices (%.1f MB)",
         m_clusterDAG.MegaIndexBase(), m_totalIndexCount,
         (m_totalIndexCount * sizeof(u32)) / (1024.0f * 1024.0f));
+}
+
+void GPUCullingManager::BuildClusterEntries()
+{
+    m_clusterEntryData.clear();
+    m_clusterSet.entryCount = 0;
+    m_clusterSet.uploaded = false;
+
+    if (!ps_r_cluster || m_clusterDAG.Empty())
+        return;
+
+    const u32 staticCount = m_staticSet.objectCount;
+    if (staticCount == 0 || m_staticBatchKeys.size() < staticCount)
+        return;
+
+    const xr_vector<ClusterMetaProto>& protos = m_clusterDAG.Protos();
+    const xr_vector<ClusterUnitRecord>& records = m_clusterDAG.Records();
+    const u32 megaBase = m_clusterDAG.MegaIndexBase();
+
+    xr_vector<xr_vector<u32>> componentBatches(records.size());
+
+    auto axisScale = [](const Fmatrix& w) {
+        const float sx = w.i.magnitude();
+        const float sy = w.j.magnitude();
+        const float sz = w.k.magnitude();
+        return std::max(sx, std::max(sy, sz));
+    };
+
+    auto emitEntry = [&](const ClusterMetaProto& p, const ClusterUnitRecord& rec, u32 batchIndex) {
+        const Fmatrix& world = m_staticInstanceData[batchIndex].world;
+        const float scale = axisScale(world);
+
+        GPUClusterEntry e;
+        Fvector c;
+
+        world.transform_tiny(c, Fvector().set(p.sphere[0], p.sphere[1], p.sphere[2]));
+        e.sphere.set(c.x, c.y, c.z, p.sphere[3] * scale);
+        world.transform_tiny(c, Fvector().set(p.lodSelf[0], p.lodSelf[1], p.lodSelf[2]));
+        e.lodSelf.set(c.x, c.y, c.z, p.lodSelf[3] * scale);
+        world.transform_tiny(c, Fvector().set(p.lodParent[0], p.lodParent[1], p.lodParent[2]));
+        e.lodParent.set(c.x, c.y, c.z, p.lodParent[3] * scale);
+
+        e.selfError = p.selfError * scale;
+        float pe = p.parentError * scale;
+        if (!(pe < 1e30f))
+            pe = 1e30f;
+        e.parentError = pe;
+
+        e.indexCount = p.indexCount;
+        e.ibFirst = megaBase + rec.firstIndex + p.ibFirst;
+        e.firstVertex = rec.isComponent
+            ? 0
+            : m_clusterDAG.MemberKeys()[rec.firstMember + p.member].vertexOffset;
+        e.batchIndex = batchIndex;
+        e.materialID = m_staticMaterialIDData[batchIndex];
+        e.flags = (p.flags & CLUSTER_PROTO_FLAG_AT) ? GPU_CLUSTER_ENTRY_AT : 0;
+
+        m_clusterEntryData.push_back(e);
+    };
+
+    u32 clusteredBatches = 0;
+    for (u32 i = 0; i < staticCount; ++i) {
+        const ClusterMeshKey& key = m_staticBatchKeys[i];
+        if (key.indexCount == 0)
+            continue;
+        if (m_staticObjectData[i].flags & GPU_OBJECT_PREPASS_SKIP)
+            continue;
+
+        u32 member = 0;
+        const ClusterUnitRecord* rec = m_clusterDAG.FindRecord(key, member);
+        if (!rec)
+            continue;
+
+        m_staticObjectData[i].flags |= GPU_OBJECT_CLUSTERED;
+        clusteredBatches++;
+
+        if (!rec->isComponent) {
+            for (u32 p = 0; p < rec->protoCount; ++p)
+                emitEntry(protos[rec->firstProto + p], *rec, i);
+        } else {
+            const u32 recIdx = u32(rec - records.data());
+            xr_vector<u32>& memberBatch = componentBatches[recIdx];
+            if (memberBatch.empty())
+                memberBatch.resize(rec->memberCount, UINT32_MAX);
+            if (memberBatch[member] == UINT32_MAX)
+                memberBatch[member] = i;
+        }
+    }
+
+    for (u32 r = 0; r < u32(records.size()); ++r) {
+        const xr_vector<u32>& memberBatch = componentBatches[r];
+        if (memberBatch.empty())
+            continue;
+
+        u32 fallback = UINT32_MAX;
+        for (u32 b : memberBatch) {
+            if (b != UINT32_MAX) {
+                fallback = b;
+                break;
+            }
+        }
+        if (fallback == UINT32_MAX)
+            continue;
+
+        const ClusterUnitRecord& rec = records[r];
+        for (u32 p = 0; p < rec.protoCount; ++p) {
+            const ClusterMetaProto& proto = protos[rec.firstProto + p];
+            const u32 batch = (proto.member < memberBatch.size() && memberBatch[proto.member] != UINT32_MAX)
+                ? memberBatch[proto.member]
+                : fallback;
+            emitEntry(proto, rec, batch);
+        }
+    }
+
+    m_clusterSet.entryCount = u32(m_clusterEntryData.size());
+    Msg("* [GPUCulling] cluster entries: %u from %u clustered batches (%u static)",
+        m_clusterSet.entryCount, clusteredBatches, staticCount);
+}
+
+void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice)
+{
+    if (m_clusterSet.entryCount == 0 || m_clusterSet.uploaded)
+        return;
+
+    const u32 n = m_clusterSet.entryCount;
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "ClusterCull_Entries";
+        desc.byteSize = u64(n) * sizeof(GPUClusterEntry);
+        desc.structStride = sizeof(GPUClusterEntry);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        m_clusterSet.entryBuffer = nvDevice->createBuffer(desc);
+    }
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "ClusterCull_Cmds";
+        desc.byteSize = u64(n) * sizeof(IndirectDrawArgs);
+        desc.structStride = sizeof(IndirectDrawArgs);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_clusterSet.cmdBuffer = nvDevice->createBuffer(desc);
+    }
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "ClusterCull_Count";
+        desc.byteSize = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        m_clusterSet.countBuffer = nvDevice->createBuffer(desc);
+    }
+
+    auto makeStreamBuffer = [&](const char* name) {
+        nvrhi::BufferDesc desc;
+        desc.debugName = name;
+        desc.byteSize = u64(n) * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        return nvDevice->createBuffer(desc);
+    };
+    m_clusterSet.batchIndexBuffer = makeStreamBuffer("ClusterCull_BatchIndices");
+    m_clusterSet.materialIDBuffer = makeStreamBuffer("ClusterCull_MaterialIDs");
+    m_clusterSet.fadeBuffer = makeStreamBuffer("ClusterCull_Fades");
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "ClusterCull_DrawIndices";
+        desc.byteSize = u64(n) * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.isVertexBuffer = true;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        m_clusterSet.drawIndexBuffer = nvDevice->createBuffer(desc);
+    }
+
+    if (!m_clusterSet.entryBuffer || !m_clusterSet.cmdBuffer || !m_clusterSet.countBuffer ||
+        !m_clusterSet.batchIndexBuffer || !m_clusterSet.materialIDBuffer ||
+        !m_clusterSet.fadeBuffer || !m_clusterSet.drawIndexBuffer) {
+        Msg("! [GPUCulling] cluster buffer creation failed, disabling cluster path");
+        m_clusterSet = {};
+        return;
+    }
+
+    cmdList->writeBuffer(m_clusterSet.entryBuffer,
+        m_clusterEntryData.data(), u64(n) * sizeof(GPUClusterEntry));
+
+    u32 zeroCount = 0;
+    cmdList->writeBuffer(m_clusterSet.countBuffer, &zeroCount, sizeof(u32));
+
+    xr_vector<u32> identity(n);
+    for (u32 i = 0; i < n; ++i)
+        identity[i] = i;
+    cmdList->writeBuffer(m_clusterSet.drawIndexBuffer, identity.data(), u64(n) * sizeof(u32));
+
+    m_clusterSet.uploaded = true;
+    m_clusterEntryData.clear();
+    m_clusterEntryData.shrink_to_fit();
+
+    Msg("* [GPUCulling] cluster entry buffers uploaded: %u entries (%.1f MB)",
+        n, (u64(n) * (sizeof(GPUClusterEntry) + sizeof(IndirectDrawArgs) + 4 * sizeof(u32))) / (1024.0f * 1024.0f));
+}
+
+struct ClusterCullParamsCB {
+    Fmatrix hizViewProj;
+    Fvector4 frustumPlanes[6];
+    Fvector4 cameraPos;
+    Fvector4 viewDir;
+    Fvector4 lodParams;
+    u32 entryCount;
+    u32 useHiZ;
+    u32 hizWidth;
+    u32 hizHeight;
+    u32 hizMipLevels;
+    float ssaCull;
+    u32 pad[2];
+};
+
+bool GPUCullingManager::EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice)
+{
+    if (m_clusterCullPipeline && m_clusterCullLayout && m_clusterCullParamsCB.IsValid())
+        return true;
+
+    auto result = GEnv.Render->GetShaderLoader()->LoadComputeShader("cluster_cull");
+    if (!result.handle) {
+        Msg("! [GPUCulling] cluster_cull.cs failed to load");
+        return false;
+    }
+
+    auto& cache = framegraph::GetPassResourceCache();
+    auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_cull", ".cs");
+    if (!refl)
+        return false;
+
+    m_clusterCullLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ClusterCull", *refl, nvDevice);
+    if (!m_clusterCullLayout)
+        return false;
+
+    nvrhi::ComputePipelineDesc pipeDesc;
+    pipeDesc.CS = result.handle;
+    pipeDesc.bindingLayouts = { m_clusterCullLayout };
+    m_clusterCullPipeline = nvDevice->createComputePipeline(pipeDesc);
+    if (!m_clusterCullPipeline)
+        return false;
+
+    if (!m_clusterCullParamsCB.IsValid()) {
+        fg::RenderDevice::BufferDesc desc;
+        desc.debugName = "ClusterCull_Params";
+        desc.byteSize = sizeof(ClusterCullParamsCB);
+        desc.isConstantBuffer = true;
+        desc.isVolatile = true;
+        desc.maxVersions = 512;
+        m_clusterCullParamsCB = m_device->CreateBuffer(desc);
+    }
+
+    return m_clusterCullParamsCB.IsValid();
+}
+
+void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+    nvrhi::ITexture* hizTexture, const CullPhaseParams& phase)
+{
+    if (!ps_r_cluster || m_clusterSet.entryCount == 0 || !m_clusterSet.uploaded)
+        return;
+    if (!EnsureClusterCullPipeline(nvDevice)) {
+        Msg("! [GPUCulling] cluster cull pipeline unavailable, disabling cluster path");
+        m_clusterSet.entryCount = 0;
+        return;
+    }
+
+    u32 zero = 0;
+    cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::CopyDest);
+    cmdList->writeBuffer(m_clusterSet.countBuffer, &zero, sizeof(u32));
+
+    ClusterCullParamsCB cb = {};
+    cb.hizViewProj = Device.mFullTransform;
+    ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
+    cb.cameraPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 0.0f);
+    Fvector dir = Device.vCameraDirection;
+    dir.normalize_safe();
+    cb.viewDir.set(dir.x, dir.y, dir.z, 0.0f);
+
+    const float lodPx = std::max(0.05f, ps_r_cluster_lod);
+    const float pxScale = Device.mProject._22 * float(Device.dwHeight) * 0.5f;
+    cb.lodParams.set(pxScale / lodPx, 0.01f, 0.0f, (ps_r_cluster_lod <= 0.0501f) ? 1.0f : 0.0f);
+    cb.entryCount = m_clusterSet.entryCount;
+    cb.useHiZ = phase.useHiZ ? 1u : 0u;
+    cb.hizWidth = phase.hizWidth;
+    cb.hizHeight = phase.hizHeight;
+    cb.hizMipLevels = phase.hizMipLevels;
+    cb.ssaCull = 0.0f;
+
+    cmdList->writeBuffer(m_device->GetNativeBuffer(m_clusterCullParamsCB), &cb, sizeof(cb));
+
+    cmdList->setBufferState(m_clusterSet.cmdBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.batchIndexBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.materialIDBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.fadeBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+    auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_cull", ".cs");
+    framegraph::BindingSetBuilder bsb(*refl, nvDevice, "GPUCull.ClusterCull");
+    bsb.ConstantBuffer("ClusterCullParams", m_device->GetNativeBuffer(m_clusterCullParamsCB))
+       .BufferSRV("g_Entries", m_clusterSet.entryBuffer)
+       .Texture("g_HiZPyramid", hizTexture)
+       .BufferUAV("g_OutCmds", m_clusterSet.cmdBuffer)
+       .BufferUAV("g_OutCount", m_clusterSet.countBuffer)
+       .BufferUAV("g_OutBatchIndices", m_clusterSet.batchIndexBuffer)
+       .BufferUAV("g_OutMaterialIDs", m_clusterSet.materialIDBuffer)
+       .BufferUAV("g_OutFades", m_clusterSet.fadeBuffer);
+
+    nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), m_clusterCullLayout);
+    if (!bindingSet)
+        return;
+
+    nvrhi::ComputeState state;
+    state.pipeline = m_clusterCullPipeline;
+    state.bindings = { bindingSet };
+    cmdList->setComputeState(state);
+    cmdList->dispatch((m_clusterSet.entryCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE, 1, 1);
+
+    cmdList->setBufferState(m_clusterSet.cmdBuffer, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(m_clusterSet.batchIndexBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(m_clusterSet.materialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(m_clusterSet.fadeBuffer, nvrhi::ResourceStates::ShaderResource);
 }
 
 void GPUCullingManager::UploadInstanceData(fg::RenderContext* ctx, const GeometryCollector* geometry)

@@ -17,6 +17,7 @@ struct PS_INPUT
     float3 tangent : TEXCOORD3;
     float3 bitangent : TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;  // Index into g_TerrainMaterials
+    nointerpolation uint drawID : TEXCOORD6;
 };
 
 struct PS_OUTPUT
