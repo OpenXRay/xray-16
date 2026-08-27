@@ -735,6 +735,9 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.skinnedSubmitted = skinnedCullStats.submitted;
             stats.skinnedVisible = skinnedCullStats.visible;
             stats.skinnedCulled = skinnedCullStats.culled;
+
+            stats.clusterEntries = m_gpuCullingManager->GetClusterEntryCount();
+            stats.clusterVisible = cullStats.clusterVisible;
         }
 
         if (m_blackboard)

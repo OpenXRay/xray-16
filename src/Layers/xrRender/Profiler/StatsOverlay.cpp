@@ -541,6 +541,18 @@ void StatsOverlay::RenderGeometrySection()
         }
 
         // ═══════════════════════════════════════════════════
+        //  CLUSTER LOD STATS
+        // ═══════════════════════════════════════════════════
+        if (s.clusterEntries > 0)
+        {
+            ImGui::Text("Cluster LOD:");
+            ImGui::Indent();
+            float drawRate = 100.0f * s.clusterVisible / s.clusterEntries;
+            ImGui::Text("Entries: %u/%u drawn (%.1f%%)", s.clusterVisible, s.clusterEntries, drawRate);
+            ImGui::Unindent();
+        }
+
+        // ═══════════════════════════════════════════════════
         //  PARTICLE CULLING STATS
         // ═══════════════════════════════════════════════════
         if (s.particleCullSubmitted > 0)

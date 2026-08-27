@@ -1676,12 +1676,12 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
     if (!nvDevice)
         return;
 
-    // Create readback buffer on first use (4 u32s: static, dynamic, terrain, skinned)
+    // Create readback buffer on first use (5 u32s: static, dynamic, terrain, skinned, cluster)
     nvrhi::BufferHandle& slot = m_statsReadbackBuffers[m_statsWriteSlot];
     if (!slot)
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32) * 4;
+        desc.byteSize = sizeof(u32) * 5;
         desc.debugName = "CullingStatsReadback";
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
@@ -1734,6 +1734,15 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
     }
     m_statsSubmittedSkinned[m_statsWriteSlot] = m_skinnedObjectCount;
 
+    if (m_clusterSet.countBuffer)
+    {
+        cmdList->copyBuffer(
+            slot, sizeof(u32) * 4,
+            m_clusterSet.countBuffer, 0,
+            sizeof(u32)
+        );
+    }
+
     m_statsWriteSlot = (m_statsWriteSlot + 1) % STATS_READBACK_SLOTS;
     if (m_statsScheduled < STATS_READBACK_SLOTS)
         ++m_statsScheduled;
@@ -1764,6 +1773,7 @@ void GPUCullingManager::ProcessStatsReadback()
         m_cullingStats.staticVisible = counts[0];
         m_cullingStats.dynamicVisible = counts[1];
         m_cullingStats.terrainVisible = counts[2];
+        m_cullingStats.clusterVisible = std::min(counts[4], m_clusterSet.entryCount);
 
         const u32 skinnedSubmitted = m_statsSubmittedSkinned[m_statsWriteSlot];
         const u32 skinnedVisible = std::min(counts[3], skinnedSubmitted);
