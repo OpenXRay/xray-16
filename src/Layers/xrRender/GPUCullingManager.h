@@ -770,7 +770,7 @@ public:
     // Bake the cluster LOD DAG over CPU-resident mega arrays and append
     // cluster index data to the mega-IB. Must run between the last
     // RegisterVBPool/RegisterIBPool call and EndLevelLoad.
-    void BakeClusterDAG(const xr_vector<ClusterMeshKey>& ranges);
+    void BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges);
     ClusterDAG& GetClusterDAG() { return m_clusterDAG; }
 
     // Detect vertex format from vertex declaration
