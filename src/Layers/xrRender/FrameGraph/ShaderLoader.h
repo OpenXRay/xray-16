@@ -3,6 +3,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include "ShaderCache.h"
+#include "xrCommon/xr_set.h"
 #include <filesystem>
 
 #include "Layers/xrRender/Shaders/SlangCompiler.h"
@@ -112,6 +113,9 @@ private:
     );
 
     IReader* OpenShaderFile(const char* name, const char* extension);
+
+    u32 ComputeSourceHash(const char* source, size_t sourceLen, const char* macros = nullptr);
+    void AccumulateIncludeHashes(const char* source, size_t sourceLen, u32& hash, xr_set<xr_string>& visited);
 
 public:
     void SetTarget(xray::render::SlangCompiler::Target target) {
