@@ -324,6 +324,7 @@ static void renderBindlessForward(
             auto* terrainPsRefl = shaderLoader->GetCachedReflection("bindless_terrain", ".ps");
             framegraph::BindingSetBuilder terrainBsb(*terrainVsRefl, *terrainPsRefl, nvDevice, "ForwardColor.Terrain");
             terrainBsb.ConstantBuffer("static_globals", staticGlobalsCB);
+            terrainBsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
             terrainBsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
             terrainBsb.BufferSRV("g_InstanceData", config.terrainInstanceBuffer);
             terrainBsb.BufferSRV("g_CompactBatchIndices", config.terrainCompactBatchIndicesBuffer);

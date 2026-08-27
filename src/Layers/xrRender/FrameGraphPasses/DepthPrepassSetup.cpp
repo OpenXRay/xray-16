@@ -32,19 +32,21 @@ static void InitializeDepthPrepassResources(fg::RenderDevice* device, DepthPrepa
 
     auto vsResult = shaderLoader->LoadVertexShader("bindless_forward", "main");
     auto psResult = shaderLoader->LoadPixelShader("bindless_depth_at", "main");
+    auto psOpaqueResult = shaderLoader->LoadPixelShader("bindless_depth_opaque", "main");
 
-    if (!vsResult.handle || !psResult.handle) {
+    if (!vsResult.handle || !psResult.handle || !psOpaqueResult.handle) {
         Msg("! [DepthPrepass] Failed to load shaders");
         return;
     }
 
     state.vs = vsResult.handle;
     state.ps = psResult.handle;
+    state.psOpaque = psOpaqueResult.handle;
 
     auto& cache = framegraph::GetPassResourceCache();
 
     state.layout = cache.GetOrCreateBindingLayoutFromReflection("DepthPrepass", *vsResult.reflection, *psResult.reflection, nvDevice);
-    state.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection("DepthPrepass_Terrain", *vsResult.reflection, nvDevice);
+    state.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection("DepthPrepass_Terrain", *vsResult.reflection, *psOpaqueResult.reflection, nvDevice);
 
     u32 attrCount = 0;
     auto* attrs = GetUnifiedVertexAttributes(attrCount);
@@ -80,6 +82,7 @@ static void InitializeDepthPrepassResources(fg::RenderDevice* device, DepthPrepa
     if (state.terrainLayout) {
         nvrhi::GraphicsPipelineDesc terrainPipeDesc;
         terrainPipeDesc.VS = state.vs;
+        terrainPipeDesc.PS = state.psOpaque;
         terrainPipeDesc.inputLayout = state.inputLayout;
         terrainPipeDesc.bindingLayouts = { state.terrainLayout };
         terrainPipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
@@ -191,7 +194,11 @@ static void renderDepthPrepass(
     drawSet(config.dynamicSet);
 
     if (config.HasTerrain() && config.UseTerrainCompaction() && ps.terrainPipeline) {
-        framegraph::BindingSetBuilder terrainBsb(*vsReflection, nvDevice, "DepthPrepass.Terrain");
+        auto* psOpaqueReflection = shaderLoader->GetCachedReflection("bindless_depth_opaque", ".ps");
+        if (!psOpaqueReflection)
+            return;
+
+        framegraph::BindingSetBuilder terrainBsb(*vsReflection, *psOpaqueReflection, nvDevice, "DepthPrepass.Terrain");
         terrainBsb.ConstantBuffer("static_globals", staticGlobalsCB);
         terrainBsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
         terrainBsb.BufferSRV("g_InstanceData", config.terrainInstanceBuffer);

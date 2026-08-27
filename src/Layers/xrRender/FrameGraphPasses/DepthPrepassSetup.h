@@ -28,6 +28,7 @@ struct DepthPrepassState {
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
+    nvrhi::ShaderHandle psOpaque;
     bool initialized = false;
 };
 
