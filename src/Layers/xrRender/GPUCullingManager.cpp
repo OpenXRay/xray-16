@@ -44,7 +44,7 @@ constexpr u32 COMPACT_THREAD_GROUP_SIZE = 256;  // Must match batch_compact_* sh
 
 struct CullParamsCB {
     Fmatrix viewProj;           // Current frame view-projection (for frustum culling)
-    Fmatrix prevViewProj;       // Previous frame view-projection (for Hi-Z sampling)
+    Fmatrix hizViewProj;        // View-projection the Hi-Z pyramid depth was rendered with
     Fvector cameraPos;          // Camera world position
     float maxDistanceSq;        // Maximum render distance (squared)
     Fvector4 frustumPlanes[6];  // View frustum planes
@@ -53,7 +53,8 @@ struct CullParamsCB {
     u32 hizHeight;              // Hi-Z pyramid height
     u32 hizMipLevels;           // Hi-Z mip levels
     u32 frameId;                // Frame stamp for visibility
-    u32 padding[3];
+    u32 useHiZ;                 // 0 = prepass phase, 1 = color phase
+    u32 padding[2];
 };
 
 // ═══════════════════════════════════════════════════════
@@ -275,6 +276,19 @@ void GPUCullingManager::CreateBuffers(fg::RenderDevice* device)
         desc.addressW = nvrhi::SamplerAddressMode::Clamp;
 
         m_pointSampler = nvDevice->createSampler(desc);
+    }
+
+    {
+        nvrhi::TextureDesc desc;
+        desc.debugName = "GPUCull_DummyHiZ";
+        desc.width = 1;
+        desc.height = 1;
+        desc.format = nvrhi::Format::R32_FLOAT;
+        desc.isShaderResource = true;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+
+        m_dummyHiZ = nvDevice->createTexture(desc);
     }
 
     // ───────────────────────────────────────────────────────
@@ -1838,6 +1852,11 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         if (batch.IsStrictB2F())
             obj.flags |= GPU_OBJECT_TRANSPARENT;
 
+        if (const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(batch.bindlessMaterialID)) {
+            if (mat->shaderVariant != 0 || (mat->flags & bindless::MAT_FLAG_ALPHA_BLEND))
+                obj.flags |= GPU_OBJECT_PREPASS_SKIP;
+        }
+
         obj.pad0 = 0.0f;
         obj.pad1 = 0.0f;
 
@@ -2498,14 +2517,326 @@ void GPUCullingManager::ExtractFrustumPlanes(Fmatrix& M, Fvector4* outPlanes)
 //  SETUP CULLING PASS
 // ═══════════════════════════════════════════════════════
 
+void GPUCullingManager::ExecuteCullPhase(fg::RenderContext* ctx, nvrhi::ITexture* hizTexture, const CullPhaseParams& phase)
+{
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+
+    if (!hizTexture)
+        return;
+
+    auto fillCullParams = [&](CullParamsCB& cb, u32 objectCount) {
+        cb.viewProj = Device.mFullTransform;
+        cb.hizViewProj = Device.mFullTransform;
+        cb.cameraPos = Device.vCameraPosition;
+        float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
+        cb.maxDistanceSq = farPlane * farPlane;
+        cb.objectCount = objectCount;
+        cb.hizWidth = phase.hizWidth;
+        cb.hizHeight = phase.hizHeight;
+        cb.hizMipLevels = phase.hizMipLevels;
+        cb.frameId = phase.stamp;
+        cb.useHiZ = phase.useHiZ ? 1u : 0u;
+        cb.padding[0] = cb.padding[1] = 0;
+        ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
+    };
+
+    struct CompactParamsCB {
+        u32 batchCount;
+        u32 frameId;
+        u32 padding[2];
+    };
+
+    auto dispatchCullSet = [&](CullSetBuffers& set, VariantPartitionBuffers* partition) {
+        if (set.objectCount == 0)
+            return;
+
+        R_ASSERT2(set.objectBuffer && set.visibleIndexBuffer && set.visibleCountBuffer && set.visibilityBuffer,
+            "Cull set buffers not initialized");
+
+        u32 zero = 0;
+        cmdList->writeBuffer(set.visibleCountBuffer, &zero, sizeof(u32));
+
+        CullParamsCB cb;
+        fillCullParams(cb, set.objectCount);
+        cmdList->writeBuffer(m_device->GetNativeBuffer(m_cullParamsCB), &cb, sizeof(cb));
+
+        auto* objectCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("object_cull", ".cs");
+        framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice, "GPUCull.ObjectCull");
+        bsb.ConstantBuffer("CullParams", m_device->GetNativeBuffer(m_cullParamsCB))
+           .BufferSRV("g_Objects", set.objectBuffer)
+           .Texture("g_HiZPyramid", hizTexture)
+           .BufferUAV("g_VisibleIndices", set.visibleIndexBuffer)
+           .BufferUAV("g_VisibleCount", set.visibleCountBuffer)
+           .BufferUAV("g_Visibility", set.visibilityBuffer);
+
+        nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), m_cullLayout);
+        R_ASSERT2(bindingSet, "Failed to create culling binding set");
+
+        nvrhi::ComputeState state;
+        state.pipeline = m_cullPipeline;
+        state.bindings = { bindingSet };
+        cmdList->setComputeState(state);
+
+        u32 groupCount = (set.objectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
+        cmdList->dispatch(groupCount, 1, 1);
+
+        if (m_compactEnabled) {
+            R_ASSERT2(set.drawArgsBuffer && set.materialIDBuffer &&
+                          set.compactDrawArgsBuffer && set.compactBatchIndicesBuffer &&
+                          set.compactMaterialIDBuffer && set.compactCountBuffer &&
+                          set.compactLocalPrefixBuffer && set.compactGroupCountsBuffer &&
+                          set.compactGroupOffsetsBuffer,
+                "Compaction buffers not initialized");
+            R_ASSERT2(m_compactCountPipeline && m_compactScanPipeline && m_compactScatterPipeline,
+                "Compaction pipelines not initialized");
+
+            u32 compactGroupCount = (set.objectCount + COMPACT_THREAD_GROUP_SIZE - 1) / COMPACT_THREAD_GROUP_SIZE;
+            if (compactGroupCount > 0) {
+                R_ASSERT2(compactGroupCount <= COMPACT_THREAD_GROUP_SIZE,
+                    "Compaction group count exceeds scan group size");
+            }
+
+            CompactParamsCB compactCB;
+            compactCB.batchCount = set.objectCount;
+            compactCB.frameId = phase.stamp;
+            compactCB.padding[0] = compactCB.padding[1] = 0;
+            cmdList->writeBuffer(m_device->GetNativeBuffer(m_compactParamsCB), &compactCB, sizeof(compactCB));
+
+            if (compactGroupCount == 0) {
+                u32 zeroCount = 0;
+                cmdList->writeBuffer(set.compactCountBuffer, &zeroCount, sizeof(u32));
+                u32 zeroDispatch[3] = { 0, 1, 1 };
+                cmdList->writeBuffer(set.compactDispatchArgsBuffer, zeroDispatch, sizeof(zeroDispatch));
+            } else {
+                cmdList->setBufferState(set.visibilityBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->setBufferState(set.compactLocalPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
+                cmdList->setBufferState(set.compactGroupCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+                auto* compactCountRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact_count", ".cs");
+                framegraph::BindingSetBuilder countBsb(*compactCountRefl, nvDevice);
+                countBsb.ConstantBuffer("CompactParams", m_device->GetNativeBuffer(m_compactParamsCB))
+                       .BufferSRV("g_Visibility", set.visibilityBuffer)
+                       .BufferUAV("g_LocalPrefix", set.compactLocalPrefixBuffer)
+                       .BufferUAV("g_GroupCounts", set.compactGroupCountsBuffer);
+
+                nvrhi::BindingSetHandle countBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(countBsb.Build(), m_compactCountLayout, nvDevice);
+                R_ASSERT2(countBindingSet, "Failed to create compaction count binding set");
+
+                nvrhi::ComputeState countState;
+                countState.pipeline = m_compactCountPipeline;
+                countState.bindings = { countBindingSet };
+                cmdList->setComputeState(countState);
+                cmdList->dispatch(compactGroupCount, 1, 1);
+
+                cmdList->setBufferState(set.compactGroupCountsBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->setBufferState(set.compactGroupOffsetsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+                cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
+                cmdList->setBufferState(set.compactDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+                auto* compactScanRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact_scan", ".cs");
+                framegraph::BindingSetBuilder scanBsb(*compactScanRefl, nvDevice);
+                scanBsb.ConstantBuffer("CompactParams", m_device->GetNativeBuffer(m_compactParamsCB))
+                       .BufferSRV("g_GroupCounts", set.compactGroupCountsBuffer)
+                       .BufferUAV("g_GroupOffsets", set.compactGroupOffsetsBuffer)
+                       .BufferUAV("g_VisibleCount", set.compactCountBuffer)
+                       .BufferUAV("g_DispatchArgs", set.compactDispatchArgsBuffer);
+
+                nvrhi::BindingSetHandle scanBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(scanBsb.Build(), m_compactScanLayout, nvDevice);
+                R_ASSERT2(scanBindingSet, "Failed to create compaction scan binding set");
+
+                nvrhi::ComputeState scanState;
+                scanState.pipeline = m_compactScanPipeline;
+                scanState.bindings = { scanBindingSet };
+                cmdList->setComputeState(scanState);
+                cmdList->dispatch(1, 1, 1);
+
+                cmdList->setBufferState(set.compactLocalPrefixBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->setBufferState(set.compactGroupOffsetsBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->setBufferState(set.drawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->setBufferState(set.materialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->setBufferState(set.compactDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+                cmdList->setBufferState(set.compactBatchIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
+                cmdList->setBufferState(set.compactMaterialIDBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+                auto* compactScatterRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact", ".cs");
+                framegraph::BindingSetBuilder scatterBsb(*compactScatterRefl, nvDevice);
+                scatterBsb.ConstantBuffer("CompactParams", m_device->GetNativeBuffer(m_compactParamsCB))
+                          .BufferSRV("g_InputDrawArgs", set.drawArgsBuffer)
+                          .BufferSRV("g_InputMaterialIDs", set.materialIDBuffer)
+                          .BufferSRV("g_Visibility", set.visibilityBuffer)
+                          .BufferSRV("g_LocalPrefix", set.compactLocalPrefixBuffer)
+                          .BufferSRV("g_GroupOffsets", set.compactGroupOffsetsBuffer)
+                          .BufferUAV("g_OutputDrawArgs", set.compactDrawArgsBuffer)
+                          .BufferUAV("g_VisibleBatchIndices", set.compactBatchIndicesBuffer)
+                          .BufferUAV("g_OutputMaterialIDs", set.compactMaterialIDBuffer);
+
+                nvrhi::BindingSetHandle scatterBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(scatterBsb.Build(), m_compactScatterLayout, nvDevice);
+                R_ASSERT2(scatterBindingSet, "Failed to create compaction scatter binding set");
+
+                nvrhi::ComputeState scatterState;
+                scatterState.pipeline = m_compactScatterPipeline;
+                scatterState.bindings = { scatterBindingSet };
+                cmdList->setComputeState(scatterState);
+                cmdList->dispatch(compactGroupCount, 1, 1);
+            }
+
+            if (partition && m_variantPartitionEnabled) {
+                DispatchVariantPartition(cmdList, nvDevice, set, *partition);
+            }
+
+            cmdList->setBufferState(set.compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+            cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
+        }
+    };
+
+    dispatchCullSet(m_staticSet,
+        (phase.runPartition && m_variantPartitionEnabled) ? &m_staticPartition : nullptr);
+    dispatchCullSet(m_dynamicSet, nullptr);
+
+    if (m_terrainObjectCount > 0 && m_terrainObjectBuffer && m_terrainDrawArgsBuffer) {
+        u32 zeroTerrain = 0;
+        cmdList->writeBuffer(m_terrainVisibleCountBuffer, &zeroTerrain, sizeof(u32));
+
+        CullParamsCB terrainCB;
+        fillCullParams(terrainCB, m_terrainObjectCount);
+        cmdList->writeBuffer(m_device->GetNativeBuffer(m_cullParamsCB), &terrainCB, sizeof(terrainCB));
+
+        auto* objectCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("object_cull", ".cs");
+        framegraph::BindingSetBuilder terrainBsb(*objectCullRefl, nvDevice, "GPUCull.TerrainCull");
+        terrainBsb.ConstantBuffer("CullParams", m_device->GetNativeBuffer(m_cullParamsCB))
+                  .BufferSRV("g_Objects", m_terrainObjectBuffer)
+                  .Texture("g_HiZPyramid", hizTexture)
+                  .BufferUAV("g_VisibleIndices", m_terrainVisibleIndexBuffer)
+                  .BufferUAV("g_VisibleCount", m_terrainVisibleCountBuffer)
+                  .BufferUAV("g_Visibility", m_terrainVisibilityBuffer);
+
+        nvrhi::BindingSetHandle terrainBindingSet = nvDevice->createBindingSet(terrainBsb.Build(), m_cullLayout);
+        R_ASSERT2(terrainBindingSet, "Terrain culling binding set creation failed");
+
+        nvrhi::ComputeState terrainState;
+        terrainState.pipeline = m_cullPipeline;
+        terrainState.bindings = { terrainBindingSet };
+        cmdList->setComputeState(terrainState);
+
+        u32 terrainGroupCount = (m_terrainObjectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
+        cmdList->dispatch(terrainGroupCount, 1, 1);
+
+        R_ASSERT2(m_compactEnabled, "Terrain compaction requires batch compaction to be enabled");
+        R_ASSERT2(m_compactCountPipeline && m_compactScanPipeline && m_compactScatterPipeline,
+            "Terrain compaction pipelines not initialized");
+        R_ASSERT2(m_terrainCompactDrawArgsBuffer && m_terrainCompactBatchIndicesBuffer &&
+                      m_terrainCompactMaterialIDBuffer && m_terrainCompactCountBuffer &&
+                      m_terrainCompactLocalPrefixBuffer && m_terrainCompactGroupCountsBuffer &&
+                      m_terrainCompactGroupOffsetsBuffer,
+            "Terrain compaction buffers not initialized");
+        R_ASSERT2(m_terrainMaterialIDBuffer, "Terrain material ID buffer missing");
+
+        CompactParamsCB terrainCompactCB;
+        terrainCompactCB.batchCount = m_terrainObjectCount;
+        terrainCompactCB.frameId = phase.stamp;
+        terrainCompactCB.padding[0] = terrainCompactCB.padding[1] = 0;
+        cmdList->writeBuffer(m_device->GetNativeBuffer(m_compactParamsCB), &terrainCompactCB, sizeof(terrainCompactCB));
+
+        u32 terrainCompactGroupCount =
+            (m_terrainObjectCount + COMPACT_THREAD_GROUP_SIZE - 1) / COMPACT_THREAD_GROUP_SIZE;
+        if (terrainCompactGroupCount > 0) {
+            R_ASSERT2(terrainCompactGroupCount <= COMPACT_THREAD_GROUP_SIZE,
+                "Terrain compaction group count exceeds scan group size");
+        }
+
+        if (terrainCompactGroupCount == 0) {
+            u32 zeroTerrainCount = 0;
+            cmdList->writeBuffer(m_terrainCompactCountBuffer, &zeroTerrainCount, sizeof(u32));
+        } else {
+            cmdList->setBufferState(m_terrainVisibilityBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(m_terrainCompactLocalPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
+            cmdList->setBufferState(m_terrainCompactGroupCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+            auto* compactCountRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact_count", ".cs");
+            framegraph::BindingSetBuilder terrainCountBsb(*compactCountRefl, nvDevice);
+            terrainCountBsb.ConstantBuffer("CompactParams", m_device->GetNativeBuffer(m_compactParamsCB))
+                           .BufferSRV("g_Visibility", m_terrainVisibilityBuffer)
+                           .BufferUAV("g_LocalPrefix", m_terrainCompactLocalPrefixBuffer)
+                           .BufferUAV("g_GroupCounts", m_terrainCompactGroupCountsBuffer);
+
+            nvrhi::BindingSetHandle terrainCountBindingSet =
+                framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainCountBsb.Build(), m_compactCountLayout, nvDevice);
+            R_ASSERT2(terrainCountBindingSet, "Terrain compaction count binding set creation failed");
+
+            nvrhi::ComputeState terrainCountState;
+            terrainCountState.pipeline = m_compactCountPipeline;
+            terrainCountState.bindings = { terrainCountBindingSet };
+            cmdList->setComputeState(terrainCountState);
+            cmdList->dispatch(terrainCompactGroupCount, 1, 1);
+
+            cmdList->setBufferState(m_terrainCompactGroupCountsBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(m_terrainCompactGroupOffsetsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+            cmdList->setBufferState(m_terrainCompactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
+            cmdList->setBufferState(m_terrainCompactDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+            auto* compactScanRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact_scan", ".cs");
+            framegraph::BindingSetBuilder terrainScanBsb(*compactScanRefl, nvDevice);
+            terrainScanBsb.ConstantBuffer("CompactParams", m_device->GetNativeBuffer(m_compactParamsCB))
+                          .BufferSRV("g_GroupCounts", m_terrainCompactGroupCountsBuffer)
+                          .BufferUAV("g_GroupOffsets", m_terrainCompactGroupOffsetsBuffer)
+                          .BufferUAV("g_VisibleCount", m_terrainCompactCountBuffer)
+                          .BufferUAV("g_DispatchArgs", m_terrainCompactDispatchArgsBuffer);
+
+            nvrhi::BindingSetHandle terrainScanBindingSet =
+                framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainScanBsb.Build(), m_compactScanLayout, nvDevice);
+            R_ASSERT2(terrainScanBindingSet, "Terrain compaction scan binding set creation failed");
+
+            nvrhi::ComputeState terrainScanState;
+            terrainScanState.pipeline = m_compactScanPipeline;
+            terrainScanState.bindings = { terrainScanBindingSet };
+            cmdList->setComputeState(terrainScanState);
+            cmdList->dispatch(1, 1, 1);
+
+            cmdList->setBufferState(m_terrainCompactLocalPrefixBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(m_terrainCompactGroupOffsetsBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(m_terrainDrawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(m_terrainMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(m_terrainCompactDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+            cmdList->setBufferState(m_terrainCompactBatchIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
+            cmdList->setBufferState(m_terrainCompactMaterialIDBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+            auto* compactScatterRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact", ".cs");
+            framegraph::BindingSetBuilder terrainScatterBsb(*compactScatterRefl, nvDevice);
+            terrainScatterBsb.ConstantBuffer("CompactParams", m_device->GetNativeBuffer(m_compactParamsCB))
+                             .BufferSRV("g_InputDrawArgs", m_terrainDrawArgsBuffer)
+                             .BufferSRV("g_InputMaterialIDs", m_terrainMaterialIDBuffer)
+                             .BufferSRV("g_Visibility", m_terrainVisibilityBuffer)
+                             .BufferSRV("g_LocalPrefix", m_terrainCompactLocalPrefixBuffer)
+                             .BufferSRV("g_GroupOffsets", m_terrainCompactGroupOffsetsBuffer)
+                             .BufferUAV("g_OutputDrawArgs", m_terrainCompactDrawArgsBuffer)
+                             .BufferUAV("g_VisibleBatchIndices", m_terrainCompactBatchIndicesBuffer)
+                             .BufferUAV("g_OutputMaterialIDs", m_terrainCompactMaterialIDBuffer);
+
+            nvrhi::BindingSetHandle terrainScatterBindingSet =
+                framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainScatterBsb.Build(), m_compactScatterLayout, nvDevice);
+            R_ASSERT2(terrainScatterBindingSet, "Terrain compaction scatter binding set creation failed");
+
+            nvrhi::ComputeState terrainScatterState;
+            terrainScatterState.pipeline = m_compactScatterPipeline;
+            terrainScatterState.bindings = { terrainScatterBindingSet };
+            cmdList->setComputeState(terrainScatterState);
+            cmdList->dispatch(terrainCompactGroupCount, 1, 1);
+        }
+
+        cmdList->setBufferState(m_terrainCompactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+        cmdList->setBufferState(m_terrainCompactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
+    }
+
+    if (phase.includeTransparent) {
+        dispatchCullSet(m_transparentSet,
+            (phase.runPartition && m_variantPartitionEnabled) ? &m_transparentPartition : nullptr);
+    }
+}
+
 GPUCullOutput GPUCullingManager::SetupCullingPass(
     framegraph::FrameGraph& fg,
-    framegraph::VirtualResourceHandle hizPyramid,
-    u32 hizWidth,
-    u32 hizHeight,
-    u32 hizMipLevels,
-    const GeometryCollector* geometry,
-    const Fmatrix& prevViewProj)
+    const GeometryCollector* geometry)
 {
     using namespace framegraph;
 
@@ -2545,16 +2876,11 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     }
 
     struct GPUCullPassData {
-        VirtualResourceHandle hizPyramid;
-        VirtualResourceHandle staticDrawArgsBuffer;   // For framegraph tracking
-        VirtualResourceHandle dynamicDrawArgsBuffer;  // For framegraph tracking
+        VirtualResourceHandle staticDrawArgsBuffer;
+        VirtualResourceHandle dynamicDrawArgsBuffer;
 
         GPUCullingManager* manager;
-        const GeometryCollector* geometry;  // For uploading during execute
-        Fmatrix prevViewProj;  // Previous frame's viewProj for temporal Hi-Z
-        u32 hizWidth;
-        u32 hizHeight;
-        u32 hizMipLevels;
+        const GeometryCollector* geometry;
     };
 
     // Import draw args buffers into framegraph for proper state tracking
@@ -2574,21 +2900,13 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
         "GPU Culling",
 
         // Setup lambda
-        [&, hizWidth, hizHeight, hizMipLevels, staticDrawArgsHandle, dynamicDrawArgsHandle, geometry, prevViewProj](FrameGraph& builder, PassHandle passHandle, GPUCullPassData& data) {
+        [&, staticDrawArgsHandle, dynamicDrawArgsHandle, geometry](FrameGraph& builder, PassHandle passHandle, GPUCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             passBuilder.asyncCompute();
 
             data.manager = this;
-            data.geometry = geometry;  // Capture for upload during execute
-            data.prevViewProj = prevViewProj;  // Previous frame's viewProj for temporal Hi-Z
-            data.hizWidth = hizWidth;
-            data.hizHeight = hizHeight;
-            data.hizMipLevels = hizMipLevels;
+            data.geometry = geometry;
 
-            // Read Hi-Z pyramid
-            data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
-
-            // Write draw args buffers (for dependency tracking)
             data.staticDrawArgsBuffer = passBuilder.write(staticDrawArgsHandle, ResourceState::UnorderedAccess);
             data.dynamicDrawArgsBuffer = passBuilder.write(dynamicDrawArgsHandle, ResourceState::UnorderedAccess);
         },
@@ -2603,8 +2921,6 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 return;
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-
-            nvrhi::IDevice* nvDevice = mgr->m_device->GetNVRHIDevice();
             u32 frameId = Device.dwFrame + 1u;
             if (frameId == 0)
                 frameId = 1;
@@ -2627,356 +2943,15 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 }
             }
 
-            // Get Hi-Z texture
-            nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
-            if (!hizTexture) {
-                Msg("! [GPUCulling] Hi-Z texture not available");
-                return;
-            }
-
-            auto dispatchCullSet = [&](CullSetBuffers& set, VariantPartitionBuffers* partition = nullptr) {
-                if (set.objectCount == 0)
-                    return;
-
-                R_ASSERT2(set.objectBuffer && set.visibleIndexBuffer && set.visibleCountBuffer && set.visibilityBuffer,
-                    "Cull set buffers not initialized");
-
-                // Clear visible count to 0
-                u32 zero = 0;
-                cmdList->writeBuffer(set.visibleCountBuffer, &zero, sizeof(u32));
-
-                // Fill constant buffer
-                CullParamsCB cb;
-                cb.viewProj = Device.mFullTransform;
-                cb.prevViewProj = data.prevViewProj;  // Previous frame's viewProj for temporal Hi-Z
-                cb.cameraPos = Device.vCameraPosition;
-                float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
-                cb.maxDistanceSq = farPlane * farPlane;
-                cb.objectCount = set.objectCount;
-                cb.hizWidth = data.hizWidth;
-                cb.hizHeight = data.hizHeight;
-                cb.hizMipLevels = data.hizMipLevels;
-                cb.frameId = frameId;
-                cb.padding[0] = cb.padding[1] = cb.padding[2] = 0;
-
-                mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
-
-                cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB), &cb, sizeof(cb));
-
-                auto* objectCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("object_cull", ".cs");
-                framegraph::BindingSetBuilder bsb(*objectCullRefl, nvDevice, "GPUCull.ObjectCull");
-                bsb.ConstantBuffer("CullParams", mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB))
-                   .BufferSRV("g_Objects", set.objectBuffer)
-                   .Texture("g_HiZPyramid", hizTexture)
-                   .BufferUAV("g_VisibleIndices", set.visibleIndexBuffer)
-                   .BufferUAV("g_VisibleCount", set.visibleCountBuffer)
-                   .BufferUAV("g_Visibility", set.visibilityBuffer);
-
-                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), mgr->m_cullLayout);
-                R_ASSERT2(bindingSet, "Failed to create culling binding set");
-
-                // Set compute state and dispatch culling
-                nvrhi::ComputeState state;
-                state.pipeline = mgr->m_cullPipeline;
-                state.bindings = { bindingSet };
-                cmdList->setComputeState(state);
-
-                u32 groupCount = (set.objectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
-                cmdList->dispatch(groupCount, 1, 1);
-
-                // ─────────────────────────────────────────────────────
-                //  BATCH COMPACTION PASS
-                // ─────────────────────────────────────────────────────
-                if (mgr->m_compactEnabled) {
-                    R_ASSERT2(set.drawArgsBuffer && set.materialIDBuffer &&
-                                  set.compactDrawArgsBuffer && set.compactBatchIndicesBuffer &&
-                                  set.compactMaterialIDBuffer && set.compactCountBuffer &&
-                                  set.compactLocalPrefixBuffer && set.compactGroupCountsBuffer &&
-                                  set.compactGroupOffsetsBuffer,
-                        "Compaction buffers not initialized");
-                    R_ASSERT2(mgr->m_compactCountPipeline && mgr->m_compactScanPipeline && mgr->m_compactScatterPipeline,
-                        "Compaction pipelines not initialized");
-
-                    u32 compactGroupCount = (set.objectCount + COMPACT_THREAD_GROUP_SIZE - 1) / COMPACT_THREAD_GROUP_SIZE;
-                    if (compactGroupCount > 0) {
-                        R_ASSERT2(compactGroupCount <= COMPACT_THREAD_GROUP_SIZE,
-                            "Compaction group count exceeds scan group size");
-                    }
-
-                    struct CompactParamsCB {
-                        u32 batchCount;
-                        u32 frameId;
-                        u32 padding[2];
-                    };
-                    CompactParamsCB compactCB;
-                    compactCB.batchCount = set.objectCount;
-                    compactCB.frameId = frameId;
-                    compactCB.padding[0] = compactCB.padding[1] = 0;
-                    cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB), &compactCB, sizeof(compactCB));
-
-                    if (compactGroupCount == 0) {
-                        u32 zeroCount = 0;
-                        cmdList->writeBuffer(set.compactCountBuffer, &zeroCount, sizeof(u32));
-                        u32 zeroDispatch[3] = { 0, 1, 1 };
-                        cmdList->writeBuffer(set.compactDispatchArgsBuffer, zeroDispatch, sizeof(zeroDispatch));
-                    } else {
-                        cmdList->setBufferState(set.visibilityBuffer, nvrhi::ResourceStates::ShaderResource);
-                        cmdList->setBufferState(set.compactLocalPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
-                        cmdList->setBufferState(set.compactGroupCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-                        auto* compactCountRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact_count", ".cs");
-                        framegraph::BindingSetBuilder countBsb(*compactCountRefl, nvDevice);
-                        countBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
-                               .BufferSRV("g_Visibility", set.visibilityBuffer)
-                               .BufferUAV("g_LocalPrefix", set.compactLocalPrefixBuffer)
-                               .BufferUAV("g_GroupCounts", set.compactGroupCountsBuffer);
-
-                        nvrhi::BindingSetHandle countBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(countBsb.Build(), mgr->m_compactCountLayout, nvDevice);
-                        R_ASSERT2(countBindingSet, "Failed to create compaction count binding set");
-
-                        nvrhi::ComputeState countState;
-                        countState.pipeline = mgr->m_compactCountPipeline;
-                        countState.bindings = { countBindingSet };
-                        cmdList->setComputeState(countState);
-                        cmdList->dispatch(compactGroupCount, 1, 1);
-
-                        cmdList->setBufferState(set.compactGroupCountsBuffer, nvrhi::ResourceStates::ShaderResource);
-                        cmdList->setBufferState(set.compactGroupOffsetsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-                        cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
-                        cmdList->setBufferState(set.compactDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-                        auto* compactScanRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact_scan", ".cs");
-                        framegraph::BindingSetBuilder scanBsb(*compactScanRefl, nvDevice);
-                        scanBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
-                               .BufferSRV("g_GroupCounts", set.compactGroupCountsBuffer)
-                               .BufferUAV("g_GroupOffsets", set.compactGroupOffsetsBuffer)
-                               .BufferUAV("g_VisibleCount", set.compactCountBuffer)
-                               .BufferUAV("g_DispatchArgs", set.compactDispatchArgsBuffer);
-
-                        nvrhi::BindingSetHandle scanBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(scanBsb.Build(), mgr->m_compactScanLayout, nvDevice);
-                        R_ASSERT2(scanBindingSet, "Failed to create compaction scan binding set");
-
-                        nvrhi::ComputeState scanState;
-                        scanState.pipeline = mgr->m_compactScanPipeline;
-                        scanState.bindings = { scanBindingSet };
-                        cmdList->setComputeState(scanState);
-                        cmdList->dispatch(1, 1, 1);
-
-                        cmdList->setBufferState(set.compactLocalPrefixBuffer, nvrhi::ResourceStates::ShaderResource);
-                        cmdList->setBufferState(set.compactGroupOffsetsBuffer, nvrhi::ResourceStates::ShaderResource);
-                        cmdList->setBufferState(set.drawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
-                        cmdList->setBufferState(set.materialIDBuffer, nvrhi::ResourceStates::ShaderResource);
-                        cmdList->setBufferState(set.compactDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-                        cmdList->setBufferState(set.compactBatchIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
-                        cmdList->setBufferState(set.compactMaterialIDBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-                        auto* compactScatterRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact", ".cs");
-                        framegraph::BindingSetBuilder scatterBsb(*compactScatterRefl, nvDevice);
-                        scatterBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
-                                  .BufferSRV("g_InputDrawArgs", set.drawArgsBuffer)
-                                  .BufferSRV("g_InputMaterialIDs", set.materialIDBuffer)
-                                  .BufferSRV("g_Visibility", set.visibilityBuffer)
-                                  .BufferSRV("g_LocalPrefix", set.compactLocalPrefixBuffer)
-                                  .BufferSRV("g_GroupOffsets", set.compactGroupOffsetsBuffer)
-                                  .BufferUAV("g_OutputDrawArgs", set.compactDrawArgsBuffer)
-                                  .BufferUAV("g_VisibleBatchIndices", set.compactBatchIndicesBuffer)
-                                  .BufferUAV("g_OutputMaterialIDs", set.compactMaterialIDBuffer);
-
-                        nvrhi::BindingSetHandle scatterBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(scatterBsb.Build(), mgr->m_compactScatterLayout, nvDevice);
-                        R_ASSERT2(scatterBindingSet, "Failed to create compaction scatter binding set");
-
-                        nvrhi::ComputeState scatterState;
-                        scatterState.pipeline = mgr->m_compactScatterPipeline;
-                        scatterState.bindings = { scatterBindingSet };
-                        cmdList->setComputeState(scatterState);
-                        cmdList->dispatch(compactGroupCount, 1, 1);
-                    }
-
-                    if (partition && mgr->m_variantPartitionEnabled) {
-                        mgr->DispatchVariantPartition(cmdList, nvDevice, set, *partition);
-                    }
-
-                    cmdList->setBufferState(set.compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-                    cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
-                }
-            };
-
-            dispatchCullSet(mgr->m_staticSet,
-                mgr->m_variantPartitionEnabled ? &mgr->m_staticPartition : nullptr);
-            dispatchCullSet(mgr->m_dynamicSet);
-
-            // ─────────────────────────────────────────────────────
-            //  TERRAIN CULLING PASS (uses same shader, different data)
-            // ─────────────────────────────────────────────────────
-            if (mgr->m_terrainObjectCount > 0) {
-                R_ASSERT2(mgr->m_terrainObjectBuffer && mgr->m_terrainDrawArgsBuffer,
-                    "Terrain buffers not initialized for culling");
-            }
-
-            if (mgr->m_terrainObjectCount > 0 && mgr->m_terrainObjectBuffer && mgr->m_terrainDrawArgsBuffer) {
-                // Clear terrain visible count and visibility buffer
-                u32 zeroTerrain = 0;
-                cmdList->writeBuffer(mgr->m_terrainVisibleCountBuffer, &zeroTerrain, sizeof(u32));
-                // Update constant buffer for terrain (reuse same CB, different object count)
-                CullParamsCB terrainCB;
-                terrainCB.viewProj = Device.mFullTransform;
-                terrainCB.prevViewProj = data.prevViewProj;  // Previous frame for temporal Hi-Z
-                terrainCB.cameraPos = Device.vCameraPosition;
-                float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
-                terrainCB.maxDistanceSq = farPlane * farPlane;
-                terrainCB.objectCount = mgr->m_terrainObjectCount;
-                terrainCB.hizWidth = data.hizWidth;
-                terrainCB.hizHeight = data.hizHeight;
-                terrainCB.hizMipLevels = data.hizMipLevels;
-                terrainCB.frameId = frameId;
-                terrainCB.padding[0] = terrainCB.padding[1] = terrainCB.padding[2] = 0;
-                mgr->ExtractFrustumPlanes(Device.mFullTransform, terrainCB.frustumPlanes);
-                cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB), &terrainCB, sizeof(terrainCB));
-
-                auto* objectCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("object_cull", ".cs");
-                framegraph::BindingSetBuilder terrainBsb(*objectCullRefl, nvDevice, "GPUCull.TerrainCull");
-                terrainBsb.ConstantBuffer("CullParams", mgr->m_device->GetNativeBuffer(mgr->m_cullParamsCB))
-                          .BufferSRV("g_Objects", mgr->m_terrainObjectBuffer)
-                          .Texture("g_HiZPyramid", hizTexture)
-                          .BufferUAV("g_VisibleIndices", mgr->m_terrainVisibleIndexBuffer)
-                          .BufferUAV("g_VisibleCount", mgr->m_terrainVisibleCountBuffer)
-                          .BufferUAV("g_Visibility", mgr->m_terrainVisibilityBuffer);
-
-                nvrhi::BindingSetHandle terrainBindingSet = nvDevice->createBindingSet(terrainBsb.Build(), mgr->m_cullLayout);
-                R_ASSERT2(terrainBindingSet, "Terrain culling binding set creation failed");
-
-                nvrhi::ComputeState terrainState;
-                terrainState.pipeline = mgr->m_cullPipeline;
-                terrainState.bindings = { terrainBindingSet };
-                cmdList->setComputeState(terrainState);
-
-                u32 terrainGroupCount = (mgr->m_terrainObjectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
-                cmdList->dispatch(terrainGroupCount, 1, 1);
-
-                // ─────────────────────────────────────────────────────
-                //  TERRAIN COMPACTION PASS
-                // ─────────────────────────────────────────────────────
-                R_ASSERT2(mgr->m_compactEnabled, "Terrain compaction requires batch compaction to be enabled");
-                R_ASSERT2(mgr->m_compactCountPipeline && mgr->m_compactScanPipeline && mgr->m_compactScatterPipeline,
-                    "Terrain compaction pipelines not initialized");
-                R_ASSERT2(mgr->m_terrainCompactDrawArgsBuffer && mgr->m_terrainCompactBatchIndicesBuffer &&
-                              mgr->m_terrainCompactMaterialIDBuffer && mgr->m_terrainCompactCountBuffer &&
-                              mgr->m_terrainCompactLocalPrefixBuffer && mgr->m_terrainCompactGroupCountsBuffer &&
-                              mgr->m_terrainCompactGroupOffsetsBuffer,
-                    "Terrain compaction buffers not initialized");
-                R_ASSERT2(mgr->m_terrainMaterialIDBuffer, "Terrain material ID buffer missing");
-
-                // Update compact params (reuse same CB)
-                struct CompactParamsCB {
-                    u32 batchCount;
-                    u32 frameId;
-                    u32 padding[2];
-                };
-                CompactParamsCB terrainCompactCB;
-                terrainCompactCB.batchCount = mgr->m_terrainObjectCount;
-                terrainCompactCB.frameId = frameId;
-                terrainCompactCB.padding[0] = terrainCompactCB.padding[1] = 0;
-                cmdList->writeBuffer(mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB), &terrainCompactCB, sizeof(terrainCompactCB));
-
-                u32 terrainCompactGroupCount =
-                    (mgr->m_terrainObjectCount + COMPACT_THREAD_GROUP_SIZE - 1) / COMPACT_THREAD_GROUP_SIZE;
-                if (terrainCompactGroupCount > 0) {
-                    R_ASSERT2(terrainCompactGroupCount <= COMPACT_THREAD_GROUP_SIZE,
-                        "Terrain compaction group count exceeds scan group size");
-                }
-
-                if (terrainCompactGroupCount == 0) {
-                    u32 zeroTerrainCount = 0;
-                    cmdList->writeBuffer(mgr->m_terrainCompactCountBuffer, &zeroTerrainCount, sizeof(u32));
-                } else {
-                    cmdList->setBufferState(mgr->m_terrainVisibilityBuffer, nvrhi::ResourceStates::ShaderResource);
-                    cmdList->setBufferState(mgr->m_terrainCompactLocalPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
-                    cmdList->setBufferState(mgr->m_terrainCompactGroupCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-                    auto* compactCountRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact_count", ".cs");
-                    framegraph::BindingSetBuilder terrainCountBsb(*compactCountRefl, nvDevice);
-                    terrainCountBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
-                                   .BufferSRV("g_Visibility", mgr->m_terrainVisibilityBuffer)
-                                   .BufferUAV("g_LocalPrefix", mgr->m_terrainCompactLocalPrefixBuffer)
-                                   .BufferUAV("g_GroupCounts", mgr->m_terrainCompactGroupCountsBuffer);
-
-                    nvrhi::BindingSetHandle terrainCountBindingSet =
-                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainCountBsb.Build(), mgr->m_compactCountLayout, nvDevice);
-                    R_ASSERT2(terrainCountBindingSet, "Terrain compaction count binding set creation failed");
-
-                    nvrhi::ComputeState terrainCountState;
-                    terrainCountState.pipeline = mgr->m_compactCountPipeline;
-                    terrainCountState.bindings = { terrainCountBindingSet };
-                    cmdList->setComputeState(terrainCountState);
-                    cmdList->dispatch(terrainCompactGroupCount, 1, 1);
-
-                    cmdList->setBufferState(mgr->m_terrainCompactGroupCountsBuffer, nvrhi::ResourceStates::ShaderResource);
-                    cmdList->setBufferState(mgr->m_terrainCompactGroupOffsetsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-                    cmdList->setBufferState(mgr->m_terrainCompactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
-                    cmdList->setBufferState(mgr->m_terrainCompactDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-                    auto* compactScanRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact_scan", ".cs");
-                    framegraph::BindingSetBuilder terrainScanBsb(*compactScanRefl, nvDevice);
-                    terrainScanBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
-                                  .BufferSRV("g_GroupCounts", mgr->m_terrainCompactGroupCountsBuffer)
-                                  .BufferUAV("g_GroupOffsets", mgr->m_terrainCompactGroupOffsetsBuffer)
-                                  .BufferUAV("g_VisibleCount", mgr->m_terrainCompactCountBuffer)
-                                  .BufferUAV("g_DispatchArgs", mgr->m_terrainCompactDispatchArgsBuffer);
-
-                    nvrhi::BindingSetHandle terrainScanBindingSet =
-                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainScanBsb.Build(), mgr->m_compactScanLayout, nvDevice);
-                    R_ASSERT2(terrainScanBindingSet, "Terrain compaction scan binding set creation failed");
-
-                    nvrhi::ComputeState terrainScanState;
-                    terrainScanState.pipeline = mgr->m_compactScanPipeline;
-                    terrainScanState.bindings = { terrainScanBindingSet };
-                    cmdList->setComputeState(terrainScanState);
-                    cmdList->dispatch(1, 1, 1);
-
-                    cmdList->setBufferState(mgr->m_terrainCompactLocalPrefixBuffer, nvrhi::ResourceStates::ShaderResource);
-                    cmdList->setBufferState(mgr->m_terrainCompactGroupOffsetsBuffer, nvrhi::ResourceStates::ShaderResource);
-                    cmdList->setBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
-                    cmdList->setBufferState(mgr->m_terrainMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
-                    cmdList->setBufferState(mgr->m_terrainCompactDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-                    cmdList->setBufferState(mgr->m_terrainCompactBatchIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
-                    cmdList->setBufferState(mgr->m_terrainCompactMaterialIDBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-                    auto* compactScatterRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("batch_compact", ".cs");
-                    framegraph::BindingSetBuilder terrainScatterBsb(*compactScatterRefl, nvDevice);
-                    terrainScatterBsb.ConstantBuffer("CompactParams", mgr->m_device->GetNativeBuffer(mgr->m_compactParamsCB))
-                                     .BufferSRV("g_InputDrawArgs", mgr->m_terrainDrawArgsBuffer)
-                                     .BufferSRV("g_InputMaterialIDs", mgr->m_terrainMaterialIDBuffer)
-                                     .BufferSRV("g_Visibility", mgr->m_terrainVisibilityBuffer)
-                                     .BufferSRV("g_LocalPrefix", mgr->m_terrainCompactLocalPrefixBuffer)
-                                     .BufferSRV("g_GroupOffsets", mgr->m_terrainCompactGroupOffsetsBuffer)
-                                     .BufferUAV("g_OutputDrawArgs", mgr->m_terrainCompactDrawArgsBuffer)
-                                     .BufferUAV("g_VisibleBatchIndices", mgr->m_terrainCompactBatchIndicesBuffer)
-                                     .BufferUAV("g_OutputMaterialIDs", mgr->m_terrainCompactMaterialIDBuffer);
-
-                    nvrhi::BindingSetHandle terrainScatterBindingSet =
-                        framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainScatterBsb.Build(), mgr->m_compactScatterLayout, nvDevice);
-                    R_ASSERT2(terrainScatterBindingSet, "Terrain compaction scatter binding set creation failed");
-
-                    nvrhi::ComputeState terrainScatterState;
-                    terrainScatterState.pipeline = mgr->m_compactScatterPipeline;
-                    terrainScatterState.bindings = { terrainScatterBindingSet };
-                    cmdList->setComputeState(terrainScatterState);
-                    cmdList->dispatch(terrainCompactGroupCount, 1, 1);
-                }
-
-                // Transition compact buffers to IndirectArgument for DrawIndexedIndirectCount
-                cmdList->setBufferState(mgr->m_terrainCompactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-                cmdList->setBufferState(mgr->m_terrainCompactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
-            }
-
-            // ─────────────────────────────────────────────────────
-            //  TRANSPARENT CULLING (uses CullSetBuffers + dispatchCullSet)
-            // ─────────────────────────────────────────────────────
-            dispatchCullSet(mgr->m_transparentSet,
-                mgr->m_variantPartitionEnabled ? &mgr->m_transparentPartition : nullptr);
-
-            // Note: partition buffers are left in IndirectArgument/ShaderResource state
-            // for the render passes to consume. keepInitialState handles reset for next frame.
+            CullPhaseParams phase;
+            phase.useHiZ = false;
+            phase.includeTransparent = false;
+            phase.runPartition = false;
+            phase.stamp = frameId & 0x7FFFFFFFu;
+            phase.hizWidth = 1;
+            phase.hizHeight = 1;
+            phase.hizMipLevels = 1;
+            mgr->ExecuteCullPhase(ctx, mgr->m_dummyHiZ.Get(), phase);
         }
     );
 
@@ -3133,6 +3108,77 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     return output;
 }
 
+void GPUCullingManager::SetupHiZCullingPass(
+    framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle hizPyramid,
+    u32 hizWidth,
+    u32 hizHeight,
+    u32 hizMipLevels,
+    framegraph::VirtualResourceHandle staticDrawArgsHandle,
+    framegraph::VirtualResourceHandle dynamicDrawArgsHandle)
+{
+    using namespace framegraph;
+
+    if (!m_computeEnabled || !hizPyramid.is_valid())
+        return;
+
+    struct HiZCullPassData {
+        VirtualResourceHandle hizPyramid;
+        VirtualResourceHandle staticDrawArgsBuffer;
+        VirtualResourceHandle dynamicDrawArgsBuffer;
+        GPUCullingManager* manager;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+    };
+
+    fg.addCallbackPass<HiZCullPassData>(
+        "GPU Culling Hi-Z",
+
+        [&, hizPyramid, staticDrawArgsHandle, dynamicDrawArgsHandle, hizWidth, hizHeight, hizMipLevels](FrameGraph& builder, PassHandle passHandle, HiZCullPassData& data) {
+            RenderPassBuilder passBuilder(builder, passHandle);
+
+            data.manager = this;
+            data.hizWidth = hizWidth;
+            data.hizHeight = hizHeight;
+            data.hizMipLevels = hizMipLevels;
+
+            data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
+            if (staticDrawArgsHandle.is_valid())
+                data.staticDrawArgsBuffer = passBuilder.write(staticDrawArgsHandle, ResourceState::UnorderedAccess);
+            if (dynamicDrawArgsHandle.is_valid())
+                data.dynamicDrawArgsBuffer = passBuilder.write(dynamicDrawArgsHandle, ResourceState::UnorderedAccess);
+        },
+
+        [](const HiZCullPassData& data,
+           const FrameGraph& fg,
+           fg::RenderContext* ctx) {
+
+            GPUCullingManager* mgr = data.manager;
+            if (!mgr->m_computeEnabled)
+                return;
+
+            u32 frameId = Device.dwFrame + 1u;
+            if (frameId == 0)
+                frameId = 1;
+
+            nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
+            if (!hizTexture)
+                return;
+
+            CullPhaseParams phase;
+            phase.useHiZ = true;
+            phase.includeTransparent = true;
+            phase.runPartition = true;
+            phase.stamp = frameId | 0x80000000u;
+            phase.hizWidth = data.hizWidth;
+            phase.hizHeight = data.hizHeight;
+            phase.hizMipLevels = data.hizMipLevels;
+            mgr->ExecuteCullPhase(ctx, hizTexture, phase);
+        }
+    );
+}
+
 // ═══════════════════════════════════════════════════════
 //  SETUP SKINNED CULLING PASS
 // ═══════════════════════════════════════════════════════
@@ -3144,7 +3190,6 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedCullingPass(
     u32 hizHeight,
     u32 hizMipLevels,
     const GeometryCollector* geometry,
-    const Fmatrix& prevViewProj,
     decals::OverlayManager* overlayMgr)
 {
     using namespace framegraph;
@@ -3161,7 +3206,6 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedCullingPass(
         GPUCullingManager* manager;
         const GeometryCollector* geometry;
         decals::OverlayManager* overlayMgr;
-        Fmatrix prevViewProj;
         u32 hizWidth;
         u32 hizHeight;
         u32 hizMipLevels;
@@ -3193,14 +3237,12 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedCullingPass(
         "Skinned GPU Culling",
 
         // Setup lambda
-        [&, hizWidth, hizHeight, hizMipLevels, geometry, prevViewProj, visBufferHandle, argsBufferHandle, overlayMgr](FrameGraph& builder, PassHandle passHandle, SkinnedCullPassData& data) {
+        [&, hizWidth, hizHeight, hizMipLevels, geometry, visBufferHandle, argsBufferHandle, overlayMgr](FrameGraph& builder, PassHandle passHandle, SkinnedCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
 
             data.manager = this;
             data.geometry = geometry;
             data.overlayMgr = overlayMgr;
-            data.prevViewProj = prevViewProj;
             data.hizWidth = hizWidth;
             data.hizHeight = hizHeight;
             data.hizMipLevels = hizMipLevels;
@@ -3254,7 +3296,7 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedCullingPass(
             // Fill constant buffer (reuse m_cullParamsCB); objectCount rewritten per dispatch
             CullParamsCB cb;
             cb.viewProj = Device.mFullTransform;
-            cb.prevViewProj = data.prevViewProj;
+            cb.hizViewProj = Device.mFullTransform;
             cb.cameraPos = Device.vCameraPosition;
             float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
             cb.maxDistanceSq = farPlane * farPlane;
@@ -3262,7 +3304,8 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedCullingPass(
             cb.hizHeight = data.hizHeight;
             cb.hizMipLevels = data.hizMipLevels;
             cb.frameId = frameId;
-            cb.padding[0] = cb.padding[1] = cb.padding[2] = 0;
+            cb.useHiZ = 1;
+            cb.padding[0] = cb.padding[1] = 0;
             mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
 
             auto* objectCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("object_cull", ".cs");

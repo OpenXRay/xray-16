@@ -479,7 +479,6 @@ private:
     // ═══════════════════════════════════════════════════
     // Instead of depth prepass, reuse previous frame's depth for Hi-Z
     // Eliminates double vertex processing cost (~1.5-2ms savings)
-    nvrhi::TextureHandle m_prevFrameDepth;
     nvrhi::TextureHandle m_normals[2];
     u32 m_pingPongIndex = 0;
 

@@ -44,7 +44,7 @@ struct IndirectDrawArgs
 cbuffer CullParams : register(b5)  // b5 to avoid conflicts with common.h
 {
     float4x4 g_ViewProj;           // Current frame view-projection (for frustum culling)
-    float4x4 g_PrevViewProj;       // Previous frame view-projection (for Hi-Z sampling)
+    float4x4 g_HiZViewProj;        // View-projection the Hi-Z pyramid depth was rendered with
     float3 g_CameraPos;            // Camera world position
     float g_MaxDistance;           // Maximum render distance (squared)
     float4 g_FrustumPlanes[6];     // View frustum planes (world space)
@@ -53,7 +53,8 @@ cbuffer CullParams : register(b5)  // b5 to avoid conflicts with common.h
     uint g_HiZHeight;              // Hi-Z pyramid base height
     uint g_HiZMipLevels;           // Number of Hi-Z mip levels
     uint g_FrameId;                // Frame stamp for visibility
-    uint3 g_Padding;
+    uint g_UseHiZ;                 // 0 = prepass phase (frustum only), 1 = color phase (with Hi-Z)
+    uint2 g_Padding;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -97,6 +98,9 @@ void main(uint3 dtID : SV_DispatchThreadID)
     // NOTE: Transparent objects are no longer skipped here.
     // They render in the same MDI pass (opaque for now, blend PSO later).
 
+    if (g_UseHiZ == 0 && (obj.flags & 0x8) != 0)
+        return;
+
     // ─────────────────────────────────────────────────────
     //  CULLING TESTS (ordered by cost: cheapest first)
     // ─────────────────────────────────────────────────────
@@ -112,7 +116,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
     // 3. Hi-Z occlusion culling (expensive - texture sample + math)
     // Note: This test is conservative - may mark occluded objects as visible
     // but will never mark visible objects as occluded
-    if (!HiZTestSphere(obj.position, obj.radius, g_CameraPos, g_PrevViewProj,
+    if (g_UseHiZ != 0 &&
+        !HiZTestSphere(obj.position, obj.radius, g_CameraPos, g_HiZViewProj,
                        g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
         return;
 

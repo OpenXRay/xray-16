@@ -65,6 +65,8 @@ struct BindlessForwardConfig {
     // Enable bindless rendering mode
     bool enabled = false;
 
+    bool prepassActive = false;
+
     // ═══════════════════════════════════════════════════════
     //  MEGA-BUFFER SYSTEM (GPU-Driven Rendering)
     // ═══════════════════════════════════════════════════════

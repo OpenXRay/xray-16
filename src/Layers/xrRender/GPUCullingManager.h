@@ -61,9 +61,10 @@ static_assert(sizeof(GPUParticleData) == 32, "GPUParticleData must be 32 bytes f
 
 // Object flags
 enum GPUObjectFlags : u32 {
-    GPU_OBJECT_OPAQUE      = 0x1,
-    GPU_OBJECT_ALPHA_TEST  = 0x2,
-    GPU_OBJECT_TRANSPARENT = 0x4,
+    GPU_OBJECT_OPAQUE       = 0x1,
+    GPU_OBJECT_ALPHA_TEST   = 0x2,
+    GPU_OBJECT_TRANSPARENT  = 0x4,
+    GPU_OBJECT_PREPASS_SKIP = 0x8,
 };
 
 // ═══════════════════════════════════════════════════════
@@ -192,17 +193,24 @@ public:
     void InvalidateStaticCullingData();
     void InvalidateShadersAndPipelines();
 
-    // Setup GPU culling pass in FrameGraph
-    // Returns handles to culled results for forward pass
+    // Setup the prepass culling phase (frustum + distance only, feeds the depth prepass)
+    // Also uploads scene objects and builds RT accel structs for the frame
     // NOTE: geometry is captured and used during execute - must remain valid
     GPUCullOutput SetupCullingPass(
+        framegraph::FrameGraph& fg,
+        const GeometryCollector* geometry
+    );
+
+    // Setup the color culling phase (frustum + distance + same-frame Hi-Z)
+    // Re-culls all sets into the same compact buffers the color passes consume
+    void SetupHiZCullingPass(
         framegraph::FrameGraph& fg,
         framegraph::VirtualResourceHandle hizPyramid,
         u32 hizWidth,
         u32 hizHeight,
         u32 hizMipLevels,
-        const GeometryCollector* geometry,
-        const Fmatrix& prevViewProj  // Previous frame's viewProj for temporal Hi-Z
+        framegraph::VirtualResourceHandle staticDrawArgsHandle,
+        framegraph::VirtualResourceHandle dynamicDrawArgsHandle
     );
 
     // Get number of objects uploaded this frame (static + dynamic)
@@ -382,7 +390,6 @@ public:
         u32 hizHeight,
         u32 hizMipLevels,
         const GeometryCollector* geometry,
-        const Fmatrix& prevViewProj,
         decals::OverlayManager* overlayMgr
     );
 
@@ -463,6 +470,17 @@ private:
     void CreateParticleResources(fg::RenderDevice* device);
     void CreateMegaBuffers();  // Called by EndLevelLoad
 
+    struct CullPhaseParams {
+        bool useHiZ = false;
+        bool includeTransparent = false;
+        bool runPartition = false;
+        u32 stamp = 0;
+        u32 hizWidth = 0;
+        u32 hizHeight = 0;
+        u32 hizMipLevels = 0;
+    };
+    void ExecuteCullPhase(fg::RenderContext* ctx, nvrhi::ITexture* hizTexture, const CullPhaseParams& phase);
+
     // Extract frustum planes from view-projection matrix
     void ExtractFrustumPlanes(Fmatrix& viewProj, Fvector4* outPlanes);
 
@@ -507,6 +525,7 @@ private:
     nvrhi::BindingLayoutHandle m_compactScanLayout;
     nvrhi::BindingLayoutHandle m_compactScatterLayout;
     nvrhi::SamplerHandle m_pointSampler;
+    nvrhi::TextureHandle m_dummyHiZ;
 
     fg::BufferHandle m_compactParamsCB;
 
