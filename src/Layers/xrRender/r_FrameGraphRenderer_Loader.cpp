@@ -24,6 +24,11 @@
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/r__sector.h"
 #include "Layers/xrRender/r__scene.h"
+#include "Layers/xrRender/FVisual.h"
+#include "Layers/xrRender/FProgressive.h"
+#include "Layers/xrRender/FTreeVisual.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/xrRender_console.h"
 
 namespace xray::render
 {
@@ -131,6 +136,12 @@ void FrameGraphRenderer::level_Load(IReader* fs)
         //  MEGA-BUFFER SYSTEM: End level load
         // ═══════════════════════════════════════════════════════
         auto* gpuCulling = GetGPUCullingManager();
+        if (gpuCulling && ps_r_cluster) {
+            g_pGamePersistent->LoadTitle("st_loading_geometry");
+            xr_vector<ClusterMeshKey> ranges;
+            CollectClusterBakeRanges(ranges);
+            gpuCulling->BakeClusterDAG(ranges);
+        }
         if (gpuCulling) {
             gpuCulling->EndLevelLoad();
         }
@@ -527,6 +538,92 @@ void FrameGraphRenderer::LoadVisuals(IReader* fs)
 
         chunk->close();
         index++;
+    }
+}
+
+void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterMeshKey>& ranges)
+{
+    auto* gpuCulling = GetGPUCullingManager();
+    if (!gpuCulling)
+        return;
+
+    ranges.reserve(BufferPool.Visuals.size());
+
+    for (dxRender_Visual* visual : BufferPool.Visuals)
+    {
+        if (!visual)
+            continue;
+
+        IRender_Mesh* mesh = nullptr;
+        u32 iBase = 0, iCount = 0;
+
+        switch (visual->getType())
+        {
+        case MT_NORMAL:
+            mesh = static_cast<Fvisual*>(visual);
+            iBase = mesh->iBase;
+            iCount = mesh->iCount;
+            break;
+        case MT_PROGRESSIVE:
+        {
+            auto* pm = static_cast<FProgressive*>(visual);
+            mesh = pm;
+            const FSlideWindowItem& swi = pm->GetSWI();
+            if (swi.sw && swi.count > 0)
+            {
+                iBase = pm->iBase + swi.sw[0].offset;
+                iCount = swi.sw[0].num_tris * 3;
+            }
+            else
+            {
+                iBase = pm->iBase;
+                iCount = pm->iCount;
+            }
+            break;
+        }
+        case MT_TREE_ST:
+            mesh = static_cast<FTreeVisual_ST*>(visual);
+            iBase = mesh->iBase;
+            iCount = mesh->iCount;
+            break;
+        case MT_TREE_PM:
+        {
+            auto* tree = static_cast<FTreeVisual_PM*>(visual);
+            mesh = tree;
+            const FSlideWindowItem* swi = tree->GetSWI();
+            if (swi && swi->sw && swi->count > 0)
+            {
+                iBase = tree->iBase + swi->sw[0].offset;
+                iCount = swi->sw[0].num_tris * 3;
+            }
+            else
+            {
+                iBase = tree->iBase;
+                iCount = tree->iCount;
+            }
+            break;
+        }
+        default:
+            continue;
+        }
+
+        if (!mesh || iCount < 3)
+            continue;
+        if (m_materialCache && m_materialCache->IsTerrainMaterial(visual))
+            continue;
+
+        MeshAllocation alloc = gpuCulling->GetMeshAllocation(
+            mesh->vbPoolID, mesh->vBase, mesh->vCount,
+            mesh->ibPoolID, iBase, iCount, mesh->useAlternativeGeom);
+        if (!alloc.valid)
+            continue;
+
+        fg::ClusterMeshKey key;
+        key.vertexOffset = alloc.vertexOffset;
+        key.indexOffset = alloc.indexOffset;
+        key.vertexCount = alloc.vertexCount;
+        key.indexCount = alloc.indexCount;
+        ranges.push_back(key);
     }
 }
 
