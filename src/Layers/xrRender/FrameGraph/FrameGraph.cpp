@@ -699,25 +699,46 @@ void FrameGraph::BuildDependencyGraph() {
     }
 
     xr_map<u32, PassNode*> lastWriter;
+    xr_map<u32, xr_vector<PassNode*>> readersSinceWrite;
+
+    auto addEdge = [](PassNode& pass, PassNode* producer) {
+        if (producer == &pass)
+            return;
+        if (!pass.DependsOn(producer)) {
+            pass.dependsOn.push_back(producer);
+            producer->dependents.push_back(&pass);
+        }
+    };
 
     for (auto& pass : m_passes) {
         for (const auto& access : pass.resourceAccesses) {
             if (!access.IsRead()) continue;
 
             auto it = lastWriter.find(access.resource.index);
-            if (it != lastWriter.end()) {
-                PassNode* producer = it->second;
-                if (!pass.DependsOn(producer)) {
-                    pass.dependsOn.push_back(producer);
-                    producer->dependents.push_back(&pass);
-                }
+            if (it != lastWriter.end())
+                addEdge(pass, it->second);
+        }
+
+        for (const auto& access : pass.resourceAccesses) {
+            if (!access.IsWrite()) continue;
+
+            auto it = lastWriter.find(access.resource.index);
+            if (it != lastWriter.end())
+                addEdge(pass, it->second);
+
+            auto rit = readersSinceWrite.find(access.resource.index);
+            if (rit != readersSinceWrite.end()) {
+                for (PassNode* reader : rit->second)
+                    addEdge(pass, reader);
+                rit->second.clear();
             }
         }
 
         for (const auto& access : pass.resourceAccesses) {
-            if (access.IsWrite()) {
+            if (access.IsRead())
+                readersSinceWrite[access.resource.index].push_back(&pass);
+            if (access.IsWrite())
                 lastWriter[access.resource.index] = &pass;
-            }
         }
     }
 }
@@ -738,9 +759,9 @@ void FrameGraph::TopologicalSort() {
     }
 
     u32 executionOrder = 0;
-    while (!queue.empty()) {
-        PassNode* current = queue.back();
-        queue.pop_back();
+    size_t queueHead = 0;
+    while (queueHead < queue.size()) {
+        PassNode* current = queue[queueHead++];
 
         current->executionOrder = executionOrder++;
         m_sortedPasses.push_back(current);
@@ -1174,6 +1195,14 @@ void FrameGraph::OptimizeMemoryAliasing() {
                 // Must have same format for textures
                 if (current->desc.type != ResourceDesc::Type::Buffer &&
                     current->desc.format != candidate->desc.format) {
+                    compatible = false;
+                }
+
+                if (current->desc.type != ResourceDesc::Type::Buffer &&
+                    (current->desc.width != candidate->desc.width ||
+                     current->desc.height != candidate->desc.height ||
+                     current->desc.mipLevels != candidate->desc.mipLevels ||
+                     current->desc.arraySize != candidate->desc.arraySize)) {
                     compatible = false;
                 }
 
