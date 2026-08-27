@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
+#include <cstdio>
 
 namespace xray::render::fg
 {
@@ -338,6 +339,59 @@ bool IsSelfLoop(const ClusterMetaProto& p)
     if (!(p.selfError > 0.0f) || !(p.parentError < kErrorCap))
         return false;
     return memcmp(p.lodSelf, p.lodParent, sizeof(p.lodSelf)) == 0 && p.selfError == p.parentError;
+}
+
+constexpr u32 kCacheMagic = 0x464C4356;
+constexpr u32 kCacheVersion = 1;
+
+#pragma pack(push, 4)
+struct CacheHeader {
+    u32 magic;
+    u32 version;
+    u64 paramsHash;
+    u64 geomStamp;
+    u64 rangeSetHash;
+    u32 recordCount;
+    u32 memberCount;
+    u32 protoCount;
+    u32 pad;
+    u64 indexCount;
+    u32 reserved[4];
+};
+#pragma pack(pop)
+
+u64 Fnv1a64(const void* data, size_t len, u64 h = 14695981039346656037ull)
+{
+    const u8* bytes = static_cast<const u8*>(data);
+    for (size_t i = 0; i < len; ++i) {
+        h ^= bytes[i];
+        h *= 1099511628211ull;
+    }
+    return h;
+}
+
+u64 ComputeParamsHash()
+{
+    const u32 words[4] = {kCacheVersion, kClusterMaxTris,
+        u32(std::max(ps_r_cluster_tris, int(kClusterMaxTris))), u32(ps_r_cluster_merge != 0)};
+    return Fnv1a64(words, sizeof(words));
+}
+
+u64 ComputeRangeSetHash(const xr_vector<ClusterBakeRange>& ranges)
+{
+    xr_vector<ClusterBakeRange> sorted = ranges;
+    std::sort(sorted.begin(), sorted.end(),
+        [](const ClusterBakeRange& a, const ClusterBakeRange& b) { return a.key < b.key; });
+    sorted.erase(std::unique(sorted.begin(), sorted.end(),
+        [](const ClusterBakeRange& a, const ClusterBakeRange& b) { return a.key == b.key; }),
+        sorted.end());
+
+    u64 h = 14695981039346656037ull;
+    for (const ClusterBakeRange& r : sorted) {
+        h = Fnv1a64(&r.key, sizeof(r.key), h);
+        h = Fnv1a64(&r.flags, sizeof(r.flags), h);
+    }
+    return h;
 }
 
 struct UnionFind {
@@ -785,6 +839,124 @@ void ClusterDAG::Bake(
         }
         Msg("* [ClusterDAG] levels: %s", levels);
     }
+}
+
+bool ClusterDAG::TryLoadCache(const char* path, u64 geomStamp, const xr_vector<ClusterBakeRange>& ranges)
+{
+    Clear();
+
+    if (!path || !path[0])
+        return false;
+
+    CTimer timer;
+    timer.Start();
+
+    FILE* f = fopen(path, "rb");
+    if (!f)
+        return false;
+
+    bool ok = false;
+    CacheHeader hdr = {};
+
+    do {
+        if (fread(&hdr, sizeof(hdr), 1, f) != 1)
+            break;
+        if (hdr.magic != kCacheMagic || hdr.version != kCacheVersion)
+            break;
+        if (hdr.paramsHash != ComputeParamsHash())
+            break;
+        if (hdr.geomStamp != geomStamp)
+            break;
+        if (hdr.rangeSetHash != ComputeRangeSetHash(ranges))
+            break;
+        if (hdr.recordCount == 0 || hdr.protoCount == 0 || hdr.indexCount == 0)
+            break;
+
+        m_records.resize(hdr.recordCount);
+        m_memberKeys.resize(hdr.memberCount);
+        m_protos.resize(hdr.protoCount);
+        m_bakedIndices.resize(size_t(hdr.indexCount));
+
+        if (fread(m_records.data(), sizeof(ClusterUnitRecord), hdr.recordCount, f) != hdr.recordCount)
+            break;
+        if (fread(m_memberKeys.data(), sizeof(ClusterMeshKey), hdr.memberCount, f) != hdr.memberCount)
+            break;
+        if (fread(m_protos.data(), sizeof(ClusterMetaProto), hdr.protoCount, f) != hdr.protoCount)
+            break;
+        if (fread(m_bakedIndices.data(), sizeof(u32), size_t(hdr.indexCount), f) != size_t(hdr.indexCount))
+            break;
+
+        ok = true;
+        for (const ClusterUnitRecord& rec : m_records) {
+            if (u64(rec.firstMember) + rec.memberCount > hdr.memberCount ||
+                u64(rec.firstProto) + rec.protoCount > hdr.protoCount ||
+                u64(rec.firstIndex) + rec.indexTotal > hdr.indexCount) {
+                ok = false;
+                break;
+            }
+        }
+    } while (false);
+
+    fclose(f);
+
+    if (!ok) {
+        Clear();
+        return false;
+    }
+
+    BuildLookup();
+
+    for (const ClusterUnitRecord& rec : m_records) {
+        m_stats.bakedMeshes += rec.memberCount;
+        if (rec.isComponent) {
+            m_stats.components++;
+            m_stats.componentMembers += rec.memberCount;
+        }
+    }
+    m_stats.eligibleMeshes = m_stats.bakedMeshes;
+    m_stats.clusters = u32(m_protos.size());
+    m_stats.bakedIndexCount = m_bakedIndices.size();
+
+    RunDiagnostics();
+
+    m_stats.bakeMs = u32(timer.GetElapsed_ms());
+
+    Msg("* [ClusterDAG] cache hit: %u meshes, %u clusters, %llu indices, %u components, %u holes, %u ms",
+        m_stats.bakedMeshes, m_stats.clusters, (unsigned long long)m_stats.bakedIndexCount,
+        m_stats.components, m_stats.holes, m_stats.bakeMs);
+    return true;
+}
+
+void ClusterDAG::SaveCache(const char* path, u64 geomStamp, const xr_vector<ClusterBakeRange>& ranges) const
+{
+    if (!path || !path[0] || m_records.empty() || m_bakedIndices.empty())
+        return;
+
+    IWriter* w = FS.w_open(path);
+    if (!w) {
+        Msg("! [ClusterDAG] failed to open cache for write: %s", path);
+        return;
+    }
+
+    CacheHeader hdr = {};
+    hdr.magic = kCacheMagic;
+    hdr.version = kCacheVersion;
+    hdr.paramsHash = ComputeParamsHash();
+    hdr.geomStamp = geomStamp;
+    hdr.rangeSetHash = ComputeRangeSetHash(ranges);
+    hdr.recordCount = u32(m_records.size());
+    hdr.memberCount = u32(m_memberKeys.size());
+    hdr.protoCount = u32(m_protos.size());
+    hdr.indexCount = m_bakedIndices.size();
+
+    w->w(&hdr, sizeof(hdr));
+    w->w(m_records.data(), u32(m_records.size() * sizeof(ClusterUnitRecord)));
+    w->w(m_memberKeys.data(), u32(m_memberKeys.size() * sizeof(ClusterMeshKey)));
+    w->w(m_protos.data(), u32(m_protos.size() * sizeof(ClusterMetaProto)));
+    w->w(m_bakedIndices.data(), u32(m_bakedIndices.size() * sizeof(u32)));
+    FS.w_close(w);
+
+    Msg("* [ClusterDAG] cache saved: %s", path);
 }
 
 void ClusterDAG::RunDiagnostics()

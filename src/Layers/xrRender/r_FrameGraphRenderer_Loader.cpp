@@ -141,7 +141,28 @@ void FrameGraphRenderer::level_Load(IReader* fs)
             g_pGamePersistent->LoadTitle("st_loading_geometry");
             xr_vector<ClusterBakeRange> ranges;
             CollectClusterBakeRanges(ranges);
-            gpuCulling->BakeClusterDAG(ranges);
+
+            u64 geomStamp = 0;
+            if (CStreamReader* geom = FS.rs_open("$level$", "level.geom")) {
+                const u64 geomSize = geom->length();
+                static u8 s_stampBuf[65536];
+                const u32 n = u32(std::min<u64>(geomSize, sizeof(s_stampBuf)));
+                geom->r(s_stampBuf, n);
+                geomStamp = geomSize ^ (u64(crc32(s_stampBuf, n)) << 8);
+                FS.r_close(geom);
+            }
+
+            string_path cachePath = "";
+            {
+                string_path levelName = "level";
+                if (g_pGameLevel && g_pGameLevel->name().size())
+                    xr_strcpy(levelName, g_pGameLevel->name().c_str());
+                string_path rel;
+                xr_sprintf(rel, "cluster_cache_fg%s%s.vclf", DELIMITER, levelName);
+                FS.update_path(cachePath, "$app_data_root$", rel);
+            }
+
+            gpuCulling->BakeClusterDAG(ranges, cachePath, geomStamp);
         }
         if (gpuCulling) {
             gpuCulling->EndLevelLoad();
