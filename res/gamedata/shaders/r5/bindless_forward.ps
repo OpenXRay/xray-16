@@ -8,6 +8,7 @@
 #define CLUSTERED_LIGHTING_FORWARD
 #include "common.h"
 #include "bindless_common.h"
+#include "cluster_fade.h"
 
 struct PS_INPUT
 {
@@ -37,6 +38,9 @@ struct PS_OUTPUT
 PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
+
+    uint fadeWord = g_DrawFades[input.drawID];
+    ClusterFadeDiscard(fadeWord, input.position);
 
     // DEBUG: Visualize UVs as color to find where black areas are in UV space
     // Uncomment ONE of these to debug:
@@ -113,11 +117,31 @@ PS_OUTPUT main(PS_INPUT input)
 
     if (dev_param_4.x > 0.5)
     {
-        uint h = input.drawID * 747796405u + 2891336453u;
-        h = ((h >> ((h >> 28u) + 4u)) ^ h) * 277803737u;
-        h = (h >> 22u) ^ h;
-        float3 tint = float3(float(h & 255u), float((h >> 8) & 255u), float((h >> 16) & 255u)) / 255.0;
-        output.color.rgb = tint;
+        uint mode = uint(dev_param_4.x);
+        if (mode == 3u)
+        {
+            uint errClass = (fadeWord >> 16) & 3u;
+            float3 classColors[4] = {
+                float3(0.1, 0.8, 0.1), float3(0.9, 0.9, 0.1),
+                float3(0.9, 0.2, 0.1), float3(0.0, 0.0, 0.0)
+            };
+            output.color.rgb = classColors[errClass];
+        }
+        else if (mode == 4u)
+        {
+            uint fA = 63u - (fadeWord & 63u);
+            uint fB = (fadeWord >> 6) & 63u;
+            output.color.rgb = float3(float(63u - fA) / 63.0, float(fB) / 63.0, (fA < 63u || fB > 0u) ? 1.0 : 0.0);
+        }
+        else
+        {
+            uint seed = (mode == 2u) ? ((fadeWord >> 12) & 15u) : input.drawID;
+            uint h = seed * 747796405u + 2891336453u;
+            h = ((h >> ((h >> 28u) + 4u)) ^ h) * 277803737u;
+            h = (h >> 22u) ^ h;
+            float3 tint = float3(float(h & 255u), float((h >> 8) & 255u), float((h >> 16) & 255u)) / 255.0;
+            output.color.rgb = tint;
+        }
     }
 
     return output;

@@ -1,6 +1,7 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
+#include "cluster_fade.h"
 
 struct PS_INPUT
 {
@@ -16,6 +17,8 @@ struct PS_INPUT
 
 void main(PS_INPUT input)
 {
+    ClusterFadeDiscard(g_DrawFades[input.drawID], input.position);
+
     MaterialData mat = g_Materials[input.materialID];
 
     if (mat.flags & MAT_FLAG_ALPHA_TEST)

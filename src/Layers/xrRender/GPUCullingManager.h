@@ -492,6 +492,7 @@ public:
     nvrhi::IBuffer* GetClusterFadeBuffer() const { return m_clusterSet.fadeBuffer.Get(); }
     nvrhi::IBuffer* GetClusterDrawIndexBuffer() const { return m_clusterSet.drawIndexBuffer.Get(); }
     u32 GetClusterEntryCount() const { return m_clusterSet.entryCount; }
+    nvrhi::IBuffer* GetNeutralFadeBuffer() const { return m_neutralFadeBuffer.Get(); }
 
 private:
     void CreateBuffers(fg::RenderDevice* device);
@@ -556,6 +557,8 @@ private:
         bool uploaded = false;
     };
     ClusterCullBuffers m_clusterSet;
+    nvrhi::BufferHandle m_neutralFadeBuffer;
+    bool m_neutralFadeZeroed = false;
     xr_vector<GPUClusterEntry> m_clusterEntryData;
     xr_vector<ClusterMeshKey> m_staticBatchKeys;
     nvrhi::ComputePipelineHandle m_clusterCullPipeline;

@@ -185,6 +185,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
             bsb.BufferSRV("g_CompactBatchIndices", cfg.compactBatchIndicesBuffer);
             bsb.BufferSRV("g_CompactMaterialIDs", cfg.compactMaterialIDBuffer);
+            bsb.BufferSRV("g_DrawFades", cfg.fadeBuffer);
             bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
             bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
             bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());

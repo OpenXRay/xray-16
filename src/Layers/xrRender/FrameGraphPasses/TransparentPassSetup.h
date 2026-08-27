@@ -26,6 +26,7 @@ struct TransparentPassConfig {
     nvrhi::IBuffer* compactBatchIndicesBuffer = nullptr;
     nvrhi::IBuffer* compactMaterialIDBuffer = nullptr;
     nvrhi::IBuffer* compactCountBuffer = nullptr;
+    nvrhi::IBuffer* fadeBuffer = nullptr;
     u32 objectCount = 0;
 
     VariantPartitionConfig variantPartition;
