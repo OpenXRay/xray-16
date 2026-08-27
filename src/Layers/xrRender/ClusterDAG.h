@@ -29,10 +29,17 @@ struct ClusterMetaProto {
     u32 flags;
     float selfError;
     float parentError;
+    u32 member;
+    u32 reserved;
 };
 #pragma pack(pop)
 
-static_assert(sizeof(ClusterMetaProto) == 72, "ClusterMetaProto layout is cache-serialized");
+static_assert(sizeof(ClusterMetaProto) == 80, "ClusterMetaProto layout is cache-serialized");
+
+constexpr u32 CLUSTER_PROTO_FLAG_AT = 1u << 0;
+
+constexpr u32 CLUSTER_RANGE_FLAG_AT = 1u << 0;
+constexpr u32 CLUSTER_RANGE_FLAG_MERGEABLE = 1u << 1;
 
 struct ClusterMeshKey {
     u32 vertexOffset;
@@ -52,17 +59,29 @@ struct ClusterMeshKey {
     }
 };
 
-struct ClusterMeshRecord {
+struct ClusterBakeRange {
     ClusterMeshKey key;
+    u32 flags;
+};
+
+struct ClusterUnitRecord {
+    u32 firstMember;
+    u32 memberCount;
     u32 firstProto;
     u32 protoCount;
     u32 firstIndex;
     u32 indexTotal;
+    u32 isComponent;
 };
 
 struct ClusterBakeStats {
     u32 eligibleMeshes;
     u32 bakedMeshes;
+    u32 components;
+    u32 componentMembers;
+    u32 orphansAttached;
+    u32 capSplits;
+    u32 pinnedVerts;
     u32 clusters;
     u32 droppedSelfLoops;
     u32 holes;
@@ -75,19 +94,22 @@ struct ClusterBakeStats {
 
 class ClusterDAG {
 public:
-    struct MeshRange {
-        ClusterMeshKey key;
+    struct MemberRef {
+        u32 record;
+        u32 member;
     };
 
     void Bake(
-        const xr_vector<ClusterMeshKey>& ranges,
+        const xr_vector<ClusterBakeRange>& ranges,
         const bindless::UnifiedVertex* megaVertices,
         const u32* megaIndices);
 
     void Clear();
 
     bool Empty() const { return m_records.empty(); }
-    const ClusterMeshRecord* FindRecord(const ClusterMeshKey& key) const;
+    const ClusterUnitRecord* FindRecord(const ClusterMeshKey& key, u32& outMember) const;
+    const xr_vector<ClusterUnitRecord>& Records() const { return m_records; }
+    const xr_vector<ClusterMeshKey>& MemberKeys() const { return m_memberKeys; }
     const xr_vector<ClusterMetaProto>& Protos() const { return m_protos; }
     const xr_vector<u32>& BakedIndices() const { return m_bakedIndices; }
     const ClusterBakeStats& Stats() const { return m_stats; }
@@ -97,12 +119,21 @@ public:
     void ReleaseIndexData() { m_bakedIndices.clear(); m_bakedIndices.shrink_to_fit(); }
 
 private:
-    xr_vector<ClusterMeshRecord> m_records;
+    struct LookupEntry {
+        ClusterMeshKey key;
+        u32 record;
+        u32 member;
+    };
+
+    xr_vector<ClusterUnitRecord> m_records;
+    xr_vector<ClusterMeshKey> m_memberKeys;
+    xr_vector<LookupEntry> m_lookup;
     xr_vector<ClusterMetaProto> m_protos;
     xr_vector<u32> m_bakedIndices;
     ClusterBakeStats m_stats = {};
     u32 m_megaIndexBase = 0;
 
+    void BuildLookup();
     void RunDiagnostics();
 };
 

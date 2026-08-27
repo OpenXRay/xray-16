@@ -3732,7 +3732,7 @@ void GPUCullingManager::EndLevelLoad()
     Msg("* [GPUCulling] Mega-buffers ready for GPU upload");
 }
 
-void GPUCullingManager::BakeClusterDAG(const xr_vector<ClusterMeshKey>& ranges)
+void GPUCullingManager::BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges)
 {
     if (!m_levelLoadInProgress) {
         Msg("! [GPUCulling] BakeClusterDAG called outside of level load");

@@ -26,6 +26,7 @@
 #include "Layers/xrRender/FProgressive.h"
 #include "Layers/xrRender/FTreeVisual.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/xrRender_console.h"
 
 namespace xray::render
@@ -116,7 +117,7 @@ void FrameGraphRenderer::level_Load(IReader* fs)
         auto* gpuCulling = GetGPUCullingManager();
         if (gpuCulling && ps_r_cluster) {
             g_pGamePersistent->LoadTitle("st_loading_geometry");
-            xr_vector<ClusterMeshKey> ranges;
+            xr_vector<ClusterBakeRange> ranges;
             CollectClusterBakeRanges(ranges);
             gpuCulling->BakeClusterDAG(ranges);
         }
@@ -448,13 +449,15 @@ void FrameGraphRenderer::LoadVisuals(IReader* fs)
     }
 }
 
-void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterMeshKey>& ranges)
+void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterBakeRange>& ranges)
 {
     auto* gpuCulling = GetGPUCullingManager();
     if (!gpuCulling)
         return;
 
     ranges.reserve(BufferPool.Visuals.size());
+
+    xr_map<fg::ClusterMeshKey, u32> refCounts;
 
     for (dxRender_Visual* visual : BufferPool.Visuals)
     {
@@ -463,6 +466,7 @@ void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterMeshKey>&
 
         IRender_Mesh* mesh = nullptr;
         u32 iBase = 0, iCount = 0;
+        bool mergeableType = false;
 
         switch (visual->getType())
         {
@@ -470,6 +474,7 @@ void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterMeshKey>&
             mesh = static_cast<Fvisual*>(visual);
             iBase = mesh->iBase;
             iCount = mesh->iCount;
+            mergeableType = true;
             break;
         case MT_PROGRESSIVE:
         {
@@ -486,6 +491,7 @@ void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterMeshKey>&
                 iBase = pm->iBase;
                 iCount = pm->iCount;
             }
+            mergeableType = true;
             break;
         }
         case MT_TREE_ST:
@@ -519,18 +525,36 @@ void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterMeshKey>&
         if (m_materialCache && m_materialCache->IsTerrainMaterial(visual))
             continue;
 
+        shader_info::ShaderBlendInfo blendInfo;
+        if (shader_info::GetShaderBlendInfo(visual->shaderName.c_str(), blendInfo)) {
+            if (blendInfo.mode != shader_info::ShaderBlendMode::Opaque &&
+                blendInfo.mode != shader_info::ShaderBlendMode::AlphaTest)
+                continue;
+        }
+
         MeshAllocation alloc = gpuCulling->GetMeshAllocation(
             mesh->vbPoolID, mesh->vBase, mesh->vCount,
             mesh->ibPoolID, iBase, iCount, mesh->useAlternativeGeom);
         if (!alloc.valid)
             continue;
 
-        fg::ClusterMeshKey key;
-        key.vertexOffset = alloc.vertexOffset;
-        key.indexOffset = alloc.indexOffset;
-        key.vertexCount = alloc.vertexCount;
-        key.indexCount = alloc.indexCount;
-        ranges.push_back(key);
+        fg::ClusterBakeRange range;
+        range.key.vertexOffset = alloc.vertexOffset;
+        range.key.indexOffset = alloc.indexOffset;
+        range.key.vertexCount = alloc.vertexCount;
+        range.key.indexCount = alloc.indexCount;
+        range.flags = 0;
+        if (blendInfo.mode == shader_info::ShaderBlendMode::AlphaTest)
+            range.flags |= fg::CLUSTER_RANGE_FLAG_AT;
+        else if (mergeableType)
+            range.flags |= fg::CLUSTER_RANGE_FLAG_MERGEABLE;
+        ranges.push_back(range);
+        refCounts[range.key]++;
+    }
+
+    for (fg::ClusterBakeRange& range : ranges) {
+        if (refCounts[range.key] > 1)
+            range.flags &= ~fg::CLUSTER_RANGE_FLAG_MERGEABLE;
     }
 }
 

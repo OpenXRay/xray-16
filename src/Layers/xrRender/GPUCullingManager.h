@@ -607,7 +607,7 @@ public:
         bool alternative = false
     ) const;
 
-    void BakeClusterDAG(const xr_vector<ClusterMeshKey>& ranges);
+    void BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges);
     ClusterDAG& GetClusterDAG() { return m_clusterDAG; }
 
     static bindless::SourceVertexFormat DetectFormatFromDecl(
