@@ -95,8 +95,16 @@ void InitializeExposureResources(fg::RenderDevice* device, ExposurePassState& st
         texDesc.keepInitialState = true;
 
         state.exposureTexture = nvDevice->createTexture(texDesc);
-        if (!state.exposureTexture)
+        if (!state.exposureTexture) {
             Msg("! [ExposurePass] Failed to create exposure texture");
+        } else {
+            nvrhi::CommandListHandle initCmd = nvDevice->createCommandList();
+            initCmd->open();
+            float initialExposure = 1.0f;
+            initCmd->writeTexture(state.exposureTexture, 0, 0, &initialExposure, sizeof(float));
+            initCmd->close();
+            nvDevice->executeCommandList(initCmd);
+        }
     }
 
     if (state.computeEnabled) {
@@ -166,6 +174,11 @@ ExposureOutput setupExposurePass(
 {
     InitializeExposureResources(device, state);
 
+    if (!state.exposureTexture || !state.histogramBuffer) {
+        ExposureOutput output;
+        return output;
+    }
+
     ResourceDesc exposureDesc;
     exposureDesc.type = ResourceDesc::Type::Texture2D;
     exposureDesc.debugName = "Exposure";
@@ -174,8 +187,10 @@ ExposureOutput setupExposurePass(
     exposureDesc.format = nvrhi::Format::R32_FLOAT;
     exposureDesc.isRenderTarget = false;
     exposureDesc.isUAV = true;
+    exposureDesc.isImported = true;
+    exposureDesc.isTransient = false;
 
-    VirtualResourceHandle exposureHandle = fg.CreateTexture("exposure_rt", exposureDesc);
+    VirtualResourceHandle exposureHandle = fg.ImportTexture("exposure_rt", state.exposureTexture, exposureDesc);
 
     ResourceDesc histogramDesc;
     histogramDesc.type = ResourceDesc::Type::Buffer;
@@ -183,8 +198,10 @@ ExposureOutput setupExposurePass(
     histogramDesc.bufferSize = 64 * sizeof(u32);
     histogramDesc.structStride = sizeof(u32);
     histogramDesc.isUAV = true;
+    histogramDesc.isImported = true;
+    histogramDesc.isTransient = false;
 
-    VirtualResourceHandle histogramHandle = fg.CreateBuffer("luminance_rt", histogramDesc);
+    VirtualResourceHandle histogramHandle = fg.ImportBuffer("luminance_rt", state.histogramBuffer, histogramDesc);
 
     auto& passData = fg.addCallbackPass<ExposurePassData>(
         "Exposure",
