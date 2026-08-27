@@ -104,6 +104,9 @@ public:
         const bindless::UnifiedVertex* megaVertices,
         const u32* megaIndices);
 
+    bool TryLoadCache(const char* path, u64 geomStamp, const xr_vector<ClusterBakeRange>& ranges);
+    void SaveCache(const char* path, u64 geomStamp, const xr_vector<ClusterBakeRange>& ranges) const;
+
     void Clear();
 
     bool Empty() const { return m_records.empty(); }

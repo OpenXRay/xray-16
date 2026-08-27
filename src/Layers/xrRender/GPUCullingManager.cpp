@@ -3990,7 +3990,8 @@ void GPUCullingManager::EndLevelLoad()
     Msg("* [GPUCulling] Mega-buffers ready for GPU upload");
 }
 
-void GPUCullingManager::BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges)
+void GPUCullingManager::BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges,
+    const char* cachePath, u64 geomStamp)
 {
     if (!m_levelLoadInProgress) {
         Msg("! [GPUCulling] BakeClusterDAG called outside of level load");
@@ -4001,7 +4002,13 @@ void GPUCullingManager::BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges
     if (ranges.empty() || m_megaVertices.empty() || m_megaIndices.empty())
         return;
 
-    m_clusterDAG.Bake(ranges, m_megaVertices.data(), m_megaIndices.data());
+    const bool cacheEnabled = ps_r_cluster_cache != 0;
+
+    if (!cacheEnabled || !m_clusterDAG.TryLoadCache(cachePath, geomStamp, ranges)) {
+        m_clusterDAG.Bake(ranges, m_megaVertices.data(), m_megaIndices.data());
+        if (cacheEnabled)
+            m_clusterDAG.SaveCache(cachePath, geomStamp, ranges);
+    }
 
     const xr_vector<u32>& baked = m_clusterDAG.BakedIndices();
     if (baked.empty())
