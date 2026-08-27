@@ -607,7 +607,8 @@ public:
         bool alternative = false
     ) const;
 
-    void BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges);
+    void BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges,
+        const char* cachePath, u64 geomStamp);
     ClusterDAG& GetClusterDAG() { return m_clusterDAG; }
 
     static bindless::SourceVertexFormat DetectFormatFromDecl(
