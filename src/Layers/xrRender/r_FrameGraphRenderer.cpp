@@ -1091,6 +1091,17 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         bindlessConfig.dynamicSet.instanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
         bindlessConfig.dynamicSet.totalObjectCount = m_gpuCullingManager->GetDynamicObjectCount();
 
+        if (ps_r_cluster && m_gpuCullingManager->GetClusterEntryCount() > 0) {
+            bindlessConfig.clusterSet.compactDrawArgsBuffer = m_gpuCullingManager->GetClusterCmdBuffer();
+            bindlessConfig.clusterSet.compactMaterialIDBuffer = m_gpuCullingManager->GetClusterMaterialIDBuffer();
+            bindlessConfig.clusterSet.compactBatchIndicesBuffer = m_gpuCullingManager->GetClusterBatchIndexBuffer();
+            bindlessConfig.clusterSet.compactCountBuffer = m_gpuCullingManager->GetClusterCountBuffer();
+            bindlessConfig.clusterSet.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+            bindlessConfig.clusterSet.totalObjectCount = m_gpuCullingManager->GetClusterEntryCount();
+            bindlessConfig.clusterDrawIndexBuffer = m_gpuCullingManager->GetClusterDrawIndexBuffer();
+            bindlessConfig.clusterFadeBuffer = m_gpuCullingManager->GetClusterFadeBuffer();
+        }
+
         // ═══════════════════════════════════════════════════════
         //  MEGA-BUFFER CONFIGURATION (GPU-Driven Rendering)
         // ═══════════════════════════════════════════════════════

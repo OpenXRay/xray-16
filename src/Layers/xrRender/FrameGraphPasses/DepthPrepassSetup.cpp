@@ -166,7 +166,7 @@ static void renderDepthPrepass(
     state.viewport.addViewport(viewport);
     state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
-    auto drawSet = [&](const BindlessDrawSet& set) {
+    auto drawSet = [&](const BindlessDrawSet& set, nvrhi::IBuffer* indexStream) {
         if (!set.IsValid())
             return;
 
@@ -180,6 +180,10 @@ static void renderDepthPrepass(
         auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps.layout, nvDevice);
         R_ASSERT2(bindingSet, "Depth prepass binding set creation failed");
 
+        state.vertexBuffers = {
+            {config.megaVertexBuffer, 0, 0},
+            {indexStream, 1, 0}
+        };
         state.bindings = { bindingSet };
         if (bindlessTable)
             state.addBindingSet(bindlessTable);
@@ -190,8 +194,10 @@ static void renderDepthPrepass(
         DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, set.totalObjectCount);
     };
 
-    drawSet(config.staticSet);
-    drawSet(config.dynamicSet);
+    drawSet(config.staticSet, drawIndexBuffer);
+    drawSet(config.dynamicSet, drawIndexBuffer);
+    if (config.clusterDrawIndexBuffer)
+        drawSet(config.clusterSet, config.clusterDrawIndexBuffer);
 
     if (config.HasTerrain() && config.UseTerrainCompaction() && ps.terrainPipeline) {
         auto* psOpaqueReflection = shaderLoader->GetCachedReflection("bindless_depth_opaque", ".ps");

@@ -12,6 +12,7 @@ extern ENGINE_API Fvector4 ps_dev_param_1;
 extern ENGINE_API Fvector4 ps_dev_param_2;
 extern ENGINE_API Fvector4 ps_dev_param_3;
 extern ENGINE_API Fvector4 ps_dev_param_4;
+extern ECORE_API int ps_r_cluster_debug;
 extern ENGINE_API float psHUD_FOV;
 namespace xray::render {
     namespace fg {
@@ -205,6 +206,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.dev_param_2 = ps_dev_param_2;
     cb.dev_param_3 = ps_dev_param_3;
     cb.dev_param_4 = ps_dev_param_4;
+    cb.dev_param_4.x = float(ps_r_cluster_debug);
 }
 
 inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity) {

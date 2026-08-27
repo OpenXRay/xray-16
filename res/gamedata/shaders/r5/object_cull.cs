@@ -54,7 +54,8 @@ cbuffer CullParams : register(b5)  // b5 to avoid conflicts with common.h
     uint g_HiZMipLevels;           // Number of Hi-Z mip levels
     uint g_FrameId;                // Frame stamp for visibility
     uint g_UseHiZ;                 // 0 = prepass phase (frustum only), 1 = color phase (with Hi-Z)
-    uint2 g_Padding;
+    uint g_ClusterActive;
+    uint g_Padding;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -99,6 +100,9 @@ void main(uint3 dtID : SV_DispatchThreadID)
     // They render in the same MDI pass (opaque for now, blend PSO later).
 
     if (g_UseHiZ == 0 && (obj.flags & 0x8) != 0)
+        return;
+
+    if (g_ClusterActive != 0 && (obj.flags & 0x10) != 0)
         return;
 
     // ─────────────────────────────────────────────────────
