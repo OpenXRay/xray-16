@@ -116,49 +116,39 @@ HiZTestResult HiZTestSphereEx(
     result.frontDepth = 0.0;
     result.hiZDepth = 0.0;
 
-    float4 clipPos = mul(pyramidViewProj, float4(center, 1.0));
-    if (clipPos.w <= 0.001)
+    float4 clipC = mul(pyramidViewProj, float4(center, 1.0));
+    if (clipC.w <= 0.001)
         return result;
 
-    float3 ndc = clipPos.xyz / clipPos.w;
-
-    float projScale = max(abs(pyramidViewProj[0][0]), abs(pyramidViewProj[1][1]));
-    float2 ndcSize = float2(radius, radius) * projScale / clipPos.w;
-
-    float2 minNDC = ndc.xy - ndcSize;
-    float2 maxNDC = ndc.xy + ndcSize;
-
-    if (any(minNDC < -1.0) || any(maxNDC > 1.0))
+    float2 ndc = clipC.xy / clipC.w;
+    float2 uv = float2(ndc.x * 0.5 + 0.5, 0.5 - ndc.y * 0.5);
+    if (any(uv < 0.0) || any(uv > 1.0))
         return result;
 
-    float2 minUV = minNDC * 0.5 + 0.5;
-    float2 maxUV = maxNDC * 0.5 + 0.5;
+    float3 viewForward = normalize(pyramidViewProj[3].xyz);
+    float4 clipN = mul(pyramidViewProj, float4(center - viewForward * radius, 1.0));
+    if (clipN.w <= 0.001)
+        return result;
+    result.frontDepth = clipN.z / clipN.w;
 
-    minUV.y = 1.0 - minUV.y;
-    maxUV.y = 1.0 - maxUV.y;
-
-    float4 boxUV = float4(min(minUV, maxUV), max(minUV, maxUV));
-
-    float boxWidth = (boxUV.z - boxUV.x) * float(hiZWidth);
-    float boxHeight = (boxUV.w - boxUV.y) * float(hiZHeight);
-
-    float mipLevel = ceil(log2(max(1.0, max(boxWidth, boxHeight))));
-    mipLevel = clamp(mipLevel, 0.0, float(hiZMipLevels - 1));
-
-    float d1 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.y), mipLevel);
-    float d2 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.y), mipLevel);
-    float d3 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.w), mipLevel);
-    float d4 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.w), mipLevel);
-
-    result.hiZDepth = min(min(d1, d2), min(d3, d4));
-
-    float3 viewDir = normalize(center - cameraPos);
-    float3 frontPoint = center - viewDir * radius;
-    float4 frontClip = mul(pyramidViewProj, float4(frontPoint, 1.0));
-    if (frontClip.w <= 0.001)
+    float focal = length(pyramidViewProj[1].xyz);
+    float screenTexels = radius * focal * float(hiZHeight) / clipC.w;
+    uint mi = (uint)ceil(log2(max(1.0, screenTexels)));
+    if (mi > hiZMipLevels - 1)
         return result;
 
-    result.frontDepth = frontClip.z / frontClip.w;
+    float2 pc0 = uv * float2(hiZWidth, hiZHeight);
+    float halfT = 0.5 * screenTexels;
+    int2 tmax = int2(max(1u, hiZWidth >> mi), max(1u, hiZHeight >> mi)) - 1;
+    int2 t0 = clamp(int2(floor(pc0 - halfT)) >> (int)mi, int2(0, 0), tmax);
+    int2 t1 = clamp(int2(floor(pc0 + halfT)) >> (int)mi, int2(0, 0), tmax);
+
+    float d0 = hiZPyramid.Load(int3(t0.x, t0.y, mi));
+    float d1 = hiZPyramid.Load(int3(t1.x, t0.y, mi));
+    float d2 = hiZPyramid.Load(int3(t0.x, t1.y, mi));
+    float d3 = hiZPyramid.Load(int3(t1.x, t1.y, mi));
+
+    result.hiZDepth = min(min(d0, d1), min(d2, d3));
     result.visible = result.frontDepth >= result.hiZDepth;
     return result;
 }
