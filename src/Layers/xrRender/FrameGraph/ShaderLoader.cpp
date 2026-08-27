@@ -111,6 +111,67 @@ IReader* ShaderLoader::OpenShaderFile(const char* name, const char* extension)
     return R;
 }
 
+u32 ShaderLoader::ComputeSourceHash(const char* source, size_t sourceLen, const char* macros)
+{
+    u32 hash = macros
+        ? ShaderCache::ComputeHash(source, sourceLen, macros)
+        : ShaderCache::ComputeHash(source, sourceLen);
+
+    xr_set<xr_string> visited;
+    AccumulateIncludeHashes(source, sourceLen, hash, visited);
+    return hash;
+}
+
+void ShaderLoader::AccumulateIncludeHashes(const char* source, size_t sourceLen, u32& hash, xr_set<xr_string>& visited)
+{
+    static constexpr char token[] = "#include";
+    constexpr size_t tokenLen = sizeof(token) - 1;
+
+    if (sourceLen < tokenLen)
+        return;
+
+    for (size_t i = 0; i + tokenLen <= sourceLen; ++i)
+    {
+        if (source[i] != '#' || memcmp(source + i, token, tokenLen) != 0)
+            continue;
+
+        size_t p = i + tokenLen;
+        while (p < sourceLen && (source[p] == ' ' || source[p] == '\t'))
+            ++p;
+        if (p >= sourceLen || source[p] != '"')
+            continue;
+
+        size_t start = ++p;
+        while (p < sourceLen && source[p] != '"' && source[p] != '\n' && source[p] != '\r')
+            ++p;
+        if (p >= sourceLen || source[p] != '"' || p == start)
+            continue;
+
+        xr_string includeName(source + start, p - start);
+        for (char& c : includeName)
+            if (c == '/' || c == '\\')
+                c = DELIMITER[0];
+
+        if (!visited.insert(includeName).second)
+            continue;
+
+        string_path relPath;
+        strconcat(sizeof(relPath), relPath, "r5" DELIMITER, includeName.c_str());
+
+        hash ^= crc32(relPath, xr_strlen(relPath)) + 0x9E3779B9u + (hash << 6) + (hash >> 2);
+
+        IReader* R = FS.r_open("$game_shaders$", relPath);
+        if (!R)
+            continue;
+
+        const char* body = (const char*)R->pointer();
+        const size_t bodyLen = (size_t)R->length();
+        hash ^= crc32(body, (u32)bodyLen) + 0x9E3779B9u + (hash << 6) + (hash >> 2);
+        AccumulateIncludeHashes(body, bodyLen, hash, visited);
+        R->close();
+    }
+}
+
 void ShaderLoader::WatchShaderFile(
     const xr_string& cacheKey,
     const char* name,
@@ -156,7 +217,7 @@ bool ShaderLoader::CompileShader(
         return false;
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -229,7 +290,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     WatchShaderFile(cacheKey, name, ".vs", entryPoint, xray::render::SlangCompiler::Stage::Vertex);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -364,7 +425,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     WatchShaderFile(cacheKey, name, ".ps", entryPoint, xray::render::SlangCompiler::Stage::Pixel);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -506,7 +567,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     WatchShaderFile(cacheKey, name, ".cs", entryPoint, xray::render::SlangCompiler::Stage::Compute);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -649,7 +710,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
     WatchShaderFile(cacheKey, name, ".as", entryPoint, xray::render::SlangCompiler::Stage::Amplification);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -759,7 +820,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
     WatchShaderFile(cacheKey, name, ".ms", entryPoint, xray::render::SlangCompiler::Stage::Mesh);
 
     // Compute hash of shader source
-    u32 sourceHash = ShaderCache::ComputeHash(
+    u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
         fs->length()
     );
@@ -879,7 +940,7 @@ bool ShaderLoader::CompileShaderWithDefines(
         definesStr.append(";");
     }
 
-    u32 cacheKey = ShaderCache::ComputeHash(
+    u32 cacheKey = ComputeSourceHash(
         sourceCode.c_str(),
         sourceCode.length(),
         definesStr.c_str()
