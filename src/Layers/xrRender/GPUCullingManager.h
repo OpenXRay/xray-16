@@ -55,9 +55,10 @@ static_assert(sizeof(GPUParticleData) == 32, "GPUParticleData must be 32 bytes f
 
 
 enum GPUObjectFlags : u32 {
-    GPU_OBJECT_OPAQUE      = 0x1,
-    GPU_OBJECT_ALPHA_TEST  = 0x2,
-    GPU_OBJECT_TRANSPARENT = 0x4,
+    GPU_OBJECT_OPAQUE       = 0x1,
+    GPU_OBJECT_ALPHA_TEST   = 0x2,
+    GPU_OBJECT_TRANSPARENT  = 0x4,
+    GPU_OBJECT_PREPASS_SKIP = 0x8,
 };
 
 enum CullState : u32 {
@@ -152,12 +153,17 @@ public:
 
     GPUCullOutput SetupCullingPass(
         framegraph::FrameGraph& fg,
+        const GeometryCollector* geometry
+    );
+
+    void SetupHiZCullingPass(
+        framegraph::FrameGraph& fg,
         framegraph::VirtualResourceHandle hizPyramid,
         u32 hizWidth,
         u32 hizHeight,
         u32 hizMipLevels,
-        const GeometryCollector* geometry,
-        const Fmatrix& prevViewProj
+        framegraph::VirtualResourceHandle staticDrawArgsHandle,
+        framegraph::VirtualResourceHandle dynamicDrawArgsHandle
     );
 
     u32 GetObjectCount() const { return m_objectCount; }
@@ -288,7 +294,6 @@ public:
         u32 hizHeight,
         u32 hizMipLevels,
         const GeometryCollector* geometry,
-        const Fmatrix& prevViewProj,
         decals::OverlayManager* overlayMgr
     );
 
@@ -357,6 +362,17 @@ private:
     void CreateParticleResources(fg::RenderDevice* device);
     void CreateMegaBuffers();
 
+    struct CullPhaseParams {
+        bool useHiZ = false;
+        bool includeTransparent = false;
+        bool runPartition = false;
+        u32 stamp = 0;
+        u32 hizWidth = 0;
+        u32 hizHeight = 0;
+        u32 hizMipLevels = 0;
+    };
+    void ExecuteCullPhase(fg::RenderContext* ctx, nvrhi::ITexture* hizTexture, const CullPhaseParams& phase);
+
     void ExtractFrustumPlanes(Fmatrix& viewProj, Fvector4* outPlanes);
 
     struct CullSetBuffers {
@@ -397,6 +413,7 @@ private:
     nvrhi::BindingLayoutHandle m_compactScanLayout;
     nvrhi::BindingLayoutHandle m_compactScatterLayout;
     nvrhi::SamplerHandle m_pointSampler;
+    nvrhi::TextureHandle m_dummyHiZ;
 
     fg::BufferHandle m_compactParamsCB;
 

@@ -121,7 +121,6 @@ HiZPyramidOutput setupHiZBuildPass(
 
         [&, width, height, hizWidth, hizHeight, hizMipLevels](FrameGraph& builder, PassHandle passHandle, HiZBuildData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
 
             data.device = device;
             data.width = hizWidth;

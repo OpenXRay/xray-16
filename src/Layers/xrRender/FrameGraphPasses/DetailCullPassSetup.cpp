@@ -50,7 +50,6 @@ void setupDetailCullPass(
         [&, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, capturedPrevViewProj, hasPrevViewProj, gpuProfiler, detailState](
             FrameGraph& builder, PassHandle passHandle, DetailCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
             passBuilder.sideEffects();
 
             data.device = device;

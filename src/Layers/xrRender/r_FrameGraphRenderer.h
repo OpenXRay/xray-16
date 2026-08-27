@@ -444,7 +444,6 @@ private:
 
     framegraph::VirtualResourceHandle m_hizPyramid;
 
-    nvrhi::TextureHandle m_prevFrameDepth;
     nvrhi::TextureHandle m_normals[2];
     u32 m_pingPongIndex = 0;
 

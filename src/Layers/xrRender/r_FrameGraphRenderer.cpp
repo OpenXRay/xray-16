@@ -28,6 +28,7 @@
 
 #include "FrameGraphPasses/DebugDrawPassSetup.h"
 #include "FrameGraphPasses/HiZBuildPassSetup.h"
+#include "FrameGraphPasses/DepthPrepassSetup.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "GPUCullingManager.h"
 #include "FGDetailManager.h"
@@ -366,7 +367,6 @@ void FrameGraphRenderer::Shutdown() {
         m_blackboard.reset();
     }
 
-    m_prevFrameDepth = nullptr;
     m_normals[0] = nullptr;
     m_normals[1] = nullptr;
     m_inspectorPreview = nullptr;
@@ -971,43 +971,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     baseColorDesc.isTransient = true;
     framegraph::VirtualResourceHandle baseColorBuffer = m_framegraph->CreateTexture("rt_BaseColor", baseColorDesc);
 
-    passes::HiZPyramidOutput hizOutput;
-    hizOutput.pyramid = framegraph::VirtualResourceHandle();
-    hizOutput.mipLevels = 0;
-    hizOutput.width = width / 2;
-    hizOutput.height = height / 2;
-
-    framegraph::VirtualResourceHandle prevDepthHandle;
-    bool hasPrevDepth = m_hasPrevFrameData && m_prevFrameDepth &&
-                        m_prevFrameWidth == width && m_prevFrameHeight == height;
-
-    if (hasPrevDepth) {
-        framegraph::ResourceDesc prevDepthDesc;
-        prevDepthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-        prevDepthDesc.debugName = "rt_PrevDepth";
-        prevDepthDesc.width = width;
-        prevDepthDesc.height = height;
-        prevDepthDesc.format = nvrhi::Format::D32;
-        prevDepthDesc.isDepthStencil = true;
-        prevDepthDesc.isImported = true;
-        prevDepthDesc.isTransient = false;
-
-        prevDepthHandle = m_framegraph->ImportTexture("rt_PrevDepth", m_prevFrameDepth, prevDepthDesc);
-
-        hizOutput = passes::setupHiZBuildPass(
-            *m_framegraph,
-            m_device,
-            prevDepthHandle,
-            width,
-            height,
-            m_blackboard->get_or_add<passes::HiZBuildPassState>()
-        );
-    }
-
-    m_hizPyramid = hizOutput.pyramid;
-    if (m_hizPyramid.is_valid())
-        m_framegraph->GetRTRegistry().RegisterRT("rt_HiZ", m_hizPyramid);
-
     framegraph::VirtualResourceHandle prevNormalsHandle;
     if (m_hasPrevFrameData && m_normals[readIdx]) {
         framegraph::ResourceDesc prevNormalsDesc;
@@ -1025,8 +988,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     framegraph::VirtualResourceHandle drawArgsBuffer;
     framegraph::VirtualResourceHandle skinnedDrawArgsBuffer;
+    GPUCullOutput cullOutput;
+    bool cullActive = false;
 
-    if (m_gpuCullingManager && hizOutput.pyramid.is_valid()) {
+    if (m_gpuCullingManager) {
         m_gpuCullingManager->Initialize(m_device);
 
         if (m_detailManager && !m_detailManager->computePipeline) {
@@ -1053,64 +1018,15 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_gpuCullingManager->SetRTAccelStructManager(m_rtAccelMgr.get());
 
         if (m_gpuCullingManager->IsEnabled()) {
-            auto cullOutput = m_gpuCullingManager->SetupCullingPass(
+            cullOutput = m_gpuCullingManager->SetupCullingPass(
                 *m_framegraph,
-                m_hizPyramid,
-                hizOutput.width,
-                hizOutput.height,
-                hizOutput.mipLevels,
-                m_geometryCollector.get(),
-                m_prevViewProj
+                m_geometryCollector.get()
             );
 
             drawArgsBuffer = cullOutput.drawArgsBuffer;
-        }
-
-        if (m_gpuCullingManager->IsSkinnedCullingEnabled()) {
-            skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedCullingPass(
-                *m_framegraph,
-                m_hizPyramid,
-                hizOutput.width,
-                hizOutput.height,
-                hizOutput.mipLevels,
-                m_geometryCollector.get(),
-                m_prevViewProj,
-                m_overlayManager.get()
-            );
+            cullActive = drawArgsBuffer.is_valid();
         }
     }
-
-    framegraph::ResourceDesc colorDesc;
-    colorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    colorDesc.width = width;
-    colorDesc.height = height;
-    colorDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    colorDesc.isRenderTarget = true;
-    colorDesc.debugName = "rt_SceneColor";
-
-    auto skyColorHandle = m_framegraph->CreateTexture("rt_SceneColor", colorDesc);
-
-    FGEnvironmentRender* fgEnv = nullptr;
-    if (g_pGamePersistent)
-        fgEnv = dynamic_cast<FGEnvironmentRender*>(&*g_pGamePersistent->Environment().m_pRender);
-
-    auto skyOutput = passes::setupSkyPass(
-        *m_framegraph,
-        skyColorHandle,
-        depthBuffer,
-        fgEnv,
-        width,
-        height
-    );
-
-    auto sunOutput = passes::setupSunPass(
-        *m_framegraph,
-        skyOutput,
-        fgEnv,
-        width,
-        height
-    );
-
     passes::BindlessForwardConfig bindlessConfig;
     if (m_gpuCullingManager && m_gpuCullingManager->IsCompactionEnabled()) {
         bindlessConfig.enabled = true;
@@ -1151,6 +1067,101 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.variantPartition = m_gpuCullingManager->GetStaticPartition().ToConfig();
     }
 
+    bool prepassActive = false;
+    if (cullActive && bindlessConfig.enabled && bindlessConfig.UseMegaBuffers()) {
+        auto& prepassState = m_blackboard->get_or_add<passes::DepthPrepassState>();
+        passes::setupDepthPrepass(
+            *m_framegraph,
+            m_device,
+            depthBuffer,
+            drawArgsBuffer,
+            bindlessConfig,
+            m_materialCache.get(),
+            width,
+            height,
+            &prepassState
+        );
+        prepassActive = prepassState.initialized;
+        bindlessConfig.prepassActive = prepassActive;
+    }
+
+    passes::HiZPyramidOutput hizOutput;
+    hizOutput.pyramid = framegraph::VirtualResourceHandle();
+    hizOutput.mipLevels = 0;
+    hizOutput.width = width / 2;
+    hizOutput.height = height / 2;
+
+    if (prepassActive) {
+        hizOutput = passes::setupHiZBuildPass(
+            *m_framegraph,
+            m_device,
+            depthBuffer,
+            width,
+            height,
+            m_blackboard->get_or_add<passes::HiZBuildPassState>()
+        );
+    }
+
+    m_hizPyramid = hizOutput.pyramid;
+    if (m_hizPyramid.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_HiZ", m_hizPyramid);
+
+    if (cullActive && hizOutput.pyramid.is_valid()) {
+        m_gpuCullingManager->SetupHiZCullingPass(
+            *m_framegraph,
+            hizOutput.pyramid,
+            hizOutput.width,
+            hizOutput.height,
+            hizOutput.mipLevels,
+            cullOutput.staticDrawArgsBuffer,
+            cullOutput.dynamicDrawArgsBuffer
+        );
+    }
+
+    if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedCullingEnabled() && hizOutput.pyramid.is_valid()) {
+        skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedCullingPass(
+            *m_framegraph,
+            m_hizPyramid,
+            hizOutput.width,
+            hizOutput.height,
+            hizOutput.mipLevels,
+            m_geometryCollector.get(),
+            m_overlayManager.get()
+        );
+    }
+
+    framegraph::ResourceDesc colorDesc;
+    colorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    colorDesc.width = width;
+    colorDesc.height = height;
+    colorDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    colorDesc.isRenderTarget = true;
+    colorDesc.debugName = "rt_SceneColor";
+
+    auto skyColorHandle = m_framegraph->CreateTexture("rt_SceneColor", colorDesc);
+
+    FGEnvironmentRender* fgEnv = nullptr;
+    if (g_pGamePersistent)
+        fgEnv = dynamic_cast<FGEnvironmentRender*>(&*g_pGamePersistent->Environment().m_pRender);
+
+    auto skyOutput = passes::setupSkyPass(
+        *m_framegraph,
+        skyColorHandle,
+        depthBuffer,
+        fgEnv,
+        width,
+        height
+    );
+
+    auto sunOutput = passes::setupSunPass(
+        *m_framegraph,
+        skyOutput,
+        fgEnv,
+        width,
+        height
+    );
+
+
     auto& clmSetup = fg::ClusteredLightManager::Instance();
     if (clmSetup.IsReady() && clmSetup.GetLightCount() > 0) {
         passes::setupClusterLightPass(
@@ -1164,8 +1175,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             hizOutput.width,
             hizOutput.height,
             hizOutput.mipLevels,
-            m_prevViewProj,
-            m_hasPrevFrameData
+            Device.mFullTransform,
+            hizOutput.pyramid.is_valid()
         );
     }
 
@@ -1194,7 +1205,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             hizOutput.width,
             hizOutput.height,
             hizOutput.mipLevels,
-            m_prevViewProj,
+            Device.mFullTransform,
             &m_worldParticleBatches
         );
     }
@@ -1222,7 +1233,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.width,
         hizOutput.height,
         hizOutput.mipLevels,
-        m_hasPrevFrameData ? &m_prevViewProj : nullptr,
+        nullptr,
         m_gpuProfiler.get(),
         &m_blackboard->get_or_add<passes::DetailPassState>()
     );
@@ -1317,8 +1328,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.width,
         hizOutput.height,
         hizOutput.mipLevels,
-        m_hasPrevFrameData ? &m_prevViewProj : nullptr,
-        prevDepthHandle,
+        &Device.mFullTransform,
+        framegraph::VirtualResourceHandle(),
         &m_blackboard->get_or_add<passes::ParticlePassState>()
     );
 
@@ -1369,7 +1380,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             *m_framegraph, m_device, m_rtAccelMgr.get(),
             transparentOutputs.depth, transparentOutputs.normal,
             transparentOutputs.baseColor,
-            prevNormalsHandle, prevDepthHandle,
+            prevNormalsHandle, framegraph::VirtualResourceHandle(),
             motionOutput.motionVectors,
             sceneColor,
             Device.mInvFullTransform, m_prevViewProj,
@@ -1721,54 +1732,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
 
     m_finalOutput = finalOutput;
-
-    {
-        nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
-
-        if (!m_prevFrameDepth || m_prevFrameWidth != width || m_prevFrameHeight != height) {
-            nvrhi::TextureDesc prevDepthDesc;
-            prevDepthDesc.width = width;
-            prevDepthDesc.height = height;
-            prevDepthDesc.format = nvrhi::Format::D32;
-            prevDepthDesc.isShaderResource = true;
-            prevDepthDesc.debugName = "PrevFrameDepth";
-            prevDepthDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-            prevDepthDesc.keepInitialState = true;
-
-            m_prevFrameDepth = nvDevice->createTexture(prevDepthDesc);
-            m_prevFrameWidth = width;
-            m_prevFrameHeight = height;
-            if (m_prevFrameDepth)
-                Msg("* [TemporalHiZ] Created persistent depth buffer: %dx%d", width, height);
-        }
-
-        if (m_prevFrameDepth) {
-            framegraph::ResourceDesc prevDepthImportDesc;
-            prevDepthImportDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-            prevDepthImportDesc.debugName = "rt_PrevDepthCopyDest";
-            prevDepthImportDesc.width = width;
-            prevDepthImportDesc.height = height;
-            prevDepthImportDesc.format = nvrhi::Format::D32;
-            prevDepthImportDesc.isDepthStencil = true;
-            prevDepthImportDesc.isImported = true;
-            prevDepthImportDesc.isTransient = false;
-
-            auto prevDepthCopyDest = m_framegraph->ImportTexture("rt_PrevDepthCopyDest", m_prevFrameDepth, prevDepthImportDesc);
-
-            auto finalDepth = transparentOutputs.depth;
-            framegraph::PassHandle depthCopyPass = m_framegraph->AddPass("DepthCopy");
-            m_framegraph->PassRead(depthCopyPass, finalDepth, framegraph::ResourceState::CopySource);
-            m_framegraph->PassWrite(depthCopyPass, prevDepthCopyDest, framegraph::ResourceState::CopyDest);
-            m_framegraph->SetPassCallback(depthCopyPass,
-                [finalDepth, prevDepthCopyDest](fg::RenderContext& ctx, const framegraph::FrameGraph& fg) {
-                    nvrhi::ITexture* src = fg.GetPhysicalTexture(finalDepth);
-                    nvrhi::ITexture* dst = fg.GetPhysicalTexture(prevDepthCopyDest);
-                    if (src && dst)
-                        ctx.GetCommandList()->copyTexture(dst, nvrhi::TextureSlice(), src, nvrhi::TextureSlice());
-                }
-            );
-        }
-    }
 
     m_prevFrameWidth = width;
     m_prevFrameHeight = height;

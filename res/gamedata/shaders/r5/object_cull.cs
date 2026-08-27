@@ -23,7 +23,7 @@ struct IndirectDrawArgs
 cbuffer CullParams : register(b5)
 {
     float4x4 g_ViewProj;
-    float4x4 g_PrevViewProj;
+    float4x4 g_HiZViewProj;
     float3 g_CameraPos;
     float g_MaxDistance;
     float4 g_FrustumPlanes[6];
@@ -32,7 +32,8 @@ cbuffer CullParams : register(b5)
     uint g_HiZHeight;
     uint g_HiZMipLevels;
     uint g_FrameId;
-    uint3 g_Padding;
+    uint g_UseHiZ;
+    uint2 g_Padding;
 };
 
 StructuredBuffer<GPUObjectData> g_Objects : register(t0);
@@ -56,13 +57,17 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     GPUObjectData obj = g_Objects[objectIdx];
 
+    if (g_UseHiZ == 0 && (obj.flags & 0x8) != 0)
+        return;
+
     if (!DistanceTestSphere(obj.position, obj.radius, g_CameraPos, g_MaxDistance))
         return;
 
     if (!FrustumTestSphere(obj.position, obj.radius, g_FrustumPlanes))
         return;
 
-    if (!HiZTestSphere(obj.position, obj.radius, g_CameraPos, g_PrevViewProj,
+    if (g_UseHiZ != 0 &&
+        !HiZTestSphere(obj.position, obj.radius, g_CameraPos, g_HiZViewProj,
                        g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
         return;
 
