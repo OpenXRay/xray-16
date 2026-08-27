@@ -170,7 +170,7 @@ private:
     using VertexDeclarator = ::xray::render::fg::VertexDeclarator;
     void LoadBuffers(CStreamReader* fs, bool alternative);
     void LoadVisuals(IReader* fs);
-    void CollectClusterBakeRanges(xr_vector<fg::ClusterMeshKey>& ranges);
+    void CollectClusterBakeRanges(xr_vector<fg::ClusterBakeRange>& ranges);
     void LoadLights(IReader* fs);
     void LoadSectors(IReader* fs);
     void LoadSWIs(CStreamReader* fs);
