@@ -7,16 +7,34 @@ Source of truth: `/Users/yohjimane/modding/OGSR-Engine/ogsr_engine/Layers/xrRend
 
 ## TODO (living checklist)
 
-- [ ] M1a: bake harness — range dedup over mega arrays, clod per-mesh path, input validation, threading
-- [ ] M1b: component merge + cross-unit seam pins + orphan attach pass
-- [ ] M1c: bake hygiene (self-loop drop) + cut-complementarity check + parentError histogram + timing logs
-- [ ] M1d: disk cache (superset-tolerant, key-matched, stdio)
-- [ ] M2a: entry table build at static-batch collection (world-space spheres, scale-aware errors, batch/material streams)
-- [ ] M2b: cluster cull shader (frustum + SSA, cut forced finest) with direct-append cmd emission + per-draw streams
-- [ ] M2c: draw integration (prepass + color consume cluster buffers; `r_cluster 0` = today's whole-mesh path untouched) + rainbow debug view
-- [ ] M3: projErr DAG cut live (`r_cluster_lod`), SSA exemption rules, LOD-health debug view
-- [ ] M4: crossfade band + Bayer screen-door in prepass AND color + Hi-Z mid-transition exemption
-- [ ] M5: stats/audit port, host-memory trim after upload, measurements
+- [x] M1a: bake harness — range dedup over mega arrays, clod per-mesh path, input validation, threading (`3f56d1976`)
+- [x] M1b: component merge + cross-unit seam pins + orphan attach pass (`6ecc75be7`)
+- [x] M1c: bake hygiene (self-loop drop) + cut-complementarity check + parentError histogram + timing logs (in M1a/M1b)
+- [x] M1d: disk cache — full-snapshot keyed by (params, geom stamp, range-set hash); v1 trades their per-record
+      key-matching for whole-bake validity, partial reuse deferred (`8de71b795`)
+- [x] M2a: entry table build at static-batch collection (world-space spheres, scale-aware errors, batch/material streams) (`eb8aa9ae4`)
+- [x] M2b: cluster cull shader with direct-append cmd emission + per-draw streams (`cluster_cull.cs`)
+- [x] M2c: draw integration (prepass + color cluster MDI; `r_cluster` live-toggles via `g_ClusterActive` back to the whole-mesh path) + `r_cluster_debug 1` rainbow
+- [x] M3: projErr DAG cut live (`r_cluster_lod`; `0.05` = forced-finest parity mode); health views `r_cluster_debug 2`=level `3`=parentError class `4`=fade viz
+- [x] M4: crossfade band + Bayer screen-door in prepass AND color (shared `cluster_fade.h`) + Hi-Z mid-transition exemption (`64d483272`)
+- [x] M5: cluster line in rs_stats (entries drawn/total) (`3fadd165d`); in-game measurements pending first playtest
+
+Shipped deviations from §1-§5 (recorded 2026-08-27):
+- Unclustered static batches KEEP the existing whole-mesh cull path (no `flags bit1` plain
+  entries); SSA (`r_ssa_px`) is therefore inert until plain entries exist. The cull still
+  implements the bit1 SSA branch for when they arrive.
+- Fade words are fetched by the PS itself via the `drawID` interpolant (added TEXCOORD6 to
+  the bindless VS output and its four paired PS inputs), not passed through the VS; the
+  encoding is neutral-at-zero (`(63-fA)|fB<<6`) so the shared 1-element dummy buffer bound
+  for non-cluster sets decodes as fully opaque, and fade bits 12-17 carry depth/errClass
+  debug data.
+- Forced-finest for the M2 parity gate is `r_cluster_lod 0.05` (the min clamp), not a flag.
+- Cache is a full-bake snapshot keyed by (params, geom stamp, range-set hash) — a superset
+  is NOT yet a hit; any eligibility change rebakes (threaded; per-record matching deferred).
+- Component entry resolution: each member proto uses its own batch's transform/material; a
+  member whose batch never appears falls back to the first present member's batch.
+- Variant/blend (`PREPASS_SKIP`) statics never enter the entry table; they continue through
+  the variant partition path untouched.
 
 ## 0. The system in one paragraph
 
