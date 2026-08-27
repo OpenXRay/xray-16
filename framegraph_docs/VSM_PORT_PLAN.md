@@ -49,8 +49,10 @@ PCSS, temporal EMA, and a no-page history carry. Receivers pay one texture load.
 - **Entire tree caster stack** (`r_vsm_tree_*`, wind hybrid, invalidation circles, near-set,
   meshlets, hulls, voxel bricks, impostors, tree VRS): predicated on animated trees; ours are
   rigid members of the static set. The residency shader keeps the 4-circle input (zeroed).
-- **Cluster bin** (`vsm_bin_cluster`, candidates, combos): no cluster DAG here; their
-  per-mesh path is their own shipped fallback and is what we port — upgraded with bindless AT.
+- **Cluster bin** (`vsm_bin_cluster`, candidates, combos): SEQUENCING CHANGE 2026-08-27 —
+  the cluster DAG now lands BEFORE VSM (see CLUSTER_DAG_PORT_PLAN.md), so the cluster bin
+  ships with VSM from the start (ortho constant-error cut over the same entry buffer);
+  their per-mesh path remains the fallback for plain/unclusterable meshes.
 - **Receiver mask (`r_vsm_rmask`)**: its only consumers are the tree/voxel bins we don't
   port. Omit the buffer and the mark work entirely.
 - **Shadow-HZB (`r_vsm_hzb`)**: default OFF for them, "measured no net gain". Skip.
@@ -63,7 +65,7 @@ Revisit triggers (the conditions that flip each cut, decided 2026-08-27):
 |---|---|---|
 | Tree wind hybrid + invalidation circles + near-set | tree wind animation is restored — MUST land in the same milestone as visual wind (wind in color without it = self-shadow banding + frozen shadows, their documented failure) | tree-dyn bin beside the skinned bin; shared wind include between color VS and page VS; the residency 4-circle input is already kept warm |
 | Tree LOD tiers (hulls, voxels, meshlets, impostors) | only after the hybrid exists AND profiling shows dyn crown fill cost — they default most of these off themselves | measured-need, one tier at a time |
-| VSM cluster bin | the world cluster-LOD DAG ships (its own post-VSM project) | days of work; unlocks ortho-constant shadow LOD with zero cache invalidations |
+| VSM cluster bin | RESOLVED 2026-08-27: DAG re-sequenced to precede VSM — the bin ships with VSM M1 | ortho-constant shadow LOD with zero cache invalidations, same entry buffer as the world cull |
 | Receiver mask (rmask) | together with the tree hybrid, never alone — its only consumers are tree/voxel bins | mark-side cell bits + bin-side test; NEVER applied to static cached pages |
 
 ## 3. Resources (ours; sizes from their constants)
