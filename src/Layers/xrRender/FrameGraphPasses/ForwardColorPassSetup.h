@@ -49,6 +49,7 @@ struct BindlessDrawSet {
     nvrhi::IBuffer* compactBatchIndicesBuffer = nullptr;   // Draw index → batch index map
     nvrhi::IBuffer* instanceBuffer = nullptr;              // Instance data buffer
     nvrhi::IBuffer* compactCountBuffer = nullptr;          // Visible draw count
+    nvrhi::IBuffer* fadeBuffer = nullptr;                  // Per-draw fade words (neutral dummy when unused)
     u32 totalObjectCount = 0;                               // Max draw count
 
     bool IsValid() const {

@@ -176,6 +176,7 @@ static void renderDepthPrepass(
         bsb.BufferSRV("g_InstanceData", set.instanceBuffer);
         bsb.BufferSRV("g_CompactBatchIndices", set.compactBatchIndicesBuffer);
         bsb.BufferSRV("g_CompactMaterialIDs", set.compactMaterialIDBuffer);
+        bsb.BufferSRV("g_DrawFades", set.fadeBuffer);
 
         auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), ps.layout, nvDevice);
         R_ASSERT2(bindingSet, "Depth prepass binding set creation failed");

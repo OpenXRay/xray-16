@@ -128,5 +128,5 @@ void main(uint3 dtID : SV_DispatchThreadID)
     g_OutCmds[slot] = cmd;
     g_OutBatchIndices[slot] = e.batchIndex;
     g_OutMaterialIDs[slot] = e.materialID;
-    g_OutFades[slot] = fA | (fB << 6);
+    g_OutFades[slot] = (63u - fA) | (fB << 6) | (((e.flags >> 8) & 0x3Fu) << 12);
 }
