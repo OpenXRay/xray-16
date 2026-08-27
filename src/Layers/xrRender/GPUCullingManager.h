@@ -7,6 +7,7 @@
 #include "Layers/xrRender/Bindless/UnifiedVertex.h"
 #include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 #include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
+#include "Layers/xrRender/ClusterDAG.h"
 
 namespace xray::render::fg::passes {
     struct ParticleBatch;
@@ -559,6 +560,8 @@ private:
     bool m_megaDataUploaded = false;
     bool m_levelLoadInProgress = false;
 
+    ClusterDAG m_clusterDAG;
+
     struct VBPoolInfo {
         u32 megaBufferVertexOffset;
         u32 vertexCount;
@@ -603,6 +606,9 @@ public:
         u32 ibID, u32 iBase, u32 iCount,
         bool alternative = false
     ) const;
+
+    void BakeClusterDAG(const xr_vector<ClusterMeshKey>& ranges);
+    ClusterDAG& GetClusterDAG() { return m_clusterDAG; }
 
     static bindless::SourceVertexFormat DetectFormatFromDecl(
         const VertexElement* decl,
