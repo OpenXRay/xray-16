@@ -4,6 +4,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include "ShaderCache.h"
+#include "xrCommon/xr_set.h"
 #include <filesystem>
 
 // Need full include (not just forward decl) since we use SlangCompiler::Stage
@@ -182,6 +183,13 @@ private:
     /// Read shader source from file
     /// </summary>
     IReader* OpenShaderFile(const char* name, const char* extension);
+
+    /// <summary>
+    /// Hash shader source plus the contents of every transitively included file,
+    /// so edits to shared headers invalidate the disk cache
+    /// </summary>
+    u32 ComputeSourceHash(const char* source, size_t sourceLen, const char* macros = nullptr);
+    void AccumulateIncludeHashes(const char* source, size_t sourceLen, u32& hash, xr_set<xr_string>& visited);
 
 public:
     void SetTarget(xray::render::SlangCompiler::Target target) {
