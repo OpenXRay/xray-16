@@ -54,6 +54,10 @@ struct RenderStats
     u32 particleQuadsSubmitted = 0; // Total particle quads submitted
     u32 particleQuadsVisible = 0;   // Particle quads in visible batches
 
+    // Cluster LOD stats
+    u32 clusterEntries = 0;         // Total cluster entries in the static entry table
+    u32 clusterVisible = 0;         // Entries drawn last frame (post cut + Hi-Z)
+
     u32 lightsClustered = 0;
     u32 lightsHiZVisible = 0;
     u32 lightsPoint = 0;
@@ -90,6 +94,7 @@ struct RenderStats
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
         skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
+        clusterEntries = clusterVisible = 0;
         lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
         detailInstances = detailSlots = 0;
         detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;

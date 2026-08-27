@@ -385,6 +385,7 @@ public:
         u32 dynamicVisible = 0;
         u32 terrainVisible = 0;
         u32 transparentVisible = 0;
+        u32 clusterVisible = 0;
         u32 totalVisible() const { return staticVisible + dynamicVisible + terrainVisible + transparentVisible; }
     };
     const CullingStats& GetCullingStats() const { return m_cullingStats; }
