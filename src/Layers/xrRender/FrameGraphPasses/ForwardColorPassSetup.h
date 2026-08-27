@@ -38,6 +38,9 @@ struct BindlessDrawSet {
 struct BindlessForwardConfig {
     BindlessDrawSet staticSet;
     BindlessDrawSet dynamicSet;
+    BindlessDrawSet clusterSet;
+    nvrhi::IBuffer* clusterDrawIndexBuffer = nullptr;
+    nvrhi::IBuffer* clusterFadeBuffer = nullptr;
 
     bool enabled = false;
 

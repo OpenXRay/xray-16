@@ -10,6 +10,7 @@ struct PS_INPUT
     float3 tangent  : TEXCOORD3;
     float3 bitangent: TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;
+    nointerpolation uint drawID : TEXCOORD6;
 };
 
 void main(PS_INPUT input)

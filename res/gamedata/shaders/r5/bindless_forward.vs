@@ -23,6 +23,7 @@ struct VS_OUTPUT
     float3 tangent  : TEXCOORD3;
     float3 bitangent: TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;
+    nointerpolation uint drawID : TEXCOORD6;
 };
 
 struct InstanceData
@@ -72,6 +73,7 @@ VS_OUTPUT main(VS_INPUT input)
     output.texcoord = input.texcoord;
 
     output.materialID = materialID;
+    output.drawID = drawID;
 
     return output;
 }

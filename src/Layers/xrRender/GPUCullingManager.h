@@ -60,6 +60,27 @@ enum GPUObjectFlags : u32 {
     GPU_OBJECT_ALPHA_TEST   = 0x2,
     GPU_OBJECT_TRANSPARENT  = 0x4,
     GPU_OBJECT_PREPASS_SKIP = 0x8,
+    GPU_OBJECT_CLUSTERED    = 0x10,
+};
+
+struct GPUClusterEntry {
+    Fvector4 sphere;
+    Fvector4 lodSelf;
+    Fvector4 lodParent;
+    u32 indexCount;
+    u32 ibFirst;
+    u32 firstVertex;
+    u32 batchIndex;
+    u32 materialID;
+    u32 flags;
+    float selfError;
+    float parentError;
+};
+static_assert(sizeof(GPUClusterEntry) == 80, "GPUClusterEntry must be 80 bytes");
+
+enum GPUClusterEntryFlags : u32 {
+    GPU_CLUSTER_ENTRY_AT    = 0x1,
+    GPU_CLUSTER_ENTRY_PLAIN = 0x2,
 };
 
 enum CullState : u32 {
@@ -355,6 +376,14 @@ public:
     nvrhi::IBuffer* GetTerrainCompactCountBuffer() const { return m_terrainCompactCountBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainCompactMaterialIDBuffer() const { return m_terrainCompactMaterialIDBuffer.Get(); }
 
+    nvrhi::IBuffer* GetClusterCmdBuffer() const { return m_clusterSet.cmdBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterCountBuffer() const { return m_clusterSet.countBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterBatchIndexBuffer() const { return m_clusterSet.batchIndexBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterMaterialIDBuffer() const { return m_clusterSet.materialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterFadeBuffer() const { return m_clusterSet.fadeBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterDrawIndexBuffer() const { return m_clusterSet.drawIndexBuffer.Get(); }
+    u32 GetClusterEntryCount() const { return m_clusterSet.entryCount; }
+
 private:
     void CreateBuffers(fg::RenderDevice* device);
     void CreateComputePipeline(fg::RenderDevice* device);
@@ -400,6 +429,30 @@ private:
 
     CullSetBuffers m_staticSet;
     CullSetBuffers m_dynamicSet;
+
+    struct ClusterCullBuffers {
+        nvrhi::BufferHandle entryBuffer;
+        nvrhi::BufferHandle cmdBuffer;
+        nvrhi::BufferHandle countBuffer;
+        nvrhi::BufferHandle batchIndexBuffer;
+        nvrhi::BufferHandle materialIDBuffer;
+        nvrhi::BufferHandle fadeBuffer;
+        nvrhi::BufferHandle drawIndexBuffer;
+        u32 entryCount = 0;
+        bool uploaded = false;
+    };
+    ClusterCullBuffers m_clusterSet;
+    xr_vector<GPUClusterEntry> m_clusterEntryData;
+    xr_vector<ClusterMeshKey> m_staticBatchKeys;
+    nvrhi::ComputePipelineHandle m_clusterCullPipeline;
+    nvrhi::BindingLayoutHandle m_clusterCullLayout;
+    fg::BufferHandle m_clusterCullParamsCB;
+
+    void BuildClusterEntries();
+    void UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice);
+    bool EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice);
+    void DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        nvrhi::ITexture* hizTexture, const CullPhaseParams& phase);
 
     fg::BufferHandle m_cullParamsCB;
 

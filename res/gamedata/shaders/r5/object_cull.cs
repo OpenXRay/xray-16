@@ -33,7 +33,8 @@ cbuffer CullParams : register(b5)
     uint g_HiZMipLevels;
     uint g_FrameId;
     uint g_UseHiZ;
-    uint2 g_Padding;
+    uint g_ClusterActive;
+    uint g_Padding;
 };
 
 StructuredBuffer<GPUObjectData> g_Objects : register(t0);
@@ -58,6 +59,9 @@ void main(uint3 dtID : SV_DispatchThreadID)
     GPUObjectData obj = g_Objects[objectIdx];
 
     if (g_UseHiZ == 0 && (obj.flags & 0x8) != 0)
+        return;
+
+    if (g_ClusterActive != 0 && (obj.flags & 0x10) != 0)
         return;
 
     if (!DistanceTestSphere(obj.position, obj.radius, g_CameraPos, g_MaxDistance))
