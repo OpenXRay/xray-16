@@ -328,22 +328,22 @@ void RenderDevice::UploadTextureDataToNVRHI(
     std::lock_guard<std::mutex> lock(m_uploadMutex);
 
     const auto& desc = texture->getDesc();
-    u32 rowPitch = 0;
+    const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(desc.format);
+    u32 mipWidth = (desc.width >> mipLevel) > 0 ? (u32)(desc.width >> mipLevel) : 1;
+    u32 mipHeight = (desc.height >> mipLevel) > 0 ? (u32)(desc.height >> mipLevel) : 1;
 
-    switch (desc.format) {
-        case nvrhi::Format::RGBA8_UNORM:
-        case nvrhi::Format::BGRA8_UNORM:
-            rowPitch = desc.width * 4;
-            break;
-        case nvrhi::Format::R8_UNORM:
-            rowPitch = desc.width;
-            break;
-        default:
-            rowPitch = dataSize / desc.height;
-            break;
+    u32 rowPitch, rowCount;
+    if (formatInfo.blockSize > 1) {
+        u32 blockWidth = (mipWidth + formatInfo.blockSize - 1) / formatInfo.blockSize;
+        u32 blockHeight = (mipHeight + formatInfo.blockSize - 1) / formatInfo.blockSize;
+        rowPitch = blockWidth * formatInfo.bytesPerBlock;
+        rowCount = blockHeight;
+    } else {
+        rowPitch = mipWidth * formatInfo.bytesPerBlock;
+        rowCount = mipHeight;
     }
 
-    size_t depthPitch = rowPitch * desc.height;
+    size_t depthPitch = (size_t)rowPitch * rowCount;
 
     ScopedUpload upload(m_backend.get(), GetNativeDevice());
     upload.Get()->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, depthPitch);
