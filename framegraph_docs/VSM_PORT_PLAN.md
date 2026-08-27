@@ -57,6 +57,15 @@ PCSS, temporal EMA, and a no-page history carry. Receivers pay one texture load.
 - **`r_vsm_ta_blend_dlss`**: no DLSS.
 - **Fog sampling of the atlas**: no volumetrics yet; the atlas accessors should exist for it.
 
+Revisit triggers (the conditions that flip each cut, decided 2026-08-27):
+
+| Cut feature | Adopt when | Shape of the adoption |
+|---|---|---|
+| Tree wind hybrid + invalidation circles + near-set | tree wind animation is restored — MUST land in the same milestone as visual wind (wind in color without it = self-shadow banding + frozen shadows, their documented failure) | tree-dyn bin beside the skinned bin; shared wind include between color VS and page VS; the residency 4-circle input is already kept warm |
+| Tree LOD tiers (hulls, voxels, meshlets, impostors) | only after the hybrid exists AND profiling shows dyn crown fill cost — they default most of these off themselves | measured-need, one tier at a time |
+| VSM cluster bin | the world cluster-LOD DAG ships (its own post-VSM project) | days of work; unlocks ortho-constant shadow LOD with zero cache invalidations |
+| Receiver mask (rmask) | together with the tree hybrid, never alone — its only consumers are tree/voxel bins | mark-side cell bits + bin-side test; NEVER applied to static cached pages |
+
 ## 3. Resources (ours; sizes from their constants)
 
 Persistent (created once, imported into the framegraph each frame):
