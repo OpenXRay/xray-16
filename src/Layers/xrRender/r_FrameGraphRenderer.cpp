@@ -1036,6 +1036,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         bindlessConfig.staticSet.compactBatchIndicesBuffer = m_gpuCullingManager->GetStaticCompactBatchIndicesBuffer();
         bindlessConfig.staticSet.compactCountBuffer = m_gpuCullingManager->GetStaticCompactCountBuffer();
         bindlessConfig.staticSet.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+        bindlessConfig.staticSet.fadeBuffer = m_gpuCullingManager->GetNeutralFadeBuffer();
         bindlessConfig.staticSet.totalObjectCount = m_gpuCullingManager->GetStaticObjectCount();
 
         bindlessConfig.dynamicSet.compactDrawArgsBuffer = m_gpuCullingManager->GetDynamicCompactDrawArgsBuffer();
@@ -1043,6 +1044,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         bindlessConfig.dynamicSet.compactBatchIndicesBuffer = m_gpuCullingManager->GetDynamicCompactBatchIndicesBuffer();
         bindlessConfig.dynamicSet.compactCountBuffer = m_gpuCullingManager->GetDynamicCompactCountBuffer();
         bindlessConfig.dynamicSet.instanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
+        bindlessConfig.dynamicSet.fadeBuffer = m_gpuCullingManager->GetNeutralFadeBuffer();
         bindlessConfig.dynamicSet.totalObjectCount = m_gpuCullingManager->GetDynamicObjectCount();
 
         if (ps_r_cluster && m_gpuCullingManager->GetClusterEntryCount() > 0) {
@@ -1051,6 +1053,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.clusterSet.compactBatchIndicesBuffer = m_gpuCullingManager->GetClusterBatchIndexBuffer();
             bindlessConfig.clusterSet.compactCountBuffer = m_gpuCullingManager->GetClusterCountBuffer();
             bindlessConfig.clusterSet.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+            bindlessConfig.clusterSet.fadeBuffer = m_gpuCullingManager->GetClusterFadeBuffer();
             bindlessConfig.clusterSet.totalObjectCount = m_gpuCullingManager->GetClusterEntryCount();
             bindlessConfig.clusterDrawIndexBuffer = m_gpuCullingManager->GetClusterDrawIndexBuffer();
             bindlessConfig.clusterFadeBuffer = m_gpuCullingManager->GetClusterFadeBuffer();
@@ -1288,6 +1291,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         transparentConfig.compactBatchIndicesBuffer = m_gpuCullingManager->GetTransparentCompactBatchIndicesBuffer();
         transparentConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetTransparentCompactMaterialIDBuffer();
         transparentConfig.compactCountBuffer = m_gpuCullingManager->GetTransparentCompactCountBuffer();
+        transparentConfig.fadeBuffer = m_gpuCullingManager->GetNeutralFadeBuffer();
         transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
 
         if (m_gpuCullingManager->IsVariantPartitionEnabled())

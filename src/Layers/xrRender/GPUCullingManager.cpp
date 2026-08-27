@@ -229,6 +229,17 @@ void GPUCullingManager::CreateBuffers(fg::RenderDevice* device)
     }
 
     {
+        nvrhi::BufferDesc fadeDesc;
+        fadeDesc.debugName = "ClusterCull_NeutralFade";
+        fadeDesc.byteSize = sizeof(u32);
+        fadeDesc.structStride = sizeof(u32);
+        fadeDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        fadeDesc.keepInitialState = true;
+        m_neutralFadeBuffer = device->GetNVRHIDevice()->createBuffer(fadeDesc);
+        m_neutralFadeZeroed = false;
+    }
+
+    {
         nvrhi::SamplerDesc desc;
         desc.minFilter = false;
         desc.magFilter = false;
@@ -1868,6 +1879,12 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     m_objectCount = staticCount + dynamicCount;
 
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+
+    if (m_neutralFadeBuffer && !m_neutralFadeZeroed) {
+        u32 neutral = 0;
+        cmdList->writeBuffer(m_neutralFadeBuffer, &neutral, sizeof(u32));
+        m_neutralFadeZeroed = true;
+    }
 
     if (!m_megaDataUploaded && m_megaBuffersReady &&
         !m_megaVertices.empty() && !m_megaIndices.empty() &&
@@ -3844,6 +3861,12 @@ void GPUCullingManager::BuildClusterEntries()
         e.materialID = m_staticMaterialIDData[batchIndex];
         e.flags = (p.flags & CLUSTER_PROTO_FLAG_AT) ? GPU_CLUSTER_ENTRY_AT : 0;
 
+        u32 errClass = 3;
+        if (e.parentError < 1.0f) errClass = 0;
+        else if (e.parentError < 10.0f) errClass = 1;
+        else if (e.parentError < 1e30f) errClass = 2;
+        e.flags |= (std::min(p.depth, 15u) << 8) | (errClass << 12);
+
         m_clusterEntryData.push_back(e);
     };
 
@@ -4078,7 +4101,7 @@ void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi:
 
     const float lodPx = std::max(0.05f, ps_r_cluster_lod);
     const float pxScale = Device.mProject._22 * float(Device.dwHeight) * 0.5f;
-    cb.lodParams.set(pxScale / lodPx, 0.01f, 0.0f, (ps_r_cluster_lod <= 0.0501f) ? 1.0f : 0.0f);
+    cb.lodParams.set(pxScale / lodPx, 0.01f, ps_r_cluster_fade, (ps_r_cluster_lod <= 0.0501f) ? 1.0f : 0.0f);
     cb.entryCount = m_clusterSet.entryCount;
     cb.useHiZ = phase.useHiZ ? 1u : 0u;
     cb.hizWidth = phase.hizWidth;

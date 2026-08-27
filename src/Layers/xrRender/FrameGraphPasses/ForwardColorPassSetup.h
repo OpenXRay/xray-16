@@ -26,6 +26,7 @@ struct BindlessDrawSet {
     nvrhi::IBuffer* compactBatchIndicesBuffer = nullptr;
     nvrhi::IBuffer* instanceBuffer = nullptr;
     nvrhi::IBuffer* compactCountBuffer = nullptr;
+    nvrhi::IBuffer* fadeBuffer = nullptr;
     u32 totalObjectCount = 0;
 
     bool IsValid() const {
