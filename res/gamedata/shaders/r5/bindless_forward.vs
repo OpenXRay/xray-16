@@ -35,7 +35,7 @@ struct VS_INPUT
 
 struct VS_OUTPUT
 {
-    float4 position : SV_Position;
+    precise float4 position : SV_Position;
     float3 worldPos : TEXCOORD0;
     float2 texcoord : TEXCOORD1;
     float3 normal   : TEXCOORD2;
