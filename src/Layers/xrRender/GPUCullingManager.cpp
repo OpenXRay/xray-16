@@ -1560,10 +1560,12 @@ void GPUCullingManager::Shutdown()
     m_terrainDrawArgsData.clear();
     m_terrainMaterialIDData.clear();
     m_terrainInstanceData.clear();
+    m_terrainBatchKeys.clear();
     m_terrainObjectCount = 0;
 
     m_staticTerrainDrawArgsUploaded = false;
     m_staticDataCached = false;
+    m_terrainDataCached = false;
 
     m_initialized = false;
     m_computeEnabled = false;
@@ -1733,14 +1735,18 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     m_dynamicInstanceData.clear();
     m_dynamicInstanceData.reserve(totalBatches);
 
-    m_terrainObjectData.clear();
-    m_terrainObjectData.reserve(totalBatches / 4);
-    m_terrainDrawArgsData.clear();
-    m_terrainDrawArgsData.reserve(totalBatches / 4);
-    m_terrainMaterialIDData.clear();
-    m_terrainMaterialIDData.reserve(totalBatches / 4);
-    m_terrainInstanceData.clear();
-    m_terrainInstanceData.reserve(totalBatches / 4);
+    if (!m_terrainDataCached) {
+        m_terrainObjectData.clear();
+        m_terrainObjectData.reserve(totalBatches / 4);
+        m_terrainDrawArgsData.clear();
+        m_terrainDrawArgsData.reserve(totalBatches / 4);
+        m_terrainMaterialIDData.clear();
+        m_terrainMaterialIDData.reserve(totalBatches / 4);
+        m_terrainInstanceData.clear();
+        m_terrainInstanceData.reserve(totalBatches / 4);
+        m_terrainBatchKeys.clear();
+        m_terrainBatchKeys.reserve(totalBatches / 4);
+    }
 
     m_transparentObjectData.clear();
     m_transparentDrawArgsData.clear();
@@ -1808,6 +1814,8 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
             continue;
 
         if (batch.isTerrain) {
+            if (m_terrainDataCached)
+                continue;
             GPUObjectData obj;
             obj.position = batch.worldBoundsCenter;
             obj.radius = batch.worldBoundsRadius;
@@ -1839,6 +1847,15 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
             inst.pad0 = 0.0f;
             inst.pad1 = 0.0f;
             m_terrainInstanceData.push_back(inst);
+
+            ClusterMeshKey key = {};
+            if (batch.megaBufferAlloc.valid) {
+                key.vertexOffset = batch.megaBufferAlloc.vertexOffset;
+                key.indexOffset = batch.megaBufferAlloc.indexOffset;
+                key.vertexCount = batch.megaBufferAlloc.vertexCount;
+                key.indexCount = batch.megaBufferAlloc.indexCount;
+            }
+            m_terrainBatchKeys.push_back(key);
             continue;
         }
 
@@ -1983,7 +2000,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
 
     m_terrainObjectCount = std::min(static_cast<u32>(m_terrainObjectData.size()), m_maxTerrainObjects);
 
-    if (m_terrainObjectCount > 0 && m_terrainObjectBuffer && m_terrainDrawArgsBuffer) {
+    if (m_terrainObjectCount > 0 && !m_terrainDataCached && m_terrainObjectBuffer && m_terrainDrawArgsBuffer) {
         ZoneScopedN("Upload::TerrainWrite");
         R_ASSERT2(m_terrainObjectCount <= m_maxTerrainObjects, "Terrain object count exceeds buffer capacity");
         R_ASSERT2(m_terrainDrawArgsData.size() >= m_terrainObjectCount, "Terrain draw args data smaller than object count");
@@ -1994,6 +2011,9 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
             m_terrainObjectData.data(),
             m_terrainObjectCount * sizeof(GPUObjectData));
         cmdList->setBufferState(m_terrainObjectBuffer, nvrhi::ResourceStates::ShaderResource);
+
+        m_terrainDataCached = true;
+        Msg("* [GPUCulling] Terrain data cached: %u objects", m_terrainObjectCount);
 
         if (!m_staticTerrainDrawArgsUploaded) {
             for (auto& args : m_terrainDrawArgsData) {
@@ -2088,6 +2108,15 @@ void GPUCullingManager::InvalidateStaticCullingData()
     m_staticBatchVertexCounts.clear();
     m_staticBatchKeys.clear();
 
+    m_terrainDataCached = false;
+    m_staticTerrainDrawArgsUploaded = false;
+    m_terrainObjectData.clear();
+    m_terrainDrawArgsData.clear();
+    m_terrainMaterialIDData.clear();
+    m_terrainInstanceData.clear();
+    m_terrainBatchKeys.clear();
+    m_terrainObjectCount = 0;
+
     m_clusterSet = {};
     m_clusterEntryData.clear();
 
@@ -2134,6 +2163,7 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
 
     m_staticDataCached = false;
     m_staticTerrainDrawArgsUploaded = false;
+    m_terrainDataCached = false;
     m_staticSet.objectsUploaded = false;
     m_staticSet.drawArgsUploaded = false;
     m_dynamicSet.objectsUploaded = false;
