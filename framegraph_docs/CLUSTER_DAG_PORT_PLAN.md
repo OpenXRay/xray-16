@@ -19,6 +19,12 @@ Source of truth: `/Users/yohjimane/modding/OGSR-Engine/ogsr_engine/Layers/xrRend
 - [x] M4: crossfade band + Bayer screen-door in prepass AND color (shared `cluster_fade.h`) + Hi-Z mid-transition exemption (`64d483272`)
 - [x] M5: cluster line in rs_stats (entries drawn/total) (`3fadd165d`); in-game measurements pending first playtest
 
+Terrain extension (§8, planned 2026-08-28):
+- [ ] T0: terrain static caching — freeze terrain arrays/order after first frame (`m_terrainDataCached`, the existing TODO), stop per-frame object/instance rebuild+upload
+- [ ] T1: bake terrain — TERRAIN range/proto flags, terrain-only merge domain with its own extent cap, params-hash + cache version bump
+- [ ] T2: terrain entries + group-routed cull outputs + two pulled terrain draws (prepass `bindless_depth_fade.ps`, color `bindless_terrain.ps` + fades) + whole-mesh terrain gating
+- [ ] T3: live LOD + crossfade verification on terrain; measurements (draw/tri deltas, seam scan)
+
 Shipped deviations from §1-§5 (recorded 2026-08-27):
 - SUBMISSION REWORK (post first playtest, 140→15fps): their per-cluster MDI relies on native
   `vkCmdDrawIndexedIndirectCount` executing GPU-side; MoltenVK's implementation predicates
@@ -229,4 +235,115 @@ freed after upload.
 10. Region overflow structurally impossible (exact prefix sums) — still audit-count it.
 11. Progressive meshes: cluster the finest slice only (coarse slices poke through).
 12. Terrain never clusters (separate material path; spheres would lie under displacement).
+    SUPERSEDED by §8 — their exclusion reason was tessellation displacement, which we
+    don't have. Terrain clusters as its own group per the terrain extension below.
 13. Free the bake's host memory before spawn (their 3.6 MB leaf list lesson, scaled up).
+
+## 8. Terrain extension (planned 2026-08-28)
+
+### 8.0 Why it's viable for us and wasn't for them
+
+OGSR excluded terrain because their terrain runs displaced through a tessellation
+evaluation shader — cluster spheres and simplification errors computed on the base mesh
+lie about the displaced surface. We have no tessellation: our terrain is plain mega-buffer
+geometry (UnifiedVertex, MT_NORMAL visuals with B_BmmD/B_LmBmmD materials) that differs
+from statics only in its material system (TerrainMaterialBuffer at t9,
+`bindless_terrain.ps`, terrain instance/material arrays). Every DAG mechanism — clod
+bake, complementarity, the cut, fades, Hi-Z, the pulled single-draw — applies unchanged.
+Terrain is also where the cut pays most: distant tiles are the largest stable triangle
+mass in the frame, and cross-tile component merge lets the horizon collapse to coarse
+DAG levels.
+
+Verified facts this plan rests on:
+- `bindless_terrain.ps` consumes the SAME interpolant contract as the forward PS (single
+  texcoord + materialID + drawID; the 4-layer mask and details all sample `input.texcoord`)
+  → `cluster_pull.vs` output is drop-in compatible; the VS itself is group-agnostic (reads
+  g_InstanceData[e.batchIndex] + e.materialID — only the BINDINGS differ per draw).
+- Terrain today: object data rebuilt+uploaded EVERY frame; draw args / material IDs /
+  instance data uploaded ONCE (`m_staticTerrainDrawArgsUploaded`) — so batch-order
+  stability across frames is ALREADY load-bearing. T0 removes the fragility.
+- Terrain culls through the same `object_cull.cs` dispatch → the existing
+  `GPU_OBJECT_CLUSTERED` + `g_ClusterActive` gating works verbatim.
+
+### 8.1 Architecture: terrain = the second group
+
+Their design always had per-material groups; ours collapsed to one. Terrain re-introduces
+exactly one more:
+
+| Piece | Static group (shipped) | Terrain group (new) |
+|---|---|---|
+| Range flag | — | `CLUSTER_RANGE_FLAG_TERRAIN` (bake input; collection stops SKIPPING terrain and flags it instead) |
+| Proto flag | bit0 AT | bit1 TERRAIN (propagated at emission) |
+| Entry flag | bit0 AT, bit1 plain | bit2 TERRAIN (routes the cull's append) |
+| Merge domain | solid statics | terrain-only union-find domain — terrain NEVER merges with statics (mixed coarse triangles would shade with the wrong material SYSTEM, not just the wrong material) |
+| Extent cap | 48 m | `kTerrainMaxComponentExtent` = 128 m starting point (tiles are big; 48 m blocks cross-tile merge). Tri cap shared at 200k. BOTH caps enter the params hash |
+| Entry batch/material | static arrays | terrain arrays: batchIndex into terrain instance buffer, materialID = terrainMaterialID |
+| Cull outputs | count[0], static visible/fade streams | count[1], terrain visible/fade streams (append routed by entry bit2; one 8-byte count buffer) |
+| Args | args buffer A {384, count0, 0, 0} | args buffer B {384, count1, 0, 0} (same `cluster_draw_args.cs`, two stores) |
+| Prepass draw | cluster_pull + `bindless_depth_at.ps` | cluster_pull + NEW `bindless_depth_fade.ps` (fade discard ONLY — no material read; terrain materialID indexes the terrain buffer, so the AT PS would read garbage from g_Materials) |
+| Color draw | cluster_pull + `bindless_forward.ps` | cluster_pull + `bindless_terrain.ps` (gains `cluster_fade.h` include + discard; the whole-mesh terrain draw binds the neutral fade buffer, unchanged behavior) |
+
+Separate per-group visible/fade buffers (not one buffer with region bases) keep
+SV_InstanceID starting at 0 for both draws — no reliance on firstInstance semantics,
+which differ between Vulkan and D3D12.
+
+Stats: readback grows to 6 u32s (cluster static count[0] at offset 16, terrain count[1]
+at offset 20); rs_stats line becomes "Entries: S+T / total".
+
+### 8.2 What deliberately does NOT change
+
+- `cluster_pull.vs`, `cluster_cull.cs` cut math, fades, Bayer, Hi-Z exemption, debug
+  modes 1-4 (they key off fade bits and work on terrain automatically).
+- The whole-mesh terrain path stays intact as the `r_cluster 0` fallback — same live A/B.
+- Bake threading, cache format layout (version bump invalidates), complementarity checks.
+- Grass/details (CPU heightmap), physics (CDB), wallmark placement — all non-render or
+  CPU-geometry consumers, unaffected by render LOD. Wallmark decals over coarse distant
+  terrain can float sub-texel — cosmetic, distance-masked, accepted.
+
+### 8.3 Milestones with visible gates
+
+**T0 — terrain static caching (prerequisite, zero rendering change).** Implement the
+existing code TODO: cache terrain object/args/material/instance arrays once like the
+static set (`m_terrainDataCached`), keys captured alongside (`m_terrainBatchKeys`), and
+stop the per-frame rebuild+upload. Gate: identical rendering; terrain culling unchanged;
+the per-frame terrain upload disappears from the frame (log once instead of every frame).
+This freezes batch order so terrain entries can reference the instance buffer safely.
+
+**T1 — terrain bake (log-verified, zero rendering change).** Collection flags terrain
+ranges instead of skipping; bake gets the terrain merge domain + 128 m cap; proto bit1;
+params hash + `kCacheVersion` bump. Gate: bake report shows terrain units/clusters/
+components/levels alongside statics; complementarity holes still small and stable; cache
+round-trips; rendering identical (no terrain entries built yet).
+
+**T2 — terrain entries drawn (parity gate).** Entry build walks cached terrain batches;
+cull routes bit2 appends to the terrain streams; two new pipelines + draws wired in
+prepass and color; terrain objectData gets CLUSTERED once at entry build. Gate:
+`r_cluster 0 ↔ 1` at `r_cluster_lod 0.05` pixel-stable on terrain; `r_cluster_debug 1`
+confetti over terrain; EQUAL scheme shows no holes/z-fighting (the congruence tripwire);
+rs_stats shows the terrain entry split.
+
+**T3 — live terrain LOD + fades (the payoff).** Gate: sliding `r_cluster_lod` visibly
+coarsens the horizon with measured draw/tri reduction; `r_cluster_fade 0 ↔ 0.25` turns
+terrain LOD changes into dissolves; strafing shows no cracks at tile/component seams
+(pins + complementarity); debug 3 over terrain shows green/yellow gradient, red only
+where legitimately terminal; before/after fps recorded.
+
+### 8.4 Terrain-specific hazards
+
+1. Prepass/color fade parity on terrain: `bindless_depth_fade.ps` and
+   `bindless_terrain.ps` must both include `cluster_fade.h` — EQUAL exposes any drift
+   instantly (that is the tripwire working, as with statics).
+2. The 128 m terrain extent cap is a guess: if distant terrain never coarsens
+   (debug 3 all red, frozen cut — their 187 m parent-sphere failure mode), lower it;
+   if the horizon still draws too fine, raise it. Params hash forces the rebake.
+3. Cross-component tile seams rely on tiles sharing boundary positions bitwise (pin
+   hashing is exact-byte). Verify via the bake report's pinned-vert count on terrain
+   components; a near-zero pin count with multiple terrain components = weld problem =
+   crack risk.
+4. Mixed-member coarse triangles (vertex-0 binning) can shade with the neighbor tile's
+   terrain material at very coarse levels — usually invisible (adjacent tiles share
+   palettes); check during T3.
+5. Terrain AT does not exist (always opaque) — bit0 never set on terrain protos; the
+   fade-only prepass PS assumes opacity.
+6. If a level's terrain is one giant mesh (no tiles), component merge is a no-op and the
+   cap discussion is moot — the mesh clusterizes solo (oversized-single-mesh path).
