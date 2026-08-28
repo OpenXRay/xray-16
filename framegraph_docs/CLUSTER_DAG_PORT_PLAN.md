@@ -347,3 +347,19 @@ where legitimately terminal; before/after fps recorded.
    fade-only prepass PS assumes opacity.
 6. If a level's terrain is one giant mesh (no tiles), component merge is a no-op and the
    cap discussion is moot — the mesh clusterizes solo (oversized-single-mesh path).
+
+### 8.5 Tessellation revisit note (assessed 2026-08-28)
+
+Platform facts (verified against MoltenVK 1.4.3 source): hull/domain tessellation is
+emulated as multiple compute passes per draw; VK_EXT_mesh_shader is absent from the
+extension table — runtime pipeline amplification is slow or unavailable on Metal-via-Vulkan.
+
+| Tier | Shape | DAG compatibility |
+|---|---|---|
+| Tess on select materials (legacy R2FLAGEXT_ENABLE_TESSELLATION revival) | route tess materials out of bake eligibility; whole-mesh fallback draws them (OGSR's own answer) | trivial — one predicate; range-set hash auto-rebakes |
+| Displacement DETAIL (terrain et al.) | subdivide+displace at BAKE into the finest DAG level; no runtime tess — the cut already does distance-adaptive density | native — clod boundary locks + complementarity keep it crack-free; cost = mega-VB memory + bake time (cached) |
+| DYNAMIC displacement (snow/craters) | compute pre-pass writing displaced verts for near clusters into a transient pool read by cluster_pull.vs (NOT pipeline tess) | real project; hardware tess structurally conflicts with the neighbor-free cut (edge factors can't match across unknown neighbors/levels) |
+
+Invariant any tier must respect (the actual root of OGSR's terrain exclusion): cluster
+spheres and errors must stay conservative for the geometry that rasterizes — inflate
+entry radii by max displacement amplitude and fold amplitude into the error metric.
