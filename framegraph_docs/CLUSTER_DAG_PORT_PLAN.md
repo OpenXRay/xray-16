@@ -20,10 +20,10 @@ Source of truth: `/Users/yohjimane/modding/OGSR-Engine/ogsr_engine/Layers/xrRend
 - [x] M5: cluster line in rs_stats (entries drawn/total) (`3fadd165d`); in-game measurements pending first playtest
 
 Terrain extension (§8, planned 2026-08-28):
-- [ ] T0: terrain static caching — freeze terrain arrays/order after first frame (`m_terrainDataCached`, the existing TODO), stop per-frame object/instance rebuild+upload
-- [ ] T1: bake terrain — TERRAIN range/proto flags, terrain-only merge domain with its own extent cap, params-hash + cache version bump
-- [ ] T2: terrain entries + group-routed cull outputs + two pulled terrain draws (prepass `bindless_depth_fade.ps`, color `bindless_terrain.ps` + fades) + whole-mesh terrain gating
-- [ ] T3: live LOD + crossfade verification on terrain; measurements (draw/tri deltas, seam scan)
+- [x] T0: terrain static caching — freeze terrain arrays/order after first frame (`m_terrainDataCached`), per-frame rebuild+upload gone (`6f3c2137d`)
+- [x] T1: bake terrain — TERRAIN range/proto flags, terrain-only merge domain, 128 m terrain extent cap, params-hash + cache v2 (`89c6bf67e`)
+- [x] T2: terrain entries + group-routed cull outputs (count[2], per-group streams/args) + two pulled terrain draws (prepass `bindless_depth_fade.ps`, color `bindless_terrain.ps` + fades, whole-mesh binds neutral) + stamp-based whole-mesh suppression (`4d9cb6636`)
+- [ ] T3: live LOD + crossfade verification on terrain in-game; measurements (draw/tri deltas, seam scan, pin counts on terrain components)
 
 Shipped deviations from §1-§5 (recorded 2026-08-27):
 - SUBMISSION REWORK (post first playtest, 140→15fps): their per-cluster MDI relies on native
