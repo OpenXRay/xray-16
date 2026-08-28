@@ -135,7 +135,7 @@ PS_OUTPUT main(PS_INPUT input)
         }
         else
         {
-            uint seed = (mode == 2u) ? ((fadeWord >> 12) & 15u) : input.drawID;
+            uint seed = (mode == 2u) ? ((fadeWord >> 12) & 15u) : (fadeWord >> 18);
             uint h = seed * 747796405u + 2891336453u;
             h = ((h >> ((h >> 28u) + 4u)) ^ h) * 277803737u;
             h = (h >> 22u) ^ h;

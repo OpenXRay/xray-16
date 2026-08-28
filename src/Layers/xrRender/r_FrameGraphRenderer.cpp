@@ -1097,15 +1097,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         bindlessConfig.dynamicSet.totalObjectCount = m_gpuCullingManager->GetDynamicObjectCount();
 
         if (ps_r_cluster && m_gpuCullingManager->GetClusterEntryCount() > 0) {
-            bindlessConfig.clusterSet.compactDrawArgsBuffer = m_gpuCullingManager->GetClusterCmdBuffer();
-            bindlessConfig.clusterSet.compactMaterialIDBuffer = m_gpuCullingManager->GetClusterMaterialIDBuffer();
-            bindlessConfig.clusterSet.compactBatchIndicesBuffer = m_gpuCullingManager->GetClusterBatchIndexBuffer();
-            bindlessConfig.clusterSet.compactCountBuffer = m_gpuCullingManager->GetClusterCountBuffer();
-            bindlessConfig.clusterSet.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
-            bindlessConfig.clusterSet.fadeBuffer = m_gpuCullingManager->GetClusterFadeBuffer();
-            bindlessConfig.clusterSet.totalObjectCount = m_gpuCullingManager->GetClusterEntryCount();
-            bindlessConfig.clusterDrawIndexBuffer = m_gpuCullingManager->GetClusterDrawIndexBuffer();
-            bindlessConfig.clusterFadeBuffer = m_gpuCullingManager->GetClusterFadeBuffer();
+            bindlessConfig.cluster.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+            bindlessConfig.cluster.visibleEntryBuffer = m_gpuCullingManager->GetClusterVisibleEntryBuffer();
+            bindlessConfig.cluster.fadeBuffer = m_gpuCullingManager->GetClusterFadeBuffer();
+            bindlessConfig.cluster.argsBuffer = m_gpuCullingManager->GetClusterArgsBuffer();
+            bindlessConfig.cluster.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+            bindlessConfig.cluster.entryCount = m_gpuCullingManager->GetClusterEntryCount();
         }
 
         // ═══════════════════════════════════════════════════════

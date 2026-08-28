@@ -29,6 +29,9 @@ struct DepthPrepassState {
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
     nvrhi::ShaderHandle psOpaque;
+    nvrhi::GraphicsPipelineHandle clusterPipeline;
+    nvrhi::BindingLayoutHandle clusterLayout;
+    nvrhi::ShaderHandle clusterVS;
     bool initialized = false;
 };
 
