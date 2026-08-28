@@ -486,12 +486,10 @@ public:
     nvrhi::IBuffer* GetTerrainCompactCountBuffer() const { return m_terrainCompactCountBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainCompactMaterialIDBuffer() const { return m_terrainCompactMaterialIDBuffer.Get(); }
 
-    nvrhi::IBuffer* GetClusterCmdBuffer() const { return m_clusterSet.cmdBuffer.Get(); }
-    nvrhi::IBuffer* GetClusterCountBuffer() const { return m_clusterSet.countBuffer.Get(); }
-    nvrhi::IBuffer* GetClusterBatchIndexBuffer() const { return m_clusterSet.batchIndexBuffer.Get(); }
-    nvrhi::IBuffer* GetClusterMaterialIDBuffer() const { return m_clusterSet.materialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterEntryBuffer() const { return m_clusterSet.entryBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterVisibleEntryBuffer() const { return m_clusterSet.visibleEntryBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterArgsBuffer() const { return m_clusterSet.argsBuffer.Get(); }
     nvrhi::IBuffer* GetClusterFadeBuffer() const { return m_clusterSet.fadeBuffer.Get(); }
-    nvrhi::IBuffer* GetClusterDrawIndexBuffer() const { return m_clusterSet.drawIndexBuffer.Get(); }
     u32 GetClusterEntryCount() const { return m_clusterSet.entryCount; }
     nvrhi::IBuffer* GetNeutralFadeBuffer() const { return m_neutralFadeBuffer.Get(); }
 
@@ -548,12 +546,10 @@ private:
     // ───────────────────────────────────────────────────────
     struct ClusterCullBuffers {
         nvrhi::BufferHandle entryBuffer;
-        nvrhi::BufferHandle cmdBuffer;
         nvrhi::BufferHandle countBuffer;
-        nvrhi::BufferHandle batchIndexBuffer;
-        nvrhi::BufferHandle materialIDBuffer;
+        nvrhi::BufferHandle visibleEntryBuffer;
         nvrhi::BufferHandle fadeBuffer;
-        nvrhi::BufferHandle drawIndexBuffer;
+        nvrhi::BufferHandle argsBuffer;
         u32 entryCount = 0;
         bool uploaded = false;
     };
@@ -564,6 +560,8 @@ private:
     xr_vector<ClusterMeshKey> m_staticBatchKeys;
     nvrhi::ComputePipelineHandle m_clusterCullPipeline;
     nvrhi::BindingLayoutHandle m_clusterCullLayout;
+    nvrhi::ComputePipelineHandle m_clusterArgsPipeline;
+    nvrhi::BindingLayoutHandle m_clusterArgsLayout;
     fg::BufferHandle m_clusterCullParamsCB;
 
     void BuildClusterEntries();

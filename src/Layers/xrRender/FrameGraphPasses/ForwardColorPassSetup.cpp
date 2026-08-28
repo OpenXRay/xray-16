@@ -126,6 +126,31 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
         }
     }
 
+    auto clusterVsResult = shaderLoader->LoadVertexShader("cluster_pull", "main");
+    if (clusterVsResult.handle) {
+        state.clusterVS = clusterVsResult.handle;
+        state.clusterLayout = cache.GetOrCreateBindingLayoutFromReflection(
+            "ForwardColor_Cluster", *clusterVsResult.reflection, *psResult.reflection, nvDevice);
+
+        if (state.clusterLayout) {
+            nvrhi::GraphicsPipelineDesc clusterPipeDesc;
+            clusterPipeDesc.VS = state.clusterVS;
+            clusterPipeDesc.PS = state.bindlessPS;
+            clusterPipeDesc.inputLayout = nullptr;
+            if (bindlessLayout)
+                clusterPipeDesc.bindingLayouts = { state.clusterLayout, bindlessLayout };
+            else
+                clusterPipeDesc.bindingLayouts = { state.clusterLayout };
+            clusterPipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
+            clusterPipeDesc.renderState.depthStencilState.depthTestEnable = true;
+            clusterPipeDesc.renderState.depthStencilState.depthWriteEnable = false;
+            clusterPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
+            clusterPipeDesc.renderState.rasterState.frontCounterClockwise = false;
+            clusterPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+            state.clusterPipeline = cache.GetOrCreatePipeline("ForwardColor_Cluster", clusterPipeDesc, fbInfo, nvDevice);
+        }
+    }
+
     state.bindlessInitialized = true;
     Msg("* [BindlessForward] Pipeline initialized");
 }
@@ -276,18 +301,42 @@ static void renderBindlessForward(
     };
 
     auto drawClusterSet = [&]() {
-        if (!config.clusterSet.IsValid() || !config.clusterDrawIndexBuffer)
+        if (!config.cluster.IsValid() || !ps.clusterPipeline || !ps.clusterLayout)
             return;
 
-        state.vertexBuffers = {
-            {config.megaVertexBuffer, 0, 0},
-            {config.clusterDrawIndexBuffer, 1, 0}
-        };
-        drawSet(config.clusterSet);
-        state.vertexBuffers = {
-            {config.megaVertexBuffer, 0, 0},
-            {drawIndexBuffer, 1, 0}
-        };
+        auto* clusterVsRefl = shaderLoader->GetCachedReflection("cluster_pull", ".vs");
+        if (!clusterVsRefl)
+            return;
+
+        framegraph::BindingSetBuilder cbsb(*clusterVsRefl, *psReflection, nvDevice, "ForwardColor.Cluster");
+        cbsb.ConstantBuffer("static_globals", staticGlobalsCB);
+        cbsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+        cbsb.BufferSRV("g_InstanceData", config.cluster.instanceBuffer);
+        cbsb.BufferSRV("g_VisibleEntries", config.cluster.visibleEntryBuffer);
+        cbsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
+        cbsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
+        cbsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
+        cbsb.BufferSRV("g_DrawFades", config.cluster.fadeBuffer);
+        cbsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
+        cbsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
+        cbsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+
+        auto clusterBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(cbsb.Build(), ps.clusterLayout, nvDevice);
+        if (!clusterBindingSet)
+            return;
+
+        nvrhi::GraphicsState clusterState;
+        clusterState.pipeline = ps.clusterPipeline;
+        clusterState.framebuffer = framebuffer;
+        clusterState.bindings = { clusterBindingSet };
+        if (bindlessTable)
+            clusterState.addBindingSet(bindlessTable);
+        clusterState.indirectParams = config.cluster.argsBuffer;
+        clusterState.viewport.addViewport(viewport);
+        clusterState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
+
+        cmdList->setGraphicsState(clusterState);
+        cmdList->drawIndirect(0, 1);
     };
 
     if (config.variantPartition.Enabled()) {

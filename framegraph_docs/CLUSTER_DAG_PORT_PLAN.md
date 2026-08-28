@@ -20,6 +20,15 @@ Source of truth: `/Users/yohjimane/modding/OGSR-Engine/ogsr_engine/Layers/xrRend
 - [x] M5: cluster line in rs_stats (entries drawn/total) (`3fadd165d`); in-game measurements pending first playtest
 
 Shipped deviations from §1-§5 (recorded 2026-08-27):
+- SUBMISSION REWORK (post first playtest, 140→15fps): their per-cluster MDI relies on native
+  `vkCmdDrawIndexedIndirectCount` executing GPU-side; MoltenVK's implementation predicates
+  args by GPU count but then CPU-encodes maxDrawCount Metal draws — O(entryCount) per pass.
+  Replaced with ONE indirect instanced draw per pass: the cull writes surviving entry
+  indices + fades, `cluster_draw_args.cs` writes {384, count, 0, 0}, and `cluster_pull.vs`
+  reconstructs clusters from SV_InstanceID/SV_VertexID by raw-loading mega IB/VB
+  (short clusters pad with repeated-last-index degenerates). Trades post-transform vertex
+  reuse (~3× VS invocations) for O(1) CPU submission. The cmd/batch/material/identity
+  buffers and the per-draw MDI are gone.
 - Unclustered static batches KEEP the existing whole-mesh cull path (no `flags bit1` plain
   entries); SSA (`r_ssa_px`) is therefore inert until plain entries exist. The cull still
   implements the bit1 SSA branch for when they arrive.
