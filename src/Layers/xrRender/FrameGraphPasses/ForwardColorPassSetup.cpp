@@ -132,22 +132,36 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
         state.clusterLayout = cache.GetOrCreateBindingLayoutFromReflection(
             "ForwardColor_Cluster", *clusterVsResult.reflection, *psResult.reflection, nvDevice);
 
-        if (state.clusterLayout) {
-            nvrhi::GraphicsPipelineDesc clusterPipeDesc;
-            clusterPipeDesc.VS = state.clusterVS;
-            clusterPipeDesc.PS = state.bindlessPS;
-            clusterPipeDesc.inputLayout = nullptr;
+        auto makeClusterPipeDesc = [&](nvrhi::IShader* pixelShader, nvrhi::IBindingLayout* layout) {
+            nvrhi::GraphicsPipelineDesc desc;
+            desc.VS = state.clusterVS;
+            desc.PS = pixelShader;
+            desc.inputLayout = nullptr;
             if (bindlessLayout)
-                clusterPipeDesc.bindingLayouts = { state.clusterLayout, bindlessLayout };
+                desc.bindingLayouts = { layout, bindlessLayout };
             else
-                clusterPipeDesc.bindingLayouts = { state.clusterLayout };
-            clusterPipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-            clusterPipeDesc.renderState.depthStencilState.depthTestEnable = true;
-            clusterPipeDesc.renderState.depthStencilState.depthWriteEnable = false;
-            clusterPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
-            clusterPipeDesc.renderState.rasterState.frontCounterClockwise = false;
-            clusterPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+                desc.bindingLayouts = { layout };
+            desc.primType = nvrhi::PrimitiveType::TriangleList;
+            desc.renderState.depthStencilState.depthTestEnable = true;
+            desc.renderState.depthStencilState.depthWriteEnable = false;
+            desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
+            desc.renderState.rasterState.frontCounterClockwise = false;
+            desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+            return desc;
+        };
+
+        if (state.clusterLayout) {
+            auto clusterPipeDesc = makeClusterPipeDesc(state.bindlessPS, state.clusterLayout);
             state.clusterPipeline = cache.GetOrCreatePipeline("ForwardColor_Cluster", clusterPipeDesc, fbInfo, nvDevice);
+        }
+
+        if (state.terrainPS && terrainPsResult.reflection) {
+            state.clusterTerrainLayout = cache.GetOrCreateBindingLayoutFromReflection(
+                "ForwardColor_ClusterTerrain", *clusterVsResult.reflection, *terrainPsResult.reflection, nvDevice);
+            if (state.clusterTerrainLayout) {
+                auto terrainPipeDesc = makeClusterPipeDesc(state.terrainPS, state.clusterTerrainLayout);
+                state.clusterTerrainPipeline = cache.GetOrCreatePipeline("ForwardColor_ClusterTerrain", terrainPipeDesc, fbInfo, nvDevice);
+            }
         }
     }
 
@@ -339,6 +353,49 @@ static void renderBindlessForward(
         cmdList->drawIndirect(0, 1);
     };
 
+    auto drawClusterTerrain = [&]() {
+        if (!config.cluster.TerrainValid() || !ps.clusterTerrainPipeline || !ps.clusterTerrainLayout)
+            return;
+
+        auto* clusterVsRefl = shaderLoader->GetCachedReflection("cluster_pull", ".vs");
+        auto* terrainPsRefl = shaderLoader->GetCachedReflection("bindless_terrain", ".ps");
+        if (!clusterVsRefl || !terrainPsRefl)
+            return;
+
+        auto& terrainMatBuffer = bindless::TerrainMaterialBuffer::Instance();
+
+        framegraph::BindingSetBuilder cbsb(*clusterVsRefl, *terrainPsRefl, nvDevice, "ForwardColor.ClusterTerrain");
+        cbsb.ConstantBuffer("static_globals", staticGlobalsCB);
+        cbsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+        cbsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
+        cbsb.BufferSRV("g_InstanceData", config.cluster.terrainInstanceBuffer);
+        cbsb.BufferSRV("g_VisibleEntries", config.cluster.terrainVisibleEntryBuffer);
+        cbsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
+        cbsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
+        cbsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
+        cbsb.BufferSRV("g_DrawFades", config.cluster.terrainFadeBuffer);
+        cbsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
+        cbsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
+        cbsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+
+        auto clusterBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(cbsb.Build(), ps.clusterTerrainLayout, nvDevice);
+        if (!clusterBindingSet)
+            return;
+
+        nvrhi::GraphicsState clusterState;
+        clusterState.pipeline = ps.clusterTerrainPipeline;
+        clusterState.framebuffer = framebuffer;
+        clusterState.bindings = { clusterBindingSet };
+        if (bindlessTable)
+            clusterState.addBindingSet(bindlessTable);
+        clusterState.indirectParams = config.cluster.terrainArgsBuffer;
+        clusterState.viewport.addViewport(viewport);
+        clusterState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
+
+        cmdList->setGraphicsState(clusterState);
+        cmdList->drawIndirect(0, 1);
+    };
+
     if (config.variantPartition.Enabled()) {
         auto* backendDev = device->GetBackend();
         VariantPartitionDrawConfig vpCfg;
@@ -364,6 +421,7 @@ static void renderBindlessForward(
         drawSet(config.staticSet);
     }
     drawClusterSet();
+    drawClusterTerrain();
     drawSet(config.dynamicSet);
 
     // ═══════════════════════════════════════════════════════
@@ -395,6 +453,7 @@ static void renderBindlessForward(
             terrainBsb.BufferSRV("g_InstanceData", config.terrainInstanceBuffer);
             terrainBsb.BufferSRV("g_CompactBatchIndices", config.terrainCompactBatchIndicesBuffer);
             terrainBsb.BufferSRV("g_CompactMaterialIDs", config.terrainCompactMaterialIDBuffer);
+            terrainBsb.BufferSRV("g_DrawFades", config.staticSet.fadeBuffer);
             terrainBsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
             terrainBsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
             terrainBsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());

@@ -738,6 +738,8 @@ void FrameGraphRenderer::RenderStatsOverlay()
 
             stats.clusterEntries = m_gpuCullingManager->GetClusterEntryCount();
             stats.clusterVisible = cullStats.clusterVisible;
+            stats.clusterTerrainEntries = m_gpuCullingManager->GetClusterTerrainEntryCount();
+            stats.clusterTerrainVisible = cullStats.clusterTerrainVisible;
         }
 
         if (m_blackboard)
@@ -1102,7 +1104,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.cluster.fadeBuffer = m_gpuCullingManager->GetClusterFadeBuffer();
             bindlessConfig.cluster.argsBuffer = m_gpuCullingManager->GetClusterArgsBuffer();
             bindlessConfig.cluster.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
-            bindlessConfig.cluster.entryCount = m_gpuCullingManager->GetClusterEntryCount();
+            bindlessConfig.cluster.entryCount = m_gpuCullingManager->GetClusterStaticEntryCount();
+            bindlessConfig.cluster.terrainVisibleEntryBuffer = m_gpuCullingManager->GetClusterTerrainVisibleEntryBuffer();
+            bindlessConfig.cluster.terrainFadeBuffer = m_gpuCullingManager->GetClusterTerrainFadeBuffer();
+            bindlessConfig.cluster.terrainArgsBuffer = m_gpuCullingManager->GetClusterTerrainArgsBuffer();
+            bindlessConfig.cluster.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+            bindlessConfig.cluster.terrainEntryCount = m_gpuCullingManager->GetClusterTerrainEntryCount();
         }
 
         // ═══════════════════════════════════════════════════════

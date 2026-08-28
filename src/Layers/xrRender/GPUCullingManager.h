@@ -86,8 +86,9 @@ struct GPUClusterEntry {
 static_assert(sizeof(GPUClusterEntry) == 80, "GPUClusterEntry must be 80 bytes");
 
 enum GPUClusterEntryFlags : u32 {
-    GPU_CLUSTER_ENTRY_AT    = 0x1,
-    GPU_CLUSTER_ENTRY_PLAIN = 0x2,
+    GPU_CLUSTER_ENTRY_AT      = 0x1,
+    GPU_CLUSTER_ENTRY_PLAIN   = 0x2,
+    GPU_CLUSTER_ENTRY_TERRAIN = 0x4,
 };
 
 // ═══════════════════════════════════════════════════════
@@ -386,6 +387,7 @@ public:
         u32 terrainVisible = 0;
         u32 transparentVisible = 0;
         u32 clusterVisible = 0;
+        u32 clusterTerrainVisible = 0;
         u32 totalVisible() const { return staticVisible + dynamicVisible + terrainVisible + transparentVisible; }
     };
     const CullingStats& GetCullingStats() const { return m_cullingStats; }
@@ -490,7 +492,12 @@ public:
     nvrhi::IBuffer* GetClusterVisibleEntryBuffer() const { return m_clusterSet.visibleEntryBuffer.Get(); }
     nvrhi::IBuffer* GetClusterArgsBuffer() const { return m_clusterSet.argsBuffer.Get(); }
     nvrhi::IBuffer* GetClusterFadeBuffer() const { return m_clusterSet.fadeBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterTerrainVisibleEntryBuffer() const { return m_clusterSet.terrainVisibleEntryBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterTerrainArgsBuffer() const { return m_clusterSet.terrainArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterTerrainFadeBuffer() const { return m_clusterSet.terrainFadeBuffer.Get(); }
     u32 GetClusterEntryCount() const { return m_clusterSet.entryCount; }
+    u32 GetClusterStaticEntryCount() const { return m_clusterSet.staticEntryCount; }
+    u32 GetClusterTerrainEntryCount() const { return m_clusterSet.terrainEntryCount; }
     nvrhi::IBuffer* GetNeutralFadeBuffer() const { return m_neutralFadeBuffer.Get(); }
 
 private:
@@ -550,7 +557,12 @@ private:
         nvrhi::BufferHandle visibleEntryBuffer;
         nvrhi::BufferHandle fadeBuffer;
         nvrhi::BufferHandle argsBuffer;
+        nvrhi::BufferHandle terrainVisibleEntryBuffer;
+        nvrhi::BufferHandle terrainFadeBuffer;
+        nvrhi::BufferHandle terrainArgsBuffer;
         u32 entryCount = 0;
+        u32 staticEntryCount = 0;
+        u32 terrainEntryCount = 0;
         bool uploaded = false;
     };
     ClusterCullBuffers m_clusterSet;

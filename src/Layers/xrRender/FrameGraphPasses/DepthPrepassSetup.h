@@ -32,6 +32,9 @@ struct DepthPrepassState {
     nvrhi::GraphicsPipelineHandle clusterPipeline;
     nvrhi::BindingLayoutHandle clusterLayout;
     nvrhi::ShaderHandle clusterVS;
+    nvrhi::GraphicsPipelineHandle clusterTerrainPipeline;
+    nvrhi::BindingLayoutHandle clusterTerrainLayout;
+    nvrhi::ShaderHandle psFade;
     bool initialized = false;
 };
 

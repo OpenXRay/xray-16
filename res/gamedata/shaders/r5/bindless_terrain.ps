@@ -7,6 +7,7 @@
 #define CLUSTERED_LIGHTING_FORWARD
 #include "common.h"
 #include "bindless_common.h"
+#include "cluster_fade.h"
 
 struct PS_INPUT
 {
@@ -60,6 +61,8 @@ float3 SampleTerrainNormal(uint index, float2 uv)
 PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
+
+    ClusterFadeDiscard(g_DrawFades[input.drawID], input.position);
 
     // Get terrain material data
     TerrainMaterialData mat = g_TerrainMaterials[input.materialID];
