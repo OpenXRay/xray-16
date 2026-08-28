@@ -24,7 +24,13 @@ constexpr float kErrorCap = 1e30f;
 constexpr float kDilate = 0.5f;
 constexpr u32 kMaxComponentTris = 200000;
 constexpr float kMaxComponentExtent = 48.0f;
+constexpr float kTerrainMaxComponentExtent = 128.0f;
 constexpr float kGapCut = 0.75f;
+
+float DomainExtentCap(u32 rangeFlags)
+{
+    return (rangeFlags & CLUSTER_RANGE_FLAG_TERRAIN) ? kTerrainMaxComponentExtent : kMaxComponentExtent;
+}
 
 struct RangeInfo {
     ClusterMeshKey key;
@@ -227,7 +233,8 @@ void BakeSingleMesh(
     BakeContext ctx = {};
     ctx.result = &result;
     ctx.groups.reserve(64);
-    ctx.protoFlags = (rangeFlags & CLUSTER_RANGE_FLAG_AT) ? CLUSTER_PROTO_FLAG_AT : 0;
+    ctx.protoFlags = ((rangeFlags & CLUSTER_RANGE_FLAG_AT) ? CLUSTER_PROTO_FLAG_AT : 0) |
+                     ((rangeFlags & CLUSTER_RANGE_FLAG_TERRAIN) ? CLUSTER_PROTO_FLAG_TERRAIN : 0);
 
     clodBuild(MakeConfig(), mesh, &ctx, &OutputGroupCB);
     result.baked = !result.protos.empty();
@@ -328,7 +335,8 @@ void BakeComponent(
     ctx.absoluteOfLocal = absoluteOfLocal.data();
     ctx.memberOfLocal = memberOfLocal.data();
     ctx.memberCount = u32(members.size());
-    ctx.protoFlags = 0;
+    ctx.protoFlags = (ranges[members[0]].flags & CLUSTER_RANGE_FLAG_TERRAIN)
+        ? CLUSTER_PROTO_FLAG_TERRAIN : 0;
 
     clodBuild(MakeConfig(), mesh, &ctx, &OutputGroupCB);
     result.baked = !result.protos.empty();
@@ -342,7 +350,7 @@ bool IsSelfLoop(const ClusterMetaProto& p)
 }
 
 constexpr u32 kCacheMagic = 0x464C4356;
-constexpr u32 kCacheVersion = 1;
+constexpr u32 kCacheVersion = 2;
 
 #pragma pack(push, 4)
 struct CacheHeader {
@@ -372,8 +380,9 @@ u64 Fnv1a64(const void* data, size_t len, u64 h = 14695981039346656037ull)
 
 u64 ComputeParamsHash()
 {
-    const u32 words[4] = {kCacheVersion, kClusterMaxTris,
-        u32(std::max(ps_r_cluster_tris, int(kClusterMaxTris))), u32(ps_r_cluster_merge != 0)};
+    const u32 words[7] = {kCacheVersion, kClusterMaxTris,
+        u32(std::max(ps_r_cluster_tris, int(kClusterMaxTris))), u32(ps_r_cluster_merge != 0),
+        kMaxComponentTris, u32(kMaxComponentExtent), u32(kTerrainMaxComponentExtent)};
     return Fnv1a64(words, sizeof(words));
 }
 
@@ -455,8 +464,9 @@ void SplitComponentRec(const xr_vector<RangeInfo>& ranges, xr_vector<u32> member
     UnitAABB(ranges, members, mn, mx);
     const float extent = std::max(mx.x - mn.x, std::max(mx.y - mn.y, mx.z - mn.z));
     const u64 tris = UnitTris(ranges, members);
+    const float extentCap = DomainExtentCap(ranges[members[0]].flags);
 
-    if (members.size() <= 1 || (tris <= kMaxComponentTris && extent <= kMaxComponentExtent)) {
+    if (members.size() <= 1 || (tris <= kMaxComponentTris && extent <= extentCap)) {
         out.push_back(std::move(members));
         return;
     }
@@ -561,6 +571,8 @@ void ClusterDAG::Bake(
             info.flags = r.flags;
             if (!mergeEnabled)
                 info.flags &= ~CLUSTER_RANGE_FLAG_MERGEABLE;
+            if (info.flags & CLUSTER_RANGE_FLAG_TERRAIN)
+                m_stats.terrainMeshes++;
             infos.push_back(info);
         }
     }
@@ -600,6 +612,8 @@ void ClusterDAG::Bake(
                 const RangeInfo& b = infos[mergeSet[j]];
                 if (b.aabbMin.x > a.aabbMax.x + kDilate)
                     break;
+                if ((a.flags ^ b.flags) & CLUSTER_RANGE_FLAG_TERRAIN)
+                    continue;
                 if (a.aabbMin.y > b.aabbMax.y + kDilate || b.aabbMin.y > a.aabbMax.y + kDilate)
                     continue;
                 if (a.aabbMin.z > b.aabbMax.z + kDilate || b.aabbMin.z > a.aabbMax.z + kDilate)
@@ -638,6 +652,8 @@ void ClusterDAG::Bake(
         float bestGrowth = flt_max;
         s32 bestHost = -1;
         for (u32 c = 0; c < u32(componentMembers.size()); ++c) {
+            if ((o.flags ^ infos[componentMembers[c][0]].flags) & CLUSTER_RANGE_FLAG_TERRAIN)
+                continue;
             if (UnitTris(infos, componentMembers[c]) + o.key.indexCount / 3 > kMaxComponentTris)
                 continue;
             Fvector mn, mx;
@@ -646,7 +662,7 @@ void ClusterDAG::Bake(
             nmn.min(o.aabbMin);
             nmx.max(o.aabbMax);
             const float newExtent = std::max(nmx.x - nmn.x, std::max(nmx.y - nmn.y, nmx.z - nmn.z));
-            if (newExtent > kMaxComponentExtent)
+            if (newExtent > DomainExtentCap(o.flags))
                 continue;
             const float oldVol = (mx.x - mn.x) * (mx.y - mn.y) * (mx.z - mn.z);
             const float newVol = (nmx.x - nmn.x) * (nmx.y - nmn.y) * (nmx.z - nmn.z);
@@ -695,6 +711,8 @@ void ClusterDAG::Bake(
         unit.totalIndices = 0;
         for (u32 m : comp)
             unit.totalIndices += infos[m].key.indexCount;
+        if (infos[comp[0]].flags & CLUSTER_RANGE_FLAG_TERRAIN)
+            m_stats.terrainComponents++;
         unit.members = std::move(comp);
         unit.flags = 0;
         unit.isComponent = true;
@@ -827,6 +845,8 @@ void ClusterDAG::Bake(
     Msg("* [ClusterDAG] %u components (%u members, %u splits, %u orphans attached, %u pinned verts), %u self-loops dropped, %u holes",
         m_stats.components, m_stats.componentMembers, m_stats.capSplits,
         m_stats.orphansAttached, m_stats.pinnedVerts, m_stats.droppedSelfLoops, m_stats.holes);
+    Msg("* [ClusterDAG] terrain: %u meshes, %u components, %u clusters",
+        m_stats.terrainMeshes, m_stats.terrainComponents, m_stats.terrainClusters);
     Msg("* [ClusterDAG] parentError histogram: inf=%u >100=%u 10-100=%u 1-10=%u 0.1-1=%u <0.1=%u",
         m_stats.histInf, m_stats.hist100, m_stats.hist10, m_stats.hist1, m_stats.hist01, m_stats.histSmall);
     {
@@ -908,9 +928,15 @@ bool ClusterDAG::TryLoadCache(const char* path, u64 geomStamp, const xr_vector<C
 
     for (const ClusterUnitRecord& rec : m_records) {
         m_stats.bakedMeshes += rec.memberCount;
+        const bool terrain = rec.protoCount > 0 &&
+            (m_protos[rec.firstProto].flags & CLUSTER_PROTO_FLAG_TERRAIN);
+        if (terrain)
+            m_stats.terrainMeshes += rec.memberCount;
         if (rec.isComponent) {
             m_stats.components++;
             m_stats.componentMembers += rec.memberCount;
+            if (terrain)
+                m_stats.terrainComponents++;
         }
     }
     m_stats.eligibleMeshes = m_stats.bakedMeshes;
@@ -979,6 +1005,8 @@ void ClusterDAG::RunDiagnostics()
             const u32 depth = std::min(p.depth, 15u);
             m_stats.levelCounts[depth]++;
             m_stats.maxDepth = std::max(m_stats.maxDepth, p.depth);
+            if (p.flags & CLUSTER_PROTO_FLAG_TERRAIN)
+                m_stats.terrainClusters++;
 
             if (!(p.parentError < kErrorCap)) m_stats.histInf++;
             else if (p.parentError > 100.0f) m_stats.hist100++;

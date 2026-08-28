@@ -636,11 +636,11 @@ void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterBakeRange
 
         if (!mesh || iCount < 3)
             continue;
-        if (m_materialCache && m_materialCache->IsTerrainMaterial(visual))
-            continue;
+
+        const bool isTerrain = m_materialCache && m_materialCache->IsTerrainMaterial(visual);
 
         shader_info::ShaderBlendInfo blendInfo;
-        if (shader_info::GetShaderBlendInfo(visual->shaderName.c_str(), blendInfo)) {
+        if (!isTerrain && shader_info::GetShaderBlendInfo(visual->shaderName.c_str(), blendInfo)) {
             if (blendInfo.mode != shader_info::ShaderBlendMode::Opaque &&
                 blendInfo.mode != shader_info::ShaderBlendMode::AlphaTest)
                 continue;
@@ -658,10 +658,15 @@ void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterBakeRange
         range.key.vertexCount = alloc.vertexCount;
         range.key.indexCount = alloc.indexCount;
         range.flags = 0;
-        if (blendInfo.mode == shader_info::ShaderBlendMode::AlphaTest)
+        if (isTerrain) {
+            range.flags |= fg::CLUSTER_RANGE_FLAG_TERRAIN;
+            if (mergeableType)
+                range.flags |= fg::CLUSTER_RANGE_FLAG_MERGEABLE;
+        } else if (blendInfo.mode == shader_info::ShaderBlendMode::AlphaTest) {
             range.flags |= fg::CLUSTER_RANGE_FLAG_AT;
-        else if (mergeableType)
+        } else if (mergeableType) {
             range.flags |= fg::CLUSTER_RANGE_FLAG_MERGEABLE;
+        }
         ranges.push_back(range);
         refCounts[range.key]++;
     }
