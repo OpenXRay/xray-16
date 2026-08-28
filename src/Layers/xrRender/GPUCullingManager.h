@@ -688,6 +688,8 @@ private:
     xr_vector<IndirectDrawArgs> m_terrainDrawArgsData;
     xr_vector<u32> m_terrainMaterialIDData;
     xr_vector<GPUInstanceData> m_terrainInstanceData;
+    xr_vector<ClusterMeshKey> m_terrainBatchKeys;
+    bool m_terrainDataCached = false;
 
     // Transparent-specific CPU data
     xr_vector<GPUObjectData> m_transparentObjectData;
