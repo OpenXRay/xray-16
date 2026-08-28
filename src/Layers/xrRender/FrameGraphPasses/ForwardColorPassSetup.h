@@ -67,9 +67,20 @@ struct ClusterDrawConfig {
     nvrhi::IBuffer* instanceBuffer = nullptr;
     u32 entryCount = 0;
 
+    nvrhi::IBuffer* terrainVisibleEntryBuffer = nullptr;
+    nvrhi::IBuffer* terrainFadeBuffer = nullptr;
+    nvrhi::IBuffer* terrainArgsBuffer = nullptr;
+    nvrhi::IBuffer* terrainInstanceBuffer = nullptr;
+    u32 terrainEntryCount = 0;
+
     bool IsValid() const {
         return entryBuffer && visibleEntryBuffer && fadeBuffer && argsBuffer &&
             instanceBuffer && entryCount > 0;
+    }
+
+    bool TerrainValid() const {
+        return entryBuffer && terrainVisibleEntryBuffer && terrainFadeBuffer &&
+            terrainArgsBuffer && terrainInstanceBuffer && terrainEntryCount > 0;
     }
 };
 
@@ -140,6 +151,8 @@ struct ForwardColorPassState {
     nvrhi::GraphicsPipelineHandle clusterPipeline;
     nvrhi::BindingLayoutHandle clusterLayout;
     nvrhi::ShaderHandle clusterVS;
+    nvrhi::GraphicsPipelineHandle clusterTerrainPipeline;
+    nvrhi::BindingLayoutHandle clusterTerrainLayout;
     nvrhi::GraphicsPipelineHandle terrainPipeline;
     nvrhi::BindingLayoutHandle terrainLayout;
     nvrhi::ShaderHandle terrainPS;

@@ -547,8 +547,11 @@ void StatsOverlay::RenderGeometrySection()
         {
             ImGui::Text("Cluster LOD:");
             ImGui::Indent();
-            float drawRate = 100.0f * s.clusterVisible / s.clusterEntries;
-            ImGui::Text("Entries: %u/%u drawn (%.1f%%)", s.clusterVisible, s.clusterEntries, drawRate);
+            float drawRate = 100.0f * (s.clusterVisible + s.clusterTerrainVisible) / s.clusterEntries;
+            ImGui::Text("Entries: %u/%u drawn (%.1f%%)",
+                s.clusterVisible + s.clusterTerrainVisible, s.clusterEntries, drawRate);
+            if (s.clusterTerrainEntries > 0)
+                ImGui::Text("Terrain: %u/%u drawn", s.clusterTerrainVisible, s.clusterTerrainEntries);
             ImGui::Unindent();
         }
 
