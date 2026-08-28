@@ -37,9 +37,11 @@ struct ClusterMetaProto {
 static_assert(sizeof(ClusterMetaProto) == 80, "ClusterMetaProto layout is cache-serialized");
 
 constexpr u32 CLUSTER_PROTO_FLAG_AT = 1u << 0;
+constexpr u32 CLUSTER_PROTO_FLAG_TERRAIN = 1u << 1;
 
 constexpr u32 CLUSTER_RANGE_FLAG_AT = 1u << 0;
 constexpr u32 CLUSTER_RANGE_FLAG_MERGEABLE = 1u << 1;
+constexpr u32 CLUSTER_RANGE_FLAG_TERRAIN = 1u << 2;
 
 struct ClusterMeshKey {
     u32 vertexOffset;
@@ -83,6 +85,9 @@ struct ClusterBakeStats {
     u32 capSplits;
     u32 pinnedVerts;
     u32 clusters;
+    u32 terrainMeshes;
+    u32 terrainComponents;
+    u32 terrainClusters;
     u32 droppedSelfLoops;
     u32 holes;
     u32 maxDepth;
