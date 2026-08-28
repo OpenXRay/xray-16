@@ -366,7 +366,6 @@ static void renderBindlessForward(
 
         framegraph::BindingSetBuilder cbsb(*clusterVsRefl, *terrainPsRefl, nvDevice, "ForwardColor.ClusterTerrain");
         cbsb.ConstantBuffer("static_globals", staticGlobalsCB);
-        cbsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
         cbsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
         cbsb.BufferSRV("g_InstanceData", config.cluster.terrainInstanceBuffer);
         cbsb.BufferSRV("g_VisibleEntries", config.cluster.terrainVisibleEntryBuffer);
