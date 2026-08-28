@@ -17,15 +17,6 @@ struct ClusterEntry
     float parentError;
 };
 
-struct IndirectDrawArgs
-{
-    uint indexCountPerInstance;
-    uint instanceCount;
-    uint startIndexLocation;
-    int baseVertexLocation;
-    uint startInstanceLocation;
-};
-
 cbuffer ClusterCullParams : register(b5)
 {
     float4x4 g_HiZViewProj;
@@ -45,11 +36,9 @@ cbuffer ClusterCullParams : register(b5)
 StructuredBuffer<ClusterEntry> g_Entries : register(t0);
 Texture2D<float> g_HiZPyramid : register(t1);
 
-RWStructuredBuffer<IndirectDrawArgs> g_OutCmds : register(u0);
-RWByteAddressBuffer g_OutCount : register(u1);
-RWStructuredBuffer<uint> g_OutBatchIndices : register(u2);
-RWStructuredBuffer<uint> g_OutMaterialIDs : register(u3);
-RWStructuredBuffer<uint> g_OutFades : register(u4);
+RWByteAddressBuffer g_OutCount : register(u0);
+RWStructuredBuffer<uint> g_OutEntryIndices : register(u1);
+RWStructuredBuffer<uint> g_OutFades : register(u2);
 
 float ProjErr(float4 s, float e)
 {
@@ -119,14 +108,6 @@ void main(uint3 dtID : SV_DispatchThreadID)
     uint slot;
     g_OutCount.InterlockedAdd(0, 1u, slot);
 
-    IndirectDrawArgs cmd;
-    cmd.indexCountPerInstance = e.indexCount;
-    cmd.instanceCount = 1;
-    cmd.startIndexLocation = e.ibFirst;
-    cmd.baseVertexLocation = (int)e.firstVertex;
-    cmd.startInstanceLocation = slot;
-    g_OutCmds[slot] = cmd;
-    g_OutBatchIndices[slot] = e.batchIndex;
-    g_OutMaterialIDs[slot] = e.materialID;
-    g_OutFades[slot] = (63u - fA) | (fB << 6) | (((e.flags >> 8) & 0x3Fu) << 12);
+    g_OutEntryIndices[slot] = idx;
+    g_OutFades[slot] = (63u - fA) | (fB << 6) | (((e.flags >> 8) & 0x3Fu) << 12) | ((idx & 0x3FFFu) << 18);
 }

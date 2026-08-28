@@ -36,12 +36,24 @@ struct BindlessDrawSet {
     }
 };
 
+struct ClusterDrawConfig {
+    nvrhi::IBuffer* entryBuffer = nullptr;
+    nvrhi::IBuffer* visibleEntryBuffer = nullptr;
+    nvrhi::IBuffer* fadeBuffer = nullptr;
+    nvrhi::IBuffer* argsBuffer = nullptr;
+    nvrhi::IBuffer* instanceBuffer = nullptr;
+    u32 entryCount = 0;
+
+    bool IsValid() const {
+        return entryBuffer && visibleEntryBuffer && fadeBuffer && argsBuffer &&
+            instanceBuffer && entryCount > 0;
+    }
+};
+
 struct BindlessForwardConfig {
     BindlessDrawSet staticSet;
     BindlessDrawSet dynamicSet;
-    BindlessDrawSet clusterSet;
-    nvrhi::IBuffer* clusterDrawIndexBuffer = nullptr;
-    nvrhi::IBuffer* clusterFadeBuffer = nullptr;
+    ClusterDrawConfig cluster;
 
     bool enabled = false;
 
@@ -89,6 +101,9 @@ struct ForwardColorPassState {
     nvrhi::ShaderHandle bindlessVS;
     nvrhi::ShaderHandle bindlessPS;
     bool bindlessInitialized = false;
+    nvrhi::GraphicsPipelineHandle clusterPipeline;
+    nvrhi::BindingLayoutHandle clusterLayout;
+    nvrhi::ShaderHandle clusterVS;
     nvrhi::GraphicsPipelineHandle terrainPipeline;
     nvrhi::BindingLayoutHandle terrainLayout;
     nvrhi::ShaderHandle terrainPS;
