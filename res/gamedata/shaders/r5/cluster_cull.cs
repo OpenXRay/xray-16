@@ -39,6 +39,8 @@ Texture2D<float> g_HiZPyramid : register(t1);
 RWByteAddressBuffer g_OutCount : register(u0);
 RWStructuredBuffer<uint> g_OutEntryIndices : register(u1);
 RWStructuredBuffer<uint> g_OutFades : register(u2);
+RWStructuredBuffer<uint> g_OutTerrainEntryIndices : register(u3);
+RWStructuredBuffer<uint> g_OutTerrainFades : register(u4);
 
 float ProjErr(float4 s, float e)
 {
@@ -105,9 +107,19 @@ void main(uint3 dtID : SV_DispatchThreadID)
             return;
     }
 
-    uint slot;
-    g_OutCount.InterlockedAdd(0, 1u, slot);
+    uint fade = (63u - fA) | (fB << 6) | (((e.flags >> 8) & 0x3Fu) << 12) | ((idx & 0x3FFFu) << 18);
 
-    g_OutEntryIndices[slot] = idx;
-    g_OutFades[slot] = (63u - fA) | (fB << 6) | (((e.flags >> 8) & 0x3Fu) << 12) | ((idx & 0x3FFFu) << 18);
+    uint slot;
+    if ((e.flags & 4u) != 0)
+    {
+        g_OutCount.InterlockedAdd(4, 1u, slot);
+        g_OutTerrainEntryIndices[slot] = idx;
+        g_OutTerrainFades[slot] = fade;
+    }
+    else
+    {
+        g_OutCount.InterlockedAdd(0, 1u, slot);
+        g_OutEntryIndices[slot] = idx;
+        g_OutFades[slot] = fade;
+    }
 }
