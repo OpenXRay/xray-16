@@ -5,6 +5,7 @@
 
 #define SM_6_0
 #define CLUSTERED_LIGHTING_FORWARD
+#define SUN_SHADOW_RECEIVER
 #include "common.h"
 #include "bindless_common.h"
 #include "cluster_fade.h"
@@ -173,6 +174,9 @@ PS_OUTPUT main(PS_INPUT input)
     output.color = float4(fwd.color.rgb, 1.0);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
+
+    if (dev_param_3.y > 0.5)
+        output.color.rgb = SunVisibility(input.worldPos).xxx;
 
     if (dev_param_4.x > 0.5)
     {

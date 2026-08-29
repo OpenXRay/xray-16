@@ -177,6 +177,7 @@ static void renderBindlessForward(
     nvrhi::ITexture* normalRT,
     nvrhi::ITexture* baseColorRT,
     nvrhi::ITexture* depthRT,
+    nvrhi::ITexture* sunShadowFar,
     const BindlessForwardConfig& config,
     MaterialCache* materialCache,
     ForwardColorPassState& ps)
@@ -228,6 +229,7 @@ static void renderBindlessForward(
     auto* psReflection = shaderLoader->GetCachedReflection("bindless_forward", ".ps");
 
     auto& clm = ClusteredLightManager::Instance();
+    nvrhi::ITexture* sunShadowTex = sunShadowFar ? sunShadowFar : cache.GetDummyShadowMap2D(nvDevice);
 
     auto buildBindingDescForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetDesc {
         framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "ForwardColor");
@@ -240,6 +242,7 @@ static void renderBindlessForward(
         bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
         bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
         bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+        bsb.Texture("g_SunShadowFar", sunShadowTex);
         return bsb.Build();
     };
 
@@ -334,6 +337,7 @@ static void renderBindlessForward(
         cbsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
         cbsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
         cbsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+        cbsb.Texture("g_SunShadowFar", sunShadowTex);
 
         auto clusterBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(cbsb.Build(), ps.clusterLayout, nvDevice);
         if (!clusterBindingSet)
@@ -376,6 +380,7 @@ static void renderBindlessForward(
         cbsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
         cbsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
         cbsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+        cbsb.Texture("g_SunShadowFar", sunShadowTex);
 
         auto clusterBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(cbsb.Build(), ps.clusterTerrainLayout, nvDevice);
         if (!clusterBindingSet)
@@ -456,6 +461,7 @@ static void renderBindlessForward(
             terrainBsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
             terrainBsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
             terrainBsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+            terrainBsb.Texture("g_SunShadowFar", sunShadowTex);
 
             auto terrainBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainBsb.Build(), ps.terrainLayout, nvDevice);
             R_ASSERT2(terrainBindingSet, "Terrain binding set creation failed");
@@ -506,7 +512,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     u32 height,
     framegraph::VirtualResourceHandle drawArgsInput,
     const BindlessForwardConfig& bindlessConfig,
-    ForwardColorPassState* state)
+    ForwardColorPassState* state,
+    framegraph::VirtualResourceHandle sunShadowFar)
 {
     using namespace framegraph;
 
@@ -526,7 +533,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA (Declares resource usage)
         // ═══════════════════════════════════════════════════════
-        [&, width, height, colorInput, normalInput, baseColorInput, drawArgsInput, bindlessConfig, state](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
+        [&, width, height, colorInput, normalInput, baseColorInput, drawArgsInput, bindlessConfig, state, sunShadowFar](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -546,6 +553,9 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             if (drawArgsInput.is_valid()) {
                 data.drawArgsBuffer = passBuilder.read(drawArgsInput, ResourceState::IndirectArgument);
             }
+
+            if (sunShadowFar.is_valid())
+                data.sunShadowFar = passBuilder.read(sunShadowFar, ResourceState::ShaderResource);
 
             data.outputs.albedo = data.color;
             data.outputs.normal = data.normal;
@@ -589,6 +599,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 drawArgsBuffer = fg.GetPhysicalBuffer(data.drawArgsBuffer);
             }
 
+            nvrhi::ITexture* sunShadowTex = data.sunShadowFar.is_valid() ? fg.GetPhysicalTexture(data.sunShadowFar) : nullptr;
+
             // ═══════════════════════════════════════════════════════
             //  BINDLESS RENDERING PATH (GPU-DRIVEN MULTI-DRAW)
             // ═══════════════════════════════════════════════════════
@@ -602,6 +614,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 normalRT,
                 baseColorRT,
                 depthRT,
+                sunShadowTex,
                 data.bindlessConfig,
                 data.materialCache,
                 *data.passState
