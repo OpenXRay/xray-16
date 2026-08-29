@@ -126,6 +126,21 @@ nvrhi::ISampler* PassResourceCache::GetShadowCmpSampler(nvrhi::IDevice* device) 
     return m_commonShadowCmp;
 }
 
+nvrhi::ISampler* PassResourceCache::GetSunShadowCmpSampler(nvrhi::IDevice* device) {
+    if (!m_sunShadowCmp) {
+        nvrhi::SamplerDesc desc;
+        desc.reductionType = nvrhi::SamplerReductionType::Comparison;
+        desc.minFilter = true;
+        desc.magFilter = true;
+        desc.mipFilter = false;
+        desc.addressU = nvrhi::SamplerAddressMode::Clamp;
+        desc.addressV = nvrhi::SamplerAddressMode::Clamp;
+        desc.addressW = nvrhi::SamplerAddressMode::Clamp;
+        m_sunShadowCmp = device->createSampler(desc);
+    }
+    return m_sunShadowCmp;
+}
+
 nvrhi::ITexture* PassResourceCache::GetDummyShadowMap(nvrhi::IDevice* device) {
     if (!m_dummyShadowMap) {
         nvrhi::TextureDesc desc;
@@ -159,6 +174,8 @@ nvrhi::ITexture* PassResourceCache::GetDummyShadowMap2D(nvrhi::IDevice* device) 
 
 nvrhi::ISampler* PassResourceCache::GetSamplerByName(const char* smpName, nvrhi::IDevice* device)
 {
+    if (strstr(smpName, "smp_sunshadow"))
+        return GetSunShadowCmpSampler(device);
     if (strstr(smpName, "smp_nofilter") || strstr(smpName, "smp_smap") || strstr(smpName, "smp_jitter"))
         return GetPointClampSampler(device);
     if (strstr(smpName, "smp_rtlinear"))

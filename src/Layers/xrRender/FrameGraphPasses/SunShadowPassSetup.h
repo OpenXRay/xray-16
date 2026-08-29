@@ -92,6 +92,8 @@ struct SunShadowState {
     nvrhi::ShaderHandle skinnedDepthMDIPS;
     bool skinnedPipelinesReady = false;
     bool skinnedPipelinesFailed = false;
+    int rasterBias = -1;
+    float rasterSlope = -1.0f;
 
     SunShadowTarget targets[kSunTargetCount];
     u32 candidates = 0;

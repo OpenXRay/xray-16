@@ -248,6 +248,8 @@ extern ECORE_API int   ps_r_sun_shadow_debug;
 extern ECORE_API int   ps_r_sun_shadow_far_size;
 extern ECORE_API float ps_r_sun_shadow_far_box;
 extern ECORE_API float ps_r_shadow_cluster_lod;
+extern ECORE_API int ps_r_sun_shadow_bias;
+extern ECORE_API float ps_r_sun_shadow_slope;
 extern ECORE_API int   ps_r_shadow_at;
 
 extern ECORE_API int   ps_r_smoke_trail_enabled;

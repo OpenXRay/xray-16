@@ -6,32 +6,24 @@
 Texture2D<float> g_SunShadowFar : register(t26);
 Texture2D<float> g_SunShadowCasc0 : register(t27);
 Texture2D<float> g_SunShadowCasc1 : register(t28);
+SamplerComparisonState smp_sunshadow;
 
-static const float kSunCascBias0 = 0.0004;
-static const float kSunCascBias1 = 0.0006;
-static const float kSunFarBias = 0.0015;
-
-float CascTap(Texture2D<float> smap, float2 uv, float ref, float2 invSize)
+float SunOccluded(Texture2D<float> smap, float2 uv, float ref)
 {
-    float2 sz = 1.0 / invSize;
-    float2 t = uv * sz - 0.5;
-    float2 f = frac(t);
-    float4 d = smap.GatherRed(smp_nofilter, (floor(t) + 1.0) * invSize);
-    float4 c = step(d, ref.xxxx);
-    return lerp(lerp(c.w, c.z, f.x), lerp(c.x, c.y, f.x), f.y);
+    return smap.SampleCmp(smp_sunshadow, uv, ref);
 }
 
-float CascSample(Texture2D<float> smap, float4x4 vp, float3 worldPos, float bias, float2 invSize)
+float CascSample(Texture2D<float> smap, float4x4 vp, float3 worldPos, float2 invSize)
 {
     float3 n = mul(vp, float4(worldPos, 1.0)).xyz;
     float2 uv = float2(n.x * 0.5 + 0.5, 0.5 - n.y * 0.5);
     if (uv.x < 0.01 || uv.x > 0.99 || uv.y < 0.01 || uv.y > 0.99 || n.z <= 0.0 || n.z >= 1.0)
         return -1.0;
-    float ref = n.z + bias;
-    return 0.25 * (CascTap(smap, uv + float2(-0.5, -0.5) * invSize, ref, invSize)
-                 + CascTap(smap, uv + float2( 0.5, -0.5) * invSize, ref, invSize)
-                 + CascTap(smap, uv + float2(-0.5,  0.5) * invSize, ref, invSize)
-                 + CascTap(smap, uv + float2( 0.5,  0.5) * invSize, ref, invSize));
+    float occluded = 0.25 * (SunOccluded(smap, uv + float2(-0.5, -0.5) * invSize, n.z)
+                           + SunOccluded(smap, uv + float2( 0.5, -0.5) * invSize, n.z)
+                           + SunOccluded(smap, uv + float2(-0.5,  0.5) * invSize, n.z)
+                           + SunOccluded(smap, uv + float2( 0.5,  0.5) * invSize, n.z));
+    return 1.0 - occluded;
 }
 
 float SunShadowFar(float3 worldPos)
@@ -41,14 +33,12 @@ float SunShadowFar(float3 worldPos)
     if (any(uv < 0.0) || any(uv > 1.0) || n.z <= 0.0 || n.z >= 1.0)
         return 1.0;
 
-    float ref = n.z + kSunFarBias;
     float2 texel = float2(cascade_splits.z, cascade_splits.z);
-    float sum = 0.0;
-    sum += step(g_SunShadowFar.SampleLevel(smp_nofilter, uv + float2(-0.75, -0.75) * texel, 0), ref);
-    sum += step(g_SunShadowFar.SampleLevel(smp_nofilter, uv + float2( 0.75, -0.75) * texel, 0), ref);
-    sum += step(g_SunShadowFar.SampleLevel(smp_nofilter, uv + float2(-0.75,  0.75) * texel, 0), ref);
-    sum += step(g_SunShadowFar.SampleLevel(smp_nofilter, uv + float2( 0.75,  0.75) * texel, 0), ref);
-    return sum * 0.25;
+    float occluded = 0.25 * (SunOccluded(g_SunShadowFar, uv + float2(-0.75, -0.75) * texel, n.z)
+                           + SunOccluded(g_SunShadowFar, uv + float2( 0.75, -0.75) * texel, n.z)
+                           + SunOccluded(g_SunShadowFar, uv + float2(-0.75,  0.75) * texel, n.z)
+                           + SunOccluded(g_SunShadowFar, uv + float2( 0.75,  0.75) * texel, n.z));
+    return 1.0 - occluded;
 }
 
 float SunVisibility(float3 worldPos)
@@ -57,13 +47,13 @@ float SunVisibility(float3 worldPos)
         return 1.0;
     if (cascade_splits.y > 0.0)
     {
-        float s = CascSample(g_SunShadowCasc0, shadow_matrices[0], worldPos, kSunCascBias0, float2(cascade_splits.y, cascade_splits.y));
+        float s = CascSample(g_SunShadowCasc0, shadow_matrices[0], worldPos, float2(cascade_splits.y, cascade_splits.y));
         if (s >= 0.0)
             return s;
     }
     if (cascade_splits.w > 0.0)
     {
-        float s = CascSample(g_SunShadowCasc1, shadow_matrices[1], worldPos, kSunCascBias1, float2(cascade_splits.w, cascade_splits.w));
+        float s = CascSample(g_SunShadowCasc1, shadow_matrices[1], worldPos, float2(cascade_splits.w, cascade_splits.w));
         if (s >= 0.0)
             return s;
     }

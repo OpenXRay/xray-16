@@ -42,8 +42,6 @@ constexpr float kCascadeZBehind = -160.0f;
 constexpr float kCascadeZAhead = 460.0f;
 constexpr float kAnchorGrid = 4.0f;
 constexpr u32 kCullThreadGroup = 64;
-constexpr int kShadowDepthBias = -2;
-constexpr float kShadowSlopeBias = -2.5f;
 
 struct TargetNames {
     const char* suffix;
@@ -229,17 +227,21 @@ bool EnsureDepthPipelines(fg::RenderDevice* device, SunShadowState& state)
         desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
         desc.renderState.rasterState.frontCounterClockwise = false;
         desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-        desc.renderState.rasterState.depthBias = kShadowDepthBias;
-        desc.renderState.rasterState.slopeScaledDepthBias = kShadowSlopeBias;
+        desc.renderState.rasterState.depthBias = -state.rasterBias;
+        desc.renderState.rasterState.slopeScaledDepthBias = -state.rasterSlope;
         desc.renderState.rasterState.depthBiasClamp = 0.0f;
         return desc;
     };
 
-    state.depthOpaquePipeline = cache.GetOrCreatePipeline("SunShadowDepth_Opaque",
+    string128 name;
+    xr_sprintf(name, "SunShadowDepth_Opaque_b%d_s%.2f", state.rasterBias, state.rasterSlope);
+    state.depthOpaquePipeline = cache.GetOrCreatePipeline(name,
         makeDesc(state.clusterVS, nullptr, state.depthOpaquePS, state.depthOpaqueLayout, false), fbInfo, nvDevice);
-    state.depthATPipeline = cache.GetOrCreatePipeline("SunShadowDepth_AT",
+    xr_sprintf(name, "SunShadowDepth_AT_b%d_s%.2f", state.rasterBias, state.rasterSlope);
+    state.depthATPipeline = cache.GetOrCreatePipeline(name,
         makeDesc(state.clusterVS, nullptr, state.depthATPS, state.depthATLayout, true), fbInfo, nvDevice);
-    state.depthDynamicPipeline = cache.GetOrCreatePipeline("SunShadowDepth_Dynamic",
+    xr_sprintf(name, "SunShadowDepth_Dynamic_b%d_s%.2f", state.rasterBias, state.rasterSlope);
+    state.depthDynamicPipeline = cache.GetOrCreatePipeline(name,
         makeDesc(state.forwardVS, state.depthDynamicInputLayout, state.depthDynamicPS, state.depthDynamicLayout, true), fbInfo, nvDevice);
 
     if (!state.depthOpaquePipeline || !state.depthATPipeline || !state.depthDynamicPipeline) {
@@ -649,8 +651,8 @@ bool EnsureSkinnedDepthPipelines(fg::RenderDevice* device, SunShadowState& state
         desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
         desc.renderState.rasterState.frontCounterClockwise = false;
         desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-        desc.renderState.rasterState.depthBias = kShadowDepthBias;
-        desc.renderState.rasterState.slopeScaledDepthBias = kShadowSlopeBias;
+        desc.renderState.rasterState.depthBias = -state.rasterBias;
+        desc.renderState.rasterState.slopeScaledDepthBias = -state.rasterSlope;
         desc.renderState.rasterState.depthBiasClamp = 0.0f;
         return desc;
     };
@@ -660,13 +662,13 @@ bool EnsureSkinnedDepthPipelines(fg::RenderDevice* device, SunShadowState& state
         const SkinningPipelineVariant* direct = SkinnedVariant(sk, f, false);
         if (direct && direct->vs && direct->inputLayout) {
             string64 name;
-            xr_sprintf(name, "SunShadowSkinned_%u", f);
+            xr_sprintf(name, "SunShadowSkinned_%u_b%d_s%.2f", f, state.rasterBias, state.rasterSlope);
             state.skinnedPipelines[f] = cache.GetOrCreatePipeline(name, makeDesc(*direct, state.skinnedDepthPS, state.skinnedLayout), fbInfo, nvDevice);
         }
         const SkinningPipelineVariant* mdi = SkinnedVariant(sk, f, true);
         if (state.skinnedMDILayout && mdi && mdi->vs && mdi->inputLayout) {
             string64 name;
-            xr_sprintf(name, "SunShadowSkinnedMDI_%u", f);
+            xr_sprintf(name, "SunShadowSkinnedMDI_%u_b%d_s%.2f", f, state.rasterBias, state.rasterSlope);
             state.skinnedMDIPipelines[f] = cache.GetOrCreatePipeline(name, makeDesc(*mdi, state.skinnedDepthMDIPS, state.skinnedMDILayout), fbInfo, nvDevice);
         }
     }
@@ -1031,6 +1033,24 @@ SunShadowCullOutput setupSunShadowCullPass(
     for (u32 t = 0; t < kSunTargetCount; ++t) {
         if (!EnsureCullBuffers(nvDevice, state->targets[t], kTargetNames[t].suffix, entryCount))
             return out;
+    }
+
+    const int rasterBias = ps_r_sun_shadow_bias;
+    const float rasterSlope = ps_r_sun_shadow_slope;
+    if (state->rasterBias != rasterBias || state->rasterSlope != rasterSlope) {
+        state->rasterBias = rasterBias;
+        state->rasterSlope = rasterSlope;
+        state->depthOpaquePipeline = nullptr;
+        state->depthATPipeline = nullptr;
+        state->depthDynamicPipeline = nullptr;
+        state->depthPipelinesFailed = false;
+        for (u32 f = 0; f < kSunShadowSkinnedFormats; ++f) {
+            state->skinnedPipelines[f] = nullptr;
+            state->skinnedMDIPipelines[f] = nullptr;
+        }
+        state->skinnedPipelinesReady = false;
+        state->skinnedPipelinesFailed = false;
+        far.valid = false;
     }
 
     Fvector sunDir;
