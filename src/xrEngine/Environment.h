@@ -305,6 +305,8 @@ public:
     CLensFlare* eff_LensFlare{};
     CEffect_Thunderbolt* eff_Thunderbolt{};
 
+    bool IsThunderboltActive() const;
+
     float fTimeFactor;
 
     void SelectEnvs(float gt);
