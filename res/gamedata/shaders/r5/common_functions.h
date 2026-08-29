@@ -219,6 +219,7 @@ float gbuf_unpack_mtl( float mtl_hemi )
 
 #include "shared/pbr_brdf.h"
 #include "shared/clustered_lighting.h"
+#include "shared/sun_shadow.h"
 
 float3 worldNormalToView(float3 N)
 {
@@ -250,7 +251,8 @@ f_forward output_forward_pbr(
 	float metallic,
 	float roughness,
 	float ao,
-	float4 svPosition = float4(0, 0, 0, 0))
+	float4 svPosition = float4(0, 0, 0, 0),
+	float sunVis = -1.0)
 {
 	f_forward res;
 
@@ -258,11 +260,14 @@ f_forward output_forward_pbr(
 	float3 V = normalize(eye_position - worldPos);
 	float3 L = normalize(-L_sun_dir_w);
 
+	if (sunVis < 0.0)
+		sunVis = SunVisibility(worldPos);
+
 	float3 sunLight = PBRDirectLighting(
 		albedo, N, V, L,
 		L_sun_color,
 		metallic, roughness, (uint)pbr_diffuse_mode
-	);
+	) * sunVis;
 
 	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
 	float3 ambient = PBRAmbient(

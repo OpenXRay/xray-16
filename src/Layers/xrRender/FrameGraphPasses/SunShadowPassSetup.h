@@ -17,8 +17,11 @@ namespace xray::render::framegraph {
 
 namespace xray::render::fg::passes {
 
+constexpr float kSunShadowFarBias = 0.0015f;
+
 struct SunShadowState {
     static constexpr u32 kReadbackSlots = 6;
+    bool receiverActive = false;
 
     nvrhi::ComputePipelineHandle cullPipeline;
     nvrhi::BindingLayoutHandle cullLayout;
