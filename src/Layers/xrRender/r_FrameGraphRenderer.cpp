@@ -31,6 +31,7 @@
 #include "FrameGraphPasses/DebugDrawPassSetup.h"
 #include "FrameGraphPasses/HiZBuildPassSetup.h"      // Phase 3.5: Hi-Z pyramid for GPU culling
 #include "FrameGraphPasses/DepthPrepassSetup.h"
+#include "FrameGraphPasses/SunShadowPassSetup.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering + pipeline init
 #include "GPUCullingManager.h"                       // Phase 3.5: GPU frustum/occlusion culling
 #include "FGDetailManager.h"                         // Detail system (grass/vegetation)
@@ -752,6 +753,12 @@ void FrameGraphRenderer::RenderStatsOverlay()
                 stats.particleQuadsSubmitted = particleCull.submittedQuads;
                 stats.particleQuadsVisible = particleCull.visibleQuads;
             }
+
+            const auto& sunShadow = m_blackboard->get_or_add<passes::SunShadowState>();
+            stats.sunCasterCandidates = sunShadow.candidates;
+            stats.sunCastersOpaque = sunShadow.castersOpaque;
+            stats.sunCastersTerrain = sunShadow.castersTerrain;
+            stats.sunCastersAT = sunShadow.castersAT;
         }
 
         // Collect detail/grass stats
@@ -1138,6 +1145,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
         if (m_gpuCullingManager->IsVariantPartitionEnabled())
             bindlessConfig.variantPartition = m_gpuCullingManager->GetStaticPartition().ToConfig();
+    }
+
+    passes::SunShadowCullOutput sunShadowCull;
+    {
+        auto& sunShadowState = m_blackboard->get_or_add<passes::SunShadowState>();
+        if (ps_r_sun_shadow && ps_r_cluster && cullActive && m_gpuCullingManager) {
+            sunShadowCull = passes::setupSunShadowCullPass(
+                *m_framegraph,
+                m_device,
+                cullOutput.staticDrawArgsBuffer,
+                m_gpuCullingManager->GetClusterEntryBuffer(),
+                m_gpuCullingManager->GetClusterEntryCount(),
+                &sunShadowState
+            );
+        }
+        if (!sunShadowCull.active)
+            sunShadowState.candidates = 0;
     }
 
     bool prepassActive = false;

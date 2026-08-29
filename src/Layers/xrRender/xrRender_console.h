@@ -243,6 +243,13 @@ extern ECORE_API float ps_r_cluster_lod;
 extern ECORE_API float ps_r_cluster_fade;
 extern ECORE_API float ps_r_ssa_px;
 
+extern ECORE_API int   ps_r_sun_shadow;
+extern ECORE_API int   ps_r_sun_shadow_debug;
+extern ECORE_API int   ps_r_sun_shadow_far_size;
+extern ECORE_API float ps_r_sun_shadow_far_box;
+extern ECORE_API float ps_r_shadow_cluster_lod;
+extern ECORE_API int   ps_r_shadow_at;
+
 extern ECORE_API int   ps_r_smoke_trail_enabled;
 extern ECORE_API float ps_r_smoke_max_emit_rate;
 extern ECORE_API float ps_r_smoke_point_lifetime;

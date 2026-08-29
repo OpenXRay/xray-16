@@ -282,6 +282,13 @@ float ps_r_cluster_lod   = 4.0f;
 float ps_r_cluster_fade  = 0.25f;
 float ps_r_ssa_px        = 2.0f;
 
+int   ps_r_sun_shadow          = 1;
+int   ps_r_sun_shadow_debug    = 0;
+int   ps_r_sun_shadow_far_size = 2048;
+float ps_r_sun_shadow_far_box  = 320.0f;
+float ps_r_shadow_cluster_lod  = 1.0f;
+int   ps_r_shadow_at           = 1;
+
 int   ps_r_smoke_trail_enabled  = 1;
 float ps_r_smoke_max_emit_rate  = 45.f;
 float ps_r_smoke_point_lifetime = 2.5f;
@@ -976,6 +983,13 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_cluster_lod", &ps_r_cluster_lod, 0.05f, 64.0f);
     CMD4(CCC_Float, "r_cluster_fade", &ps_r_cluster_fade, 0.0f, 1.0f);
     CMD4(CCC_Float, "r_ssa_px", &ps_r_ssa_px, 0.25f, 16.0f);
+
+    CMD4(CCC_Integer, "r_sun_shadow", &ps_r_sun_shadow, 0, 1);
+    CMD4(CCC_Integer, "r_sun_shadow_debug", &ps_r_sun_shadow_debug, 0, 2);
+    CMD4(CCC_Integer, "r_sun_shadow_far_size", &ps_r_sun_shadow_far_size, 1024, 8192);
+    CMD4(CCC_Float, "r_sun_shadow_far_box", &ps_r_sun_shadow_far_box, 50.0f, 1000.0f);
+    CMD4(CCC_Float, "r_shadow_cluster_lod", &ps_r_shadow_cluster_lod, 0.1f, 16.0f);
+    CMD4(CCC_Integer, "r_shadow_at", &ps_r_shadow_at, 0, 1);
 
     // Smoke Trail (weapon muzzle smoke)
     CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);
