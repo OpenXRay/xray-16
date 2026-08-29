@@ -65,6 +65,8 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/ForwardColorPassSetup.cpp
     FrameGraphPasses/DepthPrepassSetup.h
     FrameGraphPasses/DepthPrepassSetup.cpp
+    FrameGraphPasses/SunShadowPassSetup.h
+    FrameGraphPasses/SunShadowPassSetup.cpp
     FrameGraphPasses/HiZBuildPassSetup.h
     FrameGraphPasses/HiZBuildPassSetup.cpp
     FrameGraphPasses/SkinningPassSetup.h

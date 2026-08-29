@@ -60,6 +60,11 @@ struct RenderStats
     u32 clusterTerrainEntries = 0;  // Terrain share of the entry table
     u32 clusterTerrainVisible = 0;  // Terrain entries drawn last frame
 
+    u32 sunCasterCandidates = 0;
+    u32 sunCastersOpaque = 0;
+    u32 sunCastersTerrain = 0;
+    u32 sunCastersAT = 0;
+
     u32 lightsClustered = 0;
     u32 lightsHiZVisible = 0;
     u32 lightsPoint = 0;
@@ -97,6 +102,7 @@ struct RenderStats
         skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
+        sunCasterCandidates = sunCastersOpaque = sunCastersTerrain = sunCastersAT = 0;
         lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
         detailInstances = detailSlots = 0;
         detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;

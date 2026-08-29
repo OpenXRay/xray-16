@@ -32,6 +32,17 @@ bool FrustumTestSphere(float3 center, float radius, float4 planes[6])
     return true;
 }
 
+bool FrustumTestSphere6(float3 center, float radius, float4 planes[6])
+{
+    for (uint i = 0; i < 6; ++i)
+    {
+        float dist = dot(planes[i].xyz, center) + planes[i].w;
+        if (dist > radius)
+            return false;
+    }
+    return true;
+}
+
 // Test AABB against frustum planes (skip near plane)
 // Returns: true = visible, false = culled
 bool FrustumTestAABB(float3 aabb_min, float3 aabb_max, float4 planes[6])
