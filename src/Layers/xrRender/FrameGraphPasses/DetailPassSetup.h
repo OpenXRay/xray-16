@@ -41,8 +41,7 @@ struct DetailPassData {
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle outputNormal;
     framegraph::VirtualResourceHandle baseColor;
-    framegraph::VirtualResourceHandle sunShadowFar;
-    framegraph::VirtualResourceHandle sunShadowCasc0;
+    SunShadowMaps sunShadowMaps;
     fg::RenderDevice* device;
     fg::FGDetailManager* detailManager;
     framegraph::DefaultOutputLayout outputs;
