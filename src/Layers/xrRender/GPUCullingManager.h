@@ -88,6 +88,7 @@ static_assert(sizeof(GPUClusterEntry) == 80, "GPUClusterEntry must be 80 bytes")
 enum GPUClusterEntryFlags : u32 {
     GPU_CLUSTER_ENTRY_AT      = 0x1,
     GPU_CLUSTER_ENTRY_PLAIN   = 0x2,
+    GPU_CLUSTER_ENTRY_SHADOW_ONLY = 0x8,
     GPU_CLUSTER_ENTRY_TERRAIN = 0x4,
 };
 

@@ -56,6 +56,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
         return;
 
     ClusterEntry e = g_Entries[idx];
+    if ((e.flags & 8u) != 0u)
+        return;
 
     if (!FrustumTestSphere(e.sphere.xyz, e.sphere.w, g_FrustumPlanes))
         return;

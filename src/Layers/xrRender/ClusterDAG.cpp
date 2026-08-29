@@ -350,7 +350,7 @@ bool IsSelfLoop(const ClusterMetaProto& p)
 }
 
 constexpr u32 kCacheMagic = 0x464C4356;
-constexpr u32 kCacheVersion = 2;
+constexpr u32 kCacheVersion = 3;
 
 #pragma pack(push, 4)
 struct CacheHeader {
@@ -564,8 +564,10 @@ void ClusterDAG::Bake(
             sorted.end());
 
         for (const ClusterBakeRange& r : sorted) {
-            if (!ValidateRange(r.key, megaIndices + r.key.indexOffset))
+            if (!ValidateRange(r.key, megaIndices + r.key.indexOffset)) {
+                m_stats.invalidRanges++;
                 continue;
+            }
             RangeInfo info;
             info.key = r.key;
             info.flags = r.flags;
@@ -675,6 +677,9 @@ void ClusterDAG::Bake(
         if (bestHost >= 0) {
             componentMembers[bestHost].push_back(orphan);
             m_stats.orphansAttached++;
+        } else {
+            infos[orphan].flags &= ~CLUSTER_RANGE_FLAG_MERGEABLE;
+            m_stats.orphanStandalone++;
         }
     }
 
@@ -725,7 +730,7 @@ void ClusterDAG::Bake(
         if (infos[i].flags & CLUSTER_RANGE_FLAG_MERGEABLE)
             continue;
         if (infos[i].key.indexCount < 3 * minTris)
-            continue;
+            m_stats.smallStandalone++;
         BakeUnitDesc unit;
         unit.members.push_back(i);
         unit.flags = infos[i].flags;
@@ -782,8 +787,10 @@ void ClusterDAG::Bake(
 
     for (size_t i = 0; i < units.size(); ++i) {
         BakeResult& r = results[i];
-        if (!r.baked)
+        if (!r.baked) {
+            m_stats.bakeFailed++;
             continue;
+        }
 
         ClusterUnitRecord rec;
         rec.firstMember = u32(m_memberKeys.size());
@@ -839,9 +846,10 @@ void ClusterDAG::Bake(
 
     RunDiagnostics();
 
-    Msg("* [ClusterDAG] baked %u/%u meshes: %u clusters, %llu indices, %u ms",
+    Msg("* [ClusterDAG] baked %u/%u meshes: %u clusters, %llu indices, %u ms (%u invalid ranges, %u bake failures, %u small standalone, %u orphan standalone)",
         m_stats.bakedMeshes, m_stats.eligibleMeshes, m_stats.clusters,
-        (unsigned long long)m_stats.bakedIndexCount, m_stats.bakeMs);
+        (unsigned long long)m_stats.bakedIndexCount, m_stats.bakeMs,
+        m_stats.invalidRanges, m_stats.bakeFailed, m_stats.smallStandalone, m_stats.orphanStandalone);
     Msg("* [ClusterDAG] %u components (%u members, %u splits, %u orphans attached, %u pinned verts), %u self-loops dropped, %u holes",
         m_stats.components, m_stats.componentMembers, m_stats.capSplits,
         m_stats.orphansAttached, m_stats.pinnedVerts, m_stats.droppedSelfLoops, m_stats.holes);
@@ -995,7 +1003,7 @@ void ClusterDAG::RunDiagnostics()
 
         for (u32 i = 0; i < rec.protoCount; ++i) {
             const ClusterMetaProto& p = m_protos[rec.firstProto + i];
-            if (p.selfError > 0.0f) {
+            {
                 ClusterBoundsKey k;
                 k.x = p.lodSelf[0]; k.y = p.lodSelf[1]; k.z = p.lodSelf[2];
                 k.r = p.lodSelf[3]; k.e = p.selfError;

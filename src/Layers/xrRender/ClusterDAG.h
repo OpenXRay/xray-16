@@ -90,6 +90,10 @@ struct ClusterBakeStats {
     u32 terrainClusters;
     u32 droppedSelfLoops;
     u32 holes;
+    u32 invalidRanges;
+    u32 bakeFailed;
+    u32 smallStandalone;
+    u32 orphanStandalone;
     u32 maxDepth;
     u32 levelCounts[16];
     u32 histInf, hist100, hist10, hist1, hist01, histSmall;
