@@ -137,6 +137,8 @@ public:
 
     IThunderboltRender* GetRenderer() const { return &*m_pRender; }
 
+    bool IsActive() const { return state == stWorking; }
+
     SThunderboltCollection* AppendDef(shared_str sect);
 
     [[nodiscard]]

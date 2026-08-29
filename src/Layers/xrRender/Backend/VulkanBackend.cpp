@@ -454,6 +454,7 @@ bool VulkanBackend::CreateLogicalDevice() {
     features2.features.shaderStorageImageReadWithoutFormat = VK_TRUE;
     features2.features.shaderStorageImageWriteWithoutFormat = VK_TRUE;
     features2.features.multiViewport = VK_TRUE;
+    features2.features.shaderClipDistance = VK_TRUE;
 
     VkDeviceCreateInfo deviceCreateInfo = {};
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -490,6 +491,7 @@ bool VulkanBackend::CreateLogicalDevice() {
         CLAMPF(shaderStorageImageReadWithoutFormat);
         CLAMPF(shaderStorageImageWriteWithoutFormat);
         CLAMPF(multiViewport);
+        CLAMPF(shaderClipDistance);
 #undef CLAMPF
         if (vulkan11Features.shaderDrawParameters && !sup11.shaderDrawParameters) {
             Msg("! [VulkanBackend] vk11 feature unsupported: shaderDrawParameters");
@@ -499,6 +501,9 @@ bool VulkanBackend::CreateLogicalDevice() {
         Msg("* [VulkanBackend] vk12.drawIndirectCount = %s (device reports: %s)",
             vulkan12Features.drawIndirectCount ? "ENABLED" : "DISABLED",
             sup12.drawIndirectCount ? "supported" : "unsupported");
+        Msg("* [VulkanBackend] shaderClipDistance = %s (device reports: %s)",
+            features2.features.shaderClipDistance ? "ENABLED" : "DISABLED",
+            sup2.features.shaderClipDistance ? "supported" : "unsupported");
     }
 
     VkResult result = vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);

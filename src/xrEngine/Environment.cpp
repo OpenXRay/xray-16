@@ -94,6 +94,8 @@ CEnvironment::~CEnvironment()
     m_effects_config = nullptr;
 }
 
+bool CEnvironment::IsThunderboltActive() const { return eff_Thunderbolt && eff_Thunderbolt->IsActive(); }
+
 void CEnvironment::Invalidate()
 {
     bWFX = false;
