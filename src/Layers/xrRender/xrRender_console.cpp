@@ -287,6 +287,8 @@ int   ps_r_sun_shadow_debug    = 0;
 int   ps_r_sun_shadow_far_size = 2048;
 float ps_r_sun_shadow_far_box  = 320.0f;
 float ps_r_shadow_cluster_lod  = 1.0f;
+int ps_r_sun_shadow_bias = 100;
+float ps_r_sun_shadow_slope = 2.0f;
 int   ps_r_shadow_at           = 1;
 
 int   ps_r_smoke_trail_enabled  = 1;
@@ -989,6 +991,8 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_sun_shadow_far_size", &ps_r_sun_shadow_far_size, 1024, 8192);
     CMD4(CCC_Float, "r_sun_shadow_far_box", &ps_r_sun_shadow_far_box, 50.0f, 1000.0f);
     CMD4(CCC_Float, "r_shadow_cluster_lod", &ps_r_shadow_cluster_lod, 0.1f, 16.0f);
+    CMD4(CCC_Integer, "r_sun_shadow_bias", &ps_r_sun_shadow_bias, 0, 4096);
+    CMD4(CCC_Float, "r_sun_shadow_slope", &ps_r_sun_shadow_slope, 0.0f, 16.0f);
     CMD4(CCC_Integer, "r_shadow_at", &ps_r_shadow_at, 0, 1);
 
     // Smoke Trail (weapon muzzle smoke)
