@@ -91,7 +91,7 @@ PS_OUTPUT main(PS_INPUT input)
     output.normal.a = -max(fwd.normal.a, 0.004);
 
     if (dev_param_3.y > 0.5)
-        output.color.rgb = SunVisibility(input.worldPos).xxx;
+        output.color.rgb = SunShadowDebugColor(output.color.rgb, input.worldPos);
 
     return output;
 }

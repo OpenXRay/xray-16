@@ -562,6 +562,7 @@ void StatsOverlay::RenderGeometrySection()
             ImGui::Text("Casters: %u opaque / %u terrain / %u AT of %u",
                 s.sunCastersOpaque, s.sunCastersTerrain, s.sunCastersAT, s.sunCasterCandidates);
             ImGui::Text("Far map: %s, %u redraws", s.sunFarCached ? "cached" : "redrawn", s.sunFarRedraws);
+            ImGui::Text("Cascade 0: %u opaque / %u terrain / %u AT", s.sunCasc0Opaque, s.sunCasc0Terrain, s.sunCasc0AT);
             ImGui::Unindent();
         }
 
