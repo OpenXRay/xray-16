@@ -472,6 +472,14 @@ void FrameGraphRenderer::Render() {
     auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device);
     auto staticGlobalsData = passes::BuildStaticGlobals();
 
+    {
+        const auto& sunShadow = m_blackboard->get_or_add<passes::SunShadowState>();
+        if (sunShadow.receiverActive && sunShadow.farMapSize > 0) {
+            staticGlobalsData.shadow_matrices[2] = sunShadow.farVP;
+            staticGlobalsData.cascade_splits.set(1.0f, passes::kSunShadowFarBias, 1.0f / float(sunShadow.farMapSize), 0.0f);
+        }
+    }
+
     auto& clm = fg::ClusteredLightManager::Instance();
     if (clm.IsReady() && clm.GetLightCount() > 0) {
         float zNear = VIEWPORT_NEAR;
@@ -1124,6 +1132,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             if (sunShadowFar.is_valid())
                 m_framegraph->GetRTRegistry().RegisterRT("rt_SunShadowFar", sunShadowFar);
         }
+        sunShadowState.receiverActive = sunShadowFar.is_valid();
     }
 
     bool prepassActive = false;
@@ -1252,7 +1261,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height,
         drawArgsBuffer,
         bindlessConfig,
-        &m_blackboard->get_or_add<passes::ForwardColorPassState>()
+        &m_blackboard->get_or_add<passes::ForwardColorPassState>(),
+        sunShadowFar
     );
 
     if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid()) {

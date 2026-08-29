@@ -11,6 +11,7 @@ extern ENGINE_API Fvector4 ps_dev_param_2;
 extern ENGINE_API Fvector4 ps_dev_param_3;
 extern ENGINE_API Fvector4 ps_dev_param_4;
 extern ECORE_API int ps_r_cluster_debug;
+extern ECORE_API int ps_r_sun_shadow_debug;
 extern ENGINE_API float psHUD_FOV;
 namespace xray::render {
     namespace fg {
@@ -154,7 +155,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
 
     for (int i = 0; i < 4; i++)
         cb.shadow_matrices[i].identity();
-    cb.cascade_splits.set(10.0f, 50.0f, 150.0f, 500.0f);
+    cb.cascade_splits.set(0.0f, 0.0f, 0.0f, 0.0f);
 
     cb.cluster_params.set(16.0f, 16.0f, 24.0f, 0.0f);
     cb.cluster_scales.set(0.1f, 500.0f, 1.0f, 1.0f);
@@ -167,6 +168,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.dev_param_3 = ps_dev_param_3;
     cb.dev_param_4 = ps_dev_param_4;
     cb.dev_param_4.x = float(ps_r_cluster_debug);
+    cb.dev_param_3.y = float(ps_r_sun_shadow_debug);
 }
 
 inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity) {
