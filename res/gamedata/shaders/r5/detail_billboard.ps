@@ -1,5 +1,6 @@
 #define SM_6_0
 #define CLUSTERED_LIGHTING_FORWARD
+#define SUN_SHADOW_RECEIVER
 #include "common.h"
 #include "bindless_common.h"
 
@@ -59,5 +60,8 @@ f_forward main(p_billboard I)
 	float3 sss = ComputeBillboardSSS(N, -L_sun_dir_w, t);
 	albedo += sss * L_sun_color;
 
-	return output_forward_pbr(albedo, N, I.position.xyz, metallic, roughness, ao, I.hpos);
+	f_forward fwd = output_forward_pbr(albedo, N, I.position.xyz, metallic, roughness, ao, I.hpos);
+	if (dev_param_3.y > 0.5)
+		fwd.color.rgb = SunVisibility(I.position.xyz).xxx;
+	return fwd;
 }
