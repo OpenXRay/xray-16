@@ -15,6 +15,10 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
+namespace xray::profiler {
+    class GPUProfiler;
+}
+
 namespace xray::render::fg::passes {
 
 constexpr float kSunShadowFarBias = 0.0015f;
@@ -50,6 +54,14 @@ struct SunShadowState {
     Fmatrix farVP;
     float farTexel = 0.0f;
     bool farValid = false;
+    bool farRedraw = false;
+    u32 farRedraws = 0;
+    Fvector farCamPos;
+    Fvector farSunDir;
+    u32 farEntryCount = 0;
+    float farBox = 0.0f;
+    float farLod = 0.0f;
+    int farAT = 0;
 
     nvrhi::TextureHandle farMap;
     u32 farMapSize = 0;
@@ -79,6 +91,8 @@ struct SunShadowDrawConfig {
     MaterialCache* materialCache = nullptr;
 };
 
+void InvalidateSunShadowCache(SunShadowState& state);
+
 void ComputeSunFarVP(Fmatrix& outVP, float& outTexel, const Fvector& sunDir, float boxSize, u32 mapSize);
 
 SunShadowCullOutput setupSunShadowCullPass(
@@ -87,13 +101,15 @@ SunShadowCullOutput setupSunShadowCullPass(
     framegraph::VirtualResourceHandle orderAfter,
     nvrhi::IBuffer* entryBuffer,
     u32 entryCount,
-    SunShadowState* state);
+    SunShadowState* state,
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr);
 
 framegraph::VirtualResourceHandle setupSunShadowFarPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     const SunShadowCullOutput& cull,
     const SunShadowDrawConfig& config,
-    SunShadowState* state);
+    SunShadowState* state,
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr);
 
 } // namespace xray::render::fg::passes

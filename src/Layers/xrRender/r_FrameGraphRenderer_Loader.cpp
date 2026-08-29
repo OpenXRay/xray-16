@@ -14,6 +14,8 @@
 // Mega-buffer system integration
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/FrameGraph/Blackboard.h"
+#include "Layers/xrRender/FrameGraphPasses/SunShadowPassSetup.h"
 
 // D3D12: Shader compilation
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
@@ -63,6 +65,8 @@ void FrameGraphRenderer::level_Load(IReader* fs)
                 gpuCulling->BeginLevelLoad(2000000, 6000000);
             }
         }
+        if (m_blackboard)
+            passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
 
         // VB,IB,SWI - MOVED UP! Must load vertex formats before compiling shaders
         g_pGamePersistent->LoadTitle("st_loading_geometry");
@@ -381,6 +385,9 @@ void FrameGraphRenderer::level_Unload()
     //*** Lights
     // Glows.Unload			();
     Lights.Unload();
+
+    if (m_blackboard)
+        passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
 
     //*** BufferPool.Visuals
     for (dxRender_Visual* visual : BufferPool.Visuals)

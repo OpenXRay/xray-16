@@ -496,7 +496,7 @@ void FrameGraphRenderer::Render() {
 
     {
         const auto& sunShadow = m_blackboard->get_or_add<passes::SunShadowState>();
-        if (sunShadow.receiverActive && sunShadow.farMapSize > 0) {
+        if (sunShadow.receiverActive && sunShadow.farValid && sunShadow.farMapSize > 0) {
             staticGlobalsData.shadow_matrices[2] = sunShadow.farVP;
             staticGlobalsData.cascade_splits.set(1.0f, passes::kSunShadowFarBias, 1.0f / float(sunShadow.farMapSize), 0.0f);
         }
@@ -767,6 +767,8 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.sunCastersOpaque = sunShadow.castersOpaque;
             stats.sunCastersTerrain = sunShadow.castersTerrain;
             stats.sunCastersAT = sunShadow.castersAT;
+            stats.sunFarRedraws = sunShadow.farRedraws;
+            stats.sunFarCached = !sunShadow.farRedraw;
         }
 
         // Collect detail/grass stats
@@ -1166,7 +1168,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 cullOutput.staticDrawArgsBuffer,
                 m_gpuCullingManager->GetClusterEntryBuffer(),
                 m_gpuCullingManager->GetClusterEntryCount(),
-                &sunShadowState
+                &sunShadowState,
+                m_gpuProfiler.get()
             );
         }
         if (!sunShadowCull.active)
@@ -1180,7 +1183,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             sunCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
             sunCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
             sunCfg.materialCache = m_materialCache.get();
-            sunShadowFar = passes::setupSunShadowFarPass(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState);
+            sunShadowFar = passes::setupSunShadowFarPass(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState, m_gpuProfiler.get());
             if (sunShadowFar.is_valid())
                 m_framegraph->GetRTRegistry().RegisterRT("rt_SunShadowFar", sunShadowFar);
         }

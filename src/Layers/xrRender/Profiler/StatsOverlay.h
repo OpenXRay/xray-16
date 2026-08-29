@@ -64,6 +64,8 @@ struct RenderStats
     u32 sunCastersOpaque = 0;
     u32 sunCastersTerrain = 0;
     u32 sunCastersAT = 0;
+    u32 sunFarRedraws = 0;
+    bool sunFarCached = false;
 
     u32 lightsClustered = 0;
     u32 lightsHiZVisible = 0;
@@ -103,6 +105,8 @@ struct RenderStats
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
         sunCasterCandidates = sunCastersOpaque = sunCastersTerrain = sunCastersAT = 0;
+        sunFarRedraws = 0;
+        sunFarCached = false;
         lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
         detailInstances = detailSlots = 0;
         detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;
