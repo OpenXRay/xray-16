@@ -23,11 +23,34 @@ namespace {
 constexpr float kFarEyeDist = 350.0f;
 constexpr float kFarZNear = 1.0f;
 constexpr float kFarZBeyond = 400.0f;
+constexpr float kFarRedrawDist = 10.0f;
+constexpr float kFarSunDotRedraw = 0.99999847f;
+constexpr float kCascadeBox0 = 25.0f;
+constexpr u32 kCascadeSize0 = 4096;
+constexpr float kCascadeZBehind = -160.0f;
+constexpr float kCascadeZAhead = 460.0f;
+constexpr float kAnchorGrid = 4.0f;
 constexpr u32 kCullThreadGroup = 64;
 constexpr int kShadowDepthBias = -2;
 constexpr float kShadowSlopeBias = -2.5f;
-constexpr float kFarRedrawDist = 10.0f;
-constexpr float kFarSunDotRedraw = 0.99999847f;
+
+struct TargetNames {
+    const char* suffix;
+    const char* passName;
+    const char* zoneName;
+    const char* rtName;
+    const char* framebufferName;
+    const char* argsOpaqueName;
+    const char* argsTerrainName;
+    const char* argsATName;
+};
+
+constexpr TargetNames kTargetNames[kSunTargetCount] = {
+    { "Far", "Sun Shadow Far", "Shadow/Far", "rt_SunShadowFar", "SunShadowFar",
+      "sun_shadow_args_opaque_far", "sun_shadow_args_terrain_far", "sun_shadow_args_at_far" },
+    { "Casc0", "Sun Shadow Casc0", "Shadow/Casc0", "rt_SunShadowCasc0", "SunShadowCasc0",
+      "sun_shadow_args_opaque_casc0", "sun_shadow_args_terrain_casc0", "sun_shadow_args_at_casc0" },
+};
 
 struct alignas(16) SunShadowCullParams {
     Fvector4 frustumPlanes[6];
@@ -39,9 +62,7 @@ struct alignas(16) SunShadowCullParams {
 
 struct SunShadowCullData {
     VirtualResourceHandle order;
-    VirtualResourceHandle opaqueArgs;
-    VirtualResourceHandle terrainArgs;
-    VirtualResourceHandle atArgs;
+    SunShadowCullOutput::Target targets[kSunTargetCount];
     SunShadowState* state;
     fg::RenderDevice* device;
     nvrhi::IBuffer* entryBuffer;
@@ -49,14 +70,15 @@ struct SunShadowCullData {
     xray::profiler::GPUProfiler* gpuProfiler = nullptr;
 };
 
-struct SunShadowFarData {
-    VirtualResourceHandle farMap;
+struct SunShadowMapData {
+    VirtualResourceHandle map;
     VirtualResourceHandle opaqueArgs;
     VirtualResourceHandle terrainArgs;
     VirtualResourceHandle atArgs;
     SunShadowState* state;
     fg::RenderDevice* device;
     SunShadowDrawConfig config;
+    u32 target = 0;
     xray::profiler::GPUProfiler* gpuProfiler = nullptr;
 };
 
@@ -202,7 +224,7 @@ bool EnsureDepthPipelines(fg::RenderDevice* device, SunShadowState& state)
     return true;
 }
 
-nvrhi::BufferHandle MakeStreamBuffer(nvrhi::IDevice* nvDevice, const char* name, u32 elems)
+nvrhi::BufferHandle MakeStreamBuffer(nvrhi::IDevice* nvDevice, const std::string& name, u32 elems)
 {
     nvrhi::BufferDesc desc;
     desc.debugName = name;
@@ -214,7 +236,7 @@ nvrhi::BufferHandle MakeStreamBuffer(nvrhi::IDevice* nvDevice, const char* name,
     return nvDevice->createBuffer(desc);
 }
 
-nvrhi::BufferHandle MakeArgsBuffer(nvrhi::IDevice* nvDevice, const char* name)
+nvrhi::BufferHandle MakeArgsBuffer(nvrhi::IDevice* nvDevice, const std::string& name)
 {
     nvrhi::BufferDesc desc;
     desc.debugName = name;
@@ -227,66 +249,67 @@ nvrhi::BufferHandle MakeArgsBuffer(nvrhi::IDevice* nvDevice, const char* name)
     return nvDevice->createBuffer(desc);
 }
 
-bool EnsureCullBuffers(nvrhi::IDevice* nvDevice, SunShadowState& state, u32 entryCount)
+bool EnsureCullBuffers(nvrhi::IDevice* nvDevice, SunShadowTarget& target, const char* suffix, u32 entryCount)
 {
-    if (state.countBuffer && state.streamCapacity == entryCount)
+    if (target.countBuffer && target.streamCapacity == entryCount)
         return true;
 
+    const std::string base = std::string("SunShadow_") + suffix;
     {
         nvrhi::BufferDesc desc;
-        desc.debugName = "SunShadow_Count";
+        desc.debugName = base + "_Count";
         desc.byteSize = sizeof(u32) * 4;
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = true;
-        state.countBuffer = nvDevice->createBuffer(desc);
+        target.countBuffer = nvDevice->createBuffer(desc);
     }
-    state.opaqueStream = MakeStreamBuffer(nvDevice, "SunShadow_Opaque", entryCount);
-    state.terrainStream = MakeStreamBuffer(nvDevice, "SunShadow_Terrain", entryCount);
-    state.atStream = MakeStreamBuffer(nvDevice, "SunShadow_AT", entryCount);
-    state.opaqueArgs = MakeArgsBuffer(nvDevice, "SunShadow_ArgsOpaque");
-    state.terrainArgs = MakeArgsBuffer(nvDevice, "SunShadow_ArgsTerrain");
-    state.atArgs = MakeArgsBuffer(nvDevice, "SunShadow_ArgsAT");
+    target.opaqueStream = MakeStreamBuffer(nvDevice, base + "_Opaque", entryCount);
+    target.terrainStream = MakeStreamBuffer(nvDevice, base + "_Terrain", entryCount);
+    target.atStream = MakeStreamBuffer(nvDevice, base + "_AT", entryCount);
+    target.opaqueArgs = MakeArgsBuffer(nvDevice, base + "_ArgsOpaque");
+    target.terrainArgs = MakeArgsBuffer(nvDevice, base + "_ArgsTerrain");
+    target.atArgs = MakeArgsBuffer(nvDevice, base + "_ArgsAT");
 
-    for (u32 i = 0; i < SunShadowState::kReadbackSlots; ++i) {
-        if (state.readback[i])
+    for (u32 i = 0; i < SunShadowTarget::kReadbackSlots; ++i) {
+        if (target.readback[i])
             continue;
         nvrhi::BufferDesc desc;
-        desc.debugName = "SunShadow_Readback";
+        desc.debugName = base + "_Readback";
         desc.byteSize = sizeof(u32) * 4;
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
         desc.keepInitialState = true;
-        state.readback[i] = nvDevice->createBuffer(desc);
+        target.readback[i] = nvDevice->createBuffer(desc);
     }
 
-    state.readbackWrite = 0;
-    state.readbackScheduled = 0;
-    state.castersOpaque = state.castersTerrain = state.castersAT = 0;
+    target.readbackWrite = 0;
+    target.readbackScheduled = 0;
+    target.castersOpaque = target.castersTerrain = target.castersAT = 0;
 
-    if (!state.countBuffer || !state.opaqueStream || !state.terrainStream || !state.atStream ||
-        !state.opaqueArgs || !state.terrainArgs || !state.atArgs) {
-        Msg("! [SunShadow] cull buffer creation failed");
-        state.countBuffer = nullptr;
-        state.streamCapacity = 0;
+    if (!target.countBuffer || !target.opaqueStream || !target.terrainStream || !target.atStream ||
+        !target.opaqueArgs || !target.terrainArgs || !target.atArgs) {
+        Msg("! [SunShadow] %s cull buffer creation failed", suffix);
+        target.countBuffer = nullptr;
+        target.streamCapacity = 0;
         return false;
     }
 
-    state.streamCapacity = entryCount;
+    target.streamCapacity = entryCount;
     return true;
 }
 
-bool EnsureFarMap(nvrhi::IDevice* nvDevice, SunShadowState& state, u32 size)
+bool EnsureMap(nvrhi::IDevice* nvDevice, SunShadowTarget& target, const char* suffix, u32 size)
 {
-    if (state.farMap && state.farMapSize == size)
+    if (target.map && target.mapSize == size)
         return true;
 
     nvrhi::TextureDesc desc;
     desc.width = size;
     desc.height = size;
     desc.format = nvrhi::Format::D32;
-    desc.debugName = "SunShadow_Far";
+    desc.debugName = std::string("SunShadow_") + suffix;
     desc.isShaderResource = true;
     desc.isRenderTarget = true;
     desc.isTypeless = true;
@@ -294,66 +317,58 @@ bool EnsureFarMap(nvrhi::IDevice* nvDevice, SunShadowState& state, u32 size)
     desc.clearValue = nvrhi::Color(0.0f);
     desc.initialState = nvrhi::ResourceStates::DepthWrite;
     desc.keepInitialState = true;
-    state.farMap = nvDevice->createTexture(desc);
-    state.farMapSize = state.farMap ? size : 0;
-    if (!state.farMap)
-        Msg("! [SunShadow] far map creation failed (%u)", size);
-    return state.farMap != nullptr;
+    target.map = nvDevice->createTexture(desc);
+    target.mapSize = target.map ? size : 0;
+    if (!target.map)
+        Msg("! [SunShadow] %s map creation failed (%u)", suffix, size);
+    return target.map != nullptr;
 }
 
-void ProcessReadback(nvrhi::IDevice* nvDevice, SunShadowState& state)
+void ProcessReadback(nvrhi::IDevice* nvDevice, SunShadowTarget& target)
 {
-    if (state.readbackScheduled < SunShadowState::kReadbackSlots)
+    if (target.readbackScheduled < SunShadowTarget::kReadbackSlots)
         return;
-    nvrhi::IBuffer* oldest = state.readback[state.readbackWrite];
+    nvrhi::IBuffer* oldest = target.readback[target.readbackWrite];
     if (!oldest)
         return;
     void* mapped = nvDevice->mapBuffer(oldest, nvrhi::CpuAccessMode::Read);
     if (!mapped)
         return;
     const u32* counts = static_cast<const u32*>(mapped);
-    state.castersOpaque = std::min(counts[0], state.streamCapacity);
-    state.castersTerrain = std::min(counts[1], state.streamCapacity);
-    state.castersAT = std::min(counts[2], state.streamCapacity);
+    target.castersOpaque = std::min(counts[0], target.streamCapacity);
+    target.castersTerrain = std::min(counts[1], target.streamCapacity);
+    target.castersAT = std::min(counts[2], target.streamCapacity);
     nvDevice->unmapBuffer(oldest);
 }
 
-void ScheduleReadback(nvrhi::ICommandList* cmdList, SunShadowState& state)
+void ScheduleReadback(nvrhi::ICommandList* cmdList, SunShadowTarget& target)
 {
-    nvrhi::IBuffer* slot = state.readback[state.readbackWrite];
+    nvrhi::IBuffer* slot = target.readback[target.readbackWrite];
     if (!slot)
         return;
-    cmdList->copyBuffer(slot, 0, state.countBuffer, 0, sizeof(u32) * 4);
-    state.readbackWrite = (state.readbackWrite + 1) % SunShadowState::kReadbackSlots;
-    if (state.readbackScheduled < SunShadowState::kReadbackSlots)
-        ++state.readbackScheduled;
+    cmdList->copyBuffer(slot, 0, target.countBuffer, 0, sizeof(u32) * 4);
+    target.readbackWrite = (target.readbackWrite + 1) % SunShadowTarget::kReadbackSlots;
+    if (target.readbackScheduled < SunShadowTarget::kReadbackSlots)
+        ++target.readbackScheduled;
 }
 
-void ExecuteSunShadowCull(fg::RenderContext* ctx, const SunShadowCullData& data)
+void CullTarget(fg::RenderContext* ctx, const SunShadowCullData& data, SunShadowTarget& target,
+                const ExtractedReflection& cullRefl, const ExtractedReflection& argsRefl)
 {
     SunShadowState& state = *data.state;
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
-    if (!cmdList || !nvDevice)
-        return;
-    GPUZone zone(data.gpuProfiler, cmdList, "Shadow/Cull");
-    if (!state.farRedraw || !state.countBuffer || !state.farValid)
-        return;
-    if (!EnsureCullPipelines(data.device, state))
-        return;
-
     auto& cache = framegraph::GetPassResourceCache();
-    auto* shaderLoader = GEnv.Render->GetShaderLoader();
 
     SunShadowCullParams cb = {};
     {
-        Fmatrix vp = state.farVP;
+        Fmatrix vp = target.vp;
         CFrustum frustum;
         frustum.CreateFromMatrix(vp, FRUSTUM_P_ALL);
         for (u32 i = 0; i < frustum.p_count && i < 6; ++i)
             cb.frustumPlanes[i].set(frustum.planes[i].n.x, frustum.planes[i].n.y, frustum.planes[i].n.z, frustum.planes[i].d);
     }
-    cb.errBudget = state.farTexel * ps_r_shadow_cluster_lod;
+    cb.errBudget = target.texel * ps_r_shadow_cluster_lod;
     cb.entryCount = data.entryCount;
     cb.includeAT = ps_r_shadow_at ? 1u : 0u;
 
@@ -361,26 +376,21 @@ void ExecuteSunShadowCull(fg::RenderContext* ctx, const SunShadowCullData& data)
     cmdList->writeBuffer(paramsCB, &cb, sizeof(cb));
 
     const u32 zero[4] = { 0, 0, 0, 0 };
-    cmdList->setBufferState(state.countBuffer, nvrhi::ResourceStates::CopyDest);
-    cmdList->writeBuffer(state.countBuffer, zero, sizeof(zero));
+    cmdList->setBufferState(target.countBuffer, nvrhi::ResourceStates::CopyDest);
+    cmdList->writeBuffer(target.countBuffer, zero, sizeof(zero));
 
-    cmdList->setBufferState(state.countBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.opaqueStream, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.terrainStream, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.atStream, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(target.countBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(target.opaqueStream, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(target.terrainStream, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(target.atStream, nvrhi::ResourceStates::UnorderedAccess);
 
-    auto* cullRefl = shaderLoader->GetCachedReflection("shadow_cluster_cull", ".cs");
-    auto* argsRefl = shaderLoader->GetCachedReflection("shadow_draw_args", ".cs");
-    if (!cullRefl || !argsRefl)
-        return;
-
-    framegraph::BindingSetBuilder bsb(*cullRefl, nvDevice, "SunShadow.Cull");
+    framegraph::BindingSetBuilder bsb(cullRefl, nvDevice, "SunShadow.Cull");
     bsb.ConstantBuffer("ShadowCullParams", paramsCB)
        .BufferSRV("g_Entries", data.entryBuffer)
-       .BufferUAV("g_OutCount", state.countBuffer)
-       .BufferUAV("g_OutOpaque", state.opaqueStream)
-       .BufferUAV("g_OutTerrain", state.terrainStream)
-       .BufferUAV("g_OutAT", state.atStream);
+       .BufferUAV("g_OutCount", target.countBuffer)
+       .BufferUAV("g_OutOpaque", target.opaqueStream)
+       .BufferUAV("g_OutTerrain", target.terrainStream)
+       .BufferUAV("g_OutAT", target.atStream);
     auto cullSet = cache.GetOrCreateBindingSet(bsb.Build(), state.cullLayout, nvDevice);
     if (!cullSet)
         return;
@@ -391,16 +401,16 @@ void ExecuteSunShadowCull(fg::RenderContext* ctx, const SunShadowCullData& data)
     cmdList->setComputeState(cullState);
     cmdList->dispatch((data.entryCount + kCullThreadGroup - 1) / kCullThreadGroup, 1, 1);
 
-    cmdList->setBufferState(state.countBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.opaqueArgs, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.terrainArgs, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.atArgs, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(target.countBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(target.opaqueArgs, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(target.terrainArgs, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(target.atArgs, nvrhi::ResourceStates::UnorderedAccess);
 
-    framegraph::BindingSetBuilder argsBsb(*argsRefl, nvDevice, "SunShadow.Args");
-    argsBsb.BufferSRV("g_Count", state.countBuffer)
-           .BufferUAV("g_ArgsOpaque", state.opaqueArgs)
-           .BufferUAV("g_ArgsTerrain", state.terrainArgs)
-           .BufferUAV("g_ArgsAT", state.atArgs);
+    framegraph::BindingSetBuilder argsBsb(argsRefl, nvDevice, "SunShadow.Args");
+    argsBsb.BufferSRV("g_Count", target.countBuffer)
+           .BufferUAV("g_ArgsOpaque", target.opaqueArgs)
+           .BufferUAV("g_ArgsTerrain", target.terrainArgs)
+           .BufferUAV("g_ArgsAT", target.atArgs);
     auto argsSet = cache.GetOrCreateBindingSet(argsBsb.Build(), state.argsLayout, nvDevice);
     if (!argsSet)
         return;
@@ -411,31 +421,66 @@ void ExecuteSunShadowCull(fg::RenderContext* ctx, const SunShadowCullData& data)
     cmdList->setComputeState(argsState);
     cmdList->dispatch(1, 1, 1);
 
-    cmdList->setBufferState(state.opaqueArgs, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(state.terrainArgs, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(state.atArgs, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(state.opaqueStream, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.terrainStream, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.atStream, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(target.opaqueArgs, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(target.terrainArgs, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(target.atArgs, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(target.opaqueStream, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(target.terrainStream, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(target.atStream, nvrhi::ResourceStates::ShaderResource);
 
-    ScheduleReadback(cmdList, state);
+    ScheduleReadback(cmdList, target);
 }
 
-void ExecuteSunShadowFar(fg::RenderContext* ctx, const FrameGraph& fg, const SunShadowFarData& data)
+void ExecuteSunShadowCull(fg::RenderContext* ctx, const SunShadowCullData& data)
 {
     SunShadowState& state = *data.state;
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
-    nvrhi::ITexture* farMap = fg.GetPhysicalTexture(data.farMap);
-    if (!cmdList || !nvDevice || !farMap)
+    if (!cmdList || !nvDevice)
         return;
-    GPUZone zone(data.gpuProfiler, cmdList, "Shadow/Far");
-    if (!state.farRedraw)
+    GPUZone zone(data.gpuProfiler, cmdList, "Shadow/Cull");
+
+    bool any = false;
+    for (u32 t = 0; t < kSunTargetCount; ++t) {
+        const SunShadowTarget& target = state.targets[t];
+        any |= target.redraw && target.valid && target.countBuffer;
+    }
+    if (!any)
+        return;
+    if (!EnsureCullPipelines(data.device, state))
         return;
 
-    cmdList->clearDepthStencilTexture(farMap, nvrhi::AllSubresources, true, 0.0f, false, 0);
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* cullRefl = shaderLoader->GetCachedReflection("shadow_cluster_cull", ".cs");
+    auto* argsRefl = shaderLoader->GetCachedReflection("shadow_draw_args", ".cs");
+    if (!cullRefl || !argsRefl)
+        return;
 
-    if (!state.farValid || !state.countBuffer)
+    for (u32 t = 0; t < kSunTargetCount; ++t) {
+        SunShadowTarget& target = state.targets[t];
+        if (!target.redraw || !target.valid || !target.countBuffer)
+            continue;
+        CullTarget(ctx, data, target, *cullRefl, *argsRefl);
+    }
+}
+
+void ExecuteSunShadowMap(fg::RenderContext* ctx, const FrameGraph& fg, const SunShadowMapData& data)
+{
+    SunShadowState& state = *data.state;
+    SunShadowTarget& target = state.targets[data.target];
+    const TargetNames& names = kTargetNames[data.target];
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+    nvrhi::ITexture* map = fg.GetPhysicalTexture(data.map);
+    if (!cmdList || !nvDevice || !map)
+        return;
+    GPUZone zone(data.gpuProfiler, cmdList, names.zoneName);
+    if (!target.redraw)
+        return;
+
+    cmdList->clearDepthStencilTexture(map, nvrhi::AllSubresources, true, 0.0f, false, 0);
+
+    if (!target.valid || !target.countBuffer)
         return;
     if (!EnsureDepthPipelines(data.device, state))
         return;
@@ -458,20 +503,20 @@ void ExecuteSunShadowFar(fg::RenderContext* ctx, const FrameGraph& fg, const Sun
         return;
 
     nvrhi::FramebufferDesc fbDesc;
-    fbDesc.setDepthAttachment(farMap);
-    auto framebuffer = cache.GetOrCreateFramebuffer("SunShadowFar", fbDesc, nvDevice);
+    fbDesc.setDepthAttachment(map);
+    auto framebuffer = cache.GetOrCreateFramebuffer(names.framebufferName, fbDesc, nvDevice);
     if (!framebuffer)
         return;
 
     StaticGlobals globals = BuildStaticGlobals();
-    globals.m_VP = state.farVP;
+    globals.m_VP = target.vp;
     auto lightCB = cache.GetOrCreateVolatileCB("SunShadow", "StaticGlobals", sizeof(StaticGlobals), data.device);
     cmdList->writeBuffer(lightCB, &globals, sizeof(globals));
 
     auto* backend = data.device->GetBackend();
     nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
 
-    const auto& rtDesc = farMap->getDesc();
+    const auto& rtDesc = map->getDesc();
     nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
 
     auto drawStream = [&](nvrhi::IGraphicsPipeline* pipeline, nvrhi::IBindingLayout* layout,
@@ -509,14 +554,22 @@ void ExecuteSunShadowFar(fg::RenderContext* ctx, const FrameGraph& fg, const Sun
     };
 
     drawStream(state.depthOpaquePipeline, state.depthOpaqueLayout, *opaqueRefl,
-        cfg.staticInstanceBuffer, state.opaqueStream, state.opaqueArgs, false, "SunShadow.Opaque");
+        cfg.staticInstanceBuffer, target.opaqueStream, target.opaqueArgs, false, "SunShadow.Opaque");
     drawStream(state.depthOpaquePipeline, state.depthOpaqueLayout, *opaqueRefl,
-        cfg.terrainInstanceBuffer, state.terrainStream, state.terrainArgs, false, "SunShadow.Terrain");
+        cfg.terrainInstanceBuffer, target.terrainStream, target.terrainArgs, false, "SunShadow.Terrain");
     drawStream(state.depthATPipeline, state.depthATLayout, *atRefl,
-        cfg.staticInstanceBuffer, state.atStream, state.atArgs, true, "SunShadow.AT");
+        cfg.staticInstanceBuffer, target.atStream, target.atArgs, true, "SunShadow.AT");
 }
 
 } // namespace
+
+void InvalidateSunShadowCache(SunShadowState& state)
+{
+    for (u32 t = 0; t < kSunTargetCount; ++t) {
+        state.targets[t].valid = false;
+        state.targets[t].redraw = false;
+    }
+}
 
 void ComputeSunFarVP(Fmatrix& outVP, float& outTexel, const Fvector& sunDirIn, float boxSize, u32 mapSize)
 {
@@ -545,10 +598,41 @@ void ComputeSunFarVP(Fmatrix& outVP, float& outTexel, const Fvector& sunDirIn, f
     outTexel = texel;
 }
 
-void InvalidateSunShadowCache(SunShadowState& state)
+void ComputeSunCascadeVP(Fmatrix& outVP, float& outTexel, const Fvector& sunDirIn, float boxSize, u32 mapSize)
 {
-    state.farValid = false;
-    state.farRedraw = false;
+    Fvector sunDir = sunDirIn;
+    if (sunDir.magnitude() < 1e-4f)
+        sunDir.set(0.0f, -1.0f, 0.0f);
+    sunDir.normalize();
+
+    Fvector up;
+    up.set(0.0f, 1.0f, 0.0f);
+    if (_abs(sunDir.y) > 0.99f)
+        up.set(0.0f, 0.0f, 1.0f);
+
+    Fmatrix view;
+    view.build_camera_dir(Device.vCameraPosition, sunDir, up);
+
+    Fmatrix proj;
+    proj.build_projection_ortho(boxSize, boxSize, kCascadeZBehind, kCascadeZAhead);
+    Fmatrix vp;
+    vp.mul(proj, view);
+
+    Fvector anchor;
+    anchor.set((floorf(Device.vCameraPosition.x / kAnchorGrid) + 0.5f) * kAnchorGrid,
+               (floorf(Device.vCameraPosition.y / kAnchorGrid) + 0.5f) * kAnchorGrid,
+               (floorf(Device.vCameraPosition.z / kAnchorGrid) + 0.5f) * kAnchorGrid);
+    Fvector a;
+    vp.transform_tiny(a, anchor);
+    const float texNdc = 2.0f / float(std::max(mapSize, 1u));
+    const float fx = a.x - floorf(a.x / texNdc) * texNdc;
+    const float fy = a.y - floorf(a.y / texNdc) * texNdc;
+    Fmatrix snap;
+    snap.identity();
+    snap.c.x = -fx;
+    snap.c.y = -fy;
+    outVP.mul(snap, vp);
+    outTexel = boxSize / float(std::max(mapSize, 1u));
 }
 
 SunShadowCullOutput setupSunShadowCullPass(
@@ -567,9 +651,14 @@ SunShadowCullOutput setupSunShadowCullPass(
     if (!nvDevice)
         return out;
 
-    ProcessReadback(nvDevice, *state);
-    if (!EnsureCullBuffers(nvDevice, *state, entryCount))
-        return out;
+    SunShadowTarget& far = state->targets[kSunTargetFar];
+    SunShadowTarget& casc0 = state->targets[kSunTargetCasc0];
+    for (u32 t = 0; t < kSunTargetCount; ++t)
+        ProcessReadback(nvDevice, state->targets[t]);
+    for (u32 t = 0; t < kSunTargetCount; ++t) {
+        if (!EnsureCullBuffers(nvDevice, state->targets[t], kTargetNames[t].suffix, entryCount))
+            return out;
+    }
 
     Fvector sunDir;
     sunDir.set(0.0f, -1.0f, 0.0f);
@@ -584,18 +673,18 @@ SunShadowCullOutput setupSunShadowCullPass(
     const u32 size = u32(std::max(ps_r_sun_shadow_far_size, 64));
     const float lod = ps_r_shadow_cluster_lod;
     const int at = ps_r_shadow_at ? 1 : 0;
-    const bool cacheValid = state->farValid
+    const bool cacheValid = far.valid
         && state->farEntryCount == entryCount
         && state->farBox == box
-        && state->farMapSize == size
+        && far.mapSize == size
         && state->farLod == lod
         && state->farAT == at
         && camPos.distance_to_sqr(state->farCamPos) < kFarRedrawDist * kFarRedrawDist
         && state->farSunDir.dotproduct(sunDir) > kFarSunDotRedraw;
-    state->farRedraw = !cacheValid;
-    if (state->farRedraw) {
-        ComputeSunFarVP(state->farVP, state->farTexel, sunDir, box, size);
-        state->farValid = true;
+    far.redraw = !cacheValid;
+    if (far.redraw) {
+        ComputeSunFarVP(far.vp, far.texel, sunDir, box, size);
+        far.valid = true;
         state->farCamPos = camPos;
         state->farSunDir = sunDir;
         state->farEntryCount = entryCount;
@@ -604,6 +693,11 @@ SunShadowCullOutput setupSunShadowCullPass(
         state->farAT = at;
         ++state->farRedraws;
     }
+
+    ComputeSunCascadeVP(casc0.vp, casc0.texel, sunDir, kCascadeBox0, kCascadeSize0);
+    casc0.valid = true;
+    casc0.redraw = true;
+
     state->candidates = entryCount;
 
     ResourceDesc argsDesc;
@@ -614,13 +708,16 @@ SunShadowCullOutput setupSunShadowCullPass(
     argsDesc.isImported = true;
     argsDesc.isTransient = false;
     argsDesc.debugName = "sun_shadow_args";
-    VirtualResourceHandle opaqueArgs = fg.ImportBuffer("sun_shadow_args_opaque", state->opaqueArgs, argsDesc);
-    VirtualResourceHandle terrainArgs = fg.ImportBuffer("sun_shadow_args_terrain", state->terrainArgs, argsDesc);
-    VirtualResourceHandle atArgs = fg.ImportBuffer("sun_shadow_args_at", state->atArgs, argsDesc);
+    SunShadowCullOutput::Target imported[kSunTargetCount];
+    for (u32 t = 0; t < kSunTargetCount; ++t) {
+        imported[t].opaqueArgs = fg.ImportBuffer(kTargetNames[t].argsOpaqueName, state->targets[t].opaqueArgs, argsDesc);
+        imported[t].terrainArgs = fg.ImportBuffer(kTargetNames[t].argsTerrainName, state->targets[t].terrainArgs, argsDesc);
+        imported[t].atArgs = fg.ImportBuffer(kTargetNames[t].argsATName, state->targets[t].atArgs, argsDesc);
+    }
 
     auto& passData = fg.addCallbackPass<SunShadowCullData>(
         "Sun Shadow Cull",
-        [&, orderAfter, opaqueArgs, terrainArgs, atArgs, entryBuffer, entryCount, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, SunShadowCullData& data) {
+        [&, orderAfter, entryBuffer, entryCount, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, SunShadowCullData& data) {
             data.state = state;
             data.device = device;
             data.entryBuffer = entryBuffer;
@@ -630,22 +727,23 @@ SunShadowCullOutput setupSunShadowCullPass(
             RenderPassBuilder passBuilder(builder, passHandle);
             if (orderAfter.is_valid())
                 data.order = passBuilder.read(orderAfter, ResourceState::IndirectArgument);
-            data.opaqueArgs = passBuilder.write(opaqueArgs, ResourceState::UnorderedAccess);
-            data.terrainArgs = passBuilder.write(terrainArgs, ResourceState::UnorderedAccess);
-            data.atArgs = passBuilder.write(atArgs, ResourceState::UnorderedAccess);
+            for (u32 t = 0; t < kSunTargetCount; ++t) {
+                data.targets[t].opaqueArgs = passBuilder.write(imported[t].opaqueArgs, ResourceState::UnorderedAccess);
+                data.targets[t].terrainArgs = passBuilder.write(imported[t].terrainArgs, ResourceState::UnorderedAccess);
+                data.targets[t].atArgs = passBuilder.write(imported[t].atArgs, ResourceState::UnorderedAccess);
+            }
         },
         [](const SunShadowCullData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ExecuteSunShadowCull(ctx, data);
         });
 
-    out.opaqueArgs = passData.opaqueArgs;
-    out.terrainArgs = passData.terrainArgs;
-    out.atArgs = passData.atArgs;
+    for (u32 t = 0; t < kSunTargetCount; ++t)
+        out.targets[t] = passData.targets[t];
     out.active = true;
     return out;
 }
 
-framegraph::VirtualResourceHandle setupSunShadowFarPass(
+SunShadowMaps setupSunShadowMapPasses(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     const SunShadowCullOutput& cull,
@@ -653,46 +751,57 @@ framegraph::VirtualResourceHandle setupSunShadowFarPass(
     SunShadowState* state,
     xray::profiler::GPUProfiler* gpuProfiler)
 {
+    SunShadowMaps maps;
     if (!state || !device || !cull.active)
-        return VirtualResourceHandle();
+        return maps;
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice)
-        return VirtualResourceHandle();
+        return maps;
 
-    const u32 size = u32(std::max(ps_r_sun_shadow_far_size, 64));
-    if (!EnsureFarMap(nvDevice, *state, size))
-        return VirtualResourceHandle();
+    for (u32 t = 0; t < kSunTargetCount; ++t) {
+        SunShadowTarget& target = state->targets[t];
+        const TargetNames& names = kTargetNames[t];
+        const u32 size = (t == kSunTargetFar) ? u32(std::max(ps_r_sun_shadow_far_size, 64)) : kCascadeSize0;
+        if (!EnsureMap(nvDevice, target, names.suffix, size))
+            continue;
 
-    ResourceDesc mapDesc;
-    mapDesc.type = ResourceDesc::Type::Texture2D;
-    mapDesc.width = size;
-    mapDesc.height = size;
-    mapDesc.format = nvrhi::Format::D32;
-    mapDesc.isDepthStencil = true;
-    mapDesc.isImported = true;
-    mapDesc.isTransient = false;
-    mapDesc.debugName = "rt_SunShadowFar";
-    VirtualResourceHandle farHandle = fg.ImportTexture("rt_SunShadowFar", state->farMap, mapDesc);
+        ResourceDesc mapDesc;
+        mapDesc.type = ResourceDesc::Type::Texture2D;
+        mapDesc.width = size;
+        mapDesc.height = size;
+        mapDesc.format = nvrhi::Format::D32;
+        mapDesc.isDepthStencil = true;
+        mapDesc.isImported = true;
+        mapDesc.isTransient = false;
+        mapDesc.debugName = names.rtName;
+        VirtualResourceHandle handle = fg.ImportTexture(names.rtName, target.map, mapDesc);
+        const SunShadowCullOutput::Target cullTarget = cull.targets[t];
 
-    auto& passData = fg.addCallbackPass<SunShadowFarData>(
-        "Sun Shadow Far",
-        [&, farHandle, cull, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, SunShadowFarData& data) {
-            data.state = state;
-            data.device = device;
-            data.config = config;
-            data.gpuProfiler = gpuProfiler;
+        auto& passData = fg.addCallbackPass<SunShadowMapData>(
+            names.passName,
+            [&, handle, cullTarget, config, state, t, gpuProfiler](FrameGraph& builder, PassHandle passHandle, SunShadowMapData& data) {
+                data.state = state;
+                data.device = device;
+                data.config = config;
+                data.target = t;
+                data.gpuProfiler = gpuProfiler;
 
-            RenderPassBuilder passBuilder(builder, passHandle);
-            data.farMap = passBuilder.write(farHandle, ResourceState::DepthStencilWrite);
-            data.opaqueArgs = passBuilder.read(cull.opaqueArgs, ResourceState::IndirectArgument);
-            data.terrainArgs = passBuilder.read(cull.terrainArgs, ResourceState::IndirectArgument);
-            data.atArgs = passBuilder.read(cull.atArgs, ResourceState::IndirectArgument);
-        },
-        [](const SunShadowFarData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
-            ExecuteSunShadowFar(ctx, fg, data);
-        });
+                RenderPassBuilder passBuilder(builder, passHandle);
+                data.map = passBuilder.write(handle, ResourceState::DepthStencilWrite);
+                data.opaqueArgs = passBuilder.read(cullTarget.opaqueArgs, ResourceState::IndirectArgument);
+                data.terrainArgs = passBuilder.read(cullTarget.terrainArgs, ResourceState::IndirectArgument);
+                data.atArgs = passBuilder.read(cullTarget.atArgs, ResourceState::IndirectArgument);
+            },
+            [](const SunShadowMapData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+                ExecuteSunShadowMap(ctx, fg, data);
+            });
 
-    return passData.farMap;
+        if (t == kSunTargetFar)
+            maps.far = passData.map;
+        else
+            maps.casc0 = passData.map;
+    }
+    return maps;
 }
 
 } // namespace xray::render::fg::passes

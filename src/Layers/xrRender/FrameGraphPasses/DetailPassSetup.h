@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include <nvrhi/nvrhi.h>
+#include "SunShadowPassSetup.h"
 
 struct Fmatrix;
 
@@ -41,6 +42,7 @@ struct DetailPassData {
     framegraph::VirtualResourceHandle outputNormal;
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle sunShadowFar;
+    framegraph::VirtualResourceHandle sunShadowCasc0;
     fg::RenderDevice* device;
     fg::FGDetailManager* detailManager;
     framegraph::DefaultOutputLayout outputs;
@@ -63,7 +65,7 @@ framegraph::DefaultOutputLayout setupDetailPass(
     u32 width,
     u32 height,
     xray::profiler::GPUProfiler* gpuProfiler = nullptr,
-    framegraph::VirtualResourceHandle sunShadowFar = framegraph::VirtualResourceHandle()
+    SunShadowMaps sunShadowMaps = SunShadowMaps()
 );
 
 } // namespace xray::render::fg::passes

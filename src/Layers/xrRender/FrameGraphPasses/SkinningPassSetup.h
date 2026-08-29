@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include <nvrhi/nvrhi.h>
+#include "SunShadowPassSetup.h"
 
 namespace xray::render {
     struct GeometryBatch;
@@ -78,6 +79,7 @@ struct SkinningPassData {
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle skinnedDrawArgs;
     framegraph::VirtualResourceHandle sunShadowFar;
+    framegraph::VirtualResourceHandle sunShadowCasc0;
     fg::RenderDevice* device;
     const GeometryCollector* geometry;
     const xr_vector<GeometryBatch>* hudBatches;
@@ -104,7 +106,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     framegraph::VirtualResourceHandle skinnedDrawArgs = {},
     SkinningPassState* state = nullptr,
     decals::OverlayManager* overlayMgr = nullptr,
-    framegraph::VirtualResourceHandle sunShadowFar = framegraph::VirtualResourceHandle()
+    SunShadowMaps sunShadowMaps = SunShadowMaps()
 );
 
 } // namespace xray::render::fg::passes

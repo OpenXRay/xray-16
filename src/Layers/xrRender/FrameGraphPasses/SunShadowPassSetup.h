@@ -21,17 +21,12 @@ namespace xray::profiler {
 
 namespace xray::render::fg::passes {
 
-constexpr float kSunShadowFarBias = 0.0015f;
+constexpr u32 kSunTargetFar = 0;
+constexpr u32 kSunTargetCasc0 = 1;
+constexpr u32 kSunTargetCount = 2;
 
-struct SunShadowState {
+struct SunShadowTarget {
     static constexpr u32 kReadbackSlots = 6;
-    bool receiverActive = false;
-
-    nvrhi::ComputePipelineHandle cullPipeline;
-    nvrhi::BindingLayoutHandle cullLayout;
-    nvrhi::ComputePipelineHandle argsPipeline;
-    nvrhi::BindingLayoutHandle argsLayout;
-    bool pipelinesFailed = false;
 
     nvrhi::BufferHandle countBuffer;
     nvrhi::BufferHandle opaqueStream;
@@ -46,25 +41,27 @@ struct SunShadowState {
     u32 readbackWrite = 0;
     u32 readbackScheduled = 0;
 
-    u32 candidates = 0;
     u32 castersOpaque = 0;
     u32 castersTerrain = 0;
     u32 castersAT = 0;
 
-    Fmatrix farVP;
-    float farTexel = 0.0f;
-    bool farValid = false;
-    bool farRedraw = false;
-    u32 farRedraws = 0;
-    Fvector farCamPos;
-    Fvector farSunDir;
-    u32 farEntryCount = 0;
-    float farBox = 0.0f;
-    float farLod = 0.0f;
-    int farAT = 0;
+    nvrhi::TextureHandle map;
+    u32 mapSize = 0;
+    Fmatrix vp;
+    float texel = 0.0f;
+    bool valid = false;
+    bool redraw = false;
+};
 
-    nvrhi::TextureHandle farMap;
-    u32 farMapSize = 0;
+struct SunShadowState {
+    bool receiverActive = false;
+
+    nvrhi::ComputePipelineHandle cullPipeline;
+    nvrhi::BindingLayoutHandle cullLayout;
+    nvrhi::ComputePipelineHandle argsPipeline;
+    nvrhi::BindingLayoutHandle argsLayout;
+    bool pipelinesFailed = false;
+
     nvrhi::GraphicsPipelineHandle depthOpaquePipeline;
     nvrhi::GraphicsPipelineHandle depthATPipeline;
     nvrhi::BindingLayoutHandle depthOpaqueLayout;
@@ -73,12 +70,26 @@ struct SunShadowState {
     nvrhi::ShaderHandle depthOpaquePS;
     nvrhi::ShaderHandle depthATPS;
     bool depthPipelinesFailed = false;
+
+    SunShadowTarget targets[kSunTargetCount];
+    u32 candidates = 0;
+
+    Fvector farCamPos;
+    Fvector farSunDir;
+    u32 farEntryCount = 0;
+    float farBox = 0.0f;
+    float farLod = 0.0f;
+    int farAT = 0;
+    u32 farRedraws = 0;
 };
 
 struct SunShadowCullOutput {
-    framegraph::VirtualResourceHandle opaqueArgs;
-    framegraph::VirtualResourceHandle terrainArgs;
-    framegraph::VirtualResourceHandle atArgs;
+    struct Target {
+        framegraph::VirtualResourceHandle opaqueArgs;
+        framegraph::VirtualResourceHandle terrainArgs;
+        framegraph::VirtualResourceHandle atArgs;
+    };
+    Target targets[kSunTargetCount];
     bool active = false;
 };
 
@@ -91,9 +102,15 @@ struct SunShadowDrawConfig {
     MaterialCache* materialCache = nullptr;
 };
 
+struct SunShadowMaps {
+    framegraph::VirtualResourceHandle far;
+    framegraph::VirtualResourceHandle casc0;
+};
+
 void InvalidateSunShadowCache(SunShadowState& state);
 
 void ComputeSunFarVP(Fmatrix& outVP, float& outTexel, const Fvector& sunDir, float boxSize, u32 mapSize);
+void ComputeSunCascadeVP(Fmatrix& outVP, float& outTexel, const Fvector& sunDir, float boxSize, u32 mapSize);
 
 SunShadowCullOutput setupSunShadowCullPass(
     framegraph::FrameGraph& fg,
@@ -104,7 +121,7 @@ SunShadowCullOutput setupSunShadowCullPass(
     SunShadowState* state,
     xray::profiler::GPUProfiler* gpuProfiler = nullptr);
 
-framegraph::VirtualResourceHandle setupSunShadowFarPass(
+SunShadowMaps setupSunShadowMapPasses(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     const SunShadowCullOutput& cull,

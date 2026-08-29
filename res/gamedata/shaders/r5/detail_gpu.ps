@@ -180,6 +180,6 @@ f_forward main(p_flat I)
 
     f_forward fwd = output_forward_pbr(finalAlbedo, N, I.position.xyz, metallic, roughness, ao, I.hpos);
     if (dev_param_3.y > 0.5)
-        fwd.color.rgb = SunVisibility(I.position.xyz).xxx;
+        fwd.color.rgb = SunShadowDebugColor(fwd.color.rgb, I.position.xyz);
     return fwd;
 }
