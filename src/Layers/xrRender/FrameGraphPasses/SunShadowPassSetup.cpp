@@ -2,6 +2,14 @@
 #include "SunShadowPassSetup.h"
 #include "ShaderConstants.h"
 #include "PassCommon.h"
+#include "SkinningPassSetup.h"
+#include "Layers/xrRender/Geometry/GeometryBatch.h"
+#include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
+#include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/SkeletonCustom.h"
+#include "Layers/xrRender/FSkinned.h"
+#include "Layers/xrRender/SkeletonX.h"
+#include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
@@ -82,6 +90,7 @@ struct SunShadowMapData {
     VirtualResourceHandle terrainArgs;
     VirtualResourceHandle atArgs;
     VirtualResourceHandle dynamicArgs;
+    VirtualResourceHandle skinnedArgs;
     SunShadowState* state;
     fg::RenderDevice* device;
     SunShadowDrawConfig config;
@@ -483,6 +492,336 @@ void ExecuteSunShadowCull(fg::RenderContext* ctx, const SunShadowCullData& data)
     }
 }
 
+struct MapDrawContext {
+    nvrhi::ICommandList* cmdList = nullptr;
+    nvrhi::IDevice* nvDevice = nullptr;
+    fg::RenderDevice* device = nullptr;
+    nvrhi::IFramebuffer* framebuffer = nullptr;
+    nvrhi::IBuffer* lightCB = nullptr;
+    nvrhi::IBindingSet* bindlessTable = nullptr;
+    nvrhi::Viewport viewport;
+    nvrhi::Rect scissor;
+};
+
+void DrawDynamicCasters(SunShadowState& state, const SunShadowDrawConfig& cfg, const MapDrawContext& draw)
+{
+    if (!cfg.dynamicCompactDrawArgs || !cfg.dynamicCompactMaterialIDs || !cfg.dynamicCompactBatchIndices ||
+        !cfg.dynamicCompactCount || !cfg.dynamicInstanceBuffer || !cfg.dynamicFadeBuffer || cfg.dynamicObjectCount == 0 ||
+        !state.depthDynamicPipeline || !state.depthDynamicLayout)
+        return;
+
+    auto& cache = framegraph::GetPassResourceCache();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* forwardVsRefl = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
+    auto* dynamicPsRefl = shaderLoader->GetCachedReflection("bindless_depth_at", ".ps");
+    nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("SunShadow", draw.nvDevice);
+    if (!forwardVsRefl || !dynamicPsRefl || !drawIndexBuffer)
+        return;
+
+    framegraph::BindingSetBuilder dbsb(*forwardVsRefl, *dynamicPsRefl, draw.nvDevice, "SunShadow.Dynamic");
+    dbsb.ConstantBuffer("static_globals", draw.lightCB);
+    dbsb.BufferSRV("g_Materials", bindless::MaterialBuffer::Instance().GetBuffer());
+    dbsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
+    dbsb.BufferSRV("g_CompactBatchIndices", cfg.dynamicCompactBatchIndices);
+    dbsb.BufferSRV("g_CompactMaterialIDs", cfg.dynamicCompactMaterialIDs);
+    dbsb.BufferSRV("g_DrawFades", cfg.dynamicFadeBuffer);
+    auto dynamicSet = cache.GetOrCreateBindingSet(dbsb.Build(), state.depthDynamicLayout, draw.nvDevice);
+    if (!dynamicSet)
+        return;
+
+    nvrhi::GraphicsState gs;
+    gs.pipeline = state.depthDynamicPipeline;
+    gs.framebuffer = draw.framebuffer;
+    gs.bindings = { dynamicSet };
+    if (draw.bindlessTable)
+        gs.addBindingSet(draw.bindlessTable);
+    gs.vertexBuffers = { { cfg.megaVertexBuffer, 0, 0 }, { drawIndexBuffer, 1, 0 } };
+    gs.indexBuffer = { cfg.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
+    gs.indirectParams = cfg.dynamicCompactDrawArgs;
+    gs.indirectCountBuffer = cfg.dynamicCompactCount;
+    gs.viewport.addViewport(draw.viewport);
+    gs.viewport.addScissorRect(draw.scissor);
+    draw.cmdList->setGraphicsState(gs);
+    DrawIndexedIndirectCountOrFallback(draw.cmdList, 0, 0, cfg.dynamicObjectCount);
+}
+
+constexpr u16 kRMSkinningSoft = 0;
+constexpr u16 kRMSingle = 1;
+constexpr u16 kRMSingleHQ = 2;
+constexpr u16 kRMSkinning1B = 3;
+constexpr u16 kRMSkinning1BHQ = 4;
+constexpr u16 kRMSkinning2B = 5;
+constexpr u16 kRMSkinning2BHQ = 6;
+constexpr u16 kRMSkinning3B = 7;
+constexpr u16 kRMSkinning3BHQ = 8;
+constexpr u16 kRMSkinning4B = 9;
+constexpr u16 kRMSkinning4BHQ = 10;
+
+u32 SkinnedVertexFormat(u16 renderMode, u32 vertexStride)
+{
+    if (renderMode == kRMSkinning3B || renderMode == kRMSkinning3BHQ) return VF_SKINNED_HQ3W;
+    if (renderMode == kRMSkinning2B || renderMode == kRMSkinning2BHQ) return VF_SKINNED_HQ2W;
+    if (renderMode == kRMSkinning4B || renderMode == kRMSkinning4BHQ) return VF_SKINNED_HQ4W;
+    if (renderMode == kRMSkinning1BHQ || renderMode == kRMSingleHQ) return VF_SKINNED_HQ1W;
+    if (renderMode == kRMSkinning1B || renderMode == kRMSingle || renderMode == kRMSkinningSoft) return VF_SKINNED_NONHQ;
+    if (vertexStride == 36) return VF_SKINNED_HQ1W;
+    if (vertexStride == 40) return VF_SKINNED_HQ4W;
+    if (vertexStride == 44) return VF_SKINNED_HQ2W;
+    return VF_SKINNED_NONHQ;
+}
+
+const SkinningPipelineVariant* SkinnedVariant(const SkinningPassState& sk, u32 fmt, bool mdi)
+{
+    switch (fmt) {
+    case VF_SKINNED_NONHQ: return mdi ? &sk.mdiNonHQ : &sk.nonHQ;
+    case VF_SKINNED_HQ1W: return mdi ? &sk.mdiHQ1w : &sk.hq1w;
+    case VF_SKINNED_HQ4W: return mdi ? &sk.mdiHQ4w : &sk.hq4w;
+    case VF_SKINNED_HQ2W: return mdi ? &sk.mdiHQ2w : &sk.hq2w;
+    case VF_SKINNED_HQ3W: return mdi ? &sk.mdiHQ3w : &sk.hq3w;
+    default: return nullptr;
+    }
+}
+
+u32 SkeletonBoneOffset(nvrhi::ICommandList* cmdList, GPUCullingManager& gpuCulling, const GeometryBatch& batch)
+{
+    CKinematics* parent = nullptr;
+    const u32 visualType = batch.visual ? batch.visual->getType() : 0;
+    if (visualType == MT_SKELETON_GEOMDEF_ST)
+        parent = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
+    else if (visualType == MT_SKELETON_GEOMDEF_PM)
+        parent = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+    if (!parent)
+        return 0;
+    return gpuCulling.GetOrUploadSkeleton(cmdList, parent);
+}
+
+bool EnsureSkinnedDepthPipelines(fg::RenderDevice* device, SunShadowState& state, const SkinningPassState& sk)
+{
+    if (state.skinnedPipelinesReady)
+        return true;
+    if (state.skinnedPipelinesFailed || !sk.initialized)
+        return false;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    if (!nvDevice || !shaderLoader)
+        return false;
+
+    auto psResult = shaderLoader->LoadPixelShader("bindless_skinned_depth", "main");
+    auto mdiPsResult = shaderLoader->LoadPixelShader("bindless_skinned_depth_mdi", "main");
+    auto* vsRefl = shaderLoader->GetCachedReflection("bindless_skinned", ".vs");
+    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_mdi", ".vs");
+    if (!psResult.handle || !mdiPsResult.handle || !psResult.reflection || !mdiPsResult.reflection || !vsRefl) {
+        Msg("! [SunShadow] skinned depth shaders failed to load");
+        state.skinnedPipelinesFailed = true;
+        return false;
+    }
+    state.skinnedDepthPS = psResult.handle;
+    state.skinnedDepthMDIPS = mdiPsResult.handle;
+
+    auto& cache = framegraph::GetPassResourceCache();
+    state.skinnedLayout = cache.GetOrCreateBindingLayoutFromReflection("SunShadowSkinned", *vsRefl, *psResult.reflection, nvDevice);
+    if (mdiVsRefl)
+        state.skinnedMDILayout = cache.GetOrCreateBindingLayoutFromReflection("SunShadowSkinnedMDI", *mdiVsRefl, *mdiPsResult.reflection, nvDevice);
+    if (!state.skinnedLayout) {
+        state.skinnedPipelinesFailed = true;
+        return false;
+    }
+
+    auto* backend = device->GetBackend();
+    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.depthFormat = nvrhi::Format::D32;
+
+    auto makeDesc = [&](const SkinningPipelineVariant& variant, nvrhi::IShader* pixelShader, nvrhi::IBindingLayout* layout) {
+        nvrhi::GraphicsPipelineDesc desc;
+        desc.VS = variant.vs;
+        desc.PS = pixelShader;
+        desc.inputLayout = variant.inputLayout;
+        if (bindlessLayout)
+            desc.bindingLayouts = { layout, bindlessLayout };
+        else
+            desc.bindingLayouts = { layout };
+        desc.primType = nvrhi::PrimitiveType::TriangleList;
+        desc.renderState.depthStencilState.depthTestEnable = true;
+        desc.renderState.depthStencilState.depthWriteEnable = true;
+        desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+        desc.renderState.rasterState.frontCounterClockwise = false;
+        desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+        desc.renderState.rasterState.depthBias = kShadowDepthBias;
+        desc.renderState.rasterState.slopeScaledDepthBias = kShadowSlopeBias;
+        desc.renderState.rasterState.depthBiasClamp = 0.0f;
+        return desc;
+    };
+
+    static_assert(kSunShadowSkinnedFormats == SkinnedGeometryPools::FORMAT_COUNT, "skinned format count mismatch");
+    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
+        const SkinningPipelineVariant* direct = SkinnedVariant(sk, f, false);
+        if (direct && direct->vs && direct->inputLayout) {
+            string64 name;
+            xr_sprintf(name, "SunShadowSkinned_%u", f);
+            state.skinnedPipelines[f] = cache.GetOrCreatePipeline(name, makeDesc(*direct, state.skinnedDepthPS, state.skinnedLayout), fbInfo, nvDevice);
+        }
+        const SkinningPipelineVariant* mdi = SkinnedVariant(sk, f, true);
+        if (state.skinnedMDILayout && mdi && mdi->vs && mdi->inputLayout) {
+            string64 name;
+            xr_sprintf(name, "SunShadowSkinnedMDI_%u", f);
+            state.skinnedMDIPipelines[f] = cache.GetOrCreatePipeline(name, makeDesc(*mdi, state.skinnedDepthMDIPS, state.skinnedMDILayout), fbInfo, nvDevice);
+        }
+    }
+
+    state.skinnedPipelinesReady = true;
+    Msg("* [SunShadow] skinned depth pipelines initialized");
+    return true;
+}
+
+void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, const MapDrawContext& draw)
+{
+    const SunShadowDrawConfig& cfg = data.config;
+    if (!cfg.skinning || !cfg.geometry || !cfg.gpuCulling)
+        return;
+    if (!EnsureSkinnedDepthPipelines(draw.device, state, *cfg.skinning))
+        return;
+
+    u32 worldSkinnedCount = 0;
+    for (const auto& batch : cfg.geometry->GetBatches()) {
+        if (batch.isSkinned)
+            ++worldSkinnedCount;
+    }
+    if (worldSkinnedCount == 0)
+        return;
+
+    nvrhi::IBuffer* boneBuffer = cfg.gpuCulling->GetGlobalBoneBuffer();
+    if (!boneBuffer)
+        return;
+
+    auto& cache = framegraph::GetPassResourceCache();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* vsRefl = shaderLoader->GetCachedReflection("bindless_skinned", ".vs");
+    auto* psRefl = shaderLoader->GetCachedReflection("bindless_skinned_depth", ".ps");
+    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_mdi", ".vs");
+    auto* mdiPsRefl = shaderLoader->GetCachedReflection("bindless_skinned_depth_mdi", ".ps");
+    if (!vsRefl || !psRefl)
+        return;
+
+    auto& matBuffer = bindless::MaterialBuffer::Instance();
+    nvrhi::ICommandList* cmdList = draw.cmdList;
+    nvrhi::IDevice* nvDevice = draw.nvDevice;
+
+    const bool cullActive = data.skinnedArgs.is_valid()
+        && cfg.gpuCulling->IsSkinnedCullingEnabled()
+        && cfg.gpuCulling->GetSkinnedObjectCount() == worldSkinnedCount;
+    const bool mdiActive = cullActive && cfg.gpuCulling->IsSkinnedMDIEnabled();
+
+    if (mdiActive && mdiVsRefl && mdiPsRefl && state.skinnedMDILayout) {
+        nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("SunShadow", nvDevice);
+        auto& pools = cfg.gpuCulling->GetSkinnedPools();
+        for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT && drawIndexBuffer; ++f) {
+            const auto& bucket = cfg.gpuCulling->GetSkinnedBucket(f);
+            if (bucket.count == 0)
+                continue;
+            nvrhi::IGraphicsPipeline* pipeline = state.skinnedMDIPipelines[f];
+            nvrhi::IBuffer* poolVB = pools.GetVertexBuffer(f);
+            nvrhi::IBuffer* poolIB = pools.GetIndexBuffer(f);
+            if (!pipeline || !poolVB || !poolIB)
+                continue;
+
+            framegraph::BindingSetBuilder bsb(*mdiVsRefl, *mdiPsRefl, nvDevice, "SunShadow.SkinnedMDI");
+            bsb.ConstantBuffer("static_globals", draw.lightCB);
+            bsb.BufferSRV("g_BoneMatrices", boneBuffer);
+            bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+            bsb.BufferSRV("g_PaintSplats", cfg.splatBuffer);
+            bsb.BufferSRV("g_SkinnedRecords", bucket.recordsBuffer);
+            bsb.BufferSRV("g_SkinnedCompactIndices", bucket.compactBatchIndicesBuffer);
+            bsb.BufferSRV("g_SkinnedCompactMaterialIDs", bucket.compactMaterialIDBuffer);
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinnedMDILayout, nvDevice);
+            if (!bindingSet)
+                continue;
+
+            nvrhi::GraphicsState gs;
+            gs.pipeline = pipeline;
+            gs.framebuffer = draw.framebuffer;
+            gs.bindings = { bindingSet };
+            if (draw.bindlessTable)
+                gs.addBindingSet(draw.bindlessTable);
+            gs.vertexBuffers = { { poolVB, 0, 0 }, { drawIndexBuffer, 1, 0 } };
+            gs.indexBuffer = { poolIB, nvrhi::Format::R16_UINT, 0 };
+            gs.viewport.addViewport(draw.viewport);
+            gs.viewport.addScissorRect(draw.scissor);
+            gs.indirectParams = bucket.compactDrawArgsBuffer;
+            gs.indirectCountBuffer = bucket.compactCountBuffer;
+            cmdList->setGraphicsState(gs);
+            DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, bucket.count);
+        }
+    }
+
+    auto dynCB = cache.GetOrCreateVolatileCB("SunShadow", "DynTransforms", sizeof(DynamicTransforms), draw.device, 1024 * 8);
+    auto matCB = cache.GetOrCreateVolatileCB("SunShadow", "MaterialId", sizeof(SkinnedMaterialCB), draw.device, 1024 * 8);
+
+    framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "SunShadow.Skinned");
+    bsb.ConstantBuffer("dynamic_transforms", dynCB);
+    bsb.ConstantBuffer("static_globals", draw.lightCB);
+    bsb.BufferSRV("g_BoneMatrices", boneBuffer);
+    bsb.ConstantBuffer("SkinnedMaterialCB", matCB);
+    bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+    bsb.BufferSRV("g_PaintSplats", cfg.splatBuffer);
+    auto directSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinnedLayout, nvDevice);
+    if (!directSet)
+        return;
+
+    nvrhi::IBuffer* residualArgs = cullActive ? cfg.gpuCulling->GetSkinnedDrawArgsBuffer() : nullptr;
+    u32 residualIdx = 0;
+    for (const auto& batch : cfg.geometry->GetBatches()) {
+        if (!batch.isSkinned)
+            continue;
+        if (mdiActive) {
+            const u32 variantIdx = matBuffer.GetShaderVariant(batch.bindlessMaterialID);
+            const bool pooled = variantIdx == 0
+                && batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
+                && batch.skinnedPoolFormat < SkinnedGeometryPools::FORMAT_COUNT;
+            if (pooled)
+                continue;
+        }
+
+        const u32 boneOffset = SkeletonBoneOffset(cmdList, *cfg.gpuCulling, batch);
+        const u32 fmt = SkinnedVertexFormat(batch.skinningRenderMode, batch.vertexStride);
+        nvrhi::IGraphicsPipeline* pipeline = fmt < kSunShadowSkinnedFormats ? state.skinnedPipelines[fmt].Get() : nullptr;
+        if (pipeline && batch.vertexBuffer && batch.indexBuffer) {
+            DynamicTransforms dynTransData = {};
+            FillDynamicTransforms(dynTransData, batch.worldMatrix);
+            cmdList->writeBuffer(dynCB, &dynTransData, sizeof(dynTransData));
+
+            SkinnedMaterialCB matIdData = {};
+            matIdData.materialID = batch.bindlessMaterialID;
+            matIdData.skeletonBoneOffset = boneOffset;
+            cmdList->writeBuffer(matCB, &matIdData, sizeof(matIdData));
+
+            nvrhi::GraphicsState gs;
+            gs.pipeline = pipeline;
+            gs.framebuffer = draw.framebuffer;
+            gs.bindings = { directSet };
+            if (draw.bindlessTable)
+                gs.addBindingSet(draw.bindlessTable);
+            gs.vertexBuffers = { { batch.vertexBuffer, 0, 0 } };
+            gs.indexBuffer = { batch.indexBuffer, nvrhi::Format::R16_UINT, 0 };
+            gs.viewport.addViewport(draw.viewport);
+            gs.viewport.addScissorRect(draw.scissor);
+            gs.indirectParams = residualArgs;
+            cmdList->setGraphicsState(gs);
+            if (residualArgs) {
+                cmdList->drawIndexedIndirect(residualIdx * (u32)sizeof(IndirectDrawArgs), 1);
+            } else {
+                cmdList->drawIndexed(nvrhi::DrawArguments()
+                    .setVertexCount(batch.indexCount)
+                    .setStartIndexLocation(batch.startIndex)
+                    .setStartVertexLocation(batch.baseVertex));
+            }
+        }
+        ++residualIdx;
+    }
+}
+
 void ExecuteSunShadowMap(fg::RenderContext* ctx, const FrameGraph& fg, const SunShadowMapData& data)
 {
     SunShadowState& state = *data.state;
@@ -581,42 +920,18 @@ void ExecuteSunShadowMap(fg::RenderContext* ctx, const FrameGraph& fg, const Sun
 
     if (data.target == kSunTargetFar)
         return;
-    if (!cfg.dynamicCompactDrawArgs || !cfg.dynamicCompactMaterialIDs || !cfg.dynamicCompactBatchIndices ||
-        !cfg.dynamicCompactCount || !cfg.dynamicInstanceBuffer || !cfg.dynamicFadeBuffer || cfg.dynamicObjectCount == 0 ||
-        !state.depthDynamicPipeline || !state.depthDynamicLayout)
-        return;
 
-    auto* forwardVsRefl = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
-    auto* dynamicPsRefl = shaderLoader->GetCachedReflection("bindless_depth_at", ".ps");
-    nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("SunShadow", nvDevice);
-    if (!forwardVsRefl || !dynamicPsRefl || !drawIndexBuffer)
-        return;
-
-    framegraph::BindingSetBuilder dbsb(*forwardVsRefl, *dynamicPsRefl, nvDevice, "SunShadow.Dynamic");
-    dbsb.ConstantBuffer("static_globals", lightCB);
-    dbsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-    dbsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
-    dbsb.BufferSRV("g_CompactBatchIndices", cfg.dynamicCompactBatchIndices);
-    dbsb.BufferSRV("g_CompactMaterialIDs", cfg.dynamicCompactMaterialIDs);
-    dbsb.BufferSRV("g_DrawFades", cfg.dynamicFadeBuffer);
-    auto dynamicSet = cache.GetOrCreateBindingSet(dbsb.Build(), state.depthDynamicLayout, nvDevice);
-    if (!dynamicSet)
-        return;
-
-    nvrhi::GraphicsState gs;
-    gs.pipeline = state.depthDynamicPipeline;
-    gs.framebuffer = framebuffer;
-    gs.bindings = { dynamicSet };
-    if (bindlessTable)
-        gs.addBindingSet(bindlessTable);
-    gs.vertexBuffers = { { cfg.megaVertexBuffer, 0, 0 }, { drawIndexBuffer, 1, 0 } };
-    gs.indexBuffer = { cfg.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
-    gs.indirectParams = cfg.dynamicCompactDrawArgs;
-    gs.indirectCountBuffer = cfg.dynamicCompactCount;
-    gs.viewport.addViewport(viewport);
-    gs.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
-    cmdList->setGraphicsState(gs);
-    DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, cfg.dynamicObjectCount);
+    MapDrawContext draw;
+    draw.cmdList = cmdList;
+    draw.nvDevice = nvDevice;
+    draw.device = data.device;
+    draw.framebuffer = framebuffer;
+    draw.lightCB = lightCB;
+    draw.bindlessTable = bindlessTable;
+    draw.viewport = viewport;
+    draw.scissor = nvrhi::Rect(rtDesc.width, rtDesc.height);
+    DrawDynamicCasters(state, cfg, draw);
+    DrawSkinnedCasters(state, data, draw);
 }
 
 } // namespace
@@ -859,6 +1174,8 @@ SunShadowMaps setupSunShadowMapPasses(
                 data.atArgs = passBuilder.read(cullTarget.atArgs, ResourceState::IndirectArgument);
                 if (t != kSunTargetFar && config.dynamicArgs.is_valid())
                     data.dynamicArgs = passBuilder.read(config.dynamicArgs, ResourceState::IndirectArgument);
+                if (t != kSunTargetFar && config.skinnedArgs.is_valid())
+                    data.skinnedArgs = passBuilder.read(config.skinnedArgs, ResourceState::IndirectArgument);
             },
             [](const SunShadowMapData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
                 ExecuteSunShadowMap(ctx, fg, data);

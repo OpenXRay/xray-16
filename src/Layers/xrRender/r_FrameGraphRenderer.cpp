@@ -1196,25 +1196,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         if (!sunShadowCull.active)
             sunShadowState.candidates = 0;
 
-        if (sunShadowCull.active && bindlessConfig.UseMegaBuffers()) {
-            passes::SunShadowDrawConfig sunCfg;
-            sunCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
-            sunCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
-            sunCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
-            sunCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
-            sunCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
-            sunCfg.materialCache = m_materialCache.get();
-            sunCfg.dynamicCompactDrawArgs = bindlessConfig.dynamicSet.compactDrawArgsBuffer;
-            sunCfg.dynamicCompactMaterialIDs = bindlessConfig.dynamicSet.compactMaterialIDBuffer;
-            sunCfg.dynamicCompactBatchIndices = bindlessConfig.dynamicSet.compactBatchIndicesBuffer;
-            sunCfg.dynamicCompactCount = bindlessConfig.dynamicSet.compactCountBuffer;
-            sunCfg.dynamicInstanceBuffer = bindlessConfig.dynamicSet.instanceBuffer;
-            sunCfg.dynamicFadeBuffer = bindlessConfig.dynamicSet.fadeBuffer;
-            sunCfg.dynamicObjectCount = bindlessConfig.dynamicSet.totalObjectCount;
-            sunCfg.dynamicArgs = cullOutput.dynamicCompactDrawArgs;
-            sunShadowMaps = passes::setupSunShadowMapPasses(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState, m_gpuProfiler.get());
-        }
-        sunShadowState.receiverActive = sunShadowMaps.maps[passes::kSunTargetFar].is_valid();
     }
 
     bool prepassActive = false;
@@ -1278,6 +1259,34 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_geometryCollector.get(),
             m_overlayManager.get()
         );
+    }
+
+    if (sunShadowCull.active && bindlessConfig.UseMegaBuffers()) {
+        auto& sunShadowState = m_blackboard->get_or_add<passes::SunShadowState>();
+        passes::SunShadowDrawConfig sunCfg;
+        sunCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+        sunCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+        sunCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+        sunCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
+        sunCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
+        sunCfg.materialCache = m_materialCache.get();
+        sunCfg.dynamicCompactDrawArgs = bindlessConfig.dynamicSet.compactDrawArgsBuffer;
+        sunCfg.dynamicCompactMaterialIDs = bindlessConfig.dynamicSet.compactMaterialIDBuffer;
+        sunCfg.dynamicCompactBatchIndices = bindlessConfig.dynamicSet.compactBatchIndicesBuffer;
+        sunCfg.dynamicCompactCount = bindlessConfig.dynamicSet.compactCountBuffer;
+        sunCfg.dynamicInstanceBuffer = bindlessConfig.dynamicSet.instanceBuffer;
+        sunCfg.dynamicFadeBuffer = bindlessConfig.dynamicSet.fadeBuffer;
+        sunCfg.dynamicObjectCount = bindlessConfig.dynamicSet.totalObjectCount;
+        sunCfg.dynamicArgs = cullOutput.dynamicCompactDrawArgs;
+        sunCfg.skinning = &m_blackboard->get_or_add<passes::SkinningPassState>();
+        sunCfg.geometry = m_geometryCollector.get();
+        sunCfg.gpuCulling = m_gpuCullingManager.get();
+        sunCfg.splatBuffer = m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr;
+        sunCfg.skinnedArgs = skinnedDrawArgsBuffer;
+        sunShadowMaps = passes::setupSunShadowMapPasses(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState, m_gpuProfiler.get());
+        sunShadowState.receiverActive = sunShadowMaps.maps[passes::kSunTargetFar].is_valid();
+    } else {
+        m_blackboard->get_or_add<passes::SunShadowState>().receiverActive = false;
     }
 
     // ═══════════════════════════════════════════════════════
