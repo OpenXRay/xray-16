@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 #include <nvrhi/nvrhi.h>
+#include "SunShadowPassSetup.h"
 
 namespace xray::render {
     class GeometryCollector;
@@ -130,6 +131,7 @@ struct ForwardColorPassData {
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle drawArgsBuffer;
     framegraph::VirtualResourceHandle sunShadowFar;
+    framegraph::VirtualResourceHandle sunShadowCasc0;
     fg::RenderDevice* device;
     const GeometryCollector* geometry;
     MaterialCache* materialCache;
@@ -156,7 +158,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::VirtualResourceHandle drawArgsBuffer = framegraph::VirtualResourceHandle(),
     const BindlessForwardConfig& bindlessConfig = BindlessForwardConfig(),
     ForwardColorPassState* state = nullptr,
-    framegraph::VirtualResourceHandle sunShadowFar = framegraph::VirtualResourceHandle()
+    SunShadowMaps sunShadowMaps = SunShadowMaps()
 );
 
 }

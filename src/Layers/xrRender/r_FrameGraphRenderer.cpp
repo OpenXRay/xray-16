@@ -474,9 +474,14 @@ void FrameGraphRenderer::Render() {
 
     {
         const auto& sunShadow = m_blackboard->get_or_add<passes::SunShadowState>();
-        if (sunShadow.receiverActive && sunShadow.farValid && sunShadow.farMapSize > 0) {
-            staticGlobalsData.shadow_matrices[2] = sunShadow.farVP;
-            staticGlobalsData.cascade_splits.set(1.0f, passes::kSunShadowFarBias, 1.0f / float(sunShadow.farMapSize), 0.0f);
+        const auto& sunFar = sunShadow.targets[passes::kSunTargetFar];
+        const auto& sunCasc0 = sunShadow.targets[passes::kSunTargetCasc0];
+        if (sunShadow.receiverActive && sunFar.valid && sunFar.mapSize > 0) {
+            const bool casc0Active = sunCasc0.valid && sunCasc0.mapSize > 0;
+            staticGlobalsData.shadow_matrices[2] = sunFar.vp;
+            if (casc0Active)
+                staticGlobalsData.shadow_matrices[0] = sunCasc0.vp;
+            staticGlobalsData.cascade_splits.set(1.0f, casc0Active ? 1.0f / float(sunCasc0.mapSize) : 0.0f, 1.0f / float(sunFar.mapSize), 0.0f);
         }
     }
 
@@ -729,12 +734,17 @@ void FrameGraphRenderer::RenderStatsOverlay()
             }
 
             const auto& sunShadow = m_blackboard->get_or_add<passes::SunShadowState>();
+            const auto& sunFar = sunShadow.targets[passes::kSunTargetFar];
+            const auto& sunCasc0 = sunShadow.targets[passes::kSunTargetCasc0];
             stats.sunCasterCandidates = sunShadow.candidates;
-            stats.sunCastersOpaque = sunShadow.castersOpaque;
-            stats.sunCastersTerrain = sunShadow.castersTerrain;
-            stats.sunCastersAT = sunShadow.castersAT;
+            stats.sunCastersOpaque = sunFar.castersOpaque;
+            stats.sunCastersTerrain = sunFar.castersTerrain;
+            stats.sunCastersAT = sunFar.castersAT;
+            stats.sunCasc0Opaque = sunCasc0.castersOpaque;
+            stats.sunCasc0Terrain = sunCasc0.castersTerrain;
+            stats.sunCasc0AT = sunCasc0.castersAT;
             stats.sunFarRedraws = sunShadow.farRedraws;
-            stats.sunFarCached = !sunShadow.farRedraw;
+            stats.sunFarCached = !sunFar.redraw;
         }
 
         {
@@ -1106,7 +1116,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
     passes::SunShadowCullOutput sunShadowCull;
-    framegraph::VirtualResourceHandle sunShadowFar;
+    passes::SunShadowMaps sunShadowMaps;
     {
         auto& sunShadowState = m_blackboard->get_or_add<passes::SunShadowState>();
         if (ps_r_sun_shadow && ps_r_cluster && cullActive && m_gpuCullingManager) {
@@ -1131,11 +1141,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             sunCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
             sunCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
             sunCfg.materialCache = m_materialCache.get();
-            sunShadowFar = passes::setupSunShadowFarPass(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState, m_gpuProfiler.get());
-            if (sunShadowFar.is_valid())
-                m_framegraph->GetRTRegistry().RegisterRT("rt_SunShadowFar", sunShadowFar);
+            sunShadowMaps = passes::setupSunShadowMapPasses(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState, m_gpuProfiler.get());
+            if (sunShadowMaps.far.is_valid())
+                m_framegraph->GetRTRegistry().RegisterRT("rt_SunShadowFar", sunShadowMaps.far);
+            if (sunShadowMaps.casc0.is_valid())
+                m_framegraph->GetRTRegistry().RegisterRT("rt_SunShadowCasc0", sunShadowMaps.casc0);
         }
-        sunShadowState.receiverActive = sunShadowFar.is_valid();
+        sunShadowState.receiverActive = sunShadowMaps.far.is_valid();
     }
 
     bool prepassActive = false;
@@ -1265,7 +1277,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         drawArgsBuffer,
         bindlessConfig,
         &m_blackboard->get_or_add<passes::ForwardColorPassState>(),
-        sunShadowFar
+        sunShadowMaps
     );
 
     if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid()) {
@@ -1295,7 +1307,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         skinnedDrawArgsBuffer,
         &m_blackboard->get_or_add<passes::SkinningPassState>(),
         m_overlayManager.get(),
-        sunShadowFar
+        sunShadowMaps
     );
 
     passes::setupDetailCullPass(
@@ -1339,7 +1351,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width,
         height,
         m_gpuProfiler.get(),
-        sunShadowFar
+        sunShadowMaps
     );
 
     passes::TransparentPassConfig transparentConfig;
