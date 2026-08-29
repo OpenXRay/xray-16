@@ -5,6 +5,7 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
+    class MaterialCache;
     namespace fg {
         class RenderDevice;
     }
@@ -46,6 +47,17 @@ struct SunShadowState {
     Fmatrix farVP;
     float farTexel = 0.0f;
     bool farValid = false;
+
+    nvrhi::TextureHandle farMap;
+    u32 farMapSize = 0;
+    nvrhi::GraphicsPipelineHandle depthOpaquePipeline;
+    nvrhi::GraphicsPipelineHandle depthATPipeline;
+    nvrhi::BindingLayoutHandle depthOpaqueLayout;
+    nvrhi::BindingLayoutHandle depthATLayout;
+    nvrhi::ShaderHandle clusterVS;
+    nvrhi::ShaderHandle depthOpaquePS;
+    nvrhi::ShaderHandle depthATPS;
+    bool depthPipelinesFailed = false;
 };
 
 struct SunShadowCullOutput {
@@ -53,6 +65,15 @@ struct SunShadowCullOutput {
     framegraph::VirtualResourceHandle terrainArgs;
     framegraph::VirtualResourceHandle atArgs;
     bool active = false;
+};
+
+struct SunShadowDrawConfig {
+    nvrhi::IBuffer* entryBuffer = nullptr;
+    nvrhi::IBuffer* staticInstanceBuffer = nullptr;
+    nvrhi::IBuffer* terrainInstanceBuffer = nullptr;
+    nvrhi::IBuffer* megaVertexBuffer = nullptr;
+    nvrhi::IBuffer* megaIndexBuffer = nullptr;
+    MaterialCache* materialCache = nullptr;
 };
 
 void ComputeSunFarVP(Fmatrix& outVP, float& outTexel, const Fvector& sunDir, float boxSize, u32 mapSize);
@@ -63,6 +84,13 @@ SunShadowCullOutput setupSunShadowCullPass(
     framegraph::VirtualResourceHandle orderAfter,
     nvrhi::IBuffer* entryBuffer,
     u32 entryCount,
+    SunShadowState* state);
+
+framegraph::VirtualResourceHandle setupSunShadowFarPass(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    const SunShadowCullOutput& cull,
+    const SunShadowDrawConfig& config,
     SunShadowState* state);
 
 } // namespace xray::render::fg::passes

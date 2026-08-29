@@ -1148,6 +1148,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
     passes::SunShadowCullOutput sunShadowCull;
+    framegraph::VirtualResourceHandle sunShadowFar;
     {
         auto& sunShadowState = m_blackboard->get_or_add<passes::SunShadowState>();
         if (ps_r_sun_shadow && ps_r_cluster && cullActive && m_gpuCullingManager) {
@@ -1162,6 +1163,19 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
         if (!sunShadowCull.active)
             sunShadowState.candidates = 0;
+
+        if (sunShadowCull.active && bindlessConfig.UseMegaBuffers()) {
+            passes::SunShadowDrawConfig sunCfg;
+            sunCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+            sunCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+            sunCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+            sunCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
+            sunCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
+            sunCfg.materialCache = m_materialCache.get();
+            sunShadowFar = passes::setupSunShadowFarPass(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState);
+            if (sunShadowFar.is_valid())
+                m_framegraph->GetRTRegistry().RegisterRT("rt_SunShadowFar", sunShadowFar);
+        }
     }
 
     bool prepassActive = false;
