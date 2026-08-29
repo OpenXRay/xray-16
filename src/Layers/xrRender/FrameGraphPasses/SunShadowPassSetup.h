@@ -6,8 +6,10 @@
 
 namespace xray::render {
     class MaterialCache;
+    class GeometryCollector;
     namespace fg {
         class RenderDevice;
+        class GPUCullingManager;
     }
 }
 
@@ -23,6 +25,9 @@ namespace xray::profiler {
 
 namespace xray::render::fg::passes {
 
+struct SkinningPassState;
+
+constexpr u32 kSunShadowSkinnedFormats = 6;
 constexpr u32 kSunTargetFar = 0;
 constexpr u32 kSunTargetCasc0 = 1;
 constexpr u32 kSunTargetCasc1 = 2;
@@ -79,6 +84,15 @@ struct SunShadowState {
     nvrhi::ShaderHandle depthDynamicPS;
     bool depthPipelinesFailed = false;
 
+    nvrhi::GraphicsPipelineHandle skinnedPipelines[kSunShadowSkinnedFormats];
+    nvrhi::GraphicsPipelineHandle skinnedMDIPipelines[kSunShadowSkinnedFormats];
+    nvrhi::BindingLayoutHandle skinnedLayout;
+    nvrhi::BindingLayoutHandle skinnedMDILayout;
+    nvrhi::ShaderHandle skinnedDepthPS;
+    nvrhi::ShaderHandle skinnedDepthMDIPS;
+    bool skinnedPipelinesReady = false;
+    bool skinnedPipelinesFailed = false;
+
     SunShadowTarget targets[kSunTargetCount];
     u32 candidates = 0;
 
@@ -116,6 +130,11 @@ struct SunShadowDrawConfig {
     nvrhi::IBuffer* dynamicFadeBuffer = nullptr;
     u32 dynamicObjectCount = 0;
     framegraph::VirtualResourceHandle dynamicArgs;
+    const SkinningPassState* skinning = nullptr;
+    const GeometryCollector* geometry = nullptr;
+    GPUCullingManager* gpuCulling = nullptr;
+    nvrhi::IBuffer* splatBuffer = nullptr;
+    framegraph::VirtualResourceHandle skinnedArgs;
 };
 
 struct SunShadowMaps {
