@@ -387,8 +387,7 @@ static SkinnedPhaseContext BuildSkinnedPhaseContext(
     nvrhi::IDescriptorTable* bindlessTable,
     nvrhi::IBindingLayout* bindlessLayout,
     nvrhi::IBuffer* splatBuffer,
-    nvrhi::ITexture* sunShadowMap,
-    nvrhi::ITexture* sunShadowCasc0,
+    nvrhi::ITexture* const* sunShadowMaps,
     const nvrhi::Viewport& viewport,
     const nvrhi::Rect& scissor,
     bool isHUD)
@@ -429,10 +428,8 @@ static SkinnedPhaseContext BuildSkinnedPhaseContext(
     bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
     bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
     bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
-    if (!useHUDPS) {
-        bsb.Texture("g_SunShadowFar", sunShadowMap);
-        bsb.Texture("g_SunShadowCasc0", sunShadowCasc0);
-    }
+    if (!useHUDPS)
+        passes::BindSunShadowMaps(bsb, sunShadowMaps);
 
     ctx.bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), activeLayout, nvDevice);
     return ctx;
@@ -561,10 +558,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             if (skinnedDrawArgs.is_valid())
                 data.skinnedDrawArgs = passBuilder.read(skinnedDrawArgs, ResourceState::IndirectArgument);
 
-            if (sunShadowMaps.far.is_valid())
-                data.sunShadowFar = passBuilder.read(sunShadowMaps.far, ResourceState::ShaderResource);
-            if (sunShadowMaps.casc0.is_valid())
-                data.sunShadowCasc0 = passBuilder.read(sunShadowMaps.casc0, ResourceState::ShaderResource);
+            passes::ReadSunShadowMaps(passBuilder, sunShadowMaps, data.sunShadowMaps);
 
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
@@ -663,12 +657,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 data.overlayMgr->UploadSplats(cmdList);
             nvrhi::IBuffer* splatBuffer = data.overlayMgr ? data.overlayMgr->GetSplatBuffer() : nullptr;
 
-            nvrhi::ITexture* sunShadowTex = data.sunShadowFar.is_valid() ? fg.GetPhysicalTexture(data.sunShadowFar) : nullptr;
-            if (!sunShadowTex)
-                sunShadowTex = cache.GetDummyShadowMap2D(nvDevice);
-            nvrhi::ITexture* sunShadowCasc0Tex = data.sunShadowCasc0.is_valid() ? fg.GetPhysicalTexture(data.sunShadowCasc0) : nullptr;
-            if (!sunShadowCasc0Tex)
-                sunShadowCasc0Tex = cache.GetDummyShadowMap2D(nvDevice);
+            nvrhi::ITexture* sunMaps[passes::kSunTargetCount];
+            passes::ResolveSunShadowMaps(fg, data.sunShadowMaps, nvDevice, sunMaps);
 
             auto* backend = data.device->GetBackend();
             nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
@@ -686,7 +676,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 SkinnedPhaseContext worldCtx = BuildSkinnedPhaseContext(
                     *data.passState, nvDevice, framebuffer,
                     dynTransformsCB, staticGlobalsCB, materialIdCB,
-                    globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer, sunShadowTex, sunShadowCasc0Tex,
+                    globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer, sunMaps,
                     worldViewport, scissor, false);
 
                 const bool cullActive = data.skinnedDrawArgs.is_valid()
@@ -727,8 +717,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                         bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
                         bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
-                        bsb.Texture("g_SunShadowFar", sunShadowTex);
-                        bsb.Texture("g_SunShadowCasc0", sunShadowCasc0Tex);
+                        passes::BindSunShadowMaps(bsb, sunMaps);
 
                         auto& cache = framegraph::GetPassResourceCache();
                         nvrhi::BindingSetHandle mdiBindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->mdiLayout, nvDevice);
@@ -787,7 +776,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 SkinnedPhaseContext hudCtx = BuildSkinnedPhaseContext(
                     *data.passState, nvDevice, framebuffer,
                     dynTransformsCB, staticGlobalsCB, materialIdCB,
-                    globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer, sunShadowTex, sunShadowCasc0Tex,
+                    globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer, sunMaps,
                     hudViewport, scissor, true);
 
                 for (const auto& batch : *data.hudBatches) {

@@ -130,8 +130,7 @@ struct ForwardColorPassData {
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle drawArgsBuffer;
-    framegraph::VirtualResourceHandle sunShadowFar;
-    framegraph::VirtualResourceHandle sunShadowCasc0;
+    SunShadowMaps sunShadowMaps;
     fg::RenderDevice* device;
     const GeometryCollector* geometry;
     MaterialCache* materialCache;
