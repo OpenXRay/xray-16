@@ -1356,7 +1356,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_gpuCullingManager.get(),
         skinnedDrawArgsBuffer,
         &m_blackboard->get_or_add<passes::SkinningPassState>(),
-        m_overlayManager.get()
+        m_overlayManager.get(),
+        sunShadowFar
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1408,7 +1409,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hudOutputs,
         width,
         height,
-        m_gpuProfiler.get()
+        m_gpuProfiler.get(),
+        sunShadowFar
     );
 
     // ═══════════════════════════════════════════════════════

@@ -40,6 +40,7 @@ struct DetailPassData {
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle outputNormal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle sunShadowFar;
     fg::RenderDevice* device;
     fg::FGDetailManager* detailManager;
     framegraph::DefaultOutputLayout outputs;
@@ -61,7 +62,8 @@ framegraph::DefaultOutputLayout setupDetailPass(
     const framegraph::DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
-    xray::profiler::GPUProfiler* gpuProfiler = nullptr
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr,
+    framegraph::VirtualResourceHandle sunShadowFar = framegraph::VirtualResourceHandle()
 );
 
 } // namespace xray::render::fg::passes
