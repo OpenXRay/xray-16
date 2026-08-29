@@ -11,6 +11,7 @@
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/xrRender_console.h"
+#include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "xrCDB/Frustum.h"
 
 namespace xray::render::fg::passes {
@@ -25,6 +26,8 @@ constexpr float kFarZBeyond = 400.0f;
 constexpr u32 kCullThreadGroup = 64;
 constexpr int kShadowDepthBias = -2;
 constexpr float kShadowSlopeBias = -2.5f;
+constexpr float kFarRedrawDist = 10.0f;
+constexpr float kFarSunDotRedraw = 0.99999847f;
 
 struct alignas(16) SunShadowCullParams {
     Fvector4 frustumPlanes[6];
@@ -43,6 +46,7 @@ struct SunShadowCullData {
     fg::RenderDevice* device;
     nvrhi::IBuffer* entryBuffer;
     u32 entryCount;
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr;
 };
 
 struct SunShadowFarData {
@@ -53,6 +57,23 @@ struct SunShadowFarData {
     SunShadowState* state;
     fg::RenderDevice* device;
     SunShadowDrawConfig config;
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr;
+};
+
+struct GPUZone {
+    xray::profiler::GPUProfiler* profiler;
+    nvrhi::ICommandList* cmdList;
+    const char* name;
+    GPUZone(xray::profiler::GPUProfiler* p, nvrhi::ICommandList* c, const char* n) : profiler(p), cmdList(c), name(n)
+    {
+        if (profiler)
+            profiler->BeginPass(cmdList, name);
+    }
+    ~GPUZone()
+    {
+        if (profiler)
+            profiler->EndPass(cmdList, name);
+    }
 };
 
 bool EnsureCullPipelines(fg::RenderDevice* device, SunShadowState& state)
@@ -313,7 +334,10 @@ void ExecuteSunShadowCull(fg::RenderContext* ctx, const SunShadowCullData& data)
     SunShadowState& state = *data.state;
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
-    if (!cmdList || !nvDevice || !state.countBuffer || !state.farValid)
+    if (!cmdList || !nvDevice)
+        return;
+    GPUZone zone(data.gpuProfiler, cmdList, "Shadow/Cull");
+    if (!state.farRedraw || !state.countBuffer || !state.farValid)
         return;
     if (!EnsureCullPipelines(data.device, state))
         return;
@@ -404,6 +428,9 @@ void ExecuteSunShadowFar(fg::RenderContext* ctx, const FrameGraph& fg, const Sun
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     nvrhi::ITexture* farMap = fg.GetPhysicalTexture(data.farMap);
     if (!cmdList || !nvDevice || !farMap)
+        return;
+    GPUZone zone(data.gpuProfiler, cmdList, "Shadow/Far");
+    if (!state.farRedraw)
         return;
 
     cmdList->clearDepthStencilTexture(farMap, nvrhi::AllSubresources, true, 0.0f, false, 0);
@@ -518,13 +545,20 @@ void ComputeSunFarVP(Fmatrix& outVP, float& outTexel, const Fvector& sunDirIn, f
     outTexel = texel;
 }
 
+void InvalidateSunShadowCache(SunShadowState& state)
+{
+    state.farValid = false;
+    state.farRedraw = false;
+}
+
 SunShadowCullOutput setupSunShadowCullPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle orderAfter,
     nvrhi::IBuffer* entryBuffer,
     u32 entryCount,
-    SunShadowState* state)
+    SunShadowState* state,
+    xray::profiler::GPUProfiler* gpuProfiler)
 {
     SunShadowCullOutput out;
     if (!state || !device || !entryBuffer || entryCount == 0)
@@ -541,8 +575,35 @@ SunShadowCullOutput setupSunShadowCullPass(
     sunDir.set(0.0f, -1.0f, 0.0f);
     if (g_pGamePersistent)
         sunDir = g_pGamePersistent->Environment().CurrentEnv.sun_dir;
-    ComputeSunFarVP(state->farVP, state->farTexel, sunDir, ps_r_sun_shadow_far_box, u32(ps_r_sun_shadow_far_size));
-    state->farValid = true;
+    if (sunDir.magnitude() < 1e-4f)
+        sunDir.set(0.0f, -1.0f, 0.0f);
+    sunDir.normalize();
+
+    const Fvector camPos = Device.vCameraPosition;
+    const float box = ps_r_sun_shadow_far_box;
+    const u32 size = u32(std::max(ps_r_sun_shadow_far_size, 64));
+    const float lod = ps_r_shadow_cluster_lod;
+    const int at = ps_r_shadow_at ? 1 : 0;
+    const bool cacheValid = state->farValid
+        && state->farEntryCount == entryCount
+        && state->farBox == box
+        && state->farMapSize == size
+        && state->farLod == lod
+        && state->farAT == at
+        && camPos.distance_to_sqr(state->farCamPos) < kFarRedrawDist * kFarRedrawDist
+        && state->farSunDir.dotproduct(sunDir) > kFarSunDotRedraw;
+    state->farRedraw = !cacheValid;
+    if (state->farRedraw) {
+        ComputeSunFarVP(state->farVP, state->farTexel, sunDir, box, size);
+        state->farValid = true;
+        state->farCamPos = camPos;
+        state->farSunDir = sunDir;
+        state->farEntryCount = entryCount;
+        state->farBox = box;
+        state->farLod = lod;
+        state->farAT = at;
+        ++state->farRedraws;
+    }
     state->candidates = entryCount;
 
     ResourceDesc argsDesc;
@@ -559,11 +620,12 @@ SunShadowCullOutput setupSunShadowCullPass(
 
     auto& passData = fg.addCallbackPass<SunShadowCullData>(
         "Sun Shadow Cull",
-        [&, orderAfter, opaqueArgs, terrainArgs, atArgs, entryBuffer, entryCount, state](FrameGraph& builder, PassHandle passHandle, SunShadowCullData& data) {
+        [&, orderAfter, opaqueArgs, terrainArgs, atArgs, entryBuffer, entryCount, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, SunShadowCullData& data) {
             data.state = state;
             data.device = device;
             data.entryBuffer = entryBuffer;
             data.entryCount = entryCount;
+            data.gpuProfiler = gpuProfiler;
 
             RenderPassBuilder passBuilder(builder, passHandle);
             if (orderAfter.is_valid())
@@ -588,7 +650,8 @@ framegraph::VirtualResourceHandle setupSunShadowFarPass(
     fg::RenderDevice* device,
     const SunShadowCullOutput& cull,
     const SunShadowDrawConfig& config,
-    SunShadowState* state)
+    SunShadowState* state,
+    xray::profiler::GPUProfiler* gpuProfiler)
 {
     if (!state || !device || !cull.active)
         return VirtualResourceHandle();
@@ -613,10 +676,11 @@ framegraph::VirtualResourceHandle setupSunShadowFarPass(
 
     auto& passData = fg.addCallbackPass<SunShadowFarData>(
         "Sun Shadow Far",
-        [&, farHandle, cull, config, state](FrameGraph& builder, PassHandle passHandle, SunShadowFarData& data) {
+        [&, farHandle, cull, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, SunShadowFarData& data) {
             data.state = state;
             data.device = device;
             data.config = config;
+            data.gpuProfiler = gpuProfiler;
 
             RenderPassBuilder passBuilder(builder, passHandle);
             data.farMap = passBuilder.write(farHandle, ResourceState::DepthStencilWrite);

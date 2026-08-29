@@ -13,6 +13,8 @@
 
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/FrameGraph/Blackboard.h"
+#include "Layers/xrRender/FrameGraphPasses/SunShadowPassSetup.h"
 
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
@@ -53,6 +55,8 @@ void FrameGraphRenderer::level_Load(IReader* fs)
                 gpuCulling->BeginLevelLoad(2000000, 6000000);
             }
         }
+        if (m_blackboard)
+            passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
 
         g_pGamePersistent->LoadTitle("st_loading_geometry");
         {
@@ -314,6 +318,9 @@ void FrameGraphRenderer::level_Unload()
     Device.vCameraPositionSaved.set(0, 0, 0);
 
     Lights.Unload();
+
+    if (m_blackboard)
+        passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
 
     for (dxRender_Visual* visual : BufferPool.Visuals)
     {
