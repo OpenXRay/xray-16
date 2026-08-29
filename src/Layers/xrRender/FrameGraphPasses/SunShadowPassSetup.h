@@ -72,6 +72,11 @@ struct SunShadowState {
     nvrhi::ShaderHandle clusterVS;
     nvrhi::ShaderHandle depthOpaquePS;
     nvrhi::ShaderHandle depthATPS;
+    nvrhi::GraphicsPipelineHandle depthDynamicPipeline;
+    nvrhi::BindingLayoutHandle depthDynamicLayout;
+    nvrhi::InputLayoutHandle depthDynamicInputLayout;
+    nvrhi::ShaderHandle forwardVS;
+    nvrhi::ShaderHandle depthDynamicPS;
     bool depthPipelinesFailed = false;
 
     SunShadowTarget targets[kSunTargetCount];
@@ -103,6 +108,14 @@ struct SunShadowDrawConfig {
     nvrhi::IBuffer* megaVertexBuffer = nullptr;
     nvrhi::IBuffer* megaIndexBuffer = nullptr;
     MaterialCache* materialCache = nullptr;
+    nvrhi::IBuffer* dynamicCompactDrawArgs = nullptr;
+    nvrhi::IBuffer* dynamicCompactMaterialIDs = nullptr;
+    nvrhi::IBuffer* dynamicCompactBatchIndices = nullptr;
+    nvrhi::IBuffer* dynamicCompactCount = nullptr;
+    nvrhi::IBuffer* dynamicInstanceBuffer = nullptr;
+    nvrhi::IBuffer* dynamicFadeBuffer = nullptr;
+    u32 dynamicObjectCount = 0;
+    framegraph::VirtualResourceHandle dynamicArgs;
 };
 
 struct SunShadowMaps {

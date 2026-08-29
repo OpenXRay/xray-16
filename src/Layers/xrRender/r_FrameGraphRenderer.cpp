@@ -1204,6 +1204,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             sunCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
             sunCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
             sunCfg.materialCache = m_materialCache.get();
+            sunCfg.dynamicCompactDrawArgs = bindlessConfig.dynamicSet.compactDrawArgsBuffer;
+            sunCfg.dynamicCompactMaterialIDs = bindlessConfig.dynamicSet.compactMaterialIDBuffer;
+            sunCfg.dynamicCompactBatchIndices = bindlessConfig.dynamicSet.compactBatchIndicesBuffer;
+            sunCfg.dynamicCompactCount = bindlessConfig.dynamicSet.compactCountBuffer;
+            sunCfg.dynamicInstanceBuffer = bindlessConfig.dynamicSet.instanceBuffer;
+            sunCfg.dynamicFadeBuffer = bindlessConfig.dynamicSet.fadeBuffer;
+            sunCfg.dynamicObjectCount = bindlessConfig.dynamicSet.totalObjectCount;
+            sunCfg.dynamicArgs = cullOutput.dynamicCompactDrawArgs;
             sunShadowMaps = passes::setupSunShadowMapPasses(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState, m_gpuProfiler.get());
         }
         sunShadowState.receiverActive = sunShadowMaps.maps[passes::kSunTargetFar].is_valid();
