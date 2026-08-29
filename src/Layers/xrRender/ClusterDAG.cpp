@@ -196,7 +196,7 @@ clodConfig MakeConfig(bool leavesOnly)
     clodConfig cfg = clodDefaultConfig(kClusterMaxTris);
     cfg.optimize_bounds = true;
     cfg.simplify_fallback_sloppy = false;
-    cfg.simplify_prune = true;
+    cfg.simplify_prune = false;
     if (leavesOnly)
         cfg.simplify_ratio = 1.0f;
     return cfg;
@@ -352,7 +352,7 @@ bool IsSelfLoop(const ClusterMetaProto& p)
 }
 
 constexpr u32 kCacheMagic = 0x464C4356;
-constexpr u32 kCacheVersion = 4;
+constexpr u32 kCacheVersion = 5;
 
 #pragma pack(push, 4)
 struct CacheHeader {
