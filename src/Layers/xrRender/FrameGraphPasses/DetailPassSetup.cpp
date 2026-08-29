@@ -48,7 +48,8 @@ DefaultOutputLayout setupDetailPass(
     const DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
-    xray::profiler::GPUProfiler* gpuProfiler
+    xray::profiler::GPUProfiler* gpuProfiler,
+    framegraph::VirtualResourceHandle sunShadowFar
 )
 {
     if (detailManager && !detailManager->graphicsPipeline)
@@ -64,7 +65,7 @@ DefaultOutputLayout setupDetailPass(
 
     auto& passData = fg.addCallbackPass<DetailPassData>(
         "DetailDraw",
-        [&, width, height, gpuProfiler](
+        [&, width, height, gpuProfiler, sunShadowFar](
             FrameGraph& builder, PassHandle passHandle, DetailPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
@@ -80,6 +81,8 @@ DefaultOutputLayout setupDetailPass(
             data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
             if (forwardInputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
+            if (sunShadowFar.is_valid())
+                data.sunShadowFar = passBuilder.read(sunShadowFar, ResourceState::ShaderResource);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = data.outputNormal;
@@ -198,6 +201,9 @@ DefaultOutputLayout setupDetailPass(
                 data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
 
             auto* nvDev = data.device->GetNVRHIDevice();
+            nvrhi::ITexture* sunShadowTex = data.sunShadowFar.is_valid() ? fg.GetPhysicalTexture(data.sunShadowFar) : nullptr;
+            if (!sunShadowTex)
+                sunShadowTex = cache.GetDummyShadowMap2D(nvDev);
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* grassVsRefl = shaderLoader->GetCachedReflection("detail_gpu", ".vs");
@@ -216,6 +222,7 @@ DefaultOutputLayout setupDetailPass(
                 bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                 bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
                 bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+                bsb.Texture("g_SunShadowFar", sunShadowTex);
                 auto bindDesc = bsb.Build();
                 bindDesc.bindings.push_back(nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection));
                 return cache.GetOrCreateBindingSet(bindDesc, dm->graphicsBindingLayout, nvDev);
@@ -237,6 +244,7 @@ DefaultOutputLayout setupDetailPass(
                 bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                 bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
                 bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+                bsb.Texture("g_SunShadowFar", sunShadowTex);
                 return cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDev);
             };
 
@@ -297,6 +305,7 @@ DefaultOutputLayout setupDetailPass(
                 decalBsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                 decalBsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
                 decalBsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+                decalBsb.Texture("g_SunShadowFar", sunShadowTex);
                 nvrhi::BindingSetHandle decalBindingSet = cache.GetOrCreateBindingSet(decalBsb.Build(), dm->decalBindingLayout, nvDev);
 
                 nvrhi::GraphicsState state;

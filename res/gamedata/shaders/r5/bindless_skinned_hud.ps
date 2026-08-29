@@ -82,7 +82,7 @@ PS_OUTPUT main(PS_INPUT input)
 
     albedo = apply_splat_color(albedo, input.worldPos, input.texcoord);
 
-    f_forward fwd = output_forward_pbr(albedo, N, correctedWorldPos, metallic, roughness, ao, input.position);
+    f_forward fwd = output_forward_pbr(albedo, N, correctedWorldPos, metallic, roughness, ao, input.position, 1.0);
     output.color = float4(fwd.color.rgb, diffuseSample.a);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
