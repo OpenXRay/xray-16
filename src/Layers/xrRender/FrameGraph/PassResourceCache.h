@@ -22,6 +22,7 @@ public:
     nvrhi::ISampler* GetLinearClampSampler(nvrhi::IDevice* device);
     nvrhi::ISampler* GetPointClampSampler(nvrhi::IDevice* device);
     nvrhi::ISampler* GetShadowCmpSampler(nvrhi::IDevice* device);
+    nvrhi::ISampler* GetSunShadowCmpSampler(nvrhi::IDevice* device);
     nvrhi::ITexture* GetDummyShadowMap(nvrhi::IDevice* device);
     nvrhi::ITexture* GetDummyShadowMap2D(nvrhi::IDevice* device);
 
@@ -132,6 +133,7 @@ private:
     nvrhi::SamplerHandle m_commonLinearClamp;
     nvrhi::SamplerHandle m_commonPointClamp;
     nvrhi::SamplerHandle m_commonShadowCmp;
+    nvrhi::SamplerHandle m_sunShadowCmp;
     nvrhi::TextureHandle m_dummyShadowMap;
     nvrhi::TextureHandle m_dummyShadowMap2D;
 
