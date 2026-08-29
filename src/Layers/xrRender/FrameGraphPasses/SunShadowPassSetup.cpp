@@ -8,6 +8,8 @@
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "xrCDB/Frustum.h"
 
@@ -21,6 +23,8 @@ constexpr float kFarEyeDist = 350.0f;
 constexpr float kFarZNear = 1.0f;
 constexpr float kFarZBeyond = 400.0f;
 constexpr u32 kCullThreadGroup = 64;
+constexpr int kShadowDepthBias = -2;
+constexpr float kShadowSlopeBias = -2.5f;
 
 struct alignas(16) SunShadowCullParams {
     Fvector4 frustumPlanes[6];
@@ -39,6 +43,16 @@ struct SunShadowCullData {
     fg::RenderDevice* device;
     nvrhi::IBuffer* entryBuffer;
     u32 entryCount;
+};
+
+struct SunShadowFarData {
+    VirtualResourceHandle farMap;
+    VirtualResourceHandle opaqueArgs;
+    VirtualResourceHandle terrainArgs;
+    VirtualResourceHandle atArgs;
+    SunShadowState* state;
+    fg::RenderDevice* device;
+    SunShadowDrawConfig config;
 };
 
 bool EnsureCullPipelines(fg::RenderDevice* device, SunShadowState& state)
@@ -86,6 +100,84 @@ bool EnsureCullPipelines(fg::RenderDevice* device, SunShadowState& state)
     }
 
     Msg("* [SunShadow] cull pipelines initialized");
+    return true;
+}
+
+bool EnsureDepthPipelines(fg::RenderDevice* device, SunShadowState& state)
+{
+    if (state.depthOpaquePipeline && state.depthATPipeline)
+        return true;
+    if (state.depthPipelinesFailed)
+        return false;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    if (!nvDevice || !shaderLoader)
+        return false;
+
+    auto vsResult = shaderLoader->LoadVertexShader("cluster_pull", "main");
+    auto opaqueResult = shaderLoader->LoadPixelShader("bindless_depth_opaque", "main");
+    auto atResult = shaderLoader->LoadPixelShader("shadow_depth_at", "main");
+    if (!vsResult.handle || !opaqueResult.handle || !atResult.handle ||
+        !vsResult.reflection || !opaqueResult.reflection || !atResult.reflection) {
+        Msg("! [SunShadow] depth shaders failed to load");
+        state.depthPipelinesFailed = true;
+        return false;
+    }
+
+    state.clusterVS = vsResult.handle;
+    state.depthOpaquePS = opaqueResult.handle;
+    state.depthATPS = atResult.handle;
+
+    auto& cache = framegraph::GetPassResourceCache();
+    state.depthOpaqueLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "SunShadowDepth_Opaque", *vsResult.reflection, *opaqueResult.reflection, nvDevice);
+    state.depthATLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "SunShadowDepth_AT", *vsResult.reflection, *atResult.reflection, nvDevice);
+    if (!state.depthOpaqueLayout || !state.depthATLayout) {
+        state.depthPipelinesFailed = true;
+        return false;
+    }
+
+    auto* backend = device->GetBackend();
+    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.depthFormat = nvrhi::Format::D32;
+
+    auto makeDesc = [&](nvrhi::IShader* pixelShader, nvrhi::IBindingLayout* layout, bool withBindless) {
+        nvrhi::GraphicsPipelineDesc desc;
+        desc.VS = state.clusterVS;
+        desc.PS = pixelShader;
+        desc.inputLayout = nullptr;
+        if (withBindless && bindlessLayout)
+            desc.bindingLayouts = { layout, bindlessLayout };
+        else
+            desc.bindingLayouts = { layout };
+        desc.primType = nvrhi::PrimitiveType::TriangleList;
+        desc.renderState.depthStencilState.depthTestEnable = true;
+        desc.renderState.depthStencilState.depthWriteEnable = true;
+        desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+        desc.renderState.rasterState.frontCounterClockwise = false;
+        desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+        desc.renderState.rasterState.depthBias = kShadowDepthBias;
+        desc.renderState.rasterState.slopeScaledDepthBias = kShadowSlopeBias;
+        desc.renderState.rasterState.depthBiasClamp = 0.0f;
+        return desc;
+    };
+
+    state.depthOpaquePipeline = cache.GetOrCreatePipeline("SunShadowDepth_Opaque",
+        makeDesc(state.depthOpaquePS, state.depthOpaqueLayout, false), fbInfo, nvDevice);
+    state.depthATPipeline = cache.GetOrCreatePipeline("SunShadowDepth_AT",
+        makeDesc(state.depthATPS, state.depthATLayout, true), fbInfo, nvDevice);
+
+    if (!state.depthOpaquePipeline || !state.depthATPipeline) {
+        Msg("! [SunShadow] depth pipeline creation failed");
+        state.depthPipelinesFailed = true;
+        return false;
+    }
+
+    Msg("* [SunShadow] depth pipelines initialized");
     return true;
 }
 
@@ -162,6 +254,30 @@ bool EnsureCullBuffers(nvrhi::IDevice* nvDevice, SunShadowState& state, u32 entr
 
     state.streamCapacity = entryCount;
     return true;
+}
+
+bool EnsureFarMap(nvrhi::IDevice* nvDevice, SunShadowState& state, u32 size)
+{
+    if (state.farMap && state.farMapSize == size)
+        return true;
+
+    nvrhi::TextureDesc desc;
+    desc.width = size;
+    desc.height = size;
+    desc.format = nvrhi::Format::D32;
+    desc.debugName = "SunShadow_Far";
+    desc.isShaderResource = true;
+    desc.isRenderTarget = true;
+    desc.isTypeless = true;
+    desc.useClearValue = true;
+    desc.clearValue = nvrhi::Color(0.0f);
+    desc.initialState = nvrhi::ResourceStates::DepthWrite;
+    desc.keepInitialState = true;
+    state.farMap = nvDevice->createTexture(desc);
+    state.farMapSize = state.farMap ? size : 0;
+    if (!state.farMap)
+        Msg("! [SunShadow] far map creation failed (%u)", size);
+    return state.farMap != nullptr;
 }
 
 void ProcessReadback(nvrhi::IDevice* nvDevice, SunShadowState& state)
@@ -281,6 +397,98 @@ void ExecuteSunShadowCull(fg::RenderContext* ctx, const SunShadowCullData& data)
     ScheduleReadback(cmdList, state);
 }
 
+void ExecuteSunShadowFar(fg::RenderContext* ctx, const FrameGraph& fg, const SunShadowFarData& data)
+{
+    SunShadowState& state = *data.state;
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+    nvrhi::ITexture* farMap = fg.GetPhysicalTexture(data.farMap);
+    if (!cmdList || !nvDevice || !farMap)
+        return;
+
+    cmdList->clearDepthStencilTexture(farMap, nvrhi::AllSubresources, true, 0.0f, false, 0);
+
+    if (!state.farValid || !state.countBuffer)
+        return;
+    if (!EnsureDepthPipelines(data.device, state))
+        return;
+
+    const SunShadowDrawConfig& cfg = data.config;
+    if (!cfg.entryBuffer || !cfg.megaVertexBuffer || !cfg.megaIndexBuffer)
+        return;
+
+    if (cfg.materialCache)
+        cfg.materialCache->FinalizePendingMaterials(ctx);
+    auto& matBuffer = bindless::MaterialBuffer::Instance();
+    matBuffer.Upload(ctx);
+
+    auto& cache = framegraph::GetPassResourceCache();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* vsRefl = shaderLoader->GetCachedReflection("cluster_pull", ".vs");
+    auto* opaqueRefl = shaderLoader->GetCachedReflection("bindless_depth_opaque", ".ps");
+    auto* atRefl = shaderLoader->GetCachedReflection("shadow_depth_at", ".ps");
+    if (!vsRefl || !opaqueRefl || !atRefl)
+        return;
+
+    nvrhi::FramebufferDesc fbDesc;
+    fbDesc.setDepthAttachment(farMap);
+    auto framebuffer = cache.GetOrCreateFramebuffer("SunShadowFar", fbDesc, nvDevice);
+    if (!framebuffer)
+        return;
+
+    StaticGlobals globals = BuildStaticGlobals();
+    globals.m_VP = state.farVP;
+    auto lightCB = cache.GetOrCreateVolatileCB("SunShadow", "StaticGlobals", sizeof(StaticGlobals), data.device);
+    cmdList->writeBuffer(lightCB, &globals, sizeof(globals));
+
+    auto* backend = data.device->GetBackend();
+    nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
+
+    const auto& rtDesc = farMap->getDesc();
+    nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
+
+    auto drawStream = [&](nvrhi::IGraphicsPipeline* pipeline, nvrhi::IBindingLayout* layout,
+                          const ExtractedReflection& psRefl, nvrhi::IBuffer* instanceBuffer,
+                          nvrhi::IBuffer* stream, nvrhi::IBuffer* args, bool withBindless, const char* label) {
+        if (!pipeline || !layout || !instanceBuffer || !stream || !args)
+            return;
+
+        framegraph::BindingSetBuilder bsb(*vsRefl, psRefl, nvDevice, label);
+        bsb.ConstantBuffer("static_globals", lightCB);
+        if (withBindless)
+            bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+        bsb.BufferSRV("g_InstanceData", instanceBuffer);
+        bsb.BufferSRV("g_VisibleEntries", stream);
+        bsb.BufferSRV("g_Entries", cfg.entryBuffer);
+        bsb.BufferSRV("g_MegaVB", cfg.megaVertexBuffer);
+        bsb.BufferSRV("g_MegaIB", cfg.megaIndexBuffer);
+
+        auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDevice);
+        if (!bindingSet)
+            return;
+
+        nvrhi::GraphicsState gs;
+        gs.pipeline = pipeline;
+        gs.framebuffer = framebuffer;
+        gs.bindings = { bindingSet };
+        if (withBindless && bindlessTable)
+            gs.addBindingSet(bindlessTable);
+        gs.indirectParams = args;
+        gs.viewport.addViewport(viewport);
+        gs.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
+
+        cmdList->setGraphicsState(gs);
+        cmdList->drawIndirect(0, 1);
+    };
+
+    drawStream(state.depthOpaquePipeline, state.depthOpaqueLayout, *opaqueRefl,
+        cfg.staticInstanceBuffer, state.opaqueStream, state.opaqueArgs, false, "SunShadow.Opaque");
+    drawStream(state.depthOpaquePipeline, state.depthOpaqueLayout, *opaqueRefl,
+        cfg.terrainInstanceBuffer, state.terrainStream, state.terrainArgs, false, "SunShadow.Terrain");
+    drawStream(state.depthATPipeline, state.depthATLayout, *atRefl,
+        cfg.staticInstanceBuffer, state.atStream, state.atArgs, true, "SunShadow.AT");
+}
+
 } // namespace
 
 void ComputeSunFarVP(Fmatrix& outVP, float& outTexel, const Fvector& sunDirIn, float boxSize, u32 mapSize)
@@ -373,6 +581,54 @@ SunShadowCullOutput setupSunShadowCullPass(
     out.atArgs = passData.atArgs;
     out.active = true;
     return out;
+}
+
+framegraph::VirtualResourceHandle setupSunShadowFarPass(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    const SunShadowCullOutput& cull,
+    const SunShadowDrawConfig& config,
+    SunShadowState* state)
+{
+    if (!state || !device || !cull.active)
+        return VirtualResourceHandle();
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    if (!nvDevice)
+        return VirtualResourceHandle();
+
+    const u32 size = u32(std::max(ps_r_sun_shadow_far_size, 64));
+    if (!EnsureFarMap(nvDevice, *state, size))
+        return VirtualResourceHandle();
+
+    ResourceDesc mapDesc;
+    mapDesc.type = ResourceDesc::Type::Texture2D;
+    mapDesc.width = size;
+    mapDesc.height = size;
+    mapDesc.format = nvrhi::Format::D32;
+    mapDesc.isDepthStencil = true;
+    mapDesc.isImported = true;
+    mapDesc.isTransient = false;
+    mapDesc.debugName = "rt_SunShadowFar";
+    VirtualResourceHandle farHandle = fg.ImportTexture("rt_SunShadowFar", state->farMap, mapDesc);
+
+    auto& passData = fg.addCallbackPass<SunShadowFarData>(
+        "Sun Shadow Far",
+        [&, farHandle, cull, config, state](FrameGraph& builder, PassHandle passHandle, SunShadowFarData& data) {
+            data.state = state;
+            data.device = device;
+            data.config = config;
+
+            RenderPassBuilder passBuilder(builder, passHandle);
+            data.farMap = passBuilder.write(farHandle, ResourceState::DepthStencilWrite);
+            data.opaqueArgs = passBuilder.read(cull.opaqueArgs, ResourceState::IndirectArgument);
+            data.terrainArgs = passBuilder.read(cull.terrainArgs, ResourceState::IndirectArgument);
+            data.atArgs = passBuilder.read(cull.atArgs, ResourceState::IndirectArgument);
+        },
+        [](const SunShadowFarData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            ExecuteSunShadowFar(ctx, fg, data);
+        });
+
+    return passData.farMap;
 }
 
 } // namespace xray::render::fg::passes
