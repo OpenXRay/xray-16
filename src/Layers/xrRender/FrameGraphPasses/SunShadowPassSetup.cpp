@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SunShadowPassSetup.h"
 #include "ShaderConstants.h"
+#include "PassCommon.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
@@ -80,6 +81,7 @@ struct SunShadowMapData {
     VirtualResourceHandle opaqueArgs;
     VirtualResourceHandle terrainArgs;
     VirtualResourceHandle atArgs;
+    VirtualResourceHandle dynamicArgs;
     SunShadowState* state;
     fg::RenderDevice* device;
     SunShadowDrawConfig config;
@@ -166,8 +168,10 @@ bool EnsureDepthPipelines(fg::RenderDevice* device, SunShadowState& state)
     auto vsResult = shaderLoader->LoadVertexShader("cluster_pull", "main");
     auto opaqueResult = shaderLoader->LoadPixelShader("bindless_depth_opaque", "main");
     auto atResult = shaderLoader->LoadPixelShader("shadow_depth_at", "main");
-    if (!vsResult.handle || !opaqueResult.handle || !atResult.handle ||
-        !vsResult.reflection || !opaqueResult.reflection || !atResult.reflection) {
+    auto forwardVsResult = shaderLoader->LoadVertexShader("bindless_forward", "main");
+    auto dynamicResult = shaderLoader->LoadPixelShader("bindless_depth_at", "main");
+    if (!vsResult.handle || !opaqueResult.handle || !atResult.handle || !forwardVsResult.handle || !dynamicResult.handle ||
+        !vsResult.reflection || !opaqueResult.reflection || !atResult.reflection || !forwardVsResult.reflection || !dynamicResult.reflection) {
         Msg("! [SunShadow] depth shaders failed to load");
         state.depthPipelinesFailed = true;
         return false;
@@ -176,16 +180,24 @@ bool EnsureDepthPipelines(fg::RenderDevice* device, SunShadowState& state)
     state.clusterVS = vsResult.handle;
     state.depthOpaquePS = opaqueResult.handle;
     state.depthATPS = atResult.handle;
+    state.forwardVS = forwardVsResult.handle;
+    state.depthDynamicPS = dynamicResult.handle;
 
     auto& cache = framegraph::GetPassResourceCache();
     state.depthOpaqueLayout = cache.GetOrCreateBindingLayoutFromReflection(
         "SunShadowDepth_Opaque", *vsResult.reflection, *opaqueResult.reflection, nvDevice);
     state.depthATLayout = cache.GetOrCreateBindingLayoutFromReflection(
         "SunShadowDepth_AT", *vsResult.reflection, *atResult.reflection, nvDevice);
-    if (!state.depthOpaqueLayout || !state.depthATLayout) {
+    state.depthDynamicLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "SunShadowDepth_Dynamic", *forwardVsResult.reflection, *dynamicResult.reflection, nvDevice);
+    if (!state.depthOpaqueLayout || !state.depthATLayout || !state.depthDynamicLayout) {
         state.depthPipelinesFailed = true;
         return false;
     }
+
+    u32 attrCount = 0;
+    auto* attrs = GetUnifiedVertexAttributes(attrCount);
+    state.depthDynamicInputLayout = nvDevice->createInputLayout(attrs, attrCount, state.forwardVS);
 
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
@@ -193,11 +205,11 @@ bool EnsureDepthPipelines(fg::RenderDevice* device, SunShadowState& state)
     nvrhi::FramebufferInfoEx fbInfo;
     fbInfo.depthFormat = nvrhi::Format::D32;
 
-    auto makeDesc = [&](nvrhi::IShader* pixelShader, nvrhi::IBindingLayout* layout, bool withBindless) {
+    auto makeDesc = [&](nvrhi::IShader* vs, nvrhi::IInputLayout* il, nvrhi::IShader* pixelShader, nvrhi::IBindingLayout* layout, bool withBindless) {
         nvrhi::GraphicsPipelineDesc desc;
-        desc.VS = state.clusterVS;
+        desc.VS = vs;
         desc.PS = pixelShader;
-        desc.inputLayout = nullptr;
+        desc.inputLayout = il;
         if (withBindless && bindlessLayout)
             desc.bindingLayouts = { layout, bindlessLayout };
         else
@@ -215,11 +227,13 @@ bool EnsureDepthPipelines(fg::RenderDevice* device, SunShadowState& state)
     };
 
     state.depthOpaquePipeline = cache.GetOrCreatePipeline("SunShadowDepth_Opaque",
-        makeDesc(state.depthOpaquePS, state.depthOpaqueLayout, false), fbInfo, nvDevice);
+        makeDesc(state.clusterVS, nullptr, state.depthOpaquePS, state.depthOpaqueLayout, false), fbInfo, nvDevice);
     state.depthATPipeline = cache.GetOrCreatePipeline("SunShadowDepth_AT",
-        makeDesc(state.depthATPS, state.depthATLayout, true), fbInfo, nvDevice);
+        makeDesc(state.clusterVS, nullptr, state.depthATPS, state.depthATLayout, true), fbInfo, nvDevice);
+    state.depthDynamicPipeline = cache.GetOrCreatePipeline("SunShadowDepth_Dynamic",
+        makeDesc(state.forwardVS, state.depthDynamicInputLayout, state.depthDynamicPS, state.depthDynamicLayout, true), fbInfo, nvDevice);
 
-    if (!state.depthOpaquePipeline || !state.depthATPipeline) {
+    if (!state.depthOpaquePipeline || !state.depthATPipeline || !state.depthDynamicPipeline) {
         Msg("! [SunShadow] depth pipeline creation failed");
         state.depthPipelinesFailed = true;
         return false;
@@ -564,6 +578,45 @@ void ExecuteSunShadowMap(fg::RenderContext* ctx, const FrameGraph& fg, const Sun
         cfg.terrainInstanceBuffer, target.terrainStream, target.terrainArgs, false, "SunShadow.Terrain");
     drawStream(state.depthATPipeline, state.depthATLayout, *atRefl,
         cfg.staticInstanceBuffer, target.atStream, target.atArgs, true, "SunShadow.AT");
+
+    if (data.target == kSunTargetFar)
+        return;
+    if (!cfg.dynamicCompactDrawArgs || !cfg.dynamicCompactMaterialIDs || !cfg.dynamicCompactBatchIndices ||
+        !cfg.dynamicCompactCount || !cfg.dynamicInstanceBuffer || !cfg.dynamicFadeBuffer || cfg.dynamicObjectCount == 0 ||
+        !state.depthDynamicPipeline || !state.depthDynamicLayout)
+        return;
+
+    auto* forwardVsRefl = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
+    auto* dynamicPsRefl = shaderLoader->GetCachedReflection("bindless_depth_at", ".ps");
+    nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("SunShadow", nvDevice);
+    if (!forwardVsRefl || !dynamicPsRefl || !drawIndexBuffer)
+        return;
+
+    framegraph::BindingSetBuilder dbsb(*forwardVsRefl, *dynamicPsRefl, nvDevice, "SunShadow.Dynamic");
+    dbsb.ConstantBuffer("static_globals", lightCB);
+    dbsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+    dbsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
+    dbsb.BufferSRV("g_CompactBatchIndices", cfg.dynamicCompactBatchIndices);
+    dbsb.BufferSRV("g_CompactMaterialIDs", cfg.dynamicCompactMaterialIDs);
+    dbsb.BufferSRV("g_DrawFades", cfg.dynamicFadeBuffer);
+    auto dynamicSet = cache.GetOrCreateBindingSet(dbsb.Build(), state.depthDynamicLayout, nvDevice);
+    if (!dynamicSet)
+        return;
+
+    nvrhi::GraphicsState gs;
+    gs.pipeline = state.depthDynamicPipeline;
+    gs.framebuffer = framebuffer;
+    gs.bindings = { dynamicSet };
+    if (bindlessTable)
+        gs.addBindingSet(bindlessTable);
+    gs.vertexBuffers = { { cfg.megaVertexBuffer, 0, 0 }, { drawIndexBuffer, 1, 0 } };
+    gs.indexBuffer = { cfg.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
+    gs.indirectParams = cfg.dynamicCompactDrawArgs;
+    gs.indirectCountBuffer = cfg.dynamicCompactCount;
+    gs.viewport.addViewport(viewport);
+    gs.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
+    cmdList->setGraphicsState(gs);
+    DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, cfg.dynamicObjectCount);
 }
 
 } // namespace
@@ -804,6 +857,8 @@ SunShadowMaps setupSunShadowMapPasses(
                 data.opaqueArgs = passBuilder.read(cullTarget.opaqueArgs, ResourceState::IndirectArgument);
                 data.terrainArgs = passBuilder.read(cullTarget.terrainArgs, ResourceState::IndirectArgument);
                 data.atArgs = passBuilder.read(cullTarget.atArgs, ResourceState::IndirectArgument);
+                if (t != kSunTargetFar && config.dynamicArgs.is_valid())
+                    data.dynamicArgs = passBuilder.read(config.dynamicArgs, ResourceState::IndirectArgument);
             },
             [](const SunShadowMapData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
                 ExecuteSunShadowMap(ctx, fg, data);
