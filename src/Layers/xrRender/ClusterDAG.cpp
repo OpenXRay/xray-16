@@ -191,12 +191,14 @@ void FillAttributes(const bindless::UnifiedVertex* verts, u32 count, float* attr
     }
 }
 
-clodConfig MakeConfig()
+clodConfig MakeConfig(bool leavesOnly)
 {
     clodConfig cfg = clodDefaultConfig(kClusterMaxTris);
     cfg.optimize_bounds = true;
     cfg.simplify_fallback_sloppy = false;
     cfg.simplify_prune = true;
+    if (leavesOnly)
+        cfg.simplify_ratio = 1.0f;
     return cfg;
 }
 
@@ -236,7 +238,7 @@ void BakeSingleMesh(
     ctx.protoFlags = ((rangeFlags & CLUSTER_RANGE_FLAG_AT) ? CLUSTER_PROTO_FLAG_AT : 0) |
                      ((rangeFlags & CLUSTER_RANGE_FLAG_TERRAIN) ? CLUSTER_PROTO_FLAG_TERRAIN : 0);
 
-    clodBuild(MakeConfig(), mesh, &ctx, &OutputGroupCB);
+    clodBuild(MakeConfig((rangeFlags & CLUSTER_RANGE_FLAG_AT) != 0), mesh, &ctx, &OutputGroupCB);
     result.baked = !result.protos.empty();
 }
 
@@ -338,7 +340,7 @@ void BakeComponent(
     ctx.protoFlags = (ranges[members[0]].flags & CLUSTER_RANGE_FLAG_TERRAIN)
         ? CLUSTER_PROTO_FLAG_TERRAIN : 0;
 
-    clodBuild(MakeConfig(), mesh, &ctx, &OutputGroupCB);
+    clodBuild(MakeConfig(false), mesh, &ctx, &OutputGroupCB);
     result.baked = !result.protos.empty();
 }
 
@@ -350,7 +352,7 @@ bool IsSelfLoop(const ClusterMetaProto& p)
 }
 
 constexpr u32 kCacheMagic = 0x464C4356;
-constexpr u32 kCacheVersion = 3;
+constexpr u32 kCacheVersion = 4;
 
 #pragma pack(push, 4)
 struct CacheHeader {
