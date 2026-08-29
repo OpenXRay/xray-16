@@ -13,6 +13,8 @@ namespace xray::render {
 
 namespace xray::render::framegraph {
     class FrameGraph;
+    class RenderPassBuilder;
+    class BindingSetBuilder;
 }
 
 namespace xray::profiler {
@@ -23,7 +25,8 @@ namespace xray::render::fg::passes {
 
 constexpr u32 kSunTargetFar = 0;
 constexpr u32 kSunTargetCasc0 = 1;
-constexpr u32 kSunTargetCount = 2;
+constexpr u32 kSunTargetCasc1 = 2;
+constexpr u32 kSunTargetCount = 3;
 
 struct SunShadowTarget {
     static constexpr u32 kReadbackSlots = 6;
@@ -103,9 +106,12 @@ struct SunShadowDrawConfig {
 };
 
 struct SunShadowMaps {
-    framegraph::VirtualResourceHandle far;
-    framegraph::VirtualResourceHandle casc0;
+    framegraph::VirtualResourceHandle maps[kSunTargetCount];
 };
+
+void ReadSunShadowMaps(framegraph::RenderPassBuilder& builder, const SunShadowMaps& in, SunShadowMaps& out);
+void ResolveSunShadowMaps(const framegraph::FrameGraph& fg, const SunShadowMaps& maps, nvrhi::IDevice* device, nvrhi::ITexture** out);
+void BindSunShadowMaps(framegraph::BindingSetBuilder& bsb, nvrhi::ITexture* const* maps);
 
 void InvalidateSunShadowCache(SunShadowState& state);
 

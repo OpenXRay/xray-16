@@ -498,12 +498,19 @@ void FrameGraphRenderer::Render() {
         const auto& sunShadow = m_blackboard->get_or_add<passes::SunShadowState>();
         const auto& sunFar = sunShadow.targets[passes::kSunTargetFar];
         const auto& sunCasc0 = sunShadow.targets[passes::kSunTargetCasc0];
+        const auto& sunCasc1 = sunShadow.targets[passes::kSunTargetCasc1];
         if (sunShadow.receiverActive && sunFar.valid && sunFar.mapSize > 0) {
             const bool casc0Active = sunCasc0.valid && sunCasc0.mapSize > 0;
+            const bool casc1Active = sunCasc1.valid && sunCasc1.mapSize > 0;
             staticGlobalsData.shadow_matrices[2] = sunFar.vp;
             if (casc0Active)
                 staticGlobalsData.shadow_matrices[0] = sunCasc0.vp;
-            staticGlobalsData.cascade_splits.set(1.0f, casc0Active ? 1.0f / float(sunCasc0.mapSize) : 0.0f, 1.0f / float(sunFar.mapSize), 0.0f);
+            if (casc1Active)
+                staticGlobalsData.shadow_matrices[1] = sunCasc1.vp;
+            staticGlobalsData.cascade_splits.set(1.0f,
+                casc0Active ? 1.0f / float(sunCasc0.mapSize) : 0.0f,
+                1.0f / float(sunFar.mapSize),
+                casc1Active ? 1.0f / float(sunCasc1.mapSize) : 0.0f);
         }
     }
 
@@ -770,6 +777,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
             const auto& sunShadow = m_blackboard->get_or_add<passes::SunShadowState>();
             const auto& sunFar = sunShadow.targets[passes::kSunTargetFar];
             const auto& sunCasc0 = sunShadow.targets[passes::kSunTargetCasc0];
+            const auto& sunCasc1 = sunShadow.targets[passes::kSunTargetCasc1];
             stats.sunCasterCandidates = sunShadow.candidates;
             stats.sunCastersOpaque = sunFar.castersOpaque;
             stats.sunCastersTerrain = sunFar.castersTerrain;
@@ -777,6 +785,9 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.sunCasc0Opaque = sunCasc0.castersOpaque;
             stats.sunCasc0Terrain = sunCasc0.castersTerrain;
             stats.sunCasc0AT = sunCasc0.castersAT;
+            stats.sunCasc1Opaque = sunCasc1.castersOpaque;
+            stats.sunCasc1Terrain = sunCasc1.castersTerrain;
+            stats.sunCasc1AT = sunCasc1.castersAT;
             stats.sunFarRedraws = sunShadow.farRedraws;
             stats.sunFarCached = !sunFar.redraw;
         }
@@ -1194,12 +1205,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             sunCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
             sunCfg.materialCache = m_materialCache.get();
             sunShadowMaps = passes::setupSunShadowMapPasses(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState, m_gpuProfiler.get());
-            if (sunShadowMaps.far.is_valid())
-                m_framegraph->GetRTRegistry().RegisterRT("rt_SunShadowFar", sunShadowMaps.far);
-            if (sunShadowMaps.casc0.is_valid())
-                m_framegraph->GetRTRegistry().RegisterRT("rt_SunShadowCasc0", sunShadowMaps.casc0);
         }
-        sunShadowState.receiverActive = sunShadowMaps.far.is_valid();
+        sunShadowState.receiverActive = sunShadowMaps.maps[passes::kSunTargetFar].is_valid();
     }
 
     bool prepassActive = false;

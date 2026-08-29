@@ -78,8 +78,7 @@ struct SkinningPassData {
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle skinnedDrawArgs;
-    framegraph::VirtualResourceHandle sunShadowFar;
-    framegraph::VirtualResourceHandle sunShadowCasc0;
+    SunShadowMaps sunShadowMaps;
     fg::RenderDevice* device;
     const GeometryCollector* geometry;
     const xr_vector<GeometryBatch>* hudBatches;

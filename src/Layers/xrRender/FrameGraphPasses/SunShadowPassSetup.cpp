@@ -27,6 +27,8 @@ constexpr float kFarRedrawDist = 10.0f;
 constexpr float kFarSunDotRedraw = 0.99999847f;
 constexpr float kCascadeBox0 = 25.0f;
 constexpr u32 kCascadeSize0 = 4096;
+constexpr float kCascadeBox1 = 60.0f;
+constexpr u32 kCascadeSize1 = 2048;
 constexpr float kCascadeZBehind = -160.0f;
 constexpr float kCascadeZAhead = 460.0f;
 constexpr float kAnchorGrid = 4.0f;
@@ -43,13 +45,16 @@ struct TargetNames {
     const char* argsOpaqueName;
     const char* argsTerrainName;
     const char* argsATName;
+    const char* srvName;
 };
 
 constexpr TargetNames kTargetNames[kSunTargetCount] = {
     { "Far", "Sun Shadow Far", "Shadow/Far", "rt_SunShadowFar", "SunShadowFar",
-      "sun_shadow_args_opaque_far", "sun_shadow_args_terrain_far", "sun_shadow_args_at_far" },
+      "sun_shadow_args_opaque_far", "sun_shadow_args_terrain_far", "sun_shadow_args_at_far", "g_SunShadowFar" },
     { "Casc0", "Sun Shadow Casc0", "Shadow/Casc0", "rt_SunShadowCasc0", "SunShadowCasc0",
-      "sun_shadow_args_opaque_casc0", "sun_shadow_args_terrain_casc0", "sun_shadow_args_at_casc0" },
+      "sun_shadow_args_opaque_casc0", "sun_shadow_args_terrain_casc0", "sun_shadow_args_at_casc0", "g_SunShadowCasc0" },
+    { "Casc1", "Sun Shadow Casc1", "Shadow/Casc1", "rt_SunShadowCasc1", "SunShadowCasc1",
+      "sun_shadow_args_opaque_casc1", "sun_shadow_args_terrain_casc1", "sun_shadow_args_at_casc1", "g_SunShadowCasc1" },
 };
 
 struct alignas(16) SunShadowCullParams {
@@ -698,6 +703,13 @@ SunShadowCullOutput setupSunShadowCullPass(
     casc0.valid = true;
     casc0.redraw = true;
 
+    SunShadowTarget& casc1 = state->targets[kSunTargetCasc1];
+    casc1.redraw = !casc1.valid || (Device.dwFrame & 1) == 0;
+    if (casc1.redraw) {
+        ComputeSunCascadeVP(casc1.vp, casc1.texel, sunDir, kCascadeBox1, kCascadeSize1);
+        casc1.valid = true;
+    }
+
     state->candidates = entryCount;
 
     ResourceDesc argsDesc;
@@ -761,7 +773,8 @@ SunShadowMaps setupSunShadowMapPasses(
     for (u32 t = 0; t < kSunTargetCount; ++t) {
         SunShadowTarget& target = state->targets[t];
         const TargetNames& names = kTargetNames[t];
-        const u32 size = (t == kSunTargetFar) ? u32(std::max(ps_r_sun_shadow_far_size, 64)) : kCascadeSize0;
+        const u32 size = (t == kSunTargetFar) ? u32(std::max(ps_r_sun_shadow_far_size, 64))
+            : (t == kSunTargetCasc0 ? kCascadeSize0 : kCascadeSize1);
         if (!EnsureMap(nvDevice, target, names.suffix, size))
             continue;
 
@@ -796,12 +809,33 @@ SunShadowMaps setupSunShadowMapPasses(
                 ExecuteSunShadowMap(ctx, fg, data);
             });
 
-        if (t == kSunTargetFar)
-            maps.far = passData.map;
-        else
-            maps.casc0 = passData.map;
+        fg.GetRTRegistry().RegisterRT(names.rtName, passData.map);
+        maps.maps[t] = passData.map;
     }
     return maps;
+}
+
+void ReadSunShadowMaps(RenderPassBuilder& builder, const SunShadowMaps& in, SunShadowMaps& out)
+{
+    for (u32 t = 0; t < kSunTargetCount; ++t) {
+        if (in.maps[t].is_valid())
+            out.maps[t] = builder.read(in.maps[t], ResourceState::ShaderResource);
+    }
+}
+
+void ResolveSunShadowMaps(const FrameGraph& fg, const SunShadowMaps& maps, nvrhi::IDevice* device, nvrhi::ITexture** out)
+{
+    nvrhi::ITexture* dummy = framegraph::GetPassResourceCache().GetDummyShadowMap2D(device);
+    for (u32 t = 0; t < kSunTargetCount; ++t) {
+        nvrhi::ITexture* tex = maps.maps[t].is_valid() ? fg.GetPhysicalTexture(maps.maps[t]) : nullptr;
+        out[t] = tex ? tex : dummy;
+    }
+}
+
+void BindSunShadowMaps(BindingSetBuilder& bsb, nvrhi::ITexture* const* maps)
+{
+    for (u32 t = 0; t < kSunTargetCount; ++t)
+        bsb.Texture(kTargetNames[t].srvName, maps[t]);
 }
 
 } // namespace xray::render::fg::passes
