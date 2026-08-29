@@ -516,6 +516,15 @@ void StatsOverlay::RenderGeometrySection()
             ImGui::Unindent();
         }
 
+        if (s.sunCasterCandidates > 0)
+        {
+            ImGui::Text("Sun shadow:");
+            ImGui::Indent();
+            ImGui::Text("Casters: %u opaque / %u terrain / %u AT of %u",
+                s.sunCastersOpaque, s.sunCastersTerrain, s.sunCastersAT, s.sunCasterCandidates);
+            ImGui::Unindent();
+        }
+
         if (s.particleCullSubmitted > 0)
         {
             ImGui::Text("Particle Culling:");
