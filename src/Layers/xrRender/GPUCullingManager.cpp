@@ -4139,7 +4139,7 @@ void GPUCullingManager::BuildClusterEntries()
     };
 
     auto emitEntry = [&](const ClusterMetaProto& p, const ClusterUnitRecord& rec,
-                         u32 batchIndex, const Fmatrix& world, u32 materialID) {
+                         u32 batchIndex, const Fmatrix& world, u32 materialID, u32 extraFlags = 0u) {
         const float scale = axisScale(world);
 
         GPUClusterEntry e;
@@ -4166,7 +4166,8 @@ void GPUCullingManager::BuildClusterEntries()
         e.batchIndex = batchIndex;
         e.materialID = materialID;
         e.flags = ((p.flags & CLUSTER_PROTO_FLAG_AT) ? GPU_CLUSTER_ENTRY_AT : 0) |
-                  ((p.flags & CLUSTER_PROTO_FLAG_TERRAIN) ? GPU_CLUSTER_ENTRY_TERRAIN : 0);
+                  ((p.flags & CLUSTER_PROTO_FLAG_TERRAIN) ? GPU_CLUSTER_ENTRY_TERRAIN : 0) |
+                  extraFlags;
 
         u32 errClass = 3;
         if (e.parentError < 1.0f) errClass = 0;
@@ -4177,30 +4178,44 @@ void GPUCullingManager::BuildClusterEntries()
         m_clusterEntryData.push_back(e);
     };
 
-    auto emitStatic = [&](const ClusterMetaProto& p, const ClusterUnitRecord& rec, u32 batchIndex) {
+    auto emitStatic = [&](const ClusterMetaProto& p, const ClusterUnitRecord& rec, u32 batchIndex, u32 extraFlags) {
         emitEntry(p, rec, batchIndex, m_staticInstanceData[batchIndex].world,
-            m_staticMaterialIDData[batchIndex]);
+            m_staticMaterialIDData[batchIndex], extraFlags);
     };
 
     u32 clusteredBatches = 0;
+    u32 shadowOnlyBatches = 0;
+    u32 unclusteredBatches = 0;
+    xr_vector<u8> shadowOnly(staticCount, 0);
     for (u32 i = 0; i < staticCount; ++i) {
         const ClusterMeshKey& key = m_staticBatchKeys[i];
         if (key.indexCount == 0)
             continue;
-        if (m_staticObjectData[i].flags & GPU_OBJECT_PREPASS_SKIP)
-            continue;
+        if (m_staticObjectData[i].flags & GPU_OBJECT_PREPASS_SKIP) {
+            const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(m_staticMaterialIDData[i]);
+            if (!mat || (mat->flags & bindless::MAT_FLAG_ALPHA_BLEND))
+                continue;
+            shadowOnly[i] = 1;
+        }
 
         u32 member = 0;
         const ClusterUnitRecord* rec = m_clusterDAG.FindRecord(key, member);
-        if (!rec)
+        if (!rec) {
+            unclusteredBatches++;
             continue;
+        }
 
-        m_staticObjectData[i].flags |= GPU_OBJECT_CLUSTERED;
-        clusteredBatches++;
+        if (shadowOnly[i]) {
+            shadowOnlyBatches++;
+        } else {
+            m_staticObjectData[i].flags |= GPU_OBJECT_CLUSTERED;
+            clusteredBatches++;
+        }
+        const u32 extraFlags = shadowOnly[i] ? u32(GPU_CLUSTER_ENTRY_SHADOW_ONLY) : 0u;
 
         if (!rec->isComponent) {
             for (u32 p = 0; p < rec->protoCount; ++p)
-                emitStatic(protos[rec->firstProto + p], *rec, i);
+                emitStatic(protos[rec->firstProto + p], *rec, i, extraFlags);
         } else {
             const u32 recIdx = u32(rec - records.data());
             xr_vector<u32>& memberBatch = componentBatches[recIdx];
@@ -4232,7 +4247,7 @@ void GPUCullingManager::BuildClusterEntries()
             const u32 batch = (proto.member < memberBatch.size() && memberBatch[proto.member] != UINT32_MAX)
                 ? memberBatch[proto.member]
                 : fallback;
-            emitStatic(proto, rec, batch);
+            emitStatic(proto, rec, batch, shadowOnly[batch] ? u32(GPU_CLUSTER_ENTRY_SHADOW_ONLY) : 0u);
         }
     }
 
@@ -4297,6 +4312,7 @@ void GPUCullingManager::BuildClusterEntries()
 
     m_clusterSet.entryCount = u32(m_clusterEntryData.size());
     m_clusterSet.terrainEntryCount = m_clusterSet.entryCount - m_clusterSet.staticEntryCount;
+    Msg("* [GPUCulling] cluster coverage: %u static batches shadow-only (variant materials), %u without a DAG record", shadowOnlyBatches, unclusteredBatches);
     Msg("* [GPUCulling] cluster entries: %u (%u static + %u terrain) from %u+%u clustered batches",
         m_clusterSet.entryCount, m_clusterSet.staticEntryCount, m_clusterSet.terrainEntryCount,
         clusteredBatches, clusteredTerrain);
