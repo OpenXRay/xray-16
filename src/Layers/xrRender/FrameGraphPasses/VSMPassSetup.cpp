@@ -908,8 +908,9 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     rp.curCamPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 0.0f);
     rp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
     rp.params.set(histOK ? ps_r_vsm_ta_blend : 0.0f, kVSMRejectTol, histOK ? 1.0f : 0.0f, 0.0f);
-    rp.params2.set(ps_r_vsm_ta_clamp, ps_r_vsm_ta_motion, ps_r_vsm_ta_motion_floor, 0.0f);
-    rp.params3.set(0.0f, 0.0f, 0.0f, 0.0f);
+    const bool softOn = ps_r_vsm_soft >= 1;
+    rp.params2.set(softOn ? ps_r_vsm_soft_clamp : ps_r_vsm_ta_clamp, ps_r_vsm_ta_motion, ps_r_vsm_ta_motion_floor, ps_r_vsm_bias_min);
+    rp.params3.set(softOn ? float(ps_r_vsm_soft) : 0.0f, float(ps_r_vsm_soft_search), tanf(deg2rad(ps_r_vsm_soft_angle)), ps_r_vsm_soft_range);
     rp.params4.set(float(state.resolveCount & 63u), histOK ? ps_r_vsm_ta_carry : 0.0f, 0.0f, 0.0f);
     auto resolveCB = cache.GetOrCreateVolatileCB("VSM", "ResolveParams", sizeof(VsmResolveParams), data.device);
     cmdList->writeBuffer(resolveCB, &rp, sizeof(rp));
