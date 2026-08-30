@@ -490,8 +490,8 @@ void LogTelemetry(VSMState& state)
     Msg("[VSM] static: dirty=%u/%u rendered | wrong=%u | cache %s refresh %d",
         state.dirtyPages, state.markPages, state.wrongPages,
         ps_r_vsm_cache ? "on" : "off", ps_r_vsm_cache_refresh);
-    Msg("[VSM] bin: draws=%u instances=%u maxPagesPerCaster=%u lodCulled=%u drops=%u | k=%.2f",
-        state.binDraws, state.binInstances, state.binMaxPages, state.binLodCulled, state.binDrops, ps_r_vsm_cluster_lod);
+    Msg("[VSM] bin: draws=%u instances=%u maxPagesPerCaster=%u lodCulled=%u drops=%u | k=%.2f at=%d",
+        state.binDraws, state.binInstances, state.binMaxPages, state.binLodCulled, state.binDrops, ps_r_vsm_cluster_lod, ps_r_vsm_at);
     state.sunStepMax = 0.0f;
     state.snapMax = 0;
 }
@@ -661,7 +661,7 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
 
         VsmBinParams bp = {};
         bp.entryCount = data.config.entryCount;
-        bp.includeAT = 0;
+        bp.includeAT = ps_r_vsm_at ? 1u : 0u;
         bp.capOpaque = kVSMPairCapOpaque;
         bp.capTerrain = kVSMPairCapTerrain;
         bp.capAT = kVSMPairCapAT;
@@ -1057,6 +1057,11 @@ VSMOutput setupVSMPasses(
         state->pageATPipeline = nullptr;
         if (live)
             InvalidateVSMCache(*state);
+    }
+    if (state->atMode != (ps_r_vsm_at ? 1 : 0)) {
+        if (state->atMode >= 0)
+            InvalidateVSMCache(*state);
+        state->atMode = ps_r_vsm_at ? 1 : 0;
     }
     LogTelemetry(*state);
     state->active = true;

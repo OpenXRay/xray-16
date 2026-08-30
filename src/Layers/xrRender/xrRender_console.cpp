@@ -301,6 +301,7 @@ int   ps_r_vsm_cache_refresh   = 8;
 float ps_r_vsm_cluster_lod     = 1.0f;
 float ps_r_vsm_raster_bias     = 0.5f;
 float ps_r_vsm_raster_slope    = 1.5f;
+int   ps_r_vsm_at              = 1;
 
 int   ps_r_smoke_trail_enabled  = 1;
 float ps_r_smoke_max_emit_rate  = 45.f;
@@ -1016,6 +1017,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_vsm_cluster_lod", &ps_r_vsm_cluster_lod, 0.1f, 16.0f);
     CMD4(CCC_Float, "r_vsm_raster_bias", &ps_r_vsm_raster_bias, 0.0f, 16.0f);
     CMD4(CCC_Float, "r_vsm_raster_slope", &ps_r_vsm_raster_slope, 0.0f, 16.0f);
+    CMD4(CCC_Integer, "r_vsm_at", &ps_r_vsm_at, 0, 1);
 
     // Smoke Trail (weapon muzzle smoke)
     CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);
