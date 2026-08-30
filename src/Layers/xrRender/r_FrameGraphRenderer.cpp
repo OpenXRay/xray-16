@@ -736,9 +736,10 @@ void FrameGraphRenderer::RenderStatsOverlay()
         // Collect GPU culling stats
         if (m_gpuCullingManager)
         {
-            stats.objectsSubmitted = m_gpuCullingManager->GetStaticObjectCount() +
+            stats.objectsSubmitted = m_gpuCullingManager->GetStaticResidualCount() +
                                      m_gpuCullingManager->GetDynamicObjectCount() +
-                                     m_gpuCullingManager->GetTerrainObjectCount();
+                                     m_gpuCullingManager->GetTerrainResidualCount() +
+                                     m_gpuCullingManager->GetTransparentObjectCount();
 
             // Use readback data from previous frame (1-frame latency)
             const auto& cullStats = m_gpuCullingManager->GetCullingStats();
@@ -761,6 +762,9 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.clusterVisible = cullStats.clusterVisible;
             stats.clusterTerrainEntries = m_gpuCullingManager->GetClusterTerrainEntryCount();
             stats.clusterTerrainVisible = cullStats.clusterTerrainVisible;
+            stats.clusterStaticEntries = m_gpuCullingManager->GetClusterStaticEntryCount();
+            stats.clusterTrianglesDrawn = cullStats.clusterTrianglesDrawn;
+            stats.clusterTerrainTrianglesDrawn = cullStats.clusterTerrainTrianglesDrawn;
         }
 
         if (m_blackboard)

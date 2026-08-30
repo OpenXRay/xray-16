@@ -332,6 +332,8 @@ public:
     nvrhi::IBuffer* GetDynamicInstanceBuffer() const { return m_dynamicSet.instanceBuffer.Get(); }
 
     nvrhi::IBuffer* GetStaticDrawArgsBuffer() const { return m_staticSet.drawArgsBuffer.Get(); }
+    u32 GetStaticResidualCount() const;
+    u32 GetTerrainResidualCount() const;
     nvrhi::IBuffer* GetDynamicDrawArgsBuffer() const { return m_dynamicSet.drawArgsBuffer.Get(); }
 
     // ───────────────────────────────────────────────────────
@@ -389,6 +391,8 @@ public:
         u32 transparentVisible = 0;
         u32 clusterVisible = 0;
         u32 clusterTerrainVisible = 0;
+        u32 clusterTrianglesDrawn = 0;
+        u32 clusterTerrainTrianglesDrawn = 0;
         u32 totalVisible() const { return staticVisible + dynamicVisible + terrainVisible + transparentVisible; }
     };
     const CullingStats& GetCullingStats() const { return m_cullingStats; }
@@ -564,6 +568,8 @@ private:
         u32 entryCount = 0;
         u32 staticEntryCount = 0;
         u32 terrainEntryCount = 0;
+        u32 residualStaticCount = 0;
+        u32 residualTerrainCount = 0;
         bool uploaded = false;
     };
     ClusterCullBuffers m_clusterSet;

@@ -1683,7 +1683,7 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
     if (!slot)
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32) * 6;
+        desc.byteSize = sizeof(u32) * 8;
         desc.debugName = "CullingStatsReadback";
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
@@ -1748,6 +1748,11 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
             m_clusterSet.countBuffer, sizeof(u32),
             sizeof(u32)
         );
+        cmdList->copyBuffer(
+            slot, sizeof(u32) * 6,
+            m_clusterSet.countBuffer, sizeof(u32) * 2,
+            sizeof(u32) * 2
+        );
     }
 
     m_statsWriteSlot = (m_statsWriteSlot + 1) % STATS_READBACK_SLOTS;
@@ -1782,6 +1787,8 @@ void GPUCullingManager::ProcessStatsReadback()
         m_cullingStats.terrainVisible = counts[2];
         m_cullingStats.clusterVisible = std::min(counts[4], m_clusterSet.staticEntryCount);
         m_cullingStats.clusterTerrainVisible = std::min(counts[5], m_clusterSet.terrainEntryCount);
+        m_cullingStats.clusterTrianglesDrawn = counts[6];
+        m_cullingStats.clusterTerrainTrianglesDrawn = counts[7];
 
         const u32 skinnedSubmitted = m_statsSubmittedSkinned[m_statsWriteSlot];
         const u32 skinnedVisible = std::min(counts[3], skinnedSubmitted);
@@ -4110,12 +4117,28 @@ void GPUCullingManager::BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges
         (m_totalIndexCount * sizeof(u32)) / (1024.0f * 1024.0f));
 }
 
+u32 GPUCullingManager::GetStaticResidualCount() const
+{
+    if (ps_r_cluster && m_clusterSet.entryCount > 0)
+        return m_clusterSet.residualStaticCount;
+    return m_staticSet.objectCount;
+}
+
+u32 GPUCullingManager::GetTerrainResidualCount() const
+{
+    if (ps_r_cluster && m_clusterSet.entryCount > 0)
+        return m_clusterSet.residualTerrainCount;
+    return m_terrainObjectCount;
+}
+
 void GPUCullingManager::BuildClusterEntries()
 {
     m_clusterEntryData.clear();
     m_clusterSet.entryCount = 0;
     m_clusterSet.staticEntryCount = 0;
     m_clusterSet.terrainEntryCount = 0;
+    m_clusterSet.residualStaticCount = 0;
+    m_clusterSet.residualTerrainCount = 0;
     m_clusterSet.uploaded = false;
 
     if (!ps_r_cluster || m_clusterDAG.Empty())
@@ -4252,6 +4275,7 @@ void GPUCullingManager::BuildClusterEntries()
     }
 
     m_clusterSet.staticEntryCount = u32(m_clusterEntryData.size());
+    m_clusterSet.residualStaticCount = staticCount - std::min(clusteredBatches, staticCount);
 
     u32 clusteredTerrain = 0;
     const u32 terrainCount = std::min(u32(m_terrainObjectData.size()), u32(m_terrainBatchKeys.size()));
@@ -4312,6 +4336,7 @@ void GPUCullingManager::BuildClusterEntries()
 
     m_clusterSet.entryCount = u32(m_clusterEntryData.size());
     m_clusterSet.terrainEntryCount = m_clusterSet.entryCount - m_clusterSet.staticEntryCount;
+    m_clusterSet.residualTerrainCount = terrainCount - std::min(clusteredTerrain, terrainCount);
     Msg("* [GPUCulling] cluster coverage: %u static batches shadow-only (variant materials), %u without a DAG record", shadowOnlyBatches, unclusteredBatches);
     Msg("* [GPUCulling] cluster entries: %u (%u static + %u terrain) from %u+%u clustered batches",
         m_clusterSet.entryCount, m_clusterSet.staticEntryCount, m_clusterSet.terrainEntryCount,
@@ -4337,7 +4362,7 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "ClusterCull_Count";
-        desc.byteSize = sizeof(u32) * 2;
+        desc.byteSize = sizeof(u32) * 4;
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
@@ -4386,7 +4411,7 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
     cmdList->writeBuffer(m_clusterSet.entryBuffer,
         m_clusterEntryData.data(), u64(n) * sizeof(GPUClusterEntry));
 
-    u32 zeroCount[2] = { 0, 0 };
+    u32 zeroCount[4] = { 0, 0, 0, 0 };
     cmdList->writeBuffer(m_clusterSet.countBuffer, zeroCount, sizeof(zeroCount));
     u32 zeroArgs[4] = { 384, 0, 0, 0 };
     cmdList->writeBuffer(m_clusterSet.argsBuffer, zeroArgs, sizeof(zeroArgs));
@@ -4476,7 +4501,7 @@ void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi:
         return;
     }
 
-    u32 zero[2] = { 0, 0 };
+    u32 zero[4] = { 0, 0, 0, 0 };
     cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::CopyDest);
     cmdList->writeBuffer(m_clusterSet.countBuffer, zero, sizeof(zero));
 
