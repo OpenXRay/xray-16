@@ -76,6 +76,11 @@ struct RenderStats
     u32 sunFarRedraws = 0;
     bool sunFarCached = false;
 
+    bool vsmActive = false;
+    bool vsmSunMoving = false;
+    u32 vsmPages = 0;
+    u32 vsmLevelPages[6] = {0, 0, 0, 0, 0, 0};
+
     u32 lightsClustered = 0;
     u32 lightsHiZVisible = 0;
     u32 lightsPoint = 0;
@@ -119,6 +124,9 @@ struct RenderStats
         sunCasc1Opaque = sunCasc1Terrain = sunCasc1AT = 0;
         sunFarRedraws = 0;
         sunFarCached = false;
+        vsmActive = vsmSunMoving = false;
+        vsmPages = 0;
+        for (u32 i = 0; i < 6; ++i) vsmLevelPages[i] = 0;
         lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
         detailInstances = detailSlots = 0;
         detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;

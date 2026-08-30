@@ -83,6 +83,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "FrameGraphPasses/ShaderConstants.h"
+#include "FrameGraphPasses/VSMPassSetup.h"
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -794,6 +795,13 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.sunCasc1AT = sunCasc1.castersAT;
             stats.sunFarRedraws = sunShadow.farRedraws;
             stats.sunFarCached = !sunFar.redraw;
+
+            const auto& vsm = m_blackboard->get_or_add<passes::VSMState>();
+            stats.vsmActive = vsm.active;
+            stats.vsmSunMoving = vsm.sunMoving;
+            stats.vsmPages = vsm.markPages;
+            for (u32 L = 0; L < passes::kVSMLevels; ++L)
+                stats.vsmLevelPages[L] = vsm.levelPages[L];
         }
 
         // Collect detail/grass stats
@@ -1246,6 +1254,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     m_hizPyramid = hizOutput.pyramid;
     if (m_hizPyramid.is_valid())
         m_framegraph->GetRTRegistry().RegisterRT("rt_HiZ", m_hizPyramid);
+
+    {
+        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
+        vsmState.active = false;
+        if (ps_r_vsm && prepassActive && hizOutput.pyramid.is_valid()) {
+            passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
+            auto vsmMark = passes::setupVSMMarkPass(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid,
+                width, height, &vsmState, m_gpuProfiler.get());
+            if (vsmMark.debugView.is_valid())
+                m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmMark.debugView);
+        }
+    }
 
     if (cullActive && hizOutput.pyramid.is_valid()) {
         m_gpuCullingManager->SetupHiZCullingPass(
