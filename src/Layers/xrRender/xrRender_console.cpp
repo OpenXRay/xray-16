@@ -287,6 +287,12 @@ float ps_r_shadow_cluster_lod  = 1.0f;
 int ps_r_sun_shadow_bias = 100;
 float ps_r_sun_shadow_slope = 2.0f;
 int   ps_r_shadow_at           = 1;
+int   ps_r_vsm                 = 1;
+int   ps_r_vsm_debug           = 0;
+float ps_r_vsm_base            = 24.0f;
+int   ps_r_vsm_mark_half       = 1;
+float ps_r_vsm_bias            = 0.0003f;
+float ps_r_vsm_bias_dyn        = 0.00002f;
 
 int   ps_r_smoke_trail_enabled  = 1;
 float ps_r_smoke_max_emit_rate  = 45.f;
@@ -976,6 +982,12 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_sun_shadow_bias", &ps_r_sun_shadow_bias, 0, 4096);
     CMD4(CCC_Float, "r_sun_shadow_slope", &ps_r_sun_shadow_slope, 0.0f, 16.0f);
     CMD4(CCC_Integer, "r_shadow_at", &ps_r_shadow_at, 0, 1);
+    CMD4(CCC_Integer, "r_vsm", &ps_r_vsm, 0, 1);
+    CMD4(CCC_Integer, "r_vsm_debug", &ps_r_vsm_debug, 0, 5);
+    CMD4(CCC_Float, "r_vsm_base", &ps_r_vsm_base, 8.0f, 64.0f);
+    CMD4(CCC_Integer, "r_vsm_mark_half", &ps_r_vsm_mark_half, 0, 1);
+    CMD4(CCC_Float, "r_vsm_bias", &ps_r_vsm_bias, 0.0f, 0.02f);
+    CMD4(CCC_Float, "r_vsm_bias_dyn", &ps_r_vsm_bias_dyn, 0.0f, 0.02f);
 
     CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);
     CMD4(CCC_Float,   "r_smoke_emit_rate", &ps_r_smoke_max_emit_rate,  1.0f, 120.0f);

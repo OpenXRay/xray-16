@@ -16,6 +16,7 @@
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "Layers/xrRender/FrameGraphPasses/SunShadowPassSetup.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
+#include "Layers/xrRender/FrameGraphPasses/VSMPassSetup.h"
 
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
@@ -56,8 +57,10 @@ void FrameGraphRenderer::level_Load(IReader* fs)
                 gpuCulling->BeginLevelLoad(2000000, 6000000);
             }
         }
-        if (m_blackboard)
+        if (m_blackboard) {
             passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
+            passes::InvalidateVSMCache(m_blackboard->get_or_add<passes::VSMState>());
+        }
         passes::ResetSunDirVisual();
 
         g_pGamePersistent->LoadTitle("st_loading_geometry");
@@ -321,8 +324,10 @@ void FrameGraphRenderer::level_Unload()
 
     Lights.Unload();
 
-    if (m_blackboard)
+    if (m_blackboard) {
         passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
+        passes::InvalidateVSMCache(m_blackboard->get_or_add<passes::VSMState>());
+    }
     passes::ResetSunDirVisual();
 
     for (dxRender_Visual* visual : BufferPool.Visuals)
