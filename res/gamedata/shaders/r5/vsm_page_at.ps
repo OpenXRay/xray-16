@@ -1,0 +1,20 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+    nointerpolation uint materialID : TEXCOORD1;
+};
+
+void main(PS_INPUT input)
+{
+    MaterialData mat = g_Materials[input.materialID];
+    if (mat.flags & MAT_FLAG_ALPHA_TEST)
+    {
+        float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+        clip(diffuseSample.a - mat.alphaRef);
+    }
+}

@@ -46,10 +46,10 @@ int vsmSelect(float2 lxy, float4 level[VSM_LEVELS], out float2 uv, out int2 page
 }
 
 #define VSM_PAGE_RANGE(L, lp, R, lo, hi, p0, p1)                                              \
-    float2 origin = vsm_level[L].xy;                                                          \
-    float  pw     = vsm_level[L].z / float(VSM_PAGES_AXIS);                                   \
-    float2 lo = (lp - float2(R, R) - origin) / pw;                                            \
-    float2 hi = (lp + float2(R, R) - origin) / pw;                                            \
+    float2 origin##L = vsm_level[L].xy;                                                       \
+    float  pw##L     = vsm_level[L].z / float(VSM_PAGES_AXIS);                                \
+    float2 lo = (lp - float2(R, R) - origin##L) / pw##L;                                      \
+    float2 hi = (lp + float2(R, R) - origin##L) / pw##L;                                      \
     if (hi.x < 0.0 || hi.y < 0.0 || lo.x >= float(VSM_PAGES_AXIS) || lo.y >= float(VSM_PAGES_AXIS)) \
         continue;                                                                             \
     int2 p0 = clamp(int2(floor(lo)), int2(0, 0), int2(VSM_PAGES_AXIS - 1, VSM_PAGES_AXIS - 1)); \
