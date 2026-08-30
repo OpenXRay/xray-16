@@ -390,6 +390,10 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
     state.readbackScheduled = 0;
     state.physInit = false;
     state.atlasFirst = true;
+    state.primeFrames = kVSMPrimeFrames;
+    state.primeTraceLeft = kVSMPrimeTraceFrames;
+    state.primeTraceIdx = 0;
+    state.primeTraceQuiet = 0;
 
     if (!state.needed || !state.counter || !state.pageTable || !state.pageList || !state.physTile
         || !state.slotDirty || !state.dirtyList || !state.drawClear || !state.atlas || !state.binStats) {
@@ -476,10 +480,26 @@ void ScheduleReadback(nvrhi::ICommandList* cmdList, VSMState& state)
         ++state.readbackScheduled;
 }
 
+void LogPrimeTrace(VSMState& state)
+{
+    if (state.primeTraceLeft == 0 || state.readbackScheduled < VSMState::kReadbackSlots)
+        return;
+    --state.primeTraceLeft;
+    const bool onScreen = Device.dwPrecacheFrame == 0;
+    Msg("[VSM prime] f=%u primeLeft=%u wrong=%u dirty=%u budget=%d loadscreen=%d",
+        state.primeTraceIdx++, state.primeFrames, state.wrongPages, state.dirtyPages, ps_r_vsm_dirty_budget, onScreen ? 0 : 1);
+    state.primeTraceQuiet = (onScreen && state.dirtyPages == 0) ? state.primeTraceQuiet + 1 : 0;
+    if (state.primeTraceQuiet >= kVSMPrimeTraceQuiet) {
+        Msg("[VSM prime] drained: world visible and dirty==0 by frame %u", state.primeTraceIdx);
+        state.primeTraceLeft = 0;
+    }
+}
+
 void LogTelemetry(VSMState& state)
 {
     if (ps_r_vsm_debug < 1)
         return;
+    LogPrimeTrace(state);
     if (Device.dwTimeGlobal - state.lastLogTime < 2000)
         return;
     state.lastLogTime = Device.dwTimeGlobal;
@@ -488,8 +508,8 @@ void LogTelemetry(VSMState& state)
         state.levelPages[3], state.levelPages[4], state.levelPages[5],
         state.sunMoving ? "moving" : "static", state.sunStepMax, state.snapMax,
         ps_r_vsm_base, state.zCentre, state.invalidations);
-    Msg("[VSM] static: dirty=%u/%u rendered | wrong=%u | cache %s refresh %d",
-        state.dirtyPages, state.markPages, state.wrongPages,
+    Msg("[VSM] static: dirty=%u/%u rendered | wrong=%u budget=%d prime=%u | cache %s refresh %d",
+        state.dirtyPages, state.markPages, state.wrongPages, ps_r_vsm_dirty_budget, state.primeFrames,
         ps_r_vsm_cache ? "on" : "off", ps_r_vsm_cache_refresh);
     Msg("[VSM] bin: draws=%u instances=%u maxPagesPerCaster=%u lodCulled=%u drops=%u | k=%.2f at=%d",
         state.binDraws, state.binInstances, state.binMaxPages, state.binLodCulled, state.binDrops, ps_r_vsm_cluster_lod, ps_r_vsm_at);
@@ -595,7 +615,10 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
     rp.sunMoving = state.sunMoving ? 1u : 0u;
     rp.forceDirty = ps_r_vsm_cache ? 0u : 1u;
     rp.inval[3] = ps_r_vsm_base / float(kVSMPagesAxis);
-    rp.inval[7] = 0.0f;
+    const int wrongBudget = state.primeFrames > 0 ? 0 : std::max(ps_r_vsm_dirty_budget, 0);
+    if (state.primeFrames > 0)
+        --state.primeFrames;
+    rp.inval[7] = float(wrongBudget);
     rp.inval[11] = 0.0f;
     rp.inval[15] = 4096.0f;
     auto residCB = cache.GetOrCreateVolatileCB("VSM", "ResidParams", sizeof(VsmResidParams), data.device);
@@ -957,6 +980,10 @@ void InvalidateVSMCache(VSMState& state)
     state.zCentreValid = false;
     state.physInit = false;
     state.invalidations++;
+    state.primeFrames = kVSMPrimeFrames;
+    state.primeTraceLeft = kVSMPrimeTraceFrames;
+    state.primeTraceIdx = 0;
+    state.primeTraceQuiet = 0;
 }
 
 void VSMBeginFrame(VSMState& state, const Fvector& camPos, const Fvector& sunDirIn)

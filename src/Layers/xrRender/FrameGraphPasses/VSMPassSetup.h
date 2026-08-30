@@ -37,6 +37,9 @@ constexpr u32 kVSMStreamCount = 3;
 constexpr float kVSMZNear = -1000.0f;
 constexpr float kVSMZFar = 1000.0f;
 constexpr float kVSMZSnap = 256.0f;
+constexpr u32 kVSMPrimeFrames = 8;
+constexpr u32 kVSMPrimeTraceFrames = 400;
+constexpr u32 kVSMPrimeTraceQuiet = 10;
 
 struct VsmParams {
     Fmatrix view;
@@ -65,6 +68,10 @@ struct VSMState {
     float sunStepMax = 0.0f;
     bool physInit = false;
     bool atlasFirst = true;
+    u32 primeFrames = 0;
+    u32 primeTraceLeft = 0;
+    u32 primeTraceIdx = 0;
+    u32 primeTraceQuiet = 0;
 
     nvrhi::BufferHandle needed;
     nvrhi::BufferHandle counter;
