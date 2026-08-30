@@ -261,7 +261,7 @@ f_forward output_forward_pbr(
 	float3 L = normalize(-L_sun_dir_w);
 
 	if (sunVis < 0.0)
-		sunVis = SunVisibility(worldPos);
+		sunVis = SunVisibility(worldPos, svPosition);
 
 	float3 sunLight = PBRDirectLighting(
 		albedo, N, V, L,

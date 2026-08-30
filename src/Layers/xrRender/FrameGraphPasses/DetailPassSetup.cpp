@@ -211,7 +211,7 @@ DefaultOutputLayout setupDetailPass(
                 data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
 
             auto* nvDev = data.device->GetNVRHIDevice();
-            nvrhi::ITexture* sunMaps[passes::kSunTargetCount];
+            nvrhi::ITexture* sunMaps[passes::kSunMapSlots];
             passes::ResolveSunShadowMaps(fg, data.sunShadowMaps, nvDev, sunMaps);
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();

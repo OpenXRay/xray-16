@@ -597,7 +597,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 drawArgsBuffer = fg.GetPhysicalBuffer(data.drawArgsBuffer);
             }
 
-            nvrhi::ITexture* sunMaps[passes::kSunTargetCount];
+            nvrhi::ITexture* sunMaps[passes::kSunMapSlots];
             passes::ResolveSunShadowMaps(fg, data.sunShadowMaps, data.device->GetNVRHIDevice(), sunMaps);
 
             // ═══════════════════════════════════════════════════════
