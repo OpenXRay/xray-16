@@ -695,7 +695,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 data.overlayMgr->UploadSplats(cmdList);
             nvrhi::IBuffer* splatBuffer = data.overlayMgr ? data.overlayMgr->GetSplatBuffer() : nullptr;
 
-            nvrhi::ITexture* sunMaps[passes::kSunTargetCount];
+            nvrhi::ITexture* sunMaps[passes::kSunMapSlots];
             passes::ResolveSunShadowMaps(fg, data.sunShadowMaps, nvDevice, sunMaps);
 
             auto* backend = data.device->GetBackend();

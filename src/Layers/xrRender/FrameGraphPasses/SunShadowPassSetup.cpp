@@ -1232,6 +1232,8 @@ void ReadSunShadowMaps(RenderPassBuilder& builder, const SunShadowMaps& in, SunS
         if (in.maps[t].is_valid())
             out.maps[t] = builder.read(in.maps[t], ResourceState::ShaderResource);
     }
+    if (in.mask.is_valid())
+        out.mask = builder.read(in.mask, ResourceState::ShaderResource);
 }
 
 void ResolveSunShadowMaps(const FrameGraph& fg, const SunShadowMaps& maps, nvrhi::IDevice* device, nvrhi::ITexture** out)
@@ -1241,12 +1243,15 @@ void ResolveSunShadowMaps(const FrameGraph& fg, const SunShadowMaps& maps, nvrhi
         nvrhi::ITexture* tex = maps.maps[t].is_valid() ? fg.GetPhysicalTexture(maps.maps[t]) : nullptr;
         out[t] = tex ? tex : dummy;
     }
+    nvrhi::ITexture* mask = maps.mask.is_valid() ? fg.GetPhysicalTexture(maps.mask) : nullptr;
+    out[kSunTargetCount] = mask ? mask : dummy;
 }
 
 void BindSunShadowMaps(BindingSetBuilder& bsb, nvrhi::ITexture* const* maps)
 {
     for (u32 t = 0; t < kSunTargetCount; ++t)
         bsb.Texture(kTargetNames[t].srvName, maps[t]);
+    bsb.Texture("g_SunShadowMask", maps[kSunTargetCount]);
 }
 
 } // namespace xray::render::fg::passes

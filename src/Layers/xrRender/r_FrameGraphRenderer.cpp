@@ -513,6 +513,9 @@ void FrameGraphRenderer::Render() {
                 1.0f / float(sunFar.mapSize),
                 casc1Active ? 1.0f / float(sunCasc1.mapSize) : 0.0f);
         }
+        const auto& vsm = m_blackboard->get_or_add<passes::VSMState>();
+        if (ps_r_vsm && vsm.maskReady)
+            staticGlobalsData.cascade_splits.x = 2.0f;
     }
 
     auto& clm = fg::ClusteredLightManager::Instance();
@@ -1199,9 +1202,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     passes::SunShadowCullOutput sunShadowCull;
     passes::SunShadowMaps sunShadowMaps;
+    const bool vsmActive = ps_r_vsm && m_blackboard->get_or_add<passes::VSMState>().maskReady;
     {
         auto& sunShadowState = m_blackboard->get_or_add<passes::SunShadowState>();
-        if (ps_r_sun_shadow && ps_r_cluster && cullActive && m_gpuCullingManager) {
+        if (ps_r_sun_shadow && ps_r_cluster && cullActive && m_gpuCullingManager && !vsmActive) {
             sunShadowCull = passes::setupSunShadowCullPass(
                 *m_framegraph,
                 m_device,
@@ -1262,9 +1266,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_hizPyramid.is_valid())
         m_framegraph->GetRTRegistry().RegisterRT("rt_HiZ", m_hizPyramid);
 
+    framegraph::VirtualResourceHandle vsmMaskHandle;
     {
         auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
         vsmState.active = false;
+        if (!ps_r_vsm)
+            vsmState.maskReady = false;
         if (ps_r_vsm && prepassActive && hizOutput.pyramid.is_valid()) {
             passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
             passes::VSMDrawConfig vsmCfg;
@@ -1279,6 +1286,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 width, height, &vsmState, m_gpuProfiler.get());
             if (vsmOut.debugView.is_valid())
                 m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmOut.debugView);
+            vsmMaskHandle = vsmOut.mask;
         }
     }
 
@@ -1333,6 +1341,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     } else {
         m_blackboard->get_or_add<passes::SunShadowState>().receiverActive = false;
     }
+    sunShadowMaps.mask = vsmMaskHandle;
 
     // ═══════════════════════════════════════════════════════
     //  SKY PASS (Renders sky dome behind everything)

@@ -38,6 +38,7 @@ constexpr u32 kSunTargetFar = 0;
 constexpr u32 kSunTargetCasc0 = 1;
 constexpr u32 kSunTargetCasc1 = 2;
 constexpr u32 kSunTargetCount = 3;
+constexpr u32 kSunMapSlots = kSunTargetCount + 1;
 
 struct SunShadowTarget {
     static constexpr u32 kReadbackSlots = 6;
@@ -149,6 +150,7 @@ struct SunShadowDrawConfig {
 
 struct SunShadowMaps {
     framegraph::VirtualResourceHandle maps[kSunTargetCount];
+    framegraph::VirtualResourceHandle mask;
 };
 
 void ReadSunShadowMaps(framegraph::RenderPassBuilder& builder, const SunShadowMaps& in, SunShadowMaps& out);
