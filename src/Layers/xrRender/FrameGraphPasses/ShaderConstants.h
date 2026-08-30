@@ -216,6 +216,8 @@ inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
 }
 
 void GetSunLightData(SunLightData& outSun, float hdrIntensity = 2.0f);
+const Fvector& SunDirVisual();
+void ResetSunDirVisual();
 
 inline StaticGlobals BuildStaticGlobals(float hdrIntensity = 2.0f) {
     StaticGlobals sg = {};
