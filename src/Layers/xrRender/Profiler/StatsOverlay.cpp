@@ -431,15 +431,13 @@ void StatsOverlay::RenderGeometrySection()
         ImGui::Text("Triangles:");
         ImGui::Indent();
 
-        if (s.objectsSubmitted > 0)
+        ImGui::Text("Total: %s", FormatNumber(s.totalTriangles));
+        if (s.clusterEntries > 0)
         {
-            float visRatio = s.objectsVisible > 0 ?
-                (float)s.objectsVisible / s.objectsSubmitted * 100.0f : 0.0f;
-            ImGui::Text("Total: %s (%.0f%% visible)", FormatNumber(s.totalTriangles), visRatio);
-        }
-        else
-        {
-            ImGui::Text("Total: %s", FormatNumber(s.totalTriangles));
+            const u32 drawn = s.clusterTrianglesDrawn + s.clusterTerrainTrianglesDrawn;
+            const u32 baked = s.staticTriangles + s.terrainTriangles;
+            ImGui::Text("Drawn: %s clustered (%.0f%% of static+terrain)", FormatNumber(drawn),
+                baked > 0 ? 100.0f * drawn / baked : 0.0f);
         }
 
         if (s.staticTriangles > 0)
@@ -471,7 +469,7 @@ void StatsOverlay::RenderGeometrySection()
 
         if (s.objectsSubmitted > 0)
         {
-            ImGui::Text("Culling:");
+            ImGui::Text("Object culling (unclustered):");
             ImGui::Indent();
 
             float cullPercent = s.objectsCulled > 0 ?
@@ -506,13 +504,14 @@ void StatsOverlay::RenderGeometrySection()
 
         if (s.clusterEntries > 0)
         {
-            ImGui::Text("Cluster LOD:");
+            ImGui::Text("Clusters:");
             ImGui::Indent();
             float drawRate = 100.0f * (s.clusterVisible + s.clusterTerrainVisible) / s.clusterEntries;
             ImGui::Text("Entries: %u/%u drawn (%.1f%%)",
                 s.clusterVisible + s.clusterTerrainVisible, s.clusterEntries, drawRate);
+            ImGui::Text("Static:  %u/%u drawn, %s tris", s.clusterVisible, s.clusterStaticEntries, FormatNumber(s.clusterTrianglesDrawn));
             if (s.clusterTerrainEntries > 0)
-                ImGui::Text("Terrain: %u/%u drawn", s.clusterTerrainVisible, s.clusterTerrainEntries);
+                ImGui::Text("Terrain: %u/%u drawn, %s tris", s.clusterTerrainVisible, s.clusterTerrainEntries, FormatNumber(s.clusterTerrainTrianglesDrawn));
             ImGui::Unindent();
         }
 

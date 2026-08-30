@@ -112,15 +112,18 @@ void main(uint3 dtID : SV_DispatchThreadID)
     uint fade = (63u - fA) | (fB << 6) | (((e.flags >> 8) & 0x3Fu) << 12) | ((idx & 0x3FFFu) << 18);
 
     uint slot;
+    uint tris;
     if ((e.flags & 4u) != 0)
     {
         g_OutCount.InterlockedAdd(4, 1u, slot);
+        g_OutCount.InterlockedAdd(12, e.indexCount / 3u, tris);
         g_OutTerrainEntryIndices[slot] = idx;
         g_OutTerrainFades[slot] = fade;
     }
     else
     {
         g_OutCount.InterlockedAdd(0, 1u, slot);
+        g_OutCount.InterlockedAdd(8, e.indexCount / 3u, tris);
         g_OutEntryIndices[slot] = idx;
         g_OutFades[slot] = fade;
     }

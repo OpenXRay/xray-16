@@ -45,6 +45,9 @@ struct RenderStats
     u32 clusterEntries = 0;
     u32 clusterVisible = 0;
     u32 clusterTerrainEntries = 0;
+    u32 clusterStaticEntries = 0;
+    u32 clusterTrianglesDrawn = 0;
+    u32 clusterTerrainTrianglesDrawn = 0;
     u32 clusterTerrainVisible = 0;
 
     u32 sunCasterCandidates = 0;
@@ -95,6 +98,7 @@ struct RenderStats
         skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
+        clusterStaticEntries = clusterTrianglesDrawn = clusterTerrainTrianglesDrawn = 0;
         sunCasterCandidates = sunCastersOpaque = sunCastersTerrain = sunCastersAT = 0;
         sunCasc0Opaque = sunCasc0Terrain = sunCasc0AT = 0;
         sunCasc1Opaque = sunCasc1Terrain = sunCasc1AT = 0;
