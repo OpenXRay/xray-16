@@ -73,6 +73,27 @@ u64 HashPosition(const Fvector& p)
     return h;
 }
 
+float EstimateUVWorldScale(const bindless::UnifiedVertex* verts, const u32* indices, u32 indexCount)
+{
+    xr_vector<float> ratios;
+    ratios.reserve(indexCount);
+    for (u32 i = 0; i + 2 < indexCount; i += 3) {
+        const u32 idx[3] = { indices[i], indices[i + 1], indices[i + 2] };
+        for (u32 e = 0; e < 3; ++e) {
+            const bindless::UnifiedVertex& a = verts[idx[e]];
+            const bindless::UnifiedVertex& b = verts[idx[(e + 1) % 3]];
+            const float dp = a.position.distance_to(b.position);
+            const float du = _sqrt(_sqr(a.texcoord0.x - b.texcoord0.x) + _sqr(a.texcoord0.y - b.texcoord0.y));
+            if (du > 1e-5f && dp > 1e-5f)
+                ratios.push_back(dp / du);
+        }
+    }
+    if (ratios.empty())
+        return 1.0f;
+    std::nth_element(ratios.begin(), ratios.begin() + ratios.size() / 2, ratios.end());
+    return clampr(ratios[ratios.size() / 2], 0.01f, 1000.0f);
+}
+
 void EmitProto(BakeResult& out, const BakeContext& ctx, const clodCluster& c,
     const clodBounds& parent, int depth, u32 member, const u32* indices, u32 indexCount)
 {
@@ -218,7 +239,8 @@ void BakeSingleMesh(
     attrs.resize(size_t(key.vertexCount) * 7);
     FillAttributes(verts, key.vertexCount, attrs.data());
 
-    static const float s_weights[3] = {0.5f, 0.5f, 0.5f};
+    const float uvScale = EstimateUVWorldScale(verts, indices, key.indexCount);
+    const float weights[5] = {0.5f, 0.5f, 0.5f, uvScale, uvScale};
 
     clodMesh mesh = {};
     mesh.indices = indices;
@@ -228,8 +250,8 @@ void BakeSingleMesh(
     mesh.vertex_positions_stride = sizeof(bindless::UnifiedVertex);
     mesh.vertex_attributes = attrs.data();
     mesh.vertex_attributes_stride = 7 * sizeof(float);
-    mesh.attribute_weights = s_weights;
-    mesh.attribute_count = 3;
+    mesh.attribute_weights = weights;
+    mesh.attribute_count = 5;
     mesh.attribute_protect_mask = 0x78;
 
     BakeContext ctx = {};
@@ -312,11 +334,13 @@ void BakeComponent(
 
     pinnedCounter.fetch_add(pinned, std::memory_order_relaxed);
 
+    const float uvScale = EstimateUVWorldScale(verts.data(), indices.data(), u32(indices.size()));
+    const float weights[5] = {0.5f, 0.5f, 0.5f, uvScale, uvScale};
+
     xr_vector<float> attrs;
     attrs.resize(size_t(verts.size()) * 7);
     FillAttributes(verts.data(), u32(verts.size()), attrs.data());
 
-    static const float s_weights[3] = {0.5f, 0.5f, 0.5f};
 
     clodMesh mesh = {};
     mesh.indices = indices.data();
@@ -326,9 +350,9 @@ void BakeComponent(
     mesh.vertex_positions_stride = sizeof(bindless::UnifiedVertex);
     mesh.vertex_attributes = attrs.data();
     mesh.vertex_attributes_stride = 7 * sizeof(float);
-    mesh.attribute_weights = s_weights;
-    mesh.attribute_count = 3;
-    mesh.attribute_protect_mask = 0;
+    mesh.attribute_weights = weights;
+    mesh.attribute_count = 5;
+    mesh.attribute_protect_mask = 0x78;
     mesh.vertex_lock = locks.data();
 
     BakeContext ctx = {};
@@ -352,7 +376,7 @@ bool IsSelfLoop(const ClusterMetaProto& p)
 }
 
 constexpr u32 kCacheMagic = 0x464C4356;
-constexpr u32 kCacheVersion = 6;
+constexpr u32 kCacheVersion = 7;
 
 #pragma pack(push, 4)
 struct CacheHeader {
