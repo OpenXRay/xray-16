@@ -96,6 +96,12 @@ CEnvironment::~CEnvironment()
 
 bool CEnvironment::IsThunderboltActive() const { return eff_Thunderbolt && eff_Thunderbolt->IsActive(); }
 
+const Fvector& CEnvironment::ThunderboltFlash() const
+{
+    static const Fvector s_none{0.f, 0.f, 0.f};
+    return (eff_Thunderbolt && eff_Thunderbolt->IsActive()) ? eff_Thunderbolt->Flash() : s_none;
+}
+
 void CEnvironment::Invalidate()
 {
     bWFX = false;

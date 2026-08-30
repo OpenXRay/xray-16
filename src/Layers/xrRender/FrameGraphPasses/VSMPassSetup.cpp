@@ -1019,6 +1019,15 @@ void VSMBeginFrame(VSMState& state, const Fvector& camPos, const Fvector& sunDir
     if (sd.magnitude() < 1e-4f)
         sd.set(0.0f, -1.0f, 0.0f);
     sd.normalize();
+    {
+        float sunLum = 1.0f;
+        if (g_pGamePersistent) {
+            const Fvector& c = g_pGamePersistent->Environment().CurrentEnv.sun_color;
+            sunLum = c.x * 0.299f + c.y * 0.587f + c.z * 0.114f;
+        }
+        const float toSunY = -sd.y;
+        state.sunDown = ps_r_sun_night_freeze && (toSunY < ps_r_sun_night_alt || sunLum < ps_r_sun_night_lum);
+    }
     Fvector up;
     up.set(0.0f, 1.0f, 0.0f);
     if (_abs(sd.y) > 0.99f)
@@ -1140,7 +1149,13 @@ VSMOutput setupVSMPasses(
             state->primeTraceQuiet = 0;
         }
         state->behindLoadScreen = behind;
-        if (behind) {
+        const bool night = state->sunDown && !state->atlasFirst && state->maskReady;
+        if (night != state->nightFrozen) {
+            state->nightFrozen = night;
+            if (ps_r_vsm_debug >= 1)
+                Msg("[VSM] night-freeze: %s", night ? "FROZEN (sun down, VSM update skipped)" : "active (sun up)");
+        }
+        if (behind || night) {
             if (state->maskReady) {
                 ResourceDesc heldDesc;
                 heldDesc.type = ResourceDesc::Type::Texture2D;
