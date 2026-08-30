@@ -151,7 +151,7 @@ public:
     void SetVisible(bool visible) { m_visible = visible; }
     void ToggleVisible() { m_visible = !m_visible; }
 
-    void SetInspectorRTList(const xr_vector<shared_str>& names) { m_rtNames = names; }
+    void SetInspectorRTList(const xr_vector<shared_str>& names, const xr_vector<u8>& isDepth) { m_rtNames = names; m_rtIsDepth = isDepth; }
     void SetInspectorPreview(nvrhi::ITexture* tex) { m_inspectorPreview = tex; }
     shared_str GetSelectedRTName() const { return m_selectedRTName; }
     int GetChannelMode() const { return m_channelMode; }
@@ -210,6 +210,7 @@ private:
     u32 m_sourceWidth = 0;
     u32 m_sourceHeight = 0;
     shared_str m_selectedRTName;
+    xr_vector<u8> m_rtIsDepth;
 
     xr_vector<WallmarkObjectData> m_wallmarkData;
     void* m_wallmarkSelectedKey = nullptr;

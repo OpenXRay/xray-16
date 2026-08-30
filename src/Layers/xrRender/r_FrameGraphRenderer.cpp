@@ -1815,7 +1815,15 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_statsOverlay && psDeviceFlags.test(rsStatistic) && m_inspectorPreview)
     {
         auto rtNames = m_framegraph->GetRTRegistry().GetAllNames();
-        m_statsOverlay->SetInspectorRTList(rtNames);
+        xr_vector<u8> rtIsDepth;
+        rtIsDepth.reserve(rtNames.size());
+        for (const auto& name : rtNames) {
+            auto handle = m_framegraph->GetRTRegistry().TryGetRT(name.c_str());
+            const bool depth = handle.is_valid()
+                && nvrhi::getFormatInfo(m_framegraph->GetResourceDesc(handle).format).hasDepth;
+            rtIsDepth.push_back(depth ? 1 : 0);
+        }
+        m_statsOverlay->SetInspectorRTList(rtNames, rtIsDepth);
 
         auto selectedName = m_statsOverlay->GetSelectedRTName();
         if (selectedName.size() > 0)
@@ -1904,13 +1912,15 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                             u32 sourceW, sourceH;
                             u32 mode;
                             u32 mipLevel;
-                            u32 pad[2];
+                            float projA;
+                            float projB;
                         } cb;
                         cb.outputW = 512; cb.outputH = 512;
                         cb.sourceW = data.sourceW; cb.sourceH = data.sourceH;
                         cb.mode = (u32)data.channelMode;
                         cb.mipLevel = (u32)data.mipLevel;
-                        cb.pad[0] = cb.pad[1] = 0;
+                        cb.projA = Device.mProject._33;
+                        cb.projB = Device.mProject._43;
 
                         nvrhi::ICommandList* cmdList = ctx->GetCommandList();
                         cmdList->writeBuffer(s_cb, &cb, sizeof(cb));
