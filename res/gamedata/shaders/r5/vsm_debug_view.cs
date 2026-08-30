@@ -34,8 +34,13 @@ void main(uint3 dtID : SV_DispatchThreadID)
     float zndc = g_Depth.Load(int3(px, 0));
     if (g_Mode == 4u)
     {
-        float m = g_Mask.Load(int3(px, 0)).r;
-        g_Output[px] = float4(m, m, m, 1.0);
+        float4 mv = g_Mask.Load(int3(px, 0));
+        float3 c = float3(mv.r, mv.r, mv.r);
+        if (mv.a > 1.5)
+            c = float3(1.0, 0.1, 0.1);
+        else if (mv.a > 0.5)
+            c = float3(1.0, 0.9, 0.2);
+        g_Output[px] = float4(c, 1.0);
         return;
     }
     if (g_Mode == 5u)

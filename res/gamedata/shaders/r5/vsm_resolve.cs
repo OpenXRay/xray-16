@@ -116,10 +116,12 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     float outShadow = cur;
     float a = 0.0;
+    float status = 0.0;
     if (noPage)
     {
         a = histOK ? g_Params4.y : 0.0;
         outShadow = lerp(cur, hist.r, a);
+        status = histOK ? 1.0 : 2.0;
     }
     else if (histOK)
     {
@@ -129,5 +131,5 @@ void main(uint3 dtID : SV_DispatchThreadID)
         float hClamped = clamp(hist.r, cur - g_Params2.x, cur + g_Params2.x);
         outShadow = lerp(cur, hClamped, a);
     }
-    g_Mask[px] = float4(outShadow, dist, a, 0.0);
+    g_Mask[px] = float4(outShadow, dist, a, status);
 }
