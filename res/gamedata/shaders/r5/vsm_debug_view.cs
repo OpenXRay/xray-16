@@ -13,6 +13,8 @@ cbuffer VsmDebugParams : register(b5)
 
 Texture2D<float> g_Depth : register(t0);
 StructuredBuffer<uint> g_Needed : register(t1);
+StructuredBuffer<uint> g_PageTable : register(t2);
+StructuredBuffer<uint> g_SlotDirty : register(t3);
 RWTexture2D<float4> g_Output : register(u0);
 
 static const float3 kLevelColors[VSM_LEVELS] = {
@@ -49,12 +51,31 @@ void main(uint3 dtID : SV_DispatchThreadID)
             float pageTexel = vsm_level[L].z / float(VSM_PAGES_AXIS);
             int2 absPage = int2(floor(lp.xy / pageTexel));
             float check = ((absPage.x + absPage.y) & 1) != 0 ? 1.0 : 0.65;
-            color = kLevelColors[L] * check;
+            uint vp = uint(vsmPageIndex(L, page));
+            if (g_Mode == 3u)
+            {
+                uint slot = g_PageTable[vp];
+                uint dirty = slot == VSM_UNMAPPED ? 0u : g_SlotDirty[slot];
+                if (slot == VSM_UNMAPPED)
+                    color = float3(0.35, 0.35, 0.35) * check;
+                else if (dirty == 1u)
+                    color = float3(1.0, 1.0, 1.0);
+                else if (dirty == 2u)
+                    color = float3(0.95, 0.55, 0.1);
+                else if (dirty != 0u)
+                    color = float3(0.9, 0.2, 0.9);
+                else
+                    color = float3(0.15, 0.6, 0.2) * check;
+            }
+            else
+            {
+                color = kLevelColors[L] * check;
+                if (g_Needed[vp] == 0u)
+                    color *= 0.25;
+            }
             float2 f = frac(lp.xy / pageTexel);
             if (min(f.x, f.y) < 0.03 || max(f.x, f.y) > 0.97)
                 color *= 0.5;
-            if (g_Needed[vsmPageIndex(L, page)] == 0u)
-                color *= 0.25;
         }
     }
     g_Output[px] = float4(color, 1.0);
