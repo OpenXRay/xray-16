@@ -253,6 +253,12 @@ inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
         desc.hemi_color.y,
         desc.hemi_color.z
     );
+    const Fvector& flash = g_pGamePersistent->Environment().ThunderboltFlash();
+    if (ps_r_bolt_flash > 0.f && (flash.x + flash.y + flash.z) > 0.001f) {
+        cb.L_hemi_color.x += flash.x * ps_r_bolt_flash;
+        cb.L_hemi_color.y += flash.y * ps_r_bolt_flash;
+        cb.L_hemi_color.z += flash.z * ps_r_bolt_flash;
+    }
 }
 
 void GetSunLightData(SunLightData& outSun, float hdrIntensity = 2.0f);

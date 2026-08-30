@@ -60,6 +60,8 @@ struct VSMState {
     Fvector prevSunDir;
     bool prevSunValid = false;
     bool sunMoving = false;
+    bool sunDown = false;
+    bool nightFrozen = false;
     float zCentre = 0.0f;
     bool zCentreValid = false;
     u32 frame = 0;
