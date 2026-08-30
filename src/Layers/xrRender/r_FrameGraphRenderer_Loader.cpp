@@ -16,6 +16,7 @@
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "Layers/xrRender/FrameGraphPasses/SunShadowPassSetup.h"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 
 // D3D12: Shader compilation
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
@@ -67,6 +68,7 @@ void FrameGraphRenderer::level_Load(IReader* fs)
         }
         if (m_blackboard)
             passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
+        passes::ResetSunDirVisual();
 
         // VB,IB,SWI - MOVED UP! Must load vertex formats before compiling shaders
         g_pGamePersistent->LoadTitle("st_loading_geometry");
@@ -388,6 +390,7 @@ void FrameGraphRenderer::level_Unload()
 
     if (m_blackboard)
         passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
+    passes::ResetSunDirVisual();
 
     //*** BufferPool.Visuals
     for (dxRender_Visual* visual : BufferPool.Visuals)

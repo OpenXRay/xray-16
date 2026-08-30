@@ -34,6 +34,8 @@ constexpr float kFarZNear = 1.0f;
 constexpr float kFarZBeyond = 400.0f;
 constexpr float kFarRedrawDist = 10.0f;
 constexpr float kFarSunDotRedraw = 0.99999847f;
+constexpr float kCascSunTau = 1.0f;
+constexpr float kCascSnapDot = 0.99939f;
 constexpr float kCascadeBox0 = 25.0f;
 constexpr u32 kCascadeSize0 = 4096;
 constexpr float kCascadeBox1 = 60.0f;
@@ -948,6 +950,7 @@ void InvalidateSunShadowCache(SunShadowState& state)
         state.targets[t].valid = false;
         state.targets[t].redraw = false;
     }
+    state.cascSunInit = false;
 }
 
 void ComputeSunFarVP(Fmatrix& outVP, float& outTexel, const Fvector& sunDirIn, float boxSize, u32 mapSize)
@@ -1057,13 +1060,25 @@ SunShadowCullOutput setupSunShadowCullPass(
         far.valid = false;
     }
 
-    Fvector sunDir;
-    sunDir.set(0.0f, -1.0f, 0.0f);
-    if (g_pGamePersistent)
-        sunDir = g_pGamePersistent->Environment().CurrentEnv.sun_dir;
+    Fvector sunDir = SunDirVisual();
     if (sunDir.magnitude() < 1e-4f)
         sunDir.set(0.0f, -1.0f, 0.0f);
     sunDir.normalize();
+
+    if (!state->cascSunInit) {
+        state->cascSunDir = sunDir;
+        state->cascSunInit = true;
+    } else if (state->cascSunDir.dotproduct(sunDir) < kCascSnapDot) {
+        state->cascSunDir = sunDir;
+    } else {
+        const float k = 1.0f - expf(-Device.fTimeDelta / kCascSunTau);
+        state->cascSunDir.lerp(state->cascSunDir, sunDir, k);
+        if (state->cascSunDir.magnitude() > 1e-4f)
+            state->cascSunDir.normalize();
+        else
+            state->cascSunDir = sunDir;
+    }
+    const Fvector cascSunDir = state->cascSunDir;
 
     const Fvector camPos = Device.vCameraPosition;
     const float box = ps_r_sun_shadow_far_box;
@@ -1091,14 +1106,14 @@ SunShadowCullOutput setupSunShadowCullPass(
         ++state->farRedraws;
     }
 
-    ComputeSunCascadeVP(casc0.vp, casc0.texel, sunDir, kCascadeBox0, kCascadeSize0);
+    ComputeSunCascadeVP(casc0.vp, casc0.texel, cascSunDir, kCascadeBox0, kCascadeSize0);
     casc0.valid = true;
     casc0.redraw = true;
 
     SunShadowTarget& casc1 = state->targets[kSunTargetCasc1];
     casc1.redraw = !casc1.valid || (Device.dwFrame & 1) == 0;
     if (casc1.redraw) {
-        ComputeSunCascadeVP(casc1.vp, casc1.texel, sunDir, kCascadeBox1, kCascadeSize1);
+        ComputeSunCascadeVP(casc1.vp, casc1.texel, cascSunDir, kCascadeBox1, kCascadeSize1);
         casc1.valid = true;
     }
 
