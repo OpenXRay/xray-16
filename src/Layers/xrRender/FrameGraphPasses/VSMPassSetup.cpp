@@ -23,7 +23,8 @@ namespace {
 
 constexpr float kVSMRejectTol = 0.05f;
 constexpr u32 kReadbackResidOffset = 4 + kVSMPageCount;
-constexpr u32 kReadbackBinOffset = kReadbackResidOffset + 4;
+constexpr u32 kReadbackBinOffset = kReadbackResidOffset + 8;
+constexpr u32 kVSMDirtyListWords = kVSMStaticSlots + 3;
 constexpr u32 kReadbackWords = kReadbackBinOffset + 8;
 constexpr u32 kPairCaps[kVSMStreamCount] = { kVSMPairCapOpaque, kVSMPairCapTerrain, kVSMPairCapAT };
 constexpr const char* kStreamNames[kVSMStreamCount] = { "Opaque", "Terrain", "AT" };
@@ -43,6 +44,9 @@ struct VsmResidParams {
     u32 sunMoving;
     u32 forceDirty;
     float inval[16];
+    u32 sunEpoch;
+    u32 staleOn;
+    u32 pad[2];
 };
 
 struct VsmBinParams {
@@ -329,7 +333,8 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
     state.pageList = MakeUAVBuffer(nvDevice, "VSM_PageList", u64(kVSMStaticSlots) * sizeof(u32) * 4, sizeof(u32) * 4, false);
     state.physTile = MakeUAVBuffer(nvDevice, "VSM_PhysTile", u64(kVSMStaticSlots) * sizeof(u32) * 2, sizeof(u32) * 2, false);
     state.slotDirty = MakeUAVBuffer(nvDevice, "VSM_SlotDirty", u64(kVSMStaticSlots) * sizeof(u32), sizeof(u32), false);
-    state.dirtyList = MakeUAVBuffer(nvDevice, "VSM_DirtyList", u64(kVSMStaticSlots + 2) * sizeof(u32), sizeof(u32), false);
+    state.dirtyList = MakeUAVBuffer(nvDevice, "VSM_DirtyList", u64(kVSMDirtyListWords) * sizeof(u32), sizeof(u32), false);
+    state.slotEpoch = MakeUAVBuffer(nvDevice, "VSM_SlotEpoch", u64(kVSMStaticSlots) * sizeof(u32), sizeof(u32), false);
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "VSM_DrawClear";
@@ -398,7 +403,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
     state.primeTraceQuiet = 0;
 
     if (!state.needed || !state.counter || !state.pageTable || !state.pageList || !state.physTile
-        || !state.slotDirty || !state.dirtyList || !state.drawClear || !state.atlas || !state.binStats) {
+        || !state.slotDirty || !state.dirtyList || !state.drawClear || !state.slotEpoch || !state.atlas || !state.binStats) {
         Msg("! [VSM] resource creation failed");
         state.needed = nullptr;
         state.atlas = nullptr;
@@ -458,6 +463,8 @@ void ProcessReadback(nvrhi::IDevice* nvDevice, VSMState& state)
     }
     state.dirtyPages = std::min(words[kReadbackResidOffset + 1], kVSMStaticSlots);
     state.wrongPages = std::min(words[kReadbackResidOffset + 2], kVSMStaticSlots);
+    state.stalePages = std::min(words[kReadbackResidOffset + 3], kVSMStaticSlots);
+    state.staleMaxAge = words[kReadbackResidOffset + 4];
     const u32* bin = words + kReadbackBinOffset;
     state.binDraws = bin[0];
     state.binInstances = bin[1];
@@ -475,7 +482,7 @@ void ScheduleReadback(nvrhi::ICommandList* cmdList, VSMState& state)
     cmdList->copyBuffer(slot, 0, state.counter, 0, sizeof(u32) * 4);
     cmdList->copyBuffer(slot, sizeof(u32) * 4, state.needed, 0, u64(kVSMPageCount) * sizeof(u32));
     cmdList->copyBuffer(slot, u64(kReadbackResidOffset) * sizeof(u32), state.drawClear, 0, sizeof(u32) * 2);
-    cmdList->copyBuffer(slot, u64(kReadbackResidOffset + 2) * sizeof(u32), state.dirtyList, u64(kVSMStaticSlots) * sizeof(u32), sizeof(u32) * 2);
+    cmdList->copyBuffer(slot, u64(kReadbackResidOffset + 2) * sizeof(u32), state.dirtyList, u64(kVSMStaticSlots) * sizeof(u32), sizeof(u32) * 3);
     cmdList->copyBuffer(slot, u64(kReadbackBinOffset) * sizeof(u32), state.binStats, 0, sizeof(u32) * 8);
     state.readbackWrite = (state.readbackWrite + 1) % VSMState::kReadbackSlots;
     if (state.readbackScheduled < VSMState::kReadbackSlots)
@@ -511,9 +518,9 @@ void LogTelemetry(VSMState& state)
         state.sunMoving ? "moving" : "static", state.sunStepMax, state.snapMax,
         ps_r_vsm_base, ps_r_vsm_cluster_lod, state.zCentre, state.invalidations, state.boltHeld);
     state.boltHeld = 0;
-    Msg("[VSM] static: dirty=%u/%u rendered | wrong=%u budget=%d prime=%u | cache %s refresh %d",
-        state.dirtyPages, state.markPages, state.wrongPages, ps_r_vsm_dirty_budget, state.primeFrames,
-        ps_r_vsm_cache ? "on" : "off", ps_r_vsm_cache_refresh);
+    Msg("[VSM] static: dirty=%u/%u rendered | wrong=%u stale=%u (age max %u) budget=%d prime=%u | cache %s refresh %d stale_refresh %d",
+        state.dirtyPages, state.markPages, state.wrongPages, state.stalePages, state.staleMaxAge, ps_r_vsm_dirty_budget, state.primeFrames,
+        ps_r_vsm_cache ? "on" : "off", ps_r_vsm_cache_refresh, ps_r_vsm_stale_refresh);
     Msg("[VSM] bin: draws=%u instances=%u maxPagesPerCaster=%u lodCulled=%u drops=%u | k=%.2f at=%d",
         state.binDraws, state.binInstances, state.binMaxPages, state.binLodCulled, state.binDrops, ps_r_vsm_cluster_lod, ps_r_vsm_at);
     state.sunStepMax = 0.0f;
@@ -563,8 +570,11 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
     cmdList->writeBuffer(state.drawClear, clearDraw, sizeof(clearDraw));
     if (!state.physInit) {
         cmdList->setBufferState(state.physTile, nvrhi::ResourceStates::CopyDest);
+        cmdList->setBufferState(state.slotEpoch, nvrhi::ResourceStates::CopyDest);
         cmdList->clearBufferUInt(state.physTile, 0xFFFFFFFFu);
+        cmdList->clearBufferUInt(state.slotEpoch, 0);
         cmdList->setBufferState(state.physTile, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.slotEpoch, nvrhi::ResourceStates::UnorderedAccess);
         state.physInit = true;
     }
     cmdList->setBufferState(state.needed, nvrhi::ResourceStates::UnorderedAccess);
@@ -624,6 +634,8 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
     rp.inval[7] = float(wrongBudget);
     rp.inval[11] = 0.0f;
     rp.inval[15] = 4096.0f;
+    rp.sunEpoch = state.sunEpoch;
+    rp.staleOn = ps_r_vsm_stale_refresh ? 1u : 0u;
     auto residCB = cache.GetOrCreateVolatileCB("VSM", "ResidParams", sizeof(VsmResidParams), data.device);
     cmdList->writeBuffer(residCB, &rp, sizeof(rp));
 
@@ -633,6 +645,7 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
     cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.slotEpoch, nvrhi::ResourceStates::UnorderedAccess);
 
     BindingSetBuilder bsb(*refl, nvDevice, "VSM.Resid");
     bsb.ConstantBuffer("VsmResidParams", residCB)
@@ -642,7 +655,8 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
        .BufferUAV("g_PhysTile", state.physTile)
        .BufferUAV("g_SlotDirty", state.slotDirty)
        .BufferUAV("g_DirtyList", state.dirtyList)
-       .BufferUAV("g_DrawClear", state.drawClear);
+       .BufferUAV("g_DrawClear", state.drawClear)
+       .BufferUAV("g_SlotEpoch", state.slotEpoch);
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.residLayout, nvDevice);
     if (!bindingSet)
         return;
@@ -1018,6 +1032,8 @@ void VSMBeginFrame(VSMState& state, const Fvector& camPos, const Fvector& sunDir
     view.transform_tiny(camL, camPos);
 
     state.sunMoving = !state.prevSunValid || sd.x != state.prevSunDir.x || sd.y != state.prevSunDir.y || sd.z != state.prevSunDir.z;
+    if (state.sunMoving)
+        state.sunEpoch++;
     if (state.prevSunValid) {
         float dp = sd.dotproduct(state.prevSunDir);
         dp = dp > 1.0f ? 1.0f : (dp < -1.0f ? -1.0f : dp);
@@ -1155,7 +1171,7 @@ VSMOutput setupVSMPasses(
         return d;
     };
     VirtualResourceHandle neededHandle = fg.ImportBuffer("vsm_needed", state->needed, bufferDesc("vsm_needed", u64(kVSMPageCount) * sizeof(u32), sizeof(u32)));
-    VirtualResourceHandle dirtyHandle = fg.ImportBuffer("vsm_dirty_list", state->dirtyList, bufferDesc("vsm_dirty_list", u64(kVSMStaticSlots + 2) * sizeof(u32), sizeof(u32)));
+    VirtualResourceHandle dirtyHandle = fg.ImportBuffer("vsm_dirty_list", state->dirtyList, bufferDesc("vsm_dirty_list", u64(kVSMDirtyListWords) * sizeof(u32), sizeof(u32)));
     VirtualResourceHandle clearHandle = fg.ImportBuffer("vsm_draw_clear", state->drawClear, bufferDesc("vsm_draw_clear", sizeof(u32) * 4, 0));
     VirtualResourceHandle argsHandles[kVSMStreamCount];
     {
