@@ -194,6 +194,7 @@ target_sources(xrRender PRIVATE
     FLOD.cpp
     FProgressive.cpp
     ClusterDAG.cpp
+    ClusterDeviation.cpp
     FSkinned.cpp
     FTreeVisual.cpp
     FVisual.cpp

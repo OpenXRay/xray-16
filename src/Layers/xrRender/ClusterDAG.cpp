@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ClusterDAG.h"
+#include "ClusterDeviation.h"
 #include "xrRender_console.h"
 
 #include "../../../Externals/meshoptimizer/src/meshoptimizer.h"
@@ -47,9 +48,19 @@ struct BakeUnitDesc {
     u64 totalIndices;
 };
 
+struct SimplifyStats {
+    u32 groups = 0;
+    u32 sloppy = 0;
+    u32 stuck = 0;
+    u32 raised = 0;
+    u32 raisedSloppy = 0;
+    float maxRaise = 0.0f;
+};
+
 struct BakeResult {
     xr_vector<ClusterMetaProto> protos;
     xr_vector<u32> indices;
+    SimplifyStats simplify;
     bool baked;
 };
 
@@ -212,12 +223,42 @@ void FillAttributes(const bindless::UnifiedVertex* verts, u32 count, float* attr
     }
 }
 
-clodConfig MakeConfig(bool leavesOnly)
+float SimplifyErrorHook(void* ctxv, const clodMesh* mesh, const u32* source, size_t sourceCount,
+    const u32* result, size_t resultCount, u32 method, float error)
+{
+    BakeContext* ctx = static_cast<BakeContext*>(ctxv);
+    SimplifyStats& st = ctx->result->simplify;
+    st.groups++;
+    if (method & 2)
+        st.sloppy++;
+    if (method & 4) {
+        st.stuck++;
+        return error;
+    }
+
+    const float deviation = ClusterMeshDeviation(
+        mesh->vertex_positions, mesh->vertex_positions_stride / sizeof(float),
+        mesh->vertex_attributes, mesh->vertex_attributes_stride / sizeof(float),
+        mesh->attribute_weights, u32(mesh->attribute_count),
+        source, sourceCount, result, resultCount);
+
+    if (deviation > error + 1e-3f) {
+        st.raised++;
+        if (method & 2)
+            st.raisedSloppy++;
+        st.maxRaise = std::max(st.maxRaise, deviation - error);
+    }
+    return std::max(error, deviation);
+}
+
+clodConfig MakeConfig(bool leavesOnly, BakeContext& ctx)
 {
     clodConfig cfg = clodDefaultConfig(kClusterMaxTris);
     cfg.optimize_bounds = true;
     cfg.simplify_fallback_sloppy = true;
     cfg.simplify_prune = false;
+    cfg.simplify_error_hook = &SimplifyErrorHook;
+    cfg.simplify_error_context = &ctx;
     if (leavesOnly)
         cfg.simplify_ratio = 1.0f;
     return cfg;
@@ -260,7 +301,7 @@ void BakeSingleMesh(
     ctx.protoFlags = ((rangeFlags & CLUSTER_RANGE_FLAG_AT) ? CLUSTER_PROTO_FLAG_AT : 0) |
                      ((rangeFlags & CLUSTER_RANGE_FLAG_TERRAIN) ? CLUSTER_PROTO_FLAG_TERRAIN : 0);
 
-    clodBuild(MakeConfig((rangeFlags & CLUSTER_RANGE_FLAG_AT) != 0), mesh, &ctx, &OutputGroupCB);
+    clodBuild(MakeConfig((rangeFlags & CLUSTER_RANGE_FLAG_AT) != 0, ctx), mesh, &ctx, &OutputGroupCB);
     result.baked = !result.protos.empty();
 }
 
@@ -364,7 +405,7 @@ void BakeComponent(
     ctx.protoFlags = (ranges[members[0]].flags & CLUSTER_RANGE_FLAG_TERRAIN)
         ? CLUSTER_PROTO_FLAG_TERRAIN : 0;
 
-    clodBuild(MakeConfig(false), mesh, &ctx, &OutputGroupCB);
+    clodBuild(MakeConfig(false, ctx), mesh, &ctx, &OutputGroupCB);
     result.baked = !result.protos.empty();
 }
 
@@ -376,7 +417,7 @@ bool IsSelfLoop(const ClusterMetaProto& p)
 }
 
 constexpr u32 kCacheMagic = 0x464C4356;
-constexpr u32 kCacheVersion = 7;
+constexpr u32 kCacheVersion = 10;
 
 #pragma pack(push, 4)
 struct CacheHeader {
@@ -813,6 +854,12 @@ void ClusterDAG::Bake(
 
     for (size_t i = 0; i < units.size(); ++i) {
         BakeResult& r = results[i];
+        m_stats.simplifiedGroups += r.simplify.groups;
+        m_stats.sloppyGroups += r.simplify.sloppy;
+        m_stats.stuckGroups += r.simplify.stuck;
+        m_stats.deviationRaised += r.simplify.raised;
+        m_stats.deviationRaisedSloppy += r.simplify.raisedSloppy;
+        m_stats.deviationMaxRaise = std::max(m_stats.deviationMaxRaise, r.simplify.maxRaise);
         if (!r.baked) {
             m_stats.bakeFailed++;
             continue;
@@ -881,6 +928,9 @@ void ClusterDAG::Bake(
         m_stats.orphansAttached, m_stats.pinnedVerts, m_stats.droppedSelfLoops, m_stats.holes);
     Msg("* [ClusterDAG] terrain: %u meshes, %u components, %u clusters",
         m_stats.terrainMeshes, m_stats.terrainComponents, m_stats.terrainClusters);
+    Msg("* [ClusterDAG] simplify: %u groups (%u sloppy, %u stuck), deviation raised %u (%u sloppy, max +%.3f m)",
+        m_stats.simplifiedGroups, m_stats.sloppyGroups, m_stats.stuckGroups,
+        m_stats.deviationRaised, m_stats.deviationRaisedSloppy, m_stats.deviationMaxRaise);
     Msg("* [ClusterDAG] parentError histogram: inf=%u >100=%u 10-100=%u 1-10=%u 0.1-1=%u <0.1=%u",
         m_stats.histInf, m_stats.hist100, m_stats.hist10, m_stats.hist1, m_stats.hist01, m_stats.histSmall);
     {
