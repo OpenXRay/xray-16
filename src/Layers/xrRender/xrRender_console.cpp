@@ -308,6 +308,7 @@ float ps_r_vsm_ta_clamp        = 0.24f;
 float ps_r_vsm_ta_motion       = 6.0f;
 float ps_r_vsm_ta_motion_floor = 0.30f;
 float ps_r_vsm_ta_carry        = 0.98f;
+int   ps_r_vsm_dirty_budget    = 128;
 
 int   ps_r_smoke_trail_enabled  = 1;
 float ps_r_smoke_max_emit_rate  = 45.f;
@@ -1030,6 +1031,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_vsm_ta_motion", &ps_r_vsm_ta_motion, 0.5f, 64.0f);
     CMD4(CCC_Float, "r_vsm_ta_motion_floor", &ps_r_vsm_ta_motion_floor, 0.0f, 1.0f);
     CMD4(CCC_Float, "r_vsm_ta_carry", &ps_r_vsm_ta_carry, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_vsm_dirty_budget", &ps_r_vsm_dirty_budget, 0, 4096);
 
     // Smoke Trail (weapon muzzle smoke)
     CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);
