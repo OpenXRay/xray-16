@@ -302,6 +302,12 @@ float ps_r_vsm_cluster_lod     = 1.0f;
 float ps_r_vsm_raster_bias     = 0.5f;
 float ps_r_vsm_raster_slope    = 1.5f;
 int   ps_r_vsm_at              = 1;
+int   ps_r_vsm_temporal        = 1;
+float ps_r_vsm_ta_blend        = 0.9f;
+float ps_r_vsm_ta_clamp        = 0.24f;
+float ps_r_vsm_ta_motion       = 6.0f;
+float ps_r_vsm_ta_motion_floor = 0.30f;
+float ps_r_vsm_ta_carry        = 0.98f;
 
 int   ps_r_smoke_trail_enabled  = 1;
 float ps_r_smoke_max_emit_rate  = 45.f;
@@ -1018,6 +1024,12 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_vsm_raster_bias", &ps_r_vsm_raster_bias, 0.0f, 16.0f);
     CMD4(CCC_Float, "r_vsm_raster_slope", &ps_r_vsm_raster_slope, 0.0f, 16.0f);
     CMD4(CCC_Integer, "r_vsm_at", &ps_r_vsm_at, 0, 1);
+    CMD4(CCC_Integer, "r_vsm_temporal", &ps_r_vsm_temporal, 0, 1);
+    CMD4(CCC_Float, "r_vsm_ta_blend", &ps_r_vsm_ta_blend, 0.0f, 0.98f);
+    CMD4(CCC_Float, "r_vsm_ta_clamp", &ps_r_vsm_ta_clamp, 0.0f, 1.0f);
+    CMD4(CCC_Float, "r_vsm_ta_motion", &ps_r_vsm_ta_motion, 0.5f, 64.0f);
+    CMD4(CCC_Float, "r_vsm_ta_motion_floor", &ps_r_vsm_ta_motion_floor, 0.0f, 1.0f);
+    CMD4(CCC_Float, "r_vsm_ta_carry", &ps_r_vsm_ta_carry, 0.0f, 1.0f);
 
     // Smoke Trail (weapon muzzle smoke)
     CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);
