@@ -110,6 +110,9 @@ struct VSMState {
     float rasterBias = -1.0f;
     float rasterSlope = -1.0f;
     int atMode = -1;
+    float lastBase = -1.0f;
+    float lastClusterLod = -1.0f;
+    u32 boltHeld = 0;
 
     nvrhi::ComputePipelineHandle markPipeline;
     nvrhi::BindingLayoutHandle markLayout;
