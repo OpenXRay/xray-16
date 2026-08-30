@@ -10,6 +10,9 @@ cbuffer VsmResidParams : register(b5)
     uint g_SunMoving;
     uint g_ForceDirty;
     float4 g_Inval[4];
+    uint g_SunEpoch;
+    uint g_StaleOn;
+    uint2 g_ResidPad;
 };
 
 StructuredBuffer<uint> g_Needed : register(t0);
@@ -19,6 +22,7 @@ RWStructuredBuffer<uint2> g_PhysTile : register(u2);
 RWStructuredBuffer<uint> g_SlotDirty : register(u3);
 RWStructuredBuffer<uint> g_DirtyList : register(u4);
 RWByteAddressBuffer g_DrawClear : register(u5);
+RWStructuredBuffer<uint> g_SlotEpoch : register(u6);
 
 int2 pageBaseOf(int L)
 {
@@ -49,6 +53,16 @@ void main(uint3 dtID : SV_DispatchThreadID)
     uint2 tile = uint2(uint(absPage.x), uint(absPage.y));
     bool wrong = any(g_PhysTile[slot] != tile);
     bool refresh = (g_SunMoving != 0u) && (g_RefreshN != 0u) && ((uint(slot) % g_RefreshN) == (g_Frame % g_RefreshN));
+    uint age = g_SunEpoch - g_SlotEpoch[slot];
+    bool aged = !wrong && !refresh && (g_RefreshN != 0u) && (age >= g_RefreshN);
+    if (aged)
+    {
+        uint s;
+        InterlockedAdd(g_DirtyList[uint(VSM_MAX_PHYS_S) + 1u], 1u, s);
+        uint m;
+        InterlockedMax(g_DirtyList[uint(VSM_MAX_PHYS_S) + 2u], age, m);
+    }
+    bool stale = aged && (g_StaleOn != 0u);
 
     bool inval = false;
     {
@@ -84,10 +98,11 @@ void main(uint3 dtID : SV_DispatchThreadID)
         }
     }
 
-    if (wrong || refresh || inval || g_ForceDirty != 0u)
+    if (wrong || refresh || stale || inval || g_ForceDirty != 0u)
     {
         g_PhysTile[slot] = tile;
-        g_SlotDirty[slot] = wrong ? 1u : (refresh ? 2u : (inval ? 3u : 4u));
+        g_SlotEpoch[slot] = g_SunEpoch;
+        g_SlotDirty[slot] = wrong ? 1u : (refresh ? 2u : (stale ? 5u : (inval ? 3u : 4u)));
         uint d;
         g_DrawClear.InterlockedAdd(4, 1u, d);
         if (d < uint(VSM_MAX_PHYS_S))
