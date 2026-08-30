@@ -7,7 +7,8 @@ cbuffer DebugPreviewParams : register(b5)
     uint2 g_sourceSize;
     uint g_mode;
     uint g_mipLevel;
-    uint2 g_pad;
+    float g_projA;
+    float g_projB;
 };
 
 [numthreads(8, 8, 1)]
@@ -25,7 +26,12 @@ void main(uint3 dtid : SV_DispatchThreadID)
     if (g_mode == 5)
     {
         float d = color.r;
-        color = float4(d, d, d, 1.0);
+        float z = g_projB / max(d - g_projA, 1e-7);
+        float zn = g_projB / max(1.0 - g_projA, 1e-7);
+        float zf = min(g_projB / max(-g_projA, 1e-7), 4096.0);
+        float t = saturate(log2(max(z / zn, 1.0)) / log2(max(zf / zn, 2.0)));
+        float v = d > 0.0 ? 1.0 - t : 0.0;
+        color = float4(v, v, v, 1.0);
     }
     else if (g_mode == 1)
         color = float4(color.r, color.r, color.r, 1.0);

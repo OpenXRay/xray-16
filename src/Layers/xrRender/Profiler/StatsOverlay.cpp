@@ -711,6 +711,11 @@ void StatsOverlay::RenderInspectorSection()
                 m_inspectorSelectedRT = i;
                 m_selectedRTName = m_rtNames[i];
                 m_selectedMipLevel = 0;
+                const bool depthRT = i < (int)m_rtIsDepth.size() && m_rtIsDepth[i] != 0;
+                if (depthRT)
+                    m_channelMode = 5;
+                else if (m_channelMode == 5)
+                    m_channelMode = 0;
             }
             if (selected)
                 ImGui::SetItemDefaultFocus();
@@ -724,7 +729,8 @@ void StatsOverlay::RenderInspectorSection()
         ImGui::RadioButton("R", &m_channelMode, 1); ImGui::SameLine();
         ImGui::RadioButton("G", &m_channelMode, 2); ImGui::SameLine();
         ImGui::RadioButton("B", &m_channelMode, 3); ImGui::SameLine();
-        ImGui::RadioButton("A", &m_channelMode, 4);
+        ImGui::RadioButton("A", &m_channelMode, 4); ImGui::SameLine();
+        ImGui::RadioButton("Depth", &m_channelMode, 5);
 
         if (m_selectedRTMipCount > 1)
         {
