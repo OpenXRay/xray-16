@@ -12,6 +12,8 @@
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
+#include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/Environment.h"
 
 namespace xray::render::fg::passes {
 
@@ -503,11 +505,12 @@ void LogTelemetry(VSMState& state)
     if (Device.dwTimeGlobal - state.lastLogTime < 2000)
         return;
     state.lastLogTime = Device.dwTimeGlobal;
-    Msg("[VSM] mark: pages=%u | L0=%u L1=%u L2=%u L3=%u L4=%u L5=%u | sun %s step max %.3f deg | window snap max %u pages | base %.1f m | zc %.0f | inval %u",
+    Msg("[VSM] mark: pages=%u | L0=%u L1=%u L2=%u L3=%u L4=%u L5=%u | sun %s step max %.3f deg | window snap max %u pages | base %.1f m k %.2f | zc %.0f | inval %u boltHeld %u",
         state.markPages, state.levelPages[0], state.levelPages[1], state.levelPages[2],
         state.levelPages[3], state.levelPages[4], state.levelPages[5],
         state.sunMoving ? "moving" : "static", state.sunStepMax, state.snapMax,
-        ps_r_vsm_base, state.zCentre, state.invalidations);
+        ps_r_vsm_base, ps_r_vsm_cluster_lod, state.zCentre, state.invalidations, state.boltHeld);
+    state.boltHeld = 0;
     Msg("[VSM] static: dirty=%u/%u rendered | wrong=%u budget=%d prime=%u | cache %s refresh %d",
         state.dirtyPages, state.markPages, state.wrongPages, ps_r_vsm_dirty_budget, state.primeFrames,
         ps_r_vsm_cache ? "on" : "off", ps_r_vsm_cache_refresh);
@@ -994,6 +997,8 @@ void InvalidateVSMCache(VSMState& state)
 void VSMBeginFrame(VSMState& state, const Fvector& camPos, const Fvector& sunDirIn)
 {
     state.frame++;
+    if (g_pGamePersistent && g_pGamePersistent->Environment().IsThunderboltActive())
+        state.boltHeld++;
 
     Fvector sd = sunDirIn;
     if (sd.magnitude() < 1e-4f)
@@ -1099,6 +1104,15 @@ VSMOutput setupVSMPasses(
         if (state->atMode >= 0)
             InvalidateVSMCache(*state);
         state->atMode = ps_r_vsm_at ? 1 : 0;
+    }
+    {
+        const float k = std::max(0.1f, ps_r_vsm_cluster_lod);
+        if (state->lastBase != ps_r_vsm_base || state->lastClusterLod != k) {
+            if (state->lastBase >= 0.0f)
+                InvalidateVSMCache(*state);
+            state->lastBase = ps_r_vsm_base;
+            state->lastClusterLod = k;
+        }
     }
     {
         const bool behind = VSMLoadScreenFrozen();
