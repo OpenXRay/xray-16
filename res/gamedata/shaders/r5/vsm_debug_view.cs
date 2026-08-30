@@ -36,9 +36,11 @@ void main(uint3 dtID : SV_DispatchThreadID)
     {
         float4 mv = g_Mask.Load(int3(px, 0));
         float3 c = float3(mv.r, mv.r, mv.r);
-        if (mv.a > 1.5)
+        if (g_DebugPad.x != 0u)
+            c = lerp(c, float3(1.0, 0.1, 0.1), saturate(mv.b));
+        else if (mv.b > 1.5)
             c = float3(1.0, 0.1, 0.1);
-        else if (mv.a > 0.5)
+        else if (mv.b > 0.5)
             c = float3(1.0, 0.9, 0.2);
         g_Output[px] = float4(c, 1.0);
         return;
