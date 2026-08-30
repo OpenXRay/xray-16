@@ -4338,6 +4338,23 @@ void GPUCullingManager::BuildClusterEntries()
     m_clusterSet.terrainEntryCount = m_clusterSet.entryCount - m_clusterSet.staticEntryCount;
     m_clusterSet.residualTerrainCount = terrainCount - std::min(clusteredTerrain, terrainCount);
     Msg("* [GPUCulling] cluster coverage: %u static batches shadow-only (variant materials), %u without a DAG record", shadowOnlyBatches, unclusteredBatches);
+    {
+        u32 giants = 0;
+        float maxR = 0.0f;
+        u32 maxIdx = 0;
+        for (u32 i = 0; i < u32(m_clusterEntryData.size()); ++i) {
+            const float r = m_clusterEntryData[i].sphere.w;
+            if (r > 100.0f) {
+                ++giants;
+                if (r > maxR) { maxR = r; maxIdx = i; }
+            }
+        }
+        if (giants) {
+            const GPUClusterEntry& g = m_clusterEntryData[maxIdx];
+            Msg("! [GPUCulling] %u cluster entries with radius > 100 m; largest r=%.1f entry=%u batch=%u flags=0x%x tris=%u selfErr=%.3f parentErr=%.3f",
+                giants, maxR, maxIdx, g.batchIndex, g.flags, g.indexCount / 3u, g.selfError, g.parentError);
+        }
+    }
     Msg("* [GPUCulling] cluster entries: %u (%u static + %u terrain) from %u+%u clustered batches",
         m_clusterSet.entryCount, m_clusterSet.staticEntryCount, m_clusterSet.terrainEntryCount,
         clusteredBatches, clusteredTerrain);
