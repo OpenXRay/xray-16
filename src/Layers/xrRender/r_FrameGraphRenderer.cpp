@@ -802,6 +802,11 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.vsmPages = vsm.markPages;
             stats.vsmDirtyPages = vsm.dirtyPages;
             stats.vsmWrongPages = vsm.wrongPages;
+            stats.vsmBinDraws = vsm.binDraws;
+            stats.vsmBinInstances = vsm.binInstances;
+            stats.vsmBinMaxPages = vsm.binMaxPages;
+            stats.vsmBinLodCulled = vsm.binLodCulled;
+            stats.vsmBinDrops = vsm.binDrops;
             for (u32 L = 0; L < passes::kVSMLevels; ++L)
                 stats.vsmLevelPages[L] = vsm.levelPages[L];
         }
@@ -1262,7 +1267,15 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         vsmState.active = false;
         if (ps_r_vsm && prepassActive && hizOutput.pyramid.is_valid()) {
             passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
-            auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid,
+            passes::VSMDrawConfig vsmCfg;
+            vsmCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+            vsmCfg.entryCount = m_gpuCullingManager->GetClusterEntryCount();
+            vsmCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+            vsmCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+            vsmCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
+            vsmCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
+            vsmCfg.materialCache = m_materialCache.get();
+            auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, vsmCfg,
                 width, height, &vsmState, m_gpuProfiler.get());
             if (vsmOut.debugView.is_valid())
                 m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmOut.debugView);

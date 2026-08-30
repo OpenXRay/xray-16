@@ -575,6 +575,8 @@ void StatsOverlay::RenderGeometrySection()
                 s.vsmLevelPages[3], s.vsmLevelPages[4], s.vsmLevelPages[5],
                 s.vsmSunMoving ? "moving" : "static");
             ImGui::Text("Static atlas: %u dirty (%u wrong-tile)", s.vsmDirtyPages, s.vsmWrongPages);
+            ImGui::Text("Bin: %u clusters -> %u page draws (max %u/cluster), %u lod-culled, %u drops",
+                s.vsmBinDraws, s.vsmBinInstances, s.vsmBinMaxPages, s.vsmBinLodCulled, s.vsmBinDrops);
             ImGui::Unindent();
         }
 
