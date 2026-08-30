@@ -6,7 +6,24 @@
 Texture2D<float> g_SunShadowFar : register(t26);
 Texture2D<float> g_SunShadowCasc0 : register(t27);
 Texture2D<float> g_SunShadowCasc1 : register(t28);
+Texture2D<float4> g_SunShadowMask : register(t29);
 SamplerComparisonState smp_sunshadow;
+
+float VSMMaskVisibility(float3 worldPos, float4 svPosition)
+{
+    float2 pixel;
+    if (svPosition.w != 0.0)
+    {
+        pixel = svPosition.xy;
+    }
+    else
+    {
+        float4 c = mul(m_VP, float4(worldPos, 1.0));
+        float2 ndc = c.xy / max(c.w, 1e-6);
+        pixel = float2(ndc.x * 0.5 + 0.5, 0.5 - ndc.y * 0.5) * screen_res.xy;
+    }
+    return saturate(g_SunShadowMask.Load(int3(int2(pixel), 0)).r);
+}
 
 float SunOccluded(Texture2D<float> smap, float2 uv, float ref)
 {
@@ -45,6 +62,8 @@ float SunVisibility(float3 worldPos)
 {
     if (cascade_splits.x < 0.5)
         return 1.0;
+    if (cascade_splits.x > 1.5)
+        return VSMMaskVisibility(worldPos, float4(0.0, 0.0, 0.0, 0.0));
     if (cascade_splits.y > 0.0)
     {
         float s = CascSample(g_SunShadowCasc0, shadow_matrices[0], worldPos, float2(cascade_splits.y, cascade_splits.y));
@@ -58,6 +77,13 @@ float SunVisibility(float3 worldPos)
             return s;
     }
     return SunShadowFar(worldPos);
+}
+
+float SunVisibility(float3 worldPos, float4 svPosition)
+{
+    if (cascade_splits.x > 1.5)
+        return VSMMaskVisibility(worldPos, svPosition);
+    return SunVisibility(worldPos);
 }
 
 bool CascInside(float4x4 vp, float3 worldPos)
@@ -101,6 +127,11 @@ float3 SunShadowDebugColor(float3 color, float3 worldPos)
 #else
 
 float SunVisibility(float3 worldPos)
+{
+    return 1.0;
+}
+
+float SunVisibility(float3 worldPos, float4 svPosition)
 {
     return 1.0;
 }

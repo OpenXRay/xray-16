@@ -59,6 +59,29 @@ struct VsmArgsParams {
     u32 pad;
 };
 
+struct VsmResolveParams {
+    Fmatrix invViewProj;
+    Fmatrix prevViewProj;
+    Fvector4 prevCamPos;
+    Fvector4 curCamPos;
+    Fvector4 screen;
+    Fvector4 params;
+    Fvector4 params2;
+    Fvector4 params3;
+    Fvector4 params4;
+};
+
+struct VSMResolveData {
+    VirtualResourceHandle depth;
+    VirtualResourceHandle atlas;
+    VirtualResourceHandle mask;
+    VSMState* state;
+    fg::RenderDevice* device;
+    u32 width;
+    u32 height;
+    xray::profiler::GPUProfiler* gpuProfiler;
+};
+
 struct VsmDebugParams {
     Fmatrix invViewProj;
     Fvector4 screen;
@@ -109,6 +132,7 @@ struct VSMAtlasData {
 struct VSMDebugData {
     VirtualResourceHandle depth;
     VirtualResourceHandle dirtyList;
+    VirtualResourceHandle mask;
     VirtualResourceHandle output;
     VSMState* state;
     fg::RenderDevice* device;
@@ -145,10 +169,15 @@ nvrhi::BufferHandle MakeUAVBuffer(nvrhi::IDevice* nvDevice, const char* name, u6
     return nvDevice->createBuffer(desc);
 }
 
+nvrhi::IBuffer* VsmParamsCB(fg::RenderDevice* device)
+{
+    return GetPassResourceCache().GetOrCreateVolatileCB("VSM", "VsmParams", sizeof(VsmParams), device, 64);
+}
+
 bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
 {
     if (state.markPipeline && state.residPipeline && state.debugPipeline && state.clearPipeline
-        && state.binPipeline && state.argsPipeline && state.pagePipeline && state.pageATPipeline)
+        && state.binPipeline && state.argsPipeline && state.pagePipeline && state.pageATPipeline && state.resolvePipeline)
         return true;
     if (state.pipelinesFailed)
         return false;
@@ -168,6 +197,12 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     auto pageVsResult = shaderLoader->LoadVertexShader("vsm_page_pull", "main");
     auto pagePsResult = shaderLoader->LoadPixelShader("vsm_page", "main");
     auto pageATPsResult = shaderLoader->LoadPixelShader("vsm_page_at", "main");
+    auto resolveResult = shaderLoader->LoadComputeShader("vsm_resolve");
+    if (!resolveResult.handle || !resolveResult.reflection) {
+        Msg("! [VSM] resolve shader failed to load");
+        state.pipelinesFailed = true;
+        return false;
+    }
     if (!markResult.handle || !markResult.reflection || !residResult.handle || !residResult.reflection
         || !debugResult.handle || !debugResult.reflection || !clearVsResult.handle || !clearVsResult.reflection
         || !clearPsResult.handle || !clearPsResult.reflection || !binResult.handle || !binResult.reflection
@@ -190,8 +225,9 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     state.argsLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMArgs", *argsResult.reflection, nvDevice);
     state.pageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMPage", *pageVsResult.reflection, *pagePsResult.reflection, nvDevice);
     state.pageATLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMPageAT", *pageVsResult.reflection, *pageATPsResult.reflection, nvDevice);
+    state.resolveLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMResolve", *resolveResult.reflection, nvDevice);
     if (!state.markLayout || !state.residLayout || !state.debugLayout || !state.clearLayout
-        || !state.binLayout || !state.argsLayout || !state.pageLayout || !state.pageATLayout) {
+        || !state.binLayout || !state.argsLayout || !state.pageLayout || !state.pageATLayout || !state.resolveLayout) {
         state.pipelinesFailed = true;
         return false;
     }
@@ -236,6 +272,11 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     argsDesc.bindingLayouts = { state.argsLayout };
     state.argsPipeline = cache.GetOrCreateComputePipeline("VSMArgs", argsDesc, nvDevice);
 
+    nvrhi::ComputePipelineDesc resolveDesc;
+    resolveDesc.CS = resolveResult.handle;
+    resolveDesc.bindingLayouts = { state.resolveLayout };
+    state.resolvePipeline = cache.GetOrCreateComputePipeline("VSMResolve", resolveDesc, nvDevice);
+
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
     auto makePageDesc = [&](nvrhi::IShader* ps, nvrhi::IBindingLayout* layout, bool withBindless) {
@@ -265,7 +306,7 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     state.pageATPipeline = cache.GetOrCreatePipeline(name, makePageDesc(state.pageATPS, state.pageATLayout, true), fbInfo, nvDevice);
 
     if (!state.markPipeline || !state.residPipeline || !state.debugPipeline || !state.clearPipeline
-        || !state.binPipeline || !state.argsPipeline || !state.pagePipeline || !state.pageATPipeline) {
+        || !state.binPipeline || !state.argsPipeline || !state.pagePipeline || !state.pageATPipeline || !state.resolvePipeline) {
         Msg("! [VSM] pipeline creation failed");
         state.pipelinesFailed = true;
         return false;
@@ -360,6 +401,35 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
     return true;
 }
 
+bool EnsureMaskTargets(nvrhi::IDevice* nvDevice, VSMState& state, u32 width, u32 height)
+{
+    if (state.mask[0] && state.mask[1] && state.maskWidth == width && state.maskHeight == height)
+        return true;
+    for (u32 i = 0; i < 2; ++i) {
+        nvrhi::TextureDesc desc;
+        desc.width = width;
+        desc.height = height;
+        desc.format = nvrhi::Format::RGBA16_FLOAT;
+        desc.debugName = i == 0 ? "VSM_Mask0" : "VSM_Mask1";
+        desc.isShaderResource = true;
+        desc.isUAV = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        state.mask[i] = nvDevice->createTexture(desc);
+    }
+    state.maskWidth = width;
+    state.maskHeight = height;
+    state.maskSlot = 0;
+    state.resolveCount = 0;
+    state.maskReady = false;
+    if (!state.mask[0] || !state.mask[1]) {
+        Msg("! [VSM] mask creation failed (%ux%u)", width, height);
+        return false;
+    }
+    Msg("* [VSM] mask targets %ux%u RGBA16F x2", width, height);
+    return true;
+}
+
 void ProcessReadback(nvrhi::IDevice* nvDevice, VSMState& state)
 {
     if (state.readbackScheduled < VSMState::kReadbackSlots)
@@ -444,7 +514,7 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
     if (!markRefl)
         return;
 
-    auto vsmCB = cache.GetOrCreateVolatileCB("VSM", "VsmParams", sizeof(VsmParams), data.device);
+    auto vsmCB = VsmParamsCB(data.device);
     cmdList->writeBuffer(vsmCB, &state.params, sizeof(VsmParams));
 
     const u32 markStep = ps_r_vsm_mark_half ? 2u : 1u;
@@ -587,8 +657,7 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
 
     const bool haveEntries = data.config.entryBuffer && data.config.entryCount > 0;
     if (haveEntries) {
-        auto vsmCB = cache.GetOrCreateVolatileCB("VSM", "VsmParams", sizeof(VsmParams), data.device);
-        cmdList->writeBuffer(vsmCB, &state.params, sizeof(VsmParams));
+        auto vsmCB = VsmParamsCB(data.device);
 
         VsmBinParams bp = {};
         bp.entryCount = data.config.entryCount;
@@ -678,8 +747,7 @@ void DrawPages(fg::RenderContext* ctx, const VSMAtlasData& data, nvrhi::IFramebu
         return;
 
     auto& matBuffer = bindless::MaterialBuffer::Instance();
-    auto vsmCB = cache.GetOrCreateVolatileCB("VSM", "VsmParams", sizeof(VsmParams), data.device);
-    cmdList->writeBuffer(vsmCB, &state.params, sizeof(VsmParams));
+    auto vsmCB = VsmParamsCB(data.device);
     auto* backend = data.device->GetBackend();
     nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
 
@@ -770,6 +838,63 @@ void ExecuteAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMAtlasDa
         nvrhi::Rect(rtDesc.width, rtDesc.height));
 }
 
+void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResolveData& data)
+{
+    VSMState& state = *data.state;
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+    nvrhi::ITexture* depth = fg.GetPhysicalTexture(data.depth);
+    nvrhi::ITexture* atlas = fg.GetPhysicalTexture(data.atlas);
+    nvrhi::ITexture* mask = fg.GetPhysicalTexture(data.mask);
+    if (!cmdList || !nvDevice || !depth || !atlas || !mask || !state.resolvePipeline)
+        return;
+    VSMZone zone(data.gpuProfiler, cmdList, "VSM/Resolve");
+
+    auto& cache = GetPassResourceCache();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* refl = shaderLoader->GetCachedReflection("vsm_resolve", ".cs");
+    if (!refl)
+        return;
+
+    auto vsmCB = VsmParamsCB(data.device);
+
+    VsmResolveParams rp = {};
+    rp.invViewProj = Device.mInvFullTransform;
+    rp.prevViewProj = state.prevViewProj;
+    rp.prevCamPos.set(state.prevCamPos.x, state.prevCamPos.y, state.prevCamPos.z, 0.0f);
+    rp.curCamPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 0.0f);
+    rp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
+    rp.params.set(0.0f, 0.05f, 0.0f, 0.0f);
+    rp.params2.set(0.0f, 0.0f, 0.0f, 0.0f);
+    rp.params3.set(0.0f, 0.0f, 0.0f, 0.0f);
+    rp.params4.set(float(state.resolveCount & 63u), 0.0f, 0.0f, 0.0f);
+    auto resolveCB = cache.GetOrCreateVolatileCB("VSM", "ResolveParams", sizeof(VsmResolveParams), data.device);
+    cmdList->writeBuffer(resolveCB, &rp, sizeof(rp));
+
+    BindingSetBuilder bsb(*refl, nvDevice, "VSM.Resolve");
+    bsb.ConstantBuffer("VsmParams", vsmCB)
+       .ConstantBuffer("VsmResolveParams", resolveCB)
+       .Texture("g_Depth", depth)
+       .Texture("g_Atlas", atlas)
+       .BufferSRV("g_PageTable", state.pageTable)
+       .TextureUAV("g_Mask", mask);
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.resolveLayout, nvDevice);
+    if (!bindingSet)
+        return;
+
+    nvrhi::ComputeState cs;
+    cs.pipeline = state.resolvePipeline;
+    cs.bindings = { bindingSet };
+    cmdList->setComputeState(cs);
+    cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
+
+    state.prevViewProj = Device.mFullTransform;
+    state.prevCamPos = Device.vCameraPosition;
+    if (state.resolveCount < 0xFFFF)
+        state.resolveCount++;
+    state.maskReady = true;
+}
+
 void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDebugData& data)
 {
     VSMState& state = *data.state;
@@ -777,8 +902,11 @@ void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDeb
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     nvrhi::ITexture* depth = fg.GetPhysicalTexture(data.depth);
     nvrhi::ITexture* output = fg.GetPhysicalTexture(data.output);
+    nvrhi::ITexture* mask = data.mask.is_valid() ? fg.GetPhysicalTexture(data.mask) : nullptr;
     if (!cmdList || !nvDevice || !depth || !output || !state.debugPipeline)
         return;
+    if (!mask)
+        mask = GetPassResourceCache().GetDummyShadowMap2D(nvDevice);
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -786,8 +914,7 @@ void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDeb
     if (!refl)
         return;
 
-    auto vsmCB = cache.GetOrCreateVolatileCB("VSM", "VsmParams", sizeof(VsmParams), data.device);
-    cmdList->writeBuffer(vsmCB, &state.params, sizeof(VsmParams));
+    auto vsmCB = VsmParamsCB(data.device);
 
     VsmDebugParams dp = {};
     dp.invViewProj = Device.mInvFullTransform;
@@ -803,6 +930,7 @@ void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDeb
        .BufferSRV("g_Needed", state.needed)
        .BufferSRV("g_PageTable", state.pageTable)
        .BufferSRV("g_SlotDirty", state.slotDirty)
+       .Texture("g_Mask", mask)
        .TextureUAV("g_Output", output);
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.debugLayout, nvDevice);
     if (!bindingSet)
@@ -918,6 +1046,8 @@ VSMOutput setupVSMPasses(
 
     ProcessReadback(nvDevice, *state);
     if (!EnsureResources(nvDevice, *state))
+        return out;
+    if (!EnsureMaskTargets(nvDevice, *state, width, height))
         return out;
     if (state->rasterBias != ps_r_vsm_raster_bias || state->rasterSlope != ps_r_vsm_raster_slope) {
         const bool live = state->rasterBias >= 0.0f;
@@ -1035,6 +1165,38 @@ VSMOutput setupVSMPasses(
     out.atlas = atlasData.atlas;
     out.active = true;
 
+    state->maskSlot = (state->maskSlot + 1) % 2;
+    ResourceDesc maskDesc;
+    maskDesc.type = ResourceDesc::Type::Texture2D;
+    maskDesc.width = width;
+    maskDesc.height = height;
+    maskDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    maskDesc.isUAV = true;
+    maskDesc.allowUAV = true;
+    maskDesc.isImported = true;
+    maskDesc.isTransient = false;
+    maskDesc.debugName = "rt_VSMMask";
+    VirtualResourceHandle maskHandle = fg.ImportTexture("rt_VSMMask", state->mask[state->maskSlot], maskDesc);
+
+    auto& resolveData = fg.addCallbackPass<VSMResolveData>(
+        "VSM Resolve",
+        [&, depth, maskHandle, width, height, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMResolveData& data) {
+            data.state = state;
+            data.device = device;
+            data.width = width;
+            data.height = height;
+            data.gpuProfiler = gpuProfiler;
+            RenderPassBuilder passBuilder(builder, passHandle);
+            data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
+            data.atlas = passBuilder.read(atlasData.atlas, ResourceState::ShaderResource);
+            data.mask = passBuilder.write(maskHandle, ResourceState::UnorderedAccess);
+        },
+        [](const VSMResolveData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            ExecuteResolve(ctx, fg, data);
+        });
+    fg.GetRTRegistry().RegisterRT("rt_VSMMask", resolveData.mask);
+    out.mask = resolveData.mask;
+
     if (ps_r_vsm_debug >= 2) {
         ResourceDesc viewDesc;
         viewDesc.type = ResourceDesc::Type::Texture2D;
@@ -1049,7 +1211,7 @@ VSMOutput setupVSMPasses(
 
         auto& debugData = fg.addCallbackPass<VSMDebugData>(
             "VSM Debug View",
-            [&, depth, viewHandle, width, height, state](FrameGraph& builder, PassHandle passHandle, VSMDebugData& data) {
+            [&, depth, viewHandle, width, height, state, resolveData](FrameGraph& builder, PassHandle passHandle, VSMDebugData& data) {
                 data.state = state;
                 data.device = device;
                 data.width = width;
@@ -1057,6 +1219,7 @@ VSMOutput setupVSMPasses(
                 RenderPassBuilder passBuilder(builder, passHandle);
                 data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
                 data.dirtyList = passBuilder.read(residData.dirtyList, ResourceState::ShaderResource);
+                data.mask = passBuilder.read(resolveData.mask, ResourceState::ShaderResource);
                 data.output = passBuilder.write(viewHandle, ResourceState::UnorderedAccess);
             },
             [](const VSMDebugData& data, const FrameGraph& fg, fg::RenderContext* ctx) {

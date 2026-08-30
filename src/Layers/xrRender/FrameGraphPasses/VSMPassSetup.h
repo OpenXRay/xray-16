@@ -75,6 +75,14 @@ struct VSMState {
     nvrhi::BufferHandle dirtyList;
     nvrhi::BufferHandle drawClear;
     nvrhi::TextureHandle atlas;
+    nvrhi::TextureHandle mask[2];
+    u32 maskWidth = 0;
+    u32 maskHeight = 0;
+    u32 maskSlot = 0;
+    u32 resolveCount = 0;
+    bool maskReady = false;
+    Fmatrix prevViewProj;
+    Fvector prevCamPos;
     nvrhi::BufferHandle binStats;
     nvrhi::BufferHandle pairs[kVSMStreamCount];
     nvrhi::BufferHandle pageArgs[kVSMStreamCount];
@@ -100,6 +108,8 @@ struct VSMState {
     nvrhi::BindingLayoutHandle residLayout;
     nvrhi::ComputePipelineHandle debugPipeline;
     nvrhi::BindingLayoutHandle debugLayout;
+    nvrhi::ComputePipelineHandle resolvePipeline;
+    nvrhi::BindingLayoutHandle resolveLayout;
     nvrhi::GraphicsPipelineHandle clearPipeline;
     nvrhi::BindingLayoutHandle clearLayout;
     nvrhi::ComputePipelineHandle binPipeline;
@@ -129,6 +139,7 @@ struct VSMDrawConfig {
 
 struct VSMOutput {
     framegraph::VirtualResourceHandle atlas;
+    framegraph::VirtualResourceHandle mask;
     framegraph::VirtualResourceHandle debugView;
     bool active = false;
 };

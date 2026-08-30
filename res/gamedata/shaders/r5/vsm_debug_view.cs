@@ -15,6 +15,7 @@ Texture2D<float> g_Depth : register(t0);
 StructuredBuffer<uint> g_Needed : register(t1);
 StructuredBuffer<uint> g_PageTable : register(t2);
 StructuredBuffer<uint> g_SlotDirty : register(t3);
+Texture2D<float4> g_Mask : register(t30);
 RWTexture2D<float4> g_Output : register(u0);
 
 static const float3 kLevelColors[VSM_LEVELS] = {
@@ -31,6 +32,12 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     float3 color = float3(0.02, 0.02, 0.03);
     float zndc = g_Depth.Load(int3(px, 0));
+    if (g_Mode == 4u)
+    {
+        float m = g_Mask.Load(int3(px, 0)).r;
+        g_Output[px] = float4(m, m, m, 1.0);
+        return;
+    }
     if (zndc > 0.0)
     {
         float2 uv = (float2(px) + 0.5) * g_Screen.zw;
