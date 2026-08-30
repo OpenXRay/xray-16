@@ -298,6 +298,7 @@ float ps_r_vsm_bias            = 0.0003f;
 float ps_r_vsm_bias_dyn        = 0.00002f;
 int   ps_r_vsm_cache           = 1;
 int   ps_r_vsm_cache_refresh   = 8;
+int   ps_r_vsm_stale_refresh   = 1;
 float ps_r_vsm_cluster_lod     = 1.0f;
 float ps_r_vsm_raster_bias     = 0.5f;
 float ps_r_vsm_raster_slope    = 1.5f;
@@ -1022,6 +1023,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_vsm_bias_dyn", &ps_r_vsm_bias_dyn, 0.0f, 0.02f);
     CMD4(CCC_Integer, "r_vsm_cache", &ps_r_vsm_cache, 0, 1);
     CMD4(CCC_Integer, "r_vsm_cache_refresh", &ps_r_vsm_cache_refresh, 1, 64);
+    CMD4(CCC_Integer, "r_vsm_stale_refresh", &ps_r_vsm_stale_refresh, 0, 1);
     CMD4(CCC_Float, "r_vsm_cluster_lod", &ps_r_vsm_cluster_lod, 0.1f, 16.0f);
     CMD4(CCC_Float, "r_vsm_raster_bias", &ps_r_vsm_raster_bias, 0.0f, 16.0f);
     CMD4(CCC_Float, "r_vsm_raster_slope", &ps_r_vsm_raster_slope, 0.0f, 16.0f);

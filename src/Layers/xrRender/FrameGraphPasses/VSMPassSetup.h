@@ -63,6 +63,7 @@ struct VSMState {
     float zCentre = 0.0f;
     bool zCentreValid = false;
     u32 frame = 0;
+    u32 sunEpoch = 0;
     u32 invalidations = 0;
     u32 snapMax = 0;
     float sunStepMax = 0.0f;
@@ -82,6 +83,7 @@ struct VSMState {
     nvrhi::BufferHandle slotDirty;
     nvrhi::BufferHandle dirtyList;
     nvrhi::BufferHandle drawClear;
+    nvrhi::BufferHandle slotEpoch;
     nvrhi::TextureHandle atlas;
     nvrhi::TextureHandle mask[2];
     u32 maskWidth = 0;
@@ -102,6 +104,8 @@ struct VSMState {
     u32 levelPages[kVSMLevels] = {};
     u32 dirtyPages = 0;
     u32 wrongPages = 0;
+    u32 stalePages = 0;
+    u32 staleMaxAge = 0;
     u32 binDraws = 0;
     u32 binInstances = 0;
     u32 binMaxPages = 0;
