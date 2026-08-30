@@ -12,6 +12,8 @@
 
 #include <stddef.h>
 
+struct clodMesh;
+
 struct clodConfig
 {
 	// configuration of each cluster; maps to meshopt_buildMeshlets* parameters
@@ -63,6 +65,9 @@ struct clodConfig
 
 	// should clodCluster::indices be optimized for locality; helps with rasterization performance and ray tracing performance in fast-build modes
 	bool optimize_clusters;
+
+	float (*simplify_error_hook)(void* context, const struct clodMesh* mesh, const unsigned int* source, size_t source_count, const unsigned int* result, size_t result_count, unsigned int method, float error);
+	void* simplify_error_context;
 };
 
 struct clodMesh
@@ -438,17 +443,30 @@ static std::vector<unsigned int> simplify(const clodConfig& config, const clodMe
 	    mesh.vertex_attributes, mesh.vertex_attributes_stride, mesh.attribute_weights, mesh.attribute_count,
 	    &locks[0], target_count, FLT_MAX, options, error));
 
+	unsigned int method = 0;
+
 	if (lod.size() > target_count && config.simplify_fallback_permissive && !config.simplify_permissive)
+	{
 		lod.resize(meshopt_simplifyWithAttributes(&lod[0], &indices[0], indices.size(),
 		    mesh.vertex_positions, mesh.vertex_count, mesh.vertex_positions_stride,
 		    mesh.vertex_attributes, mesh.vertex_attributes_stride, mesh.attribute_weights, mesh.attribute_count,
 		    &locks[0], target_count, FLT_MAX, options | meshopt_SimplifyPermissive, error));
+		method |= 1;
+	}
 
 	// while it's possible to call simplifySloppy directly, it doesn't support sparsity or absolute error, so we need to do some extra work
 	if (lod.size() > target_count && config.simplify_fallback_sloppy)
 	{
 		simplifyFallback(lod, mesh, indices, locks, target_count, error);
 		*error *= config.simplify_error_factor_sloppy; // scale error up to account for appearance degradation
+		method |= 2;
+	}
+
+	if (config.simplify_error_hook)
+	{
+		if (lod.size() > indices.size() * config.simplify_threshold)
+			method |= 4;
+		*error = config.simplify_error_hook(config.simplify_error_context, &mesh, indices.data(), indices.size(), lod.data(), lod.size(), method, *error);
 	}
 
 	// optionally limit error by edge length, aiming to remove subpixel triangles even if the attribute error is high
