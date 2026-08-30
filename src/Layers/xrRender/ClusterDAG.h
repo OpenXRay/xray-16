@@ -97,6 +97,12 @@ struct ClusterBakeStats {
     u32 maxDepth;
     u32 levelCounts[16];
     u32 histInf, hist100, hist10, hist1, hist01, histSmall;
+    u32 simplifiedGroups;
+    u32 sloppyGroups;
+    u32 stuckGroups;
+    u32 deviationRaised;
+    u32 deviationRaisedSloppy;
+    float deviationMaxRaise;
     u64 bakedIndexCount;
     u32 bakeMs;
 };
