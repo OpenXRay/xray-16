@@ -263,6 +263,12 @@ extern ECORE_API float ps_r_vsm_cluster_lod;
 extern ECORE_API float ps_r_vsm_raster_bias;
 extern ECORE_API float ps_r_vsm_raster_slope;
 extern ECORE_API int   ps_r_vsm_at;
+extern ECORE_API int   ps_r_vsm_temporal;
+extern ECORE_API float ps_r_vsm_ta_blend;
+extern ECORE_API float ps_r_vsm_ta_clamp;
+extern ECORE_API float ps_r_vsm_ta_motion;
+extern ECORE_API float ps_r_vsm_ta_motion_floor;
+extern ECORE_API float ps_r_vsm_ta_carry;
 
 extern ECORE_API int   ps_r_smoke_trail_enabled;
 extern ECORE_API float ps_r_smoke_max_emit_rate;

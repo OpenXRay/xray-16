@@ -91,5 +91,43 @@ void main(uint3 dtID : SV_DispatchThreadID)
     bool noPage;
     float cur = sampleVSM(wp, noPage);
     float dist = length(wp - g_CurCamPos.xyz);
-    g_Mask[px] = float4(cur, dist, cur, 0.0);
+
+    float4 hist = float4(0.0, 0.0, 0.0, 0.0);
+    bool histOK = false;
+    float motionPx = 0.0;
+    if (g_Params.z > 0.5)
+    {
+        float4 pc = mul(g_PrevViewProj, float4(wp, 1.0));
+        if (pc.w > 0.0)
+        {
+            float2 puv = (pc.xy / pc.w) * float2(0.5, -0.5) + 0.5;
+            if (all(puv >= 0.0) && all(puv <= 1.0))
+            {
+                hist = g_History.SampleLevel(smp_rtlinear, puv, 0);
+                float expectPrev = length(wp - g_PrevCamPos.xyz);
+                if (abs(hist.r) <= 1.0001 && abs(hist.g - expectPrev) <= g_Params.y * expectPrev + 0.05)
+                {
+                    histOK = true;
+                    motionPx = length((puv - uv) * g_Screen.xy);
+                }
+            }
+        }
+    }
+
+    float outShadow = cur;
+    float a = 0.0;
+    if (noPage)
+    {
+        a = histOK ? g_Params4.y : 0.0;
+        outShadow = lerp(cur, hist.r, a);
+    }
+    else if (histOK)
+    {
+        a = g_Params.x;
+        float mfade = saturate(motionPx / max(g_Params2.y, 1e-3));
+        a = lerp(a, min(a, g_Params2.z), mfade);
+        float hClamped = clamp(hist.r, cur - g_Params2.x, cur + g_Params2.x);
+        outShadow = lerp(cur, hClamped, a);
+    }
+    g_Mask[px] = float4(outShadow, dist, a, 0.0);
 }

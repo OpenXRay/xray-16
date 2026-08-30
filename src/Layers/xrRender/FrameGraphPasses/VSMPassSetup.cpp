@@ -19,6 +19,7 @@ using namespace framegraph;
 
 namespace {
 
+constexpr float kVSMRejectTol = 0.05f;
 constexpr u32 kReadbackResidOffset = 4 + kVSMPageCount;
 constexpr u32 kReadbackBinOffset = kReadbackResidOffset + 4;
 constexpr u32 kReadbackWords = kReadbackBinOffset + 8;
@@ -858,16 +859,18 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
 
     auto vsmCB = VsmParamsCB(data.device);
 
+    const u32 prev = (state.maskSlot + 1) % 2;
+    const bool histOK = ps_r_vsm_temporal && state.resolveCount >= 1;
     VsmResolveParams rp = {};
     rp.invViewProj = Device.mInvFullTransform;
     rp.prevViewProj = state.prevViewProj;
     rp.prevCamPos.set(state.prevCamPos.x, state.prevCamPos.y, state.prevCamPos.z, 0.0f);
     rp.curCamPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 0.0f);
     rp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
-    rp.params.set(0.0f, 0.05f, 0.0f, 0.0f);
-    rp.params2.set(0.0f, 0.0f, 0.0f, 0.0f);
+    rp.params.set(histOK ? ps_r_vsm_ta_blend : 0.0f, kVSMRejectTol, histOK ? 1.0f : 0.0f, 0.0f);
+    rp.params2.set(ps_r_vsm_ta_clamp, ps_r_vsm_ta_motion, ps_r_vsm_ta_motion_floor, 0.0f);
     rp.params3.set(0.0f, 0.0f, 0.0f, 0.0f);
-    rp.params4.set(float(state.resolveCount & 63u), 0.0f, 0.0f, 0.0f);
+    rp.params4.set(float(state.resolveCount & 63u), histOK ? ps_r_vsm_ta_carry : 0.0f, 0.0f, 0.0f);
     auto resolveCB = cache.GetOrCreateVolatileCB("VSM", "ResolveParams", sizeof(VsmResolveParams), data.device);
     cmdList->writeBuffer(resolveCB, &rp, sizeof(rp));
 
@@ -877,6 +880,7 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
        .Texture("g_Depth", depth)
        .Texture("g_Atlas", atlas)
        .BufferSRV("g_PageTable", state.pageTable)
+       .Texture("g_History", state.mask[prev])
        .TextureUAV("g_Mask", mask);
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.resolveLayout, nvDevice);
     if (!bindingSet)
@@ -947,6 +951,7 @@ void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDeb
 
 void InvalidateVSMCache(VSMState& state)
 {
+    state.resolveCount = 0;
     state.pageBasePrevValid = false;
     state.prevSunValid = false;
     state.zCentreValid = false;

@@ -38,6 +38,12 @@ void main(uint3 dtID : SV_DispatchThreadID)
         g_Output[px] = float4(m, m, m, 1.0);
         return;
     }
+    if (g_Mode == 5u)
+    {
+        float a = g_Mask.Load(int3(px, 0)).b;
+        g_Output[px] = float4(a, a * 0.5, 1.0 - a, 1.0);
+        return;
+    }
     if (zndc > 0.0)
     {
         float2 uv = (float2(px) + 0.5) * g_Screen.zw;
