@@ -566,6 +566,17 @@ void StatsOverlay::RenderGeometrySection()
             ImGui::Unindent();
         }
 
+        if (s.vsmActive)
+        {
+            ImGui::Text("VSM:");
+            ImGui::Indent();
+            ImGui::Text("Mark: %u pages (L0 %u / L1 %u / L2 %u / L3 %u / L4 %u / L5 %u), sun %s",
+                s.vsmPages, s.vsmLevelPages[0], s.vsmLevelPages[1], s.vsmLevelPages[2],
+                s.vsmLevelPages[3], s.vsmLevelPages[4], s.vsmLevelPages[5],
+                s.vsmSunMoving ? "moving" : "static");
+            ImGui::Unindent();
+        }
+
         // ═══════════════════════════════════════════════════
         //  PARTICLE CULLING STATS
         // ═══════════════════════════════════════════════════

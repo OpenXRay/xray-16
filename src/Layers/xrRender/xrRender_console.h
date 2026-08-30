@@ -251,6 +251,12 @@ extern ECORE_API float ps_r_shadow_cluster_lod;
 extern ECORE_API int ps_r_sun_shadow_bias;
 extern ECORE_API float ps_r_sun_shadow_slope;
 extern ECORE_API int   ps_r_shadow_at;
+extern ECORE_API int   ps_r_vsm;
+extern ECORE_API int   ps_r_vsm_debug;
+extern ECORE_API float ps_r_vsm_base;
+extern ECORE_API int   ps_r_vsm_mark_half;
+extern ECORE_API float ps_r_vsm_bias;
+extern ECORE_API float ps_r_vsm_bias_dyn;
 
 extern ECORE_API int   ps_r_smoke_trail_enabled;
 extern ECORE_API float ps_r_smoke_max_emit_rate;

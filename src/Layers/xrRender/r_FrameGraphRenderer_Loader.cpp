@@ -17,6 +17,7 @@
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "Layers/xrRender/FrameGraphPasses/SunShadowPassSetup.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
+#include "Layers/xrRender/FrameGraphPasses/VSMPassSetup.h"
 
 // D3D12: Shader compilation
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
@@ -66,8 +67,10 @@ void FrameGraphRenderer::level_Load(IReader* fs)
                 gpuCulling->BeginLevelLoad(2000000, 6000000);
             }
         }
-        if (m_blackboard)
+        if (m_blackboard) {
             passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
+            passes::InvalidateVSMCache(m_blackboard->get_or_add<passes::VSMState>());
+        }
         passes::ResetSunDirVisual();
 
         // VB,IB,SWI - MOVED UP! Must load vertex formats before compiling shaders
@@ -388,8 +391,10 @@ void FrameGraphRenderer::level_Unload()
     // Glows.Unload			();
     Lights.Unload();
 
-    if (m_blackboard)
+    if (m_blackboard) {
         passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
+        passes::InvalidateVSMCache(m_blackboard->get_or_add<passes::VSMState>());
+    }
     passes::ResetSunDirVisual();
 
     //*** BufferPool.Visuals
