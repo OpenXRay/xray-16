@@ -106,6 +106,8 @@ struct SunShadowState {
 
     Fvector farCamPos;
     Fvector farSunDir;
+    Fvector cascSunDir;
+    bool cascSunInit = false;
     u32 farEntryCount = 0;
     float farBox = 0.0f;
     float farLod = 0.0f;
