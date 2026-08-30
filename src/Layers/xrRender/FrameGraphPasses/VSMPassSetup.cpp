@@ -17,12 +17,24 @@ using namespace framegraph;
 
 namespace {
 
+constexpr u32 kReadbackWords = 4 + kVSMPageCount + 4;
+constexpr u32 kReadbackResidOffset = 4 + kVSMPageCount;
+
 struct VsmMarkParams {
     Fmatrix invViewProj;
     Fvector4 screen;
     u32 markStep;
     u32 lodBias;
     u32 pad[2];
+};
+
+struct VsmResidParams {
+    s32 pageBase[12];
+    u32 frame;
+    u32 refreshN;
+    u32 sunMoving;
+    u32 forceDirty;
+    float inval[16];
 };
 
 struct VsmDebugParams {
@@ -43,9 +55,27 @@ struct VSMMarkData {
     xray::profiler::GPUProfiler* gpuProfiler;
 };
 
+struct VSMResidData {
+    VirtualResourceHandle needed;
+    VirtualResourceHandle dirtyList;
+    VirtualResourceHandle drawClear;
+    VSMState* state;
+    fg::RenderDevice* device;
+    xray::profiler::GPUProfiler* gpuProfiler;
+};
+
+struct VSMAtlasData {
+    VirtualResourceHandle atlas;
+    VirtualResourceHandle dirtyList;
+    VirtualResourceHandle drawClear;
+    VSMState* state;
+    fg::RenderDevice* device;
+    xray::profiler::GPUProfiler* gpuProfiler;
+};
+
 struct VSMDebugData {
     VirtualResourceHandle depth;
-    VirtualResourceHandle needed;
+    VirtualResourceHandle dirtyList;
     VirtualResourceHandle output;
     VSMState* state;
     fg::RenderDevice* device;
@@ -69,9 +99,22 @@ struct VSMZone {
     }
 };
 
+nvrhi::BufferHandle MakeUAVBuffer(nvrhi::IDevice* nvDevice, const char* name, u64 bytes, u32 stride, bool raw)
+{
+    nvrhi::BufferDesc desc;
+    desc.debugName = name;
+    desc.byteSize = bytes;
+    desc.structStride = raw ? 0 : stride;
+    desc.canHaveUAVs = true;
+    desc.canHaveRawViews = raw;
+    desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+    desc.keepInitialState = true;
+    return nvDevice->createBuffer(desc);
+}
+
 bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
 {
-    if (state.markPipeline && state.debugPipeline)
+    if (state.markPipeline && state.residPipeline && state.debugPipeline && state.clearPipeline)
         return true;
     if (state.pipelinesFailed)
         return false;
@@ -82,17 +125,24 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
         return false;
 
     auto markResult = shaderLoader->LoadComputeShader("vsm_mark");
+    auto residResult = shaderLoader->LoadComputeShader("vsm_resid");
     auto debugResult = shaderLoader->LoadComputeShader("vsm_debug_view");
-    if (!markResult.handle || !markResult.reflection || !debugResult.handle || !debugResult.reflection) {
-        Msg("! [VSM] mark shaders failed to load");
+    auto clearVsResult = shaderLoader->LoadVertexShader("vsm_clear", "main");
+    auto clearPsResult = shaderLoader->LoadPixelShader("vsm_clear", "main");
+    if (!markResult.handle || !markResult.reflection || !residResult.handle || !residResult.reflection
+        || !debugResult.handle || !debugResult.reflection || !clearVsResult.handle || !clearVsResult.reflection
+        || !clearPsResult.handle || !clearPsResult.reflection) {
+        Msg("! [VSM] shaders failed to load");
         state.pipelinesFailed = true;
         return false;
     }
 
     auto& cache = GetPassResourceCache();
     state.markLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMMark", *markResult.reflection, nvDevice);
+    state.residLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMResid", *residResult.reflection, nvDevice);
     state.debugLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDebugView", *debugResult.reflection, nvDevice);
-    if (!state.markLayout || !state.debugLayout) {
+    state.clearLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMClear", *clearVsResult.reflection, *clearPsResult.reflection, nvDevice);
+    if (!state.markLayout || !state.residLayout || !state.debugLayout || !state.clearLayout) {
         state.pipelinesFailed = true;
         return false;
     }
@@ -102,51 +152,84 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     markDesc.bindingLayouts = { state.markLayout };
     state.markPipeline = cache.GetOrCreateComputePipeline("VSMMark", markDesc, nvDevice);
 
+    nvrhi::ComputePipelineDesc residDesc;
+    residDesc.CS = residResult.handle;
+    residDesc.bindingLayouts = { state.residLayout };
+    state.residPipeline = cache.GetOrCreateComputePipeline("VSMResid", residDesc, nvDevice);
+
     nvrhi::ComputePipelineDesc debugDesc;
     debugDesc.CS = debugResult.handle;
     debugDesc.bindingLayouts = { state.debugLayout };
     state.debugPipeline = cache.GetOrCreateComputePipeline("VSMDebugView", debugDesc, nvDevice);
 
-    if (!state.markPipeline || !state.debugPipeline) {
-        Msg("! [VSM] mark pipeline creation failed");
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.depthFormat = nvrhi::Format::D16;
+    nvrhi::GraphicsPipelineDesc clearDesc;
+    clearDesc.VS = clearVsResult.handle;
+    clearDesc.PS = clearPsResult.handle;
+    clearDesc.inputLayout = nullptr;
+    clearDesc.bindingLayouts = { state.clearLayout };
+    clearDesc.primType = nvrhi::PrimitiveType::TriangleList;
+    clearDesc.renderState.depthStencilState.depthTestEnable = true;
+    clearDesc.renderState.depthStencilState.depthWriteEnable = true;
+    clearDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Always;
+    clearDesc.renderState.rasterState.frontCounterClockwise = false;
+    clearDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+    state.clearPipeline = cache.GetOrCreatePipeline("VSMClear", clearDesc, fbInfo, nvDevice);
+
+    if (!state.markPipeline || !state.residPipeline || !state.debugPipeline || !state.clearPipeline) {
+        Msg("! [VSM] pipeline creation failed");
         state.pipelinesFailed = true;
         return false;
     }
-    Msg("* [VSM] mark pipelines initialized");
+    Msg("* [VSM] pipelines initialized");
     return true;
 }
 
-bool EnsureBuffers(nvrhi::IDevice* nvDevice, VSMState& state)
+bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
 {
-    if (state.needed && state.counter)
+    if (state.needed && state.atlas)
         return true;
 
+    state.needed = MakeUAVBuffer(nvDevice, "VSM_Needed", u64(kVSMPageCount) * sizeof(u32), sizeof(u32), false);
+    state.counter = MakeUAVBuffer(nvDevice, "VSM_Counter", sizeof(u32) * 4, sizeof(u32), true);
+    state.pageTable = MakeUAVBuffer(nvDevice, "VSM_PageTable", u64(kVSMPageCount) * sizeof(u32), sizeof(u32), false);
+    state.pageList = MakeUAVBuffer(nvDevice, "VSM_PageList", u64(kVSMStaticSlots) * sizeof(u32) * 4, sizeof(u32) * 4, false);
+    state.physTile = MakeUAVBuffer(nvDevice, "VSM_PhysTile", u64(kVSMStaticSlots) * sizeof(u32) * 2, sizeof(u32) * 2, false);
+    state.slotDirty = MakeUAVBuffer(nvDevice, "VSM_SlotDirty", u64(kVSMStaticSlots) * sizeof(u32), sizeof(u32), false);
+    state.dirtyList = MakeUAVBuffer(nvDevice, "VSM_DirtyList", u64(kVSMStaticSlots + 2) * sizeof(u32), sizeof(u32), false);
     {
         nvrhi::BufferDesc desc;
-        desc.debugName = "VSM_Needed";
-        desc.byteSize = u64(kVSMPageCount) * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.canHaveUAVs = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
-        state.needed = nvDevice->createBuffer(desc);
-    }
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "VSM_Counter";
+        desc.debugName = "VSM_DrawClear";
         desc.byteSize = sizeof(u32) * 4;
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = true;
-        state.counter = nvDevice->createBuffer(desc);
+        state.drawClear = nvDevice->createBuffer(desc);
+    }
+    {
+        nvrhi::TextureDesc desc;
+        desc.width = kVSMAtlasW * kVSMPageSize;
+        desc.height = kVSMAtlasH * kVSMPageSize;
+        desc.format = nvrhi::Format::D16;
+        desc.debugName = "VSM_Atlas";
+        desc.isShaderResource = true;
+        desc.isRenderTarget = true;
+        desc.isTypeless = true;
+        desc.useClearValue = true;
+        desc.clearValue = nvrhi::Color(0.0f);
+        desc.initialState = nvrhi::ResourceStates::DepthWrite;
+        desc.keepInitialState = true;
+        state.atlas = nvDevice->createTexture(desc);
     }
     for (u32 i = 0; i < VSMState::kReadbackSlots; ++i) {
         if (state.readback[i])
             continue;
         nvrhi::BufferDesc desc;
         desc.debugName = "VSM_Readback";
-        desc.byteSize = u64(kVSMPageCount + 4) * sizeof(u32);
+        desc.byteSize = u64(kReadbackWords) * sizeof(u32);
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
         desc.keepInitialState = true;
@@ -154,13 +237,17 @@ bool EnsureBuffers(nvrhi::IDevice* nvDevice, VSMState& state)
     }
     state.readbackWrite = 0;
     state.readbackScheduled = 0;
+    state.physInit = false;
+    state.atlasFirst = true;
 
-    if (!state.needed || !state.counter) {
-        Msg("! [VSM] mark buffer creation failed");
+    if (!state.needed || !state.counter || !state.pageTable || !state.pageList || !state.physTile
+        || !state.slotDirty || !state.dirtyList || !state.drawClear || !state.atlas) {
+        Msg("! [VSM] resource creation failed");
         state.needed = nullptr;
-        state.counter = nullptr;
+        state.atlas = nullptr;
         return false;
     }
+    Msg("* [VSM] static atlas %ux%u D16, %u toroidal slots", kVSMAtlasW * kVSMPageSize, kVSMAtlasH * kVSMPageSize, kVSMStaticSlots);
     return true;
 }
 
@@ -183,6 +270,8 @@ void ProcessReadback(nvrhi::IDevice* nvDevice, VSMState& state)
             n += level[i] != 0 ? 1 : 0;
         state.levelPages[L] = n;
     }
+    state.dirtyPages = std::min(words[kReadbackResidOffset + 1], kVSMStaticSlots);
+    state.wrongPages = std::min(words[kReadbackResidOffset + 2], kVSMStaticSlots);
     nvDevice->unmapBuffer(oldest);
 }
 
@@ -193,6 +282,8 @@ void ScheduleReadback(nvrhi::ICommandList* cmdList, VSMState& state)
         return;
     cmdList->copyBuffer(slot, 0, state.counter, 0, sizeof(u32) * 4);
     cmdList->copyBuffer(slot, sizeof(u32) * 4, state.needed, 0, u64(kVSMPageCount) * sizeof(u32));
+    cmdList->copyBuffer(slot, u64(kReadbackResidOffset) * sizeof(u32), state.drawClear, 0, sizeof(u32) * 2);
+    cmdList->copyBuffer(slot, u64(kReadbackResidOffset + 2) * sizeof(u32), state.dirtyList, u64(kVSMStaticSlots) * sizeof(u32), sizeof(u32) * 2);
     state.readbackWrite = (state.readbackWrite + 1) % VSMState::kReadbackSlots;
     if (state.readbackScheduled < VSMState::kReadbackSlots)
         ++state.readbackScheduled;
@@ -210,8 +301,244 @@ void LogTelemetry(VSMState& state)
         state.levelPages[3], state.levelPages[4], state.levelPages[5],
         state.sunMoving ? "moving" : "static", state.sunStepMax, state.snapMax,
         ps_r_vsm_base, state.zCentre, state.invalidations);
+    Msg("[VSM] static: dirty=%u/%u rendered | wrong=%u | cache %s refresh %d",
+        state.dirtyPages, state.markPages, state.wrongPages,
+        ps_r_vsm_cache ? "on" : "off", ps_r_vsm_cache_refresh);
     state.sunStepMax = 0.0f;
     state.snapMax = 0;
+}
+
+void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData& data)
+{
+    VSMState& state = *data.state;
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+    nvrhi::ITexture* depth = fg.GetPhysicalTexture(data.depth);
+    if (!cmdList || !nvDevice || !depth)
+        return;
+    VSMZone zone(data.gpuProfiler, cmdList, "VSM/Mark");
+    if (!EnsurePipelines(data.device, state))
+        return;
+
+    auto& cache = GetPassResourceCache();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* markRefl = shaderLoader->GetCachedReflection("vsm_mark", ".cs");
+    if (!markRefl)
+        return;
+
+    auto vsmCB = cache.GetOrCreateVolatileCB("VSM", "VsmParams", sizeof(VsmParams), data.device);
+    cmdList->writeBuffer(vsmCB, &state.params, sizeof(VsmParams));
+
+    const u32 markStep = ps_r_vsm_mark_half ? 2u : 1u;
+    VsmMarkParams mp = {};
+    mp.invViewProj = Device.mInvFullTransform;
+    mp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
+    mp.markStep = markStep;
+    mp.lodBias = 0;
+    auto markCB = cache.GetOrCreateVolatileCB("VSM", "MarkParams", sizeof(VsmMarkParams), data.device);
+    cmdList->writeBuffer(markCB, &mp, sizeof(mp));
+
+    const u32 clearDraw[4] = { 6u, 0u, 0u, 0u };
+    cmdList->setBufferState(state.needed, nvrhi::ResourceStates::CopyDest);
+    cmdList->setBufferState(state.counter, nvrhi::ResourceStates::CopyDest);
+    cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::CopyDest);
+    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::CopyDest);
+    cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::CopyDest);
+    cmdList->clearBufferUInt(state.needed, 0);
+    cmdList->clearBufferUInt(state.counter, 0);
+    cmdList->clearBufferUInt(state.slotDirty, 0);
+    cmdList->clearBufferUInt(state.dirtyList, 0);
+    cmdList->writeBuffer(state.drawClear, clearDraw, sizeof(clearDraw));
+    if (!state.physInit) {
+        cmdList->setBufferState(state.physTile, nvrhi::ResourceStates::CopyDest);
+        cmdList->clearBufferUInt(state.physTile, 0xFFFFFFFFu);
+        cmdList->setBufferState(state.physTile, nvrhi::ResourceStates::UnorderedAccess);
+        state.physInit = true;
+    }
+    cmdList->setBufferState(state.needed, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.counter, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::UnorderedAccess);
+
+    BindingSetBuilder bsb(*markRefl, nvDevice, "VSM.Mark");
+    bsb.ConstantBuffer("VsmParams", vsmCB)
+       .ConstantBuffer("VsmMarkParams", markCB)
+       .Texture("g_Depth", depth)
+       .BufferUAV("g_Needed", state.needed)
+       .BufferUAV("g_Counter", state.counter);
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.markLayout, nvDevice);
+    if (!bindingSet)
+        return;
+
+    nvrhi::ComputeState cs;
+    cs.pipeline = state.markPipeline;
+    cs.bindings = { bindingSet };
+    cmdList->setComputeState(cs);
+    const u32 mw = (data.width + markStep - 1) / markStep;
+    const u32 mh = (data.height + markStep - 1) / markStep;
+    cmdList->dispatch((mw + 7) / 8, (mh + 7) / 8, 1);
+    cmdList->setBufferState(state.needed, nvrhi::ResourceStates::ShaderResource);
+}
+
+void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
+{
+    VSMState& state = *data.state;
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+    if (!cmdList || !nvDevice || !state.residPipeline)
+        return;
+    VSMZone zone(data.gpuProfiler, cmdList, "VSM/Resid");
+
+    auto& cache = GetPassResourceCache();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* refl = shaderLoader->GetCachedReflection("vsm_resid", ".cs");
+    if (!refl)
+        return;
+
+    VsmResidParams rp = {};
+    for (u32 L = 0; L < kVSMLevels; ++L) {
+        rp.pageBase[2 * L] = state.pageBase[L][0];
+        rp.pageBase[2 * L + 1] = state.pageBase[L][1];
+    }
+    rp.frame = state.frame;
+    rp.refreshN = u32(std::max(ps_r_vsm_cache_refresh, 0));
+    rp.sunMoving = state.sunMoving ? 1u : 0u;
+    rp.forceDirty = ps_r_vsm_cache ? 0u : 1u;
+    rp.inval[3] = ps_r_vsm_base / float(kVSMPagesAxis);
+    rp.inval[7] = 0.0f;
+    rp.inval[11] = 0.0f;
+    rp.inval[15] = 4096.0f;
+    auto residCB = cache.GetOrCreateVolatileCB("VSM", "ResidParams", sizeof(VsmResidParams), data.device);
+    cmdList->writeBuffer(residCB, &rp, sizeof(rp));
+
+    cmdList->setBufferState(state.pageTable, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.physTile, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::UnorderedAccess);
+
+    BindingSetBuilder bsb(*refl, nvDevice, "VSM.Resid");
+    bsb.ConstantBuffer("VsmResidParams", residCB)
+       .BufferSRV("g_Needed", state.needed)
+       .BufferUAV("g_PageTable", state.pageTable)
+       .BufferUAV("g_PageList", state.pageList)
+       .BufferUAV("g_PhysTile", state.physTile)
+       .BufferUAV("g_SlotDirty", state.slotDirty)
+       .BufferUAV("g_DirtyList", state.dirtyList)
+       .BufferUAV("g_DrawClear", state.drawClear);
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.residLayout, nvDevice);
+    if (!bindingSet)
+        return;
+
+    nvrhi::ComputeState cs;
+    cs.pipeline = state.residPipeline;
+    cs.bindings = { bindingSet };
+    cmdList->setComputeState(cs);
+    cmdList->dispatch((kVSMPageCount + 63) / 64, 1, 1);
+
+    cmdList->setBufferState(state.needed, nvrhi::ResourceStates::CopySource);
+    cmdList->setBufferState(state.counter, nvrhi::ResourceStates::CopySource);
+    cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::CopySource);
+    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::CopySource);
+    ScheduleReadback(cmdList, state);
+    cmdList->setBufferState(state.pageTable, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::IndirectArgument);
+}
+
+void ExecuteAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMAtlasData& data)
+{
+    VSMState& state = *data.state;
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+    nvrhi::ITexture* atlas = fg.GetPhysicalTexture(data.atlas);
+    if (!cmdList || !nvDevice || !atlas || !state.clearPipeline)
+        return;
+    VSMZone zone(data.gpuProfiler, cmdList, "VSM/Static");
+
+    if (state.atlasFirst) {
+        cmdList->clearDepthStencilTexture(atlas, nvrhi::AllSubresources, true, 0.0f, false, 0);
+        state.atlasFirst = false;
+    }
+
+    auto& cache = GetPassResourceCache();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* vsRefl = shaderLoader->GetCachedReflection("vsm_clear", ".vs");
+    auto* psRefl = shaderLoader->GetCachedReflection("vsm_clear", ".ps");
+    if (!vsRefl || !psRefl)
+        return;
+
+    nvrhi::FramebufferDesc fbDesc;
+    fbDesc.setDepthAttachment(atlas);
+    auto framebuffer = cache.GetOrCreateFramebuffer("VSMAtlas", fbDesc, nvDevice);
+    if (!framebuffer)
+        return;
+
+    BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "VSM.Clear");
+    bsb.BufferSRV("g_DirtyList", state.dirtyList);
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.clearLayout, nvDevice);
+    if (!bindingSet)
+        return;
+
+    const auto& rtDesc = atlas->getDesc();
+    nvrhi::GraphicsState gs;
+    gs.pipeline = state.clearPipeline;
+    gs.framebuffer = framebuffer;
+    gs.bindings = { bindingSet };
+    gs.indirectParams = state.drawClear;
+    gs.viewport.addViewport(nvrhi::Viewport(0.0f, float(rtDesc.width), 0.0f, float(rtDesc.height), 0.0f, 1.0f));
+    gs.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
+    cmdList->setGraphicsState(gs);
+    cmdList->drawIndirect(0, 1);
+}
+
+void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDebugData& data)
+{
+    VSMState& state = *data.state;
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+    nvrhi::ITexture* depth = fg.GetPhysicalTexture(data.depth);
+    nvrhi::ITexture* output = fg.GetPhysicalTexture(data.output);
+    if (!cmdList || !nvDevice || !depth || !output || !state.debugPipeline)
+        return;
+
+    auto& cache = GetPassResourceCache();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* refl = shaderLoader->GetCachedReflection("vsm_debug_view", ".cs");
+    if (!refl)
+        return;
+
+    auto vsmCB = cache.GetOrCreateVolatileCB("VSM", "VsmParams", sizeof(VsmParams), data.device);
+    cmdList->writeBuffer(vsmCB, &state.params, sizeof(VsmParams));
+
+    VsmDebugParams dp = {};
+    dp.invViewProj = Device.mInvFullTransform;
+    dp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
+    dp.mode = u32(ps_r_vsm_debug);
+    auto debugCB = cache.GetOrCreateVolatileCB("VSM", "DebugParams", sizeof(VsmDebugParams), data.device);
+    cmdList->writeBuffer(debugCB, &dp, sizeof(dp));
+
+    BindingSetBuilder bsb(*refl, nvDevice, "VSM.DebugView");
+    bsb.ConstantBuffer("VsmParams", vsmCB)
+       .ConstantBuffer("VsmDebugParams", debugCB)
+       .Texture("g_Depth", depth)
+       .BufferSRV("g_Needed", state.needed)
+       .BufferSRV("g_PageTable", state.pageTable)
+       .BufferSRV("g_SlotDirty", state.slotDirty)
+       .TextureUAV("g_Output", output);
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.debugLayout, nvDevice);
+    if (!bindingSet)
+        return;
+
+    nvrhi::ComputeState cs;
+    cs.pipeline = state.debugPipeline;
+    cs.bindings = { bindingSet };
+    cmdList->setComputeState(cs);
+    cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
 }
 
 }
@@ -221,6 +548,7 @@ void InvalidateVSMCache(VSMState& state)
     state.pageBasePrevValid = false;
     state.prevSunValid = false;
     state.zCentreValid = false;
+    state.physInit = false;
     state.invalidations++;
 }
 
@@ -296,7 +624,7 @@ void VSMBeginFrame(VSMState& state, const Fvector& camPos, const Fvector& sunDir
     params.zparams.set(zCentre + kVSMZNear, 1.0f / (kVSMZFar - kVSMZNear), ps_r_vsm_bias, ps_r_vsm_bias_dyn);
 }
 
-VSMMarkOutput setupVSMMarkPass(
+VSMOutput setupVSMPasses(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depth,
@@ -306,7 +634,7 @@ VSMMarkOutput setupVSMMarkPass(
     VSMState* state,
     xray::profiler::GPUProfiler* gpuProfiler)
 {
-    VSMMarkOutput out;
+    VSMOutput out;
     if (!state || !device || !depth.is_valid() || width == 0 || height == 0)
         return out;
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -314,21 +642,37 @@ VSMMarkOutput setupVSMMarkPass(
         return out;
 
     ProcessReadback(nvDevice, *state);
-    if (!EnsureBuffers(nvDevice, *state))
+    if (!EnsureResources(nvDevice, *state))
         return out;
     LogTelemetry(*state);
     state->active = true;
 
-    ResourceDesc neededDesc;
-    neededDesc.type = ResourceDesc::Type::Buffer;
-    neededDesc.bufferSize = u64(kVSMPageCount) * sizeof(u32);
-    neededDesc.structStride = sizeof(u32);
-    neededDesc.isUAV = true;
-    neededDesc.allowUAV = true;
-    neededDesc.isImported = true;
-    neededDesc.isTransient = false;
-    neededDesc.debugName = "vsm_needed";
-    VirtualResourceHandle neededHandle = fg.ImportBuffer("vsm_needed", state->needed, neededDesc);
+    auto bufferDesc = [](const char* name, u64 bytes, u32 stride) {
+        ResourceDesc d;
+        d.type = ResourceDesc::Type::Buffer;
+        d.bufferSize = bytes;
+        d.structStride = stride;
+        d.isUAV = true;
+        d.allowUAV = true;
+        d.isImported = true;
+        d.isTransient = false;
+        d.debugName = name;
+        return d;
+    };
+    VirtualResourceHandle neededHandle = fg.ImportBuffer("vsm_needed", state->needed, bufferDesc("vsm_needed", u64(kVSMPageCount) * sizeof(u32), sizeof(u32)));
+    VirtualResourceHandle dirtyHandle = fg.ImportBuffer("vsm_dirty_list", state->dirtyList, bufferDesc("vsm_dirty_list", u64(kVSMStaticSlots + 2) * sizeof(u32), sizeof(u32)));
+    VirtualResourceHandle clearHandle = fg.ImportBuffer("vsm_draw_clear", state->drawClear, bufferDesc("vsm_draw_clear", sizeof(u32) * 4, 0));
+
+    ResourceDesc atlasDesc;
+    atlasDesc.type = ResourceDesc::Type::Texture2D;
+    atlasDesc.width = kVSMAtlasW * kVSMPageSize;
+    atlasDesc.height = kVSMAtlasH * kVSMPageSize;
+    atlasDesc.format = nvrhi::Format::D16;
+    atlasDesc.isDepthStencil = true;
+    atlasDesc.isImported = true;
+    atlasDesc.isTransient = false;
+    atlasDesc.debugName = "rt_VSMAtlas";
+    VirtualResourceHandle atlasHandle = fg.ImportTexture("rt_VSMAtlas", state->atlas, atlasDesc);
 
     auto& markData = fg.addCallbackPass<VSMMarkData>(
         "VSM Mark",
@@ -345,67 +689,41 @@ VSMMarkOutput setupVSMMarkPass(
             data.needed = passBuilder.write(neededHandle, ResourceState::UnorderedAccess);
         },
         [](const VSMMarkData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
-            VSMState& state = *data.state;
-            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
-            nvrhi::ITexture* depth = fg.GetPhysicalTexture(data.depth);
-            if (!cmdList || !nvDevice || !depth)
-                return;
-            VSMZone zone(data.gpuProfiler, cmdList, "VSM/Mark");
-            if (!EnsurePipelines(data.device, state))
-                return;
-
-            auto& cache = GetPassResourceCache();
-            auto* shaderLoader = GEnv.Render->GetShaderLoader();
-            auto* markRefl = shaderLoader->GetCachedReflection("vsm_mark", ".cs");
-            if (!markRefl)
-                return;
-
-            auto vsmCB = cache.GetOrCreateVolatileCB("VSM", "VsmParams", sizeof(VsmParams), data.device);
-            cmdList->writeBuffer(vsmCB, &state.params, sizeof(VsmParams));
-
-            const u32 markStep = ps_r_vsm_mark_half ? 2u : 1u;
-            VsmMarkParams mp = {};
-            mp.invViewProj = Device.mInvFullTransform;
-            mp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
-            mp.markStep = markStep;
-            mp.lodBias = 0;
-            auto markCB = cache.GetOrCreateVolatileCB("VSM", "MarkParams", sizeof(VsmMarkParams), data.device);
-            cmdList->writeBuffer(markCB, &mp, sizeof(mp));
-
-            cmdList->setBufferState(state.needed, nvrhi::ResourceStates::CopyDest);
-            cmdList->setBufferState(state.counter, nvrhi::ResourceStates::CopyDest);
-            cmdList->clearBufferUInt(state.needed, 0);
-            cmdList->clearBufferUInt(state.counter, 0);
-            cmdList->setBufferState(state.needed, nvrhi::ResourceStates::UnorderedAccess);
-            cmdList->setBufferState(state.counter, nvrhi::ResourceStates::UnorderedAccess);
-
-            BindingSetBuilder bsb(*markRefl, nvDevice, "VSM.Mark");
-            bsb.ConstantBuffer("VsmParams", vsmCB)
-               .ConstantBuffer("VsmMarkParams", markCB)
-               .Texture("g_Depth", depth)
-               .BufferUAV("g_Needed", state.needed)
-               .BufferUAV("g_Counter", state.counter);
-            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.markLayout, nvDevice);
-            if (!bindingSet)
-                return;
-
-            nvrhi::ComputeState cs;
-            cs.pipeline = state.markPipeline;
-            cs.bindings = { bindingSet };
-            cmdList->setComputeState(cs);
-            const u32 mw = (data.width + markStep - 1) / markStep;
-            const u32 mh = (data.height + markStep - 1) / markStep;
-            cmdList->dispatch((mw + 7) / 8, (mh + 7) / 8, 1);
-
-            cmdList->setBufferState(state.needed, nvrhi::ResourceStates::CopySource);
-            cmdList->setBufferState(state.counter, nvrhi::ResourceStates::CopySource);
-            ScheduleReadback(cmdList, state);
-            cmdList->setBufferState(state.needed, nvrhi::ResourceStates::ShaderResource);
-            cmdList->setBufferState(state.counter, nvrhi::ResourceStates::ShaderResource);
+            ExecuteMark(ctx, fg, data);
         });
 
-    out.needed = markData.needed;
+    auto& residData = fg.addCallbackPass<VSMResidData>(
+        "VSM Residency",
+        [&, dirtyHandle, clearHandle, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMResidData& data) {
+            data.state = state;
+            data.device = device;
+            data.gpuProfiler = gpuProfiler;
+            RenderPassBuilder passBuilder(builder, passHandle);
+            data.needed = passBuilder.read(markData.needed, ResourceState::ShaderResource);
+            data.dirtyList = passBuilder.write(dirtyHandle, ResourceState::UnorderedAccess);
+            data.drawClear = passBuilder.write(clearHandle, ResourceState::UnorderedAccess);
+        },
+        [](const VSMResidData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            ExecuteResid(ctx, data);
+        });
+
+    auto& atlasData = fg.addCallbackPass<VSMAtlasData>(
+        "VSM Static Atlas",
+        [&, atlasHandle, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMAtlasData& data) {
+            data.state = state;
+            data.device = device;
+            data.gpuProfiler = gpuProfiler;
+            RenderPassBuilder passBuilder(builder, passHandle);
+            data.atlas = passBuilder.write(atlasHandle, ResourceState::DepthStencilWrite);
+            data.dirtyList = passBuilder.read(residData.dirtyList, ResourceState::ShaderResource);
+            data.drawClear = passBuilder.read(residData.drawClear, ResourceState::IndirectArgument);
+        },
+        [](const VSMAtlasData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            ExecuteAtlas(ctx, fg, data);
+        });
+
+    fg.GetRTRegistry().RegisterRT("rt_VSMAtlas", atlasData.atlas);
+    out.atlas = atlasData.atlas;
     out.active = true;
 
     if (ps_r_vsm_debug >= 2) {
@@ -429,49 +747,11 @@ VSMMarkOutput setupVSMMarkPass(
                 data.height = height;
                 RenderPassBuilder passBuilder(builder, passHandle);
                 data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
-                data.needed = passBuilder.read(markData.needed, ResourceState::ShaderResource);
+                data.dirtyList = passBuilder.read(residData.dirtyList, ResourceState::ShaderResource);
                 data.output = passBuilder.write(viewHandle, ResourceState::UnorderedAccess);
             },
             [](const VSMDebugData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
-                VSMState& state = *data.state;
-                nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-                nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
-                nvrhi::ITexture* depth = fg.GetPhysicalTexture(data.depth);
-                nvrhi::ITexture* output = fg.GetPhysicalTexture(data.output);
-                if (!cmdList || !nvDevice || !depth || !output || !state.debugPipeline)
-                    return;
-
-                auto& cache = GetPassResourceCache();
-                auto* shaderLoader = GEnv.Render->GetShaderLoader();
-                auto* refl = shaderLoader->GetCachedReflection("vsm_debug_view", ".cs");
-                if (!refl)
-                    return;
-
-                auto vsmCB = cache.GetOrCreateVolatileCB("VSM", "VsmParams", sizeof(VsmParams), data.device);
-                cmdList->writeBuffer(vsmCB, &state.params, sizeof(VsmParams));
-
-                VsmDebugParams dp = {};
-                dp.invViewProj = Device.mInvFullTransform;
-                dp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
-                dp.mode = u32(ps_r_vsm_debug);
-                auto debugCB = cache.GetOrCreateVolatileCB("VSM", "DebugParams", sizeof(VsmDebugParams), data.device);
-                cmdList->writeBuffer(debugCB, &dp, sizeof(dp));
-
-                BindingSetBuilder bsb(*refl, nvDevice, "VSM.DebugView");
-                bsb.ConstantBuffer("VsmParams", vsmCB)
-                   .ConstantBuffer("VsmDebugParams", debugCB)
-                   .Texture("g_Depth", depth)
-                   .BufferSRV("g_Needed", state.needed)
-                   .TextureUAV("g_Output", output);
-                auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.debugLayout, nvDevice);
-                if (!bindingSet)
-                    return;
-
-                nvrhi::ComputeState cs;
-                cs.pipeline = state.debugPipeline;
-                cs.bindings = { bindingSet };
-                cmdList->setComputeState(cs);
-                cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
+                ExecuteDebugView(ctx, fg, data);
             });
         out.debugView = debugData.output;
     }

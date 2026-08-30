@@ -800,6 +800,8 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.vsmActive = vsm.active;
             stats.vsmSunMoving = vsm.sunMoving;
             stats.vsmPages = vsm.markPages;
+            stats.vsmDirtyPages = vsm.dirtyPages;
+            stats.vsmWrongPages = vsm.wrongPages;
             for (u32 L = 0; L < passes::kVSMLevels; ++L)
                 stats.vsmLevelPages[L] = vsm.levelPages[L];
         }
@@ -1260,10 +1262,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         vsmState.active = false;
         if (ps_r_vsm && prepassActive && hizOutput.pyramid.is_valid()) {
             passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
-            auto vsmMark = passes::setupVSMMarkPass(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid,
+            auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid,
                 width, height, &vsmState, m_gpuProfiler.get());
-            if (vsmMark.debugView.is_valid())
-                m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmMark.debugView);
+            if (vsmOut.debugView.is_valid())
+                m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmOut.debugView);
         }
     }
 

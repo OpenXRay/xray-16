@@ -79,6 +79,8 @@ struct RenderStats
     bool vsmActive = false;
     bool vsmSunMoving = false;
     u32 vsmPages = 0;
+    u32 vsmDirtyPages = 0;
+    u32 vsmWrongPages = 0;
     u32 vsmLevelPages[6] = {0, 0, 0, 0, 0, 0};
 
     u32 lightsClustered = 0;
@@ -125,7 +127,7 @@ struct RenderStats
         sunFarRedraws = 0;
         sunFarCached = false;
         vsmActive = vsmSunMoving = false;
-        vsmPages = 0;
+        vsmPages = vsmDirtyPages = vsmWrongPages = 0;
         for (u32 i = 0; i < 6; ++i) vsmLevelPages[i] = 0;
         lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
         detailInstances = detailSlots = 0;

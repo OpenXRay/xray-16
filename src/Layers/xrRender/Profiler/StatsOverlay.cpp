@@ -574,6 +574,7 @@ void StatsOverlay::RenderGeometrySection()
                 s.vsmPages, s.vsmLevelPages[0], s.vsmLevelPages[1], s.vsmLevelPages[2],
                 s.vsmLevelPages[3], s.vsmLevelPages[4], s.vsmLevelPages[5],
                 s.vsmSunMoving ? "moving" : "static");
+            ImGui::Text("Static atlas: %u dirty (%u wrong-tile)", s.vsmDirtyPages, s.vsmWrongPages);
             ImGui::Unindent();
         }
 
