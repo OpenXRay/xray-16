@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include <nvrhi/nvrhi.h>
 #include "SunShadowPassSetup.h"
+#include "Layers/xrRender/Decals/OverlayManager.h"
 
 namespace xray::render {
     struct GeometryBatch;
@@ -60,6 +61,7 @@ struct SkinningPassState {
 };
 
 void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, SkinningPassState& state);
+decals::OverlayManager::SplatRange GetSplatRange(const GeometryBatch& batch, decals::OverlayManager* overlayMgr);
 
 struct SkinningPassData {
     framegraph::VirtualResourceHandle color;

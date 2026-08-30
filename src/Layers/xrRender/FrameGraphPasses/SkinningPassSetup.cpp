@@ -345,7 +345,7 @@ static u32 GetSkeletonBoneOffset(
     return gpuCullMgr.GetOrUploadSkeleton(cmdList, parent);
 }
 
-static decals::OverlayManager::SplatRange GetSplatRange(const GeometryBatch& batch, decals::OverlayManager* overlayMgr)
+decals::OverlayManager::SplatRange GetSplatRange(const GeometryBatch& batch, decals::OverlayManager* overlayMgr)
 {
     if (!overlayMgr)
         return { 0, 0 };

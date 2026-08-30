@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "ForwardColorPassSetup.h"
+#include "SkinningPassSetup.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -34,7 +35,19 @@ struct DepthPrepassState {
     nvrhi::GraphicsPipelineHandle clusterTerrainPipeline;
     nvrhi::BindingLayoutHandle clusterTerrainLayout;
     nvrhi::ShaderHandle psFade;
+    nvrhi::GraphicsPipelineHandle skinnedPipelines[kSunShadowSkinnedFormats];
+    nvrhi::BindingLayoutHandle skinnedLayout;
+    nvrhi::ShaderHandle skinnedDepthPS;
+    bool skinnedReady = false;
+    bool skinnedFailed = false;
     bool initialized = false;
+};
+
+struct DepthPrepassSkinnedConfig {
+    const SkinningPassState* skinning = nullptr;
+    const GeometryCollector* geometry = nullptr;
+    GPUCullingManager* gpuCulling = nullptr;
+    decals::OverlayManager* overlayMgr = nullptr;
 };
 
 struct DepthPrepassData {
@@ -44,6 +57,7 @@ struct DepthPrepassData {
     MaterialCache* materialCache;
     DepthPrepassState* passState;
     BindlessForwardConfig bindlessConfig;
+    DepthPrepassSkinnedConfig skinned;
     u32 width;
     u32 height;
 };
@@ -54,6 +68,7 @@ framegraph::VirtualResourceHandle setupDepthPrepass(
     framegraph::VirtualResourceHandle depthTarget,
     framegraph::VirtualResourceHandle drawArgsBuffer,
     const BindlessForwardConfig& bindlessConfig,
+    const DepthPrepassSkinnedConfig& skinned,
     MaterialCache* materialCache,
     u32 width,
     u32 height,
