@@ -259,6 +259,9 @@ extern ECORE_API float ps_r_vsm_bias;
 extern ECORE_API float ps_r_vsm_bias_dyn;
 extern ECORE_API int   ps_r_vsm_cache;
 extern ECORE_API int   ps_r_vsm_cache_refresh;
+extern ECORE_API float ps_r_vsm_cluster_lod;
+extern ECORE_API float ps_r_vsm_raster_bias;
+extern ECORE_API float ps_r_vsm_raster_slope;
 
 extern ECORE_API int   ps_r_smoke_trail_enabled;
 extern ECORE_API float ps_r_smoke_max_emit_rate;

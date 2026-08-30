@@ -4,8 +4,11 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include <nvrhi/nvrhi.h>
 
-namespace xray::render::fg {
-    class RenderDevice;
+namespace xray::render {
+    class MaterialCache;
+    namespace fg {
+        class RenderDevice;
+    }
 }
 
 namespace xray::render::framegraph {
@@ -27,6 +30,10 @@ constexpr u32 kVSMPageCount = kVSMLevels * kVSMPagesPerLevel;
 constexpr u32 kVSMAtlasW = 64;
 constexpr u32 kVSMAtlasH = 96;
 constexpr u32 kVSMStaticSlots = kVSMAtlasW * kVSMAtlasH;
+constexpr u32 kVSMPairCapOpaque = 1u << 20;
+constexpr u32 kVSMPairCapTerrain = 1u << 19;
+constexpr u32 kVSMPairCapAT = 1u << 19;
+constexpr u32 kVSMStreamCount = 3;
 constexpr float kVSMZNear = -1000.0f;
 constexpr float kVSMZFar = 1000.0f;
 constexpr float kVSMZSnap = 256.0f;
@@ -68,6 +75,9 @@ struct VSMState {
     nvrhi::BufferHandle dirtyList;
     nvrhi::BufferHandle drawClear;
     nvrhi::TextureHandle atlas;
+    nvrhi::BufferHandle binStats;
+    nvrhi::BufferHandle pairs[kVSMStreamCount];
+    nvrhi::BufferHandle pageArgs[kVSMStreamCount];
     nvrhi::BufferHandle readback[kReadbackSlots];
     u32 readbackWrite = 0;
     u32 readbackScheduled = 0;
@@ -76,6 +86,13 @@ struct VSMState {
     u32 levelPages[kVSMLevels] = {};
     u32 dirtyPages = 0;
     u32 wrongPages = 0;
+    u32 binDraws = 0;
+    u32 binInstances = 0;
+    u32 binMaxPages = 0;
+    u32 binLodCulled = 0;
+    u32 binDrops = 0;
+    float rasterBias = -1.0f;
+    float rasterSlope = -1.0f;
 
     nvrhi::ComputePipelineHandle markPipeline;
     nvrhi::BindingLayoutHandle markLayout;
@@ -85,8 +102,29 @@ struct VSMState {
     nvrhi::BindingLayoutHandle debugLayout;
     nvrhi::GraphicsPipelineHandle clearPipeline;
     nvrhi::BindingLayoutHandle clearLayout;
+    nvrhi::ComputePipelineHandle binPipeline;
+    nvrhi::BindingLayoutHandle binLayout;
+    nvrhi::ComputePipelineHandle argsPipeline;
+    nvrhi::BindingLayoutHandle argsLayout;
+    nvrhi::GraphicsPipelineHandle pagePipeline;
+    nvrhi::GraphicsPipelineHandle pageATPipeline;
+    nvrhi::BindingLayoutHandle pageLayout;
+    nvrhi::BindingLayoutHandle pageATLayout;
+    nvrhi::ShaderHandle pageVS;
+    nvrhi::ShaderHandle pagePS;
+    nvrhi::ShaderHandle pageATPS;
     bool pipelinesFailed = false;
     u32 lastLogTime = 0;
+};
+
+struct VSMDrawConfig {
+    nvrhi::IBuffer* entryBuffer = nullptr;
+    u32 entryCount = 0;
+    nvrhi::IBuffer* staticInstanceBuffer = nullptr;
+    nvrhi::IBuffer* terrainInstanceBuffer = nullptr;
+    nvrhi::IBuffer* megaVertexBuffer = nullptr;
+    nvrhi::IBuffer* megaIndexBuffer = nullptr;
+    MaterialCache* materialCache = nullptr;
 };
 
 struct VSMOutput {
@@ -103,6 +141,7 @@ VSMOutput setupVSMPasses(
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depth,
     framegraph::VirtualResourceHandle orderAfter,
+    const VSMDrawConfig& config,
     u32 width,
     u32 height,
     VSMState* state,
