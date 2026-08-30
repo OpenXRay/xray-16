@@ -1267,6 +1267,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_framegraph->GetRTRegistry().RegisterRT("rt_HiZ", m_hizPyramid);
 
     framegraph::VirtualResourceHandle vsmMaskHandle;
+    bool vsmPassesActive = false;
     {
         auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
         vsmState.active = false;
@@ -1284,9 +1285,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             vsmCfg.materialCache = m_materialCache.get();
             auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, vsmCfg,
                 width, height, &vsmState, m_gpuProfiler.get());
-            if (vsmOut.debugView.is_valid())
-                m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmOut.debugView);
             vsmMaskHandle = vsmOut.mask;
+            vsmPassesActive = vsmOut.active;
         }
     }
 
@@ -1312,6 +1312,19 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_geometryCollector.get(),
             m_overlayManager.get()
         );
+    }
+
+    if (vsmPassesActive) {
+        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
+        passes::VSMDynConfig vsmDyn;
+        vsmDyn.skinning = &m_blackboard->get_or_add<passes::SkinningPassState>();
+        vsmDyn.gpuCulling = m_gpuCullingManager.get();
+        vsmDyn.splatBuffer = m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr;
+        passes::setupVSMDynamicPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmDyn, &vsmState, m_gpuProfiler.get());
+        framegraph::VirtualResourceHandle vsmDebugView;
+        vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, width, height, &vsmState, m_gpuProfiler.get(), &vsmDebugView);
+        if (vsmDebugView.is_valid())
+            m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmDebugView);
     }
 
     if (sunShadowCull.active && bindlessConfig.UseMegaBuffers()) {
