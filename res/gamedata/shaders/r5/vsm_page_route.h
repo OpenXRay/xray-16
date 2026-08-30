@@ -1,6 +1,11 @@
 #ifndef VSM_PAGE_ROUTE_H
 #define VSM_PAGE_ROUTE_H
 
+#ifndef VSM_ROUTE_ATLAS_W
+#define VSM_ROUTE_ATLAS_W VSM_ATLAS_W_S
+#define VSM_ROUTE_ATLAS_H VSM_ATLAS_H_S
+#endif
+
 struct VsmRoute
 {
     float4 position;
@@ -19,10 +24,10 @@ VsmRoute VsmRoutePage(uint slot, float3 worldPos)
     float2 pmax = pmin + float2(pw, pw);
     float2 nxy = (lp.xy - pmin) / pw * 2.0 - 1.0;
     float nz = 1.0 - (lp.z - vsm_zparams.x) * vsm_zparams.y;
-    uint ax = slot % uint(VSM_ATLAS_W_S);
-    uint ay = slot / uint(VSM_ATLAS_W_S);
-    float hX = 1.0 / float(VSM_ATLAS_W_S);
-    float hY = 1.0 / float(VSM_ATLAS_H_S);
+    uint ax = slot % uint(VSM_ROUTE_ATLAS_W);
+    uint ay = slot / uint(VSM_ROUTE_ATLAS_W);
+    float hX = 1.0 / float(VSM_ROUTE_ATLAS_W);
+    float hY = 1.0 / float(VSM_ROUTE_ATLAS_H);
     float cx = (float(ax) + 0.5) * 2.0 * hX - 1.0;
     float cy = (float(ay) + 0.5) * 2.0 * hY - 1.0;
     VsmRoute r;

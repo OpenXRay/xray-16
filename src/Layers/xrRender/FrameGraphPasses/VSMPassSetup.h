@@ -8,6 +8,7 @@ namespace xray::render {
     class MaterialCache;
     namespace fg {
         class RenderDevice;
+        class GPUCullingManager;
     }
 }
 
@@ -21,6 +22,8 @@ namespace xray::profiler {
 
 namespace xray::render::fg::passes {
 
+struct SkinningPassState;
+
 constexpr u32 kVSMLevels = 6;
 constexpr u32 kVSMVirtualRes = 4096;
 constexpr u32 kVSMPageSize = 128;
@@ -30,6 +33,12 @@ constexpr u32 kVSMPageCount = kVSMLevels * kVSMPagesPerLevel;
 constexpr u32 kVSMAtlasW = 64;
 constexpr u32 kVSMAtlasH = 96;
 constexpr u32 kVSMStaticSlots = kVSMAtlasW * kVSMAtlasH;
+constexpr u32 kVSMMaxPhys = 2048;
+constexpr u32 kVSMAtlasWDyn = 64;
+constexpr u32 kVSMAtlasHDyn = 32;
+constexpr u32 kVSMSkinnedCap = 256;
+constexpr u32 kVSMMaxSkinned = 256;
+constexpr u32 kVSMSkinnedFormats = 6;
 constexpr u32 kVSMPairCapOpaque = 1u << 20;
 constexpr u32 kVSMPairCapTerrain = 1u << 19;
 constexpr u32 kVSMPairCapAT = 1u << 19;
@@ -87,6 +96,25 @@ struct VSMState {
     nvrhi::BufferHandle drawClear;
     nvrhi::BufferHandle slotEpoch;
     nvrhi::TextureHandle atlas;
+    nvrhi::TextureHandle dynAtlas;
+    nvrhi::BufferHandle dynPageTable;
+    nvrhi::BufferHandle dynPageList;
+    nvrhi::BufferHandle dynAllocInfo;
+    nvrhi::BufferHandle dynUsed;
+    nvrhi::BufferHandle skinPages[kVSMSkinnedFormats];
+    nvrhi::BufferHandle skinArgs[kVSMSkinnedFormats];
+    nvrhi::BufferHandle skinStats;
+    bool dynActive = false;
+    bool dynRendered = false;
+    u32 dynCasters = 0;
+    u32 dynInstances = 0;
+    u32 dynMaxPages = 0;
+    framegraph::VirtualResourceHandle fgNeeded;
+    framegraph::VirtualResourceHandle fgDirtyList;
+    framegraph::VirtualResourceHandle fgAtlas;
+    framegraph::VirtualResourceHandle fgDynAtlas;
+    framegraph::VirtualResourceHandle fgDynTable;
+    framegraph::VirtualResourceHandle fgDynUsed;
     nvrhi::TextureHandle mask[2];
     u32 maskWidth = 0;
     u32 maskHeight = 0;
@@ -128,6 +156,15 @@ struct VSMState {
     nvrhi::BindingLayoutHandle debugLayout;
     nvrhi::ComputePipelineHandle resolvePipeline;
     nvrhi::BindingLayoutHandle resolveLayout;
+    nvrhi::ComputePipelineHandle allocPipeline;
+    nvrhi::BindingLayoutHandle allocLayout;
+    nvrhi::ComputePipelineHandle skinBinPipeline;
+    nvrhi::BindingLayoutHandle skinBinLayout;
+    nvrhi::GraphicsPipelineHandle skinPagePipelines[kVSMSkinnedFormats];
+    nvrhi::BindingLayoutHandle skinPageLayouts[kVSMSkinnedFormats];
+    nvrhi::ShaderHandle skinPageVS[kVSMSkinnedFormats];
+    bool skinPipelinesReady = false;
+    bool skinPipelinesFailed = false;
     nvrhi::GraphicsPipelineHandle clearPipeline;
     nvrhi::BindingLayoutHandle clearLayout;
     nvrhi::ComputePipelineHandle binPipeline;
@@ -155,6 +192,12 @@ struct VSMDrawConfig {
     MaterialCache* materialCache = nullptr;
 };
 
+struct VSMDynConfig {
+    const SkinningPassState* skinning = nullptr;
+    GPUCullingManager* gpuCulling = nullptr;
+    nvrhi::IBuffer* splatBuffer = nullptr;
+};
+
 struct VSMOutput {
     framegraph::VirtualResourceHandle atlas;
     framegraph::VirtualResourceHandle mask;
@@ -176,5 +219,23 @@ VSMOutput setupVSMPasses(
     u32 height,
     VSMState* state,
     xray::profiler::GPUProfiler* gpuProfiler);
+
+void setupVSMDynamicPasses(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    framegraph::VirtualResourceHandle skinnedDrawArgs,
+    const VSMDynConfig& config,
+    VSMState* state,
+    xray::profiler::GPUProfiler* gpuProfiler);
+
+framegraph::VirtualResourceHandle setupVSMResolvePasses(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    framegraph::VirtualResourceHandle depth,
+    u32 width,
+    u32 height,
+    VSMState* state,
+    xray::profiler::GPUProfiler* gpuProfiler,
+    framegraph::VirtualResourceHandle* outDebugView);
 
 }

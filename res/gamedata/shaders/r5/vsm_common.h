@@ -15,6 +15,7 @@
 #define VSM_MAX_PHYS_S    6144
 #define VSM_ATLAS_W_S     64
 #define VSM_ATLAS_H_S     96
+#define VSM_SKIN_CAP      256
 
 int vsmPageIndex(int level, int2 page)
 {
