@@ -972,6 +972,11 @@ void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDeb
 
 }
 
+bool VSMLoadScreenFrozen()
+{
+    return ps_r_vsm_load_freeze != 0 && Device.dwPrecacheFrame != 0;
+}
+
 void InvalidateVSMCache(VSMState& state)
 {
     state.resolveCount = 0;
@@ -1094,6 +1099,31 @@ VSMOutput setupVSMPasses(
         if (state->atMode >= 0)
             InvalidateVSMCache(*state);
         state->atMode = ps_r_vsm_at ? 1 : 0;
+    }
+    {
+        const bool behind = VSMLoadScreenFrozen();
+        if (state->behindLoadScreen && !behind) {
+            state->primeFrames = kVSMPrimeFrames;
+            state->primeTraceLeft = kVSMPrimeTraceFrames;
+            state->primeTraceIdx = 0;
+            state->primeTraceQuiet = 0;
+        }
+        state->behindLoadScreen = behind;
+        if (behind) {
+            if (state->maskReady) {
+                ResourceDesc heldDesc;
+                heldDesc.type = ResourceDesc::Type::Texture2D;
+                heldDesc.width = width;
+                heldDesc.height = height;
+                heldDesc.format = nvrhi::Format::RGBA16_FLOAT;
+                heldDesc.isImported = true;
+                heldDesc.isTransient = false;
+                heldDesc.debugName = "rt_VSMMask";
+                out.mask = fg.ImportTexture("rt_VSMMask", state->mask[state->maskSlot], heldDesc);
+                fg.GetRTRegistry().RegisterRT("rt_VSMMask", out.mask);
+            }
+            return out;
+        }
     }
     LogTelemetry(*state);
     state->active = true;
