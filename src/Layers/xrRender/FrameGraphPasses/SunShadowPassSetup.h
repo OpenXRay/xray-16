@@ -7,6 +7,7 @@
 namespace xray::render {
     class MaterialCache;
     class GeometryCollector;
+    struct GeometryBatch;
     namespace fg {
         class RenderDevice;
         class GPUCullingManager;
@@ -26,8 +27,13 @@ namespace xray::profiler {
 namespace xray::render::fg::passes {
 
 struct SkinningPassState;
+struct SkinningPipelineVariant;
 
 constexpr u32 kSunShadowSkinnedFormats = 6;
+
+u32 SkinnedVertexFormat(u16 renderMode, u32 vertexStride);
+const SkinningPipelineVariant* SkinnedVariant(const SkinningPassState& sk, u32 fmt, bool mdi);
+u32 SkeletonBoneOffset(nvrhi::ICommandList* cmdList, GPUCullingManager& gpuCulling, const GeometryBatch& batch);
 constexpr u32 kSunTargetFar = 0;
 constexpr u32 kSunTargetCasc0 = 1;
 constexpr u32 kSunTargetCasc1 = 2;

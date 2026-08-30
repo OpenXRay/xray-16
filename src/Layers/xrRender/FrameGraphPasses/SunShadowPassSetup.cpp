@@ -547,6 +547,8 @@ void DrawDynamicCasters(SunShadowState& state, const SunShadowDrawConfig& cfg, c
     DrawIndexedIndirectCountOrFallback(draw.cmdList, 0, 0, cfg.dynamicObjectCount);
 }
 
+}
+
 constexpr u16 kRMSkinningSoft = 0;
 constexpr u16 kRMSingle = 1;
 constexpr u16 kRMSingleHQ = 2;
@@ -596,6 +598,8 @@ u32 SkeletonBoneOffset(nvrhi::ICommandList* cmdList, GPUCullingManager& gpuCulli
         return 0;
     return gpuCulling.GetOrUploadSkeleton(cmdList, parent);
 }
+
+namespace {
 
 bool EnsureSkinnedDepthPipelines(fg::RenderDevice* device, SunShadowState& state, const SkinningPassState& sk)
 {

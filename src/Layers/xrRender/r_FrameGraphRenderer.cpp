@@ -1205,12 +1205,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     bool prepassActive = false;
     if (cullActive && bindlessConfig.enabled && bindlessConfig.UseMegaBuffers()) {
         auto& prepassState = m_blackboard->get_or_add<passes::DepthPrepassState>();
+        passes::DepthPrepassSkinnedConfig prepassSkinned;
+        prepassSkinned.skinning = &m_blackboard->get_or_add<passes::SkinningPassState>();
+        prepassSkinned.geometry = m_geometryCollector.get();
+        prepassSkinned.gpuCulling = m_gpuCullingManager.get();
+        prepassSkinned.overlayMgr = m_overlayManager.get();
         passes::setupDepthPrepass(
             *m_framegraph,
             m_device,
             depthBuffer,
             drawArgsBuffer,
             bindlessConfig,
+            prepassSkinned,
             m_materialCache.get(),
             width,
             height,
