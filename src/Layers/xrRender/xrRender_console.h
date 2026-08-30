@@ -270,6 +270,7 @@ extern ECORE_API float ps_r_vsm_ta_motion;
 extern ECORE_API float ps_r_vsm_ta_motion_floor;
 extern ECORE_API float ps_r_vsm_ta_carry;
 extern ECORE_API int   ps_r_vsm_dirty_budget;
+extern ECORE_API int   ps_r_vsm_load_freeze;
 
 extern ECORE_API int   ps_r_smoke_trail_enabled;
 extern ECORE_API float ps_r_smoke_max_emit_rate;

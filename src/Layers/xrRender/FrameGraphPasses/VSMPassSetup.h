@@ -68,6 +68,7 @@ struct VSMState {
     float sunStepMax = 0.0f;
     bool physInit = false;
     bool atlasFirst = true;
+    bool behindLoadScreen = false;
     u32 primeFrames = 0;
     u32 primeTraceLeft = 0;
     u32 primeTraceIdx = 0;
@@ -153,6 +154,7 @@ struct VSMOutput {
 };
 
 void InvalidateVSMCache(VSMState& state);
+bool VSMLoadScreenFrozen();
 void VSMBeginFrame(VSMState& state, const Fvector& camPos, const Fvector& sunDir);
 
 VSMOutput setupVSMPasses(
