@@ -256,6 +256,7 @@ extern ECORE_API float ps_r_sun_night_lum;
 extern ECORE_API float ps_r_sun_night_alt;
 extern ECORE_API float ps_r_bolt_flash;
 extern ECORE_API int   ps_r_vsm;
+extern ECORE_API int   ps_r_vis_debug;
 extern ECORE_API int   ps_r_vsm_debug;
 extern ECORE_API float ps_r_vsm_base;
 extern ECORE_API int   ps_r_vsm_mark_half;

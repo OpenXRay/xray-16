@@ -30,12 +30,6 @@ struct DepthPrepassState {
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
     nvrhi::ShaderHandle psOpaque;
-    nvrhi::GraphicsPipelineHandle clusterPipeline;
-    nvrhi::BindingLayoutHandle clusterLayout;
-    nvrhi::ShaderHandle clusterVS;
-    nvrhi::GraphicsPipelineHandle clusterTerrainPipeline;
-    nvrhi::BindingLayoutHandle clusterTerrainLayout;
-    nvrhi::ShaderHandle psFade;
     nvrhi::GraphicsPipelineHandle skinnedPipelines[kSunShadowSkinnedFormats];
     nvrhi::BindingLayoutHandle skinnedLayout;
     nvrhi::ShaderHandle skinnedDepthPS;
