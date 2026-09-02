@@ -44,6 +44,7 @@ struct VsmMarkParams {
     u32 markStep;
     u32 lodBias;
     u32 pad[2];
+    Fvector4 hudScale;
 };
 
 struct VsmResidParams {
@@ -93,6 +94,7 @@ struct VsmResolveParams {
     Fvector4 params2;
     Fvector4 params3;
     Fvector4 params4;
+    Fvector4 hudScale;
 };
 
 struct VSMResolveData {
@@ -114,6 +116,7 @@ struct VsmDebugParams {
     Fvector4 screen;
     u32 mode;
     u32 pad[3];
+    Fvector4 hudScale;
 };
 
 struct VSMMarkData {
@@ -662,6 +665,7 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
     const u32 markStep = ps_r_vsm_mark_half ? 2u : 1u;
     VsmMarkParams mp = {};
     mp.invViewProj = Device.mInvFullTransform;
+    mp.hudScale.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, psHUD_FOV);
     mp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
     mp.markStep = markStep;
     mp.lodBias = 0;
@@ -1311,6 +1315,7 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     const bool histOK = ps_r_vsm_temporal && state.resolveCount >= 1;
     VsmResolveParams rp = {};
     rp.invViewProj = Device.mInvFullTransform;
+    rp.hudScale.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, psHUD_FOV);
     rp.prevViewProj = state.prevViewProj;
     const bool dynOn = state.dynActive && state.dynRendered;
     rp.prevCamPos.set(state.prevCamPos.x, state.prevCamPos.y, state.prevCamPos.z, dynOn ? float(std::max(ps_r_vsm_debug_dyn, 0)) : 0.0f);
@@ -1378,6 +1383,7 @@ void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDeb
 
     VsmDebugParams dp = {};
     dp.invViewProj = Device.mInvFullTransform;
+    dp.hudScale.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, psHUD_FOV);
     dp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
     dp.mode = u32(ps_r_vsm_debug);
     dp.pad[0] = (state.dynActive && state.dynRendered) ? u32(std::max(ps_r_vsm_debug_dyn, 0)) : 0u;

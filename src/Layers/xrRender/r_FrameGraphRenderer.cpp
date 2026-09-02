@@ -1269,27 +1269,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     framegraph::VirtualResourceHandle vsmMaskHandle;
     bool vsmPassesActive = false;
-    {
-        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
-        vsmState.active = false;
-        if (!ps_r_vsm)
-            vsmState.maskReady = false;
-        if (ps_r_vsm && prepassActive && hizOutput.pyramid.is_valid()) {
-            passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
-            passes::VSMDrawConfig vsmCfg;
-            vsmCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
-            vsmCfg.entryCount = m_gpuCullingManager->GetClusterEntryCount();
-            vsmCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
-            vsmCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
-            vsmCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
-            vsmCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
-            vsmCfg.materialCache = m_materialCache.get();
-            auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, vsmCfg,
-                width, height, &vsmState, m_gpuProfiler.get());
-            vsmMaskHandle = vsmOut.mask;
-            vsmPassesActive = vsmOut.active;
-        }
-    }
 
     if (cullActive && hizOutput.pyramid.is_valid()) {
         m_gpuCullingManager->SetupHiZCullingPass(
@@ -1315,47 +1294,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    if (vsmPassesActive) {
-        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
-        passes::VSMDynConfig vsmDyn;
-        vsmDyn.skinning = &m_blackboard->get_or_add<passes::SkinningPassState>();
-        vsmDyn.gpuCulling = m_gpuCullingManager.get();
-        vsmDyn.splatBuffer = m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr;
-        passes::setupVSMDynamicPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmDyn, &vsmState, m_gpuProfiler.get());
-        framegraph::VirtualResourceHandle vsmDebugView;
-        vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, width, height, &vsmState, m_gpuProfiler.get(), &vsmDebugView);
-        if (vsmDebugView.is_valid())
-            m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmDebugView);
-    }
-
-    if (sunShadowCull.active && bindlessConfig.UseMegaBuffers()) {
-        auto& sunShadowState = m_blackboard->get_or_add<passes::SunShadowState>();
-        passes::SunShadowDrawConfig sunCfg;
-        sunCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
-        sunCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
-        sunCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
-        sunCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
-        sunCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
-        sunCfg.materialCache = m_materialCache.get();
-        sunCfg.dynamicCompactDrawArgs = bindlessConfig.dynamicSet.compactDrawArgsBuffer;
-        sunCfg.dynamicCompactMaterialIDs = bindlessConfig.dynamicSet.compactMaterialIDBuffer;
-        sunCfg.dynamicCompactBatchIndices = bindlessConfig.dynamicSet.compactBatchIndicesBuffer;
-        sunCfg.dynamicCompactCount = bindlessConfig.dynamicSet.compactCountBuffer;
-        sunCfg.dynamicInstanceBuffer = bindlessConfig.dynamicSet.instanceBuffer;
-        sunCfg.dynamicFadeBuffer = bindlessConfig.dynamicSet.fadeBuffer;
-        sunCfg.dynamicObjectCount = bindlessConfig.dynamicSet.totalObjectCount;
-        sunCfg.dynamicArgs = cullOutput.dynamicCompactDrawArgs;
-        sunCfg.skinning = &m_blackboard->get_or_add<passes::SkinningPassState>();
-        sunCfg.geometry = m_geometryCollector.get();
-        sunCfg.gpuCulling = m_gpuCullingManager.get();
-        sunCfg.splatBuffer = m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr;
-        sunCfg.skinnedArgs = skinnedDrawArgsBuffer;
-        sunShadowMaps = passes::setupSunShadowMapPasses(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState, m_gpuProfiler.get());
-        sunShadowState.receiverActive = sunShadowMaps.maps[passes::kSunTargetFar].is_valid();
-    } else {
-        m_blackboard->get_or_add<passes::SunShadowState>().receiverActive = false;
-    }
-    sunShadowMaps.mask = vsmMaskHandle;
 
     // ═══════════════════════════════════════════════════════
     //  SKY PASS (Renders sky dome behind everything)
@@ -1517,6 +1455,72 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height,
         m_gpuProfiler.get()
     );
+
+    {
+        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
+        vsmState.active = false;
+        if (!ps_r_vsm)
+            vsmState.maskReady = false;
+        if (ps_r_vsm && prepassActive && hizOutput.pyramid.is_valid()) {
+            passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
+            passes::VSMDrawConfig vsmCfg;
+            vsmCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+            vsmCfg.entryCount = m_gpuCullingManager->GetClusterEntryCount();
+            vsmCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+            vsmCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+            vsmCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
+            vsmCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
+            vsmCfg.materialCache = m_materialCache.get();
+            auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, vsmCfg,
+                width, height, &vsmState, m_gpuProfiler.get());
+            vsmMaskHandle = vsmOut.mask;
+            vsmPassesActive = vsmOut.active;
+        }
+    }
+
+
+    if (vsmPassesActive) {
+        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
+        passes::VSMDynConfig vsmDyn;
+        vsmDyn.skinning = &m_blackboard->get_or_add<passes::SkinningPassState>();
+        vsmDyn.gpuCulling = m_gpuCullingManager.get();
+        vsmDyn.splatBuffer = m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr;
+        passes::setupVSMDynamicPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmDyn, &vsmState, m_gpuProfiler.get());
+        framegraph::VirtualResourceHandle vsmDebugView;
+        vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, width, height, &vsmState, m_gpuProfiler.get(), &vsmDebugView);
+        if (vsmDebugView.is_valid())
+            m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmDebugView);
+    }
+
+
+    if (sunShadowCull.active && bindlessConfig.UseMegaBuffers()) {
+        auto& sunShadowState = m_blackboard->get_or_add<passes::SunShadowState>();
+        passes::SunShadowDrawConfig sunCfg;
+        sunCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+        sunCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+        sunCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+        sunCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
+        sunCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
+        sunCfg.materialCache = m_materialCache.get();
+        sunCfg.dynamicCompactDrawArgs = bindlessConfig.dynamicSet.compactDrawArgsBuffer;
+        sunCfg.dynamicCompactMaterialIDs = bindlessConfig.dynamicSet.compactMaterialIDBuffer;
+        sunCfg.dynamicCompactBatchIndices = bindlessConfig.dynamicSet.compactBatchIndicesBuffer;
+        sunCfg.dynamicCompactCount = bindlessConfig.dynamicSet.compactCountBuffer;
+        sunCfg.dynamicInstanceBuffer = bindlessConfig.dynamicSet.instanceBuffer;
+        sunCfg.dynamicFadeBuffer = bindlessConfig.dynamicSet.fadeBuffer;
+        sunCfg.dynamicObjectCount = bindlessConfig.dynamicSet.totalObjectCount;
+        sunCfg.dynamicArgs = cullOutput.dynamicCompactDrawArgs;
+        sunCfg.skinning = &m_blackboard->get_or_add<passes::SkinningPassState>();
+        sunCfg.geometry = m_geometryCollector.get();
+        sunCfg.gpuCulling = m_gpuCullingManager.get();
+        sunCfg.splatBuffer = m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr;
+        sunCfg.skinnedArgs = skinnedDrawArgsBuffer;
+        sunShadowMaps = passes::setupSunShadowMapPasses(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState, m_gpuProfiler.get());
+        sunShadowState.receiverActive = sunShadowMaps.maps[passes::kSunTargetFar].is_valid();
+    } else {
+        m_blackboard->get_or_add<passes::SunShadowState>().receiverActive = false;
+    }
+    sunShadowMaps.mask = vsmMaskHandle;
 
     auto litOutputs = passes::setupDeferredLightPass(
         *m_framegraph,

@@ -56,4 +56,16 @@ int vsmSelect(float2 lxy, float4 level[VSM_LEVELS], out float2 uv, out int2 page
     int2 p0 = clamp(int2(floor(lo)), int2(0, 0), int2(VSM_PAGES_AXIS - 1, VSM_PAGES_AXIS - 1)); \
     int2 p1 = clamp(int2(floor(hi)), int2(0, 0), int2(VSM_PAGES_AXIS - 1, VSM_PAGES_AXIS - 1))
 
+float3 vsmReconstructPos(float4x4 invViewProj, float4 clip, float4 hudScale)
+{
+    bool hud = clip.z >= 0.9;
+    if (hud)
+        clip.z = (clip.z - 0.9) * 10.0;
+    float4 world = mul(invViewProj, clip);
+    float3 pos = world.xyz / world.w;
+    if (hud)
+        pos = hudScale.xyz + hudScale.w * (pos - hudScale.xyz);
+    return pos;
+}
+
 #endif
