@@ -197,22 +197,6 @@ struct VSMDynAtlasData {
     xray::profiler::GPUProfiler* gpuProfiler;
 };
 
-struct VSMZone {
-    xray::profiler::GPUProfiler* profiler;
-    nvrhi::ICommandList* cmdList;
-    const char* name;
-    VSMZone(xray::profiler::GPUProfiler* p, nvrhi::ICommandList* c, const char* n) : profiler(p), cmdList(c), name(n)
-    {
-        if (profiler && cmdList)
-            profiler->BeginPass(cmdList, name);
-    }
-    ~VSMZone()
-    {
-        if (profiler && cmdList)
-            profiler->EndPass(cmdList, name);
-    }
-};
-
 nvrhi::BufferHandle MakeUAVBuffer(nvrhi::IDevice* nvDevice, const char* name, u64 bytes, u32 stride, bool raw)
 {
     nvrhi::BufferDesc desc;
@@ -649,7 +633,6 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
     nvrhi::ITexture* depth = fg.GetPhysicalTexture(data.depth);
     if (!cmdList || !nvDevice || !depth)
         return;
-    VSMZone zone(data.gpuProfiler, cmdList, "VSM/Mark");
     if (!EnsurePipelines(data.device, state))
         return;
 
@@ -725,7 +708,6 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     if (!cmdList || !nvDevice || !state.residPipeline)
         return;
-    VSMZone zone(data.gpuProfiler, cmdList, "VSM/Resid");
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -796,7 +778,6 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     if (!cmdList || !nvDevice || !state.binPipeline || !state.argsPipeline)
         return;
-    VSMZone zone(data.gpuProfiler, cmdList, "VSM/Bins");
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -950,7 +931,6 @@ void ExecuteAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMAtlasDa
     nvrhi::ITexture* atlas = fg.GetPhysicalTexture(data.atlas);
     if (!cmdList || !nvDevice || !atlas || !state.clearPipeline)
         return;
-    VSMZone zone(data.gpuProfiler, cmdList, "VSM/Static");
 
     if (state.atlasFirst) {
         cmdList->clearDepthStencilTexture(atlas, nvrhi::AllSubresources, true, 0.0f, false, 0);
@@ -1072,7 +1052,6 @@ void ExecuteDynAlloc(fg::RenderContext* ctx, const VSMDynAllocData& data)
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     if (!cmdList || !nvDevice || !state.allocPipeline)
         return;
-    VSMZone zone(data.gpuProfiler, cmdList, "VSM/DynAlloc");
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -1115,7 +1094,6 @@ void ExecuteSkinBin(fg::RenderContext* ctx, const VSMSkinBinData& data)
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     if (!cmdList || !nvDevice || !state.skinBinPipeline || !data.config.gpuCulling)
         return;
-    VSMZone zone(data.gpuProfiler, cmdList, "VSM/DynBin");
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -1195,7 +1173,6 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
     nvrhi::ITexture* atlas = fg.GetPhysicalTexture(data.dynAtlas);
     if (!cmdList || !nvDevice || !atlas)
         return;
-    VSMZone zone(data.gpuProfiler, cmdList, "VSM/DynNPC");
     state.dynRendered = false;
 
     cmdList->clearDepthStencilTexture(atlas, nvrhi::AllSubresources, true, 0.0f, false, 0);
@@ -1293,7 +1270,6 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
         atlasDyn = state.dynAtlas;
     if (!atlasDyn)
         return;
-    VSMZone zone(data.gpuProfiler, cmdList, "VSM/Resolve");
 
     if (state.dynActive && state.readbackScheduled > 0) {
         nvrhi::IBuffer* slot = state.readback[(state.readbackWrite + VSMState::kReadbackSlots - 1) % VSMState::kReadbackSlots];
