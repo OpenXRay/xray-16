@@ -726,7 +726,7 @@ void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, con
         auto& pools = cfg.gpuCulling->GetSkinnedPools();
         for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT && drawIndexBuffer; ++f) {
             const auto& bucket = cfg.gpuCulling->GetSkinnedBucket(f);
-            if (bucket.count == 0)
+            if (bucket.casterCount == 0)
                 continue;
             nvrhi::IGraphicsPipeline* pipeline = state.skinnedMDIPipelines[f];
             nvrhi::IBuffer* poolVB = pools.GetVertexBuffer(f);
@@ -757,7 +757,7 @@ void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, con
             gs.viewport.addScissorRect(draw.scissor);
             gs.indirectParams = cfg.gpuCulling->GetSkinnedArgsBuffer();
             cmdList->setGraphicsState(gs);
-            cmdList->drawIndexedIndirect(bucket.base * u32(sizeof(IndirectDrawArgs)), bucket.count);
+            cmdList->drawIndexedIndirect(bucket.base * u32(sizeof(IndirectDrawArgs)), bucket.casterCount);
         }
     }
 

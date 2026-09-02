@@ -1110,7 +1110,7 @@ void ExecuteSkinBin(fg::RenderContext* ctx, const VSMSkinBinData& data)
     GPUCullingManager& gpuCulling = *data.config.gpuCulling;
     u32 pooledTotal = 0;
     for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT && f < kVSMSkinnedFormats; ++f)
-        pooledTotal = std::max(pooledTotal, gpuCulling.GetSkinnedBucket(f).base + gpuCulling.GetSkinnedBucket(f).count);
+        pooledTotal = std::max(pooledTotal, gpuCulling.GetSkinnedBucket(f).base + gpuCulling.GetSkinnedBucket(f).casterCount);
     const u32 casters = std::min(pooledTotal, kVSMMaxSkinned);
     nvrhi::IBuffer* records = gpuCulling.GetSkinnedRecordsBuffer();
     nvrhi::IBuffer* args = gpuCulling.GetSkinnedArgsBuffer();
@@ -1210,7 +1210,7 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
         nvrhi::IBindingLayout* layout = state.skinPageLayouts[f];
         nvrhi::IBuffer* poolVB = pools.GetVertexBuffer(f);
         nvrhi::IBuffer* poolIB = pools.GetIndexBuffer(f);
-        const u32 drawCount = bucket.base < kVSMMaxSkinned ? std::min(bucket.count, kVSMMaxSkinned - bucket.base) : 0u;
+        const u32 drawCount = bucket.base < kVSMMaxSkinned ? std::min(bucket.casterCount, kVSMMaxSkinned - bucket.base) : 0u;
         if (drawCount == 0 || !pipeline || !layout || !poolVB || !poolIB)
             continue;
         auto* vsRefl = shaderLoader->GetCachedReflection(kSkinPageShaders[f], ".vs");

@@ -2049,8 +2049,10 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         bucket.args.clear();
         bucket.records.clear();
         bucket.materialIDs.clear();
+        bucket.shadowOnly.clear();
         bucket.base = 0;
         bucket.count = 0;
+        bucket.casterCount = 0;
     }
     m_skinnedObjectCount = 0;
 
@@ -2107,6 +2109,7 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         rec.bounds.set(batch.worldBoundsCenter.x, batch.worldBoundsCenter.y, batch.worldBoundsCenter.z, batch.worldBoundsRadius);
         bucket.records.push_back(rec);
         bucket.materialIDs.push_back(batch.bindlessMaterialID);
+        bucket.shadowOnly.push_back(batch.isShadowOnly ? 1u : 0u);
     }
 
     FlushBoneBatch(cmdList);
@@ -2115,8 +2118,11 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
         SkinnedBucket& bucket = m_skinnedBuckets[f];
         bucket.base = pooledTotal;
-        bucket.count = static_cast<u32>(bucket.records.size());
-        pooledTotal += bucket.count;
+        bucket.casterCount = static_cast<u32>(bucket.records.size());
+        bucket.count = 0;
+        for (u8 shadowOnly : bucket.shadowOnly)
+            bucket.count += shadowOnly ? 0u : 1u;
+        pooledTotal += bucket.casterCount;
     }
     m_skinnedObjectCount = pooledTotal + residual;
 
@@ -2130,13 +2136,17 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     m_skinnedMaterialIDData.clear();
     for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
         SkinnedBucket& bucket = m_skinnedBuckets[f];
-        for (u32 i = 0; i < bucket.count; ++i) {
-            IndirectDrawArgs args = bucket.args[i];
-            args.startInstanceLocation = bucket.base + i;
-            m_skinnedArgsData.push_back(args);
+        for (u32 pass = 0; pass < 2; ++pass) {
+            for (u32 i = 0; i < bucket.casterCount; ++i) {
+                if ((bucket.shadowOnly[i] != 0u) != (pass == 1))
+                    continue;
+                IndirectDrawArgs args = bucket.args[i];
+                args.startInstanceLocation = static_cast<u32>(m_skinnedArgsData.size());
+                m_skinnedArgsData.push_back(args);
+                m_skinnedRecordsData.push_back(bucket.records[i]);
+                m_skinnedMaterialIDData.push_back(bucket.materialIDs[i]);
+            }
         }
-        m_skinnedRecordsData.insert(m_skinnedRecordsData.end(), bucket.records.begin(), bucket.records.end());
-        m_skinnedMaterialIDData.insert(m_skinnedMaterialIDData.end(), bucket.materialIDs.begin(), bucket.materialIDs.end());
     }
 
     cmdList->writeBuffer(m_skinnedArgsBuffer, m_skinnedArgsData.data(), u64(pooledTotal) * sizeof(IndirectDrawArgs));
