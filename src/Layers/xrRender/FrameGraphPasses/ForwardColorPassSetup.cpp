@@ -86,8 +86,8 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
 
     pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
     pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-    pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
-    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
+    pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
+    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
@@ -116,8 +116,8 @@ void InitializeForwardResources(fg::RenderDevice* device, const nvrhi::Framebuff
                 terrainPipeDesc.bindingLayouts = { state.terrainLayout };
             terrainPipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
             terrainPipeDesc.renderState.depthStencilState.depthTestEnable = true;
-            terrainPipeDesc.renderState.depthStencilState.depthWriteEnable = false;
-            terrainPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Equal;
+            terrainPipeDesc.renderState.depthStencilState.depthWriteEnable = true;
+            terrainPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
             terrainPipeDesc.renderState.rasterState.frontCounterClockwise = false;
             terrainPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
             state.terrainPipeline = cache.GetOrCreatePipeline("ForwardColor_Terrain", terrainPipeDesc, fbInfo, nvDevice);
@@ -447,9 +447,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             if (cmdList) {
-                if (!data.bindlessConfig.prepassActive)
-                    cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
                 if (!data.bindlessConfig.visBufferActive) {
+                    cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
                     if (normalRT)
                         cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
                     if (baseColorRT)

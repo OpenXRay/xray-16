@@ -55,6 +55,7 @@ void renderVisibilityRaster(
     VisibilityPassState& state)
 {
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
     cmdList->clearTextureUInt(visRT, nvrhi::AllSubresources, 0);
 
     if (!config.UseGPUCulling() || !config.UseMegaBuffers())
@@ -227,7 +228,7 @@ VisibilityPassOutput setupVisibilityPass(
             data.materialCache = materialCache;
             data.state = state;
             data.bindlessConfig = bindlessConfig;
-            data.depth = passBuilder.readWrite(depthTarget, ResourceState::DepthStencilWrite);
+            data.depth = passBuilder.write(depthTarget, ResourceState::DepthStencilWrite);
             data.visId = passBuilder.write(visIdTarget, ResourceState::RenderTarget);
             if (drawArgsBuffer.is_valid())
                 data.drawArgsBuffer = passBuilder.read(drawArgsBuffer, ResourceState::IndirectArgument);

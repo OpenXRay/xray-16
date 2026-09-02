@@ -93,7 +93,6 @@ struct BindlessForwardConfig {
     // Enable bindless rendering mode
     bool enabled = false;
 
-    bool prepassActive = false;
     bool visBufferActive = false;
 
     // ═══════════════════════════════════════════════════════
