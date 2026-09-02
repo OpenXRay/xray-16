@@ -189,7 +189,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     //  FORWARD+ EXTENSIONS (Phase 1.3)
     // ═══════════════════════════════════════════════════════
 
-    cb.m_InvVP.invert(cb.m_VP);
+    cb.m_InvVP.invert_44(cb.m_VP);
 
     for (int i = 0; i < 4; i++)
         cb.shadow_matrices[i].identity();

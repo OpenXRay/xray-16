@@ -231,8 +231,14 @@ float3 reconstruct_world_pos(float2 svPosXY, float depth)
 	float2 uv = svPosXY * screen_res.zw;
 	float4 clip = float4(uv * 2.0 - 1.0, depth, 1.0);
 	clip.y = -clip.y;
+	bool hud = depth >= 0.9;
+	if (hud)
+		clip.z = (depth - 0.9) * 10.0;
 	float4 world = mul(m_InvVP, clip);
-	return world.xyz / world.w;
+	float3 pos = world.xyz / world.w;
+	if (hud)
+		pos = eye_position + hud_fov * (pos - eye_position);
+	return pos;
 }
 
 f_forward output_forward_color(float3 albedo, float3 normal, float3 worldPos, float metallic, float roughness)
@@ -244,19 +250,16 @@ f_forward output_forward_color(float3 albedo, float3 normal, float3 worldPos, fl
 	return res;
 }
 
-f_forward output_forward_pbr(
+float3 shade_pbr(
 	float3 albedo,
-	float3 worldNormal,
+	float3 N,
 	float3 worldPos,
 	float metallic,
 	float roughness,
 	float ao,
-	float4 svPosition = float4(0, 0, 0, 0),
-	float sunVis = -1.0)
+	float4 svPosition,
+	float sunVis)
 {
-	f_forward res;
-
-	float3 N = normalize(worldNormal);
 	float3 V = normalize(eye_position - worldPos);
 	float3 L = normalize(-L_sun_dir_w);
 
@@ -282,15 +285,44 @@ f_forward output_forward_pbr(
 	if (svPosition.w != 0)
 	{
 		float linearDepth = mul(m_V, float4(worldPos, 1.0)).z;
-		float3 clusterLights = EvaluateClusteredLights(
+		finalColor += EvaluateClusteredLights(
 			worldPos, N, V, albedo, metallic, roughness,
 			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode);
-		finalColor += clusterLights;
 	}
 #endif
 
-	res.color = float4(finalColor, 1.0);
+	return finalColor;
+}
+
+f_forward output_forward_pbr(
+	float3 albedo,
+	float3 worldNormal,
+	float3 worldPos,
+	float metallic,
+	float roughness,
+	float ao,
+	float4 svPosition = float4(0, 0, 0, 0),
+	float sunVis = -1.0,
+	bool forwardOnly = false)
+{
+	f_forward res;
+	float3 N = normalize(worldNormal);
 	res.normal = float4(N, roughness);
+	res.baseColor = float4(albedo, metallic);
+	if (!forwardOnly)
+	{
+		res.color = float4(0, 0, 0, ao);
+		return res;
+	}
+	res.color = float4(shade_pbr(albedo, N, worldPos, metallic, roughness, ao, svPosition, sunVis), 1.0);
+	return res;
+}
+
+f_forward output_gbuffer(float3 albedo, float3 worldNormal, float metallic, float roughness, float ao)
+{
+	f_forward res;
+	res.color = float4(0, 0, 0, ao);
+	res.normal = float4(normalize(worldNormal), roughness);
 	res.baseColor = float4(albedo, metallic);
 	return res;
 }
