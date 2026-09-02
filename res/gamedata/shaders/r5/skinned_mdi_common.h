@@ -2,28 +2,19 @@
 #define SKINNED_MDI_COMMON_H
 
 #include "skinned_common.h"
-
-struct SkinnedDrawRecord
-{
-    float4x4 world;
-    uint boneOffset;
-    uint splatOffset;
-    uint splatCount;
-    uint pad;
-};
+#include "skinned_record.h"
 
 StructuredBuffer<SkinnedDrawRecord> g_SkinnedRecords : register(t14);
-StructuredBuffer<uint> g_SkinnedCompactIndices : register(t15);
-StructuredBuffer<uint> g_SkinnedCompactMaterialIDs : register(t16);
+StructuredBuffer<uint> g_SkinnedMaterialIDs : register(t15);
 
 SkinnedDrawRecord skinned_mdi_record(uint drawIndex)
 {
-    return g_SkinnedRecords[g_SkinnedCompactIndices[drawIndex]];
+    return g_SkinnedRecords[drawIndex];
 }
 
 uint skinned_mdi_material(uint drawIndex)
 {
-    return g_SkinnedCompactMaterialIDs[drawIndex];
+    return g_SkinnedMaterialIDs[drawIndex];
 }
 
 float4x4 mdi_get_bone(uint boneOffset, int legacy_index)

@@ -101,8 +101,8 @@ struct VSMState {
     nvrhi::BufferHandle dynPageList;
     nvrhi::BufferHandle dynAllocInfo;
     nvrhi::BufferHandle dynUsed;
-    nvrhi::BufferHandle skinPages[kVSMSkinnedFormats];
-    nvrhi::BufferHandle skinArgs[kVSMSkinnedFormats];
+    nvrhi::BufferHandle skinPages;
+    nvrhi::BufferHandle skinArgs;
     nvrhi::BufferHandle skinStats;
     bool dynActive = false;
     bool dynRendered = false;

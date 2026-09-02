@@ -758,12 +758,6 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.megaBufferVertices = m_gpuCullingManager->GetTotalVertexCount();
             stats.megaBufferIndices = m_gpuCullingManager->GetTotalIndexCount();
 
-            // Skinned Hi-Z culling stats
-            const auto& skinnedCullStats = m_gpuCullingManager->GetSkinnedCullingStats();
-            stats.skinnedSubmitted = skinnedCullStats.submitted;
-            stats.skinnedVisible = skinnedCullStats.visible;
-            stats.skinnedCulled = skinnedCullStats.culled;
-
             stats.clusterEntries = m_gpuCullingManager->GetClusterEntryCount();
             stats.clusterVisible = cullStats.clusterVisible;
             stats.clusterTerrainEntries = m_gpuCullingManager->GetClusterTerrainEntryCount();
@@ -1233,6 +1227,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     }
 
+    if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedEnabled())
+        skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedUploadPass(*m_framegraph, m_geometryCollector.get(), m_overlayManager.get());
+
     framegraph::VirtualResourceHandle visIdBuffer;
     if (cullActive && bindlessConfig.enabled && bindlessConfig.UseMegaBuffers() && bindlessConfig.cluster.IsValid()
         && m_gpuCullingManager->GetClusterEntryCount() < passes::kVisIdEntryLimit) {
@@ -1305,17 +1302,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedCullingEnabled() && hizOutput.pyramid.is_valid()) {
-        skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedCullingPass(
-            *m_framegraph,
-            m_hizPyramid,
-            hizOutput.width,
-            hizOutput.height,
-            hizOutput.mipLevels,
-            m_geometryCollector.get(),
-            m_overlayManager.get()
-        );
-    }
 
 
     // ═══════════════════════════════════════════════════════
