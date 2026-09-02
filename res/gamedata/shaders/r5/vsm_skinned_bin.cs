@@ -2,29 +2,18 @@
 #include "common.h"
 #include "vsm_common.h"
 #include "vsm_params.h"
-
-struct GPUObjectData
-{
-    float3 position;
-    float radius;
-    uint batchIndex;
-    uint flags;
-    float pad0;
-    float pad1;
-};
+#include "skinned_record.h"
 
 cbuffer VsmSkinBinParams : register(b5)
 {
-    uint g_BucketCount;
+    uint g_CasterCount;
     uint g_Cap;
     uint g_MaxCasters;
     float g_NpcDist;
     float4 g_CamPos;
 };
 
-ByteAddressBuffer g_CompactCount : register(t0);
-StructuredBuffer<uint> g_CompactIndices : register(t1);
-StructuredBuffer<GPUObjectData> g_Objects : register(t2);
+StructuredBuffer<SkinnedDrawRecord> g_Records : register(t0);
 ByteAddressBuffer g_InputArgs : register(t14);
 StructuredBuffer<uint> g_DynPageTable : register(t15);
 RWStructuredBuffer<uint> g_CasterPages : register(u0);
@@ -36,22 +25,19 @@ RWStructuredBuffer<uint> g_DynUsed : register(u3);
 void main(uint3 dtID : SV_DispatchThreadID)
 {
     uint c = dtID.x;
-    if (c >= g_MaxCasters)
-        return;
-    uint visible = min(g_CompactCount.Load(0), g_BucketCount);
-    if (c >= visible)
+    if (c >= g_MaxCasters || c >= g_CasterCount)
         return;
 
-    uint idx = g_CompactIndices[c];
-    GPUObjectData o = g_Objects[idx];
-    uint inBase = idx * 20u;
+    SkinnedDrawRecord rec = g_Records[c];
+    uint inBase = c * 20u;
     uint indexCount = g_InputArgs.Load(inBase + 0u);
     uint firstIndex = g_InputArgs.Load(inBase + 8u);
     uint baseVertex = g_InputArgs.Load(inBase + 12u);
 
-    float2 lp = mul(vsm_view, float4(o.position, 1.0)).xy;
-    float R = o.radius;
-    bool inRange = g_NpcDist <= 0.0 || distance(o.position, g_CamPos.xyz) <= g_NpcDist + R;
+    float3 center = rec.bounds.xyz;
+    float R = rec.bounds.w;
+    float2 lp = mul(vsm_view, float4(center, 1.0)).xy;
+    bool inRange = g_NpcDist <= 0.0 || distance(center, g_CamPos.xyz) <= g_NpcDist + R;
 
     uint cnt = 0u;
     if (inRange)

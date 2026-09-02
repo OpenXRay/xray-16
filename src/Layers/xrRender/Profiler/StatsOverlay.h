@@ -44,9 +44,6 @@ struct RenderStats
     u32 maxBonesPerMesh = 0;     // Maximum bones in a single mesh
 
     // Skinned culling stats (from GPU Hi-Z culling)
-    u32 skinnedSubmitted = 0;    // Total skinned meshes submitted for culling
-    u32 skinnedVisible = 0;      // Skinned meshes that passed culling
-    u32 skinnedCulled = 0;       // Skinned meshes culled by Hi-Z
 
     // Particle culling stats (from GPU Hi-Z culling)
     u32 particleCullSubmitted = 0;  // World particle batches submitted for culling
@@ -124,7 +121,6 @@ struct RenderStats
         objectsSubmitted = objectsCulled = objectsVisible = 0;
         megaBufferVertices = megaBufferIndices = 0;
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
-        skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
         clusterStaticEntries = clusterTrianglesDrawn = clusterTerrainTrianglesDrawn = 0;

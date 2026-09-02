@@ -717,10 +717,9 @@ void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, con
     nvrhi::ICommandList* cmdList = draw.cmdList;
     nvrhi::IDevice* nvDevice = draw.nvDevice;
 
-    const bool cullActive = data.skinnedArgs.is_valid()
-        && cfg.gpuCulling->IsSkinnedCullingEnabled()
+    const bool mdiActive = data.skinnedArgs.is_valid()
+        && cfg.gpuCulling->IsSkinnedEnabled()
         && cfg.gpuCulling->GetSkinnedObjectCount() == worldSkinnedCount;
-    const bool mdiActive = cullActive && cfg.gpuCulling->IsSkinnedMDIEnabled();
 
     if (mdiActive && mdiVsRefl && mdiPsRefl && state.skinnedMDILayout) {
         nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("SunShadow", nvDevice);
@@ -740,9 +739,8 @@ void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, con
             bsb.BufferSRV("g_BoneMatrices", boneBuffer);
             bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
             bsb.BufferSRV("g_PaintSplats", cfg.splatBuffer);
-            bsb.BufferSRV("g_SkinnedRecords", bucket.recordsBuffer);
-            bsb.BufferSRV("g_SkinnedCompactIndices", bucket.compactBatchIndicesBuffer);
-            bsb.BufferSRV("g_SkinnedCompactMaterialIDs", bucket.compactMaterialIDBuffer);
+            bsb.BufferSRV("g_SkinnedRecords", cfg.gpuCulling->GetSkinnedRecordsBuffer());
+            bsb.BufferSRV("g_SkinnedMaterialIDs", cfg.gpuCulling->GetSkinnedMaterialIDBuffer());
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinnedMDILayout, nvDevice);
             if (!bindingSet)
                 continue;
@@ -757,10 +755,9 @@ void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, con
             gs.indexBuffer = { poolIB, nvrhi::Format::R16_UINT, 0 };
             gs.viewport.addViewport(draw.viewport);
             gs.viewport.addScissorRect(draw.scissor);
-            gs.indirectParams = bucket.compactDrawArgsBuffer;
-            gs.indirectCountBuffer = bucket.compactCountBuffer;
+            gs.indirectParams = cfg.gpuCulling->GetSkinnedArgsBuffer();
             cmdList->setGraphicsState(gs);
-            DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, bucket.count);
+            cmdList->drawIndexedIndirect(bucket.base * u32(sizeof(IndirectDrawArgs)), bucket.count);
         }
     }
 
@@ -778,8 +775,6 @@ void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, con
     if (!directSet)
         return;
 
-    nvrhi::IBuffer* residualArgs = cullActive ? cfg.gpuCulling->GetSkinnedDrawArgsBuffer() : nullptr;
-    u32 residualIdx = 0;
     for (const auto& batch : cfg.geometry->GetBatches()) {
         if (!batch.isSkinned)
             continue;
@@ -815,18 +810,12 @@ void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, con
             gs.indexBuffer = { batch.indexBuffer, nvrhi::Format::R16_UINT, 0 };
             gs.viewport.addViewport(draw.viewport);
             gs.viewport.addScissorRect(draw.scissor);
-            gs.indirectParams = residualArgs;
             cmdList->setGraphicsState(gs);
-            if (residualArgs) {
-                cmdList->drawIndexedIndirect(residualIdx * (u32)sizeof(IndirectDrawArgs), 1);
-            } else {
-                cmdList->drawIndexed(nvrhi::DrawArguments()
-                    .setVertexCount(batch.indexCount)
-                    .setStartIndexLocation(batch.startIndex)
-                    .setStartVertexLocation(batch.baseVertex));
-            }
+            cmdList->drawIndexed(nvrhi::DrawArguments()
+                .setVertexCount(batch.indexCount)
+                .setStartIndexLocation(batch.startIndex)
+                .setStartVertexLocation(batch.baseVertex));
         }
-        ++residualIdx;
     }
 }
 

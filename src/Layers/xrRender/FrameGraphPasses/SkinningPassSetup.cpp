@@ -458,9 +458,7 @@ static void DrawSkinnedBatch(
     const GeometryBatch& batch,
     const Fmatrix& worldMatrix,
     u32 skeletonBoneOffset,
-    decals::OverlayManager::SplatRange splatRange = {0, 0},
-    nvrhi::IBuffer* indirectArgs = nullptr,
-    u32 indirectOffset = 0)
+    decals::OverlayManager::SplatRange splatRange = {0, 0})
 {
     using namespace fg;
     using namespace fg::bindless;
@@ -513,18 +511,13 @@ static void DrawSkinnedBatch(
         gfxState.indexBuffer = { batch.indexBuffer, nvrhi::Format::R16_UINT, 0 };
         gfxState.viewport.addViewport(ctx.viewport);
         gfxState.viewport.addScissorRect(ctx.scissor);
-        gfxState.indirectParams = indirectArgs;
 
         cmdList->setGraphicsState(gfxState);
-        if (indirectArgs) {
-            cmdList->drawIndexedIndirect(indirectOffset, 1);
-        } else {
-            cmdList->drawIndexed(
-                nvrhi::DrawArguments()
-                    .setVertexCount(batch.indexCount)
-                    .setStartIndexLocation(batch.startIndex)
-                    .setStartVertexLocation(batch.baseVertex));
-        }
+        cmdList->drawIndexed(
+            nvrhi::DrawArguments()
+                .setVertexCount(batch.indexCount)
+                .setStartIndexLocation(batch.startIndex)
+                .setStartVertexLocation(batch.baseVertex));
     }
 }
 
@@ -709,10 +702,9 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                     globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer,
                     worldViewport, scissor, false);
 
-                const bool cullActive = data.skinnedDrawArgs.is_valid()
-                    && gpuCullMgr->IsSkinnedCullingEnabled()
+                const bool mdiActive = data.skinnedDrawArgs.is_valid()
+                    && gpuCullMgr->IsSkinnedEnabled()
                     && gpuCullMgr->GetSkinnedObjectCount() == worldSkinnedCount;
-                const bool mdiActive = cullActive && gpuCullMgr->IsSkinnedMDIEnabled();
 
                 if (mdiActive) {
                     auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -741,9 +733,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         bsb.BufferSRV("g_BoneMatrices", globalBoneBuffer);
                         bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
                         bsb.BufferSRV("g_PaintSplats", splatBuffer);
-                        bsb.BufferSRV("g_SkinnedRecords", bucket.recordsBuffer);
-                        bsb.BufferSRV("g_SkinnedCompactIndices", bucket.compactBatchIndicesBuffer);
-                        bsb.BufferSRV("g_SkinnedCompactMaterialIDs", bucket.compactMaterialIDBuffer);
+                        bsb.BufferSRV("g_SkinnedRecords", gpuCullMgr->GetSkinnedRecordsBuffer());
+                        bsb.BufferSRV("g_SkinnedMaterialIDs", gpuCullMgr->GetSkinnedMaterialIDBuffer());
 
                         auto& cache = framegraph::GetPassResourceCache();
                         nvrhi::BindingSetHandle mdiBindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->mdiLayout, nvDevice);
@@ -760,16 +751,13 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         gfxState.indexBuffer = { poolIB, nvrhi::Format::R16_UINT, 0 };
                         gfxState.viewport.addViewport(worldViewport);
                         gfxState.viewport.addScissorRect(scissor);
-                        gfxState.indirectParams = bucket.compactDrawArgsBuffer;
-                        gfxState.indirectCountBuffer = bucket.compactCountBuffer;
+                        gfxState.indirectParams = gpuCullMgr->GetSkinnedArgsBuffer();
 
                         cmdList->setGraphicsState(gfxState);
-                        DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, bucket.count);
+                        cmdList->drawIndexedIndirect(bucket.base * u32(sizeof(IndirectDrawArgs)), bucket.count);
                     }
                 }
 
-                nvrhi::IBuffer* residualArgs = cullActive ? gpuCullMgr->GetSkinnedDrawArgsBuffer() : nullptr;
-                u32 residualIdx = 0;
                 for (const auto& batch : data.geometry->GetBatches()) {
                     if (!batch.isSkinned)
                         continue;
@@ -786,9 +774,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                     auto sr = GetSplatRange(batch, data.overlayMgr);
 
                     DrawSkinnedBatch(*data.passState, cmdList, nvDevice, worldCtx,
-                        batch, batch.worldMatrix, boneOffset, sr,
-                        residualArgs, residualIdx * (u32)sizeof(IndirectDrawArgs));
-                    ++residualIdx;
+                        batch, batch.worldMatrix, boneOffset, sr);
                 }
             }
 
