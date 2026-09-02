@@ -759,7 +759,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 }
 
                 for (const auto& batch : data.geometry->GetBatches()) {
-                    if (!batch.isSkinned)
+                    if (!batch.isSkinned || batch.isShadowOnly)
                         continue;
                     if (mdiActive) {
                         const u32 variantIdx = MaterialBuffer::Instance().GetShaderVariant(batch.bindlessMaterialID);

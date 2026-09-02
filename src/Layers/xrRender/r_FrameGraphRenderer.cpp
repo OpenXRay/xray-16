@@ -939,6 +939,7 @@ void FrameGraphRenderer::SetupFrame() {
     }
 
     m_lstRenderables.clear();
+    m_lstShadowCasters.clear();
 
     if (levelLoaded)
     {
@@ -959,6 +960,16 @@ void FrameGraphRenderer::SetupFrame() {
                 spatial_types,
                 view_frustum
             );
+
+            if (ps_r_vsm && ps_r_sun_shadow && ps_r_vsm_npc_dist > 0.0f) {
+                g_pGamePersistent->SpatialSpace.q_sphere(
+                    m_lstShadowCasters,
+                    0,
+                    STYPE_RENDERABLE,
+                    Device.vCameraPosition,
+                    ps_r_vsm_npc_dist
+                );
+            }
         }
     }
 
@@ -2096,12 +2107,16 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
             break;
         case MT_PARTICLE_EFFECT: // particles & particle groups
         case MT_PARTICLE_GROUP:
+            if (m_collectShadowOnly)
+                return false;
             return ProcessParticleGeometry(visual, worldTransform, renderable, false);
         default:
             return false;
     }
 
     if (!meshVisual)
+        return false;
+    if (m_collectShadowOnly && visual->getType() != MT_SKELETON_GEOMDEF_ST && visual->getType() != MT_SKELETON_GEOMDEF_PM)
         return false;
 
     // Check if geometry is valid
@@ -2190,6 +2205,7 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.visual = visual;
     batch.renderable = renderable;
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+    batch.isShadowOnly = m_collectShadowOnly;
     batch.isStatic = isStatic;
     if (batch.isSkinned) {
         if (visualType == MT_SKELETON_GEOMDEF_ST) {
@@ -2607,6 +2623,21 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         submittedDynamic++;
     }
 
+    if (!m_lstShadowCasters.empty()) {
+        ZoneScopedN("CollectVisibleGeometry::ShadowCasters");
+        xr_set<ISpatial*> visible(m_lstRenderables.begin(), m_lstRenderables.end());
+        m_collectShadowOnly = true;
+        for (ISpatial* spatial : m_lstShadowCasters) {
+            if (visible.count(spatial))
+                continue;
+            IRenderable* renderable = spatial->dcast_Renderable();
+            if (!renderable || renderable->renderable_HUD())
+                continue;
+            renderable->renderable_Render(0, renderable);
+        }
+        m_collectShadowOnly = false;
+    }
+
     if (!collectedLights.empty())
         fg::ClusteredLightManager::Instance().CollectLightsParallel(collectedLights);
 
@@ -2630,6 +2661,8 @@ void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix
     }
     
     bool isHUD = (root && root->renderable_HUD());
+    if (isHUD && m_collectShadowOnly)
+        return;
 
     ForEachLeafVisual(visual, [&](dxRender_Visual* leafVisual) {
         if (isHUD) {

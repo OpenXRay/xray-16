@@ -571,6 +571,8 @@ private:
     // ═══════════════════════════════════════════════════
     // Populated once per frame, reused across passes
     xr_vector<ISpatial*> m_lstRenderables;
+    xr_vector<ISpatial*> m_lstShadowCasters;
+    bool m_collectShadowOnly = false;
 
     // Frame setup
     void SetupFrame();

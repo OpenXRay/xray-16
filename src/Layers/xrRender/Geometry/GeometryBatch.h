@@ -84,6 +84,8 @@ struct GeometryBatch {
     // Skinned meshes use bindless_skinned.vs/ps with per-draw bone matrices
     bool isSkinned = false;
 
+    bool isShadowOnly = false;
+
     // Skinning render mode from CSkeletonX::RenderMode
     // Used to select correct shader (1B, 2B, 3B, 4B variants)
     u16 skinningRenderMode = 0;

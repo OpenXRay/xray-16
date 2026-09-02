@@ -439,8 +439,10 @@ public:
         xr_vector<IndirectDrawArgs> args;
         xr_vector<SkinnedDrawRecord> records;
         xr_vector<u32> materialIDs;
+        xr_vector<u8> shadowOnly;
         u32 base = 0;
         u32 count = 0;
+        u32 casterCount = 0;
     };
     const SkinnedBucket& GetSkinnedBucket(u32 formatID) const { return m_skinnedBuckets[formatID]; }
 
