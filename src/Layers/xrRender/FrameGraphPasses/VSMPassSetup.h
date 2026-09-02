@@ -207,6 +207,8 @@ struct VSMOutput {
 
 void InvalidateVSMCache(VSMState& state);
 bool VSMLoadScreenFrozen();
+Fmatrix VSMSunView(const Fvector& sunDir);
+float VSMReceiverExtent();
 void VSMBeginFrame(VSMState& state, const Fvector& camPos, const Fvector& sunDir);
 
 VSMOutput setupVSMPasses(

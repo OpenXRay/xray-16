@@ -961,14 +961,18 @@ void FrameGraphRenderer::SetupFrame() {
                 view_frustum
             );
 
-            if (ps_r_vsm && ps_r_sun_shadow && ps_r_vsm_npc_dist > 0.0f) {
-                g_pGamePersistent->SpatialSpace.q_sphere(
-                    m_lstShadowCasters,
-                    0,
-                    STYPE_RENDERABLE,
-                    Device.vCameraPosition,
-                    ps_r_vsm_npc_dist
-                );
+            m_shadowCasterRegion.valid = false;
+            if (ps_r_vsm && ps_r_sun_shadow) {
+                m_shadowCasterRegion = BuildShadowCasterRegion();
+                if (m_shadowCasterRegion.valid) {
+                    g_pGamePersistent->SpatialSpace.q_box(
+                        m_lstShadowCasters,
+                        0,
+                        STYPE_RENDERABLE,
+                        m_shadowCasterRegion.worldCenter,
+                        m_shadowCasterRegion.worldHalf
+                    );
+                }
             }
         }
     }
@@ -2625,10 +2629,13 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
     if (!m_lstShadowCasters.empty()) {
         ZoneScopedN("CollectVisibleGeometry::ShadowCasters");
+        const ShadowCasterRegion& region = m_shadowCasterRegion;
         xr_set<ISpatial*> visible(m_lstRenderables.begin(), m_lstRenderables.end());
         m_collectShadowOnly = true;
         for (ISpatial* spatial : m_lstShadowCasters) {
             if (visible.count(spatial))
+                continue;
+            if (!ShadowCasterMayReachView(region, spatial->GetSpatialData().sphere))
                 continue;
             IRenderable* renderable = spatial->dcast_Renderable();
             if (!renderable || renderable->renderable_HUD())
@@ -2648,6 +2655,99 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     if (g_pGameLevel && g_pGameLevel->pHUD) {
         g_pGameLevel->pHUD->Render_Last(0);  // context_id = 0 (not using legacy contexts)
     }
+}
+
+FrameGraphRenderer::ShadowCasterRegion FrameGraphRenderer::BuildShadowCasterRegion() const
+{
+    ShadowCasterRegion region;
+    region.sunView = passes::VSMSunView(passes::SunDirVisual());
+
+    const float extent = passes::VSMReceiverExtent();
+    const float reach = extent * 0.7072f;
+    const Fvector& cam = Device.vCameraPosition;
+    const Fvector& camDir = Device.vCameraDirection;
+
+    Fvector camL;
+    region.sunView.transform_tiny(camL, cam);
+    region.minXY.set(camL.x, camL.y);
+    region.maxXY.set(camL.x, camL.y);
+    region.minZ = camL.z;
+    region.maxZ = camL.z;
+
+    for (u32 i = 0; i < 4; ++i) {
+        const float nx = (i & 1u) ? 1.0f : -1.0f;
+        const float ny = (i & 2u) ? 1.0f : -1.0f;
+        Fvector4 clip;
+        clip.set(nx, ny, 1.0f, 1.0f);
+        Fvector4 world;
+        Device.mInvFullTransform.transform(world, clip);
+        if (_abs(world.w) < 1e-9f)
+            return region;
+        Fvector nearPt;
+        nearPt.set(world.x / world.w, world.y / world.w, world.z / world.w);
+        Fvector dir;
+        dir.sub(nearPt, cam);
+        const float along = dir.dotproduct(camDir);
+        if (along <= 1e-6f)
+            return region;
+        dir.mul(reach / along);
+        Fvector farPt;
+        farPt.add(cam, dir);
+        Fvector farL;
+        region.sunView.transform_tiny(farL, farPt);
+        region.minXY.x = std::min(region.minXY.x, farL.x);
+        region.minXY.y = std::min(region.minXY.y, farL.y);
+        region.maxXY.x = std::max(region.maxXY.x, farL.x);
+        region.maxXY.y = std::max(region.maxXY.y, farL.y);
+        region.minZ = std::min(region.minZ, farL.z);
+        region.maxZ = std::max(region.maxZ, farL.z);
+    }
+
+    const float half = 0.5f * extent;
+    region.minXY.x = std::max(region.minXY.x, camL.x - half);
+    region.minXY.y = std::max(region.minXY.y, camL.y - half);
+    region.maxXY.x = std::min(region.maxXY.x, camL.x + half);
+    region.maxXY.y = std::min(region.maxXY.y, camL.y + half);
+    region.minZ -= half;
+    region.valid = region.minXY.x <= region.maxXY.x && region.minXY.y <= region.maxXY.y;
+    if (!region.valid)
+        return region;
+
+    Fmatrix sunToWorld;
+    sunToWorld.invert(region.sunView);
+    Fvector worldMin;
+    Fvector worldMax;
+    worldMin.set(flt_max, flt_max, flt_max);
+    worldMax.set(-flt_max, -flt_max, -flt_max);
+    for (u32 i = 0; i < 8; ++i) {
+        Fvector cornerL;
+        cornerL.set((i & 1u) ? region.maxXY.x : region.minXY.x,
+                    (i & 2u) ? region.maxXY.y : region.minXY.y,
+                    (i & 4u) ? region.maxZ : region.minZ);
+        Fvector cornerW;
+        sunToWorld.transform_tiny(cornerW, cornerL);
+        worldMin.min(cornerW);
+        worldMax.max(cornerW);
+    }
+    region.worldCenter.add(worldMin, worldMax);
+    region.worldCenter.mul(0.5f);
+    region.worldHalf.sub(worldMax, worldMin);
+    region.worldHalf.mul(0.5f);
+    return region;
+}
+
+bool FrameGraphRenderer::ShadowCasterMayReachView(const ShadowCasterRegion& region, const Fsphere& bounds)
+{
+    if (!region.valid)
+        return true;
+    Fvector c;
+    region.sunView.transform_tiny(c, bounds.P);
+    const float r = bounds.R;
+    if (c.x + r < region.minXY.x || c.x - r > region.maxXY.x)
+        return false;
+    if (c.y + r < region.minXY.y || c.y - r > region.maxXY.y)
+        return false;
+    return c.z - r <= region.maxZ && c.z + r >= region.minZ;
 }
 
 void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& xform) {
