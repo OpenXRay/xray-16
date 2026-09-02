@@ -69,7 +69,6 @@ struct BindlessForwardConfig {
 
     bool enabled = false;
 
-    bool prepassActive = false;
     bool visBufferActive = false;
 
     nvrhi::IBuffer* megaVertexBuffer = nullptr;

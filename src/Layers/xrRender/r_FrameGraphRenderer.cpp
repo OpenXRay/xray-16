@@ -28,7 +28,6 @@
 
 #include "FrameGraphPasses/DebugDrawPassSetup.h"
 #include "FrameGraphPasses/HiZBuildPassSetup.h"
-#include "FrameGraphPasses/DepthPrepassSetup.h"
 #include "FrameGraphPasses/VisibilityPassSetup.h"
 #include "FrameGraphPasses/MaterialResolvePassSetup.h"
 #include "FrameGraphPasses/SunShadowPassSetup.h"
@@ -1182,32 +1181,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     }
 
-    bool prepassActive = false;
-    if (cullActive && bindlessConfig.enabled && bindlessConfig.UseMegaBuffers()) {
-        auto& prepassState = m_blackboard->get_or_add<passes::DepthPrepassState>();
-        passes::DepthPrepassSkinnedConfig prepassSkinned;
-        prepassSkinned.skinning = &m_blackboard->get_or_add<passes::SkinningPassState>();
-        prepassSkinned.geometry = m_geometryCollector.get();
-        prepassSkinned.gpuCulling = m_gpuCullingManager.get();
-        prepassSkinned.overlayMgr = m_overlayManager.get();
-        passes::setupDepthPrepass(
-            *m_framegraph,
-            m_device,
-            depthBuffer,
-            drawArgsBuffer,
-            bindlessConfig,
-            prepassSkinned,
-            m_materialCache.get(),
-            width,
-            height,
-            &prepassState
-        );
-        prepassActive = prepassState.initialized;
-        bindlessConfig.prepassActive = prepassActive;
-    }
-
     framegraph::VirtualResourceHandle visIdBuffer;
-    if (prepassActive && bindlessConfig.cluster.IsValid() && m_gpuCullingManager->GetClusterEntryCount() < passes::kVisIdEntryLimit) {
+    if (cullActive && bindlessConfig.enabled && bindlessConfig.UseMegaBuffers() && bindlessConfig.cluster.IsValid()
+        && m_gpuCullingManager->GetClusterEntryCount() < passes::kVisIdEntryLimit) {
         auto& visState = m_blackboard->get_or_add<passes::VisibilityPassState>();
         auto& resolveState = m_blackboard->get_or_add<passes::MaterialResolvePassState>();
         if (passes::EnsureVisibilityResources(m_device, visState) && passes::EnsureMaterialResolveResources(m_device, resolveState)) {
@@ -1239,6 +1215,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             }
         }
     }
+    const bool visActive = bindlessConfig.visBufferActive;
 
     passes::HiZPyramidOutput hizOutput;
     hizOutput.pyramid = framegraph::VirtualResourceHandle();
@@ -1246,7 +1223,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     hizOutput.width = width / 2;
     hizOutput.height = height / 2;
 
-    if (prepassActive) {
+    if (visActive) {
         hizOutput = passes::setupHiZBuildPass(
             *m_framegraph,
             m_device,
@@ -1452,7 +1429,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         vsmState.active = false;
         if (!ps_r_vsm)
             vsmState.maskReady = false;
-        if (ps_r_vsm && prepassActive && hizOutput.pyramid.is_valid()) {
+        if (ps_r_vsm && visActive && hizOutput.pyramid.is_valid()) {
             passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
             passes::VSMDrawConfig vsmCfg;
             vsmCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
