@@ -826,6 +826,13 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.lightsHiZVisible = (visCount > 0) ? visCount : stats.lightsClustered;
         }
 
+        {
+            const auto& dl = m_blackboard->get_or_add<passes::DeferredLightPassState>();
+            stats.lightTilesTotal = dl.maxTiles;
+            for (u32 i = 0; i < passes::kLightTileClasses; ++i)
+                stats.lightTiles[i] = dl.tileCounts[i];
+        }
+
         if (m_detailManager)
         {
             stats.detailSlots = m_detailManager->slot_count;
@@ -933,6 +940,7 @@ void FrameGraphRenderer::SetupFrame() {
     if (psDeviceFlags.test(rsStatistic)) {
         ZoneScopedN("Readback::LightStats");
         fg::ClusteredLightManager::Instance().ProcessStatsReadback();
+        passes::ProcessDeferredLightStats(m_blackboard->get_or_add<passes::DeferredLightPassState>(), m_device->GetNVRHIDevice());
     }
 
     m_lstRenderables.clear();

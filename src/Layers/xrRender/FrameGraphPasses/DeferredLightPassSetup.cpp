@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DeferredLightPassSetup.h"
 #include "ShaderConstants.h"
+#include "Layers/xrRender/xrRender_console.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
@@ -18,6 +19,35 @@ using namespace framegraph;
 
 namespace {
 
+struct alignas(16) TileParams {
+    u32 tilesX;
+    u32 tilesY;
+    u32 maxTiles;
+    u32 listBase;
+    u32 forceMixed;
+    u32 pad0;
+    u32 pad1;
+    u32 pad2;
+};
+static_assert(sizeof(TileParams) == 32, "TileParams must be 32 bytes");
+
+constexpr const char* kTileShaderNames[kLightTileClasses] = {
+    "deferred_light_tile_lit",
+    "deferred_light_tile_mixed",
+    "deferred_light_tile_lit_lights",
+    "deferred_light_tile_mixed_lights",
+};
+constexpr const char* kTileProfilerNames[kLightTileClasses] = {
+    "Deferred Light.Lit",
+    "Deferred Light.Mixed",
+    "Deferred Light.LitLights",
+    "Deferred Light.MixedLights",
+};
+constexpr u32 kTileClassSunMixed = 1;
+constexpr u32 kTileClassLights = 2;
+constexpr u32 kTileArgsStride = sizeof(u32) * 3;
+constexpr u32 kTileArgsBytes = kTileArgsStride * kLightTileClasses;
+
 struct DeferredLightPassData {
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
@@ -31,52 +61,142 @@ struct DeferredLightPassData {
     u32 height = 0;
 };
 
-void EnsureDeferredLightPipeline(fg::RenderDevice* device, DeferredLightPassState& state)
+bool LoadComputePass(fg::RenderDevice* device, const char* shaderName, const char* cacheName,
+    nvrhi::ShaderHandle& outShader, nvrhi::BindingLayoutHandle& outLayout, nvrhi::ComputePipelineHandle& outPipeline)
 {
-    if (state.initialized || state.failed)
-        return;
-
-    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
-    if (!nvDevice || !shaderLoader) {
-        state.failed = true;
-        return;
-    }
-
-    auto csResult = shaderLoader->LoadComputeShader("deferred_light", "main");
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    if (!shaderLoader || !nvDevice)
+        return false;
+    auto csResult = shaderLoader->LoadComputeShader(shaderName, "main");
     if (!csResult.handle || !csResult.reflection) {
-        Msg("! [DeferredLight] Failed to load deferred_light compute shader");
-        state.failed = true;
-        return;
+        Msg("! [DeferredLight] Failed to load %s", shaderName);
+        return false;
     }
-    state.shader = csResult.handle;
-
-    auto& cache = GetPassResourceCache();
-    state.layout = cache.GetOrCreateBindingLayoutFromReflection("DeferredLight", *csResult.reflection, nvDevice);
-    if (!state.layout) {
-        Msg("! [DeferredLight] Failed to create binding layout");
-        state.failed = true;
-        return;
+    outShader = csResult.handle;
+    outLayout = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(cacheName, *csResult.reflection, nvDevice);
+    if (!outLayout) {
+        Msg("! [DeferredLight] Failed to create binding layout for %s", shaderName);
+        return false;
     }
-
     nvrhi::ComputePipelineDesc pipeDesc;
-    pipeDesc.CS = state.shader;
-    pipeDesc.bindingLayouts = { state.layout };
+    pipeDesc.CS = outShader;
+    pipeDesc.bindingLayouts = { outLayout };
     auto* backend = device->GetBackend();
     if (backend && backend->GetBindlessLayout())
         pipeDesc.addBindingLayout(backend->GetBindlessLayout());
+    outPipeline = GetPassResourceCache().GetOrCreateComputePipeline(cacheName, pipeDesc, nvDevice);
+    if (!outPipeline) {
+        Msg("! [DeferredLight] Failed to create compute pipeline for %s", shaderName);
+        return false;
+    }
+    return true;
+}
 
-    state.pipeline = cache.GetOrCreateComputePipeline("DeferredLight", pipeDesc, nvDevice);
-    if (!state.pipeline) {
-        Msg("! [DeferredLight] Failed to create compute pipeline");
+void EnsurePipelines(fg::RenderDevice* device, DeferredLightPassState& state)
+{
+    if (state.initialized || state.failed)
+        return;
+    if (!LoadComputePass(device, "tile_classify", "DeferredLight_Classify", state.classifyShader, state.classifyLayout, state.classifyPipeline)) {
         state.failed = true;
         return;
     }
-
+    for (u32 cls = 0; cls < kLightTileClasses; ++cls) {
+        string64 cacheName;
+        xr_sprintf(cacheName, "DeferredLight_Tile%u", cls);
+        if (!LoadComputePass(device, kTileShaderNames[cls], cacheName, state.tileShaders[cls], state.tileLayouts[cls], state.tilePipelines[cls])) {
+            state.failed = true;
+            return;
+        }
+    }
     state.initialized = true;
-    Msg("* [DeferredLight] Pipeline initialized");
+    Msg("* [DeferredLight] Pipelines initialized");
 }
 
+bool EnsureTileBuffers(fg::RenderDevice* device, DeferredLightPassState& state, u32 width, u32 height)
+{
+    const u32 tilesX = (width + kLightTileSize - 1) / kLightTileSize;
+    const u32 tilesY = (height + kLightTileSize - 1) / kLightTileSize;
+    const u32 maxTiles = tilesX * tilesY;
+    if (state.tileListBuffer && state.tileArgsBuffer && state.maxTiles == maxTiles && state.tilesX == tilesX) {
+        state.tilesY = tilesY;
+        return true;
+    }
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    if (!nvDevice || maxTiles == 0)
+        return false;
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = u64(maxTiles) * kLightTileClasses * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.debugName = "DeferredLight_TileLists";
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        desc.canHaveUAVs = true;
+        state.tileListBuffer = nvDevice->createBuffer(desc);
+    }
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = kTileArgsBytes;
+        desc.debugName = "DeferredLight_TileArgs";
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        state.tileArgsBuffer = nvDevice->createBuffer(desc);
+    }
+    if (!state.tileListBuffer || !state.tileArgsBuffer) {
+        state.tileListBuffer = nullptr;
+        state.tileArgsBuffer = nullptr;
+        return false;
+    }
+    state.tilesX = tilesX;
+    state.tilesY = tilesY;
+    state.maxTiles = maxTiles;
+    return true;
+}
+
+void ScheduleTileStats(DeferredLightPassState& state, nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice)
+{
+    state.readbackFrame++;
+    if ((state.readbackFrame % 30) != 0)
+        return;
+    nvrhi::BufferHandle& slot = state.readback[state.readbackWrite];
+    if (!slot) {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = kTileArgsBytes;
+        desc.debugName = "DeferredLight_TileStatsReadback";
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+        slot = nvDevice->createBuffer(desc);
+        if (!slot)
+            return;
+    }
+    cmdList->copyBuffer(slot, 0, state.tileArgsBuffer, 0, kTileArgsBytes);
+    state.readbackWrite = (state.readbackWrite + 1) % DeferredLightPassState::kReadbackSlots;
+    if (state.readbackScheduled < DeferredLightPassState::kReadbackSlots)
+        ++state.readbackScheduled;
+}
+
+}
+
+void ProcessDeferredLightStats(DeferredLightPassState& state, nvrhi::IDevice* device)
+{
+    if (state.readbackScheduled < DeferredLightPassState::kReadbackSlots || !device)
+        return;
+    nvrhi::IBuffer* oldest = state.readback[state.readbackWrite];
+    if (!oldest)
+        return;
+    void* mapped = device->mapBuffer(oldest, nvrhi::CpuAccessMode::Read);
+    if (!mapped)
+        return;
+    const u32* words = static_cast<const u32*>(mapped);
+    for (u32 cls = 0; cls < kLightTileClasses; ++cls)
+        state.tileCounts[cls] = words[cls * 3];
+    device->unmapBuffer(oldest);
 }
 
 DefaultOutputLayout setupDeferredLightPass(
@@ -92,8 +212,8 @@ DefaultOutputLayout setupDeferredLightPass(
     if (!state || !inputs.albedo.is_valid() || !inputs.depth.is_valid() || !inputs.normal.is_valid() || !inputs.baseColor.is_valid())
         return inputs;
 
-    EnsureDeferredLightPipeline(device, *state);
-    if (!state->initialized)
+    EnsurePipelines(device, *state);
+    if (!state->initialized || !EnsureTileBuffers(device, *state, width, height))
         return inputs;
 
     auto& passData = fg.addCallbackPass<DeferredLightPassData>(
@@ -123,48 +243,101 @@ DefaultOutputLayout setupDeferredLightPass(
             if (!depthRT || !normalRT || !baseColorRT || !colorRT || !cmdList)
                 return;
 
+            auto& state = *data.state;
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
             auto& cache = GetPassResourceCache();
-            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
-
-            auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("deferred_light", ".cs");
-            if (!refl)
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* classifyRefl = shaderLoader->GetCachedReflection("tile_classify", ".cs");
+            if (!classifyRefl)
                 return;
 
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             nvrhi::ITexture* sunMaps[kSunMapSlots];
             ResolveSunShadowMaps(fg, data.sunShadowMaps, nvDevice, sunMaps);
+            nvrhi::IBindingSet* bindlessTable = nullptr;
+            if (auto* backend = data.device->GetBackend())
+                bindlessTable = backend->GetBindlessDescriptorTable();
+
+            const u32 argsInit[kLightTileClasses * 3] = { 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1 };
+            cmdList->writeBuffer(state.tileArgsBuffer, argsInit, sizeof(argsInit));
+
+            auto tileCB = cache.GetOrCreateVolatileCB("DeferredLight", "TileParams", sizeof(TileParams), data.device, 256);
+            TileParams tp = {};
+            tp.tilesX = state.tilesX;
+            tp.tilesY = state.tilesY;
+            tp.maxTiles = state.maxTiles;
+            tp.listBase = 0;
+            tp.forceMixed = ps_r_sun_shadow_debug != 0 ? 1u : 0u;
+            cmdList->writeBuffer(tileCB, &tp, sizeof(tp));
 
             auto& clm = ClusteredLightManager::Instance();
-            BindingSetBuilder bsb(*refl, nvDevice, "DeferredLight");
-            bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-            bsb.Texture("g_GBufferDepth", depthRT);
-            bsb.Texture("g_GBufferNormal", normalRT);
-            bsb.Texture("g_GBufferBaseColor", baseColorRT);
-            bsb.TextureUAV("g_SceneColor", colorRT);
-            bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
-            bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
-            bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
-            BindSunShadowMaps(bsb, sunMaps);
-
-            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->layout, nvDevice);
-            if (!bindingSet)
-                return;
-
-            if (data.gpuProfiler)
-                data.gpuProfiler->BeginPass(cmdList, "Lighting.Deferred");
-
-            nvrhi::ComputeState cs;
-            cs.pipeline = data.state->pipeline;
-            cs.bindings = { bindingSet };
-            if (auto* backend = data.device->GetBackend()) {
-                if (auto* bindlessTable = backend->GetBindlessDescriptorTable())
+            {
+                BindingSetBuilder bsb(*classifyRefl, nvDevice, "DeferredLight.Classify");
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                bsb.ConstantBuffer("TileParams", tileCB);
+                bsb.Texture("g_GBufferDepth", depthRT);
+                bsb.Texture("g_GBufferNormal", normalRT);
+                bsb.Texture("g_SunShadowMask", sunMaps[kSunTargetCount]);
+                bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
+                bsb.BufferUAV("g_TileLists", state.tileListBuffer);
+                bsb.BufferUAV("g_TileArgs", state.tileArgsBuffer);
+                auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.classifyLayout, nvDevice);
+                if (!bindingSet)
+                    return;
+                if (data.gpuProfiler)
+                    data.gpuProfiler->BeginPass(cmdList, "Deferred Light.Classify");
+                nvrhi::ComputeState cs;
+                cs.pipeline = state.classifyPipeline;
+                cs.bindings = { bindingSet };
+                if (bindlessTable)
                     cs.addBindingSet(bindlessTable);
+                cmdList->setComputeState(cs);
+                cmdList->dispatch(state.tilesX, state.tilesY, 1);
+                if (data.gpuProfiler)
+                    data.gpuProfiler->EndPass(cmdList, "Deferred Light.Classify");
             }
-            cmdList->setComputeState(cs);
-            cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
 
-            if (data.gpuProfiler)
-                data.gpuProfiler->EndPass(cmdList, "Lighting.Deferred");
+            for (u32 cls = 0; cls < kLightTileClasses; ++cls) {
+                auto* refl = shaderLoader->GetCachedReflection(kTileShaderNames[cls], ".cs");
+                if (!refl)
+                    continue;
+                tp.listBase = cls * state.maxTiles;
+                cmdList->writeBuffer(tileCB, &tp, sizeof(tp));
+
+                BindingSetBuilder bsb(*refl, nvDevice, kTileProfilerNames[cls]);
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                bsb.ConstantBuffer("TileParams", tileCB);
+                bsb.Texture("g_GBufferDepth", depthRT);
+                bsb.Texture("g_GBufferNormal", normalRT);
+                bsb.Texture("g_GBufferBaseColor", baseColorRT);
+                bsb.TextureUAV("g_SceneColor", colorRT);
+                bsb.BufferSRV("g_TileList", state.tileListBuffer);
+                if (cls & kTileClassLights) {
+                    bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
+                    bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
+                    bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+                }
+                if (cls & kTileClassSunMixed)
+                    BindSunShadowMaps(bsb, sunMaps);
+                auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.tileLayouts[cls], nvDevice);
+                if (!bindingSet)
+                    continue;
+
+                if (data.gpuProfiler)
+                    data.gpuProfiler->BeginPass(cmdList, kTileProfilerNames[cls]);
+                nvrhi::ComputeState cs;
+                cs.pipeline = state.tilePipelines[cls];
+                cs.bindings = { bindingSet };
+                if (bindlessTable)
+                    cs.addBindingSet(bindlessTable);
+                cs.indirectParams = state.tileArgsBuffer;
+                cmdList->setComputeState(cs);
+                cmdList->dispatchIndirect(cls * kTileArgsStride);
+                if (data.gpuProfiler)
+                    data.gpuProfiler->EndPass(cmdList, kTileProfilerNames[cls]);
+            }
+
+            ScheduleTileStats(state, cmdList, nvDevice);
         });
 
     DefaultOutputLayout outputs = inputs;

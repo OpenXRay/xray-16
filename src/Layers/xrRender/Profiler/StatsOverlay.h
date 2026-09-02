@@ -93,6 +93,8 @@ struct RenderStats
     u32 lightsPoint = 0;
     u32 lightsSpot = 0;
     u32 lightsOmni = 0;
+    u32 lightTiles[4] = {0, 0, 0, 0};
+    u32 lightTilesTotal = 0;
 
     u32 detailInstances = 0;
     u32 detailSlots = 0;         // Detail slots
@@ -136,6 +138,7 @@ struct RenderStats
         vsmBinDraws = vsmBinInstances = vsmBinMaxPages = vsmBinLodCulled = vsmBinDrops = 0;
         for (u32 i = 0; i < 6; ++i) vsmLevelPages[i] = 0;
         lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
+        lightTiles[0] = lightTiles[1] = lightTiles[2] = lightTiles[3] = lightTilesTotal = 0;
         detailInstances = detailSlots = 0;
         detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;
         detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;
