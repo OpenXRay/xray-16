@@ -12,6 +12,7 @@
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 
 namespace xray::render::fg::passes {
 
@@ -24,12 +25,22 @@ struct MaterialResolvePassData {
     VirtualResourceHandle color;
     VirtualResourceHandle normal;
     VirtualResourceHandle baseColor;
+    VirtualResourceHandle skinnedDrawArgs;
     fg::RenderDevice* device = nullptr;
     MaterialCache* materialCache = nullptr;
+    GPUCullingManager* gpuCulling = nullptr;
+    nvrhi::IBuffer* splatBuffer = nullptr;
     MaterialResolvePassState* state = nullptr;
     BindlessForwardConfig bindlessConfig;
     u32 width = 0;
     u32 height = 0;
+};
+
+struct alignas(16) MaterialResolveParams {
+    u32 skinnedEntryBase;
+    u32 pad0;
+    u32 pad1;
+    u32 pad2;
 };
 
 }
@@ -89,23 +100,30 @@ MaterialResolveOutput setupMaterialResolvePass(
     VirtualResourceHandle color,
     VirtualResourceHandle normal,
     VirtualResourceHandle baseColor,
+    VirtualResourceHandle skinnedDrawArgs,
     const BindlessForwardConfig& bindlessConfig,
     MaterialCache* materialCache,
+    GPUCullingManager* gpuCulling,
+    nvrhi::IBuffer* splatBuffer,
     u32 width,
     u32 height,
     MaterialResolvePassState* state)
 {
     auto& passData = fg.addCallbackPass<MaterialResolvePassData>(
         "Material Resolve",
-        [&, visId, color, normal, baseColor, bindlessConfig, materialCache, width, height, state](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
+        [&, visId, color, normal, baseColor, skinnedDrawArgs, bindlessConfig, materialCache, gpuCulling, splatBuffer, width, height, state](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.materialCache = materialCache;
+            data.gpuCulling = gpuCulling;
+            data.splatBuffer = splatBuffer;
             data.state = state;
             data.bindlessConfig = bindlessConfig;
             data.width = width;
             data.height = height;
             data.visId = passBuilder.read(visId, ResourceState::ShaderResource);
+            if (skinnedDrawArgs.is_valid())
+                data.skinnedDrawArgs = passBuilder.read(skinnedDrawArgs, ResourceState::IndirectArgument);
             data.color = passBuilder.readWrite(color, ResourceState::UnorderedAccess);
             data.normal = passBuilder.readWrite(normal, ResourceState::UnorderedAccess);
             data.baseColor = passBuilder.readWrite(baseColor, ResourceState::UnorderedAccess);
@@ -149,8 +167,19 @@ MaterialResolveOutput setupMaterialResolvePass(
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             nvrhi::IBuffer* terrainInstances = config.cluster.terrainInstanceBuffer ? config.cluster.terrainInstanceBuffer : config.cluster.instanceBuffer;
 
+            GPUCullingManager* gpuCulling = data.skinnedDrawArgs.is_valid() ? data.gpuCulling : nullptr;
+            const bool skinned = gpuCulling && gpuCulling->GetSkinnedEntryCount() > 0
+                && gpuCulling->GetSkinnedEntryBuffer() && gpuCulling->GetSkinnedPreVertexBuffer()
+                && gpuCulling->GetSkinnedPools().GetCombinedIndexBuffer() && gpuCulling->GetSkinnedRecordsBuffer()
+                && gpuCulling->GetGlobalBoneBuffer();
+            auto paramsCB = cache.GetOrCreateVolatileCB("MaterialResolve", "MaterialResolveParams", sizeof(MaterialResolveParams), data.device, 16);
+            MaterialResolveParams params = {};
+            params.skinnedEntryBase = skinned ? gpuCulling->GetClusterEntryCount() : 0xFFFFFFFFu;
+            cmdList->writeBuffer(paramsCB, &params, sizeof(params));
+
             BindingSetBuilder bsb(*refl, nvDevice, "MaterialResolve");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+            bsb.ConstantBuffer("MaterialResolveParams", paramsCB);
             bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
             bsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
             bsb.BufferSRV("g_InstanceData", config.cluster.instanceBuffer);
@@ -158,6 +187,12 @@ MaterialResolveOutput setupMaterialResolvePass(
             bsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
             bsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
             bsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
+            bsb.BufferSRV("g_SkinnedEntries", skinned ? gpuCulling->GetSkinnedEntryBuffer() : config.cluster.entryBuffer);
+            bsb.BufferSRV("g_SkinnedVB", skinned ? gpuCulling->GetSkinnedPreVertexBuffer() : config.megaVertexBuffer);
+            bsb.BufferSRV("g_SkinnedIB", skinned ? gpuCulling->GetSkinnedPools().GetCombinedIndexBuffer() : config.megaIndexBuffer);
+            bsb.BufferSRV("g_SkinnedRecords", skinned ? gpuCulling->GetSkinnedRecordsBuffer() : config.cluster.entryBuffer);
+            bsb.BufferSRV("g_BoneMatrices", skinned ? gpuCulling->GetGlobalBoneBuffer() : config.megaVertexBuffer);
+            bsb.BufferSRV("g_PaintSplats", skinned && data.splatBuffer ? data.splatBuffer : config.megaVertexBuffer);
             bsb.Texture("g_VisID", visRT);
             bsb.TextureUAV("g_OutNormal", normalRT);
             bsb.TextureUAV("g_OutBaseColor", baseColorRT);

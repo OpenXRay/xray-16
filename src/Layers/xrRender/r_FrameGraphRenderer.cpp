@@ -1265,8 +1265,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 depthBuffer,
                 m_framegraph->CreateTexture("rt_VisID", visDesc),
                 drawArgsBuffer,
+                skinnedDrawArgsBuffer,
                 bindlessConfig,
                 m_materialCache.get(),
+                m_gpuCullingManager.get(),
                 &visState
             );
             depthBuffer = visOut.depth;
@@ -1385,8 +1387,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             sunOutput,
             normalBuffer,
             baseColorBuffer,
+            skinnedDrawArgsBuffer,
             bindlessConfig,
             m_materialCache.get(),
+            m_gpuCullingManager.get(),
+            m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr,
             width,
             height,
             &m_blackboard->get_or_add<passes::MaterialResolvePassState>()

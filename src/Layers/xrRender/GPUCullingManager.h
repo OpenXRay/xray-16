@@ -90,6 +90,7 @@ enum GPUClusterEntryFlags : u32 {
     GPU_CLUSTER_ENTRY_PLAIN   = 0x2,
     GPU_CLUSTER_ENTRY_SHADOW_ONLY = 0x8,
     GPU_CLUSTER_ENTRY_TERRAIN = 0x4,
+    GPU_CLUSTER_ENTRY_SKINNED = 0x10,
 };
 
 // ═══════════════════════════════════════════════════════
@@ -456,6 +457,9 @@ public:
     static constexpr u32 SKINNED_CHUNK_VERTICES = 256;
 
     nvrhi::IBuffer* GetSkinnedPreVertexBuffer() const { return m_skinnedPreVB[m_skinnedPreVBIndex].Get(); }
+    nvrhi::IBuffer* GetSkinnedEntryBuffer() const { return m_skinnedEntryBuffer.Get(); }
+    u32 GetSkinnedEntryCount() const { return m_skinnedEntryCount; }
+    static constexpr u32 SKINNED_ENTRY_INDICES = 384;
     const SkinnedBucket& GetSkinnedBucket(u32 formatID) const { return m_skinnedBuckets[formatID]; }
 
     // ───────────────────────────────────────────────────────
@@ -720,6 +724,10 @@ private:
     xr_vector<SkinnedDrawRecord> m_skinnedRecordsData;
     xr_vector<u32> m_skinnedMaterialIDData;
     xr_vector<SkinnedChunk> m_skinnedChunkData;
+    xr_vector<GPUClusterEntry> m_skinnedEntryData;
+    nvrhi::BufferHandle m_skinnedEntryBuffer;
+    u32 m_skinnedEntryCapacity = 0;
+    u32 m_skinnedEntryCount = 0;
     u32 m_skinnedChunkBase[SkinnedGeometryPools::FORMAT_COUNT] = {};
     u32 m_skinnedChunkCount[SkinnedGeometryPools::FORMAT_COUNT] = {};
     nvrhi::BufferHandle m_skinnedChunkBuffer;

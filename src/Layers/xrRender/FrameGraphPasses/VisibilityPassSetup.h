@@ -9,6 +9,7 @@ namespace xray::render {
     class MaterialCache;
     namespace fg {
         class RenderDevice;
+        class GPUCullingManager;
     }
 }
 
@@ -28,6 +29,9 @@ struct VisibilityPassState {
     nvrhi::BindingLayoutHandle terrainLayout;
     nvrhi::GraphicsPipelineHandle pipeline;
     nvrhi::GraphicsPipelineHandle terrainPipeline;
+    nvrhi::ShaderHandle skinnedVS;
+    nvrhi::BindingLayoutHandle skinnedLayout;
+    nvrhi::GraphicsPipelineHandle skinnedPipeline;
     nvrhi::ShaderHandle debugShader;
     nvrhi::BindingLayoutHandle debugLayout;
     nvrhi::ComputePipelineHandle debugPipeline;
@@ -49,8 +53,10 @@ VisibilityPassOutput setupVisibilityPass(
     framegraph::VirtualResourceHandle depthTarget,
     framegraph::VirtualResourceHandle visIdTarget,
     framegraph::VirtualResourceHandle drawArgsBuffer,
+    framegraph::VirtualResourceHandle skinnedDrawArgs,
     const BindlessForwardConfig& bindlessConfig,
     MaterialCache* materialCache,
+    GPUCullingManager* gpuCulling,
     VisibilityPassState* state);
 
 framegraph::VirtualResourceHandle setupVisDebugViewPass(

@@ -138,21 +138,12 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
         hudVariant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
     };
 
-    auto mdiPsResult = shaderLoader->LoadPixelShader("bindless_skinned_mdi", "main");
     auto mdiVsResult = shaderLoader->LoadVertexShader("bindless_skinned_pre", "main");
-    if (mdiPsResult.handle && mdiVsResult.handle) {
-        state.mdiPS = mdiPsResult.handle;
-        state.mdiLayout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass_MDI",
-            *mdiVsResult.reflection, *mdiPsResult.reflection, nvDevice);
-        if (state.mdiLayout) {
-            u32 attrCount = 0;
-            auto* attrs = GetUnifiedVertexAttributes(attrCount);
-            state.mdi.vs = mdiVsResult.handle;
-            state.mdi.inputLayout = nvDevice->createInputLayout(attrs, attrCount, state.mdi.vs);
-            auto pipeDesc = buildPipelineDesc(state.mdi.vs, state.mdi.inputLayout, state.mdiPS);
-            pipeDesc.bindingLayouts[0] = state.mdiLayout;
-            state.mdi.pipeline = cache.GetOrCreatePipeline("SkinningPass_mdi", pipeDesc, fbInfo, nvDevice);
-        }
+    if (mdiVsResult.handle) {
+        u32 attrCount = 0;
+        auto* attrs = GetUnifiedVertexAttributes(attrCount);
+        state.mdi.vs = mdiVsResult.handle;
+        state.mdi.inputLayout = nvDevice->createInputLayout(attrs, attrCount, state.mdi.vs);
     }
 
     {
@@ -672,61 +663,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                     globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer,
                     worldViewport, scissor, false);
 
-                const bool mdiActive = data.skinnedDrawArgs.is_valid()
-                    && gpuCullMgr->IsSkinnedEnabled()
-                    && gpuCullMgr->GetSkinnedObjectCount() == worldSkinnedCount;
-
-                if (mdiActive) {
-                    auto* shaderLoader = GEnv.Render->GetShaderLoader();
-                    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_pre", ".vs");
-                    auto* mdiPsRefl = shaderLoader->GetCachedReflection("bindless_skinned_mdi", ".ps");
-                    nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("SkinningPass", nvDevice);
-                    nvrhi::IBuffer* preVB = gpuCullMgr->GetSkinnedPreVertexBuffer();
-                    auto& pools = gpuCullMgr->GetSkinnedPools();
-                    auto& matBuffer = MaterialBuffer::Instance();
-
-                    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
-                        const auto& bucket = gpuCullMgr->GetSkinnedBucket(f);
-                        if (bucket.count == 0)
-                            continue;
-
-                        const SkinningPipelineVariant* variant = &data.passState->mdi;
-                        nvrhi::IBuffer* poolIB = pools.GetIndexBuffer(f);
-                        if (!variant->pipeline || !preVB || !poolIB
-                            || !mdiVsRefl || !mdiPsRefl || !drawIndexBuffer || !data.passState->mdiLayout) {
-                            Msg("! [SkinningPass] MDI bucket %u unavailable, %u batches dropped", f, bucket.count);
-                            continue;
-                        }
-
-                        framegraph::BindingSetBuilder bsb(*mdiVsRefl, *mdiPsRefl, nvDevice, "Skinning.MDI");
-                        bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-                        bsb.BufferSRV("g_BoneMatrices", globalBoneBuffer);
-                        bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-                        bsb.BufferSRV("g_PaintSplats", splatBuffer);
-                        bsb.BufferSRV("g_SkinnedRecords", gpuCullMgr->GetSkinnedRecordsBuffer());
-                        bsb.BufferSRV("g_SkinnedMaterialIDs", gpuCullMgr->GetSkinnedMaterialIDBuffer());
-
-                        auto& cache = framegraph::GetPassResourceCache();
-                        nvrhi::BindingSetHandle mdiBindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->mdiLayout, nvDevice);
-                        if (!mdiBindingSet)
-                            continue;
-
-                        nvrhi::GraphicsState gfxState;
-                        gfxState.pipeline = variant->pipeline;
-                        gfxState.framebuffer = framebuffer;
-                        gfxState.bindings = { mdiBindingSet };
-                        if (bindlessTable)
-                            gfxState.addBindingSet(bindlessTable);
-                        gfxState.vertexBuffers = { {preVB, 0, 0}, {drawIndexBuffer, 1, 0} };
-                        gfxState.indexBuffer = { poolIB, nvrhi::Format::R16_UINT, 0 };
-                        gfxState.viewport.addViewport(worldViewport);
-                        gfxState.viewport.addScissorRect(scissor);
-                        gfxState.indirectParams = gpuCullMgr->GetSkinnedArgsBuffer();
-
-                        cmdList->setGraphicsState(gfxState);
-                        cmdList->drawIndexedIndirect(bucket.base * u32(sizeof(IndirectDrawArgs)), bucket.count);
-                    }
-                }
+                const bool mdiActive = data.skinnedDrawArgs.is_valid() && gpuCullMgr->IsSkinnedEnabled();
 
                 for (const auto& batch : data.geometry->GetBatches()) {
                     if (!batch.isSkinned || batch.isShadowOnly)

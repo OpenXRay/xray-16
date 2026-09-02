@@ -9,6 +9,7 @@ namespace xray::render {
     class MaterialCache;
     namespace fg {
         class RenderDevice;
+        class GPUCullingManager;
     }
 }
 
@@ -41,8 +42,11 @@ MaterialResolveOutput setupMaterialResolvePass(
     framegraph::VirtualResourceHandle color,
     framegraph::VirtualResourceHandle normal,
     framegraph::VirtualResourceHandle baseColor,
+    framegraph::VirtualResourceHandle skinnedDrawArgs,
     const BindlessForwardConfig& bindlessConfig,
     MaterialCache* materialCache,
+    GPUCullingManager* gpuCulling,
+    nvrhi::IBuffer* splatBuffer,
     u32 width,
     u32 height,
     MaterialResolvePassState* state);
