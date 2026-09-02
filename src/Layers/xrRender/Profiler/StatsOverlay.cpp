@@ -691,6 +691,13 @@ void StatsOverlay::RenderGeometrySection()
                 ImGui::Text("Lights: %u clustered", s.lightsClustered);
             ImGui::TextDisabled("  %u point, %u spot, %u omni", s.lightsPoint, s.lightsSpot, s.lightsOmni);
         }
+        if (s.lightTilesTotal > 0)
+        {
+            const u32 classified = s.lightTiles[0] + s.lightTiles[1] + s.lightTiles[2] + s.lightTiles[3];
+            const u32 sky = s.lightTilesTotal > classified ? s.lightTilesTotal - classified : 0;
+            ImGui::Text("Light tiles: %u lit / %u total (%u sky)", classified, s.lightTilesTotal, sky);
+            ImGui::TextDisabled("  sun-lit %u, sun-mixed %u, lit+lights %u, mixed+lights %u", s.lightTiles[0], s.lightTiles[1], s.lightTiles[2], s.lightTiles[3]);
+        }
     }
     else
     {
