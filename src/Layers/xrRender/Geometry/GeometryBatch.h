@@ -54,6 +54,8 @@ struct GeometryBatch {
 
     bool isSkinned = false;
 
+    bool isShadowOnly = false;
+
     u16 skinningRenderMode = 0;
 
     u32 skinnedPoolFormat = UINT32_MAX;

@@ -499,6 +499,8 @@ private:
     xr_unique_ptr<xray::profiler::StatsOverlay> m_statsOverlay;
 
     xr_vector<ISpatial*> m_lstRenderables;
+    xr_vector<ISpatial*> m_lstShadowCasters;
+    bool m_collectShadowOnly = false;
 
     void SetupFrame();
 
