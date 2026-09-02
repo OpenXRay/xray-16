@@ -14,6 +14,7 @@ cbuffer VsmResolveParams : register(b5)
     float4 g_Params2;
     float4 g_Params3;
     float4 g_Params4;
+    float4 g_HudScale;
 };
 
 Texture2D<float> g_Depth : register(t0);
@@ -45,8 +46,7 @@ bool reconWorldAt(int2 p, out float3 wp)
         return false;
     float2 uv = (float2(p) + 0.5) * g_Screen.zw;
     float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - 2.0 * uv.y, zndc, 1.0);
-    float4 world = mul(g_InvViewProj, clip);
-    wp = world.xyz / world.w;
+    wp = vsmReconstructPos(g_InvViewProj, clip, g_HudScale);
     return true;
 }
 
@@ -354,8 +354,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     float2 uv = (float2(px) + 0.5) * g_Screen.zw;
     float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - 2.0 * uv.y, zndc, 1.0);
-    float4 world = mul(g_InvViewProj, clip);
-    float3 wp = world.xyz / world.w;
+    float3 wp = vsmReconstructPos(g_InvViewProj, clip, g_HudScale);
 
     float tanT = 0.0;
     float3 nrm = float3(0.0, 0.0, 0.0);
