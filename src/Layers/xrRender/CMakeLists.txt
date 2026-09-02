@@ -33,7 +33,6 @@ target_sources(xrRender PRIVATE
     FrameGraph/BindingSetBuilder.cpp
     FrameGraph/FGResourcePool.cpp
     FrameGraph/PassResourceCache.cpp
-    FrameGraph/ShaderPhaseCache.cpp
     FrameGraph/ShaderReflection.cpp
 
     ShaderVariant/ShaderVariantRegistry.h

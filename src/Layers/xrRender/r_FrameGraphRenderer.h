@@ -14,9 +14,8 @@
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/SMAP_Allocator.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
-#include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
-#include "Layers/xrRender/FrameGraph/ShaderPhaseCache.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/ClusterDAG.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
@@ -107,12 +106,6 @@ namespace framegraph {
 
 class FrameGraphRenderer: public xray::render::fg::FGRenderBase {
 public:
-    enum
-    {
-        PHASE_NORMAL = 0,
-        PHASE_SMAP = 1,
-    };
-
     enum
     {
         MSAA_ATEST_NONE = 0x0,
@@ -395,8 +388,6 @@ public:
     fg::IndexBufferHandle old_QuadIB;
     void CreateQuadIB();
 
-    fg::ShaderElement* rimp_select_sh_static(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase);
-    fg::ShaderElement* rimp_select_sh_dynamic(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     xr_vector<fg::ShaderMacro> m_ShaderOptions;
 
     xr_vector<CompiledLevelShader> m_CompiledLevelShaders;
@@ -410,8 +401,6 @@ private:
     xr_unique_ptr<framegraph::Blackboard> m_blackboard;
 
     xr_unique_ptr<framegraph::FrameGraph> m_framegraph;
-
-    xr_unique_ptr<framegraph::ShaderPhaseCache> m_shaderPhaseCache;
 
     framegraph::VirtualResourceHandle m_finalOutput;
 
@@ -534,22 +523,6 @@ private:
     bool ProcessParticleGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr, bool isHUD = false);
     void ProcessSingleParticleEffect(fg::PS::CParticleEffect* pEffect, const Fmatrix& worldTransform, IRenderable* renderable, bool isHUD);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
-
-    struct PassEntry {
-        framegraph::RenderPhase phase;
-        xr_unique_ptr<framegraph::IPass> pass;
-        xr_vector<GeometryBatch*> assignedBatches;
-    };
-
-    xr_vector<PassEntry> m_activePasses;
-
-    xr_set<framegraph::RenderPhase> ScanRequiredPhases() const;
-
-    void CreatePhasePass(framegraph::RenderPhase phase);
-
-    void RouteBatchesToPasses();
-
-    void CreateAllRequiredPasses();
 
     public:
 

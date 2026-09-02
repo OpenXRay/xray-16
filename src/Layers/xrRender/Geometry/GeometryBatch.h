@@ -15,8 +15,6 @@ namespace xray::render {
 
 using fg::dxRender_Visual;
 
-struct MaterialPSO;
-
 struct GeometryBatch {
     nvrhi::BufferHandle vertexBuffer;
     nvrhi::BufferHandle indexBuffer;
@@ -41,10 +39,6 @@ struct GeometryBatch {
 
     nvrhi::IGraphicsPipeline* pipeline = nullptr;
     nvrhi::IBindingSet* bindingSet = nullptr;
-
-    MaterialPSO* materialPSO = nullptr;
-
-    framegraph::RenderPhase renderPhase = framegraph::RenderPhase::Geometry;
 
     dxRender_Visual* visual = nullptr;
     IRenderable* renderable = nullptr;
