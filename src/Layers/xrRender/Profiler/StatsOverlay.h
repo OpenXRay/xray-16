@@ -33,10 +33,6 @@ struct RenderStats
     u32 totalBones = 0;
     u32 maxBonesPerMesh = 0;
 
-    u32 skinnedSubmitted = 0;
-    u32 skinnedVisible = 0;
-    u32 skinnedCulled = 0;
-
     u32 particleCullSubmitted = 0;
     u32 particleCullVisible = 0;
     u32 particleQuadsSubmitted = 0;
@@ -109,7 +105,6 @@ struct RenderStats
         objectsSubmitted = objectsCulled = objectsVisible = 0;
         megaBufferVertices = megaBufferIndices = 0;
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
-        skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
         clusterStaticEntries = clusterTrianglesDrawn = clusterTerrainTrianglesDrawn = 0;
