@@ -15,6 +15,8 @@
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/SkeletonX.h"
 #include "Layers/xrRender/Decals/OverlayManager.h"
+#include "Layers/xrRender/Bindless/UnifiedVertex.h"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
@@ -1238,6 +1240,13 @@ void GPUCullingManager::Shutdown()
     m_skinnedArgsBuffer = nullptr;
     m_skinnedRecordsBuffer = nullptr;
     m_skinnedMaterialIDBuffer = nullptr;
+    m_skinnedChunkBuffer = nullptr;
+    m_skinnedPreVB[0] = nullptr;
+    m_skinnedPreVB[1] = nullptr;
+    m_skinnedChunkCapacity = 0;
+    m_skinnedPreVBCapacity = 0;
+    m_preskinPipeline = nullptr;
+    m_preskinLayout = nullptr;
     m_maxSkinnedObjects = 0;
 
     m_staticSet.objectBuffer = nullptr;
@@ -2050,6 +2059,8 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         bucket.records.clear();
         bucket.materialIDs.clear();
         bucket.shadowOnly.clear();
+        bucket.srcVertexBases.clear();
+        bucket.vertexCounts.clear();
         bucket.base = 0;
         bucket.count = 0;
         bucket.casterCount = 0;
@@ -2110,6 +2121,8 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         bucket.records.push_back(rec);
         bucket.materialIDs.push_back(batch.bindlessMaterialID);
         bucket.shadowOnly.push_back(batch.isShadowOnly ? 1u : 0u);
+        bucket.srcVertexBases.push_back(u32(batch.skinnedPoolBaseVertex));
+        bucket.vertexCounts.push_back(batch.vertexCount);
     }
 
     FlushBoneBatch(cmdList);
@@ -2134,24 +2147,171 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     m_skinnedArgsData.clear();
     m_skinnedRecordsData.clear();
     m_skinnedMaterialIDData.clear();
+    m_skinnedChunkData.clear();
+    u32 vertexTotal = 0;
     for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
         SkinnedBucket& bucket = m_skinnedBuckets[f];
+        m_skinnedChunkBase[f] = static_cast<u32>(m_skinnedChunkData.size());
         for (u32 pass = 0; pass < 2; ++pass) {
             for (u32 i = 0; i < bucket.casterCount; ++i) {
                 if ((bucket.shadowOnly[i] != 0u) != (pass == 1))
                     continue;
+                const u32 slot = static_cast<u32>(m_skinnedArgsData.size());
+                const u32 vertexCount = bucket.vertexCounts[i];
                 IndirectDrawArgs args = bucket.args[i];
-                args.startInstanceLocation = static_cast<u32>(m_skinnedArgsData.size());
+                args.startInstanceLocation = slot;
+                args.baseVertexLocation = static_cast<s32>(vertexTotal);
                 m_skinnedArgsData.push_back(args);
                 m_skinnedRecordsData.push_back(bucket.records[i]);
                 m_skinnedMaterialIDData.push_back(bucket.materialIDs[i]);
+                for (u32 v0 = 0; v0 < vertexCount; v0 += SKINNED_CHUNK_VERTICES) {
+                    SkinnedChunk chunk;
+                    chunk.slot = slot;
+                    chunk.srcVertex = bucket.srcVertexBases[i] + v0;
+                    chunk.dstVertex = vertexTotal + v0;
+                    chunk.count = std::min(SKINNED_CHUNK_VERTICES, vertexCount - v0);
+                    m_skinnedChunkData.push_back(chunk);
+                }
+                vertexTotal += vertexCount;
             }
         }
+        m_skinnedChunkCount[f] = static_cast<u32>(m_skinnedChunkData.size()) - m_skinnedChunkBase[f];
     }
 
     cmdList->writeBuffer(m_skinnedArgsBuffer, m_skinnedArgsData.data(), u64(pooledTotal) * sizeof(IndirectDrawArgs));
     cmdList->writeBuffer(m_skinnedRecordsBuffer, m_skinnedRecordsData.data(), u64(pooledTotal) * sizeof(SkinnedDrawRecord));
     cmdList->writeBuffer(m_skinnedMaterialIDBuffer, m_skinnedMaterialIDData.data(), u64(pooledTotal) * sizeof(u32));
+
+    DispatchPreskin(cmdList, overlayMgr, vertexTotal);
+}
+
+bool GPUCullingManager::EnsurePreskinPipeline(nvrhi::IDevice* nvDevice)
+{
+    if (m_preskinPipeline)
+        return true;
+    if (m_preskinFailed)
+        return false;
+
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto csResult = shaderLoader->LoadComputeShader("skinned_preskin", "main");
+    if (!csResult.handle || !csResult.reflection) {
+        Msg("! [GPUCulling] skinned_preskin.cs failed to load");
+        m_preskinFailed = true;
+        return false;
+    }
+
+    auto& cache = framegraph::GetPassResourceCache();
+    m_preskinLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_SkinnedPreskin", *csResult.reflection, nvDevice);
+    if (!m_preskinLayout) {
+        m_preskinFailed = true;
+        return false;
+    }
+
+    nvrhi::ComputePipelineDesc pipeDesc;
+    pipeDesc.CS = csResult.handle;
+    pipeDesc.bindingLayouts = { m_preskinLayout };
+    m_preskinPipeline = cache.GetOrCreateComputePipeline("GPUCull_SkinnedPreskin", pipeDesc, nvDevice);
+    if (!m_preskinPipeline) {
+        m_preskinFailed = true;
+        return false;
+    }
+    return true;
+}
+
+void GPUCullingManager::DispatchPreskin(nvrhi::ICommandList* cmdList, decals::OverlayManager* overlayMgr, u32 vertexTotal)
+{
+    if (vertexTotal == 0 || m_skinnedChunkData.empty())
+        return;
+
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    if (!EnsurePreskinPipeline(nvDevice))
+        return;
+
+    if (m_skinnedPreVBCapacity < vertexTotal) {
+        u32 capacity = std::max(m_skinnedPreVBCapacity * 2u, 65536u);
+        while (capacity < vertexTotal)
+            capacity *= 2;
+        for (u32 i = 0; i < 2; ++i) {
+            nvrhi::BufferDesc desc;
+            desc.debugName = i == 0 ? "GPUCull_SkinnedPreVB0" : "GPUCull_SkinnedPreVB1";
+            desc.byteSize = u64(capacity) * sizeof(bindless::UnifiedVertex);
+            desc.isVertexBuffer = true;
+            desc.canHaveUAVs = true;
+            desc.canHaveRawViews = true;
+            desc.initialState = nvrhi::ResourceStates::VertexBuffer;
+            desc.keepInitialState = true;
+            m_skinnedPreVB[i] = nvDevice->createBuffer(desc);
+        }
+        m_skinnedPreVBCapacity = capacity;
+    }
+    const u32 chunkCount = static_cast<u32>(m_skinnedChunkData.size());
+    if (m_skinnedChunkCapacity < chunkCount) {
+        u32 capacity = std::max(m_skinnedChunkCapacity * 2u, 1024u);
+        while (capacity < chunkCount)
+            capacity *= 2;
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedChunks";
+        desc.byteSize = u64(capacity) * sizeof(SkinnedChunk);
+        desc.structStride = sizeof(SkinnedChunk);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        m_skinnedChunkBuffer = nvDevice->createBuffer(desc);
+        m_skinnedChunkCapacity = capacity;
+    }
+    if (!m_skinnedPreVB[0] || !m_skinnedPreVB[1] || !m_skinnedChunkBuffer)
+        return;
+
+    m_skinnedPreVBIndex ^= 1u;
+    nvrhi::IBuffer* dstVB = m_skinnedPreVB[m_skinnedPreVBIndex];
+    cmdList->writeBuffer(m_skinnedChunkBuffer, m_skinnedChunkData.data(), u64(chunkCount) * sizeof(SkinnedChunk));
+
+    auto& cache = framegraph::GetPassResourceCache();
+    auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("skinned_preskin", ".cs");
+    if (!refl)
+        return;
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(fg::passes::StaticGlobals), m_device);
+    auto paramsCB = cache.GetOrCreateVolatileCB("GPUCull", "PreskinParams", 16, m_device, 64);
+    nvrhi::IBuffer* splatBuffer = overlayMgr ? overlayMgr->GetSplatBuffer() : nullptr;
+
+    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
+        if (m_skinnedChunkCount[f] == 0)
+            continue;
+        nvrhi::IBuffer* srcVB = m_skinnedPools.GetVertexBuffer(f);
+        if (!srcVB)
+            continue;
+
+        struct alignas(16) PreskinParams {
+            u32 chunkBase;
+            u32 formatID;
+            u32 stride;
+            u32 pad;
+        } params;
+        params.chunkBase = m_skinnedChunkBase[f];
+        params.formatID = f;
+        params.stride = SkinnedFormatStride(f);
+        params.pad = 0;
+        cmdList->writeBuffer(paramsCB, &params, sizeof(params));
+
+        framegraph::BindingSetBuilder bsb(*refl, nvDevice, "GPUCull.SkinnedPreskin");
+        bsb.ConstantBuffer("static_globals", staticGlobalsCB)
+           .ConstantBuffer("PreskinParams", paramsCB)
+           .BufferSRV("g_SrcVB", srcVB)
+           .BufferSRV("g_Chunks", m_skinnedChunkBuffer)
+           .BufferSRV("g_SkinnedRecords", m_skinnedRecordsBuffer)
+           .BufferSRV("g_BoneMatrices", m_globalBoneBuffer)
+           .BufferSRV("g_PaintSplats", splatBuffer)
+           .BufferUAV("g_DstVB", dstVB);
+        auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), m_preskinLayout, nvDevice);
+        if (!bindingSet)
+            continue;
+
+        nvrhi::ComputeState cs;
+        cs.pipeline = m_preskinPipeline;
+        cs.bindings = { bindingSet };
+        cmdList->setComputeState(cs);
+        cmdList->dispatch(m_skinnedChunkCount[f], 1, 1);
+    }
+    cmdList->setBufferState(dstVB, nvrhi::ResourceStates::VertexBuffer);
 }
 
 // ═══════════════════════════════════════════════════════

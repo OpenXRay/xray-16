@@ -160,9 +160,9 @@ struct VSMState {
     nvrhi::BindingLayoutHandle allocLayout;
     nvrhi::ComputePipelineHandle skinBinPipeline;
     nvrhi::BindingLayoutHandle skinBinLayout;
-    nvrhi::GraphicsPipelineHandle skinPagePipelines[kVSMSkinnedFormats];
-    nvrhi::BindingLayoutHandle skinPageLayouts[kVSMSkinnedFormats];
-    nvrhi::ShaderHandle skinPageVS[kVSMSkinnedFormats];
+    nvrhi::GraphicsPipelineHandle skinPagePipeline;
+    nvrhi::BindingLayoutHandle skinPageLayout;
+    nvrhi::ShaderHandle skinPageVS;
     bool skinPipelinesReady = false;
     bool skinPipelinesFailed = false;
     nvrhi::GraphicsPipelineHandle clearPipeline;

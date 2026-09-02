@@ -2205,6 +2205,7 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         batch.baseVertex = meshVisual->vBase;
     }
     batch.vertexStride = meshVisual->vStride;
+    batch.vertexCount = meshVisual->vCount;
     batch.worldMatrix = worldTransform;
     batch.visual = visual;
     batch.renderable = renderable;

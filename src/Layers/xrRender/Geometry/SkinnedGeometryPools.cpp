@@ -107,6 +107,7 @@ void SkinnedGeometryPools::FlushUploads(nvrhi::IDevice* nvDevice, nvrhi::IComman
                 desc.debugName = "SkinnedPool_VB";
                 desc.byteSize = capacity;
                 desc.isVertexBuffer = true;
+                desc.canHaveRawViews = true;
                 desc.initialState = nvrhi::ResourceStates::VertexBuffer;
                 desc.keepInitialState = true;
                 pool.vertexBuffer = nvDevice->createBuffer(desc);

@@ -440,10 +440,22 @@ public:
         xr_vector<SkinnedDrawRecord> records;
         xr_vector<u32> materialIDs;
         xr_vector<u8> shadowOnly;
+        xr_vector<u32> srcVertexBases;
+        xr_vector<u32> vertexCounts;
         u32 base = 0;
         u32 count = 0;
         u32 casterCount = 0;
     };
+
+    struct SkinnedChunk {
+        u32 slot;
+        u32 srcVertex;
+        u32 dstVertex;
+        u32 count;
+    };
+    static constexpr u32 SKINNED_CHUNK_VERTICES = 256;
+
+    nvrhi::IBuffer* GetSkinnedPreVertexBuffer() const { return m_skinnedPreVB[m_skinnedPreVBIndex].Get(); }
     const SkinnedBucket& GetSkinnedBucket(u32 formatID) const { return m_skinnedBuckets[formatID]; }
 
     // ───────────────────────────────────────────────────────
@@ -707,6 +719,19 @@ private:
     xr_vector<IndirectDrawArgs> m_skinnedArgsData;
     xr_vector<SkinnedDrawRecord> m_skinnedRecordsData;
     xr_vector<u32> m_skinnedMaterialIDData;
+    xr_vector<SkinnedChunk> m_skinnedChunkData;
+    u32 m_skinnedChunkBase[SkinnedGeometryPools::FORMAT_COUNT] = {};
+    u32 m_skinnedChunkCount[SkinnedGeometryPools::FORMAT_COUNT] = {};
+    nvrhi::BufferHandle m_skinnedChunkBuffer;
+    u32 m_skinnedChunkCapacity = 0;
+    nvrhi::BufferHandle m_skinnedPreVB[2];
+    u32 m_skinnedPreVBCapacity = 0;
+    u32 m_skinnedPreVBIndex = 0;
+    nvrhi::ComputePipelineHandle m_preskinPipeline;
+    nvrhi::BindingLayoutHandle m_preskinLayout;
+    bool m_preskinFailed = false;
+    bool EnsurePreskinPipeline(nvrhi::IDevice* nvDevice);
+    void DispatchPreskin(nvrhi::ICommandList* cmdList, decals::OverlayManager* overlayMgr, u32 vertexTotal);
 
     SkinnedGeometryPools m_skinnedPools;
     SkinnedBucket m_skinnedBuckets[SkinnedGeometryPools::FORMAT_COUNT];

@@ -92,7 +92,7 @@ struct SunShadowState {
     bool depthPipelinesFailed = false;
 
     nvrhi::GraphicsPipelineHandle skinnedPipelines[kSunShadowSkinnedFormats];
-    nvrhi::GraphicsPipelineHandle skinnedMDIPipelines[kSunShadowSkinnedFormats];
+    nvrhi::GraphicsPipelineHandle skinnedMDIPipeline;
     nvrhi::BindingLayoutHandle skinnedLayout;
     nvrhi::BindingLayoutHandle skinnedMDILayout;
     nvrhi::ShaderHandle skinnedDepthPS;

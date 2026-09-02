@@ -139,34 +139,21 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
     };
 
     auto mdiPsResult = shaderLoader->LoadPixelShader("bindless_skinned_mdi", "main");
-    auto mdiVsForReflection = shaderLoader->LoadVertexShader("bindless_skinned_mdi", "main");
-    if (mdiPsResult.handle && mdiVsForReflection.handle) {
+    auto mdiVsResult = shaderLoader->LoadVertexShader("bindless_skinned_pre", "main");
+    if (mdiPsResult.handle && mdiVsResult.handle) {
         state.mdiPS = mdiPsResult.handle;
         state.mdiLayout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass_MDI",
-            *mdiVsForReflection.reflection, *mdiPsResult.reflection, nvDevice);
+            *mdiVsResult.reflection, *mdiPsResult.reflection, nvDevice);
+        if (state.mdiLayout) {
+            u32 attrCount = 0;
+            auto* attrs = GetUnifiedVertexAttributes(attrCount);
+            state.mdi.vs = mdiVsResult.handle;
+            state.mdi.inputLayout = nvDevice->createInputLayout(attrs, attrCount, state.mdi.vs);
+            auto pipeDesc = buildPipelineDesc(state.mdi.vs, state.mdi.inputLayout, state.mdiPS);
+            pipeDesc.bindingLayouts[0] = state.mdiLayout;
+            state.mdi.pipeline = cache.GetOrCreatePipeline("SkinningPass_mdi", pipeDesc, fbInfo, nvDevice);
+        }
     }
-
-    auto initMDIVariant = [&](SkinningPipelineVariant& variant, const char* shaderName, const char* cacheName,
-                              const nvrhi::VertexAttributeDesc* baseAttribs, u32 baseAttrCount) {
-        if (!state.mdiPS || !state.mdiLayout)
-            return;
-        auto vsResult = shaderLoader->LoadVertexShader(shaderName, "main");
-        if (!vsResult.handle)
-            return;
-
-        nvrhi::VertexAttributeDesc attribs[8];
-        for (u32 i = 0; i < baseAttrCount; ++i)
-            attribs[i] = baseAttribs[i];
-        attribs[baseAttrCount] = nvrhi::VertexAttributeDesc()
-            .setName("DRAWINDEX").setFormat(nvrhi::Format::R32_UINT)
-            .setBufferIndex(1).setOffset(0).setElementStride(4).setIsInstanced(true);
-
-        variant.vs = vsResult.handle;
-        variant.inputLayout = nvDevice->createInputLayout(attribs, baseAttrCount + 1, variant.vs);
-        auto pipeDesc = buildPipelineDesc(variant.vs, variant.inputLayout, state.mdiPS);
-        pipeDesc.bindingLayouts[0] = state.mdiLayout;
-        variant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
-    };
 
     {
         constexpr u32 stride = 24;
@@ -178,7 +165,6 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG16_SNORM).setOffset(20).setElementStride(stride),
         };
         initVariant(state.nonHQ, "bindless_skinned", "SkinningPass_nonHQ", attribs, 5);
-        initMDIVariant(state.mdiNonHQ, "bindless_skinned_mdi", "SkinningPass_mdi_nonHQ", attribs, 5);
     }
 
     {
@@ -191,7 +177,6 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
         };
         initVariant(state.hq1w, "bindless_skinned_hq", "SkinningPass_hq1w", attribs, 5);
-        initMDIVariant(state.mdiHQ1w, "bindless_skinned_hq_mdi", "SkinningPass_mdi_hq1w", attribs, 5);
     }
 
     {
@@ -205,7 +190,6 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("BLENDINDICES").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(36).setElementStride(stride),
         };
         initVariant(state.hq4w, "bindless_skinned_4w", "SkinningPass_hq4w", attribs, 6);
-        initMDIVariant(state.mdiHQ4w, "bindless_skinned_4w_mdi", "SkinningPass_mdi_hq4w", attribs, 6);
     }
 
     {
@@ -218,7 +202,6 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
         };
         initVariant(state.hq2w, "bindless_skinned_2w", "SkinningPass_hq2w", attribs, 5);
-        initMDIVariant(state.mdiHQ2w, "bindless_skinned_2w_mdi", "SkinningPass_mdi_hq2w", attribs, 5);
     }
 
     {
@@ -231,7 +214,6 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
             nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
         };
         initVariant(state.hq3w, "bindless_skinned_3w", "SkinningPass_hq3w", attribs, 5);
-        initMDIVariant(state.mdiHQ3w, "bindless_skinned_3w_mdi", "SkinningPass_mdi_hq3w", attribs, 5);
     }
 
     initHudVariant(state.hudNonHQ, state.nonHQ, "SkinningPass_hud_nonHQ");
@@ -324,18 +306,6 @@ static nvrhi::IInputLayout* GetSkinnedInputLayout(const SkinningPassState& state
     case VF_SKINNED_HQ2W: return state.hq2w.inputLayout.Get();
     case VF_SKINNED_HQ3W: return state.hq3w.inputLayout.Get();
     default: return state.nonHQ.inputLayout.Get();
-    }
-}
-
-static const SkinningPipelineVariant* SelectMDISkinnedVariant(const SkinningPassState& state, u32 fmt)
-{
-    switch (fmt) {
-    case VF_SKINNED_NONHQ: return &state.mdiNonHQ;
-    case VF_SKINNED_HQ1W: return &state.mdiHQ1w;
-    case VF_SKINNED_HQ2W: return &state.mdiHQ2w;
-    case VF_SKINNED_HQ3W: return &state.mdiHQ3w;
-    case VF_SKINNED_HQ4W: return &state.mdiHQ4w;
-    default: return nullptr;
     }
 }
 
@@ -708,9 +678,10 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
                 if (mdiActive) {
                     auto* shaderLoader = GEnv.Render->GetShaderLoader();
-                    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_mdi", ".vs");
+                    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_pre", ".vs");
                     auto* mdiPsRefl = shaderLoader->GetCachedReflection("bindless_skinned_mdi", ".ps");
                     nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("SkinningPass", nvDevice);
+                    nvrhi::IBuffer* preVB = gpuCullMgr->GetSkinnedPreVertexBuffer();
                     auto& pools = gpuCullMgr->GetSkinnedPools();
                     auto& matBuffer = MaterialBuffer::Instance();
 
@@ -719,10 +690,9 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         if (bucket.count == 0)
                             continue;
 
-                        const SkinningPipelineVariant* variant = SelectMDISkinnedVariant(*data.passState, f);
-                        nvrhi::IBuffer* poolVB = pools.GetVertexBuffer(f);
+                        const SkinningPipelineVariant* variant = &data.passState->mdi;
                         nvrhi::IBuffer* poolIB = pools.GetIndexBuffer(f);
-                        if (!variant || !variant->pipeline || !poolVB || !poolIB
+                        if (!variant->pipeline || !preVB || !poolIB
                             || !mdiVsRefl || !mdiPsRefl || !drawIndexBuffer || !data.passState->mdiLayout) {
                             Msg("! [SkinningPass] MDI bucket %u unavailable, %u batches dropped", f, bucket.count);
                             continue;
@@ -747,7 +717,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                         gfxState.bindings = { mdiBindingSet };
                         if (bindlessTable)
                             gfxState.addBindingSet(bindlessTable);
-                        gfxState.vertexBuffers = { {poolVB, 0, 0}, {drawIndexBuffer, 1, 0} };
+                        gfxState.vertexBuffers = { {preVB, 0, 0}, {drawIndexBuffer, 1, 0} };
                         gfxState.indexBuffer = { poolIB, nvrhi::Format::R16_UINT, 0 };
                         gfxState.viewport.addViewport(worldViewport);
                         gfxState.viewport.addScissorRect(scissor);
