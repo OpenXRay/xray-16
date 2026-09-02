@@ -27,7 +27,7 @@ float VSMMaskVisibility(float3 worldPos, float4 svPosition)
 
 float SunOccluded(Texture2D<float> smap, float2 uv, float ref)
 {
-    return smap.SampleCmp(smp_sunshadow, uv, ref);
+    return smap.SampleCmpLevelZero(smp_sunshadow, uv, ref);
 }
 
 float CascSample(Texture2D<float> smap, float4x4 vp, float3 worldPos, float2 invSize)

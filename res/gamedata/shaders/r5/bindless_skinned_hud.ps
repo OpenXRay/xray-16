@@ -1,5 +1,4 @@
 #define SM_6_0
-#define CLUSTERED_LIGHTING_FORWARD
 #include "common.h"
 #include "bindless_common.h"
 #include "skinned_common.h"
@@ -22,19 +21,17 @@ struct PS_OUTPUT
     float4 baseColor : SV_Target2;
 };
 
-float3 UndoHUDFOVAdjustment(float3 adjustedWorldPos)
+float3 UndoHUDFOVDirection(float3 adjustedDir)
 {
-    float3 viewPos = mul(m_V, float4(adjustedWorldPos, 1.0)).xyz;
-    viewPos.xy *= hud_fov;
-    float3x3 invRot = transpose(float3x3(m_V[0].xyz, m_V[1].xyz, m_V[2].xyz));
-    return mul(invRot, viewPos) + eye_position;
+    float3x3 rot = float3x3(m_V[0].xyz, m_V[1].xyz, m_V[2].xyz);
+    float3 viewDir = mul(rot, adjustedDir);
+    viewDir.xy *= hud_fov;
+    return normalize(mul(transpose(rot), viewDir));
 }
 
 PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
-
-    float3 correctedWorldPos = UndoHUDFOVAdjustment(input.worldPos);
 
     uint materialID = g_SkinnedMaterialID;
     MaterialData mat = g_Materials[materialID];
@@ -48,14 +45,14 @@ PS_OUTPUT main(PS_INPUT input)
 
     float3 albedo = diffuseSample.rgb;
 
-    float3 N = normalize(input.normal);
+    float3 N = UndoHUDFOVDirection(input.normal);
     float gloss = 0.0;
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
         BumpSample bump = SampleNormal(mat, input.texcoord);
         float3x3 TBN = float3x3(
-            normalize(input.tangent),
-            normalize(input.bitangent),
+            UndoHUDFOVDirection(input.tangent),
+            UndoHUDFOVDirection(input.bitangent),
             N
         );
         N = normalize(mul(bump.normal, TBN));
@@ -82,8 +79,8 @@ PS_OUTPUT main(PS_INPUT input)
 
     albedo = apply_splat_color(albedo, input.worldPos, input.texcoord);
 
-    f_forward fwd = output_forward_pbr(albedo, N, correctedWorldPos, metallic, roughness, ao, input.position, 1.0);
-    output.color = float4(fwd.color.rgb, diffuseSample.a);
+    f_forward fwd = output_gbuffer(albedo, N, metallic, roughness, ao);
+    output.color = fwd.color;
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
     output.normal.a = -max(fwd.normal.a, 0.004);
