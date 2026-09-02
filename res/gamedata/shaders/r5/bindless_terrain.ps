@@ -1,6 +1,7 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
+#include "material_eval.h"
 #include "cluster_fade.h"
 
 struct PS_INPUT
@@ -22,30 +23,6 @@ struct PS_OUTPUT
     float4 baseColor : SV_Target2;
 };
 
-float4 SampleTerrainTexture(uint index, float2 uv)
-{
-    if (index == INVALID_TEXTURE_INDEX)
-        return float4(0.5, 0.5, 0.5, 1.0);
-
-    Texture2D tex = GetBindlessTexture(index);
-    return tex.Sample(smp_linear, uv);
-}
-
-float3 SampleTerrainNormal(uint index, float2 uv)
-{
-    if (index == INVALID_TEXTURE_INDEX)
-        return float3(0.0, 0.0, 1.0);
-
-    Texture2D tex = GetBindlessTexture(index);
-    float4 Nu = tex.Sample(smp_linear, uv);
-
-    float3 normal;
-    normal.x = Nu.a * 2.0 - 1.0;
-    normal.y = Nu.b * 2.0 - 1.0;
-    normal.z = sqrt(saturate(1.0 - normal.x * normal.x - normal.y * normal.y));
-    return normal;
-}
-
 PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
@@ -55,74 +32,12 @@ PS_OUTPUT main(PS_INPUT input)
 
     TerrainMaterialData mat = g_TerrainMaterials[input.materialID];
 
-    float2 baseUV = input.texcoord;
-
-    float2 detailUV = input.texcoord * mat.detailScale;
-
-    float4 baseSample = SampleTerrainTexture(mat.baseAlbedoIndex, baseUV);
-
-    float4 mask = SampleTerrainTexture(mat.blendMaskIndex, baseUV);
-    float maskSum = dot(mask, float4(1, 1, 1, 1));
-    if (maskSum > 0.001)
-        mask = mask / maskSum;
-    else
-        mask = float4(0.25, 0.25, 0.25, 0.25);
-
-    float3 detailR = SampleTerrainTexture(mat.detailR_Index, detailUV).rgb;
-    float3 detailG = SampleTerrainTexture(mat.detailG_Index, detailUV).rgb;
-    float3 detailB = SampleTerrainTexture(mat.detailB_Index, detailUV).rgb;
-    float3 detailA = SampleTerrainTexture(mat.detailA_Index, detailUV).rgb;
-
-    float3 blendedDetail =
-        detailR * mask.r +
-        detailG * mask.g +
-        detailB * mask.b +
-        detailA * mask.a;
-
-    float3 albedo = baseSample.rgb * blendedDetail * 2.0;
-
-    float3 N = normalize(input.normal);
-
-    float3 normalR = SampleTerrainNormal(mat.normalR_Index, detailUV);
-    float3 normalG = SampleTerrainNormal(mat.normalG_Index, detailUV);
-    float3 normalB = SampleTerrainNormal(mat.normalB_Index, detailUV);
-    float3 normalA = SampleTerrainNormal(mat.normalA_Index, detailUV);
-
-    float3 blendedNormal =
-        normalR * mask.r +
-        normalG * mask.g +
-        normalB * mask.b +
-        normalA * mask.a;
-    blendedNormal = normalize(blendedNormal);
-
-    float3x3 TBN = float3x3(
-        normalize(input.tangent),
-        normalize(input.bitangent),
-        N
-    );
-    N = normalize(mul(blendedNormal, TBN));
-
-    float metallic = 0.0;
-    float roughness = 0.5;
-    float ao = 1.0;
-
-    if (mat.flags & MAT_FLAG_HAS_PBR_LAYER)
-    {
-        float3 pbrR = SampleTerrainTexture(mat.pbrR_Index, detailUV).rgb;
-        float3 pbrG = SampleTerrainTexture(mat.pbrG_Index, detailUV).rgb;
-        float3 pbrB = SampleTerrainTexture(mat.pbrB_Index, detailUV).rgb;
-        float3 pbrA = SampleTerrainTexture(mat.pbrA_Index, detailUV).rgb;
-
-        float3 blendedPBR =
-            pbrR * mask.r +
-            pbrG * mask.g +
-            pbrB * mask.b +
-            pbrA * mask.a;
-
-        metallic = blendedPBR.r;
-        roughness = blendedPBR.g;
-        ao = blendedPBR.b;
-    }
+    MaterialSurface surface = EvalTerrainMaterial(mat, input.texcoord, ddx(input.texcoord), ddy(input.texcoord), input.normal, input.tangent, input.bitangent);
+    float3 albedo = surface.albedo;
+    float3 N = surface.N;
+    float metallic = surface.metallic;
+    float roughness = surface.roughness;
+    float ao = surface.ao;
 
     f_forward fwd = output_gbuffer(albedo, N, metallic, roughness, ao);
     output.color = fwd.color;

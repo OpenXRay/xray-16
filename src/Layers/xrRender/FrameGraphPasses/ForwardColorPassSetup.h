@@ -70,6 +70,7 @@ struct BindlessForwardConfig {
     bool enabled = false;
 
     bool prepassActive = false;
+    bool visBufferActive = false;
 
     nvrhi::IBuffer* megaVertexBuffer = nullptr;
     nvrhi::IBuffer* megaIndexBuffer = nullptr;
@@ -113,11 +114,6 @@ struct ForwardColorPassState {
     nvrhi::ShaderHandle bindlessVS;
     nvrhi::ShaderHandle bindlessPS;
     bool bindlessInitialized = false;
-    nvrhi::GraphicsPipelineHandle clusterPipeline;
-    nvrhi::BindingLayoutHandle clusterLayout;
-    nvrhi::ShaderHandle clusterVS;
-    nvrhi::GraphicsPipelineHandle clusterTerrainPipeline;
-    nvrhi::BindingLayoutHandle clusterTerrainLayout;
     nvrhi::GraphicsPipelineHandle terrainPipeline;
     nvrhi::BindingLayoutHandle terrainLayout;
     nvrhi::ShaderHandle terrainPS;

@@ -29,6 +29,8 @@
 #include "FrameGraphPasses/DebugDrawPassSetup.h"
 #include "FrameGraphPasses/HiZBuildPassSetup.h"
 #include "FrameGraphPasses/DepthPrepassSetup.h"
+#include "FrameGraphPasses/VisibilityPassSetup.h"
+#include "FrameGraphPasses/MaterialResolvePassSetup.h"
 #include "FrameGraphPasses/SunShadowPassSetup.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "GPUCullingManager.h"
@@ -1016,6 +1018,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         desc.format = nvrhi::Format::RGBA16_FLOAT;
         desc.isShaderResource = true;
         desc.isRenderTarget = true;
+        desc.isUAV = true;
         desc.initialState = nvrhi::ResourceStates::RenderTarget;
         desc.keepInitialState = true;
         for (int i = 0; i < 2; i++) {
@@ -1042,6 +1045,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     baseColorDesc.height = height;
     baseColorDesc.format = nvrhi::Format::RGBA8_UNORM;
     baseColorDesc.isRenderTarget = true;
+    baseColorDesc.allowUAV = true;
     baseColorDesc.isTransient = true;
     framegraph::VirtualResourceHandle baseColorBuffer = m_framegraph->CreateTexture("rt_BaseColor", baseColorDesc);
 
@@ -1202,6 +1206,40 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         bindlessConfig.prepassActive = prepassActive;
     }
 
+    framegraph::VirtualResourceHandle visIdBuffer;
+    if (prepassActive && bindlessConfig.cluster.IsValid() && m_gpuCullingManager->GetClusterEntryCount() < passes::kVisIdEntryLimit) {
+        auto& visState = m_blackboard->get_or_add<passes::VisibilityPassState>();
+        auto& resolveState = m_blackboard->get_or_add<passes::MaterialResolvePassState>();
+        if (passes::EnsureVisibilityResources(m_device, visState) && passes::EnsureMaterialResolveResources(m_device, resolveState)) {
+            framegraph::ResourceDesc visDesc;
+            visDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+            visDesc.debugName = "rt_VisID";
+            visDesc.width = width;
+            visDesc.height = height;
+            visDesc.format = nvrhi::Format::R32_UINT;
+            visDesc.isRenderTarget = true;
+            visDesc.isTransient = true;
+            auto visOut = passes::setupVisibilityPass(
+                *m_framegraph,
+                m_device,
+                depthBuffer,
+                m_framegraph->CreateTexture("rt_VisID", visDesc),
+                drawArgsBuffer,
+                bindlessConfig,
+                m_materialCache.get(),
+                &visState
+            );
+            depthBuffer = visOut.depth;
+            visIdBuffer = visOut.visId;
+            bindlessConfig.visBufferActive = true;
+            if (ps_r_vis_debug) {
+                auto visDebug = passes::setupVisDebugViewPass(*m_framegraph, m_device, visIdBuffer, width, height, u32(ps_r_vis_debug), &visState);
+                if (visDebug.is_valid())
+                    m_framegraph->GetRTRegistry().RegisterRT("rt_VisDebug", visDebug);
+            }
+        }
+    }
+
     passes::HiZPyramidOutput hizOutput;
     hizOutput.pyramid = framegraph::VirtualResourceHandle();
     hizOutput.mipLevels = 0;
@@ -1300,6 +1338,25 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             Device.mFullTransform,
             hizOutput.pyramid.is_valid()
         );
+    }
+
+    if (bindlessConfig.visBufferActive) {
+        auto resolved = passes::setupMaterialResolvePass(
+            *m_framegraph,
+            m_device,
+            visIdBuffer,
+            sunOutput,
+            normalBuffer,
+            baseColorBuffer,
+            bindlessConfig,
+            m_materialCache.get(),
+            width,
+            height,
+            &m_blackboard->get_or_add<passes::MaterialResolvePassState>()
+        );
+        sunOutput = resolved.color;
+        normalBuffer = resolved.normal;
+        baseColorBuffer = resolved.baseColor;
     }
 
     auto forwardOutputs = passes::setupForwardColorPass(
