@@ -1,6 +1,4 @@
 #define SM_6_0
-#define CLUSTERED_LIGHTING_FORWARD
-#define SUN_SHADOW_RECEIVER
 #include "common.h"
 #include "bindless_common.h"
 #include "skinned_mdi_common.h"
@@ -75,14 +73,11 @@ PS_OUTPUT main(PS_INPUT input)
     SkinnedDrawRecord rec = skinned_mdi_record(input.drawIndex);
     albedo = mdi_apply_splat_color(rec, albedo, input.worldPos, input.texcoord);
 
-    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position);
-    output.color = float4(fwd.color.rgb, diffuseSample.a);
+    f_forward fwd = output_gbuffer(albedo, N, metallic, roughness, ao);
+    output.color = fwd.color;
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
     output.normal.a = -max(fwd.normal.a, 0.004);
-
-    if (dev_param_3.y > 0.5)
-        output.color.rgb = SunShadowDebugColor(output.color.rgb, input.worldPos);
 
     return output;
 }

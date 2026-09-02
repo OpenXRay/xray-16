@@ -80,7 +80,6 @@ struct SkinningPassData {
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle skinnedDrawArgs;
-    SunShadowMaps sunShadowMaps;
     fg::RenderDevice* device;
     const GeometryCollector* geometry;
     const xr_vector<GeometryBatch>* hudBatches;
@@ -106,8 +105,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     fg::GPUCullingManager* gpuCulling = nullptr,
     framegraph::VirtualResourceHandle skinnedDrawArgs = {},
     SkinningPassState* state = nullptr,
-    decals::OverlayManager* overlayMgr = nullptr,
-    SunShadowMaps sunShadowMaps = SunShadowMaps()
+    decals::OverlayManager* overlayMgr = nullptr
 );
 
 } // namespace xray::render::fg::passes

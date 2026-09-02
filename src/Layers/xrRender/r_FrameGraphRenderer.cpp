@@ -38,6 +38,7 @@
 #include "FrameGraphPasses/DetailCullPassSetup.h"    // Detail culling (async compute)
 #include "FrameGraphPasses/DetailPassSetup.h"        // Detail rendering pass
 #include "FrameGraphPasses/TransparentPassSetup.h"   // Transparent alpha-blended geometry (after detail)
+#include "FrameGraphPasses/DeferredLightPassSetup.h"
 // SM6 bindless: Textures registered directly with D3D12Backend via RegisterBindlessTexture()
 #include "Bindless/MaterialBuffer.h"                 // Bindless material buffer
 #include "Bindless/TerrainMaterialBuffer.h"          // Terrain material buffer
@@ -1365,6 +1366,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     colorDesc.height = height;
     colorDesc.format = nvrhi::Format::RGBA16_FLOAT;
     colorDesc.isRenderTarget = true;
+    colorDesc.allowUAV = true;
     colorDesc.debugName = "rt_SceneColor";
 
     auto skyColorHandle = m_framegraph->CreateTexture("rt_SceneColor", colorDesc);
@@ -1426,8 +1428,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height,
         drawArgsBuffer,
         bindlessConfig,
-        &m_blackboard->get_or_add<passes::ForwardColorPassState>(),
-        sunShadowMaps
+        &m_blackboard->get_or_add<passes::ForwardColorPassState>()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1462,8 +1463,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_gpuCullingManager.get(),
         skinnedDrawArgsBuffer,
         &m_blackboard->get_or_add<passes::SkinningPassState>(),
-        m_overlayManager.get(),
-        sunShadowMaps
+        m_overlayManager.get()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1515,8 +1515,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hudOutputs,
         width,
         height,
+        m_gpuProfiler.get()
+    );
+
+    auto litOutputs = passes::setupDeferredLightPass(
+        *m_framegraph,
+        m_device,
+        detailOutputs,
+        width,
+        height,
+        sunShadowMaps,
         m_gpuProfiler.get(),
-        sunShadowMaps
+        &m_blackboard->get_or_add<passes::DeferredLightPassState>()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1541,7 +1551,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     auto transparentOutputs = passes::setupTransparentPass(
         *m_framegraph,
         m_device,
-        detailOutputs,
+        litOutputs,
         transparentConfig,
         width, height,
         m_blackboard->get_or_add<passes::TransparentPassState>()

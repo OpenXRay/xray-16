@@ -111,17 +111,20 @@ PS_OUTPUT main(PS_INPUT input)
         ao = pbrSample.b;
     }
 
-    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position);
-    output.color = float4(fwd.color.rgb, diffuseSample.a);
+    bool forwardOnly = (mat.flags & MAT_FLAG_ALPHA_BLEND) != 0;
+    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position, -1.0, forwardOnly);
+    output.color = float4(fwd.color.rgb, forwardOnly ? diffuseSample.a : fwd.color.a);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
 
-    if (dev_param_3.y > 0.5)
+    if (dev_param_3.y > 0.5 && forwardOnly)
         output.color.rgb = SunShadowDebugColor(output.color.rgb, input.worldPos);
 
     if (dev_param_4.x > 0.5)
     {
         uint mode = uint(dev_param_4.x);
+        if (!forwardOnly)
+            output.normal = float4(0, 0, 0, 0);
         if (mode == 3u)
         {
             uint errClass = (fadeWord >> 16) & 3u;

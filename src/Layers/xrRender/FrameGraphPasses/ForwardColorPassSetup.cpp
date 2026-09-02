@@ -457,10 +457,6 @@ static void renderBindlessForward(
             terrainBsb.BufferSRV("g_CompactBatchIndices", config.terrainCompactBatchIndicesBuffer);
             terrainBsb.BufferSRV("g_CompactMaterialIDs", config.terrainCompactMaterialIDBuffer);
             terrainBsb.BufferSRV("g_DrawFades", config.staticSet.fadeBuffer);
-            terrainBsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
-            terrainBsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
-            terrainBsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
-            passes::BindSunShadowMaps(terrainBsb, sunShadowMaps);
 
             auto terrainBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(terrainBsb.Build(), ps.terrainLayout, nvDevice);
             R_ASSERT2(terrainBindingSet, "Terrain binding set creation failed");
@@ -511,8 +507,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     u32 height,
     framegraph::VirtualResourceHandle drawArgsInput,
     const BindlessForwardConfig& bindlessConfig,
-    ForwardColorPassState* state,
-    SunShadowMaps sunShadowMaps)
+    ForwardColorPassState* state)
 {
     using namespace framegraph;
 
@@ -532,7 +527,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA (Declares resource usage)
         // ═══════════════════════════════════════════════════════
-        [&, width, height, colorInput, normalInput, baseColorInput, drawArgsInput, bindlessConfig, state, sunShadowMaps](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
+        [&, width, height, colorInput, normalInput, baseColorInput, drawArgsInput, bindlessConfig, state](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -552,8 +547,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             if (drawArgsInput.is_valid()) {
                 data.drawArgsBuffer = passBuilder.read(drawArgsInput, ResourceState::IndirectArgument);
             }
-
-            passes::ReadSunShadowMaps(passBuilder, sunShadowMaps, data.sunShadowMaps);
 
             data.outputs.albedo = data.color;
             data.outputs.normal = data.normal;
@@ -598,7 +591,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             }
 
             nvrhi::ITexture* sunMaps[passes::kSunMapSlots];
-            passes::ResolveSunShadowMaps(fg, data.sunShadowMaps, data.device->GetNVRHIDevice(), sunMaps);
+            passes::ResolveSunShadowMaps(fg, SunShadowMaps(), data.device->GetNVRHIDevice(), sunMaps);
 
             // ═══════════════════════════════════════════════════════
             //  BINDLESS RENDERING PATH (GPU-DRIVEN MULTI-DRAW)

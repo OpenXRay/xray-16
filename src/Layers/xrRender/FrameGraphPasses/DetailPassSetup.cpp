@@ -53,8 +53,7 @@ DefaultOutputLayout setupDetailPass(
     const DefaultOutputLayout& forwardInputs,
     u32 width,
     u32 height,
-    xray::profiler::GPUProfiler* gpuProfiler,
-    SunShadowMaps sunShadowMaps
+    xray::profiler::GPUProfiler* gpuProfiler
 )
 {
     if (detailManager && !detailManager->graphicsPipeline)
@@ -70,7 +69,7 @@ DefaultOutputLayout setupDetailPass(
 
     auto& passData = fg.addCallbackPass<DetailPassData>(
         "DetailDraw",
-        [&, width, height, gpuProfiler, sunShadowMaps](
+        [&, width, height, gpuProfiler](
             FrameGraph& builder, PassHandle passHandle, DetailPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
@@ -86,7 +85,6 @@ DefaultOutputLayout setupDetailPass(
             data.outputNormal = passBuilder.readWrite(forwardInputs.normal, ResourceState::RenderTarget);
             if (forwardInputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(forwardInputs.baseColor, ResourceState::RenderTarget);
-            passes::ReadSunShadowMaps(passBuilder, sunShadowMaps, data.sunShadowMaps);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = data.outputNormal;
@@ -211,8 +209,6 @@ DefaultOutputLayout setupDetailPass(
                 data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
 
             auto* nvDev = data.device->GetNVRHIDevice();
-            nvrhi::ITexture* sunMaps[passes::kSunMapSlots];
-            passes::ResolveSunShadowMaps(fg, data.sunShadowMaps, nvDev, sunMaps);
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* grassVsRefl = shaderLoader->GetCachedReflection("detail_gpu", ".vs");
@@ -228,10 +224,6 @@ DefaultOutputLayout setupDetailPass(
                 bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
                 bsb.BufferSRV("slot_data", dm->slotDataBuffer);
                 bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
-                bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
-                bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
-                bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
-                passes::BindSunShadowMaps(bsb, sunMaps);
                 auto bindDesc = bsb.Build();
                 bindDesc.bindings.push_back(nvrhi::BindingSetItem::TypedBuffer_SRV(32, dm->cachedDummySlotIndirection));
                 return cache.GetOrCreateBindingSet(bindDesc, dm->graphicsBindingLayout, nvDev);
@@ -250,10 +242,6 @@ DefaultOutputLayout setupDetailPass(
                 bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
                 bsb.BufferSRV("slot_data", dm->slotDataBuffer);
                 bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
-                bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
-                bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
-                bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
-                passes::BindSunShadowMaps(bsb, sunMaps);
                 return cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDev);
             };
 
@@ -304,17 +292,12 @@ DefaultOutputLayout setupDetailPass(
                 auto* decalVsRefl = shaderLoader->GetCachedReflection("detail_decal", ".vs");
                 auto* decalPsRefl = shaderLoader->GetCachedReflection("detail_decal", ".ps");
                 framegraph::BindingSetBuilder decalBsb(*decalVsRefl, *decalPsRefl, nvDev, "Detail.Decal");
-                decalBsb.ConstantBuffer("static_globals", staticGlobalsCB);
                 decalBsb.ConstantBuffer("DetailGlobals", detailGlobalsCB);
                 decalBsb.BufferSRV("visible_indices", dm->visibleDecalInstancesBuffer);
                 decalBsb.BufferSRV("detail_models", dm->detailModelsBuffer);
                 decalBsb.BufferSRV("decal_vertices", dm->pulledVertexBuffer);
                 decalBsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
                 decalBsb.BufferSRV("slot_data", dm->slotDataBuffer);
-                decalBsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
-                decalBsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
-                decalBsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
-                passes::BindSunShadowMaps(decalBsb, sunMaps);
                 nvrhi::BindingSetHandle decalBindingSet = cache.GetOrCreateBindingSet(decalBsb.Build(), dm->decalBindingLayout, nvDev);
 
                 nvrhi::GraphicsState state;
