@@ -15,9 +15,8 @@
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/SMAP_Allocator.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
-#include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
-#include "Layers/xrRender/FrameGraph/ShaderPhaseCache.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/ClusterDAG.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
@@ -113,12 +112,6 @@ namespace framegraph {
 
 class FrameGraphRenderer: public xray::render::fg::FGRenderBase {
 public:
-    enum
-    {
-        PHASE_NORMAL = 0,
-        PHASE_SMAP = 1,
-    };
-
     enum
     {
         MSAA_ATEST_NONE = 0x0,
@@ -410,8 +403,6 @@ public:
     fg::IndexBufferHandle old_QuadIB;
     void CreateQuadIB();
 
-    fg::ShaderElement* rimp_select_sh_static(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase);
-    fg::ShaderElement* rimp_select_sh_dynamic(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     xr_vector<fg::ShaderMacro> m_ShaderOptions;
 
     xr_vector<CompiledLevelShader> m_CompiledLevelShaders;
@@ -426,9 +417,6 @@ private:
 
     // FrameGraph
     xr_unique_ptr<framegraph::FrameGraph> m_framegraph;
-
-    // Shader phase cache (Week 16 - for precompilation phase detection)
-    xr_unique_ptr<framegraph::ShaderPhaseCache> m_shaderPhaseCache;
 
     // Final output texture (for copying to backbuffer)
     framegraph::VirtualResourceHandle m_finalOutput;
@@ -611,32 +599,6 @@ private:
     bool ProcessParticleGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr, bool isHUD = false);
     void ProcessSingleParticleEffect(fg::PS::CParticleEffect* pEffect, const Fmatrix& worldTransform, IRenderable* renderable, bool isHUD);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
-
-    // ═══════════════════════════════════════════════════
-    //  DYNAMIC PASS ROUTING (Week 16)
-    // ═══════════════════════════════════════════════════
-
-    // Pass registry entry
-    struct PassEntry {
-        framegraph::RenderPhase phase;
-        xr_unique_ptr<framegraph::IPass> pass;
-        xr_vector<GeometryBatch*> assignedBatches;
-    };
-
-    // Active passes for this frame (dynamically created)
-    xr_vector<PassEntry> m_activePasses;
-
-    // Scan materials to determine required phases
-    xr_set<framegraph::RenderPhase> ScanRequiredPhases() const;
-
-    // Create passes based on required phases
-    void CreatePhasePass(framegraph::RenderPhase phase);
-
-    // Route batches to appropriate passes
-    void RouteBatchesToPasses();
-
-    // Create all required passes dynamically
-    void CreateAllRequiredPasses();
 
     public:
 

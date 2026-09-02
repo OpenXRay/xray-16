@@ -3,7 +3,7 @@
 #include "HiZBuildPassSetup.h"
 #include "PassVertexFormats.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
-#include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"

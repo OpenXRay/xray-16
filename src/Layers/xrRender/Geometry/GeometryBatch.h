@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
-#include "Layers/xrRender/FrameGraph/ShaderReflection.h"  // For RenderPhase
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/Shader.h"  // For ShaderElement flags (legacy)
 #include "Layers/xrRender/FBasicVisual.h"  // For dxRender_Visual
 #include "Layers/xrRender/GPUCullingManager.h"  // For MeshAllocation
@@ -15,8 +15,6 @@ namespace xray::render::fg {
 namespace xray::render {
 
 using fg::dxRender_Visual;
-
-struct MaterialPSO;  // Forward declaration
 
 // ══════════════════════════════════════════════════════════
 //  GEOMETRY BATCH (SINGLE DRAW CALL)
@@ -57,19 +55,6 @@ struct GeometryBatch {
     // Shader
     nvrhi::IGraphicsPipeline* pipeline = nullptr;
     nvrhi::IBindingSet* bindingSet = nullptr;
-
-    // ═══════════════════════════════════════════════════
-    //  WEEK 16: DYNAMIC ROUTING DATA
-    // ═══════════════════════════════════════════════════
-
-    // MaterialPSO contains shader RT bindings and full PSO
-    // Created lazily during Execute() (after FrameGraph compilation)
-    MaterialPSO* materialPSO = nullptr;
-
-    // Rendering phase (from shader reflection via ShaderPhaseCache)
-    // Populated during ScanRequiredPhases() (before compilation)
-    // Used by routing system to assign batches to correct pass
-    framegraph::RenderPhase renderPhase = framegraph::RenderPhase::Geometry;
 
     // Source visual (for material system)
     dxRender_Visual* visual = nullptr;
