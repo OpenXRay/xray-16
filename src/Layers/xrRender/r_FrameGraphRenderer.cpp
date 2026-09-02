@@ -109,28 +109,6 @@ namespace xray::render::fg { xray::render::FrameGraphRenderer RImplementation; }
 
 namespace xray::render
 {
-fg::ShaderElement* FrameGraphRenderer::rimp_select_sh_static(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase)
-{
-    if (!pVisual->shader)
-        return nullptr;
-    int id = SE_R2_SHADOW;
-    if (FrameGraphRenderer::PHASE_NORMAL == phase)
-    {
-        id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < fg::r__dtex_range) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
-    }
-    return pVisual->shader->E[id]._get();
-}
-
-fg::ShaderElement* FrameGraphRenderer::rimp_select_sh_dynamic(fg::dxRender_Visual* pVisual, float cdist_sq, u32 phase)
-{
-    int id = SE_R2_SHADOW;
-    if (FrameGraphRenderer::PHASE_NORMAL == phase)
-    {
-        id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < fg::r__dtex_range) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
-    }
-    return pVisual->shader->E[id]._get();
-}
-
 fg::IRender_DetailModel* FrameGraphRenderer::model_CreateDM(IReader* F)
 {
     fg::CDetail* D = xr_new<fg::CDetail>();
@@ -230,7 +208,6 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
         m_shaderLoader->GetTarget() == SlangCompiler::Target::SPIRV ? "SPIRV" : "DXIL");
 
     m_framegraph = xr_make_unique<framegraph::FrameGraph>(device);
-    m_shaderPhaseCache = xr_make_unique<framegraph::ShaderPhaseCache>();
     m_geometryVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
     m_materialCache = xr_make_unique<MaterialCache>(
         device,
@@ -367,7 +344,6 @@ void FrameGraphRenderer::Shutdown() {
 
     passes::ShutdownPathTracer();
 
-    m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
 
     if (m_blackboard) {
@@ -2779,78 +2755,6 @@ void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix
             ProcessVisualGeometry(leafVisual, xform, root);
         }
     });
-}
-
-xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
-    xr_set<framegraph::RenderPhase> phases;
-
-    auto& batches = const_cast<GeometryCollector*>(m_geometryCollector.get())->GetBatchesMutable();
-    xr_map<framegraph::RenderPhase, u32> phaseCount;
-
-    for (auto& batch : batches) {
-        if (!batch.visual) {
-            continue;
-        }
-
-        framegraph::RenderPhase phase = m_shaderPhaseCache->GetPhase(batch.visual);
-        batch.renderPhase = phase;
-        phases.insert(phase);
-        phaseCount[phase]++;
-    }
-
-    return phases;
-}
-
-void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
-    PassEntry entry;
-    entry.phase = phase;
-
-    switch (phase) {
-        case framegraph::RenderPhase::Geometry: {
-            return;
-        }
-
-        case framegraph::RenderPhase::Lighting:
-        case framegraph::RenderPhase::PostProcess:
-        case framegraph::RenderPhase::Combine:
-        case framegraph::RenderPhase::Shadow:
-        case framegraph::RenderPhase::Custom:
-        default:
-            return;
-    }
-}
-
-void FrameGraphRenderer::CreateAllRequiredPasses() {
-    xr_set<framegraph::RenderPhase> requiredPhases = ScanRequiredPhases();
-    for (framegraph::RenderPhase phase : requiredPhases) {
-        CreatePhasePass(phase);
-    }
-}
-
-void FrameGraphRenderer::RouteBatchesToPasses() {
-    auto& batches = m_geometryCollector->GetBatchesMutable();
-    xr_map<framegraph::RenderPhase, xr_vector<GeometryBatch*>> batchesByPhase;
-
-    for (auto& batch : batches) {
-        batchesByPhase[batch.renderPhase].push_back(&batch);
-    }
-
-    for (const auto& [phase, phaseBatches] : batchesByPhase) {
-        const char* phaseName = framegraph::IPass::GetPhaseName(phase);
-
-        switch (phase) {
-            case framegraph::RenderPhase::Geometry:
-                break;
-
-            case framegraph::RenderPhase::Lighting:
-            case framegraph::RenderPhase::PostProcess:
-            case framegraph::RenderPhase::Combine:
-            case framegraph::RenderPhase::Shadow:
-            case framegraph::RenderPhase::Custom:
-            default:
-                break;
-        }
-    }
 }
 
 void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, fg::ImGuiRendererNVRHI* imguiRenderer) {

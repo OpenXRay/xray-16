@@ -4,7 +4,7 @@
 #include "DetailPassSetup.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FGDetailManager.h"
-#include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"

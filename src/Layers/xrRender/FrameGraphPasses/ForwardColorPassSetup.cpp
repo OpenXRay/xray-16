@@ -3,7 +3,7 @@
 #include "ForwardColorPassSetup.h"
 #include "ShaderConstants.h"  // CB layout definitions and FillGlobalConstants/FillDynamicTransforms
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
-#include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"  // For loading bindless shaders
 #include "Layers/xrRender/Geometry/GeometryBatch.h"

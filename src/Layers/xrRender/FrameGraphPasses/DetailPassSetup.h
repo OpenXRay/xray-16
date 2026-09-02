@@ -3,7 +3,7 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
-#include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include <nvrhi/nvrhi.h>
 #include "SunShadowPassSetup.h"
 
