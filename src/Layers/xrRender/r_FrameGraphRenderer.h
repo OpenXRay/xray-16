@@ -501,6 +501,19 @@ private:
     xr_vector<ISpatial*> m_lstRenderables;
     xr_vector<ISpatial*> m_lstShadowCasters;
     bool m_collectShadowOnly = false;
+    struct ShadowCasterRegion {
+        Fmatrix sunView;
+        Fvector2 minXY;
+        Fvector2 maxXY;
+        float minZ = 0.0f;
+        float maxZ = 0.0f;
+        Fvector worldCenter;
+        Fvector worldHalf;
+        bool valid = false;
+    };
+    ShadowCasterRegion m_shadowCasterRegion;
+    ShadowCasterRegion BuildShadowCasterRegion() const;
+    static bool ShadowCasterMayReachView(const ShadowCasterRegion& region, const Fsphere& bounds);
 
     void SetupFrame();
 

@@ -80,8 +80,7 @@ struct VsmSkinBinParams {
     u32 casterCount;
     u32 cap;
     u32 maxCasters;
-    float npcDist;
-    Fvector4 camPos;
+    u32 pad;
 };
 
 struct VsmResolveParams {
@@ -616,8 +615,8 @@ void LogTelemetry(VSMState& state)
         ps_r_vsm_cache ? "on" : "off", ps_r_vsm_cache_refresh, ps_r_vsm_stale_refresh);
     Msg("[VSM] bin: draws=%u instances=%u maxPagesPerCaster=%u lodCulled=%u drops=%u | k=%.2f at=%d",
         state.binDraws, state.binInstances, state.binMaxPages, state.binLodCulled, state.binDrops, ps_r_vsm_cluster_lod, ps_r_vsm_at);
-    Msg("[VSM] dyn: casters=%u instances=%u maxPages=%u | npc_dist %.0f gate %d blend_dyn %.2f",
-        state.dynCasters, state.dynInstances, state.dynMaxPages, ps_r_vsm_npc_dist, ps_r_vsm_dyn_gate, ps_r_vsm_ta_blend_dyn);
+    Msg("[VSM] dyn: casters=%u instances=%u maxPages=%u | gate %d blend_dyn %.2f",
+        state.dynCasters, state.dynInstances, state.dynMaxPages, ps_r_vsm_dyn_gate, ps_r_vsm_ta_blend_dyn);
     state.sunStepMax = 0.0f;
     state.snapMax = 0;
 }
@@ -1119,8 +1118,6 @@ void ExecuteSkinBin(fg::RenderContext* ctx, const VSMSkinBinData& data)
         bp.casterCount = casters;
         bp.cap = kVSMSkinnedCap;
         bp.maxCasters = kVSMMaxSkinned;
-        bp.npcDist = ps_r_vsm_npc_dist;
-        bp.camPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 0.0f);
         auto binCB = cache.GetOrCreateVolatileCB("VSM", "SkinBinParams", sizeof(VsmSkinBinParams), data.device);
         cmdList->writeBuffer(binCB, &bp, sizeof(bp));
 
@@ -1398,6 +1395,28 @@ void InvalidateVSMCache(VSMState& state)
     state.primeTraceQuiet = 0;
 }
 
+Fmatrix VSMSunView(const Fvector& sunDir)
+{
+    Fvector sd = sunDir;
+    if (sd.magnitude() < 1e-4f)
+        sd.set(0.0f, -1.0f, 0.0f);
+    sd.normalize();
+    Fvector up;
+    up.set(0.0f, 1.0f, 0.0f);
+    if (_abs(sd.y) > 0.99f)
+        up.set(0.0f, 0.0f, 1.0f);
+    Fvector eye;
+    eye.set(0.0f, 0.0f, 0.0f);
+    Fmatrix view;
+    view.build_camera_dir(eye, sd, up);
+    return view;
+}
+
+float VSMReceiverExtent()
+{
+    return ps_r_vsm_base * float(1u << (kVSMLevels - 1));
+}
+
 void VSMBeginFrame(VSMState& state, const Fvector& camPos, const Fvector& sunDirIn)
 {
     state.frame++;
@@ -1417,14 +1436,7 @@ void VSMBeginFrame(VSMState& state, const Fvector& camPos, const Fvector& sunDir
         const float toSunY = -sd.y;
         state.sunDown = ps_r_sun_night_freeze && (toSunY < ps_r_sun_night_alt || sunLum < ps_r_sun_night_lum);
     }
-    Fvector up;
-    up.set(0.0f, 1.0f, 0.0f);
-    if (_abs(sd.y) > 0.99f)
-        up.set(0.0f, 0.0f, 1.0f);
-    Fvector eye;
-    eye.set(0.0f, 0.0f, 0.0f);
-    Fmatrix view;
-    view.build_camera_dir(eye, sd, up);
+    Fmatrix view = VSMSunView(sd);
     state.sunView = view;
 
     Fvector camL;

@@ -9,8 +9,7 @@ cbuffer VsmSkinBinParams : register(b5)
     uint g_CasterCount;
     uint g_Cap;
     uint g_MaxCasters;
-    float g_NpcDist;
-    float4 g_CamPos;
+    uint g_Pad;
 };
 
 StructuredBuffer<SkinnedDrawRecord> g_Records : register(t0);
@@ -37,10 +36,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
     float3 center = rec.bounds.xyz;
     float R = rec.bounds.w;
     float2 lp = mul(vsm_view, float4(center, 1.0)).xy;
-    bool inRange = g_NpcDist <= 0.0 || distance(center, g_CamPos.xyz) <= g_NpcDist + R;
 
     uint cnt = 0u;
-    if (inRange)
     {
         for (int L = 0; L < VSM_LEVELS; ++L)
         {
