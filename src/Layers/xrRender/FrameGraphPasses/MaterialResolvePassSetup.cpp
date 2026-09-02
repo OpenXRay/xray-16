@@ -1,0 +1,187 @@
+#include "stdafx.h"
+#include "MaterialResolvePassSetup.h"
+#include "ShaderConstants.h"
+#include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/Backend/D3D12Backend.h"
+#include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
+
+namespace xray::render::fg::passes {
+
+using namespace framegraph;
+
+namespace {
+
+struct MaterialResolvePassData {
+    VirtualResourceHandle visId;
+    VirtualResourceHandle color;
+    VirtualResourceHandle normal;
+    VirtualResourceHandle baseColor;
+    fg::RenderDevice* device = nullptr;
+    MaterialCache* materialCache = nullptr;
+    MaterialResolvePassState* state = nullptr;
+    BindlessForwardConfig bindlessConfig;
+    u32 width = 0;
+    u32 height = 0;
+};
+
+}
+
+bool EnsureMaterialResolveResources(fg::RenderDevice* device, MaterialResolvePassState& state)
+{
+    if (state.initialized)
+        return true;
+    if (state.failed)
+        return false;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    if (!nvDevice || !shaderLoader) {
+        state.failed = true;
+        return false;
+    }
+
+    auto csResult = shaderLoader->LoadComputeShader("material_resolve", "main");
+    if (!csResult.handle || !csResult.reflection) {
+        Msg("! [MaterialResolve] Failed to load material_resolve compute shader");
+        state.failed = true;
+        return false;
+    }
+    state.shader = csResult.handle;
+
+    auto& cache = GetPassResourceCache();
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection("MaterialResolve", *csResult.reflection, nvDevice);
+    if (!state.layout) {
+        Msg("! [MaterialResolve] Failed to create binding layout");
+        state.failed = true;
+        return false;
+    }
+
+    nvrhi::ComputePipelineDesc pipeDesc;
+    pipeDesc.CS = state.shader;
+    pipeDesc.bindingLayouts = { state.layout };
+    auto* backend = device->GetBackend();
+    if (backend && backend->GetBindlessLayout())
+        pipeDesc.addBindingLayout(backend->GetBindlessLayout());
+    state.pipeline = cache.GetOrCreateComputePipeline("MaterialResolve", pipeDesc, nvDevice);
+    if (!state.pipeline) {
+        Msg("! [MaterialResolve] Failed to create compute pipeline");
+        state.failed = true;
+        return false;
+    }
+
+    state.initialized = true;
+    Msg("* [MaterialResolve] Pipeline initialized");
+    return true;
+}
+
+MaterialResolveOutput setupMaterialResolvePass(
+    FrameGraph& fg,
+    fg::RenderDevice* device,
+    VirtualResourceHandle visId,
+    VirtualResourceHandle color,
+    VirtualResourceHandle normal,
+    VirtualResourceHandle baseColor,
+    const BindlessForwardConfig& bindlessConfig,
+    MaterialCache* materialCache,
+    u32 width,
+    u32 height,
+    MaterialResolvePassState* state)
+{
+    auto& passData = fg.addCallbackPass<MaterialResolvePassData>(
+        "Material Resolve",
+        [&, visId, color, normal, baseColor, bindlessConfig, materialCache, width, height, state](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
+            RenderPassBuilder passBuilder(builder, passHandle);
+            data.device = device;
+            data.materialCache = materialCache;
+            data.state = state;
+            data.bindlessConfig = bindlessConfig;
+            data.width = width;
+            data.height = height;
+            data.visId = passBuilder.read(visId, ResourceState::ShaderResource);
+            data.color = passBuilder.readWrite(color, ResourceState::UnorderedAccess);
+            data.normal = passBuilder.readWrite(normal, ResourceState::UnorderedAccess);
+            data.baseColor = passBuilder.readWrite(baseColor, ResourceState::UnorderedAccess);
+        },
+        [](const MaterialResolvePassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            ZoneScoped;
+            ZoneName("MaterialResolvePass", 19);
+
+            auto* visRT = fg.GetPhysicalTexture(data.visId);
+            auto* colorRT = fg.GetPhysicalTexture(data.color);
+            auto* normalRT = fg.GetPhysicalTexture(data.normal);
+            auto* baseColorRT = fg.GetPhysicalTexture(data.baseColor);
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            if (!visRT || !colorRT || !normalRT || !baseColorRT || !cmdList)
+                return;
+
+            cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
+            cmdList->clearTextureFloat(baseColorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
+
+            const auto& config = data.bindlessConfig;
+            if (!config.cluster.IsValid() || !config.UseMegaBuffers())
+                return;
+
+            if (data.materialCache) {
+                data.materialCache->FinalizePendingMaterials(ctx);
+                data.materialCache->FinalizePendingTerrainMaterials(ctx);
+            }
+            auto& matBuffer = bindless::MaterialBuffer::Instance();
+            matBuffer.Upload(ctx);
+            auto& terrainMatBuffer = bindless::TerrainMaterialBuffer::Instance();
+            terrainMatBuffer.Upload(ctx);
+            if (!matBuffer.GetBuffer() || !terrainMatBuffer.GetBuffer())
+                return;
+
+            nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+            auto& cache = GetPassResourceCache();
+            auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("material_resolve", ".cs");
+            if (!refl)
+                return;
+
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            nvrhi::IBuffer* terrainInstances = config.cluster.terrainInstanceBuffer ? config.cluster.terrainInstanceBuffer : config.cluster.instanceBuffer;
+
+            BindingSetBuilder bsb(*refl, nvDevice, "MaterialResolve");
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+            bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+            bsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
+            bsb.BufferSRV("g_InstanceData", config.cluster.instanceBuffer);
+            bsb.BufferSRV("g_TerrainInstanceData", terrainInstances);
+            bsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
+            bsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
+            bsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
+            bsb.Texture("g_VisID", visRT);
+            bsb.TextureUAV("g_OutNormal", normalRT);
+            bsb.TextureUAV("g_OutBaseColor", baseColorRT);
+            bsb.TextureUAV("g_OutColor", colorRT);
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->layout, nvDevice);
+            if (!bindingSet)
+                return;
+
+            nvrhi::ComputeState cs;
+            cs.pipeline = data.state->pipeline;
+            cs.bindings = { bindingSet };
+            if (auto* backend = data.device->GetBackend()) {
+                if (auto* bindlessTable = backend->GetBindlessDescriptorTable())
+                    cs.addBindingSet(bindlessTable);
+            }
+            cmdList->setComputeState(cs);
+            cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
+        });
+
+    MaterialResolveOutput out;
+    out.color = passData.color;
+    out.normal = passData.normal;
+    out.baseColor = passData.baseColor;
+    return out;
+}
+
+}

@@ -99,47 +99,6 @@ static void InitializeDepthPrepassResources(fg::RenderDevice* device, DepthPrepa
         state.terrainPipeline = cache.GetOrCreatePipeline("DepthPrepass_Terrain", terrainPipeDesc, fbInfo, nvDevice);
     }
 
-    auto clusterVsResult = shaderLoader->LoadVertexShader("cluster_pull", "main");
-    if (clusterVsResult.handle) {
-        state.clusterVS = clusterVsResult.handle;
-        state.clusterLayout = cache.GetOrCreateBindingLayoutFromReflection(
-            "DepthPrepass_Cluster", *clusterVsResult.reflection, *psResult.reflection, nvDevice);
-
-        auto makeClusterPipeDesc = [&](nvrhi::IShader* pixelShader, nvrhi::IBindingLayout* layout) {
-            nvrhi::GraphicsPipelineDesc desc;
-            desc.VS = state.clusterVS;
-            desc.PS = pixelShader;
-            desc.inputLayout = nullptr;
-            if (bindlessLayout)
-                desc.bindingLayouts = { layout, bindlessLayout };
-            else
-                desc.bindingLayouts = { layout };
-            desc.primType = nvrhi::PrimitiveType::TriangleList;
-            desc.renderState.depthStencilState.depthTestEnable = true;
-            desc.renderState.depthStencilState.depthWriteEnable = true;
-            desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
-            desc.renderState.rasterState.frontCounterClockwise = false;
-            desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-            return desc;
-        };
-
-        if (state.clusterLayout) {
-            auto clusterPipeDesc = makeClusterPipeDesc(state.ps, state.clusterLayout);
-            state.clusterPipeline = cache.GetOrCreatePipeline("DepthPrepass_Cluster", clusterPipeDesc, fbInfo, nvDevice);
-        }
-
-        auto fadePsResult = shaderLoader->LoadPixelShader("bindless_depth_fade", "main");
-        if (fadePsResult.handle) {
-            state.psFade = fadePsResult.handle;
-            state.clusterTerrainLayout = cache.GetOrCreateBindingLayoutFromReflection(
-                "DepthPrepass_ClusterTerrain", *clusterVsResult.reflection, *fadePsResult.reflection, nvDevice);
-            if (state.clusterTerrainLayout) {
-                auto terrainPipeDesc = makeClusterPipeDesc(state.psFade, state.clusterTerrainLayout);
-                state.clusterTerrainPipeline = cache.GetOrCreatePipeline("DepthPrepass_ClusterTerrain", terrainPipeDesc, fbInfo, nvDevice);
-            }
-        }
-    }
-
     state.initialized = true;
     Msg("* [DepthPrepass] Pipeline initialized");
 }
@@ -443,68 +402,6 @@ static void renderDepthPrepass(
 
     drawSet(config.staticSet, drawIndexBuffer);
     drawSet(config.dynamicSet, drawIndexBuffer);
-
-    if (config.cluster.IsValid() && ps.clusterPipeline && ps.clusterLayout) {
-        auto* clusterVsRefl = shaderLoader->GetCachedReflection("cluster_pull", ".vs");
-        if (clusterVsRefl) {
-            framegraph::BindingSetBuilder cbsb(*clusterVsRefl, *psReflection, nvDevice, "DepthPrepass.Cluster");
-            cbsb.ConstantBuffer("static_globals", staticGlobalsCB);
-            cbsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-            cbsb.BufferSRV("g_InstanceData", config.cluster.instanceBuffer);
-            cbsb.BufferSRV("g_VisibleEntries", config.cluster.visibleEntryBuffer);
-            cbsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
-            cbsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
-            cbsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
-            cbsb.BufferSRV("g_DrawFades", config.cluster.fadeBuffer);
-
-            auto clusterBindingSet = cache.GetOrCreateBindingSet(cbsb.Build(), ps.clusterLayout, nvDevice);
-            if (clusterBindingSet) {
-                nvrhi::GraphicsState clusterState;
-                clusterState.pipeline = ps.clusterPipeline;
-                clusterState.framebuffer = framebuffer;
-                clusterState.bindings = { clusterBindingSet };
-                if (bindlessTable)
-                    clusterState.addBindingSet(bindlessTable);
-                clusterState.indirectParams = config.cluster.argsBuffer;
-                clusterState.viewport.addViewport(viewport);
-                clusterState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
-
-                cmdList->setGraphicsState(clusterState);
-                cmdList->drawIndirect(0, 1);
-            }
-        }
-    }
-
-    if (config.cluster.TerrainValid() && ps.clusterTerrainPipeline && ps.clusterTerrainLayout) {
-        auto* clusterVsRefl = shaderLoader->GetCachedReflection("cluster_pull", ".vs");
-        auto* fadePsRefl = shaderLoader->GetCachedReflection("bindless_depth_fade", ".ps");
-        if (clusterVsRefl && fadePsRefl) {
-            framegraph::BindingSetBuilder cbsb(*clusterVsRefl, *fadePsRefl, nvDevice, "DepthPrepass.ClusterTerrain");
-            cbsb.ConstantBuffer("static_globals", staticGlobalsCB);
-            cbsb.BufferSRV("g_InstanceData", config.cluster.terrainInstanceBuffer);
-            cbsb.BufferSRV("g_VisibleEntries", config.cluster.terrainVisibleEntryBuffer);
-            cbsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
-            cbsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
-            cbsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
-            cbsb.BufferSRV("g_DrawFades", config.cluster.terrainFadeBuffer);
-
-            auto clusterBindingSet = cache.GetOrCreateBindingSet(cbsb.Build(), ps.clusterTerrainLayout, nvDevice);
-            if (clusterBindingSet) {
-                nvrhi::GraphicsState clusterState;
-                clusterState.pipeline = ps.clusterTerrainPipeline;
-                clusterState.framebuffer = framebuffer;
-                clusterState.bindings = { clusterBindingSet };
-                if (bindlessTable)
-                    clusterState.addBindingSet(bindlessTable);
-                clusterState.indirectParams = config.cluster.terrainArgsBuffer;
-                clusterState.viewport.addViewport(viewport);
-                clusterState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
-
-                cmdList->setGraphicsState(clusterState);
-                cmdList->drawIndirect(0, 1);
-            }
-        }
-    }
 
     if (config.HasTerrain() && config.UseTerrainCompaction() && ps.terrainPipeline) {
         auto* psOpaqueReflection = shaderLoader->GetCachedReflection("bindless_depth_opaque", ".ps");

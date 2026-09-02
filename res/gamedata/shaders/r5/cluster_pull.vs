@@ -1,28 +1,6 @@
 #define SM_6_0
 #include "common.h"
-
-struct ClusterEntry
-{
-    float4 sphere;
-    float4 lodSelf;
-    float4 lodParent;
-    uint indexCount;
-    uint ibFirst;
-    uint firstVertex;
-    uint batchIndex;
-    uint materialID;
-    uint flags;
-    float selfError;
-    float parentError;
-};
-
-struct InstanceData
-{
-    float4x4 world;
-    uint materialID;
-    uint flags;
-    float pad0, pad1;
-};
+#include "visbuffer_common.h"
 
 StructuredBuffer<InstanceData> g_InstanceData : register(t14);
 StructuredBuffer<uint> g_VisibleEntries : register(t15);

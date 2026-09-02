@@ -1,0 +1,26 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+#include "cluster_fade.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+    nointerpolation uint materialID : TEXCOORD1;
+    nointerpolation uint drawID : TEXCOORD2;
+    nointerpolation uint visID : TEXCOORD3;
+};
+
+uint main(PS_INPUT input) : SV_Target0
+{
+    ClusterFadeDiscard(g_DrawFades[input.drawID], input.position);
+
+    MaterialData mat = g_Materials[input.materialID];
+    if (mat.flags & MAT_FLAG_ALPHA_TEST)
+    {
+        float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+        clip(diffuseSample.a - mat.alphaRef);
+    }
+    return input.visID;
+}
