@@ -205,9 +205,6 @@ DefaultOutputLayout setupDetailPass(
                 bindlessTable = backend->GetBindlessDescriptorTable();
             }
 
-            if (data.gpuProfiler)
-                data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
-
             auto* nvDev = data.device->GetNVRHIDevice();
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -313,9 +310,6 @@ DefaultOutputLayout setupDetailPass(
                 cmdList->setGraphicsState(state);
                 cmdList->drawIndexedIndirect(0);
             }
-
-            if (data.gpuProfiler)
-                data.gpuProfiler->EndPass(cmdList, "Details.Draw");
         }
     );
 

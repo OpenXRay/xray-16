@@ -2309,7 +2309,7 @@ void FGDetailManager::DispatchCulling(
 
     const u32 threadGroupSize = 256;
 
-    if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "Details.SlotCull");
+    if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "DetailCull.SlotCull");
     {
         auto* slotCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_cell_cull", ".cs");
         framegraph::BindingSetBuilder bsb(*slotCullRefl, device, "Detail.SlotCull");
@@ -2330,12 +2330,12 @@ void FGDetailManager::DispatchCulling(
         cmdList->dispatch(numGroups, 1, 1);
     }
 
-    if (gpuProfiler) gpuProfiler->EndPass(cmdList, "Details.SlotCull");
+    if (gpuProfiler) gpuProfiler->EndPass(cmdList, "DetailCull.SlotCull");
 
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::IndirectArgument);
     cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::ShaderResource);
 
-    if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "Details.InstanceCull");
+    if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "DetailCull.InstanceCull");
     {
         if (!generatedInstancesBuffer)
             return;
@@ -2370,7 +2370,7 @@ void FGDetailManager::DispatchCulling(
         cmdList->dispatchIndirect(0);
     }
 
-    if (gpuProfiler) gpuProfiler->EndPass(cmdList, "Details.InstanceCull");
+    if (gpuProfiler) gpuProfiler->EndPass(cmdList, "DetailCull.InstanceCull");
 }
 
 void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device)
@@ -2633,20 +2633,20 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
         if (gpuProfiler) gpuProfiler->EndPass(cmdList, passName);
     };
 
-    dispatchInstanceGen(0, "Details.Regen.Count");
+    dispatchInstanceGen(0, "DetailCull.RegenCount");
 
     cmdList->setBufferState(perSlotCountsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-    dispatchPrefixSum(prefixSumScanPipeline, numBlocks, "Details.Regen.ScanBlocks");
+    dispatchPrefixSum(prefixSumScanPipeline, numBlocks, "DetailCull.RegenScanBlocks");
 
     cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(blockTotalsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
-    dispatchPrefixSum(prefixSumTopPipeline, 1, "Details.Regen.ScanTop");
+    dispatchPrefixSum(prefixSumTopPipeline, 1, "DetailCull.RegenScanTop");
 
     cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::ShaderResource);
 
-    dispatchInstanceGen(1, "Details.Regen.Scatter");
+    dispatchInstanceGen(1, "DetailCull.RegenScatter");
 
     cmdList->setBufferState(generatedInstancesBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(slotAABBBuffer, nvrhi::ResourceStates::ShaderResource);
