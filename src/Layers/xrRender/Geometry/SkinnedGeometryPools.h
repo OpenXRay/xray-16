@@ -24,6 +24,8 @@ public:
 
     nvrhi::IBuffer* GetVertexBuffer(u32 formatID) const;
     nvrhi::IBuffer* GetIndexBuffer(u32 formatID) const;
+    nvrhi::IBuffer* GetCombinedIndexBuffer() const { return m_combinedIndexBuffer.Get(); }
+    u32 GetFormatIndexBase(u32 formatID) const { return formatID < FORMAT_COUNT ? m_formatIndexBase[formatID] : 0; }
 
     void Reset();
 
@@ -31,6 +33,10 @@ public:
 
 private:
     u32 m_generation = 1;
+    nvrhi::BufferHandle m_combinedIndexBuffer;
+    u32 m_combinedIndexCount = 0;
+    u32 m_formatIndexBase[FORMAT_COUNT] = {};
+    bool m_combinedDirty = false;
 
     struct Pool
     {
