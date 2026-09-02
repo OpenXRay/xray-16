@@ -31,6 +31,7 @@ struct GeometryBatch {
     u32 indexCount = 0;
     u32 startIndex = 0;
     s32 baseVertex = 0;
+    u32 vertexCount = 0;
     u32 vertexStride = 0;  // Vertex stride for skinned meshes (24=1W, 28=2W/3W/4W)
 
     // Material IDs

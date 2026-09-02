@@ -578,12 +578,14 @@ u32 SkinnedVertexFormat(u16 renderMode, u32 vertexStride)
 
 const SkinningPipelineVariant* SkinnedVariant(const SkinningPassState& sk, u32 fmt, bool mdi)
 {
+    if (mdi)
+        return &sk.mdi;
     switch (fmt) {
-    case VF_SKINNED_NONHQ: return mdi ? &sk.mdiNonHQ : &sk.nonHQ;
-    case VF_SKINNED_HQ1W: return mdi ? &sk.mdiHQ1w : &sk.hq1w;
-    case VF_SKINNED_HQ4W: return mdi ? &sk.mdiHQ4w : &sk.hq4w;
-    case VF_SKINNED_HQ2W: return mdi ? &sk.mdiHQ2w : &sk.hq2w;
-    case VF_SKINNED_HQ3W: return mdi ? &sk.mdiHQ3w : &sk.hq3w;
+    case VF_SKINNED_NONHQ: return &sk.nonHQ;
+    case VF_SKINNED_HQ1W: return &sk.hq1w;
+    case VF_SKINNED_HQ4W: return &sk.hq4w;
+    case VF_SKINNED_HQ2W: return &sk.hq2w;
+    case VF_SKINNED_HQ3W: return &sk.hq3w;
     default: return nullptr;
     }
 }
@@ -618,7 +620,7 @@ bool EnsureSkinnedDepthPipelines(fg::RenderDevice* device, SunShadowState& state
     auto psResult = shaderLoader->LoadPixelShader("bindless_skinned_depth", "main");
     auto mdiPsResult = shaderLoader->LoadPixelShader("bindless_skinned_depth_mdi", "main");
     auto* vsRefl = shaderLoader->GetCachedReflection("bindless_skinned", ".vs");
-    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_mdi", ".vs");
+    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_pre", ".vs");
     if (!psResult.handle || !mdiPsResult.handle || !psResult.reflection || !mdiPsResult.reflection || !vsRefl) {
         Msg("! [SunShadow] skinned depth shaders failed to load");
         state.skinnedPipelinesFailed = true;
@@ -671,11 +673,13 @@ bool EnsureSkinnedDepthPipelines(fg::RenderDevice* device, SunShadowState& state
             xr_sprintf(name, "SunShadowSkinned_%u_b%d_s%.2f", f, state.rasterBias, state.rasterSlope);
             state.skinnedPipelines[f] = cache.GetOrCreatePipeline(name, makeDesc(*direct, state.skinnedDepthPS, state.skinnedLayout), fbInfo, nvDevice);
         }
-        const SkinningPipelineVariant* mdi = SkinnedVariant(sk, f, true);
-        if (state.skinnedMDILayout && mdi && mdi->vs && mdi->inputLayout) {
+    }
+    {
+        const SkinningPipelineVariant& mdi = sk.mdi;
+        if (state.skinnedMDILayout && mdi.vs && mdi.inputLayout) {
             string64 name;
-            xr_sprintf(name, "SunShadowSkinnedMDI_%u_b%d_s%.2f", f, state.rasterBias, state.rasterSlope);
-            state.skinnedMDIPipelines[f] = cache.GetOrCreatePipeline(name, makeDesc(*mdi, state.skinnedDepthMDIPS, state.skinnedMDILayout), fbInfo, nvDevice);
+            xr_sprintf(name, "SunShadowSkinnedMDI_b%d_s%.2f", state.rasterBias, state.rasterSlope);
+            state.skinnedMDIPipeline = cache.GetOrCreatePipeline(name, makeDesc(mdi, state.skinnedDepthMDIPS, state.skinnedMDILayout), fbInfo, nvDevice);
         }
     }
 
@@ -708,7 +712,7 @@ void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, con
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     auto* vsRefl = shaderLoader->GetCachedReflection("bindless_skinned", ".vs");
     auto* psRefl = shaderLoader->GetCachedReflection("bindless_skinned_depth", ".ps");
-    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_mdi", ".vs");
+    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_pre", ".vs");
     auto* mdiPsRefl = shaderLoader->GetCachedReflection("bindless_skinned_depth_mdi", ".ps");
     if (!vsRefl || !psRefl)
         return;
@@ -721,25 +725,22 @@ void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, con
         && cfg.gpuCulling->IsSkinnedEnabled()
         && cfg.gpuCulling->GetSkinnedObjectCount() == worldSkinnedCount;
 
-    if (mdiActive && mdiVsRefl && mdiPsRefl && state.skinnedMDILayout) {
+    if (mdiActive && mdiVsRefl && mdiPsRefl && state.skinnedMDILayout && state.skinnedMDIPipeline) {
         nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("SunShadow", nvDevice);
+        nvrhi::IBuffer* preVB = cfg.gpuCulling->GetSkinnedPreVertexBuffer();
         auto& pools = cfg.gpuCulling->GetSkinnedPools();
-        for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT && drawIndexBuffer; ++f) {
+        for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT && drawIndexBuffer && preVB; ++f) {
             const auto& bucket = cfg.gpuCulling->GetSkinnedBucket(f);
             if (bucket.casterCount == 0)
                 continue;
-            nvrhi::IGraphicsPipeline* pipeline = state.skinnedMDIPipelines[f];
-            nvrhi::IBuffer* poolVB = pools.GetVertexBuffer(f);
+            nvrhi::IGraphicsPipeline* pipeline = state.skinnedMDIPipeline;
             nvrhi::IBuffer* poolIB = pools.GetIndexBuffer(f);
-            if (!pipeline || !poolVB || !poolIB)
+            if (!poolIB)
                 continue;
 
             framegraph::BindingSetBuilder bsb(*mdiVsRefl, *mdiPsRefl, nvDevice, "SunShadow.SkinnedMDI");
             bsb.ConstantBuffer("static_globals", draw.lightCB);
-            bsb.BufferSRV("g_BoneMatrices", boneBuffer);
             bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-            bsb.BufferSRV("g_PaintSplats", cfg.splatBuffer);
-            bsb.BufferSRV("g_SkinnedRecords", cfg.gpuCulling->GetSkinnedRecordsBuffer());
             bsb.BufferSRV("g_SkinnedMaterialIDs", cfg.gpuCulling->GetSkinnedMaterialIDBuffer());
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinnedMDILayout, nvDevice);
             if (!bindingSet)
@@ -751,7 +752,7 @@ void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, con
             gs.bindings = { bindingSet };
             if (draw.bindlessTable)
                 gs.addBindingSet(draw.bindlessTable);
-            gs.vertexBuffers = { { poolVB, 0, 0 }, { drawIndexBuffer, 1, 0 } };
+            gs.vertexBuffers = { { preVB, 0, 0 }, { drawIndexBuffer, 1, 0 } };
             gs.indexBuffer = { poolIB, nvrhi::Format::R16_UINT, 0 };
             gs.viewport.addViewport(draw.viewport);
             gs.viewport.addScissorRect(draw.scissor);
@@ -1040,10 +1041,9 @@ SunShadowCullOutput setupSunShadowCullPass(
         state->depthATPipeline = nullptr;
         state->depthDynamicPipeline = nullptr;
         state->depthPipelinesFailed = false;
-        for (u32 f = 0; f < kSunShadowSkinnedFormats; ++f) {
+        for (u32 f = 0; f < kSunShadowSkinnedFormats; ++f)
             state->skinnedPipelines[f] = nullptr;
-            state->skinnedMDIPipelines[f] = nullptr;
-        }
+        state->skinnedMDIPipeline = nullptr;
         state->skinnedPipelinesReady = false;
         state->skinnedPipelinesFailed = false;
         far.valid = false;
