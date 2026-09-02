@@ -1,18 +1,28 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
+#include "skinned_mdi_common.h"
 #include "material_eval.h"
 #include "visbuffer_common.h"
 
-StructuredBuffer<InstanceData> g_InstanceData : register(t14);
-StructuredBuffer<InstanceData> g_TerrainInstanceData : register(t15);
 StructuredBuffer<ClusterEntry> g_Entries : register(t16);
 ByteAddressBuffer g_MegaVB : register(t18);
 ByteAddressBuffer g_MegaIB : register(t19);
 Texture2D<uint> g_VisID : register(t30);
+StructuredBuffer<InstanceData> g_InstanceData : register(t40);
+StructuredBuffer<InstanceData> g_TerrainInstanceData : register(t41);
+StructuredBuffer<ClusterEntry> g_SkinnedEntries : register(t42);
+ByteAddressBuffer g_SkinnedVB : register(t43);
+ByteAddressBuffer g_SkinnedIB : register(t44);
 RWTexture2D<float4> g_OutNormal : register(u0);
 RWTexture2D<float4> g_OutBaseColor : register(u1);
 RWTexture2D<float4> g_OutColor : register(u2);
+
+cbuffer MaterialResolveParams : register(b5)
+{
+    uint g_SkinnedEntryBase;
+    uint3 g_ResolvePad;
+};
 
 [numthreads(8, 8, 1)]
 void main(uint3 dtid : SV_DispatchThreadID)
@@ -27,20 +37,37 @@ void main(uint3 dtid : SV_DispatchThreadID)
     if (id == 0u)
         return;
 
-    ClusterEntry e = g_Entries[id >> VIS_ID_TRI_BITS];
+    uint entryIdx = id >> VIS_ID_TRI_BITS;
     uint tri = id & VIS_ID_TRI_MASK;
+    bool skinned = entryIdx >= g_SkinnedEntryBase;
+    ClusterEntry e = skinned ? g_SkinnedEntries[entryIdx - g_SkinnedEntryBase] : g_Entries[entryIdx];
     uint ib = e.ibFirst + tri * 3u;
-    uint i0 = g_MegaIB.Load(ib * 4u);
-    uint i1 = g_MegaIB.Load((ib + 1u) * 4u);
-    uint i2 = g_MegaIB.Load((ib + 2u) * 4u);
 
     bool terrain = (e.flags & CLUSTER_ENTRY_FLAG_TERRAIN) != 0u;
-    float4x4 world = terrain ? g_TerrainInstanceData[e.batchIndex].world : g_InstanceData[e.batchIndex].world;
+    float4x4 world = float4x4(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+    MegaVertex v0;
+    MegaVertex v1;
+    MegaVertex v2;
+    if (skinned)
+    {
+        uint i0 = g_SkinnedIB.Load(ib * 4u);
+        uint i1 = g_SkinnedIB.Load((ib + 1u) * 4u);
+        uint i2 = g_SkinnedIB.Load((ib + 2u) * 4u);
+        v0 = LoadMegaVertex(g_SkinnedVB, e.firstVertex + i0);
+        v1 = LoadMegaVertex(g_SkinnedVB, e.firstVertex + i1);
+        v2 = LoadMegaVertex(g_SkinnedVB, e.firstVertex + i2);
+    }
+    else
+    {
+        uint i0 = g_MegaIB.Load(ib * 4u);
+        uint i1 = g_MegaIB.Load((ib + 1u) * 4u);
+        uint i2 = g_MegaIB.Load((ib + 2u) * 4u);
+        v0 = LoadMegaVertex(g_MegaVB, e.firstVertex + i0);
+        v1 = LoadMegaVertex(g_MegaVB, e.firstVertex + i1);
+        v2 = LoadMegaVertex(g_MegaVB, e.firstVertex + i2);
+        world = terrain ? g_TerrainInstanceData[e.batchIndex].world : g_InstanceData[e.batchIndex].world;
+    }
     float3x3 world3 = (float3x3)world;
-
-    MegaVertex v0 = LoadMegaVertex(g_MegaVB, e.firstVertex + i0);
-    MegaVertex v1 = LoadMegaVertex(g_MegaVB, e.firstVertex + i1);
-    MegaVertex v2 = LoadMegaVertex(g_MegaVB, e.firstVertex + i2);
 
     float4 c0 = mul(m_VP, mul(world, float4(v0.position, 1.0)));
     float4 c1 = mul(m_VP, mul(world, float4(v1.position, 1.0)));
@@ -70,7 +97,16 @@ void main(uint3 dtid : SV_DispatchThreadID)
         s = EvalStandardMaterial(mat, diffuse.rgb, uv, uvDdx, uvDdy, n, t, b);
     }
 
-    g_OutNormal[p] = float4(s.N, s.roughness);
+    float roughnessOut = s.roughness;
+    if (skinned)
+    {
+        SkinnedDrawRecord rec = g_SkinnedRecords[e.batchIndex];
+        float3 worldPos = InterpolateBary3(bd, v0.position, v1.position, v2.position);
+        s.albedo = mdi_apply_splat_color(rec, s.albedo, worldPos, uv);
+        roughnessOut = -max(s.roughness, 0.004);
+    }
+
+    g_OutNormal[p] = float4(s.N, roughnessOut);
     g_OutBaseColor[p] = float4(s.albedo, s.metallic);
     g_OutColor[p] = float4(0.0, 0.0, 0.0, s.ao);
 }

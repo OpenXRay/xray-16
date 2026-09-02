@@ -1241,6 +1241,9 @@ void GPUCullingManager::Shutdown()
     m_skinnedRecordsBuffer = nullptr;
     m_skinnedMaterialIDBuffer = nullptr;
     m_skinnedChunkBuffer = nullptr;
+    m_skinnedEntryBuffer = nullptr;
+    m_skinnedEntryCapacity = 0;
+    m_skinnedEntryCount = 0;
     m_skinnedPreVB[0] = nullptr;
     m_skinnedPreVB[1] = nullptr;
     m_skinnedChunkCapacity = 0;
@@ -2066,6 +2069,7 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         bucket.casterCount = 0;
     }
     m_skinnedObjectCount = 0;
+    m_skinnedEntryCount = 0;
 
     if (!IsSkinnedEnabled() || !geometry)
         return;
@@ -2148,6 +2152,7 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     m_skinnedRecordsData.clear();
     m_skinnedMaterialIDData.clear();
     m_skinnedChunkData.clear();
+    m_skinnedEntryData.clear();
     u32 vertexTotal = 0;
     for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
         SkinnedBucket& bucket = m_skinnedBuckets[f];
@@ -2172,6 +2177,20 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
                     chunk.count = std::min(SKINNED_CHUNK_VERTICES, vertexCount - v0);
                     m_skinnedChunkData.push_back(chunk);
                 }
+                if (pass == 0) {
+                    const u32 ibBase = m_skinnedPools.GetFormatIndexBase(f) + args.startIndexLocation;
+                    for (u32 i0 = 0; i0 < args.indexCountPerInstance; i0 += SKINNED_ENTRY_INDICES) {
+                        GPUClusterEntry e = {};
+                        e.sphere.set(bucket.records[i].bounds.x, bucket.records[i].bounds.y, bucket.records[i].bounds.z, bucket.records[i].bounds.w);
+                        e.indexCount = std::min(SKINNED_ENTRY_INDICES, args.indexCountPerInstance - i0);
+                        e.ibFirst = ibBase + i0;
+                        e.firstVertex = vertexTotal;
+                        e.batchIndex = slot;
+                        e.materialID = bucket.materialIDs[i];
+                        e.flags = GPU_CLUSTER_ENTRY_SKINNED;
+                        m_skinnedEntryData.push_back(e);
+                    }
+                }
                 vertexTotal += vertexCount;
             }
         }
@@ -2181,6 +2200,27 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     cmdList->writeBuffer(m_skinnedArgsBuffer, m_skinnedArgsData.data(), u64(pooledTotal) * sizeof(IndirectDrawArgs));
     cmdList->writeBuffer(m_skinnedRecordsBuffer, m_skinnedRecordsData.data(), u64(pooledTotal) * sizeof(SkinnedDrawRecord));
     cmdList->writeBuffer(m_skinnedMaterialIDBuffer, m_skinnedMaterialIDData.data(), u64(pooledTotal) * sizeof(u32));
+
+    m_skinnedEntryCount = static_cast<u32>(m_skinnedEntryData.size());
+    if (m_skinnedEntryCount > 0) {
+        if (m_skinnedEntryCapacity < m_skinnedEntryCount) {
+            u32 capacity = std::max(m_skinnedEntryCapacity * 2u, 4096u);
+            while (capacity < m_skinnedEntryCount)
+                capacity *= 2;
+            nvrhi::BufferDesc desc;
+            desc.debugName = "GPUCull_SkinnedEntries";
+            desc.byteSize = u64(capacity) * sizeof(GPUClusterEntry);
+            desc.structStride = sizeof(GPUClusterEntry);
+            desc.initialState = nvrhi::ResourceStates::ShaderResource;
+            desc.keepInitialState = true;
+            m_skinnedEntryBuffer = m_device->GetNVRHIDevice()->createBuffer(desc);
+            m_skinnedEntryCapacity = m_skinnedEntryBuffer ? capacity : 0;
+        }
+        if (m_skinnedEntryBuffer)
+            cmdList->writeBuffer(m_skinnedEntryBuffer, m_skinnedEntryData.data(), u64(m_skinnedEntryCount) * sizeof(GPUClusterEntry));
+        else
+            m_skinnedEntryCount = 0;
+    }
 
     DispatchPreskin(cmdList, overlayMgr, vertexTotal);
 }

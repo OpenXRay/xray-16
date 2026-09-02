@@ -81,6 +81,7 @@ bool SkinnedGeometryPools::Register(VertexStagingBuffer* vsb, IndexStagingBuffer
     pool.indexData.insert(pool.indexData.end(), isrc, isrc + iBytes);
     pool.vertexCount += vCount;
     pool.indexCount += iCount;
+    m_combinedDirty = true;
 
     vsb->Unmap();
     isb->Unmap();
@@ -94,6 +95,38 @@ bool SkinnedGeometryPools::Register(VertexStagingBuffer* vsb, IndexStagingBuffer
 
 void SkinnedGeometryPools::FlushUploads(nvrhi::IDevice* nvDevice, nvrhi::ICommandList* cmdList)
 {
+    if (m_combinedDirty) {
+        m_combinedDirty = false;
+        u32 total = 0;
+        for (u32 f = FIRST_FORMAT; f < FORMAT_COUNT; ++f) {
+            m_formatIndexBase[f] = total;
+            total += m_pools[f].indexCount;
+        }
+        if (total > 0) {
+            xr_vector<u32> combined(total);
+            for (u32 f = FIRST_FORMAT; f < FORMAT_COUNT; ++f) {
+                const u16* src = reinterpret_cast<const u16*>(m_pools[f].indexData.data());
+                u32* dst = combined.data() + m_formatIndexBase[f];
+                for (u32 i = 0; i < m_pools[f].indexCount; ++i)
+                    dst[i] = src[i];
+            }
+            if (!m_combinedIndexBuffer || m_combinedIndexBuffer->getDesc().byteSize < u64(total) * sizeof(u32)) {
+                u64 capacity = 128 * 1024;
+                while (capacity < u64(total) * sizeof(u32))
+                    capacity *= 2;
+                nvrhi::BufferDesc desc;
+                desc.debugName = "SkinnedPool_CombinedIB";
+                desc.byteSize = capacity;
+                desc.canHaveRawViews = true;
+                desc.initialState = nvrhi::ResourceStates::ShaderResource;
+                desc.keepInitialState = true;
+                m_combinedIndexBuffer = nvDevice->createBuffer(desc);
+            }
+            if (m_combinedIndexBuffer)
+                cmdList->writeBuffer(m_combinedIndexBuffer, combined.data(), u64(total) * sizeof(u32));
+            m_combinedIndexCount = total;
+        }
+    }
     for (u32 f = FIRST_FORMAT; f < FORMAT_COUNT; ++f) {
         Pool& pool = m_pools[f];
 
@@ -166,6 +199,11 @@ void SkinnedGeometryPools::Reset()
 {
     for (auto& pool : m_pools)
         pool = Pool{};
+    m_combinedIndexBuffer = nullptr;
+    m_combinedIndexCount = 0;
+    m_combinedDirty = false;
+    for (u32& base : m_formatIndexBase)
+        base = 0;
     ++m_generation;
     if (m_generation == 0)
         m_generation = 1;

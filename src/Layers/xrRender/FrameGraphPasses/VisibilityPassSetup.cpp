@@ -11,6 +11,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 
 namespace xray::render::fg::passes {
 
@@ -22,10 +23,19 @@ struct VisibilityPassData {
     VirtualResourceHandle depth;
     VirtualResourceHandle visId;
     VirtualResourceHandle drawArgsBuffer;
+    VirtualResourceHandle skinnedDrawArgs;
     fg::RenderDevice* device = nullptr;
     MaterialCache* materialCache = nullptr;
+    GPUCullingManager* gpuCulling = nullptr;
     VisibilityPassState* state = nullptr;
     BindlessForwardConfig bindlessConfig;
+};
+
+struct alignas(16) SkinnedVisParams {
+    u32 entryBase;
+    u32 pad0;
+    u32 pad1;
+    u32 pad2;
 };
 
 struct VisDebugViewData {
@@ -52,6 +62,7 @@ void renderVisibilityRaster(
     nvrhi::ITexture* visRT,
     const BindlessForwardConfig& config,
     MaterialCache* materialCache,
+    GPUCullingManager* gpuCulling,
     VisibilityPassState& state)
 {
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
@@ -133,6 +144,41 @@ void renderVisibilityRaster(
         if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.terrainLayout, nvDevice))
             draw(state.terrainPipeline, bindingSet, config.cluster.terrainArgsBuffer);
     }
+
+    const u32 skinnedEntries = gpuCulling ? gpuCulling->GetSkinnedEntryCount() : 0u;
+    if (skinnedEntries > 0 && state.skinnedPipeline) {
+        auto* skinnedVsRefl = shaderLoader->GetCachedReflection("cluster_vis_skinned", ".vs");
+        nvrhi::IBuffer* preVB = gpuCulling->GetSkinnedPreVertexBuffer();
+        nvrhi::IBuffer* skinnedIB = gpuCulling->GetSkinnedPools().GetCombinedIndexBuffer();
+        nvrhi::IBuffer* entries = gpuCulling->GetSkinnedEntryBuffer();
+        if (skinnedVsRefl && preVB && skinnedIB && entries) {
+            auto paramsCB = cache.GetOrCreateVolatileCB("VisibilityRaster", "SkinnedVisParams", sizeof(SkinnedVisParams), device, 16);
+            SkinnedVisParams params = {};
+            params.entryBase = gpuCulling->GetClusterEntryCount();
+            cmdList->writeBuffer(paramsCB, &params, sizeof(params));
+
+            BindingSetBuilder bsb(*skinnedVsRefl, *atRefl, nvDevice, "VisibilityRaster.Skinned");
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+            bsb.ConstantBuffer("SkinnedVisParams", paramsCB);
+            bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+            bsb.BufferSRV("g_SkinnedEntries", entries);
+            bsb.BufferSRV("g_SkinnedVB", preVB);
+            bsb.BufferSRV("g_SkinnedIB", skinnedIB);
+            bsb.BufferSRV("g_DrawFades", gpuCulling->GetNeutralFadeBuffer());
+            if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinnedLayout, nvDevice)) {
+                nvrhi::GraphicsState gs;
+                gs.pipeline = state.skinnedPipeline;
+                gs.framebuffer = framebuffer;
+                gs.bindings = { bindingSet };
+                if (bindlessTable)
+                    gs.addBindingSet(bindlessTable);
+                gs.viewport.addViewport(viewport);
+                gs.viewport.addScissorRect(scissor);
+                cmdList->setGraphicsState(gs);
+                cmdList->draw(nvrhi::DrawArguments().setVertexCount(GPUCullingManager::SKINNED_ENTRY_INDICES).setInstanceCount(skinnedEntries));
+            }
+        }
+    }
 }
 
 }
@@ -152,21 +198,25 @@ bool EnsureVisibilityResources(fg::RenderDevice* device, VisibilityPassState& st
     }
 
     auto vsResult = shaderLoader->LoadVertexShader("cluster_vis", "main");
+    auto skinnedVsResult = shaderLoader->LoadVertexShader("cluster_vis_skinned", "main");
     auto atResult = shaderLoader->LoadPixelShader("cluster_vis_at", "main");
     auto fadeResult = shaderLoader->LoadPixelShader("cluster_vis_fade", "main");
-    if (!vsResult.handle || !vsResult.reflection || !atResult.handle || !atResult.reflection || !fadeResult.handle || !fadeResult.reflection) {
+    if (!vsResult.handle || !vsResult.reflection || !skinnedVsResult.handle || !skinnedVsResult.reflection
+        || !atResult.handle || !atResult.reflection || !fadeResult.handle || !fadeResult.reflection) {
         Msg("! [VisibilityRaster] Failed to load cluster visibility shaders");
         state.failed = true;
         return false;
     }
     state.vs = vsResult.handle;
+    state.skinnedVS = skinnedVsResult.handle;
     state.psAlphaTest = atResult.handle;
     state.psFade = fadeResult.handle;
 
     auto& cache = GetPassResourceCache();
     state.layout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_Cluster", *vsResult.reflection, *atResult.reflection, nvDevice);
     state.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_ClusterTerrain", *vsResult.reflection, *fadeResult.reflection, nvDevice);
-    if (!state.layout || !state.terrainLayout) {
+    state.skinnedLayout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_Skinned", *skinnedVsResult.reflection, *atResult.reflection, nvDevice);
+    if (!state.layout || !state.terrainLayout || !state.skinnedLayout) {
         Msg("! [VisibilityRaster] Failed to create binding layouts");
         state.failed = true;
         return false;
@@ -179,9 +229,9 @@ bool EnsureVisibilityResources(fg::RenderDevice* device, VisibilityPassState& st
     fbInfo.colorFormats.push_back(nvrhi::Format::R32_UINT);
     fbInfo.depthFormat = nvrhi::Format::D32;
 
-    auto makeDesc = [&](nvrhi::IShader* pixelShader, nvrhi::IBindingLayout* layout) {
+    auto makeDesc = [&](nvrhi::IShader* pixelShader, nvrhi::IBindingLayout* layout, nvrhi::IShader* vertexShader = nullptr) {
         nvrhi::GraphicsPipelineDesc desc;
-        desc.VS = state.vs;
+        desc.VS = vertexShader ? nvrhi::ShaderHandle(vertexShader) : state.vs;
         desc.PS = pixelShader;
         desc.inputLayout = nullptr;
         if (bindlessLayout)
@@ -199,7 +249,8 @@ bool EnsureVisibilityResources(fg::RenderDevice* device, VisibilityPassState& st
 
     state.pipeline = cache.GetOrCreatePipeline("VisibilityRaster_Cluster", makeDesc(state.psAlphaTest, state.layout), fbInfo, nvDevice);
     state.terrainPipeline = cache.GetOrCreatePipeline("VisibilityRaster_ClusterTerrain", makeDesc(state.psFade, state.terrainLayout), fbInfo, nvDevice);
-    if (!state.pipeline || !state.terrainPipeline) {
+    state.skinnedPipeline = cache.GetOrCreatePipeline("VisibilityRaster_Skinned", makeDesc(state.psAlphaTest, state.skinnedLayout, state.skinnedVS), fbInfo, nvDevice);
+    if (!state.pipeline || !state.terrainPipeline || !state.skinnedPipeline) {
         Msg("! [VisibilityRaster] Failed to create pipelines");
         state.failed = true;
         return false;
@@ -216,29 +267,35 @@ VisibilityPassOutput setupVisibilityPass(
     VirtualResourceHandle depthTarget,
     VirtualResourceHandle visIdTarget,
     VirtualResourceHandle drawArgsBuffer,
+    VirtualResourceHandle skinnedDrawArgs,
     const BindlessForwardConfig& bindlessConfig,
     MaterialCache* materialCache,
+    GPUCullingManager* gpuCulling,
     VisibilityPassState* state)
 {
     auto& passData = fg.addCallbackPass<VisibilityPassData>(
         "Visibility Raster",
-        [&, depthTarget, visIdTarget, drawArgsBuffer, bindlessConfig, materialCache, state](FrameGraph& builder, PassHandle passHandle, VisibilityPassData& data) {
+        [&, depthTarget, visIdTarget, drawArgsBuffer, skinnedDrawArgs, bindlessConfig, materialCache, gpuCulling, state](FrameGraph& builder, PassHandle passHandle, VisibilityPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.materialCache = materialCache;
+            data.gpuCulling = gpuCulling;
             data.state = state;
             data.bindlessConfig = bindlessConfig;
             data.depth = passBuilder.write(depthTarget, ResourceState::DepthStencilWrite);
             data.visId = passBuilder.write(visIdTarget, ResourceState::RenderTarget);
             if (drawArgsBuffer.is_valid())
                 data.drawArgsBuffer = passBuilder.read(drawArgsBuffer, ResourceState::IndirectArgument);
+            if (skinnedDrawArgs.is_valid())
+                data.skinnedDrawArgs = passBuilder.read(skinnedDrawArgs, ResourceState::IndirectArgument);
         },
         [](const VisibilityPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             auto* visRT = fg.GetPhysicalTexture(data.visId);
             if (!depthRT || !visRT || !ctx->GetCommandList())
                 return;
-            renderVisibilityRaster(ctx, data.device, depthRT, visRT, data.bindlessConfig, data.materialCache, *data.state);
+            renderVisibilityRaster(ctx, data.device, depthRT, visRT, data.bindlessConfig, data.materialCache,
+                data.skinnedDrawArgs.is_valid() ? data.gpuCulling : nullptr, *data.state);
         });
 
     VisibilityPassOutput out;
