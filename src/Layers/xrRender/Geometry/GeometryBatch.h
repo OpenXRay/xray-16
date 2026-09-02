@@ -24,6 +24,7 @@ struct GeometryBatch {
     u32 indexCount = 0;
     u32 startIndex = 0;
     s32 baseVertex = 0;
+    u32 vertexCount = 0;
     u32 vertexStride = 0;
 
     u32 materialID = 0;

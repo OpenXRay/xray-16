@@ -32,9 +32,7 @@ constexpr u32 kReadbackBinOffset = kReadbackResidOffset + 8;
 constexpr u32 kVSMDirtyListWords = kVSMStaticSlots + 3;
 constexpr u32 kReadbackDynOffset = kReadbackBinOffset + 8;
 constexpr u32 kReadbackWords = kReadbackDynOffset + 4;
-constexpr const char* kSkinPageShaders[kVSMSkinnedFormats] = {
-    nullptr, "vsm_skinned_page", "vsm_skinned_page_hq", "vsm_skinned_page_4w", "vsm_skinned_page_2w", "vsm_skinned_page_3w"
-};
+constexpr const char* kSkinPageShader = "vsm_skinned_page_pre";
 constexpr u32 kPairCaps[kVSMStreamCount] = { kVSMPairCapOpaque, kVSMPairCapTerrain, kVSMPairCapAT };
 constexpr const char* kStreamNames[kVSMStreamCount] = { "Opaque", "Terrain", "AT" };
 
@@ -989,47 +987,42 @@ bool EnsureSkinPagePipelines(fg::RenderDevice* device, VSMState& state, const Sk
     nvrhi::FramebufferInfoEx fbInfo;
     fbInfo.depthFormat = nvrhi::Format::D16;
     bool any = false;
-    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT && f < kVSMSkinnedFormats; ++f) {
-        const SkinningPipelineVariant* mdi = SkinnedVariant(sk, f, true);
-        if (!mdi || !mdi->inputLayout || !kSkinPageShaders[f])
-            continue;
-        if (!state.skinPageVS[f]) {
-            auto vsResult = shaderLoader->LoadVertexShader(kSkinPageShaders[f], "main");
-            if (!vsResult.handle || !vsResult.reflection) {
-                Msg("! [VSM] %s failed to load", kSkinPageShaders[f]);
-                continue;
-            }
-            state.skinPageVS[f] = vsResult.handle;
+    {
+        const SkinningPipelineVariant* mdi = SkinnedVariant(sk, SkinnedGeometryPools::FIRST_FORMAT, true);
+        if (!state.skinPageVS) {
+            auto vsResult = shaderLoader->LoadVertexShader(kSkinPageShader, "main");
+            if (vsResult.handle && vsResult.reflection)
+                state.skinPageVS = vsResult.handle;
+            else
+                Msg("! [VSM] %s failed to load", kSkinPageShader);
         }
-        auto* vsRefl = shaderLoader->GetCachedReflection(kSkinPageShaders[f], ".vs");
-        if (!vsRefl)
-            continue;
-        string64 layoutName;
-        xr_sprintf(layoutName, "VSMSkinPage_%u", f);
-        state.skinPageLayouts[f] = cache.GetOrCreateBindingLayoutFromReflection(layoutName, *vsRefl, *psRefl, nvDevice);
-        if (!state.skinPageLayouts[f])
-            continue;
-        nvrhi::GraphicsPipelineDesc desc;
-        desc.VS = state.skinPageVS[f];
-        desc.PS = state.pagePS;
-        desc.inputLayout = mdi->inputLayout;
-        if (bindlessLayout)
-            desc.bindingLayouts = { state.skinPageLayouts[f], bindlessLayout };
-        else
-            desc.bindingLayouts = { state.skinPageLayouts[f] };
-        desc.primType = nvrhi::PrimitiveType::TriangleList;
-        desc.renderState.depthStencilState.depthTestEnable = true;
-        desc.renderState.depthStencilState.depthWriteEnable = true;
-        desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
-        desc.renderState.rasterState.frontCounterClockwise = false;
-        desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-        desc.renderState.rasterState.depthBias = -int(roundf(state.rasterBias));
-        desc.renderState.rasterState.slopeScaledDepthBias = -state.rasterSlope;
-        desc.renderState.rasterState.depthBiasClamp = 0.0f;
-        string128 name;
-        xr_sprintf(name, "VSMSkinPage_%u_b%.2f_s%.2f", f, state.rasterBias, state.rasterSlope);
-        state.skinPagePipelines[f] = cache.GetOrCreatePipeline(name, desc, fbInfo, nvDevice);
-        any |= state.skinPagePipelines[f] != nullptr;
+        auto* vsRefl = shaderLoader->GetCachedReflection(kSkinPageShader, ".vs");
+        if (mdi && mdi->inputLayout && state.skinPageVS && vsRefl) {
+            state.skinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMSkinPage", *vsRefl, *psRefl, nvDevice);
+            if (state.skinPageLayout) {
+                nvrhi::GraphicsPipelineDesc desc;
+                desc.VS = state.skinPageVS;
+                desc.PS = state.pagePS;
+                desc.inputLayout = mdi->inputLayout;
+                if (bindlessLayout)
+                    desc.bindingLayouts = { state.skinPageLayout, bindlessLayout };
+                else
+                    desc.bindingLayouts = { state.skinPageLayout };
+                desc.primType = nvrhi::PrimitiveType::TriangleList;
+                desc.renderState.depthStencilState.depthTestEnable = true;
+                desc.renderState.depthStencilState.depthWriteEnable = true;
+                desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+                desc.renderState.rasterState.frontCounterClockwise = false;
+                desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+                desc.renderState.rasterState.depthBias = -int(roundf(state.rasterBias));
+                desc.renderState.rasterState.slopeScaledDepthBias = -state.rasterSlope;
+                desc.renderState.rasterState.depthBiasClamp = 0.0f;
+                string128 name;
+                xr_sprintf(name, "VSMSkinPage_b%.2f_s%.2f", state.rasterBias, state.rasterSlope);
+                state.skinPagePipeline = cache.GetOrCreatePipeline(name, desc, fbInfo, nvDevice);
+                any = state.skinPagePipeline != nullptr;
+            }
+        }
     }
     if (!any) {
         Msg("! [VSM] skinned page pipelines failed");
@@ -1169,9 +1162,8 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
         return;
     if (!EnsureSkinPagePipelines(data.device, state, *cfg.skinning))
         return;
-    nvrhi::IBuffer* boneBuffer = cfg.gpuCulling->GetGlobalBoneBuffer();
     nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("VSM", nvDevice);
-    if (!boneBuffer || !drawIndexBuffer)
+    if (!drawIndexBuffer)
         return;
 
     auto& cache = GetPassResourceCache();
@@ -1180,9 +1172,6 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
     if (!psRefl)
         return;
 
-    StaticGlobals globals = BuildStaticGlobals();
-    auto globalsCB = cache.GetOrCreateVolatileCB("VSM", "StaticGlobals", sizeof(StaticGlobals), data.device);
-    cmdList->writeBuffer(globalsCB, &globals, sizeof(globals));
     auto vsmCB = VsmParamsCB(data.device);
     auto* backend = data.device->GetBackend();
     nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
@@ -1198,32 +1187,23 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
 
     GPUCullingManager& gpuCulling = *cfg.gpuCulling;
     auto& pools = gpuCulling.GetSkinnedPools();
-    nvrhi::IBuffer* records = gpuCulling.GetSkinnedRecordsBuffer();
-    if (!records || !state.skinArgs || !state.skinPages)
+    nvrhi::IBuffer* preVB = gpuCulling.GetSkinnedPreVertexBuffer();
+    auto* vsRefl = shaderLoader->GetCachedReflection(kSkinPageShader, ".vs");
+    if (!preVB || !state.skinArgs || !state.skinPages || !state.skinPagePipeline || !state.skinPageLayout || !vsRefl)
+        return;
+    BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "VSM.SkinPage");
+    bsb.ConstantBuffer("VsmParams", vsmCB)
+       .BufferSRV("g_PageList", state.dynPageList)
+       .BufferSRV("g_CasterPages", state.skinPages);
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinPageLayout, nvDevice);
+    if (!bindingSet)
         return;
     for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT && f < kVSMSkinnedFormats; ++f) {
         const auto& bucket = gpuCulling.GetSkinnedBucket(f);
-        nvrhi::IGraphicsPipeline* pipeline = state.skinPagePipelines[f];
-        nvrhi::IBindingLayout* layout = state.skinPageLayouts[f];
-        nvrhi::IBuffer* poolVB = pools.GetVertexBuffer(f);
+        nvrhi::IGraphicsPipeline* pipeline = state.skinPagePipeline;
         nvrhi::IBuffer* poolIB = pools.GetIndexBuffer(f);
         const u32 drawCount = bucket.base < kVSMMaxSkinned ? std::min(bucket.casterCount, kVSMMaxSkinned - bucket.base) : 0u;
-        if (drawCount == 0 || !pipeline || !layout || !poolVB || !poolIB)
-            continue;
-        auto* vsRefl = shaderLoader->GetCachedReflection(kSkinPageShaders[f], ".vs");
-        if (!vsRefl)
-            continue;
-
-        BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "VSM.SkinPage");
-        bsb.ConstantBuffer("VsmParams", vsmCB)
-           .ConstantBuffer("static_globals", globalsCB)
-           .BufferSRV("g_BoneMatrices", boneBuffer)
-           .BufferSRV("g_SkinnedRecords", records)
-           .BufferSRV("g_PaintSplats", cfg.splatBuffer)
-           .BufferSRV("g_PageList", state.dynPageList)
-           .BufferSRV("g_CasterPages", state.skinPages);
-        auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDevice);
-        if (!bindingSet)
+        if (drawCount == 0 || !poolIB)
             continue;
 
         nvrhi::GraphicsState gs;
@@ -1232,7 +1212,7 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
         gs.bindings = { bindingSet };
         if (bindlessTable)
             gs.addBindingSet(bindlessTable);
-        gs.vertexBuffers = { { poolVB, 0, 0 }, { drawIndexBuffer, 1, 0 } };
+        gs.vertexBuffers = { { preVB, 0, 0 }, { drawIndexBuffer, 1, 0 } };
         gs.indexBuffer = { poolIB, nvrhi::Format::R16_UINT, 0 };
         gs.viewport.addViewport(viewport);
         gs.viewport.addScissorRect(scissor);
@@ -1525,8 +1505,7 @@ VSMOutput setupVSMPasses(
         state->pagePipeline = nullptr;
         state->pageATPipeline = nullptr;
         state->skinPipelinesReady = false;
-        for (auto& pipe : state->skinPagePipelines)
-            pipe = nullptr;
+        state->skinPagePipeline = nullptr;
         if (live)
             InvalidateVSMCache(*state);
     }
