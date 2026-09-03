@@ -290,7 +290,7 @@ VisibilityPassOutput setupVisibilityPass(
             if (drawArgsBuffer.is_valid())
                 data.drawArgsBuffer = passBuilder.read(drawArgsBuffer, ResourceState::IndirectArgument);
             if (skinnedDrawArgs.is_valid())
-                data.skinnedDrawArgs = passBuilder.read(skinnedDrawArgs, ResourceState::IndirectArgument);
+                data.skinnedDrawArgs = passBuilder.read(skinnedDrawArgs, ResourceState::ShaderResource);
         },
         [](const VisibilityPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             auto* depthRT = fg.GetPhysicalTexture(data.depth);

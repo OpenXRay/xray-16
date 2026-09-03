@@ -155,7 +155,7 @@ MaterialResolveOutput setupMaterialResolvePass(
             data.visId = passBuilder.read(visId, ResourceState::ShaderResource);
             data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
             if (skinnedDrawArgs.is_valid())
-                data.skinnedDrawArgs = passBuilder.read(skinnedDrawArgs, ResourceState::IndirectArgument);
+                data.skinnedDrawArgs = passBuilder.read(skinnedDrawArgs, ResourceState::ShaderResource);
             data.color = passBuilder.readWrite(color, ResourceState::UnorderedAccess);
             data.normal = passBuilder.readWrite(normal, ResourceState::UnorderedAccess);
             data.baseColor = passBuilder.readWrite(baseColor, ResourceState::UnorderedAccess);

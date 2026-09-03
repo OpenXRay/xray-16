@@ -57,13 +57,6 @@ struct alignas(16) ShaderParams {
     Fvector4 dt_params;
 };
 
-struct alignas(16) SkinnedMaterialCB {
-    u32 materialID;
-    u32 skeletonBoneOffset;
-    u32 splatOffset;
-    u32 splatCount;
-};
-
 struct alignas(16) StaticGlobals {
     Fmatrix m_V;
     Fmatrix m_P;

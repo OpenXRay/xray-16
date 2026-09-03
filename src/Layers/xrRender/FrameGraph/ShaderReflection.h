@@ -20,15 +20,6 @@ struct VulkanBindShifts {
     bool HasShifts() const { return shaderResource || sampler || constantBuffer || unorderedAccess; }
 };
 
-enum class RenderPhase {
-    Geometry,
-    Lighting,
-    Combine,
-    PostProcess,
-    Shadow,
-    Custom
-};
-
 struct VertexInputSignature {
     struct InputElement {
         shared_str semanticName;
@@ -42,7 +33,6 @@ struct VertexInputSignature {
 };
 
 struct ShaderRTBindings {
-    RenderPhase phase = RenderPhase::Custom;
 
     struct InputTexture {
         shared_str name;
@@ -177,23 +167,12 @@ struct ShaderRTBindings {
     };
     xr_vector<Sampler> samplers;
 
-    enum class RTSemantic {
-        Unknown,
-        Normal,
-        Albedo,
-        Material,
-        Position,
-        Emissive,
-        Accumulator
-    };
-
     struct OutputRT {
         u32 slot;
-        RTSemantic semantic;
         shared_str formatDesc;
 
-        OutputRT() : slot(0), semantic(RTSemantic::Unknown) {}
-        OutputRT(u32 s) : slot(s), semantic(RTSemantic::Unknown) {}
+        OutputRT() : slot(0) {}
+        OutputRT(u32 s) : slot(s) {}
     };
     xr_vector<OutputRT> outputRTs;
 
@@ -311,14 +290,8 @@ public:
     static const ShaderConstantBuffers& GetConstantBuffers(
         const ExtractedReflection* reflection);
 
-    static RenderPhase InferPhase(const ShaderRTBindings& bindings);
 
-    static xr_vector<const char*> GetPhaseRTNames(RenderPhase phase);
 
-    static ShaderRTBindings::RTSemantic InferRTSemantic(
-        u32 slot,
-        u32 componentMask,
-        RenderPhase phase);
 
 private:
     static VertexInputSignature AnalyzeVertexShader(slang::ShaderReflection* reflection);
@@ -330,7 +303,6 @@ private:
 
     static ConstantPersistence InferConstantPersistence(const char* cbName, UpdateFrequency frequency);
 
-    static bool MatchesPattern(const char* name, const char* pattern);
 };
 
 }

@@ -43,14 +43,6 @@ using fg::dxRender_Visual;
 using fg::SVS;
 using fg::SPS;
 
-enum class RenderPassType : u8 {
-    DepthPrepass,
-    ForwardColor,
-    HUD,
-    UI,
-    Default
-};
-
 
 enum class PSOType : u8 {
     Material = 0,
@@ -192,10 +184,6 @@ struct MaterialPSO {
 
     framegraph::VertexInputSignature vsInputSignature;
 
-    framegraph::RenderPhase GetPhase() const {
-        return rtBindings.phase;
-    }
-
     const xr_vector<framegraph::ShaderRTBindings::InputTexture>& GetInputTextures() const {
         return rtBindings.inputTextures;
     }
@@ -205,18 +193,6 @@ struct MaterialPSO {
     }
 
 
-    u32 GetSlotForSemantic(framegraph::ShaderRTBindings::RTSemantic semantic) const {
-        for (const auto& output : rtBindings.outputRTs) {
-            if (output.semantic == semantic) {
-                return output.slot;
-            }
-        }
-        return ~0u;
-    }
-
-    bool WritesSemantic(framegraph::ShaderRTBindings::RTSemantic semantic) const {
-        return GetSlotForSemantic(semantic) != ~0u;
-    }
 
     xr_vector<u32> GetOutputSlots() const {
         xr_vector<u32> slots;
@@ -249,16 +225,6 @@ public:
         framegraph::VolatileConstantBufferPool* vcbPool = nullptr
     );
     ~MaterialCache();
-
-    MaterialPSO* GetOrCreatePSO(
-        dxRender_Visual* visual,
-        const framegraph::DefaultOutputLayout& outputs,
-        const framegraph::FrameGraph& fg,
-        RenderPassType passType = RenderPassType::ForwardColor);
-
-    MaterialPSO* GetOrCreateDepthPSO(
-        dxRender_Visual* visual,
-        const framegraph::FrameGraph& fg);
 
     MaterialPSO* GetOrCreateUIPSO(
         IUIShader* uiShader,

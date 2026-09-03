@@ -708,7 +708,6 @@ ShaderRTBindings ShaderReflector::AnalyzeResourceBindings(
         }
     }
 
-    bindings.phase = InferPhase(bindings);
 
     if (resultVarLayout)
     {
@@ -752,7 +751,6 @@ ShaderRTBindings ShaderReflector::AnalyzeResourceBindings(
                 {
                     if (output.slot == slot)
                     {
-                        output.semantic = InferRTSemantic(slot, componentMask, bindings.phase);
                         break;
                     }
                 }
@@ -763,94 +761,6 @@ ShaderRTBindings ShaderReflector::AnalyzeResourceBindings(
     return bindings;
 }
 
-RenderPhase ShaderReflector::InferPhase(const ShaderRTBindings& bindings) {
-
-    bool readsGBuffer = false;
-    for (const auto& input : bindings.inputTextures) {
-        if (MatchesPattern(input.name.c_str(), "s_position") ||
-            MatchesPattern(input.name.c_str(), "s_pos") ||
-            MatchesPattern(input.name.c_str(), "s_normal") ||
-            MatchesPattern(input.name.c_str(), "s_diffuse") ||
-            MatchesPattern(input.name.c_str(), "s_image")) {
-            readsGBuffer = true;
-            break;
-        }
-    }
-
-    if (readsGBuffer) {
-        for (const auto& input : bindings.inputTextures) {
-            if (MatchesPattern(input.name.c_str(), "s_accumulator")) {
-                return RenderPhase::Combine;
-            }
-        }
-
-        return RenderPhase::Lighting;
-    }
-
-    if (bindings.outputRTs.size() > 1) {
-        return RenderPhase::Geometry;
-    }
-
-    if (bindings.hasDepthOutput && bindings.outputRTs.empty()) {
-        return RenderPhase::Shadow;
-    }
-
-    return RenderPhase::Custom;
-}
-
-bool ShaderReflector::MatchesPattern(const char* name, const char* pattern) {
-    shared_str nameLower = name;
-    shared_str patternLower = pattern;
-
-    xr_string nameStr = name;
-    xr_string patternStr = pattern;
-
-    std::transform(nameStr.begin(), nameStr.end(), nameStr.begin(), ::tolower);
-    std::transform(patternStr.begin(), patternStr.end(), patternStr.begin(), ::tolower);
-
-    return nameStr.find(patternStr) != xr_string::npos;
-}
-
-ShaderRTBindings::RTSemantic ShaderReflector::InferRTSemantic(
-    u32 slot,
-    u32 componentMask,
-    RenderPhase phase)
-{
-
-    if (phase == RenderPhase::Geometry) {
-        switch (slot) {
-            case 0:  return ShaderRTBindings::RTSemantic::Normal;
-            case 1:  return ShaderRTBindings::RTSemantic::Albedo;
-            case 2:  return ShaderRTBindings::RTSemantic::Material;
-            default: return ShaderRTBindings::RTSemantic::Unknown;
-        }
-    }
-
-    if (phase == RenderPhase::Lighting) {
-        return ShaderRTBindings::RTSemantic::Accumulator;
-    }
-
-    return ShaderRTBindings::RTSemantic::Unknown;
-}
-
-xr_vector<const char*> ShaderReflector::GetPhaseRTNames(RenderPhase phase) {
-    switch (phase) {
-        case RenderPhase::Geometry:
-            return {"rt_Position", "rt_Normal", "rt_Albedo"};
-
-        case RenderPhase::Lighting:
-            return {"rt_Accumulator"};
-
-        case RenderPhase::Combine:
-            return {"rt_Generic0", "rt_Generic1"};
-
-        case RenderPhase::Shadow:
-            return {"rt_ShadowMap"};
-
-        default:
-            return {};
-    }
-}
 
 static void FilterReflectionByUsage(ExtractedReflection& result, slang::IComponentType* program,
     const VulkanBindShifts& vkShifts)

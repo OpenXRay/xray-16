@@ -208,8 +208,6 @@ void ShaderCache::SerializeReflection(IWriter* writer, const ExtractedReflection
         writer->w_u16(constant.matrixStride);
     }
 
-    writer->w_u32(static_cast<u32>(reflection.rtBindings.phase));
-
     writer->w_u32(static_cast<u32>(reflection.rtBindings.inputTextures.size()));
     for (const auto& tex : reflection.rtBindings.inputTextures)
     {
@@ -246,7 +244,6 @@ void ShaderCache::SerializeReflection(IWriter* writer, const ExtractedReflection
     for (const auto& rt : reflection.rtBindings.outputRTs)
     {
         writer->w_u32(rt.slot);
-        writer->w_u32(static_cast<u32>(rt.semantic));
 
         u32 descLen = rt.formatDesc.size();
         writer->w_u32(descLen);
@@ -333,8 +330,6 @@ bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& ou
             constant.matrixStride = reader->r_u16();
         }
 
-        outReflection.rtBindings.phase = static_cast<RenderPhase>(reader->r_u32());
-
         u32 texCount = reader->r_u32();
         outReflection.rtBindings.inputTextures.resize(texCount);
         for (u32 i = 0; i < texCount; ++i)
@@ -395,7 +390,6 @@ bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& ou
             auto& rt = outReflection.rtBindings.outputRTs[i];
 
             rt.slot = reader->r_u32();
-            rt.semantic = static_cast<ShaderRTBindings::RTSemantic>(reader->r_u32());
 
             u32 descLen = reader->r_u32();
             if (descLen > 0)
