@@ -30,8 +30,7 @@ constexpr u32 kReadbackResidOffset = 4 + kVSMPageCount;
 constexpr u32 kReadbackBinOffset = kReadbackResidOffset + 8;
 constexpr u32 kVSMDirtyListWords = kVSMStaticSlots + 3;
 constexpr u32 kReadbackDynOffset = kReadbackBinOffset + 8;
-constexpr u32 kReadbackWords = kReadbackDynOffset + 4;
-constexpr const char* kSkinPageShader = "vsm_skinned_page_pre";
+constexpr u32 kReadbackWords = kReadbackDynOffset + 16;
 constexpr u32 kPairCaps[kVSMStreamCount] = { kVSMPairCapOpaque, kVSMPairCapTerrain, kVSMPairCapAT };
 constexpr const char* kStreamNames[kVSMStreamCount] = { "Opaque", "Terrain", "AT" };
 
@@ -73,10 +72,20 @@ struct VsmArgsParams {
     u32 pad;
 };
 
-struct VsmSkinBinParams {
-    u32 casterCount;
-    u32 cap;
-    u32 maxCasters;
+struct VsmDynBinParams {
+    u32 entryBase;
+    u32 entryCount;
+    u32 includeAT;
+    u32 capOpaque;
+    u32 capAT;
+    u32 statsBase;
+    u32 pad[2];
+};
+
+struct VsmDynArgsParams {
+    u32 capOpaque;
+    u32 capAT;
+    u32 capSkinned;
     u32 pad;
 };
 
@@ -174,7 +183,7 @@ struct VSMDynAllocData {
     xray::profiler::GPUProfiler* gpuProfiler;
 };
 
-struct VSMSkinBinData {
+struct VSMDynBinData {
     VirtualResourceHandle dynTable;
     VirtualResourceHandle order;
     VirtualResourceHandle dynUsed;
@@ -215,7 +224,7 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
 {
     if (state.markPipeline && state.residPipeline && state.debugPipeline && state.clearPipeline
         && state.binPipeline && state.argsPipeline && state.pagePipeline && state.pageATPipeline && state.resolvePipeline
-        && state.allocPipeline && state.skinBinPipeline)
+        && state.allocPipeline && state.dynBinPipeline && state.dynArgsPipeline)
         return true;
     if (state.pipelinesFailed)
         return false;
@@ -242,8 +251,10 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
         return false;
     }
     auto allocResult = shaderLoader->LoadComputeShader("vsm_alloc");
-    auto skinBinResult = shaderLoader->LoadComputeShader("vsm_skinned_bin");
-    if (!allocResult.handle || !allocResult.reflection || !skinBinResult.handle || !skinBinResult.reflection) {
+    auto dynBinResult = shaderLoader->LoadComputeShader("vsm_bin_dyn");
+    auto dynArgsResult = shaderLoader->LoadComputeShader("vsm_dyn_draw_args");
+    if (!allocResult.handle || !allocResult.reflection || !dynBinResult.handle || !dynBinResult.reflection
+        || !dynArgsResult.handle || !dynArgsResult.reflection) {
         Msg("! [VSM] dynamic atlas shaders failed to load");
         state.pipelinesFailed = true;
         return false;
@@ -272,10 +283,11 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     state.pageATLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMPageAT", *pageVsResult.reflection, *pageATPsResult.reflection, nvDevice);
     state.resolveLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMResolve", *resolveResult.reflection, nvDevice);
     state.allocLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMAlloc", *allocResult.reflection, nvDevice);
-    state.skinBinLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMSkinBin", *skinBinResult.reflection, nvDevice);
+    state.dynBinLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynBin", *dynBinResult.reflection, nvDevice);
+    state.dynArgsLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynArgs", *dynArgsResult.reflection, nvDevice);
     if (!state.markLayout || !state.residLayout || !state.debugLayout || !state.clearLayout
         || !state.binLayout || !state.argsLayout || !state.pageLayout || !state.pageATLayout || !state.resolveLayout
-        || !state.allocLayout || !state.skinBinLayout) {
+        || !state.allocLayout || !state.dynBinLayout || !state.dynArgsLayout) {
         state.pipelinesFailed = true;
         return false;
     }
@@ -330,10 +342,15 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     allocDesc.bindingLayouts = { state.allocLayout };
     state.allocPipeline = cache.GetOrCreateComputePipeline("VSMAlloc", allocDesc, nvDevice);
 
-    nvrhi::ComputePipelineDesc skinBinDesc;
-    skinBinDesc.CS = skinBinResult.handle;
-    skinBinDesc.bindingLayouts = { state.skinBinLayout };
-    state.skinBinPipeline = cache.GetOrCreateComputePipeline("VSMSkinBin", skinBinDesc, nvDevice);
+    nvrhi::ComputePipelineDesc dynBinDesc;
+    dynBinDesc.CS = dynBinResult.handle;
+    dynBinDesc.bindingLayouts = { state.dynBinLayout };
+    state.dynBinPipeline = cache.GetOrCreateComputePipeline("VSMDynBin", dynBinDesc, nvDevice);
+
+    nvrhi::ComputePipelineDesc dynArgsDesc;
+    dynArgsDesc.CS = dynArgsResult.handle;
+    dynArgsDesc.bindingLayouts = { state.dynArgsLayout };
+    state.dynArgsPipeline = cache.GetOrCreateComputePipeline("VSMDynArgs", dynArgsDesc, nvDevice);
 
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
@@ -365,7 +382,7 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
 
     if (!state.markPipeline || !state.residPipeline || !state.debugPipeline || !state.clearPipeline
         || !state.binPipeline || !state.argsPipeline || !state.pagePipeline || !state.pageATPipeline || !state.resolvePipeline
-        || !state.allocPipeline || !state.skinBinPipeline) {
+        || !state.allocPipeline || !state.dynBinPipeline || !state.dynArgsPipeline) {
         Msg("! [VSM] pipeline creation failed");
         state.pipelinesFailed = true;
         return false;
@@ -391,18 +408,30 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
     state.dynPageList = MakeUAVBuffer(nvDevice, "VSM_DynPageList", u64(kVSMMaxPhys) * sizeof(u32) * 4, sizeof(u32) * 4, false);
     state.dynAllocInfo = MakeUAVBuffer(nvDevice, "VSM_DynAllocInfo", sizeof(u32) * 8, sizeof(u32), false);
     state.dynUsed = MakeUAVBuffer(nvDevice, "VSM_DynUsed", u64(kVSMMaxPhys) * sizeof(u32), sizeof(u32), false);
-    state.skinStats = MakeUAVBuffer(nvDevice, "VSM_SkinStats", sizeof(u32) * 4, sizeof(u32), false);
-    state.skinPages = MakeUAVBuffer(nvDevice, "VSM_SkinPages", u64(kVSMMaxSkinned) * kVSMSkinnedCap * sizeof(u32), sizeof(u32), false);
+    state.dynStats = MakeUAVBuffer(nvDevice, "VSM_DynStats", sizeof(u32) * 16, sizeof(u32), false);
     {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "VSM_SkinArgs";
-        desc.byteSize = u64(kVSMMaxSkinned) * sizeof(u32) * 5;
-        desc.canHaveUAVs = true;
-        desc.canHaveRawViews = true;
-        desc.isDrawIndirectArgs = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
-        state.skinArgs = nvDevice->createBuffer(desc);
+        static const u32 kDynCaps[kVSMDynStreamCount] = { kVSMDynPairCapOpaque, kVSMDynPairCapAT, kVSMDynPairCapSkinned };
+        static const char* kDynNames[kVSMDynStreamCount] = { "Opaque", "AT", "Skinned" };
+        for (u32 i = 0; i < kVSMDynStreamCount; ++i) {
+            string64 nm;
+            xr_sprintf(nm, "VSM_DynPairs%s", kDynNames[i]);
+            state.dynPairs[i] = MakeUAVBuffer(nvDevice, nm, u64(kDynCaps[i]) * sizeof(u32) * 2, sizeof(u32) * 2, false);
+            nvrhi::BufferDesc desc;
+            xr_sprintf(nm, "VSM_DynArgs%s", kDynNames[i]);
+            desc.debugName = nm;
+            desc.byteSize = sizeof(u32) * 4;
+            desc.canHaveUAVs = true;
+            desc.canHaveRawViews = true;
+            desc.isDrawIndirectArgs = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = true;
+            state.dynArgs[i] = nvDevice->createBuffer(desc);
+            if (!state.dynPairs[i] || !state.dynArgs[i]) {
+                Msg("! [VSM] dynamic pair arena creation failed");
+                state.needed = nullptr;
+                return false;
+            }
+        }
     }
     {
         nvrhi::BufferDesc desc;
@@ -488,7 +517,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
 
     if (!state.needed || !state.counter || !state.pageTable || !state.pageList || !state.physTile
         || !state.slotDirty || !state.dirtyList || !state.drawClear || !state.slotEpoch || !state.atlas || !state.binStats
-        || !state.dynPageTable || !state.dynPageList || !state.dynAllocInfo || !state.dynUsed || !state.dynAtlas || !state.skinStats) {
+        || !state.dynPageTable || !state.dynPageList || !state.dynAllocInfo || !state.dynUsed || !state.dynAtlas || !state.dynStats) {
         Msg("! [VSM] resource creation failed");
         state.needed = nullptr;
         state.atlas = nullptr;
@@ -557,9 +586,9 @@ void ProcessReadback(nvrhi::IDevice* nvDevice, VSMState& state)
     state.binLodCulled = bin[3];
     state.binDrops = bin[7];
     const u32* dyn = words + kReadbackDynOffset;
-    state.dynCasters = dyn[0];
-    state.dynInstances = dyn[1];
-    state.dynMaxPages = dyn[2];
+    state.dynCasters = dyn[0] + dyn[8];
+    state.dynInstances = dyn[1] + dyn[9];
+    state.dynMaxPages = std::max(dyn[2], dyn[10]);
     nvDevice->unmapBuffer(oldest);
 }
 
@@ -967,69 +996,81 @@ void ExecuteAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMAtlasDa
         nvrhi::Rect(rtDesc.width, rtDesc.height));
 }
 
-bool EnsureSkinPagePipelines(fg::RenderDevice* device, VSMState& state, GPUCullingManager& gpuCulling)
+bool EnsureDynPagePipelines(fg::RenderDevice* device, VSMState& state)
 {
-    if (state.skinPipelinesReady)
+    if (state.dynPipelinesReady)
         return true;
-    if (state.skinPipelinesFailed || !state.pagePS || !gpuCulling.EnsurePreskinnedDrawResources())
+    if (state.dynPipelinesFailed || !state.pagePS || !state.pageATPS)
         return false;
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     if (!nvDevice || !shaderLoader)
         return false;
     auto& cache = GetPassResourceCache();
+    if (!state.dynPageVS) {
+        auto vsResult = shaderLoader->LoadVertexShader("vsm_page_pull_dyn", "main");
+        if (vsResult.handle && vsResult.reflection)
+            state.dynPageVS = vsResult.handle;
+    }
+    if (!state.dynSkinPageVS) {
+        auto vsResult = shaderLoader->LoadVertexShader("vsm_page_pull_skinned", "main");
+        if (vsResult.handle && vsResult.reflection)
+            state.dynSkinPageVS = vsResult.handle;
+    }
+    auto* dynVsRefl = shaderLoader->GetCachedReflection("vsm_page_pull_dyn", ".vs");
+    auto* skinVsRefl = shaderLoader->GetCachedReflection("vsm_page_pull_skinned", ".vs");
     auto* psRefl = shaderLoader->GetCachedReflection("vsm_page", ".ps");
-    if (!psRefl)
+    auto* atRefl = shaderLoader->GetCachedReflection("vsm_page_at", ".ps");
+    if (!state.dynPageVS || !state.dynSkinPageVS || !dynVsRefl || !skinVsRefl || !psRefl || !atRefl) {
+        Msg("! [VSM] dynamic page shaders failed to load");
+        state.dynPipelinesFailed = true;
         return false;
+    }
+    state.dynPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynPage", *dynVsRefl, *psRefl, nvDevice);
+    state.dynPageATLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynPageAT", *dynVsRefl, *atRefl, nvDevice);
+    state.dynSkinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynSkinPage", *skinVsRefl, *psRefl, nvDevice);
+    if (!state.dynPageLayout || !state.dynPageATLayout || !state.dynSkinPageLayout) {
+        state.dynPipelinesFailed = true;
+        return false;
+    }
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
     nvrhi::FramebufferInfoEx fbInfo;
     fbInfo.depthFormat = nvrhi::Format::D16;
-    bool any = false;
-    {
-        nvrhi::IInputLayout* preskinnedLayout = gpuCulling.GetPreskinnedInputLayout();
-        if (!state.skinPageVS) {
-            auto vsResult = shaderLoader->LoadVertexShader(kSkinPageShader, "main");
-            if (vsResult.handle && vsResult.reflection)
-                state.skinPageVS = vsResult.handle;
-            else
-                Msg("! [VSM] %s failed to load", kSkinPageShader);
-        }
-        auto* vsRefl = shaderLoader->GetCachedReflection(kSkinPageShader, ".vs");
-        if (preskinnedLayout && state.skinPageVS && vsRefl) {
-            state.skinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMSkinPage", *vsRefl, *psRefl, nvDevice);
-            if (state.skinPageLayout) {
-                nvrhi::GraphicsPipelineDesc desc;
-                desc.VS = state.skinPageVS;
-                desc.PS = state.pagePS;
-                desc.inputLayout = preskinnedLayout;
-                if (bindlessLayout)
-                    desc.bindingLayouts = { state.skinPageLayout, bindlessLayout };
-                else
-                    desc.bindingLayouts = { state.skinPageLayout };
-                desc.primType = nvrhi::PrimitiveType::TriangleList;
-                desc.renderState.depthStencilState.depthTestEnable = true;
-                desc.renderState.depthStencilState.depthWriteEnable = true;
-                desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
-                desc.renderState.rasterState.frontCounterClockwise = false;
-                desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-                desc.renderState.rasterState.depthBias = -int(roundf(state.rasterBias));
-                desc.renderState.rasterState.slopeScaledDepthBias = -state.rasterSlope;
-                desc.renderState.rasterState.depthBiasClamp = 0.0f;
-                string128 name;
-                xr_sprintf(name, "VSMSkinPage_b%.2f_s%.2f", state.rasterBias, state.rasterSlope);
-                state.skinPagePipeline = cache.GetOrCreatePipeline(name, desc, fbInfo, nvDevice);
-                any = state.skinPagePipeline != nullptr;
-            }
-        }
-    }
-    if (!any) {
-        Msg("! [VSM] skinned page pipelines failed");
-        state.skinPipelinesFailed = true;
+    auto makeDesc = [&](nvrhi::IShader* vs, nvrhi::IShader* ps, nvrhi::IBindingLayout* layout, bool withBindless) {
+        nvrhi::GraphicsPipelineDesc desc;
+        desc.VS = vs;
+        desc.PS = ps;
+        desc.inputLayout = nullptr;
+        if (withBindless && bindlessLayout)
+            desc.bindingLayouts = { layout, bindlessLayout };
+        else
+            desc.bindingLayouts = { layout };
+        desc.primType = nvrhi::PrimitiveType::TriangleList;
+        desc.renderState.depthStencilState.depthTestEnable = true;
+        desc.renderState.depthStencilState.depthWriteEnable = true;
+        desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+        desc.renderState.rasterState.frontCounterClockwise = false;
+        desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+        desc.renderState.rasterState.depthBias = -int(roundf(state.rasterBias));
+        desc.renderState.rasterState.slopeScaledDepthBias = -state.rasterSlope;
+        desc.renderState.rasterState.depthBiasClamp = 0.0f;
+        return desc;
+    };
+    string128 name;
+    xr_sprintf(name, "VSMDynPage_b%.2f_s%.2f", state.rasterBias, state.rasterSlope);
+    state.dynPagePipeline = cache.GetOrCreatePipeline(name, makeDesc(state.dynPageVS, state.pagePS, state.dynPageLayout, false), fbInfo, nvDevice);
+    xr_sprintf(name, "VSMDynPageAT_b%.2f_s%.2f", state.rasterBias, state.rasterSlope);
+    state.dynPageATPipeline = cache.GetOrCreatePipeline(name, makeDesc(state.dynPageVS, state.pageATPS, state.dynPageATLayout, true), fbInfo, nvDevice);
+    xr_sprintf(name, "VSMDynSkinPage_b%.2f_s%.2f", state.rasterBias, state.rasterSlope);
+    state.dynSkinPagePipeline = cache.GetOrCreatePipeline(name, makeDesc(state.dynSkinPageVS, state.pagePS, state.dynSkinPageLayout, false), fbInfo, nvDevice);
+    if (!state.dynPagePipeline || !state.dynPageATPipeline || !state.dynSkinPagePipeline) {
+        Msg("! [VSM] dynamic page pipelines failed");
+        state.dynPipelinesFailed = true;
         return false;
     }
-    state.skinPipelinesReady = true;
-    Msg("* [VSM] skinned page pipelines initialized");
+    state.dynPipelinesReady = true;
+    Msg("* [VSM] dynamic page pipelines initialized");
     return true;
 }
 
@@ -1075,71 +1116,100 @@ void ExecuteDynAlloc(fg::RenderContext* ctx, const VSMDynAllocData& data)
     cmdList->setBufferState(state.dynPageList, nvrhi::ResourceStates::ShaderResource);
 }
 
-void ExecuteSkinBin(fg::RenderContext* ctx, const VSMSkinBinData& data)
+void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
 {
     VSMState& state = *data.state;
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
-    if (!cmdList || !nvDevice || !state.skinBinPipeline || !data.config.gpuCulling)
+    if (!cmdList || !nvDevice || !state.dynBinPipeline || !state.dynArgsPipeline || !data.config.gpuCulling)
         return;
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
-    auto* refl = shaderLoader->GetCachedReflection("vsm_skinned_bin", ".cs");
-    if (!refl)
+    auto* binRefl = shaderLoader->GetCachedReflection("vsm_bin_dyn", ".cs");
+    auto* argsRefl = shaderLoader->GetCachedReflection("vsm_dyn_draw_args", ".cs");
+    if (!binRefl || !argsRefl)
         return;
 
-    cmdList->setBufferState(state.skinStats, nvrhi::ResourceStates::CopyDest);
+    cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::CopyDest);
     cmdList->setBufferState(state.dynUsed, nvrhi::ResourceStates::CopyDest);
-    cmdList->clearBufferUInt(state.skinStats, 0);
+    cmdList->clearBufferUInt(state.dynStats, 0);
     cmdList->clearBufferUInt(state.dynUsed, 0);
-    cmdList->setBufferState(state.skinStats, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dynUsed, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::ShaderResource);
+    for (u32 i = 0; i < kVSMDynStreamCount; ++i)
+        cmdList->setBufferState(state.dynPairs[i], nvrhi::ResourceStates::UnorderedAccess);
 
     auto vsmCB = VsmParamsCB(data.device);
     GPUCullingManager& gpuCulling = *data.config.gpuCulling;
-    u32 pooledTotal = 0;
-    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT && f < kVSMSkinnedFormats; ++f)
-        pooledTotal = std::max(pooledTotal, gpuCulling.GetSkinnedBucket(f).base + gpuCulling.GetSkinnedBucket(f).casterCount);
-    const u32 casters = std::min(pooledTotal, kVSMMaxSkinned);
-    nvrhi::IBuffer* records = gpuCulling.GetSkinnedRecordsBuffer();
-    nvrhi::IBuffer* args = gpuCulling.GetSkinnedArgsBuffer();
-    if (casters > 0 && records && args && state.skinPages && state.skinArgs) {
-        VsmSkinBinParams bp = {};
-        bp.casterCount = casters;
-        bp.cap = kVSMSkinnedCap;
-        bp.maxCasters = kVSMMaxSkinned;
-        auto binCB = cache.GetOrCreateVolatileCB("VSM", "SkinBinParams", sizeof(VsmSkinBinParams), data.device);
+    const VSMDynConfig& cfg = data.config;
+    auto dispatchSource = [&](nvrhi::IBuffer* entries, u32 entryBase, u32 entryCount, u32 statsBase,
+                              nvrhi::IBuffer* pairsOpaque, nvrhi::IBuffer* pairsAT, u32 capOpaque, u32 capAT, const char* label) {
+        if (!entries || entryCount == 0)
+            return;
+        VsmDynBinParams bp = {};
+        bp.entryBase = entryBase;
+        bp.entryCount = entryCount;
+        bp.includeAT = ps_r_vsm_at ? 1u : 0u;
+        bp.capOpaque = capOpaque;
+        bp.capAT = capAT;
+        bp.statsBase = statsBase;
+        auto binCB = cache.GetOrCreateVolatileCB("VSM", "DynBinParams", sizeof(VsmDynBinParams), data.device, 4);
         cmdList->writeBuffer(binCB, &bp, sizeof(bp));
+        cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
 
-        cmdList->setBufferState(records, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(args, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(state.skinPages, nvrhi::ResourceStates::UnorderedAccess);
-        cmdList->setBufferState(state.skinArgs, nvrhi::ResourceStates::UnorderedAccess);
-
-        BindingSetBuilder bsb(*refl, nvDevice, "VSM.SkinBin");
+        BindingSetBuilder bsb(*binRefl, nvDevice, label);
         bsb.ConstantBuffer("VsmParams", vsmCB)
-           .ConstantBuffer("VsmSkinBinParams", binCB)
-           .BufferSRV("g_Records", records)
-           .BufferSRV("g_InputArgs", args)
+           .ConstantBuffer("VsmDynBinParams", binCB)
+           .BufferSRV("g_Entries", entries)
            .BufferSRV("g_DynPageTable", state.dynPageTable)
-           .BufferUAV("g_CasterPages", state.skinPages)
-           .BufferUAV("g_Args", state.skinArgs)
-           .BufferUAV("g_Stats", state.skinStats)
+           .BufferUAV("g_Stats", state.dynStats)
+           .BufferUAV("g_PairsOpaque", pairsOpaque)
+           .BufferUAV("g_PairsAT", pairsAT)
            .BufferUAV("g_DynUsed", state.dynUsed);
-        auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinBinLayout, nvDevice);
-        if (bindingSet) {
-            nvrhi::ComputeState cs;
-            cs.pipeline = state.skinBinPipeline;
-            cs.bindings = { bindingSet };
-            cmdList->setComputeState(cs);
-            cmdList->dispatch((casters + 63) / 64, 1, 1);
-        }
+        auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.dynBinLayout, nvDevice);
+        if (!bindingSet)
+            return;
+        nvrhi::ComputeState cs;
+        cs.pipeline = state.dynBinPipeline;
+        cs.bindings = { bindingSet };
+        cmdList->setComputeState(cs);
+        cmdList->dispatch((entryCount + 63) / 64, 1, 1);
+    };
+    dispatchSource(cfg.entryBuffer, gpuCulling.GetClusterEntryCount(), gpuCulling.GetDynamicClusterEntryCount(), 0u,
+        state.dynPairs[0], state.dynPairs[1], kVSMDynPairCapOpaque, kVSMDynPairCapAT, "VSM.DynBin");
+    dispatchSource(gpuCulling.GetSkinnedEntryBuffer(), 0u, gpuCulling.GetSkinnedEntryCount(), 8u,
+        state.dynPairs[2], state.dynPairs[1], kVSMDynPairCapSkinned, 0u, "VSM.DynBinSkinned");
 
-        cmdList->setBufferState(state.skinArgs, nvrhi::ResourceStates::IndirectArgument);
-        cmdList->setBufferState(state.skinPages, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(args, nvrhi::ResourceStates::IndirectArgument);
+    VsmDynArgsParams ap = {};
+    ap.capOpaque = kVSMDynPairCapOpaque;
+    ap.capAT = kVSMDynPairCapAT;
+    ap.capSkinned = kVSMDynPairCapSkinned;
+    auto argsCB = cache.GetOrCreateVolatileCB("VSM", "DynArgsParams", sizeof(VsmDynArgsParams), data.device);
+    cmdList->writeBuffer(argsCB, &ap, sizeof(ap));
+    for (u32 i = 0; i < kVSMDynStreamCount; ++i)
+        cmdList->setBufferState(state.dynArgs[i], nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::ShaderResource);
+
+    BindingSetBuilder abs(*argsRefl, nvDevice, "VSM.DynArgs");
+    abs.ConstantBuffer("VsmDynArgsParams", argsCB)
+       .BufferSRV("g_Stats", state.dynStats)
+       .BufferUAV("g_ArgsOpaque", state.dynArgs[0])
+       .BufferUAV("g_ArgsAT", state.dynArgs[1])
+       .BufferUAV("g_ArgsSkinned", state.dynArgs[2]);
+    auto argsSet = cache.GetOrCreateBindingSet(abs.Build(), state.dynArgsLayout, nvDevice);
+    if (argsSet) {
+        nvrhi::ComputeState cs;
+        cs.pipeline = state.dynArgsPipeline;
+        cs.bindings = { argsSet };
+        cmdList->setComputeState(cs);
+        cmdList->dispatch(1, 1, 1);
+    }
+
+    for (u32 i = 0; i < kVSMDynStreamCount; ++i) {
+        cmdList->setBufferState(state.dynArgs[i], nvrhi::ResourceStates::IndirectArgument);
+        cmdList->setBufferState(state.dynPairs[i], nvrhi::ResourceStates::ShaderResource);
     }
     cmdList->setBufferState(state.dynUsed, nvrhi::ResourceStates::ShaderResource);
 }
@@ -1159,21 +1229,22 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
     const VSMDynConfig& cfg = data.config;
     if (!cfg.gpuCulling)
         return;
-    if (!EnsureSkinPagePipelines(data.device, state, *cfg.gpuCulling))
-        return;
-    nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("VSM", nvDevice);
-    if (!drawIndexBuffer)
+    if (!EnsureDynPagePipelines(data.device, state))
         return;
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* dynVsRefl = shaderLoader->GetCachedReflection("vsm_page_pull_dyn", ".vs");
+    auto* skinVsRefl = shaderLoader->GetCachedReflection("vsm_page_pull_skinned", ".vs");
     auto* psRefl = shaderLoader->GetCachedReflection("vsm_page", ".ps");
-    if (!psRefl)
+    auto* atRefl = shaderLoader->GetCachedReflection("vsm_page_at", ".ps");
+    if (!dynVsRefl || !skinVsRefl || !psRefl || !atRefl)
         return;
 
     auto vsmCB = VsmParamsCB(data.device);
     auto* backend = data.device->GetBackend();
     nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
+    auto& matBuffer = bindless::MaterialBuffer::Instance();
 
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.setDepthAttachment(atlas);
@@ -1184,41 +1255,60 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
     const nvrhi::Viewport viewport(0.0f, float(rtDesc.width), 0.0f, float(rtDesc.height), 0.0f, 1.0f);
     const nvrhi::Rect scissor(rtDesc.width, rtDesc.height);
 
-    GPUCullingManager& gpuCulling = *cfg.gpuCulling;
-    auto& pools = gpuCulling.GetSkinnedPools();
-    nvrhi::IBuffer* preVB = gpuCulling.GetSkinnedPreVertexBuffer();
-    auto* vsRefl = shaderLoader->GetCachedReflection(kSkinPageShader, ".vs");
-    if (!preVB || !state.skinArgs || !state.skinPages || !state.skinPagePipeline || !state.skinPageLayout || !vsRefl)
-        return;
-    BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "VSM.SkinPage");
-    bsb.ConstantBuffer("VsmParams", vsmCB)
-       .BufferSRV("g_PageList", state.dynPageList)
-       .BufferSRV("g_CasterPages", state.skinPages);
-    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinPageLayout, nvDevice);
-    if (!bindingSet)
-        return;
-    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT && f < kVSMSkinnedFormats; ++f) {
-        const auto& bucket = gpuCulling.GetSkinnedBucket(f);
-        nvrhi::IGraphicsPipeline* pipeline = state.skinPagePipeline;
-        nvrhi::IBuffer* poolIB = pools.GetIndexBuffer(f);
-        const u32 drawCount = bucket.base < kVSMMaxSkinned ? std::min(bucket.casterCount, kVSMMaxSkinned - bucket.base) : 0u;
-        if (drawCount == 0 || !poolIB)
-            continue;
-
+    auto draw = [&](nvrhi::IGraphicsPipeline* pipeline, nvrhi::IBindingSet* bindingSet, nvrhi::IBuffer* args, bool withBindless) {
         nvrhi::GraphicsState gs;
         gs.pipeline = pipeline;
         gs.framebuffer = framebuffer;
         gs.bindings = { bindingSet };
-        if (bindlessTable)
+        if (withBindless && bindlessTable)
             gs.addBindingSet(bindlessTable);
-        gs.vertexBuffers = { { preVB, 0, 0 }, { drawIndexBuffer, 1, 0 } };
-        gs.indexBuffer = { poolIB, nvrhi::Format::R16_UINT, 0 };
+        gs.indirectParams = args;
         gs.viewport.addViewport(viewport);
         gs.viewport.addScissorRect(scissor);
-        gs.indirectParams = state.skinArgs;
         cmdList->setGraphicsState(gs);
-        cmdList->drawIndexedIndirect(bucket.base * u32(sizeof(IndirectDrawArgs)), drawCount);
+        cmdList->drawIndirect(0, 1);
         state.dynRendered = true;
+    };
+
+    GPUCullingManager& gpuCulling = *cfg.gpuCulling;
+    if (gpuCulling.GetDynamicClusterEntryCount() > 0 && cfg.entryBuffer && cfg.dynamicInstanceBuffer && cfg.megaVertexBuffer && cfg.megaIndexBuffer) {
+        BindingSetBuilder bsb(*dynVsRefl, *psRefl, nvDevice, "VSM.DynPage");
+        bsb.ConstantBuffer("VsmParams", vsmCB)
+           .BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer)
+           .BufferSRV("g_Pairs", state.dynPairs[0])
+           .BufferSRV("g_Entries", cfg.entryBuffer)
+           .BufferSRV("g_PageList", state.dynPageList)
+           .BufferSRV("g_MegaVB", cfg.megaVertexBuffer)
+           .BufferSRV("g_MegaIB", cfg.megaIndexBuffer);
+        if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.dynPageLayout, nvDevice))
+            draw(state.dynPagePipeline, bindingSet, state.dynArgs[0], false);
+
+        BindingSetBuilder atBsb(*dynVsRefl, *atRefl, nvDevice, "VSM.DynPageAT");
+        atBsb.ConstantBuffer("VsmParams", vsmCB)
+             .BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer)
+             .BufferSRV("g_Pairs", state.dynPairs[1])
+             .BufferSRV("g_Entries", cfg.entryBuffer)
+             .BufferSRV("g_PageList", state.dynPageList)
+             .BufferSRV("g_MegaVB", cfg.megaVertexBuffer)
+             .BufferSRV("g_MegaIB", cfg.megaIndexBuffer)
+             .BufferSRV("g_Materials", matBuffer.GetBuffer());
+        if (auto bindingSet = cache.GetOrCreateBindingSet(atBsb.Build(), state.dynPageATLayout, nvDevice))
+            draw(state.dynPageATPipeline, bindingSet, state.dynArgs[1], true);
+    }
+
+    nvrhi::IBuffer* skinnedEntries = gpuCulling.GetSkinnedEntryBuffer();
+    nvrhi::IBuffer* preVB = gpuCulling.GetSkinnedPreVertexBuffer();
+    nvrhi::IBuffer* skinnedIB = gpuCulling.GetSkinnedPools().GetCombinedIndexBuffer();
+    if (gpuCulling.GetSkinnedEntryCount() > 0 && skinnedEntries && preVB && skinnedIB) {
+        BindingSetBuilder bsb(*skinVsRefl, *psRefl, nvDevice, "VSM.DynSkinPage");
+        bsb.ConstantBuffer("VsmParams", vsmCB)
+           .BufferSRV("g_Pairs", state.dynPairs[2])
+           .BufferSRV("g_Entries", skinnedEntries)
+           .BufferSRV("g_PageList", state.dynPageList)
+           .BufferSRV("g_SkinnedVB", preVB)
+           .BufferSRV("g_SkinnedIB", skinnedIB);
+        if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.dynSkinPageLayout, nvDevice))
+            draw(state.dynSkinPagePipeline, bindingSet, state.dynArgs[2], false);
     }
 }
 
@@ -1241,8 +1331,9 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     if (state.dynActive && state.readbackScheduled > 0) {
         nvrhi::IBuffer* slot = state.readback[(state.readbackWrite + VSMState::kReadbackSlots - 1) % VSMState::kReadbackSlots];
         if (slot) {
-            cmdList->setBufferState(state.skinStats, nvrhi::ResourceStates::CopySource);
-            cmdList->copyBuffer(slot, u64(kReadbackDynOffset) * sizeof(u32), state.skinStats, 0, sizeof(u32) * 4);
+            cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::CopySource);
+            cmdList->copyBuffer(slot, u64(kReadbackDynOffset) * sizeof(u32), state.dynStats, 0, sizeof(u32) * 16);
+            cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::ShaderResource);
         }
     }
 
@@ -1503,8 +1594,10 @@ VSMOutput setupVSMPasses(
         state->rasterSlope = ps_r_vsm_raster_slope;
         state->pagePipeline = nullptr;
         state->pageATPipeline = nullptr;
-        state->skinPipelinesReady = false;
-        state->skinPagePipeline = nullptr;
+        state->dynPipelinesReady = false;
+        state->dynPagePipeline = nullptr;
+        state->dynPageATPipeline = nullptr;
+        state->dynSkinPagePipeline = nullptr;
         if (live)
             InvalidateVSMCache(*state);
     }
@@ -1678,9 +1771,9 @@ void setupVSMDynamicPasses(
     VSMState* state,
     xray::profiler::GPUProfiler* gpuProfiler)
 {
-    if (!state || !device || !state->active || !skinnedDrawArgs.is_valid() || !config.gpuCulling)
+    if (!state || !device || !state->active || !config.gpuCulling)
         return;
-    if (!config.gpuCulling->IsSkinnedEnabled() || !state->dynAtlas || !state->dynPageTable || !state->dynUsed)
+    if (!state->dynAtlas || !state->dynPageTable || !state->dynUsed)
         return;
 
     auto bufferDesc = [](const char* name, u64 bytes, u32 stride) {
@@ -1723,20 +1816,21 @@ void setupVSMDynamicPasses(
             ExecuteDynAlloc(ctx, data);
         });
 
-    auto& binData = fg.addCallbackPass<VSMSkinBinData>(
+    auto& binData = fg.addCallbackPass<VSMDynBinData>(
         "VSM Dyn Bin",
-        [&, skinnedDrawArgs, dynUsedHandle, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMSkinBinData& data) {
+        [&, skinnedDrawArgs, dynUsedHandle, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMDynBinData& data) {
             data.state = state;
             data.device = device;
             data.config = config;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
             data.dynTable = passBuilder.read(allocData.dynTable, ResourceState::ShaderResource);
-            data.order = passBuilder.read(skinnedDrawArgs, ResourceState::ShaderResource);
+            if (skinnedDrawArgs.is_valid())
+                data.order = passBuilder.read(skinnedDrawArgs, ResourceState::ShaderResource);
             data.dynUsed = passBuilder.write(dynUsedHandle, ResourceState::UnorderedAccess);
         },
-        [](const VSMSkinBinData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
-            ExecuteSkinBin(ctx, data);
+        [](const VSMDynBinData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            ExecuteDynBin(ctx, data);
         });
 
     auto& atlasData = fg.addCallbackPass<VSMDynAtlasData>(

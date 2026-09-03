@@ -1202,6 +1202,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.variantPartition = m_gpuCullingManager->GetStaticPartition().ToConfig();
     }
 
+    if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedEnabled())
+        skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedUploadPass(*m_framegraph, m_geometryCollector.get(), &m_hudBatches, m_overlayManager.get());
+
     passes::SunShadowCullOutput sunShadowCull;
     passes::SunShadowMaps sunShadowMaps;
     const bool vsmActive = ps_r_vsm && m_blackboard->get_or_add<passes::VSMState>().maskReady;
@@ -1212,9 +1215,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 *m_framegraph,
                 m_device,
                 cullOutput.staticDrawArgsBuffer,
+                skinnedDrawArgsBuffer,
                 m_gpuCullingManager->GetClusterEntryBuffer(),
                 m_gpuCullingManager->GetClusterEntryCapacity(),
                 m_gpuCullingManager->GetClusterCullEntryCount(),
+                m_gpuCullingManager.get(),
                 &sunShadowState,
                 m_gpuProfiler.get()
             );
@@ -1223,9 +1228,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             sunShadowState.candidates = 0;
 
     }
-
-    if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedEnabled())
-        skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedUploadPass(*m_framegraph, m_geometryCollector.get(), &m_hudBatches, m_overlayManager.get());
 
     framegraph::VirtualResourceHandle visIdBuffer;
     if (cullActive && bindlessConfig.enabled && bindlessConfig.UseMegaBuffers() && bindlessConfig.cluster.IsValid()
@@ -1498,6 +1500,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
         passes::VSMDynConfig vsmDyn;
         vsmDyn.gpuCulling = m_gpuCullingManager.get();
+        vsmDyn.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+        vsmDyn.dynamicInstanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
+        vsmDyn.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
+        vsmDyn.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
         passes::setupVSMDynamicPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmDyn, &vsmState, m_gpuProfiler.get());
         framegraph::VirtualResourceHandle vsmDebugView;
         vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, width, height, &vsmState, m_gpuProfiler.get(), &vsmDebugView);

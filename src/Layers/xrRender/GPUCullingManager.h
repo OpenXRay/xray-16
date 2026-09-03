@@ -426,7 +426,6 @@ public:
     bool IsSkinnedEnabled() const { return m_initialized && m_skinnedEnabled && m_compactEnabled; }
     nvrhi::IBuffer* GetSkinnedArgsBuffer() const { return m_skinnedArgsBuffer.Get(); }
     nvrhi::IBuffer* GetSkinnedRecordsBuffer() const { return m_skinnedRecordsBuffer.Get(); }
-    nvrhi::IBuffer* GetSkinnedMaterialIDBuffer() const { return m_skinnedMaterialIDBuffer.Get(); }
     SkinnedGeometryPools& GetSkinnedPools() { return m_skinnedPools; }
 
     struct SkinnedDrawRecord {
@@ -447,9 +446,6 @@ public:
         xr_vector<u32> srcVertexBases;
         xr_vector<u32> vertexCounts;
         xr_vector<const void*> visuals;
-        u32 base = 0;
-        u32 count = 0;
-        u32 casterCount = 0;
     };
 
     struct SkinnedChunk {
@@ -462,13 +458,10 @@ public:
 
     nvrhi::IBuffer* GetSkinnedPreVertexBuffer() const { return m_skinnedPreVB[m_skinnedPreVBIndex].Get(); }
     nvrhi::IBuffer* GetSkinnedPrevVertexBuffer() const { return m_skinnedPreVB[m_skinnedPreVBIndex ^ 1u].Get(); }
-    bool EnsurePreskinnedDrawResources();
-    nvrhi::IShader* GetPreskinnedVS() const { return m_preskinnedVS.Get(); }
-    nvrhi::IInputLayout* GetPreskinnedInputLayout() const { return m_preskinnedLayout.Get(); }
     nvrhi::IBuffer* GetSkinnedEntryBuffer() const { return m_skinnedEntryBuffer.Get(); }
     u32 GetSkinnedEntryCount() const { return m_skinnedEntryCount; }
+    u32 GetSkinnedVisibleEntryCount() const { return m_skinnedVisibleEntryCount; }
     static constexpr u32 SKINNED_ENTRY_INDICES = 384;
-    const SkinnedBucket& GetSkinnedBucket(u32 formatID) const { return m_skinnedBuckets[formatID]; }
 
     // ───────────────────────────────────────────────────────
     //  SKELETON BONE BUFFER (for GPU-driven skinned rendering)
@@ -497,6 +490,7 @@ public:
 
     static constexpr u32 kDynamicClusterEntryCapacity = 16384;
     u32 GetClusterCullEntryCount() const { return m_clusterSet.entryCount + m_clusterSet.dynamicEntryCount; }
+    u32 GetDynamicClusterEntryCount() const { return m_clusterSet.dynamicEntryCount; }
     u32 GetClusterEntryCapacity() const { return m_clusterSet.entryCount + kDynamicClusterEntryCapacity; }
     nvrhi::IBuffer* GetDynamicPrevWorldBuffer() const { return m_dynamicPrevWorldBuffer.Get(); }
     nvrhi::IBuffer* GetClusterEntryBuffer() const { return m_clusterSet.entryBuffer.Get(); }
@@ -737,7 +731,6 @@ private:
     // ───────────────────────────────────────────────────────
     nvrhi::BufferHandle m_skinnedArgsBuffer;
     nvrhi::BufferHandle m_skinnedRecordsBuffer;
-    nvrhi::BufferHandle m_skinnedMaterialIDBuffer;
     u32 m_skinnedObjectCount = 0;
     u32 m_maxSkinnedObjects = 0;
     bool m_skinnedEnabled = false;
@@ -747,9 +740,11 @@ private:
     xr_vector<u32> m_skinnedMaterialIDData;
     xr_vector<SkinnedChunk> m_skinnedChunkData;
     xr_vector<GPUClusterEntry> m_skinnedEntryData;
+    xr_vector<GPUClusterEntry> m_skinnedShadowEntryData;
     nvrhi::BufferHandle m_skinnedEntryBuffer;
     u32 m_skinnedEntryCapacity = 0;
     u32 m_skinnedEntryCount = 0;
+    u32 m_skinnedVisibleEntryCount = 0;
     u32 m_skinnedChunkBase[SkinnedGeometryPools::FORMAT_COUNT] = {};
     u32 m_skinnedChunkCount[SkinnedGeometryPools::FORMAT_COUNT] = {};
     nvrhi::BufferHandle m_skinnedChunkBuffer;
@@ -761,9 +756,6 @@ private:
     u32 m_skinnedHistoryIndex = 0;
     u32 m_skinnedHistoryFrame = 0;
     bool EnsurePreskinBuffers(nvrhi::IDevice* nvDevice, u32 vertexTotal);
-    nvrhi::ShaderHandle m_preskinnedVS;
-    nvrhi::InputLayoutHandle m_preskinnedLayout;
-    bool m_preskinnedFailed = false;
     nvrhi::ComputePipelineHandle m_preskinPipeline;
     nvrhi::BindingLayoutHandle m_preskinLayout;
     bool m_preskinFailed = false;
