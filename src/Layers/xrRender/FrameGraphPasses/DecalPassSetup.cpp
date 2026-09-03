@@ -24,7 +24,7 @@ using namespace bindless;
 struct DecalPassData {
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
-    VirtualResourceHandle sceneColor;
+    VirtualResourceHandle baseColor;
     fg::RenderDevice* device;
     decals::DecalManager* decalMgr;
     DecalPassState* passState;
@@ -77,9 +77,10 @@ static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::Fram
     blend.setSrcBlend(nvrhi::BlendFactor::SrcAlpha);
     blend.setDestBlend(nvrhi::BlendFactor::InvSrcAlpha);
     blend.setBlendOp(nvrhi::BlendOp::Add);
-    blend.setSrcBlendAlpha(nvrhi::BlendFactor::One);
-    blend.setDestBlendAlpha(nvrhi::BlendFactor::InvSrcAlpha);
+    blend.setSrcBlendAlpha(nvrhi::BlendFactor::Zero);
+    blend.setDestBlendAlpha(nvrhi::BlendFactor::One);
     blend.setBlendOpAlpha(nvrhi::BlendOp::Add);
+    blend.setColorWriteMask(nvrhi::ColorMask::Red | nvrhi::ColorMask::Green | nvrhi::ColorMask::Blue);
 
     state.pipeline = cache.GetOrCreatePipeline("Decal", pipeDesc, fbInfo, nvDevice);
     state.initialized = state.pipeline != nullptr;
@@ -94,7 +95,7 @@ DefaultOutputLayout setupDecalPass(
     DecalPassState& state)
 {
     nvrhi::FramebufferInfoEx fbInfo;
-    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
     InitializeDecalResources(device, fbInfo, state);
 
     auto& passData = fg.addCallbackPass<DecalPassData>(
@@ -109,7 +110,7 @@ DefaultOutputLayout setupDecalPass(
             data.height = height;
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
             data.normal = passBuilder.read(inputs.normal, ResourceState::ShaderResource);
-            data.sceneColor = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
+            data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
         },
 
         [](const DecalPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -118,8 +119,8 @@ DefaultOutputLayout setupDecalPass(
 
             auto* depthTex = fg.GetPhysicalTexture(data.depth);
             auto* normalTex = fg.GetPhysicalTexture(data.normal);
-            auto* colorTex = fg.GetPhysicalTexture(data.sceneColor);
-            if (!depthTex || !normalTex || !colorTex)
+            auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
+            if (!depthTex || !normalTex || !baseColorTex)
                 return;
 
             data.decalMgr->Upload(ctx);
@@ -130,7 +131,7 @@ DefaultOutputLayout setupDecalPass(
             auto& cache = GetPassResourceCache();
 
             nvrhi::FramebufferDesc fbDesc;
-            fbDesc.addColorAttachment(colorTex);
+            fbDesc.addColorAttachment(baseColorTex);
             auto framebuffer = cache.GetOrCreateFramebuffer("Decal", fbDesc, nvDevice);
 
             if (!data.passState->initialized)
@@ -185,7 +186,7 @@ DefaultOutputLayout setupDecalPass(
     );
 
     DefaultOutputLayout output = inputs;
-    output.albedo = passData.sceneColor;
+    output.baseColor = passData.baseColor;
     output.depth = passData.depth;
     output.normal = passData.normal;
     return output;

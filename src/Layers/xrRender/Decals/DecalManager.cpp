@@ -2,9 +2,6 @@
 #include "DecalManager.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
-#include "Layers/xrRender/SkeletonCustom.h"
-#include "Layers/xrRender/SkeletonX.h"
-#include "xrCDB/Intersect.hpp"
 #include "xrEngine/device.h"
 
 namespace xray::render::fg::decals {
@@ -45,7 +42,6 @@ void DecalManager::Initialize(fg::RenderDevice* device)
     m_decalBuffer = nvDevice->createBuffer(bufDesc);
 
     m_staticDecals.reserve(256);
-    m_skeletonDecals.reserve(64);
     m_gpuData.reserve(MAX_DECALS);
 }
 
@@ -55,7 +51,6 @@ void DecalManager::Shutdown()
     m_cubeVB = nullptr;
     m_cubeIB = nullptr;
     m_staticDecals.clear();
-    m_skeletonDecals.clear();
     m_gpuData.clear();
     m_gpuDecalCount = 0;
 }
@@ -64,7 +59,6 @@ void DecalManager::Clear()
 {
     m_lock.Enter();
     m_staticDecals.clear();
-    m_skeletonDecals.clear();
     m_gpuData.clear();
     m_gpuDecalCount = 0;
     m_lock.Leave();
@@ -150,7 +144,7 @@ void DecalManager::AddStaticDecal(const Fvector& pos, const Fvector& normal, flo
 {
     m_lock.Enter();
 
-    if (m_staticDecals.size() + m_skeletonDecals.size() >= MAX_DECALS) {
+    if (m_staticDecals.size() >= MAX_DECALS) {
         m_lock.Leave();
         return;
     }
@@ -175,138 +169,6 @@ void DecalManager::AddStaticDecal(const Fvector& pos, const Fvector& normal, flo
 
     m_staticDecals.push_back(decal);
     m_lock.Leave();
-}
-
-void DecalManager::AddSkeletonDecal(CKinematics* parent, const Fmatrix* parentXForm,
-                                     u16 boneID, const Fvector& localPos,
-                                     const Fvector& localNormal, float size, u32 materialID)
-{
-    m_lock.Enter();
-
-    if (m_staticDecals.size() + m_skeletonDecals.size() >= MAX_DECALS) {
-        m_lock.Leave();
-        return;
-    }
-
-    float angle = ::Random.randF(deg2rad(-20.f), deg2rad(20.f));
-    Fmatrix newOBB = BuildOBBMatrix(localPos, localNormal, size, angle);
-
-    for (auto& existing : m_skeletonDecals) {
-        if (existing.parent == parent && existing.materialID == materialID &&
-            existing.localOBB.c.similar(newOBB.c, 0.05f)) {
-            existing.creationTime = Device.fTimeGlobal;
-            existing.ttl = ps_r__WallmarkTTL;
-            m_lock.Leave();
-            return;
-        }
-    }
-
-    SkeletonDecalInstance decal;
-    decal.parent = parent;
-    decal.parentXForm = parentXForm;
-    decal.boneID = boneID;
-    decal.localOBB = newOBB;
-    decal.size = size;
-    decal.materialID = materialID;
-    decal.creationTime = Device.fTimeGlobal;
-    decal.ttl = ps_r__WallmarkTTL;
-
-    m_skeletonDecals.push_back(decal);
-    m_lock.Leave();
-}
-
-void DecalManager::AddSkeletonDecalFromRay(const Fmatrix* xf, CKinematics* obj,
-                                            const Fvector& start, const Fvector& dir,
-                                            float size, u32 materialID)
-{
-    VERIFY(obj && xf && (size > EPS_L));
-
-    Fmatrix P;
-    P.invert(*xf);
-    Fvector S, D;
-    P.transform_tiny(S, start);
-    P.transform_dir(D, dir);
-
-    float dist = flt_max;
-    BOOL picked = FALSE;
-    Fvector normal = {0, 0, 0};
-    u16 hitBone = u16(-1);
-
-    for (u16 k = 0; k < obj->LL_BoneCount(); k++) {
-        CBoneData& BD = obj->LL_GetData(k);
-        if (!obj->LL_GetBoneVisible(k) || BD.shape.flags.is(SBoneShape::sfNoPickable))
-            continue;
-        Fobb obb;
-        obb.transform(BD.obb, obj->LL_GetBoneInstance(k).mTransform);
-        if (!CDB::TestRayOBB(S, D, obb))
-            continue;
-        IKinematics::pick_result r;
-        r.normal = normal;
-        r.dist = dist;
-        for (u32 i = 0; i < obj->children.size(); i++) {
-            auto* skelChild = dynamic_cast<CSkeletonX*>(obj->children[i]);
-            if (skelChild && skelChild->PickBone(r, dist, S, D, k)) {
-                picked = TRUE;
-                dist = r.dist;
-                normal = r.normal;
-                hitBone = k;
-            }
-        }
-    }
-
-    if (!picked || hitBone == u16(-1)) {
-        Msg("[Decal] SKELETON ray missed all bones (tested %u bones)", obj->LL_BoneCount());
-        return;
-    }
-
-    Msg("[Decal] SKELETON ray HIT bone %u at dist=%.3f", hitBone, dist);
-
-    Fvector cp;
-    cp.mad(S, D, dist);
-
-    Fmatrix boneInv;
-    boneInv.invert(obj->LL_GetBoneInstance(hitBone).mTransform);
-    Fvector localPos, localNormal;
-    boneInv.transform_tiny(localPos, cp);
-    boneInv.transform_dir(localNormal, normal);
-    localNormal.normalize_safe();
-
-    AddSkeletonDecal(obj, xf, hitBone, localPos, localNormal, size, materialID);
-}
-
-void DecalManager::UpdateSkeletonDecals(float currentTime)
-{
-    for (auto it = m_skeletonDecals.begin(); it != m_skeletonDecals.end(); ) {
-        auto& sd = *it;
-        float age = currentTime - sd.creationTime;
-        if (age >= sd.ttl || !sd.parent) {
-            it = m_skeletonDecals.erase(it);
-            continue;
-        }
-
-        const auto& boneInst = sd.parent->LL_GetBoneInstance(sd.boneID);
-        Fmatrix boneWorld;
-        boneWorld.mul_43(*sd.parentXForm, boneInst.mTransform);
-
-        Fmatrix decalToWorld;
-        decalToWorld.mul_43(boneWorld, sd.localOBB);
-
-        Fvector worldPos = decalToWorld.c;
-
-        float opacity = 1.0f - (age / sd.ttl);
-        if (Device.vCameraPosition.distance_to_sqr(worldPos) <= _sqr(50.f)) {
-            GPUDecalData data;
-            data.decalToWorld = decalToWorld;
-            data.worldToDecal.invert(decalToWorld);
-            data.materialID = sd.materialID;
-            data.opacity = opacity;
-            data.normalThreshold = DEFAULT_NORMAL_THRESHOLD;
-            data.flags = DECAL_FLAG_SKELETON;
-            m_gpuData.push_back(data);
-        }
-
-        ++it;
-    }
 }
 
 void DecalManager::Update(float dt, float currentTime)
@@ -337,11 +199,9 @@ void DecalManager::Update(float dt, float currentTime)
         data.materialID = decal.materialID;
         data.opacity = opacity;
         data.normalThreshold = DEFAULT_NORMAL_THRESHOLD;
-        data.flags = DECAL_FLAG_STATIC;
+        data.pad = 0;
         m_gpuData.push_back(data);
     }
-
-    UpdateSkeletonDecals(currentTime);
 
     m_gpuDecalCount = (u32)m_gpuData.size();
 
