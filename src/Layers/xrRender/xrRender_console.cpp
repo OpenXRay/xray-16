@@ -270,7 +270,6 @@ const xr_token fg_render_mode_token[] = {
     {nullptr, 0}
 };
 
-int   ps_r_cluster       = 1;
 int   ps_r_cluster_tris  = 256;
 int   ps_r_cluster_merge = 1;
 int   ps_r_cluster_cache = 1;
@@ -994,7 +993,6 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
 
-    CMD4(CCC_Integer, "r_cluster", &ps_r_cluster, 0, 1);
     CMD4(CCC_Integer, "r_cluster_tris", &ps_r_cluster_tris, 128, 4096);
     CMD4(CCC_Integer, "r_cluster_merge", &ps_r_cluster_merge, 0, 1);
     CMD4(CCC_Integer, "r_cluster_cache", &ps_r_cluster_cache, 0, 1);
