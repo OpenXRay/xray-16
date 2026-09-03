@@ -367,7 +367,6 @@ static void renderBindlessForward(
     }
 
     // Transparent geometry is rendered in a separate TransparentPass (after Detail pass)
-    // Skinned meshes are rendered in the SkinningPass (see SkinningPassSetup.cpp)
 }
 
 framegraph::DefaultOutputLayout setupForwardColorPass(
@@ -474,7 +473,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             //  BINDLESS RENDERING PATH (GPU-DRIVEN MULTI-DRAW)
             // ═══════════════════════════════════════════════════════
             // Render static geometry with GPU-driven multi-draw
-            // NOTE: Skinned meshes are rendered in SkinningPass (see SkinningPassSetup.cpp)
             renderBindlessForward(
                 ctx,
                 data.device,

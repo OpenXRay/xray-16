@@ -26,14 +26,6 @@ namespace xray::profiler {
 
 namespace xray::render::fg::passes {
 
-struct SkinningPassState;
-struct SkinningPipelineVariant;
-
-constexpr u32 kSunShadowSkinnedFormats = 6;
-
-u32 SkinnedVertexFormat(u16 renderMode, u32 vertexStride);
-const SkinningPipelineVariant* SkinnedVariant(const SkinningPassState& sk, u32 fmt, bool mdi);
-u32 SkeletonBoneOffset(nvrhi::ICommandList* cmdList, GPUCullingManager& gpuCulling, const GeometryBatch& batch);
 constexpr u32 kSunTargetFar = 0;
 constexpr u32 kSunTargetCasc0 = 1;
 constexpr u32 kSunTargetCasc1 = 2;
@@ -91,11 +83,8 @@ struct SunShadowState {
     nvrhi::ShaderHandle depthDynamicPS;
     bool depthPipelinesFailed = false;
 
-    nvrhi::GraphicsPipelineHandle skinnedPipelines[kSunShadowSkinnedFormats];
     nvrhi::GraphicsPipelineHandle skinnedMDIPipeline;
-    nvrhi::BindingLayoutHandle skinnedLayout;
     nvrhi::BindingLayoutHandle skinnedMDILayout;
-    nvrhi::ShaderHandle skinnedDepthPS;
     nvrhi::ShaderHandle skinnedDepthMDIPS;
     bool skinnedPipelinesReady = false;
     bool skinnedPipelinesFailed = false;
@@ -141,10 +130,8 @@ struct SunShadowDrawConfig {
     nvrhi::IBuffer* dynamicFadeBuffer = nullptr;
     u32 dynamicObjectCount = 0;
     framegraph::VirtualResourceHandle dynamicArgs;
-    const SkinningPassState* skinning = nullptr;
     const GeometryCollector* geometry = nullptr;
     GPUCullingManager* gpuCulling = nullptr;
-    nvrhi::IBuffer* splatBuffer = nullptr;
     framegraph::VirtualResourceHandle skinnedArgs;
 };
 

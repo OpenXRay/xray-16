@@ -71,8 +71,6 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/VSMPassSetup.cpp
     FrameGraphPasses/HiZBuildPassSetup.h
     FrameGraphPasses/HiZBuildPassSetup.cpp
-    FrameGraphPasses/SkinningPassSetup.h
-    FrameGraphPasses/SkinningPassSetup.cpp
     FrameGraphPasses/ImGuiPassSetup.h
     FrameGraphPasses/ImGuiPassSetup.cpp
     FrameGraphPasses/StatGraphPassSetup.h

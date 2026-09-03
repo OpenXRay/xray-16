@@ -46,7 +46,6 @@
 #include "Bindless/VariantTextureBuffer.h"           // Variant texture buffer
 #include "FrameGraphPasses/SkyPassSetup.h"           // Sky dome rendering
 #include "FrameGraphPasses/SunPassSetup.h"           // Sun disc rendering
-#include "FrameGraphPasses/SkinningPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"      // Particle rendering (billboards/sprites)
 #include "FrameGraphPasses/DistortionApplyPassSetup.h" // Distortion post-process
 #include "FrameGraphPasses/DecalPassSetup.h"          // Screen-space box decals
@@ -1412,23 +1411,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    // 2. Skinning Pass - Renders all skinned meshes (world + HUD)
-    // World skinned: NPCs, monsters with normal depth [0.0, 1.0]
-    // HUD skinned: First-person weapons/hands with depth [0.9, 1.0]
-    auto hudOutputs = passes::setupSkinningPass(
-        *m_framegraph,
-        m_device,
-        forwardOutputs,
-        m_geometryCollector.get(),
-        m_materialCache.get(),
-        width,
-        height,
-        m_gpuCullingManager.get(),
-        skinnedDrawArgsBuffer,
-        &m_blackboard->get_or_add<passes::SkinningPassState>(),
-        m_overlayManager.get()
-    );
-
     // ═══════════════════════════════════════════════════════
     //  DETAIL CULL PASS (Async Compute)
     // ═══════════════════════════════════════════════════════
@@ -1475,7 +1457,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         *m_framegraph,
         m_device,
         m_detailManager.get(),
-        hudOutputs,
+        forwardOutputs,
         width,
         height,
         m_gpuProfiler.get()
@@ -1507,9 +1489,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (vsmPassesActive) {
         auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
         passes::VSMDynConfig vsmDyn;
-        vsmDyn.skinning = &m_blackboard->get_or_add<passes::SkinningPassState>();
         vsmDyn.gpuCulling = m_gpuCullingManager.get();
-        vsmDyn.splatBuffer = m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr;
         passes::setupVSMDynamicPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmDyn, &vsmState, m_gpuProfiler.get());
         framegraph::VirtualResourceHandle vsmDebugView;
         vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, width, height, &vsmState, m_gpuProfiler.get(), &vsmDebugView);
@@ -1535,10 +1515,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         sunCfg.dynamicFadeBuffer = bindlessConfig.dynamicSet.fadeBuffer;
         sunCfg.dynamicObjectCount = bindlessConfig.dynamicSet.totalObjectCount;
         sunCfg.dynamicArgs = cullOutput.dynamicCompactDrawArgs;
-        sunCfg.skinning = &m_blackboard->get_or_add<passes::SkinningPassState>();
         sunCfg.geometry = m_geometryCollector.get();
         sunCfg.gpuCulling = m_gpuCullingManager.get();
-        sunCfg.splatBuffer = m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr;
         sunCfg.skinnedArgs = skinnedDrawArgsBuffer;
         sunShadowMaps = passes::setupSunShadowMapPasses(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState, m_gpuProfiler.get());
         sunShadowState.receiverActive = sunShadowMaps.maps[passes::kSunTargetFar].is_valid();
