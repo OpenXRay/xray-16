@@ -53,6 +53,7 @@ MaterialResolveOutput setupMaterialResolvePass(
     const Fmatrix& prevView,
     const Fmatrix& prevProj,
     bool motionValid,
+    u32 entryLimit,
     u32 width,
     u32 height,
     MaterialResolvePassState* state);

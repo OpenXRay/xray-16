@@ -401,6 +401,7 @@ public:
     u32 GetClusterStaticEntryCount() const { return m_clusterSet.staticEntryCount; }
     u32 GetClusterTerrainEntryCount() const { return m_clusterSet.terrainEntryCount; }
     nvrhi::IBuffer* GetNeutralFadeBuffer() const { return m_neutralFadeBuffer.Get(); }
+    nvrhi::ITexture* GetDummyHiZ() const { return m_dummyHiZ.Get(); }
 
 private:
     void CreateBuffers(fg::RenderDevice* device);
