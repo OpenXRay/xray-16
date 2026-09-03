@@ -32,12 +32,6 @@ namespace xray::render::fg::passes {
 // ═══════════════════════════════════════════════════════════════════════════
 //  SKINNING PASS - Consolidated skinned mesh rendering
 // ═══════════════════════════════════════════════════════════════════════════
-// Renders all skinned meshes in two phases:
-//   1. World Phase - NPCs, monsters, etc. with normal depth [0.0, 1.0]
-//   2. HUD Phase - First-person weapons/hands with compressed depth [0.9, 1.0]
-//
-// This pass consolidates all skinned mesh rendering that was previously split
-// between ForwardColorPass (world skinned) and HUDPass (HUD skinned).
 
 struct SkinningPipelineVariant {
     nvrhi::GraphicsPipelineHandle pipeline;
@@ -52,15 +46,8 @@ struct SkinningPassState {
     SkinningPipelineVariant hq3w;
     SkinningPipelineVariant hq4w;
     nvrhi::BindingLayoutHandle layout;
-    nvrhi::BindingLayoutHandle hudLayout;
     nvrhi::ShaderHandle ps;
-    nvrhi::ShaderHandle hudPS;
     SkinningPipelineVariant mdi;
-    SkinningPipelineVariant hudNonHQ;
-    SkinningPipelineVariant hudHQ1w;
-    SkinningPipelineVariant hudHQ2w;
-    SkinningPipelineVariant hudHQ3w;
-    SkinningPipelineVariant hudHQ4w;
     nvrhi::SamplerHandle linearSampler;
     bool initialized = false;
 };
@@ -76,7 +63,6 @@ struct SkinningPassData {
     framegraph::VirtualResourceHandle skinnedDrawArgs;
     fg::RenderDevice* device;
     const GeometryCollector* geometry;
-    const xr_vector<GeometryBatch>* hudBatches;
     MaterialCache* materialCache;
     fg::GPUCullingManager* gpuCulling;
     u32 width, height;
@@ -86,13 +72,11 @@ struct SkinningPassData {
 };
 
 // Main skinning pass setup function
-// Renders world skinned meshes followed by HUD skinned meshes
 framegraph::DefaultOutputLayout setupSkinningPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     const GeometryCollector* geometry,       // Contains world skinned batches
-    const xr_vector<GeometryBatch>* hudBatches,  // HUD skinned batches (weapons, hands)
     MaterialCache* materialCache,
     u32 width,
     u32 height,

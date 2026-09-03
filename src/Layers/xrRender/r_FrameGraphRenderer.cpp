@@ -1221,7 +1221,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
     if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedEnabled())
-        skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedUploadPass(*m_framegraph, m_geometryCollector.get(), m_overlayManager.get());
+        skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedUploadPass(*m_framegraph, m_geometryCollector.get(), &m_hudBatches, m_overlayManager.get());
 
     framegraph::VirtualResourceHandle visIdBuffer;
     if (cullActive && bindlessConfig.enabled && bindlessConfig.UseMegaBuffers() && bindlessConfig.cluster.IsValid()
@@ -1420,7 +1420,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_device,
         forwardOutputs,
         m_geometryCollector.get(),
-        &m_hudBatches,
         m_materialCache.get(),
         width,
         height,
@@ -2281,12 +2280,6 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     IRender_Mesh* meshVisual = nullptr;
 
     switch (visual->getType()) {
-        case MT_NORMAL:
-            meshVisual = static_cast<Fvisual*>(visual);
-            break;
-        case MT_PROGRESSIVE:
-            meshVisual = static_cast<FProgressive*>(visual);
-            break;
         case MT_SKELETON_GEOMDEF_ST:
             meshVisual = static_cast<CSkeletonX_ST*>(visual);
             break;
@@ -2331,6 +2324,7 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
 
     u32 visualType = visual->getType();
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+    batch.vertexCount = meshVisual->vCount;
 
     if (batch.isSkinned) {
         if (visualType == MT_SKELETON_GEOMDEF_ST) {
@@ -2338,7 +2332,19 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
         } else {
             batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
         }
+        if (m_gpuCullingManager && meshVisual->p_rm_Vertices && meshVisual->p_rm_Indices) {
+            u32 fmt = fg::SkinnedFormatFromRenderMode(batch.skinningRenderMode, meshVisual->vStride);
+            if (m_gpuCullingManager->GetSkinnedPools().Register(
+                    meshVisual->p_rm_Vertices, meshVisual->p_rm_Indices,
+                    meshVisual->vCount, meshVisual->vStride, meshVisual->iCount, fmt)) {
+                batch.skinnedPoolFormat = fmt;
+                batch.skinnedPoolBaseVertex = (s32)meshVisual->p_rm_Vertices->skinned_pool_base_vertex;
+                batch.skinnedPoolFirstIndex = meshVisual->p_rm_Vertices->skinned_pool_first_index + batch.startIndex;
+            }
+        }
     }
+    worldTransform.transform_tiny(batch.worldBoundsCenter, visual->vis.sphere.P);
+    batch.worldBoundsRadius = visual->vis.sphere.R;
 
     if (m_materialCache) {
         batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);

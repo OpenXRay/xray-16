@@ -38,6 +38,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     float2 lp = mul(vsm_view, float4(center, 1.0)).xy;
 
     uint cnt = 0u;
+    if (R > 0.0)
     {
         for (int L = 0; L < VSM_LEVELS; ++L)
         {
