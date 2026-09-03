@@ -711,8 +711,6 @@ void FGDetailManager::PackSlotData()
                 (u32(src.palette[2].a2) << 8)  | (u32(src.palette[2].a3) << 12) |
                 (u32(src.palette[3].a0) << 16) | (u32(src.palette[3].a1) << 20) |
                 (u32(src.palette[3].a2) << 24) | (u32(src.palette[3].a3) << 28);
-
-            dst.hemi = src.r_qclr(src.c_hemi, 15);
         }
     }
 
@@ -836,18 +834,8 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         pulledVertexBuffer = device->createBuffer(pvDesc);
 
         if (maxPulledIndexCount > 0)
-        {
             Msg("* [FGDetailManager] Pulled vertices: %u entries (%u models, max %u indices/model)",
                 (u32)pulledVertexData.size(), (u32)(pulledVertexData.size() / maxPulledIndexCount), maxPulledIndexCount);
-
-            nvrhi::BufferDesc ibDesc;
-            ibDesc.byteSize = maxPulledIndexCount * sizeof(u16);
-            ibDesc.isIndexBuffer = true;
-            ibDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-            ibDesc.keepInitialState = true;
-            ibDesc.debugName = "DetailPulledIB";
-            pulledIndexBuffer = device->createBuffer(ibDesc);
-        }
     }
 
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
@@ -1039,28 +1027,6 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = slot_aabbs.size() * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.debugName = "DetailSlotVisibility";
-        desc.canHaveUAVs = true;
-        desc.canHaveTypedViews = false;
-        desc.isVertexBuffer = false;
-        desc.isIndexBuffer = false;
-        desc.isConstantBuffer = false;
-        desc.isDrawIndirectArgs = false;
-        desc.canHaveRawViews = false;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
-
-        slotVisibilityBuffer = device->createBuffer(desc);
-        if (!slotVisibilityBuffer)
-        {
-            Msg("! [FGDetailManager] Failed to create slot visibility buffer");
-            return false;
-        }
-    }
 
     {
         nvrhi::BufferDesc desc;
@@ -1227,16 +1193,6 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
         cachedSmp_AnisoWrap = device->createSampler(desc);
     }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = 4;
-        desc.format = nvrhi::Format::R32_UINT;
-        desc.canHaveTypedViews = true;
-        desc.debugName = "DummySlotIndirection";
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
-        desc.keepInitialState = true;
-        cachedDummySlotIndirection = device->createBuffer(desc);
-    }
 
     auto* renderDevice = GEnv.Render->GetRenderDevice();
 
@@ -1291,7 +1247,6 @@ void FGDetailManager::DestroyGPUBuffers()
     billboardDrawArgsBuffer = nullptr;
     visibleSlotIDsBuffer = nullptr;
     visibleSlotCounterBuffer = nullptr;
-    slotVisibilityBuffer = nullptr;
 
     instanceCounterBuffer = nullptr;
     instanceCountReadbackBuffer = nullptr;
@@ -1315,15 +1270,8 @@ void FGDetailManager::DestroyGPUBuffers()
     computeBindingLayout = nullptr;
     cullComputeShader = nullptr;
 
-    decalGraphicsPipeline = nullptr;
-    billboardGraphicsPipeline = nullptr;
-    decalBindingLayout = nullptr;
-    billboardBindingLayout = nullptr;
-    billboardVertexShader = nullptr;
-    billboardPixelShader = nullptr;
 
     pulledVertexBuffer = nullptr;
-    pulledIndexBuffer = nullptr;
     buildDetailsTexture = nullptr;
 
     perlin4dTexture = nullptr;
@@ -1341,7 +1289,6 @@ void FGDetailManager::DestroyGPUBuffers()
     cachedSmp_PointClamp = nullptr;
     cachedSmp_LinearClamp = nullptr;
     cachedSmp_AnisoWrap = nullptr;
-    cachedDummySlotIndirection = nullptr;
     cachedCullParamsCB = fg::BufferHandle();
     cachedInstanceGenParamsCB = fg::BufferHandle();
     cachedGrassTintsBuffer = nullptr;
@@ -1362,15 +1309,7 @@ void FGDetailManager::InvalidateShadersAndPipelines()
     computeBindingLayout = nullptr;
     computePipeline = nullptr;
 
-    decalVertexShader = nullptr;
-    decalPixelShader = nullptr;
-    billboardVertexShader = nullptr;
-    billboardPixelShader = nullptr;
 
-    decalBindingLayout = nullptr;
-    billboardBindingLayout = nullptr;
-    decalGraphicsPipeline = nullptr;
-    billboardGraphicsPipeline = nullptr;
 
     perlin4dComputeShader = nullptr;
     perlin4dBindingLayout = nullptr;
@@ -1690,45 +1629,6 @@ bool FGDetailManager::CreatePrefixSumPipeline(fg::RenderDevice* renderDevice)
     return true;
 }
 
-bool FGDetailManager::LoadGraphicsShaders(framegraph::ShaderLoader* shaderLoader)
-{
-    if (!shaderLoader)
-    {
-        Msg("! [FGDetailManager] LoadGraphicsShaders: shaderLoader is null");
-        return false;
-    }
-
-    auto decalVsResult = shaderLoader->LoadVertexShader("detail_decal", "main");
-    if (!decalVsResult.handle)
-    {
-        Msg("! [FGDetailManager] Failed to load detail_decal.vs");
-        return false;
-    }
-    decalVertexShader = decalVsResult.handle;
-
-    auto decalPsResult = shaderLoader->LoadPixelShader("detail_decal", "main");
-    if (!decalPsResult.handle)
-    {
-        Msg("! [FGDetailManager] Failed to load detail_decal.ps");
-        return false;
-    }
-    decalPixelShader = decalPsResult.handle;
-
-    auto bbVsResult = shaderLoader->LoadVertexShader("detail_billboard", "main");
-    if (!bbVsResult.handle)
-        Msg("! [FGDetailManager] Failed to load detail_billboard.vs (billboard grass unavailable)");
-    else
-        billboardVertexShader = bbVsResult.handle;
-
-    auto bbPsResult = shaderLoader->LoadPixelShader("detail_billboard", "main");
-    if (!bbPsResult.handle)
-        Msg("! [FGDetailManager] Failed to load detail_billboard.ps (billboard grass unavailable)");
-    else
-        billboardPixelShader = bbPsResult.handle;
-
-    return true;
-}
-
 void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
 {
     if (!cmdList)
@@ -1742,14 +1642,6 @@ void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
 
     if (pulledVertexBuffer && !pulledVertexData.empty())
         cmdList->writeBuffer(pulledVertexBuffer, pulledVertexData.data(), pulledVertexData.size() * sizeof(DecalPulledVertex));
-
-    if (pulledIndexBuffer && maxPulledIndexCount > 0)
-    {
-        xr_vector<u16> seqIndices(maxPulledIndexCount);
-        for (u32 j = 0; j < maxPulledIndexCount; j++)
-            seqIndices[j] = (u16)j;
-        cmdList->writeBuffer(pulledIndexBuffer, seqIndices.data(), seqIndices.size() * sizeof(u16));
-    }
 
     pulledVertexData.clear();
     pulledVertexData.shrink_to_fit();
@@ -1862,83 +1754,6 @@ bool FGDetailManager::CreateInstanceGenPipeline(fg::RenderDevice* renderDevice)
     }
 
     Msg("* [FGDetailManager] Created instance generation pipeline");
-    return true;
-}
-
-bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, const nvrhi::FramebufferInfo& fbInfo)
-{
-    if (!renderDevice || !decalVertexShader || !decalPixelShader)
-    {
-        Msg("! [FGDetailManager] CreateGraphicsPipeline: invalid parameters");
-        return false;
-    }
-
-    nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
-
-    auto* shaderLoader = GEnv.Render->GetShaderLoader();
-    auto* decalVsRefl = shaderLoader->GetCachedReflection("detail_decal", ".vs");
-    auto* decalPsRefl = shaderLoader->GetCachedReflection("detail_decal", ".ps");
-    if (!decalVsRefl || !decalPsRefl)
-    {
-        Msg("! [FGDetailManager] Failed to get detail_decal reflection");
-        return false;
-    }
-
-    decalBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailDecal", *decalVsRefl, *decalPsRefl, device);
-    if (!decalBindingLayout)
-    {
-        Msg("! [FGDetailManager] Failed to create decal binding layout");
-        return false;
-    }
-
-    auto* backend = renderDevice->GetBackend();
-    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
-
-    nvrhi::GraphicsPipelineDesc pipelineDesc;
-    pipelineDesc.inputLayout = nullptr;
-    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
-    pipelineDesc.renderState.rasterState.fillMode = nvrhi::RasterFillMode::Solid;
-    pipelineDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-    pipelineDesc.renderState.depthStencilState.depthTestEnable = true;
-    pipelineDesc.renderState.depthStencilState.depthWriteEnable = true;
-    pipelineDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
-    pipelineDesc.renderState.blendState.targets[0].disableBlend();
-
-    nvrhi::GraphicsPipelineDesc decalPipeDesc = pipelineDesc;
-    decalPipeDesc.VS = decalVertexShader;
-    decalPipeDesc.PS = decalPixelShader;
-    decalPipeDesc.bindingLayouts = { decalBindingLayout };
-    if (bindlessLayout)
-        decalPipeDesc.bindingLayouts.push_back(bindlessLayout);
-
-    decalGraphicsPipeline = device->createGraphicsPipeline(decalPipeDesc, fbInfo);
-    if (!decalGraphicsPipeline)
-    {
-        Msg("! [FGDetailManager] Failed to create decal graphics pipeline");
-        return false;
-    }
-
-    if (billboardVertexShader && billboardPixelShader)
-    {
-        auto* bbVsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".vs");
-        auto* bbPsRefl = shaderLoader->GetCachedReflection("detail_billboard", ".ps");
-        if (bbVsRefl && bbPsRefl)
-            billboardBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailBillboard", *bbVsRefl, *bbPsRefl, device);
-        if (!billboardBindingLayout)
-            billboardBindingLayout = decalBindingLayout;
-
-        nvrhi::GraphicsPipelineDesc bbPipeDesc = pipelineDesc;
-        bbPipeDesc.VS = billboardVertexShader;
-        bbPipeDesc.PS = billboardPixelShader;
-        bbPipeDesc.bindingLayouts = { billboardBindingLayout };
-        if (bindlessLayout)
-            bbPipeDesc.bindingLayouts.push_back(bindlessLayout);
-
-        billboardGraphicsPipeline = device->createGraphicsPipeline(bbPipeDesc, fbInfo);
-        if (!billboardGraphicsPipeline)
-            Msg("! [FGDetailManager] Failed to create billboard graphics pipeline");
-    }
-
     return true;
 }
 
@@ -2094,7 +1909,6 @@ void FGDetailManager::DispatchCulling(
         framegraph::BindingSetBuilder bsb(*slotCullRefl, device, "Detail.SlotCull");
         bsb.ConstantBuffer("DetailCullParams", renderDevice->GetNativeBuffer(cachedCullParamsCB))
            .BufferSRV("g_slot_aabbs", slotAABBBuffer)
-           .BufferUAV("g_slot_visibility", slotVisibilityBuffer)
            .BufferUAV("g_visible_slot_ids", visibleSlotIDsBuffer)
            .BufferUAV("g_visible_slot_counter", visibleSlotCounterBuffer);
 
@@ -2228,9 +2042,15 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
 
 void FGDetailManager::BuildDetailModelGPUData()
 {
+    const u32 maxPulledIndices = MAX_PULLED_TRIANGLES * 3;
     maxPulledIndexCount = 0;
-    for (auto* m : detail_models)
-        maxPulledIndexCount = std::max(maxPulledIndexCount, m->number_indices);
+    for (u32 i = 0; i < detail_models.size(); i++)
+    {
+        const u32 count = detail_models[i]->number_indices;
+        if (count > maxPulledIndices)
+            Msg("! [FGDetailManager] Detail model %u has %u indices, drawing the first %u", i, count, maxPulledIndices);
+        maxPulledIndexCount = std::max(maxPulledIndexCount, std::min(count, maxPulledIndices));
+    }
 
     cachedModelGPUData.resize(detail_models.size());
     xr_vector<DecalPulledVertex> pulledVerts;
@@ -2279,8 +2099,8 @@ void FGDetailManager::BuildDetailModelGPUData()
         if (m->number_indices > 0 && maxPulledIndexCount > 0)
         {
             d.pulledVertexBase = runningOffset;
-            d.pulledIndexCount = m->number_indices;
-            for (u32 j = 0; j < m->number_indices; j++)
+            d.pulledIndexCount = std::min<u32>(m->number_indices, maxPulledIndices);
+            for (u32 j = 0; j < d.pulledIndexCount; j++)
             {
                 u16 idx = m->indices[j];
                 DecalPulledVertex dv;
@@ -2291,7 +2111,7 @@ void FGDetailManager::BuildDetailModelGPUData()
                 dv.v = m->vertices[idx].v;
                 pulledVerts.push_back(dv);
             }
-            for (u32 j = m->number_indices; j < maxPulledIndexCount; j++)
+            for (u32 j = d.pulledIndexCount; j < maxPulledIndexCount; j++)
                 pulledVerts.push_back(DecalPulledVertex{});
             runningOffset += maxPulledIndexCount;
         }

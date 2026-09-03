@@ -39,7 +39,7 @@ public:
         u32 packed_ids;
         u32 packed_palette_01;
         u32 packed_palette_23;
-        float hemi;
+        float pad;
     };
     static_assert(sizeof(GPUSlotData) == 32, "GPUSlotData must be 32 bytes");
 
@@ -151,6 +151,10 @@ public:
     static constexpr u32 LOD_COUNT = 3;
     static constexpr u32 LOD_SEGMENTS[LOD_COUNT] = {9, 4, 2};
     static constexpr u32 LOD_TRIANGLES[LOD_COUNT] = {17, 7, 3};
+    static constexpr u32 VIS_KIND_MESH = 3;
+    static constexpr u32 VIS_KIND_DECAL = 4;
+    static constexpr u32 VIS_KIND_COUNT = 5;
+    static constexpr u32 MAX_PULLED_TRIANGLES = 127;
 
     nvrhi::BufferHandle slotDataBuffer;
     xr_vector<GPUSlotData> slotDataCPU;
@@ -164,7 +168,6 @@ public:
     nvrhi::ComputePipelineHandle instanceGenPipeline;
 
     nvrhi::BufferHandle pulledVertexBuffer;
-    nvrhi::BufferHandle pulledIndexBuffer;
     u32 maxPulledIndexCount = 0;
     xr_vector<DetailModelGPU> cachedModelGPUData;
 
@@ -183,7 +186,6 @@ public:
 
     nvrhi::BufferHandle visibleSlotIDsBuffer;
     nvrhi::BufferHandle visibleSlotCounterBuffer;
-    nvrhi::BufferHandle slotVisibilityBuffer;
 
     nvrhi::ShaderHandle slotCullComputeShader;
     nvrhi::BindingLayoutHandle slotCullBindingLayout;
@@ -192,16 +194,6 @@ public:
     nvrhi::ShaderHandle cullComputeShader;
     nvrhi::BindingLayoutHandle computeBindingLayout;
     nvrhi::ComputePipelineHandle computePipeline;
-
-    nvrhi::ShaderHandle decalVertexShader;
-    nvrhi::ShaderHandle decalPixelShader;
-    nvrhi::ShaderHandle billboardVertexShader;
-    nvrhi::ShaderHandle billboardPixelShader;
-
-    nvrhi::BindingLayoutHandle decalBindingLayout;
-    nvrhi::BindingLayoutHandle billboardBindingLayout;
-    nvrhi::GraphicsPipelineHandle decalGraphicsPipeline;
-    nvrhi::GraphicsPipelineHandle billboardGraphicsPipeline;
 
     u32 visibleBufferCapacity = 0;
 
@@ -241,8 +233,6 @@ public:
     nvrhi::SamplerHandle cachedSmp_PointClamp;
     nvrhi::SamplerHandle cachedSmp_LinearClamp;
     nvrhi::SamplerHandle cachedSmp_AnisoWrap;
-
-    nvrhi::BufferHandle cachedDummySlotIndirection;
 
     fg::BufferHandle cachedCullParamsCB;
     fg::BufferHandle cachedInstanceGenParamsCB;
@@ -296,8 +286,6 @@ public:
     void UploadBufferData(nvrhi::ICommandList* cmdList);
     bool LoadCullComputeShader(class framegraph::ShaderLoader* shaderLoader);
     bool LoadInstanceGenShader(class framegraph::ShaderLoader* shaderLoader);
-    bool LoadGraphicsShaders(class framegraph::ShaderLoader* shaderLoader);
-    bool CreateGraphicsPipeline(fg::RenderDevice* device, const nvrhi::FramebufferInfo& fbInfo);
     bool CreateComputePipeline(fg::RenderDevice* device);
     bool CreateInstanceGenPipeline(fg::RenderDevice* device);
     bool LoadPrefixSumShaders(class framegraph::ShaderLoader* shaderLoader);

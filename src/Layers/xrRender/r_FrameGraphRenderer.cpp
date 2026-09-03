@@ -36,7 +36,6 @@
 #include "FGDetailManager.h"                         // Detail system (grass/vegetation)
 #include "FrameGraphPasses/DetailCullPassSetup.h"
 #include "FrameGraphPasses/DetailResolvePassSetup.h"    // Detail culling (async compute)
-#include "FrameGraphPasses/DetailPassSetup.h"        // Detail rendering pass
 #include "FrameGraphPasses/TransparentPassSetup.h"   // Transparent alpha-blended geometry (after detail)
 #include "FrameGraphPasses/DeferredLightPassSetup.h"
 // SM6 bindless: Textures registered directly with D3D12Backend via RegisterBindlessTexture()
@@ -1087,7 +1086,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_detailManager->LoadCullComputeShader(shaderLoader);
             m_detailManager->LoadInstanceGenShader(shaderLoader);
             m_detailManager->LoadPrefixSumShaders(shaderLoader);
-            m_detailManager->LoadGraphicsShaders(shaderLoader);
 
             m_detailManager->CreateComputePipeline(m_device);
             m_detailManager->CreateInstanceGenPipeline(m_device);
@@ -1149,7 +1147,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         ? m_gpuCullingManager->GetClusterEntryCapacity() + fg::GPUCullingManager::SKINNED_ENTRY_CAPACITY
         : 0u;
     const bool grassIds = detailArgsHandle.is_valid()
-        && grassEntryBase + fg::FGDetailManager::LOD_COUNT * (1u << 22) <= passes::kVisIdEntryLimit;
+        && grassEntryBase + fg::FGDetailManager::VIS_KIND_COUNT * (1u << 22) <= passes::kVisIdEntryLimit;
 
     framegraph::VirtualResourceHandle visIdBuffer;
     if (cullActive && clusterConfig.UseMegaBuffers() && clusterConfig.IsValid()
@@ -1382,18 +1380,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  DETAIL DRAW PASS (Graphics)
-    // ═══════════════════════════════════════════════════════
-    auto detailOutputs = passes::setupDetailPass(
-        *m_framegraph,
-        m_device,
-        m_detailManager.get(),
-        gbufferOutputs,
-        width,
-        height,
-        m_gpuProfiler.get()
-    );
+    auto detailOutputs = gbufferOutputs;
 
     if (m_decalManager) {
         m_decalManager->Update(Device.fTimeDelta, Device.fTimeGlobal);
