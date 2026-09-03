@@ -22,9 +22,12 @@ namespace {
 
 struct MaterialResolvePassData {
     VirtualResourceHandle visId;
+    VirtualResourceHandle depth;
     VirtualResourceHandle color;
     VirtualResourceHandle normal;
     VirtualResourceHandle baseColor;
+    VirtualResourceHandle motionVectors;
+    VirtualResourceHandle visDepth;
     VirtualResourceHandle skinnedDrawArgs;
     fg::RenderDevice* device = nullptr;
     MaterialCache* materialCache = nullptr;
@@ -32,15 +35,20 @@ struct MaterialResolvePassData {
     nvrhi::IBuffer* splatBuffer = nullptr;
     MaterialResolvePassState* state = nullptr;
     BindlessForwardConfig bindlessConfig;
+    Fmatrix prevView;
+    Fmatrix prevProj;
+    bool motionValid = false;
     u32 width = 0;
     u32 height = 0;
 };
 
 struct alignas(16) MaterialResolveParams {
+    Fmatrix prevView;
+    Fmatrix prevProj;
     u32 skinnedEntryBase;
+    u32 motionValid;
     u32 pad0;
     u32 pad1;
-    u32 pad2;
 };
 
 }
@@ -97,6 +105,7 @@ MaterialResolveOutput setupMaterialResolvePass(
     FrameGraph& fg,
     fg::RenderDevice* device,
     VirtualResourceHandle visId,
+    VirtualResourceHandle depth,
     VirtualResourceHandle color,
     VirtualResourceHandle normal,
     VirtualResourceHandle baseColor,
@@ -105,13 +114,32 @@ MaterialResolveOutput setupMaterialResolvePass(
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
     nvrhi::IBuffer* splatBuffer,
+    const Fmatrix& prevView,
+    const Fmatrix& prevProj,
+    bool motionValid,
     u32 width,
     u32 height,
     MaterialResolvePassState* state)
 {
+    ResourceDesc motionDesc;
+    motionDesc.type = ResourceDesc::Type::Texture2D;
+    motionDesc.debugName = "rt_MotionVectors";
+    motionDesc.width = width;
+    motionDesc.height = height;
+    motionDesc.format = nvrhi::Format::RG16_FLOAT;
+    motionDesc.isUAV = true;
+    motionDesc.allowUAV = true;
+    motionDesc.isTransient = true;
+    VirtualResourceHandle motionHandle = fg.CreateTexture("rt_MotionVectors", motionDesc);
+
+    ResourceDesc visDepthDesc = motionDesc;
+    visDepthDesc.debugName = "rt_VisDepth";
+    visDepthDesc.format = nvrhi::Format::R32_FLOAT;
+    VirtualResourceHandle visDepthHandle = fg.CreateTexture("rt_VisDepth", visDepthDesc);
+
     auto& passData = fg.addCallbackPass<MaterialResolvePassData>(
         "Material Resolve",
-        [&, visId, color, normal, baseColor, skinnedDrawArgs, bindlessConfig, materialCache, gpuCulling, splatBuffer, width, height, state](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
+        [&, visId, depth, color, normal, baseColor, skinnedDrawArgs, bindlessConfig, materialCache, gpuCulling, splatBuffer, prevView, prevProj, motionValid, width, height, state, motionHandle, visDepthHandle](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.materialCache = materialCache;
@@ -119,25 +147,34 @@ MaterialResolveOutput setupMaterialResolvePass(
             data.splatBuffer = splatBuffer;
             data.state = state;
             data.bindlessConfig = bindlessConfig;
+            data.prevView = prevView;
+            data.prevProj = prevProj;
+            data.motionValid = motionValid;
             data.width = width;
             data.height = height;
             data.visId = passBuilder.read(visId, ResourceState::ShaderResource);
+            data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
             if (skinnedDrawArgs.is_valid())
                 data.skinnedDrawArgs = passBuilder.read(skinnedDrawArgs, ResourceState::IndirectArgument);
             data.color = passBuilder.readWrite(color, ResourceState::UnorderedAccess);
             data.normal = passBuilder.readWrite(normal, ResourceState::UnorderedAccess);
             data.baseColor = passBuilder.readWrite(baseColor, ResourceState::UnorderedAccess);
+            data.motionVectors = passBuilder.write(motionHandle, ResourceState::UnorderedAccess);
+            data.visDepth = passBuilder.write(visDepthHandle, ResourceState::UnorderedAccess);
         },
         [](const MaterialResolvePassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ZoneScoped;
             ZoneName("MaterialResolvePass", 19);
 
             auto* visRT = fg.GetPhysicalTexture(data.visId);
+            auto* depthRT = fg.GetPhysicalTexture(data.depth);
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
             auto* baseColorRT = fg.GetPhysicalTexture(data.baseColor);
+            auto* motionRT = fg.GetPhysicalTexture(data.motionVectors);
+            auto* visDepthRT = fg.GetPhysicalTexture(data.visDepth);
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            if (!visRT || !colorRT || !normalRT || !baseColorRT || !cmdList)
+            if (!visRT || !depthRT || !colorRT || !normalRT || !baseColorRT || !motionRT || !visDepthRT || !cmdList)
                 return;
 
             cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
@@ -174,7 +211,10 @@ MaterialResolveOutput setupMaterialResolvePass(
                 && gpuCulling->GetGlobalBoneBuffer();
             auto paramsCB = cache.GetOrCreateVolatileCB("MaterialResolve", "MaterialResolveParams", sizeof(MaterialResolveParams), data.device, 16);
             MaterialResolveParams params = {};
+            params.prevView = data.prevView;
+            params.prevProj = data.prevProj;
             params.skinnedEntryBase = skinned ? gpuCulling->GetClusterEntryCount() : 0xFFFFFFFFu;
+            params.motionValid = data.motionValid ? 1u : 0u;
             cmdList->writeBuffer(paramsCB, &params, sizeof(params));
 
             BindingSetBuilder bsb(*refl, nvDevice, "MaterialResolve");
@@ -190,13 +230,17 @@ MaterialResolveOutput setupMaterialResolvePass(
             bsb.BufferSRV("g_SkinnedEntries", skinned ? gpuCulling->GetSkinnedEntryBuffer() : config.cluster.entryBuffer);
             bsb.BufferSRV("g_SkinnedVB", skinned ? gpuCulling->GetSkinnedPreVertexBuffer() : config.megaVertexBuffer);
             bsb.BufferSRV("g_SkinnedIB", skinned ? gpuCulling->GetSkinnedPools().GetCombinedIndexBuffer() : config.megaIndexBuffer);
+            bsb.BufferSRV("g_SkinnedPrevVB", skinned ? gpuCulling->GetSkinnedPrevVertexBuffer() : config.megaVertexBuffer);
             bsb.BufferSRV("g_SkinnedRecords", skinned ? gpuCulling->GetSkinnedRecordsBuffer() : config.cluster.entryBuffer);
             bsb.BufferSRV("g_BoneMatrices", skinned ? gpuCulling->GetGlobalBoneBuffer() : config.megaVertexBuffer);
             bsb.BufferSRV("g_PaintSplats", skinned && data.splatBuffer ? data.splatBuffer : config.megaVertexBuffer);
             bsb.Texture("g_VisID", visRT);
+            bsb.Texture("g_Depth", depthRT);
             bsb.TextureUAV("g_OutNormal", normalRT);
             bsb.TextureUAV("g_OutBaseColor", baseColorRT);
             bsb.TextureUAV("g_OutColor", colorRT);
+            bsb.TextureUAV("g_OutMotion", motionRT);
+            bsb.TextureUAV("g_OutVisDepth", visDepthRT);
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->layout, nvDevice);
             if (!bindingSet)
                 return;
@@ -216,6 +260,8 @@ MaterialResolveOutput setupMaterialResolvePass(
     out.color = passData.color;
     out.normal = passData.normal;
     out.baseColor = passData.baseColor;
+    out.motionVectors = passData.motionVectors;
+    out.visDepth = passData.visDepth;
     return out;
 }
 

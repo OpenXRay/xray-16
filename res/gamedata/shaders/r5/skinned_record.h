@@ -7,7 +7,7 @@ struct SkinnedDrawRecord
     uint boneOffset;
     uint splatOffset;
     uint splatCount;
-    uint pad;
+    uint prevFirstVertex;
     float4 bounds;
 };
 

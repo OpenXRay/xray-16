@@ -439,6 +439,8 @@ private:
     u32 m_pingPongIndex = 0;
 
     Fmatrix m_prevViewProj;
+    Fmatrix m_prevView;
+    Fmatrix m_prevProject;
     Fvector m_prevCameraPos;
     bool m_hasPrevFrameData = false;
     u32 m_prevFrameWidth = 0;

@@ -2,6 +2,7 @@
 #include "visbuffer_common.h"
 
 Texture2D<uint> g_VisID : register(t30);
+Texture2D<float2> g_Motion : register(t31);
 RWTexture2D<float4> g_VisDebug : register(u0);
 
 cbuffer VisDebugParams : register(b5)
@@ -25,6 +26,14 @@ void main(uint3 dtid : SV_DispatchThreadID)
     g_VisID.GetDimensions(width, height);
     if (dtid.x >= width || dtid.y >= height)
         return;
+
+    if (visDebugMode == 3u)
+    {
+        float2 mv = g_Motion[dtid.xy];
+        float2 v = sign(mv) * sqrt(abs(mv) * 8.0);
+        g_VisDebug[dtid.xy] = float4(saturate(v + 0.5), 0.5, 1.0);
+        return;
+    }
 
     uint id = g_VisID[dtid.xy];
     if (id == 0u)

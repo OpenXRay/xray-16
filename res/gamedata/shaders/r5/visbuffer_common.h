@@ -67,6 +67,12 @@ MegaVertex LoadMegaVertex(ByteAddressBuffer vb, uint vertexIndex)
     return v;
 }
 
+float3 LoadMegaPosition(ByteAddressBuffer vb, uint vertexIndex)
+{
+    uint3 w = vb.Load3(vertexIndex * 48u);
+    return float3(asfloat(w.x), asfloat(w.y), asfloat(w.z));
+}
+
 struct BarycentricDeriv
 {
     float3 m_lambda;
