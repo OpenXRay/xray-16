@@ -123,6 +123,8 @@ struct VSMState {
     Fmatrix prevViewProj;
     Fvector prevCamPos;
     nvrhi::BufferHandle binStats;
+    nvrhi::BufferHandle binArgs;
+    nvrhi::BufferHandle dirtyRects;
     nvrhi::BufferHandle pairs[kVSMStreamCount];
     nvrhi::BufferHandle pageArgs[kVSMStreamCount];
     nvrhi::BufferHandle readback[kReadbackSlots];
@@ -173,6 +175,8 @@ struct VSMState {
     bool dynPipelinesFailed = false;
     nvrhi::GraphicsPipelineHandle clearPipeline;
     nvrhi::BindingLayoutHandle clearLayout;
+    nvrhi::ComputePipelineHandle binPrepPipeline;
+    nvrhi::BindingLayoutHandle binPrepLayout;
     nvrhi::ComputePipelineHandle binPipeline;
     nvrhi::BindingLayoutHandle binLayout;
     nvrhi::ComputePipelineHandle argsPipeline;
