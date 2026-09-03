@@ -145,7 +145,7 @@ void FrameGraphRenderer::level_Load(IReader* fs)
         //  MEGA-BUFFER SYSTEM: End level load
         // ═══════════════════════════════════════════════════════
         auto* gpuCulling = GetGPUCullingManager();
-        if (gpuCulling && ps_r_cluster) {
+        if (gpuCulling) {
             g_pGamePersistent->LoadTitle("st_loading_geometry");
             xr_vector<ClusterBakeRange> ranges;
             CollectClusterBakeRanges(ranges);

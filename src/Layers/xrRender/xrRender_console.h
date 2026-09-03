@@ -234,7 +234,6 @@ enum
 };
 
 // Smoke Trail (weapon muzzle smoke)
-extern ECORE_API int   ps_r_cluster;
 extern ECORE_API int   ps_r_cluster_tris;
 extern ECORE_API int   ps_r_cluster_merge;
 extern ECORE_API int   ps_r_cluster_cache;

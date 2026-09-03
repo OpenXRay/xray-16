@@ -2303,7 +2303,7 @@ void GPUCullingManager::ExecuteCullPhase(fg::RenderContext* ctx, nvrhi::ITexture
         cb.hizMipLevels = phase.hizMipLevels;
         cb.frameId = phase.stamp;
         cb.useHiZ = phase.useHiZ ? 1u : 0u;
-        cb.padding[0] = (ps_r_cluster && m_clusterSet.entryCount > 0 && m_clusterSet.uploaded) ? 1u : 0u;
+        cb.padding[0] = (m_clusterSet.entryCount > 0 && m_clusterSet.uploaded) ? 1u : 0u;
         cb.padding[1] = 0;
         ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
     };
@@ -3650,14 +3650,14 @@ void GPUCullingManager::BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges
 
 u32 GPUCullingManager::GetStaticResidualCount() const
 {
-    if (ps_r_cluster && m_clusterSet.entryCount > 0)
+    if (m_clusterSet.entryCount > 0)
         return m_clusterSet.residualStaticCount;
     return m_staticSet.objectCount;
 }
 
 u32 GPUCullingManager::GetTerrainResidualCount() const
 {
-    if (ps_r_cluster && m_clusterSet.entryCount > 0)
+    if (m_clusterSet.entryCount > 0)
         return m_clusterSet.residualTerrainCount;
     return m_terrainObjectCount;
 }
@@ -3714,7 +3714,7 @@ void GPUCullingManager::BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList)
     nextHistory.clear();
     m_dynamicPrevWorldData.resize(dynamicCount);
 
-    const bool clusterReady = ps_r_cluster && m_clusterSet.uploaded && m_clusterSet.entryBuffer;
+    const bool clusterReady = m_clusterSet.uploaded && m_clusterSet.entryBuffer;
     const xr_vector<ClusterMetaProto>& protos = m_clusterDAG.Protos();
     const u32 megaBase = m_clusterDAG.MegaIndexBase();
 
@@ -3772,7 +3772,7 @@ void GPUCullingManager::BuildClusterEntries()
     m_clusterSet.residualTerrainCount = 0;
     m_clusterSet.uploaded = false;
 
-    if (!ps_r_cluster || m_clusterDAG.Empty())
+    if (m_clusterDAG.Empty())
         return;
 
     const u32 staticCount = m_staticSet.objectCount;
@@ -4099,7 +4099,7 @@ bool GPUCullingManager::EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice)
 void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
     nvrhi::ITexture* hizTexture, const CullPhaseParams& phase)
 {
-    if (!ps_r_cluster || m_clusterSet.entryCount == 0 || !m_clusterSet.uploaded)
+    if (m_clusterSet.entryCount == 0 || !m_clusterSet.uploaded)
         return;
     if (!EnsureClusterCullPipeline(nvDevice)) {
         Msg("! [GPUCulling] cluster cull pipeline unavailable, disabling cluster path");
