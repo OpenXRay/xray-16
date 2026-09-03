@@ -182,7 +182,6 @@ void FGUIRender::Initialize(RenderDevice* device, render::MaterialCache* matCach
 
 void FGUIRender::Shutdown()
 {
-    m_constantBuffer = nullptr;
     m_indexBuffer = nullptr;
     m_vertexBuffer = nullptr;
     m_matCache = nullptr;
@@ -196,16 +195,6 @@ bool FGUIRender::CreateBuffers()
     constexpr size_t kInitialIndices = 8192;
 
     nvrhi::IDevice* nvrhiDevice = m_device->GetNVRHIDevice();
-
-    nvrhi::BufferDesc cbDesc;
-    cbDesc.byteSize = 256;
-    cbDesc.isConstantBuffer = true;
-    cbDesc.debugName = "FGUIRender_CB";
-    cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-    cbDesc.keepInitialState = true;
-    m_constantBuffer = nvrhiDevice->createBuffer(cbDesc);
-    if (!m_constantBuffer)
-        return false;
 
     nvrhi::BufferDesc vbDesc;
     vbDesc.byteSize = kInitialVertices * sizeof(UIVertex);
@@ -354,21 +343,6 @@ void FGUIRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebu
 
     EnsureBufferCapacity(m_vertexScratch.size(), m_indexScratch.size());
 
-    struct UIConstants
-    {
-        float screenWidth;
-        float screenHeight;
-        float invScreenWidth;
-        float invScreenHeight;
-    };
-
-    u8 cbData[256] = {};
-    UIConstants* constants = reinterpret_cast<UIConstants*>(cbData);
-    constants->screenWidth = static_cast<float>(screenWidth);
-    constants->screenHeight = static_cast<float>(screenHeight);
-    constants->invScreenWidth = 1.0f / constants->screenWidth;
-    constants->invScreenHeight = 1.0f / constants->screenHeight;
-    cmdList->writeBuffer(m_constantBuffer, cbData, 256);
     cmdList->writeBuffer(m_vertexBuffer, m_vertexScratch.data(), m_vertexScratch.size() * sizeof(UIVertex));
     if (!m_indexScratch.empty())
         cmdList->writeBuffer(m_indexBuffer, m_indexScratch.data(), m_indexScratch.size() * sizeof(u16));

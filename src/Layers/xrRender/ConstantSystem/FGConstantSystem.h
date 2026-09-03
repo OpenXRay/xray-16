@@ -84,6 +84,7 @@ public:
     // First frame: Uploads data to GPU
     // Later frames: Just binds existing buffer (no upload)
     void CommitStatic(fg::RenderContext* ctx);
+    static void TransitionStaticForUpload(const MaterialPSO* pso, nvrhi::ICommandList* cmdList);
 
     // Invalidate static constant (force re-upload on next commit)
     void InvalidateStatic(const char* name);
@@ -100,6 +101,8 @@ public:
     void PrintUnboundConstants() const;
 
 private:
+    static bool CBHasStaticConstants(const MaterialPSO* pso, const MaterialPSO::ConstantBufferInfo& cbInfo);
+
     const MaterialPSO* m_pso;
     framegraph::VolatileConstantBufferPool* m_vcbPool;
 
