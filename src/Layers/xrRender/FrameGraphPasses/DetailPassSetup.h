@@ -31,7 +31,6 @@ namespace xray::render::fg::passes {
 
 struct DetailPassState {
     bool detailDataUploaded = false;
-    float lastBladeWidth = 0.0f;
 };
 
 struct DetailPassData {

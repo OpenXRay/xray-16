@@ -57,15 +57,6 @@ public:
     };
     static_assert(sizeof(SlotAABB) == 64, "SlotAABB must be 64 bytes");
 
-    struct BladeVertex
-    {
-        Fvector pos;
-        Fvector2 uv;
-        float t;
-        float width_scale;
-    };
-    static_assert(sizeof(BladeVertex) == 28, "BladeVertex must be 28 bytes");
-
     struct DetailFrameConstants
     {
         Fvector4 consts;
@@ -86,6 +77,8 @@ public:
         float grass_blade_height;
         u32 buildDetailsIndex;
         u32 buildDetailsPbrIndex;
+        float grass_blade_width;
+        float pad0, pad1, pad2;
     };
 
     struct DetailCullParams
@@ -157,6 +150,7 @@ public:
 
     static constexpr u32 LOD_COUNT = 3;
     static constexpr u32 LOD_SEGMENTS[LOD_COUNT] = {9, 4, 2};
+    static constexpr u32 LOD_TRIANGLES[LOD_COUNT] = {17, 7, 3};
 
     nvrhi::BufferHandle slotDataBuffer;
     xr_vector<GPUSlotData> slotDataCPU;
@@ -168,13 +162,6 @@ public:
     nvrhi::ShaderHandle instanceGenComputeShader;
     nvrhi::BindingLayoutHandle instanceGenBindingLayout;
     nvrhi::ComputePipelineHandle instanceGenPipeline;
-
-    nvrhi::BufferHandle bladeVertexBuffer[LOD_COUNT];
-    nvrhi::BufferHandle bladeIndexBuffer[LOD_COUNT];
-    u32 bladeVertexCount[LOD_COUNT] = {0, 0, 0};
-    u32 bladeIndexCount[LOD_COUNT] = {0, 0, 0};
-    xr_vector<BladeVertex> bladeVertices[LOD_COUNT];
-    xr_vector<u16> bladeIndices[LOD_COUNT];
 
     nvrhi::BufferHandle pulledVertexBuffer;
     nvrhi::BufferHandle pulledIndexBuffer;
@@ -206,18 +193,13 @@ public:
     nvrhi::BindingLayoutHandle computeBindingLayout;
     nvrhi::ComputePipelineHandle computePipeline;
 
-    nvrhi::ShaderHandle vertexShader;
-    nvrhi::ShaderHandle pixelShader;
     nvrhi::ShaderHandle decalVertexShader;
     nvrhi::ShaderHandle decalPixelShader;
     nvrhi::ShaderHandle billboardVertexShader;
     nvrhi::ShaderHandle billboardPixelShader;
 
-    nvrhi::InputLayoutHandle inputLayout;
-    nvrhi::BindingLayoutHandle graphicsBindingLayout;
     nvrhi::BindingLayoutHandle decalBindingLayout;
     nvrhi::BindingLayoutHandle billboardBindingLayout;
-    nvrhi::GraphicsPipelineHandle graphicsPipeline;
     nvrhi::GraphicsPipelineHandle decalGraphicsPipeline;
     nvrhi::GraphicsPipelineHandle billboardGraphicsPipeline;
 
@@ -340,8 +322,9 @@ public:
     bool CreatePerlin4DPipeline(nvrhi::IDevice* device);
     void DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, float time);
 
-    void GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments = 8);
-    void RegenerateBladeGeometry(nvrhi::ICommandList* cmdList);
+    void FillFrameConstants(DetailFrameConstants& out);
+    void UploadGrassTints(nvrhi::ICommandList* cmdList);
+    void ClearDrawArgs(nvrhi::ICommandList* cmdList);
     void ComputeSlotAABBs();
 
     void ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device);

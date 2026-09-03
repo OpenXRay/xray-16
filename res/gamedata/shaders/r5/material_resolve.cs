@@ -30,7 +30,8 @@ cbuffer MaterialResolveParams : register(b5)
     float4x4 g_PrevProj;
     uint g_SkinnedEntryBase;
     uint g_MotionValid;
-    uint2 g_ResolvePad;
+    uint g_EntryLimit;
+    uint g_ResolvePad;
 };
 
 float4 ProjectEntry(float3 worldPos, bool hud)
@@ -66,6 +67,8 @@ void main(uint3 dtid : SV_DispatchThreadID)
         return;
 
     uint entryIdx = id >> VIS_ID_TRI_BITS;
+    if (entryIdx >= g_EntryLimit)
+        return;
     uint tri = id & VIS_ID_TRI_MASK;
     bool skinned = entryIdx >= g_SkinnedEntryBase;
     ClusterEntry e = skinned ? g_SkinnedEntries[entryIdx - g_SkinnedEntryBase] : g_Entries[entryIdx];

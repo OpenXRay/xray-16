@@ -33,6 +33,22 @@ extern ENGINE_API float ps_r3_grass_lod_mid;
 extern ENGINE_API float ps_r3_grass_blade_width;
 extern ENGINE_API float ps_r3_grass_blade_height;
 
+
+extern ENGINE_API float ps_r__Detail_l_aniso;
+extern ENGINE_API float ps_r__Detail_l_ambient;
+extern ENGINE_API float ps_r3_grass_wind_multiplier;
+extern ENGINE_API float ps_r3_grass_wind_min;
+extern ENGINE_API float ps_r3_grass_wind_displacement;
+extern ENGINE_API float ps_r3_grass_interaction_displacement;
+extern ENGINE_API Fvector3 ps_r3_grass_color_tip;
+extern ENGINE_API Fvector3 ps_r3_grass_color_base;
+extern ENGINE_API float ps_r3_grass_color_variation;
+extern ENGINE_API Fvector3 ps_r3_grass_sss_color;
+extern ENGINE_API float ps_r3_grass_sss_intensity;
+extern ENGINE_API Fvector3 ps_r3_grass_object_tints[64];
+extern ENGINE_API float ps_r3_grass_blade_width;
+extern ENGINE_API float ps_r3_grass_blade_height;
+
 namespace xray::render::fg
 {
 extern int ps_r__detail_gpu;
@@ -1168,63 +1184,6 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    for (u32 lod = 0; lod < LOD_COUNT; lod++)
-    {
-        GenerateBladeGeometry(bladeVertices[lod], bladeIndices[lod], LOD_SEGMENTS[lod]);
-        bladeVertexCount[lod] = static_cast<u32>(bladeVertices[lod].size());
-        bladeIndexCount[lod] = static_cast<u32>(bladeIndices[lod].size());
-
-        Msg("* [FGDetailManager] LOD%u: %u segments, %u vertices, %u indices",
-            lod, LOD_SEGMENTS[lod], bladeVertexCount[lod], bladeIndexCount[lod]);
-
-        {
-            nvrhi::BufferDesc desc;
-            desc.byteSize = bladeVertices[lod].size() * sizeof(BladeVertex);
-            desc.structStride = 0;
-            desc.debugName = ("DetailBladeVB_LOD" + std::to_string(lod)).c_str();
-            desc.canHaveUAVs = false;
-            desc.canHaveTypedViews = false;
-            desc.isVertexBuffer = true;
-            desc.isIndexBuffer = false;
-            desc.isConstantBuffer = false;
-            desc.isDrawIndirectArgs = false;
-            desc.canHaveRawViews = false;
-            desc.initialState = nvrhi::ResourceStates::ShaderResource;
-            desc.keepInitialState = true;
-
-            bladeVertexBuffer[lod] = device->createBuffer(desc);
-            if (!bladeVertexBuffer[lod])
-            {
-                Msg("! [FGDetailManager] Failed to create blade vertex buffer LOD%u", lod);
-                return false;
-            }
-        }
-
-        {
-            nvrhi::BufferDesc desc;
-            desc.byteSize = bladeIndices[lod].size() * sizeof(u16);
-            desc.structStride = 0;
-            desc.debugName = ("DetailBladeIB_LOD" + std::to_string(lod)).c_str();
-            desc.canHaveUAVs = false;
-            desc.canHaveTypedViews = false;
-            desc.isVertexBuffer = false;
-            desc.isIndexBuffer = true;
-            desc.isConstantBuffer = false;
-            desc.isDrawIndirectArgs = false;
-            desc.canHaveRawViews = false;
-            desc.initialState = nvrhi::ResourceStates::ShaderResource;
-            desc.keepInitialState = true;
-
-            bladeIndexBuffer[lod] = device->createBuffer(desc);
-            if (!bladeIndexBuffer[lod])
-            {
-                Msg("! [FGDetailManager] Failed to create blade index buffer LOD%u", lod);
-                return false;
-            }
-        }
-    }
-
-
     Msg("* [FGDetailManager] GPU buffers created (instance capacity: %u, %.2f MB)",
         generatedInstancesCapacity, float(generatedInstancesCapacity * sizeof(InstanceData)) / (1024.f * 1024.f));
 
@@ -1323,8 +1282,6 @@ void FGDetailManager::DestroyGPUBuffers()
     {
         visibleInstancesBuffer[lod] = nullptr;
         drawArgsBuffer[lod] = nullptr;
-        bladeVertexBuffer[lod] = nullptr;
-        bladeIndexBuffer[lod] = nullptr;
     }
 
     slotAABBBuffer = nullptr;
@@ -1358,10 +1315,8 @@ void FGDetailManager::DestroyGPUBuffers()
     computeBindingLayout = nullptr;
     cullComputeShader = nullptr;
 
-    graphicsPipeline = nullptr;
     decalGraphicsPipeline = nullptr;
     billboardGraphicsPipeline = nullptr;
-    graphicsBindingLayout = nullptr;
     decalBindingLayout = nullptr;
     billboardBindingLayout = nullptr;
     billboardVertexShader = nullptr;
@@ -1407,17 +1362,13 @@ void FGDetailManager::InvalidateShadersAndPipelines()
     computeBindingLayout = nullptr;
     computePipeline = nullptr;
 
-    vertexShader = nullptr;
-    pixelShader = nullptr;
     decalVertexShader = nullptr;
     decalPixelShader = nullptr;
     billboardVertexShader = nullptr;
     billboardPixelShader = nullptr;
 
-    graphicsBindingLayout = nullptr;
     decalBindingLayout = nullptr;
     billboardBindingLayout = nullptr;
-    graphicsPipeline = nullptr;
     decalGraphicsPipeline = nullptr;
     billboardGraphicsPipeline = nullptr;
 
@@ -1558,86 +1509,6 @@ void FGDetailManager::DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrh
 
     // 3D dispatch: 64/4 = 16 groups per dimension
     cmdList->dispatch(PERLIN4D_TEXTURE_SIZE / 8, PERLIN4D_TEXTURE_SIZE / 8, PERLIN4D_TEXTURE_SIZE / 8);
-}
-
-void FGDetailManager::GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments)
-{
-    vertices.clear();
-    indices.clear();
-
-    float width_base = ps_r3_grass_blade_width;
-    float height = ps_r3_grass_blade_height;
-
-    for (int i = 0; i < segments; i++)
-    {
-        float t = float(i) / float(segments);
-        float y = t * height;
-
-        float taper = 1.0f - powf(t, 0.7f);
-        float width = width_base * taper;
-
-        BladeVertex v_left;
-        v_left.pos.set(-width * 0.5f, y, 0.0f);
-        v_left.uv.set(0.0f, 1.0f - t);
-        v_left.t = t;
-        v_left.width_scale = width;
-        vertices.push_back(v_left);
-
-        BladeVertex v_right;
-        v_right.pos.set(width * 0.5f, y, 0.0f);
-        v_right.uv.set(1.0f, 1.0f - t);
-        v_right.t = t;
-        v_right.width_scale = width;
-        vertices.push_back(v_right);
-    }
-
-    {
-        BladeVertex v_tip;
-        v_tip.pos.set(0.0f, height, 0.0f);
-        v_tip.uv.set(0.5f, 0.0f);
-        v_tip.t = 1.0f;
-        v_tip.width_scale = 0.0f;
-        vertices.push_back(v_tip);
-    }
-
-    u16 tipIndex = static_cast<u16>(segments * 2);
-
-    for (int i = 0; i < segments - 1; i++)
-    {
-        u16 base = i * 2;
-        indices.push_back(base);
-        indices.push_back(base + 2);
-        indices.push_back(base + 1);
-        indices.push_back(base + 1);
-        indices.push_back(base + 2);
-        indices.push_back(base + 3);
-    }
-
-    {
-        u16 base = (segments - 1) * 2;
-        indices.push_back(base);
-        indices.push_back(tipIndex);
-        indices.push_back(base + 1);
-    }
-}
-
-void FGDetailManager::RegenerateBladeGeometry(nvrhi::ICommandList* cmdList)
-{
-    if (!cmdList)
-        return;
-
-    Msg("* [FGDetailManager] Regenerating blade geometry (width=%.3f, height=%.2f)",
-        ps_r3_grass_blade_width, ps_r3_grass_blade_height);
-
-    for (u32 lod = 0; lod < LOD_COUNT; lod++)
-    {
-        GenerateBladeGeometry(bladeVertices[lod], bladeIndices[lod], LOD_SEGMENTS[lod]);
-        bladeVertexCount[lod] = static_cast<u32>(bladeVertices[lod].size());
-        bladeIndexCount[lod] = static_cast<u32>(bladeIndices[lod].size());
-
-        cmdList->writeBuffer(bladeVertexBuffer[lod], bladeVertices[lod].data(), bladeVertices[lod].size() * sizeof(BladeVertex));
-        cmdList->writeBuffer(bladeIndexBuffer[lod], bladeIndices[lod].data(), bladeIndices[lod].size() * sizeof(u16));
-    }
 }
 
 void FGDetailManager::ComputeSlotAABBs()
@@ -1827,22 +1698,6 @@ bool FGDetailManager::LoadGraphicsShaders(framegraph::ShaderLoader* shaderLoader
         return false;
     }
 
-    auto vsResult = shaderLoader->LoadVertexShader("detail_gpu", "main");
-    if (!vsResult.handle)
-    {
-        Msg("! [FGDetailManager] Failed to load detail_gpu.vs");
-        return false;
-    }
-    vertexShader = vsResult.handle;
-
-    auto psResult = shaderLoader->LoadPixelShader("detail_gpu", "main");
-    if (!psResult.handle)
-    {
-        Msg("! [FGDetailManager] Failed to load detail_gpu.ps");
-        return false;
-    }
-    pixelShader = psResult.handle;
-
     auto decalVsResult = shaderLoader->LoadVertexShader("detail_decal", "main");
     if (!decalVsResult.handle)
     {
@@ -1884,12 +1739,6 @@ void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
 
     if (detailModelsBuffer && !cachedModelGPUData.empty())
         cmdList->writeBuffer(detailModelsBuffer, cachedModelGPUData.data(), cachedModelGPUData.size() * sizeof(DetailModelGPU));
-
-    for (u32 lod = 0; lod < LOD_COUNT; lod++)
-    {
-        cmdList->writeBuffer(bladeVertexBuffer[lod], bladeVertices[lod].data(), bladeVertices[lod].size() * sizeof(BladeVertex));
-        cmdList->writeBuffer(bladeIndexBuffer[lod], bladeIndices[lod].data(), bladeIndices[lod].size() * sizeof(u16));
-    }
 
     if (pulledVertexBuffer && !pulledVertexData.empty())
         cmdList->writeBuffer(pulledVertexBuffer, pulledVertexData.data(), pulledVertexData.size() * sizeof(DecalPulledVertex));
@@ -2018,7 +1867,7 @@ bool FGDetailManager::CreateInstanceGenPipeline(fg::RenderDevice* renderDevice)
 
 bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, const nvrhi::FramebufferInfo& fbInfo)
 {
-    if (!renderDevice || !vertexShader || !pixelShader)
+    if (!renderDevice || !decalVertexShader || !decalPixelShader)
     {
         Msg("! [FGDetailManager] CreateGraphicsPipeline: invalid parameters");
         return false;
@@ -2027,21 +1876,6 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
     nvrhi::IDevice* device = renderDevice->GetNVRHIDevice();
 
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
-    auto* vsRefl = shaderLoader->GetCachedReflection("detail_gpu", ".vs");
-    auto* psRefl = shaderLoader->GetCachedReflection("detail_gpu", ".ps");
-    if (!vsRefl || !psRefl)
-    {
-        Msg("! [FGDetailManager] Failed to get detail_gpu reflection");
-        return false;
-    }
-
-    graphicsBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailGPU", *vsRefl, *psRefl, device);
-    if (!graphicsBindingLayout)
-    {
-        Msg("! [FGDetailManager] Failed to create graphics binding layout");
-        return false;
-    }
-
     auto* decalVsRefl = shaderLoader->GetCachedReflection("detail_decal", ".vs");
     auto* decalPsRefl = shaderLoader->GetCachedReflection("detail_decal", ".ps");
     if (!decalVsRefl || !decalPsRefl)
@@ -2057,82 +1891,31 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
         return false;
     }
 
-    nvrhi::VertexAttributeDesc attributes[] = {
-        nvrhi::VertexAttributeDesc()
-            .setName("POSITION")
-            .setFormat(nvrhi::Format::RGB32_FLOAT)
-            .setOffset(0)
-            .setElementStride(sizeof(BladeVertex)),
-        nvrhi::VertexAttributeDesc()
-            .setName("TEXCOORD")
-            .setFormat(nvrhi::Format::RG32_FLOAT)
-            .setOffset(12)
-            .setElementStride(sizeof(BladeVertex)),
-        nvrhi::VertexAttributeDesc()
-            .setName("COLOR")
-            .setFormat(nvrhi::Format::R32_FLOAT)
-            .setArraySize(2)
-            .setOffset(20)
-            .setElementStride(sizeof(BladeVertex)),
-    };
-
-    inputLayout = device->createInputLayout(attributes, 3, vertexShader);
-    if (!inputLayout)
-    {
-        Msg("! [FGDetailManager] Failed to create input layout");
-        return false;
-    }
+    auto* backend = renderDevice->GetBackend();
+    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
 
     nvrhi::GraphicsPipelineDesc pipelineDesc;
-    pipelineDesc.VS = vertexShader;
-    pipelineDesc.PS = pixelShader;
-    pipelineDesc.inputLayout = inputLayout;
+    pipelineDesc.inputLayout = nullptr;
     pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
-
-    pipelineDesc.bindingLayouts.push_back(graphicsBindingLayout);
-    auto* backend = renderDevice->GetBackend();
-    if (backend) {
-        auto* bindlessLayout = backend->GetBindlessLayout();
-        if (bindlessLayout) {
-            pipelineDesc.bindingLayouts.push_back(bindlessLayout);
-        }
-    }
-
     pipelineDesc.renderState.rasterState.fillMode = nvrhi::RasterFillMode::Solid;
     pipelineDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-
     pipelineDesc.renderState.depthStencilState.depthTestEnable = true;
     pipelineDesc.renderState.depthStencilState.depthWriteEnable = true;
     pipelineDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
-
     pipelineDesc.renderState.blendState.targets[0].disableBlend();
 
-    graphicsPipeline = device->createGraphicsPipeline(pipelineDesc, fbInfo);
-    if (!graphicsPipeline)
+    nvrhi::GraphicsPipelineDesc decalPipeDesc = pipelineDesc;
+    decalPipeDesc.VS = decalVertexShader;
+    decalPipeDesc.PS = decalPixelShader;
+    decalPipeDesc.bindingLayouts = { decalBindingLayout };
+    if (bindlessLayout)
+        decalPipeDesc.bindingLayouts.push_back(bindlessLayout);
+
+    decalGraphicsPipeline = device->createGraphicsPipeline(decalPipeDesc, fbInfo);
+    if (!decalGraphicsPipeline)
     {
-        Msg("! [FGDetailManager] Failed to create graphics pipeline");
+        Msg("! [FGDetailManager] Failed to create decal graphics pipeline");
         return false;
-    }
-
-    if (decalVertexShader && decalPixelShader)
-    {
-        nvrhi::GraphicsPipelineDesc decalPipeDesc = pipelineDesc;
-        decalPipeDesc.VS = decalVertexShader;
-        decalPipeDesc.PS = decalPixelShader;
-        decalPipeDesc.inputLayout = nullptr;
-        decalPipeDesc.bindingLayouts = { decalBindingLayout };
-        if (backend) {
-            auto* bindlessLayout = backend->GetBindlessLayout();
-            if (bindlessLayout)
-                decalPipeDesc.bindingLayouts.push_back(bindlessLayout);
-        }
-
-        decalGraphicsPipeline = device->createGraphicsPipeline(decalPipeDesc, fbInfo);
-        if (!decalGraphicsPipeline)
-        {
-            Msg("! [FGDetailManager] Failed to create decal graphics pipeline");
-            return false;
-        }
     }
 
     if (billboardVertexShader && billboardPixelShader)
@@ -2147,13 +1930,9 @@ bool FGDetailManager::CreateGraphicsPipeline(fg::RenderDevice* renderDevice, con
         nvrhi::GraphicsPipelineDesc bbPipeDesc = pipelineDesc;
         bbPipeDesc.VS = billboardVertexShader;
         bbPipeDesc.PS = billboardPixelShader;
-        bbPipeDesc.inputLayout = nullptr;
         bbPipeDesc.bindingLayouts = { billboardBindingLayout };
-        if (backend) {
-            auto* bindlessLayout = backend->GetBindlessLayout();
-            if (bindlessLayout)
-                bbPipeDesc.bindingLayouts.push_back(bindlessLayout);
-        }
+        if (bindlessLayout)
+            bbPipeDesc.bindingLayouts.push_back(bindlessLayout);
 
         billboardGraphicsPipeline = device->createGraphicsPipeline(bbPipeDesc, fbInfo);
         if (!billboardGraphicsPipeline)
@@ -2295,7 +2074,7 @@ void FGDetailManager::DispatchCulling(
     struct IndirectDrawArgs { u32 indexCount, instanceCount, startIndex; s32 baseVertex; u32 startInstance; };
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
-        IndirectDrawArgs args = { bladeIndexCount[lod], 0, 0, 0, 0 };
+        IndirectDrawArgs args = { LOD_TRIANGLES[lod] * 3u, 0, 0, 0, 0 };
         cmdList->writeBuffer(drawArgsBuffer[lod], &args, sizeof(args));
     }
     {
@@ -2725,6 +2504,70 @@ void FGDetailManager::ResizeVisibleBuffersIfNeeded(nvrhi::IDevice* device)
     bbDesc.initialState = nvrhi::ResourceStates::UnorderedAccess;
     bbDesc.keepInitialState = true;
     visibleBillboardInstancesBuffer = device->createBuffer(bbDesc);
+}
+
+
+void FGDetailManager::FillFrameConstants(DetailFrameConstants& fc)
+{
+    float windAngleDeg = 0.0f;
+    if (g_pGamePersistent)
+    {
+        windSpeed = _max(g_pGamePersistent->Environment().CurrentEnv.wind_velocity * ps_r3_grass_wind_multiplier, ps_r3_grass_wind_min);
+        windAngleDeg = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
+        float windRad = deg2rad(windAngleDeg);
+        windDirection.set(_cos(windRad), _sin(windRad));
+    }
+
+    const float quant = 16384.0f;
+    fc.consts.set(1.0f / quant, 1.0f / quant, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    fc.wave.set(1.0f / 5.0f, 1.0f / 7.0f, 1.0f / 3.0f, Device.fTimeGlobal);
+    fc.dir2D.set(windDirection.x, windDirection.y, 0.0f, 0.0f);
+    fc.dir2D_2.set(-windDirection.y, windDirection.x, 0.0f, 0.0f);
+    fc.viewProj = Device.mFullTransform;
+    fc.detail_params.set(float(dtH.x_size()), float(dtH.z_size()), float(dtH.x_offs()), float(dtH.z_offs()));
+    fc.g_wind_direction.set(windAngleDeg, windSpeed, 0.0f, 0.0f);
+    fc.grass_wind_displacement = ps_r3_grass_wind_displacement;
+    fc.grass_interaction_displacement = ps_r3_grass_interaction_displacement;
+    fc.interaction_atlas_index = 0;
+    fc.perlin4d_texture_index = perlin4dBindlessIndex;
+    fc.grass_color_tip.set(ps_r3_grass_color_tip.x, ps_r3_grass_color_tip.y, ps_r3_grass_color_tip.z, 0.0f);
+    fc.grass_color_base.set(ps_r3_grass_color_base.x, ps_r3_grass_color_base.y, ps_r3_grass_color_base.z, 0.0f);
+    fc.grass_sss_color.set(ps_r3_grass_sss_color.x, ps_r3_grass_sss_color.y, ps_r3_grass_sss_color.z, ps_r3_grass_sss_intensity);
+    fc.grass_color_variation = ps_r3_grass_color_variation;
+    fc.grass_blade_height = ps_r3_grass_blade_height;
+    fc.buildDetailsIndex = buildDetailsBindlessIndex;
+    fc.buildDetailsPbrIndex = buildDetailsPbrBindlessIndex;
+    fc.grass_blade_width = ps_r3_grass_blade_width;
+    fc.pad0 = fc.pad1 = fc.pad2 = 0.0f;
+}
+
+void FGDetailManager::UploadGrassTints(nvrhi::ICommandList* cmdList)
+{
+    if (!cmdList || !cachedGrassTintsBuffer)
+        return;
+    GrassObjectTint tintData[64];
+    for (int i = 0; i < 64; i++)
+    {
+        tintData[i].r = ps_r3_grass_object_tints[i].x;
+        tintData[i].g = ps_r3_grass_object_tints[i].y;
+        tintData[i].b = ps_r3_grass_object_tints[i].z;
+        tintData[i].pad = 1.0f;
+    }
+    cmdList->writeBuffer(cachedGrassTintsBuffer, tintData, sizeof(tintData));
+}
+
+void FGDetailManager::ClearDrawArgs(nvrhi::ICommandList* cmdList)
+{
+    if (!cmdList)
+        return;
+    const u32 zero[5] = { 0, 0, 0, 0, 0 };
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+        if (drawArgsBuffer[lod])
+            cmdList->writeBuffer(drawArgsBuffer[lod], zero, sizeof(zero));
+    if (decalDrawArgsBuffer)
+        cmdList->writeBuffer(decalDrawArgsBuffer, zero, sizeof(zero));
+    if (billboardDrawArgsBuffer)
+        cmdList->writeBuffer(billboardDrawArgsBuffer, zero, sizeof(zero));
 }
 
 } // namespace xray::render::fg

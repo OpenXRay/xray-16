@@ -38,6 +38,7 @@ struct MaterialResolvePassData {
     Fmatrix prevView;
     Fmatrix prevProj;
     bool motionValid = false;
+    u32 entryLimit = 0xFFFFFFFFu;
     u32 width = 0;
     u32 height = 0;
 };
@@ -47,8 +48,8 @@ struct alignas(16) MaterialResolveParams {
     Fmatrix prevProj;
     u32 skinnedEntryBase;
     u32 motionValid;
+    u32 entryLimit;
     u32 pad0;
-    u32 pad1;
 };
 
 }
@@ -117,6 +118,7 @@ MaterialResolveOutput setupMaterialResolvePass(
     const Fmatrix& prevView,
     const Fmatrix& prevProj,
     bool motionValid,
+    u32 entryLimit,
     u32 width,
     u32 height,
     MaterialResolvePassState* state)
@@ -139,7 +141,7 @@ MaterialResolveOutput setupMaterialResolvePass(
 
     auto& passData = fg.addCallbackPass<MaterialResolvePassData>(
         "Material Resolve",
-        [&, visId, depth, color, normal, baseColor, skinnedDrawArgs, config, materialCache, gpuCulling, splatBuffer, prevView, prevProj, motionValid, width, height, state, motionHandle, visDepthHandle](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
+        [&, visId, depth, color, normal, baseColor, skinnedDrawArgs, config, materialCache, gpuCulling, splatBuffer, prevView, prevProj, motionValid, entryLimit, width, height, state, motionHandle, visDepthHandle](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.materialCache = materialCache;
@@ -150,6 +152,7 @@ MaterialResolveOutput setupMaterialResolvePass(
             data.prevView = prevView;
             data.prevProj = prevProj;
             data.motionValid = motionValid;
+            data.entryLimit = entryLimit;
             data.width = width;
             data.height = height;
             data.visId = passBuilder.read(visId, ResourceState::ShaderResource);
@@ -215,6 +218,7 @@ MaterialResolveOutput setupMaterialResolvePass(
             params.prevProj = data.prevProj;
             params.skinnedEntryBase = skinned ? gpuCulling->GetClusterEntryCapacity() : 0xFFFFFFFFu;
             params.motionValid = data.motionValid ? 1u : 0u;
+            params.entryLimit = data.entryLimit;
             cmdList->writeBuffer(paramsCB, &params, sizeof(params));
 
             BindingSetBuilder bsb(*refl, nvDevice, "MaterialResolve");

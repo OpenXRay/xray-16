@@ -10,6 +10,7 @@ namespace xray::render {
     namespace fg {
         class RenderDevice;
         class GPUCullingManager;
+        class FGDetailManager;
     }
 }
 
@@ -32,6 +33,10 @@ struct VisibilityPassState {
     nvrhi::ShaderHandle skinnedVS;
     nvrhi::BindingLayoutHandle skinnedLayout;
     nvrhi::GraphicsPipelineHandle skinnedPipeline;
+    nvrhi::ShaderHandle bladeVS;
+    nvrhi::ShaderHandle bladePS;
+    nvrhi::BindingLayoutHandle bladeLayout;
+    nvrhi::GraphicsPipelineHandle bladePipeline;
     nvrhi::ShaderHandle debugShader;
     nvrhi::BindingLayoutHandle debugLayout;
     nvrhi::ComputePipelineHandle debugPipeline;
@@ -57,6 +62,9 @@ VisibilityPassOutput setupVisibilityPass(
     const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
+    FGDetailManager* detailManager,
+    framegraph::VirtualResourceHandle detailArgs,
+    u32 grassEntryBase,
     VisibilityPassState* state,
     bool retest = false);
 
