@@ -699,6 +699,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.residualStatic = m_gpuCullingManager->GetStaticResidualCount();
             stats.residualTerrain = m_gpuCullingManager->GetTerrainResidualCount();
             stats.residualDynamic = m_gpuCullingManager->GetDynamicResidualCount();
+            stats.residualTransparent = m_gpuCullingManager->GetTransparentResidualCount();
             stats.clusterTrianglesDrawn = cullStats.clusterTrianglesDrawn;
             stats.clusterTerrainTrianglesDrawn = cullStats.clusterTerrainTrianglesDrawn;
         }

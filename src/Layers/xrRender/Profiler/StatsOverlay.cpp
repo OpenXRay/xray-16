@@ -510,7 +510,7 @@ void StatsOverlay::RenderGeometrySection()
             if (s.clusterTerrainEntries > 0)
                 ImGui::Text("Terrain: %u/%u drawn, %s tris", s.clusterTerrainVisible, s.clusterTerrainEntries, FormatNumber(s.clusterTerrainTrianglesDrawn));
             ImGui::Text("Occlusion: %u held by last frame's Hi-Z, %u recovered by the retest", s.clusterOcclusionCandidates, s.clusterOcclusionRecovered);
-            ImGui::Text("Undrawn residue: %u static / %u terrain / %u dynamic", s.residualStatic, s.residualTerrain, s.residualDynamic);
+            ImGui::Text("Undrawn residue: %u static / %u terrain / %u dynamic / %u transparent", s.residualStatic, s.residualTerrain, s.residualDynamic, s.residualTransparent);
             ImGui::Unindent();
         }
 

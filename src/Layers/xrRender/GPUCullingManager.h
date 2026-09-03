@@ -278,6 +278,7 @@ public:
     nvrhi::IBuffer* GetTerrainInstanceBuffer() const { return m_terrainInstanceBuffer.Get(); }
 
     u32 GetTransparentObjectCount() const { return m_transparentObjectCount; }
+    u32 GetTransparentResidualCount() const { return m_transparentResidualCount; }
     nvrhi::IBuffer* GetTransparentInstanceBuffer() const { return m_transparentInstanceBuffer.Get(); }
     nvrhi::IBuffer* GetTransparentDrawArgsBuffer() const { return m_transparentDrawArgsBuffer.Get(); }
 
@@ -417,6 +418,7 @@ private:
     u32 m_staticObjectCount = 0;
     u32 m_dynamicObjectCount = 0;
     u32 m_transparentObjectCount = 0;
+    u32 m_transparentResidualCount = 0;
     u32 m_maxTransparentObjects = 0;
     bool m_staticUploaded = false;
 
