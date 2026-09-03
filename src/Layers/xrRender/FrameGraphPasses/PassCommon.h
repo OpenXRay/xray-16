@@ -5,15 +5,6 @@
 
 namespace xray::render::fg::passes {
 
-inline void DrawIndexedIndirectCountOrFallback(
-    nvrhi::ICommandList* cmdList,
-    uint32_t paramOffsetBytes,
-    uint32_t countOffsetBytes,
-    uint32_t maxDrawCount)
-{
-    cmdList->drawIndexedIndirectCount(paramOffsetBytes, countOffsetBytes, maxDrawCount);
-}
-
 struct LightingConstants {
     Fvector4 sunDirection;
     Fvector4 sunColor;

@@ -32,7 +32,6 @@
 #include "FrameGraphPasses/HiZBuildPassSetup.h"      // Phase 3.5: Hi-Z pyramid for GPU culling
 #include "FrameGraphPasses/VisibilityPassSetup.h"
 #include "FrameGraphPasses/MaterialResolvePassSetup.h"
-#include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering + pipeline init
 #include "GPUCullingManager.h"                       // Phase 3.5: GPU frustum/occlusion culling
 #include "FGDetailManager.h"                         // Detail system (grass/vegetation)
 #include "FrameGraphPasses/DetailCullPassSetup.h"    // Detail culling (async compute)
@@ -700,20 +699,9 @@ void FrameGraphRenderer::RenderStatsOverlay()
         // Collect particle stats
         stats.particleBatches = static_cast<u32>(m_worldParticleBatches.size() + m_hudParticleBatches.size());
 
-        // Collect GPU culling stats
         if (m_gpuCullingManager)
         {
-            stats.objectsSubmitted = m_gpuCullingManager->GetStaticResidualCount() +
-                                     m_gpuCullingManager->GetDynamicObjectCount() +
-                                     m_gpuCullingManager->GetTerrainResidualCount() +
-                                     m_gpuCullingManager->GetTransparentObjectCount();
-
-            // Use readback data from previous frame (1-frame latency)
             const auto& cullStats = m_gpuCullingManager->GetCullingStats();
-            stats.objectsVisible = cullStats.totalVisible();
-            stats.objectsCulled = (stats.objectsSubmitted > stats.objectsVisible)
-                                  ? (stats.objectsSubmitted - stats.objectsVisible)
-                                  : 0;
 
             // Mega-buffer stats
             stats.megaBufferVertices = m_gpuCullingManager->GetTotalVertexCount();
@@ -724,9 +712,9 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.clusterTerrainEntries = m_gpuCullingManager->GetClusterTerrainEntryCount();
             stats.clusterTerrainVisible = cullStats.clusterTerrainVisible;
             stats.clusterStaticEntries = m_gpuCullingManager->GetClusterStaticEntryCount();
-            stats.forwardResidualStatic = m_gpuCullingManager->GetStaticResidualCount();
-            stats.forwardResidualTerrain = m_gpuCullingManager->GetTerrainResidualCount();
-            stats.forwardResidualDynamic = m_gpuCullingManager->GetDynamicResidualCount();
+            stats.residualStatic = m_gpuCullingManager->GetStaticResidualCount();
+            stats.residualTerrain = m_gpuCullingManager->GetTerrainResidualCount();
+            stats.residualDynamic = m_gpuCullingManager->GetDynamicResidualCount();
             stats.clusterTrianglesDrawn = cullStats.clusterTrianglesDrawn;
             stats.clusterTerrainTrianglesDrawn = cullStats.clusterTerrainTrianglesDrawn;
         }
@@ -1062,9 +1050,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     //  GPU CULLING PHASE A (Frustum + Distance, feeds the depth prepass)
     // ═══════════════════════════════════════════════════════
 
-    framegraph::VirtualResourceHandle drawArgsBuffer;  // Will be passed to forward pass
-    framegraph::VirtualResourceHandle skinnedDrawArgsBuffer;  // Will be passed to skinning pass
-    GPUCullOutput cullOutput;
+    framegraph::VirtualResourceHandle clusterArgsHandle;
+    framegraph::VirtualResourceHandle skinnedDrawArgsBuffer;
     bool cullActive = false;
 
     if (m_gpuCullingManager) {
@@ -1094,85 +1081,39 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_gpuCullingManager->SetRTAccelStructManager(m_rtAccelMgr.get());
 
         if (m_gpuCullingManager->IsEnabled()) {
-            cullOutput = m_gpuCullingManager->SetupCullingPass(
-                *m_framegraph,
-                m_geometryCollector.get()  // Geometry is uploaded during execute
-            );
-
-            drawArgsBuffer = cullOutput.drawArgsBuffer;
-            cullActive = drawArgsBuffer.is_valid();
+            clusterArgsHandle = m_gpuCullingManager->SetupCullingPass(*m_framegraph, m_geometryCollector.get());
+            cullActive = clusterArgsHandle.is_valid();
         }
     }
-    // ═══════════════════════════════════════════════════════
-    //  FORWARD COLOR PASS (Single-RT, Reuses Depth)
-    // ═══════════════════════════════════════════════════════
-    passes::BindlessForwardConfig bindlessConfig;
-    if (m_gpuCullingManager && m_gpuCullingManager->IsCompactionEnabled()) {
-        bindlessConfig.enabled = true;  // TODO: Add console var to toggle bindless mode
-
-        bindlessConfig.staticSet.compactDrawArgsBuffer = m_gpuCullingManager->GetStaticCompactDrawArgsBuffer();
-        bindlessConfig.staticSet.compactMaterialIDBuffer = m_gpuCullingManager->GetStaticCompactMaterialIDBuffer();
-        bindlessConfig.staticSet.compactBatchIndicesBuffer = m_gpuCullingManager->GetStaticCompactBatchIndicesBuffer();
-        bindlessConfig.staticSet.compactCountBuffer = m_gpuCullingManager->GetStaticCompactCountBuffer();
-        bindlessConfig.staticSet.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
-        bindlessConfig.staticSet.fadeBuffer = m_gpuCullingManager->GetNeutralFadeBuffer();
-        bindlessConfig.staticSet.totalObjectCount = m_gpuCullingManager->GetStaticObjectCount();
-
-        bindlessConfig.dynamicSet.compactDrawArgsBuffer = m_gpuCullingManager->GetDynamicCompactDrawArgsBuffer();
-        bindlessConfig.dynamicSet.compactMaterialIDBuffer = m_gpuCullingManager->GetDynamicCompactMaterialIDBuffer();
-        bindlessConfig.dynamicSet.compactBatchIndicesBuffer = m_gpuCullingManager->GetDynamicCompactBatchIndicesBuffer();
-        bindlessConfig.dynamicSet.compactCountBuffer = m_gpuCullingManager->GetDynamicCompactCountBuffer();
-        bindlessConfig.dynamicSet.instanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
-        bindlessConfig.dynamicSet.fadeBuffer = m_gpuCullingManager->GetNeutralFadeBuffer();
-        bindlessConfig.dynamicSet.totalObjectCount = m_gpuCullingManager->GetDynamicObjectCount();
-
+    passes::ClusterDrawConfig clusterConfig;
+    if (m_gpuCullingManager && m_gpuCullingManager->IsEnabled()) {
         if (m_gpuCullingManager->GetClusterEntryCount() > 0) {
-            bindlessConfig.cluster.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
-            bindlessConfig.cluster.visibleEntryBuffer = m_gpuCullingManager->GetClusterVisibleEntryBuffer();
-            bindlessConfig.cluster.fadeBuffer = m_gpuCullingManager->GetClusterFadeBuffer();
-            bindlessConfig.cluster.argsBuffer = m_gpuCullingManager->GetClusterArgsBuffer();
-            bindlessConfig.cluster.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
-            bindlessConfig.cluster.dynamicInstanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
-            bindlessConfig.cluster.dynamicPrevWorldBuffer = m_gpuCullingManager->GetDynamicPrevWorldBuffer();
-            bindlessConfig.cluster.entryCount = m_gpuCullingManager->GetClusterStaticEntryCount();
-            bindlessConfig.cluster.terrainVisibleEntryBuffer = m_gpuCullingManager->GetClusterTerrainVisibleEntryBuffer();
-            bindlessConfig.cluster.terrainFadeBuffer = m_gpuCullingManager->GetClusterTerrainFadeBuffer();
-            bindlessConfig.cluster.terrainArgsBuffer = m_gpuCullingManager->GetClusterTerrainArgsBuffer();
-            bindlessConfig.cluster.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
-            bindlessConfig.cluster.terrainEntryCount = m_gpuCullingManager->GetClusterTerrainEntryCount();
+            clusterConfig.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+            clusterConfig.visibleEntryBuffer = m_gpuCullingManager->GetClusterVisibleEntryBuffer();
+            clusterConfig.fadeBuffer = m_gpuCullingManager->GetClusterFadeBuffer();
+            clusterConfig.argsBuffer = m_gpuCullingManager->GetClusterArgsBuffer();
+            clusterConfig.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+            clusterConfig.dynamicInstanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
+            clusterConfig.dynamicPrevWorldBuffer = m_gpuCullingManager->GetDynamicPrevWorldBuffer();
+            clusterConfig.entryCount = m_gpuCullingManager->GetClusterStaticEntryCount();
+            clusterConfig.terrainVisibleEntryBuffer = m_gpuCullingManager->GetClusterTerrainVisibleEntryBuffer();
+            clusterConfig.terrainFadeBuffer = m_gpuCullingManager->GetClusterTerrainFadeBuffer();
+            clusterConfig.terrainArgsBuffer = m_gpuCullingManager->GetClusterTerrainArgsBuffer();
+            clusterConfig.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+            clusterConfig.terrainEntryCount = m_gpuCullingManager->GetClusterTerrainEntryCount();
         }
 
-        // ═══════════════════════════════════════════════════════
-        //  MEGA-BUFFER CONFIGURATION (GPU-Driven Rendering)
-        // ═══════════════════════════════════════════════════════
         if (m_gpuCullingManager->AreMegaBuffersReady()) {
-            bindlessConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
-            bindlessConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
-            bindlessConfig.megaBuffersReady = true;
+            clusterConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
+            clusterConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
         }
-
-        // ═══════════════════════════════════════════════════════
-        //  TERRAIN CONFIGURATION (4-layer detail blending)
-        // ═══════════════════════════════════════════════════════
-        if (m_gpuCullingManager->GetTerrainObjectCount() > 0) {
-            bindlessConfig.terrainDrawArgsBuffer = m_gpuCullingManager->GetTerrainDrawArgsBuffer();
-            bindlessConfig.terrainMaterialIDBuffer = m_gpuCullingManager->GetTerrainMaterialIDBuffer();
-            bindlessConfig.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
-            bindlessConfig.terrainBatchIndicesBuffer = m_gpuCullingManager->GetTerrainBatchIndicesBuffer();
-            bindlessConfig.terrainCompactDrawArgsBuffer = m_gpuCullingManager->GetTerrainCompactDrawArgsBuffer();
-            bindlessConfig.terrainCompactBatchIndicesBuffer = m_gpuCullingManager->GetTerrainCompactBatchIndicesBuffer();
-            bindlessConfig.terrainCompactMaterialIDBuffer = m_gpuCullingManager->GetTerrainCompactMaterialIDBuffer();
-            bindlessConfig.terrainCompactCountBuffer = m_gpuCullingManager->GetTerrainCompactCountBuffer();
-            bindlessConfig.terrainObjectCount = m_gpuCullingManager->GetTerrainObjectCount();
-        }
-
     }
 
     if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedEnabled())
         skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedUploadPass(*m_framegraph, m_geometryCollector.get(), &m_hudBatches, m_overlayManager.get());
 
     framegraph::VirtualResourceHandle visIdBuffer;
-    if (cullActive && bindlessConfig.enabled && bindlessConfig.UseMegaBuffers() && bindlessConfig.cluster.IsValid()
+    if (cullActive && clusterConfig.UseMegaBuffers() && clusterConfig.IsValid()
         && m_gpuCullingManager->GetClusterEntryCapacity() < passes::kVisIdEntryLimit) {
         auto& visState = m_blackboard->get_or_add<passes::VisibilityPassState>();
         auto& resolveState = m_blackboard->get_or_add<passes::MaterialResolvePassState>();
@@ -1190,9 +1131,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 m_device,
                 depthBuffer,
                 m_framegraph->CreateTexture("rt_VisID", visDesc),
-                drawArgsBuffer,
+                clusterArgsHandle,
                 skinnedDrawArgsBuffer,
-                bindlessConfig,
+                clusterConfig,
                 m_materialCache.get(),
                 m_gpuCullingManager.get(),
                 &visState
@@ -1205,8 +1146,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (!visActive) {
         static bool s_warned = false;
         if (!s_warned) {
-            Msg("! [FrameGraph] visibility raster unavailable (cull %d, bindless %d, mega %d, clusters %u), opaque world will not be drawn",
-                cullActive ? 1 : 0, bindlessConfig.enabled ? 1 : 0, bindlessConfig.UseMegaBuffers() ? 1 : 0,
+            Msg("! [FrameGraph] visibility raster unavailable (cull %d, mega %d, clusters %u), opaque world will not be drawn",
+                cullActive ? 1 : 0, clusterConfig.UseMegaBuffers() ? 1 : 0,
                 m_gpuCullingManager ? m_gpuCullingManager->GetClusterEntryCount() : 0u);
             s_warned = true;
         }
@@ -1235,20 +1176,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     framegraph::VirtualResourceHandle vsmMaskHandle;
     bool vsmPassesActive = false;
-
-    if (cullActive && hizOutput.pyramid.is_valid()) {
-        m_gpuCullingManager->SetupHiZCullingPass(
-            *m_framegraph,
-            hizOutput.pyramid,
-            hizOutput.width,
-            hizOutput.height,
-            hizOutput.mipLevels,
-            cullOutput.staticDrawArgsBuffer,
-            cullOutput.dynamicDrawArgsBuffer
-        );
-    }
-
-
 
     // ═══════════════════════════════════════════════════════
     //  SKY PASS (Renders sky dome behind everything)
@@ -1320,7 +1247,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             normalBuffer,
             baseColorBuffer,
             skinnedDrawArgsBuffer,
-            bindlessConfig,
+            clusterConfig,
             m_materialCache.get(),
             m_gpuCullingManager.get(),
             m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr,
@@ -1338,32 +1265,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         visDepthHandle = resolved.visDepth;
     }
 
-    const u32 forwardResidue = m_gpuCullingManager
-        ? m_gpuCullingManager->GetStaticResidualCount() + m_gpuCullingManager->GetTerrainResidualCount() + m_gpuCullingManager->GetDynamicResidualCount()
-        : 0u;
-    framegraph::DefaultOutputLayout forwardOutputs;
-    if (forwardResidue > 0) {
-        forwardOutputs = passes::setupForwardColorPass(
-            *m_framegraph,
-            m_device,
-            depthBuffer,
-            sunOutput,
-            normalBuffer,
-            baseColorBuffer,
-            m_geometryCollector.get(),
-            m_materialCache.get(),
-            width,
-            height,
-            drawArgsBuffer,
-            bindlessConfig,
-            &m_blackboard->get_or_add<passes::ForwardColorPassState>()
-        );
-    } else {
-        forwardOutputs.albedo = sunOutput;
-        forwardOutputs.normal = normalBuffer;
-        forwardOutputs.baseColor = baseColorBuffer;
-        forwardOutputs.depth = depthBuffer;
-    }
+    framegraph::DefaultOutputLayout gbufferOutputs;
+    gbufferOutputs.albedo = sunOutput;
+    gbufferOutputs.normal = normalBuffer;
+    gbufferOutputs.baseColor = baseColorBuffer;
+    gbufferOutputs.depth = depthBuffer;
 
     // ═══════════════════════════════════════════════════════
     //  GPU CULLING DEBUG VISUALIZATION (Optional overlay)
@@ -1372,7 +1278,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_gpuCullingManager->SetupDebugVisualizationPass(
             *m_framegraph,
             m_hizPyramid,
-            forwardOutputs.albedo,
+            gbufferOutputs.albedo,
             depthBuffer,
             hizOutput.width,
             hizOutput.height,
@@ -1428,7 +1334,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         *m_framegraph,
         m_device,
         m_detailManager.get(),
-        forwardOutputs,
+        gbufferOutputs,
         width,
         height,
         m_gpuProfiler.get()
@@ -1444,8 +1350,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             vsmCfg.entryCount = m_gpuCullingManager->GetClusterEntryCount();
             vsmCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
             vsmCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
-            vsmCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
-            vsmCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
+            vsmCfg.megaVertexBuffer = clusterConfig.megaVertexBuffer;
+            vsmCfg.megaIndexBuffer = clusterConfig.megaIndexBuffer;
             vsmCfg.materialCache = m_materialCache.get();
             auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, vsmCfg,
                 width, height, &vsmState, m_gpuProfiler.get());
@@ -1461,8 +1367,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         vsmDyn.gpuCulling = m_gpuCullingManager.get();
         vsmDyn.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
         vsmDyn.dynamicInstanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
-        vsmDyn.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
-        vsmDyn.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
+        vsmDyn.megaVertexBuffer = clusterConfig.megaVertexBuffer;
+        vsmDyn.megaIndexBuffer = clusterConfig.megaIndexBuffer;
         passes::setupVSMDynamicPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmDyn, &vsmState, m_gpuProfiler.get());
         framegraph::VirtualResourceHandle vsmDebugView;
         vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, width, height, &vsmState, m_gpuProfiler.get(), &vsmDebugView);
@@ -1487,16 +1393,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     passes::TransparentPassConfig transparentConfig;
     if (m_gpuCullingManager && m_gpuCullingManager->GetTransparentObjectCount() > 0) {
-        transparentConfig.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
-        transparentConfig.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
+        transparentConfig.megaVertexBuffer = clusterConfig.megaVertexBuffer;
+        transparentConfig.megaIndexBuffer = clusterConfig.megaIndexBuffer;
         transparentConfig.instanceBuffer = m_gpuCullingManager->GetTransparentInstanceBuffer();
-        transparentConfig.compactDrawArgsBuffer = m_gpuCullingManager->GetTransparentCompactDrawArgsBuffer();
-        transparentConfig.compactBatchIndicesBuffer = m_gpuCullingManager->GetTransparentCompactBatchIndicesBuffer();
-        transparentConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetTransparentCompactMaterialIDBuffer();
-        transparentConfig.compactCountBuffer = m_gpuCullingManager->GetTransparentCompactCountBuffer();
-        transparentConfig.fadeBuffer = m_gpuCullingManager->GetNeutralFadeBuffer();
+        transparentConfig.drawArgsBuffer = m_gpuCullingManager->GetTransparentDrawArgsBuffer();
         transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
-
     }
 
     auto transparentOutputs = passes::setupTransparentPass(

@@ -21,16 +21,11 @@ struct TransparentPassConfig {
     nvrhi::IBuffer* megaVertexBuffer = nullptr;
     nvrhi::IBuffer* megaIndexBuffer = nullptr;
     nvrhi::IBuffer* instanceBuffer = nullptr;
-    nvrhi::IBuffer* compactDrawArgsBuffer = nullptr;
-    nvrhi::IBuffer* compactBatchIndicesBuffer = nullptr;
-    nvrhi::IBuffer* compactMaterialIDBuffer = nullptr;
-    nvrhi::IBuffer* compactCountBuffer = nullptr;
-    nvrhi::IBuffer* fadeBuffer = nullptr;
+    nvrhi::IBuffer* drawArgsBuffer = nullptr;
     u32 objectCount = 0;
 
-
     bool IsValid() const {
-        return objectCount > 0 && compactDrawArgsBuffer && megaVertexBuffer && megaIndexBuffer;
+        return objectCount > 0 && drawArgsBuffer && instanceBuffer && megaVertexBuffer && megaIndexBuffer;
     }
 };
 
