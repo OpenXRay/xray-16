@@ -57,7 +57,8 @@ VisibilityPassOutput setupVisibilityPass(
     const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
-    VisibilityPassState* state);
+    VisibilityPassState* state,
+    bool retest = false);
 
 framegraph::VirtualResourceHandle setupVisDebugViewPass(
     framegraph::FrameGraph& fg,

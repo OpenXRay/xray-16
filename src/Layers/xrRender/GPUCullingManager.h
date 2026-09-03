@@ -35,6 +35,8 @@ namespace xray::render::fg {
 
 namespace xray::render::fg {
 
+struct ClusterCullParamsCB;
+
 struct GPUParticleData {
     Fvector position;
     float radius;
@@ -141,7 +143,20 @@ public:
 
     framegraph::VirtualResourceHandle SetupCullingPass(
         framegraph::FrameGraph& fg,
-        const GeometryCollector* geometry
+        const GeometryCollector* geometry,
+        framegraph::VirtualResourceHandle prevHiZ,
+        const Fmatrix& prevViewProj,
+        u32 hizWidth,
+        u32 hizHeight,
+        u32 hizMipLevels
+    );
+
+    framegraph::VirtualResourceHandle SetupClusterRetestPass(
+        framegraph::FrameGraph& fg,
+        framegraph::VirtualResourceHandle hizPyramid,
+        u32 hizWidth,
+        u32 hizHeight,
+        u32 hizMipLevels
     );
 
     u32 GetStaticObjectCount() const { return m_staticObjectCount; }
@@ -213,6 +228,8 @@ public:
         u32 clusterTerrainVisible = 0;
         u32 clusterTrianglesDrawn = 0;
         u32 clusterTerrainTrianglesDrawn = 0;
+        u32 clusterCandidates = 0;
+        u32 clusterRetestVisible = 0;
     };
     const CullingStats& GetCullingStats() const { return m_cullingStats; }
 
@@ -290,6 +307,12 @@ public:
     nvrhi::IBuffer* GetClusterTerrainVisibleEntryBuffer() const { return m_clusterSet.terrainVisibleEntryBuffer.Get(); }
     nvrhi::IBuffer* GetClusterTerrainArgsBuffer() const { return m_clusterTerrainArgsBuffer.Get(); }
     nvrhi::IBuffer* GetClusterTerrainFadeBuffer() const { return m_clusterSet.terrainFadeBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterRetestVisibleEntryBuffer() const { return m_clusterSet.visibleEntryBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestFadeBuffer() const { return m_clusterSet.fadeBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestArgsBuffer() const { return m_clusterArgsBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestTerrainVisibleEntryBuffer() const { return m_clusterSet.terrainVisibleEntryBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestTerrainFadeBuffer() const { return m_clusterSet.terrainFadeBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestTerrainArgsBuffer() const { return m_clusterTerrainArgsBuffer2.Get(); }
     u32 GetClusterEntryCount() const { return m_clusterSet.entryCount; }
     u32 GetClusterStaticEntryCount() const { return m_clusterSet.staticEntryCount; }
     u32 GetClusterTerrainEntryCount() const { return m_clusterSet.terrainEntryCount; }
@@ -320,6 +343,11 @@ private:
         nvrhi::BufferHandle fadeBuffer;
         nvrhi::BufferHandle terrainVisibleEntryBuffer;
         nvrhi::BufferHandle terrainFadeBuffer;
+        nvrhi::BufferHandle candidateBuffer;
+        nvrhi::BufferHandle visibleEntryBuffer2;
+        nvrhi::BufferHandle fadeBuffer2;
+        nvrhi::BufferHandle terrainVisibleEntryBuffer2;
+        nvrhi::BufferHandle terrainFadeBuffer2;
         u32 entryCount = 0;
         u32 dynamicEntryCount = 0;
         u32 dynamicResidualCount = 0;
@@ -332,6 +360,9 @@ private:
     ClusterCullBuffers m_clusterSet;
     nvrhi::BufferHandle m_clusterArgsBuffer;
     nvrhi::BufferHandle m_clusterTerrainArgsBuffer;
+    nvrhi::BufferHandle m_clusterArgsBuffer2;
+    nvrhi::BufferHandle m_clusterTerrainArgsBuffer2;
+    static constexpr u32 kClusterCountWords = 10;
     nvrhi::BufferHandle m_neutralFadeBuffer;
     bool m_neutralFadeZeroed = false;
     xr_vector<GPUClusterEntry> m_clusterEntryData;
@@ -349,12 +380,22 @@ private:
     nvrhi::BindingLayoutHandle m_clusterCullLayout;
     nvrhi::ComputePipelineHandle m_clusterArgsPipeline;
     nvrhi::BindingLayoutHandle m_clusterArgsLayout;
+    nvrhi::ComputePipelineHandle m_clusterRetestPipeline;
+    nvrhi::BindingLayoutHandle m_clusterRetestLayout;
     fg::BufferHandle m_clusterCullParamsCB;
+    fg::BufferHandle m_clusterArgsParamsCB;
 
     void BuildClusterEntries();
     void UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice);
     bool EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice);
-    void DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice);
+    void DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        nvrhi::ITexture* prevHiZ, const Fmatrix& prevViewProj, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
+    void DispatchClusterRetest(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        nvrhi::ITexture* hiz, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
+    void DispatchClusterArgs(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice, u32 countBase,
+        nvrhi::IBuffer* args, nvrhi::IBuffer* terrainArgs);
+    void FillClusterCullParams(ClusterCullParamsCB& cb, const Fmatrix& hizViewProj, u32 entryCount,
+        bool useHiZ, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
 
     nvrhi::TextureHandle m_dummyHiZ;
 

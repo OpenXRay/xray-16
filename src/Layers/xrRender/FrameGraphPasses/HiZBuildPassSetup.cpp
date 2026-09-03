@@ -86,7 +86,8 @@ HiZPyramidOutput setupHiZBuildPass(
     VirtualResourceHandle depthInput,
     u32 width,
     u32 height,
-    HiZBuildPassState& hizState)
+    HiZBuildPassState& hizState,
+    VirtualResourceHandle target)
 {
     InitializeHiZResources(device, width, height, hizState);
 
@@ -114,7 +115,7 @@ HiZPyramidOutput setupHiZBuildPass(
     hizDesc.isUAV = true;
     hizDesc.isTransient = true;
 
-    VirtualResourceHandle hizHandle = fg.CreateTexture("rt_HiZPyramid", hizDesc);
+    VirtualResourceHandle hizHandle = target.is_valid() ? target : fg.CreateTexture("rt_HiZPyramid", hizDesc);
 
     auto& passData = fg.addCallbackPass<HiZBuildData>(
         "Hi-Z Build",

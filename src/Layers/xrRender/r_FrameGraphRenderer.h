@@ -413,6 +413,10 @@ private:
 
     nvrhi::TextureHandle m_normals[2];
     u32 m_pingPongIndex = 0;
+    nvrhi::TextureHandle m_hizHistory[2];
+    u32 m_hizHistoryWidth = 0;
+    u32 m_hizHistoryHeight = 0;
+    bool m_hasPrevHiZ = false;
 
     Fmatrix m_prevViewProj;
     Fmatrix m_prevView;
