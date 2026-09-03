@@ -54,6 +54,8 @@ struct RenderStats
     u32 residualStatic = 0;
     u32 residualTerrain = 0;
     u32 residualDynamic = 0;
+    u32 clusterOcclusionCandidates = 0;
+    u32 clusterOcclusionRecovered = 0;
     u32 clusterTrianglesDrawn = 0;
     u32 clusterTerrainTrianglesDrawn = 0;
     u32 clusterTerrainVisible = 0;  // Terrain entries drawn last frame
@@ -109,6 +111,7 @@ struct RenderStats
         clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
         clusterStaticEntries = clusterTrianglesDrawn = clusterTerrainTrianglesDrawn = 0;
         residualStatic = residualTerrain = residualDynamic = 0;
+        clusterOcclusionCandidates = clusterOcclusionRecovered = 0;
         vsmActive = vsmSunMoving = false;
         vsmPages = vsmDirtyPages = vsmWrongPages = 0;
         vsmBinDraws = vsmBinInstances = vsmBinMaxPages = vsmBinLodCulled = vsmBinDrops = 0;

@@ -89,7 +89,8 @@ HiZPyramidOutput setupHiZBuildPass(
     framegraph::VirtualResourceHandle depthInput,
     u32 width,
     u32 height,
-    HiZBuildPassState& state
+    HiZBuildPassState& state,
+    framegraph::VirtualResourceHandle target = framegraph::VirtualResourceHandle()
 );
 
 // Get number of mip levels for given dimensions

@@ -198,6 +198,8 @@ void GPUCullingManager::CreateBuffers(fg::RenderDevice* device)
     };
     m_clusterArgsBuffer = makeArgsBuffer("ClusterCull_Args");
     m_clusterTerrainArgsBuffer = makeArgsBuffer("ClusterCull_TerrainArgs");
+    m_clusterArgsBuffer2 = makeArgsBuffer("ClusterCull_RetestArgs");
+    m_clusterTerrainArgsBuffer2 = makeArgsBuffer("ClusterCull_RetestTerrainArgs");
 
     CreateSkinnedBuffers(device);
 }
@@ -295,6 +297,8 @@ void GPUCullingManager::Shutdown()
     m_clusterSet = {};
     m_clusterArgsBuffer = nullptr;
     m_clusterTerrainArgsBuffer = nullptr;
+    m_clusterArgsBuffer2 = nullptr;
+    m_clusterTerrainArgsBuffer2 = nullptr;
     m_clusterEntryData.clear();
     m_neutralFadeBuffer = nullptr;
     m_neutralFadeZeroed = false;
@@ -375,7 +379,7 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
     if (!slot)
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32) * 4;
+        desc.byteSize = sizeof(u32) * kClusterCountWords;
         desc.debugName = "CullingStatsReadback";
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
@@ -387,7 +391,7 @@ void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
     }
 
     if (m_clusterSet.countBuffer)
-        cmdList->copyBuffer(slot, 0, m_clusterSet.countBuffer, 0, sizeof(u32) * 4);
+        cmdList->copyBuffer(slot, 0, m_clusterSet.countBuffer, 0, sizeof(u32) * kClusterCountWords);
 
     m_statsWriteSlot = (m_statsWriteSlot + 1) % STATS_READBACK_SLOTS;
     if (m_statsScheduled < STATS_READBACK_SLOTS)
@@ -414,10 +418,12 @@ void GPUCullingManager::ProcessStatsReadback()
     if (mappedData)
     {
         const u32* counts = static_cast<const u32*>(mappedData);
-        m_cullingStats.clusterVisible = std::min(counts[0], m_clusterSet.staticEntryCount);
-        m_cullingStats.clusterTerrainVisible = std::min(counts[1], m_clusterSet.terrainEntryCount);
-        m_cullingStats.clusterTrianglesDrawn = counts[2];
-        m_cullingStats.clusterTerrainTrianglesDrawn = counts[3];
+        m_cullingStats.clusterVisible = std::min(counts[0] + counts[5], m_clusterSet.staticEntryCount);
+        m_cullingStats.clusterTerrainVisible = std::min(counts[1] + counts[6], m_clusterSet.terrainEntryCount);
+        m_cullingStats.clusterTrianglesDrawn = counts[2] + counts[7];
+        m_cullingStats.clusterTerrainTrianglesDrawn = counts[3] + counts[8];
+        m_cullingStats.clusterCandidates = counts[4];
+        m_cullingStats.clusterRetestVisible = counts[5] + counts[6];
 
         nvDevice->unmapBuffer(oldest);
     }
@@ -728,6 +734,8 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
     m_clusterCullLayout = nullptr;
     m_clusterArgsPipeline = nullptr;
     m_clusterArgsLayout = nullptr;
+    m_clusterRetestPipeline = nullptr;
+    m_clusterRetestLayout = nullptr;
 
     m_particleDebugComputePipeline = nullptr;
     m_debugComputeLayout = nullptr;
@@ -1183,7 +1191,12 @@ void GPUCullingManager::ExtractFrustumPlanes(Fmatrix& M, Fvector4* outPlanes)
 
 framegraph::VirtualResourceHandle GPUCullingManager::SetupCullingPass(
     framegraph::FrameGraph& fg,
-    const GeometryCollector* geometry)
+    const GeometryCollector* geometry,
+    framegraph::VirtualResourceHandle prevHiZ,
+    const Fmatrix& prevViewProj,
+    u32 hizWidth,
+    u32 hizHeight,
+    u32 hizMipLevels)
 {
     using namespace framegraph;
 
@@ -1192,8 +1205,13 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupCullingPass(
 
     struct GPUCullPassData {
         VirtualResourceHandle clusterArgs;
+        VirtualResourceHandle prevHiZ;
         GPUCullingManager* manager;
         const GeometryCollector* geometry;
+        Fmatrix prevViewProj;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
     };
 
     ResourceDesc argsDesc;
@@ -1206,15 +1224,21 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupCullingPass(
 
     auto& passData = fg.addCallbackPass<GPUCullPassData>(
         "GPU Culling",
-        [&, argsHandle, geometry](FrameGraph& builder, PassHandle passHandle, GPUCullPassData& data) {
+        [&, argsHandle, geometry, prevHiZ, prevViewProj, hizWidth, hizHeight, hizMipLevels](FrameGraph& builder, PassHandle passHandle, GPUCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             passBuilder.asyncCompute();
 
             data.manager = this;
             data.geometry = geometry;
+            data.prevViewProj = prevViewProj;
+            data.hizWidth = hizWidth;
+            data.hizHeight = hizHeight;
+            data.hizMipLevels = hizMipLevels;
             data.clusterArgs = passBuilder.write(argsHandle, ResourceState::UnorderedAccess);
+            if (prevHiZ.is_valid())
+                data.prevHiZ = passBuilder.read(prevHiZ, ResourceState::ShaderResource);
         },
-        [](const GPUCullPassData& data, const FrameGraph&, fg::RenderContext* ctx) {
+        [](const GPUCullPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             GPUCullingManager* mgr = data.manager;
             if (!mgr->m_computeEnabled)
                 return;
@@ -1234,11 +1258,65 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupCullingPass(
                 }
             }
 
-            mgr->DispatchClusterCull(cmdList, mgr->m_device->GetNVRHIDevice());
+            nvrhi::ITexture* prevHiZ = data.prevHiZ.is_valid() ? fg.GetPhysicalTexture(data.prevHiZ) : nullptr;
+            mgr->DispatchClusterCull(cmdList, mgr->m_device->GetNVRHIDevice(), prevHiZ, data.prevViewProj,
+                data.hizWidth, data.hizHeight, data.hizMipLevels);
         }
     );
 
     return passData.clusterArgs;
+}
+
+framegraph::VirtualResourceHandle GPUCullingManager::SetupClusterRetestPass(
+    framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle hizPyramid,
+    u32 hizWidth,
+    u32 hizHeight,
+    u32 hizMipLevels)
+{
+    using namespace framegraph;
+
+    if (!m_computeEnabled || !hizPyramid.is_valid() || m_clusterSet.entryCount == 0 || !m_clusterArgsBuffer2)
+        return VirtualResourceHandle();
+
+    struct ClusterRetestPassData {
+        VirtualResourceHandle hiz;
+        VirtualResourceHandle args;
+        GPUCullingManager* manager;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+    };
+
+    ResourceDesc argsDesc;
+    argsDesc.type = ResourceDesc::Type::Buffer;
+    argsDesc.debugName = "ClusterCull_RetestArgs";
+    argsDesc.bufferSize = sizeof(u32) * 4;
+    argsDesc.isUAV = true;
+    argsDesc.isTransient = false;
+    VirtualResourceHandle argsHandle = fg.ImportBuffer("cluster_retest_args", m_clusterArgsBuffer2, argsDesc);
+
+    auto& passData = fg.addCallbackPass<ClusterRetestPassData>(
+        "Cluster Retest",
+        [&, hizPyramid, argsHandle, hizWidth, hizHeight, hizMipLevels](FrameGraph& builder, PassHandle passHandle, ClusterRetestPassData& data) {
+            RenderPassBuilder passBuilder(builder, passHandle);
+            data.manager = this;
+            data.hizWidth = hizWidth;
+            data.hizHeight = hizHeight;
+            data.hizMipLevels = hizMipLevels;
+            data.hiz = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
+            data.args = passBuilder.write(argsHandle, ResourceState::UnorderedAccess);
+        },
+        [](const ClusterRetestPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            nvrhi::ITexture* hiz = fg.GetPhysicalTexture(data.hiz);
+            if (!hiz)
+                return;
+            data.manager->DispatchClusterRetest(ctx->GetCommandList(), data.manager->m_device->GetNVRHIDevice(),
+                hiz, data.hizWidth, data.hizHeight, data.hizMipLevels);
+        }
+    );
+
+    return passData.args;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2180,7 +2258,7 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "ClusterCull_Count";
-        desc.byteSize = sizeof(u32) * 4;
+        desc.byteSize = sizeof(u32) * kClusterCountWords;
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
@@ -2202,10 +2280,17 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
     m_clusterSet.fadeBuffer = makeStreamBuffer("ClusterCull_Fades", m_clusterSet.staticEntryCount + kDynamicClusterEntryCapacity);
     m_clusterSet.terrainVisibleEntryBuffer = makeStreamBuffer("ClusterCull_TerrainVisibleEntries", m_clusterSet.terrainEntryCount);
     m_clusterSet.terrainFadeBuffer = makeStreamBuffer("ClusterCull_TerrainFades", m_clusterSet.terrainEntryCount);
+    m_clusterSet.candidateBuffer = makeStreamBuffer("ClusterCull_Candidates", n + kDynamicClusterEntryCapacity);
+    m_clusterSet.visibleEntryBuffer2 = makeStreamBuffer("ClusterCull_RetestVisibleEntries", m_clusterSet.staticEntryCount + kDynamicClusterEntryCapacity);
+    m_clusterSet.fadeBuffer2 = makeStreamBuffer("ClusterCull_RetestFades", m_clusterSet.staticEntryCount + kDynamicClusterEntryCapacity);
+    m_clusterSet.terrainVisibleEntryBuffer2 = makeStreamBuffer("ClusterCull_RetestTerrainVisibleEntries", m_clusterSet.terrainEntryCount);
+    m_clusterSet.terrainFadeBuffer2 = makeStreamBuffer("ClusterCull_RetestTerrainFades", m_clusterSet.terrainEntryCount);
 
     if (!m_clusterSet.entryBuffer || !m_clusterSet.countBuffer ||
         !m_clusterSet.visibleEntryBuffer || !m_clusterSet.fadeBuffer ||
-        !m_clusterSet.terrainVisibleEntryBuffer || !m_clusterSet.terrainFadeBuffer) {
+        !m_clusterSet.terrainVisibleEntryBuffer || !m_clusterSet.terrainFadeBuffer ||
+        !m_clusterSet.candidateBuffer || !m_clusterSet.visibleEntryBuffer2 || !m_clusterSet.fadeBuffer2 ||
+        !m_clusterSet.terrainVisibleEntryBuffer2 || !m_clusterSet.terrainFadeBuffer2) {
         Msg("! [GPUCulling] cluster buffer creation failed, disabling cluster path");
         m_clusterSet = {};
         return;
@@ -2214,11 +2299,13 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
     cmdList->writeBuffer(m_clusterSet.entryBuffer,
         m_clusterEntryData.data(), u64(n) * sizeof(GPUClusterEntry));
 
-    u32 zeroCount[4] = { 0, 0, 0, 0 };
+    u32 zeroCount[kClusterCountWords] = {};
     cmdList->writeBuffer(m_clusterSet.countBuffer, zeroCount, sizeof(zeroCount));
     u32 zeroArgs[4] = { 384, 0, 0, 0 };
     cmdList->writeBuffer(m_clusterArgsBuffer, zeroArgs, sizeof(zeroArgs));
     cmdList->writeBuffer(m_clusterTerrainArgsBuffer, zeroArgs, sizeof(zeroArgs));
+    cmdList->writeBuffer(m_clusterArgsBuffer2, zeroArgs, sizeof(zeroArgs));
+    cmdList->writeBuffer(m_clusterTerrainArgsBuffer2, zeroArgs, sizeof(zeroArgs));
 
     m_clusterSet.uploaded = true;
     m_clusterEntryData.clear();
@@ -2246,25 +2333,29 @@ struct ClusterCullParamsCB {
 bool GPUCullingManager::EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice)
 {
     if (m_clusterCullPipeline && m_clusterCullLayout && m_clusterArgsPipeline &&
-        m_clusterArgsLayout && m_clusterCullParamsCB.IsValid())
+        m_clusterArgsLayout && m_clusterRetestPipeline && m_clusterRetestLayout &&
+        m_clusterCullParamsCB.IsValid() && m_clusterArgsParamsCB.IsValid())
         return true;
 
     auto result = GEnv.Render->GetShaderLoader()->LoadComputeShader("cluster_cull");
+    auto retestResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("cluster_cull_retest");
     auto argsResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("cluster_draw_args");
-    if (!result.handle || !argsResult.handle) {
+    if (!result.handle || !retestResult.handle || !argsResult.handle) {
         Msg("! [GPUCulling] cluster cull shaders failed to load");
         return false;
     }
 
     auto& cache = framegraph::GetPassResourceCache();
     auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_cull", ".cs");
+    auto* retestRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_cull_retest", ".cs");
     auto* argsRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_draw_args", ".cs");
-    if (!refl || !argsRefl)
+    if (!refl || !retestRefl || !argsRefl)
         return false;
 
     m_clusterCullLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ClusterCull", *refl, nvDevice);
+    m_clusterRetestLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ClusterRetest", *retestRefl, nvDevice);
     m_clusterArgsLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ClusterArgs", *argsRefl, nvDevice);
-    if (!m_clusterCullLayout || !m_clusterArgsLayout)
+    if (!m_clusterCullLayout || !m_clusterRetestLayout || !m_clusterArgsLayout)
         return false;
 
     nvrhi::ComputePipelineDesc pipeDesc;
@@ -2272,13 +2363,30 @@ bool GPUCullingManager::EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice)
     pipeDesc.bindingLayouts = { m_clusterCullLayout };
     m_clusterCullPipeline = nvDevice->createComputePipeline(pipeDesc);
 
+    nvrhi::ComputePipelineDesc retestPipeDesc;
+    retestPipeDesc.CS = retestResult.handle;
+    retestPipeDesc.bindingLayouts = { m_clusterRetestLayout };
+    m_clusterRetestPipeline = nvDevice->createComputePipeline(retestPipeDesc);
+
     nvrhi::ComputePipelineDesc argsPipeDesc;
     argsPipeDesc.CS = argsResult.handle;
     argsPipeDesc.bindingLayouts = { m_clusterArgsLayout };
     m_clusterArgsPipeline = nvDevice->createComputePipeline(argsPipeDesc);
 
-    if (!m_clusterCullPipeline || !m_clusterArgsPipeline)
+    if (!m_clusterCullPipeline || !m_clusterRetestPipeline || !m_clusterArgsPipeline)
         return false;
+
+    if (!m_clusterArgsParamsCB.IsValid()) {
+        fg::RenderDevice::BufferDesc desc;
+        desc.debugName = "ClusterCull_ArgsParams";
+        desc.byteSize = 16;
+        desc.isConstantBuffer = true;
+        desc.isVolatile = true;
+        desc.maxVersions = 64;
+        m_clusterArgsParamsCB = m_device->CreateBuffer(desc);
+        if (!m_clusterArgsParamsCB.IsValid())
+            return false;
+    }
 
     if (!m_clusterCullParamsCB.IsValid()) {
         fg::RenderDevice::BufferDesc desc;
@@ -2293,76 +2401,27 @@ bool GPUCullingManager::EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice)
     return m_clusterCullParamsCB.IsValid();
 }
 
-void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice)
+void GPUCullingManager::DispatchClusterArgs(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice, u32 countBase,
+    nvrhi::IBuffer* args, nvrhi::IBuffer* terrainArgs)
 {
-    if (m_clusterSet.entryCount == 0 || !m_clusterSet.uploaded)
-        return;
-    if (!EnsureClusterCullPipeline(nvDevice)) {
-        Msg("! [GPUCulling] cluster cull pipeline unavailable, disabling cluster path");
-        m_clusterSet.entryCount = 0;
-        return;
-    }
-
-    u32 zero[4] = { 0, 0, 0, 0 };
-    cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::CopyDest);
-    cmdList->writeBuffer(m_clusterSet.countBuffer, zero, sizeof(zero));
-
-    ClusterCullParamsCB cb = {};
-    cb.hizViewProj = Device.mFullTransform;
-    ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
-    cb.cameraPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 0.0f);
-    Fvector dir = Device.vCameraDirection;
-    dir.normalize_safe();
-    cb.viewDir.set(dir.x, dir.y, dir.z, 0.0f);
-
-    const float lodPx = std::max(0.05f, ps_r_cluster_lod);
-    const float pxScale = Device.mProject._22 * float(Device.dwHeight) * 0.5f;
-    cb.lodParams.set(pxScale / lodPx, 0.01f, ps_r_cluster_fade, (ps_r_cluster_lod <= 0.0501f) ? 1.0f : 0.0f);
-    cb.entryCount = m_clusterSet.entryCount + m_clusterSet.dynamicEntryCount;
-    cb.useHiZ = 0;
-    cb.hizWidth = 1;
-    cb.hizHeight = 1;
-    cb.hizMipLevels = 1;
-    cb.ssaCull = 0.0f;
-
-    cmdList->writeBuffer(m_device->GetNativeBuffer(m_clusterCullParamsCB), &cb, sizeof(cb));
-
-    cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(m_clusterSet.visibleEntryBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(m_clusterSet.fadeBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(m_clusterSet.terrainVisibleEntryBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(m_clusterSet.terrainFadeBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-    auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_cull", ".cs");
-    framegraph::BindingSetBuilder bsb(*refl, nvDevice, "GPUCull.ClusterCull");
-    bsb.ConstantBuffer("ClusterCullParams", m_device->GetNativeBuffer(m_clusterCullParamsCB))
-       .BufferSRV("g_Entries", m_clusterSet.entryBuffer)
-       .Texture("g_HiZPyramid", m_dummyHiZ)
-       .BufferUAV("g_OutCount", m_clusterSet.countBuffer)
-       .BufferUAV("g_OutEntryIndices", m_clusterSet.visibleEntryBuffer)
-       .BufferUAV("g_OutFades", m_clusterSet.fadeBuffer)
-       .BufferUAV("g_OutTerrainEntryIndices", m_clusterSet.terrainVisibleEntryBuffer)
-       .BufferUAV("g_OutTerrainFades", m_clusterSet.terrainFadeBuffer);
-
-    nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), m_clusterCullLayout);
-    if (!bindingSet)
-        return;
-
-    nvrhi::ComputeState state;
-    state.pipeline = m_clusterCullPipeline;
-    state.bindings = { bindingSet };
-    cmdList->setComputeState(state);
-    cmdList->dispatch((m_clusterSet.entryCount + m_clusterSet.dynamicEntryCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE, 1, 1);
+    struct ClusterArgsParamsCB {
+        u32 countBase;
+        u32 pad[3];
+    };
+    ClusterArgsParamsCB cb = {};
+    cb.countBase = countBase;
+    cmdList->writeBuffer(m_device->GetNativeBuffer(m_clusterArgsParamsCB), &cb, sizeof(cb));
 
     cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(m_clusterArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(m_clusterTerrainArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(args, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(terrainArgs, nvrhi::ResourceStates::UnorderedAccess);
 
     auto* argsRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_draw_args", ".cs");
     framegraph::BindingSetBuilder argsBsb(*argsRefl, nvDevice, "GPUCull.ClusterArgs");
-    argsBsb.BufferSRV("g_Count", m_clusterSet.countBuffer)
-           .BufferUAV("g_Args", m_clusterArgsBuffer)
-           .BufferUAV("g_TerrainArgs", m_clusterTerrainArgsBuffer);
+    argsBsb.ConstantBuffer("ClusterArgsParams", m_device->GetNativeBuffer(m_clusterArgsParamsCB))
+           .BufferSRV("g_Count", m_clusterSet.countBuffer)
+           .BufferUAV("g_Args", args)
+           .BufferUAV("g_TerrainArgs", terrainArgs);
 
     nvrhi::BindingSetHandle argsBindingSet = nvDevice->createBindingSet(argsBsb.Build(), m_clusterArgsLayout);
     if (!argsBindingSet)
@@ -2374,12 +2433,140 @@ void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi:
     cmdList->setComputeState(argsState);
     cmdList->dispatch(1, 1, 1);
 
-    cmdList->setBufferState(m_clusterArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(m_clusterTerrainArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(args, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(terrainArgs, nvrhi::ResourceStates::IndirectArgument);
+}
+
+void GPUCullingManager::FillClusterCullParams(ClusterCullParamsCB& cb, const Fmatrix& hizViewProj, u32 entryCount,
+    bool useHiZ, u32 hizWidth, u32 hizHeight, u32 hizMipLevels)
+{
+    cb = {};
+    cb.hizViewProj = hizViewProj;
+    ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
+    cb.cameraPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 0.0f);
+    Fvector dir = Device.vCameraDirection;
+    dir.normalize_safe();
+    cb.viewDir.set(dir.x, dir.y, dir.z, 0.0f);
+
+    const float lodPx = std::max(0.05f, ps_r_cluster_lod);
+    const float pxScale = Device.mProject._22 * float(Device.dwHeight) * 0.5f;
+    cb.lodParams.set(pxScale / lodPx, 0.01f, ps_r_cluster_fade, (ps_r_cluster_lod <= 0.0501f) ? 1.0f : 0.0f);
+    cb.entryCount = entryCount;
+    cb.useHiZ = useHiZ ? 1u : 0u;
+    cb.hizWidth = useHiZ ? hizWidth : 1u;
+    cb.hizHeight = useHiZ ? hizHeight : 1u;
+    cb.hizMipLevels = useHiZ ? hizMipLevels : 1u;
+    cb.ssaCull = 0.0f;
+}
+
+void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+    nvrhi::ITexture* prevHiZ, const Fmatrix& prevViewProj, u32 hizWidth, u32 hizHeight, u32 hizMipLevels)
+{
+    if (m_clusterSet.entryCount == 0 || !m_clusterSet.uploaded)
+        return;
+    if (!EnsureClusterCullPipeline(nvDevice)) {
+        Msg("! [GPUCulling] cluster cull pipeline unavailable, disabling cluster path");
+        m_clusterSet.entryCount = 0;
+        return;
+    }
+
+    u32 zero[kClusterCountWords] = {};
+    cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::CopyDest);
+    cmdList->writeBuffer(m_clusterSet.countBuffer, zero, sizeof(zero));
+
+    const u32 entryCount = m_clusterSet.entryCount + m_clusterSet.dynamicEntryCount;
+    ClusterCullParamsCB cb;
+    FillClusterCullParams(cb, prevHiZ ? prevViewProj : Device.mFullTransform, entryCount, prevHiZ != nullptr,
+        hizWidth, hizHeight, hizMipLevels);
+    cmdList->writeBuffer(m_device->GetNativeBuffer(m_clusterCullParamsCB), &cb, sizeof(cb));
+
+    cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.visibleEntryBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.fadeBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.terrainVisibleEntryBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.terrainFadeBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.candidateBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+    auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_cull", ".cs");
+    framegraph::BindingSetBuilder bsb(*refl, nvDevice, "GPUCull.ClusterCull");
+    bsb.ConstantBuffer("ClusterCullParams", m_device->GetNativeBuffer(m_clusterCullParamsCB))
+       .BufferSRV("g_Entries", m_clusterSet.entryBuffer)
+       .Texture("g_HiZPyramid", prevHiZ ? prevHiZ : m_dummyHiZ.Get())
+       .BufferUAV("g_OutCount", m_clusterSet.countBuffer)
+       .BufferUAV("g_OutEntryIndices", m_clusterSet.visibleEntryBuffer)
+       .BufferUAV("g_OutFades", m_clusterSet.fadeBuffer)
+       .BufferUAV("g_OutTerrainEntryIndices", m_clusterSet.terrainVisibleEntryBuffer)
+       .BufferUAV("g_OutTerrainFades", m_clusterSet.terrainFadeBuffer)
+       .BufferUAV("g_OutCandidates", m_clusterSet.candidateBuffer);
+
+    nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), m_clusterCullLayout);
+    if (!bindingSet)
+        return;
+
+    nvrhi::ComputeState state;
+    state.pipeline = m_clusterCullPipeline;
+    state.bindings = { bindingSet };
+    cmdList->setComputeState(state);
+    cmdList->dispatch((entryCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE, 1, 1);
+
     cmdList->setBufferState(m_clusterSet.visibleEntryBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(m_clusterSet.fadeBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(m_clusterSet.terrainVisibleEntryBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(m_clusterSet.terrainFadeBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(m_clusterSet.candidateBuffer, nvrhi::ResourceStates::ShaderResource);
+
+    DispatchClusterArgs(cmdList, nvDevice, 0, m_clusterArgsBuffer, m_clusterTerrainArgsBuffer);
+}
+
+void GPUCullingManager::DispatchClusterRetest(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+    nvrhi::ITexture* hiz, u32 hizWidth, u32 hizHeight, u32 hizMipLevels)
+{
+    if (m_clusterSet.entryCount == 0 || !m_clusterSet.uploaded || !hiz)
+        return;
+    if (!m_clusterRetestPipeline || !m_clusterRetestLayout || !m_clusterArgsPipeline)
+        return;
+
+    const u32 entryCount = m_clusterSet.entryCount + m_clusterSet.dynamicEntryCount;
+    ClusterCullParamsCB cb;
+    FillClusterCullParams(cb, Device.mFullTransform, entryCount, true,
+        hizWidth, hizHeight, hizMipLevels);
+    cmdList->writeBuffer(m_device->GetNativeBuffer(m_clusterCullParamsCB), &cb, sizeof(cb));
+
+    cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.candidateBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(m_clusterSet.visibleEntryBuffer2, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.fadeBuffer2, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.terrainVisibleEntryBuffer2, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.terrainFadeBuffer2, nvrhi::ResourceStates::UnorderedAccess);
+
+    auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_cull_retest", ".cs");
+    framegraph::BindingSetBuilder bsb(*refl, nvDevice, "GPUCull.ClusterRetest");
+    bsb.ConstantBuffer("ClusterCullParams", m_device->GetNativeBuffer(m_clusterCullParamsCB))
+       .BufferSRV("g_Entries", m_clusterSet.entryBuffer)
+       .Texture("g_HiZPyramid", hiz)
+       .BufferSRV("g_Candidates", m_clusterSet.candidateBuffer)
+       .BufferUAV("g_OutCount", m_clusterSet.countBuffer)
+       .BufferUAV("g_OutEntryIndices", m_clusterSet.visibleEntryBuffer2)
+       .BufferUAV("g_OutFades", m_clusterSet.fadeBuffer2)
+       .BufferUAV("g_OutTerrainEntryIndices", m_clusterSet.terrainVisibleEntryBuffer2)
+       .BufferUAV("g_OutTerrainFades", m_clusterSet.terrainFadeBuffer2);
+
+    nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), m_clusterRetestLayout);
+    if (!bindingSet)
+        return;
+
+    nvrhi::ComputeState state;
+    state.pipeline = m_clusterRetestPipeline;
+    state.bindings = { bindingSet };
+    cmdList->setComputeState(state);
+    cmdList->dispatch((entryCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE, 1, 1);
+
+    cmdList->setBufferState(m_clusterSet.visibleEntryBuffer2, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(m_clusterSet.fadeBuffer2, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(m_clusterSet.terrainVisibleEntryBuffer2, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(m_clusterSet.terrainFadeBuffer2, nvrhi::ResourceStates::ShaderResource);
+
+    DispatchClusterArgs(cmdList, nvDevice, 20, m_clusterArgsBuffer2, m_clusterTerrainArgsBuffer2);
 }
 
 // ═══════════════════════════════════════════════════════

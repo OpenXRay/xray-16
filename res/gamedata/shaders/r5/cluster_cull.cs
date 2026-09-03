@@ -41,6 +41,7 @@ RWStructuredBuffer<uint> g_OutEntryIndices : register(u1);
 RWStructuredBuffer<uint> g_OutFades : register(u2);
 RWStructuredBuffer<uint> g_OutTerrainEntryIndices : register(u3);
 RWStructuredBuffer<uint> g_OutTerrainFades : register(u4);
+RWStructuredBuffer<uint> g_OutCandidates : register(u5);
 
 float ProjErr(float4 s, float e)
 {
@@ -106,7 +107,12 @@ void main(uint3 dtID : SV_DispatchThreadID)
     {
         if (!HiZTestSphere(e.sphere.xyz, e.sphere.w, g_CameraPos.xyz, g_HiZViewProj,
                            g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
+        {
+            uint cslot;
+            g_OutCount.InterlockedAdd(16, 1u, cslot);
+            g_OutCandidates[cslot] = idx;
             return;
+        }
     }
 
     uint fade = (63u - fA) | (fB << 6) | (((e.flags >> 8) & 0x3Fu) << 12) | ((idx & 0x3FFFu) << 18);

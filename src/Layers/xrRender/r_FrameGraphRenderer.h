@@ -447,6 +447,10 @@ private:
     // Eliminates double vertex processing cost (~1.5-2ms savings)
     nvrhi::TextureHandle m_normals[2];
     u32 m_pingPongIndex = 0;
+    nvrhi::TextureHandle m_hizHistory[2];
+    u32 m_hizHistoryWidth = 0;
+    u32 m_hizHistoryHeight = 0;
+    bool m_hasPrevHiZ = false;
 
     Fmatrix m_prevViewProj;                       // Previous frame's view-projection
     Fmatrix m_prevView;
