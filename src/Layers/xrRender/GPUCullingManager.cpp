@@ -153,7 +153,6 @@ void GPUCullingManager::Initialize(fg::RenderDevice* device)
     CreateBuffers(device);
     CreateComputePipeline(device);
     CreateCompactionResources(device);
-    CreateVariantPartitionResources(device);
     CreateDebugResources(device);
     CreateParticleResources(device);
 
@@ -1029,200 +1028,6 @@ void GPUCullingManager::CreateCompactionResources(fg::RenderDevice* device)
     }
 }
 
-void GPUCullingManager::CreateVariantPartitionResources(fg::RenderDevice* device)
-{
-    if (!m_compactEnabled)
-        return;
-
-    auto& registry = ShaderVariantRegistry::Instance();
-    u32 variantCount = registry.GetVariantCount();
-    if (variantCount <= 1) {
-        Msg("* [GPUCulling] No shader variants loaded, partition disabled");
-        return;
-    }
-
-    if (variantCount > MAX_SHADER_VARIANTS) {
-        Msg("! [GPUCulling] Variant count %d exceeds MAX_SHADER_VARIANTS (%d), clamping", variantCount, MAX_SHADER_VARIANTS);
-        variantCount = MAX_SHADER_VARIANTS;
-    }
-
-    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
-
-    auto variantPartResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("variant_partition");
-    if (!variantPartResult.handle) {
-        Msg("! [GPUCulling] variant_partition.cs not found - variant partition disabled");
-        return;
-    }
-
-    {
-        auto& cache = framegraph::GetPassResourceCache();
-        m_variantPartitionLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_VariantPartition", *variantPartResult.reflection, nvDevice);
-        R_ASSERT2(m_variantPartitionLayout, "Failed to create variant partition layout");
-    }
-
-    {
-        nvrhi::ComputePipelineDesc pipeDesc;
-        pipeDesc.CS = variantPartResult.handle;
-        pipeDesc.bindingLayouts = { m_variantPartitionLayout };
-        m_variantPartitionPipeline = nvDevice->createComputePipeline(pipeDesc);
-        R_ASSERT2(m_variantPartitionPipeline, "Failed to create variant partition pipeline");
-    }
-
-    {
-        fg::RenderDevice::BufferDesc desc;
-        desc.debugName = "VariantPartition_Params";
-        desc.byteSize = 16;
-        desc.isConstantBuffer = true;
-        desc.isVolatile = true;
-        desc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
-        m_variantPartitionParamsCB = m_device->CreateBuffer(desc);
-        R_ASSERT2(m_variantPartitionParamsCB.IsValid(), "Failed to create variant partition params CB");
-    }
-
-    InitPartitionBuffers(nvDevice, m_staticPartition, "Static", variantCount, m_maxObjects);
-    InitPartitionBuffers(nvDevice, m_transparentPartition, "Transparent", variantCount, m_maxObjects);
-
-    m_variantPartitionEnabled = true;
-    Msg("* [GPUCulling] Variant partition enabled (%d variants)", variantCount);
-}
-
-void GPUCullingManager::InitPartitionBuffers(
-    nvrhi::IDevice* nvDevice, VariantPartitionBuffers& part,
-    const char* prefix, u32 variantCount, u32 maxObjects)
-{
-    part.variantCount = variantCount;
-    part.binCapacity = maxObjects;
-    u32 totalSlots = variantCount * maxObjects;
-
-    auto makeBuffer = [&](const char* suffix, nvrhi::BufferDesc desc) -> nvrhi::BufferHandle {
-        desc.debugName = xr_string(prefix) + suffix;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
-        auto buf = nvDevice->createBuffer(desc);
-        R_ASSERT2(buf, desc.debugName);
-        return buf;
-    };
-
-    {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = variantCount * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.canHaveUAVs = true;
-        part.variantCountBuffer = makeBuffer("_VariantCounts", desc);
-    }
-    {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = totalSlots * sizeof(IndirectDrawArgs);
-        desc.canHaveUAVs = true;
-        desc.canHaveRawViews = true;
-        desc.isDrawIndirectArgs = true;
-        part.reorderedDrawArgsBuffer = makeBuffer("_ReorderedDrawArgs", desc);
-    }
-    {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = totalSlots * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.canHaveUAVs = true;
-        part.reorderedBatchIndicesBuffer = makeBuffer("_ReorderedBatchIndices", desc);
-    }
-    {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = totalSlots * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.canHaveUAVs = true;
-        part.reorderedMaterialIDsBuffer = makeBuffer("_ReorderedMaterialIDs", desc);
-    }
-    {
-        xr_vector<u32> drawIndices(totalSlots);
-        for (u32 i = 0; i < totalSlots; i++)
-            drawIndices[i] = i;
-
-        nvrhi::BufferDesc desc;
-        desc.byteSize = totalSlots * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.isVertexBuffer = true;
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
-        desc.keepInitialState = true;
-        desc.debugName = xr_string(prefix) + "_PartitionDrawIndex";
-        part.drawIndexBuffer = nvDevice->createBuffer(desc);
-        R_ASSERT2(part.drawIndexBuffer, desc.debugName);
-
-        if (GEnv.Backend)
-            GEnv.Backend->UploadBufferData(part.drawIndexBuffer, drawIndices.data(), totalSlots * sizeof(u32));
-    }
-
-    Msg("* [GPUCulling] Variant partition buffers: %s (%d variants x %d cap = %d slots, %.1f MB)",
-        prefix, variantCount, maxObjects, totalSlots,
-        static_cast<float>(totalSlots * (sizeof(IndirectDrawArgs) + sizeof(u32) * 3)) / (1024.f * 1024.f));
-}
-
-void GPUCullingManager::DispatchVariantPartition(
-    nvrhi::ICommandList* cmdList,
-    nvrhi::IDevice* nvDevice,
-    const CullSetBuffers& set,
-    VariantPartitionBuffers& partition)
-{
-    auto& matBuffer = bindless::MaterialBuffer::Instance();
-    nvrhi::IBuffer* materialBuffer = matBuffer.GetBuffer();
-    if (!materialBuffer)
-        return;
-
-    u32 zeroData[MAX_SHADER_VARIANTS] = {};
-    cmdList->writeBuffer(partition.variantCountBuffer, zeroData, partition.variantCount * sizeof(u32));
-
-    cmdList->setBufferState(set.compactDrawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(set.compactBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(set.compactMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(set.compactDrawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(set.compactBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(set.compactMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(materialBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(partition.variantCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(partition.reorderedDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(partition.reorderedBatchIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(partition.reorderedMaterialIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-    struct PartitionParamsCB {
-        u32 binCapacity;
-        u32 variantCount;
-        u32 padding0;
-        u32 padding1;
-    };
-    PartitionParamsCB params;
-    params.binCapacity = partition.binCapacity;
-    params.variantCount = partition.variantCount;
-    params.padding0 = 0;
-    params.padding1 = 0;
-    cmdList->writeBuffer(m_device->GetNativeBuffer(m_variantPartitionParamsCB), &params, sizeof(params));
-
-    auto* variantPartRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("variant_partition", ".cs");
-    framegraph::BindingSetBuilder bsb(*variantPartRefl, nvDevice, "GPUCull.VariantPart");
-    bsb.ConstantBuffer("PartitionParams", m_device->GetNativeBuffer(m_variantPartitionParamsCB))
-       .BufferSRV("g_CompactCount", set.compactCountBuffer)
-       .BufferSRV("g_CompactDrawArgs", set.compactDrawArgsBuffer)
-       .BufferSRV("g_CompactBatchIndices", set.compactBatchIndicesBuffer)
-       .BufferSRV("g_CompactMaterialIDs", set.compactMaterialIDBuffer)
-       .BufferSRV("g_Materials", materialBuffer)
-       .BufferUAV("g_VariantCounts", partition.variantCountBuffer)
-       .BufferUAV("g_ReorderedDrawArgs", partition.reorderedDrawArgsBuffer)
-       .BufferUAV("g_ReorderedBatchIndices", partition.reorderedBatchIndicesBuffer)
-       .BufferUAV("g_ReorderedMaterialIDs", partition.reorderedMaterialIDsBuffer);
-    nvrhi::BindingSetHandle bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), m_variantPartitionLayout, nvDevice);
-    R_ASSERT2(bindingSet, "Failed to create variant partition binding set");
-
-    nvrhi::ComputeState state;
-    state.pipeline = m_variantPartitionPipeline;
-    state.bindings = { bindingSet };
-    cmdList->setComputeState(state);
-    cmdList->dispatch(1, 1, 1);
-
-    cmdList->setBufferState(partition.variantCountBuffer, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(partition.reorderedDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(partition.reorderedBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(partition.reorderedMaterialIDsBuffer, nvrhi::ResourceStates::ShaderResource);
-}
-
 void GPUCullingManager::Shutdown()
 {
     m_skinnedPools.Reset();
@@ -1297,13 +1102,6 @@ void GPUCullingManager::Shutdown()
     m_compactCountLayout = nullptr;
     m_compactScanLayout = nullptr;
     m_compactScatterLayout = nullptr;
-
-    m_variantPartitionPipeline = nullptr;
-    m_variantPartitionLayout = nullptr;
-    m_variantPartitionParamsCB = fg::BufferHandle();
-    m_staticPartition = {};
-    m_transparentPartition = {};
-    m_variantPartitionEnabled = false;
 
     m_debugBuffer = nullptr;
     m_debugComputeParamsCB = fg::BufferHandle();
@@ -2024,9 +1822,6 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
     m_compactScanLayout = nullptr;
     m_compactScatterLayout = nullptr;
 
-    m_variantPartitionPipeline = nullptr;
-    m_variantPartitionLayout = nullptr;
-
     m_terrainApplyVisibilityPipeline = nullptr;
     m_terrainApplyVisibilityLayout = nullptr;
 
@@ -2042,7 +1837,6 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
     m_initialized = false;
     m_computeEnabled = false;
     m_compactEnabled = false;
-    m_variantPartitionEnabled = false;
     m_skinnedEnabled = false;
 
     m_staticDataCached = false;
@@ -2537,7 +2331,7 @@ void GPUCullingManager::ExecuteCullPhase(fg::RenderContext* ctx, nvrhi::ITexture
         u32 padding[2];
     };
 
-    auto dispatchCullSet = [&](CullSetBuffers& set, VariantPartitionBuffers* partition) {
+    auto dispatchCullSet = [&](CullSetBuffers& set) {
         if (set.objectCount == 0)
             return;
 
@@ -2671,18 +2465,13 @@ void GPUCullingManager::ExecuteCullPhase(fg::RenderContext* ctx, nvrhi::ITexture
                 cmdList->dispatch(compactGroupCount, 1, 1);
             }
 
-            if (partition && m_variantPartitionEnabled) {
-                DispatchVariantPartition(cmdList, nvDevice, set, *partition);
-            }
-
             cmdList->setBufferState(set.compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
             cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
         }
     };
 
-    dispatchCullSet(m_staticSet,
-        (phase.runPartition && m_variantPartitionEnabled) ? &m_staticPartition : nullptr);
-    dispatchCullSet(m_dynamicSet, nullptr);
+    dispatchCullSet(m_staticSet);
+    dispatchCullSet(m_dynamicSet);
 
     DispatchClusterCull(cmdList, nvDevice, hizTexture, phase);
 
@@ -2821,8 +2610,7 @@ void GPUCullingManager::ExecuteCullPhase(fg::RenderContext* ctx, nvrhi::ITexture
     }
 
     if (phase.includeTransparent) {
-        dispatchCullSet(m_transparentSet,
-            (phase.runPartition && m_variantPartitionEnabled) ? &m_transparentPartition : nullptr);
+        dispatchCullSet(m_transparentSet);
     }
 }
 
@@ -2938,7 +2726,6 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             CullPhaseParams phase;
             phase.useHiZ = false;
             phase.includeTransparent = false;
-            phase.runPartition = false;
             phase.stamp = frameId & 0x7FFFFFFFu;
             phase.hizWidth = 1;
             phase.hizHeight = 1;
@@ -3161,7 +2948,6 @@ void GPUCullingManager::SetupHiZCullingPass(
             CullPhaseParams phase;
             phase.useHiZ = true;
             phase.includeTransparent = true;
-            phase.runPartition = true;
             phase.stamp = frameId | 0x80000000u;
             phase.hizWidth = data.hizWidth;
             phase.hizHeight = data.hizHeight;

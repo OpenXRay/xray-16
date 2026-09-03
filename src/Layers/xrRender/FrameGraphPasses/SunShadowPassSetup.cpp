@@ -8,7 +8,6 @@
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/SkeletonX.h"
-#include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"

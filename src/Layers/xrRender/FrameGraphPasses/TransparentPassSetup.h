@@ -2,7 +2,6 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
-#include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -29,7 +28,6 @@ struct TransparentPassConfig {
     nvrhi::IBuffer* fadeBuffer = nullptr;
     u32 objectCount = 0;
 
-    VariantPartitionConfig variantPartition;
 
     bool IsValid() const {
         return objectCount > 0 && compactDrawArgsBuffer && megaVertexBuffer && megaIndexBuffer;
