@@ -213,7 +213,7 @@ MaterialResolveOutput setupMaterialResolvePass(
             MaterialResolveParams params = {};
             params.prevView = data.prevView;
             params.prevProj = data.prevProj;
-            params.skinnedEntryBase = skinned ? gpuCulling->GetClusterEntryCount() : 0xFFFFFFFFu;
+            params.skinnedEntryBase = skinned ? gpuCulling->GetClusterEntryCapacity() : 0xFFFFFFFFu;
             params.motionValid = data.motionValid ? 1u : 0u;
             cmdList->writeBuffer(paramsCB, &params, sizeof(params));
 
@@ -224,6 +224,8 @@ MaterialResolveOutput setupMaterialResolvePass(
             bsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
             bsb.BufferSRV("g_InstanceData", config.cluster.instanceBuffer);
             bsb.BufferSRV("g_TerrainInstanceData", terrainInstances);
+            bsb.BufferSRV("g_DynamicInstanceData", config.cluster.dynamicInstanceBuffer ? config.cluster.dynamicInstanceBuffer : config.cluster.instanceBuffer);
+            bsb.BufferSRV("g_DynamicPrevWorld", config.cluster.dynamicPrevWorldBuffer ? config.cluster.dynamicPrevWorldBuffer : config.megaVertexBuffer);
             bsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
             bsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
             bsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);

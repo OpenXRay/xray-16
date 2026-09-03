@@ -124,6 +124,7 @@ void renderVisibilityRaster(
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
         bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
         bsb.BufferSRV("g_InstanceData", config.cluster.instanceBuffer);
+        bsb.BufferSRV("g_DynamicInstanceData", config.cluster.dynamicInstanceBuffer ? config.cluster.dynamicInstanceBuffer : config.cluster.instanceBuffer);
         bsb.BufferSRV("g_VisibleEntries", config.cluster.visibleEntryBuffer);
         bsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
         bsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
@@ -137,6 +138,7 @@ void renderVisibilityRaster(
         BindingSetBuilder bsb(*vsRefl, *fadeRefl, nvDevice, "VisibilityRaster.ClusterTerrain");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
         bsb.BufferSRV("g_InstanceData", config.cluster.terrainInstanceBuffer);
+        bsb.BufferSRV("g_DynamicInstanceData", config.cluster.dynamicInstanceBuffer ? config.cluster.dynamicInstanceBuffer : config.cluster.terrainInstanceBuffer);
         bsb.BufferSRV("g_VisibleEntries", config.cluster.terrainVisibleEntryBuffer);
         bsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
         bsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
@@ -155,7 +157,7 @@ void renderVisibilityRaster(
         if (skinnedVsRefl && preVB && skinnedIB && entries) {
             auto paramsCB = cache.GetOrCreateVolatileCB("VisibilityRaster", "SkinnedVisParams", sizeof(SkinnedVisParams), device, 16);
             SkinnedVisParams params = {};
-            params.entryBase = gpuCulling->GetClusterEntryCount();
+            params.entryBase = gpuCulling->GetClusterEntryCapacity();
             cmdList->writeBuffer(paramsCB, &params, sizeof(params));
 
             BindingSetBuilder bsb(*skinnedVsRefl, *atRefl, nvDevice, "VisibilityRaster.Skinned");

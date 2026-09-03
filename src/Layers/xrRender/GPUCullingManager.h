@@ -92,6 +92,7 @@ enum GPUClusterEntryFlags : u32 {
     GPU_CLUSTER_ENTRY_TERRAIN = 0x4,
     GPU_CLUSTER_ENTRY_SKINNED = 0x10,
     GPU_CLUSTER_ENTRY_HUD = 0x20,
+    GPU_CLUSTER_ENTRY_DYNAMIC = 0x40,
 };
 
 // ═══════════════════════════════════════════════════════
@@ -494,6 +495,10 @@ public:
     nvrhi::IBuffer* GetTerrainCompactCountBuffer() const { return m_terrainCompactCountBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainCompactMaterialIDBuffer() const { return m_terrainCompactMaterialIDBuffer.Get(); }
 
+    static constexpr u32 kDynamicClusterEntryCapacity = 16384;
+    u32 GetClusterCullEntryCount() const { return m_clusterSet.entryCount + m_clusterSet.dynamicEntryCount; }
+    u32 GetClusterEntryCapacity() const { return m_clusterSet.entryCount + kDynamicClusterEntryCapacity; }
+    nvrhi::IBuffer* GetDynamicPrevWorldBuffer() const { return m_dynamicPrevWorldBuffer.Get(); }
     nvrhi::IBuffer* GetClusterEntryBuffer() const { return m_clusterSet.entryBuffer.Get(); }
     nvrhi::IBuffer* GetClusterVisibleEntryBuffer() const { return m_clusterSet.visibleEntryBuffer.Get(); }
     nvrhi::IBuffer* GetClusterArgsBuffer() const { return m_clusterSet.argsBuffer.Get(); }
@@ -567,6 +572,7 @@ private:
         nvrhi::BufferHandle terrainFadeBuffer;
         nvrhi::BufferHandle terrainArgsBuffer;
         u32 entryCount = 0;
+        u32 dynamicEntryCount = 0;
         u32 staticEntryCount = 0;
         u32 terrainEntryCount = 0;
         u32 residualStaticCount = 0;
@@ -578,6 +584,15 @@ private:
     bool m_neutralFadeZeroed = false;
     xr_vector<GPUClusterEntry> m_clusterEntryData;
     xr_vector<ClusterMeshKey> m_staticBatchKeys;
+    xr_vector<GPUClusterEntry> m_dynamicEntryData;
+    xr_vector<ClusterMeshKey> m_dynamicBatchKeys;
+    xr_vector<std::pair<const void*, const void*>> m_dynamicIdentity;
+    xr_vector<Fmatrix> m_dynamicPrevWorldData;
+    nvrhi::BufferHandle m_dynamicPrevWorldBuffer;
+    xr_map<std::pair<const void*, const void*>, Fmatrix> m_dynamicHistory[2];
+    u32 m_dynamicHistoryIndex = 0;
+    u32 m_dynamicHistoryFrame = 0;
+    void BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList);
     nvrhi::ComputePipelineHandle m_clusterCullPipeline;
     nvrhi::BindingLayoutHandle m_clusterCullLayout;
     nvrhi::ComputePipelineHandle m_clusterArgsPipeline;

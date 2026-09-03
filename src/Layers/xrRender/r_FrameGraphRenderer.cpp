@@ -1164,6 +1164,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.cluster.fadeBuffer = m_gpuCullingManager->GetClusterFadeBuffer();
             bindlessConfig.cluster.argsBuffer = m_gpuCullingManager->GetClusterArgsBuffer();
             bindlessConfig.cluster.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+            bindlessConfig.cluster.dynamicInstanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
+            bindlessConfig.cluster.dynamicPrevWorldBuffer = m_gpuCullingManager->GetDynamicPrevWorldBuffer();
             bindlessConfig.cluster.entryCount = m_gpuCullingManager->GetClusterStaticEntryCount();
             bindlessConfig.cluster.terrainVisibleEntryBuffer = m_gpuCullingManager->GetClusterTerrainVisibleEntryBuffer();
             bindlessConfig.cluster.terrainFadeBuffer = m_gpuCullingManager->GetClusterTerrainFadeBuffer();
@@ -1211,7 +1213,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 m_device,
                 cullOutput.staticDrawArgsBuffer,
                 m_gpuCullingManager->GetClusterEntryBuffer(),
-                m_gpuCullingManager->GetClusterEntryCount(),
+                m_gpuCullingManager->GetClusterEntryCapacity(),
+                m_gpuCullingManager->GetClusterCullEntryCount(),
                 &sunShadowState,
                 m_gpuProfiler.get()
             );
@@ -1226,7 +1229,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     framegraph::VirtualResourceHandle visIdBuffer;
     if (cullActive && bindlessConfig.enabled && bindlessConfig.UseMegaBuffers() && bindlessConfig.cluster.IsValid()
-        && m_gpuCullingManager->GetClusterEntryCount() < passes::kVisIdEntryLimit) {
+        && m_gpuCullingManager->GetClusterEntryCapacity() < passes::kVisIdEntryLimit) {
         auto& visState = m_blackboard->get_or_add<passes::VisibilityPassState>();
         auto& resolveState = m_blackboard->get_or_add<passes::MaterialResolvePassState>();
         if (passes::EnsureVisibilityResources(m_device, visState) && passes::EnsureMaterialResolveResources(m_device, resolveState)) {
