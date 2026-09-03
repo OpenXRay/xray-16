@@ -9,16 +9,7 @@ namespace xray::render
 struct ShaderPassDesc
 {
     shared_str name;
-    shared_str psName;
-    shared_str vsName;
-
-    nvrhi::BlendState::RenderTarget blendRT;
     bool blendEnabled = false;
-    bool alphaToCoverage = false;
-
-    nvrhi::DepthStencilState depthStencil;
-    nvrhi::RasterState rasterState;
-    nvrhi::ColorMask colorWriteMask = nvrhi::ColorMask::All;
 
     bool hasAlphaTestOverride = false;
     u32 alphaTestRef = 0;
@@ -39,7 +30,6 @@ struct ShaderVariantDesc
     bool fog = true;
     bool distort = false;
     bool emissive = false;
-    bool wmark = false;
 
     xr_map<shared_str, shared_str> textures;
 

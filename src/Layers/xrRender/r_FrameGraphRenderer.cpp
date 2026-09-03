@@ -1394,6 +1394,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_gpuProfiler.get()
     );
 
+    if (m_decalManager) {
+        m_decalManager->Update(Device.fTimeDelta, Device.fTimeGlobal);
+        if (m_decalManager->GetActiveCount() > 0) {
+            detailOutputs = passes::setupDecalPass(
+                *m_framegraph, m_device,
+                detailOutputs, m_decalManager.get(),
+                width, height,
+                m_blackboard->get_or_add<passes::DecalPassState>()
+            );
+        }
+    }
+
     {
         auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
         vsmState.active = false;
@@ -1462,21 +1474,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width, height,
         m_blackboard->get_or_add<passes::TransparentPassState>()
     );
-
-    // ═══════════════════════════════════════════════════════
-    //  DECAL PASS (screen-space box decals on surfaces)
-    // ═══════════════════════════════════════════════════════
-    if (m_decalManager) {
-        m_decalManager->Update(Device.fTimeDelta, Device.fTimeGlobal);
-        if (m_decalManager->GetActiveCount() > 0) {
-            transparentOutputs = passes::setupDecalPass(
-                *m_framegraph, m_device,
-                transparentOutputs, m_decalManager.get(),
-                width, height,
-                m_blackboard->get_or_add<passes::DecalPassState>()
-            );
-        }
-    }
 
     // ═══════════════════════════════════════════════════════
     //  MOTION VECTOR PASS (Depth-based reprojection)
