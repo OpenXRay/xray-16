@@ -497,18 +497,11 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     m_transparentInstanceData.clear();
 
     auto batchFlags = [](const GeometryBatch& batch) -> u32 {
-        u32 flags = 0;
-        if (batch.IsOpaque())
-            flags |= GPU_OBJECT_OPAQUE;
-        if (batch.IsAlphaTested())
-            flags |= GPU_OBJECT_ALPHA_TEST;
-        if (batch.IsStrictB2F())
-            flags |= GPU_OBJECT_TRANSPARENT;
         if (const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(batch.bindlessMaterialID)) {
             if (mat->shaderVariant != 0 || (mat->flags & bindless::MAT_FLAG_ALPHA_BLEND))
-                flags |= GPU_OBJECT_PREPASS_SKIP;
+                return GPU_OBJECT_NO_RESOLVE;
         }
-        return flags;
+        return 0u;
     };
 
     auto batchKey = [](const GeometryBatch& batch) {
@@ -561,7 +554,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         if (batch.isTerrain) {
             if (m_terrainDataCached)
                 continue;
-            appendBatch(batch, GPU_OBJECT_OPAQUE, batch.terrainMaterialID,
+            appendBatch(batch, 0u, batch.terrainMaterialID,
                 m_terrainDrawArgsData, m_terrainMaterialIDData, m_terrainInstanceData);
             m_terrainBatchKeys.push_back(batchKey(batch));
             continue;
@@ -2024,8 +2017,7 @@ void GPUCullingManager::BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList)
         const ClusterMeshKey& key = m_dynamicBatchKeys[i];
         if (key.indexCount == 0)
             continue;
-        u32& flags = m_dynamicObjectFlags[i];
-        if (flags & GPU_OBJECT_PREPASS_SKIP)
+        if (m_dynamicObjectFlags[i] & GPU_OBJECT_NO_RESOLVE)
             continue;
         u32 member = 0;
         const ClusterUnitRecord* rec = m_clusterDAG.FindRecord(key, member);
@@ -2036,8 +2028,6 @@ void GPUCullingManager::BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList)
         for (u32 p = 0; p < rec->protoCount; ++p)
             EmitClusterEntry(m_clusterDAG, megaBase, protos[rec->firstProto + p], *rec, i, world,
                 m_dynamicMaterialIDData[i], GPU_CLUSTER_ENTRY_DYNAMIC, m_dynamicEntryData);
-        flags |= GPU_OBJECT_CLUSTERED;
-        m_dynamicInstanceData[i].flags = flags;
         ++clustered;
     }
     m_clusterSet.dynamicResidualCount = dynamicCount - clustered;
@@ -2094,7 +2084,7 @@ void GPUCullingManager::BuildClusterEntries()
         const ClusterMeshKey& key = m_staticBatchKeys[i];
         if (key.indexCount == 0)
             continue;
-        if (m_staticObjectFlags[i] & GPU_OBJECT_PREPASS_SKIP) {
+        if (m_staticObjectFlags[i] & GPU_OBJECT_NO_RESOLVE) {
             const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(m_staticMaterialIDData[i]);
             if (!mat || (mat->flags & bindless::MAT_FLAG_ALPHA_BLEND))
                 continue;
@@ -2108,12 +2098,10 @@ void GPUCullingManager::BuildClusterEntries()
             continue;
         }
 
-        if (shadowOnly[i]) {
+        if (shadowOnly[i])
             shadowOnlyBatches++;
-        } else {
-            m_staticObjectFlags[i] |= GPU_OBJECT_CLUSTERED;
+        else
             clusteredBatches++;
-        }
         const u32 extraFlags = shadowOnly[i] ? u32(GPU_CLUSTER_ENTRY_SHADOW_ONLY) : 0u;
 
         if (!rec->isComponent) {

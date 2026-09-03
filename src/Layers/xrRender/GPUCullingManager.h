@@ -50,11 +50,7 @@ static_assert(sizeof(GPUParticleData) == 32, "GPUParticleData must be 32 bytes f
 
 // Object flags
 enum GPUObjectFlags : u32 {
-    GPU_OBJECT_OPAQUE       = 0x1,
-    GPU_OBJECT_ALPHA_TEST   = 0x2,
-    GPU_OBJECT_TRANSPARENT  = 0x4,
-    GPU_OBJECT_PREPASS_SKIP = 0x8,
-    GPU_OBJECT_CLUSTERED    = 0x10,
+    GPU_OBJECT_NO_RESOLVE = 0x1,
 };
 
 // Cluster LOD entry (matches HLSL ClusterEntry in cluster_cull.cs)
