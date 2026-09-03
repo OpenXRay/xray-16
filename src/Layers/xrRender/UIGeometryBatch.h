@@ -125,11 +125,15 @@ public:
 
     bool CanMergeWith(IUIShader* incomingShader, int incomingAlphaRef, bool incomingScissor,
                       const Irect* incomingScissorRect, int incomingCullMode,
-                      UIPrimitiveType incomingPrimType) const
+                      UIPrimitiveType incomingPrimType, size_t incomingVertexCount) const
     {
-        if (uiShader != incomingShader) return false;
+        if (!uiShader || !incomingShader) return false;
+        if (uiShader != incomingShader &&
+            !static_cast<fgUIShader*>(uiShader)->SamePipelineAs(*static_cast<fgUIShader*>(incomingShader)))
+            return false;
         if (primitiveType != incomingPrimType) return false;
         if (primitiveType == UIPrimitiveType::LineStrip) return false;
+        if (UsesIndexBuffer() && vertices.size() + incomingVertexCount > size_t(UINT16_MAX) + 1) return false;
         if (alphaRef != incomingAlphaRef) return false;
         if (hasScissor != incomingScissor) return false;
         if (hasScissor && incomingScissor) {

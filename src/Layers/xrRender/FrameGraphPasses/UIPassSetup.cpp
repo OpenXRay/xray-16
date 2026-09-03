@@ -19,6 +19,8 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"
 
+#include <algorithm>
+
 namespace xray::render::fg::passes {
 
 using namespace xray::render::fgconstants;
@@ -55,6 +57,25 @@ static fg::PrimitiveTopology GetBatchTopology(const ui::UIGeometryBatch& batch)
     case ui::UIPrimitiveType::TriList:
     default:
         return fg::PrimitiveTopology::TriangleList;
+    }
+}
+
+static void CommitUIStaticGlobals(FGUIRender* uiRender, render::MaterialCache* uiMatCache, nvrhi::IFramebuffer* framebuffer, fg::RenderContext* ctx)
+{
+    StaticGlobals staticGlobalsCB = {};
+    FillGlobalConstants(staticGlobalsCB);
+
+    xr_vector<MaterialPSO*> committed;
+    for (const auto& batch : uiRender->GetBatches()) {
+        if (!batch.uiShader)
+            continue;
+        MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(batch.uiShader, batch.shaderElement, framebuffer, GetBatchTopology(batch));
+        if (!matPSO || std::find(committed.begin(), committed.end(), matPSO) != committed.end())
+            continue;
+        committed.push_back(matPSO);
+        FGConstantSystem constants(matPSO);
+        UploadStaticGlobals(constants, staticGlobalsCB);
+        constants.CommitStatic(ctx);
     }
 }
 
@@ -109,6 +130,8 @@ framegraph::VirtualResourceHandle setupUIPass(
                 return;
             }
 
+            uiRender->Clear();
+
             g_pGamePersistent->OnRenderPPUI_main();
             g_pGamePersistent->OnRenderInGameUI();
             if (g_pGamePersistent->IsLoadingScreenShown()) {
@@ -117,26 +140,7 @@ framegraph::VirtualResourceHandle setupUIPass(
             g_pGamePersistent->OnRenderSequencers();
 
             if (!uiRender->GetBatches().empty()) {
-                StaticGlobals staticGlobalsCB = {};
-                FillGlobalConstants(staticGlobalsCB);
-
-                for (const auto& batch : uiRender->GetBatches()) {
-                    if (batch.uiShader && uiMatCache) {
-                        MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(
-                            batch.uiShader,
-                            batch.shaderElement,
-                            framebuffer,
-                            GetBatchTopology(batch)
-                        );
-
-                        if (matPSO) {
-                            FGConstantSystem constants(matPSO);
-                            UploadStaticGlobals(constants, staticGlobalsCB);
-                            constants.CommitStatic(ctx);
-                        }
-                    }
-                }
-
+                CommitUIStaticGlobals(uiRender, uiMatCache, framebuffer, ctx);
                 uiRender->Draw(cmdList, framebuffer, data.width, data.height);
             }
         }
@@ -205,26 +209,7 @@ framegraph::VirtualResourceHandle setupCursorPass(
             GEnv.UIRender = oldRenderer;
 
             if (!uiRender->GetBatches().empty()) {
-                StaticGlobals staticGlobalsCB = {};
-                FillGlobalConstants(staticGlobalsCB);
-
-                for (const auto& batch : uiRender->GetBatches()) {
-                    if (batch.uiShader && uiMatCache) {
-                        MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(
-                            batch.uiShader,
-                            batch.shaderElement,
-                            framebuffer,
-                            GetBatchTopology(batch)
-                        );
-
-                        if (matPSO) {
-                            FGConstantSystem constants(matPSO);
-                            UploadStaticGlobals(constants, staticGlobalsCB);
-                            constants.CommitStatic(ctx);
-                        }
-                    }
-                }
-
+                CommitUIStaticGlobals(uiRender, uiMatCache, framebuffer, ctx);
                 uiRender->Draw(cmdList, framebuffer, data.width, data.height);
             }
         }
