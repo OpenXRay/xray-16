@@ -39,6 +39,7 @@ public:
     void SetStaticArray(const char* name, const Fmatrix* values, u32 count);
 
     void CommitStatic(fg::RenderContext* ctx);
+    static void TransitionStaticForUpload(const MaterialPSO* pso, nvrhi::ICommandList* cmdList);
 
     void InvalidateStatic(const char* name);
     void InvalidateAllStatic();
@@ -49,6 +50,8 @@ public:
     void PrintUnboundConstants() const;
 
 private:
+    static bool CBHasStaticConstants(const MaterialPSO* pso, const MaterialPSO::ConstantBufferInfo& cbInfo);
+
     const MaterialPSO* m_pso;
     framegraph::VolatileConstantBufferPool* m_vcbPool;
 

@@ -346,18 +346,7 @@ void FGConstantSystem::CommitStatic(fg::RenderContext* ctx) {
     }
 
     for (const auto& cbInfo : m_pso->constantBuffers) {
-        bool hasStaticConstants = false;
-        for (const auto& constant : m_pso->constantLayout.constants) {
-            if (constant.cbIndex < m_pso->constantLayout.constantBuffers.buffers.size()) {
-                const auto& cb = m_pso->constantLayout.constantBuffers.buffers[constant.cbIndex];
-                if (cb.name == cbInfo.name && constant.persistence == ConstantPersistence::Static) {
-                    hasStaticConstants = true;
-                    break;
-                }
-            }
-        }
-
-        if (!hasStaticConstants)
+        if (!CBHasStaticConstants(m_pso, cbInfo))
             continue;
 
         ctx->WriteBuffer(cbInfo.nvrhiBuffer.Get(), m_staticConstants, cbInfo.size);
@@ -365,6 +354,24 @@ void FGConstantSystem::CommitStatic(fg::RenderContext* ctx) {
 
     m_dirtyStatic = 0;
     m_staticInitialized = true;
+}
+
+bool FGConstantSystem::CBHasStaticConstants(const MaterialPSO* pso, const MaterialPSO::ConstantBufferInfo& cbInfo) {
+    for (const auto& constant : pso->constantLayout.constants) {
+        if (constant.cbIndex < pso->constantLayout.constantBuffers.buffers.size()) {
+            const auto& cb = pso->constantLayout.constantBuffers.buffers[constant.cbIndex];
+            if (cb.name == cbInfo.name && constant.persistence == ConstantPersistence::Static)
+                return true;
+        }
+    }
+    return false;
+}
+
+void FGConstantSystem::TransitionStaticForUpload(const MaterialPSO* pso, nvrhi::ICommandList* cmdList) {
+    for (const auto& cbInfo : pso->constantBuffers) {
+        if (CBHasStaticConstants(pso, cbInfo))
+            cmdList->setBufferState(cbInfo.nvrhiBuffer.Get(), nvrhi::ResourceStates::CopyDest);
+    }
 }
 
 void FGConstantSystem::InvalidateStatic(const char* name) {
