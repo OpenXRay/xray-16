@@ -1636,7 +1636,7 @@ VSMOutput setupVSMPasses(
                 Msg("[VSM] night-freeze: %s", night ? "FROZEN (sun down, VSM update skipped)" : "active (sun up)");
         }
         if (behind || night) {
-            if (state->maskReady) {
+            if (behind && state->maskReady) {
                 ResourceDesc heldDesc;
                 heldDesc.type = ResourceDesc::Type::Texture2D;
                 heldDesc.width = width;
