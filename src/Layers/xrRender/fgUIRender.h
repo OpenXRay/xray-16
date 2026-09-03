@@ -52,12 +52,11 @@ public:
 private:
     bool CreateBuffers();
     void EnsureBufferCapacity(size_t vertexCount, size_t indexCount);
-    void UploadBatchGeometry(nvrhi::ICommandList* cmdList, const ui::UIGeometryBatch& batch, u32& vertexOffset, u32& indexOffset);
     void RenderBatchWithShader(nvrhi::ICommandList* cmdList, const ui::UIGeometryBatch& batch, render::MaterialPSO* pso, nvrhi::IFramebuffer* framebuffer,
         u32 screenWidth, u32 screenHeight, u32 vertexOffset, u32 indexOffset);
 
     ui::UIPrimitiveType ConvertPrimitiveType(ePrimitiveType primType);
-    ui::UIGeometryBatch* GetOrCreateBatch(ui::UIPrimitiveType primType);
+    ui::UIGeometryBatch* GetOrCreateBatch(ui::UIPrimitiveType primType, size_t incomingVertexCount);
 
     IUIShader* m_currentUIShader = nullptr;
     int m_currentAlphaRef = 0;
@@ -72,6 +71,8 @@ private:
     xr_vector<ui::UIVertex> m_currentVertices;
 
     xr_vector<ui::UIGeometryBatch> m_batches;
+    xr_vector<ui::UIVertex> m_vertexScratch;
+    xr_vector<u16> m_indexScratch;
 
     RenderDevice* m_device = nullptr;
     render::MaterialCache* m_matCache = nullptr;
