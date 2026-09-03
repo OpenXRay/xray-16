@@ -5,17 +5,6 @@
 #include "skinned_record.h"
 
 StructuredBuffer<SkinnedDrawRecord> g_SkinnedRecords : register(t14);
-StructuredBuffer<uint> g_SkinnedMaterialIDs : register(t15);
-
-SkinnedDrawRecord skinned_mdi_record(uint drawIndex)
-{
-    return g_SkinnedRecords[drawIndex];
-}
-
-uint skinned_mdi_material(uint drawIndex)
-{
-    return g_SkinnedMaterialIDs[drawIndex];
-}
 
 float4x4 mdi_get_bone(uint boneOffset, int legacy_index)
 {
@@ -86,17 +75,5 @@ float3 mdi_apply_splat_color(SkinnedDrawRecord rec, float3 albedo, float3 worldP
     }
     return albedo;
 }
-
-struct VS_OUTPUT_MDI
-{
-    float4 position  : SV_Position;
-    float3 worldPos  : TEXCOORD0;
-    float2 texcoord  : TEXCOORD1;
-    float3 normal    : TEXCOORD2;
-    float3 tangent   : TEXCOORD3;
-    float3 bitangent : TEXCOORD4;
-    nointerpolation uint materialID : TEXCOORD5;
-    nointerpolation uint drawIndex  : TEXCOORD6;
-};
 
 #endif

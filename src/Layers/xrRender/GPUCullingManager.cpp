@@ -507,7 +507,17 @@ void GPUCullingManager::CreateSkinnedBuffers(fg::RenderDevice* device)
     m_boneBufferInitialized = true;
 
     EnsureSkinnedCapacity(1024);
-    m_skinnedEnabled = m_skinnedArgsBuffer && m_skinnedRecordsBuffer;
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedEntries";
+        desc.byteSize = u64(SKINNED_ENTRY_CAPACITY) * sizeof(GPUClusterEntry);
+        desc.structStride = sizeof(GPUClusterEntry);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        m_skinnedEntryBuffer = nvDevice->createBuffer(desc);
+        m_skinnedEntryCapacity = m_skinnedEntryBuffer ? SKINNED_ENTRY_CAPACITY : 0;
+    }
+    m_skinnedEnabled = m_skinnedRecordsBuffer && m_skinnedEntryBuffer;
     Msg("* [GPUCulling] Skinned upload buffers created (max: %u objects, %u bones)",
         m_maxSkinnedObjects, MAX_TOTAL_BONES);
 }
@@ -522,16 +532,6 @@ void GPUCullingManager::EnsureSkinnedCapacity(u32 count)
 
     {
         nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_SkinnedArgs";
-        desc.byteSize = u64(capacity) * sizeof(IndirectDrawArgs);
-        desc.canHaveRawViews = true;
-        desc.isDrawIndirectArgs = true;
-        desc.initialState = nvrhi::ResourceStates::IndirectArgument;
-        desc.keepInitialState = true;
-        m_skinnedArgsBuffer = nvDevice->createBuffer(desc);
-    }
-    {
-        nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_SkinnedRecords";
         desc.byteSize = u64(capacity) * sizeof(SkinnedDrawRecord);
         desc.structStride = sizeof(SkinnedDrawRecord);
@@ -541,7 +541,6 @@ void GPUCullingManager::EnsureSkinnedCapacity(u32 count)
     }
 
     m_maxSkinnedObjects = capacity;
-    m_skinnedArgsData.reserve(capacity);
     m_skinnedRecordsData.reserve(capacity);
     m_skinnedMaterialIDData.reserve(capacity);
 }
@@ -1033,7 +1032,6 @@ void GPUCullingManager::Shutdown()
     m_skinnedPools.Reset();
     for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f)
         m_skinnedBuckets[f] = SkinnedBucket{};
-    m_skinnedArgsBuffer = nullptr;
     m_skinnedRecordsBuffer = nullptr;
     m_skinnedChunkBuffer = nullptr;
     m_skinnedEntryBuffer = nullptr;
@@ -1965,7 +1963,6 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     auto& nextHistory = m_skinnedHistory[m_skinnedHistoryIndex ^ 1u];
     nextHistory.clear();
 
-    m_skinnedArgsData.clear();
     m_skinnedRecordsData.clear();
     m_skinnedMaterialIDData.clear();
     m_skinnedChunkData.clear();
@@ -1979,12 +1976,9 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
             for (u32 i = 0; i < static_cast<u32>(bucket.records.size()); ++i) {
                 if (bucket.kinds[i] != kind)
                     continue;
-                const u32 slot = static_cast<u32>(m_skinnedArgsData.size());
+                const u32 slot = static_cast<u32>(m_skinnedRecordsData.size());
                 const u32 vertexCount = bucket.vertexCounts[i];
-                IndirectDrawArgs args = bucket.args[i];
-                args.startInstanceLocation = slot;
-                args.baseVertexLocation = static_cast<s32>(vertexTotal);
-                m_skinnedArgsData.push_back(args);
+                const IndirectDrawArgs& args = bucket.args[i];
                 m_skinnedRecordsData.push_back(bucket.records[i]);
                 u32 prevBase = 0xFFFFFFFFu;
                 if (historyValid) {
@@ -2026,31 +2020,20 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     m_skinnedVisibleEntryCount = static_cast<u32>(m_skinnedEntryData.size());
     m_skinnedEntryData.insert(m_skinnedEntryData.end(), m_skinnedShadowEntryData.begin(), m_skinnedShadowEntryData.end());
 
-    cmdList->writeBuffer(m_skinnedArgsBuffer, m_skinnedArgsData.data(), u64(pooledTotal) * sizeof(IndirectDrawArgs));
     cmdList->writeBuffer(m_skinnedRecordsBuffer, m_skinnedRecordsData.data(), u64(pooledTotal) * sizeof(SkinnedDrawRecord));
 
     m_skinnedEntryCount = static_cast<u32>(m_skinnedEntryData.size());
-    if (m_skinnedEntryCount > 0) {
-        if (m_skinnedEntryCapacity < m_skinnedEntryCount) {
-            u32 capacity = std::max(m_skinnedEntryCapacity * 2u, 4096u);
-            while (capacity < m_skinnedEntryCount)
-                capacity *= 2;
-            nvrhi::BufferDesc desc;
-            desc.debugName = "GPUCull_SkinnedEntries";
-            desc.byteSize = u64(capacity) * sizeof(GPUClusterEntry);
-            desc.structStride = sizeof(GPUClusterEntry);
-            desc.initialState = nvrhi::ResourceStates::ShaderResource;
-            desc.keepInitialState = true;
-            m_skinnedEntryBuffer = m_device->GetNVRHIDevice()->createBuffer(desc);
-            m_skinnedEntryCapacity = m_skinnedEntryBuffer ? capacity : 0;
+    if (m_skinnedEntryCount > m_skinnedEntryCapacity) {
+        static bool s_warned = false;
+        if (!s_warned) {
+            Msg("! [GPUCulling] %u skinned entries exceed the %u capacity, dropping the rest", m_skinnedEntryCount, m_skinnedEntryCapacity);
+            s_warned = true;
         }
-        if (m_skinnedEntryBuffer)
-            cmdList->writeBuffer(m_skinnedEntryBuffer, m_skinnedEntryData.data(), u64(m_skinnedEntryCount) * sizeof(GPUClusterEntry));
-        else {
-            m_skinnedEntryCount = 0;
-            m_skinnedVisibleEntryCount = 0;
-        }
+        m_skinnedEntryCount = m_skinnedEntryCapacity;
+        m_skinnedVisibleEntryCount = std::min(m_skinnedVisibleEntryCount, m_skinnedEntryCapacity);
     }
+    if (m_skinnedEntryCount > 0)
+        cmdList->writeBuffer(m_skinnedEntryBuffer, m_skinnedEntryData.data(), u64(m_skinnedEntryCount) * sizeof(GPUClusterEntry));
 
     if (DispatchPreskin(cmdList, overlayMgr, vertexTotal)) {
         m_skinnedHistoryIndex ^= 1u;
@@ -2980,14 +2963,15 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedUploadPass(
         decals::OverlayManager* overlayMgr;
     };
 
-    ResourceDesc argsBufferDesc;
-    argsBufferDesc.type = ResourceDesc::Type::Buffer;
-    argsBufferDesc.debugName = "GPUCull_SkinnedArgs";
-    argsBufferDesc.bufferSize = m_maxSkinnedObjects * sizeof(IndirectDrawArgs);
-    argsBufferDesc.isTransient = false;
+    ResourceDesc entryBufferDesc;
+    entryBufferDesc.type = ResourceDesc::Type::Buffer;
+    entryBufferDesc.debugName = "GPUCull_SkinnedEntries";
+    entryBufferDesc.bufferSize = u64(m_skinnedEntryCapacity) * sizeof(GPUClusterEntry);
+    entryBufferDesc.structStride = sizeof(GPUClusterEntry);
+    entryBufferDesc.isTransient = false;
 
     VirtualResourceHandle argsBufferHandle = fg.ImportBuffer(
-        "skinned_draw_args", m_skinnedArgsBuffer, argsBufferDesc);
+        "skinned_entries", m_skinnedEntryBuffer, entryBufferDesc);
 
     auto& passData = fg.addCallbackPass<SkinnedUploadPassData>(
         "Skinned Upload",

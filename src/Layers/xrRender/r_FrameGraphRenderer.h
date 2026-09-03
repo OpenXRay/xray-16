@@ -78,22 +78,7 @@ class MaterialCache;
 struct CompiledLevelShader {
     shared_str shaderName;
     shared_str textureName;
-    nvrhi::ShaderHandle vsHandle;
-    nvrhi::ShaderHandle psHandle;
-    xr_unique_ptr<framegraph::ExtractedReflection> vsReflection;
-    xr_unique_ptr<framegraph::ExtractedReflection> psReflection;
     MaterialSystem::MaterialInfo materialInfo;
-    struct PrecompiledPSOs {
-        struct PSOVariant {
-            u32 vertexFormatID;
-            RenderPassType passType;
-            fg::PipelineState* pso;
-            MaterialPSO* materialPSO;
-        };
-        xr_vector<PSOVariant> variants;
-        xr_map<u64, MaterialPSO*> psoCache;
-    };
-    PrecompiledPSOs precompiledPSOs;
 };
 
 namespace fg {
@@ -158,7 +143,6 @@ public:
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
 
     CompiledLevelShader* getCompiledShader(int id);
-    bool getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::ShaderHandle& outPS);
 private:
     using VertexDeclarator = ::xray::render::fg::VertexDeclarator;
     void LoadBuffers(CStreamReader* fs, bool alternative);
@@ -168,15 +152,7 @@ private:
     void LoadSectors(IReader* fs);
     void LoadSWIs(CStreamReader* fs);
     void CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName);
-    void PrecompileLevelPSOs();
-    bool IsVertexFormatCompatible(const VertexDeclarator& decl, const framegraph::ExtractedReflection* vsReflection);
-    bool MatchesSemanticName(const fg::VertexElement& elem, const xr_string& semanticName);
-    bool IsFormatCompatible(u8 d3dFormat, nvrhi::Format nvrhiFormat);
     u32 GetVertexStride(u32 vertexFormatID);
-    bool CreatePrecompiledPSO(u32 shaderID, u32 vertexFormatID, RenderPassType passType,
-                               nvrhi::Format colorFormat, nvrhi::Format depthFormat, MaterialCache* materialCache);
-    void SetupDepthState(RenderPassType passType, const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc);
-    void SetupBlendState(const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc);
 public:
 
     pcstr getShaderPath() override { return "r5\\"; }

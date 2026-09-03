@@ -40,22 +40,6 @@ float3 skinning_dir(float3 dir, float4x4 bone)
     return mul((float3x3)bone, dir);
 }
 
-float3 unpack_d3dcolor_normal(float3 packed)
-{
-    return packed * 2.0 - 1.0;
-}
-
-float3 skin_splat_pos(PaintSplat splat)
-{
-    float3 result = 0;
-    for (uint i = 0; i < 4; i++)
-    {
-        float4x4 bone = g_BoneMatrices[g_SkeletonBoneOffset + splat.boneIdx[i]];
-        result += mul(bone, float4(splat.posRadius.xyz, 1)).xyz * splat.boneWeights[i];
-    }
-    return result;
-}
-
 #define SPLAT_MODE_DECAL              0u
 #define SPLAT_MODE_PROCEDURAL_BLOOD   1u
 
@@ -127,24 +111,6 @@ float procedural_splat_mask(float2 localUV, float seed, float age)
     return saturate(mask * pitMask);
 }
 
-float3 apply_splat_deform(float3 worldPos, float3 worldNormal)
-{
-    float3 offset = 0;
-    for (uint i = 0; i < g_SplatCount; i++)
-    {
-        PaintSplat splat = g_PaintSplats[g_SplatOffset + i];
-        float3 splatWorldPos = mul(m_W, float4(skin_splat_pos(splat), 1)).xyz;
-        float dist = distance(worldPos, splatWorldPos);
-        float r = splat.posRadius.w;
-        if (dist < r)
-        {
-            float fade = 1.0 - smoothstep(r * 0.5, r, dist);
-            offset -= worldNormal * (splat.color.a * fade * dev_param_1.x);
-        }
-    }
-    return offset;
-}
-
 float4 sample_decal_stamp(PaintSplat splat, float2 meshUV)
 {
     if (splat.wallmarkMaterialID == INVALID_TEXTURE_INDEX || splat.uvRadius <= 1e-5)
@@ -191,42 +157,6 @@ float4 sample_procedural_blood(PaintSplat splat, float2 meshUV)
 
     float finalAlpha = mask * lerp(1.0, 0.75, dry);
     return float4(finalColor, finalAlpha);
-}
-
-float3 apply_splat_color(float3 albedo, float3 worldPos, float2 meshUV)
-{
-    for (uint i = 0; i < g_SplatCount; i++)
-    {
-        PaintSplat splat = g_PaintSplats[g_SplatOffset + i];
-        float3 splatWorldPos = mul(m_W, float4(skin_splat_pos(splat), 1)).xyz;
-        float dist = distance(worldPos, splatWorldPos);
-        float r = splat.posRadius.w;
-        uint mode = get_splat_mode(splat);
-        float reach = (mode == SPLAT_MODE_PROCEDURAL_BLOOD) ? (r * 1.8) : r;
-        if (dist < reach)
-        {
-            float fade = 1.0 - smoothstep(r * 0.5, reach, dist);
-
-            if (mode == SPLAT_MODE_PROCEDURAL_BLOOD)
-            {
-                float4 proc = sample_procedural_blood(splat, meshUV);
-                if (proc.a <= 1e-5)
-                    continue;
-                float procAlpha = saturate(fade * proc.a);
-                albedo = lerp(albedo, proc.rgb, procAlpha);
-                continue;
-            }
-
-            float4 stamp = sample_decal_stamp(splat, meshUV);
-            if (stamp.a <= 1e-5)
-                continue;
-
-            float3 splatColor = splat.color.rgb * stamp.rgb;
-            float splatAlpha = splat.color.a * fade * stamp.a;
-            albedo = lerp(albedo, splatColor, saturate(splatAlpha));
-        }
-    }
-    return albedo;
 }
 
 #endif // SKINNED_COMMON_H

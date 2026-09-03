@@ -22,19 +22,6 @@ struct VulkanBindShifts {
 
 // ═══════════════════════════════════════════════════
 //  RENDER PHASE TYPES
-// ═══════════════════════════════════════════════════
-//
-// Determines which rendering phase a shader belongs to.
-// Used for automatic pass routing and RT binding.
-//
-enum class RenderPhase {
-    Geometry,      // Outputs to GBuffer (rt_Position, rt_Normal, rt_Color)
-    Lighting,      // Outputs to rt_Accumulator
-    Combine,       // Outputs to rt_Generic_0/1
-    PostProcess,   // Various outputs (bloom, tonemap, etc.)
-    Shadow,        // Shadow map generation
-    Custom         // User-defined
-};
 
 // ═══════════════════════════════════════════════════
 //  VERTEX SHADER INPUT SIGNATURE
@@ -63,7 +50,6 @@ struct VertexInputSignature {
 // Contains all texture inputs/outputs for automatic RT binding.
 //
 struct ShaderRTBindings {
-    RenderPhase phase = RenderPhase::Custom;
 
     struct InputTexture {
         shared_str name;
@@ -212,23 +198,13 @@ struct ShaderRTBindings {
     xr_vector<Sampler> samplers;
 
     // ─── Output RTs (RTVs) ───
-    enum class RTSemantic {
-        Unknown,
-        Normal,      // World-space or view-space normal
-        Albedo,      // Base color / diffuse
-        Material,    // Material properties (metallic, roughness, AO)
-        Position,    // World-space or view-space position
-        Emissive,    // Emissive color
-        Accumulator  // Lighting accumulation buffer
-    };
 
     struct OutputRT {
         u32 slot;              // SV_Target index
-        RTSemantic semantic;   // Inferred semantic meaning
         shared_str formatDesc; // Format description for debugging
 
-        OutputRT() : slot(0), semantic(RTSemantic::Unknown) {}
-        OutputRT(u32 s) : slot(s), semantic(RTSemantic::Unknown) {}
+        OutputRT() : slot(0) {}
+        OutputRT(u32 s) : slot(s) {}
     };
     xr_vector<OutputRT> outputRTs;
 
@@ -420,17 +396,8 @@ public:
     static const ShaderConstantBuffers& GetConstantBuffers(
         const ExtractedReflection* reflection);
 
-    // Infer render phase from shader bindings
-    static RenderPhase InferPhase(const ShaderRTBindings& bindings);
 
-    // Get typical RT names for a phase
-    static xr_vector<const char*> GetPhaseRTNames(RenderPhase phase);
 
-    // Infer RT semantic from output signature
-    static ShaderRTBindings::RTSemantic InferRTSemantic(
-        u32 slot,
-        u32 componentMask,
-        RenderPhase phase);
 
 private:
     // Internal helpers (extract data from live Slang reflection)
@@ -445,7 +412,6 @@ private:
     // Helper: Infer constant persistence (static vs volatile) from CB name and frequency
     static ConstantPersistence InferConstantPersistence(const char* cbName, UpdateFrequency frequency);
 
-    static bool MatchesPattern(const char* name, const char* pattern);
 };
 
 } // namespace xray::render::framegraph

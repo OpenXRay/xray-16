@@ -96,18 +96,6 @@ bool GetCompiledShaderNames(int shaderID, shared_str& outShaderName, shared_str&
     return true;
 }
 
-MaterialPSO* GetCompiledShaderPSO(int shaderID, u32 vertexFormatID, RenderPassType passType)
-{
-    auto* compiled = fg::RImplementation.getCompiledShader(shaderID);
-    if (!compiled)
-        return nullptr;
-    u64 cacheKey = ((u64)vertexFormatID << 32) | (u64)passType;
-    auto it = compiled->precompiledPSOs.psoCache.find(cacheKey);
-    if (it != compiled->precompiledPSOs.psoCache.end())
-        return it->second;
-    return nullptr;
-}
-
 }
 
 namespace xray::render::scene_info
