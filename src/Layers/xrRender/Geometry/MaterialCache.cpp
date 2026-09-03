@@ -230,51 +230,6 @@ MaterialCache::~MaterialCache() {
 }
 
 
-MaterialPSO* MaterialCache::GetOrCreatePSO(
-    dxRender_Visual* visual,
-    const framegraph::DefaultOutputLayout& outputs,
-    const framegraph::FrameGraph& fg,
-    RenderPassType passType)
-{
-    if (!visual) {
-        Msg("! [MaterialCache::GetOrCreatePSO] Visual is NULL");
-        return nullptr;
-    }
-
-    u32 shaderID = visual->shader_id;
-    if (shaderID == UINT32_MAX)
-        return nullptr;
-
-    u32 vertexFormatID = GetVertexFormatID(visual);
-    if (auto* pso = shader_info::GetCompiledShaderPSO(shaderID, vertexFormatID, passType)) {
-        m_stats.numCacheHits++;
-        return pso;
-    }
-
-    m_stats.numCacheMisses++;
-    Msg("! [MaterialCache] PSO cache miss for shader %u (format %u, pass %u)",
-        shaderID, vertexFormatID, (u32)passType);
-    return nullptr;
-}
-
-
-MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
-    dxRender_Visual* visual,
-    const framegraph::FrameGraph& fg)
-{
-    if (!visual)
-        Msg("! [MaterialCache::GetOrCreateDepthPSO] Visual is NULL");
-    return nullptr;
-}
-
-
-
-
-
-
-
-
-
 void MaterialCache::CreateBindingLayouts(MaterialPSO* matPSO)
 {
     VERIFY(matPSO);

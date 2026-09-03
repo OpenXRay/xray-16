@@ -1712,23 +1712,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                             worldSkinned.push_back(b);
                     }
 
-                    float fovScale = 1.0f / psHUD_FOV;
-                    Fmatrix viewMatrix = Device.mView;
-                    Fmatrix invView;
-                    invView.invert(viewMatrix);
-                    Fmatrix fovScaleMat;
-                    fovScaleMat.identity();
-                    fovScaleMat._11 = fovScale;
-                    fovScaleMat._22 = fovScale;
+                    const Fmatrix hudFov = BuildHUDFOVMatrix();
 
                     xr_vector<GeometryBatch> hudSkinned;
                     for (const auto& b : *data.hudBatches) {
                         if (b.isSkinned && b.visual && b.indexCount > 0) {
                             auto adjusted = b;
-                            Fmatrix t1, t2;
-                            t1.mul(viewMatrix, b.worldMatrix);
-                            t2.mul(fovScaleMat, t1);
-                            adjusted.worldMatrix.mul(invView, t2);
+                            adjusted.worldMatrix.mul(hudFov, b.worldMatrix);
                             hudSkinned.push_back(adjusted);
                         }
                     }
@@ -3014,16 +3004,6 @@ CompiledLevelShader* FrameGraphRenderer::getCompiledShader(int id)
     if (id < 0 || id >= int(m_CompiledLevelShaders.size()))
         return nullptr;
     return &m_CompiledLevelShaders[id];
-}
-
-bool FrameGraphRenderer::getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::ShaderHandle& outPS)
-{
-    auto* compiled = getCompiledShader(id);
-    if (!compiled || !compiled->vsHandle || !compiled->psHandle)
-        return false;
-    outVS = compiled->vsHandle;
-    outPS = compiled->psHandle;
-    return true;
 }
 
 void FrameGraphRenderer::Calculate() {}

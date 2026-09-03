@@ -992,7 +992,7 @@ SunShadowCullOutput setupSunShadowCullPass(
             if (orderAfter.is_valid())
                 data.order = passBuilder.read(orderAfter, ResourceState::IndirectArgument);
             if (skinnedOrder.is_valid())
-                data.skinnedOrder = passBuilder.read(skinnedOrder, ResourceState::IndirectArgument);
+                data.skinnedOrder = passBuilder.read(skinnedOrder, ResourceState::ShaderResource);
             for (u32 t = 0; t < kSunTargetCount; ++t) {
                 data.targets[t].opaqueArgs = passBuilder.write(imported[t].opaqueArgs, ResourceState::UnorderedAccess);
                 data.targets[t].terrainArgs = passBuilder.write(imported[t].terrainArgs, ResourceState::UnorderedAccess);
@@ -1064,7 +1064,7 @@ SunShadowMaps setupSunShadowMapPasses(
                 if (t != kSunTargetFar && config.dynamicArgs.is_valid())
                     data.dynamicArgs = passBuilder.read(config.dynamicArgs, ResourceState::IndirectArgument);
                 if (t != kSunTargetFar && config.skinnedArgs.is_valid())
-                    data.skinnedArgs = passBuilder.read(config.skinnedArgs, ResourceState::IndirectArgument);
+                    data.skinnedArgs = passBuilder.read(config.skinnedArgs, ResourceState::ShaderResource);
             },
             [](const SunShadowMapData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
                 ExecuteSunShadowMap(ctx, fg, data);

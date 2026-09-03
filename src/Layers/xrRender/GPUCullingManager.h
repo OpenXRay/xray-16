@@ -396,7 +396,6 @@ public:
 
     u32 GetSkinnedObjectCount() const { return m_skinnedObjectCount; }
     bool IsSkinnedEnabled() const { return m_initialized && m_skinnedEnabled && m_compactEnabled; }
-    nvrhi::IBuffer* GetSkinnedArgsBuffer() const { return m_skinnedArgsBuffer.Get(); }
     nvrhi::IBuffer* GetSkinnedRecordsBuffer() const { return m_skinnedRecordsBuffer.Get(); }
     SkinnedGeometryPools& GetSkinnedPools() { return m_skinnedPools; }
 
@@ -434,6 +433,7 @@ public:
     u32 GetSkinnedEntryCount() const { return m_skinnedEntryCount; }
     u32 GetSkinnedVisibleEntryCount() const { return m_skinnedVisibleEntryCount; }
     static constexpr u32 SKINNED_ENTRY_INDICES = 384;
+    static constexpr u32 SKINNED_ENTRY_CAPACITY = 32768;
 
     // ───────────────────────────────────────────────────────
     //  SKELETON BONE BUFFER (for GPU-driven skinned rendering)
@@ -683,13 +683,11 @@ private:
     // ───────────────────────────────────────────────────────
     //  SKINNED MESH UPLOAD
     // ───────────────────────────────────────────────────────
-    nvrhi::BufferHandle m_skinnedArgsBuffer;
     nvrhi::BufferHandle m_skinnedRecordsBuffer;
     u32 m_skinnedObjectCount = 0;
     u32 m_maxSkinnedObjects = 0;
     bool m_skinnedEnabled = false;
 
-    xr_vector<IndirectDrawArgs> m_skinnedArgsData;
     xr_vector<SkinnedDrawRecord> m_skinnedRecordsData;
     xr_vector<u32> m_skinnedMaterialIDData;
     xr_vector<SkinnedChunk> m_skinnedChunkData;
