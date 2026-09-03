@@ -433,7 +433,7 @@ public:
         u32 boneOffset;
         u32 splatOffset;
         u32 splatCount;
-        u32 pad;
+        u32 prevFirstVertex;
         Fvector4 bounds;
     };
     static_assert(sizeof(SkinnedDrawRecord) == 96, "SkinnedDrawRecord must be 96 bytes");
@@ -445,6 +445,7 @@ public:
         xr_vector<u8> kinds;
         xr_vector<u32> srcVertexBases;
         xr_vector<u32> vertexCounts;
+        xr_vector<const void*> visuals;
         u32 base = 0;
         u32 count = 0;
         u32 casterCount = 0;
@@ -459,6 +460,7 @@ public:
     static constexpr u32 SKINNED_CHUNK_VERTICES = 256;
 
     nvrhi::IBuffer* GetSkinnedPreVertexBuffer() const { return m_skinnedPreVB[m_skinnedPreVBIndex].Get(); }
+    nvrhi::IBuffer* GetSkinnedPrevVertexBuffer() const { return m_skinnedPreVB[m_skinnedPreVBIndex ^ 1u].Get(); }
     bool EnsurePreskinnedDrawResources();
     nvrhi::IShader* GetPreskinnedVS() const { return m_preskinnedVS.Get(); }
     nvrhi::IInputLayout* GetPreskinnedInputLayout() const { return m_preskinnedLayout.Get(); }
@@ -740,6 +742,10 @@ private:
     nvrhi::BufferHandle m_skinnedPreVB[2];
     u32 m_skinnedPreVBCapacity = 0;
     u32 m_skinnedPreVBIndex = 0;
+    xr_map<const void*, u32> m_skinnedHistory[2];
+    u32 m_skinnedHistoryIndex = 0;
+    u32 m_skinnedHistoryFrame = 0;
+    bool EnsurePreskinBuffers(nvrhi::IDevice* nvDevice, u32 vertexTotal);
     nvrhi::ShaderHandle m_preskinnedVS;
     nvrhi::InputLayoutHandle m_preskinnedLayout;
     bool m_preskinnedFailed = false;
@@ -747,7 +753,7 @@ private:
     nvrhi::BindingLayoutHandle m_preskinLayout;
     bool m_preskinFailed = false;
     bool EnsurePreskinPipeline(nvrhi::IDevice* nvDevice);
-    void DispatchPreskin(nvrhi::ICommandList* cmdList, decals::OverlayManager* overlayMgr, u32 vertexTotal);
+    bool DispatchPreskin(nvrhi::ICommandList* cmdList, decals::OverlayManager* overlayMgr, u32 vertexTotal);
 
     SkinnedGeometryPools m_skinnedPools;
     SkinnedBucket m_skinnedBuckets[SkinnedGeometryPools::FORMAT_COUNT];

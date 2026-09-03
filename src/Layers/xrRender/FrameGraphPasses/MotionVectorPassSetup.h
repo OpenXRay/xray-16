@@ -12,6 +12,7 @@ struct MotionVectorPassState {
     nvrhi::ComputePipelineHandle pipeline;
     nvrhi::BindingLayoutHandle layout;
     nvrhi::IBuffer* cb = nullptr;
+    nvrhi::TextureHandle dummyVisId;
     bool initialized = false;
 };
 
@@ -23,8 +24,12 @@ MotionVectorOutput setupMotionVectorPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depthInput,
+    framegraph::VirtualResourceHandle visId,
+    framegraph::VirtualResourceHandle visDepth,
+    framegraph::VirtualResourceHandle motionVectors,
     const Fmatrix& invViewProj,
     const Fmatrix& prevViewProj,
+    bool motionValid,
     u32 width, u32 height,
     MotionVectorPassState& state);
 

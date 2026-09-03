@@ -526,6 +526,8 @@ void FrameGraphRenderer::Render() {
 
     m_hasPrevFrameData = true;
     m_prevViewProj = Device.mFullTransform;
+    m_prevView = Device.mView;
+    m_prevProject = Device.mProject;
     m_prevCameraPos = Device.vCameraPosition;
     m_pingPongIndex = 1 - m_pingPongIndex;
 
@@ -1251,11 +1253,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             depthBuffer = visOut.depth;
             visIdBuffer = visOut.visId;
             bindlessConfig.visBufferActive = true;
-            if (ps_r_vis_debug) {
-                auto visDebug = passes::setupVisDebugViewPass(*m_framegraph, m_device, visIdBuffer, width, height, u32(ps_r_vis_debug), &visState);
-                if (visDebug.is_valid())
-                    m_framegraph->GetRTRegistry().RegisterRT("rt_VisDebug", visDebug);
-            }
         }
     }
     const bool visActive = bindlessConfig.visBufferActive;
@@ -1356,11 +1353,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
+    framegraph::VirtualResourceHandle visMotionHandle;
+    framegraph::VirtualResourceHandle visDepthHandle;
     if (bindlessConfig.visBufferActive) {
         auto resolved = passes::setupMaterialResolvePass(
             *m_framegraph,
             m_device,
             visIdBuffer,
+            depthBuffer,
             sunOutput,
             normalBuffer,
             baseColorBuffer,
@@ -1369,6 +1369,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_materialCache.get(),
             m_gpuCullingManager.get(),
             m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr,
+            m_prevView,
+            m_prevProject,
+            m_hasPrevFrameData,
             width,
             height,
             &m_blackboard->get_or_add<passes::MaterialResolvePassState>()
@@ -1376,6 +1379,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         sunOutput = resolved.color;
         normalBuffer = resolved.normal;
         baseColorBuffer = resolved.baseColor;
+        visMotionHandle = resolved.motionVectors;
+        visDepthHandle = resolved.visDepth;
     }
 
     auto forwardOutputs = passes::setupForwardColorPass(
@@ -1582,15 +1587,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  MOTION VECTOR PASS (Depth-based reprojection)
     // ═══════════════════════════════════════════════════════
-    passes::MotionVectorOutput motionOutput;
-    if (m_hasPrevFrameData) {
-        motionOutput = passes::setupMotionVectorPass(
-            *m_framegraph, m_device,
-            transparentOutputs.depth,
-            Device.mInvFullTransform, m_prevViewProj,
-            width, height,
-            m_blackboard->get_or_add<passes::MotionVectorPassState>()
-        );
+    passes::MotionVectorOutput motionOutput = passes::setupMotionVectorPass(
+        *m_framegraph, m_device,
+        transparentOutputs.depth,
+        visIdBuffer, visDepthHandle, visMotionHandle,
+        Device.mInvFullTransform, m_prevViewProj, m_hasPrevFrameData,
+        width, height,
+        m_blackboard->get_or_add<passes::MotionVectorPassState>()
+    );
+    if (ps_r_vis_debug && visIdBuffer.is_valid()) {
+        auto visDebug = passes::setupVisDebugViewPass(*m_framegraph, m_device, visIdBuffer, motionOutput.motionVectors, width, height, u32(ps_r_vis_debug), &m_blackboard->get_or_add<passes::VisibilityPassState>());
+        if (visDebug.is_valid())
+            m_framegraph->GetRTRegistry().RegisterRT("rt_VisDebug", visDebug);
     }
 
     // ═══════════════════════════════════════════════════════
