@@ -497,18 +497,6 @@ void StatsOverlay::RenderGeometrySection()
         ImGui::Unindent();
 
         // ═══════════════════════════════════════════════════
-        //  SKINNING STATS
-        // ═══════════════════════════════════════════════════
-        if (s.skinnedMeshes > 0)
-        {
-            ImGui::Text("Skinning:");
-            ImGui::Indent();
-            ImGui::Text("Meshes: %u", s.skinnedMeshes);
-            ImGui::Text("Bones:  %u (max: %u)", s.totalBones, s.maxBonesPerMesh);
-            ImGui::Unindent();
-        }
-
-        // ═══════════════════════════════════════════════════
         //  CLUSTER LOD STATS
         // ═══════════════════════════════════════════════════
         if (s.clusterEntries > 0)

@@ -21,25 +21,13 @@ using fg::dxRender_Visual;
 // ══════════════════════════════════════════════════════════
 
 struct GeometryBatch {
-    // Vertex/index buffers (NVRHI handles for wrapped legacy buffers)
-    nvrhi::BufferHandle vertexBuffer;
-    nvrhi::BufferHandle indexBuffer;
-
     // Draw parameters
     u32 indexCount = 0;
     u32 startIndex = 0;
     s32 baseVertex = 0;
     u32 vertexCount = 0;
-    u32 vertexStride = 0;  // Vertex stride for skinned meshes (24=1W, 28=2W/3W/4W)
 
-    // Material IDs
-    u32 materialID = 0;              // Legacy material ID (for sorting)
     u32 bindlessMaterialID = UINT32_MAX;  // Index into g_Materials for GPU-driven rendering
-
-    // Textures
-    fg::TextureHandle albedoTexture;
-    fg::TextureHandle normalTexture;
-    fg::TextureHandle materialTexture;  // Metallic/roughness
 
     // Transform
     Fmatrix worldMatrix;
@@ -52,16 +40,9 @@ struct GeometryBatch {
     Fvector worldBoundsCenter;
     float worldBoundsRadius = 0.0f;
 
-    // Shader
-    nvrhi::IGraphicsPipeline* pipeline = nullptr;
-    nvrhi::IBindingSet* bindingSet = nullptr;
-
     // Source visual (for material system)
     dxRender_Visual* visual = nullptr;
     IRenderable* renderable = nullptr; // For skinned meshes
-
-    // Visibility/culling
-    bool isVisible = true;
 
     // Static vs dynamic classification (used for GPU culling uploads)
     bool isStatic = false;
@@ -87,9 +68,6 @@ struct GeometryBatch {
     // SSA = R / distSQ where R = bounding sphere radius, distSQ = distance squared to camera
     // Larger SSA = closer/bigger = should render first (front-to-back for opaque)
     float ssa = 0.0f;
-
-    // Debug
-    shared_str debugName;
 
     // ═══════════════════════════════════════════════════
     //  GPU-DRIVEN RENDERING: Mega-buffer allocation
@@ -168,7 +146,6 @@ private:
     Stats m_stats;
 
     // Sorting key
-    static u64 ComputeSortKey(const GeometryBatch& batch);
 };
 
 // Global geometry collector instance (to be initialized by renderer)
