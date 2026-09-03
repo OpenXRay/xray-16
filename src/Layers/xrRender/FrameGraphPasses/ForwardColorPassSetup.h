@@ -3,7 +3,6 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
-#include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 #include <nvrhi/nvrhi.h>
 #include "SunShadowPassSetup.h"
 
@@ -104,7 +103,6 @@ struct BindlessForwardConfig {
         return terrainObjectCount > 0 && (terrainDrawArgsBuffer || terrainCompactDrawArgsBuffer);
     }
 
-    VariantPartitionConfig variantPartition;
 };
 
 struct ForwardColorPassState {

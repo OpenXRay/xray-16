@@ -1147,8 +1147,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.terrainObjectCount = m_gpuCullingManager->GetTerrainObjectCount();
         }
 
-        if (m_gpuCullingManager->IsVariantPartitionEnabled())
-            bindlessConfig.variantPartition = m_gpuCullingManager->GetStaticPartition().ToConfig();
     }
 
     if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedEnabled())
@@ -1492,8 +1490,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         transparentConfig.fadeBuffer = m_gpuCullingManager->GetNeutralFadeBuffer();
         transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
 
-        if (m_gpuCullingManager->IsVariantPartitionEnabled())
-            transparentConfig.variantPartition = m_gpuCullingManager->GetTransparentPartition().ToConfig();
     }
 
     auto transparentOutputs = passes::setupTransparentPass(
