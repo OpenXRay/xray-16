@@ -60,19 +60,6 @@ struct RenderStats
     u32 clusterTerrainTrianglesDrawn = 0;
     u32 clusterTerrainVisible = 0;  // Terrain entries drawn last frame
 
-    u32 sunCasterCandidates = 0;
-    u32 sunCastersOpaque = 0;
-    u32 sunCastersTerrain = 0;
-    u32 sunCastersAT = 0;
-    u32 sunCasc0Opaque = 0;
-    u32 sunCasc0Terrain = 0;
-    u32 sunCasc0AT = 0;
-    u32 sunCasc1Opaque = 0;
-    u32 sunCasc1Terrain = 0;
-    u32 sunCasc1AT = 0;
-    u32 sunFarRedraws = 0;
-    bool sunFarCached = false;
-
     bool vsmActive = false;
     bool vsmSunMoving = false;
     u32 vsmPages = 0;
@@ -124,11 +111,6 @@ struct RenderStats
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
         clusterStaticEntries = clusterTrianglesDrawn = clusterTerrainTrianglesDrawn = 0;
-        sunCasterCandidates = sunCastersOpaque = sunCastersTerrain = sunCastersAT = 0;
-        sunCasc0Opaque = sunCasc0Terrain = sunCasc0AT = 0;
-        sunCasc1Opaque = sunCasc1Terrain = sunCasc1AT = 0;
-        sunFarRedraws = 0;
-        sunFarCached = false;
         vsmActive = vsmSunMoving = false;
         vsmPages = vsmDirtyPages = vsmWrongPages = 0;
         vsmBinDraws = vsmBinInstances = vsmBinMaxPages = vsmBinLodCulled = vsmBinDrops = 0;

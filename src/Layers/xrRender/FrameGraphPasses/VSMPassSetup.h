@@ -217,6 +217,7 @@ void InvalidateVSMCache(VSMState& state);
 bool VSMLoadScreenFrozen();
 Fmatrix VSMSunView(const Fvector& sunDir);
 float VSMReceiverExtent();
+nvrhi::ITexture* ResolveSunMask(const framegraph::FrameGraph& fg, framegraph::VirtualResourceHandle mask, nvrhi::IDevice* device);
 void VSMBeginFrame(VSMState& state, const Fvector& camPos, const Fvector& sunDir);
 
 VSMOutput setupVSMPasses(

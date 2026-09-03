@@ -542,18 +542,6 @@ void StatsOverlay::RenderGeometrySection()
             ImGui::Unindent();
         }
 
-        if (s.sunCasterCandidates > 0)
-        {
-            ImGui::Text("Sun shadow:");
-            ImGui::Indent();
-            ImGui::Text("Casters: %u opaque / %u terrain / %u AT of %u",
-                s.sunCastersOpaque, s.sunCastersTerrain, s.sunCastersAT, s.sunCasterCandidates);
-            ImGui::Text("Far map: %s, %u redraws", s.sunFarCached ? "cached" : "redrawn", s.sunFarRedraws);
-            ImGui::Text("Cascade 0: %u opaque / %u terrain / %u AT", s.sunCasc0Opaque, s.sunCasc0Terrain, s.sunCasc0AT);
-            ImGui::Text("Cascade 1: %u opaque / %u terrain / %u AT", s.sunCasc1Opaque, s.sunCasc1Terrain, s.sunCasc1AT);
-            ImGui::Unindent();
-        }
-
         if (s.vsmActive)
         {
             ImGui::Text("VSM:");

@@ -3,11 +3,7 @@
 
 #ifdef SUN_SHADOW_RECEIVER
 
-Texture2D<float> g_SunShadowFar : register(t26);
-Texture2D<float> g_SunShadowCasc0 : register(t27);
-Texture2D<float> g_SunShadowCasc1 : register(t28);
 Texture2D<float4> g_SunShadowMask : register(t29);
-SamplerComparisonState smp_sunshadow;
 
 float VSMMaskVisibility(float3 worldPos, float4 svPosition)
 {
@@ -25,103 +21,23 @@ float VSMMaskVisibility(float3 worldPos, float4 svPosition)
     return saturate(g_SunShadowMask.Load(int3(int2(pixel), 0)).r);
 }
 
-float SunOccluded(Texture2D<float> smap, float2 uv, float ref)
-{
-    return smap.SampleCmpLevelZero(smp_sunshadow, uv, ref);
-}
-
-float CascSample(Texture2D<float> smap, float4x4 vp, float3 worldPos, float2 invSize)
-{
-    float3 n = mul(vp, float4(worldPos, 1.0)).xyz;
-    float2 uv = float2(n.x * 0.5 + 0.5, 0.5 - n.y * 0.5);
-    if (uv.x < 0.01 || uv.x > 0.99 || uv.y < 0.01 || uv.y > 0.99 || n.z <= 0.0 || n.z >= 1.0)
-        return -1.0;
-    float occluded = 0.25 * (SunOccluded(smap, uv + float2(-0.5, -0.5) * invSize, n.z)
-                           + SunOccluded(smap, uv + float2( 0.5, -0.5) * invSize, n.z)
-                           + SunOccluded(smap, uv + float2(-0.5,  0.5) * invSize, n.z)
-                           + SunOccluded(smap, uv + float2( 0.5,  0.5) * invSize, n.z));
-    return 1.0 - occluded;
-}
-
-float SunShadowFar(float3 worldPos)
-{
-    float4 n = mul(shadow_matrices[2], float4(worldPos, 1.0));
-    float2 uv = float2(n.x * 0.5 + 0.5, 0.5 - n.y * 0.5);
-    if (any(uv < 0.0) || any(uv > 1.0) || n.z <= 0.0 || n.z >= 1.0)
-        return 1.0;
-
-    float2 texel = float2(cascade_splits.z, cascade_splits.z);
-    float occluded = 0.25 * (SunOccluded(g_SunShadowFar, uv + float2(-0.75, -0.75) * texel, n.z)
-                           + SunOccluded(g_SunShadowFar, uv + float2( 0.75, -0.75) * texel, n.z)
-                           + SunOccluded(g_SunShadowFar, uv + float2(-0.75,  0.75) * texel, n.z)
-                           + SunOccluded(g_SunShadowFar, uv + float2( 0.75,  0.75) * texel, n.z));
-    return 1.0 - occluded;
-}
-
 float SunVisibility(float3 worldPos)
 {
     if (cascade_splits.x < 0.5)
         return 1.0;
-    if (cascade_splits.x > 1.5)
-        return VSMMaskVisibility(worldPos, float4(0.0, 0.0, 0.0, 0.0));
-    if (cascade_splits.y > 0.0)
-    {
-        float s = CascSample(g_SunShadowCasc0, shadow_matrices[0], worldPos, float2(cascade_splits.y, cascade_splits.y));
-        if (s >= 0.0)
-            return s;
-    }
-    if (cascade_splits.w > 0.0)
-    {
-        float s = CascSample(g_SunShadowCasc1, shadow_matrices[1], worldPos, float2(cascade_splits.w, cascade_splits.w));
-        if (s >= 0.0)
-            return s;
-    }
-    return SunShadowFar(worldPos);
+    return VSMMaskVisibility(worldPos, float4(0.0, 0.0, 0.0, 0.0));
 }
 
 float SunVisibility(float3 worldPos, float4 svPosition)
 {
-    if (cascade_splits.x > 1.5)
-        return VSMMaskVisibility(worldPos, svPosition);
-    return SunVisibility(worldPos);
-}
-
-bool CascInside(float4x4 vp, float3 worldPos)
-{
-    float3 n = mul(vp, float4(worldPos, 1.0)).xyz;
-    float2 uv = float2(n.x * 0.5 + 0.5, 0.5 - n.y * 0.5);
-    return uv.x >= 0.01 && uv.x <= 0.99 && uv.y >= 0.01 && uv.y <= 0.99 && n.z > 0.0 && n.z < 1.0;
-}
-
-uint SunShadowZone(float3 worldPos)
-{
-    if (cascade_splits.y > 0.0 && CascInside(shadow_matrices[0], worldPos))
-        return 0u;
-    if (cascade_splits.w > 0.0 && CascInside(shadow_matrices[1], worldPos))
-        return 1u;
-    float4 f = mul(shadow_matrices[2], float4(worldPos, 1.0));
-    float2 fuv = float2(f.x * 0.5 + 0.5, 0.5 - f.y * 0.5);
-    if (all(fuv >= 0.0) && all(fuv <= 1.0) && f.z > 0.0 && f.z < 1.0)
-        return 2u;
-    return 3u;
+    if (cascade_splits.x < 0.5)
+        return 1.0;
+    return VSMMaskVisibility(worldPos, svPosition);
 }
 
 float3 SunShadowDebugColor(float3 color, float3 worldPos)
 {
-    float vis = SunVisibility(worldPos);
-    if (dev_param_3.y > 1.5)
-    {
-        uint zone = SunShadowZone(worldPos);
-        float3 tint = float3(0.3, 0.3, 1.0);
-        if (zone == 0u)
-            tint = float3(0.2, 1.0, 0.2);
-        else if (zone == 1u)
-            tint = float3(1.0, 1.0, 0.2);
-        else if (zone == 2u)
-            tint = float3(1.0, 0.6, 0.2);
-        return lerp(color, tint, 0.45) * (0.35 + 0.65 * vis);
-    }
-    return vis.xxx;
+    return SunVisibility(worldPos).xxx;
 }
 
 #else
