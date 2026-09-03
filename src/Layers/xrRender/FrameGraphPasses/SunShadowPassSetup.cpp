@@ -75,6 +75,8 @@ struct alignas(16) SunShadowCullParams {
 
 struct SunShadowCullData {
     VirtualResourceHandle order;
+    VirtualResourceHandle skinnedOrder;
+    GPUCullingManager* gpuCulling = nullptr;
     SunShadowCullOutput::Target targets[kSunTargetCount];
     SunShadowState* state;
     fg::RenderDevice* device;
@@ -90,6 +92,7 @@ struct SunShadowMapData {
     VirtualResourceHandle atArgs;
     VirtualResourceHandle dynamicArgs;
     VirtualResourceHandle skinnedArgs;
+    VirtualResourceHandle skinnedCullArgs;
     SunShadowState* state;
     fg::RenderDevice* device;
     SunShadowDrawConfig config;
@@ -127,7 +130,9 @@ bool EnsureCullPipelines(fg::RenderDevice* device, SunShadowState& state)
 
     auto cullResult = shaderLoader->LoadComputeShader("shadow_cluster_cull");
     auto argsResult = shaderLoader->LoadComputeShader("shadow_draw_args");
-    if (!cullResult.handle || !argsResult.handle || !cullResult.reflection || !argsResult.reflection) {
+    auto skinnedArgsResult = shaderLoader->LoadComputeShader("shadow_skinned_draw_args");
+    if (!cullResult.handle || !argsResult.handle || !cullResult.reflection || !argsResult.reflection
+        || !skinnedArgsResult.handle || !skinnedArgsResult.reflection) {
         Msg("! [SunShadow] cull shaders failed to load");
         state.pipelinesFailed = true;
         return false;
@@ -136,7 +141,8 @@ bool EnsureCullPipelines(fg::RenderDevice* device, SunShadowState& state)
     auto& cache = framegraph::GetPassResourceCache();
     state.cullLayout = cache.GetOrCreateBindingLayoutFromReflection("SunShadowCull", *cullResult.reflection, nvDevice);
     state.argsLayout = cache.GetOrCreateBindingLayoutFromReflection("SunShadowArgs", *argsResult.reflection, nvDevice);
-    if (!state.cullLayout || !state.argsLayout) {
+    state.skinnedArgsLayout = cache.GetOrCreateBindingLayoutFromReflection("SunShadowSkinnedArgs", *skinnedArgsResult.reflection, nvDevice);
+    if (!state.cullLayout || !state.argsLayout || !state.skinnedArgsLayout) {
         state.pipelinesFailed = true;
         return false;
     }
@@ -151,7 +157,12 @@ bool EnsureCullPipelines(fg::RenderDevice* device, SunShadowState& state)
     argsDesc.bindingLayouts = { state.argsLayout };
     state.argsPipeline = cache.GetOrCreateComputePipeline("SunShadowArgs", argsDesc, nvDevice);
 
-    if (!state.cullPipeline || !state.argsPipeline) {
+    nvrhi::ComputePipelineDesc skinnedArgsDesc;
+    skinnedArgsDesc.CS = skinnedArgsResult.handle;
+    skinnedArgsDesc.bindingLayouts = { state.skinnedArgsLayout };
+    state.skinnedArgsPipeline = cache.GetOrCreateComputePipeline("SunShadowSkinnedArgs", skinnedArgsDesc, nvDevice);
+
+    if (!state.cullPipeline || !state.argsPipeline || !state.skinnedArgsPipeline) {
         Msg("! [SunShadow] cull pipeline creation failed");
         state.pipelinesFailed = true;
         return false;
@@ -174,11 +185,13 @@ bool EnsureDepthPipelines(fg::RenderDevice* device, SunShadowState& state)
         return false;
 
     auto vsResult = shaderLoader->LoadVertexShader("cluster_pull", "main");
+    auto skinnedVsResult = shaderLoader->LoadVertexShader("cluster_pull_skinned", "main");
     auto opaqueResult = shaderLoader->LoadPixelShader("bindless_depth_opaque", "main");
     auto atResult = shaderLoader->LoadPixelShader("shadow_depth_at", "main");
     auto forwardVsResult = shaderLoader->LoadVertexShader("bindless_forward", "main");
     auto dynamicResult = shaderLoader->LoadPixelShader("bindless_depth_at", "main");
     if (!vsResult.handle || !opaqueResult.handle || !atResult.handle || !forwardVsResult.handle || !dynamicResult.handle ||
+        !skinnedVsResult.handle || !skinnedVsResult.reflection ||
         !vsResult.reflection || !opaqueResult.reflection || !atResult.reflection || !forwardVsResult.reflection || !dynamicResult.reflection) {
         Msg("! [SunShadow] depth shaders failed to load");
         state.depthPipelinesFailed = true;
@@ -186,6 +199,7 @@ bool EnsureDepthPipelines(fg::RenderDevice* device, SunShadowState& state)
     }
 
     state.clusterVS = vsResult.handle;
+    state.skinnedVS = skinnedVsResult.handle;
     state.depthOpaquePS = opaqueResult.handle;
     state.depthATPS = atResult.handle;
     state.forwardVS = forwardVsResult.handle;
@@ -198,7 +212,9 @@ bool EnsureDepthPipelines(fg::RenderDevice* device, SunShadowState& state)
         "SunShadowDepth_AT", *vsResult.reflection, *atResult.reflection, nvDevice);
     state.depthDynamicLayout = cache.GetOrCreateBindingLayoutFromReflection(
         "SunShadowDepth_Dynamic", *forwardVsResult.reflection, *dynamicResult.reflection, nvDevice);
-    if (!state.depthOpaqueLayout || !state.depthATLayout || !state.depthDynamicLayout) {
+    state.depthSkinnedLayout = cache.GetOrCreateBindingLayoutFromReflection(
+        "SunShadowDepth_Skinned", *skinnedVsResult.reflection, *opaqueResult.reflection, nvDevice);
+    if (!state.depthOpaqueLayout || !state.depthATLayout || !state.depthDynamicLayout || !state.depthSkinnedLayout) {
         state.depthPipelinesFailed = true;
         return false;
     }
@@ -244,8 +260,11 @@ bool EnsureDepthPipelines(fg::RenderDevice* device, SunShadowState& state)
     xr_sprintf(name, "SunShadowDepth_Dynamic_b%d_s%.2f", state.rasterBias, state.rasterSlope);
     state.depthDynamicPipeline = cache.GetOrCreatePipeline(name,
         makeDesc(state.forwardVS, state.depthDynamicInputLayout, state.depthDynamicPS, state.depthDynamicLayout, true), fbInfo, nvDevice);
+    xr_sprintf(name, "SunShadowDepth_Skinned_b%d_s%.2f", state.rasterBias, state.rasterSlope);
+    state.depthSkinnedPipeline = cache.GetOrCreatePipeline(name,
+        makeDesc(state.skinnedVS, nullptr, state.depthOpaquePS, state.depthSkinnedLayout, false), fbInfo, nvDevice);
 
-    if (!state.depthOpaquePipeline || !state.depthATPipeline || !state.depthDynamicPipeline) {
+    if (!state.depthOpaquePipeline || !state.depthATPipeline || !state.depthDynamicPipeline || !state.depthSkinnedPipeline) {
         Msg("! [SunShadow] depth pipeline creation failed");
         state.depthPipelinesFailed = true;
         return false;
@@ -302,6 +321,18 @@ bool EnsureCullBuffers(nvrhi::IDevice* nvDevice, SunShadowTarget& target, const 
     target.opaqueArgs = MakeArgsBuffer(nvDevice, base + "_ArgsOpaque");
     target.terrainArgs = MakeArgsBuffer(nvDevice, base + "_ArgsTerrain");
     target.atArgs = MakeArgsBuffer(nvDevice, base + "_ArgsAT");
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = base + "_SkinnedCount";
+        desc.byteSize = sizeof(u32) * 4;
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        target.skinnedCountBuffer = nvDevice->createBuffer(desc);
+    }
+    target.skinnedStream = MakeStreamBuffer(nvDevice, base + "_Skinned", kSunShadowSkinnedEntryCap);
+    target.skinnedArgs = MakeArgsBuffer(nvDevice, base + "_ArgsSkinned");
 
     for (u32 i = 0; i < SunShadowTarget::kReadbackSlots; ++i) {
         if (target.readback[i])
@@ -320,7 +351,8 @@ bool EnsureCullBuffers(nvrhi::IDevice* nvDevice, SunShadowTarget& target, const 
     target.castersOpaque = target.castersTerrain = target.castersAT = 0;
 
     if (!target.countBuffer || !target.opaqueStream || !target.terrainStream || !target.atStream ||
-        !target.opaqueArgs || !target.terrainArgs || !target.atArgs) {
+        !target.opaqueArgs || !target.terrainArgs || !target.atArgs ||
+        !target.skinnedCountBuffer || !target.skinnedStream || !target.skinnedArgs) {
         Msg("! [SunShadow] %s cull buffer creation failed", suffix);
         target.countBuffer = nullptr;
         target.streamCapacity = 0;
@@ -459,6 +491,55 @@ void CullTarget(fg::RenderContext* ctx, const SunShadowCullData& data, SunShadow
     cmdList->setBufferState(target.terrainStream, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(target.atStream, nvrhi::ResourceStates::ShaderResource);
 
+    nvrhi::IBuffer* skinnedEntries = data.gpuCulling ? data.gpuCulling->GetSkinnedEntryBuffer() : nullptr;
+    const u32 skinnedCount = data.gpuCulling ? data.gpuCulling->GetSkinnedEntryCount() : 0u;
+    cmdList->setBufferState(target.skinnedArgs, nvrhi::ResourceStates::CopyDest);
+    cmdList->clearBufferUInt(target.skinnedArgs, 0);
+    if (skinnedEntries && skinnedCount > 0 && state.skinnedArgsPipeline) {
+        cb.entryCount = skinnedCount;
+        cb.includeAT = 0;
+        auto skinnedParamsCB = cache.GetOrCreateVolatileCB("SunShadow", "SkinnedCullParams", sizeof(SunShadowCullParams), data.device, 4);
+        cmdList->writeBuffer(skinnedParamsCB, &cb, sizeof(cb));
+
+        cmdList->setBufferState(target.skinnedCountBuffer, nvrhi::ResourceStates::CopyDest);
+        cmdList->writeBuffer(target.skinnedCountBuffer, zero, sizeof(zero));
+        cmdList->setBufferState(target.skinnedCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(target.skinnedStream, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(skinnedEntries, nvrhi::ResourceStates::ShaderResource);
+
+        framegraph::BindingSetBuilder sbsb(cullRefl, nvDevice, "SunShadow.CullSkinned");
+        sbsb.ConstantBuffer("ShadowCullParams", skinnedParamsCB)
+            .BufferSRV("g_Entries", skinnedEntries)
+            .BufferUAV("g_OutCount", target.skinnedCountBuffer)
+            .BufferUAV("g_OutOpaque", target.skinnedStream)
+            .BufferUAV("g_OutTerrain", target.terrainStream)
+            .BufferUAV("g_OutAT", target.atStream);
+        auto skinnedCullSet = cache.GetOrCreateBindingSet(sbsb.Build(), state.cullLayout, nvDevice);
+        auto* skinnedArgsRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("shadow_skinned_draw_args", ".cs");
+        if (skinnedCullSet && skinnedArgsRefl) {
+            nvrhi::ComputeState skinnedCullState;
+            skinnedCullState.pipeline = state.cullPipeline;
+            skinnedCullState.bindings = { skinnedCullSet };
+            cmdList->setComputeState(skinnedCullState);
+            cmdList->dispatch((skinnedCount + kCullThreadGroup - 1) / kCullThreadGroup, 1, 1);
+
+            cmdList->setBufferState(target.skinnedCountBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(target.skinnedArgs, nvrhi::ResourceStates::UnorderedAccess);
+            framegraph::BindingSetBuilder sabsb(*skinnedArgsRefl, nvDevice, "SunShadow.SkinnedArgs");
+            sabsb.BufferSRV("g_Count", target.skinnedCountBuffer)
+                 .BufferUAV("g_ArgsSkinned", target.skinnedArgs);
+            if (auto skinnedArgsSet = cache.GetOrCreateBindingSet(sabsb.Build(), state.skinnedArgsLayout, nvDevice)) {
+                nvrhi::ComputeState skinnedArgsState;
+                skinnedArgsState.pipeline = state.skinnedArgsPipeline;
+                skinnedArgsState.bindings = { skinnedArgsSet };
+                cmdList->setComputeState(skinnedArgsState);
+                cmdList->dispatch(1, 1, 1);
+            }
+        }
+        cmdList->setBufferState(target.skinnedStream, nvrhi::ResourceStates::ShaderResource);
+    }
+    cmdList->setBufferState(target.skinnedArgs, nvrhi::ResourceStates::IndirectArgument);
+
     ScheduleReadback(cmdList, target);
 }
 
@@ -552,125 +633,46 @@ void DrawDynamicCasters(SunShadowState& state, const SunShadowDrawConfig& cfg, c
 
 namespace {
 
-bool EnsureSkinnedDepthPipelines(fg::RenderDevice* device, SunShadowState& state, GPUCullingManager& gpuCulling)
-{
-    if (state.skinnedPipelinesReady)
-        return true;
-    if (state.skinnedPipelinesFailed)
-        return false;
-
-    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
-    auto* shaderLoader = GEnv.Render->GetShaderLoader();
-    if (!nvDevice || !shaderLoader || !gpuCulling.EnsurePreskinnedDrawResources())
-        return false;
-
-    auto mdiPsResult = shaderLoader->LoadPixelShader("bindless_skinned_depth_mdi", "main");
-    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_pre", ".vs");
-    if (!mdiPsResult.handle || !mdiPsResult.reflection || !mdiVsRefl) {
-        Msg("! [SunShadow] skinned depth shaders failed to load");
-        state.skinnedPipelinesFailed = true;
-        return false;
-    }
-    state.skinnedDepthMDIPS = mdiPsResult.handle;
-
-    auto& cache = framegraph::GetPassResourceCache();
-    state.skinnedMDILayout = cache.GetOrCreateBindingLayoutFromReflection("SunShadowSkinnedMDI", *mdiVsRefl, *mdiPsResult.reflection, nvDevice);
-    if (!state.skinnedMDILayout) {
-        state.skinnedPipelinesFailed = true;
-        return false;
-    }
-
-    auto* backend = device->GetBackend();
-    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
-
-    nvrhi::FramebufferInfoEx fbInfo;
-    fbInfo.depthFormat = nvrhi::Format::D32;
-
-    nvrhi::GraphicsPipelineDesc desc;
-    desc.VS = gpuCulling.GetPreskinnedVS();
-    desc.PS = state.skinnedDepthMDIPS;
-    desc.inputLayout = gpuCulling.GetPreskinnedInputLayout();
-    if (bindlessLayout)
-        desc.bindingLayouts = { state.skinnedMDILayout, bindlessLayout };
-    else
-        desc.bindingLayouts = { state.skinnedMDILayout };
-    desc.primType = nvrhi::PrimitiveType::TriangleList;
-    desc.renderState.depthStencilState.depthTestEnable = true;
-    desc.renderState.depthStencilState.depthWriteEnable = true;
-    desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
-    desc.renderState.rasterState.frontCounterClockwise = false;
-    desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-    desc.renderState.rasterState.depthBias = -state.rasterBias;
-    desc.renderState.rasterState.slopeScaledDepthBias = -state.rasterSlope;
-    desc.renderState.rasterState.depthBiasClamp = 0.0f;
-
-    string64 name;
-    xr_sprintf(name, "SunShadowSkinnedMDI_b%d_s%.2f", state.rasterBias, state.rasterSlope);
-    state.skinnedMDIPipeline = cache.GetOrCreatePipeline(name, desc, fbInfo, nvDevice);
-    if (!state.skinnedMDIPipeline) {
-        state.skinnedPipelinesFailed = true;
-        return false;
-    }
-
-    state.skinnedPipelinesReady = true;
-    Msg("* [SunShadow] skinned depth pipelines initialized");
-    return true;
-}
-
 void DrawSkinnedCasters(SunShadowState& state, const SunShadowMapData& data, const MapDrawContext& draw)
 {
     const SunShadowDrawConfig& cfg = data.config;
-    if (!cfg.gpuCulling || !data.skinnedArgs.is_valid() || !cfg.gpuCulling->IsSkinnedEnabled())
+    SunShadowTarget& target = state.targets[data.target];
+    if (!cfg.gpuCulling || !state.depthSkinnedPipeline || !state.depthSkinnedLayout || !target.skinnedStream || !target.skinnedArgs)
         return;
-    if (!EnsureSkinnedDepthPipelines(draw.device, state, *cfg.gpuCulling))
+
+    GPUCullingManager& gpuCulling = *cfg.gpuCulling;
+    nvrhi::IBuffer* entries = gpuCulling.GetSkinnedEntryBuffer();
+    nvrhi::IBuffer* preVB = gpuCulling.GetSkinnedPreVertexBuffer();
+    nvrhi::IBuffer* skinnedIB = gpuCulling.GetSkinnedPools().GetCombinedIndexBuffer();
+    if (gpuCulling.GetSkinnedEntryCount() == 0 || !entries || !preVB || !skinnedIB)
         return;
 
     auto& cache = framegraph::GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
-    auto* mdiVsRefl = shaderLoader->GetCachedReflection("bindless_skinned_pre", ".vs");
-    auto* mdiPsRefl = shaderLoader->GetCachedReflection("bindless_skinned_depth_mdi", ".ps");
-    if (!mdiVsRefl || !mdiPsRefl || !state.skinnedMDILayout || !state.skinnedMDIPipeline)
+    auto* vsRefl = shaderLoader->GetCachedReflection("cluster_pull_skinned", ".vs");
+    auto* psRefl = shaderLoader->GetCachedReflection("bindless_depth_opaque", ".ps");
+    if (!vsRefl || !psRefl)
         return;
 
-    auto& matBuffer = bindless::MaterialBuffer::Instance();
-    nvrhi::ICommandList* cmdList = draw.cmdList;
-    nvrhi::IDevice* nvDevice = draw.nvDevice;
-
-    nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("SunShadow", nvDevice);
-    nvrhi::IBuffer* preVB = cfg.gpuCulling->GetSkinnedPreVertexBuffer();
-    if (!drawIndexBuffer || !preVB)
+    framegraph::BindingSetBuilder bsb(*vsRefl, *psRefl, draw.nvDevice, "SunShadow.Skinned");
+    bsb.ConstantBuffer("static_globals", draw.lightCB)
+       .BufferSRV("g_VisibleEntries", target.skinnedStream)
+       .BufferSRV("g_Entries", entries)
+       .BufferSRV("g_SkinnedVB", preVB)
+       .BufferSRV("g_SkinnedIB", skinnedIB);
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.depthSkinnedLayout, draw.nvDevice);
+    if (!bindingSet)
         return;
-    auto& pools = cfg.gpuCulling->GetSkinnedPools();
-    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
-        const auto& bucket = cfg.gpuCulling->GetSkinnedBucket(f);
-        if (bucket.casterCount == 0)
-            continue;
-        nvrhi::IBuffer* poolIB = pools.GetIndexBuffer(f);
-        if (!poolIB)
-            continue;
 
-        framegraph::BindingSetBuilder bsb(*mdiVsRefl, *mdiPsRefl, nvDevice, "SunShadow.SkinnedMDI");
-        bsb.ConstantBuffer("static_globals", draw.lightCB);
-        bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-        bsb.BufferSRV("g_SkinnedMaterialIDs", cfg.gpuCulling->GetSkinnedMaterialIDBuffer());
-        auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinnedMDILayout, nvDevice);
-        if (!bindingSet)
-            continue;
-
-        nvrhi::GraphicsState gs;
-        gs.pipeline = state.skinnedMDIPipeline;
-        gs.framebuffer = draw.framebuffer;
-        gs.bindings = { bindingSet };
-        if (draw.bindlessTable)
-            gs.addBindingSet(draw.bindlessTable);
-        gs.vertexBuffers = { { preVB, 0, 0 }, { drawIndexBuffer, 1, 0 } };
-        gs.indexBuffer = { poolIB, nvrhi::Format::R16_UINT, 0 };
-        gs.viewport.addViewport(draw.viewport);
-        gs.viewport.addScissorRect(draw.scissor);
-        gs.indirectParams = cfg.gpuCulling->GetSkinnedArgsBuffer();
-        cmdList->setGraphicsState(gs);
-        cmdList->drawIndexedIndirect(bucket.base * u32(sizeof(IndirectDrawArgs)), bucket.casterCount);
-    }
+    nvrhi::GraphicsState gs;
+    gs.pipeline = state.depthSkinnedPipeline;
+    gs.framebuffer = draw.framebuffer;
+    gs.bindings = { bindingSet };
+    gs.indirectParams = target.skinnedArgs;
+    gs.viewport.addViewport(draw.viewport);
+    gs.viewport.addScissorRect(draw.scissor);
+    draw.cmdList->setGraphicsState(gs);
+    draw.cmdList->drawIndirect(0, 1);
 }
 
 void ExecuteSunShadowMap(fg::RenderContext* ctx, const FrameGraph& fg, const SunShadowMapData& data)
@@ -864,9 +866,11 @@ SunShadowCullOutput setupSunShadowCullPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle orderAfter,
+    framegraph::VirtualResourceHandle skinnedOrder,
     nvrhi::IBuffer* entryBuffer,
     u32 entryCapacity,
     u32 entryCount,
+    GPUCullingManager* gpuCulling,
     SunShadowState* state,
     xray::profiler::GPUProfiler* gpuProfiler)
 {
@@ -895,9 +899,7 @@ SunShadowCullOutput setupSunShadowCullPass(
         state->depthATPipeline = nullptr;
         state->depthDynamicPipeline = nullptr;
         state->depthPipelinesFailed = false;
-        state->skinnedMDIPipeline = nullptr;
-        state->skinnedPipelinesReady = false;
-        state->skinnedPipelinesFailed = false;
+        state->depthSkinnedPipeline = nullptr;
         far.valid = false;
     }
 
@@ -968,29 +970,35 @@ SunShadowCullOutput setupSunShadowCullPass(
     argsDesc.isImported = true;
     argsDesc.isTransient = false;
     argsDesc.debugName = "sun_shadow_args";
+    static const char* kSkinnedArgsNames[kSunTargetCount] = { "sun_shadow_args_skinned_far", "sun_shadow_args_skinned_casc0", "sun_shadow_args_skinned_casc1" };
     SunShadowCullOutput::Target imported[kSunTargetCount];
     for (u32 t = 0; t < kSunTargetCount; ++t) {
         imported[t].opaqueArgs = fg.ImportBuffer(kTargetNames[t].argsOpaqueName, state->targets[t].opaqueArgs, argsDesc);
         imported[t].terrainArgs = fg.ImportBuffer(kTargetNames[t].argsTerrainName, state->targets[t].terrainArgs, argsDesc);
         imported[t].atArgs = fg.ImportBuffer(kTargetNames[t].argsATName, state->targets[t].atArgs, argsDesc);
+        imported[t].skinnedArgs = fg.ImportBuffer(kSkinnedArgsNames[t], state->targets[t].skinnedArgs, argsDesc);
     }
 
     auto& passData = fg.addCallbackPass<SunShadowCullData>(
         "Sun Shadow Cull",
-        [&, orderAfter, entryBuffer, entryCount, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, SunShadowCullData& data) {
+        [&, orderAfter, skinnedOrder, entryBuffer, entryCount, gpuCulling, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, SunShadowCullData& data) {
             data.state = state;
             data.device = device;
             data.entryBuffer = entryBuffer;
             data.entryCount = entryCount;
+            data.gpuCulling = gpuCulling;
             data.gpuProfiler = gpuProfiler;
 
             RenderPassBuilder passBuilder(builder, passHandle);
             if (orderAfter.is_valid())
                 data.order = passBuilder.read(orderAfter, ResourceState::IndirectArgument);
+            if (skinnedOrder.is_valid())
+                data.skinnedOrder = passBuilder.read(skinnedOrder, ResourceState::IndirectArgument);
             for (u32 t = 0; t < kSunTargetCount; ++t) {
                 data.targets[t].opaqueArgs = passBuilder.write(imported[t].opaqueArgs, ResourceState::UnorderedAccess);
                 data.targets[t].terrainArgs = passBuilder.write(imported[t].terrainArgs, ResourceState::UnorderedAccess);
                 data.targets[t].atArgs = passBuilder.write(imported[t].atArgs, ResourceState::UnorderedAccess);
+                data.targets[t].skinnedArgs = passBuilder.write(imported[t].skinnedArgs, ResourceState::UnorderedAccess);
             }
         },
         [](const SunShadowCullData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -1052,6 +1060,8 @@ SunShadowMaps setupSunShadowMapPasses(
                 data.opaqueArgs = passBuilder.read(cullTarget.opaqueArgs, ResourceState::IndirectArgument);
                 data.terrainArgs = passBuilder.read(cullTarget.terrainArgs, ResourceState::IndirectArgument);
                 data.atArgs = passBuilder.read(cullTarget.atArgs, ResourceState::IndirectArgument);
+                if (t != kSunTargetFar && cullTarget.skinnedArgs.is_valid())
+                    data.skinnedCullArgs = passBuilder.read(cullTarget.skinnedArgs, ResourceState::IndirectArgument);
                 if (t != kSunTargetFar && config.dynamicArgs.is_valid())
                     data.dynamicArgs = passBuilder.read(config.dynamicArgs, ResourceState::IndirectArgument);
                 if (t != kSunTargetFar && config.skinnedArgs.is_valid())
