@@ -9,7 +9,7 @@ struct GPUSlotData
     uint packed_ids;
     uint packed_palette_01;
     uint packed_palette_23;
-    float hemi;
+    float pad;
 };
 
 struct InstanceData

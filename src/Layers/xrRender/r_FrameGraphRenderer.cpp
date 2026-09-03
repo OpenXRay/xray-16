@@ -34,7 +34,6 @@
 #include "FGDetailManager.h"
 #include "FrameGraphPasses/DetailCullPassSetup.h"
 #include "FrameGraphPasses/DetailResolvePassSetup.h"
-#include "FrameGraphPasses/DetailPassSetup.h"
 #include "FrameGraphPasses/TransparentPassSetup.h"
 #include "FrameGraphPasses/DeferredLightPassSetup.h"
 #include "Bindless/MaterialBuffer.h"
@@ -1048,7 +1047,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_detailManager->LoadCullComputeShader(shaderLoader);
             m_detailManager->LoadInstanceGenShader(shaderLoader);
             m_detailManager->LoadPrefixSumShaders(shaderLoader);
-            m_detailManager->LoadGraphicsShaders(shaderLoader);
 
             m_detailManager->CreateComputePipeline(m_device);
             m_detailManager->CreateInstanceGenPipeline(m_device);
@@ -1110,7 +1108,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         ? m_gpuCullingManager->GetClusterEntryCapacity() + fg::GPUCullingManager::SKINNED_ENTRY_CAPACITY
         : 0u;
     const bool grassIds = detailArgsHandle.is_valid()
-        && grassEntryBase + fg::FGDetailManager::LOD_COUNT * (1u << 22) <= passes::kVisIdEntryLimit;
+        && grassEntryBase + fg::FGDetailManager::VIS_KIND_COUNT * (1u << 22) <= passes::kVisIdEntryLimit;
 
     framegraph::VirtualResourceHandle visIdBuffer;
     if (cullActive && clusterConfig.UseMegaBuffers() && clusterConfig.IsValid()
@@ -1333,15 +1331,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    auto detailOutputs = passes::setupDetailPass(
-        *m_framegraph,
-        m_device,
-        m_detailManager.get(),
-        gbufferOutputs,
-        width,
-        height,
-        m_gpuProfiler.get()
-    );
+    auto detailOutputs = gbufferOutputs;
 
     if (m_decalManager) {
         m_decalManager->Update(Device.fTimeDelta, Device.fTimeGlobal);

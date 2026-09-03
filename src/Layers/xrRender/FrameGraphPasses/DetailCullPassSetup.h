@@ -2,7 +2,6 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
-#include "DetailPassSetup.h"
 #include <nvrhi/nvrhi.h>
 
 struct Fmatrix;
@@ -26,6 +25,10 @@ namespace xray::render::framegraph {
 }
 
 namespace xray::render::fg::passes {
+
+struct DetailPassState {
+    bool detailDataUploaded = false;
+};
 
 framegraph::VirtualResourceHandle setupDetailCullPass(
     framegraph::FrameGraph& fg,
