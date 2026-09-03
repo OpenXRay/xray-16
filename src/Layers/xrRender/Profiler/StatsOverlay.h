@@ -33,11 +33,6 @@ struct RenderStats
     u32 megaBufferVertices = 0;  // Total vertices in mega-buffer
     u32 megaBufferIndices = 0;   // Total indices in mega-buffer
 
-    // Skinning stats
-    u32 skinnedMeshes = 0;       // Number of skinned meshes
-    u32 totalBones = 0;          // Total bones across all skinned meshes
-    u32 maxBonesPerMesh = 0;     // Maximum bones in a single mesh
-
     // Skinned culling stats (from GPU Hi-Z culling)
 
     // Particle culling stats (from GPU Hi-Z culling)
@@ -106,7 +101,6 @@ struct RenderStats
         totalBatches = staticBatches = dynamicBatches = skinnedBatches = terrainBatches = particleBatches = 0;
         totalTriangles = staticTriangles = dynamicTriangles = skinnedTriangles = terrainTriangles = 0;
         megaBufferVertices = megaBufferIndices = 0;
-        skinnedMeshes = totalBones = maxBonesPerMesh = 0;
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
         clusterStaticEntries = clusterTrianglesDrawn = clusterTerrainTrianglesDrawn = 0;
