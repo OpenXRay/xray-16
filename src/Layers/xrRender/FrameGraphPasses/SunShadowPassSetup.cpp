@@ -865,6 +865,7 @@ SunShadowCullOutput setupSunShadowCullPass(
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle orderAfter,
     nvrhi::IBuffer* entryBuffer,
+    u32 entryCapacity,
     u32 entryCount,
     SunShadowState* state,
     xray::profiler::GPUProfiler* gpuProfiler)
@@ -881,7 +882,7 @@ SunShadowCullOutput setupSunShadowCullPass(
     for (u32 t = 0; t < kSunTargetCount; ++t)
         ProcessReadback(nvDevice, state->targets[t]);
     for (u32 t = 0; t < kSunTargetCount; ++t) {
-        if (!EnsureCullBuffers(nvDevice, state->targets[t], kTargetNames[t].suffix, entryCount))
+        if (!EnsureCullBuffers(nvDevice, state->targets[t], kTargetNames[t].suffix, entryCapacity))
             return out;
     }
 

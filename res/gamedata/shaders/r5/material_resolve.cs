@@ -16,6 +16,8 @@ StructuredBuffer<ClusterEntry> g_SkinnedEntries : register(t42);
 ByteAddressBuffer g_SkinnedVB : register(t43);
 ByteAddressBuffer g_SkinnedIB : register(t44);
 ByteAddressBuffer g_SkinnedPrevVB : register(t45);
+StructuredBuffer<InstanceData> g_DynamicInstanceData : register(t46);
+StructuredBuffer<float4x4> g_DynamicPrevWorld : register(t47);
 RWTexture2D<float4> g_OutNormal : register(u0);
 RWTexture2D<float4> g_OutBaseColor : register(u1);
 RWTexture2D<float4> g_OutColor : register(u2);
@@ -72,6 +74,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
 
     bool terrain = (e.flags & CLUSTER_ENTRY_FLAG_TERRAIN) != 0u;
     bool hud = (e.flags & CLUSTER_ENTRY_FLAG_HUD) != 0u;
+    bool dynamic = (e.flags & CLUSTER_ENTRY_FLAG_DYNAMIC) != 0u;
     float4x4 world = float4x4(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
     MegaVertex v0;
     MegaVertex v1;
@@ -110,13 +113,23 @@ void main(uint3 dtid : SV_DispatchThreadID)
         v0 = LoadMegaVertex(g_MegaVB, e.firstVertex + i0);
         v1 = LoadMegaVertex(g_MegaVB, e.firstVertex + i1);
         v2 = LoadMegaVertex(g_MegaVB, e.firstVertex + i2);
-        world = terrain ? g_TerrainInstanceData[e.batchIndex].world : g_InstanceData[e.batchIndex].world;
+        world = terrain ? g_TerrainInstanceData[e.batchIndex].world : (dynamic ? g_DynamicInstanceData[e.batchIndex].world : g_InstanceData[e.batchIndex].world);
         wp0 = mul(world, float4(v0.position, 1.0)).xyz;
         wp1 = mul(world, float4(v1.position, 1.0)).xyz;
         wp2 = mul(world, float4(v2.position, 1.0)).xyz;
-        pp0 = wp0;
-        pp1 = wp1;
-        pp2 = wp2;
+        if (dynamic)
+        {
+            float4x4 prevWorld = g_DynamicPrevWorld[e.batchIndex];
+            pp0 = mul(prevWorld, float4(v0.position, 1.0)).xyz;
+            pp1 = mul(prevWorld, float4(v1.position, 1.0)).xyz;
+            pp2 = mul(prevWorld, float4(v2.position, 1.0)).xyz;
+        }
+        else
+        {
+            pp0 = wp0;
+            pp1 = wp1;
+            pp2 = wp2;
+        }
     }
     float3x3 world3 = (float3x3)world;
 

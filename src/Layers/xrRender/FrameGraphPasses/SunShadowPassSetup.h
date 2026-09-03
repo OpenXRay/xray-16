@@ -154,6 +154,7 @@ SunShadowCullOutput setupSunShadowCullPass(
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle orderAfter,
     nvrhi::IBuffer* entryBuffer,
+    u32 entryCapacity,
     u32 entryCount,
     SunShadowState* state,
     xray::profiler::GPUProfiler* gpuProfiler = nullptr);

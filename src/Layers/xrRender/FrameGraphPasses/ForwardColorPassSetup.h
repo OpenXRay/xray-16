@@ -66,6 +66,8 @@ struct ClusterDrawConfig {
     nvrhi::IBuffer* fadeBuffer = nullptr;
     nvrhi::IBuffer* argsBuffer = nullptr;
     nvrhi::IBuffer* instanceBuffer = nullptr;
+    nvrhi::IBuffer* dynamicInstanceBuffer = nullptr;
+    nvrhi::IBuffer* dynamicPrevWorldBuffer = nullptr;
     u32 entryCount = 0;
 
     nvrhi::IBuffer* terrainVisibleEntryBuffer = nullptr;
