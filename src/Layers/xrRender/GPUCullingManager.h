@@ -84,6 +84,7 @@ enum GPUClusterEntryFlags : u32 {
     GPU_CLUSTER_ENTRY_SHADOW_ONLY = 0x8,
     GPU_CLUSTER_ENTRY_TERRAIN = 0x4,
     GPU_CLUSTER_ENTRY_SKINNED = 0x10,
+    GPU_CLUSTER_ENTRY_HUD = 0x20,
 };
 
 enum CullState : u32 {
@@ -316,11 +317,12 @@ public:
     void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
 
     void UploadSkinnedObjects(fg::RenderContext* ctx, const GeometryCollector* geometry,
-        decals::OverlayManager* overlayMgr);
+        const xr_vector<GeometryBatch>* hudBatches, decals::OverlayManager* overlayMgr);
 
     framegraph::VirtualResourceHandle SetupSkinnedUploadPass(
         framegraph::FrameGraph& fg,
         const GeometryCollector* geometry,
+        const xr_vector<GeometryBatch>* hudBatches,
         decals::OverlayManager* overlayMgr
     );
 
@@ -345,7 +347,7 @@ public:
         xr_vector<IndirectDrawArgs> args;
         xr_vector<SkinnedDrawRecord> records;
         xr_vector<u32> materialIDs;
-        xr_vector<u8> shadowOnly;
+        xr_vector<u8> kinds;
         xr_vector<u32> srcVertexBases;
         xr_vector<u32> vertexCounts;
         u32 base = 0;

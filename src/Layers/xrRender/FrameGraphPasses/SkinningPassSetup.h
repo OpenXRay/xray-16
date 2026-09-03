@@ -41,15 +41,8 @@ struct SkinningPassState {
     SkinningPipelineVariant hq3w;
     SkinningPipelineVariant hq4w;
     nvrhi::BindingLayoutHandle layout;
-    nvrhi::BindingLayoutHandle hudLayout;
     nvrhi::ShaderHandle ps;
-    nvrhi::ShaderHandle hudPS;
     SkinningPipelineVariant mdi;
-    SkinningPipelineVariant hudNonHQ;
-    SkinningPipelineVariant hudHQ1w;
-    SkinningPipelineVariant hudHQ2w;
-    SkinningPipelineVariant hudHQ3w;
-    SkinningPipelineVariant hudHQ4w;
     nvrhi::SamplerHandle linearSampler;
     bool initialized = false;
 };
@@ -65,7 +58,6 @@ struct SkinningPassData {
     framegraph::VirtualResourceHandle skinnedDrawArgs;
     fg::RenderDevice* device;
     const GeometryCollector* geometry;
-    const xr_vector<GeometryBatch>* hudBatches;
     MaterialCache* materialCache;
     fg::GPUCullingManager* gpuCulling;
     u32 width, height;
@@ -79,7 +71,6 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     const GeometryCollector* geometry,
-    const xr_vector<GeometryBatch>* hudBatches,
     MaterialCache* materialCache,
     u32 width,
     u32 height,
