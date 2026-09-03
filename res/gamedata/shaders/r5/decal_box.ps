@@ -9,7 +9,7 @@ struct GPUDecalData
     uint materialID;
     float opacity;
     float normalThreshold;
-    uint flags;
+    uint pad;
 };
 
 StructuredBuffer<GPUDecalData> g_Decals : register(t3);
@@ -29,15 +29,14 @@ float4 main(VS_OUTPUT input) : SV_Target0
     int2 pixelCoord = int2(input.position.xy);
 
     float depth = g_Depth.Load(int3(pixelCoord, 0));
-    if (depth <= 0.0)
+    if (depth <= 0.0 || depth >= 0.9)
         discard;
 
-    bool isStatic = g_Normal.Load(int3(pixelCoord, 0)).a >= 0.0;
-    if (decal.flags == 0 && !isStatic)
+    float4 surface = g_Normal.Load(int3(pixelCoord, 0));
+    if (surface.a < 0.0)
         discard;
-    if (decal.flags == 1 && isStatic)
-        discard;
-    if (decal.flags == 1 && depth > 0.9)
+    float3 decalAxis = normalize(mul(decal.decalToWorld, float4(0.0, 1.0, 0.0, 0.0)).xyz);
+    if (dot(surface.xyz, decalAxis) < decal.normalThreshold)
         discard;
     float3 worldPos = reconstruct_world_pos(input.position.xy, depth);
     float4 decalLocal = mul(decal.worldToDecal, float4(worldPos, 1.0));
