@@ -2,7 +2,6 @@
 #include "VSMPassSetup.h"
 #include "PassCommon.h"
 #include "ShaderConstants.h"
-#include "SunShadowPassSetup.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
@@ -1480,6 +1479,12 @@ Fmatrix VSMSunView(const Fvector& sunDir)
     Fmatrix view;
     view.build_camera_dir(eye, sd, up);
     return view;
+}
+
+nvrhi::ITexture* ResolveSunMask(const FrameGraph& fg, VirtualResourceHandle mask, nvrhi::IDevice* device)
+{
+    nvrhi::ITexture* tex = mask.is_valid() ? fg.GetPhysicalTexture(mask) : nullptr;
+    return tex ? tex : GetPassResourceCache().GetDummyShadowMap2D(device);
 }
 
 float VSMReceiverExtent()

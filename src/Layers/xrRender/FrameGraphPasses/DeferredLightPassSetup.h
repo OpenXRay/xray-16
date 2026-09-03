@@ -3,7 +3,6 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
-#include "SunShadowPassSetup.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::profiler {
@@ -57,7 +56,7 @@ framegraph::DefaultOutputLayout setupDeferredLightPass(
     const framegraph::DefaultOutputLayout& inputs,
     u32 width,
     u32 height,
-    SunShadowMaps sunShadowMaps,
+    framegraph::VirtualResourceHandle sunMask,
     xray::profiler::GPUProfiler* gpuProfiler,
     DeferredLightPassState* state);
 

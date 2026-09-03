@@ -5,7 +5,6 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include <nvrhi/nvrhi.h>
-#include "SunShadowPassSetup.h"
 
 struct Fmatrix;
 

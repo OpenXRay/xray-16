@@ -29,9 +29,7 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID, uint gi : SV_Gr
         if (dot(n.xyz, n.xyz) >= 0.25)
         {
             uint bits = TILE_BIT_GEOMETRY;
-            if (forceMixed != 0 || (cascade_splits.x > 0.5 && cascade_splits.x < 1.5))
-                bits |= TILE_BIT_SUN_MIXED;
-            else if (cascade_splits.x > 1.5 && g_SunShadowMask.Load(int3(int2(p), 0)).r < 1.0)
+            if (forceMixed != 0 || (cascade_splits.x > 0.5 && g_SunShadowMask.Load(int3(int2(p), 0)).r < 1.0))
                 bits |= TILE_BIT_SUN_MIXED;
             if (cluster_params.w > 0.0)
             {

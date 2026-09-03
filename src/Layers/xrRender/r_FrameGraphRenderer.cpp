@@ -32,7 +32,6 @@
 #include "FrameGraphPasses/HiZBuildPassSetup.h"      // Phase 3.5: Hi-Z pyramid for GPU culling
 #include "FrameGraphPasses/VisibilityPassSetup.h"
 #include "FrameGraphPasses/MaterialResolvePassSetup.h"
-#include "FrameGraphPasses/SunShadowPassSetup.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering + pipeline init
 #include "GPUCullingManager.h"                       // Phase 3.5: GPU frustum/occlusion culling
 #include "FGDetailManager.h"                         // Detail system (grass/vegetation)
@@ -473,27 +472,10 @@ void FrameGraphRenderer::Render() {
     auto staticGlobalsData = passes::BuildStaticGlobals();
 
     {
-        const auto& sunShadow = m_blackboard->get_or_add<passes::SunShadowState>();
-        const auto& sunFar = sunShadow.targets[passes::kSunTargetFar];
-        const auto& sunCasc0 = sunShadow.targets[passes::kSunTargetCasc0];
-        const auto& sunCasc1 = sunShadow.targets[passes::kSunTargetCasc1];
-        if (sunShadow.receiverActive && sunFar.valid && sunFar.mapSize > 0) {
-            const bool casc0Active = sunCasc0.valid && sunCasc0.mapSize > 0;
-            const bool casc1Active = sunCasc1.valid && sunCasc1.mapSize > 0;
-            staticGlobalsData.shadow_matrices[2] = sunFar.vp;
-            if (casc0Active)
-                staticGlobalsData.shadow_matrices[0] = sunCasc0.vp;
-            if (casc1Active)
-                staticGlobalsData.shadow_matrices[1] = sunCasc1.vp;
-            staticGlobalsData.cascade_splits.set(1.0f,
-                casc0Active ? 1.0f / float(sunCasc0.mapSize) : 0.0f,
-                1.0f / float(sunFar.mapSize),
-                casc1Active ? 1.0f / float(sunCasc1.mapSize) : 0.0f);
-        }
         const auto& vsm = m_blackboard->get_or_add<passes::VSMState>();
-        if (ps_r_vsm && vsm.maskReady)
+        if (vsm.maskReady)
             staticGlobalsData.cascade_splits.x = 2.0f;
-        if (ps_r_vsm && vsm.sunDown)
+        if (vsm.sunDown)
             staticGlobalsData.L_sun_color.set(0.0f, 0.0f, 0.0f);
     }
 
@@ -757,23 +739,6 @@ void FrameGraphRenderer::RenderStatsOverlay()
                 stats.particleQuadsVisible = particleCull.visibleQuads;
             }
 
-            const auto& sunShadow = m_blackboard->get_or_add<passes::SunShadowState>();
-            const auto& sunFar = sunShadow.targets[passes::kSunTargetFar];
-            const auto& sunCasc0 = sunShadow.targets[passes::kSunTargetCasc0];
-            const auto& sunCasc1 = sunShadow.targets[passes::kSunTargetCasc1];
-            stats.sunCasterCandidates = sunShadow.candidates;
-            stats.sunCastersOpaque = sunFar.castersOpaque;
-            stats.sunCastersTerrain = sunFar.castersTerrain;
-            stats.sunCastersAT = sunFar.castersAT;
-            stats.sunCasc0Opaque = sunCasc0.castersOpaque;
-            stats.sunCasc0Terrain = sunCasc0.castersTerrain;
-            stats.sunCasc0AT = sunCasc0.castersAT;
-            stats.sunCasc1Opaque = sunCasc1.castersOpaque;
-            stats.sunCasc1Terrain = sunCasc1.castersTerrain;
-            stats.sunCasc1AT = sunCasc1.castersAT;
-            stats.sunFarRedraws = sunShadow.farRedraws;
-            stats.sunFarCached = !sunFar.redraw;
-
             const auto& vsm = m_blackboard->get_or_add<passes::VSMState>();
             stats.vsmActive = vsm.active;
             stats.vsmSunMoving = vsm.sunMoving;
@@ -941,7 +906,7 @@ void FrameGraphRenderer::SetupFrame() {
             );
 
             m_shadowCasterRegion.valid = false;
-            if (ps_r_vsm && ps_r_sun_shadow) {
+            {
                 m_shadowCasterRegion = BuildShadowCasterRegion();
                 if (m_shadowCasterRegion.valid) {
                     g_pGamePersistent->SpatialSpace.q_box(
@@ -1203,30 +1168,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedEnabled())
         skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedUploadPass(*m_framegraph, m_geometryCollector.get(), &m_hudBatches, m_overlayManager.get());
 
-    passes::SunShadowCullOutput sunShadowCull;
-    passes::SunShadowMaps sunShadowMaps;
-    const bool vsmActive = ps_r_vsm && m_blackboard->get_or_add<passes::VSMState>().maskReady;
-    {
-        auto& sunShadowState = m_blackboard->get_or_add<passes::SunShadowState>();
-        if (ps_r_sun_shadow && cullActive && m_gpuCullingManager && !vsmActive) {
-            sunShadowCull = passes::setupSunShadowCullPass(
-                *m_framegraph,
-                m_device,
-                cullOutput.staticDrawArgsBuffer,
-                skinnedDrawArgsBuffer,
-                m_gpuCullingManager->GetClusterEntryBuffer(),
-                m_gpuCullingManager->GetClusterEntryCapacity(),
-                m_gpuCullingManager->GetClusterCullEntryCount(),
-                m_gpuCullingManager.get(),
-                &sunShadowState,
-                m_gpuProfiler.get()
-            );
-        }
-        if (!sunShadowCull.active)
-            sunShadowState.candidates = 0;
-
-    }
-
     framegraph::VirtualResourceHandle visIdBuffer;
     if (cullActive && bindlessConfig.enabled && bindlessConfig.UseMegaBuffers() && bindlessConfig.cluster.IsValid()
         && m_gpuCullingManager->GetClusterEntryCapacity() < passes::kVisIdEntryLimit) {
@@ -1482,9 +1423,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     {
         auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
         vsmState.active = false;
-        if (!ps_r_vsm)
-            vsmState.maskReady = false;
-        if (ps_r_vsm && visActive && hizOutput.pyramid.is_valid()) {
+        if (visActive && hizOutput.pyramid.is_valid()) {
             passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
             passes::VSMDrawConfig vsmCfg;
             vsmCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
@@ -1518,40 +1457,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
 
-    if (sunShadowCull.active && bindlessConfig.UseMegaBuffers()) {
-        auto& sunShadowState = m_blackboard->get_or_add<passes::SunShadowState>();
-        passes::SunShadowDrawConfig sunCfg;
-        sunCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
-        sunCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
-        sunCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
-        sunCfg.megaVertexBuffer = bindlessConfig.megaVertexBuffer;
-        sunCfg.megaIndexBuffer = bindlessConfig.megaIndexBuffer;
-        sunCfg.materialCache = m_materialCache.get();
-        sunCfg.dynamicCompactDrawArgs = bindlessConfig.dynamicSet.compactDrawArgsBuffer;
-        sunCfg.dynamicCompactMaterialIDs = bindlessConfig.dynamicSet.compactMaterialIDBuffer;
-        sunCfg.dynamicCompactBatchIndices = bindlessConfig.dynamicSet.compactBatchIndicesBuffer;
-        sunCfg.dynamicCompactCount = bindlessConfig.dynamicSet.compactCountBuffer;
-        sunCfg.dynamicInstanceBuffer = bindlessConfig.dynamicSet.instanceBuffer;
-        sunCfg.dynamicFadeBuffer = bindlessConfig.dynamicSet.fadeBuffer;
-        sunCfg.dynamicObjectCount = bindlessConfig.dynamicSet.totalObjectCount;
-        sunCfg.dynamicArgs = cullOutput.dynamicCompactDrawArgs;
-        sunCfg.geometry = m_geometryCollector.get();
-        sunCfg.gpuCulling = m_gpuCullingManager.get();
-        sunCfg.skinnedArgs = skinnedDrawArgsBuffer;
-        sunShadowMaps = passes::setupSunShadowMapPasses(*m_framegraph, m_device, sunShadowCull, sunCfg, &sunShadowState, m_gpuProfiler.get());
-        sunShadowState.receiverActive = sunShadowMaps.maps[passes::kSunTargetFar].is_valid();
-    } else {
-        m_blackboard->get_or_add<passes::SunShadowState>().receiverActive = false;
-    }
-    sunShadowMaps.mask = vsmMaskHandle;
-
     auto litOutputs = passes::setupDeferredLightPass(
         *m_framegraph,
         m_device,
         detailOutputs,
         width,
         height,
-        sunShadowMaps,
+        vsmMaskHandle,
         m_gpuProfiler.get(),
         &m_blackboard->get_or_add<passes::DeferredLightPassState>()
     );
