@@ -1158,7 +1158,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         bindlessConfig.dynamicSet.fadeBuffer = m_gpuCullingManager->GetNeutralFadeBuffer();
         bindlessConfig.dynamicSet.totalObjectCount = m_gpuCullingManager->GetDynamicObjectCount();
 
-        if (ps_r_cluster && m_gpuCullingManager->GetClusterEntryCount() > 0) {
+        if (m_gpuCullingManager->GetClusterEntryCount() > 0) {
             bindlessConfig.cluster.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
             bindlessConfig.cluster.visibleEntryBuffer = m_gpuCullingManager->GetClusterVisibleEntryBuffer();
             bindlessConfig.cluster.fadeBuffer = m_gpuCullingManager->GetClusterFadeBuffer();
@@ -1208,7 +1208,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     const bool vsmActive = ps_r_vsm && m_blackboard->get_or_add<passes::VSMState>().maskReady;
     {
         auto& sunShadowState = m_blackboard->get_or_add<passes::SunShadowState>();
-        if (ps_r_sun_shadow && ps_r_cluster && cullActive && m_gpuCullingManager && !vsmActive) {
+        if (ps_r_sun_shadow && cullActive && m_gpuCullingManager && !vsmActive) {
             sunShadowCull = passes::setupSunShadowCullPass(
                 *m_framegraph,
                 m_device,
@@ -1255,10 +1255,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             );
             depthBuffer = visOut.depth;
             visIdBuffer = visOut.visId;
-            bindlessConfig.visBufferActive = true;
         }
     }
-    const bool visActive = bindlessConfig.visBufferActive;
+    const bool visActive = visIdBuffer.is_valid();
+    if (!visActive) {
+        static bool s_warned = false;
+        if (!s_warned) {
+            Msg("! [FrameGraph] visibility raster unavailable (cull %d, bindless %d, mega %d, clusters %u), opaque world will not be drawn",
+                cullActive ? 1 : 0, bindlessConfig.enabled ? 1 : 0, bindlessConfig.UseMegaBuffers() ? 1 : 0,
+                m_gpuCullingManager ? m_gpuCullingManager->GetClusterEntryCount() : 0u);
+            s_warned = true;
+        }
+    }
 
     passes::HiZPyramidOutput hizOutput;
     hizOutput.pyramid = framegraph::VirtualResourceHandle();
@@ -1358,7 +1366,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     framegraph::VirtualResourceHandle visMotionHandle;
     framegraph::VirtualResourceHandle visDepthHandle;
-    if (bindlessConfig.visBufferActive) {
+    if (visActive) {
         auto resolved = passes::setupMaterialResolvePass(
             *m_framegraph,
             m_device,

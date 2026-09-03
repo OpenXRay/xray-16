@@ -420,16 +420,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             if (!depthRT || !colorRT)
                 return;
 
-            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            if (cmdList) {
-                if (!data.bindlessConfig.visBufferActive) {
-                    cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
-                    if (normalRT)
-                        cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
-                    if (baseColorRT)
-                        cmdList->clearTextureFloat(baseColorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
-                }
-            }
 
             // Check if we have geometry to render
             if (!data.geometry)
