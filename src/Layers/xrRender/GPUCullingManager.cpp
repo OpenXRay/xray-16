@@ -446,6 +446,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     if (totalBatches == 0) {
         m_staticObjectCount = 0;
         m_dynamicObjectCount = 0;
+        m_transparentResidualCount = 0;
         m_clusterSet.dynamicEntryCount = 0;
         m_clusterSet.dynamicResidualCount = 0;
         return;
@@ -495,6 +496,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     m_transparentDrawArgsData.clear();
     m_transparentMaterialIDData.clear();
     m_transparentInstanceData.clear();
+    m_transparentResidualCount = 0;
 
     auto batchFlags = [](const GeometryBatch& batch) -> u32 {
         if (const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(batch.bindlessMaterialID)) {
@@ -520,15 +522,10 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
                            xr_vector<u32>& materialIDData,
                            xr_vector<GPUInstanceData>& instanceData) {
         IndirectDrawArgs args;
-        args.indexCountPerInstance = batch.indexCount;
+        args.indexCountPerInstance = batch.megaBufferAlloc.valid ? batch.indexCount : 0u;
         args.instanceCount = 1;
-        if (batch.megaBufferAlloc.valid) {
-            args.startIndexLocation = batch.megaBufferAlloc.indexOffset;
-            args.baseVertexLocation = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
-        } else {
-            args.startIndexLocation = batch.startIndex;
-            args.baseVertexLocation = batch.baseVertex;
-        }
+        args.startIndexLocation = batch.megaBufferAlloc.valid ? batch.megaBufferAlloc.indexOffset : 0u;
+        args.baseVertexLocation = batch.megaBufferAlloc.valid ? static_cast<s32>(batch.megaBufferAlloc.vertexOffset) : 0;
         args.startInstanceLocation = static_cast<u32>(drawArgsData.size());
         drawArgsData.push_back(args);
 
@@ -561,6 +558,8 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         }
 
         if (batch.IsStrictB2F()) {
+            if (!batch.megaBufferAlloc.valid)
+                ++m_transparentResidualCount;
             appendBatch(batch, batchFlags(batch), batch.bindlessMaterialID,
                 m_transparentDrawArgsData, m_transparentMaterialIDData, m_transparentInstanceData);
             continue;
@@ -2021,13 +2020,17 @@ void GPUCullingManager::BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList)
             continue;
         u32 member = 0;
         const ClusterUnitRecord* rec = m_clusterDAG.FindRecord(key, member);
-        if (!rec || rec->isComponent)
+        if (!rec)
             continue;
         if (m_dynamicEntryData.size() + rec->protoCount > kDynamicClusterEntryCapacity)
             continue;
-        for (u32 p = 0; p < rec->protoCount; ++p)
-            EmitClusterEntry(m_clusterDAG, megaBase, protos[rec->firstProto + p], *rec, i, world,
+        for (u32 p = 0; p < rec->protoCount; ++p) {
+            const ClusterMetaProto& proto = protos[rec->firstProto + p];
+            if (rec->isComponent && proto.member != member)
+                continue;
+            EmitClusterEntry(m_clusterDAG, megaBase, proto, *rec, i, world,
                 m_dynamicMaterialIDData[i], GPU_CLUSTER_ENTRY_DYNAMIC, m_dynamicEntryData);
+        }
         ++clustered;
     }
     m_clusterSet.dynamicResidualCount = dynamicCount - clustered;
@@ -2122,22 +2125,12 @@ void GPUCullingManager::BuildClusterEntries()
         if (memberBatch.empty())
             continue;
 
-        u32 fallback = UINT32_MAX;
-        for (u32 b : memberBatch) {
-            if (b != UINT32_MAX) {
-                fallback = b;
-                break;
-            }
-        }
-        if (fallback == UINT32_MAX)
-            continue;
-
         const ClusterUnitRecord& rec = records[r];
         for (u32 p = 0; p < rec.protoCount; ++p) {
             const ClusterMetaProto& proto = protos[rec.firstProto + p];
-            const u32 batch = (proto.member < memberBatch.size() && memberBatch[proto.member] != UINT32_MAX)
-                ? memberBatch[proto.member]
-                : fallback;
+            if (proto.member >= memberBatch.size() || memberBatch[proto.member] == UINT32_MAX)
+                continue;
+            const u32 batch = memberBatch[proto.member];
             emitStatic(proto, rec, batch, shadowOnly[batch] ? u32(GPU_CLUSTER_ENTRY_SHADOW_ONLY) : 0u);
         }
     }
@@ -2180,22 +2173,12 @@ void GPUCullingManager::BuildClusterEntries()
         if (memberBatch.empty())
             continue;
 
-        u32 fallback = UINT32_MAX;
-        for (u32 b : memberBatch) {
-            if (b != UINT32_MAX) {
-                fallback = b;
-                break;
-            }
-        }
-        if (fallback == UINT32_MAX)
-            continue;
-
         const ClusterUnitRecord& rec = records[r];
         for (u32 p = 0; p < rec.protoCount; ++p) {
             const ClusterMetaProto& proto = protos[rec.firstProto + p];
-            const u32 batch = (proto.member < memberBatch.size() && memberBatch[proto.member] != UINT32_MAX)
-                ? memberBatch[proto.member]
-                : fallback;
+            if (proto.member >= memberBatch.size() || memberBatch[proto.member] == UINT32_MAX)
+                continue;
+            const u32 batch = memberBatch[proto.member];
             emitEntry(proto, rec, batch,
                 m_terrainInstanceData[batch].world, m_terrainMaterialIDData[batch]);
         }

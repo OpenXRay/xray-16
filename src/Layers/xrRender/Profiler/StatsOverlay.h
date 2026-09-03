@@ -49,6 +49,7 @@ struct RenderStats
     u32 residualStatic = 0;
     u32 residualTerrain = 0;
     u32 residualDynamic = 0;
+    u32 residualTransparent = 0;
     u32 clusterOcclusionCandidates = 0;
     u32 clusterOcclusionRecovered = 0;
     u32 clusterTrianglesDrawn = 0;
@@ -104,7 +105,7 @@ struct RenderStats
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
         clusterStaticEntries = clusterTrianglesDrawn = clusterTerrainTrianglesDrawn = 0;
-        residualStatic = residualTerrain = residualDynamic = 0;
+        residualStatic = residualTerrain = residualDynamic = residualTransparent = 0;
         clusterOcclusionCandidates = clusterOcclusionRecovered = 0;
         vsmActive = vsmSunMoving = false;
         vsmPages = vsmDirtyPages = vsmWrongPages = 0;
