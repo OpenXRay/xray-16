@@ -50,8 +50,17 @@ public:
     void Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, u32 screenWidth, u32 screenHeight);
 
 private:
+    struct FrameBuffers
+    {
+        nvrhi::BufferHandle vertexBuffer;
+        nvrhi::BufferHandle indexBuffer;
+        size_t vertexCapacity = 0;
+        size_t indexCapacity = 0;
+    };
+
     bool CreateBuffers();
-    void EnsureBufferCapacity(size_t vertexCount, size_t indexCount);
+    bool CreateFrameBuffers(FrameBuffers& frame, size_t vertexCount, size_t indexCount);
+    FrameBuffers& AcquireFrameBuffers(size_t vertexCount, size_t indexCount);
     void RenderBatchWithShader(nvrhi::ICommandList* cmdList, const ui::UIGeometryBatch& batch, render::MaterialPSO* pso, nvrhi::IFramebuffer* framebuffer,
         u32 screenWidth, u32 screenHeight, u32 vertexOffset, u32 indexOffset);
 
@@ -76,10 +85,11 @@ private:
 
     RenderDevice* m_device = nullptr;
     render::MaterialCache* m_matCache = nullptr;
-    nvrhi::BufferHandle m_vertexBuffer;
-    nvrhi::BufferHandle m_indexBuffer;
-    size_t m_vertexBufferSize = 0;
-    size_t m_indexBufferSize = 0;
+    xr_vector<FrameBuffers> m_frames;
+    u32 m_frameSlot = 0;
+    u32 m_frameStamp = UINT32_MAX;
+    size_t m_frameVertexUsed = 0;
+    size_t m_frameIndexUsed = 0;
     bool m_initialized = false;
 };
 }
