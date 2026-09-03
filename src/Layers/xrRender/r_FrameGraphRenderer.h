@@ -421,6 +421,7 @@ private:
     Fmatrix m_prevViewProj;
     Fmatrix m_prevView;
     Fmatrix m_prevProject;
+    float m_prevDetailTime = 0.0f;
     Fvector m_prevCameraPos;
     bool m_hasPrevFrameData = false;
     u32 m_prevFrameWidth = 0;

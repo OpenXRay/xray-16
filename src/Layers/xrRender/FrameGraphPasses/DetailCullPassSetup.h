@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "DetailPassSetup.h"
+#include <nvrhi/nvrhi.h>
 
 struct Fmatrix;
 
@@ -26,15 +27,16 @@ namespace xray::render::framegraph {
 
 namespace xray::render::fg::passes {
 
-void setupDetailCullPass(
+framegraph::VirtualResourceHandle setupDetailCullPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     fg::FGDetailManager* detailManager,
-    framegraph::VirtualResourceHandle hiZPyramid,
+    framegraph::VirtualResourceHandle prevHiZ,
+    nvrhi::ITexture* fallbackHiZ,
     u32 hiZWidth,
     u32 hiZHeight,
     u32 hiZMipLevels,
-    const Fmatrix* prevViewProj,
+    const Fmatrix& prevViewProj,
     xray::profiler::GPUProfiler* gpuProfiler,
     DetailPassState* detailState
 );

@@ -33,6 +33,7 @@
 #include "GPUCullingManager.h"
 #include "FGDetailManager.h"
 #include "FrameGraphPasses/DetailCullPassSetup.h"
+#include "FrameGraphPasses/DetailResolvePassSetup.h"
 #include "FrameGraphPasses/DetailPassSetup.h"
 #include "FrameGraphPasses/TransparentPassSetup.h"
 #include "FrameGraphPasses/DeferredLightPassSetup.h"
@@ -491,6 +492,7 @@ void FrameGraphRenderer::Render() {
     m_prevView = Device.mView;
     m_prevProject = Device.mProject;
     m_prevCameraPos = Device.vCameraPosition;
+    m_prevDetailTime = Device.fTimeGlobal;
     m_hasPrevHiZ = m_hizPyramid.is_valid();
     m_pingPongIndex = 1 - m_pingPongIndex;
 
@@ -721,7 +723,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
         {
             stats.detailSlots = m_detailManager->slot_count;
             for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
-                stats.detailTrisPerBlade[lod] = m_detailManager->bladeIndexCount[lod] / 3;
+                stats.detailTrisPerBlade[lod] = fg::FGDetailManager::LOD_TRIANGLES[lod];
 
             const auto& cullStats = m_detailManager->GetCullingStats();
             stats.detailVisibleSlots = cullStats.visibleSlotsCount;
@@ -1097,6 +1099,19 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedEnabled())
         skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedUploadPass(*m_framegraph, m_geometryCollector.get(), &m_hudBatches, m_overlayManager.get());
 
+    framegraph::VirtualResourceHandle detailArgsHandle;
+    if (m_detailManager && m_gpuCullingManager)
+        detailArgsHandle = passes::setupDetailCullPass(
+            *m_framegraph, m_device, m_detailManager.get(),
+            prevHiZHandle, m_gpuCullingManager->GetDummyHiZ(),
+            hizWidth, hizHeight, hizMipLevels, m_prevViewProj,
+            m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DetailPassState>());
+    const u32 grassEntryBase = m_gpuCullingManager
+        ? m_gpuCullingManager->GetClusterEntryCapacity() + fg::GPUCullingManager::SKINNED_ENTRY_CAPACITY
+        : 0u;
+    const bool grassIds = detailArgsHandle.is_valid()
+        && grassEntryBase + fg::FGDetailManager::LOD_COUNT * (1u << 22) <= passes::kVisIdEntryLimit;
+
     framegraph::VirtualResourceHandle visIdBuffer;
     if (cullActive && clusterConfig.UseMegaBuffers() && clusterConfig.IsValid()
         && m_gpuCullingManager->GetClusterEntryCapacity() < passes::kVisIdEntryLimit) {
@@ -1121,6 +1136,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 clusterConfig,
                 m_materialCache.get(),
                 m_gpuCullingManager.get(),
+                grassIds ? m_detailManager.get() : nullptr,
+                grassIds ? detailArgsHandle : framegraph::VirtualResourceHandle(),
+                grassEntryBase,
                 &visState
             );
             depthBuffer = visOut.depth;
@@ -1181,6 +1199,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 retestConfig,
                 m_materialCache.get(),
                 m_gpuCullingManager.get(),
+                nullptr,
+                framegraph::VirtualResourceHandle(),
+                0u,
                 &m_blackboard->get_or_add<passes::VisibilityPassState>(),
                 true
             );
@@ -1262,10 +1283,29 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_prevView,
             m_prevProject,
             m_hasPrevFrameData,
+            grassIds ? grassEntryBase : 0xFFFFFFFFu,
             width,
             height,
             &m_blackboard->get_or_add<passes::MaterialResolvePassState>()
         );
+        if (grassIds && passes::EnsureDetailResolveResources(m_device, m_blackboard->get_or_add<passes::DetailResolvePassState>())) {
+            resolved = passes::setupDetailResolvePass(
+                *m_framegraph,
+                m_device,
+                visIdBuffer,
+                depthBuffer,
+                resolved,
+                m_detailManager.get(),
+                grassEntryBase,
+                m_prevView,
+                m_prevProject,
+                m_hasPrevFrameData,
+                m_prevDetailTime,
+                width,
+                height,
+                &m_blackboard->get_or_add<passes::DetailResolvePassState>()
+            );
+        }
         sunOutput = resolved.color;
         normalBuffer = resolved.normal;
         baseColorBuffer = resolved.baseColor;
@@ -1290,39 +1330,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             hizOutput.mipLevels,
             Device.mFullTransform,
             &m_worldParticleBatches
-        );
-    }
-
-    passes::setupDetailCullPass(
-        *m_framegraph,
-        m_device,
-        m_detailManager.get(),
-        hizOutput.pyramid,
-        hizOutput.width,
-        hizOutput.height,
-        hizOutput.mipLevels,
-        nullptr,
-        m_gpuProfiler.get(),
-        &m_blackboard->get_or_add<passes::DetailPassState>()
-    );
-
-    if (m_detailManager && m_detailManager->perlin4dPipeline)
-    {
-        struct Perlin4DGenData { FGDetailManager* dm = nullptr; };
-        m_framegraph->addCallbackPass<Perlin4DGenData>(
-            "Perlin4DGen",
-            [&](framegraph::FrameGraph& builder, framegraph::PassHandle passHandle, Perlin4DGenData& data)
-            {
-                framegraph::RenderPassBuilder passBuilder(builder, passHandle);
-                passBuilder.sideEffects();
-                data.dm = m_detailManager.get();
-            },
-            [](const Perlin4DGenData& data, const framegraph::FrameGraph&, fg::RenderContext* ctx)
-            {
-                auto* cmdList = ctx->GetCommandList();
-                auto* device  = cmdList->getDevice();
-                data.dm->DispatchPerlin4DCompute(cmdList, device, Device.fTimeGlobal);
-            }
         );
     }
 

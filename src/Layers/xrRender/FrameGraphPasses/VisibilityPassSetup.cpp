@@ -12,6 +12,7 @@
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/FGDetailManager.h"
 
 namespace xray::render::fg::passes {
 
@@ -24,11 +25,14 @@ struct VisibilityPassData {
     VirtualResourceHandle visId;
     VirtualResourceHandle drawArgsBuffer;
     VirtualResourceHandle skinnedDrawArgs;
+    VirtualResourceHandle detailArgs;
     fg::RenderDevice* device = nullptr;
     MaterialCache* materialCache = nullptr;
     GPUCullingManager* gpuCulling = nullptr;
+    FGDetailManager* detailManager = nullptr;
     VisibilityPassState* state = nullptr;
     ClusterDrawConfig config;
+    u32 grassEntryBase = 0;
     bool retest = false;
 };
 
@@ -37,6 +41,13 @@ struct alignas(16) SkinnedVisParams {
     u32 pad0;
     u32 pad1;
     u32 pad2;
+};
+
+struct alignas(16) DetailVisParams {
+    u32 entryBase;
+    u32 lod;
+    u32 segments;
+    u32 pad0;
 };
 
 struct VisDebugViewData {
@@ -65,6 +76,8 @@ void renderVisibilityRaster(
     const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
+    FGDetailManager* detailManager,
+    u32 grassEntryBase,
     VisibilityPassState& state,
     bool retest)
 {
@@ -187,6 +200,51 @@ void renderVisibilityRaster(
             }
         }
     }
+
+    if (!retest && detailManager && state.bladePipeline && detailManager->generatedInstancesBuffer && detailManager->perlin4dTexture) {
+        auto* bladeVsRefl = shaderLoader->GetCachedReflection("detail_vis", ".vs");
+        auto* bladePsRefl = shaderLoader->GetCachedReflection("detail_vis", ".ps");
+        if (bladeVsRefl && bladePsRefl) {
+            auto detailGlobalsCB = cache.GetOrCreateVolatileCB("Detail", "DetailGlobals", sizeof(FGDetailManager::DetailFrameConstants), device);
+            FGDetailManager::DetailFrameConstants frameConstants;
+            detailManager->FillFrameConstants(frameConstants);
+            cmdList->writeBuffer(detailGlobalsCB, &frameConstants, sizeof(frameConstants));
+            auto visParamsCB = cache.GetOrCreateVolatileCB("VisibilityRaster", "DetailVisParams", sizeof(DetailVisParams), device, 16);
+
+            for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; ++lod) {
+                if (!detailManager->visibleInstancesBuffer[lod] || !detailManager->drawArgsBuffer[lod])
+                    continue;
+                DetailVisParams params = {};
+                params.entryBase = grassEntryBase;
+                params.lod = lod;
+                params.segments = FGDetailManager::LOD_SEGMENTS[lod];
+                cmdList->writeBuffer(visParamsCB, &params, sizeof(params));
+
+                BindingSetBuilder bsb(*bladeVsRefl, *bladePsRefl, nvDevice, "VisibilityRaster.Blades");
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                bsb.ConstantBuffer("DetailGlobals", detailGlobalsCB);
+                bsb.ConstantBuffer("DetailVisParams", visParamsCB);
+                bsb.BufferSRV("visible_indices", detailManager->visibleInstancesBuffer[lod]);
+                bsb.BufferSRV("all_instances", detailManager->generatedInstancesBuffer);
+                bsb.Texture("g_Perlin4D", detailManager->perlin4dTexture);
+                auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.bladeLayout, nvDevice);
+                if (!bindingSet)
+                    continue;
+
+                nvrhi::GraphicsState gs;
+                gs.pipeline = state.bladePipeline;
+                gs.framebuffer = framebuffer;
+                gs.bindings = { bindingSet };
+                if (bindlessTable)
+                    gs.addBindingSet(bindlessTable);
+                gs.indirectParams = detailManager->drawArgsBuffer[lod];
+                gs.viewport.addViewport(viewport);
+                gs.viewport.addScissorRect(scissor);
+                cmdList->setGraphicsState(gs);
+                cmdList->drawIndirect(0, 1);
+            }
+        }
+    }
 }
 
 }
@@ -264,6 +322,21 @@ bool EnsureVisibilityResources(fg::RenderDevice* device, VisibilityPassState& st
         return false;
     }
 
+    auto bladeVsResult = shaderLoader->LoadVertexShader("detail_vis", "main");
+    auto bladePsResult = shaderLoader->LoadPixelShader("detail_vis", "main");
+    if (bladeVsResult.handle && bladeVsResult.reflection && bladePsResult.handle && bladePsResult.reflection) {
+        state.bladeVS = bladeVsResult.handle;
+        state.bladePS = bladePsResult.handle;
+        state.bladeLayout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_Blades", *bladeVsResult.reflection, *bladePsResult.reflection, nvDevice);
+        if (state.bladeLayout) {
+            nvrhi::GraphicsPipelineDesc bladeDesc = makeDesc(state.bladePS, state.bladeLayout, state.bladeVS);
+            bladeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+            state.bladePipeline = cache.GetOrCreatePipeline("VisibilityRaster_Blades", bladeDesc, fbInfo, nvDevice);
+        }
+    }
+    if (!state.bladePipeline)
+        Msg("! [VisibilityRaster] Blade visibility pipeline unavailable, grass will not be drawn");
+
     state.initialized = true;
     Msg("* [VisibilityRaster] Cluster visibility pipelines initialized");
     return true;
@@ -279,19 +352,26 @@ VisibilityPassOutput setupVisibilityPass(
     const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
+    FGDetailManager* detailManager,
+    VirtualResourceHandle detailArgs,
+    u32 grassEntryBase,
     VisibilityPassState* state,
     bool retest)
 {
     auto& passData = fg.addCallbackPass<VisibilityPassData>(
         retest ? "Visibility Retest" : "Visibility Raster",
-        [&, depthTarget, visIdTarget, drawArgsBuffer, skinnedDrawArgs, config, materialCache, gpuCulling, state, retest](FrameGraph& builder, PassHandle passHandle, VisibilityPassData& data) {
+        [&, depthTarget, visIdTarget, drawArgsBuffer, skinnedDrawArgs, detailArgs, config, materialCache, gpuCulling, detailManager, grassEntryBase, state, retest](FrameGraph& builder, PassHandle passHandle, VisibilityPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.materialCache = materialCache;
             data.gpuCulling = gpuCulling;
+            data.detailManager = detailManager;
+            data.grassEntryBase = grassEntryBase;
             data.state = state;
             data.config = config;
             data.retest = retest;
+            if (detailArgs.is_valid())
+                data.detailArgs = passBuilder.read(detailArgs, ResourceState::IndirectArgument);
             if (retest) {
                 data.depth = passBuilder.readWrite(depthTarget, ResourceState::DepthStencilWrite);
                 data.visId = passBuilder.readWrite(visIdTarget, ResourceState::RenderTarget);
@@ -310,7 +390,8 @@ VisibilityPassOutput setupVisibilityPass(
             if (!depthRT || !visRT || !ctx->GetCommandList())
                 return;
             renderVisibilityRaster(ctx, data.device, depthRT, visRT, data.config, data.materialCache,
-                data.skinnedDrawArgs.is_valid() ? data.gpuCulling : nullptr, *data.state, data.retest);
+                data.skinnedDrawArgs.is_valid() ? data.gpuCulling : nullptr,
+                data.detailArgs.is_valid() ? data.detailManager : nullptr, data.grassEntryBase, *data.state, data.retest);
         });
 
     VisibilityPassOutput out;
