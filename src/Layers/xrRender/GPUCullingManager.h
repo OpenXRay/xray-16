@@ -459,6 +459,9 @@ public:
     static constexpr u32 SKINNED_CHUNK_VERTICES = 256;
 
     nvrhi::IBuffer* GetSkinnedPreVertexBuffer() const { return m_skinnedPreVB[m_skinnedPreVBIndex].Get(); }
+    bool EnsurePreskinnedDrawResources();
+    nvrhi::IShader* GetPreskinnedVS() const { return m_preskinnedVS.Get(); }
+    nvrhi::IInputLayout* GetPreskinnedInputLayout() const { return m_preskinnedLayout.Get(); }
     nvrhi::IBuffer* GetSkinnedEntryBuffer() const { return m_skinnedEntryBuffer.Get(); }
     u32 GetSkinnedEntryCount() const { return m_skinnedEntryCount; }
     static constexpr u32 SKINNED_ENTRY_INDICES = 384;
@@ -737,6 +740,9 @@ private:
     nvrhi::BufferHandle m_skinnedPreVB[2];
     u32 m_skinnedPreVBCapacity = 0;
     u32 m_skinnedPreVBIndex = 0;
+    nvrhi::ShaderHandle m_preskinnedVS;
+    nvrhi::InputLayoutHandle m_preskinnedLayout;
+    bool m_preskinnedFailed = false;
     nvrhi::ComputePipelineHandle m_preskinPipeline;
     nvrhi::BindingLayoutHandle m_preskinLayout;
     bool m_preskinFailed = false;

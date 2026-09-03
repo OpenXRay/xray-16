@@ -24,6 +24,7 @@
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraphPasses/PassCommon.h"
 
 namespace fg
 {
@@ -2235,6 +2236,31 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     }
 
     DispatchPreskin(cmdList, overlayMgr, vertexTotal);
+}
+
+bool GPUCullingManager::EnsurePreskinnedDrawResources()
+{
+    if (m_preskinnedVS && m_preskinnedLayout)
+        return true;
+    if (m_preskinnedFailed)
+        return false;
+
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_pre", "main");
+    if (!vsResult.handle || !vsResult.reflection) {
+        Msg("! [GPUCulling] bindless_skinned_pre.vs failed to load");
+        m_preskinnedFailed = true;
+        return false;
+    }
+    u32 attrCount = 0;
+    auto* attrs = passes::GetUnifiedVertexAttributes(attrCount);
+    m_preskinnedVS = vsResult.handle;
+    m_preskinnedLayout = m_device->GetNVRHIDevice()->createInputLayout(attrs, attrCount, m_preskinnedVS);
+    if (!m_preskinnedLayout) {
+        m_preskinnedFailed = true;
+        return false;
+    }
+    return true;
 }
 
 bool GPUCullingManager::EnsurePreskinPipeline(nvrhi::IDevice* nvDevice)
