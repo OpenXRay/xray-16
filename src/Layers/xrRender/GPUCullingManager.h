@@ -463,6 +463,7 @@ public:
     static constexpr u32 kDynamicClusterEntryCapacity = 16384;
     u32 GetClusterCullEntryCount() const { return m_clusterSet.entryCount + m_clusterSet.dynamicEntryCount; }
     u32 GetDynamicClusterEntryCount() const { return m_clusterSet.dynamicEntryCount; }
+    u32 GetDynamicResidualCount() const { return m_clusterSet.dynamicResidualCount; }
     u32 GetClusterEntryCapacity() const { return m_clusterSet.entryCount + kDynamicClusterEntryCapacity; }
     nvrhi::IBuffer* GetDynamicPrevWorldBuffer() const { return m_dynamicPrevWorldBuffer.Get(); }
     nvrhi::IBuffer* GetClusterEntryBuffer() const { return m_clusterSet.entryBuffer.Get(); }
@@ -538,6 +539,7 @@ private:
         nvrhi::BufferHandle terrainArgsBuffer;
         u32 entryCount = 0;
         u32 dynamicEntryCount = 0;
+        u32 dynamicResidualCount = 0;
         u32 staticEntryCount = 0;
         u32 terrainEntryCount = 0;
         u32 residualStaticCount = 0;

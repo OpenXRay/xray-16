@@ -724,6 +724,9 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.clusterTerrainEntries = m_gpuCullingManager->GetClusterTerrainEntryCount();
             stats.clusterTerrainVisible = cullStats.clusterTerrainVisible;
             stats.clusterStaticEntries = m_gpuCullingManager->GetClusterStaticEntryCount();
+            stats.forwardResidualStatic = m_gpuCullingManager->GetStaticResidualCount();
+            stats.forwardResidualTerrain = m_gpuCullingManager->GetTerrainResidualCount();
+            stats.forwardResidualDynamic = m_gpuCullingManager->GetDynamicResidualCount();
             stats.clusterTrianglesDrawn = cullStats.clusterTrianglesDrawn;
             stats.clusterTerrainTrianglesDrawn = cullStats.clusterTerrainTrianglesDrawn;
         }
@@ -1335,21 +1338,32 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         visDepthHandle = resolved.visDepth;
     }
 
-    auto forwardOutputs = passes::setupForwardColorPass(
-        *m_framegraph,
-        m_device,
-        depthBuffer,
-        sunOutput,
-        normalBuffer,
-        baseColorBuffer,
-        m_geometryCollector.get(),
-        m_materialCache.get(),
-        width,
-        height,
-        drawArgsBuffer,
-        bindlessConfig,
-        &m_blackboard->get_or_add<passes::ForwardColorPassState>()
-    );
+    const u32 forwardResidue = m_gpuCullingManager
+        ? m_gpuCullingManager->GetStaticResidualCount() + m_gpuCullingManager->GetTerrainResidualCount() + m_gpuCullingManager->GetDynamicResidualCount()
+        : 0u;
+    framegraph::DefaultOutputLayout forwardOutputs;
+    if (forwardResidue > 0) {
+        forwardOutputs = passes::setupForwardColorPass(
+            *m_framegraph,
+            m_device,
+            depthBuffer,
+            sunOutput,
+            normalBuffer,
+            baseColorBuffer,
+            m_geometryCollector.get(),
+            m_materialCache.get(),
+            width,
+            height,
+            drawArgsBuffer,
+            bindlessConfig,
+            &m_blackboard->get_or_add<passes::ForwardColorPassState>()
+        );
+    } else {
+        forwardOutputs.albedo = sunOutput;
+        forwardOutputs.normal = normalBuffer;
+        forwardOutputs.baseColor = baseColorBuffer;
+        forwardOutputs.depth = depthBuffer;
+    }
 
     // ═══════════════════════════════════════════════════════
     //  GPU CULLING DEBUG VISUALIZATION (Optional overlay)

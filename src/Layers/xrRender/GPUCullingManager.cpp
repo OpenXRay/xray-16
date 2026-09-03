@@ -1316,6 +1316,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         m_dynamicSet.objectCount = 0;
         m_objectCount = 0;
         m_clusterSet.dynamicEntryCount = 0;
+        m_clusterSet.dynamicResidualCount = 0;
         return;
     }
 
@@ -3713,6 +3714,7 @@ void GPUCullingManager::BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList)
     auto& nextHistory = m_dynamicHistory[m_dynamicHistoryIndex ^ 1u];
     nextHistory.clear();
     m_dynamicPrevWorldData.resize(dynamicCount);
+    u32 clustered = 0;
 
     const bool clusterReady = m_clusterSet.uploaded && m_clusterSet.entryBuffer;
     const xr_vector<ClusterMetaProto>& protos = m_clusterDAG.Protos();
@@ -3749,7 +3751,9 @@ void GPUCullingManager::BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList)
                 m_dynamicMaterialIDData[i], GPU_CLUSTER_ENTRY_DYNAMIC, m_dynamicEntryData);
         obj.flags |= GPU_OBJECT_CLUSTERED;
         m_dynamicInstanceData[i].flags = obj.flags;
+        ++clustered;
     }
+    m_clusterSet.dynamicResidualCount = dynamicCount - clustered;
     m_dynamicHistoryIndex ^= 1u;
     m_dynamicHistoryFrame = Device.dwFrame;
 
