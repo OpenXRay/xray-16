@@ -65,14 +65,23 @@ static void CommitUIStaticGlobals(FGUIRender* uiRender, render::MaterialCache* u
     StaticGlobals staticGlobalsCB = {};
     FillGlobalConstants(staticGlobalsCB);
 
-    xr_vector<MaterialPSO*> committed;
+    xr_vector<MaterialPSO*> psos;
     for (const auto& batch : uiRender->GetBatches()) {
         if (!batch.uiShader)
             continue;
         MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(batch.uiShader, batch.shaderElement, framebuffer, GetBatchTopology(batch));
-        if (!matPSO || std::find(committed.begin(), committed.end(), matPSO) != committed.end())
-            continue;
-        committed.push_back(matPSO);
+        if (matPSO && std::find(psos.begin(), psos.end(), matPSO) == psos.end())
+            psos.push_back(matPSO);
+    }
+    if (psos.empty())
+        return;
+
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    for (MaterialPSO* matPSO : psos)
+        FGConstantSystem::TransitionStaticForUpload(matPSO, cmdList);
+    cmdList->commitBarriers();
+
+    for (MaterialPSO* matPSO : psos) {
         FGConstantSystem constants(matPSO);
         UploadStaticGlobals(constants, staticGlobalsCB);
         constants.CommitStatic(ctx);

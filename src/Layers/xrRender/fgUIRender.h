@@ -78,7 +78,6 @@ private:
     render::MaterialCache* m_matCache = nullptr;
     nvrhi::BufferHandle m_vertexBuffer;
     nvrhi::BufferHandle m_indexBuffer;
-    nvrhi::BufferHandle m_constantBuffer;
     size_t m_vertexBufferSize = 0;
     size_t m_indexBufferSize = 0;
     bool m_initialized = false;
