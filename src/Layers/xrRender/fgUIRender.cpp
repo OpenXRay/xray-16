@@ -87,7 +87,7 @@ void FGUIRender::FlushPrimitive()
 
     UIPrimitiveType uiPrimType = ConvertPrimitiveType(m_primitiveType);
 
-    UIGeometryBatch* batch = GetOrCreateBatch(uiPrimType);
+    UIGeometryBatch* batch = GetOrCreateBatch(uiPrimType, m_currentVertices.size());
     VERIFY(batch);
 
     batch->AddPrimitive(m_currentVertices, uiPrimType);
@@ -143,12 +143,12 @@ UIPrimitiveType FGUIRender::ConvertPrimitiveType(ePrimitiveType primType)
     }
 }
 
-UIGeometryBatch* FGUIRender::GetOrCreateBatch(UIPrimitiveType primType)
+UIGeometryBatch* FGUIRender::GetOrCreateBatch(UIPrimitiveType primType, size_t incomingVertexCount)
 {
     if (!m_batches.empty())
     {
         UIGeometryBatch& lastBatch = m_batches.back();
-        if (lastBatch.CanMergeWith(m_currentUIShader, m_currentAlphaRef, m_hasScissor, m_hasScissor ? &m_scissorRect : nullptr, m_cullMode, primType))
+        if (lastBatch.CanMergeWith(m_currentUIShader, m_currentAlphaRef, m_hasScissor, m_hasScissor ? &m_scissorRect : nullptr, m_cullMode, primType, incomingVertexCount))
         {
             return &lastBatch;
         }
@@ -262,25 +262,6 @@ void FGUIRender::EnsureBufferCapacity(size_t vertexCount, size_t indexCount)
     }
 }
 
-void FGUIRender::UploadBatchGeometry(nvrhi::ICommandList* cmdList, const UIGeometryBatch& batch, u32& vertexOffset, u32& indexOffset)
-{
-    if (batch.vertices.empty())
-        return;
-
-    const size_t vertexDataSize = batch.vertices.size() * sizeof(UIVertex);
-    cmdList->writeBuffer(m_vertexBuffer, batch.vertices.data(), vertexDataSize, vertexOffset * sizeof(UIVertex));
-
-    if (batch.UsesIndexBuffer() && !batch.indices.empty())
-    {
-        const size_t indexDataSize = batch.indices.size() * sizeof(u16);
-        cmdList->writeBuffer(m_indexBuffer, batch.indices.data(), indexDataSize, indexOffset * sizeof(u16));
-    }
-
-    vertexOffset += static_cast<u32>(batch.vertices.size());
-    if (batch.UsesIndexBuffer())
-        indexOffset += static_cast<u32>(batch.indices.size());
-}
-
 void FGUIRender::RenderBatchWithShader(nvrhi::ICommandList* cmdList, const UIGeometryBatch& batch, render::MaterialPSO* pso, nvrhi::IFramebuffer* framebuffer,
     u32 screenWidth, u32 screenHeight, u32 vertexOffset, u32 indexOffset)
 {
@@ -358,15 +339,20 @@ void FGUIRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebu
     if (!m_initialized || m_batches.empty())
         return;
 
-    size_t totalVertices = 0;
-    size_t totalIndices = 0;
+    m_vertexScratch.clear();
+    m_indexScratch.clear();
     for (const auto& batch : m_batches)
     {
-        totalVertices += batch.vertices.size();
-        totalIndices += batch.indices.size();
+        if (batch.IsEmpty() || !batch.uiShader)
+            continue;
+        m_vertexScratch.insert(m_vertexScratch.end(), batch.vertices.begin(), batch.vertices.end());
+        if (batch.UsesIndexBuffer())
+            m_indexScratch.insert(m_indexScratch.end(), batch.indices.begin(), batch.indices.end());
     }
+    if (m_vertexScratch.empty())
+        return;
 
-    EnsureBufferCapacity(totalVertices, totalIndices);
+    EnsureBufferCapacity(m_vertexScratch.size(), m_indexScratch.size());
 
     struct UIConstants
     {
@@ -383,6 +369,9 @@ void FGUIRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebu
     constants->invScreenWidth = 1.0f / constants->screenWidth;
     constants->invScreenHeight = 1.0f / constants->screenHeight;
     cmdList->writeBuffer(m_constantBuffer, cbData, 256);
+    cmdList->writeBuffer(m_vertexBuffer, m_vertexScratch.data(), m_vertexScratch.size() * sizeof(UIVertex));
+    if (!m_indexScratch.empty())
+        cmdList->writeBuffer(m_indexBuffer, m_indexScratch.data(), m_indexScratch.size() * sizeof(u16));
 
     IUIShader* lastUIShader = nullptr;
     render::MaterialPSO* currentPSO = nullptr;
@@ -413,18 +402,21 @@ void FGUIRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebu
             break;
         }
 
+        const u32 batchVertexOffset = vertexOffset;
+        const u32 batchIndexOffset = indexOffset;
+        vertexOffset += static_cast<u32>(batch.vertices.size());
+        if (batch.UsesIndexBuffer())
+            indexOffset += static_cast<u32>(batch.indices.size());
+
         if (batch.uiShader != lastUIShader || batch.primitiveType != lastTopology)
         {
             currentPSO = m_matCache->GetOrCreateUIPSO(batch.uiShader, 0, framebuffer, psoTopology);
-            if (!currentPSO)
-                continue;
             lastUIShader = batch.uiShader;
             lastTopology = batch.primitiveType;
         }
+        if (!currentPSO)
+            continue;
 
-        const u32 batchVertexOffset = vertexOffset;
-        const u32 batchIndexOffset = indexOffset;
-        UploadBatchGeometry(cmdList, batch, vertexOffset, indexOffset);
         RenderBatchWithShader(cmdList, batch, currentPSO, framebuffer, screenWidth, screenHeight, batchVertexOffset, batchIndexOffset);
     }
 }
