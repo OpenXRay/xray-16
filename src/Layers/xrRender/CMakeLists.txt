@@ -39,9 +39,6 @@ target_sources(xrRender PRIVATE
     ShaderVariant/ShaderVariantRegistry.cpp
     ShaderVariant/JsonParser.h
     ShaderVariant/JsonParser.cpp
-    ShaderVariant/VariantPartitionConfig.h
-    ShaderVariant/VariantPSOCache.h
-    ShaderVariant/VariantPSOCache.cpp
 
     Bindless/GPUStructuredBuffer.h
     Bindless/GPUStructuredBuffer.cpp

@@ -6,7 +6,6 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include "Layers/xrRender/Bindless/UnifiedVertex.h"
-#include "Layers/xrRender/ShaderVariant/VariantPartitionConfig.h"
 #include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
 #include "Layers/xrRender/ClusterDAG.h"
 
@@ -357,33 +356,6 @@ public:
     nvrhi::IBuffer* GetTransparentCompactCountBuffer() const { return m_transparentSet.compactCountBuffer.Get(); }
 
     // ───────────────────────────────────────────────────────
-    //  VARIANT PARTITIONING (multi-PSO rendering)
-    // ───────────────────────────────────────────────────────
-    static constexpr u32 MAX_SHADER_VARIANTS = 32;
-
-    struct VariantPartitionBuffers {
-        nvrhi::BufferHandle variantCountBuffer;
-        nvrhi::BufferHandle reorderedDrawArgsBuffer;
-        nvrhi::BufferHandle reorderedBatchIndicesBuffer;
-        nvrhi::BufferHandle reorderedMaterialIDsBuffer;
-        nvrhi::BufferHandle drawIndexBuffer;
-        u32 binCapacity = 0;
-        u32 variantCount = 0;
-
-        VariantPartitionConfig ToConfig() const {
-            return {
-                variantCountBuffer.Get(), reorderedDrawArgsBuffer.Get(),
-                reorderedBatchIndicesBuffer.Get(), reorderedMaterialIDsBuffer.Get(),
-                drawIndexBuffer.Get(), binCapacity, variantCount
-            };
-        }
-    };
-
-    bool IsVariantPartitionEnabled() const { return m_variantPartitionEnabled; }
-    const VariantPartitionBuffers& GetStaticPartition() const { return m_staticPartition; }
-    const VariantPartitionBuffers& GetTransparentPartition() const { return m_transparentPartition; }
-
-    // ───────────────────────────────────────────────────────
     //  CULLING STATS READBACK (for profiling overlay)
     // ───────────────────────────────────────────────────────
     // Returns previous frame's visible counts (1-frame latency to avoid GPU stall)
@@ -516,7 +488,6 @@ private:
     struct CullPhaseParams {
         bool useHiZ = false;
         bool includeTransparent = false;
-        bool runPartition = false;
         u32 stamp = 0;
         u32 hizWidth = 0;
         u32 hizHeight = 0;
@@ -617,23 +588,6 @@ private:
     nvrhi::TextureHandle m_dummyHiZ;
 
     fg::BufferHandle m_compactParamsCB;
-
-    // Variant partition pipeline
-    nvrhi::ComputePipelineHandle m_variantPartitionPipeline;
-    nvrhi::BindingLayoutHandle m_variantPartitionLayout;
-    fg::BufferHandle m_variantPartitionParamsCB;
-    VariantPartitionBuffers m_staticPartition;
-    VariantPartitionBuffers m_transparentPartition;
-    bool m_variantPartitionEnabled = false;
-
-    void CreateVariantPartitionResources(fg::RenderDevice* device);
-    void InitPartitionBuffers(nvrhi::IDevice* nvDevice, VariantPartitionBuffers& part,
-        const char* prefix, u32 variantCount, u32 maxObjects);
-    void DispatchVariantPartition(
-        nvrhi::ICommandList* cmdList,
-        nvrhi::IDevice* nvDevice,
-        const CullSetBuffers& set,
-        VariantPartitionBuffers& partition);
 
     bool m_staticTerrainDrawArgsUploaded = false;  // True after first upload (terrain)
 

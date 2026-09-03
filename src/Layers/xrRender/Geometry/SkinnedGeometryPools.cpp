@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "SkinnedGeometryPools.h"
 #include "Layers/xrRender/BufferUtils.h"
-#include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 
 namespace xray::render::fg {
 

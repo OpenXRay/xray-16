@@ -4,7 +4,6 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
-#include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/Materials/ShaderInfo.h"
 
 using namespace xray::render::resources;
@@ -57,7 +56,6 @@ void MaterialSystem::Shutdown()
     if (!m_initialized)
         return;
 
-    VariantPSOCache::Instance().Shutdown();
     ShaderVariantRegistry::Instance().Shutdown();
     ClearCaches();
 

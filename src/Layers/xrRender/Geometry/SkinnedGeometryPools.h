@@ -8,6 +8,16 @@ class IndexStagingBuffer;
 
 namespace xray::render::fg {
 
+enum VertexFormatID : u32
+{
+    VF_MDI = 0,
+    VF_SKINNED_NONHQ = 1,
+    VF_SKINNED_HQ1W = 2,
+    VF_SKINNED_HQ4W = 3,
+    VF_SKINNED_HQ2W = 4,
+    VF_SKINNED_HQ3W = 5,
+};
+
 u32 SkinnedFormatFromRenderMode(u16 renderMode, u32 vertexStride);
 u32 SkinnedFormatStride(u32 formatID);
 

@@ -18,7 +18,6 @@
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"  // For terrain rendering
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"  // For variant textures
-#include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
@@ -277,30 +276,7 @@ static void renderBindlessForward(
         DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, set.totalObjectCount);
     };
 
-    if (config.variantPartition.Enabled()) {
-        auto* backendDev = device->GetBackend();
-        VariantPartitionDrawConfig vpCfg;
-        vpCfg.defaultPipeline = ps.bindlessPipeline.Get();
-        vpCfg.inputLayout = ps.bindlessInputLayout;
-        vpCfg.passLayout = ps.bindlessLayout;
-        vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
-        vpCfg.bindlessTable = bindlessTable;
-        vpCfg.megaVertexBuffer = config.megaVertexBuffer;
-        vpCfg.baseBindings = buildBindingDescForSet(config.staticSet);
-        vpCfg.objectCount = config.staticSet.totalObjectCount;
-        vpCfg.partition = config.variantPartition;
-        vpCfg.selectTransparent = false;
-
-        DrawVariantPartition(cmdList, nvDevice, framebuffer, state, vpCfg);
-
-        state.pipeline = ps.bindlessPipeline;
-        state.vertexBuffers = {
-            {config.megaVertexBuffer, 0, 0},
-            {drawIndexBuffer, 1, 0}
-        };
-    } else {
-        drawSet(config.staticSet);
-    }
+    drawSet(config.staticSet);
     drawSet(config.dynamicSet);
 
     // ═══════════════════════════════════════════════════════

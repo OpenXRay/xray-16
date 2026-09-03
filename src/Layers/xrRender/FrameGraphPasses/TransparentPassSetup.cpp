@@ -10,7 +10,6 @@
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
-#include "Layers/xrRender/ShaderVariant/VariantPSOCache.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
@@ -219,26 +218,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             state.viewport.addViewport(viewport);
             state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
-            if (cfg.variantPartition.Enabled()) {
-                auto* backendDev = data.device->GetBackend();
-
-                VariantPartitionDrawConfig vpCfg;
-                vpCfg.defaultPipeline = data.passState->pipeline.Get();
-                vpCfg.inputLayout = data.passState->inputLayout;
-                vpCfg.passLayout = data.passState->layout;
-                vpCfg.bindlessLayout = backendDev ? backendDev->GetBindlessLayout() : nullptr;
-                vpCfg.bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
-                vpCfg.megaVertexBuffer = cfg.megaVertexBuffer;
-                vpCfg.baseBindings = transparentBindDesc;
-                vpCfg.objectCount = cfg.objectCount;
-                vpCfg.partition = cfg.variantPartition;
-                vpCfg.selectTransparent = true;
-
-                DrawVariantPartition(cmdList, nvDevice, framebuffer, state, vpCfg);
-            } else {
-                cmdList->setGraphicsState(state);
-                DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, cfg.objectCount);
-            }
+            cmdList->setGraphicsState(state);
+            DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, cfg.objectCount);
         }
     );
 
