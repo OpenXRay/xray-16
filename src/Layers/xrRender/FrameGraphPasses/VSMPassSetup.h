@@ -34,9 +34,10 @@ constexpr u32 kVSMStaticSlots = kVSMAtlasW * kVSMAtlasH;
 constexpr u32 kVSMMaxPhys = 2048;
 constexpr u32 kVSMAtlasWDyn = 64;
 constexpr u32 kVSMAtlasHDyn = 32;
-constexpr u32 kVSMSkinnedCap = 256;
-constexpr u32 kVSMMaxSkinned = 256;
-constexpr u32 kVSMSkinnedFormats = 6;
+constexpr u32 kVSMDynPairCapOpaque = 1u << 16;
+constexpr u32 kVSMDynPairCapAT = 1u << 15;
+constexpr u32 kVSMDynPairCapSkinned = 1u << 16;
+constexpr u32 kVSMDynStreamCount = 3;
 constexpr u32 kVSMPairCapOpaque = 1u << 20;
 constexpr u32 kVSMPairCapTerrain = 1u << 19;
 constexpr u32 kVSMPairCapAT = 1u << 19;
@@ -99,9 +100,9 @@ struct VSMState {
     nvrhi::BufferHandle dynPageList;
     nvrhi::BufferHandle dynAllocInfo;
     nvrhi::BufferHandle dynUsed;
-    nvrhi::BufferHandle skinPages;
-    nvrhi::BufferHandle skinArgs;
-    nvrhi::BufferHandle skinStats;
+    nvrhi::BufferHandle dynStats;
+    nvrhi::BufferHandle dynPairs[kVSMDynStreamCount];
+    nvrhi::BufferHandle dynArgs[kVSMDynStreamCount];
     bool dynActive = false;
     bool dynRendered = false;
     u32 dynCasters = 0;
@@ -156,13 +157,20 @@ struct VSMState {
     nvrhi::BindingLayoutHandle resolveLayout;
     nvrhi::ComputePipelineHandle allocPipeline;
     nvrhi::BindingLayoutHandle allocLayout;
-    nvrhi::ComputePipelineHandle skinBinPipeline;
-    nvrhi::BindingLayoutHandle skinBinLayout;
-    nvrhi::GraphicsPipelineHandle skinPagePipeline;
-    nvrhi::BindingLayoutHandle skinPageLayout;
-    nvrhi::ShaderHandle skinPageVS;
-    bool skinPipelinesReady = false;
-    bool skinPipelinesFailed = false;
+    nvrhi::ComputePipelineHandle dynBinPipeline;
+    nvrhi::BindingLayoutHandle dynBinLayout;
+    nvrhi::ComputePipelineHandle dynArgsPipeline;
+    nvrhi::BindingLayoutHandle dynArgsLayout;
+    nvrhi::GraphicsPipelineHandle dynPagePipeline;
+    nvrhi::GraphicsPipelineHandle dynPageATPipeline;
+    nvrhi::GraphicsPipelineHandle dynSkinPagePipeline;
+    nvrhi::BindingLayoutHandle dynPageLayout;
+    nvrhi::BindingLayoutHandle dynPageATLayout;
+    nvrhi::BindingLayoutHandle dynSkinPageLayout;
+    nvrhi::ShaderHandle dynPageVS;
+    nvrhi::ShaderHandle dynSkinPageVS;
+    bool dynPipelinesReady = false;
+    bool dynPipelinesFailed = false;
     nvrhi::GraphicsPipelineHandle clearPipeline;
     nvrhi::BindingLayoutHandle clearLayout;
     nvrhi::ComputePipelineHandle binPipeline;
@@ -192,6 +200,10 @@ struct VSMDrawConfig {
 
 struct VSMDynConfig {
     GPUCullingManager* gpuCulling = nullptr;
+    nvrhi::IBuffer* entryBuffer = nullptr;
+    nvrhi::IBuffer* dynamicInstanceBuffer = nullptr;
+    nvrhi::IBuffer* megaVertexBuffer = nullptr;
+    nvrhi::IBuffer* megaIndexBuffer = nullptr;
 };
 
 struct VSMOutput {

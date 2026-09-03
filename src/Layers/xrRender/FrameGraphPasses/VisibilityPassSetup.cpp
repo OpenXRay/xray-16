@@ -148,7 +148,7 @@ void renderVisibilityRaster(
             draw(state.terrainPipeline, bindingSet, config.cluster.terrainArgsBuffer);
     }
 
-    const u32 skinnedEntries = gpuCulling ? gpuCulling->GetSkinnedEntryCount() : 0u;
+    const u32 skinnedEntries = gpuCulling ? gpuCulling->GetSkinnedVisibleEntryCount() : 0u;
     if (skinnedEntries > 0 && state.skinnedPipeline) {
         auto* skinnedVsRefl = shaderLoader->GetCachedReflection("cluster_vis_skinned", ".vs");
         nvrhi::IBuffer* preVB = gpuCulling->GetSkinnedPreVertexBuffer();

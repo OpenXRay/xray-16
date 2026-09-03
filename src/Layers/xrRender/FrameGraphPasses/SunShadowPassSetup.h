@@ -30,6 +30,7 @@ constexpr u32 kSunTargetFar = 0;
 constexpr u32 kSunTargetCasc0 = 1;
 constexpr u32 kSunTargetCasc1 = 2;
 constexpr u32 kSunTargetCount = 3;
+constexpr u32 kSunShadowSkinnedEntryCap = 16384;
 constexpr u32 kSunMapSlots = kSunTargetCount + 1;
 
 struct SunShadowTarget {
@@ -42,6 +43,9 @@ struct SunShadowTarget {
     nvrhi::BufferHandle opaqueArgs;
     nvrhi::BufferHandle terrainArgs;
     nvrhi::BufferHandle atArgs;
+    nvrhi::BufferHandle skinnedCountBuffer;
+    nvrhi::BufferHandle skinnedStream;
+    nvrhi::BufferHandle skinnedArgs;
     u32 streamCapacity = 0;
 
     nvrhi::BufferHandle readback[kReadbackSlots];
@@ -83,11 +87,11 @@ struct SunShadowState {
     nvrhi::ShaderHandle depthDynamicPS;
     bool depthPipelinesFailed = false;
 
-    nvrhi::GraphicsPipelineHandle skinnedMDIPipeline;
-    nvrhi::BindingLayoutHandle skinnedMDILayout;
-    nvrhi::ShaderHandle skinnedDepthMDIPS;
-    bool skinnedPipelinesReady = false;
-    bool skinnedPipelinesFailed = false;
+    nvrhi::GraphicsPipelineHandle depthSkinnedPipeline;
+    nvrhi::BindingLayoutHandle depthSkinnedLayout;
+    nvrhi::ShaderHandle skinnedVS;
+    nvrhi::ComputePipelineHandle skinnedArgsPipeline;
+    nvrhi::BindingLayoutHandle skinnedArgsLayout;
     int rasterBias = -1;
     float rasterSlope = -1.0f;
 
@@ -110,6 +114,7 @@ struct SunShadowCullOutput {
         framegraph::VirtualResourceHandle opaqueArgs;
         framegraph::VirtualResourceHandle terrainArgs;
         framegraph::VirtualResourceHandle atArgs;
+        framegraph::VirtualResourceHandle skinnedArgs;
     };
     Target targets[kSunTargetCount];
     bool active = false;
@@ -153,9 +158,11 @@ SunShadowCullOutput setupSunShadowCullPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle orderAfter,
+    framegraph::VirtualResourceHandle skinnedOrder,
     nvrhi::IBuffer* entryBuffer,
     u32 entryCapacity,
     u32 entryCount,
+    GPUCullingManager* gpuCulling,
     SunShadowState* state,
     xray::profiler::GPUProfiler* gpuProfiler = nullptr);
 

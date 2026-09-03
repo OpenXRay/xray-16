@@ -41,6 +41,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
         return;
 
     ClusterEntry e = g_Entries[idx];
+    if ((e.flags & 32u) != 0u)
+        return;
 
     bool at = (e.flags & 1u) != 0;
     if (at && g_IncludeAT == 0)
