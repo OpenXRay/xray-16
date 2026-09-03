@@ -32,6 +32,7 @@ cbuffer VsmBinParams : register(b5)
 StructuredBuffer<ClusterEntry> g_Entries : register(t0);
 StructuredBuffer<uint> g_PageTable : register(t1);
 StructuredBuffer<uint> g_SlotDirty : register(t2);
+StructuredBuffer<int4> g_DirtyRects : register(t3);
 RWStructuredBuffer<uint> g_Stats : register(u0);
 RWStructuredBuffer<uint2> g_PairsOpaque : register(u1);
 RWStructuredBuffer<uint2> g_PairsTerrain : register(u2);
@@ -71,6 +72,9 @@ void main(uint3 dtID : SV_DispatchThreadID)
             continue;
         }
         VSM_PAGE_RANGE(Lc, lp, R, loC, hiC, p0C, p1C);
+        int4 rcC = g_DirtyRects[Lc];
+        if (rcC.x > rcC.z || p1C.x < rcC.x || p0C.x > rcC.z || p1C.y < rcC.y || p0C.y > rcC.w)
+            continue;
         for (int py = p0C.y; py <= p1C.y; ++py)
         for (int px = p0C.x; px <= p1C.x; ++px)
         {
@@ -113,6 +117,9 @@ void main(uint3 dtID : SV_DispatchThreadID)
         if (!LodPass(e, Lw))
             continue;
         VSM_PAGE_RANGE(Lw, lp, R, loW, hiW, p0W, p1W);
+        int4 rcW = g_DirtyRects[Lw];
+        if (rcW.x > rcW.z || p1W.x < rcW.x || p0W.x > rcW.z || p1W.y < rcW.y || p0W.y > rcW.w)
+            continue;
         for (int py = p0W.y; py <= p1W.y; ++py)
         for (int px = p0W.x; px <= p1W.x; ++px)
         {
