@@ -1212,7 +1212,7 @@ void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
         bp.capOpaque = capOpaque;
         bp.capAT = capAT;
         bp.statsBase = statsBase;
-        auto binCB = cache.GetOrCreateVolatileCB("VSM", "DynBinParams", sizeof(VsmDynBinParams), data.device, 4);
+        auto binCB = cache.GetOrCreateVolatileCB("VSM", "DynBinParams", sizeof(VsmDynBinParams), data.device, 64);
         cmdList->writeBuffer(binCB, &bp, sizeof(bp));
         cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
 
