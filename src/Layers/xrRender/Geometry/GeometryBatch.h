@@ -16,34 +16,20 @@ namespace xray::render {
 using fg::dxRender_Visual;
 
 struct GeometryBatch {
-    nvrhi::BufferHandle vertexBuffer;
-    nvrhi::BufferHandle indexBuffer;
-
     u32 indexCount = 0;
     u32 startIndex = 0;
     s32 baseVertex = 0;
     u32 vertexCount = 0;
-    u32 vertexStride = 0;
 
-    u32 materialID = 0;
     u32 bindlessMaterialID = UINT32_MAX;
-
-    fg::TextureHandle albedoTexture;
-    fg::TextureHandle normalTexture;
-    fg::TextureHandle materialTexture;
 
     Fmatrix worldMatrix;
 
     Fvector worldBoundsCenter;
     float worldBoundsRadius = 0.0f;
 
-    nvrhi::IGraphicsPipeline* pipeline = nullptr;
-    nvrhi::IBindingSet* bindingSet = nullptr;
-
     dxRender_Visual* visual = nullptr;
     IRenderable* renderable = nullptr;
-
-    bool isVisible = true;
 
     bool isStatic = false;
 
@@ -61,8 +47,6 @@ struct GeometryBatch {
     u32 terrainMaterialID = UINT32_MAX;
 
     float ssa = 0.0f;
-
-    shared_str debugName;
 
     fg::MeshAllocation megaBufferAlloc;
 
@@ -117,7 +101,6 @@ private:
     xr_vector<GeometryBatch> m_batches;
     Stats m_stats;
 
-    static u64 ComputeSortKey(const GeometryBatch& batch);
 };
 
 extern GeometryCollector* g_geometryCollector;

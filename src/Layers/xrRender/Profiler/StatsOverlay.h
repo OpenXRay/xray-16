@@ -25,10 +25,6 @@ struct RenderStats
     u32 megaBufferVertices = 0;
     u32 megaBufferIndices = 0;
 
-    u32 skinnedMeshes = 0;
-    u32 totalBones = 0;
-    u32 maxBonesPerMesh = 0;
-
     u32 particleCullSubmitted = 0;
     u32 particleCullVisible = 0;
     u32 particleQuadsSubmitted = 0;
@@ -91,7 +87,6 @@ struct RenderStats
         totalBatches = staticBatches = dynamicBatches = skinnedBatches = terrainBatches = particleBatches = 0;
         totalTriangles = staticTriangles = dynamicTriangles = skinnedTriangles = terrainTriangles = 0;
         megaBufferVertices = megaBufferIndices = 0;
-        skinnedMeshes = totalBones = maxBonesPerMesh = 0;
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
         clusterStaticEntries = clusterTrianglesDrawn = clusterTerrainTrianglesDrawn = 0;

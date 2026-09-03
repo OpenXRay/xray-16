@@ -467,15 +467,6 @@ void StatsOverlay::RenderGeometrySection()
 
         ImGui::Unindent();
 
-        if (s.skinnedMeshes > 0)
-        {
-            ImGui::Text("Skinning:");
-            ImGui::Indent();
-            ImGui::Text("Meshes: %u", s.skinnedMeshes);
-            ImGui::Text("Bones:  %u (max: %u)", s.totalBones, s.maxBonesPerMesh);
-            ImGui::Unindent();
-        }
-
         if (s.clusterEntries > 0)
         {
             ImGui::Text("Clusters:");

@@ -622,8 +622,6 @@ void FrameGraphRenderer::RenderStatsOverlay()
             const auto& batches = m_geometryCollector->GetBatches();
             stats.totalBatches = static_cast<u32>(batches.size());
 
-            xr_set<IRenderVisual*> uniqueSkeletons;
-
             for (const auto& batch : batches)
             {
                 u32 triangles = batch.indexCount / 3;
@@ -633,25 +631,6 @@ void FrameGraphRenderer::RenderStatsOverlay()
                 {
                     stats.skinnedBatches++;
                     stats.skinnedTriangles += triangles;
-
-                    if (batch.renderable)
-                    {
-                        IRenderVisual* rootVisual = batch.renderable->GetRenderData().visual;
-                        if (rootVisual && uniqueSkeletons.find(rootVisual) == uniqueSkeletons.end())
-                        {
-                            uniqueSkeletons.insert(rootVisual);
-                            stats.skinnedMeshes++;
-
-                            IKinematics* K = rootVisual->dcast_PKinematics();
-                            if (K)
-                            {
-                                u32 boneCount = K->LL_BoneCount();
-                                stats.totalBones += boneCount;
-                                if (boneCount > stats.maxBonesPerMesh)
-                                    stats.maxBonesPerMesh = boneCount;
-                            }
-                        }
-                    }
                 }
                 else if (batch.isTerrain)
                 {
@@ -1917,8 +1896,6 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         return false;
 
     GeometryBatch batch;
-    batch.vertexBuffer = nvrhiVB;
-    batch.indexBuffer = nvrhiIB;
 
     u32 visualType = visual->getType();
     bool isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
@@ -1966,7 +1943,6 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         batch.startIndex = meshVisual->iBase;
         batch.baseVertex = meshVisual->vBase;
     }
-    batch.vertexStride = meshVisual->vStride;
     batch.vertexCount = meshVisual->vCount;
     batch.worldMatrix = worldTransform;
     batch.visual = visual;
@@ -2001,24 +1977,6 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
 
     float distSQ = Device.vCameraPosition.distance_to_sqr(batch.worldBoundsCenter) + EPS;
     batch.ssa = batch.worldBoundsRadius / distSQ;
-
-    batch.pipeline = nullptr;
-    batch.bindingSet = nullptr;
-
-    fg::ShaderKey shaderKey;
-    if (fg::ExtractShaderKey(visual, shaderKey)) {
-        static thread_local std::string s_debugNameBuffer;
-        s_debugNameBuffer = shaderKey.ToString();
-        batch.debugName = s_debugNameBuffer.c_str();
-    } else {
-        batch.debugName = "<unknown_shader>";
-    }
-
-    if (!nvrhiVB || !nvrhiIB) {
-        Msg("! [ProcessVisualGeometry] ERROR: Created batch with null buffers! VB=%p, IB=%p",
-            nvrhiVB.Get(), nvrhiIB.Get());
-        return false;
-    }
 
     if (m_materialCache) {
         if (m_materialCache->IsTerrainMaterial(visual)) {
@@ -2087,17 +2045,12 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
         return false;
 
     GeometryBatch batch;
-    batch.vertexBuffer = nvrhiVB;
-    batch.indexBuffer = nvrhiIB;
     batch.indexCount = meshVisual->iCount;
     batch.startIndex = meshVisual->iBase;
     batch.baseVertex = meshVisual->vBase;
-    batch.vertexStride = meshVisual->vStride;
     batch.worldMatrix = worldTransform;
     batch.visual = visual;
     batch.renderable = renderable;
-    batch.pipeline = nullptr;
-    batch.bindingSet = nullptr;
 
     u32 visualType = visual->getType();
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
@@ -2125,15 +2078,6 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
 
     if (m_materialCache) {
         batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
-    }
-
-    fg::ShaderKey shaderKey;
-    if (fg::ExtractShaderKey(visual, shaderKey)) {
-        static thread_local std::string s_hudDebugNameBuffer;
-        s_hudDebugNameBuffer = "HUD_" + shaderKey.ToString();
-        batch.debugName = s_hudDebugNameBuffer.c_str();
-    } else {
-        batch.debugName = "<hud_unknown_shader>";
     }
 
     m_hudBatches.push_back(batch);
