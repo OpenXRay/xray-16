@@ -35,15 +35,6 @@ namespace xray::render::fg {
 
 namespace xray::render::fg {
 
-struct GPUObjectData {
-    Fvector position;
-    float radius;
-    u32 batchIndex;
-    u32 flags;
-    float pad0, pad1;
-};
-static_assert(sizeof(GPUObjectData) == 32, "GPUObjectData must be 32 bytes for GPU alignment");
-
 struct GPUParticleData {
     Fvector position;
     float radius;
@@ -134,35 +125,6 @@ struct GPUInstanceData {
 };
 static_assert(sizeof(GPUInstanceData) == 80, "GPUInstanceData must be 80 bytes for GPU alignment");
 
-struct GPUCullOutput {
-    framegraph::VirtualResourceHandle visibleIndices;
-    framegraph::VirtualResourceHandle visibleCount;
-    framegraph::VirtualResourceHandle drawArgsBuffer;
-    framegraph::VirtualResourceHandle staticDrawArgsBuffer;
-    framegraph::VirtualResourceHandle dynamicDrawArgsBuffer;
-    framegraph::VirtualResourceHandle staticCompactDrawArgs;
-    framegraph::VirtualResourceHandle staticCompactBatchIndices;
-    framegraph::VirtualResourceHandle dynamicCompactDrawArgs;
-    framegraph::VirtualResourceHandle dynamicCompactBatchIndices;
-    u32 maxObjects;
-    u32 staticObjectCount;
-    u32 dynamicObjectCount;
-
-    framegraph::VirtualResourceHandle terrainDrawArgsBuffer;
-    framegraph::VirtualResourceHandle terrainCompactDrawArgs;
-    framegraph::VirtualResourceHandle terrainCompactBatchIndices;
-    framegraph::VirtualResourceHandle terrainCompactMaterialIDs;
-    framegraph::VirtualResourceHandle terrainCompactCount;
-    u32 terrainObjectCount;
-
-    framegraph::VirtualResourceHandle transparentCompactDrawArgs;
-    framegraph::VirtualResourceHandle transparentCompactBatchIndices;
-    framegraph::VirtualResourceHandle transparentCompactMaterialIDs;
-    framegraph::VirtualResourceHandle transparentCompactCount;
-    u32 transparentObjectCount;
-
-};
-
 class GPUCullingManager {
 public:
     GPUCullingManager();
@@ -177,24 +139,13 @@ public:
     void InvalidateStaticCullingData();
     void InvalidateShadersAndPipelines();
 
-    GPUCullOutput SetupCullingPass(
+    framegraph::VirtualResourceHandle SetupCullingPass(
         framegraph::FrameGraph& fg,
         const GeometryCollector* geometry
     );
 
-    void SetupHiZCullingPass(
-        framegraph::FrameGraph& fg,
-        framegraph::VirtualResourceHandle hizPyramid,
-        u32 hizWidth,
-        u32 hizHeight,
-        u32 hizMipLevels,
-        framegraph::VirtualResourceHandle staticDrawArgsHandle,
-        framegraph::VirtualResourceHandle dynamicDrawArgsHandle
-    );
-
-    u32 GetObjectCount() const { return m_objectCount; }
-    u32 GetStaticObjectCount() const { return m_staticSet.objectCount; }
-    u32 GetDynamicObjectCount() const { return m_dynamicSet.objectCount; }
+    u32 GetStaticObjectCount() const { return m_staticObjectCount; }
+    u32 GetDynamicObjectCount() const { return m_dynamicObjectCount; }
 
     bool IsEnabled() const { return m_initialized && m_computeEnabled; }
 
@@ -216,10 +167,6 @@ public:
 
     nvrhi::IBuffer* GetMegaVertexBuffer() const { return m_megaVertexBuffer.Get(); }
     nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
-    bool IsCompactionEnabled() const { return m_compactEnabled; }
-
-    void UploadInstanceData(fg::RenderContext* ctx, const GeometryCollector* geometry);
-
     u32 GetTotalVertexCount() const { return m_totalVertexCount; }
     u32 GetTotalIndexCount() const { return m_totalIndexCount; }
 
@@ -249,44 +196,23 @@ public:
 
     bool IsDebugEnabled() const;
 
-    nvrhi::IBuffer* GetStaticCompactDrawArgsBuffer() const { return m_staticSet.compactDrawArgsBuffer.Get(); }
-    nvrhi::IBuffer* GetStaticCompactBatchIndicesBuffer() const { return m_staticSet.compactBatchIndicesBuffer.Get(); }
-    nvrhi::IBuffer* GetStaticCompactMaterialIDBuffer() const { return m_staticSet.compactMaterialIDBuffer.Get(); }
-    nvrhi::IBuffer* GetStaticCompactCountBuffer() const { return m_staticSet.compactCountBuffer.Get(); }
-    nvrhi::IBuffer* GetStaticInstanceBuffer() const { return m_staticSet.instanceBuffer.Get(); }
-
-    nvrhi::IBuffer* GetDynamicCompactDrawArgsBuffer() const { return m_dynamicSet.compactDrawArgsBuffer.Get(); }
-    nvrhi::IBuffer* GetDynamicCompactBatchIndicesBuffer() const { return m_dynamicSet.compactBatchIndicesBuffer.Get(); }
-    nvrhi::IBuffer* GetDynamicCompactMaterialIDBuffer() const { return m_dynamicSet.compactMaterialIDBuffer.Get(); }
-    nvrhi::IBuffer* GetDynamicCompactCountBuffer() const { return m_dynamicSet.compactCountBuffer.Get(); }
-    nvrhi::IBuffer* GetDynamicInstanceBuffer() const { return m_dynamicSet.instanceBuffer.Get(); }
-
-    nvrhi::IBuffer* GetStaticDrawArgsBuffer() const { return m_staticSet.drawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticInstanceBuffer() const { return m_staticInstanceBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicInstanceBuffer() const { return m_dynamicInstanceBuffer.Get(); }
     u32 GetStaticResidualCount() const;
     u32 GetTerrainResidualCount() const;
-    nvrhi::IBuffer* GetDynamicDrawArgsBuffer() const { return m_dynamicSet.drawArgsBuffer.Get(); }
 
     u32 GetTerrainObjectCount() const { return m_terrainObjectCount; }
-    nvrhi::IBuffer* GetTerrainDrawArgsBuffer() const { return m_terrainDrawArgsBuffer.Get(); }
-    nvrhi::IBuffer* GetTerrainMaterialIDBuffer() const { return m_terrainMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainInstanceBuffer() const { return m_terrainInstanceBuffer.Get(); }
 
-    u32 GetTransparentObjectCount() const { return m_transparentSet.objectCount; }
-    nvrhi::IBuffer* GetTransparentInstanceBuffer() const { return m_transparentSet.instanceBuffer.Get(); }
-    nvrhi::IBuffer* GetTransparentCompactDrawArgsBuffer() const { return m_transparentSet.compactDrawArgsBuffer.Get(); }
-    nvrhi::IBuffer* GetTransparentCompactBatchIndicesBuffer() const { return m_transparentSet.compactBatchIndicesBuffer.Get(); }
-    nvrhi::IBuffer* GetTransparentCompactMaterialIDBuffer() const { return m_transparentSet.compactMaterialIDBuffer.Get(); }
-    nvrhi::IBuffer* GetTransparentCompactCountBuffer() const { return m_transparentSet.compactCountBuffer.Get(); }
+    u32 GetTransparentObjectCount() const { return m_transparentObjectCount; }
+    nvrhi::IBuffer* GetTransparentInstanceBuffer() const { return m_transparentInstanceBuffer.Get(); }
+    nvrhi::IBuffer* GetTransparentDrawArgsBuffer() const { return m_transparentDrawArgsBuffer.Get(); }
 
     struct CullingStats {
-        u32 staticVisible = 0;
-        u32 dynamicVisible = 0;
-        u32 terrainVisible = 0;
-        u32 transparentVisible = 0;
         u32 clusterVisible = 0;
         u32 clusterTerrainVisible = 0;
         u32 clusterTrianglesDrawn = 0;
         u32 clusterTerrainTrianglesDrawn = 0;
-        u32 totalVisible() const { return staticVisible + dynamicVisible + terrainVisible + transparentVisible; }
     };
     const CullingStats& GetCullingStats() const { return m_cullingStats; }
 
@@ -303,7 +229,7 @@ public:
     );
 
     u32 GetSkinnedObjectCount() const { return m_skinnedObjectCount; }
-    bool IsSkinnedEnabled() const { return m_initialized && m_skinnedEnabled && m_compactEnabled; }
+    bool IsSkinnedEnabled() const { return m_initialized && m_skinnedEnabled; }
     nvrhi::IBuffer* GetSkinnedRecordsBuffer() const { return m_skinnedRecordsBuffer.Get(); }
     SkinnedGeometryPools& GetSkinnedPools() { return m_skinnedPools; }
 
@@ -350,12 +276,6 @@ public:
     nvrhi::IBuffer* GetGlobalBoneBuffer() const { return m_globalBoneBuffer.Get(); }
 
     void ProcessStatsReadback();
-    nvrhi::IBuffer* GetTerrainInstanceBuffer() const { return m_terrainInstanceBuffer.Get(); }
-    nvrhi::IBuffer* GetTerrainBatchIndicesBuffer() const { return m_terrainBatchIndicesBuffer.Get(); }
-    nvrhi::IBuffer* GetTerrainCompactDrawArgsBuffer() const { return m_terrainCompactDrawArgsBuffer.Get(); }
-    nvrhi::IBuffer* GetTerrainCompactBatchIndicesBuffer() const { return m_terrainCompactBatchIndicesBuffer.Get(); }
-    nvrhi::IBuffer* GetTerrainCompactCountBuffer() const { return m_terrainCompactCountBuffer.Get(); }
-    nvrhi::IBuffer* GetTerrainCompactMaterialIDBuffer() const { return m_terrainCompactMaterialIDBuffer.Get(); }
 
     static constexpr u32 kDynamicClusterEntryCapacity = 16384;
     u32 GetClusterCullEntryCount() const { return m_clusterSet.entryCount + m_clusterSet.dynamicEntryCount; }
@@ -365,10 +285,10 @@ public:
     nvrhi::IBuffer* GetDynamicPrevWorldBuffer() const { return m_dynamicPrevWorldBuffer.Get(); }
     nvrhi::IBuffer* GetClusterEntryBuffer() const { return m_clusterSet.entryBuffer.Get(); }
     nvrhi::IBuffer* GetClusterVisibleEntryBuffer() const { return m_clusterSet.visibleEntryBuffer.Get(); }
-    nvrhi::IBuffer* GetClusterArgsBuffer() const { return m_clusterSet.argsBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterArgsBuffer() const { return m_clusterArgsBuffer.Get(); }
     nvrhi::IBuffer* GetClusterFadeBuffer() const { return m_clusterSet.fadeBuffer.Get(); }
     nvrhi::IBuffer* GetClusterTerrainVisibleEntryBuffer() const { return m_clusterSet.terrainVisibleEntryBuffer.Get(); }
-    nvrhi::IBuffer* GetClusterTerrainArgsBuffer() const { return m_clusterSet.terrainArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterTerrainArgsBuffer() const { return m_clusterTerrainArgsBuffer.Get(); }
     nvrhi::IBuffer* GetClusterTerrainFadeBuffer() const { return m_clusterSet.terrainFadeBuffer.Get(); }
     u32 GetClusterEntryCount() const { return m_clusterSet.entryCount; }
     u32 GetClusterStaticEntryCount() const { return m_clusterSet.staticEntryCount; }
@@ -377,58 +297,29 @@ public:
 
 private:
     void CreateBuffers(fg::RenderDevice* device);
-    void CreateComputePipeline(fg::RenderDevice* device);
-    void CreateCompactionResources(fg::RenderDevice* device);
     void CreateDebugResources(fg::RenderDevice* device);
     void CreateParticleResources(fg::RenderDevice* device);
     void CreateMegaBuffers();
 
-    struct CullPhaseParams {
-        bool useHiZ = false;
-        bool includeTransparent = false;
-        u32 stamp = 0;
-        u32 hizWidth = 0;
-        u32 hizHeight = 0;
-        u32 hizMipLevels = 0;
-    };
-    void ExecuteCullPhase(fg::RenderContext* ctx, nvrhi::ITexture* hizTexture, const CullPhaseParams& phase);
-
     void ExtractFrustumPlanes(Fmatrix& viewProj, Fvector4* outPlanes);
 
-    struct CullSetBuffers {
-        nvrhi::BufferHandle objectBuffer;
-        nvrhi::BufferHandle visibleIndexBuffer;
-        nvrhi::BufferHandle visibleCountBuffer;
-        nvrhi::BufferHandle drawArgsBuffer;
-        nvrhi::BufferHandle materialIDBuffer;
-        nvrhi::BufferHandle visibilityBuffer;
-        nvrhi::BufferHandle compactDrawArgsBuffer;
-        nvrhi::BufferHandle compactBatchIndicesBuffer;
-        nvrhi::BufferHandle compactMaterialIDBuffer;
-        nvrhi::BufferHandle compactCountBuffer;
-        nvrhi::BufferHandle compactDispatchArgsBuffer;
-        nvrhi::BufferHandle compactLocalPrefixBuffer;
-        nvrhi::BufferHandle compactGroupCountsBuffer;
-        nvrhi::BufferHandle compactGroupOffsetsBuffer;
-        nvrhi::BufferHandle instanceBuffer;
-        u32 objectCount = 0;
-        u32 maxObjects = 0;
-        bool drawArgsUploaded = false;
-        bool objectsUploaded = false;
-    };
-
-    CullSetBuffers m_staticSet;
-    CullSetBuffers m_dynamicSet;
+    nvrhi::BufferHandle m_staticInstanceBuffer;
+    nvrhi::BufferHandle m_dynamicInstanceBuffer;
+    nvrhi::BufferHandle m_transparentInstanceBuffer;
+    nvrhi::BufferHandle m_transparentDrawArgsBuffer;
+    u32 m_staticObjectCount = 0;
+    u32 m_dynamicObjectCount = 0;
+    u32 m_transparentObjectCount = 0;
+    u32 m_maxTransparentObjects = 0;
+    bool m_staticUploaded = false;
 
     struct ClusterCullBuffers {
         nvrhi::BufferHandle entryBuffer;
         nvrhi::BufferHandle countBuffer;
         nvrhi::BufferHandle visibleEntryBuffer;
         nvrhi::BufferHandle fadeBuffer;
-        nvrhi::BufferHandle argsBuffer;
         nvrhi::BufferHandle terrainVisibleEntryBuffer;
         nvrhi::BufferHandle terrainFadeBuffer;
-        nvrhi::BufferHandle terrainArgsBuffer;
         u32 entryCount = 0;
         u32 dynamicEntryCount = 0;
         u32 dynamicResidualCount = 0;
@@ -439,6 +330,8 @@ private:
         bool uploaded = false;
     };
     ClusterCullBuffers m_clusterSet;
+    nvrhi::BufferHandle m_clusterArgsBuffer;
+    nvrhi::BufferHandle m_clusterTerrainArgsBuffer;
     nvrhi::BufferHandle m_neutralFadeBuffer;
     bool m_neutralFadeZeroed = false;
     xr_vector<GPUClusterEntry> m_clusterEntryData;
@@ -461,59 +354,20 @@ private:
     void BuildClusterEntries();
     void UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice);
     bool EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice);
-    void DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
-        nvrhi::ITexture* hizTexture, const CullPhaseParams& phase);
+    void DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice);
 
-    fg::BufferHandle m_cullParamsCB;
-
-    nvrhi::ComputePipelineHandle m_cullPipeline;
-    nvrhi::ComputePipelineHandle m_clearArgsPipeline;
-    nvrhi::ComputePipelineHandle m_compactCountPipeline;
-    nvrhi::ComputePipelineHandle m_compactScanPipeline;
-    nvrhi::ComputePipelineHandle m_compactScatterPipeline;
-    nvrhi::BindingLayoutHandle m_cullLayout;
-    nvrhi::BindingLayoutHandle m_clearArgsLayout;
-    nvrhi::BindingLayoutHandle m_compactCountLayout;
-    nvrhi::BindingLayoutHandle m_compactScanLayout;
-    nvrhi::BindingLayoutHandle m_compactScatterLayout;
-    nvrhi::SamplerHandle m_pointSampler;
     nvrhi::TextureHandle m_dummyHiZ;
-
-    fg::BufferHandle m_compactParamsCB;
-
-    bool m_staticTerrainDrawArgsUploaded = false;
-
-    bool m_compactEnabled = false;
 
     bool m_staticDataCached = false;
 
-    nvrhi::BufferHandle m_terrainObjectBuffer;
-    nvrhi::BufferHandle m_terrainDrawArgsBuffer;
-    nvrhi::BufferHandle m_terrainVisibleIndexBuffer;
-    nvrhi::BufferHandle m_terrainVisibleCountBuffer;
-    nvrhi::BufferHandle m_terrainVisibilityBuffer;
+    u32 m_terrainObjectCount = 0;
+    u32 m_maxTerrainObjects = 0;
     nvrhi::BufferHandle m_terrainInstanceBuffer;
-    nvrhi::BufferHandle m_terrainBatchIndicesBuffer;
-    nvrhi::BufferHandle m_terrainCompactDrawArgsBuffer;
-    nvrhi::BufferHandle m_terrainCompactBatchIndicesBuffer;
-    nvrhi::BufferHandle m_terrainCompactCountBuffer;
-    nvrhi::BufferHandle m_terrainCompactDispatchArgsBuffer;
-    nvrhi::BufferHandle m_terrainCompactMaterialIDBuffer;
-    nvrhi::BufferHandle m_terrainCompactLocalPrefixBuffer;
-    nvrhi::BufferHandle m_terrainCompactGroupCountsBuffer;
-    nvrhi::BufferHandle m_terrainCompactGroupOffsetsBuffer;
-    nvrhi::BufferHandle m_terrainMaterialIDBuffer;
-
-    nvrhi::ComputePipelineHandle m_terrainApplyVisibilityPipeline;
-    nvrhi::BindingLayoutHandle m_terrainApplyVisibilityLayout;
-
-    CullSetBuffers m_transparentSet;
 
     nvrhi::BufferHandle m_debugBuffer;
     fg::BufferHandle m_debugComputeParamsCB;
     fg::BufferHandle m_debugGraphicsParamsCB;
 
-    nvrhi::ComputePipelineHandle m_debugComputePipeline;
     nvrhi::ComputePipelineHandle m_particleDebugComputePipeline;
     nvrhi::BindingLayoutHandle m_debugComputeLayout;
 
@@ -527,32 +381,27 @@ private:
     xr_vector<GPUParticleData> m_particleData;
     fg::RenderDevice* m_device = nullptr;
     RTAccelStructManager* m_rtAccelMgr = nullptr;
-    u32 m_objectCount = 0;
     u32 m_maxObjects = 0;
     bool m_initialized = false;
     bool m_computeEnabled = false;
 
-    xr_vector<GPUObjectData> m_staticObjectData;
+    xr_vector<u32> m_staticObjectFlags;
     xr_vector<IndirectDrawArgs> m_staticDrawArgsData;
     xr_vector<u32> m_staticMaterialIDData;
     xr_vector<GPUInstanceData> m_staticInstanceData;
     xr_vector<u32> m_staticBatchVertexCounts;
 
-    xr_vector<GPUObjectData> m_dynamicObjectData;
+    xr_vector<u32> m_dynamicObjectFlags;
     xr_vector<IndirectDrawArgs> m_dynamicDrawArgsData;
     xr_vector<u32> m_dynamicMaterialIDData;
     xr_vector<GPUInstanceData> m_dynamicInstanceData;
 
-    u32 m_terrainObjectCount = 0;
-    u32 m_maxTerrainObjects = 0;
-    xr_vector<GPUObjectData> m_terrainObjectData;
     xr_vector<IndirectDrawArgs> m_terrainDrawArgsData;
     xr_vector<u32> m_terrainMaterialIDData;
     xr_vector<GPUInstanceData> m_terrainInstanceData;
     xr_vector<ClusterMeshKey> m_terrainBatchKeys;
     bool m_terrainDataCached = false;
 
-    xr_vector<GPUObjectData> m_transparentObjectData;
     xr_vector<IndirectDrawArgs> m_transparentDrawArgsData;
     xr_vector<u32> m_transparentMaterialIDData;
     xr_vector<GPUInstanceData> m_transparentInstanceData;

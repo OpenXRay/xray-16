@@ -23,7 +23,6 @@ struct VS_OUTPUT
     float3 tangent  : TEXCOORD3;
     float3 bitangent: TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;
-    nointerpolation uint drawID : TEXCOORD6;
 };
 
 struct InstanceData
@@ -35,8 +34,6 @@ struct InstanceData
 };
 
 StructuredBuffer<InstanceData> g_InstanceData : register(t14);
-StructuredBuffer<uint> g_CompactBatchIndices : register(t15);
-StructuredBuffer<uint> g_CompactMaterialIDs : register(t16);
 
 float3 UnpackNormal(float4 packed)
 {
@@ -47,12 +44,9 @@ VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
 
-    uint drawID = input.drawIndex;
-
-    uint batchIndex = g_CompactBatchIndices[drawID];
-    InstanceData instanceData = g_InstanceData[batchIndex];
+    InstanceData instanceData = g_InstanceData[input.drawIndex];
     float4x4 worldMatrix = instanceData.world;
-    uint materialID = g_CompactMaterialIDs[drawID];
+    uint materialID = instanceData.materialID;
 
     float3 normalUnpacked = UnpackNormal(input.normal);
     float3 tangentUnpacked = UnpackNormal(input.tangent);
@@ -73,7 +67,6 @@ VS_OUTPUT main(VS_INPUT input)
     output.texcoord = input.texcoord;
 
     output.materialID = materialID;
-    output.drawID = drawID;
 
     return output;
 }

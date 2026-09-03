@@ -2,7 +2,7 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
-#include "ForwardColorPassSetup.h"
+#include "ClusterDrawConfig.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -46,7 +46,7 @@ MaterialResolveOutput setupMaterialResolvePass(
     framegraph::VirtualResourceHandle normal,
     framegraph::VirtualResourceHandle baseColor,
     framegraph::VirtualResourceHandle skinnedDrawArgs,
-    const BindlessForwardConfig& bindlessConfig,
+    const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
     nvrhi::IBuffer* splatBuffer,

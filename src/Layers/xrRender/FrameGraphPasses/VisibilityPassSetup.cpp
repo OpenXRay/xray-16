@@ -28,7 +28,7 @@ struct VisibilityPassData {
     MaterialCache* materialCache = nullptr;
     GPUCullingManager* gpuCulling = nullptr;
     VisibilityPassState* state = nullptr;
-    BindlessForwardConfig bindlessConfig;
+    ClusterDrawConfig config;
 };
 
 struct alignas(16) SkinnedVisParams {
@@ -61,7 +61,7 @@ void renderVisibilityRaster(
     fg::RenderDevice* device,
     nvrhi::ITexture* depthRT,
     nvrhi::ITexture* visRT,
-    const BindlessForwardConfig& config,
+    const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
     VisibilityPassState& state)
@@ -70,7 +70,7 @@ void renderVisibilityRaster(
     cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
     cmdList->clearTextureUInt(visRT, nvrhi::AllSubresources, 0);
 
-    if (!config.UseGPUCulling() || !config.UseMegaBuffers())
+    if (!config.UseMegaBuffers())
         return;
 
     if (materialCache) {
@@ -119,33 +119,33 @@ void renderVisibilityRaster(
         cmdList->drawIndirect(0, 1);
     };
 
-    if (config.cluster.IsValid()) {
+    if (config.IsValid()) {
         BindingSetBuilder bsb(*vsRefl, *atRefl, nvDevice, "VisibilityRaster.Cluster");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
         bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-        bsb.BufferSRV("g_InstanceData", config.cluster.instanceBuffer);
-        bsb.BufferSRV("g_DynamicInstanceData", config.cluster.dynamicInstanceBuffer ? config.cluster.dynamicInstanceBuffer : config.cluster.instanceBuffer);
-        bsb.BufferSRV("g_VisibleEntries", config.cluster.visibleEntryBuffer);
-        bsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
+        bsb.BufferSRV("g_InstanceData", config.instanceBuffer);
+        bsb.BufferSRV("g_DynamicInstanceData", config.dynamicInstanceBuffer ? config.dynamicInstanceBuffer : config.instanceBuffer);
+        bsb.BufferSRV("g_VisibleEntries", config.visibleEntryBuffer);
+        bsb.BufferSRV("g_Entries", config.entryBuffer);
         bsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
         bsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
-        bsb.BufferSRV("g_DrawFades", config.cluster.fadeBuffer);
+        bsb.BufferSRV("g_DrawFades", config.fadeBuffer);
         if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.layout, nvDevice))
-            draw(state.pipeline, bindingSet, config.cluster.argsBuffer);
+            draw(state.pipeline, bindingSet, config.argsBuffer);
     }
 
-    if (config.cluster.TerrainValid()) {
+    if (config.TerrainValid()) {
         BindingSetBuilder bsb(*vsRefl, *fadeRefl, nvDevice, "VisibilityRaster.ClusterTerrain");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-        bsb.BufferSRV("g_InstanceData", config.cluster.terrainInstanceBuffer);
-        bsb.BufferSRV("g_DynamicInstanceData", config.cluster.dynamicInstanceBuffer ? config.cluster.dynamicInstanceBuffer : config.cluster.terrainInstanceBuffer);
-        bsb.BufferSRV("g_VisibleEntries", config.cluster.terrainVisibleEntryBuffer);
-        bsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
+        bsb.BufferSRV("g_InstanceData", config.terrainInstanceBuffer);
+        bsb.BufferSRV("g_DynamicInstanceData", config.dynamicInstanceBuffer ? config.dynamicInstanceBuffer : config.terrainInstanceBuffer);
+        bsb.BufferSRV("g_VisibleEntries", config.terrainVisibleEntryBuffer);
+        bsb.BufferSRV("g_Entries", config.entryBuffer);
         bsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
         bsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
-        bsb.BufferSRV("g_DrawFades", config.cluster.terrainFadeBuffer);
+        bsb.BufferSRV("g_DrawFades", config.terrainFadeBuffer);
         if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.terrainLayout, nvDevice))
-            draw(state.terrainPipeline, bindingSet, config.cluster.terrainArgsBuffer);
+            draw(state.terrainPipeline, bindingSet, config.terrainArgsBuffer);
     }
 
     const u32 skinnedEntries = gpuCulling ? gpuCulling->GetSkinnedVisibleEntryCount() : 0u;
@@ -271,20 +271,20 @@ VisibilityPassOutput setupVisibilityPass(
     VirtualResourceHandle visIdTarget,
     VirtualResourceHandle drawArgsBuffer,
     VirtualResourceHandle skinnedDrawArgs,
-    const BindlessForwardConfig& bindlessConfig,
+    const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
     VisibilityPassState* state)
 {
     auto& passData = fg.addCallbackPass<VisibilityPassData>(
         "Visibility Raster",
-        [&, depthTarget, visIdTarget, drawArgsBuffer, skinnedDrawArgs, bindlessConfig, materialCache, gpuCulling, state](FrameGraph& builder, PassHandle passHandle, VisibilityPassData& data) {
+        [&, depthTarget, visIdTarget, drawArgsBuffer, skinnedDrawArgs, config, materialCache, gpuCulling, state](FrameGraph& builder, PassHandle passHandle, VisibilityPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.materialCache = materialCache;
             data.gpuCulling = gpuCulling;
             data.state = state;
-            data.bindlessConfig = bindlessConfig;
+            data.config = config;
             data.depth = passBuilder.write(depthTarget, ResourceState::DepthStencilWrite);
             data.visId = passBuilder.write(visIdTarget, ResourceState::RenderTarget);
             if (drawArgsBuffer.is_valid())
@@ -297,7 +297,7 @@ VisibilityPassOutput setupVisibilityPass(
             auto* visRT = fg.GetPhysicalTexture(data.visId);
             if (!depthRT || !visRT || !ctx->GetCommandList())
                 return;
-            renderVisibilityRaster(ctx, data.device, depthRT, visRT, data.bindlessConfig, data.materialCache,
+            renderVisibilityRaster(ctx, data.device, depthRT, visRT, data.config, data.materialCache,
                 data.skinnedDrawArgs.is_valid() ? data.gpuCulling : nullptr, *data.state);
         });
 

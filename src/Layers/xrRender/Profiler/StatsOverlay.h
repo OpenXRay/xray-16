@@ -22,10 +22,6 @@ struct RenderStats
     u32 skinnedTriangles = 0;
     u32 terrainTriangles = 0;
 
-    u32 objectsSubmitted = 0;
-    u32 objectsCulled = 0;
-    u32 objectsVisible = 0;
-
     u32 megaBufferVertices = 0;
     u32 megaBufferIndices = 0;
 
@@ -42,9 +38,9 @@ struct RenderStats
     u32 clusterVisible = 0;
     u32 clusterTerrainEntries = 0;
     u32 clusterStaticEntries = 0;
-    u32 forwardResidualStatic = 0;
-    u32 forwardResidualTerrain = 0;
-    u32 forwardResidualDynamic = 0;
+    u32 residualStatic = 0;
+    u32 residualTerrain = 0;
+    u32 residualDynamic = 0;
     u32 clusterTrianglesDrawn = 0;
     u32 clusterTerrainTrianglesDrawn = 0;
     u32 clusterTerrainVisible = 0;
@@ -92,13 +88,12 @@ struct RenderStats
     {
         totalBatches = staticBatches = dynamicBatches = skinnedBatches = terrainBatches = particleBatches = 0;
         totalTriangles = staticTriangles = dynamicTriangles = skinnedTriangles = terrainTriangles = 0;
-        objectsSubmitted = objectsCulled = objectsVisible = 0;
         megaBufferVertices = megaBufferIndices = 0;
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
         particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
         clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
         clusterStaticEntries = clusterTrianglesDrawn = clusterTerrainTrianglesDrawn = 0;
-        forwardResidualStatic = forwardResidualTerrain = forwardResidualDynamic = 0;
+        residualStatic = residualTerrain = residualDynamic = 0;
         vsmActive = vsmSunMoving = false;
         vsmPages = vsmDirtyPages = vsmWrongPages = 0;
         vsmBinDraws = vsmBinInstances = vsmBinMaxPages = vsmBinLodCulled = vsmBinDrops = 0;

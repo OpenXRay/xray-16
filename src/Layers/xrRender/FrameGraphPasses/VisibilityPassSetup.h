@@ -2,7 +2,7 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
-#include "ForwardColorPassSetup.h"
+#include "ClusterDrawConfig.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -54,7 +54,7 @@ VisibilityPassOutput setupVisibilityPass(
     framegraph::VirtualResourceHandle visIdTarget,
     framegraph::VirtualResourceHandle drawArgsBuffer,
     framegraph::VirtualResourceHandle skinnedDrawArgs,
-    const BindlessForwardConfig& bindlessConfig,
+    const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
     VisibilityPassState* state);

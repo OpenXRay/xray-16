@@ -34,7 +34,7 @@ struct MaterialResolvePassData {
     GPUCullingManager* gpuCulling = nullptr;
     nvrhi::IBuffer* splatBuffer = nullptr;
     MaterialResolvePassState* state = nullptr;
-    BindlessForwardConfig bindlessConfig;
+    ClusterDrawConfig config;
     Fmatrix prevView;
     Fmatrix prevProj;
     bool motionValid = false;
@@ -110,7 +110,7 @@ MaterialResolveOutput setupMaterialResolvePass(
     VirtualResourceHandle normal,
     VirtualResourceHandle baseColor,
     VirtualResourceHandle skinnedDrawArgs,
-    const BindlessForwardConfig& bindlessConfig,
+    const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
     nvrhi::IBuffer* splatBuffer,
@@ -139,14 +139,14 @@ MaterialResolveOutput setupMaterialResolvePass(
 
     auto& passData = fg.addCallbackPass<MaterialResolvePassData>(
         "Material Resolve",
-        [&, visId, depth, color, normal, baseColor, skinnedDrawArgs, bindlessConfig, materialCache, gpuCulling, splatBuffer, prevView, prevProj, motionValid, width, height, state, motionHandle, visDepthHandle](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
+        [&, visId, depth, color, normal, baseColor, skinnedDrawArgs, config, materialCache, gpuCulling, splatBuffer, prevView, prevProj, motionValid, width, height, state, motionHandle, visDepthHandle](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.materialCache = materialCache;
             data.gpuCulling = gpuCulling;
             data.splatBuffer = splatBuffer;
             data.state = state;
-            data.bindlessConfig = bindlessConfig;
+            data.config = config;
             data.prevView = prevView;
             data.prevProj = prevProj;
             data.motionValid = motionValid;
@@ -180,8 +180,8 @@ MaterialResolveOutput setupMaterialResolvePass(
             cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
             cmdList->clearTextureFloat(baseColorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
 
-            const auto& config = data.bindlessConfig;
-            if (!config.cluster.IsValid() || !config.UseMegaBuffers())
+            const auto& config = data.config;
+            if (!config.IsValid() || !config.UseMegaBuffers())
                 return;
 
             if (data.materialCache) {
@@ -202,7 +202,7 @@ MaterialResolveOutput setupMaterialResolvePass(
                 return;
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
-            nvrhi::IBuffer* terrainInstances = config.cluster.terrainInstanceBuffer ? config.cluster.terrainInstanceBuffer : config.cluster.instanceBuffer;
+            nvrhi::IBuffer* terrainInstances = config.terrainInstanceBuffer ? config.terrainInstanceBuffer : config.instanceBuffer;
 
             GPUCullingManager* gpuCulling = data.skinnedDrawArgs.is_valid() ? data.gpuCulling : nullptr;
             const bool skinned = gpuCulling && gpuCulling->GetSkinnedEntryCount() > 0
@@ -222,18 +222,18 @@ MaterialResolveOutput setupMaterialResolvePass(
             bsb.ConstantBuffer("MaterialResolveParams", paramsCB);
             bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
             bsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
-            bsb.BufferSRV("g_InstanceData", config.cluster.instanceBuffer);
+            bsb.BufferSRV("g_InstanceData", config.instanceBuffer);
             bsb.BufferSRV("g_TerrainInstanceData", terrainInstances);
-            bsb.BufferSRV("g_DynamicInstanceData", config.cluster.dynamicInstanceBuffer ? config.cluster.dynamicInstanceBuffer : config.cluster.instanceBuffer);
-            bsb.BufferSRV("g_DynamicPrevWorld", config.cluster.dynamicPrevWorldBuffer ? config.cluster.dynamicPrevWorldBuffer : config.megaVertexBuffer);
-            bsb.BufferSRV("g_Entries", config.cluster.entryBuffer);
+            bsb.BufferSRV("g_DynamicInstanceData", config.dynamicInstanceBuffer ? config.dynamicInstanceBuffer : config.instanceBuffer);
+            bsb.BufferSRV("g_DynamicPrevWorld", config.dynamicPrevWorldBuffer ? config.dynamicPrevWorldBuffer : config.megaVertexBuffer);
+            bsb.BufferSRV("g_Entries", config.entryBuffer);
             bsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
             bsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
-            bsb.BufferSRV("g_SkinnedEntries", skinned ? gpuCulling->GetSkinnedEntryBuffer() : config.cluster.entryBuffer);
+            bsb.BufferSRV("g_SkinnedEntries", skinned ? gpuCulling->GetSkinnedEntryBuffer() : config.entryBuffer);
             bsb.BufferSRV("g_SkinnedVB", skinned ? gpuCulling->GetSkinnedPreVertexBuffer() : config.megaVertexBuffer);
             bsb.BufferSRV("g_SkinnedIB", skinned ? gpuCulling->GetSkinnedPools().GetCombinedIndexBuffer() : config.megaIndexBuffer);
             bsb.BufferSRV("g_SkinnedPrevVB", skinned ? gpuCulling->GetSkinnedPrevVertexBuffer() : config.megaVertexBuffer);
-            bsb.BufferSRV("g_SkinnedRecords", skinned ? gpuCulling->GetSkinnedRecordsBuffer() : config.cluster.entryBuffer);
+            bsb.BufferSRV("g_SkinnedRecords", skinned ? gpuCulling->GetSkinnedRecordsBuffer() : config.entryBuffer);
             bsb.BufferSRV("g_BoneMatrices", skinned ? gpuCulling->GetGlobalBoneBuffer() : config.megaVertexBuffer);
             bsb.BufferSRV("g_PaintSplats", skinned && data.splatBuffer ? data.splatBuffer : config.megaVertexBuffer);
             bsb.Texture("g_VisID", visRT);
