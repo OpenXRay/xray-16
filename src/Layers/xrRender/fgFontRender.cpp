@@ -6,6 +6,7 @@
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "xrCore/Text/StringConversion.hpp"
+#include "xrEngine/IRenderBackend.h"
 
 extern ENGINE_API bool g_bRendering;
 extern ENGINE_API Fvector2 g_current_font_scale;
@@ -111,7 +112,15 @@ void FGFontRender::InitResources()
     uploadCL->close();
     m_device->executeCommandList(uploadCL);
 
-    EnsureVertexCapacity(kInitialVerts);
+    u32 frameCount = GEnv.Backend ? GEnv.Backend->GetBackBufferCount() : 2u;
+    if (frameCount < 2)
+        frameCount = 2;
+    m_frames.resize(frameCount);
+    for (auto& frame : m_frames)
+    {
+        CreateFrameBuffer(frame, kInitialVerts);
+        R_ASSERT2(frame.vertexBuffer, "FGFontRender: createBuffer(VB) failed");
+    }
 }
 
 void FGFontRender::Initialize(cpcstr, cpcstr cTexture)
@@ -141,20 +150,34 @@ void FGFontRender::Initialize(cpcstr, cpcstr cTexture)
     R_ASSERT2(m_bindingSet, "FGFontRender: createBindingSet failed");
 }
 
-void FGFontRender::EnsureVertexCapacity(size_t vertexCount)
+bool FGFontRender::CreateFrameBuffer(FrameBuffer& frame, size_t vertexCount)
 {
-    if (vertexCount <= m_vertexCapacity && m_vertexBuffer)
-        return;
-
-    const size_t newCap = std::max<size_t>(vertexCount * 2, kInitialVerts);
     nvrhi::BufferDesc d;
-    d.byteSize = newCap * sizeof(Vertex);
+    d.byteSize = vertexCount * sizeof(Vertex);
     d.isVertexBuffer = true;
+    d.cpuAccess = nvrhi::CpuAccessMode::Write;
     d.debugName = "FGFontRender_VB";
-    d.initialState = nvrhi::ResourceStates::VertexBuffer;
-    d.keepInitialState = true;
-    m_vertexBuffer = m_device->createBuffer(d);
-    m_vertexCapacity = newCap;
+    frame.vertexBuffer = m_device->createBuffer(d);
+    frame.vertexCapacity = frame.vertexBuffer ? vertexCount : 0;
+    return frame.vertexBuffer != nullptr;
+}
+
+FGFontRender::FrameBuffer& FGFontRender::AcquireFrameBuffer(size_t vertexCount)
+{
+    if (m_frameStamp != Device.dwFrame)
+    {
+        m_frameStamp = Device.dwFrame;
+        m_frameSlot = (m_frameSlot + 1) % static_cast<u32>(m_frames.size());
+        m_frameVertexUsed = 0;
+    }
+
+    FrameBuffer& frame = m_frames[m_frameSlot];
+    if (m_frameVertexUsed + vertexCount > frame.vertexCapacity)
+    {
+        CreateFrameBuffer(frame, (m_frameVertexUsed + vertexCount) * 2);
+        m_frameVertexUsed = 0;
+    }
+    return frame;
 }
 
 void FGFontRender::EnsurePipeline(nvrhi::IFramebuffer* framebuffer)
@@ -288,9 +311,23 @@ void FGFontRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* frame
     if (m_vertices.size() > maxVerts)
         m_vertices.resize(maxVerts);
 
-    EnsureVertexCapacity(m_vertices.size());
+    FrameBuffer& frame = AcquireFrameBuffer(m_vertices.size());
+    if (!frame.vertexBuffer)
+    {
+        m_vertices.clear();
+        return;
+    }
 
-    cmdList->writeBuffer(m_vertexBuffer, m_vertices.data(), m_vertices.size() * sizeof(Vertex));
+    const u32 baseVertex = static_cast<u32>(m_frameVertexUsed);
+    void* vertexData = m_device->mapBuffer(frame.vertexBuffer, nvrhi::CpuAccessMode::Write);
+    if (!vertexData)
+    {
+        m_vertices.clear();
+        return;
+    }
+    memcpy(static_cast<u8*>(vertexData) + baseVertex * sizeof(Vertex), m_vertices.data(), m_vertices.size() * sizeof(Vertex));
+    m_device->unmapBuffer(frame.vertexBuffer);
+    m_frameVertexUsed += m_vertices.size();
 
     FontCB cb{};
     cb.screen_res.set(
@@ -300,13 +337,10 @@ void FGFontRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* frame
         1.f / float(Device.dwHeight));
     cmdList->writeBuffer(m_constantBuffer, &cb, sizeof(cb));
 
-    cmdList->setBufferState(m_vertexBuffer,   nvrhi::ResourceStates::VertexBuffer);
-    cmdList->setBufferState(m_constantBuffer, nvrhi::ResourceStates::ConstantBuffer);
-
     const auto& fbInfo = framebuffer->getFramebufferInfo();
 
     nvrhi::VertexBufferBinding vb;
-    vb.buffer = m_vertexBuffer;
+    vb.buffer = frame.vertexBuffer;
     vb.slot = 0;
     vb.offset = 0;
 
@@ -326,6 +360,7 @@ void FGFontRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* frame
     nvrhi::DrawArguments args;
     args.vertexCount = quadCount * 6;
     args.instanceCount = 1;
+    args.startVertexLocation = baseVertex;
     cmdList->drawIndexed(args);
 
     m_vertices.clear();

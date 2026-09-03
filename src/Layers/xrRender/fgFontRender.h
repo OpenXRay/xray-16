@@ -26,8 +26,15 @@ public:
     void Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer);
 
 private:
+    struct FrameBuffer
+    {
+        nvrhi::BufferHandle vertexBuffer;
+        size_t vertexCapacity = 0;
+    };
+
     void InitResources();
-    void EnsureVertexCapacity(size_t vertexCount);
+    bool CreateFrameBuffer(FrameBuffer& frame, size_t vertexCount);
+    FrameBuffer& AcquireFrameBuffer(size_t vertexCount);
     void EnsurePipeline(nvrhi::IFramebuffer* framebuffer);
     void BuildGeometry(CGameFont& owner);
 
@@ -40,9 +47,11 @@ private:
     nvrhi::BindingLayoutHandle    m_bindingLayout;
     nvrhi::BindingSetHandle       m_bindingSet;
     nvrhi::BufferHandle           m_constantBuffer;
-    nvrhi::BufferHandle           m_vertexBuffer;
     nvrhi::BufferHandle           m_indexBuffer;
-    size_t                        m_vertexCapacity = 0;
+    xr_vector<FrameBuffer>        m_frames;
+    u32                           m_frameSlot = 0;
+    u32                           m_frameStamp = UINT32_MAX;
+    size_t                        m_frameVertexUsed = 0;
     nvrhi::GraphicsPipelineHandle m_pipeline;
 
     xr_vector<Vertex>             m_vertices;
