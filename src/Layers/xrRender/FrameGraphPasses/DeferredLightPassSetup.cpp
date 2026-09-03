@@ -11,6 +11,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/ClusteredLightManager.h"
+#include "VSMPassSetup.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 
 namespace xray::render::fg::passes {
@@ -53,7 +54,7 @@ struct DeferredLightPassData {
     VirtualResourceHandle normal;
     VirtualResourceHandle baseColor;
     VirtualResourceHandle color;
-    SunShadowMaps sunShadowMaps;
+    VirtualResourceHandle sunMask;
     fg::RenderDevice* device = nullptr;
     DeferredLightPassState* state = nullptr;
     xray::profiler::GPUProfiler* gpuProfiler = nullptr;
@@ -205,7 +206,7 @@ DefaultOutputLayout setupDeferredLightPass(
     const DefaultOutputLayout& inputs,
     u32 width,
     u32 height,
-    SunShadowMaps sunShadowMaps,
+    VirtualResourceHandle sunMask,
     xray::profiler::GPUProfiler* gpuProfiler,
     DeferredLightPassState* state)
 {
@@ -218,7 +219,7 @@ DefaultOutputLayout setupDeferredLightPass(
 
     auto& passData = fg.addCallbackPass<DeferredLightPassData>(
         "Deferred Light",
-        [&, width, height, sunShadowMaps, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, DeferredLightPassData& data) {
+        [&, width, height, sunMask, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, DeferredLightPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.state = state;
@@ -229,7 +230,8 @@ DefaultOutputLayout setupDeferredLightPass(
             data.normal = passBuilder.read(inputs.normal, ResourceState::ShaderResource);
             data.baseColor = passBuilder.read(inputs.baseColor, ResourceState::ShaderResource);
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::UnorderedAccess);
-            ReadSunShadowMaps(passBuilder, sunShadowMaps, data.sunShadowMaps);
+            if (sunMask.is_valid())
+                data.sunMask = passBuilder.read(sunMask, ResourceState::ShaderResource);
         },
         [](const DeferredLightPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ZoneScoped;
@@ -252,8 +254,7 @@ DefaultOutputLayout setupDeferredLightPass(
                 return;
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
-            nvrhi::ITexture* sunMaps[kSunMapSlots];
-            ResolveSunShadowMaps(fg, data.sunShadowMaps, nvDevice, sunMaps);
+            nvrhi::ITexture* sunMask = ResolveSunMask(fg, data.sunMask, nvDevice);
             nvrhi::IBindingSet* bindlessTable = nullptr;
             if (auto* backend = data.device->GetBackend())
                 bindlessTable = backend->GetBindlessDescriptorTable();
@@ -277,7 +278,7 @@ DefaultOutputLayout setupDeferredLightPass(
                 bsb.ConstantBuffer("TileParams", tileCB);
                 bsb.Texture("g_GBufferDepth", depthRT);
                 bsb.Texture("g_GBufferNormal", normalRT);
-                bsb.Texture("g_SunShadowMask", sunMaps[kSunTargetCount]);
+                bsb.Texture("g_SunShadowMask", sunMask);
                 bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
                 bsb.BufferUAV("g_TileLists", state.tileListBuffer);
                 bsb.BufferUAV("g_TileArgs", state.tileArgsBuffer);
@@ -318,7 +319,7 @@ DefaultOutputLayout setupDeferredLightPass(
                     bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
                 }
                 if (cls & kTileClassSunMixed)
-                    BindSunShadowMaps(bsb, sunMaps);
+                    bsb.Texture("g_SunShadowMask", sunMask);
                 auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.tileLayouts[cls], nvDevice);
                 if (!bindingSet)
                     continue;

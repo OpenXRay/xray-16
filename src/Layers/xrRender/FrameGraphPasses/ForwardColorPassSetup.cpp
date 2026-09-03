@@ -21,6 +21,7 @@
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
 #include "Layers/xrRender/ClusteredLightManager.h"
+#include "VSMPassSetup.h"
 #include "xrCore/FMesh.hpp"
 
 namespace xray::render::fg
@@ -136,7 +137,7 @@ static void renderBindlessForward(
     nvrhi::ITexture* normalRT,
     nvrhi::ITexture* baseColorRT,
     nvrhi::ITexture* depthRT,
-    nvrhi::ITexture* const* sunShadowMaps,
+    nvrhi::ITexture* sunMask,
     const BindlessForwardConfig& config,
     MaterialCache* materialCache,
     ForwardColorPassState& ps)
@@ -195,7 +196,7 @@ static void renderBindlessForward(
         bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
         bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
         bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
-        passes::BindSunShadowMaps(bsb, sunShadowMaps);
+        bsb.Texture("g_SunShadowMask", sunMask);
         return bsb.Build();
     };
 
@@ -391,8 +392,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 drawArgsBuffer = fg.GetPhysicalBuffer(data.drawArgsBuffer);
             }
 
-            nvrhi::ITexture* sunMaps[passes::kSunMapSlots];
-            passes::ResolveSunShadowMaps(fg, SunShadowMaps(), data.device->GetNVRHIDevice(), sunMaps);
+            nvrhi::ITexture* sunMask = passes::ResolveSunMask(fg, framegraph::VirtualResourceHandle(), data.device->GetNVRHIDevice());
 
             renderBindlessForward(
                 ctx,
@@ -402,7 +402,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 normalRT,
                 baseColorRT,
                 depthRT,
-                sunMaps,
+                sunMask,
                 data.bindlessConfig,
                 data.materialCache,
                 *data.passState

@@ -14,7 +14,6 @@
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
-#include "Layers/xrRender/FrameGraphPasses/SunShadowPassSetup.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 #include "Layers/xrRender/FrameGraphPasses/VSMPassSetup.h"
 
@@ -58,7 +57,6 @@ void FrameGraphRenderer::level_Load(IReader* fs)
             }
         }
         if (m_blackboard) {
-            passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
             passes::InvalidateVSMCache(m_blackboard->get_or_add<passes::VSMState>());
         }
         passes::ResetSunDirVisual();
@@ -227,7 +225,6 @@ void FrameGraphRenderer::level_Unload()
     Lights.Unload();
 
     if (m_blackboard) {
-        passes::InvalidateSunShadowCache(m_blackboard->get_or_add<passes::SunShadowState>());
         passes::InvalidateVSMCache(m_blackboard->get_or_add<passes::VSMState>());
     }
     passes::ResetSunDirVisual();

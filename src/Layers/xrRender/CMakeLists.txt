@@ -63,8 +63,6 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/VisibilityPassSetup.cpp
     FrameGraphPasses/MaterialResolvePassSetup.h
     FrameGraphPasses/MaterialResolvePassSetup.cpp
-    FrameGraphPasses/SunShadowPassSetup.h
-    FrameGraphPasses/SunShadowPassSetup.cpp
     FrameGraphPasses/VSMPassSetup.cpp
     FrameGraphPasses/HiZBuildPassSetup.h
     FrameGraphPasses/HiZBuildPassSetup.cpp
