@@ -473,6 +473,8 @@ private:
     u32 m_pingPongIndex = 0;
 
     Fmatrix m_prevViewProj;                       // Previous frame's view-projection
+    Fmatrix m_prevView;
+    Fmatrix m_prevProject;
     Fvector m_prevCameraPos;                      // Previous frame's camera position
     bool m_hasPrevFrameData = false;              // Valid previous frame exists
     u32 m_prevFrameWidth = 0;                     // Previous frame resolution

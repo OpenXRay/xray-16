@@ -5,9 +5,14 @@ cbuffer MotionVectorParams : register(b5) {
     float4x4 g_PrevViewProj;
     float2 g_ScreenSize;
     float2 g_InvScreenSize;
+    uint g_HasVis;
+    uint g_MotionValid;
+    uint2 g_MotionPad;
 };
 
 Texture2D<float> t_Depth : register(t0);
+Texture2D<uint> t_VisID : register(t30);
+Texture2D<float> t_VisDepth : register(t31);
 RWTexture2D<float2> u_MotionVectors : register(u0);
 
 float3 ReconstructWorldPos(uint2 pixel, float depth)
@@ -28,10 +33,13 @@ void main(uint3 dtid : SV_DispatchThreadID)
 
     float depth = t_Depth.Load(int3(pixel, 0));
 
-    if (depth <= 0.0) {
+    if (depth <= 0.0 || g_MotionValid == 0u) {
         u_MotionVectors[pixel] = float2(0, 0);
         return;
     }
+
+    if (g_HasVis != 0u && t_VisID.Load(int3(pixel, 0)) != 0u && asuint(t_VisDepth.Load(int3(pixel, 0))) == asuint(depth))
+        return;
 
     float3 worldPos = ReconstructWorldPos(pixel, depth);
 

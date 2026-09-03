@@ -40,6 +40,7 @@ struct alignas(16) SkinnedVisParams {
 
 struct VisDebugViewData {
     VirtualResourceHandle visId;
+    VirtualResourceHandle motion;
     VirtualResourceHandle view;
     fg::RenderDevice* device = nullptr;
     VisibilityPassState* state = nullptr;
@@ -308,12 +309,13 @@ VirtualResourceHandle setupVisDebugViewPass(
     FrameGraph& fg,
     fg::RenderDevice* device,
     VirtualResourceHandle visId,
+    VirtualResourceHandle motion,
     u32 width,
     u32 height,
     u32 mode,
     VisibilityPassState* state)
 {
-    if (!state || state->debugFailed || !visId.is_valid())
+    if (!state || state->debugFailed || !visId.is_valid() || !motion.is_valid())
         return {};
 
     if (!state->debugPipeline) {
@@ -351,7 +353,7 @@ VirtualResourceHandle setupVisDebugViewPass(
 
     auto& passData = fg.addCallbackPass<VisDebugViewData>(
         "Vis Debug View",
-        [&, visId, viewHandle, width, height, mode, state](FrameGraph& builder, PassHandle passHandle, VisDebugViewData& data) {
+        [&, visId, motion, viewHandle, width, height, mode, state](FrameGraph& builder, PassHandle passHandle, VisDebugViewData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.state = state;
@@ -359,13 +361,15 @@ VirtualResourceHandle setupVisDebugViewPass(
             data.height = height;
             data.mode = mode;
             data.visId = passBuilder.read(visId, ResourceState::ShaderResource);
+            data.motion = passBuilder.read(motion, ResourceState::ShaderResource);
             data.view = passBuilder.write(viewHandle, ResourceState::UnorderedAccess);
         },
         [](const VisDebugViewData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             auto* visRT = fg.GetPhysicalTexture(data.visId);
+            auto* motionRT = fg.GetPhysicalTexture(data.motion);
             auto* viewRT = fg.GetPhysicalTexture(data.view);
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            if (!visRT || !viewRT || !cmdList)
+            if (!visRT || !motionRT || !viewRT || !cmdList)
                 return;
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
             auto& cache = GetPassResourceCache();
@@ -379,6 +383,7 @@ VirtualResourceHandle setupVisDebugViewPass(
             BindingSetBuilder bsb(*refl, nvDevice, "VisDebugView");
             bsb.ConstantBuffer("VisDebugParams", paramsCB);
             bsb.Texture("g_VisID", visRT);
+            bsb.Texture("g_Motion", motionRT);
             bsb.TextureUAV("g_VisDebug", viewRT);
             auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->debugLayout, nvDevice);
             if (!bindingSet)

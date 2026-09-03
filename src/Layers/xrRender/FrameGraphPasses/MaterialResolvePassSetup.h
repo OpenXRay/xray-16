@@ -31,6 +31,8 @@ struct MaterialResolveOutput {
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle motionVectors;
+    framegraph::VirtualResourceHandle visDepth;
 };
 
 bool EnsureMaterialResolveResources(fg::RenderDevice* device, MaterialResolvePassState& state);
@@ -39,6 +41,7 @@ MaterialResolveOutput setupMaterialResolvePass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle visId,
+    framegraph::VirtualResourceHandle depth,
     framegraph::VirtualResourceHandle color,
     framegraph::VirtualResourceHandle normal,
     framegraph::VirtualResourceHandle baseColor,
@@ -47,6 +50,9 @@ MaterialResolveOutput setupMaterialResolvePass(
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
     nvrhi::IBuffer* splatBuffer,
+    const Fmatrix& prevView,
+    const Fmatrix& prevProj,
+    bool motionValid,
     u32 width,
     u32 height,
     MaterialResolvePassState* state);

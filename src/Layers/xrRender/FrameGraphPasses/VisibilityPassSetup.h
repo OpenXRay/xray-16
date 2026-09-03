@@ -63,6 +63,7 @@ framegraph::VirtualResourceHandle setupVisDebugViewPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle visId,
+    framegraph::VirtualResourceHandle motion,
     u32 width,
     u32 height,
     u32 mode,
