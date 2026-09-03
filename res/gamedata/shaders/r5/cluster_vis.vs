@@ -5,6 +5,7 @@
 StructuredBuffer<InstanceData> g_InstanceData : register(t14);
 StructuredBuffer<uint> g_VisibleEntries : register(t15);
 StructuredBuffer<ClusterEntry> g_Entries : register(t16);
+StructuredBuffer<InstanceData> g_DynamicInstanceData : register(t20);
 ByteAddressBuffer g_MegaVB : register(t18);
 ByteAddressBuffer g_MegaIB : register(t19);
 
@@ -33,7 +34,8 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
     uint2 uvw = g_MegaVB.Load2(vertexByte + 24u);
 
     float3 position = float3(asfloat(w0.x), asfloat(w0.y), asfloat(w0.z));
-    float4 worldPos = mul(g_InstanceData[e.batchIndex].world, float4(position, 1.0));
+    float4x4 world = (e.flags & CLUSTER_ENTRY_FLAG_DYNAMIC) != 0u ? g_DynamicInstanceData[e.batchIndex].world : g_InstanceData[e.batchIndex].world;
+    float4 worldPos = mul(world, float4(position, 1.0));
     output.position = mul(m_VP, float4(worldPos.xyz, 1.0));
     output.texcoord = float2(asfloat(uvw.x), asfloat(uvw.y));
     output.materialID = e.materialID;
