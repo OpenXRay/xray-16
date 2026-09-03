@@ -22,8 +22,6 @@ namespace xray::profiler {
 
 namespace xray::render::fg::passes {
 
-struct SkinningPassState;
-
 constexpr u32 kVSMLevels = 6;
 constexpr u32 kVSMVirtualRes = 4096;
 constexpr u32 kVSMPageSize = 128;
@@ -193,9 +191,7 @@ struct VSMDrawConfig {
 };
 
 struct VSMDynConfig {
-    const SkinningPassState* skinning = nullptr;
     GPUCullingManager* gpuCulling = nullptr;
-    nvrhi::IBuffer* splatBuffer = nullptr;
 };
 
 struct VSMOutput {

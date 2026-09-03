@@ -2,7 +2,6 @@
 #include "VSMPassSetup.h"
 #include "PassCommon.h"
 #include "ShaderConstants.h"
-#include "SkinningPassSetup.h"
 #include "SunShadowPassSetup.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
@@ -968,11 +967,11 @@ void ExecuteAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMAtlasDa
         nvrhi::Rect(rtDesc.width, rtDesc.height));
 }
 
-bool EnsureSkinPagePipelines(fg::RenderDevice* device, VSMState& state, const SkinningPassState& sk)
+bool EnsureSkinPagePipelines(fg::RenderDevice* device, VSMState& state, GPUCullingManager& gpuCulling)
 {
     if (state.skinPipelinesReady)
         return true;
-    if (state.skinPipelinesFailed || !sk.initialized || !state.pagePS)
+    if (state.skinPipelinesFailed || !state.pagePS || !gpuCulling.EnsurePreskinnedDrawResources())
         return false;
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -988,7 +987,7 @@ bool EnsureSkinPagePipelines(fg::RenderDevice* device, VSMState& state, const Sk
     fbInfo.depthFormat = nvrhi::Format::D16;
     bool any = false;
     {
-        const SkinningPipelineVariant* mdi = SkinnedVariant(sk, SkinnedGeometryPools::FIRST_FORMAT, true);
+        nvrhi::IInputLayout* preskinnedLayout = gpuCulling.GetPreskinnedInputLayout();
         if (!state.skinPageVS) {
             auto vsResult = shaderLoader->LoadVertexShader(kSkinPageShader, "main");
             if (vsResult.handle && vsResult.reflection)
@@ -997,13 +996,13 @@ bool EnsureSkinPagePipelines(fg::RenderDevice* device, VSMState& state, const Sk
                 Msg("! [VSM] %s failed to load", kSkinPageShader);
         }
         auto* vsRefl = shaderLoader->GetCachedReflection(kSkinPageShader, ".vs");
-        if (mdi && mdi->inputLayout && state.skinPageVS && vsRefl) {
+        if (preskinnedLayout && state.skinPageVS && vsRefl) {
             state.skinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMSkinPage", *vsRefl, *psRefl, nvDevice);
             if (state.skinPageLayout) {
                 nvrhi::GraphicsPipelineDesc desc;
                 desc.VS = state.skinPageVS;
                 desc.PS = state.pagePS;
-                desc.inputLayout = mdi->inputLayout;
+                desc.inputLayout = preskinnedLayout;
                 if (bindlessLayout)
                     desc.bindingLayouts = { state.skinPageLayout, bindlessLayout };
                 else
@@ -1158,9 +1157,9 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
     cmdList->clearDepthStencilTexture(atlas, nvrhi::AllSubresources, true, 0.0f, false, 0);
 
     const VSMDynConfig& cfg = data.config;
-    if (!cfg.skinning || !cfg.gpuCulling)
+    if (!cfg.gpuCulling)
         return;
-    if (!EnsureSkinPagePipelines(data.device, state, *cfg.skinning))
+    if (!EnsureSkinPagePipelines(data.device, state, *cfg.gpuCulling))
         return;
     nvrhi::IBuffer* drawIndexBuffer = GetOrCreateDrawIndexBuffer("VSM", nvDevice);
     if (!drawIndexBuffer)
@@ -1679,7 +1678,7 @@ void setupVSMDynamicPasses(
     VSMState* state,
     xray::profiler::GPUProfiler* gpuProfiler)
 {
-    if (!state || !device || !state->active || !skinnedDrawArgs.is_valid() || !config.gpuCulling || !config.skinning)
+    if (!state || !device || !state->active || !skinnedDrawArgs.is_valid() || !config.gpuCulling)
         return;
     if (!config.gpuCulling->IsSkinnedEnabled() || !state->dynAtlas || !state->dynPageTable || !state->dynUsed)
         return;
