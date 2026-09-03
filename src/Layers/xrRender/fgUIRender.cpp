@@ -182,8 +182,7 @@ void FGUIRender::Initialize(RenderDevice* device, render::MaterialCache* matCach
 
 void FGUIRender::Shutdown()
 {
-    m_indexBuffer = nullptr;
-    m_vertexBuffer = nullptr;
+    m_frames.clear();
     m_matCache = nullptr;
     m_device = nullptr;
     m_initialized = false;
@@ -194,61 +193,60 @@ bool FGUIRender::CreateBuffers()
     constexpr size_t kInitialVertices = 4096;
     constexpr size_t kInitialIndices = 8192;
 
-    nvrhi::IDevice* nvrhiDevice = m_device->GetNVRHIDevice();
+    u32 frameCount = GEnv.Backend ? GEnv.Backend->GetBackBufferCount() : 2u;
+    if (frameCount < 2)
+        frameCount = 2;
 
-    nvrhi::BufferDesc vbDesc;
-    vbDesc.byteSize = kInitialVertices * sizeof(UIVertex);
-    vbDesc.isVertexBuffer = true;
-    vbDesc.debugName = "FGUIRender_VB";
-    vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-    vbDesc.keepInitialState = true;
-    m_vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
-    if (!m_vertexBuffer)
-        return false;
-    m_vertexBufferSize = kInitialVertices;
-
-    nvrhi::BufferDesc ibDesc;
-    ibDesc.byteSize = kInitialIndices * sizeof(u16);
-    ibDesc.isIndexBuffer = true;
-    ibDesc.debugName = "FGUIRender_IB";
-    ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-    ibDesc.keepInitialState = true;
-    m_indexBuffer = nvrhiDevice->createBuffer(ibDesc);
-    if (!m_indexBuffer)
-        return false;
-    m_indexBufferSize = kInitialIndices;
-
+    m_frames.resize(frameCount);
+    for (auto& frame : m_frames)
+    {
+        if (!CreateFrameBuffers(frame, kInitialVertices, kInitialIndices))
+            return false;
+    }
     return true;
 }
 
-void FGUIRender::EnsureBufferCapacity(size_t vertexCount, size_t indexCount)
+bool FGUIRender::CreateFrameBuffers(FrameBuffers& frame, size_t vertexCount, size_t indexCount)
 {
     nvrhi::IDevice* nvrhiDevice = m_device->GetNVRHIDevice();
 
-    if (vertexCount > m_vertexBufferSize)
+    nvrhi::BufferDesc vbDesc;
+    vbDesc.byteSize = vertexCount * sizeof(UIVertex);
+    vbDesc.isVertexBuffer = true;
+    vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
+    vbDesc.debugName = "FGUIRender_VB";
+    frame.vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
+    frame.vertexCapacity = frame.vertexBuffer ? vertexCount : 0;
+
+    nvrhi::BufferDesc ibDesc;
+    ibDesc.byteSize = indexCount * sizeof(u16);
+    ibDesc.isIndexBuffer = true;
+    ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
+    ibDesc.debugName = "FGUIRender_IB";
+    frame.indexBuffer = nvrhiDevice->createBuffer(ibDesc);
+    frame.indexCapacity = frame.indexBuffer ? indexCount : 0;
+
+    return frame.vertexBuffer && frame.indexBuffer;
+}
+
+FGUIRender::FrameBuffers& FGUIRender::AcquireFrameBuffers(size_t vertexCount, size_t indexCount)
+{
+    if (m_frameStamp != Device.dwFrame)
     {
-        const size_t newSize = vertexCount * 2;
-        nvrhi::BufferDesc vbDesc;
-        vbDesc.byteSize = newSize * sizeof(UIVertex);
-        vbDesc.isVertexBuffer = true;
-        vbDesc.debugName = "FGUIRender_VB";
-        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-        vbDesc.keepInitialState = true;
-        m_vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
-        m_vertexBufferSize = newSize;
+        m_frameStamp = Device.dwFrame;
+        m_frameSlot = (m_frameSlot + 1) % static_cast<u32>(m_frames.size());
+        m_frameVertexUsed = 0;
+        m_frameIndexUsed = 0;
     }
-    if (indexCount > m_indexBufferSize)
+
+    FrameBuffers& frame = m_frames[m_frameSlot];
+    if (m_frameVertexUsed + vertexCount > frame.vertexCapacity || m_frameIndexUsed + indexCount > frame.indexCapacity)
     {
-        const size_t newSize = indexCount * 2;
-        nvrhi::BufferDesc ibDesc;
-        ibDesc.byteSize = newSize * sizeof(u16);
-        ibDesc.isIndexBuffer = true;
-        ibDesc.debugName = "FGUIRender_IB";
-        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-        ibDesc.keepInitialState = true;
-        m_indexBuffer = nvrhiDevice->createBuffer(ibDesc);
-        m_indexBufferSize = newSize;
+        CreateFrameBuffers(frame, (m_frameVertexUsed + vertexCount) * 2, (m_frameIndexUsed + indexCount) * 2);
+        m_frameVertexUsed = 0;
+        m_frameIndexUsed = 0;
     }
+    return frame;
 }
 
 void FGUIRender::RenderBatchWithShader(nvrhi::ICommandList* cmdList, const UIGeometryBatch& batch, render::MaterialPSO* pso, nvrhi::IFramebuffer* framebuffer,
@@ -265,8 +263,7 @@ void FGUIRender::RenderBatchWithShader(nvrhi::ICommandList* cmdList, const UIGeo
     if (!pso->vsBindingSet)
         return;
 
-    cmdList->setBufferState(m_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
-    cmdList->setBufferState(m_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
+    const FrameBuffers& frame = m_frames[m_frameSlot];
 
     nvrhi::GraphicsState state;
     state.pipeline = nativePipeline;
@@ -278,14 +275,14 @@ void FGUIRender::RenderBatchWithShader(nvrhi::ICommandList* cmdList, const UIGeo
         state.addBindingSet(bindlessTable);
 
     nvrhi::VertexBufferBinding vbBinding;
-    vbBinding.buffer = m_vertexBuffer;
+    vbBinding.buffer = frame.vertexBuffer;
     vbBinding.slot = 0;
     vbBinding.offset = 0;
     state.addVertexBuffer(vbBinding);
 
     if (batch.UsesIndexBuffer())
     {
-        state.indexBuffer.buffer = m_indexBuffer;
+        state.indexBuffer.buffer = frame.indexBuffer;
         state.indexBuffer.format = nvrhi::Format::R16_UINT;
         state.indexBuffer.offset = 0;
     }
@@ -341,17 +338,37 @@ void FGUIRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebu
     if (m_vertexScratch.empty())
         return;
 
-    EnsureBufferCapacity(m_vertexScratch.size(), m_indexScratch.size());
+    FrameBuffers& frame = AcquireFrameBuffers(m_vertexScratch.size(), m_indexScratch.size());
+    if (!frame.vertexBuffer || !frame.indexBuffer)
+        return;
 
-    cmdList->writeBuffer(m_vertexBuffer, m_vertexScratch.data(), m_vertexScratch.size() * sizeof(UIVertex));
+    nvrhi::IDevice* nvrhiDevice = m_device->GetNVRHIDevice();
+    const u32 baseVertex = static_cast<u32>(m_frameVertexUsed);
+    const u32 baseIndex = static_cast<u32>(m_frameIndexUsed);
+
+    void* vertexData = nvrhiDevice->mapBuffer(frame.vertexBuffer, nvrhi::CpuAccessMode::Write);
+    if (!vertexData)
+        return;
+    memcpy(static_cast<u8*>(vertexData) + baseVertex * sizeof(UIVertex), m_vertexScratch.data(), m_vertexScratch.size() * sizeof(UIVertex));
+    nvrhiDevice->unmapBuffer(frame.vertexBuffer);
+
     if (!m_indexScratch.empty())
-        cmdList->writeBuffer(m_indexBuffer, m_indexScratch.data(), m_indexScratch.size() * sizeof(u16));
+    {
+        void* indexData = nvrhiDevice->mapBuffer(frame.indexBuffer, nvrhi::CpuAccessMode::Write);
+        if (!indexData)
+            return;
+        memcpy(static_cast<u8*>(indexData) + baseIndex * sizeof(u16), m_indexScratch.data(), m_indexScratch.size() * sizeof(u16));
+        nvrhiDevice->unmapBuffer(frame.indexBuffer);
+    }
+
+    m_frameVertexUsed += m_vertexScratch.size();
+    m_frameIndexUsed += m_indexScratch.size();
 
     IUIShader* lastUIShader = nullptr;
     render::MaterialPSO* currentPSO = nullptr;
 
-    u32 vertexOffset = 0;
-    u32 indexOffset = 0;
+    u32 vertexOffset = baseVertex;
+    u32 indexOffset = baseIndex;
 
     UIPrimitiveType lastTopology = UIPrimitiveType::TriList;
     for (const auto& batch : m_batches)
