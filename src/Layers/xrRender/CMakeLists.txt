@@ -119,8 +119,6 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/SunPassSetup.cpp
     FrameGraphPasses/DetailCullPassSetup.h
     FrameGraphPasses/DetailCullPassSetup.cpp
-    FrameGraphPasses/DetailPassSetup.h
-    FrameGraphPasses/DetailPassSetup.cpp
     FrameGraphPasses/DetailResolvePassSetup.h
     FrameGraphPasses/DetailResolvePassSetup.cpp
     FrameGraphPasses/TransparentPassSetup.h

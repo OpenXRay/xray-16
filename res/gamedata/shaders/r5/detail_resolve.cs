@@ -3,6 +3,7 @@
 #include "bindless_common.h"
 #include "visbuffer_common.h"
 #include "detail_blade_common.h"
+#include "detail_pulled_common.h"
 
 cbuffer DetailGlobals : register(b3)
 {
@@ -47,6 +48,10 @@ StructuredBuffer<uint> g_VisibleLod1 : register(t34);
 StructuredBuffer<uint> g_VisibleLod2 : register(t35);
 StructuredBuffer<GrassObjectTint> grass_object_tints : register(t36);
 StructuredBuffer<DetailInstance> all_instances : register(t37);
+StructuredBuffer<uint> g_VisibleMesh : register(t38);
+StructuredBuffer<uint> g_VisibleDecal : register(t39);
+StructuredBuffer<DetailModelGPU> detail_models : register(t40);
+StructuredBuffer<PulledVertex> pulled_vertices : register(t41);
 RWTexture2D<float4> g_OutNormal : register(u0);
 RWTexture2D<float4> g_OutBaseColor : register(u1);
 RWTexture2D<float4> g_OutColor : register(u2);
@@ -58,6 +63,96 @@ static const float GRASS_ROUGHNESS_TIP = 0.55;
 static const float GRASS_AO_BASE = 0.35;
 static const float GRASS_AO_TIP = 1.0;
 static const float GRASS_AO_POWER = 0.6;
+
+float2 PrevMotion(float3 prevWorld, float2 uvPix)
+{
+    float4 prevClip = mul(g_PrevProj, mul(g_PrevView, float4(prevWorld, 1.0)));
+    if (prevClip.w <= 0.0)
+        return float2(0.0, 0.0);
+    float2 prevNdc = prevClip.xy / prevClip.w;
+    return float2(prevNdc.x, -prevNdc.y) * 0.5 + 0.5 - uvPix;
+}
+
+void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2 pixelNdc)
+{
+    uint src = (kind == DETAIL_KIND_MESH) ? g_VisibleMesh[slot] : g_VisibleDecal[slot];
+    DetailInstance raw = all_instances[src];
+    PulledInstance inst = DecodePulled(raw);
+    DetailModelGPU mdl = detail_models[inst.objectId];
+    uint base = mdl.pulledVertexBase + tri * 3u;
+    PulledVertex pv0 = pulled_vertices[base];
+    PulledVertex pv1 = pulled_vertices[base + 1u];
+    PulledVertex pv2 = pulled_vertices[base + 2u];
+    bool sway = (kind == DETAIL_KIND_MESH);
+
+    float3 h = float3(PulledHeightFactor(pv0, mdl), PulledHeightFactor(pv1, mdl), PulledHeightFactor(pv2, mdl));
+    float3 b0 = PulledWorldPos(inst, pv0);
+    float3 b1 = PulledWorldPos(inst, pv1);
+    float3 b2 = PulledWorldPos(inst, pv2);
+    float3 w0 = b0;
+    float3 w1 = b1;
+    float3 w2 = b2;
+    if (sway)
+    {
+        w0 = PulledSway(b0, h.x, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+        w1 = PulledSway(b1, h.y, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+        w2 = PulledSway(b2, h.z, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+    }
+
+    float4 c0 = mul(m_VP, float4(w0, 1.0));
+    float4 c1 = mul(m_VP, float4(w1, 1.0));
+    float4 c2 = mul(m_VP, float4(w2, 1.0));
+    BarycentricDeriv bd = CalcFullBary(c0, c1, c2, pixelNdc, screen_res.xy);
+
+    float2 uv0 = float2(pv0.u, pv0.v);
+    float2 uv1 = float2(pv1.u, pv1.v);
+    float2 uv2 = float2(pv2.u, pv2.v);
+    float2 uv = InterpolateBary2(bd, uv0, uv1, uv2);
+    float2 uvDdx = InterpolateBaryDdx2(bd, uv0, uv1, uv2);
+    float2 uvDdy = InterpolateBaryDdy2(bd, uv0, uv1, uv2);
+    float heightParam = dot(bd.m_lambda, h);
+    float3 N = sway ? PulledFaceNormal(inst, pv0, pv1, pv2) : float3(0.0, 1.0, 0.0);
+
+    float4 texel = GetBindlessTexture(buildDetailsIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
+    float3 albedo = texel.rgb;
+    float metallic = 0.0;
+    float roughness = 0.85;
+    float ao = sway ? lerp(0.5, 1.0, saturate(heightParam)) : 1.0;
+    if (buildDetailsPbrIndex != 0u)
+    {
+        float4 pbr = GetBindlessTexture(buildDetailsPbrIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
+        metallic = pbr.r;
+        roughness = pbr.g;
+        ao = pbr.b;
+    }
+    if (sway)
+    {
+        float backlit = saturate(dot(N, -L_sun_dir_w) * 0.5 + 0.5);
+        float3 sss = grass_sss_color.rgb * (backlit * heightParam * grass_sss_color.w);
+        albedo += sss * L_sun_color;
+    }
+
+    float2 motion = float2(0.0, 0.0);
+    if (g_MotionValid != 0u)
+    {
+        float3 p0 = b0;
+        float3 p1 = b1;
+        float3 p2 = b2;
+        if (sway)
+        {
+            p0 = PulledSway(b0, h.x, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+            p1 = PulledSway(b1, h.y, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+            p2 = PulledSway(b2, h.z, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+        }
+        motion = PrevMotion(InterpolateBary3(bd, p0, p1, p2), uvPix);
+    }
+
+    g_OutNormal[p] = float4(N, roughness);
+    g_OutBaseColor[p] = float4(albedo, metallic);
+    g_OutColor[p] = float4(0.0, 0.0, 0.0, ao);
+    g_OutMotion[p] = motion;
+    g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
+}
 
 [numthreads(8, 8, 1)]
 void main(uint3 dtid : SV_DispatchThreadID)
@@ -75,12 +170,22 @@ void main(uint3 dtid : SV_DispatchThreadID)
     if (entryIdx < g_EntryBase)
         return;
     uint rel = entryIdx - g_EntryBase;
-    uint lod = rel >> 22;
+    uint kind = rel >> 22;
     uint slot = rel & 0x3FFFFFu;
     uint tri = id & VIS_ID_TRI_MASK;
-    if (lod > 2u)
+    if (kind > DETAIL_KIND_DECAL)
         return;
 
+    float2 uvPix = (float2(p) + 0.5) * screen_res.zw;
+    float2 pixelNdc = float2(uvPix.x * 2.0 - 1.0, 1.0 - uvPix.y * 2.0);
+
+    if (kind >= DETAIL_KIND_MESH)
+    {
+        ResolvePulled(p, kind, slot, tri, uvPix, pixelNdc);
+        return;
+    }
+
+    uint lod = kind;
     uint src = (lod == 0u) ? g_VisibleLod0[slot] : ((lod == 1u) ? g_VisibleLod1[slot] : g_VisibleLod2[slot]);
     uint segments = (lod == 0u) ? g_Segments.x : ((lod == 1u) ? g_Segments.y : g_Segments.z);
 
@@ -98,9 +203,6 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float4 c0 = mul(m_VP, float4(v0.pos, 1.0));
     float4 c1 = mul(m_VP, float4(v1.pos, 1.0));
     float4 c2 = mul(m_VP, float4(v2.pos, 1.0));
-
-    float2 uvPix = (float2(p) + 0.5) * screen_res.zw;
-    float2 pixelNdc = float2(uvPix.x * 2.0 - 1.0, 1.0 - uvPix.y * 2.0);
     BarycentricDeriv bd = CalcFullBary(c0, c1, c2, pixelNdc, screen_res.xy);
 
     float2 uv = InterpolateBary2(bd, v0.uv, v1.uv, v2.uv);
@@ -145,13 +247,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         BladeVertex p0 = EvalBladeVertex(b, wPrev, lv0, segments, g_PrevTime, grass_blade_width, g_Perlin4D, smp_linear);
         BladeVertex p1 = EvalBladeVertex(b, wPrev, lv1, segments, g_PrevTime, grass_blade_width, g_Perlin4D, smp_linear);
         BladeVertex p2 = EvalBladeVertex(b, wPrev, lv2, segments, g_PrevTime, grass_blade_width, g_Perlin4D, smp_linear);
-        float3 prevWorld = InterpolateBary3(bd, p0.pos, p1.pos, p2.pos);
-        float4 prevClip = mul(g_PrevProj, mul(g_PrevView, float4(prevWorld, 1.0)));
-        if (prevClip.w > 0.0)
-        {
-            float2 prevNdc = prevClip.xy / prevClip.w;
-            motion = float2(prevNdc.x, -prevNdc.y) * 0.5 + 0.5 - uvPix;
-        }
+        motion = PrevMotion(InterpolateBary3(bd, p0.pos, p1.pos, p2.pos), uvPix);
     }
 
     g_OutNormal[p] = float4(N, roughness);

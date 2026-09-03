@@ -148,6 +148,8 @@ MaterialResolveOutput setupDetailResolvePass(
             for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; ++lod)
                 if (!dm->visibleInstancesBuffer[lod])
                     return;
+            if (!dm->visibleBillboardInstancesBuffer || !dm->visibleDecalInstancesBuffer || !dm->detailModelsBuffer || !dm->pulledVertexBuffer)
+                return;
 
             auto* visRT = fg.GetPhysicalTexture(data.visId);
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
@@ -191,6 +193,10 @@ MaterialResolveOutput setupDetailResolvePass(
             bsb.BufferSRV("g_VisibleLod0", dm->visibleInstancesBuffer[0]);
             bsb.BufferSRV("g_VisibleLod1", dm->visibleInstancesBuffer[1]);
             bsb.BufferSRV("g_VisibleLod2", dm->visibleInstancesBuffer[2]);
+            bsb.BufferSRV("g_VisibleMesh", dm->visibleBillboardInstancesBuffer);
+            bsb.BufferSRV("g_VisibleDecal", dm->visibleDecalInstancesBuffer);
+            bsb.BufferSRV("detail_models", dm->detailModelsBuffer);
+            bsb.BufferSRV("pulled_vertices", dm->pulledVertexBuffer);
             bsb.BufferSRV("grass_object_tints", dm->cachedGrassTintsBuffer);
             bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
             bsb.Texture("g_Perlin4D", dm->perlin4dTexture);

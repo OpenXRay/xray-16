@@ -43,9 +43,6 @@ cbuffer DetailCullParams : register(b5)
 // Input
 StructuredBuffer<SlotAABB> g_slot_aabbs : register(t0);
 
-// Output: per-slot visibility flag (0 = culled, 1 = visible)
-RWStructuredBuffer<uint> g_slot_visibility : register(u0);
-
 // Visible slot tracking (for page table system)
 RWStructuredBuffer<uint> g_visible_slot_ids : register(u1);
 RWByteAddressBuffer g_visible_slot_counter : register(u2);
@@ -61,27 +58,15 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     SlotAABB slot = g_slot_aabbs[slot_idx];
 
     if (slot.instance_count == 0)
-    {
-        g_slot_visibility[slot_idx] = 0;
         return;
-    }
 
     // Distance culling for slot AABB
     if (!DistanceTestAABB(slot.aabb_min, slot.aabb_max, g_camera_pos, g_fade_distance_sqr))
-    {
-        g_slot_visibility[slot_idx] = 0;
         return;
-    }
 
     // Frustum culling for slot AABB
     if (!FrustumTestAABB(slot.aabb_min, slot.aabb_max, g_frustum_planes))
-    {
-        g_slot_visibility[slot_idx] = 0;
         return;
-    }
-
-    // Slot is visible
-    g_slot_visibility[slot_idx] = 1;
 
     // Record visible slot for indirect dispatch of Pass 2
     uint insert_index;

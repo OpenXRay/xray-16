@@ -45,9 +45,9 @@ struct alignas(16) SkinnedVisParams {
 
 struct alignas(16) DetailVisParams {
     u32 entryBase;
-    u32 lod;
+    u32 kind;
     u32 segments;
-    u32 pad0;
+    float alphaRef;
 };
 
 struct VisDebugViewData {
@@ -201,47 +201,58 @@ void renderVisibilityRaster(
         }
     }
 
-    if (!retest && detailManager && state.bladePipeline && detailManager->generatedInstancesBuffer && detailManager->perlin4dTexture) {
+    if (!retest && detailManager && state.bladePipeline && detailManager->generatedInstancesBuffer && detailManager->perlin4dTexture
+        && detailManager->detailModelsBuffer && detailManager->pulledVertexBuffer) {
         auto* bladeVsRefl = shaderLoader->GetCachedReflection("detail_vis", ".vs");
         auto* bladePsRefl = shaderLoader->GetCachedReflection("detail_vis", ".ps");
+        auto* pulledPsRefl = shaderLoader->GetCachedReflection("detail_vis_at", ".ps");
         if (bladeVsRefl && bladePsRefl) {
             auto detailGlobalsCB = cache.GetOrCreateVolatileCB("Detail", "DetailGlobals", sizeof(FGDetailManager::DetailFrameConstants), device);
             FGDetailManager::DetailFrameConstants frameConstants;
             detailManager->FillFrameConstants(frameConstants);
             cmdList->writeBuffer(detailGlobalsCB, &frameConstants, sizeof(frameConstants));
-            auto visParamsCB = cache.GetOrCreateVolatileCB("VisibilityRaster", "DetailVisParams", sizeof(DetailVisParams), device, 16);
+            auto visParamsCB = cache.GetOrCreateVolatileCB("VisibilityRaster", "DetailVisParams", sizeof(DetailVisParams), device, 64);
+
+            auto drawKind = [&](const auto& psRefl, nvrhi::IBindingLayout* layout, nvrhi::IGraphicsPipeline* pipeline, const char* name,
+                                u32 kind, u32 segments, float alphaRef, nvrhi::IBuffer* list, nvrhi::IBuffer* args) {
+                DetailVisParams params = {};
+                params.entryBase = grassEntryBase;
+                params.kind = kind;
+                params.segments = segments;
+                params.alphaRef = alphaRef;
+                cmdList->writeBuffer(visParamsCB, &params, sizeof(params));
+
+                BindingSetBuilder bsb(*bladeVsRefl, psRefl, nvDevice, name);
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                bsb.ConstantBuffer("DetailGlobals", detailGlobalsCB);
+                bsb.ConstantBuffer("DetailVisParams", visParamsCB);
+                bsb.BufferSRV("visible_indices", list);
+                bsb.BufferSRV("detail_models", detailManager->detailModelsBuffer);
+                bsb.BufferSRV("pulled_vertices", detailManager->pulledVertexBuffer);
+                bsb.BufferSRV("all_instances", detailManager->generatedInstancesBuffer);
+                bsb.Texture("g_Perlin4D", detailManager->perlin4dTexture);
+                auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDevice);
+                if (bindingSet)
+                    draw(pipeline, bindingSet, args);
+            };
 
             for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; ++lod) {
                 if (!detailManager->visibleInstancesBuffer[lod] || !detailManager->drawArgsBuffer[lod])
                     continue;
-                DetailVisParams params = {};
-                params.entryBase = grassEntryBase;
-                params.lod = lod;
-                params.segments = FGDetailManager::LOD_SEGMENTS[lod];
-                cmdList->writeBuffer(visParamsCB, &params, sizeof(params));
+                drawKind(*bladePsRefl, state.bladeLayout, state.bladePipeline, "VisibilityRaster.Blades",
+                         lod, FGDetailManager::LOD_SEGMENTS[lod], 0.0f,
+                         detailManager->visibleInstancesBuffer[lod], detailManager->drawArgsBuffer[lod]);
+            }
 
-                BindingSetBuilder bsb(*bladeVsRefl, *bladePsRefl, nvDevice, "VisibilityRaster.Blades");
-                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-                bsb.ConstantBuffer("DetailGlobals", detailGlobalsCB);
-                bsb.ConstantBuffer("DetailVisParams", visParamsCB);
-                bsb.BufferSRV("visible_indices", detailManager->visibleInstancesBuffer[lod]);
-                bsb.BufferSRV("all_instances", detailManager->generatedInstancesBuffer);
-                bsb.Texture("g_Perlin4D", detailManager->perlin4dTexture);
-                auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.bladeLayout, nvDevice);
-                if (!bindingSet)
-                    continue;
-
-                nvrhi::GraphicsState gs;
-                gs.pipeline = state.bladePipeline;
-                gs.framebuffer = framebuffer;
-                gs.bindings = { bindingSet };
-                if (bindlessTable)
-                    gs.addBindingSet(bindlessTable);
-                gs.indirectParams = detailManager->drawArgsBuffer[lod];
-                gs.viewport.addViewport(viewport);
-                gs.viewport.addScissorRect(scissor);
-                cmdList->setGraphicsState(gs);
-                cmdList->drawIndirect(0, 1);
+            if (pulledPsRefl && state.pulledPipeline && detailManager->maxPulledIndexCount > 0) {
+                if (detailManager->visibleBillboardInstancesBuffer && detailManager->billboardDrawArgsBuffer)
+                    drawKind(*pulledPsRefl, state.pulledLayout, state.pulledPipeline, "VisibilityRaster.Meshes",
+                             FGDetailManager::VIS_KIND_MESH, 0, 96.0f / 255.0f,
+                             detailManager->visibleBillboardInstancesBuffer, detailManager->billboardDrawArgsBuffer);
+                if (detailManager->visibleDecalInstancesBuffer && detailManager->decalDrawArgsBuffer)
+                    drawKind(*pulledPsRefl, state.pulledLayout, state.pulledPipeline, "VisibilityRaster.Patches",
+                             FGDetailManager::VIS_KIND_DECAL, 0, 0.5f,
+                             detailManager->visibleDecalInstancesBuffer, detailManager->decalDrawArgsBuffer);
             }
         }
     }
@@ -336,6 +347,19 @@ bool EnsureVisibilityResources(fg::RenderDevice* device, VisibilityPassState& st
     }
     if (!state.bladePipeline)
         Msg("! [VisibilityRaster] Blade visibility pipeline unavailable, grass will not be drawn");
+
+    auto pulledPsResult = shaderLoader->LoadPixelShader("detail_vis_at", "main");
+    if (state.bladeVS && bladeVsResult.reflection && pulledPsResult.handle && pulledPsResult.reflection) {
+        state.pulledPS = pulledPsResult.handle;
+        state.pulledLayout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_Pulled", *bladeVsResult.reflection, *pulledPsResult.reflection, nvDevice);
+        if (state.pulledLayout) {
+            nvrhi::GraphicsPipelineDesc pulledDesc = makeDesc(state.pulledPS, state.pulledLayout, state.bladeVS);
+            pulledDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+            state.pulledPipeline = cache.GetOrCreatePipeline("VisibilityRaster_Pulled", pulledDesc, fbInfo, nvDevice);
+        }
+    }
+    if (!state.pulledPipeline)
+        Msg("! [VisibilityRaster] Pulled detail pipeline unavailable, tufts and patches will not be drawn");
 
     state.initialized = true;
     Msg("* [VisibilityRaster] Cluster visibility pipelines initialized");

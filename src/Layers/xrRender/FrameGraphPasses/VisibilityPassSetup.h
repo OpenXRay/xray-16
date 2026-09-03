@@ -37,6 +37,9 @@ struct VisibilityPassState {
     nvrhi::ShaderHandle bladePS;
     nvrhi::BindingLayoutHandle bladeLayout;
     nvrhi::GraphicsPipelineHandle bladePipeline;
+    nvrhi::ShaderHandle pulledPS;
+    nvrhi::BindingLayoutHandle pulledLayout;
+    nvrhi::GraphicsPipelineHandle pulledPipeline;
     nvrhi::ShaderHandle debugShader;
     nvrhi::BindingLayoutHandle debugLayout;
     nvrhi::ComputePipelineHandle debugPipeline;

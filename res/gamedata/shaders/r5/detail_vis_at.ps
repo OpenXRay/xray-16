@@ -1,0 +1,49 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+cbuffer DetailGlobals : register(b3)
+{
+    float4 consts;
+    float4 wave;
+    float4 dir2D;
+    float4 dir2D_2;
+    float4x4 g_detail_VP;
+    float4 detail_params;
+    float4 g_wind_direction;
+    float grass_wind_displacement;
+    float grass_interaction_displacement;
+    uint interaction_atlas_index;
+    uint perlin4d_texture_index;
+    float4 grass_color_tip;
+    float4 grass_color_base;
+    float4 grass_sss_color;
+    float grass_color_variation;
+    float grass_blade_height;
+    uint buildDetailsIndex;
+    uint buildDetailsPbrIndex;
+    float grass_blade_width;
+    float3 detail_pad;
+};
+
+cbuffer DetailVisParams : register(b5)
+{
+    uint g_EntryBase;
+    uint g_Kind;
+    uint g_Segments;
+    float g_AlphaRef;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    nointerpolation uint visID : TEXCOORD0;
+    float2 uv : TEXCOORD1;
+};
+
+uint main(PS_INPUT input) : SV_Target0
+{
+    float4 texel = GetBindlessTexture(buildDetailsIndex).Sample(smp_linear, input.uv);
+    clip(texel.a - g_AlphaRef);
+    return input.visID;
+}
