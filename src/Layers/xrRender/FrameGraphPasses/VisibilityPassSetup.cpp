@@ -29,6 +29,7 @@ struct VisibilityPassData {
     GPUCullingManager* gpuCulling = nullptr;
     VisibilityPassState* state = nullptr;
     ClusterDrawConfig config;
+    bool retest = false;
 };
 
 struct alignas(16) SkinnedVisParams {
@@ -64,21 +65,25 @@ void renderVisibilityRaster(
     const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
-    VisibilityPassState& state)
+    VisibilityPassState& state,
+    bool retest)
 {
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-    cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
-    cmdList->clearTextureUInt(visRT, nvrhi::AllSubresources, 0);
+    if (!retest) {
+        cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
+        cmdList->clearTextureUInt(visRT, nvrhi::AllSubresources, 0);
+    }
 
     if (!config.UseMegaBuffers())
         return;
 
-    if (materialCache) {
+    if (materialCache && !retest) {
         materialCache->FinalizePendingMaterials(ctx);
         materialCache->FinalizePendingTerrainMaterials(ctx);
     }
     auto& matBuffer = bindless::MaterialBuffer::Instance();
-    matBuffer.Upload(ctx);
+    if (!retest)
+        matBuffer.Upload(ctx);
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     auto& cache = GetPassResourceCache();
@@ -148,7 +153,7 @@ void renderVisibilityRaster(
             draw(state.terrainPipeline, bindingSet, config.terrainArgsBuffer);
     }
 
-    const u32 skinnedEntries = gpuCulling ? gpuCulling->GetSkinnedVisibleEntryCount() : 0u;
+    const u32 skinnedEntries = (gpuCulling && !retest) ? gpuCulling->GetSkinnedVisibleEntryCount() : 0u;
     if (skinnedEntries > 0 && state.skinnedPipeline) {
         auto* skinnedVsRefl = shaderLoader->GetCachedReflection("cluster_vis_skinned", ".vs");
         nvrhi::IBuffer* preVB = gpuCulling->GetSkinnedPreVertexBuffer();
@@ -274,19 +279,26 @@ VisibilityPassOutput setupVisibilityPass(
     const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
-    VisibilityPassState* state)
+    VisibilityPassState* state,
+    bool retest)
 {
     auto& passData = fg.addCallbackPass<VisibilityPassData>(
-        "Visibility Raster",
-        [&, depthTarget, visIdTarget, drawArgsBuffer, skinnedDrawArgs, config, materialCache, gpuCulling, state](FrameGraph& builder, PassHandle passHandle, VisibilityPassData& data) {
+        retest ? "Visibility Retest" : "Visibility Raster",
+        [&, depthTarget, visIdTarget, drawArgsBuffer, skinnedDrawArgs, config, materialCache, gpuCulling, state, retest](FrameGraph& builder, PassHandle passHandle, VisibilityPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.materialCache = materialCache;
             data.gpuCulling = gpuCulling;
             data.state = state;
             data.config = config;
-            data.depth = passBuilder.write(depthTarget, ResourceState::DepthStencilWrite);
-            data.visId = passBuilder.write(visIdTarget, ResourceState::RenderTarget);
+            data.retest = retest;
+            if (retest) {
+                data.depth = passBuilder.readWrite(depthTarget, ResourceState::DepthStencilWrite);
+                data.visId = passBuilder.readWrite(visIdTarget, ResourceState::RenderTarget);
+            } else {
+                data.depth = passBuilder.write(depthTarget, ResourceState::DepthStencilWrite);
+                data.visId = passBuilder.write(visIdTarget, ResourceState::RenderTarget);
+            }
             if (drawArgsBuffer.is_valid())
                 data.drawArgsBuffer = passBuilder.read(drawArgsBuffer, ResourceState::IndirectArgument);
             if (skinnedDrawArgs.is_valid())
@@ -298,7 +310,7 @@ VisibilityPassOutput setupVisibilityPass(
             if (!depthRT || !visRT || !ctx->GetCommandList())
                 return;
             renderVisibilityRaster(ctx, data.device, depthRT, visRT, data.config, data.materialCache,
-                data.skinnedDrawArgs.is_valid() ? data.gpuCulling : nullptr, *data.state);
+                data.skinnedDrawArgs.is_valid() ? data.gpuCulling : nullptr, *data.state, data.retest);
         });
 
     VisibilityPassOutput out;

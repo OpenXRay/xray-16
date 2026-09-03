@@ -351,6 +351,9 @@ void FrameGraphRenderer::Shutdown() {
 
     m_normals[0] = nullptr;
     m_normals[1] = nullptr;
+    m_hizHistory[0] = nullptr;
+    m_hizHistory[1] = nullptr;
+    m_hasPrevHiZ = false;
     m_inspectorPreview = nullptr;
     old_QuadIB = nullptr;
 }
@@ -510,6 +513,7 @@ void FrameGraphRenderer::Render() {
     m_prevView = Device.mView;
     m_prevProject = Device.mProject;
     m_prevCameraPos = Device.vCameraPosition;
+    m_hasPrevHiZ = m_hizPyramid.is_valid();
     m_pingPongIndex = 1 - m_pingPongIndex;
 
     if (m_gpuProfiler)
@@ -712,6 +716,8 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.clusterTerrainEntries = m_gpuCullingManager->GetClusterTerrainEntryCount();
             stats.clusterTerrainVisible = cullStats.clusterTerrainVisible;
             stats.clusterStaticEntries = m_gpuCullingManager->GetClusterStaticEntryCount();
+            stats.clusterOcclusionCandidates = cullStats.clusterCandidates;
+            stats.clusterOcclusionRecovered = cullStats.clusterRetestVisible;
             stats.residualStatic = m_gpuCullingManager->GetStaticResidualCount();
             stats.residualTerrain = m_gpuCullingManager->GetTerrainResidualCount();
             stats.residualDynamic = m_gpuCullingManager->GetDynamicResidualCount();
@@ -1050,6 +1056,44 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     //  GPU CULLING PHASE A (Frustum + Distance, feeds the depth prepass)
     // ═══════════════════════════════════════════════════════
 
+    const u32 hizWidth = std::max(1u, width / 2);
+    const u32 hizHeight = std::max(1u, height / 2);
+    const u32 hizMipLevels = passes::CalculateHiZMipLevels(hizWidth, hizHeight);
+    if (!m_hizHistory[0] || m_hizHistoryWidth != hizWidth || m_hizHistoryHeight != hizHeight) {
+        nvrhi::TextureDesc desc;
+        desc.width = hizWidth;
+        desc.height = hizHeight;
+        desc.mipLevels = hizMipLevels;
+        desc.format = nvrhi::Format::R32_FLOAT;
+        desc.isShaderResource = true;
+        desc.isUAV = true;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        for (int i = 0; i < 2; i++) {
+            desc.debugName = (i == 0) ? "HiZ_A" : "HiZ_B";
+            m_hizHistory[i] = nvDevice->createTexture(desc);
+        }
+        m_hizHistoryWidth = hizWidth;
+        m_hizHistoryHeight = hizHeight;
+        m_hasPrevHiZ = false;
+    }
+    auto hizImportDesc = [&](const char* name) {
+        framegraph::ResourceDesc desc;
+        desc.type = framegraph::ResourceDesc::Type::Texture2D;
+        desc.debugName = name;
+        desc.width = hizWidth;
+        desc.height = hizHeight;
+        desc.mipLevels = hizMipLevels;
+        desc.format = nvrhi::Format::R32_FLOAT;
+        desc.isUAV = true;
+        desc.isImported = true;
+        desc.isTransient = false;
+        return desc;
+    };
+    framegraph::VirtualResourceHandle prevHiZHandle;
+    if (m_hasPrevHiZ && m_hizHistory[readIdx])
+        prevHiZHandle = m_framegraph->ImportTexture("rt_PrevHiZ", m_hizHistory[readIdx], hizImportDesc("rt_PrevHiZ"));
+
     framegraph::VirtualResourceHandle clusterArgsHandle;
     framegraph::VirtualResourceHandle skinnedDrawArgsBuffer;
     bool cullActive = false;
@@ -1081,7 +1125,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_gpuCullingManager->SetRTAccelStructManager(m_rtAccelMgr.get());
 
         if (m_gpuCullingManager->IsEnabled()) {
-            clusterArgsHandle = m_gpuCullingManager->SetupCullingPass(*m_framegraph, m_geometryCollector.get());
+            clusterArgsHandle = m_gpuCullingManager->SetupCullingPass(*m_framegraph, m_geometryCollector.get(),
+                prevHiZHandle, m_prevViewProj, hizWidth, hizHeight, hizMipLevels);
             cullActive = clusterArgsHandle.is_valid();
         }
     }
@@ -1156,8 +1201,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     passes::HiZPyramidOutput hizOutput;
     hizOutput.pyramid = framegraph::VirtualResourceHandle();
     hizOutput.mipLevels = 0;
-    hizOutput.width = width / 2;
-    hizOutput.height = height / 2;
+    hizOutput.width = hizWidth;
+    hizOutput.height = hizHeight;
 
     if (visActive) {
         hizOutput = passes::setupHiZBuildPass(
@@ -1166,13 +1211,43 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             depthBuffer,
             width,
             height,
-            m_blackboard->get_or_add<passes::HiZBuildPassState>()
+            m_blackboard->get_or_add<passes::HiZBuildPassState>(),
+            m_framegraph->ImportTexture("rt_HiZPyramid", m_hizHistory[writeIdx], hizImportDesc("rt_HiZPyramid"))
         );
     }
 
     m_hizPyramid = hizOutput.pyramid;
     if (m_hizPyramid.is_valid())
         m_framegraph->GetRTRegistry().RegisterRT("rt_HiZ", m_hizPyramid);
+
+    if (visActive && hizOutput.pyramid.is_valid()) {
+        framegraph::VirtualResourceHandle retestArgsHandle = m_gpuCullingManager->SetupClusterRetestPass(
+            *m_framegraph, hizOutput.pyramid, hizOutput.width, hizOutput.height, hizOutput.mipLevels);
+        if (retestArgsHandle.is_valid()) {
+            passes::ClusterDrawConfig retestConfig = clusterConfig;
+            retestConfig.visibleEntryBuffer = m_gpuCullingManager->GetClusterRetestVisibleEntryBuffer();
+            retestConfig.fadeBuffer = m_gpuCullingManager->GetClusterRetestFadeBuffer();
+            retestConfig.argsBuffer = m_gpuCullingManager->GetClusterRetestArgsBuffer();
+            retestConfig.terrainVisibleEntryBuffer = m_gpuCullingManager->GetClusterRetestTerrainVisibleEntryBuffer();
+            retestConfig.terrainFadeBuffer = m_gpuCullingManager->GetClusterRetestTerrainFadeBuffer();
+            retestConfig.terrainArgsBuffer = m_gpuCullingManager->GetClusterRetestTerrainArgsBuffer();
+            auto retestOut = passes::setupVisibilityPass(
+                *m_framegraph,
+                m_device,
+                depthBuffer,
+                visIdBuffer,
+                retestArgsHandle,
+                framegraph::VirtualResourceHandle(),
+                retestConfig,
+                m_materialCache.get(),
+                m_gpuCullingManager.get(),
+                &m_blackboard->get_or_add<passes::VisibilityPassState>(),
+                true
+            );
+            depthBuffer = retestOut.depth;
+            visIdBuffer = retestOut.visId;
+        }
+    }
 
     framegraph::VirtualResourceHandle vsmMaskHandle;
     bool vsmPassesActive = false;
