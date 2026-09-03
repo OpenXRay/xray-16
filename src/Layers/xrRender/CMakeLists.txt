@@ -57,8 +57,7 @@ target_sources(xrRender PRIVATE
 
     FrameGraphPasses/ShaderConstants.h
     FrameGraphPasses/ShaderConstants.cpp
-    FrameGraphPasses/ForwardColorPassSetup.h
-    FrameGraphPasses/ForwardColorPassSetup.cpp
+    FrameGraphPasses/ClusterDrawConfig.h
     FrameGraphPasses/VisibilityPassSetup.h
     FrameGraphPasses/VisibilityPassSetup.cpp
     FrameGraphPasses/MaterialResolvePassSetup.h

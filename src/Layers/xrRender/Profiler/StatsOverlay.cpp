@@ -497,24 +497,6 @@ void StatsOverlay::RenderGeometrySection()
         ImGui::Unindent();
 
         // ═══════════════════════════════════════════════════
-        //  GPU CULLING STATS
-        // ═══════════════════════════════════════════════════
-        if (s.objectsSubmitted > 0)
-        {
-            ImGui::Text("Object culling (unclustered):");
-            ImGui::Indent();
-
-            float cullPercent = s.objectsCulled > 0 ?
-                (float)s.objectsCulled / s.objectsSubmitted * 100.0f : 0.0f;
-
-            ImGui::Text("Submitted: %u", s.objectsSubmitted);
-            ImGui::Text("Visible:   %u", s.objectsVisible);
-            ImGui::Text("Culled:    %u (%.0f%%)", s.objectsCulled, cullPercent);
-
-            ImGui::Unindent();
-        }
-
-        // ═══════════════════════════════════════════════════
         //  SKINNING STATS
         // ═══════════════════════════════════════════════════
         if (s.skinnedMeshes > 0)
@@ -539,7 +521,7 @@ void StatsOverlay::RenderGeometrySection()
             ImGui::Text("Static:  %u/%u drawn, %s tris", s.clusterVisible, s.clusterStaticEntries, FormatNumber(s.clusterTrianglesDrawn));
             if (s.clusterTerrainEntries > 0)
                 ImGui::Text("Terrain: %u/%u drawn, %s tris", s.clusterTerrainVisible, s.clusterTerrainEntries, FormatNumber(s.clusterTerrainTrianglesDrawn));
-            ImGui::Text("Forward residue: %u static / %u terrain / %u dynamic", s.forwardResidualStatic, s.forwardResidualTerrain, s.forwardResidualDynamic);
+            ImGui::Text("Undrawn residue: %u static / %u terrain / %u dynamic", s.residualStatic, s.residualTerrain, s.residualDynamic);
             ImGui::Unindent();
         }
 

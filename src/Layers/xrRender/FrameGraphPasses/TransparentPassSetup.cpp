@@ -9,7 +9,6 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
-#include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
@@ -172,8 +171,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
 
             const auto& cfg = data.config;
 
-            auto& variantTexBuffer = bindless::VariantTextureBuffer::Instance();
-
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* vsReflection = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
             auto* psReflection = shaderLoader->GetCachedReflection("bindless_forward", ".ps");
@@ -182,9 +179,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             bsb.ConstantBuffer("static_globals", staticGlobalsCB);
             bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
             bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
-            bsb.BufferSRV("g_CompactBatchIndices", cfg.compactBatchIndicesBuffer);
-            bsb.BufferSRV("g_CompactMaterialIDs", cfg.compactMaterialIDBuffer);
-            bsb.BufferSRV("g_DrawFades", cfg.fadeBuffer);
             bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
             bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
             bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
@@ -210,8 +204,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 {drawIndexBuffer, 1, 0}
             };
             state.indexBuffer = { cfg.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
-            state.indirectParams = cfg.compactDrawArgsBuffer;
-            state.indirectCountBuffer = cfg.compactCountBuffer;
+            state.indirectParams = cfg.drawArgsBuffer;
 
             const auto& rtDesc = colorRT->getDesc();
             nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
@@ -219,7 +212,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
             cmdList->setGraphicsState(state);
-            DrawIndexedIndirectCountOrFallback(cmdList, 0, 0, cfg.objectCount);
+            cmdList->drawIndexedIndirect(0, cfg.objectCount);
         }
     );
 

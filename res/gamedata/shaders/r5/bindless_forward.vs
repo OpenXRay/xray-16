@@ -42,7 +42,6 @@ struct VS_OUTPUT
     float3 tangent  : TEXCOORD3;
     float3 bitangent: TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
-    nointerpolation uint drawID : TEXCOORD6;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -58,8 +57,6 @@ struct InstanceData
 };
 
 StructuredBuffer<InstanceData> g_InstanceData : register(t14);
-StructuredBuffer<uint> g_CompactBatchIndices : register(t15);
-StructuredBuffer<uint> g_CompactMaterialIDs : register(t16);
 
 // Unpack D3DCOLOR normal from [0,1] to [-1,1]
 float3 UnpackNormal(float4 packed)
@@ -76,12 +73,9 @@ VS_OUTPUT main(VS_INPUT input)
     // GPU-driven multi-draw: Draw index comes from per-instance DRAWINDEX attribute
     // The compaction shader sets StartInstanceLocation in indirect args (0,1,2,3...)
     // D3D12 uses StartInstanceLocation to offset into the per-instance draw index buffer
-    uint drawID = input.drawIndex;
-
-    uint batchIndex = g_CompactBatchIndices[drawID];
-    InstanceData instanceData = g_InstanceData[batchIndex];
+    InstanceData instanceData = g_InstanceData[input.drawIndex];
     float4x4 worldMatrix = instanceData.world;
-    uint materialID = g_CompactMaterialIDs[drawID];
+    uint materialID = instanceData.materialID;
 
     // Unpack compressed normal/tangent/binormal
     float3 normalUnpacked = UnpackNormal(input.normal);
@@ -107,7 +101,6 @@ VS_OUTPUT main(VS_INPUT input)
 
     // Pass material ID to pixel shader
     output.materialID = materialID;
-    output.drawID = drawID;
 
     return output;
 }
