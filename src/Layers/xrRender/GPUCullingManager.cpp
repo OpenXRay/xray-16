@@ -775,6 +775,8 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         return;
 
     auto cmdList = ctx->GetCommandList();
+    if (overlayMgr)
+        overlayMgr->UploadSplats(cmdList);
     m_skinnedPools.FlushUploads(m_device->GetNVRHIDevice(), cmdList);
     m_boneBatching = true;
     m_boneBatchStart = m_currentBoneOffset;
