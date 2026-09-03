@@ -2052,7 +2052,7 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
 // ═══════════════════════════════════════════════════════
 
 void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const GeometryCollector* geometry,
-    decals::OverlayManager* overlayMgr)
+    const xr_vector<GeometryBatch>* hudBatches, decals::OverlayManager* overlayMgr)
 {
     ZoneScopedN("GPUCull::UploadSkinnedObjects");
 
@@ -2061,7 +2061,7 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         bucket.args.clear();
         bucket.records.clear();
         bucket.materialIDs.clear();
-        bucket.shadowOnly.clear();
+        bucket.kinds.clear();
         bucket.srcVertexBases.clear();
         bucket.vertexCounts.clear();
         bucket.base = 0;
@@ -2080,18 +2080,17 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     m_boneBatchStart = m_currentBoneOffset;
 
     u32 residual = 0;
-    for (const auto& batch : geometry->GetBatches()) {
-        if (!batch.isSkinned)
-            continue;
-
+    u32 hudPooled = 0;
+    auto addBatch = [&](const GeometryBatch& batch, u8 kind) {
         const u32 variantIdx = bindless::MaterialBuffer::Instance().GetShaderVariant(batch.bindlessMaterialID);
         const bool pooled = variantIdx == 0
             && batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
             && batch.skinnedPoolFormat < SkinnedGeometryPools::FORMAT_COUNT;
         if (!pooled) {
-            ++residual;
-            continue;
+            residual += kind == 2u ? 0u : 1u;
+            return;
         }
+        hudPooled += kind == 2u ? 1u : 0u;
 
         SkinnedBucket& bucket = m_skinnedBuckets[batch.skinnedPoolFormat];
 
@@ -2121,12 +2120,23 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
             rec.splatCount = sr.count;
         }
         rec.pad = 0;
-        rec.bounds.set(batch.worldBoundsCenter.x, batch.worldBoundsCenter.y, batch.worldBoundsCenter.z, batch.worldBoundsRadius);
+        const float casterRadius = kind == 2u ? -batch.worldBoundsRadius : batch.worldBoundsRadius;
+        rec.bounds.set(batch.worldBoundsCenter.x, batch.worldBoundsCenter.y, batch.worldBoundsCenter.z, casterRadius);
         bucket.records.push_back(rec);
         bucket.materialIDs.push_back(batch.bindlessMaterialID);
-        bucket.shadowOnly.push_back(batch.isShadowOnly ? 1u : 0u);
+        bucket.kinds.push_back(kind);
         bucket.srcVertexBases.push_back(u32(batch.skinnedPoolBaseVertex));
         bucket.vertexCounts.push_back(batch.vertexCount);
+    };
+    for (const auto& batch : geometry->GetBatches()) {
+        if (batch.isSkinned)
+            addBatch(batch, batch.isShadowOnly ? 1u : 0u);
+    }
+    if (hudBatches) {
+        for (const auto& batch : *hudBatches) {
+            if (batch.isSkinned)
+                addBatch(batch, 2u);
+        }
     }
 
     FlushBoneBatch(cmdList);
@@ -2135,13 +2145,15 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
         SkinnedBucket& bucket = m_skinnedBuckets[f];
         bucket.base = pooledTotal;
-        bucket.casterCount = static_cast<u32>(bucket.records.size());
+        bucket.casterCount = 0;
         bucket.count = 0;
-        for (u8 shadowOnly : bucket.shadowOnly)
-            bucket.count += shadowOnly ? 0u : 1u;
-        pooledTotal += bucket.casterCount;
+        for (u8 kind : bucket.kinds) {
+            bucket.count += kind == 0u ? 1u : 0u;
+            bucket.casterCount += kind != 2u ? 1u : 0u;
+        }
+        pooledTotal += static_cast<u32>(bucket.records.size());
     }
-    m_skinnedObjectCount = pooledTotal + residual;
+    m_skinnedObjectCount = pooledTotal - hudPooled + residual;
 
     if (pooledTotal == 0)
         return;
@@ -2157,9 +2169,9 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
         SkinnedBucket& bucket = m_skinnedBuckets[f];
         m_skinnedChunkBase[f] = static_cast<u32>(m_skinnedChunkData.size());
-        for (u32 pass = 0; pass < 2; ++pass) {
-            for (u32 i = 0; i < bucket.casterCount; ++i) {
-                if ((bucket.shadowOnly[i] != 0u) != (pass == 1))
+        for (u32 pass = 0; pass < 3; ++pass) {
+            for (u32 i = 0; i < static_cast<u32>(bucket.records.size()); ++i) {
+                if (bucket.kinds[i] != pass)
                     continue;
                 const u32 slot = static_cast<u32>(m_skinnedArgsData.size());
                 const u32 vertexCount = bucket.vertexCounts[i];
@@ -2177,17 +2189,17 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
                     chunk.count = std::min(SKINNED_CHUNK_VERTICES, vertexCount - v0);
                     m_skinnedChunkData.push_back(chunk);
                 }
-                if (pass == 0) {
+                if (pass != 1) {
                     const u32 ibBase = m_skinnedPools.GetFormatIndexBase(f) + args.startIndexLocation;
                     for (u32 i0 = 0; i0 < args.indexCountPerInstance; i0 += SKINNED_ENTRY_INDICES) {
                         GPUClusterEntry e = {};
-                        e.sphere.set(bucket.records[i].bounds.x, bucket.records[i].bounds.y, bucket.records[i].bounds.z, bucket.records[i].bounds.w);
+                        e.sphere.set(bucket.records[i].bounds.x, bucket.records[i].bounds.y, bucket.records[i].bounds.z, std::fabs(bucket.records[i].bounds.w));
                         e.indexCount = std::min(SKINNED_ENTRY_INDICES, args.indexCountPerInstance - i0);
                         e.ibFirst = ibBase + i0;
                         e.firstVertex = vertexTotal;
                         e.batchIndex = slot;
                         e.materialID = bucket.materialIDs[i];
-                        e.flags = GPU_CLUSTER_ENTRY_SKINNED;
+                        e.flags = GPU_CLUSTER_ENTRY_SKINNED | (pass == 2 ? GPU_CLUSTER_ENTRY_HUD : 0u);
                         m_skinnedEntryData.push_back(e);
                     }
                 }
@@ -3131,6 +3143,7 @@ void GPUCullingManager::SetupHiZCullingPass(
 framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedUploadPass(
     framegraph::FrameGraph& fg,
     const GeometryCollector* geometry,
+    const xr_vector<GeometryBatch>* hudBatches,
     decals::OverlayManager* overlayMgr)
 {
     using namespace framegraph;
@@ -3142,6 +3155,7 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedUploadPass(
         VirtualResourceHandle drawArgsBuffer;
         GPUCullingManager* manager;
         const GeometryCollector* geometry;
+        const xr_vector<GeometryBatch>* hudBatches;
         decals::OverlayManager* overlayMgr;
     };
 
@@ -3156,15 +3170,16 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedUploadPass(
 
     auto& passData = fg.addCallbackPass<SkinnedUploadPassData>(
         "Skinned Upload",
-        [&, geometry, argsBufferHandle, overlayMgr](FrameGraph& builder, PassHandle passHandle, SkinnedUploadPassData& data) {
+        [&, geometry, hudBatches, argsBufferHandle, overlayMgr](FrameGraph& builder, PassHandle passHandle, SkinnedUploadPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.manager = this;
             data.geometry = geometry;
+            data.hudBatches = hudBatches;
             data.overlayMgr = overlayMgr;
             data.drawArgsBuffer = passBuilder.write(argsBufferHandle, ResourceState::CopyDest);
         },
         [](const SkinnedUploadPassData& data, const FrameGraph&, fg::RenderContext* ctx) {
-            data.manager->UploadSkinnedObjects(ctx, data.geometry, data.overlayMgr);
+            data.manager->UploadSkinnedObjects(ctx, data.geometry, data.hudBatches, data.overlayMgr);
         }
     );
 

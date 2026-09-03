@@ -29,34 +29,8 @@
 #include "Layers/xrRender/ClusteredLightManager.h"
 #include "xrCore/FMesh.hpp"
 
-extern ENGINE_API float psHUD_FOV;
-
 namespace xray::render::fg::passes {
 using namespace bindless;
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  HUD FOV ADJUSTMENT
-// ═══════════════════════════════════════════════════════════════════════════
-static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
-{
-    float fovScale = 1.0f / psHUD_FOV;
-    Fmatrix viewMatrix = Device.mView;
-    Fmatrix invView;
-    invView.invert(viewMatrix);
-
-    Fmatrix fovScaleMatrix;
-    fovScaleMatrix.identity();
-    fovScaleMatrix._11 = fovScale;
-    fovScaleMatrix._22 = fovScale;
-    fovScaleMatrix._33 = 1.0f;
-
-    Fmatrix temp1, temp2, result;
-    temp1.mul(viewMatrix, worldMatrix);
-    temp2.mul(fovScaleMatrix, temp1);
-    result.mul(invView, temp2);
-
-    return result;
-}
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  PIPELINE INITIALIZATION
@@ -89,14 +63,6 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
     auto skinnedVsForReflection = shaderLoader->LoadVertexShader("bindless_skinned", "main");
     state.layout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass", *skinnedVsForReflection.reflection, *skinnedPsResult.reflection, nvDevice);
 
-    auto hudPsResult = shaderLoader->LoadPixelShader("bindless_skinned_hud", "main");
-    if (hudPsResult.handle) {
-        state.hudPS = hudPsResult.handle;
-        state.hudLayout = cache.GetOrCreateBindingLayoutFromReflection("SkinningPass_HUD", *skinnedVsForReflection.reflection, *hudPsResult.reflection, nvDevice);
-    }
-    if (!state.hudLayout)
-        state.hudLayout = state.layout;
-
     auto buildPipelineDesc = [&](nvrhi::IShader* vs, nvrhi::IInputLayout* il, nvrhi::IShader* psOverride = nullptr) {
         nvrhi::GraphicsPipelineDesc pipeDesc;
         pipeDesc.VS = vs;
@@ -126,16 +92,6 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
         variant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
         if (variant.pipeline)
             QueryBindingLayoutFromPipeline(variant.pipeline, state.layout);
-    };
-
-    auto initHudVariant = [&](SkinningPipelineVariant& hudVariant, const SkinningPipelineVariant& worldVariant, const char* cacheName) {
-        if (!worldVariant.pipeline || !state.hudPS)
-            return;
-        hudVariant.vs = worldVariant.vs;
-        hudVariant.inputLayout = worldVariant.inputLayout;
-        auto pipeDesc = buildPipelineDesc(worldVariant.vs, worldVariant.inputLayout, state.hudPS);
-        pipeDesc.bindingLayouts[0] = state.hudLayout;
-        hudVariant.pipeline = cache.GetOrCreatePipeline(cacheName, pipeDesc, fbInfo, nvDevice);
     };
 
     auto mdiVsResult = shaderLoader->LoadVertexShader("bindless_skinned_pre", "main");
@@ -207,12 +163,6 @@ void InitializeSkinningResources(fg::RenderDevice* device, const nvrhi::Framebuf
         initVariant(state.hq3w, "bindless_skinned_3w", "SkinningPass_hq3w", attribs, 5);
     }
 
-    initHudVariant(state.hudNonHQ, state.nonHQ, "SkinningPass_hud_nonHQ");
-    initHudVariant(state.hudHQ1w, state.hq1w, "SkinningPass_hud_hq1w");
-    initHudVariant(state.hudHQ2w, state.hq2w, "SkinningPass_hud_hq2w");
-    initHudVariant(state.hudHQ3w, state.hq3w, "SkinningPass_hud_hq3w");
-    initHudVariant(state.hudHQ4w, state.hq4w, "SkinningPass_hud_hq4w");
-
     state.initialized = true;
     Msg("* [SkinningPass] Pipeline initialization complete");
 }
@@ -268,12 +218,6 @@ static nvrhi::IGraphicsPipeline* SelectSkinnedPipelineFromVariants(
 static nvrhi::IGraphicsPipeline* SelectSkinnedPipeline(const SkinningPassState& state, u32 vertexStride, u16 renderMode)
 {
     return SelectSkinnedPipelineFromVariants(state.nonHQ, state.hq1w, state.hq2w, state.hq3w, state.hq4w, vertexStride, renderMode);
-}
-
-static nvrhi::IGraphicsPipeline* SelectHUDSkinnedPipeline(const SkinningPassState& state, u32 vertexStride, u16 renderMode)
-{
-    auto* hudPipe = SelectSkinnedPipelineFromVariants(state.hudNonHQ, state.hudHQ1w, state.hudHQ2w, state.hudHQ3w, state.hudHQ4w, vertexStride, renderMode);
-    return hudPipe ? hudPipe : SelectSkinnedPipeline(state, vertexStride, renderMode);
 }
 
 static u32 GetSkinnedVertexFormatID(u16 renderMode, u32 vertexStride)
@@ -355,7 +299,6 @@ struct SkinnedPhaseContext {
     nvrhi::IBindingLayout* bindlessLayout = nullptr;
     nvrhi::Viewport viewport;
     nvrhi::Rect scissor;
-    bool isHUD = false;
 };
 
 static SkinnedPhaseContext BuildSkinnedPhaseContext(
@@ -370,8 +313,7 @@ static SkinnedPhaseContext BuildSkinnedPhaseContext(
     nvrhi::IBindingLayout* bindlessLayout,
     nvrhi::IBuffer* splatBuffer,
     const nvrhi::Viewport& viewport,
-    const nvrhi::Rect& scissor,
-    bool isHUD)
+    const nvrhi::Rect& scissor)
 {
     using namespace fg;
     using namespace fg::bindless;
@@ -384,7 +326,6 @@ static SkinnedPhaseContext BuildSkinnedPhaseContext(
     ctx.bindlessLayout = bindlessLayout;
     ctx.viewport = viewport;
     ctx.scissor = scissor;
-    ctx.isHUD = isHUD;
 
     if (!globalBoneBuffer)
         return ctx;
@@ -394,12 +335,9 @@ static SkinnedPhaseContext BuildSkinnedPhaseContext(
 
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     auto* vsReflection = shaderLoader->GetCachedReflection("bindless_skinned", ".vs");
-    const bool useHUDPS = isHUD && state.hudPS;
-    const char* psShaderName = useHUDPS ? "bindless_skinned_hud" : "bindless_skinned";
-    auto* psReflection = shaderLoader->GetCachedReflection(psShaderName, ".ps");
-    auto activeLayout = isHUD ? state.hudLayout : state.layout;
+    auto* psReflection = shaderLoader->GetCachedReflection("bindless_skinned", ".ps");
 
-    framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, isHUD ? "Skinning.HUD" : "Skinning");
+    framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Skinning");
     bsb.ConstantBuffer("dynamic_transforms", dynTransformsCB);
     bsb.ConstantBuffer("static_globals", staticGlobalsCB);
     bsb.BufferSRV("g_BoneMatrices", globalBoneBuffer);
@@ -407,7 +345,7 @@ static SkinnedPhaseContext BuildSkinnedPhaseContext(
     bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
     bsb.BufferSRV("g_PaintSplats", splatBuffer);
 
-    ctx.bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), activeLayout, nvDevice);
+    ctx.bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.layout, nvDevice);
     return ctx;
 }
 
@@ -455,9 +393,7 @@ static void DrawSkinnedBatch(
                 nvDevice, ctx.framebuffer, variantIdx, *variant, p, fmt,
                 GetSkinnedInputLayout(state, fmt), state.layout, ctx.bindlessLayout);
         } else {
-            pipeline = ctx.isHUD
-                ? SelectHUDSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode)
-                : SelectSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode);
+            pipeline = SelectSkinnedPipeline(state, batch.vertexStride, batch.skinningRenderMode);
         }
         if (!pipeline)
             continue;
@@ -491,7 +427,6 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     const GeometryCollector* geometry,
-    const xr_vector<GeometryBatch>* hudBatches,
     MaterialCache* materialCache,
     u32 width,
     u32 height,
@@ -524,7 +459,6 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             data.height = height;
             data.device = device;
             data.geometry = geometry;
-            data.hudBatches = hudBatches;
             data.materialCache = materialCache;
             data.gpuCulling = gpuCulling;
             data.passState = state;
@@ -553,7 +487,6 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
             // Check if any skinned batches to render
             bool hasWorldSkinned = data.geometry && !data.geometry->GetBatches().empty();
-            bool hasHUDSkinned = data.hudBatches && !data.hudBatches->empty();
 
             // Count actual skinned batches in world geometry
             u32 worldSkinnedCount = 0;
@@ -563,7 +496,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 }
             }
 
-            if (worldSkinnedCount == 0 && !hasHUDSkinned) {
+            if (worldSkinnedCount == 0) {
                 // Msg("! [SkinningPass] No skinned batches to render");
                 return;
             }
@@ -661,7 +594,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                     *data.passState, nvDevice, framebuffer,
                     dynTransformsCB, staticGlobalsCB, materialIdCB,
                     globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer,
-                    worldViewport, scissor, false);
+                    worldViewport, scissor);
 
                 const bool mdiActive = data.skinnedDrawArgs.is_valid() && gpuCullMgr->IsSkinnedEnabled();
 
@@ -685,30 +618,6 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 }
             }
 
-            // ═══════════════════════════════════════════════════════
-            //  PHASE 2: HUD SKINNED MESHES (depth [0.9, 1.0])
-            // ═══════════════════════════════════════════════════════
-            if (hasHUDSkinned) {
-                nvrhi::Viewport hudViewport(
-                    0.0f, static_cast<float>(rtDesc.width),
-                    0.0f, static_cast<float>(rtDesc.height),
-                    0.9f, 1.0f
-                );
-
-                SkinnedPhaseContext hudCtx = BuildSkinnedPhaseContext(
-                    *data.passState, nvDevice, framebuffer,
-                    dynTransformsCB, staticGlobalsCB, materialIdCB,
-                    globalBoneBuffer, bindlessTable, bindlessLayout, splatBuffer,
-                    hudViewport, scissor, true);
-
-                for (const auto& batch : *data.hudBatches) {
-                    Fmatrix adjustedWorldMatrix = ApplyHUDFOVAdjustment(batch.worldMatrix);
-                    u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
-
-                    DrawSkinnedBatch(*data.passState, cmdList, nvDevice, hudCtx,
-                        batch, adjustedWorldMatrix, boneOffset, {0, 0});
-                }
-            }
         }
     );
 

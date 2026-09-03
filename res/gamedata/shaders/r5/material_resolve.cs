@@ -24,6 +24,17 @@ cbuffer MaterialResolveParams : register(b5)
     uint3 g_ResolvePad;
 };
 
+float4 ProjectEntry(float3 worldPos, bool hud)
+{
+    if (hud)
+    {
+        float4 viewPos = mul(m_V, float4(worldPos, 1.0));
+        viewPos.xy /= hud_fov;
+        return mul(m_P, viewPos);
+    }
+    return mul(m_VP, float4(worldPos, 1.0));
+}
+
 [numthreads(8, 8, 1)]
 void main(uint3 dtid : SV_DispatchThreadID)
 {
@@ -44,6 +55,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     uint ib = e.ibFirst + tri * 3u;
 
     bool terrain = (e.flags & CLUSTER_ENTRY_FLAG_TERRAIN) != 0u;
+    bool hud = (e.flags & CLUSTER_ENTRY_FLAG_HUD) != 0u;
     float4x4 world = float4x4(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
     MegaVertex v0;
     MegaVertex v1;
@@ -69,9 +81,9 @@ void main(uint3 dtid : SV_DispatchThreadID)
     }
     float3x3 world3 = (float3x3)world;
 
-    float4 c0 = mul(m_VP, mul(world, float4(v0.position, 1.0)));
-    float4 c1 = mul(m_VP, mul(world, float4(v1.position, 1.0)));
-    float4 c2 = mul(m_VP, mul(world, float4(v2.position, 1.0)));
+    float4 c0 = ProjectEntry(mul(world, float4(v0.position, 1.0)).xyz, hud);
+    float4 c1 = ProjectEntry(mul(world, float4(v1.position, 1.0)).xyz, hud);
+    float4 c2 = ProjectEntry(mul(world, float4(v2.position, 1.0)).xyz, hud);
 
     float2 uvPix = (float2(p) + 0.5) * screen_res.zw;
     float2 pixelNdc = float2(uvPix.x * 2.0 - 1.0, 1.0 - uvPix.y * 2.0);
