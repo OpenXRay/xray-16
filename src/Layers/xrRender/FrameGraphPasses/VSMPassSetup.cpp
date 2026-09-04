@@ -45,13 +45,13 @@ struct VsmMarkParams {
 struct VsmResidParams {
     s32 pageBase[12];
     u32 frame;
-    u32 refreshN;
-    u32 sunMoving;
+    u32 refreshBudget;
+    u32 wrongBudget;
     u32 forceDirty;
-    float inval[16];
-    u32 sunEpoch;
-    u32 staleOn;
-    u32 pad[2];
+    u32 interval[8];
+    Fvector4 pivot;
+    Fvector4 sun;
+    Fvector4 levelOrigin[kVSMLevels];
 };
 
 struct VsmBinParams {
@@ -415,7 +415,9 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
     state.physTile = MakeUAVBuffer(nvDevice, "VSM_PhysTile", u64(kVSMStaticSlots) * sizeof(u32) * 2, sizeof(u32) * 2, false);
     state.slotDirty = MakeUAVBuffer(nvDevice, "VSM_SlotDirty", u64(kVSMStaticSlots) * sizeof(u32), sizeof(u32), false);
     state.dirtyList = MakeUAVBuffer(nvDevice, "VSM_DirtyList", u64(kVSMDirtyListWords) * sizeof(u32), sizeof(u32), false);
-    state.slotEpoch = MakeUAVBuffer(nvDevice, "VSM_SlotEpoch", u64(kVSMStaticSlots) * sizeof(u32), sizeof(u32), false);
+    state.slotFrame = MakeUAVBuffer(nvDevice, "VSM_SlotFrame", u64(kVSMStaticSlots) * sizeof(u32), sizeof(u32), false);
+    state.slotPivot = MakeUAVBuffer(nvDevice, "VSM_SlotPivot", u64(kVSMStaticSlots) * sizeof(float) * 4, sizeof(float) * 4, false);
+    state.slotSun = MakeUAVBuffer(nvDevice, "VSM_SlotSun", u64(kVSMStaticSlots) * sizeof(float) * 4, sizeof(float) * 4, false);
     state.dynPageTable = MakeUAVBuffer(nvDevice, "VSM_DynPageTable", u64(kVSMPageCount) * sizeof(u32), sizeof(u32), false);
     state.dynPageList = MakeUAVBuffer(nvDevice, "VSM_DynPageList", u64(kVSMMaxPhys) * sizeof(u32) * 4, sizeof(u32) * 4, false);
     state.dynAllocInfo = MakeUAVBuffer(nvDevice, "VSM_DynAllocInfo", sizeof(u32) * 8, sizeof(u32), false);
@@ -540,7 +542,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
     state.primeTraceQuiet = 0;
 
     if (!state.needed || !state.counter || !state.pageTable || !state.pageList || !state.physTile
-        || !state.slotDirty || !state.dirtyList || !state.drawClear || !state.slotEpoch || !state.atlas || !state.binStats
+        || !state.slotDirty || !state.dirtyList || !state.drawClear || !state.slotFrame || !state.slotPivot || !state.slotSun || !state.atlas || !state.binStats
         || !state.dirtyRects || !state.binArgs
         || !state.dynPageTable || !state.dynPageList || !state.dynAllocInfo || !state.dynUsed || !state.dynAtlas || !state.dynStats) {
         Msg("! [VSM] resource creation failed");
@@ -602,8 +604,8 @@ void ProcessReadback(nvrhi::IDevice* nvDevice, VSMState& state)
     }
     state.dirtyPages = std::min(words[kReadbackResidOffset + 1], kVSMStaticSlots);
     state.wrongPages = std::min(words[kReadbackResidOffset + 2], kVSMStaticSlots);
-    state.stalePages = std::min(words[kReadbackResidOffset + 3], kVSMStaticSlots);
-    state.staleMaxAge = words[kReadbackResidOffset + 4];
+    state.refreshPages = std::min(words[kReadbackResidOffset + 3], kVSMStaticSlots);
+    state.overduePages = std::min(words[kReadbackResidOffset + 4], kVSMStaticSlots);
     const u32* bin = words + kReadbackBinOffset;
     state.binDraws = bin[0];
     state.binInstances = bin[1];
@@ -655,21 +657,23 @@ void LogTelemetry(VSMState& state)
     if (Device.dwTimeGlobal - state.lastLogTime < 2000)
         return;
     state.lastLogTime = Device.dwTimeGlobal;
-    Msg("[VSM] mark: pages=%u | L0=%u L1=%u L2=%u L3=%u L4=%u L5=%u | sun %s step max %.3f deg | window snap max %u pages | base %.1f m k %.2f | zc %.0f | inval %u boltHeld %u",
+    Msg("[VSM] mark: pages=%u | L0=%u L1=%u L2=%u L3=%u L4=%u L5=%u | sun %s rate %.2e rad/f step max %.3f deg | pivot (%.0f %.0f %.0f) relabels %u | base %.1f m k %.2f | inval %u boltHeld %u",
         state.markPages, state.levelPages[0], state.levelPages[1], state.levelPages[2],
         state.levelPages[3], state.levelPages[4], state.levelPages[5],
-        state.sunMoving ? "moving" : "static", state.sunStepMax, state.snapMax,
-        ps_r_vsm_base, ps_r_vsm_cluster_lod, state.zCentre, state.invalidations, state.boltHeld);
+        state.sunMoving ? "moving" : "static", state.sunRate, state.sunStepMax,
+        state.pivot.x, state.pivot.y, state.pivot.z, state.relabels,
+        ps_r_vsm_base, ps_r_vsm_cluster_lod, state.invalidations, state.boltHeld);
     state.boltHeld = 0;
-    Msg("[VSM] static: dirty=%u/%u rendered | wrong=%u stale=%u (age max %u) budget=%d prime=%u | cache %s refresh %d stale_refresh %d",
-        state.dirtyPages, state.markPages, state.wrongPages, state.stalePages, state.staleMaxAge, ps_r_vsm_dirty_budget, state.primeFrames,
-        ps_r_vsm_cache ? "on" : "off", ps_r_vsm_cache_refresh, ps_r_vsm_stale_refresh);
+    state.relabels = 0;
+    Msg("[VSM] static: dirty=%u/%u rendered | wrong=%u refresh=%u overdue=%u | wrong budget=%d refresh budget=%u (floor %d, stretch %.1f, lod bias %u) prime=%u | interval L0=%u L1=%u L2=%u L3=%u L4=%u L5=%u | cache %s",
+        state.dirtyPages, state.markPages, state.wrongPages, state.refreshPages, state.overduePages, ps_r_vsm_dirty_budget, state.refreshBudget, ps_r_vsm_refresh_budget, state.refreshStretch, state.lodBias, state.primeFrames,
+        state.refreshInterval[0], state.refreshInterval[1], state.refreshInterval[2], state.refreshInterval[3], state.refreshInterval[4], state.refreshInterval[5],
+        ps_r_vsm_cache ? "on" : "off");
     Msg("[VSM] bin: draws=%u instances=%u maxPagesPerCaster=%u lodCulled=%u drops=%u | k=%.2f at=%d",
         state.binDraws, state.binInstances, state.binMaxPages, state.binLodCulled, state.binDrops, ps_r_vsm_cluster_lod, ps_r_vsm_at);
     Msg("[VSM] dyn: casters=%u instances=%u maxPages=%u | gate %d blend_dyn %.2f",
         state.dynCasters, state.dynInstances, state.dynMaxPages, ps_r_vsm_dyn_gate, ps_r_vsm_ta_blend_dyn);
     state.sunStepMax = 0.0f;
-    state.snapMax = 0;
 }
 
 void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData& data)
@@ -698,7 +702,7 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
     mp.hudScale.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, psHUD_FOV);
     mp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
     mp.markStep = markStep;
-    mp.lodBias = 0;
+    mp.lodBias = state.lodBias;
     auto markCB = cache.GetOrCreateVolatileCB("VSM", "MarkParams", sizeof(VsmMarkParams), data.device);
     cmdList->writeBuffer(markCB, &mp, sizeof(mp));
 
@@ -715,11 +719,17 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
     cmdList->writeBuffer(state.drawClear, clearDraw, sizeof(clearDraw));
     if (!state.physInit) {
         cmdList->setBufferState(state.physTile, nvrhi::ResourceStates::CopyDest);
-        cmdList->setBufferState(state.slotEpoch, nvrhi::ResourceStates::CopyDest);
+        cmdList->setBufferState(state.slotFrame, nvrhi::ResourceStates::CopyDest);
+        cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::CopyDest);
+        cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::CopyDest);
         cmdList->clearBufferUInt(state.physTile, 0xFFFFFFFFu);
-        cmdList->clearBufferUInt(state.slotEpoch, 0);
+        cmdList->clearBufferUInt(state.slotFrame, 0);
+        cmdList->clearBufferUInt(state.slotPivot, 0);
+        cmdList->clearBufferUInt(state.slotSun, 0);
         cmdList->setBufferState(state.physTile, nvrhi::ResourceStates::UnorderedAccess);
-        cmdList->setBufferState(state.slotEpoch, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.slotFrame, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::UnorderedAccess);
         state.physInit = true;
     }
     cmdList->setBufferState(state.needed, nvrhi::ResourceStates::UnorderedAccess);
@@ -763,23 +773,42 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
         return;
 
     VsmResidParams rp = {};
+    float demand = 0.0f;
+    for (u32 L = 0; L < kVSMLevels; ++L)
+        demand += float(state.levelPages[L]) / float(std::max(state.refreshInterval[L], 1u));
+    const u32 floorBudget = u32(std::max(ps_r_vsm_refresh_budget, 0));
+    state.refreshBudget = std::min(std::max(u32(ceilf(demand * 1.25f)) + 2u, floorBudget), kVSMRefreshBudgetMax);
+    const float unbiased = demand * float(1u << (2u * state.lodBias)) / float(kVSMRefreshBudgetMax);
+    u32 target = 0;
+    while (target < kVSMLodBiasMax && unbiased > float(1u << (2u * target)))
+        ++target;
+    if (state.lodBiasHold > 0) {
+        --state.lodBiasHold;
+    } else if (target > state.lodBias) {
+        state.lodBias = target;
+        state.lodBiasHold = kVSMLodBiasHold;
+    } else if (target < state.lodBias && unbiased * 2.0f <= float(1u << (2u * (state.lodBias - 1u)))) {
+        --state.lodBias;
+        state.lodBiasHold = kVSMLodBiasHold;
+    }
+    state.refreshStretch = std::max(unbiased / float(1u << (2u * state.lodBias)), 1.0f);
     for (u32 L = 0; L < kVSMLevels; ++L) {
-        rp.pageBase[2 * L] = state.pageBase[L][0];
-        rp.pageBase[2 * L + 1] = state.pageBase[L][1];
+        rp.pageBase[2 * L] = state.pageBase[L][0] + state.tileBias[L][0];
+        rp.pageBase[2 * L + 1] = state.pageBase[L][1] + state.tileBias[L][1];
+        const float stretched = float(state.refreshInterval[L]) * state.refreshStretch;
+        rp.interval[L] = stretched >= float(kVSMRefreshIntervalMax) ? kVSMRefreshIntervalMax : u32(stretched);
     }
     rp.frame = state.frame;
-    rp.refreshN = u32(std::max(ps_r_vsm_cache_refresh, 0));
-    rp.sunMoving = state.sunMoving ? 1u : 0u;
+    rp.refreshBudget = state.refreshBudget;
     rp.forceDirty = ps_r_vsm_cache ? 0u : 1u;
-    rp.inval[3] = ps_r_vsm_base / float(kVSMPagesAxis);
     const int wrongBudget = state.primeFrames > 0 ? 0 : std::max(ps_r_vsm_dirty_budget, 0);
     if (state.primeFrames > 0)
         --state.primeFrames;
-    rp.inval[7] = float(wrongBudget);
-    rp.inval[11] = 0.0f;
-    rp.inval[15] = 4096.0f;
-    rp.sunEpoch = state.sunEpoch;
-    rp.staleOn = ps_r_vsm_stale_refresh ? 1u : 0u;
+    rp.wrongBudget = u32(wrongBudget);
+    rp.pivot.set(state.pivot.x, state.pivot.y, state.pivot.z, 0.0f);
+    rp.sun.set(state.sunDir.x, state.sunDir.y, state.sunDir.z, 0.0f);
+    for (u32 L = 0; L < kVSMLevels; ++L)
+        rp.levelOrigin[L].set(state.params.level[L].x, state.params.level[L].y, state.params.level[L].z / float(kVSMPagesAxis), 0.0f);
     auto residCB = cache.GetOrCreateVolatileCB("VSM", "ResidParams", sizeof(VsmResidParams), data.device);
     cmdList->writeBuffer(residCB, &rp, sizeof(rp));
 
@@ -789,7 +818,9 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
     cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.slotEpoch, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.slotFrame, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::UnorderedAccess);
 
     BindingSetBuilder bsb(*refl, nvDevice, "VSM.Resid");
     bsb.ConstantBuffer("VsmResidParams", residCB)
@@ -800,7 +831,9 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
        .BufferUAV("g_SlotDirty", state.slotDirty)
        .BufferUAV("g_DirtyList", state.dirtyList)
        .BufferUAV("g_DrawClear", state.drawClear)
-       .BufferUAV("g_SlotEpoch", state.slotEpoch);
+       .BufferUAV("g_SlotFrame", state.slotFrame)
+       .BufferUAV("g_SlotPivot", state.slotPivot)
+       .BufferUAV("g_SlotSun", state.slotSun);
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.residLayout, nvDevice);
     if (!bindingSet)
         return;
@@ -816,6 +849,8 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
     cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::ShaderResource);
 }
 
 void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
@@ -1433,6 +1468,8 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
        .Texture("g_AtlasDyn", atlasDyn)
        .BufferSRV("g_DynPageTable", state.dynPageTable)
        .BufferSRV("g_DynUsed", state.dynUsed)
+       .BufferSRV("g_SlotPivot", state.slotPivot)
+       .BufferSRV("g_SlotSun", state.slotSun)
        .TextureUAV("g_Mask", mask);
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.resolveLayout, nvDevice);
     if (!bindingSet)
@@ -1511,9 +1548,7 @@ bool VSMLoadScreenFrozen()
 void InvalidateVSMCache(VSMState& state)
 {
     state.resolveCount = 0;
-    state.pageBasePrevValid = false;
     state.prevSunValid = false;
-    state.zCentreValid = false;
     state.physInit = false;
     state.invalidations++;
     state.primeFrames = kVSMPrimeFrames;
@@ -1522,7 +1557,7 @@ void InvalidateVSMCache(VSMState& state)
     state.primeTraceQuiet = 0;
 }
 
-Fmatrix VSMSunView(const Fvector& sunDir)
+Fmatrix VSMSunView(const Fvector& sunDir, const Fvector& eye)
 {
     Fvector sd = sunDir;
     if (sd.magnitude() < 1e-4f)
@@ -1532,11 +1567,26 @@ Fmatrix VSMSunView(const Fvector& sunDir)
     up.set(0.0f, 1.0f, 0.0f);
     if (_abs(sd.y) > 0.99f)
         up.set(0.0f, 0.0f, 1.0f);
-    Fvector eye;
-    eye.set(0.0f, 0.0f, 0.0f);
     Fmatrix view;
     view.build_camera_dir(eye, sd, up);
     return view;
+}
+
+Fmatrix VSMSunView(const Fvector& sunDir)
+{
+    Fvector eye;
+    eye.set(0.0f, 0.0f, 0.0f);
+    return VSMSunView(sunDir, eye);
+}
+
+static void ComputePageBases(const Fvector& camL, s32 (&pb)[kVSMLevels][2])
+{
+    for (u32 L = 0; L < kVSMLevels; ++L) {
+        const float ext = ps_r_vsm_base * float(1u << L);
+        const float pageTexel = ext / float(kVSMPagesAxis);
+        pb[L][0] = (s32)floorf((camL.x - 0.5f * ext) / pageTexel);
+        pb[L][1] = (s32)floorf((camL.y - 0.5f * ext) / pageTexel);
+    }
 }
 
 nvrhi::ITexture* ResolveSunMask(const FrameGraph& fg, VirtualResourceHandle mask, nvrhi::IDevice* device)
@@ -1569,63 +1619,84 @@ void VSMBeginFrame(VSMState& state, const Fvector& camPos, const Fvector& sunDir
         const float toSunY = -sd.y;
         state.sunDown = ps_r_sun_night_freeze && (toSunY < ps_r_sun_night_alt || sunLum < ps_r_sun_night_lum);
     }
-    Fmatrix view = VSMSunView(sd);
-    state.sunView = view;
+    if (!state.pivotValid) {
+        state.pivot = camPos;
+        state.pivotValid = true;
+        for (u32 L = 0; L < kVSMLevels; ++L) {
+            state.tileBias[L][0] = 0;
+            state.tileBias[L][1] = 0;
+        }
+    }
 
-    Fvector camL;
-    view.transform_tiny(camL, camPos);
-
-    state.sunMoving = !state.prevSunValid || sd.x != state.prevSunDir.x || sd.y != state.prevSunDir.y || sd.z != state.prevSunDir.z;
-    if (state.sunMoving)
-        state.sunEpoch++;
+    float rate = 0.0f;
     if (state.prevSunValid) {
-        float dp = sd.dotproduct(state.prevSunDir);
-        dp = dp > 1.0f ? 1.0f : (dp < -1.0f ? -1.0f : dp);
-        const float stepDeg = acosf(dp) * 57.29578f;
+        Fvector cr;
+        cr.crossproduct(sd, state.prevSunDir);
+        rate = cr.magnitude();
+        const float stepDeg = rate * 57.29578f;
         if (stepDeg > state.sunStepMax)
             state.sunStepMax = stepDeg;
+        state.sunRate += (rate - state.sunRate) * 0.1f;
+    } else {
+        state.sunRate = 0.0f;
     }
     state.prevSunDir = sd;
     state.prevSunValid = true;
+    state.sunMoving = state.sunRate > 1e-9f;
+
+    const float relabelStep = ps_r_vsm_base;
+    Fmatrix view = VSMSunView(sd, state.pivot);
+    Fvector camL;
+    view.transform_tiny(camL, camPos);
+    s32 pbOld[kVSMLevels][2];
+    ComputePageBases(camL, pbOld);
+    const s32 kx = (s32)floorf(camL.x / relabelStep + 0.5f);
+    const s32 ky = (s32)floorf(camL.y / relabelStep + 0.5f);
+    const s32 kz = (s32)floorf(camL.z / relabelStep + 0.5f);
+    if (kx != 0 || ky != 0 || kz != 0) {
+        Fvector right, up, fwd;
+        right.set(view._11, view._21, view._31);
+        up.set(view._12, view._22, view._32);
+        fwd.set(view._13, view._23, view._33);
+        Fvector shift;
+        shift.mul(right, float(kx) * relabelStep);
+        shift.mad(up, float(ky) * relabelStep);
+        shift.mad(fwd, float(kz) * relabelStep);
+        state.pivot.add(shift);
+        view = VSMSunView(sd, state.pivot);
+        view.transform_tiny(camL, camPos);
+        s32 pbNew[kVSMLevels][2];
+        ComputePageBases(camL, pbNew);
+        for (u32 L = 0; L < kVSMLevels; ++L) {
+            state.tileBias[L][0] += pbOld[L][0] - pbNew[L][0];
+            state.tileBias[L][1] += pbOld[L][1] - pbNew[L][1];
+        }
+        state.relabels++;
+    }
+    state.sunView = view;
 
     VsmParams& params = state.params;
     params.view = view;
+    ComputePageBases(camL, state.pageBase);
+    const float camDist = camL.magnitude();
     for (u32 L = 0; L < kVSMLevels; ++L) {
         const float ext = ps_r_vsm_base * float(1u << L);
         const float texel = ext / float(kVSMVirtualRes);
         const float pageTexel = texel * float(kVSMPageSize);
-        const float baseX = camL.x - 0.5f * ext;
-        const float baseY = camL.y - 0.5f * ext;
-        const s32 pbx = (s32)floorf(baseX / pageTexel);
-        const s32 pby = (s32)floorf(baseY / pageTexel);
-        state.pageBase[L][0] = pbx;
-        state.pageBase[L][1] = pby;
-        params.level[L].set(float(pbx) * pageTexel, float(pby) * pageTexel, ext, 0.0f);
+        params.level[L].set(float(state.pageBase[L][0]) * pageTexel, float(state.pageBase[L][1]) * pageTexel, ext, 0.0f);
+        const float reach = camDist + 0.7071f * ext;
+        const float drift = reach * state.sunRate;
+        float interval = float(kVSMRefreshIntervalMax);
+        if (drift > 1e-12f)
+            interval = kVSMRefreshTexels * texel / drift;
+        if (interval < 1.0f)
+            interval = 1.0f;
+        if (interval > float(kVSMRefreshIntervalMax))
+            interval = float(kVSMRefreshIntervalMax);
+        state.refreshInterval[L] = u32(interval);
     }
-    if (state.pageBasePrevValid) {
-        u32 mx = 0;
-        for (u32 L = 0; L < kVSMLevels; ++L) {
-            const u32 d = (u32)(_abs(state.pageBase[L][0] - state.pageBasePrev[L][0]) + _abs(state.pageBase[L][1] - state.pageBasePrev[L][1]));
-            if (d > mx)
-                mx = d;
-        }
-        if (mx > state.snapMax)
-            state.snapMax = mx;
-    }
-    for (u32 L = 0; L < kVSMLevels; ++L) {
-        state.pageBasePrev[L][0] = state.pageBase[L][0];
-        state.pageBasePrev[L][1] = state.pageBase[L][1];
-    }
-    state.pageBasePrevValid = true;
-
-    const float zCentre = floorf(camL.z / kVSMZSnap) * kVSMZSnap;
-    if (!state.zCentreValid || zCentre != state.zCentre) {
-        if (state.zCentreValid)
-            InvalidateVSMCache(state);
-        state.zCentre = zCentre;
-        state.zCentreValid = true;
-    }
-    params.zparams.set(zCentre + kVSMZNear, 1.0f / (kVSMZFar - kVSMZNear), ps_r_vsm_bias, ps_r_vsm_bias_dyn);
+    params.zparams.set(kVSMZNear, 1.0f / (kVSMZFar - kVSMZNear), ps_r_vsm_bias, ps_r_vsm_bias_dyn);
+    state.sunDir = sd;
 }
 
 VSMOutput setupVSMPasses(

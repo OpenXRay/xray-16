@@ -24,6 +24,8 @@ Texture2D<float4> g_History : register(t3);
 Texture2D<float> g_AtlasDyn : register(t14);
 StructuredBuffer<uint> g_DynPageTable : register(t15);
 StructuredBuffer<uint> g_DynUsed : register(t16);
+StructuredBuffer<float4> g_SlotPivot : register(t17);
+StructuredBuffer<float4> g_SlotSun : register(t18);
 RWTexture2D<float4> g_Mask : register(u0);
 
 static const float2 kDimS = float2(float(VSM_ATLAS_W_S), float(VSM_ATLAS_H_S));
@@ -35,6 +37,40 @@ static const float kMaxNormalOffset = 0.25;
 bool dynOn()
 {
     return g_Params4.w > 0.5;
+}
+
+struct VsmFrame
+{
+    float3 right;
+    float3 up;
+    float3 fwd;
+    float3 pivot;
+    float2 origin;
+};
+
+VsmFrame vsmSlotFrame(uint slot)
+{
+    float4 a = g_SlotPivot[slot];
+    float4 b = g_SlotSun[slot];
+    VsmFrame f;
+    f.fwd = b.xyz;
+    float3 worldUp = (abs(f.fwd.y) > 0.99) ? float3(0.0, 0.0, 1.0) : float3(0.0, 1.0, 0.0);
+    f.up = normalize(worldUp - f.fwd * dot(worldUp, f.fwd));
+    f.right = cross(f.up, f.fwd);
+    f.pivot = a.xyz;
+    f.origin = float2(a.w, b.w);
+    return f;
+}
+
+float3 vsmFrameLp(VsmFrame f, float3 wp)
+{
+    float3 d = wp - f.pivot;
+    return float3(dot(f.right, d), dot(f.up, d), dot(f.fwd, d));
+}
+
+float2 vsmFramePl(VsmFrame f, float2 lxy, float pw)
+{
+    return clamp((lxy - f.origin) / pw, float2(kInset, kInset), float2(1.0 - kInset, 1.0 - kInset));
 }
 
 bool reconWorldAt(int2 p, out float3 wp)
@@ -121,7 +157,12 @@ float sampleVSM(float3 wp, float3 nrm, float tanT, out float dynOcc, out float d
     bool dbgD = resD && (g_PrevCamPos.w > 0.5);
 
     float2 pageLocal = luv * float(VSM_PAGES_AXIS) - float2(page);
-    float zHere = 1.0 - (lp.z - vsm_zparams.x) * vsm_zparams.y;
+    VsmFrame fr = vsmSlotFrame(slot);
+    float pwL = vsm_level[L].z / float(VSM_PAGES_AXIS);
+    float3 lpG = vsmFrameLp(fr, wp);
+    float2 pageLocalG = vsmFramePl(fr, lpG.xy, pwL);
+    float zHere = 1.0 - (lpG.z - vsm_zparams.x) * vsm_zparams.y;
+    float zHereD = 1.0 - (lp.z - vsm_zparams.x) * vsm_zparams.y;
     float bias = vsm_zparams.z;
     if (g_Params2.w > 0.0)
     {
@@ -136,14 +177,16 @@ float sampleVSM(float3 wp, float3 nrm, float tanT, out float dynOcc, out float d
     for (int dy = -1; dy <= 1; ++dy)
     for (int dx = -1; dx <= 1; ++dx)
     {
-        float2 pl = clamp(pageLocal + float2(float(dx), float(dy)) * kTexel, float2(kInset, kInset), float2(1.0 - kInset, 1.0 - kInset));
-        float occS = vsmDepthS(slot, pl);
+        float2 tap = float2(float(dx), float(dy)) * kTexel;
+        float2 pl = clamp(pageLocal + tap, float2(kInset, kInset), float2(1.0 - kInset, 1.0 - kInset));
+        float2 plG = clamp(pageLocalG + tap, float2(kInset, kInset), float2(1.0 - kInset, 1.0 - kInset));
+        float occS = vsmDepthS(slot, plG);
         bool shS = occS > zHere + bias;
         bool sh = shS;
         if (hasD || dbgD)
         {
             float d = vsmDepthD(slotD, pl);
-            if (hasD && d > zHere + biasD)
+            if (hasD && d > zHereD + biasD)
             {
                 sh = true;
                 dynHit += 1.0 / 9.0;
@@ -155,7 +198,7 @@ float sampleVSM(float3 wp, float3 nrm, float tanT, out float dynOcc, out float d
                     if (d > 0.001)
                         dynOcc += 1.0 / 9.0;
                 }
-                else if ((g_PrevCamPos.w > 1.5 || !shS) && (d > zHere + biasD))
+                else if ((g_PrevCamPos.w > 1.5 || !shS) && (d > zHereD + biasD))
                     dynOcc += 1.0 / 9.0;
             }
         }
@@ -237,9 +280,15 @@ float sampleVSMSoft(float3 wp, float3 nrm, float tanT, float rot,
     bool useD = resD && (g_Params.w < 0.5 || g_DynUsed[slotDC] != 0u);
     bool dbgD = resD && (g_PrevCamPos.w > 0.5);
 
+    VsmFrame frC = vsmSlotFrame(slotSC);
+    float pwL = vsm_level[L].z / float(VSM_PAGES_AXIS);
+    float3 rightNow = vsm_view[0].xyz;
+    float3 upNow = vsm_view[1].xyz;
     float3 wpS = haveN ? wp + nrm * (2.0 * texelW) : wp;
     float3 lpS = mul(vsm_view, float4(wpS, 1.0)).xyz;
-    float zS = 1.0 - (lpS.z - vsm_zparams.x) * zScale;
+    float3 lpSG = vsmFrameLp(frC, wpS);
+    float zS = 1.0 - (lpSG.z - vsm_zparams.x) * zScale;
+    float zSD = 1.0 - (lpS.z - vsm_zparams.x) * zScale;
     float biasC = (g_Params2.w > 0.0) ? g_Params2.w : vsm_zparams.z;
     float biasD = vsm_zparams.w;
 
@@ -256,14 +305,19 @@ float sampleVSMSoft(float3 wp, float3 nrm, float tanT, float rot,
             continue;
         float r = length(off);
         float slope = min(r * tanT * zScale, 0.15 * zScale);
+        float3 wpT = wpS + rightNow * off.x + upNow * off.y;
+        VsmFrame frT = (sS == slotSC) ? frC : vsmSlotFrame(sS);
+        float3 lpT = vsmFrameLp(frT, wpT);
+        float2 plG = vsmFramePl(frT, lpT.xy, pwL);
+        float zT = 1.0 - (lpT.z - vsm_zparams.x) * zScale;
         float dBest = -1.0;
-        float dS = vsmDepthS(sS, pl);
-        if (dS > zS + (biasC + slope))
+        float dS = vsmDepthS(sS, plG);
+        if (dS > zT + (biasC + slope))
             dBest = dS;
         if (useD && sD < uint(VSM_MAX_PHYS))
         {
             float dD = vsmDepthD(sD, pl);
-            if (dD > zS + biasD)
+            if (dD > zSD + biasD)
                 dBest = max(dBest, dD);
         }
         if (dBest > -0.5)
@@ -280,7 +334,7 @@ float sampleVSMSoft(float3 wp, float3 nrm, float tanT, float rot,
 
     float3 wpF = haveN ? wp + nrm * min(max(w, 2.0 * texelW), kMaxNormalOffset) : wp;
     float3 lpF = mul(vsm_view, float4(wpF, 1.0)).xyz;
-    float zF = 1.0 - (lpF.z - vsm_zparams.x) * zScale;
+    float zFD = 1.0 - (lpF.z - vsm_zparams.x) * zScale;
 
     int nf = max(int(g_Params3.x), 1);
     float lit = 0.0;
@@ -301,13 +355,18 @@ float sampleVSMSoft(float3 wp, float3 nrm, float tanT, float rot,
         float r = length(off);
         float slope = min(r * tanT * zScale, 0.15 * zScale);
         float bias = biasC + slope;
-        float occS = vsmDepthS(sS, pl);
-        bool shS = occS > zF + bias;
+        float3 wpT = wpF + rightNow * off.x + upNow * off.y;
+        VsmFrame frT = (sS == slotSC) ? frC : vsmSlotFrame(sS);
+        float3 lpT = vsmFrameLp(frT, wpT);
+        float2 plG = vsmFramePl(frT, lpT.xy, pwL);
+        float zT = 1.0 - (lpT.z - vsm_zparams.x) * zScale;
+        float occS = vsmDepthS(sS, plG);
+        bool shS = occS > zT + bias;
         bool sh = shS;
         if ((useD || dbgD) && sD < uint(VSM_MAX_PHYS))
         {
             float d = vsmDepthD(sD, pl);
-            if (useD && d > zF + biasD)
+            if (useD && d > zFD + biasD)
             {
                 sh = true;
                 hitD += 1.0;
@@ -319,7 +378,7 @@ float sampleVSMSoft(float3 wp, float3 nrm, float tanT, float rot,
                     if (d > 0.001)
                         occDbg += 1.0;
                 }
-                else if ((g_PrevCamPos.w > 1.5 || !shS) && (d > zF + biasD))
+                else if ((g_PrevCamPos.w > 1.5 || !shS) && (d > zFD + biasD))
                     occDbg += 1.0;
             }
         }
