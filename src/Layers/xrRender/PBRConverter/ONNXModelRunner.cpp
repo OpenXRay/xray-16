@@ -792,6 +792,9 @@ static std::string TRT_ProfileSingle(const char* input_name, u32 channels, u32 H
     return buf;
 }
 
+static constexpr u32 MATERIAL_CLASS_COUNT = 10;
+static constexpr u32 STAGE2_MR_INPUT_CH = 6 + MATERIAL_CLASS_COUNT;
+
 static std::string TRT_ProfileWithFeatures(const char* input_name, u32 channels, u32 H, u32 W) {
     u32 fH = std::max(H / 32, 1u);
     u32 fW = std::max(W / 32, 1u);
@@ -869,7 +872,7 @@ bool PBRPipeline::EnsureStage2ModelsLoaded(u32 H, u32 W) {
     Msg("[PBRPipeline] Loading Stage2 models for %ux%u", W, H);
 
     auto prof_5ch = TRT_ProfileWithFeatures("image", 5, H, W);
-    auto prof_12ch = TRT_ProfileWithFeatures("image", 12, H, W);
+    auto prof_12ch = TRT_ProfileWithFeatures("image", STAGE2_MR_INPUT_CH, H, W);
 
     char res_cache[512];
     FormatResCachePath(res_cache, sizeof(res_cache), trt_cache_path_.c_str(), W, H);
@@ -912,7 +915,7 @@ bool PBRPipeline::EnsureAllModelsLoaded(u32 H, u32 W) {
     auto prof_seg = TRT_ProfileSingle("input", 6, H, W);
     auto prof_albedo = TRT_ProfileWithFeatures("image", 6, H, W);
     auto prof_5ch = TRT_ProfileWithFeatures("image", 5, H, W);
-    auto prof_12ch = TRT_ProfileWithFeatures("image", 12, H, W);
+    auto prof_12ch = TRT_ProfileWithFeatures("image", STAGE2_MR_INPUT_CH, H, W);
 
     char res_cache[512];
     FormatResCachePath(res_cache, sizeof(res_cache), trt_cache_path_.c_str(), W, H);
@@ -1098,7 +1101,7 @@ static Stage2Inputs PrepareStage2Inputs(
     Tensor curvature = PreprocessingUtils::ComputeMeanCurvature(normal_std);
     Tensor poisson = PreprocessingUtils::ComputePoissonCoarse(normal_std);
 
-    constexpr u32 NUM_CLASSES = 6;
+    constexpr u32 NUM_CLASSES = MATERIAL_CLASS_COUNT;
     Tensor material_mask = PreprocessingUtils::LogitsToMask(material_logits, NUM_CLASSES);
     material_mask = PreprocessingUtils::Upsample(material_mask, H, W);
 
@@ -1120,7 +1123,7 @@ static Stage2Inputs PrepareStage2Inputs(
         result.input_5ch.data[4 * H * W + i] = poisson.data[i];
     }
 
-    result.input_12ch = Tensor::Create(1, 12, H, W);
+    result.input_12ch = Tensor::Create(1, STAGE2_MR_INPUT_CH, H, W);
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
             result.input_12ch.data[c * H * W + i] = albedo_default.data[c * H * W + i];
@@ -1278,7 +1281,7 @@ PBRPipeline::Stage2Outputs PBRPipeline::RunStage2SingleModel(
     FormatResCachePath(res_cache, sizeof(res_cache), trt_cache_path_.c_str(), W, H);
 
     auto prof_5ch = TRT_ProfileWithFeatures("image", 5, H, W);
-    auto prof_12ch = TRT_ProfileWithFeatures("image", 12, H, W);
+    auto prof_12ch = TRT_ProfileWithFeatures("image", STAGE2_MR_INPUT_CH, H, W);
 
     ResetAllCachedModels();
 
@@ -1457,7 +1460,7 @@ void PBRPipeline::WarmupTRTEngines(const xr_vector<std::pair<u32, u32>>& dimensi
         auto prof_seg     = TRT_ProfileSingle("input", 6, H, W);
         auto prof_albedo  = TRT_ProfileWithFeatures("image", 6, H, W);
         auto prof_5ch     = TRT_ProfileWithFeatures("image", 5, H, W);
-        auto prof_12ch    = TRT_ProfileWithFeatures("image", 12, H, W);
+        auto prof_12ch    = TRT_ProfileWithFeatures("image", STAGE2_MR_INPUT_CH, H, W);
 
         u32 cached_engine_count = 0;
         try {
