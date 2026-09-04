@@ -1250,6 +1250,29 @@ void ExecuteAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMAtlasDa
     if (!vsRefl || !psRefl)
         return;
 
+    {
+        const VSMDrawConfig& cfg = data.config;
+        auto srv = [&](nvrhi::IBuffer* b) {
+            if (b)
+                cmdList->setBufferState(b, nvrhi::ResourceStates::ShaderResource);
+        };
+        srv(state.dirtyList);
+        srv(state.pageList);
+        srv(cfg.entryBuffer);
+        srv(cfg.staticInstanceBuffer);
+        srv(cfg.terrainInstanceBuffer);
+        srv(cfg.megaVertexBuffer);
+        srv(cfg.megaIndexBuffer);
+        srv(bindless::MaterialBuffer::Instance().GetBuffer());
+        for (u32 i = 0; i < kVSMStreamCount; ++i) {
+            srv(state.pairs[i]);
+            cmdList->setBufferState(state.pageArgs[i], nvrhi::ResourceStates::IndirectArgument);
+        }
+        cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::IndirectArgument);
+        cmdList->setTextureState(atlas, nvrhi::AllSubresources, nvrhi::ResourceStates::DepthWrite);
+        cmdList->commitBarriers();
+    }
+
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.setDepthAttachment(atlas);
     auto framebuffer = cache.GetOrCreateFramebuffer("VSMAtlas", fbDesc, nvDevice);
@@ -1575,6 +1598,30 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
     auto* backend = data.device->GetBackend();
     nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
     auto& matBuffer = bindless::MaterialBuffer::Instance();
+
+    {
+        GPUCullingManager& gc = *cfg.gpuCulling;
+        auto srv = [&](nvrhi::IBuffer* b) {
+            if (b)
+                cmdList->setBufferState(b, nvrhi::ResourceStates::ShaderResource);
+        };
+        srv(state.dynPageList);
+        srv(cfg.entryBuffer);
+        srv(cfg.dynamicInstanceBuffer);
+        srv(cfg.megaVertexBuffer);
+        srv(cfg.megaIndexBuffer);
+        srv(matBuffer.GetBuffer());
+        srv(gc.GetSkinnedEntryBuffer());
+        srv(gc.GetSkinnedPreVertexBuffer());
+        srv(gc.GetSkinnedPools().GetCombinedIndexBuffer());
+        for (u32 i = 0; i < kVSMDynStreamCount; ++i) {
+            srv(state.dynPairs[i]);
+            cmdList->setBufferState(state.dynArgs[i], nvrhi::ResourceStates::IndirectArgument);
+        }
+        cmdList->setBufferState(state.dynClearArgs, nvrhi::ResourceStates::IndirectArgument);
+        cmdList->setTextureState(atlas, nvrhi::AllSubresources, nvrhi::ResourceStates::DepthWrite);
+        cmdList->commitBarriers();
+    }
 
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.setDepthAttachment(atlas);
