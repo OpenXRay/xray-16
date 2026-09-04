@@ -16,6 +16,9 @@
 #define VSM_ATLAS_W_S     64
 #define VSM_ATLAS_H_S     96
 #define VSM_SKIN_CAP      256
+#define VSM_BUCKET_AXIS   48
+#define VSM_BUCKET_MARGIN 8
+#define VSM_BUCKETS_PER_LVL 2304
 
 int vsmPageIndex(int level, int2 page)
 {

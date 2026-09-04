@@ -55,12 +55,28 @@ struct VsmResidParams {
 };
 
 struct VsmBinParams {
-    u32 entryCount;
     u32 includeAT;
     u32 capOpaque;
     u32 capTerrain;
     u32 capAT;
+    s32 winToBucket[12];
+    u32 itemBase[8];
+};
+
+struct VsmBucketParams {
+    u32 entryCount;
+    u32 level;
+    u32 itemBase;
+    u32 itemCap;
+    s32 shift[4];
     float errK;
+    float pw;
+    u32 pad[2];
+};
+
+struct VsmBucketScanParams {
+    u32 level;
+    u32 itemCap;
     u32 pad[2];
 };
 
@@ -69,11 +85,6 @@ struct VsmArgsParams {
     u32 capTerrain;
     u32 capAT;
     u32 pad;
-};
-
-struct VsmBinPrepParams {
-    u32 entryCount;
-    u32 pad[3];
 };
 
 struct VsmDynBinParams {
@@ -228,7 +239,8 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
 {
     if (state.markPipeline && state.residPipeline && state.debugPipeline && state.clearPipeline
         && state.binPrepPipeline && state.binPipeline && state.argsPipeline && state.pagePipeline && state.pageATPipeline && state.resolvePipeline
-        && state.allocPipeline && state.dynBinPipeline && state.dynArgsPipeline)
+        && state.allocPipeline && state.dynBinPipeline && state.dynArgsPipeline
+        && state.bucketCountPipeline && state.bucketScanPipeline && state.bucketFillPipeline)
         return true;
     if (state.pipelinesFailed)
         return false;
@@ -246,6 +258,15 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     auto binPrepResult = shaderLoader->LoadComputeShader("vsm_bin_prep");
     auto binResult = shaderLoader->LoadComputeShader("vsm_bin_cluster");
     auto argsResult = shaderLoader->LoadComputeShader("vsm_draw_args");
+    auto bucketCountResult = shaderLoader->LoadComputeShader("vsm_bucket_count");
+    auto bucketScanResult = shaderLoader->LoadComputeShader("vsm_bucket_scan");
+    auto bucketFillResult = shaderLoader->LoadComputeShader("vsm_bucket_fill");
+    if (!bucketCountResult.handle || !bucketCountResult.reflection || !bucketScanResult.handle || !bucketScanResult.reflection
+        || !bucketFillResult.handle || !bucketFillResult.reflection) {
+        Msg("! [VSM] bucket shaders failed to load");
+        state.pipelinesFailed = true;
+        return false;
+    }
     auto pageVsResult = shaderLoader->LoadVertexShader("vsm_page_pull", "main");
     auto pagePsResult = shaderLoader->LoadPixelShader("vsm_page", "main");
     auto pageATPsResult = shaderLoader->LoadPixelShader("vsm_page_at", "main");
@@ -286,6 +307,9 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     state.binPrepLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBinPrep", *binPrepResult.reflection, nvDevice);
     state.binLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBin", *binResult.reflection, nvDevice);
     state.argsLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMArgs", *argsResult.reflection, nvDevice);
+    state.bucketCountLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBucketCount", *bucketCountResult.reflection, nvDevice);
+    state.bucketScanLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBucketScan", *bucketScanResult.reflection, nvDevice);
+    state.bucketFillLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBucketFill", *bucketFillResult.reflection, nvDevice);
     state.pageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMPage", *pageVsResult.reflection, *pagePsResult.reflection, nvDevice);
     state.pageATLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMPageAT", *pageVsResult.reflection, *pageATPsResult.reflection, nvDevice);
     state.resolveLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMResolve", *resolveResult.reflection, nvDevice);
@@ -294,7 +318,8 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     state.dynArgsLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynArgs", *dynArgsResult.reflection, nvDevice);
     if (!state.markLayout || !state.residLayout || !state.debugLayout || !state.clearLayout
         || !state.binPrepLayout || !state.binLayout || !state.argsLayout || !state.pageLayout || !state.pageATLayout || !state.resolveLayout
-        || !state.allocLayout || !state.dynBinLayout || !state.dynArgsLayout) {
+        || !state.allocLayout || !state.dynBinLayout || !state.dynArgsLayout
+        || !state.bucketCountLayout || !state.bucketScanLayout || !state.bucketFillLayout) {
         state.pipelinesFailed = true;
         return false;
     }
@@ -338,6 +363,21 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     binDesc.CS = binResult.handle;
     binDesc.bindingLayouts = { state.binLayout };
     state.binPipeline = cache.GetOrCreateComputePipeline("VSMBin", binDesc, nvDevice);
+
+    nvrhi::ComputePipelineDesc bucketCountDesc;
+    bucketCountDesc.CS = bucketCountResult.handle;
+    bucketCountDesc.bindingLayouts = { state.bucketCountLayout };
+    state.bucketCountPipeline = cache.GetOrCreateComputePipeline("VSMBucketCount", bucketCountDesc, nvDevice);
+
+    nvrhi::ComputePipelineDesc bucketScanDesc;
+    bucketScanDesc.CS = bucketScanResult.handle;
+    bucketScanDesc.bindingLayouts = { state.bucketScanLayout };
+    state.bucketScanPipeline = cache.GetOrCreateComputePipeline("VSMBucketScan", bucketScanDesc, nvDevice);
+
+    nvrhi::ComputePipelineDesc bucketFillDesc;
+    bucketFillDesc.CS = bucketFillResult.handle;
+    bucketFillDesc.bindingLayouts = { state.bucketFillLayout };
+    state.bucketFillPipeline = cache.GetOrCreateComputePipeline("VSMBucketFill", bucketFillDesc, nvDevice);
 
     nvrhi::ComputePipelineDesc argsDesc;
     argsDesc.CS = argsResult.handle;
@@ -459,7 +499,14 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
         state.drawClear = nvDevice->createBuffer(desc);
     }
     state.binStats = MakeUAVBuffer(nvDevice, "VSM_BinStats", sizeof(u32) * 8, sizeof(u32), false);
-    state.dirtyRects = MakeUAVBuffer(nvDevice, "VSM_DirtyRects", sizeof(s32) * 4 * kVSMLevels, sizeof(s32) * 4, false);
+    state.bucketCount = MakeUAVBuffer(nvDevice, "VSM_BucketCount", u64(kVSMLevels) * kVSMBucketsPerLevel * sizeof(u32), sizeof(u32), false);
+    state.bucketStart = MakeUAVBuffer(nvDevice, "VSM_BucketStart", u64(kVSMLevels) * kVSMBucketsPerLevel * sizeof(u32), sizeof(u32), false);
+    state.bucketEnd = MakeUAVBuffer(nvDevice, "VSM_BucketEnd", u64(kVSMLevels) * kVSMBucketsPerLevel * sizeof(u32), sizeof(u32), false);
+    state.bucketCursor = MakeUAVBuffer(nvDevice, "VSM_BucketCursor", u64(kVSMLevels) * kVSMBucketsPerLevel * sizeof(u32), sizeof(u32), false);
+    state.bucketItems = MakeUAVBuffer(nvDevice, "VSM_BucketItems", u64(kVSMBucketItemTotal) * sizeof(u32), sizeof(u32), false);
+    state.bucketInit = false;
+    for (u32 L = 0; L < kVSMLevels; ++L)
+        state.bucketValid[L] = false;
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "VSM_BinArgs";
@@ -543,7 +590,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
 
     if (!state.needed || !state.counter || !state.pageTable || !state.pageList || !state.physTile
         || !state.slotDirty || !state.dirtyList || !state.drawClear || !state.slotFrame || !state.slotPivot || !state.slotSun || !state.atlas || !state.binStats
-        || !state.dirtyRects || !state.binArgs
+        || !state.bucketCount || !state.bucketStart || !state.bucketEnd || !state.bucketCursor || !state.bucketItems || !state.binArgs
         || !state.dynPageTable || !state.dynPageList || !state.dynAllocInfo || !state.dynUsed || !state.dynAtlas || !state.dynStats) {
         Msg("! [VSM] resource creation failed");
         state.needed = nullptr;
@@ -669,8 +716,9 @@ void LogTelemetry(VSMState& state)
         state.dirtyPages, state.markPages, state.wrongPages, state.refreshPages, state.overduePages, ps_r_vsm_dirty_budget, state.refreshBudget, ps_r_vsm_refresh_budget, state.refreshStretch, state.lodBias, state.primeFrames,
         state.refreshInterval[0], state.refreshInterval[1], state.refreshInterval[2], state.refreshInterval[3], state.refreshInterval[4], state.refreshInterval[5],
         ps_r_vsm_cache ? "on" : "off");
-    Msg("[VSM] bin: draws=%u instances=%u maxPagesPerCaster=%u lodCulled=%u drops=%u | k=%.2f at=%d",
-        state.binDraws, state.binInstances, state.binMaxPages, state.binLodCulled, state.binDrops, ps_r_vsm_cluster_lod, ps_r_vsm_at);
+    Msg("[VSM] bin: pages=%u pairs=%u maxBucket=%u drops=%u rebuilds=%u | k=%.2f at=%d",
+        state.binDraws, state.binInstances, state.binMaxPages, state.binDrops, state.bucketRebuilds, ps_r_vsm_cluster_lod, ps_r_vsm_at);
+    state.bucketRebuilds = 0;
     Msg("[VSM] dyn: casters=%u instances=%u maxPages=%u | gate %d blend_dyn %.2f",
         state.dynCasters, state.dynInstances, state.dynMaxPages, ps_r_vsm_dyn_gate, ps_r_vsm_ta_blend_dyn);
     state.sunStepMax = 0.0f;
@@ -877,23 +925,151 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
 
     const bool haveEntries = data.config.entryBuffer && data.config.entryCount > 0;
     if (haveEntries) {
-        VsmBinPrepParams pp = {};
-        pp.entryCount = data.config.entryCount;
-        auto prepCB = cache.GetOrCreateVolatileCB("VSM", "BinPrepParams", sizeof(VsmBinPrepParams), data.device);
-        cmdList->writeBuffer(prepCB, &pp, sizeof(pp));
+        auto vsmCB = VsmParamsCB(data.device);
+        if (!state.bucketInit) {
+            cmdList->setBufferState(state.bucketCount, nvrhi::ResourceStates::CopyDest);
+            cmdList->setBufferState(state.bucketStart, nvrhi::ResourceStates::CopyDest);
+            cmdList->setBufferState(state.bucketEnd, nvrhi::ResourceStates::CopyDest);
+            cmdList->setBufferState(state.bucketCursor, nvrhi::ResourceStates::CopyDest);
+            cmdList->clearBufferUInt(state.bucketCount, 0);
+            cmdList->clearBufferUInt(state.bucketStart, 0);
+            cmdList->clearBufferUInt(state.bucketEnd, 0);
+            cmdList->clearBufferUInt(state.bucketCursor, 0);
+            state.bucketInit = true;
+        }
+
+        const float errK = std::max(0.1f, ps_r_vsm_cluster_lod);
+        const bool entriesChanged = state.bucketEntryCount != data.config.entryCount || state.bucketErrK != errK;
+        state.bucketEntryCount = data.config.entryCount;
+        state.bucketErrK = errK;
+        s32 stableBase[kVSMLevels][2];
+        u32 itemBase[kVSMLevels];
+        u32 acc = 0;
+        for (u32 L = 0; L < kVSMLevels; ++L) {
+            stableBase[L][0] = state.pageBase[L][0] + state.tileBias[L][0];
+            stableBase[L][1] = state.pageBase[L][1] + state.tileBias[L][1];
+            itemBase[L] = acc;
+            acc += kVSMBucketItemCap[L];
+        }
+
+        bool anyRebuild = false;
+        for (u32 L = 0; L < kVSMLevels; ++L) {
+            const float ext = ps_r_vsm_base * float(1u << L);
+            const float pw = ext / float(kVSMPagesAxis);
+            bool rebuild = entriesChanged || !state.bucketValid[L];
+            if (!rebuild) {
+                const s32 offX = stableBase[L][0] - state.bucketBase[L][0];
+                const s32 offY = stableBase[L][1] - state.bucketBase[L][1];
+                const s32 slackMax = s32(kVSMBucketAxis - kVSMPagesAxis) - 2;
+                if (offX < 2 || offY < 2 || offX > slackMax || offY > slackMax)
+                    rebuild = true;
+                Fvector cr;
+                cr.crossproduct(state.sunDir, state.bucketSun[L]);
+                if (cr.magnitude() * kVSMZFar > 0.5f * pw)
+                    rebuild = true;
+            }
+            if (!rebuild)
+                continue;
+            anyRebuild = true;
+            state.bucketRebuilds++;
+            state.bucketValid[L] = true;
+            state.bucketBase[L][0] = stableBase[L][0] - s32(kVSMBucketMargin);
+            state.bucketBase[L][1] = stableBase[L][1] - s32(kVSMBucketMargin);
+            state.bucketSun[L] = state.sunDir;
+
+            VsmBucketParams bp = {};
+            bp.entryCount = data.config.entryCount;
+            bp.level = L;
+            bp.itemBase = itemBase[L];
+            bp.itemCap = kVSMBucketItemCap[L];
+            bp.shift[0] = state.tileBias[L][0] - state.bucketBase[L][0];
+            bp.shift[1] = state.tileBias[L][1] - state.bucketBase[L][1];
+            bp.errK = errK;
+            bp.pw = pw;
+            auto bucketCB = cache.GetOrCreateVolatileCB("VSM", "BucketParams", sizeof(VsmBucketParams), data.device, 16);
+            cmdList->writeBuffer(bucketCB, &bp, sizeof(bp));
+            VsmBucketScanParams sp = {};
+            sp.level = L;
+            sp.itemCap = kVSMBucketItemCap[L];
+            auto scanCB = cache.GetOrCreateVolatileCB("VSM", "BucketScanParams", sizeof(VsmBucketScanParams), data.device, 16);
+            cmdList->writeBuffer(scanCB, &sp, sizeof(sp));
+
+            cmdList->setBufferState(state.bucketCount, nvrhi::ResourceStates::UnorderedAccess);
+            cmdList->setBufferState(state.bucketStart, nvrhi::ResourceStates::UnorderedAccess);
+            cmdList->setBufferState(state.bucketEnd, nvrhi::ResourceStates::UnorderedAccess);
+            cmdList->setBufferState(state.bucketCursor, nvrhi::ResourceStates::UnorderedAccess);
+            cmdList->setBufferState(state.bucketItems, nvrhi::ResourceStates::UnorderedAccess);
+            const u32 groups = (data.config.entryCount + 63) / 64;
+            {
+                auto* refl = shaderLoader->GetCachedReflection("vsm_bucket_count", ".cs");
+                if (!refl)
+                    return;
+                BindingSetBuilder cbs(*refl, nvDevice, "VSM.BucketCount");
+                cbs.ConstantBuffer("VsmParams", vsmCB)
+                   .ConstantBuffer("VsmBucketParams", bucketCB)
+                   .BufferSRV("g_Entries", data.config.entryBuffer)
+                   .BufferUAV("g_BucketCount", state.bucketCount);
+                auto set = cache.GetOrCreateBindingSet(cbs.Build(), state.bucketCountLayout, nvDevice);
+                if (!set)
+                    return;
+                nvrhi::ComputeState cs;
+                cs.pipeline = state.bucketCountPipeline;
+                cs.bindings = { set };
+                cmdList->setComputeState(cs);
+                cmdList->dispatch(groups, 1, 1);
+            }
+            {
+                auto* refl = shaderLoader->GetCachedReflection("vsm_bucket_scan", ".cs");
+                if (!refl)
+                    return;
+                BindingSetBuilder sbs(*refl, nvDevice, "VSM.BucketScan");
+                sbs.ConstantBuffer("VsmBucketScanParams", scanCB)
+                   .BufferUAV("g_BucketCount", state.bucketCount)
+                   .BufferUAV("g_BucketStart", state.bucketStart)
+                   .BufferUAV("g_BucketEnd", state.bucketEnd)
+                   .BufferUAV("g_BucketCursor", state.bucketCursor);
+                auto set = cache.GetOrCreateBindingSet(sbs.Build(), state.bucketScanLayout, nvDevice);
+                if (!set)
+                    return;
+                nvrhi::ComputeState cs;
+                cs.pipeline = state.bucketScanPipeline;
+                cs.bindings = { set };
+                cmdList->setComputeState(cs);
+                cmdList->dispatch(1, 1, 1);
+            }
+            {
+                auto* refl = shaderLoader->GetCachedReflection("vsm_bucket_fill", ".cs");
+                if (!refl)
+                    return;
+                BindingSetBuilder fbs(*refl, nvDevice, "VSM.BucketFill");
+                fbs.ConstantBuffer("VsmParams", vsmCB)
+                   .ConstantBuffer("VsmBucketParams", bucketCB)
+                   .BufferSRV("g_Entries", data.config.entryBuffer)
+                   .BufferUAV("g_BucketCursor", state.bucketCursor)
+                   .BufferUAV("g_Items", state.bucketItems)
+                   .BufferUAV("g_Stats", state.binStats);
+                auto set = cache.GetOrCreateBindingSet(fbs.Build(), state.bucketFillLayout, nvDevice);
+                if (!set)
+                    return;
+                nvrhi::ComputeState cs;
+                cs.pipeline = state.bucketFillPipeline;
+                cs.bindings = { set };
+                cmdList->setComputeState(cs);
+                cmdList->dispatch(groups, 1, 1);
+            }
+        }
+        (void)anyRebuild;
 
         cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::ShaderResource);
         cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
         cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(state.dirtyRects, nvrhi::ResourceStates::UnorderedAccess);
         cmdList->setBufferState(state.binArgs, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.bucketStart, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(state.bucketEnd, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(state.bucketItems, nvrhi::ResourceStates::ShaderResource);
 
         BindingSetBuilder pbs(*prepRefl, nvDevice, "VSM.BinPrep");
-        pbs.ConstantBuffer("VsmBinPrepParams", prepCB)
-           .BufferSRV("g_DrawClear", state.drawClear)
-           .BufferSRV("g_DirtyList", state.dirtyList)
-           .BufferSRV("g_PageList", state.pageList)
-           .BufferUAV("g_DirtyRects", state.dirtyRects)
+        pbs.BufferSRV("g_DrawClear", state.drawClear)
            .BufferUAV("g_BinArgs", state.binArgs);
         auto prepSet = cache.GetOrCreateBindingSet(pbs.Build(), state.binPrepLayout, nvDevice);
         if (prepSet) {
@@ -903,18 +1079,18 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
             cmdList->setComputeState(cs);
             cmdList->dispatch(1, 1, 1);
         }
-        cmdList->setBufferState(state.dirtyRects, nvrhi::ResourceStates::ShaderResource);
         cmdList->setBufferState(state.binArgs, nvrhi::ResourceStates::IndirectArgument);
 
-        auto vsmCB = VsmParamsCB(data.device);
-
         VsmBinParams bp = {};
-        bp.entryCount = data.config.entryCount;
         bp.includeAT = ps_r_vsm_at ? 1u : 0u;
         bp.capOpaque = kVSMPairCapOpaque;
         bp.capTerrain = kVSMPairCapTerrain;
         bp.capAT = kVSMPairCapAT;
-        bp.errK = std::max(0.1f, ps_r_vsm_cluster_lod);
+        for (u32 L = 0; L < kVSMLevels; ++L) {
+            bp.winToBucket[2 * L] = stableBase[L][0] - state.bucketBase[L][0];
+            bp.winToBucket[2 * L + 1] = stableBase[L][1] - state.bucketBase[L][1];
+            bp.itemBase[L] = itemBase[L];
+        }
         auto binCB = cache.GetOrCreateVolatileCB("VSM", "BinParams", sizeof(VsmBinParams), data.device);
         cmdList->writeBuffer(binCB, &bp, sizeof(bp));
 
@@ -922,9 +1098,11 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
         bsb.ConstantBuffer("VsmParams", vsmCB)
            .ConstantBuffer("VsmBinParams", binCB)
            .BufferSRV("g_Entries", data.config.entryBuffer)
-           .BufferSRV("g_PageTable", state.pageTable)
-           .BufferSRV("g_SlotDirty", state.slotDirty)
-           .BufferSRV("g_DirtyRects", state.dirtyRects)
+           .BufferSRV("g_DirtyList", state.dirtyList)
+           .BufferSRV("g_PageList", state.pageList)
+           .BufferSRV("g_BucketStart", state.bucketStart)
+           .BufferSRV("g_BucketEnd", state.bucketEnd)
+           .BufferSRV("g_Items", state.bucketItems)
            .BufferUAV("g_Stats", state.binStats)
            .BufferUAV("g_PairsOpaque", state.pairs[0])
            .BufferUAV("g_PairsTerrain", state.pairs[1])
@@ -1550,6 +1728,8 @@ void InvalidateVSMCache(VSMState& state)
     state.resolveCount = 0;
     state.prevSunValid = false;
     state.physInit = false;
+    for (u32 L = 0; L < kVSMLevels; ++L)
+        state.bucketValid[L] = false;
     state.invalidations++;
     state.primeFrames = kVSMPrimeFrames;
     state.primeTraceLeft = kVSMPrimeTraceFrames;
