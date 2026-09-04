@@ -40,7 +40,8 @@ struct LocalShadowBinParams {
     u32 capAT;
     u32 includeAT;
     float errK;
-    u32 pad[3];
+    u32 applyLod;
+    u32 pad[2];
 };
 
 struct LocalShadowArgsParams {
@@ -335,7 +336,7 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
 
     auto dispatchSource = [&](nvrhi::IBuffer* entries, u32 entryBase, u32 entryCount, u32 statsBase,
                               nvrhi::IBuffer* refresh, u32 refreshCount, u32 streamOpaque, u32 streamTerrain, u32 streamAT,
-                              u32 capOpaque, u32 capTerrain, u32 capAT, const char* label) {
+                              u32 capOpaque, u32 capTerrain, u32 capAT, bool applyLod, const char* label) {
         if (!entries || entryCount == 0 || refreshCount == 0)
             return;
         LocalShadowBinParams bp = {};
@@ -348,6 +349,7 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
         bp.capAT = capAT;
         bp.includeAT = ps_r_vsm_at ? 1u : 0u;
         bp.errK = std::max(0.1f, ps_r_vsm_cluster_lod);
+        bp.applyLod = applyLod ? 1u : 0u;
         auto binCB = cache.GetOrCreateVolatileCB("LocalShadow", "BinParams", sizeof(LocalShadowBinParams), data.device, 64);
         cmdList->writeBuffer(binCB, &bp, sizeof(bp));
         cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
@@ -374,13 +376,13 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
     if (gpuCulling && cfg.entryBuffer) {
         dispatchSource(cfg.entryBuffer, 0, gpuCulling->GetClusterEntryCount(), 0u,
             state.refreshStaticBuffer, state.refreshStaticCount, 0, 1, 2,
-            kLocalPairCapOpaque, kLocalPairCapTerrain, kLocalPairCapAT, "LocalShadow.Bin");
+            kLocalPairCapOpaque, kLocalPairCapTerrain, kLocalPairCapAT, true, "LocalShadow.Bin");
         dispatchSource(cfg.entryBuffer, gpuCulling->GetClusterEntryCount(), gpuCulling->GetDynamicClusterEntryCount(), 8u,
             state.refreshDynBuffer, state.refreshDynCount, 3, 5, 4,
-            kLocalPairCapDynOpaque, 0u, kLocalPairCapDynAT, "LocalShadow.BinDyn");
+            kLocalPairCapDynOpaque, 0u, kLocalPairCapDynAT, false, "LocalShadow.BinDyn");
         dispatchSource(gpuCulling->GetSkinnedEntryBuffer(), 0, gpuCulling->GetSkinnedEntryCount(), 16u,
             state.refreshDynBuffer, state.refreshDynCount, 5, 1, 2,
-            kLocalPairCapSkinned, 0u, 0u, "LocalShadow.BinSkinned");
+            kLocalPairCapSkinned, 0u, 0u, false, "LocalShadow.BinSkinned");
     }
 
     LocalShadowArgsParams ap = {};
@@ -799,18 +801,30 @@ void SelectLocalShadowLights(
     xr_vector<Candidate> spotCandidates;
     xr_vector<Candidate> pointCandidates;
 
+    auto owns = [](const LocalTile* pool, u32 poolSize, const light* L) {
+        for (u32 t = 0; t < poolSize; ++t)
+            if (pool[t].owner == L)
+                return true;
+        return false;
+    };
+
     for (u32 i = 0; i < lights.size(); ++i) {
         const light* L = lights[i];
         if (!L || !L->flags.bActive || !L->flags.bShadow || L->flags.bHudMode)
             continue;
         const float d2 = camPos.distance_to_sqr(L->position);
         if (L->flags.type == IRender_Light::SPOT) {
-            const float eff = d2 * (L->cone < deg2rad(60.f) ? 0.25f : 1.0f);
+            float eff = d2 * (L->cone < deg2rad(60.f) ? 0.25f : 1.0f);
+            if (owns(state.spots, kLocalSpotSlots, L))
+                eff *= 0.64f;
             spotCandidates.push_back({ i, eff });
         } else if (L->flags.type == IRender_Light::POINT) {
             if (L->range < 3.0f || d2 > 30.0f * 30.0f)
                 continue;
-            pointCandidates.push_back({ i, d2 });
+            float eff = d2;
+            if (owns(state.points, kLocalPointLights, L))
+                eff *= 0.64f;
+            pointCandidates.push_back({ i, eff });
         }
     }
 
@@ -868,7 +882,8 @@ void SelectLocalShadowLights(
     auto pushRefresh = [&](u32 slot, bool needStatic, bool inView, u32 cadence) {
         if (needStatic && state.refreshStaticCount < kLocalTileCount)
             state.refreshStatic[state.refreshStaticCount++] = slot;
-        if (inView && ((frame + slot) % cadence) == 0 && state.refreshDynCount < kLocalTileCount)
+        const bool dyn = inView && (needStatic || ((frame + slot) % cadence) == 0);
+        if (dyn && state.refreshDynCount < kLocalTileCount)
             state.refreshDyn[state.refreshDynCount++] = slot;
     };
 
