@@ -44,6 +44,11 @@ struct LocalShadowBinParams {
     u32 pad[2];
 };
 
+struct LocalShadowRouteParams {
+    u32 pancake;
+    u32 pad[3];
+};
+
 struct LocalShadowArgsParams {
     u32 caps[8];
     u32 refreshStaticCount;
@@ -435,13 +440,14 @@ struct LocalDrawContext {
     nvrhi::IDevice* nvDevice;
     nvrhi::IFramebuffer* framebuffer;
     nvrhi::IBindingSet* bindlessTable;
+    nvrhi::IBuffer* routeCB;
     nvrhi::Viewport viewport;
     nvrhi::Rect scissor;
 };
 
 bool BeginAtlasPass(fg::RenderContext* ctx, const LocalShadowConfig& cfg, LocalShadowState& state,
                     nvrhi::ITexture* atlas, fg::RenderDevice* device, const char* fbName, u32 clearIndex,
-                    LocalDrawContext& out)
+                    bool pancake, LocalDrawContext& out)
 {
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -485,7 +491,13 @@ bool BeginAtlasPass(fg::RenderContext* ctx, const LocalShadowConfig& cfg, LocalS
     if (!framebuffer)
         return false;
 
+    LocalShadowRouteParams rp = {};
+    rp.pancake = pancake ? 1u : 0u;
+    auto routeCB = cache.GetOrCreateVolatileCB("LocalShadow", "RouteParams", sizeof(LocalShadowRouteParams), device, 8);
+    cmdList->writeBuffer(routeCB, &rp, sizeof(rp));
+
     auto* backend = device->GetBackend();
+    out.routeCB = routeCB;
     out.cmdList = cmdList;
     out.nvDevice = nvDevice;
     out.framebuffer = framebuffer;
@@ -546,7 +558,7 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Static");
 
     LocalDrawContext dc;
-    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowStatic", 0, dc)) {
+    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowStatic", 0, false, dc)) {
         if (data.gpuProfiler)
             data.gpuProfiler->EndPass(cmdList, "Local Shadow.Static");
         return;
@@ -558,6 +570,7 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         if (!pipeline || !layout || !instanceBuffer)
             return;
         BindingSetBuilder bsb(*vsRefl, ps, nvDevice, label);
+        bsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
         bsb.BufferSRV("g_InstanceData", instanceBuffer);
         bsb.BufferSRV("g_Pairs", state.pairs[stream]);
         bsb.BufferSRV("g_Entries", cfg.entryBuffer);
@@ -623,7 +636,7 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Dyn");
 
     LocalDrawContext dc;
-    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowDyn", 1, dc)) {
+    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowDyn", 1, true, dc)) {
         if (data.gpuProfiler)
             data.gpuProfiler->EndPass(cmdList, "Local Shadow.Dyn");
         return;
@@ -648,6 +661,7 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
 
     if (gpuCulling.GetDynamicClusterEntryCount() > 0 && cfg.entryBuffer && cfg.dynamicInstanceBuffer) {
         BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "LocalShadow.DynOpaque");
+        bsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
         bsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
         bsb.BufferSRV("g_Pairs", state.pairs[3]);
         bsb.BufferSRV("g_Entries", cfg.entryBuffer);
@@ -658,6 +672,7 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
             draw(state.pagePipeline, bindingSet, 3, false);
 
         BindingSetBuilder atBsb(*vsRefl, *atRefl, nvDevice, "LocalShadow.DynAT");
+        atBsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
         atBsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
         atBsb.BufferSRV("g_Pairs", state.pairs[4]);
         atBsb.BufferSRV("g_Entries", cfg.entryBuffer);
@@ -674,6 +689,7 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
     nvrhi::IBuffer* skinnedIB = gpuCulling.GetSkinnedPools().GetCombinedIndexBuffer();
     if (gpuCulling.GetSkinnedEntryCount() > 0 && skinnedEntries && preVB && skinnedIB) {
         BindingSetBuilder bsb(*skinVsRefl, *psRefl, nvDevice, "LocalShadow.DynSkin");
+        bsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
         bsb.BufferSRV("g_Pairs", state.pairs[5]);
         bsb.BufferSRV("g_Entries", skinnedEntries);
         bsb.BufferSRV("g_LocalShadowTiles", state.tiles);
