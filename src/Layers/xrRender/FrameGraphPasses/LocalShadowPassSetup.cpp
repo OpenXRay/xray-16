@@ -164,6 +164,17 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, LocalShadowState& state)
     }
     state.args = MakeArgsBuffer(nvDevice, "LocalShadow_Args", kLocalStreamCount);
     state.clearArgs = MakeArgsBuffer(nvDevice, "LocalShadow_ClearArgs", 2);
+    for (u32 i = 0; i < LocalShadowState::kReadbackSlots; ++i) {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "LocalShadow_Readback";
+        desc.byteSize = u64(kLocalStatWords) * sizeof(u32);
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+        state.readback[i] = nvDevice->createBuffer(desc);
+    }
+    state.readbackWrite = 0;
+    state.readbackScheduled = 0;
     state.staticAtlas = MakeAtlas(nvDevice, "LocalShadow_Static");
     state.dynAtlas = MakeAtlas(nvDevice, "LocalShadow_Dyn");
 
@@ -404,6 +415,14 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
         cmdList->setBufferState(state.pairs[i], nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(state.args, nvrhi::ResourceStates::IndirectArgument);
     cmdList->setBufferState(state.clearArgs, nvrhi::ResourceStates::IndirectArgument);
+
+    if (nvrhi::IBuffer* slot = state.readback[state.readbackWrite]) {
+        cmdList->setBufferState(state.stats, nvrhi::ResourceStates::CopySource);
+        cmdList->copyBuffer(slot, 0, state.stats, 0, u64(kLocalStatWords) * sizeof(u32));
+        state.readbackWrite = (state.readbackWrite + 1) % LocalShadowState::kReadbackSlots;
+        if (state.readbackScheduled < LocalShadowState::kReadbackSlots)
+            ++state.readbackScheduled;
+    }
 
     if (data.gpuProfiler)
         data.gpuProfiler->EndPass(cmdList, "Local Shadow.Bin");
@@ -719,6 +738,7 @@ void ResetLocalShadowPool(LocalShadowState& state)
 {
     for (u32 i = 0; i < kLocalSpotSlots; ++i)
         state.spots[i] = LocalTile();
+    state.statPairs = state.statDynPairs = state.statSkinnedPairs = state.statDrops = 0;
     for (u32 i = 0; i < kLocalPointLights; ++i)
         state.points[i] = LocalTile();
     for (u32 i = 0; i < kLocalTileCount; ++i)
@@ -728,6 +748,31 @@ void ResetLocalShadowPool(LocalShadowState& state)
     state.pooledSpots = 0;
     state.pooledPoints = 0;
     state.slotOfLight.clear();
+}
+
+void ProcessLocalShadowStats(LocalShadowState& state, nvrhi::IDevice* device)
+{
+    if (state.readbackScheduled < LocalShadowState::kReadbackSlots)
+        return;
+    nvrhi::IBuffer* oldest = state.readback[state.readbackWrite];
+    if (!oldest)
+        return;
+    void* mapped = device->mapBuffer(oldest, nvrhi::CpuAccessMode::Read);
+    if (!mapped)
+        return;
+    const u32* words = static_cast<const u32*>(mapped);
+    state.statPairs = words[4] + words[5] + words[6];
+    state.statDynPairs = words[12] + words[14];
+    state.statSkinnedPairs = words[20];
+    state.statDrops = words[7] + words[15] + words[23];
+    device->unmapBuffer(oldest);
+
+    if (ps_r_local_shadow_debug && Device.dwTimeGlobal - state.lastLogTime > 2000) {
+        state.lastLogTime = Device.dwTimeGlobal;
+        Msg("[LocalShadow] spots=%u points=%u static=%u dyn=%u pairs=%u drops=%u",
+            state.pooledSpots, state.pooledPoints, state.refreshStaticCount, state.refreshDynCount,
+            state.statPairs + state.statDynPairs + state.statSkinnedPairs, state.statDrops);
+    }
 }
 
 void SelectLocalShadowLights(
@@ -806,6 +851,7 @@ void SelectLocalShadowLights(
                 continue;
             pool[best].owner = nullptr;
             pool[best].staticValid = false;
+            pool[best].dirty = true;
             pool[best].lastSeen = frame;
             outTile[c] = best;
         }
@@ -819,11 +865,15 @@ void SelectLocalShadowLights(
     for (u32 i = 0; i < kLocalTileCount; ++i)
         state.records[i].zparams.w = 0.0f;
 
-    auto pushRefresh = [&](u32 slot, bool needStatic, bool inView) {
+    auto pushRefresh = [&](u32 slot, bool needStatic, bool inView, u32 cadence) {
         if (needStatic && state.refreshStaticCount < kLocalTileCount)
             state.refreshStatic[state.refreshStaticCount++] = slot;
-        if (inView && state.refreshDynCount < kLocalTileCount)
+        if (inView && ((frame + slot) % cadence) == 0 && state.refreshDynCount < kLocalTileCount)
             state.refreshDyn[state.refreshDynCount++] = slot;
+    };
+
+    auto cadenceFor = [](float dist) -> u32 {
+        return dist < 30.0f ? 1u : (dist < 70.0f ? 4u : 12u);
     };
 
     for (u32 c = 0; c < spotCandidates.size(); ++c) {
@@ -859,10 +909,15 @@ void SelectLocalShadowLights(
         FillRecord(rec, vp, float((t & 3) * kLocalSpotTile), float((t >> 2) * kLocalSpotTile), float(kLocalSpotTile),
             nearZ, farZ, 2.0f * tanf(fov * 0.5f) / float(kLocalSpotTile), L->position, L->range);
 
-        const bool needStatic = !tile.staticValid || moved;
+        tile.dirty = tile.dirty || moved;
         tile.inView = camFrustum.testSphere_dirty(L->position, L->range);
-        tile.staticValid = true;
-        pushRefresh(slot, needStatic, tile.inView);
+        const bool needStatic = tile.inView && (!tile.staticValid || tile.dirty);
+        if (needStatic) {
+            tile.staticValid = true;
+            tile.dirty = false;
+        }
+        rec.zparams.w = tile.staticValid ? 1.0f : 0.0f;
+        pushRefresh(slot, needStatic, tile.inView, cadenceFor(camPos.distance_to(L->position)));
         state.slotOfLight[spotCandidates[c].index] = slot + 1;
         ++state.pooledSpots;
     }
@@ -883,9 +938,14 @@ void SelectLocalShadowLights(
 
         const float nearZ = 0.25f;
         const float farZ = std::max(L->range, 1.0f);
-        const bool needStatic = !tile.staticValid || moved;
+        tile.dirty = tile.dirty || moved;
         tile.inView = camFrustum.testSphere_dirty(L->position, L->range);
-        tile.staticValid = true;
+        const bool needStatic = tile.inView && (!tile.staticValid || tile.dirty);
+        if (needStatic) {
+            tile.staticValid = true;
+            tile.dirty = false;
+        }
+        const u32 cadence = cadenceFor(camPos.distance_to(L->position));
 
         for (u32 f = 0; f < 6; ++f) {
             const u32 k = t * 6 + f;
@@ -898,7 +958,8 @@ void SelectLocalShadowLights(
             vp.mul(proj, view);
             FillRecord(state.records[slot], vp, float((k & 7) * kLocalPointFace), float(2048 + (k >> 3) * kLocalPointFace),
                 float(kLocalPointFace), nearZ, farZ, 2.0f / float(kLocalPointFace), L->position, L->range);
-            pushRefresh(slot, needStatic, tile.inView);
+            state.records[slot].zparams.w = tile.staticValid ? 1.0f : 0.0f;
+            pushRefresh(slot, needStatic, tile.inView, cadence);
         }
         state.slotOfLight[pointCandidates[c].index] = kLocalSpotSlots + t * 6 + 1;
         ++state.pooledPoints;
@@ -921,6 +982,7 @@ LocalShadowOutput setupLocalShadowPasses(
         return out;
     if (!EnsureResources(nvDevice, *state))
         return out;
+    ProcessLocalShadowStats(*state, nvDevice);
     out.state = state;
     if (state->pooledSpots == 0 && state->pooledPoints == 0)
         return out;
