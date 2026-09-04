@@ -6,13 +6,13 @@ cbuffer VsmResidParams : register(b5)
 {
     int4 g_PageBase[3];
     uint g_Frame;
-    uint g_RefreshN;
-    uint g_SunMoving;
+    uint g_RefreshBudget;
+    uint g_WrongBudget;
     uint g_ForceDirty;
-    float4 g_Inval[4];
-    uint g_SunEpoch;
-    uint g_StaleOn;
-    uint2 g_ResidPad;
+    uint4 g_Interval[2];
+    float4 g_Pivot;
+    float4 g_Sun;
+    float4 g_LevelOrigin[VSM_LEVELS];
 };
 
 StructuredBuffer<uint> g_Needed : register(t0);
@@ -22,12 +22,21 @@ RWStructuredBuffer<uint2> g_PhysTile : register(u2);
 RWStructuredBuffer<uint> g_SlotDirty : register(u3);
 RWStructuredBuffer<uint> g_DirtyList : register(u4);
 RWByteAddressBuffer g_DrawClear : register(u5);
-RWStructuredBuffer<uint> g_SlotEpoch : register(u6);
+RWStructuredBuffer<uint> g_SlotFrame : register(u6);
+RWStructuredBuffer<float4> g_SlotPivot : register(u7);
+RWStructuredBuffer<float4> g_SlotSun : register(u8);
 
 int2 pageBaseOf(int L)
 {
     int4 v = g_PageBase[L >> 1];
     return ((L & 1) == 0) ? v.xy : v.zw;
+}
+
+uint intervalOf(int L)
+{
+    uint4 v = g_Interval[L >> 2];
+    int c = L & 3;
+    return (c == 0) ? v.x : ((c == 1) ? v.y : ((c == 2) ? v.z : v.w));
 }
 
 [numthreads(64, 1, 1)]
@@ -51,58 +60,54 @@ void main(uint3 dtID : SV_DispatchThreadID)
     g_PageList[slot] = uint4(uint(level), uint(wpage.x), uint(wpage.y), 0u);
 
     uint2 tile = uint2(uint(absPage.x), uint(absPage.y));
+    bool force = g_ForceDirty != 0u;
     bool wrong = any(g_PhysTile[slot] != tile);
-    bool refresh = (g_SunMoving != 0u) && (g_RefreshN != 0u) && ((uint(slot) % g_RefreshN) == (g_Frame % g_RefreshN));
-    uint age = g_SunEpoch - g_SlotEpoch[slot];
-    bool aged = !wrong && !refresh && (g_RefreshN != 0u) && (age >= g_RefreshN);
-    if (aged)
-    {
-        uint s;
-        InterlockedAdd(g_DirtyList[uint(VSM_MAX_PHYS_S) + 1u], 1u, s);
-        uint m;
-        InterlockedMax(g_DirtyList[uint(VSM_MAX_PHYS_S) + 2u], age, m);
-    }
-    bool stale = aged && (g_StaleOn != 0u);
+    bool refresh = false;
 
-    bool inval = false;
+    if (wrong && !force)
     {
-        float pw = g_Inval[0].w * float(1 << level);
-        if (pw > 0.0)
-        {
-            float2 pmin = float2(absPage) * pw;
-            float2 pmax = pmin + float2(pw, pw);
-            for (int i = 0; i < 4; ++i)
-            {
-                float r = g_Inval[i].z;
-                if (r <= 0.0)
-                    continue;
-                float2 d = clamp(g_Inval[i].xy, pmin, pmax) - g_Inval[i].xy;
-                if (dot(d, d) <= r * r)
-                {
-                    inval = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    if (wrong && !inval && g_ForceDirty == 0u)
-    {
-        uint budget = uint(g_Inval[1].w + 0.5);
         uint n;
         InterlockedAdd(g_DirtyList[uint(VSM_MAX_PHYS_S)], 1u, n);
-        if (budget != 0u && n >= budget)
+        if (g_WrongBudget != 0u && n >= g_WrongBudget)
         {
             g_PageTable[vp] = VSM_UNMAPPED;
             return;
         }
     }
+    else if (!force)
+    {
+        uint age = g_Frame - g_SlotFrame[slot];
+        if (age >= intervalOf(level))
+        {
+            uint n;
+            InterlockedAdd(g_DirtyList[uint(VSM_MAX_PHYS_S) + 1u], 1u, n);
+            if (n < g_RefreshBudget)
+            {
+                refresh = true;
+            }
+            else
+            {
+                uint m;
+                InterlockedAdd(g_DirtyList[uint(VSM_MAX_PHYS_S) + 2u], 1u, m);
+            }
+        }
+    }
 
-    if (wrong || refresh || stale || inval || g_ForceDirty != 0u)
+    if (wrong || refresh || force)
     {
         g_PhysTile[slot] = tile;
-        g_SlotEpoch[slot] = g_SunEpoch;
-        g_SlotDirty[slot] = wrong ? 1u : (refresh ? 2u : (stale ? 5u : (inval ? 3u : 4u)));
+        uint phase = 0u;
+        if (!refresh)
+        {
+            uint h = uint(slot) * 2654435761u;
+            h ^= h >> 15;
+            phase = h % max(intervalOf(level), 1u);
+        }
+        g_SlotFrame[slot] = g_Frame - phase;
+        float2 org = g_LevelOrigin[level].xy + float2(wpage) * g_LevelOrigin[level].z;
+        g_SlotPivot[slot] = float4(g_Pivot.xyz, org.x);
+        g_SlotSun[slot] = float4(g_Sun.xyz, org.y);
+        g_SlotDirty[slot] = wrong ? 1u : (refresh ? 2u : 4u);
         uint d;
         g_DrawClear.InterlockedAdd(4, 1u, d);
         if (d < uint(VSM_MAX_PHYS_S))
