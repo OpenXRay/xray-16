@@ -23,7 +23,6 @@ StructuredBuffer<uint> g_PageTable : register(t2);
 Texture2D<float4> g_History : register(t3);
 Texture2D<float> g_AtlasDyn : register(t14);
 StructuredBuffer<uint> g_DynPageTable : register(t15);
-StructuredBuffer<uint> g_DynUsed : register(t16);
 StructuredBuffer<float4> g_SlotPivot : register(t17);
 StructuredBuffer<float4> g_SlotSun : register(t18);
 RWTexture2D<float4> g_Mask : register(u0);
@@ -153,7 +152,7 @@ float sampleVSM(float3 wp, float3 nrm, float tanT, out float dynOcc, out float d
     int idx = vsmPageIndex(L, page);
     uint slotD = dynOn() ? g_DynPageTable[idx] : VSM_UNMAPPED;
     bool resD = slotD < uint(VSM_MAX_PHYS);
-    bool hasD = resD && (g_Params.w < 0.5 || g_DynUsed[slotD] != 0u);
+    bool hasD = resD;
     bool dbgD = resD && (g_PrevCamPos.w > 0.5);
 
     float2 pageLocal = luv * float(VSM_PAGES_AXIS) - float2(page);
@@ -277,7 +276,7 @@ float sampleVSMSoft(float3 wp, float3 nrm, float tanT, float rot,
     uint slotDC;
     vsmPageAt(lp.xy, L, plC, slotSC, slotDC);
     bool resD = slotDC < uint(VSM_MAX_PHYS);
-    bool useD = resD && (g_Params.w < 0.5 || g_DynUsed[slotDC] != 0u);
+    bool useD = resD;
     bool dbgD = resD && (g_PrevCamPos.w > 0.5);
 
     VsmFrame frC = vsmSlotFrame(slotSC);

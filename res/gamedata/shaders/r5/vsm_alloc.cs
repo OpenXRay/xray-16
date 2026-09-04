@@ -13,13 +13,21 @@ void main(uint3 dtID : SV_DispatchThreadID)
     uint t = dtID.x;
     if (t >= uint(VSM_PAGE_COUNT))
         return;
-    if (g_Needed[t] == 0u)
+    if (g_DynPageTable[t] != VSM_TOUCHED)
         return;
+    if (g_Needed[t] == 0u)
+    {
+        g_DynPageTable[t] = VSM_UNMAPPED;
+        return;
+    }
 
     uint slot;
     InterlockedAdd(g_DynAllocInfo[0], 1u, slot);
     if (slot >= uint(VSM_MAX_PHYS))
+    {
+        g_DynPageTable[t] = VSM_UNMAPPED;
         return;
+    }
 
     int level = int(t) / VSM_PAGES_PER_LVL;
     int within = int(t) % VSM_PAGES_PER_LVL;

@@ -273,7 +273,6 @@ extern ECORE_API float ps_r_vsm_ta_motion_floor;
 extern ECORE_API float ps_r_vsm_ta_carry;
 extern ECORE_API int   ps_r_vsm_dirty_budget;
 extern ECORE_API float ps_r_vsm_ta_blend_dyn;
-extern ECORE_API int   ps_r_vsm_dyn_gate;
 extern ECORE_API int   ps_r_vsm_debug_dyn;
 extern ECORE_API int   ps_r_vsm_load_freeze;
 

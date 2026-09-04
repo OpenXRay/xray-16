@@ -312,7 +312,6 @@ float ps_r_vsm_ta_motion_floor = 0.30f;
 float ps_r_vsm_ta_carry        = 0.98f;
 int   ps_r_vsm_dirty_budget    = 128;
 float ps_r_vsm_ta_blend_dyn    = 0.35f;
-int   ps_r_vsm_dyn_gate        = 1;
 int   ps_r_vsm_debug_dyn       = 0;
 int   ps_r_vsm_load_freeze     = 1;
 
@@ -1041,7 +1040,6 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_vsm_ta_carry", &ps_r_vsm_ta_carry, 0.0f, 1.0f);
     CMD4(CCC_Integer, "r_vsm_dirty_budget", &ps_r_vsm_dirty_budget, 0, 4096);
     CMD4(CCC_Float, "r_vsm_ta_blend_dyn", &ps_r_vsm_ta_blend_dyn, 0.0f, 0.98f);
-    CMD4(CCC_Integer, "r_vsm_dyn_gate", &ps_r_vsm_dyn_gate, 0, 1);
     CMD4(CCC_Integer, "r_vsm_debug_dyn", &ps_r_vsm_debug_dyn, 0, 3);
     CMD4(CCC_Integer, "r_vsm_load_freeze", &ps_r_vsm_load_freeze, 0, 1);
 

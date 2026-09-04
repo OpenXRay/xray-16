@@ -93,6 +93,7 @@ struct VSMState {
     float sunStepMax = 0.0f;
     bool physInit = false;
     bool atlasFirst = true;
+    bool dynAtlasFirst = true;
     bool behindLoadScreen = false;
     u32 primeFrames = 0;
     u32 primeTraceLeft = 0;
@@ -100,7 +101,6 @@ struct VSMState {
     u32 primeTraceQuiet = 0;
 
     nvrhi::BufferHandle needed;
-    nvrhi::BufferHandle counter;
     nvrhi::BufferHandle pageTable;
     nvrhi::BufferHandle pageList;
     nvrhi::BufferHandle physTile;
@@ -115,7 +115,7 @@ struct VSMState {
     nvrhi::BufferHandle dynPageTable;
     nvrhi::BufferHandle dynPageList;
     nvrhi::BufferHandle dynAllocInfo;
-    nvrhi::BufferHandle dynUsed;
+    nvrhi::BufferHandle dynClearArgs;
     nvrhi::BufferHandle dynStats;
     nvrhi::BufferHandle dynPairs[kVSMDynStreamCount];
     nvrhi::BufferHandle dynArgs[kVSMDynStreamCount];
@@ -129,7 +129,7 @@ struct VSMState {
     framegraph::VirtualResourceHandle fgAtlas;
     framegraph::VirtualResourceHandle fgDynAtlas;
     framegraph::VirtualResourceHandle fgDynTable;
-    framegraph::VirtualResourceHandle fgDynUsed;
+    framegraph::VirtualResourceHandle fgDynArgs;
     nvrhi::TextureHandle mask[2];
     u32 maskWidth = 0;
     u32 maskHeight = 0;
@@ -190,6 +190,11 @@ struct VSMState {
     nvrhi::BindingLayoutHandle dynBinLayout;
     nvrhi::ComputePipelineHandle dynArgsPipeline;
     nvrhi::BindingLayoutHandle dynArgsLayout;
+    nvrhi::ComputePipelineHandle touchPipeline;
+    nvrhi::BindingLayoutHandle touchLayout;
+    nvrhi::GraphicsPipelineHandle dynClearPipeline;
+    nvrhi::BindingLayoutHandle dynClearLayout;
+    nvrhi::ShaderHandle dynClearVS;
     nvrhi::GraphicsPipelineHandle dynPagePipeline;
     nvrhi::GraphicsPipelineHandle dynPageATPipeline;
     nvrhi::GraphicsPipelineHandle dynSkinPagePipeline;

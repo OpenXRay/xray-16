@@ -21,7 +21,7 @@ RWStructuredBuffer<uint4> g_PageList : register(u1);
 RWStructuredBuffer<uint2> g_PhysTile : register(u2);
 RWStructuredBuffer<uint> g_SlotDirty : register(u3);
 RWStructuredBuffer<uint> g_DirtyList : register(u4);
-RWByteAddressBuffer g_DrawClear : register(u5);
+RWByteAddressBuffer g_Counters : register(u5);
 RWStructuredBuffer<uint> g_SlotFrame : register(u6);
 RWStructuredBuffer<float4> g_SlotPivot : register(u7);
 RWStructuredBuffer<float4> g_SlotSun : register(u8);
@@ -43,19 +43,30 @@ uint intervalOf(int L)
 void main(uint3 dtID : SV_DispatchThreadID)
 {
     uint vp = dtID.x;
-    if (vp >= uint(VSM_PAGE_COUNT))
-        return;
-    if (g_Needed[vp] == 0u)
+    bool inRange = vp < uint(VSM_PAGE_COUNT);
+    bool needed = inRange && g_Needed[vp] != 0u;
+    int level = int(min(vp, uint(VSM_PAGE_COUNT - 1))) / VSM_PAGES_PER_LVL;
+    uint nWave = WaveActiveCountBits(needed);
+    if (WaveIsFirstLane() && nWave != 0u)
     {
-        g_PageTable[vp] = VSM_UNMAPPED;
-        return;
+        uint d;
+        g_Counters.InterlockedAdd(32u + 4u * uint(level), nWave, d);
     }
+    if (vp == 0u)
+        g_Counters.Store(0, 6u);
+    if (!inRange)
+        return;
 
-    int level = int(vp) / VSM_PAGES_PER_LVL;
     int within = int(vp) % VSM_PAGES_PER_LVL;
     int2 wpage = int2(within % VSM_PAGES_AXIS, within / VSM_PAGES_AXIS);
     int2 absPage = pageBaseOf(level) + wpage;
     int slot = vsmToroidalSlot(level, absPage);
+    if (!needed)
+    {
+        g_PageTable[vp] = VSM_UNMAPPED;
+        g_SlotDirty[slot] = 0u;
+        return;
+    }
     g_PageTable[vp] = uint(slot);
     g_PageList[slot] = uint4(uint(level), uint(wpage.x), uint(wpage.y), 0u);
 
@@ -67,10 +78,11 @@ void main(uint3 dtID : SV_DispatchThreadID)
     if (wrong && !force)
     {
         uint n;
-        InterlockedAdd(g_DirtyList[uint(VSM_MAX_PHYS_S)], 1u, n);
+        g_Counters.InterlockedAdd(16u, 1u, n);
         if (g_WrongBudget != 0u && n >= g_WrongBudget)
         {
             g_PageTable[vp] = VSM_UNMAPPED;
+            g_SlotDirty[slot] = 0u;
             return;
         }
     }
@@ -80,7 +92,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
         if (age >= intervalOf(level))
         {
             uint n;
-            InterlockedAdd(g_DirtyList[uint(VSM_MAX_PHYS_S) + 1u], 1u, n);
+            g_Counters.InterlockedAdd(20u, 1u, n);
             if (n < g_RefreshBudget)
             {
                 refresh = true;
@@ -88,7 +100,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
             else
             {
                 uint m;
-                InterlockedAdd(g_DirtyList[uint(VSM_MAX_PHYS_S) + 2u], 1u, m);
+                g_Counters.InterlockedAdd(24u, 1u, m);
             }
         }
     }
@@ -109,8 +121,12 @@ void main(uint3 dtID : SV_DispatchThreadID)
         g_SlotSun[slot] = float4(g_Sun.xyz, org.y);
         g_SlotDirty[slot] = wrong ? 1u : (refresh ? 2u : 4u);
         uint d;
-        g_DrawClear.InterlockedAdd(4, 1u, d);
+        g_Counters.InterlockedAdd(4u, 1u, d);
         if (d < uint(VSM_MAX_PHYS_S))
             g_DirtyList[d] = uint(slot);
+    }
+    else
+    {
+        g_SlotDirty[slot] = 0u;
     }
 }

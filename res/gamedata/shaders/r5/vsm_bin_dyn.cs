@@ -34,7 +34,6 @@ StructuredBuffer<uint> g_DynPageTable : register(t1);
 RWStructuredBuffer<uint> g_Stats : register(u0);
 RWStructuredBuffer<uint2> g_PairsOpaque : register(u1);
 RWStructuredBuffer<uint2> g_PairsAT : register(u2);
-RWStructuredBuffer<uint> g_DynUsed : register(u3);
 
 [numthreads(64, 1, 1)]
 void main(uint3 dtID : SV_DispatchThreadID)
@@ -102,8 +101,6 @@ void main(uint3 dtID : SV_DispatchThreadID)
                     g_PairsAT[base + w] = pair;
                 else
                     g_PairsOpaque[base + w] = pair;
-                uint prev;
-                InterlockedOr(g_DynUsed[slot], 1u, prev);
             }
             ++w;
         }
