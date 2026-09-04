@@ -25,6 +25,10 @@ Flags:
                     Needs ONNX Runtime: Externals/onnxruntime/vs_build/Release
                     on Windows, or e.g. 'brew install onnxruntime' on macOS
                     (XRAY_ONNXRUNTIME_ROOT overrides the search path).
+  --reconfigure     Re-run CMake on the existing build dir instead of wiping it,
+  -r                so only targets affected by a changed option rebuild (e.g.
+                    adding --ai-pbr rebuilds xrRender, not the whole engine).
+                    Falls back to a clean configure if no cache exists yet.
 
 Build dir: cmake_builds/<config-lowercased>[_x86]  (or cmake_builds/vs_<config>[_x86] with --vs)
 USAGE
@@ -34,6 +38,7 @@ USAGE
 CONFIG_INPUT=""
 USE_VS=0
 USE_AI_PBR=0
+RECONFIGURE=0
 ARCH="x64"
 expect_arch=0
 for arg in "$@"; do
@@ -43,6 +48,7 @@ for arg in "$@"; do
     case "$arg" in
         --vs) USE_VS=1 ;;
         --ai-pbr) USE_AI_PBR=1 ;;
+        --reconfigure|-r|--no-clean) RECONFIGURE=1 ;;
         --arch) expect_arch=1 ;;
         --arch=*) ARCH="${arg#--arch=}" ;;
         -h|--help|help) usage ;;
@@ -107,6 +113,17 @@ run_cmd_file() {
         wsl)     cmd.exe /c "$cmd_file_win" ;;
         windows) cmd.exe //c "$cmd_file_win" ;;
     esac
+}
+
+prepare_build_dir() {
+    if [[ $RECONFIGURE -eq 1 && -f "$BUILD_DIR/CMakeCache.txt" ]]; then
+        echo ">> Reconfiguring existing $BUILD_DIR (no clean; only affected targets rebuild)"
+        return
+    fi
+    [[ $RECONFIGURE -eq 1 ]] && echo ">> --reconfigure: no cache in $BUILD_DIR yet, doing a clean configure"
+    echo ">> Cleaning $BUILD_DIR"
+    rm -rf "$BUILD_DIR"
+    mkdir -p "$BUILD_DIR"
 }
 
 configure_windows_build() {
@@ -184,9 +201,7 @@ configure_windows_build() {
     fi
     local clangxx_win="${clang_win%clang.exe}clang++.exe"
 
-    echo ">> Cleaning $BUILD_DIR"
-    rm -rf "$BUILD_DIR"
-    mkdir -p "$BUILD_DIR"
+    prepare_build_dir
 
     local build_dir_win="${repo_win}\\${BUILD_DIR//\//\\}"
     local tmp_cmd="${BUILD_DIR}/_configure.cmd"
@@ -237,9 +252,7 @@ CMDEOF
 
 configure_native() {
     local label="$1"
-    echo ">> Cleaning $BUILD_DIR"
-    rm -rf "$BUILD_DIR"
-    mkdir -p "$BUILD_DIR"
+    prepare_build_dir
 
     echo ">> Configuring $CONFIG -> $BUILD_DIR ($label, native)"
     echo
