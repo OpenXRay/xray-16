@@ -278,6 +278,11 @@ extern ECORE_API int   ps_r_vsm_load_freeze;
 extern ECORE_API int   ps_r_vsm_hud;
 extern ECORE_API float ps_r_vsm_hud_bias;
 
+extern ECORE_API int   ps_r_local_shadow_spots;
+extern ECORE_API int   ps_r_local_shadow_points;
+extern ECORE_API float ps_r_local_shadow_bias;
+extern ECORE_API int   ps_r_local_shadow_debug;
+
 extern ECORE_API int   ps_r_smoke_trail_enabled;
 extern ECORE_API float ps_r_smoke_max_emit_rate;
 extern ECORE_API float ps_r_smoke_point_lifetime;

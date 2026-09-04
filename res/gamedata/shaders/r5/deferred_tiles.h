@@ -13,7 +13,8 @@ cbuffer TileParams : register(b5)
     uint maxTiles;
     uint listBase;
     uint forceMixed;
-    uint3 tilePad;
+    uint localShadowDebug;
+    uint2 tilePad;
 };
 
 #endif

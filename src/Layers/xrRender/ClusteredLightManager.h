@@ -52,7 +52,7 @@ public:
     void Shutdown();
     void BeginFrame();
     void CollectLight(const light* L);
-    void CollectLightsParallel(const xr_vector<const light*>& lights);
+    void CollectLightsParallel(const xr_vector<const light*>& lights, const xr_vector<u32>& shadowSlots);
     void BuildLightBuffer(const light_Package& package);
     void Upload(nvrhi::ICommandList* cmdList);
     void UploadAllVisible(nvrhi::ICommandList* cmdList);
@@ -81,7 +81,7 @@ public:
 
 private:
     void AddLight(const light* L, u32 type);
-    GPULightData BuildGPULightData(const light* L);
+    GPULightData BuildGPULightData(const light* L, u32 shadowSlot);
     u32 GetOrLoadSpotTexture(const shared_str& name);
 
     nvrhi::DeviceHandle m_device;

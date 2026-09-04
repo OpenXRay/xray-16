@@ -17,6 +17,7 @@
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 #include "Layers/xrRender/FrameGraphPasses/VSMPassSetup.h"
+#include "Layers/xrRender/FrameGraphPasses/LocalShadowPassSetup.h"
 
 // D3D12: Shader compilation
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
@@ -68,6 +69,7 @@ void FrameGraphRenderer::level_Load(IReader* fs)
         }
         if (m_blackboard) {
             passes::InvalidateVSMCache(m_blackboard->get_or_add<passes::VSMState>());
+            passes::ResetLocalShadowPool(m_blackboard->get_or_add<passes::LocalShadowState>());
         }
         passes::ResetSunDirVisual();
 
@@ -272,6 +274,7 @@ void FrameGraphRenderer::level_Unload()
 
     if (m_blackboard) {
         passes::InvalidateVSMCache(m_blackboard->get_or_add<passes::VSMState>());
+        passes::ResetLocalShadowPool(m_blackboard->get_or_add<passes::LocalShadowState>());
     }
     passes::ResetSunDirVisual();
 

@@ -317,6 +317,11 @@ int   ps_r_vsm_load_freeze     = 1;
 int   ps_r_vsm_hud             = 1;
 float ps_r_vsm_hud_bias        = 0.0015f;
 
+int   ps_r_local_shadow_spots  = 8;
+int   ps_r_local_shadow_points = 4;
+float ps_r_local_shadow_bias   = 0.04f;
+int   ps_r_local_shadow_debug  = 0;
+
 int   ps_r_smoke_trail_enabled  = 1;
 float ps_r_smoke_max_emit_rate  = 45.f;
 float ps_r_smoke_point_lifetime = 2.5f;
@@ -1046,6 +1051,11 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_vsm_load_freeze", &ps_r_vsm_load_freeze, 0, 1);
     CMD4(CCC_Integer, "r_vsm_hud", &ps_r_vsm_hud, 0, 1);
     CMD4(CCC_Float, "r_vsm_hud_bias", &ps_r_vsm_hud_bias, 0.0f, 0.05f);
+
+    CMD4(CCC_Integer, "r_local_shadow_spots", &ps_r_local_shadow_spots, 1, 8);
+    CMD4(CCC_Integer, "r_local_shadow_points", &ps_r_local_shadow_points, 1, 4);
+    CMD4(CCC_Float, "r_local_shadow_bias", &ps_r_local_shadow_bias, 0.0f, 0.5f);
+    CMD4(CCC_Integer, "r_local_shadow_debug", &ps_r_local_shadow_debug, 0, 1);
 
     // Smoke Trail (weapon muzzle smoke)
     CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);

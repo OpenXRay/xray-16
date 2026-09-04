@@ -1421,6 +1421,22 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
 
+    passes::LocalShadowOutput localShadowOut;
+    if (m_blackboard && m_gpuCullingManager) {
+        auto& localShadowState = m_blackboard->get_or_add<passes::LocalShadowState>();
+        passes::LocalShadowConfig localCfg;
+        localCfg.gpuCulling = m_gpuCullingManager.get();
+        localCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+        localCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+        localCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+        localCfg.dynamicInstanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
+        localCfg.megaVertexBuffer = clusterConfig.megaVertexBuffer;
+        localCfg.megaIndexBuffer = clusterConfig.megaIndexBuffer;
+        localCfg.materialCache = m_materialCache.get();
+        localShadowOut = passes::setupLocalShadowPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
+            &localShadowState, m_gpuProfiler.get());
+    }
+
     auto litOutputs = passes::setupDeferredLightPass(
         *m_framegraph,
         m_device,
@@ -1428,6 +1444,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width,
         height,
         vsmMaskHandle,
+        localShadowOut,
         m_gpuProfiler.get(),
         &m_blackboard->get_or_add<passes::DeferredLightPassState>()
     );
@@ -1449,6 +1466,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_device,
         litOutputs,
         transparentConfig,
+        localShadowOut,
         width, height,
         m_blackboard->get_or_add<passes::TransparentPassState>()
     );
@@ -2445,8 +2463,17 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         m_collectShadowOnly = false;
     }
 
-    if (!collectedLights.empty())
-        fg::ClusteredLightManager::Instance().CollectLightsParallel(collectedLights);
+    {
+        static const xr_vector<u32> noSlots;
+        const xr_vector<u32>* slots = &noSlots;
+        if (m_blackboard) {
+            auto& localShadowState = m_blackboard->get_or_add<passes::LocalShadowState>();
+            passes::SelectLocalShadowLights(localShadowState, collectedLights, Device.vCameraPosition, Device.mFullTransform);
+            slots = &localShadowState.slotOfLight;
+        }
+        if (!collectedLights.empty())
+            fg::ClusteredLightManager::Instance().CollectLightsParallel(collectedLights, *slots);
+    }
 
     // ═══════════════════════════════════════════════════════
     //  HUD RENDERING (after dynamic objects)

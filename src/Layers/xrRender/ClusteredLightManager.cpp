@@ -125,7 +125,7 @@ void ClusteredLightManager::BeginFrame()
     m_numOmni = 0;
 }
 
-GPULightData ClusteredLightManager::BuildGPULightData(const light* L)
+GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadowSlot)
 {
     GPULightData gpu;
 
@@ -155,7 +155,7 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L)
 
         float texIdxBits;
         std::memcpy(&texIdxBits, &texIdx, sizeof(float));
-        gpu.spotParamsAndType.set(offset, 1.0f, texIdxBits, 0.0f);
+        gpu.spotParamsAndType.set(offset, 1.0f, texIdxBits, float(shadowSlot));
 
         if (texIdx != 0)
         {
@@ -200,7 +200,7 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L)
     else
     {
         gpu.directionAndSpotScale.set(0.0f, -1.0f, 0.0f, 0.0f);
-        gpu.spotParamsAndType.set(0.0f, 0.0f, 0.0f, 0.0f);
+        gpu.spotParamsAndType.set(0.0f, 0.0f, 0.0f, float(shadowSlot));
     }
 
     return gpu;
@@ -211,11 +211,11 @@ void ClusteredLightManager::CollectLight(const light* L)
     if (m_numLights >= MAX_LIGHTS)
         return;
 
-    m_lightsCPU.push_back(BuildGPULightData(L));
+    m_lightsCPU.push_back(BuildGPULightData(L, 0));
     m_numLights++;
 }
 
-void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>& lights)
+void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>& lights, const xr_vector<u32>& shadowSlots)
 {
     const u32 count = std::min(static_cast<u32>(lights.size()), MAX_LIGHTS);
     if (count == 0)
@@ -235,7 +235,7 @@ void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>&
 
     xr_parallel_for(TaskRange<u32>(0, count), [&](const TaskRange<u32>& range) {
         for (u32 i = range.begin(); i != range.end(); ++i)
-            m_lightsCPU[i] = BuildGPULightData(lights[i]);
+            m_lightsCPU[i] = BuildGPULightData(lights[i], i < shadowSlots.size() ? shadowSlots[i] : 0u);
     });
 
     if (psDeviceFlags.test(rsStatistic))
@@ -258,7 +258,7 @@ void ClusteredLightManager::AddLight(const light* L, u32 type)
     if (m_numLights >= MAX_LIGHTS)
         return;
 
-    m_lightsCPU.push_back(BuildGPULightData(L));
+    m_lightsCPU.push_back(BuildGPULightData(L, 0));
     m_numLights++;
 }
 
