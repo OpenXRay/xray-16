@@ -16,6 +16,7 @@
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 #include "Layers/xrRender/FrameGraphPasses/VSMPassSetup.h"
+#include "Layers/xrRender/FrameGraphPasses/LocalShadowPassSetup.h"
 
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
@@ -58,6 +59,7 @@ void FrameGraphRenderer::level_Load(IReader* fs)
         }
         if (m_blackboard) {
             passes::InvalidateVSMCache(m_blackboard->get_or_add<passes::VSMState>());
+            passes::ResetLocalShadowPool(m_blackboard->get_or_add<passes::LocalShadowState>());
         }
         passes::ResetSunDirVisual();
 
@@ -226,6 +228,7 @@ void FrameGraphRenderer::level_Unload()
 
     if (m_blackboard) {
         passes::InvalidateVSMCache(m_blackboard->get_or_add<passes::VSMState>());
+        passes::ResetLocalShadowPool(m_blackboard->get_or_add<passes::LocalShadowState>());
     }
     passes::ResetSunDirVisual();
 

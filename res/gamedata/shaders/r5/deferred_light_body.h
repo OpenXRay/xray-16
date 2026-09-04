@@ -4,6 +4,7 @@
 #define SM_6_0
 #if TILE_LIGHTS
 #define CLUSTERED_LIGHTING_FORWARD
+#define LOCAL_SHADOW_RECEIVER
 #endif
 #if TILE_SUN_MIXED
 #define SUN_SHADOW_RECEIVER
@@ -47,6 +48,15 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
 #if TILE_SUN_MIXED
     if (dev_param_3.y > 0.5)
         lit = SunShadowDebugColor(lit, worldPos);
+#endif
+#if TILE_LIGHTS
+    if (localShadowDebug != 0u)
+    {
+        float linearDepth = mul(m_V, float4(worldPos, 1.0)).z;
+        float4 dbg = LocalShadowDebug(worldPos, normalize(n.xyz), pixel, linearDepth);
+        if (dbg.w > 0.5)
+            lit = dbg.rgb;
+    }
 #endif
     g_SceneColor[p] = float4(lit, 1.0);
 }
