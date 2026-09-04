@@ -22,7 +22,6 @@
 #include "xrParticles/psystem.h"
 #include "xrCDB/Frustum.h"  // For CFrustum (frustum plane extraction)
 
-extern ENGINE_API float psHUD_FOV;
 
 namespace xray::render::fg::passes {
 
@@ -188,22 +187,6 @@ static void FillSpriteAligned(
     FillSprite(pv, dir, R, pos, lt, rb, r1, r2, clr, matID, sina, cosa);
 }
 
-static Fmatrix BuildHUDFOVMatrix()
-{
-    float fovScale = 1.0f / psHUD_FOV;
-    Fmatrix viewMatrix = Device.mView;
-    Fmatrix invView;
-    invView.invert(viewMatrix);
-    Fmatrix fovScaleMat;
-    fovScaleMat.identity();
-    fovScaleMat._11 = fovScale;
-    fovScaleMat._22 = fovScale;
-    Fmatrix t1, result;
-    t1.mul(fovScaleMat, viewMatrix);
-    result.mul(invView, t1);
-    return result;
-}
-
 static u32 GenerateParticleVertices(
     const xr_vector<ParticleBatch>& batches,
     xr_vector<ParticleVertex>& vertices,
@@ -243,7 +226,7 @@ static u32 GenerateParticleVertices(
         Fmatrix hudMat;
         bool isHUD = batch.isHUDMode;
         if (isHUD)
-            hudMat = BuildHUDFOVMatrix();
+            hudMat = HudFovWarp();
 
         float sina = 0.0f, cosa = 0.0f;
         float angle = float(0xFFFFFFFF);

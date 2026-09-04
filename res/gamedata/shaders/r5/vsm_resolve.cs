@@ -14,7 +14,8 @@ cbuffer VsmResolveParams : register(b5)
     float4 g_Params2;
     float4 g_Params3;
     float4 g_Params4;
-    float4 g_HudScale;
+    float4x4 g_HudViewProj;
+    float4 g_HudParams;
 };
 
 Texture2D<float> g_Depth : register(t0);
@@ -25,6 +26,7 @@ Texture2D<float> g_AtlasDyn : register(t14);
 StructuredBuffer<uint> g_DynPageTable : register(t15);
 StructuredBuffer<float4> g_SlotPivot : register(t17);
 StructuredBuffer<float4> g_SlotSun : register(t18);
+Texture2D<float> g_HudMap : register(t19);
 RWTexture2D<float4> g_Mask : register(u0);
 
 static const float2 kDimS = float2(float(VSM_ATLAS_W_S), float(VSM_ATLAS_H_S));
@@ -72,17 +74,36 @@ float2 vsmFramePl(VsmFrame f, float2 lxy, float pw)
     return clamp((lxy - f.origin) / pw, float2(kInset, kInset), float2(1.0 - kInset, 1.0 - kInset));
 }
 
-bool reconWorldAt(int2 p, out float3 wp)
+bool reconWorldAt(int2 p, bool hud, out float3 wp)
 {
     wp = float3(0.0, 0.0, 0.0);
     p = clamp(p, int2(0, 0), int2(g_Screen.xy) - int2(1, 1));
     float zndc = g_Depth.Load(int3(p, 0));
-    if (zndc <= 0.0)
+    if (zndc <= 0.0 || (zndc >= 0.9) != hud)
         return false;
     float2 uv = (float2(p) + 0.5) * g_Screen.zw;
     float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - 2.0 * uv.y, zndc, 1.0);
-    wp = vsmReconstructPos(g_InvViewProj, clip, g_HudScale);
+    wp = vsmReconstructPos(g_InvViewProj, clip);
     return true;
+}
+
+float sampleHud(float3 wp, float3 nrm, float tanT)
+{
+    float3 wpH = wp + nrm * (1.5 * g_HudParams.z);
+    float4 hc = mul(g_HudViewProj, float4(wpH, 1.0));
+    hc.xyz /= hc.w;
+    float2 huv = hc.xy * float2(0.5, -0.5) + 0.5;
+    if (any(huv <= 0.0) || any(huv >= 1.0))
+        return 1.0;
+    float bias = (g_HudParams.y + g_HudParams.z * min(tanT, 4.0)) * g_HudParams.w;
+    float lit = 0.0;
+    for (int dy = -1; dy <= 1; ++dy)
+    for (int dx = -1; dx <= 1; ++dx)
+    {
+        float occ = g_HudMap.SampleLevel(smp_nofilter, huv + float2(float(dx), float(dy)) * g_HudParams.x, 0).r;
+        lit += (occ > hc.z + bias) ? 0.0 : 1.0;
+    }
+    return lit * (1.0 / 9.0);
 }
 
 float3 planeDelta(float3 wp, bool okP, float3 wP, bool okN, float3 wN)
@@ -412,7 +433,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     float2 uv = (float2(px) + 0.5) * g_Screen.zw;
     float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - 2.0 * uv.y, zndc, 1.0);
-    float3 wp = vsmReconstructPos(g_InvViewProj, clip, g_HudScale);
+    float3 wp = vsmReconstructPos(g_InvViewProj, clip);
+    bool hud = zndc >= 0.9;
 
     float tanT = 0.0;
     float3 nrm = float3(0.0, 0.0, 0.0);
@@ -421,10 +443,10 @@ void main(uint3 dtID : SV_DispatchThreadID)
     if (g_Params2.w > 0.0 || softOn)
     {
         float3 wxp, wxn, wyp, wyn;
-        bool okxp = reconWorldAt(px + int2(1, 0), wxp);
-        bool okxn = reconWorldAt(px - int2(1, 0), wxn);
-        bool okyp = reconWorldAt(px + int2(0, 1), wyp);
-        bool okyn = reconWorldAt(px - int2(0, 1), wyn);
+        bool okxp = reconWorldAt(px + int2(1, 0), hud, wxp);
+        bool okxn = reconWorldAt(px - int2(1, 0), hud, wxn);
+        bool okyp = reconWorldAt(px + int2(0, 1), hud, wyp);
+        bool okyn = reconWorldAt(px - int2(0, 1), hud, wyn);
         float3 dx = planeDelta(wp, okxp, wxp, okxn, wxn);
         float3 dy = planeDelta(wp, okyp, wyp, okyn, wyn);
         float3 n = cross(dx, dy);
@@ -497,6 +519,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
         float hClamped = clamp(hist.r, cur - g_Params2.x, cur + g_Params2.x);
         outShadow = lerp(cur, hClamped, a);
     }
+    if (hud && g_HudParams.x > 0.0)
+        outShadow = min(outShadow, sampleHud(wp, nrm, tanT));
     float sel = g_Params4.z;
     float bOut = (sel > 1.5) ? dynOcc : ((sel > 0.5) ? status : a);
     g_Mask[px] = float4(outShadow, dist, bOut, dynHit);

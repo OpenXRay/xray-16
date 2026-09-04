@@ -39,7 +39,6 @@ struct VsmMarkParams {
     u32 markStep;
     u32 lodBias;
     u32 pad[2];
-    Fvector4 hudScale;
 };
 
 struct VsmResidParams {
@@ -114,7 +113,12 @@ struct VsmResolveParams {
     Fvector4 params2;
     Fvector4 params3;
     Fvector4 params4;
-    Fvector4 hudScale;
+    Fmatrix hudViewProj;
+    Fvector4 hudParams;
+};
+
+struct VsmHudParams {
+    Fmatrix viewProj;
 };
 
 struct VSMResolveData {
@@ -123,6 +127,7 @@ struct VSMResolveData {
     VirtualResourceHandle mask;
     VirtualResourceHandle dynAtlas;
     VirtualResourceHandle dynTable;
+    VirtualResourceHandle hudMap;
     VSMState* state;
     fg::RenderDevice* device;
     u32 width;
@@ -135,7 +140,6 @@ struct VsmDebugParams {
     Fvector4 screen;
     u32 mode;
     u32 pad[3];
-    Fvector4 hudScale;
 };
 
 struct VSMMarkData {
@@ -211,6 +215,15 @@ struct VSMDynBinData {
 struct VSMDynAtlasData {
     VirtualResourceHandle dynAtlas;
     VirtualResourceHandle dynArgs;
+    VSMState* state;
+    fg::RenderDevice* device;
+    VSMDynConfig config;
+    xray::profiler::GPUProfiler* gpuProfiler;
+};
+
+struct VSMHudData {
+    VirtualResourceHandle hudMap;
+    VirtualResourceHandle order;
     VSMState* state;
     fg::RenderDevice* device;
     VSMDynConfig config;
@@ -576,6 +589,21 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
         desc.keepInitialState = true;
         state.dynAtlas = nvDevice->createTexture(desc);
     }
+    {
+        nvrhi::TextureDesc desc;
+        desc.width = kVSMHudMapSize;
+        desc.height = kVSMHudMapSize;
+        desc.format = nvrhi::Format::D16;
+        desc.debugName = "VSM_Hud";
+        desc.isShaderResource = true;
+        desc.isRenderTarget = true;
+        desc.isTypeless = true;
+        desc.useClearValue = true;
+        desc.clearValue = nvrhi::Color(0.0f);
+        desc.initialState = nvrhi::ResourceStates::DepthWrite;
+        desc.keepInitialState = true;
+        state.hudMap = nvDevice->createTexture(desc);
+    }
     for (u32 i = 0; i < VSMState::kReadbackSlots; ++i) {
         if (state.readback[i])
             continue;
@@ -599,7 +627,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
     if (!state.needed || !state.dynClearArgs || !state.pageTable || !state.pageList || !state.physTile
         || !state.slotDirty || !state.dirtyList || !state.drawClear || !state.slotFrame || !state.slotPivot || !state.slotSun || !state.atlas || !state.binStats
         || !state.bucketCount || !state.bucketStart || !state.bucketEnd || !state.bucketCursor || !state.bucketItems || !state.binArgs
-        || !state.dynPageTable || !state.dynPageList || !state.dynAllocInfo || !state.dynAtlas || !state.dynStats) {
+        || !state.dynPageTable || !state.dynPageList || !state.dynAllocInfo || !state.dynAtlas || !state.dynStats || !state.hudMap) {
         Msg("! [VSM] resource creation failed");
         state.needed = nullptr;
         state.atlas = nullptr;
@@ -754,7 +782,6 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
     const u32 markStep = ps_r_vsm_mark_half ? 2u : 1u;
     VsmMarkParams mp = {};
     mp.invViewProj = Device.mInvFullTransform;
-    mp.hudScale.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, psHUD_FOV);
     mp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
     mp.markStep = markStep;
     mp.lodBias = state.lodBias;
@@ -1699,6 +1726,157 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
     }
 }
 
+bool EnsureHudPipeline(fg::RenderDevice* device, VSMState& state)
+{
+    if (state.hudPipeline)
+        return true;
+    if (state.hudPipelineFailed || !state.pageATPS)
+        return false;
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto& cache = GetPassResourceCache();
+    if (!state.hudVS) {
+        auto vsResult = shaderLoader->LoadVertexShader("vsm_hud_depth", "main");
+        if (vsResult.handle && vsResult.reflection)
+            state.hudVS = vsResult.handle;
+    }
+    auto* vsRefl = shaderLoader->GetCachedReflection("vsm_hud_depth", ".vs");
+    auto* atRefl = shaderLoader->GetCachedReflection("vsm_page_at", ".ps");
+    if (!state.hudVS || !vsRefl || !atRefl) {
+        Msg("! [VSM] hud depth shader failed to load");
+        state.hudPipelineFailed = true;
+        return false;
+    }
+    state.hudLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMHud", *vsRefl, *atRefl, nvDevice);
+    if (!state.hudLayout) {
+        state.hudPipelineFailed = true;
+        return false;
+    }
+    auto* backend = device->GetBackend();
+    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.depthFormat = nvrhi::Format::D16;
+    nvrhi::GraphicsPipelineDesc desc;
+    desc.VS = state.hudVS;
+    desc.PS = state.pageATPS;
+    desc.inputLayout = nullptr;
+    if (bindlessLayout)
+        desc.bindingLayouts = { state.hudLayout, bindlessLayout };
+    else
+        desc.bindingLayouts = { state.hudLayout };
+    desc.primType = nvrhi::PrimitiveType::TriangleList;
+    desc.renderState.depthStencilState.depthTestEnable = true;
+    desc.renderState.depthStencilState.depthWriteEnable = true;
+    desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+    desc.renderState.rasterState.frontCounterClockwise = false;
+    desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+    desc.renderState.rasterState.depthBias = -int(roundf(state.rasterBias));
+    desc.renderState.rasterState.slopeScaledDepthBias = -state.rasterSlope;
+    desc.renderState.rasterState.depthBiasClamp = 0.0f;
+    string128 name;
+    xr_sprintf(name, "VSMHud_b%.2f_s%.2f", state.rasterBias, state.rasterSlope);
+    state.hudPipeline = cache.GetOrCreatePipeline(name, desc, fbInfo, nvDevice);
+    if (!state.hudPipeline) {
+        Msg("! [VSM] hud pipeline failed");
+        state.hudPipelineFailed = true;
+        return false;
+    }
+    return true;
+}
+
+void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const VSMHudData& data)
+{
+    VSMState& state = *data.state;
+    state.hudRendered = false;
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+    nvrhi::ITexture* hudMap = fg.GetPhysicalTexture(data.hudMap);
+    if (!cmdList || !nvDevice || !hudMap || !data.config.gpuCulling || !ps_r_vsm_hud)
+        return;
+    GPUCullingManager& gc = *data.config.gpuCulling;
+    const u32 count = gc.GetSkinnedHudEntryCount();
+    nvrhi::IBuffer* hudEntries = gc.GetSkinnedHudEntryBuffer();
+    nvrhi::IBuffer* entries = gc.GetSkinnedEntryBuffer();
+    nvrhi::IBuffer* preVB = gc.GetSkinnedPreVertexBuffer();
+    nvrhi::IBuffer* ib = gc.GetSkinnedPools().GetCombinedIndexBuffer();
+    if (count == 0 || !hudEntries || !entries || !preVB || !ib)
+        return;
+    if (!EnsureHudPipeline(data.device, state))
+        return;
+
+    auto& cache = GetPassResourceCache();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* vsRefl = shaderLoader->GetCachedReflection("vsm_hud_depth", ".vs");
+    auto* atRefl = shaderLoader->GetCachedReflection("vsm_page_at", ".ps");
+    if (!vsRefl || !atRefl)
+        return;
+
+    const Fmatrix warp = HudFovWarp();
+    const Fvector4& b = gc.GetSkinnedHudBounds();
+    const float stretch = std::max(1.0f / psHUD_FOV, 1.0f);
+    const float r = std::max(b.w, 0.05f) * stretch + kVSMHudMargin;
+    Fvector center;
+    center.set(b.x, b.y, b.z);
+    warp.transform_tiny(center);
+    Fvector eye;
+    eye.mad(center, state.sunDir, -(r + kVSMHudMargin));
+    const float depthRange = 2.0f * (r + kVSMHudMargin);
+    Fmatrix view = VSMSunView(state.sunDir, eye);
+    Fmatrix proj;
+    proj.build_projection_ortho(2.0f * r, 2.0f * r, 0.0f, depthRange);
+    state.hudViewProj.mul(proj, view);
+    state.hudTexelWorld = 2.0f * r / float(kVSMHudMapSize);
+    state.hudDepthRange = depthRange;
+    Fmatrix viewWarp;
+    viewWarp.mul(view, warp);
+
+    VsmHudParams hp = {};
+    hp.viewProj.mul(proj, viewWarp);
+    auto hudCB = cache.GetOrCreateVolatileCB("VSM", "HudParams", sizeof(VsmHudParams), data.device);
+    cmdList->writeBuffer(hudCB, &hp, sizeof(hp));
+
+    auto& matBuffer = bindless::MaterialBuffer::Instance();
+    cmdList->setBufferState(hudEntries, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(preVB, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(ib, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(matBuffer.GetBuffer(), nvrhi::ResourceStates::ShaderResource);
+    cmdList->setTextureState(hudMap, nvrhi::AllSubresources, nvrhi::ResourceStates::DepthWrite);
+    cmdList->commitBarriers();
+    cmdList->clearDepthStencilTexture(hudMap, nvrhi::AllSubresources, true, 0.0f, false, 0);
+
+    nvrhi::FramebufferDesc fbDesc;
+    fbDesc.setDepthAttachment(hudMap);
+    auto framebuffer = cache.GetOrCreateFramebuffer("VSMHud", fbDesc, nvDevice);
+    if (!framebuffer)
+        return;
+
+    BindingSetBuilder bsb(*vsRefl, *atRefl, nvDevice, "VSM.Hud");
+    bsb.ConstantBuffer("VsmHudParams", hudCB)
+       .BufferSRV("g_HudEntries", hudEntries)
+       .BufferSRV("g_Entries", entries)
+       .BufferSRV("g_SkinnedVB", preVB)
+       .BufferSRV("g_SkinnedIB", ib)
+       .BufferSRV("g_Materials", matBuffer.GetBuffer());
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.hudLayout, nvDevice);
+    if (!bindingSet)
+        return;
+
+    auto* backend = data.device->GetBackend();
+    nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
+    nvrhi::GraphicsState gs;
+    gs.pipeline = state.hudPipeline;
+    gs.framebuffer = framebuffer;
+    gs.bindings = { bindingSet };
+    if (bindlessTable)
+        gs.addBindingSet(bindlessTable);
+    gs.viewport.addViewport(nvrhi::Viewport(0.0f, float(kVSMHudMapSize), 0.0f, float(kVSMHudMapSize), 0.0f, 1.0f));
+    gs.viewport.addScissorRect(nvrhi::Rect(kVSMHudMapSize, kVSMHudMapSize));
+    cmdList->setGraphicsState(gs);
+    cmdList->draw(nvrhi::DrawArguments().setVertexCount(GPUCullingManager::SKINNED_ENTRY_INDICES).setInstanceCount(count));
+    state.hudRendered = true;
+}
+
 void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResolveData& data)
 {
     VSMState& state = *data.state;
@@ -1725,11 +1903,17 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
 
     auto vsmCB = VsmParamsCB(data.device);
 
+    nvrhi::ITexture* hudTex = data.hudMap.is_valid() ? fg.GetPhysicalTexture(data.hudMap) : nullptr;
+    const bool hudOn = hudTex && state.hudRendered && ps_r_vsm_hud;
+    if (!hudTex)
+        hudTex = cache.GetDummyShadowMap2D(nvDevice);
+
     const u32 prev = (state.maskSlot + 1) % 2;
     const bool histOK = ps_r_vsm_temporal && state.resolveCount >= 1;
     VsmResolveParams rp = {};
     rp.invViewProj = Device.mInvFullTransform;
-    rp.hudScale.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, psHUD_FOV);
+    rp.hudViewProj = state.hudViewProj;
+    rp.hudParams.set(hudOn ? 1.0f / float(kVSMHudMapSize) : 0.0f, ps_r_vsm_hud_bias, state.hudTexelWorld, 1.0f / std::max(state.hudDepthRange, 1e-3f));
     rp.prevViewProj = state.prevViewProj;
     const bool dynOn = state.dynActive && state.dynRendered;
     rp.prevCamPos.set(state.prevCamPos.x, state.prevCamPos.y, state.prevCamPos.z, dynOn ? float(std::max(ps_r_vsm_debug_dyn, 0)) : 0.0f);
@@ -1756,6 +1940,7 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
        .BufferSRV("g_DynPageTable", state.dynPageTable)
        .BufferSRV("g_SlotPivot", state.slotPivot)
        .BufferSRV("g_SlotSun", state.slotSun)
+       .Texture("g_HudMap", hudTex)
        .TextureUAV("g_Mask", mask);
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.resolveLayout, nvDevice);
     if (!bindingSet)
@@ -1797,7 +1982,6 @@ void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDeb
 
     VsmDebugParams dp = {};
     dp.invViewProj = Device.mInvFullTransform;
-    dp.hudScale.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, psHUD_FOV);
     dp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
     dp.mode = u32(ps_r_vsm_debug);
     dp.pad[0] = (state.dynActive && state.dynRendered) ? u32(std::max(ps_r_vsm_debug_dyn, 0)) : 0u;
@@ -2020,6 +2204,7 @@ VSMOutput setupVSMPasses(
         state->dynPagePipeline = nullptr;
         state->dynPageATPipeline = nullptr;
         state->dynSkinPagePipeline = nullptr;
+        state->hudPipeline = nullptr;
         if (live)
             InvalidateVSMCache(*state);
     }
@@ -2180,8 +2365,10 @@ VSMOutput setupVSMPasses(
     state->fgDynAtlas = VirtualResourceHandle{};
     state->fgDynTable = VirtualResourceHandle{};
     state->fgDynArgs = VirtualResourceHandle{};
+    state->fgHudMap = VirtualResourceHandle{};
     state->dynActive = false;
     state->dynRendered = false;
+    state->hudRendered = false;
     return out;
 }
 
@@ -2278,6 +2465,35 @@ void setupVSMDynamicPasses(
     state->fgDynTable = allocData.dynTable;
     state->fgDynArgs = binData.dynArgs;
     state->dynActive = true;
+
+    ResourceDesc hudDesc;
+    hudDesc.type = ResourceDesc::Type::Texture2D;
+    hudDesc.width = kVSMHudMapSize;
+    hudDesc.height = kVSMHudMapSize;
+    hudDesc.format = nvrhi::Format::D16;
+    hudDesc.isDepthStencil = true;
+    hudDesc.isImported = true;
+    hudDesc.isTransient = false;
+    hudDesc.debugName = "rt_VSMHud";
+    VirtualResourceHandle hudHandle = fg.ImportTexture("rt_VSMHud", state->hudMap, hudDesc);
+
+    auto& hudData = fg.addCallbackPass<VSMHudData>(
+        "VSM HUD Map",
+        [&, hudHandle, skinnedDrawArgs, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMHudData& data) {
+            data.state = state;
+            data.device = device;
+            data.config = config;
+            data.gpuProfiler = gpuProfiler;
+            RenderPassBuilder passBuilder(builder, passHandle);
+            data.hudMap = passBuilder.write(hudHandle, ResourceState::DepthStencilWrite);
+            if (skinnedDrawArgs.is_valid())
+                data.order = passBuilder.read(skinnedDrawArgs, ResourceState::ShaderResource);
+        },
+        [](const VSMHudData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            ExecuteHud(ctx, fg, data);
+        });
+    fg.GetRTRegistry().RegisterRT("rt_VSMHud", hudData.hudMap);
+    state->fgHudMap = hudData.hudMap;
 }
 
 framegraph::VirtualResourceHandle setupVSMResolvePasses(
@@ -2323,6 +2539,8 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
                 data.dynAtlas = passBuilder.read(state->fgDynAtlas, ResourceState::ShaderResource);
                 data.dynTable = passBuilder.read(state->fgDynTable, ResourceState::ShaderResource);
             }
+            if (state->fgHudMap.is_valid())
+                data.hudMap = passBuilder.read(state->fgHudMap, ResourceState::ShaderResource);
             data.mask = passBuilder.write(maskHandle, ResourceState::UnorderedAccess);
         },
         [](const VSMResolveData& data, const FrameGraph& fg, fg::RenderContext* ctx) {

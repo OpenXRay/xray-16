@@ -356,8 +356,12 @@ public:
     nvrhi::IBuffer* GetSkinnedEntryBuffer() const { return m_skinnedEntryBuffer.Get(); }
     u32 GetSkinnedEntryCount() const { return m_skinnedEntryCount; }
     u32 GetSkinnedVisibleEntryCount() const { return m_skinnedVisibleEntryCount; }
+    nvrhi::IBuffer* GetSkinnedHudEntryBuffer() const { return m_skinnedHudEntryBuffer.Get(); }
+    u32 GetSkinnedHudEntryCount() const { return m_skinnedHudEntryCount; }
+    const Fvector4& GetSkinnedHudBounds() const { return m_skinnedHudBounds; }
     static constexpr u32 SKINNED_ENTRY_INDICES = 384;
     static constexpr u32 SKINNED_ENTRY_CAPACITY = 32768;
+    static constexpr u32 SKINNED_HUD_ENTRY_CAPACITY = 4096;
 
     // ───────────────────────────────────────────────────────
     //  SKELETON BONE BUFFER (for GPU-driven skinned rendering)
@@ -559,6 +563,10 @@ private:
     u32 m_skinnedEntryCapacity = 0;
     u32 m_skinnedEntryCount = 0;
     u32 m_skinnedVisibleEntryCount = 0;
+    xr_vector<u32> m_skinnedHudEntryData;
+    nvrhi::BufferHandle m_skinnedHudEntryBuffer;
+    u32 m_skinnedHudEntryCount = 0;
+    Fvector4 m_skinnedHudBounds = {};
     u32 m_skinnedChunkBase[SkinnedGeometryPools::FORMAT_COUNT] = {};
     u32 m_skinnedChunkCount[SkinnedGeometryPools::FORMAT_COUNT] = {};
     nvrhi::BufferHandle m_skinnedChunkBuffer;

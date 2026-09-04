@@ -4,6 +4,7 @@ RWByteAddressBuffer g_Output : register(u0);
 
 cbuffer RTSkinningCB : register(b5) {
     column_major float4x4 g_WorldMatrix;
+    column_major float4x4 g_NormalMatrix;
     uint g_VertexCount;
     uint g_VertexStride;
     uint g_FormatID;
@@ -81,7 +82,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         uv = unpack_snorm16_xy(uvPacked);
 
         float4 worldPos = mul(g_WorldMatrix, skinnedPos);
-        float3 worldN = normalize(mul((float3x3)g_WorldMatrix, skinnedN));
+        float3 worldN = normalize(mul((float3x3)g_NormalMatrix, skinnedN));
 
         uint outAddr = (g_OutputOffset + vid) * 24;
         g_Output.Store3(outAddr, asuint(worldPos.xyz));
@@ -103,7 +104,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         uv = asfloat(g_SrcVB.Load2(srcAddr + 28));
 
         float4 worldPos = mul(g_WorldMatrix, skinnedPos);
-        float3 worldN = normalize(mul((float3x3)g_WorldMatrix, skinnedN));
+        float3 worldN = normalize(mul((float3x3)g_NormalMatrix, skinnedN));
 
         uint outAddr = (g_OutputOffset + vid) * 24;
         g_Output.Store3(outAddr, asuint(worldPos.xyz));
@@ -131,7 +132,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         float3 skinnedN = mul((float3x3)bone0, localNormal) * w0 + mul((float3x3)bone1, localNormal) * (1.0 - w0);
 
         float4 worldPos = mul(g_WorldMatrix, skinnedPos);
-        float3 worldN = normalize(mul((float3x3)g_WorldMatrix, skinnedN));
+        float3 worldN = normalize(mul((float3x3)g_NormalMatrix, skinnedN));
 
         uint outAddr = (g_OutputOffset + vid) * 24;
         g_Output.Store3(outAddr, asuint(worldPos.xyz));
@@ -165,7 +166,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         float3 skinnedN = mul((float3x3)bone0, localNormal) * w0 + mul((float3x3)bone1, localNormal) * w1 + mul((float3x3)bone2, localNormal) * w2;
 
         float4 worldPos = mul(g_WorldMatrix, skinnedPos);
-        float3 worldN = normalize(mul((float3x3)g_WorldMatrix, skinnedN));
+        float3 worldN = normalize(mul((float3x3)g_NormalMatrix, skinnedN));
 
         uint outAddr = (g_OutputOffset + vid) * 24;
         g_Output.Store3(outAddr, asuint(worldPos.xyz));
@@ -202,7 +203,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         float3 skinnedN = mul((float3x3)bone0, localNormal) * w0 + mul((float3x3)bone1, localNormal) * w1 + mul((float3x3)bone2, localNormal) * w2 + mul((float3x3)bone3, localNormal) * w3;
 
         float4 worldPos = mul(g_WorldMatrix, skinnedPos);
-        float3 worldN = normalize(mul((float3x3)g_WorldMatrix, skinnedN));
+        float3 worldN = normalize(mul((float3x3)g_NormalMatrix, skinnedN));
 
         uint outAddr = (g_OutputOffset + vid) * 24;
         g_Output.Store3(outAddr, asuint(worldPos.xyz));

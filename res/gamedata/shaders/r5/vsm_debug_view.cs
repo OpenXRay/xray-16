@@ -9,7 +9,6 @@ cbuffer VsmDebugParams : register(b5)
     float4 g_Screen;
     uint g_Mode;
     uint3 g_DebugPad;
-    float4 g_HudScale;
 };
 
 Texture2D<float> g_Depth : register(t0);
@@ -56,7 +55,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     {
         float2 uv = (float2(px) + 0.5) * g_Screen.zw;
         float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - 2.0 * uv.y, zndc, 1.0);
-        float3 wp = vsmReconstructPos(g_InvViewProj, clip, g_HudScale);
+        float3 wp = vsmReconstructPos(g_InvViewProj, clip);
         float3 lp = mul(vsm_view, float4(wp, 1.0)).xyz;
 
         float2 luv;

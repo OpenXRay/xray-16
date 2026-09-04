@@ -275,6 +275,8 @@ extern ECORE_API int   ps_r_vsm_dirty_budget;
 extern ECORE_API float ps_r_vsm_ta_blend_dyn;
 extern ECORE_API int   ps_r_vsm_debug_dyn;
 extern ECORE_API int   ps_r_vsm_load_freeze;
+extern ECORE_API int   ps_r_vsm_hud;
+extern ECORE_API float ps_r_vsm_hud_bias;
 
 extern ECORE_API int   ps_r_smoke_trail_enabled;
 extern ECORE_API float ps_r_smoke_max_emit_rate;
