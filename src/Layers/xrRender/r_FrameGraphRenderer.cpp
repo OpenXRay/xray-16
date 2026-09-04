@@ -711,6 +711,14 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.vsmBinDrops = vsm.binDrops;
             for (u32 L = 0; L < passes::kVSMLevels; ++L)
                 stats.vsmLevelPages[L] = vsm.levelPages[L];
+
+            const auto& localShadow = m_blackboard->get_or_add<passes::LocalShadowState>();
+            stats.localShadowSpots = localShadow.pooledSpots;
+            stats.localShadowPoints = localShadow.pooledPoints;
+            stats.localShadowStatic = localShadow.refreshStaticCount;
+            stats.localShadowDyn = localShadow.refreshDynCount;
+            stats.localShadowPairs = localShadow.statPairs + localShadow.statDynPairs + localShadow.statSkinnedPairs;
+            stats.localShadowDrops = localShadow.statDrops;
         }
 
         // Collect detail/grass stats

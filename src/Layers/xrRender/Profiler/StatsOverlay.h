@@ -67,6 +67,12 @@ struct RenderStats
     u32 vsmBinLodCulled = 0;
     u32 vsmBinDrops = 0;
     u32 vsmLevelPages[6] = {0, 0, 0, 0, 0, 0};
+    u32 localShadowSpots = 0;
+    u32 localShadowPoints = 0;
+    u32 localShadowStatic = 0;
+    u32 localShadowDyn = 0;
+    u32 localShadowPairs = 0;
+    u32 localShadowDrops = 0;
 
     u32 lightsClustered = 0;
     u32 lightsHiZVisible = 0;
@@ -111,6 +117,8 @@ struct RenderStats
         vsmPages = vsmDirtyPages = vsmWrongPages = 0;
         vsmBinDraws = vsmBinInstances = vsmBinMaxVisited = vsmBinLodCulled = vsmBinDrops = 0;
         for (u32 i = 0; i < 6; ++i) vsmLevelPages[i] = 0;
+        localShadowSpots = localShadowPoints = localShadowStatic = localShadowDyn = 0;
+        localShadowPairs = localShadowDrops = 0;
         lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
         lightTiles[0] = lightTiles[1] = lightTiles[2] = lightTiles[3] = lightTilesTotal = 0;
         detailInstances = detailSlots = 0;
