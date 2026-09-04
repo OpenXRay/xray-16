@@ -57,6 +57,7 @@ struct LocalTile {
     float cone = 0.0f;
     u32 lastSeen = 0;
     bool staticValid = false;
+    bool dirty = true;
     bool inView = false;
 };
 
@@ -72,6 +73,16 @@ struct LocalShadowState {
     u32 pooledSpots = 0;
     u32 pooledPoints = 0;
     u32 frame = 0;
+    u32 statPairs = 0;
+    u32 statDynPairs = 0;
+    u32 statSkinnedPairs = 0;
+    u32 statDrops = 0;
+    u32 lastLogTime = 0;
+
+    static constexpr u32 kReadbackSlots = 4;
+    nvrhi::BufferHandle readback[kReadbackSlots];
+    u32 readbackWrite = 0;
+    u32 readbackScheduled = 0;
 
     nvrhi::BufferHandle tiles;
     nvrhi::BufferHandle refreshStaticBuffer;
@@ -123,6 +134,8 @@ struct LocalShadowOutput {
 };
 
 void ResetLocalShadowPool(LocalShadowState& state);
+
+void ProcessLocalShadowStats(LocalShadowState& state, nvrhi::IDevice* device);
 
 void SelectLocalShadowLights(
     LocalShadowState& state,

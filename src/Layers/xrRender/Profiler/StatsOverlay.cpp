@@ -528,6 +528,16 @@ void StatsOverlay::RenderGeometrySection()
             ImGui::Unindent();
         }
 
+        if (s.localShadowSpots > 0 || s.localShadowPoints > 0)
+        {
+            ImGui::Text("Local shadows:");
+            ImGui::Indent();
+            ImGui::Text("Pool: %u spots / %u points, %u static refresh / %u dyn refresh",
+                s.localShadowSpots, s.localShadowPoints, s.localShadowStatic, s.localShadowDyn);
+            ImGui::Text("Bin: %u pairs, %u drops", s.localShadowPairs, s.localShadowDrops);
+            ImGui::Unindent();
+        }
+
         // ═══════════════════════════════════════════════════
         //  PARTICLE CULLING STATS
         // ═══════════════════════════════════════════════════
