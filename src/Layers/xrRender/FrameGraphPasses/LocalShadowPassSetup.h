@@ -32,10 +32,13 @@ constexpr u32 kLocalPointSlots = kLocalPointLights * 6;
 constexpr u32 kLocalTileCount = kLocalSpotSlots + kLocalPointSlots;
 constexpr u32 kLocalPullVertices = 384;
 constexpr u32 kLocalStatWords = 32;
-constexpr u32 kLocalStaticStreamCount = 3;
+constexpr u32 kLocalStreamCount = 6;
 constexpr u32 kLocalPairCapOpaque = 1u << 18;
 constexpr u32 kLocalPairCapTerrain = 1u << 17;
 constexpr u32 kLocalPairCapAT = 1u << 17;
+constexpr u32 kLocalPairCapDynOpaque = 1u << 16;
+constexpr u32 kLocalPairCapDynAT = 1u << 15;
+constexpr u32 kLocalPairCapSkinned = 1u << 16;
 
 struct LocalShadowTileGPU {
     Fmatrix viewProj;
@@ -72,9 +75,10 @@ struct LocalShadowState {
 
     nvrhi::BufferHandle tiles;
     nvrhi::BufferHandle refreshStaticBuffer;
+    nvrhi::BufferHandle refreshDynBuffer;
     nvrhi::BufferHandle stats;
-    nvrhi::BufferHandle pairs[kLocalStaticStreamCount];
-    nvrhi::BufferHandle args[kLocalStaticStreamCount];
+    nvrhi::BufferHandle pairs[kLocalStreamCount];
+    nvrhi::BufferHandle args;
     nvrhi::BufferHandle clearArgs;
     nvrhi::TextureHandle staticAtlas;
     nvrhi::TextureHandle dynAtlas;
@@ -91,7 +95,10 @@ struct LocalShadowState {
     nvrhi::BindingLayoutHandle pageLayout;
     nvrhi::GraphicsPipelineHandle pageATPipeline;
     nvrhi::BindingLayoutHandle pageATLayout;
+    nvrhi::GraphicsPipelineHandle skinPagePipeline;
+    nvrhi::BindingLayoutHandle skinPageLayout;
     nvrhi::ShaderHandle pageVS;
+    nvrhi::ShaderHandle skinPageVS;
     bool pipelinesFailed = false;
     bool resourcesFailed = false;
 };
