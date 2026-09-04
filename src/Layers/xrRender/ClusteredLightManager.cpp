@@ -142,8 +142,8 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L)
 
     if (isSpot)
     {
-        const float cosOuter = _cos(L->cone);
-        const float cosInner = _cos(L->cone * 0.8f);
+        const float cosOuter = _cos(L->cone * 0.5f);
+        const float cosInner = _cos(L->cone * 0.4f);
         const float scale = 1.0f / std::max(cosInner - cosOuter, 0.001f);
         const float offset = -cosOuter * scale;
 
