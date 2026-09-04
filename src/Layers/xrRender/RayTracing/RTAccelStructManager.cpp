@@ -45,6 +45,7 @@ bool RTAccelStructManager::s_billboardInitialized = false;
 
 struct RTSkinningCB {
     Fmatrix worldMatrix;
+    Fmatrix normalMatrix;
     u32 vertexCount;
     u32 vertexStride;
     u32 formatID;
@@ -53,7 +54,7 @@ struct RTSkinningCB {
     u32 inputBaseVertex;
     u32 pad[2];
 };
-static_assert(sizeof(RTSkinningCB) == 96, "RTSkinningCB must be 96 bytes");
+static_assert(sizeof(RTSkinningCB) == 160, "RTSkinningCB must be 160 bytes");
 
 struct GrassRTCB {
     Fvector4 detail_params;
@@ -694,6 +695,9 @@ void RTAccelStructManager::BuildSkinnedBLAS(
 
         RTSkinningCB cb;
         cb.worldMatrix = sb.worldMatrix;
+        Fmatrix worldInv;
+        worldInv.invert(sb.worldMatrix);
+        cb.normalMatrix.transpose(worldInv);
         cb.vertexCount = sb.vertexCount;
         cb.vertexStride = sb.srcStride;
         cb.formatID = sb.formatID;
