@@ -2,6 +2,7 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "LocalShadowPassSetup.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -40,6 +41,10 @@ struct TransparentPassState {
 };
 
 struct TransparentPassData {
+    framegraph::VirtualResourceHandle localTiles;
+    framegraph::VirtualResourceHandle localStatic;
+    framegraph::VirtualResourceHandle localDyn;
+    LocalShadowOutput localShadow;
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
@@ -57,6 +62,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     const TransparentPassConfig& config,
+    const LocalShadowOutput& localShadow,
     u32 width, u32 height,
     TransparentPassState& state
 );

@@ -9,6 +9,24 @@ struct GPULightData {
     float4x4 spotVP;
 };
 
+#include "shared/local_shadow.h"
+
+uint LocalShadowSlot(GPULightData light, float3 worldPos)
+{
+    uint slot1 = (uint)(light.spotParamsAndType.w + 0.5f);
+    if (slot1 == 0u)
+        return 0xFFFFFFFFu;
+    uint slot = slot1 - 1u;
+    if (light.spotParamsAndType.y < 0.5f)
+    {
+        float3 d = worldPos - light.positionAndInvRangeSq.xyz;
+        float3 a = abs(d);
+        slot += (a.x >= a.y && a.x >= a.z) ? (d.x >= 0.0 ? 0u : 1u)
+              : (a.y >= a.z) ? (d.y >= 0.0 ? 2u : 3u) : (d.z >= 0.0 ? 4u : 5u);
+    }
+    return slot;
+}
+
 // Point light distance attenuation (smooth window function)
 float PointLightAttenuation(float distSq, float invRangeSq)
 {
@@ -123,6 +141,10 @@ float3 EvaluateClusteredLights(
             }
         }
 
+        uint shadowSlot = LocalShadowSlot(light, worldPos);
+        if (shadowSlot != 0xFFFFFFFFu)
+            atten *= LocalShadowVisibility(shadowSlot, worldPos, N);
+
         if (atten > 0.001f)
         {
             float3 litColor = PBRDirectLighting(
@@ -133,6 +155,27 @@ float3 EvaluateClusteredLights(
         }
     }
     return totalLight;
+}
+
+float4 LocalShadowDebug(float3 worldPos, float3 N, float2 screenPos, float linearDepth)
+{
+    uint numLights = (uint)cluster_params.w;
+    if (numLights == 0)
+        return 0;
+    uint clusterIdx = GetClusterIndex(screenPos, linearDepth, cluster_params.xyz, cluster_scales);
+    uint2 clusterData = g_ClusterGrid[clusterIdx];
+    for (uint i = 0; i < clusterData.y; i++)
+    {
+        GPULightData light = g_LightData[g_LightIndexList[clusterData.x + i]];
+        uint slot = LocalShadowSlot(light, worldPos);
+        if (slot == 0xFFFFFFFFu)
+            continue;
+        if (distance(light.positionAndInvRangeSq.xyz, worldPos) > light.colorAndRange.w)
+            continue;
+        float v = LocalShadowVisibility(slot, worldPos, N);
+        return float4(lerp(float3(1.0, 0.0, 0.0), float3(0.0, 1.0, 0.0), v), 1.0);
+    }
+    return 0;
 }
 #endif // CLUSTERED_LIGHTING_FORWARD
 

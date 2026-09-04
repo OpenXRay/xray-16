@@ -12,6 +12,7 @@
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/ClusteredLightManager.h"
 #include "VSMPassSetup.h"
+#include "LocalShadowPassSetup.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 
 namespace xray::render::fg::passes {
@@ -26,9 +27,9 @@ struct alignas(16) TileParams {
     u32 maxTiles;
     u32 listBase;
     u32 forceMixed;
+    u32 localShadowDebug;
     u32 pad0;
     u32 pad1;
-    u32 pad2;
 };
 static_assert(sizeof(TileParams) == 32, "TileParams must be 32 bytes");
 
@@ -55,6 +56,10 @@ struct DeferredLightPassData {
     VirtualResourceHandle baseColor;
     VirtualResourceHandle color;
     VirtualResourceHandle sunMask;
+    VirtualResourceHandle localTiles;
+    VirtualResourceHandle localStatic;
+    VirtualResourceHandle localDyn;
+    LocalShadowOutput localShadow;
     fg::RenderDevice* device = nullptr;
     DeferredLightPassState* state = nullptr;
     xray::profiler::GPUProfiler* gpuProfiler = nullptr;
@@ -207,6 +212,7 @@ DefaultOutputLayout setupDeferredLightPass(
     u32 width,
     u32 height,
     VirtualResourceHandle sunMask,
+    const LocalShadowOutput& localShadow,
     xray::profiler::GPUProfiler* gpuProfiler,
     DeferredLightPassState* state)
 {
@@ -219,7 +225,7 @@ DefaultOutputLayout setupDeferredLightPass(
 
     auto& passData = fg.addCallbackPass<DeferredLightPassData>(
         "Deferred Light",
-        [&, width, height, sunMask, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, DeferredLightPassData& data) {
+        [&, width, height, sunMask, localShadow, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, DeferredLightPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.state = state;
@@ -232,6 +238,12 @@ DefaultOutputLayout setupDeferredLightPass(
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::UnorderedAccess);
             if (sunMask.is_valid())
                 data.sunMask = passBuilder.read(sunMask, ResourceState::ShaderResource);
+            data.localShadow = localShadow;
+            if (localShadow.active) {
+                data.localTiles = passBuilder.read(localShadow.tiles, ResourceState::ShaderResource);
+                data.localStatic = passBuilder.read(localShadow.staticAtlas, ResourceState::ShaderResource);
+                data.localDyn = passBuilder.read(localShadow.dynAtlas, ResourceState::ShaderResource);
+            }
         },
         [](const DeferredLightPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ZoneScoped;
@@ -255,6 +267,10 @@ DefaultOutputLayout setupDeferredLightPass(
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             nvrhi::ITexture* sunMask = ResolveSunMask(fg, data.sunMask, nvDevice);
+            nvrhi::IBuffer* localTiles = nullptr;
+            nvrhi::ITexture* localStatic = nullptr;
+            nvrhi::ITexture* localDyn = nullptr;
+            ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn);
             nvrhi::IBindingSet* bindlessTable = nullptr;
             if (auto* backend = data.device->GetBackend())
                 bindlessTable = backend->GetBindlessDescriptorTable();
@@ -269,6 +285,7 @@ DefaultOutputLayout setupDeferredLightPass(
             tp.maxTiles = state.maxTiles;
             tp.listBase = 0;
             tp.forceMixed = ps_r_sun_shadow_debug != 0 ? 1u : 0u;
+            tp.localShadowDebug = ps_r_local_shadow_debug != 0 ? 1u : 0u;
             cmdList->writeBuffer(tileCB, &tp, sizeof(tp));
 
             auto& clm = ClusteredLightManager::Instance();
@@ -317,6 +334,9 @@ DefaultOutputLayout setupDeferredLightPass(
                     bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
                     bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
                     bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
+                    bsb.BufferSRV("g_LocalShadowTiles", localTiles);
+                    bsb.Texture("g_LocalShadowStatic", localStatic);
+                    bsb.Texture("g_LocalShadowDyn", localDyn);
                 }
                 if (cls & kTileClassSunMixed)
                     bsb.Texture("g_SunShadowMask", sunMask);

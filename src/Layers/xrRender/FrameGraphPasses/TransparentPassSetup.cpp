@@ -93,6 +93,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& inputs,
     const TransparentPassConfig& config,
+    const LocalShadowOutput& localShadow,
     u32 width, u32 height,
     TransparentPassState& state)
 {
@@ -112,7 +113,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     auto& passData = fg.addCallbackPass<TransparentPassData>(
         "Transparent Pass",
 
-        [&, width, height, config](FrameGraph& builder, PassHandle passHandle, TransparentPassData& data) {
+        [&, width, height, config, localShadow](FrameGraph& builder, PassHandle passHandle, TransparentPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -125,6 +126,12 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
             if (inputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
+            data.localShadow = localShadow;
+            if (localShadow.active) {
+                data.localTiles = passBuilder.read(localShadow.tiles, ResourceState::ShaderResource);
+                data.localStatic = passBuilder.read(localShadow.staticAtlas, ResourceState::ShaderResource);
+                data.localDyn = passBuilder.read(localShadow.dynAtlas, ResourceState::ShaderResource);
+            }
         },
 
         [](const TransparentPassData& data,
@@ -182,6 +189,13 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
             bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
             bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+            nvrhi::IBuffer* localTiles = nullptr;
+            nvrhi::ITexture* localStatic = nullptr;
+            nvrhi::ITexture* localDyn = nullptr;
+            ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn);
+            bsb.BufferSRV("g_LocalShadowTiles", localTiles);
+            bsb.Texture("g_LocalShadowStatic", localStatic);
+            bsb.Texture("g_LocalShadowDyn", localDyn);
 
             auto transparentBindDesc = bsb.Build();
             auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(transparentBindDesc, data.passState->layout, nvDevice);
