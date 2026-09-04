@@ -150,7 +150,6 @@ void FrameGraphRenderer::CreateQuadIB()
 }
 namespace xray::render { void InitializeImGuiRenderer(fg::RenderDevice* renderDevice); void ShutdownImGuiRenderer(); }
 
-extern ENGINE_API float psHUD_FOV;
 extern ENGINE_API int ps_r_rt_gi;
 extern ENGINE_API float ps_r_rt_gi_intensity;
 extern ENGINE_API int ps_r_path_tracer;
@@ -163,23 +162,6 @@ using namespace fg;
 // Forward declaration and extern for accessing RImplementation
 namespace fg {
     extern xray::render::FrameGraphRenderer RImplementation;
-}
-
-static Fmatrix BuildHUDFOVMatrix()
-{
-    const float fovScale = 1.0f / psHUD_FOV;
-    Fmatrix invView;
-    invView.invert(Device.mView);
-
-    Fmatrix fovScaleMat;
-    fovScaleMat.identity();
-    fovScaleMat._11 = fovScale;
-    fovScaleMat._22 = fovScale;
-
-    Fmatrix t1, result;
-    t1.mul(fovScaleMat, Device.mView);
-    result.mul(invView, t1);
-    return result;
 }
 
 FrameGraphRenderer::FrameGraphRenderer() {
@@ -1586,7 +1568,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                             worldSkinned.push_back(b);
                     }
 
-                    const Fmatrix hudFov = BuildHUDFOVMatrix();
+                    const Fmatrix hudFov = passes::HudFovWarp();
 
                     xr_vector<GeometryBatch> hudSkinned;
                     for (const auto& b : *data.hudBatches) {
@@ -2633,7 +2615,7 @@ void FrameGraphRenderer::UpdateSmokeTrail(
 
     if (isHUDMode)
     {
-        const Fmatrix hudMat = BuildHUDFOVMatrix();
+        const Fmatrix hudMat = passes::HudFovWarp();
         hudMat.transform_tiny(correctedPos);
         hudMat.transform_dir(correctedDir);
         correctedDir.normalize_safe();

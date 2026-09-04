@@ -57,6 +57,8 @@ constexpr u32 kVSMBucketItemTotal = 3u * (1u << 18) + 2u * (1u << 19) + (1u << 2
 constexpr u32 kVSMPrimeFrames = 8;
 constexpr u32 kVSMPrimeTraceFrames = 400;
 constexpr u32 kVSMPrimeTraceQuiet = 10;
+constexpr u32 kVSMHudMapSize = 2048;
+constexpr float kVSMHudMargin = 0.05f;
 
 struct VsmParams {
     Fmatrix view;
@@ -121,6 +123,16 @@ struct VSMState {
     nvrhi::BufferHandle dynArgs[kVSMDynStreamCount];
     bool dynActive = false;
     bool dynRendered = false;
+    nvrhi::TextureHandle hudMap;
+    nvrhi::GraphicsPipelineHandle hudPipeline;
+    nvrhi::BindingLayoutHandle hudLayout;
+    nvrhi::ShaderHandle hudVS;
+    bool hudPipelineFailed = false;
+    bool hudRendered = false;
+    Fmatrix hudViewProj;
+    float hudTexelWorld = 0.0f;
+    float hudDepthRange = 1.0f;
+    framegraph::VirtualResourceHandle fgHudMap;
     u32 dynCasters = 0;
     u32 dynInstances = 0;
     u32 dynMaxPages = 0;

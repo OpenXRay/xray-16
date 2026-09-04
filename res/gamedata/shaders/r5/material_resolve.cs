@@ -164,6 +164,14 @@ void main(uint3 dtid : SV_DispatchThreadID)
         s = EvalStandardMaterial(mat, diffuse.rgb, uv, uvDdx, uvDdy, n, t, b);
     }
 
+    if (hud)
+    {
+        float3x3 view3 = float3x3(m_V[0].xyz, m_V[1].xyz, m_V[2].xyz);
+        float3 nv = mul(view3, s.N);
+        nv.xy *= hud_fov;
+        s.N = normalize(mul(nv, view3));
+    }
+
     float roughnessOut = s.roughness;
     if (skinned)
     {

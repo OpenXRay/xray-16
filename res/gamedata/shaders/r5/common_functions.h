@@ -231,14 +231,10 @@ float3 reconstruct_world_pos(float2 svPosXY, float depth)
 	float2 uv = svPosXY * screen_res.zw;
 	float4 clip = float4(uv * 2.0 - 1.0, depth, 1.0);
 	clip.y = -clip.y;
-	bool hud = depth >= 0.9;
-	if (hud)
+	if (depth >= 0.9)
 		clip.z = (depth - 0.9) * 10.0;
 	float4 world = mul(m_InvVP, clip);
-	float3 pos = world.xyz / world.w;
-	if (hud)
-		pos = eye_position + hud_fov * (pos - eye_position);
-	return pos;
+	return world.xyz / world.w;
 }
 
 f_forward output_forward_color(float3 albedo, float3 normal, float3 worldPos, float metallic, float roughness)

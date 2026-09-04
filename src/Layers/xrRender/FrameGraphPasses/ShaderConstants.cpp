@@ -31,6 +31,21 @@ void ResetSunDirVisual()
     s_sunDirVisualInit = false;
 }
 
+Fmatrix HudFovWarp()
+{
+    Fmatrix invView;
+    invView.invert(Device.mView);
+    Fmatrix scale;
+    scale.identity();
+    scale._11 = 1.0f / psHUD_FOV;
+    scale._22 = 1.0f / psHUD_FOV;
+    Fmatrix scaledView;
+    scaledView.mul(scale, Device.mView);
+    Fmatrix warp;
+    warp.mul(invView, scaledView);
+    return warp;
+}
+
 void GetSunLightData(SunLightData& outSun, float hdrIntensity) {
     auto* sun = static_cast<light*>(Lights.sun._get());
     if (sun) {
