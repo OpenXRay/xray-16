@@ -14,7 +14,8 @@ cbuffer LocalShadowBinParams : register(b5)
     uint g_CapAT;
     uint g_IncludeAT;
     float g_ErrK;
-    uint3 g_BinPad;
+    uint g_ApplyLod;
+    uint2 g_BinPad;
 };
 
 StructuredBuffer<ClusterEntry> g_Entries : register(t14);
@@ -89,7 +90,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
                 }
             }
         }
-        if (hit && !plain)
+        if (hit && !plain && g_ApplyLod != 0u)
         {
             float d = max(distance(c, t.lightPos.xyz) - R, t.zparams.x);
             float errB = d * t.zparams.z * g_ErrK;
