@@ -25,9 +25,9 @@ using namespace framegraph;
 namespace {
 
 constexpr float kVSMRejectTol = 0.05f;
-constexpr u32 kReadbackResidOffset = 4 + kVSMPageCount;
-constexpr u32 kReadbackBinOffset = kReadbackResidOffset + 8;
-constexpr u32 kVSMDirtyListWords = kVSMStaticSlots + 3;
+constexpr u32 kVSMCounterWords = 16;
+constexpr u32 kReadbackBinOffset = kVSMCounterWords;
+constexpr u32 kVSMDirtyListWords = kVSMStaticSlots;
 constexpr u32 kReadbackDynOffset = kReadbackBinOffset + 8;
 constexpr u32 kReadbackWords = kReadbackDynOffset + 16;
 constexpr u32 kPairCaps[kVSMStreamCount] = { kVSMPairCapOpaque, kVSMPairCapTerrain, kVSMPairCapAT };
@@ -123,7 +123,6 @@ struct VSMResolveData {
     VirtualResourceHandle mask;
     VirtualResourceHandle dynAtlas;
     VirtualResourceHandle dynTable;
-    VirtualResourceHandle dynUsed;
     VSMState* state;
     fg::RenderDevice* device;
     u32 width;
@@ -195,13 +194,14 @@ struct VSMDynAllocData {
     VirtualResourceHandle dynTable;
     VSMState* state;
     fg::RenderDevice* device;
+    VSMDynConfig config;
     xray::profiler::GPUProfiler* gpuProfiler;
 };
 
 struct VSMDynBinData {
     VirtualResourceHandle dynTable;
     VirtualResourceHandle order;
-    VirtualResourceHandle dynUsed;
+    VirtualResourceHandle dynArgs;
     VSMState* state;
     fg::RenderDevice* device;
     VSMDynConfig config;
@@ -210,7 +210,7 @@ struct VSMDynBinData {
 
 struct VSMDynAtlasData {
     VirtualResourceHandle dynAtlas;
-    VirtualResourceHandle dynUsed;
+    VirtualResourceHandle dynArgs;
     VSMState* state;
     fg::RenderDevice* device;
     VSMDynConfig config;
@@ -239,7 +239,7 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
 {
     if (state.markPipeline && state.residPipeline && state.debugPipeline && state.clearPipeline
         && state.binPrepPipeline && state.binPipeline && state.argsPipeline && state.pagePipeline && state.pageATPipeline && state.resolvePipeline
-        && state.allocPipeline && state.dynBinPipeline && state.dynArgsPipeline
+        && state.allocPipeline && state.dynBinPipeline && state.dynArgsPipeline && state.touchPipeline
         && state.bucketCountPipeline && state.bucketScanPipeline && state.bucketFillPipeline)
         return true;
     if (state.pipelinesFailed)
@@ -279,8 +279,9 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     auto allocResult = shaderLoader->LoadComputeShader("vsm_alloc");
     auto dynBinResult = shaderLoader->LoadComputeShader("vsm_bin_dyn");
     auto dynArgsResult = shaderLoader->LoadComputeShader("vsm_dyn_draw_args");
+    auto touchResult = shaderLoader->LoadComputeShader("vsm_dyn_touch");
     if (!allocResult.handle || !allocResult.reflection || !dynBinResult.handle || !dynBinResult.reflection
-        || !dynArgsResult.handle || !dynArgsResult.reflection) {
+        || !dynArgsResult.handle || !dynArgsResult.reflection || !touchResult.handle || !touchResult.reflection) {
         Msg("! [VSM] dynamic atlas shaders failed to load");
         state.pipelinesFailed = true;
         return false;
@@ -316,9 +317,10 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     state.allocLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMAlloc", *allocResult.reflection, nvDevice);
     state.dynBinLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynBin", *dynBinResult.reflection, nvDevice);
     state.dynArgsLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynArgs", *dynArgsResult.reflection, nvDevice);
+    state.touchLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynTouch", *touchResult.reflection, nvDevice);
     if (!state.markLayout || !state.residLayout || !state.debugLayout || !state.clearLayout
         || !state.binPrepLayout || !state.binLayout || !state.argsLayout || !state.pageLayout || !state.pageATLayout || !state.resolveLayout
-        || !state.allocLayout || !state.dynBinLayout || !state.dynArgsLayout
+        || !state.allocLayout || !state.dynBinLayout || !state.dynArgsLayout || !state.touchLayout
         || !state.bucketCountLayout || !state.bucketScanLayout || !state.bucketFillLayout) {
         state.pipelinesFailed = true;
         return false;
@@ -363,6 +365,11 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     binDesc.CS = binResult.handle;
     binDesc.bindingLayouts = { state.binLayout };
     state.binPipeline = cache.GetOrCreateComputePipeline("VSMBin", binDesc, nvDevice);
+
+    nvrhi::ComputePipelineDesc touchDesc;
+    touchDesc.CS = touchResult.handle;
+    touchDesc.bindingLayouts = { state.touchLayout };
+    state.touchPipeline = cache.GetOrCreateComputePipeline("VSMDynTouch", touchDesc, nvDevice);
 
     nvrhi::ComputePipelineDesc bucketCountDesc;
     bucketCountDesc.CS = bucketCountResult.handle;
@@ -449,7 +456,6 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
         return true;
 
     state.needed = MakeUAVBuffer(nvDevice, "VSM_Needed", u64(kVSMPageCount) * sizeof(u32), sizeof(u32), false);
-    state.counter = MakeUAVBuffer(nvDevice, "VSM_Counter", sizeof(u32) * 4, sizeof(u32), true);
     state.pageTable = MakeUAVBuffer(nvDevice, "VSM_PageTable", u64(kVSMPageCount) * sizeof(u32), sizeof(u32), false);
     state.pageList = MakeUAVBuffer(nvDevice, "VSM_PageList", u64(kVSMStaticSlots) * sizeof(u32) * 4, sizeof(u32) * 4, false);
     state.physTile = MakeUAVBuffer(nvDevice, "VSM_PhysTile", u64(kVSMStaticSlots) * sizeof(u32) * 2, sizeof(u32) * 2, false);
@@ -461,7 +467,6 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
     state.dynPageTable = MakeUAVBuffer(nvDevice, "VSM_DynPageTable", u64(kVSMPageCount) * sizeof(u32), sizeof(u32), false);
     state.dynPageList = MakeUAVBuffer(nvDevice, "VSM_DynPageList", u64(kVSMMaxPhys) * sizeof(u32) * 4, sizeof(u32) * 4, false);
     state.dynAllocInfo = MakeUAVBuffer(nvDevice, "VSM_DynAllocInfo", sizeof(u32) * 8, sizeof(u32), false);
-    state.dynUsed = MakeUAVBuffer(nvDevice, "VSM_DynUsed", u64(kVSMMaxPhys) * sizeof(u32), sizeof(u32), false);
     state.dynStats = MakeUAVBuffer(nvDevice, "VSM_DynStats", sizeof(u32) * 16, sizeof(u32), false);
     {
         static const u32 kDynCaps[kVSMDynStreamCount] = { kVSMDynPairCapOpaque, kVSMDynPairCapAT, kVSMDynPairCapSkinned };
@@ -489,14 +494,17 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
     }
     {
         nvrhi::BufferDesc desc;
-        desc.debugName = "VSM_DrawClear";
-        desc.byteSize = sizeof(u32) * 4;
+        desc.debugName = "VSM_Counters";
+        desc.byteSize = sizeof(u32) * kVSMCounterWords;
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
         desc.isDrawIndirectArgs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = true;
         state.drawClear = nvDevice->createBuffer(desc);
+        desc.debugName = "VSM_DynClearArgs";
+        desc.byteSize = sizeof(u32) * 4;
+        state.dynClearArgs = nvDevice->createBuffer(desc);
     }
     state.binStats = MakeUAVBuffer(nvDevice, "VSM_BinStats", sizeof(u32) * 8, sizeof(u32), false);
     state.bucketCount = MakeUAVBuffer(nvDevice, "VSM_BucketCount", u64(kVSMLevels) * kVSMBucketsPerLevel * sizeof(u32), sizeof(u32), false);
@@ -588,10 +596,10 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
     state.primeTraceIdx = 0;
     state.primeTraceQuiet = 0;
 
-    if (!state.needed || !state.counter || !state.pageTable || !state.pageList || !state.physTile
+    if (!state.needed || !state.dynClearArgs || !state.pageTable || !state.pageList || !state.physTile
         || !state.slotDirty || !state.dirtyList || !state.drawClear || !state.slotFrame || !state.slotPivot || !state.slotSun || !state.atlas || !state.binStats
         || !state.bucketCount || !state.bucketStart || !state.bucketEnd || !state.bucketCursor || !state.bucketItems || !state.binArgs
-        || !state.dynPageTable || !state.dynPageList || !state.dynAllocInfo || !state.dynUsed || !state.dynAtlas || !state.dynStats) {
+        || !state.dynPageTable || !state.dynPageList || !state.dynAllocInfo || !state.dynAtlas || !state.dynStats) {
         Msg("! [VSM] resource creation failed");
         state.needed = nullptr;
         state.atlas = nullptr;
@@ -641,18 +649,16 @@ void ProcessReadback(nvrhi::IDevice* nvDevice, VSMState& state)
     if (!mapped)
         return;
     const u32* words = static_cast<const u32*>(mapped);
-    state.markPages = std::min(words[0], kVSMPageCount);
+    u32 total = 0;
     for (u32 L = 0; L < kVSMLevels; ++L) {
-        u32 n = 0;
-        const u32* level = words + 4 + L * kVSMPagesPerLevel;
-        for (u32 i = 0; i < kVSMPagesPerLevel; ++i)
-            n += level[i] != 0 ? 1 : 0;
-        state.levelPages[L] = n;
+        state.levelPages[L] = std::min(words[8 + L], kVSMPagesPerLevel);
+        total += state.levelPages[L];
     }
-    state.dirtyPages = std::min(words[kReadbackResidOffset + 1], kVSMStaticSlots);
-    state.wrongPages = std::min(words[kReadbackResidOffset + 2], kVSMStaticSlots);
-    state.refreshPages = std::min(words[kReadbackResidOffset + 3], kVSMStaticSlots);
-    state.overduePages = std::min(words[kReadbackResidOffset + 4], kVSMStaticSlots);
+    state.markPages = total;
+    state.dirtyPages = std::min(words[1], kVSMStaticSlots);
+    state.wrongPages = std::min(words[4], kVSMStaticSlots);
+    state.refreshPages = std::min(words[5], kVSMStaticSlots);
+    state.overduePages = std::min(words[6], kVSMStaticSlots);
     const u32* bin = words + kReadbackBinOffset;
     state.binDraws = bin[0];
     state.binInstances = bin[1];
@@ -671,11 +677,12 @@ void ScheduleReadback(nvrhi::ICommandList* cmdList, VSMState& state)
     nvrhi::IBuffer* slot = state.readback[state.readbackWrite];
     if (!slot)
         return;
-    cmdList->copyBuffer(slot, 0, state.counter, 0, sizeof(u32) * 4);
-    cmdList->copyBuffer(slot, sizeof(u32) * 4, state.needed, 0, u64(kVSMPageCount) * sizeof(u32));
-    cmdList->copyBuffer(slot, u64(kReadbackResidOffset) * sizeof(u32), state.drawClear, 0, sizeof(u32) * 2);
-    cmdList->copyBuffer(slot, u64(kReadbackResidOffset + 2) * sizeof(u32), state.dirtyList, u64(kVSMStaticSlots) * sizeof(u32), sizeof(u32) * 3);
+    cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::CopySource);
+    cmdList->setBufferState(state.binStats, nvrhi::ResourceStates::CopySource);
+    cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::CopySource);
+    cmdList->copyBuffer(slot, 0, state.drawClear, 0, sizeof(u32) * kVSMCounterWords);
     cmdList->copyBuffer(slot, u64(kReadbackBinOffset) * sizeof(u32), state.binStats, 0, sizeof(u32) * 8);
+    cmdList->copyBuffer(slot, u64(kReadbackDynOffset) * sizeof(u32), state.dynStats, 0, sizeof(u32) * 16);
     state.readbackWrite = (state.readbackWrite + 1) % VSMState::kReadbackSlots;
     if (state.readbackScheduled < VSMState::kReadbackSlots)
         ++state.readbackScheduled;
@@ -719,8 +726,8 @@ void LogTelemetry(VSMState& state)
     Msg("[VSM] bin: pages=%u pairs=%u maxBucket=%u drops=%u rebuilds=%u | k=%.2f at=%d",
         state.binDraws, state.binInstances, state.binMaxPages, state.binDrops, state.bucketRebuilds, ps_r_vsm_cluster_lod, ps_r_vsm_at);
     state.bucketRebuilds = 0;
-    Msg("[VSM] dyn: casters=%u instances=%u maxPages=%u | gate %d blend_dyn %.2f",
-        state.dynCasters, state.dynInstances, state.dynMaxPages, ps_r_vsm_dyn_gate, ps_r_vsm_ta_blend_dyn);
+    Msg("[VSM] dyn: casters=%u instances=%u maxPages=%u | blend_dyn %.2f",
+        state.dynCasters, state.dynInstances, state.dynMaxPages, ps_r_vsm_ta_blend_dyn);
     state.sunStepMax = 0.0f;
 }
 
@@ -754,44 +761,57 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
     auto markCB = cache.GetOrCreateVolatileCB("VSM", "MarkParams", sizeof(VsmMarkParams), data.device);
     cmdList->writeBuffer(markCB, &mp, sizeof(mp));
 
-    const u32 clearDraw[4] = { 6u, 0u, 0u, 0u };
+    const bool dyn = state.dynActive;
     cmdList->setBufferState(state.needed, nvrhi::ResourceStates::CopyDest);
-    cmdList->setBufferState(state.counter, nvrhi::ResourceStates::CopyDest);
-    cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::CopyDest);
-    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::CopyDest);
     cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::CopyDest);
-    cmdList->clearBufferUInt(state.needed, 0);
-    cmdList->clearBufferUInt(state.counter, 0);
-    cmdList->clearBufferUInt(state.slotDirty, 0);
-    cmdList->clearBufferUInt(state.dirtyList, 0);
-    cmdList->writeBuffer(state.drawClear, clearDraw, sizeof(clearDraw));
+    cmdList->setBufferState(state.binStats, nvrhi::ResourceStates::CopyDest);
+    if (dyn) {
+        cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::CopyDest);
+        cmdList->setBufferState(state.dynAllocInfo, nvrhi::ResourceStates::CopyDest);
+        cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::CopyDest);
+    }
     if (!state.physInit) {
         cmdList->setBufferState(state.physTile, nvrhi::ResourceStates::CopyDest);
         cmdList->setBufferState(state.slotFrame, nvrhi::ResourceStates::CopyDest);
         cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::CopyDest);
         cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::CopyDest);
+        cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::CopyDest);
+    }
+    cmdList->clearBufferUInt(state.needed, 0);
+    cmdList->clearBufferUInt(state.drawClear, 0);
+    cmdList->clearBufferUInt(state.binStats, 0);
+    if (dyn) {
+        cmdList->clearBufferUInt(state.dynPageTable, 0xFFFFFFFFu);
+        cmdList->clearBufferUInt(state.dynAllocInfo, 0);
+        cmdList->clearBufferUInt(state.dynStats, 0);
+    }
+    if (!state.physInit) {
         cmdList->clearBufferUInt(state.physTile, 0xFFFFFFFFu);
         cmdList->clearBufferUInt(state.slotFrame, 0);
         cmdList->clearBufferUInt(state.slotPivot, 0);
         cmdList->clearBufferUInt(state.slotSun, 0);
+        cmdList->clearBufferUInt(state.slotDirty, 0);
         cmdList->setBufferState(state.physTile, nvrhi::ResourceStates::UnorderedAccess);
         cmdList->setBufferState(state.slotFrame, nvrhi::ResourceStates::UnorderedAccess);
         cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::UnorderedAccess);
         cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::UnorderedAccess);
         state.physInit = true;
     }
     cmdList->setBufferState(state.needed, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.counter, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.binStats, nvrhi::ResourceStates::UnorderedAccess);
+    if (dyn) {
+        cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.dynAllocInfo, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::UnorderedAccess);
+    }
 
     BindingSetBuilder bsb(*markRefl, nvDevice, "VSM.Mark");
     bsb.ConstantBuffer("VsmParams", vsmCB)
        .ConstantBuffer("VsmMarkParams", markCB)
        .Texture("g_Depth", depth)
-       .BufferUAV("g_Needed", state.needed)
-       .BufferUAV("g_Counter", state.counter);
+       .BufferUAV("g_Needed", state.needed);
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.markLayout, nvDevice);
     if (!bindingSet)
         return;
@@ -878,7 +898,7 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
        .BufferUAV("g_PhysTile", state.physTile)
        .BufferUAV("g_SlotDirty", state.slotDirty)
        .BufferUAV("g_DirtyList", state.dirtyList)
-       .BufferUAV("g_DrawClear", state.drawClear)
+       .BufferUAV("g_Counters", state.drawClear)
        .BufferUAV("g_SlotFrame", state.slotFrame)
        .BufferUAV("g_SlotPivot", state.slotPivot)
        .BufferUAV("g_SlotSun", state.slotSun);
@@ -917,8 +937,6 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
     if (!prepRefl || !binRefl || !argsRefl)
         return;
 
-    cmdList->setBufferState(state.binStats, nvrhi::ResourceStates::CopyDest);
-    cmdList->clearBufferUInt(state.binStats, 0);
     cmdList->setBufferState(state.binStats, nvrhi::ResourceStates::UnorderedAccess);
     for (u32 i = 0; i < kVSMStreamCount; ++i)
         cmdList->setBufferState(state.pairs[i], nvrhi::ResourceStates::UnorderedAccess);
@@ -1069,7 +1087,7 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
         cmdList->setBufferState(state.bucketItems, nvrhi::ResourceStates::ShaderResource);
 
         BindingSetBuilder pbs(*prepRefl, nvDevice, "VSM.BinPrep");
-        pbs.BufferSRV("g_DrawClear", state.drawClear)
+        pbs.BufferSRV("g_Counters", state.drawClear)
            .BufferUAV("g_BinArgs", state.binArgs);
         auto prepSet = cache.GetOrCreateBindingSet(pbs.Build(), state.binPrepLayout, nvDevice);
         if (prepSet) {
@@ -1143,14 +1161,7 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
         cmdList->dispatch(1, 1, 1);
     }
 
-    cmdList->setBufferState(state.needed, nvrhi::ResourceStates::CopySource);
-    cmdList->setBufferState(state.counter, nvrhi::ResourceStates::CopySource);
-    cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::CopySource);
-    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::CopySource);
-    cmdList->setBufferState(state.binStats, nvrhi::ResourceStates::CopySource);
-    ScheduleReadback(cmdList, state);
     cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
     for (u32 i = 0; i < kVSMStreamCount; ++i) {
         cmdList->setBufferState(state.pageArgs[i], nvrhi::ResourceStates::IndirectArgument);
         cmdList->setBufferState(state.pairs[i], nvrhi::ResourceStates::ShaderResource);
@@ -1287,11 +1298,18 @@ bool EnsureDynPagePipelines(fg::RenderDevice* device, VSMState& state)
         if (vsResult.handle && vsResult.reflection)
             state.dynSkinPageVS = vsResult.handle;
     }
+    if (!state.dynClearVS) {
+        auto vsResult = shaderLoader->LoadVertexShader("vsm_clear_dyn", "main");
+        if (vsResult.handle && vsResult.reflection)
+            state.dynClearVS = vsResult.handle;
+    }
     auto* dynVsRefl = shaderLoader->GetCachedReflection("vsm_page_pull_dyn", ".vs");
     auto* skinVsRefl = shaderLoader->GetCachedReflection("vsm_page_pull_skinned", ".vs");
     auto* psRefl = shaderLoader->GetCachedReflection("vsm_page", ".ps");
     auto* atRefl = shaderLoader->GetCachedReflection("vsm_page_at", ".ps");
-    if (!state.dynPageVS || !state.dynSkinPageVS || !dynVsRefl || !skinVsRefl || !psRefl || !atRefl) {
+    auto* clearVsRefl = shaderLoader->GetCachedReflection("vsm_clear_dyn", ".vs");
+    auto* clearPsRefl = shaderLoader->GetCachedReflection("vsm_clear", ".ps");
+    if (!state.dynPageVS || !state.dynSkinPageVS || !state.dynClearVS || !dynVsRefl || !skinVsRefl || !psRefl || !atRefl || !clearVsRefl || !clearPsRefl) {
         Msg("! [VSM] dynamic page shaders failed to load");
         state.dynPipelinesFailed = true;
         return false;
@@ -1299,7 +1317,8 @@ bool EnsureDynPagePipelines(fg::RenderDevice* device, VSMState& state)
     state.dynPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynPage", *dynVsRefl, *psRefl, nvDevice);
     state.dynPageATLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynPageAT", *dynVsRefl, *atRefl, nvDevice);
     state.dynSkinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynSkinPage", *skinVsRefl, *psRefl, nvDevice);
-    if (!state.dynPageLayout || !state.dynPageATLayout || !state.dynSkinPageLayout) {
+    state.dynClearLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynClear", *clearVsRefl, *clearPsRefl, nvDevice);
+    if (!state.dynPageLayout || !state.dynPageATLayout || !state.dynSkinPageLayout || !state.dynClearLayout) {
         state.dynPipelinesFailed = true;
         return false;
     }
@@ -1334,7 +1353,21 @@ bool EnsureDynPagePipelines(fg::RenderDevice* device, VSMState& state)
     state.dynPageATPipeline = cache.GetOrCreatePipeline(name, makeDesc(state.dynPageVS, state.pageATPS, state.dynPageATLayout, true), fbInfo, nvDevice);
     xr_sprintf(name, "VSMDynSkinPage_b%.2f_s%.2f", state.rasterBias, state.rasterSlope);
     state.dynSkinPagePipeline = cache.GetOrCreatePipeline(name, makeDesc(state.dynSkinPageVS, state.pagePS, state.dynSkinPageLayout, false), fbInfo, nvDevice);
-    if (!state.dynPagePipeline || !state.dynPageATPipeline || !state.dynSkinPagePipeline) {
+    {
+        nvrhi::GraphicsPipelineDesc clearDesc;
+        clearDesc.VS = state.dynClearVS;
+        clearDesc.PS = state.clearPipeline ? state.clearPipeline->getDesc().PS : nullptr;
+        clearDesc.inputLayout = nullptr;
+        clearDesc.bindingLayouts = { state.dynClearLayout };
+        clearDesc.primType = nvrhi::PrimitiveType::TriangleList;
+        clearDesc.renderState.depthStencilState.depthTestEnable = true;
+        clearDesc.renderState.depthStencilState.depthWriteEnable = true;
+        clearDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Always;
+        clearDesc.renderState.rasterState.frontCounterClockwise = false;
+        clearDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+        state.dynClearPipeline = cache.GetOrCreatePipeline("VSMDynClear", clearDesc, fbInfo, nvDevice);
+    }
+    if (!state.dynPagePipeline || !state.dynPageATPipeline || !state.dynSkinPagePipeline || !state.dynClearPipeline) {
         Msg("! [VSM] dynamic page pipelines failed");
         state.dynPipelinesFailed = true;
         return false;
@@ -1355,17 +1388,43 @@ void ExecuteDynAlloc(fg::RenderContext* ctx, const VSMDynAllocData& data)
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     auto* refl = shaderLoader->GetCachedReflection("vsm_alloc", ".cs");
-    if (!refl)
+    auto* touchRefl = shaderLoader->GetCachedReflection("vsm_dyn_touch", ".cs");
+    if (!refl || !touchRefl || !state.touchPipeline || !data.config.gpuCulling)
         return;
 
-    cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::CopyDest);
-    cmdList->setBufferState(state.dynAllocInfo, nvrhi::ResourceStates::CopyDest);
-    cmdList->clearBufferUInt(state.dynPageTable, 0xFFFFFFFFu);
-    cmdList->clearBufferUInt(state.dynAllocInfo, 0);
     cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dynAllocInfo, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dynPageList, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.needed, nvrhi::ResourceStates::ShaderResource);
+
+    auto vsmCB = VsmParamsCB(data.device);
+    GPUCullingManager& gpuCulling = *data.config.gpuCulling;
+    auto touch = [&](nvrhi::IBuffer* entries, u32 entryBase, u32 entryCount, const char* label) {
+        if (!entries || entryCount == 0)
+            return;
+        VsmDynBinParams tp = {};
+        tp.entryBase = entryBase;
+        tp.entryCount = entryCount;
+        tp.includeAT = ps_r_vsm_at ? 1u : 0u;
+        auto touchCB = cache.GetOrCreateVolatileCB("VSM", "DynTouchParams", sizeof(VsmDynBinParams), data.device, 64);
+        cmdList->writeBuffer(touchCB, &tp, sizeof(tp));
+        cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
+        BindingSetBuilder tbs(*touchRefl, nvDevice, label);
+        tbs.ConstantBuffer("VsmParams", vsmCB)
+           .ConstantBuffer("VsmDynBinParams", touchCB)
+           .BufferSRV("g_Entries", entries)
+           .BufferUAV("g_DynPageTable", state.dynPageTable);
+        auto set = cache.GetOrCreateBindingSet(tbs.Build(), state.touchLayout, nvDevice);
+        if (!set)
+            return;
+        nvrhi::ComputeState cs;
+        cs.pipeline = state.touchPipeline;
+        cs.bindings = { set };
+        cmdList->setComputeState(cs);
+        cmdList->dispatch((entryCount + 63) / 64, 1, 1);
+    };
+    touch(data.config.entryBuffer, gpuCulling.GetClusterEntryCount(), gpuCulling.GetDynamicClusterEntryCount(), "VSM.DynTouch");
+    touch(gpuCulling.GetSkinnedEntryBuffer(), 0u, gpuCulling.GetSkinnedEntryCount(), "VSM.DynTouchSkinned");
 
     BindingSetBuilder bsb(*refl, nvDevice, "VSM.DynAlloc");
     bsb.BufferSRV("g_Needed", state.needed)
@@ -1401,12 +1460,7 @@ void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
     if (!binRefl || !argsRefl)
         return;
 
-    cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::CopyDest);
-    cmdList->setBufferState(state.dynUsed, nvrhi::ResourceStates::CopyDest);
-    cmdList->clearBufferUInt(state.dynStats, 0);
-    cmdList->clearBufferUInt(state.dynUsed, 0);
     cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.dynUsed, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::ShaderResource);
     for (u32 i = 0; i < kVSMDynStreamCount; ++i)
         cmdList->setBufferState(state.dynPairs[i], nvrhi::ResourceStates::UnorderedAccess);
@@ -1436,8 +1490,7 @@ void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
            .BufferSRV("g_DynPageTable", state.dynPageTable)
            .BufferUAV("g_Stats", state.dynStats)
            .BufferUAV("g_PairsOpaque", pairsOpaque)
-           .BufferUAV("g_PairsAT", pairsAT)
-           .BufferUAV("g_DynUsed", state.dynUsed);
+           .BufferUAV("g_PairsAT", pairsAT);
         auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.dynBinLayout, nvDevice);
         if (!bindingSet)
             return;
@@ -1460,14 +1513,18 @@ void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
     cmdList->writeBuffer(argsCB, &ap, sizeof(ap));
     for (u32 i = 0; i < kVSMDynStreamCount; ++i)
         cmdList->setBufferState(state.dynArgs[i], nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.dynClearArgs, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.dynAllocInfo, nvrhi::ResourceStates::ShaderResource);
 
     BindingSetBuilder abs(*argsRefl, nvDevice, "VSM.DynArgs");
     abs.ConstantBuffer("VsmDynArgsParams", argsCB)
        .BufferSRV("g_Stats", state.dynStats)
+       .BufferSRV("g_DynAllocInfo", state.dynAllocInfo)
        .BufferUAV("g_ArgsOpaque", state.dynArgs[0])
        .BufferUAV("g_ArgsAT", state.dynArgs[1])
-       .BufferUAV("g_ArgsSkinned", state.dynArgs[2]);
+       .BufferUAV("g_ArgsSkinned", state.dynArgs[2])
+       .BufferUAV("g_ArgsClear", state.dynClearArgs);
     auto argsSet = cache.GetOrCreateBindingSet(abs.Build(), state.dynArgsLayout, nvDevice);
     if (argsSet) {
         nvrhi::ComputeState cs;
@@ -1481,7 +1538,7 @@ void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
         cmdList->setBufferState(state.dynArgs[i], nvrhi::ResourceStates::IndirectArgument);
         cmdList->setBufferState(state.dynPairs[i], nvrhi::ResourceStates::ShaderResource);
     }
-    cmdList->setBufferState(state.dynUsed, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.dynClearArgs, nvrhi::ResourceStates::IndirectArgument);
 }
 
 void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynAtlasData& data)
@@ -1494,7 +1551,10 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
         return;
     state.dynRendered = false;
 
-    cmdList->clearDepthStencilTexture(atlas, nvrhi::AllSubresources, true, 0.0f, false, 0);
+    if (state.dynAtlasFirst) {
+        cmdList->clearDepthStencilTexture(atlas, nvrhi::AllSubresources, true, 0.0f, false, 0);
+        state.dynAtlasFirst = false;
+    }
 
     const VSMDynConfig& cfg = data.config;
     if (!cfg.gpuCulling)
@@ -1539,6 +1599,16 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
         cmdList->drawIndirect(0, 1);
         state.dynRendered = true;
     };
+    {
+        nvrhi::GraphicsState gs;
+        gs.pipeline = state.dynClearPipeline;
+        gs.framebuffer = framebuffer;
+        gs.indirectParams = state.dynClearArgs;
+        gs.viewport.addViewport(viewport);
+        gs.viewport.addScissorRect(scissor);
+        cmdList->setGraphicsState(gs);
+        cmdList->drawIndirect(0, 1);
+    }
 
     GPUCullingManager& gpuCulling = *cfg.gpuCulling;
     if (gpuCulling.GetDynamicClusterEntryCount() > 0 && cfg.entryBuffer && cfg.dynamicInstanceBuffer && cfg.megaVertexBuffer && cfg.megaIndexBuffer) {
@@ -1598,14 +1668,7 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     if (!atlasDyn)
         return;
 
-    if (state.dynActive && state.readbackScheduled > 0) {
-        nvrhi::IBuffer* slot = state.readback[(state.readbackWrite + VSMState::kReadbackSlots - 1) % VSMState::kReadbackSlots];
-        if (slot) {
-            cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::CopySource);
-            cmdList->copyBuffer(slot, u64(kReadbackDynOffset) * sizeof(u32), state.dynStats, 0, sizeof(u32) * 16);
-            cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::ShaderResource);
-        }
-    }
+    ScheduleReadback(cmdList, state);
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -1625,7 +1688,7 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     rp.prevCamPos.set(state.prevCamPos.x, state.prevCamPos.y, state.prevCamPos.z, dynOn ? float(std::max(ps_r_vsm_debug_dyn, 0)) : 0.0f);
     rp.curCamPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, ps_r_vsm_ta_blend_dyn);
     rp.screen.set(float(data.width), float(data.height), 1.0f / float(data.width), 1.0f / float(data.height));
-    rp.params.set(histOK ? ps_r_vsm_ta_blend : 0.0f, kVSMRejectTol, histOK ? 1.0f : 0.0f, ps_r_vsm_dyn_gate ? 1.0f : 0.0f);
+    rp.params.set(histOK ? ps_r_vsm_ta_blend : 0.0f, kVSMRejectTol, histOK ? 1.0f : 0.0f, 1.0f);
     const bool softOn = ps_r_vsm_soft >= 1;
     rp.params2.set(softOn ? ps_r_vsm_soft_clamp : ps_r_vsm_ta_clamp, ps_r_vsm_ta_motion, ps_r_vsm_ta_motion_floor, ps_r_vsm_bias_min);
     rp.params3.set(softOn ? float(ps_r_vsm_soft) : 0.0f, float(ps_r_vsm_soft_search), tanf(deg2rad(ps_r_vsm_soft_angle)), ps_r_vsm_soft_range);
@@ -1635,7 +1698,6 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     cmdList->writeBuffer(resolveCB, &rp, sizeof(rp));
 
     cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.dynUsed, nvrhi::ResourceStates::ShaderResource);
     BindingSetBuilder bsb(*refl, nvDevice, "VSM.Resolve");
     bsb.ConstantBuffer("VsmParams", vsmCB)
        .ConstantBuffer("VsmResolveParams", resolveCB)
@@ -1645,7 +1707,6 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
        .Texture("g_History", state.mask[prev])
        .Texture("g_AtlasDyn", atlasDyn)
        .BufferSRV("g_DynPageTable", state.dynPageTable)
-       .BufferSRV("g_DynUsed", state.dynUsed)
        .BufferSRV("g_SlotPivot", state.slotPivot)
        .BufferSRV("g_SlotSun", state.slotSun)
        .TextureUAV("g_Mask", mask);
@@ -1977,7 +2038,7 @@ VSMOutput setupVSMPasses(
     };
     VirtualResourceHandle neededHandle = fg.ImportBuffer("vsm_needed", state->needed, bufferDesc("vsm_needed", u64(kVSMPageCount) * sizeof(u32), sizeof(u32)));
     VirtualResourceHandle dirtyHandle = fg.ImportBuffer("vsm_dirty_list", state->dirtyList, bufferDesc("vsm_dirty_list", u64(kVSMDirtyListWords) * sizeof(u32), sizeof(u32)));
-    VirtualResourceHandle clearHandle = fg.ImportBuffer("vsm_draw_clear", state->drawClear, bufferDesc("vsm_draw_clear", sizeof(u32) * 4, 0));
+    VirtualResourceHandle clearHandle = fg.ImportBuffer("vsm_draw_clear", state->drawClear, bufferDesc("vsm_draw_clear", sizeof(u32) * kVSMCounterWords, 0));
     VirtualResourceHandle argsHandles[kVSMStreamCount];
     {
         static const char* kArgsNames[kVSMStreamCount] = { "vsm_page_args_opaque", "vsm_page_args_terrain", "vsm_page_args_at" };
@@ -2071,7 +2132,7 @@ VSMOutput setupVSMPasses(
     state->fgAtlas = atlasData.atlas;
     state->fgDynAtlas = VirtualResourceHandle{};
     state->fgDynTable = VirtualResourceHandle{};
-    state->fgDynUsed = VirtualResourceHandle{};
+    state->fgDynArgs = VirtualResourceHandle{};
     state->dynActive = false;
     state->dynRendered = false;
     return out;
@@ -2087,7 +2148,9 @@ void setupVSMDynamicPasses(
 {
     if (!state || !device || !state->active || !config.gpuCulling)
         return;
-    if (!state->dynAtlas || !state->dynPageTable || !state->dynUsed)
+    if (!state->dynAtlas || !state->dynPageTable || !state->dynClearArgs)
+        return;
+    if (config.gpuCulling->GetDynamicClusterEntryCount() == 0 && config.gpuCulling->GetSkinnedEntryCount() == 0)
         return;
 
     auto bufferDesc = [](const char* name, u64 bytes, u32 stride) {
@@ -2103,7 +2166,7 @@ void setupVSMDynamicPasses(
         return d;
     };
     VirtualResourceHandle dynTableHandle = fg.ImportBuffer("vsm_dyn_page_table", state->dynPageTable, bufferDesc("vsm_dyn_page_table", u64(kVSMPageCount) * sizeof(u32), sizeof(u32)));
-    VirtualResourceHandle dynUsedHandle = fg.ImportBuffer("vsm_dyn_used", state->dynUsed, bufferDesc("vsm_dyn_used", u64(kVSMMaxPhys) * sizeof(u32), sizeof(u32)));
+    VirtualResourceHandle dynArgsHandle = fg.ImportBuffer("vsm_dyn_args", state->dynArgs[0], bufferDesc("vsm_dyn_args", sizeof(u32) * 4, 0));
 
     ResourceDesc dynAtlasDesc;
     dynAtlasDesc.type = ResourceDesc::Type::Texture2D;
@@ -2118,9 +2181,10 @@ void setupVSMDynamicPasses(
 
     auto& allocData = fg.addCallbackPass<VSMDynAllocData>(
         "VSM Dyn Alloc",
-        [&, dynTableHandle, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMDynAllocData& data) {
+        [&, dynTableHandle, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMDynAllocData& data) {
             data.state = state;
             data.device = device;
+            data.config = config;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
             data.needed = passBuilder.read(state->fgNeeded, ResourceState::ShaderResource);
@@ -2132,7 +2196,7 @@ void setupVSMDynamicPasses(
 
     auto& binData = fg.addCallbackPass<VSMDynBinData>(
         "VSM Dyn Bin",
-        [&, skinnedDrawArgs, dynUsedHandle, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMDynBinData& data) {
+        [&, skinnedDrawArgs, dynArgsHandle, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMDynBinData& data) {
             data.state = state;
             data.device = device;
             data.config = config;
@@ -2141,7 +2205,7 @@ void setupVSMDynamicPasses(
             data.dynTable = passBuilder.read(allocData.dynTable, ResourceState::ShaderResource);
             if (skinnedDrawArgs.is_valid())
                 data.order = passBuilder.read(skinnedDrawArgs, ResourceState::ShaderResource);
-            data.dynUsed = passBuilder.write(dynUsedHandle, ResourceState::UnorderedAccess);
+            data.dynArgs = passBuilder.write(dynArgsHandle, ResourceState::UnorderedAccess);
         },
         [](const VSMDynBinData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ExecuteDynBin(ctx, data);
@@ -2156,7 +2220,7 @@ void setupVSMDynamicPasses(
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
             data.dynAtlas = passBuilder.write(dynAtlasHandle, ResourceState::DepthStencilWrite);
-            data.dynUsed = passBuilder.read(binData.dynUsed, ResourceState::ShaderResource);
+            data.dynArgs = passBuilder.read(binData.dynArgs, ResourceState::IndirectArgument);
         },
         [](const VSMDynAtlasData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ExecuteDynAtlas(ctx, fg, data);
@@ -2165,7 +2229,7 @@ void setupVSMDynamicPasses(
     fg.GetRTRegistry().RegisterRT("rt_VSMAtlasDyn", atlasData.dynAtlas);
     state->fgDynAtlas = atlasData.dynAtlas;
     state->fgDynTable = allocData.dynTable;
-    state->fgDynUsed = binData.dynUsed;
+    state->fgDynArgs = binData.dynArgs;
     state->dynActive = true;
 }
 
@@ -2211,7 +2275,6 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
             if (state->dynActive) {
                 data.dynAtlas = passBuilder.read(state->fgDynAtlas, ResourceState::ShaderResource);
                 data.dynTable = passBuilder.read(state->fgDynTable, ResourceState::ShaderResource);
-                data.dynUsed = passBuilder.read(state->fgDynUsed, ResourceState::ShaderResource);
             }
             data.mask = passBuilder.write(maskHandle, ResourceState::UnorderedAccess);
         },

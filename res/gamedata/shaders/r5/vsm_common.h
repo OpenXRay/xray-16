@@ -12,6 +12,7 @@
 #define VSM_ATLAS_H       32
 #define VSM_PAGES_CAP     1024
 #define VSM_UNMAPPED      0xFFFFFFFFu
+#define VSM_TOUCHED       0xFFFFFFFEu
 #define VSM_MAX_PHYS_S    6144
 #define VSM_ATLAS_W_S     64
 #define VSM_ATLAS_H_S     96

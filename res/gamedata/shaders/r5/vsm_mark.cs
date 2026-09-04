@@ -15,7 +15,6 @@ cbuffer VsmMarkParams : register(b5)
 
 Texture2D<float> g_Depth : register(t0);
 RWStructuredBuffer<uint> g_Needed : register(u0);
-RWByteAddressBuffer g_Counter : register(u1);
 
 [numthreads(8, 8, 1)]
 void main(uint3 dtID : SV_DispatchThreadID)
@@ -50,9 +49,4 @@ void main(uint3 dtID : SV_DispatchThreadID)
     uint idx = uint(vsmPageIndex(L, page));
     uint prev;
     InterlockedOr(g_Needed[idx], 1u, prev);
-    if (prev == 0u)
-    {
-        uint dummy;
-        g_Counter.InterlockedAdd(0, 1u, dummy);
-    }
 }
