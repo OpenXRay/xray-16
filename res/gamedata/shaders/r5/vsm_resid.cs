@@ -2,18 +2,7 @@
 #include "common.h"
 #include "vsm_common.h"
 
-cbuffer VsmResidParams : register(b5)
-{
-    int4 g_PageBase[3];
-    uint g_Frame;
-    uint g_RefreshBudget;
-    uint g_WrongBudget;
-    uint g_ForceDirty;
-    uint4 g_Interval[2];
-    float4 g_Pivot;
-    float4 g_Sun;
-    float4 g_LevelOrigin[VSM_LEVELS];
-};
+#include "vsm_resid_params.h"
 
 StructuredBuffer<uint> g_Needed : register(t0);
 RWStructuredBuffer<uint> g_PageTable : register(u0);
@@ -50,11 +39,10 @@ void main(uint3 dtID : SV_DispatchThreadID)
         uint d;
         g_Counters.InterlockedAdd(32u + 4u * uint(level), nWave, d);
     }
-    if (vp == 0u)
-        g_Counters.Store(0, 6u);
     if (!inRange)
         return;
 
+    g_CandList[uint(VSM_MAX_PHYS_S) + vp] = uint4(0u, 0u, 0u, 0u);
     int within = int(vp) % VSM_PAGES_PER_LVL;
     int2 wpage = int2(within % VSM_PAGES_AXIS, within / VSM_PAGES_AXIS);
     int2 absPage = pageBaseOf(level) + wpage;
@@ -76,11 +64,6 @@ void main(uint3 dtID : SV_DispatchThreadID)
     {
         uint n;
         g_Counters.InterlockedAdd(16u, 1u, n);
-        if (!force && g_WrongBudget != 0u && n >= g_WrongBudget)
-        {
-            g_PageTable[vp] = VSM_UNMAPPED;
-            return;
-        }
         kind = 1u;
     }
     else if (force)
@@ -94,15 +77,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
         {
             uint n;
             g_Counters.InterlockedAdd(20u, 1u, n);
-            if (n < g_RefreshBudget)
-            {
-                kind = 2u;
-            }
-            else
-            {
-                uint m;
-                g_Counters.InterlockedAdd(24u, 1u, m);
-            }
+            kind = 2u;
         }
     }
 
@@ -110,19 +85,5 @@ void main(uint3 dtID : SV_DispatchThreadID)
     if (kind == 0u)
         return;
 
-    uint4 cand = uint4(uint(slot), vp, kind, 0u);
-    if (kind == 1u)
-    {
-        uint d;
-        g_Counters.InterlockedAdd(8u, 1u, d);
-        if (d < uint(VSM_MAX_PHYS_S))
-            g_CandList[d] = cand;
-    }
-    else
-    {
-        uint d;
-        g_Counters.InterlockedAdd(12u, 1u, d);
-        if (d < uint(VSM_MAX_PHYS_S))
-            g_CandList[uint(VSM_MAX_PHYS_S) + d] = cand;
-    }
+    g_CandList[uint(VSM_MAX_PHYS_S) + vp] = uint4(uint(slot), vp, kind, 0u);
 }
