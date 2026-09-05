@@ -14,6 +14,8 @@ struct ClusterEntry
     uint flags;
     float selfError;
     float parentError;
+    float3 extent;
+    float extentPad;
 };
 
 cbuffer VsmHudParams : register(b5)

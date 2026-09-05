@@ -67,6 +67,7 @@ struct BakeResult {
 struct BakeContext {
     BakeResult* result;
     xr_vector<clodBounds> groups;
+    const bindless::UnifiedVertex* verts;
     const u32* absoluteOfLocal;
     const u32* memberOfLocal;
     u32 memberCount;
@@ -105,14 +106,37 @@ float EstimateUVWorldScale(const bindless::UnifiedVertex* verts, const u32* indi
     return clampr(ratios[ratios.size() / 2], 0.01f, 1000.0f);
 }
 
+void MeasureBounds(const bindless::UnifiedVertex* verts, const u32* indices, u32 indexCount,
+    float* center, float* radius, float* extent)
+{
+    Fvector lo, hi;
+    lo.set(flt_max, flt_max, flt_max);
+    hi.set(-flt_max, -flt_max, -flt_max);
+    for (u32 i = 0; i < indexCount; ++i) {
+        const Fvector& v = verts[indices[i]].position;
+        lo.min(v);
+        hi.max(v);
+    }
+    Fvector c;
+    c.add(lo, hi).mul(0.5f);
+    float r2 = 0.0f;
+    for (u32 i = 0; i < indexCount; ++i)
+        r2 = std::max(r2, c.distance_to_sqr(verts[indices[i]].position));
+    center[0] = c.x;
+    center[1] = c.y;
+    center[2] = c.z;
+    *radius = _sqrt(r2);
+    extent[0] = (hi.x - lo.x) * 0.5f;
+    extent[1] = (hi.y - lo.y) * 0.5f;
+    extent[2] = (hi.z - lo.z) * 0.5f;
+}
+
 void EmitProto(BakeResult& out, const BakeContext& ctx, const clodCluster& c,
-    const clodBounds& parent, int depth, u32 member, const u32* indices, u32 indexCount)
+    const clodBounds& parent, int depth, u32 member, const u32* indices, u32 indexCount,
+    const u32* boundsIndices)
 {
     ClusterMetaProto p = {};
-    p.sphere[0] = c.bounds.center[0];
-    p.sphere[1] = c.bounds.center[1];
-    p.sphere[2] = c.bounds.center[2];
-    p.sphere[3] = c.bounds.radius;
+    MeasureBounds(ctx.verts, boundsIndices, indexCount, p.sphere, &p.sphere[3], p.extent);
 
     p.lodParent[0] = parent.center[0];
     p.lodParent[1] = parent.center[1];
@@ -163,7 +187,7 @@ int OutputGroupCB(void* ctxv, clodGroup group, const clodCluster* clusters, size
         const clodCluster& c = clusters[i];
 
         if (!ctx->absoluteOfLocal) {
-            EmitProto(out, *ctx, c, parent, group.depth, 0, c.indices, u32(c.index_count));
+            EmitProto(out, *ctx, c, parent, group.depth, 0, c.indices, u32(c.index_count), c.indices);
             continue;
         }
 
@@ -179,18 +203,21 @@ int OutputGroupCB(void* ctxv, clodGroup group, const clodCluster* clusters, size
 
         for (u32 m = 0; m < ctx->memberCount; ++m) {
             static thread_local xr_vector<u32> s_memberIndices;
+            static thread_local xr_vector<u32> s_memberLocal;
             s_memberIndices.clear();
+            s_memberLocal.clear();
             for (size_t t = 0; t < c.index_count / 3; ++t) {
                 if (s_triMember[t] != m)
                     continue;
-                s_memberIndices.push_back(s_translated[t * 3 + 0]);
-                s_memberIndices.push_back(s_translated[t * 3 + 1]);
-                s_memberIndices.push_back(s_translated[t * 3 + 2]);
+                for (u32 e = 0; e < 3; ++e) {
+                    s_memberIndices.push_back(s_translated[t * 3 + e]);
+                    s_memberLocal.push_back(c.indices[t * 3 + e]);
+                }
             }
             if (s_memberIndices.empty())
                 continue;
             EmitProto(out, *ctx, c, parent, group.depth, m,
-                s_memberIndices.data(), u32(s_memberIndices.size()));
+                s_memberIndices.data(), u32(s_memberIndices.size()), s_memberLocal.data());
         }
     }
 
@@ -298,6 +325,7 @@ void BakeSingleMesh(
     BakeContext ctx = {};
     ctx.result = &result;
     ctx.groups.reserve(64);
+    ctx.verts = verts;
     ctx.protoFlags = ((rangeFlags & CLUSTER_RANGE_FLAG_AT) ? CLUSTER_PROTO_FLAG_AT : 0) |
                      ((rangeFlags & CLUSTER_RANGE_FLAG_TERRAIN) ? CLUSTER_PROTO_FLAG_TERRAIN : 0);
 
@@ -399,6 +427,7 @@ void BakeComponent(
     BakeContext ctx = {};
     ctx.result = &result;
     ctx.groups.reserve(256);
+    ctx.verts = verts.data();
     ctx.absoluteOfLocal = absoluteOfLocal.data();
     ctx.memberOfLocal = memberOfLocal.data();
     ctx.memberCount = u32(members.size());
@@ -417,7 +446,7 @@ bool IsSelfLoop(const ClusterMetaProto& p)
 }
 
 constexpr u32 kCacheMagic = 0x464C4356;
-constexpr u32 kCacheVersion = 10;
+constexpr u32 kCacheVersion = 11;
 
 #pragma pack(push, 4)
 struct CacheHeader {
