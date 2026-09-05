@@ -191,6 +191,7 @@ target_sources(xrRender PRIVATE
     FProgressive.cpp
     ClusterDAG.cpp
     ClusterDeviation.cpp
+    ClusterShadowBVH.cpp
     FSkinned.cpp
     FTreeVisual.cpp
     FVisual.cpp

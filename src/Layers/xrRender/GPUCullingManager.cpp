@@ -1,6 +1,7 @@
 // xrRender/GPUCullingManager.cpp
 #include "stdafx.h"
 #include "GPUCullingManager.h"
+#include "ClusterShadowBVH.h"
 #include "xrCore/Profiler/Profiler.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
@@ -2320,6 +2321,35 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
 
     cmdList->writeBuffer(m_clusterSet.entryBuffer,
         m_clusterEntryData.data(), u64(n) * sizeof(GPUClusterEntry));
+
+    {
+        ClusterBvh bvh;
+        BuildClusterShadowBVH(m_clusterEntryData.data(), n, bvh);
+        m_clusterSet.bvhNodeCount = u32(bvh.nodes.size());
+        nvrhi::BufferDesc desc;
+        desc.debugName = "ClusterCull_ShadowBvhNodes";
+        desc.byteSize = u64(m_clusterSet.bvhNodeCount) * sizeof(ClusterBvhNode);
+        desc.structStride = sizeof(ClusterBvhNode);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        m_clusterSet.bvhNodeBuffer = nvDevice->createBuffer(desc);
+        desc.debugName = "ClusterCull_ShadowBvhIndices";
+        desc.byteSize = u64(bvh.indices.size()) * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        m_clusterSet.bvhIndexBuffer = nvDevice->createBuffer(desc);
+        if (!m_clusterSet.bvhNodeBuffer || !m_clusterSet.bvhIndexBuffer) {
+            Msg("! [GPUCulling] shadow BVH buffer creation failed, disabling cluster path");
+            m_clusterSet = {};
+            return;
+        }
+        cmdList->writeBuffer(m_clusterSet.bvhNodeBuffer, bvh.nodes.data(),
+            u64(m_clusterSet.bvhNodeCount) * sizeof(ClusterBvhNode));
+        cmdList->writeBuffer(m_clusterSet.bvhIndexBuffer, bvh.indices.data(),
+            u64(bvh.indices.size()) * sizeof(u32));
+        Msg("* [GPUCulling] shadow BVH: %u nodes, %u leaves, depth %u (%.1f MB)",
+            m_clusterSet.bvhNodeCount, bvh.leafCount, bvh.maxDepth,
+            (u64(m_clusterSet.bvhNodeCount) * sizeof(ClusterBvhNode) + u64(n) * sizeof(u32)) / (1024.0f * 1024.0f));
+    }
 
     u32 zeroCount[kClusterCountWords] = {};
     cmdList->writeBuffer(m_clusterSet.countBuffer, zeroCount, sizeof(zeroCount));
