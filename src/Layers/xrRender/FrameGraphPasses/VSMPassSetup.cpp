@@ -77,6 +77,10 @@ struct VsmReserveParams {
     Fvector4 levelOrigin[kVSMLevels];
 };
 static_assert(sizeof(VsmReserveParams) == 240, "VsmReserveParams layout is shader-visible");
+static_assert(offsetof(VsmReserveParams, interval) == 80);
+static_assert(offsetof(VsmReserveParams, pivot) == 112);
+static_assert(offsetof(VsmReserveParams, sun) == 128);
+static_assert(offsetof(VsmReserveParams, levelOrigin) == 144);
 
 struct VsmArgsParams {
     u32 capOpaque;
@@ -531,6 +535,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
         string64 nm;
         xr_sprintf(nm, "VSM_Pairs%s", kStreamNames[i]);
         state.pairs[i] = MakeUAVBuffer(nvDevice, nm, u64(kPairCaps[i]) * sizeof(u32) * 2, sizeof(u32) * 2, false);
+        state.pairCapacity[i] = kPairCaps[i];
         nvrhi::BufferDesc desc;
         xr_sprintf(nm, "VSM_PageArgs%s", kStreamNames[i]);
         desc.debugName = nm;
@@ -622,6 +627,32 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
         return false;
     }
     Msg("* [VSM] static atlas %ux%u D16, %u toroidal slots", kVSMAtlasW * kVSMPageSize, kVSMAtlasH * kVSMPageSize, kVSMStaticSlots);
+    return true;
+}
+
+bool EnsurePairCapacity(nvrhi::IDevice* nvDevice, VSMState& state, const VSMDrawConfig& config)
+{
+    nvrhi::BufferHandle buffers[kVSMStreamCount];
+    u32 capacity[kVSMStreamCount];
+    for (u32 i = 0; i < kVSMStreamCount; ++i) {
+        capacity[i] = std::max(state.pairCapacity[i], config.minimumPairCapacity[i]);
+        buffers[i] = state.pairs[i];
+        if (capacity[i] == state.pairCapacity[i])
+            continue;
+        string64 name;
+        xr_sprintf(name, "VSM_Pairs%s", kStreamNames[i]);
+        buffers[i] = MakeUAVBuffer(nvDevice, name, u64(capacity[i]) * sizeof(u32) * 2, sizeof(u32) * 2, false);
+        if (!buffers[i]) {
+            Msg("! [VSM] cannot allocate %u %s pairs for complete coarse coverage", capacity[i], kStreamNames[i]);
+            return false;
+        }
+    }
+    for (u32 i = 0; i < kVSMStreamCount; ++i) {
+        if (capacity[i] != state.pairCapacity[i])
+            Msg("* [VSM] %s pair capacity: %u -> %u", kStreamNames[i], state.pairCapacity[i], capacity[i]);
+        state.pairs[i] = buffers[i];
+        state.pairCapacity[i] = capacity[i];
+    }
     return true;
 }
 
@@ -736,7 +767,7 @@ void LogTelemetry(VSMState& state)
         ps_r_vsm_base, ps_r_vsm_cluster_lod, state.invalidations, state.boltHeld);
     state.boltHeld = 0;
     state.relabels = 0;
-    Msg("[VSM] static: dirty=%u/%u rendered | deferred=%u | wrong=%u refresh=%u overdue=%u | wrong budget=%d refresh budget=%u (floor %d, stretch %.1f, lod bias %u) prime=%u | interval L0=%u L1=%u L2=%u L3=%u L4=%u L5=%u | cache %s",
+    Msg("[VSM] static: dirty=%u/%u rendered | deferred=%u | wrong=%u refresh=%u overdue=%u | fine wrong budget=%d fine refresh budget=%u (floor %d, stretch %.1f, lod bias %u) prime=%u | interval L0=%u L1=%u L2=%u L3=%u L4=%u L5=%u | cache %s",
         state.dirtyPages, state.markPages, state.deferredPages, state.wrongPages, state.refreshPages, state.overduePages, ps_r_vsm_dirty_budget, state.refreshBudget, ps_r_vsm_refresh_budget, state.refreshStretch, state.lodBias, state.primeFrames,
         state.refreshInterval[0], state.refreshInterval[1], state.refreshInterval[2], state.refreshInterval[3], state.refreshInterval[4], state.refreshInterval[5],
         ps_r_vsm_cache ? "on" : "off");
@@ -857,7 +888,7 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
 
     VsmResidParams rp = {};
     float demand = 0.0f;
-    for (u32 L = 0; L < kVSMLevels; ++L)
+    for (u32 L = 0; L + 1 < kVSMLevels; ++L)
         demand += float(state.levelPages[L]) / float(std::max(state.refreshInterval[L], 1u));
     const u32 floorBudget = u32(std::max(ps_r_vsm_refresh_budget, 0));
     state.refreshBudget = std::min(std::max(u32(ceilf(demand * 1.25f)) + 2u, floorBudget), kVSMRefreshBudgetMax);
@@ -955,9 +986,9 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
 
         VsmBinParams bp = {};
         bp.includeAT = ps_r_vsm_at ? 1u : 0u;
-        bp.capOpaque = kVSMPairCapOpaque;
-        bp.capTerrain = kVSMPairCapTerrain;
-        bp.capAT = kVSMPairCapAT;
+        bp.capOpaque = state.pairCapacity[0];
+        bp.capTerrain = state.pairCapacity[1];
+        bp.capAT = state.pairCapacity[2];
         bp.nodeCount = data.config.bvhNodeCount;
         bp.errK = std::max(0.1f, ps_r_vsm_cluster_lod);
         auto binCB = cache.GetOrCreateVolatileCB("VSM", "BinParams", sizeof(VsmBinParams), data.device);
@@ -973,9 +1004,9 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
         }
         rsp.frame = state.frame;
         rsp.maxPages = kVSMDirtyListWords;
-        rsp.capOpaque = kVSMPairCapOpaque;
-        rsp.capTerrain = kVSMPairCapTerrain;
-        rsp.capAT = kVSMPairCapAT;
+        rsp.capOpaque = state.pairCapacity[0];
+        rsp.capTerrain = state.pairCapacity[1];
+        rsp.capAT = state.pairCapacity[2];
         rsp.pivot.set(state.pivot.x, state.pivot.y, state.pivot.z, 0.0f);
         rsp.sun.set(state.sunDir.x, state.sunDir.y, state.sunDir.z, 0.0f);
         auto reserveCB = cache.GetOrCreateVolatileCB("VSM", "ReserveParams", sizeof(VsmReserveParams), data.device, 16);
@@ -983,9 +1014,13 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
 
         cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::UnorderedAccess);
         cmdList->setBufferState(state.binArgs, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.candList, nvrhi::ResourceStates::UnorderedAccess);
+        auto residCB = cache.GetOrCreateVolatileCB("VSM", "ResidParams", sizeof(VsmResidParams), data.device);
         BindingSetBuilder pbs(*prepRefl, nvDevice, "VSM.BinPrep");
-        pbs.BufferUAV("g_Counters", state.drawClear)
-           .BufferUAV("g_BinArgs", state.binArgs);
+        pbs.ConstantBuffer("VsmResidParams", residCB)
+           .BufferUAV("g_Counters", state.drawClear)
+           .BufferUAV("g_BinArgs", state.binArgs)
+           .BufferUAV("g_CandList", state.candList);
         auto prepSet = cache.GetOrCreateBindingSet(pbs.Build(), state.binPrepLayout, nvDevice);
         if (!prepSet)
             return;
@@ -1000,7 +1035,6 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
 
         if (haveEntries) {
             cmdList->setBufferState(state.candList, nvrhi::ResourceStates::ShaderResource);
-            cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::ShaderResource);
             cmdList->setBufferState(state.pageCount, nvrhi::ResourceStates::UnorderedAccess);
             cmdList->setBufferState(data.config.bvhNodeBuffer, nvrhi::ResourceStates::ShaderResource);
             cmdList->setBufferState(data.config.bvhIndexBuffer, nvrhi::ResourceStates::ShaderResource);
@@ -1009,7 +1043,6 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
                .ConstantBuffer("VsmBinParams", binCB)
                .BufferSRV("g_Entries", data.config.entryBuffer)
                .BufferSRV("g_CandList", state.candList)
-               .BufferSRV("g_Counters", state.drawClear)
                .BufferSRV("g_BvhNodes", data.config.bvhNodeBuffer)
                .BufferSRV("g_BvhIndex", data.config.bvhIndexBuffer)
                .BufferUAV("g_PageCount", state.pageCount);
@@ -1096,9 +1129,9 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
     }
 
     VsmArgsParams ap = {};
-    ap.capOpaque = kVSMPairCapOpaque;
-    ap.capTerrain = kVSMPairCapTerrain;
-    ap.capAT = kVSMPairCapAT;
+    ap.capOpaque = state.pairCapacity[0];
+    ap.capTerrain = state.pairCapacity[1];
+    ap.capAT = state.pairCapacity[2];
     auto argsCB = cache.GetOrCreateVolatileCB("VSM", "ArgsParams", sizeof(VsmArgsParams), data.device);
     cmdList->writeBuffer(argsCB, &ap, sizeof(ap));
     for (u32 i = 0; i < kVSMStreamCount; ++i)
@@ -2128,6 +2161,8 @@ VSMOutput setupVSMPasses(
     ProcessReadback(nvDevice, *state);
     if (!EnsureResources(nvDevice, *state))
         return out;
+    if (!EnsurePairCapacity(nvDevice, *state, config))
+        return out;
     if (!EnsureMaskTargets(nvDevice, *state, width, height))
         return out;
     if (state->rasterBias != ps_r_vsm_raster_bias || state->rasterSlope != ps_r_vsm_raster_slope) {
@@ -2267,7 +2302,7 @@ VSMOutput setupVSMPasses(
             data.config = config;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
-            data.candList = passBuilder.read(residData.candList, ResourceState::ShaderResource);
+            data.candList = passBuilder.readWrite(residData.candList, ResourceState::UnorderedAccess);
             data.drawClear = passBuilder.readWrite(residData.drawClear, ResourceState::UnorderedAccess);
             data.dirtyList = passBuilder.write(dirtyHandle, ResourceState::UnorderedAccess);
             for (u32 i = 0; i < kVSMStreamCount; ++i)

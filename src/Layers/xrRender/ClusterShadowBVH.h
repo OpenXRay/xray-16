@@ -31,6 +31,15 @@ struct ClusterBvh {
     u32 leafCount = 0;
 };
 
+struct ClusterShadowCaster {
+    float radius;
+    float selfError;
+    float parentError;
+    u32 stream;
+};
+
 void BuildClusterShadowBVH(const GPUClusterEntry* entries, u32 count, ClusterBvh& out);
+bool ClusterShadowPairCapacity(const xr_vector<ClusterShadowCaster>& casters,
+    float pageWidth, float errorThreshold, u32 pagesAxis, u32* capacity);
 
 }

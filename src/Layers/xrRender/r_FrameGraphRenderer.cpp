@@ -1392,10 +1392,15 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             vsmCfg.megaVertexBuffer = clusterConfig.megaVertexBuffer;
             vsmCfg.megaIndexBuffer = clusterConfig.megaIndexBuffer;
             vsmCfg.materialCache = m_materialCache.get();
-            auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, vsmCfg,
-                width, height, &vsmState, m_gpuProfiler.get());
-            vsmMaskHandle = vsmOut.mask;
-            vsmPassesActive = vsmOut.active;
+            const float coarseExtent = vsmState.params.level[passes::kVSMLevels - 1].z;
+            if (m_gpuCullingManager->GetShadowPairCapacity(coarseExtent / float(passes::kVSMPagesAxis),
+                coarseExtent / float(passes::kVSMVirtualRes) * std::max(0.1f, ps_r_vsm_cluster_lod),
+                passes::kVSMPagesAxis, vsmCfg.minimumPairCapacity)) {
+                auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, vsmCfg,
+                    width, height, &vsmState, m_gpuProfiler.get());
+                vsmMaskHandle = vsmOut.mask;
+                vsmPassesActive = vsmOut.active;
+            }
         }
     }
 

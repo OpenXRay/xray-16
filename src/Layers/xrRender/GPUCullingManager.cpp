@@ -2351,6 +2351,20 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
             (u64(m_clusterSet.bvhNodeCount) * sizeof(ClusterBvhNode) + u64(n) * sizeof(u32)) / (1024.0f * 1024.0f));
     }
 
+    m_clusterSet.shadowCasters.clear();
+    m_clusterSet.shadowCasters.reserve(n);
+    m_clusterSet.shadowCapacityWidth = 0.0f;
+    for (const GPUClusterEntry& e : m_clusterEntryData) {
+        const bool plain = (e.flags & GPU_CLUSTER_ENTRY_PLAIN) != 0;
+        ClusterShadowCaster caster;
+        caster.radius = float(std::sqrt(double(e.extent.x) * e.extent.x
+            + double(e.extent.y) * e.extent.y + double(e.extent.z) * e.extent.z));
+        caster.selfError = plain ? 0.0f : e.selfError;
+        caster.parentError = plain ? 1e30f : e.parentError;
+        caster.stream = (e.flags & GPU_CLUSTER_ENTRY_AT) ? 2u : ((e.flags & GPU_CLUSTER_ENTRY_TERRAIN) ? 1u : 0u);
+        m_clusterSet.shadowCasters.push_back(caster);
+    }
+
     u32 zeroCount[kClusterCountWords] = {};
     cmdList->writeBuffer(m_clusterSet.countBuffer, zeroCount, sizeof(zeroCount));
     u32 zeroArgs[4] = { 384, 0, 0, 0 };
@@ -2365,6 +2379,25 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
 
     Msg("* [GPUCulling] cluster entry buffers uploaded: %u entries (%.1f MB)",
         n, (u64(n) * (sizeof(GPUClusterEntry) + 2 * sizeof(u32))) / (1024.0f * 1024.0f));
+}
+
+bool GPUCullingManager::GetShadowPairCapacity(float pageWidth, float errorThreshold, u32 pagesAxis, u32* capacity)
+{
+    auto& state = m_clusterSet;
+    if (state.shadowCapacityWidth != pageWidth || state.shadowCapacityError != errorThreshold || state.shadowCapacityAxis != pagesAxis) {
+        state.shadowCapacityWidth = pageWidth;
+        state.shadowCapacityError = errorThreshold;
+        state.shadowCapacityAxis = pagesAxis;
+        state.shadowCapacityValid = ClusterShadowPairCapacity(state.shadowCasters,
+            pageWidth, errorThreshold, pagesAxis, state.shadowCapacity);
+        if (!state.shadowCapacityValid)
+            Msg("! [GPUCulling] shadow pair capacity exceeds the supported draw range");
+    }
+    if (!state.shadowCapacityValid)
+        return false;
+    for (u32 i = 0; i < 3; ++i)
+        capacity[i] = state.shadowCapacity[i];
+    return true;
 }
 
 struct ClusterCullParamsCB {

@@ -45,7 +45,13 @@ void main(uint3 dtID : SV_DispatchThreadID)
         L = Lb;
     }
 
-    uint idx = uint(vsmPageIndex(L, page));
-    uint prev;
-    InterlockedOr(g_Needed[idx], 1u, prev);
+    for (int level = L; level < VSM_LEVELS; ++level)
+    {
+        float2 t = (lp.xy - vsm_level[level].xy) / vsm_level[level].z;
+        if (any(t < 0.0) || any(t >= 1.0))
+            continue;
+        int2 p = int2(floor(t * float(VSM_PAGES_AXIS)));
+        uint prev;
+        InterlockedOr(g_Needed[vsmPageIndex(level, p)], 1u, prev);
+    }
 }
