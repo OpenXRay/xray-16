@@ -390,6 +390,9 @@ public:
     u32 GetClusterEntryCapacity() const { return m_clusterSet.entryCount + kDynamicClusterEntryCapacity; }
     nvrhi::IBuffer* GetDynamicPrevWorldBuffer() const { return m_dynamicPrevWorldBuffer.Get(); }
     nvrhi::IBuffer* GetClusterEntryBuffer() const { return m_clusterSet.entryBuffer.Get(); }
+    nvrhi::IBuffer* GetShadowBvhNodeBuffer() const { return m_clusterSet.bvhNodeBuffer.Get(); }
+    nvrhi::IBuffer* GetShadowBvhIndexBuffer() const { return m_clusterSet.bvhIndexBuffer.Get(); }
+    u32 GetShadowBvhNodeCount() const { return m_clusterSet.bvhNodeCount; }
     nvrhi::IBuffer* GetClusterVisibleEntryBuffer() const { return m_clusterSet.visibleEntryBuffer.Get(); }
     nvrhi::IBuffer* GetClusterArgsBuffer() const { return m_clusterArgsBuffer.Get(); }
     nvrhi::IBuffer* GetClusterFadeBuffer() const { return m_clusterSet.fadeBuffer.Get(); }
@@ -443,6 +446,9 @@ private:
         nvrhi::BufferHandle fadeBuffer2;
         nvrhi::BufferHandle terrainVisibleEntryBuffer2;
         nvrhi::BufferHandle terrainFadeBuffer2;
+        nvrhi::BufferHandle bvhNodeBuffer;
+        nvrhi::BufferHandle bvhIndexBuffer;
+        u32 bvhNodeCount = 0;
         u32 entryCount = 0;
         u32 dynamicEntryCount = 0;
         u32 dynamicResidualCount = 0;

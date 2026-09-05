@@ -706,7 +706,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.vsmWrongPages = vsm.wrongPages;
             stats.vsmBinDraws = vsm.binDraws;
             stats.vsmBinInstances = vsm.binInstances;
-            stats.vsmBinMaxPages = vsm.binMaxPages;
+            stats.vsmBinMaxVisited = vsm.binMaxVisited;
             stats.vsmBinLodCulled = vsm.binLodCulled;
             stats.vsmBinDrops = vsm.binDrops;
             for (u32 L = 0; L < passes::kVSMLevels; ++L)
@@ -1384,6 +1384,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             passes::VSMDrawConfig vsmCfg;
             vsmCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
             vsmCfg.entryCount = m_gpuCullingManager->GetClusterEntryCount();
+            vsmCfg.bvhNodeBuffer = m_gpuCullingManager->GetShadowBvhNodeBuffer();
+            vsmCfg.bvhIndexBuffer = m_gpuCullingManager->GetShadowBvhIndexBuffer();
+            vsmCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
             vsmCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
             vsmCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
             vsmCfg.megaVertexBuffer = clusterConfig.megaVertexBuffer;
