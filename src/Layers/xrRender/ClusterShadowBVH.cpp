@@ -242,4 +242,28 @@ void BuildClusterShadowBVH(const GPUClusterEntry* entries, u32 count, ClusterBvh
         out.indices[i] = prims[i].entry;
 }
 
+bool ClusterShadowPairCapacity(const xr_vector<ClusterShadowCaster>& casters,
+    float pageWidth, float errorThreshold, u32 pagesAxis, u32* capacity)
+{
+    if (!(pageWidth > 0.0f) || pagesAxis == 0)
+        return false;
+    u64 required[3] = {};
+    for (const ClusterShadowCaster& caster : casters) {
+        u64& pairs = required[caster.stream];
+        ++pairs;
+        if (caster.selfError > errorThreshold || caster.parentError <= errorThreshold)
+            continue;
+        const double span = 2.0 * double(caster.radius) / double(pageWidth);
+        const u64 cells = u64(std::min(std::ceil(span) + 2.0, double(pagesAxis)));
+        pairs += cells * cells;
+    }
+    for (u32 i = 0; i < 3; ++i) {
+        if (required[i] > UINT32_MAX)
+            return false;
+    }
+    for (u32 i = 0; i < 3; ++i)
+        capacity[i] = u32(required[i]);
+    return true;
+}
+
 }

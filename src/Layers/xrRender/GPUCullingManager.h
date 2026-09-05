@@ -8,6 +8,7 @@
 #include "Layers/xrRender/Bindless/UnifiedVertex.h"
 #include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
 #include "Layers/xrRender/ClusterDAG.h"
+#include "Layers/xrRender/ClusterShadowBVH.h"
 
 namespace xray::render::fg::passes {
     struct ParticleBatch;
@@ -393,6 +394,7 @@ public:
     nvrhi::IBuffer* GetShadowBvhNodeBuffer() const { return m_clusterSet.bvhNodeBuffer.Get(); }
     nvrhi::IBuffer* GetShadowBvhIndexBuffer() const { return m_clusterSet.bvhIndexBuffer.Get(); }
     u32 GetShadowBvhNodeCount() const { return m_clusterSet.bvhNodeCount; }
+    bool GetShadowPairCapacity(float pageWidth, float errorThreshold, u32 pagesAxis, u32* capacity);
     nvrhi::IBuffer* GetClusterVisibleEntryBuffer() const { return m_clusterSet.visibleEntryBuffer.Get(); }
     nvrhi::IBuffer* GetClusterArgsBuffer() const { return m_clusterArgsBuffer.Get(); }
     nvrhi::IBuffer* GetClusterFadeBuffer() const { return m_clusterSet.fadeBuffer.Get(); }
@@ -449,6 +451,12 @@ private:
         nvrhi::BufferHandle bvhNodeBuffer;
         nvrhi::BufferHandle bvhIndexBuffer;
         u32 bvhNodeCount = 0;
+        xr_vector<ClusterShadowCaster> shadowCasters;
+        float shadowCapacityWidth = 0.0f;
+        float shadowCapacityError = 0.0f;
+        u32 shadowCapacityAxis = 0;
+        u32 shadowCapacity[3] = {};
+        bool shadowCapacityValid = false;
         u32 entryCount = 0;
         u32 dynamicEntryCount = 0;
         u32 dynamicResidualCount = 0;

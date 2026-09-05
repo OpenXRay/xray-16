@@ -153,6 +153,7 @@ struct VSMState {
     nvrhi::BufferHandle pageCount;
     nvrhi::BufferHandle pairBase;
     nvrhi::BufferHandle pairs[kVSMStreamCount];
+    u32 pairCapacity[kVSMStreamCount] = {};
     nvrhi::BufferHandle pageArgs[kVSMStreamCount];
     nvrhi::BufferHandle readback[kReadbackSlots];
     u32 readbackWrite = 0;
@@ -235,6 +236,7 @@ struct VSMDrawConfig {
     nvrhi::IBuffer* bvhNodeBuffer = nullptr;
     nvrhi::IBuffer* bvhIndexBuffer = nullptr;
     u32 bvhNodeCount = 0;
+    u32 minimumPairCapacity[kVSMStreamCount] = {};
     nvrhi::IBuffer* staticInstanceBuffer = nullptr;
     nvrhi::IBuffer* terrainInstanceBuffer = nullptr;
     nvrhi::IBuffer* megaVertexBuffer = nullptr;

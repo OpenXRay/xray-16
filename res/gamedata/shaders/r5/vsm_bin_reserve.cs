@@ -12,7 +12,9 @@ cbuffer VsmReserveParams : register(b5)
     uint g_CapOpaque;
     uint g_CapTerrain;
     uint g_CapAT;
-    uint3 g_ReservePad;
+    uint g_ReservePad0;
+    uint g_ReservePad1;
+    uint g_ReservePad2;
     uint4 g_Interval[2];
     float4 g_Pivot;
     float4 g_Sun;
@@ -108,9 +110,7 @@ void publishPage(uint index, uint4 cand, uint3 base)
 void main(uint3 gtID : SV_GroupThreadID)
 {
     uint t = gtID.x;
-    uint cw = g_Counters.Load(8);
-    uint cr = g_Counters.Load(12);
-    uint n = cw + cr;
+    uint n = g_Counters.Load(8);
 
     if (t == 0u)
     {
@@ -144,7 +144,7 @@ void main(uint3 gtID : SV_GroupThreadID)
         }
         if (fits)
         {
-            uint4 cand = g_CandList[(g < cw) ? g : (uint(VSM_MAX_PHYS_S) + g - cw)];
+            uint4 cand = g_CandList[g];
             publishPage(g, cand, pre - cnt);
             uint d;
             InterlockedAdd(gs_accepted, 1u, d);
@@ -167,7 +167,7 @@ void main(uint3 gtID : SV_GroupThreadID)
     if (t == 0u)
     {
         uint k = gs_accepted;
-        g_Counters.Store(4, k);
+        g_Counters.Store4(0, uint4(6u, k, 0u, 0u));
         g_Counters.Store(28, n - k);
         g_Stats[4] = gs_total[0];
         g_Stats[5] = gs_total[1];

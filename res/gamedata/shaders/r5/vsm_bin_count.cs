@@ -18,7 +18,6 @@ cbuffer VsmBinParams : register(b5)
 
 StructuredBuffer<ClusterEntry> g_Entries : register(t0);
 StructuredBuffer<uint4> g_CandList : register(t1);
-ByteAddressBuffer g_Counters : register(t2);
 RWStructuredBuffer<uint4> g_PageCount : register(u0);
 
 groupshared uint gs_count[3];
@@ -49,9 +48,8 @@ void main(uint3 gID : SV_GroupID, uint3 gtID : SV_GroupThreadID)
         gs_count[t] = 0u;
     GroupMemoryBarrierWithGroupSync();
 
-    uint cw = g_Counters.Load(8);
     uint g = gID.x;
-    uint4 cand = (g < cw) ? g_CandList[g] : g_CandList[uint(VSM_MAX_PHYS_S) + (g - cw)];
+    uint4 cand = g_CandList[g];
 
     uint vp = min(cand.y, uint(VSM_PAGE_COUNT - 1));
     int L = int(vp) / VSM_PAGES_PER_LVL;
