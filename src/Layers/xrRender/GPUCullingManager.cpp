@@ -940,6 +940,7 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
                     for (u32 i0 = 0; i0 < args.indexCountPerInstance; i0 += SKINNED_ENTRY_INDICES) {
                         GPUClusterEntry e = {};
                         e.sphere.set(bucket.records[i].bounds.x, bucket.records[i].bounds.y, bucket.records[i].bounds.z, bucket.records[i].bounds.w);
+                        e.extent.set(bucket.records[i].bounds.w, bucket.records[i].bounds.w, bucket.records[i].bounds.w, 0.0f);
                         e.indexCount = std::min(SKINNED_ENTRY_INDICES, args.indexCountPerInstance - i0);
                         e.ibFirst = ibBase + i0;
                         e.firstVertex = vertexTotal;
@@ -1997,6 +1998,11 @@ static void EmitClusterEntry(const ClusterDAG& dag, u32 megaBase, const ClusterM
 
     world.transform_tiny(c, Fvector().set(p.sphere[0], p.sphere[1], p.sphere[2]));
     e.sphere.set(c.x, c.y, c.z, p.sphere[3] * scale);
+    e.extent.set(
+        _abs(world.i.x) * p.extent[0] + _abs(world.j.x) * p.extent[1] + _abs(world.k.x) * p.extent[2],
+        _abs(world.i.y) * p.extent[0] + _abs(world.j.y) * p.extent[1] + _abs(world.k.y) * p.extent[2],
+        _abs(world.i.z) * p.extent[0] + _abs(world.j.z) * p.extent[1] + _abs(world.k.z) * p.extent[2],
+        0.0f);
     world.transform_tiny(c, Fvector().set(p.lodSelf[0], p.lodSelf[1], p.lodSelf[2]));
     e.lodSelf.set(c.x, c.y, c.z, p.lodSelf[3] * scale);
     world.transform_tiny(c, Fvector().set(p.lodParent[0], p.lodParent[1], p.lodParent[2]));
