@@ -66,8 +66,9 @@ struct GPUClusterEntry {
     u32 flags;
     float selfError;
     float parentError;
+    Fvector4 extent;
 };
-static_assert(sizeof(GPUClusterEntry) == 80, "GPUClusterEntry must be 80 bytes");
+static_assert(sizeof(GPUClusterEntry) == 96, "GPUClusterEntry must be 96 bytes");
 
 enum GPUClusterEntryFlags : u32 {
     GPU_CLUSTER_ENTRY_AT      = 0x1,

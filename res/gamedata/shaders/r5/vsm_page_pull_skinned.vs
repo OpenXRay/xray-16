@@ -16,6 +16,8 @@ struct ClusterEntry
     uint flags;
     float selfError;
     float parentError;
+    float3 extent;
+    float extentPad;
 };
 
 StructuredBuffer<uint2> g_Pairs : register(t15);

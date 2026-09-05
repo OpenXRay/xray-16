@@ -15,6 +15,8 @@ struct ClusterEntry
     uint flags;
     float selfError;
     float parentError;
+    float3 extent;
+    float extentPad;
 };
 
 cbuffer ClusterCullParams : register(b5)

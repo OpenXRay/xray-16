@@ -23,6 +23,7 @@ struct ClusterMetaProto {
     float sphere[4];
     float lodSelf[4];
     float lodParent[4];
+    float extent[3];
     u32 indexCount;
     u32 ibFirst;
     u32 depth;
@@ -34,7 +35,7 @@ struct ClusterMetaProto {
 };
 #pragma pack(pop)
 
-static_assert(sizeof(ClusterMetaProto) == 80, "ClusterMetaProto layout is cache-serialized");
+static_assert(sizeof(ClusterMetaProto) == 92, "ClusterMetaProto layout is cache-serialized");
 
 constexpr u32 CLUSTER_PROTO_FLAG_AT = 1u << 0;
 constexpr u32 CLUSTER_PROTO_FLAG_TERRAIN = 1u << 1;
