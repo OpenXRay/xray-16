@@ -63,6 +63,21 @@ struct VsmBinParams {
     u32 pad[2];
 };
 
+struct VsmReserveParams {
+    s32 pageBase[12];
+    u32 frame;
+    u32 maxPages;
+    u32 capOpaque;
+    u32 capTerrain;
+    u32 capAT;
+    u32 pad[3];
+    u32 interval[8];
+    Fvector4 pivot;
+    Fvector4 sun;
+    Fvector4 levelOrigin[kVSMLevels];
+};
+static_assert(sizeof(VsmReserveParams) == 240, "VsmReserveParams layout is shader-visible");
+
 struct VsmArgsParams {
     u32 capOpaque;
     u32 capTerrain;
@@ -139,7 +154,7 @@ struct VSMMarkData {
 
 struct VSMResidData {
     VirtualResourceHandle needed;
-    VirtualResourceHandle dirtyList;
+    VirtualResourceHandle candList;
     VirtualResourceHandle drawClear;
     VSMState* state;
     fg::RenderDevice* device;
@@ -147,7 +162,9 @@ struct VSMResidData {
 };
 
 struct VSMBinData {
+    VirtualResourceHandle candList;
     VirtualResourceHandle dirtyList;
+    VirtualResourceHandle drawClear;
     VirtualResourceHandle pageArgs[kVSMStreamCount];
     VSMState* state;
     fg::RenderDevice* device;
@@ -235,7 +252,8 @@ nvrhi::IBuffer* VsmParamsCB(fg::RenderDevice* device)
 bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
 {
     if (state.markPipeline && state.residPipeline && state.debugPipeline && state.clearPipeline
-        && state.binPrepPipeline && state.binPipeline && state.argsPipeline && state.pagePipeline && state.pageATPipeline && state.resolvePipeline
+        && state.binPrepPipeline && state.binCountPipeline && state.binReservePipeline
+        && state.binPipeline && state.argsPipeline && state.pagePipeline && state.pageATPipeline && state.resolvePipeline
         && state.allocPipeline && state.dynBinPipeline && state.dynArgsPipeline && state.touchPipeline)
         return true;
     if (state.pipelinesFailed)
@@ -252,6 +270,8 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     auto clearVsResult = shaderLoader->LoadVertexShader("vsm_clear", "main");
     auto clearPsResult = shaderLoader->LoadPixelShader("vsm_clear", "main");
     auto binPrepResult = shaderLoader->LoadComputeShader("vsm_bin_prep");
+    auto binCountResult = shaderLoader->LoadComputeShader("vsm_bin_count");
+    auto binReserveResult = shaderLoader->LoadComputeShader("vsm_bin_reserve");
     auto binResult = shaderLoader->LoadComputeShader("vsm_bin_cluster");
     auto argsResult = shaderLoader->LoadComputeShader("vsm_draw_args");
     auto pageVsResult = shaderLoader->LoadVertexShader("vsm_page_pull", "main");
@@ -277,6 +297,8 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
         || !debugResult.handle || !debugResult.reflection || !clearVsResult.handle || !clearVsResult.reflection
         || !clearPsResult.handle || !clearPsResult.reflection || !binResult.handle || !binResult.reflection
         || !binPrepResult.handle || !binPrepResult.reflection
+        || !binCountResult.handle || !binCountResult.reflection
+        || !binReserveResult.handle || !binReserveResult.reflection
         || !argsResult.handle || !argsResult.reflection || !pageVsResult.handle || !pageVsResult.reflection
         || !pagePsResult.handle || !pagePsResult.reflection || !pageATPsResult.handle || !pageATPsResult.reflection) {
         Msg("! [VSM] shaders failed to load");
@@ -293,6 +315,8 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     state.debugLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDebugView", *debugResult.reflection, nvDevice);
     state.clearLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMClear", *clearVsResult.reflection, *clearPsResult.reflection, nvDevice);
     state.binPrepLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBinPrep", *binPrepResult.reflection, nvDevice);
+    state.binCountLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBinCount", *binCountResult.reflection, nvDevice);
+    state.binReserveLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBinReserve", *binReserveResult.reflection, nvDevice);
     state.binLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBin", *binResult.reflection, nvDevice);
     state.argsLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMArgs", *argsResult.reflection, nvDevice);
     state.pageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMPage", *pageVsResult.reflection, *pagePsResult.reflection, nvDevice);
@@ -303,7 +327,7 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     state.dynArgsLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynArgs", *dynArgsResult.reflection, nvDevice);
     state.touchLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynTouch", *touchResult.reflection, nvDevice);
     if (!state.markLayout || !state.residLayout || !state.debugLayout || !state.clearLayout
-        || !state.binPrepLayout || !state.binLayout || !state.argsLayout || !state.pageLayout || !state.pageATLayout || !state.resolveLayout
+        || !state.binPrepLayout || !state.binCountLayout || !state.binReserveLayout || !state.binLayout || !state.argsLayout || !state.pageLayout || !state.pageATLayout || !state.resolveLayout
         || !state.allocLayout || !state.dynBinLayout || !state.dynArgsLayout || !state.touchLayout
         ) {
         state.pipelinesFailed = true;
@@ -344,6 +368,16 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     binPrepDesc.CS = binPrepResult.handle;
     binPrepDesc.bindingLayouts = { state.binPrepLayout };
     state.binPrepPipeline = cache.GetOrCreateComputePipeline("VSMBinPrep", binPrepDesc, nvDevice);
+
+    nvrhi::ComputePipelineDesc binCountDesc;
+    binCountDesc.CS = binCountResult.handle;
+    binCountDesc.bindingLayouts = { state.binCountLayout };
+    state.binCountPipeline = cache.GetOrCreateComputePipeline("VSMBinCount", binCountDesc, nvDevice);
+
+    nvrhi::ComputePipelineDesc binReserveDesc;
+    binReserveDesc.CS = binReserveResult.handle;
+    binReserveDesc.bindingLayouts = { state.binReserveLayout };
+    state.binReservePipeline = cache.GetOrCreateComputePipeline("VSMBinReserve", binReserveDesc, nvDevice);
 
     nvrhi::ComputePipelineDesc binDesc;
     binDesc.CS = binResult.handle;
@@ -409,7 +443,8 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     state.pageATPipeline = cache.GetOrCreatePipeline(name, makePageDesc(state.pageATPS, state.pageATLayout, true), fbInfo, nvDevice);
 
     if (!state.markPipeline || !state.residPipeline || !state.debugPipeline || !state.clearPipeline
-        || !state.binPrepPipeline || !state.binPipeline || !state.argsPipeline || !state.pagePipeline || !state.pageATPipeline || !state.resolvePipeline
+        || !state.binPrepPipeline || !state.binCountPipeline || !state.binReservePipeline
+        || !state.binPipeline || !state.argsPipeline || !state.pagePipeline || !state.pageATPipeline || !state.resolvePipeline
         || !state.allocPipeline || !state.dynBinPipeline || !state.dynArgsPipeline) {
         Msg("! [VSM] pipeline creation failed");
         state.pipelinesFailed = true;
@@ -476,6 +511,9 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
         state.dynClearArgs = nvDevice->createBuffer(desc);
     }
     state.binStats = MakeUAVBuffer(nvDevice, "VSM_BinStats", sizeof(u32) * 8, sizeof(u32), false);
+    state.candList = MakeUAVBuffer(nvDevice, "VSM_CandList", u64(2) * kVSMDirtyListWords * sizeof(u32) * 4, sizeof(u32) * 4, false);
+    state.pageCount = MakeUAVBuffer(nvDevice, "VSM_PageCount", u64(kVSMDirtyListWords) * sizeof(u32) * 4, sizeof(u32) * 4, false);
+    state.pairBase = MakeUAVBuffer(nvDevice, "VSM_PairBase", u64(kVSMDirtyListWords) * sizeof(u32) * 4, sizeof(u32) * 4, false);
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "VSM_BinArgs";
@@ -486,6 +524,8 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = true;
         state.binArgs = nvDevice->createBuffer(desc);
+        desc.debugName = "VSM_EmitArgs";
+        state.emitArgs = nvDevice->createBuffer(desc);
     }
     for (u32 i = 0; i < kVSMStreamCount; ++i) {
         string64 nm;
@@ -574,7 +614,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, VSMState& state)
 
     if (!state.needed || !state.dynClearArgs || !state.pageTable || !state.pageList || !state.physTile
         || !state.slotDirty || !state.dirtyList || !state.drawClear || !state.slotFrame || !state.slotPivot || !state.slotSun || !state.atlas || !state.binStats
-        || !state.binArgs
+        || !state.binArgs || !state.emitArgs || !state.candList || !state.pageCount || !state.pairBase
         || !state.dynPageTable || !state.dynPageList || !state.dynAllocInfo || !state.dynAtlas || !state.dynStats || !state.hudMap) {
         Msg("! [VSM] resource creation failed");
         state.needed = nullptr;
@@ -632,6 +672,7 @@ void ProcessReadback(nvrhi::IDevice* nvDevice, VSMState& state)
     }
     state.markPages = total;
     state.dirtyPages = std::min(words[1], kVSMStaticSlots);
+    state.deferredPages = std::min(words[7], 2u * kVSMStaticSlots);
     state.wrongPages = std::min(words[4], kVSMStaticSlots);
     state.refreshPages = std::min(words[5], kVSMStaticSlots);
     state.overduePages = std::min(words[6], kVSMStaticSlots);
@@ -695,8 +736,8 @@ void LogTelemetry(VSMState& state)
         ps_r_vsm_base, ps_r_vsm_cluster_lod, state.invalidations, state.boltHeld);
     state.boltHeld = 0;
     state.relabels = 0;
-    Msg("[VSM] static: dirty=%u/%u rendered | wrong=%u refresh=%u overdue=%u | wrong budget=%d refresh budget=%u (floor %d, stretch %.1f, lod bias %u) prime=%u | interval L0=%u L1=%u L2=%u L3=%u L4=%u L5=%u | cache %s",
-        state.dirtyPages, state.markPages, state.wrongPages, state.refreshPages, state.overduePages, ps_r_vsm_dirty_budget, state.refreshBudget, ps_r_vsm_refresh_budget, state.refreshStretch, state.lodBias, state.primeFrames,
+    Msg("[VSM] static: dirty=%u/%u rendered | deferred=%u | wrong=%u refresh=%u overdue=%u | wrong budget=%d refresh budget=%u (floor %d, stretch %.1f, lod bias %u) prime=%u | interval L0=%u L1=%u L2=%u L3=%u L4=%u L5=%u | cache %s",
+        state.dirtyPages, state.markPages, state.deferredPages, state.wrongPages, state.refreshPages, state.overduePages, ps_r_vsm_dirty_budget, state.refreshBudget, ps_r_vsm_refresh_budget, state.refreshStretch, state.lodBias, state.primeFrames,
         state.refreshInterval[0], state.refreshInterval[1], state.refreshInterval[2], state.refreshInterval[3], state.refreshInterval[4], state.refreshInterval[5],
         ps_r_vsm_cache ? "on" : "off");
     Msg("[VSM] bin: pages=%u pairs=%u maxVisited=%u drops=%u | k=%.2f at=%d",
@@ -839,6 +880,7 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
         rp.pageBase[2 * L + 1] = state.pageBase[L][1] + state.tileBias[L][1];
         const float stretched = float(state.refreshInterval[L]) * state.refreshStretch;
         rp.interval[L] = stretched >= float(kVSMRefreshIntervalMax) ? kVSMRefreshIntervalMax : u32(stretched);
+        state.stretchedInterval[L] = rp.interval[L];
     }
     rp.frame = state.frame;
     rp.refreshBudget = state.refreshBudget;
@@ -858,11 +900,9 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
     cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.physTile, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(state.candList, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.slotFrame, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::UnorderedAccess);
 
     BindingSetBuilder bsb(*refl, nvDevice, "VSM.Resid");
     bsb.ConstantBuffer("VsmResidParams", residCB)
@@ -871,11 +911,9 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
        .BufferUAV("g_PageList", state.pageList)
        .BufferUAV("g_PhysTile", state.physTile)
        .BufferUAV("g_SlotDirty", state.slotDirty)
-       .BufferUAV("g_DirtyList", state.dirtyList)
+       .BufferUAV("g_CandList", state.candList)
        .BufferUAV("g_Counters", state.drawClear)
-       .BufferUAV("g_SlotFrame", state.slotFrame)
-       .BufferUAV("g_SlotPivot", state.slotPivot)
-       .BufferUAV("g_SlotSun", state.slotSun);
+       .BufferUAV("g_SlotFrame", state.slotFrame);
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.residLayout, nvDevice);
     if (!bindingSet)
         return;
@@ -885,14 +923,6 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
     cs.bindings = { bindingSet };
     cmdList->setComputeState(cs);
     cmdList->dispatch((kVSMPageCount + 63) / 64, 1, 1);
-
-    cmdList->setBufferState(state.pageTable, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::ShaderResource);
 }
 
 void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
@@ -900,15 +930,18 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
     VSMState& state = *data.state;
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
-    if (!cmdList || !nvDevice || !state.binPrepPipeline || !state.binPipeline || !state.argsPipeline)
+    if (!cmdList || !nvDevice || !state.binPrepPipeline || !state.binCountPipeline
+        || !state.binReservePipeline || !state.binPipeline || !state.argsPipeline)
         return;
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     auto* prepRefl = shaderLoader->GetCachedReflection("vsm_bin_prep", ".cs");
+    auto* countRefl = shaderLoader->GetCachedReflection("vsm_bin_count", ".cs");
+    auto* reserveRefl = shaderLoader->GetCachedReflection("vsm_bin_reserve", ".cs");
     auto* binRefl = shaderLoader->GetCachedReflection("vsm_bin_cluster", ".cs");
     auto* argsRefl = shaderLoader->GetCachedReflection("vsm_draw_args", ".cs");
-    if (!prepRefl || !binRefl || !argsRefl)
+    if (!prepRefl || !countRefl || !reserveRefl || !binRefl || !argsRefl)
         return;
 
     cmdList->setBufferState(state.binStats, nvrhi::ResourceStates::UnorderedAccess);
@@ -917,22 +950,46 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
 
     const bool haveEntries = data.config.entryBuffer && data.config.entryCount > 0
         && data.config.bvhNodeBuffer && data.config.bvhIndexBuffer && data.config.bvhNodeCount > 0;
-    if (haveEntries) {
+    {
         auto vsmCB = VsmParamsCB(data.device);
-        const float errK = std::max(0.1f, ps_r_vsm_cluster_lod);
 
-        cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::ShaderResource);
+        VsmBinParams bp = {};
+        bp.includeAT = ps_r_vsm_at ? 1u : 0u;
+        bp.capOpaque = kVSMPairCapOpaque;
+        bp.capTerrain = kVSMPairCapTerrain;
+        bp.capAT = kVSMPairCapAT;
+        bp.nodeCount = data.config.bvhNodeCount;
+        bp.errK = std::max(0.1f, ps_r_vsm_cluster_lod);
+        auto binCB = cache.GetOrCreateVolatileCB("VSM", "BinParams", sizeof(VsmBinParams), data.device);
+        cmdList->writeBuffer(binCB, &bp, sizeof(bp));
+
+        VsmReserveParams rsp = {};
+        for (u32 L = 0; L < kVSMLevels; ++L) {
+            rsp.pageBase[2 * L] = state.pageBase[L][0] + state.tileBias[L][0];
+            rsp.pageBase[2 * L + 1] = state.pageBase[L][1] + state.tileBias[L][1];
+            rsp.interval[L] = state.stretchedInterval[L];
+            rsp.levelOrigin[L].set(state.params.level[L].x, state.params.level[L].y,
+                state.params.level[L].z / float(kVSMPagesAxis), 0.0f);
+        }
+        rsp.frame = state.frame;
+        rsp.maxPages = kVSMDirtyListWords;
+        rsp.capOpaque = kVSMPairCapOpaque;
+        rsp.capTerrain = kVSMPairCapTerrain;
+        rsp.capAT = kVSMPairCapAT;
+        rsp.pivot.set(state.pivot.x, state.pivot.y, state.pivot.z, 0.0f);
+        rsp.sun.set(state.sunDir.x, state.sunDir.y, state.sunDir.z, 0.0f);
+        auto reserveCB = cache.GetOrCreateVolatileCB("VSM", "ReserveParams", sizeof(VsmReserveParams), data.device, 16);
+        cmdList->writeBuffer(reserveCB, &rsp, sizeof(rsp));
+
+        cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::UnorderedAccess);
         cmdList->setBufferState(state.binArgs, nvrhi::ResourceStates::UnorderedAccess);
-        cmdList->setBufferState(data.config.bvhNodeBuffer, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(data.config.bvhIndexBuffer, nvrhi::ResourceStates::ShaderResource);
-
         BindingSetBuilder pbs(*prepRefl, nvDevice, "VSM.BinPrep");
-        pbs.BufferSRV("g_Counters", state.drawClear)
+        pbs.BufferUAV("g_Counters", state.drawClear)
            .BufferUAV("g_BinArgs", state.binArgs);
         auto prepSet = cache.GetOrCreateBindingSet(pbs.Build(), state.binPrepLayout, nvDevice);
-        if (prepSet) {
+        if (!prepSet)
+            return;
+        {
             nvrhi::ComputeState cs;
             cs.pipeline = state.binPrepPipeline;
             cs.bindings = { prepSet };
@@ -941,36 +998,100 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
         }
         cmdList->setBufferState(state.binArgs, nvrhi::ResourceStates::IndirectArgument);
 
-        VsmBinParams bp = {};
-        bp.includeAT = ps_r_vsm_at ? 1u : 0u;
-        bp.capOpaque = kVSMPairCapOpaque;
-        bp.capTerrain = kVSMPairCapTerrain;
-        bp.capAT = kVSMPairCapAT;
-        bp.nodeCount = data.config.bvhNodeCount;
-        bp.errK = errK;
-        auto binCB = cache.GetOrCreateVolatileCB("VSM", "BinParams", sizeof(VsmBinParams), data.device);
-        cmdList->writeBuffer(binCB, &bp, sizeof(bp));
-
-        BindingSetBuilder bsb(*binRefl, nvDevice, "VSM.Bin");
-        bsb.ConstantBuffer("VsmParams", vsmCB)
-           .ConstantBuffer("VsmBinParams", binCB)
-           .BufferSRV("g_Entries", data.config.entryBuffer)
-           .BufferSRV("g_DirtyList", state.dirtyList)
-           .BufferSRV("g_PageList", state.pageList)
-           .BufferSRV("g_BvhNodes", data.config.bvhNodeBuffer)
-           .BufferSRV("g_BvhIndex", data.config.bvhIndexBuffer)
-           .BufferUAV("g_Stats", state.binStats)
-           .BufferUAV("g_PairsOpaque", state.pairs[0])
-           .BufferUAV("g_PairsTerrain", state.pairs[1])
-           .BufferUAV("g_PairsAT", state.pairs[2]);
-        auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.binLayout, nvDevice);
-        if (bindingSet) {
+        if (haveEntries) {
+            cmdList->setBufferState(state.candList, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(state.pageCount, nvrhi::ResourceStates::UnorderedAccess);
+            cmdList->setBufferState(data.config.bvhNodeBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(data.config.bvhIndexBuffer, nvrhi::ResourceStates::ShaderResource);
+            BindingSetBuilder cbs(*countRefl, nvDevice, "VSM.BinCount");
+            cbs.ConstantBuffer("VsmParams", vsmCB)
+               .ConstantBuffer("VsmBinParams", binCB)
+               .BufferSRV("g_Entries", data.config.entryBuffer)
+               .BufferSRV("g_CandList", state.candList)
+               .BufferSRV("g_Counters", state.drawClear)
+               .BufferSRV("g_BvhNodes", data.config.bvhNodeBuffer)
+               .BufferSRV("g_BvhIndex", data.config.bvhIndexBuffer)
+               .BufferUAV("g_PageCount", state.pageCount);
+            auto countSet = cache.GetOrCreateBindingSet(cbs.Build(), state.binCountLayout, nvDevice);
+            if (!countSet)
+                return;
             nvrhi::ComputeState cs;
-            cs.pipeline = state.binPipeline;
-            cs.bindings = { bindingSet };
+            cs.pipeline = state.binCountPipeline;
+            cs.bindings = { countSet };
             cs.indirectParams = state.binArgs;
             cmdList->setComputeState(cs);
             cmdList->dispatchIndirect(0);
+        } else {
+            cmdList->setBufferState(state.pageCount, nvrhi::ResourceStates::CopyDest);
+            cmdList->clearBufferUInt(state.pageCount, 0);
+        }
+
+        cmdList->setBufferState(state.pageCount, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(state.candList, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.pairBase, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.pageTable, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.physTile, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.slotFrame, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setBufferState(state.emitArgs, nvrhi::ResourceStates::UnorderedAccess);
+        BindingSetBuilder rbs(*reserveRefl, nvDevice, "VSM.BinReserve");
+        rbs.ConstantBuffer("VsmReserveParams", reserveCB)
+           .BufferSRV("g_PageCount", state.pageCount)
+           .BufferSRV("g_CandList", state.candList)
+           .BufferUAV("g_Counters", state.drawClear)
+           .BufferUAV("g_DirtyList", state.dirtyList)
+           .BufferUAV("g_PairBase", state.pairBase)
+           .BufferUAV("g_PageTable", state.pageTable)
+           .BufferUAV("g_PhysTile", state.physTile)
+           .BufferUAV("g_SlotFrame", state.slotFrame)
+           .BufferUAV("g_SlotPivot", state.slotPivot)
+           .BufferUAV("g_SlotSun", state.slotSun)
+           .BufferUAV("g_SlotDirty", state.slotDirty)
+           .BufferUAV("g_Stats", state.binStats)
+           .BufferUAV("g_EmitArgs", state.emitArgs);
+        auto reserveSet = cache.GetOrCreateBindingSet(rbs.Build(), state.binReserveLayout, nvDevice);
+        if (!reserveSet)
+            return;
+        {
+            nvrhi::ComputeState cs;
+            cs.pipeline = state.binReservePipeline;
+            cs.bindings = { reserveSet };
+            cmdList->setComputeState(cs);
+            cmdList->dispatch(1, 1, 1);
+        }
+
+        if (haveEntries) {
+            cmdList->setBufferState(state.emitArgs, nvrhi::ResourceStates::IndirectArgument);
+            cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(state.pairBase, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::ShaderResource);
+            BindingSetBuilder bsb(*binRefl, nvDevice, "VSM.Bin");
+            bsb.ConstantBuffer("VsmParams", vsmCB)
+               .ConstantBuffer("VsmBinParams", binCB)
+               .BufferSRV("g_Entries", data.config.entryBuffer)
+               .BufferSRV("g_DirtyList", state.dirtyList)
+               .BufferSRV("g_PageList", state.pageList)
+               .BufferSRV("g_PairBase", state.pairBase)
+               .BufferSRV("g_BvhNodes", data.config.bvhNodeBuffer)
+               .BufferSRV("g_BvhIndex", data.config.bvhIndexBuffer)
+               .BufferUAV("g_Stats", state.binStats)
+               .BufferUAV("g_PairsOpaque", state.pairs[0])
+               .BufferUAV("g_PairsTerrain", state.pairs[1])
+               .BufferUAV("g_PairsAT", state.pairs[2]);
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.binLayout, nvDevice);
+            if (bindingSet) {
+                nvrhi::ComputeState cs;
+                cs.pipeline = state.binPipeline;
+                cs.bindings = { bindingSet };
+                cs.indirectParams = state.emitArgs;
+                cmdList->setComputeState(cs);
+                cmdList->dispatchIndirect(0);
+            }
         }
     }
 
@@ -1000,6 +1121,12 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
     }
 
     cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.pageTable, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::ShaderResource);
     for (u32 i = 0; i < kVSMStreamCount; ++i) {
         cmdList->setBufferState(state.pageArgs[i], nvrhi::ResourceStates::IndirectArgument);
         cmdList->setBufferState(state.pairs[i], nvrhi::ResourceStates::ShaderResource);
@@ -2079,6 +2206,7 @@ VSMOutput setupVSMPasses(
     };
     VirtualResourceHandle neededHandle = fg.ImportBuffer("vsm_needed", state->needed, bufferDesc("vsm_needed", u64(kVSMPageCount) * sizeof(u32), sizeof(u32)));
     VirtualResourceHandle dirtyHandle = fg.ImportBuffer("vsm_dirty_list", state->dirtyList, bufferDesc("vsm_dirty_list", u64(kVSMDirtyListWords) * sizeof(u32), sizeof(u32)));
+    VirtualResourceHandle candHandle = fg.ImportBuffer("vsm_cand_list", state->candList, bufferDesc("vsm_cand_list", u64(2) * kVSMDirtyListWords * sizeof(u32) * 4, sizeof(u32) * 4));
     VirtualResourceHandle clearHandle = fg.ImportBuffer("vsm_draw_clear", state->drawClear, bufferDesc("vsm_draw_clear", sizeof(u32) * kVSMCounterWords, 0));
     VirtualResourceHandle argsHandles[kVSMStreamCount];
     {
@@ -2118,13 +2246,13 @@ VSMOutput setupVSMPasses(
 
     auto& residData = fg.addCallbackPass<VSMResidData>(
         "VSM Residency",
-        [&, dirtyHandle, clearHandle, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMResidData& data) {
+        [&, candHandle, clearHandle, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMResidData& data) {
             data.state = state;
             data.device = device;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
             data.needed = passBuilder.read(markData.needed, ResourceState::ShaderResource);
-            data.dirtyList = passBuilder.write(dirtyHandle, ResourceState::UnorderedAccess);
+            data.candList = passBuilder.write(candHandle, ResourceState::UnorderedAccess);
             data.drawClear = passBuilder.write(clearHandle, ResourceState::UnorderedAccess);
         },
         [](const VSMResidData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -2133,13 +2261,15 @@ VSMOutput setupVSMPasses(
 
     auto& binData = fg.addCallbackPass<VSMBinData>(
         "VSM Bin",
-        [&, argsHandles, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMBinData& data) {
+        [&, dirtyHandle, argsHandles, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMBinData& data) {
             data.state = state;
             data.device = device;
             data.config = config;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
-            data.dirtyList = passBuilder.read(residData.dirtyList, ResourceState::ShaderResource);
+            data.candList = passBuilder.read(residData.candList, ResourceState::ShaderResource);
+            data.drawClear = passBuilder.readWrite(residData.drawClear, ResourceState::UnorderedAccess);
+            data.dirtyList = passBuilder.write(dirtyHandle, ResourceState::UnorderedAccess);
             for (u32 i = 0; i < kVSMStreamCount; ++i)
                 data.pageArgs[i] = passBuilder.write(argsHandles[i], ResourceState::UnorderedAccess);
         },
@@ -2156,8 +2286,8 @@ VSMOutput setupVSMPasses(
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
             data.atlas = passBuilder.write(atlasHandle, ResourceState::DepthStencilWrite);
-            data.dirtyList = passBuilder.read(residData.dirtyList, ResourceState::ShaderResource);
-            data.drawClear = passBuilder.read(residData.drawClear, ResourceState::IndirectArgument);
+            data.dirtyList = passBuilder.read(binData.dirtyList, ResourceState::ShaderResource);
+            data.drawClear = passBuilder.read(binData.drawClear, ResourceState::IndirectArgument);
             for (u32 i = 0; i < kVSMStreamCount; ++i)
                 data.pageArgs[i] = passBuilder.read(binData.pageArgs[i], ResourceState::IndirectArgument);
         },
@@ -2169,7 +2299,7 @@ VSMOutput setupVSMPasses(
     out.atlas = atlasData.atlas;
     out.active = true;
     state->fgNeeded = markData.needed;
-    state->fgDirtyList = residData.dirtyList;
+    state->fgDirtyList = binData.dirtyList;
     state->fgAtlas = atlasData.atlas;
     state->fgDynAtlas = VirtualResourceHandle{};
     state->fgDynTable = VirtualResourceHandle{};
