@@ -79,6 +79,7 @@ struct VSMState {
     bool sunMoving = false;
     float sunRate = 0.0f;
     u32 refreshInterval[kVSMLevels] = {};
+    u32 stretchedInterval[kVSMLevels] = {};
     u32 refreshBudget = 0;
     float refreshStretch = 1.0f;
     u32 lodBias = 0;
@@ -147,6 +148,10 @@ struct VSMState {
     Fvector prevCamPos;
     nvrhi::BufferHandle binStats;
     nvrhi::BufferHandle binArgs;
+    nvrhi::BufferHandle emitArgs;
+    nvrhi::BufferHandle candList;
+    nvrhi::BufferHandle pageCount;
+    nvrhi::BufferHandle pairBase;
     nvrhi::BufferHandle pairs[kVSMStreamCount];
     nvrhi::BufferHandle pageArgs[kVSMStreamCount];
     nvrhi::BufferHandle readback[kReadbackSlots];
@@ -156,6 +161,7 @@ struct VSMState {
     u32 markPages = 0;
     u32 levelPages[kVSMLevels] = {};
     u32 dirtyPages = 0;
+    u32 deferredPages = 0;
     u32 wrongPages = 0;
     u32 refreshPages = 0;
     u32 overduePages = 0;
@@ -204,6 +210,10 @@ struct VSMState {
     nvrhi::BindingLayoutHandle clearLayout;
     nvrhi::ComputePipelineHandle binPrepPipeline;
     nvrhi::BindingLayoutHandle binPrepLayout;
+    nvrhi::ComputePipelineHandle binCountPipeline;
+    nvrhi::BindingLayoutHandle binCountLayout;
+    nvrhi::ComputePipelineHandle binReservePipeline;
+    nvrhi::BindingLayoutHandle binReserveLayout;
     nvrhi::ComputePipelineHandle binPipeline;
     nvrhi::BindingLayoutHandle binLayout;
     nvrhi::ComputePipelineHandle argsPipeline;
