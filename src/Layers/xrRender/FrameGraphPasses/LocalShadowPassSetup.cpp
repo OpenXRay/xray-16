@@ -1187,6 +1187,27 @@ void SelectLocalShadowLights(
     Fmatrix camMatrix = camViewProj;
     camFrustum.CreateFromMatrix(camMatrix, FRUSTUM_P_ALL);
 
+    auto faceNeeded = [&](const Fvector& P, float range, u32 f) {
+        Fvector right;
+        right.crossproduct(kFaceUp[f], kFaceDir[f]);
+        Fvector corners[5];
+        corners[0] = P;
+        for (u32 k = 0; k < 4; ++k) {
+            Fvector axis = kFaceDir[f];
+            axis.mad(right, (k & 1u) ? 1.0f : -1.0f);
+            axis.mad(kFaceUp[f], (k & 2u) ? 1.0f : -1.0f);
+            corners[k + 1].mad(P, axis, range);
+        }
+        for (size_t i = 0; i < camFrustum.p_count; ++i) {
+            bool outside = true;
+            for (u32 c = 0; c < 5 && outside; ++c)
+                outside = camFrustum.planes[i].classify(corners[c]) > 0.0f;
+            if (outside)
+                return false;
+        }
+        return true;
+    };
+
     struct Candidate { u32 index; float eff; float want; };
     xr_vector<Candidate> spotCandidates;
     xr_vector<Candidate> pointCandidates;
@@ -1375,10 +1396,16 @@ void SelectLocalShadowLights(
         if (!isPoint)
             SpotBasis(L, dir, up);
 
+        bool need[6] = { true, true, true, true, true, true };
+        for (u32 f = 1; f < faceCount; ++f)
+            need[f] = faceNeeded(L->position, L->range, f);
+
         u32 newNode[6] = { u32(-1), u32(-1), u32(-1), u32(-1), u32(-1), u32(-1) };
         u32 newSize[6] = {};
         bool placed = true;
         for (u32 f = 0; f < faceCount; ++f) {
+            if (!need[f])
+                continue;
             const u32 desired = sizeFor(cd.want, tile.size[f], loSize, hiSize);
             if (tile.node[f] != u32(-1) && tile.size[f] == desired)
                 continue;
@@ -1408,7 +1435,7 @@ void SelectLocalShadowLights(
         const bool newOwner = tile.owner != L;
         bool resized = false;
         for (u32 f = 0; f < faceCount; ++f)
-            resized = resized || newNode[f] != u32(-1);
+            resized = resized || (newNode[f] != u32(-1) && tile.node[f] != u32(-1));
         bool moved = newOwner
             || tile.pos.distance_to_sqr(L->position) > 0.002f * 0.002f
             || _abs(tile.range - L->range) > 0.01f;
@@ -1431,8 +1458,16 @@ void SelectLocalShadowLights(
         }
 
         for (u32 f = 0; f < faceCount; ++f) {
-            if (newOwner)
+            if (newOwner || !need[f])
                 releasePending(baseSlot + f);
+            if (!need[f]) {
+                if (tile.node[f] != u32(-1)) {
+                    state.atlas.Free(tile.node[f]);
+                    tile.node[f] = u32(-1);
+                    tile.size[f] = 0;
+                }
+                continue;
+            }
             if (newNode[f] == u32(-1))
                 continue;
             if (tile.node[f] != u32(-1)) {
@@ -1474,6 +1509,10 @@ void SelectLocalShadowLights(
         const float farZ = std::max(L->range, 1.0f);
         for (u32 f = 0; f < 6; ++f) {
             const u32 slot = baseSlot + f;
+            if (!need[f]) {
+                pushCandidate(slot, 0u, tile.serial, false, false);
+                continue;
+            }
             Fmatrix view, proj, vp;
             Fvector fd = kFaceDir[f];
             Fvector fu = kFaceUp[f];
