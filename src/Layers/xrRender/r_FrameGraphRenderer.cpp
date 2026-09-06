@@ -721,6 +721,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.localShadowPairs = localShadow.statPairs + localShadow.statDynPairs + localShadow.statSkinnedPairs;
             stats.localShadowDrops = localShadow.statDrops;
             stats.localShadowDynDrops = localShadow.statDynDrops;
+            stats.localShadowAtlas = localShadow.statAtlasPercent;
         }
 
         // Collect detail/grass stats
@@ -2481,7 +2482,8 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         const xr_vector<u32>* slots = &noSlots;
         if (m_blackboard) {
             auto& localShadowState = m_blackboard->get_or_add<passes::LocalShadowState>();
-            passes::SelectLocalShadowLights(localShadowState, collectedLights, Device.vCameraPosition, Device.mFullTransform);
+            const float projScale = 0.5f * float(Device.dwHeight) / tanf(deg2rad(Device.fFOV) * 0.5f);
+            passes::SelectLocalShadowLights(localShadowState, collectedLights, Device.vCameraPosition, Device.mFullTransform, projScale);
             slots = &localShadowState.slotOfLight;
         }
         if (!collectedLights.empty())

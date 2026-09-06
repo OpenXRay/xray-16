@@ -317,11 +317,14 @@ int   ps_r_vsm_load_freeze     = 1;
 int   ps_r_vsm_hud             = 1;
 float ps_r_vsm_hud_bias        = 0.0015f;
 
-int   ps_r_local_shadow_spots  = 8;
-int   ps_r_local_shadow_points = 4;
+int   ps_r_local_shadow_spots  = 16;
+int   ps_r_local_shadow_points = 40;
 float ps_r_local_shadow_bias   = 0.04f;
 int   ps_r_local_shadow_debug  = 0;
 int   ps_r_local_shadow_pairs_budget = 65536;
+float ps_r_local_shadow_range  = 100.0f;
+float ps_r_local_shadow_min_px = 12.0f;
+float ps_r_local_shadow_texel_ratio = 1.0f;
 
 int   ps_r_smoke_trail_enabled  = 1;
 float ps_r_smoke_max_emit_rate  = 45.f;
@@ -1053,11 +1056,14 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_vsm_hud", &ps_r_vsm_hud, 0, 1);
     CMD4(CCC_Float, "r_vsm_hud_bias", &ps_r_vsm_hud_bias, 0.0f, 0.05f);
 
-    CMD4(CCC_Integer, "r_local_shadow_spots", &ps_r_local_shadow_spots, 1, 8);
-    CMD4(CCC_Integer, "r_local_shadow_points", &ps_r_local_shadow_points, 1, 4);
+    CMD4(CCC_Integer, "r_local_shadow_spots", &ps_r_local_shadow_spots, 1, 64);
+    CMD4(CCC_Integer, "r_local_shadow_points", &ps_r_local_shadow_points, 1, 40);
     CMD4(CCC_Float, "r_local_shadow_bias", &ps_r_local_shadow_bias, 0.0f, 0.5f);
     CMD4(CCC_Integer, "r_local_shadow_debug", &ps_r_local_shadow_debug, 0, 1);
     CMD4(CCC_Integer, "r_local_shadow_pairs_budget", &ps_r_local_shadow_pairs_budget, 4096, 1048576);
+    CMD4(CCC_Float, "r_local_shadow_range", &ps_r_local_shadow_range, 10.0f, 500.0f);
+    CMD4(CCC_Float, "r_local_shadow_min_px", &ps_r_local_shadow_min_px, 2.0f, 64.0f);
+    CMD4(CCC_Float, "r_local_shadow_texel_ratio", &ps_r_local_shadow_texel_ratio, 0.25f, 2.0f);
 
     // Smoke Trail (weapon muzzle smoke)
     CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);

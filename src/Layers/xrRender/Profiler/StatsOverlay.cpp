@@ -532,8 +532,9 @@ void StatsOverlay::RenderGeometrySection()
         {
             ImGui::Text("Local shadows:");
             ImGui::Indent();
-            ImGui::Text("Pool: %u spots / %u points, %u accepted / %u deferred / %u dyn refresh",
-                s.localShadowSpots, s.localShadowPoints, s.localShadowAccepted, s.localShadowDeferred, s.localShadowDyn);
+            ImGui::Text("Pool: %u spots / %u points, %u accepted / %u deferred / %u dyn refresh, atlas %u%%",
+                s.localShadowSpots, s.localShadowPoints, s.localShadowAccepted, s.localShadowDeferred, s.localShadowDyn,
+                s.localShadowAtlas);
             ImGui::Text("Bin: %u pairs, %u drops, %u dyn drops", s.localShadowPairs, s.localShadowDrops, s.localShadowDynDrops);
             ImGui::Unindent();
         }
