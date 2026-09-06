@@ -201,7 +201,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, LocalShadowState& state)
     for (u32 i = 0; i < LocalShadowState::kReadbackSlots; ++i) {
         nvrhi::BufferDesc desc;
         desc.debugName = "LocalShadow_Readback";
-        desc.byteSize = u64(kLocalStatWords) * sizeof(u32);
+        desc.byteSize = u64(kLocalStatWords) * sizeof(u32) + u64(kLocalTileCount) * sizeof(u32) * 4;
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
         desc.keepInitialState = true;
@@ -225,7 +225,8 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, LocalShadowState& state)
         state.resourcesFailed = true;
         return false;
     }
-    Msg("* [LocalShadow] atlases %ux%u D16, %u spot tiles + %u point faces", kLocalShadowAtlas, kLocalShadowAtlas, kLocalSpotSlots, kLocalPointSlots);
+    Msg("* [LocalShadow] atlases %ux%u D16, %u view records, tiles %u..%u", kLocalShadowAtlas, kLocalShadowAtlas,
+        kLocalTileCount, kLocalPointFaceMin, kLocalSpotTileMax);
     return true;
 }
 
@@ -585,6 +586,9 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
     if (nvrhi::IBuffer* slot = state.readback[state.readbackWrite]) {
         cmdList->setBufferState(state.stats, nvrhi::ResourceStates::CopySource);
         cmdList->copyBuffer(slot, 0, state.stats, 0, u64(kLocalStatWords) * sizeof(u32));
+        cmdList->setBufferState(state.schedule, nvrhi::ResourceStates::CopySource);
+        cmdList->copyBuffer(slot, u64(kLocalStatWords) * sizeof(u32), state.schedule, 0,
+            u64(kLocalTileCount) * sizeof(u32) * 4);
         state.readbackWrite = (state.readbackWrite + 1) % LocalShadowState::kReadbackSlots;
         if (state.readbackScheduled < LocalShadowState::kReadbackSlots)
             ++state.readbackScheduled;
@@ -895,12 +899,14 @@ void SpotBasis(const light* L, Fvector& outDir, Fvector& outUp)
     outUp = L_up;
 }
 
-void FillRecord(LocalShadowViewGPU& rec, const Fmatrix& vp, float rectX, float rectY, float tileSize,
-                float nearZ, float farZ, float texelPerMetre, const Fvector& pos, float range)
+void FillRecord(LocalShadowViewGPU& rec, const Fmatrix& vp, const LocalAtlasAllocator& atlas, u32 node,
+                float nearZ, float farZ, float halfFovTan, const Fvector& pos, float range)
 {
+    u32 rectX = 0, rectY = 0, tileSize = 1;
+    atlas.Rect(node, rectX, rectY, tileSize);
     rec.viewProj = vp;
-    rec.rect.set(rectX, rectY, tileSize, ps_r_local_shadow_bias);
-    rec.zparams.set(nearZ, farZ, texelPerMetre, 0.0f);
+    rec.rect.set(float(rectX), float(rectY), float(tileSize), ps_r_local_shadow_bias);
+    rec.zparams.set(nearZ, farZ, 2.0f * halfFovTan / float(tileSize), 0.0f);
     rec.lightPos.set(pos.x, pos.y, pos.z, range);
     rec.shape.set(0.0f, 0.0f, 0.0f, 0.0f);
     CFrustum fr;
@@ -914,19 +920,166 @@ void FillRecord(LocalShadowViewGPU& rec, const Fmatrix& vp, float rectX, float r
 
 } // namespace
 
+u32 LocalAtlasAllocator::LevelOf(u32 size)
+{
+    u32 level = 0;
+    u32 s = kLocalShadowAtlas;
+    while (s > size && level + 1 < kLocalAtlasLevels) {
+        s >>= 1;
+        ++level;
+    }
+    return level;
+}
+
+void LocalAtlasAllocator::Build()
+{
+    nodeX[0] = 0;
+    nodeY[0] = 0;
+    nodeLevel[0] = 0;
+    u32 base = 0;
+    u32 count = 1;
+    for (u32 level = 1; level < kLocalAtlasLevels; ++level) {
+        const u32 childBase = base + count;
+        const u32 size = SizeOf(level);
+        for (u32 p = 0; p < count; ++p) {
+            const u32 parent = base + p;
+            for (u32 k = 0; k < 4; ++k) {
+                const u32 child = childBase + p * 4 + k;
+                nodeX[child] = u16(nodeX[parent] + (k & 1u) * size);
+                nodeY[child] = u16(nodeY[parent] + (k >> 1) * size);
+                nodeLevel[child] = u8(level);
+            }
+        }
+        base = childBase;
+        count *= 4;
+    }
+    built = true;
+}
+
+void LocalAtlasAllocator::ListPush(u32 node)
+{
+    xr_vector<u32>& list = freeList[nodeLevel[node]];
+    nodeSlot[node] = u16(list.size());
+    list.push_back(node);
+}
+
+void LocalAtlasAllocator::ListRemove(u32 node)
+{
+    xr_vector<u32>& list = freeList[nodeLevel[node]];
+    const u32 pos = nodeSlot[node];
+    const u32 last = list.back();
+    list[pos] = last;
+    nodeSlot[last] = u16(pos);
+    list.pop_back();
+}
+
+void LocalAtlasAllocator::Reset()
+{
+    if (!built)
+        Build();
+    for (u32 i = 0; i < kLocalAtlasNodes; ++i) {
+        nodeState[i] = 3;
+        nodeSlot[i] = 0;
+    }
+    for (u32 l = 0; l < kLocalAtlasLevels; ++l)
+        freeList[l].clear();
+    usedTexels = 0;
+    nodeState[0] = 0;
+    ListPush(0);
+}
+
+u32 LocalAtlasAllocator::Take(u32 level)
+{
+    if (!freeList[level].empty()) {
+        const u32 node = freeList[level].back();
+        ListRemove(node);
+        nodeState[node] = 3;
+        return node;
+    }
+    if (level == 0)
+        return u32(-1);
+    const u32 parent = Take(level - 1);
+    if (parent == u32(-1))
+        return u32(-1);
+    nodeState[parent] = 1;
+    const u32 parentBase = ((1u << (2u * (level - 1))) - 1u) / 3u;
+    const u32 base = ((1u << (2u * level)) - 1u) / 3u + (parent - parentBase) * 4u;
+    for (u32 k = 1; k < 4; ++k) {
+        nodeState[base + k] = 0;
+        ListPush(base + k);
+    }
+    nodeState[base] = 3;
+    return base;
+}
+
+u32 LocalAtlasAllocator::Alloc(u32 level)
+{
+    if (!built)
+        Reset();
+    if (level >= kLocalAtlasLevels)
+        return u32(-1);
+    const u32 node = Take(level);
+    if (node == u32(-1))
+        return u32(-1);
+    nodeState[node] = 2;
+    const u32 size = SizeOf(level);
+    usedTexels += size * size;
+    return node;
+}
+
+void LocalAtlasAllocator::Free(u32 node)
+{
+    VERIFY(node < kLocalAtlasNodes && nodeState[node] == 2);
+    u32 level = nodeLevel[node];
+    const u32 size = SizeOf(level);
+    usedTexels -= size * size;
+    nodeState[node] = 0;
+    ListPush(node);
+    while (level > 0) {
+        const u32 levelBase = ((1u << (2u * level)) - 1u) / 3u;
+        const u32 sibBase = levelBase + (((node - levelBase) >> 2) << 2);
+        bool all = true;
+        for (u32 k = 0; k < 4; ++k)
+            if (nodeState[sibBase + k] != 0)
+                all = false;
+        if (!all)
+            break;
+        for (u32 k = 0; k < 4; ++k) {
+            ListRemove(sibBase + k);
+            nodeState[sibBase + k] = 3;
+        }
+        const u32 parentBase = ((1u << (2u * (level - 1))) - 1u) / 3u;
+        node = parentBase + ((node - levelBase) >> 2);
+        --level;
+        nodeState[node] = 0;
+        ListPush(node);
+    }
+}
+
+void LocalAtlasAllocator::Rect(u32 node, u32& x, u32& y, u32& size) const
+{
+    x = nodeX[node];
+    y = nodeY[node];
+    size = SizeOf(nodeLevel[node]);
+}
+
 void ResetLocalShadowPool(LocalShadowState& state)
 {
-    for (u32 i = 0; i < kLocalSpotSlots; ++i)
+    for (u32 i = 0; i < kLocalSpotSlotsMax; ++i)
         state.spots[i] = LocalTile();
     state.statPairs = state.statDynPairs = state.statSkinnedPairs = state.statDrops = 0;
-    for (u32 i = 0; i < kLocalPointLights; ++i)
+    for (u32 i = 0; i < kLocalPointLightsMax; ++i)
         state.points[i] = LocalTile();
     for (u32 i = 0; i < kLocalTileCount; ++i)
         state.request[i] = LocalShadowViewGPU();
+    state.atlas.Reset();
+    state.pendingFree.clear();
     state.candCount = 0;
     state.stateReset = true;
     state.pooledSpots = 0;
     state.pooledPoints = 0;
+    state.statAtlasPercent = 0;
+    state.statPendingFree = 0;
     state.slotOfLight.clear();
 }
 
@@ -954,6 +1107,22 @@ void ProcessLocalShadowStats(LocalShadowState& state, nvrhi::IDevice* device)
     state.statMaxPendingAge = words[12];
     state.statDynRefresh = words[13];
     u32 demand[3] = { words[9], words[10], words[11] };
+
+    const u32* sched = words + kLocalStatWords;
+    for (u32 i = 0; i < state.pendingFree.size();) {
+        const LocalPendingFree& p = state.pendingFree[i];
+        const u32* rec = sched + p.slot * 4;
+        if (rec[0] == p.serial && rec[3] > p.stamp) {
+            state.atlas.Free(p.node);
+            state.pendingFree[i] = state.pendingFree.back();
+            state.pendingFree.pop_back();
+            continue;
+        }
+        ++i;
+    }
+    state.statPendingFree = u32(state.pendingFree.size());
+    state.statAtlasPercent = u32((u64(state.atlas.UsedTexels()) * 100u)
+        / (u64(kLocalShadowAtlas) * u64(kLocalShadowAtlas)));
     device->unmapBuffer(oldest);
 
     for (u32 s = 0; s < 3; ++s) {
@@ -977,10 +1146,10 @@ void ProcessLocalShadowStats(LocalShadowState& state, nvrhi::IDevice* device)
 
     if (ps_r_local_shadow_debug && Device.dwTimeGlobal - state.lastLogTime > 2000) {
         state.lastLogTime = Device.dwTimeGlobal;
-        Msg("[LocalShadow] spots=%u points=%u accepted=%u deferred=%u skipped=%u upToDate=%u pairs=%u drops=%u dynDrops=%u maxVisited=%u maxPendingAge=%u dynRefresh=%u",
+        Msg("[LocalShadow] spots=%u points=%u accepted=%u deferred=%u skipped=%u upToDate=%u pairs=%u drops=%u dynDrops=%u maxVisited=%u maxPendingAge=%u dynRefresh=%u atlas=%u%% pendingFree=%u",
             state.pooledSpots, state.pooledPoints, state.statAccepted, state.statDeferred, state.statSkipped, state.statUpToDate,
             state.statPairs + state.statDynPairs + state.statSkinnedPairs, state.statDrops, state.statDynDrops,
-            state.statMaxVisited, state.statMaxPendingAge, state.statDynRefresh);
+            state.statMaxVisited, state.statMaxPendingAge, state.statDynRefresh, state.statAtlasPercent, state.statPendingFree);
     }
 }
 
@@ -988,12 +1157,16 @@ void SelectLocalShadowLights(
     LocalShadowState& state,
     const xr_vector<const light*>& lights,
     const Fvector& camPos,
-    const Fmatrix& camViewProj)
+    const Fmatrix& camViewProj,
+    float projScale)
 {
-    if (state.lastVsmAT != ps_r_vsm_at || state.lastClusterLod != ps_r_vsm_cluster_lod) {
+    if (state.lastVsmAT != ps_r_vsm_at || state.lastClusterLod != ps_r_vsm_cluster_lod
+        || state.lastSpotsCvar != ps_r_local_shadow_spots || state.lastPointsCvar != ps_r_local_shadow_points) {
         ResetLocalShadowPool(state);
         state.lastVsmAT = ps_r_vsm_at;
         state.lastClusterLod = ps_r_vsm_cluster_lod;
+        state.lastSpotsCvar = ps_r_local_shadow_spots;
+        state.lastPointsCvar = ps_r_local_shadow_points;
     }
     ++state.frame;
     const u32 frame = state.frame;
@@ -1004,11 +1177,17 @@ void SelectLocalShadowLights(
     state.pooledSpots = 0;
     state.pooledPoints = 0;
 
+    const u32 spotSlots = std::min<u32>(kLocalSpotSlotsMax, u32(std::max(1, ps_r_local_shadow_spots)));
+    const u32 pointRoom = std::min<u32>(kLocalPointLightsMax, (kLocalTileCount - spotSlots) / 6u);
+    const u32 pointGroups = std::max<u32>(1u, std::min<u32>(pointRoom, u32(std::max(1, ps_r_local_shadow_points))));
+    state.spotSlots = spotSlots;
+    state.pointGroups = pointGroups;
+
     CFrustum camFrustum;
     Fmatrix camMatrix = camViewProj;
     camFrustum.CreateFromMatrix(camMatrix, FRUSTUM_P_ALL);
 
-    struct Candidate { u32 index; float eff; };
+    struct Candidate { u32 index; float eff; float want; };
     xr_vector<Candidate> spotCandidates;
     xr_vector<Candidate> pointCandidates;
 
@@ -1023,19 +1202,27 @@ void SelectLocalShadowLights(
         const light* L = lights[i];
         if (!L || !L->flags.bActive || !L->flags.bShadow || L->flags.bHudMode)
             continue;
-        const float d2 = camPos.distance_to_sqr(L->position);
-        if (L->flags.type == IRender_Light::SPOT) {
+        const bool isSpot = L->flags.type == IRender_Light::SPOT;
+        if (!isSpot && L->flags.type != IRender_Light::POINT)
+            continue;
+        const float dist = camPos.distance_to(L->position);
+        if (dist - L->range > ps_r_local_shadow_range)
+            continue;
+        const float rPx = (dist <= L->range) ? 1e9f : projScale * L->range / std::max(dist, 1e-3f);
+        if (rPx < ps_r_local_shadow_min_px)
+            continue;
+        const float want = 2.0f * rPx * ps_r_local_shadow_texel_ratio;
+        const float d2 = dist * dist;
+        if (isSpot) {
             float eff = d2 * (L->cone < deg2rad(60.f) ? 0.25f : 1.0f);
-            if (owns(state.spots, kLocalSpotSlots, L))
+            if (owns(state.spots, spotSlots, L))
                 eff *= 0.64f;
-            spotCandidates.push_back({ i, eff });
-        } else if (L->flags.type == IRender_Light::POINT) {
-            if (L->range < 3.0f || d2 > 30.0f * 30.0f)
-                continue;
+            spotCandidates.push_back({ i, eff, want });
+        } else {
             float eff = d2;
-            if (owns(state.points, kLocalPointLights, L))
+            if (owns(state.points, pointGroups, L))
                 eff *= 0.64f;
-            pointCandidates.push_back({ i, eff });
+            pointCandidates.push_back({ i, eff, want });
         }
     }
 
@@ -1043,12 +1230,10 @@ void SelectLocalShadowLights(
     std::sort(spotCandidates.begin(), spotCandidates.end(), byEff);
     std::sort(pointCandidates.begin(), pointCandidates.end(), byEff);
 
-    const u32 spotCap = std::min<u32>(kLocalSpotSlots, u32(std::max(1, ps_r_local_shadow_spots)));
-    const u32 pointCap = std::min<u32>(kLocalPointLights, u32(std::max(1, ps_r_local_shadow_points)));
-    if (spotCandidates.size() > spotCap)
-        spotCandidates.resize(spotCap);
-    if (pointCandidates.size() > pointCap)
-        pointCandidates.resize(pointCap);
+    if (spotCandidates.size() > spotSlots)
+        spotCandidates.resize(spotSlots);
+    if (pointCandidates.size() > pointGroups)
+        pointCandidates.resize(pointGroups);
 
     auto assign = [&](xr_vector<Candidate>& candidates, LocalTile* pool, u32 poolSize, xr_vector<u32>& outTile) {
         outTile.assign(candidates.size(), u32(-1));
@@ -1082,8 +1267,8 @@ void SelectLocalShadowLights(
 
     xr_vector<u32> spotTile;
     xr_vector<u32> pointTile;
-    assign(spotCandidates, state.spots, kLocalSpotSlots, spotTile);
-    assign(pointCandidates, state.points, kLocalPointLights, pointTile);
+    assign(spotCandidates, state.spots, spotSlots, spotTile);
+    assign(pointCandidates, state.points, pointGroups, pointTile);
 
     auto cadenceFor = [](float dist) -> u32 {
         return dist < 30.0f ? 1u : (dist < 70.0f ? 4u : 12u);
@@ -1112,32 +1297,158 @@ void SelectLocalShadowLights(
         entry[3] = rank | (dynDue ? 1u << 30 : 0u) | (inView ? 1u << 31 : 0u);
     };
 
-    for (const Selected& sel : selected) {
-        const u32 t = sel.tile;
-        if (!sel.point) {
-            const light* L = lights[spotCandidates[sel.candidate].index];
-            LocalTile& tile = state.spots[t];
-            const bool newOwner = tile.owner != L;
-            Fvector dir, up;
-            SpotBasis(L, dir, up);
-            const bool moved = newOwner
-                || tile.pos.distance_to_sqr(L->position) > 0.002f * 0.002f
-                || tile.dir.dotproduct(dir) < 0.999999f
-                || _abs(tile.range - L->range) > 0.01f
-                || _abs(tile.cone - L->cone) > 0.001f;
-            tile.owner = L;
-            tile.pos = L->position;
-            tile.dir = dir;
-            tile.range = L->range;
-            tile.cone = L->cone;
-            if (newOwner) {
-                tile.serial = ++state.nextSerial;
-                tile.stamp = 1;
-            } else if (moved) {
-                if (++tile.stamp == 0)
-                    tile.stamp = 1;
+    auto releasePending = [&](u32 slot) {
+        u32 freed = 0;
+        for (u32 i = 0; i < state.pendingFree.size();) {
+            if (state.pendingFree[i].slot != slot) {
+                ++i;
+                continue;
             }
+            state.atlas.Free(state.pendingFree[i].node);
+            state.pendingFree[i] = state.pendingFree.back();
+            state.pendingFree.pop_back();
+            ++freed;
+        }
+        return freed;
+    };
 
+    auto nearestPow2 = [](float want, u32 lo, u32 hi) {
+        u32 s = lo;
+        while (s < hi && want > float(s) * 1.41421356f)
+            s <<= 1;
+        return s;
+    };
+    auto sizeFor = [&](float want, u32 cur, u32 lo, u32 hi) -> u32 {
+        if (cur < lo || cur > hi)
+            return nearestPow2(want, lo, hi);
+        if (want > 1.25f * float(cur))
+            return std::min<u32>(cur << 1, hi);
+        if (want < 0.45f * float(cur))
+            return std::max<u32>(cur >> 1, lo);
+        return cur;
+    };
+
+    xr_vector<u8> evicted;
+    evicted.assign(selected.size(), 0u);
+    u32 evictCursor = u32(selected.size());
+    auto evictTail = [&](u32 current) {
+        while (evictCursor > current + 1) {
+            const u32 e = --evictCursor;
+            if (evicted[e])
+                continue;
+            const Selected& s = selected[e];
+            LocalTile& tile = s.point ? state.points[s.tile] : state.spots[s.tile];
+            const u32 base = s.point ? (spotSlots + s.tile * 6) : s.tile;
+            const u32 faces = s.point ? 6u : 1u;
+            u32 freed = 0;
+            for (u32 f = 0; f < faces; ++f) {
+                freed += releasePending(base + f);
+                if (tile.node[f] != u32(-1)) {
+                    state.atlas.Free(tile.node[f]);
+                    tile.node[f] = u32(-1);
+                    tile.size[f] = 0;
+                    ++freed;
+                }
+            }
+            evicted[e] = 1u;
+            tile.owner = nullptr;
+            if (freed)
+                return true;
+        }
+        return false;
+    };
+
+    for (u32 si = 0; si < selected.size(); ++si) {
+        if (evicted[si])
+            continue;
+        const Selected& sel = selected[si];
+        const bool isPoint = sel.point;
+        const Candidate& cd = isPoint ? pointCandidates[sel.candidate] : spotCandidates[sel.candidate];
+        const light* L = lights[cd.index];
+        LocalTile& tile = isPoint ? state.points[sel.tile] : state.spots[sel.tile];
+        const u32 baseSlot = isPoint ? (spotSlots + sel.tile * 6) : sel.tile;
+        const u32 faceCount = isPoint ? 6u : 1u;
+        const u32 loSize = isPoint ? kLocalPointFaceMin : kLocalSpotTileMin;
+        const u32 hiSize = isPoint ? kLocalPointFaceMax : kLocalSpotTileMax;
+
+        Fvector dir, up;
+        if (!isPoint)
+            SpotBasis(L, dir, up);
+
+        u32 newNode[6] = { u32(-1), u32(-1), u32(-1), u32(-1), u32(-1), u32(-1) };
+        u32 newSize[6] = {};
+        bool placed = true;
+        for (u32 f = 0; f < faceCount; ++f) {
+            const u32 desired = sizeFor(cd.want, tile.size[f], loSize, hiSize);
+            if (tile.node[f] != u32(-1) && tile.size[f] == desired)
+                continue;
+            u32 node = u32(-1);
+            for (u32 s = desired; s >= loSize && node == u32(-1); s >>= 1)
+                node = state.atlas.Alloc(LocalAtlasAllocator::LevelOf(s));
+            while (node == u32(-1) && evictTail(si)) {
+                for (u32 s = desired; s >= loSize && node == u32(-1); s >>= 1)
+                    node = state.atlas.Alloc(LocalAtlasAllocator::LevelOf(s));
+            }
+            if (node == u32(-1)) {
+                placed = false;
+                break;
+            }
+            u32 rx = 0, ry = 0, rs = 0;
+            state.atlas.Rect(node, rx, ry, rs);
+            newNode[f] = node;
+            newSize[f] = rs;
+        }
+        if (!placed) {
+            for (u32 f = 0; f < faceCount; ++f)
+                if (newNode[f] != u32(-1))
+                    state.atlas.Free(newNode[f]);
+            continue;
+        }
+
+        const bool newOwner = tile.owner != L;
+        bool resized = false;
+        for (u32 f = 0; f < faceCount; ++f)
+            resized = resized || newNode[f] != u32(-1);
+        bool moved = newOwner
+            || tile.pos.distance_to_sqr(L->position) > 0.002f * 0.002f
+            || _abs(tile.range - L->range) > 0.01f;
+        if (!isPoint)
+            moved = moved || tile.dir.dotproduct(dir) < 0.999999f || _abs(tile.cone - L->cone) > 0.001f;
+
+        tile.owner = L;
+        tile.pos = L->position;
+        tile.range = L->range;
+        if (!isPoint) {
+            tile.dir = dir;
+            tile.cone = L->cone;
+        }
+        if (newOwner) {
+            tile.serial = ++state.nextSerial;
+            tile.stamp = 1;
+        } else if (moved || resized) {
+            if (++tile.stamp == 0)
+                tile.stamp = 1;
+        }
+
+        for (u32 f = 0; f < faceCount; ++f) {
+            if (newOwner)
+                releasePending(baseSlot + f);
+            if (newNode[f] == u32(-1))
+                continue;
+            if (tile.node[f] != u32(-1)) {
+                if (newOwner)
+                    state.atlas.Free(tile.node[f]);
+                else
+                    state.pendingFree.push_back({ baseSlot + f, tile.serial, tile.node[f], tile.rectStamp[f] });
+            }
+            tile.node[f] = newNode[f];
+            tile.size[f] = newSize[f];
+        }
+
+        tile.inView = camFrustum.testSphere_dirty(L->position, L->range);
+        const u32 cadence = cadenceFor(camPos.distance_to(L->position));
+
+        if (!isPoint) {
             const float fov = L->cone + deg2rad(3.5f);
             const float nearZ = 0.5f;
             const float farZ = std::max(L->range, 1.0f);
@@ -1145,50 +1456,24 @@ void SelectLocalShadowLights(
             view.build_camera_dir(L->position, dir, up);
             proj.build_projection(fov, 1.f, nearZ, farZ);
             vp.mul(proj, view);
-
-            const u32 slot = t;
-            LocalShadowViewGPU& rec = state.request[slot];
-            FillRecord(rec, vp, float((t & 3) * kLocalSpotTile), float((t >> 2) * kLocalSpotTile), float(kLocalSpotTile),
-                nearZ, farZ, 2.0f * tanf(fov * 0.5f) / float(kLocalSpotTile), L->position, L->range);
+            LocalShadowViewGPU& rec = state.request[baseSlot];
+            FillRecord(rec, vp, state.atlas, tile.node[0], nearZ, farZ, tanf(fov * 0.5f), L->position, L->range);
             rec.meta[0] = tile.stamp;
             rec.meta[1] = tile.serial;
             rec.meta[2] = 0;
             rec.meta[3] = 0;
-
-            tile.inView = camFrustum.testSphere_dirty(L->position, L->range);
-            const u32 cadence = cadenceFor(camPos.distance_to(L->position));
-            const bool dynDue = tile.inView && ((frame + slot) % cadence) == 0;
-            pushCandidate(slot, tile.stamp, tile.serial, tile.inView, dynDue);
-            state.slotOfLight[spotCandidates[sel.candidate].index] = slot + 1;
+            tile.rectStamp[0] = tile.stamp;
+            const bool dynDue = tile.inView && ((frame + baseSlot) % cadence) == 0;
+            pushCandidate(baseSlot, tile.stamp, tile.serial, tile.inView, dynDue);
+            state.slotOfLight[cd.index] = baseSlot + 1;
             ++state.pooledSpots;
             continue;
         }
 
-        const light* L = lights[pointCandidates[sel.candidate].index];
-        LocalTile& tile = state.points[t];
-        const bool newOwner = tile.owner != L;
-        const bool moved = newOwner
-            || tile.pos.distance_to_sqr(L->position) > 0.002f * 0.002f
-            || _abs(tile.range - L->range) > 0.01f;
-        tile.owner = L;
-        tile.pos = L->position;
-        tile.range = L->range;
-        if (newOwner) {
-            tile.serial = ++state.nextSerial;
-            tile.stamp = 1;
-        } else if (moved) {
-            if (++tile.stamp == 0)
-                tile.stamp = 1;
-        }
-
         const float nearZ = 0.25f;
         const float farZ = std::max(L->range, 1.0f);
-        tile.inView = camFrustum.testSphere_dirty(L->position, L->range);
-        const u32 cadence = cadenceFor(camPos.distance_to(L->position));
-
         for (u32 f = 0; f < 6; ++f) {
-            const u32 k = t * 6 + f;
-            const u32 slot = kLocalSpotSlots + k;
+            const u32 slot = baseSlot + f;
             Fmatrix view, proj, vp;
             Fvector fd = kFaceDir[f];
             Fvector fu = kFaceUp[f];
@@ -1196,18 +1481,22 @@ void SelectLocalShadowLights(
             proj.build_projection(PI_DIV_2, 1.f, nearZ, farZ);
             vp.mul(proj, view);
             LocalShadowViewGPU& rec = state.request[slot];
-            FillRecord(rec, vp, float((k & 7) * kLocalPointFace), float(2048 + (k >> 3) * kLocalPointFace),
-                float(kLocalPointFace), nearZ, farZ, 2.0f / float(kLocalPointFace), L->position, L->range);
+            FillRecord(rec, vp, state.atlas, tile.node[f], nearZ, farZ, 1.0f, L->position, L->range);
             rec.meta[0] = tile.stamp;
             rec.meta[1] = tile.serial;
             rec.meta[2] = 1;
             rec.meta[3] = f;
+            tile.rectStamp[f] = tile.stamp;
             const bool dynDue = tile.inView && ((frame + slot) % cadence) == 0;
             pushCandidate(slot, tile.stamp, tile.serial, tile.inView, dynDue);
         }
-        state.slotOfLight[pointCandidates[sel.candidate].index] = kLocalSpotSlots + t * 6 + 1;
+        state.slotOfLight[cd.index] = baseSlot + 1;
         ++state.pooledPoints;
     }
+
+    state.statAtlasPercent = u32((u64(state.atlas.UsedTexels()) * 100u)
+        / (u64(kLocalShadowAtlas) * u64(kLocalShadowAtlas)));
+    state.statPendingFree = u32(state.pendingFree.size());
 }
 
 LocalShadowOutput setupLocalShadowPasses(
