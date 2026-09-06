@@ -46,7 +46,9 @@ void writePair(uint stream, uint pos, uint2 pair)
         g_PairsOpaque[pos] = pair;
 }
 
-void VsmVisit(bool active, uint entryIdx, VsmPageQuery q)
+typedef VsmPageQuery BvhQuery;
+
+void BvhVisit(bool active, uint entryIdx, VsmPageQuery q)
 {
     if (!active)
         return;
@@ -67,7 +69,7 @@ void VsmVisit(bool active, uint entryIdx, VsmPageQuery q)
     InterlockedAdd(gs_pairs, 1u, d);
 }
 
-#include "vsm_bvh.h"
+#include "cluster_bvh.h"
 
 [numthreads(VSM_BVH_GROUP, 1, 1)]
 void main(uint3 gID : SV_GroupID, uint3 gtID : SV_GroupThreadID)
@@ -97,7 +99,7 @@ void main(uint3 gID : SV_GroupID, uint3 gtID : SV_GroupThreadID)
     q.includeAT = g_IncludeAT;
     q.pad = 0u;
 
-    vsmBvhTraverse(t, g_NodeCount, q);
+    bvhTraverse(t, g_NodeCount, q);
 
     GroupMemoryBarrierWithGroupSync();
     if (t == 0u)

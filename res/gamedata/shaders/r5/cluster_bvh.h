@@ -1,29 +1,31 @@
-#ifndef VSM_BVH_H
-#define VSM_BVH_H
+#ifndef CLUSTER_BVH_H
+#define CLUSTER_BVH_H
 
-#ifndef VSM_BVH_T_NODES
-#define VSM_BVH_T_NODES t14
+#include "cluster_bvh_types.h"
+
+#ifndef CLUSTER_BVH_T_NODES
+#define CLUSTER_BVH_T_NODES t14
 #endif
-#ifndef VSM_BVH_T_INDEX
-#define VSM_BVH_T_INDEX t15
+#ifndef CLUSTER_BVH_T_INDEX
+#define CLUSTER_BVH_T_INDEX t15
 #endif
 
-StructuredBuffer<ClusterBvhNode> g_BvhNodes : register(VSM_BVH_T_NODES);
-StructuredBuffer<uint> g_BvhIndex : register(VSM_BVH_T_INDEX);
+StructuredBuffer<ClusterBvhNode> g_BvhNodes : register(CLUSTER_BVH_T_NODES);
+StructuredBuffer<uint> g_BvhIndex : register(CLUSTER_BVH_T_INDEX);
 
 groupshared uint gs_bvhStack[VSM_BVH_STACK_CAP];
 groupshared uint gs_bvhStackCount;
 groupshared uint gs_bvhLeaf[VSM_BVH_LEAF_CAP];
 groupshared uint gs_bvhLeafCount;
 
-void vsmBvhSubtree(uint root, VsmPageQuery q)
+void bvhSubtree(uint root, BvhQuery q)
 {
     uint end = g_BvhNodes[root].escape;
     uint i = root;
     [loop] while (i < end)
     {
         ClusterBvhNode nd = g_BvhNodes[i];
-        if (!vsmNodeTouchesPage(nd, q))
+        if (!bvhNodeTest(nd, q))
         {
             i = nd.escape;
             continue;
@@ -31,7 +33,7 @@ void vsmBvhSubtree(uint root, VsmPageQuery q)
         if (nd.count != 0u)
         {
             for (uint k = 0u; k < nd.count; ++k)
-                VsmVisit(true, g_BvhIndex[nd.first + k], q);
+                BvhVisit(true, g_BvhIndex[nd.first + k], q);
             i = nd.escape;
         }
         else
@@ -41,7 +43,7 @@ void vsmBvhSubtree(uint root, VsmPageQuery q)
     }
 }
 
-void vsmBvhTraverse(uint t, uint nodeCount, VsmPageQuery q)
+void bvhTraverse(uint t, uint nodeCount, BvhQuery q)
 {
     if (t == 0u)
     {
@@ -68,7 +70,7 @@ void vsmBvhTraverse(uint t, uint nodeCount, VsmPageQuery q)
         if (node != VSM_BVH_NONE)
         {
             ClusterBvhNode nd = g_BvhNodes[node];
-            if (vsmNodeTouchesPage(nd, q))
+            if (bvhNodeTest(nd, q))
             {
                 if (nd.count != 0u)
                 {
@@ -89,13 +91,13 @@ void vsmBvhTraverse(uint t, uint nodeCount, VsmPageQuery q)
                     if (p0 < uint(VSM_BVH_STACK_CAP))
                         gs_bvhStack[p0] = left;
                     else
-                        vsmBvhSubtree(left, q);
+                        bvhSubtree(left, q);
                     uint p1;
                     InterlockedAdd(gs_bvhStackCount, 1u, p1);
                     if (p1 < uint(VSM_BVH_STACK_CAP))
                         gs_bvhStack[p1] = right;
                     else
-                        vsmBvhSubtree(right, q);
+                        bvhSubtree(right, q);
                 }
             }
         }
@@ -110,7 +112,7 @@ void vsmBvhTraverse(uint t, uint nodeCount, VsmPageQuery q)
         {
             uint i = base + t;
             bool active = i < leafN;
-            VsmVisit(active, active ? gs_bvhLeaf[i] : 0u, q);
+            BvhVisit(active, active ? gs_bvhLeaf[i] : 0u, q);
         }
         GroupMemoryBarrierWithGroupSync();
         if (t == 0u)

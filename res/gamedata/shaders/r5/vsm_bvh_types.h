@@ -1,22 +1,7 @@
 #ifndef VSM_BVH_TYPES_H
 #define VSM_BVH_TYPES_H
 
-#define VSM_BVH_STACK_CAP 1024
-#define VSM_BVH_LEAF_CAP  1024
-#define VSM_BVH_GROUP     256
-#define VSM_BVH_NONE      0xFFFFFFFFu
-
-struct ClusterBvhNode
-{
-    float3 bmin;
-    float minSelfError;
-    float3 bmax;
-    float maxParentError;
-    uint first;
-    uint count;
-    uint escape;
-    uint pad;
-};
+#include "cluster_bvh_types.h"
 
 struct VsmPageQuery
 {
@@ -43,7 +28,7 @@ bool vsmBoxTouchesPage(float3 center, float3 half3, VsmPageQuery q)
         && (lc.y + lh.y >= q.pmin.y) && (lc.y - lh.y < q.pmax.y);
 }
 
-bool vsmNodeTouchesPage(ClusterBvhNode nd, VsmPageQuery q)
+bool bvhNodeTest(ClusterBvhNode nd, VsmPageQuery q)
 {
     if (nd.minSelfError > q.errB || nd.maxParentError <= q.errB)
         return false;
