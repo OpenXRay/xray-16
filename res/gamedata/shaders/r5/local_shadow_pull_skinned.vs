@@ -5,7 +5,7 @@
 
 StructuredBuffer<uint2> g_Pairs : register(t15);
 StructuredBuffer<ClusterEntry> g_Entries : register(t16);
-StructuredBuffer<LocalShadowTile> g_LocalShadowTiles : register(t17);
+StructuredBuffer<LocalShadowView> g_LocalShadowTiles : register(t17);
 ByteAddressBuffer g_SkinnedVB : register(t43);
 ByteAddressBuffer g_SkinnedIB : register(t44);
 

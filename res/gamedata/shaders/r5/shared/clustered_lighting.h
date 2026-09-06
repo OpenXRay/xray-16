@@ -16,15 +16,7 @@ uint LocalShadowSlot(GPULightData light, float3 worldPos)
     uint slot1 = (uint)(light.spotParamsAndType.w + 0.5f);
     if (slot1 == 0u)
         return 0xFFFFFFFFu;
-    uint slot = slot1 - 1u;
-    if (light.spotParamsAndType.y < 0.5f)
-    {
-        float3 d = worldPos - light.positionAndInvRangeSq.xyz;
-        float3 a = abs(d);
-        slot += (a.x >= a.y && a.x >= a.z) ? (d.x >= 0.0 ? 0u : 1u)
-              : (a.y >= a.z) ? (d.y >= 0.0 ? 2u : 3u) : (d.z >= 0.0 ? 4u : 5u);
-    }
-    return slot;
+    return LocalShadowCachedSlot(slot1 - 1u, light.spotParamsAndType.y < 0.5f, worldPos);
 }
 
 // Point light distance attenuation (smooth window function)

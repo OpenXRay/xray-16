@@ -6,7 +6,7 @@
 StructuredBuffer<InstanceData> g_InstanceData : register(t14);
 StructuredBuffer<uint2> g_Pairs : register(t15);
 StructuredBuffer<ClusterEntry> g_Entries : register(t16);
-StructuredBuffer<LocalShadowTile> g_LocalShadowTiles : register(t17);
+StructuredBuffer<LocalShadowView> g_LocalShadowTiles : register(t17);
 ByteAddressBuffer g_MegaVB : register(t18);
 ByteAddressBuffer g_MegaIB : register(t19);
 
