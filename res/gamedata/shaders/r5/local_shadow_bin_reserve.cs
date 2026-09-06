@@ -2,7 +2,7 @@
 #include "common.h"
 #include "local_shadow_common.h"
 
-#define LOCAL_RESERVE_THREADS 32
+#define LOCAL_RESERVE_THREADS 256
 
 cbuffer LocalShadowBinParams : register(b5)
 {
@@ -227,7 +227,7 @@ void main(uint3 gtID : SV_GroupThreadID)
         g_DirtyList[gs_index[t]] = slot;
         g_PairBase[gs_index[t]] = uint4(gs_base[t], 0u);
         sched.z = 0u;
-        sched.w = g_Frame;
+        sched.w = cand.y;
     }
     if (have)
         g_Schedule[slot] = sched;

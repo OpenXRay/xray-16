@@ -24,12 +24,15 @@ namespace xray::profiler {
 namespace xray::render::fg::passes {
 
 constexpr u32 kLocalShadowAtlas = 4096;
-constexpr u32 kLocalSpotTile = 1024;
-constexpr u32 kLocalSpotSlots = 8;
-constexpr u32 kLocalPointFace = 512;
-constexpr u32 kLocalPointLights = 4;
-constexpr u32 kLocalPointSlots = kLocalPointLights * 6;
-constexpr u32 kLocalTileCount = kLocalSpotSlots + kLocalPointSlots;
+constexpr u32 kLocalAtlasLevels = 6;
+constexpr u32 kLocalAtlasNodes = 1365;
+constexpr u32 kLocalSpotTileMax = 1024;
+constexpr u32 kLocalSpotTileMin = 256;
+constexpr u32 kLocalPointFaceMax = 512;
+constexpr u32 kLocalPointFaceMin = 128;
+constexpr u32 kLocalSpotSlotsMax = 64;
+constexpr u32 kLocalPointLightsMax = 40;
+constexpr u32 kLocalTileCount = 256;
 constexpr u32 kLocalPullVertices = 384;
 constexpr u32 kLocalStatWords = 32;
 constexpr u32 kLocalStreamCount = 6;
@@ -51,6 +54,32 @@ struct LocalShadowViewGPU {
 };
 static_assert(sizeof(LocalShadowViewGPU) == 240, "LocalShadowViewGPU is shader-visible");
 
+struct LocalAtlasAllocator {
+    u16 nodeX[kLocalAtlasNodes] = {};
+    u16 nodeY[kLocalAtlasNodes] = {};
+    u8 nodeLevel[kLocalAtlasNodes] = {};
+    u8 nodeState[kLocalAtlasNodes] = {};
+    u16 nodeSlot[kLocalAtlasNodes] = {};
+    xr_vector<u32> freeList[kLocalAtlasLevels];
+    u32 usedTexels = 0;
+    bool built = false;
+
+    void Reset();
+    u32 Alloc(u32 level);
+    void Free(u32 node);
+    void Rect(u32 node, u32& x, u32& y, u32& size) const;
+    u32 UsedTexels() const { return usedTexels; }
+
+    static u32 SizeOf(u32 level) { return kLocalShadowAtlas >> level; }
+    static u32 LevelOf(u32 size);
+
+private:
+    void Build();
+    void ListPush(u32 node);
+    void ListRemove(u32 node);
+    u32 Take(u32 level);
+};
+
 struct LocalTile {
     const light* owner = nullptr;
     Fvector pos = {};
@@ -61,17 +90,33 @@ struct LocalTile {
     u32 stamp = 0;
     u32 serial = 0;
     bool inView = false;
+    u32 node[6] = { ~0u, ~0u, ~0u, ~0u, ~0u, ~0u };
+    u32 size[6] = {};
+    u32 rectStamp[6] = {};
+};
+
+struct LocalPendingFree {
+    u32 slot;
+    u32 serial;
+    u32 node;
+    u32 stamp;
 };
 
 struct LocalShadowState {
-    LocalTile spots[kLocalSpotSlots];
-    LocalTile points[kLocalPointLights];
+    LocalTile spots[kLocalSpotSlotsMax];
+    LocalTile points[kLocalPointLightsMax];
+    LocalAtlasAllocator atlas;
+    xr_vector<LocalPendingFree> pendingFree;
+    u32 spotSlots = 0;
+    u32 pointGroups = 0;
     LocalShadowViewGPU request[kLocalTileCount] = {};
     u32 candList[kLocalTileCount][4] = {};
     u32 candCount = 0;
     u32 nextSerial = 0;
     bool stateReset = true;
     int lastVsmAT = -1;
+    int lastSpotsCvar = -1;
+    int lastPointsCvar = -1;
     float lastClusterLod = -1.0f;
     u32 pairCapacity[kLocalStreamCount] = {};
     nvrhi::IBuffer* lastEntryBuffer = nullptr;
@@ -92,6 +137,8 @@ struct LocalShadowState {
     u32 statMaxVisited = 0;
     u32 statMaxPendingAge = 0;
     u32 statDynRefresh = 0;
+    u32 statAtlasPercent = 0;
+    u32 statPendingFree = 0;
     u32 lastLogTime = 0;
 
     static constexpr u32 kReadbackSlots = 4;
@@ -171,7 +218,8 @@ void SelectLocalShadowLights(
     LocalShadowState& state,
     const xr_vector<const light*>& lights,
     const Fvector& camPos,
-    const Fmatrix& camViewProj);
+    const Fmatrix& camViewProj,
+    float projScale);
 
 LocalShadowOutput setupLocalShadowPasses(
     framegraph::FrameGraph& fg,
