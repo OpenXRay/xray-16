@@ -33,21 +33,23 @@ constexpr u32 kLocalTileCount = kLocalSpotSlots + kLocalPointSlots;
 constexpr u32 kLocalPullVertices = 384;
 constexpr u32 kLocalStatWords = 32;
 constexpr u32 kLocalStreamCount = 6;
-constexpr u32 kLocalPairCapOpaque = 1u << 20;
-constexpr u32 kLocalPairCapTerrain = 1u << 19;
-constexpr u32 kLocalPairCapAT = 1u << 19;
+constexpr u32 kLocalPairCapOpaque = 1u << 18;
+constexpr u32 kLocalPairCapTerrain = 1u << 16;
+constexpr u32 kLocalPairCapAT = 1u << 17;
 constexpr u32 kLocalPairCapDynOpaque = 1u << 16;
 constexpr u32 kLocalPairCapDynAT = 1u << 15;
 constexpr u32 kLocalPairCapSkinned = 1u << 16;
 
-struct LocalShadowTileGPU {
+struct LocalShadowViewGPU {
     Fmatrix viewProj;
     Fvector4 rect;
     Fvector4 zparams;
     Fvector4 lightPos;
     Fvector4 planes[6];
+    Fvector4 shape;
+    u32 meta[4];
 };
-static_assert(sizeof(LocalShadowTileGPU) == 208, "LocalShadowTileGPU is shader-visible");
+static_assert(sizeof(LocalShadowViewGPU) == 240, "LocalShadowViewGPU is shader-visible");
 
 struct LocalTile {
     const light* owner = nullptr;
@@ -56,27 +58,40 @@ struct LocalTile {
     float range = 0.0f;
     float cone = 0.0f;
     u32 lastSeen = 0;
-    bool staticValid = false;
-    bool dirty = true;
+    u32 stamp = 0;
+    u32 serial = 0;
     bool inView = false;
 };
 
 struct LocalShadowState {
     LocalTile spots[kLocalSpotSlots];
     LocalTile points[kLocalPointLights];
-    LocalShadowTileGPU records[kLocalTileCount] = {};
-    u32 refreshStatic[kLocalTileCount] = {};
-    u32 refreshDyn[kLocalTileCount] = {};
-    u32 refreshStaticCount = 0;
-    u32 refreshDynCount = 0;
+    LocalShadowViewGPU request[kLocalTileCount] = {};
+    u32 candList[kLocalTileCount][4] = {};
+    u32 candCount = 0;
+    u32 nextSerial = 0;
+    bool stateReset = true;
+    int lastVsmAT = -1;
+    float lastClusterLod = -1.0f;
+    u32 pairCapacity[kLocalStreamCount] = {};
+    nvrhi::IBuffer* lastEntryBuffer = nullptr;
+    nvrhi::IBuffer* lastBvhNodeBuffer = nullptr;
     xr_vector<u32> slotOfLight;
     u32 pooledSpots = 0;
     u32 pooledPoints = 0;
     u32 frame = 0;
+    u32 statAccepted = 0;
+    u32 statDeferred = 0;
+    u32 statSkipped = 0;
+    u32 statUpToDate = 0;
     u32 statPairs = 0;
     u32 statDynPairs = 0;
     u32 statSkinnedPairs = 0;
     u32 statDrops = 0;
+    u32 statDynDrops = 0;
+    u32 statMaxVisited = 0;
+    u32 statMaxPendingAge = 0;
+    u32 statDynRefresh = 0;
     u32 lastLogTime = 0;
 
     static constexpr u32 kReadbackSlots = 4;
@@ -84,9 +99,15 @@ struct LocalShadowState {
     u32 readbackWrite = 0;
     u32 readbackScheduled = 0;
 
-    nvrhi::BufferHandle tiles;
-    nvrhi::BufferHandle refreshStaticBuffer;
+    nvrhi::BufferHandle requestBuffer;
+    nvrhi::BufferHandle stateBuffer;
+    nvrhi::BufferHandle candListBuffer;
+    nvrhi::BufferHandle tileCount;
+    nvrhi::BufferHandle schedule;
+    nvrhi::BufferHandle dirtyList;
     nvrhi::BufferHandle refreshDynBuffer;
+    nvrhi::BufferHandle pairBase;
+    nvrhi::BufferHandle emitArgs;
     nvrhi::BufferHandle stats;
     nvrhi::BufferHandle pairs[kLocalStreamCount];
     nvrhi::BufferHandle args;
@@ -96,8 +117,14 @@ struct LocalShadowState {
     bool staticAtlasFirst = true;
     bool dynAtlasFirst = true;
 
-    nvrhi::ComputePipelineHandle binPipeline;
-    nvrhi::BindingLayoutHandle binLayout;
+    nvrhi::ComputePipelineHandle binCountPipeline;
+    nvrhi::BindingLayoutHandle binCountLayout;
+    nvrhi::ComputePipelineHandle binReservePipeline;
+    nvrhi::BindingLayoutHandle binReserveLayout;
+    nvrhi::ComputePipelineHandle binEmitPipeline;
+    nvrhi::BindingLayoutHandle binEmitLayout;
+    nvrhi::ComputePipelineHandle binDynPipeline;
+    nvrhi::BindingLayoutHandle binDynLayout;
     nvrhi::ComputePipelineHandle argsPipeline;
     nvrhi::BindingLayoutHandle argsLayout;
     nvrhi::GraphicsPipelineHandle clearPipeline;
@@ -117,6 +144,9 @@ struct LocalShadowState {
 struct LocalShadowConfig {
     GPUCullingManager* gpuCulling = nullptr;
     nvrhi::IBuffer* entryBuffer = nullptr;
+    nvrhi::IBuffer* bvhNodeBuffer = nullptr;
+    nvrhi::IBuffer* bvhIndexBuffer = nullptr;
+    u32 bvhNodeCount = 0;
     nvrhi::IBuffer* staticInstanceBuffer = nullptr;
     nvrhi::IBuffer* terrainInstanceBuffer = nullptr;
     nvrhi::IBuffer* dynamicInstanceBuffer = nullptr;

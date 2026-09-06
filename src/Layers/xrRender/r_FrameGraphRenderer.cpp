@@ -715,10 +715,12 @@ void FrameGraphRenderer::RenderStatsOverlay()
             const auto& localShadow = m_blackboard->get_or_add<passes::LocalShadowState>();
             stats.localShadowSpots = localShadow.pooledSpots;
             stats.localShadowPoints = localShadow.pooledPoints;
-            stats.localShadowStatic = localShadow.refreshStaticCount;
-            stats.localShadowDyn = localShadow.refreshDynCount;
+            stats.localShadowAccepted = localShadow.statAccepted;
+            stats.localShadowDeferred = localShadow.statDeferred;
+            stats.localShadowDyn = localShadow.statDynRefresh;
             stats.localShadowPairs = localShadow.statPairs + localShadow.statDynPairs + localShadow.statSkinnedPairs;
             stats.localShadowDrops = localShadow.statDrops;
+            stats.localShadowDynDrops = localShadow.statDynDrops;
         }
 
         // Collect detail/grass stats
@@ -1435,6 +1437,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         passes::LocalShadowConfig localCfg;
         localCfg.gpuCulling = m_gpuCullingManager.get();
         localCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+        localCfg.bvhNodeBuffer = m_gpuCullingManager->GetShadowBvhNodeBuffer();
+        localCfg.bvhIndexBuffer = m_gpuCullingManager->GetShadowBvhIndexBuffer();
+        localCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
         localCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
         localCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
         localCfg.dynamicInstanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
