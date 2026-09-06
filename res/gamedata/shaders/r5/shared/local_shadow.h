@@ -5,13 +5,27 @@
 
 #ifdef LOCAL_SHADOW_RECEIVER
 
-StructuredBuffer<LocalShadowTile> g_LocalShadowTiles : register(t34);
+StructuredBuffer<LocalShadowView> g_LocalShadowTiles : register(t34);
 Texture2D<float> g_LocalShadowStatic : register(t35);
 Texture2D<float> g_LocalShadowDyn : register(t36);
 
+uint LocalShadowCachedSlot(uint baseSlot, bool pointLight, float3 worldPos)
+{
+    LocalShadowView base = g_LocalShadowTiles[baseSlot];
+    if (base.zparams.w < 0.5)
+        return 0xFFFFFFFFu;
+    if (!pointLight)
+        return baseSlot;
+    float3 d = worldPos - base.lightPos.xyz;
+    float3 a = abs(d);
+    uint face = (a.x >= a.y && a.x >= a.z) ? (d.x >= 0.0 ? 0u : 1u)
+              : (a.y >= a.z) ? (d.y >= 0.0 ? 2u : 3u) : (d.z >= 0.0 ? 4u : 5u);
+    return baseSlot + face;
+}
+
 float LocalShadowVisibility(uint slot, float3 wp, float3 N)
 {
-    LocalShadowTile t = g_LocalShadowTiles[slot];
+    LocalShadowView t = g_LocalShadowTiles[slot];
     if (t.zparams.w < 0.5)
         return 1.0;
     float4 c0 = mul(t.viewProj, float4(wp, 1.0));
@@ -43,6 +57,11 @@ float LocalShadowVisibility(uint slot, float3 wp, float3 N)
 }
 
 #else
+
+uint LocalShadowCachedSlot(uint baseSlot, bool pointLight, float3 worldPos)
+{
+    return 0xFFFFFFFFu;
+}
 
 float LocalShadowVisibility(uint slot, float3 wp, float3 N)
 {

@@ -2,7 +2,7 @@
 #include "common.h"
 #include "local_shadow_common.h"
 
-StructuredBuffer<LocalShadowTile> g_LocalShadowTiles : register(t17);
+StructuredBuffer<LocalShadowView> g_LocalShadowTiles : register(t17);
 StructuredBuffer<uint> g_Refresh : register(t16);
 
 struct VS_OUTPUT
