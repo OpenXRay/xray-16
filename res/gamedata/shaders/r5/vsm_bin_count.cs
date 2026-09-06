@@ -22,7 +22,9 @@ RWStructuredBuffer<uint4> g_PageCount : register(u0);
 
 groupshared uint gs_count[3];
 
-void VsmVisit(bool active, uint entryIdx, VsmPageQuery q)
+typedef VsmPageQuery BvhQuery;
+
+void BvhVisit(bool active, uint entryIdx, VsmPageQuery q)
 {
     if (!active)
         return;
@@ -38,7 +40,7 @@ void VsmVisit(bool active, uint entryIdx, VsmPageQuery q)
     InterlockedAdd(gs_count[stream], 1u, d);
 }
 
-#include "vsm_bvh.h"
+#include "cluster_bvh.h"
 
 [numthreads(VSM_BVH_GROUP, 1, 1)]
 void main(uint3 gID : SV_GroupID, uint3 gtID : SV_GroupThreadID)
@@ -65,7 +67,7 @@ void main(uint3 gID : SV_GroupID, uint3 gtID : SV_GroupThreadID)
     q.includeAT = g_IncludeAT;
     q.pad = 0u;
 
-    vsmBvhTraverse(t, g_NodeCount, q);
+    bvhTraverse(t, g_NodeCount, q);
 
     GroupMemoryBarrierWithGroupSync();
     if (t == 0u)
