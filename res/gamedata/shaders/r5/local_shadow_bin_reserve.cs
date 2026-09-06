@@ -88,24 +88,25 @@ void main(uint3 gtID : SV_GroupThreadID)
     bool inView = ((cand.w >> 31u) & 1u) != 0u;
     bool dynDue = ((cand.w >> 30u) & 1u) != 0u;
     uint rank = cand.w & 0xFFFFu;
+    bool release = have && cand.y == 0u;
 
     bool valid = st.zparams.w > 0.5;
     bool sameOwner = valid && st.meta.y == cand.z;
     bool upToDate = sameOwner && st.meta.x == cand.y;
     bool isNew = !sameOwner;
 
-    if (valid && st.meta.y != cand.z)
+    if (release || (valid && st.meta.y != cand.z))
         st.zparams.w = 0.0;
     st.rect.w = req.rect.w;
     st.shape = req.shape;
     if (have)
         g_TileState[slot] = st;
 
-    if (sched.x != cand.z)
+    if (release || sched.x != cand.z)
         sched = uint4(cand.z, 0u, 0u, 0u);
 
     uint3 cnt = have ? g_TileCount[t].xyz : uint3(0u, 0u, 0u);
-    bool want = have && inView && !upToDate;
+    bool want = have && !release && inView && !upToDate;
     if (want && sched.z == 0u)
     {
         sched.y = g_Frame;
@@ -232,7 +233,7 @@ void main(uint3 gtID : SV_GroupThreadID)
     if (have)
         g_Schedule[slot] = sched;
 
-    bool postValid = acceptedTile || sameOwner;
+    bool postValid = !release && (acceptedTile || sameOwner);
     gs_dyn[t] = (have && postValid && (acceptedTile || dynDue)) ? 1u : 0u;
     GroupMemoryBarrierWithGroupSync();
 
