@@ -61,9 +61,10 @@ void main(uint3 gID : SV_GroupID, uint3 gtID : SV_GroupThreadID)
     uint g = gID.x;
     uint4 cand = g_CandList[g];
     LocalShadowView st = g_TileState[cand.x];
+    bool release = cand.y == 0u;
     bool inView = (cand.w >> 31u) != 0u;
     bool upToDate = st.zparams.w > 0.5 && st.meta.x == cand.y && st.meta.y == cand.z;
-    uint flags = (upToDate ? 1u : 0u) | (inView ? 0u : 2u);
+    uint flags = release ? 2u : ((upToDate ? 1u : 0u) | (inView ? 0u : 2u));
     if (flags != 0u)
     {
         if (t == 0u)
