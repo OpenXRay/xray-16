@@ -113,6 +113,10 @@ void ClusteredLightManager::Shutdown()
     m_statsWriteSlot = 0;
     m_statsScheduled = 0;
     m_visibleLightCountCPU = 0;
+    m_lightsThisFrame.clear();
+    for (auto& snapshot : m_lightSnapshots)
+        snapshot.clear();
+    m_culledLights.clear();
     m_lightsCPU.clear();
     m_spotTextureCache.clear();
     m_device = nullptr;
@@ -261,6 +265,7 @@ void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>&
 
     m_lightsCPU.resize(count);
     m_numLights = count;
+    m_lightsThisFrame = lights;
 
     xr_parallel_for(TaskRange<u32>(0, count), [&](const TaskRange<u32>& range) {
         for (u32 i = range.begin(); i != range.end(); ++i)
@@ -331,6 +336,7 @@ void ClusteredLightManager::UploadAllVisible(nvrhi::ICommandList* cmdList)
     cmdList->writeBuffer(m_visibleLightIndicesBuffer, m_identityIndices.data(), m_numLights * sizeof(u32));
     cmdList->writeBuffer(m_visibleLightCountBuffer, &m_numLights, sizeof(u32));
     m_visibleLightCountCPU = m_numLights;
+    m_culledLights.clear();
 }
 
 ClusterCB ClusteredLightManager::BuildClusterCB(u32 screenWidth, u32 screenHeight, float zNear, float zFar) const
@@ -359,10 +365,11 @@ void ClusteredLightManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
         return;
 
     nvrhi::BufferHandle& slot = m_statsReadbackBuffers[m_statsWriteSlot];
-    if (!slot)
+    const u64 byteSize = u64(1 + m_numLights) * sizeof(u32);
+    if (!slot || slot->getDesc().byteSize < byteSize)
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32);
+        desc.byteSize = byteSize;
         desc.debugName = "ClusteredLights_StatsReadback";
         desc.cpuAccess = nvrhi::CpuAccessMode::Read;
         desc.initialState = nvrhi::ResourceStates::CopyDest;
@@ -373,6 +380,9 @@ void ClusteredLightManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
     }
 
     cmdList->copyBuffer(slot, 0, m_visibleLightCountBuffer, 0, sizeof(u32));
+    if (m_numLights)
+        cmdList->copyBuffer(slot, sizeof(u32), m_visibleLightIndicesBuffer, 0, u64(m_numLights) * sizeof(u32));
+    m_lightSnapshots[m_statsWriteSlot] = m_lightsThisFrame;
     m_statsWriteSlot = (m_statsWriteSlot + 1) % STATS_READBACK_SLOTS;
     if (m_statsScheduled < STATS_READBACK_SLOTS)
         ++m_statsScheduled;
@@ -384,12 +394,21 @@ void ClusteredLightManager::ProcessStatsReadback()
         return;
 
     nvrhi::IBuffer* oldest = m_statsReadbackBuffers[m_statsWriteSlot];
-    void* mappedData = m_device->mapBuffer(oldest, nvrhi::CpuAccessMode::Read);
-    if (mappedData)
-    {
-        m_visibleLightCountCPU = *static_cast<const u32*>(mappedData);
-        m_device->unmapBuffer(oldest);
-    }
+    const u32* words = static_cast<const u32*>(m_device->mapBuffer(oldest, nvrhi::CpuAccessMode::Read));
+    if (!words)
+        return;
+    const xr_vector<const light*>& snapshot = m_lightSnapshots[m_statsWriteSlot];
+    const u32 total = u32(snapshot.size());
+    m_visibleLightCountCPU = std::min(words[0], total);
+    xr_vector<bool> visible(total, false);
+    for (u32 i = 0; i < m_visibleLightCountCPU; ++i)
+        if (words[1 + i] < total)
+            visible[words[1 + i]] = true;
+    m_culledLights.clear();
+    for (u32 i = 0; i < total; ++i)
+        if (!visible[i])
+            m_culledLights.push_back(snapshot[i]);
+    m_device->unmapBuffer(oldest);
 }
 
 u32 ClusteredLightManager::GetOrLoadSpotTexture(const shared_str& name)

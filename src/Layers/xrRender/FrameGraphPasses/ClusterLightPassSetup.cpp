@@ -212,7 +212,7 @@ void setupClusterLightPass(
                             cmdList->dispatch(groups, 1, 1);
 
                             cmdList->commitBarriers();
-                            if (psDeviceFlags.test(rsStatistic))
+                            if (psDeviceFlags.test(rsStatistic) || ps_r_local_shadow_debug != 0)
                                 data.lightManager->ScheduleStatsReadback(cmdList);
                             didHiZCull = true;
                         }
