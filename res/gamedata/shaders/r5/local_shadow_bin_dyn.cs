@@ -86,7 +86,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
         if (hit)
         {
             LocalViewQuery q = localQueryFromView(v, slot, g_IncludeAT, 1.0);
-            if (g_StaticOverflow != 0u ? !localEntryTouchesView(e, q) : localBoxOutside(e.sphere.xyz, e.extent, q))
+            bool skinned = (e.flags & CLUSTER_ENTRY_FLAG_SKINNED) != 0u;
+            if (skinned ? localBoxOutside(e.sphere.xyz, e.extent, q) : !localEntryTouchesView(e, q))
                 hit = false;
         }
         uint2 pair = uint2(entryIdx, slot);

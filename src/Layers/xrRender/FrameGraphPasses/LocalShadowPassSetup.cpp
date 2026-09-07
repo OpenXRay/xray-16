@@ -743,7 +743,7 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Static");
 
     LocalDrawContext dc;
-    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowStatic", 0, true, dc)) {
+    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowStatic", 0, false, dc)) {
         if (data.gpuProfiler)
             data.gpuProfiler->EndPass(cmdList, "Local Shadow.Static");
         return;
@@ -835,7 +835,7 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Dyn");
 
     LocalDrawContext dc;
-    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowDyn", 1, true, dc)) {
+    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowDyn", 1, false, dc)) {
         if (data.gpuProfiler)
             data.gpuProfiler->EndPass(cmdList, "Local Shadow.Dyn");
         return;
