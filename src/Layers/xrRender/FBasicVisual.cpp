@@ -62,6 +62,8 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
         string256 fnT, fnS;
         data->r_stringZ(fnT, sizeof(fnT));
         data->r_stringZ(fnS, sizeof(fnS));
+        xr_strlwr(fnT);
+        xr_strlwr(fnS);
 
         shaderName = fnS;
         textureName = fnT;
