@@ -215,6 +215,35 @@ void FGDebugDraw::DrawEllipse(const Fmatrix& T, u32 color)
     }
 }
 
+void FGDebugDraw::DrawSphere(const Fvector& center, float radius, u32 fillColor, u32 wireColor)
+{
+    constexpr u32 rings = 16, segments = 32;
+    auto sample = [&](u32 ring, u32 segment) {
+        const float latitude = PI * float(ring) / float(rings);
+        const float longitude = PI_MUL_2 * float(segment) / float(segments);
+        return Fvector{ center.x + radius * _sin(latitude) * _cos(longitude),
+            center.y + radius * _cos(latitude), center.z + radius * _sin(latitude) * _sin(longitude) };
+    };
+    for (u32 ring = 0; ring < rings; ++ring) {
+        for (u32 segment = 0; segment < segments; ++segment) {
+            const Fvector a = sample(ring, segment), b = sample(ring, segment + 1);
+            const Fvector c = sample(ring + 1, segment), d = sample(ring + 1, segment + 1);
+            if (ring != 0)
+                AddTriangle(a, b, c, fillColor);
+            if (ring + 1 != rings)
+                AddTriangle(b, d, c, fillColor);
+        }
+    }
+    Fmatrix transform;
+    transform.scale(radius, radius, radius);
+    transform.c = center;
+    DrawEllipse(transform, wireColor);
+    const float marker = std::min(radius * 0.05f, 0.15f);
+    AddLine(Fvector{center.x - marker, center.y, center.z}, Fvector{center.x + marker, center.y, center.z}, wireColor);
+    AddLine(Fvector{center.x, center.y - marker, center.z}, Fvector{center.x, center.y + marker, center.z}, wireColor);
+    AddLine(Fvector{center.x, center.y, center.z - marker}, Fvector{center.x, center.y, center.z + marker}, wireColor);
+}
+
 bool FGDebugDraw::EnsurePipelines(nvrhi::IDevice* device, nvrhi::IFramebuffer* framebuffer)
 {
     if (m_pipelineLine && m_pipelineTri)

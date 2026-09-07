@@ -33,6 +33,7 @@ public:
     void DrawTRI(const Fmatrix& T, const Fvector& p1, const Fvector& p2, const Fvector& p3, u32 color);
     void DrawOBB(const Fmatrix& T, const Fvector& halfdim, u32 color);
     void DrawEllipse(const Fmatrix& T, u32 color);
+    void DrawSphere(const Fvector& center, float radius, u32 fillColor, u32 wireColor);
 
     void Render(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, const Fmatrix& viewProj);
 

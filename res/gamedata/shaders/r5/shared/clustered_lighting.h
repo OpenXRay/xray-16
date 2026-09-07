@@ -151,29 +151,6 @@ float3 EvaluateClusteredLights(
     return totalLight;
 }
 
-float4 LocalShadowDebug(float3 worldPos, float3 N, float2 screenPos, float linearDepth)
-{
-    uint numLights = (uint)cluster_params.w;
-    if (numLights == 0)
-        return 0;
-    uint clusterIdx = GetClusterIndex(screenPos, linearDepth, cluster_params.xyz, cluster_scales);
-    uint2 clusterData = g_ClusterGrid[clusterIdx];
-    for (uint i = 0; i < clusterData.y; i++)
-    {
-        uint lightIdx = i;
-        if (clusterData.x != 0xFFFFFFFFu)
-            lightIdx = g_LightIndexList[clusterData.x + i];
-        GPULightData light = g_LightData[lightIdx];
-        uint slot = LocalShadowSlot(light, worldPos);
-        if (slot == 0xFFFFFFFFu)
-            continue;
-        if (distance(light.positionAndInvRangeSq.xyz, worldPos) > light.colorAndRange.w)
-            continue;
-        float v = LocalShadowVisibility(slot, worldPos, N);
-        return float4(lerp(float3(1.0, 0.0, 0.0), float3(0.0, 1.0, 0.0), v), 1.0);
-    }
-    return 0;
-}
 #endif // CLUSTERED_LIGHTING_FORWARD
 
 #endif // CLUSTERED_LIGHTING_H
