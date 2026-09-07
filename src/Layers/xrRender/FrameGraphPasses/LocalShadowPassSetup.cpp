@@ -56,11 +56,6 @@ struct LocalShadowDynBinParams {
 };
 static_assert(sizeof(LocalShadowDynBinParams) == 32, "LocalShadowDynBinParams is shader-visible");
 
-struct LocalShadowRouteParams {
-    u32 pancake;
-    u32 pad[3];
-};
-
 struct LocalShadowArgsParams {
     u32 caps[8];
 };
@@ -628,14 +623,13 @@ struct LocalDrawContext {
     nvrhi::IDevice* nvDevice;
     nvrhi::IFramebuffer* framebuffer;
     nvrhi::IBindingSet* bindlessTable;
-    nvrhi::IBuffer* routeCB;
     nvrhi::Viewport viewport;
     nvrhi::Rect scissor;
 };
 
 bool BeginAtlasPass(fg::RenderContext* ctx, const LocalShadowConfig& cfg, LocalShadowState& state,
                     nvrhi::ITexture* atlas, fg::RenderDevice* device, const char* fbName, u32 clearIndex,
-                    bool pancake, LocalDrawContext& out)
+                    LocalDrawContext& out)
 {
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -679,13 +673,7 @@ bool BeginAtlasPass(fg::RenderContext* ctx, const LocalShadowConfig& cfg, LocalS
     if (!framebuffer)
         return false;
 
-    LocalShadowRouteParams rp = {};
-    rp.pancake = pancake ? 1u : 0u;
-    auto routeCB = cache.GetOrCreateVolatileCB("LocalShadow", "RouteParams", sizeof(LocalShadowRouteParams), device, 1024);
-    cmdList->writeBuffer(routeCB, &rp, sizeof(rp));
-
     auto* backend = device->GetBackend();
-    out.routeCB = routeCB;
     out.cmdList = cmdList;
     out.nvDevice = nvDevice;
     out.framebuffer = framebuffer;
@@ -743,7 +731,7 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Static");
 
     LocalDrawContext dc;
-    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowStatic", 0, false, dc)) {
+    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowStatic", 0, dc)) {
         if (data.gpuProfiler)
             data.gpuProfiler->EndPass(cmdList, "Local Shadow.Static");
         return;
@@ -755,7 +743,6 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         if (!pipeline || !layout || !instanceBuffer)
             return;
         BindingSetBuilder bsb(*vsRefl, ps, nvDevice, label);
-        bsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
         bsb.BufferSRV("g_InstanceData", instanceBuffer);
         bsb.BufferSRV("g_Pairs", state.pairs[stream]);
         bsb.BufferSRV("g_Entries", cfg.entryBuffer);
@@ -835,7 +822,7 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Dyn");
 
     LocalDrawContext dc;
-    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowDyn", 1, false, dc)) {
+    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowDyn", 1, dc)) {
         if (data.gpuProfiler)
             data.gpuProfiler->EndPass(cmdList, "Local Shadow.Dyn");
         return;
@@ -871,7 +858,6 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
             BinCasterBatch(ctx, data.device, state, cfg.entryBuffer, gpuCulling.GetClusterEntryCount() + base,
                 std::min(batchSize, count - base), 2u);
             BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "LocalShadow.DynOpaque");
-            bsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
             bsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
             bsb.BufferSRV("g_Pairs", state.pairs[3]);
             bsb.BufferSRV("g_Entries", cfg.entryBuffer);
@@ -882,7 +868,6 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
                 draw(state.pagePipeline, bindingSet, 3, false);
 
             BindingSetBuilder atBsb(*vsRefl, *atRefl, nvDevice, "LocalShadow.DynAT");
-            atBsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
             atBsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
             atBsb.BufferSRV("g_Pairs", state.pairs[4]);
             atBsb.BufferSRV("g_Entries", cfg.entryBuffer);
@@ -904,7 +889,6 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
         for (u32 base = 0; base < count; base += batchSize) {
             BinCasterBatch(ctx, data.device, state, skinnedEntries, base, std::min(batchSize, count - base), 3u);
             BindingSetBuilder bsb(*skinVsRefl, *atRefl, nvDevice, "LocalShadow.DynSkin");
-            bsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
             bsb.BufferSRV("g_Pairs", state.pairs[5]);
             bsb.BufferSRV("g_Entries", skinnedEntries);
             bsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
@@ -1223,7 +1207,7 @@ void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandid
         state.slotOfLight.push_back(base + 1u);
         const float farZ = std::max(L->range + EPS_S, 0.002f);
         const float nearZ = clampr(L->virtual_size, 0.001f, farZ * 0.5f);
-        const float fov = (point ? PI_DIV_2 : L->cone) + deg2rad(3.5f);
+        const float fov = point ? PI_DIV_2 + deg2rad(11.5f) : L->cone + deg2rad(3.5f);
         for (u32 f = 0; f < faces; ++f) {
             const u32 slot = state.candCount++;
             Fvector dir, up;

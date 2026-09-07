@@ -10,12 +10,6 @@ StructuredBuffer<LocalShadowView> g_LocalShadowTiles : register(t17);
 ByteAddressBuffer g_MegaVB : register(t18);
 ByteAddressBuffer g_MegaIB : register(t19);
 
-cbuffer LocalShadowRouteParams : register(b5)
-{
-    uint g_Pancake;
-    uint3 g_RoutePad;
-};
-
 #include "local_shadow_route.h"
 
 struct VS_OUTPUT
