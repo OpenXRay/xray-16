@@ -1365,10 +1365,8 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
         if (strstr(visual->shaderName.c_str(), "water") != nullptr)
             matData.flags |= MAT_FLAG_WATER;
         matData.shaderVariant = matInfo.shaderVariant;
-        if (matInfo.emissive > 0.0f) {
+        if (matInfo.emissive > 0.0f)
             matData.flags |= MAT_FLAG_EMISSIVE;
-            matData.emissive = matInfo.emissive;
-        }
         matData.flags |= MAT_FLAG_HAS_NORMAL;
     }
 

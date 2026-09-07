@@ -2,6 +2,7 @@
 #include "GPUStructuredBuffer.h"
 #include "BindlessTypes.h"
 #include "VariantTextureBuffer.h"
+#include "VariantBuffer.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 
@@ -77,5 +78,6 @@ void GPUStructuredBuffer<T>::Upload(fg::RenderContext* ctx)
 template class GPUStructuredBuffer<MaterialData>;
 template class GPUStructuredBuffer<TerrainMaterialData>;
 template class GPUStructuredBuffer<VariantTextureData>;
+template class GPUStructuredBuffer<VariantData>;
 
 } // namespace xray::render::fg::bindless

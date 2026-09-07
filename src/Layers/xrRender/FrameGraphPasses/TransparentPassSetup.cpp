@@ -9,6 +9,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/VariantBuffer.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
@@ -185,6 +186,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Transparent");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB);
             bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+            bsb.BufferSRV("g_Variants", bindless::VariantBuffer::Instance().GetBuffer());
             bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
             bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
             bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());

@@ -11,6 +11,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/VariantBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 
@@ -225,6 +226,7 @@ MaterialResolveOutput setupMaterialResolvePass(
             bsb.ConstantBuffer("static_globals", staticGlobalsCB);
             bsb.ConstantBuffer("MaterialResolveParams", paramsCB);
             bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+            bsb.BufferSRV("g_Variants", bindless::VariantBuffer::Instance().GetBuffer());
             bsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
             bsb.BufferSRV("g_InstanceData", config.instanceBuffer);
             bsb.BufferSRV("g_TerrainInstanceData", terrainInstances);

@@ -80,7 +80,7 @@ PS_OUTPUT main(PS_INPUT input)
 
     bool forwardOnly = (mat.flags & MAT_FLAG_ALPHA_BLEND) != 0;
     f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position, -1.0, forwardOnly);
-    output.color = float4(fwd.color.rgb, forwardOnly ? diffuseSample.a : fwd.color.a);
+    output.color = float4(fwd.color.rgb + surface.emissive, forwardOnly ? diffuseSample.a : fwd.color.a);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;
 
