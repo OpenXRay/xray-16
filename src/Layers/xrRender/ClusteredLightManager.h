@@ -76,6 +76,7 @@ public:
     void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
     void ProcessStatsReadback();
     u32 GetVisibleLightCount() const { return m_visibleLightCountCPU; }
+    const xr_vector<const light*>& GetCulledLights() const { return m_culledLights; }
     bool HasVisibilityStats() const { return m_statsScheduled >= STATS_READBACK_SLOTS; }
 
     bool IsReady() const { return m_lightDataBuffer != nullptr; }
@@ -108,6 +109,9 @@ private:
     u32 m_statsWriteSlot = 0;
     u32 m_statsScheduled = 0;
     u32 m_visibleLightCountCPU = 0;
+    xr_vector<const light*> m_lightsThisFrame;
+    xr_vector<const light*> m_lightSnapshots[STATS_READBACK_SLOTS];
+    xr_vector<const light*> m_culledLights;
 
     u32 m_tilesX = 0;
     u32 m_tilesY = 0;
