@@ -117,6 +117,7 @@ void SkinnedGeometryPools::FlushUploads(nvrhi::IDevice* nvDevice, nvrhi::IComman
                 desc.debugName = "SkinnedPool_CombinedIB";
                 desc.byteSize = capacity;
                 desc.canHaveRawViews = true;
+                desc.isIndexBuffer = true;
                 desc.initialState = nvrhi::ResourceStates::ShaderResource;
                 desc.keepInitialState = true;
                 m_combinedIndexBuffer = nvDevice->createBuffer(desc);

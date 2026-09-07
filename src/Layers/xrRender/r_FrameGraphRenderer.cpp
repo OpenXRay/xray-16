@@ -1446,6 +1446,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         transparentConfig.instanceBuffer = m_gpuCullingManager->GetTransparentInstanceBuffer();
         transparentConfig.drawArgsBuffer = m_gpuCullingManager->GetTransparentDrawArgsBuffer();
         transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
+        transparentConfig.ranges = &m_gpuCullingManager->GetTransparentRanges();
+    }
+    if (m_gpuCullingManager && m_gpuCullingManager->GetSkinnedForwardCount() > 0) {
+        transparentConfig.gpuCulling = m_gpuCullingManager.get();
+        transparentConfig.skinned = true;
     }
 
     auto transparentOutputs = passes::setupTransparentPass(
@@ -1454,6 +1459,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         litOutputs,
         transparentConfig,
         localShadowOut,
+        skinnedDrawArgsBuffer,
         width, height,
         m_blackboard->get_or_add<passes::TransparentPassState>()
     );

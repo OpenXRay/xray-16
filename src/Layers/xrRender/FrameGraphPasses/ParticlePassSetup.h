@@ -117,6 +117,7 @@ struct ParticlePassData {
     bool hasPrevViewProj;
     ParticlePassState* passState;
     bool hasDistortion;
+    bool reuseDistortion = false;
 };
 
 struct ParticlePassOutput {

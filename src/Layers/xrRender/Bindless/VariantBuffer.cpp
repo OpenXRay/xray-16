@@ -21,7 +21,7 @@ void VariantBuffer::Initialize(fg::RenderDevice* device)
         Msg("! [VariantBuffer] Failed to create shader variant buffer");
         return;
     }
-    m_data.assign(MAX_SHADER_VARIANTS, VariantData{ 0.0f, VARIANT_FLAG_FOG, 0u, 0u });
+    m_data.assign(MAX_SHADER_VARIANTS, VariantData{ 0.0f, VARIANT_FLAG_FOG, 0u, 1.0f });
     if (GEnv.Backend)
         GEnv.Backend->UploadBufferData(m_buffer, m_data.data(), MAX_SHADER_VARIANTS * sizeof(VariantData));
 }
@@ -34,7 +34,7 @@ void VariantBuffer::Rebuild(const ShaderVariantRegistry& registry)
     R_ASSERT2(count <= MAX_SHADER_VARIANTS, "Shader variant table overflow");
     for (u32 i = 0; i < MAX_SHADER_VARIANTS; ++i)
     {
-        VariantData d = { 0.0f, VARIANT_FLAG_FOG, 0u, 0u };
+        VariantData d = { 0.0f, VARIANT_FLAG_FOG, 0u, 1.0f };
         if (const ShaderVariantDesc* v = i < count ? registry.GetVariantByIndex(i) : nullptr)
         {
             d.emissive = v->emissive ? v->emissiveIntensity : 0.0f;
@@ -42,6 +42,8 @@ void VariantBuffer::Rebuild(const ShaderVariantRegistry& registry)
                 | (v->transparent ? VARIANT_FLAG_TRANSPARENT : 0u) | (v->backToFront ? VARIANT_FLAG_BACK_TO_FRONT : 0u)
                 | (v->emissive ? VARIANT_FLAG_EMISSIVE : 0u)
                 | (v->castsShadow ? 0u : VARIANT_FLAG_NO_SHADOW);
+            d.packed = u32(v->fadeMode) | (u32(v->colorMode) << 8);
+            d.fadeScale = v->fadeScale;
         }
         m_data[i] = d;
     }
