@@ -28,6 +28,7 @@
 #include <imgui.h>
 
 #include "FrameGraphPasses/DebugDrawPassSetup.h"
+#include "FGDebugDraw.h"
 #include "FrameGraphPasses/HiZBuildPassSetup.h"
 #include "FrameGraphPasses/VisibilityPassSetup.h"
 #include "FrameGraphPasses/MaterialResolvePassSetup.h"
@@ -2452,6 +2453,19 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         }
         if (!collectedLights.empty())
             fg::ClusteredLightManager::Instance().CollectLightsParallel(collectedLights, *slots);
+    }
+
+    if (ps_r_local_shadow_debug != 0) {
+        auto debugLights = collectedLights;
+        std::sort(debugLights.begin(), debugLights.end(), [](const light* a, const light* b) {
+            return Device.vCameraPosition.distance_to_sqr(a->position) > Device.vCameraPosition.distance_to_sqr(b->position);
+        });
+        for (const light* L : debugLights) {
+            if (L->flags.type != IRender_Light::POINT)
+                continue;
+            const u32 rgb = bgr2rgb(L->flags.bShadow ? color_rgba(40, 210, 255, 0) : color_rgba(255, 170, 40, 0));
+            fg::g_debug_draw.DrawSphere(L->position, L->range, rgb | color_rgba(0, 0, 0, 14), rgb | color_rgba(0, 0, 0, 170));
+        }
     }
 
     if (g_pGameLevel && g_pGameLevel->pHUD) {

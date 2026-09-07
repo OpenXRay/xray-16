@@ -27,9 +27,7 @@ struct alignas(16) TileParams {
     u32 maxTiles;
     u32 listBase;
     u32 forceMixed;
-    u32 localShadowDebug;
-    u32 pad0;
-    u32 pad1;
+    u32 pad[3];
 };
 static_assert(sizeof(TileParams) == 32, "TileParams must be 32 bytes");
 
@@ -285,7 +283,6 @@ DefaultOutputLayout setupDeferredLightPass(
             tp.maxTiles = state.maxTiles;
             tp.listBase = 0;
             tp.forceMixed = ps_r_sun_shadow_debug != 0 ? 1u : 0u;
-            tp.localShadowDebug = ps_r_local_shadow_debug != 0 ? 1u : 0u;
             cmdList->writeBuffer(tileCB, &tp, sizeof(tp));
 
             auto& clm = ClusteredLightManager::Instance();
