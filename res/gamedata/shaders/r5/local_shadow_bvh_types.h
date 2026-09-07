@@ -45,6 +45,8 @@ bool bvhNodeTest(ClusterBvhNode nd, LocalViewQuery q)
 
 bool localEntryTouchesView(ClusterEntry e, LocalViewQuery q)
 {
+    if ((e.flags & CLUSTER_ENTRY_FLAG_NO_SHADOW) != 0u)
+        return false;
     if (localBoxOutside(e.sphere.xyz, e.extent, q))
         return false;
     if ((e.flags & 2u) != 0u)

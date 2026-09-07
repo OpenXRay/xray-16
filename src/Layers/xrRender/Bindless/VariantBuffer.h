@@ -15,6 +15,7 @@ enum VariantFlags : u32 {
     VARIANT_FLAG_TRANSPARENT = (1 << 2),
     VARIANT_FLAG_BACK_TO_FRONT = (1 << 3),
     VARIANT_FLAG_EMISSIVE = (1 << 4),
+    VARIANT_FLAG_NO_SHADOW = (1 << 5),
 };
 
 struct alignas(16) VariantData {

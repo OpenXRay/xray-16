@@ -40,7 +40,8 @@ void VariantBuffer::Rebuild(const ShaderVariantRegistry& registry)
             d.emissive = v->emissive ? v->emissiveIntensity : 0.0f;
             d.flags = (v->fog ? VARIANT_FLAG_FOG : 0u) | (v->distort ? VARIANT_FLAG_DISTORT : 0u)
                 | (v->transparent ? VARIANT_FLAG_TRANSPARENT : 0u) | (v->backToFront ? VARIANT_FLAG_BACK_TO_FRONT : 0u)
-                | (v->emissive ? VARIANT_FLAG_EMISSIVE : 0u);
+                | (v->emissive ? VARIANT_FLAG_EMISSIVE : 0u)
+                | (v->castsShadow ? 0u : VARIANT_FLAG_NO_SHADOW);
         }
         m_data[i] = d;
     }

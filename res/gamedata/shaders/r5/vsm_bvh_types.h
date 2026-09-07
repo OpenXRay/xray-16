@@ -39,6 +39,8 @@ bool bvhNodeTest(ClusterBvhNode nd, VsmPageQuery q)
 
 bool vsmEntryTouchesPage(ClusterEntry e, VsmPageQuery q)
 {
+    if ((e.flags & 128u) != 0u) // GPU_CLUSTER_ENTRY_NO_SHADOW
+        return false;
     if ((e.flags & 2u) == 0u)
     {
         if (e.selfError > q.errB || e.parentError <= q.errB)

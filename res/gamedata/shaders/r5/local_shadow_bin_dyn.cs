@@ -68,7 +68,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     ClusterEntry e = (ClusterEntry)0;
     if (valid)
         e = g_Entries[entryIdx];
-    if ((e.flags & CLUSTER_ENTRY_FLAG_HUD) != 0u)
+    if ((e.flags & (CLUSTER_ENTRY_FLAG_HUD | CLUSTER_ENTRY_FLAG_NO_SHADOW)) != 0u)
         valid = false;
     bool at = (e.flags & CLUSTER_ENTRY_FLAG_AT) != 0u;
     if (at && g_IncludeAT == 0u)
