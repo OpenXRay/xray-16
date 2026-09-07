@@ -20,10 +20,6 @@ struct MaterialData
     float alphaRef;
     uint flags;
     uint shaderVariant;
-    float emissive;
-    uint pad0;
-    uint pad1;
-    uint pad2;
 };
 
 #define MAT_FLAG_ALPHA_TEST    (1 << 0)
@@ -66,9 +62,24 @@ struct VariantTextureData
     uint tex[8];
 };
 
+struct VariantData
+{
+    float emissive;
+    uint flags;
+    uint pad0;
+    uint pad1;
+};
+
+#define VARIANT_FLAG_FOG           (1 << 0)
+#define VARIANT_FLAG_DISTORT       (1 << 1)
+#define VARIANT_FLAG_TRANSPARENT   (1 << 2)
+#define VARIANT_FLAG_BACK_TO_FRONT (1 << 3)
+#define VARIANT_FLAG_EMISSIVE      (1 << 4)
+
 StructuredBuffer<MaterialData> g_Materials : register(t8);
 StructuredBuffer<TerrainMaterialData> g_TerrainMaterials : register(t9);
 StructuredBuffer<VariantTextureData> g_VariantTextures : register(t10);
+StructuredBuffer<VariantData> g_Variants : register(t23);
 
 #ifndef common_samplers_h_included
 #include "common_samplers.h"

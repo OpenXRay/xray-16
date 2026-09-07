@@ -33,13 +33,8 @@ struct alignas(16) MaterialData {
     float alphaRef;
     u32 flags;
     u32 shaderVariant;
-    float emissive;
-    u32 pad0;
-    u32 pad1;
-    u32 pad2;
 };
-static_assert(sizeof(MaterialData) == 48, "MaterialData must be 48 bytes for GPU alignment");
-static_assert(offsetof(MaterialData, emissive) == 32, "MaterialData emissive offset is shader-visible");
+static_assert(sizeof(MaterialData) == 32, "MaterialData must be 32 bytes for GPU alignment");
 
 enum MaterialFlags : u32 {
     MAT_FLAG_ALPHA_TEST    = (1 << 0),

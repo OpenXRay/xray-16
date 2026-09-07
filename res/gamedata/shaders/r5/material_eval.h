@@ -75,7 +75,7 @@ MaterialSurface EvalStandardMaterial(MaterialData mat, float3 diffuse, float2 uv
         s.roughness = pbrSample.g;
         s.ao = pbrSample.b;
     }
-    s.emissive = (mat.flags & MAT_FLAG_EMISSIVE) ? s.albedo * mat.emissive : 0.0;
+    s.emissive = (mat.flags & MAT_FLAG_EMISSIVE) ? s.albedo * g_Variants[mat.shaderVariant].emissive : 0.0;
     return s;
 }
 

@@ -41,6 +41,7 @@
 #include "Bindless/MaterialBuffer.h"
 #include "Bindless/TerrainMaterialBuffer.h"
 #include "Bindless/VariantTextureBuffer.h"
+#include "Bindless/VariantBuffer.h"
 #include "FrameGraphPasses/SkyPassSetup.h"
 #include "FrameGraphPasses/SunPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"
@@ -213,6 +214,7 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     bindless::MaterialBuffer::Instance().Initialize(m_device);
     bindless::TerrainMaterialBuffer::Instance().Initialize(m_device);
     bindless::VariantTextureBuffer::Instance().Initialize(m_device);
+    bindless::VariantBuffer::Instance().Initialize(m_device);
     bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);
     fg::ClusteredLightManager::Instance().Initialize(m_device);
     Msg("* [FrameGraphRenderer] Bindless material buffers initialized (early)");
