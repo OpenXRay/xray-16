@@ -193,7 +193,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
 
     g_OutNormal[p] = float4(s.N, roughnessOut);
     g_OutBaseColor[p] = float4(s.albedo, s.metallic);
-    g_OutColor[p] = float4(0.0, 0.0, 0.0, s.ao);
+    g_OutColor[p] = float4(s.emissive, s.ao);
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }
