@@ -9,6 +9,7 @@
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
+#include "Layers/xrRender/Bindless/VariantBuffer.h"
 
 #include "xrEngine/IRenderBackend.h"
 #include "xrEngine/GameFont.h"
@@ -41,6 +42,7 @@ void FGRenderBase::Destroy()
 
     bindless::DrawMaterialIDBuffer::Instance().Shutdown();
     bindless::VariantTextureBuffer::Instance().Shutdown();
+    bindless::VariantBuffer::Instance().Shutdown();
     bindless::MaterialBuffer::Instance().Shutdown();
     bindless::TerrainMaterialBuffer::Instance().Shutdown();
 

@@ -44,6 +44,7 @@ target_sources(xrRender PRIVATE
     Bindless/GPUStructuredBuffer.cpp
     Bindless/VariantTextureBuffer.h
     Bindless/VariantTextureBuffer.cpp
+    Bindless/VariantBuffer.cpp
     Bindless/MaterialBuffer.cpp
     Bindless/TerrainMaterialBuffer.cpp
     Bindless/VertexConverter.cpp

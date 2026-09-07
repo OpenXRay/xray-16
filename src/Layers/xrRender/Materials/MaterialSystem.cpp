@@ -4,6 +4,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
+#include "Layers/xrRender/Bindless/VariantBuffer.h"
 #include "Layers/xrRender/Materials/ShaderInfo.h"
 
 using namespace xray::render::resources;
@@ -46,6 +47,7 @@ void MaterialSystem::Initialize(resources::FGResourceManager* fgResourceManager,
     m_emptyTextureSet = TextureSet{};
 
     ShaderVariantRegistry::Instance().Initialize();
+    fg::bindless::VariantBuffer::Instance().Rebuild(ShaderVariantRegistry::Instance());
 
     m_initialized = true;
     Msg("* [MaterialSystem] Initialized");
