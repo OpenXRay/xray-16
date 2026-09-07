@@ -80,6 +80,8 @@ void main(uint3 gID : SV_GroupID, uint3 gtID : SV_GroupThreadID)
 {
     uint t = gtID.x;
     uint4 pairBase = g_PairBase[gID.x];
+    if (pairBase.w != 0u)
+        return; // This complete view is rendered by the bounded overflow batches.
     if (t < 3u)
         gs_cursor[t] = pairBase[t];
     if (t == 0u)

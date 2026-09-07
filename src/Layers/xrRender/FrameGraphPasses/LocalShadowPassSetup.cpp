@@ -129,12 +129,14 @@ nvrhi::BufferHandle MakeArgsBuffer(nvrhi::IDevice* nvDevice, const char* name, u
     return nvDevice->createBuffer(desc);
 }
 
-nvrhi::TextureHandle MakeAtlas(nvrhi::IDevice* nvDevice, const char* name)
+nvrhi::TextureHandle MakeAtlas(nvrhi::IDevice* nvDevice, const char* name, u32 layers = 1)
 {
     nvrhi::TextureDesc desc;
+    desc.dimension = nvrhi::TextureDimension::Texture2DArray;
+    desc.arraySize = layers;
     desc.width = kLocalShadowAtlas;
     desc.height = kLocalShadowAtlas;
-    desc.format = nvrhi::Format::D16;
+    desc.format = nvrhi::Format::D32;
     desc.debugName = name;
     desc.isShaderResource = true;
     desc.isRenderTarget = true;
@@ -210,8 +212,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, LocalShadowState& state)
     state.readbackWrite = 0;
     state.readbackScheduled = 0;
     state.stateReset = true;
-    state.staticAtlas = MakeAtlas(nvDevice, "LocalShadow_Static");
-    state.dynAtlas = MakeAtlas(nvDevice, "LocalShadow_Dyn");
+    R_ASSERT(state.staticAtlas && state.dynAtlas);
 
     bool ok = state.requestBuffer && state.candListBuffer && state.stateBuffer && state.tileCount
         && state.schedule && state.dirtyList && state.refreshDynBuffer && state.pairBase && state.emitArgs
@@ -225,7 +226,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, LocalShadowState& state)
         state.resourcesFailed = true;
         return false;
     }
-    Msg("* [LocalShadow] atlases %ux%u D16, %u view records, tiles %u..%u", kLocalShadowAtlas, kLocalShadowAtlas,
+    Msg("* [LocalShadow] atlases %ux%u D32, %u view records, tiles %u..%u", kLocalShadowAtlas, kLocalShadowAtlas,
         kLocalTileCount, kLocalPointFaceMin, kLocalSpotTileMax);
     return true;
 }
@@ -277,7 +278,7 @@ bool EnsurePipelines(fg::RenderDevice* device, LocalShadowState& state)
     state.clearLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowClear", *clearVsResult.reflection, *clearPsResult.reflection, nvDevice);
     state.pageLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowPage", *pageVsResult.reflection, *pagePsResult.reflection, nvDevice);
     state.pageATLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowPageAT", *pageVsResult.reflection, *pageATPsResult.reflection, nvDevice);
-    state.skinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowSkinPage", *skinVsResult.reflection, *pagePsResult.reflection, nvDevice);
+    state.skinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowSkinPage", *skinVsResult.reflection, *pageATPsResult.reflection, nvDevice);
     if (!state.binCountLayout || !state.binReserveLayout || !state.binEmitLayout || !state.binDynLayout
         || !state.argsLayout || !state.clearLayout || !state.pageLayout || !state.pageATLayout || !state.skinPageLayout) {
         state.pipelinesFailed = true;
@@ -301,7 +302,7 @@ bool EnsurePipelines(fg::RenderDevice* device, LocalShadowState& state)
     state.argsPipeline = cache.GetOrCreateComputePipeline("LocalShadowArgs", argsDesc, nvDevice);
 
     nvrhi::FramebufferInfoEx fbInfo;
-    fbInfo.depthFormat = nvrhi::Format::D16;
+    fbInfo.depthFormat = nvrhi::Format::D32;
 
     nvrhi::GraphicsPipelineDesc clearDesc;
     clearDesc.VS = clearVsResult.handle;
@@ -337,7 +338,7 @@ bool EnsurePipelines(fg::RenderDevice* device, LocalShadowState& state)
     };
     state.pagePipeline = cache.GetOrCreatePipeline("LocalShadowPage", makePageDesc(state.pageVS, pagePsResult.handle, state.pageLayout, false), fbInfo, nvDevice);
     state.pageATPipeline = cache.GetOrCreatePipeline("LocalShadowPageAT", makePageDesc(state.pageVS, pageATPsResult.handle, state.pageATLayout, true), fbInfo, nvDevice);
-    state.skinPagePipeline = cache.GetOrCreatePipeline("LocalShadowSkinPage", makePageDesc(state.skinPageVS, pagePsResult.handle, state.skinPageLayout, false), fbInfo, nvDevice);
+    state.skinPagePipeline = cache.GetOrCreatePipeline("LocalShadowSkinPage", makePageDesc(state.skinPageVS, pageATPsResult.handle, state.skinPageLayout, true), fbInfo, nvDevice);
 
     if (!state.binCountPipeline || !state.binReservePipeline || !state.binEmitPipeline || !state.binDynPipeline
         || !state.argsPipeline || !state.clearPipeline || !state.pagePipeline || !state.pageATPipeline || !state.skinPagePipeline) {
@@ -349,6 +350,103 @@ bool EnsurePipelines(fg::RenderDevice* device, LocalShadowState& state)
     return true;
 }
 
+void BuildLocalShadowArgs(fg::RenderContext* ctx, fg::RenderDevice* device, LocalShadowState& state, u32 mode)
+{
+    auto* cmdList = ctx->GetCommandList();
+    auto* nvDevice = device->GetNVRHIDevice();
+    auto& cache = GetPassResourceCache();
+    auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("local_shadow_args", ".cs");
+    R_ASSERT(reflection);
+    LocalShadowArgsParams ap = {};
+    std::copy_n(state.pairCapacity, kLocalStreamCount, ap.caps);
+    ap.caps[6] = mode;
+    auto cb = cache.GetOrCreateVolatileCB("LocalShadow", "ArgsParams", sizeof(ap), device, 1024);
+    cmdList->writeBuffer(cb, &ap, sizeof(ap));
+    cmdList->setBufferState(state.stats, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.args, nvrhi::ResourceStates::UnorderedAccess);
+    BindingSetBuilder bsb(*reflection, nvDevice, "LocalShadow.Args");
+    bsb.ConstantBuffer("LocalShadowArgsParams", cb).BufferSRV("g_Stats", state.stats).BufferUAV("g_Args", state.args);
+    auto bindings = cache.GetOrCreateBindingSet(bsb.Build(), state.argsLayout, nvDevice);
+    R_ASSERT(bindings);
+    nvrhi::ComputeState cs;
+    cs.pipeline = state.argsPipeline;
+    cs.bindings = { bindings };
+    cmdList->setComputeState(cs);
+    cmdList->dispatch(1, 1, 1);
+    cmdList->setBufferState(state.args, nvrhi::ResourceStates::IndirectArgument);
+}
+
+void BinCasterBatch(fg::RenderContext* ctx, fg::RenderDevice* device, LocalShadowState& state,
+                    nvrhi::IBuffer* entries, u32 entryBase, u32 count, u32 mode)
+{
+    auto* cmd = ctx->GetCommandList();
+    auto* nvDevice = device->GetNVRHIDevice();
+    auto& cache = GetPassResourceCache();
+    const bool statics = mode == 1u;
+    const bool skinned = mode == 3u;
+    const u32 opaque = statics ? 0u : (skinned ? 5u : 3u);
+    const u32 terrain = statics ? 1u : 0u;
+    const u32 at = statics ? 2u : 4u;
+    LocalShadowDynBinParams dp = {};
+    dp.entryBase = entryBase;
+    dp.entryCount = count;
+    dp.statsBase = statics ? 32u : (skinned ? 24u : 16u);
+    dp.capOpaque = state.pairCapacity[opaque];
+    dp.capTerrain = statics ? state.pairCapacity[terrain] : 0u;
+    dp.capAT = skinned ? 0u : state.pairCapacity[at];
+    dp.includeAT = 1u;
+    dp.pad = statics ? 1u : 0u;
+    // count * refreshCount <= every writable stream capacity. No pair truncation.
+    const u32 zeros[3] = {};
+    cmd->setBufferState(state.stats, nvrhi::ResourceStates::CopyDest);
+    cmd->writeBuffer(state.stats, zeros, sizeof(zeros), u64(dp.statsBase + 4u) * sizeof(u32));
+    auto cb = cache.GetOrCreateVolatileCB("LocalShadow", "DynBinParams", sizeof(dp), device, 1024);
+    cmd->writeBuffer(cb, &dp, sizeof(dp));
+    auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("local_shadow_bin_dyn", ".cs");
+    R_ASSERT(reflection);
+    cmd->setBufferState(state.stats, nvrhi::ResourceStates::UnorderedAccess);
+    cmd->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
+    cmd->setBufferState(state.stateBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmd->setBufferState(statics ? state.dirtyList : state.refreshDynBuffer, nvrhi::ResourceStates::ShaderResource);
+    for (u32 stream : { opaque, terrain, at })
+        cmd->setBufferState(state.pairs[stream], nvrhi::ResourceStates::UnorderedAccess);
+    BindingSetBuilder bsb(*reflection, nvDevice, "LocalShadow.CasterBatch");
+    bsb.ConstantBuffer("LocalShadowDynBinParams", cb)
+       .BufferSRV("g_Entries", entries)
+       .BufferSRV("g_Tiles", state.stateBuffer)
+       .BufferSRV("g_Refresh", statics ? state.dirtyList : state.refreshDynBuffer)
+       .BufferUAV("g_Stats", state.stats)
+       .BufferUAV("g_PairsOpaque", state.pairs[opaque])
+       .BufferUAV("g_PairsTerrain", state.pairs[terrain])
+       .BufferUAV("g_PairsAT", state.pairs[at]);
+    auto bindings = cache.GetOrCreateBindingSet(bsb.Build(), state.binDynLayout, nvDevice);
+    R_ASSERT(bindings);
+    nvrhi::ComputeState cs;
+    cs.pipeline = state.binDynPipeline;
+    cs.bindings = { bindings };
+    cmd->setComputeState(cs);
+    cmd->dispatch((count + 63u) / 64u, 1, 1);
+    BuildLocalShadowArgs(ctx, device, state, mode);
+    for (u32 stream : { opaque, terrain, at })
+        cmd->setBufferState(state.pairs[stream], nvrhi::ResourceStates::ShaderResource);
+    ++state.statCasterBatches;
+}
+
+void ScheduleLocalShadowStats(LocalShadowState& state, nvrhi::ICommandList* cmdList)
+{
+    if (nvrhi::IBuffer* slot = state.readback[state.readbackWrite]) {
+        cmdList->setBufferState(state.stats, nvrhi::ResourceStates::CopySource);
+        cmdList->copyBuffer(slot, 0, state.stats, 0, u64(kLocalStatWords) * sizeof(u32));
+        cmdList->setBufferState(state.schedule, nvrhi::ResourceStates::CopySource);
+        cmdList->copyBuffer(slot, u64(kLocalStatWords) * sizeof(u32), state.schedule, 0,
+            u64(kLocalTileCount) * sizeof(u32) * 4);
+        state.readbackWrite = (state.readbackWrite + 1) % LocalShadowState::kReadbackSlots;
+        if (state.readbackScheduled < LocalShadowState::kReadbackSlots)
+            ++state.readbackScheduled;
+    }
+
+}
+
 void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowBinData& data)
 {
     LocalShadowState& state = *data.state;
@@ -356,18 +454,14 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     if (!cmdList || !nvDevice)
         return;
-    if (!EnsurePipelines(data.device, state))
-        return;
+    R_ASSERT2(EnsurePipelines(data.device, state), "Cannot render complete local light shadows without their pipelines");
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     auto* countRefl = shaderLoader->GetCachedReflection("local_shadow_bin_count", ".cs");
     auto* reserveRefl = shaderLoader->GetCachedReflection("local_shadow_bin_reserve", ".cs");
     auto* emitRefl = shaderLoader->GetCachedReflection("local_shadow_bin_emit", ".cs");
-    auto* binRefl = shaderLoader->GetCachedReflection("local_shadow_bin_dyn", ".cs");
-    auto* argsRefl = shaderLoader->GetCachedReflection("local_shadow_args", ".cs");
-    if (!countRefl || !reserveRefl || !emitRefl || !binRefl || !argsRefl)
-        return;
+    R_ASSERT(countRefl && reserveRefl && emitRefl);
 
     if (data.gpuProfiler)
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Bin");
@@ -382,6 +476,7 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
     state.lastBvhNodeBuffer = cfg.bvhNodeBuffer;
 
     if (state.stateReset) {
+        state.dirtyViews = state.candCount;
         cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::CopyDest);
         cmdList->setBufferState(state.schedule, nvrhi::ResourceStates::CopyDest);
         cmdList->clearBufferUInt(state.stateBuffer, 0);
@@ -404,13 +499,14 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
     LocalShadowBinParams bp = {};
     bp.candCount = state.candCount;
     bp.nodeCount = cfg.bvhNodeCount;
-    bp.includeAT = ps_r_vsm_at ? 1u : 0u;
-    bp.errK = std::max(0.1f, ps_r_vsm_cluster_lod);
+    bp.includeAT = 1u;
+    bp.errK = 1.0f;
     bp.capOpaque = state.pairCapacity[0];
     bp.capTerrain = state.pairCapacity[1];
     bp.capAT = state.pairCapacity[2];
     bp.budget = u32(std::max(1, ps_r_local_shadow_pairs_budget));
     bp.frame = state.frame;
+    bp.pad[0] = gpuCulling ? gpuCulling->GetClusterEntryCount() : 0u;
     auto binCB = cache.GetOrCreateVolatileCB("LocalShadow", "BinParams", sizeof(LocalShadowBinParams), data.device, 64);
     cmdList->writeBuffer(binCB, &bp, sizeof(bp));
 
@@ -439,6 +535,7 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
             counted = true;
         }
     }
+    R_ASSERT2(counted || !haveEntries, "Local shadow caster counting failed");
     if (!counted) {
         cmdList->setBufferState(state.tileCount, nvrhi::ResourceStates::CopyDest);
         cmdList->clearBufferUInt(state.tileCount, 0);
@@ -467,7 +564,9 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
            .BufferUAV("g_EmitArgs", state.emitArgs)
            .BufferUAV("g_ClearArgs", state.clearArgs)
            .BufferUAV("g_Stats", state.stats);
-        if (auto reserveSet = cache.GetOrCreateBindingSet(rbs.Build(), state.binReserveLayout, nvDevice)) {
+        auto reserveSet = cache.GetOrCreateBindingSet(rbs.Build(), state.binReserveLayout, nvDevice);
+        R_ASSERT(reserveSet);
+        {
             nvrhi::ComputeState cs;
             cs.pipeline = state.binReservePipeline;
             cs.bindings = { reserveSet };
@@ -493,7 +592,9 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
            .BufferUAV("g_PairsOpaque", state.pairs[0])
            .BufferUAV("g_PairsTerrain", state.pairs[1])
            .BufferUAV("g_PairsAT", state.pairs[2]);
-        if (auto emitSet = cache.GetOrCreateBindingSet(ebs.Build(), state.binEmitLayout, nvDevice)) {
+        auto emitSet = cache.GetOrCreateBindingSet(ebs.Build(), state.binEmitLayout, nvDevice);
+        R_ASSERT(emitSet);
+        {
             nvrhi::ComputeState cs;
             cs.pipeline = state.binEmitPipeline;
             cs.bindings = { emitSet };
@@ -507,73 +608,7 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
     cmdList->setBufferState(state.refreshDynBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(state.stats, nvrhi::ResourceStates::UnorderedAccess);
 
-    auto dispatchDyn = [&](nvrhi::IBuffer* entries, u32 entryBase, u32 entryCount, u32 statsBase,
-                           u32 streamOpaque, u32 streamTerrain, u32 streamAT,
-                           u32 capOpaque, u32 capTerrain, u32 capAT, const char* label) {
-        if (!entries || entryCount == 0)
-            return;
-        LocalShadowDynBinParams dp = {};
-        dp.entryBase = entryBase;
-        dp.entryCount = entryCount;
-        dp.statsBase = statsBase;
-        dp.capOpaque = capOpaque;
-        dp.capTerrain = capTerrain;
-        dp.capAT = capAT;
-        dp.includeAT = ps_r_vsm_at ? 1u : 0u;
-        auto dynCB = cache.GetOrCreateVolatileCB("LocalShadow", "DynBinParams", sizeof(LocalShadowDynBinParams), data.device, 64);
-        cmdList->writeBuffer(dynCB, &dp, sizeof(dp));
-        cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
-
-        BindingSetBuilder bsb(*binRefl, nvDevice, label);
-        bsb.ConstantBuffer("LocalShadowDynBinParams", dynCB)
-           .BufferSRV("g_Entries", entries)
-           .BufferSRV("g_Tiles", state.stateBuffer)
-           .BufferSRV("g_Refresh", state.refreshDynBuffer)
-           .BufferUAV("g_Stats", state.stats)
-           .BufferUAV("g_PairsOpaque", state.pairs[streamOpaque])
-           .BufferUAV("g_PairsTerrain", state.pairs[streamTerrain])
-           .BufferUAV("g_PairsAT", state.pairs[streamAT]);
-        auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.binDynLayout, nvDevice);
-        if (!bindingSet)
-            return;
-        nvrhi::ComputeState cs;
-        cs.pipeline = state.binDynPipeline;
-        cs.bindings = { bindingSet };
-        cmdList->setComputeState(cs);
-        cmdList->dispatch((entryCount + 63) / 64, 1, 1);
-    };
-
-    if (gpuCulling) {
-        if (cfg.entryBuffer)
-            dispatchDyn(cfg.entryBuffer, gpuCulling->GetClusterEntryCount(), gpuCulling->GetDynamicClusterEntryCount(), 16u,
-                3, 5, 4, state.pairCapacity[3], 0u, state.pairCapacity[4], "LocalShadow.BinDyn");
-        dispatchDyn(gpuCulling->GetSkinnedEntryBuffer(), 0, gpuCulling->GetSkinnedEntryCount(), 24u,
-            5, 1, 2, state.pairCapacity[5], 0u, 0u, "LocalShadow.BinSkinned");
-    }
-
-    LocalShadowArgsParams ap = {};
-    ap.caps[0] = state.pairCapacity[0];
-    ap.caps[1] = state.pairCapacity[1];
-    ap.caps[2] = state.pairCapacity[2];
-    ap.caps[3] = state.pairCapacity[3];
-    ap.caps[4] = state.pairCapacity[4];
-    ap.caps[5] = state.pairCapacity[5];
-    auto argsCB = cache.GetOrCreateVolatileCB("LocalShadow", "ArgsParams", sizeof(LocalShadowArgsParams), data.device, 64);
-    cmdList->writeBuffer(argsCB, &ap, sizeof(ap));
-    cmdList->setBufferState(state.args, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.stats, nvrhi::ResourceStates::ShaderResource);
-
-    BindingSetBuilder abs(*argsRefl, nvDevice, "LocalShadow.Args");
-    abs.ConstantBuffer("LocalShadowArgsParams", argsCB)
-       .BufferSRV("g_Stats", state.stats)
-       .BufferUAV("g_Args", state.args);
-    if (auto argsSet = cache.GetOrCreateBindingSet(abs.Build(), state.argsLayout, nvDevice)) {
-        nvrhi::ComputeState cs;
-        cs.pipeline = state.argsPipeline;
-        cs.bindings = { argsSet };
-        cmdList->setComputeState(cs);
-        cmdList->dispatch(1, 1, 1);
-    }
+    BuildLocalShadowArgs(ctx, data.device, state, 0u);
 
     for (u32 i = 0; i < kLocalStreamCount; ++i)
         cmdList->setBufferState(state.pairs[i], nvrhi::ResourceStates::ShaderResource);
@@ -583,16 +618,6 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
     cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(state.refreshDynBuffer, nvrhi::ResourceStates::ShaderResource);
 
-    if (nvrhi::IBuffer* slot = state.readback[state.readbackWrite]) {
-        cmdList->setBufferState(state.stats, nvrhi::ResourceStates::CopySource);
-        cmdList->copyBuffer(slot, 0, state.stats, 0, u64(kLocalStatWords) * sizeof(u32));
-        cmdList->setBufferState(state.schedule, nvrhi::ResourceStates::CopySource);
-        cmdList->copyBuffer(slot, u64(kLocalStatWords) * sizeof(u32), state.schedule, 0,
-            u64(kLocalTileCount) * sizeof(u32) * 4);
-        state.readbackWrite = (state.readbackWrite + 1) % LocalShadowState::kReadbackSlots;
-        if (state.readbackScheduled < LocalShadowState::kReadbackSlots)
-            ++state.readbackScheduled;
-    }
 
     if (data.gpuProfiler)
         data.gpuProfiler->EndPass(cmdList, "Local Shadow.Bin");
@@ -649,14 +674,14 @@ bool BeginAtlasPass(fg::RenderContext* ctx, const LocalShadowConfig& cfg, LocalS
     cmdList->commitBarriers();
 
     nvrhi::FramebufferDesc fbDesc;
-    fbDesc.setDepthAttachment(atlas);
+    fbDesc.setDepthAttachment(atlas, nvrhi::TextureSubresourceSet(0, 1, state.atlasLayer, 1));
     auto framebuffer = cache.GetOrCreateFramebuffer(fbName, fbDesc, nvDevice);
     if (!framebuffer)
         return false;
 
     LocalShadowRouteParams rp = {};
     rp.pancake = pancake ? 1u : 0u;
-    auto routeCB = cache.GetOrCreateVolatileCB("LocalShadow", "RouteParams", sizeof(LocalShadowRouteParams), device, 8);
+    auto routeCB = cache.GetOrCreateVolatileCB("LocalShadow", "RouteParams", sizeof(LocalShadowRouteParams), device, 1024);
     cmdList->writeBuffer(routeCB, &rp, sizeof(rp));
 
     auto* backend = device->GetBackend();
@@ -695,7 +720,7 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         return;
 
     if (state.staticAtlasFirst) {
-        cmdList->clearDepthStencilTexture(atlas, nvrhi::AllSubresources, true, 0.0f, false, 0);
+        cmdList->clearDepthStencilTexture(atlas, nvrhi::TextureSubresourceSet(0, 1, state.atlasLayer, 1), true, 0.0f, false, 0);
         state.staticAtlasFirst = false;
     }
 
@@ -718,7 +743,7 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Static");
 
     LocalDrawContext dc;
-    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowStatic", 0, false, dc)) {
+    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowStatic", 0, true, dc)) {
         if (data.gpuProfiler)
             data.gpuProfiler->EndPass(cmdList, "Local Shadow.Static");
         return;
@@ -759,6 +784,21 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         drawStream(0, state.pagePipeline, state.pageLayout, *psRefl, cfg.staticInstanceBuffer, false, "LocalShadow.PageOpaque");
         drawStream(1, state.pagePipeline, state.pageLayout, *psRefl, cfg.terrainInstanceBuffer, false, "LocalShadow.PageTerrain");
         drawStream(2, state.pageATPipeline, state.pageATLayout, *atRefl, cfg.staticInstanceBuffer, true, "LocalShadow.PageAT");
+
+        if (cfg.gpuCulling && state.dirtyViews > 0) {
+            const u32 count = cfg.gpuCulling->GetClusterEntryCount();
+            const u32 capacity = std::min({ state.pairCapacity[0], state.pairCapacity[1], state.pairCapacity[2] });
+            const u64 upperBound = u64(count) * state.dirtyViews;
+            if (upperBound > capacity || upperBound > u32(std::max(1, ps_r_local_shadow_pairs_budget)) || !cfg.bvhNodeCount) {
+                const u32 batchSize = std::max(1u, capacity / state.dirtyViews);
+                for (u32 base = 0; base < count; base += batchSize) {
+                    BinCasterBatch(ctx, data.device, state, cfg.entryBuffer, base, std::min(batchSize, count - base), 1u);
+                    drawStream(0, state.pagePipeline, state.pageLayout, *psRefl, cfg.staticInstanceBuffer, false, "LocalShadow.PageOpaque");
+                    drawStream(1, state.pagePipeline, state.pageLayout, *psRefl, cfg.terrainInstanceBuffer, false, "LocalShadow.PageTerrain");
+                    drawStream(2, state.pageATPipeline, state.pageATLayout, *atRefl, cfg.staticInstanceBuffer, true, "LocalShadow.PageAT");
+                }
+            }
+        }
     }
 
     if (data.gpuProfiler)
@@ -775,7 +815,7 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
         return;
 
     if (state.dynAtlasFirst) {
-        cmdList->clearDepthStencilTexture(atlas, nvrhi::AllSubresources, true, 0.0f, false, 0);
+        cmdList->clearDepthStencilTexture(atlas, nvrhi::TextureSubresourceSet(0, 1, state.atlasLayer, 1), true, 0.0f, false, 0);
         state.dynAtlasFirst = false;
     }
 
@@ -825,44 +865,58 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
     };
 
     if (gpuCulling.GetDynamicClusterEntryCount() > 0 && cfg.entryBuffer && cfg.dynamicInstanceBuffer) {
-        BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "LocalShadow.DynOpaque");
-        bsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
-        bsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
-        bsb.BufferSRV("g_Pairs", state.pairs[3]);
-        bsb.BufferSRV("g_Entries", cfg.entryBuffer);
-        bsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
-        bsb.BufferSRV("g_MegaVB", cfg.megaVertexBuffer);
-        bsb.BufferSRV("g_MegaIB", cfg.megaIndexBuffer);
-        if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.pageLayout, nvDevice))
-            draw(state.pagePipeline, bindingSet, 3, false);
+        const u32 count = gpuCulling.GetDynamicClusterEntryCount();
+        const u32 batchSize = std::max(1u, std::min(state.pairCapacity[3], state.pairCapacity[4]) / std::max(1u, state.candCount));
+        for (u32 base = 0; base < count; base += batchSize) {
+            BinCasterBatch(ctx, data.device, state, cfg.entryBuffer, gpuCulling.GetClusterEntryCount() + base,
+                std::min(batchSize, count - base), 2u);
+            BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "LocalShadow.DynOpaque");
+            bsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
+            bsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
+            bsb.BufferSRV("g_Pairs", state.pairs[3]);
+            bsb.BufferSRV("g_Entries", cfg.entryBuffer);
+            bsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
+            bsb.BufferSRV("g_MegaVB", cfg.megaVertexBuffer);
+            bsb.BufferSRV("g_MegaIB", cfg.megaIndexBuffer);
+            if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.pageLayout, nvDevice))
+                draw(state.pagePipeline, bindingSet, 3, false);
 
-        BindingSetBuilder atBsb(*vsRefl, *atRefl, nvDevice, "LocalShadow.DynAT");
-        atBsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
-        atBsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
-        atBsb.BufferSRV("g_Pairs", state.pairs[4]);
-        atBsb.BufferSRV("g_Entries", cfg.entryBuffer);
-        atBsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
-        atBsb.BufferSRV("g_MegaVB", cfg.megaVertexBuffer);
-        atBsb.BufferSRV("g_MegaIB", cfg.megaIndexBuffer);
-        atBsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-        if (auto bindingSet = cache.GetOrCreateBindingSet(atBsb.Build(), state.pageATLayout, nvDevice))
-            draw(state.pageATPipeline, bindingSet, 4, true);
+            BindingSetBuilder atBsb(*vsRefl, *atRefl, nvDevice, "LocalShadow.DynAT");
+            atBsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
+            atBsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
+            atBsb.BufferSRV("g_Pairs", state.pairs[4]);
+            atBsb.BufferSRV("g_Entries", cfg.entryBuffer);
+            atBsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
+            atBsb.BufferSRV("g_MegaVB", cfg.megaVertexBuffer);
+            atBsb.BufferSRV("g_MegaIB", cfg.megaIndexBuffer);
+            atBsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+            if (auto bindingSet = cache.GetOrCreateBindingSet(atBsb.Build(), state.pageATLayout, nvDevice))
+                draw(state.pageATPipeline, bindingSet, 4, true);
+        }
     }
 
     nvrhi::IBuffer* skinnedEntries = gpuCulling.GetSkinnedEntryBuffer();
     nvrhi::IBuffer* preVB = gpuCulling.GetSkinnedPreVertexBuffer();
     nvrhi::IBuffer* skinnedIB = gpuCulling.GetSkinnedPools().GetCombinedIndexBuffer();
     if (gpuCulling.GetSkinnedEntryCount() > 0 && skinnedEntries && preVB && skinnedIB) {
-        BindingSetBuilder bsb(*skinVsRefl, *psRefl, nvDevice, "LocalShadow.DynSkin");
-        bsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
-        bsb.BufferSRV("g_Pairs", state.pairs[5]);
-        bsb.BufferSRV("g_Entries", skinnedEntries);
-        bsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
-        bsb.BufferSRV("g_SkinnedVB", preVB);
-        bsb.BufferSRV("g_SkinnedIB", skinnedIB);
-        if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinPageLayout, nvDevice))
-            draw(state.skinPagePipeline, bindingSet, 5, false);
+        const u32 count = gpuCulling.GetSkinnedEntryCount();
+        const u32 batchSize = std::max(1u, state.pairCapacity[5] / std::max(1u, state.candCount));
+        for (u32 base = 0; base < count; base += batchSize) {
+            BinCasterBatch(ctx, data.device, state, skinnedEntries, base, std::min(batchSize, count - base), 3u);
+            BindingSetBuilder bsb(*skinVsRefl, *atRefl, nvDevice, "LocalShadow.DynSkin");
+            bsb.ConstantBuffer("LocalShadowRouteParams", dc.routeCB);
+            bsb.BufferSRV("g_Pairs", state.pairs[5]);
+            bsb.BufferSRV("g_Entries", skinnedEntries);
+            bsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
+            bsb.BufferSRV("g_SkinnedVB", preVB);
+            bsb.BufferSRV("g_SkinnedIB", skinnedIB);
+            bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+            if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinPageLayout, nvDevice))
+                draw(state.skinPagePipeline, bindingSet, 5, true);
+        }
     }
+
+    ScheduleLocalShadowStats(state, cmdList);
 
     if (data.gpuProfiler)
         data.gpuProfiler->EndPass(cmdList, "Local Shadow.Dyn");
@@ -1065,21 +1119,18 @@ void LocalAtlasAllocator::Rect(u32 node, u32& x, u32& y, u32& size) const
 
 void ResetLocalShadowPool(LocalShadowState& state)
 {
-    for (u32 i = 0; i < kLocalSpotSlotsMax; ++i)
-        state.spots[i] = LocalTile();
-    state.statPairs = state.statDynPairs = state.statSkinnedPairs = state.statDrops = 0;
-    for (u32 i = 0; i < kLocalPointLightsMax; ++i)
-        state.points[i] = LocalTile();
-    for (u32 i = 0; i < kLocalTileCount; ++i)
-        state.request[i] = LocalShadowViewGPU();
-    state.atlas.Reset();
-    state.pendingFree.clear();
-    state.candCount = 0;
-    state.stateReset = true;
-    state.pooledSpots = 0;
-    state.pooledPoints = 0;
-    state.statAtlasPercent = 0;
-    state.statPendingFree = 0;
+    state.overflowPages.clear();
+    state.activePages = state.atlasLayers = 0;
+    state.receiverTiles = nullptr;
+    state.staticAtlas = state.dynAtlas = nullptr;
+    std::fill_n(state.owners, kLocalTileCount, nullptr);
+    std::fill_n(state.request, kLocalTileCount, LocalShadowViewGPU{});
+    state.candCount = state.dirtyViews = 0;
+    state.stateReset = state.staticAtlasFirst = state.dynAtlasFirst = true;
+    state.pooledSpots = state.pooledPoints = 0;
+    state.statAccepted = state.statDeferred = state.statDynRefresh = state.statOverflowViews = 0;
+    state.statPairs = state.statDynPairs = state.statSkinnedPairs = state.statDrops = state.statDynDrops = 0;
+    state.statAtlasPercent = state.statCasterBatches = 0;
     state.slotOfLight.clear();
 }
 
@@ -1090,461 +1141,202 @@ void ProcessLocalShadowStats(LocalShadowState& state, nvrhi::IDevice* device)
     nvrhi::IBuffer* oldest = state.readback[state.readbackWrite];
     if (!oldest)
         return;
-    void* mapped = device->mapBuffer(oldest, nvrhi::CpuAccessMode::Read);
-    if (!mapped)
+    const u32* words = static_cast<const u32*>(device->mapBuffer(oldest, nvrhi::CpuAccessMode::Read));
+    if (!words)
         return;
-    const u32* words = static_cast<const u32*>(mapped);
     state.statAccepted = words[0];
     state.statDeferred = words[1];
-    state.statSkipped = words[2];
+    state.statOverflowViews = words[2];
     state.statUpToDate = words[3];
-    state.statPairs = words[4] + words[5] + words[6];
-    state.statDynPairs = words[20] + words[22];
-    state.statSkinnedPairs = words[28];
-    state.statDrops = words[7];
+    state.statPairs = words[4] + words[5] + words[6] + words[32] + words[33] + words[34];
+    state.statDynPairs = words[16] + words[18];
+    state.statSkinnedPairs = words[24];
+    state.statDrops = words[7] + words[39];
     state.statDynDrops = words[23] + words[31];
     state.statMaxVisited = words[8];
-    state.statMaxPendingAge = words[12];
     state.statDynRefresh = words[13];
-    u32 demand[3] = { words[9], words[10], words[11] };
-
-    const u32* sched = words + kLocalStatWords;
-    for (u32 i = 0; i < state.pendingFree.size();) {
-        const LocalPendingFree& p = state.pendingFree[i];
-        const u32* rec = sched + p.slot * 4;
-        if (rec[0] == p.serial && rec[3] > p.stamp) {
-            state.atlas.Free(p.node);
-            state.pendingFree[i] = state.pendingFree.back();
-            state.pendingFree.pop_back();
-            continue;
-        }
-        ++i;
-    }
-    state.statPendingFree = u32(state.pendingFree.size());
-    state.statAtlasPercent = u32((u64(state.atlas.UsedTexels()) * 100u)
-        / (u64(kLocalShadowAtlas) * u64(kLocalShadowAtlas)));
     device->unmapBuffer(oldest);
-
-    for (u32 s = 0; s < 3; ++s) {
-        if (demand[s] <= state.pairCapacity[s])
-            continue;
-        const u64 grownCap = std::max<u64>(u64(demand[s]) + 1u, u64(demand[s]) * 5u / 4u);
-        const u32 newCap = u32(std::min<u64>(grownCap, u64(1u) << 26));
-        if (newCap <= state.pairCapacity[s])
-            continue;
-        string64 name;
-        xr_sprintf(name, "LocalShadow_Pairs%s", kLocalStreamNames[s]);
-        nvrhi::BufferHandle grown = MakeUAVBuffer(device, name, u64(newCap) * sizeof(u32) * 2, sizeof(u32) * 2, false);
-        if (!grown) {
-            Msg("! [LocalShadow] cannot allocate %u %s pairs", newCap, kLocalStreamNames[s]);
-            continue;
-        }
-        Msg("* [LocalShadow] %s pair capacity: %u -> %u", kLocalStreamNames[s], state.pairCapacity[s], newCap);
-        state.pairs[s] = grown;
-        state.pairCapacity[s] = newCap;
-    }
-
-    if (ps_r_local_shadow_debug && Device.dwTimeGlobal - state.lastLogTime > 2000) {
-        state.lastLogTime = Device.dwTimeGlobal;
-        Msg("[LocalShadow] spots=%u points=%u accepted=%u deferred=%u skipped=%u upToDate=%u pairs=%u drops=%u dynDrops=%u maxVisited=%u maxPendingAge=%u dynRefresh=%u atlas=%u%% pendingFree=%u",
-            state.pooledSpots, state.pooledPoints, state.statAccepted, state.statDeferred, state.statSkipped, state.statUpToDate,
-            state.statPairs + state.statDynPairs + state.statSkinnedPairs, state.statDrops, state.statDynDrops,
-            state.statMaxVisited, state.statMaxPendingAge, state.statDynRefresh, state.statAtlasPercent, state.statPendingFree);
-    }
 }
+
+namespace {
+struct ShadowCandidate {
+    const light* source;
+    u32 lightIndex;
+    float desiredSize;
+};
+
+void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandidate>& candidates)
+{
+    ++state.frame;
+    state.candCount = 0;
+    state.dirtyViews = 0;
+    state.statCasterBatches = 0;
+    state.pooledSpots = state.pooledPoints = 0;
+    xr_vector<u32> sizes, nodes;
+    for (const auto& candidate : candidates) {
+        const bool point = candidate.source->flags.type == IRender_Light::POINT;
+        const u32 lo = point ? kLocalPointFaceMin : kLocalSpotTileMin;
+        const u32 hi = point ? kLocalPointFaceMax : kLocalSpotTileMax;
+        u32 size = lo;
+        while (size < hi && float(size) < candidate.desiredSize)
+            size <<= 1;
+        sizes.push_back(size);
+    }
+    // Pack complete lights. A full page fits at minimum sizes, so resolution can
+    // decrease under pressure without rejecting a light or any of its six faces.
+    for (;;) {
+        state.atlas.Reset();
+        nodes.clear();
+        bool fit = true;
+        for (u32 i = 0; i < candidates.size() && fit; ++i) {
+            const u32 faces = candidates[i].source->flags.type == IRender_Light::POINT ? 6u : 1u;
+            for (u32 f = 0; f < faces; ++f) {
+                const u32 node = state.atlas.Alloc(LocalAtlasAllocator::LevelOf(sizes[i]));
+                if (node == ~0u) {
+                    fit = false;
+                    break;
+                }
+                nodes.push_back(node);
+            }
+        }
+        if (fit)
+            break;
+        bool reduced = false;
+        for (u32 i = 0; i < candidates.size(); ++i) {
+            const u32 lo = candidates[i].source->flags.type == IRender_Light::POINT ? kLocalPointFaceMin : kLocalSpotTileMin;
+            if (sizes[i] > lo) {
+                sizes[i] >>= 1;
+                reduced = true;
+            }
+        }
+        R_ASSERT2(reduced, "A local shadow page must fit all of its minimum-size views");
+    }
+
+    state.slotOfLight.clear();
+    for (const auto& candidate : candidates) {
+        const light* L = candidate.source;
+        const bool point = L->flags.type == IRender_Light::POINT;
+        const u32 base = state.candCount;
+        const u32 faces = point ? 6u : 1u;
+        const bool newOwner = state.owners[base] != L || state.request[base].meta[2] != u32(point);
+        const u32 serial = newOwner ? ++state.nextSerial : state.request[base].meta[1];
+        state.slotOfLight.push_back(base + 1u);
+        const float farZ = std::max(L->range + EPS_S, 0.002f);
+        const float nearZ = clampr(L->virtual_size, 0.001f, farZ * 0.5f);
+        const float fov = (point ? PI_DIV_2 : L->cone) + deg2rad(3.5f);
+        for (u32 f = 0; f < faces; ++f) {
+            const u32 slot = state.candCount++;
+            Fvector dir, up;
+            if (point) {
+                dir = kFaceDir[f];
+                up = kFaceUp[f];
+            } else {
+                SpotBasis(L, dir, up);
+            }
+            Fmatrix view, proj, vp;
+            view.build_camera_dir(L->position, dir, up);
+            proj.build_projection(fov, 1.f, nearZ, farZ);
+            vp.mul(proj, view);
+            LocalShadowViewGPU rec = {};
+            FillRecord(rec, vp, state.atlas, nodes[slot], nearZ, farZ, tanf(fov * 0.5f), L->position, L->range);
+            rec.shape.y = float(state.atlasLayer);
+            const auto& previous = state.request[slot];
+            // Exact transform/rectangle comparison includes virtual size and roll.
+            // The baseline is a requested revision that is rendered this frame;
+            // sub-threshold movement can no longer accumulate against an old map.
+            const bool changed = newOwner || state.owners[slot] != L
+                || memcmp(&rec, &previous, offsetof(LocalShadowViewGPU, meta)) != 0;
+            u32 stamp = previous.meta[0] + u32(changed);
+            if (stamp == 0u)
+                stamp = 1u;
+            rec.meta[0] = stamp;
+            rec.meta[1] = serial;
+            rec.meta[2] = point ? 1u : 0u;
+            rec.meta[3] = f;
+            state.dirtyViews += u32(changed);
+            state.request[slot] = rec;
+            state.owners[slot] = L;
+            state.candList[slot][0] = slot;
+            state.candList[slot][1] = stamp;
+            state.candList[slot][2] = serial;
+            state.candList[slot][3] = slot | (3u << 30); // Visible; refresh dynamic depth every frame.
+        }
+        if (point)
+            ++state.pooledPoints;
+        else
+            ++state.pooledSpots;
+    }
+    state.statAtlasPercent = u32(u64(state.atlas.UsedTexels()) * 100u / (u64(kLocalShadowAtlas) * kLocalShadowAtlas));
+}
+} // namespace
 
 void SelectLocalShadowLights(
     LocalShadowState& state,
     const xr_vector<const light*>& lights,
     const Fvector& camPos,
-    const Fmatrix& camViewProj,
     float projScale)
 {
-    if (state.lastVsmAT != ps_r_vsm_at || state.lastClusterLod != ps_r_vsm_cluster_lod
-        || state.lastSpotsCvar != ps_r_local_shadow_spots || state.lastPointsCvar != ps_r_local_shadow_points) {
-        ResetLocalShadowPool(state);
-        state.lastVsmAT = ps_r_vsm_at;
-        state.lastClusterLod = ps_r_vsm_cluster_lod;
-        state.lastSpotsCvar = ps_r_local_shadow_spots;
-        state.lastPointsCvar = ps_r_local_shadow_points;
-    }
-    ++state.frame;
-    const u32 frame = state.frame;
-    state.slotOfLight.assign(lights.size(), 0u);
-    if (state.resourcesFailed)
-        return;
-    state.candCount = 0;
-    state.pooledSpots = 0;
-    state.pooledPoints = 0;
-
-    const u32 spotSlots = std::min<u32>(kLocalSpotSlotsMax, u32(std::max(1, ps_r_local_shadow_spots)));
-    const u32 pointRoom = std::min<u32>(kLocalPointLightsMax, (kLocalTileCount - spotSlots) / 6u);
-    const u32 pointGroups = std::max<u32>(1u, std::min<u32>(pointRoom, u32(std::max(1, ps_r_local_shadow_points))));
-    state.spotSlots = spotSlots;
-    state.pointGroups = pointGroups;
-
-    CFrustum camFrustum;
-    Fmatrix camMatrix = camViewProj;
-    camFrustum.CreateFromMatrix(camMatrix, FRUSTUM_P_ALL);
-
-    auto faceNeeded = [&](const Fvector& P, float range, u32 f) {
-        Fvector right;
-        right.crossproduct(kFaceUp[f], kFaceDir[f]);
-        Fvector corners[5];
-        corners[0] = P;
-        for (u32 k = 0; k < 4; ++k) {
-            Fvector axis = kFaceDir[f];
-            axis.mad(right, (k & 1u) ? 1.0f : -1.0f);
-            axis.mad(kFaceUp[f], (k & 2u) ? 1.0f : -1.0f);
-            corners[k + 1].mad(P, axis, range);
-        }
-        for (size_t i = 0; i < camFrustum.p_count; ++i) {
-            bool outside = true;
-            for (u32 c = 0; c < 5 && outside; ++c)
-                outside = camFrustum.planes[i].classify(corners[c]) > 0.0f;
-            if (outside)
-                return false;
-        }
-        return true;
-    };
-
-    struct Candidate { u32 index; float eff; float want; };
-    xr_vector<Candidate> spotCandidates;
-    xr_vector<Candidate> pointCandidates;
-
-    auto owns = [](const LocalTile* pool, u32 poolSize, const light* L) {
-        for (u32 t = 0; t < poolSize; ++t)
-            if (pool[t].owner == L)
-                return true;
-        return false;
-    };
-
+    xr_vector<ShadowCandidate> spots, points;
     for (u32 i = 0; i < lights.size(); ++i) {
         const light* L = lights[i];
-        if (!L || !L->flags.bActive || !L->flags.bShadow || L->flags.bHudMode)
+        if (!L || !L->flags.bActive || !L->flags.bShadow)
             continue;
-        const bool isSpot = L->flags.type == IRender_Light::SPOT;
-        if (!isSpot && L->flags.type != IRender_Light::POINT)
+        const bool point = L->flags.type == IRender_Light::POINT;
+        if (!point && L->flags.type != IRender_Light::SPOT)
             continue;
         const float dist = camPos.distance_to(L->position);
-        if (dist - L->range > ps_r_local_shadow_range)
-            continue;
-        const float rPx = (dist <= L->range) ? 1e9f : projScale * L->range / std::max(dist, 1e-3f);
-        if (rPx < ps_r_local_shadow_min_px)
-            continue;
-        const float want = 2.0f * rPx * ps_r_local_shadow_texel_ratio;
-        const float d2 = dist * dist;
-        if (isSpot) {
-            float eff = d2 * (L->cone < deg2rad(60.f) ? 0.25f : 1.0f);
-            if (owns(state.spots, spotSlots, L))
-                eff *= 0.64f;
-            spotCandidates.push_back({ i, eff, want });
-        } else {
-            float eff = d2;
-            if (owns(state.points, pointGroups, L))
-                eff *= 0.64f;
-            pointCandidates.push_back({ i, eff, want });
-        }
+        const float radius = dist <= L->range ? 1e9f : projScale * L->range / std::max(dist, 1e-3f);
+        float desired = 2.0f * radius * ps_r_local_shadow_texel_ratio;
+        if (dist - L->range > ps_r_local_shadow_range || radius < ps_r_local_shadow_min_px)
+            desired = 0.0f;
+        (point ? points : spots).push_back({ L, i, desired });
     }
-
-    auto byEff = [](const Candidate& a, const Candidate& b) { return a.eff < b.eff; };
-    std::sort(spotCandidates.begin(), spotCandidates.end(), byEff);
-    std::sort(pointCandidates.begin(), pointCandidates.end(), byEff);
-
-    if (spotCandidates.size() > spotSlots)
-        spotCandidates.resize(spotSlots);
-    if (pointCandidates.size() > pointGroups)
-        pointCandidates.resize(pointGroups);
-
-    auto assign = [&](xr_vector<Candidate>& candidates, LocalTile* pool, u32 poolSize, xr_vector<u32>& outTile) {
-        outTile.assign(candidates.size(), u32(-1));
-        for (u32 c = 0; c < candidates.size(); ++c) {
-            const light* L = lights[candidates[c].index];
-            for (u32 t = 0; t < poolSize; ++t) {
-                if (pool[t].owner == L && pool[t].lastSeen != frame) {
-                    pool[t].lastSeen = frame;
-                    outTile[c] = t;
-                    break;
-                }
-            }
-        }
-        for (u32 c = 0; c < candidates.size(); ++c) {
-            if (outTile[c] != u32(-1))
-                continue;
-            u32 best = u32(-1);
-            for (u32 t = 0; t < poolSize; ++t) {
-                if (pool[t].lastSeen == frame)
-                    continue;
-                if (best == u32(-1) || pool[t].lastSeen < pool[best].lastSeen)
-                    best = t;
-            }
-            if (best == u32(-1))
-                continue;
-            pool[best].owner = nullptr;
-            pool[best].lastSeen = frame;
-            outTile[c] = best;
-        }
+    auto nearest = [&](const ShadowCandidate& a, const ShadowCandidate& b) {
+        const float da = camPos.distance_to_sqr(a.source->position);
+        const float db = camPos.distance_to_sqr(b.source->position);
+        return da != db ? da < db : std::less<const light*>()(a.source, b.source);
     };
+    std::sort(spots.begin(), spots.end(), nearest);
+    std::sort(points.begin(), points.end(), nearest);
+    // Legacy pool controls now choose which lights receive the larger tiles.
+    // Every remaining eligible light still gets a complete minimum-resolution map.
+    for (u32 i = u32(std::max(0, ps_r_local_shadow_spots)); i < spots.size(); ++i)
+        spots[i].desiredSize = 0.0f;
+    for (u32 i = u32(std::max(0, ps_r_local_shadow_points)); i < points.size(); ++i)
+        points[i].desiredSize = 0.0f;
 
-    xr_vector<u32> spotTile;
-    xr_vector<u32> pointTile;
-    assign(spotCandidates, state.spots, spotSlots, spotTile);
-    assign(pointCandidates, state.points, pointGroups, pointTile);
-
-    auto cadenceFor = [](float dist) -> u32 {
-        return dist < 30.0f ? 1u : (dist < 70.0f ? 4u : 12u);
-    };
-
-    struct Selected { bool point; u32 candidate; u32 tile; float eff; };
-    xr_vector<Selected> selected;
-    selected.reserve(spotCandidates.size() + pointCandidates.size());
-    for (u32 c = 0; c < spotCandidates.size(); ++c)
-        if (spotTile[c] != u32(-1))
-            selected.push_back({ false, c, spotTile[c], spotCandidates[c].eff });
-    for (u32 c = 0; c < pointCandidates.size(); ++c)
-        if (pointTile[c] != u32(-1))
-            selected.push_back({ true, c, pointTile[c], pointCandidates[c].eff });
-    std::stable_sort(selected.begin(), selected.end(),
-        [](const Selected& a, const Selected& b) { return a.eff < b.eff; });
-
-    auto pushCandidate = [&](u32 slot, u32 stamp, u32 serial, bool inView, bool dynDue) {
-        if (state.candCount >= kLocalTileCount)
-            return;
-        const u32 rank = state.candCount;
-        u32* entry = state.candList[state.candCount++];
-        entry[0] = slot;
-        entry[1] = stamp;
-        entry[2] = serial;
-        entry[3] = rank | (dynDue ? 1u << 30 : 0u) | (inView ? 1u << 31 : 0u);
-    };
-
-    auto releasePending = [&](u32 slot) {
-        u32 freed = 0;
-        for (u32 i = 0; i < state.pendingFree.size();) {
-            if (state.pendingFree[i].slot != slot) {
-                ++i;
-                continue;
-            }
-            state.atlas.Free(state.pendingFree[i].node);
-            state.pendingFree[i] = state.pendingFree.back();
-            state.pendingFree.pop_back();
-            ++freed;
-        }
-        return freed;
-    };
-
-    auto nearestPow2 = [](float want, u32 lo, u32 hi) {
-        u32 s = lo;
-        while (s < hi && want > float(s) * 1.41421356f)
-            s <<= 1;
-        return s;
-    };
-    auto sizeFor = [&](float want, u32 cur, u32 lo, u32 hi) -> u32 {
-        if (cur < lo || cur > hi)
-            return nearestPow2(want, lo, hi);
-        if (want > 1.25f * float(cur))
-            return std::min<u32>(cur << 1, hi);
-        if (want < 0.45f * float(cur))
-            return std::max<u32>(cur >> 1, lo);
-        return cur;
-    };
-
-    xr_vector<u8> evicted;
-    evicted.assign(selected.size(), 0u);
-    u32 evictCursor = u32(selected.size());
-    auto evictTail = [&](u32 current) {
-        while (evictCursor > current + 1) {
-            const u32 e = --evictCursor;
-            if (evicted[e])
-                continue;
-            const Selected& s = selected[e];
-            LocalTile& tile = s.point ? state.points[s.tile] : state.spots[s.tile];
-            const u32 base = s.point ? (spotSlots + s.tile * 6) : s.tile;
-            const u32 faces = s.point ? 6u : 1u;
-            u32 freed = 0;
-            for (u32 f = 0; f < faces; ++f) {
-                freed += releasePending(base + f);
-                if (tile.node[f] != u32(-1)) {
-                    state.atlas.Free(tile.node[f]);
-                    tile.node[f] = u32(-1);
-                    tile.size[f] = 0;
-                    ++freed;
-                }
-            }
-            evicted[e] = 1u;
-            tile.owner = nullptr;
-            if (freed)
-                return true;
-        }
-        return false;
-    };
-
-    for (u32 si = 0; si < selected.size(); ++si) {
-        if (evicted[si])
-            continue;
-        const Selected& sel = selected[si];
-        const bool isPoint = sel.point;
-        const Candidate& cd = isPoint ? pointCandidates[sel.candidate] : spotCandidates[sel.candidate];
-        const light* L = lights[cd.index];
-        LocalTile& tile = isPoint ? state.points[sel.tile] : state.spots[sel.tile];
-        const u32 baseSlot = isPoint ? (spotSlots + sel.tile * 6) : sel.tile;
-        const u32 faceCount = isPoint ? 6u : 1u;
-        const u32 loSize = isPoint ? kLocalPointFaceMin : kLocalSpotTileMin;
-        const u32 hiSize = isPoint ? kLocalPointFaceMax : kLocalSpotTileMax;
-
-        Fvector dir, up;
-        if (!isPoint)
-            SpotBasis(L, dir, up);
-
-        bool need[6] = { true, true, true, true, true, true };
-        for (u32 f = 1; f < faceCount; ++f)
-            need[f] = faceNeeded(L->position, L->range, f);
-
-        u32 newNode[6] = { u32(-1), u32(-1), u32(-1), u32(-1), u32(-1), u32(-1) };
-        u32 newSize[6] = {};
-        bool placed = true;
-        for (u32 f = 0; f < faceCount; ++f) {
-            if (!need[f])
-                continue;
-            const u32 desired = sizeFor(cd.want, tile.size[f], loSize, hiSize);
-            if (tile.node[f] != u32(-1) && tile.size[f] == desired)
-                continue;
-            u32 node = u32(-1);
-            for (u32 s = desired; s >= loSize && node == u32(-1); s >>= 1)
-                node = state.atlas.Alloc(LocalAtlasAllocator::LevelOf(s));
-            while (node == u32(-1) && evictTail(si)) {
-                for (u32 s = desired; s >= loSize && node == u32(-1); s >>= 1)
-                    node = state.atlas.Alloc(LocalAtlasAllocator::LevelOf(s));
-            }
-            if (node == u32(-1)) {
-                placed = false;
-                break;
-            }
-            u32 rx = 0, ry = 0, rs = 0;
-            state.atlas.Rect(node, rx, ry, rs);
-            newNode[f] = node;
-            newSize[f] = rs;
-        }
-        if (!placed) {
-            for (u32 f = 0; f < faceCount; ++f)
-                if (newNode[f] != u32(-1))
-                    state.atlas.Free(newNode[f]);
-            continue;
-        }
-
-        const bool newOwner = tile.owner != L;
-        bool resized = false;
-        for (u32 f = 0; f < faceCount; ++f)
-            resized = resized || (newNode[f] != u32(-1) && tile.node[f] != u32(-1));
-        bool moved = newOwner
-            || tile.pos.distance_to_sqr(L->position) > 0.002f * 0.002f
-            || _abs(tile.range - L->range) > 0.01f;
-        if (!isPoint)
-            moved = moved || tile.dir.dotproduct(dir) < 0.999999f || _abs(tile.cone - L->cone) > 0.001f;
-
-        tile.owner = L;
-        tile.pos = L->position;
-        tile.range = L->range;
-        if (!isPoint) {
-            tile.dir = dir;
-            tile.cone = L->cone;
-        }
-        if (newOwner) {
-            tile.serial = ++state.nextSerial;
-            tile.stamp = 1;
-        } else if (moved || resized) {
-            if (++tile.stamp == 0)
-                tile.stamp = 1;
-        }
-
-        for (u32 f = 0; f < faceCount; ++f) {
-            if (newOwner || !need[f])
-                releasePending(baseSlot + f);
-            if (!need[f]) {
-                if (tile.node[f] != u32(-1)) {
-                    state.atlas.Free(tile.node[f]);
-                    tile.node[f] = u32(-1);
-                    tile.size[f] = 0;
-                }
-                continue;
-            }
-            if (newNode[f] == u32(-1))
-                continue;
-            if (tile.node[f] != u32(-1)) {
-                if (newOwner)
-                    state.atlas.Free(tile.node[f]);
-                else
-                    state.pendingFree.push_back({ baseSlot + f, tile.serial, tile.node[f], tile.rectStamp[f] });
-            }
-            tile.node[f] = newNode[f];
-            tile.size[f] = newSize[f];
-        }
-
-        tile.inView = camFrustum.testSphere_dirty(L->position, L->range);
-        const u32 cadence = cadenceFor(camPos.distance_to(L->position));
-
-        if (!isPoint) {
-            const float fov = L->cone + deg2rad(3.5f);
-            const float nearZ = 0.5f;
-            const float farZ = std::max(L->range, 1.0f);
-            Fmatrix view, proj, vp;
-            view.build_camera_dir(L->position, dir, up);
-            proj.build_projection(fov, 1.f, nearZ, farZ);
-            vp.mul(proj, view);
-            LocalShadowViewGPU& rec = state.request[baseSlot];
-            FillRecord(rec, vp, state.atlas, tile.node[0], nearZ, farZ, tanf(fov * 0.5f), L->position, L->range);
-            rec.meta[0] = tile.stamp;
-            rec.meta[1] = tile.serial;
-            rec.meta[2] = 0;
-            rec.meta[3] = 0;
-            tile.rectStamp[0] = tile.stamp;
-            const bool dynDue = tile.inView && ((frame + baseSlot) % cadence) == 0;
-            pushCandidate(baseSlot, tile.stamp, tile.serial, tile.inView, dynDue);
-            state.slotOfLight[cd.index] = baseSlot + 1;
-            ++state.pooledSpots;
-            continue;
-        }
-
-        const float nearZ = 0.25f;
-        const float farZ = std::max(L->range, 1.0f);
-        for (u32 f = 0; f < 6; ++f) {
-            const u32 slot = baseSlot + f;
-            if (!need[f]) {
-                pushCandidate(slot, 0u, tile.serial, false, false);
-                continue;
-            }
-            Fmatrix view, proj, vp;
-            Fvector fd = kFaceDir[f];
-            Fvector fu = kFaceUp[f];
-            view.build_camera_dir(L->position, fd, fu);
-            proj.build_projection(PI_DIV_2, 1.f, nearZ, farZ);
-            vp.mul(proj, view);
-            LocalShadowViewGPU& rec = state.request[slot];
-            FillRecord(rec, vp, state.atlas, tile.node[f], nearZ, farZ, 1.0f, L->position, L->range);
-            rec.meta[0] = tile.stamp;
-            rec.meta[1] = tile.serial;
-            rec.meta[2] = 1;
-            rec.meta[3] = f;
-            tile.rectStamp[f] = tile.stamp;
-            const bool dynDue = tile.inView && ((frame + slot) % cadence) == 0;
-            pushCandidate(slot, tile.stamp, tile.serial, tile.inView, dynDue);
-        }
-        state.slotOfLight[cd.index] = baseSlot + 1;
-        ++state.pooledPoints;
+    xr_vector<u32> slots(lights.size(), 0u);
+    u32 si = 0, pi = 0, page = 0;
+    while (si < spots.size() || pi < points.size()) {
+        xr_vector<ShadowCandidate> batch;
+        for (u32 count = 0; si < spots.size() && count < kLocalSpotSlotsMax; ++count)
+            batch.push_back(spots[si++]);
+        const u32 pointRoom = std::min(kLocalPointLightsMax, (kLocalTileCount - u32(batch.size())) / 6u);
+        for (u32 count = 0; pi < points.size() && count < pointRoom; ++count)
+            batch.push_back(points[pi++]);
+        if (page > state.overflowPages.size())
+            state.overflowPages.emplace_back(xr_new<LocalShadowState>());
+        LocalShadowState& current = page == 0 ? state : *state.overflowPages[page - 1];
+        current.atlasLayer = page;
+        SelectLocalShadowPage(current, batch);
+        for (u32 i = 0; i < batch.size(); ++i)
+            slots[batch[i].lightIndex] = page * kLocalTileCount + current.slotOfLight[i];
+        ++page;
     }
-
-    state.statAtlasPercent = u32((u64(state.atlas.UsedTexels()) * 100u)
-        / (u64(kLocalShadowAtlas) * u64(kLocalShadowAtlas)));
-    state.statPendingFree = u32(state.pendingFree.size());
+    state.slotOfLight = std::move(slots);
+    state.activePages = page;
+    state.pooledSpots = u32(spots.size());
+    state.pooledPoints = u32(points.size());
 }
 
-LocalShadowOutput setupLocalShadowPasses(
+static LocalShadowOutput SetupLocalShadowPage(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle orderAfter,
     const LocalShadowConfig& config,
     LocalShadowState* state,
-    xray::profiler::GPUProfiler* gpuProfiler)
+    xray::profiler::GPUProfiler* gpuProfiler,
+    VirtualResourceHandle staticHandle, VirtualResourceHandle dynHandle)
 {
     LocalShadowOutput out;
     if (!state || !device)
@@ -1552,8 +1344,7 @@ LocalShadowOutput setupLocalShadowPasses(
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice)
         return out;
-    if (!EnsureResources(nvDevice, *state))
-        return out;
+    R_ASSERT2(EnsureResources(nvDevice, *state), "Cannot allocate a complete local shadow page");
     ProcessLocalShadowStats(*state, nvDevice);
     out.state = state;
     if (state->pooledSpots == 0 && state->pooledPoints == 0)
@@ -1581,21 +1372,6 @@ LocalShadowOutput setupLocalShadowPasses(
         bufferDesc("local_shadow_dirty_list", u64(kLocalTileCount) * sizeof(u32), sizeof(u32), true));
     VirtualResourceHandle refreshDynHandle = fg.ImportBuffer("local_shadow_refresh_dyn", state->refreshDynBuffer,
         bufferDesc("local_shadow_refresh_dyn", u64(kLocalTileCount) * sizeof(u32), sizeof(u32), true));
-
-    auto atlasDesc = [](const char* name) {
-        ResourceDesc d;
-        d.type = ResourceDesc::Type::Texture2D;
-        d.width = kLocalShadowAtlas;
-        d.height = kLocalShadowAtlas;
-        d.format = nvrhi::Format::D16;
-        d.isDepthStencil = true;
-        d.isImported = true;
-        d.isTransient = false;
-        d.debugName = name;
-        return d;
-    };
-    VirtualResourceHandle staticHandle = fg.ImportTexture("rt_LocalShadowStatic", state->staticAtlas, atlasDesc("rt_LocalShadowStatic"));
-    VirtualResourceHandle dynHandle = fg.ImportTexture("rt_LocalShadowDyn", state->dynAtlas, atlasDesc("rt_LocalShadowDyn"));
 
     auto& binData = fg.addCallbackPass<LocalShadowBinData>(
         "Local Shadow Bin",
@@ -1627,7 +1403,7 @@ LocalShadowOutput setupLocalShadowPasses(
             RenderPassBuilder passBuilder(builder, passHandle);
             data.atlas = passBuilder.write(staticHandle, ResourceState::DepthStencilWrite);
             data.tiles = passBuilder.read(binData.tiles, ResourceState::ShaderResource);
-            data.args = passBuilder.read(binData.args, ResourceState::IndirectArgument);
+            data.args = passBuilder.write(binData.args, ResourceState::IndirectArgument);
             data.clearArgs = passBuilder.read(binData.clearArgs, ResourceState::IndirectArgument);
             data.dirtyList = passBuilder.read(binData.dirtyList, ResourceState::ShaderResource);
         },
@@ -1645,7 +1421,7 @@ LocalShadowOutput setupLocalShadowPasses(
             RenderPassBuilder passBuilder(builder, passHandle);
             data.atlas = passBuilder.write(dynHandle, ResourceState::DepthStencilWrite);
             data.tiles = passBuilder.read(binData.tiles, ResourceState::ShaderResource);
-            data.args = passBuilder.read(binData.args, ResourceState::IndirectArgument);
+            data.args = passBuilder.write(staticData.args, ResourceState::IndirectArgument);
             data.clearArgs = passBuilder.read(binData.clearArgs, ResourceState::IndirectArgument);
             data.refreshDyn = passBuilder.read(binData.refreshDyn, ResourceState::ShaderResource);
         },
@@ -1662,6 +1438,121 @@ LocalShadowOutput setupLocalShadowPasses(
     return out;
 }
 
+LocalShadowOutput setupLocalShadowPasses(
+    FrameGraph& fg, fg::RenderDevice* device, VirtualResourceHandle orderAfter,
+    const LocalShadowConfig& config, LocalShadowState* state,
+    xray::profiler::GPUProfiler* gpuProfiler)
+{
+    LocalShadowOutput out;
+    if (!state || !device || state->activePages == 0)
+        return out;
+    auto* nvDevice = device->GetNVRHIDevice();
+    if (!nvDevice)
+        return out;
+    if (state->atlasLayers < state->activePages || !state->receiverTiles) {
+        const u32 layers = state->activePages;
+        auto statics = MakeAtlas(nvDevice, "LocalShadow_Static", layers);
+        auto dynamics = MakeAtlas(nvDevice, "LocalShadow_Dyn", layers);
+        nvrhi::BufferDesc desc;
+        desc.debugName = "LocalShadow_Receivers";
+        desc.byteSize = u64(layers) * kLocalTileCount * sizeof(LocalShadowViewGPU);
+        desc.structStride = sizeof(LocalShadowViewGPU);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        auto receivers = nvDevice->createBuffer(desc);
+        R_ASSERT2(statics && dynamics && receivers, "Cannot allocate local shadow overflow pages");
+        state->staticAtlas = statics;
+        state->dynAtlas = dynamics;
+        state->receiverTiles = receivers;
+        state->atlasLayers = layers;
+        for (u32 i = 0; i < state->activePages; ++i) {
+            auto& page = i == 0 ? *state : *state->overflowPages[i - 1];
+            page.staticAtlas = statics;
+            page.dynAtlas = dynamics;
+            page.staticAtlasFirst = page.dynAtlasFirst = true;
+            page.stateReset = true;
+        }
+    }
+    auto textureDesc = [&](const char* name) {
+        ResourceDesc desc;
+        desc.type = ResourceDesc::Type::Texture2DArray;
+        desc.width = desc.height = kLocalShadowAtlas;
+        desc.arraySize = state->atlasLayers;
+        desc.format = nvrhi::Format::D32;
+        desc.isDepthStencil = true;
+        desc.isImported = true;
+        desc.isTransient = false;
+        desc.debugName = name;
+        return desc;
+    };
+    auto staticHandle = fg.ImportTexture("rt_LocalShadowStatic", state->staticAtlas, textureDesc("rt_LocalShadowStatic"));
+    auto dynHandle = fg.ImportTexture("rt_LocalShadowDyn", state->dynAtlas, textureDesc("rt_LocalShadowDyn"));
+    xr_vector<VirtualResourceHandle> pageTiles;
+    for (u32 i = 0; i < state->activePages; ++i) {
+        auto& page = i == 0 ? *state : *state->overflowPages[i - 1];
+        page.staticAtlas = state->staticAtlas;
+        page.dynAtlas = state->dynAtlas;
+        auto rendered = SetupLocalShadowPage(fg, device, orderAfter, config, &page, gpuProfiler, staticHandle, dynHandle);
+        R_ASSERT(rendered.active);
+        staticHandle = rendered.staticAtlas;
+        dynHandle = rendered.dynAtlas;
+        pageTiles.push_back(rendered.tiles);
+    }
+    ResourceDesc desc;
+    desc.type = ResourceDesc::Type::Buffer;
+    desc.bufferSize = state->receiverTiles->getDesc().byteSize;
+    desc.structStride = sizeof(LocalShadowViewGPU);
+    desc.isImported = true;
+    desc.isTransient = false;
+    desc.debugName = "local_shadow_receivers";
+    auto receivers = fg.ImportBuffer("local_shadow_receivers", state->receiverTiles, desc);
+    struct PublishData { VirtualResourceHandle tiles; LocalShadowState* state; };
+    auto& published = fg.addCallbackPass<PublishData>("Local Shadow Publish",
+        [=](FrameGraph& builder, PassHandle handle, PublishData& data) {
+            RenderPassBuilder pass(builder, handle);
+            pass.read(staticHandle, ResourceState::ShaderResource);
+            pass.read(dynHandle, ResourceState::ShaderResource);
+            for (auto tiles : pageTiles)
+                pass.read(tiles, ResourceState::CopySource);
+            data.tiles = pass.write(receivers, ResourceState::CopyDest);
+            data.state = state;
+        },
+        [](const PublishData& data, const FrameGraph&, fg::RenderContext* ctx) {
+            auto* cmd = ctx->GetCommandList();
+            const u64 bytes = u64(kLocalTileCount) * sizeof(LocalShadowViewGPU);
+            cmd->setBufferState(data.state->receiverTiles, nvrhi::ResourceStates::CopyDest);
+            for (u32 i = 0; i < data.state->activePages; ++i) {
+                auto& page = i == 0 ? *data.state : *data.state->overflowPages[i - 1];
+                cmd->setBufferState(page.stateBuffer, nvrhi::ResourceStates::CopySource);
+                cmd->copyBuffer(data.state->receiverTiles, u64(i) * bytes, page.stateBuffer, 0, bytes);
+            }
+            cmd->setBufferState(data.state->receiverTiles, nvrhi::ResourceStates::ShaderResource);
+        });
+    out.tiles = published.tiles;
+    out.staticAtlas = staticHandle;
+    out.dynAtlas = dynHandle;
+    out.state = state;
+    out.active = true;
+    return out;
+}
+
+static nvrhi::ITexture* FallbackShadowArray(nvrhi::IDevice* device)
+{
+    static nvrhi::TextureHandle texture;
+    if (!texture) {
+        nvrhi::TextureDesc desc;
+        desc.debugName = "LocalShadow_FallbackArray";
+        desc.width = desc.height = 1;
+        desc.dimension = nvrhi::TextureDimension::Texture2DArray;
+        desc.format = nvrhi::Format::D32;
+        desc.isRenderTarget = true;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        texture = device->createTexture(desc);
+    }
+    return texture;
+}
+
 void ResolveLocalShadowBindings(
     const framegraph::FrameGraph& fg,
     const LocalShadowOutput& out,
@@ -1670,7 +1561,7 @@ void ResolveLocalShadowBindings(
     nvrhi::ITexture*& staticAtlas,
     nvrhi::ITexture*& dynAtlas)
 {
-    tiles = out.state ? out.state->stateBuffer.Get() : nullptr;
+    tiles = out.state ? out.state->receiverTiles.Get() : nullptr;
     if (!tiles)
         tiles = FallbackTiles(device);
     staticAtlas = nullptr;
@@ -1680,9 +1571,9 @@ void ResolveLocalShadowBindings(
         dynAtlas = fg.GetPhysicalTexture(out.dynAtlas);
     }
     if (!staticAtlas)
-        staticAtlas = GetPassResourceCache().GetDummyShadowMap2D(device);
+        staticAtlas = FallbackShadowArray(device);
     if (!dynAtlas)
-        dynAtlas = GetPassResourceCache().GetDummyShadowMap2D(device);
+        dynAtlas = FallbackShadowArray(device);
 }
 
 }

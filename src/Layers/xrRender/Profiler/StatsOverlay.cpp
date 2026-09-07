@@ -532,9 +532,10 @@ void StatsOverlay::RenderGeometrySection()
         {
             ImGui::Text("Local shadows:");
             ImGui::Indent();
-            ImGui::Text("Pool: %u spots / %u points, %u accepted / %u deferred / %u dyn refresh, atlas %u%%",
-                s.localShadowSpots, s.localShadowPoints, s.localShadowAccepted, s.localShadowDeferred, s.localShadowDyn,
-                s.localShadowAtlas);
+            ImGui::Text("%u spots / %u points, %u atlas pages (%u%% occupied)",
+                s.localShadowSpots, s.localShadowPoints, s.localShadowPages, s.localShadowAtlas);
+            ImGui::Text("Views: %u static refresh / %u dynamic / %u overflow", s.localShadowAccepted, s.localShadowDyn, s.localShadowOverflow);
+            ImGui::Text("%u caster batches, %u additional off-camera local casters", s.localShadowBatches, s.localShadowExtraCasters);
             ImGui::Text("Bin: %u pairs, %u drops, %u dyn drops", s.localShadowPairs, s.localShadowDrops, s.localShadowDynDrops);
             ImGui::Unindent();
         }
@@ -640,15 +641,17 @@ void StatsOverlay::RenderGeometrySection()
             ImGui::Unindent();
         }
 
-        if (s.lightsClustered > 0)
+        if (s.lightsFrustum > 0 || s.lightsTouching > 0 || s.lightsClustered > 0)
         {
-            u32 culled = (s.lightsHiZVisible > 0 && s.lightsHiZVisible < s.lightsClustered)
+            u32 culled = (s.lightsHiZVisible < s.lightsClustered)
                 ? (s.lightsClustered - s.lightsHiZVisible) : 0;
             if (culled > 0)
                 ImGui::Text("Lights: %u visible / %u total (%u Hi-Z culled)", s.lightsHiZVisible, s.lightsClustered, culled);
             else
                 ImGui::Text("Lights: %u clustered", s.lightsClustered);
             ImGui::TextDisabled("  %u point, %u spot, %u omni", s.lightsPoint, s.lightsSpot, s.lightsOmni);
+            ImGui::TextDisabled("  %u frustum candidates, %u camera-touch admissions", s.lightsFrustum, s.lightsTouching);
+            ImGui::TextDisabled("  rejected: %u invalid sector, %u LOD, %u HOM", s.lightsInvalidSector, s.lightsLodCulled, s.lightsHomCulled);
         }
         if (s.lightTilesTotal > 0)
         {

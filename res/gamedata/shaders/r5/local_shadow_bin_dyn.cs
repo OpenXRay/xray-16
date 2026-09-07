@@ -14,7 +14,7 @@ cbuffer LocalShadowDynBinParams : register(b5)
     uint g_CapTerrain;
     uint g_CapAT;
     uint g_IncludeAT;
-    uint g_DynBinPad;
+    uint g_StaticOverflow;
 };
 
 StructuredBuffer<ClusterEntry> g_Entries : register(t14);
@@ -33,7 +33,11 @@ void emitStream(bool emit, uint cursor, uint cap, uint2 pair, uint stream)
     uint rank = WavePrefixCountBits(emit);
     uint base = 0u;
     if (WaveIsFirstLane())
+    {
         InterlockedAdd(g_Stats[cursor], cnt, base);
+        uint ignored;
+        InterlockedAdd(g_Stats[g_StatsBase + stream], cnt, ignored);
+    }
     base = WaveReadLaneFirst(base);
     if (!emit)
         return;
@@ -55,11 +59,15 @@ void emitStream(bool emit, uint cursor, uint cap, uint2 pair, uint stream)
 [numthreads(64, 1, 1)]
 void main(uint3 dtID : SV_DispatchThreadID)
 {
+    if (g_StaticOverflow != 0u && g_Stats[2] == 0u)
+        return;
     uint idx = dtID.x;
     bool valid = idx < g_EntryCount;
 
     uint entryIdx = g_EntryBase + (valid ? idx : 0u);
-    ClusterEntry e = g_Entries[entryIdx];
+    ClusterEntry e = (ClusterEntry)0;
+    if (valid)
+        e = g_Entries[entryIdx];
     if ((e.flags & CLUSTER_ENTRY_FLAG_HUD) != 0u)
         valid = false;
     bool at = (e.flags & CLUSTER_ENTRY_FLAG_AT) != 0u;
@@ -67,16 +75,18 @@ void main(uint3 dtID : SV_DispatchThreadID)
         valid = false;
     uint stream = at ? 2u : (((e.flags & CLUSTER_ENTRY_FLAG_TERRAIN) != 0u) ? 1u : 0u);
 
-    uint n = g_Stats[13];
+    uint n = g_Stats[g_StaticOverflow != 0u ? 0u : 13u];
     for (uint k = 0u; k < n; ++k)
     {
         uint slot = g_Refresh[k];
         LocalShadowView v = g_Tiles[slot];
         bool hit = valid && v.zparams.w > 0.5;
+        if (g_StaticOverflow != 0u && v.shape.x < 0.5)
+            hit = false;
         if (hit)
         {
             LocalViewQuery q = localQueryFromView(v, slot, g_IncludeAT, 1.0);
-            if (localBoxOutside(e.sphere.xyz, e.extent, q))
+            if (g_StaticOverflow != 0u ? !localEntryTouchesView(e, q) : localBoxOutside(e.sphere.xyz, e.extent, q))
                 hit = false;
         }
         uint2 pair = uint2(entryIdx, slot);

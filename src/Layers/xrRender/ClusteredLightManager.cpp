@@ -21,14 +21,16 @@ void ClusteredLightManager::Initialize(fg::RenderDevice* device)
 {
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     m_device = nvDevice;
-    m_lightsCPU.reserve(MAX_LIGHTS);
+    m_lightsCPU.reserve(INITIAL_LIGHT_CAPACITY);
+    m_lightCapacity = INITIAL_LIGHT_CAPACITY;
+    m_identityIndices.resize(m_lightCapacity);
 
-    for (u32 i = 0; i < MAX_LIGHTS; i++)
+    for (u32 i = 0; i < INITIAL_LIGHT_CAPACITY; i++)
         m_identityIndices[i] = i;
 
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = MAX_LIGHTS * sizeof(GPULightData);
+        desc.byteSize = INITIAL_LIGHT_CAPACITY * sizeof(GPULightData);
         desc.structStride = sizeof(GPULightData);
         desc.debugName = "ClusteredLights_LightData";
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
@@ -74,7 +76,7 @@ void ClusteredLightManager::Initialize(fg::RenderDevice* device)
 
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = MAX_LIGHTS * sizeof(u32);
+        desc.byteSize = INITIAL_LIGHT_CAPACITY * sizeof(u32);
         desc.structStride = sizeof(u32);
         desc.debugName = "ClusteredLights_VisibleIndices";
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
@@ -95,7 +97,7 @@ void ClusteredLightManager::Initialize(fg::RenderDevice* device)
     }
 
     Msg("* [ClusteredLights] Created GPU buffers (max %u lights, %u max clusters)",
-        MAX_LIGHTS, maxClusters);
+        INITIAL_LIGHT_CAPACITY, maxClusters);
 }
 
 void ClusteredLightManager::Shutdown()
@@ -116,6 +118,29 @@ void ClusteredLightManager::Shutdown()
     m_device = nullptr;
 }
 
+void ClusteredLightManager::EnsureLightCapacity(u32 count)
+{
+    if (count <= m_lightCapacity)
+        return;
+    R_ASSERT(m_device);
+    u32 capacity = std::max(1u, m_lightCapacity);
+    while (capacity < count)
+        capacity *= 2u;
+    auto lightDesc = m_lightDataBuffer->getDesc();
+    lightDesc.byteSize = u64(capacity) * sizeof(GPULightData);
+    auto visibleDesc = m_visibleLightIndicesBuffer->getDesc();
+    visibleDesc.byteSize = u64(capacity) * sizeof(u32);
+    auto lights = m_device->createBuffer(lightDesc);
+    auto visible = m_device->createBuffer(visibleDesc);
+    R_ASSERT2(lights && visible, "Cannot grow the light buffers without dropping lights");
+    m_lightDataBuffer = lights;
+    m_visibleLightIndicesBuffer = visible;
+    m_identityIndices.resize(capacity);
+    for (u32 i = m_lightCapacity; i < capacity; ++i)
+        m_identityIndices[i] = i;
+    m_lightCapacity = capacity;
+}
+
 void ClusteredLightManager::BeginFrame()
 {
     m_lightsCPU.clear();
@@ -134,6 +159,10 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadow
 
     gpu.positionAndInvRangeSq.set(L->position.x, L->position.y, L->position.z, invRangeSq);
     gpu.colorAndRange.set(L->color.r, L->color.g, L->color.b, range);
+    const float lod = L->get_LOD();
+    gpu.colorAndRange.x *= lod;
+    gpu.colorAndRange.y *= lod;
+    gpu.colorAndRange.z *= lod;
 
     std::memset(&gpu.spotVP, 0, sizeof(gpu.spotVP));
 
@@ -208,8 +237,7 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadow
 
 void ClusteredLightManager::CollectLight(const light* L)
 {
-    if (m_numLights >= MAX_LIGHTS)
-        return;
+    EnsureLightCapacity(m_numLights + 1u);
 
     m_lightsCPU.push_back(BuildGPULightData(L, 0));
     m_numLights++;
@@ -217,9 +245,10 @@ void ClusteredLightManager::CollectLight(const light* L)
 
 void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>& lights, const xr_vector<u32>& shadowSlots)
 {
-    const u32 count = std::min(static_cast<u32>(lights.size()), MAX_LIGHTS);
+    const u32 count = static_cast<u32>(lights.size());
     if (count == 0)
         return;
+    EnsureLightCapacity(count);
 
     for (u32 i = 0; i < count; i++)
     {
@@ -255,8 +284,7 @@ void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>&
 
 void ClusteredLightManager::AddLight(const light* L, u32 type)
 {
-    if (m_numLights >= MAX_LIGHTS)
-        return;
+    EnsureLightCapacity(m_numLights + 1u);
 
     m_lightsCPU.push_back(BuildGPULightData(L, 0));
     m_numLights++;
@@ -328,10 +356,6 @@ ClusterCB ClusteredLightManager::BuildClusterCB(u32 screenWidth, u32 screenHeigh
 void ClusteredLightManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
 {
     if (!m_visibleLightCountBuffer || !m_device)
-        return;
-
-    m_statsFrameCounter++;
-    if ((m_statsFrameCounter % 30) != 0)
         return;
 
     nvrhi::BufferHandle& slot = m_statsReadbackBuffers[m_statsWriteSlot];

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "light.h"
+#include "xrRender_console.h"
 
 namespace xray::render::fg
 {
@@ -178,6 +179,19 @@ vis_data& light::get_homdata()
 };
 
 Fvector light::spatial_sector_point() { return position; }
+
+float light::get_LOD() const
+{
+    if (!flags.bShadow)
+        return 1.0f;
+    const float screen = float(Device.dwWidth) * float(Device.dwHeight)
+        * _sqr(90.0f / Device.fFOV) * (EPS_S + ps_r__LOD);
+    const float start = _sqr(ps_r__GLOD_ssa_start / 3.0f) / screen;
+    const float end = _sqr(ps_r__GLOD_ssa_end / 3.0f) / screen;
+    const float distSq = Device.vCameraPosition.distance_to_sqr(spatial.sphere.P) + EPS;
+    const float ssa = ps_r2_slight_fade * spatial.sphere.R / distSq;
+    return _sqrt(clampr((ssa - end) / (start - end), 0.0f, 1.0f));
+}
 //////////////////////////////////////////////////////////////////////////
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
 // Xforms

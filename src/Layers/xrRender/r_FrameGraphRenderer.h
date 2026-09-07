@@ -543,6 +543,12 @@ private:
     // Populated once per frame, reused across passes
     xr_vector<ISpatial*> m_lstRenderables;
     xr_vector<ISpatial*> m_lstShadowCasters;
+    u32 m_lightsFrustum = 0;
+    u32 m_lightsTouching = 0;
+    u32 m_lightsInvalidSector = 0;
+    u32 m_lightsLodCulled = 0;
+    u32 m_lightsHomCulled = 0;
+    u32 m_localShadowCasters = 0;
     bool m_collectShadowOnly = false;
     struct ShadowCasterRegion {
         Fmatrix sunView;

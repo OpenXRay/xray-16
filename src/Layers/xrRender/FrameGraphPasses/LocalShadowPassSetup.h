@@ -34,7 +34,7 @@ constexpr u32 kLocalSpotSlotsMax = 64;
 constexpr u32 kLocalPointLightsMax = 40;
 constexpr u32 kLocalTileCount = 256;
 constexpr u32 kLocalPullVertices = 384;
-constexpr u32 kLocalStatWords = 32;
+constexpr u32 kLocalStatWords = 48;
 constexpr u32 kLocalStreamCount = 6;
 constexpr u32 kLocalPairCapOpaque = 1u << 18;
 constexpr u32 kLocalPairCapTerrain = 1u << 16;
@@ -80,44 +80,21 @@ private:
     u32 Take(u32 level);
 };
 
-struct LocalTile {
-    const light* owner = nullptr;
-    Fvector pos = {};
-    Fvector dir = {};
-    float range = 0.0f;
-    float cone = 0.0f;
-    u32 lastSeen = 0;
-    u32 stamp = 0;
-    u32 serial = 0;
-    bool inView = false;
-    u32 node[6] = { ~0u, ~0u, ~0u, ~0u, ~0u, ~0u };
-    u32 size[6] = {};
-    u32 rectStamp[6] = {};
-};
-
-struct LocalPendingFree {
-    u32 slot;
-    u32 serial;
-    u32 node;
-    u32 stamp;
-};
-
 struct LocalShadowState {
-    LocalTile spots[kLocalSpotSlotsMax];
-    LocalTile points[kLocalPointLightsMax];
+    // Each page has a bounded work list; additional pages preserve all admitted lights.
+    xr_vector<xr_unique_ptr<LocalShadowState>> overflowPages;
+    u32 activePages = 0;
+    u32 atlasLayers = 0;
+    u32 atlasLayer = 0;
+    nvrhi::BufferHandle receiverTiles;
+    const light* owners[kLocalTileCount] = {};
     LocalAtlasAllocator atlas;
-    xr_vector<LocalPendingFree> pendingFree;
-    u32 spotSlots = 0;
-    u32 pointGroups = 0;
     LocalShadowViewGPU request[kLocalTileCount] = {};
     u32 candList[kLocalTileCount][4] = {};
     u32 candCount = 0;
+    u32 dirtyViews = 0;
     u32 nextSerial = 0;
     bool stateReset = true;
-    int lastVsmAT = -1;
-    int lastSpotsCvar = -1;
-    int lastPointsCvar = -1;
-    float lastClusterLod = -1.0f;
     u32 pairCapacity[kLocalStreamCount] = {};
     nvrhi::IBuffer* lastEntryBuffer = nullptr;
     nvrhi::IBuffer* lastBvhNodeBuffer = nullptr;
@@ -127,7 +104,6 @@ struct LocalShadowState {
     u32 frame = 0;
     u32 statAccepted = 0;
     u32 statDeferred = 0;
-    u32 statSkipped = 0;
     u32 statUpToDate = 0;
     u32 statPairs = 0;
     u32 statDynPairs = 0;
@@ -135,11 +111,10 @@ struct LocalShadowState {
     u32 statDrops = 0;
     u32 statDynDrops = 0;
     u32 statMaxVisited = 0;
-    u32 statMaxPendingAge = 0;
     u32 statDynRefresh = 0;
     u32 statAtlasPercent = 0;
-    u32 statPendingFree = 0;
-    u32 lastLogTime = 0;
+    u32 statOverflowViews = 0;
+    u32 statCasterBatches = 0;
 
     static constexpr u32 kReadbackSlots = 4;
     nvrhi::BufferHandle readback[kReadbackSlots];
@@ -218,7 +193,6 @@ void SelectLocalShadowLights(
     LocalShadowState& state,
     const xr_vector<const light*>& lights,
     const Fvector& camPos,
-    const Fmatrix& camViewProj,
     float projScale);
 
 LocalShadowOutput setupLocalShadowPasses(

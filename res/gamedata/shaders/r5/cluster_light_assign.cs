@@ -60,7 +60,7 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
         float2 tileMax = float2(min((tileX + 1) * tileSize, cb_screenSize.x),
                                  min((tileY + 1) * tileSize, cb_screenSize.y));
 
-        uint numVisible = min(g_VisibleLightCount.Load(0), 1024u);
+        uint numVisible = min(g_VisibleLightCount.Load(0), (uint)cb_gridDims.w);
 
         for (uint iter = gtid.x; iter < numVisible; iter += ASSIGN_THREADS)
         {
@@ -81,21 +81,21 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
             if (lightDepth + range <= 0)
                 continue;
 
-            if (clipPos.w > 0 && lightDepth > range)
-            {
-                float3 ndc = clipPos.xyz / clipPos.w;
-                float2 screenPos;
-                screenPos.x = (ndc.x * 0.5 + 0.5) * cb_screenSize.x;
-                screenPos.y = (0.5 - ndc.y * 0.5) * cb_screenSize.y;
-
-                float zNearOverlap = max(sliceNear, max(depthNear, zNear));
-                float screenRadius = (range / zNearOverlap) * cb_screenSize.y * 0.5;
-
-                float2 closest = clamp(screenPos, tileMin, tileMax);
-                float2 diff = screenPos - closest;
-                if (dot(diff, diff) > screenRadius * screenRadius)
-                    continue;
-            }
+            // Test against the actual cluster side planes. A projected radius
+            // that omits focal length underestimates light coverage at narrow FOV.
+            float left = tileMin.x / cb_screenSize.x * 2.0 - 1.0;
+            float right = tileMax.x / cb_screenSize.x * 2.0 - 1.0;
+            float top = 1.0 - tileMin.y / cb_screenSize.y * 2.0;
+            float bottom = 1.0 - tileMax.y / cb_screenSize.y * 2.0;
+            float4 planes[4] = {
+                m_VP[0] - left * m_VP[3], right * m_VP[3] - m_VP[0],
+                top * m_VP[3] - m_VP[1], m_VP[1] - bottom * m_VP[3]
+            };
+            bool outside = false;
+            [unroll] for (uint p = 0; p < 4; ++p)
+                outside = outside || dot(planes[p], float4(lightPos, 1.0)) < -range * length(planes[p].xyz);
+            if (outside)
+                continue;
 
             uint slot;
             InterlockedAdd(s_count, 1, slot);
@@ -109,7 +109,12 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
 
     if (gtid.x == 0 && clusterValid)
     {
-        if (lightCount > 0)
+        if (s_count > MAX_LIGHTS_PER_CLUSTER)
+        {
+            // Receivers evaluate the full light buffer for an overflowing cluster.
+            g_ClusterGrid[clusterIdx] = uint2(0xFFFFFFFFu, (uint)cb_gridDims.w);
+        }
+        else if (lightCount > 0)
         {
             uint globalOffset;
             g_LightIndexCounter.InterlockedAdd(0, lightCount, globalOffset);
@@ -121,7 +126,7 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
             }
             else
             {
-                g_ClusterGrid[clusterIdx] = uint2(0, 0);
+                g_ClusterGrid[clusterIdx] = uint2(0xFFFFFFFFu, (uint)cb_gridDims.w);
             }
         }
         else

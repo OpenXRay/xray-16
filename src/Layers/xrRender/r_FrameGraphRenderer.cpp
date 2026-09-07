@@ -5,6 +5,7 @@
 #include "Layers/xrRender/DetailModel.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "xrCore/FMesh.hpp"
+#include "xrCore/Threading/TaskManager.hpp"
 #include "FHierrarhyVisual.h"
 #include "SkeletonAnimated.h"
 #include "FVisual.h"
@@ -715,13 +716,20 @@ void FrameGraphRenderer::RenderStatsOverlay()
             const auto& localShadow = m_blackboard->get_or_add<passes::LocalShadowState>();
             stats.localShadowSpots = localShadow.pooledSpots;
             stats.localShadowPoints = localShadow.pooledPoints;
-            stats.localShadowAccepted = localShadow.statAccepted;
-            stats.localShadowDeferred = localShadow.statDeferred;
-            stats.localShadowDyn = localShadow.statDynRefresh;
-            stats.localShadowPairs = localShadow.statPairs + localShadow.statDynPairs + localShadow.statSkinnedPairs;
-            stats.localShadowDrops = localShadow.statDrops;
-            stats.localShadowDynDrops = localShadow.statDynDrops;
-            stats.localShadowAtlas = localShadow.statAtlasPercent;
+            stats.localShadowPages = localShadow.activePages;
+            stats.localShadowExtraCasters = m_localShadowCasters;
+            for (u32 i = 0; i < localShadow.activePages; ++i) {
+                const auto& page = i == 0 ? localShadow : *localShadow.overflowPages[i - 1];
+                stats.localShadowAccepted += page.statAccepted;
+                stats.localShadowDyn += page.statDynRefresh;
+                stats.localShadowPairs += page.statPairs + page.statDynPairs + page.statSkinnedPairs;
+                stats.localShadowDrops += page.statDrops;
+                stats.localShadowDynDrops += page.statDynDrops;
+                stats.localShadowAtlas += page.statAtlasPercent;
+                stats.localShadowOverflow += page.statOverflowViews;
+                stats.localShadowBatches += page.statCasterBatches;
+            }
+            stats.localShadowAtlas /= std::max(1u, localShadow.activePages);
         }
 
         // Collect detail/grass stats
@@ -731,8 +739,12 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.lightsPoint = clmStats.GetPointCount();
             stats.lightsSpot = clmStats.GetSpotCount();
             stats.lightsOmni = clmStats.GetOmniCount();
-            u32 visCount = clmStats.GetVisibleLightCount();
-            stats.lightsHiZVisible = (visCount > 0) ? visCount : stats.lightsClustered;
+            stats.lightsHiZVisible = clmStats.HasVisibilityStats() ? clmStats.GetVisibleLightCount() : stats.lightsClustered;
+            stats.lightsFrustum = m_lightsFrustum;
+            stats.lightsTouching = m_lightsTouching;
+            stats.lightsInvalidSector = m_lightsInvalidSector;
+            stats.lightsLodCulled = m_lightsLodCulled;
+            stats.lightsHomCulled = m_lightsHomCulled;
         }
 
         {
@@ -831,7 +843,10 @@ void FrameGraphRenderer::RenderStatsOverlay()
 }
 
 void FrameGraphRenderer::SetupFrame() {
-    const bool levelLoaded = g_pGamePersistent && g_pGameLevel;
+    // The level object exists during prefetch, before Load initializes SpatialSpace.
+    // All scene collection (including camera-touching lights) needs a ready level.
+    const bool collectScene = g_pGamePersistent && g_pGameLevel && g_pGameLevel->bReady
+        && !g_pGamePersistent->IsLoadingScreenShown() && g_pGamePersistent->SpatialSpace.m_root;
 
     if (m_gpuCullingManager) {
         {
@@ -854,10 +869,12 @@ void FrameGraphRenderer::SetupFrame() {
 
     m_lstRenderables.clear();
     m_lstShadowCasters.clear();
+    m_shadowCasterRegion.valid = false;
+    m_lightsFrustum = m_lightsTouching = m_lightsInvalidSector = 0;
+    m_lightsLodCulled = m_lightsHomCulled = m_localShadowCasters = 0;
 
-    if (levelLoaded)
+    if (collectScene)
     {
-        if (levelLoaded && !g_pGamePersistent->IsLoadingScreenShown())
         {
             ZoneScopedN("SetupFrame::FrustumQuery");
 
@@ -875,7 +892,6 @@ void FrameGraphRenderer::SetupFrame() {
                 view_frustum
             );
 
-            m_shadowCasterRegion.valid = false;
             {
                 m_shadowCasterRegion = BuildShadowCasterRegion();
                 if (m_shadowCasterRegion.valid) {
@@ -901,9 +917,16 @@ void FrameGraphRenderer::SetupFrame() {
         fg::ClusteredLightManager::Instance().BeginFrame();
     }
 
-    if (levelLoaded) {
+    if (collectScene) {
         ZoneScopedN("SetupFrame::CollectVisibleGeometry");
         CollectVisibleGeometry();
+    } else if (m_blackboard) {
+        // Keep cached storage, but do not schedule the previous scene's lights.
+        if (auto* shadows = m_blackboard->try_get<passes::LocalShadowState>()) {
+            shadows->activePages = shadows->candCount = 0;
+            shadows->pooledSpots = shadows->pooledPoints = 0;
+            shadows->slotOfLight.clear();
+        }
     }
 
     {
@@ -1979,8 +2002,6 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
 
     if (!meshVisual)
         return false;
-    if (m_collectShadowOnly && visual->getType() != MT_SKELETON_GEOMDEF_ST && visual->getType() != MT_SKELETON_GEOMDEF_PM)
-        return false;
 
     // Check if geometry is valid
     if (!meshVisual->rm_geom || !meshVisual->rm_geom._get())
@@ -2438,14 +2459,55 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     xr_vector<const light*> collectedLights;
     collectedLights.reserve(256);
 
+    if (m_pProcessHOMTask) {
+        TaskScheduler->Wait(*m_pProcessHOMTask);
+        m_pProcessHOMTask = nullptr;
+    }
+    xr_set<const light*> admitted;
+    auto collectLight = [&](ISpatial* spatial, bool touchesCamera) {
+        auto* L = static_cast<light*>(spatial->dcast_Light());
+        if (!L || !L->flags.bActive || admitted.count(L))
+            return;
+        if (L->flags.type != IRender_Light::POINT && L->flags.type != IRender_Light::SPOT)
+            return;
+        if (L->flags.bStatic && !ps_r2_ls_flags.test(R2FLAG_R1LIGHTS))
+            return;
+        L->spatial_updatesector(fg::Scene.detect_sector(L->position));
+        if (L->GetSpatialData().sector_id == IRender_Sector::INVALID_SECTOR_ID) {
+            ++m_lightsInvalidSector;
+            return;
+        }
+        if (o.noshadows)
+            L->flags.bShadow = false;
+        if (!touchesCamera) {
+            if (L->get_LOD() <= EPS_L) {
+                ++m_lightsLodCulled;
+                return;
+            }
+            if (!m_HOM.visible(L->get_homdata())) {
+                ++m_lightsHomCulled;
+                return;
+            }
+        } else {
+            ++m_lightsTouching;
+        }
+        admitted.insert(L);
+        collectedLights.push_back(L);
+    };
+
+    // Vanilla force-adds lights touching the eye, independently of camera portals/HOM.
+    xr_vector<ISpatial*> touchingLights;
+    g_pGamePersistent->SpatialSpace.q_sphere(touchingLights, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
+    for (ISpatial* spatial : touchingLights)
+        collectLight(spatial, true);
+
     for (ISpatial* spatial : m_lstRenderables)
     {
         const auto& data = spatial->GetSpatialData();
 
         if (data.type & STYPE_LIGHTSOURCE) {
-            const light* L = (const light*)spatial->dcast_Light();
-            if (L)
-                collectedLights.push_back(L);
+            ++m_lightsFrustum;
+            collectLight(spatial, false);
             continue;
         }
 
@@ -2459,20 +2521,38 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         submittedDynamic++;
     }
 
-    if (!m_lstShadowCasters.empty()) {
+    // Collect the union once. A caster needed by a local light must never be
+    // rejected by the camera frustum or by the sun's extruded caster region.
+    {
         ZoneScopedN("CollectVisibleGeometry::ShadowCasters");
         const ShadowCasterRegion& region = m_shadowCasterRegion;
         xr_set<ISpatial*> visible(m_lstRenderables.begin(), m_lstRenderables.end());
         m_collectShadowOnly = true;
-        for (ISpatial* spatial : m_lstShadowCasters) {
+        auto submitCaster = [&](ISpatial* spatial) {
             if (visible.count(spatial))
-                continue;
-            if (!ShadowCasterMayReachView(region, spatial->GetSpatialData().sphere))
-                continue;
+                return false;
             IRenderable* renderable = spatial->dcast_Renderable();
             if (!renderable || renderable->renderable_HUD())
+                return false;
+            visible.insert(spatial);
+            renderable->renderable_Render(0, nullptr);
+            return true;
+        };
+        for (ISpatial* spatial : m_lstShadowCasters) {
+            if (!ShadowCasterMayReachView(region, spatial->GetSpatialData().sphere))
                 continue;
-            renderable->renderable_Render(0, renderable);
+            submitCaster(spatial);
+        }
+        xr_vector<ISpatial*> localCasters;
+        for (const light* L : collectedLights) {
+            if (!L->flags.bShadow)
+                continue;
+            // The light's influence sphere conservatively contains every light-to-
+            // receiver segment. GPU binning refines it against each shadow view.
+            g_pGamePersistent->SpatialSpace.q_sphere(localCasters, 0, STYPE_RENDERABLE, L->position, L->range);
+            for (ISpatial* spatial : localCasters)
+                if (submitCaster(spatial))
+                    ++m_localShadowCasters;
         }
         m_collectShadowOnly = false;
     }
@@ -2483,7 +2563,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         if (m_blackboard) {
             auto& localShadowState = m_blackboard->get_or_add<passes::LocalShadowState>();
             const float projScale = 0.5f * float(Device.dwHeight) / tanf(deg2rad(Device.fFOV) * 0.5f);
-            passes::SelectLocalShadowLights(localShadowState, collectedLights, Device.vCameraPosition, Device.mFullTransform, projScale);
+            passes::SelectLocalShadowLights(localShadowState, collectedLights, Device.vCameraPosition, projScale);
             slots = &localShadowState.slotOfLight;
         }
         if (!collectedLights.empty())
