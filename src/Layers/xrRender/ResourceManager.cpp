@@ -66,6 +66,7 @@ static CResourceManager::BlendMode TokenToBlendMode(u32 tokenID)
     case 3: return BlendMode::Multiply;
     case 4: return BlendMode::Multiply2X;
     case 5: return BlendMode::Additive;
+    case 6: return BlendMode::Multiply2X;
     default: return BlendMode::AlphaBlend;
     }
 }

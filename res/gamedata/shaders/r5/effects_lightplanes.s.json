@@ -1,0 +1,25 @@
+{
+    "transparent": true,
+    "castsShadow": false,
+    "fog": false,
+    "sorting": {
+        "priority": 2,
+        "backToFront": false
+    },
+    "colorMode": "unlitAlphaFade",
+    "vertexFade": {
+        "mode": "facing",
+        "scale": 1.0
+    },
+    "blend": {
+        "src": "srcalpha",
+        "dst": "one"
+    },
+    "depth": {
+        "test": true,
+        "write": false
+    },
+    "alphaTest": {
+        "ref": 0
+    }
+}
