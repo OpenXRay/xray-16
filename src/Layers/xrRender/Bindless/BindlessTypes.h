@@ -42,9 +42,10 @@ inline const char* GetTextureTypeName(TextureType type) {
 // GPU-side material representation - must match HLSL exactly!
 // Uses SM6 bindless texture indices from ResourceDescriptorHeap
 //
-// Layout (32 bytes total):
+// Layout (48 bytes total):
 //   Bytes 0-15:  Texture descriptor indices (4× u32)
 //   Bytes 16-31: Material properties
+//   Bytes 32-47: Emissive intensity + padding
 
 struct alignas(16) MaterialData {
     // Descriptor heap indices (UINT32_MAX = invalid/not present)
@@ -58,8 +59,13 @@ struct alignas(16) MaterialData {
     float alphaRef;      // Alpha test threshold (0.5 typical)
     u32 flags;           // Material flags (see MaterialFlags)
     u32 shaderVariant;   // Index into ShaderVariantRegistry (0=default)
+    float emissive;
+    u32 pad0;
+    u32 pad1;
+    u32 pad2;
 };
-static_assert(sizeof(MaterialData) == 32, "MaterialData must be 32 bytes for GPU alignment");
+static_assert(sizeof(MaterialData) == 48, "MaterialData must be 48 bytes for GPU alignment");
+static_assert(offsetof(MaterialData, emissive) == 32, "MaterialData emissive offset is shader-visible");
 
 // Material flags (must match HLSL)
 enum MaterialFlags : u32 {

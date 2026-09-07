@@ -126,6 +126,8 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared
         info.shaderVariant = variantIdx;
         if (variant->transparent)
             info.transparent = true;
+        if (variant->emissive)
+            info.emissive = variant->emissiveIntensity;
         if (!variant->passes.empty() && variant->passes[0].hasAlphaTestOverride)
         {
             info.alphaTest = true;

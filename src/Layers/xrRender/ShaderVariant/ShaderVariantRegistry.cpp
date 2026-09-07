@@ -68,6 +68,7 @@ void ShaderVariantRegistry::LoadVariantFile(const char* filename, const char* fi
     desc.fog = root["fog"].as_bool(true);
     desc.distort = root["distort"].as_bool(false);
     desc.emissive = root["emissive"].as_bool(false);
+    desc.emissiveIntensity = root["emissiveIntensity"].as_float(1.0f);
 
     ParseTextures(root["textures"], desc.textures);
 

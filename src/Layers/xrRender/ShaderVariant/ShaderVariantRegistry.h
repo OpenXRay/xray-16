@@ -30,6 +30,7 @@ struct ShaderVariantDesc
     bool fog = true;
     bool distort = false;
     bool emissive = false;
+    float emissiveIntensity = 1.0f;
 
     xr_map<shared_str, shared_str> textures;
 
