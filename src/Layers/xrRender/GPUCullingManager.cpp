@@ -34,6 +34,30 @@ namespace fg
 
 namespace xray::render::fg {
 
+static u32 MaterialObjectFlags(u32 materialID)
+{
+    const auto* material = bindless::MaterialBuffer::Instance().GetMaterial(materialID);
+    if (!material)
+        return 0u;
+    if (material->flags & bindless::MAT_FLAG_ALPHA_BLEND)
+        return GPU_OBJECT_NO_RESOLVE;
+    if (const auto* variant = ShaderVariantRegistry::Instance().GetVariantByIndex(material->shaderVariant))
+        if (variant->transparent || (!variant->passes.empty() && variant->passes[0].blendEnabled))
+            return GPU_OBJECT_NO_RESOLVE;
+    return 0u;
+}
+
+static bool MaterialCastsShadow(u32 materialID)
+{
+    const auto* material = bindless::MaterialBuffer::Instance().GetMaterial(materialID);
+    if (!material)
+        return true;
+    if (material->flags & bindless::MAT_FLAG_ALPHA_BLEND)
+        return false;
+    const auto* variant = ShaderVariantRegistry::Instance().GetVariantByIndex(material->shaderVariant);
+    return !variant || variant->castsShadow;
+}
+
 // ═══════════════════════════════════════════════════════
 //  CONSTANTS
 // ═══════════════════════════════════════════════════════
@@ -512,14 +536,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     m_transparentResidualCount = 0;
 
     auto batchFlags = [](const GeometryBatch& batch) -> u32 {
-        if (const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(batch.bindlessMaterialID)) {
-            if (mat->flags & bindless::MAT_FLAG_ALPHA_BLEND)
-                return GPU_OBJECT_NO_RESOLVE;
-            if (const auto* variant = ShaderVariantRegistry::Instance().GetVariantByIndex(mat->shaderVariant))
-                if (mat->shaderVariant != 0 && (variant->transparent || !variant->passes.empty() && variant->passes[0].blendEnabled))
-                    return GPU_OBJECT_NO_RESOLVE;
-        }
-        return 0u;
+        return MaterialObjectFlags(batch.bindlessMaterialID) | (batch.isShadowOnly ? GPU_OBJECT_SHADOW_ONLY : 0u);
     };
 
     auto batchKey = [](const GeometryBatch& batch) {
@@ -801,8 +818,7 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     u32 residual = 0;
     u32 hudPooled = 0;
     auto addBatch = [&](const GeometryBatch& batch, u8 kind) {
-        const u32 variantIdx = bindless::MaterialBuffer::Instance().GetShaderVariant(batch.bindlessMaterialID);
-        const bool pooled = variantIdx == 0
+        const bool pooled = (MaterialObjectFlags(batch.bindlessMaterialID) & GPU_OBJECT_NO_RESOLVE) == 0
             && batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
             && batch.skinnedPoolFormat < SkinnedGeometryPools::FORMAT_COUNT;
         if (!pooled) {
@@ -952,6 +968,8 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
                         e.batchIndex = slot;
                         e.materialID = bucket.materialIDs[i];
                         e.flags = GPU_CLUSTER_ENTRY_SKINNED | (kind == 2u ? GPU_CLUSTER_ENTRY_HUD : 0u) | (kind == 1u ? GPU_CLUSTER_ENTRY_SHADOW_ONLY : 0u);
+                        if (!MaterialCastsShadow(e.materialID))
+                            e.flags |= GPU_CLUSTER_ENTRY_NO_SHADOW;
                         if (kind == 2u)
                             m_skinnedHudEntryData.push_back(static_cast<u32>(m_skinnedEntryData.size()));
                         (kind == 1u ? m_skinnedShadowEntryData : m_skinnedEntryData).push_back(e);
@@ -2029,6 +2047,10 @@ static void EmitClusterEntry(const ClusterDAG& dag, u32 megaBase, const ClusterM
     e.flags = ((p.flags & CLUSTER_PROTO_FLAG_AT) ? GPU_CLUSTER_ENTRY_AT : 0) |
               ((p.flags & CLUSTER_PROTO_FLAG_TERRAIN) ? GPU_CLUSTER_ENTRY_TERRAIN : 0) |
               extraFlags;
+    // Terrain material IDs index a separate table. Regular entries retain their
+    // material's shadow eligibility independently of camera rendering eligibility.
+    if (!(e.flags & GPU_CLUSTER_ENTRY_TERRAIN) && !MaterialCastsShadow(materialID))
+        e.flags |= GPU_CLUSTER_ENTRY_NO_SHADOW;
 
     u32 errClass = 3;
     if (e.parentError < 1.0f) errClass = 0;
@@ -2085,7 +2107,8 @@ void GPUCullingManager::BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList)
             if (rec->isComponent && proto.member != member)
                 continue;
             EmitClusterEntry(m_clusterDAG, megaBase, proto, *rec, i, world,
-                m_dynamicMaterialIDData[i], GPU_CLUSTER_ENTRY_DYNAMIC, m_dynamicEntryData);
+                m_dynamicMaterialIDData[i], GPU_CLUSTER_ENTRY_DYNAMIC |
+                    ((m_dynamicObjectFlags[i] & GPU_OBJECT_SHADOW_ONLY) ? GPU_CLUSTER_ENTRY_SHADOW_ONLY : 0u), m_dynamicEntryData);
         }
         ++clustered;
     }

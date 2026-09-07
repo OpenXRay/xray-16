@@ -46,7 +46,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     uint entryIdx = g_EntryBase + idx;
     ClusterEntry e = g_Entries[entryIdx];
-    if ((e.flags & 32u) != 0u)
+    if ((e.flags & (32u | 128u)) != 0u) // HUD or material without a shadow pass
         return;
     bool at = (e.flags & 1u) != 0u;
     if (at && g_IncludeAT == 0u)

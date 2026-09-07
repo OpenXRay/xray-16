@@ -1,5 +1,6 @@
 {
     "emissive": true,
+    "castsShadow": false,
     "emissiveIntensity": 16,
     "fog": false
 }
