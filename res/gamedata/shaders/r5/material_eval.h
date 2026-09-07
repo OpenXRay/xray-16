@@ -8,6 +8,7 @@ struct MaterialSurface
     float roughness;
     float metallic;
     float ao;
+    float3 emissive;
 };
 
 float4 SampleDiffuseGrad(MaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy)
@@ -74,6 +75,7 @@ MaterialSurface EvalStandardMaterial(MaterialData mat, float3 diffuse, float2 uv
         s.roughness = pbrSample.g;
         s.ao = pbrSample.b;
     }
+    s.emissive = (mat.flags & MAT_FLAG_EMISSIVE) ? s.albedo * mat.emissive : 0.0;
     return s;
 }
 
@@ -142,6 +144,7 @@ MaterialSurface EvalTerrainMaterial(TerrainMaterialData mat, float2 uv, float2 u
         s.roughness = blendedPBR.g;
         s.ao = blendedPBR.b;
     }
+    s.emissive = 0.0;
     return s;
 }
 

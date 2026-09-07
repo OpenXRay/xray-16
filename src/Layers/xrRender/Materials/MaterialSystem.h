@@ -33,6 +33,7 @@ public:
         bool useDetail = false;
 
         u32 shaderVariant = 0;
+        float emissive = 0.0f;
     };
 
     struct TextureSet

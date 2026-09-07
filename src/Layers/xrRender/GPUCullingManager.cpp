@@ -10,6 +10,7 @@
 #include "Layers/xrRender/xrRender_console.h"
 #include "Layers/xrRender/FrameGraphPasses/ParticlePassSetup.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/Bindless/VertexConverter.h"
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/FSkinned.h"
@@ -483,8 +484,11 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
 
     auto batchFlags = [](const GeometryBatch& batch) -> u32 {
         if (const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(batch.bindlessMaterialID)) {
-            if (mat->shaderVariant != 0 || (mat->flags & bindless::MAT_FLAG_ALPHA_BLEND))
+            if (mat->flags & bindless::MAT_FLAG_ALPHA_BLEND)
                 return GPU_OBJECT_NO_RESOLVE;
+            if (const auto* variant = ShaderVariantRegistry::Instance().GetVariantByIndex(mat->shaderVariant))
+                if (mat->shaderVariant != 0 && (variant->transparent || !variant->passes.empty() && variant->passes[0].blendEnabled))
+                    return GPU_OBJECT_NO_RESOLVE;
         }
         return 0u;
     };
