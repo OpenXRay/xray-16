@@ -113,14 +113,14 @@ bool CResourceManager::GetBlenderProperties(LPCSTR shaderName, BlenderProperties
     }
     if (cls == B_MODEL)
     {
-        auto* b = static_cast<CBlender_Model*>(B);
-        outProps.alphaRef = b->oAREF.value;
-        if (b->oBlend.value)
+        auto* b = static_cast<CBlender_deffer_model*>(B);
+        if (b->oBlend.value && b->oAREF.value < 16)
             outProps.blendMode = BlendMode::AlphaBlend;
-        else if (b->oAREF.value > 0)
+        else if (b->oBlend.value)
             outProps.blendMode = BlendMode::AlphaTest;
         else
             outProps.blendMode = BlendMode::Opaque;
+        outProps.alphaRef = b->oBlend.value ? b->oAREF.value : 0;
         outProps.writesDepth = (outProps.blendMode != BlendMode::AlphaBlend);
         return true;
     }
