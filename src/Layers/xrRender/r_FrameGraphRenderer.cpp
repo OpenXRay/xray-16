@@ -862,9 +862,11 @@ void FrameGraphRenderer::SetupFrame() {
         m_detailManager->ProcessStatsReadback(m_device->GetNVRHIDevice());
     }
 
-    if (psDeviceFlags.test(rsStatistic)) {
+    if (psDeviceFlags.test(rsStatistic) || ps_r_local_shadow_debug != 0) {
         ZoneScopedN("Readback::LightStats");
         fg::ClusteredLightManager::Instance().ProcessStatsReadback();
+    }
+    if (psDeviceFlags.test(rsStatistic)) {
         passes::ProcessDeferredLightStats(m_blackboard->get_or_add<passes::DeferredLightPassState>(), m_device->GetNVRHIDevice());
     }
 
@@ -2465,6 +2467,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         m_pProcessHOMTask = nullptr;
     }
     xr_set<const light*> admitted;
+    xr_vector<const light*> culledLights;
     auto collectLight = [&](ISpatial* spatial, bool touchesCamera) {
         auto* L = static_cast<light*>(spatial->dcast_Light());
         if (!L || !L->flags.bActive || admitted.count(L))
@@ -2476,6 +2479,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         L->spatial_updatesector(fg::Scene.detect_sector(L->position));
         if (L->GetSpatialData().sector_id == IRender_Sector::INVALID_SECTOR_ID) {
             ++m_lightsInvalidSector;
+            culledLights.push_back(L);
             return;
         }
         if (o.noshadows)
@@ -2483,10 +2487,12 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         if (!touchesCamera) {
             if (L->get_LOD() <= EPS_L) {
                 ++m_lightsLodCulled;
+                culledLights.push_back(L);
                 return;
             }
             if (!m_HOM.visible(L->get_homdata())) {
                 ++m_lightsHomCulled;
+                culledLights.push_back(L);
                 return;
             }
         } else {
@@ -2572,15 +2578,22 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     }
 
     if (ps_r_local_shadow_debug != 0) {
+        xr_set<const light*> gpuCulled;
+        for (const light* L : fg::ClusteredLightManager::Instance().GetCulledLights())
+            if (admitted.count(L))
+                gpuCulled.insert(L);
         auto debugLights = collectedLights;
+        debugLights.insert(debugLights.end(), culledLights.begin(), culledLights.end());
         std::sort(debugLights.begin(), debugLights.end(), [](const light* a, const light* b) {
             return Device.vCameraPosition.distance_to_sqr(a->position) > Device.vCameraPosition.distance_to_sqr(b->position);
         });
+        const u32 red = bgr2rgb(color_rgba(255, 40, 40, 0));
         for (const light* L : debugLights) {
-            if (L->flags.type != IRender_Light::POINT)
+            const bool culled = gpuCulled.count(L) || !admitted.count(L);
+            if (!culled && L->flags.type != IRender_Light::POINT)
                 continue;
-            const u32 rgb = bgr2rgb(L->flags.bShadow ? color_rgba(40, 210, 255, 0) : color_rgba(255, 170, 40, 0));
-            fg::g_debug_draw.DrawSphere(L->position, L->range, rgb | color_rgba(0, 0, 0, 14), rgb | color_rgba(0, 0, 0, 170));
+            const u32 rgb = culled ? red : bgr2rgb(L->flags.bShadow ? color_rgba(40, 210, 255, 0) : color_rgba(255, 170, 40, 0));
+            fg::g_debug_draw.DrawSphere(L->position, L->range, rgb | color_rgba(0, 0, 0, culled ? 40 : 14), rgb | color_rgba(0, 0, 0, culled ? 230 : 170));
         }
     }
 
