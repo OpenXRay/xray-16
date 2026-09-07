@@ -55,6 +55,20 @@ enum GPUObjectFlags : u32 {
     GPU_OBJECT_SHADOW_ONLY = 0x2,
 };
 
+struct TransparentDrawRange {
+    u32 key;
+    u32 first;
+    u32 count;
+};
+
+enum TransparentKeyBits : u32 {
+    TRANSPARENT_KEY_DST_SHIFT = 8,
+    TRANSPARENT_KEY_DEPTH_WRITE = 1u << 16,
+    TRANSPARENT_KEY_DISTORT = 1u << 17,
+    TRANSPARENT_KEY_NO_COLOR = 1u << 18,
+    TRANSPARENT_KEY_UNLIT = 1u << 19,
+};
+
 // Cluster LOD entry (matches HLSL ClusterEntry in cluster_cull.cs)
 struct GPUClusterEntry {
     Fvector4 sphere;
@@ -285,6 +299,11 @@ public:
     u32 GetTransparentResidualCount() const { return m_transparentResidualCount; }
     nvrhi::IBuffer* GetTransparentInstanceBuffer() const { return m_transparentInstanceBuffer.Get(); }
     nvrhi::IBuffer* GetTransparentDrawArgsBuffer() const { return m_transparentDrawArgsBuffer.Get(); }
+    const xr_vector<TransparentDrawRange>& GetTransparentRanges() const { return m_transparentRanges; }
+    u32 GetSkinnedForwardCount() const { return m_skinnedForwardCount; }
+    nvrhi::IBuffer* GetSkinnedForwardArgsBuffer() const { return m_skinnedForwardArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetSkinnedForwardInstanceBuffer() const { return m_skinnedForwardInstanceBuffer.Get(); }
+    const xr_vector<TransparentDrawRange>& GetSkinnedForwardRanges() const { return m_skinnedForwardRanges; }
 
     // ───────────────────────────────────────────────────────
     //  CULLING STATS READBACK (for profiling overlay)
@@ -345,6 +364,7 @@ public:
         xr_vector<u32> srcVertexBases;
         xr_vector<u32> vertexCounts;
         xr_vector<const void*> visuals;
+        xr_vector<float> ssa;
     };
 
     struct SkinnedChunk {
@@ -562,6 +582,8 @@ private:
     xr_vector<IndirectDrawArgs> m_transparentDrawArgsData;
     xr_vector<u32> m_transparentMaterialIDData;
     xr_vector<GPUInstanceData> m_transparentInstanceData;
+    xr_vector<u32> m_transparentKeys;
+    xr_vector<TransparentDrawRange> m_transparentRanges;
 
     // ───────────────────────────────────────────────────────
     //  SKINNED MESH UPLOAD
@@ -580,6 +602,16 @@ private:
     u32 m_skinnedEntryCapacity = 0;
     u32 m_skinnedEntryCount = 0;
     u32 m_skinnedVisibleEntryCount = 0;
+    static constexpr u32 SKINNED_FORWARD_CAPACITY = 2048;
+    xr_vector<IndirectDrawArgs> m_skinnedForwardArgsData;
+    xr_vector<GPUInstanceData> m_skinnedForwardInstanceData;
+    xr_vector<u32> m_skinnedForwardKeys;
+    xr_vector<float> m_skinnedForwardSort;
+    xr_vector<TransparentDrawRange> m_skinnedForwardRanges;
+    nvrhi::BufferHandle m_skinnedForwardArgsBuffer;
+    nvrhi::BufferHandle m_skinnedForwardInstanceBuffer;
+    u32 m_skinnedForwardCount = 0;
+    void EnsureSkinnedForwardBuffers(nvrhi::IDevice* nvDevice);
     xr_vector<u32> m_skinnedHudEntryData;
     nvrhi::BufferHandle m_skinnedHudEntryBuffer;
     u32 m_skinnedHudEntryCount = 0;

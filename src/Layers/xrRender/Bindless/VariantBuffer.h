@@ -21,8 +21,8 @@ enum VariantFlags : u32 {
 struct alignas(16) VariantData {
     float emissive;
     u32 flags;
-    u32 pad0;
-    u32 pad1;
+    u32 packed;
+    float fadeScale;
 };
 static_assert(sizeof(VariantData) == 16, "VariantData must be 16 bytes");
 

@@ -10,12 +10,82 @@
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/VariantBuffer.h"
+#include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
+#include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "PassCommon.h"
 #include "Layers/xrRender/ClusteredLightManager.h"
 
 namespace xray::render::fg::passes {
+
+static nvrhi::BlendFactor ToBlendFactor(u32 factor)
+{
+    switch (static_cast<VariantBlendFactor>(factor)) {
+    case VariantBlendFactor::Zero: return nvrhi::BlendFactor::Zero;
+    case VariantBlendFactor::One: return nvrhi::BlendFactor::One;
+    case VariantBlendFactor::SrcColor: return nvrhi::BlendFactor::SrcColor;
+    case VariantBlendFactor::InvSrcColor: return nvrhi::BlendFactor::InvSrcColor;
+    case VariantBlendFactor::SrcAlpha: return nvrhi::BlendFactor::SrcAlpha;
+    case VariantBlendFactor::InvSrcAlpha: return nvrhi::BlendFactor::InvSrcAlpha;
+    case VariantBlendFactor::DstAlpha: return nvrhi::BlendFactor::DstAlpha;
+    case VariantBlendFactor::InvDstAlpha: return nvrhi::BlendFactor::InvDstAlpha;
+    case VariantBlendFactor::DstColor: return nvrhi::BlendFactor::DstColor;
+    case VariantBlendFactor::InvDstColor: return nvrhi::BlendFactor::InvDstColor;
+    }
+    return nvrhi::BlendFactor::SrcAlpha;
+}
+
+static nvrhi::GraphicsPipelineDesc MakeBasePipelineDesc(fg::RenderDevice* device, TransparentPassState& state,
+    nvrhi::IShader* ps, nvrhi::IBindingLayout* layout)
+{
+    nvrhi::GraphicsPipelineDesc desc;
+    desc.VS = state.vs;
+    desc.PS = ps;
+    desc.inputLayout = state.inputLayout;
+    auto* backend = device->GetBackend();
+    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+    if (bindlessLayout)
+        desc.bindingLayouts = { layout, bindlessLayout };
+    else
+        desc.bindingLayouts = { layout };
+    desc.primType = nvrhi::PrimitiveType::TriangleList;
+    desc.renderState.depthStencilState.depthTestEnable = true;
+    desc.renderState.depthStencilState.depthWriteEnable = false;
+    desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+    desc.renderState.rasterState.frontCounterClockwise = false;
+    desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+    return desc;
+}
+
+static nvrhi::IGraphicsPipeline* GetColorPipeline(fg::RenderDevice* device, TransparentPassState& state, u32 key)
+{
+    auto it = state.pipelines.find(key);
+    if (it != state.pipelines.end())
+        return it->second.Get();
+
+    nvrhi::GraphicsPipelineDesc desc = MakeBasePipelineDesc(device, state, state.ps, state.layout);
+    desc.renderState.depthStencilState.depthWriteEnable = (key & TRANSPARENT_KEY_DEPTH_WRITE) != 0;
+    auto& rt0 = desc.renderState.blendState.targets[0];
+    rt0.blendEnable = true;
+    rt0.srcBlend = ToBlendFactor(key & 0xFFu);
+    rt0.destBlend = ToBlendFactor((key >> TRANSPARENT_KEY_DST_SHIFT) & 0xFFu);
+    rt0.blendOp = nvrhi::BlendOp::Add;
+    rt0.srcBlendAlpha = nvrhi::BlendFactor::One;
+    rt0.destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
+    rt0.blendOpAlpha = nvrhi::BlendOp::Add;
+    if (key & TRANSPARENT_KEY_UNLIT) {
+        desc.renderState.blendState.targets[1].colorWriteMask = static_cast<nvrhi::ColorMask>(0);
+        desc.renderState.blendState.targets[2].colorWriteMask = static_cast<nvrhi::ColorMask>(0);
+    }
+
+    string64 name;
+    xr_sprintf(name, "TransparentPass_%08x", key);
+    auto& cache = framegraph::GetPassResourceCache();
+    nvrhi::GraphicsPipelineHandle pipeline = cache.GetOrCreatePipeline(name, desc, state.fbInfo, device->GetNVRHIDevice());
+    state.pipelines[key] = pipeline;
+    return pipeline.Get();
+}
 
 void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, TransparentPassState& state)
 {
@@ -32,15 +102,19 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
 
     auto vsResult = shaderLoader->LoadVertexShader("bindless_forward", "main");
     auto psResult = shaderLoader->LoadPixelShader("bindless_forward", "main");
-    if (!vsResult.handle || !psResult.handle)
+    auto distortResult = shaderLoader->LoadPixelShader("bindless_forward_distort", "main");
+    if (!vsResult.handle || !psResult.handle || !distortResult.handle)
         return;
 
     state.vs = vsResult.handle;
     state.ps = psResult.handle;
+    state.distortPS = distortResult.handle;
+    state.fbInfo = fbInfo;
 
     auto& cache = framegraph::GetPassResourceCache();
     state.layout = cache.GetOrCreateBindingLayoutFromReflection("TransparentPass", *vsResult.reflection, *psResult.reflection, nvDevice);
-    if (!state.layout)
+    state.distortLayout = cache.GetOrCreateBindingLayoutFromReflection("TransparentPass_Distort", *vsResult.reflection, *distortResult.reflection, nvDevice);
+    if (!state.layout || !state.distortLayout)
         return;
 
     u32 attrCount = 0;
@@ -51,42 +125,42 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
     if (!drawIndexBuffer)
         return;
 
-    nvrhi::GraphicsPipelineDesc pipeDesc;
-    pipeDesc.VS = state.vs;
-    pipeDesc.PS = state.ps;
-    pipeDesc.inputLayout = state.inputLayout;
-
-    auto* backend = device->GetBackend();
-    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
-    if (bindlessLayout)
-        pipeDesc.bindingLayouts = { state.layout, bindlessLayout };
-    else
-        pipeDesc.bindingLayouts = { state.layout };
-
-    pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-    pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-    pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
-    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
-    pipeDesc.renderState.rasterState.frontCounterClockwise = false;
-    pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-    auto& rt0 = pipeDesc.renderState.blendState.targets[0];
-    rt0.blendEnable = true;
-    rt0.srcBlend = nvrhi::BlendFactor::SrcAlpha;
-    rt0.destBlend = nvrhi::BlendFactor::InvSrcAlpha;
-    rt0.blendOp = nvrhi::BlendOp::Add;
-    rt0.srcBlendAlpha = nvrhi::BlendFactor::One;
-    rt0.destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
-    rt0.blendOpAlpha = nvrhi::BlendOp::Add;
-
-    state.pipeline = cache.GetOrCreatePipeline("TransparentPass", pipeDesc, fbInfo, nvDevice);
-    if (!state.pipeline)
+    nvrhi::FramebufferInfoEx distortFbInfo;
+    distortFbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    distortFbInfo.depthFormat = nvrhi::Format::D32;
+    nvrhi::GraphicsPipelineDesc distortDesc = MakeBasePipelineDesc(device, state, state.distortPS, state.distortLayout);
+    distortDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+    auto& drt0 = distortDesc.renderState.blendState.targets[0];
+    drt0.blendEnable = true;
+    drt0.srcBlend = nvrhi::BlendFactor::One;
+    drt0.destBlend = nvrhi::BlendFactor::One;
+    drt0.blendOp = nvrhi::BlendOp::Add;
+    drt0.srcBlendAlpha = nvrhi::BlendFactor::One;
+    drt0.destBlendAlpha = nvrhi::BlendFactor::One;
+    drt0.blendOpAlpha = nvrhi::BlendOp::Add;
+    state.distortPipeline = cache.GetOrCreatePipeline("TransparentPass_Distort", distortDesc, distortFbInfo, nvDevice);
+    if (!state.distortPipeline)
         return;
 
-    QueryBindingLayoutFromPipeline(state.pipeline, state.layout);
+    const u32 defaultKey = u32(VariantBlendFactor::SrcAlpha) | (u32(VariantBlendFactor::InvSrcAlpha) << TRANSPARENT_KEY_DST_SHIFT);
+    if (!GetColorPipeline(device, state, defaultKey))
+        return;
+
+    QueryBindingLayoutFromPipeline(state.pipelines[defaultKey], state.layout);
+    QueryBindingLayoutFromPipeline(state.distortPipeline, state.distortLayout);
 
     state.initialized = true;
     Msg("* [TransparentPass] Pipeline initialized");
+}
+
+static bool RangesWantDistortion(const xr_vector<TransparentDrawRange>* ranges)
+{
+    if (!ranges)
+        return false;
+    for (const auto& range : *ranges)
+        if (range.key & TRANSPARENT_KEY_DISTORT)
+            return true;
+    return false;
 }
 
 framegraph::DefaultOutputLayout setupTransparentPass(
@@ -95,6 +169,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     const framegraph::DefaultOutputLayout& inputs,
     const TransparentPassConfig& config,
     const LocalShadowOutput& localShadow,
+    framegraph::VirtualResourceHandle skinnedOrder,
     u32 width, u32 height,
     TransparentPassState& state)
 {
@@ -111,10 +186,13 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     fbInfo.depthFormat = nvrhi::Format::D32;
     InitializeTransparentResources(device, fbInfo, state);
 
+    const bool wantDistortion = RangesWantDistortion(config.ranges)
+        || (config.skinned && config.gpuCulling && RangesWantDistortion(&config.gpuCulling->GetSkinnedForwardRanges()));
+
     auto& passData = fg.addCallbackPass<TransparentPassData>(
         "Transparent Pass",
 
-        [&, width, height, config, localShadow](FrameGraph& builder, PassHandle passHandle, TransparentPassData& data) {
+        [&, width, height, config, localShadow, skinnedOrder, wantDistortion](FrameGraph& builder, PassHandle passHandle, TransparentPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -124,9 +202,23 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             RenderPassBuilder passBuilder(builder, passHandle);
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
-            data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
+            data.depth = passBuilder.readWrite(inputs.depth, ResourceState::DepthStencilWrite);
             if (inputs.baseColor.is_valid())
                 data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
+            if (skinnedOrder.is_valid())
+                data.skinnedOrder = passBuilder.read(skinnedOrder, ResourceState::ShaderResource);
+            if (wantDistortion) {
+                ResourceDesc distDesc;
+                distDesc.type = ResourceDesc::Type::Texture2D;
+                distDesc.width = width;
+                distDesc.height = height;
+                distDesc.format = nvrhi::Format::RGBA16_FLOAT;
+                distDesc.isRenderTarget = true;
+                distDesc.isTransient = true;
+                distDesc.isUAV = true;
+                distDesc.debugName = "rt_Distortion";
+                data.distortion = passBuilder.createTexture("rt_Distortion", distDesc);
+            }
             data.localShadow = localShadow;
             if (localShadow.active) {
                 data.localTiles = passBuilder.read(localShadow.tiles, ResourceState::ShaderResource);
@@ -164,71 +256,129 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             if (!framebuffer)
                 return;
 
-            if (!data.passState->initialized || !data.passState->pipeline)
+            if (!data.passState->initialized)
                 return;
 
             using namespace fg::bindless;
             auto& matBuffer = MaterialBuffer::Instance();
-
-            auto lightingCB = cache.GetOrCreateVolatileCB("TransparentPass", "LightingCB", sizeof(LightingConstants), data.device);
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("TransparentPass", nvDevice);
-
-            auto lightingData = FillLightingConstants();
-            cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
 
             const auto& cfg = data.config;
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* vsReflection = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
             auto* psReflection = shaderLoader->GetCachedReflection("bindless_forward", ".ps");
+            auto* distortReflection = shaderLoader->GetCachedReflection("bindless_forward_distort", ".ps");
+            if (!vsReflection || !psReflection || !distortReflection)
+                return;
 
-            framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Transparent");
-            bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-            bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-            bsb.BufferSRV("g_Variants", bindless::VariantBuffer::Instance().GetBuffer());
-            bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
-            bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
-            bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
-            bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
             nvrhi::IBuffer* localTiles = nullptr;
             nvrhi::ITexture* localStatic = nullptr;
             nvrhi::ITexture* localDyn = nullptr;
             ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn);
-            bsb.BufferSRV("g_LocalShadowTiles", localTiles);
-            bsb.Texture("g_LocalShadowStatic", localStatic);
-            bsb.Texture("g_LocalShadowDyn", localDyn);
 
-            auto transparentBindDesc = bsb.Build();
-            auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(transparentBindDesc, data.passState->layout, nvDevice);
-            R_ASSERT2(bindingSet, "Transparent binding set creation failed");
-
-            nvrhi::GraphicsState state;
-            state.pipeline = data.passState->pipeline;
-            state.framebuffer = framebuffer;
-            state.bindings = { bindingSet };
+            auto makeColorBindings = [&](nvrhi::IBuffer* instanceBuffer, const char* name) -> nvrhi::IBindingSet* {
+                framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, name);
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+                bsb.BufferSRV("g_Variants", VariantBuffer::Instance().GetBuffer());
+                bsb.BufferSRV("g_InstanceData", instanceBuffer);
+                bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
+                bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
+                bsb.BufferSRV("g_LightIndexList", ClusteredLightManager::Instance().GetLightIndexListBuffer());
+                bsb.BufferSRV("g_LocalShadowTiles", localTiles);
+                bsb.Texture("g_LocalShadowStatic", localStatic);
+                bsb.Texture("g_LocalShadowDyn", localDyn);
+                auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
+                R_ASSERT2(set, "Transparent binding set creation failed");
+                return set;
+            };
+            auto makeDistortBindings = [&](nvrhi::IBuffer* instanceBuffer, const char* name) -> nvrhi::IBindingSet* {
+                framegraph::BindingSetBuilder bsb(*vsReflection, *distortReflection, nvDevice, name);
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+                bsb.BufferSRV("g_Variants", VariantBuffer::Instance().GetBuffer());
+                bsb.BufferSRV("g_VariantTextures", VariantTextureBuffer::Instance().GetBuffer());
+                bsb.BufferSRV("g_InstanceData", instanceBuffer);
+                auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->distortLayout, nvDevice);
+                R_ASSERT2(set, "Transparent distortion binding set creation failed");
+                return set;
+            };
 
             auto* backend = data.device->GetBackend();
-            if (backend) {
-                auto* bindlessTable = backend->GetBindlessDescriptorTable();
-                if (bindlessTable)
-                    state.addBindingSet(bindlessTable);
-            }
-
-            state.vertexBuffers = {
-                {cfg.megaVertexBuffer, 0, 0},
-                {drawIndexBuffer, 1, 0}
-            };
-            state.indexBuffer = { cfg.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
-            state.indirectParams = cfg.drawArgsBuffer;
-
+            nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
             const auto& rtDesc = colorRT->getDesc();
             nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
-            state.viewport.addViewport(viewport);
-            state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
+            nvrhi::Rect scissor(rtDesc.width, rtDesc.height);
 
-            cmdList->setGraphicsState(state);
-            cmdList->drawIndexedIndirect(0, cfg.objectCount);
+            struct DrawSource {
+                nvrhi::IBuffer* vertexBuffer;
+                nvrhi::IBuffer* indexBuffer;
+                nvrhi::IBuffer* instanceBuffer;
+                nvrhi::IBuffer* drawArgs;
+                const xr_vector<TransparentDrawRange>* ranges;
+                const char* name;
+            };
+            DrawSource sources[2] = {};
+            u32 sourceCount = 0;
+            if (cfg.HasRigid())
+                sources[sourceCount++] = { cfg.megaVertexBuffer, cfg.megaIndexBuffer, cfg.instanceBuffer, cfg.drawArgsBuffer, cfg.ranges, "Transparent" };
+            if (cfg.skinned && cfg.gpuCulling && cfg.gpuCulling->GetSkinnedForwardCount() > 0) {
+                GPUCullingManager& gc = *cfg.gpuCulling;
+                nvrhi::IBuffer* preVB = gc.GetSkinnedPreVertexBuffer();
+                nvrhi::IBuffer* skinnedIB = gc.GetSkinnedPools().GetCombinedIndexBuffer();
+                if (preVB && skinnedIB && gc.GetSkinnedForwardArgsBuffer() && gc.GetSkinnedForwardInstanceBuffer())
+                    sources[sourceCount++] = { preVB, skinnedIB, gc.GetSkinnedForwardInstanceBuffer(), gc.GetSkinnedForwardArgsBuffer(), &gc.GetSkinnedForwardRanges(), "Transparent.Skinned" };
+            }
+
+            auto drawRanges = [&](const DrawSource& src, nvrhi::IFramebuffer* fb, nvrhi::IBindingSet* bindings, bool distortPass) {
+                for (const auto& range : *src.ranges) {
+                    if (range.count == 0)
+                        continue;
+                    if (distortPass ? (range.key & TRANSPARENT_KEY_DISTORT) == 0 : (range.key & TRANSPARENT_KEY_NO_COLOR) != 0)
+                        continue;
+                    nvrhi::IGraphicsPipeline* pipeline = distortPass
+                        ? data.passState->distortPipeline.Get()
+                        : GetColorPipeline(data.device, *data.passState, range.key);
+                    if (!pipeline)
+                        continue;
+                    nvrhi::GraphicsState gs;
+                    gs.pipeline = pipeline;
+                    gs.framebuffer = fb;
+                    gs.bindings = { bindings };
+                    if (bindlessTable)
+                        gs.addBindingSet(bindlessTable);
+                    gs.vertexBuffers = {
+                        {src.vertexBuffer, 0, 0},
+                        {drawIndexBuffer, 1, 0}
+                    };
+                    gs.indexBuffer = { src.indexBuffer, nvrhi::Format::R32_UINT, 0 };
+                    gs.indirectParams = src.drawArgs;
+                    gs.viewport.addViewport(viewport);
+                    gs.viewport.addScissorRect(scissor);
+                    cmdList->setGraphicsState(gs);
+                    cmdList->drawIndexedIndirect(range.first * sizeof(IndirectDrawArgs), range.count);
+                }
+            };
+
+            for (u32 i = 0; i < sourceCount; ++i)
+                drawRanges(sources[i], framebuffer, makeColorBindings(sources[i].instanceBuffer, sources[i].name), false);
+
+            if (!data.distortion.is_valid())
+                return;
+            auto* distortRT = fg.GetPhysicalTexture(data.distortion);
+            if (!distortRT)
+                return;
+            nvrhi::FramebufferDesc distortFbDesc;
+            distortFbDesc.addColorAttachment(distortRT);
+            distortFbDesc.setDepthAttachment(depthRT);
+            auto distortFB = cache.GetOrCreateFramebuffer("TransparentPass_Distort", distortFbDesc, nvDevice);
+            if (!distortFB)
+                return;
+            cmdList->clearTextureFloat(distortRT, nvrhi::AllSubresources, nvrhi::Color(0.f, 0.f, 0.f, 0.f));
+            for (u32 i = 0; i < sourceCount; ++i)
+                drawRanges(sources[i], distortFB, makeDistortBindings(sources[i].instanceBuffer, sources[i].name), true);
         }
     );
 
@@ -237,6 +387,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     outputs.normal = passData.normal;
     outputs.baseColor = passData.baseColor;
     outputs.depth = passData.depth;
+    outputs.distortion = passData.distortion.is_valid() ? passData.distortion : inputs.distortion;
     return outputs;
 }
 

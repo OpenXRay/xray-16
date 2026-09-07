@@ -42,6 +42,7 @@ struct VS_OUTPUT
     float3 tangent  : TEXCOORD3;
     float3 bitangent: TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    float fade : TEXCOORD6;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -101,6 +102,18 @@ VS_OUTPUT main(VS_INPUT input)
 
     // Pass material ID to pixel shader
     output.materialID = materialID;
+
+    VariantData variant = g_Variants[g_Materials[materialID].shaderVariant];
+    uint fadeMode = VariantFadeMode(variant);
+    float fade = 1.0;
+    if (fadeMode != VARIANT_FADE_NONE)
+    {
+        float3 dirV = normalize(mul(m_V, float4(worldPos.xyz, 1.0)).xyz);
+        float3 normV = normalize(mul((float3x3)m_V, output.normal));
+        float facing = abs(dot(dirV, normV));
+        fade = variant.fadeScale * (fadeMode == VARIANT_FADE_EDGE ? 1.0 - facing : facing);
+    }
+    output.fade = fade;
 
     return output;
 }
