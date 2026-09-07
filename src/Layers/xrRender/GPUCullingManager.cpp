@@ -58,6 +58,82 @@ static bool MaterialCastsShadow(u32 materialID)
     return !variant || variant->castsShadow;
 }
 
+static u32 TransparentKeyForMaterial(u32 materialID)
+{
+    u32 key = u32(VariantBlendFactor::SrcAlpha) | (u32(VariantBlendFactor::InvSrcAlpha) << TRANSPARENT_KEY_DST_SHIFT);
+    const auto* material = bindless::MaterialBuffer::Instance().GetMaterial(materialID);
+    if (!material || material->shaderVariant == 0)
+        return key;
+    const auto* variant = ShaderVariantRegistry::Instance().GetVariantByIndex(material->shaderVariant);
+    if (!variant)
+        return key;
+    if (!variant->passes.empty()) {
+        const ShaderPassDesc& pass = variant->passes[0];
+        if (pass.blendEnabled)
+            key = u32(pass.srcBlend) | (u32(pass.dstBlend) << TRANSPARENT_KEY_DST_SHIFT);
+        if (pass.depthWrite)
+            key |= TRANSPARENT_KEY_DEPTH_WRITE;
+    }
+    if (variant->distort)
+        key |= TRANSPARENT_KEY_DISTORT;
+    if (variant->colorMode == VariantColorMode::None)
+        key |= TRANSPARENT_KEY_NO_COLOR;
+    else if (variant->colorMode != VariantColorMode::Lit)
+        key |= TRANSPARENT_KEY_UNLIT;
+    return key;
+}
+
+static void PartitionTransparentDraws(xr_vector<IndirectDrawArgs>& args, xr_vector<u32>* materialIDs,
+    xr_vector<GPUInstanceData>& instances, xr_vector<u32>& keys, u32 maxCount, xr_vector<TransparentDrawRange>& ranges)
+{
+    ranges.clear();
+    u32 n = static_cast<u32>(args.size());
+    if (n > maxCount) {
+        static bool s_warned = false;
+        if (!s_warned) {
+            Msg("! [GPUCulling] %u transparent draws exceed the %u capacity, dropping the rest", n, maxCount);
+            s_warned = true;
+        }
+        n = maxCount;
+        args.resize(n);
+        instances.resize(n);
+        keys.resize(n);
+        if (materialIDs)
+            materialIDs->resize(n);
+    }
+    if (n == 0)
+        return;
+    xr_vector<u32> order(n);
+    for (u32 i = 0; i < n; ++i)
+        order[i] = i;
+    std::stable_sort(order.begin(), order.end(), [&](u32 a, u32 b) { return keys[a] < keys[b]; });
+    xr_vector<IndirectDrawArgs> sortedArgs(n);
+    xr_vector<GPUInstanceData> sortedInstances(n);
+    xr_vector<u32> sortedKeys(n);
+    xr_vector<u32> sortedMaterials(materialIDs ? n : 0);
+    for (u32 i = 0; i < n; ++i) {
+        const u32 src = order[i];
+        sortedArgs[i] = args[src];
+        sortedArgs[i].startInstanceLocation = i;
+        sortedInstances[i] = instances[src];
+        sortedKeys[i] = keys[src];
+        if (materialIDs)
+            sortedMaterials[i] = (*materialIDs)[src];
+    }
+    args.swap(sortedArgs);
+    instances.swap(sortedInstances);
+    keys.swap(sortedKeys);
+    if (materialIDs)
+        materialIDs->swap(sortedMaterials);
+    for (u32 i = 0; i < n;) {
+        u32 j = i;
+        while (j < n && keys[j] == keys[i])
+            ++j;
+        ranges.push_back({ keys[i], i, j - i });
+        i = j;
+    }
+}
+
 // ═══════════════════════════════════════════════════════
 //  CONSTANTS
 // ═══════════════════════════════════════════════════════
@@ -277,6 +353,30 @@ void GPUCullingManager::CreateSkinnedBuffers(fg::RenderDevice* device)
         m_maxSkinnedObjects, MAX_TOTAL_BONES);
 }
 
+void GPUCullingManager::EnsureSkinnedForwardBuffers(nvrhi::IDevice* nvDevice)
+{
+    if (!nvDevice)
+        return;
+    if (!m_skinnedForwardArgsBuffer) {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedForward_DrawArgs";
+        desc.byteSize = u64(SKINNED_FORWARD_CAPACITY) * sizeof(IndirectDrawArgs);
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::IndirectArgument;
+        desc.keepInitialState = true;
+        m_skinnedForwardArgsBuffer = nvDevice->createBuffer(desc);
+    }
+    if (!m_skinnedForwardInstanceBuffer) {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedForward_InstanceData";
+        desc.byteSize = u64(SKINNED_FORWARD_CAPACITY) * sizeof(GPUInstanceData);
+        desc.structStride = sizeof(GPUInstanceData);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        m_skinnedForwardInstanceBuffer = nvDevice->createBuffer(desc);
+    }
+}
+
 void GPUCullingManager::EnsureSkinnedCapacity(u32 count)
 {
     if (count <= m_maxSkinnedObjects)
@@ -308,6 +408,9 @@ void GPUCullingManager::Shutdown()
     m_skinnedRecordsBuffer = nullptr;
     m_skinnedChunkBuffer = nullptr;
     m_skinnedEntryBuffer = nullptr;
+    m_skinnedForwardArgsBuffer = nullptr;
+    m_skinnedForwardInstanceBuffer = nullptr;
+    m_skinnedForwardCount = 0;
     m_skinnedEntryCapacity = 0;
     m_skinnedEntryCount = 0;
     m_skinnedHudEntryBuffer = nullptr;
@@ -533,6 +636,8 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     m_transparentDrawArgsData.clear();
     m_transparentMaterialIDData.clear();
     m_transparentInstanceData.clear();
+    m_transparentKeys.clear();
+    m_transparentRanges.clear();
     m_transparentResidualCount = 0;
 
     auto batchFlags = [](const GeometryBatch& batch) -> u32 {
@@ -595,6 +700,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
                 ++m_transparentResidualCount;
             appendBatch(batch, batchFlags(batch), batch.bindlessMaterialID,
                 m_transparentDrawArgsData, m_transparentMaterialIDData, m_transparentInstanceData);
+            m_transparentKeys.push_back(TransparentKeyForMaterial(batch.bindlessMaterialID));
             continue;
         }
 
@@ -711,6 +817,8 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         Msg("* [GPUCulling] Terrain data cached: %u objects", m_terrainObjectCount);
     }
 
+    PartitionTransparentDraws(m_transparentDrawArgsData, &m_transparentMaterialIDData, m_transparentInstanceData,
+        m_transparentKeys, m_maxTransparentObjects, m_transparentRanges);
     m_transparentObjectCount = std::min(static_cast<u32>(m_transparentInstanceData.size()), m_maxTransparentObjects);
 
     if (m_transparentObjectCount > 0 && m_transparentInstanceBuffer && m_transparentDrawArgsBuffer) {
@@ -783,7 +891,7 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
 //  UPLOAD SKINNED OBJECTS
 // ═══════════════════════════════════════════════════════
 
-static const u32 kSkinnedKindOrder[3] = { 0u, 2u, 1u };
+static const u32 kSkinnedKindOrder[4] = { 0u, 2u, 1u, 3u };
 
 void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const GeometryCollector* geometry,
     const xr_vector<GeometryBatch>* hudBatches, decals::OverlayManager* overlayMgr)
@@ -799,7 +907,14 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         bucket.srcVertexBases.clear();
         bucket.vertexCounts.clear();
         bucket.visuals.clear();
+        bucket.ssa.clear();
     }
+    m_skinnedForwardArgsData.clear();
+    m_skinnedForwardInstanceData.clear();
+    m_skinnedForwardKeys.clear();
+    m_skinnedForwardSort.clear();
+    m_skinnedForwardRanges.clear();
+    m_skinnedForwardCount = 0;
     m_skinnedObjectCount = 0;
     m_skinnedEntryCount = 0;
     m_skinnedVisibleEntryCount = 0;
@@ -818,13 +933,16 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     u32 residual = 0;
     u32 hudPooled = 0;
     auto addBatch = [&](const GeometryBatch& batch, u8 kind) {
-        const bool pooled = (MaterialObjectFlags(batch.bindlessMaterialID) & GPU_OBJECT_NO_RESOLVE) == 0
-            && batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
-            && batch.skinnedPoolFormat < SkinnedGeometryPools::FORMAT_COUNT;
+        const bool forward = (MaterialObjectFlags(batch.bindlessMaterialID) & GPU_OBJECT_NO_RESOLVE) != 0;
+        const bool pooled = batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
+            && batch.skinnedPoolFormat < SkinnedGeometryPools::FORMAT_COUNT
+            && !(forward && kind != 0u);
         if (!pooled) {
             residual += kind == 2u ? 0u : 1u;
             return;
         }
+        if (forward)
+            kind = 3u;
         hudPooled += kind == 2u ? 1u : 0u;
 
         SkinnedBucket& bucket = m_skinnedBuckets[batch.skinnedPoolFormat];
@@ -862,6 +980,7 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         bucket.srcVertexBases.push_back(u32(batch.skinnedPoolBaseVertex));
         bucket.vertexCounts.push_back(batch.vertexCount);
         bucket.visuals.push_back(batch.visual);
+        bucket.ssa.push_back(batch.ssa);
     };
     for (const auto& batch : geometry->GetBatches()) {
         if (batch.isSkinned)
@@ -956,7 +1075,24 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
                     chunk.count = std::min(SKINNED_CHUNK_VERTICES, vertexCount - v0);
                     m_skinnedChunkData.push_back(chunk);
                 }
-                {
+                if (kind == 3u) {
+                    IndirectDrawArgs forwardArgs;
+                    forwardArgs.indexCountPerInstance = args.indexCountPerInstance;
+                    forwardArgs.instanceCount = 1;
+                    forwardArgs.startIndexLocation = m_skinnedPools.GetFormatIndexBase(f) + args.startIndexLocation;
+                    forwardArgs.baseVertexLocation = static_cast<s32>(vertexTotal);
+                    forwardArgs.startInstanceLocation = static_cast<u32>(m_skinnedForwardArgsData.size());
+                    m_skinnedForwardArgsData.push_back(forwardArgs);
+                    GPUInstanceData inst;
+                    inst.world.identity();
+                    inst.materialID = bucket.materialIDs[i];
+                    inst.flags = 0;
+                    inst.pad0 = 0.0f;
+                    inst.pad1 = 0.0f;
+                    m_skinnedForwardInstanceData.push_back(inst);
+                    m_skinnedForwardKeys.push_back(TransparentKeyForMaterial(bucket.materialIDs[i]));
+                    m_skinnedForwardSort.push_back(bucket.ssa[i]);
+                } else {
                     const u32 ibBase = m_skinnedPools.GetFormatIndexBase(f) + args.startIndexLocation;
                     for (u32 i0 = 0; i0 < args.indexCountPerInstance; i0 += SKINNED_ENTRY_INDICES) {
                         GPUClusterEntry e = {};
@@ -979,6 +1115,35 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
             }
         }
         m_skinnedChunkCount[f] = static_cast<u32>(m_skinnedChunkData.size()) - m_skinnedChunkBase[f];
+    }
+
+    if (!m_skinnedForwardArgsData.empty()) {
+        const u32 n = static_cast<u32>(m_skinnedForwardArgsData.size());
+        xr_vector<u32> order(n);
+        for (u32 i = 0; i < n; ++i)
+            order[i] = i;
+        std::stable_sort(order.begin(), order.end(), [&](u32 a, u32 b) { return m_skinnedForwardSort[a] < m_skinnedForwardSort[b]; });
+        xr_vector<IndirectDrawArgs> sortedArgs(n);
+        xr_vector<GPUInstanceData> sortedInstances(n);
+        xr_vector<u32> sortedKeys(n);
+        for (u32 i = 0; i < n; ++i) {
+            sortedArgs[i] = m_skinnedForwardArgsData[order[i]];
+            sortedInstances[i] = m_skinnedForwardInstanceData[order[i]];
+            sortedKeys[i] = m_skinnedForwardKeys[order[i]];
+        }
+        m_skinnedForwardArgsData.swap(sortedArgs);
+        m_skinnedForwardInstanceData.swap(sortedInstances);
+        m_skinnedForwardKeys.swap(sortedKeys);
+        PartitionTransparentDraws(m_skinnedForwardArgsData, nullptr, m_skinnedForwardInstanceData,
+            m_skinnedForwardKeys, SKINNED_FORWARD_CAPACITY, m_skinnedForwardRanges);
+        m_skinnedForwardCount = static_cast<u32>(m_skinnedForwardArgsData.size());
+        EnsureSkinnedForwardBuffers(m_device->GetNVRHIDevice());
+        if (m_skinnedForwardCount > 0 && m_skinnedForwardArgsBuffer && m_skinnedForwardInstanceBuffer) {
+            cmdList->writeBuffer(m_skinnedForwardArgsBuffer, m_skinnedForwardArgsData.data(), u64(m_skinnedForwardCount) * sizeof(IndirectDrawArgs));
+            cmdList->setBufferState(m_skinnedForwardArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+            cmdList->writeBuffer(m_skinnedForwardInstanceBuffer, m_skinnedForwardInstanceData.data(), u64(m_skinnedForwardCount) * sizeof(GPUInstanceData));
+            cmdList->setBufferState(m_skinnedForwardInstanceBuffer, nvrhi::ResourceStates::ShaderResource);
+        }
     }
 
     m_skinnedVisibleEntryCount = static_cast<u32>(m_skinnedEntryData.size());

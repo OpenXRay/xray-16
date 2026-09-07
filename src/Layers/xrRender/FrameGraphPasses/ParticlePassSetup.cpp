@@ -596,8 +596,12 @@ ParticlePassOutput setupParticlePass(
                 return false;
             };
             data.hasDistortion = hasDistortBatch(worldParticleBatches) || hasDistortBatch(hudParticleBatches);
+            data.reuseDistortion = false;
 
-            if (data.hasDistortion) {
+            if (forwardInputs.distortion.is_valid()) {
+                data.distortionRT = passBuilder.readWrite(forwardInputs.distortion, ResourceState::RenderTarget);
+                data.reuseDistortion = true;
+            } else if (data.hasDistortion) {
                 framegraph::ResourceDesc distDesc;
                 distDesc.type = framegraph::ResourceDesc::Type::Texture2D;
                 distDesc.width = width;
@@ -982,7 +986,8 @@ ParticlePassOutput setupParticlePass(
             if (!data.passState->distortPipeline)
                 return;
 
-            cmdList->clearTextureFloat(distortRT, nvrhi::AllSubresources, nvrhi::Color(0.f, 0.f, 0.f, 0.f));
+            if (!data.reuseDistortion)
+                cmdList->clearTextureFloat(distortRT, nvrhi::AllSubresources, nvrhi::Color(0.f, 0.f, 0.f, 0.f));
 
             auto* distortVsReflection = shaderLoader->GetCachedReflection("bindless_particle", ".vs");
             auto* distortPsReflection = shaderLoader->GetCachedReflection("bindless_particle_distort", ".ps");

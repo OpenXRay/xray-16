@@ -21,6 +21,7 @@ struct PS_INPUT
     float3 tangent : TEXCOORD3;
     float3 bitangent : TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    float fade : TEXCOORD6;
 };
 
 struct PS_OUTPUT
@@ -69,6 +70,22 @@ PS_OUTPUT main(PS_INPUT input)
     if (mat.flags & MAT_FLAG_ALPHA_TEST)
     {
         clip(diffuseSample.a - mat.alphaRef);
+    }
+
+    VariantData variant = g_Variants[mat.shaderVariant];
+    uint colorMode = VariantColorMode(variant);
+    if (colorMode != VARIANT_COLOR_LIT)
+    {
+        float fade = saturate(input.fade);
+        if (colorMode == VARIANT_COLOR_UNLIT)
+            output.color = float4(diffuseSample.rgb * fade, diffuseSample.a * fade);
+        else if (colorMode == VARIANT_COLOR_ALPHA_ONLY)
+            output.color = (diffuseSample.a * fade).xxxx;
+        else
+            output.color = float4(diffuseSample.rgb, diffuseSample.a * fade);
+        output.normal = 0.0;
+        output.baseColor = 0.0;
+        return output;
     }
 
     MaterialSurface surface = EvalStandardMaterial(mat, diffuseSample.rgb, input.texcoord, ddx(input.texcoord), ddy(input.texcoord), input.normal, input.tangent, input.bitangent);

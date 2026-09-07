@@ -6,10 +6,44 @@
 namespace xray::render
 {
 
+enum class VariantBlendFactor : u8
+{
+    Zero,
+    One,
+    SrcColor,
+    InvSrcColor,
+    SrcAlpha,
+    InvSrcAlpha,
+    DstAlpha,
+    InvDstAlpha,
+    DstColor,
+    InvDstColor,
+};
+
+enum class VariantColorMode : u8
+{
+    Lit,
+    Unlit,
+    AlphaOnly,
+    UnlitAlphaFade,
+    None,
+};
+
+enum class VariantFadeMode : u8
+{
+    None,
+    Edge,
+    Facing,
+};
+
 struct ShaderPassDesc
 {
     shared_str name;
     bool blendEnabled = false;
+    VariantBlendFactor srcBlend = VariantBlendFactor::SrcAlpha;
+    VariantBlendFactor dstBlend = VariantBlendFactor::InvSrcAlpha;
+    bool depthTest = true;
+    bool depthWrite = false;
 
     bool hasAlphaTestOverride = false;
     u32 alphaTestRef = 0;
@@ -32,6 +66,9 @@ struct ShaderVariantDesc
     bool emissive = false;
     bool castsShadow = true;
     float emissiveIntensity = 1.0f;
+    VariantColorMode colorMode = VariantColorMode::Lit;
+    VariantFadeMode fadeMode = VariantFadeMode::None;
+    float fadeScale = 1.0f;
 
     xr_map<shared_str, shared_str> textures;
 

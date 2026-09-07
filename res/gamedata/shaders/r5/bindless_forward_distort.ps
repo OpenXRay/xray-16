@@ -1,0 +1,27 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+    float fade : TEXCOORD6;
+};
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    MaterialData mat = g_Materials[input.materialID];
+    float4 distort = g_VariantTextures[input.materialID].tex[0] != INVALID_TEXTURE_INDEX
+        ? SampleVariantTexture(input.materialID, 0u, input.texcoord)
+        : SampleDiffuse(mat, input.texcoord);
+    float intensity = distort.a * saturate(input.fade);
+    float2 offset = (distort.xy - 0.5) * def_distort * intensity;
+    float sourceViewZ = dot(input.worldPos - eye_position, camera_direction.xyz);
+    return float4(offset, sourceViewZ * intensity, intensity);
+}

@@ -1,7 +1,9 @@
 #pragma once
 
+#include "xrCore/xrCore.h"
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 #include "LocalShadowPassSetup.h"
 #include <nvrhi/nvrhi.h>
 
@@ -24,19 +26,28 @@ struct TransparentPassConfig {
     nvrhi::IBuffer* instanceBuffer = nullptr;
     nvrhi::IBuffer* drawArgsBuffer = nullptr;
     u32 objectCount = 0;
+    const xr_vector<TransparentDrawRange>* ranges = nullptr;
+    GPUCullingManager* gpuCulling = nullptr;
+    bool skinned = false;
 
+    bool HasRigid() const {
+        return objectCount > 0 && ranges && drawArgsBuffer && instanceBuffer && megaVertexBuffer && megaIndexBuffer;
+    }
     bool IsValid() const {
-        return objectCount > 0 && drawArgsBuffer && instanceBuffer && megaVertexBuffer && megaIndexBuffer;
+        return HasRigid() || (skinned && gpuCulling);
     }
 };
 
 struct TransparentPassState {
-    nvrhi::GraphicsPipelineHandle pipeline;
+    xr_map<u32, nvrhi::GraphicsPipelineHandle> pipelines;
+    nvrhi::GraphicsPipelineHandle distortPipeline;
     nvrhi::BindingLayoutHandle layout;
+    nvrhi::BindingLayoutHandle distortLayout;
     nvrhi::InputLayoutHandle inputLayout;
-    nvrhi::SamplerHandle sampler;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
+    nvrhi::ShaderHandle distortPS;
+    nvrhi::FramebufferInfoEx fbInfo;
     bool initialized = false;
 };
 
@@ -49,6 +60,8 @@ struct TransparentPassData {
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle distortion;
+    framegraph::VirtualResourceHandle skinnedOrder;
     fg::RenderDevice* device;
     TransparentPassConfig config;
     TransparentPassState* passState;
@@ -63,6 +76,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     const framegraph::DefaultOutputLayout& inputs,
     const TransparentPassConfig& config,
     const LocalShadowOutput& localShadow,
+    framegraph::VirtualResourceHandle skinnedOrder,
     u32 width, u32 height,
     TransparentPassState& state
 );

@@ -99,9 +99,20 @@ struct VariantData
 {
     float emissive;
     uint flags;
-    uint pad0;
-    uint pad1;
+    uint packed;
+    float fadeScale;
 };
+
+#define VARIANT_FADE_NONE   0u
+#define VARIANT_FADE_EDGE   1u
+#define VARIANT_FADE_FACING 2u
+#define VARIANT_COLOR_LIT             0u
+#define VARIANT_COLOR_UNLIT           1u
+#define VARIANT_COLOR_ALPHA_ONLY      2u
+#define VARIANT_COLOR_UNLIT_ALPHA_FADE 3u
+#define VARIANT_COLOR_NONE            4u
+#define VariantFadeMode(v)  ((v).packed & 0xFFu)
+#define VariantColorMode(v) (((v).packed >> 8) & 0xFFu)
 
 #define VARIANT_FLAG_FOG           (1 << 0)
 #define VARIANT_FLAG_DISTORT       (1 << 1)
