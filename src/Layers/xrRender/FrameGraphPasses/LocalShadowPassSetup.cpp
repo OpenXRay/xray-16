@@ -329,6 +329,7 @@ bool EnsurePipelines(fg::RenderDevice* device, LocalShadowState& state)
         desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
         desc.renderState.rasterState.frontCounterClockwise = false;
         desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+        desc.renderState.rasterState.depthClipEnable = true;
         return desc;
     };
     state.pagePipeline = cache.GetOrCreatePipeline("LocalShadowPage", makePageDesc(state.pageVS, pagePsResult.handle, state.pageLayout, false), fbInfo, nvDevice);

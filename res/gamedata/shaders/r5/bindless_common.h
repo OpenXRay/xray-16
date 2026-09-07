@@ -75,6 +75,7 @@ struct VariantData
 #define VARIANT_FLAG_TRANSPARENT   (1 << 2)
 #define VARIANT_FLAG_BACK_TO_FRONT (1 << 3)
 #define VARIANT_FLAG_EMISSIVE      (1 << 4)
+#define VARIANT_FLAG_NO_SHADOW     (1 << 5)
 
 StructuredBuffer<MaterialData> g_Materials : register(t8);
 StructuredBuffer<TerrainMaterialData> g_TerrainMaterials : register(t9);
