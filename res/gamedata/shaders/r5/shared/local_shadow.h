@@ -6,8 +6,8 @@
 #ifdef LOCAL_SHADOW_RECEIVER
 
 StructuredBuffer<LocalShadowView> g_LocalShadowTiles : register(t34);
-Texture2D<float> g_LocalShadowStatic : register(t35);
-Texture2D<float> g_LocalShadowDyn : register(t36);
+Texture2DArray<float> g_LocalShadowStatic : register(t35);
+Texture2DArray<float> g_LocalShadowDyn : register(t36);
 
 uint LocalShadowCachedSlot(uint baseSlot, bool pointLight, float3 worldPos)
 {
@@ -47,8 +47,9 @@ float LocalShadowVisibility(uint slot, float3 wp, float3 N)
         for (int dx = -1; dx <= 1; ++dx)
         {
             float2 uv = (t.rect.xy + clamp(pl + float2(dx, dy), 1.5, t.rect.z - 1.5)) / LOCAL_SHADOW_ATLAS;
-            float z = max(g_LocalShadowStatic.SampleLevel(smp_nofilter, uv, 0),
-                          g_LocalShadowDyn.SampleLevel(smp_nofilter, uv, 0));
+            float3 uvw = float3(uv, t.shape.y);
+            float z = max(g_LocalShadowStatic.SampleLevel(smp_nofilter, uvw, 0),
+                          g_LocalShadowDyn.SampleLevel(smp_nofilter, uvw, 0));
             float dOcc = n * f / (n + z * (f - n));
             lit += (dOcc >= dRef) ? 1.0 : 0.0;
         }

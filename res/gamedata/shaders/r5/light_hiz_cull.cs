@@ -31,11 +31,11 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float range = ld.colorAndRange.w;
 
     float3 toLight = lightPos - cb_cameraPos.xyz;
-    if (dot(toLight, toLight) <= range * range)
+    if (ld.spotParamsAndType.w == 0.0 || dot(toLight, toLight) <= range * range)
     {
         uint idx;
         g_VisibleLightCount.InterlockedAdd(0, 1, idx);
-        if (idx < 1024)
+        if (idx < cb_numLights)
             g_VisibleLightIndices[idx] = lightIdx;
         return;
     }
@@ -50,7 +50,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     {
         uint idx;
         g_VisibleLightCount.InterlockedAdd(0, 1, idx);
-        if (idx < 1024)
+        if (idx < cb_numLights)
             g_VisibleLightIndices[idx] = lightIdx;
     }
 }
