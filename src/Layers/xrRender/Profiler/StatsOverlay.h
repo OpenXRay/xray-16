@@ -76,6 +76,16 @@ struct RenderStats
     u32 localShadowDrops = 0;
     u32 localShadowDynDrops = 0;
     u32 localShadowAtlas = 0;
+    u32 localShadowPages = 0;
+    u32 localShadowOverflow = 0;
+    u32 localShadowBatches = 0;
+    u32 localShadowExtraCasters = 0;
+
+    u32 lightsFrustum = 0;
+    u32 lightsTouching = 0;
+    u32 lightsInvalidSector = 0;
+    u32 lightsLodCulled = 0;
+    u32 lightsHomCulled = 0;
 
     u32 lightsClustered = 0;
     u32 lightsHiZVisible = 0;
@@ -122,6 +132,8 @@ struct RenderStats
         for (u32 i = 0; i < 6; ++i) vsmLevelPages[i] = 0;
         localShadowSpots = localShadowPoints = localShadowAccepted = localShadowDeferred = localShadowDyn = 0;
         localShadowPairs = localShadowDrops = localShadowDynDrops = localShadowAtlas = 0;
+        localShadowPages = localShadowOverflow = localShadowBatches = localShadowExtraCasters = 0;
+        lightsFrustum = lightsTouching = lightsInvalidSector = lightsLodCulled = lightsHomCulled = 0;
         lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
         lightTiles[0] = lightTiles[1] = lightTiles[2] = lightTiles[3] = lightTilesTotal = 0;
         detailInstances = detailSlots = 0;

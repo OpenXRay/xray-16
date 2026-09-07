@@ -21,7 +21,8 @@ bool localBoxOutside(float3 c, float3 h, LocalViewQuery q)
 {
     if (localBoxNear(c, h, q.lightPos) > q.range)
         return true;
-    [unroll] for (uint i = 0u; i < 6u; ++i)
+    // The projection near plane is for rasterization, not caster rejection.
+    [unroll] for (uint i = 0u; i < 5u; ++i)
     {
         float3 n = q.planes[i].xyz;
         if (dot(n, c) + q.planes[i].w > dot(abs(n), h))
@@ -36,10 +37,10 @@ bool bvhNodeTest(ClusterBvhNode nd, LocalViewQuery q)
     float3 h = (nd.bmax - nd.bmin) * 0.5;
     if (localBoxOutside(c, h, q))
         return false;
-    float k = q.texelPerMetre * q.errK;
-    float dMin = max(localBoxNear(c, h, q.lightPos), q.nearZ);
-    float dMax = max(localBoxFar(c, h, q.lightPos), q.nearZ);
-    return nd.minSelfError <= dMax * k && nd.maxParentError > dMin * k;
+    // One threshold for the entire hierarchy gives a complete cut. Per-entry
+    // AABB distances let both a near parent and its far child reject themselves.
+    float errB = q.nearZ * q.texelPerMetre * q.errK;
+    return nd.minSelfError <= errB && nd.maxParentError > errB;
 }
 
 bool localEntryTouchesView(ClusterEntry e, LocalViewQuery q)
@@ -48,8 +49,7 @@ bool localEntryTouchesView(ClusterEntry e, LocalViewQuery q)
         return false;
     if ((e.flags & 2u) != 0u)
         return true;
-    float d = max(localBoxNear(e.sphere.xyz, e.extent, q.lightPos), q.nearZ);
-    float errB = d * q.texelPerMetre * q.errK;
+    float errB = q.nearZ * q.texelPerMetre * q.errK;
     return e.selfError <= errB && e.parentError > errB;
 }
 

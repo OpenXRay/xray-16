@@ -41,7 +41,7 @@ static_assert(sizeof(LightHiZCullCB) == 160, "LightHiZCullCB must be 160 bytes")
 
 static constexpr u32 CLUSTER_TILE_SIZE = 64;
 static constexpr u32 CLUSTER_NUM_SLICES = 24;
-static constexpr u32 MAX_LIGHTS = 1024;
+static constexpr u32 INITIAL_LIGHT_CAPACITY = 1024;
 static constexpr u32 MAX_LIGHT_INDICES = 1024 * 1024;
 
 class ClusteredLightManager {
@@ -76,10 +76,12 @@ public:
     void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
     void ProcessStatsReadback();
     u32 GetVisibleLightCount() const { return m_visibleLightCountCPU; }
+    bool HasVisibilityStats() const { return m_statsScheduled >= STATS_READBACK_SLOTS; }
 
     bool IsReady() const { return m_lightDataBuffer != nullptr; }
 
 private:
+    void EnsureLightCapacity(u32 count);
     void AddLight(const light* L, u32 type);
     GPULightData BuildGPULightData(const light* L, u32 shadowSlot);
     u32 GetOrLoadSpotTexture(const shared_str& name);
@@ -87,7 +89,8 @@ private:
     nvrhi::DeviceHandle m_device;
 
     xr_vector<GPULightData> m_lightsCPU;
-    std::array<u32, MAX_LIGHTS> m_identityIndices;
+    xr_vector<u32> m_identityIndices;
+    u32 m_lightCapacity = 0;
     xr_map<shared_str, u32> m_spotTextureCache;
     u32 m_numLights = 0;
     u32 m_numPoint = 0;
@@ -105,7 +108,6 @@ private:
     u32 m_statsWriteSlot = 0;
     u32 m_statsScheduled = 0;
     u32 m_visibleLightCountCPU = 0;
-    u32 m_statsFrameCounter = 0;
 
     u32 m_tilesX = 0;
     u32 m_tilesY = 0;
