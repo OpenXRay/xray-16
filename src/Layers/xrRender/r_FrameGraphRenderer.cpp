@@ -2363,13 +2363,15 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     u32 submittedDynamic = 0;
     u32 notRenderable = 0;
 
-    xr_vector<const light*> collectedLights;
-    collectedLights.reserve(256);
+    const u32 collectStamp = ++m_collectGeneration;
+    xr_vector<const light*>& collectedLights = m_collectedLights;
+    collectedLights.clear();
 
     for (ISpatial* spatial : m_lstRenderables)
     {
         if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)
             continue;
+        spatial->GetSpatialData().collect_stamp = collectStamp;
 
         IRenderable* renderable = spatial->dcast_Renderable();
         if (!renderable) {
@@ -2386,11 +2388,16 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         TaskScheduler->Wait(*m_pProcessHOMTask);
         m_pProcessHOMTask = nullptr;
     }
-    xr_set<const light*> admitted;
-    xr_vector<const light*> culledLights;
+    xr_vector<const light*>& culledLights = m_culledLights;
+    culledLights.clear();
+    const bool debugLights = ps_r_local_shadow_debug != 0;
+    auto cullLight = [&](const light* L) {
+        if (debugLights)
+            culledLights.push_back(L);
+    };
     auto collectLight = [&](ISpatial* spatial, bool touchesCamera) {
         auto* L = static_cast<light*>(spatial->dcast_Light());
-        if (!L || !L->flags.bActive || admitted.count(L))
+        if (!L || !L->flags.bActive || L->spatial.collect_stamp == collectStamp)
             return;
         if (L->flags.type != IRender_Light::POINT && L->flags.type != IRender_Light::SPOT)
             return;
@@ -2400,7 +2407,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             L->spatial_updatesector(fg::Scene.detect_sector(L->position));
         if (L->GetSpatialData().sector_id == IRender_Sector::INVALID_SECTOR_ID) {
             ++m_lightsInvalidSector;
-            culledLights.push_back(L);
+            cullLight(L);
             return;
         }
         if (o.noshadows)
@@ -2408,22 +2415,22 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         if (!touchesCamera) {
             if (L->get_LOD() <= EPS_L) {
                 ++m_lightsLodCulled;
-                culledLights.push_back(L);
+                cullLight(L);
                 return;
             }
             if (!m_HOM.visible(L->get_homdata())) {
                 ++m_lightsHomCulled;
-                culledLights.push_back(L);
+                cullLight(L);
                 return;
             }
         } else {
             ++m_lightsTouching;
         }
-        admitted.insert(L);
+        L->spatial.collect_stamp = collectStamp;
         collectedLights.push_back(L);
     };
 
-    xr_vector<ISpatial*> touchingLights;
+    xr_vector<ISpatial*>& touchingLights = m_touchingLights;
     g_pGamePersistent->SpatialSpace.q_sphere(touchingLights, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
     for (ISpatial* spatial : touchingLights)
         collectLight(spatial, true);
@@ -2439,15 +2446,15 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     {
         ZoneScopedN("CollectVisibleGeometry::ShadowCasters");
         const ShadowCasterRegion& region = m_shadowCasterRegion;
-        xr_set<ISpatial*> visible(m_lstRenderables.begin(), m_lstRenderables.end());
         m_collectShadowOnly = true;
         auto submitCaster = [&](ISpatial* spatial) {
-            if (visible.count(spatial))
+            SpatialData& sd = spatial->GetSpatialData();
+            if (sd.collect_stamp == collectStamp)
                 return false;
             IRenderable* renderable = spatial->dcast_Renderable();
             if (!renderable || renderable->renderable_HUD())
                 return false;
-            visible.insert(spatial);
+            sd.collect_stamp = collectStamp;
             renderable->renderable_Render(0, nullptr);
             return true;
         };
@@ -2456,7 +2463,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
                 continue;
             submitCaster(spatial);
         }
-        xr_vector<ISpatial*> localCasters;
+        xr_vector<ISpatial*>& localCasters = m_localCasters;
         for (const light* L : collectedLights) {
             if (!L->flags.bShadow)
                 continue;
@@ -2484,7 +2491,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     if (ps_r_local_shadow_debug != 0) {
         xr_set<const light*> gpuCulled;
         for (const light* L : fg::ClusteredLightManager::Instance().GetCulledLights())
-            if (admitted.count(L))
+            if (std::find(collectedLights.begin(), collectedLights.end(), L) != collectedLights.end())
                 gpuCulled.insert(L);
         auto debugLights = collectedLights;
         debugLights.insert(debugLights.end(), culledLights.begin(), culledLights.end());
@@ -2493,7 +2500,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         });
         const u32 red = bgr2rgb(color_rgba(255, 40, 40, 0));
         for (const light* L : debugLights) {
-            const bool culled = gpuCulled.count(L) || !admitted.count(L);
+            const bool culled = gpuCulled.count(L) || L->spatial.collect_stamp != collectStamp;
             if (!culled && L->flags.type != IRender_Light::POINT)
                 continue;
             const u32 rgb = culled ? red : bgr2rgb(L->flags.bShadow ? color_rgba(40, 210, 255, 0) : color_rgba(255, 170, 40, 0));
