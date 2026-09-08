@@ -187,6 +187,8 @@ struct LocalShadowOutput {
 
 void ResetLocalShadowPool(LocalShadowState& state);
 
+void WarmLocalShadowPool(fg::RenderDevice* device, LocalShadowState& state);
+
 void ProcessLocalShadowStats(LocalShadowState& state, nvrhi::IDevice* device);
 
 void SelectLocalShadowLights(

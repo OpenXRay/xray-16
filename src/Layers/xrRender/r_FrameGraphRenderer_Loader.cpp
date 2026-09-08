@@ -219,6 +219,9 @@ void FrameGraphRenderer::level_Load(IReader* fs)
     g_pGamePersistent->LoadTitle("st_loading_lights");
     LoadLights(fs);
 
+    if (!GEnv.isDedicatedServer && m_blackboard)
+        passes::WarmLocalShadowPool(GetRenderDevice(), m_blackboard->get_or_add<passes::LocalShadowState>());
+
     // End
     g_pGamePersistent->LoadEnd();
 

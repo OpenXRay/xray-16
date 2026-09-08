@@ -143,6 +143,37 @@ nvrhi::TextureHandle MakeAtlas(nvrhi::IDevice* nvDevice, const char* name, u32 l
     return nvDevice->createTexture(desc);
 }
 
+bool EnsureAtlasLayers(nvrhi::IDevice* nvDevice, LocalShadowState& state, u32 layers)
+{
+    if (state.atlasLayers >= layers && state.receiverTiles)
+        return true;
+    auto statics = MakeAtlas(nvDevice, "LocalShadow_Static", layers);
+    auto dynamics = MakeAtlas(nvDevice, "LocalShadow_Dyn", layers);
+    nvrhi::BufferDesc desc;
+    desc.debugName = "LocalShadow_Receivers";
+    desc.byteSize = u64(layers) * kLocalTileCount * sizeof(LocalShadowViewGPU);
+    desc.structStride = sizeof(LocalShadowViewGPU);
+    desc.initialState = nvrhi::ResourceStates::ShaderResource;
+    desc.keepInitialState = true;
+    auto receivers = nvDevice->createBuffer(desc);
+    if (!statics || !dynamics || !receivers)
+        return false;
+    state.staticAtlas = statics;
+    state.dynAtlas = dynamics;
+    state.receiverTiles = receivers;
+    state.atlasLayers = layers;
+    auto bind = [&](LocalShadowState& page) {
+        page.staticAtlas = statics;
+        page.dynAtlas = dynamics;
+        page.staticAtlasFirst = page.dynAtlasFirst = true;
+        page.stateReset = true;
+    };
+    bind(state);
+    for (auto& page : state.overflowPages)
+        bind(*page);
+    return true;
+}
+
 nvrhi::IBuffer* FallbackTiles(nvrhi::IDevice* nvDevice)
 {
     static nvrhi::BufferHandle s_tiles;
@@ -1121,6 +1152,16 @@ void ResetLocalShadowPool(LocalShadowState& state)
     state.slotOfLight.clear();
 }
 
+void WarmLocalShadowPool(fg::RenderDevice* device, LocalShadowState& state)
+{
+    nvrhi::IDevice* nvDevice = device ? device->GetNVRHIDevice() : nullptr;
+    if (!nvDevice)
+        return;
+    R_ASSERT2(EnsureAtlasLayers(nvDevice, state, 1), "Cannot allocate the local shadow atlas");
+    R_ASSERT2(EnsureResources(nvDevice, state), "Cannot allocate a complete local shadow page");
+    R_ASSERT2(EnsurePipelines(device, state), "Cannot render complete local light shadows without their pipelines");
+}
+
 void ProcessLocalShadowStats(LocalShadowState& state, nvrhi::IDevice* device)
 {
     if (state.readbackScheduled < LocalShadowState::kReadbackSlots)
@@ -1436,30 +1477,7 @@ LocalShadowOutput setupLocalShadowPasses(
     auto* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice)
         return out;
-    if (state->atlasLayers < state->activePages || !state->receiverTiles) {
-        const u32 layers = state->activePages;
-        auto statics = MakeAtlas(nvDevice, "LocalShadow_Static", layers);
-        auto dynamics = MakeAtlas(nvDevice, "LocalShadow_Dyn", layers);
-        nvrhi::BufferDesc desc;
-        desc.debugName = "LocalShadow_Receivers";
-        desc.byteSize = u64(layers) * kLocalTileCount * sizeof(LocalShadowViewGPU);
-        desc.structStride = sizeof(LocalShadowViewGPU);
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
-        desc.keepInitialState = true;
-        auto receivers = nvDevice->createBuffer(desc);
-        R_ASSERT2(statics && dynamics && receivers, "Cannot allocate local shadow overflow pages");
-        state->staticAtlas = statics;
-        state->dynAtlas = dynamics;
-        state->receiverTiles = receivers;
-        state->atlasLayers = layers;
-        for (u32 i = 0; i < state->activePages; ++i) {
-            auto& page = i == 0 ? *state : *state->overflowPages[i - 1];
-            page.staticAtlas = statics;
-            page.dynAtlas = dynamics;
-            page.staticAtlasFirst = page.dynAtlasFirst = true;
-            page.stateReset = true;
-        }
-    }
+    R_ASSERT2(EnsureAtlasLayers(nvDevice, *state, state->activePages), "Cannot allocate local shadow overflow pages");
     auto textureDesc = [&](const char* name) {
         ResourceDesc desc;
         desc.type = ResourceDesc::Type::Texture2DArray;
