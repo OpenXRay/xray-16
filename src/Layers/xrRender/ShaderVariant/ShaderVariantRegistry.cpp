@@ -120,6 +120,7 @@ void ShaderVariantRegistry::LoadVariantFile(const char* filename, const char* fi
     desc.distort = root["distort"].as_bool(false);
     desc.emissive = root["emissive"].as_bool(false);
     desc.castsShadow = root["castsShadow"].as_bool(true);
+    desc.wmark = root["wmark"].as_bool(false);
     desc.emissiveIntensity = root["emissiveIntensity"].as_float(1.0f);
     desc.colorMode = ParseColorMode(root["colorMode"]);
     desc.fadeMode = ParseFadeMode(root["vertexFade"]["mode"]);

@@ -41,13 +41,17 @@ struct TransparentPassConfig {
 struct TransparentPassState {
     xr_map<u32, nvrhi::GraphicsPipelineHandle> pipelines;
     nvrhi::GraphicsPipelineHandle distortPipeline;
+    xr_map<u32, nvrhi::GraphicsPipelineHandle> wallmarkPipelines;
     nvrhi::BindingLayoutHandle layout;
     nvrhi::BindingLayoutHandle distortLayout;
+    nvrhi::BindingLayoutHandle wallmarkLayout;
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
     nvrhi::ShaderHandle distortPS;
+    nvrhi::ShaderHandle wallmarkPS;
     nvrhi::FramebufferInfoEx fbInfo;
+    nvrhi::FramebufferInfoEx wallmarkFbInfo;
     bool initialized = false;
 };
 
@@ -77,6 +81,15 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     const TransparentPassConfig& config,
     const LocalShadowOutput& localShadow,
     framegraph::VirtualResourceHandle skinnedOrder,
+    u32 width, u32 height,
+    TransparentPassState& state
+);
+
+framegraph::DefaultOutputLayout setupStaticWallmarkPass(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    const framegraph::DefaultOutputLayout& inputs,
+    const TransparentPassConfig& config,
     u32 width, u32 height,
     TransparentPassState& state
 );

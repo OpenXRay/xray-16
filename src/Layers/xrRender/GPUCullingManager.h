@@ -67,6 +67,7 @@ enum TransparentKeyBits : u32 {
     TRANSPARENT_KEY_DISTORT = 1u << 17,
     TRANSPARENT_KEY_NO_COLOR = 1u << 18,
     TRANSPARENT_KEY_UNLIT = 1u << 19,
+    TRANSPARENT_KEY_WMARK = 1u << 20,
 };
 
 // Cluster LOD entry (matches HLSL ClusterEntry in cluster_cull.cs)

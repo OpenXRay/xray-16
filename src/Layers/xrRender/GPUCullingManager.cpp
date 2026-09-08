@@ -76,6 +76,8 @@ static u32 TransparentKeyForMaterial(u32 materialID)
     }
     if (variant->distort)
         key |= TRANSPARENT_KEY_DISTORT;
+    if (variant->wmark)
+        key |= TRANSPARENT_KEY_WMARK;
     if (variant->colorMode == VariantColorMode::None)
         key |= TRANSPARENT_KEY_NO_COLOR;
     else if (variant->colorMode != VariantColorMode::Lit)
