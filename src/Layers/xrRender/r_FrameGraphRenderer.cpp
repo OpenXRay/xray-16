@@ -2470,7 +2470,23 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     xr_vector<const light*> collectedLights;
     collectedLights.reserve(256);
 
+    for (ISpatial* spatial : m_lstRenderables)
+    {
+        if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)
+            continue;
+
+        IRenderable* renderable = spatial->dcast_Renderable();
+        if (!renderable) {
+            notRenderable++;
+            continue;
+        }
+
+        renderable->renderable_Render(0, renderable);
+        submittedDynamic++;
+    }
+
     if (m_pProcessHOMTask) {
+        ZoneScopedN("CollectVisibleGeometry::WaitHOM");
         TaskScheduler->Wait(*m_pProcessHOMTask);
         m_pProcessHOMTask = nullptr;
     }
@@ -2484,7 +2500,8 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             return;
         if (L->flags.bStatic && !ps_r2_ls_flags.test(R2FLAG_R1LIGHTS))
             return;
-        L->spatial_updatesector(fg::Scene.detect_sector(L->position));
+        if (L->GetSpatialData().type & STYPEFLAG_INVALIDSECTOR)
+            L->spatial_updatesector(fg::Scene.detect_sector(L->position));
         if (L->GetSpatialData().sector_id == IRender_Sector::INVALID_SECTOR_ID) {
             ++m_lightsInvalidSector;
             culledLights.push_back(L);
@@ -2518,22 +2535,10 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
     for (ISpatial* spatial : m_lstRenderables)
     {
-        const auto& data = spatial->GetSpatialData();
-
-        if (data.type & STYPE_LIGHTSOURCE) {
+        if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE) {
             ++m_lightsFrustum;
             collectLight(spatial, false);
-            continue;
         }
-
-        IRenderable* renderable = spatial->dcast_Renderable();
-        if (!renderable) {
-            notRenderable++;
-            continue;
-        }
-
-        renderable->renderable_Render(0, renderable);
-        submittedDynamic++;
     }
 
     // Collect the union once. A caster needed by a local light must never be
