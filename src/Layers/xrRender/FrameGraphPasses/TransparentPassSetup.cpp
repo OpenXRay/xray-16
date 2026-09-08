@@ -87,6 +87,41 @@ static nvrhi::IGraphicsPipeline* GetColorPipeline(fg::RenderDevice* device, Tran
     return pipeline.Get();
 }
 
+static nvrhi::IGraphicsPipeline* GetWallmarkPipeline(fg::RenderDevice* device, TransparentPassState& state, u32 key)
+{
+    auto it = state.wallmarkPipelines.find(key);
+    if (it != state.wallmarkPipelines.end())
+        return it->second.Get();
+
+    nvrhi::GraphicsPipelineDesc desc = MakeBasePipelineDesc(device, state, state.wallmarkPS, state.wallmarkLayout);
+    auto& rt0 = desc.renderState.blendState.targets[0];
+    rt0.blendEnable = true;
+    rt0.srcBlend = ToBlendFactor(key & 0xFFu);
+    rt0.destBlend = ToBlendFactor((key >> TRANSPARENT_KEY_DST_SHIFT) & 0xFFu);
+    rt0.blendOp = nvrhi::BlendOp::Add;
+    rt0.srcBlendAlpha = nvrhi::BlendFactor::Zero;
+    rt0.destBlendAlpha = nvrhi::BlendFactor::One;
+    rt0.blendOpAlpha = nvrhi::BlendOp::Add;
+    rt0.colorWriteMask = nvrhi::ColorMask::Red | nvrhi::ColorMask::Green | nvrhi::ColorMask::Blue;
+
+    string64 name;
+    xr_sprintf(name, "StaticWallmarkPass_%08x", key);
+    auto& cache = framegraph::GetPassResourceCache();
+    nvrhi::GraphicsPipelineHandle pipeline = cache.GetOrCreatePipeline(name, desc, state.wallmarkFbInfo, device->GetNVRHIDevice());
+    state.wallmarkPipelines[key] = pipeline;
+    return pipeline.Get();
+}
+
+static nvrhi::FramebufferInfoEx TransparentFramebufferInfo()
+{
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
+    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
+    fbInfo.depthFormat = nvrhi::Format::D32;
+    return fbInfo;
+}
+
 void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, TransparentPassState& state)
 {
     if (state.initialized)
@@ -103,18 +138,25 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
     auto vsResult = shaderLoader->LoadVertexShader("bindless_forward", "main");
     auto psResult = shaderLoader->LoadPixelShader("bindless_forward", "main");
     auto distortResult = shaderLoader->LoadPixelShader("bindless_forward_distort", "main");
-    if (!vsResult.handle || !psResult.handle || !distortResult.handle)
+    auto wallmarkResult = shaderLoader->LoadPixelShader("bindless_wallmark", "main");
+    if (!vsResult.handle || !psResult.handle || !distortResult.handle || !wallmarkResult.handle)
         return;
 
     state.vs = vsResult.handle;
     state.ps = psResult.handle;
     state.distortPS = distortResult.handle;
+    state.wallmarkPS = wallmarkResult.handle;
     state.fbInfo = fbInfo;
+    nvrhi::FramebufferInfoEx wallmarkFbInfo;
+    wallmarkFbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
+    wallmarkFbInfo.depthFormat = nvrhi::Format::D32;
+    state.wallmarkFbInfo = wallmarkFbInfo;
 
     auto& cache = framegraph::GetPassResourceCache();
     state.layout = cache.GetOrCreateBindingLayoutFromReflection("TransparentPass", *vsResult.reflection, *psResult.reflection, nvDevice);
     state.distortLayout = cache.GetOrCreateBindingLayoutFromReflection("TransparentPass_Distort", *vsResult.reflection, *distortResult.reflection, nvDevice);
-    if (!state.layout || !state.distortLayout)
+    state.wallmarkLayout = cache.GetOrCreateBindingLayoutFromReflection("StaticWallmarkPass", *vsResult.reflection, *wallmarkResult.reflection, nvDevice);
+    if (!state.layout || !state.distortLayout || !state.wallmarkLayout)
         return;
 
     u32 attrCount = 0;
@@ -146,8 +188,13 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
     if (!GetColorPipeline(device, state, defaultKey))
         return;
 
+    const u32 wallmarkKey = u32(VariantBlendFactor::DstColor) | (u32(VariantBlendFactor::SrcColor) << TRANSPARENT_KEY_DST_SHIFT) | TRANSPARENT_KEY_WMARK;
+    if (!GetWallmarkPipeline(device, state, wallmarkKey))
+        return;
+
     QueryBindingLayoutFromPipeline(state.pipelines[defaultKey], state.layout);
     QueryBindingLayoutFromPipeline(state.distortPipeline, state.distortLayout);
+    QueryBindingLayoutFromPipeline(state.wallmarkPipelines[wallmarkKey], state.wallmarkLayout);
 
     state.initialized = true;
     Msg("* [TransparentPass] Pipeline initialized");
@@ -179,12 +226,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
         return inputs;
     }
 
-    nvrhi::FramebufferInfoEx fbInfo;
-    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
-    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
-    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
-    fbInfo.depthFormat = nvrhi::Format::D32;
-    InitializeTransparentResources(device, fbInfo, state);
+    InitializeTransparentResources(device, TransparentFramebufferInfo(), state);
 
     const bool wantDistortion = RangesWantDistortion(config.ranges)
         || (config.skinned && config.gpuCulling && RangesWantDistortion(&config.gpuCulling->GetSkinnedForwardRanges()));
@@ -334,7 +376,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
 
             auto drawRanges = [&](const DrawSource& src, nvrhi::IFramebuffer* fb, nvrhi::IBindingSet* bindings, bool distortPass) {
                 for (const auto& range : *src.ranges) {
-                    if (range.count == 0)
+                    if (range.count == 0 || (range.key & TRANSPARENT_KEY_WMARK))
                         continue;
                     if (distortPass ? (range.key & TRANSPARENT_KEY_DISTORT) == 0 : (range.key & TRANSPARENT_KEY_NO_COLOR) != 0)
                         continue;
@@ -388,6 +430,134 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     outputs.baseColor = passData.baseColor;
     outputs.depth = passData.depth;
     outputs.distortion = passData.distortion.is_valid() ? passData.distortion : inputs.distortion;
+    return outputs;
+}
+
+static bool RangesWantWallmarks(const xr_vector<TransparentDrawRange>* ranges)
+{
+    if (!ranges)
+        return false;
+    for (const auto& range : *ranges)
+        if (range.key & TRANSPARENT_KEY_WMARK)
+            return true;
+    return false;
+}
+
+struct StaticWallmarkPassData {
+    framegraph::VirtualResourceHandle depth;
+    framegraph::VirtualResourceHandle baseColor;
+    fg::RenderDevice* device;
+    TransparentPassConfig config;
+    TransparentPassState* passState;
+    u32 width, height;
+};
+
+framegraph::DefaultOutputLayout setupStaticWallmarkPass(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    const framegraph::DefaultOutputLayout& inputs,
+    const TransparentPassConfig& config,
+    u32 width, u32 height,
+    TransparentPassState& state)
+{
+    using namespace framegraph;
+
+    if (!config.HasRigid() || !RangesWantWallmarks(config.ranges) || !inputs.baseColor.is_valid())
+        return inputs;
+
+    InitializeTransparentResources(device, TransparentFramebufferInfo(), state);
+
+    auto& passData = fg.addCallbackPass<StaticWallmarkPassData>(
+        "Static Wallmarks",
+
+        [&, width, height, config](FrameGraph& builder, PassHandle passHandle, StaticWallmarkPassData& data) {
+            data.width = width;
+            data.height = height;
+            data.device = device;
+            data.config = config;
+            data.passState = &state;
+
+            RenderPassBuilder passBuilder(builder, passHandle);
+            data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
+            data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
+        },
+
+        [](const StaticWallmarkPassData& data,
+            const FrameGraph& fg,
+            fg::RenderContext* ctx) {
+
+            auto* baseColorRT = fg.GetPhysicalTexture(data.baseColor);
+            auto* depthRT = fg.GetPhysicalTexture(data.depth);
+            if (!baseColorRT || !depthRT || !data.passState->initialized)
+                return;
+
+            nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            if (!nvDevice || !cmdList)
+                return;
+
+            auto& cache = framegraph::GetPassResourceCache();
+            nvrhi::FramebufferDesc fbDesc;
+            fbDesc.addColorAttachment(baseColorRT);
+            fbDesc.setDepthAttachment(depthRT);
+            auto framebuffer = cache.GetOrCreateFramebuffer("StaticWallmarkPass", fbDesc, nvDevice);
+            if (!framebuffer)
+                return;
+
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* vsReflection = shaderLoader->GetCachedReflection("bindless_forward", ".vs");
+            auto* psReflection = shaderLoader->GetCachedReflection("bindless_wallmark", ".ps");
+            if (!vsReflection || !psReflection)
+                return;
+
+            using namespace fg::bindless;
+            auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("TransparentPass", nvDevice);
+            const auto& cfg = data.config;
+
+            framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "StaticWallmark");
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+            bsb.BufferSRV("g_Materials", MaterialBuffer::Instance().GetBuffer());
+            bsb.BufferSRV("g_Variants", VariantBuffer::Instance().GetBuffer());
+            bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
+            nvrhi::IBindingSet* bindings = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->wallmarkLayout, nvDevice);
+            R_ASSERT2(bindings, "Static wallmark binding set creation failed");
+
+            auto* backend = data.device->GetBackend();
+            nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
+            const auto& rtDesc = baseColorRT->getDesc();
+            nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
+            nvrhi::Rect scissor(rtDesc.width, rtDesc.height);
+
+            for (const auto& range : *cfg.ranges) {
+                if (range.count == 0 || (range.key & TRANSPARENT_KEY_WMARK) == 0)
+                    continue;
+                nvrhi::IGraphicsPipeline* pipeline = GetWallmarkPipeline(data.device, *data.passState, range.key);
+                if (!pipeline)
+                    continue;
+                nvrhi::GraphicsState gs;
+                gs.pipeline = pipeline;
+                gs.framebuffer = framebuffer;
+                gs.bindings = { bindings };
+                if (bindlessTable)
+                    gs.addBindingSet(bindlessTable);
+                gs.vertexBuffers = {
+                    {cfg.megaVertexBuffer, 0, 0},
+                    {drawIndexBuffer, 1, 0}
+                };
+                gs.indexBuffer = { cfg.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
+                gs.indirectParams = cfg.drawArgsBuffer;
+                gs.viewport.addViewport(viewport);
+                gs.viewport.addScissorRect(scissor);
+                cmdList->setGraphicsState(gs);
+                cmdList->drawIndexedIndirect(range.first * sizeof(IndirectDrawArgs), range.count);
+            }
+        }
+    );
+
+    DefaultOutputLayout outputs = inputs;
+    outputs.baseColor = passData.baseColor;
+    outputs.depth = passData.depth;
     return outputs;
 }
 
