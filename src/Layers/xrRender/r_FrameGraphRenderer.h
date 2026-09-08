@@ -543,6 +543,11 @@ private:
     // Populated once per frame, reused across passes
     xr_vector<ISpatial*> m_lstRenderables;
     xr_vector<ISpatial*> m_lstShadowCasters;
+    xr_vector<const fg::light*> m_collectedLights;
+    xr_vector<const fg::light*> m_culledLights;
+    xr_vector<ISpatial*> m_touchingLights;
+    xr_vector<ISpatial*> m_localCasters;
+    u32 m_collectGeneration = 0;
     u32 m_lightsFrustum = 0;
     u32 m_lightsTouching = 0;
     u32 m_lightsInvalidSector = 0;
