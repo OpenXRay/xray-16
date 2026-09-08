@@ -1349,6 +1349,20 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
+    passes::TransparentPassConfig transparentConfig;
+    if (m_gpuCullingManager && m_gpuCullingManager->GetTransparentObjectCount() > 0) {
+        transparentConfig.megaVertexBuffer = clusterConfig.megaVertexBuffer;
+        transparentConfig.megaIndexBuffer = clusterConfig.megaIndexBuffer;
+        transparentConfig.instanceBuffer = m_gpuCullingManager->GetTransparentInstanceBuffer();
+        transparentConfig.drawArgsBuffer = m_gpuCullingManager->GetTransparentDrawArgsBuffer();
+        transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
+        transparentConfig.ranges = &m_gpuCullingManager->GetTransparentRanges();
+    }
+    if (m_gpuCullingManager && m_gpuCullingManager->GetSkinnedForwardCount() > 0) {
+        transparentConfig.gpuCulling = m_gpuCullingManager.get();
+        transparentConfig.skinned = true;
+    }
+
     auto detailOutputs = gbufferOutputs;
 
     if (m_decalManager) {
@@ -1362,6 +1376,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             );
         }
     }
+
+    detailOutputs = passes::setupStaticWallmarkPass(
+        *m_framegraph, m_device,
+        detailOutputs, transparentConfig,
+        width, height,
+        m_blackboard->get_or_add<passes::TransparentPassState>()
+    );
 
     {
         auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
@@ -1438,20 +1459,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_gpuProfiler.get(),
         &m_blackboard->get_or_add<passes::DeferredLightPassState>()
     );
-
-    passes::TransparentPassConfig transparentConfig;
-    if (m_gpuCullingManager && m_gpuCullingManager->GetTransparentObjectCount() > 0) {
-        transparentConfig.megaVertexBuffer = clusterConfig.megaVertexBuffer;
-        transparentConfig.megaIndexBuffer = clusterConfig.megaIndexBuffer;
-        transparentConfig.instanceBuffer = m_gpuCullingManager->GetTransparentInstanceBuffer();
-        transparentConfig.drawArgsBuffer = m_gpuCullingManager->GetTransparentDrawArgsBuffer();
-        transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
-        transparentConfig.ranges = &m_gpuCullingManager->GetTransparentRanges();
-    }
-    if (m_gpuCullingManager && m_gpuCullingManager->GetSkinnedForwardCount() > 0) {
-        transparentConfig.gpuCulling = m_gpuCullingManager.get();
-        transparentConfig.skinned = true;
-    }
 
     auto transparentOutputs = passes::setupTransparentPass(
         *m_framegraph,

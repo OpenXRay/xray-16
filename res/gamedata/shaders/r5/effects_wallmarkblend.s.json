@@ -1,12 +1,12 @@
 {
     "transparent": true,
+    "wmark": true,
     "castsShadow": false,
     "fog": false,
     "sorting": {
         "priority": 1,
         "backToFront": false
     },
-    "colorMode": "unlit",
     "blend": {
         "src": "srcalpha",
         "dst": "invsrcalpha"
@@ -14,8 +14,5 @@
     "depth": {
         "test": true,
         "write": false
-    },
-    "alphaTest": {
-        "ref": 0
     }
 }

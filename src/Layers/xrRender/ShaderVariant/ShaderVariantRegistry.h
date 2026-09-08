@@ -65,6 +65,7 @@ struct ShaderVariantDesc
     bool distort = false;
     bool emissive = false;
     bool castsShadow = true;
+    bool wmark = false;
     float emissiveIntensity = 1.0f;
     VariantColorMode colorMode = VariantColorMode::Lit;
     VariantFadeMode fadeMode = VariantFadeMode::None;
