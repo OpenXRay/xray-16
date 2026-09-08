@@ -108,6 +108,7 @@ public:
     ISpatial_NODE* node_ptr; // Cached parent node for "empty-members" optimization
     IRender_Sector::sector_id_t sector_id;
     ISpatial_DB* space; // allow different spaces
+    u32 collect_stamp = 0;
 };
 
 class XRCDB_API ISpatial
