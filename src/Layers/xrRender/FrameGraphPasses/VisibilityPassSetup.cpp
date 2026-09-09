@@ -202,7 +202,8 @@ void renderVisibilityRaster(
     }
 
     if (!retest && detailManager && state.bladePipeline && detailManager->generatedInstancesBuffer && detailManager->perlin4dTexture
-        && detailManager->detailModelsBuffer && detailManager->pulledVertexBuffer) {
+        && detailManager->detailModelsBuffer && detailManager->pulledVertexBuffer
+        && detailManager->interactionTexture[0] && detailManager->interactionTexture[1]) {
         auto* bladeVsRefl = shaderLoader->GetCachedReflection("detail_vis", ".vs");
         auto* bladePsRefl = shaderLoader->GetCachedReflection("detail_vis", ".ps");
         auto* pulledPsRefl = shaderLoader->GetCachedReflection("detail_vis_at", ".ps");
@@ -231,6 +232,7 @@ void renderVisibilityRaster(
                 bsb.BufferSRV("pulled_vertices", detailManager->pulledVertexBuffer);
                 bsb.BufferSRV("all_instances", detailManager->generatedInstancesBuffer);
                 bsb.Texture("g_Perlin4D", detailManager->perlin4dTexture);
+                bsb.Texture("g_Interaction", detailManager->interactionTexture[detailManager->interactionCurrent]);
                 auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDevice);
                 if (bindingSet)
                     draw(pipeline, bindingSet, args);

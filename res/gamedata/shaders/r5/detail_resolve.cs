@@ -16,8 +16,8 @@ cbuffer DetailGlobals : register(b3)
     float4 g_wind_direction;
     float grass_wind_displacement;
     float grass_interaction_displacement;
-    uint interaction_atlas_index;
-    uint perlin4d_texture_index;
+    float grass_interaction_max_angle;
+    float grass_blade_width;
     float4 grass_color_tip;
     float4 grass_color_base;
     float4 grass_sss_color;
@@ -25,8 +25,8 @@ cbuffer DetailGlobals : register(b3)
     float grass_blade_height;
     uint buildDetailsIndex;
     uint buildDetailsPbrIndex;
-    float grass_blade_width;
-    float3 detail_pad;
+    float4 interaction_window;
+    float4 interaction_window_prev;
 };
 
 cbuffer DetailResolveParams : register(b5)
@@ -38,9 +38,15 @@ cbuffer DetailResolveParams : register(b5)
     float g_PrevTime;
     uint g_VeinIndex;
     uint4 g_Segments;
+    uint g_InteractionDebug;
+    uint g_ResolvePad0;
+    uint g_ResolvePad1;
+    uint g_ResolvePad2;
 };
 
 Texture3D g_Perlin4D : register(t12);
+Texture2D g_Interaction : register(t13);
+Texture2D g_InteractionPrev : register(t14);
 Texture2D<uint> g_VisID : register(t30);
 Texture2D<float> g_Depth : register(t31);
 StructuredBuffer<uint> g_VisibleLod0 : register(t33);
@@ -92,11 +98,16 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
     float3 w0 = b0;
     float3 w1 = b1;
     float3 w2 = b2;
+    float2 inter = float2(0.0, 0.0);
     if (sway)
     {
-        w0 = PulledSway(b0, h.x, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
-        w1 = PulledSway(b1, h.y, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
-        w2 = PulledSway(b2, h.z, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+        inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, inst.pos.xz, interaction_window);
+        w0 = PulledInteractionBend(inst, b0, inter, grass_interaction_displacement, grass_interaction_max_angle);
+        w1 = PulledInteractionBend(inst, b1, inter, grass_interaction_displacement, grass_interaction_max_angle);
+        w2 = PulledInteractionBend(inst, b2, inter, grass_interaction_displacement, grass_interaction_max_angle);
+        w0 = PulledSway(w0, h.x, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+        w1 = PulledSway(w1, h.y, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+        w2 = PulledSway(w2, h.z, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
     }
 
     float4 c0 = mul(m_VP, float4(w0, 1.0));
@@ -130,6 +141,8 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
         float backlit = saturate(dot(N, -L_sun_dir_w) * 0.5 + 0.5);
         float3 sss = grass_sss_color.rgb * (backlit * heightParam * grass_sss_color.w);
         albedo += sss * L_sun_color;
+        if (g_InteractionDebug != 0u)
+            albedo = lerp(albedo, float3(1.0, 0.0, 0.0), saturate(length(inter) * 4.0));
     }
 
     float2 motion = float2(0.0, 0.0);
@@ -140,9 +153,13 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
         float3 p2 = b2;
         if (sway)
         {
-            p0 = PulledSway(b0, h.x, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
-            p1 = PulledSway(b1, h.y, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
-            p2 = PulledSway(b2, h.z, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+            float2 interPrev = SampleGrassInteraction(g_InteractionPrev, smp_rtlinear, inst.pos.xz, interaction_window_prev);
+            p0 = PulledInteractionBend(inst, b0, interPrev, grass_interaction_displacement, grass_interaction_max_angle);
+            p1 = PulledInteractionBend(inst, b1, interPrev, grass_interaction_displacement, grass_interaction_max_angle);
+            p2 = PulledInteractionBend(inst, b2, interPrev, grass_interaction_displacement, grass_interaction_max_angle);
+            p0 = PulledSway(p0, h.x, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+            p1 = PulledSway(p1, h.y, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+            p2 = PulledSway(p2, h.z, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
         }
         motion = PrevMotion(InterpolateBary3(bd, p0, p1, p2), uvPix);
     }
@@ -191,7 +208,8 @@ void main(uint3 dtid : SV_DispatchThreadID)
 
     DetailInstance raw = all_instances[src];
     BladeInstance b = DecodeBlade(raw, g_Perlin4D, smp_linear, grass_blade_height);
-    BladeWind w = EvalBladeWind(b, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+    float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, b.pos.xz, interaction_window);
+    BladeBend w = EvalBladeBend(b, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
 
     uint lv0 = BladeTriangleVertex(tri, 0u, segments);
     uint lv1 = BladeTriangleVertex(tri, 1u, segments);
@@ -239,11 +257,14 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float backlit = saturate(dot(N, -L_sun_dir_w) * 0.5 + 0.5);
     float3 sss = grass_sss_color.rgb * (backlit * t * grass_sss_color.w);
     albedo += sss * L_sun_color;
+    if (g_InteractionDebug != 0u)
+        albedo = lerp(albedo, float3(1.0, 0.0, 0.0), saturate(length(inter) * 4.0));
 
     float2 motion = float2(0.0, 0.0);
     if (g_MotionValid != 0u)
     {
-        BladeWind wPrev = EvalBladeWind(b, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+        float2 interPrev = SampleGrassInteraction(g_InteractionPrev, smp_rtlinear, b.pos.xz, interaction_window_prev);
+        BladeBend wPrev = EvalBladeBend(b, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, interPrev, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
         BladeVertex p0 = EvalBladeVertex(b, wPrev, lv0, segments, g_PrevTime, grass_blade_width, g_Perlin4D, smp_linear);
         BladeVertex p1 = EvalBladeVertex(b, wPrev, lv1, segments, g_PrevTime, grass_blade_width, g_Perlin4D, smp_linear);
         BladeVertex p2 = EvalBladeVertex(b, wPrev, lv2, segments, g_PrevTime, grass_blade_width, g_Perlin4D, smp_linear);

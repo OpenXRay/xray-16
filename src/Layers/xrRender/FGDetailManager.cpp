@@ -7,6 +7,7 @@
 #include "ResourceManager/TextureManager.h"
 #include "xrRender_console.h"
 #include "xrEngine/device.h"
+#include "xrEngine/GrassInteractionCollector.h"
 #include "xrCDB/Frustum.h"
 #include "xrCDB/Intersect.hpp"
 #include "xrCDB/xrXRC.h"
@@ -25,6 +26,10 @@ extern ENGINE_API float ps_r3_grass_wind_min;
 extern ENGINE_API float ps_r3_grass_wind_lerp_rate;
 extern ENGINE_API float ps_r3_grass_wind_displacement;
 extern ENGINE_API float ps_r3_grass_interaction_displacement;
+extern ENGINE_API float ps_r3_grass_interaction_radius_scale;
+extern ENGINE_API float ps_r3_grass_interaction_frequency;
+extern ENGINE_API float ps_r3_grass_interaction_damping;
+extern ENGINE_API float ps_r3_grass_interaction_max_angle;
 extern ENGINE_API u32 ps_r3_grass_wind_octaves;
 
 extern ENGINE_API float ps_r3_grass_lod_close;
@@ -1280,6 +1285,18 @@ void FGDetailManager::DestroyGPUBuffers()
     perlin4dPipeline = nullptr;
     perlin4dCB = fg::BufferHandle();
 
+    interactionTexture[0] = nullptr;
+    interactionTexture[1] = nullptr;
+    interactionValid[0] = false;
+    interactionValid[1] = false;
+    interactionCurrent = 0;
+    interactionDispatchFrame = 0;
+    interactionEntityBuffer = nullptr;
+    interactionComputeShader = nullptr;
+    interactionBindingLayout = nullptr;
+    interactionPipeline = nullptr;
+    interactionCB = fg::BufferHandle();
+
     for (u32 i = 0; i < STATS_READBACK_SLOTS; ++i)
         statsReadbackBuffers[i] = nullptr;
     statsWriteSlot = 0;
@@ -1314,6 +1331,10 @@ void FGDetailManager::InvalidateShadersAndPipelines()
     perlin4dComputeShader = nullptr;
     perlin4dBindingLayout = nullptr;
     perlin4dPipeline = nullptr;
+
+    interactionComputeShader = nullptr;
+    interactionBindingLayout = nullptr;
+    interactionPipeline = nullptr;
 
     prefixSumScanShader = nullptr;
     prefixSumTopShader = nullptr;
@@ -1448,6 +1469,206 @@ void FGDetailManager::DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrh
 
     // 3D dispatch: 64/4 = 16 groups per dimension
     cmdList->dispatch(PERLIN4D_TEXTURE_SIZE / 8, PERLIN4D_TEXTURE_SIZE / 8, PERLIN4D_TEXTURE_SIZE / 8);
+}
+
+bool FGDetailManager::CreateInteractionResources(nvrhi::IDevice* device)
+{
+    if (!device)
+        return false;
+
+    for (u32 i = 0; i < 2; ++i)
+    {
+        nvrhi::TextureDesc desc;
+        desc.width = INTERACTION_TEXTURE_SIZE;
+        desc.height = INTERACTION_TEXTURE_SIZE;
+        desc.format = nvrhi::Format::RGBA16_FLOAT;
+        desc.isUAV = true;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        desc.debugName = i == 0 ? "DetailInteraction0" : "DetailInteraction1";
+        interactionTexture[i] = device->createTexture(desc);
+        if (!interactionTexture[i])
+        {
+            Msg("! [FGDetailManager] Failed to create interaction texture %u", i);
+            return false;
+        }
+        interactionValid[i] = false;
+    }
+    interactionCurrent = 0;
+    interactionDispatchFrame = 0;
+
+    nvrhi::BufferDesc bufDesc;
+    bufDesc.byteSize = sizeof(InteractionEntity) * INTERACTION_MAX_ENTITIES;
+    bufDesc.structStride = sizeof(InteractionEntity);
+    bufDesc.debugName = "DetailInteractionEntities";
+    bufDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    bufDesc.keepInitialState = true;
+    interactionEntityBuffer = device->createBuffer(bufDesc);
+    if (!interactionEntityBuffer)
+    {
+        Msg("! [FGDetailManager] Failed to create interaction entity buffer");
+        return false;
+    }
+    interactionEntities.reserve(INTERACTION_MAX_ENTITIES);
+
+    Msg("* [FGDetailManager] Interaction window created (2x %u^2 RGBA16F, %.1f m span, %u MB)",
+        INTERACTION_TEXTURE_SIZE, INTERACTION_TEXTURE_SIZE * INTERACTION_TEXEL_SIZE,
+        2 * INTERACTION_TEXTURE_SIZE * INTERACTION_TEXTURE_SIZE * 8 / (1024 * 1024));
+    return true;
+}
+
+bool FGDetailManager::LoadInteractionComputeShader(framegraph::ShaderLoader* shaderLoader)
+{
+    if (!shaderLoader)
+        return false;
+
+    interactionComputeShader = shaderLoader->LoadComputeShader("detail_interaction", "main").handle;
+    if (!interactionComputeShader)
+    {
+        Msg("! [FGDetailManager] Failed to load detail_interaction compute shader");
+        return false;
+    }
+    return true;
+}
+
+bool FGDetailManager::CreateInteractionPipeline(nvrhi::IDevice* device)
+{
+    if (!device || !interactionComputeShader)
+        return false;
+
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* refl = shaderLoader->GetCachedReflection("detail_interaction", ".cs");
+    if (!refl)
+    {
+        Msg("! [FGDetailManager] Failed to get interaction reflection");
+        return false;
+    }
+
+    interactionBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailInteraction", *refl, device);
+    if (!interactionBindingLayout)
+    {
+        Msg("! [FGDetailManager] Failed to create interaction binding layout");
+        return false;
+    }
+
+    nvrhi::ComputePipelineDesc pipelineDesc;
+    pipelineDesc.CS = interactionComputeShader;
+    pipelineDesc.bindingLayouts = { interactionBindingLayout };
+    interactionPipeline = device->createComputePipeline(pipelineDesc);
+    if (!interactionPipeline)
+    {
+        Msg("! [FGDetailManager] Failed to create interaction compute pipeline");
+        return false;
+    }
+
+    if (!interactionCB.IsValid())
+    {
+        fg::RenderDevice::BufferDesc cbDesc;
+        cbDesc.byteSize = sizeof(InteractionParams);
+        cbDesc.isVolatile = true;
+        cbDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+        cbDesc.isConstantBuffer = true;
+        cbDesc.debugName = "DetailInteractionCB";
+        interactionCB = GEnv.Render->GetRenderDevice()->CreateBuffer(cbDesc);
+    }
+    return true;
+}
+
+void FGDetailManager::DispatchInteraction(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device)
+{
+    if (!interactionPipeline || !interactionTexture[0] || !interactionTexture[1] || !interactionEntityBuffer
+        || !heightmapTexture || !interactionCB.IsValid())
+        return;
+
+    const u32 prev = interactionCurrent;
+    const u32 write = prev ^ 1u;
+    const float texel = INTERACTION_TEXEL_SIZE;
+    const float halfSpan = 0.5f * INTERACTION_TEXTURE_SIZE * texel;
+    const Fvector& cam = Device.vCameraPosition;
+
+    Fvector2 origin;
+    origin.x = floorf((cam.x - halfSpan) / texel) * texel;
+    origin.y = floorf((cam.z - halfSpan) / texel) * texel;
+
+    const int shiftX = int(lroundf((origin.x - interactionOrigin[prev].x) / texel));
+    const int shiftY = int(lroundf((origin.y - interactionOrigin[prev].y) / texel));
+    const bool prevValid = interactionValid[prev]
+        && _abs(shiftX) < int(INTERACTION_TEXTURE_SIZE) && _abs(shiftY) < int(INTERACTION_TEXTURE_SIZE);
+
+    interactionEntities.clear();
+    xr_vector<GrassInteractionEntity> gameEntities;
+    g_GrassInteractionCollector.GetEntitiesForFrame(gameEntities);
+    for (const GrassInteractionEntity& e : gameEntities)
+    {
+        const float radius = e.radius * ps_r3_grass_interaction_radius_scale;
+        if (radius <= 0.0f || e.weight <= 0.0f)
+            continue;
+        if (_abs(e.position.x - cam.x) > halfSpan + radius || _abs(e.position.z - cam.z) > halfSpan + radius)
+            continue;
+        InteractionEntity& out = interactionEntities.emplace_back();
+        out.pos = e.position;
+        out.radius = radius;
+        out.vel = e.velocity;
+        out.weight = e.weight;
+        if (interactionEntities.size() >= INTERACTION_MAX_ENTITIES)
+            break;
+    }
+
+    const float dt = _min(Device.fTimeDelta, 0.1f);
+    const float omega0 = 2.0f * PI * _max(ps_r3_grass_interaction_frequency, 0.05f);
+    const float zeta = clampr(ps_r3_grass_interaction_damping, 0.01f, 0.98f);
+    const float omegaD = omega0 * _sqrt(1.0f - zeta * zeta);
+    const float decay = expf(-zeta * omega0 * dt);
+    const float cs = _cos(omegaD * dt);
+    const float sn = _sin(omegaD * dt);
+
+    InteractionParams params;
+    params.originCur = origin;
+    params.originPrev = interactionOrigin[prev];
+    params.prevShiftX = shiftX;
+    params.prevShiftY = shiftY;
+    params.texelSize = texel;
+    params.size = INTERACTION_TEXTURE_SIZE;
+    params.spring.set(
+        decay * (cs + zeta * omega0 / omegaD * sn),
+        decay * sn / omegaD,
+        -decay * omega0 * omega0 / omegaD * sn,
+        decay * (cs - zeta * omega0 / omegaD * sn));
+    params.contactRate = 1.0f - expf(-dt / 0.04f);
+    params.dt = dt;
+    params.maxVelocity = 12.0f;
+    params.entityCount = u32(interactionEntities.size());
+    params.heightmapMinX = heightmapWorldMinX;
+    params.heightmapMinZ = heightmapWorldMinZ;
+    params.heightmapTexelSize = heightmapTexelSize;
+    params.prevValid = prevValid ? 1u : 0u;
+
+    auto* renderDevice = GEnv.Render->GetRenderDevice();
+    if (!interactionEntities.empty())
+        cmdList->writeBuffer(interactionEntityBuffer, interactionEntities.data(), interactionEntities.size() * sizeof(InteractionEntity));
+    cmdList->writeBuffer(renderDevice->GetNativeBuffer(interactionCB), &params, sizeof(params));
+
+    auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_interaction", ".cs");
+    framegraph::BindingSetBuilder bsb(*refl, device, "Detail.Interaction");
+    bsb.ConstantBuffer("InteractionParams", renderDevice->GetNativeBuffer(interactionCB))
+       .BufferSRV("g_entities", interactionEntityBuffer)
+       .Texture("g_prev", interactionTexture[prev])
+       .Texture("g_heightmap", heightmapTexture)
+       .TextureUAV("g_cur", interactionTexture[write]);
+    auto bindSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), interactionBindingLayout, device);
+    if (!bindSet)
+        return;
+
+    nvrhi::ComputeState state;
+    state.pipeline = interactionPipeline;
+    state.bindings = { bindSet };
+    cmdList->setComputeState(state);
+    cmdList->dispatch(INTERACTION_TEXTURE_SIZE / 8, INTERACTION_TEXTURE_SIZE / 8, 1);
+
+    interactionOrigin[write] = origin;
+    interactionValid[write] = true;
+    interactionCurrent = write;
+    interactionDispatchFrame = Device.dwFrame;
 }
 
 void FGDetailManager::ComputeSlotAABBs()
@@ -2348,8 +2569,8 @@ void FGDetailManager::FillFrameConstants(DetailFrameConstants& fc)
     fc.g_wind_direction.set(windAngleDeg, windSpeed, 0.0f, 0.0f);
     fc.grass_wind_displacement = ps_r3_grass_wind_displacement;
     fc.grass_interaction_displacement = ps_r3_grass_interaction_displacement;
-    fc.interaction_atlas_index = 0;
-    fc.perlin4d_texture_index = perlin4dBindlessIndex;
+    fc.grass_interaction_max_angle = ps_r3_grass_interaction_max_angle;
+    fc.grass_blade_width = ps_r3_grass_blade_width;
     fc.grass_color_tip.set(ps_r3_grass_color_tip.x, ps_r3_grass_color_tip.y, ps_r3_grass_color_tip.z, 0.0f);
     fc.grass_color_base.set(ps_r3_grass_color_base.x, ps_r3_grass_color_base.y, ps_r3_grass_color_base.z, 0.0f);
     fc.grass_sss_color.set(ps_r3_grass_sss_color.x, ps_r3_grass_sss_color.y, ps_r3_grass_sss_color.z, ps_r3_grass_sss_intensity);
@@ -2357,8 +2578,13 @@ void FGDetailManager::FillFrameConstants(DetailFrameConstants& fc)
     fc.grass_blade_height = ps_r3_grass_blade_height;
     fc.buildDetailsIndex = buildDetailsBindlessIndex;
     fc.buildDetailsPbrIndex = buildDetailsPbrBindlessIndex;
-    fc.grass_blade_width = ps_r3_grass_blade_width;
-    fc.pad0 = fc.pad1 = fc.pad2 = 0.0f;
+
+    const u32 cur = interactionCurrent;
+    const u32 prev = cur ^ 1u;
+    const bool live = interactionDispatchFrame == Device.dwFrame && interactionValid[cur];
+    const float invSpan = 1.0f / (INTERACTION_TEXTURE_SIZE * INTERACTION_TEXEL_SIZE);
+    fc.interaction_window.set(interactionOrigin[cur].x, interactionOrigin[cur].y, invSpan, live ? 1.0f : 0.0f);
+    fc.interaction_window_prev.set(interactionOrigin[prev].x, interactionOrigin[prev].y, invSpan, (live && interactionValid[prev]) ? 1.0f : 0.0f);
 }
 
 void FGDetailManager::UploadGrassTints(nvrhi::ICommandList* cmdList)

@@ -31,6 +31,11 @@
 
 // Detail manager debug
 extern ENGINE_API int dm_debug_trails;
+extern ENGINE_API float ps_r3_grass_interaction_displacement;
+extern ENGINE_API float ps_r3_grass_interaction_radius_scale;
+extern ENGINE_API float ps_r3_grass_interaction_frequency;
+extern ENGINE_API float ps_r3_grass_interaction_damping;
+extern ENGINE_API int ps_r3_grass_interaction_debug;
 
 namespace xray::render::fg
 {
@@ -783,6 +788,11 @@ void xrRender_initconsole()
     CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 600);
     CMD4(CCC_Float, "r__detail_height", &ps_r__Detail_height, 1, 2);
     CMD4(CCC_Integer, "r__detail_gpu", &ps_r__detail_gpu, 0, 1); // Toggle GPU compute path
+    CMD4(CCC_Float, "r3_grass_interaction_strength", &ps_r3_grass_interaction_displacement, 0.f, 3.f);
+    CMD4(CCC_Float, "r3_grass_interaction_radius", &ps_r3_grass_interaction_radius_scale, 0.5f, 3.f);
+    CMD4(CCC_Float, "r3_grass_interaction_frequency", &ps_r3_grass_interaction_frequency, 0.2f, 5.f);
+    CMD4(CCC_Float, "r3_grass_interaction_damping", &ps_r3_grass_interaction_damping, 0.01f, 0.98f);
+    CMD4(CCC_Integer, "r3_grass_interaction_debug", &ps_r3_grass_interaction_debug, 0, 1);
 
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);

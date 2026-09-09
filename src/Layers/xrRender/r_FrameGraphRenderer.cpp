@@ -1119,6 +1119,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             if (m_detailManager->perlin4dComputeShader) {
                 m_detailManager->CreatePerlin4DPipeline(m_device->GetNVRHIDevice());
             }
+
+            if (!m_detailManager->interactionTexture[0]) {
+                m_detailManager->CreateInteractionResources(m_device->GetNVRHIDevice());
+            }
+            m_detailManager->LoadInteractionComputeShader(shaderLoader);
+            if (m_detailManager->interactionComputeShader) {
+                m_detailManager->CreateInteractionPipeline(m_device->GetNVRHIDevice());
+            }
         }
 
         if (m_rtAccelMgr && m_rtAccelMgr->IsSupported())

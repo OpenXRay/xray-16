@@ -102,6 +102,13 @@ VirtualResourceHandle setupDetailCullPass(
                 if (data.gpuProfiler) data.gpuProfiler->EndPass(cmdList, "DetailCull.Perlin");
             }
 
+            if (dm->interactionPipeline)
+            {
+                if (data.gpuProfiler) data.gpuProfiler->BeginPass(cmdList, "DetailCull.Interaction");
+                dm->DispatchInteraction(cmdList, nvDevice);
+                if (data.gpuProfiler) data.gpuProfiler->EndPass(cmdList, "DetailCull.Interaction");
+            }
+
             nvrhi::ITexture* hiZTexture = data.hiZPyramid.is_valid() ? fg.GetPhysicalTexture(data.hiZPyramid) : nullptr;
             u32 hiZWidth = data.hiZWidth;
             u32 hiZHeight = data.hiZHeight;

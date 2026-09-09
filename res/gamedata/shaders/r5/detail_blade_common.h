@@ -66,24 +66,34 @@ BladeInstance DecodeBlade(DetailInstance raw, Texture3D perlin, SamplerState smp
     return b;
 }
 
-struct BladeWind
+float2 SampleGrassInteraction(Texture2D tex, SamplerState smp, float2 posXZ, float4 window)
+{
+    if (window.w == 0.0)
+        return float2(0.0, 0.0);
+    float2 uv = (posXZ - window.xy) * window.z;
+    if (any(uv < 0.0) || any(uv > 1.0))
+        return float2(0.0, 0.0);
+    return tex.SampleLevel(smp, uv, 0).xy;
+}
+
+struct BladeBend
 {
     float3 bendDir;
-    float bendStrength;
+    float bendAngle;
     float windSpeed;
 };
 
-BladeWind EvalBladeWind(BladeInstance b, float time, float2 windAngleSpeed, float windDisplacement, Texture3D perlin, SamplerState smp)
+BladeBend EvalBladeBend(BladeInstance b, float time, float2 windAngleSpeed, float windDisplacement, float2 interaction, float interactionDisplacement, float interactionMaxAngle, Texture3D perlin, SamplerState smp)
 {
-    BladeWind w;
-    w.windSpeed = max(windAngleSpeed.y, 0.1);
-    float2 dirUv = b.pos.zx * (0.005 / w.windSpeed) + time * (0.005 * w.windSpeed);
+    BladeBend o;
+    o.windSpeed = max(windAngleSpeed.y, 0.1);
+    float2 dirUv = b.pos.zx * (0.005 / o.windSpeed) + time * (0.005 * o.windSpeed);
     float windDirNoise = perlin.SampleLevel(smp, float3(dirUv, 0.0), 0).r;
-    float2 strUv = b.pos.xz * (0.025 / w.windSpeed) + time * 0.05;
+    float2 strUv = b.pos.xz * (0.025 / o.windSpeed) + time * 0.05;
     float windStrNoise = perlin.SampleLevel(smp, float3(strUv, 0.0), 0).r;
     float fbmStrength = lerp(0.25, 1.0, windStrNoise);
     fbmStrength *= fbmStrength;
-    fbmStrength *= w.windSpeed;
+    fbmStrength *= o.windSpeed;
     float fbmTurb = (windDirNoise * 2.0 - 1.0) * 0.3;
     float angle = windAngleSpeed.x * (BLADE_PI / 180.0);
     float2 globalDir = float2(sin(angle), cos(angle));
@@ -91,9 +101,20 @@ BladeWind EvalBladeWind(BladeInstance b, float time, float2 windAngleSpeed, floa
     float2 windDirXZ = normalize(normalize(globalDir + perp * fbmTurb));
     float alignment = dot(windDirXZ, b.facing.xz);
     float resistance = lerp(0.3, 1.0, abs(alignment));
-    w.bendDir = float3(windDirXZ.x, 0.0, windDirXZ.y);
-    w.bendStrength = fbmStrength * windDisplacement * resistance;
-    return w;
+    float windStrength = fbmStrength * windDisplacement * resistance;
+    float windAngle = saturate(windStrength / (b.bladeHeight * 0.8)) * 1.2;
+
+    float2 push = interaction * interactionDisplacement;
+    float pushLen = length(push);
+    float2 pushDir = (pushLen > 1e-4) ? push / pushLen : float2(0.0, 0.0);
+    float pushAngle = saturate(pushLen) * interactionMaxAngle;
+
+    float2 bend = windDirXZ * windAngle + pushDir * pushAngle;
+    float bendLen = length(bend);
+    o.bendAngle = min(bendLen, interactionMaxAngle);
+    float2 bendDirXZ = (bendLen > 1e-4) ? bend / bendLen : windDirXZ;
+    o.bendDir = float3(bendDirXZ.x, 0.0, bendDirXZ.y);
+    return o;
 }
 
 struct BladeVertex
@@ -105,7 +126,7 @@ struct BladeVertex
     float2 uv;
 };
 
-BladeVertex EvalBladeVertex(BladeInstance b, BladeWind w, uint localVert, uint segments, float time, float bladeWidth, Texture3D perlin, SamplerState smp)
+BladeVertex EvalBladeVertex(BladeInstance b, BladeBend w, uint localVert, uint segments, float time, float bladeWidth, Texture3D perlin, SamplerState smp)
 {
     BladeVertex v;
     float localX;
@@ -137,8 +158,8 @@ BladeVertex EvalBladeVertex(BladeInstance b, BladeWind w, uint localVert, uint s
     float3 P2 = b.pos + float3(0.0, h * 0.67, 0.0);
     float3 P3 = b.pos + float3(0.0, h, 0.0);
 
-    float bendAngle = saturate(w.bendStrength / (h * 0.8)) * 1.2 + turbulence * v.t;
-    if (w.bendStrength > 0.001)
+    float bendAngle = w.bendAngle + turbulence * v.t;
+    if (w.bendAngle > 0.001)
     {
         P3 += w.bendDir * (h * sin(bendAngle));
         P3.y -= h * (1.0 - cos(bendAngle));
