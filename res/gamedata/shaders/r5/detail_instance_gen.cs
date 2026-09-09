@@ -287,11 +287,13 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         else
         {
             DetailModelGPU mdl = g_detail_models[object_id];
-            float scale = mdl.maxScale * g_detail_height_multiplier;
-            float rotation = 0.0f;
-
             uint flags = asuint(mdl.flags);
             const uint DO_NO_WAVING = 0x0001;
+            bool pulled = (flags & DO_NO_WAVING) != 0 || g_grass_mode == 0u;
+
+            float scale = (pulled ? pcg_randF(r_scale, mdl.minScale * 0.5, mdl.maxScale * 0.9) : mdl.maxScale) * g_detail_height_multiplier;
+            float rotation = pulled ? pcg_randF(r_yaw, 0.0, TWO_PI) : 0.0;
+
             uint vis_id;
             if ((flags & DO_NO_WAVING) != 0)
                 vis_id = 0;

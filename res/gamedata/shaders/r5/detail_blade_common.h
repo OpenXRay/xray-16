@@ -45,12 +45,20 @@ struct BladeInstance
     float bladeHash;
 };
 
+uint BladeHash(float3 pos)
+{
+    uint h = asuint(pos.x) ^ (asuint(pos.z) * 0x9E3779B9u) ^ (asuint(pos.y) * 0x85EBCA6Bu);
+    h = (h ^ (h >> 16)) * 0x7FEB352Du;
+    h = (h ^ (h >> 15)) * 0x846CA68Bu;
+    return h ^ (h >> 16);
+}
+
 BladeInstance DecodeBlade(DetailInstance raw, Texture3D perlin, SamplerState smp, float heightMul)
 {
     BladeInstance b;
     b.pos = raw.pos;
     b.objectId = raw.packed & 0x3Fu;
-    b.rotation = float((raw.packed >> 8) & 0x3FFu) / 1023.0 * BLADE_TWO_PI;
+    b.rotation = float(BladeHash(raw.pos) & 0xFFFFu) / 65535.0 * BLADE_TWO_PI;
     b.scale = float((raw.packed >> 18) & 0x3FFu) / 1023.0 * BLADE_PACK_MAX_SCALE;
     float2 heightUv = b.pos.xz * BLADE_HEIGHT_NOISE_SCALE + float2(0.37, 0.73);
     float heightNoise = perlin.SampleLevel(smp, float3(heightUv, 0.0), 0).r;
