@@ -18,6 +18,7 @@ StructuredBuffer<InstanceData> g_AllInstances : register(t0);
 StructuredBuffer<GPUSlotData> g_SlotData : register(t1);
 StructuredBuffer<uint> g_VisibleIndices : register(t2);
 #include "common_samplers.h"
+#include "detail_blade_common.h"
 
 Texture3D g_WindTexture : register(t3);
 RWByteAddressBuffer g_Output : register(u0);
@@ -67,7 +68,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
 
     float3 base_pos = raw.pos;
     uint object_id = raw.packed & 0x3F;
-    float rotation = float((raw.packed >> 8) & 0x3FF) / 1023.0 * TWO_PI;
+    float rotation = float(BladeHash(raw.pos) & 0xFFFFu) / 65535.0 * TWO_PI;
     float scale = float((raw.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
 
     float2 height_uv = base_pos.xz * HEIGHT_NOISE_SCALE + float2(0.37, 0.73);

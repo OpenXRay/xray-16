@@ -298,6 +298,7 @@ public:
     nvrhi::TextureHandle heightmapTexture;
 
     float m_lastDensity = -1.0f;
+    u32 m_lastGrassMode = ~0u;
     bool m_instancesNeedRegeneration = true;
 
     nvrhi::BufferHandle instanceCounterBuffer;
