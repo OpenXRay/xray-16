@@ -2006,6 +2006,12 @@ void FGDetailManager::DispatchCulling(
         m_lastDensity = current_density;
         Msg("[DetailManager] Density changed to %.3f - regeneration needed", current_density);
     }
+    const u32 grassMode = ps_r__detail_gpu ? 1u : 0u;
+    if (grassMode != m_lastGrassMode)
+    {
+        m_instancesNeedRegeneration = true;
+        m_lastGrassMode = grassMode;
+    }
 
     ResizeVisibleBuffersIfNeeded(device);
 
@@ -2391,6 +2397,7 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
     DetailCullParams cullParams = {};
     cullParams.detailDensity = ps_current_detail_density;
     cullParams.totalSlotCount = slot_count;
+    cullParams.grassMode = ps_r__detail_gpu ? 1u : 0u;
     for (u32 i = 0; i < 6; i++)
         cullParams.frustumPlanes[i].set(0, 0, 0, 1000000.0f);
     cmdList->writeBuffer(renderDevice->GetNativeBuffer(cachedCullParamsCB), &cullParams, sizeof(cullParams));
