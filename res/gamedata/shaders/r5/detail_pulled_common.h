@@ -84,6 +84,21 @@ float3 PulledSway(float3 worldPos, float heightFactor, float time, float2 windAn
     return worldPos;
 }
 
+float3 PulledInteractionBend(PulledInstance inst, float3 worldPos, float2 interaction, float interactionDisplacement, float interactionMaxAngle)
+{
+    float2 push = interaction * interactionDisplacement;
+    float pushLen = length(push);
+    if (pushLen < 1e-4)
+        return worldPos;
+    float angle = saturate(pushLen) * interactionMaxAngle;
+    float2 dir = push / pushLen;
+    float3 local = worldPos - inst.pos;
+    float s = sin(angle);
+    float c = cos(angle);
+    float3 up = float3(dir.x * s, c, dir.y * s);
+    return inst.pos + float3(local.x, 0.0, local.z) + up * local.y;
+}
+
 float3 PulledFaceNormal(PulledInstance inst, PulledVertex v0, PulledVertex v1, PulledVertex v2)
 {
     float3 e1 = float3(v1.px - v0.px, v1.py - v0.py, v1.pz - v0.pz);
