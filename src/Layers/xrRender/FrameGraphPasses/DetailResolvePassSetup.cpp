@@ -11,6 +11,8 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 
+extern ENGINE_API int ps_r3_grass_interaction_debug;
+
 namespace xray::render::fg::passes {
 
 using namespace framegraph;
@@ -45,6 +47,8 @@ struct alignas(16) DetailResolveParams {
     float prevTime;
     u32 veinIndex;
     u32 segments[4];
+    u32 interactionDebug;
+    u32 pad[3];
 };
 
 }
@@ -145,6 +149,8 @@ MaterialResolveOutput setupDetailResolvePass(
                 return;
             if (!dm->generatedInstancesBuffer || !dm->perlin4dTexture || !dm->cachedGrassTintsBuffer)
                 return;
+            if (!dm->interactionTexture[0] || !dm->interactionTexture[1])
+                return;
             for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; ++lod)
                 if (!dm->visibleInstancesBuffer[lod])
                     return;
@@ -184,6 +190,8 @@ MaterialResolveOutput setupDetailResolvePass(
             for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; ++lod)
                 params.segments[lod] = FGDetailManager::LOD_SEGMENTS[lod];
             params.segments[3] = 0;
+            params.interactionDebug = ps_r3_grass_interaction_debug ? 1u : 0u;
+            params.pad[0] = params.pad[1] = params.pad[2] = 0;
             cmdList->writeBuffer(paramsCB, &params, sizeof(params));
 
             BindingSetBuilder bsb(*refl, nvDevice, "DetailResolve");
@@ -200,6 +208,8 @@ MaterialResolveOutput setupDetailResolvePass(
             bsb.BufferSRV("grass_object_tints", dm->cachedGrassTintsBuffer);
             bsb.BufferSRV("all_instances", dm->generatedInstancesBuffer);
             bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
+            bsb.Texture("g_Interaction", dm->interactionTexture[dm->interactionCurrent]);
+            bsb.Texture("g_InteractionPrev", dm->interactionTexture[dm->interactionCurrent ^ 1u]);
             bsb.Texture("g_VisID", visRT);
             bsb.Texture("g_Depth", depthRT);
             bsb.TextureUAV("g_OutNormal", normalRT);

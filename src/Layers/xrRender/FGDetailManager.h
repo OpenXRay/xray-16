@@ -68,8 +68,8 @@ public:
         Fvector4 g_wind_direction;
         float grass_wind_displacement;
         float grass_interaction_displacement;
-        u32 interaction_atlas_index;
-        u32 perlin4d_texture_index;
+        float grass_interaction_max_angle;
+        float grass_blade_width;
         Fvector4 grass_color_tip;
         Fvector4 grass_color_base;
         Fvector4 grass_sss_color;
@@ -77,8 +77,8 @@ public:
         float grass_blade_height;
         u32 buildDetailsIndex;
         u32 buildDetailsPbrIndex;
-        float grass_blade_width;
-        float pad0, pad1, pad2;
+        Fvector4 interaction_window;
+        Fvector4 interaction_window_prev;
     };
 
     struct DetailCullParams
@@ -103,6 +103,35 @@ public:
     };
 
     struct GrassObjectTint { float r, g, b, pad; };
+
+    struct InteractionEntity
+    {
+        Fvector pos;
+        float radius;
+        Fvector vel;
+        float weight;
+    };
+    static_assert(sizeof(InteractionEntity) == 32, "InteractionEntity must be 32 bytes");
+
+    struct InteractionParams
+    {
+        Fvector2 originCur;
+        Fvector2 originPrev;
+        int prevShiftX;
+        int prevShiftY;
+        float texelSize;
+        u32 size;
+        Fvector4 spring;
+        float contactRate;
+        float dt;
+        float maxVelocity;
+        u32 entityCount;
+        float heightmapMinX;
+        float heightmapMinZ;
+        float heightmapTexelSize;
+        u32 prevValid;
+    };
+    static_assert(sizeof(InteractionParams) == 80, "InteractionParams must be 80 bytes");
 
     struct DecalPulledVertex
     {
@@ -198,13 +227,29 @@ public:
     u32 visibleBufferCapacity = 0;
 
     nvrhi::TextureHandle perlin4dTexture;  // 3D volume (RGBA16F, 32³)
-    u32 perlin4dBindlessIndex = 0;         // not used for 3D — bound directly at t12
     static constexpr u32 PERLIN4D_TEXTURE_SIZE = 32;
 
     nvrhi::ShaderHandle perlin4dComputeShader;
     nvrhi::BindingLayoutHandle perlin4dBindingLayout;
     nvrhi::ComputePipelineHandle perlin4dPipeline;
     fg::BufferHandle perlin4dCB;
+
+    static constexpr u32 INTERACTION_TEXTURE_SIZE = 1024;
+    static constexpr float INTERACTION_TEXEL_SIZE = 0.0625f;
+    static constexpr u32 INTERACTION_MAX_ENTITIES = 64;
+
+    nvrhi::TextureHandle interactionTexture[2];
+    Fvector2 interactionOrigin[2] = {};
+    bool interactionValid[2] = {false, false};
+    u32 interactionCurrent = 0;
+    u32 interactionDispatchFrame = 0;
+    nvrhi::BufferHandle interactionEntityBuffer;
+    xr_vector<InteractionEntity> interactionEntities;
+
+    nvrhi::ShaderHandle interactionComputeShader;
+    nvrhi::BindingLayoutHandle interactionBindingLayout;
+    nvrhi::ComputePipelineHandle interactionPipeline;
+    fg::BufferHandle interactionCB;
 
     // Wind parameters (set from environment, consumed by detail/grass passes)
     Fvector2 windDirection = {1.0f, 0.0f};
@@ -309,6 +354,11 @@ public:
     bool LoadPerlin4DComputeShader(class framegraph::ShaderLoader* shaderLoader);
     bool CreatePerlin4DPipeline(nvrhi::IDevice* device);
     void DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, float time);
+
+    bool CreateInteractionResources(nvrhi::IDevice* device);
+    bool LoadInteractionComputeShader(class framegraph::ShaderLoader* shaderLoader);
+    bool CreateInteractionPipeline(nvrhi::IDevice* device);
+    void DispatchInteraction(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device);
 
     void FillFrameConstants(DetailFrameConstants& out);
     void UploadGrassTints(nvrhi::ICommandList* cmdList);

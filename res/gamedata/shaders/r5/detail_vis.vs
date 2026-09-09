@@ -15,8 +15,8 @@ cbuffer DetailGlobals : register(b3)
     float4 g_wind_direction;
     float grass_wind_displacement;
     float grass_interaction_displacement;
-    uint interaction_atlas_index;
-    uint perlin4d_texture_index;
+    float grass_interaction_max_angle;
+    float grass_blade_width;
     float4 grass_color_tip;
     float4 grass_color_base;
     float4 grass_sss_color;
@@ -24,8 +24,8 @@ cbuffer DetailGlobals : register(b3)
     float grass_blade_height;
     uint buildDetailsIndex;
     uint buildDetailsPbrIndex;
-    float grass_blade_width;
-    float3 detail_pad;
+    float4 interaction_window;
+    float4 interaction_window_prev;
 };
 
 cbuffer DetailVisParams : register(b5)
@@ -37,6 +37,7 @@ cbuffer DetailVisParams : register(b5)
 };
 
 Texture3D g_Perlin4D : register(t12);
+Texture2D g_Interaction : register(t13);
 StructuredBuffer<uint> visible_indices : register(t33);
 StructuredBuffer<DetailModelGPU> detail_models : register(t35);
 StructuredBuffer<PulledVertex> pulled_vertices : register(t36);
@@ -70,7 +71,11 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
         PulledVertex v = pulled_vertices[mdl.pulledVertexBase + vid];
         float3 wp = PulledWorldPos(inst, v);
         if (g_Kind == DETAIL_KIND_MESH)
+        {
+            float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, inst.pos.xz, interaction_window);
+            wp = PulledInteractionBend(inst, wp, inter, grass_interaction_displacement, grass_interaction_max_angle);
             wp = PulledSway(wp, PulledHeightFactor(v, mdl), wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+        }
         o.position = mul(m_VP, float4(wp, 1.0));
         o.uv = float2(v.u, v.v);
         return o;
@@ -79,7 +84,8 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
     uint corner = vid - tri * 3u;
     uint localVert = BladeTriangleVertex(tri, corner, g_Segments);
     BladeInstance b = DecodeBlade(raw, g_Perlin4D, smp_linear, grass_blade_height);
-    BladeWind w = EvalBladeWind(b, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+    float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, b.pos.xz, interaction_window);
+    BladeBend w = EvalBladeBend(b, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
     BladeVertex v = EvalBladeVertex(b, w, localVert, g_Segments, wave.w, grass_blade_width, g_Perlin4D, smp_linear);
     o.position = mul(m_VP, float4(v.pos, 1.0));
     o.uv = v.uv;

@@ -13,7 +13,12 @@ ENGINE_API float ps_r3_grass_wind_multiplier = 1.0f;     // Multiplier for envir
 ENGINE_API float ps_r3_grass_wind_min = 0.1f;            // Minimum wind speed
 ENGINE_API float ps_r3_grass_wind_lerp_rate = 2.0f;      // Speed of wind transitions
 ENGINE_API float ps_r3_grass_wind_displacement = 2.0f;   // Vertex displacement strength
-ENGINE_API float ps_r3_grass_interaction_displacement = 0.5f;  // Interaction displacement strength
+ENGINE_API float ps_r3_grass_interaction_displacement = 1.0f;
+ENGINE_API float ps_r3_grass_interaction_radius_scale = 1.3f;
+ENGINE_API float ps_r3_grass_interaction_frequency = 1.6f;
+ENGINE_API float ps_r3_grass_interaction_damping = 0.22f;
+ENGINE_API float ps_r3_grass_interaction_max_angle = 1.45f;
+ENGINE_API int ps_r3_grass_interaction_debug = 0;
 ENGINE_API u32 ps_r3_grass_wind_octaves = 5;             // FBM octave count
 
 // Grass color parameters (per object ID support)
@@ -579,6 +584,31 @@ void CEnvironment::on_tool_frame()
             if (ImGui::SliderInt("FBM quality (octaves)", &octaves, 1, 8))
                 ps_r3_grass_wind_octaves = (u32)octaves;
             ItemHelp("Number of noise octaves for wind generation (higher = more detail, slower)");
+        }
+
+        if (ImGui::CollapsingHeader("Grass Interaction", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::DragFloat("Interaction strength", &ps_r3_grass_interaction_displacement, 0.01f, 0.0f, 3.0f);
+            ItemHelp("Scales the pushed-aside amount before it is mapped to a bend angle (0 = off)");
+
+            ImGui::DragFloat("Footprint radius scale", &ps_r3_grass_interaction_radius_scale, 0.01f, 0.5f, 3.0f);
+            ItemHelp("Multiplies each entity's bounding-box footprint radius");
+
+            ImGui::DragFloat("Spring frequency (Hz)", &ps_r3_grass_interaction_frequency, 0.01f, 0.2f, 5.0f);
+            ItemHelp("Natural frequency of the spring-back after an entity leaves");
+
+            ImGui::DragFloat("Spring damping", &ps_r3_grass_interaction_damping, 0.005f, 0.01f, 0.98f);
+            ItemHelp("Damping ratio: low = several visible swings, high = settles without overshoot");
+
+            float maxAngleDeg = rad2deg(ps_r3_grass_interaction_max_angle);
+            if (ImGui::DragFloat("Flatten angle (deg)", &maxAngleDeg, 0.5f, 30.0f, 89.0f))
+                ps_r3_grass_interaction_max_angle = deg2rad(maxAngleDeg);
+            ItemHelp("Bend angle of grass directly under an entity");
+
+            bool interactionDebug = ps_r3_grass_interaction_debug != 0;
+            if (ImGui::Checkbox("Debug tint (r3_grass_interaction_debug)", &interactionDebug))
+                ps_r3_grass_interaction_debug = interactionDebug ? 1 : 0;
+            ItemHelp("Tints blades and tufts red by the interaction displacement sampled at their base");
         }
 
         // Grass Color controls
