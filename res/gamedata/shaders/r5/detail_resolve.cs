@@ -27,6 +27,7 @@ cbuffer DetailGlobals : register(b3)
     uint buildDetailsPbrIndex;
     float4 interaction_window;
     float4 interaction_window_prev;
+    float grass_normal_bend;
 };
 
 cbuffer DetailResolveParams : register(b5)
@@ -122,7 +123,8 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
     float2 uvDdx = InterpolateBaryDdx2(bd, uv0, uv1, uv2);
     float2 uvDdy = InterpolateBaryDdy2(bd, uv0, uv1, uv2);
     float heightParam = dot(bd.m_lambda, h);
-    float3 N = sway ? PulledFaceNormal(inst, pv0, pv1, pv2) : float3(0.0, 1.0, 0.0);
+    float3 local = InterpolateBary3(bd, float3(pv0.px, pv0.py, pv0.pz), float3(pv1.px, pv1.py, pv1.pz), float3(pv2.px, pv2.py, pv2.pz));
+    float3 N = sway ? PulledBentNormal(inst, mdl, local, grass_normal_bend) : float3(0.0, 1.0, 0.0);
 
     float4 texel = GetBindlessTexture(buildDetailsIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
     float3 albedo = texel.rgb;
@@ -138,7 +140,7 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
     }
     if (sway)
     {
-        float backlit = saturate(dot(N, -L_sun_dir_w) * 0.5 + 0.5);
+        float backlit = saturate(dot(N, L_sun_dir_w) * 0.5 + 0.5);
         float3 sss = grass_sss_color.rgb * (backlit * heightParam * grass_sss_color.w);
         albedo += sss * L_sun_color;
         if (g_InteractionDebug != 0u)
@@ -166,7 +168,7 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
 
     g_OutNormal[p] = float4(N, roughness);
     g_OutBaseColor[p] = float4(albedo, metallic);
-    g_OutColor[p] = float4(0.0, 0.0, 0.0, ao);
+    g_OutColor[p] = float4(0.0, 0.0, 0.0, -max(ao, 0.004));
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }

@@ -152,6 +152,11 @@ float3 PBRDirectLighting(
     return (diffuse + specular) * lightColor * NdotL;
 }
 
+float3 FoliageDirectLighting(float3 albedo, float3 N, float3 L, float3 lightColor)
+{
+    return albedo * (saturate(dot(N, L)) / PI) * lightColor;
+}
+
 // Simplified ambient term (placeholder for future IBL)
 float3 PBRAmbient(
     float3 albedo,
