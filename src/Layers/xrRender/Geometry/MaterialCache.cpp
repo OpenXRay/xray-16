@@ -1362,6 +1362,8 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
         if (matInfo.transparent) {
             matData.flags |= MAT_FLAG_ALPHA_BLEND;
         }
+        if (matInfo.foliage)
+            matData.flags |= MAT_FLAG_FOLIAGE;
         if (strstr(visual->shaderName.c_str(), "water") != nullptr)
             matData.flags |= MAT_FLAG_WATER;
         matData.shaderVariant = matInfo.shaderVariant;

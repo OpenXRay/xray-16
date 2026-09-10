@@ -38,7 +38,6 @@ static_assert(sizeof(MaterialData) == 32, "MaterialData must be 32 bytes for GPU
 
 enum MaterialFlags : u32 {
     MAT_FLAG_ALPHA_TEST    = (1 << 0),
-    MAT_FLAG_TWO_SIDED     = (1 << 1),
     MAT_FLAG_EMISSIVE      = (1 << 2),
     MAT_FLAG_HAS_DETAIL    = (1 << 3),
     MAT_FLAG_HAS_NORMAL    = (1 << 4),
@@ -47,6 +46,7 @@ enum MaterialFlags : u32 {
     MAT_FLAG_HAS_PBR_LAYER = (1 << 7),
     MAT_FLAG_ALPHA_BLEND   = (1 << 8),
     MAT_FLAG_WATER         = (1 << 9),
+    MAT_FLAG_FOLIAGE       = (1 << 10),
 };
 
 constexpr u32 MAX_TERRAIN_MATERIALS = 512 * 4;

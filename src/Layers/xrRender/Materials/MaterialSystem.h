@@ -24,6 +24,7 @@ public:
         u32 alphaRef = 0;
         bool transparent = false;
         u8 priority = 1;
+        bool foliage = false;
 
         float metallic = 0.0f;
         float roughness = 0.5f;

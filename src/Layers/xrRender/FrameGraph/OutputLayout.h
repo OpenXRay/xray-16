@@ -8,6 +8,7 @@ struct DefaultOutputLayout {
     VirtualResourceHandle albedo;
     VirtualResourceHandle normal;
     VirtualResourceHandle baseColor;
+    VirtualResourceHandle material;
     VirtualResourceHandle depth;
     VirtualResourceHandle distortion;
 };

@@ -27,6 +27,7 @@ struct MaterialResolvePassData {
     VirtualResourceHandle color;
     VirtualResourceHandle normal;
     VirtualResourceHandle baseColor;
+    VirtualResourceHandle material;
     VirtualResourceHandle motionVectors;
     VirtualResourceHandle visDepth;
     VirtualResourceHandle skinnedDrawArgs;
@@ -111,6 +112,7 @@ MaterialResolveOutput setupMaterialResolvePass(
     VirtualResourceHandle color,
     VirtualResourceHandle normal,
     VirtualResourceHandle baseColor,
+    VirtualResourceHandle material,
     VirtualResourceHandle skinnedDrawArgs,
     const ClusterDrawConfig& config,
     MaterialCache* materialCache,
@@ -142,7 +144,7 @@ MaterialResolveOutput setupMaterialResolvePass(
 
     auto& passData = fg.addCallbackPass<MaterialResolvePassData>(
         "Material Resolve",
-        [&, visId, depth, color, normal, baseColor, skinnedDrawArgs, config, materialCache, gpuCulling, splatBuffer, prevView, prevProj, motionValid, entryLimit, width, height, state, motionHandle, visDepthHandle](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
+        [&, visId, depth, color, normal, baseColor, material, skinnedDrawArgs, config, materialCache, gpuCulling, splatBuffer, prevView, prevProj, motionValid, entryLimit, width, height, state, motionHandle, visDepthHandle](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.materialCache = materialCache;
@@ -163,6 +165,7 @@ MaterialResolveOutput setupMaterialResolvePass(
             data.color = passBuilder.readWrite(color, ResourceState::UnorderedAccess);
             data.normal = passBuilder.readWrite(normal, ResourceState::UnorderedAccess);
             data.baseColor = passBuilder.readWrite(baseColor, ResourceState::UnorderedAccess);
+            data.material = passBuilder.readWrite(material, ResourceState::UnorderedAccess);
             data.motionVectors = passBuilder.write(motionHandle, ResourceState::UnorderedAccess);
             data.visDepth = passBuilder.write(visDepthHandle, ResourceState::UnorderedAccess);
         },
@@ -175,14 +178,16 @@ MaterialResolveOutput setupMaterialResolvePass(
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
             auto* baseColorRT = fg.GetPhysicalTexture(data.baseColor);
+            auto* materialRT = fg.GetPhysicalTexture(data.material);
             auto* motionRT = fg.GetPhysicalTexture(data.motionVectors);
             auto* visDepthRT = fg.GetPhysicalTexture(data.visDepth);
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            if (!visRT || !depthRT || !colorRT || !normalRT || !baseColorRT || !motionRT || !visDepthRT || !cmdList)
+            if (!visRT || !depthRT || !colorRT || !normalRT || !baseColorRT || !materialRT || !motionRT || !visDepthRT || !cmdList)
                 return;
 
             cmdList->clearTextureFloat(normalRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
             cmdList->clearTextureFloat(baseColorRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
+            cmdList->clearTextureFloat(materialRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
 
             const auto& config = data.config;
             if (!config.IsValid() || !config.UseMegaBuffers())
@@ -246,6 +251,7 @@ MaterialResolveOutput setupMaterialResolvePass(
             bsb.Texture("g_Depth", depthRT);
             bsb.TextureUAV("g_OutNormal", normalRT);
             bsb.TextureUAV("g_OutBaseColor", baseColorRT);
+            bsb.TextureUAV("g_OutMaterial", materialRT);
             bsb.TextureUAV("g_OutColor", colorRT);
             bsb.TextureUAV("g_OutMotion", motionRT);
             bsb.TextureUAV("g_OutVisDepth", visDepthRT);
@@ -268,6 +274,7 @@ MaterialResolveOutput setupMaterialResolvePass(
     out.color = passData.color;
     out.normal = passData.normal;
     out.baseColor = passData.baseColor;
+    out.material = passData.material;
     out.motionVectors = passData.motionVectors;
     out.visDepth = passData.visDepth;
     return out;

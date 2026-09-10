@@ -1004,6 +1004,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     baseColorDesc.isTransient = true;
     framegraph::VirtualResourceHandle baseColorBuffer = m_framegraph->CreateTexture("rt_BaseColor", baseColorDesc);
 
+    framegraph::ResourceDesc materialDesc = baseColorDesc;
+    materialDesc.debugName = "rt_Material";
+    materialDesc.format = nvrhi::Format::RG8_UNORM;
+    framegraph::VirtualResourceHandle materialBuffer = m_framegraph->CreateTexture("rt_Material", materialDesc);
+
     framegraph::VirtualResourceHandle prevNormalsHandle;
     if (m_hasPrevFrameData && m_normals[readIdx]) {
         framegraph::ResourceDesc prevNormalsDesc;
@@ -1303,6 +1308,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             sunOutput,
             normalBuffer,
             baseColorBuffer,
+            materialBuffer,
             skinnedDrawArgsBuffer,
             clusterConfig,
             m_materialCache.get(),
@@ -1337,6 +1343,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         sunOutput = resolved.color;
         normalBuffer = resolved.normal;
         baseColorBuffer = resolved.baseColor;
+        materialBuffer = resolved.material;
         visMotionHandle = resolved.motionVectors;
         visDepthHandle = resolved.visDepth;
     }
@@ -1345,6 +1352,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     gbufferOutputs.albedo = sunOutput;
     gbufferOutputs.normal = normalBuffer;
     gbufferOutputs.baseColor = baseColorBuffer;
+    gbufferOutputs.material = materialBuffer;
     gbufferOutputs.depth = depthBuffer;
 
     if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid()) {
@@ -1750,6 +1758,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Normal", transparentOutputs.normal);
     m_framegraph->GetRTRegistry().RegisterRT("rt_BaseColor", baseColorBuffer);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_Material", materialBuffer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Exposure", exposureOutput.exposureTexture);
     if (motionOutput.motionVectors.is_valid())
         m_framegraph->GetRTRegistry().RegisterRT("rt_MotionVectors", motionOutput.motionVectors);

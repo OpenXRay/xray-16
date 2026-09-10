@@ -109,6 +109,7 @@ public:
         u32 alphaRef = 0;
         bool writesDepth = true;
         bool strictB2F = false;
+        bool foliage = false;
     };
     bool GetBlenderProperties(LPCSTR blenderName, BlenderProperties& outProps);
     //.	BOOL							_GetDetailTexture	(LPCSTR Name, LPCSTR& T, R_constant_setup* &M);

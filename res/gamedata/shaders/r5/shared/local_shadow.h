@@ -23,25 +23,28 @@ uint LocalShadowCachedSlot(uint baseSlot, bool pointLight, float3 worldPos)
     return baseSlot + face;
 }
 
-float LocalShadowVisibility(uint slot, float3 wp, float3 N)
+float2 LocalShadow(uint slot, float3 wp, float3 N)
 {
     LocalShadowView t = g_LocalShadowTiles[slot];
     if (t.zparams.w < 0.5)
-        return 1.0;
+        return float2(1.0, 0.0);
     float4 c0 = mul(t.viewProj, float4(wp, 1.0));
     if (c0.w <= t.zparams.x)
-        return 1.0;
+        return float2(1.0, 0.0);
     float4 c = mul(t.viewProj, float4(wp + N * (c0.w * t.zparams.z), 1.0));
     if (c.w <= 0.0)
-        return 1.0;
+        return float2(1.0, 0.0);
     float2 ndc = c.xy / c.w;
     if (any(abs(ndc) > 1.0))
-        return 1.0;
+        return float2(1.0, 0.0);
     float2 pl = (ndc * 0.5 + 0.5) * t.rect.z;
     float dRef = c.w - t.rect.w;
+    float dSurf = c0.w - t.rect.w;
     float n = t.zparams.x;
     float f = t.zparams.y;
     float lit = 0.0;
+    float thickSum = 0.0;
+    float thickCnt = 0.0;
     for (int dy = -1; dy <= 1; ++dy)
     {
         for (int dx = -1; dx <= 1; ++dx)
@@ -51,10 +54,18 @@ float LocalShadowVisibility(uint slot, float3 wp, float3 N)
             float z = max(g_LocalShadowStatic.SampleLevel(smp_nofilter, uvw, 0),
                           g_LocalShadowDyn.SampleLevel(smp_nofilter, uvw, 0));
             float dOcc = n * f / (n + z * (f - n));
-            lit += (dOcc >= dRef) ? 1.0 : 0.0;
+            if (dOcc >= dRef)
+            {
+                lit += 1.0;
+            }
+            else
+            {
+                thickSum += max(dSurf - dOcc, 0.0);
+                thickCnt += 1.0;
+            }
         }
     }
-    return lit * (1.0 / 9.0);
+    return float2(lit * (1.0 / 9.0), thickCnt > 0.5 ? thickSum / thickCnt : 0.0);
 }
 
 #else
@@ -64,9 +75,9 @@ uint LocalShadowCachedSlot(uint baseSlot, bool pointLight, float3 worldPos)
     return 0xFFFFFFFFu;
 }
 
-float LocalShadowVisibility(uint slot, float3 wp, float3 N)
+float2 LocalShadow(uint slot, float3 wp, float3 N)
 {
-    return 1.0;
+    return float2(1.0, 0.0);
 }
 
 #endif
