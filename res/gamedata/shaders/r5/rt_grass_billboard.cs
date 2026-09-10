@@ -43,14 +43,23 @@ void main(uint3 dtid : SV_DispatchThreadID)
 
     uint vertCount = min(mdl.pulledIndexCount / 3, maxVertsPerBillboard / 3) * 3;
 
-    for (uint v = 0; v < vertCount; v++) {
-        uint vi = vertBase + v;
-        PulledVertex pv = g_PulledVerts[mdl.pulledVertexBase + v];
-        float3 n = PulledBentNormal(inst, mdl, float3(pv.px, pv.py, pv.pz), normalBend);
-        g_Output.Store3(vi * 24, asuint(PulledWorldPos(inst, pv)));
-        g_Output.Store(vi * 24 + 12, pack_normal(n));
-        g_Output.Store2(vi * 24 + 16, asuint(float2(pv.u, pv.v)));
-        g_OutputIB.Store(vi * 4, vi);
+    for (uint t = 0; t < vertCount; t += 3) {
+        PulledVertex pv0 = g_PulledVerts[mdl.pulledVertexBase + t];
+        PulledVertex pv1 = g_PulledVerts[mdl.pulledVertexBase + t + 1];
+        PulledVertex pv2 = g_PulledVerts[mdl.pulledVertexBase + t + 2];
+        float3 p0 = PulledWorldPos(inst, pv0);
+        float3 p1 = PulledWorldPos(inst, pv1);
+        float3 p2 = PulledWorldPos(inst, pv2);
+        float3 faceN = PulledFaceNormal(p0, p1, p2);
+        for (uint c = 0; c < 3; c++) {
+            uint vi = vertBase + t + c;
+            PulledVertex pv = (c == 0) ? pv0 : ((c == 1) ? pv1 : pv2);
+            float3 n = PulledBentNormal(inst, mdl, float3(pv.px, pv.py, pv.pz), faceN, normalBend);
+            g_Output.Store3(vi * 24, asuint((c == 0) ? p0 : ((c == 1) ? p1 : p2)));
+            g_Output.Store(vi * 24 + 12, pack_normal(n));
+            g_Output.Store2(vi * 24 + 16, asuint(float2(pv.u, pv.v)));
+            g_OutputIB.Store(vi * 4, vi);
+        }
     }
 
     for (uint w = vertCount; w < maxVertsPerBillboard; w++) {

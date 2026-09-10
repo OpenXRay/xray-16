@@ -79,9 +79,9 @@ public:
         Fvector4 interaction_window;
         Fvector4 interaction_window_prev;
         float grass_normal_bend;
+        u32 buildDetailsBumpIndex;
         float grass_pad0;
         float grass_pad1;
-        float grass_pad2;
     };
 
     struct DetailCullParams
@@ -215,6 +215,8 @@ public:
     u32 buildDetailsBindlessIndex = 0;
     nvrhi::TextureHandle buildDetailsPbrTexture;
     u32 buildDetailsPbrBindlessIndex = 0;
+    nvrhi::TextureHandle buildDetailsBumpTexture;
+    u32 buildDetailsBumpBindlessIndex = 0;
 
     nvrhi::BufferHandle visibleSlotIDsBuffer;
     nvrhi::BufferHandle visibleSlotCounterBuffer;

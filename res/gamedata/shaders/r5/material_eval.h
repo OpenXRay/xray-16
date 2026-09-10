@@ -22,17 +22,9 @@ float4 SampleDiffuseGrad(MaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy
 
 BumpSample SampleNormalGrad(MaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy)
 {
-    BumpSample result;
-    result.normal = float3(0, 0, 1);
-    result.gloss = 0.0;
     if (mat.normalIndex == INVALID_TEXTURE_INDEX)
-        return result;
-    float4 Nu = GetBindlessTexture(mat.normalIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
-    result.normal.x = Nu.a * 2.0 - 1.0;
-    result.normal.y = Nu.b * 2.0 - 1.0;
-    result.normal.z = sqrt(saturate(1.0 - result.normal.x * result.normal.x - result.normal.y * result.normal.y));
-    result.gloss = Nu.r * Nu.r;
-    return result;
+        return DecodeBump(float4(0.0, 0.0, 0.5, 0.5));
+    return DecodeBump(GetBindlessTexture(mat.normalIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy));
 }
 
 float4 SampleDetailGrad(MaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy)
@@ -95,12 +87,7 @@ float3 SampleTerrainNormalGrad(uint index, float2 uv, float2 uvDdx, float2 uvDdy
 {
     if (index == INVALID_TEXTURE_INDEX)
         return float3(0.0, 0.0, 1.0);
-    float4 Nu = GetBindlessTexture(index).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
-    float3 normal;
-    normal.x = Nu.a * 2.0 - 1.0;
-    normal.y = Nu.b * 2.0 - 1.0;
-    normal.z = sqrt(saturate(1.0 - normal.x * normal.x - normal.y * normal.y));
-    return normal;
+    return DecodeBump(GetBindlessTexture(index).SampleGrad(smp_linear, uv, uvDdx, uvDdy)).normal;
 }
 
 MaterialSurface EvalTerrainMaterial(TerrainMaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy, float3 vertexNormal, float3 tangent, float3 bitangent)
