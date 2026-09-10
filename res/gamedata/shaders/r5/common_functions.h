@@ -264,10 +264,12 @@ float3 shade_pbr(
 		sunVis = SunVisibility(worldPos, svPosition);
 
 	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
+	float3 sssColor = foliage ? albedo * foliage_sss.rgb * (foliage_sss.w * ao) : 0.0;
 	float3 finalColor;
 	if (foliage)
 	{
-		finalColor = FoliageDirectLighting(albedo, N, L, L_sun_color) * sunVis + albedo * ambientColor * ao;
+		float3 sunLight = FoliageDirectLighting(albedo, N, L, L_sun_color) + FoliageTransmission(N, V, L) * sssColor * L_sun_color;
+		finalColor = sunLight * sunVis + albedo * ambientColor * ao;
 	}
 	else
 	{
@@ -290,7 +292,7 @@ float3 shade_pbr(
 		float linearDepth = mul(m_V, float4(worldPos, 1.0)).z;
 		finalColor += EvaluateClusteredLights(
 			worldPos, N, V, albedo, metallic, roughness,
-			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode, foliage);
+			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode, foliage, sssColor);
 	}
 #endif
 

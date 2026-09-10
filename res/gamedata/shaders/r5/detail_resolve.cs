@@ -138,14 +138,8 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
         roughness = pbr.g;
         ao = pbr.b;
     }
-    if (sway)
-    {
-        float backlit = saturate(dot(N, L_sun_dir_w) * 0.5 + 0.5);
-        float3 sss = grass_sss_color.rgb * (backlit * heightParam * grass_sss_color.w);
-        albedo += sss * L_sun_color;
-        if (g_InteractionDebug != 0u)
-            albedo = lerp(albedo, float3(1.0, 0.0, 0.0), saturate(length(inter) * 4.0));
-    }
+    if (sway && g_InteractionDebug != 0u)
+        albedo = lerp(albedo, float3(1.0, 0.0, 0.0), saturate(length(inter) * 4.0));
 
     float2 motion = float2(0.0, 0.0);
     if (g_MotionValid != 0u)
