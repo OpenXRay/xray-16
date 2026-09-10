@@ -176,17 +176,16 @@ bool EnsureAtlasLayers(nvrhi::IDevice* nvDevice, LocalShadowState& state, u32 la
 
 nvrhi::IBuffer* FallbackTiles(nvrhi::IDevice* nvDevice)
 {
-    static nvrhi::BufferHandle s_tiles;
-    if (!s_tiles) {
+    static const nvrhi::BufferDesc desc = [] {
         nvrhi::BufferDesc desc;
         desc.debugName = "LocalShadow_TilesFallback";
         desc.byteSize = u64(kLocalTileCount) * sizeof(LocalShadowViewGPU);
         desc.structStride = sizeof(LocalShadowViewGPU);
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
-        s_tiles = nvDevice->createBuffer(desc);
-    }
-    return s_tiles;
+        return desc;
+    }();
+    return GetPassResourceCache().GetOrCreateStaticBuffer("LocalShadow", "TilesFallback", desc, nvDevice);
 }
 
 bool EnsureResources(nvrhi::IDevice* nvDevice, LocalShadowState& state)
@@ -1541,23 +1540,6 @@ LocalShadowOutput setupLocalShadowPasses(
     return out;
 }
 
-static nvrhi::ITexture* FallbackShadowArray(nvrhi::IDevice* device)
-{
-    static nvrhi::TextureHandle texture;
-    if (!texture) {
-        nvrhi::TextureDesc desc;
-        desc.debugName = "LocalShadow_FallbackArray";
-        desc.width = desc.height = 1;
-        desc.dimension = nvrhi::TextureDimension::Texture2DArray;
-        desc.format = nvrhi::Format::D32;
-        desc.isRenderTarget = true;
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
-        desc.keepInitialState = true;
-        texture = device->createTexture(desc);
-    }
-    return texture;
-}
-
 void ResolveLocalShadowBindings(
     const framegraph::FrameGraph& fg,
     const LocalShadowOutput& out,
@@ -1576,9 +1558,9 @@ void ResolveLocalShadowBindings(
         dynAtlas = fg.GetPhysicalTexture(out.dynAtlas);
     }
     if (!staticAtlas)
-        staticAtlas = FallbackShadowArray(device);
+        staticAtlas = GetPassResourceCache().GetDummyShadowMap(device);
     if (!dynAtlas)
-        dynAtlas = FallbackShadowArray(device);
+        dynAtlas = GetPassResourceCache().GetDummyShadowMap(device);
 }
 
 }
