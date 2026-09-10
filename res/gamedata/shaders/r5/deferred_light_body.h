@@ -44,7 +44,7 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
 #else
     float sunVis = 1.0;
 #endif
-    float3 lit = c.rgb + shade_pbr(bc.rgb, normalize(n.xyz), worldPos, bc.a, abs(n.w), c.a, float4(pixel, depth, 1.0), sunVis);
+    float3 lit = c.rgb + shade_pbr(bc.rgb, normalize(n.xyz), worldPos, bc.a, abs(n.w), abs(c.a), float4(pixel, depth, 1.0), sunVis, c.a < 0.0);
 #if TILE_SUN_MIXED
     if (dev_param_3.y > 0.5)
         lit = SunShadowDebugColor(lit, worldPos);

@@ -79,6 +79,10 @@ public:
         u32 buildDetailsPbrIndex;
         Fvector4 interaction_window;
         Fvector4 interaction_window_prev;
+        float grass_normal_bend;
+        float grass_pad0;
+        float grass_pad1;
+        float grass_pad2;
     };
 
     struct DetailCullParams

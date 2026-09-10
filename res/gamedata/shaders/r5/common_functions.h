@@ -254,7 +254,8 @@ float3 shade_pbr(
 	float roughness,
 	float ao,
 	float4 svPosition,
-	float sunVis)
+	float sunVis,
+	bool foliage = false)
 {
 	float3 V = normalize(eye_position - worldPos);
 	float3 L = normalize(-L_sun_dir_w);
@@ -262,20 +263,26 @@ float3 shade_pbr(
 	if (sunVis < 0.0)
 		sunVis = SunVisibility(worldPos, svPosition);
 
-	float3 sunLight = PBRDirectLighting(
-		albedo, N, V, L,
-		L_sun_color,
-		metallic, roughness, (uint)pbr_diffuse_mode
-	) * sunVis;
-
 	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
-	float3 ambient = PBRAmbient(
-		albedo, N, V,
-		metallic, roughness, ao,
-		ambientColor
-	);
-
-	float3 finalColor = sunLight + ambient;
+	float3 finalColor;
+	if (foliage)
+	{
+		finalColor = FoliageDirectLighting(albedo, N, L, L_sun_color) * sunVis + albedo * ambientColor * ao;
+	}
+	else
+	{
+		float3 sunLight = PBRDirectLighting(
+			albedo, N, V, L,
+			L_sun_color,
+			metallic, roughness, (uint)pbr_diffuse_mode
+		) * sunVis;
+		float3 ambient = PBRAmbient(
+			albedo, N, V,
+			metallic, roughness, ao,
+			ambientColor
+		);
+		finalColor = sunLight + ambient;
+	}
 
 #ifdef CLUSTERED_LIGHTING_FORWARD
 	if (svPosition.w != 0)
@@ -283,7 +290,7 @@ float3 shade_pbr(
 		float linearDepth = mul(m_V, float4(worldPos, 1.0)).z;
 		finalColor += EvaluateClusteredLights(
 			worldPos, N, V, albedo, metallic, roughness,
-			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode);
+			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode, foliage);
 	}
 #endif
 

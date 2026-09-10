@@ -99,14 +99,12 @@ float3 PulledInteractionBend(PulledInstance inst, float3 worldPos, float2 intera
     return inst.pos + float3(local.x, 0.0, local.z) + up * local.y;
 }
 
-float3 PulledFaceNormal(PulledInstance inst, PulledVertex v0, PulledVertex v1, PulledVertex v2)
+float3 PulledBentNormal(PulledInstance inst, DetailModelGPU mdl, float3 local, float bend)
 {
-    float3 e1 = float3(v1.px - v0.px, v1.py - v0.py, v1.pz - v0.pz);
-    float3 e2 = float3(v2.px - v0.px, v2.py - v0.py, v2.pz - v0.pz);
-    float3 n = cross(e1, e2);
-    float len = length(n);
-    n = (len > 0.001) ? (n / len) : float3(0.0, 1.0, 0.0);
-    return PulledRotate(inst, n);
+    float3 radial = float3(local.x / max(mdl.geomExtentX * 0.5, 0.01), max(local.y, 0.0) / max(mdl.geomExtentY, 0.01), local.z / max(mdl.geomExtentZ * 0.5, 0.01));
+    float len = length(radial);
+    radial = (len > 1e-4) ? (radial / len) : float3(0.0, 1.0, 0.0);
+    return PulledRotate(inst, normalize(lerp(float3(0.0, 1.0, 0.0), radial, bend)));
 }
 
 #endif
