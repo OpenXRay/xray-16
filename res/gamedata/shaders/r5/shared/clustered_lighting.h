@@ -79,7 +79,8 @@ float3 EvaluateClusteredLights(
     float2 screenPos,
     float linearDepth,
     uint diffuseMode,
-    bool foliage = false)
+    bool foliage = false,
+    float3 sssColor = 0.0)
 {
     uint numLights = (uint)cluster_params.w;
     if (numLights == 0)
@@ -142,9 +143,10 @@ float3 EvaluateClusteredLights(
 
         if (atten > 0.001f)
         {
+            float3 lc = lightColor * atten;
             float3 litColor = foliage
-                ? FoliageDirectLighting(albedo, N, L, lightColor * atten)
-                : PBRDirectLighting(albedo, N, V, L, lightColor * atten, metallic, roughness, diffuseMode);
+                ? FoliageDirectLighting(albedo, N, L, lc) + FoliageTransmission(N, V, L) * sssColor * lc
+                : PBRDirectLighting(albedo, N, V, L, lc, metallic, roughness, diffuseMode);
             totalLight += litColor;
         }
     }

@@ -66,6 +66,8 @@ cbuffer	static_globals : register(b2)
 	float4		dev_param_2;
 	float4		dev_param_3;
 	float4		dev_param_4;
+
+	float4		foliage_sss;
 };
 
 /*
